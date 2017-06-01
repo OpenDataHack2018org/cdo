@@ -75,9 +75,9 @@ void *Vertcum(void *argument)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
-  int *varnmiss[nvars];
-  double **vardata1[nvars];
-  double **vardata2[nvars];
+  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));
+  double ***vardata1 = (double***) Malloc(nvars*sizeof(double**));
+  double ***vardata2 = (double***) Malloc(nvars*sizeof(double**));
 
   int zaxisIDhl = -1;
 
@@ -105,9 +105,10 @@ void *Vertcum(void *argument)
                       zaxisInqVct(zaxisID, vct);
 
                       zaxisIDhl = zaxisCreate(ZAXIS_HYBRID_HALF, nlevshl);
-                      double levels[nlevshl];
+                      double *levels = (double*) Malloc(nlevshl*sizeof(double));
                       for ( levelID = 0; levelID < nlevshl; ++levelID ) levels[levelID] = levelID+1;
                       zaxisDefLevels(zaxisIDhl, levels);
+                      Free(levels);
                       zaxisDefVct(zaxisIDhl, nvct, vct);
                       vlistChangeZaxisIndex(vlistID2, i, zaxisIDhl);
                     }
@@ -229,6 +230,10 @@ void *Vertcum(void *argument)
       Free(vardata2[varID]);
       Free(varnmiss[varID]);
     }
+
+  Free(vardata1);
+  Free(vardata2);
+  Free(varnmiss);
 
   streamClose(streamID2);
   streamClose(streamID1);

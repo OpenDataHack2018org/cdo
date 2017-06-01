@@ -91,7 +91,7 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
 		double *restrict rh_pbl, double *restrict theta_pbl, double *restrict *restrict vars_pbl, 
 		double *restrict zt2, double *restrict zq2)
 {
-  long k, iv, ijk, ijk1, ijk2;
+  long ijk, ijk1, ijk2;
   long jlev = 0, jlevr, jnop;
   long klo;
   long jjblt;
@@ -108,13 +108,13 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
   /* pressure */
   ph1[0]   =  0.0;
   lnph1[0] = -1.0; 
-  for ( k = 1; k < nlev1p1; ++k )
+  for ( int k = 1; k < nlev1p1; ++k )
     {
       ph1[k]   = ah1[k]+bh1[k]*ps1[ij];
       lnph1[k] = log(ph1[k]);
     } 
 
-  for ( k = 0; k < nlev1; ++k )
+  for ( int k = 0; k < nlev1; ++k )
     {
       pf1[k]   = af1[k]+bf1[k]*ps1[ij];
       lnpf1[k] = log(pf1[k]);
@@ -122,7 +122,7 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
 
   /* virtual temperature, relative humidity, potential temperature */
   if ( ltq )
-    for ( k = 0; k < nlev1; ++k )
+    for ( int k = 0; k < nlev1; ++k )
       {
 	ijk = k*ngp+ij;
 	zq1 = q1[ijk];
@@ -137,20 +137,20 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
     {
       fi1[0] = 0.0;
       fi1[nlev1] = fis1[ij];
-      for ( k = nlev1-1; k > 0; --k )
+      for ( int k = nlev1-1; k > 0; --k )
 	{
 	  fi1[k] = fi1[k+1]+rair*tv1[k]*(lnph1[k+1]-lnph1[k]);
 	}
     }
 #if defined(OUTPUT)
   if ( ij == OPOINT )
-    for ( k = nlev1-1; k >= 0; --k )
+    for ( int k = nlev1-1; k >= 0; --k )
       { 
 	ijk = k*ngp+ij;
 	if ( ltq ) { t = t1[ijk]; q = q1[ijk]; fi = fi1[k]; }
 	else       { t = 0; q = 0; fi = 0; }
 	fprintf(old, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi/g, pf1[k], t, q);
-	for ( iv = 0; iv < nvars; ++iv ) fprintf(old, " %18.10f", vars1[iv][ijk]);
+	for ( int iv = 0; iv < nvars; ++iv ) fprintf(old, " %18.10f", vars1[iv][ijk]);
 	fprintf(old, "\n");
       }
 #endif
@@ -162,7 +162,7 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
   */
   if ( ltq )
     {
-      for ( k = nlev1-2; k > 0; --k )
+      for ( int k = nlev1-2; k > 0; --k )
 	{
 	  /* find index for regression, 1 <= jlev <= nlevec-2 */
 	  jlev = k;
@@ -173,7 +173,7 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
       
       /* get the number of points used for estimation of regression coefficients */
       jlevr = 0;
-      for ( k = jlev-1; k > 0; --k )
+      for ( int k = jlev-1; k > 0; --k )
 	{
 	  jlevr = k;
 	  double zdffl = fi1[k]-fi1[jlev+1];
@@ -191,7 +191,7 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
       double zsumpp = 0.0;
       double zsumtp = 0.0;
 
-      for ( k = jlevr; k <= jlev+1; ++k )
+      for ( int k = jlevr; k <= jlev+1; ++k )
 	{
 	  zsumt  = zsumt  + tv1[k];
 	  zsump  = zsump  + lnpf1[k];
@@ -228,13 +228,13 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
 
   ph2[0]   =  0.0;
   lnph2[0] = -1.0; 
-  for ( k = 1; k < nlev2p1; ++k )
+  for ( int k = 1; k < nlev2p1; ++k )
     {
       ph2[k]   = ah2[k]+bh2[k]* ps2[ij];
       lnph2[k] = log(ph2[k]);
     } 
 
-  for ( k = 0; k < nlev2; ++k )
+  for ( int k = 0; k < nlev2; ++k )
     {
       pf2[k]   = af2[k]+bf2[k]* ps2[ij];
       /* lnpf2[k] = log(pf2[k]); */
@@ -246,7 +246,7 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
     {
       /* using old pressure at half levels
 	 find first level below reference pressure */
-      for ( k = 1; k < nlev1p1; ++k )
+      for ( int k = 1; k < nlev1p1; ++k )
 	{
 	  jlev = k;
 	  if ( ph1[k] > p_firef ) break;
@@ -261,7 +261,7 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
   /* using the pressure from the old system */
   double pbl_lim = ps1[ij]*eta_pbl;
   jjblt = nlev2-1;
-  for ( k = nlev2-1; k > 0; --k )
+  for ( int k = nlev2-1; k > 0; --k )
     {
       /* find the next upper level in new system */
       double pbl_lim_need = ps2[ij] *etah2[k];
@@ -276,14 +276,14 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
   /* tension spline interpolation with full eta levels */
 
   if ( ltq )
-    for ( k = jjblt; k < nlev2; ++k )
+    for ( int k = jjblt; k < nlev2; ++k )
       {
 	theta_pbl[k] = w1[k]*theta1[jl1[k]] + w2[k]*theta1[jl2[k]];
 	rh_pbl[k]    = w1[k]*rh1[jl1[k]]    + w2[k]*rh1[jl2[k]];
       }
 
-  for ( iv = 0; iv < nvars; ++iv )
-    for ( k = jjblt; k < nlev2; ++k )
+  for ( int iv = 0; iv < nvars; ++iv )
+    for ( int k = jjblt; k < nlev2; ++k )
       {
 	ijk1 = jl1[k]*ngp+ij;
 	ijk2 = jl2[k]*ngp+ij;
@@ -293,25 +293,25 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
   /******* linear interpolation using pressure in free atmosphere
 	   pressure in new system using preliminary pressure */
 
-  for ( k = 0; k <= jjblt; ++k )
+  for ( int k = 0; k <= jjblt; ++k )
     {
       idx[k] = int_index(nlev1, pf1, pf2[k]);
     }
 
-  for ( k = 0; k <= jjblt; ++k )
+  for ( int k = 0; k <= jjblt; ++k )
     {
       wgt[k] = (pf1[idx[k]+1]-pf2[k])/(pf1[idx[k]+1]-pf1[idx[k]]);
     }
 
   if ( ltq )
     {
-      for ( k = 0; k < nlev1; ++k )
+      for ( int k = 0; k < nlev1; ++k )
 	{
 	  ijk = k*ngp+ij;
 	  zvar[k] = t1[ijk];
 	}
 
-      for ( k = 0; k <= jjblt; ++k )
+      for ( int k = 0; k <= jjblt; ++k )
 	{
 	  klo = idx[k];
 	  zt2[k] = wgt[k]*zvar[klo] + (1-wgt[k])*zvar[klo+1];
@@ -319,14 +319,14 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
 	}
     }
 
-  for ( iv = 0; iv < nvars; ++iv )
+  for ( int iv = 0; iv < nvars; ++iv )
     {
-      for ( k = 0; k < nlev1; ++k )
+      for ( int k = 0; k < nlev1; ++k )
 	{
 	  ijk = k*ngp+ij;
 	  zvar[k] = vars1[iv][ijk];
 	}
-      for ( k = 0; k <= jjblt; ++k )
+      for ( int k = 0; k <= jjblt; ++k )
 	{
 	  ijk = k*ngp+ij;
 	  klo = idx[k];
@@ -346,28 +346,28 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
     }
 
   ijk = jjblt*ngp+ij;
-  for ( iv = 0; iv < nvars; ++iv )
+  for ( int iv = 0; iv < nvars; ++iv )
     {
       vars2[iv][ijk] = 0.5*(vars2[iv][ijk]+vars_pbl[iv][jjblt]);
     }
 
   /* correct boundary profile values */
   if ( ltq )
-    for ( k = jjblt+1; k < nlev2; ++k ) 
+    for ( int k = jjblt+1; k < nlev2; ++k ) 
       {
 	zt2[k] = (theta_pbl[k]+dteta)*pow(pf2[k]/apr, rair_d_cpair);
 	rh2[k] = rh_pbl[k];
       }
 
-  for ( iv = 0; iv < nvars; ++iv )
-    for ( k = jjblt+1; k < nlev2; ++k ) 
+  for ( int iv = 0; iv < nvars; ++iv )
+    for ( int k = jjblt+1; k < nlev2; ++k ) 
       {
 	ijk = k*ngp+ij;
 	vars2[iv][ijk] = vars_pbl[iv][k];
       }
 
   if ( ltq )
-    for ( k = 0; k < nlev2; ++k )
+    for ( int k = 0; k < nlev2; ++k )
       {
 	zq2[k] = rh2[k]*epsilon*esat(zt2[k])/pf2[k];
       }
@@ -380,13 +380,13 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
       fi2[0]     = -1.0; /* top not defined, infinity */
     
       /* problem at top level, top pressure is zero per definition */
-      for ( k = nlev2-1; k > 0; --k )
+      for ( int k = nlev2-1; k > 0; --k )
 	{
 	  fi2[k] = fi2[k+1]+rair*zt2[k]*(lnph2[k+1]-lnph2[k])*(1.0+epsm1i*zq2[k]);
 	}
 
       /* search next level above reference level in new system */
-      for ( k = nlev2-1; k > 0; --k )
+      for ( int k = nlev2-1; k > 0; --k )
 	{ 
 	  jlev = k; 
 	  if (ph2[k] < p_firef) break;
@@ -402,22 +402,22 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
   /******* final calculation of specific humidity profiles */
   if ( ltq )
     {
-      for ( k = 0; k < nlev2; ++k )
+      for ( int k = 0; k < nlev2; ++k )
 	pf2[k] = af2[k] + bf2[k]* ps2[ij];
 
-      for ( k = 0; k < nlev2; ++k )
+      for ( int k = 0; k < nlev2; ++k )
 	zq2[k] = rh2[k]*epsilon*esat(zt2[k])/pf2[k];
     }
 
 #if defined(OUTPUT)
   if ( ij == OPOINT )
-    for ( k = nlev2-1; k >= 0; --k )
+    for ( int k = nlev2-1; k >= 0; --k )
       { 
 	ijk = k*ngp+ij;
 	if ( ltq ) { t = t2[k]; q = zq2[k]; fi = fi2[k]; }
 	else       { t = 0; q = 0; fi = 0; }
 	fprintf(new, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi/g, pf2[k], t, q);
-	for ( iv = 0; iv < nvars; ++iv ) fprintf(new, " %18.10f", vars2[iv][ijk]);
+	for ( int iv = 0; iv < nvars; ++iv ) fprintf(new, " %18.10f", vars2[iv][ijk]);
 	fprintf(new, "\n");
       }
 #endif
@@ -434,7 +434,7 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
     }
 
   if ( ltq )
-    for ( k = 0; k < nlev2; ++k ) 
+    for ( int k = 0; k < nlev2; ++k ) 
       {
 	ijk = k*ngp+ij;
 	t2[ijk] = zt2[k];
@@ -455,7 +455,6 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 {
   double epsm1i;
   long jblt;
-  long k, iv;
   long jlev = 0;
   double *zt2 = NULL, *zq2 = NULL;
   double /* *etah1,*/ *ph1, *lnph1, *fi1;
@@ -471,7 +470,6 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   long *idx;
   int lpsmod = 1;
 #if defined(_OPENMP)
-  long i;
   extern int ompNumThreads;
   double *vars_pbl[MAX_VARS];
 #else
@@ -488,36 +486,36 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   long nlev2p1 = nlev2+1;
 
 #if defined(_OPENMP)
-  double *ph1_2[ompNumThreads];
-  double *lnph1_2[ompNumThreads];
-  double *fi1_2[ompNumThreads];
+  double **ph1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **lnph1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **fi1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
 
-  double *pf1_2[ompNumThreads];
-  double *lnpf1_2[ompNumThreads];
-  double *tv1_2[ompNumThreads];
-  double *theta1_2[ompNumThreads];
-  double *rh1_2[ompNumThreads];
-  double *zvar_2[ompNumThreads];
+  double **pf1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **lnpf1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **tv1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **theta1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **rh1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **zvar_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
 
-  double *ph2_2[ompNumThreads];
-  double *lnph2_2[ompNumThreads];
-  double *fi2_2[ompNumThreads];
+  double **ph2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **lnph2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **fi2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
 
-  double *pf2_2[ompNumThreads];
-  double *rh2_2[ompNumThreads];
-  double *wgt_2[ompNumThreads];
-  long   *idx_2[ompNumThreads];
+  double **pf2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **rh2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **wgt_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  long   **idx_2 = (long**) Malloc(ompNumThreads*sizeof(long*));
 
   // if ( ltq )
-  double *zt2_2[ompNumThreads];
-  double *zq2_2[ompNumThreads];
-  double *rh_pbl_2[ompNumThreads];
-  double *theta_pbl_2[ompNumThreads];
+  double **zt2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **zq2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **rh_pbl_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **theta_pbl_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
 
   // if ( nvars > 0 )
-  double **vars_pbl_2[ompNumThreads];
+  double ***vars_pbl_2 = (double***) Malloc(ompNumThreads*sizeof(double**));
 
-  for ( i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < ompNumThreads; i++ )
     {
       ph1_2[i]    = (double*) Malloc(nlev1p1*sizeof(double));
       lnph1_2[i]  = (double*) Malloc(nlev1p1*sizeof(double));
@@ -555,7 +553,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 	      exit(-1);
 	    }
 	  vars_pbl_2[i]  = (double **) Malloc(nvars*sizeof(double *));
-	  for ( iv = 0; iv < nvars; ++iv )
+	  for ( int iv = 0; iv < nvars; ++iv )
 	    vars_pbl_2[i][iv] = (double*) Malloc(nlev2*sizeof(double));
 	}
     }
@@ -593,25 +591,25 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   if ( nvars > 0 )
     {
       vars_pbl  = (double **) Malloc(nvars*sizeof(double *));
-      for ( iv = 0; iv < nvars; ++iv )
+      for ( int iv = 0; iv < nvars; ++iv )
 	vars_pbl[iv] = (double*) Malloc(nlev2*sizeof(double));
     }
 #endif
   
-  double af1[nlev1];
-  double bf1[nlev1];
-  double etaf1[nlev1];
+  double *af1 = (double*) Malloc(nlev1*sizeof(double));
+  double *bf1 = (double*) Malloc(nlev1*sizeof(double));
+  double *etaf1 = (double*) Malloc(nlev1*sizeof(double));
 
-  double etah2[nlev2p1];
+  double *etah2 = (double*) Malloc(nlev2p1*sizeof(double));
 
-  double af2[nlev2];
-  double bf2[nlev2];
-  double etaf2[nlev2];
+  double *af2 = (double*) Malloc(nlev2*sizeof(double));
+  double *bf2 = (double*) Malloc(nlev2*sizeof(double));
+  double *etaf2 = (double*) Malloc(nlev2*sizeof(double));
 
-  double w1[nlev2];
-  double w2[nlev2];
-  long jl1[nlev2];
-  long jl2[nlev2];
+  double *w1 = (double*) Malloc(nlev2*sizeof(double));
+  double *w2 = (double*) Malloc(nlev2*sizeof(double));
+  long *jl1 = (long*) Malloc(nlev2*sizeof(long));
+  long *jl2 = (long*) Malloc(nlev2*sizeof(long));
 
   /******* set coordinate system ETA's, A's, B's
 	   calculate half and full level ETA
@@ -619,14 +617,14 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
   /* input system */
 
-  for ( k = 0; k < nlev1; ++k )
+  for ( int k = 0; k < nlev1; ++k )
     {
       af1[k] = 0.5*(ah1[k]+ah1[k+1]);
       bf1[k] = 0.5*(bh1[k]+bh1[k+1]);
     }
 
   /* etah1[nlev1] = ah1[nlev1]*aipr+bh1[nlev1]; */
-  for ( k = 0; k < nlev1; ++k )
+  for ( int k = 0; k < nlev1; ++k )
     { 
       /* etah1[k] = ah1[k]*aipr+bh1[k]; */
       etaf1[k] = af1[k]*aipr+bf1[k];
@@ -635,7 +633,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   /* output system */
 
   /* calculates full level VCT */
-  for ( k = 0; k < nlev2; ++k )
+  for ( int k = 0; k < nlev2; ++k )
     {
       af2[k] = 0.5*(ah2[k]+ah2[k+1]);
       bf2[k] = 0.5*(bh2[k]+bh2[k+1]);
@@ -643,7 +641,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
   etah2[nlev2] = ah2[nlev2]*aipr+bh2[nlev2];
   jblt = nlev2;
-  for ( k = nlev2-1; k >= 0; --k )
+  for ( int k = nlev2-1; k >= 0; --k )
     { 
       etah2[k] = ah2[k]*aipr+bh2[k];
       etaf2[k] = af2[k]*aipr+bf2[k];
@@ -651,7 +649,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
     }
 
   /* calculate weights for PBL interpolation */
-  for ( k = 0; k < nlev2; ++k )
+  for ( int k = 0; k < nlev2; ++k )
     {
       /* scan through new vertical levels
 	 set changes outside the full level eta's of old system to constant */
@@ -762,7 +760,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
 
 #if defined(_OPENMP)
-  for ( i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < ompNumThreads; i++ )
     {
       Free(ph1_2[i]);    
       Free(lnph1_2[i]);  
@@ -795,12 +793,33 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
       if ( nvars > 0 )
 	{
-	  for ( iv = 0; iv < nvars; ++iv )
+	  for ( int iv = 0; iv < nvars; ++iv )
 	    Free(vars_pbl_2[i][iv]);
 	  
 	  Free(vars_pbl_2[i]);
 	}
     }
+  Free(ph1_2);
+  Free(lnph1_2);
+  Free(fi1_2);
+  Free(pf1_2);
+  Free(lnpf1_2);
+  Free(tv1_2);
+  Free(theta1_2);
+  Free(rh1_2);
+  Free(zvar_2);
+  Free(ph2_2);
+  Free(lnph2_2);
+  Free(fi2_2);
+  Free(pf2_2);
+  Free(rh2_2);
+  Free(wgt_2);
+  Free(idx_2);
+  Free(zt2_2);
+  Free(zq2_2);
+  Free(rh_pbl_2);
+  Free(theta_pbl_2);
+  Free(vars_pbl_2);
 #else
   /* Free(etah1); */     
   Free(ph1);    
@@ -834,12 +853,24 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
   if ( nvars > 0 )
     {
-      for ( iv = 0; iv < nvars; ++iv )
+      for ( int iv = 0; iv < nvars; ++iv )
         Free(vars_pbl[iv]);
 
       Free(vars_pbl);
     }
 #endif
+
+  Free(af1);
+  Free(bf1);
+  Free(etaf1);
+  Free(etah2);
+  Free(af2);
+  Free(bf2);
+  Free(etaf2);
+  Free(w1);
+  Free(w2);
+  Free(jl1);
+  Free(jl2);
 
   return;
 }

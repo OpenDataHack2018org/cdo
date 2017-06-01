@@ -36,19 +36,17 @@ void *Change_e5slm(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
-
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int vlistID2 = vlistDuplicate(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamDefVlist(streamID2, vlistID2);
-
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   /* get filename of SLM */
   operatorInputArg("filename of the sea land mask");
@@ -57,10 +55,10 @@ void *Change_e5slm(void *argument)
 
   /* read SLM */
   argument_t *fileargument = file_argument_new(fn_slm);
-  int streamIDslm = streamOpenRead(fileargument);
+  int streamIDslm = pstreamOpenRead(fileargument);
   file_argument_free(fileargument);
 
-  int vlistIDslm = streamInqVlist(streamIDslm);
+  int vlistIDslm = pstreamInqVlist(streamIDslm);
 
   long gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
 
@@ -68,10 +66,10 @@ void *Change_e5slm(void *argument)
   double *cland = (double*) Malloc(gridsize*sizeof(double));
   bool *lsea  = (bool*) Malloc(gridsize*sizeof(bool));
 
-  streamInqTimestep(streamIDslm, 0);
+  pstreamInqTimestep(streamIDslm, 0);
 
-  streamInqRecord(streamIDslm, &varID, &levelID);
-  streamReadRecord(streamIDslm, cland, &nmiss);
+  pstreamInqRecord(streamIDslm, &varID, &levelID);
+  pstreamReadRecord(streamIDslm, cland, &nmiss);
 
   if ( nmiss > 0 ) cdoAbort("SLM with missing values are unsupported!");
 
@@ -80,7 +78,7 @@ void *Change_e5slm(void *argument)
   if ( minval < 0 || maxval > 1 )
     cdoWarning("Values of SLM out of bounds! (minval=%g, maxval=%g)", minval , maxval);
 
-  streamClose(streamIDslm);
+  pstreamClose(streamIDslm);
 
   for ( long i = 0; i < gridsize; ++i )
     {
@@ -123,16 +121,16 @@ void *Change_e5slm(void *argument)
 
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{ 
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  int code = codes[varID];
 	  if ( code == 172 )
@@ -163,15 +161,15 @@ void *Change_e5slm(void *argument)
 		if ( lsea[i] ) array[i] = array[0];
 	    }
 
-	  streamDefRecord(streamID2,  varID,  levelID);
-	  streamWriteRecord(streamID2, array, nmiss);
+	  pstreamDefRecord(streamID2,  varID,  levelID);
+	  pstreamWriteRecord(streamID2, array, nmiss);
 	}
 
       tsID++;
     }
   
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   Free(array);
   Free(cland);

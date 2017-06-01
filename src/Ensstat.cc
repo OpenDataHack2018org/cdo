@@ -119,13 +119,13 @@ void *ensstat_func(void *ensarg)
       if ( arg->count_data ) arg->count2[i] = nfiles - field[ompthID].nmiss;
     }
 
-  streamDefRecord(arg->streamID2, arg->varID[t], arg->levelID[t]);
-  streamWriteRecord(arg->streamID2, arg->array2, nmiss);
+  pstreamDefRecord(arg->streamID2, arg->varID[t], arg->levelID[t]);
+  pstreamWriteRecord(arg->streamID2, arg->array2, nmiss);
 
   if ( arg->count_data )
     {
-      streamDefRecord(arg->streamID2, arg->varID[t]+arg->nvars, arg->levelID[t]);
-      streamWriteRecord(arg->streamID2, arg->count2, 0);
+      pstreamDefRecord(arg->streamID2, arg->varID[t]+arg->nvars, arg->levelID[t]);
+      pstreamWriteRecord(arg->streamID2, arg->count2, 0);
     }
 
   return NULL;
@@ -197,8 +197,8 @@ void *Ensstat(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      ef[fileID].streamID = streamOpenRead(cdoStreamName(fileID));
-      ef[fileID].vlistID  = streamInqVlist(ef[fileID].streamID);
+      ef[fileID].streamID = pstreamOpenRead(cdoStreamName(fileID));
+      ef[fileID].vlistID  = pstreamInqVlist(ef[fileID].streamID);
     }
 
   /* check that the contents is always the same */
@@ -241,9 +241,8 @@ void *Ensstat(void *argument)
 	}
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   ensstat_arg.vlistID1 = vlistID1;
   ensstat_arg.streamID2 = streamID2;
@@ -264,11 +263,11 @@ void *Ensstat(void *argument)
   int tsID = 0;
   do
     {
-      nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
+      nrecs0 = pstreamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
 	  int streamID = ef[fileID].streamID;
-	  int nrecs = streamInqTimestep(streamID, tsID);
+	  int nrecs = pstreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    {
 	      if ( nrecs == 0 )
@@ -294,7 +293,7 @@ void *Ensstat(void *argument)
       if ( nrecs0 > 0 )
 	{
 	  taxisCopyTimestep(taxisID2, taxisID1);
-	  streamDefTimestep(streamID2, tsID);
+	  pstreamDefTimestep(streamID2, tsID);
 	}
 
       for ( int recID = 0; recID < nrecs0; recID++ )
@@ -303,13 +302,13 @@ void *Ensstat(void *argument)
 
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
-	      streamInqRecord(ef[fileID].streamID, &varID, &levelID);
+	      pstreamInqRecord(ef[fileID].streamID, &varID, &levelID);
               ef[fileID].missval[t] = vlistInqVarMissval(ef[fileID].vlistID, varID);
 	    }
           //#pragma omp parallel for default(none) shared(ef, nfiles)
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
-	      streamReadRecord(ef[fileID].streamID, ef[fileID].array[t], &ef[fileID].nmiss[t]);
+	      pstreamReadRecord(ef[fileID].streamID, ef[fileID].array[t], &ef[fileID].nmiss[t]);
 	    }
 
           ensstat_arg.ef = ef;
@@ -339,9 +338,9 @@ void *Ensstat(void *argument)
   if ( task ) cdo_task_wait(task);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
-    streamClose(ef[fileID].streamID);
+    pstreamClose(ef[fileID].streamID);
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -427,8 +426,8 @@ void *Ensstat(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      ef[fileID].streamID = streamOpenRead(cdoStreamName(fileID));
-      ef[fileID].vlistID  = streamInqVlist(ef[fileID].streamID);
+      ef[fileID].streamID = pstreamOpenRead(cdoStreamName(fileID));
+      ef[fileID].vlistID  = pstreamInqVlist(ef[fileID].streamID);
     }
 
   /* check that the contents is always the same */
@@ -471,9 +470,8 @@ void *Ensstat(void *argument)
 	}
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   ensstat_arg.vlistID1 = vlistID1;
   ensstat_arg.streamID2 = streamID2;
@@ -494,11 +492,11 @@ void *Ensstat(void *argument)
   int tsID = 0;
   do
     {
-      nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
+      nrecs0 = pstreamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
 	  int streamID = ef[fileID].streamID;
-	  int nrecs = streamInqTimestep(streamID, tsID);
+	  int nrecs = pstreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    {
 	      if ( nrecs == 0 )
@@ -524,7 +522,7 @@ void *Ensstat(void *argument)
       if ( nrecs0 > 0 )
 	{
 	  taxisCopyTimestep(taxisID2, taxisID1);
-	  streamDefTimestep(streamID2, tsID);
+	  pstreamDefTimestep(streamID2, tsID);
 	}
 
       for ( int recID = 0; recID < nrecs0; recID++ )
@@ -533,13 +531,13 @@ void *Ensstat(void *argument)
 
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
-	      streamInqRecord(ef[fileID].streamID, &varID, &levelID);
+	      pstreamInqRecord(ef[fileID].streamID, &varID, &levelID);
               ef[fileID].missval[t] = vlistInqVarMissval(ef[fileID].vlistID, varID);
 	    }
           //#pragma omp parallel for default(none) shared(ef, nfiles)
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
-	      streamReadRecord(ef[fileID].streamID, ef[fileID].array[t], &ef[fileID].nmiss[t]);
+	      pstreamReadRecord(ef[fileID].streamID, ef[fileID].array[t], &ef[fileID].nmiss[t]);
 	    }
 
           ensstat_arg.ef = ef;
@@ -566,9 +564,9 @@ void *Ensstat(void *argument)
   if ( lerror ) cdoAbort("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
-    streamClose(ef[fileID].streamID);
+    pstreamClose(ef[fileID].streamID);
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {

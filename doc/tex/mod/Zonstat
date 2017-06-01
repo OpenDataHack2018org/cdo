@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = zonmin zonmax zonsum zonmean zonavg zonstd zonstd1 zonvar zonvar1 zonpctl
+@Operators = zonmin zonmax zonrange zonsum zonmean zonavg zonstd zonstd1 zonvar zonvar1 zonpctl
 
 @BeginDescription
 This module computes zonal statistical values of the input fields.
-According to the chosen operator the zonal minimum, maximum, sum, average,
+According to the chosen operator the zonal minimum, maximum, range, sum, average,
 variance, standard deviation or a certain percentile is written to @file{outfile}.
 This operator requires all variables on the same regular lon/lat grid.
 @EndDescription
@@ -30,6 +30,15 @@ For every latitude the minimum over all longitudes is computed.
 
 @BeginDescription
 For every latitude the maximum over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonrange
+@Title     = Zonal range
+
+@BeginDescription
+For every latitude the range over all longitudes is computed.
 @EndDescription
 @EndOperator
 

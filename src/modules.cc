@@ -34,8 +34,6 @@
 // for std::sort()
 #include <algorithm>
 
-int NumModules;
-int NumAliases;
 
 /* \cond */
 void *Adisit(void *argument);
@@ -404,11 +402,11 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  RhopotOperators        {"rhopot"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunpctlOperators       {"runpctl"}
-#define  RunstatOperators       {"runmin", "runmax", "runsum", "runmean", "runavg", "runstd", "runstd1", "runvar", "runvar1"}
+#define  RunstatOperators       {"runrange", "runmin", "runmax", "runsum", "runmean", "runavg", "runstd", "runstd1", "runvar", "runvar1"}
 #define  SamplegridiconOperators {"samplegridicon"}
 #define  SeascountOperators     {"seascount"}
 #define  SeaspctlOperators      {"seaspctl"}
-#define  SeasstatOperators      {"seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
+#define  SeasstatOperators      {"seasrange", "seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
 #define  SelgridcellOperators   {"selgridcell", "delgridcell"}
 #define  SelectOperators        {"select", "delete"}
@@ -468,7 +466,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define    DaypctlOperators     {"daypctl"}
 #define    HourpctlOperators    {"hourpctl"}
 #define  TimselpctlOperators    {"timselpctl"}
-#define  TimselstatOperators    {"timselmin", "timselmax", "timselsum", "timselmean", "timselavg", "timselvar", "timselvar1", "timselstd", "timselstd1"}
+#define  TimselstatOperators    {"timselrange", "timselmin", "timselmax", "timselsum", "timselmean", "timselavg", "timselvar", "timselvar1", "timselstd", "timselstd1"}
 #define  XTimstatOperators      {"xtimmin",  "xtimmax",  "xtimsum",  "xtimmean",  "xtimavg",  "xtimvar",  "xtimvar1",  "xtimstd",  "xtimstd1", \
                                  "xyearmin", "xyearmax", "xyearsum", "xyearmean", "xyearavg", "xyearvar", "xyearvar1", "xyearstd", "xyearstd1", \
                                  "xmonmin",  "xmonmax",  "xmonsum",  "xmonmean",  "xmonavg",  "xmonvar",  "xmonvar1",  "xmonstd",  "xmonstd1"}
@@ -511,8 +509,8 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  YmonpctlOperators      {"ymonpctl"}
 #define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd", "ymonstd1", "ymonvar", "ymonvar1"}
 #define  YseaspctlOperators     {"yseaspctl"}
-#define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd", "yseasstd1", "yseasvar", "yseasvar1"}
-#define  ZonstatOperators       {"zonmin", "zonmax", "zonrange", "zonsum", "zonmean", "zonavg", "zonstd", "zonstd1", "zonvar", "zonvar1", "zonpctl"}
+#define  YseasstatOperators     {"yseasrange", "yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd", "yseasstd1", "yseasvar", "yseasvar1"}
+#define  ZonstatOperators       {"zonrange", "zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd", "zonstd1", "zonvar", "zonvar1", "zonpctl"}
 
 #define  EcaCfdOperators        {"eca_cfd"}
 #define  EcaCsuOperators        {"eca_csu"}
@@ -747,7 +745,6 @@ void add_module(std::string module_name, modules_t new_module) {
             // if the operator name is not already in the map or in the aliases
             if (!operator_name_exists(operatorName)) {
                 modules_map[operatorName] = module_name;
-                NumModules++;
             } else {
                 Error("Tried to add operator but the operator name already exists");
             }
@@ -781,7 +778,7 @@ int add_alias(std::string alias, std::string original) {
       Error("alias %s could not be added: alias name already exists as an operator", alias.c_str());
     }
     aliases[alias] = original;
-    NumAliases++;
+
     return 0;
 }
 /* clang-format off */
@@ -993,7 +990,7 @@ void init_modules()
   add_module("Vertwind"      , {Vertwind      , {}                , VertwindOperators      , 1 , CDI_REAL , 1  , 1  });
   add_module("Verifygrid"    , {Verifygrid    , {}                , VerifygridOperators    , 1 , CDI_REAL , 1  , 0  });
   add_module("Wind"          , {Wind          , WindHelp          , WindOperators          , 1 , CDI_REAL , 1  , 1  });
-  add_module("Writegrid"     , {Writegrid     , {}                , WritegridOperators     , 1 , CDI_REAL , 1  , 1  }); /* no cdi output */
+  add_module("Writegrid"     , {Writegrid     , {}                , WritegridOperators     , 1 , CDI_REAL , 1  , 1  }); // no cdi output
   add_module("Writerandom"   , {Writerandom   , {}                , WriterandomOperators   , 1 , CDI_REAL , 1  , 1  });
   add_module("YAR"           , {YAR           , {}                , YAROperators           , 0 , CDI_REAL , 1  , 1  });
   add_module("Yearmonstat"   , {Yearmonstat   , YearmonstatHelp   , YearmonstatOperators   , 1 , CDI_REAL , 1  , 1  });
@@ -1050,7 +1047,7 @@ void init_modules()
   add_module("Strbre"        , {Strbre        , StrbreHelp        , StrbreOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Strgal"        , {Strgal        , StrgalHelp        , StrgalOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Hurr"          , {Hurr          , HurrHelp          , HurrOperators          , 1 , CDI_REAL , 1  , 1  });
-  // add_module("Hi"         , { Hi           , {}                , HiOperators            , 1 , CDI_REAL , 3  , 1   }); */
+  // add_module("Hi"         , { Hi           , {}                , HiOperators            , 1 , CDI_REAL , 3  , 1   });
   add_module("Wct"           , {Wct           , WctHelp           , WctOperators           , 1 , CDI_REAL , 2  , 1  });
   add_module("Magplot"       , {Magplot       , MagplotHelp       , MagplotOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Magvector"     , {Magvector     , MagvectorHelp     , MagvectorOperators     , 1 , CDI_REAL , 1  , 1  });
@@ -1201,13 +1198,6 @@ int operatorStreamNumber(const char *operatorName) {
     return modules[get_module_name_to(operator_name)].number;
 }
 
-int cmpname(const void *s1, const void *s2) {
-    char **c1 = (char **)s1;
-    char **c2 = (char **)s2;
-
-    return strcmp((const char *)*c1, (const char *)*c2);
-}
-
 /***
  * Creates a sorted vector with all operator names and alisases excluding all modules that are
  * marked as internal
@@ -1237,7 +1227,7 @@ void operatorPrintAll(void) {
     // using a set because it sorts the operators alphabetically on its own
     std::vector<std::string> sorted_operator_names = get_sorted_operator_name_list();
 
-    std::cout << tab << std::endl;
+    std::cout << tab;
     for (auto operatorName : sorted_operator_names) {
         if (number_of_chars > 85) {
             number_of_chars = tab_width;
@@ -1249,44 +1239,6 @@ void operatorPrintAll(void) {
     }
 
     std::cerr << std::endl;
-    /* old implementation for comparison only
-
-    for(auto alias : opalias){}
-     //-0----------
-    int i, j, nbyte, nop = 0;
-    const char *opernames[4096];
-    FILE *pout = stderr;
-
-    for ( i = 0; i < NumModules; i++ )
-      {
-        if ( Modules[i].mode )
-          {
-            j = 0;
-            while ( Modules[i].operators[j] )
-              opernames[nop++] = Modules[i].operators[j++];
-    }
-      }
-
-    // Add operator aliases
-    for ( i = 0; i < nopalias; i++ )
-      {
-        opernames[nop++] = opalias[i][0];
-      }
-
-    qsort(opernames, nop, sizeof(char *), cmpname);
-
-    nbyte = fprintf(pout, "   ");
-    for ( i = 0; i < nop; i++ )
-      {
-        if ( nbyte > 85 )
-    {
-      fprintf(pout, "\n");
-      nbyte = fprintf(pout, "   ");
-    }
-        nbyte += fprintf(pout, " %s", opernames[i]);
-      }
-    fprintf(pout, "\n");
-    */
 }
 
 #ifdef CUSTOM_MODULES
@@ -1296,13 +1248,11 @@ void operatorPrintAll(void) {
 */
 #ifdef CUSTOM_MODULES
 void load_custom_modules(std::string folder_path) {
-    DIR *dir;
-    struct dirent *ent;
-    dir = opendir(folder_path.c_str());
+    DIR *dir = opendir(folder_path.c_str());
     std::string file_path;
     std::regex library_regex("(.*\\.so)");
     if (dir != NULL) {
-        ent = readdir(dir);
+        struct dirent *ent = readdir(dir);
         while (ent != NULL) {
             if (std::regex_match(ent->d_name, library_regex)) {
                 file_path = folder_path + "/" + ent->d_name;
@@ -1322,10 +1272,8 @@ void load_custom_modules(std::string folder_path) {
  * @param module file path
  */
 void load_custom_module(std::string file_path) {
-    const char *dlsym_error;
-    void *lib_handle;
     void (*init_custom_module)();
-    lib_handle = dlopen(file_path.c_str(), RTLD_LAZY);
+    void *lib_handle = dlopen(file_path.c_str(), RTLD_LAZY);
     custom_modules_lib_handles.push_back(lib_handle);
     if (!lib_handle) {
         std::cerr << "Cannot open library: " << dlerror() << std::endl;
@@ -1334,7 +1282,7 @@ void load_custom_module(std::string file_path) {
 
     dlerror();
     init_custom_module = (void (*)())dlsym(lib_handle, "init_custom_module");
-    dlsym_error = dlerror();
+    const char *dlsym_error = dlerror();
 
     if (dlsym_error) {
         std::cerr << "Cannot load symbol 'init_custom_module': " << dlsym_error << std::endl;

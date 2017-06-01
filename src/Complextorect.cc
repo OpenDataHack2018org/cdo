@@ -36,9 +36,9 @@ void *Complextorect(void *argument)
 
   // int operatorID = cdoOperatorID();
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
   int vlistID3 = vlistDuplicate(vlistID1);
 
@@ -61,11 +61,11 @@ void *Complextorect(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID3, vlistID3);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(2*gridsize*sizeof(double));
@@ -73,23 +73,23 @@ void *Complextorect(void *argument)
   double *array3 = (double*) Malloc(gridsize*sizeof(double));
       
   int tsID  = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       taxisCopyTimestep(taxisID3, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamDefRecord(streamID3, varID, levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamDefRecord(streamID3, varID, levelID);
 	      
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  streamReadRecord(streamID1, array1, &nmiss);
+	  pstreamReadRecord(streamID1, array1, &nmiss);
 
 	  for ( i = 0; i < gridsize; ++i )
 	    {
@@ -97,16 +97,16 @@ void *Complextorect(void *argument)
 	      array3[i] = array1[2*i+1];
 	    }
 
-	  streamWriteRecord(streamID2, array2, nmiss);
-	  streamWriteRecord(streamID3, array3, nmiss);
+	  pstreamWriteRecord(streamID2, array2, nmiss);
+	  pstreamWriteRecord(streamID3, array3, nmiss);
 	}
        
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);

@@ -15,10 +15,6 @@
   GNU General Public License for more details.
 */
 
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600 /* ftello */
-#endif
-
 #if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif

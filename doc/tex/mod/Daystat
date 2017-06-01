@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = daymin daymax daysum daymean dayavg daystd daystd1 dayvar dayvar1
+@Operators = daymin daymax dayrange daysum daymean dayavg daystd daystd1 dayvar dayvar1
 
 @BeginDescription
 This module computes statistical values over timesteps of the same day.
-Depending on the chosen operator the minimum, maximum, sum, average, variance
+Depending on the chosen operator the minimum, maximum, range, sum, average, variance
 or standard deviation of timesteps of the same day is written to @file{outfile}.
 The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 @EndDescription
@@ -48,6 +48,25 @@ o(t,x) = max{i(t',x), t_1<t'<=t_n}
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
 o(t,x) = \mbox{\textbf{max}}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_dayrange
+@Title     = Daily range
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
+
+o(t,x) = range{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
+@BeginMath
+o(t,x) = \mbox{\textbf{range}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

@@ -36,7 +36,7 @@ void *Enlarge(void *argument)
 
   operatorCheckArgc(1);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int gridID2 = cdoDefineGrid(operatorArgv()[0]);
   int xsize2 = gridInqXsize(gridID2);
@@ -45,7 +45,7 @@ void *Enlarge(void *argument)
   if ( cdoVerbose ) fprintf(stderr, "gridID2 %d, xsize2 %d, ysize2 %d\n", gridID2, xsize2, ysize2);
 
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -62,25 +62,25 @@ void *Enlarge(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   double *array1 = (double*) Malloc(gridsize2*sizeof(double));
   double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
           int varID, levelID, nmiss;
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array1, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array1, &nmiss);
 
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 	  int gridID1 = vlistInqVarGrid(vlistID1, varID);
@@ -131,15 +131,15 @@ void *Enlarge(void *argument)
 	      if ( nmiss && DBL_IS_EQUAL(array1[gridsize1-1], missval) ) nmiss += (gridsize2 - gridsize1);
 	    }
 	    
-	  streamDefRecord(streamID2, varID,  levelID);
-	  streamWriteRecord(streamID2, array2, nmiss);
+	  pstreamDefRecord(streamID2, varID,  levelID);
+	  pstreamWriteRecord(streamID2, array2, nmiss);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);

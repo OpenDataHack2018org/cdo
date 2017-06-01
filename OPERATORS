@@ -258,6 +258,7 @@ Operator catalog:
    Ensval        ensbrs          Ensemble Brier score
    Fldstat       fldmin          Field minimum
    Fldstat       fldmax          Field maximum
+   Fldstat       fldrange        Field range
    Fldstat       fldsum          Field sum
    Fldstat       fldmean         Field mean
    Fldstat       fldavg          Field average
@@ -268,6 +269,7 @@ Operator catalog:
    Fldstat       fldpctl         Field percentiles
    Zonstat       zonmin          Zonal minimum
    Zonstat       zonmax          Zonal maximum
+   Zonstat       zonrange        Zonal range
    Zonstat       zonsum          Zonal sum
    Zonstat       zonmean         Zonal mean
    Zonstat       zonavg          Zonal average
@@ -304,18 +306,20 @@ Operator catalog:
    Vertstat      vertstd1        Vertical standard deviation (n-1)
    Vertstat      vertvar         Vertical variance
    Vertstat      vertvar1        Vertical variance (n-1)
-   Timselstat    timselmin       Time range minimum
-   Timselstat    timselmax       Time range maximum
-   Timselstat    timselsum       Time range sum
-   Timselstat    timselmean      Time range mean
-   Timselstat    timselavg       Time range average
-   Timselstat    timselstd       Time range standard deviation
-   Timselstat    timselstd1      Time range standard deviation (n-1)
-   Timselstat    timselvar       Time range variance
-   Timselstat    timselvar1      Time range variance (n-1)
+   Timselstat    timselmin       Time selection minimum
+   Timselstat    timselmax       Time selection maximum
+   Timselstat    timselrange     Time selection range
+   Timselstat    timselsum       Time selection sum
+   Timselstat    timselmean      Time selection mean
+   Timselstat    timselavg       Time selection average
+   Timselstat    timselstd       Time selection standard deviation
+   Timselstat    timselstd1      Time selection standard deviation (n-1)
+   Timselstat    timselvar       Time selection variance
+   Timselstat    timselvar1      Time selection variance (n-1)
    Timselpctl    timselpctl      Time range percentiles
    Runstat       runmin          Running minimum
    Runstat       runmax          Running maximum
+   Runstat       runrange        Running range
    Runstat       runsum          Running sum
    Runstat       runmean         Running mean
    Runstat       runavg          Running average
@@ -326,6 +330,7 @@ Operator catalog:
    Runpctl       runpctl         Running percentiles
    Timstat       timmin          Time minimum
    Timstat       timmax          Time maximum
+   Timstat       timrange        Time range
    Timstat       timsum          Time sum
    Timstat       timmean         Time mean
    Timstat       timavg          Time average
@@ -336,6 +341,7 @@ Operator catalog:
    Timpctl       timpctl         Time percentiles
    Hourstat      hourmin         Hourly minimum
    Hourstat      hourmax         Hourly maximum
+   Hourstat      hourrange       Hourly range
    Hourstat      hoursum         Hourly sum
    Hourstat      hourmean        Hourly mean
    Hourstat      houravg         Hourly average
@@ -346,6 +352,7 @@ Operator catalog:
    Hourpctl      hourpctl        Hourly percentiles
    Daystat       daymin          Daily minimum
    Daystat       daymax          Daily maximum
+   Daystat       dayrange        Daily range
    Daystat       daysum          Daily sum
    Daystat       daymean         Daily mean
    Daystat       dayavg          Daily average
@@ -356,6 +363,7 @@ Operator catalog:
    Daypctl       daypctl         Daily percentiles
    Monstat       monmin          Monthly minimum
    Monstat       monmax          Monthly maximum
+   Monstat       monrange        Monthly range
    Monstat       monsum          Monthly sum
    Monstat       monmean         Monthly mean
    Monstat       monavg          Monthly average
@@ -367,6 +375,7 @@ Operator catalog:
    Yearmonstat   yearmonmean     Yearly mean from monthly data
    Yearstat      yearmin         Yearly minimum
    Yearstat      yearmax         Yearly maximum
+   Yearstat      yearrange       Yearly range
    Yearstat      yearsum         Yearly sum
    Yearstat      yearmean        Yearly mean
    Yearstat      yearavg         Yearly average
@@ -377,6 +386,7 @@ Operator catalog:
    Yearpctl      yearpctl        Yearly percentiles
    Seasstat      seasmin         Seasonal minimum
    Seasstat      seasmax         Seasonal maximum
+   Seasstat      seasrange       Seasonal range
    Seasstat      seassum         Seasonal sum
    Seasstat      seasmean        Seasonal mean
    Seasstat      seasavg         Seasonal average

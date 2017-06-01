@@ -225,9 +225,9 @@ void *Distgrid(void *argument)
   if ( nxblocks <= 0 ) cdoAbort("nxblocks has to be greater than 0!");
   if ( nyblocks <= 0 ) cdoAbort("nyblocks has to be greater than 0!");
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int ngrids = vlistNgrids(vlistID1);
 
@@ -319,7 +319,7 @@ void *Distgrid(void *argument)
 
   const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   for ( int index = 0; index < nsplit; index++ )
     {
@@ -328,23 +328,23 @@ void *Distgrid(void *argument)
 	sprintf(filename+nchars+5, "%s", filesuffix);
 
       argument_t *fileargument = file_argument_new(filename);
-      streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+      streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
-      streamDefVlist(streamIDs[index], vlistIDs[index]);
+      pstreamDefVlist(streamIDs[index], vlistIDs[index]);
     }
 
   if ( ngrids > 1 ) cdoPrint("Baustelle: number of different grids > 1!");
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       for ( int index = 0; index < nsplit; index++ )
-	streamDefTimestep(streamIDs[index], tsID);
+	pstreamDefTimestep(streamIDs[index], tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array1, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array1, &nmiss);
 
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 
@@ -352,25 +352,25 @@ void *Distgrid(void *argument)
 	    {
 	      i = 0;
 	      window_cell(array1, array2, grids[i].gridsize[index], grids[i].gridindex[index]);
-	      streamDefRecord(streamIDs[index], varID, levelID);
+	      pstreamDefRecord(streamIDs[index], varID, levelID);
 	      if ( nmiss > 0 )
 		{
 		  nmiss = 0;
 		  for ( int k = 0; k < grids[i].gridsize[index]; ++k )
 		    if ( DBL_IS_EQUAL(array2[k], missval) ) nmiss++;
 		}
-	      streamWriteRecord(streamIDs[index], array2, nmiss);
+	      pstreamWriteRecord(streamIDs[index], array2, nmiss);
 	    }
 	}
 
       tsID++;
     }
 
-  streamClose(streamID1);
+  pstreamClose(streamID1);
 
   for ( int index = 0; index < nsplit; index++ )
     {
-      streamClose(streamIDs[index]);
+      pstreamClose(streamIDs[index]);
       vlistDestroy(vlistIDs[index]);
     }
 

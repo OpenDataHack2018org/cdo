@@ -90,7 +90,7 @@ static
 void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subarray_end)
 {
   int subarray_length = (subarray_end - subarray_start) / 2 + 1;     
-  double subarray[subarray_length];
+  double *subarray = (double*) Malloc(subarray_length*sizeof(double));
   int subarray_index = 0;
   
   for(int index = subarray_start + 1; index <= subarray_end + 1; index += 2){	 
@@ -105,7 +105,9 @@ void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subar
   for(int index = subarray_start + 1; index <= subarray_end + 1; index += 2){
     array[index] = subarray[subarray_index];
     subarray_index += 1;	  
-  }            
+  }
+
+  Free(subarray);
 }
 
 
@@ -123,7 +125,7 @@ double determinant(double matrix[3][3])
 }
 
 static
-void find_unit_normal(double a[3], double b[3], double c[3], double * unit_normal)
+void find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal)
 {  
   /* Calculates the unit normal for a plane defined on three points a, b, c in Euclidean space. */
 
@@ -150,6 +152,47 @@ void find_unit_normal(double a[3], double b[3], double c[3], double * unit_norma
   unit_normal[0] = x / magnitude;
   unit_normal[1] = y / magnitude;
   unit_normal[2] = z / magnitude;
+}
+
+static
+int find_coordinate_to_ignore(double *cell_corners_xyz)
+{
+  double corner_coordinates[3];
+  double second_corner_coordinates[3];
+  double third_corner_coordinates[3];
+
+  /* Takes the first three corners/vertices of the cell and calculates the unit normal via determinants. */
+      
+  corner_coordinates[0] = cell_corners_xyz[0];
+  corner_coordinates[1] = cell_corners_xyz[1];
+  corner_coordinates[2] = cell_corners_xyz[2];
+
+  second_corner_coordinates[0] = cell_corners_xyz[3 + 0];
+  second_corner_coordinates[1] = cell_corners_xyz[3 + 1];
+  second_corner_coordinates[2] = cell_corners_xyz[3 + 2];
+
+  third_corner_coordinates[0] = cell_corners_xyz[6 + 0];
+  third_corner_coordinates[1] = cell_corners_xyz[6 + 1];
+  third_corner_coordinates[2] = cell_corners_xyz[6 + 2];
+      
+  double surface_normal_of_the_cell[3];
+  find_unit_normal(corner_coordinates, second_corner_coordinates, third_corner_coordinates, surface_normal_of_the_cell);
+
+  /* The surface normal is used to choose the coordinate to ignore. */
+
+  double abs_x = fabs(surface_normal_of_the_cell[0]);
+  double abs_y = fabs(surface_normal_of_the_cell[1]);
+  double abs_z = fabs(surface_normal_of_the_cell[2]);
+
+  int coordinate_to_ignore = 3;
+
+  if (abs_x > abs_y){
+    if (abs_x > abs_z) coordinate_to_ignore = 1;
+  } else {
+    if (abs_y > abs_z) coordinate_to_ignore = 2;
+  }
+
+  return coordinate_to_ignore;
 }
 
 static
@@ -311,25 +354,20 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   */
   
   double center_point_xyz[3];
-  double cell_corners_xyz_open_cell[ncorner * 3];
+  double *cell_corners_xyz_open_cell = (double*) Malloc(3*ncorner*sizeof(double));
   
   double corner_coordinates[3];
-  double second_corner_coordinates[3];
-  double third_corner_coordinates[3];
-  double surface_normal_of_the_cell[3];
   double center_point_plane_projection[2];
 
   int no_of_cells_with_duplicates = 0;
+  int no_usable_cells = 0;
   int no_convex_cells = 0;
   int no_clockwise_cells = 0;
   int no_counterclockwise_cells = 0;
   int no_of_cells_with_center_points_out_of_bounds = 0;
-  int coordinate_to_ignore = 0;
   int no_unique_center_points = 1;
-  
-  double *p_surface_normal_of_the_cell = &surface_normal_of_the_cell[0];
 
-  int no_cells_with_a_specific_no_of_corners[ncorner];
+  int *no_cells_with_a_specific_no_of_corners = (int*) Malloc(ncorner*sizeof(int));
 
   for ( int i = 0; i < ncorner; i++ )
     no_cells_with_a_specific_no_of_corners[i] = 0;
@@ -452,10 +490,12 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
           
           continue;
         }
+
+      no_usable_cells++;
       
       /* Checks if there are any duplicate vertices in the list of corners. Note that the last (additional) corner has not been set yet. */
 
-      int marked_duplicate_indices[actual_number_of_corners];
+      int *marked_duplicate_indices = (int*) Malloc(actual_number_of_corners*sizeof(int));
       for ( int i = 0; i < actual_number_of_corners; i++ ) marked_duplicate_indices[i] = 0;
 
       int no_duplicates = 0;
@@ -476,7 +516,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
       /* Writes the unique corner vertices in a new array. */
 
-      double cell_corners_xyz_without_duplicates[(actual_number_of_corners - no_duplicates) * 3];
+      double *cell_corners_xyz_without_duplicates = (double*) Malloc(3*(actual_number_of_corners - no_duplicates)*sizeof(double));
       
       int unique_corner_number = 0;
       
@@ -495,6 +535,8 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       
       actual_number_of_corners = actual_number_of_corners - no_duplicates;
 
+      if ( no_duplicates != 0 ) no_of_cells_with_duplicates += 1;
+
       /* If there are less than three corners in the cell left after removing duplicates, it is unusable and considered degenerate. No area can be computed. */
       
       if ( actual_number_of_corners < 3 )
@@ -504,12 +546,10 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
           continue;
         }
-      
-      if ( no_duplicates != 0 ) no_of_cells_with_duplicates += 1;
 
       /* We are creating a closed polygon/cell by setting the additional last corner to be the same as the first one. */
 
-      double cell_corners_xyz[(actual_number_of_corners + 1) * 3];
+      double *cell_corners_xyz = (double*) Malloc(3*(actual_number_of_corners + 1)*sizeof(double));
 
       for ( int corner_no = 0; corner_no < actual_number_of_corners; corner_no++ )
         {
@@ -523,42 +563,16 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       cell_corners_xyz[actual_number_of_corners * 3 + 1] = cell_corners_xyz[1];
       cell_corners_xyz[actual_number_of_corners * 3 + 2] = cell_corners_xyz[2];
 
-      /* Takes the first three corners/vertices of the cell and calculates the unit normal via determinants. */
-      
-      corner_coordinates[0] = cell_corners_xyz[0];
-      corner_coordinates[1] = cell_corners_xyz[1];
-      corner_coordinates[2] = cell_corners_xyz[2];
-
-      second_corner_coordinates[0] = cell_corners_xyz[3 + 0];
-      second_corner_coordinates[1] = cell_corners_xyz[3 + 1];
-      second_corner_coordinates[2] = cell_corners_xyz[3 + 2];
-
-      third_corner_coordinates[0] = cell_corners_xyz[6 + 0];
-      third_corner_coordinates[1] = cell_corners_xyz[6 + 1];
-      third_corner_coordinates[2] = cell_corners_xyz[6 + 2];
-      
-      find_unit_normal(corner_coordinates, second_corner_coordinates, third_corner_coordinates, p_surface_normal_of_the_cell);
-
-      /* The surface normal is used to choose the coordinate to ignore. */
-
-      double abs_x = fabs(surface_normal_of_the_cell[0]);
-      double abs_y = fabs(surface_normal_of_the_cell[1]);
-      double abs_z = fabs(surface_normal_of_the_cell[2]);
-
-      coordinate_to_ignore = 3;
-
-      if (abs_x > abs_y){
-	if (abs_x > abs_z) coordinate_to_ignore = 1;
-      } else {
-	if (abs_y > abs_z) coordinate_to_ignore = 2;
-      }
+      int coordinate_to_ignore = find_coordinate_to_ignore(cell_corners_xyz);
      
       /* The remaining two-dimensional coordinates are extracted into one array for all the cell's corners and into one array for the center point. */
 
-      double cell_corners_plane_projection[(actual_number_of_corners +1) * 2];
+      double *cell_corners_plane_projection = (double*) Malloc(2*(actual_number_of_corners +1)*sizeof(double));
       
-      /* The following projection on the plane that two coordinate axes lie on changes the arrangement of the polygon vertices if the coordinate to be ignored along the third axis is smaller than 0.
-	 In this case, the result of the computation of the orientation of vertices needs to be inverted. Clockwise becomes counterclockwise and vice versa. */
+      /* The following projection on the plane that two coordinate axes lie on changes the arrangement of
+         the polygon vertices if the coordinate to be ignored along the third axis is smaller than 0.
+	 In this case, the result of the computation of the orientation of vertices needs to be inverted.
+         Clockwise becomes counterclockwise and vice versa. */
 
       bool invert_result = false;
       if ( cell_corners_xyz[coordinate_to_ignore - 1] < 0 ) invert_result = true;
@@ -630,10 +644,16 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
             printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no]);
           printf("\n");
         }
+
+      Free(cell_corners_plane_projection);
+      Free(cell_corners_xyz);
+      Free(cell_corners_xyz_without_duplicates);
+      Free(marked_duplicate_indices);
     }
 
   int no_nonunique_cells = gridsize - no_unique_center_points;
-  int no_nonconvex_cells =  (int) gridsize - no_convex_cells;
+  int no_nonconvex_cells = (int) gridsize - no_convex_cells;
+  int no_nonusable_cells = (int) gridsize - no_usable_cells;
 
   for ( int i = 2; i < ncorner; i++ )
     if ( no_cells_with_a_specific_no_of_corners[i] )
@@ -641,6 +661,9 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
   if ( no_of_cells_with_duplicates )
     cdoPrintBlue("%9d cells have duplicate vertices", no_of_cells_with_duplicates);
+
+  if ( no_nonusable_cells )
+    cdoPrintRed("%9d cells have unusable vertices", no_nonusable_cells);
 
   if ( no_nonunique_cells )
     cdoPrintRed("%9d cells are not unique", no_nonunique_cells);
@@ -654,7 +677,10 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   if ( no_of_cells_with_center_points_out_of_bounds )
     cdoPrintRed("%9d cells have their center points located outside their boundaries", no_of_cells_with_center_points_out_of_bounds);
 
-  cdoPrint("");
+  // cdoPrint("");
+
+  Free(no_cells_with_a_specific_no_of_corners);
+  Free(cell_corners_xyz_open_cell);
 }
 
 
@@ -768,7 +794,7 @@ void *Verifygrid(void *argument)
             cdoPrintBlue("Grid consists of %d points (type: %s)", gridsize, gridNamePtr(gridtype));
           else
             cdoPrintBlue("Grid no %u (of %u) consists of %d points (type: %s)", gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
-          cdoPrint("");
+          // cdoPrint("");
         }
     }
 

@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = seasmin seasmax seassum seasmean seasavg seasstd seasstd1 seasvar seasvar1
+@Operators = seasmin seasmax seasrange seassum seasmean seasavg seasstd seasstd1 seasvar seasvar1
 
 @BeginDescription
 This module computes statistical values over timesteps of the same season.
-Depending on the chosen operator the minimum, maximum, sum, average, variance
+Depending on the chosen operator the minimum, maximum, range, sum, average, variance
 or standard deviation of timesteps of the same season is written to @file{outfile}.
 The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 Be careful about the first and the last output timestep, they may be incorrect values 
@@ -50,6 +50,25 @@ o(t,x) = max{i(t',x), t1 < t' <= tn}
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\textbf{max}}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seasrange
+@Title     = Seasonal range
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:
+
+o(t,x) = range{i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same season it is: \\
+@BeginMath
+o(t,x) = \mbox{\textbf{range}}\{i(t',x), t_1 < t' \le t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

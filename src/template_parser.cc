@@ -19,62 +19,6 @@ xmlDoc *param_doc;
 
 void *magics_node, *results_node;
 
-// not used
-static
-int template_parser(  char *Filename, const char *varname )
-{
-#if defined(HAVE_LIBXML2)
-  xmlDoc         *doc = NULL;
-  xmlNode        *root_element = NULL;
-
-  doc = xmlReadFile( Filename, NULL, 0 );
-  if ( doc == NULL )
-    {
-      printf( "Error: Could not parse the file \"%s\"\n", Filename );
-      return (1);
-    }
-  else
-    {
-      /* 
-         Get the name of the root element node 
-         If "magics" , call "magics" parser
-         If "results", call "results" parser
-      */                      
-
-      root_element = xmlDocGetRootElement( doc );
-		  
-      if( !strcmp( (const char*)root_element->name, "magics" ) )
-        {
-          if ( magics_template_parser( root_element ) == 1 )
-            {
-              printf( "Un-Supported version of Magics++! \n" );
-              return (2);
-            }
-        }
-      else if( !strcmp( (const char*)root_element->name, "results" ) )
-        {
-          results_template_parser( root_element, varname );
-          /* Needs some error handling */
-        }
-
-      /*** free the document ***/
-      xmlFreeDoc( doc );
-    }
-  
-  /*** Free the global variables that may
-   *   have been allocated by the parser. 
-   ***/
-
-  xmlCleanupParser();
-#else
-  
-  cdoAbort("XML2 support not compiled in!");
-  
-#endif
-
-  return 0;
-}
-
 
 int init_XMLtemplate_parser( char *Filename )
 {

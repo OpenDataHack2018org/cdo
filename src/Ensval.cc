@@ -133,8 +133,8 @@ void *Ensval(void *argument)
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      streamID = streamOpenRead(cdoStreamName(fileID));
-      vlistID = streamInqVlist(streamID);
+      streamID = pstreamOpenRead(cdoStreamName(fileID));
+      vlistID = pstreamInqVlist(streamID);
       
       ef[fileID].streamID = streamID;
       ef[fileID].vlistID  = vlistID;
@@ -168,7 +168,7 @@ void *Ensval(void *argument)
 
   const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   memset(file_suffix, 0, sizeof(file_suffix) );
-  cdoGenFileSuffix(file_suffix, sizeof(file_suffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(file_suffix, sizeof(file_suffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   for ( stream = 0; stream < nostreams; stream++ ) {
     int namelen = strlen(ofilebase) 
@@ -199,7 +199,7 @@ void *Ensval(void *argument)
       cdoAbort("Outputfile %s already exists!", ofilename);
 
     argument_t *fileargument = file_argument_new(ofilename);
-    streamID2[stream] = streamOpenWrite(fileargument, cdoFiletype());    
+    streamID2[stream] = pstreamOpenWrite(fileargument, cdoFiletype());    
     file_argument_free(fileargument);
 
     Free(ofilename);
@@ -214,9 +214,9 @@ void *Ensval(void *argument)
       vlistChangeGridIndex(vlistID2[stream], i, gridID2);
 
     vlistDefTaxis(vlistID2[stream], taxisID2[stream]);
-    streamDefVlist(streamID2[stream], vlistID2[stream]);
+    pstreamDefVlist(streamID2[stream], vlistID2[stream]);
 
-    // vlistCheck = streamInqVlist(streamID2[stream]);
+    // vlistCheck = pstreamInqVlist(streamID2[stream]);
     // gridsizeCheck = vlistGridsizeMax(vlistCheck);
 
     //fprintf(stderr,"stream %i vlist %3i gridsize %4i\n",stream,vlistCheck,gridsizeCheck);
@@ -228,18 +228,18 @@ void *Ensval(void *argument)
   int tsID = 0;
   do
     {
-      nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
+      nrecs0 = pstreamInqTimestep(ef[0].streamID, tsID);
       for ( fileID = 1; fileID < nfiles; fileID++ )
 	{
 	  streamID = ef[fileID].streamID;
-	  nrecs = streamInqTimestep(streamID, tsID);
+	  nrecs = pstreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
 	}
       
       for ( stream = 0; stream < nostreams; stream++ ) {
 	taxisCopyTimestep(taxisID2[stream], taxisID1);
-	if ( nrecs0 > 0 ) streamDefTimestep(streamID2[stream], tsID);
+	if ( nrecs0 > 0 ) pstreamDefTimestep(streamID2[stream], tsID);
       }
       
       for ( int recID = 0; recID < nrecs0; recID++ )
@@ -262,7 +262,7 @@ void *Ensval(void *argument)
 	      ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
 
 	      streamID = ef[fileID].streamID;
-	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
+	      pstreamReadRecord(streamID, ef[fileID].array, &nmiss);
 	    }
 
 	  // xsize = gridInqXsize(gridID);
@@ -460,12 +460,12 @@ void *Ensval(void *argument)
 		     crps,crps_reli,crps_pot, crps_reli+crps_pot);
 	  
 	  for ( stream =0; stream<nostreams; stream++ ) {
-	    streamDefRecord(streamID2[stream],varID,levelID);
+	    pstreamDefRecord(streamID2[stream],varID,levelID);
 	    if ( isnan ( r[stream] )  ) {
 	      r[stream] = missval; 
 	      have_miss = 1;
 	    }
-	    streamWriteRecord(streamID2[stream],&r[stream],have_miss);
+	    pstreamWriteRecord(streamID2[stream],&r[stream],have_miss);
 	  }
 	  
 	  switch ( operfunc ) {
@@ -487,11 +487,11 @@ void *Ensval(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = ef[fileID].streamID;
-      streamClose(streamID);
+      pstreamClose(streamID);
     }
   
   for ( stream = 0; stream < nostreams; stream++ )
-    streamClose(streamID2[stream]);
+    pstreamClose(streamID2[stream]);
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     if ( ef[fileID].array ) Free(ef[fileID].array);

@@ -123,9 +123,9 @@ void *Ensstat3(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      streamID = streamOpenRead(cdoStreamName(fileID));
+      streamID = pstreamOpenRead(cdoStreamName(fileID));
 
-      vlistID = streamInqVlist(streamID);
+      vlistID = pstreamInqVlist(streamID);
 
       ef[fileID].streamID = streamID;
       ef[fileID].vlistID = vlistID;
@@ -186,9 +186,8 @@ void *Ensstat3(void *argument)
 
   if ( operfunc != func_roc )
     {
-      streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-
-      streamDefVlist(streamID2, vlistID2);
+      streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+      pstreamDefVlist(streamID2, vlistID2);
     }
 
   int gridsize = vlistGridsizeMax(vlistID1);
@@ -231,11 +230,11 @@ void *Ensstat3(void *argument)
   int tsID = 0;
   do
     {
-      nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
+      nrecs0 = pstreamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
 	  streamID = ef[fileID].streamID;
-	  nrecs = streamInqTimestep(streamID, tsID);
+	  nrecs = pstreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    {
 	      if ( nrecs == 0 )
@@ -249,7 +248,7 @@ void *Ensstat3(void *argument)
       if ( operfunc == func_rank && ( datafunc == TIME || tsID == 0 ) )
 	{
 	  taxisCopyTimestep(taxisID2, taxisID1);
-	  if ( nrecs0 > 0 ) streamDefTimestep(streamID2, tsID);
+	  if ( nrecs0 > 0 ) pstreamDefTimestep(streamID2, tsID);
 	}
 
       //      fprintf(stderr,"TIMESTEP %i varID %i rec %i\n",tsID,varID,recID);
@@ -264,8 +263,8 @@ void *Ensstat3(void *argument)
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
 	      streamID = ef[fileID].streamID;
-	      streamInqRecord(streamID, &varID, &levelID);
-	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
+	      pstreamInqRecord(streamID, &varID, &levelID);
+	      pstreamReadRecord(streamID, ef[fileID].array, &nmiss);
 	    }
 
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -383,8 +382,8 @@ void *Ensstat3(void *argument)
 	      for ( binID=0; binID<nfiles; binID++ ) {
 		val = (double)array2[binID][0];
 		//		fprintf(stderr,"%i ",(int)val);
-		streamDefRecord(streamID2, varID2[varID], binID);
-		streamWriteRecord(streamID2,&val, nmiss);
+		pstreamDefRecord(streamID2, varID2[varID], binID);
+		pstreamWriteRecord(streamID2,&val, nmiss);
 	      }
 	      //fprintf(stderr,"\n");
 	    }
@@ -433,8 +432,8 @@ void *Ensstat3(void *argument)
 	  for ( i = 0; i < osize; i++ )
 	    tmpdoub[i] = (double) array2[binID][i];
 
-	  streamDefRecord(streamID2, varID2[varID], binID);
-	  streamWriteRecord(streamID2, tmpdoub, nmiss);
+	  pstreamDefRecord(streamID2, varID2[varID], binID);
+	  pstreamWriteRecord(streamID2, tmpdoub, nmiss);
 	}
 
       Free(tmpdoub);
@@ -467,11 +466,11 @@ void *Ensstat3(void *argument)
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = ef[fileID].streamID;
-      streamClose(streamID);
+      pstreamClose(streamID);
     }
 
   if ( operfunc != func_roc ) 
-    streamClose(streamID2);
+    pstreamClose(streamID2);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     if ( ef[fileID].array ) Free(ef[fileID].array);

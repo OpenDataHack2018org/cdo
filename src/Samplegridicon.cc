@@ -2,7 +2,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 
-#define MAX_CHILDS 9
+constexpr int MAX_CHILDS = 9;
 
 typedef struct {
   int ncells;
@@ -192,6 +192,11 @@ void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
   int ncells1 = cellindex1->ncells;
   int *parent1 = cellindex1->parent;
+  {
+    int i;
+    for ( i = 0; i < ncells1; ++i ) if ( parent1[i] >= 0 ) break;
+    if ( i == ncells1 ) cdoAbort("Missing parent index of %s!", cellindex1->filename);
+  }
   int *idx1 = (int*) Malloc(ncells1*sizeof(int));
   for ( int i = 0; i < ncells1; ++i ) idx1[i] = i;
   for ( int i = 1; i < ncells1; ++i )

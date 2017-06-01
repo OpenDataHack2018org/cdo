@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Yseasstat  yseasrange      Multi-year seasonally range
       Yseasstat  yseasmin        Multi-year seasonally minimum
       Yseasstat  yseasmax        Multi-year seasonally maximum
       Yseasstat  yseassum        Multi-year seasonally sum
@@ -44,6 +45,12 @@ typedef struct {
 }
 date_time_t;
 
+typedef struct {
+  short varID;
+  short levelID;
+} recinfo_t;
+
+
 void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 {
   int year, month, day;
@@ -60,34 +67,32 @@ void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 
 void *Yseasstat(void *argument)
 {
-  int i;
   int varID;
-  int vdate, vtime;
-  int year, month, day, seas;
+  int year, month, day;
   int nrecs;
   int levelID;
   int nsets[NSEAS];
   int nmiss;
-  int nlevel;
   date_time_t datetime[NSEAS];
   field_type **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("yseasmin",  func_min,  0, NULL);
-  cdoOperatorAdd("yseasmax",  func_max,  0, NULL);
-  cdoOperatorAdd("yseassum",  func_sum,  0, NULL);
-  cdoOperatorAdd("yseasmean", func_mean, 0, NULL);
-  cdoOperatorAdd("yseasavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("yseasvar",  func_var,  0, NULL);
-  cdoOperatorAdd("yseasvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("yseasstd",  func_std,  0, NULL);
-  cdoOperatorAdd("yseasstd1", func_std1, 0, NULL);
+  cdoOperatorAdd("yseasrange", func_range, 0, NULL);
+  cdoOperatorAdd("yseasmin",   func_min,   0, NULL);
+  cdoOperatorAdd("yseasmax",   func_max,   0, NULL);
+  cdoOperatorAdd("yseassum",   func_sum,   0, NULL);
+  cdoOperatorAdd("yseasmean",  func_mean,  0, NULL);
+  cdoOperatorAdd("yseasavg",   func_avg,   0, NULL);
+  cdoOperatorAdd("yseasvar",   func_var,   0, NULL);
+  cdoOperatorAdd("yseasvar1",  func_var1,  0, NULL);
+  cdoOperatorAdd("yseasstd",   func_std,   0, NULL);
+  cdoOperatorAdd("yseasstd1",  func_std1,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  for ( seas = 0; seas < NSEAS; seas++ )
+  for ( int seas = 0; seas < NSEAS; seas++ )
     {
       vars1[seas]  = NULL;
       vars2[seas]  = NULL;
@@ -97,10 +102,11 @@ void *Yseasstat(void *argument)
       datetime[seas].vtime = 0;
     }
 
+  bool lrange  = operfunc == func_range;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor  = operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -116,27 +122,25 @@ void *Yseasstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  int nvars    = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
+  int maxrecs = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  int gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
 
   int tsID = 0;
   int otsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
       cdiDecodeDate(vdate, &year, &month, &day);
 
-      seas = month_to_season(month); 
+      int seas = month_to_season(month);
 
       set_date(vdate, vtime, &datetime[seas]);
 
@@ -144,7 +148,7 @@ void *Yseasstat(void *argument)
 	{
 	  vars1[seas] = field_malloc(vlistID1, FIELD_PTR);
 	  samp1[seas] = field_malloc(vlistID1, FIELD_NONE);
-	  if ( lvarstd )
+	  if ( lvarstd || lrange )
 	    vars2[seas] = field_malloc(vlistID1, FIELD_PTR);
 	}
 
@@ -154,136 +158,161 @@ void *Yseasstat(void *argument)
 
 	  if ( tsID == 0 )
 	    {
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
+              recinfo[recID].varID   = varID;
+              recinfo[recID].levelID = levelID;
 	    }
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          field_type *pvars1 = &vars1[seas][varID][levelID];
+          field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
+
+	  int gridsize = pvars1->size;
 
 	  if ( nsets[seas] == 0 )
 	    {
-	      streamReadRecord(streamID1, vars1[seas][varID][levelID].ptr, &nmiss);
-	      vars1[seas][varID][levelID].nmiss = (size_t)nmiss;
+	      streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	      pvars1->nmiss = (size_t)nmiss;
+              if ( lrange )
+                {
+                  pvars2->nmiss = pvars1->nmiss;
+                  for ( int i = 0; i < gridsize; i++ )
+                    pvars2->ptr[i] = pvars1->ptr[i];
+                }
 
 	      if ( nmiss > 0 || samp1[seas][varID][levelID].ptr )
 		{
 		  if ( samp1[seas][varID][levelID].ptr == NULL )
 		    samp1[seas][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		  for ( i = 0; i < gridsize; i++ )
-		    if ( DBL_IS_EQUAL(vars1[seas][varID][levelID].ptr[i],
-				      vars1[seas][varID][levelID].missval) )
-		      samp1[seas][varID][levelID].ptr[i] = 0;
-		    else
-		      samp1[seas][varID][levelID].ptr[i] = 1;
+		  for ( int i = 0; i < gridsize; i++ )
+                    samp1[seas][varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		}
 	    }
 	  else
 	    {
 	      streamReadRecord(streamID1, field.ptr, &nmiss);
               field.nmiss   = (size_t)nmiss;
-	      field.grid    = vars1[seas][varID][levelID].grid;
-	      field.missval = vars1[seas][varID][levelID].missval;
+	      field.grid    = pvars1->grid;
+	      field.missval = pvars1->missval;
 
 	      if ( field.nmiss > 0 || samp1[seas][varID][levelID].ptr )
 		{
 		  if ( samp1[seas][varID][levelID].ptr == NULL )
 		    {
 		      samp1[seas][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			samp1[seas][varID][levelID].ptr[i] = nsets[seas];
 		    }
 		  
-		  for ( i = 0; i < gridsize; i++ )
-		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[seas][varID][levelID].missval) )
+		  for ( int i = 0; i < gridsize; i++ )
+		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 		      samp1[seas][varID][levelID].ptr[i]++;
 		}
 
 	      if ( lvarstd )
 		{
-		  farsumq(&vars2[seas][varID][levelID], field);
-		  farsum(&vars1[seas][varID][levelID], field);
+		  farsumq(pvars2, field);
+		  farsum(pvars1, field);
 		}
+              else if ( lrange )
+                {
+                  farmin(pvars2, field);
+                  farmax(pvars1, field);
+                }
 	      else
 		{
-		  farfun(&vars1[seas][varID][levelID], field, operfunc);
+		  farfun(pvars1, field, operfunc);
 		}
 	    }
 	}
 
       if ( nsets[seas] == 0 && lvarstd )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[seas][varID][levelID];
+            field_type *pvars2 = &vars2[seas][varID][levelID];
+
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      farmoq(&vars2[seas][varID][levelID], vars1[seas][varID][levelID]);
+
+            farmoq(pvars2, *pvars1);
 	  }
 
       nsets[seas]++;
       tsID++;
     }
 
-  for ( seas = 0; seas < NSEAS; seas++ )
+  for ( int seas = 0; seas < NSEAS; seas++ )
     if ( nsets[seas] )
       {
 	if ( lmean )
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID   = recinfo[recID].varID;
+              int levelID = recinfo[recID].levelID;
+              field_type *pvars1 = &vars1[seas][varID][levelID];
+
 	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		{
-		  if ( samp1[seas][varID][levelID].ptr == NULL )
-		    farcdiv(&vars1[seas][varID][levelID], (double)nsets[seas]);
-		  else
-		    fardiv(&vars1[seas][varID][levelID], samp1[seas][varID][levelID]);
-		}
+              
+              if ( samp1[seas][varID][levelID].ptr == NULL )
+                farcdiv(pvars1, (double)nsets[seas]);
+              else
+                fardiv(pvars1, samp1[seas][varID][levelID]);
 	    }
 	else if ( lvarstd )
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID   = recinfo[recID].varID;
+              int levelID = recinfo[recID].levelID;
+              field_type *pvars1 = &vars1[seas][varID][levelID];
+              field_type *pvars2 = &vars2[seas][varID][levelID];
+
 	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		{
-		  if ( samp1[seas][varID][levelID].ptr == NULL )
-		    {
-		      if ( lstd )
-			farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], nsets[seas], divisor);
-		      else
-			farcvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], nsets[seas], divisor);
-		    }
-		  else
-		    {
-		      if ( lstd )
-			farstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID], divisor);
-		      else
-			farvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID], divisor);
-		    }
+
+              if ( samp1[seas][varID][levelID].ptr == NULL )
+                {
+                  if ( lstd ) farcstd(pvars1, *pvars2, nsets[seas], divisor);
+                  else        farcvar(pvars1, *pvars2, nsets[seas], divisor);
+                }
+              else
+                {
+                  if ( lstd ) farstd(pvars1, *pvars2, samp1[seas][varID][levelID], divisor);
+                  else        farvar(pvars1, *pvars2, samp1[seas][varID][levelID], divisor);
 		}
 	    }
+        else if ( lrange )
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID   = recinfo[recID].varID;
+              int levelID = recinfo[recID].levelID;
+              field_type *pvars1 = &vars1[seas][varID][levelID];
+              field_type *pvars2 = &vars2[seas][varID][levelID];
+
+              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+              farsub(pvars1, *pvars2);
+            }
 
 	taxisDefVdate(taxisID2, datetime[seas].vdate);
 	taxisDefVtime(taxisID2, datetime[seas].vtime);
 	streamDefTimestep(streamID2, otsID);
 
-	for ( int recID = 0; recID < nrecords; recID++ )
+	for ( int recID = 0; recID < maxrecs; recID++ )
 	  {
-	    varID    = recVarID[recID];
-	    levelID  = recLevelID[recID];
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[seas][varID][levelID];
 
 	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	    streamDefRecord(streamID2, varID, levelID);
-	    streamWriteRecord(streamID2, vars1[seas][varID][levelID].ptr,
-			      (int)vars1[seas][varID][levelID].nmiss);
+	    streamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
 	  }
 
 	otsID++;
       }
 
-  for ( seas = 0; seas < NSEAS; seas++ )
+  for ( int seas = 0; seas < NSEAS; seas++ )
     {
       if ( vars1[seas] != NULL )
 	{
@@ -295,8 +324,7 @@ void *Yseasstat(void *argument)
 
   if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  Free(recinfo);
 
   streamClose(streamID2);
   streamClose(streamID1);

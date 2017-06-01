@@ -85,8 +85,8 @@ void *EOF3d(void * argument)
   enum T_EIGEN_MODE eigen_mode = get_eigenmode();
   enum T_WEIGHT_MODE weight_mode = get_weightmode();
 
-  int streamID1  = streamOpenRead(cdoStreamName(0));
-  int vlistID1   = streamInqVlist(streamID1);
+  int streamID1  = pstreamOpenRead(cdoStreamName(0));
+  int vlistID1   = pstreamInqVlist(streamID1);
   int gridID1    = vlistInqVarGrid(vlistID1, 0);
   long gridsize  = vlistGridsizeMax(vlistID1);
   int nvars      = vlistNvars(vlistID1);
@@ -115,17 +115,17 @@ void *EOF3d(void * argument)
   if ( nts == -1 )
     {
       nts = 0;
-      while ( streamInqTimestep(streamID1, nts) ) nts++;
+      while ( pstreamInqTimestep(streamID1, nts) ) nts++;
 
       if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
     }
   else
     if ( cdoVerbose ) cdoPrint("Found %i timeSteps", nts);
 
-  streamClose(streamID1);
+  pstreamClose(streamID1);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  vlistID1  = streamInqVlist(streamID1);
+  streamID1 = pstreamOpenRead(cdoStreamName(0));
+  vlistID1  = pstreamInqVlist(streamID1);
   int taxisID1  = vlistInqTaxis(vlistID1);
 
   /* reset the requested number of eigen-function to the maximum if neccessary */
@@ -192,17 +192,17 @@ void *EOF3d(void * argument)
   /* read the data and create covariance matrices for each var & level */
   while ( TRUE )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID1, &varID, &levelID);
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
           missval = vlistInqVarMissval(vlistID1, varID);
-          streamReadRecord(streamID1, in, &nmiss);
+          pstreamReadRecord(streamID1, in, &nmiss);
 
 	  offset = gridsize * levelID;
 	  for ( int i = 0; i < gridsize; ++i )
@@ -381,7 +381,7 @@ void *EOF3d(void * argument)
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
   /*  eigenvalues */
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int taxisID2 = taxisDuplicate(taxisID1);
 
@@ -410,7 +410,7 @@ void *EOF3d(void * argument)
   for ( int i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID2, i, gridID2);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   int vlistID3 = vlistDuplicate(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
@@ -418,8 +418,8 @@ void *EOF3d(void * argument)
   taxisDefRtime(taxisID3, 0);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamDefVlist(streamID2, vlistID2);
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID3, vlistID3);
 
   int vdate = 10101;
   int vtime = 0;
@@ -431,13 +431,13 @@ void *EOF3d(void * argument)
 
       taxisDefVdate(taxisID2, vdate);
       taxisDefVtime(taxisID2, vtime);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       if ( tsID < n_eig )
         {
           taxisDefVdate(taxisID3, vdate);
           taxisDefVtime(taxisID3, vtime);
-          streamDefTimestep(streamID3, tsID);
+          pstreamDefTimestep(streamID3, tsID);
         }
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -452,14 +452,14 @@ void *EOF3d(void * argument)
                   for ( int i = 0; i < gridsize; i++ )
                     if ( DBL_IS_EQUAL(eigenvectors[varID][tsID][offset + i], missval) ) nmiss++;
 
-                  streamDefRecord(streamID3, varID, levelID);
-                  streamWriteRecord(streamID3, &eigenvectors[varID][tsID][offset], nmiss);
+                  pstreamDefRecord(streamID3, varID, levelID);
+                  pstreamWriteRecord(streamID3, &eigenvectors[varID][tsID][offset], nmiss);
                 }
 	    }
 	  if ( DBL_IS_EQUAL(eigenvalues[varID][tsID][0], missval) ) nmiss = 1;
 	  else nmiss = 0;
-	  streamDefRecord(streamID2, varID, 0);
-	  streamWriteRecord(streamID2, eigenvalues[varID][tsID],nmiss);
+	  pstreamDefRecord(streamID2, varID, 0);
+	  pstreamWriteRecord(streamID2, eigenvalues[varID][tsID],nmiss);
         } // for ( varID = 0; ... )
     } // for ( tsID = 0; ... )
 
@@ -489,9 +489,9 @@ void *EOF3d(void * argument)
   Free(pack);
   Free(weight);
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
   
   cdoFinish();
  

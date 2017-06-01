@@ -55,11 +55,11 @@ void *Diff(void *argument)
   if ( operatorArgc() == 2 ) rellim = parameter2double(operatorArgv()[1]);
   if ( rellim < -1.e33 || rellim > 1.e+33 ) cdoAbort("Rel. limit out of range!");
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
@@ -73,21 +73,21 @@ void *Diff(void *argument)
   int taxisID = vlistInqTaxis(vlistID1);
   while ( TRUE )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs > 0 )
 	{
 	  date2str(taxisInqVdate(taxisID), vdatestr, sizeof(vdatestr));
 	  time2str(taxisInqVtime(taxisID), vtimestr, sizeof(vtimestr));
 	}
 
-      nrecs2 = streamInqTimestep(streamID2, tsID);
+      nrecs2 = pstreamInqTimestep(streamID2, tsID);
 
       if ( nrecs == 0 || nrecs2 == 0 ) break;
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID1, &levelID);
-	  streamInqRecord(streamID2, &varID2, &levelID);
+	  pstreamInqRecord(streamID1, &varID1, &levelID);
+	  pstreamInqRecord(streamID2, &varID2, &levelID);
 
 	  indg += 1;
 
@@ -104,8 +104,8 @@ void *Diff(void *argument)
 
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
-	  streamReadRecord(streamID1, array1, &nmiss1);
-	  streamReadRecord(streamID2, array2, &nmiss2);
+	  pstreamReadRecord(streamID1, array1, &nmiss1);
+	  pstreamReadRecord(streamID2, array2, &nmiss2);
 
 	  int ndiff = 0;
 	  bool dsgn = false;
@@ -234,8 +234,8 @@ void *Diff(void *argument)
   if ( nrecs > 0 && nrecs2 == 0 )
     cdoWarning("stream1 has more time steps than stream2!");
 
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);

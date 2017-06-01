@@ -88,9 +88,9 @@ void *Arithdays(void *argument)
   int operfunc = cdoOperatorF1(operatorID);
   int operfunc2 = cdoOperatorF2(operatorID);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -99,9 +99,8 @@ void *Arithdays(void *argument)
 
   int calendar = taxisInqCalendar(taxisID1);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -111,14 +110,14 @@ void *Arithdays(void *argument)
   field.weight = NULL;
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
@@ -139,8 +138,8 @@ void *Arithdays(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
 
           field.nmiss   = (size_t)nmiss;
 	  field.grid    = vlistInqVarGrid(vlistID1, varID);
@@ -148,14 +147,14 @@ void *Arithdays(void *argument)
 
 	  farcfun(&field, rconst, operfunc);
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, field.ptr, (int)field.nmiss);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, field.ptr, (int)field.nmiss);
 	}
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( field.ptr ) Free(field.ptr);
 

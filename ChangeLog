@@ -1,7 +1,21 @@
 2017-08-15  Uwe Schulzweida
 
-	* Using CDI library version 1.8.3
+	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
+
+2017-05-30  Uwe Schulzweida
+
+	* New operator seasrange: seasonal range (seasmax-seasmin)
+	* New operator timselrange: time selection range (timmax-timmin)
+	* New operator runrange: running range (runmax-runmin)
+
+2017-05-26  Uwe Schulzweida
+
+	* eca_gsl: set default to northern hemisphere
+
+2017-05-23  Uwe Schulzweida
+
+	* expr: addeed support for variables starting with digits
 
 2017-05-22  Uwe Schulzweida
 

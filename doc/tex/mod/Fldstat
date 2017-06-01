@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = fldmin fldmax fldsum fldmean fldavg fldstd fldstd1 fldvar fldvar1 fldpctl
+@Operators = fldmin fldmax fldrange fldsum fldmean fldavg fldstd fldstd1 fldvar fldvar1 fldpctl
 
 @BeginDescription
 This module computes statistical values of the input fields. According to the chosen 
-operator the field minimum, maximum, sum, average, variance, standard deviation or 
+operator the field minimum, maximum, range, sum, average, variance, standard deviation or 
 a certain percentile is written to @file{outfile}.
 @EndDescription
 @EndModule
@@ -47,6 +47,25 @@ o(t,1) = max{i(t,x'), x_1<x'<=x_n}
 For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\textbf{max}}\{i(t,x'), x_1 < x' \leq x_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_fldrange
+@Title     = Field range
+
+@BeginDescription
+@IfMan
+For every gridpoint x_1, ..., x_n of the same field it is:
+
+o(t,1) = range{i(t,x'), x_1<x'<=x_n}
+@EndifMan
+@IfDoc
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+@BeginMath
+o(t,1) = \mbox{\textbf{range}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 @EndDescription

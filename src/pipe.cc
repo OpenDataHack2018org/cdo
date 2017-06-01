@@ -27,13 +27,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h> // time()
-#include "pipe.h"
-#include "pstream_int.h"
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "error.h"
 #include "dmemory.h"
+#include "pipe.h"
+#include "pstream_int.h"
 
 #if defined(HAVE_LIBPTHREAD)
 
