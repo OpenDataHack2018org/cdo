@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Yseasstat  yseasrange      Multi-year seasonally range
       Yseasstat  yseasmin        Multi-year seasonally minimum
       Yseasstat  yseasmax        Multi-year seasonally maximum
       Yseasstat  yseassum        Multi-year seasonally sum
@@ -77,15 +78,16 @@ void *Yseasstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("yseasmin",  func_min,  0, NULL);
-  cdoOperatorAdd("yseasmax",  func_max,  0, NULL);
-  cdoOperatorAdd("yseassum",  func_sum,  0, NULL);
-  cdoOperatorAdd("yseasmean", func_mean, 0, NULL);
-  cdoOperatorAdd("yseasavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("yseasvar",  func_var,  0, NULL);
-  cdoOperatorAdd("yseasvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("yseasstd",  func_std,  0, NULL);
-  cdoOperatorAdd("yseasstd1", func_std1, 0, NULL);
+  cdoOperatorAdd("yseasrange", func_range, 0, NULL);
+  cdoOperatorAdd("yseasmin",   func_min,   0, NULL);
+  cdoOperatorAdd("yseasmax",   func_max,   0, NULL);
+  cdoOperatorAdd("yseassum",   func_sum,   0, NULL);
+  cdoOperatorAdd("yseasmean",  func_mean,  0, NULL);
+  cdoOperatorAdd("yseasavg",   func_avg,   0, NULL);
+  cdoOperatorAdd("yseasvar",   func_var,   0, NULL);
+  cdoOperatorAdd("yseasvar1",  func_var1,  0, NULL);
+  cdoOperatorAdd("yseasstd",   func_std,   0, NULL);
+  cdoOperatorAdd("yseasstd1",  func_std1,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -100,10 +102,11 @@ void *Yseasstat(void *argument)
       datetime[seas].vtime = 0;
     }
 
+  bool lrange  = operfunc == func_range;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor  = operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -123,11 +126,11 @@ void *Yseasstat(void *argument)
 
   recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  int gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
 
   int tsID = 0;
   int otsID = 0;
@@ -145,7 +148,7 @@ void *Yseasstat(void *argument)
 	{
 	  vars1[seas] = field_malloc(vlistID1, FIELD_PTR);
 	  samp1[seas] = field_malloc(vlistID1, FIELD_NONE);
-	  if ( lvarstd )
+	  if ( lvarstd || lrange )
 	    vars2[seas] = field_malloc(vlistID1, FIELD_PTR);
 	}
 
@@ -162,12 +165,18 @@ void *Yseasstat(void *argument)
           field_type *pvars1 = &vars1[seas][varID][levelID];
           field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
 
-	  gridsize = pvars1->size;
+	  int gridsize = pvars1->size;
 
 	  if ( nsets[seas] == 0 )
 	    {
 	      streamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	      pvars1->nmiss = (size_t)nmiss;
+              if ( lrange )
+                {
+                  pvars2->nmiss = pvars1->nmiss;
+                  for ( int i = 0; i < gridsize; i++ )
+                    pvars2->ptr[i] = pvars1->ptr[i];
+                }
 
 	      if ( nmiss > 0 || samp1[seas][varID][levelID].ptr )
 		{
@@ -204,6 +213,11 @@ void *Yseasstat(void *argument)
 		  farsumq(pvars2, field);
 		  farsum(pvars1, field);
 		}
+              else if ( lrange )
+                {
+                  farmin(pvars2, field);
+                  farmax(pvars1, field);
+                }
 	      else
 		{
 		  farfun(pvars1, field, operfunc);
@@ -266,6 +280,18 @@ void *Yseasstat(void *argument)
                   else        farvar(pvars1, *pvars2, samp1[seas][varID][levelID], divisor);
 		}
 	    }
+        else if ( lrange )
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID   = recinfo[recID].varID;
+              int levelID = recinfo[recID].levelID;
+              field_type *pvars1 = &vars1[seas][varID][levelID];
+              field_type *pvars2 = &vars2[seas][varID][levelID];
+
+              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+              farsub(pvars1, *pvars2);
+            }
 
 	taxisDefVdate(taxisID2, datetime[seas].vdate);
 	taxisDefVtime(taxisID2, datetime[seas].vtime);
