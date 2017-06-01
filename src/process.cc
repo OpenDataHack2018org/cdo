@@ -65,7 +65,8 @@ int processCreate(void)
   Process[processID].threadID     = pthread_self();
   Process[processID].l_threadID   = 1;
 #endif
-  Process[processID].nstream      = 0;
+  Process[processID].nInStream      = 0;
+  Process[processID].nOutStream      = 0;
   Process[processID].nchild       = 0;
 
   cdoProcessTime(&Process[processID].s_utime, &Process[processID].s_stime);
@@ -157,18 +158,29 @@ off_t processInqNvals(int processID)
   return Process[processID].nvals;
 }
 
+void processAddOutputStream(int streamID)
+{
+  int processID = processSelf();
 
-void processAddStream(int streamID)
+  int sindex = Process[processID].nOutStream++;
+
+  if ( sindex >= MAX_STREAM )
+    Error("Limit of %d output streams per process reached (processID = %d)!", MAX_STREAM, processID);
+
+  Process[processID].outputStreams[sindex] = streamID;
+}
+
+void processAddInputStream(int streamID)
 {
   int processID = processSelf();
 
   if ( pstreamIsPipe(streamID) ) Process[processID].nchild++;
-  int sindex = Process[processID].nstream++;
+  int sindex = Process[processID].nInStream++;
 
   if ( sindex >= MAX_STREAM )
-    Error("Limit of %d streams per process reached (processID = %d)!", MAX_STREAM, processID);
+    Error("Limit of %d input streams per process reached (processID = %d)!", MAX_STREAM, processID);
 
-  Process[processID].streams[sindex] = streamID;
+  Process[processID].inputStreams[sindex] = streamID;
 }
 
 
@@ -213,11 +225,18 @@ void processAccuTime(double utime, double stime)
 }
 
 
-int processInqStreamNum(void)
+int processInqOutputStreamNum(void)
 {
   int processID = processSelf();
 
-  return Process[processID].nstream;
+  return Process[processID].nOutStream;
+}
+
+int processInqInputStreamNum(void)
+{
+  int processID = processSelf();
+
+  return Process[processID].nInStream;
 }
 
 
@@ -229,13 +248,18 @@ int processInqChildNum(void)
 }
 
 
-int processInqStreamID(int streamindex)
+int processInqOutputStreamID(int streamindex)
 {
   int processID = processSelf();
 
-  return (Process[processID].streams[streamindex]);
+  return (Process[processID].outputStreams[streamindex]);
 }
+int processInqInputStreamID(int streamindex)
+{
+  int processID = processSelf();
 
+  return (Process[processID].inputStreams[streamindex]);
+}
 
 const char *processInqOpername2(int processID)
 {

@@ -42,8 +42,10 @@ typedef struct {
   int         l_threadID;
 #endif
   short       nchild;
-  short       nstream;
-  short       streams[MAX_STREAM];
+  short       nInStream;
+  short       nOutStream;
+  short       inputStreams[MAX_STREAM];
+  short       outputStreams[MAX_STREAM];
   double      s_utime;
   double      s_stime;
   double      a_utime;
@@ -77,9 +79,12 @@ void processDelete(void);
 int  processInqTimesteps(void);
 void processDefTimesteps(int streamID);
 int  processInqVarNum(void);
-int  processInqStreamNum(void);
-int  processInqStreamID(int streamindex);
-void processAddStream(int streamID);
+int  processInqInputStreamNum(void);
+int  processInqOutputStreamNum(void);
+int  processInqInputStreamID(int streamindex);
+int  processInqOutputStreamID(int streamindex);
+void processAddInputStream(int streamID);
+void processAddOutputStream(int streamID);
 void processDelStream(int streamID);
 void processDefVarNum(int nvars, int streamID);
 void processDefArgument(void *vargument);

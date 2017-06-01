@@ -372,7 +372,7 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
   }
   pCreateReadThread(newarg, newargument, operatorName);
   /* Free(operatorName); */
-  processAddStream(pstreamID);
+  processAddInputStream(pstreamID);
   /*      pipeInqInfo(pstreamID); */
   if ( PSTREAM_Debug ) Message("pipe %s", pipename);
 #else
@@ -659,7 +659,7 @@ int pstreamOpenWritePipe(const argument_t *argument, int filetype)
 
   pstreamptr->wthreadID = pthread_self();
   pstreamptr->filetype = filetype;
-  processAddStream(pstreamID);
+  processAddOutputStream(pstreamID);
 #endif
 
   return pstreamID;
@@ -1596,10 +1596,22 @@ void pstreamCloseAll(void)
 static
 void processClosePipes(void)
 {
-  int nstream = processInqStreamNum();
+  int nstream = processInqInputStreamNum();
   for ( int sindex = 0; sindex < nstream; sindex++ )
     {
-      int pstreamID = processInqStreamID(sindex);
+      int pstreamID = processInqInputStreamID(sindex);
+      pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+
+      if ( PSTREAM_Debug )
+	Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamID);
+
+      if ( pstreamptr ) pstreamClose(pstreamID);
+    }
+
+  nstream = processInqOutputStreamNum();
+  for ( int sindex = 0; sindex < nstream; sindex++ )
+    {
+      int pstreamID = processInqOutputStreamID(sindex);
       pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
       if ( PSTREAM_Debug )
