@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Vertstat   vertrange       Vertical range
       Vertstat   vertmin         Vertical minimum
       Vertstat   vertmax         Vertical maximum
       Vertstat   vertsum         Vertical sum
@@ -169,25 +170,27 @@ void *Vertstat(void *argument)
 
   cdoInitialize(argument);
 
-                 cdoOperatorAdd("vertmin",  func_min,  0, NULL);
-                 cdoOperatorAdd("vertmax",  func_max,  0, NULL);
-                 cdoOperatorAdd("vertsum",  func_sum,  0, NULL);
-  int VERTINT  = cdoOperatorAdd("vertint",  func_sum,  1, NULL);
-                 cdoOperatorAdd("vertmean", func_mean, 1, NULL);
-                 cdoOperatorAdd("vertavg",  func_avg,  1, NULL);
-                 cdoOperatorAdd("vertvar",  func_var,  1, NULL);
-                 cdoOperatorAdd("vertvar1", func_var1, 1, NULL);
-                 cdoOperatorAdd("vertstd",  func_std,  1, NULL);
-                 cdoOperatorAdd("vertstd1", func_std1, 1, NULL);
+                 cdoOperatorAdd("vertrange", func_range, 0, NULL);
+                 cdoOperatorAdd("vertmin",   func_min,   0, NULL);
+                 cdoOperatorAdd("vertmax",   func_max,   0, NULL);
+                 cdoOperatorAdd("vertsum",   func_sum,   0, NULL);
+  int VERTINT  = cdoOperatorAdd("vertint",   func_sum,   1, NULL);
+                 cdoOperatorAdd("vertmean",  func_mean,  1, NULL);
+                 cdoOperatorAdd("vertavg",   func_avg,   1, NULL);
+                 cdoOperatorAdd("vertvar",   func_var,   1, NULL);
+                 cdoOperatorAdd("vertvar1",  func_var1,  1, NULL);
+                 cdoOperatorAdd("vertstd",   func_std,   1, NULL);
+                 cdoOperatorAdd("vertstd1",  func_std1,  1, NULL);
 
   int operatorID   = cdoOperatorID();
   int operfunc     = cdoOperatorF1(operatorID);
   bool needWeights = cdoOperatorF2(operatorID);
 
+  bool lrange  = operfunc == func_range;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor  = operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   //int applyWeights = lmean;
 
@@ -259,7 +262,7 @@ void *Vertstat(void *argument)
   field_type *vars1 = (field_type*) Malloc(nvars*sizeof(field_type));
   field_type *samp1 = (field_type*) Malloc(nvars*sizeof(field_type));
   field_type *vars2 = NULL;
-  if ( lvarstd )
+  if ( lvarstd || lrange )
     vars2 = (field_type*) Malloc(nvars*sizeof(field_type));
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -281,7 +284,7 @@ void *Vertstat(void *argument)
       samp1[varID].nmiss   = 0;
       samp1[varID].missval = missval;
       samp1[varID].ptr     = NULL;
-      if ( lvarstd )
+      if ( lvarstd || lrange )
 	{
 	  field_init(&vars2[varID]);
 	  vars2[varID].grid    = gridID;
@@ -302,6 +305,7 @@ void *Vertstat(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 
           vars1[varID].nsamp++;
+          if ( lrange ) vars2[varID].nsamp++;
 	  gridsize = gridInqSize(vars1[varID].grid);
 	  zaxisID  = vars1[varID].zaxis;
 	  nlev = zaxisInqSize(zaxisID);
@@ -333,6 +337,12 @@ void *Vertstat(void *argument)
 	    {
 	      streamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
 	      vars1[varID].nmiss = (size_t)nmiss;
+              if ( lrange )
+                {
+                  vars2[varID].nmiss = (size_t)nmiss;
+                  for ( int i = 0; i < gridsize; i++ )
+                    vars2[varID].ptr[i] = vars1[varID].ptr[i];
+                }
 
 	      if ( operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0) ) farcmul(&vars1[varID], layer_thickness);
 	      if ( lmean && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&vars1[varID], layer_weight);
@@ -399,6 +409,11 @@ void *Vertstat(void *argument)
                       farsum(&vars1[varID], field);
                     }
 		}
+              else if ( lrange )
+                {
+                  farmin(&vars2[varID], field);
+                  farmax(&vars1[varID], field);
+                }
 	      else
 		{
 		  farfun(&vars1[varID], field, operfunc);
@@ -434,6 +449,10 @@ void *Vertstat(void *argument)
 			farvar(&vars1[varID], vars2[varID], samp1[varID], divisor);
 		    }
 		}
+              else if ( lrange )
+                {
+                  farsub(&vars1[varID], vars2[varID]);
+                }
 
 	      streamDefRecord(streamID2, varID, 0);
 	      streamWriteRecord(streamID2, vars1[varID].ptr, (int)vars1[varID].nmiss);

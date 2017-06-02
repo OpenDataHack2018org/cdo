@@ -301,6 +301,7 @@ Operator catalog:
    Gridboxstat   gridboxvar1     Gridbox variance (n-1)
    Vertstat      vertmin         Vertical minimum
    Vertstat      vertmax         Vertical maximum
+   Vertstat      vertrange       Vertical range
    Vertstat      vertsum         Vertical sum
    Vertstat      vertmean        Vertical mean
    Vertstat      vertavg         Vertical average
