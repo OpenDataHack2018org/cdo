@@ -5,6 +5,7 @@
 
 2017-06-02  Uwe Schulzweida
 
+	* New operator ensrange: Ensemble range (ensmax-ensmin)
 	* New operator vertrange: Vertical range (vertmax-vertmin)
 	* New operator merrange: Meridional range (mermax-mermin)
 	* New operator gridboxrange: Gridbox range (gribboxmax-gridboxmin)
