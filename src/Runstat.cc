@@ -148,6 +148,7 @@ void *Runstat(void *argument)
               recinfo[recID].levelID = levelID;
 	    }
 	  
+          field_type *psamp1 = samp1 ? &samp1[tsID][varID][levelID] : NULL;
           field_type *pvars1 = &vars1[tsID][varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[tsID][varID][levelID] : NULL;
 
@@ -162,7 +163,7 @@ void *Runstat(void *argument)
                 pvars2->ptr[i] = pvars1->ptr[i];
             }
 
-	  if ( runstat_nomiss && nmiss > 0 ) cdoAbort("Missing values supported swichted off!");
+	  if ( runstat_nomiss && nmiss > 0 ) cdoAbort("Missing values supported was swichted off by env. RUNSTAT_NOMISS!");
 
 	  if ( !runstat_nomiss )
 	    {
@@ -172,14 +173,14 @@ void *Runstat(void *argument)
                 imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
 	      for ( int i = 0; i < gridsize; i++ )
-		samp1[tsID][varID][levelID].ptr[i] = (double) imask[i];
+		psamp1->ptr[i] = (double) imask[i];
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(tsID,gridsize,imask,samp1,varID,levelID)
 #endif
 	      for ( int inp = 0; inp < tsID; inp++ )
 		{
-		  double *ptr = samp1[inp][varID][levelID].ptr;
+                  double *ptr = samp1[inp][varID][levelID].ptr;
 		  for ( int i = 0; i < gridsize; i++ )
 		    if ( imask[i] ) ptr[i]++;
 		}
@@ -224,53 +225,40 @@ void *Runstat(void *argument)
   int otsID = 0;
   while ( TRUE )
     {
-      if ( lmean )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[0][varID][levelID];
+      for ( int recID = 0; recID < maxrecs; recID++ )
+        {
+          int varID   = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
+          field_type *psamp1 = samp1 ? &samp1[0][varID][levelID] : NULL;
+          field_type *pvars1 = &vars1[0][varID][levelID];
+          field_type *pvars2 = vars2 ? &vars2[0][varID][levelID] : NULL;
+          int nsets = ndates;
 
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-            if ( runstat_nomiss )
-              farcdiv(pvars1, (double)ndates);
-            else
-              fardiv(pvars1, samp1[0][varID][levelID]);
-	  }
-      else if ( lvarstd )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[0][varID][levelID];
-            field_type *pvars2 = &vars2[0][varID][levelID];
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-            if ( runstat_nomiss )
-              {
-                if ( lstd ) farcstd(pvars1, *pvars2, ndates, divisor);
-                else        farcvar(pvars1, *pvars2, ndates, divisor);
-              }
-            else
-              {
-                if ( lstd ) farstd(pvars1, *pvars2, samp1[0][varID][levelID], divisor);
-                else        farvar(pvars1, *pvars2, samp1[0][varID][levelID], divisor);
-	      }
-	  }
-      else if ( lrange )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[0][varID][levelID];
-            field_type *pvars2 = &vars2[0][varID][levelID];
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-            farsub(pvars1, *pvars2);
-	  }
+          if ( lmean )
+            {
+              if ( !runstat_nomiss ) fardiv(pvars1, *psamp1);
+              else                   farcdiv(pvars1, (double)nsets);
+            }
+          else if ( lvarstd )
+            {
+              if ( !runstat_nomiss )
+                {
+                  if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
+                  else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                }
+              else
+                {
+                  if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
+                  else        farcvar(pvars1, *pvars2, nsets, divisor);
+                }
+            }
+          else if ( lrange )
+            {
+              farsub(pvars1, *pvars2);
+            }
+        }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
       streamDefTimestep(streamID2, otsID);
@@ -315,6 +303,7 @@ void *Runstat(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  
+          field_type *psamp1 = samp1 ? &samp1[ndates-1][varID][levelID] : NULL;
           field_type *pvars1 = &vars1[ndates-1][varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[ndates-1][varID][levelID] : NULL;
 
@@ -339,14 +328,14 @@ void *Runstat(void *argument)
                 imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
 	      for ( int i = 0; i < gridsize; i++ )
-		samp1[ndates-1][varID][levelID].ptr[i] = (double) imask[i];
+		psamp1->ptr[i] = (double) imask[i];
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(ndates,imask,gridsize,samp1,varID,levelID)
 #endif
 	      for ( int inp = 0; inp < ndates-1; inp++ )
 		{
-		  double *ptr = samp1[inp][varID][levelID].ptr;
+                  double *ptr = samp1[inp][varID][levelID].ptr;
 		  for ( int i = 0; i < gridsize; i++ )
 		    if ( imask[i] ) ptr[i]++;
 		}
