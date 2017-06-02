@@ -1310,110 +1310,9 @@ static char *get_txtatt(int vlistID, int varID, char *key)
   return txtatt;
 }
 
-static void setup_dataset(list_t *kvl, int streamID, int *calendar)
-{
-  if ( cdoVerbose )
-    printf("*******Start to process cmor_setup and cmor_dataset.*******\n");
-  int netcdf_file_action = get_netcdf_file_action(kvl);
-  int set_verbosity = get_cmor_verbosity(kvl);
-  int exit_control = get_cmor_exit_control(kvl);
-  int creat_subs = 1;
-  char *drs = kv_get_a_val(kvl, "d", "y");
-  if ( drs[0] == 'n' )
-    creat_subs = 0;
-  else if ( drs[0] != 'y' )
-    {
-      cdoWarning("Unknown value for keyword 'drs' is found: '%s'.\nAllowed are: 'n' or 'y'. DRS is set to 'y'.", drs);
-      kv_insert_a_val(kvl, "d", "y", 1);
-    }
-
-  int vlistID = streamInqVlist(streamID);
-
-  cmor_setup(kv_get_a_val(kvl, "inpath", "/usr/share/cmor/"),
-             &netcdf_file_action,
-             &set_verbosity,
-             &exit_control,
-             kv_get_a_val(kvl, "logfile", NULL),
-             &creat_subs);
-
-  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
-
-/*
-  char *attcomment = kv_get_a_val(kvl, "comment", NULL);
-  char *comment = get_txtatt(vlistID, CDI_GLOBAL, "comment");
-*/
-  
-  char *attcalendar = kv_get_a_val(kvl, "calendar", NULL);
-  char *calendarptr = get_calendar_ptr(taxisInqCalendar(taxisID));
-  if ( cdoVerbose )
-    printf("Checking attribute 'calendar' from configuration.\n");
-  if ( *calendar = get_calendar_int(attcalendar) )
-    check_compare_set(&calendarptr, attcalendar, "calendar", NULL);
-  else 
-    {
-      if ( cdoVerbose )
-        printf("Try to use Ifile calendar.\n");
-      if ( !get_calendar_int(calendarptr) )
-        cdoAbort("No valid configuration and no valid Ifile calendar found.");
-      else
-        *calendar = get_calendar_int(calendarptr);
-    }
-  
-  double branch_time = atof(kv_get_a_val(kvl, "branch_time", "0.0"));
-
-#if defined(CMOR_VERSION_MAJOR)
-#if ( CMOR_VERSION_MAJOR == 2 )
-    {
-      cmor_dataset(kv_get_a_val(kvl, "dr", "./"),
-               kv_get_a_val(kvl, "experiment_id", ""),
-               kv_get_a_val(kvl, "institution", ""),
-               kv_get_a_val(kvl, "source", ""),
-               calendarptr,
-               atoi(kv_get_a_val(kvl, "realization", "")),
-               kv_get_a_val(kvl, "contact", ""),
-               kv_get_a_val(kvl, "history", ""),
-/* comment:*/
-               kv_get_a_val(kvl, "comment", ""),
-               kv_get_a_val(kvl, "references", ""),
-               atoi(kv_get_a_val(kvl, "leap_year", "")),
-               atoi(kv_get_a_val(kvl, "leap_month", "")),
-               NULL,
-               kv_get_a_val(kvl, "model_id", ""),
-               kv_get_a_val(kvl, "forcing", ""),
-               atoi(kv_get_a_val(kvl, "initialization_method", "")),
-               atoi(kv_get_a_val(kvl, "physics_version", "")),
-               kv_get_a_val(kvl, "institute_id", ""),
-               kv_get_a_val(kvl, "parent_experiment_id", ""),
-               &branch_time,
-               kv_get_a_val(kvl, "parent_experiment_rip", ""));
-    }
-#elif ( CMOR_VERSION_MAJOR == 3 )
-    {
-      cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
-      cmor_set_cur_dataset_attribute("branch_time", kv_get_a_val(kvl, "branchtime", "0.0"), 1); 
-      cmor_dataset_json("/home/dkrz/k204210/test.json");
-
-      int i = 0;
-      char *allneeded[] = {"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institution_id", "institute_id", "parent_experiment_rip", NULL};
-      while ( allneeded[i] )
-        {
-          char *tmp = kv_get_a_val(kvl, allneeded[i], "notSet");
-          if ( strncmp(tmp, "notSet", 6) != 0 )
-            cmor_set_cur_dataset_attribute(allneeded[i], tmp, 1);
-          i++;
-        }
-    }
-#else
-    cdoAbort("Cmor version %d not yet enabled!\n", (int) CMOR_VERSION_MAJOR);
-#endif
-#else
-    cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
-#endif
-  Free(calendarptr);
-  if ( cdoVerbose )
-    printf("*******Successfully finished cmor_setup and cmor_dataset.*******\n");
-}
-
+/***********************************************/
+/*Time related functions************************/
+/***********************************************/
 
 static char *get_time_units(int taxisID)
 {
@@ -1467,19 +1366,6 @@ static int check_time_units(char *time_units)
   return 1;
 }
 
-static void get_taxis(char *required_time_units, int *sdate, int *stime, int *timeunit)
-{
-  int attyear, attmonth, attday, atthour, attminute, attsecond;
-  char atttimeunit[CMOR_MAX_STRING];
-
-  sscanf(required_time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s",
-                  atttimeunit, &attyear, &attmonth, &attday, &atthour,
-                  &attminute, &attsecond);
-  *sdate = cdiEncodeDate(attyear, attmonth, attday);
-  *stime = cdiEncodeTime(atthour, attminute, attsecond);
-  *timeunit = get_time_step_int(atttimeunit);
-}
-
 static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time_name, char *project_id, int miptab_freq, int *time_axis)
 {
   if ( ( strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CMIP6") == 0 ) && miptab_freq )
@@ -1508,6 +1394,202 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
       Free(time_method);
     }
 }
+
+static void get_taxis(char *required_time_units, int *sdate, int *stime, int *timeunit)
+{
+  int attyear, attmonth, attday, atthour, attminute, attsecond;
+  char atttimeunit[CMOR_MAX_STRING];
+
+  sscanf(required_time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s",
+                  atttimeunit, &attyear, &attmonth, &attday, &atthour,
+                  &attminute, &attsecond);
+  *sdate = cdiEncodeDate(attyear, attmonth, attday);
+  *stime = cdiEncodeTime(atthour, attminute, attsecond);
+  *timeunit = get_time_step_int(atttimeunit);
+}
+
+static double *get_branch_times(list_t *kvl, int calendar, char *time_units)
+{
+  if ( cdoVerbose )
+    printf("*******Start to compute attribute 'branch_time'.******\n");
+  double *branch_time = Malloc(2 * sizeof(double));
+  branch_time[0] = 0.0;
+  branch_time[1] = 0.0;
+
+  int numdates;
+  char **branch_times_p = kv_get_vals(kvl, "branch_times", &numdates);
+
+  if ( numdates == 2 && kv_get_a_val(kvl, "parent_experiment_id", NULL) )
+    {
+      int parentdates[2], parentyears[2], parentmonths[2], parentdays[2], parentvdates[2], parentvtimes[2];
+      juldate_t parentstartdate, parentbranchdate, childstartdate ;
+      for ( int i = 0; i < 2; i++ )
+        {
+          parentdates[i]  = atol(branch_times_p[i]);
+          parentyears[i]  =  parentdates[i]/100/100;
+          parentmonths[i] = (parentdates[i] - parentyears[i]*100*100)/100;
+          parentdays[i]   =  parentdates[i] - parentyears[i]*100*100 - parentmonths[i]*100;
+          parentvdates[i] = cdiEncodeDate(parentyears[i], parentmonths[i], parentdays[i]);
+          parentvtimes[i] = 0;
+        }
+      parentstartdate   = juldate_encode(calendar, parentvdates[0], parentvtimes[0]);
+      parentbranchdate  = juldate_encode(calendar, parentvdates[1], parentvtimes[1]);
+
+      int childsdate, childstime, childtimeunit;
+      get_taxis(time_units, &childsdate, &childstime, &childtimeunit);
+      childstartdate    = juldate_encode(calendar, childsdate, childstime);
+
+/* If time unit is always "days since.." */
+      branch_time[0] = juldate_to_seconds(juldate_sub(parentbranchdate, parentstartdate)) / 86400;
+      branch_time[1] = juldate_to_seconds(juldate_sub(parentbranchdate, childstartdate)) / 86400;
+    }
+  if ( cdoVerbose )
+    printf("*******Succesfully computed 'branch_time'.*******\n");
+  return branch_time;
+}
+
+static char *check_required_time_units(list_t *kvl, int taxisID)
+{
+  if ( cdoVerbose )
+    printf("*******Start to check attribute 'required_time_units'.******\n");
+  char *time_units = get_time_units(taxisID);
+  char *required_time_units = kv_get_a_val(kvl, "required_time_units", NULL);
+  if ( check_time_units(required_time_units) )
+    check_compare_set(&time_units, required_time_units, "time_units", NULL);
+  else 
+    cdoAbort("Required Attribute 'required_time_units' from configuration is invalid!");
+  kv_insert_a_val(kvl, "required_time_units", time_units, 1);
+  if ( cdoVerbose )
+    printf("*******Succesfully checked attribute 'required_time_units'.*******\n");
+  return time_units;
+}
+
+static char *check_calendar(list_t *kvl, int taxisID, int *calendar)
+{ 
+  if ( cdoVerbose )
+    printf("*******Start to check attribute 'calendar'.******\n");
+  char *attcalendar = kv_get_a_val(kvl, "calendar", NULL);
+  char *calendarptr = get_calendar_ptr(taxisInqCalendar(taxisID));
+  if ( *calendar = get_calendar_int(attcalendar) )
+    check_compare_set(&calendarptr, attcalendar, "calendar", NULL);
+  else 
+    {
+      if ( cdoVerbose )
+        printf("Try to use Ifile calendar.\n");
+      if ( !get_calendar_int(calendarptr) )
+        cdoAbort("No valid configuration and no valid Ifile calendar found.");
+      else
+        *calendar = get_calendar_int(calendarptr);
+    }
+  if ( cdoVerbose )
+    printf("*******Succesfully checked attribute 'calendar'.*******\n");
+}
+
+/*********/
+/* main: */
+/*********/
+
+static void setup_dataset(list_t *kvl, int streamID, int *calendar)
+{
+  if ( cdoVerbose )
+    printf("*******Start to process cmor_setup and cmor_dataset.*******\n");
+  int netcdf_file_action = get_netcdf_file_action(kvl);
+  int set_verbosity = get_cmor_verbosity(kvl);
+  int exit_control = get_cmor_exit_control(kvl);
+  int creat_subs = 1;
+  char *drs = kv_get_a_val(kvl, "d", "y");
+  if ( drs[0] == 'n' )
+    creat_subs = 0;
+  else if ( drs[0] != 'y' )
+    {
+      cdoWarning("Unknown value for keyword 'drs' is found: '%s'.\nAllowed are: 'n' or 'y'. DRS is set to 'y'.", drs);
+      kv_insert_a_val(kvl, "d", "y", 1);
+    }
+
+  int vlistID = streamInqVlist(streamID);
+
+  cmor_setup(kv_get_a_val(kvl, "inpath", "/usr/share/cmor/"),
+             &netcdf_file_action,
+             &set_verbosity,
+             &exit_control,
+             kv_get_a_val(kvl, "logfile", NULL),
+             &creat_subs);
+
+  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
+
+/*
+  char *attcomment = kv_get_a_val(kvl, "comment", NULL);
+  char *comment = get_txtatt(vlistID, CDI_GLOBAL, "comment");
+*/
+
+/* First compare file calendar and config calendar and retrieve pointer and integer
+   Then check the required time units from config and retrieve
+   Then compute branch_time_in_parent and branch_time_in_child */
+
+  char *calendarptr = check_calendar(kvl, taxisID, calendar);  
+  char *time_units = check_required_time_units(kvl, taxisID);
+  double *branch_times = get_branch_times(kvl, *calendar, time_units); 
+
+#if defined(CMOR_VERSION_MAJOR)
+#if ( CMOR_VERSION_MAJOR == 2 )
+    {
+      cmor_dataset(kv_get_a_val(kvl, "dr", "./"),
+               kv_get_a_val(kvl, "experiment_id", ""),
+               kv_get_a_val(kvl, "institution", ""),
+               kv_get_a_val(kvl, "source", ""),
+               calendarptr,
+               atoi(kv_get_a_val(kvl, "realization", "")),
+               kv_get_a_val(kvl, "contact", ""),
+               kv_get_a_val(kvl, "history", ""),
+               kv_get_a_val(kvl, "comment", ""),
+               kv_get_a_val(kvl, "references", ""),
+               atoi(kv_get_a_val(kvl, "leap_year", "")),
+               atoi(kv_get_a_val(kvl, "leap_month", "")),
+               NULL,
+               kv_get_a_val(kvl, "model_id", ""),
+               kv_get_a_val(kvl, "forcing", ""),
+               atoi(kv_get_a_val(kvl, "initialization_method", "")),
+               atoi(kv_get_a_val(kvl, "physics_version", "")),
+               kv_get_a_val(kvl, "institute_id", ""),
+               kv_get_a_val(kvl, "parent_experiment_id", ""),
+               &(branch_times[0]),
+               kv_get_a_val(kvl, "parent_experiment_rip", ""));
+    }
+#elif ( CMOR_VERSION_MAJOR == 3 )
+    {
+      cmor_dataset_json("/home/dkrz/k204210/test.json");
+      cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
+      char *branch_time_in_parent = (char *) Malloc(sizeof(double));;
+      memcpy(branch_time_in_parent, &(branch_times[0]), sizeof(double));
+      char *branch_time_in_child = (char *) Malloc(sizeof(double));;
+      memcpy(branch_time_in_child, &(branch_times[1]), sizeof(double));
+      cmor_set_cur_dataset_attribute("branch_time_in_parent", branch_time_in_parent, 1); 
+      cmor_set_cur_dataset_attribute("branch_time_in_child", branch_time_in_child, 1); 
+
+      int i = 0;
+      char *allneeded[] = {"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institution_id", "institute_id", "parent_experiment_rip", NULL};
+      while ( allneeded[i] )
+        {
+          char *tmp = kv_get_a_val(kvl, allneeded[i], "notSet");
+          if ( strncmp(tmp, "notSet", 6) != 0 )
+            cmor_set_cur_dataset_attribute(allneeded[i], tmp, 1);
+          i++;
+        }
+      Free(branch_time_in_parent);
+      Free(branch_time_in_child);
+    }
+#else
+    cdoAbort("Cmor version %d not yet enabled!\n", (int) CMOR_VERSION_MAJOR);
+#endif
+#else
+    cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
+#endif
+  Free(calendarptr);
+  Free(branch_times);
+  if ( cdoVerbose )
+    printf("*******Successfully finished cmor_setup and cmor_dataset.*******\n");
+}
+
 
 static void gen_bounds(int n, double *vals, double *bounds)
 {
@@ -2570,16 +2652,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
-  if ( cdoVerbose )
-    printf("*******Start to check attribute 'required_time_units'.******\n");
-  char *time_units = get_time_units(taxisID);
-  char *required_time_units = kv_get_a_val(kvl, "required_time_units", NULL);
-  if ( check_time_units(required_time_units) )
-    check_compare_set(&time_units, required_time_units, "time_units", NULL);
-  else 
-    cdoAbort("Required Attribute 'required_time_units' from configuration is invalid!");
-  if ( cdoVerbose )
-    printf("*******Succesfully checked attribute 'required_time_units'.*******\n");
+  char *time_units = kv_get_a_val(kvl, "required_time_units", NULL);
 
   if ( cdoVerbose )
     printf("*******Start to retrieve requested variables.******\n");
@@ -3914,7 +3987,7 @@ static char *get_project_id(list_t *kvl)
   return project_id;
 }
 
-static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, char *mip_table);
+static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, char *mip_table)
 {
   int table_id = 0;
 #if ( CMOR_VERSION_MAJOR == 3 )
@@ -3955,12 +4028,12 @@ void *CMOR(void *argument)
   read_config_files(kvl);
 
   /* Get project_id, mip_table and mip_table frequency*/
-  char *project_id = get_project_id(kvl, &project_id);
-  char *mip_table  = get_mip_table(params[0], kvl, *project_id);
+  char *project_id = get_project_id(kvl);
+  char *mip_table  = get_mip_table(params[0], kvl, project_id);
 #if ( CMOR_VERSION_MAJOR == 3 )
   mip_table[strlen(mip_table)-5] = '\0';
 #endif
-  int miptab_freq  = get_miptab_freq(kvl, mip_table, *project_id);
+  int miptab_freq  = get_miptab_freq(kvl, mip_table, project_id);
 
   char *miptab_freqptr = strdup(freq_from_path(mip_table));
   kv_insert_a_val(kvl, "miptab_freq", miptab_freqptr, 1);
