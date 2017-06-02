@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = yhourmin yhourmax yhoursum yhourmean yhouravg yhourstd yhourstd1 yhourvar yhourvar1
+@Operators = yhourmin yhourmax yhourrange yhoursum yhourmean yhouravg yhourstd yhourstd1 yhourvar yhourvar1
 
 @BeginDescription
 This module computes statistical values of each hour and day of year.
-Depending on the chosen operator the minimum, maximum, sum, average, variance
+Depending on the chosen operator the minimum, maximum, range, sum, average, variance
 or standard deviation of each hour and day of year in @file{infile} is written to @file{outfile}.
 The date information in an output field is the date of the last contributing input field.
 @EndModule
@@ -52,6 +52,28 @@ o(8784,x) = max{i(t,x), day(i(t)) = 8784}
 o(\mbox{0001},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
 o(\mbox{8784},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhourrange
+@Title     = Multi-year hourly range
+
+@BeginDescription
+@IfMan
+o(0001,x) = range{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = range{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\textbf{range}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\textbf{range}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc

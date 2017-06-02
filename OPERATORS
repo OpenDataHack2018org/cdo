@@ -397,6 +397,7 @@ Operator catalog:
    Seaspctl      seaspctl        Seasonal percentiles
    Yhourstat     yhourmin        Multi-year hourly minimum
    Yhourstat     yhourmax        Multi-year hourly maximum
+   Yhourstat     yhourrange      Multi-year hourly range
    Yhourstat     yhoursum        Multi-year hourly sum
    Yhourstat     yhourmean       Multi-year hourly mean
    Yhourstat     yhouravg        Multi-year hourly average
@@ -406,6 +407,7 @@ Operator catalog:
    Yhourstat     yhourvar1       Multi-year hourly variance (n-1)
    Ydaystat      ydaymin         Multi-year daily minimum
    Ydaystat      ydaymax         Multi-year daily maximum
+   Ydaystat      ydayrange       Multi-year daily range
    Ydaystat      ydaysum         Multi-year daily sum
    Ydaystat      ydaymean        Multi-year daily mean
    Ydaystat      ydayavg         Multi-year daily average
@@ -416,6 +418,7 @@ Operator catalog:
    Ydaypctl      ydaypctl        Multi-year daily percentiles
    Ymonstat      ymonmin         Multi-year monthly minimum
    Ymonstat      ymonmax         Multi-year monthly maximum
+   Ymonstat      ymonrange       Multi-year monthly range
    Ymonstat      ymonsum         Multi-year monthly sum
    Ymonstat      ymonmean        Multi-year monthly mean
    Ymonstat      ymonavg         Multi-year monthly average
@@ -426,6 +429,7 @@ Operator catalog:
    Ymonpctl      ymonpctl        Multi-year monthly percentiles
    Yseasstat     yseasmin        Multi-year seasonal minimum
    Yseasstat     yseasmax        Multi-year seasonal maximum
+   Yseasstat     yseasrange      Multi-year seasonal range
    Yseasstat     yseassum        Multi-year seasonal sum
    Yseasstat     yseasmean       Multi-year seasonal mean
    Yseasstat     yseasavg        Multi-year seasonal average
