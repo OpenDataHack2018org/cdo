@@ -5,7 +5,8 @@
 
 2017-06-02  Uwe Schulzweida
 
-	* New operator gridboxrange: gridbox range (gribboxmax-gridboxmin)
+	* New operator merrange: Meridional range (mermax-mermin)
+	* New operator gridboxrange: Gridbox range (gribboxmax-gridboxmin)
 
 2017-06-01  Uwe Schulzweida
 

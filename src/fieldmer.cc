@@ -27,6 +27,7 @@ void merfun(field_type field1, field_type *field2, int function)
     {
     case func_min:   mermin(field1, field2);    break;
     case func_max:   mermax(field1, field2);    break;
+    case func_range: merrange(field1, field2);  break;
     case func_sum:   mersum(field1, field2);    break;
     case func_meanw: mermeanw(field1, field2);  break;
     case func_avgw:  meravgw(field1, field2);   break;
@@ -117,6 +118,64 @@ void mermax(field_type field1, field_type *field2)
 	}
 
       field2->ptr[i] = rmax;
+    }
+
+  field2->nmiss  = rnmiss;
+}
+
+
+void merrange(field_type field1, field_type *field2)
+{
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
+  int    grid    = field1.grid;
+  int    nmiss   = field1.nmiss;
+  double missval = field1.missval;
+  double *array  = field1.ptr;
+  double rmin = 0;
+  double rmax = 0;
+  double rrange = 0;
+
+  nx    = gridInqXsize(grid);
+  ny    = gridInqYsize(grid);
+
+  for ( i = 0; i < nx; i++ )
+    {
+      if ( nmiss > 0 )
+	{
+	  rmin =  DBL_MAX;
+	  rmax = -DBL_MAX;
+	  for ( j = 0; j < ny; j++ )
+	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
+              {
+		if      ( array[j*nx+i] < rmin ) rmin = array[j*nx+i];
+                else if ( array[j*nx+i] > rmax ) rmax = array[j*nx+i];
+              }
+
+	  if ( IS_EQUAL(rmin, DBL_MAX) || IS_EQUAL(rmax, -DBL_MAX) )
+	    {
+	      rnmiss++;
+	      rrange = missval;
+	    }
+	  else
+	    {
+	      rrange = rmax - rmin;
+	    }
+	}
+      else
+	{
+	  rmin = DBL_MAX;
+	  rmax = DBL_MIN;
+	  for ( j = 0; j < ny; j++ )
+	    {
+	      if      ( array[j*nx+i] < rmin )  rmin = array[j*nx+i];
+	      else if ( array[j*nx+i] > rmax )  rmax = array[j*nx+i];
+	    }
+
+          rrange = rmax - rmin;
+	}
+
+      field2->ptr[i] = rrange;
     }
 
   field2->nmiss  = rnmiss;

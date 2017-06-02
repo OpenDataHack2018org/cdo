@@ -280,6 +280,7 @@ Operator catalog:
    Zonstat       zonpctl         Zonal percentiles
    Merstat       mermin          Meridional minimum
    Merstat       mermax          Meridional maximum
+   Merstat       merrange        Meridional range
    Merstat       mersum          Meridional sum
    Merstat       mermean         Meridional mean
    Merstat       meravg          Meridional average

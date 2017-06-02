@@ -370,7 +370,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}
-#define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "merstd", "merstd1", "mervar", "mervar1", "merpctl"}
+#define  MerstatOperators       {"merrange", "mermin", "mermax", "mersum", "mermean", "meravg", "merstd", "merstd1", "mervar", "mervar1", "merpctl"}
 #define  MonarithOperators      {"monadd", "monsub", "monmul", "mondiv"}
 #define  MrotuvOperators        {"mrotuv"}
 #define  MrotuvbOperators       {"mrotuvb"}
