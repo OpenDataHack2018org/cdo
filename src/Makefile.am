@@ -240,6 +240,7 @@ cdo_SOURCES += Adisit.c        \
                Ensval.c        \
                Eofcoeff.c      \
 	       Eofcoeff3d.c    \
+               EstFreq.c       \
                Exprf.c         \
                FC.c            \
                Filedes.c       \

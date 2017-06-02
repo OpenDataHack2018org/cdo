@@ -83,6 +83,7 @@ void *Eofcoeff(void *argument);
 void *Eofcoeff3d(void *argument);
 void *EOFs(void *argument);
 void *EOF3d(void *argument);
+void *EstFreq(void *argument);
 void *Expr(void *argument);
 void *FC(void *argument);
 void *Filedes(void *argument);
@@ -330,6 +331,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  EOFsOperators          {"eof", "eofspatial", "eoftime"}
 #define  EOF3dOperators         {"eof3d","eof3dspatial","eof3dtime"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
+#define  EstFreqOperators       {"estfreq"}
 #define  FCOperators            {"fc2sp", "sp2fc", "fc2gp", "gp2fc"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "codetab", \
                                  "vlist", "partab", "partab2", "spartab"}
@@ -626,6 +628,7 @@ static modules_t Modules[] =
   { Eofcoeff3d,     EofcoeffHelp,      Eofcoeff3dOperators,    1,   CDI_REAL,  2, -1 },
   { EOFs,           EOFsHelp,          EOFsOperators,          1,   CDI_REAL,  1,  2 },
   { EOF3d,          EOFsHelp,          EOF3dOperators,         1,   CDI_REAL,  1,  2 },
+  { EstFreq,        NULL,              EstFreqOperators,       1,   CDI_REAL,  1,  1 },
   { Expr,           ExprHelp,          ExprOperators,          1,   CDI_REAL,  1,  1 },
   { FC,             NULL,              FCOperators,            1,   CDI_REAL,  1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,       1,   CDI_BOTH,  1,  0 },
