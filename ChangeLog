@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
 
+2017-06-02  Uwe Schulzweida
+
+	* New operator gridboxrange: gridbox range (gribboxmax-gridboxmin)
+
 2017-06-01  Uwe Schulzweida
 
 	* New operator yhourrange: Multi-year hourly range (yhourmax-yhourmin)

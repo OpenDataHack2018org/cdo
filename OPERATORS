@@ -290,6 +290,7 @@ Operator catalog:
    Merstat       merpctl         Meridional percentiles
    Gridboxstat   gridboxmin      Gridbox minimum
    Gridboxstat   gridboxmax      Gridbox maximum
+   Gridboxstat   gridboxrange    Gridbox range
    Gridboxstat   gridboxsum      Gridbox sum
    Gridboxstat   gridboxmean     Gridbox mean
    Gridboxstat   gridboxavg      Gridbox average

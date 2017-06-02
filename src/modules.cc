@@ -339,7 +339,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  FourierOperators       {"fourier"}
 #define  GengridOperators       {"gengrid"}
 #define  GradsdesOperators      {"gradsdes", "dumpmap"}
-#define  GridboxstatOperators   {"gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", "gridboxstd", "gridboxstd1", "gridboxvar", "gridboxvar1"}
+#define  GridboxstatOperators   {"gridboxrange", "gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", "gridboxstd", "gridboxstd1", "gridboxvar", "gridboxvar1"}
 #define  GridcellOperators      {"gridarea", "gridweights", "gridmask", "griddx", "griddy"}
 #define  GridsearchOperators    {"testpointsearch", "testcellsearch"}
 #define  HarmonicOperators      {"harmonic"}

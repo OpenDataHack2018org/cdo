@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = gridboxmin gridboxmax gridboxsum gridboxmean gridboxavg gridboxstd gridboxstd1 gridboxvar gridboxvar1
+@Operators = gridboxmin gridboxmax gridboxrange gridboxsum gridboxmean gridboxavg gridboxstd gridboxstd1 gridboxvar gridboxvar1
 
 @BeginDescription
 This module computes statistical values over surrounding grid boxes.
@@ -32,6 +32,16 @@ Minimum value of the selected grid boxes.
 
 @BeginDescription
 Maximum value of the selected grid boxes.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxrange
+@Title     = Gridbox range
+@Parameter = nx ny
+
+@BeginDescription
+Range (max-min value) of the selected grid boxes.
 @EndDescription
 @EndOperator
 
