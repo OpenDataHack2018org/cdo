@@ -238,10 +238,11 @@ const char *getOperatorName(const char *operatorArg)
     }
 
   /*  return operatorName; */
-  std::string opName =  aliases[std::string(operatorName)];
-  memcpy(operatorName,opName.c_str(),opName.size() );
-
-  return operatorName;
+  if(is_alias(operatorName))
+  {
+    get_original(operatorName);
+  }
+    return operatorName;
 }
 
 
