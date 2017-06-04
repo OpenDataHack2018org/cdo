@@ -159,6 +159,7 @@ void *Seasstat(void *argument)
                   recinfo[recID].levelID = levelID;
 		}
 
+              field_type *psamp1 = &samp1[varID][levelID];
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
@@ -175,13 +176,13 @@ void *Seasstat(void *argument)
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
-		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
+		  if ( nmiss > 0 || psamp1->ptr )
 		    {
-		      if ( samp1[varID][levelID].ptr == NULL )
-			samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
+		      if ( psamp1->ptr == NULL )
+			psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 
 		      for ( int i = 0; i < gridsize; i++ )
-                        samp1[varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		    }
 		}
 	      else
@@ -191,18 +192,18 @@ void *Seasstat(void *argument)
 		  field.grid    = pvars1->grid;
 		  field.missval = pvars1->missval;
 
-		  if ( field.nmiss > 0 || samp1[varID][levelID].ptr )
+		  if ( field.nmiss > 0 || psamp1->ptr )
 		    {
-		      if ( samp1[varID][levelID].ptr == NULL )
+		      if ( psamp1->ptr == NULL )
 			{
-			  samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
+			  psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 			  for ( int i = 0; i < gridsize; i++ )
-			    samp1[varID][levelID].ptr[i] = nsets;
+			    psamp1->ptr[i] = nsets;
 			}
 
 		      for ( int i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-			  samp1[varID][levelID].ptr[i]++;
+			  psamp1->ptr[i]++;
 		    }
 
 		  if ( lvarstd )
@@ -243,53 +244,39 @@ void *Seasstat(void *argument)
 
       if ( nrecs == 0 && nsets == 0 ) break;
 
-      if ( lmean )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[varID][levelID];
+      for ( int recID = 0; recID < maxrecs; recID++ )
+        {
+          int varID   = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
+          field_type *psamp1 = &samp1[varID][levelID];
+          field_type *pvars1 = &vars1[varID][levelID];
+          field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-            if ( samp1[varID][levelID].ptr == NULL )
-              farcdiv(pvars1, (double)nsets);
-            else
-              fardiv(pvars1, samp1[varID][levelID]);
-	  }
-      else if ( lvarstd )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[varID][levelID];
-            field_type *pvars2 = &vars2[varID][levelID];
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-            if ( samp1[varID][levelID].ptr == NULL )
-              {
-                if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
-                else        farcvar(pvars1, *pvars2, nsets, divisor);
-              }
-            else
-              {
-                if ( lstd ) farstd(pvars1, *pvars2, samp1[varID][levelID], divisor);
-                else        farvar(pvars1, *pvars2, samp1[varID][levelID], divisor);
-	      }
-	  }
-      else if ( lrange )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[varID][levelID];
-            field_type *pvars2 = &vars2[varID][levelID];
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-            farsub(pvars1, *pvars2);
-	  }
+          if ( lmean )
+            {
+              if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
+              else               farcdiv(pvars1, (double)nsets);
+            }
+          else if ( lvarstd )
+            {
+              if ( psamp1->ptr )
+                {
+                  if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
+                  else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                }
+              else
+                {
+                  if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
+                  else        farcvar(pvars1, *pvars2, nsets, divisor);
+                }
+            }
+          else if ( lrange )
+            {
+              farsub(pvars1, *pvars2);
+            }
+        }
 
       if ( cdoVerbose )
 	{

@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Ensstat    ensrange        Ensemble range
       Ensstat    ensmin          Ensemble minimum
       Ensstat    ensmax          Ensemble maximum
       Ensstat    enssum          Ensemble sum
@@ -141,16 +142,17 @@ void *Ensstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("ensmin",  func_min,  0, NULL);
-  cdoOperatorAdd("ensmax",  func_max,  0, NULL);
-  cdoOperatorAdd("enssum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ensmean", func_mean, 0, NULL);
-  cdoOperatorAdd("ensavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("ensstd",  func_std,  0, NULL);
-  cdoOperatorAdd("ensstd1", func_std1, 0, NULL);
-  cdoOperatorAdd("ensvar",  func_var,  0, NULL);
-  cdoOperatorAdd("ensvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("enspctl", func_pctl, 0, NULL);
+  cdoOperatorAdd("ensrange", func_range, 0, NULL);
+  cdoOperatorAdd("ensmin",   func_min,   0, NULL);
+  cdoOperatorAdd("ensmax",   func_max,   0, NULL);
+  cdoOperatorAdd("enssum",   func_sum,   0, NULL);
+  cdoOperatorAdd("ensmean",  func_mean,  0, NULL);
+  cdoOperatorAdd("ensavg",   func_avg,   0, NULL);
+  cdoOperatorAdd("ensstd",   func_std,   0, NULL);
+  cdoOperatorAdd("ensstd1",  func_std1,  0, NULL);
+  cdoOperatorAdd("ensvar",   func_var,   0, NULL);
+  cdoOperatorAdd("ensvar1",  func_var1,  0, NULL);
+  cdoOperatorAdd("enspctl",  func_pctl,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -370,16 +372,17 @@ void *Ensstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("ensmin",  func_min,  0, NULL);
-  cdoOperatorAdd("ensmax",  func_max,  0, NULL);
-  cdoOperatorAdd("enssum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ensmean", func_mean, 0, NULL);
-  cdoOperatorAdd("ensavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("ensstd",  func_std,  0, NULL);
-  cdoOperatorAdd("ensstd1", func_std1, 0, NULL);
-  cdoOperatorAdd("ensvar",  func_var,  0, NULL);
-  cdoOperatorAdd("ensvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("enspctl", func_pctl, 0, NULL);
+  cdoOperatorAdd("ensrange", func_range, 0, NULL);
+  cdoOperatorAdd("ensmin",   func_min,   0, NULL);
+  cdoOperatorAdd("ensmax",   func_max,   0, NULL);
+  cdoOperatorAdd("enssum",   func_sum,   0, NULL);
+  cdoOperatorAdd("ensmean",  func_mean,  0, NULL);
+  cdoOperatorAdd("ensavg",   func_avg,   0, NULL);
+  cdoOperatorAdd("ensstd",   func_std,   0, NULL);
+  cdoOperatorAdd("ensstd1",  func_std1,  0, NULL);
+  cdoOperatorAdd("ensvar",   func_var,   0, NULL);
+  cdoOperatorAdd("ensvar1",  func_var1,  0, NULL);
+  cdoOperatorAdd("enspctl",  func_pctl,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

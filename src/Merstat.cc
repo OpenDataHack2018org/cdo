@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Merstat    merrange        Meridional range
       Merstat    mermin          Meridional minimum
       Merstat    mermax          Meridional maximum
       Merstat    mersum          Meridional sum
@@ -50,16 +51,17 @@ void *Merstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("mermin",  func_min,   0, NULL);
-  cdoOperatorAdd("mermax",  func_max,   0, NULL);
-  cdoOperatorAdd("mersum",  func_sum,   0, NULL);
-  cdoOperatorAdd("mermean", func_meanw, 1, NULL);
-  cdoOperatorAdd("meravg",  func_avgw,  1, NULL);
-  cdoOperatorAdd("mervar",  func_varw,  1, NULL);
-  cdoOperatorAdd("mervar1", func_var1w, 1, NULL);
-  cdoOperatorAdd("merstd",  func_stdw,  1, NULL);
-  cdoOperatorAdd("merstd1", func_std1w, 1, NULL);
-  cdoOperatorAdd("merpctl", func_pctl,  0, NULL);
+  cdoOperatorAdd("merrange", func_range, 0, NULL);
+  cdoOperatorAdd("mermin",   func_min,   0, NULL);
+  cdoOperatorAdd("mermax",   func_max,   0, NULL);
+  cdoOperatorAdd("mersum",   func_sum,   0, NULL);
+  cdoOperatorAdd("mermean",  func_meanw, 1, NULL);
+  cdoOperatorAdd("meravg",   func_avgw,  1, NULL);
+  cdoOperatorAdd("mervar",   func_varw,  1, NULL);
+  cdoOperatorAdd("mervar1",  func_var1w, 1, NULL);
+  cdoOperatorAdd("merstd",   func_stdw,  1, NULL);
+  cdoOperatorAdd("merstd1",  func_std1w, 1, NULL);
+  cdoOperatorAdd("merpctl",  func_pctl,  0, NULL);
  
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

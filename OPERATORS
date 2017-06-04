@@ -243,6 +243,7 @@ Operator catalog:
    Consecstat    consects        Consecutive Timesteps
    Ensstat       ensmin          Ensemble minimum
    Ensstat       ensmax          Ensemble maximum
+   Ensstat       ensrange        Ensemble range
    Ensstat       enssum          Ensemble sum
    Ensstat       ensmean         Ensemble mean
    Ensstat       ensavg          Ensemble average
@@ -280,6 +281,7 @@ Operator catalog:
    Zonstat       zonpctl         Zonal percentiles
    Merstat       mermin          Meridional minimum
    Merstat       mermax          Meridional maximum
+   Merstat       merrange        Meridional range
    Merstat       mersum          Meridional sum
    Merstat       mermean         Meridional mean
    Merstat       meravg          Meridional average
@@ -290,6 +292,7 @@ Operator catalog:
    Merstat       merpctl         Meridional percentiles
    Gridboxstat   gridboxmin      Gridbox minimum
    Gridboxstat   gridboxmax      Gridbox maximum
+   Gridboxstat   gridboxrange    Gridbox range
    Gridboxstat   gridboxsum      Gridbox sum
    Gridboxstat   gridboxmean     Gridbox mean
    Gridboxstat   gridboxavg      Gridbox average
@@ -299,6 +302,7 @@ Operator catalog:
    Gridboxstat   gridboxvar1     Gridbox variance (n-1)
    Vertstat      vertmin         Vertical minimum
    Vertstat      vertmax         Vertical maximum
+   Vertstat      vertrange       Vertical range
    Vertstat      vertsum         Vertical sum
    Vertstat      vertmean        Vertical mean
    Vertstat      vertavg         Vertical average
@@ -397,6 +401,7 @@ Operator catalog:
    Seaspctl      seaspctl        Seasonal percentiles
    Yhourstat     yhourmin        Multi-year hourly minimum
    Yhourstat     yhourmax        Multi-year hourly maximum
+   Yhourstat     yhourrange      Multi-year hourly range
    Yhourstat     yhoursum        Multi-year hourly sum
    Yhourstat     yhourmean       Multi-year hourly mean
    Yhourstat     yhouravg        Multi-year hourly average
@@ -406,6 +411,7 @@ Operator catalog:
    Yhourstat     yhourvar1       Multi-year hourly variance (n-1)
    Ydaystat      ydaymin         Multi-year daily minimum
    Ydaystat      ydaymax         Multi-year daily maximum
+   Ydaystat      ydayrange       Multi-year daily range
    Ydaystat      ydaysum         Multi-year daily sum
    Ydaystat      ydaymean        Multi-year daily mean
    Ydaystat      ydayavg         Multi-year daily average
@@ -416,6 +422,7 @@ Operator catalog:
    Ydaypctl      ydaypctl        Multi-year daily percentiles
    Ymonstat      ymonmin         Multi-year monthly minimum
    Ymonstat      ymonmax         Multi-year monthly maximum
+   Ymonstat      ymonrange       Multi-year monthly range
    Ymonstat      ymonsum         Multi-year monthly sum
    Ymonstat      ymonmean        Multi-year monthly mean
    Ymonstat      ymonavg         Multi-year monthly average
@@ -426,6 +433,7 @@ Operator catalog:
    Ymonpctl      ymonpctl        Multi-year monthly percentiles
    Yseasstat     yseasmin        Multi-year seasonal minimum
    Yseasstat     yseasmax        Multi-year seasonal maximum
+   Yseasstat     yseasrange      Multi-year seasonal range
    Yseasstat     yseassum        Multi-year seasonal sum
    Yseasstat     yseasmean       Multi-year seasonal mean
    Yseasstat     yseasavg        Multi-year seasonal average

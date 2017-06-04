@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = ymonmin ymonmax ymonsum ymonmean ymonavg ymonstd ymonstd1 ymonvar ymonvar1
+@Operators = ymonmin ymonmax ymonrange ymonsum ymonmean ymonavg ymonstd ymonstd1 ymonvar ymonvar1
 
 @BeginDescription
 This module computes statistical values of each month of year.
-Depending on the chosen operator the minimum, maximum, sum, average, variance
+Depending on the chosen operator the minimum, maximum, range, sum, average, variance
 or standard deviation of each month of year in @file{infile} is written to @file{outfile}.
 The date information in an output field is the date of the last contributing input field.
 @EndDescription
@@ -53,6 +53,28 @@ o(12,x) = max{i(t,x), month(i(t)) = 12}
 o(\mbox{01},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
 \vdots \\
 o(\mbox{12},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ymonrange
+@Title     = Multi-year monthly range
+
+@BeginDescription
+@IfMan
+o(01,x) = range{i(t,x), month(i(t)) = 01}
+                 ...
+o(12,x) = range{i(t,x), month(i(t)) = 12}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{01},x) = \mbox{\textbf{range}}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
+\vdots \\
+o(\mbox{12},x) = \mbox{\textbf{range}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc

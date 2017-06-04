@@ -319,7 +319,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  Echam5iniOperators     {"import_e5ml", "import_e5res", "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
-#define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensvar1", "ensstd", "ensstd1", "enspctl"}
+#define  EnsstatOperators       {"ensrange", "ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensvar1", "ensstd", "ensstd1", "enspctl"}
 #define  Ensstat3Operators      {"ensrkhistspace", "ensrkhisttime", "ensroc"}
 #define  EnsvalOperators        {"enscrps", "ensbrs"}
 #define  EofcoeffOperators      {"eofcoeff"}
@@ -339,7 +339,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  FourierOperators       {"fourier"}
 #define  GengridOperators       {"gengrid"}
 #define  GradsdesOperators      {"gradsdes", "dumpmap"}
-#define  GridboxstatOperators   {"gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", "gridboxstd", "gridboxstd1", "gridboxvar", "gridboxvar1"}
+#define  GridboxstatOperators   {"gridboxrange", "gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", "gridboxstd", "gridboxstd1", "gridboxvar", "gridboxvar1"}
 #define  GridcellOperators      {"gridarea", "gridweights", "gridmask", "griddx", "griddy"}
 #define  GridsearchOperators    {"testpointsearch", "testcellsearch"}
 #define  HarmonicOperators      {"harmonic"}
@@ -370,7 +370,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}
-#define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "merstd", "merstd1", "mervar", "mervar1", "merpctl"}
+#define  MerstatOperators       {"merrange", "mermin", "mermax", "mersum", "mermean", "meravg", "merstd", "merstd1", "mervar", "mervar1", "merpctl"}
 #define  MonarithOperators      {"monadd", "monsub", "monmul", "mondiv"}
 #define  MrotuvOperators        {"mrotuv"}
 #define  MrotuvbOperators       {"mrotuvb"}
@@ -488,7 +488,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  VarrmsOperators        {"varrms"}
 #define  VertintmlOperators     {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
 #define  VertintapOperators     {"ap2pl", "ap2plx", "ap2pl_lp", "ap2plx_lp", "ap2hl", "ap2hlx"}
-#define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertint", "vertmean", "vertavg", "vertstd", "vertstd1", "vertvar", "vertvar1"}
+#define  VertstatOperators      {"vertrange", "vertmin", "vertmax", "vertsum", "vertint", "vertmean", "vertavg", "vertstd", "vertstd1", "vertvar", "vertvar1"}
 #define  VertcumOperators       {"vertcum", "vertcumhl"}
 #define  VertwindOperators      {"vertwind"}
 #define  VerifygridOperators    {"verifygrid"}
@@ -499,15 +499,15 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  YearmonstatOperators   {"yearmonmean", "yearmonavg"}
 #define  YdayarithOperators     {"ydayadd", "ydaysub", "ydaymul", "ydaydiv"}
 #define  YdaypctlOperators      {"ydaypctl"}
-#define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydaystd", "ydaystd1", "ydayvar", "ydayvar1"}
+#define  YdaystatOperators      {"ydayrange", "ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydaystd", "ydaystd1", "ydayvar", "ydayvar1"}
 #define  YdrunpctlOperators     {"ydrunpctl"}
 #define  YdrunstatOperators     {"ydrunmin", "ydrunmax", "ydrunsum", "ydrunmean", "ydrunavg", "ydrunstd", "ydrunstd1", "ydrunvar", "ydrunvar1"}
 #define  YhourarithOperators    {"yhouradd", "yhoursub", "yhourmul", "yhourdiv"}
-#define  YhourstatOperators     {"yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourstd", "yhourstd1", "yhourvar", "yhourvar1"}
+#define  YhourstatOperators     {"yhourrange", "yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourstd", "yhourstd1", "yhourvar", "yhourvar1"}
 #define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv"}
 #define  YseasarithOperators    {"yseasadd", "yseassub", "yseasmul", "yseasdiv"}
 #define  YmonpctlOperators      {"ymonpctl"}
-#define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd", "ymonstd1", "ymonvar", "ymonvar1"}
+#define  YmonstatOperators      {"ymonrange", "ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd", "ymonstd1", "ymonvar", "ymonvar1"}
 #define  YseaspctlOperators     {"yseaspctl"}
 #define  YseasstatOperators     {"yseasrange", "yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd", "yseasstd1", "yseasvar", "yseasvar1"}
 #define  ZonstatOperators       {"zonrange", "zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd", "zonstd1", "zonvar", "zonvar1", "zonpctl"}

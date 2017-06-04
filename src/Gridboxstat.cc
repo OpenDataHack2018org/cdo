@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Gridboxstat    gridboxrange        Gridbox range
       Gridboxstat    gridboxmin          Gridbox minimum
       Gridboxstat    gridboxmax          Gridbox maximum
       Gridboxstat    gridboxsum          Gridbox sum
@@ -551,15 +552,16 @@ void *Gridboxstat(void *argument)
   int xinc = parameter2int(operatorArgv()[0]);
   int yinc = parameter2int(operatorArgv()[1]);
 
-  cdoOperatorAdd("gridboxmin",  func_min,   0, NULL);
-  cdoOperatorAdd("gridboxmax",  func_max,   0, NULL);
-  cdoOperatorAdd("gridboxsum",  func_sum,   0, NULL);
-  cdoOperatorAdd("gridboxmean", func_meanw, 1, NULL);
-  cdoOperatorAdd("gridboxavg",  func_avgw,  1, NULL);
-  cdoOperatorAdd("gridboxvar",  func_varw,  1, NULL);
-  cdoOperatorAdd("gridboxvar1", func_var1w, 1, NULL);
-  cdoOperatorAdd("gridboxstd",  func_stdw,  1, NULL);
-  cdoOperatorAdd("gridboxstd1", func_std1w, 1, NULL);
+  cdoOperatorAdd("gridboxrange", func_range, 0, NULL);
+  cdoOperatorAdd("gridboxmin",   func_min,   0, NULL);
+  cdoOperatorAdd("gridboxmax",   func_max,   0, NULL);
+  cdoOperatorAdd("gridboxsum",   func_sum,   0, NULL);
+  cdoOperatorAdd("gridboxmean",  func_meanw, 1, NULL);
+  cdoOperatorAdd("gridboxavg",   func_avgw,  1, NULL);
+  cdoOperatorAdd("gridboxvar",   func_varw,  1, NULL);
+  cdoOperatorAdd("gridboxvar1",  func_var1w, 1, NULL);
+  cdoOperatorAdd("gridboxstd",   func_stdw,  1, NULL);
+  cdoOperatorAdd("gridboxstd1",  func_std1w, 1, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

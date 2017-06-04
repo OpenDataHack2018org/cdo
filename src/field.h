@@ -153,6 +153,7 @@ void zonpctl(field_type field1, field_type *field2, const int k);
 void merfun(field_type field1, field_type *field2, const int function);
 void mermin(field_type field1, field_type *field2);
 void mermax(field_type field1, field_type *field2);
+void merrange(field_type field1, field_type *field2);
 void mersum(field_type field1, field_type *field2);
 void meravgw(field_type field1, field_type *field2);
 void mermeanw(field_type field1, field_type *field2);

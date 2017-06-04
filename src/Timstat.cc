@@ -256,8 +256,8 @@ void *Timstat(void *argument)
   else
     field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
 
-  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **vars2 = NULL;
   if ( lvarstd || lrange ) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
@@ -287,6 +287,7 @@ void *Timstat(void *argument)
                   recinfo[recID].levelID = levelID;
 		}
 
+              field_type *psamp1 = &samp1[varID][levelID];
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
@@ -304,13 +305,13 @@ void *Timstat(void *argument)
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
-		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
+		  if ( nmiss > 0 || psamp1->ptr )
 		    {
-		      if ( samp1[varID][levelID].ptr == NULL )
-			samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+		      if ( psamp1->ptr == NULL )
+			psamp1->ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 
 		      for ( int i = 0; i < nwpv*gridsize; i++ )
-                        samp1[varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		    }
 		}
 	      else
@@ -323,18 +324,18 @@ void *Timstat(void *argument)
 		  field.size    = gridsize;
 		  field.grid    = pvars1->grid;
 		  field.missval = pvars1->missval;
-		  if ( field.nmiss > 0 || samp1[varID][levelID].ptr )
+		  if ( field.nmiss > 0 || psamp1->ptr )
 		    {
-		      if ( samp1[varID][levelID].ptr == NULL )
+		      if ( psamp1->ptr == NULL )
 			{
-			  samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+			  psamp1->ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 			  for ( int i = 0; i < nwpv*gridsize; i++ )
-			    samp1[varID][levelID].ptr[i] = nsets;
+			    psamp1->ptr[i] = nsets;
 			}
 
 		      for ( int i = 0; i < nwpv*gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-			  samp1[varID][levelID].ptr[i]++;
+			  psamp1->ptr[i]++;
 		    }
 
 		  if ( lvarstd )
@@ -375,53 +376,39 @@ void *Timstat(void *argument)
 
       if ( nrecs == 0 && nsets == 0 ) break;
 
-      if ( lmean )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[varID][levelID];
+      for ( int recID = 0; recID < maxrecs; recID++ )
+        {
+          int varID   = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
+          field_type *psamp1 = &samp1[varID][levelID];
+          field_type *pvars1 = &vars1[varID][levelID];
+          field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-            if ( samp1[varID][levelID].ptr == NULL )
-              farcdiv(pvars1, (double)nsets);
-            else
-              fardiv(pvars1, samp1[varID][levelID]);
-	  }
-      else if ( lvarstd )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[varID][levelID];
-            field_type *pvars2 = &vars2[varID][levelID];
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-            if ( samp1[varID][levelID].ptr == NULL )
-              {
-                if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
-                else        farcvar(pvars1, *pvars2, nsets, divisor);
-              }
-            else
-              {
-                if ( lstd ) farstd(pvars1, *pvars2, samp1[varID][levelID], divisor);
-                else        farvar(pvars1, *pvars2, samp1[varID][levelID], divisor);
-	      }
-	  }
-      else if ( lrange )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_type *pvars1 = &vars1[varID][levelID];
-            field_type *pvars2 = &vars2[varID][levelID];
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-            farsub(pvars1, *pvars2);
-	  }
+          if ( lmean )
+            {
+              if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
+              else               farcdiv(pvars1, (double)nsets);
+            }
+          else if ( lvarstd )
+            {
+              if ( psamp1->ptr )
+                {
+                  if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
+                  else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                }
+              else
+                {
+                  if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
+                  else        farcvar(pvars1, *pvars2, nsets, divisor);
+                }
+            }
+          else if ( lrange )
+            {
+              farsub(pvars1, *pvars2);
+            }
+        }
 
       if ( cdoVerbose )
 	{
@@ -436,6 +423,7 @@ void *Timstat(void *argument)
           {
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
+            field_type *psamp1 = &samp1[varID][levelID];
             field_type *pvars1 = &vars1[varID][levelID];
 
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
@@ -443,12 +431,12 @@ void *Timstat(void *argument)
             int nwpv     = pvars1->nwpv;
             int gridsize = gridInqSize(pvars1->grid);
             double missval = pvars1->missval;
-            if ( samp1[varID][levelID].ptr )
+            if ( psamp1->ptr )
               {
                 int irun = 0;
                 for ( int i = 0; i < nwpv*gridsize; ++i )
                   {
-                    if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
+                    if ( (psamp1->ptr[i] / nsets) < vfrac )
                       {
                         pvars1->ptr[i] = missval;
                         irun++;
@@ -478,6 +466,7 @@ void *Timstat(void *argument)
 	{
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
+          field_type *psamp1 = &samp1[varID][levelID];
           field_type *pvars1 = &vars1[varID][levelID];
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
@@ -488,7 +477,7 @@ void *Timstat(void *argument)
 	  if ( cdoDiag )
 	    {
               double *sampptr = field.ptr;
-	      if ( samp1[varID][levelID].ptr ) sampptr = samp1[varID][levelID].ptr;
+	      if ( psamp1->ptr ) sampptr = psamp1->ptr;
               else
                 {
                   int gridsize = pvars1->size;

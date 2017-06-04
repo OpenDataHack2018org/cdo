@@ -73,15 +73,15 @@ void *Ydrunstat(void *argument)
     
   cdoInitialize(argument);
 
-  cdoOperatorAdd("ydrunmin",  func_min,  0, NULL);
-  cdoOperatorAdd("ydrunmax",  func_max,  0, NULL);
-  cdoOperatorAdd("ydrunsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ydrunmean", func_mean, 0, NULL);
-  cdoOperatorAdd("ydrunavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("ydrunvar",  func_var,  0, NULL);
-  cdoOperatorAdd("ydrunvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("ydrunstd",  func_std,  0, NULL);
-  cdoOperatorAdd("ydrunstd1", func_std1, 0, NULL);
+  cdoOperatorAdd("ydrunmin",   func_min,   0, NULL);
+  cdoOperatorAdd("ydrunmax",   func_max,   0, NULL);
+  cdoOperatorAdd("ydrunsum",   func_sum,   0, NULL);
+  cdoOperatorAdd("ydrunmean",  func_mean,  0, NULL);
+  cdoOperatorAdd("ydrunavg",   func_avg,   0, NULL);
+  cdoOperatorAdd("ydrunvar",   func_var,   0, NULL);
+  cdoOperatorAdd("ydrunvar1",  func_var1,  0, NULL);
+  cdoOperatorAdd("ydrunstd",   func_std,   0, NULL);
+  cdoOperatorAdd("ydrunstd1",  func_std1,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -155,7 +155,7 @@ void *Ydrunstat(void *argument)
 	  if ( lvarstd )
 	    {
 	      farmoq(pvars2, *pvars1);
-	      for ( inp = 0; inp < tsID; inp++ )
+	      for ( int inp = 0; inp < tsID; inp++ )
 		{
 		  farsumq(&vars2[inp][varID][levelID], *pvars1);
 		  farsum(&vars1[inp][varID][levelID], *pvars1);
@@ -163,7 +163,7 @@ void *Ydrunstat(void *argument)
 	    }
 	  else
 	    {
-	      for ( inp = 0; inp < tsID; inp++ )
+	      for ( int inp = 0; inp < tsID; inp++ )
 		{
 		  farfun(&vars1[inp][varID][levelID], *pvars1, operfunc);
 		}
@@ -360,13 +360,13 @@ static
 void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
 		  field_type **vars1, field_type **vars2, int nsets, int operfunc)
 {
-  int varID, levelID, nvars, nlevels;
+  int varID, levelID, nlevels;
   int gridsize;
   int year, month, day, dayoy;
 
   bool lvarstd = vars2 != NULL;
 
-  nvars = vlistNvars(stats->vlist);
+  int nvars = vlistNvars(stats->vlist);
 
   cdiDecodeDate(vdate, &year, &month, &day);
 
@@ -429,11 +429,11 @@ void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
 static
 void ydstatFinalize(YDAY_STATS *stats, int operfunc)
 {
-  int varID, levelID, nvars, nlevels;
+  int varID, levelID, nlevels;
   int dayoy;
   int divisor = operfunc == func_std1 || operfunc == func_var1;
 
-  nvars = vlistNvars(stats->vlist);
+  int nvars = vlistNvars(stats->vlist);
   
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( stats->nsets[dayoy] )

@@ -3,6 +3,20 @@
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
 
+2017-06-02  Uwe Schulzweida
+
+	* New operator ensrange: Ensemble range (ensmax-ensmin)
+	* New operator vertrange: Vertical range (vertmax-vertmin)
+	* New operator merrange: Meridional range (mermax-mermin)
+	* New operator gridboxrange: Gridbox range (gribboxmax-gridboxmin)
+
+2017-06-01  Uwe Schulzweida
+
+	* New operator yhourrange: Multi-year hourly range (yhourmax-yhourmin)
+	* New operator ydayrange: Multi-year daily range (ydaymax-ydaymin)
+	* New operator ymonrange: Multi-year monthly range (ymonmax-ymonmin)
+	* New operator yseasrange: Multi-year seasonal range (yseasmax-yseasmin)
+
 2017-05-30  Uwe Schulzweida
 
 	* New operator seasrange: seasonal range (seasmax-seasmin)

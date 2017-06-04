@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = mermin mermax mersum mermean meravg merstd merstd1 mervar mervar1 merpctl
+@Operators = mermin mermax merrange mersum mermean meravg merstd merstd1 mervar mervar1 merpctl
 
 @BeginDescription
 This module computes meridional statistical values of the input fields.
-According to the chosen operator the meridional minimum, maximum, sum, average,
+According to the chosen operator the meridional minimum, maximum, range, sum, average,
 variance, standard deviation or a certain percentile is written to @file{outfile}.
 This operator requires all variables on the same regular lon/lat grid.
 @EndDescription
@@ -30,6 +30,15 @@ For every longitude the minimum over all latitudes is computed.
 
 @BeginDescription
 For every longitude the maximum over all latitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_merrange
+@Title     = Meridional range
+
+@BeginDescription
+For every longitude the range over all latitudes is computed.
 @EndDescription
 @EndOperator
 
