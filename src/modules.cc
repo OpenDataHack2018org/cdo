@@ -664,7 +664,7 @@ static
 std::string find_similar(std::string operatorName) {
     std::string found_similar_operators = "";
     unsigned long lines = 1;
-    unsigned long line_length = 75;
+    unsigned long line_length = 105;
     if (operatorName != "") {
         // Searching for simlar operator names in operator to module map
         for (auto str : modules_map) {
@@ -720,20 +720,19 @@ bool check_operator(std::string operatorName) {
             fclose(fp);
             fprintf(stderr, "Use commandline option -h for help.");
             Error("Operator missing, %s is a file on disk!", operatorName.c_str());
-
-            // Operator is no filename
-            // Checking for similar operators
-            fprintf(stderr, "Operator >%s< not found!\n", operatorName.c_str());
-            fprintf(stderr, "Similar operators are:\n");
-            std::string found_similar_operators = find_similar(operatorName);
-
-            if (found_similar_operators.size() > 0) {
-                std::cerr << found_similar_operators << std::endl;
-            } else {
-                fprintf(stderr, "(not found)\n");
-            }
-            exit(EXIT_FAILURE);
         }
+        // Operator is no filename
+        // Checking for similar operators
+        fprintf(stderr, "Operator >%s< not found!\n", operatorName.c_str());
+        fprintf(stderr, "Similar operators are:\n");
+        std::string found_similar_operators = find_similar(operatorName);
+
+        if (found_similar_operators.size() > 0) {
+          std::cerr << found_similar_operators << std::endl;
+        } else {
+          fprintf(stderr, "(not found)\n");
+        }
+        exit(EXIT_FAILURE);
     }
     return false;
 }
