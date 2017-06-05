@@ -1,6 +1,7 @@
 #include <cdi.h>
 #include "cdo_int.h"
 
+
 bool *cdo_read_timestepmask(const char *maskfile, int *n)
 {
   *n = 0;
@@ -53,6 +54,46 @@ bool *cdo_read_timestepmask(const char *maskfile, int *n)
       
       tsID++;  
     }
+  
+  streamClose(streamID);
+
+  return imask;
+}
+
+
+bool *cdo_read_mask(const char *maskfile, int *n)
+{
+  *n = 0;
+
+  int streamID = streamOpenRead(maskfile);
+  if ( streamID == CDI_UNDEFID ) cdoAbort("Open failed on %s!", maskfile);
+
+  int vlistID = streamInqVlist(streamID);
+
+  int nvars = vlistNvars(vlistID);
+  if ( nvars > 1 ) cdoAbort("Mask %s contains more than one variable!", maskfile);
+
+  int gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
+
+  int nlev = zaxisInqSize(vlistInqVarZaxis(vlistID, 0));
+  if ( nlev > 1 ) cdoAbort("Mask %s has more than one level!", maskfile);
+
+  *n = gridsize;
+  bool *imask = (bool*) Malloc(gridsize*sizeof(bool));
+  double *dmask = (double*) Malloc(gridsize*sizeof(double));
+
+  int nrecs = streamInqTimestep(streamID, 0);
+  if ( nrecs != 1 ) cdoAbort("Internal error; unexprected number of records!");
+
+  int varID, levelID;
+  int nmiss;
+  streamInqRecord(streamID, &varID, &levelID);
+  streamReadRecord(streamID, dmask, &nmiss);
+
+  for ( int i = 0; i < gridsize; ++i )
+    imask[i] = IS_NOT_EQUAL(dmask[i], 0);
+      
+      Free(dmask);
   
   streamClose(streamID);
 
