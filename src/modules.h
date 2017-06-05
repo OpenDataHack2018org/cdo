@@ -63,9 +63,6 @@ void *(*operatorModule(const char *operatorName))(void *);
 void init_modules();
 
 void init_aliases();
-int add_alias(std::string alias, std::string original);
-void add_module(std::string module_name, modules_t new_module);
-std::string get_module_name_to(std::string operatorName);
 
 std::vector<std::string> operatorHelp(std::string operatorName);
 int operatorStreamInCnt(const char *operatorName);
