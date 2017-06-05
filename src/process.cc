@@ -945,10 +945,11 @@ int cdoOperatorID(void)
 
   if ( Process[processID].noper > 0 )
     {
-      for ( operID = 0; operID < Process[processID].noper; operID++ )
+      for ( operID = 0; operID < Process[processID].noper; operID++ ){
         if ( Process[processID].oper[operID].name )
           if ( strcmp(Process[processID].operatorName, Process[processID].oper[operID].name) == 0 ) break;
 
+      }
       if ( operID == Process[processID].noper )
         cdoAbort("Operator not callable by this name!");
     }

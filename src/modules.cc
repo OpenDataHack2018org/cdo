@@ -1406,3 +1406,20 @@ void operatorPrintList(bool print_no_output) {
         std::cout << str << std::endl;
     }
 }
+
+bool is_alias(char * operatorName)
+{
+    return (aliases.find(std::string(operatorName)) != aliases.end());
+}
+
+void get_original(char * operatorName)
+{
+    if(is_alias(operatorName)){
+        std::string opName = aliases[std::string(operatorName)];
+        operatorName = (char*)realloc(operatorName, opName.size());
+        strcpy(operatorName, opName.c_str());
+    }
+    else{
+        Error("%s is not an alias", operatorName);
+    }
+}
