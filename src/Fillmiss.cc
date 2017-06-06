@@ -467,18 +467,18 @@ void *Fillmiss(void *argument)
       cdoAbort("Too many arguments!");
   }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -489,23 +489,23 @@ void *Fillmiss(void *argument)
   field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = (size_t) nmiss;
 
-	  streamDefRecord(streamID2, varID, levelID);
+	  pstreamDefRecord(streamID2, varID, levelID);
 
           if ( field1.nmiss == 0 )
             {
-              streamWriteRecord(streamID2, field1.ptr, 0);
+              pstreamWriteRecord(streamID2, field1.ptr, 0);
             }
           else
             {
@@ -529,14 +529,14 @@ void *Fillmiss(void *argument)
               for ( int i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
               
-              streamWriteRecord(streamID2, field2.ptr, nmiss);
+              pstreamWriteRecord(streamID2, field2.ptr, nmiss);
             }
         }
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( field2.ptr ) Free(field2.ptr);
   if ( field1.ptr ) Free(field1.ptr);
