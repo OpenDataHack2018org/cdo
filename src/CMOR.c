@@ -1562,7 +1562,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       char *branch_time_in_parent = (char *) Malloc(sizeof(double));;
       memcpy(branch_time_in_parent, &(branch_times[0]), sizeof(double));
       char *branch_time_in_child = (char *) Malloc(sizeof(double));;
-      memcpy(branch_time_in_child, &(branch_times[1]), sizeof(double));
+      memcpy((void *)branch_time_in_child, (void *)&(branch_times[1]), sizeof(double));
       cmor_set_cur_dataset_attribute("branch_time_in_parent", branch_time_in_parent, 1); 
       cmor_set_cur_dataset_attribute("branch_time_in_child", branch_time_in_child, 1); 
 
