@@ -1444,7 +1444,7 @@ static double *get_branch_times(list_t *kvl, int calendar, char *time_units)
       branch_time[1] = juldate_to_seconds(juldate_sub(parentbranchdate, childstartdate)) / 86400;
     }
   if ( cdoVerbose )
-    printf("*******Succesfully computed 'branch_time'.*******\n");
+    printf("*******Succesfully computed 'branch_time': '%f', '%f'.*******\n", branch_time[0], branch_time[1]);
   return branch_time;
 }
 
@@ -1559,10 +1559,10 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
     {
       cmor_dataset_json("/home/dkrz/k204210/test.json");
       cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
-      char *branch_time_in_parent = (char *) Malloc(sizeof(double));;
-      memcpy(branch_time_in_parent, &(branch_times[0]), sizeof(double));
-      char *branch_time_in_child = (char *) Malloc(sizeof(double));;
-      memcpy((void *)branch_time_in_child, (void *)&(branch_times[1]), sizeof(double));
+      char *branch_time_in_parent = (char *) Malloc(2*sizeof(double));;
+      char *branch_time_in_child = (char *) Malloc(2*sizeof(double));;
+      snprintf(branch_time_in_parent, sizeof(double), "%.12f", branch_times[0]);
+      snprintf(branch_time_in_child, sizeof(double), "%.12f", branch_times[1]);
       cmor_set_cur_dataset_attribute("branch_time_in_parent", branch_time_in_parent, 1); 
       cmor_set_cur_dataset_attribute("branch_time_in_child", branch_time_in_child, 1); 
 
@@ -4008,6 +4008,7 @@ void *CMOR(void *argument)
 #if defined(HAVE_LIBCMOR)
   int nparams = operatorArgc();
   char **params = operatorArgv();
+  char *arg1 = strdup(params[0]);
 
   /* Definition of pml: */
   list_t *pml = list_new(sizeof(list_t *), free_kvlist, "pml");
@@ -4029,7 +4030,7 @@ void *CMOR(void *argument)
 
   /* Get project_id, mip_table and mip_table frequency*/
   char *project_id = get_project_id(kvl);
-  char *mip_table  = get_mip_table(params[0], kvl, project_id);
+  char *mip_table  = get_mip_table(arg1, kvl, project_id);
 #if ( CMOR_VERSION_MAJOR == 3 )
   mip_table[strlen(mip_table)-5] = '\0';
 #endif
@@ -4061,7 +4062,7 @@ void *CMOR(void *argument)
 
   setup_dataset(kvl, streamID, &calendar);
 
-  int table_id = cmor_load_and_set_table(kvl, params[0], project_id, mip_table);
+  int table_id = cmor_load_and_set_table(kvl, arg1, project_id, mip_table);
 
   register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq, &time_axis);
   write_variables(kvl, &streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
@@ -4070,6 +4071,7 @@ void *CMOR(void *argument)
   Free(mip_table);
   Free(project_id); 
   Free(miptab_freqptr);
+  Free(arg1);
   list_destroy(pml); 
 
   streamClose(streamID);
