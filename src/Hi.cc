@@ -96,13 +96,13 @@ void *Hi(void *argument)
   cdoInitialize(argument);
   cdoOperatorAdd("hi", 0, 0, NULL);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
-  int streamID3 = streamOpenRead(cdoStreamName(2));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID3 = pstreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
-  int vlistID3 = streamInqVlist(streamID3);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID3 = pstreamInqVlist(streamID3);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   //taxisID2 = vlistInqTaxis(vlistID2);
@@ -141,33 +141,33 @@ void *Hi(void *argument)
   vlistDefVarLongname(vlistID4, varID4, HI_LONGNAME);
   vlistDefVarUnits(vlistID4, varID4, HI_UNITS);
 
-  int streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
 
-  streamDefVlist(streamID4, vlistID4);
+  pstreamDefVlist(streamID4, vlistID4);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
-      int nrecs2 = streamInqTimestep(streamID2, tsID);
-      int nrecs3 = streamInqTimestep(streamID3, tsID);
+      int nrecs2 = pstreamInqTimestep(streamID2, tsID);
+      int nrecs3 = pstreamInqTimestep(streamID3, tsID);
       if ( nrecs2 == 0 || nrecs3 == 0 )
         cdoAbort("Input streams have different number of timesteps!");
 
       taxisCopyTimestep(taxisID4, taxisID1);
-      streamDefTimestep(streamID4, tsID);
+      pstreamDefTimestep(streamID4, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID1, &levelID1);
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID1, &levelID1);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = (size_t) nmiss;
           
-	  streamInqRecord(streamID2, &varID2, &levelID2);
-	  streamReadRecord(streamID2, field2.ptr, &nmiss);
+	  pstreamInqRecord(streamID2, &varID2, &levelID2);
+	  pstreamReadRecord(streamID2, field2.ptr, &nmiss);
           field2.nmiss = (size_t) nmiss;
 	  
-	  streamInqRecord(streamID3, &varID3, &levelID3);
-	  streamReadRecord(streamID3, field3.ptr, &nmiss);
+	  pstreamInqRecord(streamID3, &varID3, &levelID3);
+	  pstreamReadRecord(streamID3, field3.ptr, &nmiss);
           field3.nmiss = (size_t) nmiss;
 	  
 	  if ( varID1 != varID2 || varID1 != varID3 || levelID1 != levelID2 || levelID1 != levelID3 )
@@ -186,17 +186,17 @@ void *Hi(void *argument)
 
 	  farexpr(&field1, field2, field3, humidityIndex);
 	  
-	  streamDefRecord(streamID4, varID4, levelID1);
-	  streamWriteRecord(streamID4, field1.ptr, (int)field1.nmiss);
+	  pstreamDefRecord(streamID4, varID4, levelID1);
+	  pstreamWriteRecord(streamID4, field1.ptr, (int)field1.nmiss);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID4);
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID4);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( field1.ptr ) Free(field1.ptr);
   if ( field2.ptr ) Free(field2.ptr);

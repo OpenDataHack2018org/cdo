@@ -56,9 +56,9 @@ void *Harmonic(void *argument)
     cdoAbort("The wave length must be positive and smaller than "
 	     "2 times the number of requested harmonics (=%d)!", n_out);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -67,7 +67,7 @@ void *Harmonic(void *argument)
 
   refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   int *streamIDs = (int*) Malloc(n_out*sizeof(int));
 
@@ -81,12 +81,12 @@ void *Harmonic(void *argument)
 	sprintf(filename+nchars+1, "%s", filesuffix);
 
       argument_t *fileargument = file_argument_new(filename);
-      int streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+      int streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
       streamIDs[j] = streamID2;
 
-      streamDefVlist(streamID2, vlistID2);
+      pstreamDefVlist(streamID2, vlistID2);
     }
 
   int nvars = vlistNvars(vlistID1);
@@ -122,7 +122,7 @@ void *Harmonic(void *argument)
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID == 0 )
 	{
@@ -132,18 +132,18 @@ void *Harmonic(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
-
-	  streamReadRecord(streamID1, array, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  if ( nmiss > 0 ) cdoAbort("Missing values are not allowed!");
 
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  offset   = gridsize*levelID;
+
 	  for ( int j = 0; j < n_out; ++j )
 	    {
-	      double sine   = sin (2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
-	      double cosine = cos (2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
+	      double sine   = sin(2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
+	      double cosine = cos(2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
 	      for ( int i = 0; i < gridsize; i++ )
 		{
 		  work[j][varID][i+offset]         += array[i] * sine;
@@ -159,8 +159,7 @@ void *Harmonic(void *argument)
 
   if ( array ) Free(array);
 
-  streamClose(streamID1);
-
+  pstreamClose(streamID1);
 
   if ( nts%n )
     {
@@ -206,7 +205,7 @@ void *Harmonic(void *argument)
   for ( int j = 0; j < nout; j++ )
     {
       int streamID2 = streamIDs[j];
-      streamDefTimestep(streamID2, 0);
+      pstreamDefTimestep(streamID2, 0);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -215,8 +214,8 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, out[j][varID]+offset, 0);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, out[j][varID]+offset, 0);
 	    }
 	}
     }
@@ -252,7 +251,7 @@ void *Harmonic(void *argument)
   for ( int j = 0; j < nout; j++ )
     {
       int streamID2 = streamIDs[j];
-      streamDefTimestep(streamID2, 1);
+      pstreamDefTimestep(streamID2, 1);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -262,11 +261,11 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      streamDefRecord(streamID2, varID, levelID);
+	      pstreamDefRecord(streamID2, varID, levelID);
 	      nmiss = 0;
 	      for ( int i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(out[j][varID][i+offset], missval) ) nmiss++;
-	      streamWriteRecord(streamID2, out[j][varID]+offset, nmiss);
+	      pstreamWriteRecord(streamID2, out[j][varID]+offset, nmiss);
 	    }
 	}
     }
@@ -274,7 +273,7 @@ void *Harmonic(void *argument)
   for ( int j = 0; j < n_out; j++ )
     {
       int streamID2 = streamIDs[j];
-      streamClose(streamID2);
+      pstreamClose(streamID2);
     }
 
   Free(streamIDs);

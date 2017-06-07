@@ -81,6 +81,7 @@ void grid_cell_area(int gridID, double *array)
     }
 }
 
+
 void *Gridcell(void *argument)
 {
   int status;
@@ -108,9 +109,9 @@ void *Gridcell(void *argument)
 
   if ( cdoVerbose ) cdoPrint("PlanetRadius: %g", PlanetRadius);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int ngrids = vlistNgrids(vlistID1);
 
@@ -175,8 +176,7 @@ void *Gridcell(void *argument)
     }
   else if ( operatorID == GRIDMASK )
     {
-      int *mask;
-      mask = (int*) Malloc(gridsize*sizeof(int));
+      int *mask = (int*) Malloc(gridsize*sizeof(int));
       if ( gridInqMask(gridID, NULL) )
 	{
 	  gridInqMask(gridID, mask);
@@ -284,20 +284,20 @@ void *Gridcell(void *argument)
     }
 
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  streamDefTimestep(streamID2, tsID);
+  pstreamDefTimestep(streamID2, tsID);
 
   varID = 0;
   int levelID = 0;
-  streamDefRecord(streamID2, varID, levelID);
-  streamWriteRecord(streamID2, array, 0);
+  pstreamDefRecord(streamID2, varID, levelID);
+  pstreamWriteRecord(streamID2, array, 0);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array ) Free(array);
 
