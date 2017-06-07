@@ -653,6 +653,8 @@ ENABLE_GRIB
 ENABLE_GRIBAPI
 GRIB_API_LIBS
 GRIB_API_INCLUDE
+ECCODES_LIBS
+ECCODES_INCLUDE
 CMOR_LIBS
 UDUNITS_INCLUDE
 UDUNITS_LDFLAGS
@@ -828,6 +830,7 @@ with_hdf5
 with_netcdf
 with_udunits2
 with_cmor
+with_eccodes
 with_grib_api
 enable_grib
 enable_cgribex
@@ -1525,6 +1528,9 @@ Optional Packages:
   --with-udunits2=<directory>
                           Specify location of UDUNITS2 library.
   --with-cmor=<directory> Specify location of CMOR library.
+  --with-eccodes=<yes|no|directory> (default=no)
+                          location of ECCODES library (lib and include
+                          subdirs)
   --with-grib_api=<yes|no|directory> (default=no)
                           location of GRIB_API library (lib and include
                           subdirs)
@@ -20725,10 +20731,194 @@ fi
 
 
 #  ----------------------------------------------------------------------
+#  Compile application with ECCODES library (for GRIB2 support)
+ECCODES_INCLUDE=''
+ECCODES_LIBS=''
+ENABLE_GRIBAPI=no
+
+# Check whether --with-eccodes was given.
+if test "${with_eccodes+set}" = set; then :
+  withval=$with_eccodes; case "$with_eccodes" in #(
+  no) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ECCODES library" >&5
+$as_echo_n "checking for ECCODES library... " >&6; }
+                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
+$as_echo "suppressed" >&6; } ;; #(
+  yes) :
+    for ac_header in grib_api.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "grib_api.h" "ac_cv_header_grib_api_h" "$ac_includes_default"
+if test "x$ac_cv_header_grib_api_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GRIB_API_H 1
+_ACEOF
+
+fi
+
+done
+
+                            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing grib_get_message" >&5
+$as_echo_n "checking for library containing grib_get_message... " >&6; }
+if ${ac_cv_search_grib_get_message+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char grib_get_message ();
+int
+main ()
+{
+return grib_get_message ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' eccodes; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_grib_get_message=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_grib_get_message+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_grib_get_message+:} false; then :
+
+else
+  ac_cv_search_grib_get_message=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_grib_get_message" >&5
+$as_echo "$ac_cv_search_grib_get_message" >&6; }
+ac_res=$ac_cv_search_grib_get_message
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBGRIB_API 1" >>confdefs.h
+
+                                            ENABLE_GRIBAPI=yes
+else
+  as_fn_error $? "Could not link to eccodes library" "$LINENO" 5
+fi
+ ;; #(
+  *) :
+    ECCODES_ROOT=$with_eccodes
+                          if test -d "$ECCODES_ROOT"; then :
+  LDFLAGS="-L$ECCODES_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$ECCODES_ROOT/include $CPPFLAGS"
+                                 for ac_header in grib_api.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "grib_api.h" "ac_cv_header_grib_api_h" "$ac_includes_default"
+if test "x$ac_cv_header_grib_api_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GRIB_API_H 1
+_ACEOF
+
+fi
+
+done
+
+                                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing grib_get_message" >&5
+$as_echo_n "checking for library containing grib_get_message... " >&6; }
+if ${ac_cv_search_grib_get_message+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char grib_get_message ();
+int
+main ()
+{
+return grib_get_message ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' eccodes; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_grib_get_message=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_grib_get_message+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_grib_get_message+:} false; then :
+
+else
+  ac_cv_search_grib_get_message=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_grib_get_message" >&5
+$as_echo "$ac_cv_search_grib_get_message" >&6; }
+ac_res=$ac_cv_search_grib_get_message
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBGRIB_API 1" >>confdefs.h
+
+                                                 ENABLE_GRIBAPI=yes
+else
+  as_fn_error $? "Could not link to eccodes library" "$LINENO" 5
+fi
+
+                                 ECCODES_LIBS=" -L$ECCODES_ROOT/lib -leccodes"
+                                 ECCODES_INCLUDE=" -I$ECCODES_ROOT/include"
+else
+  as_fn_error $? "$ECCODES_ROOT is not a directory! ECCODES suppressed" "$LINENO" 5
+fi ;; #(
+  *) :
+     ;;
+esac
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the ECCODES library" >&5
+$as_echo_n "checking for the ECCODES library... " >&6; }
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
+$as_echo "suppressed" >&6; }
+fi
+
+
+
+#AC_SUBST([ENABLE_GRIBAPI])
+#  ----------------------------------------------------------------------
 #  Compile application with GRIB_API library (for GRIB2 support)
 GRIB_API_INCLUDE=''
 GRIB_API_LIBS=''
-ENABLE_GRIBAPI=no
+#ENABLE_GRIBAPI=no
 
 # Check whether --with-grib_api was given.
 if test "${with_grib_api+set}" = set; then :

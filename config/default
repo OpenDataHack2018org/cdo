@@ -80,17 +80,13 @@ case "${HOSTNAME}" in
 	;;
     hama*)
 #        CDOLIBS="--with-fftw3 \
-#                 --with-netcdf=/opt/local \
-#                 --with-hdf5=/opt/local \
-#                 --with-szlib=$HOME/local \
-#                 --with-proj=/opt/local \
 #                 --with-cmor=/Users/m214003/work/CMOR \
 #                 --with-magics=$HOME/local/magics-2.25.3 \
 #                 --with-curl=/opt/local"
         CDOLIBS="--enable-nearpt3 \
                  --with-fftw3 \
                  --with-szlib=$HOME/local \
-                 --with-grib_api=$HOME/local/grib_api-1.21.0 \
+                 --with-eccodes=$HOME/local/eccodes-2.3.0 \
                  --with-netcdf=$HOME/local/netcdf-c-4.4.1.1 \
                  --with-hdf5=$HOME/local/hdf5-1.8.18 \
                  --with-libxml2=/opt/local \
@@ -119,7 +115,7 @@ case "${HOSTNAME}" in
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
-                    $CDOLIBS \
+                    $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=g++ CXXFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q -fstack-protector" \
 	            CC=gcc  CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q -fstack-protector"
 #                    --with-libxml2=/usr \
