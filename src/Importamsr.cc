@@ -152,8 +152,8 @@ void write_data(int streamID, int nvars, double *data[], int *nmiss)
 {
   for ( int varID = 0; varID < nvars; ++varID )
     {
-      streamDefRecord(streamID, varID, 0);
-      streamWriteRecord(streamID, data[varID], nmiss[varID]);
+      pstreamDefRecord(streamID, varID, 0);
+      pstreamWriteRecord(streamID, data[varID], nmiss[varID]);
     }
 }
 
@@ -190,7 +190,7 @@ void *Importamsr(void *argument)
   int vdate = getDate(cdoStreamName(0)->args);
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
-  int streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   /*
     Longitude  is 0.25*xdim-0.125    degrees east
@@ -219,7 +219,7 @@ void *Importamsr(void *argument)
 
       init_amsr_day(vlistID, gridID, zaxisID, nvars);
 
-      streamDefVlist(streamID, vlistID);
+      pstreamDefVlist(streamID, vlistID);
 
       vtime = 13000; /* 1:30:00 */
       for ( tsID = 0; tsID < 2; ++tsID )
@@ -227,7 +227,7 @@ void *Importamsr(void *argument)
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
 	  vtime += 120000;  /* 13:30:00 */
-	  streamDefTimestep(streamID, tsID);
+	  pstreamDefTimestep(streamID, tsID);
 	  processDefTimesteps(streamID);
 
 	  read_amsr(fp, vlistID, nvars, data, nmiss);
@@ -245,12 +245,12 @@ void *Importamsr(void *argument)
       init_amsr_averaged(vlistID, gridID, zaxisID, nvars);
 
       /* vlistDefNtsteps(vlistID, 0);*/
-      streamDefVlist(streamID, vlistID);
+      pstreamDefVlist(streamID, vlistID);
       
       taxisDefVdate(taxisID, vdate);
       taxisDefVtime(taxisID, vtime);
       tsID = 0;
-      streamDefTimestep(streamID, tsID);
+      pstreamDefTimestep(streamID, tsID);
       processDefTimesteps(streamID);
       
       read_amsr(fp, vlistID, nvars, data, nmiss);
@@ -264,7 +264,7 @@ void *Importamsr(void *argument)
 
   processDefVarNum(vlistNvars(vlistID), streamID);
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   fclose(fp);
 

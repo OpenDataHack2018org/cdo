@@ -113,9 +113,9 @@ void *Mastrfu(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
   if ( nvars != 1 ) cdoAbort("This operator works only with one variable!");
@@ -152,26 +152,25 @@ void *Mastrfu(void *argument)
   vlistDefVarUnits(vlistID2, 0, "kg/s");
   vlistDefVarDatatype(vlistID2, 0, CDI_DATATYPE_FLT32);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   double *array1 = (double*) Malloc(gridsize*nlev*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*nlev*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       nmiss = 0;
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  offset  = gridsize*levelID;
-	  streamReadRecord(streamID1, array1+offset, &nmiss1);
+	  pstreamReadRecord(streamID1, array1+offset, &nmiss1);
 	  nmiss += nmiss1;
 	}
 
@@ -181,15 +180,15 @@ void *Mastrfu(void *argument)
 	{
 	  varID = 0;
 	  levelID = recID;
-	  streamDefRecord(streamID2, varID,  levelID);
+	  pstreamDefRecord(streamID2, varID,  levelID);
 	  offset  = gridsize*levelID;
-	  streamWriteRecord(streamID2, array2+offset, nmiss);     
+	  pstreamWriteRecord(streamID2, array2+offset, nmiss);     
 	}
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);

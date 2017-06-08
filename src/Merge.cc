@@ -148,9 +148,8 @@ void *Merge(void *argument)
 
   for ( index = 0; index < nmerge; index++ )
     {
-      streamID1 = streamOpenRead(cdoStreamName(index));
-      streamIDs[index] = streamID1;
-      vlistIDs[index]  = streamInqVlist(streamID1);
+      streamIDs[index] = pstreamOpenRead(cdoStreamName(index));
+      vlistIDs[index]  = pstreamInqVlist(streamIDs[index]);
     }
 
   int taxisindex = 0;
@@ -211,10 +210,10 @@ void *Merge(void *argument)
       vlistPrint(vlistID2);
     }
        
-  int streamID2 = streamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
 
   vlistDefTaxis(vlistID2, taxisID2);
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   double *array = NULL;
   if ( ! lcopy )
@@ -232,7 +231,7 @@ void *Merge(void *argument)
 	  vlistID1  = vlistIDs[index];
 	  if ( vlistID1 == -1 ) continue;
 
-	  numrecs[index] = streamInqTimestep(streamID1, tsID);
+	  numrecs[index] = pstreamInqTimestep(streamID1, tsID);
 	}
 
       for ( index = 0; index < nmerge; index++ ) if ( numrecs[index] != 0 ) break;
@@ -274,7 +273,7 @@ void *Merge(void *argument)
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( index = 0; index < nmerge; index++ )
 	{
@@ -286,22 +285,22 @@ void *Merge(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
 
 	      varID2   = vlistMergedVar(vlistID1, varID);
 	      levelID2 = vlistMergedLevel(vlistID1, varID, levelID);
 
 	      if ( cdoVerbose )	cdoPrint("var %d %d %d %d", varID, levelID, varID2, levelID2);
 
-	      streamDefRecord(streamID2, varID2, levelID2);
+	      pstreamDefRecord(streamID2, varID2, levelID2);
 	      if ( lcopy )
 		{
-		  streamCopyRecord(streamID2, streamID1);
+		  pstreamCopyRecord(streamID2, streamID1);
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, array, &nmiss);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  pstreamReadRecord(streamID1, array, &nmiss);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 		}
 	    }
 	}
@@ -310,9 +309,9 @@ void *Merge(void *argument)
    }
 
   for ( index = 0; index < nmerge; index++ )
-    streamClose(streamIDs[index]);
+    pstreamClose(streamIDs[index]);
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 
   vlistDestroy(vlistID2);
 

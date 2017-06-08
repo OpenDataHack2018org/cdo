@@ -288,9 +288,9 @@ void *Maskbox(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int ngrids = vlistNgrids(vlistID1);
   int ndiffgrids = 0;
@@ -334,9 +334,8 @@ void *Maskbox(void *argument)
 	vars[varID] = false;
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = gridInqSize(gridID);
   double *array = (double *) Malloc(gridsize*sizeof(double));
@@ -387,19 +386,19 @@ void *Maskbox(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( vars[varID] )
 	    {
               int nmiss;
-	      streamReadRecord(streamID1, array, &nmiss);
+	      pstreamReadRecord(streamID1, array, &nmiss);
 
               double missval = vlistInqVarMissval(vlistID1, varID);             
 	      for ( int i = 0; i < gridsize; i++ )
@@ -409,15 +408,15 @@ void *Maskbox(void *argument)
 	      for ( int i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, array, nmiss);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, array, nmiss);
 	    }
 	}
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( vars  ) Free(vars);
   if ( array ) Free(array);

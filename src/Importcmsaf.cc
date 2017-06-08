@@ -1549,9 +1549,9 @@ void *Importcmsaf(void *argument)
   vdate = get_vdate(vlistID);
   if ( vdate == 0 ) vdate = 10101;
 
-  streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID, vlistID);
+  pstreamDefVlist(streamID, vlistID);
 
   for ( tsID = 0; tsID < nt; ++tsID )
     {
@@ -1559,7 +1559,7 @@ void *Importcmsaf(void *argument)
       vtime = 0;
       if ( vtimes ) vtime = vtimes[tsID];
       taxisDefVtime(taxisID, vtime);
-      streamDefTimestep(streamID, tsID);
+      pstreamDefTimestep(streamID, tsID);
 
       for ( ivar = 0; ivar < dsets.nsets; ++ivar )
 	{
@@ -1600,8 +1600,8 @@ void *Importcmsaf(void *argument)
 		cdoWarning(" Missval is inside of valid values! Name: %s  Range: %g - %g  Missval: %g\n",
 		dsets.obj[ivar].name, minval, maxval, missval);
 	      */
-	      streamDefRecord(streamID,  varID,  levelID);
-	      streamWriteRecord(streamID, array, nmiss);
+	      pstreamDefRecord(streamID,  varID,  levelID);
+	      pstreamWriteRecord(streamID, array, nmiss);
 	    }
 	}
     }
@@ -1612,7 +1612,7 @@ void *Importcmsaf(void *argument)
 
   processDefVarNum(vlistNvars(vlistID), streamID);
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   vlistDestroy(vlistID);
   gridDestroy(gridID);

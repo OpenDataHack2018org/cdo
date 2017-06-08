@@ -64,13 +64,13 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
       int gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       double missval  = vlistInqVarMissval(vlistID, varID);
       
-      streamDefRecord(streamID, varID, 0);
+      pstreamDefRecord(streamID, varID, 0);
 
       int nmiss = 0;
       for ( int i = 0; i < gridsize; ++i )
 	if ( DBL_IS_EQUAL(data[varID][i], missval) ) nmiss++;
       
-      streamWriteRecord(streamID, data[varID], nmiss);
+      pstreamWriteRecord(streamID, data[varID], nmiss);
     }
 }
 
@@ -142,7 +142,7 @@ void *Importobs(void *argument)
   int vdate = getDate(cdoStreamName(0)->args);
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
-  int streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
@@ -155,7 +155,7 @@ void *Importobs(void *argument)
 
   init_vars(vlistID, gridID, zaxisID, nvars);
 
-  streamDefVlist(streamID, vlistID);
+  pstreamDefVlist(streamID, vlistID);
 
   int vdate0 = 0;
   int vtime0 = 0;
@@ -179,7 +179,7 @@ void *Importobs(void *argument)
           */
           taxisDefVdate(taxisID, vdate);
           taxisDefVtime(taxisID, vtime);
-          streamDefTimestep(streamID, tsID);
+          pstreamDefTimestep(streamID, tsID);
       
           init_data(vlistID, nvars, data);
 
@@ -233,7 +233,7 @@ void *Importobs(void *argument)
 
   processDefVarNum(vlistNvars(vlistID), streamID);
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   fclose(fp);
 

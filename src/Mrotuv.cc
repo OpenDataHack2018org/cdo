@@ -199,9 +199,9 @@ void *Mrotuv(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
   for ( varid = 0; varid < nvars; varid++ )
@@ -305,11 +305,11 @@ void *Mrotuv(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID3, vlistID3);
 
   double missval1 = vlistInqVarMissval(vlistID1, uid);
   double missval2 = vlistInqVarMissval(vlistID1, vid);
@@ -329,19 +329,19 @@ void *Mrotuv(void *argument)
   double *vhelp = (double*) Malloc(gridsizex*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
       taxisCopyTimestep(taxisID3, taxisID1);
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( varID == uid ) streamReadRecord(streamID1, urfield[levelID], &nmiss1);
-	  if ( varID == vid ) streamReadRecord(streamID1, vrfield[levelID], &nmiss2);
+	  if ( varID == uid ) pstreamReadRecord(streamID1, urfield[levelID], &nmiss1);
+	  if ( varID == vid ) pstreamReadRecord(streamID1, vrfield[levelID], &nmiss2);
 	}
 
       for ( levelID = 0; levelID < nlevs; levelID++ )
@@ -395,18 +395,18 @@ void *Mrotuv(void *argument)
 	      vfield[IX2D(nlat-1,i,nlon)] = vhelp[IX2D(nlat-1,i+1,nlon+2)];
 	    }
 
-	  streamDefRecord(streamID2, 0, levelID);
-	  streamWriteRecord(streamID2, ufield, nmiss1);     
-	  streamDefRecord(streamID3, 0, levelID);
-	  streamWriteRecord(streamID3, vfield, nmiss2);     
+	  pstreamDefRecord(streamID2, 0, levelID);
+	  pstreamWriteRecord(streamID2, ufield, nmiss1);     
+	  pstreamDefRecord(streamID3, 0, levelID);
+	  pstreamWriteRecord(streamID3, vfield, nmiss2);     
 	}
 
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( ufield  ) Free(ufield);
   if ( vfield  ) Free(vfield);

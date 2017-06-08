@@ -917,9 +917,9 @@ void *Maggraph(void *argument)
       if( DBG )
         fprintf( stderr," file %d is %s\n", fileID, cdoStreamName(fileID)->args );
       
-      int streamID = streamOpenRead(cdoStreamName(fileID));
+      int streamID = pstreamOpenRead(cdoStreamName(fileID));
 
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);
 
       vlistInqVarUnits(vlistID, 0, units);
@@ -946,7 +946,7 @@ void *Maggraph(void *argument)
 
       int tsID = 0;
       nts_alloc = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
 	{
 	  if ( nrecs != 1 ) cdoAbort("Input stream has more than one point in time!");
 	  
@@ -969,8 +969,8 @@ void *Maggraph(void *argument)
 	    }
 
           double val;
-	  streamInqRecord( streamID, &varID, &levelID );
-	  streamReadRecord( streamID, &val, &nmiss );
+	  pstreamInqRecord( streamID, &varID, &levelID );
+	  pstreamReadRecord( streamID, &val, &nmiss );
 	  datatab[ fileID ][ tsID ] = val;
 	  vdate[ fileID ][ tsID ] = taxisInqVdate(taxisID);
 	  vtime[ fileID ][ tsID ] = taxisInqVtime(taxisID);
@@ -979,7 +979,7 @@ void *Maggraph(void *argument)
 	    fprintf(stderr, "%f %f\n", datatab[ fileID ][ tsID ],val ); 
 	  tsID++;
 	}
-      streamClose(streamID);
+      pstreamClose(streamID);
     }
   
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */

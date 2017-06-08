@@ -77,9 +77,9 @@ void *Intgridtraj(void *argument)
   juldate_t juldate;
   readnextpos(fp, calendar, &juldate, &xpos, &ypos);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   field_type field1, field2;
   field_init(&field1);
@@ -129,33 +129,32 @@ void *Intgridtraj(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  int nrecs = streamInqTimestep(streamID1, tsID++);
+  int nrecs = pstreamInqTimestep(streamID1, tsID++);
   juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
   for ( int recID = 0; recID < nrecs; recID++ )
     {
-      streamInqRecord(streamID1, &varID, &levelID);
+      pstreamInqRecord(streamID1, &varID, &levelID);
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       offset   = gridsize*levelID;
       single1  = vardata1[varID] + offset;
-      streamReadRecord(streamID1, single1, &nmiss);
+      pstreamReadRecord(streamID1, single1, &nmiss);
       if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
     }
 
   int tsIDo = 0;
   while ( juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate) )
     {
-      nrecs = streamInqTimestep(streamID1, tsID++);
+      nrecs = pstreamInqTimestep(streamID1, tsID++);
       if ( nrecs == 0 ) break;
       juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  recVarID[recID]   = varID;
 	  recLevelID[recID] = levelID;
@@ -163,7 +162,7 @@ void *Intgridtraj(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  offset   = gridsize*levelID;
 	  single2  = vardata2[varID] + offset;
-	  streamReadRecord(streamID1, single2, &nmiss);
+	  pstreamReadRecord(streamID1, single2, &nmiss);
 	  if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
 	}
 
@@ -175,7 +174,7 @@ void *Intgridtraj(void *argument)
 	      juldate_decode(calendar, juldate, &vdate, &vtime);
 	      taxisDefVdate(taxisID2, vdate);
 	      taxisDefVtime(taxisID2, vtime);
-	      streamDefTimestep(streamID2, tsIDo++);
+	      pstreamDefTimestep(streamID2, tsIDo++);
 
 	      double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
 		            juldate_to_seconds(juldate_sub(juldate2, juldate1));
@@ -210,8 +209,8 @@ void *Intgridtraj(void *argument)
 
 		  intgridbil(&field1, &field2);
 
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, &point, nmiss);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, &point, nmiss);
 		}
 	    }
 	  if ( readnextpos(fp, calendar, &juldate, &xpos, &ypos) == EOF ) break;
@@ -229,8 +228,8 @@ void *Intgridtraj(void *argument)
     }
 
   fclose(fp);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   for ( varID = 0; varID < nvars; varID++ )
     {

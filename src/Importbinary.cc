@@ -338,9 +338,9 @@ void *Importbinary(void *argument)
 
   vlistDefTaxis(vlistID, taxisID);
 
-  int streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID, vlistID);
+  pstreamDefVlist(streamID, vlistID);
 
 
   gridsize = pfi.dnum[0]*pfi.dnum[1];
@@ -459,7 +459,7 @@ void *Importbinary(void *argument)
 
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
-	  streamDefTimestep(streamID, tsID);
+	  pstreamDefTimestep(streamID, tsID);
 
 	  for ( int recID = 0; recID < nrecs; ++recID )
 	    {
@@ -544,8 +544,8 @@ void *Importbinary(void *argument)
 	      */
 	      varID   = recVarID[recID];
 	      levelID = recLevelID[recID];
-	      streamDefRecord(streamID,  varID,  levelID);
-              streamWriteRecord(streamID, array, nmiss);
+	      pstreamDefRecord(streamID,  varID,  levelID);
+              pstreamWriteRecord(streamID, array, nmiss);
  	    }
 	}
 
@@ -557,7 +557,7 @@ void *Importbinary(void *argument)
 
   processDefVarNum(vlistNvars(vlistID), streamID);
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   vlistDestroy(vlistID);
   gridDestroy(gridID);

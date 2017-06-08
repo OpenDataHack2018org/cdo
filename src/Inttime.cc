@@ -89,9 +89,9 @@ void *Inttime(void *argument)
   /* increment in seconds */
   int ijulinc = incperiod * incunit;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( ijulinc == 0 ) vlistDefNtsteps(vlistID2, 1);
@@ -137,15 +137,15 @@ void *Inttime(void *argument)
     }
 
   int tsID = 0;
-  int nrecs = streamInqTimestep(streamID1, tsID++);
+  int nrecs = pstreamInqTimestep(streamID1, tsID++);
   juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
   for ( int recID = 0; recID < nrecs; recID++ )
     {
-      streamInqRecord(streamID1, &varID, &levelID);
+      pstreamInqRecord(streamID1, &varID, &levelID);
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       offset   = gridsize*levelID;
       single1  = vardata1[varID] + offset;
-      streamReadRecord(streamID1, single1, &nmiss1[varID][levelID]);
+      pstreamReadRecord(streamID1, single1, &nmiss1[varID][levelID]);
     }
 
   if ( cdoVerbose )
@@ -160,7 +160,7 @@ void *Inttime(void *argument)
   int tsIDo = 0;
   while ( juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate) )
     {
-      nrecs = streamInqTimestep(streamID1, tsID++);
+      nrecs = pstreamInqTimestep(streamID1, tsID++);
       if ( nrecs == 0 ) break;
 
       juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
@@ -172,7 +172,7 @@ void *Inttime(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  recVarID[recID]   = varID;
 	  recLevelID[recID] = levelID;
@@ -180,7 +180,7 @@ void *Inttime(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  offset   = gridsize*levelID;
 	  single2  = vardata2[varID] + offset;
-	  streamReadRecord(streamID1, single2, &nmiss2[varID][levelID]);
+	  pstreamReadRecord(streamID1, single2, &nmiss2[varID][levelID]);
 	}
 
       while ( juldate_to_seconds(juldate) <= juldate_to_seconds(juldate2) )
@@ -205,13 +205,13 @@ void *Inttime(void *argument)
 
 	      if ( streamID2 == -1 )
 		{
-		  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-		  streamDefVlist(streamID2, vlistID2);
+		  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+		  pstreamDefVlist(streamID2, vlistID2);
 		}
 
 	      taxisDefVdate(taxisID2, vdate);
 	      taxisDefVtime(taxisID2, vtime);
-	      streamDefTimestep(streamID2, tsIDo++);
+	      pstreamDefTimestep(streamID2, tsIDo++);
 
 	      double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
                             juldate_to_seconds(juldate_sub(juldate2, juldate1));
@@ -258,8 +258,8 @@ void *Inttime(void *argument)
 			array[i] = single1[i]*fac1 + single2[i]*fac2;
 		    }
 
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, array, nmiss3);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, array, nmiss3);
 		}
 	    }
 
@@ -310,8 +310,8 @@ void *Inttime(void *argument)
 
   if ( array )  Free(array);
 
-  if ( streamID2 != -1 ) streamClose(streamID2);
-  streamClose(streamID1);
+  if ( streamID2 != -1 ) pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( tsIDo == 0 ) cdoWarning("date/time out of time axis, no time step interpolated!");
 

@@ -186,9 +186,9 @@ void *Intlevel(void *argument)
 
   if ( cdoVerbose ) for ( i = 0; i < nlev2; ++i ) printf("lev2 %d: %g\n", i, lev2[i]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -281,9 +281,8 @@ void *Intlevel(void *argument)
     if ( zaxisID1 == vlistZaxis(vlistID1, i) )
       vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
 
@@ -321,22 +320,22 @@ void *Intlevel(void *argument)
 
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = false;
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  offset   = gridsize*levelID;
 	  single1  = vardata1[varID] + offset;
 	  
-	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
+	  pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 	  vars[varID] = true;
 	}
 
@@ -374,8 +373,8 @@ void *Intlevel(void *argument)
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 		  offset   = gridsize*levelID;
 		  single2  = vardata2[varID] + offset;
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
 		}
 	    }
 	}
@@ -383,8 +382,8 @@ void *Intlevel(void *argument)
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
