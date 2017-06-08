@@ -108,11 +108,16 @@ void *Output(void *argument)
 	      if ( len < 3 ) len = 3;
 	      if ( strncmp(parnames[i], Keynames[k], len) == 0 )
 		{
+                  int len2 = strlen(parnames[i]);
+                  if ( len2 > len && parnames[i][len] != ':' )
+                    cdoAbort("Key parameter >%s< contains invalid character at position %d!", parnames[i], len+1);
+
 		  if ( k == knohead ) lhead = false;
 		  else
 		    {
 		      keys[nkeys++] = k;
-		      if ( parnames[i][len] == ':' && isdigit(parnames[i][len+1]) ) Keylen[k] = atoi(&parnames[i][len+1]);
+		      if ( len2 > len && parnames[i][len] == ':' && isdigit(parnames[i][len+1]) )
+                        Keylen[k] = atoi(&parnames[i][len+1]);
 		    }
 		  break;
 		}
