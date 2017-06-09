@@ -142,7 +142,7 @@ void *Vertwind(void *argument)
     vlistDefFlag(vlistID1, omegaID, levelID, TRUE);
 
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
   vlistDefVarCode(vlistID2, 0, 40);
   vlistDefVarName(vlistID2, 0, "W");
   vlistDefVarLongname(vlistID2, 0, "Vertical velocity");

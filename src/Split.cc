@@ -141,7 +141,7 @@ void *Split(void *argument)
 	    }
 
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
 	  if ( codes[index] > 9999 )
@@ -206,7 +206,7 @@ void *Split(void *argument)
 	    }
 
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
 	  cdiParamToString(params[index], paramstr, sizeof(paramstr));
@@ -259,7 +259,7 @@ void *Split(void *argument)
 		}
 	    }
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%03d", tabnums[index]);
@@ -290,7 +290,7 @@ void *Split(void *argument)
 	    }
 
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
 	  filename[nchars] = '\0';
@@ -346,7 +346,7 @@ void *Split(void *argument)
 		}
 	    }
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%06g", levels[index]);
@@ -386,7 +386,7 @@ void *Split(void *argument)
 		}
 	    }
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", vlistGridIndex(vlistID1, gridIDs[index])+1);
@@ -424,7 +424,7 @@ void *Split(void *argument)
 		}
 	    }
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", vlistZaxisIndex(vlistID1, zaxisIDs[index])+1);

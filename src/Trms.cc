@@ -109,7 +109,7 @@ void *Trms(void *argument)
   if ( pvarID == -1 ) cdoAbort("pressure variable missing!");
 
   int vlistID3 = vlistCreate();
-  vlistCopyFlag(vlistID3, vlistID1);
+  cdoVlistCopyFlag(vlistID3, vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);

@@ -20,6 +20,9 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream_write.h"
+#define  streamOpenWrite          pstreamOpenWrite
+#define  streamDefVlist           pstreamDefVlist
+#define  streamDefTimestep        pstreamDefTimestep
 #endif
 
 #if defined(AFTERBURNER)
@@ -2075,7 +2078,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 {
   int i;
 
-  //#if defined(_PSTREAM_H)
+  //#if defined(PSTREAM_H)
   //  globs->istreamID = streamOpenRead(cdoStreamName(0));
   //#else
   globs->istreamID = streamOpenRead(ifile);
@@ -2089,7 +2092,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   if ( globs->Mean != 2 )
     {
-#if defined(_PSTREAM_WRITE_H)
+#if defined(PSTREAM_WRITE_H)
       globs->ostreamID = streamOpenWrite(cdoStreamName(ofileidx), ofiletype);
 #else
       globs->ostreamID = streamOpenWrite(ofile, ofiletype);
@@ -2229,7 +2232,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   after_control(globs, vars);
 
-#if defined(_PSTREAM_WRITE_H)
+#if defined(PSTREAM_WRITE_H)
   if ( globs->ostreamID  != CDI_UNDEFID ) pstreamClose(globs->ostreamID);
 #else
   if ( globs->ostreamID2 != CDI_UNDEFID ) streamClose(globs->ostreamID2);

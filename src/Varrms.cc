@@ -65,7 +65,7 @@ void *Varrms(void *argument)
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
   int vlistID3 = vlistCreate();
-  vlistCopyFlag(vlistID3, vlistID1);
+  cdoVlistCopyFlag(vlistID3, vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);

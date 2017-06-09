@@ -437,7 +437,7 @@ void *Setpartab(void *argument)
 	    }
 
 	  int vlistIDx = vlistCreate();
-	  vlistCopyFlag(vlistIDx, vlistID2);
+	  cdoVlistCopyFlag(vlistIDx, vlistID2);
 
 	  vlistDestroy(vlistID2);
 

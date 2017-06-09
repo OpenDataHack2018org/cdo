@@ -644,7 +644,7 @@ struct mapping
 
 static struct mapping *construct_var_mapping(int streamID)
 {
-  int nvars_max = vlistNvars(streamInqVlist(streamID));
+  int nvars_max = vlistNvars(pstreamInqVlist(streamID));
   struct mapping *vars =
     (struct mapping *) Malloc((nvars_max + 1) * sizeof(struct mapping));
   vars[0].cdi_varID = CDI_UNDEFID;

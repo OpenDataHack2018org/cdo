@@ -285,7 +285,7 @@ void *Selvar(void *argument)
   if ( npar == 0 ) cdoAbort("No variables selected!");
 
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
 
   nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; ++varID )

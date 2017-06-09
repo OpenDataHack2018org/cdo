@@ -204,7 +204,7 @@ void *Vertstat(void *argument)
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);

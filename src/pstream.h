@@ -15,35 +15,12 @@
   GNU General Public License for more details.
 */
 
-#ifndef _PSTREAM_H
-#define _PSTREAM_H
+#ifndef PSTREAM_H
+#define PSTREAM_H
 
 #include "pstream_write.h"
 
 #include <sys/types.h> /* off_t */
-
-#define  streamOpenRead           pstreamOpenRead
-#define  streamOpenAppend         pstreamOpenAppend
-#define  streamClose              pstreamClose
-
-#define  streamInqFiletype        pstreamInqFiletype
-#define  streamInqByteorder       pstreamInqByteorder
-
-#define  streamInqVlist           pstreamInqVlist
-
-#define  streamInqTimestep        pstreamInqTimestep
-
-#define  streamInqRecord          pstreamInqRecord
-
-#define  streamReadRecord         pstreamReadRecord
-#define  streamReadRecordF        pstreamReadRecordF
-
-#define  streamCopyRecord         pstreamCopyRecord
-
-#define  streamInqGRIBinfo        pstreamInqGRIBinfo
-
-#define  vlistCopyFlag            cdoVlistCopyFlag
-
 
 int     pstreamOpenRead(const argument_t *argument);
 int     pstreamOpenAppend(const argument_t *argument);
@@ -68,4 +45,4 @@ int     pstreamFileID(int pstreamID);
 
 void    cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
-#endif  /* _PSTREAM_H */
+#endif  /* PSTREAM_H */

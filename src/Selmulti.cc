@@ -326,7 +326,7 @@ void *Selmulti(void *argument)
   if ( cdoDebugExt ) cdoPrint(" Writing the selected fields ...");
 
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
 
   nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; ++varID )

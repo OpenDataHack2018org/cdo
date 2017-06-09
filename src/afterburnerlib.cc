@@ -8,6 +8,8 @@
 #if defined(CDO)
 #include "cdo_int.h"
 #include "pstream_write.h"
+#define  streamDefRecord          pstreamDefRecord
+#define  streamWriteRecord        pstreamWriteRecord
 #else
 #define  OPENMP4  201307
 #if defined(_OPENMP) && defined(OPENMP4) && _OPENMP >= OPENMP4

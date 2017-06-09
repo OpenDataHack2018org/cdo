@@ -290,13 +290,13 @@ void *Mrotuv(void *argument)
   vlistClearFlag(vlistID1);
   for ( int lid = 0; lid < nlevs; lid++ ) vlistDefFlag(vlistID1, uid, lid, TRUE);
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
   vlistChangeVarGrid(vlistID2, 0, gridIDu);
 
   vlistClearFlag(vlistID1);
   for ( int lid = 0; lid < nlevs; lid++ ) vlistDefFlag(vlistID1, vid, lid, TRUE);
   int vlistID3 = vlistCreate();
-  vlistCopyFlag(vlistID3, vlistID1);
+  cdoVlistCopyFlag(vlistID3, vlistID1);
   vlistChangeVarGrid(vlistID3, 0, gridIDv);
 
   int taxisID1 = vlistInqTaxis(vlistID1);

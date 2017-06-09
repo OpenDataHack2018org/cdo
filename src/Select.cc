@@ -428,7 +428,7 @@ void *Select(void *argument)
 	  //if ( cdoVerbose ) vlistPrint(vlistID0);
 
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID0);
+	  cdoVlistCopyFlag(vlistID2, vlistID0);
 
 	  //if ( cdoVerbose ) vlistPrint(vlistID2);
 

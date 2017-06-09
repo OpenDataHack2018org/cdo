@@ -76,7 +76,7 @@ void *Subtrend(void *argument)
     }
 
   tsID = 0;
-  nrecs = streamInqTimestep(streamID3, tsID);
+  nrecs = pstreamInqTimestep(streamID3, tsID);
 
   for ( int recID = 0; recID < nrecs; recID++ )
     {

@@ -341,7 +341,7 @@ void *Expr(void *argument)
                 vlistDefFlag(vlistID1, varID, levID, TRUE);
             }
         }
-      vlistCopyFlag(vlistID2, vlistID1);
+      cdoVlistCopyFlag(vlistID2, vlistID1);
     }
 
   for ( int pidx = 0; pidx < parse_arg.nparams; pidx++ )

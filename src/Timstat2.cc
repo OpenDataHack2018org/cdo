@@ -245,7 +245,7 @@ void *Timstat2(void *argument)
   tsID = 0;
   taxisDefVdate(taxisID3, vdate);
   taxisDefVtime(taxisID3, vtime);
-  streamDefTimestep(streamID3, tsID);
+  pstreamDefTimestep(streamID3, tsID);
 
   for ( int recID = 0; recID < nrecs3; recID++ )
     {

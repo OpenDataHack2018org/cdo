@@ -146,7 +146,7 @@ void *MapReduce(void *argument)
         }
     }
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
   /* }}} */
 
   int taxisID1  = vlistInqTaxis(vlistID1);

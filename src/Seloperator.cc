@@ -89,7 +89,7 @@ void *Seloperator(void *argument)
     cdoWarning("Code %d, ltype %d, level %g not found!", scode, sltype, slevel);
 
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);

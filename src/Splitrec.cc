@@ -76,7 +76,7 @@ void *Splitrec(void *argument)
 	  vlistDefFlag(vlistID1, varID, levelID, TRUE);
 
 	  int vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 
 	  index++;
 	  sprintf(filename+nchars, "%06d", index);
