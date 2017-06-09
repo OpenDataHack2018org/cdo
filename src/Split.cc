@@ -85,9 +85,9 @@ void *Split(void *argument)
       else cdoAbort("Unknown parameter: >%s<", operatorArgv()[0]); 
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int nvars  = vlistNvars(vlistID1);
 
@@ -99,7 +99,7 @@ void *Split(void *argument)
 
   const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
   
   if ( operatorID == SPLITCODE )
     {
@@ -161,7 +161,7 @@ void *Split(void *argument)
 	    }
 
 	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
     }
@@ -216,7 +216,7 @@ void *Split(void *argument)
 	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
     }
@@ -266,7 +266,7 @@ void *Split(void *argument)
 	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
     }
@@ -299,7 +299,7 @@ void *Split(void *argument)
 	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
     }
@@ -353,7 +353,7 @@ void *Split(void *argument)
 	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
    
 	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
     }
@@ -393,7 +393,7 @@ void *Split(void *argument)
 	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
     }
@@ -431,7 +431,7 @@ void *Split(void *argument)
 	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
     }
@@ -444,7 +444,7 @@ void *Split(void *argument)
     {
       if ( uuid_attribute ) cdo_def_tracking_id(vlistIDs[index], uuid_attribute);
 
-      streamDefVlist(streamIDs[index], vlistIDs[index]);
+      pstreamDefVlist(streamIDs[index], vlistIDs[index]);
     }
 
   double *array = NULL;
@@ -457,14 +457,14 @@ void *Split(void *argument)
 
   int nrecs;
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       for ( int index = 0; index < nsplit; index++ )
-	streamDefTimestep(streamIDs[index], tsID);
+	pstreamDefTimestep(streamIDs[index], tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  int index    = vlistInqIndex(vlistID1, varID, levelID);
 	  vlistID2 = vlistIDs[index];
@@ -473,26 +473,26 @@ void *Split(void *argument)
 	  /*
 	    printf("%d %d %d %d %d %d\n", index, vlistID2, varID, levelID, varID2, levelID2);
 	  */
-	  streamDefRecord(streamIDs[index], varID2, levelID2);
+	  pstreamDefRecord(streamIDs[index], varID2, levelID2);
 	  if ( lcopy )
 	    {
-	      streamCopyRecord(streamIDs[index], streamID1);
+	      pstreamCopyRecord(streamIDs[index], streamID1);
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, array, &nmiss);
-	      streamWriteRecord(streamIDs[index], array, nmiss);
+	      pstreamReadRecord(streamID1, array, &nmiss);
+	      pstreamWriteRecord(streamIDs[index], array, nmiss);
 	    }
 	}
 
       tsID++;
     }
 
-  streamClose(streamID1);
+  pstreamClose(streamID1);
 
   for ( int index = 0; index < nsplit; index++ )
     {
-      streamClose(streamIDs[index]);
+      pstreamClose(streamIDs[index]);
       vlistDestroy(vlistIDs[index]);
     }
  

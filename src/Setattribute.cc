@@ -213,9 +213,9 @@ void *Setattribute(void *argument)
         }
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   set_attributes(kvlist, vlistID2);
@@ -227,9 +227,8 @@ void *Setattribute(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   double *array = NULL;
   if ( ! lcopy )
@@ -240,34 +239,33 @@ void *Setattribute(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamDefRecord(streamID2,  varID,  levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamDefRecord(streamID2,  varID,  levelID);
 	  
           if ( lcopy )
             {
-              streamCopyRecord(streamID2, streamID1);
+              pstreamCopyRecord(streamID2, streamID1);
             }
           else
             {
               int nmiss;
-              streamReadRecord(streamID1, array, &nmiss);
-              streamWriteRecord(streamID2, array, nmiss);
+              pstreamReadRecord(streamID1, array, &nmiss);
+              pstreamWriteRecord(streamID2, array, nmiss);
             }
         }
 
       tsID++;
     }
 
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   if ( array ) Free(array);
 

@@ -49,43 +49,41 @@ void *Selrec(void *argument)
 	cdoPrint("intarr entry: %d %d", i, intarr[i]);
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int filetype = streamInqFiletype(streamID1);
+  int filetype = pstreamInqFiletype(streamID1);
 
   if ( filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
     cdoAbort("This operator does not work on NetCDF data!");
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int recordID = 0;
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
      
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  recordID++;
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  for ( int i = 0; i < nsel; i++ )
 	    {
 	      if ( recordID == intarr[i] )
 		{
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamCopyRecord(streamID2, streamID1);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamCopyRecord(streamID2, streamID1);
 
 		  break;
 		}
@@ -95,8 +93,8 @@ void *Selrec(void *argument)
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   lista_destroy(ilista);
 

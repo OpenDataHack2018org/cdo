@@ -71,9 +71,9 @@ void *Splitsel(void *argument)
 
   if ( cdoVerbose ) cdoPrint("nsets = %f, noffset = %f, nskip = %f", ndates, noffset, nskip);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -86,7 +86,7 @@ void *Splitsel(void *argument)
 
   refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   //  if ( ! lcopy )
     {
@@ -130,7 +130,7 @@ void *Splitsel(void *argument)
   /* offset */
   for ( tsID = 0; tsID < noffset; tsID++ )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 )
 	{
 	  cdoWarning("noffset is larger than number of timesteps!");
@@ -140,10 +140,10 @@ void *Splitsel(void *argument)
       if ( tsID == 0 && nconst )
 	for ( int recID = 0; recID < nrecs; recID++ )
 	  {
-	    streamInqRecord(streamID1, &varID, &levelID);
+	    pstreamInqRecord(streamID1, &varID, &levelID);
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
               {
-                streamReadRecord(streamID1, vars[varID][levelID].ptr, &nmiss);
+                pstreamReadRecord(streamID1, vars[varID][levelID].ptr, &nmiss);
                 vars[varID][levelID].nmiss = (size_t) nmiss;
               }
           }
@@ -156,20 +156,20 @@ void *Splitsel(void *argument)
 	  
       if ( cdoVerbose ) cdoPrint("create file %s", filename);
       argument_t *fileargument = file_argument_new(filename);
-      int streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+      int streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
-      streamDefVlist(streamID2, vlistID2);
+      pstreamDefVlist(streamID2, vlistID2);
 
       int tsID2 = 0;
 
       for ( ; nsets < (int)(ndates*(index+1)); nsets++ ) 
 	{
-	  nrecs = streamInqTimestep(streamID1, tsID);
+	  nrecs = pstreamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
-	  streamDefTimestep(streamID2, tsID2);
+	  pstreamDefTimestep(streamID2, tsID2);
 
 	  if ( tsID > 0 && tsID2 == 0 && nconst )
 	    {
@@ -180,9 +180,9 @@ void *Splitsel(void *argument)
 		      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
-			  streamDefRecord(streamID2, varID, levelID);
+			  pstreamDefRecord(streamID2, varID, levelID);
 			  nmiss = vars[varID][levelID].nmiss;
-			  streamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
+			  pstreamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
 			}
 		    }
 		}
@@ -191,16 +191,16 @@ void *Splitsel(void *argument)
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      
-	      streamInqRecord(streamID1, &varID, &levelID);
-	      streamDefRecord(streamID2,  varID,  levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
+	      pstreamDefRecord(streamID2,  varID,  levelID);
 	      if ( lcopy && !(tsID == 0 && nconst) )
 		{
-		  streamCopyRecord(streamID2, streamID1);
+		  pstreamCopyRecord(streamID2, streamID1);
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, array, &nmiss);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  pstreamReadRecord(streamID1, array, &nmiss);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 
 		  if ( tsID == 0 && nconst )
 		    {
@@ -219,20 +219,20 @@ void *Splitsel(void *argument)
 	  tsID2++;	  
 	}
       
-      streamClose(streamID2);
+      pstreamClose(streamID2);
       if ( nrecs == 0 ) break;
 
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       for ( ; i2 < (int)(nskip*(index+1)); i2++ )
 	{
-	  nrecs = streamInqTimestep(streamID1, tsID);
+	  nrecs = pstreamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 	  tsID++;
 	}
 
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       index++;
@@ -240,7 +240,7 @@ void *Splitsel(void *argument)
 
  LABEL_END:
 
-  streamClose(streamID1);
+  pstreamClose(streamID1);
  
   if ( array ) Free(array);
 

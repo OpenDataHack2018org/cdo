@@ -179,9 +179,9 @@ void *Timstat(void *argument)
 
   int cmplen = DATE_LEN - comparelen;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( cmplen == 0 ) vlistDefNtsteps(vlistID2, 1);
@@ -204,9 +204,8 @@ void *Timstat(void *argument)
   else if ( comparelen == YEAR_LEN ) freq = "year";
   if ( freq ) cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int)strlen(freq), freq);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   if ( cdoDiag )
     {
@@ -216,7 +215,7 @@ void *Timstat(void *argument)
       strcat(filename, "_");
       strcat(filename, cdoStreamName(1)->args);
       argument_t *fileargument = file_argument_new(filename);
-      streamID3 = streamOpenWrite(fileargument, cdoFiletype());
+      streamID3 = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
       vlistID3 = vlistDuplicate(vlistID1);
@@ -233,7 +232,7 @@ void *Timstat(void *argument)
       taxisID3 = taxisDuplicate(taxisID1);
       vlistDefTaxis(vlistID3, taxisID3);
 
-      streamDefVlist(streamID3, vlistID3);
+      pstreamDefVlist(streamID3, vlistID3);
     }
 
   recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
@@ -266,7 +265,7 @@ void *Timstat(void *argument)
   while ( TRUE )
     {
       int nsets = 0;
-      while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 	  int vdate = dtlist_get_vdate(dtlist, nsets);
@@ -279,7 +278,7 @@ void *Timstat(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
 
 	      if ( tsID == 0 )
 		{
@@ -296,7 +295,7 @@ void *Timstat(void *argument)
 
 	      if ( nsets == 0 )
 		{
-		  streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+		  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 		  pvars1->nmiss = (size_t)nmiss;
                   if ( lrange )
                     {
@@ -317,9 +316,9 @@ void *Timstat(void *argument)
 	      else
 		{
                   if ( CDO_Memtype == MEMTYPE_FLOAT )
-                    streamReadRecordF(streamID1, field.ptrf, &nmiss);
+                    pstreamReadRecordF(streamID1, field.ptrf, &nmiss);
                   else
-                    streamReadRecord(streamID1, field.ptr, &nmiss);
+                    pstreamReadRecord(streamID1, field.ptr, &nmiss);
                   field.nmiss   = (size_t)nmiss;
 		  field.size    = gridsize;
 		  field.grid    = pvars1->grid;
@@ -454,12 +453,12 @@ void *Timstat(void *argument)
 	  }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
-      streamDefTimestep(streamID2, otsID);
+      pstreamDefTimestep(streamID2, otsID);
 
       if ( cdoDiag )
 	{
 	  dtlist_stat_taxisDefTimestep(dtlist, taxisID3, nsets);
-	  streamDefTimestep(streamID3, otsID);
+	  pstreamDefTimestep(streamID3, otsID);
 	}
 
       for ( int recID = 0; recID < maxrecs; recID++ )
@@ -471,8 +470,8 @@ void *Timstat(void *argument)
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
           
 	  if ( cdoDiag )
 	    {
@@ -484,8 +483,8 @@ void *Timstat(void *argument)
                   for ( int i = 0; i < gridsize; ++i ) sampptr[i] = nsets;
                 }
 
-              streamDefRecord(streamID3, varID, levelID);
-              streamWriteRecord(streamID3, sampptr, 0);
+              pstreamDefRecord(streamID3, varID, levelID);
+              pstreamWriteRecord(streamID3, sampptr, 0);
 	    }
 	}
 
@@ -500,9 +499,9 @@ void *Timstat(void *argument)
 
   dtlist_delete(dtlist);
 
-  if ( cdoDiag ) streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  if ( cdoDiag ) pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( field.ptr ) Free(field.ptr);
   Free(recinfo);

@@ -26,7 +26,7 @@
 
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h" // ENABLE_DATA
+#include "config.h" // ENABLE_DATA
 #endif
 
 #include <cdi.h>
@@ -399,9 +399,9 @@ void *Vargen(void *argument)
        operatorID == TOPO || operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
-  int streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
+  int streamID = pstreamOpenWrite(cdoStreamName(0), cdoFiletype());
 
-  streamDefVlist(streamID, vlistID);
+  pstreamDefVlist(streamID, vlistID);
 
   int gridsize = gridInqSize(gridID);
   int datasize = gridsize;
@@ -432,14 +432,14 @@ void *Vargen(void *argument)
       int vtime = 0;
       taxisDefVdate(taxisID, vdate);
       taxisDefVtime(taxisID, vtime);
-      streamDefTimestep(streamID, tsID);
+      pstreamDefTimestep(streamID, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
         {
           nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
           for ( levelID = 0; levelID < nlevels; levelID++ )
             {
-              streamDefRecord(streamID, varID, levelID);
+              pstreamDefRecord(streamID, varID, levelID);
 
               if ( operatorID == RANDOM )
                 {
@@ -533,12 +533,12 @@ void *Vargen(void *argument)
                   remap_nn_reg2d(nlon, nlat, data, gridID, array);
                 }
 
-              streamWriteRecord(streamID, array, 0);
+              pstreamWriteRecord(streamID, array, 0);
             }
         }
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   vlistDestroy(vlistID);
 

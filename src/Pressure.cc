@@ -58,9 +58,9 @@ void *Pressure(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
@@ -221,24 +221,22 @@ void *Pressure(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( varID == pvarID )
 	    {	  
-	      streamReadRecord(streamID1, pdata, &nmiss);
+	      pstreamReadRecord(streamID1, pdata, &nmiss);
 	      if ( nmiss > 0 ) cdoAbort("Missing valus unsupported!");
 	    }
 	}
@@ -283,16 +281,16 @@ void *Pressure(void *argument)
       varID = 0;
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
-	  streamDefRecord(streamID2, varID, levelID);
+	  pstreamDefRecord(streamID2, varID, levelID);
 	  offset = levelID*gridsize;
-	  streamWriteRecord(streamID2, pout+offset, 0);
+	  pstreamWriteRecord(streamID2, pout+offset, 0);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( pdata      ) Free(pdata);
   if ( ps_prog    ) Free(ps_prog);

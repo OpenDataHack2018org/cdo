@@ -35,13 +35,13 @@ void *Subtrend(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
-  int streamID3 = streamOpenRead(cdoStreamName(2));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID3 = pstreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
-  int vlistID3 = streamInqVlist(streamID3);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID3 = pstreamInqVlist(streamID3);
   int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_DIM);
@@ -51,9 +51,8 @@ void *Subtrend(void *argument)
   int taxisID4 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  int streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
-
-  streamDefVlist(streamID4, vlistID4);
+  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  pstreamDefVlist(streamID4, vlistID4);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -68,12 +67,12 @@ void *Subtrend(void *argument)
 
 
   int tsID = 0;
-  int nrecs = streamInqTimestep(streamID2, tsID);
+  int nrecs = pstreamInqTimestep(streamID2, tsID);
 
   for ( int recID = 0; recID < nrecs; recID++ )
     {
-      streamInqRecord(streamID2, &varID, &levelID);
-      streamReadRecord(streamID2, vars2[varID][levelID].ptr, &nmiss);
+      pstreamInqRecord(streamID2, &varID, &levelID);
+      pstreamReadRecord(streamID2, vars2[varID][levelID].ptr, &nmiss);
     }
 
   tsID = 0;
@@ -81,22 +80,21 @@ void *Subtrend(void *argument)
 
   for ( int recID = 0; recID < nrecs; recID++ )
     {
-      streamInqRecord(streamID3, &varID, &levelID);
-      streamReadRecord(streamID3, vars3[varID][levelID].ptr, &nmiss);
+      pstreamInqRecord(streamID3, &varID, &levelID);
+      pstreamReadRecord(streamID3, vars3[varID][levelID].ptr, &nmiss);
     }
 
 
   tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID4, taxisID1);
-
-      streamDefTimestep(streamID4, tsID);
+      pstreamDefTimestep(streamID4, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
 
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
@@ -111,8 +109,8 @@ void *Subtrend(void *argument)
 	  for ( int i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(field4.ptr[i], missval) ) nmiss++;
 
-	  streamDefRecord(streamID4, varID, levelID);
-	  streamWriteRecord(streamID4, field4.ptr, nmiss);
+	  pstreamDefRecord(streamID4, varID, levelID);
+	  pstreamWriteRecord(streamID4, field4.ptr, nmiss);
 	}
 
       tsID++;
@@ -124,10 +122,10 @@ void *Subtrend(void *argument)
   if ( field1.ptr ) Free(field1.ptr);
   if ( field4.ptr ) Free(field4.ptr);
 
-  streamClose(streamID4);
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID4);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

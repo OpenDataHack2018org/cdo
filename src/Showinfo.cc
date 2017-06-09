@@ -64,9 +64,9 @@ void *Showinfo(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   int nvars   = vlistNvars(vlistID);
   int taxisID = vlistInqTaxis(vlistID);
@@ -76,7 +76,7 @@ void *Showinfo(void *argument)
     {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) )
+	while ( pstreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 
@@ -96,7 +96,7 @@ void *Showinfo(void *argument)
     {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) )
+	while ( pstreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 
@@ -117,7 +117,7 @@ void *Showinfo(void *argument)
       char vdatestr[32];
       int tsID  = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) )
+	while ( pstreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	 
@@ -138,7 +138,7 @@ void *Showinfo(void *argument)
       char vtimestr[32];
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) )
+	while ( pstreamInqTimestep(streamID, tsID) )
 	  {
 	    int vtime = taxisInqVtime(taxisID);
 
@@ -154,7 +154,7 @@ void *Showinfo(void *argument)
       char vdatetimestr[64];
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) )
+	while ( pstreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    int vtime = taxisInqVtime(taxisID);
@@ -257,7 +257,7 @@ void *Showinfo(void *argument)
       printFiletype(streamID, vlistID);
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   cdoFinish();
 

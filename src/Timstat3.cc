@@ -75,12 +75,12 @@ void *Timstat3(void *argument)
 
   for ( is = 0; is < NIN; ++is )
     {
-      streamID[is] = streamOpenRead(cdoStreamName(is));
+      streamID[is] = pstreamOpenRead(cdoStreamName(is));
 
-      vlistID[is] = streamInqVlist(streamID[is]);
+      vlistID[is] = pstreamInqVlist(streamID[is]);
       if ( is > 0 )
 	{
-	  vlistID2 = streamInqVlist(streamID[is]);
+	  vlistID2 = pstreamInqVlist(streamID[is]);
 	  vlistCompare(vlistID[0], vlistID2, CMP_ALL);
 	}
     }
@@ -98,9 +98,8 @@ void *Timstat3(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
  
   vlistDefTaxis(vlistID3, taxisID3);
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(streamID3, vlistID3);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID3);
 
   for ( int i = 0; i < NIN; ++i ) reached_eof[i] = 0;
 
@@ -161,7 +160,7 @@ void *Timstat3(void *argument)
 	{
 	  if ( reached_eof[is] ) continue;
 
-	  nrecs = streamInqTimestep(streamID[is], tsID);
+	  nrecs = pstreamInqTimestep(streamID[is], tsID);
 	  if ( nrecs == 0 )
 	    {
 	      reached_eof[is] = 1;
@@ -173,7 +172,7 @@ void *Timstat3(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID[is], &varID, &levelID);
+	      pstreamInqRecord(streamID[is], &varID, &levelID);
 
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID[is], varID));
 
@@ -185,7 +184,7 @@ void *Timstat3(void *argument)
 		  recLevelID[recID] = levelID;	     	     
 		}	 
 
-	      streamReadRecord(streamID[is], in[is].ptr, &nmiss);
+	      pstreamReadRecord(streamID[is], in[is].ptr, &nmiss);
 	      in[is].nmiss = (size_t) nmiss;
               
 	      for ( int i = 0; i < gridsize; ++i )
@@ -214,7 +213,7 @@ void *Timstat3(void *argument)
 
   taxisDefVdate(taxisID3, vdate);
   taxisDefVtime(taxisID3, vtime);
-  streamDefTimestep(streamID3, 0);
+  pstreamDefTimestep(streamID3, 0);
 
   for ( int recID = 0; recID < nrecs3; recID++ )
     {
@@ -304,8 +303,8 @@ void *Timstat3(void *argument)
       for ( int i = 0; i < gridsize; i++ )
 	if ( DBL_IS_EQUAL(out[0].ptr[i], missval1) ) nmiss++;
 
-      streamDefRecord(streamID3, varID, levelID);
-      streamWriteRecord(streamID3, out[0].ptr, nmiss);
+      pstreamDefRecord(streamID3, varID, levelID);
+      pstreamWriteRecord(streamID3, out[0].ptr, nmiss);
     }
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -327,9 +326,9 @@ void *Timstat3(void *argument)
   for ( int iw = 0; iw < NIWORK; iw++ ) Free(iwork[iw]);
 
 
-  streamClose(streamID3);
+  pstreamClose(streamID3);
   for ( is = 0; is < NIN; ++is )
-    streamClose(streamID[is]);
+    pstreamClose(streamID[is]);
 
   for ( int i = 0; i < NIN; ++i ) Free(in[i].ptr);
   for ( int i = 0; i < NOUT; ++i ) Free(out[i].ptr);

@@ -40,9 +40,9 @@ void *Trend(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   vlistDefNtsteps(vlistID2, 1);
@@ -57,11 +57,11 @@ void *Trend(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
-  streamDefVlist(streamID3, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID3, vlistID2);
 
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
@@ -78,7 +78,7 @@ void *Trend(void *argument)
     work[w] = field_calloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
@@ -87,7 +87,7 @@ void *Trend(void *argument)
       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( tsID == 0 )
 	    {
@@ -95,7 +95,7 @@ void *Trend(void *argument)
 	      recLevelID[recID] = levelID;
 	    }
 
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
 
 	  double missval  = vlistInqVarMissval(vlistID1, varID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -118,8 +118,8 @@ void *Trend(void *argument)
 
   taxisDefVdate(taxisID2, vdate);
   taxisDefVtime(taxisID2, vtime);
-  streamDefTimestep(streamID2, 0);
-  streamDefTimestep(streamID3, 0);
+  pstreamDefTimestep(streamID2, 0);
+  pstreamDefTimestep(streamID3, 0);
 
   for ( int recID = 0; recID < nrecords; recID++ )
     {
@@ -149,15 +149,15 @@ void *Trend(void *argument)
       for ( int i = 0; i < gridsize; i++ )
 	if ( DBL_IS_EQUAL(field1.ptr[i], missval) ) nmiss++;
 
-      streamDefRecord(streamID2, varID, levelID);
-      streamWriteRecord(streamID2, field1.ptr, nmiss);
+      pstreamDefRecord(streamID2, varID, levelID);
+      pstreamWriteRecord(streamID2, field1.ptr, nmiss);
 
       nmiss = 0;
       for ( int i = 0; i < gridsize; i++ )
 	if ( DBL_IS_EQUAL(field2.ptr[i], missval) ) nmiss++;
 
-      streamDefRecord(streamID3, varID, levelID);
-      streamWriteRecord(streamID3, field2.ptr, nmiss);
+      pstreamDefRecord(streamID3, varID, levelID);
+      pstreamWriteRecord(streamID3, field2.ptr, nmiss);
     }
 
 
@@ -169,9 +169,9 @@ void *Trend(void *argument)
   if ( recVarID   ) Free(recVarID);
   if ( recLevelID ) Free(recLevelID);
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

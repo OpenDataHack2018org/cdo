@@ -45,18 +45,17 @@ void *Runpctl(void *argument)
   percentile_check_number(pn);
   int ndates = parameter2int(operatorArgv()[1]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
@@ -77,14 +76,14 @@ void *Runpctl(void *argument)
   int tsID;
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
-      int nrecs = streamInqTimestep(streamID1, tsID);
+      int nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) cdoAbort("File has less than %d timesteps!", ndates);
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
         
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID1, &varID, &levelID);
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
           if ( tsID == 0 )
             {
@@ -92,7 +91,7 @@ void *Runpctl(void *argument)
               recLevelID[recID] = levelID;
             }
           
-          streamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
+          pstreamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
           vars1[tsID][varID][levelID].nmiss = nmiss;
         }
     }
@@ -135,7 +134,7 @@ void *Runpctl(void *argument)
         }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
-      streamDefTimestep(streamID2, otsID);
+      pstreamDefTimestep(streamID2, otsID);
 
       for ( int recID = 0; recID < nrecords; recID++ )
         {
@@ -144,8 +143,8 @@ void *Runpctl(void *argument)
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[0][varID][levelID].ptr, vars1[0][varID][levelID].nmiss);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, vars1[0][varID][levelID].ptr, vars1[0][varID][levelID].nmiss);
         }
 
       otsID++;
@@ -155,16 +154,15 @@ void *Runpctl(void *argument)
       vars1[ndates] = vars1[0];
       for ( int inp = 0; inp < ndates; inp++ ) vars1[inp] = vars1[inp+1];
 
-      int nrecs = streamInqTimestep(streamID1, tsID);
+      int nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, ndates-1);
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID1, &varID, &levelID);
-          
-          streamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
           vars1[ndates-1][varID][levelID].nmiss = nmiss;
         }
 
@@ -182,8 +180,8 @@ void *Runpctl(void *argument)
 
   dtlist_delete(dtlist);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

@@ -76,34 +76,32 @@ void *Tests(void *argument)
 	cdoAbort("both degrees must be positive!");
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);	  
-	  streamReadRecord(streamID1, array1, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);	  
+	  pstreamReadRecord(streamID1, array1, &nmiss);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  missval = vlistInqVarMissval(vlistID1, varID);
@@ -148,15 +146,15 @@ void *Tests(void *argument)
 	      cdoAbort("Internal problem, operator not implemented!");
 	    }
 
-	  streamDefRecord(streamID2,  varID,  levelID);
-	  streamWriteRecord(streamID2, array2, nmiss);
+	  pstreamDefRecord(streamID2,  varID,  levelID);
+	  pstreamWriteRecord(streamID2, array2, nmiss);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   vlistDestroy(vlistID2);
 

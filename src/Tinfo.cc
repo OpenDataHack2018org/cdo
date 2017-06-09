@@ -240,9 +240,9 @@ void *Tinfo(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   fprintf(stdout, "\n");
 
@@ -315,7 +315,7 @@ void *Tinfo(void *argument)
       fprintf(stdout, "\n");
 
       tsID = 0;
-      while ( streamInqTimestep(streamID, tsID) )
+      while ( pstreamInqTimestep(streamID, tsID) )
 	{  
 	  vdate = taxisInqVdate(taxisID);
 	  vtime = taxisInqVtime(taxisID);
@@ -425,7 +425,7 @@ void *Tinfo(void *argument)
 	}
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   fprintf(stdout, "\n");
 

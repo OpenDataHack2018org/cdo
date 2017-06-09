@@ -32,9 +32,9 @@ void *Writegrid(void *argument)
 {
   cdoInitialize(argument);
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
   int gridID  = vlistGrid(vlistID, 0);
 
   int gridtype = gridInqType(gridID);
@@ -61,7 +61,7 @@ void *Writegrid(void *argument)
       
   writeNCgrid(cdoStreamName(1)->args, gridID, mask);
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   if ( mask ) Free(mask);
 

@@ -30,11 +30,11 @@ void *Test(void *argument)
   cdoInitialize(argument);
 
   /*
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamID1 = pstreamOpenRead(cdoStreamName(0));
+  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
   */
   cdoFinish();
 
@@ -51,13 +51,13 @@ void *Test2(void *argument)
   cdoInitialize(argument);
 
   /*
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  streamID1 = pstreamOpenRead(cdoStreamName(0));
+  streamID2 = pstreamOpenRead(cdoStreamName(1));
+  streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
   */
   cdoFinish();
 
@@ -75,18 +75,18 @@ void *Testdata(void *argument)
 
   int tsID2 = 0;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int vlistID2 = vlistDuplicate(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
@@ -98,18 +98,17 @@ void *Testdata(void *argument)
   FILE *fp = fopen("testdata", "w");
 
   int tsID1 = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID2);
+      pstreamDefTimestep(streamID2, tsID2);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamDefRecord(streamID2,  varID,  levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamDefRecord(streamID2,  varID,  levelID);
 	  
-	  streamReadRecord(streamID1, array, &nmiss);
+	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  for ( int i = 0; i < gridsize; ++i )
@@ -129,7 +128,7 @@ void *Testdata(void *argument)
 		     i, (unsigned int)cval[4*i+0], (unsigned int)cval[4*i+1], (unsigned int)cval[4*i+2], (unsigned int)cval[4*i+3], ival[i], fval[i]);
 	    }
 
-	  streamWriteRecord(streamID2, array, nmiss);
+	  pstreamWriteRecord(streamID2, array, nmiss);
 
 	  fwrite(cval, 4, gridsize, fp);
 	}
@@ -139,8 +138,8 @@ void *Testdata(void *argument)
     }
   
   fclose(fp);
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   if ( array ) Free(array);
 

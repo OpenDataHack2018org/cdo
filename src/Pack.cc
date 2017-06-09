@@ -94,9 +94,9 @@ void *Pack(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -106,7 +106,7 @@ void *Pack(void *argument)
   int nvars = vlistNvars(vlistID1);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
 	{
@@ -120,11 +120,11 @@ void *Pack(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
+	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
 
@@ -229,14 +229,13 @@ void *Pack(void *argument)
 	}
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
       dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -246,8 +245,8 @@ void *Pack(void *argument)
 	      if ( vars[tsID][varID][levelID].ptr )
 		{
 		  nmiss = vars[tsID][varID][levelID].nmiss;
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 		  Free(vars[tsID][varID][levelID].ptr);
 		  vars[tsID][varID][levelID].ptr = NULL;
 		}
@@ -261,8 +260,8 @@ void *Pack(void *argument)
 
   dtlist_delete(dtlist);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

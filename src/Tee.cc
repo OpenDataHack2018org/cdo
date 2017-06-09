@@ -31,13 +31,13 @@ void *Tee(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   int vlistID2 = vlistDuplicate(vlistID1);
   int vlistID3 = vlistDuplicate(vlistID1);
@@ -48,53 +48,52 @@ void *Tee(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamDefVlist(streamID2, vlistID2);
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID3, vlistID3);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       taxisCopyTimestep(taxisID3, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{ 
 	  if ( lcopy )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      streamDefRecord(streamID2,  varID,  levelID);
-	      streamCopyRecord(streamID2, streamID1);
+	      pstreamDefRecord(streamID2,  varID,  levelID);
+	      pstreamCopyRecord(streamID2, streamID1);
 
-	      streamDefRecord(streamID3,  varID,  levelID);
-	      streamCopyRecord(streamID3, streamID1);
+	      pstreamDefRecord(streamID3,  varID,  levelID);
+	      pstreamCopyRecord(streamID3, streamID1);
 	    }
 	  else
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
-	      streamReadRecord(streamID1, array, &nmiss);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
+	      pstreamReadRecord(streamID1, array, &nmiss);
 
-	      streamDefRecord(streamID2,  varID,  levelID);
-	      streamWriteRecord(streamID2, array, nmiss);
+	      pstreamDefRecord(streamID2,  varID,  levelID);
+	      pstreamWriteRecord(streamID2, array, nmiss);
 
-	      streamDefRecord(streamID3,  varID,  levelID);
-	      streamWriteRecord(streamID3, array, nmiss);
+	      pstreamDefRecord(streamID3,  varID,  levelID);
+	      pstreamWriteRecord(streamID3, array, nmiss);
 	    }
 	}
 
       tsID++;
     }
 
-  streamClose(streamID1);
-
-  streamClose(streamID2);
-  streamClose(streamID3);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID3);
 
   if ( array ) Free(array);
 

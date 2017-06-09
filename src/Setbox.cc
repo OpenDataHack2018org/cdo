@@ -85,9 +85,9 @@ void *Setbox(void *argument)
 
   constant = parameter2double(operatorArgv()[0]);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  vlistID1 = pstreamInqVlist(streamID1);
 
   ngrids = vlistNgrids(vlistID1);
   ndiffgrids = 0;
@@ -134,26 +134,26 @@ void *Setbox(void *argument)
 	vars[varID] = FALSE;
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   gridsize = gridInqSize(gridID);
   array = (double*) Malloc(gridsize*sizeof(double));
 
   tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( vars[varID] )
 	    {
-	      streamReadRecord(streamID1, array, &nmiss);
+	      pstreamReadRecord(streamID1, array, &nmiss);
 
 	      missval = vlistInqVarMissval(vlistID1, varID);
 	      setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
@@ -162,15 +162,16 @@ void *Setbox(void *argument)
 	      for ( i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, array, nmiss);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, array, nmiss);
 	    }
 	}
+
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( vars  ) Free(vars);
   if ( array ) Free(array);

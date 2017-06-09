@@ -57,9 +57,9 @@ void *Pardup(void *argument)
   else
     cdoAbort("operator not implemented!");
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -92,20 +92,18 @@ void *Pardup(void *argument)
 	vlistDefVarParam(vlistID2, varID+nvars*i, cdiEncodeParam(-(varID+nvars*i+1), 255, 255));
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  recVarID[recID]   = varID;
 	  recLevelID[recID] = levelID;
@@ -114,7 +112,7 @@ void *Pardup(void *argument)
 	  offset   = gridsize*levelID;
 	  single   = vardata[varID] + offset;
   
-	  streamReadRecord(streamID1, single, &nmiss);
+	  pstreamReadRecord(streamID1, single, &nmiss);
 	  varnmiss[varID][levelID] = nmiss;
 	}
 
@@ -132,15 +130,15 @@ void *Pardup(void *argument)
 
 	    memcpy(array, single, gridsize*sizeof(double));
 
-	    streamDefRecord(streamID2,  varID2,  levelID);
-	    streamWriteRecord(streamID2, array, nmiss);
+	    pstreamDefRecord(streamID2,  varID2,  levelID);
+	    pstreamWriteRecord(streamID2, array, nmiss);
 	  }
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   for ( varID = 0; varID < nvars; varID++ ) Free(vardata[varID]);
   for ( varID = 0; varID < nvars; varID++ ) Free(varnmiss[varID]);

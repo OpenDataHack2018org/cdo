@@ -36,27 +36,26 @@ void *Writerandom(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
+      pstreamDefTimestep(streamID2, tsID);
 
-      streamDefTimestep(streamID2, tsID);
-
-      double **recdata    = (double**) Malloc(nrecs*sizeof(double*));
+      double **recdata = (double**) Malloc(nrecs*sizeof(double*));
       int *recvarID   = (int*) Malloc(nrecs*sizeof(int));
       int *reclevelID = (int*) Malloc(nrecs*sizeof(int));
       int *recnmiss   = (int*) Malloc(nrecs*sizeof(int));
@@ -64,12 +63,12 @@ void *Writerandom(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  recvarID[recID] = varID;
 	  reclevelID[recID] = levelID;
 	  recdata[recID] = (double*) Malloc(gridsize*sizeof(double));
-	  streamReadRecord(streamID1, recdata[recID], &recnmiss[recID]);
+	  pstreamReadRecord(streamID1, recdata[recID], &recnmiss[recID]);
 	}
 
       for ( int recID = 0; recID < nrecs; recID++ ) recindex[recID] = -1;
@@ -104,8 +103,8 @@ void *Writerandom(void *argument)
 	  varID    = recvarID[rindex];
 	  levelID  = reclevelID[rindex];
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, recdata[rindex], recnmiss[rindex]);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, recdata[rindex], recnmiss[rindex]);
 	}
 
       for ( int recID = 0; recID < nrecs; recID++ ) Free(recdata[recID]);
@@ -119,8 +118,8 @@ void *Writerandom(void *argument)
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

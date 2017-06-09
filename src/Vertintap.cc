@@ -144,9 +144,9 @@ void *Vertintap(void *argument)
       plev  = (double *) lista_dataptr(flista);
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -319,12 +319,12 @@ void *Vertintap(void *argument)
 	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       for ( varID = 0; varID < nvars; ++varID )
 	{
@@ -335,11 +335,11 @@ void *Vertintap(void *argument)
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  /*
 	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	  nlevel   = zaxisInqSize(zaxisID);
@@ -352,7 +352,7 @@ void *Vertintap(void *argument)
 	  offset   = gridsize*levelID;
 	  single1  = vardata1[varID] + offset;
 
-	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
+	  pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 
 	  vars[varID] = true;
 	}
@@ -447,8 +447,8 @@ void *Vertintap(void *argument)
 		{
 		  offset   = gridsize*levelID;
 		  single2  = vardata2[varID] + offset;
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
 		}
 	    }
 	}
@@ -456,8 +456,8 @@ void *Vertintap(void *argument)
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   for ( varID = 0; varID < nvars; varID++ )
     {

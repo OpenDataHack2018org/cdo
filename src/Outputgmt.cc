@@ -258,9 +258,9 @@ void *Outputgmt(void *argument)
       if ( cdoVerbose ) cptWrite(stderr, cpt);
     }
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   int varID = 0;
@@ -435,7 +435,7 @@ void *Outputgmt(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID);
       int vtime = taxisInqVtime(taxisID);
@@ -471,12 +471,12 @@ void *Outputgmt(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID, &varID, &levelID);
+	  pstreamInqRecord(streamID, &varID, &levelID);
 
 	  if ( varID != varID0 ) continue;
 	  if ( recID > 0 && !lzon && !lmer ) continue;
 
-	  streamReadRecord(streamID, array, &nmiss);
+	  pstreamReadRecord(streamID, array, &nmiss);
 
 	  if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
 	    make_cyclic(array, array2, nlon, nlat);
@@ -561,8 +561,8 @@ void *Outputgmt(void *argument)
 	      if ( nrecs < 2 ) cdoAbort("Too few fields!");
 
 	      memcpy(uf, array, gridsize*sizeof(double));
-	      streamInqRecord(streamID, &varID, &levelID);
-	      streamReadRecord(streamID, vf, &nmiss);
+	      pstreamInqRecord(streamID, &varID, &levelID);
+	      pstreamReadRecord(streamID, vf, &nmiss);
 
 	      for ( int j = 0; j < nlat; j += ninc )
 		for ( int i = 0; i < nlon; i += ninc )
@@ -714,7 +714,7 @@ void *Outputgmt(void *argument)
       tsID++;
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   if ( array  ) Free(array);
   if ( array2 ) Free(array2);

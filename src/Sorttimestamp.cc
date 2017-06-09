@@ -73,9 +73,9 @@ void *Sorttimestamp(void *argument)
   int xtsID = 0;
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      int streamID1 = streamOpenRead(cdoStreamName(fileID));
+      int streamID1 = pstreamOpenRead(cdoStreamName(fileID));
 
-      int vlistID1 = streamInqVlist(streamID1);
+      int vlistID1 = pstreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( fileID == 0 )
@@ -96,7 +96,7 @@ void *Sorttimestamp(void *argument)
       nvars = vlistNvars(vlistID1);
 
       int tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
 	{
 	  if ( xtsID >= nalloc )
 	    {
@@ -113,11 +113,11 @@ void *Sorttimestamp(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
 	      gridID   = vlistInqVarGrid(vlistID1, varID);
 	      gridsize = gridInqSize(gridID);
 	      vars[xtsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-	      streamReadRecord(streamID1, vars[xtsID][varID][levelID].ptr, &nmiss);
+	      pstreamReadRecord(streamID1, vars[xtsID][varID][levelID].ptr, &nmiss);
 	      vars[xtsID][varID][levelID].nmiss = nmiss;
 	    }
 
@@ -125,7 +125,7 @@ void *Sorttimestamp(void *argument)
 	  xtsID++;
 	}
 
-      streamClose(streamID1);
+      pstreamClose(streamID1);
     }
 
   int nts = xtsID;
@@ -148,9 +148,8 @@ void *Sorttimestamp(void *argument)
 
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID2 = 0;
   for ( tsID = 0; tsID < nts; tsID++ )
@@ -176,7 +175,7 @@ void *Sorttimestamp(void *argument)
 
       taxisDefVdate(taxisID2, vdate[xtsID]);
       taxisDefVtime(taxisID2, vtime[xtsID]);
-      streamDefTimestep(streamID2, tsID2++);
+      pstreamDefTimestep(streamID2, tsID2++);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -186,8 +185,8 @@ void *Sorttimestamp(void *argument)
 	      if ( vars[xtsID][varID][levelID].ptr )
 		{
 		  nmiss = vars[xtsID][varID][levelID].nmiss;
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, vars[xtsID][varID][levelID].ptr, nmiss);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, vars[xtsID][varID][levelID].ptr, nmiss);
 		}
 	    }
 	}
@@ -199,7 +198,7 @@ void *Sorttimestamp(void *argument)
   if ( vdate ) Free(vdate);
   if ( vtime ) Free(vtime);
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 
   cdoFinish();
 

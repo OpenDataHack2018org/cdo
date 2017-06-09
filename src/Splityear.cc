@@ -66,9 +66,9 @@ void *Splityear(void *argument)
 
   memset(cyear, 0, MAX_YEARS*sizeof(int));
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -80,7 +80,7 @@ void *Splityear(void *argument)
 
   const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   // if ( ! lcopy )
     {
@@ -124,7 +124,7 @@ void *Splityear(void *argument)
   mon1  = -1;
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       cdiDecodeDate(vdate, &year2, &mon2, &day);
@@ -146,7 +146,7 @@ void *Splityear(void *argument)
 
 	      year1 = year2;
 
-	      if ( streamID2 >= 0 ) streamClose(streamID2);
+	      if ( streamID2 >= 0 ) pstreamClose(streamID2);
 
 	      sprintf(filename+nchars, "%04d", year1);
 	      if ( ic > 0 ) sprintf(filename+strlen(filename), "_%d", ic+1);
@@ -156,10 +156,10 @@ void *Splityear(void *argument)
 	      if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
 	      argument_t *fileargument = file_argument_new(filename);
-	      streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+	      streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
 	      file_argument_free(fileargument);
 
-	      streamDefVlist(streamID2, vlistID2);
+	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 	  mon1 = mon2;
 	}
@@ -173,7 +173,7 @@ void *Splityear(void *argument)
 
 	      index1 = index2;
 
-	      if ( streamID2 >= 0 ) streamClose(streamID2);
+	      if ( streamID2 >= 0 ) pstreamClose(streamID2);
 
 	      sprintf(filename+nchars, "%04d", index1);
 	      //if ( ic > 0 ) sprintf(filename+strlen(filename), "_%d", ic+1);
@@ -183,15 +183,15 @@ void *Splityear(void *argument)
 	      if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
 	      argument_t *fileargument = file_argument_new(filename);
-	      streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+	      streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
 	      file_argument_free(fileargument);
 
-	      streamDefVlist(streamID2, vlistID2);
+	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 	}
       
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID2);
+      pstreamDefTimestep(streamID2, tsID2);
 
       if ( tsID > 0 && tsID2 == 0 && nconst )
 	{
@@ -202,9 +202,9 @@ void *Splityear(void *argument)
 		  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
-		      streamDefRecord(streamID2, varID, levelID);
+		      pstreamDefRecord(streamID2, varID, levelID);
 		      nmiss = vars[varID][levelID].nmiss;
-		      streamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
+		      pstreamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
 		    }
 		}
 	    }
@@ -212,17 +212,17 @@ void *Splityear(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamDefRecord(streamID2,  varID,  levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamDefRecord(streamID2,  varID,  levelID);
 
 	  if ( lcopy && !(tsID == 0 && nconst) )
 	    {
-	      streamCopyRecord(streamID2, streamID1);
+	      pstreamCopyRecord(streamID2, streamID1);
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, array, &nmiss);
-	      streamWriteRecord(streamID2, array, nmiss);
+	      pstreamReadRecord(streamID1, array, &nmiss);
+	      pstreamWriteRecord(streamID2, array, nmiss);
 
 	      if ( tsID == 0 && nconst )
 		{
@@ -241,8 +241,8 @@ void *Splityear(void *argument)
       tsID++;
     }
 
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
  
   if ( array ) Free(array);
 

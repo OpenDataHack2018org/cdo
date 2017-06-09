@@ -104,9 +104,9 @@ void *Ymonstat(void *argument)
       month_nsets[month] = 0;
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -114,9 +114,8 @@ void *Ymonstat(void *argument)
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
 
@@ -128,7 +127,7 @@ void *Ymonstat(void *argument)
 
   int tsID = 0;
   int otsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
@@ -154,7 +153,7 @@ void *Ymonstat(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( tsID == 0 )
 	    {
@@ -171,7 +170,7 @@ void *Ymonstat(void *argument)
 
 	  if ( nsets == 0 )
 	    {
-	      streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	      pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	      pvars1->nmiss = (size_t) nmiss;
               if ( lrange )
                 {
@@ -191,7 +190,7 @@ void *Ymonstat(void *argument)
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, field.ptr, &nmiss);
+	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
               field.nmiss   = (size_t) nmiss;
 	      field.grid    = pvars1->grid;
 	      field.missval = pvars1->missval;
@@ -312,7 +311,7 @@ void *Ymonstat(void *argument)
 
       taxisDefVdate(taxisID2, vdates[month]);
       taxisDefVtime(taxisID2, vtimes[month]);
-      streamDefTimestep(streamID2, otsID);
+      pstreamDefTimestep(streamID2, otsID);
 
       for ( int recID = 0; recID < maxrecs; recID++ )
 	{
@@ -322,8 +321,8 @@ void *Ymonstat(void *argument)
 	  
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
 	}
 
       otsID++;
@@ -343,8 +342,8 @@ void *Ymonstat(void *argument)
 
   Free(recinfo);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

@@ -91,9 +91,9 @@ void *Ydrunstat(void *argument)
 
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -104,9 +104,8 @@ void *Ydrunstat(void *argument)
   int calendar = taxisInqCalendar(taxisID1);
   int dpy      = calendar_dpy(calendar);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
 
@@ -129,7 +128,7 @@ void *Ydrunstat(void *argument)
   
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 )
 	cdoAbort("File has less then %d timesteps!", ndates);
 
@@ -138,7 +137,7 @@ void *Ydrunstat(void *argument)
 	
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( tsID == 0 )
 	    {
@@ -149,7 +148,7 @@ void *Ydrunstat(void *argument)
           field_type *pvars1 = &vars1[tsID][varID][levelID];
           field_type *pvars2 = (vars2 && vars2[tsID]) ? &vars2[tsID][varID][levelID] : NULL;
 
-	  streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
 
 	  if ( lvarstd )
@@ -196,7 +195,7 @@ void *Ydrunstat(void *argument)
 	    vars2[inp] = vars2[inp+1];
 	}
 
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       datetime[ndates-1].date = taxisInqVdate(taxisID1);
@@ -204,12 +203,12 @@ void *Ydrunstat(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  
           field_type *pvars1 = &vars1[ndates-1][varID][levelID];
           field_type *pvars2 = (vars2 && vars2[ndates-1]) ? &vars2[ndates-1][varID][levelID] : NULL;
 
-	  streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
 
 	  if ( lvarstd )
@@ -260,7 +259,7 @@ void *Ydrunstat(void *argument)
       {
 	taxisDefVdate(taxisID2, stats->vdate[dayoy]);
 	taxisDefVtime(taxisID2, stats->vtime[dayoy]);
-	streamDefTimestep(streamID2, otsID);
+	pstreamDefTimestep(streamID2, otsID);
 
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
@@ -270,8 +269,8 @@ void *Ydrunstat(void *argument)
 
 	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	    streamDefRecord(streamID2, varID, levelID);
-	    streamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
+	    pstreamDefRecord(streamID2, varID, levelID);
+	    pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	  }
 
 	otsID++;
@@ -291,8 +290,8 @@ void *Ydrunstat(void *argument)
 
   Free(recinfo);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

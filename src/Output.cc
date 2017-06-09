@@ -145,9 +145,9 @@ void *Output(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      int streamID = streamOpenRead(cdoStreamName(indf));
+      int streamID = pstreamOpenRead(cdoStreamName(indf));
 
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
 
       int ngrids = vlistNgrids(vlistID);
       int ndiffgrids = 0;
@@ -189,7 +189,7 @@ void *Output(void *argument)
 
       int tsID = 0;
       int taxisID = vlistInqTaxis(vlistID);
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
 	{
 	  int vdate = taxisInqVdate(taxisID);
 	  int vtime = taxisInqVtime(taxisID);
@@ -200,7 +200,7 @@ void *Output(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID, &varID, &levelID);
+	      pstreamInqRecord(streamID, &varID, &levelID);
 
 	      vlistInqVarName(vlistID, varID, name);
 	      int param    = vlistInqVarParam(vlistID, varID);
@@ -217,7 +217,7 @@ void *Output(void *argument)
 
 	      if ( nlon*nlat != gridsize ) { nlon = gridsize; nlat = 1; }
 
-	      streamReadRecord(streamID, array, &nmiss);
+	      pstreamReadRecord(streamID, array, &nmiss);
 
 	      if ( operatorID == OUTPUTSRV )
 		fprintf(stdout, "%4d %8g %8d %4d %8d %8d %d %d\n", code, level, vdate, vtime, nlon, nlat, 0, 0);
@@ -432,9 +432,11 @@ void *Output(void *argument)
 		    }
 		}
 	    }
+
 	  tsID++;
 	}
-      streamClose(streamID);
+
+      pstreamClose(streamID);
 
       if ( array ) Free(array);
       if ( grid_center_lon ) Free(grid_center_lon);

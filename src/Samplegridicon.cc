@@ -314,9 +314,9 @@ void *Samplegridicon(void *argument)
   
   int gridID2 = read_grid(operatorArgv()[nsamplegrids-1]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   if ( cdoVerbose ) cdoPrint("Source gridsize = %d", gridsize);
@@ -346,11 +346,11 @@ void *Samplegridicon(void *argument)
       vlistChangeGridIndex(vlistID3, index, gridID2);
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  streamDefVlist(streamID3, vlistID3);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID3);
 
   int gridsize2 = gridInqSize(gridID2);
   if ( cdoVerbose ) cdoPrint("Target gridsize = %d", gridsize2);
@@ -359,18 +359,18 @@ void *Samplegridicon(void *argument)
   double *array3 = (double *) Malloc(gridsize2*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       taxisCopyTimestep(taxisID3, taxisID1);
-      streamDefTimestep(streamID2, tsID);
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
           int nmiss;
-          streamInqRecord(streamID1, &varID, &levelID);
-          streamReadRecord(streamID1, array1, &nmiss);
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, array1, &nmiss);
 
           double missval = vlistInqVarMissval(vlistID1, varID);
 
@@ -380,23 +380,23 @@ void *Samplegridicon(void *argument)
           for ( int i = 0; i < gridsize2; ++i )
             if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
-          streamDefRecord(streamID2, varID, levelID);
-          streamWriteRecord(streamID2, array2, nmiss);
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, array2, nmiss);
 
           nmiss = 0;
           for ( int i = 0; i < gridsize2; ++i )
             if ( DBL_IS_EQUAL(array3[i], missval) ) nmiss++;
 
-          streamDefRecord(streamID3, varID, levelID);
-          streamWriteRecord(streamID3, array3, nmiss);
+          pstreamDefRecord(streamID3, varID, levelID);
+          pstreamWriteRecord(streamID3, array3, nmiss);
         }
 
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
   gridDestroy(gridID2);

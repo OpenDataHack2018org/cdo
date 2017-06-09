@@ -64,11 +64,11 @@ void *Ymonarith(void *argument)
   int operfunc = cdoOperatorF1(operatorID);
   int opertype = cdoOperatorF2(operatorID);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -86,9 +86,8 @@ void *Ymonarith(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(streamID3, vlistID3);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID3);
 
   int nvars  = vlistNvars(vlistID2);
 
@@ -97,7 +96,7 @@ void *Ymonarith(void *argument)
   for ( mon = 0; mon < MAX_MON ; mon++ ) vardata2[mon] = NULL;
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
     {
       vdate = taxisInqVdate(taxisID2);
 
@@ -128,12 +127,12 @@ void *Ymonarith(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID2, &varID, &levelID);
+	  pstreamInqRecord(streamID2, &varID, &levelID);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  offset   = gridsize*levelID;
 
-	  streamReadRecord(streamID2, vardata2[mon][varID]+offset, &nmiss);
+	  pstreamReadRecord(streamID2, vardata2[mon][varID]+offset, &nmiss);
 	  varnmiss2[mon][varID][levelID] = nmiss;
 	}
 
@@ -142,7 +141,7 @@ void *Ymonarith(void *argument)
 
 
   tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
 
@@ -161,12 +160,12 @@ void *Ymonarith(void *argument)
 	}
 
       taxisCopyTimestep(taxisID3, taxisID1);
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = (size_t) nmiss;
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
@@ -181,15 +180,15 @@ void *Ymonarith(void *argument)
 
 	  farfun(&field1, field2, operfunc);
 
-	  streamDefRecord(streamID3, varID, levelID);
-	  streamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamDefRecord(streamID3, varID, levelID);
+	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
 	}
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   for ( mon = 0; mon < MAX_MON ; mon++ ) 
     if ( vardata2[mon] )

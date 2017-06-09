@@ -194,9 +194,9 @@ void *Vertstat(void *argument)
 
   //int applyWeights = lmean;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);
@@ -249,9 +249,8 @@ void *Vertstat(void *argument)
 	}
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -295,14 +294,14 @@ void *Vertstat(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
           vars1[varID].nsamp++;
           if ( lrange ) vars2[varID].nsamp++;
@@ -335,7 +334,7 @@ void *Vertstat(void *argument)
 
 	  if ( levelID == 0 )
 	    {
-	      streamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
+	      pstreamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
 	      vars1[varID].nmiss = (size_t)nmiss;
               if ( lrange )
                 {
@@ -374,7 +373,7 @@ void *Vertstat(void *argument)
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, field.ptr, &nmiss);
+	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
               field.nmiss   = (size_t)nmiss;
 	      field.grid    = vars1[varID].grid;
 	      field.missval = vars1[varID].missval;
@@ -454,8 +453,8 @@ void *Vertstat(void *argument)
                   farsub(&vars1[varID], vars2[varID]);
                 }
 
-	      streamDefRecord(streamID2, varID, 0);
-	      streamWriteRecord(streamID2, vars1[varID].ptr, (int)vars1[varID].nmiss);
+	      pstreamDefRecord(streamID2, varID, 0);
+	      pstreamWriteRecord(streamID2, vars1[varID].ptr, (int)vars1[varID].nmiss);
 	      vars1[varID].nsamp = 0;
 	    }
 	}
@@ -482,8 +481,8 @@ void *Vertstat(void *argument)
 
   Free(vert);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 
