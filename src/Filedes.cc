@@ -288,6 +288,7 @@ void *Filedes(void *argument)
 {
   cdoInitialize(argument);
 
+  // clang-format off
   int GRIDDES  = cdoOperatorAdd("griddes",   0, 0, NULL);
   int GRIDDES2 = cdoOperatorAdd("griddes2",  0, 0, NULL);
   int ZAXISDES = cdoOperatorAdd("zaxisdes",  0, 0, NULL);
@@ -299,6 +300,7 @@ void *Filedes(void *argument)
   int SPARTAB  = cdoOperatorAdd("spartab",   0, 0, NULL);
   int PARTAB   = cdoOperatorAdd("partab",    0, 0, NULL);
   int PARTAB2  = cdoOperatorAdd("partab2",   0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

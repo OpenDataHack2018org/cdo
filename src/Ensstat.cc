@@ -142,6 +142,7 @@ void *Ensstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("ensrange", func_range, 0, NULL);
   cdoOperatorAdd("ensmin",   func_min,   0, NULL);
   cdoOperatorAdd("ensmax",   func_max,   0, NULL);
@@ -153,6 +154,7 @@ void *Ensstat(void *argument)
   cdoOperatorAdd("ensvar",   func_var,   0, NULL);
   cdoOperatorAdd("ensvar1",  func_var1,  0, NULL);
   cdoOperatorAdd("enspctl",  func_pctl,  0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

@@ -66,9 +66,11 @@ void *Input(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int INPUT    = cdoOperatorAdd("input",    0, 0, NULL);
   int INPUTSRV = cdoOperatorAdd("inputsrv", 0, 0, NULL);
   int INPUTEXT = cdoOperatorAdd("inputext", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

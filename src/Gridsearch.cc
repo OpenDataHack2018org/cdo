@@ -239,8 +239,10 @@ void *Gridsearch(void *argument)
 {
   cdoInitialize(argument);
 
+  // clang-format off
   int PSEARCH = cdoOperatorAdd("testpointsearch",  0,   0, NULL);
   int CSEARCH = cdoOperatorAdd("testcellsearch",   0,   0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

@@ -43,10 +43,12 @@ void *Diff(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int DIFF  = cdoOperatorAdd("diff",  0, 0, NULL);
   int DIFFP = cdoOperatorAdd("diffp", 0, 0, NULL);
   int DIFFN = cdoOperatorAdd("diffn", 0, 0, NULL);
   int DIFFC = cdoOperatorAdd("diffc", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

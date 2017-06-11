@@ -149,7 +149,7 @@ void *Filter(void *argument)
 
   cdoOperatorAdd("bandpass",  BANDPASS,  0, NULL);
   cdoOperatorAdd("highpass",  HIGHPASS,  0, NULL);
-  cdoOperatorAdd("lowpass" ,  LOWPASS,   0, NULL);
+  cdoOperatorAdd("lowpass",   LOWPASS,   0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);

@@ -42,8 +42,10 @@ void *Pinfo(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int PINFO  = cdoOperatorAdd("pinfo",  0, 0, NULL);
   int PINFOV = cdoOperatorAdd("pinfov", 0, 0, NULL);
+  // clang-format on
 
   UNUSED(PINFO);
 

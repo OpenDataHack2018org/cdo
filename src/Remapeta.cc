@@ -250,9 +250,11 @@ void *Remapeta(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int REMAPETA  = cdoOperatorAdd("remapeta",   0, 0, "VCT file name");
   int REMAPETAS = cdoOperatorAdd("remapeta_s", 0, 0, "VCT file name");
   int REMAPETAZ = cdoOperatorAdd("remapeta_z", 0, 0, "VCT file name");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

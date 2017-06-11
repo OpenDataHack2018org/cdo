@@ -198,9 +198,11 @@ void *EOFs(void * argument)
   
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("eof",        EOF_,        0, NULL);
   cdoOperatorAdd("eoftime",    EOF_TIME,    0, NULL);
   cdoOperatorAdd("eofspatial", EOF_SPATIAL, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);

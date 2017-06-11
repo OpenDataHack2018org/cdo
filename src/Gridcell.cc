@@ -88,11 +88,13 @@ void *Gridcell(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int GRIDAREA = cdoOperatorAdd("gridarea",     1,  0, NULL);
   int GRIDWGTS = cdoOperatorAdd("gridweights",  1,  0, NULL);
   int GRIDMASK = cdoOperatorAdd("gridmask",     0,  0, NULL);
   int GRIDDX   = cdoOperatorAdd("griddx",       1,  0, NULL);
   int GRIDDY   = cdoOperatorAdd("griddy",       1,  0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

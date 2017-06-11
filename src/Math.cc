@@ -51,6 +51,7 @@ void *Math(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("abs",   ABS,   0, NULL);
   cdoOperatorAdd("int",   FINT,  0, NULL);
   cdoOperatorAdd("nint",  FNINT, 0, NULL);
@@ -67,6 +68,7 @@ void *Math(void *argument)
   cdoOperatorAdd("atan",  ATAN,  0, NULL);
   cdoOperatorAdd("pow",   POW,   0, NULL);
   cdoOperatorAdd("reci",  RECI,  0, NULL);
+  // clang-format on
  
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

@@ -40,23 +40,23 @@
 
 
 #if defined(ENABLE_DATA)
-  static const double etopo_scale  = 3;
-  static const double etopo_offset = 11000;
-  static const unsigned short etopo[] = {
+static const double etopo_scale  = 3;
+static const double etopo_offset = 11000;
+static const unsigned short etopo[] = {
 #include "etopo.h"
-  };
+};
 
-  static const double temp_scale  =  500;
-  static const double temp_offset = -220;
-  static const unsigned short temp[] = {
+static const double temp_scale  =  500;
+static const double temp_offset = -220;
+static const unsigned short temp[] = {
 #include "temp.h"
-  };
+};
 
-  static const double mask_scale  =  1;
-  static const double mask_offset =  0;
-  static const unsigned short mask[] = {
+static const double mask_scale  =  1;
+static const double mask_offset =  0;
+static const unsigned short mask[] = {
 #include "mask.h"
-  };
+};
 #endif
 
 /*  some Constants for creating temperatur and pressure for the standard atmosphere */

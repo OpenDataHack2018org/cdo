@@ -294,11 +294,13 @@ void *Intgrid(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
   int INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
   int INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
   int BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
   int THINOUT     = cdoOperatorAdd("thinout",     0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

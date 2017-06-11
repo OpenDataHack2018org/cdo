@@ -102,8 +102,10 @@ void *Fldstat2(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("fldcor",   func_cor,   0, NULL);
   cdoOperatorAdd("fldcovar", func_covar, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

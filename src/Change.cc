@@ -58,6 +58,7 @@ void *Change(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int CHCODE   = cdoOperatorAdd("chcode",   0, 0, "pairs of old and new code numbers");
   int CHTABNUM = cdoOperatorAdd("chtabnum", 0, 0, "pairs of old and new GRIB1 table numbers");
   int CHPARAM  = cdoOperatorAdd("chparam",  0, 0, "pairs of old and new parameter identifiers");
@@ -67,6 +68,7 @@ void *Change(void *argument)
   int CHLEVELC = cdoOperatorAdd("chlevelc", 0, 0, "code number, old and new level");
   int CHLEVELV = cdoOperatorAdd("chlevelv", 0, 0, "variable name, old and new level");
   int CHLTYPE  = cdoOperatorAdd("chltype",  0, 0, "pairs of old and new type");          
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

@@ -287,12 +287,14 @@ void *Invert(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("invertlat",     func_all, func_lat, NULL);
   cdoOperatorAdd("invertlon",     func_all, func_lon, NULL);
   cdoOperatorAdd("invertlatdes",  func_hrd, func_lat, NULL);
   cdoOperatorAdd("invertlondes",  func_hrd, func_lon, NULL);
   cdoOperatorAdd("invertlatdata", func_fld, func_lat, NULL);
   cdoOperatorAdd("invertlondata", func_fld, func_lon, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc1 = cdoOperatorF1(operatorID);

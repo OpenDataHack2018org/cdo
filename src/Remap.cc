@@ -761,6 +761,7 @@ void *Remap(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("remapcon",     REMAPCON,     0, NULL);
   cdoOperatorAdd("remapcon2",    REMAPCON2,    0, NULL);
   cdoOperatorAdd("remapbil",     REMAPBIL,     0, NULL);
@@ -779,6 +780,7 @@ void *Remap(void *argument)
   cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
   cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
   cdoOperatorAdd("genycon",      GENYCON,      1, NULL);
+  // clang-format on
 
   int operatorID   = cdoOperatorID();
   int operfunc     = cdoOperatorF1(operatorID);

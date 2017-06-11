@@ -78,11 +78,13 @@ void *Arithdays(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
                cdoOperatorAdd("muldpm", func_mul, func_month, NULL);
                cdoOperatorAdd("divdpm", func_div, func_month, NULL);
                cdoOperatorAdd("muldpy", func_mul, func_year,  NULL);
                cdoOperatorAdd("divdpy", func_div, func_year,  NULL);
   int MULDOY = cdoOperatorAdd("muldoy", func_mul,         0,  NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

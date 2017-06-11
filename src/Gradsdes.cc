@@ -977,8 +977,10 @@ void *Gradsdes(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int GRADSDES = cdoOperatorAdd("gradsdes",  0, 0, NULL);
   int DUMPMAP  = cdoOperatorAdd("dumpmap",   0, 0, NULL);
+  // clang-format on
 
   UNUSED(GRADSDES);
 

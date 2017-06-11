@@ -1026,9 +1026,11 @@ void *EcaPd(void *argument)
   
   cdoInitialize(argument);
 
+  // clang-format off
   ECA_PD      = cdoOperatorAdd("eca_pd",      0, 31, NULL);
   ECA_R10MM   = cdoOperatorAdd("eca_r10mm",   0, 31, NULL);
   ECA_R20MM   = cdoOperatorAdd("eca_r20mm",   0, 31, NULL);
+  // clang-format on
 
   operatorID = cdoOperatorID();
 

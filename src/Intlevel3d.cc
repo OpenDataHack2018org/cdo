@@ -58,8 +58,10 @@ void *Intlevel3d(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int INTLEVEL3D  = cdoOperatorAdd("intlevel3d",  0, 0, NULL);
   int INTLEVELX3D = cdoOperatorAdd("intlevelx3d", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

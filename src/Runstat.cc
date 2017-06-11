@@ -59,6 +59,7 @@ void *Runstat(void *argument)
       if ( envval == 1 ) runstat_nomiss = 1;
     }
 
+  // clang-format off
   cdoOperatorAdd("runrange", func_range, 0, NULL);
   cdoOperatorAdd("runmin",   func_min,   0, NULL);
   cdoOperatorAdd("runmax",   func_max,   0, NULL);
@@ -69,6 +70,7 @@ void *Runstat(void *argument)
   cdoOperatorAdd("runvar1",  func_var1,  0, NULL);
   cdoOperatorAdd("runstd",   func_std,   0, NULL);
   cdoOperatorAdd("runstd1",  func_std1,  0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

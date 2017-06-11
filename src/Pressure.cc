@@ -52,9 +52,11 @@ void *Pressure(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int PRESSURE_FL = cdoOperatorAdd("pressure_fl", 0, 0, NULL);
   int PRESSURE_HL = cdoOperatorAdd("pressure_hl", 0, 0, NULL);
   int DELTAP      = cdoOperatorAdd("deltap",      0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

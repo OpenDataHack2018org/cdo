@@ -39,8 +39,10 @@ void *Condc(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int IFTHENC    = cdoOperatorAdd("ifthenc",    0, 0, NULL);
   int IFNOTTHENC = cdoOperatorAdd("ifnotthenc", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

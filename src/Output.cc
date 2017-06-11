@@ -52,6 +52,8 @@ void *Output(void *argument)
   int year, month, day;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
+
+  // clang-format off
   int Keylen[]           = {      0,        8,      11,      4,      8,     6,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
   enum                     {knohead,   kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kbin,  kxind,  kyind,  ktimestep,  kdate,  ktime,  kyear,  kmonth,  kday };
   const char *Keynames[] = {"nohead",  "value", "param", "code", "name", "lon", "lat", "lev", "bin", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
@@ -69,6 +71,7 @@ void *Output(void *argument)
   int OUTPUTARR = cdoOperatorAdd("outputarr", 0, 0, NULL);
   int OUTPUTXYZ = cdoOperatorAdd("outputxyz", 0, 0, NULL);
   int OUTPUTTAB = cdoOperatorAdd("outputtab", 0, 0, NULL);
+  // clang-format on
 
   UNUSED(OUTPUT);
 

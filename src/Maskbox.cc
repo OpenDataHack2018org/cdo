@@ -280,9 +280,11 @@ void *Maskbox(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int MASKLONLATBOX = cdoOperatorAdd("masklonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");
   int MASKINDEXBOX  = cdoOperatorAdd("maskindexbox",  0, 0, "index of first and last longitude and index of first and last latitude");
   int MASKREGION    = cdoOperatorAdd("maskregion",    0, 0, "limiting coordinates of the region");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

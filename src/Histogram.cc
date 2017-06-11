@@ -37,10 +37,12 @@ void *Histogram(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int HISTCOUNT = cdoOperatorAdd("histcount", 0, 0, NULL);
   int HISTSUM   = cdoOperatorAdd("histsum",   0, 0, NULL);
   int HISTMEAN  = cdoOperatorAdd("histmean",  0, 0, NULL);
   int HISTFREQ  = cdoOperatorAdd("histfreq",  0, 0, NULL);
+  // clang-format on
 
   UNUSED(HISTSUM);
 

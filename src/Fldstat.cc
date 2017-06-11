@@ -92,6 +92,7 @@ void *Fldstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("fldrange", func_range,  0, NULL);
   cdoOperatorAdd("fldmin",   func_min,    0, NULL);
   cdoOperatorAdd("fldmax",   func_max,    0, NULL);
@@ -103,6 +104,7 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldvar",   func_varw,   1, NULL);
   cdoOperatorAdd("fldvar1",  func_var1w,  1, NULL);
   cdoOperatorAdd("fldpctl",  func_pctl,   0, NULL);
+  // clang-format on
 
   int operatorID  = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

@@ -51,6 +51,7 @@ void *Merstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("merrange", func_range, 0, NULL);
   cdoOperatorAdd("mermin",   func_min,   0, NULL);
   cdoOperatorAdd("mermax",   func_max,   0, NULL);
@@ -62,7 +63,8 @@ void *Merstat(void *argument)
   cdoOperatorAdd("merstd",   func_stdw,  1, NULL);
   cdoOperatorAdd("merstd1",  func_std1w, 1, NULL);
   cdoOperatorAdd("merpctl",  func_pctl,  0, NULL);
- 
+  // clang-format on
+  
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
   bool needWeights = cdoOperatorF2(operatorID) != 0;

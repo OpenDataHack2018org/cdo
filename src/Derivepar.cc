@@ -58,8 +58,10 @@ void *Derivepar(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int GHEIGHT          = cdoOperatorAdd("gheight",            0, 0, NULL);
   int SEALEVELPRESSURE = cdoOperatorAdd("sealevelpressure",   0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

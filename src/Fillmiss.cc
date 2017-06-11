@@ -424,10 +424,12 @@ void *Fillmiss(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int FILLMISS        = cdoOperatorAdd("fillmiss"   ,   0, 0, "nfill");
   int FILLMISSONESTEP = cdoOperatorAdd("fillmiss2"  ,   0, 0, "nfill");
   int SETMISSTONN     = cdoOperatorAdd("setmisstonn" ,  0, 0, "");
   int SETMISSTODIS    = cdoOperatorAdd("setmisstodis" , 0, 0, "number of neighbors");
+  // clang-format on
 
   int operatorID      = cdoOperatorID();
 

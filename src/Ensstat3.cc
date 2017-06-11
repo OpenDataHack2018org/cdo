@@ -78,9 +78,11 @@ void *Ensstat3(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("ensroc",          func_roc,  0,          NULL);
   cdoOperatorAdd("ensrkhist_space", func_rank, space_data, NULL);
   cdoOperatorAdd("ensrkhist_time",  func_rank, time_data,  NULL);
+  // clang-format on
   
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

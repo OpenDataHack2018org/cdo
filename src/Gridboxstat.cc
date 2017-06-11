@@ -552,6 +552,7 @@ void *Gridboxstat(void *argument)
   int xinc = parameter2int(operatorArgv()[0]);
   int yinc = parameter2int(operatorArgv()[1]);
 
+  // clang-format off
   cdoOperatorAdd("gridboxrange", func_range, 0, NULL);
   cdoOperatorAdd("gridboxmin",   func_min,   0, NULL);
   cdoOperatorAdd("gridboxmax",   func_max,   0, NULL);
@@ -562,6 +563,7 @@ void *Gridboxstat(void *argument)
   cdoOperatorAdd("gridboxvar1",  func_var1w, 1, NULL);
   cdoOperatorAdd("gridboxstd",   func_stdw,  1, NULL);
   cdoOperatorAdd("gridboxstd1",  func_std1w, 1, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

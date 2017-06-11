@@ -168,8 +168,10 @@ void *Intlevel(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int INTLEVEL   = cdoOperatorAdd("intlevel",  0, 0, NULL);
   int INTLEVELX  = cdoOperatorAdd("intlevelx", 0, 0, NULL);
+  // clang-format on
 
   UNUSED(INTLEVEL);
 

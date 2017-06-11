@@ -220,6 +220,7 @@ void *Outputgmt(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int OUTPUTCENTER    = cdoOperatorAdd("gmtxyz",          0, 0, NULL);
   int OUTPUTCENTER2   = cdoOperatorAdd("outputcenter2",   0, 0, NULL);
   int OUTPUTCENTERCPT = cdoOperatorAdd("outputcentercpt", 0, 0, NULL);
@@ -228,6 +229,7 @@ void *Outputgmt(void *argument)
   int OUTPUTVECTOR    = cdoOperatorAdd("outputvector",    0, 0, NULL);
   int OUTPUTTRI       = cdoOperatorAdd("outputtri",       0, 0, NULL);
   int OUTPUTVRML      = cdoOperatorAdd("outputvrml",      0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

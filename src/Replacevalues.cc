@@ -43,9 +43,11 @@ void *Replacevalues(void *argument)
 
   cdoInitialize(argument);
 
-  int SETVALS  = cdoOperatorAdd("setvals" , 0, 0, "I1,O1,...,In,On");
+  // clang-format off
+  int SETVALS  = cdoOperatorAdd("setvals",  0, 0, "I1,O1,...,In,On");
   int SETRTOC  = cdoOperatorAdd("setrtoc",  0, 0, "range (min, max), value");
   int SETRTOC2 = cdoOperatorAdd("setrtoc2", 0, 0, "range (min, max), value1, value2");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

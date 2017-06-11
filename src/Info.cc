@@ -271,12 +271,14 @@ void *Info(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int INFO   = cdoOperatorAdd("info",   E_PARAM,  0, NULL);
   int INFOP  = cdoOperatorAdd("infop",  E_PARAM,  0, NULL);
   int INFON  = cdoOperatorAdd("infon",  E_NAME,   0, NULL);
   int INFOC  = cdoOperatorAdd("infoc",  E_CODE,   0, NULL);
   int XINFON = cdoOperatorAdd("xinfon", E_NAME,   0, NULL);
   int MAP    = cdoOperatorAdd("map",    E_PARAM,  0, NULL);
+  // clang-format on
 
   UNUSED(INFO);
   UNUSED(INFOP);
