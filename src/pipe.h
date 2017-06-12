@@ -15,13 +15,14 @@
   GNU General Public License for more details.
 */
 
-#ifndef _PIPE_H
-#define _PIPE_H
+#ifndef PIPE_H
+#define PIPE_H
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#include "config.h"
 #endif
 
+#include <stdbool.h>
 #include <sys/types.h>
 
 #if defined(HAVE_LIBPTHREAD)
@@ -32,7 +33,7 @@
 #endif
 
 typedef struct {
-  short       check_datarange;
+  bool        check_datarange;
   int         gridsize;
   int         datatype;
   double      missval;
@@ -48,12 +49,12 @@ typedef struct {
   int            vlistID;
   int            tsID;
   int            filetype;
-  int            ispipe;
-  int            isopen;
   int            tsID0;
   int            mfiles;
   int            nfiles;
   int            varID;           /* next varID defined with streamDefVar */
+  bool           ispipe;
+  bool           isopen;
   char          *name;
   char         **mfnames;
   varlist_t     *varlist;
@@ -69,10 +70,12 @@ typedef struct {
 #if defined(HAVE_LIBPTHREAD)
 
 struct pipe_s {
-  int     nrecs, EOP;
+  bool    EOP;
+  bool    usedata;
+  short   hasdata;
+  int     nrecs;
   int     varID, levelID;
   int     recIDr, recIDw, tsIDr, tsIDw;
-  int     hasdata, usedata;
   int     nmiss;
   double *data;
   pstream_t *pstreamptr_in;
@@ -105,4 +108,4 @@ void  pipeCopyRecord(pstream_t *pstreamptr_dest, pstream_t *pstreamptr_src);
 
 #endif
 
-#endif  /* _PIPE_H */
+#endif  /* PIPE_H */

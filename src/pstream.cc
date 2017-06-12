@@ -16,11 +16,11 @@
 */
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#include "config.h"
 #endif
 
 #if defined(_OPENMP)
-#  include <omp.h>
+#include <omp.h>
 #endif
 
 #include <stdio.h>
@@ -52,7 +52,7 @@ static int _pstream_max = MAX_PSTREAMS;
 
 static void pstream_initialize(void);
 
-static int _pstream_init = FALSE;
+static bool _pstream_init = false;
 
 #if defined(HAVE_LIBPTHREAD)
 #include <pthread.h>
@@ -71,14 +71,14 @@ static pthread_mutex_t _pstream_mutex;
 #  define PSTREAM_LOCK()           pthread_mutex_lock(&_pstream_mutex)
 #  define PSTREAM_UNLOCK()         pthread_mutex_unlock(&_pstream_mutex)
 #  define PSTREAM_INIT()	  \
-   if ( _pstream_init == FALSE ) pthread_once(&_pstream_init_thread, pstream_initialize)
+   if ( !_pstream_init ) pthread_once(&_pstream_init_thread, pstream_initialize)
 
 #else
 
 #  define PSTREAM_LOCK()
 #  define PSTREAM_UNLOCK()
 #  define PSTREAM_INIT()	  \
-   if ( _pstream_init == FALSE ) pstream_initialize()
+   if ( !_pstream_init ) pstream_initialize()
 
 #endif
 
@@ -181,8 +181,8 @@ void pstream_init_entry(pstream_t *pstreamptr)
 {
   pstreamptr->self       = pstream_from_pointer(pstreamptr);
 
-  pstreamptr->isopen     = TRUE;
-  pstreamptr->ispipe     = FALSE;
+  pstreamptr->isopen     = true;
+  pstreamptr->ispipe     = false;
   pstreamptr->fileID     = -1;
   pstreamptr->vlistID    = -1;
   pstreamptr->tsID       = -1;
@@ -254,7 +254,7 @@ void pstream_initialize(void)
 
   pstream_init_pointer();
 
-  _pstream_init = TRUE;
+  _pstream_init = true;
 }
 
 static
@@ -361,7 +361,7 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
     for ( int i = 0; i < newargument->argc; ++i )
     printf("pstreamOpenRead: new arg %d >%s<\n", i, newargument->argv[i]);
   */
-  pstreamptr->ispipe    = TRUE;
+  pstreamptr->ispipe    = true;
   pstreamptr->name      = pipename;
   pstreamptr->rthreadID = pthread_self();
   pstreamptr->pipe      = pipeNew();
@@ -507,19 +507,18 @@ void pstreamOpenReadFile(const argument_t *argument, pstream_t *pstreamptr)
 {  
   pstreamCreateFilelist(argument, pstreamptr);
 
-  size_t len;
   char *filename = NULL;
 
   if ( pstreamptr->mfiles )
     {
-      len = strlen(pstreamptr->mfnames[0]);
+      size_t len = strlen(pstreamptr->mfnames[0]);
       filename = (char*) Malloc(len+1);
       strcpy(filename, pstreamptr->mfnames[0]);
       pstreamptr->nfiles = 1;
     }
   else
     {
-      len = strlen(argument->args);
+      size_t len = strlen(argument->args);
       filename = (char*) Malloc(len+1);
       strcpy(filename, argument->args);
     }
@@ -535,7 +534,7 @@ void pstreamOpenReadFile(const argument_t *argument, pstream_t *pstreamptr)
   int fileID = streamOpenRead(filename);
   if ( fileID < 0 )
     {
-      pstreamptr->isopen = FALSE;
+      pstreamptr->isopen = false;
       cdiOpenError(fileID, "Open failed on >%s<", filename);
     }
       
@@ -855,18 +854,18 @@ void pstreamClose(int pstreamID)
     {
 #if defined(HAVE_LIBPTHREAD)
       pipe_t *pipe;
-      int lread = FALSE, lwrite = FALSE;
+      bool lread = false, lwrite = false;
       pthread_t threadID = pthread_self();
 
-      if      ( pthread_equal(threadID, pstreamptr->rthreadID) ) lread  = TRUE;
-      else if ( pthread_equal(threadID, pstreamptr->wthreadID) ) lwrite = TRUE;
+      if      ( pthread_equal(threadID, pstreamptr->rthreadID) ) lread  = true;
+      else if ( pthread_equal(threadID, pstreamptr->wthreadID) ) lwrite = true;
       else Error("Internal problem! Close pipe %s", pstreamptr->name);
 
       if ( lread )
 	{
 	  pipe = pstreamptr->pipe;
 	  pthread_mutex_lock(pipe->mutex);
-	  pipe->EOP = TRUE;
+	  pipe->EOP = true;
 	  if ( PSTREAM_Debug ) Message("%s read closed", pstreamptr->name);
 	  pthread_mutex_unlock(pipe->mutex);     
 	  pthread_cond_signal(pipe->tsDef);
@@ -875,7 +874,7 @@ void pstreamClose(int pstreamID)
 	  pthread_cond_signal(pipe->recInq);
 	 
 	  pthread_mutex_lock(pipe->mutex);
-	  pstreamptr->isopen = FALSE;
+	  pstreamptr->isopen = false;
 	  pthread_mutex_unlock(pipe->mutex);     
 	  pthread_cond_signal(pipe->isclosed);
 
@@ -902,7 +901,7 @@ void pstreamClose(int pstreamID)
 	{
 	  pipe = pstreamptr->pipe;
 	  pthread_mutex_lock(pipe->mutex);
-	  pipe->EOP = TRUE;
+	  pipe->EOP = true;
 	  if ( PSTREAM_Debug ) Message("%s write closed", pstreamptr->name);
 	  pthread_mutex_unlock(pipe->mutex);     
 	  pthread_cond_signal(pipe->tsDef);
@@ -1039,7 +1038,7 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
       varlist[varID].addoffset   = vlistInqVarAddoffset(vlistID, varID);
       varlist[varID].scalefactor = vlistInqVarScalefactor(vlistID, varID);
 
-      varlist[varID].check_datarange = FALSE;
+      varlist[varID].check_datarange = false;
 
       int laddoffset   = IS_NOT_EQUAL(varlist[varID].addoffset, 0);
       int lscalefactor = IS_NOT_EQUAL(varlist[varID].scalefactor, 1);
@@ -1066,11 +1065,11 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 		   datatype == CDI_DATATYPE_UINT8  ||
 		   datatype == CDI_DATATYPE_INT16  ||
 		   datatype == CDI_DATATYPE_UINT16 )
-		varlist[varID].check_datarange = TRUE;
+		varlist[varID].check_datarange = true;
 	    }
 	  else if ( cdoCheckDatarange )
 	    {
-	      varlist[varID].check_datarange = TRUE;
+	      varlist[varID].check_datarange = true;
 	    }
 	}
     }
@@ -1304,6 +1303,7 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
 
       double vmin = 0, vmax = 0;
 
+      // clang-format off
       if      ( datatype == CDI_DATATYPE_INT8   ) { vmin =        -128.; vmax =        127.; }
       else if ( datatype == CDI_DATATYPE_UINT8  ) { vmin =           0.; vmax =        255.; }
       else if ( datatype == CDI_DATATYPE_INT16  ) { vmin =      -32768.; vmax =      32767.; }
@@ -1311,7 +1311,8 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
       else if ( datatype == CDI_DATATYPE_INT32  ) { vmin = -2147483648.; vmax = 2147483647.; }
       else if ( datatype == CDI_DATATYPE_UINT32 ) { vmin =           0.; vmax = 4294967295.; }
       else if ( datatype == CDI_DATATYPE_FLT32  ) { vmin = -3.40282e+38; vmax = 3.40282e+38; }
-      else                                    { vmin =     -1.e+300; vmax =     1.e+300; }
+      else                                        { vmin =     -1.e+300; vmax =     1.e+300; }
+      // clang-format on
 
       if ( smin < vmin || smax > vmax )
 	cdoWarning("Some data values (min=%g max=%g) are outside the\n"

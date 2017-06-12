@@ -17,7 +17,7 @@
 
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#include "config.h"
 #endif
 
 #ifndef _XOPEN_SOURCE
@@ -78,7 +78,7 @@ void pipe_init(pipe_t *pipe)
     Message("_POSIX_THREAD_PROCESS_SHARED undefined");
 #endif
   */
-  pipe->EOP     = 0;
+  pipe->EOP     = false;
 
   pipe->recIDr  = -1;
   pipe->recIDw  = -1;
@@ -89,7 +89,7 @@ void pipe_init(pipe_t *pipe)
   pipe->nmiss   = 0;
   pipe->data    = NULL;
   pipe->hasdata = 0;
-  pipe->usedata = TRUE;
+  pipe->usedata = true;
   pipe->pstreamptr_in = 0;
 
   pipe->mutex = (pthread_mutex_t*) Malloc(sizeof(pthread_mutex_t));
@@ -223,7 +223,7 @@ int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
 
   // LOCK
   pthread_mutex_lock(pipe->mutex);
-  pipe->usedata = FALSE;
+  pipe->usedata = false;
   pipe->recIDr  = -1;
   if ( tsID != pipe->tsIDr+1 )
     {
@@ -299,7 +299,7 @@ void pipeDefTimestep(pstream_t *pstreamptr, int tsID)
 
   pipe->nrecs = nrecs;
   if ( PipeDebug ) Message("%s nrecs %d tsID %d %d %d", pname, nrecs, tsID, pipe->tsIDw, pipe->tsIDr);
-  if ( nrecs == 0 ) pipe->EOP = TRUE;
+  if ( nrecs == 0 ) pipe->EOP = true;
   pthread_mutex_unlock(pipe->mutex);
   // UNLOCK
 
@@ -327,7 +327,7 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
 {
   char *pname = pstreamptr->name;
   pipe_t *pipe = pstreamptr->pipe;
-  int condSignal = FALSE;
+  bool condSignal = false;
 
   if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
  
@@ -338,8 +338,8 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
     {
       pipe->hasdata = 0;
       pipe->data = NULL;
-      pipe->usedata = FALSE;
-      condSignal = TRUE;
+      pipe->usedata = false;
+      condSignal = true;
     }	  
   pthread_mutex_unlock(pipe->mutex);
   // UNLOCK
@@ -348,7 +348,7 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
 
   // LOCK
   pthread_mutex_lock(pipe->mutex);
-  pipe->usedata = TRUE;
+  pipe->usedata = true;
   pipe->recIDr++;
   
   if ( PipeDebug ) Message("%s recID %d %d", pname, pipe->recIDr, pipe->recIDw);  
@@ -388,7 +388,7 @@ void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID)
 {
   char *pname = pstreamptr->name;
   pipe_t *pipe = pstreamptr->pipe;
-  int condSignal = FALSE;
+  bool condSignal = false;
 
   if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
@@ -399,7 +399,7 @@ void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID)
     {
       pipe->hasdata = 0;
       pipe->data = NULL;
-      condSignal = TRUE;
+      condSignal = true;
     }
   pthread_mutex_unlock(pipe->mutex);
   // UNLOCK
@@ -408,7 +408,7 @@ void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID)
 
   // LOCK
   pthread_mutex_lock(pipe->mutex);
-  pipe->usedata = TRUE;
+  pipe->usedata = true;
   pipe->recIDw++;
   pipe->varID   = varID;
   pipe->levelID = levelID;
@@ -454,7 +454,7 @@ void pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
   pthread_mutex_lock(pipe->mutex);
   while ( pipe->hasdata )
     {
-      if ( pipe->usedata == FALSE ) break;
+      if ( ! pipe->usedata ) break;
 
       if ( pipe->recIDw != pipe->recIDr ) break;
 
@@ -591,7 +591,7 @@ void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss)
   pthread_mutex_lock(pipe->mutex);
   while ( pipe->hasdata )
     {
-      if ( pipe->usedata == FALSE ) break;
+      if ( ! pipe->usedata ) break;
       /*     
       printf("ts ids %d %d\n", pipe->tsIDw, pipe->tsIDr);
       printf("rec ids %d %d\n", pipe->recIDw, pipe->recIDr);
