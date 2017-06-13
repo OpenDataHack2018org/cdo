@@ -66,9 +66,11 @@ void *Input(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int INPUT    = cdoOperatorAdd("input",    0, 0, NULL);
   int INPUTSRV = cdoOperatorAdd("inputsrv", 0, 0, NULL);
   int INPUTEXT = cdoOperatorAdd("inputext", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 
@@ -227,27 +229,27 @@ void *Input(void *argument)
 	  taxisID = taxisCreate(TAXIS_RELATIVE);
 	  vlistDefTaxis(vlistID, taxisID);
 
-	  streamID = streamOpenWrite(cdoStreamName(0), output_filetype);
+	  streamID = pstreamOpenWrite(cdoStreamName(0), output_filetype);
 
-	  streamDefVlist(streamID, vlistID);
+	  pstreamDefVlist(streamID, vlistID);
 	}
 
       int vdate = date;
       int vtime = time;
       taxisDefVdate(taxisID, vdate);
       taxisDefVtime(taxisID, vtime);
-      streamDefTimestep(streamID, tsID);
+      pstreamDefTimestep(streamID, tsID);
 
       for ( int levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  streamDefRecord(streamID, varID, levelID);
+	  pstreamDefRecord(streamID, varID, levelID);
 
           int offset = gridsize*levelID;
 	  int nmiss = 0;
 	  for ( i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(array[offset+i], missval) ) nmiss++;
 
-	  streamWriteRecord(streamID, array+offset, nmiss);
+	  pstreamWriteRecord(streamID, array+offset, nmiss);
 	}
 
       nrecs++;
@@ -256,7 +258,7 @@ void *Input(void *argument)
 
   if ( streamID >= 0 )
     {
-      streamClose(streamID);
+      pstreamClose(streamID);
       vlistDestroy(vlistID);
     }
 

@@ -52,6 +52,8 @@ void *Output(void *argument)
   int year, month, day;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
+
+  // clang-format off
   int Keylen[]           = {      0,        8,      11,      4,      8,     6,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
   enum                     {knohead,   kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kbin,  kxind,  kyind,  ktimestep,  kdate,  ktime,  kyear,  kmonth,  kday };
   const char *Keynames[] = {"nohead",  "value", "param", "code", "name", "lon", "lat", "lev", "bin", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
@@ -69,6 +71,7 @@ void *Output(void *argument)
   int OUTPUTARR = cdoOperatorAdd("outputarr", 0, 0, NULL);
   int OUTPUTXYZ = cdoOperatorAdd("outputxyz", 0, 0, NULL);
   int OUTPUTTAB = cdoOperatorAdd("outputtab", 0, 0, NULL);
+  // clang-format on
 
   UNUSED(OUTPUT);
 
@@ -108,11 +111,16 @@ void *Output(void *argument)
 	      if ( len < 3 ) len = 3;
 	      if ( strncmp(parnames[i], Keynames[k], len) == 0 )
 		{
+                  int len2 = strlen(parnames[i]);
+                  if ( len2 > len && parnames[i][len] != ':' )
+                    cdoAbort("Key parameter >%s< contains invalid character at position %d!", parnames[i], len+1);
+
 		  if ( k == knohead ) lhead = false;
 		  else
 		    {
 		      keys[nkeys++] = k;
-		      if ( parnames[i][len] == ':' && isdigit(parnames[i][len+1]) ) Keylen[k] = atoi(&parnames[i][len+1]);
+		      if ( len2 > len && parnames[i][len] == ':' && isdigit(parnames[i][len+1]) )
+                        Keylen[k] = atoi(&parnames[i][len+1]);
 		    }
 		  break;
 		}
@@ -140,9 +148,9 @@ void *Output(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      int streamID = streamOpenRead(cdoStreamName(indf));
+      int streamID = pstreamOpenRead(cdoStreamName(indf));
 
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
 
       int ngrids = vlistNgrids(vlistID);
       int ndiffgrids = 0;
@@ -184,7 +192,7 @@ void *Output(void *argument)
 
       int tsID = 0;
       int taxisID = vlistInqTaxis(vlistID);
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
 	{
 	  int vdate = taxisInqVdate(taxisID);
 	  int vtime = taxisInqVtime(taxisID);
@@ -195,7 +203,7 @@ void *Output(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID, &varID, &levelID);
+	      pstreamInqRecord(streamID, &varID, &levelID);
 
 	      vlistInqVarName(vlistID, varID, name);
 	      int param    = vlistInqVarParam(vlistID, varID);
@@ -212,7 +220,7 @@ void *Output(void *argument)
 
 	      if ( nlon*nlat != gridsize ) { nlon = gridsize; nlat = 1; }
 
-	      streamReadRecord(streamID, array, &nmiss);
+	      pstreamReadRecord(streamID, array, &nmiss);
 
 	      if ( operatorID == OUTPUTSRV )
 		fprintf(stdout, "%4d %8g %8d %4d %8d %8d %d %d\n", code, level, vdate, vtime, nlon, nlat, 0, 0);
@@ -427,9 +435,11 @@ void *Output(void *argument)
 		    }
 		}
 	    }
+
 	  tsID++;
 	}
-      streamClose(streamID);
+
+      pstreamClose(streamID);
 
       if ( array ) Free(array);
       if ( grid_center_lon ) Free(grid_center_lon);

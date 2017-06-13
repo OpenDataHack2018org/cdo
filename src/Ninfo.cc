@@ -44,6 +44,7 @@ void *Ninfo(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("nyear"       , NYEAR       , 0 , NULL);
   cdoOperatorAdd("nmon"        , NMON        , 0 , NULL);
   cdoOperatorAdd("ndate"       , NDATE       , 0 , NULL);
@@ -52,13 +53,14 @@ void *Ninfo(void *argument)
   cdoOperatorAdd("nlevel"      , NLEVEL      , 0 , NULL);
   cdoOperatorAdd("ngridpoints" , NGRIDPOINTS , 0 , NULL);
   cdoOperatorAdd("ngrids"      , NGRIDS      , 0 , NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   int nvars   = vlistNvars(vlistID);
   int taxisID = vlistInqTaxis(vlistID);
@@ -72,7 +74,7 @@ void *Ninfo(void *argument)
       int nyear = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) )
+	while ( pstreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    cdiDecodeDate(vdate, &year, &mon, &day);
@@ -93,7 +95,7 @@ void *Ninfo(void *argument)
       int nmon = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) )
+	while ( pstreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    cdiDecodeDate(vdate, &year, &mon, &day);
@@ -114,7 +116,7 @@ void *Ninfo(void *argument)
       int ndate = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) )
+	while ( pstreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    
@@ -133,7 +135,7 @@ void *Ninfo(void *argument)
       {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( streamInqTimestep(streamID, tsID) ) tsID++;
+	while ( pstreamInqTimestep(streamID, tsID) ) tsID++;
       fprintf(stdout, "%d\n", tsID);
       break;
       }
@@ -164,7 +166,7 @@ void *Ninfo(void *argument)
       break;
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   cdoFinish();
 

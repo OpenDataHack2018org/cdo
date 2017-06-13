@@ -39,8 +39,10 @@ void *Deltime(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
+  // clang-format off
   int DELDAY   = cdoOperatorAdd("delday",   0, 0, NULL);
   int DEL29FEB = cdoOperatorAdd("del29feb", 0, 0, NULL);
+  // clang-format on
 
   UNUSED(DELDAY);
 

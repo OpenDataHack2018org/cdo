@@ -35,9 +35,9 @@ void *Tocomplex(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID2);
@@ -57,9 +57,8 @@ void *Tocomplex(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( cdoFiletype() != CDI_FILETYPE_EXT ) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
@@ -67,19 +66,19 @@ void *Tocomplex(void *argument)
       
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID2++);
+      pstreamDefTimestep(streamID2, tsID2++);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamDefRecord(streamID2, varID, levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamDefRecord(streamID2, varID, levelID);
 	      
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  streamReadRecord(streamID1, array1, &nmiss);
+	  pstreamReadRecord(streamID1, array1, &nmiss);
 
 	  if ( operatorID == RETOCOMPLEX )
 	    {
@@ -98,14 +97,14 @@ void *Tocomplex(void *argument)
 		}
 	    }
 
-	  streamWriteRecord(streamID2, array2, nmiss);
+	  pstreamWriteRecord(streamID2, array2, nmiss);
 	}
        
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);

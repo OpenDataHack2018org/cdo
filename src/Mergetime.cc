@@ -31,15 +31,9 @@
 
 void *Mergetime(void *argument)
 {
-  int streamID1;
-  int tsID2 = 0, varID, levelID;
-  int vlistID1, vlistID2;
-  int fileID;
-  int taxisID1, taxisID2 = CDI_UNDEFID;
-  int nmiss;
-  int vdate, vtime;
+  int tsID2 = 0;
+  int taxisID2 = CDI_UNDEFID;
   int last_vdate = -1, last_vtime = -1;
-  int next_fileID;
   bool skip_same_time = false;
   double *array = NULL;
   typedef struct
@@ -55,20 +49,17 @@ void *Mergetime(void *argument)
 
   cdoInitialize(argument);
 
-  {
-    char *envstr = getenv("SKIP_SAME_TIME");
-    if ( envstr )
-      {
-	int ival;
-	ival = atoi(envstr);
-	if ( ival == 1 )
-	  {
-	    skip_same_time = true;
-	    if ( cdoVerbose )
-	      cdoPrint("Set SKIP_SAME_TIME to %d", ival);
-	  }
-      }
-  }
+  char *envstr = getenv("SKIP_SAME_TIME");
+  if ( envstr )
+    {
+      int ival = atoi(envstr);
+      if ( ival == 1 )
+        {
+          skip_same_time = true;
+          if ( cdoVerbose )
+            cdoPrint("Set SKIP_SAME_TIME to %d", ival);
+        }
+    }
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -76,33 +67,28 @@ void *Mergetime(void *argument)
 
   sfile_t *sf = (sfile_t*) Malloc(nfiles*sizeof(sfile_t));
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       if ( cdoVerbose ) cdoPrint("process: %s", cdoStreamName(fileID)->args);
 
-      streamID1 = streamOpenRead(cdoStreamName(fileID));
-
-      vlistID1 = streamInqVlist(streamID1);
-      taxisID1 = vlistInqTaxis(vlistID1);
-
-      sf[fileID].streamID = streamID1;
-      sf[fileID].vlistID  = vlistID1;
-      sf[fileID].taxisID  = taxisID1;
+      sf[fileID].streamID = pstreamOpenRead(cdoStreamName(fileID));
+      sf[fileID].vlistID = pstreamInqVlist(sf[fileID].streamID);
+      sf[fileID].taxisID = vlistInqTaxis(sf[fileID].vlistID);
     }
 
   
-  /* check that the contents is always the same */
-  for ( fileID = 1; fileID < nfiles; fileID++ )
+  // check that the contents is always the same
+  for ( int fileID = 1; fileID < nfiles; fileID++ )
     vlistCompare(sf[0].vlistID, sf[fileID].vlistID, CMP_ALL);
 
-  /* read the first time step */
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  // read the first time step
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       sf[fileID].tsID = 0;
-      sf[fileID].nrecs = streamInqTimestep(sf[fileID].streamID, sf[fileID].tsID);
+      sf[fileID].nrecs = pstreamInqTimestep(sf[fileID].streamID, sf[fileID].tsID);
       if ( sf[fileID].nrecs == 0 )
 	{
-	  streamClose(sf[fileID].streamID);
+	  pstreamClose(sf[fileID].streamID);
 	  sf[fileID].streamID = -1;
 	}
       else
@@ -117,7 +103,7 @@ void *Mergetime(void *argument)
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
   if ( ! lcopy )
     {
@@ -125,14 +111,14 @@ void *Mergetime(void *argument)
       array = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  while ( TRUE )
+  while ( true )
     {
       bool process_timestep = true;
 
-      next_fileID = -1;
-      vdate = 0;
-      vtime = 0;
-      for ( fileID = 0; fileID < nfiles; fileID++ )
+      int next_fileID = -1;
+      int vdate = 0;
+      int vtime = 0;
+      for ( int fileID = 0; fileID < nfiles; fileID++ )
 	{
 	  if ( sf[fileID].streamID != -1 )
 	    if ( next_fileID == -1 || sf[fileID].vdate < vdate ||
@@ -144,12 +130,12 @@ void *Mergetime(void *argument)
 	      }
 	}
 
-      fileID = next_fileID;
+      int fileID = next_fileID;
 
       if ( cdoVerbose )
-	cdoPrint("nextstep = %d  vdate = %d  vtime = %d", next_fileID, vdate, vtime);
+	cdoPrint("nextstep = %d  vdate = %d  vtime = %d", fileID, vdate, vtime);
 
-      if ( next_fileID == -1 ) break;
+      if ( fileID == -1 ) break;
 
       if ( skip_same_time )
 	if ( vdate == last_vdate && vtime == last_vtime )
@@ -166,13 +152,13 @@ void *Mergetime(void *argument)
 	{
 	  if ( tsID2 == 0 )
 	    {
-	      vlistID1 = sf[0].vlistID;
-	      vlistID2 = vlistDuplicate(vlistID1);
-	      taxisID1 = vlistInqTaxis(vlistID1);
+	      int vlistID1 = sf[fileID].vlistID;
+	      int vlistID2 = vlistDuplicate(vlistID1);
+	      int taxisID1 = vlistInqTaxis(vlistID1);
 	      taxisID2 = taxisDuplicate(taxisID1);
 	      vlistDefTaxis(vlistID2, taxisID2);
 	      
-	      streamDefVlist(streamID2, vlistID2);
+	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 
 	  last_vdate = vdate;
@@ -180,36 +166,38 @@ void *Mergetime(void *argument)
 
 	  taxisCopyTimestep(taxisID2, sf[fileID].taxisID);
 
-	  streamDefTimestep(streamID2, tsID2);
+	  pstreamDefTimestep(streamID2, tsID2);
 	       
 	  for ( int recID = 0; recID < sf[fileID].nrecs; recID++ )
 	    {
-	      streamInqRecord(sf[fileID].streamID, &varID, &levelID);
+              int varID, levelID;
+	      pstreamInqRecord(sf[fileID].streamID, &varID, &levelID);
 
               if ( tsID2 > 0 && sf[fileID].tsID == 0 )
                 if ( vlistInqVarTsteptype(sf[fileID].vlistID, varID) == TSTEP_CONSTANT )
                   continue;
 
-              streamDefRecord(streamID2, varID, levelID);
+              pstreamDefRecord(streamID2, varID, levelID);
 	  
 	      if ( lcopy )
 		{
-		  streamCopyRecord(streamID2, sf[fileID].streamID); 
+		  pstreamCopyRecord(streamID2, sf[fileID].streamID); 
 		}
 	      else
 		{
-		  streamReadRecord(sf[fileID].streamID, array, &nmiss);
-		  streamWriteRecord(streamID2, array, nmiss);
+                  int nmiss;
+		  pstreamReadRecord(sf[fileID].streamID, array, &nmiss);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 		}
 	    }
 
 	  tsID2++;
 	}
 
-      sf[fileID].nrecs = streamInqTimestep(sf[fileID].streamID, ++sf[fileID].tsID);
+      sf[fileID].nrecs = pstreamInqTimestep(sf[fileID].streamID, ++sf[fileID].tsID);
       if ( sf[fileID].nrecs == 0 )
 	{
-	  streamClose(sf[fileID].streamID);
+	  pstreamClose(sf[fileID].streamID);
 	  sf[fileID].streamID = -1;
 	}
       else
@@ -219,7 +207,7 @@ void *Mergetime(void *argument)
 	}
     }
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 
   if ( ! lcopy )
     if ( array ) Free(array);

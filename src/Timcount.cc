@@ -53,9 +53,9 @@ void *Timcount(void *argument)
 
   int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
@@ -68,9 +68,8 @@ void *Timcount(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int nrecords = vlistNrecs(vlistID1);
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
@@ -90,7 +89,7 @@ void *Timcount(void *argument)
   while ( TRUE )
     {
       int nsets = 0;
-      while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
 	{
 	  int vdate = taxisInqVdate(taxisID1);
 	  int vtime = taxisInqVtime(taxisID1);
@@ -102,7 +101,7 @@ void *Timcount(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
 
 	      if ( tsID == 0 )
 		{
@@ -120,7 +119,7 @@ void *Timcount(void *argument)
 		  vars1[varID][levelID].nmiss = gridsize;
 		}
 
-              streamReadRecord(streamID1, field.ptr, &nmiss);
+              pstreamReadRecord(streamID1, field.ptr, &nmiss);
               field.nmiss   = (size_t)nmiss;
               field.grid    = vars1[varID][levelID].grid;
 	      field.missval = vars1[varID][levelID].missval;
@@ -138,7 +137,7 @@ void *Timcount(void *argument)
 
       taxisDefVdate(taxisID2, vdate0);
       taxisDefVtime(taxisID2, vtime0);
-      streamDefTimestep(streamID2, otsID);
+      pstreamDefTimestep(streamID2, otsID);
 
       for ( int recID = 0; recID < nrecords; recID++ )
 	{
@@ -147,8 +146,8 @@ void *Timcount(void *argument)
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;
@@ -162,8 +161,8 @@ void *Timcount(void *argument)
   if ( recVarID   ) Free(recVarID);
   if ( recLevelID ) Free(recLevelID);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

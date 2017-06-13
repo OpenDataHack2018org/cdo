@@ -26,7 +26,7 @@
 
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h" // ENABLE_DATA
+#include "config.h" // ENABLE_DATA
 #endif
 
 #include <cdi.h>
@@ -40,23 +40,23 @@
 
 
 #if defined(ENABLE_DATA)
-  static const double etopo_scale  = 3;
-  static const double etopo_offset = 11000;
-  static const unsigned short etopo[] = {
+static const double etopo_scale  = 3;
+static const double etopo_offset = 11000;
+static const unsigned short etopo[] = {
 #include "etopo.h"
-  };
+};
 
-  static const double temp_scale  =  500;
-  static const double temp_offset = -220;
-  static const unsigned short temp[] = {
+static const double temp_scale  =  500;
+static const double temp_offset = -220;
+static const unsigned short temp[] = {
 #include "temp.h"
-  };
+};
 
-  static const double mask_scale  =  1;
-  static const double mask_offset =  0;
-  static const unsigned short mask[] = {
+static const double mask_scale  =  1;
+static const double mask_offset =  0;
+static const unsigned short mask[] = {
 #include "mask.h"
-  };
+};
 #endif
 
 /*  some Constants for creating temperatur and pressure for the standard atmosphere */
@@ -399,9 +399,9 @@ void *Vargen(void *argument)
        operatorID == TOPO || operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
-  int streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
+  int streamID = pstreamOpenWrite(cdoStreamName(0), cdoFiletype());
 
-  streamDefVlist(streamID, vlistID);
+  pstreamDefVlist(streamID, vlistID);
 
   int gridsize = gridInqSize(gridID);
   int datasize = gridsize;
@@ -432,14 +432,14 @@ void *Vargen(void *argument)
       int vtime = 0;
       taxisDefVdate(taxisID, vdate);
       taxisDefVtime(taxisID, vtime);
-      streamDefTimestep(streamID, tsID);
+      pstreamDefTimestep(streamID, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
         {
           nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
           for ( levelID = 0; levelID < nlevels; levelID++ )
             {
-              streamDefRecord(streamID, varID, levelID);
+              pstreamDefRecord(streamID, varID, levelID);
 
               if ( operatorID == RANDOM )
                 {
@@ -533,12 +533,12 @@ void *Vargen(void *argument)
                   remap_nn_reg2d(nlon, nlat, data, gridID, array);
                 }
 
-              streamWriteRecord(streamID, array, 0);
+              pstreamWriteRecord(streamID, array, 0);
             }
         }
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   vlistDestroy(vlistID);
 

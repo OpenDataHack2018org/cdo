@@ -94,9 +94,9 @@ void *Samplegrid(void *argument)
   else
     cdoAbort("Unknown operator ...");
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -153,9 +153,8 @@ void *Samplegrid(void *argument)
       if ( operatorID == SUBGRID    ) cdoPrint("Sub-grid has been created.");
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
@@ -168,18 +167,17 @@ void *Samplegrid(void *argument)
   if ( cdoDebugExt ) cdoPrint("gridsize = %ld, gridsize2 = %ld", gridsize, gridsize2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID1, &varID, &levelID);
-          streamReadRecord(streamID1, array1, &nmiss);
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, array1, &nmiss);
 
-          streamDefRecord(streamID2, varID, levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
 
           if ( cdoDebugExt>=20 ) cdoPrint("Processing record (%d) of %d.",recID, nrecs);
 
@@ -212,19 +210,19 @@ void *Samplegrid(void *argument)
                     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
                 }
 
-              streamWriteRecord(streamID2, array2, nmiss);
+              pstreamWriteRecord(streamID2, array2, nmiss);
             }
           else
             {
-              streamWriteRecord(streamID2, array1, nmiss);
+              pstreamWriteRecord(streamID2, array1, nmiss);
             }
         }
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

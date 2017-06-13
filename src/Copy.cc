@@ -53,9 +53,11 @@ void *Copy(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
+  // clang-format off
                 cdoOperatorAdd("copy",   0, 0, NULL);
   int SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
   int SZIP    = cdoOperatorAdd("szip",   0, 0, NULL);
+  // clang-format on
 
 #ifdef HIRLAM_EXTENSIONS
   // KEEP in mind the difference between copy and selall with respect to unpacking and repacking the GRIB information!

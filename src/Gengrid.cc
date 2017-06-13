@@ -35,11 +35,11 @@ void *Gengrid(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
 
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
@@ -55,15 +55,15 @@ void *Gengrid(void *argument)
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
   double *array3 = (double*) Malloc(gridsize*sizeof(double));
 
-  streamInqRecord(streamID1, &varID, &levelID);
-  streamReadRecord(streamID1, array1, &nmiss1);
-  streamInqRecord(streamID2, &varID, &levelID);
-  streamReadRecord(streamID2, array2, &nmiss2);
+  pstreamInqRecord(streamID1, &varID, &levelID);
+  pstreamReadRecord(streamID1, array1, &nmiss1);
+  pstreamInqRecord(streamID2, &varID, &levelID);
+  pstreamReadRecord(streamID2, array2, &nmiss2);
 
   int datatype = vlistInqVarDatatype(vlistID1, 0);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( nmiss1 || nmiss2 ) cdoAbort("Missing values unsupported!");
 
@@ -126,19 +126,19 @@ void *Gengrid(void *argument)
 
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;
-  streamDefTimestep(streamID3, tsID);
+  pstreamDefTimestep(streamID3, tsID);
 
   for ( int i = 0; i < gridsize; ++i ) array3[i] = missval;
 
-  streamDefRecord(streamID3, 0, 0);
-  streamWriteRecord(streamID3, array3, gridsize);
+  pstreamDefRecord(streamID3, 0, 0);
+  pstreamWriteRecord(streamID3, array3, gridsize);
 
-  streamClose(streamID3);
+  pstreamClose(streamID3);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);

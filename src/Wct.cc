@@ -90,11 +90,11 @@ void *Wct(void *argument)
   cdoInitialize(argument);
   cdoOperatorAdd("wct", 0, 0, NULL);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
 
@@ -127,28 +127,28 @@ void *Wct(void *argument)
   vlistDefVarLongname(vlistID3, varID3, WCT_LONGNAME);
   vlistDefVarUnits(vlistID3, varID3, WCT_UNITS);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
-      nrecs2 = streamInqTimestep(streamID2, tsID);
+      nrecs2 = pstreamInqTimestep(streamID2, tsID);
       if ( nrecs2 == 0 )
         cdoAbort("Input streams have different number of timesteps!");
 
       taxisCopyTimestep(taxisID3, taxisID1);
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID1, &levelID1);
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID1, &levelID1);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = (size_t) nmiss;
           
-	  streamInqRecord(streamID2, &varID2, &levelID2);
-	  streamReadRecord(streamID2, field2.ptr, &nmiss);
+	  pstreamInqRecord(streamID2, &varID2, &levelID2);
+	  pstreamReadRecord(streamID2, field2.ptr, &nmiss);
           field2.nmiss = (size_t) nmiss;
 	  
 	  if ( varID1 != varID2 || levelID1 != levelID2 )
@@ -165,16 +165,16 @@ void *Wct(void *argument)
 
 	  farexpr(&field1, field2, windchillTemperature);
 	  
-	  streamDefRecord(streamID3, varID3, levelID1);
-	  streamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamDefRecord(streamID3, varID3, levelID1);
+	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( field1.ptr ) Free(field1.ptr);
   if ( field2.ptr ) Free(field2.ptr);

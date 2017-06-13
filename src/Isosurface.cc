@@ -97,9 +97,9 @@ void *Isosurface(void *argument)
   if ( cdoVerbose ) cdoPrint("Isoval: %g", isoval);
 
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -130,9 +130,9 @@ void *Isosurface(void *argument)
     if ( zaxisID1 == vlistZaxis(vlistID1, i) )
       vlistChangeZaxisIndex(vlistID2, i, zaxisIDsfc);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -165,11 +165,11 @@ void *Isosurface(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -179,12 +179,12 @@ void *Isosurface(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  offset   = gridsize*levelID;
 	  single   = vars1[varID].ptr + offset;
 	  
-	  streamReadRecord(streamID1, single, &nmiss);
+	  pstreamReadRecord(streamID1, single, &nmiss);
 	  vars1[varID].nmiss += nmiss;
 	  vars[varID] = TRUE;
 	}
@@ -197,8 +197,8 @@ void *Isosurface(void *argument)
 		{
 		  isosurface(isoval, nlev1, lev1, &vars1[varID], &field);
 
-		  streamDefRecord(streamID2, varID, 0);
-		  streamWriteRecord(streamID2, field.ptr, field.nmiss);
+		  pstreamDefRecord(streamID2, varID, 0);
+		  pstreamWriteRecord(streamID2, field.ptr, field.nmiss);
 		}
 	      else
 		{
@@ -215,8 +215,8 @@ void *Isosurface(void *argument)
 		      for ( i = 0; i < gridsize; ++i )
 			if ( DBL_IS_EQUAL(single[i], missval) ) nmiss++;
 
-		      streamDefRecord(streamID2, varID, levelID);
-		      streamWriteRecord(streamID2, single, nmiss);
+		      pstreamDefRecord(streamID2, varID, levelID);
+		      pstreamWriteRecord(streamID2, single, nmiss);
 		    }
 		}
 	    }
@@ -234,8 +234,8 @@ void *Isosurface(void *argument)
 
   Free(field.ptr);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

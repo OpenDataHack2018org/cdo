@@ -15,20 +15,8 @@
   GNU General Public License for more details.
 */
 
-#ifndef _PSTREAM_WRITE_H
-#define _PSTREAM_WRITE_H
-
-#define  streamOpenWrite          pstreamOpenWrite
-
-#define  streamDefVlist           pstreamDefVlist
-
-#define  streamDefTimestep        pstreamDefTimestep
-
-#define  streamDefRecord          pstreamDefRecord
-
-#define  streamWriteRecord        pstreamWriteRecord
-#define  streamWriteRecordF       pstreamWriteRecordF
-
+#ifndef PSTREAM_WRITE_H
+#define PSTREAM_WRITE_H
 
 int     pstreamOpenWrite(const argument_t *argument, int filetype);
 void    pstreamClose(int pstreamID);
@@ -42,4 +30,4 @@ void    pstreamDefRecord(int pstreamID, int  varID, int  levelID);
 void    pstreamWriteRecord(int pstreamID, double *data, int nmiss);
 void    pstreamWriteRecordF(int pstreamID, float *data, int nmiss);
 
-#endif  /* _PSTREAM_WRITE_H */
+#endif  /* PSTREAM_WRITE_H */

@@ -58,9 +58,9 @@ void eca1(const ECA_REQUEST_1 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID = streamOpenRead(cdoStreamName(0));
+  istreamID = pstreamOpenRead(cdoStreamName(0));
 
-  ivlistID = streamInqVlist(istreamID);
+  ivlistID = pstreamInqVlist(istreamID);
   ovlistID = vlistCreate();
   
   gridID  = vlistInqVarGrid(ivlistID, FIRST_VAR_ID);
@@ -103,9 +103,8 @@ void eca1(const ECA_REQUEST_1 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(ostreamID, ovlistID);
+  ostreamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID);
   recVarID   = (int*) Malloc(nrecords*sizeof(int));
@@ -186,7 +185,7 @@ void eca1(const ECA_REQUEST_1 *request)
   while ( TRUE )
     {
       nsets = 0;
-      while ( (nrecs = streamInqTimestep(istreamID, itsID)) > 0 )
+      while ( (nrecs = pstreamInqTimestep(istreamID, itsID)) > 0 )
         {
           ivdate = taxisInqVdate(itaxisID);
           ivtime = taxisInqVtime(itaxisID);
@@ -198,7 +197,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
           for ( int recID = 0; recID < nrecs; recID++ )
             {
-              streamInqRecord(istreamID, &varID, &levelID);
+              pstreamInqRecord(istreamID, &varID, &levelID);
 
               if ( itsID == 0 )
                 {
@@ -225,7 +224,7 @@ void eca1(const ECA_REQUEST_1 *request)
                   if ( IS_SET(request->var2.h3) ) var23[levelID].nmiss = gridsize; 
                 }
 
-              streamReadRecord(istreamID, field1.ptr, &nmiss);
+              pstreamReadRecord(istreamID, field1.ptr, &nmiss);
               field1.nmiss   = (size_t)nmiss;
               field1.grid    = var12[levelID].grid;
               field1.missval = var12[levelID].missval;
@@ -321,7 +320,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
       taxisDefVdate(otaxisID, ovdate);
       taxisDefVtime(otaxisID, ovtime);
-      streamDefTimestep(ostreamID, otsID);
+      pstreamDefTimestep(ostreamID, otsID);
 
       if ( otsID && vlistInqVarTsteptype(ivlistID, FIRST_VAR_ID) == TSTEP_CONSTANT ) continue;
 
@@ -335,8 +334,8 @@ void eca1(const ECA_REQUEST_1 *request)
 
 	  farsel(var, samp1[levelID]);
 
-	  streamDefRecord(ostreamID, varID, levelID);
-	  streamWriteRecord(ostreamID, var->ptr, var->nmiss);
+	  pstreamDefRecord(ostreamID, varID, levelID);
+	  pstreamWriteRecord(ostreamID, var->ptr, var->nmiss);
 	}
 
       if ( IS_SET(request->var2.h2) || IS_SET(request->var2.h3) )
@@ -351,8 +350,8 @@ void eca1(const ECA_REQUEST_1 *request)
                   
 	      farsel(var, samp1[levelID]);
                   
-	      streamDefRecord(ostreamID, varID, levelID);
-	      streamWriteRecord(ostreamID, var->ptr, var->nmiss);
+	      pstreamDefRecord(ostreamID, varID, levelID);
+	      pstreamWriteRecord(ostreamID, var->ptr, var->nmiss);
 	    }
         }
 
@@ -395,8 +394,8 @@ void eca1(const ECA_REQUEST_1 *request)
   if ( IS_SET(recVarID) )   Free(recVarID);
   if ( IS_SET(recLevelID) ) Free(recLevelID);
 
-  streamClose(ostreamID);
-  streamClose(istreamID);
+  pstreamClose(ostreamID);
+  pstreamClose(istreamID);
 }
 
 
@@ -426,11 +425,11 @@ void eca2(const ECA_REQUEST_2 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID1 = streamOpenRead(cdoStreamName(0));
-  istreamID2 = streamOpenRead(cdoStreamName(1));
+  istreamID1 = pstreamOpenRead(cdoStreamName(0));
+  istreamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  ivlistID1 = streamInqVlist(istreamID1);
-  ivlistID2 = streamInqVlist(istreamID2);
+  ivlistID1 = pstreamInqVlist(istreamID1);
+  ivlistID2 = pstreamInqVlist(istreamID2);
   ovlistID  = vlistCreate();
   
   vlistCompare(ivlistID1, ivlistID2, CMP_ALL);
@@ -476,9 +475,8 @@ void eca2(const ECA_REQUEST_2 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(ostreamID, ovlistID);
+  ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID1);
   recVarID   = (int*) Malloc(nrecords*sizeof(int));
@@ -562,9 +560,9 @@ void eca2(const ECA_REQUEST_2 *request)
   while ( TRUE )
     {
       nsets = 0;
-      while ( (nrecs = streamInqTimestep(istreamID1, itsID)) > 0 )
+      while ( (nrecs = pstreamInqTimestep(istreamID1, itsID)) > 0 )
         {
-	  if ( !streamInqTimestep(istreamID2, itsID) )
+	  if ( !pstreamInqTimestep(istreamID2, itsID) )
 	    cdoAbort("Input streams have different number of time steps!");
 
           ivdate = taxisInqVdate(itaxisID1);
@@ -577,8 +575,8 @@ void eca2(const ECA_REQUEST_2 *request)
 
           for ( int recID = 0; recID < nrecs; recID++ )
             {
-              streamInqRecord(istreamID1, &varID, &levelID);
-              streamInqRecord(istreamID2, &varID, &levelID);
+              pstreamInqRecord(istreamID1, &varID, &levelID);
+              pstreamInqRecord(istreamID2, &varID, &levelID);
 
               if ( itsID == 0 )
                 {
@@ -614,12 +612,12 @@ void eca2(const ECA_REQUEST_2 *request)
                     var22[levelID].nmiss = gridsize;
                 }
 
-              streamReadRecord(istreamID1, field1.ptr, &nmiss);
+              pstreamReadRecord(istreamID1, field1.ptr, &nmiss);
               field1.nmiss   = (size_t)nmiss;
               field1.grid    = gridID;
               field1.missval = missval1;
               
-              streamReadRecord(istreamID2, field2.ptr, &nmiss);
+              pstreamReadRecord(istreamID2, field2.ptr, &nmiss);
               field2.nmiss   = (size_t)nmiss;
               field2.grid    = gridID;
               field2.missval = missval2;
@@ -710,7 +708,7 @@ void eca2(const ECA_REQUEST_2 *request)
 
       taxisDefVdate(otaxisID, ovdate);
       taxisDefVtime(otaxisID, ovtime);
-      streamDefTimestep(ostreamID, otsID);
+      pstreamDefTimestep(ostreamID, otsID);
 
       if ( otsID && vlistInqVarTsteptype(ivlistID1, FIRST_VAR_ID) == TSTEP_CONSTANT ) continue;
 
@@ -725,8 +723,8 @@ void eca2(const ECA_REQUEST_2 *request)
 	  farsel(var, samp1[levelID]);
 	  farsel(var, samp2[levelID]);
               
-	  streamDefRecord(ostreamID, varID, levelID);
-	  streamWriteRecord(ostreamID, var->ptr, var->nmiss);
+	  pstreamDefRecord(ostreamID, varID, levelID);
+	  pstreamWriteRecord(ostreamID, var->ptr, var->nmiss);
 	}
       if ( IS_SET(request->var2.h2) )
 	{
@@ -738,8 +736,8 @@ void eca2(const ECA_REQUEST_2 *request)
 	      farsel(var, samp1[levelID]);
 	      farsel(var, samp2[levelID]);
                   
-	      streamDefRecord(ostreamID, varID, levelID);
-	      streamWriteRecord(ostreamID, var->ptr, var->nmiss);
+	      pstreamDefRecord(ostreamID, varID, levelID);
+	      pstreamWriteRecord(ostreamID, var->ptr, var->nmiss);
 	    }
         }
 
@@ -784,9 +782,9 @@ void eca2(const ECA_REQUEST_2 *request)
   if ( IS_SET(recVarID) )   Free(recVarID);
   if ( IS_SET(recLevelID) ) Free(recLevelID);
 
-  streamClose(ostreamID);
-  streamClose(istreamID2);
-  streamClose(istreamID1);
+  pstreamClose(ostreamID);
+  pstreamClose(istreamID2);
+  pstreamClose(istreamID1);
 }
 
 
@@ -817,11 +815,11 @@ void eca3(const ECA_REQUEST_3 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID1 = streamOpenRead(cdoStreamName(0));
-  istreamID2 = streamOpenRead(cdoStreamName(1));
+  istreamID1 = pstreamOpenRead(cdoStreamName(0));
+  istreamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  ivlistID1 = streamInqVlist(istreamID1);
-  ivlistID2 = streamInqVlist(istreamID2);
+  ivlistID1 = pstreamInqVlist(istreamID1);
+  ivlistID2 = pstreamInqVlist(istreamID2);
   ovlistID  = vlistCreate();
   
   vlistCompare(ivlistID1, ivlistID2, CMP_ALL);
@@ -853,9 +851,8 @@ void eca3(const ECA_REQUEST_3 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(ostreamID, ovlistID);
+  ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID1);
   recVarID   = (int*) Malloc(nrecords*sizeof(int));
@@ -893,9 +890,9 @@ void eca3(const ECA_REQUEST_3 *request)
   while ( TRUE )
     {
       nsets = 0;
-      while ( (nrecs = streamInqTimestep(istreamID1, itsID)) > 0 )
+      while ( (nrecs = pstreamInqTimestep(istreamID1, itsID)) > 0 )
         {
-	  if ( !streamInqTimestep(istreamID2, itsID) )
+	  if ( !pstreamInqTimestep(istreamID2, itsID) )
 	    cdoAbort("Input streams have different number of time steps!");
             
           ivdate1 = taxisInqVdate(itaxisID1);
@@ -915,8 +912,8 @@ void eca3(const ECA_REQUEST_3 *request)
 
           for ( int recID = 0; recID < nrecs; recID++ )
             {
-              streamInqRecord(istreamID1, &varID, &levelID);
-              streamInqRecord(istreamID2, &varID, &levelID);
+              pstreamInqRecord(istreamID1, &varID, &levelID);
+              pstreamInqRecord(istreamID2, &varID, &levelID);
 
               if ( itsID == 0 )
                 {
@@ -936,12 +933,12 @@ void eca3(const ECA_REQUEST_3 *request)
                   var2[levelID].nmiss = gridsize;
                 }
 
-              streamReadRecord(istreamID1, field1.ptr, &nmiss);
+              pstreamReadRecord(istreamID1, field1.ptr, &nmiss);
               field1.nmiss   = (size_t)nmiss;
               field1.grid    = var1[levelID].grid;
               field1.missval = var1[levelID].missval;
 
-              streamReadRecord(istreamID2, field2.ptr, &nmiss);
+              pstreamReadRecord(istreamID2, field2.ptr, &nmiss);
               field2.nmiss   = (size_t)nmiss;
               field2.grid    = var1[levelID].grid;
               field2.missval = var1[levelID].missval;
@@ -963,15 +960,15 @@ void eca3(const ECA_REQUEST_3 *request)
 
       taxisDefVdate(otaxisID, ovdate);
       taxisDefVtime(otaxisID, ovtime);
-      streamDefTimestep(ostreamID, otsID);
+      pstreamDefTimestep(ostreamID, otsID);
 
       if ( otsID && vlistInqVarTsteptype(ivlistID1, FIRST_VAR_ID) == TSTEP_CONSTANT ) continue;
 
       varID = 0;
       for ( levelID = 0; levelID < nlevels; levelID++ )
 	{
-	  streamDefRecord(ostreamID, varID, levelID);
-	  streamWriteRecord(ostreamID, var1[levelID].ptr, var1[levelID].nmiss);
+	  pstreamDefRecord(ostreamID, varID, levelID);
+	  pstreamWriteRecord(ostreamID, var1[levelID].ptr, var1[levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;
@@ -992,9 +989,9 @@ void eca3(const ECA_REQUEST_3 *request)
   if ( IS_SET(recVarID) )   Free(recVarID);
   if ( IS_SET(recLevelID) ) Free(recLevelID);
 
-  streamClose(ostreamID);
-  streamClose(istreamID2);
-  streamClose(istreamID1);
+  pstreamClose(ostreamID);
+  pstreamClose(istreamID2);
+  pstreamClose(istreamID1);
 }
 
 
@@ -1015,11 +1012,11 @@ void eca4(const ECA_REQUEST_4 *request)
 
   int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  int istreamID1 = streamOpenRead(cdoStreamName(0));
-  int istreamID2 = streamOpenRead(cdoStreamName(1));
+  int istreamID1 = pstreamOpenRead(cdoStreamName(0));
+  int istreamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int ivlistID1 = streamInqVlist(istreamID1);
-  int ivlistID2 = streamInqVlist(istreamID2);
+  int ivlistID1 = pstreamInqVlist(istreamID1);
+  int ivlistID2 = pstreamInqVlist(istreamID2);
   int ovlistID = vlistCreate();
 
   int gridID = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
@@ -1056,9 +1053,8 @@ void eca4(const ECA_REQUEST_4 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  int ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(ostreamID, ovlistID);
+  int ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(ostreamID, ovlistID);
 
   int nrecords    = vlistNrecs(ivlistID1);
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
@@ -1171,10 +1167,10 @@ void eca4(const ECA_REQUEST_4 *request)
   int itsID   = 0;
   int otsID   = 0;
 
-  if ( streamInqTimestep(istreamID2, itsID) )
+  if ( pstreamInqTimestep(istreamID2, itsID) )
     {
-      streamInqRecord(istreamID2, &varID, &levelID);
-      streamReadRecord(istreamID2, mask.ptr, &nmiss);
+      pstreamInqRecord(istreamID2, &varID, &levelID);
+      pstreamReadRecord(istreamID2, mask.ptr, &nmiss);
       mask.nmiss   = (size_t)nmiss;
       mask.grid    = gridID;
       mask.missval = vlistInqVarMissval(ivlistID2, 0);
@@ -1186,7 +1182,7 @@ void eca4(const ECA_REQUEST_4 *request)
   while ( TRUE )
     {
       long nsets = 0;
-      while ( (nrecs = streamInqTimestep(istreamID1, itsID)) > 0 )
+      while ( (nrecs = pstreamInqTimestep(istreamID1, itsID)) > 0 )
         {
           ivdate = taxisInqVdate(itaxisID);
           ivtime = taxisInqVtime(itaxisID);
@@ -1205,7 +1201,7 @@ void eca4(const ECA_REQUEST_4 *request)
 
           for ( int recID = 0; recID < nrecs; recID++ )
             {
-              streamInqRecord(istreamID1, &varID, &levelID);
+              pstreamInqRecord(istreamID1, &varID, &levelID);
 
               if ( itsID == 0 )
                 {
@@ -1242,7 +1238,7 @@ void eca4(const ECA_REQUEST_4 *request)
                   endDateWithHist[1][levelID].nmiss   = gridsize;
                 }
 
-              streamReadRecord(istreamID1, fieldGt.ptr, &nmiss);
+              pstreamReadRecord(istreamID1, fieldGt.ptr, &nmiss);
               fieldGt.nmiss   = (size_t)nmiss;
               memcpy(fieldLt.ptr, fieldGt.ptr, gridsize*sizeof(double));
               fieldLt.nmiss   = fieldGt.nmiss;
@@ -1533,7 +1529,6 @@ void eca4(const ECA_REQUEST_4 *request)
   if ( IS_SET(recVarID) )   Free(recVarID);
   if ( IS_SET(recLevelID) ) Free(recLevelID);
 
-  streamClose(ostreamID);
-  streamClose(istreamID1);
-
+  pstreamClose(ostreamID);
+  pstreamClose(istreamID1);
 }

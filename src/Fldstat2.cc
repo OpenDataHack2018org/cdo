@@ -92,29 +92,29 @@ void *Fldstat2(void *argument)
 {
   int gridID, lastgridID = -1;
   int gridID3;
-  int index;
   int nrecs, nrecs2;
   int varID, levelID;
-  int nmiss1, nmiss2, nmiss3;
+  int nmiss1, nmiss2;
   bool wstatus = false;
   bool needWeights = true;
-  double missval1, missval2;
   double sglval = 0;
   char varname[CDI_MAX_NAME];
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("fldcor",   func_cor,   0, NULL);
   cdoOperatorAdd("fldcovar", func_covar, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -142,25 +142,23 @@ void *Fldstat2(void *argument)
 
   int ngrids = vlistNgrids(vlistID1);
 
-  for ( index = 0; index < ngrids; index++ )
+  for ( int index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID3, index, gridID3);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID3, vlistID3);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
-  double *weight = NULL;
-  if ( needWeights )
-    weight = (double*) Malloc(gridsize*sizeof(double));
+  double *weight = needWeights ? (double*) Malloc(gridsize*sizeof(double)) : NULL;
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
-      nrecs2 = streamInqTimestep(streamID2, tsID);
+      nrecs2 = pstreamInqTimestep(streamID2, tsID);
 
       if ( nrecs2 == 0 )
 	{
@@ -170,14 +168,14 @@ void *Fldstat2(void *argument)
 
       taxisCopyTimestep(taxisID3, taxisID1);
 
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamInqRecord(streamID2, &varID, &levelID);
-	  streamReadRecord(streamID1, array1, &nmiss1);
-	  streamReadRecord(streamID2, array2, &nmiss2);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID2, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array1, &nmiss1);
+	  pstreamReadRecord(streamID2, array2, &nmiss2);
 
 	  gridID = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
@@ -192,8 +190,8 @@ void *Fldstat2(void *argument)
 	      cdoWarning("Using constant grid cell area weights for variable %s!", varname);
 	    }
 
-	  missval1 = vlistInqVarMissval(vlistID1, varID);
-	  missval2 = vlistInqVarMissval(vlistID2, varID);
+	  double missval1 = vlistInqVarMissval(vlistID1, varID);
+	  double missval2 = vlistInqVarMissval(vlistID2, varID);
 
 	  if ( operfunc == func_cor )
 	    {
@@ -204,20 +202,18 @@ void *Fldstat2(void *argument)
 	      sglval = covariance_s(array1, array2, weight, missval1, missval2, gridsize);
 	    }
 
-	  if ( DBL_IS_EQUAL(sglval, missval1) )
-	    nmiss3 = 1;
-	  else
-	    nmiss3 = 0;
+          int nmiss3 = DBL_IS_EQUAL(sglval, missval1) ? 1 : 0;
 
-	  streamDefRecord(streamID3, varID,  levelID);
-	  streamWriteRecord(streamID3, &sglval, nmiss3);
+	  pstreamDefRecord(streamID3, varID,  levelID);
+	  pstreamWriteRecord(streamID3, &sglval, nmiss3);
 	}
+
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);

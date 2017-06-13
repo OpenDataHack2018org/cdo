@@ -27,10 +27,10 @@ void *readRecord(void *arg)
   nmiss    = read_arg->nmiss;
   array    = read_arg->array;
 
-  /* fprintf(stderr, "streamInqRecord: streamID = %d\n", streamID); */
-  streamInqRecord(streamID, varID, levelID);
-  streamReadRecord(streamID, array, nmiss);
-  /* fprintf(stderr, "readRecord: varID %d levelID %d\n", *varID, *levelID); */
+  /* fprintf(stderr, "pstreamInqRecord: streamID = %d\n", streamID); */
+  pstreamInqRecord(streamID, varID, levelID);
+  pstreamReadRecord(streamID, array, nmiss);
+  /* fprintf(stderr, "pstreamReadRecord: varID %d levelID %d\n", *varID, *levelID); */
 
   return (NULL);
 }

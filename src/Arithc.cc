@@ -78,11 +78,13 @@ void *Arithc(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("addc", func_add, 0, "constant value");
   cdoOperatorAdd("subc", func_sub, 0, "constant value");
   cdoOperatorAdd("mulc", func_mul, 0, "constant value");
   cdoOperatorAdd("divc", func_div, 0, "constant value");
   cdoOperatorAdd("mod",  func_mod, 0, "divisor");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

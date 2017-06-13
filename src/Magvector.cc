@@ -340,9 +340,9 @@ void *Magvector(void *argument)
       VerifyVectorParameters( nparam, pnames, operatorID );
     }
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   int found = 0;
@@ -386,7 +386,7 @@ void *Magvector(void *argument)
 
   init_MAGICS( );
 
-  while( (nrecs = streamInqTimestep(streamID, tsID)) )
+  while( (nrecs = pstreamInqTimestep(streamID, tsID)) )
     {
       if( ANIM_FLAG )
         {
@@ -414,7 +414,7 @@ void *Magvector(void *argument)
 
       for( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID, &varID, &levelID);
+	  pstreamInqRecord(streamID, &varID, &levelID);
 
 	  vlistInqVarName(vlistID, varID, varname);
 
@@ -423,14 +423,14 @@ void *Magvector(void *argument)
 	       if( !strcmp( varname, "var131" ) || !strcmp( varname, "u" ) ) /* U Velocity as per GRIB is 'var131, as per NC 'u' */
 	  	 {
                    if( DBG ) fprintf( stderr,"Found U VEL in Varname %s\n",varname );
-                   streamReadRecord(streamID, uarray, &nmiss);
+                   pstreamReadRecord(streamID, uarray, &nmiss);
                    if ( nmiss ) cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize, uarray);
                    found++;
 	  	 }
 	       if( !strcmp( varname, "var132" ) || !strcmp( varname, "v" ) ) /* V Velocity as per GRIB  is 'var132, as per NC 'v'*/
 	  	 {
                    if( DBG ) fprintf( stderr,"Found V VEL in Varname %s\n",varname );
-                   streamReadRecord(streamID, varray, &nmiss);
+                   pstreamReadRecord(streamID, varray, &nmiss);
                    if ( nmiss ) cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize, varray);
                    found++;
 	  	 }	
@@ -478,7 +478,7 @@ void *Magvector(void *argument)
       */
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   if ( uarray  ) Free(uarray);
   if ( varray  ) Free(varray);

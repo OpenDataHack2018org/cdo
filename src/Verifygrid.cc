@@ -694,9 +694,9 @@ void *Verifygrid(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   int ngrids = vlistNgrids(vlistID);
   for ( int gridno = 0; gridno < ngrids; ++gridno )
@@ -798,7 +798,7 @@ void *Verifygrid(void *argument)
         }
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
   
   cdoFinish();
 

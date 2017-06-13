@@ -64,7 +64,7 @@ int countMask(double *maskField, int gridSize, double falseVal)
   return counter;
 }
 
-/* 
+/*
  * the operators argument has to be a single horizontal field,
  * non-zero values are used to mark the relevant locations
  */
@@ -79,7 +79,7 @@ void *MapReduce(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   /* check input grid type and size - this will be used for selecting relevant
    * variables from the input file*/
@@ -123,7 +123,7 @@ void *MapReduce(void *argument)
   /* create output vlist: Only variabes which have the same gridtype and
    * gridsize as the input mask should be proessed. Everything else is ignoreds
    * {{{ */
-  int vlistID1  = streamInqVlist(streamID1);
+  int vlistID1  = pstreamInqVlist(streamID1);
   int nvars     = vlistNvars(vlistID1);
   int *vars     = (int*) Malloc(nvars*sizeof(int));
 
@@ -146,7 +146,7 @@ void *MapReduce(void *argument)
         }
     }
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
   /* }}} */
 
   int taxisID1  = vlistInqTaxis(vlistID1);
@@ -158,34 +158,34 @@ void *MapReduce(void *argument)
   for ( int index = 0; index < ngrids; index++ ) vlistChangeGridIndex(vlistID2, index, outputGridID);
 
   /* loop over input fields and mask the data values {{{ */
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   double *arrayIn  = (double *)Malloc(inputGridSize*sizeof(double));
   double *arrayOut = (double *)Malloc(maskSize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID1, &varID, &levelID);
+          pstreamInqRecord(streamID1, &varID, &levelID);
           if (TRUE == vars[varID])
             {
               int varID2   = vlistFindVar(vlistID2, varID);
               int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
-              streamReadRecord(streamID1, arrayIn, &nmiss);
+              pstreamReadRecord(streamID1, arrayIn, &nmiss);
 
               for (int i = 0; i < maskSize;  i++)
                 arrayOut[i] = arrayIn[maskIndexList[i]];
 
 
-              streamDefRecord(streamID2, varID2, levelID2);
-              streamWriteRecord(streamID2, arrayOut, 0);
+              pstreamDefRecord(streamID2, varID2, levelID2);
+              pstreamWriteRecord(streamID2, arrayOut, 0);
 
             }
         }
@@ -194,8 +194,8 @@ void *MapReduce(void *argument)
   /* }}} */
 
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   Free(vars);
   Free(arrayOut);

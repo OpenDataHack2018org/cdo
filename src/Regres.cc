@@ -40,9 +40,9 @@ void *Regres(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   vlistDefNtsteps(vlistID2, 1);
@@ -51,13 +51,11 @@ void *Regres(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
   /*
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
   */
-  int streamID3 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID3, vlistID2);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID2);
 
   int nrecords = vlistNrecs(vlistID1);
 
@@ -77,16 +75,16 @@ void *Regres(void *argument)
 
   int vdate = 0, vtime = 0;
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      tsID++; /* don't move this line !!! */
+      tsID++; // don't move this line !!!
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( tsID == 1 )
 	    {
@@ -94,7 +92,7 @@ void *Regres(void *argument)
 	      recLevelID[recID] = levelID;
 	    }
 
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
 
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -115,8 +113,8 @@ void *Regres(void *argument)
 
   taxisDefVdate(taxisID2, vdate);
   taxisDefVtime(taxisID2, vtime);
-  /* streamDefTimestep(streamID2, 0); */
-  streamDefTimestep(streamID3, 0);
+  /* pstreamDefTimestep(streamID2, 0); */
+  pstreamDefTimestep(streamID3, 0);
 
   for ( int recID = 0; recID < nrecords; recID++ )
     {
@@ -147,15 +145,15 @@ void *Regres(void *argument)
       for ( i = 0; i < gridsize; i++ )
 	if ( DBL_IS_EQUAL(field1.ptr[i], missval) ) nmiss++;
 
-      streamDefRecord(streamID2, varID, levelID);
-      streamWriteRecord(streamID2, field1.ptr, nmiss);
+      pstreamDefRecord(streamID2, varID, levelID);
+      pstreamWriteRecord(streamID2, field1.ptr, nmiss);
       */
       nmiss = 0;
       for ( int i = 0; i < gridsize; i++ )
 	if ( DBL_IS_EQUAL(field2.ptr[i], missval) ) nmiss++;
 
-      streamDefRecord(streamID3, varID, levelID);
-      streamWriteRecord(streamID3, field2.ptr, nmiss);
+      pstreamDefRecord(streamID3, varID, levelID);
+      pstreamWriteRecord(streamID3, field2.ptr, nmiss);
     }
 
 
@@ -167,9 +165,9 @@ void *Regres(void *argument)
   if ( recVarID   ) Free(recVarID);
   if ( recLevelID ) Free(recLevelID);
 
-  streamClose(streamID3);
-  /* streamClose(streamID2); */
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  /* pstreamClose(streamID2); */
+  pstreamClose(streamID1);
 
   cdoFinish();
 

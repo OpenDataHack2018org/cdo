@@ -129,7 +129,6 @@ void *Zonstat(void *argument)
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
-
   pstreamDefVlist(streamID2, vlistID2);
 
   gridID1 = vlistInqVarGrid(vlistID1, 0);
@@ -148,7 +147,6 @@ void *Zonstat(void *argument)
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -177,6 +175,7 @@ void *Zonstat(void *argument)
 	  pstreamDefRecord(streamID2, varID,  levelID);
 	  pstreamWriteRecord(streamID2, field2.ptr, (int)field2.nmiss);
 	}
+
       tsID++;
     }
 

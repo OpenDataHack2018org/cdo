@@ -1127,9 +1127,9 @@ void *Magplot(void *argument)
       VerifyPlotParameters( nparam, pnames, operatorID );
     }
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   int varID = 0;
@@ -1174,7 +1174,7 @@ void *Magplot(void *argument)
 
   init_MAGICS( );
 
-  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
     {
       if( ANIM_FLAG )
         {
@@ -1223,8 +1223,8 @@ void *Magplot(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID, &varID, &levelID);
-	  streamReadRecord(streamID, array, &nmiss);
+	  pstreamInqRecord(streamID, &varID, &levelID);
+	  pstreamReadRecord(streamID, array, &nmiss);
 
           if ( nmiss ) cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize, array);
 	  
@@ -1280,7 +1280,7 @@ void *Magplot(void *argument)
     }
   quit_MAGICS( );
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   if ( array  ) Free(array);
   if ( grid_center_lon ) Free(grid_center_lon);

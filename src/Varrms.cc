@@ -45,11 +45,11 @@ void *Varrms(void *argument)
 
   bool needWeights = true;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
 
   double slon = 0;
   double slat = 0;
@@ -65,7 +65,7 @@ void *Varrms(void *argument)
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
   int vlistID3 = vlistCreate();
-  vlistCopyFlag(vlistID3, vlistID1);
+  cdoVlistCopyFlag(vlistID3, vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
@@ -83,9 +83,8 @@ void *Varrms(void *argument)
   vlistChangeGridIndex(vlistID3, index, gridID3);
   if ( ngrids > 1 ) cdoAbort("Too many different grids!");
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(streamID3, vlistID3);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID3);
 
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
   double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
@@ -114,30 +113,28 @@ void *Varrms(void *argument)
   field3.grid = gridID3;
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
-      nrecs = streamInqTimestep(streamID2, tsID);
+      nrecs = pstreamInqTimestep(streamID2, tsID);
 
       taxisCopyTimestep(taxisID3, taxisID1);
-
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  offset   = gridsize*levelID;
 	  single   = vardata1[varID] + offset;
 
-	  streamReadRecord(streamID1, single, &nmiss);
+	  pstreamReadRecord(streamID1, single, &nmiss);
 	  if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
 
-	  streamInqRecord(streamID2, &varID, &levelID);
+	  pstreamInqRecord(streamID2, &varID, &levelID);
 
-	  single   = vardata2[varID] + offset;
-
-	  streamReadRecord(streamID2, single, &nmiss);
+	  single = vardata2[varID] + offset;
+	  pstreamReadRecord(streamID2, single, &nmiss);
 	  if ( nmiss ) cdoAbort("this operator does not work with missing values!");
 	}
 
@@ -164,15 +161,16 @@ void *Varrms(void *argument)
 
 	  varrms(field1, field2, &field3);
 
-	  streamDefRecord(streamID3, varID, 0);
-	  streamWriteRecord(streamID3, &sglval, field3.nmiss);
+	  pstreamDefRecord(streamID3, varID, 0);
+	  pstreamWriteRecord(streamID3, &sglval, field3.nmiss);
 	}
+
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID3);
 

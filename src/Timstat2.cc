@@ -124,11 +124,11 @@ void *Timstat2(void *argument)
   if      ( operfunc == func_cor   ) nwork = 5;
   else if ( operfunc == func_covar ) nwork = 3;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -144,9 +144,8 @@ void *Timstat2(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
  
   vlistDefTaxis(vlistID3, taxisID3);
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(streamID3, vlistID3);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID3);
  
   gridsize = vlistGridsizeMax(vlistID1);
 
@@ -180,19 +179,19 @@ void *Timstat2(void *argument)
     }
  
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      nrecs2 = streamInqTimestep(streamID2, tsID);
+      nrecs2 = pstreamInqTimestep(streamID2, tsID);
       if ( nrecs != nrecs2 )
         cdoWarning("Input streams have different number of records!");
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamInqRecord(streamID2, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID2, &varID, &levelID);
 
 	  if ( tsID == 0 )
 	    {
@@ -205,8 +204,8 @@ void *Timstat2(void *argument)
 	  missval1 = vlistInqVarMissval(vlistID1, varID);
 	  missval2 = vlistInqVarMissval(vlistID2, varID);
 
-	  streamReadRecord(streamID1, array1, &nmiss);
-	  streamReadRecord(streamID2, array2, &nmiss);
+	  pstreamReadRecord(streamID1, array1, &nmiss);
+	  pstreamReadRecord(streamID2, array2, &nmiss);
 
 	  if ( operfunc == func_cor )
 	    {
@@ -246,7 +245,7 @@ void *Timstat2(void *argument)
   tsID = 0;
   taxisDefVdate(taxisID3, vdate);
   taxisDefVtime(taxisID3, vtime);
-  streamDefTimestep(streamID3, tsID);
+  pstreamDefTimestep(streamID3, tsID);
 
   for ( int recID = 0; recID < nrecs3; recID++ )
     {
@@ -272,8 +271,8 @@ void *Timstat2(void *argument)
 			       work[varID][levelID][2]);
 	}
 
-      streamDefRecord(streamID3, varID, levelID);
-      streamWriteRecord(streamID3, work[varID][levelID][0], nmiss);
+      pstreamDefRecord(streamID3, varID, levelID);
+      pstreamWriteRecord(streamID3, work[varID][levelID][0], nmiss);
     }
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -294,9 +293,9 @@ void *Timstat2(void *argument)
   Free(nofvals);
   Free(work);
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array1 )     Free(array1);
   if ( array2 )     Free(array2);

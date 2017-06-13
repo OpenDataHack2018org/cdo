@@ -28,6 +28,7 @@ void *Log(void *argument)
 {
   cdoInitialize(argument);
 
+  // clang-format off
   int DUMPLOGS  = cdoOperatorAdd("dumplogs",   0, 0, NULL);
   int DAYLOGS   = cdoOperatorAdd("daylogs",    0, 0, NULL);
   int MONLOGS   = cdoOperatorAdd("monlogs",    0, 0, NULL);
@@ -37,6 +38,7 @@ void *Log(void *argument)
                   cdoOperatorAdd("smemlogo",   1, 3, NULL);
                   cdoOperatorAdd("stimelogo",  1, 4, NULL);
                   cdoOperatorAdd("sperclogo",  1, 5, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);

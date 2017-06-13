@@ -97,20 +97,20 @@ void *Setgrid(void *argument)
       char *areafile = operatorArgv()[0];
 
       argument_t *fileargument = file_argument_new(areafile);
-      int streamID = streamOpenRead(fileargument);
+      int streamID = pstreamOpenRead(fileargument);
       file_argument_free(fileargument);
 
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
 
-      nrecs = streamInqTimestep(streamID, 0);
-      streamInqRecord(streamID, &varID, &levelID);
+      nrecs = pstreamInqTimestep(streamID, 0);
+      pstreamInqRecord(streamID, &varID, &levelID);
 
       int gridID = vlistInqVarGrid(vlistID, varID);
       areasize = gridInqSize(gridID);
       areaweight = (double*) Malloc(areasize*sizeof(double));
   
-      streamReadRecord(streamID, areaweight, &nmiss);
-      streamClose(streamID);
+      pstreamReadRecord(streamID, areaweight, &nmiss);
+      pstreamClose(streamID);
 
       if ( cdoVerbose )
 	{
@@ -133,21 +133,21 @@ void *Setgrid(void *argument)
       operatorCheckArgc(1);
       char *maskfile = operatorArgv()[0];
       argument_t *fileargument = file_argument_new(maskfile);
-      int streamID = streamOpenRead(fileargument);
+      int streamID = pstreamOpenRead(fileargument);
       file_argument_free(fileargument);
 
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
 
-      nrecs = streamInqTimestep(streamID, 0);
-      streamInqRecord(streamID, &varID, &levelID);
+      nrecs = pstreamInqTimestep(streamID, 0);
+      pstreamInqRecord(streamID, &varID, &levelID);
 
       double missval  = vlistInqVarMissval(vlistID, varID);
       int gridID   = vlistInqVarGrid(vlistID, varID);
       masksize = gridInqSize(gridID);
       gridmask = (double*) Malloc(masksize*sizeof(double));
   
-      streamReadRecord(streamID, gridmask, &nmiss);
-      streamClose(streamID);
+      pstreamReadRecord(streamID, gridmask, &nmiss);
+      pstreamClose(streamID);
 
       for ( int i = 0; i < masksize; i++ )
 	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
@@ -175,9 +175,9 @@ void *Setgrid(void *argument)
       griduri = operatorArgv()[0];
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -367,9 +367,9 @@ void *Setgrid(void *argument)
 	}
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
   //vlistPrint(vlistID2);
 
   int gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2) : vlistGridsizeMax(vlistID1);
@@ -378,18 +378,17 @@ void *Setgrid(void *argument)
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamDefRecord(streamID2,  varID,  levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamDefRecord(streamID2,  varID,  levelID);
 	  
-	  streamReadRecord(streamID1, array, &nmiss);
+	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  int gridID1 = vlistInqVarGrid(vlistID1, varID);
 	  if ( lregular || lregularnn )
@@ -410,13 +409,14 @@ void *Setgrid(void *argument)
 		if ( grid2_vgpm[i] ) array[j++] = array[i];
 	    }
 
-	  streamWriteRecord(streamID2, array, nmiss);
+	  pstreamWriteRecord(streamID2, array, nmiss);
 	}
+
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( gridmask ) Free(gridmask);
   if ( areaweight ) Free(areaweight);

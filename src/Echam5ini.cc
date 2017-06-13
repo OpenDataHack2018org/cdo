@@ -1438,10 +1438,12 @@ void *Echam5ini(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int IMPORT_E5ML  = cdoOperatorAdd("import_e5ml",  func_read,  0, NULL);
   int IMPORT_E5RES = cdoOperatorAdd("import_e5res", func_read,  0, NULL);
   int EXPORT_E5ML  = cdoOperatorAdd("export_e5ml",  func_write, 0, NULL);
   int EXPORT_E5RES = cdoOperatorAdd("export_e5res", func_write, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

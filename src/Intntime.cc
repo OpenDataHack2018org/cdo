@@ -46,9 +46,9 @@ void *Intntime(void *argument)
   int numts = parameter2int(operatorArgv()[0]);
   if ( numts < 2 ) cdoAbort("parameter must be greater than 1!");
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars    = vlistNvars(vlistID1);
@@ -80,34 +80,34 @@ void *Intntime(void *argument)
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int calendar = taxisInqCalendar(taxisID1);
 
   int tsID = 0;
   int tsIDo = 0;
-  int nrecs = streamInqTimestep(streamID1, tsID++);
+  int nrecs = pstreamInqTimestep(streamID1, tsID++);
   int vdate1 = taxisInqVdate(taxisID1);
   int vtime1 = taxisInqVtime(taxisID1);
   juldate_t juldate1 = juldate_encode(calendar, vdate1, vtime1);
 
   taxisCopyTimestep(taxisID2, taxisID1);
-  streamDefTimestep(streamID2, tsIDo++);
+  pstreamDefTimestep(streamID2, tsIDo++);
   for ( int recID = 0; recID < nrecs; recID++ )
     {
-      streamInqRecord(streamID1, &varID, &levelID);
+      pstreamInqRecord(streamID1, &varID, &levelID);
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       offset   = gridsize*levelID;
       single1  = vardata1[varID] + offset;
-      streamReadRecord(streamID1, single1, &nmiss1[varID][levelID]);
+      pstreamReadRecord(streamID1, single1, &nmiss1[varID][levelID]);
 
-      streamDefRecord(streamID2, varID, levelID);
-      streamWriteRecord(streamID2, single1, nmiss1[varID][levelID]);
+      pstreamDefRecord(streamID2, varID, levelID);
+      pstreamWriteRecord(streamID2, single1, nmiss1[varID][levelID]);
     }
 
-  while ( (nrecs = streamInqTimestep(streamID1, tsID++)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID++)) )
     {
       int vdate2 = taxisInqVdate(taxisID1);
       int vtime2 = taxisInqVtime(taxisID1);
@@ -115,7 +115,7 @@ void *Intntime(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  recVarID[recID]   = varID;
 	  recLevelID[recID] = levelID;
@@ -123,7 +123,7 @@ void *Intntime(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  offset   = gridsize*levelID;
 	  single2  = vardata2[varID] + offset;
-	  streamReadRecord(streamID1, single2, &nmiss2[varID][levelID]);
+	  pstreamReadRecord(streamID1, single2, &nmiss2[varID][levelID]);
 	}
 
       for ( int it = 1; it < numts; it++ )
@@ -148,7 +148,7 @@ void *Intntime(void *argument)
 
 	  taxisDefVdate(taxisID2, vdate);
 	  taxisDefVtime(taxisID2, vtime);
-	  streamDefTimestep(streamID2, tsIDo++);
+	  pstreamDefTimestep(streamID2, tsIDo++);
 
 	  double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
 	                juldate_to_seconds(juldate_sub(juldate2, juldate1));
@@ -195,14 +195,14 @@ void *Intntime(void *argument)
 		    array[i] = single1[i]*fac1 + single2[i]*fac2;
 		}
 
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, array, nmiss3);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, array, nmiss3);
 	    }
 	}
 
       taxisDefVdate(taxisID2, vdate2);
       taxisDefVtime(taxisID2, vtime2);
-      streamDefTimestep(streamID2, tsIDo++);
+      pstreamDefTimestep(streamID2, tsIDo++);
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  varID   = recVarID[recID];
@@ -212,8 +212,8 @@ void *Intntime(void *argument)
 	  offset   = gridsize*levelID;
 	  single2  = vardata2[varID] + offset;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, single2, nmiss2[varID][levelID]);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, single2, nmiss2[varID][levelID]);
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -243,8 +243,8 @@ void *Intntime(void *argument)
 
   if ( array )  Free(array);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

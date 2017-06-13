@@ -102,9 +102,9 @@ void *Sinfo(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      int streamID = streamOpenRead(cdoStreamName(indf));
+      int streamID = pstreamOpenRead(cdoStreamName(indf));
 
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
 
       set_text_color(stdout, BRIGHT, BLACK);
       fprintf(stdout, "   File format");
@@ -332,7 +332,7 @@ void *Sinfo(void *argument)
 	  fprintf(stdout, "\n");
 	}
 
-      streamClose(streamID);
+      pstreamClose(streamID);
     }
 
   cdoFinish();

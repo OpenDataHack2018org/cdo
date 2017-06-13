@@ -208,9 +208,9 @@ void *Selmulti(void *argument)
     if (getNumberOfSelectionTuples()==0)
       cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'CHANGE,  .. or (/;;|;;;)'\nCheck the file: %s",filenameOrString);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);
@@ -326,7 +326,7 @@ void *Selmulti(void *argument)
   if ( cdoDebugExt ) cdoPrint(" Writing the selected fields ...");
 
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
 
   nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; ++varID )
@@ -339,23 +339,22 @@ void *Selmulti(void *argument)
 
   int nrecs = vlistNrecs(vlistID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double *) malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID1, &varID, &levelID);
+          pstreamInqRecord(streamID1, &varID, &levelID);
           missval = vlistInqVarMissval(vlistID1, varID);
 
           if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
@@ -413,21 +412,21 @@ void *Selmulti(void *argument)
                 cdoPrint(" Warning: Missing varID or levelID with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)] .. #2[varID(%d),levelID(%d)]",code, ltype, (int)(level), varID,levelID, varID2, levelID2);
                 continue;
               }
-              streamDefRecord(streamID2, varID2, levelID2);
+              pstreamDefRecord(streamID2, varID2, levelID2);
 
               if ( lcopy )
                 {
                   if ( cdoDebugExt ) cdoPrint(" Copying record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",recID, code, ltype, (int)(level), varID,levelID);
-                  streamCopyRecord(streamID2, streamID1);
+                  pstreamCopyRecord(streamID2, streamID1);
                 }
               else
                 {
-                  streamReadRecord(streamID1, array, &nmiss);
+                  pstreamReadRecord(streamID1, array, &nmiss);
 
                   if (!simpleMath)
                     {
                       if ( cdoDebugExt ) cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",recID, code, ltype, (int)(level), varID,levelID);
-                      streamWriteRecord(streamID2, array, nmiss);
+                      pstreamWriteRecord(streamID2, array, nmiss);
                     }
                   else  // 1:  simple array arithmetics ( *,+)
                     {
@@ -438,7 +437,7 @@ void *Selmulti(void *argument)
                             array[li] = scale*(array[li] - offset);
                             // If SCALE and/or OFFSET are defined, then the data values are scaled as SCALE*(VALUE-OFFSET).
                           }
-                      streamWriteRecord(streamID2, array, nmiss);
+                      pstreamWriteRecord(streamID2, array, nmiss);
                     }
                 } // end of else ( lcopy )
             } // end if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
@@ -458,8 +457,8 @@ void *Selmulti(void *argument)
       tsID++;
     } // end while ( (nrecs
 
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   vlistDestroy(vlistID2);
 

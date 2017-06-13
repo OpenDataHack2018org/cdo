@@ -48,11 +48,11 @@ void *Monarith(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -70,9 +70,8 @@ void *Monarith(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(streamID3, vlistID3);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID3);
 
   int nvars  = vlistNvars(vlistID2);
 
@@ -89,7 +88,7 @@ void *Monarith(void *argument)
 
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int yearmon1 = vdate / 100;
@@ -103,7 +102,7 @@ void *Monarith(void *argument)
 
 	  if ( cdoVerbose ) cdoPrint("Process: Year = %4d  Month = %2d", year1, mon1);
 
-	  nrecs2 = streamInqTimestep(streamID2, tsID2);
+	  nrecs2 = pstreamInqTimestep(streamID2, tsID2);
 	  if ( nrecs2 == 0 )
 	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoStreamName(1)->args);
 
@@ -120,12 +119,12 @@ void *Monarith(void *argument)
 
 	  for ( int recID = 0; recID < nrecs2; recID++ )
 	    {
-	      streamInqRecord(streamID2, &varID, &levelID);
+	      pstreamInqRecord(streamID2, &varID, &levelID);
 
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      offset   = gridsize*levelID;
 
-	      streamReadRecord(streamID2, vardata2[varID]+offset, &nmiss);
+	      pstreamReadRecord(streamID2, vardata2[varID]+offset, &nmiss);
 	      varnmiss2[varID][levelID] = nmiss;
 	    }
 
@@ -133,13 +132,12 @@ void *Monarith(void *argument)
 	}
 
       taxisCopyTimestep(taxisID3, taxisID1);
-
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss   = (size_t) nmiss;
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
@@ -153,16 +151,16 @@ void *Monarith(void *argument)
 
 	  farfun(&field1, field2, operfunc);
 
-	  streamDefRecord(streamID3, varID, levelID);
-	  streamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamDefRecord(streamID3, varID, levelID);
+	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   for ( varID = 0; varID < nvars; varID++ )
     {

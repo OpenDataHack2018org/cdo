@@ -55,18 +55,17 @@ void *Yearmonstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
@@ -94,7 +93,7 @@ void *Yearmonstat(void *argument)
     {
       nsets = 0;
       dsets = 0;
-      while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 	  vdate = dtlist_get_vdate(dtlist, nsets);
@@ -120,7 +119,7 @@ void *Yearmonstat(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
 
 	      if ( tsID == 0 )
 		{
@@ -132,7 +131,7 @@ void *Yearmonstat(void *argument)
 
 	      if ( nsets == 0 )
 		{
-		  streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
+		  pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
 		  vars1[varID][levelID].nmiss = (size_t) nmiss;
 
 		  farcmul(&vars1[varID][levelID], dpm);
@@ -151,7 +150,7 @@ void *Yearmonstat(void *argument)
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, field.ptr, &nmiss);
+		  pstreamReadRecord(streamID1, field.ptr, &nmiss);
                   field.nmiss   = (size_t) nmiss;
 		  field.grid    = vars1[varID][levelID].grid;
 		  field.missval = vars1[varID][levelID].missval;
@@ -207,7 +206,7 @@ void *Yearmonstat(void *argument)
 	}
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
-      streamDefTimestep(streamID2, otsID);
+      pstreamDefTimestep(streamID2, otsID);
 
       for ( int recID = 0; recID < nrecords; recID++ )
 	{
@@ -216,8 +215,8 @@ void *Yearmonstat(void *argument)
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;
@@ -235,8 +234,8 @@ void *Yearmonstat(void *argument)
 
   dtlist_delete(dtlist);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

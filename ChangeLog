@@ -3,6 +3,14 @@
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
 
+2017-06-08  Uwe Schulzweida
+
+	* mergetime: wrong time information if first input file does not contain the first time step (bug introduce in 1.8.1) [Bug #7760]
+
+2017-06-04  Uwe Schulzweida
+
+	* selgridcell: read indices from mask
+
 2017-06-02  Uwe Schulzweida
 
 	* New operator ensrange: Ensemble range (ensmax-ensmin)

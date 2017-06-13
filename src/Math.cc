@@ -51,6 +51,7 @@ void *Math(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("abs",   ABS,   0, NULL);
   cdoOperatorAdd("int",   FINT,  0, NULL);
   cdoOperatorAdd("nint",  FNINT, 0, NULL);
@@ -67,6 +68,7 @@ void *Math(void *argument)
   cdoOperatorAdd("atan",  ATAN,  0, NULL);
   cdoOperatorAdd("pow",   POW,   0, NULL);
   cdoOperatorAdd("reci",  RECI,  0, NULL);
+  // clang-format on
  
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -80,9 +82,9 @@ void *Math(void *argument)
       rc = parameter2double(operatorArgv()[0]);
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -95,21 +97,19 @@ void *Math(void *argument)
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array1, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array1, &nmiss);
 
 	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -211,14 +211,15 @@ void *Math(void *argument)
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval1) ) nmiss2++;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, array2, nmiss2);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, array2, nmiss2);
 	}
+
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

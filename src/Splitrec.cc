@@ -44,9 +44,9 @@ void *Splitrec(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int nrecs  = vlistNrecs(vlistID1);
 
@@ -55,7 +55,7 @@ void *Splitrec(void *argument)
 
   refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   if ( ! lcopy )
     {
@@ -66,17 +66,17 @@ void *Splitrec(void *argument)
 
   int index = 0;
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  vlistClearFlag(vlistID1);
 	  vlistDefFlag(vlistID1, varID, levelID, TRUE);
 
 	  int vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  cdoVlistCopyFlag(vlistID2, vlistID1);
 
 	  index++;
 	  sprintf(filename+nchars, "%06d", index);
@@ -86,34 +86,34 @@ void *Splitrec(void *argument)
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
 	  argument_t *fileargument = file_argument_new(filename);
-	  int streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+	  int streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 
-	  streamDefVlist(streamID2, vlistID2);
+	  pstreamDefVlist(streamID2, vlistID2);
 
 	  int varID2   = vlistFindVar(vlistID2, varID);
 	  int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
-	  streamDefTimestep(streamID2, 0);
-	  streamDefRecord(streamID2, varID2, levelID2);
+	  pstreamDefTimestep(streamID2, 0);
+	  pstreamDefRecord(streamID2, varID2, levelID2);
 	  if ( lcopy )
 	    {
-	      streamCopyRecord(streamID2, streamID1);
+	      pstreamCopyRecord(streamID2, streamID1);
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, array, &nmiss);
-	      streamWriteRecord(streamID2, array, nmiss);
+	      pstreamReadRecord(streamID1, array, &nmiss);
+	      pstreamWriteRecord(streamID2, array, nmiss);
 	    }
 
-	  streamClose(streamID2);
+	  pstreamClose(streamID2);
 	  vlistDestroy(vlistID2);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID1);
+  pstreamClose(streamID1);
 
   if ( ! lcopy )
     if ( array ) Free(array);

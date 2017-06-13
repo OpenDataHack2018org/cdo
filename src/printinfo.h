@@ -1,10 +1,16 @@
 // This file is used in CDI and CDO !!!
 
 #if defined (HAVE_CONFIG_H)
-#  include "../src/config.h"
+#include "../src/config.h"
 #endif
 
 #include <stdio.h>
+
+#ifdef CDO
+#define  streamInqFiletype        pstreamInqFiletype
+#define  streamInqByteorder       pstreamInqByteorder
+#define  streamInqTimestep        pstreamInqTimestep
+#endif
 
 #define DATE_FORMAT "%5.4d-%2.2d-%2.2d"
 #define TIME_FORMAT "%2.2d:%2.2d:%2.2d"

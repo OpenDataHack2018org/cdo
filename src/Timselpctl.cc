@@ -56,13 +56,13 @@ void *Timselpctl(void *argument)
 
   if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
-  int streamID3 = streamOpenRead(cdoStreamName(2));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID3 = pstreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
-  int vlistID3 = streamInqVlist(streamID3);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID3 = pstreamInqVlist(streamID3);
   int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -76,9 +76,8 @@ void *Timselpctl(void *argument)
   int taxisID4 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  int streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
-
-  streamDefVlist(streamID4, vlistID4);
+  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  pstreamDefVlist(streamID4, vlistID4);
 
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
@@ -109,12 +108,12 @@ void *Timselpctl(void *argument)
 
   for ( tsID = 0; tsID < noffset; tsID++ )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( tsID == 0 )
 	    {
@@ -133,8 +132,8 @@ void *Timselpctl(void *argument)
 
   while ( TRUE )
     {
-      nrecs = streamInqTimestep(streamID2, otsID);
-      if ( nrecs != streamInqTimestep(streamID3, otsID) )
+      nrecs = pstreamInqTimestep(streamID2, otsID);
+      if ( nrecs != pstreamInqTimestep(streamID3, otsID) )
         cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
 
       int vdate2 = taxisInqVdate(taxisID2);
@@ -146,15 +145,15 @@ void *Timselpctl(void *argument)
       
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID2, &varID, &levelID);
-          streamReadRecord(streamID2, vars1[varID][levelID].ptr, &nmiss);
+          pstreamInqRecord(streamID2, &varID, &levelID);
+          pstreamReadRecord(streamID2, vars1[varID][levelID].ptr, &nmiss);
           vars1[varID][levelID].nmiss = nmiss;
         }
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID3, &varID, &levelID);
-          streamReadRecord(streamID3, field.ptr, &nmiss);
+          pstreamInqRecord(streamID3, &varID, &levelID);
+          pstreamReadRecord(streamID3, field.ptr, &nmiss);
           field.nmiss   = nmiss;
           field.grid    = vars1[varID][levelID].grid;
           field.missval = vars1[varID][levelID].missval;
@@ -166,14 +165,14 @@ void *Timselpctl(void *argument)
       if ( nrecs )
 	for ( nsets = 0; nsets < ndates; nsets++ )
 	  {
-	    nrecs = streamInqTimestep(streamID1, tsID);
+	    nrecs = pstreamInqTimestep(streamID1, tsID);
 	    if ( nrecs == 0 ) break;
 
 	    dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 
 	    for ( int recID = 0; recID < nrecs; recID++ )
 	      {
-		streamInqRecord(streamID1, &varID, &levelID);
+		pstreamInqRecord(streamID1, &varID, &levelID);
 
 		if ( tsID == 0 )
 		  {
@@ -181,7 +180,7 @@ void *Timselpctl(void *argument)
 		    recLevelID[recID] = levelID;
 		  }
 
-		streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
+		pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
 		vars1[varID][levelID].nmiss = nmiss;
                   
 		hsetAddVarLevelValues(hset, varID, levelID, &vars1[varID][levelID]);
@@ -202,7 +201,7 @@ void *Timselpctl(void *argument)
         }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
-      streamDefTimestep(streamID4, otsID);
+      pstreamDefTimestep(streamID4, otsID);
 
       for ( int recID = 0; recID < nrecords; recID++ )
 	{
@@ -211,8 +210,8 @@ void *Timselpctl(void *argument)
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	  streamDefRecord(streamID4, varID, levelID);
-	  streamWriteRecord(streamID4, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+	  pstreamDefRecord(streamID4, varID, levelID);
+	  pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;
@@ -220,7 +219,7 @@ void *Timselpctl(void *argument)
 
       for ( int i = 0; i < nskip; i++ )
 	{
-	  nrecs = streamInqTimestep(streamID1, tsID);
+	  nrecs = pstreamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 	  tsID++;
 	}
@@ -240,10 +239,10 @@ void *Timselpctl(void *argument)
   if ( recVarID   ) Free(recVarID);
   if ( recLevelID ) Free(recLevelID);
 
-  streamClose(streamID4);
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID4);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

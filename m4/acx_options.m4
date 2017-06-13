@@ -259,10 +259,44 @@ AC_ARG_WITH([cmor],
              AC_MSG_RESULT([suppressed])])
 AC_SUBST([CMOR_LIBS])
 #  ----------------------------------------------------------------------
+#  Compile application with ECCODES library (for GRIB2 support)
+ECCODES_INCLUDE=''
+ECCODES_LIBS=''
+ENABLE_GRIBAPI=no
+AC_ARG_WITH([eccodes],
+            [AS_HELP_STRING([--with-eccodes=<yes|no|directory> (default=no)],[location of ECCODES library (lib and include subdirs)])],
+            [AS_CASE(["$with_eccodes"],
+                     [no],[AC_MSG_CHECKING([for ECCODES library])
+                           AC_MSG_RESULT([suppressed])],
+                     [yes],[AC_CHECK_HEADERS([grib_api.h])
+                            AC_SEARCH_LIBS([grib_get_message],
+                                           [eccodes],
+                                           [AC_DEFINE([HAVE_LIBGRIB_API],[1],[ECCODES library is present if defined to 1])
+                                            ENABLE_GRIBAPI=yes],
+                                           [AC_MSG_ERROR([Could not link to eccodes library])])],
+                     [*],[ECCODES_ROOT=$with_eccodes
+                          AS_IF([test -d "$ECCODES_ROOT"],
+                                [LDFLAGS="-L$ECCODES_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$ECCODES_ROOT/include $CPPFLAGS"
+                                 AC_CHECK_HEADERS([grib_api.h])
+                                 AC_SEARCH_LIBS([grib_get_message],
+                                                [eccodes],
+                                                [AC_DEFINE([HAVE_LIBGRIB_API],[1],[ECCODES library is present if defined to 1])
+                                                 ENABLE_GRIBAPI=yes],
+                                                [AC_MSG_ERROR([Could not link to eccodes library])])
+                                 ECCODES_LIBS=" -L$ECCODES_ROOT/lib -leccodes"
+                                 ECCODES_INCLUDE=" -I$ECCODES_ROOT/include"],
+                                [AC_MSG_ERROR([$ECCODES_ROOT is not a directory! ECCODES suppressed])])])],
+            [AC_MSG_CHECKING([for the ECCODES library])
+             AC_MSG_RESULT([suppressed])])
+AC_SUBST([ECCODES_INCLUDE])
+AC_SUBST([ECCODES_LIBS])
+#AC_SUBST([ENABLE_GRIBAPI])
+#  ----------------------------------------------------------------------
 #  Compile application with GRIB_API library (for GRIB2 support)
 GRIB_API_INCLUDE=''
 GRIB_API_LIBS=''
-ENABLE_GRIBAPI=no
+#ENABLE_GRIBAPI=no
 AC_ARG_WITH([grib_api],
             [AS_HELP_STRING([--with-grib_api=<yes|no|directory> (default=no)],[location of GRIB_API library (lib and include subdirs)])],
             [AS_CASE(["$with_grib_api"],

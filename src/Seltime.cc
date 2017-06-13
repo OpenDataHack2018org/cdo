@@ -265,9 +265,9 @@ void *Seltime(void *argument)
       for ( i = 0; i < nsel; i++ ) selfound[i] = false;
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( nsel == 1 && operfunc == func_step )  vlistDefNtsteps(vlistID2,  1);
@@ -353,7 +353,7 @@ void *Seltime(void *argument)
 
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
@@ -434,9 +434,8 @@ void *Seltime(void *argument)
 	{
 	  if ( tsID2 == 0 )
 	    {
-	      streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-	      streamDefVlist(streamID2, vlistID2);
+	      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 
 	  if ( lnts1 && ncts == 0 )
@@ -452,7 +451,7 @@ void *Seltime(void *argument)
 		{
 		  taxisDefVdate(taxisID2, vdate_list[it]);
 		  taxisDefVtime(taxisID2, vtime_list[it]);
-		  streamDefTimestep(streamID2, tsID2++);
+		  pstreamDefTimestep(streamID2, tsID2++);
 		  
 		  for ( varID = 0; varID < nvars; varID++ )
 		    {
@@ -460,10 +459,10 @@ void *Seltime(void *argument)
 		      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
-			  streamDefRecord(streamID2, varID, levelID);
+			  pstreamDefRecord(streamID2, varID, levelID);
 			  single = vars[it][varID][levelID].ptr;
 			  nmiss  = vars[it][varID][levelID].nmiss;
-			  streamWriteRecord(streamID2, single, nmiss);
+			  pstreamWriteRecord(streamID2, single, nmiss);
 			}
 		    }
 		}
@@ -479,8 +478,7 @@ void *Seltime(void *argument)
 	    }
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
-
-	  streamDefTimestep(streamID2, tsID2++);
+	  pstreamDefTimestep(streamID2, tsID2++);
 
 	  if ( tsID > 0 && lconstout )
 	    {
@@ -493,10 +491,10 @@ void *Seltime(void *argument)
 		      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
-			  streamDefRecord(streamID2, varID, levelID);
+			  pstreamDefRecord(streamID2, varID, levelID);
 			  single = vars[nts][varID][levelID].ptr;
 			  nmiss  = vars[nts][varID][levelID].nmiss;
-			  streamWriteRecord(streamID2, single, nmiss);
+			  pstreamWriteRecord(streamID2, single, nmiss);
 			}
 		    }
 		}
@@ -504,16 +502,16 @@ void *Seltime(void *argument)
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
-	      streamDefRecord(streamID2, varID, levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
+	      pstreamDefRecord(streamID2, varID, levelID);
 	      if ( lcopy )
 		{
-		  streamCopyRecord(streamID2, streamID1);
+		  pstreamCopyRecord(streamID2, streamID1);
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, array, &nmiss);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  pstreamReadRecord(streamID1, array, &nmiss);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 		}
 	    }
 	}
@@ -559,11 +557,11 @@ void *Seltime(void *argument)
 
 	      for ( int recID = 0; recID < nrecs; recID++ )
 		{
-		  streamInqRecord(streamID1, &varID, &levelID);
+		  pstreamInqRecord(streamID1, &varID, &levelID);
 		  if ( lnts1 || (vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT) )
 		    {
 		      single = vars[nts][varID][levelID].ptr;
-		      streamReadRecord(streamID1, single, &nmiss);
+		      pstreamReadRecord(streamID1, single, &nmiss);
 		      vars[nts][varID][levelID].nmiss = nmiss;
 		    }
 		}
@@ -573,8 +571,8 @@ void *Seltime(void *argument)
       tsID++;
     }
 
-  if ( streamID2 != -1 ) streamClose(streamID2);
-  streamClose(streamID1);
+  if ( streamID2 != -1 ) pstreamClose(streamID2);
+  pstreamClose(streamID1);
  
   if ( operatorID == SELSMON )
     if ( its2 < nts2 )

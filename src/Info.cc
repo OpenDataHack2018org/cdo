@@ -271,12 +271,14 @@ void *Info(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int INFO   = cdoOperatorAdd("info",   E_PARAM,  0, NULL);
   int INFOP  = cdoOperatorAdd("infop",  E_PARAM,  0, NULL);
   int INFON  = cdoOperatorAdd("infon",  E_NAME,   0, NULL);
   int INFOC  = cdoOperatorAdd("infoc",  E_CODE,   0, NULL);
   int XINFON = cdoOperatorAdd("xinfon", E_NAME,   0, NULL);
   int MAP    = cdoOperatorAdd("map",    E_PARAM,  0, NULL);
+  // clang-format on
 
   UNUSED(INFO);
   UNUSED(INFOP);
@@ -292,9 +294,9 @@ void *Info(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      int streamID = streamOpenRead(cdoStreamName(indf));
+      int streamID = pstreamOpenRead(cdoStreamName(indf));
 
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);
 
       int nvars = vlistNvars(vlistID);
@@ -309,7 +311,7 @@ void *Info(void *argument)
 
       int indg = 0;
       int tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID, 0);
 	  int vdate = dtlist_get_vdate(dtlist, 0);
@@ -337,8 +339,8 @@ void *Info(void *argument)
 		  fprintf(stdout, "\n" );  
 		}
 
-	      streamInqRecord(streamID, &varID, &levelID);
-	      streamReadRecord(streamID, array, &nmiss);
+	      pstreamInqRecord(streamID, &varID, &levelID);
+	      pstreamReadRecord(streamID, array, &nmiss);
 
               infostat_type *infostatp = &infostat[varID];
               indg = (operatorID == XINFON) ? varID+1 : indg + 1;
@@ -525,7 +527,7 @@ void *Info(void *argument)
 	  tsID++;
 	}
 
-      streamClose(streamID);
+      pstreamClose(streamID);
 
       if ( array ) Free(array);
       if ( infostat ) Free(infostat);

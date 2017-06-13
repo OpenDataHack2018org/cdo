@@ -72,9 +72,12 @@ void *EOF3d(void * argument)
     }
 
   cdoInitialize(argument);
+
+  // clang-format off
   cdoOperatorAdd("eof3d",        EOF3D_,        0, NULL);
   cdoOperatorAdd("eof3dtime",    EOF3D_TIME,    0, NULL);
   cdoOperatorAdd("eof3dspatial", EOF3D_SPATIAL, 0, NULL);
+  // clang-format on
 
   int operatorID  = cdoOperatorID();
   int operfunc    = cdoOperatorF1(operatorID);

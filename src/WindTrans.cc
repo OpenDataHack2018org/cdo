@@ -242,9 +242,9 @@ void *DestaggerUV()
 
   if ( cdoDebugExt ) cdoPrint("destagGridOffsets = (%01.1f,%01.1f)", destagGridOffsets[0],destagGridOffsets[1]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -460,7 +460,7 @@ void *DestaggerUV()
       ovar = (double *) Malloc(gridsize*sizeof(double));
     } // end of  if (!lcopy)
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   if ( varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID )
     {
@@ -468,14 +468,14 @@ void *DestaggerUV()
       vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
     }
 
-  streamDefVlist(streamID2, vlistID2);  // from this point the stream is using a different vlistID !!!!!
-  vlistID2 = streamInqVlist(streamID2); // refresh it
+  pstreamDefVlist(streamID2, vlistID2);  // from this point the stream is using a different vlistID !!!!!
+  vlistID2 = pstreamInqVlist(streamID2); // refresh it
   
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       if ( !lcopy && cdoDebugExt )
         {
@@ -485,7 +485,7 @@ void *DestaggerUV()
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID1, &varID, &levelID);
+          pstreamInqRecord(streamID1, &varID, &levelID);
           int param = vlistInqVarParam(vlistID1, varID);
           int pnum, pcat, pdis;
           cdiDecodeParam(param, &pnum, &pcat, &pdis);
@@ -531,7 +531,7 @@ void *DestaggerUV()
               if (UorV>=0)  // re-check again since it could mean that current record with U or V is not staggered
                 {
                   int nmiss;
-                  streamReadRecord(streamID1, ivar, &nmiss);
+                  pstreamReadRecord(streamID1, ivar, &nmiss);
                   // read the original record with staggered u or v
                   gridsize = gridInqSize(gridID1);
 
@@ -557,25 +557,25 @@ void *DestaggerUV()
                   // cdo uvDestag: Grid info: (dxU; dyU) = (0.00; 0.05); (dxV; dyV) = (0.05; 0.00)
                   if ( cdoDebugExt>=20 ) cdoPrint("Setting GRID id from: %d => to: %d", vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID) );
 
-                  streamDefRecord(streamID2, varID, levelID);
-                  streamWriteRecord(streamID2, ovar, nmiss);
+                  pstreamDefRecord(streamID2, varID, levelID);
+                  pstreamWriteRecord(streamID2, ovar, nmiss);
                 }
               else
                 {   // copy the record to the output unchanged...
-                  streamDefRecord(streamID2, varID, levelID);
+                  pstreamDefRecord(streamID2, varID, levelID);
                   if ( cdoDebugExt>=20 )
                     cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
                              recID, tsID, varID, code, ltype, level, levelID);
-                  streamCopyRecord(streamID2, streamID1);
+                  pstreamCopyRecord(streamID2, streamID1);
                 }
             }  // end of: if (!lcopy)
           else
             {   // copy the record to the output unchanged...
-              streamDefRecord(streamID2, varID, levelID);
+              pstreamDefRecord(streamID2, varID, levelID);
               if ( cdoDebugExt>=20 )
                 cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
                          recID, tsID, varID, code, ltype, level, levelID);
-              streamCopyRecord(streamID2, streamID1);
+              pstreamCopyRecord(streamID2, streamID1);
             }
 
         } // end of for ( recID = ...
@@ -583,8 +583,8 @@ void *DestaggerUV()
         tsID++;
     } // end of while ( (nrecs ...
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( ivar ) Free(ivar);
   if ( ovar ) Free(ovar);
@@ -1103,9 +1103,9 @@ void *TransformUV(int operatorID)
 	chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
@@ -1190,24 +1190,23 @@ void *TransformUV(int operatorID)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
-  vlistID2 = streamInqVlist(streamID2); // refresh it
+  pstreamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
+  vlistID2 = pstreamInqVlist(streamID2); // refresh it
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       if ( cdoDebugExt )
         cdoPrint("About to read U & V data to memory. Other data will be stream-copied to the output file.");
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID1, &varID, &levelID);
+          pstreamInqRecord(streamID1, &varID, &levelID);
           code    = vlistInqVarCode(vlistID1, varID);
           zaxisID = vlistInqVarZaxis(vlistID1, varID);
           ltype   = zaxis2ltype(zaxisID);
@@ -1218,12 +1217,12 @@ void *TransformUV(int operatorID)
               recVarID[recID]   = -1;  // We will NOT record/store this field in memory
               recLevelID[recID] = -1;
               // We will stream-copy this data
-              streamDefRecord(streamID2, varID, levelID);
+              pstreamDefRecord(streamID2, varID, levelID);
               //if ( cdoDebugExt>10 ) cdoPrint("Copying data record.. %05d (timestep:%05d)", recID, tsID);
               if ( cdoDebugExt>=20 )
                 cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
                          recID, tsID, varID, code, ltype, level, levelID);
-              streamCopyRecord(streamID2, streamID1);  // cannot do this ! We have to set the flag uvGridRelative = 0
+              pstreamCopyRecord(streamID2, streamID1);  // cannot do this ! We have to set the flag uvGridRelative = 0
             }
           else
             {
@@ -1235,7 +1234,7 @@ void *TransformUV(int operatorID)
               if ( cdoDebugExt>=10 )
                 cdoPrint("Memmory-read data record:   %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
                          recID, tsID, varID, code, ltype, level, levelID);
-              streamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
+              pstreamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
               if ( varnmiss[varID][levelID] )
                 cdoAbort("Missing values unsupported for this operator!");
             }
@@ -1414,16 +1413,16 @@ void *TransformUV(int operatorID)
               offset   = gridsize*levelID;
               single   = vardata[varID] + offset;
 
-              streamDefRecord(streamID2, varID,  levelID);
-              streamWriteRecord(streamID2, single, varnmiss[varID][levelID]);
+              pstreamDefRecord(streamID2, varID,  levelID);
+              pstreamWriteRecord(streamID2, single, varnmiss[varID][levelID]);
             }
         }
 
       tsID++;
-    } // end of while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+    } // end of while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
   
   if ( gridIDcurvl != -1 )
     gridDestroy(gridIDcurvl);  // at the end must Free the allocated curvilinear grid definition...

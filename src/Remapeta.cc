@@ -250,9 +250,11 @@ void *Remapeta(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int REMAPETA  = cdoOperatorAdd("remapeta",   0, 0, "VCT file name");
   int REMAPETAS = cdoOperatorAdd("remapeta_s", 0, 0, "VCT file name");
   int REMAPETAZ = cdoOperatorAdd("remapeta_z", 0, 0, "VCT file name");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 
@@ -281,7 +283,7 @@ void *Remapeta(void *argument)
     for ( i = 0; i < nhlevf2+1; ++i )
       cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2/2+i]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   if ( operatorArgc() == 2 )
     {
@@ -289,18 +291,18 @@ void *Remapeta(void *argument)
 
       const char *fname = operatorArgv()[1];
       argument_t *fileargument = file_argument_new(fname);
-      int streamID = streamOpenRead(fileargument);
+      int streamID = pstreamOpenRead(fileargument);
       file_argument_free(fileargument);
 
-      int vlistID1 = streamInqVlist(streamID);
+      int vlistID1 = pstreamInqVlist(streamID);
 
-      streamInqRecord(streamID, &varID, &levelID);
+      pstreamInqRecord(streamID, &varID, &levelID);
       int gridID  = vlistInqVarGrid(vlistID1, varID);
       nfis2gp = gridInqSize(gridID);
 
       fis2 = (double*) Malloc(nfis2gp*sizeof(double));
 
-      streamReadRecord(streamID, fis2, &nmiss);
+      pstreamReadRecord(streamID, fis2, &nmiss);
 
       if ( nmiss )
 	{
@@ -325,10 +327,10 @@ void *Remapeta(void *argument)
       if ( minval < -1.e10 || maxval > 1.e10 )
 	cdoAbort("%s out of range!", var_stdname(surface_geopotential));
 
-      streamClose(streamID); 
+      pstreamClose(streamID); 
     }
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -375,9 +377,8 @@ void *Remapeta(void *argument)
       cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1/2+i]);
 
   
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
 
   if ( zaxisIDh == -1 )
@@ -542,18 +543,18 @@ void *Remapeta(void *argument)
   if ( cdoVerbose ) cdoPrint("nvars3D = %d   ltq = %d", nvars3D, (int)ltq);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  int zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	  int nlevel  = zaxisInqSize(zaxisID);
 	  int offset = gridsize*levelID;
-	  streamReadRecord(streamID1, array, &nmiss);
+	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  if ( zaxisIDh != -1 )
 	    {
@@ -582,14 +583,14 @@ void *Remapeta(void *argument)
 		}
 	      else
 		{
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 		}
 	    }
 	  else
 	    {
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, array, nmiss);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, array, nmiss);
 	    }
 	}
 
@@ -663,8 +664,8 @@ void *Remapeta(void *argument)
 	  varID   = sgeopotID;
 	  levelID = 0;
 	  setmissval(gridsize, imiss, missval, fis2);
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, fis2, nmissout);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, fis2, nmissout);
 	}
 
       if ( zaxisIDh != -1 && lnpsID != -1 )
@@ -675,8 +676,8 @@ void *Remapeta(void *argument)
 	  varID   = presID;
 	  levelID = 0;
 	  setmissval(gridsize, imiss, missval, ps2);
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, ps2, nmissout);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, ps2, nmissout);
 	}
 
       if ( ltq )
@@ -694,8 +695,8 @@ void *Remapeta(void *argument)
 			   levelID+1, minval, maxval);
 
 	      setmissval(gridsize, imiss, missval, single2);
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, single2, nmissout);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, single2, nmissout);
 	    }
 
 	  varID = sqID;
@@ -716,8 +717,8 @@ void *Remapeta(void *argument)
 			   levelID+1, minval, maxval);
 
 	      setmissval(gridsize, imiss, missval, single2);
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, single2, nmissout);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, single2, nmissout);
 	    }
 	}
 
@@ -772,16 +773,16 @@ void *Remapeta(void *argument)
 		}
 
 	      setmissval(gridsize, imiss, missval, single2);
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, single2, nmissout);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, single2, nmissout);
 	    }
 	}
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( nvars3D )
     {

@@ -246,7 +246,7 @@ void *Ensval(void *argument)
 	{
 	  for ( fileID = 0; fileID < nfiles; fileID++ ) 
 	    {
-	      streamInqRecord(fileID, &varID, &levelID);
+	      pstreamInqRecord(fileID, &varID, &levelID);
 	      
 	      if ( fileID == 0 )
 		{

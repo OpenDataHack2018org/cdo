@@ -161,7 +161,7 @@ void *Comp(void *argument)
   vlistDefTaxis(vlistID3, taxisID3);
 
   int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamIDx1, tsID)) )

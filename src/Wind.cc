@@ -65,9 +65,9 @@ void *Wind(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -293,9 +293,9 @@ void *Wind(void *argument)
 	}
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
@@ -314,19 +314,18 @@ void *Wind(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( (varID1 != -1 && varID2 != -1) && (varID == varID1 || varID == varID2) )
 	    {
-	      streamReadRecord(streamID1, array1, &nmiss);
+	      pstreamReadRecord(streamID1, array1, &nmiss);
 	      if ( nmiss ) cdoAbort("Missing values unsupported for spectral data!");
 
 	      gridsize = gridInqSize(gridID1);
@@ -339,15 +338,15 @@ void *Wind(void *argument)
 	    }   
 	  else
 	    {
-	      streamDefRecord(streamID2, varID, levelID);
+	      pstreamDefRecord(streamID2, varID, levelID);
 	      if ( lcopy )
 		{
-		  streamCopyRecord(streamID2, streamID1);
+		  pstreamCopyRecord(streamID2, streamID1);
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, array1, &nmiss);
-		  streamWriteRecord(streamID2, array1, nmiss);
+		  pstreamReadRecord(streamID1, array1, &nmiss);
+		  pstreamWriteRecord(streamID2, array1, nmiss);
 		}
 	    }
 	}
@@ -370,14 +369,14 @@ void *Wind(void *argument)
 	      for ( levelID = 0; levelID < nlev; levelID++ )
 		{
 		  offset = gridsize*levelID;
-		  streamDefRecord(streamID2, varID2, levelID);
-		  streamWriteRecord(streamID2, ovar2+offset, 0);
+		  pstreamDefRecord(streamID2, varID2, levelID);
+		  pstreamWriteRecord(streamID2, ovar2+offset, 0);
 		}
 	      for ( levelID = 0; levelID < nlev; levelID++ )
 		{
 		  offset = gridsize*levelID;
-		  streamDefRecord(streamID2, varID1, levelID);
-		  streamWriteRecord(streamID2, ovar1+offset, 0);
+		  pstreamDefRecord(streamID2, varID1, levelID);
+		  pstreamWriteRecord(streamID2, ovar1+offset, 0);
 		}
 	    }
 	  else if ( operatorID == DV2UV || operatorID == DV2UVL )
@@ -385,14 +384,14 @@ void *Wind(void *argument)
 	      for ( levelID = 0; levelID < nlev; levelID++ )
 		{
 		  offset = gridsize*levelID;
-		  streamDefRecord(streamID2, varID1, levelID);
-		  streamWriteRecord(streamID2, ovar1+offset, 0);
+		  pstreamDefRecord(streamID2, varID1, levelID);
+		  pstreamWriteRecord(streamID2, ovar1+offset, 0);
 		}
 	      for ( levelID = 0; levelID < nlev; levelID++ )
 		{
 		  offset = gridsize*levelID;
-		  streamDefRecord(streamID2, varID2, levelID);
-		  streamWriteRecord(streamID2, ovar2+offset, 0);
+		  pstreamDefRecord(streamID2, varID2, levelID);
+		  pstreamWriteRecord(streamID2, ovar2+offset, 0);
 		}
 	    }
 	}
@@ -400,8 +399,8 @@ void *Wind(void *argument)
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array1 ) Free(array1);
 

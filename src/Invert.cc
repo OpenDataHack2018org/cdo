@@ -287,20 +287,22 @@ void *Invert(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("invertlat",     func_all, func_lat, NULL);
   cdoOperatorAdd("invertlon",     func_all, func_lon, NULL);
   cdoOperatorAdd("invertlatdes",  func_hrd, func_lat, NULL);
   cdoOperatorAdd("invertlondes",  func_hrd, func_lon, NULL);
   cdoOperatorAdd("invertlatdata", func_fld, func_lat, NULL);
   cdoOperatorAdd("invertlondata", func_fld, func_lon, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc1 = cdoOperatorF1(operatorID);
   int operfunc2 = cdoOperatorF2(operatorID);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -313,9 +315,9 @@ void *Invert(void *argument)
       else                         invertLonDes(vlistID2);
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -323,18 +325,18 @@ void *Invert(void *argument)
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array1, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  streamDefRecord(streamID2, varID, levelID);
+	  pstreamDefRecord(streamID2, varID, levelID);
 
 	  if ( operfunc1 == func_all || operfunc1 == func_fld )
 	    {
@@ -345,18 +347,18 @@ void *Invert(void *argument)
 	      else
 		invertLonData(array1, array2, gridID1);
 
-	      streamWriteRecord(streamID2, array2, nmiss);     
+	      pstreamWriteRecord(streamID2, array2, nmiss);     
 	    }
 	  else
 	    {
-	      streamWriteRecord(streamID2, array1, nmiss);     
+	      pstreamWriteRecord(streamID2, array1, nmiss);     
 	    }
 	}
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);

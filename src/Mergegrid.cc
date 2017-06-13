@@ -165,15 +165,15 @@ void *Mergegrid(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
 
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID2 = pstreamInqVlist(streamID2);
 
   vlistCompare(vlistID1, vlistID2, CMP_NAME | CMP_NLEVEL);
 
@@ -205,34 +205,34 @@ void *Mergegrid(void *argument)
 
   int vlistID3 = vlistDuplicate(vlistID1);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   vlistDefTaxis(vlistID3, taxisID3);
-  streamDefVlist(streamID3, vlistID3);
+  pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID3, taxisID1);
 
-      int nrecs2 = streamInqTimestep(streamID2, tsID);
+      int nrecs2 = pstreamInqTimestep(streamID2, tsID);
       if ( nrecs2 == 0 )
 	cdoAbort("Input streams have different number of timesteps!");
 
       if ( nrecs != nrecs2 )
 	cdoAbort("Input streams have different number of records!");
 
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID2, &varID, &levelID);
-	  streamReadRecord(streamID2, array2, &nmiss2);
+	  pstreamInqRecord(streamID2, &varID, &levelID);
+	  pstreamReadRecord(streamID2, array2, &nmiss2);
 
 	  double missval2 = vlistInqVarMissval(vlistID2, varID);
 
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array1, &nmiss1);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array1, &nmiss1);
 
 	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 
@@ -251,16 +251,16 @@ void *Mergegrid(void *argument)
 		if ( DBL_IS_EQUAL(array1[i], missval1) ) nmiss1++;
 	    }
 
-	  streamDefRecord(streamID3, varID, levelID);
-	  streamWriteRecord(streamID3, array1, nmiss1);
+	  pstreamDefRecord(streamID3, varID, levelID);
+	  pstreamWriteRecord(streamID3, array1, nmiss1);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
  
   if ( gindex ) Free(gindex);
   if ( array2 ) Free(array2);

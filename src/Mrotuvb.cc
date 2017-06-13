@@ -266,11 +266,11 @@ void *Mrotuvb(void *argument)
   if ( operatorArgc() == 1 )
     if ( strcmp(operatorArgv()[0], "noint") == 0 ) gpint = false;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
 
   int nvars = vlistNvars(vlistID1);
   if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoStreamName(0)->args);
@@ -379,9 +379,8 @@ void *Mrotuvb(void *argument)
 
   if ( cdoVerbose ) vlistPrint(vlistID3);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(streamID3, vlistID3);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID3);
 
   double missval1 = vlistInqVarMissval(vlistID1, 0);
   double missval2 = vlistInqVarMissval(vlistID2, 0);
@@ -400,23 +399,23 @@ void *Mrotuvb(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID3, taxisID1);
 
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
-      nrecs2 = streamInqTimestep(streamID2, tsID);
+      nrecs2 = pstreamInqTimestep(streamID2, tsID);
 
       if ( nrecs != nrecs2 ) cdoAbort("Input streams have different number of levels!");
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID1, &levelID);
-	  streamInqRecord(streamID2, &varID2, &levelID);
+	  pstreamInqRecord(streamID1, &varID1, &levelID);
+	  pstreamInqRecord(streamID2, &varID2, &levelID);
 
-	  streamReadRecord(streamID1, ufield, &nmiss1);
-	  streamReadRecord(streamID2, vfield, &nmiss2);
+	  pstreamReadRecord(streamID1, ufield, &nmiss1);
+	  pstreamReadRecord(streamID2, vfield, &nmiss2);
 
 	  /* remove missing values */
 	  if ( nmiss1 || nmiss2 )
@@ -489,18 +488,18 @@ void *Mrotuvb(void *argument)
 	  */
 	  nmiss1 = 0;
 	  nmiss2 = 0;
-	  streamDefRecord(streamID3, 0, levelID);
-	  streamWriteRecord(streamID3, urfield, nmiss1);     
-	  streamDefRecord(streamID3, 1, levelID);
-	  streamWriteRecord(streamID3, vrfield, nmiss2);     
+	  pstreamDefRecord(streamID3, 0, levelID);
+	  pstreamWriteRecord(streamID3, urfield, nmiss1);     
+	  pstreamDefRecord(streamID3, 1, levelID);
+	  pstreamWriteRecord(streamID3, vrfield, nmiss2);     
 	}
 
       tsID++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( ufield  ) Free(ufield);
   if ( vfield  ) Free(vfield);

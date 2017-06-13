@@ -52,23 +52,23 @@ void *Fourier(void *argument)
   operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse transformation)!");
   int sign = parameter2int(operatorArgv()[0]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
 	{
@@ -85,11 +85,11 @@ void *Fourier(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(2*gridsize*sizeof(double));
-	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
+	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
 
@@ -177,7 +177,7 @@ void *Fourier(void *argument)
     {
       taxisDefVdate(taxisID2, vdate[tsID]);
       taxisDefVtime(taxisID2, vtime[tsID]);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -187,8 +187,8 @@ void *Fourier(void *argument)
 	      if ( vars[tsID][varID][levelID].ptr )
 		{
 		  nmiss = vars[tsID][varID][levelID].nmiss;
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 		  Free(vars[tsID][varID][levelID].ptr);
 		  vars[tsID][varID][levelID].ptr = NULL;
 		}
@@ -202,8 +202,8 @@ void *Fourier(void *argument)
   if ( vdate ) Free(vdate);
   if ( vtime ) Free(vtime);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

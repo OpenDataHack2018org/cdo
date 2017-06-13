@@ -37,10 +37,12 @@ void *Histogram(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int HISTCOUNT = cdoOperatorAdd("histcount", 0, 0, NULL);
   int HISTSUM   = cdoOperatorAdd("histsum",   0, 0, NULL);
   int HISTMEAN  = cdoOperatorAdd("histmean",  0, 0, NULL);
   int HISTFREQ  = cdoOperatorAdd("histfreq",  0, 0, NULL);
+  // clang-format on
 
   UNUSED(HISTSUM);
 
@@ -60,9 +62,9 @@ void *Histogram(void *argument)
 	printf("flt %d = %g\n", i+1, fltarr[i]);
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
   int vlistID2 = vlistDuplicate(vlistID1);
@@ -91,12 +93,12 @@ void *Histogram(void *argument)
       vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID2);
   double **vardata   = (double **) Malloc(nvars*sizeof(double *));
@@ -117,14 +119,14 @@ void *Histogram(void *argument)
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID1 = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array, &nmiss);
 	  missval = vlistInqVarMissval(vlistID1, varID);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -158,7 +160,7 @@ void *Histogram(void *argument)
     }
 
 
-  streamDefTimestep(streamID2, 0);
+  pstreamDefTimestep(streamID2, 0);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -195,17 +197,17 @@ void *Histogram(void *argument)
 		}
 	    }
 
-	  streamDefRecord(streamID2,  varID,  index);
+	  pstreamDefRecord(streamID2,  varID,  index);
 
 	  if ( operatorID == HISTCOUNT )
-	    streamWriteRecord(streamID2, varcount[varID]+offset, nmiss);
+	    pstreamWriteRecord(streamID2, varcount[varID]+offset, nmiss);
 	  else
-	    streamWriteRecord(streamID2, vardata[varID]+offset, nmiss);
+	    pstreamWriteRecord(streamID2, vardata[varID]+offset, nmiss);
 	}
     }
   
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   if ( vardata )
     {

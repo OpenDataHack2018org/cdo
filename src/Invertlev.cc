@@ -99,9 +99,9 @@ void *Invertlev(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -110,9 +110,9 @@ void *Invertlev(void *argument)
 
   if ( operfunc == func_all || operfunc == func_hrd ) invertLevDes(vlistID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -146,15 +146,15 @@ void *Invertlev(void *argument)
   if ( linvert == false ) cdoWarning("No variables with invertable levels found!");
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( vardata[varID] )
 	    {    
@@ -162,20 +162,20 @@ void *Invertlev(void *argument)
 	      gridsize = gridInqSize(gridID);
 	      offset   = gridsize*levelID;
 
-	      streamReadRecord(streamID1, vardata[varID]+offset, &nmiss);
+	      pstreamReadRecord(streamID1, vardata[varID]+offset, &nmiss);
 	      varnmiss[varID][levelID] = nmiss;
 	    }
 	  else
 	    {
-	      streamDefRecord(streamID2, varID, levelID);
+	      pstreamDefRecord(streamID2, varID, levelID);
 	      if ( lcopy )
 		{
-		  streamCopyRecord(streamID2, streamID1); 
+		  pstreamCopyRecord(streamID2, streamID1); 
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, array, &nmiss);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  pstreamReadRecord(streamID1, array, &nmiss);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 		}
 	    }
 	}
@@ -190,12 +190,12 @@ void *Invertlev(void *argument)
 	      nlevel   = zaxisInqSize(zaxisID);
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  streamDefRecord(streamID2, varID, levelID);
+		  pstreamDefRecord(streamID2, varID, levelID);
 
 		  offset = gridsize*(nlevel-levelID-1);
 		  nmiss = varnmiss[varID][nlevel-levelID-1];
 
-		  streamWriteRecord(streamID2, vardata[varID]+offset, nmiss);
+		  pstreamWriteRecord(streamID2, vardata[varID]+offset, nmiss);
 		}   
 	    }
 	}
@@ -203,8 +203,8 @@ void *Invertlev(void *argument)
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array ) Free(array);
 

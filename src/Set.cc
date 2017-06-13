@@ -94,9 +94,9 @@ void *Set(void *argument)
       newlevel = parameter2double(operatorArgv()[0]);
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
   /* vlistPrint(vlistID2);*/
 
@@ -161,34 +161,34 @@ void *Set(void *argument)
 	}
     }
 
-  /* vlistPrint(vlistID2);*/
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  // vlistPrint(vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID1 = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID1);
+      pstreamDefTimestep(streamID2, tsID1);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamDefRecord(streamID2,  varID,  levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamDefRecord(streamID2,  varID,  levelID);
 	  
-	  streamReadRecord(streamID1, array, &nmiss);
-	  streamWriteRecord(streamID2, array, nmiss);
+	  pstreamReadRecord(streamID1, array, &nmiss);
+	  pstreamWriteRecord(streamID2, array, nmiss);
 	}
+
       tsID1++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array ) Free(array);
 

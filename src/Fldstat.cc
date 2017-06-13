@@ -61,9 +61,8 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
           {
             if ( DBL_IS_EQUAL(fieldptr[j*nlon+i], sglval) )
               {
-                double xval, yval;
-                xval = gridInqXval(gridID,i);
-                yval = gridInqYval(gridID,j);
+                double xval = gridInqXval(gridID,i);
+                double yval = gridInqYval(gridID,j);
                 if ( showHeader )
                   {
                     if ( operfunc == func_min )
@@ -90,10 +89,10 @@ void *Fldstat(void *argument)
   int varID, levelID;
   int nmiss;
   double sglval;
-  field_type field;
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("fldrange", func_range,  0, NULL);
   cdoOperatorAdd("fldmin",   func_min,    0, NULL);
   cdoOperatorAdd("fldmax",   func_max,    0, NULL);
@@ -105,6 +104,7 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldvar",   func_varw,   1, NULL);
   cdoOperatorAdd("fldvar1",  func_var1w,  1, NULL);
   cdoOperatorAdd("fldpctl",  func_pctl,   0, NULL);
+  // clang-format on
 
   int operatorID  = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -136,9 +136,9 @@ void *Fldstat(void *argument)
 	}
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -167,10 +167,11 @@ void *Fldstat(void *argument)
   for ( index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
+  field_type field;
   field_init(&field);
 
   int lim = vlistGridsizeMax(vlistID1);
@@ -187,10 +188,10 @@ void *Fldstat(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       /* Precompute date + time for later representation in verbose mode */
       int vdate = 0, vtime = 0;
@@ -205,8 +206,8 @@ void *Fldstat(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
 
           field.nmiss   = (size_t)nmiss;
           field.grid = vlistInqVarGrid(vlistID1, varID);
@@ -243,15 +244,15 @@ void *Fldstat(void *argument)
 	  else
 	    nmiss = 0;
 
-	  streamDefRecord(streamID2, varID,  levelID);
-	  streamWriteRecord(streamID2, &sglval, nmiss);
+	  pstreamDefRecord(streamID2, varID,  levelID);
+	  pstreamWriteRecord(streamID2, &sglval, nmiss);
 	}
       tsID++;
     }
 
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

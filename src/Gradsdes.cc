@@ -23,7 +23,7 @@
 
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h" /* VERSION */
+#include "config.h" /* VERSION */
 #endif
 
 #include <cdi.h>
@@ -946,7 +946,6 @@ void *Gradsdes(void *argument)
   int varID;
   int levelID;
   int nrecs;
-  int vdate, vtime;
   char *idxfile = NULL;
   char varname[CDI_MAX_NAME];
   bool yrev = false;
@@ -978,8 +977,10 @@ void *Gradsdes(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int GRADSDES = cdoOperatorAdd("gradsdes",  0, 0, NULL);
   int DUMPMAP  = cdoOperatorAdd("dumpmap",   0, 0, NULL);
+  // clang-format on
 
   UNUSED(GRADSDES);
 
@@ -1019,16 +1020,16 @@ void *Gradsdes(void *argument)
     cdoAbort("GrADS GRIB map version %d requires size of off_t to be 8! The size of off_t is %ld.",
              map_version, sizeof(off_t));
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   int nvars   = vlistNvars(vlistID);
   int ntsteps = vlistNtsteps(vlistID);
   int ngrids  = vlistNgrids(vlistID);
 
-  int filetype  = streamInqFiletype(streamID);
-  int byteorder = streamInqByteorder(streamID);
+  int filetype  = pstreamInqFiletype(streamID);
+  int byteorder = pstreamInqByteorder(streamID);
 
   if ( filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 ) filetype = CDI_FILETYPE_NC;
 
@@ -1202,10 +1203,10 @@ void *Gradsdes(void *argument)
   bool cal365day = (taxisInqCalendar(taxisID) == CALENDAR_365DAYS);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID);
-      vtime = taxisInqVtime(taxisID);
+      int vdate = taxisInqVdate(taxisID);
+      int vtime = taxisInqVtime(taxisID);
 
       if ( tsID == 0 )
         {
@@ -1308,14 +1309,14 @@ void *Gradsdes(void *argument)
 
           for ( int recID = 0; recID < nrecs; recID++ )
             {
-              streamInqRecord(streamID, &varID, &levelID);
+              pstreamInqRecord(streamID, &varID, &levelID);
               if ( vars[varID] == TRUE )
                 {
-                  streamReadRecord(streamID, array, &nmiss);
+                  pstreamReadRecord(streamID, array, &nmiss);
 
                   index = (tsID*nrecsout + recoffset[varID] + levelID);
 
-                  streamInqGRIBinfo(streamID, &intnum[index], &fltnum[index*3], &bignum[index*2]);
+                  pstreamInqGRIBinfo(streamID, &intnum[index], &fltnum[index*3], &bignum[index*2]);
 
                   if ( map_version != 4 )
                     {
@@ -1397,7 +1398,7 @@ void *Gradsdes(void *argument)
       // write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum, bignum);
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   if ( ctlfile ) Free(ctlfile);
   if ( idxfile ) Free(idxfile);

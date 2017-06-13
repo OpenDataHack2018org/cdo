@@ -49,8 +49,8 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
                 if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
 
               // if ( levelID2c == 0 ) printf("Write varID %d\n", varID2c);
-              streamDefRecord(streamID2, varID2c, levelID2c);
-              streamWriteRecord(streamID2, pdata, nmiss);
+              pstreamDefRecord(streamID2, varID2c, levelID2c);
+              pstreamWriteRecord(streamID2, pdata, nmiss);
             }
           Free(vardata2[varID2c]);
           vardata2[varID2c] = NULL;
@@ -186,9 +186,9 @@ void *Select(void *argument)
       if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, (indf+1.)/nfiles);
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
 
-      int streamID1 = streamOpenRead(cdoStreamName(indf));
+      int streamID1 = pstreamOpenRead(cdoStreamName(indf));
 
-      int vlistID1 = streamInqVlist(streamID1);
+      int vlistID1 = pstreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       bool lcopy_const = false;
@@ -428,7 +428,7 @@ void *Select(void *argument)
 	  //if ( cdoVerbose ) vlistPrint(vlistID0);
 
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID0);
+	  cdoVlistCopyFlag(vlistID2, vlistID0);
 
 	  //if ( cdoVerbose ) vlistPrint(vlistID2);
 
@@ -505,7 +505,7 @@ void *Select(void *argument)
 
       bool lstop = false;
       int tsID1 = 0;
-      while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
+      while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
 	{
           timestep++;
 	  bool copytimestep = true;
@@ -599,16 +599,16 @@ void *Select(void *argument)
                   bool lasttimestep = (nfiles == 1) && (ntsteps2 > 1) && (ntsteps2 == (tsID1+1));
                   if ( lasttimestep && tsID2 == 0 ) ntsteps2 = 1;
                   if ( ntsteps2 == 0 || ntsteps2 == 1 ) vlistDefNtsteps(vlistID2, ntsteps2);
-		  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-		  streamDefVlist(streamID2, vlistID2);
+		  streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+		  pstreamDefVlist(streamID2, vlistID2);
 		}
 
 	      taxisCopyTimestep(taxisID2, taxisID1);
-	      streamDefTimestep(streamID2, tsID2);
+	      pstreamDefTimestep(streamID2, tsID2);
               
 	      for ( int recID = 0; recID < nrecs; ++recID )
 		{
-		  streamInqRecord(streamID1, &varID, &levelID);
+		  pstreamInqRecord(streamID1, &varID, &levelID);
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
                       if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
@@ -621,17 +621,17 @@ void *Select(void *argument)
                       if ( lcopy_const && tsID2 == 0 )
                         write_const_vars(streamID2, vlistID2, varID2, vardata2);
 
-                      streamDefRecord(streamID2, varID2, levelID2);
+                      pstreamDefRecord(streamID2, varID2, levelID2);
                       // if ( levelID2 == 0 ) printf("Write varID %d\n", varID2);
 		      if ( lcopy )
 			{
-			  streamCopyRecord(streamID2, streamID1);
+			  pstreamCopyRecord(streamID2, streamID1);
 			}
 		      else
 			{
                           int nmiss;
-			  streamReadRecord(streamID1, array, &nmiss);
-			  streamWriteRecord(streamID2, array, nmiss);
+			  pstreamReadRecord(streamID1, array, &nmiss);
+			  pstreamWriteRecord(streamID2, array, nmiss);
 			}
 		    }
 		}
@@ -645,7 +645,7 @@ void *Select(void *argument)
             {
 	      for ( int recID = 0; recID < nrecs; ++recID )
 		{
-		  streamInqRecord(streamID1, &varID, &levelID);
+		  pstreamInqRecord(streamID1, &varID, &levelID);
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
 		      int varID2 = vlistFindVar(vlistID2, varID);
@@ -659,7 +659,7 @@ void *Select(void *argument)
                               vardata2[varID2] = (double*) Malloc(gridsize*nlevel*sizeof(double));
                             }
                           int nmiss;
-                          streamReadRecord(streamID1, vardata2[varID2]+gridsize*levelID2, &nmiss);
+                          pstreamReadRecord(streamID1, vardata2[varID2]+gridsize*levelID2, &nmiss);
                         }
 		    }
 		}
@@ -668,7 +668,7 @@ void *Select(void *argument)
 	  tsID1++;
 	}
       
-      streamClose(streamID1);
+      pstreamClose(streamID1);
 
       if ( lstop ) break;
     }
@@ -689,7 +689,7 @@ void *Select(void *argument)
   SELLIST_CHECK_FLAG(season);
   SELLIST_CHECK_FLAG(date);
 
-  if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);
+  if ( streamID2 != CDI_UNDEFID ) pstreamClose(streamID2);
 
   vlistDestroy(vlistID0);
   vlistDestroy(vlistID2);

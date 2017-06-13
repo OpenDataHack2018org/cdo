@@ -45,9 +45,9 @@ void *Seloperator(void *argument)
   if ( operatorArgc() == 3 )
     slevel = parameter2double(operatorArgv()[2]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
@@ -89,15 +89,14 @@ void *Seloperator(void *argument)
     cdoWarning("Code %d, ltype %d, level %g not found!", scode, sltype, slevel);
 
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   if ( ! lcopy )
     {
@@ -106,30 +105,29 @@ void *Seloperator(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
 	    {
 	      varID2   = vlistFindVar(vlistID2, varID);
 	      levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
-	      streamDefRecord(streamID2, varID2, levelID2);
+	      pstreamDefRecord(streamID2, varID2, levelID2);
 	  
 	      if ( lcopy )
 		{
-		  streamCopyRecord(streamID2, streamID1);
+		  pstreamCopyRecord(streamID2, streamID1);
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, array, &nmiss);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  pstreamReadRecord(streamID1, array, &nmiss);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 		}
 	    }
 	}
@@ -137,8 +135,8 @@ void *Seloperator(void *argument)
       tsID++;
     }
 
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   vlistDestroy(vlistID2);
 

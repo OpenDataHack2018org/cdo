@@ -49,11 +49,11 @@ void *Intyear(void *argument)
 
   int *streamIDs = (int*) Malloc(nyears*sizeof(int));
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -74,7 +74,7 @@ void *Intyear(void *argument)
 
   const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   for ( int iy = 0; iy < nyears; iy++ )
     {
@@ -83,18 +83,18 @@ void *Intyear(void *argument)
 	sprintf(filename+nchars+4, "%s", filesuffix);
 
       argument_t *fileargument = file_argument_new(filename);
-      streamIDs[iy] = streamOpenWrite(fileargument, cdoFiletype());
+      streamIDs[iy] = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
-      streamDefVlist(streamIDs[iy], vlistID3);
+      pstreamDefVlist(streamIDs[iy], vlistID3);
     }
 
   int tsID = 0;
   while ( TRUE )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
+      nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
-      nrecs = streamInqTimestep(streamID2, tsID);
+      nrecs = pstreamInqTimestep(streamID2, tsID);
       if ( nrecs == 0 ) cdoAbort("Too few timesteps in second inputfile!");
 
       int vtime  = taxisInqVtime(taxisID1);
@@ -111,16 +111,16 @@ void *Intyear(void *argument)
 	  int vdate3 = vdate1 - year1*10000 + iyears[iy]*10000;
 	  taxisDefVdate(taxisID3, vdate3);
 	  taxisDefVtime(taxisID3, vtime);
-	  streamDefTimestep(streamIDs[iy], tsID);
+	  pstreamDefTimestep(streamIDs[iy], tsID);
 	}
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamInqRecord(streamID2, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID2, &varID, &levelID);
 
-	  streamReadRecord(streamID1, array1, &nmiss1);
-	  streamReadRecord(streamID2, array2, &nmiss2);
+	  pstreamReadRecord(streamID1, array1, &nmiss1);
+	  pstreamReadRecord(streamID2, array2, &nmiss2);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
@@ -162,8 +162,8 @@ void *Intyear(void *argument)
 		    array3[i] = array1[i]*fac1 + array2[i]*fac2;
 		}
 
-	      streamDefRecord(streamIDs[iy], varID, levelID);
-	      streamWriteRecord(streamIDs[iy], array3, nmiss3);
+	      pstreamDefRecord(streamIDs[iy], varID, levelID);
+	      pstreamWriteRecord(streamIDs[iy], array3, nmiss3);
 	    }
 	}
 
@@ -171,10 +171,10 @@ void *Intyear(void *argument)
     }
 
   for ( int iy = 0; iy < nyears; iy++ )
-    streamClose(streamIDs[iy]);
+    pstreamClose(streamIDs[iy]);
   
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( array3 )  Free(array3);
   if ( array2 )  Free(array2);

@@ -59,6 +59,7 @@ void *Runstat(void *argument)
       if ( envval == 1 ) runstat_nomiss = 1;
     }
 
+  // clang-format off
   cdoOperatorAdd("runrange", func_range, 0, NULL);
   cdoOperatorAdd("runmin",   func_min,   0, NULL);
   cdoOperatorAdd("runmax",   func_max,   0, NULL);
@@ -69,6 +70,7 @@ void *Runstat(void *argument)
   cdoOperatorAdd("runvar1",  func_var1,  0, NULL);
   cdoOperatorAdd("runstd",   func_std,   0, NULL);
   cdoOperatorAdd("runstd1",  func_std1,  0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -82,9 +84,9 @@ void *Runstat(void *argument)
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -99,9 +101,8 @@ void *Runstat(void *argument)
       if ( nsteps > 0 ) vlistDefNtsteps(vlistID2, nsteps);
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
 
@@ -133,14 +134,14 @@ void *Runstat(void *argument)
   int tsID = 0;
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
-      int nrecs = streamInqTimestep(streamID1, tsID);
+      int nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) cdoAbort("File has less then %d timesteps!", ndates);
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
 	
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( tsID == 0 )
 	    {
@@ -154,7 +155,7 @@ void *Runstat(void *argument)
 
           int gridsize = pvars1->size;
 
-          streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+          pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
           if ( lrange )
             {
@@ -261,7 +262,7 @@ void *Runstat(void *argument)
         }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
-      streamDefTimestep(streamID2, otsID);
+      pstreamDefTimestep(streamID2, otsID);
 
       for ( int recID = 0; recID < maxrecs; recID++ )
 	{
@@ -271,8 +272,8 @@ void *Runstat(void *argument)
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	}
 
       otsID++;
@@ -294,14 +295,14 @@ void *Runstat(void *argument)
 	    vars2[inp] = vars2[inp+1];
 	}
 
-      int nrecs = streamInqTimestep(streamID1, tsID);
+      int nrecs = pstreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, ndates-1);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  
           field_type *psamp1 = samp1 ? &samp1[ndates-1][varID][levelID] : NULL;
           field_type *pvars1 = &vars1[ndates-1][varID][levelID];
@@ -309,7 +310,7 @@ void *Runstat(void *argument)
 
           int gridsize = pvars1->size;
 
-          streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+          pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
           if ( lrange )
             {
@@ -396,8 +397,8 @@ void *Runstat(void *argument)
 
   Free(recinfo);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

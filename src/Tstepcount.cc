@@ -72,9 +72,9 @@ void *Tstepcount(void *argument)
 
   if ( operatorArgc() == 1 ) refval = parameter2double(operatorArgv()[0]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   vlistDefNtsteps(vlistID2, 1);
@@ -89,12 +89,11 @@ void *Tstepcount(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
 	{
@@ -109,11 +108,11 @@ void *Tstepcount(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
+	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
 
@@ -158,7 +157,7 @@ void *Tstepcount(void *argument)
 
   taxisDefVdate(taxisID2, vdate);
   taxisDefVtime(taxisID2, vtime);
-  streamDefTimestep(streamID2, 0);
+  pstreamDefTimestep(streamID2, 0);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -169,13 +168,13 @@ void *Tstepcount(void *argument)
 
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
-	  streamDefRecord(streamID2, varID, levelID);
+	  pstreamDefRecord(streamID2, varID, levelID);
 
 	  nmiss = 0;
 	  for ( int i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(vars[0][varID][levelID].ptr[i], missval) ) nmiss++;
 
-	  streamWriteRecord(streamID2, vars[0][varID][levelID].ptr, nmiss);
+	  pstreamWriteRecord(streamID2, vars[0][varID][levelID].ptr, nmiss);
 	}
     }
 
@@ -183,8 +182,8 @@ void *Tstepcount(void *argument)
 
   if ( vars ) Free(vars);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

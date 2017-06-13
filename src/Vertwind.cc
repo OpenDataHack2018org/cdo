@@ -45,9 +45,9 @@ void *Vertwind(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   vlist_check_gridsize(vlistID1);
 
@@ -142,7 +142,7 @@ void *Vertwind(void *argument)
     vlistDefFlag(vlistID1, omegaID, levelID, TRUE);
 
   int vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  cdoVlistCopyFlag(vlistID2, vlistID1);
   vlistDefVarCode(vlistID2, 0, 40);
   vlistDefVarName(vlistID2, 0, "W");
   vlistDefVarLongname(vlistID2, 0, "Vertical velocity");
@@ -153,30 +153,30 @@ void *Vertwind(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
      
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  size_t offset = (size_t)levelID*gridsize;
 
 	  if      ( varID == tempID )
-	    streamReadRecord(streamID1, temp+offset, &nmiss);
+	    pstreamReadRecord(streamID1, temp+offset, &nmiss);
 	  else if ( varID == sqID )
-	    streamReadRecord(streamID1, sq+offset, &nmiss);
+	    pstreamReadRecord(streamID1, sq+offset, &nmiss);
 	  else if ( varID == omegaID )
-	    streamReadRecord(streamID1, omega+offset, &nmiss);
+	    pstreamReadRecord(streamID1, omega+offset, &nmiss);
 	  else if ( varID == psID && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
-	    streamReadRecord(streamID1, ps_prog, &nmiss);
+	    pstreamReadRecord(streamID1, ps_prog, &nmiss);
 	}
 
       if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
@@ -219,15 +219,15 @@ void *Vertwind(void *argument)
             if ( DBL_IS_EQUAL(wms[offset+i],missval_out) )
 	      nmiss_out++;
 
-	  streamDefRecord(streamID2, 0, levelID);
-	  streamWriteRecord(streamID2, wms+offset, nmiss_out);
+	  pstreamDefRecord(streamID2, 0, levelID);
+	  pstreamWriteRecord(streamID2, wms+offset, nmiss_out);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
  
   vlistDestroy(vlistID2);
 

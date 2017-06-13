@@ -28,7 +28,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
-#include "util.h"
 
 
 void cdo_print_zaxis(int zaxisID);
@@ -121,7 +120,7 @@ void printSource(FILE *fp, int vlistID, int varID)
 static
 void partab(FILE *fp, int streamID, int option)
 {
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
   int varID, datatype = -1;
   char pstr[32];
   char paramstr[32];
@@ -250,7 +249,7 @@ static
 void filedes(int streamID)
 {
   printf("\n");
-  int filetype = streamInqFiletype(streamID);
+  int filetype = pstreamInqFiletype(streamID);
   switch ( filetype )
     {
     case CDI_FILETYPE_GRB:  printf("  GRIB data\n"); break;
@@ -271,11 +270,12 @@ void filedes(int streamID)
     case CDI_FILETYPE_EXT:
     case CDI_FILETYPE_IEG:
       {
-        switch ( streamInqByteorder(streamID) )
+        int byteorder = pstreamInqByteorder(streamID);
+        switch ( byteorder )
           {
           case CDI_BIGENDIAN:    printf("  byteorder is BIGENDIAN\n"); break;
           case CDI_LITTLEENDIAN: printf("  byteorder is LITTLEENDIAN\n"); break;
-          default:  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
+          default:  printf("  byteorder %d undefined\n", byteorder); break;
           }
        }
     }  
@@ -288,6 +288,7 @@ void *Filedes(void *argument)
 {
   cdoInitialize(argument);
 
+  // clang-format off
   int GRIDDES  = cdoOperatorAdd("griddes",   0, 0, NULL);
   int GRIDDES2 = cdoOperatorAdd("griddes2",  0, 0, NULL);
   int ZAXISDES = cdoOperatorAdd("zaxisdes",  0, 0, NULL);
@@ -299,12 +300,13 @@ void *Filedes(void *argument)
   int SPARTAB  = cdoOperatorAdd("spartab",   0, 0, NULL);
   int PARTAB   = cdoOperatorAdd("partab",    0, 0, NULL);
   int PARTAB2  = cdoOperatorAdd("partab2",   0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   int nvars  = vlistNvars(vlistID);
   int ngrids = vlistNgrids(vlistID);
@@ -411,7 +413,7 @@ void *Filedes(void *argument)
       filedes(streamID);
     }
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 
   cdoFinish();
 

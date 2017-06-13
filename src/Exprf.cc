@@ -255,10 +255,12 @@ void *Expr(void *argument)
 #define REPLACES_VARIABLES(id) cdoOperatorF1(id)
 #define READS_COMMAND_LINE(id) cdoOperatorF2(id)
 
+  // clang-format off
   cdoOperatorAdd("expr",   1, 1, "expressions");
   cdoOperatorAdd("exprf",  1, 0, "expr script filename");
   cdoOperatorAdd("aexpr",  0, 1, "expressions");
   cdoOperatorAdd("aexprf", 0, 0, "expr script filename");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 
@@ -341,7 +343,7 @@ void *Expr(void *argument)
                 vlistDefFlag(vlistID1, varID, levID, TRUE);
             }
         }
-      vlistCopyFlag(vlistID2, vlistID1);
+      cdoVlistCopyFlag(vlistID2, vlistID1);
     }
 
   for ( int pidx = 0; pidx < parse_arg.nparams; pidx++ )

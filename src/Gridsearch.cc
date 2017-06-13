@@ -1,7 +1,6 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
 #include "grid.h"
 
 void check_lon_range(long nlons, double *lons);
@@ -240,8 +239,10 @@ void *Gridsearch(void *argument)
 {
   cdoInitialize(argument);
 
+  // clang-format off
   int PSEARCH = cdoOperatorAdd("testpointsearch",  0,   0, NULL);
   int CSEARCH = cdoOperatorAdd("testcellsearch",   0,   0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

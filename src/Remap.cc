@@ -761,6 +761,7 @@ void *Remap(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("remapcon",     REMAPCON,     0, NULL);
   cdoOperatorAdd("remapcon2",    REMAPCON2,    0, NULL);
   cdoOperatorAdd("remapbil",     REMAPBIL,     0, NULL);
@@ -779,6 +780,7 @@ void *Remap(void *argument)
   cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
   cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
   cdoOperatorAdd("genycon",      GENYCON,      1, NULL);
+  // clang-format on
 
   int operatorID   = cdoOperatorID();
   int operfunc     = cdoOperatorF1(operatorID);
@@ -801,7 +803,7 @@ void *Remap(void *argument)
 	cdoPrint("Extrapolation disabled!");
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   if ( lremapxxx )
     {
@@ -829,9 +831,9 @@ void *Remap(void *argument)
 
   if ( gridInqType(gridID2) == GRID_GENERIC ) cdoAbort("Unsupported target grid type (generic)!");
 
-  int filetype = streamInqFiletype(streamID1);
+  int filetype = pstreamInqFiletype(streamID1);
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -957,22 +959,22 @@ void *Remap(void *argument)
 
   if ( ! lwrite_remap )
     {
-      streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-      streamDefVlist(streamID2, vlistID2);
+      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+      pstreamDefVlist(streamID2, vlistID2);
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       if ( ! lwrite_remap ) 
-	streamDefTimestep(streamID2, tsID);
+	pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array1, &nmiss1);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, array1, &nmiss1);
 
 	  gridID1 = vlistInqVarGrid(vlistID1, varID);
 
@@ -1247,13 +1249,14 @@ void *Remap(void *argument)
 
 	SKIPVAR:
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, array2, nmiss2);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, array2, nmiss2);
 	}
+
       tsID++;
     }
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 
  WRITE_REMAP:
  
@@ -1261,7 +1264,7 @@ void *Remap(void *argument)
     write_remap_scrip(cdoStreamName(1)->args, map_type, submap_type, num_neighbors, remap_order,
 		      remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars);
 
-  streamClose(streamID1);
+  pstreamClose(streamID1);
 
   if ( imask )  Free(imask);
   if ( array2 ) Free(array2);

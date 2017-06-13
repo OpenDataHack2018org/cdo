@@ -104,7 +104,7 @@ void *cdoReadTimestep(void *rarg)
 
   for ( int recID = 0; recID < nrecs; ++recID )
     {
-      streamInqRecord(streamID, &varID, &levelID);
+      pstreamInqRecord(streamID, &varID, &levelID);
 
       if ( tsIDnext == 1 && recinfo )
         {
@@ -113,16 +113,16 @@ void *cdoReadTimestep(void *rarg)
         }
 
       if ( CDO_Memtype == MEMTYPE_FLOAT )
-        streamReadRecordF(streamID, (float*)input_vars[varID][levelID].ptr2, &nmiss);
+        pstreamReadRecordF(streamID, (float*)input_vars[varID][levelID].ptr2, &nmiss);
       else
-        streamReadRecord(streamID, (double*)input_vars[varID][levelID].ptr2, &nmiss);
+        pstreamReadRecord(streamID, (double*)input_vars[varID][levelID].ptr2, &nmiss);
       
       input_vars[varID][levelID].nmiss2 = nmiss;
     }
 
   // timer_stop(timer_read);
 
-  num_recs = streamInqTimestep(streamID, tsIDnext);
+  num_recs = pstreamInqTimestep(streamID, tsIDnext);
 
   return ((void *) &num_recs);
 }
@@ -226,10 +226,10 @@ void *XTimstat(void *argument)
 
   int cmplen = DATE_LEN - comparelen;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  //int streamID1 = streamOpenRead(cdoStreamName(0)->args);
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  //int streamID1 = pstreamOpenRead(cdoStreamName(0)->args);
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( cmplen == 0 ) vlistDefNtsteps(vlistID2, 1);
@@ -251,9 +251,8 @@ void *XTimstat(void *argument)
   else if ( comparelen == YEAR_LEN ) freq = "year";
   if ( freq ) cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int)strlen(freq), freq);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   if ( cdoDiag )
     {
@@ -262,7 +261,7 @@ void *XTimstat(void *argument)
       strcat(filename, "_");
       strcat(filename, cdoStreamName(1)->args);
       argument_t *fileargument = file_argument_new(filename);
-      streamID3 = streamOpenWrite(fileargument, cdoFiletype());
+      streamID3 = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
       vlistID3 = vlistDuplicate(vlistID1);
@@ -279,7 +278,7 @@ void *XTimstat(void *argument)
       taxisID3 = taxisDuplicate(taxisID1);
       vlistDefTaxis(vlistID3, taxisID3);
 
-      streamDefVlist(streamID3, vlistID3);
+      pstreamDefVlist(streamID3, vlistID3);
     }
 
   dtlist_type *dtlist = dtlist_new();
@@ -318,7 +317,7 @@ void *XTimstat(void *argument)
 
   int tsID  = 0;
   int otsID = 0;
-  int nrecs = streamInqTimestep(streamID1, tsID);
+  int nrecs = pstreamInqTimestep(streamID1, tsID);
   int maxrecs = nrecs;
   recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
   
@@ -541,12 +540,12 @@ void *XTimstat(void *argument)
 	  }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
-      streamDefTimestep(streamID2, otsID);
+      pstreamDefTimestep(streamID2, otsID);
 
       if ( cdoDiag )
 	{
 	  dtlist_stat_taxisDefTimestep(dtlist, taxisID3, nsets);
-	  streamDefTimestep(streamID3, otsID);
+	  pstreamDefTimestep(streamID3, otsID);
 	}
 
       for ( int recID = 0; recID < maxrecs; recID++ )
@@ -557,15 +556,15 @@ void *XTimstat(void *argument)
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-          streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, pvars1->ptr,  pvars1->nmiss);
+          pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, pvars1->ptr,  pvars1->nmiss);
               
           if ( cdoDiag )
             {
               if ( samp1[varID][levelID].ptr )
                 {
-                  streamDefRecord(streamID3, varID, levelID);
-                  streamWriteRecord(streamID3, samp1[varID][levelID].ptr, 0);
+                  pstreamDefRecord(streamID3, varID, levelID);
+                  pstreamWriteRecord(streamID3, samp1[varID][levelID].ptr, 0);
                 }
             }
 	}
@@ -585,7 +584,7 @@ void *XTimstat(void *argument)
 
   if ( cdoDiag ) pstreamClose(streamID3);
   pstreamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

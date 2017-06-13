@@ -172,9 +172,9 @@ void *Sort(void *argument)
       if ( iarg < 0 ) cmpvarlev = cmpvarlevelrev;
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -189,11 +189,10 @@ void *Sort(void *argument)
       ;
   */
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
-  streamDefVlist(streamID2, vlistID2);
-
-  int nvars   = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
   varinfo_t *varInfo = (varinfo_t*) Malloc(nvars*sizeof(varinfo_t));
   for ( varID = 0; varID < nvars; ++varID )
@@ -213,15 +212,14 @@ void *Sort(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( tsID == 0 )
 	    {
@@ -239,7 +237,7 @@ void *Sort(void *argument)
 	  offset   = gridsize*levelID;
 	  single   = vardata[varID] + offset;
 
-	  streamReadRecord(streamID1, single, &nmiss);
+	  pstreamReadRecord(streamID1, single, &nmiss);
 
 	  setNmiss(varID, levelID, nvars, varInfo, nmiss);
 	  // varInfo[varID].levInfo[levelID].nmiss = nmiss;
@@ -296,8 +294,8 @@ void *Sort(void *argument)
 		  offset   = gridsize*levelID;
 		  single   = vardata[varID] + offset;
 
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, single, nmiss);
+		  pstreamDefRecord(streamID2, varID, levelID);
+		  pstreamWriteRecord(streamID2, single, nmiss);
 		}
 	    }
 	}
@@ -305,8 +303,8 @@ void *Sort(void *argument)
       tsID++;
     }
 
-  streamClose(streamID1);
-  streamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   for ( varID = 0; varID < nvars; varID++ ) Free(vardata[varID]);
   Free(vardata);

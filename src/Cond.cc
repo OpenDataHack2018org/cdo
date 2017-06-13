@@ -44,8 +44,10 @@ void *Cond(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int IFTHEN    = cdoOperatorAdd("ifthen",    0, 0, NULL);
   int IFNOTTHEN = cdoOperatorAdd("ifnotthen", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

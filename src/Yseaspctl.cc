@@ -74,13 +74,13 @@ void *Yseaspctl(void *argument)
       datetime2[seas].vtime = 0;
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
-  int streamID3 = streamOpenRead(cdoStreamName(2));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID3 = pstreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
-  int vlistID3 = streamInqVlist(streamID3);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID3 = pstreamInqVlist(streamID3);
   int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -95,9 +95,8 @@ void *Yseaspctl(void *argument)
   if ( taxisHasBounds(taxisID4) ) taxisDeleteBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  int streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
-
-  streamDefVlist(streamID4, vlistID4);
+  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  pstreamDefVlist(streamID4, vlistID4);
 
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
@@ -112,9 +111,9 @@ void *Yseaspctl(void *argument)
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
     {
-      if ( nrecs != streamInqTimestep(streamID3, tsID) )
+      if ( nrecs != pstreamInqTimestep(streamID3, tsID) )
         cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
       
       vdate = taxisInqVdate(taxisID2);
@@ -147,14 +146,14 @@ void *Yseaspctl(void *argument)
       
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID2, &varID, &levelID);
-	  streamReadRecord(streamID2, vars1[seas][varID][levelID].ptr, &nmiss);
+          pstreamInqRecord(streamID2, &varID, &levelID);
+	  pstreamReadRecord(streamID2, vars1[seas][varID][levelID].ptr, &nmiss);
           vars1[seas][varID][levelID].nmiss = nmiss;
         }
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          streamInqRecord(streamID3, &varID, &levelID);
-	  streamReadRecord(streamID3, field.ptr, &nmiss);
+          pstreamInqRecord(streamID3, &varID, &levelID);
+	  pstreamReadRecord(streamID3, field.ptr, &nmiss);
           field.nmiss   = nmiss;
           field.grid    = vars1[seas][varID][levelID].grid;
 	  field.missval = vars1[seas][varID][levelID].missval;
@@ -166,7 +165,7 @@ void *Yseaspctl(void *argument)
     }
 
   tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
@@ -189,7 +188,7 @@ void *Yseaspctl(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( tsID == 0 )
 	    {
@@ -197,7 +196,7 @@ void *Yseaspctl(void *argument)
 	      recLevelID[recID] = levelID;
 	    }
 
-	  streamReadRecord(streamID1, vars1[seas][varID][levelID].ptr, &nmiss);
+	  pstreamReadRecord(streamID1, vars1[seas][varID][levelID].ptr, &nmiss);
 	  vars1[seas][varID][levelID].nmiss = nmiss;
 	  
 	  hsetAddVarLevelValues(hsets[seas], varID, levelID, &vars1[seas][varID][levelID]);
@@ -226,7 +225,7 @@ void *Yseaspctl(void *argument)
 
 	taxisDefVdate(taxisID4, datetime1[seas].vdate);
 	taxisDefVtime(taxisID4, datetime1[seas].vtime);
-	streamDefTimestep(streamID4, otsID);
+	pstreamDefTimestep(streamID4, otsID);
 
 	for ( int recID = 0; recID < nrecords; recID++ )
 	  {
@@ -235,8 +234,8 @@ void *Yseaspctl(void *argument)
 
 	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	    streamDefRecord(streamID4, varID, levelID);
-	    streamWriteRecord(streamID4, vars1[seas][varID][levelID].ptr, vars1[seas][varID][levelID].nmiss);
+	    pstreamDefRecord(streamID4, varID, levelID);
+	    pstreamWriteRecord(streamID4, vars1[seas][varID][levelID].ptr, vars1[seas][varID][levelID].nmiss);
 	  }
 
 	otsID++;
@@ -256,10 +255,10 @@ void *Yseaspctl(void *argument)
   if ( recVarID   ) Free(recVarID);
   if ( recLevelID ) Free(recLevelID);
 
-  streamClose(streamID4);
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID4);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   cdoFinish();
 

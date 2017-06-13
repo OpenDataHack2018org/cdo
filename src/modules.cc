@@ -587,7 +587,8 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
  * operators.
  */
 
-static bool similar(const char *a, const char *b, unsigned long alen, unsigned long blen) {
+static
+bool similar(const char *a, const char *b, unsigned long alen, unsigned long blen) {
     if (alen > 2 && blen > 2 && strstr(b, a))
         return true;
 
@@ -617,7 +618,8 @@ static bool similar(const char *a, const char *b, unsigned long alen, unsigned l
  *
  * Wrapper function for #similar() to parse c++ strings to c strings
  */
-static bool similar(std::string original, std::string other) {
+static
+bool similar(std::string original, std::string other) {
     return (similar(original.c_str(), other.c_str(), original.size(), other.size()));
 }
 
@@ -626,6 +628,7 @@ static bool similar(std::string original, std::string other) {
  * @retval true if #modules_map contains \p operatorName
  * @retval false if not
  */
+static
 bool operator_name_exists(std::string operatorName) {
     if (modules_map.find(operatorName) != modules_map.end()) {
         return true;
@@ -641,6 +644,7 @@ bool operator_name_exists(std::string operatorName) {
  * @retval true if #modules contains \a moduleName
  * @retval false if not
  */
+static
 bool module_map_contains(std::string moduleName) {
     if (modules.find(moduleName) != modules.end()) {
         return true;
@@ -656,10 +660,11 @@ bool module_map_contains(std::string moduleName) {
  * @returns A string with all found names. The string is seqmented into lines
  * with a max lenght of 75 characters
  */
+static
 std::string find_similar(std::string operatorName) {
     std::string found_similar_operators = "";
     unsigned long lines = 1;
-    unsigned long line_length = 75;
+    unsigned long line_length = 105;
     if (operatorName != "") {
         // Searching for simlar operator names in operator to module map
         for (auto str : modules_map) {
@@ -686,6 +691,7 @@ std::string find_similar(std::string operatorName) {
     }
     return found_similar_operators;
 }
+
 /**
  * @param operatorName operator name.
  * @retval true if \p operatorName exists.
@@ -700,6 +706,7 @@ std::string find_similar(std::string operatorName) {
  *
  *  \note If \p operatorName is a file name the program will exit.
  */
+static
 bool check_operator(std::string operatorName) {
     if (operator_name_exists(operatorName)) {
         return true;
@@ -713,20 +720,19 @@ bool check_operator(std::string operatorName) {
             fclose(fp);
             fprintf(stderr, "Use commandline option -h for help.");
             Error("Operator missing, %s is a file on disk!", operatorName.c_str());
-
-            // Operator is no filename
-            // Checking for similar operators
-            fprintf(stderr, "Operator >%s< not found!\n", operatorName.c_str());
-            fprintf(stderr, "Similar operators are:\n");
-            std::string found_similar_operators = find_similar(operatorName);
-
-            if (found_similar_operators.size() > 0) {
-                std::cerr << found_similar_operators << std::endl;
-            } else {
-                fprintf(stderr, "(not found)\n");
-            }
-            exit(EXIT_FAILURE);
         }
+        // Operator is no filename
+        // Checking for similar operators
+        fprintf(stderr, "Operator >%s< not found!\n", operatorName.c_str());
+        fprintf(stderr, "Similar operators are:\n");
+        std::string found_similar_operators = find_similar(operatorName);
+
+        if (found_similar_operators.size() > 0) {
+          std::cerr << found_similar_operators << std::endl;
+        } else {
+          fprintf(stderr, "(not found)\n");
+        }
+        exit(EXIT_FAILURE);
     }
     return false;
 }
@@ -738,6 +744,7 @@ bool check_operator(std::string operatorName) {
  * @param new_module newly constructed module
  * @note: if an error happens while adding the new module cdo will exit.
  */
+static
 void add_module(std::string module_name, modules_t new_module) {
     if (modules.find(module_name) == modules.end()) {
         modules[module_name] = new_module;
@@ -760,6 +767,7 @@ void add_module(std::string module_name, modules_t new_module) {
  * @param alias new alias to be added
  * @param original original operator name
  */
+static
 int add_alias(std::string alias, std::string original) {
     auto iter_original = modules_map.find(original);
     auto iter_alias = aliases.find(alias);
@@ -1125,6 +1133,7 @@ void init_aliases()
  * return value:
  *      std::string -> name of the operators module
  */
+static
 std::string get_module_name_to(std::string operatorName) {
     // if not true the programm will exit in function check_operator
     if (check_operator(operatorName)) {
@@ -1204,6 +1213,7 @@ int operatorStreamNumber(const char *operatorName) {
  * @return a sorted std::vector containing all operator names and aliases excluding all operators
  * which modules are marked as internal
  */
+static
 std::vector<std::string> get_sorted_operator_name_list() {
 
     std::vector<std::string> names;
