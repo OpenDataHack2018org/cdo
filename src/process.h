@@ -104,4 +104,5 @@ const char *processInqOpername(void);
 const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
+void print_process(int p_process_id);
 #endif  /* _PROCESS_H */

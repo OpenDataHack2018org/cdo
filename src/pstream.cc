@@ -290,12 +290,12 @@ static void createPipeName(char *pipename, int pnlen){
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
 }
 
-static pthread_t pCreateReadThread(char *newarg, argument_t *argument, const char *operatorName){
+pthread_t pCreateReadThread(argument_t *argument){
   pthread_attr_t attr;
   int status = pthread_attr_init(&attr);
-  if ( status ) SysError("pthread_attr_init failed for '%s'", newarg+1);
+  if ( status ) SysError("pthread_attr_init failed for '%s'", argument->operatorName);
   status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'", newarg+1);
+  if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'", argument->operatorName);
   /*
     param.sched_priority = 0;
     status = pthread_attr_setschedparam(&attr, &param);
@@ -320,11 +320,11 @@ static pthread_t pCreateReadThread(char *newarg, argument_t *argument, const cha
     }
 
   pthread_t thrID;
-  int rval = pthread_create(&thrID, &attr, operatorModule(operatorName), argument);
+  int rval = pthread_create(&thrID, &attr, operatorModule(argument->operatorName.c_str()), argument);
   if ( rval != 0 )
     {
       errno = rval;
-      SysError("pthread_create failed for '%s'", newarg+1);
+      SysError("pthread_create failed for '%s'", argument->operatorName);
     }
   return thrID;
 }
@@ -339,9 +339,10 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
   char *pipename = (char*) Malloc(pnlen);
   // struct sched_param param;
   
-  argument_t *newargument = (argument_t*) Malloc(sizeof(argument_t));
+  argument_t *newargument = new argument_t();
   newargument->argc = argument->argc + 1;
   newargument->argv = (char **) Malloc(newargument->argc*sizeof(char *));
+  newargument->operatorName = "";
   memcpy(newargument->argv, argument->argv, argument->argc*sizeof(char *));
 
   char *operatorArg  = argument->argv[0];
@@ -356,6 +357,7 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
 
   newargument->argv[argument->argc] = pipename;
   newargument->args = newarg;
+  newargument->operatorName = std::string(operatorName,strlen(operatorName));
   /*
     printf("pstreamOpenRead: new args >%s<\n", newargument->args);
     for ( int i = 0; i < newargument->argc; ++i )
@@ -370,7 +372,7 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
   if ( ! cdoSilentMode ){
     cdoPrint("Started child process \"%s\".", newarg+1);
   }
-  pCreateReadThread(newarg, newargument, operatorName);
+  pCreateReadThread(newargument);
   /* Free(operatorName); */
   processAddInputStream(pstreamID);
   /*      pipeInqInfo(pstreamID); */
@@ -888,7 +890,7 @@ void pstreamClose(int pstreamID)
 	      argument_t *argument = (argument_t *) (pstreamptr->argument);
 	      if ( argument->argv ) Free(argument->argv);
 	      if ( argument->args ) Free(argument->args);
-	      Free(argument);
+          delete(argument);
 	    }
 	  vlistDestroy(pstreamptr->vlistID);
 	  pthread_mutex_unlock(pipe->mutex);

@@ -113,10 +113,12 @@ extern const char *CDO_Version;
 
 
 typedef struct {
+  int process_id;
   int    argc;
-  int    argl;
   char **argv;
   char  *args;
+  std::string operatorName;
+  char * operatorArguments;
 } argument_t;
 
 argument_t *file_argument_new(const char *filename);
@@ -126,8 +128,9 @@ void        argument_free(argument_t *argument);
 void        argument_fill(argument_t *argument, int argc, char *argv[]);
 
 char *getProgname(char *string);
-char *getOperator(const char *argument);
+char *GetOperator(const char *argument);
 const char *getOperatorName(const char *xoperator);
+char *getOperatorArg(const char *xoperator);
 const char *cdoComment(void);
 
 argument_t makeArgument(int argc, char *argv[]);
@@ -235,4 +238,5 @@ int wildcardmatch(const char *w, const char *s);
 
 void cdo_check_round(void);
 
+void print_argument(argument_t *argument);
 #endif  /* _UTIL_H */

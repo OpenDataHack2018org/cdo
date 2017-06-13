@@ -116,8 +116,6 @@ const char *cdoExpName         = NULL;
 
 int timer_read, timer_write;
 
-
-
 const char *cdoComment(void)
 {
   static char comment[256];
@@ -243,6 +241,28 @@ const char *getOperatorName(const char *operatorArg)
     get_original(operatorName);
   }
     return operatorName;
+}
+
+char *getOperatorArg(const char *xoperator)
+{
+  char *operatorArg = NULL;
+
+  if ( xoperator )
+    {
+      char *commapos = (char *)strchr(xoperator, ',');
+
+      if ( commapos )
+        {
+          size_t len = strlen(commapos+1);
+          if ( len )
+            {
+              operatorArg = (char*) Malloc(len+1);
+              strcpy(operatorArg, commapos+1);
+            }
+        }
+    }
+
+  return operatorArg;
 }
 
 
@@ -922,4 +942,18 @@ void cdo_check_round(void)
             cdoAbort("Function round() produces wrong results!");
         }
     }
+}
+
+void print_argument(argument_t * p_argument)
+{
+    std::cout << "argv with " << p_argument->argc << " arguments:" << std::endl;
+    for(int i = 0; i < p_argument->argc; i++)
+    {
+        std::cout << p_argument->argv[i] << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "OperatorName: "<< p_argument->operatorName << std::endl;
+
+    std::cout << "operatorArguments: " << p_argument->operatorArguments << std::endl;
 }
