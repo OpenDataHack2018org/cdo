@@ -452,19 +452,56 @@ static int getVarIDToMap(int vlistID, int nvars, char *key, char *value)
   return CDI_UNDEFID;
 }
 
+
+static char *check_short_key(char *key)
+{
+  char *short_keys[]={"cn", "n", "c", "u", "cm", "vc", "p", "szc", "i", "ca", "gi", "rtu", "mt", "om", "ms", "dr", "d", "lc", "dj", NULL};
+  char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "output_mode", "max_size", "drs_root", "drs", "last_chunk", "dataset_json", NULL};
+
+  for ( int i = 0; short_keys[i]; i++ )
+    if ( strcmp(key, short_keys[i]) == 0 || strcmp(key, long_keys[i]) == 0 )
+      return short_keys[i];
+/*  if ( strcmp(key, "cmor_name") == 0 ) short_key = strdup("cn");
+  else if ( strcmp(key, "name") == 0 ) short_key = strdup("n");
+  else if ( strcmp(key, "code") == 0 ) short_key = strdup("c");
+  else if ( strcmp(key, "units") == 0 ) short_key = strdup("u");
+  else if ( strcmp(key, "cell_methods") == 0 ) short_key = strdup("cm");
+  else if ( strcmp(key, "comment") == 0 ) short_key = strdup("k");
+  else if ( strcmp(key, "positive") == 0 ) short_key = strdup("p");
+  else if ( strcmp(key, "scalar_z_coordinate") == 0 ) short_key = strdup("szc");
+  else if ( strcmp(key, "info") == 0 ) short_key = strdup("i");
+  else if ( strcmp(key, "character_axis") == 0 ) short_key = strdup("ca");
+  else if ( strcmp(key, "grid_info") == 0 ) short_key = strdup("gi");
+  else if ( strcmp(key, "required_time_units") == 0 ) short_key = strdup("rtu");
+  else if ( strcmp(key, "mapping_table") == 0 ) short_key = strdup("mt");
+  else if ( strcmp(key, "calendar") == 0 ) short_key = strdup("l");
+  else if ( strcmp(key, "output_mode") == 0 ) short_key = strdup("om");
+  else if ( strcmp(key, "max_size") == 0 ) short_key = strdup("ms");
+  else if ( strcmp(key, "drs_root") == 0 ) short_key = strdup("dr");
+  else if ( strcmp(key, "drs") == 0 ) short_key = strdup("d");
+  else if ( strcmp(key, "last_chunk") == 0 ) short_key = strdup("lc"); 
+  else if ( strcmp(key, "dataset_json") == 0 ) short_key = strdup("dj"); */
+  return NULL;
+}
+
 static void map_it(list_t *kvl, int vlistID, int varID)
 {
   for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
     {
       keyValues_t *kv = *(keyValues_t **)kvnode->data;
-      const char *key = kv->key;
+      const char *key = ( check_short_key((char *)kv->key ) ) ? (const char *) check_short_key((char *)kv->key) : NULL;
+      if ( !key )
+        {
+          cdoWarning("Don't know what to do with mapping table keyword: '%s'\n", kv->key);
+          continue;
+         }
       const char *value = kv->values[0];
 /*      printf("'%s' = '%s'\n", key, value); */
       if ( !value ) continue;
 /* Not necessary because cmor_name is what we use for renaming :
       else if ( STR_IS_EQ(key, "name")          ) vlistDefVarName(vlistID, varID, parameter2word(value));
 */
-      else if ( STR_IS_EQ(key, "cmor_name") )
+      else if ( STR_IS_EQ(key, "cn") )
         {
           char name[CDI_MAX_NAME];
           vlistInqVarName(vlistID, varID, name);
@@ -472,9 +509,9 @@ static void map_it(list_t *kvl, int vlistID, int varID)
             cdiDefAttTxt(vlistID, varID, "original_name", (int) strlen(name), parameter2word(name));
           vlistDefVarName(vlistID, varID, parameter2word(value));
          }
-      else if ( STR_IS_EQ(key, "units")        ) vlistDefVarUnits(vlistID, varID, value);
-      else if ( STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID, varID, "cell_methods", (int) strlen(value), value);
-      else if ( STR_IS_EQ(key, "character_axis")  ) cdiDefAttTxt(vlistID, varID, "character_axis", (int) strlen(value), value);
+      else if ( STR_IS_EQ(key, "u")        ) vlistDefVarUnits(vlistID, varID, value);
+      else if ( STR_IS_EQ(key, "cm")  ) cdiDefAttTxt(vlistID, varID, "cell_methods", (int) strlen(value), value);
+      else if ( STR_IS_EQ(key, "ca")  ) cdiDefAttTxt(vlistID, varID, "character_axis", (int) strlen(value), value);
 /*      else if ( STR_IS_EQ(key, "factor")        ) {}
       else if ( STR_IS_EQ(key, "delete")        ) {}
       else if ( STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID, varID, value);
@@ -484,7 +521,7 @@ static void map_it(list_t *kvl, int vlistID, int varID)
               // else if ( STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               // else if ( STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
 */
-      else if ( STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID, varID, "comment", (int) strlen(value), value);
+      else if ( STR_IS_EQ(key, "vc")       ) cdiDefAttTxt(vlistID, varID, "comment", (int) strlen(value), value);
       else if ( STR_IS_EQ(key, "p")       )
         {
           if ( !isspace(value[0]) )
@@ -542,7 +579,10 @@ static int change_name_via_code(int vlistID, char *map_code, char *cmor_name)
 static int maptab_via_key(list_t *pml, int vlistID, int varID, int nventry, const char **ventry, const char *key, char *miptabfreq)
 {
   char ifilevalue[CDI_MAX_NAME];
-  get_ifilevalue(ifilevalue, key, vlistID, varID);
+  if ( strcmp(key, "cmor_name") != 0 )
+    get_ifilevalue(ifilevalue, key, vlistID, varID);
+  else
+    get_ifilevalue(ifilevalue, "name", vlistID, varID);
 
   if ( ifilevalue[0] )
     {
@@ -619,7 +659,13 @@ static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, i
             }
           else
             {
-              cdoWarning("No identification 'name' or 'key' in mapping table line of cmor_name '%s'. Variable not mapped.\n", request[j]);
+              cdoWarning("No identification 'name' or 'code' in mapping table line of cmor_name '%s'. Try to use cmor_name.\n", request[j]);
+              if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "code") )
+                {
+                  printf("*******Succesfully mapped variable via cmor_name to cmor_name '%s'.********\n", request[j]); 
+                  continue;
+                }
+              cdoWarning("Cmor_name could not be used as identification name. Variable not mapped.\n", request[j]);
               continue;
             }
         }
@@ -1371,11 +1417,12 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
   if ( ( strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CMIP6") == 0 ) && miptab_freq )
     switch ( miptab_freq )
       {
-      case 1: strcpy(cmor_time_name, "time2"); break;
-      case 2: strcpy(cmor_time_name, "time"); break;
-      case 4: strcpy(cmor_time_name, "time"); break;
-      case 5: strcpy(cmor_time_name, "time1"); break;
-      case 6: strcpy(cmor_time_name, "time1"); break;
+      case 1: strcpy(cmor_time_name, "time2"); *time_axis=2; break;
+      case 2: strcpy(cmor_time_name, "time"); *time_axis=0; break;
+      case 4: strcpy(cmor_time_name, "time"); *time_axis=0; break;
+      case 5: strcpy(cmor_time_name, "time1"); *time_axis=1; break;
+      case 6: strcpy(cmor_time_name, "time1"); *time_axis=1; break;
+      case 7: strcpy(cmor_time_name, "time3"); *time_axis=3; break;
       }
   if ( cmor_time_name[0] != 't' )
     {
@@ -1385,7 +1432,8 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
       if ( time_method[0] == 'm' )      { strcpy(cmor_time_name, "time \0"); *time_axis=0; }
       else if ( time_method[0] == 'p' ) { strcpy(cmor_time_name, "time1\0"); *time_axis=1; }
       else if ( time_method[0] == 'c' ) { strcpy(cmor_time_name, "time2\0"); *time_axis=2; }
-      else if ( time_method[0] == 'n' ) { strcpy(cmor_time_name, "none\0"); *time_axis=3; }
+      else if ( time_method[0] == 'd' ) { strcpy(cmor_time_name, "time3\0"); *time_axis=3; }
+      else if ( time_method[0] == 'n' ) { strcpy(cmor_time_name, "none\0"); *time_axis=4; }
       else
         {
           cdoWarning("Found configuration time cell method '%s' is not valid. Check CF-conventions for allowed time cell methods.\nTime cell method is set to 'mean'. \n", time_method);
@@ -1483,6 +1531,7 @@ static char *check_calendar(list_t *kvl, int taxisID, int *calendar)
     }
   if ( cdoVerbose )
     printf("*******Succesfully checked attribute 'calendar'.*******\n");
+  return calendarptr;
 }
 
 /*********/
@@ -1557,24 +1606,83 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
     }
 #elif ( CMOR_VERSION_MAJOR == 3 )
     {
-      cmor_dataset_json("/home/dkrz/k204210/test.json");
-      cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
-      char *branch_time_in_parent = (char *) Malloc(2*sizeof(double));;
-      char *branch_time_in_child = (char *) Malloc(2*sizeof(double));;
-      snprintf(branch_time_in_parent, sizeof(double), "%.12f", branch_times[0]);
-      snprintf(branch_time_in_child, sizeof(double), "%.12f", branch_times[1]);
-      cmor_set_cur_dataset_attribute("branch_time_in_parent", branch_time_in_parent, 1); 
-      cmor_set_cur_dataset_attribute("branch_time_in_child", branch_time_in_child, 1); 
+/***/
+/* Could not give CMOR all attributes separately because some are required to be in a json file (outpath,...). /
+/* Better collect them in this file. */
+/* If a Json file is denoted, add attributes to this file */
+/* If attributes recur, the last occurence is used by CMOR */
+/***/
 
+      char *filename = kv_get_a_val(kvl, "dj", "dataset.json");
+      char cwd[1024];
+      getcwd(cwd, sizeof(cwd));
+
+      char dataset_path[strlen(cwd) + 1 + strlen(filename)];
+      sprintf(dataset_path, "%s/%s", cwd, filename);
+
+      FILE *dataset_json = ( strcmp(filename, "dataset.json") == 0 ) ? fopen(dataset_path, "w+") : fopen(dataset_path, "a+");
+      if ( !dataset_json )
+        cdoAbort("Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
+
+      fseek(dataset_json, 0, SEEK_SET );
+      char bracket[4];
+      if ( fgets (bracket, 2, dataset_json) != NULL )
+        {
+          if ( bracket[0] != '{' && strcmp(bracket, "") != 0 )
+            cdoAbort("File '%s' must begin with { because it is a json file.", dataset_path);
+        }
+      else
+        fputs("{\n", dataset_json);
+
+      fseek(dataset_json, -4, SEEK_END );
+      if ( fgets (bracket, 2, dataset_json) != NULL )
+        {
+          if ( bracket[0] != '}' ) 
+            cdoWarning("File '%s' does not end with }.", dataset_path);
+          else
+            fseek(dataset_json, -4, SEEK_END );
+        }
+      else
+        cdoAbort("Could not read last character of file %s\n");
+
+      char *allneeded[] = /*CMIP5*/{"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip", 
+/* CMIP6: */
+/* CMOR internal */ 
+"outpath", "output_path_template", "output_file_template", "tracking_prefix",
+/* Glob Atts */
+"Conventions", "activity_id", "experiment", "experiment_id", "forcing_index", "further_info_url", "grid", "grid_label", "initialization_index", "institution", "institution_id", "license", "mip_era", "nominal_resolution", "physics_index", "product", "realization_index", "source", "source_id", "source_type", "sub_experiment", "sub_experiment_id", "table_id", "variant_label", "parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label",
+"parent_time_units", NULL};
       int i = 0;
-      char *allneeded[] = {"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institution_id", "institute_id", "parent_experiment_rip", NULL};
       while ( allneeded[i] )
         {
           char *tmp = kv_get_a_val(kvl, allneeded[i], "notSet");
+          int linelen = strlen(allneeded[i]) + strlen(tmp) + 10;
+          char line[linelen];
+          sprintf(line, "\"%s\" : \"%s\",\n", allneeded[i], tmp);
           if ( strncmp(tmp, "notSet", 6) != 0 )
-            cmor_set_cur_dataset_attribute(allneeded[i], tmp, 1);
+            fputs((const char *) line, dataset_json);
           i++;
         }
+      fputs("\"calendar\" : \"", dataset_json);
+      fputs(calendarptr, dataset_json);
+      fputs("\",\n", dataset_json); 
+
+      char *branch_time_in_parent = (char *) Malloc(2*sizeof(double));
+      char *branch_time_in_child = (char *) Malloc(2*sizeof(double));
+      snprintf(branch_time_in_parent, sizeof(double), "%.12f", branch_times[0]);
+      snprintf(branch_time_in_child, sizeof(double), "%.12f", branch_times[1]);
+
+      fputs("\"branch_time_in_parent\" : \"", dataset_json);
+      fputs(branch_time_in_parent, dataset_json);
+      fputs("\",\n", dataset_json);
+      fputs("\"branch_time_in_child\" : \"", dataset_json);
+      fputs(branch_time_in_child, dataset_json);
+      fputs("\",\n", dataset_json); 
+
+      fputs("}\n", dataset_json);
+      fclose(dataset_json);
+      cmor_dataset_json("test.json");
+
       Free(branch_time_in_parent);
       Free(branch_time_in_child);
     }
@@ -2574,11 +2682,13 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
   char *positive = get_txtatt(vlistID, varID, "positive");
   char *origname = get_txtatt(vlistID, varID, "original_name");
   char *history = get_txtatt(vlistID, varID, "history");
+  char *varcom = get_txtatt(vlistID, varID, "variable_comment");
   char *units = Malloc(CDI_MAX_NAME * sizeof(char));
   vlistInqVarUnits(vlistID, varID, units);
   char *attunits = kv_get_a_val(kvl, "u", NULL);
   char *attp = kv_get_a_val(kvl, "p", NULL);
   char *attorigname = kv_get_a_val(kvl, "original_name", NULL);
+  char *attvarcom = kv_get_a_val(kvl, "vc", NULL);
   check_compare_set(&positive, attp, "positive", "");
   if ( strcmp(positive, " ") == 0 )
     strcpy(positive, "");
@@ -2588,6 +2698,12 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
     {
       Free(origname);
       origname = NULL;
+    }
+  check_compare_set(&varcom, attvarcom, "variable_comment", "");
+  if ( strcmp(varcom, "") == 0 )
+    {
+      Free(varcom);
+      varcom = NULL;
     }
   if ( cdoVerbose )
     printf("*******Succesfully retrieved 'positive': '%s' and 'units' : '%s'.******\n", positive, units);
@@ -2768,7 +2884,6 @@ static void register_all_dimensions(list_t *kvl, int streamID,
     cdoAbort("No variables from your table %s found in Ifile.\n");
   if ( !foundName && cmor_names )
     cdoAbort("None of the given variables to process by attribute 'cmor_name' is found in Ifile.\n");
-  if ( time_units) Free(time_units);
   if ( cdoVerbose )
     printf("*******Succesfully registered all dimensions for %d variables successfully.*******\n", foundName);
 }
@@ -2957,51 +3072,99 @@ static juldate_t get_cmor_time_val(int taxisID, juldate_t ref_date, int tunitsec
   return juldate;
 }
 
-static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date, juldate_t jtime_val, int calendar, int tunitsec, double *time_bnds)
+static double *get_time_bounds(list_t *kvl, int taxisID, char *frequency, juldate_t ref_date, juldate_t jtime_val, int calendar, int tunitsec, double *time_bnds, int time_axis)
 {
   double time_val = juldate_to_seconds(juldate_sub(jtime_val, ref_date)) / tunitsec;
   int vdate0b, vdate1b, vtime0b, vtime1b, vdatecorr, vtimecorr;
   int year, month, day;
+  int hour, min, sec;
   cdiDecodeDate(taxisInqVdate(taxisID), &year, &month, &day);
   if ( month == 0 || day == 0 )
     {
       juldate_decode(calendar, jtime_val, &vdatecorr, &vtimecorr);
       cdiDecodeDate(vdatecorr, &year, &month, &day);
     }
+/***/
+/* If file time axis has bounds use them, otherwise use cmor time axis deduced from miptable frequency and cell_methods or frequency itself*/
+/***/
+
   if ( !taxisHasBounds(taxisID) )
     {
-      if ( strcmp(frequency, "yr") == 0 )
-        {
-          vdate0b = cdiEncodeDate(year,   1, 1);
-          vdate1b = cdiEncodeDate(year+1, 1, 1);
-        }     
-      if ( strcmp(frequency, "mon") == 0 )
-        {
-          vdate0b = cdiEncodeDate(year, month, 1);
-          month++;
-          if ( month > 12 ) { month = 1; year++; }
-          vdate1b = cdiEncodeDate(year, month, 1);
-        }  
-      if ( strcmp(frequency, "day") == 0 )
-        {
-          time_bnds[0] = floor(time_val);
-          time_bnds[1] = ceil(time_val);
-          return time_bnds;
-        }  
-      if ( strcmp(frequency, "6hr") == 0 || strcmp(frequency, "3hr") == 0 )
-        {
-          time_bnds[0] = time_val - 0.125;
-          time_bnds[1] = time_val + 0.125;
-          return time_bnds;
-        }  
-      if ( strcmp(frequency, "3hr") == 0 )
-        {
-          time_bnds[0] = time_val - 0.0625;
-          time_bnds[1] = time_val + 0.0625;
-          return time_bnds;
-        }  
       vtime0b = 0;
       vtime1b = 0;
+  
+      if ( time_axis == 2 || time_axis == 3 )
+        {
+          int numdates;
+          char **climyears = kv_get_vals(kvl, "climatology_interval", &numdates);
+          if ( numdates != 2 )
+            cdoAbort("Could not calculate time bounds for climatology time axis because attribute 'climatology_interval' has not two values.");
+          int expstartyear = atol(climyears[0]);
+          int expendyear = atol(climyears[1]);
+/***/
+/* Climatologies */
+/***/
+          if ( time_axis == 2 )
+            {
+              vdate0b = cdiEncodeDate(expstartyear, month, 1);
+              month++;
+              if ( month > 12 ) { month = 1; year++; }
+              vdate1b = cdiEncodeDate(expendyear, month, 1);
+            }
+/***/
+/* Diurnal cycle */
+/***/
+          if ( time_axis == 3 )
+            {
+              vdate0b = cdiEncodeDate(expstartyear, month, day);
+              cdiDecodeTime(taxisInqVtime(taxisID), & hour, &min, &sec);
+              vtime0b = cdiEncodeTime(hour,0,0);
+
+              hour++;
+              if ( hour > 23 ) { hour = 0; day++; }
+              vtime1b = cdiEncodeTime(hour,0,0);
+              vdate1b = cdiEncodeDate(expendyear, month, day);
+            }
+        }
+      else
+        {
+/***/
+/* Frequency dependent: */
+/***/
+          if ( strcmp(frequency, "yr") == 0 )
+            {
+              vdate0b = cdiEncodeDate(year,   1, 1);
+              vdate1b = cdiEncodeDate(year+1, 1, 1);
+            }     
+          else if ( strcmp(frequency, "mon") == 0 )
+            {
+              vdate0b = cdiEncodeDate(year, month, 1);
+              month++;
+              if ( month > 12 ) { month = 1; year++; }
+              vdate1b = cdiEncodeDate(year, month, 1);
+            }  
+          else if ( strcmp(frequency, "day") == 0 )
+            {
+              time_bnds[0] = floor(time_val);
+              time_bnds[1] = ceil(time_val);
+              return time_bnds;
+            }
+/***/
+/* Note that time_val must be correct in Infile for subdaily frequencies */
+/***/  
+          else if ( strcmp(frequency, "6hr") == 0 )
+            {
+              time_bnds[0] = time_val - 0.125;
+              time_bnds[1] = time_val + 0.125;
+              return time_bnds;
+            }  
+          else if ( strcmp(frequency, "3hr") == 0 )
+            {
+              time_bnds[0] = time_val - 0.0625;
+              time_bnds[1] = time_val + 0.0625;
+              return time_bnds;
+            } 
+        }
     }
   else
     {
@@ -3301,7 +3464,7 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
   char *dummy = kv_get_a_val(kvl, "om", NULL);
   if ( !dummy || strcmp(dummy, "a") != 0 )
     return empty_array(vars, &chunk_files);
-  else if ( time_axis == 3 )
+  else if ( time_axis == 4 )
     {
       printf("CMOR APPEND mode not possible for time independent variables.\nSwitched to replace mode");
       return empty_array(vars, &chunk_files);
@@ -3373,7 +3536,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
   int tunitsec = get_tunitsec(time_unit);
   juldate_t ref_date = juldate_encode(calendar, sdate, stime);
   char *frequency = NULL;
-  if ( time_axis != 3 )
+  if ( time_axis != 4 )
     frequency = get_frequency(kvl, *streamID, vlistID, taxisID, miptab_freq);
   if ( cdoVerbose )
     printf("\n*******Succesfully retrieved time value from 'required_time_units' and frequency.******\n");
@@ -3419,11 +3582,11 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
       double *time_bndsp;
       juldate_t jtime_val;
       double time_val;
-      if ( time_axis != 3 )
+      if ( time_axis != 4 )
         {
           jtime_val = get_cmor_time_val(taxisID, ref_date, tunitsec, calendar, frequency, tsID);
           time_val = juldate_to_seconds(juldate_sub(jtime_val, ref_date)) / tunitsec;
-          time_bndsp = ( time_axis != 1 ) ? get_time_bounds(taxisID, frequency, ref_date, jtime_val, calendar, tunitsec, time_bnds) : 0;
+          time_bndsp = ( time_axis != 1 ) ? get_time_bounds(kvl, taxisID, frequency, ref_date, jtime_val, calendar, tunitsec, time_bnds, time_axis) : 0;
         }
       while ( nrecs-- )
         read_record(*streamID, vars, vlistID);
@@ -3437,7 +3600,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
           vlistInqVarName(vlistID, vars[i].cdi_varID, name); */
           if ( !vars[i].help_var )
             {
-              if ( time_axis != 3 )
+              if ( time_axis != 4 )
                 {
                   if ( vars[i].charvars )
                     {
@@ -3568,6 +3731,11 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
 
 static list_t *check_for_charvars(list_t *maptab, char *key)
 {
+/***/
+/* If a mapping table variable selector (name or code) has more than one value, it must be a character coordinate*/
+/* If it is given as a string and the string contains a ',', */
+/* it must be divided into several values and is a variable with character coordinate */
+/***/
   listNode_t *node = maptab->head;
   while ( node )
     {
@@ -3585,6 +3753,7 @@ static list_t *check_for_charvars(list_t *maptab, char *key)
             }
           if ( kvn && kvn->nvalues > 1 )
             return kvlist;
+
           if ( kvn && strstr(kvn->values[0], ",") && kvn->nvalues == 1 )
             {
               char *workchar2 = strdup(kvn->values[0]);
@@ -3641,6 +3810,9 @@ static list_t *check_for_charvars(list_t *maptab, char *key)
 
 static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapping vars[])
 {
+/***/
+/* Build mapping table from a combination of two attributes if mt does not begin with / and a directory path is given */
+/***/
   if ( cdoVerbose )
     printf("*******Start to read mapping table.*******\n");
   char *maptab = kv_get_a_val(kvl, "mt", NULL);
@@ -3660,6 +3832,9 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
       if ( maptabbuild ) maptab = maptabbuild;
       int vlistID = streamInqVlist(streamID);
 
+/***/
+/* Parse the table as a fortran namelist wich contains lists (=lines) of keyvalues */
+/***/
       if ( cdoVerbose )
         printf("*******Try to apply mapping table: '%s'*******\n", maptab);
       list_t *pml = cdo_parse_cmor_file(maptab);
@@ -3672,6 +3847,22 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
       int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
 
       list_t *charvarlist = NULL; 
+/***/
+/* If a variable selector name or code is given in cmdline, the corresponding variable is picked from Infile and mapped. */
+/* Only the first value of name/code given in the cmdline is processed */
+/* If no variable selector is given, process all variables and map via name and code */
+/***/
+/* However, if the mapping table contains a keyvalue pair for name or code with more than one value, */
+/* the corresponding variable has a character coordinate and requires special treatment */
+/* This is tested once before mapping. If the special variable equals the variable which is to map,
+/* the special treatment begins with fct addcharvar */
+/***/
+/* Different CMOR variables are built with one model variable. */
+/* Consequently, for one model variable more than one mapping table entry can exist */
+/* As a second identification argument, the mapping table name (miptabfreq) is used */
+/***/
+/* If no variable selector is given in the mapping table, it is assumed that the infile variable is already named like cmor_name */
+/***/
       if ( kvn )
         {
           if ( charvarlist = check_for_charvars(pml, "name") )
@@ -3740,46 +3931,27 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
                   printf("*******Successfully mapped varID '%d' via code.*******\n", varID);
                   continue;
                 }
+/***/
+/* In case corresponding mapping table entry does not contain a variable selector attribute */
+/***/
+              if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "cmor_name", miptabfreq) )
+                {
+                  printf("*******Successfully mapped varID '%d' via cmor_name.*******\n", varID);
+                  continue;
+                }
               cdoWarning("Could not map variable with id '%d'.", varID);
             }
         }
+/***/
+/* In case a requested variable needs an auxilliary variable, the latter may be mapped later. */
+/* If a mapping table exists is saved here */
+/***/
       kv_insert_a_val(kvl, "mtproof", maptab, 1);
       list_destroy(pml);
       if ( maptabbuild ) Free(maptabbuild);
     }
   else if ( cdoVerbose )
     printf("*******No mapping table found.*******\n");
-}
-
-static char *check_short_key(char *key)
-{
-  char *short_keys[]={"cn", "n", "c", "u", "cm", "vc", "p", "szc", "i", "ca", "gi", "rtu", "mt", "om", "ms", "dr", "d", "lc", NULL};
-  char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "output_mode", "max_size", "drs_root", "drs", "last_chunk", NULL};
-
-  for ( int i = 0; short_keys[i]; i++ )
-    if ( strcmp(key, short_keys[i]) == 0 || strcmp(key, long_keys[i]) == 0 )
-      return short_keys[i];
-/*  if ( strcmp(key, "cmor_name") == 0 ) short_key = strdup("cn");
-  else if ( strcmp(key, "name") == 0 ) short_key = strdup("n");
-  else if ( strcmp(key, "code") == 0 ) short_key = strdup("c");
-  else if ( strcmp(key, "units") == 0 ) short_key = strdup("u");
-  else if ( strcmp(key, "cell_methods") == 0 ) short_key = strdup("cm");
-  else if ( strcmp(key, "comment") == 0 ) short_key = strdup("k");
-  else if ( strcmp(key, "positive") == 0 ) short_key = strdup("p");
-  else if ( strcmp(key, "scalar_z_coordinate") == 0 ) short_key = strdup("szc");
-  else if ( strcmp(key, "info") == 0 ) short_key = strdup("i");
-  else if ( strcmp(key, "character_axis") == 0 ) short_key = strdup("ca");
-  else if ( strcmp(key, "grid_info") == 0 ) short_key = strdup("gi");
-  else if ( strcmp(key, "required_time_units") == 0 ) short_key = strdup("rtu");
-  else if ( strcmp(key, "mapping_table") == 0 ) short_key = strdup("mt");
-  else if ( strcmp(key, "calendar") == 0 ) short_key = strdup("l");
-  else if ( strcmp(key, "output_mode") == 0 ) short_key = strdup("om");
-  else if ( strcmp(key, "max_size") == 0 ) short_key = strdup("ms");
-  else if ( strcmp(key, "drs_root") == 0 ) short_key = strdup("dr");
-  else if ( strcmp(key, "no_drs") == 0 ) short_key = strdup("d");
-  else if ( strcmp(key, "last_chunk") == 0 ) short_key = strdup("lc"); */
-  cdoWarning("Unknown commandline keyword: '%s'\n", key);
-  return NULL;
 }
 
 static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
@@ -3807,6 +3979,8 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
                     }
                   kvlist_append(kvl, (const char *)key, (const char **) values, j);
                 }
+              else
+                cdoWarning("Unknown commandline keyword: '%s'\n", key);
               Free(key);
               free_array(values);
             }
@@ -3930,6 +4104,8 @@ static int get_miptab_freq(list_t *kvl, char *mip_table, char *project_id)
         miptab_freq = 5;
       else if ( strcmp(freq, "6hrLev") == 0 )
         miptab_freq = 6;
+      else if ( strcmp(freq, "E1hrClimMon") == 0 )
+        miptab_freq = 7;
     }
 }
 
@@ -3958,10 +4134,7 @@ static char *get_project_id(list_t *kvl)
   if ( !dummy && !dummy2)
     cdoAbort("Value for attribute 'project_id' is required.");
   else if ( !dummy )
-    {
-      cdoAbort("Cannot produce CMIP6 standard with CMOR2.\nValue for attribute 'project_id' is required.");
-      project_id = strdup(dummy2);
-    }
+    cdoAbort("Cannot produce CMIP6 standard with CMOR2.\nValue for attribute 'project_id' is required.");
   else
     project_id = strdup(dummy);
 }
@@ -4008,7 +4181,7 @@ void *CMOR(void *argument)
 #if defined(HAVE_LIBCMOR)
   int nparams = operatorArgc();
   char **params = operatorArgv();
-  char *arg1 = strdup(params[0]);
+  char *miptableInput = strdup(params[0]);
 
   /* Definition of pml: */
   list_t *pml = list_new(sizeof(list_t *), free_kvlist, "pml");
@@ -4030,7 +4203,7 @@ void *CMOR(void *argument)
 
   /* Get project_id, mip_table and mip_table frequency*/
   char *project_id = get_project_id(kvl);
-  char *mip_table  = get_mip_table(arg1, kvl, project_id);
+  char *mip_table  = get_mip_table(miptableInput, kvl, project_id);
 #if ( CMOR_VERSION_MAJOR == 3 )
   mip_table[strlen(mip_table)-5] = '\0';
 #endif
@@ -4062,7 +4235,7 @@ void *CMOR(void *argument)
 
   setup_dataset(kvl, streamID, &calendar);
 
-  int table_id = cmor_load_and_set_table(kvl, arg1, project_id, mip_table);
+  int table_id = cmor_load_and_set_table(kvl, miptableInput, project_id, mip_table);
 
   register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq, &time_axis);
   write_variables(kvl, &streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
@@ -4071,7 +4244,7 @@ void *CMOR(void *argument)
   Free(mip_table);
   Free(project_id); 
   Free(miptab_freqptr);
-  Free(arg1);
+  Free(miptableInput);
   list_destroy(pml); 
 
   streamClose(streamID);
