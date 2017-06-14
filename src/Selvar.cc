@@ -67,6 +67,7 @@ void *Selvar(void *argument)
 # define TAKES_INTEGERS(id) (cdoOperatorF2(id) & 4)
 # define TAKES_FLOATS(id) (cdoOperatorF2(id) & 8)
 
+  // clang-format off
   int SELPARAM     = cdoOperatorAdd("selparam",     0, 2,   "parameters");
   int SELCODE      = cdoOperatorAdd("selcode",      0, 4,   "code numbers");
   int SELNAME      = cdoOperatorAdd("selname",      0, 2,   "variable names");
@@ -81,6 +82,7 @@ void *Selvar(void *argument)
   int DELCODE      = cdoOperatorAdd("delcode",      1, 1,   "code numbers");
   int DELNAME      = cdoOperatorAdd("delname",      1, 2|1, "variable names");
   int SELLTYPE     = cdoOperatorAdd("selltype",     0, 4,   "GRIB level types"); 
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

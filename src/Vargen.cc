@@ -244,6 +244,7 @@ void *Vargen(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int RANDOM  = cdoOperatorAdd("random",  0, 0, "grid description file or name, <seed>");
   int SINCOS  = cdoOperatorAdd("sincos",  0, 0, "grid description file or name");
   int COSHILL = cdoOperatorAdd("coshill", 0, 0, "grid description file or name");
@@ -253,6 +254,7 @@ void *Vargen(void *argument)
   int TEMP    = cdoOperatorAdd("temp",    0, 0, NULL);
   int MASK    = cdoOperatorAdd("mask",    0, 0, NULL);
   int STDATM  = cdoOperatorAdd("stdatm",  0, 0, "height levels [m]");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

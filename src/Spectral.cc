@@ -57,12 +57,14 @@ void *Spectral(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
+  // clang-format off
   int GP2SP  = cdoOperatorAdd("gp2sp",  0, 0, NULL);
   int GP2SPL = cdoOperatorAdd("gp2spl", 0, 0, NULL);
   int SP2GP  = cdoOperatorAdd("sp2gp",  0, 0, NULL);
   int SP2GPL = cdoOperatorAdd("sp2gpl", 0, 0, NULL);
   int SP2SP  = cdoOperatorAdd("sp2sp",  0, 0, NULL);
   int SPCUT  = cdoOperatorAdd("spcut",  0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

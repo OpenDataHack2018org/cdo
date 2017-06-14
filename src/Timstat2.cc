@@ -115,8 +115,10 @@ void *Timstat2(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("timcor",   func_cor,   0, NULL);
   cdoOperatorAdd("timcovar", func_covar, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);

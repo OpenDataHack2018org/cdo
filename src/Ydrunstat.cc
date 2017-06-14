@@ -73,6 +73,7 @@ void *Ydrunstat(void *argument)
     
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("ydrunmin",   func_min,   0, NULL);
   cdoOperatorAdd("ydrunmax",   func_max,   0, NULL);
   cdoOperatorAdd("ydrunsum",   func_sum,   0, NULL);
@@ -82,6 +83,7 @@ void *Ydrunstat(void *argument)
   cdoOperatorAdd("ydrunvar1",  func_var1,  0, NULL);
   cdoOperatorAdd("ydrunstd",   func_std,   0, NULL);
   cdoOperatorAdd("ydrunstd1",  func_std1,  0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

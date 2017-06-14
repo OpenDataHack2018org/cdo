@@ -215,11 +215,13 @@ void *Timpctl(void *argument)
   
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("timpctl",  func_pctl, 31, NULL);
   cdoOperatorAdd("yearpctl", func_pctl, 10, NULL);
   cdoOperatorAdd("monpctl",  func_pctl,  8, NULL);
   cdoOperatorAdd("daypctl",  func_pctl,  6, NULL);
   cdoOperatorAdd("hourpctl", func_pctl,  4, NULL);
+  // clang-format on
 
   operatorID = cdoOperatorID();
   

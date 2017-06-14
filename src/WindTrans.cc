@@ -1446,10 +1446,12 @@ void *WindTrans(void *argument)
 {
   cdoInitialize(argument);
 
-  UVDESTAG        = cdoOperatorAdd("uvDestag",  0, 0, NULL);
-  ROTUVNORTH      = cdoOperatorAdd("rotuvNorth",  0, 0, NULL);
-  ROTUVN          = cdoOperatorAdd("rotuvN",  0, 0, NULL);
-  PROJUVLATLON    = cdoOperatorAdd("projuvLatLon",  0, 0, NULL);  // Cylindrical Equidistant projection
+  // clang-format off
+  UVDESTAG     = cdoOperatorAdd("uvDestag",  0, 0, NULL);
+  ROTUVNORTH   = cdoOperatorAdd("rotuvNorth",  0, 0, NULL);
+  ROTUVN       = cdoOperatorAdd("rotuvN",  0, 0, NULL);
+  PROJUVLATLON = cdoOperatorAdd("projuvLatLon",  0, 0, NULL);  // Cylindrical Equidistant projection
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

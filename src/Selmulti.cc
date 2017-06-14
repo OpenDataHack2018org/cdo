@@ -174,9 +174,11 @@ void *Selmulti(void *argument)
 
   cdoInitialize(argument);
 
-  int SELMULTI       = cdoOperatorAdd("selmulti",       0, 0, "filename/string with selection specification ");
-  int DELMULTI       = cdoOperatorAdd("delmulti",       0, 0, "filename/string with selection specification ");
-  int CHANGEMULTI    = cdoOperatorAdd("changemulti",    0, 0, "filename/string with selection specification ");
+  // clang-format off
+  int SELMULTI    = cdoOperatorAdd("selmulti",    0, 0, "filename/string with selection specification ");
+  int DELMULTI    = cdoOperatorAdd("delmulti",    0, 0, "filename/string with selection specification ");
+  int CHANGEMULTI = cdoOperatorAdd("changemulti", 0, 0, "filename/string with selection specification ");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

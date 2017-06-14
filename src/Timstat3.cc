@@ -54,8 +54,10 @@ void *Timstat3(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int VARQUOT2TEST  = cdoOperatorAdd("varquot2test",  0, 0, NULL);
   int MEANDIFF2TEST = cdoOperatorAdd("meandiff2test", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 
@@ -64,7 +66,7 @@ void *Timstat3(void *argument)
   double rconst = parameter2double(operatorArgv()[0]);
   double risk   = parameter2double(operatorArgv()[1]);
 
-  if ( operatorID == VARQUOT2TEST )
+  if ( operatorID == VARQUOT2TEST )1
     {
       if ( rconst <= 0 )
 	cdoAbort("Constant must be positive!");

@@ -82,6 +82,7 @@ void *Yhourstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("yhourrange", func_range, 0, NULL);
   cdoOperatorAdd("yhourmin",   func_min,   0, NULL);
   cdoOperatorAdd("yhourmax",   func_max,   0, NULL);
@@ -101,6 +102,7 @@ void *Yhourstat(void *argument)
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
+  // clang-format on
 
   for ( int houroy = 0; houroy < MAX_HOUR; ++houroy )
     {

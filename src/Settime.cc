@@ -176,6 +176,7 @@ void *Settime(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SETYEAR     = cdoOperatorAdd("setyear",      0,  1, "year");
   int SETMON      = cdoOperatorAdd("setmon",       0,  1, "month");
   int SETDAY      = cdoOperatorAdd("setday",       0,  1, "day");
@@ -187,6 +188,7 @@ void *Settime(void *argument)
   int SETREFTIME  = cdoOperatorAdd("setreftime",   0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
   int SETCALENDAR = cdoOperatorAdd("setcalendar",  0,  1, "calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)");
   int SHIFTTIME   = cdoOperatorAdd("shifttime",    0,  1, "shift value");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   // nargs = cdoOperatorF2(operatorID);

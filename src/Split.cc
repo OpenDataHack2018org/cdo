@@ -66,6 +66,7 @@ void *Split(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
+  // clang-format off
   int SPLITCODE   = cdoOperatorAdd("splitcode",   0, 0, NULL);
   int SPLITPARAM  = cdoOperatorAdd("splitparam",  0, 0, NULL);
   int SPLITNAME   = cdoOperatorAdd("splitname",   0, 0, NULL);
@@ -73,6 +74,7 @@ void *Split(void *argument)
   int SPLITGRID   = cdoOperatorAdd("splitgrid",   0, 0, NULL);
   int SPLITZAXIS  = cdoOperatorAdd("splitzaxis",  0, 0, NULL);
   int SPLITTABNUM = cdoOperatorAdd("splittabnum", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

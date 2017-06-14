@@ -100,6 +100,7 @@ void *Timstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("timrange",  func_range, DATE_LEN, NULL);
   cdoOperatorAdd("timmin",    func_min,   DATE_LEN, NULL);
   cdoOperatorAdd("timmax",    func_max,   DATE_LEN, NULL);
@@ -160,6 +161,7 @@ void *Timstat(void *argument)
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
+  // clang-format on
 
   if ( operfunc == func_mean )
     {

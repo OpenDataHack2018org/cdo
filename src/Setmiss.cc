@@ -51,11 +51,13 @@ void *Setmiss(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SETMISSVAL = cdoOperatorAdd("setmissval", 0, 0, "missing value");
   int SETCTOMISS = cdoOperatorAdd("setctomiss", 0, 0, "constant");
   int SETMISSTOC = cdoOperatorAdd("setmisstoc", 0, 0, "constant");
   int SETRTOMISS = cdoOperatorAdd("setrtomiss", 0, 0, "range (min, max)");
   int SETVRANGE  = cdoOperatorAdd("setvrange",  0, 0, "range (min, max)");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

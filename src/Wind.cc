@@ -57,11 +57,13 @@ void *Wind(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
+  // clang-format off
   int UV2DV  = cdoOperatorAdd("uv2dv",  0, 0, NULL);
   int UV2DVL = cdoOperatorAdd("uv2dvl", 0, 0, NULL);
   int DV2UV  = cdoOperatorAdd("dv2uv",  0, 0, NULL);
   int DV2UVL = cdoOperatorAdd("dv2uvl", 0, 0, NULL);
   int DV2PS  = cdoOperatorAdd("dv2ps",  0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

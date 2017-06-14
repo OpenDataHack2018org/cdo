@@ -54,6 +54,7 @@ void *Timselstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("timselrange", func_range, 0, NULL);
   cdoOperatorAdd("timselmin",   func_min,   0, NULL);
   cdoOperatorAdd("timselmax",   func_max,   0, NULL);
@@ -68,20 +69,21 @@ void *Timselstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
+  bool lrange  = operfunc == func_range;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
+
   operatorInputArg("nsets <noffset <nskip>>");
 
   int nargc  = operatorArgc();
   int ndates = parameter2int(operatorArgv()[0]);
   int noffset = (nargc > 1) ? parameter2int(operatorArgv()[1]) : 0;
   int nskip   = (nargc > 2) ? parameter2int(operatorArgv()[2]) : 0;
+  // clang-format on
 
   if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
-
-  bool lrange  = operfunc == func_range;
-  bool lmean   = operfunc == func_mean || operfunc == func_avg;
-  bool lstd    = operfunc == func_std || operfunc == func_std1;
-  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
