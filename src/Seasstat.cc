@@ -58,6 +58,7 @@ void *Seasstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("seasrange", func_range, 0, NULL);
   cdoOperatorAdd("seasmin",   func_min,   0, NULL);
   cdoOperatorAdd("seasmax",   func_max,   0, NULL);
@@ -72,14 +73,15 @@ void *Seasstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int season_start = get_season_start();
-  get_season_name(seas_name);
-
   bool lrange  = operfunc == func_range;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
+  // clang-format on
+
+  int season_start = get_season_start();
+  get_season_name(seas_name);
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 

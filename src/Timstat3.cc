@@ -51,11 +51,12 @@ void *Timstat3(void *argument)
   int reached_eof[NIN];
   int n_in = NIN;
 
-
   cdoInitialize(argument);
 
+  // clang-format off
   int VARQUOT2TEST  = cdoOperatorAdd("varquot2test",  0, 0, NULL);
   int MEANDIFF2TEST = cdoOperatorAdd("meandiff2test", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

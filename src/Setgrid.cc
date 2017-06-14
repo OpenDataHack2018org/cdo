@@ -54,6 +54,7 @@ void *Setgrid(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SETGRID       = cdoOperatorAdd("setgrid",       0, 0, "grid description file or name");
   int SETGRIDTYPE   = cdoOperatorAdd("setgridtype",   0, 0, "grid type");
   int SETGRIDAREA   = cdoOperatorAdd("setgridarea",   0, 0, "filename with area weights");
@@ -62,6 +63,7 @@ void *Setgrid(void *argument)
   int SETGRIDNUMBER = cdoOperatorAdd("setgridnumber", 0, 0, "grid number and optionally grid position");
   int SETGRIDURI    = cdoOperatorAdd("setgriduri",    0, 0, "reference URI of the horizontal grid");
   int USEGRIDNUMBER = cdoOperatorAdd("usegridnumber", 0, 0, "use existing grid identified by grid number");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

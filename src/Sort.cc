@@ -157,10 +157,12 @@ void *Sort(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SORTCODE  = cdoOperatorAdd("sortcode",  0, 0, NULL);
   int SORTPARAM = cdoOperatorAdd("sortparam", 0, 0, NULL);
   int SORTNAME  = cdoOperatorAdd("sortname",  0, 0, NULL);
   int SORTLEVEL = cdoOperatorAdd("sortlevel", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

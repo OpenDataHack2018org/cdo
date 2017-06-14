@@ -403,9 +403,11 @@ void *Smooth(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SMOOTH  = cdoOperatorAdd("smooth",   0,   0, NULL);
   int SMOOTH9 = cdoOperatorAdd("smooth9",  0,   0, NULL);
- 
+  // clang-format on
+  
   int operatorID = cdoOperatorID();
 
   if ( operatorID == SMOOTH ) smooth_set_parameter(&xnsmooth, &spoint);

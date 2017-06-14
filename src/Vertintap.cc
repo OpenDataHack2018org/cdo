@@ -85,12 +85,14 @@ void *Vertintap(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int AP2PL     = cdoOperatorAdd("ap2pl",     func_pl, type_lin, "pressure levels in pascal");
   int AP2PLX    = cdoOperatorAdd("ap2plx",    func_pl, type_lin, "pressure levels in pascal");
   int AP2HL     = cdoOperatorAdd("ap2hl",     func_hl, type_lin, "height levels in meter");
   int AP2HLX    = cdoOperatorAdd("ap2hlx",    func_hl, type_lin, "height levels in meter");
   int AP2PL_LP  = cdoOperatorAdd("ap2pl_lp",  func_pl, type_log, "pressure levels in pascal");
   int AP2PLX_LP = cdoOperatorAdd("ap2plx_lp", func_pl, type_log, "pressure levels in pascal");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);

@@ -51,6 +51,7 @@ void *Ymonarith(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("ymonadd",  func_add, MONTHLY, NULL);
   cdoOperatorAdd("ymonsub",  func_sub, MONTHLY, NULL);
   cdoOperatorAdd("ymonmul",  func_mul, MONTHLY, NULL);
@@ -59,6 +60,7 @@ void *Ymonarith(void *argument)
   cdoOperatorAdd("yseassub", func_sub, SEASONAL, NULL);
   cdoOperatorAdd("yseasmul", func_mul, SEASONAL, NULL);
   cdoOperatorAdd("yseasdiv", func_div, SEASONAL, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

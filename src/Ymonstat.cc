@@ -76,6 +76,7 @@ void *Ymonstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("ymonrange", func_range, 0, NULL);
   cdoOperatorAdd("ymonmin",   func_min,   0, NULL);
   cdoOperatorAdd("ymonmax",   func_max,   0, NULL);
@@ -95,6 +96,7 @@ void *Ymonstat(void *argument)
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
+  // clang-format on
 
   for ( month = 0; month < NMONTH; month++ )
     {

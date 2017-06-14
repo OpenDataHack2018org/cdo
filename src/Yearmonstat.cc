@@ -49,8 +49,10 @@ void *Yearmonstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("yearmonmean",  func_mean, 0, NULL);
   cdoOperatorAdd("yearmonavg",   func_avg,  0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

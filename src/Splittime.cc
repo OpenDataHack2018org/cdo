@@ -77,10 +77,12 @@ void *Splittime(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
+  // clang-format off
   int SPLITHOUR = cdoOperatorAdd("splithour", func_time, 10000, NULL);
   int SPLITDAY  = cdoOperatorAdd("splitday",  func_date,     1, NULL);
   int SPLITMON  = cdoOperatorAdd("splitmon",  func_date,   100, NULL);
   int SPLITSEAS = cdoOperatorAdd("splitseas", func_date,   100, NULL);
+  // clang-format on
 
   UNUSED(SPLITDAY);
   UNUSED(SPLITHOUR);

@@ -47,6 +47,7 @@ void *Showinfo(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SHOWYEAR      = cdoOperatorAdd("showyear",      0, 0, NULL);
   int SHOWMON       = cdoOperatorAdd("showmon",       0, 0, NULL);
   int SHOWDATE      = cdoOperatorAdd("showdate",      0, 0, NULL);
@@ -61,6 +62,7 @@ void *Showinfo(void *argument)
   int SHOWLTYPE     = cdoOperatorAdd("showltype",     0, 0, NULL);
   int SHOWFORMAT    = cdoOperatorAdd("showformat",    0, 0, NULL);
   int SHOWGRID      = cdoOperatorAdd("showgrid",      0, 0, NULL); 
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

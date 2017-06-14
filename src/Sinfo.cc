@@ -86,6 +86,7 @@ void *Sinfo(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("sinfo",   func_generic, 0, NULL);
   cdoOperatorAdd("sinfop",  func_param,   0, NULL);
   cdoOperatorAdd("sinfon",  func_name,    0, NULL);
@@ -94,6 +95,7 @@ void *Sinfo(void *argument)
   cdoOperatorAdd("seinfop", func_param,   1, NULL);
   cdoOperatorAdd("seinfon", func_name,    1, NULL);
   cdoOperatorAdd("seinfoc", func_code,    1, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

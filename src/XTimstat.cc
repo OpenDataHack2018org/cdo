@@ -171,6 +171,7 @@ void *XTimstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("xtimmin",    func_min,   DATE_LEN, NULL);
   cdoOperatorAdd("xtimmax",    func_max,   DATE_LEN, NULL);
   cdoOperatorAdd("xtimsum",    func_sum,   DATE_LEN, NULL);
@@ -207,6 +208,7 @@ void *XTimstat(void *argument)
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor  = operfunc == func_std1 || operfunc == func_var1;
+  // clang-format on
 
   if ( operfunc == func_mean )
     {

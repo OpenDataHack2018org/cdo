@@ -64,8 +64,10 @@ void *Setzaxis(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SETZAXIS       = cdoOperatorAdd("setzaxis",        0, 0, "zaxis description file");
   int GENLEVELBOUNDS = cdoOperatorAdd("genlevelbounds",  0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

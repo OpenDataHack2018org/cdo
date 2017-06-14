@@ -194,6 +194,7 @@ void *Seltime(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
+  // clang-format off
   int SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     0, "timesteps");
   int SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 0, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
   int SELTIME     = cdoOperatorAdd("seltime",     func_time,     0, "times (format hh:mm:ss)");
@@ -203,6 +204,7 @@ void *Seltime(void *argument)
   int SELYEAR     = cdoOperatorAdd("selyear",     func_date,     0, "years");
   int SELSEASON   = cdoOperatorAdd("selseason",   func_date,     0, "seasons");
   int SELSMON     = cdoOperatorAdd("selsmon",     func_date,     0, "month[,nts1[,nts2]]");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

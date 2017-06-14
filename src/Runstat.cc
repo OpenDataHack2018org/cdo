@@ -70,19 +70,19 @@ void *Runstat(void *argument)
   cdoOperatorAdd("runvar1",  func_var1,  0, NULL);
   cdoOperatorAdd("runstd",   func_std,   0, NULL);
   cdoOperatorAdd("runstd1",  func_std1,  0, NULL);
-  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
-
-  operatorInputArg("number of timesteps");
-  int ndates = parameter2int(operatorArgv()[0]);
 
   bool lrange  = operfunc == func_range;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
+  // clang-format on
+
+  operatorInputArg("number of timesteps");
+  int ndates = parameter2int(operatorArgv()[0]);
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 

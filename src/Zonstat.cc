@@ -50,6 +50,7 @@ void *Zonstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("zonmin",   func_min,   0, NULL);
   cdoOperatorAdd("zonmax",   func_max,   0, NULL);
   cdoOperatorAdd("zonrange", func_range, 0, NULL);
@@ -61,6 +62,7 @@ void *Zonstat(void *argument)
   cdoOperatorAdd("zonstd",   func_std,   0, NULL);
   cdoOperatorAdd("zonstd1",  func_std1,  0, NULL);
   cdoOperatorAdd("zonpctl",  func_pctl,  0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

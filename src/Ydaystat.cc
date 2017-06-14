@@ -56,6 +56,7 @@ void *Ydaystat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("ydayrange", func_range, 0, NULL);
   cdoOperatorAdd("ydaymin",   func_min,   0, NULL);
   cdoOperatorAdd("ydaymax",   func_max,   0, NULL);
@@ -75,6 +76,7 @@ void *Ydaystat(void *argument)
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
+  // clang-format on
 
   for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     {

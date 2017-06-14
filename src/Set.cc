@@ -58,6 +58,7 @@ void *Set(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code number");
   int SETPARAM   = cdoOperatorAdd("setparam",   0, 0, "parameter identifier (format: code[.tabnum] or num[.cat[.dis]])");
   int SETNAME    = cdoOperatorAdd("setname",    0, 0, "variable name");
@@ -65,6 +66,7 @@ void *Set(void *argument)
   int SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
   int SETLTYPE   = cdoOperatorAdd("setltype",   0, 0, "GRIB level type");
   int SETTABNUM  = cdoOperatorAdd("settabnum",  0, 0, "GRIB table number");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

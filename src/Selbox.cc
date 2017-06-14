@@ -857,8 +857,10 @@ void *Selbox(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SELLONLATBOX = cdoOperatorAdd("sellonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");
   int SELINDEXBOX  = cdoOperatorAdd("selindexbox",  0, 0, "index of first and last longitude and index of first and last latitude");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

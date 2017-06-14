@@ -58,8 +58,10 @@ void *Splityear(void *argument)
   
   bool lcopy = UNCHANGED_RECORD;
 
+  // clang-format off
   int SPLITYEAR    = cdoOperatorAdd("splityear",     0, 10000, NULL);
   int SPLITYEARMON = cdoOperatorAdd("splityearmon",  0,   100, NULL);
+  // clang-format on
   
   int operatorID = cdoOperatorID();
   int operintval = cdoOperatorF2(operatorID);

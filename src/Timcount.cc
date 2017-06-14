@@ -43,11 +43,13 @@ void *Timcount(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("timcount",  0, 31, NULL);
   cdoOperatorAdd("yearcount", 0, 10, NULL);
   cdoOperatorAdd("moncount",  0,  8, NULL);
   cdoOperatorAdd("daycount",  0,  6, NULL);
   cdoOperatorAdd("hourcount", 0,  4, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

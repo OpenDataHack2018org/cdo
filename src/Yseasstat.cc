@@ -78,6 +78,7 @@ void *Yseasstat(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   cdoOperatorAdd("yseasrange", func_range, 0, NULL);
   cdoOperatorAdd("yseasmin",   func_min,   0, NULL);
   cdoOperatorAdd("yseasmax",   func_max,   0, NULL);
@@ -92,6 +93,13 @@ void *Yseasstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
+  bool lrange  = operfunc == func_range;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
+  // clang-format on
+
   for ( int seas = 0; seas < NSEAS; seas++ )
     {
       vars1[seas]  = NULL;
@@ -101,12 +109,6 @@ void *Yseasstat(void *argument)
       datetime[seas].vdate = 0;
       datetime[seas].vtime = 0;
     }
-
-  bool lrange  = operfunc == func_range;
-  bool lmean   = operfunc == func_mean || operfunc == func_avg;
-  bool lstd    = operfunc == func_std || operfunc == func_std1;
-  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 

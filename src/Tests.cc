@@ -32,11 +32,13 @@ void *Tests(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int NORMAL    = cdoOperatorAdd("normal",    0, 0, NULL);
   int STUDENTT  = cdoOperatorAdd("studentt",  0, 0, "degree of freedom");
   int CHISQUARE = cdoOperatorAdd("chisquare", 0, 0, "degree of freedom");
   int BETA      = cdoOperatorAdd("beta",      0, 0, "p and q");
   int FISHER    = cdoOperatorAdd("fisher",    0, 0, "degree of freedom of nominator and of denominator");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

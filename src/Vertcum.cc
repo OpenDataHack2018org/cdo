@@ -64,8 +64,10 @@ void *Vertcum(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
                   cdoOperatorAdd("vertcum",    0,  0, NULL);
   int VERTCUMHL = cdoOperatorAdd("vertcumhl",  0,  0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 

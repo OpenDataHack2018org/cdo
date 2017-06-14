@@ -451,8 +451,10 @@ void *Sethalo(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int SETHALO = cdoOperatorAdd("sethalo", 0, 0, NULL);
                 cdoOperatorAdd("tpnhalo", 0, 0, NULL);
+  // clang-format on
 
   int operatorID = cdoOperatorID();
 
