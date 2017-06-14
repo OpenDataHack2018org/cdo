@@ -51,7 +51,6 @@ void *Timstat3(void *argument)
   int reached_eof[NIN];
   int n_in = NIN;
 
-
   cdoInitialize(argument);
 
   // clang-format off
@@ -66,7 +65,7 @@ void *Timstat3(void *argument)
   double rconst = parameter2double(operatorArgv()[0]);
   double risk   = parameter2double(operatorArgv()[1]);
 
-  if ( operatorID == VARQUOT2TEST )1
+  if ( operatorID == VARQUOT2TEST )
     {
       if ( rconst <= 0 )
 	cdoAbort("Constant must be positive!");
