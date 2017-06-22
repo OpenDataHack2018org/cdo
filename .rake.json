@@ -43,9 +43,9 @@
   "remoteUser": "m300064",
 
   "builders": {
-    "localCLANG_3.8_Debug": {
+    "localCLANG_4.0_Debug": {
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp CC=clang CXX=clang++ CFLAGS='-g -O0'",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp CC=clang CXX=clang++ CFLAGS='-g -O0' LDFLAGS=-lhdf5",
       "makeCall": "make -j 12",
       "sync": false
     },
