@@ -264,7 +264,7 @@ AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Genweights.test test/Rema
 AC_CONFIG_FILES([test/EOF.test test/Select.test test/Spectral.test test/Vertint.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Timstat.test test/Timselstat.test test/Seasstat.test test/Runstat.test test/Multiyearstat.test test/Ydrunstat.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gridboxstat.test test/Vertstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([test/Merstat.test test/Zonstat.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Merstat.test test/Zonstat.test test/Mergetime.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/MapReduce.test test/Ninfo.test],[chmod a+x "$ac_file"])
