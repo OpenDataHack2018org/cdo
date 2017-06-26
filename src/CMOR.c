@@ -608,7 +608,7 @@ static int maptab_via_cn_and_key(list_t *kvl_oname, int vlistID, int nvars, char
   keyValues_t *kv = kvlist_search(kvl_oname, key);
   if ( kv )
     {
-      int varID = getVarIDToMap(vlistID, nvars, key, kv->values[0]);
+      int varID = ( strcmp(key, "cmor_name") == 0 ) ? getVarIDToMap(vlistID, nvars, "name", kv->values[0]) : getVarIDToMap(vlistID, nvars, key, kv->values[0]);
       if ( varID != CDI_UNDEFID )
         {
           printf("Started mapping of variable via '%s'.\n", key);
@@ -660,7 +660,7 @@ static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, i
           else
             {
               cdoWarning("No identification 'name' or 'code' in mapping table line of cmor_name '%s'. Try to use cmor_name.\n", request[j]);
-              if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "code") )
+              if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "cmor_name") )
                 {
                   printf("*******Succesfully mapped variable via cmor_name to cmor_name '%s'.********\n", request[j]); 
                   continue;
@@ -1694,6 +1694,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 #endif
   Free(calendarptr);
   Free(branch_times);
+  Free(time_units);
   if ( cdoVerbose )
     printf("*******Successfully finished cmor_setup and cmor_dataset.*******\n");
 }
@@ -4107,6 +4108,7 @@ static int get_miptab_freq(list_t *kvl, char *mip_table, char *project_id)
       else if ( strcmp(freq, "E1hrClimMon") == 0 )
         miptab_freq = 7;
     }
+  return miptab_freq;
 }
 
 static void check_cmdline_mapping(list_t *kvl)
