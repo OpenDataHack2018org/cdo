@@ -567,8 +567,13 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
   char yunits[CDI_MAX_NAME]; yunits[0] = 0;
   cdiGridInqKeyStr(gridID, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
-  grid_to_radian(yunits, nx, grid->reg2d_center_lon, "grid reg2d center lon"); 
-  grid_to_radian(yunits, ny, grid->reg2d_center_lat, "grid reg2d center lat"); 
+  grid_to_radian(yunits, nx, grid->reg2d_center_lon, "grid reg2d center lon");
+  grid_to_radian(yunits, ny, grid->reg2d_center_lat, "grid reg2d center lat");
+
+  if ( grid->reg2d_center_lon[nx-1] < grid->reg2d_center_lon[0] )
+    for ( long i = 1; i < nx; ++i )
+      if ( grid->reg2d_center_lon[i] < grid->reg2d_center_lon[i-1] )
+        grid->reg2d_center_lon[i] += PI2;
 
   if ( grid->is_cyclic ) grid->reg2d_center_lon[nx] = grid->reg2d_center_lon[0] + PI2;
 
