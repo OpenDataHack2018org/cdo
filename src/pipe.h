@@ -29,43 +29,9 @@
 
 #include <pthread.h>
 #include "pthread_debug.h"
+#include "pstream.h"
 
 #endif
-
-typedef struct {
-  bool        check_datarange;
-  int         gridsize;
-  int         datatype;
-  double      missval;
-  double      addoffset;
-  double      scalefactor;
-} varlist_t;
-
-
-typedef struct {
-  int            self;
-  int            mode;
-  int            fileID;
-  int            vlistID;
-  int            tsID;
-  int            filetype;
-  int            tsID0;
-  int            mfiles;
-  int            nfiles;
-  int            varID;           /* next varID defined with streamDefVar */
-  bool           ispipe;
-  bool           isopen;
-  char          *name;
-  char         **mfnames;
-  varlist_t     *varlist;
-#if defined(HAVE_LIBPTHREAD)
-  void          *argument;
-  struct pipe_s *pipe;
-  pthread_t     rthreadID; /* read  thread ID */
-  pthread_t     wthreadID; /* write thread ID */
-#endif
-} pstream_t;
-
 
 #if defined(HAVE_LIBPTHREAD)
 

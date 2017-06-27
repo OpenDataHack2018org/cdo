@@ -19,8 +19,33 @@
 #define PSTREAM_H
 
 #include "pstream_write.h"
+#include "varlist.h"
 
 #include <sys/types.h> /* off_t */
+
+typedef struct {
+  int            self;
+  int            mode;
+  int            fileID;
+  int            vlistID;
+  int            tsID;
+  int            filetype;
+  int            tsID0;
+  int            mfiles;
+  int            nfiles;
+  int            varID;           /* next varID defined with streamDefVar */
+  bool           ispipe;
+  bool           isopen;
+  char          *name;
+  char         **mfnames;
+  varlist_t     *varlist;
+#if defined(HAVE_LIBPTHREAD)
+  void          *argument;
+  struct pipe_s *pipe;
+  pthread_t     rthreadID; /* read  thread ID */
+  pthread_t     wthreadID; /* write thread ID */
+#endif
+} pstream_t;
 
 int     pstreamOpenRead(const argument_t *argument);
 int     pstreamOpenAppend(const argument_t *argument);

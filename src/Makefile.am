@@ -162,6 +162,7 @@ libcdo_la_SOURCES =            \
                uthash.h        \
                util.cc          \
                util.h          \
+			   varlist.h		\
                zaxis_print.cc   \
                zaxis.cc
 libcdo_la_SOURCES +=           \
