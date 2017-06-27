@@ -22395,7 +22395,7 @@ ac_config_files="$ac_config_files test/Timstat.test test/Timselstat.test test/Se
 
 ac_config_files="$ac_config_files test/Gridboxstat.test test/Vertstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test"
 
-ac_config_files="$ac_config_files test/Merstat.test test/Zonstat.test"
+ac_config_files="$ac_config_files test/Merstat.test test/Zonstat.test test/Mergetime.test"
 
 ac_config_files="$ac_config_files test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test"
 
@@ -23585,6 +23585,7 @@ do
     "test/Enspctl.test") CONFIG_FILES="$CONFIG_FILES test/Enspctl.test" ;;
     "test/Merstat.test") CONFIG_FILES="$CONFIG_FILES test/Merstat.test" ;;
     "test/Zonstat.test") CONFIG_FILES="$CONFIG_FILES test/Zonstat.test" ;;
+    "test/Mergetime.test") CONFIG_FILES="$CONFIG_FILES test/Mergetime.test" ;;
     "test/Afterburner.test") CONFIG_FILES="$CONFIG_FILES test/Afterburner.test" ;;
     "test/Detrend.test") CONFIG_FILES="$CONFIG_FILES test/Detrend.test" ;;
     "test/Arithc.test") CONFIG_FILES="$CONFIG_FILES test/Arithc.test" ;;
@@ -25118,6 +25119,7 @@ _LT_EOF
     "test/Enspctl.test":F) chmod a+x "$ac_file" ;;
     "test/Merstat.test":F) chmod a+x "$ac_file" ;;
     "test/Zonstat.test":F) chmod a+x "$ac_file" ;;
+    "test/Mergetime.test":F) chmod a+x "$ac_file" ;;
     "test/Afterburner.test":F) chmod a+x "$ac_file" ;;
     "test/Detrend.test":F) chmod a+x "$ac_file" ;;
     "test/Arithc.test":F) chmod a+x "$ac_file" ;;

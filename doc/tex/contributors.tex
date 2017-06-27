@@ -1,113 +1,162 @@
-Contributors
+\chapter{Contributors}
 
-* History
+\section{History}
 
-CDO was originally developed by Uwe Schulzweida at the Max Planck Institute for Meteorology (MPI-M).
+{\CDO} was originally developed by Uwe Schulzweida at the Max Planck Institute for Meteorology (MPI-M).
 The MPI-M, together with the DKRZ, has a long history in the development of tools for processing climate data.
-CDO was inspired by some of these tools, such as the PINGO package and the GRIB-Modules. 
-PINGO was developed by Jürgen Waszkewitz, Peter Lenzen, and Nathan Gillet in 1995 at the DKRZ, Hamburg (Germany).
-CDO has a similar user interface and uses some of PINGO routines.
-The GRIB-Modules was developed by 
+{\CDO} was inspired by some of these tools, such as the PINGO package and the GRIB-Modules.
 
-* External sources
+PINGO\footnote{Procedural INterface for GRIB formatted Objects} was developed by J\"urgen Waszkewitz,
+ Peter Lenzen, and Nathan Gillet in 1995 at the DKRZ, Hamburg (Germany).
+{\CDO} has a similar user interface and uses some of the PINGO routines.
 
-CDO has incorporated code from several sources:
+The GRIB-Modules was developed by Heiko Borgert and Wolfgang Welke in 1991 at the MPI-M.
+{\CDO} is using a similar module structure and also some of the routines.
 
-afterburner is a postprocessing program for ECHAM data and ECMWF analysis data,
+\section{External sources}
+
+{\CDO} has incorporated code from several sources:
+
+\begin{description}
+\item[afterburner] is a postprocessing program for ECHAM data and ECMWF analysis data,
 originally developed by Edilbert Kirk, Michael Ponater and Arno Hellbach.
-The afterburner code was modified for the CDO opertors after, sp2gp, gp2sp.
+The afterburner code was modified for the {\CDO} opertors  {\htmlref{after}{after}},  {\htmlref{sp2gp}{sp2gp}},  {\htmlref{gp2sp}{gp2sp}}.
 
-SCRIP is a software package used to generate interpolation weights for remapping
-fields from one grid to another in spherical geometry.
+\item[SCRIP] is a software package used to generate interpolation weights for remapping
+fields from one grid to another in spherical geometry \cite{SCRIP}.
 It was developed at the Los Alamos National Laboratory by Philip W. Jones.
-The SCRIP library was converted from Fortran to ANSI C and is used a
-the base for the remapping operators in CDO.
+The SCRIP library was converted from Fortran to ANSI C and is used as
+the base for the remapping operators in {\CDO}.
 
-YAC (Yet Another Coupler) was jointly developed by DKRZ and MPI-M by Moritz Hanke and Rene Redler.
-CDO is using the clipping routines for the conservative remapping with remapycon.
+\item[YAC] (Yet Another Coupler) was jointly developed by DKRZ and MPI-M by Moritz Hanke and Rene Redler \cite{YAC}.
+{\CDO} is using the clipping routines for the conservative remapping with remapycon.
 
-CDO uses tools from the GNU project, including automake, and libtool. 
+\item[libkdtree] a C99 implementation of the kd-tree algorithm developed by J\"org Dietrich.
+\end{description}
 
-* Contributors
+{\CDO} uses tools from the GNU project, including automake, and libtool. 
 
-Users have contributed patches and suggestions over time.
-The primary contributors to the CDO development have been: 
+\section{Contributors}
 
-Uwe Schulweida
+The primary contributors to the {\CDO} development have been: 
 
-Concept, design and implementation of CDO, project coordination, and releases.
+\begin{description}
+\item[Uwe Schulweida]: Concept, design and implementation of {\CDO}, project coordination, and releases.
 
-Luis Kornblueh
-supported CDO from the beginning. His main contributions is performance optimization.
+% Luis Kornblueh  GME, dv2uvl uv2dvl dv2ps gauaw
+% supported {\CDO} from the beginning. His main contributions is performance optimization.
 
-Ralf Müller
+% \item[Ralf M\"uller]: Webpage, ruby and python interface <------------------
+% Implemented operators: showunit, stdatm, intlevel3d, consecsum, consects
+% Modified operators: eca\_gsl
 
-Webpage <------------------
-Implemented operators: showunit, stdatm, intlevel3d, consecsum, consects
-Modified operators: eca_gsl
+\item[Cedrick Ansorge]: He worked on the {\CDO} software package as a student assistant at MPI-M from 2007-2011.
+Implemented operators: {\htmlref{eof}{eof}}, {\htmlref{eof3d}{eof3d}}, {\htmlref{enscrps}{enscrps}}, {\htmlref{ensbrs}{ensbrs}},
+ {\htmlref{maskregion}{maskregion}}, {\htmlref{bandpass}{bandpass}}, {\htmlref{lowpass}{lowpass}}, {\htmlref{highpass}{highpass}}, {\htmlref{smooth9}{smooth9}}
 
-Cedrick Ansorge
+\item[Oliver Heidmann]: He worked on the {\CDO} software package as a student assistant at MPI-M from 2015-2017.
 
-He worked on the CDO software package as a student assistant at MPI-M from 2007-2011.
-Implemented operators: eof, eof3d, enscrps, ensbrs, maskregion, bandpass, lowpass, highpass, smooth9
+\item[Fabian Wachsmann]: He is working on {\CDO} for the CMIP6 project and is responsible for the operator cmor.
 
-Ralf Quast
-
-He worked on CDO on behalf of the Service Gruppe Anpassung (SGA), DKRZ in 2006.
-Implemented operators: all ECA Indices of Daily Temperature and
-Precipitation Extremes, all percentile operators, module Ydrun<STAT>,
-wct, hi
+\item[Ralf Quast]: He worked on {\CDO} on behalf of the Service Gruppe Anpassung (SGA), DKRZ in 2006.
+Implemented all ECA Indices of Daily Temperature and Precipitation Extremes, 
+all percentile operators, module {\htmlref{YDRUNSTAT}{YDRUNSTAT}} and {\htmlref{wct}{wct}}.
 % timcount, hourcount, daycount, moncount, yearcount, seascount
 
-Karl-Hermann Wieners
+\item[Kameswarrao Modali]: Implemented operators: contour, shaded, grfill, vector, graph.
 
-Implemented operators: aexpr, aexprf, selzaxisname
+\item[Michal Koutek]: Implemented operators: {\htmlref{selmulti}{selmulti}}
+{\htmlref{delmulti}{delmulti}}, {\htmlref{changemulti}{changemulti}}, {\htmlref{samplegrid}{samplegrid}},
+{\htmlref{uvDestag}{uvDestag}}, {\htmlref{rotuvNorth}{rotuvNorth}}, {\htmlref{projuvLatLon}{projuvLatLon}}.
 
-Frank Kaspar
+\item[Etienne Tourigny]: Implemented operators:  {\htmlref{setclonlatbox}{setclonlatbox}}, {\htmlref{setcindexbox}{setcindexbox}},
+ {\htmlref{setvals}{setvals}}, {\htmlref{splitsel}{splitsel}}, {\htmlref{histfreq}{histfreq}}, {\htmlref{setrtoc}{setrtoc}}, {\htmlref{setrtoc2}{setrtoc2}}.
 
-Contributed to operator: import_cmsaf
+\item[Karl-Hermann Wieners]: Implemented operators: {\htmlref{aexpr}{aexpr}},  {\htmlref{aexprf}{aexprf}},  {\htmlref{selzaxisname}{selzaxisname}}.
+\end{description}
 
-Etienne Tourigny
+% Frank Kaspar: Contributed to operator: import\_cmsaf
 
-Implemented operators: setclonlatbox, setcindexbox, setvals, splitsel, histfreq, setrtoc, setrtoc2
+% Helmut Haak: Contributed to operator: adisit, adipot
 
-Helmut Haak
+% Martin Claus: Modified operator: vertwind (added missing value support)
 
-Contributed to operator: adisit
+% Álvaro M. Valdebenito: Modified operators:  settunits, settaxis and shifttime (added support for "seconds")
 
-Martin Claus
+% Mathis Rosenhauer: Implemented operators: cmor (initial version)
 
-Modified operator: vertwind (added missing value support)
+%Reinhard Budich
 
-Álvaro M. Valdebenito
+Many users have contributed to {\CDO} by sending bug reports, patches
+and suggestions over time.
+Very helpful is also the active participation in the user forum of some users.
+Here is an incomplete list:
 
-Modified operators:  settunits, settaxis and shifttime (added support for "seconds")
-
-Modali Kameswarrao
-
-Mathis Rosenhauer
-
-Implemented operators: cmor (initial version)
-
-Reinhard Budich
-
+Jaison-Thomas Ambadan,
+Harald Anlauf,
+Andy Aschwanden,
+Stefan Bauer,
+Renate Brokopf,
+Michael Boettinger,
+Simon Blessing,
+Tim Br\"ucher,
+Martin Claus,
+Traute Cr\"uger,
+Irene Fischer-Bruns,
+Chris Fletscher,
+Helmut Frank,
+Kristina Fr\"ohlich,
+Oliver Fuhrer,
+Monika Esch,
+Pier Giuseppe Fogli,
+Beate Gayer,
+Veronika Gayler,
+Marco Giorgetta,
+David Gobbett,
+Holger Goettel,
+Helmut Haak,
+Stefan Hagemann,
+Angelika Heil,
+Barbara Hennemuth,
+Daniel Hernandez,
+Nathanael Huebbe,
+Thomas Jahns,
+Frank Kaspar,
+Daniel Klocke,
+Edi Kirk,
+Yvonne K\"ustermann,
+Stefanie Legutke,
+Leonidas Linardakis,
+Stephan Lorenz,
+Frank Lunkeit,
+Karin Meier-Fleischer,
+Uwe Mikolajewicz,
+Laura Niederdrenk,
+Dirk Notz,
+Hans-J\"urgen Panitz,
+Ronny Petrik,
+Swantje Preuschmann,
+Florian Prill,
+Asela Rajapakse,
+Daniel Reinert,
+Hannes Reuter,
+Mathis Rosenhauer,
+Reiner Schnur,
+Martin Schultz,
+Dennis Shea,
+Kevin Sieck,
+Martin Stendel,
+Bjorn Stevens,
+Martina Stockhaus,
+Claas Teichmann,
+J\"org Trentmann,
+\'Alvaro M. Valdebenito
+Geert Jan van Oldenborgh,
+Jin-Song von Storch
+David Wang,
+Joerg Wegner,
+Heiner Widmann,
+Claudia Wunram,
+Klaus Wyser
 
 Please let me know if your name was omitted!
-
-CDO would not be what it is today without the invaluable help of these people, who contributed by donating code, bug fixes and documentation:
-Helmut Haak,
-Renate Brokopf,
-Traute, 
-Thomas Jahns,
-Florian Prill,
-Daniel Reinert
-Jaison-Thomas Ambadan
-
-I have probably omitted some important names here because of incomplete record keeping. If I have overlooked you, please let me know and I will update the list. Many more, too numerous to mention here, have contributed by sending bug reports and suggesting various improvements.
-
-
-Acknowledgments
-
-
-
-* Procedural INterface for GRIB formatted Objects

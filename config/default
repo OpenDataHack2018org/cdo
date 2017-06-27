@@ -33,43 +33,48 @@ case "${HOSTNAME}" in
     bailung*|d133*|d134*)
         CDOLIBS="--enable-nearpt3 \
                  --with-fftw3 \
-                 --with-grib_api=$HOME/local/grib_api-1.14.7aec \
-                 --with-netcdf=$HOME/local/netcdf-c-4.3.3.1-threadsafe \
-                 --with-hdf5=$HOME/local/hdf5-1.8.15-threadsafe \
+                 --with-eccodes=$HOME/local/eccodes-2.3.0 \
+                 --with-netcdf=$HOME/local/netcdf-4.4.1.1 \
+                 --with-hdf5=$HOME/local/hdf5-1.8.19-threadsafe \
                  --with-udunits2=/opt/local \
                  --with-curl=/opt/local \
                  --with-libxml2=/usr \
-                 --with-magics=$HOME/local/Magics-2.25.3 \
                  --with-proj=/opt/local \
-                 --with-szlib=$HOME/local/libaec-0.3.2"
+                 --with-szlib=$HOME/local"
+#                 --with-magics=$HOME/local/Magics-2.25.3 \
 
         if  test "$COMP" = intel ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib -Wl,-rpath,/opt/intel/lib" \
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
 	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=clang++ CXXFLAGS="-g -Wall -O3" \
 	            CC=clang    CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = gnu4.9 ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=g++-mp-4.9 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
                     CC=gcc-mp-4.9  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         elif  test "$COMP" = gnu5 ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=g++-mp-5 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
                     CC=gcc-mp-5  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         elif  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=g++ CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
                     CC=gcc  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
 #                    --with-libxml2=/usr 

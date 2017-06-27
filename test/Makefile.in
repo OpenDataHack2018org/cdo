@@ -95,12 +95,13 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Fldstat.test.in $(srcdir)/Fldpctl.test.in \
 	$(srcdir)/Ensstat.test.in $(srcdir)/Enspctl.test.in \
 	$(srcdir)/Merstat.test.in $(srcdir)/Zonstat.test.in \
-	$(srcdir)/Afterburner.test.in $(srcdir)/Detrend.test.in \
-	$(srcdir)/Arithc.test.in $(srcdir)/Arith.test.in \
-	$(srcdir)/Expr.test.in $(srcdir)/Gradsdes.test.in \
-	$(srcdir)/Collgrid.test.in $(srcdir)/threads.test.in \
-	$(srcdir)/tsformat.test.in $(srcdir)/wildcard.test.in \
-	$(srcdir)/MapReduce.test.in $(srcdir)/Ninfo.test.in README
+	$(srcdir)/Mergetime.test.in $(srcdir)/Afterburner.test.in \
+	$(srcdir)/Detrend.test.in $(srcdir)/Arithc.test.in \
+	$(srcdir)/Arith.test.in $(srcdir)/Expr.test.in \
+	$(srcdir)/Gradsdes.test.in $(srcdir)/Collgrid.test.in \
+	$(srcdir)/threads.test.in $(srcdir)/tsformat.test.in \
+	$(srcdir)/wildcard.test.in $(srcdir)/MapReduce.test.in \
+	$(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
@@ -120,9 +121,9 @@ CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Seasstat.test Runstat.test Multiyearstat.test Ydrunstat.test \
 	Gridboxstat.test Vertstat.test Fldstat.test Fldpctl.test \
 	Ensstat.test Enspctl.test Merstat.test Zonstat.test \
-	Afterburner.test Detrend.test Arithc.test Arith.test Expr.test \
-	Gradsdes.test Collgrid.test threads.test tsformat.test \
-	wildcard.test MapReduce.test Ninfo.test
+	Mergetime.test Afterburner.test Detrend.test Arithc.test \
+	Arith.test Expr.test Gradsdes.test Collgrid.test threads.test \
+	tsformat.test wildcard.test MapReduce.test Ninfo.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -541,7 +542,7 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
         Timstat.test Timselstat.test Seasstat.test \
         Runstat.test Multiyearstat.test Ydrunstat.test \
-        EOF.test \
+        Mergetime.test EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
         Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
 
@@ -649,6 +650,8 @@ Enspctl.test: $(top_builddir)/config.status $(srcdir)/Enspctl.test.in
 Merstat.test: $(top_builddir)/config.status $(srcdir)/Merstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Zonstat.test: $(top_builddir)/config.status $(srcdir)/Zonstat.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Mergetime.test: $(top_builddir)/config.status $(srcdir)/Mergetime.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Afterburner.test: $(top_builddir)/config.status $(srcdir)/Afterburner.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

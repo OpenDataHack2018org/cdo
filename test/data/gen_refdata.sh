@@ -5,6 +5,16 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Mergetime
+#
+$CDO $FORMAT settaxis,2001-01-01,,1year -const,1,r1x1 mergetime_y1
+$CDO $FORMAT settaxis,2002-01-01,,1year -const,2,r1x1 mergetime_y2
+$CDO $FORMAT mergetime mergetime_y1 mergetime_y2 mergetime_y12
+env SKIP_SAME_TIME=1 cdo mergetime mergetime_y2 mergetime_y12  mergetime_ref
+env SKIP_SAME_TIME=1 cdo mergetime mergetime_y12 mergetime_y2  mergetime_ref2
+exit
+########################################################################
+#
 # Timstat Yearstat Monstat Daystat Runstat
 #
 IFILE=$HOME/data/cdt/cera/EH5_AMIP_1_TSURF_6H_1991-1995.grb
