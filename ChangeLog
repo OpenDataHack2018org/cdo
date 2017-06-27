@@ -5,6 +5,7 @@
 
 2017-06-27  Uwe Schulzweida
 
+	* expr: added support for clev in ifthenelse (bug fix).
 	* setpartabp: param key values without leading zeros (bug fix).
 
 2017-06-08  Uwe Schulzweida
