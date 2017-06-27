@@ -40,6 +40,7 @@
 #include "util.h"
 #include "pstream_int.h"
 #include "dmemory.h"
+#include "pthread.h"
 
 #if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -383,29 +384,6 @@ const char *processOperator(void)
   int processID = processSelf();
 
   return Process[processID].xoperator;
-}
-
-static
-char *getOperatorArg(const char *xoperator)
-{
-  char *operatorArg = NULL;
-
-  if ( xoperator )
-    {
-      char *commapos = (char *)strchr(xoperator, ',');
-
-      if ( commapos )
-        {
-          size_t len = strlen(commapos+1);
-          if ( len )
-            {
-              operatorArg = (char*) Malloc(len+1);
-              strcpy(operatorArg, commapos+1);
-            }
-        }
-    }
-
-  return operatorArg;
 }
 
 static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams);
@@ -999,4 +977,37 @@ int cdoStreamNumber()
   int processID = processSelf();
 
   return operatorStreamNumber(Process[processID].operatorName);
+}
+
+void print_process(int p_process_id)
+{
+#if defined(HAVE_LIBPTHREAD)
+  std::cout << " threadID        : " << Process[p_process_id].threadID                     <<  std::endl;
+  std::cout << " l_threadID      : " << Process[p_process_id].l_threadID                   <<  std::endl;
+#endif
+  std::cout << " nchild          : " << Process[p_process_id].nchild                       <<  std::endl;
+  std::cout << " nInStream       : " << Process[p_process_id].nInStream                    <<  std::endl;
+  std::cout << " nOutStream      : " << Process[p_process_id].nOutStream                   <<  std::endl;
+  for(int i = 0; i < Process[p_process_id].nInStream; i++){
+    std::cout << "    " << Process[p_process_id].inputStreams[i]  <<  std::endl;
+  }
+  for(int i = 0; i < Process[p_process_id].nOutStream; i++){
+    std::cout << "    " << Process[p_process_id].outputStreams[i] <<  std::endl;
+  }
+  std::cout << " s_utime         : " << Process[p_process_id].s_utime                      <<  std::endl;
+  std::cout << " s_stime         : " << Process[p_process_id].s_stime                      <<  std::endl;
+  std::cout << " a_utime         : " << Process[p_process_id].a_utime                      <<  std::endl;
+  std::cout << " a_stime         : " << Process[p_process_id].a_stime                      <<  std::endl;
+  std::cout << " cputime         : " << Process[p_process_id].cputime                      <<  std::endl;
+
+  std::cout << " nvals           : " << Process[p_process_id].nvals                        <<  std::endl;
+  std::cout << " nvars           : " << Process[p_process_id].nvars                        <<  std::endl;
+  std::cout << " ntimesteps      : " << Process[p_process_id].ntimesteps                   <<  std::endl;
+  std::cout << " streamCnt       : " << Process[p_process_id].streamCnt                    <<  std::endl;
+  std::cout << " streamNames     : " << Process[p_process_id].streamNames                  <<  std::endl;
+  std::cout << " xoperator       : " << Process[p_process_id].xoperator                    <<  std::endl;
+  std::cout << " operatorName    : " << Process[p_process_id].operatorName                 <<  std::endl;
+  std::cout << " operatorArg     : " << Process[p_process_id].operatorArg                  <<  std::endl;
+  std::cout << " oargc           : " << Process[p_process_id].oargc                        <<  std::endl;
+  std::cout << " noper           : " << Process[p_process_id].noper                        <<  std::endl;
 }
