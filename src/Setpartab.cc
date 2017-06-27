@@ -30,7 +30,25 @@
 #include "convert_units.h"
 
 int stringToParam(const char *paramstr);
-void paramToStringLong(int param, char *paramstr, int maxlen);
+
+void paramToString(int param, char *paramstr, int maxlen)
+{
+  int len;
+
+  int dis, cat, num;
+  cdiDecodeParam(param, &num, &cat, &dis);
+
+  size_t umaxlen = maxlen >= 0 ? (unsigned)maxlen : 0U;
+  if ( dis == 255 && (cat == 255 || cat == 0 ) )
+    len = snprintf(paramstr, umaxlen, "%d", num);
+  else  if ( dis == 255 )
+    len = snprintf(paramstr, umaxlen, "%d.%d", num, cat);
+  else
+    len = snprintf(paramstr, umaxlen, "%d.%d.%d", num, cat, dis);
+
+  if ( len >= maxlen || len < 0)
+    fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
+}
 
 typedef enum {CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
 
@@ -119,6 +137,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
         }
 
       list_t *kvlist = NULL;
+      keyValues_t *kv;
       if ( ptmode == CODE_NUMBER )
         {
           codenum = vlistInqVarCode(vlistID2, varID);
@@ -129,27 +148,24 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
               int tableID = vlistInqVarTable(vlistID2, varID);
               int tabnum  = tableInqNum(tableID);
               int levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
-              int table = tabnum;
-              int ltype = levtype;
-              keyValues_t *kv = kvlist_search(kvlist, "table");
-              if ( kv && kv->nvalues == 1 ) table = parameter2int(kv->values[0]);
+              kv = kvlist_search(kvlist, "table");
+              int table = (kv && kv->nvalues == 1) ? parameter2int(kv->values[0]) : tabnum;
               kv = kvlist_search(kvlist, "ltype");
-              if ( kv && kv->nvalues == 1 ) ltype = parameter2int(kv->values[0]);
+              int ltype = (kv && kv->nvalues == 1) ? parameter2int(kv->values[0]) : levtype;
               if ( !(tabnum == table && levtype == ltype) ) kvlist = NULL;
             }
         }
       else if ( ptmode == PARAMETER_ID )
         {
           int param = vlistInqVarParam(vlistID2, varID);
-          paramToStringLong(param, paramstr, sizeof(paramstr));
+          paramToString(param, paramstr, sizeof(paramstr));
           snprintf(valstr, sizeof(valstr), "%s", paramstr);
           kvlist = pmlist_search_kvlist_ventry(pmlist, "param", valstr, nventry, ventry);
           if ( kvlist )
             {
               int levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
-              int ltype = levtype;
-              keyValues_t *kv = kvlist_search(kvlist, "ltype");
-              if ( kv && kv->nvalues == 1 ) ltype = parameter2int(kv->values[0]);
+              kv = kvlist_search(kvlist, "ltype");
+              int ltype = (kv && kv->nvalues == 1) ? parameter2int(kv->values[0]) : levtype;
               if ( !(levtype == ltype) ) kvlist = NULL;
             }  
         }
@@ -166,7 +182,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
 
           for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
             {
-              keyValues_t *kv = *(keyValues_t **)kvnode->data;
+              kv = *(keyValues_t **)kvnode->data;
               const char *key = kv->key;
               const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
               bool lv1 = (kv->nvalues == 1);
