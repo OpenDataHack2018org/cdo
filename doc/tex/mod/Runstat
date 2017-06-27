@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = runmin runmax runsum runmean runavg runstd runstd1 runvar runvar1
+@Operators = runmin runmax runrange runsum runmean runavg runstd runstd1 runvar runvar1
 
 @BeginDescription
 This module computes running statistical values over a selected number of timesteps. Depending on 
-the chosen operator the minimum, maximum, sum, average, variance or standard deviation of a selected 
+the chosen operator the minimum, maximum, range, sum, average, variance or standard deviation of a selected 
 number of consecutive timesteps read from @file{infile} is written to @file{outfile}. 
 The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 @EndDescription
@@ -44,6 +44,23 @@ o(t+(nts-1)/2,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @IfDoc
 @BeginMath
 o(t+(nts-1)/2,x) = \mbox{\textbf{max}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_runrange
+@Title     = Running range
+@Parameter = nts
+
+@BeginDescription
+@IfMan
+o(t+(nts-1)/2,x) = range{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\textbf{range}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription

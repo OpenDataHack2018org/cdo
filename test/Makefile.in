@@ -90,11 +90,12 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Spectral.test.in $(srcdir)/Vertint.test.in \
 	$(srcdir)/Timstat.test.in $(srcdir)/Timselstat.test.in \
 	$(srcdir)/Seasstat.test.in $(srcdir)/Runstat.test.in \
-	$(srcdir)/Multiyearstat.test.in $(srcdir)/Gridboxstat.test.in \
-	$(srcdir)/Vertstat.test.in $(srcdir)/Fldstat.test.in \
-	$(srcdir)/Fldpctl.test.in $(srcdir)/Ensstat.test.in \
-	$(srcdir)/Enspctl.test.in $(srcdir)/Merstat.test.in \
-	$(srcdir)/Zonstat.test.in $(srcdir)/Afterburner.test.in \
+	$(srcdir)/Multiyearstat.test.in $(srcdir)/Ydrunstat.test.in \
+	$(srcdir)/Gridboxstat.test.in $(srcdir)/Vertstat.test.in \
+	$(srcdir)/Fldstat.test.in $(srcdir)/Fldpctl.test.in \
+	$(srcdir)/Ensstat.test.in $(srcdir)/Enspctl.test.in \
+	$(srcdir)/Merstat.test.in $(srcdir)/Zonstat.test.in \
+	$(srcdir)/Mergetime.test.in $(srcdir)/Afterburner.test.in \
 	$(srcdir)/Detrend.test.in $(srcdir)/Arithc.test.in \
 	$(srcdir)/Arith.test.in $(srcdir)/Expr.test.in \
 	$(srcdir)/Gradsdes.test.in $(srcdir)/Collgrid.test.in \
@@ -103,6 +104,8 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
+	$(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
+	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
@@ -115,12 +118,12 @@ CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Comp.test Compc.test Cat.test Gridarea.test \
 	Genweights.test Remap.test Remap2.test EOF.test Select.test \
 	Spectral.test Vertint.test Timstat.test Timselstat.test \
-	Seasstat.test Runstat.test Multiyearstat.test Gridboxstat.test \
-	Vertstat.test Fldstat.test Fldpctl.test Ensstat.test \
-	Enspctl.test Merstat.test Zonstat.test Afterburner.test \
-	Detrend.test Arithc.test Arith.test Expr.test Gradsdes.test \
-	Collgrid.test threads.test tsformat.test wildcard.test \
-	MapReduce.test Ninfo.test
+	Seasstat.test Runstat.test Multiyearstat.test Ydrunstat.test \
+	Gridboxstat.test Vertstat.test Fldstat.test Fldpctl.test \
+	Ensstat.test Enspctl.test Merstat.test Zonstat.test \
+	Mergetime.test Afterburner.test Detrend.test Arithc.test \
+	Arith.test Expr.test Gradsdes.test Collgrid.test threads.test \
+	tsformat.test wildcard.test MapReduce.test Ninfo.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -375,13 +378,14 @@ DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
+ECCODES_INCLUDE = @ECCODES_INCLUDE@
+ECCODES_LIBS = @ECCODES_LIBS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 ENABLE_CDI_LIB = @ENABLE_CDI_LIB@
 ENABLE_CGRIBEX = @ENABLE_CGRIBEX@
-ENABLE_CXX = @ENABLE_CXX@
 ENABLE_DATA = @ENABLE_DATA@
 ENABLE_EXTRA = @ENABLE_EXTRA@
 ENABLE_GRIB = @ENABLE_GRIB@
@@ -399,6 +403,7 @@ FGREP = @FGREP@
 GREP = @GREP@
 GRIB_API_INCLUDE = @GRIB_API_INCLUDE@
 GRIB_API_LIBS = @GRIB_API_LIBS@
+HAVE_CXX11 = @HAVE_CXX11@
 HDF5_INCLUDE = @HDF5_INCLUDE@
 HDF5_LIBS = @HDF5_LIBS@
 HDF5_ROOT = @HDF5_ROOT@
@@ -536,8 +541,8 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Ensstat.test Enspctl.test Gridboxstat.test \
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
         Timstat.test Timselstat.test Seasstat.test \
-        Runstat.test Multiyearstat.test \
-        EOF.test \
+        Runstat.test Multiyearstat.test Ydrunstat.test \
+        Mergetime.test EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
         Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
 
@@ -628,6 +633,8 @@ Runstat.test: $(top_builddir)/config.status $(srcdir)/Runstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Multiyearstat.test: $(top_builddir)/config.status $(srcdir)/Multiyearstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Ydrunstat.test: $(top_builddir)/config.status $(srcdir)/Ydrunstat.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Gridboxstat.test: $(top_builddir)/config.status $(srcdir)/Gridboxstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Vertstat.test: $(top_builddir)/config.status $(srcdir)/Vertstat.test.in
@@ -643,6 +650,8 @@ Enspctl.test: $(top_builddir)/config.status $(srcdir)/Enspctl.test.in
 Merstat.test: $(top_builddir)/config.status $(srcdir)/Merstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Zonstat.test: $(top_builddir)/config.status $(srcdir)/Zonstat.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Mergetime.test: $(top_builddir)/config.status $(srcdir)/Mergetime.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Afterburner.test: $(top_builddir)/config.status $(srcdir)/Afterburner.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

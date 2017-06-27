@@ -43,6 +43,7 @@
 
 #define  UNCHANGED_RECORD  (processSelf() == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
+#include <string>
 extern char *Progname;
 extern char *cdoGridSearchDir;
 extern int CDO_Reduce_Dim;
@@ -50,7 +51,7 @@ extern int CDO_Memtype;
 extern int CDO_Parallel_Read;
 extern int CDO_Append_History;
 extern int CDO_Reset_History;
-extern int timer_read, timer_write; // refactor: both pstream.c and CDIread.c CDIwrite.c defined in cdo.c
+extern int timer_read, timer_write; // refactor: both pstream.cc and CDIread.cc CDIwrite.cc defined in cdo.cc
 
 extern int CDO_optind;
 extern const char *CDO_optarg;
@@ -221,13 +222,14 @@ int zaxisFromName(const char *zaxisname);
 /* refactor: moved here from cdo.h */
 int cdo_omp_get_thread_num(void);
 void cdo_omp_set_num_threads(int nthreads);
+std::string string2lower(std::string str);
 void strtolower(char *str);
 void strtoupper(char *str);
 
-/* refactor: moved here from cdo.c */
-void exp_run(int argc, char *argv[], const char *cdoExpName); // job.c
-void printFeatures(void); // features.c
-void printLibraries(void);  // features.c  
+/* refactor: moved here from cdo.cc */
+void exp_run(int argc, char *argv[], const char *cdoExpName); // job.cc
+void printFeatures(void); // features.cc
+void printLibraries(void);  // features.cc  
 
 int wildcardmatch(const char *w, const char *s);
 

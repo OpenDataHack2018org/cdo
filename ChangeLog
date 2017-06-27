@@ -1,4 +1,57 @@
-2017-05-15  Uwe Schulzweida
+2017-08-15  Uwe Schulzweida
+
+	* Using CDI library version 1.9.0
+	* Version 1.9.0 release
+
+2017-06-08  Uwe Schulzweida
+
+	* mergetime: wrong time information if first input file does not contain the first time step (bug introduce in 1.8.1) [Bug #7760]
+
+2017-06-04  Uwe Schulzweida
+
+	* selgridcell: read indices from mask
+
+2017-06-02  Uwe Schulzweida
+
+	* New operator ensrange: Ensemble range (ensmax-ensmin)
+	* New operator vertrange: Vertical range (vertmax-vertmin)
+	* New operator merrange: Meridional range (mermax-mermin)
+	* New operator gridboxrange: Gridbox range (gribboxmax-gridboxmin)
+
+2017-06-01  Uwe Schulzweida
+
+	* New operator yhourrange: Multi-year hourly range (yhourmax-yhourmin)
+	* New operator ydayrange: Multi-year daily range (ydaymax-ydaymin)
+	* New operator ymonrange: Multi-year monthly range (ymonmax-ymonmin)
+	* New operator yseasrange: Multi-year seasonal range (yseasmax-yseasmin)
+
+2017-05-30  Uwe Schulzweida
+
+	* New operator seasrange: seasonal range (seasmax-seasmin)
+	* New operator timselrange: time selection range (timmax-timmin)
+	* New operator runrange: running range (runmax-runmin)
+
+2017-05-26  Uwe Schulzweida
+
+	* eca_gsl: set default to northern hemisphere
+
+2017-05-23  Uwe Schulzweida
+
+	* expr: addeed support for variables starting with digits
+
+2017-05-22  Uwe Schulzweida
+
+	* settbounds: added support for hourly frequencies
+
+2017-05-17  Uwe Schulzweida
+
+	* gridToCurvilinear: Check that nvertex of regular lonlat grid is 2 [Bug #7744]
+
+2017-05-16  Uwe Schulzweida
+
+	* Renamed all .c files to .cc, code needs to be compiled with an ISO C++11 compiler!!!
+
+2017-05-16  Uwe Schulzweida
 
 	* Using CDI library version 1.8.2
 	* Version 1.8.2 release

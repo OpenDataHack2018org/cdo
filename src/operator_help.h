@@ -1,6 +1,6 @@
 /* Automatically created with makedoc, don't edit! */
 
-static const char *InfoHelp[] = {
+std::vector<std::string> InfoHelp = {
     "NAME",
     "    info, infon, map - Information and simple statistics",
     "",
@@ -29,10 +29,9 @@ static const char *InfoHelp[] = {
     "    map    Dataset information and simple map",
     "           Prints information, simple statistics and a map for each field of all input",
     "           datasets. The map will be printed only for fields on a regular lon/lat grid.",
-    NULL
 };
 
-static const char *SinfoHelp[] = {
+std::vector<std::string> SinfoHelp = {
     "NAME",
     "    sinfo, sinfon - Short information",
     "",
@@ -61,10 +60,9 @@ static const char *SinfoHelp[] = {
     "    sinfon  Short information listed by parameter name",
     "            The same as operator sinfo but using the name instead of the ",
     "            identifier to label the parameter.",
-    NULL
 };
 
-static const char *DiffHelp[] = {
+std::vector<std::string> DiffHelp = {
     "NAME",
     "    diff, diffn - Compare two datasets field by field",
     "",
@@ -90,10 +88,9 @@ static const char *DiffHelp[] = {
     "    diffn  Compare two datasets listed by parameter name",
     "           The same as operator diff. Using the name instead of the",
     "           identifier to label the parameter.",
-    NULL
 };
 
-static const char *NinfoHelp[] = {
+std::vector<std::string> NinfoHelp = {
     "NAME",
     "    npar, nlevel, nyear, nmon, ndate, ntime, ngridpoints, ngrids - ",
     "    Print the number of parameters, levels or times",
@@ -122,10 +119,9 @@ static const char *NinfoHelp[] = {
     "                 Prints the number of gridpoints for each variable.",
     "    ngrids       Number of horizontal grids",
     "                 Prints the number of horizontal grids.",
-    NULL
 };
 
-static const char *ShowinfoHelp[] = {
+std::vector<std::string> ShowinfoHelp = {
     "NAME",
     "    showformat, showcode, showname, showstdname, showlevel, showltype, showyear, ",
     "    showmon, showdate, showtime, showtimestamp - Show variables, levels or times",
@@ -159,10 +155,9 @@ static const char *ShowinfoHelp[] = {
     "                   Prints time information of all timesteps (format hh:mm:ss).",
     "    showtimestamp  Show timestamp",
     "                   Prints timestamp of all timesteps (format YYYY-MM-DDThh:mm:ss).",
-    NULL
 };
 
-static const char *FiledesHelp[] = {
+std::vector<std::string> FiledesHelp = {
     "NAME",
     "    partab, codetab, griddes, zaxisdes, vct - Dataset description",
     "",
@@ -186,10 +181,9 @@ static const char *FiledesHelp[] = {
     "              Prints the description of all z-axes.",
     "    vct       Vertical coordinate table",
     "              Prints the vertical coordinate table.",
-    NULL
 };
 
-static const char *CopyHelp[] = {
+std::vector<std::string> CopyHelp = {
     "NAME",
     "    copy, cat - Copy datasets",
     "",
@@ -207,10 +201,9 @@ static const char *CopyHelp[] = {
     "    cat   Concatenate datasets",
     "          Concatenates all input datasets and appends the result to the end ",
     "          of outfile. If outfile does not exist it will be created.",
-    NULL
 };
 
-static const char *ReplaceHelp[] = {
+std::vector<std::string> ReplaceHelp = {
     "NAME",
     "    replace - Replace variables",
     "",
@@ -220,10 +213,9 @@ static const char *ReplaceHelp[] = {
     "DESCRIPTION",
     "    The replace operator replaces variables in infile1 by variables from infile2 and write",
     "    the result to outfile. Both input datasets need to have the same number of timesteps.",
-    NULL
 };
 
-static const char *DuplicateHelp[] = {
+std::vector<std::string> DuplicateHelp = {
     "NAME",
     "    duplicate - Duplicates a dataset",
     "",
@@ -236,10 +228,9 @@ static const char *DuplicateHelp[] = {
     "",
     "PARAMETER",
     "    ndup  INTEGER  Number of duplicates, default is 2.",
-    NULL
 };
 
-static const char *MergegridHelp[] = {
+std::vector<std::string> MergegridHelp = {
     "NAME",
     "    mergegrid - Merge grid",
     "",
@@ -252,10 +243,9 @@ static const char *MergegridHelp[] = {
     "    be smaller or equal to the grid of infile1 and the resolution must be the same.",
     "    Only rectilinear grids are supported. Both input files need to have the same variables ",
     "    and the same number of timesteps.",
-    NULL
 };
 
-static const char *MergeHelp[] = {
+std::vector<std::string> MergeHelp = {
     "NAME",
     "    merge, mergetime - Merge datasets",
     "",
@@ -287,10 +277,9 @@ static const char *MergeHelp[] = {
     "NOTE",
     "    The operators in this module need to open all input files simultaneously.",
     "    The maximum number of open files depends on the operating system!",
-    NULL
 };
 
-static const char *SplitHelp[] = {
+std::vector<std::string> SplitHelp = {
     "NAME",
     "    splitcode, splitparam, splitname, splitlevel, splitgrid, splitzaxis, ",
     "    splittabnum - Split a dataset",
@@ -340,10 +329,9 @@ static const char *SplitHelp[] = {
     "NOTE",
     "    The operators in this module need to open all output files simultaneously.",
     "    The maximum number of open files depends on the operating system!",
-    NULL
 };
 
-static const char *SplittimeHelp[] = {
+std::vector<std::string> SplittimeHelp = {
     "NAME",
     "    splithour, splitday, splitseas, splityear, splityearmon, splitmon - ",
     "    Split timesteps of a dataset",
@@ -389,10 +377,9 @@ static const char *SplittimeHelp[] = {
     "NOTE",
     "    The operators in this module need to open all output files simultaneously.",
     "    The maximum number of open files depends on the operating system!",
-    NULL
 };
 
-static const char *SplitselHelp[] = {
+std::vector<std::string> SplitselHelp = {
     "NAME",
     "    splitsel - Split selected timesteps",
     "",
@@ -415,10 +402,9 @@ static const char *SplitselHelp[] = {
     "        Set the default file suffix. This suffix will be added to the output file ",
     "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
-    NULL
 };
 
-static const char *DistgridHelp[] = {
+std::vector<std::string> DistgridHelp = {
     "NAME",
     "    distgrid - Distribute horizontal grid",
     "",
@@ -440,10 +426,9 @@ static const char *DistgridHelp[] = {
     "NOTE",
     "    This operator needs to open all output files simultaneously.",
     "    The maximum number of open files depends on the operating system!",
-    NULL
 };
 
-static const char *CollgridHelp[] = {
+std::vector<std::string> CollgridHelp = {
     "NAME",
     "    collgrid - Collect horizontal grid",
     "",
@@ -463,10 +448,9 @@ static const char *CollgridHelp[] = {
     "NOTE",
     "    This operator needs to open all input files simultaneously.",
     "    The maximum number of open files depends on the operating system!",
-    NULL
 };
 
-static const char *SelectHelp[] = {
+std::vector<std::string> SelectHelp = {
     "NAME",
     "    select, delete - Select fields",
     "",
@@ -510,10 +494,9 @@ static const char *SelectHelp[] = {
     "    timestep          INTEGER Comma separated list of timesteps. Negative values selects timesteps from the end (NetCDF only).",
     "    timestep_of_year  INTEGER Comma separated list of timesteps of year.",
     "    timestepmask      STRING  Read timesteps from a mask file.",
-    NULL
 };
 
-static const char *SelmultiHelp[] = {
+std::vector<std::string> SelmultiHelp = {
     "NAME",
     "    selmulti, delmulti, changemulti - Select multiple fields via GRIB1 parameters",
     "",
@@ -560,10 +543,9 @@ static const char *SelmultiHelp[] = {
     "    selmulti     Select multiple fields",
     "    delmulti     Delete multiple fields",
     "    changemulti  Change identication of multiple fields",
-    NULL
 };
 
-static const char *SelvarHelp[] = {
+std::vector<std::string> SelvarHelp = {
     "NAME",
     "    selparam, delparam, selcode, delcode, selname, delname, selstdname, sellevel, ",
     "    sellevidx, selgrid, selzaxis, selzaxisname, selltype, seltabnum - Select fields",
@@ -629,10 +611,9 @@ static const char *SelvarHelp[] = {
     "    zaxes       STRING   Comma separated list of z-axis types or numbers",
     "    zaxisnames  STRING   Comma separated list of z-axis names",
     "    tabnums     INTEGER  Comma separated list of parameter table numbers",
-    NULL
 };
 
-static const char *SeltimeHelp[] = {
+std::vector<std::string> SeltimeHelp = {
     "NAME",
     "    seltimestep, seltime, selhour, selday, selmonth, selyear, selseason, seldate, ",
     "    selsmon - Select timesteps",
@@ -684,10 +665,9 @@ static const char *SeltimeHelp[] = {
     "    date2      STRING   End date (format YYYY-MM-DDThh:mm:ss) [default: date1].",
     "    nts1       INTEGER  Number of timesteps before the selected month [default: 0].",
     "    nts2       INTEGER  Number of timesteps after the selected month [default: nts1].",
-    NULL
 };
 
-static const char *SelboxHelp[] = {
+std::vector<std::string> SelboxHelp = {
     "NAME",
     "    sellonlatbox, selindexbox - Select a box of a field",
     "",
@@ -716,10 +696,9 @@ static const char *SelboxHelp[] = {
     "    idx2  INTEGER  Index of last longitude (1 - nlon)",
     "    idy1  INTEGER  Index of first latitude (1 - nlat)",
     "    idy2  INTEGER  Index of last latitude (1 - nlat)",
-    NULL
 };
 
-static const char *SelgridcellHelp[] = {
+std::vector<std::string> SelgridcellHelp = {
     "NAME",
     "    selgridcell, delgridcell - Select grid cells",
     "",
@@ -736,10 +715,9 @@ static const char *SelgridcellHelp[] = {
     "",
     "PARAMETER",
     "    indexes  INTEGER  Comma separated list of indexes",
-    NULL
 };
 
-static const char *SamplegridHelp[] = {
+std::vector<std::string> SamplegridHelp = {
     "NAME",
     "    samplegrid - Resample grid",
     "",
@@ -753,10 +731,9 @@ static const char *SamplegridHelp[] = {
     "",
     "PARAMETER",
     "    factor  INTEGER  Resample factor, typically 2, which will half the resolution",
-    NULL
 };
 
-static const char *CondHelp[] = {
+std::vector<std::string> CondHelp = {
     "NAME",
     "    ifthen, ifnotthen - Conditional select one field",
     "",
@@ -780,10 +757,9 @@ static const char *CondHelp[] = {
     "                        / i_2(t,x) if i_1([t,]x) EQ 0  AND  i_1([t,]x) NE miss",
     "               o(t,x) = ",
     "                        \\ miss     if i_1([t,]x) NE 0  OR   i_1([t,]x) EQ miss",
-    NULL
 };
 
-static const char *Cond2Help[] = {
+std::vector<std::string> Cond2Help = {
     "NAME",
     "    ifthenelse - Conditional select  two fields",
     "",
@@ -802,10 +778,9 @@ static const char *Cond2Help[] = {
     "              / i_2(t,x) if i_1([t,]x) NE 0  AND  i_1([t,]x) NE miss",
     "    o(t,x) = <  i_3(t,x) if i_1([t,]x) EQ 0  AND  i_1([t,]x) NE miss",
     "              \\ miss     if i_1([t,]x) EQ miss",
-    NULL
 };
 
-static const char *CondcHelp[] = {
+std::vector<std::string> CondcHelp = {
     "NAME",
     "    ifthenc, ifnotthenc - Conditional select a constant",
     "",
@@ -829,10 +804,9 @@ static const char *CondcHelp[] = {
     "",
     "PARAMETER",
     "    c  FLOAT  Constant",
-    NULL
 };
 
-static const char *MapReduceHelp[] = {
+std::vector<std::string> MapReduceHelp = {
     "NAME",
     "    reducegrid - Reduce fields to user-defined mask",
     "",
@@ -848,10 +822,9 @@ static const char *MapReduceHelp[] = {
     "PARAMETER",
     "    mask               STRING file which holds the mask field",
     "    limitCoordsOutput  STRING optional parameter to limit coordinates output: 'nobounds' disables coordinate bounds, 'nocoords' avoids all coordinate information",
-    NULL
 };
 
-static const char *CompHelp[] = {
+std::vector<std::string> CompHelp = {
     "NAME",
     "    eq, ne, le, lt, ge, gt - Comparison of two fields",
     "",
@@ -891,10 +864,9 @@ static const char *CompHelp[] = {
     "                  /   1   if i_1(t,x) GT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss",
     "        o(t,x) = <    0   if i_1(t,x) LE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss",
     "                  \\  miss if i_1(t,x) EQ miss      OR   i_2(t,x) EQ miss",
-    NULL
 };
 
-static const char *CompcHelp[] = {
+std::vector<std::string> CompcHelp = {
     "NAME",
     "    eqc, nec, lec, ltc, gec, gtc - Comparison of a field with a constant",
     "",
@@ -934,10 +906,9 @@ static const char *CompcHelp[] = {
     "",
     "PARAMETER",
     "    c  FLOAT  Constant",
-    NULL
 };
 
-static const char *SetattributeHelp[] = {
+std::vector<std::string> SetattributeHelp = {
     "NAME",
     "    setattribute - Set attributes",
     "",
@@ -969,10 +940,9 @@ static const char *SetattributeHelp[] = {
     "",
     "PARAMETER",
     "    attributes  STRING  Comma separated list of attributes. ",
-    NULL
 };
 
-static const char *SetpartabHelp[] = {
+std::vector<std::string> SetpartabHelp = {
     "NAME",
     "    setpartabp, setpartabn - Set parameter table",
     "",
@@ -1020,10 +990,9 @@ static const char *SetpartabHelp[] = {
     "PARAMETER",
     "    table    STRING   Parameter table file or name",
     "    convert  STRING   Converts the units if necessary",
-    NULL
 };
 
-static const char *SetHelp[] = {
+std::vector<std::string> SetHelp = {
     "NAME",
     "    setcodetab, setcode, setparam, setname, setunit, setlevel, setltype - ",
     "    Set field info",
@@ -1064,10 +1033,9 @@ static const char *SetHelp[] = {
     "    name   STRING   Variable name",
     "    level  FLOAT    New level",
     "    ltype  INTEGER  GRIB level type",
-    NULL
 };
 
-static const char *SettimeHelp[] = {
+std::vector<std::string> SettimeHelp = {
     "NAME",
     "    setdate, settime, setday, setmon, setyear, settunits, settaxis, settbounds, ",
     "    setreftime, setcalendar, shifttime - Set time",
@@ -1121,13 +1089,12 @@ static const char *SettimeHelp[] = {
     "    date       STRING   Date (format: YYYY-MM-DD)",
     "    time       STRING   Time (format: hh:mm:ss)",
     "    inc        STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 1hour]",
-    "    frequency  STRING   Frequency of the time series (day, month, year)",
+    "    frequency  STRING   Frequency of the time series (hour, day, month, year)",
     "    calendar   STRING   Calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)",
     "    sval       STRING   Shift value (e.g. -3hour)",
-    NULL
 };
 
-static const char *ChangeHelp[] = {
+std::vector<std::string> ChangeHelp = {
     "NAME",
     "    chcode, chparam, chname, chunit, chlevel, chlevelc, chlevelv - ",
     "    Change field header",
@@ -1171,10 +1138,9 @@ static const char *ChangeHelp[] = {
     "    oldlev                 FLOAT    Old level",
     "    newlev                 FLOAT    New level",
     "    oldlev,newlev,...      FLOAT    Pairs of old and new levels",
-    NULL
 };
 
-static const char *SetgridHelp[] = {
+std::vector<std::string> SetgridHelp = {
     "NAME",
     "    setgrid, setgridtype, setgridarea - Set grid information",
     "",
@@ -1210,10 +1176,9 @@ static const char *SetgridHelp[] = {
     "    grid      STRING  Grid description file or name",
     "    gridtype  STRING  Grid type (curvilinear, unstructured, regular, lonlat or dereference)",
     "    gridarea  STRING  Data file, the first field is used as grid cell area",
-    NULL
 };
 
-static const char *SetzaxisHelp[] = {
+std::vector<std::string> SetzaxisHelp = {
     "NAME",
     "    setzaxis, genlevelbounds - Set z-axis information",
     "",
@@ -1234,10 +1199,9 @@ static const char *SetzaxisHelp[] = {
     "    zaxis  STRING  Z-axis description file or name of the target z-axis",
     "    zbot   FLOAT   Specifying the bottom of the vertical column. Must have the same units as z-axis. ",
     "    ztop   FLOAT   Specifying the top of the vertical column. Must have the same units as z-axis. ",
-    NULL
 };
 
-static const char *InvertHelp[] = {
+std::vector<std::string> InvertHelp = {
     "NAME",
     "    invertlat - Invert latitudes",
     "",
@@ -1246,10 +1210,9 @@ static const char *InvertHelp[] = {
     "",
     "DESCRIPTION",
     "    This operator inverts the latitudes of all fields on a rectilinear grid. ",
-    NULL
 };
 
-static const char *InvertlevHelp[] = {
+std::vector<std::string> InvertlevHelp = {
     "NAME",
     "    invertlev - Invert levels",
     "",
@@ -1258,10 +1221,9 @@ static const char *InvertlevHelp[] = {
     "",
     "DESCRIPTION",
     "    This operator inverts the levels of all 3D variables.",
-    NULL
 };
 
-static const char *ShiftxyHelp[] = {
+std::vector<std::string> ShiftxyHelp = {
     "NAME",
     "    shiftx, shifty - Shift field",
     "",
@@ -1282,10 +1244,9 @@ static const char *ShiftxyHelp[] = {
     "    nshift  INTEGER  Number of grid cells to shift (default: 1)",
     "    cyclic  STRING   If set, cells are filled up cyclic (default: missing value)",
     "    coord   STRING   If set, coordinates are also shifted",
-    NULL
 };
 
-static const char *MaskregionHelp[] = {
+std::vector<std::string> MaskregionHelp = {
     "NAME",
     "    maskregion - Mask regions",
     "",
@@ -1305,10 +1266,9 @@ static const char *MaskregionHelp[] = {
     "",
     "PARAMETER",
     "    regions  STRING Comma separated list of ASCII formatted files with different regions",
-    NULL
 };
 
-static const char *MaskboxHelp[] = {
+std::vector<std::string> MaskboxHelp = {
     "NAME",
     "    masklonlatbox, maskindexbox - Mask a box",
     "",
@@ -1338,10 +1298,9 @@ static const char *MaskboxHelp[] = {
     "    idx2  INTEGER  Index of last longitude",
     "    idy1  INTEGER  Index of first latitude",
     "    idy2  INTEGER  Index of last latitude",
-    NULL
 };
 
-static const char *SetboxHelp[] = {
+std::vector<std::string> SetboxHelp = {
     "NAME",
     "    setclonlatbox, setcindexbox - Set a box to constant",
     "",
@@ -1373,10 +1332,9 @@ static const char *SetboxHelp[] = {
     "    idx2  INTEGER  Index of last longitude",
     "    idy1  INTEGER  Index of first latitude",
     "    idy2  INTEGER  Index of last latitude",
-    NULL
 };
 
-static const char *EnlargeHelp[] = {
+std::vector<std::string> EnlargeHelp = {
     "NAME",
     "    enlarge - Enlarge fields",
     "",
@@ -1393,10 +1351,9 @@ static const char *EnlargeHelp[] = {
     "",
     "PARAMETER",
     "    grid  STRING  Target grid description file or name",
-    NULL
 };
 
-static const char *SetmissHelp[] = {
+std::vector<std::string> SetmissHelp = {
     "NAME",
     "    setmissval, setctomiss, setmisstoc, setrtomiss, setvrange, setmisstonn, ",
     "    setmisstodis - Set missing value",
@@ -1451,10 +1408,9 @@ static const char *SetmissHelp[] = {
     "    c          FLOAT    Constant",
     "    rmin       FLOAT    Lower bound",
     "    rmax       FLOAT    Upper bound",
-    NULL
 };
 
-static const char *ExprHelp[] = {
+std::vector<std::string> ExprHelp = {
     "NAME",
     "    expr, exprf, aexpr, aexprf - Evaluate expressions",
     "",
@@ -1560,10 +1516,9 @@ static const char *ExprHelp[] = {
     "NOTE",
     "    The expr commands sellevel(x,k) and sellevidx(x,k) are only available with exprf/aexprf.",
     "    If the input stream contains duplicate entries of the same variable name then the last one is used.",
-    NULL
 };
 
-static const char *MathHelp[] = {
+std::vector<std::string> MathHelp = {
     "NAME",
     "    abs, int, nint, pow, sqr, sqrt, exp, ln, log10, sin, cos, tan, asin, acos, ",
     "    atan, reci - Mathematical functions",
@@ -1608,10 +1563,9 @@ static const char *MathHelp[] = {
     "           o(t,x) = atan(i(t,x))",
     "    reci   Reciprocal value",
     "           o(t,x) = 1 / i(t,x)",
-    NULL
 };
 
-static const char *ArithcHelp[] = {
+std::vector<std::string> ArithcHelp = {
     "NAME",
     "    addc, subc, mulc, divc - Arithmetic with a constant",
     "",
@@ -1634,10 +1588,9 @@ static const char *ArithcHelp[] = {
     "",
     "PARAMETER",
     "    c  FLOAT  Constant",
-    NULL
 };
 
-static const char *ArithHelp[] = {
+std::vector<std::string> ArithHelp = {
     "NAME",
     "    add, sub, mul, div, min, max, atan2 - Arithmetic on two datasets",
     "",
@@ -1668,10 +1621,9 @@ static const char *ArithHelp[] = {
     "           in radians, which is between -PI and PI (inclusive).",
     "           ",
     "           o(t,x) = atan2(i_1(t,x), i_2(t,x))",
-    NULL
 };
 
-static const char *MonarithHelp[] = {
+std::vector<std::string> MonarithHelp = {
     "NAME",
     "    monadd, monsub, monmul, mondiv - Monthly arithmetic",
     "",
@@ -1695,10 +1647,9 @@ static const char *MonarithHelp[] = {
     "            Multiplies a time series and a monthly time series.",
     "    mondiv  Divide monthly time series",
     "            Divides a time series and a monthly time series.",
-    NULL
 };
 
-static const char *YhourarithHelp[] = {
+std::vector<std::string> YhourarithHelp = {
     "NAME",
     "    yhouradd, yhoursub, yhourmul, yhourdiv - Multi-year hourly arithmetic",
     "",
@@ -1722,10 +1673,9 @@ static const char *YhourarithHelp[] = {
     "              Multiplies a time series and a multi-year hourly time series.",
     "    yhourdiv  Divide multi-year hourly time series",
     "              Divides a time series and a multi-year hourly time series.",
-    NULL
 };
 
-static const char *YdayarithHelp[] = {
+std::vector<std::string> YdayarithHelp = {
     "NAME",
     "    ydayadd, ydaysub, ydaymul, ydaydiv - Multi-year daily arithmetic",
     "",
@@ -1749,10 +1699,9 @@ static const char *YdayarithHelp[] = {
     "             Multiplies a time series and a multi-year daily time series.",
     "    ydaydiv  Divide multi-year daily time series",
     "             Divides a time series and a multi-year daily time series.",
-    NULL
 };
 
-static const char *YmonarithHelp[] = {
+std::vector<std::string> YmonarithHelp = {
     "NAME",
     "    ymonadd, ymonsub, ymonmul, ymondiv - Multi-year monthly arithmetic",
     "",
@@ -1775,10 +1724,9 @@ static const char *YmonarithHelp[] = {
     "             Multiplies a time series and a multi-year monthly time series.",
     "    ymondiv  Divide multi-year monthly time series",
     "             Divides a time series and a multi-year monthly time series.",
-    NULL
 };
 
-static const char *YseasarithHelp[] = {
+std::vector<std::string> YseasarithHelp = {
     "NAME",
     "    yseasadd, yseassub, yseasmul, yseasdiv - Multi-year seasonal arithmetic",
     "",
@@ -1801,10 +1749,9 @@ static const char *YseasarithHelp[] = {
     "              Multiplies a time series and a multi-year seasonal time series.",
     "    yseasdiv  Divide multi-year seasonal time series",
     "              Divides a time series and a multi-year seasonal time series.",
-    NULL
 };
 
-static const char *ArithdaysHelp[] = {
+std::vector<std::string> ArithdaysHelp = {
     "NAME",
     "    muldpm, divdpm, muldpy, divdpy - Arithmetic with days",
     "",
@@ -1825,10 +1772,9 @@ static const char *ArithdaysHelp[] = {
     "            o(t,x) = i(t,x) * days_per_year",
     "    divdpy  Divide by days per year",
     "            o(t,x) = i(t,x) / days_per_year",
-    NULL
 };
 
-static const char *TimcumsumHelp[] = {
+std::vector<std::string> TimcumsumHelp = {
     "NAME",
     "    timcumsum - Cumulative sum over all timesteps",
     "",
@@ -1840,10 +1786,9 @@ static const char *TimcumsumHelp[] = {
     "    Missing values are treated as numeric zero when summing.",
     "    ",
     "    o(t,x) = sum{i(t',x), 0<t'<=t}",
-    NULL
 };
 
-static const char *ConsecstatHelp[] = {
+std::vector<std::string> ConsecstatHelp = {
     "NAME",
     "    consecsum, consects - Consecute timestep periods",
     "",
@@ -1867,13 +1812,12 @@ static const char *ConsecstatHelp[] = {
     "               In contrast to the operator above consects only computes the lenght of each",
     "               period together with its last timestep. To be able to perform statistical",
     "               analysis like min, max or mean, everything else is set to missing value.",
-    NULL
 };
 
-static const char *EnsstatHelp[] = {
+std::vector<std::string> EnsstatHelp = {
     "NAME",
-    "    ensmin, ensmax, enssum, ensmean, ensavg, ensstd, ensstd1, ensvar, ensvar1, ",
-    "    enspctl - Statistical values over an ensemble",
+    "    ensmin, ensmax, ensrange, enssum, ensmean, ensavg, ensstd, ensstd1, ensvar, ",
+    "    ensvar1, enspctl - Statistical values over an ensemble",
     "",
     "SYNOPSIS",
     "    <operator>  infiles outfile",
@@ -1881,41 +1825,43 @@ static const char *EnsstatHelp[] = {
     "",
     "DESCRIPTION",
     "    This module computes statistical values over an ensemble of input files.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance,",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance,",
     "    standard deviation or a certain percentile over all input files is written",
     "    to outfile.",
     "    All input files need to have the same structure with the same variables.",
     "    The date information of a timestep in outfile is the date of the first input file.",
     "",
     "OPERATORS",
-    "    ensmin   Ensemble minimum",
-    "             o(t,x) = min{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    ensmax   Ensemble maximum",
-    "             o(t,x) = max{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    enssum   Ensemble sum",
-    "             o(t,x) = sum{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    ensmean  Ensemble mean",
-    "             o(t,x) = mean{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    ensavg   Ensemble average",
-    "             o(t,x) = avg{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    ensstd   Ensemble standard deviation",
-    "             Normalize by n.",
-    "             ",
-    "             o(t,x) = std{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    ensstd1  Ensemble standard deviation (n-1)",
-    "             Normalize by (n-1).",
-    "             ",
-    "             o(t,x) = std1{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    ensvar   Ensemble variance",
-    "             Normalize by n.",
-    "             ",
-    "             o(t,x) = var{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    ensvar1  Ensemble variance (n-1)",
-    "             Normalize by (n-1).",
-    "             ",
-    "             o(t,x) = var1{i1(t,x), i2(t,x), ..., in(t,x)}",
-    "    enspctl  Ensemble percentiles",
-    "             o(t,x) = pth percentile {i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensmin    Ensemble minimum",
+    "              o(t,x) = min{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensmax    Ensemble maximum",
+    "              o(t,x) = max{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensrange  Ensemble range",
+    "              o(t,x) = range{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    enssum    Ensemble sum",
+    "              o(t,x) = sum{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensmean   Ensemble mean",
+    "              o(t,x) = mean{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensavg    Ensemble average",
+    "              o(t,x) = avg{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensstd    Ensemble standard deviation",
+    "              Normalize by n.",
+    "              ",
+    "              o(t,x) = std{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensstd1   Ensemble standard deviation (n-1)",
+    "              Normalize by (n-1).",
+    "              ",
+    "              o(t,x) = std1{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensvar    Ensemble variance",
+    "              Normalize by n.",
+    "              ",
+    "              o(t,x) = var{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    ensvar1   Ensemble variance (n-1)",
+    "              Normalize by (n-1).",
+    "              ",
+    "              o(t,x) = var1{i1(t,x), i2(t,x), ..., in(t,x)}",
+    "    enspctl   Ensemble percentiles",
+    "              o(t,x) = pth percentile {i1(t,x), i2(t,x), ..., in(t,x)}",
     "",
     "PARAMETER",
     "    p  FLOAT  Percentile number in {0, ..., 100}",
@@ -1923,10 +1869,9 @@ static const char *EnsstatHelp[] = {
     "NOTE",
     "    This operator needs to open all input files simultaneously.",
     "    The maximum number of open files depends on the operating system!",
-    NULL
 };
 
-static const char *Ensstat2Help[] = {
+std::vector<std::string> Ensstat2Help = {
     "NAME",
     "    ensrkhistspace, ensrkhisttime, ensroc - Statistical values over an ensemble",
     "",
@@ -1963,10 +1908,9 @@ static const char *Ensstat2Help[] = {
     "    ensrkhistspace  Ranked Histogram averaged over time",
     "    ensrkhisttime   Ranked Histogram averaged over space",
     "    ensroc          Ensemble Receiver Operating characteristics",
-    NULL
 };
 
-static const char *EnsvalHelp[] = {
+std::vector<std::string> EnsvalHelp = {
     "NAME",
     "    enscrps, ensbrs - Ensemble validation tools",
     "",
@@ -2026,13 +1970,12 @@ static const char *EnsvalHelp[] = {
     "    enscrps  Ensemble CRPS and decomposition",
     "    ensbrs   Ensemble Brier score",
     "             Ensemble Brier Score and Decomposition",
-    NULL
 };
 
-static const char *FldstatHelp[] = {
+std::vector<std::string> FldstatHelp = {
     "NAME",
-    "    fldmin, fldmax, fldsum, fldmean, fldavg, fldstd, fldstd1, fldvar, fldvar1, ",
-    "    fldpctl - Statistical values over a field",
+    "    fldmin, fldmax, fldrange, fldsum, fldmean, fldavg, fldstd, fldstd1, fldvar, ",
+    "    fldvar1, fldpctl - Statistical values over a field",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
@@ -2040,66 +1983,69 @@ static const char *FldstatHelp[] = {
     "",
     "DESCRIPTION",
     "    This module computes statistical values of the input fields. According to the chosen ",
-    "    operator the field minimum, maximum, sum, average, variance, standard deviation or ",
+    "    operator the field minimum, maximum, range, sum, average, variance, standard deviation or ",
     "    a certain percentile is written to outfile.",
     "",
     "OPERATORS",
-    "    fldmin   Field minimum",
-    "             For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = min{i(t,x'), x_1<x'<=x_n}",
-    "    fldmax   Field maximum",
-    "             For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = max{i(t,x'), x_1<x'<=x_n}",
-    "    fldsum   Field sum",
-    "             For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = sum{i(t,x'), x_1<x'<=x_n}",
-    "    fldmean  Field mean",
-    "             For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = mean{i(t,x'), x_1<x'<=x_n}",
-    "             weighted by area weights obtained by the input field.",
-    "    fldavg   Field average",
-    "             For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = avg{i(t,x'), x_1<x'<=x_n}",
-    "             weighted by area weights obtained by the input field.",
-    "    fldstd   Field standard deviation",
-    "             Normalize by n. For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = std{i(t,x'), x_1<x'<=x_n}",
-    "             weighted by area weights obtained by the input field.",
-    "    fldstd1  Field standard deviation (n-1)",
-    "             Normalize by (n-1). For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = std1{i(t,x'), x_1<x'<=x_n}",
-    "             weighted by area weights obtained by the input field.",
-    "    fldvar   Field variance",
-    "             Normalize by n. For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = var{i(t,x'), x_1<x'<=x_n}",
-    "             weighted by area weights obtained by the input field.",
-    "    fldvar1  Field variance (n-1)",
-    "             Normalize by (n-1). For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = var1{i(t,x'), x_1<x'<=x_n}",
-    "             weighted by area weights obtained by the input field.",
-    "    fldpctl  Field percentiles",
-    "             For every gridpoint x_1, ..., x_n of the same field it is:",
-    "             ",
-    "             o(t,1) = pth percentile {i(t,x'), x_1<x'<=x_n}",
+    "    fldmin    Field minimum",
+    "              For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = min{i(t,x'), x_1<x'<=x_n}",
+    "    fldmax    Field maximum",
+    "              For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = max{i(t,x'), x_1<x'<=x_n}",
+    "    fldrange  Field range",
+    "              For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = range{i(t,x'), x_1<x'<=x_n}",
+    "    fldsum    Field sum",
+    "              For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = sum{i(t,x'), x_1<x'<=x_n}",
+    "    fldmean   Field mean",
+    "              For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = mean{i(t,x'), x_1<x'<=x_n}",
+    "              weighted by area weights obtained by the input field.",
+    "    fldavg    Field average",
+    "              For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = avg{i(t,x'), x_1<x'<=x_n}",
+    "              weighted by area weights obtained by the input field.",
+    "    fldstd    Field standard deviation",
+    "              Normalize by n. For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = std{i(t,x'), x_1<x'<=x_n}",
+    "              weighted by area weights obtained by the input field.",
+    "    fldstd1   Field standard deviation (n-1)",
+    "              Normalize by (n-1). For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = std1{i(t,x'), x_1<x'<=x_n}",
+    "              weighted by area weights obtained by the input field.",
+    "    fldvar    Field variance",
+    "              Normalize by n. For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = var{i(t,x'), x_1<x'<=x_n}",
+    "              weighted by area weights obtained by the input field.",
+    "    fldvar1   Field variance (n-1)",
+    "              Normalize by (n-1). For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = var1{i(t,x'), x_1<x'<=x_n}",
+    "              weighted by area weights obtained by the input field.",
+    "    fldpctl   Field percentiles",
+    "              For every gridpoint x_1, ..., x_n of the same field it is:",
+    "              ",
+    "              o(t,1) = pth percentile {i(t,x'), x_1<x'<=x_n}",
     "",
     "PARAMETER",
     "    p  FLOAT  Percentile number in {0, ..., 100}",
-    NULL
 };
 
-static const char *ZonstatHelp[] = {
+std::vector<std::string> ZonstatHelp = {
     "NAME",
-    "    zonmin, zonmax, zonsum, zonmean, zonavg, zonstd, zonstd1, zonvar, zonvar1, ",
-    "    zonpctl - Zonal statistical values",
+    "    zonmin, zonmax, zonrange, zonsum, zonmean, zonavg, zonstd, zonstd1, zonvar, ",
+    "    zonvar1, zonpctl - Zonal statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
@@ -2107,41 +2053,42 @@ static const char *ZonstatHelp[] = {
     "",
     "DESCRIPTION",
     "    This module computes zonal statistical values of the input fields.",
-    "    According to the chosen operator the zonal minimum, maximum, sum, average,",
+    "    According to the chosen operator the zonal minimum, maximum, range, sum, average,",
     "    variance, standard deviation or a certain percentile is written to outfile.",
     "    This operator requires all variables on the same regular lon/lat grid.",
     "",
     "OPERATORS",
-    "    zonmin   Zonal minimum",
-    "             For every latitude the minimum over all longitudes is computed.",
-    "    zonmax   Zonal maximum",
-    "             For every latitude the maximum over all longitudes is computed.",
-    "    zonsum   Zonal sum",
-    "             For every latitude the sum over all longitudes is computed.",
-    "    zonmean  Zonal mean",
-    "             For every latitude the mean over all longitudes is computed.",
-    "    zonavg   Zonal average",
-    "             For every latitude the average over all longitudes is computed.",
-    "    zonstd   Zonal standard deviation",
-    "             For every latitude the standard deviation over all longitudes is computed. Normalize by n.",
-    "    zonstd1  Zonal standard deviation (n-1)",
-    "             For every latitude the standard deviation over all longitudes is computed. Normalize by (n-1). ",
-    "    zonvar   Zonal variance",
-    "             For every latitude the variance over all longitudes is computed. Normalize by n.",
-    "    zonvar1  Zonal variance (n-1)",
-    "             For every latitude the variance over all longitudes is computed. Normalize by (n-1).",
-    "    zonpctl  Zonal percentiles",
-    "             For every latitude the pth percentile over all longitudes is computed.",
+    "    zonmin    Zonal minimum",
+    "              For every latitude the minimum over all longitudes is computed.",
+    "    zonmax    Zonal maximum",
+    "              For every latitude the maximum over all longitudes is computed.",
+    "    zonrange  Zonal range",
+    "              For every latitude the range over all longitudes is computed.",
+    "    zonsum    Zonal sum",
+    "              For every latitude the sum over all longitudes is computed.",
+    "    zonmean   Zonal mean",
+    "              For every latitude the mean over all longitudes is computed.",
+    "    zonavg    Zonal average",
+    "              For every latitude the average over all longitudes is computed.",
+    "    zonstd    Zonal standard deviation",
+    "              For every latitude the standard deviation over all longitudes is computed. Normalize by n.",
+    "    zonstd1   Zonal standard deviation (n-1)",
+    "              For every latitude the standard deviation over all longitudes is computed. Normalize by (n-1). ",
+    "    zonvar    Zonal variance",
+    "              For every latitude the variance over all longitudes is computed. Normalize by n.",
+    "    zonvar1   Zonal variance (n-1)",
+    "              For every latitude the variance over all longitudes is computed. Normalize by (n-1).",
+    "    zonpctl   Zonal percentiles",
+    "              For every latitude the pth percentile over all longitudes is computed.",
     "",
     "PARAMETER",
     "    p  FLOAT  Percentile number in {0, ..., 100}",
-    NULL
 };
 
-static const char *MerstatHelp[] = {
+std::vector<std::string> MerstatHelp = {
     "NAME",
-    "    mermin, mermax, mersum, mermean, meravg, merstd, merstd1, mervar, mervar1, ",
-    "    merpctl - Meridional statistical values",
+    "    mermin, mermax, merrange, mersum, mermean, meravg, merstd, merstd1, mervar, ",
+    "    mervar1, merpctl - Meridional statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
@@ -2149,172 +2096,179 @@ static const char *MerstatHelp[] = {
     "",
     "DESCRIPTION",
     "    This module computes meridional statistical values of the input fields.",
-    "    According to the chosen operator the meridional minimum, maximum, sum, average,",
+    "    According to the chosen operator the meridional minimum, maximum, range, sum, average,",
     "    variance, standard deviation or a certain percentile is written to outfile.",
     "    This operator requires all variables on the same regular lon/lat grid.",
     "",
     "OPERATORS",
-    "    mermin   Meridional minimum",
-    "             For every longitude the minimum over all latitudes is computed.",
-    "    mermax   Meridional maximum",
-    "             For every longitude the maximum over all latitudes is computed.",
-    "    mersum   Meridional sum",
-    "             For every longitude the sum over all latitudes is computed.",
-    "    mermean  Meridional mean",
-    "             For every longitude the area weighted mean over all latitudes is computed.",
-    "    meravg   Meridional average",
-    "             For every longitude the area weighted average over all latitudes is computed.",
-    "    merstd   Meridional standard deviation",
-    "             For every longitude the standard deviation over all latitudes is computed. Normalize by n.",
-    "    merstd1  Meridional standard deviation (n-1)",
-    "             For every longitude the standard deviation over all latitudes is computed. Normalize by (n-1).",
-    "    mervar   Meridional variance",
-    "             For every longitude the variance over all latitudes is computed. Normalize by n.",
-    "    mervar1  Meridional variance (n-1)",
-    "             For every longitude the variance over all latitudes is computed. Normalize by (n-1).",
-    "    merpctl  Meridional percentiles",
-    "             For every longitude the pth percentile over all latitudes is computed.",
+    "    mermin    Meridional minimum",
+    "              For every longitude the minimum over all latitudes is computed.",
+    "    mermax    Meridional maximum",
+    "              For every longitude the maximum over all latitudes is computed.",
+    "    merrange  Meridional range",
+    "              For every longitude the range over all latitudes is computed.",
+    "    mersum    Meridional sum",
+    "              For every longitude the sum over all latitudes is computed.",
+    "    mermean   Meridional mean",
+    "              For every longitude the area weighted mean over all latitudes is computed.",
+    "    meravg    Meridional average",
+    "              For every longitude the area weighted average over all latitudes is computed.",
+    "    merstd    Meridional standard deviation",
+    "              For every longitude the standard deviation over all latitudes is computed. Normalize by n.",
+    "    merstd1   Meridional standard deviation (n-1)",
+    "              For every longitude the standard deviation over all latitudes is computed. Normalize by (n-1).",
+    "    mervar    Meridional variance",
+    "              For every longitude the variance over all latitudes is computed. Normalize by n.",
+    "    mervar1   Meridional variance (n-1)",
+    "              For every longitude the variance over all latitudes is computed. Normalize by (n-1).",
+    "    merpctl   Meridional percentiles",
+    "              For every longitude the pth percentile over all latitudes is computed.",
     "",
     "PARAMETER",
     "    p  FLOAT  Percentile number in {0, ..., 100}",
-    NULL
 };
 
-static const char *GridboxstatHelp[] = {
+std::vector<std::string> GridboxstatHelp = {
     "NAME",
-    "    gridboxmin, gridboxmax, gridboxsum, gridboxmean, gridboxavg, gridboxstd, ",
-    "    gridboxstd1, gridboxvar, gridboxvar1 - Statistical values over grid boxes",
+    "    gridboxmin, gridboxmax, gridboxrange, gridboxsum, gridboxmean, gridboxavg, ",
+    "    gridboxstd, gridboxstd1, gridboxvar, gridboxvar1 - ",
+    "    Statistical values over grid boxes",
     "",
     "SYNOPSIS",
     "    <operator>,nx,ny  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over surrounding grid boxes.",
-    "    According to the chosen operator the minimum, maximum, sum, average, ",
+    "    According to the chosen operator the minimum, maximum, range, sum, average, ",
     "    variance, or standard deviation of the neighboring grid boxes is written to outfile.",
     "    All gridbox operators only works on quadrilateral curvilinear grids.",
     "",
     "OPERATORS",
-    "    gridboxmin   Gridbox minimum",
-    "                 Minimum value of the selected grid boxes.",
-    "    gridboxmax   Gridbox maximum",
-    "                 Maximum value of the selected grid boxes.",
-    "    gridboxsum   Gridbox sum",
-    "                 Sum of the selected grid boxes.",
-    "    gridboxmean  Gridbox mean",
-    "                 Mean of the selected grid boxes.",
-    "    gridboxavg   Gridbox average",
-    "                 Average of the selected grid boxes.",
-    "    gridboxstd   Gridbox standard deviation",
-    "                 Standard deviation of the selected grid boxes. Normalize by n.",
-    "    gridboxstd1  Gridbox standard deviation (n-1)",
-    "                 Standard deviation of the selected grid boxes. Normalize by (n-1).",
-    "    gridboxvar   Gridbox variance",
-    "                 Variance of the selected grid boxes. Normalize by n.",
-    "    gridboxvar1  Gridbox variance (n-1)",
-    "                 Variance of the selected grid boxes. Normalize by (n-1).",
+    "    gridboxmin    Gridbox minimum",
+    "                  Minimum value of the selected grid boxes.",
+    "    gridboxmax    Gridbox maximum",
+    "                  Maximum value of the selected grid boxes.",
+    "    gridboxrange  Gridbox range",
+    "                  Range (max-min value) of the selected grid boxes.",
+    "    gridboxsum    Gridbox sum",
+    "                  Sum of the selected grid boxes.",
+    "    gridboxmean   Gridbox mean",
+    "                  Mean of the selected grid boxes.",
+    "    gridboxavg    Gridbox average",
+    "                  Average of the selected grid boxes.",
+    "    gridboxstd    Gridbox standard deviation",
+    "                  Standard deviation of the selected grid boxes. Normalize by n.",
+    "    gridboxstd1   Gridbox standard deviation (n-1)",
+    "                  Standard deviation of the selected grid boxes. Normalize by (n-1).",
+    "    gridboxvar    Gridbox variance",
+    "                  Variance of the selected grid boxes. Normalize by n.",
+    "    gridboxvar1   Gridbox variance (n-1)",
+    "                  Variance of the selected grid boxes. Normalize by (n-1).",
     "",
     "PARAMETER",
     "    nx  INTEGER  Number of grid boxes in x direction",
     "    ny  INTEGER  Number of grid boxes in y direction",
-    NULL
 };
 
-static const char *VertstatHelp[] = {
+std::vector<std::string> VertstatHelp = {
     "NAME",
-    "    vertmin, vertmax, vertsum, vertmean, vertavg, vertstd, vertstd1, vertvar, ",
-    "    vertvar1 - Vertical statistical values",
+    "    vertmin, vertmax, vertrange, vertsum, vertmean, vertavg, vertstd, vertstd1, ",
+    "    vertvar, vertvar1 - Vertical statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over all levels of the input variables.",
-    "    According to chosen operator the vertical minimum, maximum, sum, average, variance",
+    "    According to chosen operator the vertical minimum, maximum, range, sum, average, variance",
     "    or standard deviation is written to outfile.",
     "",
     "OPERATORS",
-    "    vertmin   Vertical minimum",
-    "              For every gridpoint the minimum over all levels is computed.",
-    "    vertmax   Vertical maximum",
-    "              For every gridpoint the maximum over all levels is computed.",
-    "    vertsum   Vertical sum",
-    "              For every gridpoint the sum over all levels is computed.",
-    "    vertmean  Vertical mean",
-    "              For every gridpoint the layer weighted mean over all levels is computed.",
-    "    vertavg   Vertical average",
-    "              For every gridpoint the layer weighted average over all levels is computed.",
-    "    vertstd   Vertical standard deviation",
-    "              For every gridpoint the standard deviation over all levels is computed. Normalize by n.",
-    "    vertstd1  Vertical standard deviation (n-1)",
-    "              For every gridpoint the standard deviation over all levels is computed. Normalize by (n-1).",
-    "    vertvar   Vertical variance",
-    "              For every gridpoint the variance over all levels is computed. Normalize by n.",
-    "    vertvar1  Vertical variance (n-1)",
-    "              For every gridpoint the variance over all levels is computed. Normalize by (n-1).",
-    NULL
+    "    vertmin    Vertical minimum",
+    "               For every gridpoint the minimum over all levels is computed.",
+    "    vertmax    Vertical maximum",
+    "               For every gridpoint the maximum over all levels is computed.",
+    "    vertrange  Vertical range",
+    "               For every gridpoint the range over all levels is computed.",
+    "    vertsum    Vertical sum",
+    "               For every gridpoint the sum over all levels is computed.",
+    "    vertmean   Vertical mean",
+    "               For every gridpoint the layer weighted mean over all levels is computed.",
+    "    vertavg    Vertical average",
+    "               For every gridpoint the layer weighted average over all levels is computed.",
+    "    vertstd    Vertical standard deviation",
+    "               For every gridpoint the standard deviation over all levels is computed. Normalize by n.",
+    "    vertstd1   Vertical standard deviation (n-1)",
+    "               For every gridpoint the standard deviation over all levels is computed. Normalize by (n-1).",
+    "    vertvar    Vertical variance",
+    "               For every gridpoint the variance over all levels is computed. Normalize by n.",
+    "    vertvar1   Vertical variance (n-1)",
+    "               For every gridpoint the variance over all levels is computed. Normalize by (n-1).",
 };
 
-static const char *TimselstatHelp[] = {
+std::vector<std::string> TimselstatHelp = {
     "NAME",
-    "    timselmin, timselmax, timselsum, timselmean, timselavg, timselstd, ",
-    "    timselstd1, timselvar, timselvar1 - Time range statistical values",
+    "    timselmin, timselmax, timselrange, timselsum, timselmean, timselavg, ",
+    "    timselstd, timselstd1, timselvar, timselvar1 - Time range statistical values",
     "",
     "SYNOPSIS",
     "    <operator>,nsets[,noffset[,nskip]]  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values for a selected number of timesteps. According to ",
-    "    the chosen operator the minimum, maximum, sum, average, variance or standard deviation of ",
+    "    the chosen operator the minimum, maximum, range, sum, average, variance or standard deviation of ",
     "    the selected timesteps is written to outfile.",
     "    The time of outfile is determined by the time in the middle of all contributing timesteps of infile.",
     "",
     "OPERATORS",
-    "    timselmin   Time range minimum",
-    "                For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = min{i(t',x), t1 < t' <= tn}",
-    "    timselmax   Time range maximum",
-    "                For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = max{i(t',x), t1 < t' <= tn}",
-    "    timselsum   Time range sum",
-    "                For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = sum{i(t',x), t1 < t' <= tn}",
-    "    timselmean  Time range mean",
-    "                For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = mean{i(t',x), t1 < t' <= tn}",
-    "    timselavg   Time range average",
-    "                For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = avg{i(t',x), t1 < t' <= tn}",
-    "    timselstd   Time range standard deviation",
-    "                Normalize by n. For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = std{i(t',x), t1 < t' <= tn}",
-    "    timselstd1  Time range standard deviation (n-1)",
-    "                Normalize by (n-1). For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = std1{i(t',x), t1 < t' <= tn}",
-    "    timselvar   Time range variance",
-    "                Normalize by n. For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = var{i(t',x), t1 < t' <= tn}",
-    "    timselvar1  Time range variance (n-1)",
-    "                Normalize by (n-1). For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
-    "                ",
-    "                o(t,x) = var1{i(t',x), t1 < t' <= tn}",
+    "    timselmin    Time selection minimum",
+    "                 For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = min{i(t',x), t1 < t' <= tn}",
+    "    timselmax    Time selection maximum",
+    "                 For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = max{i(t',x), t1 < t' <= tn}",
+    "    timselrange  Time selection range",
+    "                 For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = range{i(t',x), t1 < t' <= tn}",
+    "    timselsum    Time selection sum",
+    "                 For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = sum{i(t',x), t1 < t' <= tn}",
+    "    timselmean   Time selection mean",
+    "                 For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = mean{i(t',x), t1 < t' <= tn}",
+    "    timselavg    Time selection average",
+    "                 For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = avg{i(t',x), t1 < t' <= tn}",
+    "    timselstd    Time selection standard deviation",
+    "                 Normalize by n. For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = std{i(t',x), t1 < t' <= tn}",
+    "    timselstd1   Time selection standard deviation (n-1)",
+    "                 Normalize by (n-1). For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = std1{i(t',x), t1 < t' <= tn}",
+    "    timselvar    Time selection variance",
+    "                 Normalize by n. For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = var{i(t',x), t1 < t' <= tn}",
+    "    timselvar1   Time selection variance (n-1)",
+    "                 Normalize by (n-1). For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:",
+    "                 ",
+    "                 o(t,x) = var1{i(t',x), t1 < t' <= tn}",
     "",
     "PARAMETER",
     "    nsets    INTEGER  Number of input timesteps for each output timestep ",
     "    noffset  INTEGER  Number of input timesteps skipped before the first timestep range (optional)",
     "    nskip    INTEGER  Number of input timesteps skipped between timestep ranges (optional)",
-    NULL
 };
 
-static const char *TimselpctlHelp[] = {
+std::vector<std::string> TimselpctlHelp = {
     "NAME",
     "    timselpctl - Time range percentile values",
     "",
@@ -2341,50 +2295,51 @@ static const char *TimselpctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *RunstatHelp[] = {
+std::vector<std::string> RunstatHelp = {
     "NAME",
-    "    runmin, runmax, runsum, runmean, runavg, runstd, runstd1, runvar, runvar1 - ",
-    "    Running statistical values",
+    "    runmin, runmax, runrange, runsum, runmean, runavg, runstd, runstd1, runvar, ",
+    "    runvar1 - Running statistical values",
     "",
     "SYNOPSIS",
     "    <operator>,nts  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes running statistical values over a selected number of timesteps. Depending on ",
-    "    the chosen operator the minimum, maximum, sum, average, variance or standard deviation of a selected ",
+    "    the chosen operator the minimum, maximum, range, sum, average, variance or standard deviation of a selected ",
     "    number of consecutive timesteps read from infile is written to outfile. ",
     "    The time of outfile is determined by the time in the middle of all contributing timesteps of infile.",
     "",
     "OPERATORS",
-    "    runmin   Running minimum",
-    "             o(t+(nts-1)/2,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
-    "    runmax   Running maximum",
-    "             o(t+(nts-1)/2,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
-    "    runsum   Running sum",
-    "             o(t+(nts-1)/2,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
-    "    runmean  Running mean",
-    "             o(t+(nts-1)/2,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
-    "    runavg   Running average",
-    "             o(t+(nts-1)/2,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
-    "    runstd   Running standard deviation",
-    "             Normalize by n. ",
-    "             ",
-    "             o(t+(nts-1)/2,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
-    "    runstd1  Running standard deviation (n-1)",
-    "             Normalize by (n-1). ",
-    "             ",
-    "             o(t+(nts-1)/2,x) = std1{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
-    "    runvar   Running variance",
-    "             Normalize by n. ",
-    "             ",
-    "             o(t+(nts-1)/2,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
-    "    runvar1  Running variance (n-1)",
-    "             Normalize by (n-1). ",
-    "             ",
-    "             o(t+(nts-1)/2,x) = var1{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runmin    Running minimum",
+    "              o(t+(nts-1)/2,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runmax    Running maximum",
+    "              o(t+(nts-1)/2,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runrange  Running range",
+    "              o(t+(nts-1)/2,x) = range{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runsum    Running sum",
+    "              o(t+(nts-1)/2,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runmean   Running mean",
+    "              o(t+(nts-1)/2,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runavg    Running average",
+    "              o(t+(nts-1)/2,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runstd    Running standard deviation",
+    "              Normalize by n. ",
+    "              ",
+    "              o(t+(nts-1)/2,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runstd1   Running standard deviation (n-1)",
+    "              Normalize by (n-1). ",
+    "              ",
+    "              o(t+(nts-1)/2,x) = std1{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runvar    Running variance",
+    "              Normalize by n. ",
+    "              ",
+    "              o(t+(nts-1)/2,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
+    "    runvar1   Running variance (n-1)",
+    "              Normalize by (n-1). ",
+    "              ",
+    "              o(t+(nts-1)/2,x) = var1{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
     "",
     "PARAMETER",
     "    nts  INTEGER  Number of timesteps",
@@ -2392,10 +2347,9 @@ static const char *RunstatHelp[] = {
     "ENVIRONMENT",
     "    CDO_TIMESTAT_DATE",
     "        Sets the time stamp in outfile to the \"first\", \"middle\" or \"last\" contributing timestep of infile.",
-    NULL
 };
 
-static const char *RunpctlHelp[] = {
+std::vector<std::string> RunpctlHelp = {
     "NAME",
     "    runpctl - Running percentile values",
     "",
@@ -2411,54 +2365,54 @@ static const char *RunpctlHelp[] = {
     "PARAMETER",
     "    p    FLOAT    Percentile number in {0, ..., 100}",
     "    nts  INTEGER  Number of timesteps",
-    NULL
 };
 
-static const char *TimstatHelp[] = {
+std::vector<std::string> TimstatHelp = {
     "NAME",
-    "    timmin, timmax, timsum, timmean, timavg, timstd, timstd1, timvar, timvar1 - ",
-    "    Statistical values over all timesteps",
+    "    timmin, timmax, timrange, timsum, timmean, timavg, timstd, timstd1, timvar, ",
+    "    timvar1 - Statistical values over all timesteps",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
-    "    This module computes statistical  values over all timesteps in infile. Depending on ",
-    "    the chosen operator the minimum, maximum, sum, average, variance or standard deviation of ",
+    "    This module computes statistical values over all timesteps in infile. Depending on ",
+    "    the chosen operator the minimum, maximum, range, sum, average, variance or standard deviation of ",
     "    all timesteps read from infile is written to outfile.",
     "    The time of outfile is determined by the time in the middle of all contributing timesteps of infile.",
     "",
     "OPERATORS",
-    "    timmin   Time minimum",
-    "             o(1,x) = min{i(t',x), t_1<t'<=t_n}",
-    "    timmax   Time maximum",
-    "             o(1,x) = max{i(t',x), t_1<t'<=t_n}",
-    "    timsum   Time sum",
-    "             o(1,x) = sum{i(t',x), t_1<t'<=t_n}",
-    "    timmean  Time mean",
-    "             o(1,x) = mean{i(t',x), t_1<t'<=t_n}",
-    "    timavg   Time average",
-    "             o(1,x) = avg{i(t',x), t_1<t'<=t_n}",
-    "    timstd   Time standard deviation",
-    "             Normalize by n. ",
-    "             ",
-    "             o(1,x) = std{i(t',x), t_1<t'<=t_n}",
-    "    timstd1  Time standard deviation (n-1)",
-    "             Normalize by (n-1). ",
-    "             ",
-    "             o(1,x) = std1{i(t',x), t_1<t'<=t_n}",
-    "    timvar   Time variance",
-    "             Normalize by n. ",
-    "             ",
-    "             o(1,x) = var{i(t',x), t_1<t'<=t_n}",
-    "    timvar1  Time variance (n-1)",
-    "             Normalize by (n-1). ",
-    "             ",
-    "             o(1,x) = var1{i(t',x), t_1<t'<=t_n}",
-    NULL
+    "    timmin    Time minimum",
+    "              o(1,x) = min{i(t',x), t_1<t'<=t_n}",
+    "    timmax    Time maximum",
+    "              o(1,x) = max{i(t',x), t_1<t'<=t_n}",
+    "    timrange  Time range",
+    "              o(1,x) = range{i(t',x), t_1<t'<=t_n}",
+    "    timsum    Time sum",
+    "              o(1,x) = sum{i(t',x), t_1<t'<=t_n}",
+    "    timmean   Time mean",
+    "              o(1,x) = mean{i(t',x), t_1<t'<=t_n}",
+    "    timavg    Time average",
+    "              o(1,x) = avg{i(t',x), t_1<t'<=t_n}",
+    "    timstd    Time standard deviation",
+    "              Normalize by n. ",
+    "              ",
+    "              o(1,x) = std{i(t',x), t_1<t'<=t_n}",
+    "    timstd1   Time standard deviation (n-1)",
+    "              Normalize by (n-1). ",
+    "              ",
+    "              o(1,x) = std1{i(t',x), t_1<t'<=t_n}",
+    "    timvar    Time variance",
+    "              Normalize by n. ",
+    "              ",
+    "              o(1,x) = var{i(t',x), t_1<t'<=t_n}",
+    "    timvar1   Time variance (n-1)",
+    "              Normalize by (n-1). ",
+    "              ",
+    "              o(1,x) = var1{i(t',x), t_1<t'<=t_n}",
 };
 
-static const char *TimpctlHelp[] = {
+std::vector<std::string> TimpctlHelp = {
     "NAME",
     "    timpctl - Percentile values over all timesteps",
     "",
@@ -2481,64 +2435,66 @@ static const char *TimpctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *HourstatHelp[] = {
+std::vector<std::string> HourstatHelp = {
     "NAME",
-    "    hourmin, hourmax, hoursum, hourmean, houravg, hourstd, hourstd1, hourvar, ",
-    "    hourvar1 - Hourly statistical values",
+    "    hourmin, hourmax, hourrange, hoursum, hourmean, houravg, hourstd, hourstd1, ",
+    "    hourvar, hourvar1 - Hourly statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over timesteps of the same hour.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of timesteps of the same hour is written to outfile.",
     "    The time of outfile is determined by the time in the middle of all contributing timesteps of infile.",
     "",
     "OPERATORS",
-    "    hourmin   Hourly minimum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = min{i(t',x), t_1<t'<=t_n}",
-    "    hourmax   Hourly maximum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = max{i(t',x), t_1<t'<=t_n}",
-    "    hoursum   Hourly sum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = sum{i(t',x), t_1<t'<=t_n}",
-    "    hourmean  Hourly mean",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
-    "    houravg   Hourly average",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = avg{i(t',x), t_1<t'<=t_n}",
-    "    hourstd   Hourly standard deviation",
-    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = std{i(t',x), t_1<t'<=t_n}",
-    "    hourstd1  Hourly standard deviation (n-1)",
-    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = std1{i(t',x), t_1<t'<=t_n}",
-    "    hourvar   Hourly variance",
-    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = var{i(t',x), t_1<t'<=t_n}",
-    "    hourvar1  Hourly variance (n-1)",
-    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
-    "              ",
-    "              o(t,x) = var1{i(t',x), t_1<t'<=t_n}",
-    NULL
+    "    hourmin    Hourly minimum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = min{i(t',x), t_1<t'<=t_n}",
+    "    hourmax    Hourly maximum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = max{i(t',x), t_1<t'<=t_n}",
+    "    hourrange  Hourly range",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = range{i(t',x), t_1<t'<=t_n}",
+    "    hoursum    Hourly sum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = sum{i(t',x), t_1<t'<=t_n}",
+    "    hourmean   Hourly mean",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
+    "    houravg    Hourly average",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = avg{i(t',x), t_1<t'<=t_n}",
+    "    hourstd    Hourly standard deviation",
+    "               Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = std{i(t',x), t_1<t'<=t_n}",
+    "    hourstd1   Hourly standard deviation (n-1)",
+    "               Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = std1{i(t',x), t_1<t'<=t_n}",
+    "    hourvar    Hourly variance",
+    "               Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = var{i(t',x), t_1<t'<=t_n}",
+    "    hourvar1   Hourly variance (n-1)",
+    "               Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same hour it is:",
+    "               ",
+    "               o(t,x) = var1{i(t',x), t_1<t'<=t_n}",
 };
 
-static const char *HourpctlHelp[] = {
+std::vector<std::string> HourpctlHelp = {
     "NAME",
     "    hourpctl - Hourly percentile values",
     "",
@@ -2563,64 +2519,66 @@ static const char *HourpctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *DaystatHelp[] = {
+std::vector<std::string> DaystatHelp = {
     "NAME",
-    "    daymin, daymax, daysum, daymean, dayavg, daystd, daystd1, dayvar, dayvar1 - ",
-    "    Daily statistical values",
+    "    daymin, daymax, dayrange, daysum, daymean, dayavg, daystd, daystd1, dayvar, ",
+    "    dayvar1 - Daily statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over timesteps of the same day.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of timesteps of the same day is written to outfile.",
     "    The time of outfile is determined by the time in the middle of all contributing timesteps of infile.",
     "",
     "OPERATORS",
-    "    daymin   Daily minimum",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = min{i(t',x), t_1<t'<=t_n}",
-    "    daymax   Daily maximum",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = max{i(t',x), t_1<t'<=t_n}",
-    "    daysum   Daily sum",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = sum{i(t',x), t_1<t'<=t_n}",
-    "    daymean  Daily mean",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
-    "    dayavg   Daily average",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = avg{i(t',x), t_1<t'<=t_n}",
-    "    daystd   Daily standard deviation",
-    "             Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = std{i(t',x), t_1<t'<=t_n}",
-    "    daystd1  Daily standard deviation (n-1)",
-    "             Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = std1{i(t',x), t_1<t'<=t_n}",
-    "    dayvar   Daily variance",
-    "             Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = var{i(t',x), t_1<t'<=t_n}",
-    "    dayvar1  Daily variance (n-1)",
-    "             Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
-    "             ",
-    "             o(t,x) = var1{i(t',x), t_1<t'<=t_n}",
-    NULL
+    "    daymin    Daily minimum",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = min{i(t',x), t_1<t'<=t_n}",
+    "    daymax    Daily maximum",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = max{i(t',x), t_1<t'<=t_n}",
+    "    dayrange  Daily range",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = range{i(t',x), t_1<t'<=t_n}",
+    "    daysum    Daily sum",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = sum{i(t',x), t_1<t'<=t_n}",
+    "    daymean   Daily mean",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
+    "    dayavg    Daily average",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = avg{i(t',x), t_1<t'<=t_n}",
+    "    daystd    Daily standard deviation",
+    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = std{i(t',x), t_1<t'<=t_n}",
+    "    daystd1   Daily standard deviation (n-1)",
+    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = std1{i(t',x), t_1<t'<=t_n}",
+    "    dayvar    Daily variance",
+    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = var{i(t',x), t_1<t'<=t_n}",
+    "    dayvar1   Daily variance (n-1)",
+    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:",
+    "              ",
+    "              o(t,x) = var1{i(t',x), t_1<t'<=t_n}",
 };
 
-static const char *DaypctlHelp[] = {
+std::vector<std::string> DaypctlHelp = {
     "NAME",
     "    daypctl - Daily percentile values",
     "",
@@ -2645,64 +2603,66 @@ static const char *DaypctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *MonstatHelp[] = {
+std::vector<std::string> MonstatHelp = {
     "NAME",
-    "    monmin, monmax, monsum, monmean, monavg, monstd, monstd1, monvar, monvar1 - ",
-    "    Monthly statistical values",
+    "    monmin, monmax, monrange, monsum, monmean, monavg, monstd, monstd1, monvar, ",
+    "    monvar1 - Monthly statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over timesteps of the same month.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of timesteps of the same month is written to outfile.",
     "    The time of outfile is determined by the time in the middle of all contributing timesteps of infile.",
     "",
     "OPERATORS",
-    "    monmin   Monthly minimum",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = min{i(t',x), t_1<t'<=t_n}",
-    "    monmax   Monthly maximum",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = max{i(t',x), t_1<t'<=t_n}",
-    "    monsum   Monthly sum",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = sum{i(t',x), t_1<t'<=t_n}",
-    "    monmean  Monthly mean",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
-    "    monavg   Monthly average",
-    "             For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = avg{i(t',x), t_1<t'<=t_n}",
-    "    monstd   Monthly standard deviation",
-    "             Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = std{i(t',x), t_1 < t' <= t_n}",
-    "    monstd1  Monthly standard deviation (n-1)",
-    "             Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = std1{i(t',x), t_1 < t' <= t_n}",
-    "    monvar   Monthly variance",
-    "             Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = var{i(t',x), t_1 < t' <= t_n}",
-    "    monvar1  Monthly variance (n-1)",
-    "             Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
-    "             ",
-    "             o(t,x) = var1{i(t',x), t_1 < t' <= t_n}",
-    NULL
+    "    monmin    Monthly minimum",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = min{i(t',x), t_1<t'<=t_n}",
+    "    monmax    Monthly maximum",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = max{i(t',x), t_1<t'<=t_n}",
+    "    monrange  Monthly range",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = range{i(t',x), t_1<t'<=t_n}",
+    "    monsum    Monthly sum",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = sum{i(t',x), t_1<t'<=t_n}",
+    "    monmean   Monthly mean",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
+    "    monavg    Monthly average",
+    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = avg{i(t',x), t_1<t'<=t_n}",
+    "    monstd    Monthly standard deviation",
+    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = std{i(t',x), t_1 < t' <= t_n}",
+    "    monstd1   Monthly standard deviation (n-1)",
+    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = std1{i(t',x), t_1 < t' <= t_n}",
+    "    monvar    Monthly variance",
+    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = var{i(t',x), t_1 < t' <= t_n}",
+    "    monvar1   Monthly variance (n-1)",
+    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is:",
+    "              ",
+    "              o(t,x) = var1{i(t',x), t_1 < t' <= t_n}",
 };
 
-static const char *MonpctlHelp[] = {
+std::vector<std::string> MonpctlHelp = {
     "NAME",
     "    monpctl - Monthly percentile values",
     "",
@@ -2727,10 +2687,9 @@ static const char *MonpctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *YearmonstatHelp[] = {
+std::vector<std::string> YearmonstatHelp = {
     "NAME",
     "    yearmonmean - Yearly mean from monthly data",
     "",
@@ -2749,67 +2708,69 @@ static const char *YearmonstatHelp[] = {
     "ENVIRONMENT",
     "    CDO_TIMESTAT_DATE",
     "        Sets the date information in outfile to the \"first\", \"middle\" or \"last\" contributing timestep of infile.",
-    NULL
 };
 
-static const char *YearstatHelp[] = {
+std::vector<std::string> YearstatHelp = {
     "NAME",
-    "    yearmin, yearmax, yearsum, yearmean, yearavg, yearstd, yearstd1, yearvar, ",
-    "    yearvar1 - Yearly statistical values",
+    "    yearmin, yearmax, yearrange, yearsum, yearmean, yearavg, yearstd, yearstd1, ",
+    "    yearvar, yearvar1 - Yearly statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over timesteps of the same year.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of timesteps of the same year is written to outfile.",
     "    The time of outfile is determined by the time in the middle of all contributing timesteps of infile.",
     "",
     "OPERATORS",
-    "    yearmin   Yearly minimum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = min{i(t',x), t_1<t'<=t_n}",
-    "    yearmax   Yearly maximum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = max{i(t',x), t_1<t'<=t_n}",
-    "    yearsum   Yearly sum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = sum{i(t',x), t_1<t'<=t_n}",
-    "    yearmean  Yearly mean",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
-    "    yearavg   Yearly average",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = avg{i(t',x), t_1<t'<=t_n}",
-    "    yearstd   Yearly standard deviation",
-    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = std{i(t',x), t_1 < t' <= t_n}",
-    "    yearstd1  Yearly standard deviation (n-1)",
-    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = std1{i(t',x), t_1 < t' <= t_n}",
-    "    yearvar   Yearly variance",
-    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = var{i(t',x), t_1 < t' <= t_n}",
-    "    yearvar1  Yearly variance (n-1)",
-    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
-    "              ",
-    "              o(t,x) = var1{i(t',x), t_1 < t' <= t_n}",
+    "    yearmin    Yearly minimum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = min{i(t',x), t_1<t'<=t_n}",
+    "    yearmax    Yearly maximum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = max{i(t',x), t_1<t'<=t_n}",
+    "    yearrange  Yearly range",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = range{i(t',x), t_1<t'<=t_n}",
+    "    yearsum    Yearly sum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = sum{i(t',x), t_1<t'<=t_n}",
+    "    yearmean   Yearly mean",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
+    "    yearavg    Yearly average",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = avg{i(t',x), t_1<t'<=t_n}",
+    "    yearstd    Yearly standard deviation",
+    "               Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = std{i(t',x), t_1 < t' <= t_n}",
+    "    yearstd1   Yearly standard deviation (n-1)",
+    "               Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = std1{i(t',x), t_1 < t' <= t_n}",
+    "    yearvar    Yearly variance",
+    "               Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = var{i(t',x), t_1 < t' <= t_n}",
+    "    yearvar1   Yearly variance (n-1)",
+    "               Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:",
+    "               ",
+    "               o(t,x) = var1{i(t',x), t_1 < t' <= t_n}",
     "",
     "NOTE",
     "    The operators yearmean and yearavg compute only arithmetical means!",
-    NULL
 };
 
-static const char *YearpctlHelp[] = {
+std::vector<std::string> YearpctlHelp = {
     "NAME",
     "    yearpctl - Yearly percentile values",
     "",
@@ -2833,66 +2794,68 @@ static const char *YearpctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *SeasstatHelp[] = {
+std::vector<std::string> SeasstatHelp = {
     "NAME",
-    "    seasmin, seasmax, seassum, seasmean, seasavg, seasstd, seasstd1, seasvar, ",
-    "    seasvar1 - Seasonal statistical values",
+    "    seasmin, seasmax, seasrange, seassum, seasmean, seasavg, seasstd, seasstd1, ",
+    "    seasvar, seasvar1 - Seasonal statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over timesteps of the same season.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of timesteps of the same season is written to outfile.",
     "    The time of outfile is determined by the time in the middle of all contributing timesteps of infile.",
     "    Be careful about the first and the last output timestep, they may be incorrect values ",
     "    if the seasons have incomplete timesteps.",
     "",
     "OPERATORS",
-    "    seasmin   Seasonal minimum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = min{i(t',x), t1 < t' <= tn}",
-    "    seasmax   Seasonal maximum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = max{i(t',x), t1 < t' <= tn}",
-    "    seassum   Seasonal sum",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = sum{i(t',x), t1 < t' <= tn}",
-    "    seasmean  Seasonal mean",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = mean{i(t',x), t1 < t' <= tn}",
-    "    seasavg   Seasonal average",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = avg{i(t',x), t1 < t' <= tn}",
-    "    seasstd   Seasonal standard deviation",
-    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = std{i(t',x), t1 < t' <= tn}",
-    "    seasstd1  Seasonal standard deviation (n-1)",
-    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = std1{i(t',x), t1 < t' <= tn}",
-    "    seasvar   Seasonal variance",
-    "              Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = var{i(t',x), t1 < t' <= tn}",
-    "    seasvar1  Seasonal variance (n-1)",
-    "              Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
-    "              ",
-    "              o(t,x) = var1{i(t',x), t1 < t' <= tn}",
-    NULL
+    "    seasmin    Seasonal minimum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = min{i(t',x), t1 < t' <= tn}",
+    "    seasmax    Seasonal maximum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = max{i(t',x), t1 < t' <= tn}",
+    "    seasrange  Seasonal range",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = range{i(t',x), t1 < t' <= tn}",
+    "    seassum    Seasonal sum",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = sum{i(t',x), t1 < t' <= tn}",
+    "    seasmean   Seasonal mean",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = mean{i(t',x), t1 < t' <= tn}",
+    "    seasavg    Seasonal average",
+    "               For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = avg{i(t',x), t1 < t' <= tn}",
+    "    seasstd    Seasonal standard deviation",
+    "               Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = std{i(t',x), t1 < t' <= tn}",
+    "    seasstd1   Seasonal standard deviation (n-1)",
+    "               Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = std1{i(t',x), t1 < t' <= tn}",
+    "    seasvar    Seasonal variance",
+    "               Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = var{i(t',x), t1 < t' <= tn}",
+    "    seasvar1   Seasonal variance (n-1)",
+    "               Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is:",
+    "               ",
+    "               o(t,x) = var1{i(t',x), t1 < t' <= tn}",
 };
 
-static const char *SeaspctlHelp[] = {
+std::vector<std::string> SeaspctlHelp = {
     "NAME",
     "    seaspctl - Seasonal percentile values",
     "",
@@ -2918,134 +2881,139 @@ static const char *SeaspctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *YhourstatHelp[] = {
+std::vector<std::string> YhourstatHelp = {
     "NAME",
-    "    yhourmin, yhourmax, yhoursum, yhourmean, yhouravg, yhourstd, yhourstd1, ",
-    "    yhourvar, yhourvar1 - Multi-year hourly statistical values",
+    "    yhourmin, yhourmax, yhourrange, yhoursum, yhourmean, yhouravg, yhourstd, ",
+    "    yhourstd1, yhourvar, yhourvar1 - Multi-year hourly statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values of each hour and day of year.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of each hour and day of year in infile is written to outfile.",
     "    The date information in an output field is the date of the last contributing input field.",
     "",
     "OPERATORS",
-    "    yhourmin   Multi-year hourly minimum",
-    "               o(0001,x) = min{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = min{i(t,x), day(i(t)) = 8784}",
-    "    yhourmax   Multi-year hourly maximum",
-    "               o(0001,x) = max{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = max{i(t,x), day(i(t)) = 8784}",
-    "    yhoursum   Multi-year hourly sum",
-    "               o(0001,x) = sum{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = sum{i(t,x), day(i(t)) = 8784}",
-    "    yhourmean  Multi-year hourly mean",
-    "               o(0001,x) = mean{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = mean{i(t,x), day(i(t)) = 8784}",
-    "    yhouravg   Multi-year hourly average",
-    "               o(0001,x) = avg{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = avg{i(t,x), day(i(t)) = 8784}",
-    "    yhourstd   Multi-year hourly standard deviation",
-    "               Normalize by n. ",
-    "               ",
-    "               o(0001,x) = std{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = std{i(t,x), day(i(t)) = 8784}",
-    "    yhourstd1  Multi-year hourly standard deviation (n-1)",
-    "               Normalize by (n-1). ",
-    "               ",
-    "               o(0001,x) = std1{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = std1{i(t,x), day(i(t)) = 8784}",
-    "    yhourvar   Multi-year hourly variance",
-    "               Normalize by n. ",
-    "               ",
-    "               o(0001,x) = var{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = var{i(t,x), day(i(t)) = 8784}",
-    "    yhourvar1  Multi-year hourly variance (n-1)",
-    "               Normalize by (n-1). ",
-    "               ",
-    "               o(0001,x) = var1{i(t,x), day(i(t)) = 0001}",
-    "                                ...",
-    "               o(8784,x) = var1{i(t,x), day(i(t)) = 8784}",
-    NULL
+    "    yhourmin    Multi-year hourly minimum",
+    "                o(0001,x) = min{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = min{i(t,x), day(i(t)) = 8784}",
+    "    yhourmax    Multi-year hourly maximum",
+    "                o(0001,x) = max{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = max{i(t,x), day(i(t)) = 8784}",
+    "    yhourrange  Multi-year hourly range",
+    "                o(0001,x) = range{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = range{i(t,x), day(i(t)) = 8784}",
+    "    yhoursum    Multi-year hourly sum",
+    "                o(0001,x) = sum{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = sum{i(t,x), day(i(t)) = 8784}",
+    "    yhourmean   Multi-year hourly mean",
+    "                o(0001,x) = mean{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = mean{i(t,x), day(i(t)) = 8784}",
+    "    yhouravg    Multi-year hourly average",
+    "                o(0001,x) = avg{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = avg{i(t,x), day(i(t)) = 8784}",
+    "    yhourstd    Multi-year hourly standard deviation",
+    "                Normalize by n. ",
+    "                ",
+    "                o(0001,x) = std{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = std{i(t,x), day(i(t)) = 8784}",
+    "    yhourstd1   Multi-year hourly standard deviation (n-1)",
+    "                Normalize by (n-1). ",
+    "                ",
+    "                o(0001,x) = std1{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = std1{i(t,x), day(i(t)) = 8784}",
+    "    yhourvar    Multi-year hourly variance",
+    "                Normalize by n. ",
+    "                ",
+    "                o(0001,x) = var{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = var{i(t,x), day(i(t)) = 8784}",
+    "    yhourvar1   Multi-year hourly variance (n-1)",
+    "                Normalize by (n-1). ",
+    "                ",
+    "                o(0001,x) = var1{i(t,x), day(i(t)) = 0001}",
+    "                                 ...",
+    "                o(8784,x) = var1{i(t,x), day(i(t)) = 8784}",
 };
 
-static const char *YdaystatHelp[] = {
+std::vector<std::string> YdaystatHelp = {
     "NAME",
-    "    ydaymin, ydaymax, ydaysum, ydaymean, ydayavg, ydaystd, ydaystd1, ydayvar, ",
-    "    ydayvar1 - Multi-year daily statistical values",
+    "    ydaymin, ydaymax, ydayrange, ydaysum, ydaymean, ydayavg, ydaystd, ydaystd1, ",
+    "    ydayvar, ydayvar1 - Multi-year daily statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values of each day of year.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of each day of year in infile is written to outfile.",
     "    The date information in an output field is the date of the last contributing input field.",
     "",
     "OPERATORS",
-    "    ydaymin   Multi-year daily minimum",
-    "              o(001,x) = min{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = min{i(t,x), day(i(t)) = 366}",
-    "    ydaymax   Multi-year daily maximum",
-    "              o(001,x) = max{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = max{i(t,x), day(i(t)) = 366}",
-    "    ydaysum   Multi-year daily sum",
-    "              o(001,x) = sum{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = sum{i(t,x), day(i(t)) = 366}",
-    "    ydaymean  Multi-year daily mean",
-    "              o(001,x) = mean{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = mean{i(t,x), day(i(t)) = 366}",
-    "    ydayavg   Multi-year daily average",
-    "              o(001,x) = avg{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = avg{i(t,x), day(i(t)) = 366}",
-    "    ydaystd   Multi-year daily standard deviation",
-    "              Normalize by n. ",
-    "              ",
-    "              o(001,x) = std{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = std{i(t,x), day(i(t)) = 366}",
-    "    ydaystd1  Multi-year daily standard deviation (n-1)",
-    "              Normalize by (n-1). ",
-    "              ",
-    "              o(001,x) = std1{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = std1{i(t,x), day(i(t)) = 366}",
-    "    ydayvar   Multi-year daily variance",
-    "              Normalize by n. ",
-    "              ",
-    "              o(001,x) = var{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = var{i(t,x), day(i(t)) = 366}",
-    "    ydayvar1  Multi-year daily variance (n-1)",
-    "              Normalize by (n-1). ",
-    "              ",
-    "              o(001,x) = var1{i(t,x), day(i(t)) = 001}",
-    "                               ...",
-    "              o(366,x) = var1{i(t,x), day(i(t)) = 366}",
-    NULL
+    "    ydaymin    Multi-year daily minimum",
+    "               o(001,x) = min{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = min{i(t,x), day(i(t)) = 366}",
+    "    ydaymax    Multi-year daily maximum",
+    "               o(001,x) = max{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = max{i(t,x), day(i(t)) = 366}",
+    "    ydayrange  Multi-year daily range",
+    "               o(001,x) = range{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = range{i(t,x), day(i(t)) = 366}",
+    "    ydaysum    Multi-year daily sum",
+    "               o(001,x) = sum{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = sum{i(t,x), day(i(t)) = 366}",
+    "    ydaymean   Multi-year daily mean",
+    "               o(001,x) = mean{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = mean{i(t,x), day(i(t)) = 366}",
+    "    ydayavg    Multi-year daily average",
+    "               o(001,x) = avg{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = avg{i(t,x), day(i(t)) = 366}",
+    "    ydaystd    Multi-year daily standard deviation",
+    "               Normalize by n. ",
+    "               ",
+    "               o(001,x) = std{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = std{i(t,x), day(i(t)) = 366}",
+    "    ydaystd1   Multi-year daily standard deviation (n-1)",
+    "               Normalize by (n-1). ",
+    "               ",
+    "               o(001,x) = std1{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = std1{i(t,x), day(i(t)) = 366}",
+    "    ydayvar    Multi-year daily variance",
+    "               Normalize by n. ",
+    "               ",
+    "               o(001,x) = var{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = var{i(t,x), day(i(t)) = 366}",
+    "    ydayvar1   Multi-year daily variance (n-1)",
+    "               Normalize by (n-1). ",
+    "               ",
+    "               o(001,x) = var1{i(t,x), day(i(t)) = 001}",
+    "                                ...",
+    "               o(366,x) = var1{i(t,x), day(i(t)) = 366}",
 };
 
-static const char *YdaypctlHelp[] = {
+std::vector<std::string> YdaypctlHelp = {
     "NAME",
     "    ydaypctl - Multi-year daily percentile values",
     "",
@@ -3071,72 +3039,74 @@ static const char *YdaypctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *YmonstatHelp[] = {
+std::vector<std::string> YmonstatHelp = {
     "NAME",
-    "    ymonmin, ymonmax, ymonsum, ymonmean, ymonavg, ymonstd, ymonstd1, ymonvar, ",
-    "    ymonvar1 - Multi-year monthly statistical values",
+    "    ymonmin, ymonmax, ymonrange, ymonsum, ymonmean, ymonavg, ymonstd, ymonstd1, ",
+    "    ymonvar, ymonvar1 - Multi-year monthly statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values of each month of year.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of each month of year in infile is written to outfile.",
     "    The date information in an output field is the date of the last contributing input field.",
     "",
     "OPERATORS",
-    "    ymonmin   Multi-year monthly minimum",
-    "              o(01,x) = min{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = min{i(t,x), month(i(t)) = 12}",
-    "    ymonmax   Multi-year monthly maximum",
-    "              o(01,x) = max{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = max{i(t,x), month(i(t)) = 12}",
-    "    ymonsum   Multi-year monthly sum",
-    "              o(01,x) = sum{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = sum{i(t,x), month(i(t)) = 12}",
-    "    ymonmean  Multi-year monthly mean",
-    "              o(01,x) = mean{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = mean{i(t,x), month(i(t)) = 12}",
-    "    ymonavg   Multi-year monthly average",
-    "              o(01,x) = avg{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = avg{i(t,x), month(i(t)) = 12}",
-    "    ymonstd   Multi-year monthly standard deviation",
-    "              Normalize by n. ",
-    "              ",
-    "              o(01,x) = std{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = std{i(t,x), month(i(t)) = 12}",
-    "    ymonstd1  Multi-year monthly standard deviation (n-1)",
-    "              Normalize by (n-1). ",
-    "              ",
-    "              o(01,x) = std1{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = std1{i(t,x), month(i(t)) = 12}",
-    "    ymonvar   Multi-year monthly variance",
-    "              Normalize by n. ",
-    "              ",
-    "              o(01,x) = var{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = var{i(t,x), month(i(t)) = 12}",
-    "    ymonvar1  Multi-year monthly variance (n-1)",
-    "              Normalize by (n-1). ",
-    "              ",
-    "              o(01,x) = var1{i(t,x), month(i(t)) = 01}",
-    "                               ...",
-    "              o(12,x) = var1{i(t,x), month(i(t)) = 12}",
-    NULL
+    "    ymonmin    Multi-year monthly minimum",
+    "               o(01,x) = min{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = min{i(t,x), month(i(t)) = 12}",
+    "    ymonmax    Multi-year monthly maximum",
+    "               o(01,x) = max{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = max{i(t,x), month(i(t)) = 12}",
+    "    ymonrange  Multi-year monthly range",
+    "               o(01,x) = range{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = range{i(t,x), month(i(t)) = 12}",
+    "    ymonsum    Multi-year monthly sum",
+    "               o(01,x) = sum{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = sum{i(t,x), month(i(t)) = 12}",
+    "    ymonmean   Multi-year monthly mean",
+    "               o(01,x) = mean{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = mean{i(t,x), month(i(t)) = 12}",
+    "    ymonavg    Multi-year monthly average",
+    "               o(01,x) = avg{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = avg{i(t,x), month(i(t)) = 12}",
+    "    ymonstd    Multi-year monthly standard deviation",
+    "               Normalize by n. ",
+    "               ",
+    "               o(01,x) = std{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = std{i(t,x), month(i(t)) = 12}",
+    "    ymonstd1   Multi-year monthly standard deviation (n-1)",
+    "               Normalize by (n-1). ",
+    "               ",
+    "               o(01,x) = std1{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = std1{i(t,x), month(i(t)) = 12}",
+    "    ymonvar    Multi-year monthly variance",
+    "               Normalize by n. ",
+    "               ",
+    "               o(01,x) = var{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = var{i(t,x), month(i(t)) = 12}",
+    "    ymonvar1   Multi-year monthly variance (n-1)",
+    "               Normalize by (n-1). ",
+    "               ",
+    "               o(01,x) = var1{i(t,x), month(i(t)) = 01}",
+    "                                ...",
+    "               o(12,x) = var1{i(t,x), month(i(t)) = 12}",
 };
 
-static const char *YmonpctlHelp[] = {
+std::vector<std::string> YmonpctlHelp = {
     "NAME",
     "    ymonpctl - Multi-year monthly percentile values",
     "",
@@ -3164,73 +3134,76 @@ static const char *YmonpctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *YseasstatHelp[] = {
+std::vector<std::string> YseasstatHelp = {
     "NAME",
-    "    yseasmin, yseasmax, yseassum, yseasmean, yseasavg, yseasstd, yseasstd1, ",
-    "    yseasvar, yseasvar1 - Multi-year seasonal statistical values",
+    "    yseasmin, yseasmax, yseasrange, yseassum, yseasmean, yseasavg, yseasstd, ",
+    "    yseasstd1, yseasvar, yseasvar1 - Multi-year seasonal statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values of each season.",
-    "    Depending on the chosen operator the minimum, maximum, sum, average, variance",
+    "    Depending on the chosen operator the minimum, maximum, range, sum, average, variance",
     "    or standard deviation of each season in infile is written to outfile.",
     "    The date information in an output field is the date of the last contributing input field.",
     "",
     "OPERATORS",
-    "    yseasmin   Multi-year seasonal minimum",
-    "               o(1,x) = min{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = min{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = min{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = min{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseasmax   Multi-year seasonal maximum",
-    "               o(1,x) = max{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = max{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = max{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = max{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseassum   Multi-year seasonal sum",
-    "               o(1,x) = sum{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = sum{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = sum{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = sum{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseasmean  Multi-year seasonal mean",
-    "               o(1,x) = mean{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = mean{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = mean{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = mean{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseasavg   Multi-year seasonal average",
-    "               o(1,x) = avg{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = avg{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = avg{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = avg{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseasstd   Multi-year seasonal standard deviation",
-    "               o(1,x) = std{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = std{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = std{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = std{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseasstd1  Multi-year seasonal standard deviation (n-1)",
-    "               o(1,x) = std1{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = std1{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = std1{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = std1{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseasvar   Multi-year seasonal variance",
-    "               o(1,x) = var{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = var{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = var{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = var{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseasvar1  Multi-year seasonal variance (n-1)",
-    "               o(1,x) = var1{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = var1{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = var1{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = var1{i(t,x), month(i(t)) = 09, 10, 11}",
-    NULL
+    "    yseasmin    Multi-year seasonal minimum",
+    "                o(1,x) = min{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = min{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = min{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = min{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasmax    Multi-year seasonal maximum",
+    "                o(1,x) = max{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = max{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = max{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = max{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasrange  Multi-year seasonal range",
+    "                o(1,x) = range{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = range{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = range{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = range{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseassum    Multi-year seasonal sum",
+    "                o(1,x) = sum{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = sum{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = sum{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = sum{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasmean   Multi-year seasonal mean",
+    "                o(1,x) = mean{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = mean{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = mean{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = mean{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasavg    Multi-year seasonal average",
+    "                o(1,x) = avg{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = avg{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = avg{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = avg{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasstd    Multi-year seasonal standard deviation",
+    "                o(1,x) = std{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = std{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = std{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = std{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasstd1   Multi-year seasonal standard deviation (n-1)",
+    "                o(1,x) = std1{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = std1{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = std1{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = std1{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasvar    Multi-year seasonal variance",
+    "                o(1,x) = var{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = var{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = var{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = var{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasvar1   Multi-year seasonal variance (n-1)",
+    "                o(1,x) = var1{i(t,x), month(i(t)) = 12, 01, 02}",
+    "                o(2,x) = var1{i(t,x), month(i(t)) = 03, 04, 05}",
+    "                o(3,x) = var1{i(t,x), month(i(t)) = 06, 07, 08}",
+    "                o(4,x) = var1{i(t,x), month(i(t)) = 09, 10, 11}",
 };
 
-static const char *YseaspctlHelp[] = {
+std::vector<std::string> YseaspctlHelp = {
     "NAME",
     "    yseaspctl - Multi-year seasonal percentile values",
     "",
@@ -3259,10 +3232,9 @@ static const char *YseaspctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *YdrunstatHelp[] = {
+std::vector<std::string> YdrunstatHelp = {
     "NAME",
     "    ydrunmin, ydrunmax, ydrunsum, ydrunmean, ydrunavg, ydrunstd, ydrunstd1, ",
     "    ydrunvar, ydrunvar1 - Multi-year daily running statistical values",
@@ -3331,10 +3303,9 @@ static const char *YdrunstatHelp[] = {
     "",
     "PARAMETER",
     "    nts  INTEGER  Number of timesteps",
-    NULL
 };
 
-static const char *YdrunpctlHelp[] = {
+std::vector<std::string> YdrunpctlHelp = {
     "NAME",
     "    ydrunpctl - Multi-year daily running percentile values",
     "",
@@ -3371,10 +3342,9 @@ static const char *YdrunpctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
-    NULL
 };
 
-static const char *FldcorHelp[] = {
+std::vector<std::string> FldcorHelp = {
     "NAME",
     "    fldcor - Correlation in grid space",
     "",
@@ -3395,10 +3365,9 @@ static const char *FldcorHelp[] = {
     "    where w(x) are the area weights obtained by the input streams.",
     "    For every timestep t only those field elements x belong to the sample,",
     "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
-    NULL
 };
 
-static const char *TimcorHelp[] = {
+std::vector<std::string> TimcorHelp = {
     "NAME",
     "    timcor - Correlation over time",
     "",
@@ -3418,10 +3387,9 @@ static const char *TimcorHelp[] = {
     "    ",
     "    For every gridpoint x only those timesteps t belong to the sample,",
     "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
-    NULL
 };
 
-static const char *FldcovarHelp[] = {
+std::vector<std::string> FldcovarHelp = {
     "NAME",
     "    fldcovar - Covariance in grid space",
     "",
@@ -3441,10 +3409,9 @@ static const char *FldcovarHelp[] = {
     "    where w(x) are the area weights obtained by the input streams.",
     "    For every timestep t only those field elements x belong to the sample,",
     "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
-    NULL
 };
 
-static const char *TimcovarHelp[] = {
+std::vector<std::string> TimcovarHelp = {
     "NAME",
     "    timcovar - Covariance over time",
     "",
@@ -3463,10 +3430,9 @@ static const char *TimcovarHelp[] = {
     "    ",
     "    For every gridpoint x only those timesteps t belong to the sample,",
     "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
-    NULL
 };
 
-static const char *RegresHelp[] = {
+std::vector<std::string> RegresHelp = {
     "NAME",
     "    regres - Regression",
     "",
@@ -3478,10 +3444,9 @@ static const char *RegresHelp[] = {
     "    N(a+b*t,S^2) with unknown a, b and S^2. This operator estimates the",
     "    parameter b. For every field element x only those timesteps ",
     "    t belong to the sample S(x), which have i(t,x) NE miss.",
-    NULL
 };
 
-static const char *DetrendHelp[] = {
+std::vector<std::string> DetrendHelp = {
     "NAME",
     "    detrend - Detrend time series",
     "",
@@ -3495,10 +3460,9 @@ static const char *DetrendHelp[] = {
     "NOTE",
     "    This operator has to keep the fields of all timesteps concurrently in the memory.",
     "    If not enough memory is available use the operators trend and subtrend.",
-    NULL
 };
 
-static const char *TrendHelp[] = {
+std::vector<std::string> TrendHelp = {
     "NAME",
     "    trend - Trend of time series",
     "",
@@ -3512,10 +3476,9 @@ static const char *TrendHelp[] = {
     "    t belong to the sample S(x), which have i(t,x) NE miss.",
     "    Thus the estimation for a is stored in outfile1 and that for b is stored ",
     "    in outfile2. To subtract the trend from the data see operator subtrend.",
-    NULL
 };
 
-static const char *SubtrendHelp[] = {
+std::vector<std::string> SubtrendHelp = {
     "NAME",
     "    subtrend - Subtract a trend",
     "",
@@ -3528,10 +3491,9 @@ static const char *SubtrendHelp[] = {
     "    ",
     "    o(t,x) = i_1(t,x) - (i_2(1,x) + i_3(1,x)*t)",
     "    where t is the timesteps.",
-    NULL
 };
 
-static const char *EOFsHelp[] = {
+std::vector<std::string> EOFsHelp = {
     "NAME",
     "    eof, eoftime, eofspatial, eof3d - Empirical Orthogonal Functions",
     "",
@@ -3586,10 +3548,9 @@ static const char *EOFsHelp[] = {
     "        a sufficient level of convergence. If all annihilation-pairs of vectors have ",
     "        a norm below this value, the computation is considered to have converged ",
     "        properly. Otherwise, a warning will occur. The default value 1e-12.",
-    NULL
 };
 
-static const char *EofcoeffHelp[] = {
+std::vector<std::string> EofcoeffHelp = {
     "NAME",
     "    eofcoeff - Principal coefficients of EOFs",
     "",
@@ -3613,10 +3574,9 @@ static const char *EofcoeffHelp[] = {
     "        Set the default file suffix. This suffix will be added to the output file ",
     "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
-    NULL
 };
 
-static const char *RemapbilHelp[] = {
+std::vector<std::string> RemapbilHelp = {
     "NAME",
     "    remapbil, genbil - Bilinear interpolation",
     "",
@@ -3644,10 +3604,9 @@ static const char *RemapbilHelp[] = {
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
     "        By default the extrapolation is enabled for circular grids.",
-    NULL
 };
 
-static const char *RemapbicHelp[] = {
+std::vector<std::string> RemapbicHelp = {
     "NAME",
     "    remapbic, genbic - Bicubic interpolation",
     "",
@@ -3675,10 +3634,9 @@ static const char *RemapbicHelp[] = {
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
     "        By default the extrapolation is enabled for circular grids.",
-    NULL
 };
 
-static const char *RemapnnHelp[] = {
+std::vector<std::string> RemapnnHelp = {
     "NAME",
     "    remapnn, gennn - Nearest neighbor remapping",
     "",
@@ -3706,10 +3664,9 @@ static const char *RemapnnHelp[] = {
     "        By default the extrapolation is enabled for this remapping method.",
     "    CDO_GRIDSEARCH_RADIUS",
     "        Grid search radius in degree, default 180 degree.",
-    NULL
 };
 
-static const char *RemapdisHelp[] = {
+std::vector<std::string> RemapdisHelp = {
     "NAME",
     "    remapdis, gendis - Distance-weighted average remapping",
     "",
@@ -3743,10 +3700,9 @@ static const char *RemapdisHelp[] = {
     "        By default the extrapolation is enabled for this remapping method.",
     "    CDO_GRIDSEARCH_RADIUS",
     "        Grid search radius in degree, default 180 degree.",
-    NULL
 };
 
-static const char *RemapyconHelp[] = {
+std::vector<std::string> RemapyconHelp = {
     "NAME",
     "    remapycon, genycon - First order conservative remapping",
     "",
@@ -3782,10 +3738,9 @@ static const char *RemapyconHelp[] = {
     "    REMAP_AREA_MIN",
     "        This variable is used to set the minimum destination area fraction. The default",
     "        of this variable is 0.0.",
-    NULL
 };
 
-static const char *RemapconHelp[] = {
+std::vector<std::string> RemapconHelp = {
     "NAME",
     "    remapcon, gencon - First order conservative remapping",
     "",
@@ -3825,10 +3780,9 @@ static const char *RemapconHelp[] = {
     "NOTE",
     "    The SCRIP conservative remapping method doesn't work correctly for some grid combinations.",
     "    Please use remapycon or genycon in case of problems. ",
-    NULL
 };
 
-static const char *Remapcon2Help[] = {
+std::vector<std::string> Remapcon2Help = {
     "NAME",
     "    remapcon2, gencon2 - Second order conservative remapping",
     "",
@@ -3867,10 +3821,9 @@ static const char *Remapcon2Help[] = {
     "",
     "NOTE",
     "    The SCRIP conservative remapping method doesn't work correctly for some grid combinations.",
-    NULL
 };
 
-static const char *RemaplafHelp[] = {
+std::vector<std::string> RemaplafHelp = {
     "NAME",
     "    remaplaf, genlaf - Largest area fraction remapping",
     "",
@@ -3899,10 +3852,9 @@ static const char *RemaplafHelp[] = {
     "    REMAP_AREA_MIN",
     "        This variable is used to set the minimum destination area fraction. The default",
     "        of this variable is 0.0.",
-    NULL
 };
 
-static const char *RemapHelp[] = {
+std::vector<std::string> RemapHelp = {
     "NAME",
     "    remap - Grid remapping",
     "",
@@ -3941,10 +3893,9 @@ static const char *RemapHelp[] = {
     "        of this variable is 0.0.",
     "    CDO_GRIDSEARCH_RADIUS",
     "        Grid search radius in degree, default 180 degree.",
-    NULL
 };
 
-static const char *RemapetaHelp[] = {
+std::vector<std::string> RemapetaHelp = {
     "NAME",
     "    remapeta - Remap vertical hybrid level",
     "",
@@ -4000,10 +3951,9 @@ static const char *RemapetaHelp[] = {
     "    In case remapeta complains about not finding any data on hybrid model levels you may wish",
     "    to use the setzaxis command to generate a zaxis description which conforms to the ECHAM convention.",
     "    See section \"1.4 Z-axis description\" for an example how to define a hybrid Z-axis.",
-    NULL
 };
 
-static const char *VertintmlHelp[] = {
+std::vector<std::string> VertintmlHelp = {
     "NAME",
     "    ml2pl, ml2hl - Vertical interpolation",
     "",
@@ -4038,10 +3988,9 @@ static const char *VertintmlHelp[] = {
     "ENVIRONMENT",
     "    EXTRAPOLATE",
     "        If set to 1 extrapolate missing values.",
-    NULL
 };
 
-static const char *VertintapHelp[] = {
+std::vector<std::string> VertintapHelp = {
     "NAME",
     "    ap2pl, ap2hl - Vertical interpolation",
     "",
@@ -4075,10 +4024,9 @@ static const char *VertintapHelp[] = {
     "",
     "NOTE",
     "    This is a specific implementation for NetCDF files from the ICON model, it may not work with data from other sources.",
-    NULL
 };
 
-static const char *IntlevelHelp[] = {
+std::vector<std::string> IntlevelHelp = {
     "NAME",
     "    intlevel - Linear level interpolation",
     "",
@@ -4090,10 +4038,9 @@ static const char *IntlevelHelp[] = {
     "",
     "PARAMETER",
     "    levels  FLOAT  Target levels",
-    NULL
 };
 
-static const char *Intlevel3dHelp[] = {
+std::vector<std::string> Intlevel3dHelp = {
     "NAME",
     "    intlevel3d, intlevelx3d - ",
     "    Linear level interpolation from/to 3d vertical coordinates",
@@ -4112,10 +4059,9 @@ static const char *Intlevel3dHelp[] = {
     "PARAMETER",
     "    icoordinate  STRING  filename for vertical source coordinates variable",
     "    infile2      STRING  target vertical coordinate field (intlevel3d only)",
-    NULL
 };
 
-static const char *InttimeHelp[] = {
+std::vector<std::string> InttimeHelp = {
     "NAME",
     "    inttime, intntime - Time interpolation",
     "",
@@ -4139,10 +4085,9 @@ static const char *InttimeHelp[] = {
     "    time  STRING  Start time (format hh:mm:ss)",
     "    inc   STRING  Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]",
     "    n     INTEGER Number of timesteps from one timestep to the next",
-    NULL
 };
 
-static const char *IntyearHelp[] = {
+std::vector<std::string> IntyearHelp = {
     "NAME",
     "    intyear - Year interpolation",
     "",
@@ -4167,10 +4112,9 @@ static const char *IntyearHelp[] = {
     "NOTE",
     "    This operator needs to open all output files simultaneously.",
     "    The maximum number of open files depends on the operating system!",
-    NULL
 };
 
-static const char *SpectralHelp[] = {
+std::vector<std::string> SpectralHelp = {
     "NAME",
     "    sp2gp, sp2gpl, gp2sp, gp2spl, sp2sp - Spectral transformation",
     "",
@@ -4212,10 +4156,9 @@ static const char *SpectralHelp[] = {
     "",
     "PARAMETER",
     "    trunc  INTEGER  New spectral resolution",
-    NULL
 };
 
-static const char *WindHelp[] = {
+std::vector<std::string> WindHelp = {
     "NAME",
     "    dv2uv, dv2uvl, uv2dv, uv2dvl, dv2ps - Wind transformation",
     "",
@@ -4265,10 +4208,9 @@ static const char *WindHelp[] = {
     "            Calculate spherical harmonic coefficients of velocity potential and stream function from ",
     "            spherical harmonic coefficients of relative divergence and vorticity. The divergence and ",
     "            vorticity need to have the names sd and svo or code numbers 155 and 138.",
-    NULL
 };
 
-static const char *ImportbinaryHelp[] = {
+std::vector<std::string> ImportbinaryHelp = {
     "NAME",
     "    import_binary - Import binary data sets",
     "",
@@ -4293,10 +4235,9 @@ static const char *ImportbinaryHelp[] = {
     "",
     "NOTE",
     "    Only 32-bit IEEE floats are supported for standard binary files!",
-    NULL
 };
 
-static const char *ImportcmsafHelp[] = {
+std::vector<std::string> ImportcmsafHelp = {
     "NAME",
     "    import_cmsaf - Import CM-SAF HDF5 files",
     "",
@@ -4342,10 +4283,9 @@ static const char *ImportcmsafHelp[] = {
     "    To use this operator, it is necessary to build CDO with HDF5 support (version 1.6 or higher).",
     "    The PROJ.4 library (version 4.6 or higher) is needed for full support of the remapping",
     "    functionality. ",
-    NULL
 };
 
-static const char *ImportamsrHelp[] = {
+std::vector<std::string> ImportamsrHelp = {
     "NAME",
     "    import_amsr - Import AMSR binary files",
     "",
@@ -4362,10 +4302,9 @@ static const char *ImportamsrHelp[] = {
     "    are followed by six nighttime maps in the same order. Time-Averaged files contain ",
     "    just the geophysical layers in the same order [SST, WSPD, VAPOR, CLOUD, RAIN].",
     "    More information to the data is available on the AMSR homepage http://www.remss.com/amsr.",
-    NULL
 };
 
-static const char *InputHelp[] = {
+std::vector<std::string> InputHelp = {
     "NAME",
     "    input, inputsrv, inputext - Formatted input",
     "",
@@ -4398,10 +4337,9 @@ static const char *InputHelp[] = {
     "PARAMETER",
     "    grid   STRING  Grid description file or name",
     "    zaxis  STRING  Z-axis description file",
-    NULL
 };
 
-static const char *OutputHelp[] = {
+std::vector<std::string> OutputHelp = {
     "NAME",
     "    output, outputf, outputint, outputsrv, outputext - Formatted output",
     "",
@@ -4438,10 +4376,9 @@ static const char *OutputHelp[] = {
     "PARAMETER",
     "    format  STRING  C-style format for one element (e.g. %13.6g)",
     "    nelem   INTEGER Number of elements for each row (default: nelem = 1)",
-    NULL
 };
 
-static const char *OutputtabHelp[] = {
+std::vector<std::string> OutputtabHelp = {
     "NAME",
     "    outputtab - Table output",
     "",
@@ -4478,10 +4415,9 @@ static const char *OutputtabHelp[] = {
     "",
     "PARAMETER",
     "    params  STRING   Comma separated list of keynames, one for each column of the table",
-    NULL
 };
 
-static const char *OutputgmtHelp[] = {
+std::vector<std::string> OutputgmtHelp = {
     "NAME",
     "    gmtxyz, gmtcells - GMT output",
     "",
@@ -4500,10 +4436,9 @@ static const char *OutputgmtHelp[] = {
     "    gmtcells  GMT multiple segment format",
     "              The operator exports the first field to the GMT multiple segment ASCII format.",
     "              The output can be used to create shaded gridfill plots with the GMT module psxy.",
-    NULL
 };
 
-static const char *GradsdesHelp[] = {
+std::vector<std::string> GradsdesHelp = {
     "NAME",
     "    gradsdes - GrADS data descriptor file",
     "",
@@ -4523,10 +4458,9 @@ static const char *GradsdesHelp[] = {
     "                A version 2 map file can be used only with GrADS version 1.8 or newer.",
     "                A version 4 map file can be used only with GrADS version 2.0 or newer.",
     "                The default is 4 for files >2GB, otherwise 2.",
-    NULL
 };
 
-static const char *AfterburnerHelp[] = {
+std::vector<std::string> AfterburnerHelp = {
     "NAME",
     "    after - ECHAM standard post processor",
     "",
@@ -4619,10 +4553,9 @@ static const char *AfterburnerHelp[] = {
     "",
     "PARAMETER",
     "    vct  STRING  File with VCT in ASCII format",
-    NULL
 };
 
-static const char *FilterHelp[] = {
+std::vector<std::string> FilterHelp = {
     "NAME",
     "    bandpass, lowpass, highpass - Time series filtering",
     "",
@@ -4668,10 +4601,9 @@ static const char *FilterHelp[] = {
     "",
     "NOTE",
     "    For better performace of these operators use the CDO configure option --with-fftw3.",
-    NULL
 };
 
-static const char *GridcellHelp[] = {
+std::vector<std::string> GridcellHelp = {
     "NAME",
     "    gridarea, gridweights - Grid cell quantities",
     "",
@@ -4695,10 +4627,9 @@ static const char *GridcellHelp[] = {
     "    PLANET_RADIUS",
     "        This variable is used to scale the computed grid cell areas to square meters. ",
     "        By default PLANET_RADIUS is set to an earth radius of 6371000 meter.",
-    NULL
 };
 
-static const char *SmoothHelp[] = {
+std::vector<std::string> SmoothHelp = {
     "NAME",
     "    smooth, smooth9 - Smooth grid points",
     "",
@@ -4737,10 +4668,9 @@ static const char *SmoothHelp[] = {
     "    form       STRING   Form of the curve, default form=linear",
     "    weight0    FLOAT    Weight at distance 0, default weight0=0.25",
     "    weightR    FLOAT    Weight at the search radius, default weightR=0.25",
-    NULL
 };
 
-static const char *ReplacevaluesHelp[] = {
+std::vector<std::string> ReplacevaluesHelp = {
     "NAME",
     "    setvals, setrtoc, setrtoc2 - Replace variable values",
     "",
@@ -4770,10 +4700,9 @@ static const char *ReplacevaluesHelp[] = {
     "    rmax               FLOAT   Upper bound",
     "    c                  FLOAT   New value - inside range",
     "    c2                 FLOAT   New value - outside range",
-    NULL
 };
 
-static const char *TimsortHelp[] = {
+std::vector<std::string> TimsortHelp = {
     "NAME",
     "    timsort - Timsort",
     "",
@@ -4785,10 +4714,9 @@ static const char *TimsortHelp[] = {
     "    After sorting it is:",
     "    ",
     "    o(t_1,x) <= o(t_2,x)      forall (t_1<t_2),x",
-    NULL
 };
 
-static const char *VargenHelp[] = {
+std::vector<std::string> VargenHelp = {
     "NAME",
     "    const, random, topo, for, stdatm - Generate a field",
     "",
@@ -4841,10 +4769,9 @@ static const char *VargenHelp[] = {
     "    end     FLOAT   End value of the loop",
     "    inc     FLOAT   Increment of the loop [default: 1]",
     "    levels  FLOAT   Target levels in metre above surface",
-    NULL
 };
 
-static const char *WindTransHelp[] = {
+std::vector<std::string> WindTransHelp = {
     "NAME",
     "    uvDestag, rotuvNorth, projuvLatLon - Wind Transformation",
     "",
@@ -4872,10 +4799,9 @@ static const char *WindTransHelp[] = {
     "PARAMETER",
     "    u,v            STRING  Pair of u,v wind components (use variable names or code numbers)",
     "    -/+0.5,-/+0.5  STRING  Destaggered grid offsets are optional (default -0.5,-0.5)",
-    NULL
 };
 
-static const char *RotuvbHelp[] = {
+std::vector<std::string> RotuvbHelp = {
     "NAME",
     "    rotuvb - Rotation",
     "",
@@ -4889,10 +4815,9 @@ static const char *RotuvbHelp[] = {
     "",
     "PARAMETER",
     "    u,v,...  STRING  Pairs of zonal and meridional velocity components (use variable names or code numbers)",
-    NULL
 };
 
-static const char *MastrfuHelp[] = {
+std::vector<std::string> MastrfuHelp = {
     "NAME",
     "    mastrfu - Mass stream function",
     "",
@@ -4903,10 +4828,9 @@ static const char *MastrfuHelp[] = {
     "    This is a special operator for the post processing of the atmospheric general circulation",
     "    model ECHAM. It computes the mass stream function (code=272). The input dataset have ",
     "    to be a zonal mean of v-velocity [m/s] (code=132) on pressure levels.",
-    NULL
 };
 
-static const char *DeriveparHelp[] = {
+std::vector<std::string> DeriveparHelp = {
     "NAME",
     "    sealevelpressure - Sea level pressure",
     "",
@@ -4916,10 +4840,9 @@ static const char *DeriveparHelp[] = {
     "DESCRIPTION",
     "    This operator computes the sea level pressure (air_pressure_at_sea_level). Required input fields",
     "    are surface_air_pressure, surface_geopotential and air_temperature on hybrid sigma pressure levels.",
-    NULL
 };
 
-static const char *AdisitHelp[] = {
+std::vector<std::string> AdisitHelp = {
     "NAME",
     "    adisit, adipot - Potential temperature to in-situ temperature and vice versa",
     "",
@@ -4947,10 +4870,9 @@ static const char *AdisitHelp[] = {
     "",
     "PARAMETER",
     "    pressure  FLOAT   Pressure in bar (constant value assigned to all levels)",
-    NULL
 };
 
-static const char *RhopotHelp[] = {
+std::vector<std::string> RhopotHelp = {
     "NAME",
     "    rhopot - Calculates potential density",
     "",
@@ -4965,10 +4887,9 @@ static const char *RhopotHelp[] = {
     "",
     "PARAMETER",
     "    pressure  FLOAT   Pressure in bar (constant value assigned to all levels)",
-    NULL
 };
 
-static const char *HistogramHelp[] = {
+std::vector<std::string> HistogramHelp = {
     "NAME",
     "    histcount, histsum, histmean, histfreq - Histogram",
     "",
@@ -4997,10 +4918,9 @@ static const char *HistogramHelp[] = {
     "",
     "PARAMETER",
     "    bounds  FLOAT  Comma separated list of the bin bounds (-inf and inf valid)",
-    NULL
 };
 
-static const char *SethaloHelp[] = {
+std::vector<std::string> SethaloHelp = {
     "NAME",
     "    sethalo - Set the left and right bounds of a field",
     "",
@@ -5017,10 +4937,9 @@ static const char *SethaloHelp[] = {
     "PARAMETER",
     "    lhalo  INTEGER  Left halo",
     "    rhalo  INTEGER  Right halo",
-    NULL
 };
 
-static const char *WctHelp[] = {
+std::vector<std::string> WctHelp = {
     "NAME",
     "    wct - Windchill temperature",
     "",
@@ -5035,10 +4954,9 @@ static const char *WctHelp[] = {
     "    of v >= 1.39 m/s. Whenever these conditions are not satisfied, a missing",
     "    value is written to outfile. Note that temperature and wind speed records",
     "    have to be given in units of °C and m/s, respectively.",
-    NULL
 };
 
-static const char *FdnsHelp[] = {
+std::vector<std::string> FdnsHelp = {
     "NAME",
     "    fdns - Frost days where no snow index per time period",
     "",
@@ -5053,10 +4971,9 @@ static const char *FdnsHelp[] = {
     "    have to be given in units of Kelvin.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    NULL
 };
 
-static const char *StrwinHelp[] = {
+std::vector<std::string> StrwinHelp = {
     "NAME",
     "    strwin - Strong wind days index per time period",
     "",
@@ -5076,10 +4993,9 @@ static const char *StrwinHelp[] = {
     "",
     "PARAMETER",
     "    v  FLOAT   Horizontal wind speed threshold (m/s, default v = 10.5 m/s)",
-    NULL
 };
 
-static const char *StrbreHelp[] = {
+std::vector<std::string> StrbreHelp = {
     "NAME",
     "    strbre - Strong breeze days index per time period",
     "",
@@ -5095,10 +5011,9 @@ static const char *StrbreHelp[] = {
     "    meridional wind speeds and have to be given in units of m/s.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    NULL
 };
 
-static const char *StrgalHelp[] = {
+std::vector<std::string> StrgalHelp = {
     "NAME",
     "    strgal - Strong gale days index per time period",
     "",
@@ -5114,10 +5029,9 @@ static const char *StrgalHelp[] = {
     "    meridional wind speeds and have to be given in units of m/s.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    NULL
 };
 
-static const char *HurrHelp[] = {
+std::vector<std::string> HurrHelp = {
     "NAME",
     "    hurr - Hurricane days index per time period",
     "",
@@ -5133,10 +5047,9 @@ static const char *HurrHelp[] = {
     "    meridional wind speeds and have to be given in units of m/s.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    NULL
 };
 
-static const char *CMORHelp[] = {
+std::vector<std::string> CMORHelp = {
     "NAME",
     "    cmor - Climate Model Output Rewriting to produce CMIP-compliant data",
     "",
@@ -5213,7 +5126,7 @@ static const char *CMORHelp[] = {
     NULL
 };
 
-static const char *CMORliteHelp[] = {
+std::vector<std::string> CMORliteHelp = {
     "NAME",
     "    cmorlite - CMOR lite",
     "",
@@ -5259,10 +5172,9 @@ static const char *CMORliteHelp[] = {
     "PARAMETER",
     "    table    STRING   Name of the CMOR table as specified from PCMDI",
     "    convert  STRING   Converts the units if necessary",
-    NULL
 };
 
-static const char *MagplotHelp[] = {
+std::vector<std::string> MagplotHelp = {
     "NAME",
     "    contour, shaded, grfill - Lat/Lon plot",
     "",
@@ -5353,10 +5265,9 @@ static const char *MagplotHelp[] = {
     "    \"reddishorange\", \"orange\", \"yellowishorange\", \"orangeyellow\", \"orangishyellow\",",
     "    \"greenishyellow\", \"yellowgreen\", \"yellowishgreen\", \"bluishgreen\", \"bluegreen\",",
     "    \"greenishblue\", \"purplishblue\", \"bluepurple\", \"bluishpurple\", \"purple\", \"white\"",
-    NULL
 };
 
-static const char *MagvectorHelp[] = {
+std::vector<std::string> MagvectorHelp = {
     "NAME",
     "    vector - Lat/Lon vector plot",
     "",
@@ -5383,10 +5294,9 @@ static const char *MagvectorHelp[] = {
     "",
     "PARAMETER",
     "    params  STRING   Comma separated list of plot parameters",
-    NULL
 };
 
-static const char *MaggraphHelp[] = {
+std::vector<std::string> MaggraphHelp = {
     "NAME",
     "    graph - Line graph plot",
     "",
@@ -5415,10 +5325,9 @@ static const char *MaggraphHelp[] = {
     "",
     "PARAMETER",
     "    params  STRING   Comma separated list of plot parameters",
-    NULL
 };
 
-static const char *EcaCddHelp[] = {
+std::vector<std::string> EcaCddHelp = {
     "NAME",
     "    eca_cdd - Consecutive dry days index per time period",
     "",
@@ -5430,17 +5339,13 @@ static const char *EcaCddHelp[] = {
     "    of consecutive days where RR is less than R is counted. R is an optional parameter with ",
     "    default R = 1 mm. A further output variable is the number of dry periods of more than N days.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - consecutive_dry_days_index_per_time_period",
-    "    - number_of_cdd_periods_with_more_than_<N>days_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT    Precipitation threshold (unit: mm; default: R = 1 mm)",
     "    N  INTEGER  Minimum number of days exceeded (default: N = 5)",
-    NULL
 };
 
-static const char *EcaCfdHelp[] = {
+std::vector<std::string> EcaCfdHelp = {
     "NAME",
     "    eca_cfd - Consecutive frost days index per time period",
     "",
@@ -5452,16 +5357,12 @@ static const char *EcaCfdHelp[] = {
     "    consecutive days where TN < 0 °C is counted. Note that TN have to be given in units of Kelvin.",
     "    A further output variable is the number of frost periods of more than N days.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - consecutive_frost_days_index_per_time_period",
-    "    - number_of_cfd_periods_with_more_than_<N>days_per_time_period",
     "",
     "PARAMETER",
     "    N  INTEGER  Minimum number of days exceeded (default: N = 5)",
-    NULL
 };
 
-static const char *EcaCsuHelp[] = {
+std::vector<std::string> EcaCsuHelp = {
     "NAME",
     "    eca_csu - Consecutive summer days index per time period",
     "",
@@ -5474,17 +5375,13 @@ static const char *EcaCsuHelp[] = {
     "    Note that TN have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
     "    A further output variable is the number of summer periods of more than N days.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - consecutive_summer_days_index_per_time_period",
-    "    - number_of_csu_periods_with_more_than_<N>days_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT    Temperature threshold (unit: °C; default: T = 25°C)",
     "    N  INTEGER  Minimum number of days exceeded (default: N = 5)",
-    NULL
 };
 
-static const char *EcaCwdHelp[] = {
+std::vector<std::string> EcaCwdHelp = {
     "NAME",
     "    eca_cwd - Consecutive wet days index per time period",
     "",
@@ -5496,17 +5393,13 @@ static const char *EcaCwdHelp[] = {
     "    of consecutive days where RR is at least R is counted. R is an optional parameter with ",
     "    default R = 1 mm. A further output variable is the number of wet periods of more than N days.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - consecutive_wet_days_index_per_time_period",
-    "    - number_of_cwd_periods_with_more_than_<N>days_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT    Precipitation threshold (unit: mm; default: R = 1 mm)",
     "    N  INTEGER  Minimum number of days exceeded (default: N = 5)",
-    NULL
 };
 
-static const char *EcaCwdiHelp[] = {
+std::vector<std::string> EcaCwdiHelp = {
     "NAME",
     "    eca_cwdi - Cold wave duration index wrt mean of reference period",
     "",
@@ -5522,17 +5415,13 @@ static const char *EcaCwdiHelp[] = {
     "    TNnorm is calculated as the mean of minimum temperatures of a five day window centred on each calendar day ",
     "    of a given climate reference period. Note that both TN and TNnorm have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - cold_wave_duration_index_wrt_mean_of_reference_period",
-    "    - cold_waves_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
     "    T     FLOAT    Temperature offset (unit: °C; default: T = 5°C)",
-    NULL
 };
 
-static const char *EcaCwfiHelp[] = {
+std::vector<std::string> EcaCwfiHelp = {
     "NAME",
     "    eca_cwfi - Cold-spell days index wrt 10th percentile of reference period",
     "",
@@ -5549,16 +5438,12 @@ static const char *EcaCwfiHelp[] = {
     "    centred on each calendar day of a given climate reference period. Note that both TG and TGn10 ",
     "    have to be given in the same units. The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - cold_spell_days_index_wrt_10th_percentile_of_reference_period",
-    "    - cold_spell_periods_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
-    NULL
 };
 
-static const char *EcaEtrHelp[] = {
+std::vector<std::string> EcaEtrHelp = {
     "NAME",
     "    eca_etr - Intra-period extreme temperature range",
     "",
@@ -5572,12 +5457,9 @@ static const char *EcaEtrHelp[] = {
     "    Note that TX and TN have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timesteps in infile1 and infile2.",
-    "    The following variables are created: ",
-    "    - intra_period_extreme_temperature_range",
-    NULL
 };
 
-static const char *EcaFdHelp[] = {
+std::vector<std::string> EcaFdHelp = {
     "NAME",
     "    eca_fd - Frost days index per time period",
     "",
@@ -5590,12 +5472,9 @@ static const char *EcaFdHelp[] = {
     "    that TN have to be given in units of Kelvin.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - frost_days_index_per_time_period",
-    NULL
 };
 
-static const char *EcaGslHelp[] = {
+std::vector<std::string> EcaGslHelp = {
     "NAME",
     "    eca_gsl - Thermal Growing season length index",
     "",
@@ -5607,7 +5486,7 @@ static const char *EcaGslHelp[] = {
     "    Within a period of 12 months, the thermal growing season length is officially defined as the number of days between:",
     "    - first occurrence of at least nday consecutive days with TG > T",
     "    - first occurrence of at least nday consecutive days with TG < T within the last 6 months",
-    "    On northern hemispere, this period corresponds with the regular year, whereas on southern hemispere, it starts ",
+    "    On northern hemisphere, this period corresponds with the regular year, whereas on southern hemisphere, it starts ",
     "    at July 1st. Please note, that this definition may lead to weird results concerning values TG = T: ",
     "    In the first half of the period, these days do not contribute to the gsl, but they do within the second half.",
     "    Moreover this definition could lead to discontinuous values in equatorial regions.",
@@ -5619,18 +5498,14 @@ static const char *EcaGslHelp[] = {
     "    have to be given in degrees Celsius.",
     "    ",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - thermal_growing_season_length",
-    "    - day_of_year_of_growing_season_start",
     "",
     "PARAMETER",
     "    nday   INTEGER  Number of consecutive days (default: nday = 6)",
     "    T      FLOAT    Temperature threshold (unit: °C; default: T = 5°C)",
     "    fland  FLOAT    Land fraction threshold (default: fland = 0.5)",
-    NULL
 };
 
-static const char *EcaHdHelp[] = {
+std::vector<std::string> EcaHdHelp = {
     "NAME",
     "    eca_hd - Heating degree days per time period",
     "",
@@ -5644,16 +5519,13 @@ static const char *EcaHdHelp[] = {
     "    If only T1 is given, T2 is set to T1. Note that TG have to be given in units ",
     "    of kelvin, whereas T1 and T2 have to be given in degrees Celsius.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - heating_degree_days_per_time_period",
     "",
     "PARAMETER",
     "    T1  FLOAT   Temperature limit (unit: °C; default: T1 = 17°C)",
     "    T2  FLOAT   Temperature limit (unit: °C; default: T2 = T1)",
-    NULL
 };
 
-static const char *EcaHwdiHelp[] = {
+std::vector<std::string> EcaHwdiHelp = {
     "NAME",
     "    eca_hwdi - Heat wave duration index wrt mean of reference period",
     "",
@@ -5669,17 +5541,13 @@ static const char *EcaHwdiHelp[] = {
     "    TXnorm is calculated as the mean of maximum temperatures of a five day window centred on each calendar day",
     "    of a given climate reference period. Note that both TX and TXnorm have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - heat_wave_duration_index_wrt_mean_of_reference_period",
-    "    - heat_waves_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
     "    T     FLOAT    Temperature offset (unit: °C; default: T = 5°C)",
-    NULL
 };
 
-static const char *EcaHwfiHelp[] = {
+std::vector<std::string> EcaHwfiHelp = {
     "NAME",
     "    eca_hwfi - Warm spell days index wrt 90th percentile of reference period",
     "",
@@ -5699,16 +5567,12 @@ static const char *EcaHwfiHelp[] = {
     "    Note that both TG and TGn90 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - warm_spell_days_index_wrt_90th_percentile_of_reference_period",
-    "    - warm_spell_periods_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
-    NULL
 };
 
-static const char *EcaIdHelp[] = {
+std::vector<std::string> EcaIdHelp = {
     "NAME",
     "    eca_id - Ice days index per time period",
     "",
@@ -5721,12 +5585,9 @@ static const char *EcaIdHelp[] = {
     "    that TX have to be given in units of Kelvin.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - ice_days_index_per_time_period",
-    NULL
 };
 
-static const char *EcaR75pHelp[] = {
+std::vector<std::string> EcaR75pHelp = {
     "NAME",
     "    eca_r75p - Moderate wet days wrt 75th percentile of reference period",
     "",
@@ -5740,12 +5601,9 @@ static const char *EcaR75pHelp[] = {
     "    RRn75 is calculated as the 75th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,75.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - moderate_wet_days_wrt_75th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaR75ptotHelp[] = {
+std::vector<std::string> EcaR75ptotHelp = {
     "NAME",
     "    eca_r75ptot - Precipitation percent due to R75p days",
     "",
@@ -5760,12 +5618,9 @@ static const char *EcaR75ptotHelp[] = {
     "    RRn75 is calculated as the 75th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,75.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - precipitation_percent_due_to_R75p_days",
-    NULL
 };
 
-static const char *EcaR90pHelp[] = {
+std::vector<std::string> EcaR90pHelp = {
     "NAME",
     "    eca_r90p - Wet days wrt 90th percentile of reference period",
     "",
@@ -5779,12 +5634,9 @@ static const char *EcaR90pHelp[] = {
     "    RRn90 is calculated as the 90th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,90.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - wet_days_wrt_90th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaR90ptotHelp[] = {
+std::vector<std::string> EcaR90ptotHelp = {
     "NAME",
     "    eca_r90ptot - Precipitation percent due to R90p days",
     "",
@@ -5799,12 +5651,9 @@ static const char *EcaR90ptotHelp[] = {
     "    RRn90 is calculated as the 90th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,90.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - precipitation_percent_due_to_R90p_days",
-    NULL
 };
 
-static const char *EcaR95pHelp[] = {
+std::vector<std::string> EcaR95pHelp = {
     "NAME",
     "    eca_r95p - Very wet days wrt 95th percentile of reference period",
     "",
@@ -5818,12 +5667,9 @@ static const char *EcaR95pHelp[] = {
     "    RRn95 is calculated as the 95th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,95.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - very_wet_days_wrt_95th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaR95ptotHelp[] = {
+std::vector<std::string> EcaR95ptotHelp = {
     "NAME",
     "    eca_r95ptot - Precipitation percent due to R95p days",
     "",
@@ -5838,12 +5684,9 @@ static const char *EcaR95ptotHelp[] = {
     "    RRn95 is calculated as the 95th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,95.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - precipitation_percent_due_to_R95p_days",
-    NULL
 };
 
-static const char *EcaR99pHelp[] = {
+std::vector<std::string> EcaR99pHelp = {
     "NAME",
     "    eca_r99p - Extremely wet days wrt 99th percentile of reference period",
     "",
@@ -5857,12 +5700,9 @@ static const char *EcaR99pHelp[] = {
     "    RRn99 is calculated as the 99th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,99.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - extremely_wet_days_wrt_99th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaR99ptotHelp[] = {
+std::vector<std::string> EcaR99ptotHelp = {
     "NAME",
     "    eca_r99ptot - Precipitation percent due to R99p days",
     "",
@@ -5877,12 +5717,9 @@ static const char *EcaR99ptotHelp[] = {
     "    RRn99 is calculated as the 99th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,99.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - precipitation_percent_due_to_R99p_days",
-    NULL
 };
 
-static const char *EcaPdHelp[] = {
+std::vector<std::string> EcaPdHelp = {
     "NAME",
     "    eca_pd, eca_r10mm, eca_r20mm - Precipitation days index per time period",
     "",
@@ -5896,8 +5733,6 @@ static const char *EcaPdHelp[] = {
     "    then the number of days where RR is at least x mm is counted. ",
     "    eca_r10mm and eca_r20mm are specific ECA operators with a daily precipitation amount of 10 and 20 mm respectively.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - precipitation_days_index_per_time_period",
     "",
     "OPERATORS",
     "    eca_pd     Precipitation days index per time period",
@@ -5913,10 +5748,9 @@ static const char *EcaPdHelp[] = {
     "NOTE",
     "    Precipitation rates in [mm/s] have to be converted to precipitation amounts (multiply with 86400 s).",
     "    Apart from metadata information the result of eca_pd,1 and eca_rr1 is the same.",
-    NULL
 };
 
-static const char *EcaRr1Help[] = {
+std::vector<std::string> EcaRr1Help = {
     "NAME",
     "    eca_rr1 - Wet days index per time period",
     "",
@@ -5927,15 +5761,12 @@ static const char *EcaRr1Help[] = {
     "    Let infile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]), then",
     "    the number of days where RR is at least R is counted. R is an optional parameter with default R = 1 mm. ",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - wet_days_index_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
-    NULL
 };
 
-static const char *EcaRx1dayHelp[] = {
+std::vector<std::string> EcaRx1dayHelp = {
     "NAME",
     "    eca_rx1day - Highest one day precipitation amount per time period",
     "",
@@ -5949,15 +5780,12 @@ static const char *EcaRx1dayHelp[] = {
     "    amounts are determined for each month. ",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - highest_one_day_precipitation_amount_per_time_period",
     "",
     "PARAMETER",
     "    mode  STRING   Operation mode (optional). If mode = 'm' then maximum daily precipitation amounts are determined for each month",
-    NULL
 };
 
-static const char *EcaRx5dayHelp[] = {
+std::vector<std::string> EcaRx5dayHelp = {
     "NAME",
     "    eca_rx5day - Highest five-day precipitation amount per time period",
     "",
@@ -5969,16 +5797,12 @@ static const char *EcaRx5dayHelp[] = {
     "    A further output variable is the number of 5 day period with precipitation totals greater than x mm, where x ",
     "    is an optional parameter with default x = 50 mm.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - highest_five_day_precipitation_amount_per_time_period",
-    "    - number_of_5day_heavy_precipitation_periods_per_time_period",
     "",
     "PARAMETER",
     "    x  FLOAT   Precipitation threshold (unit: mm; default: x = 50 mm)",
-    NULL
 };
 
-static const char *EcaSdiiHelp[] = {
+std::vector<std::string> EcaSdiiHelp = {
     "NAME",
     "    eca_sdii - Simple daily intensity index per time period",
     "",
@@ -5989,15 +5813,12 @@ static const char *EcaSdiiHelp[] = {
     "    Let infile be a time series of the daily precipitation amount RR, then the mean precipitation amount at ",
     "    wet days (RR > R) is written to outfile. R is an optional parameter with default R = 1 mm.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - simple_daily_intensity_index_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
-    NULL
 };
 
-static const char *EcaSuHelp[] = {
+std::vector<std::string> EcaSuHelp = {
     "NAME",
     "    eca_su - Summer days index per time period",
     "",
@@ -6009,15 +5830,12 @@ static const char *EcaSuHelp[] = {
     "    TX > T is counted. The number T is an optional parameter with default T = 25°C. ",
     "    Note that TX have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - summer_days_index_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT   Temperature threshold (unit: °C; default: T = 25°C)",
-    NULL
 };
 
-static const char *EcaTg10pHelp[] = {
+std::vector<std::string> EcaTg10pHelp = {
     "NAME",
     "    eca_tg10p - Cold days percent wrt 10th percentile of reference period",
     "",
@@ -6034,12 +5852,9 @@ static const char *EcaTg10pHelp[] = {
     "    Note that both TG and TGn10 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - cold_days_percent_wrt_10th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaTg90pHelp[] = {
+std::vector<std::string> EcaTg90pHelp = {
     "NAME",
     "    eca_tg90p - Warm days percent wrt 90th percentile of reference period",
     "",
@@ -6056,12 +5871,9 @@ static const char *EcaTg90pHelp[] = {
     "    Note that both TG and TGn90 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - warm_days_percent_wrt_90th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaTn10pHelp[] = {
+std::vector<std::string> EcaTn10pHelp = {
     "NAME",
     "    eca_tn10p - Cold nights percent wrt 10th percentile of reference period",
     "",
@@ -6078,12 +5890,9 @@ static const char *EcaTn10pHelp[] = {
     "    Note that both TN and TNn10 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - cold_nights_percent_wrt_10th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaTn90pHelp[] = {
+std::vector<std::string> EcaTn90pHelp = {
     "NAME",
     "    eca_tn90p - Warm nights percent wrt 90th percentile of reference period",
     "",
@@ -6097,12 +5906,9 @@ static const char *EcaTn90pHelp[] = {
     "    of daily minimum temperatures of a five day window centred on each calendar day of a given climate",
     "    reference period. Note that both TN and TNn90 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - warm_nights_percent_wrt_90th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaTrHelp[] = {
+std::vector<std::string> EcaTrHelp = {
     "NAME",
     "    eca_tr - Tropical nights index per time period",
     "",
@@ -6114,15 +5920,12 @@ static const char *EcaTrHelp[] = {
     "    TN > T is counted. The number T is an optional parameter with default T = 20°C. ",
     "    Note that TN have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - tropical_nights_index_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT   Temperature threshold (unit: °C; default: T = 20°C)",
-    NULL
 };
 
-static const char *EcaTx10pHelp[] = {
+std::vector<std::string> EcaTx10pHelp = {
     "NAME",
     "    eca_tx10p - Very cold days percent wrt 10th percentile of reference period",
     "",
@@ -6139,12 +5942,9 @@ static const char *EcaTx10pHelp[] = {
     "    Note that both TX and TXn10 have to be givenin the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - very_cold_days_percent_wrt_10th_percentile_of_reference_period",
-    NULL
 };
 
-static const char *EcaTx90pHelp[] = {
+std::vector<std::string> EcaTx90pHelp = {
     "NAME",
     "    eca_tx90p - Very warm days percent wrt 90th percentile of reference period",
     "",
@@ -6161,7 +5961,4 @@ static const char *EcaTx90pHelp[] = {
     "    Note that both TX and TXn90 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - very_warm_days_percent_wrt_90th_percentile_of_reference_period",
-    NULL
 };

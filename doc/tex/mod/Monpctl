@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Monpctl
 @Title     = Monthly percentile values
 @Section   = Statistical values

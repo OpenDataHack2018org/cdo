@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = ydaymin ydaymax ydaysum ydaymean ydayavg ydaystd ydaystd1 ydayvar ydayvar1
+@Operators = ydaymin ydaymax ydayrange ydaysum ydaymean ydayavg ydaystd ydaystd1 ydayvar ydayvar1
 
 @BeginDescription
 This module computes statistical values of each day of year.
-Depending on the chosen operator the minimum, maximum, sum, average, variance
+Depending on the chosen operator the minimum, maximum, range, sum, average, variance
 or standard deviation of each day of year in @file{infile} is written to @file{outfile}.
 The date information in an output field is the date of the last contributing input field.
 @EndModule
@@ -52,6 +52,28 @@ o(366,x) = max{i(t,x), day(i(t)) = 366}
 o(\mbox{001},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
 \vdots \\
 o(\mbox{366},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydayrange
+@Title     = Multi-year daily range
+
+@BeginDescription
+@IfMan
+o(001,x) = range{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = range{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\textbf{range}}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\textbf{range}}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc

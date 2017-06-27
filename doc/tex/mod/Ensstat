@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infiles outfile
-@Operators = ensmin ensmax enssum ensmean ensavg ensstd ensstd1 ensvar ensvar1 enspctl
+@Operators = ensmin ensmax ensrange enssum ensmean ensavg ensstd ensstd1 ensvar ensvar1 enspctl
 
 @BeginDescription
 This module computes statistical values over an ensemble of input files.
-Depending on the chosen operator the minimum, maximum, sum, average, variance,
+Depending on the chosen operator the minimum, maximum, range, sum, average, variance,
 standard deviation or a certain percentile over all input files is written
 to @file{outfile}.
 All input files need to have the same structure with the same variables.
@@ -33,6 +33,7 @@ o(t,x) = \mbox{\textbf{min}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndDescription
 @EndOperator
 
+
 @BeginOperator_ensmax
 @Title     = Ensemble maximum
 
@@ -43,6 +44,22 @@ o(t,x) = max{i1(t,x), i2(t,x), ..., in(t,x)}
 @IfDoc
 @BeginMath
 o(t,x) = \mbox{\textbf{max}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ensrange
+@Title     = Ensemble range
+
+@BeginDescription
+@IfMan
+o(t,x) = range{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\textbf{range}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription

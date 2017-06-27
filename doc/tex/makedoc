@@ -288,6 +288,7 @@ while (<MOFILE>) {
 #	print TRCARD "\\makebox[0.65in][c]{\$<\\!stat\\!>\$} \\\\ \\hline\n";
 	print TRCARD "minimum  & \\textbf{min}   \\\\ \n";
 	print TRCARD "maximum  & \\textbf{max}   \\\\ \n";
+	print TRCARD "range    & \\textbf{range}   \\\\ \n";
 	print TRCARD "sum      & \\textbf{sum}  \\\\ \n";
 	print TRCARD "mean     & \\textbf{mean}  \\\\ \n";
 	print TRCARD "average            & \\textbf{avg}  \\\\ \n";
@@ -305,7 +306,7 @@ while (<MOFILE>) {
     }
 
     print HELPFILE "\n";
-    print HELPFILE "static const char *${mname}Help[] = {\n";
+    print HELPFILE "std::vector<std::string> ${mname}Help = {\n";
 
     @hkeys = split(" ", $moperators);
 #    print "$#hkeys @hkeys \n";
@@ -1019,7 +1020,6 @@ while (<MOFILE>) {
 #      print HELPFILE "    \"\",\n";
 #      print HELPFILE "    \"\@End_${operator}\",\n";
 
-    print HELPFILE "    NULL\n";
     print HELPFILE "};\n";
 
     print TCFILE "\\end{tabular*}\n";

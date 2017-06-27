@@ -1,5 +1,5 @@
 #! @BASH@
-echo 1..9 # Number of tests to be executed.
+echo 1..10 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -7,7 +7,7 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout$$
 CDOERR=cerr$$
 TYPE=timsel
-STATS="min max sum avg mean std std1 var var1"
+STATS="min max range sum avg mean std std1 var var1"
 NTEST=1
 #
 IFILE=$DATAPATH/ts_mm_5years

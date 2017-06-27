@@ -76,6 +76,11 @@ M_E          {
                 return VARIABLE;
              }
 
+{LPHDGT}*{LPH}{LPHDGT}* {
+                yylval->varnm = strdup(yytext);
+                return VARIABLE;
+             }
+
 
 [-()=+*/;,{}^.?:] {
                 return *yytext;

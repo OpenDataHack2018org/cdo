@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Hourpctl
 @Title     = Hourly percentile values
 @Section   = Statistical values

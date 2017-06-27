@@ -97,14 +97,14 @@ typedef struct {
 field_type;
 
 
-/* fieldmem.c */
+/* fieldmem.cc */
 
 void      field_init(field_type *field);
 field_type **field_malloc(const int vlistID, const int ptype);
 field_type **field_calloc(const int vlistID, const int ptype);
 void      field_free(field_type **field, const int vlistID);
 
-/* field.c */
+/* field.cc */
 
 double fldfun(field_type field, int function);
 double fldrange(field_type field);
@@ -133,7 +133,7 @@ double fldbrs(field_type field);
 double fldrank(field_type field);
 double fldroc(field_type field);
 
-/* fieldzon.c */
+/* fieldzon.cc */
 
 void zonfun(field_type field1, field_type *field2, const int function);
 void zonmin(field_type field1, field_type *field2);
@@ -148,11 +148,12 @@ void zonvar(field_type field1, field_type *field2);
 void zonvar1(field_type field1, field_type *field2);
 void zonpctl(field_type field1, field_type *field2, const int k);
 
-/* fieldmer.c */
+/* fieldmer.cc */
 
 void merfun(field_type field1, field_type *field2, const int function);
 void mermin(field_type field1, field_type *field2);
 void mermax(field_type field1, field_type *field2);
+void merrange(field_type field1, field_type *field2);
 void mersum(field_type field1, field_type *field2);
 void meravgw(field_type field1, field_type *field2);
 void mermeanw(field_type field1, field_type *field2);
@@ -166,7 +167,7 @@ void fldrms(field_type field1, field_type field2, field_type *field3);
 
 void varrms(field_type field1, field_type field2, field_type *field3);
 
-/* fieldc.c */
+/* fieldc.cc */
 
 void farcfun(field_type *field, const double rconst, const int function);
 
@@ -180,7 +181,7 @@ void farmod(field_type *field, const double divisor);
 void farinv(field_type *field);
 void farround(field_type *field);
 
-/* field2.c */
+/* field2.cc */
 
 void farfun(field_type *field1, field_type field2, int function);
 
