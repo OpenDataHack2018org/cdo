@@ -975,7 +975,7 @@ static void check_compare_set(char **finalset, char *attribute, char *attname, c
     }
 }
 
-static int check_attr(list_t *kvl, char *project_id)
+static void add_globalhybrids(list_t *kvl)
 {
   const char *longAtt[] = {"required_time_units", "grid_info", "mapping_table", NULL};
   const char *shortAtt[] = {"rtu", "gi", "mt", NULL};
@@ -991,7 +991,11 @@ static int check_attr(list_t *kvl, char *project_id)
         kv_insert_a_val(kvl, longAtt[i], kv_satt->values[0], 1);      
       i++;
     }
+}
 
+static int check_attr(list_t *kvl, char *project_id)
+{
+  int i = 0;
 /* Project id moved to main void fct */
   const char *reqAtt[] = {"institute_id", "institution", "contact", "model_id", "source",
             "experiment_id", "required_time_units", NULL};
@@ -1613,37 +1617,29 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 /* If attributes recur, the last occurence is used by CMOR */
 /***/
 
-      char *filename = kv_get_a_val(kvl, "dj", "dataset.json");
+      char *filename = kv_get_a_val(kvl, "dj", NULL);
+      int isfile = ( filename ) ? 1 : 0;
+      char *dataset_path = NULL;
+      FILE *dataset_json;
+      if ( !isfile )
+        filename = strdup("dataset.json");
+
       char cwd[1024];
       getcwd(cwd, sizeof(cwd));
 
-      char dataset_path[strlen(cwd) + 1 + strlen(filename)];
-      sprintf(dataset_path, "%s/%s", cwd, filename);
+      dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen(filename) + 1) * sizeof(char));
+      sprintf(dataset_path, "%s/%s\0", cwd, filename);
 
-      FILE *dataset_json = ( strcmp(filename, "dataset.json") == 0 ) ? fopen(dataset_path, "w+") : fopen(dataset_path, "a+");
-      if ( !dataset_json )
-        cdoAbort("Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
-
-      fseek(dataset_json, 0, SEEK_SET );
-      char bracket[4];
-      if ( fgets (bracket, 2, dataset_json) != NULL )
+      if ( !isfile )
         {
-          if ( bracket[0] != '{' && strcmp(bracket, "") != 0 )
-            cdoAbort("File '%s' must begin with { because it is a json file.", dataset_path);
+          dataset_json = fopen(dataset_path, "w+");
+          if ( !dataset_json )
+            cdoAbort("Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
+
+          fputs("{\n", dataset_json);
         }
       else
-        fputs("{\n", dataset_json);
-
-      fseek(dataset_json, -4, SEEK_END );
-      if ( fgets (bracket, 2, dataset_json) != NULL )
-        {
-          if ( bracket[0] != '}' ) 
-            cdoWarning("File '%s' does not end with }.", dataset_path);
-          else
-            fseek(dataset_json, -4, SEEK_END );
-        }
-      else
-        cdoAbort("Could not read last character of file %s\n");
+        cmor_dataset_json(dataset_path);
 
       char *allneeded[] = /*CMIP5*/{"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip", 
 /* CMIP6: */
@@ -1653,35 +1649,52 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 "Conventions", "activity_id", "experiment", "experiment_id", "forcing_index", "further_info_url", "grid", "grid_label", "initialization_index", "institution", "institution_id", "license", "mip_era", "nominal_resolution", "physics_index", "product", "realization_index", "source", "source_id", "source_type", "sub_experiment", "sub_experiment_id", "table_id", "variant_label", "parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label",
 "parent_time_units", NULL};
       int i = 0;
+
       while ( allneeded[i] )
         {
           char *tmp = kv_get_a_val(kvl, allneeded[i], "notSet");
-          int linelen = strlen(allneeded[i]) + strlen(tmp) + 10;
-          char line[linelen];
-          sprintf(line, "\"%s\" : \"%s\",\n", allneeded[i], tmp);
           if ( strncmp(tmp, "notSet", 6) != 0 )
-            fputs((const char *) line, dataset_json);
+            {
+              if ( !isfile )
+                {
+                  int linelen = strlen(allneeded[i]) + strlen(tmp) + 10;
+                  char line[linelen];
+                  sprintf(line, "\"%s\" : \"%s\",\n", allneeded[i], tmp);
+                  fputs((const char *) line, dataset_json);
+                }
+              else
+                cmor_set_cur_dataset_attribute(allneeded[i], tmp, 1);
+            }
           i++;
         }
-      fputs("\"calendar\" : \"", dataset_json);
-      fputs(calendarptr, dataset_json);
-      fputs("\",\n", dataset_json); 
 
       char *branch_time_in_parent = (char *) Malloc(2*sizeof(double));
       char *branch_time_in_child = (char *) Malloc(2*sizeof(double));
       snprintf(branch_time_in_parent, sizeof(double), "%.12f", branch_times[0]);
       snprintf(branch_time_in_child, sizeof(double), "%.12f", branch_times[1]);
+      if ( !isfile )
+        {
+          fputs("\"calendar\" : \"", dataset_json);
+          fputs(calendarptr, dataset_json);
+          fputs("\",\n", dataset_json); 
+          fputs("\"branch_time_in_parent\" : \"", dataset_json);
+          fputs(branch_time_in_parent, dataset_json);
+          fputs("\",\n", dataset_json);
+          fputs("\"branch_time_in_child\" : \"", dataset_json);
+          fputs(branch_time_in_child, dataset_json);
+          fputs("\",\n", dataset_json); 
 
-      fputs("\"branch_time_in_parent\" : \"", dataset_json);
-      fputs(branch_time_in_parent, dataset_json);
-      fputs("\",\n", dataset_json);
-      fputs("\"branch_time_in_child\" : \"", dataset_json);
-      fputs(branch_time_in_child, dataset_json);
-      fputs("\",\n", dataset_json); 
-
-      fputs("}\n", dataset_json);
-      fclose(dataset_json);
-      cmor_dataset_json("test.json");
+          fputs("}\n", dataset_json);
+          fclose(dataset_json);
+          cmor_dataset_json(dataset_path);
+          Free(dataset_path);
+        }
+      else
+        {
+          cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
+          cmor_set_cur_dataset_attribute("branch_time_in_parent", branch_time_in_parent, 1);
+          cmor_set_cur_dataset_attribute("branch_time_in_child", branch_time_in_child, 1);
+        }
 
       Free(branch_time_in_parent);
       Free(branch_time_in_child);
@@ -2108,12 +2121,18 @@ static void get_cmor_table(list_t *kvl, char *project_id)
   char *mip_table_dir = kv_get_a_val(kvl, "mip_table_dir", NULL);
   if ( mip_table_dir && project_id )
     {
+#if ( CMOR_VERSION_MAJOR == 2 )
       sprintf(gridtable, "%s/%s_grids\0", mip_table_dir, project_id);
+#elif ( CMOR_VERSION_MAJOR == 3 )
+      sprintf(gridtable, "%s/%s_grids.json\0", mip_table_dir, project_id);
+#endif
       if ( file_exist(gridtable, 1) )  
         {
           cmor_load_table(gridtable, &gridtable_id);
           cmor_set_table(gridtable_id);
         }
+      else
+        cdoAbort("A project grid table is required for this type of grid but not found in the mip table directory '%s'.", mip_table_dir);
     }
   else
     {
@@ -4216,16 +4235,19 @@ void *CMOR(void *argument)
 
   int streamID = pstreamOpenRead(cdoStreamName(0));
 
-  /* Existing attributes have lowest priority. */
-  dump_special_attributes(kvl, streamID);
+  /* Short keys from rtu, mt, gi must be included similar to global atts */
+  add_globalhybrids(kvl);
 
   /* Check for attributes and member name */
-  if ( cdoVerbose )
-    printf("*******Start to check attributes.*******\n");
-  check_attr(kvl, project_id);
-  check_mem(kvl, project_id);
-  if ( cdoVerbose )
-    printf("*******Successfully checked global attributes.*******\n");
+  if ( !kv_get_a_val(kvl, "dj", NULL) )
+    {
+      if ( cdoVerbose )
+        printf("*******Start to check attributes.*******\n");
+      check_attr(kvl, project_id);
+      check_mem(kvl, project_id);
+      if ( cdoVerbose )
+        printf("*******Successfully checked global attributes.*******\n");
+    }
 
  /* dump_global_attributes(pml, streamID); */
 
