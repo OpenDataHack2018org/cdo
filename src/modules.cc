@@ -814,7 +814,7 @@ void init_modules()
   add_module("Change"        , {Change        , ChangeHelp        , ChangeOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Change_e5slm"  , {Change_e5slm  , {}                , Change_e5slmOperators  , 0 , CDI_REAL , 1  , 1  });
   add_module("Cloudlayer"    , {Cloudlayer    , {}                , CloudlayerOperators    , 1 , CDI_REAL , 1  , 1  });
-  add_module("CMOR"          , {CMORHelp      , {}                , CMOROperators,         , 1 , CDI_REAL , 1  , 0  });
+  add_module("CMOR"          , {CMOR          , CMORHelp          , CMOROperators          , 1 , CDI_REAL , 1  , 0  });
   add_module("CMOR_lite"     , {CMOR_lite     , CMORliteHelp      , CMORliteOperators      , 1 , CDI_REAL , 1  , 1  });
   add_module("CMOR_table"    , {CMOR_table    , {}                , CMORtableOperators     , 1 , CDI_REAL , 0  , 0  });
   add_module("Collgrid"      , {Collgrid      , CollgridHelp      , CollgridOperators      , 1 , CDI_REAL , -1 , 1  });

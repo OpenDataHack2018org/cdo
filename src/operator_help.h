@@ -5123,7 +5123,6 @@ std::vector<std::string> CMORHelp = {
     "    scalar_z_coordinate | szc  STRING    Scalar z-coordinate (=name_value).",
     "    character_axis      | ca   STRING    CMOR name of a character axis.",
     "                                         Valid axes are: basin, vegtype or oline. ",
-    NULL
 };
 
 std::vector<std::string> CMORliteHelp = {
