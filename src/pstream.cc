@@ -1090,7 +1090,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
     {
       int vlistIDcp = vlistDuplicate(vlistID);
       /*    pipeDefVlist(pstreamptr, vlistID);*/
-      pipeDefVlist(pstreamptr, vlistID);
+      pipeDefVlist(pstreamptr, vlistIDcp);
     }
   else
 #endif
