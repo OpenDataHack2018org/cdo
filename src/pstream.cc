@@ -293,9 +293,9 @@ static void createPipeName(char *pipename, int pnlen){
 pthread_t pCreateReadThread(argument_t *argument){
   pthread_attr_t attr;
   int status = pthread_attr_init(&attr);
-  if ( status ) SysError("pthread_attr_init failed for '%s'", argument->operatorName);
+  if ( status ) SysError("pthread_attr_init failed for '%s'", argument->operatorName.c_str());
   status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'", argument->operatorName);
+  if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'", argument->operatorName.c_str());
   /*
     param.sched_priority = 0;
     status = pthread_attr_setschedparam(&attr, &param);
@@ -324,7 +324,7 @@ pthread_t pCreateReadThread(argument_t *argument){
   if ( rval != 0 )
     {
       errno = rval;
-      SysError("pthread_create failed for '%s'", argument->operatorName);
+      SysError("pthread_create failed for '%s'", argument->operatorName.c_str());
     }
   return thrID;
 }
@@ -1090,7 +1090,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
     {
       int vlistIDcp = vlistDuplicate(vlistID);
       /*    pipeDefVlist(pstreamptr, vlistID);*/
-      pipeDefVlist(pstreamptr, vlistIDcp);
+      pipeDefVlist(pstreamptr, vlistID);
     }
   else
 #endif
