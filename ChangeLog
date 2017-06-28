@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
 
+2017-06-28  Uwe Schulzweida
+
+	* expr: improve ternary operator, no brackets needed anymore.
+
 2017-06-27  Uwe Schulzweida
 
 	* expr: added support for clev in ifthenelse (bug fix).

@@ -1,3 +1,5 @@
+/* http://epaperpress.com/lexandyacc/download/LexAndYaccTutorial.pdf */
+
 /* bison -y -o expr_yacc.c -d expr_yacc.y */
 %{
 #include <stdio.h>
@@ -39,6 +41,7 @@ void freeNode(nodeType *p);
 %token <cvalue> CONSTANT
 %token <varnm>  VARIABLE
 %token <fname>  FUNCTION
+%token QUESTION COLON
 %token REMOVE
 %token PRINT
 
@@ -47,10 +50,9 @@ void freeNode(nodeType *p);
 %left '+' '-'
 %left '*' '/'
 %precedence UMINUS
-%right '?' ':'
 %right '^'
 
-%type <nPtr> stmt expr stmt_list
+%type <nPtr> stmt expr stmt_list ternary
 
 %%
 
@@ -64,13 +66,14 @@ function:
         ;
 
 stmt:
-          ';'                     { $$ = expr_opr(';', 2, NULL, NULL); }
-        | expr ';'                { $$ = $1; }
-        | VARIABLE '=' expr ';'   { $$ = expr_opr('=', 2, expr_var($1), $3); }
-        | VARIABLE ';'            { $$ = expr_opr('=', 2, expr_var($1), expr_var($1)); } /* conflicts: 1 shift/reduce */
-        | REMOVE VARIABLE ')' ';' { $$ = expr_com("remove", $2); }
-        | PRINT VARIABLE ')' ';' { $$ = expr_com("print", $2); }
-        | '{' stmt_list '}'       { $$ = $2; }
+          ';'                      { $$ = expr_opr(';', 2, NULL, NULL); }
+        | expr ';'                 { $$ = $1; }
+        | VARIABLE '=' expr ';'    { $$ = expr_opr('=', 2, expr_var($1), $3); }
+        | VARIABLE '=' ternary ';' { $$ = expr_opr('=', 2, expr_var($1), $3); }
+        | VARIABLE ';'             { $$ = expr_opr('=', 2, expr_var($1), expr_var($1)); } /* conflicts: 1 shift/reduce */
+        | REMOVE VARIABLE ')' ';'  { $$ = expr_com("remove", $2); }
+        | PRINT VARIABLE ')' ';'   { $$ = expr_com("print", $2); }
+        | '{' stmt_list '}'        { $$ = $2; }
         ;
 
 stmt_list:
@@ -96,11 +99,13 @@ expr:
         | expr LEG expr           { $$ = expr_opr(LEG, 2, $1, $3); }
         | expr AND expr           { $$ = expr_opr(AND, 2, $1, $3); }
         | expr OR  expr           { $$ = expr_opr(OR,  2, $1, $3); }
-        | expr '?' expr ':' expr  { $$ = expr_opr('?', 3, $1, $3, $5); }
         | '(' expr ')'            { $$ = $2; }
         | FUNCTION '(' expr ',' '-' CONSTANT ')'   { $$ = expr_fun1c($1, $3, - $6); }
         | FUNCTION '(' expr ',' CONSTANT ')'   { $$ = expr_fun1c($1, $3, $5); }
         | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }
+        ;
+
+ternary:  expr QUESTION expr COLON expr   { $$ = expr_opr('?', 3, $1, $3, $5); }
         ;
 
 %%
