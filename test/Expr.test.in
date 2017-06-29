@@ -56,7 +56,7 @@ function testfunc()
 INSTR="_clev=clev(var130);pottemp=var130*((100000/_clev)^0.287);"
 testfunc
 #
-INSTR="var1=(var129>0)?(var130-273.15):var152;"
+INSTR="var1=var129>0?var130-273.15:1*var152;"
 testfunc
 #
 rm -f $CDOOUT $CDOERR

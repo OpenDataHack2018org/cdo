@@ -82,7 +82,7 @@ M_E          {
              }
 
 
-[-()=+*/;,{}^.?:] {
+[-()=+*/;,{}^.] {
                 return *yytext;
              }
 
@@ -95,6 +95,8 @@ M_E          {
 "!="            return NE;
 "&&"            return AND;
 "||"            return OR;
+"?"             return QUESTION;
+":"             return COLON;
 
 [ \t\n\r]+      ;       /* ignore whitespace */
 

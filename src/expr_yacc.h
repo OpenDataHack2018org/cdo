@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_EXPR_YACC_H_INCLUDED
-# define YY_YY_EXPR_YACC_H_INCLUDED
+#ifndef YY_YY_EXPR_YACC_HH_INCLUDED
+# define YY_YY_EXPR_YACC_HH_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -48,36 +48,40 @@ extern int yydebug;
     CONSTANT = 258,
     VARIABLE = 259,
     FUNCTION = 260,
-    REMOVE = 261,
-    PRINT = 262,
-    AND = 263,
-    OR = 264,
-    LEG = 265,
-    GE = 266,
-    LE = 267,
-    EQ = 268,
-    NE = 269,
-    GT = 270,
-    LT = 271,
-    UMINUS = 272
+    QUESTION = 261,
+    COLON = 262,
+    REMOVE = 263,
+    PRINT = 264,
+    AND = 265,
+    OR = 266,
+    LEG = 267,
+    GE = 268,
+    LE = 269,
+    EQ = 270,
+    NE = 271,
+    GT = 272,
+    LT = 273,
+    UMINUS = 274
   };
 #endif
 /* Tokens.  */
 #define CONSTANT 258
 #define VARIABLE 259
 #define FUNCTION 260
-#define REMOVE 261
-#define PRINT 262
-#define AND 263
-#define OR 264
-#define LEG 265
-#define GE 266
-#define LE 267
-#define EQ 268
-#define NE 269
-#define GT 270
-#define LT 271
-#define UMINUS 272
+#define QUESTION 261
+#define COLON 262
+#define REMOVE 263
+#define PRINT 264
+#define AND 265
+#define OR 266
+#define LEG 267
+#define GE 268
+#define LE 269
+#define EQ 270
+#define NE 271
+#define GT 272
+#define LT 273
+#define UMINUS 274
 
 /* Value type.  */
 
@@ -85,4 +89,4 @@ extern int yydebug;
 
 int yyparse (parse_param_t *parse_arg, void *scanner);
 
-#endif /* !YY_YY_EXPR_YACC_H_INCLUDED  */
+#endif /* !YY_YY_EXPR_YACC_HH_INCLUDED  */
