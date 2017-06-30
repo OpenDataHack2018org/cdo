@@ -512,6 +512,34 @@ pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
   // UNLOCK
 }
 
+/***
+ * copys data from a pipe to data 
+ *
+ * @param data destination for the record data
+ * @param pipe pipe that has the wanted data 
+ */
+void pipeReadPipeRecord(pipe_t *pipe, double *data, char *pname, int vlistID, int *nmiss)
+{
+  int datasize;
+
+  if (!pipe->data)
+    Error("No data pointer for %s", pname);
+
+  datasize = gridInqSize(vlistInqVarGrid(vlistID, pipe->varID));
+  pipe->nvals += datasize;
+  if (vlistNumber(vlistID) != CDI_REAL)
+    datasize *= 2;
+  memcpy(data, pipe->data, datasize * sizeof(double));
+  *nmiss = pipe->nmiss;
+}
+
+/***
+ * Reads data from a file
+ */
+void pipeReadFileRecord()
+{
+
+}
 void
 pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 {
@@ -532,6 +560,7 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
     }
 
   if (pipe->hasdata == 2)
+//===============================
     {
       pstream_t *pstreamptr_in;
 
@@ -549,21 +578,22 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 
       if (pstreamptr_in == 0)
         {
+            pipe = pstreamptr->pipe;
           if (PipeDebug)
             fprintf(stderr, "pstreamID = %d\n", pstreamptr->self);
-          if (pstreamptr->pipe->hasdata == 1)
+          if (pipe->hasdata == 1)
             {
               int vlistID, datasize;
 
-              if (!pstreamptr->pipe->data)
+              if (!pipe->data)
                 Error("No data pointer for %s", pname);
 
               vlistID = pstreamptr->vlistID;
-              datasize = gridInqSize(vlistInqVarGrid(vlistID, pstreamptr->pipe->varID));
+              datasize = gridInqSize(vlistInqVarGrid(vlistID, pipe->varID));
               if (vlistNumber(vlistID) != CDI_REAL)
                 datasize *= 2;
-              memcpy(data, pstreamptr->pipe->data, datasize * sizeof(double));
-              *nmiss = pstreamptr->pipe->nmiss;
+              memcpy(data, pipe->data, datasize * sizeof(double));
+              *nmiss = pipe->nmiss;
             }
           else
             Error("Internal problem! istream undefined");
@@ -575,22 +605,15 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
           streamReadRecord(pstreamptr_in->fileID, data, nmiss);
         }
     }
+//===============================
   else if (pipe->hasdata == 1)
+//===============================
     {
-      int vlistID, datasize;
-
-      if (!pipe->data)
-        Error("No data pointer for %s", pname);
-
-      vlistID = pstreamptr->vlistID;
-      datasize = gridInqSize(vlistInqVarGrid(vlistID, pipe->varID));
-      pipe->nvals += datasize;
-      if (vlistNumber(vlistID) != CDI_REAL)
-        datasize *= 2;
-      memcpy(data, pipe->data, datasize * sizeof(double));
-      *nmiss = pipe->nmiss;
+      pipeReadPipeRecord(pipe,data,pname, pstreamptr->vlistID, nmiss);
     }
+//===============================
   else
+//===============================
     {
       Error("data type %d not implemented", pipe->hasdata);
     }
