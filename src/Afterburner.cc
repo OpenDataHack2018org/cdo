@@ -1171,18 +1171,13 @@ void after_defineGrid(struct Control *globs, struct Variable *vars)
 static
 void after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, int numCodes)
 {
-  int code;
-  int table, modelID, tableID;
-  const char *name, *longname;
-  int varID;
-
   if ( globs->Verbose ) lprintf(stdout);
 
   if ( numCodes == 0 )
     {
       if ( globs->Verbose ) fprintf(stdout, " All detected codes selected:\n");
       
-      for ( code = 0; code < maxCodes; code++ )
+      for ( int code = 0; code < maxCodes; code++ )
 	if ( vars[code].detected ) vars[code].selected = 1;
     }
   else if ( globs->Verbose )
@@ -1194,17 +1189,18 @@ void after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, 
       fprintf(stdout, "  ----- ---- ----              --------\n");
     }
 
-  for ( code = 0; code < maxCodes; code++ )
+  for ( int code = 0; code < maxCodes; code++ )
     if ( vars[code].selected )
       {
-	table    = 0;
-	name     = NULL;
-	longname = NULL;
-	varID    = vars[code].ivarID;
+        char name[CDI_MAX_NAME]; name[0] = 0;
+        char longname[CDI_MAX_NAME]; longname[0] = 0;
+        int tableID;
+        int table = 0;
+	int varID = vars[code].ivarID;
 
 	if ( varID == CDI_UNDEFID )
 	  {
-	    modelID  = vlistInqVarModel(globs->ivlistID, 0);
+	    int modelID  = vlistInqVarModel(globs->ivlistID, 0);
 	    table    = 128;
 	    tableID  = tableInq(modelID, table, NULL);
 
@@ -1214,23 +1210,24 @@ void after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, 
 	  {
 	    tableID  = vlistInqVarTable(globs->ivlistID, varID);
 	    table    = tableInqNum(tableID);
-	    name     = vlistInqVarNamePtr(globs->ivlistID, varID);
-	    longname = vlistInqVarLongnamePtr(globs->ivlistID, varID);
+	    vlistInqVarName(globs->ivlistID, varID, name);
+	    vlistInqVarLongname(globs->ivlistID, varID, longname);
 	  }
-	if ( name     == NULL )     name = (char*) tableInqParNamePtr(tableID, code);
-	if ( longname == NULL ) longname = (char*) tableInqParLongnamePtr(tableID, code);
+
+	if ( !name[0] )     tableInqParName(tableID, code, name);
+	if ( !longname[0] ) tableInqParLongname(tableID, code, longname);
 	
 	if ( globs->Verbose )
 	  {
 	    fprintf(stdout, " %5d", table);
 	    fprintf(stdout, " %4d", code);
-	    if ( name == NULL )
+	    if ( !name[0] )
 	      fprintf(stdout, "  var%d", code);
 	    else
 	      {
 		fprintf(stdout, "  %-16s", name);
-	    if ( longname != NULL )
-	      fprintf(stdout, "  %s", longname);
+                if ( longname[0] )
+                  fprintf(stdout, "  %s", longname);
 	      }
 	    fprintf(stdout, "\n");
 	  }
@@ -1725,7 +1722,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
   int ovarID, ogridID, ozaxisID;
   int ovarID2;
   int ivarID, instID, modelID, tableID;
-  const char *name, *longname, *units;
+  char name[CDI_MAX_NAME], longname[CDI_MAX_NAME], units[CDI_MAX_NAME];
   char histstring[99];
   int datatype;
 
@@ -1762,9 +1759,9 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
   for ( code = 0; code < MaxCodes; code++ )
     if ( vars[code].selected )
       {
-	name     = NULL;
-	longname = NULL;
-	units    = NULL;
+	name[0] = 0;
+	longname[0] = 0;
+	units[0] = 0;
 	ivarID   = vars[code].ivarID;
 	ogridID  = vars[code].ogridID;
 	ozaxisID = vars[code].ozaxisID;
@@ -1802,9 +1799,9 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	  }
 	else
 	  {
-	    name     = vlistInqVarNamePtr(globs->ivlistID, ivarID);
-	    longname = vlistInqVarLongnamePtr(globs->ivlistID, ivarID);
-	    units    = vlistInqVarUnitsPtr(globs->ivlistID, ivarID);
+	    vlistInqVarName(globs->ivlistID, ivarID, name);
+	    vlistInqVarLongname(globs->ivlistID, ivarID, longname);
+	    vlistInqVarUnits(globs->ivlistID, ivarID, units);
 	  }
 
         int tsteptype = (globs->Mean) ? TSTEP_AVG : TSTEP_INSTANT;
@@ -1818,9 +1815,9 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	    vlistDefVarInstitut(globs->ovlistID, ovarID, instID);
 	    vlistDefVarModel(globs->ovlistID, ovarID, modelID);
 	    vlistDefVarTable(globs->ovlistID, ovarID, tableID);
-	    if ( name )     vlistDefVarName(globs->ovlistID, ovarID, name);
-	    if ( longname ) vlistDefVarLongname(globs->ovlistID, ovarID, longname);
-	    if ( units )    vlistDefVarUnits(globs->ovlistID, ovarID, units);
+	    if ( name[0] )     vlistDefVarName(globs->ovlistID, ovarID, name);
+	    if ( longname[0] ) vlistDefVarLongname(globs->ovlistID, ovarID, longname);
+	    if ( units[0] )    vlistDefVarUnits(globs->ovlistID, ovarID, units);
 	    vlistDefVarDatatype(globs->ovlistID, ovarID, datatype);
 	    vlistDefVarMissval(globs->ovlistID, ovarID, vars[code].missval);
 	  }
@@ -1834,9 +1831,9 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	    vlistDefVarInstitut(globs->ovlistID2, ovarID2, instID);
 	    vlistDefVarModel(globs->ovlistID2, ovarID2, modelID);
 	    vlistDefVarTable(globs->ovlistID2, ovarID2, tableID);
-	    if ( name )     vlistDefVarName(globs->ovlistID2, ovarID2, name);
-	    if ( longname ) vlistDefVarLongname(globs->ovlistID2, ovarID2, longname);
-	    if ( units )    vlistDefVarUnits(globs->ovlistID2, ovarID2, units);
+	    if ( name[0] )     vlistDefVarName(globs->ovlistID2, ovarID2, name);
+	    if ( longname[0] ) vlistDefVarLongname(globs->ovlistID2, ovarID2, longname);
+	    if ( units[0] )    vlistDefVarUnits(globs->ovlistID2, ovarID2, units);
 	    vlistDefVarDatatype(globs->ovlistID2, ovarID2, datatype);
 	    vlistDefVarMissval(globs->ovlistID2, ovarID2, vars[code].missval);
 	  }
@@ -1974,16 +1971,18 @@ void after_printCodes(void)
   for ( int i = 0; i < ncodes; i++ )
     {
       int code     = codes[i];
-      const char *name     = tableInqParNamePtr(tableID, code);
-      const char *longname = tableInqParLongnamePtr(tableID, code);
+      char name[CDI_MAX_NAME]; name[0] = 0;
+      char longname[CDI_MAX_NAME]; longname[0] = 0;
+      tableInqParName(tableID, code, name);
+      tableInqParLongname(tableID, code, longname);
 
       fprintf(stdout, " %4d", code);
-      if ( name == NULL )
+      if ( !name[0] )
 	fprintf(stdout, "  var%d", code);
       else
 	{
 	  fprintf(stdout, "  %-16s", name);
-	  if ( longname != NULL )
+	  if ( longname[0] )
 	    fprintf(stdout, "  %s", longname);
 	}
       fprintf(stdout, "\n");
