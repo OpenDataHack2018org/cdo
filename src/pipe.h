@@ -35,14 +35,15 @@
 
 #if defined(HAVE_LIBPTHREAD)
 
-struct pipe_s {
-  bool    EOP;
-  bool    usedata;
-  short   hasdata;
-  int     nrecs;
-  int     varID, levelID;
-  int     recIDr, recIDw, tsIDr, tsIDw;
-  int     nmiss;
+struct pipe_s
+{
+  bool EOP;
+  bool usedata;
+  short hasdata;
+  int nrecs;
+  int varID, levelID;
+  int recIDr, recIDw, tsIDr, tsIDw;
+  int nmiss;
   double *data;
   pstream_t *pstreamptr_in;
   /* unsigned long */ off_t nvals;
@@ -55,23 +56,23 @@ struct pipe_s {
 typedef struct pipe_s pipe_t;
 
 pipe_t *pipeNew(void);
-void    pipeDelete(pipe_t *pipe);
+void pipeDelete(pipe_t *pipe);
 
-void  pipeDebug(int debug);
+void pipeDebug(int debug);
 
-void  pipeDefVlist(pstream_t *pstreamptr, int vlistID);
-int   pipeInqVlist(pstream_t *pstreamptr);
+void pipeDefVlist(pstream_t *pstreamptr, int vlistID);
+int pipeInqVlist(pstream_t *pstreamptr);
 
-void  pipeDefTimestep(pstream_t *pstreamptr, int tsID);
-int   pipeInqTimestep(pstream_t *pstreamptr, int tsID);
+void pipeDefTimestep(pstream_t *pstreamptr, int tsID);
+int pipeInqTimestep(pstream_t *pstreamptr, int tsID);
 
-void  pipeDefRecord(pstream_t *pstreamptr, int  varID, int  levelID);
-int   pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID);
+void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID);
+int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID);
 
-void  pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss);
-void  pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss);
-void  pipeCopyRecord(pstream_t *pstreamptr_dest, pstream_t *pstreamptr_src);
+void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss);
+void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss);
+void pipeCopyRecord(pstream_t *pstreamptr_dest, pstream_t *pstreamptr_src);
 
 #endif
 
-#endif  /* PIPE_H */
+#endif /* PIPE_H */
