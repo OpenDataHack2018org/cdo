@@ -588,12 +588,7 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
               if (!pipe->data)
                 Error("No data pointer for %s", pname);
 
-              vlistID = pstreamptr->vlistID;
-              datasize = gridInqSize(vlistInqVarGrid(vlistID, pipe->varID));
-              if (vlistNumber(vlistID) != CDI_REAL)
-                datasize *= 2;
-              memcpy(data, pipe->data, datasize * sizeof(double));
-              *nmiss = pipe->nmiss;
+                pipeReadPipeRecord(pipe,data,pname, pstreamptr->vlistID, nmiss);
             }
           else
             Error("Internal problem! istream undefined");
