@@ -535,7 +535,7 @@ pipeReadPipeRecord(pipe_t *pipe, double *data, char *pname, int vlistID, int *nm
 }
 
 void
-pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
+pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in, char *pname)
 {
 
   pstreamptr_in = pstreamptr->pipe->pstreamptr_in;
@@ -549,14 +549,17 @@ pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
       if (pstreamptr_in == 0)
         break;
     }
+
+  if (pstreamptr->pipe->hasdata != 1)
+    {
+      Error("Internal problem! istream undefined");
+    }
+  else if (!pstreamptr->pipe->data)
+    {
+      Error("No data pointer for %s", pname);
+    }
 }
-/***
- * Reads data from a file
- */
-void
-pipeReadFileRecord()
-{
-}
+
 void
 pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 {
@@ -577,41 +580,29 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
     }
 
   if (pipe->hasdata == 2)
-    //===============================
     {
-      pstream_t *pstreamptr_in;
-      pipeGetReadTarget(pstreamptr, pstreamptr_in);
+      pstream_t *pstreamptr_in = 0;
+      pipeGetReadTarget(pstreamptr, pstreamptr_in, pname);
       if (pstreamptr_in == 0)
         {
           if (PipeDebug)
             fprintf(stderr, "pstreamID = %d\n", pstreamptr->self);
-          if (pipe->hasdata == 1)
-            {
-              if (!pipe->data)
-                {
-                  Error("No data pointer for %s", pname);
-                }
-              pipeReadPipeRecord(pstreamptr->pipe, data, pname, pstreamptr->vlistID, nmiss);
-            }
-          else
-            Error("Internal problem! istream undefined");
+
+          pipeReadPipeRecord(pstreamptr->pipe, data, pname, pstreamptr->vlistID, nmiss);
         }
       else
         {
           if (PipeDebug)
             fprintf(stderr, "%s: istream %d is file\n", __func__, pstreamptr_in->self);
+
           streamReadRecord(pstreamptr_in->fileID, data, nmiss);
         }
     }
-  //===============================
   else if (pipe->hasdata == 1)
-    //===============================
     {
       pipeReadPipeRecord(pipe, data, pname, pstreamptr->vlistID, nmiss);
     }
-  //===============================
   else
-    //===============================
     {
       Error("data type %d not implemented", pipe->hasdata);
     }
