@@ -513,12 +513,13 @@ pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
 }
 
 /***
- * copys data from a pipe to data 
+ * copys data from a pipe to data
  *
  * @param data destination for the record data
- * @param pipe pipe that has the wanted data 
+ * @param pipe pipe that has the wanted data
  */
-void pipeReadPipeRecord(pipe_t *pipe, double *data, char *pname, int vlistID, int *nmiss)
+void
+pipeReadPipeRecord(pipe_t *pipe, double *data, char *pname, int vlistID, int *nmiss)
 {
   int datasize;
 
@@ -533,27 +534,28 @@ void pipeReadPipeRecord(pipe_t *pipe, double *data, char *pname, int vlistID, in
   *nmiss = pipe->nmiss;
 }
 
-void pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
+void
+pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
 {
 
-      pstreamptr_in = pstreamptr->pipe->pstreamptr_in;
+  pstreamptr_in = pstreamptr->pipe->pstreamptr_in;
+  pstreamptr = pstreamptr_in;
+  while (pstreamptr_in->ispipe)
+    {
+      if (PipeDebug)
+        fprintf(stderr, "%s: istream %d is pipe\n", __func__, pstreamptr_in->self);
       pstreamptr = pstreamptr_in;
-      while (pstreamptr_in->ispipe)
-        {
-          if (PipeDebug)
-            fprintf(stderr, "%s: istream %d is pipe\n", __func__, pstreamptr_in->self);
-          pstreamptr = pstreamptr_in;
-          pstreamptr_in = pstreamptr_in->pipe->pstreamptr_in;
-          if (pstreamptr_in == 0)
-            break;
-        }
+      pstreamptr_in = pstreamptr_in->pipe->pstreamptr_in;
+      if (pstreamptr_in == 0)
+        break;
+    }
 }
 /***
  * Reads data from a file
  */
-void pipeReadFileRecord()
+void
+pipeReadFileRecord()
 {
-
 }
 void
 pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
@@ -575,7 +577,7 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
     }
 
   if (pipe->hasdata == 2)
-//===============================
+    //===============================
     {
       pstream_t *pstreamptr_in;
       pipeGetReadTarget(pstreamptr, pstreamptr_in);
@@ -586,10 +588,10 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
           if (pipe->hasdata == 1)
             {
               if (!pipe->data)
-              {
-                Error("No data pointer for %s", pname);
-              }
-                pipeReadPipeRecord(pstreamptr->pipe,data,pname, pstreamptr->vlistID, nmiss);
+                {
+                  Error("No data pointer for %s", pname);
+                }
+              pipeReadPipeRecord(pstreamptr->pipe, data, pname, pstreamptr->vlistID, nmiss);
             }
           else
             Error("Internal problem! istream undefined");
@@ -601,15 +603,15 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
           streamReadRecord(pstreamptr_in->fileID, data, nmiss);
         }
     }
-//===============================
+  //===============================
   else if (pipe->hasdata == 1)
-//===============================
+    //===============================
     {
-      pipeReadPipeRecord(pipe,data,pname, pstreamptr->vlistID, nmiss);
+      pipeReadPipeRecord(pipe, data, pname, pstreamptr->vlistID, nmiss);
     }
-//===============================
+  //===============================
   else
-//===============================
+    //===============================
     {
       Error("data type %d not implemented", pipe->hasdata);
     }
