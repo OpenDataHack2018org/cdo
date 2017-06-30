@@ -533,6 +533,21 @@ void pipeReadPipeRecord(pipe_t *pipe, double *data, char *pname, int vlistID, in
   *nmiss = pipe->nmiss;
 }
 
+void pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
+{
+
+      pstreamptr_in = pstreamptr->pipe->pstreamptr_in;
+      pstreamptr = pstreamptr_in;
+      while (pstreamptr_in->ispipe)
+        {
+          if (PipeDebug)
+            fprintf(stderr, "%s: istream %d is pipe\n", __func__, pstreamptr_in->self);
+          pstreamptr = pstreamptr_in;
+          pstreamptr_in = pstreamptr_in->pipe->pstreamptr_in;
+          if (pstreamptr_in == 0)
+            break;
+        }
+}
 /***
  * Reads data from a file
  */
@@ -563,32 +578,18 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 //===============================
     {
       pstream_t *pstreamptr_in;
-
-      pstreamptr_in = pipe->pstreamptr_in;
-      pstreamptr = pstreamptr_in;
-      while (pstreamptr_in->ispipe)
-        {
-          if (PipeDebug)
-            fprintf(stderr, "%s: istream %d is pipe\n", __func__, pstreamptr_in->self);
-          pstreamptr = pstreamptr_in;
-          pstreamptr_in = pstreamptr_in->pipe->pstreamptr_in;
-          if (pstreamptr_in == 0)
-            break;
-        }
-
+      pipeGetReadTarget(pstreamptr, pstreamptr_in);
       if (pstreamptr_in == 0)
         {
-            pipe = pstreamptr->pipe;
           if (PipeDebug)
             fprintf(stderr, "pstreamID = %d\n", pstreamptr->self);
           if (pipe->hasdata == 1)
             {
-              int vlistID, datasize;
-
               if (!pipe->data)
+              {
                 Error("No data pointer for %s", pname);
-
-                pipeReadPipeRecord(pipe,data,pname, pstreamptr->vlistID, nmiss);
+              }
+                pipeReadPipeRecord(pstreamptr->pipe,data,pname, pstreamptr->vlistID, nmiss);
             }
           else
             Error("Internal problem! istream undefined");
