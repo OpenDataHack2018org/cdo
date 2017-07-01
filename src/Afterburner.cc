@@ -1214,8 +1214,7 @@ void after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, 
 	    vlistInqVarLongname(globs->ivlistID, varID, longname);
 	  }
 
-	if ( !name[0] )     tableInqParName(tableID, code, name);
-	if ( !longname[0] ) tableInqParLongname(tableID, code, longname);
+	if ( !name[0] ) tableInqEntry(tableID, code, -1, name, longname, NULL);
 	
 	if ( globs->Verbose )
 	  {
@@ -1973,18 +1972,18 @@ void after_printCodes(void)
       int code     = codes[i];
       char name[CDI_MAX_NAME]; name[0] = 0;
       char longname[CDI_MAX_NAME]; longname[0] = 0;
-      tableInqParName(tableID, code, name);
-      tableInqParLongname(tableID, code, longname);
+      tableInqEntry(tableID, code, -1, name, longname, NULL);
 
       fprintf(stdout, " %4d", code);
-      if ( !name[0] )
-	fprintf(stdout, "  var%d", code);
-      else
+      if ( name[0] )
 	{
 	  fprintf(stdout, "  %-16s", name);
 	  if ( longname[0] )
 	    fprintf(stdout, "  %s", longname);
 	}
+      else
+	fprintf(stdout, "  var%d", code);
+        
       fprintf(stdout, "\n");
     }
 

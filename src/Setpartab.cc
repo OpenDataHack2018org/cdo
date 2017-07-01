@@ -398,15 +398,16 @@ void *Setpartab(void *argument)
           if ( pdis == 255 )
             {
               int code = pnum;
-              if ( tableInqParName(tableID, code, name) == 0 )
+              int ltype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
+              name[0] = 0;
+              longname[0] = 0;
+              units[0] = 0;
+              tableInqEntry(tableID, code, ltype, name, longname, units);
+              if ( name[0] )
                 {
                   vlistDefVarName(vlistID2, varID, name);
-                  longname[0] = 0;
-                  tableInqParLongname(tableID, code, longname);
-                  vlistDefVarLongname(vlistID2, varID, longname);
-                  units[0] = 0;
-                  tableInqParUnits(tableID, code, units);
-                  vlistDefVarUnits(vlistID2, varID, units);
+                  if ( longname[0] ) vlistDefVarLongname(vlistID2, varID, longname);
+                  if ( units[0] )    vlistDefVarUnits(vlistID2, varID, units);
                 }
             }
           vlistDefVarTable(vlistID2, varID, tableID);
