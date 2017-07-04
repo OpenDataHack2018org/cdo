@@ -3294,7 +3294,7 @@ static double *get_time_bounds(list_t *kvl, int taxisID, char *frequency, juldat
 /* If file time axis has bounds use them, otherwise use cmor time axis deduced from miptable frequency and cell_methods or frequency itself*/
 /***/
 
-  if ( !taxisHasBounds(taxisID) )
+  if ( !taxisHasBounds(taxisID) || strcmp(kv_get_a_val(kvl, "tbnds_force", "n"), "y") == 0 )
     {
       vtime0b = 0;
       vtime1b = 0;
@@ -4455,7 +4455,7 @@ void *CMOR(void *argument)
   Free(mip_table);
   Free(project_id); 
   Free(miptab_freqptr);
-  Free(miptableInput);
+ /* Free(miptableInput); */
   list_destroy(pml); 
 
   pstreamClose(streamID);
