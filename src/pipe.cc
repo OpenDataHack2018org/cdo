@@ -20,7 +20,7 @@
 #endif
 
 #ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600 /* struct timespec */
+//#define _XOPEN_SOURCE 600 /* struct timespec */
 #endif
 
 #include <stdio.h>
@@ -535,7 +535,7 @@ pipeReadPipeRecord(pipe_t *pipe, double *data,  int vlistID, int *nmiss)
   int datasize;
 
   if (!pipe->data)
-    Error("No data pointer for %s", pipe->name);
+    Error("No data pointer for %s", pipe->name.c_str());
 
   datasize = gridInqSize(vlistInqVarGrid(vlistID, pipe->varID));
   pipe->nvals += datasize;
@@ -567,7 +567,7 @@ pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
     }
   else if (!pstreamptr->pipe->data)
     {
-      Error("No data pointer for %s", pstreamptr->pipe->name);
+      Error("No data pointer for %s", pstreamptr->pipe->name.c_str());
     }
 }
 
@@ -578,14 +578,14 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 
   *nmiss = 0;
   if (PipeDebug)
-    Message("%s pstreamID %d", pipe->name, pstreamptr->self);
+    Message("%s pstreamID %d", pipe->name.c_str(), pstreamptr->self);
 
   // LOCK
   pthread_mutex_lock(pipe->mutex);
   while (pipe->hasdata == 0)
     {
       if (PipeDebug)
-        Message("%s wait of writeCond", pipe->name);
+        Message("%s wait of writeCond", pipe->name.c_str());
       pthread_cond_wait(pipe->writeCond, pipe->mutex);
     }
 
@@ -618,7 +618,7 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
     }
 
   if (PipeDebug)
-    Message("%s read record %d", pipe->name, pipe->recIDr);
+    Message("%s read record %d", pipe->name.c_str(), pipe->recIDr);
 
   pipe->hasdata = 0;
   pipe->data = NULL;
