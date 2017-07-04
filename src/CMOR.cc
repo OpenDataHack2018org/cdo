@@ -1267,17 +1267,35 @@ static int in_list(char **list, const char *needle, int num)
 
 static int get_netcdf_file_action(list_t *kvl)
 {
+  char *proj = kv_get_a_val(kvl, "project_id", NULL);
   char *chunk = kv_get_a_val(kvl, "om", "r");
-  if ( chunk[0] == 'r' )
-    return CMOR_REPLACE;
-  else if ( chunk[0] == 'a')
-    return CMOR_APPEND;
-  else if ( chunk[0] == 'p')
-    return CMOR_PRESERVE;
+  if ( strcmp(proj, "CORDEX") == 0 )
+    {
+      if ( chunk[0] == 'r' )
+        return CMOR_REPLACE_4;
+      else if ( chunk[0] == 'a')
+        return CMOR_APPEND_4;
+      else if ( chunk[0] == 'p')
+        return CMOR_PRESERVE_4;
+      else
+        {
+          cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append ,'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.", chunk);
+          return CMOR_REPLACE;
+        }
+    }
   else
     {
-      cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append ,'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.", chunk);
-      return CMOR_REPLACE;
+      if ( chunk[0] == 'r' )
+        return CMOR_REPLACE;
+      else if ( chunk[0] == 'a')
+        return CMOR_APPEND;
+      else if ( chunk[0] == 'p')
+        return CMOR_PRESERVE;
+      else
+        {
+          cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append ,'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.", chunk);
+          return CMOR_REPLACE;
+        }
     }
 }
 
