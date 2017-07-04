@@ -80,7 +80,6 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID);
 
 void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss);
 void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss);
-void pipeCopyRecord(pstream_t *pstreamptr_dest, pstream_t *pstreamptr_src);
 
 #endif
 

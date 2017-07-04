@@ -1539,16 +1539,6 @@ void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
   if ( pstreamptr_dest->ispipe || pstreamptr_src->ispipe )
     cdoAbort("This operator can't be combined with other operators!");
 
-  /*
-#if defined(HAVE_LIBPTHREAD)
-  if ( pstreamptr_dest->ispipe || pstreamptr_src->ispipe )
-    {
-      pipeCopyRecord(pstreamptr_dest, pstreamptr_src);
-    }
-  else
-#endif
-  */
-    {
 #if defined(HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
 #endif
@@ -1556,7 +1546,6 @@ void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 #if defined(HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-    }
 }
 
 

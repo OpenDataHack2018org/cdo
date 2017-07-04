@@ -478,51 +478,6 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
   // UNLOCK
 }
 
-void
-pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
-{
-  char *ipname = pstreamptr_in->name;
-  char *opname = pstreamptr_out->name;
-  pipe_t *pipe = pstreamptr_out->pipe;
-
-  if (PipeDebug)
-    Message("%s pstreamIDin %d", ipname, pstreamptr_in->self);
-  if (PipeDebug)
-    Message("%s pstreamIDout %d", opname, pstreamptr_out->self);
-
-  // LOCK
-  pthread_mutex_lock(pipe->mutex);
-  pipe->hasdata = 2; /* pipe */
-  pipe->pstreamptr_in = pstreamptr_in;
-  pthread_mutex_unlock(pipe->mutex);
-  // UNLOCK
-
-  pthread_cond_signal(pipe->writeCond);
-
-  // LOCK
-  pthread_mutex_lock(pipe->mutex);
-  while (pipe->hasdata)
-    {
-      if (!pipe->usedata)
-        break;
-
-      if (pipe->recIDw != pipe->recIDr)
-        break;
-
-      if (pipe->EOP)
-        {
-          if (PipeDebug)
-            Message("EOP");
-          break;
-        }
-      if (PipeDebug)
-        Message("%s wait of readCond", opname);
-      pthread_cond_wait(pipe->readCond, pipe->mutex);
-    }
-  pthread_mutex_unlock(pipe->mutex);
-  // UNLOCK
-}
-
 /***
  * copys data from a pipe to data
  *
