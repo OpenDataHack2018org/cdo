@@ -629,54 +629,52 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 }
 
 void
-pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss)
+pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
 {
-  char *pname = pstreamptr->name;
-  pipe_t *pipe = pstreamptr->pipe;
 
   if (PipeDebug)
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+//    Message("%s pstreamID %d", "INSERT_PIPENAME", pstreamptr->self);
 
   /*
-  if ( ! pipe->usedata ) return;
+  if ( ! usedata ) return;
   */
   // LOCK
-  pthread_mutex_lock(pipe->mutex);
-  pipe->hasdata = 1; /* data pointer */
-  pipe->data = data;
-  pipe->nmiss = nmiss;
-  pthread_mutex_unlock(pipe->mutex);
+  pthread_mutex_lock(mutex);
+  hasdata = 1; /* data pointer */
+  data = p_data;
+  nmiss = p_nmiss;
+  pthread_mutex_unlock(mutex);
   // UNLOCK
 
-  pthread_cond_signal(pipe->writeCond);
+  pthread_cond_signal(writeCond);
 
   if (PipeDebug)
-    Message("%s write record %d", pname, pipe->recIDw);
+    Message("%s write record %d", "INSERT_PIPENAME", recIDw);
 
   // LOCK
-  pthread_mutex_lock(pipe->mutex);
-  while (pipe->hasdata)
+  pthread_mutex_lock(mutex);
+  while (hasdata)
     {
-      if (!pipe->usedata)
+      if (!usedata)
         break;
       /*
-      printf("ts ids %d %d\n", pipe->tsIDw, pipe->tsIDr);
-      printf("rec ids %d %d\n", pipe->recIDw, pipe->recIDr);
+      printf("ts ids %d %d\n", tsIDw, tsIDr);
+      printf("rec ids %d %d\n", recIDw, recIDr);
       */
-      if (pipe->recIDw != pipe->recIDr)
+      if (recIDw != recIDr)
         break;
 
-      if (pipe->EOP)
+      if (EOP)
         {
           if (PipeDebug)
             Message("EOP");
           break;
         }
       if (PipeDebug)
-        Message("%s wait of readCond", pname);
-      pthread_cond_wait(pipe->readCond, pipe->mutex);
+        Message("%s wait of readCond", "INSERT_PIPENAME");
+      pthread_cond_wait(readCond, mutex);
     }
-  pthread_mutex_unlock(pipe->mutex);
+  pthread_mutex_unlock(mutex);
   // UNLOCK
 }
 

@@ -1340,7 +1340,7 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
     {
-      pipeWriteRecord(pstreamptr, data, nmiss);
+      pstreamptr->pipe->pipeWriteRecord(data, nmiss);
     }
   else
 #endif

@@ -49,6 +49,8 @@ public:
   int pipeInqTimestep(int p_tsID);
   int pipeInqRecord(int *varID, int *levelID);
 
+  void pipeWriteRecord(double *p_data, int p_nmiss);
+
   bool EOP;
   bool usedata;
   short hasdata;
@@ -71,8 +73,6 @@ public:
 pipe_t *pipeNew(void);
 
 void pipeDebug(int debug);
-
-void pipeDefVlist(pstream_t *pstreamptr, int vlistID);
 
 void pipeDefTimestep(pstream_t *pstreamptr, int tsID);
 
