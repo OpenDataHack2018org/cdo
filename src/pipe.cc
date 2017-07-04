@@ -544,26 +544,7 @@ pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
       pthread_cond_wait(pipe->writeCond, pipe->mutex);
     }
 
-  if (pipe->hasdata == 2)
-    {
-      pstream_t *pstreamptr_in = 0;
-      pipeGetReadTarget(pstreamptr, pstreamptr_in);
-      if (pstreamptr_in == 0)
-        {
-          if (PipeDebug)
-            fprintf(stderr, "pstreamID = %d\n", pstreamptr->self);
-
-          pipeReadPipeRecord(pstreamptr->pipe, data, pstreamptr->vlistID, nmiss);
-        }
-      else
-        {
-          if (PipeDebug)
-            fprintf(stderr, "%s: istream %d is file\n", __func__, pstreamptr_in->self);
-
-          streamReadRecord(pstreamptr_in->fileID, data, nmiss);
-        }
-    }
-  else if (pipe->hasdata == 1)
+  if (pipe->hasdata == 1)
     {
       pipeReadPipeRecord(pipe, data, pstreamptr->vlistID, nmiss);
     }
