@@ -2984,7 +2984,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
 
 /* Cmdlinemapping: */
   char *mapname, *mapcode;
-  if ( kv_get_a_val(kvl, "mt", NULL) && numvals )
+  if ( !kv_get_a_val(kvl, "mt", NULL) && numvals )
     {
       if ( mapname = kv_get_a_val(kvl, "n", NULL) )
         change_name_via_name(vlistID, mapname, cmor_names[0]);
