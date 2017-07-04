@@ -1635,6 +1635,16 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
                &(branch_times[0]),
                kv_get_a_val(kvl, "parent_experiment_rip", ""));
     }
+  char *allneeded2[] = {"cordex_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id", NULL};
+  int ind = 0;
+  if ( strcmp(kv_get_a_val(kvl, "project_id", NULL),"CORDEX") == 0 )
+    while ( allneeded2[ind] )
+      {
+        char *tmp = kv_get_a_val(kvl, allneeded2[ind], NULL );
+        if ( tmp )
+          cmor_set_cur_dataset_attribute(allneeded2[ind], tmp, 1);
+        ind++;
+      }
 #elif ( CMOR_VERSION_MAJOR == 3 )
     {
 /***/
@@ -1669,10 +1679,12 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
         cmor_dataset_json(dataset_path);
 
       char *allneeded[] = /*CMIP5*/{"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip", 
+/*CORDEX */
+  "CORDEX_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id",
 /* CMIP6: */
-/* CMOR internal */ 
+  /* CMOR internal */ 
 "outpath", "output_path_template", "output_file_template", "tracking_prefix",
-/* Glob Atts */
+  /* Glob Atts */
 "Conventions", "activity_id", "experiment", "experiment_id", "forcing_index", "further_info_url", "grid", "grid_label", "initialization_index", "institution", "institution_id", "license", "mip_era", "nominal_resolution", "physics_index", "product", "realization_index", "source", "source_id", "source_type", "sub_experiment", "sub_experiment_id", "table_id", "variant_label", "parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label",
 "parent_time_units", NULL};
       int i = 0;
