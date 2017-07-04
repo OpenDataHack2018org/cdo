@@ -936,7 +936,7 @@ static int file_exist(const char *tfilename, int force)
 static int parse_kv_file(list_t *kvl, const char *filename)
 {
   if ( !file_exist(filename, 1) )
-    cdoAbort("Configuration failed.\n");
+    return 0;
 
   FILE *fp = fopen(filename, "r");
   size_t filesize = fileSize(filename);
@@ -947,7 +947,7 @@ static int parse_kv_file(list_t *kvl, const char *filename)
   parse_buffer_to_list(kvl, filesize, buffer, 0, 1);
 
   if ( buffer ) Free(buffer);
-  return 0;
+  return 1;
 }
 
 static void check_compare_set(char **finalset, char *attribute, char *attname, const char *defaultstr)
@@ -1217,7 +1217,10 @@ static void read_config_files(list_t *kvl)
       {
         if ( cdoVerbose )
           printf("Try to parse file: '%s' configured with key 'info'.\n", info->values[i]);
-        parse_kv_file(kvl, info->values[i]);
+        if ( parse_kv_file(kvl, info->values[i]) == 0 )
+          cdoAbort("File '%s' does not exist.", info->values[i]);
+        if ( cdoVerbose )
+          printf("Finished parsing file: '%s' configured with key 'info'.\n", info->values[i]);
         i++;
       }
 
@@ -1229,7 +1232,10 @@ static void read_config_files(list_t *kvl)
   sprintf(workfile, "%s/%s", cwd, dotconfig);
   if ( cdoVerbose )
     printf("Try to parse default file: '%s'\n", workfile);
-  parse_kv_file(kvl, workfile);
+  if ( parse_kv_file(kvl, workfile) == 0 )
+    cdoWarning("File '%s' does not exist.", workfile);
+  if ( cdoVerbose )
+    printf("Finished parsing default file: '%s'\n", workfile);
   Free(workfile);
   
   if ( i == 0 )
@@ -1240,7 +1246,10 @@ static void read_config_files(list_t *kvl)
           {
             if ( cdoVerbose )
               printf("Try to parse file: '%s' configured with key 'info' in file '.cdocmorinfo'.\n", info2->values[i]);
-            parse_kv_file(kvl, info2->values[i]);
+            if ( parse_kv_file(kvl, info2->values[i]) == 0 )
+              cdoAbort("File '%s' does not exist.", info2->values[i]);
+            if ( cdoVerbose )
+              printf("Finished parsing file: '%s' configured with key 'info' in file '.cdocmorinfo'.\n", info2->values[i]);
             i++;
           }
     }
