@@ -30,13 +30,25 @@
 #include <pthread.h>
 #include "pthread_debug.h"
 #include "pstream.h"
+#include <iostream>
 
 #endif
 
 #if defined(HAVE_LIBPTHREAD)
 
-struct pipe_s
+struct pipe_t
 {
+
+public:
+  pipe_t();
+  int pipeInqVlist(int &vlistID);
+  void pipe_init();
+  void pipeDefRecord(int p_varId, int p_levelID);
+  void pipeDefVlist(int &target_vlistID, int new_vlistID);
+
+  int pipeInqTimestep(int p_tsID);
+  int pipeInqRecord(int *varID, int *levelID);
+
   bool EOP;
   bool usedata;
   short hasdata;
@@ -47,26 +59,23 @@ struct pipe_s
   double *data;
   pstream_t *pstreamptr_in;
   /* unsigned long */ off_t nvals;
+
   pthread_mutex_t *mutex;
   pthread_cond_t *tsDef, *tsInq, *vlistDef, *isclosed;
   pthread_cond_t *recDef, *recInq;
   pthread_cond_t *writeCond, *readCond;
+
+  std::string name;
 };
 
-typedef struct pipe_s pipe_t;
-
 pipe_t *pipeNew(void);
-void pipeDelete(pipe_t *pipe);
 
 void pipeDebug(int debug);
 
 void pipeDefVlist(pstream_t *pstreamptr, int vlistID);
-int pipeInqVlist(pstream_t *pstreamptr);
 
 void pipeDefTimestep(pstream_t *pstreamptr, int tsID);
-int pipeInqTimestep(pstream_t *pstreamptr, int tsID);
 
-void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID);
 int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID);
 
 void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss);

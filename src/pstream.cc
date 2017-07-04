@@ -366,7 +366,7 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
   pstreamptr->ispipe    = true;
   pstreamptr->name      = pipename;
   pstreamptr->rthreadID = pthread_self();
-  pstreamptr->pipe      = pipeNew();
+  pstreamptr->pipe      = new pipe_t();
   pstreamptr->argument  = (void *) newargument;
  
   if ( ! cdoSilentMode ){
@@ -895,8 +895,7 @@ void pstreamClose(int pstreamID)
 	  pthread_mutex_unlock(pipe->mutex);
 
 	  processAddNvals(pipe->nvals);
-	  pipeDelete(pipe);
-
+      delete(pipe);
 	  pstream_delete_entry(pstreamptr);
 	}
       else if ( lwrite )
@@ -976,12 +975,14 @@ int pstreamInqVlist(int pstreamID)
   int vlistID = -1;
 
 #if defined(HAVE_LIBPTHREAD)
+  //read from pipe
   if ( pstreamptr->ispipe )
     {
-      vlistID = pipeInqVlist(pstreamptr);
+        vlistID = pstreamptr->pipe->pipeInqVlist(pstreamptr->vlistID);
       if ( vlistID == -1 )
 	cdoAbort("Couldn't read data from input stream %s!", pstreamptr->name);
     }
+//read from file through cdi streamInqVlist
   else
 #endif
     {
@@ -1088,9 +1089,11 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
     {
+  if (PSTREAM_Debug)
+    Message("%s pstreamID %d", pstreamptr->name, pstreamptr->self);
       int vlistIDcp = vlistDuplicate(vlistID);
       /*    pipeDefVlist(pstreamptr, vlistID);*/
-      pipeDefVlist(pstreamptr, vlistIDcp);
+      pstreamptr->pipe->pipeDefVlist(pstreamptr->vlistID, vlistIDcp);
     }
   else
 #endif
@@ -1156,7 +1159,7 @@ int pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
-    pipeInqRecord(pstreamptr, varID, levelID);
+    pstreamptr->pipe->pipeInqRecord(varID, levelID);
   else
 #endif
     {
@@ -1186,7 +1189,10 @@ void pstreamDefRecord(int pstreamID, int varID, int levelID)
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
     {
-      pipeDefRecord(pstreamptr, varID, levelID);
+      
+  if (PSTREAM_Debug)
+    Message("%s pstreamid %d", pstreamptr->name, pstreamptr->self);
+      pstreamptr->pipe->pipeDefRecord(varID, levelID);
     }
   else
 #endif
@@ -1401,7 +1407,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
-    nrecs = pipeInqTimestep(pstreamptr, tsID);
+   nrecs = pstreamptr->pipe->pipeInqTimestep(tsID);
   else
 #endif
     {
