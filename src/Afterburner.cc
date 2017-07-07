@@ -2237,7 +2237,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
   if ( globs->ostreamID  != CDI_UNDEFID ) streamClose(globs->ostreamID);
 #endif
 #if defined(CDO)
-  processDefVarNum(vlistNvars(globs->ivlistID), globs->istreamID);
+  processDefVarNum(vlistNvars(globs->ivlistID));
   processAddNvals(streamNvals(globs->istreamID));
 #endif
   streamClose(globs->istreamID);

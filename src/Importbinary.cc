@@ -555,7 +555,7 @@ void *Importbinary(void *argument)
     } /* end of while (1) loop */
 
 
-  processDefVarNum(vlistNvars(vlistID), streamID);
+  processDefVarNum(vlistNvars(vlistID));
 
   pstreamClose(streamID);
 

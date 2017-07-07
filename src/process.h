@@ -83,7 +83,7 @@ int  processInqOutputStreamID(int streamindex);
 void processAddInputStream(int streamID);
 void processAddOutputStream(int streamID);
 void processDelStream(int streamID);
-void processDefVarNum(int nvars, int streamID);
+void processDefVarNum(int nvars);
 void processDefArgument(void *vargument);
 
 void processStartTime(double *utime, double *stime);

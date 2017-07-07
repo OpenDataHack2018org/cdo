@@ -746,11 +746,10 @@ void processDefArgument(void *vargument)
 }
 
 
-void processDefVarNum(int nvars, int streamID)
+void processDefVarNum(int nvars)
 {
   int processID = processSelf();
 
-  UNUSED(streamID);
   /*  if ( streamID == Process[processID].streams[0] ) */
     Process[processID].nvars += nvars;
 }

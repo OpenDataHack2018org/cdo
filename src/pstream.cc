@@ -185,7 +185,7 @@ pstream_init_entry(pstream_t *pstreamptr)
   pstreamptr->isopen = true;
   pstreamptr->ispipe = false;
   pstreamptr->fileID = -1;
-  pstreamptr->vlistID = -1;
+  pstreamptr->m_vlistID = -1;
   pstreamptr->tsID = -1;
   pstreamptr->filetype = -1;
   pstreamptr->name = NULL;
@@ -938,7 +938,7 @@ pstreamClose(int pstreamID)
                 Free(argument->args);
               delete (argument);
             }
-          vlistDestroy(pstreamptr->vlistID);
+          vlistDestroy(pstreamptr->m_vlistID);
           pthread_mutex_unlock(pipe->mutex);
 
           processAddNvals(pipe->nvals);
@@ -1022,16 +1022,19 @@ int
 pstreamInqVlist(int pstreamID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  return pstreamptr->InqVlist();
+}
 
+int pstream_t::InqVlist(){
   int vlistID = -1;
 
 #if defined(HAVE_LIBPTHREAD)
   // read from pipe
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
-      vlistID = pstreamptr->pipe->pipeInqVlist(pstreamptr->vlistID);
+      vlistID = pipe->pipeInqVlist(m_vlistID);
       if (vlistID == -1)
-        cdoAbort("Couldn't read data from input stream %s!", pstreamptr->name);
+        cdoAbort("Couldn't read data from input stream %s!", name);
     }
   // read from file through cdi streamInqVlist
   else
@@ -1043,7 +1046,7 @@ pstreamInqVlist(int pstreamID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      vlistID = streamInqVlist(pstreamptr->fileID);
+      vlistID = streamInqVlist(fileID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1058,7 +1061,7 @@ pstreamInqVlist(int pstreamID)
       if (cdoDefaultTimeType != CDI_UNDEFID)
         taxisDefType(vlistInqTaxis(vlistID), cdoDefaultTimeType);
 
-      pstreamptr->vlistID = vlistID;
+      m_vlistID = vlistID;
     }
 
   if (vlistNumber(vlistID) == CDI_COMP && cdoStreamNumber() == CDI_REAL)
@@ -1067,7 +1070,7 @@ pstreamInqVlist(int pstreamID)
   if (vlistNumber(vlistID) == CDI_REAL && cdoStreamNumber() == CDI_COMP)
     cdoAbort("This operator needs complex fields!");
 
-  processDefVarNum(vlistNvars(vlistID), pstreamID);
+  processDefVarNum(vlistNvars(vlistID));
 
   return vlistID;
 }
@@ -1077,7 +1080,7 @@ pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 {
   int filetype = pstreamptr->filetype;
 
-  if (pstreamptr->vlistID != -1)
+  if (pstreamptr->m_vlistID != -1)
     cdoAbort("Internal problem, vlist already defined!");
 
   if (pstreamptr->varlist != NULL)
@@ -1132,7 +1135,7 @@ pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
     }
 
   pstreamptr->varlist = varlist;
-  pstreamptr->vlistID = vlistID; /* used for -r/-a */
+  pstreamptr->m_vlistID = vlistID; /* used for -r/-a */
 }
 
 void
@@ -1147,7 +1150,7 @@ pstreamDefVlist(int pstreamID, int vlistID)
         Message("%s pstreamID %d", pstreamptr->name, pstreamptr->self);
       int vlistIDcp = vlistDuplicate(vlistID);
       /*    pipeDefVlist(pstreamptr, vlistID);*/
-      pstreamptr->pipe->pipeDefVlist(pstreamptr->vlistID, vlistIDcp);
+      pstreamptr->pipe->pipeDefVlist(pstreamptr->m_vlistID, vlistIDcp);
     }
   else
 #endif
@@ -1299,7 +1302,7 @@ pstreamReadRecord(int pstreamID, double *data, int *nmiss)
         {
           Message("%s pstreamID %d", pstreamptr->pipe->name.c_str(), pstreamptr->self);
         }
-      pstreamptr->pipe->pipeReadRecord(pstreamptr->vlistID, data, nmiss);
+      pstreamptr->pipe->pipeReadRecord(pstreamptr->m_vlistID, data, nmiss);
     }
   else
 #endif
@@ -1617,7 +1620,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
         }
 
       if (tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID)
-        taxisDefType(vlistInqTaxis(pstreamptr->vlistID), cdoDefaultTimeType);
+        taxisDefType(vlistInqTaxis(pstreamptr->m_vlistID), cdoDefaultTimeType);
     }
 
   if (nrecs && tsID != pstreamptr->tsID)
@@ -1641,7 +1644,7 @@ pstreamDefTimestep(int pstreamID, int tsID)
         {
           Message("%s pstreamID %d", pstreamptr->pipe->name.c_str(), pstreamptr->self);
         }
-      pstreamptr->pipe->pipeDefTimestep(pstreamptr->vlistID, tsID);
+      pstreamptr->pipe->pipeDefTimestep(pstreamptr->m_vlistID, tsID);
     }
   else
 #endif
@@ -1649,7 +1652,7 @@ pstreamDefTimestep(int pstreamID, int tsID)
       if (tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID)
         {
           int taxisID, vlistID;
-          vlistID = pstreamptr->vlistID;
+          vlistID = pstreamptr->m_vlistID;
           taxisID = vlistInqTaxis(vlistID);
           taxisDefType(taxisID, cdoDefaultTimeType);
         }

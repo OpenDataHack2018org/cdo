@@ -24,10 +24,12 @@
 #include <sys/types.h> /* off_t */
 
 typedef struct {
+
+  int InqVlist();
   int            self;
   int            mode;
   int            fileID;
-  int            vlistID;
+  int            m_vlistID;
   int            tsID;
   int            filetype;
   int            tsID0;
