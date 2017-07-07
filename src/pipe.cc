@@ -32,7 +32,6 @@
 #include "error.h"
 #include "dmemory.h"
 #include "pipe.h"
-#include "pstream_int.h"
 
 #if defined(HAVE_LIBPTHREAD)
 
@@ -94,7 +93,7 @@ pipe_t::pipe_init()
   data = NULL;
   hasdata = 0;
   usedata = true;
-  pstreamptr_in = 0;
+ // pstreamptr_in = 0;
 
   mutex = (pthread_mutex_t *) Malloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(mutex, &m_attr);
@@ -437,6 +436,7 @@ pipe_t::pipeReadPipeRecord(double *p_data,  int vlistID, int *p_nmiss)
   *p_nmiss = nmiss;
 }
 
+/*
 void
 pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
 {
@@ -462,7 +462,7 @@ pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
       Error("No data pointer for %s", pstreamptr->pipe->name.c_str());
     }
 }
-
+*/
 void
 pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 {

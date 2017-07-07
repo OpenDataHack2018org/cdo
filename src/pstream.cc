@@ -36,6 +36,7 @@ int pclose(FILE *stream);
 #include "cdo.h"
 #include "cdo_int.h"
 #include "modules.h"
+#include "pstream.h"
 #include "pstream_int.h"
 #include "cdo_int.h"
 #include "util.h"

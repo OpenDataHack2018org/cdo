@@ -29,7 +29,7 @@
 
 #include <pthread.h>
 #include "pthread_debug.h"
-#include "pstream.h"
+//#include "pstream.h"
 #include <iostream>
 
 #endif
@@ -62,7 +62,7 @@ public:
   int recIDr, recIDw, tsIDr, tsIDw;
   int nmiss;
   double *data;
-  pstream_t *pstreamptr_in;
+  //pstream_t *pstreamptr_in;
   /* unsigned long */ off_t nvals;
 
   pthread_mutex_t *mutex;
