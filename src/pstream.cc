@@ -195,7 +195,7 @@ pstream_init_entry(pstream_t *pstreamptr)
   pstreamptr->varID = -1;
   pstreamptr->name = NULL;
   pstreamptr->mfnames = NULL;
-  pstreamptr->varlist = NULL;
+  pstreamptr->m_varlist = NULL;
 #if defined(HAVE_LIBPTHREAD)
   pstreamptr->argument = NULL;
   pstreamptr->pipe = NULL;
@@ -1008,10 +1008,10 @@ pstreamClose(int pstreamID)
           pstreamptr->name = NULL;
         }
 
-      if (pstreamptr->varlist)
+      if (pstreamptr->m_varlist)
         {
-          Free(pstreamptr->varlist);
-          pstreamptr->varlist = NULL;
+          Free(pstreamptr->m_varlist);
+          pstreamptr->m_varlist = NULL;
         }
 
       pstream_delete_entry(pstreamptr);
@@ -1083,7 +1083,7 @@ pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
   if (pstreamptr->m_vlistID != -1)
     cdoAbort("Internal problem, vlist already defined!");
 
-  if (pstreamptr->varlist != NULL)
+  if (pstreamptr->m_varlist != NULL)
     cdoAbort("Internal problem, varlist already allocated!");
 
   int nvars = vlistNvars(vlistID);
@@ -1134,7 +1134,7 @@ pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
         }
     }
 
-  pstreamptr->varlist = varlist;
+  pstreamptr->m_varlist = varlist;
   pstreamptr->m_vlistID = vlistID; /* used for -r/-a */
 }
 
@@ -1360,11 +1360,11 @@ void
 pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int nmiss)
 {
   long i;
-  long gridsize = pstreamptr->varlist[varID].gridsize;
-  int datatype = pstreamptr->varlist[varID].datatype;
-  double missval = pstreamptr->varlist[varID].missval;
-  double addoffset = pstreamptr->varlist[varID].addoffset;
-  double scalefactor = pstreamptr->varlist[varID].scalefactor;
+  long gridsize = pstreamptr->m_varlist[varID].gridsize;
+  int datatype = pstreamptr->m_varlist[varID].datatype;
+  double missval = pstreamptr->m_varlist[varID].missval;
+  double addoffset = pstreamptr->m_varlist[varID].addoffset;
+  double scalefactor = pstreamptr->m_varlist[varID].scalefactor;
 
   long ivals = 0;
   double arrmin = 1.e300;
@@ -1456,8 +1456,8 @@ pstreamWriteRecord(int pstreamID, double *data, int nmiss)
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_write);
 
-      if (pstreamptr->varlist)
-        if (pstreamptr->varlist[varID].check_datarange)
+      if (pstreamptr->m_varlist)
+        if (pstreamptr->m_varlist[varID].check_datarange)
           pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
 
 #if defined(HAVE_LIBPTHREAD)
@@ -1500,8 +1500,8 @@ pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_write);
 /*
-if ( pstreamptr->varlist )
-  if ( pstreamptr->varlist[varID].check_datarange )
+if ( pstreamptr->m_varlist )
+  if ( pstreamptr->m_varlist[varID].check_datarange )
     pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
 */
 #if defined(HAVE_LIBPTHREAD)

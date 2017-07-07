@@ -40,7 +40,7 @@ typedef struct {
   bool           isopen;
   char          *name;
   char         **mfnames;
-  varlist_t     *varlist;
+  varlist_t     *m_varlist;
 #if defined(HAVE_LIBPTHREAD)
   void          *argument;
   struct pipe_t *pipe;
