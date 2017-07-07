@@ -127,9 +127,6 @@ pipe_t::pipeInqTimestep(int p_tsID)
 {
   int numrecs;
 
-  // if (PipeDebug)
-  //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
-
   // LOCK
   pthread_mutex_lock(mutex);
   usedata = false;
@@ -246,9 +243,6 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
 {
   int numrecs;
 
- // if (PipeDebug)
-    //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
-
   // LOCK
   pthread_mutex_lock(mutex);
   recIDw = -1;
@@ -264,9 +258,16 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
       vlistID = p_vlistID;
       numrecs = 0;
       for (varID = 0; varID < vlistNvars(vlistID); varID++)
-        if (vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT)
-          numrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
-      // Message("numrecs = %d nvars = %d", numrecs, vlistNvars(vlistID));
+        {
+          if (vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT)
+            {
+              numrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+            }
+      }
+    if (PipeDebug)
+      {
+        Message("numrecs = %d nvars = %d", numrecs, vlistNvars(vlistID));
+      }
     }
 
   nrecs = numrecs;
@@ -304,7 +305,6 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
   bool condSignal = false;
 
   //if (PipeDebug)
-    //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
 
   // LOCK
   pthread_mutex_lock(mutex);
@@ -466,10 +466,7 @@ pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
 void
 pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 {
-
   *nmiss = 0;
-  //if (PipeDebug)
-    //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
 
   // LOCK
   pthread_mutex_lock(mutex);
@@ -503,10 +500,6 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 void
 pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
 {
-
-  //if (PipeDebug)
-  //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
-
   /*
   if ( ! usedata ) return;
   */

@@ -980,9 +980,9 @@ int pstreamInqVlist(int pstreamID)
   //read from pipe
   if ( pstreamptr->ispipe )
     {
-        vlistID = pstreamptr->pipe->pipeInqVlist(pstreamptr->vlistID);
+      vlistID = pstreamptr->pipe->pipeInqVlist(pstreamptr->vlistID);
       if ( vlistID == -1 )
-	cdoAbort("Couldn't read data from input stream %s!", pstreamptr->name);
+	    cdoAbort("Couldn't read data from input stream %s!", pstreamptr->name);
     }
 //read from file through cdi streamInqVlist
   else
@@ -1161,7 +1161,14 @@ int pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
-    pstreamptr->pipe->pipeInqRecord(varID, levelID);
+    {
+      if(PSTREAM_Debug)
+        {
+          Message("%s pstreamID %d",pstreamptr->pipe->name.c_str(), pstreamptr->self);
+        }
+      pstreamptr->pipe->pipeInqRecord(varID, levelID);
+    }
+
   else
 #endif
     {
@@ -1220,7 +1227,13 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
-   pstreamptr->pipe->pipeReadRecord(pstreamptr->vlistID, data, nmiss);
+    {
+      if(PSTREAM_Debug)
+        {
+          Message("%s pstreamID %d",pstreamptr->pipe->name.c_str(), pstreamptr->self);
+        }
+      pstreamptr->pipe->pipeReadRecord(pstreamptr->vlistID, data, nmiss);
+    }
   else
 #endif
     {
@@ -1342,6 +1355,10 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
     {
+      if(PSTREAM_Debug)
+        {
+          Message("%s pstreamID %d",pstreamptr->pipe->name.c_str(), pstreamptr->self);
+        }
       pstreamptr->pipe->pipeWriteRecord(data, nmiss);
     }
   else
@@ -1377,7 +1394,11 @@ void pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
   if ( pstreamptr->ispipe )
     {
       cdoAbort("pipeWriteRecord not implemented for memtype float!");
-      //pipeWriteRecord(pstreamptr, data, nmiss);
+      if(PSTREAM_Debug)
+        {
+          Message("%s pstreamID %d",pstreamptr->pipe->name.c_str(), pstreamptr->self);
+        }
+    //pipeWriteRecord(pstreamptr, data, nmiss);
     }
   else
 #endif
@@ -1408,8 +1429,13 @@ int pstreamInqTimestep(int pstreamID, int tsID)
   int nrecs = 0;
 
 #if defined(HAVE_LIBPTHREAD)
-  if ( pstreamptr->ispipe )
+  if ( pstreamptr->ispipe ){
+      if(PSTREAM_Debug)
+      {
+          Message("%s pstreamID %d",pstreamptr->pipe->name.c_str(), pstreamptr->self);
+      }
    nrecs = pstreamptr->pipe->pipeInqTimestep(tsID);
+}
   else
 #endif
     {
@@ -1503,7 +1529,13 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
-    pstreamptr->pipe->pipeDefTimestep(pstreamptr->vlistID, tsID);
+    {
+        if(PSTREAM_Debug)
+        {
+          Message("%s pstreamID %d",pstreamptr->pipe->name.c_str(), pstreamptr->self);
+        }
+      pstreamptr->pipe->pipeDefTimestep(pstreamptr->vlistID, tsID);
+    }
   else
 #endif
     {
