@@ -31,7 +31,7 @@ typedef struct {
   int            fileID;
   int            m_vlistID;
   int            tsID;
-  int            filetype;
+  int            m_filetype;
   int            tsID0;
   int            mfiles;
   int            nfiles;

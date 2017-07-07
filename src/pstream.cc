@@ -187,7 +187,7 @@ pstream_init_entry(pstream_t *pstreamptr)
   pstreamptr->fileID = -1;
   pstreamptr->m_vlistID = -1;
   pstreamptr->tsID = -1;
-  pstreamptr->filetype = -1;
+  pstreamptr->m_filetype = -1;
   pstreamptr->name = NULL;
   pstreamptr->tsID0 = 0;
   pstreamptr->mfiles = 0;
@@ -685,7 +685,7 @@ pstreamOpenWritePipe(const argument_t *argument, int filetype)
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
   pstreamptr->wthreadID = pthread_self();
-  pstreamptr->filetype = filetype;
+  pstreamptr->m_filetype = filetype;
   processAddOutputStream(pstreamID);
 #endif
 
@@ -793,7 +793,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
   pstreamptr->mode = 'w';
   pstreamptr->name = filename;
   pstreamptr->fileID = fileID;
-  pstreamptr->filetype = filetype;
+  pstreamptr->m_filetype = filetype;
 
   return pstreamID;
 }
@@ -1078,7 +1078,7 @@ int pstream_t::InqVlist(){
 static void
 pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 {
-  int filetype = pstreamptr->filetype;
+  int filetype = pstreamptr->m_filetype;
 
   if (pstreamptr->m_vlistID != -1)
     cdoAbort("Internal problem, vlist already defined!");
@@ -1909,7 +1909,7 @@ pstreamInqFiletype(int pstreamID)
 
 #if defined(HAVE_LIBPTHREAD)
   if (pstreamptr->ispipe)
-    filetype = pstreamptr->filetype;
+    filetype = pstreamptr->m_filetype;
   else
 #endif
     filetype = streamInqFiletype(pstreamptr->fileID);
@@ -1926,7 +1926,7 @@ pstreamInqByteorder(int pstreamID)
 
 #if defined(HAVE_LIBPTHREAD)
   if (pstreamptr->ispipe)
-    byteorder = pstreamptr->filetype;
+    byteorder = pstreamptr->m_filetype;
   else
 #endif
     byteorder = streamInqByteorder(pstreamptr->fileID);
