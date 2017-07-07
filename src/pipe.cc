@@ -20,7 +20,7 @@
 #endif
 
 #ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600 /* struct timespec */
+//#define _XOPEN_SOURCE 600 /* struct timespec */
 #endif
 
 #include <stdio.h>
@@ -459,7 +459,7 @@ pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
     }
   else if (!pstreamptr->pipe->data)
     {
-      Error("No data pointer for %s", pstreamptr->pipe->name);
+      Error("No data pointer for %s", pstreamptr->pipe->name.c_str());
     }
 }
 
@@ -469,14 +469,14 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 
   *nmiss = 0;
   //if (PipeDebug)
-    //Message("%s pstreamID %d", name, pstreamptr->self);
+    //Message("%s pstreamID %d", name.c_str(), pstreamptr->self);
 
   // LOCK
   pthread_mutex_lock(mutex);
   while (hasdata == 0)
     {
       if (PipeDebug)
-        Message("%s wait of writeCond",name);
+        Message("%s wait of writeCond",name.c_str());
       pthread_cond_wait(writeCond, mutex);
     }
 
@@ -490,7 +490,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
     }
 
   if (PipeDebug)
-    Message("%s read record %d", name, recIDr);
+    Message("%s read record %d", name.c_str(), recIDr);
 
   hasdata = 0;
   data = NULL;

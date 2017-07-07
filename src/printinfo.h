@@ -205,9 +205,9 @@ void print_xyvals2D(int gridID, int dig)
       gridInqXunits(gridID, xunits);
       gridInqYunits(gridID, yunits);
 
-      int gridsize = gridInqSize(gridID);
-      double *xvals2D = (double*) malloc((size_t)gridsize*sizeof(double));
-      double *yvals2D = (double*) malloc((size_t)gridsize*sizeof(double));
+      size_t gridsize = gridInqSize(gridID);
+      double *xvals2D = (double*) malloc(gridsize*sizeof(double));
+      double *yvals2D = (double*) malloc(gridsize*sizeof(double));
 
       gridInqXvals(gridID, xvals2D);
       gridInqYvals(gridID, yvals2D);
@@ -216,7 +216,7 @@ void print_xyvals2D(int gridID, int dig)
       double xlast  = xvals2D[0];
       double yfirst = yvals2D[0];
       double ylast  = yvals2D[0];
-      for ( int i = 1; i < gridsize; i++ )
+      for ( size_t i = 1; i < gridsize; i++ )
         {
           if ( xvals2D[i] < xfirst ) xfirst = xvals2D[i];
           if ( xvals2D[i] > xlast  ) xlast  = xvals2D[i];
@@ -277,10 +277,10 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
     fprintf(stderr, "Internal problem (%s): sub grid not equal GRID_PROJECTION!\n", __func__);
 
   int trunc    = gridInqTrunc(gridID);
-  int gridsize = gridInqSize(gridID);
-  int xsize    = gridInqXsize(gridID);
-  int ysize    = gridInqYsize(gridID);
-  int xysize   = xsize*ysize;
+  size_t gridsize = gridInqSize(gridID);
+  size_t xsize    = gridInqXsize(gridID);
+  size_t ysize    = gridInqYsize(gridID);
+  size_t xysize   = xsize*ysize;
 
   // int prec     = gridInqPrec(gridID);
   // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
@@ -313,11 +313,11 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
 #ifdef CDO
           set_text_color(stdout, RESET, GREEN);
 #endif
-          fprintf(stdout, "points=%d", gridsize);
+          fprintf(stdout, "points=%zu", gridsize);
           if ( gridtype == GRID_GAUSSIAN_REDUCED )
-            fprintf(stdout, "  nlat=%d", ysize);
+            fprintf(stdout, "  nlat=%zu", ysize);
           else if ( xysize )
-            fprintf(stdout, " (%dx%d)", xsize, ysize);
+            fprintf(stdout, " (%zux%zu)", xsize, ysize);
 
           if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED )
             fprintf(stdout, "  np=%d", gridInqNP(gridID));
@@ -361,7 +361,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
 #ifdef CDO
       set_text_color(stdout, RESET, GREEN);
 #endif
-      fprintf(stdout, "points=%d  nsp=%d  truncation=%d", gridsize, gridsize/2, trunc);
+      fprintf(stdout, "points=%zu  nsp=%zu  truncation=%d", gridsize, gridsize/2, trunc);
       if ( gridInqComplexPacking(gridID) ) fprintf(stdout, "  complexPacking");
       my_reset_text_color(stdout);
       fprintf(stdout, "\n");
@@ -371,7 +371,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
 #ifdef CDO
       set_text_color(stdout, RESET, GREEN);
 #endif
-      fprintf(stdout, "points=%d  nfc=%d  truncation=%d\n", gridsize, gridsize/2, trunc);
+      fprintf(stdout, "points=%zu  nfc=%zu  truncation=%d\n", gridsize, gridsize/2, trunc);
       my_reset_text_color(stdout);
     }
   else if ( gridtype == GRID_GME )
@@ -381,7 +381,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
 #ifdef CDO
       set_text_color(stdout, RESET, GREEN);
 #endif
-      fprintf(stdout, "points=%d  nd=%d  ni=%d\n", gridsize, nd, ni);
+      fprintf(stdout, "points=%zu  nd=%d  ni=%d\n", gridsize, nd, ni);
       my_reset_text_color(stdout);
     }
   else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
@@ -390,9 +390,9 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
       set_text_color(stdout, RESET, GREEN);
 #endif
       if ( gridtype == GRID_CURVILINEAR )
-        fprintf(stdout, "points=%d (%dx%d)", gridsize, xsize, ysize);
+        fprintf(stdout, "points=%zu (%zux%zu)", gridsize, xsize, ysize);
       else
-        fprintf(stdout, "points=%d", gridsize);
+        fprintf(stdout, "points=%zu", gridsize);
 
       if ( gridtype == GRID_UNSTRUCTURED && gridInqNvertex(gridID) > 0 )
         fprintf(stdout, "  nvertex=%d", gridInqNvertex(gridID));
@@ -423,9 +423,9 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
       set_text_color(stdout, RESET, GREEN);
 #endif
       if ( ysize == 0 )
-        fprintf(stdout, "points=%d\n", gridsize);
+        fprintf(stdout, "points=%zu\n", gridsize);
       else
-        fprintf(stdout, "points=%d (%dx%d)\n", gridsize, xsize, ysize);
+        fprintf(stdout, "points=%zu (%zux%zu)\n", gridsize, xsize, ysize);
       my_reset_text_color(stdout);
     }
 
