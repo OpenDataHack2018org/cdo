@@ -19,10 +19,6 @@
 #include "config.h"
 #endif
 
-#ifndef _XOPEN_SOURCE
-//#define _XOPEN_SOURCE 600 /* struct timespec */
-#endif
-
 #include <stdio.h>
 #include <string.h>
 #include <time.h>  // time()
@@ -122,8 +118,6 @@ pipe_t::pipe_init()
 int
 pipe_t::pipeInqTimestep(int p_tsID)
 {
-  int numrecs;
-
   // LOCK
   pthread_mutex_lock(mutex);
   usedata = false;
@@ -161,10 +155,7 @@ pipe_t::pipeInqTimestep(int p_tsID)
       pthread_cond_wait(tsDef, mutex);
     }
 
-  if (EOP)
-    numrecs = 0;
-  else
-    numrecs = nrecs;
+  int numrecs = EOP ? 0 : nrecs;
 
   pthread_mutex_unlock(mutex);
   // UNLOCK
@@ -251,10 +242,9 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
     numrecs = vlistNrecs(p_vlistID);
   else
     {
-      int vlistID, varID;
-      vlistID = p_vlistID;
+      int vlistID = p_vlistID;
       numrecs = 0;
-      for (varID = 0; varID < vlistNvars(vlistID); varID++)
+      for (int varID = 0; varID < vlistNvars(vlistID); varID++)
         {
           if (vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT)
             {
@@ -419,12 +409,10 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
 void
 pipe_t::pipeReadPipeRecord(double *p_data, int vlistID, int *p_nmiss)
 {
-  int datasize;
-
   if (!p_data)
     Error("No data pointer for %s", name.c_str());
 
-  datasize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+  int datasize = gridInqSize(vlistInqVarGrid(vlistID, varID));
   nvals += datasize;
   if (vlistNumber(vlistID) != CDI_REAL)
     datasize *= 2;
