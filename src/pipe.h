@@ -44,12 +44,15 @@ public:
   int pipeInqVlist(int &vlistID);
   void pipe_init();
   void pipeDefRecord(int p_varId, int p_levelID);
+  void pipeDefTimestep(int p_vlistID, int tsID);
   void pipeDefVlist(int &target_vlistID, int new_vlistID);
 
   int pipeInqTimestep(int p_tsID);
   int pipeInqRecord(int *varID, int *levelID);
 
   void pipeWriteRecord(double *p_data, int p_nmiss);
+  void pipeReadRecord(int p_vlistID, double *data, int *nmiss);
+  void pipeReadPipeRecord(double *data, int vlistID, int *p_nmiss);
 
   bool EOP;
   bool usedata;
@@ -70,16 +73,7 @@ public:
   std::string name;
 };
 
-pipe_t *pipeNew(void);
-
 void pipeDebug(int debug);
-
-void pipeDefTimestep(pstream_t *pstreamptr, int tsID);
-
-int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID);
-
-void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss);
-void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss);
 
 #endif
 

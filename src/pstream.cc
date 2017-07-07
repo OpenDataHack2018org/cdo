@@ -367,6 +367,7 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
   pstreamptr->name      = pipename;
   pstreamptr->rthreadID = pthread_self();
   pstreamptr->pipe      = new pipe_t();
+  pstreamptr->pipe->name = std::string(pipename);
   pstreamptr->argument  = (void *) newargument;
  
   if ( ! cdoSilentMode ){
@@ -1218,7 +1219,7 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
-    pipeReadRecord(pstreamptr, data, nmiss);
+   pstreamptr->pipe->pipeReadRecord(pstreamptr->vlistID, data, nmiss);
   else
 #endif
     {
@@ -1501,7 +1502,7 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
-    pipeDefTimestep(pstreamptr, tsID);
+    pstreamptr->pipe->pipeDefTimestep(pstreamptr->vlistID, tsID);
   else
 #endif
     {
