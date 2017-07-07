@@ -33,10 +33,7 @@
 
 static int PipeDebug = 0;
 
-pipe_t::pipe_t()
-{
-  pipe_init();
-}
+pipe_t::pipe_t() { pipe_init(); }
 
 void
 pipe_t::pipe_init()
@@ -89,7 +86,7 @@ pipe_t::pipe_init()
   data = NULL;
   hasdata = 0;
   usedata = true;
- // pstreamptr_in = 0;
+  // pstreamptr_in = 0;
 
   mutex = (pthread_mutex_t *) Malloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(mutex, &m_attr);
@@ -121,9 +118,6 @@ pipe_t::pipe_init()
 int
 pipe_t::pipeInqTimestep(int p_tsID)
 {
-  // if (PipeDebug)
-  //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
-
   // LOCK
   pthread_mutex_lock(mutex);
   usedata = false;
@@ -131,7 +125,7 @@ pipe_t::pipeInqTimestep(int p_tsID)
   if (p_tsID != tsIDr + 1)
     {
       if (!(p_tsID == tsIDr && tsIDr == tsIDw && recIDr == -1))
-        Error("%s unexpected tsID %d %d %d",name.c_str(), p_tsID, tsIDr + 1, tsIDw);
+        Error("%s unexpected tsID %d %d %d", name.c_str(), p_tsID, tsIDr + 1, tsIDw);
     }
 
   tsIDr = p_tsID;
@@ -140,24 +134,24 @@ pipe_t::pipeInqTimestep(int p_tsID)
       if (EOP)
         {
           if (PipeDebug)
-            Message("%s EOP",name.c_str());
+            Message("%s EOP", name.c_str());
           break;
         }
       if (hasdata)
         {
           if (PipeDebug)
-            Message("%s has data",name.c_str());
+            Message("%s has data", name.c_str());
           hasdata = 0;
           data = NULL;
           pthread_cond_signal(readCond);
         }
       else if (PipeDebug)
-        Message("%s has no data",name.c_str());
+        Message("%s has no data", name.c_str());
 
       pthread_cond_signal(recInq); /* o.k. ??? */
 
       if (PipeDebug)
-        Message("%s wait of tsDef",name.c_str());
+        Message("%s wait of tsDef", name.c_str());
       pthread_cond_wait(tsDef, mutex);
     }
 
@@ -181,7 +175,7 @@ pipe_t::pipeDefVlist(int &target_vlistID, int new_vlistID)
   pthread_mutex_unlock(mutex);
   // UNLOCK
 
-  //lets the program know that the vlist is now defined
+  // lets the program know that the vlist is now defined
   pthread_cond_signal(vlistDef);
 }
 
@@ -209,7 +203,7 @@ pipe_t::pipeInqVlist(int &p_vlistID)
       time_to_wait.tv_sec += TIMEOUT;
       // fprintf(stderr, "tvsec %g\n", (double) time_to_wait.tv_sec);
       if (PipeDebug)
-        Message("%s wait of vlistDef",name.c_str());
+        Message("%s wait of vlistDef", name.c_str());
       // pthread_cond_wait(pipe->vlistDef, pipe->mutex);
       retcode = pthread_cond_timedwait(vlistDef, mutex, &time_to_wait);
       // fprintf(stderr, "self %d retcode %d %d %d\n", pstreamptr->self, retcode, processNumsActive(),
@@ -224,7 +218,7 @@ pipe_t::pipeInqVlist(int &p_vlistID)
   if (retcode == 0)
     vlistID = p_vlistID;
   else if (PipeDebug)
-    Message("%s timeout!",name.c_str());
+    Message("%s timeout!", name.c_str());
 
   pthread_mutex_unlock(mutex);
   // UNLOCK
@@ -237,15 +231,12 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
 {
   int numrecs;
 
- // if (PipeDebug)
-    //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
-
   // LOCK
   pthread_mutex_lock(mutex);
   recIDw = -1;
   tsIDw++;
   if (p_tsID != tsIDw)
-    Error("unexpected p_tsID %d(%d) for %s", p_tsID, tsIDw,name.c_str());
+    Error("unexpected p_tsID %d(%d) for %s", p_tsID, tsIDw, name.c_str());
 
   if (p_tsID == 0)
     numrecs = vlistNrecs(p_vlistID);
@@ -254,14 +245,21 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
       int vlistID = p_vlistID;
       numrecs = 0;
       for (int varID = 0; varID < vlistNvars(vlistID); varID++)
-        if (vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT)
-          numrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
-      // Message("numrecs = %d nvars = %d", numrecs, vlistNvars(vlistID));
+        {
+          if (vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT)
+            {
+              numrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+            }
+        }
+      if (PipeDebug)
+        {
+          Message("numrecs = %d nvars = %d", numrecs, vlistNvars(vlistID));
+        }
     }
 
   nrecs = numrecs;
   if (PipeDebug)
-    Message("%s numrecs %d p_tsID %d %d %d",name.c_str(), numrecs, p_tsID, tsIDw, tsIDr);
+    Message("%s numrecs %d p_tsID %d %d %d", name.c_str(), numrecs, p_tsID, tsIDw, tsIDr);
   if (numrecs == 0)
     EOP = true;
   pthread_mutex_unlock(mutex);
@@ -281,7 +279,7 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
           break;
         }
       if (PipeDebug)
-        Message("%s wait of tsInq (p_tsID %d %d)",name.c_str(), p_tsID, tsIDr);
+        Message("%s wait of tsInq (p_tsID %d %d)", name.c_str(), p_tsID, tsIDr);
       pthread_cond_wait(tsInq, mutex);
     }
   pthread_mutex_unlock(mutex);
@@ -293,13 +291,12 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
 {
   bool condSignal = false;
 
-  //if (PipeDebug)
-    //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
+  // if (PipeDebug)
 
   // LOCK
   pthread_mutex_lock(mutex);
   if (PipeDebug)
-    Message("%s has no data %d %d",name.c_str(), recIDr, recIDw);
+    Message("%s has no data %d %d", name.c_str(), recIDr, recIDw);
   if (hasdata || usedata)
     {
       hasdata = 0;
@@ -319,7 +316,7 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
   recIDr++;
 
   if (PipeDebug)
-    Message("%s recID %d %d",name.c_str(), recIDr, recIDw);
+    Message("%s recID %d %d", name.c_str(), recIDr, recIDw);
 
   while (recIDw != recIDr)
     {
@@ -330,7 +327,7 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
           break;
         }
       if (PipeDebug)
-        Message("%s wait of recDef",name.c_str());
+        Message("%s wait of recDef", name.c_str());
       pthread_cond_wait(recDef, mutex);
     }
 
@@ -361,7 +358,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
   // LOCK
   pthread_mutex_lock(mutex);
   if (PipeDebug)
-    Message("%s has data %d %d",name.c_str(), recIDr, recIDw);
+    Message("%s has data %d %d", name.c_str(), recIDr, recIDw);
   if (hasdata)
     {
       hasdata = 0;
@@ -381,7 +378,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
   varID = p_varID;
   levelID = p_levelID;
   if (PipeDebug)
-    Message("%s recID %d %d",name.c_str(), recIDr, recIDw);
+    Message("%s recID %d %d", name.c_str(), recIDr, recIDw);
   pthread_mutex_unlock(mutex);
   // UNLOCK
 
@@ -396,7 +393,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
       if (EOP)
         break;
       if (PipeDebug)
-        Message("%s wait of recInq %d",name.c_str(), recIDr);
+        Message("%s wait of recInq %d", name.c_str(), recIDr);
       pthread_cond_wait(recInq, mutex);
     }
   pthread_mutex_unlock(mutex);
@@ -410,10 +407,10 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
  * @param pipe pipe that has the wanted data
  */
 void
-pipe_t::pipeReadPipeRecord(double *p_data,  int vlistID, int *p_nmiss)
+pipe_t::pipeReadPipeRecord(double *p_data, int vlistID, int *p_nmiss)
 {
   if (!p_data)
-    Error("No data pointer for %s",name.c_str());
+    Error("No data pointer for %s", name.c_str());
 
   int datasize = gridInqSize(vlistInqVarGrid(vlistID, varID));
   nvals += datasize;
@@ -454,15 +451,13 @@ void
 pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 {
   *nmiss = 0;
-  //if (PipeDebug)
-    //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
 
   // LOCK
   pthread_mutex_lock(mutex);
   while (hasdata == 0)
     {
       if (PipeDebug)
-        Message("%s wait of writeCond",name.c_str());
+        Message("%s wait of writeCond", name.c_str());
       pthread_cond_wait(writeCond, mutex);
     }
 
@@ -476,7 +471,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
     }
 
   if (PipeDebug)
-    Message("%s read record %d",name.c_str(), recIDr);
+    Message("%s read record %d", name.c_str(), recIDr);
 
   hasdata = 0;
   data = NULL;
@@ -489,10 +484,6 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 void
 pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
 {
-
-  //if (PipeDebug)
-  //Message("%s pstreamID %d",name.c_str(), pstreamptr->self);
-
   /*
   if ( ! usedata ) return;
   */
@@ -507,7 +498,7 @@ pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
   pthread_cond_signal(writeCond);
 
   if (PipeDebug)
-    Message("%s write record %d",name.c_str(), recIDw);
+    Message("%s write record %d", name.c_str(), recIDw);
 
   // LOCK
   pthread_mutex_lock(mutex);
@@ -529,7 +520,7 @@ pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
           break;
         }
       if (PipeDebug)
-        Message("%s wait of readCond",name.c_str());
+        Message("%s wait of readCond", name.c_str());
       pthread_cond_wait(readCond, mutex);
     }
   pthread_mutex_unlock(mutex);
