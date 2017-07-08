@@ -84,7 +84,7 @@ pipe_t::pipe_init()
   nvals = 0;
   nmiss = 0;
   data = NULL;
-  hasdata = 0;
+  hasdata = false;
   usedata = true;
   // pstreamptr_in = 0;
 
@@ -141,7 +141,7 @@ pipe_t::pipeInqTimestep(int p_tsID)
         {
           if (PipeDebug)
             Message("%s has data", name.c_str());
-          hasdata = 0;
+          hasdata = false;
           data = NULL;
           pthread_cond_signal(readCond);
         }
@@ -299,7 +299,7 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
     Message("%s has no data %d %d", name.c_str(), recIDr, recIDw);
   if (hasdata || usedata)
     {
-      hasdata = 0;
+      hasdata = false;
       data = NULL;
       usedata = false;
       condSignal = true;
@@ -361,7 +361,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
     Message("%s has data %d %d", name.c_str(), recIDr, recIDw);
   if (hasdata)
     {
-      hasdata = 0;
+      hasdata = false;
       data = NULL;
       condSignal = true;
     }
@@ -437,7 +437,7 @@ pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
         break;
     }
 
-  if (pstreamptr->pipe->hasdata != 1)
+  if (pstreamptr->pipe->hasdata == false)
     {
       Error("Internal problem! istream undefined");
     }
@@ -454,14 +454,14 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 
   // LOCK
   pthread_mutex_lock(mutex);
-  while (hasdata == 0)
+  while (!hasdata)
     {
       if (PipeDebug)
         Message("%s wait of writeCond", name.c_str());
       pthread_cond_wait(writeCond, mutex);
     }
 
-  if (hasdata == 1)
+  if (hasdata)
     {
       pipeReadPipeRecord(data, p_vlistID, nmiss);
     }
@@ -473,7 +473,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
   if (PipeDebug)
     Message("%s read record %d", name.c_str(), recIDr);
 
-  hasdata = 0;
+  hasdata = false;
   data = NULL;
   pthread_mutex_unlock(mutex);
   // UNLOCK
@@ -489,7 +489,7 @@ pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
   */
   // LOCK
   pthread_mutex_lock(mutex);
-  hasdata = 1; /* data pointer */
+  hasdata = true; /* data pointer */
   data = p_data;
   nmiss = p_nmiss;
   pthread_mutex_unlock(mutex);

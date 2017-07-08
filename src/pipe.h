@@ -56,7 +56,7 @@ public:
 
   bool EOP;
   bool usedata;
-  short hasdata;
+  bool hasdata;
   int nrecs;
   int varID, levelID;
   int recIDr, recIDw, tsIDr, tsIDw;
