@@ -1610,7 +1610,7 @@ void *Importcmsaf(void *argument)
   status = H5Fclose(file_id);
   UNUSED(status);
 
-  processDefVarNum(vlistNvars(vlistID), streamID);
+  processDefVarNum(vlistNvars(vlistID));
 
   pstreamClose(streamID);
 
