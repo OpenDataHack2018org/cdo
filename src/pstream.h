@@ -31,7 +31,7 @@ public:
   int inqVlist();
   void defTimestep(int p_tsID);
   bool isPipe();
-  // void pstreamOpenReadPipe(const argument_t *argument);
+  void pstreamOpenReadPipe(const argument_t *argument);
   // void pstreamOpenReadFile(const argument_t *argument);
   int self;
   int mode;

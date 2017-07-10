@@ -328,14 +328,15 @@ pCreateReadThread(argument_t *argument)
   return thrID;
 }
 
-static void
-pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
+void
+pstream_t::pstreamOpenReadPipe(const argument_t *argument)
 {
 #if defined(HAVE_LIBPTHREAD)
-  int pstreamID = pstreamptr->self;
+ // int pstreamID = pstreamptr->self;
 
   size_t pnlen = 16;
   char *pipename = (char *) Malloc(pnlen);
+  createPipeName(pipename, pnlen);
   // struct sched_param param;
 
   argument_t *newargument = new argument_t();
@@ -350,7 +351,6 @@ pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
   size_t len = strlen(argument->args);
   char *newarg = (char *) Malloc(len + pnlen);
   strcpy(newarg, argument->args);
-  createPipeName(pipename, pnlen);
   newarg[len] = ' ';
   strcpy(&newarg[len + 1], pipename);
 
@@ -362,12 +362,12 @@ pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
     for ( int i = 0; i < newargument->argc; ++i )
     printf("pstreamOpenRead: new arg %d >%s<\n", i, newargument->argv[i]);
   */
-  pstreamptr->ispipe = true;
-  pstreamptr->name = pipename;
-  pstreamptr->rthreadID = pthread_self();
-  pstreamptr->pipe = new pipe_t();
-  pstreamptr->pipe->name = std::string(pipename);
-  pstreamptr->argument = (void *) newargument;
+  ispipe = true;
+  name = pipename;
+  rthreadID = pthread_self();
+  pipe = new pipe_t();
+  pipe->name = std::string(pipename);
+  argument = newargument;
 
   if (!cdoSilentMode)
     {
@@ -375,7 +375,7 @@ pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
     }
   pCreateReadThread(newargument);
   /* Free(operatorName); */
-  processAddInputStream(pstreamptr);
+  processAddInputStream(this);
   /*      pipeInqInfo(pstreamID); */
   if (PSTREAM_Debug)
     Message("pipe %s", pipename);
@@ -586,7 +586,7 @@ pstreamOpenRead(const argument_t *argument)
   */
   if (ispipe)
     {
-      pstreamOpenReadPipe(argument, pstreamptr);
+      pstreamptr->pstreamOpenReadPipe(argument);
     }
   else
     {
