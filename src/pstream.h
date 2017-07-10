@@ -32,10 +32,10 @@ public:
   void defTimestep(int p_tsID);
   bool isPipe();
   void pstreamOpenReadPipe(const argument_t *argument);
-  // void pstreamOpenReadFile(const argument_t *argument);
+  void pstreamOpenReadFile(const argument_t *argument);
   int self;
   int mode;
-  int fileID;
+  int m_fileID;
   int m_vlistID;
   int tsID;
   int m_filetype;

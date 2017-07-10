@@ -184,7 +184,7 @@ pstream_init_entry(pstream_t *pstreamptr)
 
   pstreamptr->isopen = true;
   pstreamptr->ispipe = false;
-  pstreamptr->fileID = -1;
+  pstreamptr->m_fileID = -1;
   pstreamptr->m_vlistID = -1;
   pstreamptr->tsID = -1;
   pstreamptr->m_filetype = -1;
@@ -511,19 +511,19 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
     }
 }
 
-static void
-pstreamOpenReadFile(const argument_t *argument, pstream_t *pstreamptr)
+void
+pstream_t::pstreamOpenReadFile(const argument_t *argument)
 {
-  pstreamCreateFilelist(argument, pstreamptr);
+  pstreamCreateFilelist(argument, this);
 
   char *filename = NULL;
 
-  if (pstreamptr->mfiles)
+  if (mfiles)
     {
-      size_t len = strlen(pstreamptr->mfnames[0]);
+      size_t len = strlen(mfnames[0]);
       filename = (char *) Malloc(len + 1);
-      strcpy(filename, pstreamptr->mfnames[0]);
-      pstreamptr->nfiles = 1;
+      strcpy(filename, mfnames[0]);
+      nfiles = 1;
     }
   else
     {
@@ -544,7 +544,7 @@ pstreamOpenReadFile(const argument_t *argument, pstream_t *pstreamptr)
   int fileID = streamOpenRead(filename);
   if (fileID < 0)
     {
-      pstreamptr->isopen = false;
+      isopen = false;
       cdiOpenError(fileID, "Open failed on >%s<", filename);
     }
 
@@ -562,9 +562,9 @@ pstreamOpenReadFile(const argument_t *argument, pstream_t *pstreamptr)
     pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
 
-  pstreamptr->mode = 'r';
-  pstreamptr->name = filename;
-  pstreamptr->fileID = fileID;
+  mode = 'r';
+  name = filename;
+  m_fileID = fileID;
 }
 
 int
@@ -590,7 +590,7 @@ pstreamOpenRead(const argument_t *argument)
     }
   else
     {
-      pstreamOpenReadFile(argument, pstreamptr);
+      pstreamptr->pstreamOpenReadFile(argument);
     }
 
   if (pstreamID < 0)
@@ -783,7 +783,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
 
   pstreamptr->mode = 'w';
   pstreamptr->name = filename;
-  pstreamptr->fileID = fileID;
+  pstreamptr->m_fileID = fileID;
   pstreamptr->m_filetype = filetype;
 
   return pstreamID;
@@ -871,7 +871,7 @@ pstreamOpenAppend(const argument_t *argument)
 
       pstreamptr->mode = 'a';
       pstreamptr->name = filename;
-      pstreamptr->fileID = fileID;
+      pstreamptr->m_fileID = fileID;
     }
 
   return pstreamID;
@@ -967,18 +967,18 @@ pstreamClose(int pstreamID)
   else
     {
       if (PSTREAM_Debug)
-        Message("%s fileID %d", pstreamptr->name, pstreamptr->fileID);
+        Message("%s fileID %d", pstreamptr->name, pstreamptr->m_fileID);
 
       if (pstreamptr->mode == 'r')
         {
-          processAddNvals(streamNvals(pstreamptr->fileID));
+          processAddNvals(streamNvals(pstreamptr->m_fileID));
         }
 
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamClose(pstreamptr->fileID);
+      streamClose(pstreamptr->m_fileID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1041,7 +1041,7 @@ pstream_t::inqVlist()
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      vlistID = streamInqVlist(fileID);
+      vlistID = streamInqVlist(m_fileID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1196,7 +1196,7 @@ pstreamDefVlist(int pstreamID, int vlistID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamDefVlist(pstreamptr->fileID, vlistID);
+      streamDefVlist(pstreamptr->m_fileID, vlistID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1232,7 +1232,7 @@ pstreamInqRecord(int pstreamID, int *varID, int *levelID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamInqRecord(pstreamptr->fileID, varID, levelID);
+      streamInqRecord(pstreamptr->m_fileID, varID, levelID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1272,7 +1272,7 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamDefRecord(pstreamptr->fileID, varID, levelID);
+      streamDefRecord(pstreamptr->m_fileID, varID, levelID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1308,7 +1308,7 @@ pstreamReadRecord(int pstreamID, double *data, int *nmiss)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamReadRecord(pstreamptr->fileID, data, nmiss);
+      streamReadRecord(pstreamptr->m_fileID, data, nmiss);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1341,7 +1341,7 @@ pstreamReadRecordF(int pstreamID, float *data, int *nmiss)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamReadRecordF(pstreamptr->fileID, data, nmiss);
+      streamReadRecordF(pstreamptr->m_fileID, data, nmiss);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1459,7 +1459,7 @@ pstreamWriteRecord(int pstreamID, double *data, int nmiss)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamWriteRecord(pstreamptr->fileID, data, nmiss);
+      streamWriteRecord(pstreamptr->m_fileID, data, nmiss);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1503,7 +1503,7 @@ if ( pstreamptr->m_varlist )
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamWriteRecordF(pstreamptr->fileID, data, nmiss);
+      streamWriteRecordF(pstreamptr->m_fileID, data, nmiss);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1541,7 +1541,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      nrecs = streamInqTimestep(pstreamptr->fileID, tsID);
+      nrecs = streamInqTimestep(pstreamptr->m_fileID, tsID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1559,8 +1559,8 @@ pstreamInqTimestep(int pstreamID, int tsID)
 
           pstreamptr->tsID0 += tsID;
 
-          vlistIDold = vlistDuplicate(streamInqVlist(pstreamptr->fileID));
-          streamClose(pstreamptr->fileID);
+          vlistIDold = vlistDuplicate(streamInqVlist(pstreamptr->m_fileID));
+          streamClose(pstreamptr->m_fileID);
 
           len = strlen(pstreamptr->mfnames[nfile]);
           filename = (char *) Malloc(len + 1);
@@ -1597,7 +1597,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
           Free(pstreamptr->name);
 
           pstreamptr->name = filename;
-          pstreamptr->fileID = fileID;
+          pstreamptr->m_fileID = fileID;
 
           if (processNums() == 1 && ompNumThreads == 1)
             timer_start(timer_read);
@@ -1605,7 +1605,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
           if (cdoLockIO)
             pthread_mutex_lock(&streamMutex);
 #endif
-          nrecs = streamInqTimestep(pstreamptr->fileID, 0);
+          nrecs = streamInqTimestep(pstreamptr->m_fileID, 0);
 #if defined(HAVE_LIBPTHREAD)
           if (cdoLockIO)
             pthread_mutex_unlock(&streamMutex);
@@ -1665,7 +1665,7 @@ pstream_t::defTimestep(int p_tsID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamDefTimestep(fileID, p_tsID);
+      streamDefTimestep(m_fileID, p_tsID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1691,7 +1691,7 @@ pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
   if (cdoLockIO)
     pthread_mutex_lock(&streamMutex);
 #endif
-  streamCopyRecord(pstreamptr_dest->fileID, pstreamptr_src->fileID);
+  streamCopyRecord(pstreamptr_dest->m_fileID, pstreamptr_src->m_fileID);
 #if defined(HAVE_LIBPTHREAD)
   if (cdoLockIO)
     pthread_mutex_unlock(&streamMutex);
@@ -1732,11 +1732,11 @@ pstreamCloseAll(void)
       pstream_t *pstreamptr = _pstreamList[i].ptr;
       if (pstreamptr && pstreamptr->isopen)
         {
-          if (!pstreamptr->ispipe && pstreamptr->fileID != CDI_UNDEFID)
+          if (!pstreamptr->ispipe && pstreamptr->m_fileID != CDI_UNDEFID)
             {
               if (PSTREAM_Debug)
-                Message("Close file %s id %d", pstreamptr->name, pstreamptr->fileID);
-              streamClose(pstreamptr->fileID);
+                Message("Close file %s id %d", pstreamptr->name, pstreamptr->m_fileID);
+              streamClose(pstreamptr->m_fileID);
             }
         }
     }
@@ -1912,7 +1912,7 @@ pstreamInqFiletype(int pstreamID)
     filetype = pstreamptr->m_filetype;
   else
 #endif
-    filetype = streamInqFiletype(pstreamptr->fileID);
+    filetype = streamInqFiletype(pstreamptr->m_fileID);
 
   return filetype;
 }
@@ -1929,7 +1929,7 @@ pstreamInqByteorder(int pstreamID)
     byteorder = pstreamptr->m_filetype;
   else
 #endif
-    byteorder = streamInqByteorder(pstreamptr->fileID);
+    byteorder = streamInqByteorder(pstreamptr->m_fileID);
 
   return byteorder;
 }
@@ -1939,7 +1939,7 @@ pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-  streamInqGRIBinfo(pstreamptr->fileID, intnum, fltnum, bignum);
+  streamInqGRIBinfo(pstreamptr->m_fileID, intnum, fltnum, bignum);
 }
 
 int
@@ -1947,7 +1947,7 @@ pstreamFileID(int pstreamID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-  return pstreamptr->fileID;
+  return pstreamptr->m_fileID;
 }
 
 void
