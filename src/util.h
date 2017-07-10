@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "percentiles.h"
+#include "argument.h"
 
 /* dummy use of unused parameters to silence compiler warnings */
 #define  UNUSED(x) (void)x
@@ -112,20 +113,7 @@ extern char CDO_File_Suffix[32]; // refactor: added keyword extern
 extern const char *CDO_Version;
 
 
-typedef struct {
-  int process_id;
-  int    argc;
-  char **argv;
-  char  *args;
-  std::string operatorName;
-  char * operatorArguments;
-} argument_t;
 
-argument_t *file_argument_new(const char *filename);
-void        file_argument_free(argument_t *argument);
-argument_t *argument_new(size_t argc, size_t len);
-void        argument_free(argument_t *argument);
-void        argument_fill(argument_t *argument, int argc, char *argv[]);
 
 char *getProgname(char *string);
 char *GetOperator(const char *argument);
@@ -238,5 +226,4 @@ int wildcardmatch(const char *w, const char *s);
 
 void cdo_check_round(void);
 
-void print_argument(argument_t *argument);
 #endif  /* _UTIL_H */
