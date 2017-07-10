@@ -26,6 +26,7 @@
 class pstream_t {
     public:
 
+        pstream_t();
   int inqVlist();
   void defTimestep(int p_tsID);
   bool isPipe();

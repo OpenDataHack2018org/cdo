@@ -203,16 +203,9 @@ pstream_init_entry(pstream_t *pstreamptr)
 //  pstreamptr->wthreadID  = 0;
 #endif
 }
-
-static pstream_t *
-pstream_new_entry(void)
+pstream_t::pstream_t()
 {
-  pstream_t *pstreamptr = (pstream_t *) Malloc(sizeof(pstream_t));
-
-  if (pstreamptr)
-    pstream_init_entry(pstreamptr);
-
-  return pstreamptr;
+    pstream_init_entry(this);
 }
 
 static void
@@ -222,7 +215,7 @@ pstream_delete_entry(pstream_t *pstreamptr)
 
   PSTREAM_LOCK();
 
-  Free(pstreamptr);
+  delete(pstreamptr);
 
   _pstreamList[idx].next = _pstreamAvail;
   _pstreamList[idx].ptr = 0;
@@ -582,7 +575,7 @@ pstreamOpenRead(const argument_t *argument)
 {
   PSTREAM_INIT();
 
-  pstream_t *pstreamptr = pstream_new_entry();
+  pstream_t *pstreamptr = new pstream_t();
   if (!pstreamptr)
     Error("No memory");
 
@@ -733,7 +726,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
 {
   char *filename = (char *) Malloc(strlen(argument->args) + 1);
 
-  pstream_t *pstreamptr = pstream_new_entry();
+  pstream_t *pstreamptr = new pstream_t();
   if (!pstreamptr)
     Error("No memory");
 
@@ -830,14 +823,16 @@ pstreamOpenAppend(const argument_t *argument)
   if (ispipe)
     {
       if (PSTREAM_Debug)
+      {
         Message("pipe %s", argument->args);
       cdoAbort("this operator doesn't work with pipes!");
+      }
     }
   else
     {
       char *filename = (char *) Malloc(strlen(argument->args) + 1);
 
-      pstream_t *pstreamptr = pstream_new_entry();
+      pstream_t *pstreamptr = new pstream_t();
       if (!pstreamptr)
         Error("No memory");
 
