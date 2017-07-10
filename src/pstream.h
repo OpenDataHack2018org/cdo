@@ -20,6 +20,7 @@
 
 #include "pstream_write.h"
 #include "varlist.h"
+#include "argument.h"
 
 #include <sys/types.h> /* off_t */
 

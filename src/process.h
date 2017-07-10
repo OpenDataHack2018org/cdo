@@ -106,4 +106,6 @@ const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
 void print_process(int p_process_id);
+
+const argument_t *cdoStreamName(int cnt);
 #endif  /* _PROCESS_H */

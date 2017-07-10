@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "percentiles.h"
-#include "argument.h"
 
 /* dummy use of unused parameters to silence compiler warnings */
 #define  UNUSED(x) (void)x
@@ -121,7 +120,6 @@ const char *getOperatorName(const char *xoperator);
 char *getOperatorArg(const char *xoperator);
 const char *cdoComment(void);
 
-argument_t makeArgument(int argc, char *argv[]);
 char *getFileArg(char *argument);
 
 enum {START_DEC, START_JAN};
@@ -169,7 +167,6 @@ int     operatorArgc(void);
 char  **operatorArgv(void);
 void    operatorCheckArgc(int numargs);
 
-const argument_t *cdoStreamName(int cnt);
 
 void    cdoInitialize(void *argument);
 void    cdoFinish(void);
