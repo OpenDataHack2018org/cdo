@@ -23,9 +23,14 @@
 
 #include <sys/types.h> /* off_t */
 
-typedef struct {
+class pstream_t {
+    public:
 
-  int InqVlist();
+  int inqVlist();
+  void defTimestep(int p_tsID);
+  bool isPipe();
+  //void pstreamOpenReadPipe(const argument_t *argument);
+  //void pstreamOpenReadFile(const argument_t *argument);
   int            self;
   int            mode;
   int            fileID;
@@ -47,7 +52,7 @@ typedef struct {
   pthread_t     rthreadID; /* read  thread ID */
   pthread_t     wthreadID; /* write thread ID */
 #endif
-} pstream_t;
+};
 
 int     pstreamOpenRead(const argument_t *argument);
 int     pstreamOpenAppend(const argument_t *argument);

@@ -21,7 +21,6 @@
 #include "pipe.h"
 
 void  pstreamDebug(int debug);
-int   pstreamIsPipe(int streamID);
 pthread_t  pCreateReadThread(argument_t *argument);
 
 #endif  /* _PSTREAM_INT_H */

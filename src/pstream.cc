@@ -282,13 +282,10 @@ pstreamFindID(const char *name)
 
   return pstreamID;
 }
-
-int
-pstreamIsPipe(int pstreamID)
+bool
+pstream_t::isPipe()
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-
-  return pstreamptr->ispipe;
+  return ispipe;
 }
 
 static void
@@ -388,7 +385,7 @@ pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
     }
   pCreateReadThread(newargument);
   /* Free(operatorName); */
-  processAddInputStream(pstreamID);
+  processAddInputStream(pstreamptr);
   /*      pipeInqInfo(pstreamID); */
   if (PSTREAM_Debug)
     Message("pipe %s", pipename);
@@ -677,16 +674,20 @@ pstreamOpenWritePipe(const argument_t *argument, int filetype)
 
 #if defined(HAVE_LIBPTHREAD)
   if (PSTREAM_Debug)
-    Message("pipe %s", argument->args);
+  {
+      Message("pipe %s", argument->args);
+  }
   pstreamID = pstreamFindID(argument->args);
   if (pstreamID == -1)
+  {
     Error("%s is not open!", argument->args);
+  }
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
   pstreamptr->wthreadID = pthread_self();
   pstreamptr->m_filetype = filetype;
-  processAddOutputStream(pstreamID);
+  processAddOutputStream(pstreamptr);
 #endif
 
   return pstreamID;
@@ -1022,10 +1023,10 @@ int
 pstreamInqVlist(int pstreamID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-  return pstreamptr->InqVlist();
+  return pstreamptr->inqVlist();
 }
 
-int pstream_t::InqVlist(){
+int pstream_t::inqVlist(){
   int vlistID = -1;
 
 #if defined(HAVE_LIBPTHREAD)
@@ -1636,23 +1637,27 @@ void
 pstreamDefTimestep(int pstreamID, int tsID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->defTimestep(tsID);
+}
 
+void pstream_t::defTimestep(int p_tsID)
+{
 #if defined(HAVE_LIBPTHREAD)
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
       if (PSTREAM_Debug)
         {
-          Message("%s pstreamID %d", pstreamptr->pipe->name.c_str(), pstreamptr->self);
+          Message("%s pstreamID %d", pipe->name.c_str(), self);
         }
-      pstreamptr->pipe->pipeDefTimestep(pstreamptr->m_vlistID, tsID);
+      pipe->pipeDefTimestep(m_vlistID, p_tsID);
     }
   else
 #endif
     {
-      if (tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID)
+      if (p_tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID)
         {
           int taxisID, vlistID;
-          vlistID = pstreamptr->m_vlistID;
+          vlistID = m_vlistID;
           taxisID = vlistInqTaxis(vlistID);
           taxisDefType(taxisID, cdoDefaultTimeType);
         }
@@ -1660,12 +1665,12 @@ pstreamDefTimestep(int pstreamID, int tsID)
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_write);
 /* don't use sync -> very slow on GPFS */
-//  if ( tsID > 0 ) streamSync(pstreamptr->fileID);
+//  if ( p_tsID > 0 ) streamSync(fileID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamDefTimestep(pstreamptr->fileID, tsID);
+      streamDefTimestep(fileID, p_tsID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
