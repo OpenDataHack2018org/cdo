@@ -23,59 +23,59 @@
 
 #include <sys/types.h> /* off_t */
 
-class pstream_t {
-    public:
-
-        pstream_t();
+class pstream_t
+{
+public:
+  pstream_t();
   int inqVlist();
   void defTimestep(int p_tsID);
   bool isPipe();
-  //void pstreamOpenReadPipe(const argument_t *argument);
-  //void pstreamOpenReadFile(const argument_t *argument);
-  int            self;
-  int            mode;
-  int            fileID;
-  int            m_vlistID;
-  int            tsID;
-  int            m_filetype;
-  int            tsID0;
-  int            mfiles;
-  int            nfiles;
-  int            varID;           /* next varID defined with streamDefVar */
-  bool           ispipe;
-  bool           isopen;
-  char          *name;
-  char         **mfnames;
-  varlist_t     *m_varlist;
+  // void pstreamOpenReadPipe(const argument_t *argument);
+  // void pstreamOpenReadFile(const argument_t *argument);
+  int self;
+  int mode;
+  int fileID;
+  int m_vlistID;
+  int tsID;
+  int m_filetype;
+  int tsID0;
+  int mfiles;
+  int nfiles;
+  int varID; /* next varID defined with streamDefVar */
+  bool ispipe;
+  bool isopen;
+  char *name;
+  char **mfnames;
+  varlist_t *m_varlist;
 #if defined(HAVE_LIBPTHREAD)
-  void          *argument;
+  void *argument;
   struct pipe_t *pipe;
-  pthread_t     rthreadID; /* read  thread ID */
-  pthread_t     wthreadID; /* write thread ID */
+  pthread_t rthreadID; /* read  thread ID */
+  pthread_t wthreadID; /* write thread ID */
 #endif
 };
 
-int     pstreamOpenRead(const argument_t *argument);
-int     pstreamOpenAppend(const argument_t *argument);
-void    pstreamClose(int pstreamID);
+int pstreamOpenRead(const argument_t *argument);
+int pstreamOpenAppend(const argument_t *argument);
+void pstreamClose(int pstreamID);
 
-int     pstreamInqFiletype(int pstreamID);
-int     pstreamInqByteorder(int pstreamID);
+int pstreamInqFiletype(int pstreamID);
+int pstreamInqByteorder(int pstreamID);
 
-int     pstreamInqVlist(int pstreamID);
+int pstreamInqVlist(int pstreamID);
 
-int     pstreamInqTimestep(int pstreamID, int tsID);
+int pstreamInqTimestep(int pstreamID, int tsID);
 
-int     pstreamInqRecord(int pstreamID, int *varID, int *levelID);
+int pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
-void    pstreamReadRecord(int pstreamID, double *data, int *nmiss);
-void    pstreamReadRecordF(int pstreamID, float *data, int *nmiss);
-void    pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
+void pstreamReadRecord(int pstreamID, double *data, int *nmiss);
+void pstreamReadRecordF(int pstreamID, float *data, int *nmiss);
+void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
-void    pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
+void pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
 
-int     pstreamFileID(int pstreamID);
+int pstreamFileID(int pstreamID);
 
-void    cdoVlistCopyFlag(int vlistID2, int vlistID1);
+void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
-#endif  /* PSTREAM_H */
+#endif /* PSTREAM_H */

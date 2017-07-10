@@ -203,10 +203,7 @@ pstream_init_entry(pstream_t *pstreamptr)
 //  pstreamptr->wthreadID  = 0;
 #endif
 }
-pstream_t::pstream_t()
-{
-    pstream_init_entry(this);
-}
+pstream_t::pstream_t() { pstream_init_entry(this); }
 
 static void
 pstream_delete_entry(pstream_t *pstreamptr)
@@ -215,7 +212,7 @@ pstream_delete_entry(pstream_t *pstreamptr)
 
   PSTREAM_LOCK();
 
-  delete(pstreamptr);
+  delete (pstreamptr);
 
   _pstreamList[idx].next = _pstreamAvail;
   _pstreamList[idx].ptr = 0;
@@ -667,14 +664,14 @@ pstreamOpenWritePipe(const argument_t *argument, int filetype)
 
 #if defined(HAVE_LIBPTHREAD)
   if (PSTREAM_Debug)
-  {
+    {
       Message("pipe %s", argument->args);
-  }
+    }
   pstreamID = pstreamFindID(argument->args);
   if (pstreamID == -1)
-  {
-    Error("%s is not open!", argument->args);
-  }
+    {
+      Error("%s is not open!", argument->args);
+    }
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -823,10 +820,10 @@ pstreamOpenAppend(const argument_t *argument)
   if (ispipe)
     {
       if (PSTREAM_Debug)
-      {
-        Message("pipe %s", argument->args);
-      cdoAbort("this operator doesn't work with pipes!");
-      }
+        {
+          Message("pipe %s", argument->args);
+          cdoAbort("this operator doesn't work with pipes!");
+        }
     }
   else
     {
@@ -1021,7 +1018,9 @@ pstreamInqVlist(int pstreamID)
   return pstreamptr->inqVlist();
 }
 
-int pstream_t::inqVlist(){
+int
+pstream_t::inqVlist()
+{
   int vlistID = -1;
 
 #if defined(HAVE_LIBPTHREAD)
@@ -1635,7 +1634,8 @@ pstreamDefTimestep(int pstreamID, int tsID)
   pstreamptr->defTimestep(tsID);
 }
 
-void pstream_t::defTimestep(int p_tsID)
+void
+pstream_t::defTimestep(int p_tsID)
 {
 #if defined(HAVE_LIBPTHREAD)
   if (ispipe)
