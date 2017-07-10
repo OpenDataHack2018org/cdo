@@ -38,7 +38,7 @@
 #include "error.h"
 #include "modules.h"
 #include "util.h"
-#include "pstream_int.h"
+#include "pstream.h"
 #include "dmemory.h"
 #include "pthread.h"
 
@@ -164,7 +164,7 @@ off_t processInqNvals(int processID)
   return Process[processID].nvals;
 }
 
-void processAddOutputStream(int streamID)
+void processAddOutputStream(pstream_t *p_pstream_ptr)
 {
   int processID = processSelf();
 
@@ -173,20 +173,23 @@ void processAddOutputStream(int streamID)
   if ( sindex >= MAX_STREAM )
     Error("Limit of %d output streams per process reached (processID = %d)!", MAX_STREAM, processID);
 
-  Process[processID].outputStreams[sindex] = streamID;
+  Process[processID].outputStreams[sindex] = p_pstream_ptr->self;
 }
 
-void processAddInputStream(int streamID)
+void processAddInputStream(pstream_t *p_pstream_ptr)
 {
   int processID = processSelf();
 
-  if ( pstreamIsPipe(streamID) ) Process[processID].nchild++;
+  if (p_pstream_ptr->isPipe())
+  {
+      Process[processID].nchild++;
+  }
   int sindex = Process[processID].nInStream++;
 
   if ( sindex >= MAX_STREAM )
     Error("Limit of %d input streams per process reached (processID = %d)!", MAX_STREAM, processID);
 
-  Process[processID].inputStreams[sindex] = streamID;
+  Process[processID].inputStreams[sindex] = p_pstream_ptr->self;
 }
 
 

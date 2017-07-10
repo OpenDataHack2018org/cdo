@@ -20,6 +20,7 @@
 
 #include <sys/types.h> /* off_t */
 #include "util.h"
+#include "pstream.h"
 
 constexpr int MAX_PROCESS  =   128;
 constexpr int MAX_STREAM   =    64;
@@ -80,8 +81,8 @@ int  processInqInputStreamNum(void);
 int  processInqOutputStreamNum(void);
 int  processInqInputStreamID(int streamindex);
 int  processInqOutputStreamID(int streamindex);
-void processAddInputStream(int streamID);
-void processAddOutputStream(int streamID);
+void processAddInputStream(pstream_t *p_pstream_ptr);
+void processAddOutputStream(pstream_t *p_pstream_ptr);
 void processDelStream(int streamID);
 void processDefVarNum(int nvars);
 void processDefArgument(void *vargument);
