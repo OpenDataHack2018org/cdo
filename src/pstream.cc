@@ -332,7 +332,7 @@ void
 pstream_t::pstreamOpenReadPipe(const argument_t *argument)
 {
 #if defined(HAVE_LIBPTHREAD)
- // int pstreamID = pstreamptr->self;
+  // int pstreamID = pstreamptr->self;
 
   size_t pnlen = 16;
   char *pipename = (char *) Malloc(pnlen);
@@ -813,8 +813,6 @@ pstreamOpenWrite(const argument_t *argument, int filetype)
 int
 pstreamOpenAppend(const argument_t *argument)
 {
-  int pstreamID = -1;
-
   int ispipe = strncmp(argument->args, "(pipe", 5) == 0;
 
   if (ispipe)
@@ -822,59 +820,71 @@ pstreamOpenAppend(const argument_t *argument)
       if (PSTREAM_Debug)
         {
           Message("pipe %s", argument->args);
-          cdoAbort("this operator doesn't work with pipes!");
         }
+      cdoAbort("this operator doesn't work with pipes!");
+    }
+
+  pstream_t *pstreamptr = new pstream_t();
+
+  if (!pstreamptr)
+    Error("No memory");
+
+  if (PSTREAM_Debug)
+    Message("file %s", argument->args);
+
+  pstreamptr->openAppend(argument->args);
+
+  return pstreamptr->self;
+}
+void
+pstream_t::openAppend(const char *p_filename)
+{
+  if (processNums() == 1 && ompNumThreads == 1)
+    {
+      timer_start(timer_write);
+    }
+#if defined(HAVE_LIBPTHREAD)
+  if (cdoLockIO)
+    {
+      pthread_mutex_lock(&streamMutex);
     }
   else
     {
-      char *filename = (char *) Malloc(strlen(argument->args) + 1);
-
-      pstream_t *pstreamptr = new pstream_t();
-      if (!pstreamptr)
-        Error("No memory");
-
-      pstreamID = pstreamptr->self;
-
-      if (PSTREAM_Debug)
-        Message("file %s", argument->args);
-
-      if (processNums() == 1 && ompNumThreads == 1)
-        timer_start(timer_write);
-#if defined(HAVE_LIBPTHREAD)
-      if (cdoLockIO)
-        pthread_mutex_lock(&streamMutex);
-      else
-        pthread_mutex_lock(&streamOpenReadMutex);
-#endif
-
-      int fileID = streamOpenAppend(argument->args);
-
-#if defined(HAVE_LIBPTHREAD)
-      if (cdoLockIO)
-        pthread_mutex_unlock(&streamMutex);
-      else
-        pthread_mutex_unlock(&streamOpenReadMutex);
-#endif
-
-      if (processNums() == 1 && ompNumThreads == 1)
-        timer_stop(timer_write);
-      if (fileID < 0)
-        cdiOpenError(fileID, "Open failed on >%s<", argument->args);
-      /*
-      cdoInqHistory(fileID);
-      cdoDefHistory(fileID, commandLine());
-      */
-      int filetype = streamInqFiletype(fileID);
-      set_comp(fileID, filetype);
-
-      strcpy(filename, argument->args);
-
-      pstreamptr->mode = 'a';
-      pstreamptr->name = filename;
-      pstreamptr->m_fileID = fileID;
+      pthread_mutex_lock(&streamOpenReadMutex);
     }
+#endif
 
-  return pstreamID;
+  int fileID = streamOpenAppend(p_filename);
+
+#if defined(HAVE_LIBPTHREAD)
+  if (cdoLockIO)
+    {
+      pthread_mutex_unlock(&streamMutex);
+    }
+  else
+    {
+      pthread_mutex_unlock(&streamOpenReadMutex);
+    }
+#endif
+  if (processNums() == 1 && ompNumThreads == 1)
+    {
+      timer_stop(timer_write);
+    }
+  if (fileID < 0)
+    {
+      cdiOpenError(fileID, "Open failed on >%s<", p_filename);
+    }
+  /*
+  cdoInqHistory(fileID);
+  cdoDefHistory(fileID, commandLine());
+  */
+  int filetype = streamInqFiletype(fileID);
+  set_comp(fileID, filetype);
+
+  name = (char *) Malloc(strlen(p_filename) + 1);
+  strcpy(name, p_filename);
+  mode = 'a';
+  m_fileID = fileID;
 }
 
 void
@@ -1903,17 +1913,23 @@ cdoFinish(void)
 int
 pstreamInqFiletype(int pstreamID)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-
+  return pstream_to_pointer(pstreamID)->inqFileType();
+}
+int
+pstream_t::inqFileType()
+{
   int filetype;
 
 #if defined(HAVE_LIBPTHREAD)
-  if (pstreamptr->ispipe)
-    filetype = pstreamptr->m_filetype;
+  if (ispipe)
+    {
+      filetype = m_filetype;
+    }
   else
 #endif
-    filetype = streamInqFiletype(pstreamptr->m_fileID);
-
+    {
+      filetype = streamInqFiletype(m_fileID);
+    }
   return filetype;
 }
 

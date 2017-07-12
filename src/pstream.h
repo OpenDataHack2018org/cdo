@@ -29,10 +29,12 @@ class pstream_t
 public:
   pstream_t();
   int inqVlist();
+  int inqFileType();
   void defTimestep(int p_tsID);
   bool isPipe();
   void pstreamOpenReadPipe(const argument_t *argument);
   void pstreamOpenReadFile(const argument_t *argument);
+  void openAppend(const char * p_filename);
   int self;
   int mode;
   int m_fileID;
