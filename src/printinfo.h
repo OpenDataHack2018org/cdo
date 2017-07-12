@@ -251,16 +251,16 @@ void print_xyvals2D(int gridID, int dig)
             }
         }
 
-      fprintf(stdout, "%33s : %.*g to %.*g", xname, dig, xfirst, dig, xlast);
-      if ( IS_NOT_EQUAL(xinc, 0) )
-        fprintf(stdout, " by %.*g", dig, xinc);
+      fprintf(stdout, "%33s : %.*g", xname, dig, xfirst);
+      if ( gridsize > 1 ) fprintf(stdout, " to %.*g", dig, xlast);
+      if ( IS_NOT_EQUAL(xinc, 0) ) fprintf(stdout, " by %.*g", dig, xinc);
       fprintf(stdout, " %s", xunits);
       if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
       fprintf(stdout, "\n");
-      fprintf(stdout, "%33s : %.*g to %.*g", yname, dig, yfirst, dig, ylast);
-      if ( IS_NOT_EQUAL(yinc, 0) )
-        fprintf(stdout, " by %.*g", dig, yinc);
-      fprintf(stdout, " %s", xunits);
+      fprintf(stdout, "%33s : %.*g", yname, dig, yfirst);
+      if ( gridsize > 1 ) fprintf(stdout, " to %.*g", dig, ylast);
+      if ( IS_NOT_EQUAL(yinc, 0) ) fprintf(stdout, " by %.*g", dig, yinc);
+      fprintf(stdout, " %s", yunits);
       fprintf(stdout, "\n");
 
       free(xvals2D);
