@@ -7,6 +7,11 @@ Version 1.9.0 (15 September 2017):
      * Added range operator to all statistic modules (e.g. yearrange, zonrange)
    New operators:
      *
+   Fixed bugs:
+     * expr: improve ternary operator, no brackets needed anymore.
+     * expr: added support for clev in ternary operator.
+     * mergetime: wrong time information if first input file does not contain the first time step (bug introduce in 1.8.1) [Bug #7760]
+     * percentile: fix wrong result with method numpy (linear interpolation) and nist [Bug #7798]
 
 Version 1.8.2 (15 May 2017):
 
