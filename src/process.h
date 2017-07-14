@@ -19,6 +19,7 @@
 #define _PROCESS_H
 
 #include <sys/types.h> /* off_t */
+#include <vector>
 #include "util.h"
 #include "pstream.h"
 
@@ -57,7 +58,7 @@ typedef struct {
   short       nvars;
   int         ntimesteps;
   short       streamCnt;
-  argument_t *streamNames;
+  std::vector<argument_t> streamNames;
   char       *xoperator;
   const char *operatorName;
   char       *operatorArg;

@@ -579,7 +579,7 @@ int expand_wildcards(int processID, int streamCnt)
       Free(Process[processID].streamNames[0].argv);
       Free(Process[processID].streamNames[0].args);
 
-      Process[processID].streamNames = (argument_t*) Realloc(Process[processID].streamNames, streamCnt*sizeof(argument_t));
+      Process[processID].streamNames.resize(streamCnt);
           
       // move output streams to the end
       for ( i = 1; i < Process[processID].streamCnt; ++i )
@@ -687,7 +687,7 @@ void setStreams(int argc, char *argv[])
 
   Process[processID].streamCnt  = 0; /* filled in setStreamNames */
   if ( streamCnt )
-    Process[processID].streamNames = (argument_t*) Malloc(streamCnt*sizeof(argument_t));
+    Process[processID].streamNames = std::vector<argument_t>(streamCnt);
   for ( int i = 0; i < streamCnt; i++ )
     {
       Process[processID].streamNames[i].argc = 0;
@@ -1006,7 +1006,7 @@ void print_process(int p_process_id)
   std::cout << " nvars           : " << Process[p_process_id].nvars                        <<  std::endl;
   std::cout << " ntimesteps      : " << Process[p_process_id].ntimesteps                   <<  std::endl;
   std::cout << " streamCnt       : " << Process[p_process_id].streamCnt                    <<  std::endl;
-  std::cout << " streamNames     : " << Process[p_process_id].streamNames                  <<  std::endl;
+ // std::cout << " streamNames     : " << Process[p_process_id].streamNames                  <<  std::endl;
   std::cout << " xoperator       : " << Process[p_process_id].xoperator                    <<  std::endl;
   std::cout << " operatorName    : " << Process[p_process_id].operatorName                 <<  std::endl;
   std::cout << " operatorArg     : " << Process[p_process_id].operatorArg                  <<  std::endl;
