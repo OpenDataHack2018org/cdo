@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
 
+2017-07-14  Uwe Schulzweida
+
+	* settaxis: made time argument optional
+
 2017-07-13  Uwe Schulzweida
 
 	* percentile: fix wrong result with method numpy (linear interpolation) and nist [Bug #7798]

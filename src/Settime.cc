@@ -183,9 +183,9 @@ void *Settime(void *argument)
   int SETDATE     = cdoOperatorAdd("setdate",      0,  1, "date (format: YYYY-MM-DD)");
   int SETTIME     = cdoOperatorAdd("settime",      0,  1, "time (format: hh:mm:ss)");
   int SETTUNITS   = cdoOperatorAdd("settunits",    0,  1, "time units (seconds, minutes, hours, days, months, years)");
-  int SETTAXIS    = cdoOperatorAdd("settaxis",     0, -2, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
+  int SETTAXIS    = cdoOperatorAdd("settaxis",     0, -2, "date<,time<,increment>> (format YYYY-MM-DD,hh:mm:ss)");
   int SETTBOUNDS  = cdoOperatorAdd("settbounds",   0,  1, "frequency (day, month, year)");
-  int SETREFTIME  = cdoOperatorAdd("setreftime",   0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
+  int SETREFTIME  = cdoOperatorAdd("setreftime",   0, -2, "date<,time<,units>> (format YYYY-MM-DD,hh:mm:ss)");
   int SETCALENDAR = cdoOperatorAdd("setcalendar",  0,  1, "calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)");
   int SHIFTTIME   = cdoOperatorAdd("shifttime",    0,  1, "shift value");
   // clang-format on
@@ -199,7 +199,7 @@ void *Settime(void *argument)
 
   if ( operatorID == SETTAXIS || operatorID == SETREFTIME )
     {
-      if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
+      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
       if ( operatorArgc() > 3 ) cdoAbort("Too many arguments!");
 
       const char *datestr = operatorArgv()[0];
@@ -215,28 +215,32 @@ void *Settime(void *argument)
 	  sdate = parameter2int(datestr);
 	}
 
-      if ( strchr(timestr, ':') )
-	{
-	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
-	  stime = cdiEncodeTime(hour, minute, second);
-	}
-      else
-	{
-	  stime = parameter2int(timestr);
-	}
-
-      if ( operatorArgc() == 3 )
-	{
-	  const char *timeunits = operatorArgv()[2];
-          int ich = timeunits[0];
-          if ( ich == '-' || ich == '+' || isdigit(ich) )
+      if ( operatorArgc() > 1 )
+        {
+          if ( strchr(timestr, ':') )
             {
-              incperiod = (int)strtol(timeunits, NULL, 10);
-              if ( ich == '-' || ich == '+' ) timeunits++;
-              while ( isdigit((int) *timeunits) ) timeunits++;
+              sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
+              stime = cdiEncodeTime(hour, minute, second);
             }
-	  get_tunits(timeunits, &incperiod, &incunit, &tunit);
-	}
+          else
+            {
+              stime = parameter2int(timestr);
+            }
+
+          if ( operatorArgc() == 3 )
+            {
+              const char *timeunits = operatorArgv()[2];
+              int ich = timeunits[0];
+              if ( ich == '-' || ich == '+' || isdigit(ich) )
+                {
+                  incperiod = (int)strtol(timeunits, NULL, 10);
+                  if ( ich == '-' || ich == '+' ) timeunits++;
+                  while ( isdigit((int) *timeunits) ) timeunits++;
+                }
+              get_tunits(timeunits, &incperiod, &incunit, &tunit);
+            }
+        }
+
       /* increment in seconds */
       ijulinc = incperiod * incunit;
     }
