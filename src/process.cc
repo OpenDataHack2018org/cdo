@@ -580,7 +580,7 @@ int expand_wildcards(int processID, int streamCnt)
       Free(Process[processID].streamNames[0].args);
 
       Process[processID].streamNames.resize(streamCnt);
-          
+
       // move output streams to the end
       for ( i = 1; i < Process[processID].streamCnt; ++i )
         Process[processID].streamNames[i+glob_arg->argc-1] = Process[processID].streamNames[i];
@@ -592,7 +592,7 @@ int expand_wildcards(int processID, int streamCnt)
           Process[processID].streamNames[i].argv[0] = strdupx(glob_arg->argv[i]);
           Process[processID].streamNames[i].args    = strdupx(glob_arg->argv[i]);
         }
-      
+
       Process[processID].streamCnt = streamCnt;
     }
 
