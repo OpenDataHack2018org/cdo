@@ -38,7 +38,7 @@ void *Arith(void *argument)
   enum {FILL_NONE, FILL_TS, FILL_VAR, FILL_VARTS, FILL_FILE};
   int filltype = FILL_NONE;
   int nmiss;
-  int nrecs, nrecs2, nvars = 0;
+  int nrecs, nvars = 0;
   int nlevels2 = 1;
   int varID, levelID;
   int levelID2;
@@ -211,7 +211,7 @@ void *Arith(void *argument)
     {
       if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS )
 	{
-	  nrecs2 = pstreamInqTimestep(streamIDx2, tsID2);
+	  int nrecs2 = pstreamInqTimestep(streamIDx2, tsID2);
 	  if ( nrecs2 == 0 )
 	    {
 	      if ( filltype == FILL_NONE && streamIDx2 == streamID2 )
@@ -254,7 +254,7 @@ void *Arith(void *argument)
           
 	  if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS )
 	    {
-	      int lstatus = nlevels2 > 1 ? varID == 0 : recID == 0;
+	      bool lstatus = nlevels2 > 1 ? varID == 0 : recID == 0;
 
 	      if ( lstatus || (filltype != FILL_VAR && filltype != FILL_VARTS) )
 		{
@@ -293,9 +293,8 @@ void *Arith(void *argument)
 
 	  if ( filltype == FILL_VAR || filltype == FILL_VARTS )
 	    {
+	      levelID2 = (nlevels2 > 1) ? levelID : 0;
 	      int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
-	      levelID2 = 0;
-	      if ( nlevels2 > 1 ) levelID2 = levelID;
 	      int offset   = gridsize*levelID2;
 	      memcpy(fieldx2->ptr, vardata2+offset, gridsize*sizeof(double));
 	      fieldx2->nmiss   = varnmiss2[levelID2];
