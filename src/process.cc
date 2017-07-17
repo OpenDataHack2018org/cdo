@@ -573,7 +573,8 @@ int expand_wildcards(int processID, int streamCnt)
   // in case of one filename skip, no adaption needed
   if ( glob_arg->argc > 1 && glob_arg->argv[0][0] != '-' )
     {
-      int i;
+      if ( cdoVerbose ) cdoPrint("Replaced >%s< by", Process[processID].streamNames[0].args);
+
       streamCnt = streamCnt - 1 + glob_arg->argc;
 
       Free(Process[processID].streamNames[0].argv);
@@ -582,15 +583,16 @@ int expand_wildcards(int processID, int streamCnt)
       Process[processID].streamNames.resize(streamCnt);
 
       // move output streams to the end
-      for ( i = 1; i < Process[processID].streamCnt; ++i )
+      for ( int i = 1; i < Process[processID].streamCnt; ++i )
         Process[processID].streamNames[i+glob_arg->argc-1] = Process[processID].streamNames[i];
 
-      for ( i = 0; i < glob_arg->argc; ++i )
+      for ( int i = 0; i < glob_arg->argc; ++i )
         {
           Process[processID].streamNames[i].argv    = (char **) Malloc(sizeof(char *));
           Process[processID].streamNames[i].argc    = 1;
           Process[processID].streamNames[i].argv[0] = strdupx(glob_arg->argv[i]);
           Process[processID].streamNames[i].args    = strdupx(glob_arg->argv[i]);
+          if ( cdoVerbose ) cdoPrint("         >%s<", glob_arg->argv[i]);
         }
 
       Process[processID].streamCnt = streamCnt;
