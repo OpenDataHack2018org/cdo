@@ -21,6 +21,7 @@ for STAT in $STATS; do
   OFILE=ens${STAT}_res
 
   CDOTEST="ens$STAT"
+
   CDOCOMMAND="$CDO ens${STAT} $IFILES $OFILE"
 
   echo "Running test: $NTEST"
@@ -34,11 +35,12 @@ for STAT in $STATS; do
   test -s $CDOOUT && let RSTAT+=1
   cat $CDOOUT $CDOERR
 
+  rm -f $OFILE
+
   test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
   test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 
   let NTEST+=1
-  rm -f $OFILE
 done
 #
 rm -f $CDOOUT $CDOERR
