@@ -29,7 +29,7 @@ void file_argument_free(argument_t *argument)
           assert(argument->argc == 1);
           Free(argument->argv);
         }
-      delete(argument);
+      Free(argument);
     }
 }
 
