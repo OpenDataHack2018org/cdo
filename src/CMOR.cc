@@ -1595,7 +1595,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       kv_insert_a_val(kvl, "d", (char *)"y", 1);
     }
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   cmor_setup(kv_get_a_val(kvl, "inpath", "/usr/share/cmor/"),
              &netcdf_file_action,
@@ -1604,7 +1604,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
              kv_get_a_val(kvl, "logfile", NULL),
              &creat_subs);
 
-  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
+  int taxisID = vlistInqTaxis(vlistID);
 
 /*
   char *attcomment = kv_get_a_val(kvl, "comment", NULL);
