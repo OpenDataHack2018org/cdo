@@ -741,7 +741,6 @@ void *Remap(void *argument)
 {
   int streamID2 = -1;
   int nrecs;
-  int index;
   int varID, levelID;
   int gridsize, gridsize2;
   int gridID1 = -1, gridID2;
@@ -842,7 +841,7 @@ void *Remap(void *argument)
 
   int ngrids = vlistNgrids(vlistID1);
   bool remapgrids[ngrids];
-  index = set_remapgrids(filetype, vlistID1, ngrids, remapgrids);
+  int index = set_remapgrids(filetype, vlistID1, ngrids, remapgrids);
   gridID1 = vlistGrid(vlistID1, index);
 
   for ( index = 0; index < ngrids; index++ )
