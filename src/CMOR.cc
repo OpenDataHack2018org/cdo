@@ -7,7 +7,15 @@
 #include <unistd.h>
 #include "uthash.h"
 #include "util.h"
+
+#ifdef __cplusplus
+  extern "C" {
+#endif
 #include "cmor.h"
+#ifdef __cplusplus
+  }
+#endif
+
 #include "netcdf.h"
 #include "pmlist.h"
 
@@ -21,7 +29,7 @@ int stringToParam(const char *paramstr);
 list_t *pmlist_search_kvlist_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry);
 list_t *pmlist_get_kvlist_ventry(list_t *pml, int nentry, const char **entry);
 
-list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *miptab, char *key)
+list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *miptab, const char *key)
 {
   if ( pmlist && cmorname && miptab )
     {
@@ -311,7 +319,7 @@ void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int che
   char line[4096];
   char name[256];
   char *pline;
-  char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter", NULL};
+  const char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter", NULL};
   int linenumber = 0;
   int listtype = 0;
 
@@ -339,9 +347,9 @@ void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int che
           i++;
         }
       if ( listtype )
-        parse_line_to_list(list, pline, listkeys[i], checkpml, lowprior);
+        parse_line_to_list(list, pline, (char *)listkeys[i], checkpml, lowprior);
       else
-        parse_line_to_list(list, pline, "keyvals", checkpml, lowprior);
+        parse_line_to_list(list, pline, (char *)"keyvals", checkpml, lowprior);
     }
 }
 
@@ -364,12 +372,15 @@ static void kv_insert_a_val(list_t *kvl, const char *key, char *value, int repla
     }
 }
 
-static char *kv_get_a_val(list_t *kvl, const char *key, char *replacer)
+static char *kv_get_a_val(list_t *kvl, const char *key, const char *replacer)
 {
   keyValues_t *kv = kvlist_search(kvl, key);
   if ( kv )
     return kv->values[0];
-  return replacer;
+  if ( replacer )
+    return (char *)replacer;
+  else
+    return NULL;
 }
 
 static char **kv_get_vals(list_t *kvl, const char *key, int *numvals)
@@ -440,7 +451,7 @@ static void get_ifilevalue(char *ifilevalue, const char *key, int vlistID, int v
     }
 }
 
-static int getVarIDToMap(int vlistID, int nvars, char *key, char *value)
+static int getVarIDToMap(int vlistID, int nvars, const char *key, const char *value)
 {
   for ( int varID = 0; varID < nvars; varID++ )
     {
@@ -453,10 +464,10 @@ static int getVarIDToMap(int vlistID, int nvars, char *key, char *value)
 }
 
 
-static char *check_short_key(char *key)
+static const char *check_short_key(char *key)
 {
-  char *short_keys[]={"cn", "n", "c", "u", "cm", "vc", "p", "szc", "i", "ca", "gi", "rtu", "mt", "om", "ms", "dr", "d", "lc", "dj", NULL};
-  char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "output_mode", "max_size", "drs_root", "drs", "last_chunk", "dataset_json", NULL};
+  const char *short_keys[]={"cn", "n", "c", "u", "cm", "vc", "p", "szc", "i", "ca", "gi", "rtu", "mt", "om", "ms", "dr", "d", "lc", "dj", NULL};
+  const char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "output_mode", "max_size", "drs_root", "drs", "last_chunk", "dataset_json", NULL};
 
   for ( int i = 0; short_keys[i]; i++ )
     if ( strcmp(key, short_keys[i]) == 0 || strcmp(key, long_keys[i]) == 0 )
@@ -489,7 +500,7 @@ static void map_it(list_t *kvl, int vlistID, int varID)
   for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
     {
       keyValues_t *kv = *(keyValues_t **)kvnode->data;
-      const char *key = ( check_short_key((char *)kv->key ) ) ? (const char *) check_short_key((char *)kv->key) : NULL;
+      const char *key = ( check_short_key((char *)kv->key ) ) ? check_short_key((char *)kv->key) : NULL;
       if ( !key )
         {
           cdoWarning("Don't know what to do with mapping table keyword: '%s'\n", kv->key);
@@ -586,7 +597,7 @@ static int maptab_via_key(list_t *pml, int vlistID, int varID, int nventry, cons
 
   if ( ifilevalue[0] )
     {
-      list_t *kvl = maptab_search_miptab(pml, ifilevalue, miptabfreq, (char *)key);
+      list_t *kvl = maptab_search_miptab(pml, ifilevalue, miptabfreq, key);
       if ( kvl )
         {
           printf("Started mapping of variable via '%s'.\n", key);
@@ -603,7 +614,7 @@ static int maptab_via_key(list_t *pml, int vlistID, int varID, int nventry, cons
     }
 }
 
-static int maptab_via_cn_and_key(list_t *kvl_oname, int vlistID, int nvars, char *key)
+static int maptab_via_cn_and_key(list_t *kvl_oname, int vlistID, int nvars, const char *key)
 {
   keyValues_t *kv = kvlist_search(kvl_oname, key);
   if ( kv )
@@ -622,7 +633,7 @@ static int maptab_via_cn_and_key(list_t *kvl_oname, int vlistID, int nvars, char
   return 0;
 }
 
-static void maptab_via_cmd(list_t *pml, char *origValue, int vlistID, int nvars, char *key, char *cmorName, char *miptabfreq)
+static void maptab_via_cmd(list_t *pml, const char *origValue, int vlistID, int nvars, const char *key, char *cmorName, char *miptabfreq)
 {
   int varIDToMap = getVarIDToMap(vlistID, nvars, key, origValue);
   if ( varIDToMap == CDI_UNDEFID )
@@ -743,7 +754,7 @@ static int count_axis_ids(int *axis_ids)
   return i;
 }
 
-static void addcharvar(keyValues_t *charvars, int vlistID, char *key, struct mapping vars[])
+static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, struct mapping vars[])
 {
   if ( cdoVerbose )
     printf("*******Start to merge variables to one character coordinate.*******\n");
@@ -776,7 +787,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, char *key, struct map
   int axissize[3];
   double *xvals, *yvals, *zvals, *subsvals;
 
-  subsvals = Malloc(charvars->nvalues * sizeof(double));
+  subsvals = (double *) Malloc(charvars->nvalues * sizeof(double));
   for ( int i = 0; i < charvars->nvalues; i++ )
     subsvals[i] = i+1;
 
@@ -806,25 +817,25 @@ static void addcharvar(keyValues_t *charvars, int vlistID, char *key, struct map
   if ( axissize[0] == 1 )
     {
       xvals = subsvals;
-      yvals = Malloc(axissize[1] * sizeof(double));
-      zvals = Malloc(axissize[2] * sizeof(double));
+      yvals = (double *) Malloc(axissize[1] * sizeof(double));
+      zvals = (double *) Malloc(axissize[2] * sizeof(double));
       gridInqYvals(gridID, yvals);
       zaxisInqLevels(zaxisID, zvals); 
       axissize[0] = charvars->nvalues;
     }
   else if ( axissize[1] == 1 )
     {
-      xvals = Malloc(axissize[0] * sizeof(double));
+      xvals = (double *) Malloc(axissize[0] * sizeof(double));
       yvals = subsvals;
-      zvals = Malloc(axissize[2] * sizeof(double));
+      zvals = (double *) Malloc(axissize[2] * sizeof(double));
       gridInqXvals(gridID, xvals);
       zaxisInqLevels(zaxisID, zvals); 
       axissize[1] = charvars->nvalues;
     }
   else if ( axissize[2] == 1 )
     {
-      xvals = Malloc(axissize[0] * sizeof(double));
-      yvals = Malloc(axissize[1] * sizeof(double));
+      xvals = (double *) Malloc(axissize[0] * sizeof(double));
+      yvals = (double *) Malloc(axissize[1] * sizeof(double));
       zvals = subsvals;
       gridInqXvals(gridID, xvals);
       gridInqYvals(gridID, yvals);
@@ -950,7 +961,7 @@ static int parse_kv_file(list_t *kvl, const char *filename)
   return 1;
 }
 
-static void check_compare_set(char **finalset, char *attribute, char *attname, const char *defaultstr)
+static void check_compare_set(char **finalset, char *attribute, const char *attname, const char *defaultstr)
 {
   if ( !(*finalset) )
     {
@@ -1077,7 +1088,7 @@ static int check_attr(list_t *kvl, char *project_id)
 static int check_mem(list_t *kvl, char *project_id)
 {
   char *kv_member = kv_get_a_val(kvl, "member", "");
-  char *ripchar[] = {"realization", "initialization_method", "physics_version"};
+  const char *ripchar[] = {"realization", "initialization_method", "physics_version", NULL};
   char crealiz[strlen(kv_member)];
   char *cinitial, *cphysics;
   char workchar[CMOR_MAX_STRING]; 
@@ -1102,14 +1113,14 @@ static int check_mem(list_t *kvl, char *project_id)
     {
       char *ripvaluechar[] = {crealiz, cinitial, cphysics};
       for ( int i = 0; i < 3; i++ )
-        kv_insert_a_val(kvl, (const char *)ripchar[i], ripvaluechar[i], 1);
+        kv_insert_a_val(kvl, ripchar[i], ripvaluechar[i], 1);
       return 1;
     }
   else if ( strcmp(kv_member, "notSet") == 0 )
     {
       cdoWarning("The member has no RIP format! We set \n Attribute realization=-1 \n Attribute initialization_method=-1 \n Attribute physics_version=-1 \n");
       for ( int i = 0; i < 3; i++ )   
-        kv_insert_a_val(kvl, (const char *)ripchar[i], "-1", 1);
+        kv_insert_a_val(kvl, ripchar[i], (char *)"-1", 1);
     }
 /* Now abort or warn */ 
   if (strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CORDEX") == 0)
@@ -1185,7 +1196,7 @@ static void dump_special_attributes(list_t *kvl, int streamID)
 
   if ( historysize )
     {
-      char *history = Malloc(historysize + 1);
+      char *history = (char *)Malloc(historysize + 1);
       memset(history, 0, historysize + 1);
       if ( old_historysize )
         {
@@ -1228,7 +1239,7 @@ static void read_config_files(list_t *kvl)
   char cwd[1024];
   getcwd(cwd, sizeof(cwd));
   const char *dotconfig = ".cdocmorinfo";
-  char *workfile = Malloc(strlen(cwd) + strlen(dotconfig) + 2);
+  char *workfile = (char *)Malloc(strlen(cwd) + strlen(dotconfig) + 2);
   sprintf(workfile, "%s/%s", cwd, dotconfig);
   if ( cdoVerbose )
     printf("Try to parse default file: '%s'\n", workfile);
@@ -1325,7 +1336,7 @@ static int get_cmor_exit_control(list_t *kvl)
 
 static char *get_calendar_ptr(int calendar)
 {
-  char *calendar_ptr = Malloc(CMOR_MAX_STRING * sizeof(char));
+  char *calendar_ptr = (char *)Malloc(CMOR_MAX_STRING * sizeof(char));
   switch ( calendar )
     {
     case CALENDAR_STANDARD:
@@ -1365,7 +1376,7 @@ static int get_calendar_int(char *calendar)
     }
 }
 
-static char *get_txtatt(int vlistID, int varID, char *key)
+static char *get_txtatt(int vlistID, int varID, const char *key)
 {
   int natts;
   cdiInqNatts(vlistID, varID, &natts);
@@ -1378,7 +1389,7 @@ static char *get_txtatt(int vlistID, int varID, char *key)
       cdiInqAtt(vlistID, varID, i, name, &type, &len);
       if ( strcmp(name, key) == 0 )
         {
-          txtatt = Malloc(CMOR_MAX_STRING * sizeof(char));
+          txtatt = (char *)Malloc(CMOR_MAX_STRING * sizeof(char));
           cdiInqAttTxt(vlistID, varID, name, len, txtatt);
           txtatt[len] = '\0';
           return txtatt;
@@ -1393,7 +1404,7 @@ static char *get_txtatt(int vlistID, int varID, char *key)
 
 static char *get_time_units(int taxisID)
 {
-  char *units = Malloc ( CMOR_MAX_STRING * sizeof(char) );
+  char *units = (char *)Malloc ( CMOR_MAX_STRING * sizeof(char) );
   int timeunit = taxisInqTunit(taxisID);
   int year, month, day, hour, minute, second;
   cdiDecodeDate(taxisInqRdate(taxisID), &year, &month, &day);
@@ -1491,7 +1502,7 @@ static double *get_branch_times(list_t *kvl, int calendar, char *time_units)
 {
   if ( cdoVerbose )
     printf("*******Start to compute attribute 'branch_time'.******\n");
-  double *branch_time = Malloc(2 * sizeof(double));
+  double *branch_time = (double *)Malloc(2 * sizeof(double));
   branch_time[0] = 0.0;
   branch_time[1] = 0.0;
 
@@ -1583,7 +1594,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
   else if ( drs[0] != 'y' )
     {
       cdoWarning("Unknown value for keyword 'drs' is found: '%s'.\nAllowed are: 'n' or 'y'. DRS is set to 'y'.", drs);
-      kv_insert_a_val(kvl, "d", "y", 1);
+      kv_insert_a_val(kvl, "d", (char *)"y", 1);
     }
 
   int vlistID = streamInqVlist(streamID);
@@ -1635,14 +1646,14 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
                &(branch_times[0]),
                kv_get_a_val(kvl, "parent_experiment_rip", ""));
     }
-  char *allneeded2[] = {"cordex_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id", NULL};
+  const char *allneeded2[] = {"cordex_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id", NULL};
   int ind = 0;
   if ( strcmp(kv_get_a_val(kvl, "project_id", NULL),"CORDEX") == 0 )
     while ( allneeded2[ind] )
       {
         char *tmp = kv_get_a_val(kvl, allneeded2[ind], NULL );
         if ( tmp )
-          cmor_set_cur_dataset_attribute(allneeded2[ind], tmp, 1);
+          cmor_set_cur_dataset_attribute((char *)allneeded2[ind], tmp, 1);
         ind++;
       }
 #elif ( CMOR_VERSION_MAJOR == 3 )
@@ -1678,7 +1689,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       else
         cmor_dataset_json(dataset_path);
 
-      char *allneeded[] = /*CMIP5*/{"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip", 
+      const char *allneeded[] = /*CMIP5*/{"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip", 
 /*CORDEX */
   "CORDEX_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id",
 /* CMIP6: */
@@ -1702,7 +1713,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
                   fputs((const char *) line, dataset_json);
                 }
               else
-                cmor_set_cur_dataset_attribute(allneeded[i], tmp, 1);
+                cmor_set_cur_dataset_attribute((char *)allneeded[i], tmp, 1);
             }
           i++;
         }
@@ -1767,10 +1778,10 @@ static void gen_bounds(int n, double *vals, double *bounds)
 static void get_zcell_bounds(int zaxisID, double *zcell_bounds, double *levels, int zsize)
 {
   double *lbounds;
-  lbounds = Malloc(zsize * sizeof(double));
+  lbounds = (double *)Malloc(zsize * sizeof(double));
   zaxisInqLbounds(zaxisID, lbounds);
   double *ubounds;
-  ubounds = Malloc(zsize * sizeof(double));
+  ubounds = (double *)Malloc(zsize * sizeof(double));
   zaxisInqUbounds(zaxisID, ubounds);
   if ( !lbounds || !ubounds || pow((ubounds[1] - ubounds[0]),2) < 0.001 || pow((lbounds[1] - lbounds[0]), 2) < 0.001 )
     gen_bounds(zsize, levels, zcell_bounds);
@@ -1798,7 +1809,7 @@ static void get_zhybrid(int zaxisID, double *p0, double *alev_val, double *alev_
 {
   int zsize = zaxisInqSize(zaxisID);
   int vctsize = zaxisInqVctSize(zaxisID);
-  double *vct = Malloc(vctsize * sizeof(double) );
+  double *vct = (double *)Malloc(vctsize * sizeof(double) );
   zaxisInqVct(zaxisID, vct);
   for ( int i = 0; i<(zsize+1); i++)
     {
@@ -1839,7 +1850,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
       if ( zsize )
         cdoWarning("You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis attributes are ignored and the '%d' levels are interpreted as the character coordinates in the order they are given for '%s'.", chardim, zsize, zsize, varname);
       int numchar = 0;
-      char *charvalstring = Malloc(CMOR_MAX_STRING * sizeof(char));
+      char *charvalstring = (char *)Malloc(CMOR_MAX_STRING * sizeof(char));
       sprintf(charvalstring, "char_axis_%s", chardim);
       char **charvals = kv_get_vals(kvl, charvalstring, &numchar);
       Free(charvalstring);
@@ -1858,7 +1869,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
               sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[i]), blanks);         
             }
           if ( numchar == zsize )
-            cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
+            cmor_axis(new_axis_id(axis_ids), chardim, (char *)"", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
           else
             cdoAbort("The number of registered character coordinates '%d' differ from the number of axis levels '%d'.", numchar, zsize);
           Free(charcmor);
@@ -1870,17 +1881,17 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
   {
   if ( zsize > 1)
     {
-      levels = Malloc(zsize * sizeof(double));
+      levels = (double *)Malloc(zsize * sizeof(double));
       zaxisInqLevels(zaxisID, levels);
       double *zcell_bounds;
-      zcell_bounds = Malloc( 2*zsize * sizeof(double) );
+      zcell_bounds = (double *)Malloc( 2*zsize * sizeof(double) );
       get_zcell_bounds(zaxisID, zcell_bounds, levels, zsize);
       if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
         {
           if ( strcmp(project_id, "CMIP5") != 0 && strcmp(project_id, "CMIP6") != 0 )
             cmor_axis(new_axis_id(axis_ids),
-                        "plevs",
-                        "Pa",
+                        (char *) "plevs",
+                        (char *) "Pa",
                         zsize,
                         (void *)levels,
                         'd', NULL, 0, NULL);
@@ -1889,26 +1900,26 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
               switch ( miptab_freq )
                 {
                 case 3: cmor_axis(new_axis_id(axis_ids),
-                        "plev7",
-                        "Pa",
+                        (char *) "plev7",
+                        (char *) "Pa",
                         zsize,
                         (void *)levels,
                         'd', NULL, 0, NULL); break;
                 case 4: cmor_axis(new_axis_id(axis_ids),
-                        "plev8",
-                        "Pa",
+                        (char *) "plev8",
+                        (char *) "Pa",
                         zsize,
                         (void *)levels,
                         'd', NULL, 0, NULL); break;
                 case 5: cmor_axis(new_axis_id(axis_ids),
-                        "plev3",
-                        "Pa",
+                        (char *) "plev3",
+                        (char *) "Pa",
                         zsize,
                         (void *)levels,
                         'd', NULL, 0, NULL); break;
                 default: cmor_axis(new_axis_id(axis_ids),
-                        "plevs",
-                        "Pa",
+                        (char *) "plevs",
+                        (char *) "Pa",
                         zsize,
                         (void *)levels,
                         'd', NULL, 0, NULL); break;
@@ -1917,13 +1928,13 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
         }
       else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
         {
-          double *alev_val = Malloc(zsize * sizeof(double));
-          double *alev_bnds = Malloc((zsize + 1) * sizeof(double));
-          double *ap_val = Malloc(zsize * sizeof(double));
-          double *ap_bnds = Malloc((zsize + 1) * sizeof(double));
-          double *b_val = Malloc(zsize * sizeof(double));
-          double *b_bnds = Malloc((zsize + 1) * sizeof(double));
-          double *p0 = Malloc(sizeof(double));
+          double *alev_val = (double *) Malloc(zsize * sizeof(double));
+          double *alev_bnds = (double *) Malloc((zsize + 1) * sizeof(double));
+          double *ap_val = (double *) Malloc(zsize * sizeof(double));
+          double *ap_bnds = (double *) Malloc((zsize + 1) * sizeof(double));
+          double *b_val = (double *) Malloc(zsize * sizeof(double));
+          double *b_bnds = (double *) Malloc((zsize + 1) * sizeof(double));
+          double *p0 = (double *) Malloc(sizeof(double));
           p0[0] = 101325.0;
 
           char *mtproof = kv_get_a_val(kvl, "mtproof", NULL);
@@ -1936,8 +1947,8 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
                 cdoWarning("Mapping table: '%s' could not be parsed. Infile variable name needs to be 'ps'.", mtproof);
               else
                 {
-                  char *tempo[] = {"ps"};
-                  maptab_via_cn(pml, tempo, vlistID, vlistNvars(vlistID), 1, kv_get_a_val(kvl, "miptab_freq", NULL)); 
+                  const char *tempo[] = {"ps"};
+                  maptab_via_cn(pml, (char **) tempo, vlistID, vlistNvars(vlistID), 1, kv_get_a_val(kvl, "miptab_freq", NULL)); 
                   if ( cdoVerbose )
                     printf("*******Succesfully applied mapping table: '%s' for ps.*******\n", mtproof);
                   list_destroy(pml);
@@ -1955,18 +1966,18 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           get_zhybrid(zaxisID, p0, alev_val, alev_bnds, b_val, b_bnds, ap_val, ap_bnds);
 /*cmor_zfactor (int *zfactor_id,int zaxis_id, char *zfactor_name, char *units, int ndims, int axis_ids[], char type, void *zfactor_values, void *zfactor_bounds)*/
           cmor_axis(new_axis_id(axis_ids),
-                        "alternate_hybrid_sigma",
-                        "",
+                        (char *) "alternate_hybrid_sigma",
+                        (char *) "",
                         zsize,
                         (void *)alev_val,
                         'd', alev_bnds,  1, NULL);
           int lev_id = axis_ids[count_axis_ids(axis_ids)-1];
           int lev_id_array[2];
           lev_id_array[0] = lev_id;
-          cmor_zfactor(zfactor_id, lev_id, "p0", "Pa", 0, 0, 'd', (void *)p0, NULL);
-          cmor_zfactor(zfactor_id, lev_id, "b", "", 1, &lev_id_array[0], 'd', (void *)b_val, (void *)b_bnds);
-          cmor_zfactor(zfactor_id, lev_id, "ap", "Pa", 1, &lev_id_array[0], 'd', (void *)ap_val, (void *)ap_bnds);
-          cmor_zfactor(zfactor_id, lev_id, "ps", "Pa", count_axis_ids(axis_ids)-1, axis_ids, 'd', NULL, NULL);  
+          cmor_zfactor(zfactor_id, lev_id, (char *)"p0", (char *)"Pa", 0, 0, 'd', (void *)p0, NULL);
+          cmor_zfactor(zfactor_id, lev_id, (char *)"b",  (char *)"", 1, &lev_id_array[0], 'd', (void *)b_val, (void *)b_bnds);
+          cmor_zfactor(zfactor_id, lev_id, (char *)"ap", (char *)"Pa", 1, &lev_id_array[0], 'd', (void *)ap_val, (void *)ap_bnds);
+          cmor_zfactor(zfactor_id, lev_id, (char *)"ps", (char *)"Pa", count_axis_ids(axis_ids)-1, axis_ids, 'd', NULL, NULL);  
           Free(alev_val);  
           Free(alev_bnds);  
           Free(ap_val);  
@@ -1978,8 +1989,8 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
         {
           zcell_bounds[0] = (double) 0;
           cmor_axis(new_axis_id(axis_ids),
-                        "depth_coord",
-                        "m",
+                        (char *) "depth_coord",
+                        (char *) "m",
                         zsize,
                         (void *)levels,
                         'd', zcell_bounds,  2, NULL);
@@ -1988,19 +1999,19 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
         {
           zcell_bounds[0] = (double) 0;
           cmor_axis(new_axis_id(axis_ids),
-                        "sdepth",
-                        "cm",
+                        (char *) "sdepth",
+                        (char *) "cm",
                         zsize,
                         (void *)levels,
                         'd', zcell_bounds, 2, NULL);
         }
       else if ( zaxisInqType(zaxisID) == ZAXIS_GENERIC || zaxisInqType(zaxisID) == ZAXIS_HEIGHT)
         {
-          char *zaxisname = Malloc(CDI_MAX_NAME * sizeof(char));
+          char *zaxisname = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
           zaxisInqName(zaxisID, zaxisname);
           if ( strcmp(zaxisname, "rho") == 0 )
             {
-              char *zaxisunits = Malloc(CDI_MAX_NAME * sizeof(char));
+              char *zaxisunits = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
               zaxisInqUnits(zaxisID, zaxisunits);
               if ( strcmp(zaxisunits, "kg m-3") != 0 )
                 {
@@ -2008,14 +2019,14 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
                 }
               else
                 {
-                  levels = Malloc(zsize * sizeof(double));
+                  levels = (double *) Malloc(zsize * sizeof(double));
                   zaxisInqLevels(zaxisID, levels);
                   double *zcell_bounds;
-                  zcell_bounds = Malloc( 2*zsize * sizeof(double) );
+                  zcell_bounds = (double *) Malloc( 2*zsize * sizeof(double) );
                   get_zcell_bounds(zaxisID, zcell_bounds, levels, zsize);
                   cmor_axis(new_axis_id(axis_ids),
-                      "rho",
-                      "kg m-3",
+                      (char *) "rho",
+                      (char *) "kg m-3",
                       zsize,
                       (void *) levels,
                       'd', zcell_bounds, 2, NULL);
@@ -2038,13 +2049,13 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
       strtok_r(szc_name, "_", &szc_value);
       if ( !szc_value || !szc_value[0] )
         cdoAbort("Could not find an underscore '_' in szc value '%s' to seperate axis name from axis value", szc_name);
-      levels = Malloc(sizeof(double));
+      levels = (double *)Malloc(sizeof(double));
       levels[0] = (double) atof(szc_value);
       if ( cdoVerbose )
         printf("Attribute szc is found.\nScalar z coordinate name is: '%s'\nScalar z coordinate value is: '%f'\n", szc_name, levels[0]);
       cmor_axis(new_axis_id(axis_ids),
                       szc_name,
-                      "m",
+                      (char *) "m",
                       zsize,
                       (void *) levels,
                       'd', NULL, 0, NULL);
@@ -2469,15 +2480,15 @@ static void select_and_register_character_dimension(char *grid_file, int *axis_i
 */
 static void register_lon_axis(int gridID, int xlength, int *axis_ids)
 {
-  double *xcoord_vals = Malloc(xlength * sizeof(double));
+  double *xcoord_vals = (double *) Malloc(xlength * sizeof(double));
   if ( gridInqXvals(gridID, xcoord_vals) == 0 )
     Free(xcoord_vals);
   else
     {
-      double *xcell_bounds = Malloc(2 * xlength * sizeof(double));
+      double *xcell_bounds = (double *) Malloc(2 * xlength * sizeof(double));
       int xnbounds = gridInqXbounds(gridID, xcell_bounds);
       check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
-      cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd',    (void *)xcell_bounds,    2,    NULL);
+      cmor_axis(new_axis_id(axis_ids),    (char *) "longitude",    (char *) "degrees_east",    xlength,    (void *)xcoord_vals,    'd',    (void *)xcell_bounds,    2,    NULL);
       if ( xcell_bounds ) Free(xcell_bounds);
       if ( xcoord_vals ) Free(xcoord_vals);
     }
@@ -2485,15 +2496,15 @@ static void register_lon_axis(int gridID, int xlength, int *axis_ids)
 
 static void register_lat_axis(int gridID, int ylength, int *axis_ids)
 {
-  double *ycoord_vals = Malloc(ylength * sizeof(double));
+  double *ycoord_vals = (double *) Malloc(ylength * sizeof(double));
   if ( gridInqYvals(gridID, ycoord_vals) == 0 )
     Free(ycoord_vals);
   else
     {
-      double *ycell_bounds = Malloc(2 * ylength * sizeof(double));
+      double *ycell_bounds = (double *) Malloc(2 * ylength * sizeof(double));
       int ynbounds = gridInqYbounds(gridID, ycell_bounds);
       check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
-      cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
+      cmor_axis(new_axis_id(axis_ids),    (char *) "latitude",    (char *) "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
       if ( ycell_bounds ) Free(ycell_bounds);
       if ( ycoord_vals ) Free(ycoord_vals);  
     }
@@ -2513,7 +2524,7 @@ static void register_char_axis(int numchar, char **charvals, int *axis_ids, char
       sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
       sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[i]), blanks);   
     }
-  cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
+  cmor_axis(new_axis_id(axis_ids), chardim, (char *) "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
   Free(charcmor);
 }
 
@@ -2523,10 +2534,10 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
               int pynbounds;
               int pylength = gridInqYsize(projID);
               int pxlength = gridInqXsize(projID);
-              double *pxcoord_vals = Malloc(pxlength * sizeof(double));
-              double *pycoord_vals = Malloc(pylength * sizeof(double));
-              double *pxcell_bounds = Malloc(2 * pxlength * sizeof(double));
-              double *pycell_bounds = Malloc(2 * pylength * sizeof(double));
+              double *pxcoord_vals = (double *) Malloc(pxlength * sizeof(double));
+              double *pycoord_vals = (double *) Malloc(pylength * sizeof(double));
+              double *pxcell_bounds = (double *) Malloc(2 * pxlength * sizeof(double));
+              double *pycell_bounds = (double *) Malloc(2 * pylength * sizeof(double));
               inquire_vals_and_bounds(projID, &pxnbounds, &pynbounds, pxcoord_vals, pycoord_vals, pxcell_bounds, pycell_bounds);
               check_and_gen_bounds(projID, pxnbounds, pxlength, pxcoord_vals, pxcell_bounds, 1);
               check_and_gen_bounds(projID, pynbounds, pylength, pycoord_vals, pycell_bounds, 0);
@@ -2551,11 +2562,11 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
               int l_u_lcc = 6;
               memcpy(u_lcc_cmor, "      \0      \0      \0      \0", 4*l_u_lcc);
 
-              char *p_rll[] = {"grid_north_pole_latitude",
+              const char *p_rll[] = {"grid_north_pole_latitude",
                                "grid_north_pole_longitude",
                                "north_pole_grid_longitude", NULL};
 
-              char *p_lcc[] = {"standard_parallel1",
+              const char *p_lcc[] = {"standard_parallel1",
                                "longitude_of_central_meridian",
                                "latitude_of_projection_origin",
                                "standard_parallel2", NULL};
@@ -2584,7 +2595,7 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
               if ( natts != p_len )
                 cdoWarning("The number of required grid mapping attributes '%d' differs from the number of given mapping attributes '%d'.\n Consider that all required mapping attributes are set to 0.0 by default in case they are not given.", p_len, natts);
  
-              parameter_values = Malloc(p_len * sizeof(double));
+              parameter_values = (double *) Malloc(p_len * sizeof(double));
               for ( int i = 0; i < p_len; i++ )
                 parameter_values[i] = 0.0;
 
@@ -2627,21 +2638,21 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
               int grid_axis[2];
               if ( projtype == CDI_PROJ_RLL )
                 {
-                  cmor_axis(&grid_axis[0],    "grid_latitude",    "degrees_north",    pylength,    (void *)pycoord_vals,    'd',    0, 0,   NULL);
-                  cmor_axis(&grid_axis[1],    "grid_longitude",    "degrees_east",    pxlength,    (void *)pxcoord_vals,    'd',    0, 0,   NULL);
+                  cmor_axis(&grid_axis[0],    (char *) "grid_latitude",   (char *) "degrees_north",    pylength,    (void *)pycoord_vals,    'd',    0, 0,   NULL);
+                  cmor_axis(&grid_axis[1],    (char *)"grid_longitude",   (char *) "degrees_east",    pxlength,    (void *)pxcoord_vals,    'd',    0, 0,   NULL);
                   cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    4,     (void *)ycell_bounds,    (void *)xcell_bounds);
-                  cmor_set_grid_mapping(grid_ids[0], "rotated_latitude_longitude", p_len, (char **) p_rll_cmor, l_p_rll, parameter_values, (char **)u_rll_cmor,  l_u_rll);
+                  cmor_set_grid_mapping(grid_ids[0], (char *)"rotated_latitude_longitude", p_len, (char **) p_rll_cmor, l_p_rll, parameter_values, (char **)u_rll_cmor,  l_u_rll);
                 }
               else if ( projtype == CDI_PROJ_LCC )
                 {
-                  double *xii = Malloc(xlength * sizeof(double));
-                  double *yii = Malloc(ylength * sizeof(double));
+                  double *xii = (double *) Malloc(xlength * sizeof(double));
+                  double *yii = (double *) Malloc(ylength * sizeof(double));
                   for ( int i = 0; i < xlength; i++ )
                     xii[i] = (double) i;
                   for ( int i = 0; i < ylength; i++ )
                     yii[i] = (double) i;
-                  cmor_axis(&grid_axis[0],    "x",    "m",    ylength,    (void *)yii,    'd',    0, 0,   NULL);
-                  cmor_axis(&grid_axis[1],    "y",    "m",    xlength,    (void *)xii,    'd',    0, 0,   NULL);
+                  cmor_axis(&grid_axis[0],  (char *)  "x",  (char *)  "m",    ylength,    (void *)yii,    'd',    0, 0,   NULL);
+                  cmor_axis(&grid_axis[1],  (char *)  "y",  (char *)  "m",    xlength,    (void *)xii,    'd',    0, 0,   NULL);
                   cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    4,     (void *)ycell_bounds,    (void *)xcell_bounds);
                   cmor_set_grid_mapping(grid_ids[0], mapping, p_len,(char **)p_lcc_cmor, l_p_lcc, parameter_values, (char **)u_lcc_cmor,  l_u_lcc);
                   Free(xii); Free(yii);
@@ -2689,17 +2700,17 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       if ( type == GRID_GAUSSIAN || type == GRID_LONLAT )
         {
           grid_ids[0] = 0;
-          xcoord_vals = Malloc(xlength * sizeof(double));
-          ycoord_vals = Malloc(ylength * sizeof(double));
-          xcell_bounds = Malloc(2 * xlength * sizeof(double));
-          ycell_bounds = Malloc(2 * ylength * sizeof(double));
+          xcoord_vals = (double *) Malloc(xlength * sizeof(double));
+          ycoord_vals = (double *) Malloc(ylength * sizeof(double));
+          xcell_bounds = (double *) Malloc(2 * xlength * sizeof(double));
+          ycell_bounds = (double *) Malloc(2 * ylength * sizeof(double));
           inquire_vals_and_bounds(gridID, &xnbounds, &ynbounds, xcoord_vals, ycoord_vals, xcell_bounds, ycell_bounds);
 
           check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
           check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
 
-          cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
-          cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd',    (void *)xcell_bounds,    2,    NULL);
+          cmor_axis(new_axis_id(axis_ids),  (char *)  "latitude",   (char *) "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
+          cmor_axis(new_axis_id(axis_ids),  (char *)  "longitude",  (char *) "degrees_east",    xlength,    (void *)xcoord_vals,    'd',    (void *)xcell_bounds,    2,    NULL);
 
           Free(xcell_bounds);
           Free(ycell_bounds);
@@ -2708,11 +2719,11 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
         }
       else if ( type == GRID_CURVILINEAR || type == GRID_UNSTRUCTURED )
             {
-              xcoord_vals = Malloc(totalsize * sizeof(double));
-              ycoord_vals = Malloc(totalsize * sizeof(double));
+              xcoord_vals = (double *) Malloc(totalsize * sizeof(double));
+              ycoord_vals = (double *) Malloc(totalsize * sizeof(double));
         /* maximal 4 gridbounds per gridcell permitted */
-              xcell_bounds = Malloc(4 * totalsize * sizeof(double));
-              ycell_bounds = Malloc(4 * totalsize * sizeof(double));
+              xcell_bounds = (double *) Malloc(4 * totalsize * sizeof(double));
+              ycell_bounds = (double *) Malloc(4 * totalsize * sizeof(double));
               inquire_vals_and_bounds(gridID, &xnbounds, &ynbounds, xcoord_vals, ycoord_vals, xcell_bounds, ycell_bounds);
        /* In a projection, this is done by setting mapping parameter */
               move_lons(xcoord_vals, xcell_bounds, totalsize, 4 * totalsize, xnbounds);   
@@ -2723,15 +2734,15 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
                 {
                   double *xncoord_vals;
                   double *yncoord_vals;
-                  xncoord_vals = Malloc(xlength * sizeof(double));
-                  yncoord_vals = Malloc(ylength * sizeof(double)); 
+                  xncoord_vals = (double *) Malloc(xlength * sizeof(double));
+                  yncoord_vals = (double *) Malloc(ylength * sizeof(double)); 
                   for (int j=0; j<ylength; j++) 
                     yncoord_vals[j]= (double) j;
                   for (int j=0; j<xlength; j++)
                     xncoord_vals[j]= (double) j;
-                  cmor_axis(&grid_axis[0], "j_index",    "1",    ylength,    (void *)yncoord_vals,
+                  cmor_axis(&grid_axis[0],(char *) "j_index",   (char *) "1",    ylength,    (void *)yncoord_vals,
             'd', 0, 0, NULL);
-                  cmor_axis(&grid_axis[1], "i_index",    "1",    xlength,    (void *)xncoord_vals,    'd', 0, 0, NULL);
+                  cmor_axis(&grid_axis[1],(char *) "i_index",   (char *) "1",    xlength,    (void *)xncoord_vals,    'd', 0, 0, NULL);
                   cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    4,     (void *)ycell_bounds,    (void *)xcell_bounds);
                   Free(xncoord_vals);
                   Free(yncoord_vals);
@@ -2753,7 +2764,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
                 printf("*******Start to define a character axis '%s' instead of a grid axis'.******\n", chardim);
               grid_ids[0] = 0;
               int numchar = 0;
-              char *charvalstring = Malloc(CMOR_MAX_STRING * sizeof(char));
+              char *charvalstring = (char *) Malloc(CMOR_MAX_STRING * sizeof(char));
               sprintf(charvalstring, "char_axis_%s", chardim);
               char **charvals = kv_get_vals(kvl, charvalstring, &numchar);
               Free(charvalstring);
@@ -2813,12 +2824,12 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       else if ( type == GRID_CHARXY )
             {
               grid_ids[0] = 0;
-              char *xname = Malloc(CDI_MAX_NAME * sizeof(char));
-              char *yname = Malloc(CDI_MAX_NAME * sizeof(char));
+              char *xname = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
+              char *yname = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
               gridInqXname(gridID, xname);
               gridInqYname(gridID, yname);
-              char *xdimname = Malloc(CDI_MAX_NAME * sizeof(char));
-              char *ydimname = Malloc(CDI_MAX_NAME * sizeof(char));
+              char *xdimname = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
+              char *ydimname = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
               cdiGridInqKeyStr(gridID, 902, CDI_MAX_NAME, xdimname);
               cdiGridInqKeyStr(gridID, 912, CDI_MAX_NAME, ydimname);
               if ( strcmp(xdimname, "line") == 0 )
@@ -2889,7 +2900,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
   char *origname = get_txtatt(vlistID, varID, "original_name");
   char *history = get_txtatt(vlistID, varID, "history");
   char *varcom = get_txtatt(vlistID, varID, "variable_comment");
-  char *units = Malloc(CDI_MAX_NAME * sizeof(char));
+  char *units = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
   vlistInqVarUnits(vlistID, varID, units);
   char *attunits = kv_get_a_val(kvl, "u", NULL);
   char *attp = kv_get_a_val(kvl, "p", NULL);
@@ -3096,7 +3107,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
 
 static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, int miptab_freq)
 {
-  char *frequency = Malloc(CMOR_MAX_STRING * sizeof(char));
+  char *frequency = (char *) Malloc(CMOR_MAX_STRING * sizeof(char));
   int ntsteps = vlistNtsteps(vlistID);
   int reccounter = 0;
   int recdummy = 0;
@@ -3602,7 +3613,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
 
 static char *use_chunk_des_files(list_t *kvl, int vlistID, int var_id, char *chunk_des_file, int ifreq, int calendar)
 {
-  char *chunk_file = Malloc(4096 * sizeof(char));
+  char *chunk_file = (char *) Malloc(4096 * sizeof(char));
   if ( file_exist(chunk_des_file, 0) )
     {
       FILE *fp = fopen(chunk_des_file, "r");
@@ -3634,11 +3645,11 @@ static char **empty_array(struct mapping vars[], char ***chunk_files)
 
 static char **get_chunk_des_files(list_t *kvl, struct mapping vars[], char *miptab_freqptr, int nreq, int vlistID, char *charname)
 {
-  char **chunk_des_files = Malloc((nreq+1) * sizeof(char *));
+  char **chunk_des_files = (char **) Malloc((nreq+1) * sizeof(char *));
   chunk_des_files[nreq] = NULL;
 
   char trunk[CMOR_MAX_STRING];
-  char *description_atts[] = {"model_id", "experiment_id", "member", NULL};
+  const char *description_atts[] = {"model_id", "experiment_id", "member", NULL};
   strcpy(trunk, miptab_freqptr);
   for ( int i = 0; description_atts[i]; i++ )
     {
@@ -3648,12 +3659,12 @@ static char **get_chunk_des_files(list_t *kvl, struct mapping vars[], char *mipt
 
   for ( int j = 0; vars[j].cdi_varID != CDI_UNDEFID; j++)
     {
-      char *name = Malloc(CDI_MAX_NAME * sizeof(char));
+      char *name = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
       if ( charname )
         strcpy(name, charname);
       else
         vlistInqVarName(vlistID, vars[j].cdi_varID, name);
-      chunk_des_files[j] = Malloc(CMOR_MAX_STRING * sizeof(char));
+      chunk_des_files[j] = (char *) Malloc(CMOR_MAX_STRING * sizeof(char));
       sprintf(chunk_des_files[j], "CHUNK_FILE_%s_%s.txt\0", name, trunk);
       Free(name);
     }
@@ -3664,7 +3675,7 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
 {
   int i = 0;
   for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
-  char **chunk_files = Malloc((i+1) * sizeof(char *));
+  char **chunk_files = (char **) Malloc((i+1) * sizeof(char *));
   chunk_files[i] = NULL;
   
   char *dummy = kv_get_a_val(kvl, "om", NULL);
@@ -3771,7 +3782,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
       {
         zaxisID = vlistInqVarZaxis(vlistID, vars[i].cdi_varID);
         zsize = zaxisInqSize(zaxisID);
-        charname = Malloc(CDI_MAX_NAME * sizeof(char));
+        charname = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
         vlistInqVarName(vlistID, vars[i].cdi_varID, charname);
         
         pstreamClose(*streamID);
@@ -3810,7 +3821,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                 {
                   if ( vars[i].charvars )
                     {
-                      void *dataslice = Malloc(gridsize * zsize * sizeof(double));
+                      void *dataslice = (void *) Malloc(gridsize * zsize * sizeof(double));
                       for ( int j = 0; j < gridsize * zsize; j++ )
                         ((double *)dataslice)[j] = ((double *)vars[i].data)[(tsID-1)*gridsize*zsize+j];
                       #if ( CMOR_VERSION_MAJOR == 2 )
@@ -3935,7 +3946,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
     printf("\n*******Succesfully closed files and freed allocated memory.******\n");
 }
 
-static list_t *check_for_charvars(list_t *maptab, char *key)
+static list_t *check_for_charvars(list_t *maptab, const char *key)
 {
 /***/
 /* If a mapping table variable selector (name or code) has more than one value, it must be a character coordinate*/
@@ -3982,7 +3993,7 @@ static list_t *check_for_charvars(list_t *maptab, char *key)
                 {
                   if ( *thepoint == ',')
                     {
-                      kvn->values[j] = Malloc( (i+1) * sizeof(char) );
+                      kvn->values[j] = (char *)Malloc( (i+1) * sizeof(char) );
                       strncpy(kvn->values[j], workchar, i);
                       kvn->values[j][i] = '\0';
                       j++; thepoint++; workchar+=i+1; i = 0;
@@ -3994,7 +4005,7 @@ static list_t *check_for_charvars(list_t *maptab, char *key)
                 }
               if ( i > 0 )
                 {
-                  kvn->values[j] = Malloc( (i+1) * sizeof(char) );
+                  kvn->values[j] = (char *)Malloc( (i+1) * sizeof(char) );
                   strncpy(kvn->values[j], workchar, i);
                   kvn->values[j][i] = '\0';
                   workchar+=i; i = 0; j++; 
@@ -4030,7 +4041,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
 
   if ( maptab && maptabdir ) if ( maptab[0] != '/' )
     {
-      maptabbuild = Malloc((strlen(maptab)+strlen(maptabdir)+2) * sizeof(char));
+      maptabbuild = (char *) Malloc((strlen(maptab)+strlen(maptabdir)+2) * sizeof(char));
       sprintf(maptabbuild, "%s/%s\0", maptabdir, maptab);
     }
   if ( maptab )
@@ -4160,7 +4171,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
     printf("*******No mapping table found.*******\n");
 }
 
-static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
+static void parse_cmdline(list_t *pml, char **params, int nparams, const char *ventry)
 {
   list_t *kvl = NULL;
   kvl = list_new(sizeof(keyValues_t *), free_keyval, ventry);
@@ -4175,7 +4186,7 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
         {
           if ( key && values[0] )
             {
-              char *short_key = check_short_key(key);
+              const char *short_key = check_short_key(key);
               if ( short_key )
                 {
                   if ( strcmp(short_key, key) != 0 )
@@ -4195,7 +4206,7 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
           if ( strlen(eqpos) == 1 )
             cdoAbort("Could not find values for commandline parameter: '%s'\n", params[i]);
           key = strdup(strtok(params[i], "="));
-          values = Malloc(100 * sizeof(char *));
+          values = (char **) Malloc(100 * sizeof(char *));
           j = 0;   
           copy_value(strtok(NULL, ""), values, &j);  
         }
@@ -4210,7 +4221,7 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
     }
   if ( key && values )
     {
-      char *short_key = check_short_key(key);
+      const char *short_key = check_short_key(key);
       if ( short_key )
         {
           if ( strcmp(short_key, key) != 0 )
@@ -4242,12 +4253,12 @@ static char *get_mip_table(char *params, list_t *kvl, char *project_id)
           char *miptab;
 #if ( CMOR_VERSION_MAJOR == 2 )
           {
-          miptab = Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
+          miptab = (char *) Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
           sprintf(miptab, "%s/%s_%s\0", miptabdir, project_id, params);
           }
 #elif ( CMOR_VERSION_MAJOR == 3 )
           {
-          miptab = Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+8) * sizeof(char));
+          miptab = (char *) Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+8) * sizeof(char));
           sprintf(miptab, "%s/%s_%s.json\0", miptabdir, project_id, params);
           }
 #endif
