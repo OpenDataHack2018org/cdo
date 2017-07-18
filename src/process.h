@@ -19,7 +19,9 @@
 #define _PROCESS_H
 
 #include <sys/types.h> /* off_t */
+#include <vector>
 #include "util.h"
+#include "pstream.h"
 
 constexpr int MAX_PROCESS  =   128;
 constexpr int MAX_STREAM   =    64;
@@ -56,7 +58,7 @@ typedef struct {
   short       nvars;
   int         ntimesteps;
   short       streamCnt;
-  argument_t *streamNames;
+  std::vector<argument_t> streamNames;
   char       *xoperator;
   const char *operatorName;
   char       *operatorArg;
@@ -80,10 +82,10 @@ int  processInqInputStreamNum(void);
 int  processInqOutputStreamNum(void);
 int  processInqInputStreamID(int streamindex);
 int  processInqOutputStreamID(int streamindex);
-void processAddInputStream(int streamID);
-void processAddOutputStream(int streamID);
+void processAddInputStream(pstream_t *p_pstream_ptr);
+void processAddOutputStream(pstream_t *p_pstream_ptr);
 void processDelStream(int streamID);
-void processDefVarNum(int nvars, int streamID);
+void processDefVarNum(int nvars);
 void processDefArgument(void *vargument);
 
 void processStartTime(double *utime, double *stime);
@@ -104,4 +106,7 @@ const char *processInqOpername(void);
 const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
+void print_process(int p_process_id);
+
+const argument_t *cdoStreamName(int cnt);
 #endif  /* _PROCESS_H */

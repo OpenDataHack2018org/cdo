@@ -26,8 +26,6 @@
 /* */
 int stringToParam(const char *paramstr);
 
-list_t *pmlist_search_kvlist_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry);
-list_t *pmlist_get_kvlist_ventry(list_t *pml, int nentry, const char **entry);
 
 list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *miptab, const char *key)
 {

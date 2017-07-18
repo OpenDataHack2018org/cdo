@@ -1,7 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES =            \
-               array.h         \
+			   argument.h		\
+			   argument.cc		\
+			   array.h         \
                array.cc         \
                cdo_int.h       \
                compare.h       \
@@ -162,6 +164,7 @@ libcdo_la_SOURCES =            \
                uthash.h        \
                util.cc          \
                util.h          \
+			   varlist.h		\
                zaxis_print.cc   \
                zaxis.cc
 libcdo_la_SOURCES +=           \

@@ -3,6 +3,27 @@
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
 
+2017-07-14  Uwe Schulzweida
+
+	* settaxis: made time argument optional
+
+2017-07-13  Uwe Schulzweida
+
+	* percentile: fix wrong result with method numpy (linear interpolation) and nist [Bug #7798]
+
+2017-07-01  Uwe Schulzweida
+
+	* setcodetab: added support for GRIB level type
+
+2017-06-28  Uwe Schulzweida
+
+	* expr: improve ternary operator, no brackets needed anymore.
+
+2017-06-27  Uwe Schulzweida
+
+	* expr: added support for clev in ifthenelse (bug fix).
+	* setpartabp: param key values without leading zeros (bug fix).
+
 2017-06-08  Uwe Schulzweida
 
 	* mergetime: wrong time information if first input file does not contain the first time step (bug introduce in 1.8.1) [Bug #7760]

@@ -231,7 +231,7 @@ void *Importobs(void *argument)
   if ( cdoVerbose )
     printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax, latmin, latmax);
 
-  processDefVarNum(vlistNvars(vlistID), streamID);
+  processDefVarNum(vlistNvars(vlistID));
 
   pstreamClose(streamID);
 

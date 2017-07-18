@@ -8,8 +8,8 @@
 @Operators = selgridcell delgridcell
 
 @BeginDescription
-Selects grid cells of all fields from infile. The user has to give the indexes of each
-grid cell. The resulting grid in outfile is unstructured.
+Selects grid cells of all fields from @file{infile}. The user has to give the indexes of each
+grid cell. The resulting grid in @file{outfile} is unstructured.
 @EndDescription
 @EndModule
 

@@ -12,17 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <errno.h>
-#include <ctype.h>
-#include <math.h>
-#include <float.h>
-#include <time.h>
-#include <pwd.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <limits.h>
 
 #ifndef _ERROR_H
 #  include "error.h"

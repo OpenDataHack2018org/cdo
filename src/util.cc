@@ -116,8 +116,6 @@ const char *cdoExpName         = NULL;
 
 int timer_read, timer_write;
 
-
-
 const char *cdoComment(void)
 {
   static char comment[256];
@@ -245,91 +243,27 @@ const char *getOperatorName(const char *operatorArg)
     return operatorName;
 }
 
-
-argument_t *file_argument_new(const char *filename)
+char *getOperatorArg(const char *xoperator)
 {
-  argument_t *argument = (argument_t*) Calloc(1, sizeof(argument_t));
+  char *operatorArg = NULL;
 
-  argument->argc = 1;
-  argument->argv = (char **) Calloc(1, sizeof(char *));
-  argument->argv[0] = (char *) filename;
-  argument->args = (char *) filename;
-
-  return argument;
-}
-
-
-void file_argument_free(argument_t *argument)
-{
-  if ( argument )
+  if ( xoperator )
     {
-      if ( argument->argc )
+      char *commapos = (char *)strchr(xoperator, ',');
+
+      if ( commapos )
         {
-          assert(argument->argc == 1);
-          Free(argument->argv);
-        }
-      Free(argument);
-    }
-}
-
-
-argument_t *argument_new(size_t argc, size_t len)
-{
-  argument_t *argument = (argument_t*) Calloc(1, sizeof(argument_t));
-
-  if ( argc > 0 )
-    {
-      argument->argc = argc;
-      argument->argv = (char **) Calloc(argc, sizeof(char *));
-    }
-
-  if ( len > 0 )
-    argument->args = (char*) Calloc(len, sizeof(char));
-
-  return argument;
-}
-
-
-void argument_free(argument_t *argument)
-{
-  if ( argument )
-    {
-      if ( argument->argc )
-        {
-          int argc =  argument->argc;
-          for ( int i = 0; i < argc; ++i )
+          size_t len = strlen(commapos+1);
+          if ( len )
             {
-              if ( argument->argv[i] )
-                {
-                  Free(argument->argv[i]);
-                  argument->argv[i] = NULL;
-                }
+              operatorArg = (char*) Malloc(len+1);
+              strcpy(operatorArg, commapos+1);
             }
-
-          Free(argument->argv);
-          argument->argv = NULL;
-          argument->argc = 0;
         }
-
-      if ( argument->args )
-        {
-          Free(argument->args);
-          argument->args = NULL;
-        }
-
-      Free(argument);
     }
+
+  return operatorArg;
 }
-
-
-void argument_fill(argument_t *argument, int argc, char *argv[])
-{
-  assert(argument->argc == argc);
-
-  for ( int iarg = 0; iarg < argc; ++iarg )
-    argument->argv[iarg] = strdup(argv[iarg]);
-}
-
 
 char *getFileArg(char *argument)
 {
@@ -923,3 +857,5 @@ void cdo_check_round(void)
         }
     }
 }
+
+

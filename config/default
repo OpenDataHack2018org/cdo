@@ -67,20 +67,26 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
+                    LDFLAGS="/opt/local/lib/gcc5/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=g++-mp-5 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
                     CC=gcc-mp-5  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         elif  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-                    LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
+                    LDFLAGS="/opt/local/lib/gcc6/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
+	            CXX=g++ CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
+                    CC=gcc  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
+        elif  test "$COMP" = gribapi ; then
+	  ${CONFPATH}configure --prefix=$HOME/local --disable-cgribex \
+                    $CDOLIBS \
+                    LDFLAGS="/opt/local/lib/gcc6/libstdc++.6.dylib -Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=g++ CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
                     CC=gcc  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9
         else
-	  ${CONFPATH}configure  $CDOLIBS  CC=$COMP
+	  ${CONFPATH}configure  $CDOLIBS
         fi
 	;;
     hama*)
@@ -135,21 +141,12 @@ case "${HOSTNAME}" in
                  --with-udunits2=/usr \
                  --with-proj=/usr"
 
-        if  test "$COMP" = g++ ; then
+        if  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure --prefix=/usr/local \
-                    --program-suffix=-g++ \
-                    --enable-cxx \
                     --enable-maintainer-mode \
-                    $CDOLIBS \
-	            CC=gcc CXX=g++ CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
-                    LDFLAGS='-L/usr/local/lib' \
-                    LIBS='-lpthread -lm -lcurl -lhdf5_hl -lhdf5 -lz  -lsz -laec -ldl'
-        else
-	  ${CONFPATH}configure --prefix=$HOME/local \
-                    --enable-maintainer-mode \
-                    --enable-all-static \
                     $CDOLIBS \
 	            CC=gcc CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
+	            CXX=g++ CXXFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
                     LDFLAGS='-L/usr/local/lib' \
                     LIBS='-lpthread -lm -lcurl -lhdf5_hl -lhdf5 -lz  -lsz -laec -ldl'
         fi
@@ -220,30 +217,33 @@ case "${HOSTNAME}" in
 	;;
 # mistral
     mlogin*)
-        CDOLIBS="--with-grib_api=/sw/rhel6-x64/grib_api/grib_api-1.13.0-gcc48 \
+        CDOLIBS="--with-eccodes=/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48 \
                  --with-netcdf=/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-gcc48 \
                  --with-hdf5=/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-gcc48 \
-                 --with-szlib=/sw/rhel6-x64/sys/libaec-0.3.2-gcc48 \
+                 --with-szlib=/sw/rhel6-x64/sys/libaec-0.3.4-gcc48 \
                  --with-udunits2=/sw/rhel6-x64/util/udunits-2.2.17-gcc48 \
-                 --with-proj=/sw/rhel6-x64/graphics/proj4-4.9.1-gcc48"
-#                 --with-magics=/sw/rhel6-x64/graphics/magicsxx-2.18.15-gfxonly-gcc48 \
+                 --with-proj=/sw/rhel6-x64/graphics/proj4-4.9.3-gcc48"
+#                 --with-magics=/sw/rhel6-x64/graphics/magicsxx-2.33.0-gfxonly-gcc48"
 #                 --with-cmor=/sw/rhel6-x64/cmor-2.9.2-shared-gcc48 \
 
         if  test "$COMP" = intel ; then
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
                     $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
 	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = pgi ; then
           ${CONFPATH}configure --disable-openmp \
                     $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
 	            CXX=pgc++ CXXFLAGS="-g -fast" \
 	            CC=pgcc   CFLAGS="-g -fast"
 	else
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
                     $CDOLIBS \
+                    LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
                     CXX=g++ CXXFLAGS='-g -Wall -O3 -march=native -mavx2' \
                     CC=gcc  CFLAGS='-g -Wall -O3 -march=native -mavx2'
 	fi

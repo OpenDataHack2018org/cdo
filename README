@@ -66,7 +66,7 @@ Building and installing it:
 Porting:
 
      This package was designed for maximum portability. It is written entirely
-     in ANSI C99, and will compile on most UNIX platforms.
+     in ISO C++11 and ANSI C99, and will compile on most UNIX platforms.
      
 Contact:
 

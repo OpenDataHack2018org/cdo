@@ -11,19 +11,19 @@ static int percentile_method = NRANK;
 static int interpolation_method = LINEAR;
 
 static
-double percentile_nrank(double *array, int len, double pn)
+double percentile_nrank(double *array, size_t len, double pn)
 {
-  int irank = (int)ceil(len*(pn/100.0));
+  size_t irank = (size_t)ceil(len*(pn/100.0));
   if ( irank <   1 ) irank = 1;
   if ( irank > len ) irank = len;
   return nth_element(array, len, irank-1);
 }
 
 static
-double percentile_nist(double *array, int len, double pn)
+double percentile_nist(double *array, size_t len, double pn)
 {
   double rank = (len+1)*(pn/100.0);
-  int k = (int) rank;
+  size_t k = (size_t) rank;
   double d = rank - k;
   double percentil = 0;
   if      ( k ==   0 ) percentil = nth_element(array, len, 0);
@@ -31,7 +31,7 @@ double percentile_nist(double *array, int len, double pn)
   else
     {
       double vk1 = nth_element(array, len, k);
-      double vk  = array[k-1];
+      double vk  = nth_element(array, len, k-1);;
       percentil = vk + d*(vk1 - vk);
     }
 
@@ -39,10 +39,10 @@ double percentile_nist(double *array, int len, double pn)
 }
 
 static
-double percentile_numpy(double *array, int len, double pn)
+double percentile_numpy(double *array, size_t len, double pn)
 {
   double rank = (len-1)*(pn/100.0) + 1;
-  int k = (int) rank;
+  size_t k = (size_t) rank;
   double d = rank - k;
   double percentil = 0;
   if      ( k ==   0 ) percentil = nth_element(array, len, 0);
@@ -52,15 +52,15 @@ double percentile_numpy(double *array, int len, double pn)
       if ( interpolation_method == LINEAR )
         {
           double vk1 = nth_element(array, len, k);
-          double vk  = array[k-1];
+          double vk  = nth_element(array, len, k-1);;
           percentil = vk + d*(vk1 - vk);
         }
       else
         {
-          int irank = 0;
-          if      ( interpolation_method == LOWER   ) irank = (int) floor(rank);
-          else if ( interpolation_method == HIGHER  ) irank = (int) ceil(rank);
-          else if ( interpolation_method == NEAREST ) irank = (int) lround(rank);
+          size_t irank = 0;
+          if      ( interpolation_method == LOWER   ) irank = (size_t) floor(rank);
+          else if ( interpolation_method == HIGHER  ) irank = (size_t) ceil(rank);
+          else if ( interpolation_method == NEAREST ) irank = (size_t) lround(rank);
           // numpy is using around(), with rounds to the nearest even value
 
           if ( irank <   1 ) irank = 1;
@@ -74,10 +74,10 @@ double percentile_numpy(double *array, int len, double pn)
 }
 
 
-double percentile(double *array, int len, double pn)
+double percentile(double *array, size_t len, double pn)
 {
   double percentil = 0;
-  
+
   if      ( percentile_method == NRANK ) percentil = percentile_nrank(array, len, pn);
   else if ( percentile_method == NIST  ) percentil = percentile_nist(array, len, pn);
   else if ( percentile_method == NUMPY ) percentil = percentile_numpy(array, len, pn);

@@ -1036,10 +1036,6 @@ while (<MOFILE>) {
 #     print TRCARD "\\rowcolor[gray]{.9}\n";
       print TRCARD "\\multicolumn{2}{|>{\\columncolor{pcolor3}}l|}";
     }
-    if ( "$opername" eq "selpctl" )  {
-      $marguments =~ s/ifile/in/og;
-      $marguments =~ s/ofile/out/og;
-    }
     $opernamex = $opername;
     $opernamex =~ s/_/\\_/g;
     if ( $refskip == 0 ) {
@@ -1210,11 +1206,6 @@ sub print_description {
 	  $line =~ s/i\\_1/i_1/og;
 	  $line =~ s/i\\_2/i_2/og;
 	  $line =~ s/\@newline/ \\\\/og;
-	  $line =~ s/infiles/\\texttt{infiles}/og;
-	  $line =~ s/infile1/\\texttt{infile1}/og;
-	  $line =~ s/infile2/\\texttt{infile2}/og;
-	  $line =~ s/infile/\\texttt{infile}/og;
-	  $line =~ s/outfile/\\texttt{outfile}/og;
 	  $line =~ s/\@math\{([^}]*)\}/\\begin{math}\1\\end{math}/og;
 	  $line =~ s/\@file\{([^}]*)\}/\\texttt{\1}/og;
 	  $line =~ s/\@var\{([^}]*)\}/\\textit{\1}/og;

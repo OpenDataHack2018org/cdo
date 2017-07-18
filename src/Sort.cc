@@ -127,9 +127,9 @@ void setNmiss(int varID, int levelID, int nvars, varinfo_t *varInfo, int nmiss)
 
 void paramToStringLong(int param, char *paramstr, int maxlen)
 {
-  int dis, cat, num;
   int len;
 
+  int dis, cat, num;
   cdiDecodeParam(param, &num, &cat, &dis);
 
   size_t umaxlen = maxlen >= 0 ? (unsigned)maxlen : 0U;

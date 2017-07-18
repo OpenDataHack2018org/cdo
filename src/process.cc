@@ -38,8 +38,9 @@
 #include "error.h"
 #include "modules.h"
 #include "util.h"
-#include "pstream_int.h"
+#include "pstream.h"
 #include "dmemory.h"
+#include "pthread.h"
 
 #if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -163,7 +164,7 @@ off_t processInqNvals(int processID)
   return Process[processID].nvals;
 }
 
-void processAddOutputStream(int streamID)
+void processAddOutputStream(pstream_t *p_pstream_ptr)
 {
   int processID = processSelf();
 
@@ -172,20 +173,23 @@ void processAddOutputStream(int streamID)
   if ( sindex >= MAX_STREAM )
     Error("Limit of %d output streams per process reached (processID = %d)!", MAX_STREAM, processID);
 
-  Process[processID].outputStreams[sindex] = streamID;
+  Process[processID].outputStreams[sindex] = p_pstream_ptr->self;
 }
 
-void processAddInputStream(int streamID)
+void processAddInputStream(pstream_t *p_pstream_ptr)
 {
   int processID = processSelf();
 
-  if ( pstreamIsPipe(streamID) ) Process[processID].nchild++;
+  if (p_pstream_ptr->isPipe())
+  {
+      Process[processID].nchild++;
+  }
   int sindex = Process[processID].nInStream++;
 
   if ( sindex >= MAX_STREAM )
     Error("Limit of %d input streams per process reached (processID = %d)!", MAX_STREAM, processID);
 
-  Process[processID].inputStreams[sindex] = streamID;
+  Process[processID].inputStreams[sindex] = p_pstream_ptr->self;
 }
 
 
@@ -385,29 +389,6 @@ const char *processOperator(void)
   return Process[processID].xoperator;
 }
 
-static
-char *getOperatorArg(const char *xoperator)
-{
-  char *operatorArg = NULL;
-
-  if ( xoperator )
-    {
-      char *commapos = (char *)strchr(xoperator, ',');
-
-      if ( commapos )
-        {
-          size_t len = strlen(commapos+1);
-          if ( len )
-            {
-              operatorArg = (char*) Malloc(len+1);
-              strcpy(operatorArg, commapos+1);
-            }
-        }
-    }
-
-  return operatorArg;
-}
-
 static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams);
 
 static
@@ -592,26 +573,28 @@ int expand_wildcards(int processID, int streamCnt)
   // in case of one filename skip, no adaption needed
   if ( glob_arg->argc > 1 && glob_arg->argv[0][0] != '-' )
     {
-      int i;
+      if ( cdoVerbose ) cdoPrint("Replaced >%s< by", Process[processID].streamNames[0].args);
+
       streamCnt = streamCnt - 1 + glob_arg->argc;
 
       Free(Process[processID].streamNames[0].argv);
       Free(Process[processID].streamNames[0].args);
 
-      Process[processID].streamNames = (argument_t*) Realloc(Process[processID].streamNames, streamCnt*sizeof(argument_t));
-          
+      Process[processID].streamNames.resize(streamCnt);
+
       // move output streams to the end
-      for ( i = 1; i < Process[processID].streamCnt; ++i )
+      for ( int i = 1; i < Process[processID].streamCnt; ++i )
         Process[processID].streamNames[i+glob_arg->argc-1] = Process[processID].streamNames[i];
 
-      for ( i = 0; i < glob_arg->argc; ++i )
+      for ( int i = 0; i < glob_arg->argc; ++i )
         {
           Process[processID].streamNames[i].argv    = (char **) Malloc(sizeof(char *));
           Process[processID].streamNames[i].argc    = 1;
           Process[processID].streamNames[i].argv[0] = strdupx(glob_arg->argv[i]);
           Process[processID].streamNames[i].args    = strdupx(glob_arg->argv[i]);
+          if ( cdoVerbose ) cdoPrint("         >%s<", glob_arg->argv[i]);
         }
-      
+
       Process[processID].streamCnt = streamCnt;
     }
 
@@ -706,7 +689,7 @@ void setStreams(int argc, char *argv[])
 
   Process[processID].streamCnt  = 0; /* filled in setStreamNames */
   if ( streamCnt )
-    Process[processID].streamNames = (argument_t*) Malloc(streamCnt*sizeof(argument_t));
+    Process[processID].streamNames = std::vector<argument_t>(streamCnt);
   for ( int i = 0; i < streamCnt; i++ )
     {
       Process[processID].streamNames[i].argc = 0;
@@ -768,11 +751,10 @@ void processDefArgument(void *vargument)
 }
 
 
-void processDefVarNum(int nvars, int streamID)
+void processDefVarNum(int nvars)
 {
   int processID = processSelf();
 
-  UNUSED(streamID);
   /*  if ( streamID == Process[processID].streams[0] ) */
     Process[processID].nvars += nvars;
 }
@@ -999,4 +981,37 @@ int cdoStreamNumber()
   int processID = processSelf();
 
   return operatorStreamNumber(Process[processID].operatorName);
+}
+
+void print_process(int p_process_id)
+{
+#if defined(HAVE_LIBPTHREAD)
+  std::cout << " threadID        : " << Process[p_process_id].threadID                     <<  std::endl;
+  std::cout << " l_threadID      : " << Process[p_process_id].l_threadID                   <<  std::endl;
+#endif
+  std::cout << " nchild          : " << Process[p_process_id].nchild                       <<  std::endl;
+  std::cout << " nInStream       : " << Process[p_process_id].nInStream                    <<  std::endl;
+  std::cout << " nOutStream      : " << Process[p_process_id].nOutStream                   <<  std::endl;
+  for(int i = 0; i < Process[p_process_id].nInStream; i++){
+    std::cout << "    " << Process[p_process_id].inputStreams[i]  <<  std::endl;
+  }
+  for(int i = 0; i < Process[p_process_id].nOutStream; i++){
+    std::cout << "    " << Process[p_process_id].outputStreams[i] <<  std::endl;
+  }
+  std::cout << " s_utime         : " << Process[p_process_id].s_utime                      <<  std::endl;
+  std::cout << " s_stime         : " << Process[p_process_id].s_stime                      <<  std::endl;
+  std::cout << " a_utime         : " << Process[p_process_id].a_utime                      <<  std::endl;
+  std::cout << " a_stime         : " << Process[p_process_id].a_stime                      <<  std::endl;
+  std::cout << " cputime         : " << Process[p_process_id].cputime                      <<  std::endl;
+
+  std::cout << " nvals           : " << Process[p_process_id].nvals                        <<  std::endl;
+  std::cout << " nvars           : " << Process[p_process_id].nvars                        <<  std::endl;
+  std::cout << " ntimesteps      : " << Process[p_process_id].ntimesteps                   <<  std::endl;
+  std::cout << " streamCnt       : " << Process[p_process_id].streamCnt                    <<  std::endl;
+ // std::cout << " streamNames     : " << Process[p_process_id].streamNames                  <<  std::endl;
+  std::cout << " xoperator       : " << Process[p_process_id].xoperator                    <<  std::endl;
+  std::cout << " operatorName    : " << Process[p_process_id].operatorName                 <<  std::endl;
+  std::cout << " operatorArg     : " << Process[p_process_id].operatorArg                  <<  std::endl;
+  std::cout << " oargc           : " << Process[p_process_id].oargc                        <<  std::endl;
+  std::cout << " noper           : " << Process[p_process_id].noper                        <<  std::endl;
 }

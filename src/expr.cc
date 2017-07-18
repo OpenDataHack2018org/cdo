@@ -1171,8 +1171,18 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
       nlev2 = p2->param.nlev;
       missval2 = p2->param.missval;
       pdata2 = p2->param.data;
-      if ( ngp2 > 1 && ngp2 != ngp1 )
-	cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", ngp1, ngp2);
+
+      if ( ngp2 > 1 && ngp2 != ngp )
+        {
+          if ( ngp == 1 )
+            {
+              ngp = ngp2;
+              px = p2;
+            }
+          else
+            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", ngp1, ngp2);
+        }
+
       if ( nlev2 > 1 && nlev2 != nlev )
 	{
 	  if ( nlev == 1 )
@@ -1200,8 +1210,18 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
       nlev3 = p3->param.nlev;
       missval3 = p3->param.missval;
       pdata3 = p3->param.data;
-      if ( ngp3 > 1 && ngp3 != ngp1 )
-	cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp3 = %ld)", ngp1, ngp3);
+
+      if ( ngp3 > 1 && ngp3 != ngp )
+        {
+          if ( ngp == 1 )
+            {
+              ngp = ngp3;
+              px = p3;
+            }
+          else
+            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp3 = %ld)", ngp1, ngp3);
+        }
+
       if ( nlev3 > 1 && nlev3 != nlev )
 	{
 	  if ( nlev == 1 )
@@ -1232,8 +1252,8 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
       for ( size_t k = 0; k < nlev; ++k )
         {
+          size_t loff1 = (nlev1 == 1) ? 0 : k*ngp1;
           size_t loff  = k*ngp;
-          size_t loff1 = (nlev1 == 1) ? 0 : loff;
           size_t loff2 = (nlev2 == 1) ? 0 : loff;
           size_t loff3 = (nlev3 == 1) ? 0 : loff;
 
@@ -1242,16 +1262,18 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
           const double *restrict idat3 = pdata3+loff3;
           double *restrict odat = p->param.data+loff;
 
+          double ival1 = idat1[0];
           double ival2 = idat2[0];
           double ival3 = idat3[0];
           for ( size_t i = 0; i < ngp; ++i ) 
             {
+              if ( ngp1 > 1 ) ival1 = idat1[i];
               if ( ngp2 > 1 ) ival2 = idat2[i];
               if ( ngp3 > 1 ) ival3 = idat3[i];
 
-              if ( nmiss1 && DBL_IS_EQUAL(idat1[i], missval1) )
+              if ( nmiss1 && DBL_IS_EQUAL(ival1, missval1) )
                 odat[i] = missval1;
-              else if ( IS_NOT_EQUAL(idat1[i], 0) )
+              else if ( IS_NOT_EQUAL(ival1, 0) )
                 odat[i] = DBL_IS_EQUAL(ival2, missval2) ? missval1 : ival2;
               else
                 odat[i] = DBL_IS_EQUAL(ival3, missval3) ? missval1 : ival3;

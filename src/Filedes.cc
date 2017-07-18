@@ -193,7 +193,7 @@ void partab(FILE *fp, int streamID, int option)
       if ( param >= 0 )
 	{
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
-	  fprintf(fp, "  param=%s", paramstr);
+	  fprintf(fp, "  param = %s", paramstr);
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       if ( strlen(varstdname) )

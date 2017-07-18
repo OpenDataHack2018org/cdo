@@ -262,7 +262,7 @@ void *Importamsr(void *argument)
   else
     cdoAbort("Unexpected file size for AMSR data!");
 
-  processDefVarNum(vlistNvars(vlistID), streamID);
+  processDefVarNum(vlistNvars(vlistID));
 
   pstreamClose(streamID);
 

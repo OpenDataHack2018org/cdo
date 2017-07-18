@@ -112,25 +112,14 @@ extern char CDO_File_Suffix[32]; // refactor: added keyword extern
 extern const char *CDO_Version;
 
 
-typedef struct {
-  int    argc;
-  int    argl;
-  char **argv;
-  char  *args;
-} argument_t;
 
-argument_t *file_argument_new(const char *filename);
-void        file_argument_free(argument_t *argument);
-argument_t *argument_new(size_t argc, size_t len);
-void        argument_free(argument_t *argument);
-void        argument_fill(argument_t *argument, int argc, char *argv[]);
 
 char *getProgname(char *string);
-char *getOperator(const char *argument);
+char *GetOperator(const char *argument);
 const char *getOperatorName(const char *xoperator);
+char *getOperatorArg(const char *xoperator);
 const char *cdoComment(void);
 
-argument_t makeArgument(int argc, char *argv[]);
 char *getFileArg(char *argument);
 
 enum {START_DEC, START_JAN};
@@ -178,7 +167,6 @@ int     operatorArgc(void);
 char  **operatorArgv(void);
 void    operatorCheckArgc(int numargs);
 
-const argument_t *cdoStreamName(int cnt);
 
 void    cdoInitialize(void *argument);
 void    cdoFinish(void);
