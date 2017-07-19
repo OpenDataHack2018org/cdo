@@ -28,6 +28,7 @@
 */
 
 
+#include <vector>
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -55,7 +56,6 @@ void *Split(void *argument)
   char filesuffix[32];
   char filename[8192];
   int nsplit = 0;
-  int gridsize;
   int nmiss;
   bool swap_obase = false;
   const char *uuid_attribute = NULL;
@@ -122,15 +122,15 @@ void *Split(void *argument)
 
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
-      int codes[nsplit];
-      memcpy(codes, itmp, nsplit*sizeof(int));
+      std::vector<int> codes(nsplit);
+      for ( int index = 0; index < nsplit; ++index ) codes[index] = itmp[index];
 
-      for ( int index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; ++index )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      int code    = vlistInqVarCode(vlistID1, varID);
+	      int code = vlistInqVarCode(vlistID1, varID);
 	      if ( codes[index] == code )
 		{
                   int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
@@ -187,10 +187,10 @@ void *Split(void *argument)
 
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
-      int params[nsplit];
-      memcpy(params, itmp, nsplit*sizeof(int));
+      std::vector<int> params(nsplit);
+      for ( int index = 0; index < nsplit; ++index ) params[index] = itmp[index];
 
-      for ( int index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; ++index )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -241,10 +241,10 @@ void *Split(void *argument)
 
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
-      int tabnums[nsplit];
-      memcpy(tabnums, itmp, nsplit*sizeof(int));
+      std::vector<int> tabnums(nsplit);
+      for ( int index = 0; index < nsplit; ++index ) tabnums[index] = itmp[index];
 
-      for ( int index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; ++index )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -327,10 +327,10 @@ void *Split(void *argument)
 
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
-      double levels[nsplit];
-      memcpy(levels, ftmp, nsplit*sizeof(double));
+      std::vector<double> levels(nsplit);
+      for ( int index = 0; index < nsplit; ++index ) levels[index] = ftmp[index];
 
-      for ( int index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; ++index )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -367,11 +367,11 @@ void *Split(void *argument)
 
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
-      int gridIDs[nsplit];
-      for ( int index = 0; index < nsplit; index++ )
+      std::vector<int> gridIDs(nsplit);
+      for ( int index = 0; index < nsplit; ++index )
 	gridIDs[index] = vlistGrid(vlistID1, index);
 
-      for ( int index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; ++index )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -405,11 +405,11 @@ void *Split(void *argument)
 
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
-      int zaxisIDs[nsplit];
-      for ( int index = 0; index < nsplit; index++ )
+      std::vector<int> zaxisIDs(nsplit);
+      for ( int index = 0; index < nsplit; ++index )
 	zaxisIDs[index] = vlistZaxis(vlistID1, index);
 
-      for ( int index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; ++index )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -452,7 +452,7 @@ void *Split(void *argument)
   double *array = NULL;
   if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
+      int gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double *) Malloc(gridsize*sizeof(double));
     }
@@ -468,7 +468,7 @@ void *Split(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  int index    = vlistInqIndex(vlistID1, varID, levelID);
+	  int index = vlistInqIndex(vlistID1, varID, levelID);
 	  vlistID2 = vlistIDs[index];
 	  varID2   = vlistFindVar(vlistID2, varID);
 	  levelID2 = vlistFindLevel(vlistID2, varID, levelID);

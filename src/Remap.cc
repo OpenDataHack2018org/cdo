@@ -35,6 +35,7 @@
       Remap       remap           SCRIP grid remapping
 */
 
+#include <vector>
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -489,7 +490,7 @@ void scale_gridbox_area(long gridsize, const double *restrict array1, long grids
 }
 
 static
-int set_remapgrids(int filetype, int vlistID, int ngrids, bool *remapgrids)
+int set_remapgrids(int filetype, int vlistID, int ngrids, std::vector<bool>& remapgrids)
 {
   int index;
   for ( index = 0; index < ngrids; index++ )
@@ -840,7 +841,7 @@ void *Remap(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int ngrids = vlistNgrids(vlistID1);
-  bool remapgrids[ngrids];
+  std::vector<bool> remapgrids(ngrids);
   int index = set_remapgrids(filetype, vlistID1, ngrids, remapgrids);
   gridID1 = vlistGrid(vlistID1, index);
 

@@ -2,6 +2,7 @@
 #  include "config.h"
 #endif
 
+#include <vector>
 #include <limits.h>
 #include <time.h>
 
@@ -1258,7 +1259,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   long    srch_corners;     /* num of corners of srch cells           */
   long    nsrch_corners;
   int*    srch_add;         /* global address of cells in srch arrays */
-  int*    srch_add2[ompNumThreads];
+  std::vector<int *> srch_add2(ompNumThreads);
   int     i;
   double *srch_corner_lat;  /* lat of each corner of srch cells */
   double *srch_corner_lon;  /* lon of each corner of srch cells */
@@ -1354,9 +1355,9 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       tgt_centroid_lon[n] = 0;
     }
 
-  double* srch_corner_lat2[ompNumThreads];
-  double* srch_corner_lon2[ompNumThreads];
-  long max_srch_cells2[ompNumThreads];
+  std::vector<double *> srch_corner_lat2(ompNumThreads);
+  std::vector<double *> srch_corner_lon2(ompNumThreads);
+  std::vector<long> max_srch_cells2(ompNumThreads);
 
   /*  Integrate around each cell on source grid */
 

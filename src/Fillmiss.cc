@@ -313,18 +313,10 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-  unsigned *mindex = NULL;
-  unsigned *vindex = NULL;
-  double *lons = NULL;
-  double *lats = NULL;
-
-  if ( nmiss ) mindex = (unsigned *) Calloc(1, nmiss*sizeof(unsigned));
-  if ( nvals )
-    {
-      vindex = (unsigned *) Calloc(1, nvals*sizeof(unsigned));
-      lons   = (double *) Malloc(nvals*sizeof(double));
-      lats   = (double *) Malloc(nvals*sizeof(double));
-    }
+  unsigned *mindex = nmiss ? (unsigned *) Calloc(1, nmiss*sizeof(unsigned)) : NULL;
+  unsigned *vindex = nvals ? (unsigned *) Calloc(1, nvals*sizeof(unsigned)) : NULL;
+  double *lons = nvals ? (double *) Malloc(nvals*sizeof(double)) : NULL;
+  double *lats = nvals ? (double *) Malloc(nvals*sizeof(double)) : NULL;
   
   unsigned nv = 0, nm = 0;
   for ( unsigned i = 0; i < gridsize; ++i ) 

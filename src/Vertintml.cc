@@ -23,6 +23,7 @@
 */
 
 
+#include <vector>
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -176,8 +177,8 @@ void *Vertintml(void *argument)
 
   if ( linvertvct )
     {
-      double vctbuf[nvct];
-      memcpy(vctbuf, vct, nvct*sizeof(double));
+      std::vector<double> vctbuf(nvct);
+      for ( int i = 0; i < nvct; ++i ) vctbuf[i] = vct[i];
       for ( int i = 0; i < nvct/2; i++ )
         {
           vct[nvct/2-1-i] = vctbuf[i];
@@ -187,11 +188,11 @@ void *Vertintml(void *argument)
 
   int nvars = vlistNvars(vlistID1);
 
-  bool vars[nvars];
-  bool varinterp[nvars];
-  int *varnmiss[nvars];
-  double *vardata1[nvars];
-  double *vardata2[nvars];
+  std::vector<bool> vars(nvars);
+  std::vector<bool> varinterp(nvars);
+  std::vector<int *> varnmiss(nvars);
+  std::vector<double *> vardata1(nvars);
+  std::vector<double *> vardata2(nvars);
 
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
@@ -202,8 +203,8 @@ void *Vertintml(void *argument)
     {
       int nlev = zaxisInqSize(zaxisIDh);
       if ( nlev != nhlev ) cdoAbort("Internal error, wrong number of hybrid level!");
-      double levels[nlev];
-      cdoZaxisInqLevels(zaxisIDh, levels);
+      std::vector<double> levels(nlev);
+      cdoZaxisInqLevels(zaxisIDh, levels.data());
 
       for ( int ilev = 0; ilev < nlev; ++ilev )
 	{
@@ -229,14 +230,14 @@ void *Vertintml(void *argument)
 
   if ( operfunc == func_hl )
     {
-      double phlev[nplev];
-      height2pressure(phlev, plev, nplev);
+      std::vector<double> phlev(nplev);
+      height2pressure(phlev.data(), plev, nplev);
 
       if ( cdoVerbose )
 	for ( int i = 0; i < nplev; ++i )
 	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
 
-      memcpy(plev, phlev, nplev*sizeof(double));
+      memcpy(plev, phlev.data(), nplev*sizeof(double));
     }
 
   if ( opertype == type_log )

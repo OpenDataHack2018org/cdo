@@ -1,3 +1,4 @@
+#include <vector>
 #include <cdi.h>
 #include "cdo_int.h"
 #include "grid.h"
@@ -300,7 +301,7 @@ void *Samplegridicon(void *argument)
   int nsamplegrids = operatorArgc();
   if ( nsamplegrids < 2 ) cdoAbort("Parameter missing!");
 
-  cellindex_type *cellindex[nsamplegrids];
+  std::vector<cellindex_type *> cellindex(nsamplegrids);
   
   for ( int i = 0; i < nsamplegrids; ++i )
     {
@@ -374,7 +375,7 @@ void *Samplegridicon(void *argument)
 
           double missval = vlistInqVarMissval(vlistID1, varID);
 
-          samplegrid(missval, nsamplegrids, cellindex, array1, array2, array3);
+          samplegrid(missval, nsamplegrids, cellindex.data(), array1, array2, array3);
 
           nmiss = 0;
           for ( int i = 0; i < gridsize2; ++i )

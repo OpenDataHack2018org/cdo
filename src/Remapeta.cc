@@ -21,6 +21,7 @@
 */
 
 
+#include <vector>
 #include "hetaeta.h"
 #include <cdi.h>
 #include "cdo.h"
@@ -63,13 +64,13 @@ long ncctop(double cptop, long nlev, long nlevp1, double *vct_a, double *vct_b)
   */
   /* local variables */
   long nctop = 0;
-  long jk;
-  double    za, zb, zph[nlevp1], zp[nlev];
+  double za, zb;
+  std::vector<double> zph(nlevp1), zp(nlev);
   // double    cptop  =  1000.;   /* min. pressure level for cond. */
 
   /* half level pressure values, assuming 101320. Pa surface pressure */
 
-  for ( jk = 0; jk < nlevp1; ++jk )
+  for ( long jk = 0; jk < nlevp1; ++jk )
     {
       za = vct_a[jk];
       zb = vct_b[jk];
@@ -78,12 +79,12 @@ long ncctop(double cptop, long nlev, long nlevp1, double *vct_a, double *vct_b)
 
   /* full level pressure */
 
-  for ( jk = 0; jk < nlev; ++jk )
+  for ( long jk = 0; jk < nlev; ++jk )
     zp[jk] = (zph[jk] + zph[jk+1])*0.5;
 
   /* search for pressure level cptop (Pa) */
 
-  for ( jk = 0; jk < nlev; ++jk )
+  for ( long jk = 0; jk < nlev; ++jk )
     {
       nctop = jk;
       if ( zp[jk] >= cptop ) break;

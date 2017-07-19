@@ -1,3 +1,4 @@
+#include <vector>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
@@ -760,7 +761,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
     }
 
 
-  struct grid_cell *tgt_grid_cell2[ompNumThreads];  
+  std::vector<struct grid_cell *> tgt_grid_cell2(ompNumThreads);  
   for ( int i = 0; i < ompNumThreads; ++i )
     {
       tgt_grid_cell2[i] = (struct grid_cell*) Malloc(sizeof(struct grid_cell));
@@ -772,7 +773,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       tgt_grid_cell2[i]->coordinates_xyz = (double*) Malloc(3*tgt_num_cell_corners*sizeof(double));
     }
 
-  search_t search[ompNumThreads];
+  std::vector<search_t> search(ompNumThreads);
   for ( int i = 0; i < ompNumThreads; ++i )
     {
       search[i].srch_corners    = src_num_cell_corners;
@@ -784,7 +785,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       search[i].overlap_buffer  = NULL;
     }
 
-  int *srch_add2[ompNumThreads];
+  std::vector<int *> srch_add2(ompNumThreads);
   for ( int i = 0; i < ompNumThreads; ++i )
     srch_add2[i] = (int*) Malloc(src_grid_size*sizeof(int));
 

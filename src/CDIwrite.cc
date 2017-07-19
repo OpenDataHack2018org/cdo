@@ -93,14 +93,13 @@ void *CDIwrite(void *argument)
   int nvars = 10, nlevs = 0, ntimesteps = 30;
   const char *defaultgrid = "global_.2";
   int tsID, varID, levelID;
-  int gridsize, i;
+  int i;
   int vlistID;
   int zaxisID, taxisID;
-  int vdate, vtime, julday;
+  int vdate, vtime;
   int filetype = -1, datatype = -1;
   int irun, nruns = 1;
   unsigned int seed = 1;
-  const char *gridfile;
   char sinfo[64];
   off_t nvalues = 0;
   double file_size = 0, data_size = 0;
@@ -117,7 +116,7 @@ void *CDIwrite(void *argument)
 
   if ( operatorArgc() > 5 ) cdoAbort("Too many arguments!");
 
-  gridfile = defaultgrid;
+  const char *gridfile = defaultgrid;
   if ( operatorArgc() >= 1 ) nruns = parameter2int(operatorArgv()[0]);
   if ( operatorArgc() >= 2 ) gridfile = operatorArgv()[1];
   if ( operatorArgc() >= 3 ) nlevs = parameter2int(operatorArgv()[2]);
@@ -133,16 +132,17 @@ void *CDIwrite(void *argument)
   if ( nvars <= 0 ) nvars = 1;
 
   int gridID = cdoDefineGrid(gridfile);
-  gridsize = gridInqSize(gridID);
+  int gridsize = gridInqSize(gridID);
 
   if ( nlevs == 1 )
     zaxisID  = zaxisCreate(ZAXIS_SURFACE, 1);
   else
     {
-      double levels[nlevs];
+      double *levels = (double *) Malloc(nlevs*sizeof(double));
       for ( i = 0; i < nlevs; ++i ) levels[i] = 100*i; 
       zaxisID  = zaxisCreate(ZAXIS_HEIGHT, nlevs);
       zaxisDefLevels(zaxisID, levels);
+      Free(levels);
     }
 
   if ( cdoVerbose )
@@ -222,7 +222,7 @@ void *CDIwrite(void *argument)
       datatype = vlistInqVarDatatype(vlistID, 0);
       if ( datatype == CDI_UNDEFID ) datatype = CDI_DATATYPE_FLT32;
 	  
-      julday = date_to_julday(CALENDAR_PROLEPTIC, 19870101);
+      int julday = date_to_julday(CALENDAR_PROLEPTIC, 19870101);
 
       t0 = timer_val(timer_write);
 
