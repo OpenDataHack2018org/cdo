@@ -26,6 +26,16 @@
 /* */
 int stringToParam(const char *paramstr);
 
+static char *kv_get_a_val(list_t *kvl, const char *key, const char *replacer)
+{
+  keyValues_t *kv = kvlist_search(kvl, key);
+  if ( kv )
+    return kv->values[0];
+  if ( replacer )
+    return (char *)replacer;
+  else
+    return NULL;
+}
 
 list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *miptab, const char *key)
 {
@@ -52,7 +62,8 @@ list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *m
         }
       if ( listlatest )
         {
-          printf("No attribute 'mip_table' found in mapping table line for cmorname '%s'.\n The latest line of the mapping table is used.", cmorname);
+          if ( cdoVerbose )
+            cdoPrint("No attribute 'mip_table' found in mapping table line for cmorname '%s'.\n          The latest line of the mapping table is used.", cmorname);
           return listlatest;
         }
     }
@@ -106,8 +117,32 @@ char *skipSeparator(char *pline)
   return pline;
 }
 
+static void *handleError(list_t *kvl, int errnum, char *argument)
+{
+  char *filename = NULL;
+  if ( kvl )
+    filename = kv_get_a_val(kvl, "workfile4err", NULL);
+  else 
+    cdoAbort("In parsing the command line:\n          More than 100 values for a key are not supported.");
+  if ( !filename )
+    cdoAbort("In parsing file:\n          Cannot resolve recent working file.");
+  switch ( errnum )
+    {
+    case ( 1 ): cdoAbort("In parsing file '%s':\n          Unexpected blank in line:\n          '%s'\n          Check syntax.", filename, argument);
+    case ( 2 ): cdoAbort("In parsing file '%s':\n          Unexpected separator sign ',' in a key of line:\n          '%s'\n          Check syntax.", filename, argument);
+    case ( 3 ): cdoAbort("In parsing file '%s':\n          More than 100 values for a key are not supported.", filename);
+    case ( 4 ): cdoAbort("In parsing file '%s':\n          No values found for a keyword in line:\n          '%s'.\n          Check syntax.", filename, argument);
+    case ( 5 ): cdoAbort("In parsing file '%s':\n          A value for a keyword begins with ',' in line:\n          '%s'.\n          Check syntax.", filename, argument);
+    case ( 6 ): cdoAbort("In parsing file '%s':\n          A Value for a keyword has a start quote sign but no end quote sign in line:\n          '%s'.\n          Check syntax.",filename,  argument);
+    case ( 7 ): cdoAbort("In parsing file '%s':\n          Unexpected separator sign '=' or ':' is found in values in line:\n          '%s'.", filename, argument);
+    case ( 8 ): cdoAbort("In parsing file '%s':\n          Connected lines for one keyvalue contain more than the allowed 4096 characters.",filename);
+    case ( 9 ): cdoAbort("In parsing file '%s':\n          A ',' is found at end of a line without information in next line.",filename);
+    case ( 10): cdoAbort("In parsing file '%s':\n          A ',' is found at end of file.",filename);
+    }
+}
+
 static
-char *getElementName(char *pline, char *name)
+char *getElementName(char *pline, char *name, int *errh)
 {
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
@@ -115,11 +150,11 @@ char *getElementName(char *pline, char *name)
   while ( pos < len && *(pline+pos) != '=' )
     {
       if ( isspace((int) *(pline+pos)) )
-        cdoAbort("Cannot interpret key of keyvalue because a blank is in: ...'%s'.... Use quotes.\n", pline);
+        { *errh=1; return pline; }
       if ( *(pline+pos) == ',' )
-        cdoAbort("Unexpected separator sign ',' in key: ...'%s'.... Use quotes.\n", pline);
+        { *errh=2; return pline; }
       if ( *(pline+pos) == ':' )
-        cdoWarning("Separator sign ':' is not supported. Use '=' instead.\n...'%s'...\n", pline);
+        cdoWarning("In parsing file:\n          Separator sign ':' is not supported. Use '=' instead.\n          ...'%s'...", pline);
       name[pos] = tolower(*(pline+pos));
       pos++;
     }
@@ -129,14 +164,16 @@ char *getElementName(char *pline, char *name)
   return pline;
 }
 
-static void copy_value(char *value, char **values, int *nvalues)
+static int copy_value(char *value, char **values, int *nvalues)
 {
   if ( *nvalues > 100 )
-    cdoAbort("More than 100 values for a key are not supported.");
+    return 3;
   values[*nvalues] = strdup(value);
   (*nvalues)++;
   values[*nvalues] = NULL;
+  return 0;
 }
+
 
 static void free_array(char **tofree)
 {
@@ -162,14 +199,14 @@ static void quote_replace(char **values, int nvalues, int i)
 }
 
 static
-char *getElementValues(char *pline, char **values, int *nvalues)
+char *getElementValues(char *pline, char **values, int *nvalues, char *keyword, int *errh)
 {
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
   while ( isspace((int) *(pline+(int)len)) ) len--;
   *(pline+len) = 0;
   if ( (int)len == 0 )
-    cdoAbort("No values found.\n");
+    {*errh=4; return keyword;}
   *nvalues = 0;
   int i = 0;
   while ( i < len && len )
@@ -177,8 +214,13 @@ char *getElementValues(char *pline, char **values, int *nvalues)
       if ( *(pline+i) == ',')
         {
           if ( i == 0 )
-            cdoAbort("A value begins with ',': '%s'.\nCheck syntax.", pline);
-          copy_value(pline, values, nvalues);
+            {
+              *errh=5;
+              return pline;
+            }
+          *errh = copy_value(pline, values, nvalues);
+          if ( *errh > 0 )
+            return pline;
           if ( *(values[*nvalues-1]+i-1) == '"' || *(values[*nvalues-1]+i-1) == '\'' )
             quote_replace(values, *nvalues-1,i);
           else
@@ -196,18 +238,23 @@ char *getElementValues(char *pline, char **values, int *nvalues)
             {
               i++;
               if ( *(pline+i) == 0 )
-                cdoAbort("Found a start quote sign for a value but no end quote sign.\n");
+                {*errh=6; return pline;}
             }
           i++;
         }
       else if ( isspace((int) *(pline+i)) )
         break;          
       else if ( *(pline+i) == '=' || *(pline+i) == ':' )
-        cdoAbort("Found unexpected separator sign in value: '%c'.", *(pline+i) );
+        {
+          *errh=7;
+          return pline;
+        }
       else
         i++;
     }
-  copy_value(pline, values, nvalues);
+  *errh = copy_value(pline, values, nvalues);
+  if ( *errh > 0 )
+    return pline;
   if ( *(values[*nvalues-1]+i-1) == '"' )
     quote_replace(values, *nvalues-1, i);
   else
@@ -216,8 +263,9 @@ char *getElementValues(char *pline, char **values, int *nvalues)
   return pline;
 }
 
-static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int checkpml, int lowprior)
+static int parse_line_to_list(list_t *list, char *pline, const char *kvlname, int checkpml, int lowprior)
 {
+  int errh = 0;
   char name[256];
   int i = 0, nvalues;
   list_t *kvl = NULL;
@@ -230,21 +278,24 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
     {
       char **values = (char **) Malloc( 100 * sizeof(char *) );
       
-      pline = getElementName(pline, name);
+      pline = getElementName(pline, name, &errh);
+      if ( errh > 0 )
+        return errh;
       if ( *pline == 0 )
         {
-          if ( cdoVerbose )
-            printf("Could not find values for: '%s'\n", name);
+          cdoPrint("In parsing a line of a file:\n          Could not find values for key: '%s'. Use correct 'key=value' syntax.", name);
           break;
         }
       pline = skipSeparator(pline);
       if ( *pline == 0 )
         {
-          if ( cdoVerbose )
-            printf("Could not find values for: '%s'\n", name);
+          cdoPrint("In parsing a line of a file:\n          Could not find values for: '%s'. Use correct 'key=value' syntax.", name);
           break;
         }
-      pline = getElementValues(pline, values, &nvalues);
+      pline = getElementValues(pline, values, &nvalues, name, &errh);
+      if ( errh > 0 )
+        return errh;
+
       if ( checkpml )
         kvlist_append(kvl, name, (const char **)values, nvalues);
       else
@@ -262,6 +313,7 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
         *pline = 0;
       free_array(values);
     }
+  return 0;
 }
 
 static void remove_space_and_comms(char **pline, char *line)
@@ -291,7 +343,7 @@ static int add_lines_tester(char *line)
   return 0;
 }
 
-static void add_lines(char *line, char **buffer, size_t *buffersize)
+static int add_lines(char *line, char **buffer, size_t *buffersize)
 {
   int len = strlen(line);
   char nextline[4096];
@@ -302,17 +354,17 @@ static void add_lines(char *line, char **buffer, size_t *buffersize)
       if ( *nexttester != '\0' && *nexttester != '&' )
         {
           if ( strlen(nexttester) + len > 4096 )
-            cdoAbort("Line too long!");
+            return 8;
           strcat(line, nextline);
         }
       else
-        cdoAbort("Found ',' at end of line without information in next line.");
+        return 9;
     }
   else
-    cdoAbort("Found ',' at end of file.");
+    return 10;
 }  
 
-void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int checkpml, int lowprior)
+void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int checkpml, int lowprior, list_t *kvl)
 {
   char line[4096];
   char name[256];
@@ -320,6 +372,7 @@ void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int che
   const char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter", NULL};
   int linenumber = 0;
   int listtype = 0;
+  int errh = 0;
 
   while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
     {
@@ -328,7 +381,11 @@ void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int che
       remove_space_and_comms(&pline, line);
       if ( *pline == '\0' ) continue;
       while ( add_lines_tester(line) )
-        add_lines(line, &buffer, &buffersize);
+        {
+          errh = add_lines(line, &buffer, &buffersize);
+          if ( errh > 0 )
+            handleError(kvl, errh, NULL);
+        }
       //  len = (int) strlen(pline);
       if ( listtype == 0 && *pline == '&' ) listtype = 1;
 /* MAXNVALUES*/
@@ -345,9 +402,11 @@ void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int che
           i++;
         }
       if ( listtype )
-        parse_line_to_list(list, pline, (char *)listkeys[i], checkpml, lowprior);
+        errh = parse_line_to_list(list, pline, listkeys[i], checkpml, lowprior);
       else
-        parse_line_to_list(list, pline, (char *)"keyvals", checkpml, lowprior);
+        errh = parse_line_to_list(list, pline, "keyvals", checkpml, lowprior);
+      if ( errh > 0 )
+        handleError(kvl, errh, pline);
     }
 }
 
@@ -370,17 +429,6 @@ static void kv_insert_a_val(list_t *kvl, const char *key, char *value, int repla
     }
 }
 
-static char *kv_get_a_val(list_t *kvl, const char *key, const char *replacer)
-{
-  keyValues_t *kv = kvlist_search(kvl, key);
-  if ( kv )
-    return kv->values[0];
-  if ( replacer )
-    return (char *)replacer;
-  else
-    return NULL;
-}
-
 static char **kv_get_vals(list_t *kvl, const char *key, int *numvals)
 {
   keyValues_t *kv = kvlist_search(kvl, key);
@@ -389,21 +437,21 @@ static char **kv_get_vals(list_t *kvl, const char *key, int *numvals)
   return NULL;
 }
 
-list_t *cdo_parse_cmor_file(const char *filename)
+list_t *cdo_parse_cmor_file(const char *filename, list_t *kvl)
 {
   assert(filename != NULL);
 
   size_t filesize = fileSize(filename);
   if ( filesize == 0 )
     {
-      fprintf(stderr, "Empty table file: %s\n", filename);
+      fprintf(stderr, "In reading the mapping table:\n          Empty table file: %s.", filename);
       return NULL;
     }
 
   FILE *fp = fopen(filename, "r");
   if ( fp == NULL )
     {
-      fprintf(stderr, "Open failed on %s: %s\n", filename, strerror(errno));
+      fprintf(stderr, "In reading the mapping table:\n          Open failed on %s: %s.", filename, strerror(errno));
       return NULL;
     }
 
@@ -414,7 +462,7 @@ list_t *cdo_parse_cmor_file(const char *filename)
 
   if ( nitems != filesize )
     {
-      fprintf(stderr, "Read failed on %s!\n", filename);
+      fprintf(stderr, "In reading the mapping table:\n          Read failed on %s.", filename);
       return NULL;
     }
  
@@ -423,7 +471,7 @@ list_t *cdo_parse_cmor_file(const char *filename)
 /*  if ( buffer[0] == '{' )
     parse_json_buffer_to_pml(pml, filesize, buffer);
   else */
-  parse_buffer_to_list(pml, filesize, buffer, 1, 0);
+  parse_buffer_to_list(pml, filesize, buffer, 1, 0, kvl);
 
   if ( buffer ) Free(buffer);
   
@@ -493,7 +541,7 @@ static const char *check_short_key(char *key)
   return NULL;
 }
 
-static void map_it(list_t *kvl, int vlistID, int varID)
+static void map_it(list_t *kvl, int vlistID, int varID, char *var2map)
 {
   for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
     {
@@ -501,7 +549,8 @@ static void map_it(list_t *kvl, int vlistID, int varID)
       const char *key = ( check_short_key((char *)kv->key ) ) ? check_short_key((char *)kv->key) : NULL;
       if ( !key )
         {
-          cdoWarning("Don't know what to do with mapping table keyword: '%s'\n", kv->key);
+          if ( strcmp(kv->key, "mip_table") != 0 )
+            cdoWarning("In variable mapping:\n           you try to assign '%s' to variable '%s'.\n          This mapping table keyword is skipped. Check allowed mapping table keywords.", kv->key, var2map);
           continue;
          }
       const char *value = kv->values[0];
@@ -546,7 +595,7 @@ static void map_it(list_t *kvl, int vlistID, int varID)
       else if ( STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type") ) {} */
       else
         {
-          if ( cdoVerbose ) printf("For Mapping key '%s' is ignored.\n", key);
+          if ( cdoVerbose ) cdoPrint("In applying the mapping table:\n          Key: '%s' is ignored.", key);
         }
     }
 }
@@ -598,16 +647,19 @@ static int maptab_via_key(list_t *pml, int vlistID, int varID, int nventry, cons
       list_t *kvl = maptab_search_miptab(pml, ifilevalue, miptabfreq, key);
       if ( kvl )
         {
-          printf("Started mapping of variable via '%s'.\n", key);
-          map_it(kvl, vlistID, varID);
+          if ( cdoVerbose )
+            cdoPrint("Start to map via '%s'.", key);
+          map_it(kvl, vlistID, varID, ifilevalue);
           return 1;
         }
-      cdoWarning("Variable named '%s' with varID '%d' could not be mapped via '%s' because no corresponding key '%s' was found in mapping table file.", ifilevalue, varID, key, key);
+      if ( cdoVerbose )
+        cdoPrint("In variable mapping:\n          Variable named '%s' with varID '%d' could not be mapped via '%s' because no corresponding key '%s' was found in mapping table file.", ifilevalue, varID, key, key);
       return 0;
     }
   else
     {
-      cdoWarning("Variable with varID '%d' could not be mapped via '%s' because it does not possess a '%s' in Ifile.", varID, key, key);
+      if ( cdoVerbose )
+        cdoPrint("In variable mapping:\n          Variable with varID '%d' could not be mapped via '%s' because it does not possess a '%s' in infile.", varID, key, key);
       return 0;
     }
 }
@@ -615,19 +667,22 @@ static int maptab_via_key(list_t *pml, int vlistID, int varID, int nventry, cons
 static int maptab_via_cn_and_key(list_t *kvl_oname, int vlistID, int nvars, const char *key)
 {
   keyValues_t *kv = kvlist_search(kvl_oname, key);
+  keyValues_t *kvcn = kvlist_search(kvl_oname, "cmor_name");
   if ( kv )
     {
       int varID = ( strcmp(key, "cmor_name") == 0 ) ? getVarIDToMap(vlistID, nvars, "name", kv->values[0]) : getVarIDToMap(vlistID, nvars, key, kv->values[0]);
       if ( varID != CDI_UNDEFID )
         {
-          printf("Started mapping of variable via '%s'.\n", key);
-          map_it(kvl_oname, vlistID, varID);
+          if ( cdoVerbose )
+            cdoPrint("Started mapping of variable via '%s'.", key);
+          map_it(kvl_oname, vlistID, varID, kv->values[0]);
           return 1;
         }
-      cdoWarning("Could not map via key '%s' because no Ifile variable '%s' equals '%s'.", key, key, kv->values[0]);
+      cdoPrint("In variable mapping:\n          Variable '%s' configured via cmor_name\n          could not be mapped via key '%s' because no infile variable '%s' equals '%s'.", kvcn->values[0], key, key, kv->values[0]);
     }
   else
-    cdoWarning("Could not map via key '%s' because it possesses no corresponding key '%s' in mapping file.", key, key);
+    if ( cdoVerbose )
+      cdoPrint("In variable mapping:\n          Variable '%s' configured via cmor_name\n          could not be mapped via key '%s' because it possesses no corresponding key '%s' in mapping file.", kvcn->values[0], key, key);
   return 0;
 }
 
@@ -635,52 +690,65 @@ static void maptab_via_cmd(list_t *pml, const char *origValue, int vlistID, int 
 {
   int varIDToMap = getVarIDToMap(vlistID, nvars, key, origValue);
   if ( varIDToMap == CDI_UNDEFID )
-    cdoAbort("Could not find variable with '%s': '%s' in Ifile.", key, origValue);
+    cdoAbort("In variable mapping:\n          Variable with '%s': '%s' configured via cmdline could not be found in infile '%s'.", key, origValue, cdoStreamName(0)->args);
   list_t *kvl_maptab = maptab_search_miptab(pml, cmorName, miptabfreq, "cmor_name");
   if ( !kvl_maptab )
     {
-      cdoWarning("Could not find cmor_name '%s' in mapping table.\n No mapping table is applied.", cmorName);
+      cdoWarning("In variable mapping:\n          The registered cmor_name '%s' via cmdline could not be found in mapping table.\n          No mapping table is applied.", cmorName);
       vlistDefVarName(vlistID, varIDToMap, parameter2word((const char *) cmorName));
     }
   else
     {
-      printf("Started mapping of variable via '%s'.\n", key);
-      map_it(kvl_maptab, vlistID, varIDToMap);
+      if ( cdoVerbose )
+        cdoPrint("Started mapping of variable via '%s'.", key);
+      map_it(kvl_maptab, vlistID, varIDToMap, cmorName);
     }
 }
 
-static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, int numvals, char *miptabfreq)
+static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, int numvals, char *miptabfreq, int filetype)
 {
   for ( int j = 0; j<numvals; j++)
     {
       list_t *kvl_oname = maptab_search_miptab(pml, request[j], miptabfreq, "cmor_name");
       if ( kvl_oname )
         {
+          if ( filetype == FILETYPE_GRB || filetype ==  FILETYPE_GRB2 )
+            {
+              if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "code") )
+                {
+                  if ( cdoVerbose )
+                    cdoPrint("Succesfully mapped variable via code to cmor_name '%s'.", request[j]); 
+                  continue;
+                }
+            }
           if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "name") )
             {
-              printf("*******Succesfully mapped variable via name to cmor_name: '%s'.********\n", request[j]); 
+              if ( cdoVerbose )
+                cdoPrint("Succesfully mapped variable via name to cmor_name: '%s'.", request[j]); 
               continue;
             }
-          else if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "code") )
+          else if ( ( filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 ) && maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "code") )
             {
-              printf("*******Succesfully mapped variable via code to cmor_name '%s'.********\n", request[j]); 
+              if ( cdoVerbose )
+                cdoPrint("Succesfully mapped variable via code to cmor_name '%s'.", request[j]); 
               continue;
             }
           else
             {
-              cdoWarning("No identification 'name' or 'code' in mapping table line of cmor_name '%s'. Try to use cmor_name.\n", request[j]);
+              if ( cdoVerbose )
+                cdoPrint("In variable mapping:\n          Try to use cmor_name for selecting the infile variable.", request[j]);
               if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "cmor_name") )
                 {
-                  printf("*******Succesfully mapped variable via cmor_name to cmor_name '%s'.********\n", request[j]); 
+                  cdoPrint("Succesfully mapped variable via cmor_name to cmor_name '%s'.", request[j]); 
                   continue;
                 }
-              cdoWarning("Cmor_name could not be used as identification name. Variable not mapped.\n", request[j]);
+              cdoWarning("In variable mapping:\n          Mapping table line of cmor_name '%s' could neither be mapped via 'name', 'code' nor 'cmor_name'.\n          No mapping for cmor_name: '%s'.", request[j]);
               continue;
             }
         }
       else
         {
-          cdoWarning("Requested cmor_name: '%s' is not found in mapping table.'\n", request[j]);
+          cdoWarning("In variable mapping:\n          Requested cmor_name: '%s' is not found in mapping table.\n          No mapping for cmor_name: '%s'", request[j]);
           continue;
         }
     }
@@ -755,14 +823,14 @@ static int count_axis_ids(int *axis_ids)
 static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, struct mapping vars[])
 {
   if ( cdoVerbose )
-    printf("*******Start to merge variables to one character coordinate.*******\n");
+    cdoPrint("Start to merge variables to one character coordinate.");
   int varIDs[charvars->nvalues];
   int nvars = vlistNvars(vlistID);
   for ( int i = 0; i < charvars->nvalues; i++)
     {
       varIDs[i] = getVarIDToMap(vlistID, nvars, key, charvars->values[i]);
       if ( varIDs[i] == CDI_UNDEFID )
-        cdoAbort("Could not find '%s' to build a variable with character coordinate.", charvars->values[i]);
+        cdoAbort("In merging variables to a variable with a character coordinate:\n          Could not find '%s' in infile '%s' to build a variable with character coordinate.", charvars->values[i], cdoStreamName(0)->args);
     }
 
   int gridID = vlistInqVarGrid(vlistID, varIDs[0]);
@@ -795,7 +863,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
 
 
   if ( axissize[0] != 1 && axissize[1] != 1 && axissize[2] != 1 )
-    cdoAbort("No axis found to merge. One axis may not be allocated with more than one value.");
+    cdoAbort("In merging variables to a variable with a character coordinate:\n          No axis found to merge. One axis may not be allocated with more than one value.");
 
   int oldgridsize = axissize[0] * axissize[1];
   double *buffer_old = (double *)Malloc(oldgridsize * sizeof(double));
@@ -805,11 +873,11 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
       gridID = vlistInqVarGrid(vlistID, varIDs[i]);  
       zaxisID = vlistInqVarZaxis(vlistID, varIDs[i]);
       if ( axissize[0] != gridInqXsize(gridID) )
-        cdoAbort("Size of x-axis: '%d' of variable '%s'\n differ from x-axis size of variable '%s': '%d'.", gridInqXsize(gridID), charvars->values[i], charvars->values[0], axissize[0]);
+        cdoAbort("In merging variables to a variable with a character coordinate:\n          Size of x-axis: '%d' of variable '%s'\n          differ from x-axis size of variable '%s': '%d'.", gridInqXsize(gridID), charvars->values[i], charvars->values[0], axissize[0]);
       if ( axissize[1] != gridInqYsize(gridID) )
-        cdoAbort("Size of y-axis: '%d' of variable '%s'\n differ from y-axis size of variable '%s': '%d'.", gridInqYsize(gridID), charvars->values[i], charvars->values[0], axissize[1]);
+        cdoAbort("In merging variables to a variable with a character coordinate:\n          Size of y-axis: '%d' of variable '%s'\n          differ from y-axis size of variable '%s': '%d'.", gridInqYsize(gridID), charvars->values[i], charvars->values[0], axissize[1]);
       if ( axissize[2] != zaxisInqSize(zaxisID) )
-        cdoAbort("Size of z-axis: '%d' of variable '%s'\n differ from z-axis size of variable '%s': '%d'.", zaxisInqSize(zaxisID), charvars->values[i], charvars->values[0], axissize[2]);
+        cdoAbort("In merging variables to a variable with a character coordinate:\n          Size of z-axis: '%d' of variable '%s'\n          differ from z-axis size of variable '%s': '%d'.", zaxisInqSize(zaxisID), charvars->values[i], charvars->values[0], axissize[2]);
     }
 
   if ( axissize[0] == 1 )
@@ -895,7 +963,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
   Free(buffer_old);
 
   if ( cdoVerbose )
-    printf("*******Successfully merged variables into one character axis. The final variable is called '%s' and has the ID: '%d'*******\n", charvars->values[0], var->cdi_varID);
+    cdoPrint("Successfully merged variables into one character axis. The final variable is called '%s' and has the ID: '%d'", charvars->values[0], var->cdi_varID);
 }
 
 static char *trim(char *s)
@@ -910,31 +978,25 @@ static char *trim(char *s)
   return s;
 }
 
-static int file_exist(const char *tfilename, int force)
+static int file_exist(const char *tfilename, int force, const char *fileart)
 {
   assert(tfilename != NULL);
   size_t filesize = fileSize(tfilename);
   if ( filesize == 0 && force)
-    {
-      fprintf(stderr, "Empty file: %s\n", tfilename);
-      return 0;
-    }
+    cdoAbort("In checking wether a %s file exist:\n          Empty file: '%s'.", fileart, tfilename);
   else if ( filesize == 0 && !force )
     {
-      cdoWarning("cannot open '%s'", tfilename);
+      cdoPrint("In checking wether a %s file exist:\n          Empty file: '%s'.", fileart, tfilename);
       return 0;
     }
   if ( strstr(tfilename, ".nc") || strstr(tfilename, ".grb") )
     return 1;
   FILE *fp = fopen(tfilename, "r");
   if ( fp == NULL && force )
-    {
-      fprintf(stderr, "Open failed on %s: %s\n", tfilename, strerror(errno));
-      return 0;
-    }
+    cdoAbort("In checking wether a %s file exist:\n          Open failed on: '%s'.", fileart, tfilename);
   else if ( fp == NULL && !force )
     {
-      cdoWarning("cannot open '%s'", tfilename);
+      cdoPrint("In checking wether a %s file exist::\n          Open failed on: '%s'.", fileart, tfilename);
       return 0;
     }
 
@@ -944,8 +1006,7 @@ static int file_exist(const char *tfilename, int force)
   
 static int parse_kv_file(list_t *kvl, const char *filename)
 {
-  if ( !file_exist(filename, 1) )
-    return 0;
+  file_exist(filename, 1, "Configuration");
 
   FILE *fp = fopen(filename, "r");
   size_t filesize = fileSize(filename);
@@ -953,7 +1014,8 @@ static int parse_kv_file(list_t *kvl, const char *filename)
   size_t nitems = fread(buffer, 1, filesize, fp);
   fclose(fp);
 
-  parse_buffer_to_list(kvl, filesize, buffer, 0, 1);
+  kv_insert_a_val(kvl, "workfile4err", (char *)filename, 1);
+  parse_buffer_to_list(kvl, filesize, buffer, 0, 1, kvl);
 
   if ( buffer ) Free(buffer);
   return 1;
@@ -968,7 +1030,7 @@ static void check_compare_set(char **finalset, char *attribute, const char *attn
           if ( defaultstr )
             *finalset = strdup(defaultstr);
           else
-            cdoAbort("Required value for attribute '%s' is neither found in input file nor in the configuration.", attname);
+            cdoAbort("In comparison of configuration attribute and infile attribute:\n          Required value for attribute '%s' is neither found in input file nor in the configuration.", attname);
         }
       else 
         *finalset = strdup(attribute);
@@ -977,7 +1039,7 @@ static void check_compare_set(char **finalset, char *attribute, const char *attn
     {
       if ( strcmp(attribute, *finalset) != 0 )
         {
-          cdoWarning("%s of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\nCmor libary is called with attribute unit '%s'.\n", attname, *finalset, attname, attribute, attribute);
+          cdoPrint("In comparison of configuration attribute and infile attribute:\n          '%s' of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\n          Cmor libary is called with attribute unit '%s'.", attname, *finalset, attname, attribute, attribute);
           Free(*finalset);
           *finalset = strdup(attribute);
         }
@@ -1020,7 +1082,7 @@ static int check_attr(list_t *kvl, char *project_id)
       if ( !kv_reqatt || strcmp(kv_reqatt->values[0], "notSet") == 0 )
         cdoAbort("Attribute '%s' is required. Either it is missing or notSet.", reqAtt[i]);
       if ( cdoVerbose )
-        printf("Attribute '%s' is '%s' \n", reqAtt[i], kv_reqatt->values[0]);
+        cdoPrint("Attribute '%s' is '%s'. ", reqAtt[i], kv_reqatt->values[0]);
       i++;
     }
 /* Set default attributes */
@@ -1032,7 +1094,7 @@ static int check_attr(list_t *kvl, char *project_id)
       char *references = (char *) Malloc(strlen(kv_model_id->values[0]) + 28);
       strcpy(references, "No references available for ");
       strcat(references, kv_model_id->values[0]);
-      cdoWarning("Attribute 'references' is set to '%s' ", references);
+      cdoPrint("Attribute 'references' is set to '%s' ", references);
       kv_insert_a_val(kvl, "references", references, 1);
       Free(references);
     }
@@ -1042,14 +1104,14 @@ static int check_attr(list_t *kvl, char *project_id)
   if ( strcmp(project_id, "CMIP5") == 0 )
     {
       if ( cdoVerbose )
-        printf("Since the project id is %s further attributes are tested. \n", project_id);
+        cdoPrint("Since the project id is %s further attributes are tested. ", project_id);
       while ( reqAttCMIP5[i] != NULL )
         {
           keyValues_t *kv_reqattCMIP5 = kvlist_search(kvl, reqAttCMIP5[i]);
           if ( !kv_reqattCMIP5 || strcmp(kv_reqattCMIP5->values[0], "notSet") == 0 )
             cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCMIP5[i]);
           if ( cdoVerbose )
-            printf("Attribute '%s' is '%s' \n", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
+            cdoPrint("Attribute '%s' is '%s'. ", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
           i++;
         }
 #if ( CMOR_VERSION_MAJOR == 3 )
@@ -1060,7 +1122,7 @@ static int check_attr(list_t *kvl, char *project_id)
           if ( !kv_reqattCMIP5 || strcmp(kv_reqattCMIP5->values[0], "notSet") == 0 )
             cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCMIP5[i]);
           if ( cdoVerbose )
-            printf("Attribute '%s' is '%s' \n", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
+            cdoPrint("Attribute '%s' is '%s'. ", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
           i++;
         }    
 #endif
@@ -1068,7 +1130,7 @@ static int check_attr(list_t *kvl, char *project_id)
   else if (strcmp(project_id, "CORDEX") == 0 )
     {
       if ( cdoVerbose )
-        printf("\nSince the project id is %s further attributes are tested\n", project_id);
+        cdoPrint("Since the project id is %s further attributes are tested.", project_id);
       i=0;
       while ( reqAttCORDEX[i] != NULL )
         {
@@ -1076,7 +1138,7 @@ static int check_attr(list_t *kvl, char *project_id)
           if ( !kv_reqattCORDEX || strcmp(kv_reqattCORDEX->values[0], "notSet") == 0 )
             cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCORDEX[i]);
           if ( cdoVerbose )
-            printf("Attribute '%s' is '%s' \n", reqAttCORDEX[i], kv_reqattCORDEX->values[0]);
+            cdoPrint("Attribute '%s' is '%s'. ", reqAttCORDEX[i], kv_reqattCORDEX->values[0]);
           i++;
         }
     }
@@ -1086,7 +1148,7 @@ static int check_attr(list_t *kvl, char *project_id)
 static int check_mem(list_t *kvl, char *project_id)
 {
   char *kv_member = kv_get_a_val(kvl, "member", "");
-  const char *ripchar[] = {"realization", "initialization_method", "physics_version", NULL};
+  const char *ripchar[] = {"realization", "initialization_method", "physics_version"};
   char crealiz[strlen(kv_member)];
   char *cinitial, *cphysics;
   char workchar[CMOR_MAX_STRING]; 
@@ -1116,13 +1178,13 @@ static int check_mem(list_t *kvl, char *project_id)
     }
   else if ( strcmp(kv_member, "notSet") == 0 )
     {
-      cdoWarning("The member has no RIP format! We set \n Attribute realization=-1 \n Attribute initialization_method=-1 \n Attribute physics_version=-1 \n");
+      cdoPrint("The member has no RIP format! Default setting is used: \n          realization=-1 \n           initialization_method=-1 \n           physics_version=-1. ");
       for ( int i = 0; i < 3; i++ )   
         kv_insert_a_val(kvl, ripchar[i], (char *)"-1", 1);
     }
 /* Now abort or warn */ 
   if (strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CORDEX") == 0)
-    cdoAbort("The member has no RIP format (at least 6 characters and in RIP order)! Found for \n member: %s. This is interpreted as \n Realization: %s \n Initialization: %s \n Physics: %s \n   But three Integers are needed", kv_member, crealiz, cinitial, cphysics);
+    cdoAbort("Attribute member has no RIP format (at least 6 characters and in RIP order)! Found for \n          member: %s. This is interpreted as \n           Realization: %s \n           Initialization: %s \n           Physics: %s \n             But three Integers are needed", kv_member, crealiz, cinitial, cphysics);
 
   return 0;
 } 
@@ -1217,7 +1279,7 @@ static void dump_special_attributes(list_t *kvl, int streamID)
 static void read_config_files(list_t *kvl)
 {
   if ( cdoVerbose )
-    printf("*******Start to read configuration files.*******\n");
+    cdoPrint("1. Start to read configuration files.");
   /* Files from info key in command line. */
   keyValues_t *info = kvlist_search(kvl, "i");
   int i = 0;
@@ -1225,11 +1287,11 @@ static void read_config_files(list_t *kvl)
     while ( i < info->nvalues )
       {
         if ( cdoVerbose )
-          printf("Try to parse file: '%s' configured with key 'info'.\n", info->values[i]);
+          cdoPrint("1.1. Try to parse file: '%s' configured with key 'info'.", info->values[i]);
         if ( parse_kv_file(kvl, info->values[i]) == 0 )
           cdoAbort("File '%s' does not exist.", info->values[i]);
         if ( cdoVerbose )
-          printf("Finished parsing file: '%s' configured with key 'info'.\n", info->values[i]);
+          cdoPrint("1.1. Successfully parsed file: '%s' configured with key 'info'.", info->values[i]);
         i++;
       }
 
@@ -1237,14 +1299,14 @@ static void read_config_files(list_t *kvl)
   char cwd[1024];
   getcwd(cwd, sizeof(cwd));
   const char *dotconfig = ".cdocmorinfo";
-  char *workfile = (char *)Malloc(strlen(cwd) + strlen(dotconfig) + 2);
+  char *workfile = (char *)Malloc((strlen(cwd) + strlen(dotconfig) + 2 ) * sizeof(char));
   sprintf(workfile, "%s/%s", cwd, dotconfig);
   if ( cdoVerbose )
-    printf("Try to parse default file: '%s'\n", workfile);
+    cdoPrint("1.2. Try to parse default file: '%s'.", workfile);
   if ( parse_kv_file(kvl, workfile) == 0 )
-    cdoWarning("File '%s' does not exist.", workfile);
-  if ( cdoVerbose )
-    printf("Finished parsing default file: '%s'\n", workfile);
+    cdoWarning("Default file for keyword 'info': '%s' does not exist.", workfile);
+  else if ( cdoVerbose )
+    cdoPrint("1.2. Successfully parsed default file: '%s'.", workfile);
   Free(workfile);
   
   if ( i == 0 )
@@ -1254,16 +1316,16 @@ static void read_config_files(list_t *kvl)
         while ( i < info2->nvalues )
           {
             if ( cdoVerbose )
-              printf("Try to parse file: '%s' configured with key 'info' in file '.cdocmorinfo'.\n", info2->values[i]);
+              cdoPrint("1.3. Try to parse file: '%s' configured with key 'info' in file '.cdocmorinfo'.", info2->values[i]);
             if ( parse_kv_file(kvl, info2->values[i]) == 0 )
               cdoAbort("File '%s' does not exist.", info2->values[i]);
             if ( cdoVerbose )
-              printf("Finished parsing file: '%s' configured with key 'info' in file '.cdocmorinfo'.\n", info2->values[i]);
+              cdoPrint("1.3. Successfully parsed file: '%s' configured with key 'info' in file '.cdocmorinfo'.", info2->values[i]);
             i++;
           }
     }
   if ( cdoVerbose )
-    printf("*******Successfully read configuration files.*******\n");
+    cdoPrint("1. Successfully read configuration files.");
 }
 
 static int in_list(char **list, const char *needle, int num)
@@ -1288,7 +1350,7 @@ static int get_netcdf_file_action(list_t *kvl)
         return CMOR_PRESERVE_4;
       else
         {
-          cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append ,'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.", chunk);
+          cdoWarning("You set output_mode = '%s', but valid are 'a' for append ,'r' for replace or 'p' for preserve.\n          CMOR output mode is set to: replace.", chunk);
           return CMOR_REPLACE;
         }
     }
@@ -1302,7 +1364,7 @@ static int get_netcdf_file_action(list_t *kvl)
         return CMOR_PRESERVE;
       else
         {
-          cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append ,'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.", chunk);
+          cdoWarning("You set output_mode = '%s', but valid are 'a' for append ,'r' for replace or 'p' for preserve.\n          CMOR output mode is set to: replace.", chunk);
           return CMOR_REPLACE;
         }
     }
@@ -1369,7 +1431,7 @@ static int get_calendar_int(char *calendar)
     return  CALENDAR_366DAYS;
   else
     {
-      cdoWarning("Calendar type %s is not supported by CMOR.\n", calendar);
+      cdoWarning("You set calendar type = '%s' which is not supported by CMOR.", calendar);
       return 0;
     }
 }
@@ -1430,7 +1492,7 @@ static int get_time_step_int(char *time_step)
     return TUNIT_YEAR;
   else
     {
-      cdoWarning("Timeunit %s not yet implemented in cmor.\n", time_step);
+      cdoWarning("You set required_time_units = '%s since...'.\n          This time step is not yet implemented in cmor.", time_step);
       return 0;
     }
 }
@@ -1444,7 +1506,7 @@ static int check_time_units(char *time_units)
                   time_step, &attyear, &attmonth, &attday, &atthour,
                   &attminute, &attsecond) != 7)
     {
-      cdoWarning("Could not read all 7 required time unit values.");
+      cdoWarning("You set required_time_units = '%s'\n          but it requires the form 'timestep since year-month-day hour:minute:second.\n          Could not read all 7 required time unit values.", time_units);
       return 0;
     }
   if ( !get_time_step_int(time_step) )
@@ -1476,7 +1538,7 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
       else if ( time_method[0] == 'n' ) { strcpy(cmor_time_name, "none\0"); *time_axis=4; }
       else
         {
-          cdoWarning("Found configuration time cell method '%s' is not valid. Check CF-conventions for allowed time cell methods.\nTime cell method is set to 'mean'. \n", time_method);
+          cdoWarning("You set cell method = '%s' which is not valid. Check CF-conventions for allowed time cell methods.\n          Time cell method is set to 'mean'. ", time_method);
           strcpy(cmor_time_name, "time \0");
         }
       Free(time_method);
@@ -1499,7 +1561,7 @@ static void get_taxis(char *required_time_units, int *sdate, int *stime, int *ti
 static double *get_branch_times(list_t *kvl, int calendar, char *time_units)
 {
   if ( cdoVerbose )
-    printf("*******Start to compute attribute 'branch_time'.******\n");
+    cdoPrint("6.1.3. Start to compute attribute 'branch_time'.");
   double *branch_time = (double *)Malloc(2 * sizeof(double));
   branch_time[0] = 0.0;
   branch_time[1] = 0.0;
@@ -1532,14 +1594,14 @@ static double *get_branch_times(list_t *kvl, int calendar, char *time_units)
       branch_time[1] = juldate_to_seconds(juldate_sub(parentbranchdate, childstartdate)) / 86400;
     }
   if ( cdoVerbose )
-    printf("*******Succesfully computed 'branch_time': '%f', '%f'.*******\n", branch_time[0], branch_time[1]);
+    cdoPrint("6.1.3. Succesfully computed 'branch_time': '%f', '%f'.", branch_time[0], branch_time[1]);
   return branch_time;
 }
 
 static char *check_required_time_units(list_t *kvl, int taxisID)
 {
   if ( cdoVerbose )
-    printf("*******Start to check attribute 'required_time_units'.******\n");
+    cdoPrint("6.1.2. Start to check attribute 'required_time_units'.");
   char *time_units = get_time_units(taxisID);
   char *required_time_units = kv_get_a_val(kvl, "required_time_units", NULL);
   if ( check_time_units(required_time_units) )
@@ -1548,14 +1610,14 @@ static char *check_required_time_units(list_t *kvl, int taxisID)
     cdoAbort("Required Attribute 'required_time_units' from configuration is invalid!");
   kv_insert_a_val(kvl, "required_time_units", time_units, 1);
   if ( cdoVerbose )
-    printf("*******Succesfully checked attribute 'required_time_units'.*******\n");
+    cdoPrint("6.1.2. Succesfully checked attribute 'required_time_units'.");
   return time_units;
 }
 
 static char *check_calendar(list_t *kvl, int taxisID, int *calendar)
 { 
   if ( cdoVerbose )
-    printf("*******Start to check attribute 'calendar'.******\n");
+    cdoPrint("6.1.1. Start to check attribute 'calendar'.");
   char *attcalendar = kv_get_a_val(kvl, "calendar", NULL);
   char *calendarptr = get_calendar_ptr(taxisInqCalendar(taxisID));
   if ( *calendar = get_calendar_int(attcalendar) )
@@ -1563,14 +1625,14 @@ static char *check_calendar(list_t *kvl, int taxisID, int *calendar)
   else 
     {
       if ( cdoVerbose )
-        printf("Try to use Ifile calendar.\n");
+        cdoPrint("Try to use infile calendar.");
       if ( !get_calendar_int(calendarptr) )
-        cdoAbort("No valid configuration and no valid Ifile calendar found.");
+        cdoAbort("In validating calendar:\n          No valid configuration calendar and no valid infile calendar found.");
       else
         *calendar = get_calendar_int(calendarptr);
     }
   if ( cdoVerbose )
-    printf("*******Succesfully checked attribute 'calendar'.*******\n");
+    cdoPrint("6.1.1. Succesfully checked attribute 'calendar'.");
   return calendarptr;
 }
 
@@ -1581,7 +1643,7 @@ static char *check_calendar(list_t *kvl, int taxisID, int *calendar)
 static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 {
   if ( cdoVerbose )
-    printf("*******Start to process cmor_setup and cmor_dataset.*******\n");
+    cdoPrint("6. Start to process cmor_setup and cmor_dataset.");
   int netcdf_file_action = get_netcdf_file_action(kvl);
   int set_verbosity = get_cmor_verbosity(kvl);
   int exit_control = get_cmor_exit_control(kvl);
@@ -1591,7 +1653,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
     creat_subs = 0;
   else if ( drs[0] != 'y' )
     {
-      cdoWarning("Unknown value for keyword 'drs' is found: '%s'.\nAllowed are: 'n' or 'y'. DRS is set to 'y'.", drs);
+      cdoWarning("In preparing cmor_setup:\n          You set 'd' = '%s' which is not valid.\n          Allowed are: 'n' or 'y'. d is set to 'y'.", drs);
       kv_insert_a_val(kvl, "d", (char *)"y", 1);
     }
 
@@ -1615,10 +1677,13 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
    Then check the required time units from config and retrieve
    Then compute branch_time_in_parent and branch_time_in_child */
 
+  if ( cdoVerbose )
+    cdoPrint("6.1. Start to check model calendar as well as 'required_time_units' and 'branch_times' attributes.");
   char *calendarptr = check_calendar(kvl, taxisID, calendar);  
   char *time_units = check_required_time_units(kvl, taxisID);
   double *branch_times = get_branch_times(kvl, *calendar, time_units); 
-
+  if ( cdoVerbose )
+    cdoPrint("6.1. Successfully found valid calendar, 'required_time_units' and 'branch_times'.");
 #if defined(CMOR_VERSION_MAJOR)
 #if ( CMOR_VERSION_MAJOR == 2 )
     {
@@ -1680,7 +1745,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
         {
           dataset_json = fopen(dataset_path, "w+");
           if ( !dataset_json )
-            cdoAbort("Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
+            cdoAbort("In preparing cmor_dataset:\n          Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
 
           fputs("{\n", dataset_json);
         }
@@ -1739,25 +1804,27 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
         }
       else
         {
-          cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
-          cmor_set_cur_dataset_attribute("branch_time_in_parent", branch_time_in_parent, 1);
-          cmor_set_cur_dataset_attribute("branch_time_in_child", branch_time_in_child, 1);
+          cmor_set_cur_dataset_attribute((char *)"calendar", calendarptr, 1);
+          cmor_set_cur_dataset_attribute((char *)"branch_time_in_parent", branch_time_in_parent, 1);
+          cmor_set_cur_dataset_attribute((char *)"branch_time_in_child", branch_time_in_child, 1);
         }
 
       Free(branch_time_in_parent);
       Free(branch_time_in_child);
+      if ( !isfile)
+        Free(filename);
     }
 #else
-    cdoAbort("Cmor version %d not yet enabled!\n", (int) CMOR_VERSION_MAJOR);
+    cdoAbort("Cmor version %d not yet enabled!", (int) CMOR_VERSION_MAJOR);
 #endif
 #else
-    cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
+    cdoAbort("It is not clear which CMOR version is installed since\n          Makros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.");
 #endif
   Free(calendarptr);
   Free(branch_times);
   Free(time_units);
   if ( cdoVerbose )
-    printf("*******Successfully finished cmor_setup and cmor_dataset.*******\n");
+    cdoPrint("6. Successfully finished cmor_setup and cmor_dataset.");
 }
 
 
@@ -1846,9 +1913,9 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
   if ( strcmp(chardim, "vegtype") == 0 || strcmp(chardim, "oline") == 0  )
     {
       if ( zsize )
-        cdoWarning("You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis attributes are ignored and the '%d' levels are interpreted as the character coordinates in the order they are given for '%s'.", chardim, zsize, zsize, varname);
+        cdoPrint("In Z-axis registration:\n          You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis attributes are ignored and the '%d' levels are interpreted as the character coordinates in the order they are given for '%s'.", chardim, zsize, zsize, varname);
       int numchar = 0;
-      char *charvalstring = (char *)Malloc(CMOR_MAX_STRING * sizeof(char));
+      char *charvalstring = (char *) Malloc(CMOR_MAX_STRING * sizeof(char));
       sprintf(charvalstring, "char_axis_%s", chardim);
       char **charvals = kv_get_vals(kvl, charvalstring, &numchar);
       Free(charvalstring);
@@ -1869,11 +1936,11 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           if ( numchar == zsize )
             cmor_axis(new_axis_id(axis_ids), chardim, (char *)"", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
           else
-            cdoAbort("The number of registered character coordinates '%d' differ from the number of axis levels '%d'.", numchar, zsize);
+            cdoAbort("In registration of a character coordinate as a substitution for a vertical coordinate:\n          The number of registered character coordinates '%d' differ from the number of axis levels '%d'.", numchar, zsize);
           Free(charcmor);
         }
       else
-        cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
+        cdoAbort("In registration of a character coordinate as a substitution for a vertical coordinate:\n          You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'.", chardim);
     }
   else
   {
@@ -1888,8 +1955,8 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
         {
           if ( strcmp(project_id, "CMIP5") != 0 && strcmp(project_id, "CMIP6") != 0 )
             cmor_axis(new_axis_id(axis_ids),
-                        (char *) "plevs",
-                        (char *) "Pa",
+                        (char *)"plevs",
+                        (char *)"Pa",
                         zsize,
                         (void *)levels,
                         'd', NULL, 0, NULL);
@@ -1939,27 +2006,20 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           if ( mtproof )
             {
               if ( cdoVerbose )
-                printf("Try to apply mapping table: '%s' for ps.\n", mtproof);
-              list_t *pml = cdo_parse_cmor_file(mtproof);
-              if ( pml == NULL )
-                cdoWarning("Mapping table: '%s' could not be parsed. Infile variable name needs to be 'ps'.", mtproof);
-              else
-                {
-                  const char *tempo[] = {"ps"};
-                  maptab_via_cn(pml, (char **) tempo, vlistID, vlistNvars(vlistID), 1, kv_get_a_val(kvl, "miptab_freq", NULL)); 
-                  if ( cdoVerbose )
-                    printf("*******Succesfully applied mapping table: '%s' for ps.*******\n", mtproof);
-                  list_destroy(pml);
-                }
+                cdoPrint("Mapping table: '%s' is applied for ps.", mtproof);
+              kv_insert_a_val(kvl, "workfile4err", mtproof, 1);
+              list_t *pml = cdo_parse_cmor_file(mtproof, kvl);
+              const char *tempo[] = {"ps"};
+              maptab_via_cn(pml, (char **)tempo, vlistID, vlistNvars(vlistID), 1, kv_get_a_val(kvl, "miptab_freq", NULL),  FILETYPE_NC ); 
+              list_destroy(pml);
             }
           else
             {
-              if ( cdoVerbose )
-                printf("Ps needs to be one infile variable name.");
+              cdoPrint("Ps needs to be one infile variable name.");
             }
           int psID = getVarIDToMap(vlistID, vlistNvars(vlistID), "name", "ps");
           if ( psID == CDI_UNDEFID )
-            cdoAbort("Could not find a surface pressure variable in infile. Cannot register a hybrid zaxis without surface pressure.");
+            cdoAbort("In registration of a vertical axis:\n          Could not find a surface pressure variable in infile. Cannot register a hybrid zaxis without surface pressure.");
 
           get_zhybrid(zaxisID, p0, alev_val, alev_bnds, b_val, b_bnds, ap_val, ap_bnds);
 /*cmor_zfactor (int *zfactor_id,int zaxis_id, char *zfactor_name, char *units, int ndims, int axis_ids[], char type, void *zfactor_values, void *zfactor_bounds)*/
@@ -2032,11 +2092,11 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
               Free(zaxisunits);
             }
           else
-            cdoAbort("Z-axis type %d with name '%s' not yet enabled.", zaxisInqType(zaxisID), zaxisname);
+            cdoAbort("In registration of a vertical axis:\n          Z-axis type %d with name '%s' not yet enabled.", zaxisInqType(zaxisID), zaxisname);
           Free(zaxisname);
         }
       else
-        cdoAbort("Invalid Z-axis type %d . \n", zaxisInqType(zaxisID));
+        cdoAbort("In registration of a vertical axis:\n          Invalid Z-axis type %d . ", zaxisInqType(zaxisID));
       Free(zcell_bounds);
       Free(levels);
     }
@@ -2111,26 +2171,26 @@ static void change_grid(char *grid_file, int gridID, int vlistID)
   int gridID2 = vlistInqVarGrid(vlistID2, 0); 
 
   if ( !gridID2 )
-    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n because of internal problems.", grid_file);
+    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n          because of internal problems.", grid_file);
 
   int a,b;
   a = gridInqSize(gridID);
   b = gridInqSize(gridID2);
   if ( a != b )
-    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n because total size of $IFILE: '%d' is not identical to total size of ginfo file: '%d'.", grid_file, a, b);
+    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n          because total size of $IFILE: '%d' is not identical to total size of ginfo file: '%d'.", grid_file, a, b);
 
   a = gridInqYsize(gridID);
   b = gridInqYsize(gridID2);
   if ( a != b )
-    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n because ysize of $IFILE: '%d' is not identical to ysize of ginfo file: '%d'.", grid_file, a, b);
+    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n          because ysize of $IFILE: '%d' is not identical to ysize of ginfo file: '%d'.", grid_file, a, b);
 
   a = gridInqXsize(gridID);
   b = gridInqXsize(gridID2);
   if ( a != b )
-    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n because xsize of $IFILE: '%d' is not identical to xsize of ginfo file: '%d'.", grid_file, a, b);
+    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n          because xsize of $IFILE: '%d' is not identical to xsize of ginfo file: '%d'.", grid_file, a, b);
 
   vlistChangeGrid(vlistID, gridID, gridID2);
-  printf("Succesfully substituted grid.\n");
+  cdoPrint("Succesfully substituted grid.");
 
   pstreamClose(streamID2);
 }
@@ -2174,18 +2234,18 @@ static void get_cmor_table(list_t *kvl, char *project_id)
 #elif ( CMOR_VERSION_MAJOR == 3 )
       sprintf(gridtable, "%s/%s_grids.json\0", mip_table_dir, project_id);
 #endif
-      if ( file_exist(gridtable, 1) )  
+      if ( file_exist(gridtable, 0, "Cmor-grid_table") )  
         {
           cmor_load_table(gridtable, &gridtable_id);
           cmor_set_table(gridtable_id);
         }
       else
-        cdoAbort("A project grid table is required for this type of grid but not found in the mip table directory '%s'.", mip_table_dir);
+        cdoAbort("In grid registration:\n          A project grid table is required for this type of grid but not found in the mip table directory '%s'.", mip_table_dir);
     }
   else
     {
-      cdoAbort("A project grid table is required for this type of grid but not found in the mip table directory. Check attributes \n mip_table_dir \n and \n project_id !");
-    } 
+      cdoAbort("In grid registration:\n          A project grid table is required for this type of grid but not found in the mip table directory. Check attributes 'mip_table_dir' and 'project_id' !");
+    }  
 }
 
 static void check_and_gen_bounds(int gridID, int nbounds, int length, double *coord_vals, double *cell_bounds, int x)
@@ -2585,13 +2645,13 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
                 {
                 case CDI_PROJ_RLL: 
                  p_len = (sizeof(p_rll) / sizeof(p_rll[0]))-1; break;
-                case CDI_PROJ_LAEA: cdoAbort("This grid projection is not yet enabled."); break;
+                case CDI_PROJ_LAEA: cdoAbort("In grid registration:\n          This grid projection is not yet enabled."); break;
                 case CDI_PROJ_LCC:
                   p_len = (sizeof(p_lcc) / sizeof(p_lcc[0]))-1; break;
-                case CDI_PROJ_SINU: cdoAbort("This grid projection is not yet enabled."); break;
+                case CDI_PROJ_SINU: cdoAbort("In grid registration:\n          This grid projection is not yet enabled."); break;
                 }
               if ( natts != p_len )
-                cdoWarning("The number of required grid mapping attributes '%d' differs from the number of given mapping attributes '%d'.\n Consider that all required mapping attributes are set to 0.0 by default in case they are not given.", p_len, natts);
+                cdoWarning("In grid registration:\n          Number of required grid mapping attributes '%d' differs from the number of given grid mapping attributes '%d'.\n          Note that all required mapping attributes are set to 0.0 by default in case they are not given.", p_len, natts);
  
               parameter_values = (double *) Malloc(p_len * sizeof(double));
               for ( int i = 0; i < p_len; i++ )
@@ -2603,7 +2663,7 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
                   if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
                     {
                       if ( attlen > 1 )
-                        cdoAbort("Dont know what to do with grid mapping attribute '%s'.", attname);
+                        cdoAbort("In grid registration:\n          Dont know what to do with grid mapping attribute '%s'.", attname);
                       double attflt[attlen];
                       cdiInqAttFlt(projID, CDI_GLOBAL, attname, attlen, attflt);
                       int i = 0;
@@ -2624,7 +2684,7 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
 
                         }
                       if ( i == p_len )
-                        cdoWarning("Grid mapping attribute '%s' is neglected.", attname);
+                        cdoWarning("In grid registration:\n          grid mapping attribute '%s' is neglected.", attname);
                     }
                   else if ( atttype  == DATATYPE_TXT )
                     {
@@ -2639,7 +2699,11 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
                   cmor_axis(&grid_axis[0],    (char *) "grid_latitude",   (char *) "degrees_north",    pylength,    (void *)pycoord_vals,    'd',    0, 0,   NULL);
                   cmor_axis(&grid_axis[1],    (char *)"grid_longitude",   (char *) "degrees_east",    pxlength,    (void *)pxcoord_vals,    'd',    0, 0,   NULL);
                   cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    4,     (void *)ycell_bounds,    (void *)xcell_bounds);
-                  cmor_set_grid_mapping(grid_ids[0], (char *)"rotated_latitude_longitude", p_len, (char **) p_rll_cmor, l_p_rll, parameter_values, (char **)u_rll_cmor,  l_u_rll);
+#if ( CMOR_VERSION_MAJOR == 2 )
+                  cmor_set_grid_mapping(grid_ids[0], "rotated_latitude_longitude", p_len, (char **) p_rll_cmor, l_p_rll, parameter_values, (char **)u_rll_cmor,  l_u_rll);
+#elif ( CMOR_VERSION_MAJOR == 3 )
+                  cmor_set_grid_mapping(grid_ids[0], (char *)"rotated_latitude_longitude", p_len, p_rll_cmor, l_p_rll, parameter_values, u_rll_cmor,  l_u_rll);
+#endif
                 }
               else if ( projtype == CDI_PROJ_LCC )
                 {
@@ -2652,7 +2716,11 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
                   cmor_axis(&grid_axis[0],  (char *)  "x",  (char *)  "m",    ylength,    (void *)yii,    'd',    0, 0,   NULL);
                   cmor_axis(&grid_axis[1],  (char *)  "y",  (char *)  "m",    xlength,    (void *)xii,    'd',    0, 0,   NULL);
                   cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    4,     (void *)ycell_bounds,    (void *)xcell_bounds);
+#if ( CMOR_VERSION_MAJOR == 2 )
                   cmor_set_grid_mapping(grid_ids[0], mapping, p_len,(char **)p_lcc_cmor, l_p_lcc, parameter_values, (char **)u_lcc_cmor,  l_u_lcc);
+#elif ( CMOR_VERSION_MAJOR == 3 )
+                  cmor_set_grid_mapping(grid_ids[0], mapping, p_len, p_lcc_cmor, l_p_lcc, parameter_values, u_lcc_cmor,  l_u_lcc);
+#endif
                   Free(xii); Free(yii);
                 }
               Free(parameter_values);
@@ -2759,7 +2827,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       else if ( type == GRID_GENERIC && ( strcmp(chardim, "oline") == 0 || strcmp(chardim, "basin") == 0 ))
             {
               if ( cdoVerbose )
-                printf("*******Start to define a character axis '%s' instead of a grid axis'.******\n", chardim);
+                cdoPrint("Start to define a character axis '%s' instead of a grid axis'.", chardim);
               grid_ids[0] = 0;
               int numchar = 0;
               char *charvalstring = (char *) Malloc(CMOR_MAX_STRING * sizeof(char));
@@ -2767,9 +2835,9 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
               char **charvals = kv_get_vals(kvl, charvalstring, &numchar);
               Free(charvalstring);
               if ( ( xlength > 0 && xlength != numchar ) && ( ylength > 0 && ylength != numchar ) )
-                cdoAbort("You configured a character coordinate '%s' with '%d' string values but you also registered a grid with '%d' numerical values on X axis and '%d' numerical values on Y axis. Both is not supported!", chardim, numchar, xlength, ylength);
+                cdoAbort("In registration of a character coordinate as substitution for a horizontal axis:\n          You configured a character coordinate '%s' with '%d' string values but you also registered a grid with '%d' numerical values on X axis and '%d' numerical values on Y axis. One axis must match the number of string values.", chardim, numchar, xlength, ylength);
               if ( !charvals )
-                cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
+                cdoAbort("In registration of a character coordinate as substitution for a horizontal axis:\n          You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
               if ( charvals && ( xlength == numchar || xlength == 0 ) )
                 {
                   register_char_axis(numchar, charvals, axis_ids, chardim);
@@ -2782,7 +2850,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
                   register_char_axis(numchar, charvals, axis_ids, chardim);
                 }
               if ( cdoVerbose )
-                printf("*******Succesfully defined a character axis '%s' instead of a grid axis.******\n", chardim);
+                cdoPrint("Succesfully defined a character axis '%s' instead of a grid axis.", chardim);
             }
         /*
               grid_ids[0] = 0;
@@ -2866,12 +2934,12 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
             }
       else if ( type == GRID_PROJECTION )
             {
-              cdoAbort("For a 'rotated_lat_lon' projection, both grids, the unprojected lat/lon and the projected rlat/rlon are required.");            
+              cdoAbort("In grid registration:\n          For a 'rotated_lat_lon' projection, both grids, the unprojected lat/lon and the projected rlat/rlon are required.");            
             }
       else
             {
               grid_ids[0] = 0;
-              cdoWarning("Either the grid type is unknown or a registration is not necessary. However, it is not registered by cdo.\n");
+              cdoWarning("Registration of a grid is skipped. Either the grid type is unknown or a registration is not necessary.");
             }
 
       if ( projID != CDI_UNDEFID )
@@ -2893,7 +2961,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
                               struct mapping *var, int *grid_ids, char *name)
 {
   if ( cdoVerbose )
-    printf("*******Start to retrieve 'positive' and 'units'.******\n");
+    cdoPrint("Start to retrieve 'positive' and 'units'.");
   char *positive = get_txtatt(vlistID, varID, "positive");
   char *origname = get_txtatt(vlistID, varID, "original_name");
   char *history = get_txtatt(vlistID, varID, "history");
@@ -2921,7 +2989,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
       varcom = NULL;
     }
   if ( cdoVerbose )
-    printf("*******Succesfully retrieved 'positive': '%s' and 'units' : '%s'.******\n", positive, units);
+    cdoPrint("Succesfully retrieved 'positive': '%s' and 'units' : '%s'.", positive, units);
   char missing_value[sizeof(double)];
   double tolerance = 1e-4;
   size_t gridsize = vlistGridsizeMax(vlistID);
@@ -2948,7 +3016,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
     *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
    
   if ( cdoVerbose )
-    printf("*******Start to call cmor_variable.******\n");
+    cdoPrint("Start to call cmor_variable.");
   if ( grid_ids[0] != 0 )
     {
       int *tmp_id = new_axis_id(axis_ids);
@@ -2970,7 +3038,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
                         kv_get_a_val(kvl, "vc", NULL));
     }
   if ( cdoVerbose )
-    printf("*******Succesfully called cmor_variable.******\n");
+    cdoPrint("Succesfully called cmor_variable.");
   if (positive) Free(positive); 
   if (origname) Free(origname); 
   if (history) Free(history); 
@@ -2986,7 +3054,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
   char *time_units = kv_get_a_val(kvl, "required_time_units", NULL);
 
   if ( cdoVerbose )
-    printf("*******Start to retrieve requested variables.******\n");
+    cdoPrint("7. Start to retrieve requested variables.");
 
   int numvals = 0;
   char **cmor_names = kv_get_vals(kvl, "cn", &numvals);
@@ -3002,9 +3070,9 @@ static void register_all_dimensions(list_t *kvl, int streamID,
     }
 
   if ( cmor_names == NULL && vlistNvars(vlistID) > 1 )
-    cdoWarning("You have not requested any specific variable but there are several in input! Notice that all command line configuration attributes including cmor_name and units will be used for every variable!\n");
+    cdoPrint("In registration of all dimensions for the variables:\n          You have not requested any specific variable but there are several in infile! Notice that if attributes e.g. units are configured via cmdline, they will be used for every variable!");
   if ( cdoVerbose )
-    printf("*******Succesfully retrieved requested variables*******\n");
+    cdoPrint("7. Succesfully retrieved requested variables");
   int foundName = 0;
   int ps_required = 0;
   int ps_in_file = 0;
@@ -3021,18 +3089,17 @@ static void register_all_dimensions(list_t *kvl, int streamID,
           axis_ids[0] = CMOR_UNDEFID;
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
           if ( cdoVerbose )
-            printf("*******Start to define variable with ID: '%d' and name: '%s'*******\n", varID, name);
+            cdoPrint("Start to define variable with ID: '%d' and name: '%s'", varID, name);
           if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
             {
-              if ( cdoVerbose )
-                printf("Since the zaxis of variable '%s' is of type HYBRID, surface pressure is required. An infile variable must have the name ps.\n", name);
+              cdoPrint("Since the zaxis of variable '%s' is of type HYBRID, surface pressure is required. An infile variable must have the name ps.", name);
               ps_required++;
             }
           foundName++;
           /* Time-Axis */
           if ( cdoVerbose )
-            printf("*******Start to register a time axis*******\n");
-          char cmor_time_name[CMOR_MAX_STRING];
+            cdoPrint("Start to register a time axis");
+          char cmor_time_name[CMOR_MAX_STRING]; cmor_time_name[0] = '\0';
           get_time_method(kvl, vlistID, varID, cmor_time_name, project_id, miptab_freq, time_axis);
           if ( strcmp(cmor_time_name, "none") != 0 )
             cmor_axis(new_axis_id(axis_ids),
@@ -3040,31 +3107,31 @@ static void register_all_dimensions(list_t *kvl, int streamID,
                     time_units,
                     0,NULL, 0, NULL, 0, NULL);
           if ( cdoVerbose )
-            printf("*******Succesfully handled time axis registration*******\n");
+            cdoPrint("Succesfully handled time axis registration.");
           /* Grid: */
           if ( cdoVerbose )
-            printf("*******Start to register a grid*******\n");
+            cdoPrint("Start to register a grid");
           int grid_ids[CMOR_MAX_GRIDS];
           register_grid(kvl, vlistID, varID, axis_ids, grid_ids, project_id);
           cmor_set_table(table_id);
           if ( cdoVerbose )
-            printf("*******Succesfully handled grid registration*******\n");
+            cdoPrint("Succesfully handled grid registration.");
           /* Z-Axis */
           if ( cdoVerbose )
-            printf("*******Start to register a zaxis*******\n");
+            cdoPrint("Start to register a zaxis");
           register_z_axis(kvl, vlistID, varID, zaxisID, name, axis_ids, &var->zfactor_id, project_id, miptab_freq);
           if ( cdoVerbose )
-            printf("*******Succesfully handled zaxis registration*******\n");
+            cdoPrint("Succesfully handled zaxis registration.");
           /* Variable */
           register_variable(kvl, vlistID, varID, axis_ids, var, grid_ids, name);     
           if ( cdoVerbose )
-            printf("*******Succesfully defined variable with ID: '%d' and name: '%s'*******\n", varID, name);
+            cdoPrint("Succesfully defined variable with ID: '%d' and name: '%s'.", varID, name);
         }
     }
   if ( ps_required )
     {
       if ( cdoVerbose )
-        printf("\n *******Start to find surface pressure.*******\\n");
+        cdoPrint("Start to find surface pressure.");
       for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
         if ( vlistInqVarCode(vlistID, varID) == 134 )
           {
@@ -3094,13 +3161,11 @@ static void register_all_dimensions(list_t *kvl, int streamID,
         printf("\n *******Succesfully registered surface pressure.*******\\n");
     }
   if ( ps_required && !ps_in_file )
-    cdoAbort("No surface pressure found in Ifile but required for a hybrid sigma pressure z axis!");
-  if ( !foundName && cmor_names == NULL )
-    cdoAbort("No variables from your table %s found in Ifile.\n");
+    cdoAbort("After registration of all dimensions for all variables:\n          No surface pressure found in infile but required for a hybrid sigma pressure z axis!");
   if ( !foundName && cmor_names )
-    cdoAbort("None of the given variables to process by attribute 'cmor_name' is found in Ifile.\n");
+    cdoAbort("After registration of all dimensions for all variables:\n          None of the given variables to process by attribute 'cmor_name' is found in infile.");
   if ( cdoVerbose )
-    printf("*******Succesfully registered all dimensions for %d variables successfully.*******\n", foundName);
+    cdoPrint("Succesfully registered all dimensions for %d variables successfully.", foundName);
 }
 
 static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, int miptab_freq)
@@ -3179,7 +3244,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
               int step_per_year = 0;
               reccounter = 0;
               if ( cdoVerbose )
-                printf("Frequency is calculated by counting all timesteps in year %d\nin order to calculate time bounds in case they are not given.\n", fyear, fmonth);
+                cdoPrint("Frequency is calculated by counting all timesteps in year %d\n          in order to calculate time bounds in case they are not given.", fyear, fmonth);
               while ( recdummy = pstreamInqTimestep(streamID2, reccounter++) )
                 {
                   int reqyear;
@@ -3190,7 +3255,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
                 } 
               int covered_months = lmonth-fmonth+1;
               if ( step_per_year > 366*8 )
-                cdoAbort("Frequency is sub-3hourly! Not yet enabled.");
+                cdoAbort("In estimating frequency:\n          Frequency is sub-3hourly! Not yet enabled.");
               else
                 {
                   if ( (double)step_per_year / (double)covered_months > 31*8 )
@@ -3205,15 +3270,15 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
                     strcpy(frequency, "mon");
                 }
               if ( cdoVerbose )
-                printf("Found %d time steps in year %d.\nTherefore, the frequency is %s.\n", step_per_year, fyear, frequency);
+                cdoPrint("Found %d time steps in year %d.\n          Therefore, the frequency is %s.", step_per_year, fyear, frequency);
             }
         }
       else
         {
           if ( !taxisHasBounds(taxisID2) && ntsteps > 0 )
-            cdoAbort("No time bounds are found in Ifile and for %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nDefine time bounds before cdo cmor.", ntsteps);
+            cdoAbort("In estimating frequency:\n          No time bounds are found in Ifile and for %d found timesteps no frequency can be computed - at least 3 timesteps are required.\n          Define time bounds before cdo cmor.", ntsteps);
           else
-            cdoWarning("For %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nTime bounds of the rec are used.\n", ntsteps);
+            cdoWarning("In frequency estimation:\n          For %d found timesteps no frequency can be computed - at least 3 timesteps are required.\n          Time bounds of the rec are used.", ntsteps);
         }
       pstreamClose(streamID2);
     }
@@ -3245,8 +3310,8 @@ static juldate_t get_cmor_time_val(int taxisID, juldate_t ref_date, int tunitsec
       int ryear, rmonth, rday, addseconds = 0;
       juldate_decode(calendar, ref_date, &rdate, &rtime);
       cdiDecodeDate(rdate, &ryear, &rmonth, &rday);
-      if ( ts_id < 4 )
-        cdoWarning("Your time axis is incorrect. It is tried to calculate time values with frequency.\nCONSIDER: These are only valid if\n - cm=m \n - a continous time axis exist according to the frequency \n- a correct calendar exist!\n\n This warning is generated for the first 3 time steps");
+      if ( ts_id < 2 )
+        cdoWarning("In writing the data:\n          Time axis is incorrect. It is tried to calculate time values with frequency.\n          Note: These are only valid if\n           - cm=m \n           - a equally spaced monotonical time axis exist according to the frequency \n           - a correct calendar exist!");
       if ( strcmp(frequency, "yr") == 0 )
         {
           year = ryear+ts_id;
@@ -3313,7 +3378,7 @@ static double *get_time_bounds(list_t *kvl, int taxisID, char *frequency, juldat
           int numdates;
           char **climyears = kv_get_vals(kvl, "climatology_interval", &numdates);
           if ( numdates != 2 )
-            cdoAbort("Could not calculate time bounds for climatology time axis because attribute 'climatology_interval' has not two values.");
+            cdoAbort("In writing model output:\n          Could not calculate time bounds for climatology time axis because attribute 'climatology_interval' has not two values.");
           int expstartyear = atol(climyears[0]);
           int expendyear = atol(climyears[1]);
 /***/
@@ -3454,7 +3519,7 @@ static void check_for_sfc_pressure(int *ps_index, struct mapping vars[], int vli
         ps_required ++;
     }
   if ( ps_index < 0 && ps_required )
-    cdoAbort("No surface pressure found for time step %d but required in Hybrid-sigma-pressure-coordinates! \n", timestep);
+    cdoAbort("In writing data with CMOR:\n          No surface pressure found for time step %d but required in Hybrid-sigma-pressure-coordinates. ", timestep);
 }
 
 
@@ -3466,7 +3531,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   char old_end_date[CMOR_MAX_STRING];
   int i = 0, j = 0;
 /* Get dates from chunk string */
-  if ( cdoVerbose) printf("*******Start to retrieve dates from chunk string.******\n");
+  if ( cdoVerbose) cdoPrint("Start to retrieve dates from chunk string.");
   while ( *(test+i) != 0 )
     {
       if ( *(test+i) == '_' )
@@ -3480,7 +3545,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
     }
   if ( !i || !j || *(test+j+1) == 0 || *(test+2*j) == 0 )
     {
-      cdoWarning("Error while checking chunk size for append mode.\nNew data will be appended.");
+      cdoWarning("In checking the last chunk:\n          Date from filename of the chunk cannot be read.\n          Switched to replace mode for this variable.");
       return 0;
     }
 
@@ -3496,10 +3561,14 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   if ( (j == 8 && ifreq !=3) || (ifreq == 3 && j != 8)
     || (j == 6 && ifreq !=2) || (ifreq == 2 && j != 6)
     || (j == 4 && ifreq !=1) || (ifreq == 1 && j != 4) )
-    cdoAbort("Frequency of chunk file does not agree with frequency of the working file.");
+    {
+      cdoWarning("In checking last chunk:\n          Frequency of chunk file does not agree with frequency of the working file.\n          Switched to replace mode for this variable.");
+      return 0;
+    }
+
 
 /* Encode in julseconds depending on frequency */
-  if ( cdoVerbose) printf("*******Start to encode dates with frequencies to julseconds.******\n");
+  if ( cdoVerbose) cdoPrint("Start to encode dates with frequencies to julseconds.");
 
   int old_start_year, old_start_month = 1, old_start_day = 1;
   int old_end_year, old_end_month = 1, old_end_day = 1;
@@ -3520,7 +3589,10 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
       old_end_year = atol(old_end_date);
       break;
     default:
-      cdoAbort("Selected chunk to append data has subdaily frequency which is yet not enabled by cdo cmor.\nA new file will be written.");
+      {
+        cdoWarning("In checking last chunk:\n          Last chunk has subdaily frequency which is yet not enabled by cdo cmor.\n          Switched to replace mode for this variable.");
+        return 0;
+      }
     }
 
   int cdi_startdate = cdiEncodeDate(old_start_year, old_start_month, old_start_day);
@@ -3529,12 +3601,12 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   juldate_t julostart = juldate_encode(calendar, cdi_startdate, cdi_time);
   juldate_t juloend = juldate_encode(calendar, cdi_enddate, cdi_time);
 
-  if ( cdoVerbose) printf("*******Succesfully calculated juldates.******\n", old_start_date);
+  if ( cdoVerbose) cdoPrint("Succesfully calculated juldates.", old_start_date);
 /* Read in first vdate in case not piped */
-  if ( cdoVerbose) printf("*******Start to calculate temporal gap between chunk and working file.******\n");
+  if ( cdoVerbose) cdoPrint("Start to calculate temporal gap between chunk and working file.");
   if ( cdoStreamName(0)->args[0] == '-' )
     {
-      cdoWarning("Cdo cmor cannot enable append mode since you piped several cdo operators.\nA new file will be written.");
+      cdoWarning("Cdo cmor cannot enable append mode since you piped several cdo operators.\n          Switched to replace mode for this variable.");
       return 0;
     }
       
@@ -3551,14 +3623,14 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
      ||( j == 6 && ( append_distance/24.0 > 62.0 || append_distance < 0 ) )
      ||( j == 4 && ( append_distance/24.0/30.5 > 24.0 || append_distance < 0 ) ) )
     {
-      cdoWarning("A temporal gap is diagnosed between end date of chunk file and first date of working file of: '%f' hours. Maximal valid gaps are:\n48 hours for daily frequency\n62 days for monthly frequency\n24 month for yearly frequency.\nSwitched to replace mode.", append_distance);
+      cdoWarning("In checking the last chunk:\n          A temporal gap is diagnosed between end date of chunk file and first date of working file of: '%f' hours. Maximal valid gaps are:\n          48 hours for daily frequency\n          62 days for monthly frequency\n          24 month for yearly frequency.\n          Switched to replace mode for this variable.", append_distance);
       pstreamClose(streamID2);
       return 0;
     }
 
-  if ( cdoVerbose) printf("*******Succesfully checked temporal gap.******\n");
+  if ( cdoVerbose) cdoPrint("Succesfully checked temporal gap.");
 /* Check file size */
-  if ( cdoVerbose) printf("*******Start to check file size of chunk + working file.******\n");
+  if ( cdoVerbose) cdoPrint("Start to check file size of chunk + working file.");
   double old_interval_sec = juldate_to_seconds(juldate_sub(juloend, julostart));
   double size_per_sec = (double) filesize / old_interval_sec;
 
@@ -3572,7 +3644,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
       while ( pstreamInqTimestep(streamID2, ntsteps++)) ;
       if ( ntsteps == 0 )
         {
-          cdoWarning("A mistake occured during timesteps determination.\nSwitched to replace mode.");
+          cdoWarning("In checking whether append mode is possible:\n          No time steps found in infile.\n          Switched to replace mode for this variable.");
           pstreamClose(streamID2);
           return 0;
         }
@@ -3592,7 +3664,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
       break;
     default:
       {
-        cdoWarning("Selected chunk to append data has subdaily frequency which is yet not enabled by cdo cmor.\nA new file will be written.");
+        cdoWarning("In checking whether append mode is valid:\n          Selected chunk to append data has subdaily frequency which is yet not enabled by cdo cmor.\n          Switched to replace mode for this variable.");
         pstreamClose(streamID2);
         return 0;
       }
@@ -3600,19 +3672,19 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
 
   if ( (unsigned int)estimated_size > (unsigned int) maxsizeb )
     {
-      cdoWarning("Estimated file size of appended file is : '%f'gb and exceeds maximal allowed file size: '%d'gb.\nA new file will be written.", estimated_size/1024.0/1024.0/1024.0, maxsizegb);
+      cdoWarning("In checking whether append mode is valid:\n          Estimated file size of appended file is : '%f'gb and exceeds maximal allowed file size: '%d'gb.\n          Switched to replace mode for this variable.", estimated_size/1024.0/1024.0/1024.0, maxsizegb);
       pstreamClose(streamID2);
       return 0;
     }
   pstreamClose(streamID2);
-  if ( cdoVerbose) printf("*******Succesfully checked file size of chunk + working file.******\n");
+  if ( cdoVerbose) cdoPrint("Succesfully checked file size of chunk + working file.");
   return 1;
 }
 
 static char *use_chunk_des_files(list_t *kvl, int vlistID, int var_id, char *chunk_des_file, int ifreq, int calendar)
 {
   char *chunk_file = (char *) Malloc(4096 * sizeof(char));
-  if ( file_exist(chunk_des_file, 0) )
+  if ( file_exist(chunk_des_file, 0, "chunk_description") )
     {
       FILE *fp = fopen(chunk_des_file, "r");
       size_t filesize = fileSize(chunk_des_file);
@@ -3620,13 +3692,13 @@ static char *use_chunk_des_files(list_t *kvl, int vlistID, int var_id, char *chu
       size_t nitems = fread(buffer, 1, filesize, fp);
       char *eof = readLineFromBuffer(buffer, &filesize, chunk_file, 4096);
       if ( eof != NULL )
-        cdoWarning("Chunk description file contains more than one line.\n All lines after line 1 are ignored.");
+        cdoWarning("In checking the last chunk:\n          Chunk description file contains more than one line.\n          All lines after line 1 are ignored.");
       fclose(fp);
       Free(buffer);
-      if ( file_exist(chunk_file, 0) && check_append_and_size(kvl, vlistID, chunk_file, ifreq, calendar) )
+      if ( file_exist(chunk_file, 0, "chunk_description") && check_append_and_size(kvl, vlistID, chunk_file, ifreq, calendar) )
         return chunk_file;
       else
-        cdoWarning("Chunk '%s' configured via chunk description file could either not be opened or is not suitable to be appended.\nSwitched to replace mode.", chunk_file);
+        cdoWarning("In checking the last chunk:\n          Chunk '%s' configured via chunk description file could either not be opened or is not suitable to be appended.\n          Switched to replace mode for this variable.", chunk_file);
     }
   else
     cdoWarning("Chunk description file '%s' could not be opened.\nSwitched to replace mode.", chunk_des_file);
@@ -3681,7 +3753,7 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
     return empty_array(vars, &chunk_files);
   else if ( time_axis == 4 )
     {
-      printf("CMOR APPEND mode not possible for time independent variables.\nSwitched to replace mode");
+      cdoWarning("In validating append mode:\n          CMOR APPEND mode not possible for time independent variables.\n          Switched to replace mode for this variable");
       return empty_array(vars, &chunk_files);
     }
 
@@ -3702,9 +3774,9 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
 /* For chunk description file : */
       if ( nd[0] == 'y' )
         chunk_des_files = get_chunk_des_files(kvl, vars, miptab_freqptr, i, vlistID, NULL);
-      else if ( cdoVerbose )
+      else
         {
-          printf("Automatic chunk configuration via file not possible if DRS is not created.\nSwichted to replace mode.");
+          cdoWarning("In getting chunk files:\n          Automatic chunk configuration via file not possible if DRS is not created.\n          Swichted to replace mode.");
           return empty_array(vars, &chunk_files);
         }
     }
@@ -3713,26 +3785,26 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
     {
       if ( num_aaf != 0 )
         {
-          if ( file_exist(chunk_att_files[j], 0) && check_append_and_size(kvl, vlistID, chunk_att_files[j], ifreq, calendar) )
+          if ( file_exist(chunk_att_files[j], 0, "chunk file") && check_append_and_size(kvl, vlistID, chunk_att_files[j], ifreq, calendar) )
             chunk_files[j] = strdup(chunk_att_files[j]);
           else
             {
-              cdoWarning("Chunk '%s' could not be used.\nSwitched to replace mode for this variable.\n", chunk_att_files[j]);
+              cdoWarning("Chunk '%s' could not be used.\n          Switched to replace mode for this variable.", chunk_att_files[j]);
               chunk_files[j] = strdup(" ");
             }   
         }
       else 
         {
           if ( cdoVerbose )
-            printf("It is tried to open a chunk description file for varID: '%d': '%s'.\n", vars[j].cdi_varID, chunk_des_files[j]);
+            cdoPrint("It is tried to open a chunk description file for varID: '%d': '%s'.", vars[j].cdi_varID, chunk_des_files[j]);
           chunk_files[j] = use_chunk_des_files(kvl, vlistID, vars[j].cdi_varID, chunk_des_files[j], ifreq, calendar);  
         }
       if ( cdoVerbose && strcmp(chunk_files[j], " ") != 0 )
-        printf("\n*******Chunk file to append on var with CDI ID %d is: '%s' .******\n", vars[j].cdi_varID, chunk_files[j]);
+        cdoPrint("Chunk file to append on var with CDI ID %d is: '%s'.", vars[j].cdi_varID, chunk_files[j]);
     }
   if ( chunk_des_files ) free_array(chunk_des_files);
   if ( cdoVerbose )
-    printf("\n*******Successfully processed chunk file retrieval.******\n");
+    cdoPrint("Successfully processed chunk file retrieval.");
   return chunk_files;
 }
 
@@ -3745,7 +3817,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
   size_t gridsize = vlistGridsizeMax(vlistID);
 
   if ( cdoVerbose )
-    printf("\n*******Start to retrieve relative start time value from 'required_time_units' and file and start to retrieve frequency.******\n");
+    cdoPrint("Start to retrieve relative start time value from 'required_time_units' and file and start to retrieve frequency.");
   int sdate, stime, time_unit;
   get_taxis(kv_get_a_val(kvl, "rtu", NULL), &sdate, &stime, &time_unit);
   int tunitsec = get_tunitsec(time_unit);
@@ -3754,7 +3826,8 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
   if ( time_axis != 4 )
     frequency = get_frequency(kvl, *streamID, vlistID, taxisID, miptab_freq);
   if ( cdoVerbose )
-    printf("\n*******Succesfully retrieved time value from 'required_time_units' and frequency.******\n");
+    cdoPrint("Succesfully retrieved time value from 'required_time_units' and frequency.");
+
 
   int ifreq = 0;
   if ( frequency )
@@ -3788,8 +3861,8 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
         pscheck = 0;
         break;
       }
-  if ( !pscheck )
-    cdoWarning("Since you defined a variable with character coordinate axis you cannot write another variable with zaxis of type ZAXIS_HYBRID.");
+  if ( pscheck == 0 )
+    cdoPrint("Since you defined a variable with character coordinate axis you cannot write another variable with zaxis of type ZAXIS_HYBRID.");
 
   while ( (nrecs = pstreamInqTimestep(*streamID, tsID++)) )
     { 
@@ -3904,9 +3977,9 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
         }
     }
   if ( cdoVerbose )
-    printf("\n*******Succesfully written variables via cmor_write.******\n");
+    cdoPrint("Succesfully written variables via cmor_write.");
   if ( cdoVerbose )
-    printf("\n*******Start to close files and free allocated memory.******\n");
+    cdoPrint("Start to close files and free allocated memory.");
   char **chunkdf = NULL;
   if ( strcmp(kv_get_a_val(kvl, "om", ""), "a") == 0 && strcmp(kv_get_a_val(kvl, "d", "y"), "y") == 0 )
     chunkdf = get_chunk_des_files(kvl, vars, miptab_freqptr, i, vlistID, charname);
@@ -3917,23 +3990,22 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
       if ( !vars[i].help_var )
         {
           cmor_close_variable(vars[i].cmor_varID, file_name, NULL);
-          printf("*******File stored in:  '%s' with cmor!*******\n", file_name);
+          cdoPrint("     File stored in:  '%s' with cmor!", file_name);
           if ( chunkdf )
             {
               if ( cdoVerbose )
-                printf("*******Start to write a chunk description file.******\n");
+                cdoPrint("Start to write a chunk description file.");
               FILE *fp = fopen(chunkdf[i], "w+"); 
               if ( fp )
                 fprintf(fp, "%s", file_name);
               else
                 {
-                  if ( cdoVerbose )
-                    printf("Could not open a chunk description file '%s'.\n", chunkdf[i]);
+                  cdoPrint("Could not open a chunk description file '%s'.", chunkdf[i]);
                   continue;
                 }
               fclose(fp);  
               if ( cdoVerbose )
-                printf("*******Succesfully written a chunk description file '%s'******\n" , chunkdf[i]);            
+                cdoPrint("Succesfully written a chunk description file '%s'" , chunkdf[i]);            
             }         
         }
     }
@@ -3941,7 +4013,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
 
   if (frequency) Free(frequency); if (chunk_files) free_array(chunk_files); if (chunkdf) free_array(chunkdf); if (charname) Free(charname);
   if ( cdoVerbose )
-    printf("\n*******Succesfully closed files and freed allocated memory.******\n");
+    cdoPrint("Succesfully closed files and freed allocated memory.");
 }
 
 static list_t *check_for_charvars(list_t *maptab, const char *key)
@@ -4011,7 +4083,7 @@ static list_t *check_for_charvars(list_t *maptab, const char *key)
               else
                 {
                   Free(workchar2);
-                  cdoWarning("Names in String for key '%s' could not be interpreted correctly due to a comma at end of line.", key);
+                  cdoWarning("In checking for variables with character coordinate:\n          Names in String for key '%s' could not be interpreted correctly due to a comma at end of line.", key);
                   return NULL;
                 }
               Free(workchar2);
@@ -4029,13 +4101,15 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
 /* Build mapping table from a combination of two attributes if mt does not begin with / and a directory path is given */
 /***/
   if ( cdoVerbose )
-    printf("*******Start to read mapping table.*******\n");
+    cdoPrint("5. Start to find, read and apply mapping table.");
   char *maptab = kv_get_a_val(kvl, "mt", NULL);
   char *maptabdir = kv_get_a_val(kvl, "mapping_table_dir", NULL);
   char *maptabbuild = NULL;
   keyValues_t *kvn = kvlist_search(kvl, "n");
   keyValues_t *kvc = kvlist_search(kvl, "c");
   keyValues_t *kvcn = kvlist_search(kvl, "cn");
+  int byteorder;
+  int filetype = cdiGetFiletype(cdoStreamName(0)->args, &byteorder);
 
   if ( maptab && maptabdir ) if ( maptab[0] != '/' )
     {
@@ -4051,11 +4125,12 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
 /* Parse the table as a fortran namelist wich contains lists (=lines) of keyvalues */
 /***/
       if ( cdoVerbose )
-        printf("*******Try to apply mapping table: '%s'*******\n", maptab);
-      list_t *pml = cdo_parse_cmor_file(maptab);
+        cdoPrint("5.1 Try to read mapping table: '%s'", maptab);
+      kv_insert_a_val(kvl, "workfile4err", maptab, 1);
+      list_t *pml = cdo_parse_cmor_file(maptab, kvl);
       if ( pml == NULL )
         {
-          cdoWarning("Mapping table: '%s' could not be parsed. Operator continues.", maptab);
+          cdoWarning("5.1. In parsing the mapping table '%s':\n          Mapping table could not be parsed. Operator continues.", maptab);
           return;
         }
       const char *ventry[] = {"&parameter"};
@@ -4078,8 +4153,11 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
 /***/
 /* If no variable selector is given in the mapping table, it is assumed that the infile variable is already named like cmor_name */
 /***/
+ 
       if ( kvn )
         {
+          if ( filetype == FILETYPE_GRB || filetype ==  FILETYPE_GRB2 )
+            cdoPrint("5.1. In applying the mapping table:\n          Note that you use 'name' as selector keyword allthough the type of infile is GRB.");
           if ( charvarlist = check_for_charvars(pml, "name") )
             {
               keyValues_t *charkvn = kvlist_search(charvarlist, "name");
@@ -4089,10 +4167,10 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
                 addcharvar(charkvn, vlistID, "name", vars);
             }
           if ( kvn->nvalues > 1 )
-            cdoWarning("Only the first value of variable selection key 'name' is processed.");
+            cdoWarning("5.1. In applying the mapping table '%s':\n          Only the first value of commandline variable selection key 'name' is processed.", maptab);
           maptab_via_cmd(pml, kvn->values[0], vlistID, vlistNvars(vlistID),  "name", kvcn->values[0], miptabfreq);
           if ( cdoVerbose )
-            printf("*******Successfully read and applied mapping table '%s'.*******\n", maptab);
+            cdoPrint("5. Successfully found, read and applied mapping table '%s'.", maptab);
         }
       else if ( kvc )
         {
@@ -4105,10 +4183,10 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
                 addcharvar(charkvc, vlistID, "code", vars);
             }
           if ( kvc->nvalues > 1 )
-            cdoWarning("Only the first value of variable selection key 'code' is processed.");
+            cdoWarning("5.1. In applying the mapping table '%s':\n          Only the first value of commandline variable selection key 'code' is processed.", maptab);
           maptab_via_cmd(pml, kvc->values[0], vlistID, vlistNvars(vlistID), "code", kvcn->values[0], miptabfreq);
           if ( cdoVerbose )
-            printf("*******Successfully read and applied mapping table '%s'.*******\n", maptab);
+            cdoPrint("5. Successfully found, read and applied mapping table '%s'.", maptab);
         }
       else if ( kvcn )
         { 
@@ -4120,9 +4198,9 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
               else if ( strcmp(charkvcn->values[0], kvcn->values[0]) == 0 )
                 addcharvar(charkvn, vlistID, "name", vars);
             }
-          maptab_via_cn(pml, kvcn->values, vlistID, vlistNvars(vlistID), kvcn->nvalues, miptabfreq); 
+          maptab_via_cn(pml, kvcn->values, vlistID, vlistNvars(vlistID), kvcn->nvalues, miptabfreq, filetype); 
           if ( cdoVerbose )
-            printf("*******Successfully read and applied mapping table '%s'.*******\n", maptab);
+            cdoPrint("5. Successfully found, read and applied mapping table '%s'.", maptab);
         }
       else
         {
@@ -4136,14 +4214,26 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
             }
           for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
             {
+/***/
+/* Begin with Code in case infile is of type GRB */
+/***/
+              if ( filetype == FILETYPE_GRB || filetype ==  FILETYPE_GRB2 )
+                if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "code", miptabfreq) )
+                  {
+                    if ( cdoVerbose )
+                      cdoPrint("5.1. Successfully mapped varID '%d' via code.", varID);
+                    continue;
+                  }
               if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "name", miptabfreq) )
                 {
-                  printf("*******Successfully mapped varID '%d' via name.*******\n", varID);
+                  if ( cdoVerbose )
+                    cdoPrint("5.1. Successfully mapped varID '%d' via name.", varID);
                   continue;
                 }
               if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "code", miptabfreq) )
                 {
-                  printf("*******Successfully mapped varID '%d' via code.*******\n", varID);
+                  if ( cdoVerbose )
+                    cdoPrint("5.1. Successfully mapped varID '%d' via code.", varID);
                   continue;
                 }
 /***/
@@ -4151,10 +4241,11 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
 /***/
               if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "cmor_name", miptabfreq) )
                 {
-                  printf("*******Successfully mapped varID '%d' via cmor_name.*******\n", varID);
+                  if ( cdoVerbose )
+                    cdoPrint("5.1. Successfully mapped varID '%d' via cmor_name.", varID);
                   continue;
                 }
-              cdoWarning("Could not map variable with id '%d'.", varID);
+              cdoWarning("5.1. In applying the mapping table '%s':\n          Could not map variable with id '%d'.", maptab, varID);
             }
         }
 /***/
@@ -4166,7 +4257,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
       if ( maptabbuild ) Free(maptabbuild);
     }
   else if ( cdoVerbose )
-    printf("*******No mapping table found.*******\n");
+    cdoPrint("5. No mapping table found.");
 }
 
 static void parse_cmdline(list_t *pml, char **params, int nparams, const char *ventry)
@@ -4200,20 +4291,26 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, const char *v
               free_array(values);
             }
           else if ( key )
-            cdoAbort("Found no value for key '%s'.", key);
+            cdoAbort("Could not find values for commandline keyword: '%s'.", key);
           if ( strlen(eqpos) == 1 )
-            cdoAbort("Could not find values for commandline parameter: '%s'\n", params[i]);
+            cdoAbort("Could not find values for commandline parameter: '%s'.", params[i]);
           key = strdup(strtok(params[i], "="));
           values = (char **) Malloc(100 * sizeof(char *));
           j = 0;   
-          copy_value(strtok(NULL, ""), values, &j);  
+          int errh = copy_value(strtok(NULL, ""), values, &j);
+          if ( errh > 0 )
+            handleError(NULL, errh, NULL);
         }
       else
         {
           if ( !key )
             cdoAbort("Found no key for value '%s'.", params[i]);
           else
-            copy_value(params[i], values, &j);
+            {
+              int errh = copy_value(params[i], values, &j);
+              if ( errh > 0 )
+                handleError(NULL, errh, NULL);
+            }
         }
       i++;
     }
@@ -4233,41 +4330,43 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, const char *v
       free_array(values);
     }
   else if ( values )
-    cdoAbort("Found no key for value '%s'.", params[i-1]);
+    cdoAbort("Found no commandline keyword for value '%s'.", params[i-1]);
 }
 
 static char *get_mip_table(char *params, list_t *kvl, char *project_id)
 {
+  if ( cdoVerbose )
+    cdoPrint("2.2. Start to find a MIP table file.");
   if ( !params )
-    cdoAbort("A mip table name or path is required as first argument. No first argument found.");
-  if ( file_exist(params, 0) )
+    cdoAbort("In finding the MIP table:\n          A mip table name or path is required as first argument. No first argument found.");
+  if ( file_exist(params, 0, "MIP table") )
     return params;
   else
     {
-      cdoWarning("Your first argument is not an existing file. It is tried to build a path with additional configuration attributes 'mip_table_dir' and 'project_id'");
+      cdoPrint("In finding the MIP table:\n          Your first argument is not an existing mip table file.\n          It is tried to build a path with additional configuration attributes 'mip_table_dir' and 'project_id'");
       char *miptabdir = kv_get_a_val(kvl, "mip_table_dir", NULL);
       if ( miptabdir && project_id )
         {
           char *miptab;
 #if ( CMOR_VERSION_MAJOR == 2 )
           {
-          miptab = (char *) Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
+          miptab = (char *)Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
           sprintf(miptab, "%s/%s_%s\0", miptabdir, project_id, params);
           }
 #elif ( CMOR_VERSION_MAJOR == 3 )
           {
-          miptab = (char *) Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+8) * sizeof(char));
+          miptab = (char *)Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+8) * sizeof(char));
           sprintf(miptab, "%s/%s_%s.json\0", miptabdir, project_id, params);
           }
 #endif
-          if ( file_exist(miptab, 0) )
-            return miptab;
-          else
-            cdoAbort("Could not open mip table '%s'.", miptab);
+          file_exist(miptab, 1, "MIP table");
+          return miptab;
         }
       else
-        cdoAbort("Could not build a mip table path.");
-    }        
+        cdoAbort("In finding the MIP table:\n          Could not find attribute 'mip_table_dir'.");
+    }   
+  if ( cdoVerbose )
+    cdoPrint("2.2. Successfully found a MIP table.");     
 }
 
 static char *freq_from_path(char *mip_table)
@@ -4339,8 +4438,7 @@ static void check_cmdline_mapping(list_t *kvl)
 static char *get_project_id(list_t *kvl)
 {
   if ( cdoVerbose )
-    printf("*******Start to check MIP table, MIP table frequency and project_id / mip_era.*******\n");
-
+    cdoPrint("2.1. Start to check whether 'project_id' or 'mip_era' is denoted.");
   char *project_id, *dummy, *dummy2;
   dummy = kv_get_a_val(kvl, "project_id", NULL);
   dummy2 = kv_get_a_val(kvl, "mip_era", NULL);
@@ -4348,19 +4446,19 @@ static char *get_project_id(list_t *kvl)
 #if ( CMOR_VERSION_MAJOR == 2 )
 {
   if ( !dummy && !dummy2)
-    cdoAbort("Value for attribute 'project_id' is required.");
+    cdoAbort("Attribute 'project_id' is required.");
   else if ( !dummy )
-    cdoAbort("Cannot produce CMIP6 standard with CMOR2.\nValue for attribute 'project_id' is required.");
+    cdoAbort("Cannot produce CMIP6 standard with CMOR2.\n          Value for attribute 'project_id' is required.");
   else
     project_id = strdup(dummy);
 }
 #elif ( CMOR_VERSION_MAJOR == 3 )
 {
   if ( !dummy && !dummy2)
-    cdoAbort("Value for attribute 'mip_era' or 'project_id' is required.");
+    cdoAbort("Attribute 'mip_era' or 'project_id' is required.");
   else if ( !dummy2 )
     {
-      cdoWarning("You try to produce CMIP5 standard with CMOR3.\nIt is recommended to use CMOR2 for this job instead.");
+      cdoWarning("You try to produce CMIP5 standard with CMOR3.\n          It is recommended to use CMOR2 for this job instead.");
       project_id = strdup(dummy);
     }
   else
@@ -4372,9 +4470,10 @@ static char *get_project_id(list_t *kvl)
 #endif
 
   if ( cdoVerbose )
-    printf("*******Successfully checked MIP table, MIP table frequency and project_id.*******\n");
+    cdoPrint("2.1. Successfully found 'project_id' / 'mip_era'.");
   return project_id;
 }
+
 
 static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, char *mip_table)
 {
@@ -4418,6 +4517,8 @@ void *CMOR(void *argument)
   read_config_files(kvl);
 
   /* Get project_id, mip_table and mip_table frequency*/
+  if ( cdoVerbose )
+    cdoPrint("2. Start to find a MIP table and to deduce a frequency from MIP table file.");
   char *project_id = get_project_id(kvl);
   char *mip_table  = get_mip_table(miptableInput, kvl, project_id);
 #if ( CMOR_VERSION_MAJOR == 3 )
@@ -4428,8 +4529,14 @@ void *CMOR(void *argument)
   char *miptab_freqptr = strdup(freq_from_path(mip_table));
   kv_insert_a_val(kvl, "miptab_freq", miptab_freqptr, 1);
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  if ( cdoVerbose )
+    cdoPrint("2. Successfully found a MIP table '%s' and deduced a MIP table frequency '%s'.", mip_table, miptab_freqptr);
 
+  if ( cdoVerbose )
+    cdoPrint("3. Start to open infile '%s'.", cdoStreamName(0)->args);
+  int streamID = pstreamOpenRead(cdoStreamName(0));
+  if ( cdoVerbose )
+    cdoPrint("3. Successfully opened infile '%s'.", cdoStreamName(0)->args);
   /* Short keys from rtu, mt, gi must be included similar to global atts */
   add_globalhybrids(kvl);
 
@@ -4437,11 +4544,11 @@ void *CMOR(void *argument)
   if ( !kv_get_a_val(kvl, "dj", NULL) )
     {
       if ( cdoVerbose )
-        printf("*******Start to check attributes.*******\n");
+        cdoPrint("4. Start to check attributes.");
       check_attr(kvl, project_id);
       check_mem(kvl, project_id);
       if ( cdoVerbose )
-        printf("*******Successfully checked global attributes.*******\n");
+        cdoPrint("4. Successfully checked global attributes.");
     }
 
  /* dump_global_attributes(pml, streamID); */
