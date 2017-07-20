@@ -23,7 +23,13 @@
 #endif
 
 #if defined(HAVE_LIBCMOR)
+#ifdef __cplusplus
+  extern "C" {
+#endif
 #include "cmor.h"
+#ifdef __cplusplus
+  }
+#endif
 #endif
 
 #include <stdio.h>
