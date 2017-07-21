@@ -38,11 +38,6 @@
 
 #define  MAX_DOY       373
 
-typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
 
 void *Ydaystat(void *argument)
 {
@@ -100,8 +95,7 @@ void *Ydaystat(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   int gridsizemax = vlistGridsizeMax(vlistID1);
 
@@ -145,6 +139,7 @@ void *Ydaystat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
 	    }
 
           field_type *psamp1 = &samp1[dayoy][varID][levelID];
@@ -215,12 +210,12 @@ void *Ydaystat(void *argument)
       if ( dayoy_nsets[dayoy] == 0 && lvarstd )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[dayoy][varID][levelID];
             field_type *pvars2 = &vars2[dayoy][varID][levelID];
-
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             farmoq(pvars2, *pvars1);
 	  }
@@ -251,13 +246,13 @@ void *Ydaystat(void *argument)
         int nsets = dayoy_nsets[dayoy];
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[dayoy][varID][levelID];
             field_type *pvars1 = &vars1[dayoy][varID][levelID];
             field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             if ( lmean )
               {
@@ -289,11 +284,11 @@ void *Ydaystat(void *argument)
 
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( otsID && recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[dayoy][varID][levelID];
-
-	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	    pstreamDefRecord(streamID2, varID, levelID);
 	    pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
@@ -313,8 +308,6 @@ void *Ydaystat(void *argument)
     }
 
   if ( field.ptr ) Free(field.ptr);
-
-  Free(recinfo);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

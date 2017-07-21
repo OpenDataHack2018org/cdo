@@ -37,12 +37,6 @@
 #include "pstream.h"
 
 
-typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
-
 void *Seasstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
@@ -97,8 +91,7 @@ void *Seasstat(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -158,6 +151,7 @@ void *Seasstat(void *argument)
 		{
                   recinfo[recID].varID   = varID;
                   recinfo[recID].levelID = levelID;
+                  recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
 		}
 
               field_type *psamp1 = &samp1[varID][levelID];
@@ -227,12 +221,12 @@ void *Seasstat(void *argument)
 	  if ( nsets == 0 && lvarstd )
             for ( int recID = 0; recID < maxrecs; recID++ )
               {
+                if ( recinfo[recID].lconst ) continue;
+
                 int varID   = recinfo[recID].varID;
                 int levelID = recinfo[recID].levelID;
                 field_type *pvars1 = &vars1[varID][levelID];
                 field_type *pvars2 = &vars2[varID][levelID];
-
-		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
                 farmoq(pvars2, *pvars1);
 	      }
@@ -247,13 +241,13 @@ void *Seasstat(void *argument)
 
       for ( int recID = 0; recID < maxrecs; recID++ )
         {
+          if ( recinfo[recID].lconst ) continue;
+
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = &samp1[varID][levelID];
           field_type *pvars1 = &vars1[varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
-
-          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
           if ( lmean )
             {
@@ -304,11 +298,11 @@ void *Seasstat(void *argument)
 
       for ( int recID = 0; recID < maxrecs; recID++ )
 	{
+          if ( otsID && recinfo[recID].lconst ) continue;
+
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *pvars1 = &vars1[varID][levelID];
-
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
@@ -324,8 +318,6 @@ void *Seasstat(void *argument)
   if ( lvarstd ) field_free(vars2, vlistID1);
 
   dtlist_delete(dtlist);
-
-  Free(recinfo);
 
   if ( field.ptr ) Free(field.ptr);
 

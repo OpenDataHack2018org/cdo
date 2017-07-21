@@ -77,12 +77,6 @@
 #include "pstream.h"
 
 
-typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
-
 void *Timstat(void *argument)
 {
   enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
@@ -194,7 +188,6 @@ void *Timstat(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars   = vlistNvars(vlistID1);
-  int maxrecs = vlistNrecs(vlistID1);
 
   if ( cmplen == 0 && CDO_Reduce_Dim )
     for ( varID = 0; varID < nvars; ++varID )
@@ -237,7 +230,8 @@ void *Timstat(void *argument)
       pstreamDefVlist(streamID3, vlistID3);
     }
 
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -286,6 +280,7 @@ void *Timstat(void *argument)
 		{
                   recinfo[recID].varID   = varID;
                   recinfo[recID].levelID = levelID;
+                  recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
 		}
 
               field_type *psamp1 = &samp1[varID][levelID];
@@ -359,12 +354,12 @@ void *Timstat(void *argument)
 	  if ( nsets == 0 && lvarstd )
             for ( int recID = 0; recID < maxrecs; recID++ )
               {
+                if ( recinfo[recID].lconst ) continue;
+
                 int varID   = recinfo[recID].varID;
                 int levelID = recinfo[recID].levelID;
                 field_type *pvars1 = &vars1[varID][levelID];
                 field_type *pvars2 = &vars2[varID][levelID];
-
-		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
                 farmoq(pvars2, *pvars1);
 	      }
@@ -379,13 +374,13 @@ void *Timstat(void *argument)
 
       for ( int recID = 0; recID < maxrecs; recID++ )
         {
+          if ( recinfo[recID].lconst ) continue;
+
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = &samp1[varID][levelID];
           field_type *pvars1 = &vars1[varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
-
-          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
           if ( lmean )
             {
@@ -422,12 +417,12 @@ void *Timstat(void *argument)
       if ( lvfrac && operfunc == func_mean )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+            if ( recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[varID][levelID];
             field_type *pvars1 = &vars1[varID][levelID];
-
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             int nwpv     = pvars1->nwpv;
             int gridsize = gridInqSize(pvars1->grid);
@@ -464,12 +459,12 @@ void *Timstat(void *argument)
 
       for ( int recID = 0; recID < maxrecs; recID++ )
 	{
+          if ( otsID && recinfo[recID].lconst ) continue;
+
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = &samp1[varID][levelID];
           field_type *pvars1 = &vars1[varID][levelID];
-
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
@@ -505,7 +500,6 @@ void *Timstat(void *argument)
   pstreamClose(streamID1);
 
   if ( field.ptr ) Free(field.ptr);
-  Free(recinfo);
 
   cdoFinish();
 
