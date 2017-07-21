@@ -28,7 +28,7 @@ field_type **field_allocate(int vlistID, int ptype, int init)
       int gridsize = gridInqSize(gridID);
       int zaxisID  = vlistInqVarZaxis(vlistID, varID);
       int nlevel   = zaxisInqSize(zaxisID);
-      double missval  = vlistInqVarMissval(vlistID, varID);
+      double missval = vlistInqVarMissval(vlistID, varID);
 
       field[varID] = (field_type*) Malloc(nlevel*sizeof(field_type));
 
@@ -36,17 +36,17 @@ field_type **field_allocate(int vlistID, int ptype, int init)
 	{
 	  field_init(&field[varID][levelID]);
 
-	  field[varID][levelID].nwpv    = nwpv;
-	  field[varID][levelID].grid    = gridID;
-	  field[varID][levelID].size    = gridsize;
-	  field[varID][levelID].nsamp   = 0;
-	  field[varID][levelID].nmiss   = 0;
-	  field[varID][levelID].nmiss2  = 0;
+	  field[varID][levelID].nwpv     = nwpv;
+	  field[varID][levelID].grid     = gridID;
+	  field[varID][levelID].size     = gridsize;
+	  field[varID][levelID].nsamp    = 0;
+	  field[varID][levelID].nmiss    = 0;
+	  field[varID][levelID].nmiss2   = 0;
 	  if ( ptype & FIELD_FLT ) field[varID][levelID].memtype = MEMTYPE_FLOAT;
-	  field[varID][levelID].missval = missval;
-	  field[varID][levelID].ptr     = NULL;
-	  field[varID][levelID].ptr2    = NULL;
-	  field[varID][levelID].weight  = NULL;
+	  field[varID][levelID].missval  = missval;
+	  field[varID][levelID].ptr      = NULL;
+	  field[varID][levelID].ptr2     = NULL;
+	  field[varID][levelID].weight   = NULL;
 
 	  if ( ptype & FIELD_PTR )
 	    {

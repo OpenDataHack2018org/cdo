@@ -97,6 +97,14 @@ typedef struct {
 field_type;
 
 
+typedef struct {
+  short varID;
+  short levelID;
+  bool  lconst;
+}
+recinfo_type;
+
+
 /* fieldmem.cc */
 
 void      field_init(field_type *field);
