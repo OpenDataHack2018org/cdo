@@ -279,6 +279,10 @@ static int parse_line_to_list(list_t *list, char *pline, const char *kvlname, in
       char **values = (char **) Malloc( 100 * sizeof(char *) );
       
       pline = getElementName(pline, name, &errh);
+      if ( strcmp(name, "conventions") == 0 )
+        strcpy(name, "Conventions");
+      if ( strcmp(name, "cordex_domain") == 0 )
+        strcpy(name, "CORDEX_domain");
       if ( errh > 0 )
         return errh;
       if ( *pline == 0 )
@@ -1064,27 +1068,51 @@ static void add_globalhybrids(list_t *kvl)
     }
 }
 
-static int check_attr(list_t *kvl, char *project_id)
+static int check_attarray(list_t *kvl, const char **reqAtt)
 {
   int i = 0;
-/* Project id moved to main void fct */
-  const char *reqAtt[] = {"institute_id", "institution", "contact", "model_id", "source",
-            "experiment_id", "required_time_units", NULL};
-  const char *reqAttCMIP5[] = {"product", "member", NULL};
-  const char *reqAttCMIP5CMOR3[] = {"modeling_realm", NULL};
-  const char *reqAttCORDEX[] = {"product", "member", "cordex_domain", "driving_model_id", NULL};
-/* In all Projects needed Attributes are tested first */
-
   while ( reqAtt[i] != NULL )
     {
       keyValues_t *kv_reqatt = kvlist_search(kvl, reqAtt[i]);
-      
       if ( !kv_reqatt || strcmp(kv_reqatt->values[0], "notSet") == 0 )
-        cdoAbort("Attribute '%s' is required. Either it is missing or notSet.", reqAtt[i]);
+        return i;
       if ( cdoVerbose )
         cdoPrint("Attribute '%s' is '%s'. ", reqAtt[i], kv_reqatt->values[0]);
       i++;
     }
+  return -1;
+}
+
+static void attErr(const char **reqAtt, int errnum)
+{
+  char errStr[CMOR_MAX_STRING];
+  int i = 1;
+
+  sprintf(errStr, "Attribute '%s' is required. Either it is missing or notSet.\n          Make sure that you have configured all following attributes:\n          %s", reqAtt[errnum], reqAtt[0]);
+  while ( reqAtt[i] )
+    {
+      sprintf(errStr, "%s, %s", errStr, reqAtt[i]);
+      i++;
+    }
+  cdoAbort(errStr);
+}
+
+static int check_attr(list_t *kvl, char *project_id)
+{
+/* Project id moved to main void fct */
+  const char *reqAtt[] = {"institution", "contact", "model_id", "source",
+            "experiment_id", "required_time_units", NULL};
+  const char *reqAttCMIP5[] = {"institute_id", "product", "member", NULL};
+  const char *reqAttCMIP5CMOR3[] = {"modeling_realm", NULL};
+  const char *reqAttCORDEX[] = {"institute_id", "product", "member", "CORDEX_domain", "driving_model_id", NULL};
+  const char *reqAttCMIP6CMOR3[] = {"outpath", "output_path_template", "output_file_template", "tracking_prefix", NULL};
+  const char *reqAttCMIP6[] = {"Conventions", "activity_id", "experiment", "further_info_url", "grid", "grid_label", "institution_id", "license", "mip_era", "nominal_resolution", "product", "source_id", "source_type", "variant_label", NULL};
+  const char *expdepAttCMIP6[] = {"parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label", "parent_time_units", "sub_experiment", "sub_experiment_id", NULL};
+/* In all Projects needed Attributes are tested first */
+
+  int errnum = 0;
+  if ( ( errnum = check_attarray(kvl, reqAtt) ) != -1 )
+    attErr(reqAtt, errnum);
 /* Set default attributes */
   keyValues_t *kv = kvlist_search(kvl, "references");
 
@@ -1099,47 +1127,45 @@ static int check_attr(list_t *kvl, char *project_id)
       Free(references);
     }
 
-/* Special check for CMIP5 or CORDEX projects */
-  i=0;
+/* Special check for CMIP or CORDEX projects */
   if ( strcmp(project_id, "CMIP5") == 0 )
     {
       if ( cdoVerbose )
-        cdoPrint("Since the project id is %s further attributes are tested. ", project_id);
-      while ( reqAttCMIP5[i] != NULL )
-        {
-          keyValues_t *kv_reqattCMIP5 = kvlist_search(kvl, reqAttCMIP5[i]);
-          if ( !kv_reqattCMIP5 || strcmp(kv_reqattCMIP5->values[0], "notSet") == 0 )
-            cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCMIP5[i]);
-          if ( cdoVerbose )
-            cdoPrint("Attribute '%s' is '%s'. ", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
-          i++;
-        }
+        cdoPrint("Since the project id is CMIP5 further attributes are tested. ");
+      if ( ( errnum = check_attarray(kvl, reqAttCMIP5) ) != -1 )
+        attErr(reqAttCMIP5, errnum);
 #if ( CMOR_VERSION_MAJOR == 3 )
-      i = 0;
-      while ( reqAttCMIP5CMOR3[i] != NULL )
-        {
-          keyValues_t *kv_reqattCMIP5 = kvlist_search(kvl, reqAttCMIP5[i]);
-          if ( !kv_reqattCMIP5 || strcmp(kv_reqattCMIP5->values[0], "notSet") == 0 )
-            cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCMIP5[i]);
-          if ( cdoVerbose )
-            cdoPrint("Attribute '%s' is '%s'. ", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
-          i++;
-        }    
+/**************/
+/* Add additional attributes for CMIP5 */
+/* allthough using CMOR 3 */
+/**************/
+      if ( ( errnum = check_attarray(kvl, reqAttCMIP5CMOR3) ) != -1 )
+        attErr(reqAttCMIP5CMOR3, errnum);
 #endif
     }
   else if (strcmp(project_id, "CORDEX") == 0 )
     {
       if ( cdoVerbose )
-        cdoPrint("Since the project id is %s further attributes are tested.", project_id);
-      i=0;
-      while ( reqAttCORDEX[i] != NULL )
+        cdoPrint("Since the project id is CORDEX further attributes are tested.");
+      if ( ( errnum = check_attarray(kvl, reqAttCORDEX) ) != -1 )
+        attErr(reqAttCORDEX, errnum);
+    }
+  else if (strcmp(project_id, "CMIP6") == 0 )
+    {
+      if ( cdoVerbose )
+        cdoPrint("Since the project id is CMIP6 further attributes are tested.");
+      if ( ( errnum = check_attarray(kvl, reqAttCMIP6) ) != -1 )
+        attErr(reqAttCMIP6, errnum);
+      int j = 0;
+      while ( expdepAttCMIP6[j] != NULL )
         {
-          keyValues_t *kv_reqattCORDEX = kvlist_search(kvl, reqAttCORDEX[i]);
-          if ( !kv_reqattCORDEX || strcmp(kv_reqattCORDEX->values[0], "notSet") == 0 )
-            cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCORDEX[i]);
-          if ( cdoVerbose )
-            cdoPrint("Attribute '%s' is '%s'. ", reqAttCORDEX[i], kv_reqattCORDEX->values[0]);
-          i++;
+          keyValues_t *kv_reqatt = kvlist_search(kvl, expdepAttCMIP6[j]);
+          if ( !kv_reqatt || strcmp(kv_reqatt->values[0], "notSet") == 0 )
+            if ( cdoVerbose )
+              cdoPrint("Depending on the experiment, attribute '%s' may be required. Either it is missing or notSet", expdepAttCMIP6[j]);
+          else if ( cdoVerbose )
+            cdoPrint("Attribute '%s' is '%s'. ", expdepAttCMIP6[j], kv_reqatt->values[0]);
+          j++;
         }
     }
   return 1;
@@ -1147,15 +1173,88 @@ static int check_attr(list_t *kvl, char *project_id)
 
 static int check_mem(list_t *kvl, char *project_id)
 {
+  const char *ripcharCMIP5[] = {"realization", "initialization_method", "physics_version"};
+  const char *ripcharCMIP6[] = {"realization_index","initialization_index","physics_index","forcing_index"};
+  char ripchar[5];
+  strcpy(ripchar, "ripf");
+
   char *kv_member = kv_get_a_val(kvl, "member", "");
-  const char *ripchar[] = {"realization", "initialization_method", "physics_version"};
-  char crealiz[strlen(kv_member)];
-  char *cinitial, *cphysics;
+  int ripcharlen = 3;
+  if ( strcmp(project_id, "CMIP6") == 0 )
+    {
+      kv_member= kv_get_a_val(kvl, "variant_label", "");
+      ripcharlen = 4;
+    }
+  int memberlen = strlen(kv_member);
+  char ripvaluechar[memberlen][CMOR_MAX_STRING];
+  for ( int k = 0; k < memberlen; k++ )
+    strcpy(ripvaluechar[k], kv_member);
+
+  int firstNum, tonull, j = 0;
+  for ( int i = 0; i < ripcharlen; i++ )
+    {
+      while ( kv_member[j] != ripchar[i] && j < memberlen )
+        j++;
+      if ( j == memberlen )
+        {
+          j = -1;
+          if ( ripcharlen == 3)
+            cdoPrint("Attribute 'member' has no RIP format! Default setting is used: \n          realization=-1 \n          initialization=-1 \n          physics=-1. \n          forcing=-1.");
+          else
+            cdoPrint("Attribute 'variant_label' has no RIPF format! Default setting is used: \n          realization=-1 \n          initialization=-1 \n          physics=-1. \n          forcing=-1.");
+          break;
+        }
+      firstNum = j+1;
+      j = 0;
+      if ( i < (ripcharlen - 1) )
+        while ( kv_member[j] != ripchar[i+1] && j < memberlen )
+          j++;
+      if ( j == memberlen )
+        {
+          j = -1;
+          if ( ripcharlen == 3)
+            cdoPrint("Attribute 'member' has no RIP format! Default setting is used: \n          realization=-1 \n          initialization=-1 \n          physics=-1. \n          forcing=-1.");
+          else
+            cdoPrint("Attribute 'variant_label' has no RIPF format! Default setting is used: \n          realization=-1 \n          initialization=-1 \n          physics=-1. \n          forcing=-1.");
+          break;
+        }
+      tonull = j;
+      j = 0;
+      char *temp = ripvaluechar[i];
+      temp += firstNum;
+      strcpy(ripvaluechar[i], temp);
+
+      if ( i < ripcharlen - 1 )
+        ripvaluechar[i][tonull-firstNum] = '\0';
+    }
+  if ( j != -1 )
+    {
+      if ( ripcharlen == 3 )
+        for ( int i = 0; i < ripcharlen; i++ )
+          kv_insert_a_val(kvl, (char *)ripcharCMIP5[i], ripvaluechar[i], 1);
+      else
+        for ( int i = 0; i < ripcharlen; i++ )
+          kv_insert_a_val(kvl, (char *)ripcharCMIP6[i], ripvaluechar[i], 1);
+    }
+  else
+    {
+      if ( ripcharlen == 3 )
+        for ( int i = 0; i < ripcharlen; i++ )
+          kv_insert_a_val(kvl, (char *)ripcharCMIP5[i], (char *)"-1", 1);
+      else
+        for ( int i = 0; i < ripcharlen; i++ )
+          kv_insert_a_val(kvl, (char *)ripcharCMIP6[i], (char *)"-1", 1);
+    }
+  return 0;
+
+/*
   char workchar[CMOR_MAX_STRING]; 
-  int realization, initialization_method, physics_version;
+  int realization, initialization_method, physics_version, forcing;
   int ipos=0, ppos=0;
 
-/* Test for the right member, else abort or warn */ 
+/* Test for the right member, else abort or warn */
+/*
+  
   if ( strlen(kv_member) >= 6 && kv_member[0] == 'r' )
     {
       strcpy(crealiz, &kv_member[1]);
@@ -1182,11 +1281,11 @@ static int check_mem(list_t *kvl, char *project_id)
       for ( int i = 0; i < 3; i++ )   
         kv_insert_a_val(kvl, ripchar[i], (char *)"-1", 1);
     }
-/* Now abort or warn */ 
+/* Now abort or warn */
+/* 
   if (strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CORDEX") == 0)
     cdoAbort("Attribute member has no RIP format (at least 6 characters and in RIP order)! Found for \n          member: %s. This is interpreted as \n           Realization: %s \n           Initialization: %s \n           Physics: %s \n             But three Integers are needed", kv_member, crealiz, cinitial, cphysics);
-
-  return 0;
+*/
 } 
 
 
@@ -1713,7 +1812,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
   int ind = 0;
   if ( strcmp(kv_get_a_val(kvl, "project_id", NULL),"CORDEX") == 0 )
     while ( allneeded2[ind] )
-      {
+    r  {
         char *tmp = kv_get_a_val(kvl, allneeded2[ind], NULL );
         if ( tmp )
           cmor_set_cur_dataset_attribute((char *)allneeded2[ind], tmp, 1);
@@ -1724,40 +1823,29 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 /***/
 /* Could not give CMOR all attributes separately because some are required to be in a json file (outpath,...). /
 /* Better collect them in this file. */
-/* If a Json file is denoted, add attributes to this file */
-/* If attributes recur, the last occurence is used by CMOR */
+/* todo this **/
+/* If a Json file is denoted, read this file and check attributes */
 /***/
 
-      char *filename = kv_get_a_val(kvl, "dj", NULL);
-      int isfile = ( filename ) ? 1 : 0;
-      char *dataset_path = NULL;
-      FILE *dataset_json;
-      if ( !isfile )
-        filename = strdup("dataset.json");
+/*
+      char *filename = kv_get_a_val(kvl, "dj", NULL); */
 
       char cwd[1024];
       getcwd(cwd, sizeof(cwd));
+      char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 1) * sizeof(char));;
+      FILE *dataset_json;
 
-      dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen(filename) + 1) * sizeof(char));
-      sprintf(dataset_path, "%s/%s\0", cwd, filename);
+      sprintf(dataset_path, "%s/dataset.json\0", cwd);
 
-      if ( !isfile )
-        {
-          dataset_json = fopen(dataset_path, "w+");
-          if ( !dataset_json )
-            cdoAbort("In preparing cmor_dataset:\n          Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
-
-          fputs("{\n", dataset_json);
-        }
-      else
-        cmor_dataset_json(dataset_path);
+      dataset_json = fopen(dataset_path, "w+");
+      if ( !dataset_json )
+        cdoAbort("In preparing cmor_dataset:\n          Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
+      fputs("{\n", dataset_json);
 
       const char *allneeded[] = /*CMIP5*/{"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip", 
 /*CORDEX */
   "CORDEX_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id",
 /* CMIP6: */
-  /* CMOR internal */ 
-"outpath", "output_path_template", "output_file_template", "tracking_prefix",
   /* Glob Atts */
 "Conventions", "activity_id", "experiment", "experiment_id", "forcing_index", "further_info_url", "grid", "grid_label", "initialization_index", "institution", "institution_id", "license", "mip_era", "nominal_resolution", "physics_index", "product", "realization_index", "source", "source_id", "source_type", "sub_experiment", "sub_experiment_id", "table_id", "variant_label", "parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label",
 "parent_time_units", NULL};
@@ -1768,15 +1856,10 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
           char *tmp = kv_get_a_val(kvl, allneeded[i], "notSet");
           if ( strncmp(tmp, "notSet", 6) != 0 )
             {
-              if ( !isfile )
-                {
                   int linelen = strlen(allneeded[i]) + strlen(tmp) + 10;
                   char line[linelen];
                   sprintf(line, "\"%s\" : \"%s\",\n", allneeded[i], tmp);
                   fputs((const char *) line, dataset_json);
-                }
-              else
-                cmor_set_cur_dataset_attribute((char *)allneeded[i], tmp, 1);
             }
           i++;
         }
@@ -1785,8 +1868,22 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       char *branch_time_in_child = (char *) Malloc(2*sizeof(double));
       snprintf(branch_time_in_parent, sizeof(double), "%.12f", branch_times[0]);
       snprintf(branch_time_in_child, sizeof(double), "%.12f", branch_times[1]);
-      if ( !isfile )
-        {
+
+  /* CMOR internal */ 
+          fputs("\"outpath\" : \"", dataset_json);
+          fputs(kv_get_a_val(kvl, "dr", "./"), dataset_json);
+          fputs("\",\n", dataset_json); 
+          fputs("\"output_path_template\" : \"", dataset_json);
+          fputs(kv_get_a_val(kvl, "output_path_template", "<activity_id><institution_id><source_id><experiment_id><variant_label><table><variable_id><grid_label><version>"), dataset_json);
+          fputs("\",\n", dataset_json); 
+          fputs("\"output_file_template\" : \"", dataset_json);
+          fputs(kv_get_a_val(kvl, "output_path_template", "<variable_id><table><experiment_id><source_id><variant_label><grid_label>"), dataset_json);
+          fputs("\",\n", dataset_json); 
+          fputs("\"tracking_prefix\" : \"", dataset_json);
+          fputs(kv_get_a_val(kvl, "tracking_prefix", "hdl:21.14100"), dataset_json);
+          fputs("\",\n", dataset_json); 
+
+/* cdo cmor preprocessed: */
           fputs("\"calendar\" : \"", dataset_json);
           fputs(calendarptr, dataset_json);
           fputs("\",\n", dataset_json); 
@@ -1801,18 +1898,10 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
           fclose(dataset_json);
           cmor_dataset_json(dataset_path);
           Free(dataset_path);
-        }
-      else
-        {
-          cmor_set_cur_dataset_attribute((char *)"calendar", calendarptr, 1);
-          cmor_set_cur_dataset_attribute((char *)"branch_time_in_parent", branch_time_in_parent, 1);
-          cmor_set_cur_dataset_attribute((char *)"branch_time_in_child", branch_time_in_child, 1);
-        }
+
 
       Free(branch_time_in_parent);
       Free(branch_time_in_child);
-      if ( !isfile)
-        Free(filename);
     }
 #else
     cdoAbort("Cmor version %d not yet enabled!", (int) CMOR_VERSION_MAJOR);
@@ -2110,7 +2199,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
       levels = (double *)Malloc(sizeof(double));
       levels[0] = (double) atof(szc_value);
       if ( cdoVerbose )
-        printf("Attribute szc is found.\nScalar z coordinate name is: '%s'\nScalar z coordinate value is: '%f'\n", szc_name, levels[0]);
+        cdoPrint("Attribute szc is found.\n          Scalar z coordinate name is: '%s'\n          Scalar z coordinate value is: '%f'\n          ", szc_name, levels[0]);
       cmor_axis(new_axis_id(axis_ids),
                       szc_name,
                       (char *) "m",
@@ -2164,7 +2253,7 @@ static void register_character_dimension(int *axis_ids, char *filename)
 static void change_grid(char *grid_file, int gridID, int vlistID)
 {
   if ( cdoVerbose )
-    printf("You configured a grid_info file: '%s'. It is tested for a valid use as substitution.\n");
+    cdoPrint("You configured a grid_info file: '%s'. It is tested for a valid use as substitution.\n");
   argument_t *fileargument = file_argument_new(grid_file);
   int streamID2 = pstreamOpenRead(fileargument); 
   int vlistID2 = pstreamInqVlist(streamID2);
@@ -3158,7 +3247,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
               }
           }
       if ( cdoVerbose )
-        printf("\n *******Succesfully registered surface pressure.*******\\n");
+        cdoPrint("Succesfully registered surface pressure.");
     }
   if ( ps_required && !ps_in_file )
     cdoAbort("After registration of all dimensions for all variables:\n          No surface pressure found in infile but required for a hybrid sigma pressure z axis!");
@@ -4541,15 +4630,12 @@ void *CMOR(void *argument)
   add_globalhybrids(kvl);
 
   /* Check for attributes and member name */
-  if ( !kv_get_a_val(kvl, "dj", NULL) )
-    {
-      if ( cdoVerbose )
-        cdoPrint("4. Start to check attributes.");
-      check_attr(kvl, project_id);
-      check_mem(kvl, project_id);
-      if ( cdoVerbose )
-        cdoPrint("4. Successfully checked global attributes.");
-    }
+  if ( cdoVerbose )
+    cdoPrint("4. Start to check attributes.");
+  check_attr(kvl, project_id);
+  check_mem(kvl, project_id);
+  if ( cdoVerbose )
+    cdoPrint("4. Successfully checked global attributes.");
 
  /* dump_global_attributes(pml, streamID); */
 
