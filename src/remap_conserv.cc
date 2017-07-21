@@ -1,4 +1,3 @@
-#include <vector>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"

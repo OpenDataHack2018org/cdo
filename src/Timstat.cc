@@ -446,10 +446,9 @@ void *Timstat(void *argument)
 
                 if ( irun )
                   {
-                    nmiss = 0;
+                    pvars1->nmiss = 0;
                     for ( int i = 0; i < nwpv*gridsize; ++i )
-                      if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) nmiss++;
-                    pvars1->nmiss = (size_t)nmiss;
+                      if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) pvars1->nmiss++;
                   }
 	      }
 	  }
@@ -473,7 +472,7 @@ void *Timstat(void *argument)
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
           
 	  if ( cdoDiag )
 	    {

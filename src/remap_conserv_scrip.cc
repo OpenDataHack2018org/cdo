@@ -2,7 +2,6 @@
 #  include "config.h"
 #endif
 
-#include <vector>
 #include <limits.h>
 #include <time.h>
 

@@ -30,7 +30,6 @@
 #include <regex>
 #include <set>
 #include <string>
-#include <vector>
 // for std::sort()
 #include <algorithm>
 
