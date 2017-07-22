@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
 
+2017-07-22  Uwe Schulzweida
+
+	* grid_search_reg2d_nn: bug fix for nx/ny = 1
+
 2017-07-14  Uwe Schulzweida
 
 	* settaxis: made time argument optional

@@ -277,7 +277,7 @@ void cdo_usage(void)
   fprintf(stderr, "                   Precision to use in displaying floating-point data (default: 7,15)\n");
   fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
   if ( ITSME )
-    fprintf(stderr, "    --remap_genweights\n");
+    fprintf(stderr, "    --remap_genweights 0/1\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (cgribex only)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
@@ -1244,7 +1244,7 @@ int parse_options_long(int argc, char *argv[])
             {
               int intarg = parameter2int(CDO_optarg);
               if ( intarg != 0 && intarg != 1 )
-                cdoAbort("Unsupported value for option --remap_genweights=%d [range: 0-1]", intarg);
+                cdoAbort("Unsupported value for option --remap_genweights %d [0/1]", intarg);
               remap_genweights = intarg;
             }
           else if ( lsortname )

@@ -30,16 +30,16 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restri
       if ( src_center_lat[0] < src_center_lat[ny-1] )
 	{
 	  if ( plat <= src_center_lat[0] )
-	    { jjf = 0; jjl = 1; }
+	    { jjf = 0; jjl = (ny==1) ? 0 : 1; }
 	  else
-	    { jjf = ny-2; jjl = ny-1; }
+	    { jjf = (ny==1) ? 0 : ny-2; jjl = ny-1; }
 	}
       else
 	{
 	  if ( plat >= src_center_lat[0] )
-	    { jjf = 0; jjl = 1; }
+	    { jjf = 0; jjl = (ny==1) ? 0 : 1; }
 	  else
-	    { jjf = ny-2; jjl = ny-1; }
+	    { jjf = (ny==1) ? 0 : ny-2; jjl = ny-1; }
 	}
     }
 
