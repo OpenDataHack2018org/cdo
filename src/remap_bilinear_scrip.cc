@@ -214,7 +214,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
       double plon = 0, plat = 0;
       remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
-      /* Find nearest square of grid points on source grid  */
+      // Find nearest square of grid points on source grid
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, 
 					  plat, plon, src_grid->dims,
@@ -225,23 +225,23 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 				    src_grid->cell_center_lat, src_grid->cell_center_lon,
 				    src_grid->cell_bound_box, src_grid->bin_addr);
 
-      /* Check to see if points are land points */
+      // Check to see if points are mask points
       if ( search_result > 0 )
 	{
 	  for ( int n = 0; n < 4; ++n )
 	    if ( ! src_grid->mask[src_add[n]] ) search_result = 0;
 	}
 
-      /* If point found, find local iw,jw coordinates for weights  */
+      // If point found, find local iw,jw coordinates for weights
       if ( search_result > 0 )
 	{
-	  double iw, jw;  /*  current guess for bilinear coordinate  */
+	  double iw, jw;  // current guess for bilinear coordinate 
 
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
           if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
 	    {
-	      /* Successfully found iw,jw - compute weights */
+	      // Successfully found iw,jw - compute weights
 	      set_bilinear_weights(iw, jw, wgts);
 
 	      store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
@@ -276,7 +276,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
   if ( weightlinks ) Free(weightlinks);
 
   if ( cdoTimer ) timer_stop(timer_remap_bil);
-} /* scrip_remap_weights_bilinear */
+} // scrip_remap_weights_bilinear
 
 /*
   -----------------------------------------------------------------------
@@ -334,7 +334,7 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
       double plon = 0, plat = 0;
       remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
-      /* Find nearest square of grid points on source grid  */
+      // Find nearest square of grid points on source grid
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, 
 					  plat, plon, src_grid->dims,
@@ -345,23 +345,23 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
 				    src_grid->cell_center_lat, src_grid->cell_center_lon,
 				    src_grid->cell_bound_box, src_grid->bin_addr);
 
-      /* Check to see if points are land points */
+      // Check to see if points are mask points
       if ( search_result > 0 )
 	{
 	  for ( int n = 0; n < 4; ++n )
 	    if ( ! src_grid->mask[src_add[n]] ) search_result = 0;
 	}
 
-      /* If point found, find local iw,jw coordinates for weights  */
+      // If point found, find local iw,jw coordinates for weights
       if ( search_result > 0 )
 	{
-	  double iw, jw;  /*  current guess for bilinear coordinate  */
+	  double iw, jw;  // current guess for bilinear coordinate
 
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
           if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
 	    {
-	      /* Successfully found iw,jw - compute weights */
+	      // Successfully found iw,jw - compute weights
 	      set_bilinear_weights(iw, jw, wgts);
 
 	      sort_add_and_wgts(4, src_add, wgts);
@@ -396,4 +396,4 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
     }
 
   if ( cdoTimer ) timer_stop(timer_remap_bil);
-} /* scrip_remap_bilinear */
+} // scrip_remap_bilinear
