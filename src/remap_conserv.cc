@@ -701,7 +701,7 @@ void reg2d_bound_box(remapgrid_t *remap_grid, double *grid_bound_box)
 
 void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
-  int lcheck = TRUE;
+  bool lcheck = true;
   int srch_corners;  // num of corners of srch cells
 
   /* Variables necessary if segment manages to hit pole */
@@ -801,7 +801,8 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 #ifdef STIMER
   double stimer = 0;
 #endif
-  /* Loop over destination grid */
+
+  // Loop over destination grid
 
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(dynamic) default(none)                   \
@@ -813,7 +814,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       double partial_weight;
-      long src_cell_add;       /* current linear address for source grid cell   */
+      long src_cell_add;       // current linear address for source grid cell
       size_t num_srch_cells;
       size_t n, num_weights, num_weights_old;
       int ompthID = cdo_omp_get_thread_num();
@@ -829,7 +830,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       int *srch_add = srch_add2[ompthID];
       struct grid_cell *tgt_grid_cell = tgt_grid_cell2[ompthID];
 
-      /* Get search cells */
+      // Get search cells
 #ifdef STIMER
       clock_t start = clock();
 #endif
@@ -883,7 +884,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, tgt_grid_cell);
 
-      /* Create search arrays */
+      // Create search arrays
 
       search_realloc(num_srch_cells, &search[ompthID]);
 
@@ -994,7 +995,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area; 
       // printf("area %d %g %g\n", tgt_cell_add, tgt_grid->cell_area[tgt_cell_add], tgt_area);
-  }
+    }
 
 #ifdef STIMER
 printf("stime = %gs\n", stimer);
@@ -1006,7 +1007,7 @@ printf("stime = %gs\n", stimer);
       printf("sum_srch_cells2: %zu\n", sum_srch_cells2);
     }
 
-  /* Finished with all cells: deallocate search arrays */
+  // Finished with all cells: deallocate search arrays
 
   for ( int ompthID = 0; ompthID < ompNumThreads; ++ompthID )
     {

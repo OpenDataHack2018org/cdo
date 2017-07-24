@@ -671,17 +671,45 @@ void links_per_value(remapvars_t *remapvars)
   long num_links = remapvars->num_links;
   int lpv = -1;
 
+  remapvars->links_per_value = lpv;
+  return;
+
   if ( num_links > 0 )
     {
       lpv = 1;
       const int *restrict dst_add = remapvars->tgt_cell_add;
-      int ival = dst_add[0];
-      for ( long n = 1; n < num_links; ++n )
+      long n = 0;
+      int ival = dst_add[n];
+      for ( n = 1; n < num_links; ++n )
         if ( dst_add[n] == ival ) lpv++;
         else break;
 
+    printf("lpv %d\n", lpv);
+
       if ( num_links%lpv != 0 ) lpv = -1;
-      else if ( lpv == 1 )
+
+      n++;
+      if ( n < num_links )
+        {
+          int lpv2 = -1;
+          int ival2 = dst_add[n];
+          for ( ; n < num_links; ++n )
+            if ( dst_add[n] == ival2 ) lpv2++;
+            else if ( lpv == lpv2 )
+              {
+                lpv2 = -1;
+                ival2 = dst_add[n];
+              }
+            else
+              {
+                lpv = -1;
+                break;
+              }
+        }
+      
+  printf("lpv %d\n", lpv);
+
+      if ( lpv == 1 )
         {
           for ( long n = 1; n < num_links; ++n )
             {
@@ -709,6 +737,8 @@ void links_per_value(remapvars_t *remapvars)
             }
         }
     }
+
+  printf("lpv %d\n", lpv);
 
   remapvars->links_per_value = lpv;
 }
