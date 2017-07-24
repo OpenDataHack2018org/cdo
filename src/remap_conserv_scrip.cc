@@ -1228,8 +1228,6 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
                             /* 1000 is too small!!! */
   long src_grid_size;
   long tgt_grid_size;
-  long src_num_cell_corners;
-  long tgt_num_cell_corners;
   long src_cell_add;       /* current linear address for source grid cell   */
   long tgt_cell_add;       /* current linear address for target grid cell   */
   long n, k;            /* generic counters                        */
@@ -1245,9 +1243,6 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   double intrsct_lat, intrsct_lon;         /* lat/lon of next intersect  */
   double beglat, endlat, beglon, endlon;   /* endpoints of current seg.  */
   double norm_factor = 0;                  /* factor for normalizing wts */
-
-  double *tgt_centroid_lat, *tgt_centroid_lon;   /* centroid coords  */
-  double *src_centroid_lat, *src_centroid_lon;   /* on each grid     */
 
   double begseg[2];         /* begin lat/lon for full segment */
   double weights[6];        /* local wgt array */
@@ -1306,8 +1301,8 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   src_grid_size = src_grid->size;
   tgt_grid_size = tgt_grid->size;
 
-  src_num_cell_corners = src_grid->num_cell_corners;
-  tgt_num_cell_corners = tgt_grid->num_cell_corners;
+  long src_num_cell_corners = src_grid->num_cell_corners;
+  long tgt_num_cell_corners = tgt_grid->num_cell_corners;
 
   if ( ! remap_store_link_fast )
     {
@@ -1337,10 +1332,10 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   /* Initialize centroid arrays */
 
-  src_centroid_lat = (double*) Malloc(src_grid_size*sizeof(double));
-  src_centroid_lon = (double*) Malloc(src_grid_size*sizeof(double));
-  tgt_centroid_lat = (double*) Malloc(tgt_grid_size*sizeof(double));
-  tgt_centroid_lon = (double*) Malloc(tgt_grid_size*sizeof(double));
+  double *src_centroid_lat = (double*) Malloc(src_grid_size*sizeof(double));
+  double *src_centroid_lon = (double*) Malloc(src_grid_size*sizeof(double));
+  double *tgt_centroid_lat = (double*) Malloc(tgt_grid_size*sizeof(double));
+  double *tgt_centroid_lon = (double*) Malloc(tgt_grid_size*sizeof(double));
 
   for ( n = 0; n < src_grid_size; ++n )
     {
@@ -1372,7 +1367,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   for ( i = 0; i < ompNumThreads; ++i )
     srch_add2[i] = (int*) Malloc(tgt_grid_size*sizeof(int));
 
-  srch_corners    = tgt_num_cell_corners;
+  srch_corners = tgt_num_cell_corners;
 
   if ( cdoTimer ) timer_start(timer_remap_con_l1);
 

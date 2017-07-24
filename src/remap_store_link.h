@@ -1,5 +1,5 @@
-#ifndef _REMAP_STORE_LINK_H
-#define _REMAP_STORE_LINK_H
+#ifndef REMAP_STORE_LINK_H
+#define REMAP_STORE_LINK_H
 
 
 typedef struct
@@ -35,4 +35,4 @@ void sort_add_and_wgts(unsigned num_weights, int *src_add, double *wgts);
 void sort_add_and_wgts4(unsigned num_weights, int *src_add, double wgts[4][4]);
 
 
-#endif  /* _REMAP_STORE_LINK */
+#endif  /* REMAP_STORE_LINK */

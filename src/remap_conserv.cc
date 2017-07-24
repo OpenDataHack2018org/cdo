@@ -23,7 +23,7 @@ extern "C" {
 typedef struct {
   enum yac_edge_type *src_edge_type;
   long srch_corners;
-  long max_srch_cells;
+  size_t max_srch_cells;
   double *partial_areas;
   double *partial_weights;
   struct grid_cell *src_grid_cells;
@@ -31,9 +31,9 @@ typedef struct {
 } search_t;
 
 static
-void search_realloc(long num_srch_cells, search_t *search)
+void search_realloc(size_t num_srch_cells, search_t *search)
 {
-  long max_srch_cells  = search->max_srch_cells;
+  size_t max_srch_cells = search->max_srch_cells;
   double *partial_areas   = search->partial_areas;
   double *partial_weights = search->partial_weights;
   struct grid_cell *overlap_buffer = search->overlap_buffer;
@@ -46,7 +46,7 @@ void search_realloc(long num_srch_cells, search_t *search)
       overlap_buffer = (struct grid_cell*) Realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
       src_grid_cells = (struct grid_cell*) Realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
 
-      for ( long n = max_srch_cells; n < num_srch_cells; ++n )
+      for ( size_t n = max_srch_cells; n < num_srch_cells; ++n )
         {
           overlap_buffer[n].array_size      = 0;
           overlap_buffer[n].num_corners     = 0;
@@ -56,7 +56,7 @@ void search_realloc(long num_srch_cells, search_t *search)
           overlap_buffer[n].coordinates_xyz = NULL;
         }
 
-      for ( long n = max_srch_cells; n < num_srch_cells; ++n )
+      for ( size_t n = max_srch_cells; n < num_srch_cells; ++n )
         {
           src_grid_cells[n].array_size      = search->srch_corners;
           src_grid_cells[n].num_corners     = search->srch_corners;
@@ -79,13 +79,13 @@ void search_realloc(long num_srch_cells, search_t *search)
 static
 void search_free(search_t *search)
 {
-  long max_srch_cells  = search->max_srch_cells;
+  size_t max_srch_cells  = search->max_srch_cells;
   double *partial_areas   = search->partial_areas;
   double *partial_weights = search->partial_weights;
   struct grid_cell *overlap_buffer = search->overlap_buffer;
   struct grid_cell *src_grid_cells = search->src_grid_cells;
 
-  for ( long n = 0; n < max_srch_cells; n++ )
+  for ( size_t n = 0; n < max_srch_cells; n++ )
     {
       if ( overlap_buffer[n].array_size > 0 )
         {
@@ -108,14 +108,14 @@ void search_free(search_t *search)
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm);
 
 static
-long get_srch_cells_reg2d(const int *restrict src_grid_dims, 
-			  const double *restrict src_corner_lat, const double *restrict src_corner_lon,
-			  const double *restrict tgt_cell_bound_box, int *srch_add)
+size_t get_srch_cells_reg2d(const int *restrict src_grid_dims, 
+                            const double *restrict src_corner_lat, const double *restrict src_corner_lon,
+                            const double *restrict tgt_cell_bound_box, int *srch_add)
 {
   int debug = 0;
   long nx = src_grid_dims[0];
   long ny = src_grid_dims[1];
-  long num_srch_cells = 0;  // num cells in restricted search arrays
+  size_t num_srch_cells = 0;  // num cells in restricted search arrays
 
   long nxp1 = nx+1;
   long nyp1 = ny+1;
@@ -201,7 +201,7 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 	}
     }
 
-  if ( debug ) printf(" -> num_srch_cells: %ld\n", num_srch_cells);
+  if ( debug ) printf(" -> num_srch_cells: %zu\n", num_srch_cells);
 
   return num_srch_cells;
 }
@@ -248,20 +248,17 @@ static
 void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
 			    const double *restrict corner_lat, double *restrict bound_box)
 {
-  long inc, j;
-  double clon, clat;
+  long inc = ic*nc;
 
-  inc = ic*nc;
-
-  clat = corner_lat[inc];
-  clon = corner_lon[inc];
+  double clat = corner_lat[inc];
+  double clon = corner_lon[inc];
 
   bound_box[0] = clat;
   bound_box[1] = clat;
   bound_box[2] = clon;
   bound_box[3] = clon;
 
-  for ( j = 1; j < nc; ++j )
+  for ( long j = 1; j < nc; ++j )
     {
       clat = corner_lat[inc+j];
       clon = corner_lon[inc+j];
@@ -350,7 +347,7 @@ double gridcell_area(struct grid_cell cell)
 }
 
 static
-void cdo_compute_overlap_areas(unsigned N, search_t *search, struct grid_cell target_cell)
+void cdo_compute_overlap_areas(size_t N, search_t *search, struct grid_cell target_cell)
 {
   double *partial_areas   = search->partial_areas;
   struct grid_cell *overlap_buffer = search->overlap_buffer;
@@ -362,13 +359,13 @@ void cdo_compute_overlap_areas(unsigned N, search_t *search, struct grid_cell ta
 
   /* Get the partial areas for the overlapping regions */
 
-  for ( unsigned n = 0; n < N; n++ )
+  for ( size_t n = 0; n < N; n++ )
     {
       partial_areas[n] = gridcell_area(overlap_buffer[n]);
     }
 
 #ifdef VERBOSE
-  for ( unsigned n = 0; n < N; n++ )
+  for ( size_t n = 0; n < N; n++ )
     printf("overlap area : %lf\n", partial_areas[n]);
 #endif
 }
@@ -414,7 +411,7 @@ static enum cell_type get_cell_type(struct grid_cell target_cell) {
 }
 */
 static
-void cdo_compute_concave_overlap_areas(unsigned N, search_t *search, struct grid_cell target_cell,
+void cdo_compute_concave_overlap_areas(size_t N, search_t *search, struct grid_cell target_cell,
 				       double target_node_x, double target_node_y)
 {
   double *partial_areas   = search->partial_areas;
@@ -457,7 +454,7 @@ void cdo_compute_concave_overlap_areas(unsigned N, search_t *search, struct grid
 
   /* Do the clipping and get the cell for the overlapping area */
 
-  for ( unsigned n = 0; n < N; n++) partial_areas[n] = 0.0;
+  for ( size_t n = 0; n < N; n++) partial_areas[n] = 0.0;
 
   // common node point to all partial target cells
   target_partial_cell.coordinates_x[0] = target_node_x;
@@ -509,11 +506,11 @@ void cdo_compute_concave_overlap_areas(unsigned N, search_t *search, struct grid
       target_partial_cell.coordinates_xyz[1+3*2] = target_cell.coordinates_xyz[1+3*corner_b];
       target_partial_cell.coordinates_xyz[2+3*2] = target_cell.coordinates_xyz[2+3*corner_b];
 
-      yac_cell_clipping(N, source_cell, target_partial_cell, overlap_buffer);
+      yac_cell_clipping((unsigned)N, source_cell, target_partial_cell, overlap_buffer);
 
       /* Get the partial areas for the overlapping regions as sum over the partial target cells. */
 
-      for (unsigned n = 0; n < N; n++)
+      for (size_t n = 0; n < N; n++)
 	{
 	  partial_areas[n] += gridcell_area(overlap_buffer[n]);
 	  // we cannot use pole_area because it is rather inaccurate for great circle
@@ -523,8 +520,8 @@ void cdo_compute_concave_overlap_areas(unsigned N, search_t *search, struct grid
     }
 
 #ifdef VERBOSE
-  for (unsigned n = 0; n < N; n++)
-    printf("overlap area %i: %lf \n", n, partial_areas[n]);
+  for (size_t n = 0; n < N; n++)
+    printf("overlap area %zu: %lf\n", n, partial_areas[n]);
 #endif
 }
 
@@ -798,8 +795,8 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   
   double findex = 0;
 
-  long sum_srch_cells = 0;
-  long sum_srch_cells2 = 0;
+  size_t sum_srch_cells = 0;
+  size_t sum_srch_cells2 = 0;
 
 #ifdef STIMER
   double stimer = 0;
@@ -817,8 +814,8 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
     {
       double partial_weight;
       long src_cell_add;       /* current linear address for source grid cell   */
-      long num_srch_cells;
-      long n, num_weights, num_weights_old;
+      size_t num_srch_cells;
+      size_t n, num_weights, num_weights_old;
       int ompthID = cdo_omp_get_thread_num();
 
 #if defined(_OPENMP)
@@ -880,7 +877,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       if ( 0 && cdoVerbose ) sum_srch_cells += num_srch_cells;
 
       if ( 0 && cdoVerbose )
-	printf("tgt_cell_add %ld  num_srch_cells %ld\n", tgt_cell_add, num_srch_cells);
+	printf("tgt_cell_add %ld  num_srch_cells %zu\n", tgt_cell_add, num_srch_cells);
 
       if ( num_srch_cells == 0 ) continue;
 
@@ -1005,8 +1002,8 @@ printf("stime = %gs\n", stimer);
 
   if ( 0 && cdoVerbose )
     {
-      printf("sum_srch_cells : %ld\n", sum_srch_cells);
-      printf("sum_srch_cells2: %ld\n", sum_srch_cells2);
+      printf("sum_srch_cells : %zu\n", sum_srch_cells);
+      printf("sum_srch_cells2: %zu\n", sum_srch_cells2);
     }
 
   /* Finished with all cells: deallocate search arrays */
