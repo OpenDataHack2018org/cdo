@@ -317,20 +317,24 @@ void *DestaggerUV()
       if      (VarIsU) { varID1 = varID; zaxisID1 = zaxisID; }
       else if (VarIsV) { varID2 = varID; zaxisID2 = zaxisID; }
 
-      if ( (varID1stg == -1) && (varID2stg == -1) )
-        if ( (varID1 != -1) && (varID2 != -1) )
-          {
-            CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2);
-            if ( VarsUVareStaggered )
-              {
-                gridID1 = vlistInqVarGrid(vlistID1, varID1);
-                gridID2 = vlistInqVarGrid(vlistID1, varID2);
-                if ( cdoDebugExt )
-                  cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), varID2=%d (gridID2=%d)",varID1, gridID2, varID2, gridID1);
-                varID1stg = varID1;
-                varID2stg = varID2;
-              }
-          }
+      if ( (varID1 != CDI_UNDEFID) && (varID2 != CDI_UNDEFID) )
+        {
+          CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2);
+          if ( VarsUVareStaggered )
+            {
+              gridID1 = vlistInqVarGrid(vlistID1, varID1);
+              gridID2 = vlistInqVarGrid(vlistID1, varID2);
+              if ( cdoDebugExt )
+                cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), varID2=%d (gridID2=%d)",varID1, gridID2, varID2, gridID1);
+              varID1stg = varID1;
+              varID2stg = varID2;
+              vlistChangeVarGrid(vlistID2, varID1stg, gridID0);   // set the variable onto the non-staggered grid
+              vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
+              // Allow a next level-type UV-pair to be found;
+              // NOTE: There may be separate CDO staggerd variables for (33/34; 109; *) and (33/34; 100; *)
+              varID1 = varID2 = CDI_UNDEFID;
+            }
+        }
       // search for a reference (non-staggered) grid
       // We take temperature for example as the new (horizontal) grid for de-staggered uv
       // If there will be no temperature field we will define grid the grid
@@ -462,11 +466,12 @@ void *DestaggerUV()
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  if ( varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID )
-    {
-      vlistChangeVarGrid(vlistID2, varID1stg, gridID0);   // set the variable onto the non-staggered grid
-      vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
-    }
+  // The following code is NOT applicable here! Done already before.
+  //if ( varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID )
+  //  {
+  //    vlistChangeVarGrid(vlistID2, varID1stg, gridID0);   // set the variable onto the non-staggered grid
+  //    vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
+  //  }
 
   pstreamDefVlist(streamID2, vlistID2);  // from this point the stream is using a different vlistID !!!!!
   vlistID2 = pstreamInqVlist(streamID2); // refresh it
@@ -496,8 +501,13 @@ void *DestaggerUV()
 
           if ( !lcopy )
             {
-              VarIsU = (varID == varID1stg);
-              VarIsV = (varID == varID2stg);
+              // NOTE: There may be separate CDO staggerd variables for (33/34; 109; *) and (33/34; 100; *)
+              //       You cannot use this way of U/V variable detection!
+              //VarIsU = (varID == varID1stg); ** DON'T USE
+              //VarIsV = (varID == varID2stg); ** DON'T USE
+              vlistInqVarName(vlistID1, varID, varname); 
+              CheckVarIsU(varID,varname,code);
+              CheckVarIsV(varID,varname,code);
 
               UorV = -1;            // -1: not U, neither V
               if      (VarIsU) UorV = 0; // 0: U-wind; 1: V-wind
