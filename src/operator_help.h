@@ -1055,7 +1055,7 @@ std::vector<std::string> SettimeHelp = {
     "",
     "DESCRIPTION",
     "    This module sets the time axis or part of the time axis. Which part of the",
-    "    time axis is overwritten depends on the chosen operator.",
+    "    time axis is overwritten/created depends on the chosen operator.",
     "",
     "OPERATORS",
     "    setdate      Set date",
