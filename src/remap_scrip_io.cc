@@ -83,6 +83,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   const char *tgt_grid_units = "radians";
   bool lgridarea = false;
   int writemode = NC_CLOBBER;
+  nc_type sizetype = NC_INT;
 
   switch ( rv.norm_opt )
     {
@@ -149,8 +150,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
     size_t nele2 = 4*8 + 4;
     if ( src_grid.lneed_cell_corners ) nele1 += src_grid.num_cell_corners*2*8;
     if ( tgt_grid.lneed_cell_corners ) nele2 += tgt_grid.num_cell_corners*2*8;
-    size_t filesize = src_grid.size*(nele1) +
-                      tgt_grid.size*(nele2) +
+    size_t filesize = src_grid.size*nele1 +
+                      tgt_grid.size*nele2 +
                       nlinks*(4 + 4 + rv.num_wts*8);
 
     if ( cdoVerbose )
@@ -162,11 +163,16 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
     if ( filesize > 0x7FFFFC00 ) // 2**31 - 1024 (<2GB)
       {
         size_t maxlinks = 0x3FFFFFFF; // 1GB
-        if ( nlinks > maxlinks || filesize > 8*maxlinks )
+        size_t gridsize_max = (src_grid.size > tgt_grid.size) ? src_grid.size : tgt_grid.size;
+        if ( nlinks > maxlinks || filesize > 8*maxlinks || gridsize_max > 0x7FFFFC00 )
           {
 #if defined (HAVE_NETCDF4)
-            writemode |= NC_NETCDF4 | NC_CLASSIC_MODEL;
             if ( cdoVerbose ) cdoPrint("Store weights and links to NetCDF4!");
+            writemode |= NC_NETCDF4;
+            if ( gridsize_max > 0x7FFFFC00 )
+              sizetype = NC_UINT64;
+            else
+              writemode |= NC_CLASSIC_MODEL;
 #else
             cdoPrint("Number of remap links %lz exceeds maximum of %lz and NetCDF 4 is not available!",
                      nlinks, maxlinks);
@@ -246,8 +252,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   nce(nc_def_dim(nc_file_id, "num_wgts", rv.num_wts, &nc_numwgts_id));
        
   // Define grid dimensions
-  nce(nc_def_var(nc_file_id, "src_grid_dims", NC_INT, 1, &nc_srcgrdrank_id, &nc_srcgrddims_id));
-  nce(nc_def_var(nc_file_id, "dst_grid_dims", NC_INT, 1, &nc_dstgrdrank_id, &nc_dstgrddims_id));
+  nce(nc_def_var(nc_file_id, "src_grid_dims", sizetype, 1, &nc_srcgrdrank_id, &nc_srcgrddims_id));
+  nce(nc_def_var(nc_file_id, "dst_grid_dims", sizetype, 1, &nc_dstgrdrank_id, &nc_dstgrddims_id));
 
   // Define all arrays for NetCDF descriptors
 
@@ -325,8 +331,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 
   // Define mapping arrays
 
-  nce(nc_def_var(nc_file_id, "src_address", NC_INT, 1, &nc_numlinks_id, &nc_srcadd_id));      
-  nce(nc_def_var(nc_file_id, "dst_address", NC_INT, 1, &nc_numlinks_id, &nc_dstadd_id));
+  nce(nc_def_var(nc_file_id, "src_address", sizetype, 1, &nc_numlinks_id, &nc_srcadd_id));      
+  nce(nc_def_var(nc_file_id, "dst_address", sizetype, 1, &nc_numlinks_id, &nc_dstadd_id));
 
   nc_dims2_id[0] = nc_numlinks_id;
   nc_dims2_id[1] = nc_numwgts_id;
