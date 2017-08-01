@@ -26,7 +26,6 @@ void nce(int istat)
   // This routine provides a simple interface to NetCDF error message routine.
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
 }
-#endif
 
 static
 void write_links(int nc_file_id, int nc_add_id, nc_type sizetype, size_t num_links, size_t *cell_add)
@@ -65,6 +64,7 @@ void read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_ad
     }
 #endif
 }
+#endif
 
 
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, int num_neighbors,
