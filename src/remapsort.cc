@@ -12,9 +12,9 @@
 /*****************************************************************************/
 
 static
-int isSorted(int *restrict array1, int *restrict array2, const long size)
+int isSorted(size_t *restrict array1, size_t *restrict array2, const size_t size)
 {
-  for ( long idx = 1; idx < size; ++idx )
+  for ( size_t idx = 1; idx < size; ++idx )
     {
       if (  (array1[idx-1] >  array1[idx]) ||
 	   ((array1[idx-1] == array1[idx]) &&
@@ -92,13 +92,13 @@ void remap_heapsort_recursiv(const long num_links, int *restrict arr1, int *rest
 */
 
 static
-void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2, int *restrict idx)
+void remap_heapsort(const size_t num_links, size_t *restrict add1, size_t *restrict add2, size_t *restrict idx)
 {
-  int add1_tmp, add2_tmp;  /* temp for addresses during swap     */
-  int idx_tmp;
-  long lvl, final_lvl;     /* level indexes for heap sort levels */
-  long chk_lvl1, max_lvl;
-  long i;
+  size_t add1_tmp, add2_tmp;  /* temp for addresses during swap     */
+  size_t idx_tmp;
+  long lvl;     /* level indexes for heap sort levels */
+  size_t chk_lvl1, max_lvl, final_lvl;
+  size_t i;
 
   /*
     start at the lowest level (N/2) of the tree and shift lower 
@@ -196,7 +196,7 @@ void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2
 
           chk_lvl1 = 2*final_lvl+1;
           max_lvl  = 2*final_lvl+2;
-          if ( max_lvl >= lvl ) max_lvl = chk_lvl1;
+          if ( max_lvl >= (size_t)lvl ) max_lvl = chk_lvl1;
 
           if ( (add1[chk_lvl1] >  add1[max_lvl]) ||
               ((add1[chk_lvl1] == add1[max_lvl]) &&
@@ -232,7 +232,7 @@ void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2
 	      idx[final_lvl]  = idx[max_lvl];
 
 	      final_lvl = max_lvl;
-	      if ( 2*final_lvl+1 >= lvl )
+	      if ( 2*final_lvl+1 >= (size_t)lvl )
 		{
 		  add1[final_lvl] = add1_tmp;
 		  add2[final_lvl] = add2_tmp;
@@ -262,7 +262,7 @@ void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2
 }
 
 
-void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
+void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the destination address with the 
@@ -278,24 +278,18 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
        weights         ! remapping weights [num_links*num_wts]
   */
 
-  /* Local variables */
-
-  int *idx;
-  long i, n;
-  double *wgt_tmp;
-
   if ( num_links <= 1 ) return;
 
-  idx = (int*) Malloc(num_links*sizeof(int));
-  for ( i = 0; i < num_links; ++i ) idx[i] = i;
+  size_t *idx = (size_t*) Malloc(num_links*sizeof(size_t));
+  for ( size_t i = 0; i < num_links; ++i ) idx[i] = i;
 
   remap_heapsort(num_links, add1, add2, idx);
 
-  wgt_tmp = (double*) Malloc(num_wts*num_links*sizeof(double));
+  double *wgt_tmp = (double*) Malloc(num_wts*num_links*sizeof(double));
   memcpy(wgt_tmp, weights, num_wts*num_links*sizeof(double));
 
-  for ( i = 0; i < num_links; ++i )
-    for ( n = 0; n < num_wts; ++n )
+  for ( size_t i = 0; i < num_links; ++i )
+    for ( size_t n = 0; n < num_wts; ++n )
       weights[num_wts*i+n] = wgt_tmp[num_wts*idx[i]+n];
 
   Free(wgt_tmp);
@@ -307,7 +301,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 
 /*****************************************************************************/
 
-void sort_add_orig(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
+void sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the
@@ -326,10 +320,10 @@ void sort_add_orig(long num_links, long num_wts, int *restrict add1, int *restri
 
   /* Local variables */
 
-  int add1_tmp, add2_tmp;  /* temp for addresses during swap     */
-  long lvl, final_lvl;     /* level indexes for heap sort levels */
-  long chk_lvl1, chk_lvl2, max_lvl;
-  long i, n;
+  size_t add1_tmp, add2_tmp;  /* temp for addresses during swap     */
+  long lvl;     /* level indexes for heap sort levels */
+  size_t chk_lvl1, chk_lvl2, max_lvl, final_lvl;
+  size_t i, n;
   double wgttmp[4];        /* temp for holding wts during swap   */
 
   if ( num_links <= 1 ) return;
@@ -441,7 +435,7 @@ void sort_add_orig(long num_links, long num_wts, int *restrict add1, int *restri
 
           chk_lvl1 = 2*final_lvl+1;
           chk_lvl2 = 2*final_lvl+2;
-          if ( chk_lvl2 >= lvl ) chk_lvl2 = chk_lvl1;
+          if ( chk_lvl2 >= (size_t)lvl ) chk_lvl2 = chk_lvl1;
 
           if ((add1[chk_lvl1] >  add1[chk_lvl2]) ||
              ((add1[chk_lvl1] == add1[chk_lvl2]) &&
@@ -479,7 +473,7 @@ void sort_add_orig(long num_links, long num_wts, int *restrict add1, int *restri
 		weights[num_wts*final_lvl+n] = weights[num_wts*max_lvl+n];
 
 	      final_lvl = max_lvl;
-	      if ( 2*final_lvl+1 >= lvl )
+	      if ( 2*final_lvl+1 >= (size_t)lvl )
 		{
 		  add1[final_lvl] = add1_tmp;
 		  add2[final_lvl] = add2_tmp;
@@ -541,7 +535,7 @@ void sort_add_orig(long num_links, long num_wts, int *restrict add1, int *restri
 
 
 static
-void merge_lists(int *nl, int *l11, int *l12, int *l21, int *l22, long *idx)
+void merge_lists(size_t *nl, size_t *l11, size_t *l12, size_t *l21, size_t *l22, size_t *idx)
 {      
   /*
     This routine writes to idx a list of indices relative to *l11 and *l12
@@ -551,8 +545,8 @@ void merge_lists(int *nl, int *l11, int *l12, int *l21, int *l22, long *idx)
                         OR (II) l11[idx[i]]==l11[idx[i+1]] && l21[idx[i]]<l21[idx[i+1]]
 		       where 0 <= i < nl
   */    		       
-  int i1=0, i2=0, i=0, ii;
-  const int n1=nl[0], n2=nl[1];
+  size_t i1=0, i2=0, i=0, ii;
+  const size_t n1=nl[0], n2=nl[1];
 
   i=0;
   while ( i2 < n2 && i1 < n1 ) 
@@ -570,7 +564,7 @@ void merge_lists(int *nl, int *l11, int *l12, int *l21, int *l22, long *idx)
 }
 
 static
-void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict add2, 
+void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, 
 	      double *restrict weights, int parent, int par_depth)
 {
   /*
@@ -599,19 +593,18 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
   */
 
 
-  const int nsplit = 2;                      /* (only 2 allowed) number of segments to split the data */
-  int nl[nsplit];                            /* number of links in each sub-array              */
-  int who_am_i;                              /* current depth, depth of children and index
-						to be parent in next call to sort_par          */
-  int add_srt[nsplit]/*, add_end[nsplit]*/;  /* arrays for start and end index of sub array    */
-  int *add1s[nsplit], *add2s[nsplit];        /* pointers to sub arrays for sort and merge step */
-  int *tmp;                                  /* pointer to buffer for merging of address lists */
-  double *tmp2 = NULL;                       /* pointer to buffer for merging weight lists     */
-  double *wgttmp = NULL;                     /* pointer to buffer for swap weights             */
-  long *idx;                                 /* index list to merge sub-arrays                 */
-  long i,n,m;   
+  const int nsplit = 2;                         /* (only 2 allowed) number of segments to split the data */
+  size_t nl[nsplit];                            /* number of links in each sub-array              */
+  int who_am_i;                                 /* current depth, depth of children and index
+						   to be parent in next call to sort_par          */
+  size_t add_srt[nsplit]/*, add_end[nsplit]*/;  /* arrays for start and end index of sub array    */
+  size_t *add1s[nsplit], *add2s[nsplit];        /* pointers to sub arrays for sort and merge step */
+  size_t *tmp;                                  /* pointer to buffer for merging of address lists */
+  double *tmp2 = NULL;                          /* pointer to buffer for merging weight lists     */
+  double *wgttmp = NULL;                        /* pointer to buffer for swap weights             */
+  size_t i,n,m;   
 
-  // printf("sort_par: parent = %d numlinks = %ld\n", parent, num_links);
+  // printf("sort_par: parent = %d numlinks = %zu\n", parent, num_links);
   if ( nsplit != 2 )
     {
       fprintf(stderr,"Error: splitting into more than two subsegments not allowed\n"
@@ -619,7 +612,8 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
       exit(-1);
     }
 
-  idx = (long*) Malloc(num_links*sizeof(long));
+  // index list to merge sub-arrays
+  size_t *idx = (size_t*) Malloc(num_links*sizeof(size_t));
 
   /* SPLIT AND SORT THE DATA FRAGMENTS */
   /*
@@ -697,7 +691,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
                                                               /* ********************** */
   merge_lists(nl,add1s[0],add2s[0],add1s[1],add2s[1], idx);   /* MERGE THE SEGMENTS     */
                                                               /* ********************** */
-  tmp = (int*) Malloc(num_links*sizeof(int));
+  tmp = (size_t*) Malloc(num_links*sizeof(size_t));
   
 #if defined(_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
@@ -746,7 +740,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
 }
 
 
-void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights, int parent)
+void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights, int parent)
 {
   /*
     This routine is an interface between the parallelized (merge-sort) 
@@ -769,19 +763,19 @@ void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict a
 		     been called before
 		   + determines number of threads to use on first call of sort_iter(...)
   */
-  static int first_sort_iter_call = 1;
+  static bool first_sort_iter_call = true;
   static int par_depth = 1;
   static int nthreads = 1;
 
   if ( first_sort_iter_call )
     {
-      first_sort_iter_call = 0;
+      first_sort_iter_call = false;
       nthreads = parent;
       par_depth = (int)(log(parent)/log(2));
       parent = 1;
     }
 
-  // fprintf(stdout, "parent %d par_depth %d num_links %ld\n", parent, par_depth, num_links);
+  // fprintf(stdout, "parent %d par_depth %d num_links %zu\n", parent, par_depth, num_links);
 
   if ( num_links > MERGE_SORT_LIMIT_SIZE && parent <= (nthreads-1) )
     {
@@ -790,7 +784,7 @@ void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict a
     }
   else
     {
-      // printf("sort_add: parent %d, par_depth %d num_links %ld\n", parent, par_depth, num_links);
+      // printf("sort_add: parent %d, par_depth %d num_links %tz\n", parent, par_depth, num_links);
       sort_add(num_links, num_wts, add1, add2, weights);
     }
 }

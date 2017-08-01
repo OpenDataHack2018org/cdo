@@ -277,9 +277,9 @@ void fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
 }
 
 
-int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
-double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, bool *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist);
-unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const bool *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist);
+int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+double nbr_compute_weights(size_t num_neighbors, const int *restrict src_grid_mask, bool *restrict nbr_mask, const size_t *restrict nbr_add, double *restrict nbr_dist);
+size_t nbr_normalize_weights(size_t num_neighbors, double dist_tot, const bool *restrict nbr_mask, size_t *restrict nbr_add, double *restrict nbr_dist);
 
 static
 void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
@@ -313,8 +313,8 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-  unsigned *mindex = nmiss ? (unsigned *) Calloc(1, nmiss*sizeof(unsigned)) : NULL;
-  unsigned *vindex = nvals ? (unsigned *) Calloc(1, nvals*sizeof(unsigned)) : NULL;
+  size_t *mindex = nmiss ? (size_t *) Calloc(1, nmiss*sizeof(size_t)) : NULL;
+  size_t *vindex = nvals ? (size_t *) Calloc(1, nvals*sizeof(size_t)) : NULL;
   double *lons = nvals ? (double *) Malloc(nvals*sizeof(double)) : NULL;
   double *lats = nvals ? (double *) Malloc(nvals*sizeof(double)) : NULL;
   
@@ -339,7 +339,7 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
   
   bool nbr_mask[num_neighbors];   /* mask at nearest neighbors                   */
-  int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
+  size_t nbr_add[num_neighbors];  /* source address at nearest neighbors         */
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
 
   clock_t start, finish;
@@ -381,11 +381,11 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
       double dist_tot = nbr_compute_weights(num_neighbors, NULL, nbr_mask, nbr_add, nbr_dist);
 
       /* Normalize weights and store the link */
-      unsigned nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      size_t nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
       if ( nadds )
         {
           double result = 0;
-          for ( unsigned n = 0; n < nadds; ++n ) result += array1[vindex[nbr_add[n]]]*nbr_dist[n];
+          for ( size_t n = 0; n < nadds; ++n ) result += array1[vindex[nbr_add[n]]]*nbr_dist[n];
           array2[mindex[i]] = result;
         }
     }

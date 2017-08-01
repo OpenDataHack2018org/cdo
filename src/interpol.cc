@@ -105,7 +105,7 @@ long find_element(double x, long nelem, const double *array)
 }
 */
 
-int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym)
+int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, size_t nym, const double *restrict xm, const double *restrict ym)
 {
   int lfound = 0;
 
@@ -236,7 +236,7 @@ void intlinarr2(double missval, int lon_is_circular,
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
 
-      long ii, jj;
+      size_t ii, jj;
       int lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
 
       if ( lfound )

@@ -30,9 +30,9 @@ int cmp_adds4(const void *s1, const void *s2)
 }
 
 static
-void sort_addweights(unsigned num_weights, addweight_t *addweights)
+void sort_addweights(size_t num_weights, addweight_t *addweights)
 {
-  unsigned n;
+  size_t n;
 
   for ( n = 1; n < num_weights; ++n )
     if ( addweights[n].add < addweights[n-1].add ) break;
@@ -42,9 +42,9 @@ void sort_addweights(unsigned num_weights, addweight_t *addweights)
 }
 
 static
-void sort_addweights4(unsigned num_weights, addweight4_t *addweights)
+void sort_addweights4(size_t num_weights, addweight4_t *addweights)
 {
-  unsigned n;
+  size_t n;
 
   for ( n = 1; n < num_weights; ++n )
     if ( addweights[n].add < addweights[n-1].add ) break;
@@ -54,9 +54,9 @@ void sort_addweights4(unsigned num_weights, addweight4_t *addweights)
 }
 
 
-void sort_add_and_wgts(unsigned num_weights, int *src_add, double *wgts)
+void sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts)
 {
-  unsigned n;
+  size_t n;
 
   for ( n = 1; n < num_weights; ++n )
     if ( src_add[n] < src_add[n-1] ) break;
@@ -83,9 +83,9 @@ void sort_add_and_wgts(unsigned num_weights, int *src_add, double *wgts)
 }
 
 
-void sort_add_and_wgts4(unsigned num_weights, int *src_add, double wgts[4][4])
+void sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
 {
-  unsigned n;
+  size_t n;
 
   for ( n = 1; n < num_weights; ++n )
     if ( src_add[n] < src_add[n-1] ) break;
@@ -114,7 +114,7 @@ void sort_add_and_wgts4(unsigned num_weights, int *src_add, double wgts[4][4])
 }
 
 
-void store_weightlinks(int lalloc, unsigned num_weights, int *srch_add, double *weights, size_t cell_add, weightlinks_t *weightlinks)
+void store_weightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weights, size_t cell_add, weightlinks_t *weightlinks)
 {
   weightlinks[cell_add].nlinks = 0;
   weightlinks[cell_add].offset = 0;
@@ -127,7 +127,7 @@ void store_weightlinks(int lalloc, unsigned num_weights, int *srch_add, double *
       else
         addweights = weightlinks[cell_add].addweights;
 
-      for ( unsigned n = 0; n < num_weights; ++n )
+      for ( size_t n = 0; n < num_weights; ++n )
 	{
 	  addweights[n].add    = srch_add[n];
 	  addweights[n].weight = weights[n];
@@ -142,7 +142,7 @@ void store_weightlinks(int lalloc, unsigned num_weights, int *srch_add, double *
 }
 
 
-void store_weightlinks4(unsigned num_weights, int *srch_add, double weights[4][4], size_t cell_add, weightlinks4_t *weightlinks)
+void store_weightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], size_t cell_add, weightlinks4_t *weightlinks)
 {
   weightlinks[cell_add].nlinks = 0;
   weightlinks[cell_add].offset = 0;
@@ -151,7 +151,7 @@ void store_weightlinks4(unsigned num_weights, int *srch_add, double weights[4][4
     {
       addweight4_t *addweights = weightlinks[cell_add].addweights;
 
-      for ( unsigned n = 0; n < num_weights; ++n )
+      for ( size_t n = 0; n < num_weights; ++n )
 	{
 	  addweights[n].add = srch_add[n];
 	  for ( unsigned k = 0; k < 4; ++k )
@@ -182,11 +182,11 @@ void weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *wei
   rv->num_links = nlinks;
   if ( nlinks )
     {
-      rv->src_cell_add = (int*) Malloc(nlinks*sizeof(int));
-      rv->tgt_cell_add = (int*) Malloc(nlinks*sizeof(int));
+      rv->src_cell_add = (size_t*) Malloc(nlinks*sizeof(size_t));
+      rv->tgt_cell_add = (size_t*) Malloc(nlinks*sizeof(size_t));
       rv->wts          = (double*) Malloc(nlinks*sizeof(double));
-      int *restrict src_cell_adds = rv->src_cell_add;
-      int *restrict tgt_cell_adds = rv->tgt_cell_add;
+      size_t *restrict src_cell_adds = rv->src_cell_add;
+      size_t *restrict tgt_cell_adds = rv->tgt_cell_add;
       double *restrict wts = rv->wts;
 
 #if defined(_OPENMP)
@@ -241,11 +241,11 @@ void weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, 
   rv->num_links = nlinks;
   if ( nlinks )
     {
-      rv->src_cell_add = (int*) Malloc(nlinks*sizeof(int));
-      rv->tgt_cell_add = (int*) Malloc(nlinks*sizeof(int));
+      rv->src_cell_add = (size_t*) Malloc(nlinks*sizeof(size_t));
+      rv->tgt_cell_add = (size_t*) Malloc(nlinks*sizeof(size_t));
       rv->wts          = (double*) Malloc(4*nlinks*sizeof(double));
-      int *restrict src_cell_adds = rv->src_cell_add;
-      int *restrict tgt_cell_adds = rv->tgt_cell_add;
+      size_t *restrict src_cell_adds = rv->src_cell_add;
+      size_t *restrict tgt_cell_adds = rv->tgt_cell_add;
       double *restrict wts = rv->wts;
 
 #if defined(_OPENMP)
