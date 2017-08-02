@@ -912,24 +912,24 @@ pstreamClose(int pstreamID)
       if (lread)
         {
           pipe = pstreamptr->pipe;
-          pthread_mutex_lock(pipe->mutex);
+          pthread_mutex_lock(pipe->m_mutex);
           pipe->EOP = true;
           if (PSTREAM_Debug)
             Message("%s read closed", pstreamptr->name);
-          pthread_mutex_unlock(pipe->mutex);
+          pthread_mutex_unlock(pipe->m_mutex);
           pthread_cond_signal(pipe->tsDef);
           pthread_cond_signal(pipe->tsInq);
 
           pthread_cond_signal(pipe->recInq);
 
-          pthread_mutex_lock(pipe->mutex);
+          pthread_mutex_lock(pipe->m_mutex);
           pstreamptr->isopen = false;
-          pthread_mutex_unlock(pipe->mutex);
+          pthread_mutex_unlock(pipe->m_mutex);
           pthread_cond_signal(pipe->isclosed);
 
           pthread_join(pstreamptr->wthreadID, NULL);
 
-          pthread_mutex_lock(pipe->mutex);
+          pthread_mutex_lock(pipe->m_mutex);
           if (pstreamptr->name)
             Free(pstreamptr->name);
           if (pstreamptr->argument)
@@ -942,7 +942,7 @@ pstreamClose(int pstreamID)
               delete (argument);
             }
           vlistDestroy(pstreamptr->m_vlistID);
-          pthread_mutex_unlock(pipe->mutex);
+          pthread_mutex_unlock(pipe->m_mutex);
 
           processAddNvals(pipe->nvals);
           delete (pipe);
@@ -951,22 +951,22 @@ pstreamClose(int pstreamID)
       else if (lwrite)
         {
           pipe = pstreamptr->pipe;
-          pthread_mutex_lock(pipe->mutex);
+          pthread_mutex_lock(pipe->m_mutex);
           pipe->EOP = true;
           if (PSTREAM_Debug)
             Message("%s write closed", pstreamptr->name);
-          pthread_mutex_unlock(pipe->mutex);
+          pthread_mutex_unlock(pipe->m_mutex);
           pthread_cond_signal(pipe->tsDef);
           pthread_cond_signal(pipe->tsInq);
 
-          pthread_mutex_lock(pipe->mutex);
+          std::unique_lock<std::mutex> locked_mutex(pipe->m_mutex);
           while (pstreamptr->isopen)
             {
               if (PSTREAM_Debug)
                 Message("wait of read close");
-              pthread_cond_wait(pipe->isclosed, pipe->mutex);
+              pthread_cond_wait(pipe->isclosed, locked_mutex);
             }
-          pthread_mutex_unlock(pipe->mutex);
+          locked_mutex.unlock();
         }
 
       processDelStream(pstreamID);
