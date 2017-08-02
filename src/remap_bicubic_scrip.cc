@@ -32,7 +32,7 @@ void set_bicubic_weights(double iw, double jw, double wgts[4][4])
   wgts[3][3] =     iw*(iw-1.)*(iw-1.) *     jw*jw*(jw-1.);
 }
 
-int num_src_points(const int* restrict mask, const int src_add[4], double src_lats[4]);
+int num_src_points(const int* restrict mask, const size_t src_add[4], double src_lats[4]);
 
 static
 void renormalize_weights(const double src_lats[4], double wgts[4][4])
@@ -61,7 +61,7 @@ void bicubic_warning(void)
 }
 
 static
-void bicubic_remap(double* restrict tgt_point, const double* restrict src_array, double wgts[4][4], const int src_add[4],
+void bicubic_remap(double* restrict tgt_point, const double* restrict src_array, double wgts[4][4], const size_t src_add[4],
 		   const double* restrict grad1, const double* restrict grad2, const double* restrict grad3)
 {
   *tgt_point = 0.;
@@ -83,7 +83,7 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 {
   /*   Local variables */
   int  search_result;
-  int src_add[4];      /*  address for the four source points     */
+  size_t src_add[4];   /*  address for the four source points     */
   double src_lats[4];  /*  latitudes  of four bilinear corners    */
   double src_lons[4];  /*  longitudes of four bilinear corners    */
   double wgts[4][4];   /*  bicubic weights for four corners       */
@@ -209,7 +209,7 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 {
   /*   Local variables */
   int  search_result;
-  int src_add[4];      /*  address for the four source points   */
+  size_t src_add[4];      /*  address for the four source points   */
   double src_lats[4];  /*  latitudes  of four bilinear corners  */
   double src_lons[4];  /*  longitudes of four bilinear corners  */
   double wgts[4][4];   /*  bicubic weights for four corners     */

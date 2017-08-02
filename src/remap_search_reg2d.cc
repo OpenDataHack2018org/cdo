@@ -2,17 +2,14 @@
 #include "remap.h"
 
 
-int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym);
-
-
-int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
+int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
 			 const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
-  long n, srch_add;
-  long i;
-  long ii, jj;
-  long jjskip;
+  size_t n, srch_add;
+  size_t i;
+  size_t ii, jj;
+  size_t jjskip;
   double coslat, sinlat;
   double dist_min, distance; /* For computing dist-weighted avg */
   double *sincoslon;
@@ -24,7 +21,7 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restri
   dist_min = BIGNUM;
   for ( n = 0; n < 4; ++n ) nbr_dist[n] = BIGNUM;  
 
-  long jjf = 0, jjl = ny-1;
+  size_t jjf = 0, jjl = ny-1;
   if ( plon >= src_center_lon[0] && plon <= src_center_lon[nx-1] )
     {
       if ( src_center_lat[0] < src_center_lat[ny-1] )
@@ -96,7 +93,7 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restri
 }
 
 
-int grid_search_reg2d(remapgrid_t *src_grid, int *restrict src_add, double *restrict src_lats, 
+int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
 		      double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
 		      const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
@@ -120,14 +117,14 @@ int grid_search_reg2d(remapgrid_t *src_grid, int *restrict src_add, double *rest
   /*  Local variables */
   int search_result = 0;
   long n;
-  long ii, iix, jj;
+  size_t ii, iix, jj;
 
   for ( n = 0; n < 4; ++n ) src_add[n] = 0;
 
-  long nx = src_grid_dims[0];
-  long ny = src_grid_dims[1];
+  size_t nx = src_grid_dims[0];
+  size_t ny = src_grid_dims[1];
 
-  long nxm = nx;
+  size_t nxm = nx;
   if ( src_grid->is_cyclic ) nxm++;
 
   if ( /*plon < 0   &&*/ plon < src_center_lon[0]     ) plon += PI2;

@@ -6,7 +6,7 @@
 #include "kdtreelib/kdtree.h"
 #include "nearpt3c.h"
 
-#define GS_NOT_FOUND  INT_MAX
+#define GS_NOT_FOUND  ULONG_MAX
 
 
 enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_KDTREE, GS_NEARPT3};
@@ -28,8 +28,8 @@ struct gsNear {
 
 struct gridsearch {
   int method_nn;
-  unsigned n;
-  unsigned nx, ny;
+  size_t n;
+  size_t nx, ny;
 
   struct gsNear *near;
   struct kdNode *kdt;
@@ -47,21 +47,21 @@ struct gsknn {
   unsigned ndist;
   unsigned size;
   bool    *mask;
-  int     *add;
-  int     *tmpadd;
+  size_t  *add;
+  size_t  *tmpadd;
   double  *dist;
   double  *tmpdist;
 };
 
-struct gsknn *gridsearch_knn_new(unsigned size);
+struct gsknn *gridsearch_knn_new(size_t size);
 void gridsearch_knn_delete(struct gsknn *knn);
-int gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat);
+size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat);
 
-struct gridsearch *gridsearch_create_reg2d(bool lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
-struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats);
-struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats);
+struct gridsearch *gridsearch_create_reg2d(bool lcyclic, size_t nx, size_t ny, const double *restrict lons, const double *restrict lats);
+struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, const double *restrict lats);
+struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, const double *restrict lats);
 void gridsearch_delete(struct gridsearch *gs);
-unsigned gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
-struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, unsigned nnn);
+size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
+struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn);
 
 #endif

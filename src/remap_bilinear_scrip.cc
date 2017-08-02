@@ -92,7 +92,7 @@ void set_bilinear_weights(double iw, double jw, double wgts[4])
 }
 
 
-int num_src_points(const int* restrict mask, const int src_add[4], double src_lats[4])
+int num_src_points(const int* restrict mask, const size_t src_add[4], double src_lats[4])
 {
   int icount = 0;
 
@@ -117,7 +117,7 @@ void renormalize_weights(const double src_lats[4], double wgts[4])
 }
 
 static
-void bilinear_warning(double plon, double plat, double iw, double jw, int* src_add, double* src_lons, double* src_lats, remapgrid_t* src_grid)
+void bilinear_warning(double plon, double plat, double iw, double jw, size_t* src_add, double* src_lons, double* src_lats, remapgrid_t* src_grid)
 {
   static bool lwarn = true;
 
@@ -126,7 +126,7 @@ void bilinear_warning(double plon, double plat, double iw, double jw, int* src_a
       cdoPrint("Point coords: %g %g", plat, plon);
       cdoPrint("Src grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
       cdoPrint("Src grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
-      cdoPrint("Src grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
+      cdoPrint("Src grid addresses: %zu %zu %zu %zu", src_add[0], src_add[1], src_add[2], src_add[3]);
       cdoPrint("Src grid lats: %g %g %g %g",
 	       src_grid->cell_center_lat[src_add[0]], src_grid->cell_center_lat[src_add[1]],
 	       src_grid->cell_center_lat[src_add[2]], src_grid->cell_center_lat[src_add[3]]);
@@ -145,7 +145,7 @@ void bilinear_warning(double plon, double plat, double iw, double jw, int* src_a
 }
 
 static
-void bilinear_remap(double* restrict tgt_point, const double *restrict src_array, const double wgts[4], const int src_add[4])
+void bilinear_remap(double* restrict tgt_point, const double *restrict src_array, const double wgts[4], const size_t src_add[4])
 {
   // *tgt_point = 0.;
   // for ( int n = 0; n < 4; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
@@ -164,7 +164,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 {
   /*   Local variables */
   int  search_result;
-  int src_add[4];                /*  address for the four source points     */
+  size_t src_add[4];             /*  address for the four source points     */
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */
   double wgts[4];                /*  bilinear weights for four corners      */
@@ -289,7 +289,7 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
 {
   /*   Local variables */
   int  search_result;
-  int src_add[4];                /*  address for the four source points     */
+  size_t src_add[4];             /*  address for the four source points     */
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */
   double wgts[4];                /*  bilinear weights for four corners      */

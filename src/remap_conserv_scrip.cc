@@ -46,7 +46,7 @@ static
 void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon, int *lcoinc,
 		       int *lthresh, double beglat, double beglon, double endlat, double endlon,
 		       double *begseg, int lrevers,
-		       long num_srch_cells, long srch_corners, const int *restrict srch_add,
+		       long num_srch_cells, long srch_corners, const size_t *restrict srch_add,
 		       const double *restrict srch_corner_lat, const double *restrict srch_corner_lon,
 		       int *luse_last, double *intrsct_x, double *intrsct_y,
 		       int *avoid_pole_count, double *avoid_pole_offset)
@@ -160,7 +160,7 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
       if ( *lthresh )
 	{
 	  for ( cell=0; cell < num_srch_cells; ++cell )
-	    if ( srch_add[cell] == *location )
+	    if ( srch_add[cell] == (size_t)*location )
 	      {
 		eps = TINY;
 		goto after_srch_loop;
@@ -515,7 +515,7 @@ static
 void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int *lcoinc,
 		  double beglat, double beglon, double endlat, double endlon, double *begseg,
 		  int lbegin, int lrevers,
-		  long num_srch_cells, long srch_corners, const int *restrict srch_add,
+		  long num_srch_cells, long srch_corners, const size_t *restrict srch_add,
 		  const double *restrict srch_corner_lat, const double *restrict srch_corner_lon,
 		  int *last_loc, int *lthresh, double *intrsct_lat_off, double *intrsct_lon_off,
 		  int *luse_last, double *intrsct_x, double *intrsct_y,
@@ -612,7 +612,7 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
       if ( *lthresh )
        {
          for ( cell = 0; cell < num_srch_cells; ++cell )
-	   if ( srch_add[cell] == *last_loc )
+	   if ( srch_add[cell] == (size_t)*last_loc )
 	     {
                *location = *last_loc;
                eps = TINY;
@@ -991,7 +991,7 @@ static
 void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
 		  double *src_centroid_lat, double *src_centroid_lon,
 		  double *tgt_centroid_lat, double *tgt_centroid_lon,
-		  grid_store_t *grid_store, int *link_add1[2], int *link_add2[2])
+		  grid_store_t *grid_store, long *link_add1[2], long *link_add2[2])
 {
   /*
      Correct for situations where N/S pole not explicitly included in
@@ -1020,7 +1020,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
   weights[4] =  PI*PI;
   weights[5] =  ZERO;
 
-  src_cell_add = -1;
+  src_cell_add = src_grid_size;
   /* pole_loop1 */
   for ( n = 0; n < src_grid_size; ++n )
     if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] > ZERO )
@@ -1031,7 +1031,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
 #endif
       }
 
-  tgt_cell_add = -1;
+  tgt_cell_add = tgt_grid_size;
   /* pole_loop2 */
   for ( n = 0; n < tgt_grid_size; ++n )
     if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] > ZERO )
@@ -1042,21 +1042,21 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
 #endif
       }
 
-  if ( src_cell_add != -1 )
+  if ( src_cell_add != src_grid_size )
     {
       src_grid->cell_area[src_cell_add] += weights[0];
       src_centroid_lat[src_cell_add]    += weights[1];
       src_centroid_lon[src_cell_add]    += weights[2];
     }
 
-  if ( tgt_cell_add != -1 )
+  if ( tgt_cell_add != tgt_grid_size )
     {
       tgt_grid->cell_area[tgt_cell_add] += weights[3];
       tgt_centroid_lat[tgt_cell_add]    += weights[4];
       tgt_centroid_lon[tgt_cell_add]    += weights[5];
     }
 
-  if ( src_cell_add != -1 && tgt_cell_add != -1 )
+  if ( src_cell_add != src_grid_size && tgt_cell_add != tgt_grid_size )
     {
       if ( remap_store_link_fast )
 	store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
@@ -1075,7 +1075,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
   weights[4] = -PI*PI;
   weights[5] =  ZERO;
 
-  src_cell_add = -1;
+  src_cell_add = src_grid_size;
   /* pole_loop3 */
   for ( n = 0; n < src_grid_size; ++n )
     if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] < ZERO )
@@ -1086,7 +1086,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
 #endif
       }
 
-  tgt_cell_add = -1;
+  tgt_cell_add = tgt_grid_size;
   /* pole_loop4 */
   for ( n = 0; n < tgt_grid_size; ++n )
     if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] < ZERO )
@@ -1097,21 +1097,21 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
 #endif
       }
 
-  if ( src_cell_add != -1 )
+  if ( src_cell_add != src_grid_size )
     {
       src_grid->cell_area[src_cell_add] += weights[0];
       src_centroid_lat[src_cell_add]    += weights[1];
       src_centroid_lon[src_cell_add]    += weights[2];
     }
 
-  if ( tgt_cell_add != -1 )
+  if ( tgt_cell_add != tgt_grid_size )
     {
       tgt_grid->cell_area[tgt_cell_add] += weights[3];
       tgt_centroid_lat[tgt_cell_add]    += weights[4];
       tgt_centroid_lon[tgt_cell_add]    += weights[5];
     }
 
-  if ( src_cell_add != -1 && tgt_cell_add != -1 )
+  if ( src_cell_add != src_grid_size && tgt_cell_add != tgt_grid_size )
     {
       if ( remap_store_link_fast )
 	store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
@@ -1252,14 +1252,14 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   long    num_srch_cells;   /* num cells in restricted search arrays  */
   long    srch_corners;     /* num of corners of srch cells           */
   long    nsrch_corners;
-  int*    srch_add;         /* global address of cells in srch arrays */
-  std::vector<int *> srch_add2(ompNumThreads);
+  size_t*    srch_add;         /* global address of cells in srch arrays */
+  std::vector<size_t *> srch_add2(ompNumThreads);
   int     i;
   double *srch_corner_lat;  /* lat of each corner of srch cells */
   double *srch_corner_lon;  /* lon of each corner of srch cells */
 
-  int *link_add1[2];        /* min,max link add to restrict search */
-  int *link_add2[2];        /* min,max link add to restrict search */
+  long *link_add1[2];        /* min,max link add to restrict search */
+  long *link_add2[2];        /* min,max link add to restrict search */
 
   /* Intersection */
   int last_loc = -1;        /* save location when crossing threshold  */
@@ -1306,10 +1306,10 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( ! remap_store_link_fast )
     {
-      link_add1[0] = (int*) Malloc(src_grid_size*sizeof(int));
-      link_add1[1] = (int*) Malloc(src_grid_size*sizeof(int));
-      link_add2[0] = (int*) Malloc(tgt_grid_size*sizeof(int));
-      link_add2[1] = (int*) Malloc(tgt_grid_size*sizeof(int));
+      link_add1[0] = (long*) Malloc(src_grid_size*sizeof(long));
+      link_add1[1] = (long*) Malloc(src_grid_size*sizeof(long));
+      link_add2[0] = (long*) Malloc(tgt_grid_size*sizeof(long));
+      link_add2[1] = (long*) Malloc(tgt_grid_size*sizeof(long));
 
 #if defined(SX)
 #pragma vdir nodep
@@ -1365,7 +1365,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
     max_srch_cells2[i] = 0;
 
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (int*) Malloc(tgt_grid_size*sizeof(int));
+    srch_add2[i] = (size_t*) Malloc(tgt_grid_size*sizeof(size_t));
 
   srch_corners = tgt_num_cell_corners;
 
@@ -1583,7 +1583,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
     max_srch_cells2[i] = 0;
 
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (int*) Malloc(src_grid_size*sizeof(int));
+    srch_add2[i] = (size_t*) Malloc(src_grid_size*sizeof(size_t));
 
   srch_corners    = src_num_cell_corners;
   max_srch_cells  = 0;
@@ -1866,7 +1866,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	    }
 	}
 
-     if ( cdoVerbose ) cdoPrint("Removed number of links = %ld", rv->num_links - num_links);
+     if ( cdoVerbose ) cdoPrint("Removed number of links = %zu", rv->num_links - num_links);
 
       rv->num_links = num_links;
     }
@@ -1878,7 +1878,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   num_links = rv->num_links;
 
   if ( cdoVerbose )
-    cdoPrint("Total number of links = %ld", rv->num_links);
+    cdoPrint("Total number of links = %zu", rv->num_links);
 
   for ( n = 0; n < src_grid_size; ++n )
     if ( IS_NOT_EQUAL(src_grid->cell_area[n], 0) ) src_grid->cell_frac[n] /= src_grid->cell_area[n];
@@ -1949,4 +1949,4 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( cdoTimer ) timer_stop(timer_remap_con);
 
-} /* remap_conserv */
+} // remap_conserv_scrip
