@@ -949,8 +949,10 @@ pstreamCloseParentStream(pstream_t *pstreamptr)
   locked_mutex.unlock();
 }
 
-void pstreamClose(int pstreamID)
-{pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+void
+pstreamClose(int pstreamID)
+{
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
   if (pstreamptr == NULL)
     Error("Internal problem, stream %d not open!", pstreamID);
@@ -961,9 +963,9 @@ void pstreamClose(int pstreamID)
       pthread_t threadID = pthread_self();
 
       if (pthread_equal(threadID, pstreamptr->rthreadID))
-          pstreamCloseChildStream(pstreamptr);
+        pstreamCloseChildStream(pstreamptr);
       else if (pthread_equal(threadID, pstreamptr->wthreadID))
-       pstreamCloseParentStream(pstreamptr) ;
+        pstreamCloseParentStream(pstreamptr);
       else
         Error("Internal problem! Close pipe %s", pstreamptr->name);
 
