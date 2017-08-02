@@ -1,6 +1,15 @@
 #include <cdi.h>
 #include "cdo_int.h"
 #include "grid.h"
+#include "grid_search.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "clipping/geometry.h"
+#ifdef __cplusplus
+}
+#endif
 
 constexpr int MAX_CHILDS = 9;
 
@@ -188,15 +197,11 @@ int cmpsinfo(const void *s1, const void *s2)
 }
 
 static
-void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
+void compute_child_from_parent(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
   int ncells1 = cellindex1->ncells;
   int *parent1 = cellindex1->parent;
-  {
-    int i;
-    for ( i = 0; i < ncells1; ++i ) if ( parent1[i] >= 0 ) break;
-    if ( i == ncells1 ) cdoAbort("Missing parent index of %s!", cellindex1->filename);
-  }
+
   int *idx1 = (int*) Malloc(ncells1*sizeof(int));
   for ( int i = 0; i < ncells1; ++i ) idx1[i] = i;
   for ( int i = 1; i < ncells1; ++i )
@@ -236,6 +241,211 @@ void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
       // if ( i%10000 == 0 ) printf("%d %d %d %d %d %d\n", i, j, parent1[j], parent1[j+1], parent1[j+2], parent1[j+3]);      
     }
   Free(idx1);
+}
+
+static
+void read_coordinates(const char *filename, int n, double *lon, double *lat, int nv, double *lon_bnds, double *lat_bnds)
+{
+  openLock();
+  int streamID = streamOpenRead(filename);
+  openUnlock();
+
+  if ( streamID < 0 ) cdiOpenError(streamID, "Open failed on >%s<", filename);
+
+  int vlistID = streamInqVlist(streamID);
+  int ngrids = vlistNgrids(vlistID);
+  int gridID = -1;
+  for ( int index = 0; index < ngrids; ++index )
+    {
+      gridID = vlistGrid(vlistID, index);
+      if ( gridInqType(gridID) == GRID_UNSTRUCTURED &&
+           gridInqSize(gridID) == n &&
+           gridInqNvertex(gridID) == 3 ) break;
+    }
+
+  if ( gridID == -1 ) cdoAbort("No ICON grid with %d cells found in %s!", filename, n);
+
+  gridInqXvals(gridID, lon);
+  gridInqYvals(gridID, lat);
+
+  char units[CDI_MAX_NAME];
+  /* Convert lat/lon units if required */
+  gridInqXunits(gridID, units);
+  grid_to_radian(units, n, lon, "grid center lon");
+  gridInqYunits(gridID, units);
+  grid_to_radian(units, n, lat, "grid center lat");
+
+  if ( nv == 3 && lon_bnds && lat_bnds )
+    {
+      gridInqXbounds(gridID, lon_bnds);
+      gridInqYbounds(gridID, lat_bnds);
+
+      gridInqXunits(gridID, units);
+      grid_to_radian(units, n*3, lon_bnds, "grid corner lon");
+      gridInqYunits(gridID, units);
+      grid_to_radian(units, n*3, lat_bnds, "grid corner lat");
+    }
+
+  streamClose(streamID);
+}
+
+int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+
+int find_coordinate_to_ignore(double *cell_corners_xyz);
+double calculate_the_polygon_area(double cell_corners[], int number_corners);
+bool are_polygon_vertices_arranged_in_clockwise_order(double cell_area);
+int winding_numbers_algorithm(double cell_corners[], int number_corners, double point[]);
+
+static
+void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *grid_center_lon2, double *grid_center_lat2, double *grid_corner_lon2,
+                               double *grid_corner_lat2, int ncells1, double *grid_center_lon1, double *grid_center_lat1)
+{
+  struct gridsearch *gs = gridsearch_create(ncells1, grid_center_lon1, grid_center_lat1);
+  size_t nbr_add[9];  // source address at nearest neighbors
+  double nbr_dist[9]; // angular distance four nearest neighbors
+
+  int ncorner = 3;
+  double corner_coordinates[3];
+  double center_point_xyz[3];
+  double cell_corners_xyz[12];
+  double cell_corners_plane_projection[8];
+  double center_point_plane_projection[2];
+
+  int *child2 = (int*) Malloc(MAX_CHILDS*ncells2*sizeof(int));
+  cellindex2->child = child2;
+  for ( int cell_no2 = 0; cell_no2 < ncells2; ++cell_no2 )
+    {
+      for ( int k = 0; k < MAX_CHILDS; ++k ) child2[cell_no2*MAX_CHILDS+k] = -1;
+
+      for ( int corner_no = 0; corner_no < ncorner; corner_no++ )
+	{	  
+	  /* Conversion of corner spherical coordinates to Cartesian coordinates. */
+
+          LLtoXYZ(grid_corner_lon2[cell_no2 * ncorner + corner_no], grid_corner_lat2[cell_no2 * ncorner + corner_no], corner_coordinates);
+
+          /* The components of the result vector are appended to the list of cell corner coordinates. */
+
+          int off = corner_no * 3;
+	  cell_corners_xyz[off + 0] = corner_coordinates[0];	  
+	  cell_corners_xyz[off + 1] = corner_coordinates[1];	  
+	  cell_corners_xyz[off + 2] = corner_coordinates[2];	  
+        }
+      cell_corners_xyz[ncorner * 3 + 0] = cell_corners_xyz[0];
+      cell_corners_xyz[ncorner * 3 + 1] = cell_corners_xyz[1];
+      cell_corners_xyz[ncorner * 3 + 2] = cell_corners_xyz[2];
+
+      int coordinate_to_ignore = find_coordinate_to_ignore(cell_corners_xyz);
+
+      bool invert_result = false;
+      if ( cell_corners_xyz[coordinate_to_ignore - 1] < 0 ) invert_result = true;
+
+      switch(coordinate_to_ignore){
+      case 1:
+	for ( int corner_no = 0; corner_no <= ncorner; corner_no++ )
+          {
+            cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 1];
+            cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 2];
+          }
+	break;
+      case 2:
+	for ( int corner_no = 0; corner_no <= ncorner; corner_no++ )
+          {
+            cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 2];
+            cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 0];
+          }
+	break;
+      case 3:
+	for ( int corner_no = 0; corner_no <= ncorner; corner_no++ )
+          {
+            cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 0];
+            cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 1];
+          }
+	break;
+      }
+
+      double polygon_area = calculate_the_polygon_area(cell_corners_plane_projection, ncorner + 1);
+      bool is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
+
+      if ( invert_result ) is_clockwise = !is_clockwise;
+      if ( is_clockwise ) continue;
+      
+      grid_search_nbr(gs, 9, nbr_add, nbr_dist, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
+      int k = 0;
+
+      for ( int i = 0; i < 9; ++i )
+        {
+          size_t cell_no1 = nbr_add[i];
+          if ( cell_no1 < ULONG_MAX )
+            {
+              LLtoXYZ(grid_center_lon1[cell_no1], grid_center_lat1[cell_no1], center_point_xyz);
+
+              switch(coordinate_to_ignore){
+              case 1:
+                center_point_plane_projection[0] = center_point_xyz[1];
+                center_point_plane_projection[1] = center_point_xyz[2];		
+                break;
+              case 2:
+                center_point_plane_projection[0] = center_point_xyz[2];
+                center_point_plane_projection[1] = center_point_xyz[0];	
+                break;
+              case 3:
+                center_point_plane_projection[0] = center_point_xyz[0];
+                center_point_plane_projection[1] = center_point_xyz[1];	
+                break;
+              }
+
+              int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, ncorner + 1, center_point_plane_projection);
+              if ( winding_number != 0 ) child2[cell_no2*MAX_CHILDS+k++] = (int)cell_no1;
+            }
+        }
+    }
+}
+
+static
+void compute_child_from_coordinates(cellindex_type *cellindex1, cellindex_type *cellindex2)
+{
+  int ncells1 = cellindex1->ncells;
+  int ncells2 = cellindex2->ncells;
+
+  double *lon1 = (double*) Malloc(ncells1*sizeof(double));
+  double *lat1 = (double*) Malloc(ncells1*sizeof(double));
+  double *lon2 = (double*) Malloc(ncells2*sizeof(double));
+  double *lat2 = (double*) Malloc(ncells2*sizeof(double));
+  double *lon2_bnds = (double*) Malloc(3*ncells2*sizeof(double));
+  double *lat2_bnds = (double*) Malloc(3*ncells2*sizeof(double));
+
+  read_coordinates(cellindex1->filename, ncells1, lon1, lat1, 0, NULL, NULL);
+  read_coordinates(cellindex2->filename, ncells2, lon2, lat2, 3, lon2_bnds, lat2_bnds);
+
+  compute_child_from_bounds(cellindex2, ncells2, lon2, lat2, lon2_bnds, lat2_bnds, ncells1, lon1, lat1);
+
+  Free(lon1);
+  Free(lat1);
+  Free(lon2);
+  Free(lat2);
+  Free(lon2_bnds);
+  Free(lat2_bnds);
+}
+
+static
+void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
+{
+  bool lparent = true;
+  int ncells1 = cellindex1->ncells;
+  int *parent1 = cellindex1->parent;
+  {
+    int i;
+    for ( i = 0; i < ncells1; ++i ) if ( parent1[i] >= 0 ) break;
+    if ( i == ncells1 ) lparent = false;
+  }
+
+  if ( lparent )
+    compute_child_from_parent(cellindex1, cellindex2);
+  else
+    {
+      compute_child_from_coordinates(cellindex1, cellindex2);
+      // cdoAbort("Missing parent index of %s!", cellindex1->filename);
+    }
 }
 
 static
