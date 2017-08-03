@@ -521,7 +521,7 @@ void knn_check_distance(size_t num_neighbors, const size_t *restrict nbr_add, do
 {
   // If distance is zero, set to small number
   for ( size_t nchk = 0; nchk < num_neighbors; ++nchk )
-    if ( nbr_add[nchk] >= 0 && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
+    if ( nbr_add[nchk] != GS_NOT_FOUND && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
 }
 
 
@@ -533,7 +533,7 @@ void gridsearch_knn_init(struct gsknn *knn)
 
   for ( size_t i = 0; i < ndist; ++i )
     {
-      add[i]  = -1;
+      add[i]  = GS_NOT_FOUND;
       dist[i] = BIGNUM;
     }
 }
@@ -651,7 +651,7 @@ size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, dou
     }
 
   ndist = j;
-  size_t max_neighbors = ( ndist < num_neighbors ) ? ndist : num_neighbors;
+  size_t max_neighbors = (ndist < num_neighbors) ? ndist : num_neighbors;
 
   for ( j = 0; j < ndist; ++j )
     knn_store_distance(adds[j], dist[j], max_neighbors, nbr_add, nbr_dist);
