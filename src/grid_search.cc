@@ -35,7 +35,8 @@ double cdo_default_search_radius(void)
   return search_radius;
 }
 
-static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
+static inline
+void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 {
    double cos_lat = cos(lat);
    xyz[0] = cos_lat * cos(lon);
@@ -43,7 +44,8 @@ static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
    xyz[2] = sin(lat);
 }
 
-static inline void LLtoXYZ_kd(double lon, double lat, kdata_t *restrict xyz)
+static inline
+void LLtoXYZ_kd(double lon, double lat, kdata_t *restrict xyz)
 {
    double cos_lat = cos(lat);
    xyz[0] = KDATA_SCALE(cos_lat * cos(lon));
@@ -51,13 +53,13 @@ static inline void LLtoXYZ_kd(double lon, double lat, kdata_t *restrict xyz)
    xyz[2] = KDATA_SCALE(sin(lat));
 }
 
-static
+static constexpr
 float square(const float x)
 {
   return x*x;
 }
 
-static
+static constexpr
 float distance(const float *restrict a, const float *restrict b)
 {
   return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
