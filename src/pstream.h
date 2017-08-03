@@ -27,7 +27,9 @@
 class pstream_t
 {
 public:
+  int pstream_id;
   pstream_t();
+  ~pstream_t();
   int inqVlist();
   int inqFileType();
   void defTimestep(int p_tsID);

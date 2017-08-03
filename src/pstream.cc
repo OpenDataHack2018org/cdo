@@ -15,6 +15,8 @@
   GNU General Public License for more details.
 */
 
+
+#include <thread>
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -50,6 +52,7 @@ static int PSTREAM_Debug = 0;
 
 static int _pstream_max = MAX_PSTREAMS;
 
+
 static void pstream_initialize(void);
 
 static bool _pstream_init = false;
@@ -66,14 +69,19 @@ static pthread_mutex_t streamOpenWriteMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t streamMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static pthread_once_t _pstream_init_thread = PTHREAD_ONCE_INIT;
-static pthread_mutex_t _pstream_mutex;
+//static pthread_mutex_t _pstream_mutex;
 
+static std::mutex _pstream_map_mutex;
+#define PSTREAM_LOCK() _pstream_map_mutex.lock();
+#define PSTREAM_UNLOCK() _pstream_map_mutex.unlock();
+/*
 #define PSTREAM_LOCK() pthread_mutex_lock(&_pstream_mutex)
 #define PSTREAM_UNLOCK() pthread_mutex_unlock(&_pstream_mutex)
 #define PSTREAM_INIT() \
   if (!_pstream_init)  \
   pthread_once(&_pstream_init_thread, pstream_initialize)
 
+*/
 #else
 
 #define PSTREAM_LOCK()
@@ -84,16 +92,21 @@ static pthread_mutex_t _pstream_mutex;
 
 #endif
 
+/*
 typedef struct _pstreamPtrToIdx
 {
   int idx;
   pstream_t *ptr;
   struct _pstreamPtrToIdx *next;
 } pstreamPtrToIdx;
-
+*/
+/*
 static pstreamPtrToIdx *_pstreamList = NULL;
 static pstreamPtrToIdx *_pstreamAvail = NULL;
-
+*/
+static std::map<int,pstream_t> _pstream_map;
+static int next_pstream_id = 1;
+/*
 static void
 pstream_list_new(void)
 {
@@ -101,7 +114,6 @@ pstream_list_new(void)
 
   _pstreamList = (pstreamPtrToIdx *) Malloc(_pstream_max * sizeof(pstreamPtrToIdx));
 }
-
 static void
 pstream_list_delete(void)
 {
@@ -123,7 +135,42 @@ pstream_init_pointer(void)
 
   _pstreamAvail = _pstreamList;
 }
+*/
 
+static pstream_t *create_pstream()
+{
+     //TODO  << "creating new pstream" << std::endl;
+    pstream_t * new_pstream = nullptr;
+    PSTREAM_LOCK();
+     //TODO  << "lol " << std::endl;
+    pstream_t *pstream = new pstream_t();
+     //TODO  << _pstream_map.size() << std::endl;
+     //TODO  << next_pstream_id << std::endl;
+    _pstream_map[next_pstream_id] = *pstream;
+     //TODO  << "rofl " << std::endl;
+    PSTREAM_UNLOCK();
+    new_pstream = &_pstream_map[next_pstream_id];
+    new_pstream->self = next_pstream_id;
+
+    next_pstream_id++;
+ //TODO  << "created pointer with id: " << next_pstream_id << std::endl;
+
+    return new_pstream;
+
+}
+static pstream_t * pstream_to_pointer(int idx)
+{
+    PSTREAM_LOCK();
+    auto pstream_iterator = _pstream_map.find(idx);
+    PSTREAM_UNLOCK();
+    if(pstream_iterator == _pstream_map.end())
+    {
+        Error("pstream index %d undefined!", idx);
+    }
+
+    return &pstream_iterator->second;
+}
+/*
 static pstream_t *
 pstream_to_pointer(int idx)
 {
@@ -132,7 +179,7 @@ pstream_to_pointer(int idx)
   PSTREAM_INIT();
 
   if (idx >= 0 && idx < _pstream_max)
-    {
+    //{
       PSTREAM_LOCK();
 
       pstreamptr = _pstreamList[idx].ptr;
@@ -144,8 +191,9 @@ pstream_to_pointer(int idx)
 
   return pstreamptr;
 }
-
+*/
 /* Create an index from a pointer */
+/*
 static int
 pstream_from_pointer(pstream_t *ptr)
 {
@@ -176,11 +224,11 @@ pstream_from_pointer(pstream_t *ptr)
 
   return idx;
 }
+*/
 
 static void
 pstream_init_entry(pstream_t *pstreamptr)
 {
-  pstreamptr->self = pstream_from_pointer(pstreamptr);
 
   pstreamptr->isopen = true;
   pstreamptr->ispipe = false;
@@ -204,6 +252,9 @@ pstream_init_entry(pstream_t *pstreamptr)
 #endif
 }
 pstream_t::pstream_t() { pstream_init_entry(this); }
+pstream_t::~pstream_t(){
+  //vlistDestroy(m_vlistID);
+}
 
 static void
 pstream_delete_entry(pstream_t *pstreamptr)
@@ -212,23 +263,19 @@ pstream_delete_entry(pstream_t *pstreamptr)
 
   PSTREAM_LOCK();
 
-  delete (pstreamptr);
-
-  _pstreamList[idx].next = _pstreamAvail;
-  _pstreamList[idx].ptr = 0;
-  _pstreamAvail = &_pstreamList[idx];
+  _pstream_map.erase(idx);
 
   PSTREAM_UNLOCK();
 
   if (PSTREAM_Debug)
     Message("Removed idx %d from pstream list", idx);
 }
-
+/*
 static void
 pstream_initialize(void)
 {
 #if defined(HAVE_LIBPTHREAD)
-  /* initialize global API mutex lock */
+  // initialize global API mutex lock 
   pthread_mutex_init(&_pstream_mutex, NULL);
 #endif
 
@@ -250,7 +297,21 @@ pstream_initialize(void)
 
   _pstream_init = true;
 }
-
+*/
+static int pstreamFindID(const char *name)
+{
+    for(auto map_pair :  _pstream_map)
+    {
+        if(map_pair.second.name){
+            if(strcmp(map_pair.second.name, name) == 0)
+            {
+                return map_pair.first;
+            }
+        }
+    }
+    return -1;
+}
+/*
 static int
 pstreamFindID(const char *name)
 {
@@ -272,6 +333,7 @@ pstreamFindID(const char *name)
 
   return pstreamID;
 }
+*/
 bool
 pstream_t::isPipe()
 {
@@ -357,11 +419,7 @@ pstream_t::pstreamOpenReadPipe(const argument_t *argument)
   newargument->argv[argument->argc] = pipename;
   newargument->args = newarg;
   newargument->operatorName = std::string(operatorName, strlen(operatorName));
-  /*
-    printf("pstreamOpenRead: new args >%s<\n", newargument->args);
-    for ( int i = 0; i < newargument->argc; ++i )
-    printf("pstreamOpenRead: new arg %d >%s<\n", i, newargument->argv[i]);
-  */
+
   ispipe = true;
   name = pipename;
   rthreadID = pthread_self();
@@ -570,9 +628,11 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
 int
 pstreamOpenRead(const argument_t *argument)
 {
-  PSTREAM_INIT();
+ // PSTREAM_INIT();
 
-  pstream_t *pstreamptr = new pstream_t();
+   //TODO  << "pstreamOpeneRead" << std::endl;
+  pstream_t *pstreamptr = create_pstream();
+   //TODO  << "pstreamOpeneRead" << std::endl;
   if (!pstreamptr)
     Error("No memory");
 
@@ -586,10 +646,18 @@ pstreamOpenRead(const argument_t *argument)
   */
   if (ispipe)
     {
+      if(PSTREAM_Debug)
+      {
+         //TODO  << "opening pipe for reading" << std::this_thread::get_id() << std::endl;
+      }
       pstreamptr->pstreamOpenReadPipe(argument);
     }
   else
     {
+      if(PSTREAM_Debug)
+      {
+       //TODO  << "opening file for reading" << std::this_thread::get_id() << std::endl;
+      }
       pstreamptr->pstreamOpenReadFile(argument);
     }
 
@@ -723,7 +791,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
 {
   char *filename = (char *) Malloc(strlen(argument->args) + 1);
 
-  pstream_t *pstreamptr = new pstream_t();
+  pstream_t *pstreamptr = create_pstream();
   if (!pstreamptr)
     Error("No memory");
 
@@ -794,7 +862,7 @@ pstreamOpenWrite(const argument_t *argument, int filetype)
 {
   int pstreamID = -1;
 
-  PSTREAM_INIT();
+  //PSTREAM_INIT();
 
   int ispipe = strncmp(argument->args, "(pipe", 5) == 0;
 
@@ -824,7 +892,7 @@ pstreamOpenAppend(const argument_t *argument)
       cdoAbort("this operator doesn't work with pipes!");
     }
 
-  pstream_t *pstreamptr = new pstream_t();
+  pstream_t *pstreamptr = create_pstream();
 
   if (!pstreamptr)
     Error("No memory");
@@ -889,6 +957,7 @@ pstream_t::openAppend(const char *p_filename)
 void
 pstreamCloseChildStream(pstream_t *pstreamptr)
 {
+     //TODO  << "pCCS"<< std::endl;
   pipe_t *pipe = pstreamptr->pipe;
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
@@ -908,9 +977,7 @@ pstreamCloseChildStream(pstream_t *pstreamptr)
   pthread_join(pstreamptr->wthreadID, NULL);
 
   pthread_mutex_lock(pipe->m_mutex);
-  if (pstreamptr->name)
-    Free(pstreamptr->name);
-  if (pstreamptr->argument)
+    if (pstreamptr->argument)
     {
       argument_t *argument = (argument_t *) (pstreamptr->argument);
       if (argument->argv)
@@ -919,17 +986,16 @@ pstreamCloseChildStream(pstream_t *pstreamptr)
         Free(argument->args);
       delete (argument);
     }
-  vlistDestroy(pstreamptr->m_vlistID);
   pthread_mutex_unlock(pipe->m_mutex);
 
   processAddNvals(pipe->nvals);
-  delete (pipe);
-  pstream_delete_entry(pstreamptr);
+   //TODO  << "HERE WE ARE !!!|" << std::endl;
 }
 void
 pstreamCloseParentStream(pstream_t *pstreamptr)
 {
 
+     //TODO  << "pCPS"<< std::endl;
   pipe_t *pipe = pstreamptr->pipe;
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
@@ -1729,8 +1795,17 @@ cdoInitialize(void *argument)
 #endif
 
   processDefArgument(argument);
+   //TODO  << "we got through this" << std::endl;
 }
-
+void pstreamCloseAll()
+{
+    for(auto pstream_iter : _pstream_map)
+    {
+        Message("Close file %s id %d", pstream_iter.second.name, pstream_iter.second.m_fileID);
+        streamClose(pstream_iter.second.m_fileID);
+    }
+}
+/*
 void
 pstreamCloseAll(void)
 {
@@ -1751,7 +1826,7 @@ pstreamCloseAll(void)
         }
     }
 }
-
+*/
 static void
 processClosePipes(void)
 {
