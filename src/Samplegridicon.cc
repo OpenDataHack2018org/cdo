@@ -296,13 +296,15 @@ double calculate_the_polygon_area(double cell_corners[], int number_corners);
 bool are_polygon_vertices_arranged_in_clockwise_order(double cell_area);
 int winding_numbers_algorithm(double cell_corners[], int number_corners, double point[]);
 
+#define MAX_SEARCH 128 // the triangles are distorted!
+
 static
 void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *grid_center_lon2, double *grid_center_lat2, double *grid_corner_lon2,
                                double *grid_corner_lat2, int ncells1, double *grid_center_lon1, double *grid_center_lat1)
 {
   struct gridsearch *gs = gridsearch_create(ncells1, grid_center_lon1, grid_center_lat1);
-  size_t nbr_add[9];  // source address at nearest neighbors
-  double nbr_dist[9]; // angular distance four nearest neighbors
+  size_t nbr_add[MAX_SEARCH];  // source address at nearest neighbors
+  double nbr_dist[MAX_SEARCH]; // angular distance four nearest neighbors
 
   int ncorner = 3;
   double corner_coordinates[3];
@@ -369,10 +371,10 @@ void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *
       if ( invert_result ) is_clockwise = !is_clockwise;
       if ( is_clockwise ) continue;
       
-      grid_search_nbr(gs, 9, nbr_add, nbr_dist, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
+      grid_search_nbr(gs, MAX_SEARCH, nbr_add, nbr_dist, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
       int k = 0;
 
-      for ( int i = 0; i < 9; ++i )
+      for ( int i = 0; i < MAX_SEARCH; ++i )
         {
           size_t cell_no1 = nbr_add[i];
           if ( cell_no1 < ULONG_MAX )
@@ -395,9 +397,15 @@ void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *
               }
 
               int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, ncorner + 1, center_point_plane_projection);
-              if ( winding_number != 0 ) child2[cell_no2*MAX_CHILDS+k++] = (int)cell_no1;
+              //printf("%d %g %g %g %g %d\n", cell_no2, RAD2DEG*grid_center_lon2[cell_no2], RAD2DEG*grid_center_lat2[cell_no2], RAD2DEG*grid_center_lon1[cell_no1], RAD2DEG*grid_center_lat1[cell_no1], winding_number);
+              if ( winding_number != 0 )
+                {
+                  if ( k >= MAX_CHILDS ) cdoAbort("Internal problem, limit of MAX_CHILDS reached (limit=9).");
+                  child2[cell_no2*MAX_CHILDS+k++] = (int)cell_no1;
+                }
             }
         }
+      // printf("%d k = %d\n", cell_no2, k);
     }
 }
 
