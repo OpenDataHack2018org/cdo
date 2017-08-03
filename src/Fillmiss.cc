@@ -27,8 +27,8 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
-
 #include "grid_search.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
