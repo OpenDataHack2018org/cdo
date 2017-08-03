@@ -1050,6 +1050,7 @@ printf("stime = %gs\n", stimer);
 } // remap_weights_conserv
 
 
-void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
+//void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
+void remap_conserv(remapgrid_t *, remapgrid_t *, const double* restrict , double* restrict , double )
 {
 } // remap_conserv
