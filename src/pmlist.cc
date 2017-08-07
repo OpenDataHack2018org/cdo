@@ -140,10 +140,10 @@ int kvlist_parse_cmdline(list_t *kvlist, int nparams, char **params)
 
       int nvalues = j;
 
+      const char **values = nvalues ? (const char**) malloc(nvalues*sizeof(char*)) : NULL;
+
       values[0] = end + 1;
       if ( *values[0] == 0 ) nvalues = 0;
-
-      const char **values = nvalues ? (const char**) malloc(nvalues*sizeof(char*)) : NULL;
 
       for ( j = 1; j < nvalues; ++j ) values[j] = params[i + j];
       kvlist_append(kvlist, key, values, nvalues);

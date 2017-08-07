@@ -484,7 +484,7 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
   bool lcyclic = src_grid->is_cyclic;
 
   bool nbr_mask[num_neighbors];   // mask at nearest neighbors
-  size_t nbr_add[num_neighbors];     // source address at nearest neighbors
+  size_t nbr_add[num_neighbors];  // source address at nearest neighbors
   double nbr_dist[num_neighbors]; // angular distance four nearest neighbors
 
 #if defined(_OPENMP)
