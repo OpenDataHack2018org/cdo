@@ -18,7 +18,7 @@
  * Keywords:
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Rene Redler <rene.redler@mpimet.mpg.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *
@@ -169,12 +169,6 @@ if (!(c)) {\
    fprintf(stderr, "### Assertion violation: %s in %s:%d\n",\
            #c, __FILE__, __LINE__);\
    abort ();\
-}
-
-#define ASSERT2(c, a, b) \
-if (!(c)) {\
-   fprintf(stderr, "### Assertion violation: %s (%s = %d, %s = %d) in %s:%d\n", #c, #a, a, #b, b, __FILE__, __LINE__);\
-   abort();\
 }
 
 #endif // UTILS_H

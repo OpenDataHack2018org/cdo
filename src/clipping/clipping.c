@@ -12,7 +12,7 @@
  * Keywords:
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Rene Redler <rene.redler@mpimet.mpg.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *
@@ -155,17 +155,6 @@ void yac_compute_concave_overlap_areas (unsigned N,
                                "(x_coordinates == NULL || y_coordinates == NULL)",
                                __FILE__ , __LINE__);
 
-#ifdef __cplusplus
-  double init_value[3] = {-1};
-  double init_2d_array_value[3*3] = {-1};
-  enum yac_edge_type edge_type_init_value[3]= {GREAT_CIRCLE};
-  struct grid_cell target_partial_cell;
-    target_partial_cell.coordinates_x    = init_value;
-     target_partial_cell.coordinates_y   = init_value;
-     target_partial_cell.coordinates_xyz = init_2d_array_value;
-     target_partial_cell.edge_type       = edge_type_init_value;
-     target_partial_cell.num_corners     = 3;
-#else
   struct grid_cell target_partial_cell =
     {.coordinates_x   = (double[3]){-1},
      .coordinates_y   = (double[3]){-1},
@@ -173,7 +162,6 @@ void yac_compute_concave_overlap_areas (unsigned N,
      .edge_type       = (enum yac_edge_type[3]) {GREAT_CIRCLE},
      .num_corners     = 3};
 
-#endif
   static struct grid_cell * overlap_buffer = NULL;
   static unsigned overlap_buffer_size = 0;
 
@@ -914,7 +902,7 @@ void yac_cell_clipping (unsigned N,
   if (tgt_cell_type == MIXED_CELL)
     yac_internal_abort_message("invalid target cell type (cell contains edges consisting "
                                "of great circles and circles of latitude)\n",
-			       __FILE__, __LINE__);
+                               __FILE__, __LINE__);
 
   init_point_list(&temp_list);
 
@@ -928,6 +916,17 @@ void yac_cell_clipping (unsigned N,
     free_point_list(&target_list);
     for (unsigned i = 0; i < N; ++i)
       overlap_buffer[i].num_corners = 0;
+    return;
+  }
+
+  // compute target direction
+  target_ordering = get_cell_points_ordering(&target_list);
+
+  // if all corners of the target cell are on the same great circle
+  if (target_ordering == -1) {
+    free_point_list(&target_list);
+    for (unsigned n = 0; n < N; n++ )
+      overlap_buffer[n].num_corners = 0;
     return;
   }
 
@@ -964,9 +963,6 @@ void yac_cell_clipping (unsigned N,
     curr_tgt_point = curr_tgt_point->next;
   }
 
-  // compute target direction
-  target_ordering = get_cell_points_ordering(&target_list);
-
   init_point_list(&source_list);
 
   // for all source cells
@@ -999,6 +995,9 @@ void yac_cell_clipping (unsigned N,
 
     // compute source direction
     source_ordering = get_cell_points_ordering(&source_list);
+
+    // if all corners of the source cell are on the same great circle
+    if (source_ordering == -1) continue;
 
     struct point_list * overlap;
 
@@ -1072,6 +1071,9 @@ void yac_correct_weights ( unsigned nSourceCells, double * weight ) {
   unsigned iter;
 
   double weight_diff;
+#ifdef VERBOSE
+  double weight_sum;
+#endif
 
   for ( iter = 1; iter < maxIter; iter++ ) {
 
@@ -1081,6 +1083,9 @@ void yac_correct_weights ( unsigned nSourceCells, double * weight ) {
       weight_diff -= weight[n];
 
 #ifdef VERBOSE
+    for ( n = 0; n < nSourceCells; n++ )
+      weight_sum += weight[n];
+
     printf ("weight sum is %.15f \n", weight_sum);
     printf ("weights are  ");
     for (unsigned i = 0; i < nSourceCells; ++i)
@@ -1125,9 +1130,6 @@ static unsigned get_cell_points_ordering(struct point_list * cell) {
       return dot > 0;
 
   } while (curr != cell->first);
-
-  yac_internal_abort_message("ERROR: could not determine order of points in cell\n",
-                             __FILE__, __LINE__);
 
   return -1;
 }

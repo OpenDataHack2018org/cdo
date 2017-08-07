@@ -16,7 +16,7 @@
  * Keywords:
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Rene Redler <rene.redler@mpimet.mpg.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *
@@ -218,9 +218,9 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
          // dot product is most accurate for angles around half PI
          // (for angles very close to half PI: alpha = fabs(acos(alpha))
-         double angle = fabs(cross_cd[0] * a[0] +
+         double angle = fabs((double)(cross_cd[0] * a[0] +
                              cross_cd[1] * a[1] +
-                             cross_cd[2] * a[2]) / length_cross_cd ;
+                             cross_cd[2] * a[2])) / length_cross_cd ;
 
          // if ab is on the plane of cd
          if (fabs(angle) < tol) {
@@ -250,7 +250,7 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
          // dot product is most accurate for angles around half PI
          // (for angles very close to half PI: alpha = fabs(acos(alpha))
-         double angle = fabs(cross_ab[0] * c[0] +
+         double angle = (double)fabsl(cross_ab[0] * c[0] +
                              cross_ab[1] * c[1] +
                              cross_ab[2] * c[2]) / length_cross_ab;
 
@@ -439,7 +439,7 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
 
          // dot product is most accurate for angles around half PI
          // (for angles very close to half PI: alpha = fabs(acos(alpha))
-         double angle = fabs(cross_cd[0] * a[0] +
+         double angle = (double)fabsl(cross_cd[0] * a[0] +
                              cross_cd[1] * a[1] +
                              cross_cd[2] * a[2]) / length_cross_cd ;
 
@@ -459,7 +459,7 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
 
          // dot product is most accurate for angles around half PI
          // (for angles very close to half PI: alpha = fabs(acos(alpha))
-         double angle = fabs(cross_ab[0] * c[0] +
+         double angle = (double) fabsl(cross_ab[0] * c[0] +
                              cross_ab[1] * c[1] +
                              cross_ab[2] * c[2]) / length_cross_ab;
 
@@ -1030,7 +1030,6 @@ int yac_loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
    return ret_value;
 }
 
-#if !defined(CDO) 
 static
 int loncxlonc_ (struct edge edge_a, struct edge edge_b) {
 
@@ -1103,7 +1102,6 @@ int loncxlonc_ (struct edge edge_a, struct edge edge_b) {
           ((angle_ac + angle_ad) < angle_cd) ||
           ((angle_bc + angle_bd) < angle_cd);
 }
-#endif
 
 /** \brief compute the intersection point of a meridian and a parallel
  *
@@ -1370,23 +1368,25 @@ static int loncxlatc_ (struct edge edge_a, struct edge edge_b) {
    if (fabs(get_angle(edge_a.points[0].lon, edge_a.points[1].lon)) > tol) {
 
       double lat = (edge_a.points[0].lat > 0)?M_PI_2:-M_PI_2;
-    
-      struct edge edge_new_1;
-      edge_new_1.edge_type = LON_CIRCLE;
-      edge_new_1.points[0] = edge_a.points[0];
-      edge_new_1.points[1].lon = edge_a.points[0].lon;
-      edge_new_1.points[1].lat = lat;
-      
-      struct edge edge_new_2;
-      edge_new_2.edge_type = LON_CIRCLE;
-      edge_new_2.points[0] = edge_a.points[1];
-      edge_new_2.points[1].lon = edge_a.points[1].lon;
-      edge_new_2.points[1].lat = lat;
+
       return
-         loncxlatc_(edge_new_1, edge_b)
+         loncxlatc_(
+            (struct edge){
+               .edge_type = LON_CIRCLE,
+               .points = {{.lon = edge_a.points[0].lon,
+                           .lat = edge_a.points[0].lat},
+                          {.lon = edge_a.points[0].lon,
+                           .lat = lat}}}, edge_b)
          ||
-         loncxlatc_(edge_new_2, edge_b);
+         loncxlatc_(
+            (struct edge){
+               .edge_type = LON_CIRCLE,
+               .points = {{.lon = edge_a.points[1].lon,
+                           .lat = edge_a.points[1].lat},
+                          {.lon = edge_a.points[1].lon,
+                           .lat = lat}}}, edge_b);
    }
+
    // if edge b is at the pole
    if (fabs(fabs(edge_b.points[0].lat) - M_PI_2) < tol) {
 
@@ -1905,11 +1905,7 @@ int yac_do_intersect (struct edge edge_a, double a[3], double b[3],
       case ((1 << 1) | (1 << 3)):
          return loncxlatc_(edge_a, edge_b);
       case ((1 << 1) | (1 << 4)):
-#if defined(CDO)
-         yac_internal_abort_message ( "flag not supported in CDO.", __FILE__, __LINE__ );
-#else
          return loncxlonc_(edge_a, edge_b);
-#endif
       case ((1 << 1) | (1 << 5)):
       case ((1 << 2) | (1 << 4)):
       case ((1 << 2) | (1 << 5)):

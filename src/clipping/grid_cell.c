@@ -15,7 +15,7 @@
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Rene Redler <rene.redler@mpimet.mpg.de>
  *             Thomas Jahns <jahns@dkrz.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *
@@ -91,3 +91,43 @@ void yac_free_grid_cell(struct grid_cell * cell) {
 
    yac_init_grid_cell(cell);
 }
+
+#ifdef DEBUG
+void print_grid_cell(FILE * stream, struct grid_cell cell, char * name) {
+
+  char * out = NULL;
+  unsigned out_array_size = 0;
+  unsigned out_size = 0;
+
+  if (name != NULL) {
+
+      out_size = strlen(name) + 1 + 1 + 1;
+      ENSURE_ARRAY_SIZE(out, out_array_size, out_size);
+
+      strcpy(out, name);
+      strcat(out, ":\n");
+  }
+
+  for (unsigned i = 0; i < cell.num_corners; ++i) {
+
+      char buffer[1024];
+
+      sprintf(buffer, "%d x %.16f y %.16f %s\n", i, cell.coordinates_x[i],
+              cell.coordinates_y[i],
+             (cell.edge_type[i] == LAT_CIRCLE)?("LAT_CIRCLE"):
+            ((cell.edge_type[i] == LON_CIRCLE)?("LON_CIRCLE"):
+             ("GREAT_CIRCLE")));
+
+      out_size += strlen(buffer);
+
+      ENSURE_ARRAY_SIZE(out, out_array_size, out_size);
+
+      strcat(out, buffer);
+  }
+
+  if (out != NULL)
+    fputs(out, stream);
+
+  free(out);
+}
+#endif
