@@ -1259,10 +1259,10 @@ int yac_loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
           ((fabs(a[2] - c[2]) < tol)) || (fabs(b[2] - c[2]) < tol))
          ret_value |= 1;
 
-         if (p != NULL)
-            p[0] = c[0], p[1] = c[1], p[2] = c[2];
-         if (q != NULL)
-            q[0] = c[0], q[1] = c[1], q[2] = c[2];
+      if (p != NULL)
+         p[0] = c[0], p[1] = c[1], p[2] = c[2];
+      if (q != NULL)
+         q[0] = c[0], q[1] = c[1], q[2] = c[2];
 
       ret_value |= 4;
 
