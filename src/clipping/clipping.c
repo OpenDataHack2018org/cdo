@@ -465,11 +465,11 @@ static void point_list_clipping (struct point_list * source_list, int source_ord
   // target lat-circle edges at the end
   {
 
-    int count = 0;
+    unsigned count = 0;
 
     struct point_list_element * curr_tgt_point = target_list.first;
 
-    for (int i = 0; i < nct; ++i, curr_tgt_point = curr_tgt_point->next) {
+    for (unsigned i = 0; i < nct; ++i, curr_tgt_point = curr_tgt_point->next) {
 
       if (curr_tgt_point->edge_type == LAT_CIRCLE) continue;
 
@@ -478,7 +478,7 @@ static void point_list_clipping (struct point_list * source_list, int source_ord
     }
 
     if (count != nct) {
-      for (int i = 0; i < nct; ++i, curr_tgt_point = curr_tgt_point->next) {
+      for (unsigned i = 0; i < nct; ++i, curr_tgt_point = curr_tgt_point->next) {
 
         if (curr_tgt_point->edge_type != LAT_CIRCLE) continue;
 
@@ -488,7 +488,7 @@ static void point_list_clipping (struct point_list * source_list, int source_ord
     }
   }
 
-  for (int i = 0; i < nct; ++i) {
+  for (unsigned i = 0; i < nct; ++i) {
 
     struct point_list_element * curr_src_point = source_list->first;
     struct point_list_element * prev_src_point = source_list->last;
