@@ -241,7 +241,6 @@ void pstream_t::init()
   nfiles = 0;
   varID = -1;
   name = NULL;
-  mfnames = NULL;
   m_varlist = NULL;
 #if defined(HAVE_LIBPTHREAD)
   argument = NULL;
@@ -495,8 +494,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
                 cdoAbort("No imput file found in %s", pch);
 
               mfiles = nfiles;
-              mfnames = (char **) Malloc(nfiles * sizeof(char *));
-
+              mfnames.resize(nfiles);
               rewind(fp);
 
               nfiles = 0;
@@ -505,7 +503,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
                   if (line[0] == '#' || line[0] == '\0' || line[0] == ' ')
                     continue;
 
-                  mfnames[nfiles] = strdupx(line);
+                  mfnames[nfiles] = line;
                   nfiles++;
                 }
 
@@ -516,7 +514,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
               char line[65536];
 
               mfiles = nfiles;
-              mfnames = (char **) Malloc(nfiles * sizeof(char *));
+              mfnames.resize(nfiles);
 
               strcpy(line, pch);
               for (i = 0; i < len; i++)
@@ -529,7 +527,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
               i = 0;
               for (j = 0; j < nfiles; j++)
                 {
-                  mfnames[j] = strdupx(&line[i]);
+                  mfnames[j] = line[i];
                   i += strlen(&line[i]) + 1;
                 }
             }
@@ -559,10 +557,10 @@ void pstream_t::createFilelist(const argument_t *p_argument)
           pclose(pfp);
 
           mfiles = nfiles;
-          mfnames = (char **) Malloc(nfiles * sizeof(char *));
+          mfnames.resize(nfiles);
 
           for (j = 0; j < nfiles; j++)
-            mfnames[j] = fnames[j];
+            mfnames[j] = std::string(fnames[j]);
         }
     }
 }
@@ -572,24 +570,20 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
 {
   createFilelist(argument);
 
-  char *filename = NULL;
+  std::string filename; 
 
   if (mfiles)
     {
-      size_t len = strlen(mfnames[0]);
-      filename = (char *) Malloc(len + 1);
-      strcpy(filename, mfnames[0]);
+      filename = mfnames[0];
       nfiles = 1;
     }
   else
     {
-      size_t len = strlen(argument->args);
-      filename = (char *) Malloc(len + 1);
-      strcpy(filename, argument->args);
+     filename = std::string(argument->args);
     }
 
   if (PSTREAM_Debug)
-    Message("file %s", filename);
+    Message("file %s", filename.c_str());
 
 #if defined(HAVE_LIBPTHREAD)
   if (cdoLockIO)
@@ -597,11 +591,11 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
   else
     pthread_mutex_lock(&streamOpenReadMutex);
 #endif
-  int fileID = streamOpenRead(filename);
+  int fileID = streamOpenRead(filename.c_str());
   if (fileID < 0)
     {
       isopen = false;
-      cdiOpenError(fileID, "Open failed on >%s<", filename);
+      cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
     }
 
   if (cdoDefaultFileType == CDI_UNDEFID)
@@ -619,7 +613,8 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
 #endif
 
   mode = 'r';
-  name = filename;
+  name =  (char*)Malloc(sizeof(char) * filename.size() + 1);
+  strcpy(name, filename.c_str());
   m_fileID = fileID;
 }
 
@@ -1627,7 +1622,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
         {
           size_t len;
           int nfile = pstreamptr->nfiles;
-          char *filename = NULL;
+          std::string filename; 
           int fileID;
           int vlistIDold, vlistIDnew;
 
@@ -1636,9 +1631,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
           vlistIDold = vlistDuplicate(streamInqVlist(pstreamptr->m_fileID));
           streamClose(pstreamptr->m_fileID);
 
-          len = strlen(pstreamptr->mfnames[nfile]);
-          filename = (char *) Malloc(len + 1);
-          strcpy(filename, pstreamptr->mfnames[nfile]);
+          filename = pstreamptr->mfnames[nfile];
           pstreamptr->nfiles++;
 
 #if defined(HAVE_LIBPTHREAD)
@@ -1648,11 +1641,11 @@ pstreamInqTimestep(int pstreamID, int tsID)
             pthread_mutex_lock(&streamOpenReadMutex);
 #endif
           if (cdoVerbose)
-            cdoPrint("Continuation file: %s", filename);
+            cdoPrint("Continuation file: %s", filename.c_str());
 
           if (processNums() == 1 && ompNumThreads == 1)
             timer_start(timer_read);
-          fileID = streamOpenRead(filename);
+          fileID = streamOpenRead(filename.c_str());
           vlistIDnew = streamInqVlist(fileID);
           if (processNums() == 1 && ompNumThreads == 1)
             timer_stop(timer_read);
@@ -1666,11 +1659,11 @@ pstreamInqTimestep(int pstreamID, int tsID)
             pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
           if (fileID < 0)
-            cdiOpenError(fileID, "Open failed on >%s<", filename);
+            cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
 
           Free(pstreamptr->name);
 
-          pstreamptr->name = filename;
+          strcpy(pstreamptr->name, filename.c_str());
           pstreamptr->m_fileID = fileID;
 
           if (processNums() == 1 && ompNumThreads == 1)

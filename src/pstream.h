@@ -51,7 +51,7 @@ public:
   bool ispipe;
   bool isopen;
   char *name;
-  char **mfnames;
+  std::vector<std::string> mfnames;
   varlist_t *m_varlist;
 #if defined(HAVE_LIBPTHREAD)
   void *argument;
