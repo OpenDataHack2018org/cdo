@@ -27,8 +27,7 @@
 class pstream_t
 {
 public:
-  int pstream_id;
-  pstream_t();
+  pstream_t(int id);
   ~pstream_t();
   int inqVlist();
   int inqFileType();
@@ -38,7 +37,7 @@ public:
   void pstreamOpenReadFile(const argument_t *argument);
   void openAppend(const char * p_filename);
   void init();
-  int self;
+  int self; //aka the id of the pstream
   int mode;
   int m_fileID;
   int m_vlistID;
@@ -60,6 +59,7 @@ public:
   pthread_t wthreadID; /* write thread ID */
 private:
    void createFilelist(const argument_t * p_argument);
+   pstream_t();
 #endif
 };
 

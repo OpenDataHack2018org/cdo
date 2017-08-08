@@ -139,25 +139,16 @@ pstream_init_pointer(void)
 
 static pstream_t *create_pstream()
 {
-     //TODO  << "creating new pstream" << std::endl;
-    pstream_t * new_pstream = nullptr;
     PSTREAM_LOCK();
-     //TODO  << "lol " << std::endl;
-    pstream_t *pstream = new pstream_t();
-     //TODO  << _pstream_map.size() << std::endl;
-     //TODO  << next_pstream_id << std::endl;
-    _pstream_map[next_pstream_id] = *pstream;
-     //TODO  << "rofl " << std::endl;
-    PSTREAM_UNLOCK();
-    new_pstream = &_pstream_map[next_pstream_id];
-    new_pstream->self = next_pstream_id;
-
+    auto new_entry  = _pstream_map.insert(
+            std::make_pair(next_pstream_id, pstream_t(next_pstream_id))
+            );
     next_pstream_id++;
- //TODO  << "created pointer with id: " << next_pstream_id << std::endl;
+    PSTREAM_UNLOCK();
 
-    return new_pstream;
-
+    return &new_entry.first->second;
 }
+
 static pstream_t * pstream_to_pointer(int idx)
 {
     PSTREAM_LOCK();
@@ -228,7 +219,6 @@ pstream_from_pointer(pstream_t *ptr)
 
 void pstream_t::init()
 {
-
   isopen = true;
   ispipe = false;
   m_fileID = -1;
@@ -248,7 +238,7 @@ void pstream_t::init()
 //  pstreamptr->wthreadID  = 0;
 #endif
 }
-pstream_t::pstream_t() { init(); }
+pstream_t::pstream_t(int p_id) : self(p_id) { init(); }
 pstream_t::~pstream_t(){
   //vlistDestroy(m_vlistID);
 }
@@ -621,11 +611,8 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
 int
 pstreamOpenRead(const argument_t *argument)
 {
- // PSTREAM_INIT();
 
-   //TODO  << "pstreamOpeneRead" << std::endl;
   pstream_t *pstreamptr = create_pstream();
-   //TODO  << "pstreamOpeneRead" << std::endl;
   if (!pstreamptr)
     Error("No memory");
 
