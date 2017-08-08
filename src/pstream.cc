@@ -15,6 +15,8 @@
   GNU General Public License for more details.
 */
 
+
+#include <thread>
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -50,6 +52,7 @@ static int PSTREAM_Debug = 0;
 
 static int _pstream_max = MAX_PSTREAMS;
 
+
 static void pstream_initialize(void);
 
 static bool _pstream_init = false;
@@ -66,14 +69,19 @@ static pthread_mutex_t streamOpenWriteMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t streamMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static pthread_once_t _pstream_init_thread = PTHREAD_ONCE_INIT;
-static pthread_mutex_t _pstream_mutex;
+//static pthread_mutex_t _pstream_mutex;
 
+static std::mutex _pstream_map_mutex;
+#define PSTREAM_LOCK() _pstream_map_mutex.lock();
+#define PSTREAM_UNLOCK() _pstream_map_mutex.unlock();
+/*
 #define PSTREAM_LOCK() pthread_mutex_lock(&_pstream_mutex)
 #define PSTREAM_UNLOCK() pthread_mutex_unlock(&_pstream_mutex)
 #define PSTREAM_INIT() \
   if (!_pstream_init)  \
   pthread_once(&_pstream_init_thread, pstream_initialize)
 
+*/
 #else
 
 #define PSTREAM_LOCK()
@@ -84,16 +92,21 @@ static pthread_mutex_t _pstream_mutex;
 
 #endif
 
+/*
 typedef struct _pstreamPtrToIdx
 {
   int idx;
   pstream_t *ptr;
   struct _pstreamPtrToIdx *next;
 } pstreamPtrToIdx;
-
+*/
+/*
 static pstreamPtrToIdx *_pstreamList = NULL;
 static pstreamPtrToIdx *_pstreamAvail = NULL;
-
+*/
+static std::map<int,pstream_t> _pstream_map;
+static int next_pstream_id = 1;
+/*
 static void
 pstream_list_new(void)
 {
@@ -101,7 +114,6 @@ pstream_list_new(void)
 
   _pstreamList = (pstreamPtrToIdx *) Malloc(_pstream_max * sizeof(pstreamPtrToIdx));
 }
-
 static void
 pstream_list_delete(void)
 {
@@ -123,7 +135,33 @@ pstream_init_pointer(void)
 
   _pstreamAvail = _pstreamList;
 }
+*/
 
+static pstream_t *create_pstream()
+{
+    PSTREAM_LOCK();
+    auto new_entry  = _pstream_map.insert(
+            std::make_pair(next_pstream_id, pstream_t(next_pstream_id))
+            );
+    next_pstream_id++;
+    PSTREAM_UNLOCK();
+
+    return &new_entry.first->second;
+}
+
+static pstream_t * pstream_to_pointer(int idx)
+{
+    PSTREAM_LOCK();
+    auto pstream_iterator = _pstream_map.find(idx);
+    PSTREAM_UNLOCK();
+    if(pstream_iterator == _pstream_map.end())
+    {
+        Error("pstream index %d undefined!", idx);
+    }
+
+    return &pstream_iterator->second;
+}
+/*
 static pstream_t *
 pstream_to_pointer(int idx)
 {
@@ -132,7 +170,7 @@ pstream_to_pointer(int idx)
   PSTREAM_INIT();
 
   if (idx >= 0 && idx < _pstream_max)
-    {
+    //{
       PSTREAM_LOCK();
 
       pstreamptr = _pstreamList[idx].ptr;
@@ -144,8 +182,9 @@ pstream_to_pointer(int idx)
 
   return pstreamptr;
 }
-
+*/
 /* Create an index from a pointer */
+/*
 static int
 pstream_from_pointer(pstream_t *ptr)
 {
@@ -176,34 +215,33 @@ pstream_from_pointer(pstream_t *ptr)
 
   return idx;
 }
+*/
 
-static void
-pstream_init_entry(pstream_t *pstreamptr)
+void pstream_t::init()
 {
-  pstreamptr->self = pstream_from_pointer(pstreamptr);
-
-  pstreamptr->isopen = true;
-  pstreamptr->ispipe = false;
-  pstreamptr->m_fileID = -1;
-  pstreamptr->m_vlistID = -1;
-  pstreamptr->tsID = -1;
-  pstreamptr->m_filetype = -1;
-  pstreamptr->name = NULL;
-  pstreamptr->tsID0 = 0;
-  pstreamptr->mfiles = 0;
-  pstreamptr->nfiles = 0;
-  pstreamptr->varID = -1;
-  pstreamptr->name = NULL;
-  pstreamptr->mfnames = NULL;
-  pstreamptr->m_varlist = NULL;
+  isopen = true;
+  ispipe = false;
+  m_fileID = -1;
+  m_vlistID = -1;
+  tsID = -1;
+  m_filetype = -1;
+  m_name = "";
+  tsID0 = 0;
+  mfiles = 0;
+  nfiles = 0;
+  varID = -1;
+  m_varlist = NULL;
 #if defined(HAVE_LIBPTHREAD)
-  pstreamptr->argument = NULL;
-  pstreamptr->pipe = NULL;
+  argument = NULL;
+  pipe = NULL;
 //  pstreamptr->rthreadID  = 0;
 //  pstreamptr->wthreadID  = 0;
 #endif
 }
-pstream_t::pstream_t() { pstream_init_entry(this); }
+pstream_t::pstream_t(int p_id) : self(p_id) { init(); }
+pstream_t::~pstream_t(){
+  //vlistDestroy(m_vlistID);
+}
 
 static void
 pstream_delete_entry(pstream_t *pstreamptr)
@@ -212,23 +250,19 @@ pstream_delete_entry(pstream_t *pstreamptr)
 
   PSTREAM_LOCK();
 
-  delete (pstreamptr);
-
-  _pstreamList[idx].next = _pstreamAvail;
-  _pstreamList[idx].ptr = 0;
-  _pstreamAvail = &_pstreamList[idx];
+  _pstream_map.erase(idx);
 
   PSTREAM_UNLOCK();
 
   if (PSTREAM_Debug)
     Message("Removed idx %d from pstream list", idx);
 }
-
+/*
 static void
 pstream_initialize(void)
 {
 #if defined(HAVE_LIBPTHREAD)
-  /* initialize global API mutex lock */
+  // initialize global API mutex lock 
   pthread_mutex_init(&_pstream_mutex, NULL);
 #endif
 
@@ -250,7 +284,23 @@ pstream_initialize(void)
 
   _pstream_init = true;
 }
-
+*/
+static int pstreamFindID(const char *p_name)
+{
+    std::string cur_name;
+    for(auto map_pair :  _pstream_map)
+    {
+        cur_name = map_pair.second.m_name;
+        if(!(cur_name.empty())){
+            if(cur_name.compare(p_name) == 0)
+            {
+                return map_pair.first;
+            }
+        }
+    }
+    return -1;
+}
+/*
 static int
 pstreamFindID(const char *name)
 {
@@ -262,8 +312,8 @@ pstreamFindID(const char *name)
       pstreamptr = pstream_to_pointer(pstreamID);
 
       if (pstreamptr)
-        if (pstreamptr->name)
-          if (strcmp(pstreamptr->name, name) == 0)
+        if (pstreamptr->m_name)
+          if (strcmp(pstreamptr->m_name, m_name) == 0)
             break;
     }
 
@@ -272,14 +322,14 @@ pstreamFindID(const char *name)
 
   return pstreamID;
 }
+*/
 bool
 pstream_t::isPipe()
 {
   return ispipe;
 }
 
-static void
-createPipeName(char *pipename, int pnlen)
+void pstream_t::createPipeName(char *pipename, int pnlen)
 {
 
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
@@ -357,13 +407,9 @@ pstream_t::pstreamOpenReadPipe(const argument_t *argument)
   newargument->argv[argument->argc] = pipename;
   newargument->args = newarg;
   newargument->operatorName = std::string(operatorName, strlen(operatorName));
-  /*
-    printf("pstreamOpenRead: new args >%s<\n", newargument->args);
-    for ( int i = 0; i < newargument->argc; ++i )
-    printf("pstreamOpenRead: new arg %d >%s<\n", i, newargument->argv[i]);
-  */
+
   ispipe = true;
-  name = pipename;
+  m_name = pipename;
   rthreadID = pthread_self();
   pipe = new pipe_t();
   pipe->name = std::string(pipename);
@@ -384,23 +430,22 @@ pstream_t::pstreamOpenReadPipe(const argument_t *argument)
 #endif
 }
 
-static void
-pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
+void pstream_t::createFilelist(const argument_t *p_argument)
 {
   size_t i;
-  size_t len = strlen(argument->args);
+  size_t len = strlen(p_argument->args);
 
   for (i = 0; i < len; i++)
-    if (argument->args[i] == ':')
+    if (p_argument->args[i] == ':')
       break;
 
   if (i < len)
     {
       int nfiles = 1, j;
 
-      const char *pch = &argument->args[i + 1];
+      const char *pch = &p_argument->args[i + 1];
       len -= (i + 1);
-      if (len && (strncmp(argument->args, "filelist:", 9) == 0 || strncmp(argument->args, "flist:", 6) == 0))
+      if (len && (strncmp(p_argument->args, "filelist:", 9) == 0 || strncmp(p_argument->args, "flist:", 6) == 0))
         {
           for (i = 0; i < len; i++)
             if (pch[i] == ',')
@@ -438,9 +483,8 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
               if (nfiles == 0)
                 cdoAbort("No imput file found in %s", pch);
 
-              pstreamptr->mfiles = nfiles;
-              pstreamptr->mfnames = (char **) Malloc(nfiles * sizeof(char *));
-
+              mfiles = nfiles;
+              m_mfnames.resize(nfiles);
               rewind(fp);
 
               nfiles = 0;
@@ -449,7 +493,7 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
                   if (line[0] == '#' || line[0] == '\0' || line[0] == ' ')
                     continue;
 
-                  pstreamptr->mfnames[nfiles] = strdupx(line);
+                  m_mfnames[nfiles] = line;
                   nfiles++;
                 }
 
@@ -459,8 +503,8 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
             {
               char line[65536];
 
-              pstreamptr->mfiles = nfiles;
-              pstreamptr->mfnames = (char **) Malloc(nfiles * sizeof(char *));
+              mfiles = nfiles;
+              m_mfnames.resize(nfiles);
 
               strcpy(line, pch);
               for (i = 0; i < len; i++)
@@ -473,12 +517,12 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
               i = 0;
               for (j = 0; j < nfiles; j++)
                 {
-                  pstreamptr->mfnames[j] = strdupx(&line[i]);
+                  m_mfnames[j] = line[i];
                   i += strlen(&line[i]) + 1;
                 }
             }
         }
-      else if (len && strncmp(argument->args, "ls:", 3) == 0)
+      else if (len && strncmp(p_argument->args, "ls:", 3) == 0)
         {
           char line[4096];
           char command[4096];
@@ -502,11 +546,11 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
 
           pclose(pfp);
 
-          pstreamptr->mfiles = nfiles;
-          pstreamptr->mfnames = (char **) Malloc(nfiles * sizeof(char *));
+          mfiles = nfiles;
+          m_mfnames.resize(nfiles);
 
           for (j = 0; j < nfiles; j++)
-            pstreamptr->mfnames[j] = fnames[j];
+            m_mfnames[j] = std::string(fnames[j]);
         }
     }
 }
@@ -514,26 +558,22 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
 void
 pstream_t::pstreamOpenReadFile(const argument_t *argument)
 {
-  pstreamCreateFilelist(argument, this);
+  createFilelist(argument);
 
-  char *filename = NULL;
+  std::string filename; 
 
   if (mfiles)
     {
-      size_t len = strlen(mfnames[0]);
-      filename = (char *) Malloc(len + 1);
-      strcpy(filename, mfnames[0]);
+      filename = m_mfnames[0];
       nfiles = 1;
     }
   else
     {
-      size_t len = strlen(argument->args);
-      filename = (char *) Malloc(len + 1);
-      strcpy(filename, argument->args);
+     filename = std::string(argument->args);
     }
 
   if (PSTREAM_Debug)
-    Message("file %s", filename);
+    Message("file %s", filename.c_str());
 
 #if defined(HAVE_LIBPTHREAD)
   if (cdoLockIO)
@@ -541,11 +581,11 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
   else
     pthread_mutex_lock(&streamOpenReadMutex);
 #endif
-  int fileID = streamOpenRead(filename);
+  int fileID = streamOpenRead(filename.c_str());
   if (fileID < 0)
     {
       isopen = false;
-      cdiOpenError(fileID, "Open failed on >%s<", filename);
+      cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
     }
 
   if (cdoDefaultFileType == CDI_UNDEFID)
@@ -563,16 +603,15 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
 #endif
 
   mode = 'r';
-  name = filename;
+  m_name = filename;
   m_fileID = fileID;
 }
 
 int
 pstreamOpenRead(const argument_t *argument)
 {
-  PSTREAM_INIT();
 
-  pstream_t *pstreamptr = new pstream_t();
+  pstream_t *pstreamptr = create_pstream();
   if (!pstreamptr)
     Error("No memory");
 
@@ -586,10 +625,18 @@ pstreamOpenRead(const argument_t *argument)
   */
   if (ispipe)
     {
+      if(PSTREAM_Debug)
+      {
+         //TODO  << "opening pipe for reading" << std::this_thread::get_id() << std::endl;
+      }
       pstreamptr->pstreamOpenReadPipe(argument);
     }
   else
     {
+      if(PSTREAM_Debug)
+      {
+       //TODO  << "opening file for reading" << std::this_thread::get_id() << std::endl;
+      }
       pstreamptr->pstreamOpenReadFile(argument);
     }
 
@@ -723,7 +770,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
 {
   char *filename = (char *) Malloc(strlen(argument->args) + 1);
 
-  pstream_t *pstreamptr = new pstream_t();
+  pstream_t *pstreamptr = create_pstream();
   if (!pstreamptr)
     Error("No memory");
 
@@ -782,7 +829,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
   strcpy(filename, argument->args);
 
   pstreamptr->mode = 'w';
-  pstreamptr->name = filename;
+  pstreamptr->m_name = filename;
   pstreamptr->m_fileID = fileID;
   pstreamptr->m_filetype = filetype;
 
@@ -794,7 +841,7 @@ pstreamOpenWrite(const argument_t *argument, int filetype)
 {
   int pstreamID = -1;
 
-  PSTREAM_INIT();
+  //PSTREAM_INIT();
 
   int ispipe = strncmp(argument->args, "(pipe", 5) == 0;
 
@@ -824,7 +871,7 @@ pstreamOpenAppend(const argument_t *argument)
       cdoAbort("this operator doesn't work with pipes!");
     }
 
-  pstream_t *pstreamptr = new pstream_t();
+  pstream_t *pstreamptr = create_pstream();
 
   if (!pstreamptr)
     Error("No memory");
@@ -881,10 +928,69 @@ pstream_t::openAppend(const char *p_filename)
   int filetype = streamInqFiletype(fileID);
   set_comp(fileID, filetype);
 
-  name = (char *) Malloc(strlen(p_filename) + 1);
-  strcpy(name, p_filename);
+  m_name = p_filename;
   mode = 'a';
   m_fileID = fileID;
+}
+void
+pstreamCloseChildStream(pstream_t *pstreamptr)
+{
+     //TODO  << "pCCS"<< std::endl;
+  pipe_t *pipe = pstreamptr->pipe;
+  pthread_mutex_lock(pipe->m_mutex);
+  pipe->EOP = true;
+  if (PSTREAM_Debug)
+    Message("%s read closed", pstreamptr->m_name);
+  pthread_mutex_unlock(pipe->m_mutex);
+  pthread_cond_signal(pipe->tsDef);
+  pthread_cond_signal(pipe->tsInq);
+
+  pthread_cond_signal(pipe->recInq);
+
+  pthread_mutex_lock(pipe->m_mutex);
+  pstreamptr->isopen = false;
+  pthread_mutex_unlock(pipe->m_mutex);
+  pthread_cond_signal(pipe->isclosed);
+
+  pthread_join(pstreamptr->wthreadID, NULL);
+
+  pthread_mutex_lock(pipe->m_mutex);
+    if (pstreamptr->argument)
+    {
+      argument_t *argument = (argument_t *) (pstreamptr->argument);
+      if (argument->argv)
+        Free(argument->argv);
+      if (argument->args)
+        Free(argument->args);
+      delete (argument);
+    }
+  pthread_mutex_unlock(pipe->m_mutex);
+
+  processAddNvals(pipe->nvals);
+   //TODO  << "HERE WE ARE !!!|" << std::endl;
+}
+void
+pstreamCloseParentStream(pstream_t *pstreamptr)
+{
+
+     //TODO  << "pCPS"<< std::endl;
+  pipe_t *pipe = pstreamptr->pipe;
+  pthread_mutex_lock(pipe->m_mutex);
+  pipe->EOP = true;
+  if (PSTREAM_Debug)
+    Message("%s write closed", pstreamptr->m_name);
+  pthread_mutex_unlock(pipe->m_mutex);
+  pthread_cond_signal(pipe->tsDef);
+  pthread_cond_signal(pipe->tsInq);
+
+  std::unique_lock<std::mutex> locked_mutex(pipe->m_mutex);
+  while (pstreamptr->isopen)
+    {
+      if (PSTREAM_Debug)
+        Message("wait of read close");
+      pthread_cond_wait(pipe->isclosed, locked_mutex);
+    }
+  locked_mutex.unlock();
 }
 
 void
@@ -898,76 +1004,14 @@ pstreamClose(int pstreamID)
   if (pstreamptr->ispipe)
     {
 #if defined(HAVE_LIBPTHREAD)
-      pipe_t *pipe;
-      bool lread = false, lwrite = false;
       pthread_t threadID = pthread_self();
 
       if (pthread_equal(threadID, pstreamptr->rthreadID))
-        lread = true;
+        pstreamCloseChildStream(pstreamptr);
       else if (pthread_equal(threadID, pstreamptr->wthreadID))
-        lwrite = true;
+        pstreamCloseParentStream(pstreamptr);
       else
-        Error("Internal problem! Close pipe %s", pstreamptr->name);
-
-      if (lread)
-        {
-          pipe = pstreamptr->pipe;
-          pthread_mutex_lock(pipe->mutex);
-          pipe->EOP = true;
-          if (PSTREAM_Debug)
-            Message("%s read closed", pstreamptr->name);
-          pthread_mutex_unlock(pipe->mutex);
-          pthread_cond_signal(pipe->tsDef);
-          pthread_cond_signal(pipe->tsInq);
-
-          pthread_cond_signal(pipe->recInq);
-
-          pthread_mutex_lock(pipe->mutex);
-          pstreamptr->isopen = false;
-          pthread_mutex_unlock(pipe->mutex);
-          pthread_cond_signal(pipe->isclosed);
-
-          pthread_join(pstreamptr->wthreadID, NULL);
-
-          pthread_mutex_lock(pipe->mutex);
-          if (pstreamptr->name)
-            Free(pstreamptr->name);
-          if (pstreamptr->argument)
-            {
-              argument_t *argument = (argument_t *) (pstreamptr->argument);
-              if (argument->argv)
-                Free(argument->argv);
-              if (argument->args)
-                Free(argument->args);
-              delete (argument);
-            }
-          vlistDestroy(pstreamptr->m_vlistID);
-          pthread_mutex_unlock(pipe->mutex);
-
-          processAddNvals(pipe->nvals);
-          delete (pipe);
-          pstream_delete_entry(pstreamptr);
-        }
-      else if (lwrite)
-        {
-          pipe = pstreamptr->pipe;
-          pthread_mutex_lock(pipe->mutex);
-          pipe->EOP = true;
-          if (PSTREAM_Debug)
-            Message("%s write closed", pstreamptr->name);
-          pthread_mutex_unlock(pipe->mutex);
-          pthread_cond_signal(pipe->tsDef);
-          pthread_cond_signal(pipe->tsInq);
-
-          pthread_mutex_lock(pipe->mutex);
-          while (pstreamptr->isopen)
-            {
-              if (PSTREAM_Debug)
-                Message("wait of read close");
-              pthread_cond_wait(pipe->isclosed, pipe->mutex);
-            }
-          pthread_mutex_unlock(pipe->mutex);
-        }
+        Error("Internal problem! Close pipe %s", pstreamptr->m_name);
 
       processDelStream(pstreamID);
 #else
@@ -977,7 +1021,7 @@ pstreamClose(int pstreamID)
   else
     {
       if (PSTREAM_Debug)
-        Message("%s fileID %d", pstreamptr->name, pstreamptr->m_fileID);
+        Message("%s fileID %d", pstreamptr->m_name, pstreamptr->m_fileID);
 
       if (pstreamptr->mode == 'r')
         {
@@ -1000,15 +1044,9 @@ pstreamClose(int pstreamID)
             {
               extern const char *cdojobfiles;
               FILE *fp = fopen(cdojobfiles, "a");
-              fprintf(fp, "%s\n", pstreamptr->name);
+              fprintf(fp, "%s\n", pstreamptr->m_name);
               fclose(fp);
             }
-        }
-
-      if (pstreamptr->name)
-        {
-          Free(pstreamptr->name);
-          pstreamptr->name = NULL;
         }
 
       if (pstreamptr->m_varlist)
@@ -1039,7 +1077,7 @@ pstream_t::inqVlist()
     {
       vlistID = pipe->pipeInqVlist(m_vlistID);
       if (vlistID == -1)
-        cdoAbort("Couldn't read data from input stream %s!", name);
+        cdoAbort("Couldn't read data from input stream %s!", m_name);
     }
   // read from file through cdi streamInqVlist
   else
@@ -1080,29 +1118,28 @@ pstream_t::inqVlist()
   return vlistID;
 }
 
-static void
-pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
+void pstream_t::defVarList(int p_vlistID)
 {
-  int filetype = pstreamptr->m_filetype;
+  int filetype = m_filetype;
 
-  if (pstreamptr->m_vlistID != -1)
+  if (m_vlistID != -1)
     cdoAbort("Internal problem, vlist already defined!");
 
-  if (pstreamptr->m_varlist != NULL)
+  if (m_varlist != NULL)
     cdoAbort("Internal problem, varlist already allocated!");
 
-  int nvars = vlistNvars(vlistID);
+  int nvars = vlistNvars(p_vlistID);
   assert(nvars > 0);
 
   varlist_t *varlist = (varlist_t *) Malloc(nvars * sizeof(varlist_t));
 
   for (int varID = 0; varID < nvars; ++varID)
     {
-      varlist[varID].gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      varlist[varID].datatype = vlistInqVarDatatype(vlistID, varID);
-      varlist[varID].missval = vlistInqVarMissval(vlistID, varID);
-      varlist[varID].addoffset = vlistInqVarAddoffset(vlistID, varID);
-      varlist[varID].scalefactor = vlistInqVarScalefactor(vlistID, varID);
+      varlist[varID].gridsize = gridInqSize(vlistInqVarGrid(p_vlistID, varID));
+      varlist[varID].datatype = vlistInqVarDatatype(p_vlistID, varID);
+      varlist[varID].missval = vlistInqVarMissval(p_vlistID, varID);
+      varlist[varID].addoffset = vlistInqVarAddoffset(p_vlistID, varID);
+      varlist[varID].scalefactor = vlistInqVarScalefactor(p_vlistID, varID);
 
       varlist[varID].check_datarange = false;
 
@@ -1139,66 +1176,69 @@ pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
         }
     }
 
-  pstreamptr->m_varlist = varlist;
-  pstreamptr->m_vlistID = vlistID; /* used for -r/-a */
+  m_varlist = varlist;
+  m_vlistID = p_vlistID; /* used for -r/-a */
 }
 
 void
 pstreamDefVlist(int pstreamID, int vlistID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->defVlist(vlistID);
+}
 
+void pstream_t::defVlist(int p_vlistID){
 #if defined(HAVE_LIBPTHREAD)
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
       if (PSTREAM_Debug)
-        Message("%s pstreamID %d", pstreamptr->name, pstreamptr->self);
-      int vlistIDcp = vlistDuplicate(vlistID);
-      /*    pipeDefVlist(pstreamptr, vlistID);*/
-      pstreamptr->pipe->pipeDefVlist(pstreamptr->m_vlistID, vlistIDcp);
+        Message("%s pstreamID %d", m_name, self);
+      int vlistIDcp = vlistDuplicate(p_vlistID);
+      /*    pipeDefVlist(pstreamptr, p_vlistID);*/
+      pipe->pipeDefVlist(m_vlistID, vlistIDcp);
     }
   else
 #endif
     {
       if (cdoDefaultDataType != CDI_UNDEFID)
         {
-          int varID, nvars = vlistNvars(vlistID);
+          int varID, nvars = vlistNvars(p_vlistID);
 
           for (varID = 0; varID < nvars; ++varID)
-            vlistDefVarDatatype(vlistID, varID, cdoDefaultDataType);
+            vlistDefVarDatatype(p_vlistID, varID, cdoDefaultDataType);
 
           if (cdoDefaultDataType == CDI_DATATYPE_FLT64 || cdoDefaultDataType == CDI_DATATYPE_FLT32)
             {
               for (varID = 0; varID < nvars; varID++)
                 {
-                  vlistDefVarAddoffset(vlistID, varID, 0.0);
-                  vlistDefVarScalefactor(vlistID, varID, 1.0);
+                  vlistDefVarAddoffset(p_vlistID, varID, 0.0);
+                  vlistDefVarScalefactor(p_vlistID, varID, 1.0);
                 }
             }
         }
 
       if (cdoChunkType != CDI_UNDEFID)
         {
-          int varID, nvars = vlistNvars(vlistID);
+          int varID, nvars = vlistNvars(p_vlistID);
 
           for (varID = 0; varID < nvars; ++varID)
-            vlistDefVarChunkType(vlistID, varID, cdoChunkType);
+            vlistDefVarChunkType(p_vlistID, varID, cdoChunkType);
         }
 
       if (CDO_CMOR_Mode)
         {
-          cdo_def_tracking_id(vlistID, "tracking_id");
-          cdo_def_creation_date(vlistID);
+          cdo_def_tracking_id(p_vlistID, "tracking_id");
+          cdo_def_creation_date(p_vlistID);
         }
 
       if (CDO_Version_Info)
-        cdiDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int) strlen(cdoComment()), cdoComment());
+        cdiDefAttTxt(p_vlistID, CDI_GLOBAL, "CDO", (int) strlen(cdoComment()), cdoComment());
 
 #if defined(_OPENMP)
       if (ompNumThreads > 1)
-        cdiDefAttInt(vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", CDI_DATATYPE_INT32, 1, &ompNumThreads);
+        cdiDefAttInt(p_vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", CDI_DATATYPE_INT32, 1, &ompNumThreads);
 #endif
-      pstreamDefVarlist(pstreamptr, vlistID);
+      defVarList(p_vlistID);
 
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_write);
@@ -1206,7 +1246,7 @@ pstreamDefVlist(int pstreamID, int vlistID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamDefVlist(pstreamptr->m_fileID, vlistID);
+      streamDefVlist(m_fileID, p_vlistID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1269,7 +1309,7 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
 
       if (PSTREAM_Debug)
         {
-          Message("%s pstreamid %d", pstreamptr->name, pstreamptr->self);
+          Message("%s pstreamid %d", pstreamptr->m_name, pstreamptr->self);
         }
       pstreamptr->pipe->pipeDefRecord(varID, levelID);
     }
@@ -1563,7 +1603,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
         {
           size_t len;
           int nfile = pstreamptr->nfiles;
-          char *filename = NULL;
+          std::string filename; 
           int fileID;
           int vlistIDold, vlistIDnew;
 
@@ -1572,9 +1612,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
           vlistIDold = vlistDuplicate(streamInqVlist(pstreamptr->m_fileID));
           streamClose(pstreamptr->m_fileID);
 
-          len = strlen(pstreamptr->mfnames[nfile]);
-          filename = (char *) Malloc(len + 1);
-          strcpy(filename, pstreamptr->mfnames[nfile]);
+          filename = pstreamptr->m_mfnames[nfile];
           pstreamptr->nfiles++;
 
 #if defined(HAVE_LIBPTHREAD)
@@ -1584,11 +1622,11 @@ pstreamInqTimestep(int pstreamID, int tsID)
             pthread_mutex_lock(&streamOpenReadMutex);
 #endif
           if (cdoVerbose)
-            cdoPrint("Continuation file: %s", filename);
+            cdoPrint("Continuation file: %s", filename.c_str());
 
           if (processNums() == 1 && ompNumThreads == 1)
             timer_start(timer_read);
-          fileID = streamOpenRead(filename);
+          fileID = streamOpenRead(filename.c_str());
           vlistIDnew = streamInqVlist(fileID);
           if (processNums() == 1 && ompNumThreads == 1)
             timer_stop(timer_read);
@@ -1602,11 +1640,9 @@ pstreamInqTimestep(int pstreamID, int tsID)
             pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
           if (fileID < 0)
-            cdiOpenError(fileID, "Open failed on >%s<", filename);
+            cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
 
-          Free(pstreamptr->name);
-
-          pstreamptr->name = filename;
+          pstreamptr->m_name = filename;
           pstreamptr->m_fileID = fileID;
 
           if (processNums() == 1 && ompNumThreads == 1)
@@ -1729,8 +1765,17 @@ cdoInitialize(void *argument)
 #endif
 
   processDefArgument(argument);
+   //TODO  << "we got through this" << std::endl;
 }
-
+void pstreamCloseAll()
+{
+    for(auto pstream_iter : _pstream_map)
+    {
+        Message("Close file %s id %d", pstream_iter.second.m_name, pstream_iter.second.m_fileID);
+        streamClose(pstream_iter.second.m_fileID);
+    }
+}
+/*
 void
 pstreamCloseAll(void)
 {
@@ -1745,13 +1790,13 @@ pstreamCloseAll(void)
           if (!pstreamptr->ispipe && pstreamptr->m_fileID != CDI_UNDEFID)
             {
               if (PSTREAM_Debug)
-                Message("Close file %s id %d", pstreamptr->name, pstreamptr->m_fileID);
+                Message("Close file %s id %d", pstreamptr->m_name, pstreamptr->m_fileID);
               streamClose(pstreamptr->m_fileID);
             }
         }
     }
 }
-
+*/
 static void
 processClosePipes(void)
 {

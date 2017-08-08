@@ -27,7 +27,8 @@
 class pstream_t
 {
 public:
-  pstream_t();
+  pstream_t(int id);
+  ~pstream_t();
   int inqVlist();
   int inqFileType();
   void defTimestep(int p_tsID);
@@ -35,7 +36,9 @@ public:
   void pstreamOpenReadPipe(const argument_t *argument);
   void pstreamOpenReadFile(const argument_t *argument);
   void openAppend(const char * p_filename);
-  int self;
+  void init();
+  void defVlist(int p_vlistID);
+  int self; //aka the id of the pstream
   int mode;
   int m_fileID;
   int m_vlistID;
@@ -47,14 +50,19 @@ public:
   int varID; /* next varID defined with streamDefVar */
   bool ispipe;
   bool isopen;
-  char *name;
-  char **mfnames;
+  std::string m_name;
+  std::vector<std::string> m_mfnames;
   varlist_t *m_varlist;
 #if defined(HAVE_LIBPTHREAD)
   void *argument;
   struct pipe_t *pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
+private:
+   void createFilelist(const argument_t * p_argument);
+   pstream_t();
+   void createPipeName(char *pipename, int pnlen);
+   void defVarList(int vlistID);
 #endif
 };
 

@@ -36,6 +36,9 @@
 
 #if defined(HAVE_LIBPTHREAD)
 
+#include <condition_variable>
+#include <mutex>
+
 struct pipe_t
 {
 
@@ -65,10 +68,10 @@ public:
   // pstream_t *pstreamptr_in;
   /* unsigned long */ off_t nvals;
 
-  pthread_mutex_t *mutex;
-  pthread_cond_t *tsDef, *tsInq, *vlistDef, *isclosed;
-  pthread_cond_t *recDef, *recInq;
-  pthread_cond_t *writeCond, *readCond;
+  std::mutex m_mutex;
+  std::condition_variable tsDef, tsInq, vlistDef, isclosed;
+  std::condition_variable recDef, recInq;
+  std::condition_variable writeCond, readCond;
 
   std::string name;
 };

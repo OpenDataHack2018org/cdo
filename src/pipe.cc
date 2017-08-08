@@ -38,11 +38,12 @@ pipe_t::pipe_t() { pipe_init(); }
 void
 pipe_t::pipe_init()
 {
-  pthread_mutexattr_t m_attr;
+/*  pthread_mutexattr_t m_attr;
   pthread_condattr_t c_attr;
 
   pthread_mutexattr_init(&m_attr);
   pthread_condattr_init(&c_attr);
+  */
   /*
 #if defined(_POSIX_THREAD_PROCESS_SHARED)
   if ( PipeDebug )
@@ -87,7 +88,7 @@ pipe_t::pipe_init()
   hasdata = false;
   usedata = true;
   // pstreamptr_in = 0;
-
+/*
   mutex = (pthread_mutex_t *) Malloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(mutex, &m_attr);
 
@@ -114,12 +115,13 @@ pipe_t::pipe_init()
 
   pthread_mutexattr_destroy(&m_attr);
   pthread_condattr_destroy(&c_attr);
+  */
 }
 int
 pipe_t::pipeInqTimestep(int p_tsID)
 {
   // LOCK
-  pthread_mutex_lock(mutex);
+    std::unique_lock<std::mutex> locked_mutex(m_mutex);
   usedata = false;
   recIDr = -1;
   if (p_tsID != tsIDr + 1)
@@ -143,24 +145,24 @@ pipe_t::pipeInqTimestep(int p_tsID)
             Message("%s has data", name.c_str());
           hasdata = false;
           data = NULL;
-          pthread_cond_signal(readCond);
+          readCond.notify_all();
         }
       else if (PipeDebug)
         Message("%s has no data", name.c_str());
 
-      pthread_cond_signal(recInq); /* o.k. ??? */
+      recInq.notify_all(); /* o.k. ??? */
 
       if (PipeDebug)
         Message("%s wait of tsDef", name.c_str());
-      pthread_cond_wait(tsDef, mutex);
+      tsDef.wait(locked_mutex);
     }
 
   int numrecs = EOP ? 0 : nrecs;
 
-  pthread_mutex_unlock(mutex);
+  m_mutex.unlock();
   // UNLOCK
 
-  pthread_cond_signal(tsInq);
+  tsInq.notify_all();
 
   return numrecs;
 }
@@ -170,16 +172,17 @@ pipe_t::pipeDefVlist(int &target_vlistID, int new_vlistID)
 {
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  m_mutex.lock();
   target_vlistID = new_vlistID;
-  pthread_mutex_unlock(mutex);
+  m_mutex.unlock();
   // UNLOCK
 
   // lets the program know that the vlist is now defined
-  pthread_cond_signal(vlistDef);
+  vlistDef.notify_all();
 }
 
-#define TIMEOUT 1  // wait 1 seconds
+//#define TIMEOUT 1  // wait 1 seconds
+constexpr std::chrono::milliseconds TIMEOUT = std::chrono::milliseconds(1000);
 #define MIN_WAIT_CYCLES 10
 #define MAX_WAIT_CYCLES 3600
 int processNumsActive(void);
@@ -188,39 +191,35 @@ int
 pipe_t::pipeInqVlist(int &p_vlistID)
 {
   int vlistID = -1;
-  struct timespec time_to_wait;
-  int retcode = 0;
+  std::chrono::milliseconds time_to_wait(0);
+  std::cv_status retcode = std::cv_status::timeout;
   int nwaitcycles = 0;
 
-  time_to_wait.tv_sec = 0;
-  time_to_wait.tv_nsec = 0;
-
   // LOCK
-  pthread_mutex_lock(mutex);
-  time_to_wait.tv_sec = time(NULL);
-  while (p_vlistID == -1 && retcode == 0)
+  std::unique_lock<std::mutex> locked_mutex(m_mutex);
+  while (p_vlistID == -1 && retcode == std::cv_status::timeout)
     {
-      time_to_wait.tv_sec += TIMEOUT;
+      time_to_wait += TIMEOUT;
       // fprintf(stderr, "tvsec %g\n", (double) time_to_wait.tv_sec);
       if (PipeDebug)
         Message("%s wait of vlistDef", name.c_str());
       // pthread_cond_wait(pipe->vlistDef, pipe->mutex);
-      retcode = pthread_cond_timedwait(vlistDef, mutex, &time_to_wait);
+      retcode = vlistDef.wait_for(locked_mutex, time_to_wait);
       // fprintf(stderr, "self %d retcode %d %d %d\n", pstreamptr->self, retcode, processNumsActive(),
       // vlistID);
-      if (retcode != 0 && nwaitcycles++ < MAX_WAIT_CYCLES)
+      //if (retcode != 0 && nwaitcycles++ < MAX_WAIT_CYCLES)
+      if (retcode != std::cv_status::timeout && nwaitcycles++ < MAX_WAIT_CYCLES)
         {
           if (processNumsActive() > 1 || (processNumsActive() == 1 && nwaitcycles < MIN_WAIT_CYCLES))
-            retcode = 0;
+            retcode = std::cv_status::timeout;
         }
     }
 
-  if (retcode == 0)
+  if (retcode == std::cv_status::timeout)
     vlistID = p_vlistID;
   else if (PipeDebug)
     Message("%s timeout!", name.c_str());
 
-  pthread_mutex_unlock(mutex);
   // UNLOCK
 
   return vlistID;
@@ -232,7 +231,7 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
   int numrecs;
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  m_mutex.lock();
   recIDw = -1;
   tsIDw++;
   if (p_tsID != tsIDw)
@@ -262,14 +261,14 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
     Message("%s numrecs %d p_tsID %d %d %d", name.c_str(), numrecs, p_tsID, tsIDw, tsIDr);
   if (numrecs == 0)
     EOP = true;
-  pthread_mutex_unlock(mutex);
+  m_mutex.unlock();
   // UNLOCK
 
-  pthread_cond_signal(tsDef);
+  tsDef.notify_all();
   // sleep(1);
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  std::unique_lock<std::mutex> locked_mutex(m_mutex);
   while (tsIDr < p_tsID)
     {
       if (EOP)
@@ -280,9 +279,8 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
         }
       if (PipeDebug)
         Message("%s wait of tsInq (p_tsID %d %d)", name.c_str(), p_tsID, tsIDr);
-      pthread_cond_wait(tsInq, mutex);
+      tsInq.wait(locked_mutex);
     }
-  pthread_mutex_unlock(mutex);
   // UNLOCK
 }
 
@@ -294,7 +292,7 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
   // if (PipeDebug)
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  m_mutex.lock();
   if (PipeDebug)
     Message("%s has no data %d %d", name.c_str(), recIDr, recIDw);
   if (hasdata || usedata)
@@ -304,14 +302,14 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
       usedata = false;
       condSignal = true;
     }
-  pthread_mutex_unlock(mutex);
+  m_mutex.unlock();
   // UNLOCK
 
   if (condSignal)
-    pthread_cond_signal(readCond);
+    readCond.notify_all();
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  std::unique_lock<std::mutex> locked_mutex(m_mutex);
   usedata = true;
   recIDr++;
 
@@ -328,7 +326,7 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
         }
       if (PipeDebug)
         Message("%s wait of recDef", name.c_str());
-      pthread_cond_wait(recDef, mutex);
+      recDef.wait(locked_mutex);
     }
 
   if (EOP)
@@ -342,10 +340,10 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
       *p_levelID = levelID;
     }
 
-  pthread_mutex_unlock(mutex);
+  locked_mutex.unlock();
   // UNLOCK
 
-  pthread_cond_signal(recInq);
+  recInq.notify_all();
 
   return 0;
 }
@@ -356,7 +354,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
   bool condSignal = false;
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  m_mutex.lock();
   if (PipeDebug)
     Message("%s has data %d %d", name.c_str(), recIDr, recIDw);
   if (hasdata)
@@ -365,27 +363,27 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
       data = NULL;
       condSignal = true;
     }
-  pthread_mutex_unlock(mutex);
+  m_mutex.unlock();
   // UNLOCK
 
   if (condSignal)
-    pthread_cond_signal(readCond);
+    readCond.notify_all();
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  m_mutex.lock();
   usedata = true;
   recIDw++;
   varID = p_varID;
   levelID = p_levelID;
   if (PipeDebug)
     Message("%s recID %d %d", name.c_str(), recIDr, recIDw);
-  pthread_mutex_unlock(mutex);
+  m_mutex.unlock();
   // UNLOCK
 
-  pthread_cond_signal(recDef);
+  recDef.notify_all();
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  std::unique_lock<std::mutex> locked_mutex(m_mutex);
   while (recIDr < recIDw)
     {
       if (tsIDw != tsIDr)
@@ -394,9 +392,8 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
         break;
       if (PipeDebug)
         Message("%s wait of recInq %d", name.c_str(), recIDr);
-      pthread_cond_wait(recInq, mutex);
+      recInq.wait( locked_mutex);
     }
-  pthread_mutex_unlock(mutex);
   // UNLOCK
 }
 
@@ -453,12 +450,12 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
   *nmiss = 0;
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  std::unique_lock<std::mutex> locked_mutex(m_mutex);
   while (!hasdata)
     {
       if (PipeDebug)
         Message("%s wait of writeCond", name.c_str());
-      pthread_cond_wait(writeCond, mutex);
+      writeCond.wait(locked_mutex);
     }
 
   if (hasdata)
@@ -475,10 +472,9 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 
   hasdata = false;
   data = NULL;
-  pthread_mutex_unlock(mutex);
   // UNLOCK
 
-  pthread_cond_signal(readCond);
+  readCond.notify_all();
 }
 
 void
@@ -488,20 +484,20 @@ pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
   if ( ! usedata ) return;
   */
   // LOCK
-  pthread_mutex_lock(mutex);
+  m_mutex.lock();
   hasdata = true; /* data pointer */
   data = p_data;
   nmiss = p_nmiss;
-  pthread_mutex_unlock(mutex);
+  m_mutex.unlock();
   // UNLOCK
 
-  pthread_cond_signal(writeCond);
+  writeCond.notify_all();
 
   if (PipeDebug)
     Message("%s write record %d", name.c_str(), recIDw);
 
   // LOCK
-  pthread_mutex_lock(mutex);
+  std::unique_lock<std::mutex> locked_mutex(m_mutex);
   while (hasdata)
     {
       if (!usedata)
@@ -521,9 +517,8 @@ pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
         }
       if (PipeDebug)
         Message("%s wait of readCond", name.c_str());
-      pthread_cond_wait(readCond, mutex);
+      readCond.wait(locked_mutex);
     }
-  pthread_mutex_unlock(mutex);
   // UNLOCK
 }
 
