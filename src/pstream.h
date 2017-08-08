@@ -37,6 +37,7 @@ public:
   void pstreamOpenReadPipe(const argument_t *argument);
   void pstreamOpenReadFile(const argument_t *argument);
   void openAppend(const char * p_filename);
+  void init();
   int self;
   int mode;
   int m_fileID;
@@ -57,6 +58,8 @@ public:
   struct pipe_t *pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
+private:
+   void createFilelist(const argument_t * p_argument);
 #endif
 };
 

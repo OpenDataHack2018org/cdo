@@ -226,32 +226,31 @@ pstream_from_pointer(pstream_t *ptr)
 }
 */
 
-static void
-pstream_init_entry(pstream_t *pstreamptr)
+void pstream_t::init()
 {
 
-  pstreamptr->isopen = true;
-  pstreamptr->ispipe = false;
-  pstreamptr->m_fileID = -1;
-  pstreamptr->m_vlistID = -1;
-  pstreamptr->tsID = -1;
-  pstreamptr->m_filetype = -1;
-  pstreamptr->name = NULL;
-  pstreamptr->tsID0 = 0;
-  pstreamptr->mfiles = 0;
-  pstreamptr->nfiles = 0;
-  pstreamptr->varID = -1;
-  pstreamptr->name = NULL;
-  pstreamptr->mfnames = NULL;
-  pstreamptr->m_varlist = NULL;
+  isopen = true;
+  ispipe = false;
+  m_fileID = -1;
+  m_vlistID = -1;
+  tsID = -1;
+  m_filetype = -1;
+  name = NULL;
+  tsID0 = 0;
+  mfiles = 0;
+  nfiles = 0;
+  varID = -1;
+  name = NULL;
+  mfnames = NULL;
+  m_varlist = NULL;
 #if defined(HAVE_LIBPTHREAD)
-  pstreamptr->argument = NULL;
-  pstreamptr->pipe = NULL;
+  argument = NULL;
+  pipe = NULL;
 //  pstreamptr->rthreadID  = 0;
 //  pstreamptr->wthreadID  = 0;
 #endif
 }
-pstream_t::pstream_t() { pstream_init_entry(this); }
+pstream_t::pstream_t() { init(); }
 pstream_t::~pstream_t(){
   //vlistDestroy(m_vlistID);
 }
@@ -442,23 +441,22 @@ pstream_t::pstreamOpenReadPipe(const argument_t *argument)
 #endif
 }
 
-static void
-pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
+void pstream_t::createFilelist(const argument_t *p_argument)
 {
   size_t i;
-  size_t len = strlen(argument->args);
+  size_t len = strlen(p_argument->args);
 
   for (i = 0; i < len; i++)
-    if (argument->args[i] == ':')
+    if (p_argument->args[i] == ':')
       break;
 
   if (i < len)
     {
       int nfiles = 1, j;
 
-      const char *pch = &argument->args[i + 1];
+      const char *pch = &p_argument->args[i + 1];
       len -= (i + 1);
-      if (len && (strncmp(argument->args, "filelist:", 9) == 0 || strncmp(argument->args, "flist:", 6) == 0))
+      if (len && (strncmp(p_argument->args, "filelist:", 9) == 0 || strncmp(p_argument->args, "flist:", 6) == 0))
         {
           for (i = 0; i < len; i++)
             if (pch[i] == ',')
@@ -496,8 +494,8 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
               if (nfiles == 0)
                 cdoAbort("No imput file found in %s", pch);
 
-              pstreamptr->mfiles = nfiles;
-              pstreamptr->mfnames = (char **) Malloc(nfiles * sizeof(char *));
+              mfiles = nfiles;
+              mfnames = (char **) Malloc(nfiles * sizeof(char *));
 
               rewind(fp);
 
@@ -507,7 +505,7 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
                   if (line[0] == '#' || line[0] == '\0' || line[0] == ' ')
                     continue;
 
-                  pstreamptr->mfnames[nfiles] = strdupx(line);
+                  mfnames[nfiles] = strdupx(line);
                   nfiles++;
                 }
 
@@ -517,8 +515,8 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
             {
               char line[65536];
 
-              pstreamptr->mfiles = nfiles;
-              pstreamptr->mfnames = (char **) Malloc(nfiles * sizeof(char *));
+              mfiles = nfiles;
+              mfnames = (char **) Malloc(nfiles * sizeof(char *));
 
               strcpy(line, pch);
               for (i = 0; i < len; i++)
@@ -531,12 +529,12 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
               i = 0;
               for (j = 0; j < nfiles; j++)
                 {
-                  pstreamptr->mfnames[j] = strdupx(&line[i]);
+                  mfnames[j] = strdupx(&line[i]);
                   i += strlen(&line[i]) + 1;
                 }
             }
         }
-      else if (len && strncmp(argument->args, "ls:", 3) == 0)
+      else if (len && strncmp(p_argument->args, "ls:", 3) == 0)
         {
           char line[4096];
           char command[4096];
@@ -560,11 +558,11 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
 
           pclose(pfp);
 
-          pstreamptr->mfiles = nfiles;
-          pstreamptr->mfnames = (char **) Malloc(nfiles * sizeof(char *));
+          mfiles = nfiles;
+          mfnames = (char **) Malloc(nfiles * sizeof(char *));
 
           for (j = 0; j < nfiles; j++)
-            pstreamptr->mfnames[j] = fnames[j];
+            mfnames[j] = fnames[j];
         }
     }
 }
@@ -572,7 +570,7 @@ pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
 void
 pstream_t::pstreamOpenReadFile(const argument_t *argument)
 {
-  pstreamCreateFilelist(argument, this);
+  createFilelist(argument);
 
   char *filename = NULL;
 
