@@ -1,3 +1,10 @@
+#define NEW_DOUBLE_2D(P2D, N, M) { \
+      P2D = (N)?new double*[(N)]:nullptr; P2D[0] = ((N)&&(M))?new double[(N)*(M)]:nullptr; \
+      if ((N)&&(M)) for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
+#define NEW_LONG_2D(P2D, N, M) { \
+      P2D = (N)?new long*[(N)]:nullptr; P2D[0] = ((N)&&(M))?new long[(N)*(M)]:nullptr; \
+      if ((N)&&(M)) for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
+#define DELETE_2D(P2D) if (P2D) { if (P2D[0]) delete[] P2D[0]; delete[] P2D; P2D = nullptr;}
 /*
 #define  NGP    100000
 #define  OUTPUT 1
@@ -486,130 +493,96 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   long nlev2p1 = nlev2+1;
 
 #if defined(_OPENMP)
-  double **ph1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **lnph1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **fi1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **ph1_2;    NEW_DOUBLE_2D(ph1_2, ompNumThreads, nlev1p1);
+  double **lnph1_2;  NEW_DOUBLE_2D(lnph1_2, ompNumThreads, nlev1p1);
+  double **fi1_2;    NEW_DOUBLE_2D(fi1_2, ompNumThreads, nlev1p1);
 
-  double **pf1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **lnpf1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **tv1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **theta1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **rh1_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **zvar_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **pf1_2;    NEW_DOUBLE_2D(pf1_2, ompNumThreads, nlev1);
+  double **lnpf1_2;  NEW_DOUBLE_2D(lnpf1_2, ompNumThreads, nlev1);
+  double **tv1_2;    NEW_DOUBLE_2D(tv1_2, ompNumThreads, nlev1);
+  double **theta1_2; NEW_DOUBLE_2D(theta1_2, ompNumThreads, nlev1);
+  double **rh1_2;    NEW_DOUBLE_2D(rh1_2, ompNumThreads, nlev1);
+  double **zvar_2;   NEW_DOUBLE_2D(zvar_2, ompNumThreads, nlev1);
 
-  double **ph2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **lnph2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **fi2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **ph2_2;    NEW_DOUBLE_2D(ph2_2, ompNumThreads, nlev2p1);
+  double **lnph2_2;  NEW_DOUBLE_2D(lnph2_2, ompNumThreads, nlev2p1);
+  double **fi2_2;    NEW_DOUBLE_2D(fi2_2, ompNumThreads, nlev2p1);
 
-  double **pf2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **rh2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **wgt_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  long   **idx_2 = (long**) Malloc(ompNumThreads*sizeof(long*));
+  double **pf2_2;    NEW_DOUBLE_2D(pf2_2, ompNumThreads, nlev2);
+  double **rh2_2;    NEW_DOUBLE_2D(rh2_2, ompNumThreads, nlev2);
+  double **wgt_2;    NEW_DOUBLE_2D(wgt_2, ompNumThreads, nlev2);
+  long **idx_2;      NEW_LONG_2D(idx_2, ompNumThreads, nlev2);
 
-  // if ( ltq )
-  double **zt2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **zq2_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **rh_pbl_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
-  double **theta_pbl_2 = (double**) Malloc(ompNumThreads*sizeof(double*));
+  double **zt2_2 = nullptr;       if ( ltq ) NEW_DOUBLE_2D(zt2_2, ompNumThreads, nlev2);
+  double **zq2_2 = nullptr;       if ( ltq ) NEW_DOUBLE_2D(zq2_2, ompNumThreads, nlev2);
+  double **rh_pbl_2 = nullptr;    if ( ltq ) NEW_DOUBLE_2D(rh_pbl_2, ompNumThreads, nlev2);
+  double **theta_pbl_2 = nullptr; if ( ltq ) NEW_DOUBLE_2D(theta_pbl_2, ompNumThreads, nlev2);
 
+  if ( nvars > MAX_VARS )
+    {
+      fprintf(stderr, "Too many vars (max = %d)!\n", MAX_VARS);
+      exit(-1);
+    }
   // if ( nvars > 0 )
   double ***vars_pbl_2 = (double***) Malloc(ompNumThreads*sizeof(double**));
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  if ( nvars > 0 )
     {
-      ph1_2[i]    = (double*) Malloc(nlev1p1*sizeof(double));
-      lnph1_2[i]  = (double*) Malloc(nlev1p1*sizeof(double));
-      fi1_2[i]    = (double*) Malloc(nlev1p1*sizeof(double));
-
-      pf1_2[i]    = (double*) Malloc(nlev1*sizeof(double));
-      lnpf1_2[i]  = (double*) Malloc(nlev1*sizeof(double));
-      tv1_2[i]    = (double*) Malloc(nlev1*sizeof(double));
-      theta1_2[i] = (double*) Malloc(nlev1*sizeof(double));
-      rh1_2[i]    = (double*) Malloc(nlev1*sizeof(double));
-      zvar_2[i]   = (double*) Malloc(nlev1*sizeof(double));
-
-      ph2_2[i]    = (double*) Malloc(nlev2p1*sizeof(double));
-      lnph2_2[i]  = (double*) Malloc(nlev2p1*sizeof(double));
-      fi2_2[i]    = (double*) Malloc(nlev2p1*sizeof(double));
-
-      pf2_2[i]    = (double*) Malloc(nlev2*sizeof(double));
-      rh2_2[i]    = (double*) Malloc(nlev2*sizeof(double));
-      wgt_2[i]    = (double*) Malloc(nlev2*sizeof(double));
-      idx_2[i]    = (long*) Malloc(nlev2*sizeof(long));
-
-      if ( ltq )
-	{
-	  zt2_2[i]       = (double*) Malloc(nlev2*sizeof(double));
-	  zq2_2[i]       = (double*) Malloc(nlev2*sizeof(double));
-	  rh_pbl_2[i]    = (double*) Malloc(nlev2*sizeof(double));
-	  theta_pbl_2[i] = (double*) Malloc(nlev2*sizeof(double));
-	}
-
-      if ( nvars > 0 )
-	{
-	  if ( nvars > MAX_VARS )
-	    {
-	      fprintf(stderr, "Too many vars (max = %d)!\n", MAX_VARS);
-	      exit(-1);
-	    }
+      for ( int i = 0; i < ompNumThreads; i++ )
+        {
 	  vars_pbl_2[i]  = (double **) Malloc(nvars*sizeof(double *));
 	  for ( int iv = 0; iv < nvars; ++iv )
 	    vars_pbl_2[i][iv] = (double*) Malloc(nlev2*sizeof(double));
 	}
     }
 #else
-  /* etah1  = (double*) Malloc(nlev1p1*sizeof(double)); */
-  ph1    = (double*) Malloc(nlev1p1*sizeof(double));
-  lnph1  = (double*) Malloc(nlev1p1*sizeof(double));
-  fi1    = (double*) Malloc(nlev1p1*sizeof(double));
+  // etah1  = new double[nlev1p1];
+  ph1    = new double[nlev1p1];
+  lnph1  = new double[nlev1p1];
+  fi1    = new double[nlev1p1];
 
-  pf1    = (double*) Malloc(nlev1*sizeof(double));
-  lnpf1  = (double*) Malloc(nlev1*sizeof(double));
-  tv1    = (double*) Malloc(nlev1*sizeof(double));
-  theta1 = (double*) Malloc(nlev1*sizeof(double));
-  rh1    = (double*) Malloc(nlev1*sizeof(double));
-  zvar   = (double*) Malloc(nlev1*sizeof(double));
+  pf1    = new double[nlev1];
+  lnpf1  = new double[nlev1];
+  tv1    = new double[nlev1];
+  theta1 = new double[nlev1];
+  rh1    = new double[nlev1];
+  zvar   = new double[nlev1];
 
-  ph2    = (double*) Malloc(nlev2p1*sizeof(double));
-  lnph2  = (double*) Malloc(nlev2p1*sizeof(double));
-  fi2    = (double*) Malloc(nlev2p1*sizeof(double));
+  ph2    = new double[nlev2p1];
+  lnph2  = new double[nlev2p1];
+  fi2    = new double[nlev2p1];
 
-  pf2    = (double*) Malloc(nlev2*sizeof(double));
-  /* lnpf2  = (double*) Malloc(nlev2*sizeof(double)); */
-  rh2    = (double*) Malloc(nlev2*sizeof(double));
-  wgt    = (double*) Malloc(nlev2*sizeof(double));
-  idx    = (long*) Malloc(nlev2*sizeof(long));
+  pf2    = new double[nlev2];
+  // lnpf2  = new double[nlev2];
+  rh2    = new double[nlev2];
+  wgt    = new double[nlev2];
+  idx    = new long[nlev2];
 
   if ( ltq )
     {
-      zt2       = (double*) Malloc(nlev2*sizeof(double));
-      zq2       = (double*) Malloc(nlev2*sizeof(double));
-      rh_pbl    = (double*) Malloc(nlev2*sizeof(double));
-      theta_pbl = (double*) Malloc(nlev2*sizeof(double));
+      zt2       = new double[nlev2];
+      zq2       = new double[nlev2];
+      rh_pbl    = new double[nlev2];
+      theta_pbl = new double[nlev2];
     }
 
-  if ( nvars > 0 )
-    {
-      vars_pbl  = (double **) Malloc(nvars*sizeof(double *));
-      for ( int iv = 0; iv < nvars; ++iv )
-	vars_pbl[iv] = (double*) Malloc(nlev2*sizeof(double));
-    }
+  if ( nvars > 0 ) NEW_DOUBLE_2D(vars_pbl, nvars, nlev2);
 #endif
   
-  double *af1 = (double*) Malloc(nlev1*sizeof(double));
-  double *bf1 = (double*) Malloc(nlev1*sizeof(double));
-  double *etaf1 = (double*) Malloc(nlev1*sizeof(double));
+  double *af1 = new double[nlev1];
+  double *bf1 = new double[nlev1];
+  double *etaf1 = new double[nlev1];
 
-  double *etah2 = (double*) Malloc(nlev2p1*sizeof(double));
+  double *etah2 = new double[nlev2p1];
 
-  double *af2 = (double*) Malloc(nlev2*sizeof(double));
-  double *bf2 = (double*) Malloc(nlev2*sizeof(double));
-  double *etaf2 = (double*) Malloc(nlev2*sizeof(double));
+  double *af2 = new double[nlev2];
+  double *bf2 = new double[nlev2];
+  double *etaf2 = new double[nlev2];
 
-  double *w1 = (double*) Malloc(nlev2*sizeof(double));
-  double *w2 = (double*) Malloc(nlev2*sizeof(double));
-  long *jl1 = (long*) Malloc(nlev2*sizeof(long));
-  long *jl2 = (long*) Malloc(nlev2*sizeof(long));
+  double *w1 = new double[nlev2];
+  double *w2 = new double[nlev2];
+  long *jl1 = new long[nlev2];
+  long *jl2 = new long[nlev2];
 
   /******* set coordinate system ETA's, A's, B's
 	   calculate half and full level ETA
@@ -623,10 +596,10 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
       bf1[k] = 0.5*(bh1[k]+bh1[k+1]);
     }
 
-  /* etah1[nlev1] = ah1[nlev1]*aipr+bh1[nlev1]; */
+  // etah1[nlev1] = ah1[nlev1]*aipr+bh1[nlev1];
   for ( int k = 0; k < nlev1; ++k )
     { 
-      /* etah1[k] = ah1[k]*aipr+bh1[k]; */
+      // etah1[k] = ah1[k]*aipr+bh1[k];
       etaf1[k] = af1[k]*aipr+bf1[k];
     }
 
@@ -760,37 +733,38 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
 
 #if defined(_OPENMP)
+  DELETE_2D(ph1_2);
+  DELETE_2D(lnph1_2);
+  DELETE_2D(fi1_2);
+
+  DELETE_2D(pf1_2);
+  DELETE_2D(lnpf1_2);
+  DELETE_2D(tv1_2);
+  DELETE_2D(theta1_2);
+  DELETE_2D(rh1_2);
+  DELETE_2D(zvar_2);
+
+  DELETE_2D(ph2_2);
+  DELETE_2D(lnph2_2);
+  DELETE_2D(fi2_2);
+
+  DELETE_2D(pf2_2);
+  // DELETE_2D(lnpf2_2);
+  DELETE_2D(rh2_2);
+  DELETE_2D(wgt_2);
+  DELETE_2D(idx_2);
+
+  if ( ltq )
+    {
+      DELETE_2D(zt2_2); 
+      DELETE_2D(zq2_2); 
+      DELETE_2D(rh_pbl_2); 
+      DELETE_2D(theta_pbl_2); 
+    }   
+
   for ( int i = 0; i < ompNumThreads; i++ )
     {
-      Free(ph1_2[i]);    
-      Free(lnph1_2[i]);  
-      Free(fi1_2[i]);    
-
-      Free(pf1_2[i]);    
-      Free(lnpf1_2[i]);  
-      Free(tv1_2[i]);    
-      Free(theta1_2[i]); 
-      Free(rh1_2[i]);    
-      Free(zvar_2[i]);    
-
-      Free(ph2_2[i]);       
-      Free(lnph2_2[i]);     
-      Free(fi2_2[i]);
-
-      Free(pf2_2[i]);       
-      /* Free(lnpf2_2[i]); */
-      Free(rh2_2[i]);      
-      Free(wgt_2[i]); 
-      Free(idx_2[i]); 
-
-      if ( ltq )
-	{
-	  Free(zt2_2[i]); 
-	  Free(zq2_2[i]); 
-	  Free(rh_pbl_2[i]); 
-	  Free(theta_pbl_2[i]); 
-	}   
-
+ 
       if ( nvars > 0 )
 	{
 	  for ( int iv = 0; iv < nvars; ++iv )
@@ -799,78 +773,52 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 	  Free(vars_pbl_2[i]);
 	}
     }
-  Free(ph1_2);
-  Free(lnph1_2);
-  Free(fi1_2);
-  Free(pf1_2);
-  Free(lnpf1_2);
-  Free(tv1_2);
-  Free(theta1_2);
-  Free(rh1_2);
-  Free(zvar_2);
-  Free(ph2_2);
-  Free(lnph2_2);
-  Free(fi2_2);
-  Free(pf2_2);
-  Free(rh2_2);
-  Free(wgt_2);
-  Free(idx_2);
-  Free(zt2_2);
-  Free(zq2_2);
-  Free(rh_pbl_2);
-  Free(theta_pbl_2);
   Free(vars_pbl_2);
 #else
-  /* Free(etah1); */     
-  Free(ph1);    
-  Free(lnph1);  
-  Free(fi1);    
+  // delete[] etah1;     
+  delete[] ph1;    
+  delete[] lnph1;  
+  delete[] fi1;    
 
-  Free(pf1);    
-  Free(lnpf1);  
-  Free(tv1);    
-  Free(theta1); 
-  Free(rh1);    
-  Free(zvar);    
+  delete[] pf1;    
+  delete[] lnpf1;  
+  delete[] tv1;    
+  delete[] theta1; 
+  delete[] rh1;    
+  delete[] zvar;    
 
-  Free(ph2);       
-  Free(lnph2);     
-  Free(fi2);
+  delete[] ph2;       
+  delete[] lnph2;     
+  delete[] fi2;
 
-  Free(pf2);       
-  /* Free(lnpf2); */
-  Free(rh2);      
-  Free(wgt); 
-  Free(idx); 
+  delete[] pf2;       
+  // delete[] lnpf2;
+  delete[] rh2;      
+  delete[] wgt; 
+  delete[] idx; 
 
   if ( ltq )
     {
-      Free(zt2); 
-      Free(zq2); 
-      Free(rh_pbl); 
-      Free(theta_pbl); 
+      delete[] zt2; 
+      delete[] zq2; 
+      delete[] rh_pbl; 
+      delete[] theta_pbl; 
     }   
 
-  if ( nvars > 0 )
-    {
-      for ( int iv = 0; iv < nvars; ++iv )
-        Free(vars_pbl[iv]);
-
-      Free(vars_pbl);
-    }
+  if ( nvars > 0 ) DELETE_2D(vars_pbl);
 #endif
 
-  Free(af1);
-  Free(bf1);
-  Free(etaf1);
-  Free(etah2);
-  Free(af2);
-  Free(bf2);
-  Free(etaf2);
-  Free(w1);
-  Free(w2);
-  Free(jl1);
-  Free(jl2);
+  delete[] af1;
+  delete[] bf1;
+  delete[] etaf1;
+  delete[] etah2;
+  delete[] af2;
+  delete[] bf2;
+  delete[] etaf2;
+  delete[] w1;
+  delete[] w2;
+  delete[] jl1;
+  delete[] jl2;
 
   return;
 }
