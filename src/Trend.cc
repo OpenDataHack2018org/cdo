@@ -99,9 +99,9 @@ void *Trend(void *argument)
 
 	  double missval  = vlistInqVarMissval(vlistID1, varID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
-	  int gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( !DBL_IS_EQUAL(field1.ptr[i], missval) )
 	      {
 		work[0][varID][levelID].ptr[i] += zj;
@@ -128,12 +128,12 @@ void *Trend(void *argument)
 
       double missval  = vlistInqVarMissval(vlistID1, varID);
       int gridID   = vlistInqVarGrid(vlistID1, varID);
-      int gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
 
       double missval1  = missval;
       double missval2  = missval;
 
-      for ( int i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
 	{
 	  temp1 = SUBMN(work[2][varID][levelID].ptr[i],
 		      DIVMN( MULMN(work[0][varID][levelID].ptr[i], work[3][varID][levelID].ptr[i]), work[4][varID][levelID].ptr[i]));
@@ -146,14 +146,14 @@ void *Trend(void *argument)
 	}
 
       nmiss = 0;
-      for ( int i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
 	if ( DBL_IS_EQUAL(field1.ptr[i], missval) ) nmiss++;
 
       pstreamDefRecord(streamID2, varID, levelID);
       pstreamWriteRecord(streamID2, field1.ptr, nmiss);
 
       nmiss = 0;
-      for ( int i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
 	if ( DBL_IS_EQUAL(field2.ptr[i], missval) ) nmiss++;
 
       pstreamDefRecord(streamID3, varID, levelID);

@@ -56,7 +56,7 @@ char *gen_param(const char *fmt, ...)
 }
 
 static
-void verify_lcc_parameter(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0, double y_0)
+void verify_lcc_parameter(double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0, double y_0)
 {
   const char *projection = "lambert_conformal_conic";
 
@@ -246,7 +246,7 @@ int cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
 
   if ( status ) cdoAbort("%s mapping parameter missing!", projection);
 
-  verify_lcc_parameter(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0);
+  verify_lcc_parameter(lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0);
 
   lcc_to_lonlat(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0, nvals, xvals, yvals);
 
@@ -325,8 +325,8 @@ bool cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int
 
   if ( atttype == CDI_DATATYPE_INT32 )
     {
-      int attint[attlen];
-      cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, attint);
+      std::vector<int> attint(attlen);
+      cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, attint.data());
       for ( int i = 0; i < attlen; ++i ) attflt[i] = (double)attint[i];
     }
   else if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )

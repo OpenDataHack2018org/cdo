@@ -13,7 +13,7 @@
  * Keywords:
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Rene Redler <rene.redler@mpimet.mpg.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *
@@ -40,11 +40,15 @@
 
 #include "grid.h"
 
+#define YAC_MAX_LOC_STR_LEN 10
+
 enum yac_location {
 
    CELL =   0,
    CORNER = 1,
    EDGE =   2,
+   LOC_UNDEFINED = 3,
+   LOC_INVALID = 4,
 };
 
 struct points {
@@ -56,9 +60,37 @@ struct points {
    struct grid * base_grid;
 
    struct grid * point_grid;
+
+   unsigned unique_id;
 };
 
+/**
+ * converts integer value into enum yac_location
+ * @param[in] location integer value containing a location
+ * @returns location as enum yac_location
+ * @remark if location does not contain a valid value,
+ *         \ref yac_internal_abort_message is called by this routine
+ */
 enum yac_location yac_get_location(int const location);
+
+/**
+ * convertes a string into a enum yac_location
+ * @param[in] location string containing a location
+ * @returns location as enum yac_location
+ * @remark if location does not contain a valid value
+ *         \ref yac_internal_abort_message is called by this routine
+ */
+enum yac_location yac_str2loc(char const * location);
+
+/**
+ * convertes a enum yac_location into a string
+ * @param[in] location location
+ * @returns pointer to location string
+ * @remark if location does not contain a valid value
+ *         \ref yac_internal_abort_message is called by this routine
+ * @remark the user is not allowed to alter or free the returned string
+ */
+char const * yac_loc2str(enum yac_location location);
 
 /**
  * initialises a struct points

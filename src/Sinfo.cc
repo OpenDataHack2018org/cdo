@@ -50,6 +50,7 @@ const char *tunit2str(int tunits)
 const char *calendar2str(int calendar)
 {
   if      ( calendar == CALENDAR_STANDARD )  return ("standard");
+  else if ( calendar == CALENDAR_GREGORIAN ) return ("gregorian");
   else if ( calendar == CALENDAR_PROLEPTIC ) return ("proleptic_gregorian");
   else if ( calendar == CALENDAR_360DAYS )   return ("360_day");
   else if ( calendar == CALENDAR_365DAYS )   return ("365_day");

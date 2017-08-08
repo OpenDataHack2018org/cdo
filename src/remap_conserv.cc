@@ -724,13 +724,13 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   size_t max_num_cell_corners = src_num_cell_corners;
   if ( tgt_num_cell_corners > max_num_cell_corners ) max_num_cell_corners = tgt_num_cell_corners;
 
-  enum yac_edge_type great_circle_type[max_num_cell_corners];
+  std::vector<enum yac_edge_type> great_circle_type(max_num_cell_corners);
   for ( size_t i = 0; i < max_num_cell_corners; ++i ) great_circle_type[i] = GREAT_CIRCLE;
 
   enum yac_edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
 
-  enum yac_edge_type *src_edge_type = great_circle_type;
-  enum yac_edge_type *tgt_edge_type = great_circle_type;
+  enum yac_edge_type *src_edge_type = great_circle_type.data();
+  enum yac_edge_type *tgt_edge_type = great_circle_type.data();
 
   enum cell_type target_cell_type = UNDEF_CELL;
 

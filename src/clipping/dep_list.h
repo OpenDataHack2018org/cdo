@@ -15,7 +15,7 @@
  * Keywords:
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Thomas Jahns <jahns@dkrz.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *

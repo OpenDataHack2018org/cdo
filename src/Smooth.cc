@@ -58,7 +58,7 @@ double smooth_knn_compute_weights(size_t num_neighbors, const bool *restrict src
   for ( size_t n = 0; n < num_neighbors; ++n )
     {
       nbr_mask[n] = false;
-      if ( nbr_add[n] >= 0 && src_grid_mask[nbr_add[n]] )
+      if ( nbr_add[n] < ULONG_MAX && src_grid_mask[nbr_add[n]] )
         {
           nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightR, search_radius);
           dist_tot += nbr_dist[n];

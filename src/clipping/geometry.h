@@ -19,7 +19,7 @@
  * Keywords:
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Rene Redler <rene.redler@mpimet.mpg.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *
@@ -74,12 +74,21 @@ struct edge {
  */
 struct bounding_circle {
 
-   //! the middle point of the spherical cap in spherical coordinates (in rad)
-   double base_point[2];
    //! the middle point of the spherical cap in cartesian coordinates (is a unit vector)
    double base_vector[3];
    //! angle between the middle point and the boundary of the spherical cap
    double inc_angle; // height >= pi -> everything
+};
+
+/**
+ * defines a spherical cap, which is used as a convex hull to describe the extents of subdomain
+ */
+struct reduced_bounding_circle {
+
+   //! the middle point of the spherical cap in cartesian coordinates (is a unit vector)
+   double base_vector[3];
+   //! cosine of angle between the middle point and the boundary of the spherical cap
+   double cos_inc_angle;
 };
 
 /** \example test_check_overlap.c
