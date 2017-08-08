@@ -37,6 +37,7 @@ public:
   void pstreamOpenReadFile(const argument_t *argument);
   void openAppend(const char * p_filename);
   void init();
+  void defVlist(int p_vlistID);
   int self; //aka the id of the pstream
   int mode;
   int m_fileID;
@@ -60,6 +61,8 @@ public:
 private:
    void createFilelist(const argument_t * p_argument);
    pstream_t();
+   void createPipeName(char *pipename, int pnlen);
+   void defVarList(int vlistID);
 #endif
 };
 

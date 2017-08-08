@@ -329,8 +329,7 @@ pstream_t::isPipe()
   return ispipe;
 }
 
-static void
-createPipeName(char *pipename, int pnlen)
+void pstream_t::createPipeName(char *pipename, int pnlen)
 {
 
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
@@ -1119,29 +1118,28 @@ pstream_t::inqVlist()
   return vlistID;
 }
 
-static void
-pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
+void pstream_t::defVarList(int p_vlistID)
 {
-  int filetype = pstreamptr->m_filetype;
+  int filetype = m_filetype;
 
-  if (pstreamptr->m_vlistID != -1)
+  if (m_vlistID != -1)
     cdoAbort("Internal problem, vlist already defined!");
 
-  if (pstreamptr->m_varlist != NULL)
+  if (m_varlist != NULL)
     cdoAbort("Internal problem, varlist already allocated!");
 
-  int nvars = vlistNvars(vlistID);
+  int nvars = vlistNvars(p_vlistID);
   assert(nvars > 0);
 
   varlist_t *varlist = (varlist_t *) Malloc(nvars * sizeof(varlist_t));
 
   for (int varID = 0; varID < nvars; ++varID)
     {
-      varlist[varID].gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      varlist[varID].datatype = vlistInqVarDatatype(vlistID, varID);
-      varlist[varID].missval = vlistInqVarMissval(vlistID, varID);
-      varlist[varID].addoffset = vlistInqVarAddoffset(vlistID, varID);
-      varlist[varID].scalefactor = vlistInqVarScalefactor(vlistID, varID);
+      varlist[varID].gridsize = gridInqSize(vlistInqVarGrid(p_vlistID, varID));
+      varlist[varID].datatype = vlistInqVarDatatype(p_vlistID, varID);
+      varlist[varID].missval = vlistInqVarMissval(p_vlistID, varID);
+      varlist[varID].addoffset = vlistInqVarAddoffset(p_vlistID, varID);
+      varlist[varID].scalefactor = vlistInqVarScalefactor(p_vlistID, varID);
 
       varlist[varID].check_datarange = false;
 
@@ -1178,66 +1176,69 @@ pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
         }
     }
 
-  pstreamptr->m_varlist = varlist;
-  pstreamptr->m_vlistID = vlistID; /* used for -r/-a */
+  m_varlist = varlist;
+  m_vlistID = p_vlistID; /* used for -r/-a */
 }
 
 void
 pstreamDefVlist(int pstreamID, int vlistID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->defVlist(vlistID);
+}
 
+void pstream_t::defVlist(int p_vlistID){
 #if defined(HAVE_LIBPTHREAD)
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
       if (PSTREAM_Debug)
-        Message("%s pstreamID %d", pstreamptr->m_name, pstreamptr->self);
-      int vlistIDcp = vlistDuplicate(vlistID);
-      /*    pipeDefVlist(pstreamptr, vlistID);*/
-      pstreamptr->pipe->pipeDefVlist(pstreamptr->m_vlistID, vlistIDcp);
+        Message("%s pstreamID %d", m_name, self);
+      int vlistIDcp = vlistDuplicate(p_vlistID);
+      /*    pipeDefVlist(pstreamptr, p_vlistID);*/
+      pipe->pipeDefVlist(m_vlistID, vlistIDcp);
     }
   else
 #endif
     {
       if (cdoDefaultDataType != CDI_UNDEFID)
         {
-          int varID, nvars = vlistNvars(vlistID);
+          int varID, nvars = vlistNvars(p_vlistID);
 
           for (varID = 0; varID < nvars; ++varID)
-            vlistDefVarDatatype(vlistID, varID, cdoDefaultDataType);
+            vlistDefVarDatatype(p_vlistID, varID, cdoDefaultDataType);
 
           if (cdoDefaultDataType == CDI_DATATYPE_FLT64 || cdoDefaultDataType == CDI_DATATYPE_FLT32)
             {
               for (varID = 0; varID < nvars; varID++)
                 {
-                  vlistDefVarAddoffset(vlistID, varID, 0.0);
-                  vlistDefVarScalefactor(vlistID, varID, 1.0);
+                  vlistDefVarAddoffset(p_vlistID, varID, 0.0);
+                  vlistDefVarScalefactor(p_vlistID, varID, 1.0);
                 }
             }
         }
 
       if (cdoChunkType != CDI_UNDEFID)
         {
-          int varID, nvars = vlistNvars(vlistID);
+          int varID, nvars = vlistNvars(p_vlistID);
 
           for (varID = 0; varID < nvars; ++varID)
-            vlistDefVarChunkType(vlistID, varID, cdoChunkType);
+            vlistDefVarChunkType(p_vlistID, varID, cdoChunkType);
         }
 
       if (CDO_CMOR_Mode)
         {
-          cdo_def_tracking_id(vlistID, "tracking_id");
-          cdo_def_creation_date(vlistID);
+          cdo_def_tracking_id(p_vlistID, "tracking_id");
+          cdo_def_creation_date(p_vlistID);
         }
 
       if (CDO_Version_Info)
-        cdiDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int) strlen(cdoComment()), cdoComment());
+        cdiDefAttTxt(p_vlistID, CDI_GLOBAL, "CDO", (int) strlen(cdoComment()), cdoComment());
 
 #if defined(_OPENMP)
       if (ompNumThreads > 1)
-        cdiDefAttInt(vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", CDI_DATATYPE_INT32, 1, &ompNumThreads);
+        cdiDefAttInt(p_vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", CDI_DATATYPE_INT32, 1, &ompNumThreads);
 #endif
-      pstreamDefVarlist(pstreamptr, vlistID);
+      defVarList(p_vlistID);
 
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_write);
@@ -1245,7 +1246,7 @@ pstreamDefVlist(int pstreamID, int vlistID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamDefVlist(pstreamptr->m_fileID, vlistID);
+      streamDefVlist(m_fileID, p_vlistID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
