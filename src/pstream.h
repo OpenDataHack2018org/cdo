@@ -50,8 +50,8 @@ public:
   int varID; /* next varID defined with streamDefVar */
   bool ispipe;
   bool isopen;
-  char *name;
-  std::vector<std::string> mfnames;
+  char* name;
+  std::vector<std::string> m_mfnames;
   varlist_t *m_varlist;
 #if defined(HAVE_LIBPTHREAD)
   void *argument;

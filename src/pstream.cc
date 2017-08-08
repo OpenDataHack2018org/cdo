@@ -494,7 +494,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
                 cdoAbort("No imput file found in %s", pch);
 
               mfiles = nfiles;
-              mfnames.resize(nfiles);
+              m_mfnames.resize(nfiles);
               rewind(fp);
 
               nfiles = 0;
@@ -503,7 +503,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
                   if (line[0] == '#' || line[0] == '\0' || line[0] == ' ')
                     continue;
 
-                  mfnames[nfiles] = line;
+                  m_mfnames[nfiles] = line;
                   nfiles++;
                 }
 
@@ -514,7 +514,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
               char line[65536];
 
               mfiles = nfiles;
-              mfnames.resize(nfiles);
+              m_mfnames.resize(nfiles);
 
               strcpy(line, pch);
               for (i = 0; i < len; i++)
@@ -527,7 +527,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
               i = 0;
               for (j = 0; j < nfiles; j++)
                 {
-                  mfnames[j] = line[i];
+                  m_mfnames[j] = line[i];
                   i += strlen(&line[i]) + 1;
                 }
             }
@@ -557,10 +557,10 @@ void pstream_t::createFilelist(const argument_t *p_argument)
           pclose(pfp);
 
           mfiles = nfiles;
-          mfnames.resize(nfiles);
+          m_mfnames.resize(nfiles);
 
           for (j = 0; j < nfiles; j++)
-            mfnames[j] = std::string(fnames[j]);
+            m_mfnames[j] = std::string(fnames[j]);
         }
     }
 }
@@ -574,7 +574,7 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
 
   if (mfiles)
     {
-      filename = mfnames[0];
+      filename = m_mfnames[0];
       nfiles = 1;
     }
   else
@@ -1631,7 +1631,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
           vlistIDold = vlistDuplicate(streamInqVlist(pstreamptr->m_fileID));
           streamClose(pstreamptr->m_fileID);
 
-          filename = pstreamptr->mfnames[nfile];
+          filename = pstreamptr->m_mfnames[nfile];
           pstreamptr->nfiles++;
 
 #if defined(HAVE_LIBPTHREAD)
