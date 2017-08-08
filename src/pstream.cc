@@ -235,7 +235,7 @@ void pstream_t::init()
   m_vlistID = -1;
   tsID = -1;
   m_filetype = -1;
-  m_name = NULL;
+  m_name = "";
   tsID0 = 0;
   mfiles = 0;
   nfiles = 0;
@@ -297,10 +297,12 @@ pstream_initialize(void)
 */
 static int pstreamFindID(const char *p_name)
 {
+    std::string cur_name;
     for(auto map_pair :  _pstream_map)
     {
-        if(map_pair.second.m_name){
-            if(strcmp(map_pair.second.m_name, p_name) == 0)
+        cur_name = map_pair.second.m_name;
+        if(!(cur_name.empty())){
+            if(cur_name.compare(p_name) == 0)
             {
                 return map_pair.first;
             }
@@ -612,8 +614,7 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
 #endif
 
   mode = 'r';
-  m_name =  (char*)Malloc(sizeof(char) * filename.size() + 1);
-  strcpy(m_name, filename.c_str());
+  m_name = filename;
   m_fileID = fileID;
 }
 
@@ -941,8 +942,7 @@ pstream_t::openAppend(const char *p_filename)
   int filetype = streamInqFiletype(fileID);
   set_comp(fileID, filetype);
 
-  m_name = (char *) Malloc(strlen(p_filename) + 1);
-  strcpy(m_name, p_filename);
+  m_name = p_filename;
   mode = 'a';
   m_fileID = fileID;
 }
@@ -1061,12 +1061,6 @@ pstreamClose(int pstreamID)
               fprintf(fp, "%s\n", pstreamptr->m_name);
               fclose(fp);
             }
-        }
-
-      if (pstreamptr->m_name)
-        {
-          Free(pstreamptr->m_name);
-          pstreamptr->m_name = NULL;
         }
 
       if (pstreamptr->m_varlist)
@@ -1660,9 +1654,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
           if (fileID < 0)
             cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
 
-          Free(pstreamptr->m_name);
-
-          strcpy(pstreamptr->m_name, filename.c_str());
+          pstreamptr->m_name = filename;
           pstreamptr->m_fileID = fileID;
 
           if (processNums() == 1 && ompNumThreads == 1)
