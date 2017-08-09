@@ -1,5 +1,5 @@
 #if defined(_OPENMP)
-#include <omp.h> // omp_get_wtime
+#include <omp.h> // omp_get_thread_num
 #endif
 
 #include "cdo.h"

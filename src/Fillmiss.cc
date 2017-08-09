@@ -19,6 +19,10 @@
    This module contains the following operators:
 
 */
+#if defined(_OPENMP)
+#include <omp.h> // omp_get_thread_num
+#endif
+
 #include <time.h> // clock()
 
 #include <cdi.h>
@@ -338,9 +342,19 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
   
-  bool nbr_mask[num_neighbors];   /* mask at nearest neighbors                   */
-  size_t nbr_add[num_neighbors];  /* source address at nearest neighbors         */
-  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
+  bool *nbr_mask;   // mask at nearest neighbors
+  size_t *nbr_add;  // source address at nearest neighbors
+  double *nbr_dist; // angular distance four nearest neighbors
+
+#if defined(_OPENMP)
+  NEW_2D(bool, nbr_mask_2, ompNumThreads, num_neighbors);
+  NEW_2D(size_t, nbr_add_2, ompNumThreads, num_neighbors);
+  NEW_2D(double, nbr_dist_2, ompNumThreads, num_neighbors);
+#else
+  nbr_mask = new bool[num_neighbors];
+  nbr_add = new size_t[num_neighbors];
+  nbr_dist = new double[num_neighbors];
+#endif
 
   clock_t start, finish;
   start = clock();
@@ -365,8 +379,11 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
   double findex = 0;
 
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(findex, mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, num_neighbors) \
+                                      shared(nbr_mask_2, nbr_add_2, nbr_dist_2) \
                                       private(nbr_mask, nbr_add, nbr_dist)
+#endif
   for ( unsigned i = 0; i < nmiss; ++i )
     {
 #if defined(_OPENMP)
@@ -374,6 +391,14 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 #endif
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/nmiss);
+
+#if defined(_OPENMP)
+      int ompthID = omp_get_thread_num();
+
+      nbr_mask = nbr_mask_2[ompthID];
+      nbr_add  = nbr_add_2[ompthID];
+      nbr_dist = nbr_dist_2[ompthID];
+#endif
 
       grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, xvals[mindex[i]], yvals[mindex[i]]);
 
@@ -396,6 +421,16 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
   finish = clock();
 
   if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+
+#if defined(_OPENMP)
+  DELETE_2D(nbr_mask_2);
+  DELETE_2D(nbr_add_2);
+  DELETE_2D(nbr_dist_2);
+#else
+  delete[] nbr_mask;
+  delete[] nbr_add;
+  delete[] nbr_dist;
+#endif
 
   if ( gs ) gridsearch_delete(gs);
 
