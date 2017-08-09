@@ -713,7 +713,6 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   fclose(new);
 #endif
 
-
 #if defined(_OPENMP)
   DELETE_2D(ph1_2);
   DELETE_2D(lnph1_2);
@@ -744,10 +743,10 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
       DELETE_2D(theta_pbl_2); 
     }   
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  if ( nvars > 0 )
     {
-      if ( nvars > 0 )
-	{
+      for ( int i = 0; i < ompNumThreads; i++ )
+        {
 	  for ( int iv = 0; iv < nvars; ++iv )
 	    Free(vars_pbl_2[i][iv]);
 	  
