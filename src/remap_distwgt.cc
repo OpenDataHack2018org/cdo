@@ -1,5 +1,5 @@
 #if defined(_OPENMP)
-#include <omp.h> // omp_get_thread_num
+#include <omp.h> // omp_get_wtime
 #endif
 
 #include "cdo.h"
@@ -380,19 +380,9 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
   for ( size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + num_neighbors*tgt_cell_add;
 
-  bool *nbr_mask;   // mask at nearest neighbors
-  size_t *nbr_add;  // source address at nearest neighbors
-  double *nbr_dist; // angular distance four nearest neighbors
-
-#if defined(_OPENMP)
-  NEW_2D(bool, nbr_mask_2, ompNumThreads, num_neighbors);
-  NEW_2D(size_t, nbr_add_2, ompNumThreads, num_neighbors);
-  NEW_2D(double, nbr_dist_2, ompNumThreads, num_neighbors);
-#else
-  nbr_mask = new bool[num_neighbors];
-  nbr_add = new size_t[num_neighbors];
-  nbr_dist = new double[num_neighbors];
-#endif
+  NEW_2D(bool, nbr_mask, ompNumThreads, num_neighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, ompNumThreads, num_neighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, ompNumThreads, num_neighbors); // angular distance four nearest neighbors
 
 #if defined(_OPENMP)
   double start = 0;
@@ -419,8 +409,7 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
-  shared(nbr_mask_2, nbr_add_2, nbr_dist_2) \
-  private(nbr_mask, nbr_add, nbr_dist)
+  shared(nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
@@ -430,13 +419,7 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
       
-#if defined(_OPENMP)
-      int ompthID = omp_get_thread_num();
-
-      nbr_mask = nbr_mask_2[ompthID];
-      nbr_add  = nbr_add_2[ompthID];
-      nbr_dist = nbr_dist_2[ompthID];
-#endif
+      int ompthID = cdo_omp_get_thread_num();
 
       weightlinks[tgt_cell_add].nlinks = 0;	
 
@@ -447,34 +430,28 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
 
       // Find nearest grid points on source grid and distances to each point
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add, nbr_dist, 
+	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add[ompthID], nbr_dist[ompthID], 
 			      plon, plat, src_grid->dims);
       else
-        grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, plon, plat);
+        grid_search_nbr(gs, num_neighbors, nbr_add[ompthID], nbr_dist[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      double dist_tot = nbr_compute_weights(num_neighbors, src_grid->mask, nbr_mask, nbr_add, nbr_dist);
+      double dist_tot = nbr_compute_weights(num_neighbors, src_grid->mask, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
 
       // Normalize weights and store the link
-      size_t nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      size_t nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
 
       for ( size_t n = 0; n < nadds; ++n )
-        if ( nbr_mask[n] ) tgt_grid->cell_frac[tgt_cell_add] = ONE;
+        if ( nbr_mask[ompthID][n] ) tgt_grid->cell_frac[tgt_cell_add] = ONE;
 
-      store_weightlinks(0, nadds, nbr_add, nbr_dist, tgt_cell_add, weightlinks);
+      store_weightlinks(0, nadds, nbr_add[ompthID], nbr_dist[ompthID], tgt_cell_add, weightlinks);
     }
 
   progressStatus(0, 1, 1);
 
-#if defined(_OPENMP)
-  DELETE_2D(nbr_mask_2);
-  DELETE_2D(nbr_add_2);
-  DELETE_2D(nbr_dist_2);
-#else
-  delete[] nbr_mask;
-  delete[] nbr_add;
-  delete[] nbr_dist;
-#endif
+  DELETE_2D(nbr_mask);
+  DELETE_2D(nbr_add);
+  DELETE_2D(nbr_dist);
 
   if ( gs ) gridsearch_delete(gs);
 
@@ -512,19 +489,9 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
   size_t ny = src_grid->dims[1];
   bool lcyclic = src_grid->is_cyclic;
 
-  bool *nbr_mask;   // mask at nearest neighbors
-  size_t *nbr_add;  // source address at nearest neighbors
-  double *nbr_dist; // angular distance four nearest neighbors
-
-#if defined(_OPENMP)
-  NEW_2D(bool, nbr_mask_2, ompNumThreads, num_neighbors);
-  NEW_2D(size_t, nbr_add_2, ompNumThreads, num_neighbors);
-  NEW_2D(double, nbr_dist_2, ompNumThreads, num_neighbors);
-#else
-  nbr_mask = new bool[num_neighbors];
-  nbr_add = new size_t[num_neighbors];
-  nbr_dist = new double[num_neighbors];
-#endif
+  NEW_2D(bool, nbr_mask, ompNumThreads, num_neighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, ompNumThreads, num_neighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, ompNumThreads, num_neighbors); // angular distance four nearest neighbors
 
 #if defined(_OPENMP)
   double start = 0;
@@ -551,9 +518,7 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(gs, num_neighbors, src_remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
-  shared(src_array, tgt_array, missval) \
-  shared(nbr_mask_2, nbr_add_2, nbr_dist_2) \
-  private(nbr_mask, nbr_add, nbr_dist)
+  shared(src_array, tgt_array, missval, nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
@@ -563,13 +528,7 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
       
-#if defined(_OPENMP)
-      int ompthID = omp_get_thread_num();
-
-      nbr_mask = nbr_mask_2[ompthID];
-      nbr_add  = nbr_add_2[ompthID];
-      nbr_dist = nbr_dist_2[ompthID];
-#endif
+      int ompthID = cdo_omp_get_thread_num();
 
       tgt_array[tgt_cell_add] = missval;
 
@@ -580,36 +539,30 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
 
       // Find nearest grid points on source grid and distances to each point
       if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add, nbr_dist, 
+	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add[ompthID], nbr_dist[ompthID], 
 			      plon, plat, src_grid->dims);
       else
-        grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, plon, plat);
+        grid_search_nbr(gs, num_neighbors, nbr_add[ompthID], nbr_dist[ompthID], plon, plat);
       
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      double dist_tot = nbr_compute_weights(num_neighbors, src_grid->mask, nbr_mask, nbr_add, nbr_dist);
+      double dist_tot = nbr_compute_weights(num_neighbors, src_grid->mask, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
 
       // Normalize weights and store the link
-      size_t nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      size_t nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
 
       for ( size_t n = 0; n < nadds; ++n )
-        if ( nbr_mask[n] ) tgt_grid->cell_frac[tgt_cell_add] = ONE;
+        if ( nbr_mask[ompthID][n] ) tgt_grid->cell_frac[tgt_cell_add] = ONE;
 
-      if ( nadds > 1 ) sort_add_and_wgts(nadds, nbr_add, nbr_dist);
+      if ( nadds > 1 ) sort_add_and_wgts(nadds, nbr_add[ompthID], nbr_dist[ompthID]);
 
-      if ( nadds ) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbr_dist, nbr_add);
+      if ( nadds ) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbr_dist[ompthID], nbr_add[ompthID]);
     }
 
   progressStatus(0, 1, 1);
 
-#if defined(_OPENMP)
-  DELETE_2D(nbr_mask_2);
-  DELETE_2D(nbr_add_2);
-  DELETE_2D(nbr_dist_2);
-#else
-  delete[] nbr_mask;
-  delete[] nbr_add;
-  delete[] nbr_dist;
-#endif
+  DELETE_2D(nbr_mask);
+  DELETE_2D(nbr_add);
+  DELETE_2D(nbr_dist);
 
   if ( gs ) gridsearch_delete(gs);
 
