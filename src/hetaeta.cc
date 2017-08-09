@@ -1,10 +1,3 @@
-#define NEW_DOUBLE_2D(P2D, N, M) { \
-      P2D = (N)?new double*[(N)]:nullptr; P2D[0] = ((N)&&(M))?new double[(N)*(M)]:nullptr; \
-      if ((N)&&(M)) for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
-#define NEW_LONG_2D(P2D, N, M) { \
-      P2D = (N)?new long*[(N)]:nullptr; P2D[0] = ((N)&&(M))?new long[(N)*(M)]:nullptr; \
-      if ((N)&&(M)) for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
-#define DELETE_2D(P2D) if (P2D) { if (P2D[0]) delete[] P2D[0]; delete[] P2D; P2D = nullptr;}
 /*
 #define  NGP    100000
 #define  OUTPUT 1
@@ -493,30 +486,30 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   long nlev2p1 = nlev2+1;
 
 #if defined(_OPENMP)
-  double **ph1_2;    NEW_DOUBLE_2D(ph1_2, ompNumThreads, nlev1p1);
-  double **lnph1_2;  NEW_DOUBLE_2D(lnph1_2, ompNumThreads, nlev1p1);
-  double **fi1_2;    NEW_DOUBLE_2D(fi1_2, ompNumThreads, nlev1p1);
+  NEW_2D(double, ph1_2, ompNumThreads, nlev1p1);
+  NEW_2D(double, lnph1_2, ompNumThreads, nlev1p1);
+  NEW_2D(double, fi1_2, ompNumThreads, nlev1p1);
 
-  double **pf1_2;    NEW_DOUBLE_2D(pf1_2, ompNumThreads, nlev1);
-  double **lnpf1_2;  NEW_DOUBLE_2D(lnpf1_2, ompNumThreads, nlev1);
-  double **tv1_2;    NEW_DOUBLE_2D(tv1_2, ompNumThreads, nlev1);
-  double **theta1_2; NEW_DOUBLE_2D(theta1_2, ompNumThreads, nlev1);
-  double **rh1_2;    NEW_DOUBLE_2D(rh1_2, ompNumThreads, nlev1);
-  double **zvar_2;   NEW_DOUBLE_2D(zvar_2, ompNumThreads, nlev1);
+  NEW_2D(double, pf1_2, ompNumThreads, nlev1);
+  NEW_2D(double, lnpf1_2, ompNumThreads, nlev1);
+  NEW_2D(double, tv1_2, ompNumThreads, nlev1);
+  NEW_2D(double, theta1_2, ompNumThreads, nlev1);
+  NEW_2D(double, rh1_2, ompNumThreads, nlev1);
+  NEW_2D(double, zvar_2, ompNumThreads, nlev1);
 
-  double **ph2_2;    NEW_DOUBLE_2D(ph2_2, ompNumThreads, nlev2p1);
-  double **lnph2_2;  NEW_DOUBLE_2D(lnph2_2, ompNumThreads, nlev2p1);
-  double **fi2_2;    NEW_DOUBLE_2D(fi2_2, ompNumThreads, nlev2p1);
+  NEW_2D(double, ph2_2, ompNumThreads, nlev2p1);
+  NEW_2D(double, lnph2_2, ompNumThreads, nlev2p1);
+  NEW_2D(double, fi2_2, ompNumThreads, nlev2p1);
 
-  double **pf2_2;    NEW_DOUBLE_2D(pf2_2, ompNumThreads, nlev2);
-  double **rh2_2;    NEW_DOUBLE_2D(rh2_2, ompNumThreads, nlev2);
-  double **wgt_2;    NEW_DOUBLE_2D(wgt_2, ompNumThreads, nlev2);
-  long **idx_2;      NEW_LONG_2D(idx_2, ompNumThreads, nlev2);
+  NEW_2D(double, pf2_2, ompNumThreads, nlev2);
+  NEW_2D(double, rh2_2, ompNumThreads, nlev2);
+  NEW_2D(double, wgt_2, ompNumThreads, nlev2);
+  NEW_2D(long, idx_2, ompNumThreads, nlev2);
 
-  double **zt2_2 = nullptr;       if ( ltq ) NEW_DOUBLE_2D(zt2_2, ompNumThreads, nlev2);
-  double **zq2_2 = nullptr;       if ( ltq ) NEW_DOUBLE_2D(zq2_2, ompNumThreads, nlev2);
-  double **rh_pbl_2 = nullptr;    if ( ltq ) NEW_DOUBLE_2D(rh_pbl_2, ompNumThreads, nlev2);
-  double **theta_pbl_2 = nullptr; if ( ltq ) NEW_DOUBLE_2D(theta_pbl_2, ompNumThreads, nlev2);
+  NEW_2D(double, zt2_2, ltq?ompNumThreads:0, nlev2);
+  NEW_2D(double, zq2_2, ltq?ompNumThreads:0, nlev2);
+  NEW_2D(double, rh_pbl_2, ltq?ompNumThreads:0, nlev2);
+  NEW_2D(double, theta_pbl_2, ltq?ompNumThreads:0, nlev2);
 
   if ( nvars > MAX_VARS )
     {
@@ -566,7 +559,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
       theta_pbl = new double[nlev2];
     }
 
-  if ( nvars > 0 ) NEW_DOUBLE_2D(vars_pbl, nvars, nlev2);
+  NEW_2D(double, vars_pbl, nvars, nlev2);
 #endif
   
   double *af1 = new double[nlev1];
@@ -693,24 +686,13 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
       wgt    = wgt_2[ompthID];
       idx    = idx_2[ompthID];
 
-      zt2       = NULL;
-      zq2       = NULL;
-      rh_pbl    = NULL;
-      theta_pbl = NULL;
+      zt2       = ltq ? zt2_2[ompthID] : NULL;
+      zq2       = ltq ? zq2_2[ompthID] : NULL;
+      rh_pbl    = ltq ? rh_pbl_2[ompthID] : NULL;
+      theta_pbl = ltq ? theta_pbl_2[ompthID] : NULL;
 
-      if ( ltq )
-	{
-	  zt2       = zt2_2[ompthID];
-	  zq2       = zq2_2[ompthID];
-	  rh_pbl    = rh_pbl_2[ompthID];
-	  theta_pbl = theta_pbl_2[ompthID];
-	}
-
-      if ( nvars > 0 )
-	{
-	  for ( int iv = 0; iv < nvars; ++iv )
-	    vars_pbl[iv] = vars_pbl_2[ompthID][iv];
-	}
+      for ( int iv = 0; iv < nvars; ++iv )
+        vars_pbl[iv] = vars_pbl_2[ompthID][iv];
 #endif
 
       if ( imiss )
@@ -764,7 +746,6 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
   for ( int i = 0; i < ompNumThreads; i++ )
     {
- 
       if ( nvars > 0 )
 	{
 	  for ( int iv = 0; iv < nvars; ++iv )
