@@ -43,25 +43,25 @@ void remap_set_threshhold(double threshhold)
     accurately.
 */
 static
-void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon, int *lcoinc,
-		       int *lthresh, double beglat, double beglon, double endlat, double endlon,
-		       double *begseg, int lrevers,
+void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon, bool *lcoinc,
+		       bool *lthresh, double beglat, double beglon, double endlat, double endlon,
+		       double *begseg, bool lrevers,
 		       long num_srch_cells, long srch_corners, const size_t *restrict srch_add,
 		       const double *restrict srch_corner_lat, const double *restrict srch_corner_lon,
-		       int *luse_last, double *intrsct_x, double *intrsct_y,
+		       bool *luse_last, double *intrsct_x, double *intrsct_y,
 		       int *avoid_pole_count, double *avoid_pole_offset)
 {
   /*
     Intent(in): 
     double beglat, beglon,  ! beginning lat/lon endpoints for segment
     double endlat, endlon   ! ending    lat/lon endpoints for segment
-    int    lrevers          ! flag true if segment integrated in reverse
+    bool   lrevers          ! flag true if segment integrated in reverse
 
     Intent(inout) :
     double begseg[2] ! begin lat/lon of full segment
     int *location    ! address in destination array containing this
                      ! segment -- also may contain last location on entry
-    int *lthresh     ! flag segment crossing threshold boundary
+    bool *lthresh    ! flag segment crossing threshold boundary
 
     intent(out): 
     *int lcoinc      ! flag segment coincident with grid line
@@ -94,7 +94,7 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
   /* Initialize defaults, flags, etc. */
 
   if ( ! *lthresh ) *location = -1;
-  *lcoinc      = FALSE;
+  *lcoinc      = false;
   *intrsct_lat = endlat;
   *intrsct_lon = endlon;
 
@@ -126,7 +126,7 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
     {
       x1 = rns*TWO*sin(pi4 - HALF*beglat)*cos(beglon);
       y1 =     TWO*sin(pi4 - HALF*beglat)*sin(beglon);
-      *luse_last = TRUE;
+      *luse_last = true;
     }
 
   x2 = rns*TWO*sin(pi4 - HALF*endlat)*cos(endlon);
@@ -222,7 +222,7 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 
 		  if ( IS_EQUAL(cross_product, 0) )
 		    {
-		      *lcoinc = TRUE;
+		      *lcoinc = true;
 		      cross_product = vec1_x*vec2_x + vec1_y*vec2_y;
 		      if ( lrevers ) cross_product = -cross_product;
 		    }
@@ -277,7 +277,7 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 	{
           Free(srch_corner_y);
           Free(srch_corner_x);
-          *luse_last = FALSE;
+          *luse_last = false;
           return;
 	}
     } /* srch_loop */
@@ -453,7 +453,7 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
         }
 
       *avoid_pole_count = *avoid_pole_count + 1;
-      *luse_last = FALSE;
+      *luse_last = false;
     }
   else
     {
@@ -471,7 +471,7 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
   if ( *lthresh )
     {
       if ( *intrsct_lat > north_thresh || *intrsct_lat < south_thresh )
-	*lthresh = FALSE;
+	*lthresh = false;
     }
   else if ( beglat > ZERO && *intrsct_lat < north_thresh )
     {
@@ -482,8 +482,8 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
       *intrsct_lat = north_thresh - TINY;
       s1 = (north_thresh - begseg[0])/mat4;
       *intrsct_lon = begseg[1] + s1*mat3;
-      *luse_last = FALSE;
-      *lthresh = TRUE;
+      *luse_last = false;
+      *lthresh = true;
     }
   else if ( beglat < ZERO && *intrsct_lat > south_thresh )
     {
@@ -494,13 +494,13 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
       *intrsct_lat = south_thresh + TINY;
       s1 = (south_thresh - begseg[0])/mat4;
       *intrsct_lon = begseg[1] + s1*mat3;
-      *luse_last = FALSE;
-      *lthresh = TRUE;
+      *luse_last = false;
+      *lthresh = true;
     }
 
   /* If reached end of segment, do not use x,y intersect on next entry */
 
-  if ( IS_EQUAL(*intrsct_lat, endlat) && IS_EQUAL(*intrsct_lon, endlon) ) *luse_last = FALSE;
+  if ( IS_EQUAL(*intrsct_lat, endlat) && IS_EQUAL(*intrsct_lon, endlon) ) *luse_last = false;
 
 }  /* pole_intersection */
 
@@ -512,19 +512,19 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
    have already been restricted in the calling routine.
 */
 static
-void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int *lcoinc,
+void intersection(long *location, double *intrsct_lat, double *intrsct_lon, bool *lcoinc,
 		  double beglat, double beglon, double endlat, double endlon, double *begseg,
-		  int lbegin, int lrevers,
+		  bool lbegin, bool lrevers,
 		  long num_srch_cells, long srch_corners, const size_t *restrict srch_add,
 		  const double *restrict srch_corner_lat, const double *restrict srch_corner_lon,
-		  int *last_loc, int *lthresh, double *intrsct_lat_off, double *intrsct_lon_off,
-		  int *luse_last, double *intrsct_x, double *intrsct_y,
+		  long *last_loc, bool *lthresh, double *intrsct_lat_off, double *intrsct_lon_off,
+		  bool *luse_last, double *intrsct_x, double *intrsct_y,
 		  int *avoid_pole_count, double *avoid_pole_offset)
 {
   /*
     Intent(in): 
-    int lbegin,             ! flag for first integration along this segment
-    int lrevers             ! flag whether segment integrated in reverse
+    bool lbegin,            ! flag for first integration along this segment
+    bool lrevers            ! flag whether segment integrated in reverse
     double beglat, beglon,  ! beginning lat/lon endpoints for segment
     double endlat, endlon   ! ending    lat/lon endpoints for segment
 
@@ -533,7 +533,7 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
 
     intent(out): 
     int *location           ! address in destination array containing this segment
-    int *lcoinc             ! flag segments which are entirely coincident with a grid line
+    bool *lcoinc            ! flag segments which are entirely coincident with a grid line
     double *intrsct_lat, *intrsct_lon ! lat/lon coords of next intersect.
   */
   /* Local variables */
@@ -556,7 +556,7 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
   /* Initialize defaults, flags, etc. */
 
   *location    = -1;
-  *lcoinc      = FALSE;
+  *lcoinc      = false;
   *intrsct_lat = endlat;
   *intrsct_lon = endlon;
 
@@ -688,7 +688,7 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
 
 		  if ( IS_EQUAL(cross_product, 0) )
 		    {
-		      *lcoinc = TRUE;
+		      *lcoinc = true;
 		      cross_product = vec1_lon*vec2_lon + vec1_lat*vec2_lat;
 		      if ( lrevers ) cross_product = -cross_product;
 		    }
@@ -873,7 +873,7 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
   if ( *lthresh )
     {
       if ( *intrsct_lat < north_thresh || *intrsct_lat > south_thresh )
-	*lthresh = FALSE;
+	*lthresh = false;
     }
   else if ( lat1 > ZERO && *intrsct_lat > north_thresh )
     {
@@ -883,7 +883,7 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
       *intrsct_lon     = begseg[1] + s1*mat3;
       *intrsct_lon_off = begseg[1] + (s1+eps)*mat3;
       *last_loc = *location;
-      *lthresh = TRUE;
+      *lthresh = true;
     }
   else if ( lat1 < ZERO && *intrsct_lat < south_thresh )
     {
@@ -893,7 +893,7 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
       *intrsct_lon     = begseg[1] + s1*mat3;
       *intrsct_lon_off = begseg[1] + (s1+eps)*mat3;
       *last_loc = *location;
-      *lthresh = TRUE;
+      *lthresh = true;
     }
 
 }  /* intersection */
@@ -1221,58 +1221,17 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 {
   /* local variables */
 
-  int lcheck = TRUE;
+  bool lcheck = true;
 
-  long ioffset;
   long max_subseg = 100000; /* max number of subsegments per segment to prevent infinite loop */
                             /* 1000 is too small!!! */
-  long src_grid_size;
-  long tgt_grid_size;
-  long src_cell_add;       /* current linear address for source grid cell   */
-  long tgt_cell_add;       /* current linear address for target grid cell   */
-  long n, k;            /* generic counters                        */
-  long corner;          /* corner of cell that segment starts from */
-  long next_corn;       /* corner of cell that segment ends on     */
-  long nbins, num_links;
-  long num_subseg;      /* number of subsegments                   */
 
-  int lcoinc;           /* flag for coincident segments            */
-  int lrevers;          /* flag for reversing direction of segment */
-  int lbegin;           /* flag for first integration of a segment */
-
-  double intrsct_lat, intrsct_lon;         /* lat/lon of next intersect  */
-  double beglat, endlat, beglon, endlon;   /* endpoints of current seg.  */
-  double norm_factor = 0;                  /* factor for normalizing wts */
-
-  double begseg[2];         /* begin lat/lon for full segment */
-  double weights[6];        /* local wgt array */
-  long    num_wts;
-
-  long    max_srch_cells;   /* num cells in restricted search arrays  */
-  long    num_srch_cells;   /* num cells in restricted search arrays  */
-  long    srch_corners;     /* num of corners of srch cells           */
-  long    nsrch_corners;
-  size_t*    srch_add;         /* global address of cells in srch arrays */
-  std::vector<size_t *> srch_add2(ompNumThreads);
-  int     i;
-  double *srch_corner_lat;  /* lat of each corner of srch cells */
-  double *srch_corner_lon;  /* lon of each corner of srch cells */
-
-  long *link_add1[2];        /* min,max link add to restrict search */
-  long *link_add2[2];        /* min,max link add to restrict search */
-
-  /* Intersection */
-  int last_loc = -1;        /* save location when crossing threshold  */
-  int lthresh = FALSE;      /* flags segments crossing threshold bndy */
-  double intrsct_lat_off = 0, intrsct_lon_off = 0; /* lat/lon coords offset for next search */
+  long srch_corners;      /* num of corners of srch cells           */
+  long i;
 
   /* Pole_intersection */
   /* Save last intersection to avoid roundoff during coord transformation */
-  int luse_last = FALSE;
-  double intrsct_x, intrsct_y;      /* x,y for intersection */
   /* Variables necessary if segment manages to hit pole */
-  int avoid_pole_count = 0;         /* count attempts to avoid pole  */
-  double avoid_pole_offset = TINY;  /* endpoint offset to avoid pole */
   grid_store_t *grid_store = NULL;
   double findex = 0;
   extern int timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
@@ -1281,8 +1240,8 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   progressInit();
 
-  nbins = src_grid->num_srch_bins;
-  num_wts = rv->num_wts;
+  long nbins = src_grid->num_srch_bins;
+  long num_wts = rv->num_wts;
 
   if ( remap_store_link_fast )
     {
@@ -1298,12 +1257,14 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( cdoTimer ) timer_start(timer_remap_con);
 
-  src_grid_size = src_grid->size;
-  tgt_grid_size = tgt_grid->size;
+  long src_grid_size = src_grid->size;
+  long tgt_grid_size = tgt_grid->size;
 
   long src_num_cell_corners = src_grid->num_cell_corners;
   long tgt_num_cell_corners = tgt_grid->num_cell_corners;
 
+  long *link_add1[2];  // min,max link add to restrict search
+  long *link_add2[2];  // min,max link add to restrict search
   if ( ! remap_store_link_fast )
     {
       link_add1[0] = (long*) Malloc(src_grid_size*sizeof(long));
@@ -1314,7 +1275,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 #if defined(SX)
 #pragma vdir nodep
 #endif
-      for ( n = 0; n < src_grid_size; ++n )
+      for ( long n = 0; n < src_grid_size; ++n )
 	{
 	  link_add1[0][n] = -1;
 	  link_add1[1][n] = -1;
@@ -1323,7 +1284,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 #if defined(SX)
 #pragma vdir nodep
 #endif
-      for ( n = 0; n < tgt_grid_size; ++n )
+      for ( long n = 0; n < tgt_grid_size; ++n )
 	{
 	  link_add2[0][n] = -1;
 	  link_add2[1][n] = -1;
@@ -1337,35 +1298,33 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   double *tgt_centroid_lat = (double*) Malloc(tgt_grid_size*sizeof(double));
   double *tgt_centroid_lon = (double*) Malloc(tgt_grid_size*sizeof(double));
 
-  for ( n = 0; n < src_grid_size; ++n )
+  for ( long n = 0; n < src_grid_size; ++n )
     {
       src_centroid_lat[n] = 0;
       src_centroid_lon[n] = 0;
     }
 
-  for ( n = 0; n < tgt_grid_size; ++n )
+  for ( long n = 0; n < tgt_grid_size; ++n )
     {
       tgt_centroid_lat[n] = 0;
       tgt_centroid_lon[n] = 0;
     }
 
-  std::vector<double *> srch_corner_lat2(ompNumThreads);
-  std::vector<double *> srch_corner_lon2(ompNumThreads);
-  std::vector<long> max_srch_cells2(ompNumThreads);
+  std::vector<double *> srch_corner_lat(ompNumThreads); // lat of each corner of srch cells
+  std::vector<double *> srch_corner_lon(ompNumThreads); // lon of each corner of srch cells
+  std::vector<long> max_srch_cells(ompNumThreads);      // num cells in restricted search arrays
 
   /*  Integrate around each cell on source grid */
 
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      srch_corner_lat2[i] = NULL;
-      srch_corner_lon2[i] = NULL;
+      srch_corner_lat[i] = NULL;
+      srch_corner_lon[i] = NULL;
+      max_srch_cells[i] = 0;
     }
 
-  for ( i = 0; i < ompNumThreads; ++i )
-    max_srch_cells2[i] = 0;
-
-  for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (size_t*) Malloc(tgt_grid_size*sizeof(size_t));
+  std::vector<size_t *> srch_add(ompNumThreads);  // global address of cells in srch arrays
+  for ( i = 0; i < ompNumThreads; ++i ) srch_add[i] = new size_t[tgt_grid_size];
 
   srch_corners = tgt_num_cell_corners;
 
@@ -1375,15 +1334,10 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 #pragma omp parallel for default(none) \
   shared(nbins, num_wts, src_centroid_lon, src_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
-	 srch_corner_lat2, srch_corner_lon2, max_srch_cells2, 		\
-	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
-  private(srch_add, n, k, num_srch_cells, max_srch_cells, 	\
-	  src_cell_add, tgt_cell_add, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
-	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
-	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
-	  last_loc, lcoinc, lthresh, luse_last, avoid_pole_count, avoid_pole_offset)
+	 srch_corner_lat, srch_corner_lon, max_srch_cells, 		\
+	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add, findex)
 #endif
-  for ( src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add )
+  for ( long src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add )
     {
       int ompthID = cdo_omp_get_thread_num();
 
@@ -1393,66 +1347,59 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       findex++;
       if ( ompthID == 0 ) progressStatus(0, 0.5, findex/src_grid_size);
 
-      srch_add = srch_add2[ompthID];
+      bool lcoinc;                     // flag for coincident segments
+      bool lthresh   = false;
+      bool luse_last = false;
+      int avoid_pole_count  = 0;       // count attempts to avoid pole
+      double avoid_pole_offset = TINY; // endpoint offset to avoid pole
+      double intrsct_lat, intrsct_lon; // lat/lon of next intersect
+      double intrsct_lat_off = 0, intrsct_lon_off = 0; // lat/lon coords offset for next search
+      double intrsct_x, intrsct_y;     // x,y for intersection
+      long last_loc = -1;              // save location when crossing threshold
+      long tgt_cell_add;
 
-      lthresh   = FALSE;
-      luse_last = FALSE;
-      avoid_pole_count  = 0;
-      avoid_pole_offset = TINY;
-
-      /* Get search cells */
-      num_srch_cells = get_srch_cells(src_cell_add, nbins, src_grid->bin_addr, tgt_grid->bin_addr,
-				      src_grid->cell_bound_box+src_cell_add*4, tgt_grid->cell_bound_box, tgt_grid_size, srch_add);
+      // Get search cells
+      long num_srch_cells = get_srch_cells(src_cell_add, nbins, src_grid->bin_addr, tgt_grid->bin_addr,
+                                           src_grid->cell_bound_box+src_cell_add*4, tgt_grid->cell_bound_box, tgt_grid_size, srch_add[ompthID]);
 
       if ( num_srch_cells == 0 ) continue;
 
-      /* Create search arrays */
-
-      max_srch_cells  = max_srch_cells2[ompthID];
-      srch_corner_lat = srch_corner_lat2[ompthID];
-      srch_corner_lon = srch_corner_lon2[ompthID];
-
-      if ( num_srch_cells > max_srch_cells )
+      // Create search arrays
+      if ( num_srch_cells > max_srch_cells[ompthID] )
 	{
-          srch_corner_lat = (double*) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
-	  srch_corner_lon = (double*) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
-
-	  max_srch_cells  = num_srch_cells;
-
-	  max_srch_cells2[ompthID]  = max_srch_cells;
-	  srch_corner_lat2[ompthID] = srch_corner_lat;
-	  srch_corner_lon2[ompthID] = srch_corner_lon;
+          srch_corner_lat[ompthID] = (double*) realloc(srch_corner_lat[ompthID], srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon[ompthID] = (double*) realloc(srch_corner_lon[ompthID], srch_corners*num_srch_cells*sizeof(double));
+	  max_srch_cells[ompthID]  = num_srch_cells;
 	}
 
-      /* gather1 */
-      for ( n = 0; n < num_srch_cells; ++n )
+      // gather1
+      long ioffset;
+      for ( long n = 0; n < num_srch_cells; ++n )
 	{
-	  tgt_cell_add = srch_add[n];
+	  tgt_cell_add = srch_add[ompthID][n];
 	  ioffset = tgt_cell_add*srch_corners;
 
-	  nsrch_corners = n*srch_corners;
-	  for ( k = 0; k < srch_corners; k++ )
+	  long nsrch_corners = n*srch_corners;
+	  for ( long k = 0; k < srch_corners; k++ )
 	    {
-	      srch_corner_lat[nsrch_corners+k] = tgt_grid->cell_corner_lat[ioffset+k];
-	      srch_corner_lon[nsrch_corners+k] = tgt_grid->cell_corner_lon[ioffset+k];
+	      srch_corner_lat[ompthID][nsrch_corners+k] = tgt_grid->cell_corner_lat[ioffset+k];
+	      srch_corner_lon[ompthID][nsrch_corners+k] = tgt_grid->cell_corner_lon[ioffset+k];
 	    }
 	}
 
-      /* Integrate around this cell */
-
+      // Integrate around this cell
       ioffset = src_cell_add*src_num_cell_corners;
-
-      for ( corner = 0; corner < src_num_cell_corners; ++corner )
+      for ( long corner = 0; corner < src_num_cell_corners; ++corner )
 	{
-          next_corn = (corner+1)%src_num_cell_corners;
+          long next_corn = (corner+1)%src_num_cell_corners;
 
           /* Define endpoints of the current segment */
 
-          beglat = src_grid->cell_corner_lat[ioffset+corner];
-          beglon = src_grid->cell_corner_lon[ioffset+corner];
-          endlat = src_grid->cell_corner_lat[ioffset+next_corn];
-          endlon = src_grid->cell_corner_lon[ioffset+next_corn];
-          lrevers = FALSE;
+          double beglat = src_grid->cell_corner_lat[ioffset+corner];
+          double beglon = src_grid->cell_corner_lon[ioffset+corner];
+          double endlat = src_grid->cell_corner_lat[ioffset+next_corn];
+          double endlon = src_grid->cell_corner_lon[ioffset+next_corn];
+          bool lrevers = false;
 
 	  /*  To ensure exact path taken during both sweeps, always integrate segments in the same direction (SW to NE). */
           if ( (endlat < beglat) || (IS_EQUAL(endlat, beglat) && endlon < beglon) )
@@ -1461,7 +1408,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      beglon = src_grid->cell_corner_lon[ioffset+next_corn];
 	      endlat = src_grid->cell_corner_lat[ioffset+corner];
 	      endlon = src_grid->cell_corner_lon[ioffset+corner];
-	      lrevers = TRUE;
+	      lrevers = true;
 	    }
 
           /*
@@ -1470,11 +1417,13 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
           */
           if ( IS_EQUAL(endlon, beglon) ) continue;
 
+          double weights[6];        // local wgt array
+          double begseg[2];         // begin lat/lon for full segment
           begseg[0] = beglat;
           begseg[1] = beglon;
-          lbegin = TRUE;
+          bool lbegin = true;
 
-	  num_subseg = 0;
+	  long num_subseg = 0;
 	  /*
 	    Integrate along this segment, detecting intersections 
 	    and computing the line integral for each sub-segment
@@ -1504,13 +1453,13 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      intersection(&tgt_cell_add, &intrsct_lat, &intrsct_lon, &lcoinc,
 			   beglat, beglon, endlat, endlon, begseg, 
 			   lbegin, lrevers,
-			   num_srch_cells, srch_corners, srch_add,
-			   srch_corner_lat, srch_corner_lon,
+			   num_srch_cells, srch_corners, srch_add[ompthID],
+			   srch_corner_lat[ompthID], srch_corner_lon[ompthID],
 			   &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off,
 			   &luse_last, &intrsct_x, &intrsct_y,
 			   &avoid_pole_count, &avoid_pole_offset);
 
-	      lbegin = FALSE;
+	      lbegin = false;
 
 	      /* Compute line integral for this subsegment. */
 
@@ -1523,7 +1472,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
 	      /* If integrating in reverse order, change sign of weights */
 
-	      if ( lrevers ) for ( k = 0; k < 6; ++k ) weights[k] = -weights[k];
+	      if ( lrevers ) for ( long k = 0; k < 6; ++k ) weights[k] = -weights[k];
 
 	      /*
 		Store the appropriate addresses and weights. 
@@ -1564,31 +1513,25 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      free(srch_corner_lon2[i]);
-      free(srch_corner_lat2[i]);
+      free(srch_corner_lon[i]);
+      free(srch_corner_lat[i]);
     }
 
-  for ( i = 0; i < ompNumThreads; ++i )
-    Free(srch_add2[i]);
+  for ( i = 0; i < ompNumThreads; ++i ) delete[] srch_add[i];
 
   /* Integrate around each cell on target grid */
 
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      srch_corner_lat2[i] = NULL;
-      srch_corner_lon2[i] = NULL;
+      srch_corner_lat[i] = NULL;
+      srch_corner_lon[i] = NULL;
     }
 
-  for ( i = 0; i < ompNumThreads; ++i )
-    max_srch_cells2[i] = 0;
+  for ( i = 0; i < ompNumThreads; ++i ) max_srch_cells[i] = 0;
 
-  for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (size_t*) Malloc(src_grid_size*sizeof(size_t));
+  for ( i = 0; i < ompNumThreads; ++i ) srch_add[i] = new size_t[src_grid_size];
 
-  srch_corners    = src_num_cell_corners;
-  max_srch_cells  = 0;
-  srch_corner_lat = NULL;
-  srch_corner_lon = NULL;
+  srch_corners  = src_num_cell_corners;
 
   if ( cdoTimer ) timer_start(timer_remap_con_l2);
 
@@ -1598,15 +1541,10 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 #pragma omp parallel for default(none) \
   shared(nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
-	 srch_corner_lat2, srch_corner_lon2, max_srch_cells2, 		\
-	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
-  private(srch_add, n, k, num_srch_cells, max_srch_cells,	\
-	  src_cell_add, tgt_cell_add, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
-	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
-	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
-	  last_loc, lcoinc, lthresh, luse_last, avoid_pole_count, avoid_pole_offset)
+	 srch_corner_lat, srch_corner_lon, max_srch_cells, 		\
+	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add, findex)
 #endif
-  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       int ompthID = cdo_omp_get_thread_num();
 
@@ -1616,66 +1554,58 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       findex++;
       if ( ompthID == 0 ) progressStatus(0.5, 0.5, findex/tgt_grid_size);
 
-      srch_add = srch_add2[ompthID];
+      bool lcoinc;                     // flag for coincident segments
+      bool lthresh   = false;
+      bool luse_last = false;
+      int avoid_pole_count  = 0;       // count attempts to avoid pole
+      double avoid_pole_offset = TINY; // endpoint offset to avoid pole
+      double intrsct_lat, intrsct_lon; // lat/lon of next intersect
+      double intrsct_lat_off = 0, intrsct_lon_off = 0; // lat/lon coords offset for next search
+      double intrsct_x, intrsct_y;     // x,y for intersection
+      long last_loc = -1;              // save location when crossing threshold
+      long src_cell_add;
 
-      lthresh   = FALSE;
-      luse_last = FALSE;
-      avoid_pole_count  = 0;
-      avoid_pole_offset = TINY;
-
-      /* Get search cells */
-      num_srch_cells = get_srch_cells(tgt_cell_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
-				      tgt_grid->cell_bound_box+tgt_cell_add*4, src_grid->cell_bound_box, src_grid_size, srch_add);
+      // Get search cells
+      long num_srch_cells = get_srch_cells(tgt_cell_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
+                                           tgt_grid->cell_bound_box+tgt_cell_add*4, src_grid->cell_bound_box, src_grid_size, srch_add[ompthID]);
 
       if ( num_srch_cells == 0 ) continue;
 
-      /* Create search arrays */
-      
-      max_srch_cells  = max_srch_cells2[ompthID];
-      srch_corner_lat = srch_corner_lat2[ompthID];
-      srch_corner_lon = srch_corner_lon2[ompthID];
-
-      if ( num_srch_cells > max_srch_cells )
+      // Create search arrays
+      if ( num_srch_cells > max_srch_cells[ompthID] )
 	{
-	  srch_corner_lat = (double*) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
-	  srch_corner_lon = (double*) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
-
-	  max_srch_cells  = num_srch_cells;
-
-	  max_srch_cells2[ompthID]  = max_srch_cells;
-	  srch_corner_lat2[ompthID] = srch_corner_lat;
-	  srch_corner_lon2[ompthID] = srch_corner_lon;
+	  srch_corner_lat[ompthID] = (double*) realloc(srch_corner_lat[ompthID], srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon[ompthID] = (double*) realloc(srch_corner_lon[ompthID], srch_corners*num_srch_cells*sizeof(double));
+	  max_srch_cells[ompthID]  = num_srch_cells;
 	}
 
-      /* gather2 */
-      for ( n = 0; n < num_srch_cells; ++n )
+      // gather2
+      long ioffset;
+      for ( long n = 0; n < num_srch_cells; ++n )
 	{
-	  src_cell_add = srch_add[n];
+	  src_cell_add = srch_add[ompthID][n];
 	  ioffset = src_cell_add*srch_corners;
 
-	  nsrch_corners = n*srch_corners;
-	  for ( k = 0; k < srch_corners; ++k )
+	  long nsrch_corners = n*srch_corners;
+	  for ( long k = 0; k < srch_corners; ++k )
 	    {
-	      srch_corner_lat[nsrch_corners+k] = src_grid->cell_corner_lat[ioffset+k];
-	      srch_corner_lon[nsrch_corners+k] = src_grid->cell_corner_lon[ioffset+k];
+	      srch_corner_lat[ompthID][nsrch_corners+k] = src_grid->cell_corner_lat[ioffset+k];
+	      srch_corner_lon[ompthID][nsrch_corners+k] = src_grid->cell_corner_lon[ioffset+k];
 	    }
 	}
 
-      /* Integrate around this cell */
-
+      // Integrate around this cell
       ioffset = tgt_cell_add*tgt_num_cell_corners;
-
-      for ( corner = 0; corner < tgt_num_cell_corners; ++corner )
+      for ( long corner = 0; corner < tgt_num_cell_corners; ++corner )
 	{
-          next_corn = (corner+1)%tgt_num_cell_corners;
+          long next_corn = (corner+1)%tgt_num_cell_corners;
 
           /* Define endpoints of the current segment */
-
-          beglat = tgt_grid->cell_corner_lat[ioffset+corner];
-          beglon = tgt_grid->cell_corner_lon[ioffset+corner];
-          endlat = tgt_grid->cell_corner_lat[ioffset+next_corn];
-          endlon = tgt_grid->cell_corner_lon[ioffset+next_corn];
-          lrevers = FALSE;
+          double beglat = tgt_grid->cell_corner_lat[ioffset+corner];
+          double beglon = tgt_grid->cell_corner_lon[ioffset+corner];
+          double endlat = tgt_grid->cell_corner_lat[ioffset+next_corn];
+          double endlon = tgt_grid->cell_corner_lon[ioffset+next_corn];
+          bool lrevers = false;
 
 	  /* To ensure exact path taken during both sweeps, always integrate in the same direction */
           if ( (endlat < beglat) || (IS_EQUAL(endlat, beglat) && endlon < beglon) )
@@ -1684,7 +1614,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      beglon = tgt_grid->cell_corner_lon[ioffset+next_corn];
 	      endlat = tgt_grid->cell_corner_lat[ioffset+corner];
 	      endlon = tgt_grid->cell_corner_lon[ioffset+corner];
-	      lrevers = TRUE;
+	      lrevers = true;
 	    }
 
           /*
@@ -1693,11 +1623,13 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
           */
           if ( IS_EQUAL(endlon, beglon) ) continue;
 
+          double weights[6];        // local wgt array
+          double begseg[2];         // begin lat/lon for full segment
           begseg[0] = beglat;
           begseg[1] = beglon;
-          lbegin = TRUE;
+          bool lbegin = true;
 
-	  num_subseg = 0;
+	  long num_subseg = 0;
 	  /*
 	    Integrate along this segment, detecting intersections 
 	    and computing the line integral for each sub-segment
@@ -1727,13 +1659,13 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      intersection(&src_cell_add, &intrsct_lat, &intrsct_lon, &lcoinc,
 			   beglat, beglon, endlat, endlon, begseg,
 			   lbegin, lrevers,
-			   num_srch_cells, srch_corners, srch_add,
-			   srch_corner_lat, srch_corner_lon,
+			   num_srch_cells, srch_corners, srch_add[ompthID],
+			   srch_corner_lat[ompthID], srch_corner_lon[ompthID],
 			   &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off,
 			   &luse_last, &intrsct_x, &intrsct_y,
 			   &avoid_pole_count, &avoid_pole_offset);
 
-	      lbegin = FALSE;
+	      lbegin = false;
 
 	      /* Compute line integral for this subsegment. */
 
@@ -1746,7 +1678,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
 	      /* If integrating in reverse order, change sign of weights */
 
-	      if ( lrevers ) for ( k = 0; k < 6; ++k ) weights[k] = -weights[k];
+	      if ( lrevers ) for ( long k = 0; k < 6; ++k ) weights[k] = -weights[k];
 
 	      /*
 		Store the appropriate addresses and weights. 
@@ -1790,12 +1722,11 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      free(srch_corner_lon2[i]);
-      free(srch_corner_lat2[i]);
+      free(srch_corner_lon[i]);
+      free(srch_corner_lat[i]);
     }
 
-  for ( i = 0; i < ompNumThreads; ++i )
-    Free(srch_add2[i]);
+  for ( i = 0; i < ompNumThreads; ++i ) delete[] srch_add[i];
 
   /*
      Correct for situations where N/S pole not explicitly included in
@@ -1818,14 +1749,14 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   /* Finish centroid computation */
 
-  for ( n = 0; n < src_grid_size; ++n )
+  for ( long n = 0; n < src_grid_size; ++n )
     if ( IS_NOT_EQUAL(src_grid->cell_area[n], 0) )
       {
         src_centroid_lat[n] /= src_grid->cell_area[n];
         src_centroid_lon[n] /= src_grid->cell_area[n];
       }
 
-  for ( n = 0; n < tgt_grid_size; ++n )
+  for ( long n = 0; n < tgt_grid_size; ++n )
     if ( IS_NOT_EQUAL(tgt_grid->cell_area[n], 0) )
       {
         tgt_centroid_lat[n] /= tgt_grid->cell_area[n];
@@ -1840,10 +1771,10 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       num_links = rv->num_links;
 
       if ( cdoVerbose )
-	for ( n = 0; n < num_links; n++ )
+	for ( long n = 0; n < num_links; n++ )
 	  printf("wts1: %d %g\n", n, rv->wts[3*n]);
 
-      for ( n = 0; n < num_links; n++ )
+      for ( long n = 0; n < num_links; n++ )
 	{
 	  if ( rv->wts[3*n] < 0 )
 	    {
@@ -1875,15 +1806,15 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   /* Include centroids in weights and normalize using destination area if requested */
   normalize_weights(tgt_grid, rv, src_centroid_lat, src_centroid_lon);
 
-  num_links = rv->num_links;
+  long num_links = rv->num_links;
 
   if ( cdoVerbose )
     cdoPrint("Total number of links = %zu", rv->num_links);
 
-  for ( n = 0; n < src_grid_size; ++n )
+  for ( long n = 0; n < src_grid_size; ++n )
     if ( IS_NOT_EQUAL(src_grid->cell_area[n], 0) ) src_grid->cell_frac[n] /= src_grid->cell_area[n];
 
-  for ( n = 0; n < tgt_grid_size; ++n )
+  for ( long n = 0; n < tgt_grid_size; ++n )
     if ( IS_NOT_EQUAL(tgt_grid->cell_area[n], 0) ) tgt_grid->cell_frac[n] /= tgt_grid->cell_area[n];
 
   /* Perform some error checking on final weights  */
@@ -1893,7 +1824,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
       remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
 
-      for ( n = 0; n < src_grid_size; ++n )
+      for ( long n = 0; n < src_grid_size; ++n )
 	{
 	  if ( src_centroid_lat[n] < -PIH-.01 || src_centroid_lat[n] > PIH+.01 )
 	    cdoPrint("Source grid centroid lat error: %d %g", n, src_centroid_lat[n]);
@@ -1902,7 +1833,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	  src_centroid_lon[n] = 0;
 	}
 
-      for ( n = 0; n < tgt_grid_size; ++n )
+      for ( long n = 0; n < tgt_grid_size; ++n )
 	{
 	  if ( tgt_centroid_lat[n] < -PIH-.01 || tgt_centroid_lat[n] > PIH+.01 )
 	    cdoPrint("Target grid centroid lat error: %d %g", n, tgt_centroid_lat[n]);
@@ -1913,14 +1844,15 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
       remapCheckWeights(num_links, 3, rv->norm_opt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
 
-      for ( n = 0; n < num_links; ++n )
+      for ( long n = 0; n < num_links; ++n )
 	{
-	  tgt_cell_add = rv->tgt_cell_add[n];
+	  long tgt_cell_add = rv->tgt_cell_add[n];
 	  tgt_centroid_lat[tgt_cell_add] += rv->wts[3*n];
 	}
 
       /* 2012-01-24 Uwe Schulzweida: changed [tgt_cell_add] to [n] (bug fix) */
-      for ( n = 0; n < tgt_grid_size; ++n )
+      double norm_factor = 0;    // factor for normalizing wts
+      for ( long n = 0; n < tgt_grid_size; ++n )
 	{
 	  if ( rv->norm_opt == NORM_OPT_DESTAREA )
 	    norm_factor = tgt_grid->cell_frac[n];
