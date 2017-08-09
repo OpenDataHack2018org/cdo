@@ -456,25 +456,8 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   double epsm1i;
   long jblt;
   long jlev = 0;
-  double *zt2 = NULL, *zq2 = NULL;
-  double /* *etah1,*/ *ph1, *lnph1, *fi1;
-  double *pf1, *lnpf1;
-  double *tv1, *theta1, *rh1;
-  double *ph2, *lnph2, *fi2;
-  double *pf2/*, *lnpf2*/;
-  double *zvar;
-  double *rh_pbl = NULL;
-  double *theta_pbl = NULL;
-  double *rh2;
-  double *wgt;
-  long *idx;
   int lpsmod = 1;
-#if defined(_OPENMP)
-  extern int ompNumThreads;
   double *vars_pbl[MAX_VARS];
-#else
-  double **vars_pbl = NULL;
-#endif
 #if defined(OUTPUT)
   double t, q, fi;
 
@@ -485,31 +468,30 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   long nlev1p1 = nlev1+1;
   long nlev2p1 = nlev2+1;
 
-#if defined(_OPENMP)
-  NEW_2D(double, ph1_2, ompNumThreads, nlev1p1);
-  NEW_2D(double, lnph1_2, ompNumThreads, nlev1p1);
-  NEW_2D(double, fi1_2, ompNumThreads, nlev1p1);
+  NEW_2D(double, ph1, ompNumThreads, nlev1p1);
+  NEW_2D(double, lnph1, ompNumThreads, nlev1p1);
+  NEW_2D(double, fi1, ompNumThreads, nlev1p1);
 
-  NEW_2D(double, pf1_2, ompNumThreads, nlev1);
-  NEW_2D(double, lnpf1_2, ompNumThreads, nlev1);
-  NEW_2D(double, tv1_2, ompNumThreads, nlev1);
-  NEW_2D(double, theta1_2, ompNumThreads, nlev1);
-  NEW_2D(double, rh1_2, ompNumThreads, nlev1);
-  NEW_2D(double, zvar_2, ompNumThreads, nlev1);
+  NEW_2D(double, pf1, ompNumThreads, nlev1);
+  NEW_2D(double, lnpf1, ompNumThreads, nlev1);
+  NEW_2D(double, tv1, ompNumThreads, nlev1);
+  NEW_2D(double, theta1, ompNumThreads, nlev1);
+  NEW_2D(double, rh1, ompNumThreads, nlev1);
+  NEW_2D(double, zvar, ompNumThreads, nlev1);
 
-  NEW_2D(double, ph2_2, ompNumThreads, nlev2p1);
-  NEW_2D(double, lnph2_2, ompNumThreads, nlev2p1);
-  NEW_2D(double, fi2_2, ompNumThreads, nlev2p1);
+  NEW_2D(double, ph2, ompNumThreads, nlev2p1);
+  NEW_2D(double, lnph2, ompNumThreads, nlev2p1);
+  NEW_2D(double, fi2, ompNumThreads, nlev2p1);
 
-  NEW_2D(double, pf2_2, ompNumThreads, nlev2);
-  NEW_2D(double, rh2_2, ompNumThreads, nlev2);
-  NEW_2D(double, wgt_2, ompNumThreads, nlev2);
-  NEW_2D(long, idx_2, ompNumThreads, nlev2);
+  NEW_2D(double, pf2, ompNumThreads, nlev2);
+  NEW_2D(double, rh2, ompNumThreads, nlev2);
+  NEW_2D(double, wgt, ompNumThreads, nlev2);
+  NEW_2D(long, idx, ompNumThreads, nlev2);
 
-  NEW_2D(double, zt2_2, ltq?ompNumThreads:0, nlev2);
-  NEW_2D(double, zq2_2, ltq?ompNumThreads:0, nlev2);
-  NEW_2D(double, rh_pbl_2, ltq?ompNumThreads:0, nlev2);
-  NEW_2D(double, theta_pbl_2, ltq?ompNumThreads:0, nlev2);
+  NEW_2D(double, zt2, ompNumThreads, ltq?nlev2:0);
+  NEW_2D(double, zq2, ompNumThreads, ltq?nlev2:0);
+  NEW_2D(double, rh_pbl, ompNumThreads, ltq?nlev2:0);
+  NEW_2D(double, theta_pbl, ompNumThreads, ltq?nlev2:0);
 
   if ( nvars > MAX_VARS )
     {
@@ -528,39 +510,6 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 	    vars_pbl_2[i][iv] = (double*) Malloc(nlev2*sizeof(double));
 	}
     }
-#else
-  // etah1  = new double[nlev1p1];
-  ph1    = new double[nlev1p1];
-  lnph1  = new double[nlev1p1];
-  fi1    = new double[nlev1p1];
-
-  pf1    = new double[nlev1];
-  lnpf1  = new double[nlev1];
-  tv1    = new double[nlev1];
-  theta1 = new double[nlev1];
-  rh1    = new double[nlev1];
-  zvar   = new double[nlev1];
-
-  ph2    = new double[nlev2p1];
-  lnph2  = new double[nlev2p1];
-  fi2    = new double[nlev2p1];
-
-  pf2    = new double[nlev2];
-  // lnpf2  = new double[nlev2];
-  rh2    = new double[nlev2];
-  wgt    = new double[nlev2];
-  idx    = new long[nlev2];
-
-  if ( ltq )
-    {
-      zt2       = new double[nlev2];
-      zq2       = new double[nlev2];
-      rh_pbl    = new double[nlev2];
-      theta_pbl = new double[nlev2];
-    }
-
-  NEW_2D(double, vars_pbl, nvars, nlev2);
-#endif
   
   double *af1 = new double[nlev1];
   double *bf1 = new double[nlev1];
@@ -650,61 +599,29 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(ngp, ph1_2, lnph1_2, fi1_2, pf1_2, lnpf1_2, tv1_2, theta1_2, rh1_2, zvar_2, ph2_2, lnph2_2, \
-	 fi2_2, pf2_2, rh_pbl_2, zt2_2, zq2_2, theta_pbl_2, rh2_2, wgt_2, idx_2, vars_pbl_2, \
+#pragma omp parallel for default(none) firstprivate(lpsmod)  private(vars_pbl)  schedule(dynamic,1) \
+  shared(ngp, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, \
+	 fi2, pf2, rh_pbl, zt2, zq2, theta_pbl, rh2, wgt, idx, vars_pbl_2, \
 	 af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2,	\
 	 ltq, nvars, imiss, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, fis1, fis2, ps2, \
-	 ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt) \
-  firstprivate(lpsmod) \
-  private(ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, \
-          theta_pbl, rh2, wgt, idx, vars_pbl, zt2, zq2) \
-  schedule(dynamic,1)
+	 ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt)
 #endif
   for ( int ij = 0; ij < ngp; ++ij )
     {
-#if defined(_OPENMP)
-      int ompthID = omp_get_thread_num();
-
-      ph1    = ph1_2[ompthID];
-      lnph1  = lnph1_2[ompthID];
-      fi1    = fi1_2[ompthID];
-
-      pf1    = pf1_2[ompthID];
-      lnpf1  = lnpf1_2[ompthID];
-      tv1    = tv1_2[ompthID];
-      theta1 = theta1_2[ompthID];
-      rh1    = rh1_2[ompthID];
-      zvar   = zvar_2[ompthID];
-
-      ph2    = ph2_2[ompthID];
-      lnph2  = lnph2_2[ompthID];
-      fi2    = fi2_2[ompthID];
-
-      pf2    = pf2_2[ompthID];
-      rh2    = rh2_2[ompthID];
-      wgt    = wgt_2[ompthID];
-      idx    = idx_2[ompthID];
-
-      zt2       = ltq ? zt2_2[ompthID] : NULL;
-      zq2       = ltq ? zq2_2[ompthID] : NULL;
-      rh_pbl    = ltq ? rh_pbl_2[ompthID] : NULL;
-      theta_pbl = ltq ? theta_pbl_2[ompthID] : NULL;
+      int ompthID = cdo_omp_get_thread_num();
 
       for ( int iv = 0; iv < nvars; ++iv )
         vars_pbl[iv] = vars_pbl_2[ompthID][iv];
-#endif
 
-      if ( imiss )
-	if ( imiss[ij] ) continue;
+      if ( imiss && imiss[ij] ) continue;
 
       hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars,
 		 af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2,
 		 ah1, bh1, ps1, epsm1i, q1, t1, fis1, fis2, ps2,
 		 ah2, bh2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt,
-		 ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, 
-                 ph2, lnph2, fi2, pf2, rh2, wgt, idx,
-		 rh_pbl, theta_pbl, vars_pbl, zt2, zq2);
+		 ph1[ompthID], lnph1[ompthID], fi1[ompthID], pf1[ompthID], lnpf1[ompthID], tv1[ompthID], theta1[ompthID], rh1[ompthID], zvar[ompthID], 
+                 ph2[ompthID], lnph2[ompthID], fi2[ompthID], pf2[ompthID], rh2[ompthID], wgt[ompthID], idx[ompthID],
+		 rh_pbl[ompthID], theta_pbl[ompthID], vars_pbl, zt2[ompthID], zq2[ompthID]);
 
     } /* end for ij */
 
@@ -713,35 +630,31 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   fclose(new);
 #endif
 
-#if defined(_OPENMP)
-  DELETE_2D(ph1_2);
-  DELETE_2D(lnph1_2);
-  DELETE_2D(fi1_2);
+  DELETE_2D(ph1);
+  DELETE_2D(lnph1);
+  DELETE_2D(fi1);
 
-  DELETE_2D(pf1_2);
-  DELETE_2D(lnpf1_2);
-  DELETE_2D(tv1_2);
-  DELETE_2D(theta1_2);
-  DELETE_2D(rh1_2);
-  DELETE_2D(zvar_2);
+  DELETE_2D(pf1);
+  DELETE_2D(lnpf1);
+  DELETE_2D(tv1);
+  DELETE_2D(theta1);
+  DELETE_2D(rh1);
+  DELETE_2D(zvar);
 
-  DELETE_2D(ph2_2);
-  DELETE_2D(lnph2_2);
-  DELETE_2D(fi2_2);
+  DELETE_2D(ph2);
+  DELETE_2D(lnph2);
+  DELETE_2D(fi2);
 
-  DELETE_2D(pf2_2);
-  // DELETE_2D(lnpf2_2);
-  DELETE_2D(rh2_2);
-  DELETE_2D(wgt_2);
-  DELETE_2D(idx_2);
+  DELETE_2D(pf2);
+  // DELETE_2D(lnpf2);
+  DELETE_2D(rh2);
+  DELETE_2D(wgt);
+  DELETE_2D(idx);
 
-  if ( ltq )
-    {
-      DELETE_2D(zt2_2); 
-      DELETE_2D(zq2_2); 
-      DELETE_2D(rh_pbl_2); 
-      DELETE_2D(theta_pbl_2); 
-    }   
+  DELETE_2D(zt2); 
+  DELETE_2D(zq2); 
+  DELETE_2D(rh_pbl); 
+  DELETE_2D(theta_pbl); 
 
   if ( nvars > 0 )
     {
@@ -754,39 +667,6 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 	}
     }
   Free(vars_pbl_2);
-#else
-  // delete[] etah1;     
-  delete[] ph1;    
-  delete[] lnph1;  
-  delete[] fi1;    
-
-  delete[] pf1;    
-  delete[] lnpf1;  
-  delete[] tv1;    
-  delete[] theta1; 
-  delete[] rh1;    
-  delete[] zvar;    
-
-  delete[] ph2;       
-  delete[] lnph2;     
-  delete[] fi2;
-
-  delete[] pf2;       
-  // delete[] lnpf2;
-  delete[] rh2;      
-  delete[] wgt; 
-  delete[] idx; 
-
-  if ( ltq )
-    {
-      delete[] zt2; 
-      delete[] zq2; 
-      delete[] rh_pbl; 
-      delete[] theta_pbl; 
-    }   
-
-  if ( nvars > 0 ) DELETE_2D(vars_pbl);
-#endif
 
   delete[] af1;
   delete[] bf1;
