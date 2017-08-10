@@ -251,9 +251,7 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
             }
         }
       if (PipeDebug)
-        {
-          Message("numrecs = %d nvars = %d", numrecs, vlistNvars(vlistID));
-        }
+        Message("%s numrecs = %d nvars = %d", name.c_str(), numrecs, vlistNvars(vlistID));
     }
 
   nrecs = numrecs;
