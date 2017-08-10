@@ -940,7 +940,7 @@ pstreamCloseChildStream(pstream_t *pstreamptr)
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
   if (PSTREAM_Debug)
-    Message("%s read closed", pstreamptr->m_name);
+    Message("%s read closed", pstreamptr->m_name.c_str());
   pthread_mutex_unlock(pipe->m_mutex);
   pthread_cond_signal(pipe->tsDef);
   pthread_cond_signal(pipe->tsInq);
@@ -978,7 +978,7 @@ pstreamCloseParentStream(pstream_t *pstreamptr)
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
   if (PSTREAM_Debug)
-    Message("%s write closed", pstreamptr->m_name);
+    Message("%s write closed", pstreamptr->m_name.c_str());
   pthread_mutex_unlock(pipe->m_mutex);
   pthread_cond_signal(pipe->tsDef);
   pthread_cond_signal(pipe->tsInq);
@@ -1011,7 +1011,7 @@ pstreamClose(int pstreamID)
       else if (pthread_equal(threadID, pstreamptr->wthreadID))
         pstreamCloseParentStream(pstreamptr);
       else
-        Error("Internal problem! Close pipe %s", pstreamptr->m_name);
+        Error("Internal problem! Close pipe %s", pstreamptr->m_name.c_str());
 
       processDelStream(pstreamID);
 #else
@@ -1021,7 +1021,7 @@ pstreamClose(int pstreamID)
   else
     {
       if (PSTREAM_Debug)
-        Message("%s fileID %d", pstreamptr->m_name, pstreamptr->m_fileID);
+        Message("%s fileID %d", pstreamptr->m_name.c_str(), pstreamptr->m_fileID);
 
       if (pstreamptr->mode == 'r')
         {
@@ -1044,7 +1044,7 @@ pstreamClose(int pstreamID)
             {
               extern const char *cdojobfiles;
               FILE *fp = fopen(cdojobfiles, "a");
-              fprintf(fp, "%s\n", pstreamptr->m_name);
+              fprintf(fp, "%s\n", pstreamptr->m_name.c_str());
               fclose(fp);
             }
         }
@@ -1077,7 +1077,7 @@ pstream_t::inqVlist()
     {
       vlistID = pipe->pipeInqVlist(m_vlistID);
       if (vlistID == -1)
-        cdoAbort("Couldn't read data from input stream %s!", m_name);
+        cdoAbort("Couldn't read data from input stream %s!", m_name.c_str());
     }
   // read from file through cdi streamInqVlist
   else
@@ -1192,7 +1192,7 @@ void pstream_t::defVlist(int p_vlistID){
   if (ispipe)
     {
       if (PSTREAM_Debug)
-        Message("%s pstreamID %d", m_name, self);
+        Message("%s pstreamID %d", m_name.c_str(), self);
       int vlistIDcp = vlistDuplicate(p_vlistID);
       /*    pipeDefVlist(pstreamptr, p_vlistID);*/
       pipe->pipeDefVlist(m_vlistID, vlistIDcp);
@@ -1309,7 +1309,7 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
 
       if (PSTREAM_Debug)
         {
-          Message("%s pstreamid %d", pstreamptr->m_name, pstreamptr->self);
+          Message("%s pstreamid %d", pstreamptr->m_name.c_str(), pstreamptr->self);
         }
       pstreamptr->pipe->pipeDefRecord(varID, levelID);
     }
@@ -1771,7 +1771,7 @@ void pstreamCloseAll()
 {
     for(auto pstream_iter : _pstream_map)
     {
-        Message("Close file %s id %d", pstream_iter.second.m_name, pstream_iter.second.m_fileID);
+        Message("Close file %s id %d", pstream_iter.second.m_name.c_str(), pstream_iter.second.m_fileID);
         streamClose(pstream_iter.second.m_fileID);
     }
 }
@@ -1790,7 +1790,7 @@ pstreamCloseAll(void)
           if (!pstreamptr->ispipe && pstreamptr->m_fileID != CDI_UNDEFID)
             {
               if (PSTREAM_Debug)
-                Message("Close file %s id %d", pstreamptr->m_name, pstreamptr->m_fileID);
+                Message("Close file %s id %d", pstreamptr->m_name.c_str(), pstreamptr->m_fileID);
               streamClose(pstreamptr->m_fileID);
             }
         }
