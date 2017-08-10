@@ -625,18 +625,10 @@ pstreamOpenRead(const argument_t *argument)
   */
   if (ispipe)
     {
-      if(PSTREAM_Debug)
-      {
-         //TODO  << "opening pipe for reading" << std::this_thread::get_id() << std::endl;
-      }
       pstreamptr->pstreamOpenReadPipe(argument);
     }
   else
     {
-      if(PSTREAM_Debug)
-      {
-       //TODO  << "opening file for reading" << std::this_thread::get_id() << std::endl;
-      }
       pstreamptr->pstreamOpenReadFile(argument);
     }
 
@@ -935,7 +927,6 @@ pstream_t::openAppend(const char *p_filename)
 void
 pstreamCloseChildStream(pstream_t *pstreamptr)
 {
-     //TODO  << "pCCS"<< std::endl;
   pipe_t *pipe = pstreamptr->pipe;
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
@@ -967,13 +958,11 @@ pstreamCloseChildStream(pstream_t *pstreamptr)
   pthread_mutex_unlock(pipe->m_mutex);
 
   processAddNvals(pipe->nvals);
-   //TODO  << "HERE WE ARE !!!|" << std::endl;
 }
 void
 pstreamCloseParentStream(pstream_t *pstreamptr)
 {
 
-     //TODO  << "pCPS"<< std::endl;
   pipe_t *pipe = pstreamptr->pipe;
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
@@ -1777,7 +1766,6 @@ cdoInitialize(void *argument)
 #endif
 
   processDefArgument(argument);
-   //TODO  << "we got through this" << std::endl;
 }
 void pstreamCloseAll()
 {
