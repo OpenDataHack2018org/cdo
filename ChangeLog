@@ -1,6 +1,6 @@
 2017-08-12  Uwe Schulzweida
 
-	* eof3d: weight was allocated for only one level (bug fix) [report: Frank Kauler]
+	* eof3d: weight was allocated for only one level (bug fix) [report: Frank Kauker]
 
 2017-07-27  Uwe Schulzweida
 
