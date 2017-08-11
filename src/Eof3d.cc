@@ -53,7 +53,8 @@ void *EOF3d(void * argument)
   size_t temp_size = 0, npack = 0;
   int varID, levelID;
   int missval_warning = 0;
-  int nmiss, ngrids, n = 0;
+  int nmiss, ngrids;
+  int n = 0;
   size_t nlevs = 0;
   size_t offset;
   int timer_cov = 0, timer_eig = 0;
@@ -136,7 +137,7 @@ void *EOF3d(void * argument)
   size_t gridsizemax  = vlistGridsizeMax(vlistID1);
 
   /* allocation of temporary fields and output structures */
-  double *in       = (double *) Malloc(gridsizemax*sizeof(double));
+  double *in     = (double *) Malloc(gridsizemax*sizeof(double));
   int **datacounts = (int **) Malloc(nvars*sizeof(int*));
   double ***datafields   = (double ***) Malloc(nvars*sizeof(double **));
   double ***eigenvectors = (double ***) Malloc(nvars*sizeof(double **));
@@ -246,7 +247,7 @@ void *EOF3d(void * argument)
   if ( cdoVerbose ) 
     cdoPrint("Read data for %i variables",nvars);
   
-  int *pack = (int*) Malloc(temp_size*sizeof(int)); //TODO
+  size_t *pack = (size_t*) Malloc(temp_size*sizeof(size_t)); //TODO
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -337,7 +338,7 @@ void *EOF3d(void * argument)
       /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
 
       if ( cdoVerbose ) 
-	cdoPrint("Processed SVD decomposition for var %i from %i x %i matrix",varID,n,n);
+	cdoPrint("Processed SVD decomposition for var %i from %zu x %zu matrix",varID,n,n);
 
       for( int eofID = 0; eofID < n; eofID++ )
 	eigenvalues[varID][eofID][0] = eigv[eofID];
@@ -384,7 +385,7 @@ void *EOF3d(void * argument)
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(eigenvec,pack,missval,npack)
 #endif
-	      for( size_t i = 0; i < npack; i++ )
+	      for ( size_t i = 0; i < npack; i++ )
 		eigenvec[pack[i]] = missval;
 	    }
 	}     /* for ( eofID = 0; eofID < n_eig; eofID++ )     */
@@ -459,7 +460,7 @@ void *EOF3d(void * argument)
       for ( varID = 0; varID < nvars; varID++ )
         {
           nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-          for ( levelID = 0; levelID < nlevs; levelID++ )
+          for ( levelID = 0; levelID < (int)nlevs; levelID++ )
             {
 	      offset = levelID * gridsizemax;
               if ( tsID < n_eig )
