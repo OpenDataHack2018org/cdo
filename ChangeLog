@@ -1,3 +1,7 @@
+2017-08-12  Uwe Schulzweida
+
+	* eof3d: weight was allocated for only one level (bug fix) [report: Frank Kauler]
+
 2017-07-27  Uwe Schulzweida
 
 	* Using CDI library version 1.9.0

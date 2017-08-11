@@ -53,8 +53,9 @@ void *EOF3d(void * argument)
   size_t temp_size = 0, npack = 0;
   int varID, levelID;
   int missval_warning = 0;
-  int nmiss, ngrids, n = 0, nlevs = 0;
-  int offset;
+  int nmiss, ngrids, n = 0;
+  size_t nlevs = 0;
+  size_t offset;
   int timer_cov = 0, timer_eig = 0;
 
   int calendar = CALENDAR_STANDARD;
@@ -88,30 +89,13 @@ void *EOF3d(void * argument)
   enum T_EIGEN_MODE eigen_mode = get_eigenmode();
   enum T_WEIGHT_MODE weight_mode = get_weightmode();
 
-  int streamID1  = pstreamOpenRead(cdoStreamName(0));
-  int vlistID1   = pstreamInqVlist(streamID1);
-  int gridID1    = vlistInqVarGrid(vlistID1, 0);
-  long gridsize  = vlistGridsizeMax(vlistID1);
-  int nvars      = vlistNvars(vlistID1);
-  int nrecs;
-
-  double *weight = (double *) Malloc(gridsize*sizeof(double));
-  for ( int i = 0; i < gridsize; ++i ) weight[i] = 1.;
-
-  if ( weight_mode == WEIGHT_ON )
-    {
-      int wstatus = gridWeights(gridID1, weight);
-      if ( wstatus != 0 )
-	{
-	  weight_mode = WEIGHT_OFF;
-	  cdoWarning("Using constant grid cell area weights!");
-	}
-    }
-
   /*  eigenvalues */
 
   if ( operfunc == EOF3D_SPATIAL )
     cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
+
+  int streamID1  = pstreamOpenRead(cdoStreamName(0));
+  int vlistID1   = pstreamInqVlist(streamID1);
 
   /* COUNT NUMBER OF TIMESTEPS if EOF3D_ or EOF3D_TIME */
   int nts = vlistNtsteps(vlistID1);
@@ -121,14 +105,15 @@ void *EOF3d(void * argument)
       while ( pstreamInqTimestep(streamID1, nts) ) nts++;
 
       if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
+
+      pstreamClose(streamID1);
+
+      streamID1 = pstreamOpenRead(cdoStreamName(0));
+      vlistID1  = pstreamInqVlist(streamID1);
     }
   else
     if ( cdoVerbose ) cdoPrint("Found %i timeSteps", nts);
 
-  pstreamClose(streamID1);
-
-  streamID1 = pstreamOpenRead(cdoStreamName(0));
-  vlistID1  = pstreamInqVlist(streamID1);
   int taxisID1  = vlistInqTaxis(vlistID1);
 
   /* reset the requested number of eigen-function to the maximum if neccessary */
@@ -144,19 +129,28 @@ void *EOF3d(void * argument)
 
   if ( cdoVerbose )  cdoPrint("counted %i timesteps",n);
 
+  int nvars      = vlistNvars(vlistID1);
+  int nrecs;
+
+  int gridID1    = vlistInqVarGrid(vlistID1, 0);
+  size_t gridsizemax  = vlistGridsizeMax(vlistID1);
+
   /* allocation of temporary fields and output structures */
-  double *in       = (double *) Malloc(gridsize*sizeof(double));
+  double *in       = (double *) Malloc(gridsizemax*sizeof(double));
   int **datacounts = (int **) Malloc(nvars*sizeof(int*));
   double ***datafields   = (double ***) Malloc(nvars*sizeof(double **));
   double ***eigenvectors = (double ***) Malloc(nvars*sizeof(double **));
   double ***eigenvalues  = (double ***) Malloc(nvars*sizeof(double **));
 
+  size_t maxlevs = 0;
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridsize            = vlistGridsizeMax(vlistID1);
+      size_t gridsize     = vlistGridsizeMax(vlistID1);
       nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      temp_size           = ((size_t)gridsize) * nlevs;
+      temp_size           = gridsize * nlevs;
       missval             = vlistInqVarMissval(vlistID1, varID);
+
+      if ( nlevs > maxlevs ) maxlevs = nlevs;
 
       datacounts[varID]   = (int*) Malloc(nlevs*sizeof(int));
       datafields[varID]   = (double **) Malloc(nts*sizeof(double *));
@@ -187,9 +181,28 @@ void *EOF3d(void * argument)
     }
 
   if ( cdoVerbose)
-    cdoPrint("allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%i for processing in %s",
-	     nts,n,gridsize,"time_space");
+    cdoPrint("allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%zu for processing in %s",
+	     nts,n,gridsizemax,"time_space");
   
+  double *weight = (double *) Malloc(maxlevs*gridsizemax*sizeof(double));
+  for ( size_t i = 0; i < maxlevs*gridsizemax; ++i ) weight[i] = 1.;
+
+  if ( weight_mode == WEIGHT_ON )
+    {
+      int wstatus = gridWeights(gridID1, weight);
+      if ( wstatus != 0 )
+	{
+	  weight_mode = WEIGHT_OFF;
+	  cdoWarning("Using constant grid cell area weights!");
+	}
+      else
+        {
+          for ( size_t k = 1; k < maxlevs; ++k )
+            for ( size_t i = 0; i < gridsizemax; ++i )
+              weight[k*gridsizemax+i] =  weight[i];
+        }
+    }
+
   int tsID = 0;
 
   /* read the data and create covariance matrices for each var & level */
@@ -202,13 +215,13 @@ void *EOF3d(void * argument)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
           missval = vlistInqVarMissval(vlistID1, varID);
           pstreamReadRecord(streamID1, in, &nmiss);
 
 	  offset = gridsize * levelID;
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      if ( ! DBL_IS_EQUAL(in[i], missval ) )
 		{
@@ -237,9 +250,9 @@ void *EOF3d(void * argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      temp_size = ((size_t)gridsize) * nlevs;
+      temp_size = gridsize * nlevs;
 
       if ( cdoVerbose )
         {
@@ -301,7 +314,7 @@ void *EOF3d(void * argument)
               double *df2p = datafields[varID][j2];
               double sum = 0;
               for ( size_t i = 0; i < npack; i++ )
-                sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
+                sum += weight[pack[i]%gridsizemax]*df1p[pack[i]]*df2p[pack[i]];
               cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
             }
         }
@@ -351,10 +364,10 @@ void *EOF3d(void * argument)
 	  double sum = 0;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none)  shared(eigenvec,weight,pack,npack,gridsize) reduction(+:sum)
+#pragma omp parallel for default(none)  shared(eigenvec,weight,pack,npack,gridsizemax) reduction(+:sum)
 #endif 
 	  for ( size_t i = 0; i < npack; i++ )
-	    sum +=  weight[pack[i]%gridsize] *
+	    sum +=  weight[pack[i]%gridsizemax] *
 	            eigenvec[pack[i]] * eigenvec[pack[i]];
 
 	  if ( sum > 0 )
@@ -448,11 +461,11 @@ void *EOF3d(void * argument)
           nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           for ( levelID = 0; levelID < nlevs; levelID++ )
             {
-	      offset = levelID * gridsize;
+	      offset = levelID * gridsizemax;
               if ( tsID < n_eig )
                 {
                   nmiss = 0;
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsizemax; i++ )
                     if ( DBL_IS_EQUAL(eigenvectors[varID][tsID][offset + i], missval) ) nmiss++;
 
                   pstreamDefRecord(streamID3, varID, levelID);
