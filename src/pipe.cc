@@ -121,7 +121,7 @@ int
 pipe_t::pipeInqTimestep(int p_tsID)
 {
   // LOCK
-    std::unique_lock<std::mutex> locked_mutex(m_mutex);
+  std::unique_lock<std::mutex> locked_mutex(m_mutex);
   usedata = false;
   recIDr = -1;
   if (p_tsID != tsIDr + 1)
@@ -159,7 +159,7 @@ pipe_t::pipeInqTimestep(int p_tsID)
 
   int numrecs = EOP ? 0 : nrecs;
 
-  m_mutex.unlock();
+  locked_mutex.unlock();
   // UNLOCK
 
   tsInq.notify_all();
@@ -390,7 +390,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
         break;
       if (PipeDebug)
         Message("%s wait of recInq %d", name.c_str(), recIDr);
-      recInq.wait( locked_mutex);
+      recInq.wait(locked_mutex);
     }
   // UNLOCK
 }
@@ -470,6 +470,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 
   hasdata = false;
   data = NULL;
+  locked_mutex.unlock();
   // UNLOCK
 
   readCond.notify_all();
