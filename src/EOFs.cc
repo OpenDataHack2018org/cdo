@@ -141,7 +141,7 @@ enum T_EIGEN_MODE get_eigenmode(void)
 
 enum T_WEIGHT_MODE get_weightmode(void)
 {  
-  enum T_WEIGHT_MODE weight_mode = WEIGHT_ON;
+  enum T_WEIGHT_MODE weight_mode = WEIGHT_OFF;
 
   char *envstr = getenv("CDO_WEIGHT_MODE");
   if ( envstr )

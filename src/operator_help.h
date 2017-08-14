@@ -3538,7 +3538,7 @@ std::vector<std::string> EOFsHelp = {
     "        a one-sided parallel jacobi-algorithm (only executed in parallel if -P flag is set)",
     "        and  'danielson_lanczos' for a non-parallel d/l algorithm. The default setting is 'jacobi'.",
     "    CDO_WEIGHT_MODE",
-    "        It is used to set the weight mode. The default is 'on'. Set it to 'off' for a non weighted version.",
+    "        It is used to set the weight mode. The default is 'off'. Set it to 'on' for a weighted version.",
     "    MAX_JACOBI_ITER",
     "        Is the maximum integer number of annihilation sweeps that is executed if the ",
     "        jacobi-algorithm is used to compute the eigen values. The default value is 12.",
