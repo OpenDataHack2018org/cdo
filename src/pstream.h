@@ -90,4 +90,6 @@ int pstreamFileID(int pstreamID);
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
+const int &getPthreadScope();
+
 #endif /* PSTREAM_H */
