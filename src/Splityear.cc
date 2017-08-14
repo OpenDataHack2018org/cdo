@@ -54,7 +54,7 @@ void *Splityear(void *argument)
 
   cdoInitialize(argument);
 
-  if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
+  if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
   
   bool lcopy = UNCHANGED_RECORD;
 

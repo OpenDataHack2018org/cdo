@@ -332,7 +332,7 @@ pstream_t::isPipe()
 void pstream_t::createPipeName(char *pipename, int pnlen)
 {
 
-  snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
+  snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
 }
 
 pthread_t
@@ -625,18 +625,10 @@ pstreamOpenRead(const argument_t *argument)
   */
   if (ispipe)
     {
-      if(PSTREAM_Debug)
-      {
-         //TODO  << "opening pipe for reading" << std::this_thread::get_id() << std::endl;
-      }
       pstreamptr->pstreamOpenReadPipe(argument);
     }
   else
     {
-      if(PSTREAM_Debug)
-      {
-       //TODO  << "opening file for reading" << std::this_thread::get_id() << std::endl;
-      }
       pstreamptr->pstreamOpenReadFile(argument);
     }
 
@@ -935,7 +927,6 @@ pstream_t::openAppend(const char *p_filename)
 void
 pstreamCloseChildStream(pstream_t *pstreamptr)
 {
-     //TODO  << "pCCS"<< std::endl;
   pipe_t *pipe = pstreamptr->pipe;
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
@@ -967,13 +958,11 @@ pstreamCloseChildStream(pstream_t *pstreamptr)
   pthread_mutex_unlock(pipe->m_mutex);
 
   processAddNvals(pipe->nvals);
-   //TODO  << "HERE WE ARE !!!|" << std::endl;
 }
 void
 pstreamCloseParentStream(pstream_t *pstreamptr)
 {
 
-     //TODO  << "pCPS"<< std::endl;
   pipe_t *pipe = pstreamptr->pipe;
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
@@ -1001,19 +990,28 @@ pstreamClose(int pstreamID)
   if (pstreamptr == NULL)
     Error("Internal problem, stream %d not open!", pstreamID);
 
-  if (pstreamptr->ispipe)
+  pstreamptr->close();
+
+  if(!pstreamptr->ispipe)
+  {
+    pstream_delete_entry(pstreamptr);
+  }
+}
+
+void pstream_t::close(){
+  if (ispipe)
     {
 #if defined(HAVE_LIBPTHREAD)
       pthread_t threadID = pthread_self();
 
-      if (pthread_equal(threadID, pstreamptr->rthreadID))
-        pstreamCloseChildStream(pstreamptr);
-      else if (pthread_equal(threadID, pstreamptr->wthreadID))
-        pstreamCloseParentStream(pstreamptr);
+      if (pthread_equal(threadID, rthreadID))
+        pstreamCloseChildStream(this);
+      else if (pthread_equal(threadID, wthreadID))
+        pstreamCloseParentStream(this);
       else
-        Error("Internal problem! Close pipe %s", pstreamptr->m_name.c_str());
+        Error("Internal problem! Close pipe %s", m_name.c_str());
 
-      processDelStream(pstreamID);
+     // processDelStream(pstreamID);
 #else
       cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
@@ -1021,18 +1019,18 @@ pstreamClose(int pstreamID)
   else
     {
       if (PSTREAM_Debug)
-        Message("%s fileID %d", pstreamptr->m_name.c_str(), pstreamptr->m_fileID);
+        Message("%s fileID %d", m_name.c_str(), m_fileID);
 
-      if (pstreamptr->mode == 'r')
+      if (mode == 'r')
         {
-          processAddNvals(streamNvals(pstreamptr->m_fileID));
+          processAddNvals(streamNvals(m_fileID));
         }
 
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamClose(pstreamptr->m_fileID);
+      streamClose(m_fileID);
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1040,22 +1038,21 @@ pstreamClose(int pstreamID)
 
       if (cdoExpMode == CDO_EXP_REMOTE)
         {
-          if (pstreamptr->mode == 'w')
+          if (mode == 'w')
             {
               extern const char *cdojobfiles;
               FILE *fp = fopen(cdojobfiles, "a");
-              fprintf(fp, "%s\n", pstreamptr->m_name.c_str());
+              fprintf(fp, "%s\n", m_name.c_str());
               fclose(fp);
             }
         }
 
-      if (pstreamptr->m_varlist)
+      if (m_varlist)
         {
-          Free(pstreamptr->m_varlist);
-          pstreamptr->m_varlist = NULL;
+          Free(m_varlist);
+          m_varlist = NULL;
         }
 
-      pstream_delete_entry(pstreamptr);
     }
 }
 
@@ -1090,6 +1087,10 @@ pstream_t::inqVlist()
         pthread_mutex_lock(&streamMutex);
 #endif
       vlistID = streamInqVlist(m_fileID);
+    if (vlistID == -1){
+        cdoAbort("Couldn't read data from input fileID %d!", m_fileID);
+    }
+
 #if defined(HAVE_LIBPTHREAD)
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1761,11 +1762,10 @@ cdoInitialize(void *argument)
 
 #if defined(HAVE_LIBPTHREAD)
   if (PSTREAM_Debug)
-    Message("process %d  thread %ld", processSelf(), pthread_self());
+    Message("process %d  thread %ld", processSelf().m_ID, pthread_self());
 #endif
 
   processDefArgument(argument);
-   //TODO  << "we got through this" << std::endl;
 }
 void pstreamCloseAll()
 {
@@ -1803,34 +1803,32 @@ processClosePipes(void)
   int nstream = processInqInputStreamNum();
   for (int sindex = 0; sindex < nstream; sindex++)
     {
-      int pstreamID = processInqInputStreamID(sindex);
-      pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+      pstream_t *pstreamptr = processInqInputStream(sindex);
 
       if (PSTREAM_Debug)
-        Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamID);
+        Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamptr->self);
 
       if (pstreamptr)
-        pstreamClose(pstreamID);
+        pstreamptr->close();
     }
 
   nstream = processInqOutputStreamNum();
   for (int sindex = 0; sindex < nstream; sindex++)
     {
-      int pstreamID = processInqOutputStreamID(sindex);
-      pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+      pstream_t *pstreamptr = processInqOutputStream(sindex);
 
       if (PSTREAM_Debug)
-        Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamID);
+        Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamptr->self);
 
       if (pstreamptr)
-        pstreamClose(pstreamID);
+          pstreamptr->close();
     }
 }
 
 void
 cdoFinish(void)
 {
-  int processID = processSelf();
+  int processID = processSelf().m_ID;
   int nvars, ntimesteps;
   char memstring[32] = { "" };
   double s_utime, s_stime;

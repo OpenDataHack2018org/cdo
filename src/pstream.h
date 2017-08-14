@@ -38,6 +38,7 @@ public:
   void openAppend(const char * p_filename);
   void init();
   void defVlist(int p_vlistID);
+  void close();
   int self; //aka the id of the pstream
   int mode;
   int m_fileID;
