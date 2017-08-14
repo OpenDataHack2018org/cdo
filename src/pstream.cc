@@ -556,9 +556,9 @@ void pstream_t::createFilelist(const char * p_args)
 }
 
 void
-pstream_t::pstreamOpenReadFile(const argument_t *argument)
+pstream_t::pstreamOpenReadFile(const char* p_args)
 {
-  createFilelist(argument->args);
+  createFilelist(p_args);
 
   std::string filename; 
 
@@ -569,7 +569,7 @@ pstream_t::pstreamOpenReadFile(const argument_t *argument)
     }
   else
     {
-     filename = std::string(argument->args);
+     filename = std::string(p_args);
     }
 
   if (PSTREAM_Debug)
@@ -629,7 +629,7 @@ pstreamOpenRead(const argument_t *argument)
     }
   else
     {
-      pstreamptr->pstreamOpenReadFile(argument);
+      pstreamptr->pstreamOpenReadFile(argument->args);
     }
 
   if (pstreamID < 0)
