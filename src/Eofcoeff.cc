@@ -101,6 +101,7 @@ void *Eofcoeff(void * argument)
          eof[varID][levelID][eofID].missval= missval1;
          eof[varID][levelID][eofID].ptr    = (double*) Malloc(gridsize*sizeof(double));
          memset(&eof[varID][levelID][eofID].ptr[0], missval1, gridsize*sizeof(double));
+
          if ( varID >= nvars )
            cdoAbort("Internal error - too high varID");
          if ( levelID >= nlevs )
@@ -111,6 +112,7 @@ void *Eofcoeff(void * argument)
        }
      eofID++;
    }
+
   int neof = eofID;  
   
   if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoStreamName(0)->args, neof);
@@ -118,17 +120,14 @@ void *Eofcoeff(void * argument)
   int gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
-  double *xvals = (double*) Malloc(1*sizeof(double));
-  double *yvals = (double*) Malloc(1*sizeof(double));
-  xvals[0]=0;
-  yvals[0]=0;
-  gridDefXvals(gridID3, xvals);
-  gridDefYvals(gridID3, yvals);
-  
+  double xvals = 0;
+  double yvals = 0;
+  gridDefXvals(gridID3, &xvals);
+  gridDefYvals(gridID3, &yvals);
+ 
   // Create var-list and time-axis for output
       
   int ngrids = vlistNgrids(vlistID3);
-  
   for ( i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID3, i, gridID3);     
   
@@ -141,7 +140,7 @@ void *Eofcoeff(void * argument)
   for ( eofID = 0; eofID < neof; eofID++)
     {
       oname[nchars] = '\0';                       
-      for(varID=0; varID<nvars; varID++) 
+
       sprintf(eof_name, "%5.5i", eofID);
       strcat(oname, eof_name);
       if ( filesuffix[0] )
