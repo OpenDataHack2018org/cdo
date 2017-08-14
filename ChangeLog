@@ -1,6 +1,7 @@
 2017-08-14  Uwe Schulzweida
 
 	* eof, eof3d: set default of env. CDO_WEIGHT_MODE to off
+	* eof3d: preserve variable name on first output file [report: Frank Kauker]
 
 2017-08-12  Uwe Schulzweida
 

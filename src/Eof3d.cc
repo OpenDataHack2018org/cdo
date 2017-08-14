@@ -182,8 +182,8 @@ void *EOF3d(void * argument)
     }
 
   if ( cdoVerbose)
-    cdoPrint("allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%zu for processing in %s",
-	     nts,n,gridsizemax,"time_space");
+    cdoPrint("Allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%zu for processing in %s",
+	     nts, n, gridsizemax, "time_space");
   
   double *weight = (double *) Malloc(maxlevs*gridsizemax*sizeof(double));
   for ( size_t i = 0; i < maxlevs*gridsizemax; ++i ) weight[i] = 1.;
@@ -400,7 +400,11 @@ void *EOF3d(void * argument)
   /*  eigenvalues */
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
+  int vlistID2 = vlistDuplicate(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisDefRdate(taxisID2, 0);
+  taxisDefRtime(taxisID2, 0);
+  vlistDefTaxis(vlistID2, taxisID2);
 
   int gridID2 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
@@ -409,24 +413,21 @@ void *EOF3d(void * argument)
   gridDefXvals(gridID2, &xvals);
   gridDefYvals(gridID2, &yvals);
 
+  ngrids = vlistNgrids(vlistID2);
+  for ( int i = 0; i < ngrids; i++ )
+    vlistChangeGridIndex(vlistID2, i, gridID2);
+
   int zaxisID2 = zaxisCreate(ZAXIS_GENERIC, 1);
   double zvals = 0;
   zaxisDefLevels(zaxisID2, &zvals);
   zaxisDefName(zaxisID2, "zaxis_Reduced");
   zaxisDefLongname(zaxisID2, "Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
 
-  int vlistID2 = vlistCreate();
-  taxisDefRdate(taxisID2, 0);
-  taxisDefRtime(taxisID2, 0);
-  vlistDefTaxis(vlistID2, taxisID2);
+  int nzaxis = vlistNzaxis(vlistID2);
+  for ( int i = 0; i < nzaxis; i++ )
+    vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 
-  int *varID2 = (int*) Malloc(nvars*sizeof(int));
-  for ( varID=0; varID<nvars; varID++ )
-    varID2[varID] = vlistDefVar(vlistID2, gridID2, zaxisID2, TSTEP_INSTANT);
-  ngrids = vlistNgrids(vlistID2);
-  for ( int i = 0; i < ngrids; i++ )
-    vlistChangeGridIndex(vlistID2, i, gridID2);
-
+  /*  eigenvectors */
   int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   int vlistID3 = vlistDuplicate(vlistID1);
@@ -501,7 +502,6 @@ void *EOF3d(void * argument)
   Free(eigenvectors);
   Free(eigenvalues);
   Free(in);
-  Free(varID2);
 
   Free(pack);
   Free(weight);
