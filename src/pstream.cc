@@ -430,22 +430,22 @@ pstream_t::pstreamOpenReadPipe(const argument_t *argument)
 #endif
 }
 
-void pstream_t::createFilelist(const argument_t *p_argument)
+void pstream_t::createFilelist(const char * p_args)
 {
   size_t i;
-  size_t len = strlen(p_argument->args);
+  size_t len = strlen(p_args);
 
   for (i = 0; i < len; i++)
-    if (p_argument->args[i] == ':')
+    if (p_args[i] == ':')
       break;
 
   if (i < len)
     {
       int nfiles = 1, j;
 
-      const char *pch = &p_argument->args[i + 1];
+      const char *pch = &p_args[i + 1];
       len -= (i + 1);
-      if (len && (strncmp(p_argument->args, "filelist:", 9) == 0 || strncmp(p_argument->args, "flist:", 6) == 0))
+      if (len && (strncmp(p_args, "filelist:", 9) == 0 || strncmp(p_args, "flist:", 6) == 0))
         {
           for (i = 0; i < len; i++)
             if (pch[i] == ',')
@@ -522,7 +522,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
                 }
             }
         }
-      else if (len && strncmp(p_argument->args, "ls:", 3) == 0)
+      else if (len && strncmp(p_args, "ls:", 3) == 0)
         {
           char line[4096];
           char command[4096];
@@ -558,7 +558,7 @@ void pstream_t::createFilelist(const argument_t *p_argument)
 void
 pstream_t::pstreamOpenReadFile(const argument_t *argument)
 {
-  createFilelist(argument);
+  createFilelist(argument->args);
 
   std::string filename; 
 
