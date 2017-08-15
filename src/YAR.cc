@@ -96,45 +96,6 @@ void yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
   rv->wts[nlink] = weight;
 }
 
-static
-void gen_xbounds(int nx, double *xvals, double *xbounds)
-{
-  int i;
-
-  for ( i = 0; i < nx-1; i++ )
-    {
-      xbounds[i+1]   = 0.5*(xvals[i] + xvals[i+1]);
-    }
-
-  xbounds[0]  = 2*xvals[0] - xbounds[1];
-  xbounds[nx] = 2*xvals[nx-1] - xbounds[nx-1];
-}
-
-static
-void gen_ybounds(int ny, double *yvals, double *ybounds)
-{
-  int i;
-
-  for ( i = 0; i < ny-1; i++ )
-    {
-      ybounds[i+1]   = 0.5*(yvals[i] + yvals[i+1]);
-    }
-
-  ybounds[0]  = 2*yvals[0] - ybounds[1];
-  ybounds[ny] = 2*yvals[ny-1] - ybounds[ny-1];
-
-  if ( yvals[0] > yvals[ny-1] )
-    {
-      if ( ybounds[0]  >  88 ) ybounds[0]  =  90;
-      if ( ybounds[ny] < -88 ) ybounds[ny] = -90;
-    }
-  else
-    {
-      if ( ybounds[0]  < -88 ) ybounds[0]  = -90;
-      if ( ybounds[ny] >  88 ) ybounds[ny] =  90;
-    }
-}
-
 
 void set_source_data(double * source_data, double init_value,
                      unsigned size_x, unsigned size_y) {
@@ -149,6 +110,7 @@ void set_source_data(double * source_data, double init_value,
   This routine stores the address and weight for four links associated with one destination
   point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
+#if defined(HAVE_LIBYAC)
 static
 void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weights[4])
 {
@@ -177,34 +139,16 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weigh
     }
 
 } /* store_link_bilin */
+#endif
 
 void yar_remap_bil(field_type *field1, field_type *field2)
 {
-  int nlonIn, nlatIn;
-  int nlonOut, nlatOut;
-  int ilat, ilon;
-  int gridIDin, gridIDout;
-  int i, nmiss;
-  int gridsize1, gridsize2;
-  double *lonIn, *latIn;
-  double *lonOut, *latOut;
-  double *xlonIn, *xlatIn;
-  double *xlonOut, *xlatOut;
-  double **fieldIn;
-  double **field;
-  double *array = NULL;
-  double *array1, *array2;
-  double missval;
-  int testit = 1;
   double dxIn, dxOut;
   remap_t remap;
   /* static int index = 0; */
 
-  gridIDin  = field1->grid;
-  gridIDout = field2->grid;
-  array1    = field1->ptr;
-  array2    = field2->ptr;
-  missval   = field1->missval;
+  int gridIDin  = field1->grid;
+  int gridIDout = field2->grid;
 
   if ( ! (gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)) )
     cdoAbort("Source grid has no values");
@@ -220,18 +164,18 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
-  nlonIn = gridInqXsize(gridIDin);
-  nlatIn = gridInqYsize(gridIDin);
-  gridsize1 = gridInqSize(gridIDin);
-  lonIn = (double*) Malloc(nlonIn*sizeof(double));
-  latIn = (double*) Malloc(nlatIn*sizeof(double));
+  int nlonIn = gridInqXsize(gridIDin);
+  int nlatIn = gridInqYsize(gridIDin);
+  // int gridsize1 = gridInqSize(gridIDin);
+  double *lonIn = (double*) Malloc(nlonIn*sizeof(double));
+  double *latIn = (double*) Malloc(nlatIn*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
   for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= DEG2RAD;
   for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= DEG2RAD;
 
-  xlonIn = (double*) Malloc((nlonIn+1)*sizeof(double));
-  xlatIn = (double*) Malloc((nlatIn+1)*sizeof(double));
+  double *xlonIn = (double*) Malloc((nlonIn+1)*sizeof(double));
+  double *xlatIn = (double*) Malloc((nlatIn+1)*sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = xlonIn[1] - xlonIn[0];
@@ -245,18 +189,18 @@ void yar_remap_bil(field_type *field1, field_type *field2)
   if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
     cdoAbort("Target grid has no values");
 
-  nlonOut = gridInqXsize(gridIDout);
-  nlatOut = gridInqYsize(gridIDout);
-  gridsize2 = gridInqSize(gridIDout);
-  lonOut = (double*) Malloc(nlonOut*sizeof(double));
-  latOut = (double*) Malloc(nlatOut*sizeof(double));
+  int nlonOut = gridInqXsize(gridIDout);
+  int nlatOut = gridInqYsize(gridIDout);
+  // int gridsize2 = gridInqSize(gridIDout);
+  double *lonOut = (double*) Malloc(nlonOut*sizeof(double));
+  double *latOut = (double*) Malloc(nlatOut*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
   for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= DEG2RAD;
   for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= DEG2RAD;
 
-  xlonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
-  xlatOut = (double*) Malloc((nlatOut+1)*sizeof(double));
+  double *xlonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
+  double *xlatOut = (double*) Malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = xlonOut[1] - xlonOut[0];
@@ -408,12 +352,16 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 
   if ( cdoTimer ) timer_stop(timer_yar_remap_bil);
 
+  double *array1 = field1->ptr;
+  double *array2 = field2->ptr;
+  double missval = field1->missval;
+
   if ( cdoTimer ) timer_start(timer_yar_remap);
   yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts,
 	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
-  nmiss = 0;
+  int nmiss = 0;
   for ( int i = 0; i < gridInqSize(gridIDout); ++i )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
@@ -424,7 +372,6 @@ void yar_remap_bil(field_type *field1, field_type *field2)
   //free(latIn);
   //free(lonOut);
   //free(latOut);
-  //free(fieldIn);
 #endif
 }
 
@@ -433,27 +380,17 @@ void yar_remap_con(field_type *field1, field_type *field2)
 {
   int nlonIn, nlatIn;
   int nlonOut, nlatOut;
-  int ilat, ilon;
   int gridIDin, gridIDout;
-  int i, nmiss;
-  int gridsize1, gridsize2;
   double *lonIn, *latIn;
   double *lonOut, *latOut;
   double *xlonIn, *xlatIn;
   double *xlonOut, *xlatOut;
-  double **fieldIn;
-  double **field;
-  double *array1, *array2;
-  double missval;
   double dxIn, dxOut;
   remap_t remap;
   /* static int index = 0; */
 
   gridIDin  = field1->grid;
   gridIDout = field2->grid;
-  array1    = field1->ptr;
-  array2    = field2->ptr;
-  missval   = field1->missval;
 
   if ( ! (gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)) )
     cdoAbort("Source grid has no values");
@@ -471,7 +408,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
-  gridsize1 = gridInqSize(gridIDin);
+  // int gridsize1 = gridInqSize(gridIDin);
   lonIn = (double*) Malloc((nlonIn+1)*sizeof(double));
   latIn = (double*) Malloc((nlatIn+1)*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
@@ -493,7 +430,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
 
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
-  gridsize2 = gridInqSize(gridIDout);
+  // int gridsize2 = gridInqSize(gridIDout);
   lonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
   latOut = (double*) Malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
@@ -712,12 +649,16 @@ void yar_remap_con(field_type *field1, field_type *field2)
   //polygon_destroy ( &polygons );
   if ( cdoTimer ) timer_stop(timer_yar_remap_con);
 
+  double *array1 = field1->ptr;
+  double *array2 = field2->ptr;
+  double missval = field1->missval;
+
   if ( cdoTimer ) timer_start(timer_yar_remap);
   yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts,
 	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
-  nmiss = 0;
+  int nmiss = 0;
   for ( int i = 0; i < gridInqSize(gridIDout); ++i )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
@@ -738,7 +679,6 @@ void yar_remap_con(field_type *field1, field_type *field2)
   //free(latIn);
   //free(lonOut);
   //free(latOut);
-  //free(fieldIn);
 #endif
 }
 
@@ -750,9 +690,7 @@ void *YAR(void *argument)
   int varID, levelID;
   int gridID1 = -1;
   int nmiss;
-  int xinc = 0, yinc = 0;
   double missval;
-  double slon, slat;
 
   if ( cdoTimer )
     {
