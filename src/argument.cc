@@ -10,7 +10,7 @@
 
 argument_t *file_argument_new(const char *filename)
 {
-  argument_t *argument = (argument_t*) Calloc(1, sizeof(argument_t));
+  argument_t *argument = new argument_t();
 
   argument->argc = 1;
   argument->argv = (char **) Calloc(1, sizeof(char *));
@@ -35,7 +35,7 @@ void file_argument_free(argument_t *argument)
 
 argument_t *argument_new(size_t argc, size_t len)
 {
-  argument_t *argument = (argument_t*) Calloc(1, sizeof(argument_t));
+  argument_t *argument = new argument_t();
 
   if ( argc > 0 )
     {
