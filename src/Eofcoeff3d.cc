@@ -218,11 +218,12 @@ void *Eofcoeff3d(void * argument)
 		  else
 		    nmiss += 1;
                 }            
-
+              /*
               if ( nmiss ) {
 		out[varID][eofID].nmiss=1;
 		out[varID][eofID].ptr[0]=missval2;
 	      }
+              */
             }
 
           if ( varID >= nvars )
