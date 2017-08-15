@@ -391,7 +391,7 @@ pstream_t::pstreamOpenReadPipe(const argument_t *argument)
 
   argument_t *newargument = argument_new(argument->argc + 1, argument->argc *sizeof(char *));
   newargument->operatorName = "";
-  memcpy(newargument->argv, argument->argv, argument->argc * sizeof(char *));
+  newargument->argv = argument->argv;
 
   char *operatorArg = argument->argv[0];
   const char *operatorName = getOperatorName(operatorArg);
@@ -947,8 +947,6 @@ pstreamCloseChildStream(pstream_t *pstreamptr)
     if (pstreamptr->argument)
     {
       argument_t *argument = (argument_t *) (pstreamptr->argument);
-      if (argument->argv)
-        Free(argument->argv);
       if (argument->args)
         Free(argument->args);
       delete (argument);

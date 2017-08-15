@@ -13,7 +13,7 @@ argument_t *file_argument_new(const char *filename)
   argument_t *argument = new argument_t();
 
   argument->argc = 1;
-  argument->argv = (char **) Calloc(1, sizeof(char *));
+  argument->argv.resize(argument->argc);
   argument->argv[0] = (char *) filename;
   argument->args = (char *) filename;
 
@@ -27,9 +27,8 @@ void file_argument_free(argument_t *argument)
       if ( argument->argc )
         {
           assert(argument->argc == 1);
-          Free(argument->argv);
         }
-      Free(argument);
+      delete(argument);
     }
 }
 
@@ -40,7 +39,7 @@ argument_t *argument_new(size_t argc, size_t len)
   if ( argc > 0 )
     {
       argument->argc = argc;
-      argument->argv = (char **) Calloc(argc, sizeof(char *));
+      argument->argv.resize(argc);
     }
 
   if ( len > 0 )
@@ -60,13 +59,10 @@ void argument_free(argument_t *argument)
             {
               if ( argument->argv[i] )
                 {
-                  Free(argument->argv[i]);
-                  argument->argv[i] = NULL;
+                    argument->argv[i] = NULL;
                 }
             }
 
-          Free(argument->argv);
-          argument->argv = NULL;
           argument->argc = 0;
         }
 

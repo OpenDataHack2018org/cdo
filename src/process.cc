@@ -406,10 +406,10 @@ processOperator(void)
   return processSelf().xoperator;
 }
 
-static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams);
+static int skipInputStreams(int argc,  std::vector<char *> &argv, int globArgc, int nstreams);
 
 static int
-getGlobArgc(int argc, char *argv[], int globArgc)
+getGlobArgc(int argc,  std::vector<char *> &argv, int globArgc)
 {
   char *opername = &argv[globArgc][1];
   char *comma_position = strchr(opername, ',');
@@ -436,7 +436,7 @@ getGlobArgc(int argc, char *argv[], int globArgc)
 }
 
 static int
-skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
+skipInputStreams(int argc, std::vector<char*>& argv, int globArgc, int nstreams)
 {
   while (nstreams > 0)
     {
@@ -459,7 +459,7 @@ skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
 }
 
 static int
-getStreamCnt(int argc, char *argv[])
+getStreamCnt(int argc, std::vector<char *>& argv)
 {
   int streamCnt = 0;
   int globArgc = 1;
@@ -480,7 +480,7 @@ getStreamCnt(int argc, char *argv[])
 }
 
 static void
-setStreamNames(int argc, char *argv[])
+setStreamNames(int argc, std::vector<char *> &argv)
 {
   process_t &process = processSelf();
   int i, ac;
@@ -512,7 +512,7 @@ setStreamNames(int argc, char *argv[])
           process.streamNames[process.streamCnt].args = streamname;
           ac = globArgc - globArgcStart;
           // printf("setStreamNames:  ac %d  streamname1: %s\n", ac, streamname);
-          process.streamNames[process.streamCnt].argv = (char **) Malloc(ac * sizeof(char *));
+          process.streamNames[process.streamCnt].argv.resize(ac);
           for (i = 0; i < ac; ++i)
             process.streamNames[process.streamCnt].argv[i] = argv[i + globArgcStart];
           process.streamNames[process.streamCnt].argc = ac;
@@ -526,7 +526,7 @@ setStreamNames(int argc, char *argv[])
           strcpy(streamname, argv[globArgc]);
           process.streamNames[process.streamCnt].args = streamname;
           ac = 1;
-          process.streamNames[process.streamCnt].argv = (char **) Malloc(ac * sizeof(char *));
+          process.streamNames[process.streamCnt].argv.resize(ac);
           process.streamNames[process.streamCnt].argv[0] = argv[globArgc];
           process.streamNames[process.streamCnt].argc = ac;
           process.streamNames[process.streamCnt].args = streamname;
@@ -605,7 +605,6 @@ expand_wildcards(process_t &process, int streamCnt)
 
       streamCnt = streamCnt - 1 + glob_arg->argc;
 
-      Free(process.streamNames[0].argv);
       Free(process.streamNames[0].args);
 
       process.streamNames.resize(streamCnt);
@@ -616,10 +615,11 @@ expand_wildcards(process_t &process, int streamCnt)
 
       for (int i = 0; i < glob_arg->argc; ++i)
         {
-          process.streamNames[i].argv = (char **) Malloc(sizeof(char *));
-          process.streamNames[i].argc = 1;
-          process.streamNames[i].argv[0] = strdupx(glob_arg->argv[i]);
-          process.streamNames[i].args = strdupx(glob_arg->argv[i]);
+          argument_t &current_argument = process.streamNames[i];
+          current_argument.argc = 1;
+          current_argument.argv.resize(current_argument.argc);
+          current_argument.argv[0] = strdupx(glob_arg->argv[i]);
+          current_argument.args = strdupx(glob_arg->argv[i]);
           if (cdoVerbose)
             cdoPrint("         >%s<", glob_arg->argv[i]);
         }
@@ -713,7 +713,7 @@ checkStreamCnt(void)
 }
 
 static void
-setStreams(int argc, char *argv[])
+setStreams(int argc, std::vector<char *> &argv)
 {
   process_t &process = processSelf();
   int streamCnt = getStreamCnt(argc, argv);
@@ -728,7 +728,6 @@ setStreams(int argc, char *argv[])
   for (int i = 0; i < streamCnt; i++)
     {
       process.streamNames[i].argc = 0;
-      process.streamNames[i].argv = NULL;
       process.streamNames[i].args = NULL;
     }
 
@@ -753,7 +752,7 @@ processDefArgument(void *vargument)
   int oargc = 0;
   char **oargv = process.oargv;
   int argc = ((argument_t *) vargument)->argc;
-  char **argv = ((argument_t *) vargument)->argv;
+  std::vector<char *> &argv = ((argument_t *) vargument)->argv;
 
   process.xoperator = argv[0];
   process.operatorName = getOperatorName(process.xoperator);

@@ -2,13 +2,14 @@
 #define ARGUMENT_H
 
 #include <string>
+#include <vector>
 
 struct argument_t
 {
   //argument_t();
   int process_id;
   int    argc;
-  char **argv;
+  std::vector<char *> argv;
   char  *args;
   std::string operatorName;
   char * operatorArguments;
