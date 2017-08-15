@@ -389,9 +389,7 @@ pstream_t::pstreamOpenReadPipe(const argument_t *argument)
   createPipeName(pipename, pnlen);
   // struct sched_param param;
 
-  argument_t *newargument = new argument_t();
-  newargument->argc = argument->argc + 1;
-  newargument->argv = (char **) Malloc(newargument->argc * sizeof(char *));
+  argument_t *newargument = argument_new(argument->argc + 1, argument->argc *sizeof(char *));
   newargument->operatorName = "";
   memcpy(newargument->argv, argument->argv, argument->argc * sizeof(char *));
 

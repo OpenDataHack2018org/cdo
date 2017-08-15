@@ -17,6 +17,7 @@
 #ifndef MODULES_H
 #define MODULES_H
 
+
 #include <iostream>
 #include <map>
 #include <stdbool.h>
@@ -60,6 +61,8 @@ static std::map<std::string, std::string> aliases;
 
 void *(*operatorModule(std::string operatorName))(void *);
 void *(*operatorModule(const char *operatorName))(void *);
+
+modules_t &getModule(const std::string &operatorName);
 void init_modules();
 
 void init_aliases();

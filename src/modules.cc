@@ -1421,3 +1421,9 @@ void get_original(char * operatorName)
         Error("%s is not an alias", operatorName);
     }
 }
+
+
+modules_t &getModule(const std::string &operator_name)
+{
+    return modules[get_module_name_to(operator_name)];
+}

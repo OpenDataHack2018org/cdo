@@ -782,6 +782,8 @@ processDefArgument(void *vargument)
 
   processDefPrompt(process.operatorName);
 
+  process.module = getModule(process.operatorName);
+
   setStreams(argc, argv);
 }
 

@@ -22,8 +22,10 @@
 #include <vector>
 #include "util.h"
 #include "pstream.h"
+#include "modules.h"
 
 #include <vector>
+#include <iostream>
 
 constexpr int MAX_PROCESS  =   128;
 constexpr int MAX_STREAM   =    64;
@@ -70,6 +72,8 @@ class process_t {
   short       noper;
   oper_t      oper[MAX_OPERATOR];
 
+  modules_t module;
+
   int getInStreamCnt();
   int getOutStreamCnt();
   void initProcess();
@@ -77,7 +81,9 @@ class process_t {
   process_t(int ID);
  private: 
   process_t();
-
+  void OpenRead(int p_input_idx);
+  void OpenWrite(int p_input_idx);
+  void OpenAppend(int p_input_idx);
 };
 
   pstream_t*  processInqInputStream(int streamindex);
@@ -115,4 +121,5 @@ const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
 const argument_t *cdoStreamName(int cnt);
+
 #endif  /* _PROCESS_H */

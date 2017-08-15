@@ -23,6 +23,7 @@
 #include "argument.h"
 
 #include <sys/types.h> /* off_t */
+#include <vector>
 
 class pstream_t
 {
@@ -34,12 +35,13 @@ public:
   void defTimestep(int p_tsID);
   bool isPipe();
   void pstreamOpenReadPipe(const argument_t *argument);
-  void pstreamOpenReadFile(const argument_t *argument);
+  void pstreamOpenReadFile(const char *argument);
   void openAppend(const char * p_filename);
   void init();
   void defVlist(int p_vlistID);
   void close();
   int self; //aka the id of the pstream
+  std::pair<int, int> m_id;
   int mode;
   int m_fileID;
   int m_vlistID;
@@ -60,7 +62,7 @@ public:
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
 private:
-   void createFilelist(const argument_t * p_argument);
+   void createFilelist(const char *p_args);
    pstream_t();
    void createPipeName(char *pipename, int pnlen);
    void defVarList(int vlistID);
