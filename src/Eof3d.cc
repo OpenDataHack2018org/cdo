@@ -52,17 +52,14 @@ void *EOF3d(void * argument)
 
   size_t temp_size = 0, npack = 0;
   int varID, levelID;
-  int missval_warning = 0;
+  bool missval_warning = false;
   int nmiss, ngrids;
   int n = 0;
   size_t nlevs = 0;
-  size_t offset;
   int timer_cov = 0, timer_eig = 0;
 
   int calendar = CALENDAR_STANDARD;
-  juldate_t juldate;
 
-  double missval = 0;
   double sum_w;
   double **cov = NULL;                                /* TODO: covariance matrix / eigenvectors after solving */
   double *eigv;
@@ -146,10 +143,10 @@ void *EOF3d(void * argument)
   size_t maxlevs = 0;
   for ( varID = 0; varID < nvars; ++varID )
     {
-      size_t gridsize     = vlistGridsizeMax(vlistID1);
-      nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      temp_size           = gridsize * nlevs;
-      missval             = vlistInqVarMissval(vlistID1, varID);
+      size_t gridsize = vlistGridsizeMax(vlistID1);
+      nlevs     = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      temp_size = gridsize * nlevs;
+      double missval = vlistInqVarMissval(vlistID1, varID);
 
       if ( nlevs > maxlevs ) maxlevs = nlevs;
 
@@ -217,11 +214,11 @@ void *EOF3d(void * argument)
           pstreamInqRecord(streamID1, &varID, &levelID);
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          double missval = vlistInqVarMissval(vlistID1, varID);
 
-          missval = vlistInqVarMissval(vlistID1, varID);
           pstreamReadRecord(streamID1, in, &nmiss);
 
-	  offset = gridsize * levelID;
+	  size_t offset = gridsize * levelID;
 	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      if ( ! DBL_IS_EQUAL(in[i], missval ) )
@@ -231,11 +228,12 @@ void *EOF3d(void * argument)
 		}
 	      else
 		{
-		  if ( missval_warning == 0 )
+                  if ( datacounts[varID][offset + i] != 0 ) cdoAbort("Missing values unsupported!");
+		  if ( missval_warning == false )
 		    {
-		      cdoWarning("Missing Value Support not checked for this Operator!");
-		      cdoWarning("Does not work with changing locations of missing values in time.");
-		      missval_warning = 1;
+		      // cdoWarning("Missing Value Support not checked for this Operator!");
+		      // cdoWarning("Does not work with changing locations of missing values in time.");
+		      missval_warning = true;
 		    }
 		  datafields[varID][tsID][i+offset] = 0;
 		}
@@ -254,6 +252,7 @@ void *EOF3d(void * argument)
       size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       temp_size = gridsize * nlevs;
+      double missval = vlistInqVarMissval(vlistID1, varID);
 
       if ( cdoVerbose )
         {
@@ -287,7 +286,7 @@ void *EOF3d(void * argument)
         {
           char vname[64];
           vlistInqVarName(vlistID1,varID,&vname[0]);
-          cdoWarning("Refusing to calculate EOF from a single time step for var%i (%s)",varID,&vname[0]);
+          cdoWarning("Refusing to calculate EOF from a single time step for var%i (%s)", varID+1, &vname[0]);
           continue;
         }
 
@@ -441,7 +440,7 @@ void *EOF3d(void * argument)
 
   int vdate = 10101;
   int vtime = 0;
-  juldate = juldate_encode(calendar, vdate, vtime);
+  juldate_t juldate = juldate_encode(calendar, vdate, vtime);
   for ( tsID = 0; tsID < n; tsID++ )
     {
       juldate = juldate_add_seconds(60, juldate);
@@ -460,10 +459,11 @@ void *EOF3d(void * argument)
 
       for ( varID = 0; varID < nvars; varID++ )
         {
+          double missval = vlistInqVarMissval(vlistID1, varID);
           nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           for ( levelID = 0; levelID < (int)nlevs; levelID++ )
             {
-	      offset = levelID * gridsizemax;
+	      size_t offset = levelID * gridsizemax;
               if ( tsID < n_eig )
                 {
                   nmiss = 0;
@@ -474,8 +474,9 @@ void *EOF3d(void * argument)
                   pstreamWriteRecord(streamID3, &eigenvectors[varID][tsID][offset], nmiss);
                 }
 	    }
-	  if ( DBL_IS_EQUAL(eigenvalues[varID][tsID][0], missval) ) nmiss = 1;
-	  else nmiss = 0;
+
+	  nmiss = (DBL_IS_EQUAL(eigenvalues[varID][tsID][0], missval)) ? 1 : 0;
+
 	  pstreamDefRecord(streamID2, varID, 0);
 	  pstreamWriteRecord(streamID2, eigenvalues[varID][tsID],nmiss);
         } // for ( varID = 0; ... )
