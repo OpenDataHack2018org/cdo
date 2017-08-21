@@ -34,7 +34,7 @@ public:
   int inqFileType();
   void defTimestep(int p_tsID);
   bool isPipe();
-  void pstreamOpenReadPipe(const argument_t *argument);
+  void pstreamOpenReadPipe(const char* pipename);
   void pstreamOpenReadFile(const char *argument);
   void openAppend(const char * p_filename);
   void init();
@@ -64,7 +64,6 @@ public:
 private:
    void createFilelist(const char *p_args);
    pstream_t();
-   void createPipeName(char *pipename, int pnlen);
    void defVarList(int vlistID);
 #endif
 };

@@ -232,7 +232,7 @@ processDefCputime(int processID, double cputime)
 double
 processInqCputime(int processID)
 {
-  return processSelf().cputime;
+  return Process.find(processID)->second.cputime;
 }
 
 void

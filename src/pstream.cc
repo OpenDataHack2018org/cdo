@@ -329,12 +329,6 @@ pstream_t::isPipe()
   return ispipe;
 }
 
-void pstream_t::createPipeName(char *pipename, int pnlen)
-{
-
-  snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
-}
-
 pthread_t
 pCreateReadThread(argument_t *argument)
 {
@@ -379,47 +373,18 @@ pCreateReadThread(argument_t *argument)
 }
 
 void
-pstream_t::pstreamOpenReadPipe(const argument_t *argument)
+pstream_t::pstreamOpenReadPipe(const char *pipename)
 {
 #if defined(HAVE_LIBPTHREAD)
   // int pstreamID = pstreamptr->self;
-
-  size_t pnlen = 16;
-  char *pipename = (char *) Malloc(pnlen);
-  createPipeName(pipename, pnlen);
-  // struct sched_param param;
-
-  argument_t *newargument = argument_new(argument->argc + 1, argument->argc *sizeof(char *));
-  newargument->operatorName = "";
-  newargument->argv = argument->argv;
-
-  char *operatorArg = argument->argv[0];
-  const char *operatorName = getOperatorName(operatorArg);
-
-  size_t len = strlen(argument->args);
-  char *newarg = (char *) Malloc(len + pnlen);
-  strcpy(newarg, argument->args);
-  newarg[len] = ' ';
-  strcpy(&newarg[len + 1], pipename);
-
-  newargument->argv[argument->argc] = pipename;
-  newargument->args = newarg;
-  newargument->operatorName = std::string(operatorName, strlen(operatorName));
 
   ispipe = true;
   m_name = pipename;
   rthreadID = pthread_self();
   pipe = new pipe_t();
   pipe->name = std::string(pipename);
-  argument = newargument;
 
-  if (!cdoSilentMode)
-    {
-      cdoPrint("Started child process \"%s\".", newarg + 1);
-    }
-  pCreateReadThread(newargument);
-  /* Free(operatorName); */
-  processAddInputStream(this);
+    /* Free(operatorName); */
   /*      pipeInqInfo(pstreamID); */
   if (PSTREAM_Debug)
     Message("pipe %s", pipename);
@@ -605,6 +570,12 @@ pstream_t::pstreamOpenReadFile(const char* p_args)
   m_fileID = fileID;
 }
 
+void createPipeName(char *pipename, int pnlen)
+{
+
+  snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
+}
+
 int
 pstreamOpenRead(const argument_t *argument)
 {
@@ -623,7 +594,18 @@ pstreamOpenRead(const argument_t *argument)
   */
   if (ispipe)
     {
-      pstreamptr->pstreamOpenReadPipe(argument);
+      size_t pnlen = 16;
+      char *pipename = (char *) Malloc(pnlen);
+      createPipeName(pipename, pnlen);
+      argument_t * newargument = pipe_argument_new(argument, pipename, pnlen);
+      pstreamptr->pstreamOpenReadPipe(pipename);
+      pCreateReadThread(newargument);
+      if (!cdoSilentMode)
+      {
+        cdoPrint("Started child process \"%s\".", newargument->args + 1);
+      }
+
+      processAddInputStream(pstreamptr);
     }
   else
     {

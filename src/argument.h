@@ -15,6 +15,7 @@ struct argument_t
   char * operatorArguments;
 };
 
+argument_t * pipe_argument_new(const argument_t *argument,  char *pipename, int pnlen);
 argument_t makeArgument(int argc, char *argv[]);
 argument_t *file_argument_new(const char *filename);
 void        file_argument_free(argument_t *argument);

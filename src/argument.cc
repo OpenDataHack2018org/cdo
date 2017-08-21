@@ -1,6 +1,7 @@
 
 #include "argument.h"
 #include "dmemory.h"
+#include "util.h"
 
 #include <string>
 #include <iostream>
@@ -18,6 +19,30 @@ argument_t *file_argument_new(const char *filename)
   argument->args = (char *) filename;
 
   return argument;
+}
+
+
+argument_t * pipe_argument_new(const argument_t *argument,  char *pipename, int pnlen)
+{
+  // struct sched_param param;
+
+  argument_t *newargument = argument_new(argument->argc + 1, argument->argc *sizeof(char *));
+  newargument->operatorName = "";
+  newargument->argv = argument->argv;
+
+  char *operatorArg = argument->argv[0];
+  const char *operatorName = getOperatorName(operatorArg);
+
+  size_t len = strlen(argument->args);
+  char *newarg = (char *) Malloc(len + pnlen);
+  strcpy(newarg, argument->args);
+  newarg[len] = ' ';
+  strcpy(&newarg[len + 1], pipename);
+
+  newargument->argv[argument->argc] = pipename;
+  newargument->args = newarg;
+  newargument->operatorName = std::string(operatorName, strlen(operatorName));
+  return newargument;
 }
 
 void file_argument_free(argument_t *argument)
