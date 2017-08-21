@@ -40,22 +40,20 @@ int pclose(FILE *stream);
 #include "modules.h"
 #include "pstream.h"
 #include "pstream_int.h"
-#include "cdo_int.h"
 #include "util.h"
 #include "pipe.h"
 #include "error.h"
-#include "dmemory.h"
 
 static int PSTREAM_Debug = 0;
 
-#define MAX_PSTREAMS 4096
+//#define MAX_PSTREAMS 4096
 
-static int _pstream_max = MAX_PSTREAMS;
+//static int _pstream_max = MAX_PSTREAMS;
 
 
-static void pstream_initialize(void);
+//static void pstream_initialize(void);
 
-static bool _pstream_init = false;
+//static bool _pstream_init = false;
 
 #if defined(HAVE_LIBPTHREAD)
 #include <pthread.h>
@@ -68,7 +66,7 @@ static pthread_mutex_t streamOpenReadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t streamOpenWriteMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t streamMutex = PTHREAD_MUTEX_INITIALIZER;
 
-static pthread_once_t _pstream_init_thread = PTHREAD_ONCE_INIT;
+//static pthread_once_t _pstream_init_thread = PTHREAD_ONCE_INIT;
 //static pthread_mutex_t _pstream_mutex;
 
 static std::mutex _pstream_map_mutex;
@@ -1580,7 +1578,6 @@ pstreamInqTimestep(int pstreamID, int tsID)
 
       if (nrecs == 0 && pstreamptr->mfiles && (pstreamptr->nfiles < pstreamptr->mfiles))
         {
-          size_t len;
           int nfile = pstreamptr->nfiles;
           std::string filename; 
           int fileID;

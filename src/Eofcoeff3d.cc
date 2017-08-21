@@ -32,7 +32,7 @@
 
 void *Eofcoeff3d(void * argument)
 {
-  char eof_name[6], oname[1024], filesuffix[32];
+  char eof_name[8], oname[1024], filesuffix[32];
   double missval1 = -999, missval2 = -999;
   field_type in;  
   int i, varID, levelID;    
@@ -62,7 +62,7 @@ void *Eofcoeff3d(void * argument)
     cdoAbort("Gridsize of input files does not match!");     
   
   if ( vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1 )
-    cdoAbort("Too many grids in input");
+    cdoAbort("Too many different grids in input");
   
   int nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
   int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));
@@ -110,6 +110,7 @@ void *Eofcoeff3d(void * argument)
        }
      eofID++;
    }
+
   int neof = eofID;  
   
   if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoStreamName(0)->args, neof);
@@ -117,25 +118,32 @@ void *Eofcoeff3d(void * argument)
   int gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
-  double *xvals= (double*) Malloc(1*sizeof(double));
-  double *yvals= (double*) Malloc(1*sizeof(double));
-  xvals[0]=0;
-  yvals[0]=0;
-  gridDefXvals(gridID3, xvals);
-  gridDefYvals(gridID3, yvals);
+  double xvals = 0;
+  double yvals = 0;
+  gridDefXvals(gridID3, &xvals);
+  gridDefYvals(gridID3, &yvals);
   
-  double *zvals = (double *) Malloc( 1* sizeof(double ));
-  zvals[0] = 0.;
+  double zvals = 0.;
   int zaxisID3 = zaxisCreate(ZAXIS_GENERIC,1);
-  zaxisDefLevels(zaxisID3,zvals);
+  zaxisDefLevels(zaxisID3, &zvals);
   zaxisDefName(zaxisID3,"zaxis_Reduced");
   zaxisDefLongname(zaxisID3,"Reduced zaxis from EOF3D - only one coefficient per 3D eigenvector and time step");
   
-  int vlistID3 = vlistCreate();
+  // Create var-list and time-axis for output
+
+  int vlistID3 = vlistDuplicate(vlistID2);   
+
+  int ngrids = vlistNgrids(vlistID3);
+  for ( i = 0; i < ngrids; i++ )
+    vlistChangeGridIndex(vlistID3, i, gridID3);     
+      
+  int nzaxis = vlistNzaxis(vlistID3);
+  for ( i = 0; i < nzaxis; i++ )
+    vlistChangeZaxisIndex(vlistID3, i, zaxisID3);
+  
   vlistDefTaxis(vlistID3,taxisID3);
-  int *varID3 = (int*) Malloc(nvars * sizeof(int));
-  for ( varID=0; varID<nvars; varID++ )
-    varID3[varID] = vlistDefVar(vlistID3, gridID3, zaxisID3, TSTEP_INSTANT);
+  for (varID =0; varID<nvars; varID++)
+    vlistDefVarTsteptype(vlistID3, varID, TSTEP_INSTANT);
   
   // open streams for eofcoeff output
   int *streamIDs = (int*) Malloc(neof*sizeof(int)); 
@@ -157,7 +165,7 @@ void *Eofcoeff3d(void * argument)
       
       pstreamDefVlist(streamIDs[eofID], vlistID3);
     }
-  
+
   // ALLOCATE temporary fields for data read and write
   in.ptr = (double*) Malloc(gridsize*sizeof(double));
   in.grid = gridID1;  
@@ -210,11 +218,12 @@ void *Eofcoeff3d(void * argument)
 		  else
 		    nmiss += 1;
                 }            
-
+              /*
               if ( nmiss ) {
 		out[varID][eofID].nmiss=1;
 		out[varID][eofID].ptr[0]=missval2;
 	      }
+              */
             }
 
           if ( varID >= nvars )

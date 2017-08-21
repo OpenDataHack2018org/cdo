@@ -1094,7 +1094,7 @@ processClosePipes(void)
       pstream_t *pstreamptr = processInqInputStream(sindex);
 
       if (PROCESS_DEBUG)
-        Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamptr->self);
+        Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
 
       if (pstreamptr)
         pstreamptr->close();
@@ -1106,7 +1106,7 @@ processClosePipes(void)
       pstream_t *pstreamptr = processInqOutputStream(sindex);
 
       if (PROCESS_DEBUG)
-        Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamptr->self);
+        Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
 
       if (pstreamptr)
           pstreamptr->close();

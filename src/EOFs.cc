@@ -176,9 +176,6 @@ void *EOFs(void * argument)
   int timer_cov = 0, timer_eig = 0;
 
   int calendar = CALENDAR_STANDARD;
-  juldate_t juldate;
-
-  double missval = 0;
 
   typedef struct {
     bool init;
@@ -320,9 +317,7 @@ void *EOFs(void * argument)
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
-      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      missval  = vlistInqVarMissval(vlistID1, varID);
+      nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
       eofdata[varID] = (eofdata_t *) Malloc(nlevs*sizeof(eofdata_t));
 
@@ -360,8 +355,8 @@ void *EOFs(void * argument)
           pstreamInqRecord(streamID1, &varID, &levelID);
           pstreamReadRecord(streamID1, in, &nmiss);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-          missval = vlistInqVarMissval(vlistID1, varID);
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          double missval = vlistInqVarMissval(vlistID1, varID);
 	  if ( npack == ULONG_MAX )
 	    {
 	      npack = 0;
@@ -471,7 +466,7 @@ void *EOFs(void * argument)
 
   int vdate = 10101;
   int vtime = 0;
-  juldate = juldate_encode(calendar, vdate, vtime);
+  juldate_t juldate = juldate_encode(calendar, vdate, vtime);
 
   double *out = in;
   double *eig_val = NULL;
@@ -499,8 +494,9 @@ void *EOFs(void * argument)
 	{
 	  char vname[256];
 	  vlistInqVarName(vlistID1, varID, vname);
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          double missval = vlistInqVarMissval(vlistID1, varID);
 
 	  for ( levelID = 0; levelID < nlevs; levelID++ )
 	    {
@@ -619,8 +615,8 @@ void *EOFs(void * argument)
                   pstreamWriteRecord(streamID3, out, nmiss);
 		} // loop n_eig
 
-	      nmiss = 0;
-              if ( DBL_IS_EQUAL(eig_val[tsID], missval) ) nmiss = 1;
+              nmiss = (DBL_IS_EQUAL(eig_val[tsID], missval)) ? 1 : 0;
+
               pstreamDefRecord(streamID2, varID, levelID);
               pstreamWriteRecord(streamID2, &eig_val[tsID], nmiss);
 	    } // loop nlevs

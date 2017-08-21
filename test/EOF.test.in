@@ -1,6 +1,6 @@
 #! @BASH@
 #
-echo 1..2 # Number of tests to be executed.
+echo 1..4 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -22,11 +22,15 @@ OFILE1=eval_res
 OFILE2=eof_res
 OFILE3=res_pcoeff
 #
+DIM=""
+#
+for X in 1 2; do
+if [ $X = 2 ] ; then DIM=3d ; fi
 for MODE in jacobi danielson_lanczos; do
   export CDO_SVD_MODE=$MODE
   RSTAT=0
-  CDOTEST="eof/eofcoeff - $MODE"
-  CDOCOMMAND="$CDO $FORMAT eof,1 $IFILE $OFILE1 $OFILE2"
+  CDOTEST="eof${DIM}/eofcoeff${DIM} - $MODE"
+  CDOCOMMAND="$CDO $FORMAT eof${DIM},1 $IFILE $OFILE1 $OFILE2"
   echo "$CDOCOMMAND"
 
   $CDOCOMMAND
@@ -40,7 +44,7 @@ for MODE in jacobi danielson_lanczos; do
   test $? -eq 0 || let RSTAT+=1
   test -s $CDOOUT && let RSTAT+=1
 
-  CDOCOMMAND="$CDO $FORMAT eofcoeff $OFILE2 $IFILE $OFILE3"
+  CDOCOMMAND="$CDO $FORMAT eofcoeff${DIM} $OFILE2 $IFILE $OFILE3"
   echo "$CDOCOMMAND"
 
   $CDOCOMMAND
@@ -57,6 +61,7 @@ for MODE in jacobi danielson_lanczos; do
 #
   let NTEST+=1
   rm -f $OFILE1 $OFILE2 ${OFILE3}00000
+done
 done
 #
 rm -f $CDOOUT $CDOERR
