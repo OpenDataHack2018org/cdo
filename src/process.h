@@ -67,7 +67,7 @@ class process_t {
   const char *operatorName;
   char       *operatorArg;
   int         oargc;
-  char       *oargv[MAX_OARGC];
+  std::vector<char *> oargv;
   char        prompt[64];
   short       noper;
   oper_t      oper[MAX_OPERATOR];

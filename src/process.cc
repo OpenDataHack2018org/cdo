@@ -749,8 +749,7 @@ processDefArgument(void *vargument)
   process_t &process = processSelf();
   char *operatorArg;
   char *commapos;
-  int oargc = 0;
-  char **oargv = process.oargv;
+  std::vector<char*> &oargv = process.oargv;
   int argc = ((argument_t *) vargument)->argc;
   std::vector<char *> &argv = ((argument_t *) vargument)->argv;
 
@@ -761,22 +760,20 @@ processDefArgument(void *vargument)
 
   if (operatorArg)
     {
-      oargv[oargc++] = operatorArg;
+      oargv.push_back(operatorArg);
       // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
 
       commapos = operatorArg;
       while ((commapos = strchr(commapos, ',')) != NULL)
         {
-          *commapos++ = '\0';
+          *commapos = '\0';
+          *commapos++;
           if (strlen(commapos))
             {
-              if (oargc >= MAX_OARGC)
-                cdoAbort("Too many parameter (limit=%d)!", MAX_OARGC);
-
-              oargv[oargc++] = commapos;
+              oargv.push_back(commapos);
             }
         }
-      process.oargc = oargc;
+      process.oargc = oargv.size();
     }
 
   processDefPrompt(process.operatorName);
@@ -850,7 +847,7 @@ operatorArgc(void)
 char **
 operatorArgv(void)
 {
-  return processSelf().oargv;
+  return &processSelf().oargv[0];
 }
 
 void
