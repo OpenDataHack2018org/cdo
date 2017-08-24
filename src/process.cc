@@ -62,7 +62,7 @@ process_t::process_t(int p_ID,  char *operatorCommand ) : m_ID(p_ID)
     operatorName = getOperatorName(operatorCommand);
     initProcess();
     setOperatorArgv(operatorCommand);
-    xoperator = operatorCommand;
+    m_operatorCommand = operatorCommand;
 }
 
 void
@@ -106,7 +106,7 @@ process_t::initProcess()
   m_streamCnt = 0;
 
   oargc = 0;
-  xoperator = "UNINITALIZED";
+  m_operatorCommand = "UNINITALIZED";
   operatorArg = "UNINITALIZED";
 
   noper = 0;
@@ -451,7 +451,7 @@ cdoStreamName(int cnt)
 const char *
 processOperator(void)
 {
-  return processSelf().xoperator;
+  return processSelf().m_operatorCommand;
 }
 
 static int skipInputStreams(int argc,  std::vector<char *> &argv, int globArgc, int nstreams);
@@ -832,9 +832,9 @@ processDefArgument(void *vargument)
   std::vector<char *> &argv = ((argument_t *) vargument)->argv;
   /*
 
-  process.xoperator = argv[0];
-  process.operatorName = getOperatorName(process.xoperator);
-  process.operatorArg = getOperatorArg(process.xoperator);
+  process.m_operatorCommand = argv[0];
+  process.operatorName = getOperatorName(process.m_operatorCommand);
+  process.operatorArg = getOperatorArg(process.m_operatorCommand);
   operatorArg = process.operatorArg;
 
   if (operatorArg)
@@ -1153,7 +1153,7 @@ process_t::print_process()
   std::cout << " ntimesteps      : " << ntimesteps << std::endl;
   std::cout << " streamCnt       : " << m_streamCnt << std::endl;
   // std::cout << " streamNames     : " << streamNames                  <<  std::endl;
-  std::cout << " xoperator       : " << xoperator << std::endl;
+  std::cout << " m_operatorCommand       : " << m_operatorCommand << std::endl;
   std::cout << " operatorName    : " << operatorName << std::endl;
   std::cout << " operatorArg     : " << operatorArg << std::endl;
   std::cout << " oargc           : " << oargc << std::endl;

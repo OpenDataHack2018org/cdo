@@ -63,7 +63,7 @@ class process_t {
   int         ntimesteps;
   short       m_streamCnt;
   std::vector<argument_t> streamNames;
-  char       *xoperator;
+  char       *m_operatorCommand;
   const char *operatorName;
   char       *operatorArg;
   int         oargc;
