@@ -97,7 +97,7 @@ void argument_free(argument_t *argument)
           argument->args = NULL;
         }
 
-      Free(argument);
+      delete(argument);
     }
 }
 
@@ -111,14 +111,32 @@ void argument_fill(argument_t *argument, int argc, char *argv[])
 
 void print_argument(argument_t * p_argument)
 {
-    std::cout << "argv with " << p_argument->argc << " arguments:" << std::endl;
+    std::string output = "";
+    output += "argv with " + std::to_string(p_argument->argc) + " arguments:\n" ;
     for(int i = 0; i < p_argument->argc; i++)
     {
-        std::cout << p_argument->argv[i] << " ";
+        output += std::string(p_argument->argv[i]) + " ";
     }
-    std::cout << std::endl;
+    output += "\n";
 
-    std::cout << "OperatorName: "<< p_argument->operatorName << std::endl;
+    output += "OperatorName: " + p_argument->operatorName + "\n";
 
-    std::cout << "operatorArguments: " << p_argument->operatorArguments << std::endl;
+    output += "operatorArguments";
+    if(p_argument->operatorArguments){
+    output += ": " + std::string(p_argument->operatorArguments) + "\n";
+    }
+    else
+    {
+        output += " not set\n";
+    }
+
+    output += "args";
+    if(p_argument->operatorArguments){
+    output += ": " + std::string(p_argument->args) + "\n";
+    }
+    else
+    {
+        output += " not set\n";
+    }
+    std::cout << output;
 }
