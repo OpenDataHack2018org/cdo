@@ -79,12 +79,11 @@ class process_t {
   void initProcess();
   void print_process();
   void defArgument();
-  process_t(int ID);
   process_t(int p_ID,  char * operatorCommand);
   void setOperatorArgv( char *operatorArguments);
   void setStreams(int argc, std::vector<char *> &argv);
  private: 
-  void processDefPrompt();
+  void defPrompt();
   process_t();
   void OpenRead(int p_input_idx);
   void OpenWrite(int p_input_idx);

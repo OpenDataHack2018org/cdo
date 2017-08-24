@@ -56,13 +56,14 @@ static std::map<int, process_t> Process;
 static int NumProcess = 0;
 static int NumProcessActive = 0;
 
-process_t::process_t(int p_ID) : m_ID(p_ID) { initProcess(); }
 process_t::process_t(int p_ID,  char *operatorCommand ) : m_ID(p_ID) 
 {
-    operatorName = getOperatorName(operatorCommand);
     initProcess();
+    operatorName = getOperatorName(operatorCommand);
     setOperatorArgv(operatorCommand);
     m_operatorCommand = operatorCommand;
+
+    defPrompt(); // has to be called after get operatorName
 }
 
 void
@@ -111,7 +112,6 @@ process_t::initProcess()
 
   noper = 0;
 
-  processDefPrompt();
 }
 
 int
@@ -134,28 +134,6 @@ processCreate(char *command)
 
   int processID = NumProcess++;
   Process.insert(std::make_pair(processID, process_t(processID, command)));
-
-  NumProcessActive++;
-
-#if defined(HAVE_LIBPTHREAD)
-  pthread_mutex_unlock(&processMutex);
-#endif
-
-  if (processID >= MAX_PROCESS)
-    Error("Limit of %d processes reached!", MAX_PROCESS);
-
-  return &Process.find(processID)->second;
-}
-
-process_t *
-processCreate(void)
-{
-#if defined(HAVE_LIBPTHREAD)
-  pthread_mutex_lock(&processMutex);
-#endif
-
-  int processID = NumProcess++;
-  Process.insert(std::make_pair(processID, process_t(processID)));
 
   NumProcessActive++;
 
@@ -352,7 +330,7 @@ processInqOpername(void)
 }
 
 void process_t::
-processDefPrompt()
+defPrompt()
 {
   if (m_ID == 0)
     sprintf(prompt, "%s %s", Progname, operatorName);
