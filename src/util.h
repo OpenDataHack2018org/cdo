@@ -116,8 +116,8 @@ extern const char *CDO_Version;
 
 char *getProgname(char *string);
 char *GetOperator(const char *argument);
-const char *getOperatorName(const char *xoperator);
-char *getOperatorArg(const char *xoperator);
+const char *getOperatorName(const char *operatorCommand);
+char *getOperatorArg(const char *operatorCommand);
 const char *cdoComment(void);
 
 char *getFileArg(char *argument);
