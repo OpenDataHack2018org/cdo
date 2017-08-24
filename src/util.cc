@@ -243,13 +243,13 @@ const char *getOperatorName(const char *operatorArg)
     return operatorName;
 }
 
-char *getOperatorArg(const char *xoperator)
+char *getOperatorArg(const char *operatorCommand)
 {
   char *operatorArg = NULL;
 
-  if ( xoperator )
+  if ( operatorCommand )
     {
-      char *commapos = (char *)strchr(xoperator, ',');
+      char *commapos = (char *)strchr(operatorCommand, ',');
 
       if ( commapos )
         {
