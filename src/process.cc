@@ -50,12 +50,41 @@ pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 
 constexpr bool PROCESS_DEBUG = false;
 
+static process_t *root_process;
 static std::map<int, process_t> Process;
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
 
 process_t::process_t(int p_ID) : m_ID(p_ID) { initProcess(); }
+process_t::process_t(int p_ID,  char *operatorCommand ) : m_ID(p_ID) 
+{
+    operatorName = getOperatorName(operatorCommand);
+    initProcess();
+    setOperatorArgv(operatorCommand);
+    xoperator = operatorCommand;
+}
+
+void
+process_t::setOperatorArgv( char *operatorArguments)
+{
+    if (operatorArguments)
+    {
+       char *operatorArg = operatorArguments;
+      // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
+
+      while ((operatorArg = strchr(operatorArg, ',')) != NULL)
+        {
+          *operatorArg = '\0';
+          *operatorArg++;
+          if (strlen(operatorArg))
+            {
+              oargv.push_back(operatorArg);
+            }
+        }
+    }
+    oargc = oargv.size();
+}
 
 void
 process_t::initProcess()
@@ -74,14 +103,15 @@ process_t::initProcess()
   nvars = NULL;
   ntimesteps = NULL;
 
-  streamCnt = 0;
+  m_streamCnt = 0;
 
   oargc = 0;
   xoperator = "UNINITALIZED";
-  operatorName = "UNINITALIZED";
   operatorArg = "UNINITALIZED";
 
   noper = 0;
+
+  processDefPrompt();
 }
 
 int
@@ -95,7 +125,29 @@ process_t::getOutStreamCnt()
   return outputStreams.size();
 }
 
-int
+process_t *
+processCreate(char *command)
+{
+#if defined(HAVE_LIBPTHREAD)
+  pthread_mutex_lock(&processMutex);
+#endif
+
+  int processID = NumProcess++;
+  Process.insert(std::make_pair(processID, process_t(processID, command)));
+
+  NumProcessActive++;
+
+#if defined(HAVE_LIBPTHREAD)
+  pthread_mutex_unlock(&processMutex);
+#endif
+
+  if (processID >= MAX_PROCESS)
+    Error("Limit of %d processes reached!", MAX_PROCESS);
+
+  return &Process.find(processID)->second;
+}
+
+process_t *
 processCreate(void)
 {
 #if defined(HAVE_LIBPTHREAD)
@@ -114,7 +166,7 @@ processCreate(void)
   if (processID >= MAX_PROCESS)
     Error("Limit of %d processes reached!", MAX_PROCESS);
 
-  return processID;
+  return &Process.find(processID)->second;
 }
 
 process_t &
@@ -135,11 +187,9 @@ processSelf(void)
           }
       }
 
-  std::cout << "returning the 0th process" << std::endl;
   pthread_mutex_unlock(&processMutex);
 
 #endif
-  std::cout << "returning the std process 0" << std::endl;
   return Process.find(0)->second;
 }
 
@@ -301,15 +351,13 @@ processInqOpername(void)
   return processSelf().operatorName;
 }
 
-void
-processDefPrompt(const char *opername)
+void process_t::
+processDefPrompt()
 {
-  process_t &process = processSelf();
-
-  if (process.m_ID == 0)
-    sprintf(process.prompt, "%s %s", Progname, opername);
+  if (m_ID == 0)
+    sprintf(prompt, "%s %s", Progname, operatorName);
   else
-    sprintf(process.prompt, "%s(%d) %s", Progname, process.m_ID + 1, opername);
+    sprintf(prompt, "%s(%d) %s", Progname, m_ID + 1, operatorName);
 }
 
 const char *
@@ -385,7 +433,7 @@ glob_pattern(const char *restrict string)
 int
 cdoStreamCnt(void)
 {
-  int cnt = processSelf().streamCnt;
+  int cnt = processSelf().m_streamCnt;
   return cnt;
 }
 
@@ -394,7 +442,7 @@ cdoStreamName(int cnt)
 {
   process_t &process = processSelf();
 
-  if (cnt > process.streamCnt || cnt < 0)
+  if (cnt > process.m_streamCnt || cnt < 0)
     Error("count %d out of range!", cnt);
 
   return &(process.streamNames[cnt]);
@@ -479,10 +527,49 @@ getStreamCnt(int argc, std::vector<char *>& argv)
   return streamCnt;
 }
 
-static void
-setStreamNames(int argc, std::vector<char *> &argv)
+/*
+static void setStreamNames(int argc, std::vector<char *> *argv)
 {
-  process_t &process = processSelf();
+    //check for output of first
+    int current_argv_entry;
+    std::vector<pstream_t*> &current_instreams = root_process->inputStreams;
+    std::vector<pstream_t*> &current_outstreams = root_process->outputStreams;
+
+}
+*/
+ void
+process_t::setStreams(int argc, std::vector<char *> &argv)
+{
+  int streamCnt = getStreamCnt(argc, argv);
+
+  nvals = 0;
+  nvars = 0;
+  ntimesteps = 0;
+
+  m_streamCnt = 0; /* filled in setStreamNames */
+  if (streamCnt)
+    streamNames = std::vector<argument_t>(streamCnt);
+  for (int i = 0; i < streamCnt; i++)
+    {
+      streamNames[i].argc = 0;
+      streamNames[i].args = NULL;
+    }
+
+  setStreamNames(argc, argv);
+
+  int status = checkStreamCnt();
+
+  if (status == 0 && streamCnt != streamCnt)
+    Error("Internal problem with stream count %d %d", streamCnt, streamCnt);
+  /*
+  for ( i = 0; i < streamCnt; i++ )
+    fprintf(stderr, "setStreams: stream %d %s\n", i+1, process.streamNames[i].args);
+  */
+}
+
+ void
+process_t::setStreamNames(int argc, std::vector<char *> &argv)
+{
   int i, ac;
   int globArgc = 1;
   int globArgcStart;
@@ -498,25 +585,32 @@ setStreamNames(int argc, std::vector<char *> &argv)
           globArgc = getGlobArgc(argc, argv, globArgc);
           len = 0;
           for (i = globArgcStart; i < globArgc; i++)
+          {
             len += strlen(argv[i]) + 1;
+          }
           streamname = (char *) Calloc(1, len);
           for (i = globArgcStart; i < globArgc; i++)
             {
               strcat(streamname, argv[i]);
               if (i < globArgc - 1)
+              {
                 strcat(streamname, " ");
+              }
             }
-          for (i = 1; i < len - 1; i++)
-            if (streamname[i] == '\0')
+          for (i = 1; i < len - 1; i++){
+            if (streamname[i] == '\0'){
               streamname[i] = ' ';
-          process.streamNames[process.streamCnt].args = streamname;
+            }
+          }
+
+          streamNames[m_streamCnt].args = streamname;
           ac = globArgc - globArgcStart;
           // printf("setStreamNames:  ac %d  streamname1: %s\n", ac, streamname);
-          process.streamNames[process.streamCnt].argv.resize(ac);
+          streamNames[m_streamCnt].argv.resize(ac);
           for (i = 0; i < ac; ++i)
-            process.streamNames[process.streamCnt].argv[i] = argv[i + globArgcStart];
-          process.streamNames[process.streamCnt].argc = ac;
-          process.streamCnt++;
+            streamNames[m_streamCnt].argv[i] = argv[i + globArgcStart];
+          streamNames[m_streamCnt].argc = ac;
+          m_streamCnt++;
           // printf("setStreamNames:  streamname1: %s\n", streamname);
         }
       else
@@ -524,13 +618,13 @@ setStreamNames(int argc, std::vector<char *> &argv)
           len = strlen(argv[globArgc]) + 1;
           streamname = (char *) Malloc(len);
           strcpy(streamname, argv[globArgc]);
-          process.streamNames[process.streamCnt].args = streamname;
+          streamNames[m_streamCnt].args = streamname;
           ac = 1;
-          process.streamNames[process.streamCnt].argv.resize(ac);
-          process.streamNames[process.streamCnt].argv[0] = argv[globArgc];
-          process.streamNames[process.streamCnt].argc = ac;
-          process.streamNames[process.streamCnt].args = streamname;
-          process.streamCnt++;
+          streamNames[m_streamCnt].argv.resize(ac);
+          streamNames[m_streamCnt].argv[0] = argv[globArgc];
+          streamNames[m_streamCnt].argc = ac;
+          streamNames[m_streamCnt].args = streamname;
+          m_streamCnt++;
           // printf("setStreamNames:  streamname2: %s\n", streamname);
           globArgc++;
         }
@@ -610,7 +704,7 @@ expand_wildcards(process_t &process, int streamCnt)
       process.streamNames.resize(streamCnt);
 
       // move output streams to the end
-      for (int i = 1; i < process.streamCnt; ++i)
+      for (int i = 1; i < process.m_streamCnt; ++i)
         process.streamNames[i + glob_arg->argc - 1] = process.streamNames[i];
 
       for (int i = 0; i < glob_arg->argc; ++i)
@@ -624,7 +718,7 @@ expand_wildcards(process_t &process, int streamCnt)
             cdoPrint("         >%s<", glob_arg->argv[i]);
         }
 
-      process.streamCnt = streamCnt;
+      process.m_streamCnt = streamCnt;
     }
 
   Free(glob_arg);
@@ -633,7 +727,7 @@ expand_wildcards(process_t &process, int streamCnt)
   return 1;
 }
 
-static int
+ int
 checkStreamCnt(void)
 {
   process_t &process = processSelf();
@@ -661,29 +755,29 @@ checkStreamCnt(void)
   // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
   if (streamInCnt == -1)
     {
-      streamInCnt = process.streamCnt - streamOutCnt;
+      streamInCnt = process.m_streamCnt - streamOutCnt;
       if (streamInCnt < 1)
         cdoAbort("Input streams missing!");
     }
 
   if (streamOutCnt == -1)
     {
-      streamOutCnt = process.streamCnt - streamInCnt;
+      streamOutCnt = process.m_streamCnt - streamInCnt;
       if (streamOutCnt < 1)
         cdoAbort("Output streams missing!");
     }
   // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
 
   streamCnt = streamInCnt + streamOutCnt;
-  // printf(" streamCnt %d %d\n", process.streamCnt, streamCnt);
+  // printf(" streamCnt %d %d\n", process.m_streamCnt, streamCnt);
 
-  if (process.streamCnt > streamCnt)
+  if (process.m_streamCnt > streamCnt)
     cdoAbort("Too many streams!"
              " Operator needs %d input and %d output streams.",
              streamInCnt,
              streamOutCnt);
 
-  if (process.streamCnt < streamCnt)
+  if (process.m_streamCnt < streamCnt)
     cdoAbort("Too few streams specified!"
              " Operator needs %d input and %d output streams.",
              streamInCnt,
@@ -712,46 +806,31 @@ checkStreamCnt(void)
   return status;
 }
 
-static void
-setStreams(int argc, std::vector<char *> &argv)
+
+void createProcesses(int argc, char** argv)
 {
-  process_t &process = processSelf();
-  int streamCnt = getStreamCnt(argc, argv);
-
-  process.nvals = 0;
-  process.nvars = 0;
-  process.ntimesteps = 0;
-
-  process.streamCnt = 0; /* filled in setStreamNames */
-  if (streamCnt)
-    process.streamNames = std::vector<argument_t>(streamCnt);
-  for (int i = 0; i < streamCnt; i++)
+   root_process = processCreate(argv[0]);
+    for(int i = 2; i < argc; argc++)
     {
-      process.streamNames[i].argc = 0;
-      process.streamNames[i].args = NULL;
+        if(argv[i][0] == '-')
+        {
+            processCreate(argv[i]);
+        }
     }
-
-  setStreamNames(argc, argv);
-
-  int status = checkStreamCnt();
-
-  if (status == 0 && process.streamCnt != streamCnt)
-    Error("Internal problem with stream count %d %d", process.streamCnt, streamCnt);
-  /*
-  for ( i = 0; i < streamCnt; i++ )
-    fprintf(stderr, "setStreams: stream %d %s\n", i+1, process.streamNames[i].args);
-  */
 }
 
 void
 processDefArgument(void *vargument)
 {
+    /*
   process_t &process = processSelf();
   char *operatorArg;
   char *commapos;
-  std::vector<char*> &oargv = process.oargv;
+  std::vector< char*> &oargv = process.oargv;
+  */
   int argc = ((argument_t *) vargument)->argc;
   std::vector<char *> &argv = ((argument_t *) vargument)->argv;
+  /*
 
   process.xoperator = argv[0];
   process.operatorName = getOperatorName(process.xoperator);
@@ -760,7 +839,7 @@ processDefArgument(void *vargument)
 
   if (operatorArg)
     {
-      oargv.push_back(operatorArg);
+      orgv.push_back(operatorArg);
       // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
 
       commapos = operatorArg;
@@ -778,9 +857,8 @@ processDefArgument(void *vargument)
 
   processDefPrompt(process.operatorName);
 
-  process.module = getModule(process.operatorName);
-
-  setStreams(argc, argv);
+  process.m_module = getModule(process.operatorName);
+*/
 }
 
 void
@@ -1073,7 +1151,7 @@ process_t::print_process()
                 << "UNINITALIZED" << std::endl;
     }
   std::cout << " ntimesteps      : " << ntimesteps << std::endl;
-  std::cout << " streamCnt       : " << streamCnt << std::endl;
+  std::cout << " streamCnt       : " << m_streamCnt << std::endl;
   // std::cout << " streamNames     : " << streamNames                  <<  std::endl;
   std::cout << " xoperator       : " << xoperator << std::endl;
   std::cout << " operatorName    : " << operatorName << std::endl;

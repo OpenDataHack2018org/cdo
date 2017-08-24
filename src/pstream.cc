@@ -577,6 +577,11 @@ void createPipeName(char *pipename, int pnlen)
 int
 pstreamOpenRead(const argument_t *argument)
 {
+  if(PSTREAM_Debug)
+  {
+      std::cout << "Opening new pstream for reading with argument:" << std::endl;
+      print_argument((argument_t*)argument);
+  }
 
   pstream_t *pstreamptr = create_pstream();
   if (!pstreamptr)
@@ -1729,18 +1734,20 @@ pstreamDebug(int debug)
 void
 cdoInitialize(void *argument)
 {
+    argument_t* argu = (argument_t *)argument;
 #if defined(_OPENMP)
   omp_set_num_threads(ompNumThreads); /* Have to be called for every module (pthread)! */
 #endif
 
-  processCreate();
+  process_t* process = processCreate(argu->argv[0]);
+  process->setStreams(argu->argc, argu->argv);
+
 
 #if defined(HAVE_LIBPTHREAD)
   if (PSTREAM_Debug)
     Message("process %d  thread %ld", processSelf().m_ID, pthread_self());
 #endif
 
-  processDefArgument(argument);
 }
 void pstreamCloseAll()
 {

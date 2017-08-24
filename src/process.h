@@ -61,7 +61,7 @@ class process_t {
   off_t       nvals;
   short       nvars;
   int         ntimesteps;
-  short       streamCnt;
+  short       m_streamCnt;
   std::vector<argument_t> streamNames;
   char       *xoperator;
   const char *operatorName;
@@ -72,24 +72,31 @@ class process_t {
   short       noper;
   oper_t      oper[MAX_OPERATOR];
 
-  modules_t module;
+  modules_t m_module;
 
   int getInStreamCnt();
   int getOutStreamCnt();
   void initProcess();
   void print_process();
+  void defArgument();
   process_t(int ID);
+  process_t(int p_ID,  char * operatorCommand);
+  void setOperatorArgv( char *operatorArguments);
+  void setStreams(int argc, std::vector<char *> &argv);
  private: 
+  void processDefPrompt();
   process_t();
   void OpenRead(int p_input_idx);
   void OpenWrite(int p_input_idx);
-  void OpenAppend(int p_input_idx);
+  void OpenAppend(int p_input_idx); 
+  void setStreamNames(int argc, std::vector<char *> &argv);
 };
 
   pstream_t*  processInqInputStream(int streamindex);
   pstream_t*  processInqOutputStream(int streamindex);
   process_t&  processSelf(void);
-int  processCreate(void);
+process_t *processCreate(void);
+process_t *processCreate(char *command);
 void processDelete(void);
 int  processInqTimesteps(void);
 void processDefTimesteps(int streamID);
@@ -121,5 +128,6 @@ const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
 const argument_t *cdoStreamName(int cnt);
+int checkStreamCnt();
 
 #endif  /* _PROCESS_H */
