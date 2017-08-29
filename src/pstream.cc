@@ -1742,13 +1742,18 @@ cdoInitialize(void *argument)
 
   processDefArgument(argument);
 }
-void pstreamCloseAll()
+
+void
+pstreamCloseAll()
 {
-    for(auto pstream_iter : _pstream_map)
+  for (auto pstream_iter : _pstream_map)
     {
-        if(PSTREAM_Debug)
-        Message("Close file %s id %d", pstream_iter.second.m_name.c_str(), pstream_iter.second.m_fileID);
-        streamClose(pstream_iter.second.m_fileID);
+      if ( pstream_iter.second.m_fileID != CDI_UNDEFID )
+        {
+          if (PSTREAM_Debug)
+            Message("Close file %s id %d", pstream_iter.second.m_name.c_str(), pstream_iter.second.m_fileID);
+          streamClose(pstream_iter.second.m_fileID);
+        }
     }
 }
 /*
