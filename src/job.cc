@@ -1,9 +1,5 @@
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
-#endif
-
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600 /* gethostname */
+#include "config.h"
 #endif
 
 #include "cdo_int.h"
@@ -14,7 +10,7 @@
 
 
 #if defined(HAVE_LIBDRMAA)
-#  include "drmaa.h"
+#include "drmaa.h"
 #endif
 
 #define  GRID_TMPDIR  "/opt/griddata/tmp"

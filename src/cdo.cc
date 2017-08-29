@@ -16,11 +16,7 @@
 */
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
-#endif
-
-#ifndef _XOPEN_SOURCE
-//#define _XOPEN_SOURCE 600 /* gethostname */
+#include "config.h"
 #endif
 
 #if defined (HAVE_EXECINFO_H)

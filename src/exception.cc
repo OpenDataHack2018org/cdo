@@ -1,5 +1,5 @@
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#include "config.h"
 #endif
 
 #include <stdarg.h>
@@ -61,8 +61,11 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 	}
     }
   
-  if ( _ExitOnError ) pstreamCloseAll();
-  if ( _ExitOnError ) exit(EXIT_FAILURE);
+  if ( _ExitOnError )
+    {
+      pstreamCloseAll();
+      exit(EXIT_FAILURE);
+    }
 }
 
 void cdoAbort(const char *fmt, ...)
@@ -80,8 +83,11 @@ void cdoAbort(const char *fmt, ...)
   reset_text_color(stderr);
   fprintf(stderr, "\n");
 
-  if ( _ExitOnError ) pstreamCloseAll();
-  if ( _ExitOnError ) exit(EXIT_FAILURE);
+  if ( _ExitOnError )
+    {
+      pstreamCloseAll();
+      exit(EXIT_FAILURE);
+    }
 }
 
 
