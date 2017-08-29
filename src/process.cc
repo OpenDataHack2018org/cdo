@@ -43,6 +43,7 @@
 #include "pthread.h"
 
 #include <map>
+#include <stack>
 
 #if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -784,17 +785,60 @@ checkStreamCnt(void)
   return status;
 }
 
+bool process_t::hasAllInputs()
+{
+    return m_module.streamInCnt == childProcesses.size();
+}
 
+#include <fstream>
 void createProcesses(int argc, char** argv)
 {
+   std::ofstream outfile ("processCreation.txt");
+
    root_process = processCreate(argv[0]);
-    for(int i = 2; i < argc; argc++)
+   process_t *current_process;
+   process_t *parent_process;
+   std::stack<process_t*> call_stack;
+    call_stack.push(root_process);
+    current_process = call_stack.top();
+    for(int i = 1; i < argc; i++)
     {
+        while(current_process->hasAllInputs() && call_stack.top() != root_process )
+        {
+            outfile << "process " << current_process->m_ID <<
+                " of command " << current_process->operatorName <<
+                " has all inputs" << std::endl;
+            if(call_stack.top() != root_process)
+            {
+            call_stack.pop();
+            current_process = call_stack.top();
+            }
+        }
         if(argv[i][0] == '-')
         {
-            processCreate(argv[i]);
+            outfile << "found new operator: creating process" << std::endl;
+            parent_process = current_process;
+            parent_process->addChild(current_process);
+            current_process = processCreate(argv[i]);
+            current_process->addParent(parent_process);
+            call_stack.push(current_process);
+        }
+        else
+        {
+            
         }
     }
+   outfile << std::endl << "RESULTS:" << std::endl;
+   for(auto &process :  Process)
+   {
+       outfile << "process: " << process.second.operatorName << " has children: "<< std::endl;
+        for(auto child : process.second.childProcesses)
+        {
+          outfile << child->m_ID << "  " ;
+        }
+   }
+   outfile << std::endl;
+   outfile.close();
 }
 
 void
@@ -1069,11 +1113,11 @@ process_t::print_process()
   std::cout << " nOutStream      : " << nOutStream << std::endl;
   for (int i = 0; i < nInStream; i++)
     {
-      std::cout << "    " << inputStreams[i]->self << std::endl;
+      std::cout << "    " << childProcesses[i]->m_ID << std::endl;
     }
   for (int i = 0; i < nOutStream; i++)
     {
-      std::cout << "    " << outputStreams[i]->self << std::endl;
+      std::cout << "    " << parentProcesses[i]->m_ID << std::endl;
     }
   if (s_utime)
     {
@@ -1293,4 +1337,20 @@ cdoFinish(void)
   processClosePipes();
 
   processDelete();
+}
+
+void process_t::addChild(process_t *childProcess)
+{
+    childProcesses.push_back(childProcess);
+}
+
+void process_t::addParent(process_t * parentProcess)
+{
+    parentProcesses.push_back(parentProcess);
+}
+void clearProcesses()
+{ 
+   Process.clear();
+   NumProcess = 0;
+   NumProcessActive = 0;
 }

@@ -50,6 +50,8 @@ class process_t {
   int         l_threadID;
 #endif
   short       nchild;
+  std::vector<process_t*>       childProcesses;
+  std::vector<process_t*>       parentProcesses;
   std::vector<pstream_t*>       inputStreams;
   std::vector<pstream_t*>       outputStreams;
   double      s_utime;
@@ -82,6 +84,9 @@ class process_t {
   process_t(int p_ID,  char * operatorCommand);
   void setOperatorArgv( char *operatorArguments);
   void setStreams(int argc, std::vector<char *> &argv);
+  void addChild(process_t *child_process);
+  void addParent(process_t *parent_process);
+  bool hasAllInputs();
  private: 
   void defPrompt();
   process_t();
@@ -128,5 +133,7 @@ const char *processInqPrompt(void);
 
 const argument_t *cdoStreamName(int cnt);
 int checkStreamCnt();
+void createProcesses(int argc, char **argv);
+void clearProcesses();
 
 #endif  /* _PROCESS_H */

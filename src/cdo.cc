@@ -60,6 +60,7 @@
 #endif
 
 #include "modules.h"
+#include "process.h"
 #include "error.h"
 #include "grid_proj.h"
 
@@ -1611,6 +1612,8 @@ int main(int argc, char *argv[])
       operatorModule(operatorName)(argument);
       close_library_handles();
 #else
+      createProcesses(argc - CDO_optind, argv + CDO_optind);
+      clearProcesses();
       operatorModule(operatorName)(argument);
 
 #endif
