@@ -57,22 +57,24 @@ static std::map<int, process_t> Process;
 static int NumProcess = 0;
 static int NumProcessActive = 0;
 
-process_t::process_t(int p_ID,  char *operatorCommand ) : m_ID(p_ID) 
+process_t::process_t(int p_ID, char *operatorCommand) : m_ID(p_ID)
 {
-    initProcess();
-    operatorName = getOperatorName(operatorCommand);
-    setOperatorArgv(operatorCommand);
-    m_operatorCommand = operatorCommand;
+  initProcess();
+  operatorName = getOperatorName(operatorCommand);
+  setOperatorArgv(operatorCommand);
+  m_operatorCommand = operatorCommand;
 
-    defPrompt(); // has to be called after get operatorName
+  defPrompt();  // has to be called after get operatorName
+
+  m_module = getModule(operatorName);
 }
 
 void
-process_t::setOperatorArgv( char *operatorArguments)
+process_t::setOperatorArgv(char *operatorArguments)
 {
-    if (operatorArguments)
+  if (operatorArguments)
     {
-       char *operatorArg = operatorArguments;
+      char *operatorArg = operatorArguments;
       // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
 
       while ((operatorArg = strchr(operatorArg, ',')) != NULL)
@@ -85,7 +87,7 @@ process_t::setOperatorArgv( char *operatorArguments)
             }
         }
     }
-    oargc = oargv.size();
+  oargc = oargv.size();
 }
 
 void
@@ -112,7 +114,6 @@ process_t::initProcess()
   operatorArg = "UNINITALIZED";
 
   noper = 0;
-
 }
 
 int
@@ -156,7 +157,7 @@ processSelf(void)
 
   pthread_mutex_lock(&processMutex);
 
-  for ( auto &id_process_pair : Process)
+  for (auto &id_process_pair : Process)
     if (id_process_pair.second.l_threadID)
       {
         if (pthread_equal(id_process_pair.second.threadID, thID))
@@ -330,8 +331,8 @@ processInqOpername(void)
   return processSelf().operatorName;
 }
 
-void process_t::
-defPrompt()
+void
+process_t::defPrompt()
 {
   if (m_ID == 0)
     sprintf(prompt, "%s %s", Progname, operatorName);
@@ -433,10 +434,10 @@ processOperator(void)
   return processSelf().m_operatorCommand;
 }
 
-static int skipInputStreams(int argc,  std::vector<char *> &argv, int globArgc, int nstreams);
+static int skipInputStreams(int argc, std::vector<char *> &argv, int globArgc, int nstreams);
 
 static int
-getGlobArgc(int argc,  std::vector<char *> &argv, int globArgc)
+getGlobArgc(int argc, std::vector<char *> &argv, int globArgc)
 {
   char *opername = &argv[globArgc][1];
   char *comma_position = strchr(opername, ',');
@@ -463,7 +464,7 @@ getGlobArgc(int argc,  std::vector<char *> &argv, int globArgc)
 }
 
 static int
-skipInputStreams(int argc, std::vector<char*>& argv, int globArgc, int nstreams)
+skipInputStreams(int argc, std::vector<char *> &argv, int globArgc, int nstreams)
 {
   while (nstreams > 0)
     {
@@ -486,7 +487,7 @@ skipInputStreams(int argc, std::vector<char*>& argv, int globArgc, int nstreams)
 }
 
 static int
-getStreamCnt(int argc, std::vector<char *>& argv)
+getStreamCnt(int argc, std::vector<char *> &argv)
 {
   int streamCnt = 0;
   int globArgc = 1;
@@ -516,7 +517,7 @@ static void setStreamNames(int argc, std::vector<char *> *argv)
 
 }
 */
- void
+void
 process_t::setStreams(int argc, std::vector<char *> &argv)
 {
   int streamCnt = getStreamCnt(argc, argv);
@@ -546,7 +547,7 @@ process_t::setStreams(int argc, std::vector<char *> &argv)
   */
 }
 
- void
+void
 process_t::setStreamNames(int argc, std::vector<char *> &argv)
 {
   int i, ac;
@@ -564,23 +565,25 @@ process_t::setStreamNames(int argc, std::vector<char *> &argv)
           globArgc = getGlobArgc(argc, argv, globArgc);
           len = 0;
           for (i = globArgcStart; i < globArgc; i++)
-          {
-            len += strlen(argv[i]) + 1;
-          }
+            {
+              len += strlen(argv[i]) + 1;
+            }
           streamname = (char *) Calloc(1, len);
           for (i = globArgcStart; i < globArgc; i++)
             {
               strcat(streamname, argv[i]);
               if (i < globArgc - 1)
-              {
-                strcat(streamname, " ");
-              }
+                {
+                  strcat(streamname, " ");
+                }
             }
-          for (i = 1; i < len - 1; i++){
-            if (streamname[i] == '\0'){
-              streamname[i] = ' ';
+          for (i = 1; i < len - 1; i++)
+            {
+              if (streamname[i] == '\0')
+                {
+                  streamname[i] = ' ';
+                }
             }
-          }
 
           streamNames[m_streamCnt].args = streamname;
           ac = globArgc - globArgcStart;
@@ -706,7 +709,7 @@ expand_wildcards(process_t &process, int streamCnt)
   return 1;
 }
 
- int
+int
 checkStreamCnt(void)
 {
   process_t &process = processSelf();
@@ -785,71 +788,101 @@ checkStreamCnt(void)
   return status;
 }
 
-bool process_t::hasAllInputs()
+bool
+process_t::hasAllInputs()
 {
-    return m_module.streamInCnt == childProcesses.size();
+  // std::cout << m_module.streamInCnt << " " << childProcesses.size() + inputStreams.size() << std::endl;
+  return m_module.streamInCnt == (childProcesses.size() + inputStreams.size());
 }
 
 #include <fstream>
-void createProcesses(int argc, char** argv)
+void print_creation_results(std::ofstream &p_outfile)
 {
-   std::ofstream outfile ("processCreation.txt");
-
-   root_process = processCreate(argv[0]);
-   process_t *current_process;
-   process_t *parent_process;
-   std::stack<process_t*> call_stack;
-    call_stack.push(root_process);
-    current_process = call_stack.top();
-    for(int i = 1; i < argc; i++)
+ p_outfile << std::endl << "RESULTS:" << std::endl;
+  for (auto &process : Process)
     {
-        while(current_process->hasAllInputs() && call_stack.top() != root_process )
+      p_outfile << "process: " << process.second.operatorName << " has children: " << std::endl;
+      for (auto child : process.second.childProcesses)
         {
-            outfile << "process " << current_process->m_ID <<
-                " of command " << current_process->operatorName <<
-                " has all inputs" << std::endl;
-            if(call_stack.top() != root_process)
-            {
-            call_stack.pop();
-            current_process = call_stack.top();
-            }
+          p_outfile << child->m_ID << ", ";
         }
-        if(argv[i][0] == '-')
+      for (auto outstream : process.second.inputStreams)
         {
-            outfile << "found new operator: creating process" << std::endl;
-            parent_process = current_process;
-            parent_process->addChild(current_process);
-            current_process = processCreate(argv[i]);
-            current_process->addParent(parent_process);
-            call_stack.push(current_process);
-        }
-        else
-        {
-            
+          p_outfile << "S: " << outstream->self << " ";
         }
     }
-   outfile << std::endl << "RESULTS:" << std::endl;
-   for(auto &process :  Process)
-   {
-       outfile << "process: " << process.second.operatorName << " has children: "<< std::endl;
-        for(auto child : process.second.childProcesses)
+  p_outfile << std::endl;
+
+}
+
+void
+createProcesses(int argc, char **argv)
+{
+  std::ofstream outfile("processCreation.txt");
+
+  for (int i = 0; i < argc; i++)
+    {
+      outfile << argv[i] << " ";
+    }
+  outfile << std::endl;
+
+  root_process = processCreate(argv[0]);
+
+  process_t *current_process;
+  process_t *parent_process;
+
+  int idx = 1;
+  std::stack<process_t *> call_stack;
+
+  call_stack.push(root_process);
+  current_process = call_stack.top();
+  // root_process.addOutputStream();
+  do
+    {
+      outfile << "iteration " << idx << " start" << std::endl
+              << "current argv: " << argv[idx] << "  current_process: " << current_process->operatorName << std::endl;
+      if (argv[idx][0] == '-')
         {
-          outfile << child->m_ID << "  " ;
+          outfile << "found new operator: creating process: ";
+          parent_process = current_process;
+          current_process = processCreate(argv[idx]);
+          parent_process->addChild(current_process);
+          current_process->addParent(parent_process);
+          call_stack.push(current_process);
+          outfile << current_process->operatorName << std::endl;
         }
-   }
-   outfile << std::endl;
-   outfile.close();
+      else
+        {
+          outfile << "added file " << argv[idx] << std::endl;
+          pstream_t *new_pstream = create_pstream();
+          // new_pstream->pstreamOpenReadFile(argv[i]);
+          current_process->inputStreams.push_back(new_pstream);
+        }
+      while (current_process->hasAllInputs() && current_process != root_process)
+        {
+          outfile << "process " << current_process->operatorName << "poped" << std::endl;
+          call_stack.pop();
+          current_process = call_stack.top();
+        }
+      outfile << "iteration " << idx << " end"
+              << "current_process: " << current_process->operatorName << std::endl;
+      idx++;
+    }
+  while ((current_process != root_process || !root_process->hasAllInputs()) && idx < argc - 1);
+
+  print_creation_results(outfile);
+  outfile.close();
 }
 
 void
 processDefArgument(void *vargument)
 {
-    /*
-  process_t &process = processSelf();
-  char *operatorArg;
-  char *commapos;
-  std::vector< char*> &oargv = process.oargv;
-  */
+  /*
+process_t &process = processSelf();
+char *operatorArg;
+char *commapos;
+std::vector< char*> &oargv = process.oargv;
+*/
   int argc = ((argument_t *) vargument)->argc;
   std::vector<char *> &argv = ((argument_t *) vargument)->argv;
   /*
@@ -879,7 +912,6 @@ processDefArgument(void *vargument)
 
   processDefPrompt(process.operatorName);
 
-  process.m_module = getModule(process.operatorName);
 */
 }
 
@@ -1206,10 +1238,9 @@ processClosePipes(void)
         Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
 
       if (pstreamptr)
-          pstreamptr->close();
+        pstreamptr->close();
     }
 }
-
 
 void
 cdoFinish(void)
@@ -1339,18 +1370,22 @@ cdoFinish(void)
   processDelete();
 }
 
-void process_t::addChild(process_t *childProcess)
+void
+process_t::addChild(process_t *childProcess)
 {
-    childProcesses.push_back(childProcess);
+  childProcesses.push_back(childProcess);
+  nchild = childProcesses.size();
 }
 
-void process_t::addParent(process_t * parentProcess)
+void
+process_t::addParent(process_t *parentProcess)
 {
-    parentProcesses.push_back(parentProcess);
+  parentProcesses.push_back(parentProcess);
 }
-void clearProcesses()
-{ 
-   Process.clear();
-   NumProcess = 0;
-   NumProcessActive = 0;
+void
+clearProcesses()
+{
+  Process.clear();
+  NumProcess = 0;
+  NumProcessActive = 0;
 }
