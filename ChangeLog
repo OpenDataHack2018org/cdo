@@ -1,3 +1,12 @@
+2017-07-27  Uwe Schulzweida
+
+	* Using CDI library version 1.9.1
+	* Version 1.9.1 release
+
+2017-08-30  Uwe Schulzweida
+
+	* tee: added docu
+
 2017-08-14  Uwe Schulzweida
 
 	* eof, eof3d: set default of env. CDO_WEIGHT_MODE to off

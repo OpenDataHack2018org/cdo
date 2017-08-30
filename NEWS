@@ -3,6 +3,8 @@ CDO NEWS
 
 Version 1.9.1 (27 September 2017):
 
+   New operators:
+     * tee - Duplicate a data stream
    Changes operators:
      * eof, eof3d: set default value of environment variable CDO_WEIGHT_MODE to off
    Fixed bugs:

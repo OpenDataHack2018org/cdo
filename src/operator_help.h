@@ -203,6 +203,18 @@ std::vector<std::string> CopyHelp = {
     "          of outfile. If outfile does not exist it will be created.",
 };
 
+std::vector<std::string> TeeHelp = {
+    "NAME",
+    "    tee - Duplicate a data stream",
+    "",
+    "SYNOPSIS",
+    "    tee  infile outfile1 outfile2",
+    "",
+    "DESCRIPTION",
+    "    This operator copies the input datasets to outfile1 and outfile2.",
+    "    It can be used to store intermediate results to a file.",
+};
+
 std::vector<std::string> ReplaceHelp = {
     "NAME",
     "    replace - Replace variables",
