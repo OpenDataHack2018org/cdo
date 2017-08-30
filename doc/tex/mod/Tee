@@ -1,0 +1,30 @@
+@BeginModule
+@NewPage
+@Name      = Tee
+@Title     = Duplicate a data stream
+@Section   = File operations
+@Class     = File operation
+@Arguments = infile outfile1 outfile2
+@Operators = tee
+
+@BeginDescription
+@EndDescription
+@EndModule
+
+
+@BeginOperator_tee
+@Title     = Duplicate a data stream
+
+@BeginDescription
+This operator copies the input datasets to @file{outfile1} and @file{outfile2}.
+It can be used to store intermediate results to a file.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the daily and monthy average of a dataset use:
+@BeginVerbatim
+   cdo monavg -tee dayavg infile outfile_dayavg  outfile_monavg
+@EndVerbatim
+@EndExample
