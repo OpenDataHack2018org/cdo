@@ -135,7 +135,7 @@ pstream_init_pointer(void)
 }
 */
 
-static pstream_t *create_pstream()
+ pstream_t *create_pstream()
 {
     PSTREAM_LOCK();
     auto new_entry  = _pstream_map.insert(
