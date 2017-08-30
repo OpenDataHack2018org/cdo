@@ -387,6 +387,7 @@ void *EOFs(void * argument)
                   ipack++;
 		}
 	    }
+          if ( ipack != npack ) cdoAbort("Missing values unsupported!");
 
 	  if ( grid_space )
             {

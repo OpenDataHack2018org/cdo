@@ -6,6 +6,7 @@
 2017-08-30  Uwe Schulzweida
 
 	* tee: added docu
+	* eof: check missing values
 
 2017-08-14  Uwe Schulzweida
 
