@@ -189,10 +189,6 @@ void *Timstat(void *argument)
 
   int nvars   = vlistNvars(vlistID1);
 
-  if ( cmplen == 0 && CDO_Reduce_Dim )
-    for ( varID = 0; varID < nvars; ++varID )
-      vlistDefVarTsteptype(vlistID2, varID, TSTEP_CONSTANT);
-
   const char *freq = NULL;
   if      ( comparelen == DAY_LEN )  freq = "day";
   else if ( comparelen == MON_LEN )  freq = "mon";

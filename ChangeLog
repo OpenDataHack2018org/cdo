@@ -1,7 +1,11 @@
-2017-07-27  Uwe Schulzweida
+2017-09-27  Uwe Schulzweida
 
 	* Using CDI library version 1.9.1
 	* Version 1.9.1 release
+
+2017-08-31  Uwe Schulzweida
+
+	* Implementation of option --reduce_dim for time axis
 
 2017-08-30  Uwe Schulzweida
 

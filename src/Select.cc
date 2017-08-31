@@ -448,7 +448,7 @@ void *Select(void *argument)
 	    }
 
 	  ntsteps2 = (operatorID == SELECT && SELLIST_NVAL(timestep) == 1) ? 1 : ntsteps;
-	  
+
 	  if ( ntsteps2 == 0 && nfiles > 1 )
 	    {
               lconstvars = false;

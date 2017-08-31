@@ -1045,6 +1045,7 @@ void cdo_set_options(void)
     }
   
   if ( CDO_CMOR_Mode )          cdiDefGlobal("CMOR_MODE", CDO_CMOR_Mode);
+  if ( CDO_Reduce_Dim )         cdiDefGlobal("REDUCE_DIM", CDO_Reduce_Dim);
   if ( CDO_netcdf_hdr_pad > 0 ) cdiDefGlobal("NETCDF_HDR_PAD", CDO_netcdf_hdr_pad);  
 }
 
