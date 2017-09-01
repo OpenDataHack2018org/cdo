@@ -271,7 +271,7 @@ void cdo_usage(void)
   fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
   fprintf(stderr, "    --precision <float_digits[,double_digits]>\n");
   fprintf(stderr, "                   Precision to use in displaying floating-point data (default: 7,15)\n");
-  fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
+  fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions\n");
   if ( ITSME )
     fprintf(stderr, "    --remap_genweights 0/1\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (cgribex only)\n");
