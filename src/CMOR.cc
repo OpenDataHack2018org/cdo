@@ -1857,7 +1857,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       const char *allneeded[] = /*CMIP5*/{"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institute_id", "parent_experiment_rip", 
 /*CORDEX */
   "CORDEX_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id",
-/* CMIP6: */ "frequency",
+/* CMIP6: */
   /* Glob Atts */
 "_cmip6_option", "Conventions", "activity_id", "branch_method", "experiment", "experiment_id", "forcing_index", "further_info_url", "grid", "grid_label", "initialization_index", "institution", "institution_id", "license", "mip_era", "nominal_resolution", "physics_index", "product", "realization_index", "source", "source_id", "source_type", "sub_experiment", "sub_experiment_id", "table_id", "variant_label", "parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label",
 "parent_time_units", NULL};
@@ -1875,6 +1875,31 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
             }
           i++;
         }
+
+/*      char *miptabfreq = kv_get_a_val(kvl, "miptab_freq", NULL);
+      char *freq = (char *) Malloc(11 * sizeof(char));
+      if ( strstr(miptabfreq, "yr") || strstr(miptabfreq, "Yr") )
+        strcpy(freq, "yr");
+      else if ( strstr(miptabfreq, "mon") || strstr(miptabfreq, "Mon") )
+        {
+          strcpy(freq, "mon");
+          if ( strstr(miptabfreq, "ClimMon") )
+            strcpy(freq, "ClimMon");
+        }
+      else if ( strstr(miptabfreq, "day") || strstr(miptabfreq, "Day") )
+        strcpy(freq, "day");
+      else if ( strstr(miptabfreq, "6hr") )
+        strcpy(freq, "6hr");
+      else if ( strstr(miptabfreq, "3hr") )
+        strcpy(freq, "3hr");
+      else if ( strstr(miptabfreq, "1hr") )
+        {
+          strcpy(freq, "1hr");
+          if ( strstr(miptabfreq, "1hrClimMon") )
+            strcpy(freq, "1hrClimMon");
+        }
+      else if ( strstr(miptabfreq, "fx") )
+        strcpy(freq, "fx"); */
 
       char *branch_time_in_parent = (char *) Malloc(2*sizeof(double));
       char *branch_time_in_child = (char *) Malloc(2*sizeof(double));
@@ -1894,6 +1919,9 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
           fputs("\"tracking_prefix\" : \"", dataset_json);
           fputs(kv_get_a_val(kvl, "tracking_prefix", "hdl:21.14100"), dataset_json);
           fputs("\",\n", dataset_json); 
+/*          fputs("\"frequency\" : \"", dataset_json);
+          fputs(freq, dataset_json);
+          fputs("\",\n", dataset_json);  */
 
 /* cdo cmor preprocessed: */
           fputs("\"calendar\" : \"", dataset_json);
@@ -1916,6 +1944,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 
       Free(branch_time_in_parent);
       Free(branch_time_in_child);
+/*      Free(freq); */
     }
 #else
     cdoAbort("Cmor version %d not yet enabled!", (int) CMOR_VERSION_MAJOR);
@@ -2064,7 +2093,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           char *attzaxis = kv_get_a_val(kvl, "za", NULL);
           check_compare_set(&zaxis, attzaxis, "z_axis", "notSet");
 
-          if ( strcmp(zaxis, "notset") != 0 )
+          if ( strcmp(zaxis, "notSet") != 0 )
             cmf = cmor_axis(new_axis_id(axis_ids),
                         zaxis,
                         (char *) "Pa",
@@ -4776,7 +4805,7 @@ void *CMOR(void *argument)
   write_variables(kvl, &streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
 
 #if ( CMOR_VERSION_MAJOR == 3 )
-  removeDataset();
+  removeDataset();  
 #endif
   destruct_var_mapping(vars);
   Free(mip_table);
