@@ -1504,6 +1504,7 @@ static char *get_calendar_ptr(int calendar)
   switch ( calendar )
     {
     case CALENDAR_STANDARD:
+    case CALENDAR_GREGORIAN:
       strcpy(calendar_ptr, "gregorian"); break;
     case CALENDAR_PROLEPTIC:
       strcpy(calendar_ptr, "proleptic_gregorian"); break;

@@ -39,11 +39,6 @@
 
 #define  NMONTH     17
 
-typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
 
 /*
 static
@@ -120,8 +115,7 @@ void *Ymonstat(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   int gridsizemax = vlistGridsizeMax(vlistID1);
   field_init(&field);
@@ -161,6 +155,7 @@ void *Ymonstat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
 	    }
 
           field_type *psamp1 = &samp1[month][varID][levelID];
@@ -231,12 +226,12 @@ void *Ymonstat(void *argument)
       if ( month_nsets[month] == 0 && lvarstd )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[month][varID][levelID];
             field_type *pvars2 = &vars2[month][varID][levelID];
-
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             farmoq(pvars2, *pvars1);
 	  }
@@ -274,18 +269,18 @@ void *Ymonstat(void *argument)
   for ( int i = 0; i < nmon; i++ )
     {
       month = mon[i];
-      if ( month_nsets[month] == 0 ) cdoAbort("Internal problem, nsets[%d] not defined!", month);
-
       int nsets = month_nsets[month];
+      if ( nsets == 0 ) cdoAbort("Internal problem, nsets[%d] not defined!", month);
+
       for ( int recID = 0; recID < maxrecs; recID++ )
         {
+          if ( recinfo[recID].lconst ) continue;
+
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = &samp1[month][varID][levelID];
           field_type *pvars1 = &vars1[month][varID][levelID];
           field_type *pvars2 = vars2[month] ? &vars2[month][varID][levelID] : NULL;
-
-          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
           if ( lmean )
             {
@@ -317,11 +312,11 @@ void *Ymonstat(void *argument)
 
       for ( int recID = 0; recID < maxrecs; recID++ )
 	{
+          if ( otsID && recinfo[recID].lconst ) continue;
+
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *pvars1 = &vars1[month][varID][levelID];
-	  
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
@@ -341,8 +336,6 @@ void *Ymonstat(void *argument)
     }
 
   if ( field.ptr ) Free(field.ptr);
-
-  Free(recinfo);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

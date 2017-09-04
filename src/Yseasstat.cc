@@ -45,11 +45,6 @@ typedef struct {
 }
 date_time_t;
 
-typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
 
 void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 {
@@ -124,8 +119,7 @@ void *Yseasstat(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   int gridsizemax = vlistGridsizeMax(vlistID1);
 
@@ -161,6 +155,7 @@ void *Yseasstat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
 	    }
 
           field_type *psamp1 = &samp1[seas][varID][levelID];
@@ -231,12 +226,12 @@ void *Yseasstat(void *argument)
       if ( seas_nsets[seas] == 0 && lvarstd )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[seas][varID][levelID];
             field_type *pvars2 = &vars2[seas][varID][levelID];
-
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             farmoq(pvars2, *pvars1);
 	  }
@@ -251,13 +246,13 @@ void *Yseasstat(void *argument)
         int nsets = seas_nsets[seas];
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[seas][varID][levelID];
             field_type *pvars1 = &vars1[seas][varID][levelID];
             field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             if ( lmean )
               {
@@ -289,11 +284,11 @@ void *Yseasstat(void *argument)
 
 	for ( int recID = 0; recID < maxrecs; recID++ )
 	  {
+            if ( otsID && recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[seas][varID][levelID];
-
-	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	    pstreamDefRecord(streamID2, varID, levelID);
 	    pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
@@ -313,8 +308,6 @@ void *Yseasstat(void *argument)
     }
 
   if ( field.ptr ) Free(field.ptr);
-
-  Free(recinfo);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

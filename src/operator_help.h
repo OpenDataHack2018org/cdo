@@ -203,6 +203,18 @@ std::vector<std::string> CopyHelp = {
     "          of outfile. If outfile does not exist it will be created.",
 };
 
+std::vector<std::string> TeeHelp = {
+    "NAME",
+    "    tee - Duplicate a data stream",
+    "",
+    "SYNOPSIS",
+    "    tee  infile outfile1 outfile2",
+    "",
+    "DESCRIPTION",
+    "    This operator copies the input datasets to outfile1 and outfile2.",
+    "    It can be used to store intermediate results to a file.",
+};
+
 std::vector<std::string> ReplaceHelp = {
     "NAME",
     "    replace - Replace variables",
@@ -1055,7 +1067,7 @@ std::vector<std::string> SettimeHelp = {
     "",
     "DESCRIPTION",
     "    This module sets the time axis or part of the time axis. Which part of the",
-    "    time axis is overwritten depends on the chosen operator.",
+    "    time axis is overwritten/created depends on the chosen operator.",
     "",
     "OPERATORS",
     "    setdate      Set date",
@@ -3538,7 +3550,7 @@ std::vector<std::string> EOFsHelp = {
     "        a one-sided parallel jacobi-algorithm (only executed in parallel if -P flag is set)",
     "        and  'danielson_lanczos' for a non-parallel d/l algorithm. The default setting is 'jacobi'.",
     "    CDO_WEIGHT_MODE",
-    "        It is used to set the weight mode. The default is 'on'. Set it to 'off' for a non weighted version.",
+    "        It is used to set the weight mode. The default is 'off'. Set it to 'on' for a weighted version.",
     "    MAX_JACOBI_ITER",
     "        Is the maximum integer number of annihilation sweeps that is executed if the ",
     "        jacobi-algorithm is used to compute the eigen values. The default value is 12.",

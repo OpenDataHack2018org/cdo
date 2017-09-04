@@ -26,6 +26,44 @@ void nce(int istat)
   // This routine provides a simple interface to NetCDF error message routine.
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
 }
+
+static
+void write_links(int nc_file_id, int nc_add_id, nc_type sizetype, size_t num_links, size_t *cell_add)
+{
+  if ( num_links == 0 ) return;
+
+  if ( sizetype == NC_INT )
+    {
+      int *intadd = (int*) Malloc(num_links*sizeof(int));
+      for ( size_t i = 0; i < num_links; ++i ) intadd[i] = (int)cell_add[i];
+      nce(nc_put_var_int(nc_file_id, nc_add_id, intadd));
+      Free(intadd);
+    }
+#if defined (HAVE_NETCDF4)
+  else
+    {
+      nce(nc_put_var_ulonglong(nc_file_id, nc_add_id, (unsigned long long*) cell_add));
+    }
+#endif
+}
+
+static
+void read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
+{
+  if ( num_links < 0x7FFFFC00 ) // 2GB
+    {
+      int *intadd = (int*) Malloc(num_links*sizeof(int));
+      nce(nc_get_var_int(nc_file_id, nc_add_id, intadd));
+      for ( size_t i = 0; i < num_links; ++i ) cell_add[i] = (size_t)intadd[i];
+      Free(intadd);
+    }
+#if defined (HAVE_NETCDF4)
+  else
+    {
+      nce(nc_get_var_ulonglong(nc_file_id, nc_add_id, (unsigned long long*) cell_add));
+    }
+#endif
+}
 #endif
 
 
@@ -83,6 +121,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   const char *tgt_grid_units = "radians";
   bool lgridarea = false;
   int writemode = NC_CLOBBER;
+  nc_type sizetype = NC_INT;
 
   switch ( rv.norm_opt )
     {
@@ -149,8 +188,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
     size_t nele2 = 4*8 + 4;
     if ( src_grid.lneed_cell_corners ) nele1 += src_grid.num_cell_corners*2*8;
     if ( tgt_grid.lneed_cell_corners ) nele2 += tgt_grid.num_cell_corners*2*8;
-    size_t filesize = src_grid.size*(nele1) +
-                      tgt_grid.size*(nele2) +
+    size_t filesize = src_grid.size*nele1 +
+                      tgt_grid.size*nele2 +
                       nlinks*(4 + 4 + rv.num_wts*8);
 
     if ( cdoVerbose )
@@ -162,13 +201,18 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
     if ( filesize > 0x7FFFFC00 ) // 2**31 - 1024 (<2GB)
       {
         size_t maxlinks = 0x3FFFFFFF; // 1GB
-        if ( nlinks > maxlinks || filesize > 8*maxlinks )
+        size_t gridsize_max = (src_grid.size > tgt_grid.size) ? src_grid.size : tgt_grid.size;
+        if ( nlinks > maxlinks || filesize > 8*maxlinks || gridsize_max > 0x7FFFFC00 )
           {
 #if defined (HAVE_NETCDF4)
-            writemode |= NC_NETCDF4 | NC_CLASSIC_MODEL;
             if ( cdoVerbose ) cdoPrint("Store weights and links to NetCDF4!");
+            writemode |= NC_NETCDF4;
+            if ( gridsize_max > 0x7FFFFC00 )
+              sizetype = NC_UINT64;
+            else
+              writemode |= NC_CLASSIC_MODEL;
 #else
-            cdoPrint("Number of remap links %lz exceeds maximum of %lz and NetCDF 4 not available!",
+            cdoPrint("Number of remap links %zu exceeds maximum of %zu and NetCDF 4 is not available!",
                      nlinks, maxlinks);
 #endif
           }
@@ -246,8 +290,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   nce(nc_def_dim(nc_file_id, "num_wgts", rv.num_wts, &nc_numwgts_id));
        
   // Define grid dimensions
-  nce(nc_def_var(nc_file_id, "src_grid_dims", NC_INT, 1, &nc_srcgrdrank_id, &nc_srcgrddims_id));
-  nce(nc_def_var(nc_file_id, "dst_grid_dims", NC_INT, 1, &nc_dstgrdrank_id, &nc_dstgrddims_id));
+  nce(nc_def_var(nc_file_id, "src_grid_dims", sizetype, 1, &nc_srcgrdrank_id, &nc_srcgrddims_id));
+  nce(nc_def_var(nc_file_id, "dst_grid_dims", sizetype, 1, &nc_dstgrdrank_id, &nc_dstgrddims_id));
 
   // Define all arrays for NetCDF descriptors
 
@@ -325,8 +369,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 
   // Define mapping arrays
 
-  nce(nc_def_var(nc_file_id, "src_address", NC_INT, 1, &nc_numlinks_id, &nc_srcadd_id));      
-  nce(nc_def_var(nc_file_id, "dst_address", NC_INT, 1, &nc_numlinks_id, &nc_dstadd_id));
+  nce(nc_def_var(nc_file_id, "src_address", sizetype, 1, &nc_numlinks_id, &nc_srcadd_id));      
+  nce(nc_def_var(nc_file_id, "dst_address", sizetype, 1, &nc_numlinks_id, &nc_dstadd_id));
 
   nc_dims2_id[0] = nc_numlinks_id;
   nc_dims2_id[1] = nc_numwgts_id;
@@ -379,14 +423,14 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 
   nce(nc_put_var_double(nc_file_id, nc_dstgrdfrac_id, tgt_grid.cell_frac));
 
-  for ( long i = 0; i < rv.num_links; i++ )
+  for ( size_t i = 0; i < rv.num_links; i++ )
     {
       rv.src_cell_add[i]++;
       rv.tgt_cell_add[i]++;
     }
 
-  nce(nc_put_var_int(nc_file_id, nc_srcadd_id, rv.src_cell_add));
-  nce(nc_put_var_int(nc_file_id, nc_dstadd_id, rv.tgt_cell_add));
+  write_links(nc_file_id, nc_srcadd_id, sizetype, rv.num_links, rv.src_cell_add);
+  write_links(nc_file_id, nc_dstadd_id, sizetype, rv.num_links, rv.tgt_cell_add);
 
   nce(nc_put_var_double(nc_file_id, nc_rmpmatrix_id, rv.wts));
 
@@ -659,8 +703,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   rv->wts = NULL;
   if ( rv->num_links > 0 )
     {
-      rv->src_cell_add = (int*) Malloc(rv->num_links*sizeof(int));
-      rv->tgt_cell_add = (int*) Malloc(rv->num_links*sizeof(int));
+      rv->src_cell_add = (size_t*) Malloc(rv->num_links*sizeof(size_t));
+      rv->tgt_cell_add = (size_t*) Malloc(rv->num_links*sizeof(size_t));
 
       rv->wts = (double*) Malloc(rv->num_wts*rv->num_links*sizeof(double));
     }
@@ -769,10 +813,10 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   if ( rv->num_links > 0 )
     {
-      nce(nc_get_var_int(nc_file_id, nc_srcadd_id, rv->src_cell_add));
-      nce(nc_get_var_int(nc_file_id, nc_dstadd_id, rv->tgt_cell_add));
+      read_links(nc_file_id, nc_srcadd_id, rv->num_links, rv->src_cell_add);
+      read_links(nc_file_id, nc_dstadd_id, rv->num_links, rv->tgt_cell_add);
 
-      for ( long i = 0; i < rv->num_links; i++ )
+      for ( size_t i = 0; i < rv->num_links; ++i )
         {
           rv->src_cell_add[i]--;
           rv->tgt_cell_add[i]--;

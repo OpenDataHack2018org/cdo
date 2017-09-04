@@ -35,11 +35,12 @@ int defineTable(const char *tablearg)
       if ( tablepath )
 	{
 	  int len = sizeof(tablepath) + sizeof(tablename) + 3;
-	  char tablefile[len];
+	  char *tablefile = (char*) malloc(len*sizeof(char));
 	  strcpy(tablefile, tablepath);
 	  strcat(tablefile, "/");
 	  strcat(tablefile, tablename);
 	  if ( fileExists(tablename) ) tableID = tableRead(tablefile);
+          free(tablefile);
 	}
     }
 

@@ -889,6 +889,12 @@ int gridToCurvilinear(int gridID1, int lbounds)
           else if ( projtype == CDI_PROJ_LAEA ) lproj_laea = true;
           else if ( projtype == CDI_PROJ_LCC  ) lproj_lcc  = true;
           else if ( projtype == CDI_PROJ_SINU ) lproj_sinu = true;
+          else
+            {
+              char mapname[CDI_MAX_NAME];
+              cdiGridInqKeyStr(gridID1, CDI_KEY_MAPNAME, CDI_MAX_NAME, mapname);
+              cdoAbort("Projection type >%s< unsupported!", mapname);
+            }
 
           if ( lproj_rll || lproj_laea || lproj_lcc || lproj_sinu ) gridtype = GRID_LONLAT;
         }

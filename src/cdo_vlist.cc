@@ -274,7 +274,9 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 
   if ( lchecknames )
     {
-      char names1[nvars][CDI_MAX_NAME], names2[nvars][CDI_MAX_NAME];
+      NEW_2D(char, names1, nvars, CDI_MAX_NAME);
+      NEW_2D(char, names2, nvars, CDI_MAX_NAME);
+
       for ( varID = 0; varID < nvars; varID++ )
 	vlistInqVarName(vlistID1, varID, names1[varID]);
       for ( varID = 0; varID < nvars; varID++ )
@@ -288,6 +290,9 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 
       if ( varID == nvars )
 	cdoPrint("Use CDO option --sortname to sort the parameter by name (NetCDF only)!");
+
+      DELETE_2D(names1);
+      DELETE_2D(names2);
     }
 }
 

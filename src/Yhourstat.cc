@@ -38,11 +38,6 @@
 
 #define  MAX_HOUR  9301  /* 31*12*25 + 1 */
 
-typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
 
 static
 int hour_of_year(int vdate, int vtime)
@@ -126,8 +121,7 @@ void *Yhourstat(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   int gridsizemax = vlistGridsizeMax(vlistID1);
 
@@ -165,6 +159,7 @@ void *Yhourstat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
 	    }
 
           field_type *psamp1 = &samp1[houroy][varID][levelID];
@@ -235,12 +230,12 @@ void *Yhourstat(void *argument)
       if ( houroy_nsets[houroy] == 0 && lvarstd )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[houroy][varID][levelID];
             field_type *pvars2 = &vars2[houroy][varID][levelID];
-
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             farmoq(pvars2, *pvars1);
 	  }
@@ -255,13 +250,13 @@ void *Yhourstat(void *argument)
         int nsets = houroy_nsets[houroy];
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[houroy][varID][levelID];
             field_type *pvars1 = &vars1[houroy][varID][levelID];
             field_type *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
-
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             if ( lmean )
               {
@@ -293,11 +288,11 @@ void *Yhourstat(void *argument)
 
 	for ( int recID = 0; recID < maxrecs; recID++ )
 	  {
+	    if ( otsID && recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[houroy][varID][levelID];
-
-	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	    pstreamDefRecord(streamID2, varID, levelID);
 	    pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
@@ -317,8 +312,6 @@ void *Yhourstat(void *argument)
     }
 
   if ( field.ptr ) Free(field.ptr);
-
-  Free(recinfo);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

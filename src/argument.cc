@@ -1,6 +1,7 @@
 
 #include "argument.h"
 #include "dmemory.h"
+#include "util.h"
 
 #include <string>
 #include <iostream>
@@ -10,14 +11,38 @@
 
 argument_t *file_argument_new(const char *filename)
 {
-  argument_t *argument = (argument_t*) Calloc(1, sizeof(argument_t));
+  argument_t *argument = new argument_t();
 
   argument->argc = 1;
-  argument->argv = (char **) Calloc(1, sizeof(char *));
+  argument->argv.resize(argument->argc);
   argument->argv[0] = (char *) filename;
   argument->args = (char *) filename;
 
   return argument;
+}
+
+
+argument_t * pipe_argument_new(const argument_t *argument,  char *pipename, int pnlen)
+{
+  // struct sched_param param;
+
+  argument_t *newargument = argument_new(argument->argc + 1, argument->argc *sizeof(char *));
+  newargument->operatorName = "";
+  newargument->argv = argument->argv;
+
+  char *operatorArg = argument->argv[0];
+  const char *operatorName = getOperatorName(operatorArg);
+
+  size_t len = strlen(argument->args);
+  char *newarg = (char *) Malloc(len + pnlen);
+  strcpy(newarg, argument->args);
+  newarg[len] = ' ';
+  strcpy(&newarg[len + 1], pipename);
+
+  newargument->argv[argument->argc] = pipename;
+  newargument->args = newarg;
+  newargument->operatorName = std::string(operatorName, strlen(operatorName));
+  return newargument;
 }
 
 void file_argument_free(argument_t *argument)
@@ -27,20 +52,19 @@ void file_argument_free(argument_t *argument)
       if ( argument->argc )
         {
           assert(argument->argc == 1);
-          Free(argument->argv);
         }
-      Free(argument);
+      delete(argument);
     }
 }
 
 argument_t *argument_new(size_t argc, size_t len)
 {
-  argument_t *argument = (argument_t*) Calloc(1, sizeof(argument_t));
+  argument_t *argument = new argument_t();
 
   if ( argc > 0 )
     {
       argument->argc = argc;
-      argument->argv = (char **) Calloc(argc, sizeof(char *));
+      argument->argv.resize(argc);
     }
 
   if ( len > 0 )
@@ -60,13 +84,10 @@ void argument_free(argument_t *argument)
             {
               if ( argument->argv[i] )
                 {
-                  Free(argument->argv[i]);
-                  argument->argv[i] = NULL;
+                    argument->argv[i] = NULL;
                 }
             }
 
-          Free(argument->argv);
-          argument->argv = NULL;
           argument->argc = 0;
         }
 

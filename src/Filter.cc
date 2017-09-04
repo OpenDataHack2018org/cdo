@@ -143,7 +143,6 @@ void *Filter(void *argument)
     fftw_plan p_S2T;
 #endif
   } memory_t;
-  memory_t *ompmem = NULL;
   
   cdoInitialize(argument);
 
@@ -250,10 +249,11 @@ void *Filter(void *argument)
   int nts = tsID;
   if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
 
+  memory_t *ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
+
   if ( use_fftw )
     {
 #if defined(HAVE_LIBFFTW3) 
-      ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
       for ( int i = 0; i < ompNumThreads; i++ )
 	{
 	  ompmem[i].in_fft  = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
@@ -265,7 +265,6 @@ void *Filter(void *argument)
     }
   else
     {
-      ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
       for ( int i = 0; i < ompNumThreads; i++ )
 	{
 	  ompmem[i].array1 = (double*) Malloc(nts*sizeof(double));
@@ -368,7 +367,6 @@ void *Filter(void *argument)
 	  Free(ompmem[i].in_fft);
 	  Free(ompmem[i].out_fft);
 	}
-      Free(ompmem);
 #endif
     }
   else
@@ -378,8 +376,9 @@ void *Filter(void *argument)
 	  Free(ompmem[i].array1);
 	  Free(ompmem[i].array2);
 	}
-      Free(ompmem);
     }
+
+  Free(ompmem);
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
   

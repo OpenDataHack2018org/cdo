@@ -105,7 +105,11 @@ int magics_template_parser( void *node )
 }
 
 
+#if defined(HAVE_LIBMAGICS)
 int SetMagicsParameterValue( const char *param_name, const char *param_type, const char *param_value )
+#else
+int SetMagicsParameterValue( const char *, const char *, const char * )
+#endif  
 {
 	int ret_flag = 0;
 #if defined(HAVE_LIBMAGICS)

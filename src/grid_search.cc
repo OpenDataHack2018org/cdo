@@ -35,7 +35,8 @@ double cdo_default_search_radius(void)
   return search_radius;
 }
 
-static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
+static inline
+void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 {
    double cos_lat = cos(lat);
    xyz[0] = cos_lat * cos(lon);
@@ -43,7 +44,8 @@ static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
    xyz[2] = sin(lat);
 }
 
-static inline void LLtoXYZ_kd(double lon, double lat, kdata_t *restrict xyz)
+static inline
+void LLtoXYZ_kd(double lon, double lat, kdata_t *restrict xyz)
 {
    double cos_lat = cos(lat);
    xyz[0] = KDATA_SCALE(cos_lat * cos(lon));
@@ -51,13 +53,13 @@ static inline void LLtoXYZ_kd(double lon, double lat, kdata_t *restrict xyz)
    xyz[2] = KDATA_SCALE(sin(lat));
 }
 
-static
+static constexpr
 float square(const float x)
 {
   return x*x;
 }
 
-static
+static constexpr
 float distance(const float *restrict a, const float *restrict b)
 {
   return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
@@ -74,7 +76,7 @@ void gridsearch_set_method(const char *methodstr)
 }
 
 
-struct gridsearch *gridsearch_create_reg2d(bool lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_reg2d(bool lcyclic, size_t nx, size_t ny, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
@@ -95,7 +97,7 @@ struct gridsearch *gridsearch_create_reg2d(bool lcyclic, unsigned nx, unsigned n
   double *coslat = (double *) Malloc(ny*sizeof(double));
   double *sinlat = (double *) Malloc(ny*sizeof(double));
 
-  for ( unsigned n = 0; n < nx; ++n )
+  for ( size_t n = 0; n < nx; ++n )
     {
       double rlon = lons[n];
       if ( rlon > PI2 ) rlon -= PI2;
@@ -103,7 +105,7 @@ struct gridsearch *gridsearch_create_reg2d(bool lcyclic, unsigned nx, unsigned n
       coslon[n] = cos(rlon);
       sinlon[n] = sin(rlon);
     }
-  for ( unsigned n = 0; n < ny; ++n )
+  for ( size_t n = 0; n < ny; ++n )
     {
       coslat[n] = cos(lats[n]);
       sinlat[n] = sin(lats[n]);
@@ -123,11 +125,11 @@ struct gridsearch *gridsearch_create_reg2d(bool lcyclic, unsigned nx, unsigned n
 }
 
 
-struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const double *restrict lats)
+struct kdNode *gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));  
   // see  example_cartesian.c
-  if ( cdoVerbose ) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
+  if ( cdoVerbose ) printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
   kdata_t min[3], max[3];
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
@@ -135,11 +137,11 @@ struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const d
 #if defined(HAVE_OPENMP4)
 #pragma omp simd
 #endif
-  for ( unsigned i = 0; i < n; i++ ) 
+  for ( size_t i = 0; i < n; i++ ) 
     {
       point = pointlist[i].point;
       LLtoXYZ_kd(lons[i], lats[i], point);
-      for ( unsigned j = 0; j < 3; ++j )
+      for ( size_t j = 0; j < 3; ++j )
         {
           min[j] = point[j] < min[j] ? point[j] : min[j];
           max[j] = point[j] > max[j] ? point[j] : max[j];
@@ -172,20 +174,20 @@ void gs_destroy_nearpt3(struct gsNear *near)
 }
 
 
-struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const double *restrict lats)
+struct gsNear *gs_create_nearpt3(size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gsNear *near = (struct gsNear *) Calloc(1, sizeof(struct gsNear));
 
   Coord_T **p = (Coord_T **) Malloc(n*sizeof(Coord_T *));
   p[0] = (Coord_T *) Malloc(3*n*sizeof(Coord_T));
-  for ( unsigned i = 1; i < n; i++ ) p[i] = p[0] + i*3;
+  for ( size_t i = 1; i < n; i++ ) p[i] = p[0] + i*3;
 
   float point[3];
 
 #if defined(HAVE_OPENMP4)
 #pragma omp simd
 #endif
-  for ( unsigned i = 0; i < n; i++ )
+  for ( size_t i = 0; i < n; i++ )
     {
       LLtoXYZ_f(lons[i], lats[i], point);
 
@@ -223,18 +225,18 @@ void gs_destroy_full(struct gsFull *full)
 }
 
 
-struct gsFull *gs_create_full(unsigned n, const double *restrict lons, const double *restrict lats)
+struct gsFull *gs_create_full(size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gsFull *full = (struct gsFull *) Calloc(1, sizeof(struct gsFull));
 
   float **p = (float **) Malloc(n*sizeof(float *));
   p[0] = (float *) Malloc(3*n*sizeof(float));
-  for ( unsigned i = 1; i < n; i++ ) p[i] = p[0] + i*3;
+  for ( size_t i = 1; i < n; i++ ) p[i] = p[0] + i*3;
 
 #if defined(HAVE_OPENMP4)
 #pragma omp simd
 #endif
-  for ( unsigned i = 0; i < n; i++ )
+  for ( size_t i = 0; i < n; i++ )
     {
       LLtoXYZ_f(lons[i], lats[i], p[i]);
     }
@@ -248,7 +250,7 @@ struct gsFull *gs_create_full(unsigned n, const double *restrict lons, const dou
 }
 
 
-struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
@@ -263,7 +265,7 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
 }
 
 
-struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
@@ -341,7 +343,7 @@ kdNode *gs_nearest_kdtree(kdNode *kdt, double lon, double lat, double *prange)
 
 unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double *prange)
 {
-  unsigned index = GS_NOT_FOUND;
+  size_t index = GS_NOT_FOUND;
   if ( near == NULL ) return index;
   
 #if defined(ENABLE_NEARPT3)
@@ -379,9 +381,9 @@ unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double 
 }
 
 
-unsigned gs_nearest_full(struct  gsFull *full, double lon, double lat, double *prange)
+size_t gs_nearest_full(struct  gsFull *full, double lon, double lat, double *prange)
 {
-  unsigned index = GS_NOT_FOUND;
+  size_t index = GS_NOT_FOUND;
   if ( full == NULL ) return index;
   
   float range0 = gs_set_range(prange);
@@ -389,26 +391,26 @@ unsigned gs_nearest_full(struct  gsFull *full, double lon, double lat, double *p
   float point[3];
   LLtoXYZ_f(lon, lat, point);
 
-  int n = full->n;
+  size_t n = full->n;
   float **pts = full->pts;
-  int closestpt = -1;
+  size_t closestpt = n;
   float dist = FLT_MAX;
-  for ( int i = 0; i < n; i++ )
+  for ( size_t i = 0; i < n; i++ )
     {
       float d = distance(point, pts[i]);
-      if ( closestpt < 0 || d < dist || (d<=dist && i < closestpt) )
+      if ( closestpt >=n || d < dist || (d<=dist && i < closestpt) )
         {
           dist = d;
           closestpt = i;
         }
     }
 
-  if ( closestpt >= 0 )
+  if ( closestpt < n )
     {
       if ( dist < range0 )
         {
           *prange = dist;
-          index = (unsigned) closestpt;
+          index = closestpt;
         }
     }
   
@@ -416,9 +418,9 @@ unsigned gs_nearest_full(struct  gsFull *full, double lon, double lat, double *p
 }
 
 
-unsigned gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *prange)
+size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *prange)
 {
-  unsigned index = GS_NOT_FOUND;
+  size_t index = GS_NOT_FOUND;
 
   if ( gs )
     {
@@ -445,7 +447,7 @@ unsigned gridsearch_nearest(struct gridsearch *gs, double lon, double lat, doubl
 }
 
 
-struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, unsigned nnn)
+struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
 {
   if ( gs->kdt == NULL ) return NULL;
   
@@ -485,7 +487,7 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
 #define  TINY     1.e-14
 
 static
-void knn_store_distance(int nadd, double distance, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist)
+void knn_store_distance(size_t nadd, double distance, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist)
 {
   if ( num_neighbors == 1 )
     {
@@ -497,11 +499,11 @@ void knn_store_distance(int nadd, double distance, int num_neighbors, int *restr
     }
   else
     {
-      for ( int nchk = 0; nchk < num_neighbors; ++nchk )
+      for ( size_t nchk = 0; nchk < num_neighbors; ++nchk )
 	{
 	  if ( distance < nbr_dist[nchk] || (distance <= nbr_dist[nchk] && nadd < nbr_add[nchk]) )
 	    {
-	      for ( int n = num_neighbors-1; n > nchk; --n )
+	      for ( size_t n = num_neighbors-1; n > nchk; --n )
 		{
 		  nbr_add[n]  = nbr_add[n-1];
 		  nbr_dist[n] = nbr_dist[n-1];
@@ -515,36 +517,36 @@ void knn_store_distance(int nadd, double distance, int num_neighbors, int *restr
 }
 
 static
-void knn_check_distance(int num_neighbors, const int *restrict nbr_add, double *restrict nbr_dist)
+void knn_check_distance(size_t num_neighbors, const size_t *restrict nbr_add, double *restrict nbr_dist)
 {
   // If distance is zero, set to small number
-  for ( int nchk = 0; nchk < num_neighbors; ++nchk )
-    if ( nbr_add[nchk] >= 0 && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
+  for ( size_t nchk = 0; nchk < num_neighbors; ++nchk )
+    if ( nbr_add[nchk] != GS_NOT_FOUND && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
 }
 
 
 void gridsearch_knn_init(struct gsknn *knn)
 {
   unsigned ndist = knn->ndist;
-  int *restrict add = knn->add;
+  size_t *restrict add = knn->add;
   double *restrict dist = knn->dist;
 
-  for ( unsigned i = 0; i < ndist; ++i )
+  for ( size_t i = 0; i < ndist; ++i )
     {
-      add[i]  = -1;
+      add[i]  = GS_NOT_FOUND;
       dist[i] = BIGNUM;
     }
 }
 
 
-struct gsknn *gridsearch_knn_new(unsigned size)
+struct gsknn *gridsearch_knn_new(size_t size)
 {
   struct gsknn *knn = (struct gsknn *) Malloc(sizeof(struct gsknn));
   
   knn->ndist   = size;
   knn->size    = size;
   knn->mask    = (bool*) Malloc(size*sizeof(bool));     // mask at nearest neighbors
-  knn->add     = (int*) Malloc(size*sizeof(int));       // source address at nearest neighbors
+  knn->add     = (size_t*) Malloc(size*sizeof(size_t)); // source address at nearest neighbors
   knn->dist    = (double*) Malloc(size*sizeof(double)); // angular distance of the nearest neighbors
   knn->tmpadd  = NULL;
   knn->tmpdist = NULL;
@@ -570,7 +572,7 @@ void gridsearch_knn_delete(struct gsknn *knn)
 }
 
 
-int gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat)
+size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat)
 {
   /*
     Output variables:
@@ -589,30 +591,30 @@ int gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double
   // Initialize distance and address arrays
   gridsearch_knn_init(knn);
 
-  int num_neighbors = knn->size;
-  int *restrict nbr_add = knn->add;
+  size_t num_neighbors = knn->size;
+  size_t *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
-  int ndist = num_neighbors;
+  size_t ndist = num_neighbors;
   // check some more points if distance is the same use the smaller index (nadd)
   if ( ndist > 8 ) ndist += 8;
   else             ndist *= 2; 
-  if ( ndist > (int)gs->n ) ndist = gs->n;
+  if ( ndist > gs->n ) ndist = gs->n;
 
-  if ( knn->tmpadd  == NULL ) knn->tmpadd  = (int*) Malloc(ndist*sizeof(int));
+  if ( knn->tmpadd  == NULL ) knn->tmpadd  = (size_t*) Malloc(ndist*sizeof(size_t));
   if ( knn->tmpdist == NULL ) knn->tmpdist = (double*) Malloc(ndist*sizeof(double));
 
-  int *adds = knn->tmpadd;
+  size_t *adds = knn->tmpadd;
   double *dist = knn->tmpdist;
   
   const double range0 = SQR(search_radius);
   double range = range0;
 
-  int j = 0;
+  size_t j = 0;
 
   if ( num_neighbors == 1 )
     {
-      unsigned nadd = gridsearch_nearest(gs, plon, plat, &range);
+      size_t nadd = gridsearch_nearest(gs, plon, plat, &range);
       if ( nadd != GS_NOT_FOUND )
         {
           //if ( range < range0 )
@@ -628,7 +630,7 @@ int gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double
       struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, ndist);
       if ( gs_result )
         {
-          unsigned nadd;
+          size_t nadd;
           struct resItem *p;
           while ( pqremove_min(gs_result, &p) )
             {
@@ -649,7 +651,7 @@ int gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double
     }
 
   ndist = j;
-  int max_neighbors = ( ndist < num_neighbors ) ? ndist : num_neighbors;
+  size_t max_neighbors = (ndist < num_neighbors) ? ndist : num_neighbors;
 
   for ( j = 0; j < ndist; ++j )
     knn_store_distance(adds[j], dist[j], max_neighbors, nbr_add, nbr_dist);

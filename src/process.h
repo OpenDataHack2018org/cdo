@@ -22,6 +22,10 @@
 #include <vector>
 #include "util.h"
 #include "pstream.h"
+#include "modules.h"
+
+#include <vector>
+#include <iostream>
 
 constexpr int MAX_PROCESS  =   128;
 constexpr int MAX_STREAM   =    64;
@@ -38,16 +42,16 @@ typedef struct {
 }
 oper_t;
 
-typedef struct {
+class process_t {
+    public:
+   int m_ID;
 #if defined(HAVE_LIBPTHREAD)
   pthread_t   threadID;
   int         l_threadID;
 #endif
   short       nchild;
-  short       nInStream;
-  short       nOutStream;
-  short       inputStreams[MAX_STREAM];
-  short       outputStreams[MAX_STREAM];
+  std::vector<pstream_t*>       inputStreams;
+  std::vector<pstream_t*>       outputStreams;
   double      s_utime;
   double      s_stime;
   double      a_utime;
@@ -63,25 +67,35 @@ typedef struct {
   const char *operatorName;
   char       *operatorArg;
   int         oargc;
-  char       *oargv[MAX_OARGC];
+  std::vector<char *> oargv;
   char        prompt[64];
   short       noper;
   oper_t      oper[MAX_OPERATOR];
-}
-process_t;
 
+  modules_t module;
 
+  int getInStreamCnt();
+  int getOutStreamCnt();
+  void initProcess();
+  void print_process();
+  process_t(int ID);
+ private: 
+  process_t();
+  void OpenRead(int p_input_idx);
+  void OpenWrite(int p_input_idx);
+  void OpenAppend(int p_input_idx);
+};
 
-int  processSelf(void);
+  pstream_t*  processInqInputStream(int streamindex);
+  pstream_t*  processInqOutputStream(int streamindex);
+  process_t&  processSelf(void);
 int  processCreate(void);
 void processDelete(void);
 int  processInqTimesteps(void);
 void processDefTimesteps(int streamID);
 int  processInqVarNum(void);
-int  processInqInputStreamNum(void);
-int  processInqOutputStreamNum(void);
-int  processInqInputStreamID(int streamindex);
-int  processInqOutputStreamID(int streamindex);
+int processInqInputStreamNum(void);
+int processInqOutputStreamNum(void);
 void processAddInputStream(pstream_t *p_pstream_ptr);
 void processAddOutputStream(pstream_t *p_pstream_ptr);
 void processDelStream(int streamID);
@@ -106,7 +120,6 @@ const char *processInqOpername(void);
 const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
-void print_process(int p_process_id);
-
 const argument_t *cdoStreamName(int cnt);
+
 #endif  /* _PROCESS_H */

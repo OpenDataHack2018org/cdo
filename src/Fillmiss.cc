@@ -27,8 +27,8 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
-
 #include "grid_search.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -277,9 +277,9 @@ void fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
 }
 
 
-int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
-double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, bool *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist);
-unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const bool *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist);
+int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+double nbr_compute_weights(size_t num_neighbors, const int *restrict src_grid_mask, bool *restrict nbr_mask, const size_t *restrict nbr_add, double *restrict nbr_dist);
+size_t nbr_normalize_weights(size_t num_neighbors, double dist_tot, const bool *restrict nbr_mask, size_t *restrict nbr_add, double *restrict nbr_dist);
 
 static
 void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
@@ -313,18 +313,10 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-  unsigned *mindex = NULL;
-  unsigned *vindex = NULL;
-  double *lons = NULL;
-  double *lats = NULL;
-
-  if ( nmiss ) mindex = (unsigned *) Calloc(1, nmiss*sizeof(unsigned));
-  if ( nvals )
-    {
-      vindex = (unsigned *) Calloc(1, nvals*sizeof(unsigned));
-      lons   = (double *) Malloc(nvals*sizeof(double));
-      lats   = (double *) Malloc(nvals*sizeof(double));
-    }
+  size_t *mindex = nmiss ? (size_t *) Calloc(1, nmiss*sizeof(size_t)) : NULL;
+  size_t *vindex = nvals ? (size_t *) Calloc(1, nvals*sizeof(size_t)) : NULL;
+  double *lons = nvals ? (double *) Malloc(nvals*sizeof(double)) : NULL;
+  double *lats = nvals ? (double *) Malloc(nvals*sizeof(double)) : NULL;
   
   unsigned nv = 0, nm = 0;
   for ( unsigned i = 0; i < gridsize; ++i ) 
@@ -346,9 +338,10 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
   
-  bool nbr_mask[num_neighbors];   /* mask at nearest neighbors                   */
-  int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
-  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
+
+  NEW_2D(bool, nbr_mask, ompNumThreads, num_neighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, ompNumThreads, num_neighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, ompNumThreads, num_neighbors); // angular distance four nearest neighbors
 
   clock_t start, finish;
   start = clock();
@@ -373,8 +366,10 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
   double findex = 0;
 
-#pragma omp parallel for default(none) shared(findex, mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, num_neighbors) \
-                                      private(nbr_mask, nbr_add, nbr_dist)
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(nbr_mask, nbr_add, nbr_dist)  \
+  shared(findex, mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, num_neighbors)
+#endif
   for ( unsigned i = 0; i < nmiss; ++i )
     {
 #if defined(_OPENMP)
@@ -383,17 +378,19 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/nmiss);
 
-      grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, xvals[mindex[i]], yvals[mindex[i]]);
+      int ompthID = cdo_omp_get_thread_num();
+
+      grid_search_nbr(gs, num_neighbors, nbr_add[ompthID], nbr_dist[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
-      double dist_tot = nbr_compute_weights(num_neighbors, NULL, nbr_mask, nbr_add, nbr_dist);
+      double dist_tot = nbr_compute_weights(num_neighbors, NULL, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
 
       /* Normalize weights and store the link */
-      unsigned nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      size_t nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
       if ( nadds )
         {
           double result = 0;
-          for ( unsigned n = 0; n < nadds; ++n ) result += array1[vindex[nbr_add[n]]]*nbr_dist[n];
+          for ( size_t n = 0; n < nadds; ++n ) result += array1[vindex[nbr_add[ompthID][n]]]*nbr_dist[ompthID][n];
           array2[mindex[i]] = result;
         }
     }
@@ -404,6 +401,10 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
   finish = clock();
 
   if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+
+  DELETE_2D(nbr_mask);
+  DELETE_2D(nbr_add);
+  DELETE_2D(nbr_dist);
 
   if ( gs ) gridsearch_delete(gs);
 

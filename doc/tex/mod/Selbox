@@ -57,7 +57,7 @@ INTEGER  Index of last latitude (1 - nlat)
 
 
 @BeginExample
-To select the region with the longitudes from 30W to 60E and latitudes from 30N to 80S from all input fields use:
+To select the region with the longitudes from 30W to 60E and latitudes from 30N to 80N from all input fields use:
 @BeginVerbatim
    cdo sellonlatbox,-30,60,30,80 infile outfile
 @EndVerbatim

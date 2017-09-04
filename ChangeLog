@@ -1,7 +1,47 @@
-2017-08-15  Uwe Schulzweida
+2017-09-27  Uwe Schulzweida
+
+	* Using CDI library version 1.9.1
+	* Version 1.9.1 release
+
+2017-09-01  Uwe Schulzweida
+
+	* Implementation of option --reduce_dim for z axis
+
+2017-08-31  Uwe Schulzweida
+
+	* Implementation of option --reduce_dim for time axis
+	* Implementation of option --reduce_dim for x/y axis
+
+2017-08-30  Uwe Schulzweida
+
+	* tee: added docu
+	* eof: check missing values
+
+2017-08-14  Uwe Schulzweida
+
+	* eof, eof3d: set default of env. CDO_WEIGHT_MODE to off
+	* eof3d, eofcoeff3d: preserve variable name on output files [report: Frank Kauker]
+
+2017-08-12  Uwe Schulzweida
+
+	* eof3d: weight was allocated for only one level (bug fix) [report: Frank Kauker]
+
+2017-07-27  Uwe Schulzweida
 
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
+
+2017-07-25  Uwe Schulzweida
+
+	* uvDestag: HIRLAM extensions (patch from Michal Koutek)
+
+2017-07-24  Uwe Schulzweida
+
+	* remap: deactivate links_per_value() [Bug #7821]
+
+2017-07-22  Uwe Schulzweida
+
+	* grid_search_reg2d_nn: bug fix for nx/ny = 1
 
 2017-07-14  Uwe Schulzweida
 
@@ -21,7 +61,7 @@
 
 2017-06-27  Uwe Schulzweida
 
-	* expr: added support for clev in ifthenelse (bug fix).
+	* expr: added support for clev in ternary operator (bug fix).
 	* setpartabp: param key values without leading zeros (bug fix).
 
 2017-06-08  Uwe Schulzweida

@@ -16,11 +16,11 @@
 */
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#include "config.h"
 #endif
 
 #if defined(_OPENMP)
-#  include <omp.h>
+#include <omp.h>
 #endif
 
 #if defined(HAVE_FNMATCH_H)
@@ -40,7 +40,7 @@
 
 
 #if ! defined(VERSION)
-#  define  VERSION  "0.0.1"
+#define  VERSION  "0.0.1"
 #endif
  
 

@@ -123,22 +123,13 @@ void *Fldstat2(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  if ( CDO_Reduce_Dim )
-    {
-      gridID3 = gridCreate(GRID_GENERIC, 1);
-      gridDefXsize(gridID3, 0);
-      gridDefYsize(gridID3, 0);
-    }
-  else
-    {
-      double slon = 0;
-      double slat = 0;
-      gridID3 = gridCreate(GRID_LONLAT, 1);
-      gridDefXsize(gridID3, 1);
-      gridDefYsize(gridID3, 1);
-      gridDefXvals(gridID3, &slon);
-      gridDefYvals(gridID3, &slat);
-    }
+  double slon = 0;
+  double slat = 0;
+  gridID3 = gridCreate(GRID_LONLAT, 1);
+  gridDefXsize(gridID3, 1);
+  gridDefYsize(gridID3, 1);
+  gridDefXvals(gridID3, &slon);
+  gridDefYvals(gridID3, &slat);
 
   int ngrids = vlistNgrids(vlistID1);
 

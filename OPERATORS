@@ -43,6 +43,7 @@ Operator catalog:
 -------------------------------------------------------------
    Copy          copy            Copy datasets
    Copy          cat             Concatenate datasets
+   Tee           tee             Duplicate a data stream
    Replace       replace         Replace variables
    Duplicate     duplicate       Duplicates a dataset
    Mergegrid     mergegrid       Merge grid

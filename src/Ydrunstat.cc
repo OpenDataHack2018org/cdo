@@ -38,11 +38,6 @@
 
 #define NDAY 373
 
-typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
 
 typedef struct {
   int       vdate[NDAY];
@@ -110,8 +105,7 @@ void *Ydrunstat(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   cdo_datetime_t *datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
   
@@ -145,6 +139,7 @@ void *Ydrunstat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
 	    }
 	  
           field_type *pvars1 = &vars1[tsID][varID][levelID];
@@ -265,11 +260,11 @@ void *Ydrunstat(void *argument)
 
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
+	    if ( otsID && recinfo[recID].lconst ) continue;
+
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &stats->vars1[dayoy][varID][levelID];
-
-	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	    pstreamDefRecord(streamID2, varID, levelID);
 	    pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
@@ -289,8 +284,6 @@ void *Ydrunstat(void *argument)
   if ( lvarstd ) Free(vars2);
 
   if ( datetime ) Free(datetime);
-
-  Free(recinfo);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

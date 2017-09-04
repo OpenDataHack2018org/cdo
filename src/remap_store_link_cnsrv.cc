@@ -27,12 +27,12 @@ void grid_store_init(grid_store_t* grid_store, long gridsize)
   if ( grid_store->max_size%grid_store->blk_size > 0 ) grid_store->nblocks++;
 
   if ( cdoVerbose )
-    fprintf(stdout, "blksize = %d  lastblksize = %d  max_size = %d  nblocks = %d\n", 
+    fprintf(stdout, "blksize = %zu  lastblksize = %zu  max_size = %zu  nblocks = %zu\n", 
 	    grid_store->blk_size, grid_store->max_size%grid_store->blk_size, 
 	    grid_store->max_size, grid_store->nblocks);
 
-  grid_store->blksize = (int*) Malloc(grid_store->nblocks*sizeof(int));
-  grid_store->nlayers = (int*) Malloc(grid_store->nblocks*sizeof(int));
+  grid_store->blksize = (long*) Malloc(grid_store->nblocks*sizeof(long));
+  grid_store->nlayers = (long*) Malloc(grid_store->nblocks*sizeof(long));
   grid_store->layers  = (grid_layer_t **) Malloc(grid_store->nblocks*sizeof(grid_layer_t *));
 
   nblocks = grid_store->nblocks;
@@ -102,7 +102,7 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
   long nlink; /* link index */
   long ilayer, i, iblk, iadd2;
   long nlayer, blksize;
-  int lstore_link;
+  bool lstore_link;
   grid_layer_t *grid_layer = NULL, **grid_layer2;
 
   /*  If all weights are ZERO, do not bother storing the link */
@@ -121,7 +121,7 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
   iblk  = BLK_NUM(add2);
   iadd2 = BLK_IDX(add2);
 
-  lstore_link = FALSE;
+  lstore_link = false;
   grid_layer2 = &grid_store->layers[iblk];
   nlayer = grid_store->nlayers[iblk];
   for ( ilayer = 0; ilayer < nlayer; ++ilayer )
@@ -132,9 +132,9 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
 	{
 	  break;
 	}
-      else if ( add1 == rv->src_cell_add[nlink] )
+      else if ( (size_t)add1 == rv->src_cell_add[nlink] )
 	{
-	  lstore_link = TRUE;
+	  lstore_link = true;
 	  break;
 	}
       grid_layer2 = &(*grid_layer2)->next;
@@ -161,7 +161,7 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
     {
       grid_layer = (grid_layer_t*) Malloc(sizeof(grid_layer_t));
       grid_layer->next = NULL;
-      grid_layer->grid2_link = (int*) Malloc(grid_store->blksize[iblk]*sizeof(int));
+      grid_layer->grid2_link = (long*) Malloc(grid_store->blksize[iblk]*sizeof(long));
 
       blksize = grid_store->blksize[iblk];
       for ( i = 0; i < blksize; ++i )
@@ -188,7 +188,7 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
     This routine stores the address and weight for this link in the appropriate 
     address and weight arrays and resizes those arrays if necessary.
 */
-void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict weights, int *link_add1[2], int *link_add2[2])
+void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict weights, long *link_add1[2], long *link_add2[2])
 {
   /*
     Input variables:
@@ -251,8 +251,8 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 #else
   for ( nlink = min_link; nlink <= max_link; ++nlink )
     {
-      if ( add2 == rv->tgt_cell_add[nlink] )
-	if ( add1 == rv->src_cell_add[nlink] ) break;
+      if ( (size_t)add2 == rv->tgt_cell_add[nlink] )
+	if ( (size_t)add1 == rv->src_cell_add[nlink] ) break;
     }
 #endif
 
@@ -283,9 +283,9 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
   rv->wts[3*nlink+1] = weights[1];
   rv->wts[3*nlink+2] = weights[2];
 
-  if ( link_add1[0][add1] == -1 ) link_add1[0][add1] = (int)nlink;
-  if ( link_add2[0][add2] == -1 ) link_add2[0][add2] = (int)nlink;
-  link_add1[1][add1] = (int)nlink;
-  link_add2[1][add2] = (int)nlink;
+  if ( link_add1[0][add1] == -1 ) link_add1[0][add1] = nlink;
+  if ( link_add2[0][add2] == -1 ) link_add2[0][add2] = nlink;
+  link_add1[1][add1] = nlink;
+  link_add2[1][add2] = nlink;
 
 }  /* store_link_cnsrv */

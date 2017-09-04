@@ -1375,7 +1375,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                     {
                       if ( i < maxout || (ngp > maxout && i >= (ngp-maxout)) )
                         {
-                          if ( steptype == TIME_CONSTANT )
+                          if ( steptype == TSTEP_CONSTANT )
                             fprintf(stdout, "   %s[lev=%lu:gp=%lu] = %g\n", vname, k+1, i+1, data[k*ngp+i]);
                           else
                             fprintf(stdout, "   %s[ts=%ld:lev=%lu:gp=%lu] = %g\n", vname, tsID, k+1, i+1, data[k*ngp+i]);
@@ -1435,7 +1435,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         params[nvarID].missval  = params[varID].missval;
                         params[nvarID].gridID   = params[varID].gridID;
                         params[nvarID].zaxisID  = parse_arg->surfaceID;
-                        params[nvarID].steptype = TIME_CONSTANT;
+                        params[nvarID].steptype = TSTEP_CONSTANT;
                         params[nvarID].ngp      = params[varID].ngp;
                         params[nvarID].nlev     = 1;
                         if ( units ) params[nvarID].units = strdup(units);
@@ -1471,7 +1471,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         params[nvarID].missval  = params[varID].missval;
                         params[nvarID].gridID   = parse_arg->pointID;
                         params[nvarID].zaxisID  = params[varID].zaxisID;
-                        params[nvarID].steptype = TIME_CONSTANT;
+                        params[nvarID].steptype = TSTEP_CONSTANT;
                         params[nvarID].ngp      = 1;
                         params[nvarID].nlev     = params[varID].nlev;
                         if ( units ) params[nvarID].units = strdup(units);

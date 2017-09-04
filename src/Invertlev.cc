@@ -41,15 +41,19 @@ void invertLevDes(int vlistID)
 
       if ( zaxisInqLevels(zaxisID1, NULL) )
 	{
-	  double yv1[nlev], yv2[nlev];
+          double *yv1 = (double*) Malloc(nlev*sizeof(double));
+          double *yv2 = (double*) Malloc(nlev*sizeof(double));
 	  zaxisInqLevels(zaxisID1, yv1);
 	  for ( int ilev = 0; ilev < nlev; ++ilev ) yv2[nlev-ilev-1] = yv1[ilev];
 	  zaxisDefLevels(zaxisID2, yv2);
+          Free(yv1);
+          Free(yv2);
 	}
 
       if ( zaxisInqLbounds(zaxisID1, NULL) && zaxisInqUbounds(zaxisID1, NULL) )
 	{
-	  double yb1[nlev], yb2[nlev];
+          double *yb1 = (double*) Malloc(nlev*sizeof(double));
+          double *yb2 = (double*) Malloc(nlev*sizeof(double));
 	  zaxisInqLbounds(zaxisID1, yb1);
 	  for ( int ilev = 0; ilev < nlev; ++ilev ) yb2[nlev-ilev-1] = yb1[ilev];
 	  zaxisDefLbounds(zaxisID2, yb2);
@@ -57,6 +61,8 @@ void invertLevDes(int vlistID)
 	  zaxisInqUbounds(zaxisID1, yb1);
 	  for ( int ilev = 0; ilev < nlev; ++ilev ) yb2[nlev-ilev-1] = yb1[ilev];
 	  zaxisDefUbounds(zaxisID2, yb2);
+          Free(yb1);
+          Free(yb2);
 	}
 
       if ( zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF )
@@ -64,8 +70,8 @@ void invertLevDes(int vlistID)
           int vctsize = zaxisInqVctSize(zaxisID1);		
           if ( vctsize && vctsize%2 == 0 )
             {
-              double vct1[vctsize];
-              double vct2[vctsize];
+              double *vct1 = (double*) Malloc(vctsize*sizeof(double));
+              double *vct2 = (double*) Malloc(vctsize*sizeof(double));
               zaxisInqVct(zaxisID1, vct1);
               for ( int i = 0; i < vctsize/2; ++i )
                 {
@@ -73,6 +79,8 @@ void invertLevDes(int vlistID)
                   vct2[vctsize-1-i]   = vct1[vctsize/2+i];
                 }
               zaxisDefVct(zaxisID2, vctsize, vct2);
+              Free(vct1);
+              Free(vct2);
             }
         }
 

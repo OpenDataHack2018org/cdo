@@ -30,7 +30,6 @@
 #include <regex>
 #include <set>
 #include <string>
-#include <vector>
 // for std::sort()
 #include <algorithm>
 
@@ -799,6 +798,7 @@ int add_alias(std::string alias, std::string original) {
  */
 void init_modules()
 {
+  
 /*                             function        help function      operator names          mode number     num streams
                                                                                                   type       in out      */
   add_module("Adisit"        , {Adisit        , AdisitHelp        , AdisitOperators        , 1 , CDI_REAL , 1  , 1  });
@@ -957,7 +957,7 @@ void init_modules()
   add_module("Splittime"     , {Splittime     , SplittimeHelp     , SplittimeOperators     , 1 , CDI_BOTH , 1  , -1 });
   add_module("Splityear"     , {Splityear     , SplittimeHelp     , SplityearOperators     , 1 , CDI_BOTH , 1  , -1 });
   add_module("Subtrend"      , {Subtrend      , SubtrendHelp      , SubtrendOperators      , 1 , CDI_REAL , 3  , 1  });
-  add_module("Tee"           , {Tee           , {}                , TeeOperators           , 1 , CDI_REAL , 2  , 1  });
+  add_module("Tee"           , {Tee           , TeeHelp           , TeeOperators           , 1 , CDI_REAL , 2  , 1  });
   add_module("Template1"     , {Template1     , {}                , Template1Operators     , 0 , CDI_REAL , 1  , 1  });
   add_module("Template2"     , {Template2     , {}                , Template2Operators     , 0 , CDI_REAL , 1  , 1  });
   add_module("Test"          , {Test          , {}                , TestOperators          , 0 , CDI_REAL , 1  , 1  });
@@ -1425,4 +1425,10 @@ void get_original(char * operatorName)
     else{
         Error("%s is not an alias", operatorName);
     }
+}
+
+
+modules_t &getModule(const std::string &operator_name)
+{
+    return modules[get_module_name_to(operator_name)];
 }

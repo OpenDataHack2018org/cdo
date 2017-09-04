@@ -124,12 +124,8 @@ void *Detrend(void *argument)
 
   int nts = tsID;
 
-  memory_t *ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-  for ( i = 0; i < ompNumThreads; i++ )
-    {
-      ompmem[i].array1 = (double*) Malloc(nts*sizeof(double));
-      ompmem[i].array2 = (double*) Malloc(nts*sizeof(double));
-    }
+  NEW_2D(double, array1, ompNumThreads, nts);
+  NEW_2D(double, array2, ompNumThreads, nts);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -140,29 +136,25 @@ void *Detrend(void *argument)
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(ompmem, vars, varID, levelID, gridsize, nts, missval)
+#pragma omp parallel for default(none) shared(array1, array2, vars, varID, levelID, gridsize, nts, missval)
 #endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
               int ompthID = cdo_omp_get_thread_num();
 
 	      for ( int tsID = 0; tsID < nts; tsID++ )
-		ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+		array1[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
-	      detrend(nts, missval, ompmem[ompthID].array1, ompmem[ompthID].array2);
+	      detrend(nts, missval, array1[ompthID], array2[ompthID]);
 
 	      for ( int tsID = 0; tsID < nts; tsID++ )
-		vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].array2[tsID];
+		vars[tsID][varID][levelID].ptr[i] = array2[ompthID][tsID];
 	    }
 	}
     }
 
-  for ( i = 0; i < ompNumThreads; i++ )
-    {
-      Free(ompmem[i].array1);
-      Free(ompmem[i].array2);
-    }
-  Free(ompmem);
+  DELETE_2D(array1);
+  DELETE_2D(array2);
 
   for ( int tsID = 0; tsID < nts; tsID++ )
     {

@@ -75,14 +75,9 @@
 
 
 typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
-typedef struct {
   int tsIDnext;
   int streamID, nrecs;
-  recinfo_t *recinfo;
+  recinfo_type *recinfo;
   field_type **vars;
 }
 readarg_t;
@@ -95,7 +90,7 @@ void *cdoReadTimestep(void *rarg)
   int varID, levelID, nmiss;
   readarg_t *readarg = (readarg_t *) rarg;
   field_type **input_vars = readarg->vars;
-  recinfo_t *recinfo = readarg->recinfo;
+  recinfo_type *recinfo = readarg->recinfo;
   int streamID = readarg->streamID;
   int tsIDnext = readarg->tsIDnext;
   int nrecs = readarg->nrecs;
@@ -243,10 +238,6 @@ void *XTimstat(void *argument)
 
   int nvars = vlistNvars(vlistID1);
 
-  if ( cmplen == 0 && CDO_Reduce_Dim )
-    for ( varID = 0; varID < nvars; ++varID )
-      vlistDefVarTsteptype(vlistID2, varID, TSTEP_CONSTANT);
-
   const char *freq = NULL;
   if      ( comparelen == DAY_LEN )  freq = "day";
   else if ( comparelen == MON_LEN )  freq = "mon";
@@ -321,7 +312,7 @@ void *XTimstat(void *argument)
   int otsID = 0;
   int nrecs = pstreamInqTimestep(streamID1, tsID);
   int maxrecs = nrecs;
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  recinfo_type *recinfo = (recinfo_type *) Malloc(maxrecs*sizeof(recinfo_type));
   
   tsID++;
   while ( TRUE )

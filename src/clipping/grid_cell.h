@@ -13,7 +13,7 @@
  * Keywords:
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Rene Redler <rene.redler@mpimet.mpg.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *
@@ -75,5 +75,17 @@ void yac_copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell);
  * @param[in,out] cell
  */
 void yac_free_grid_cell(struct grid_cell * cell);
+
+#ifdef DEBUG
+/**
+ * prints out info about a grid_cell object and reinitialised, used for debugging
+ * interpolation_method_conserv and interpolation_method_patch
+ * the cell
+ * @param[in] stream
+ * @param[in] cell
+ * @param[in] name
+ */
+void print_grid_cell(FILE * stream, struct grid_cell cell, char * name);
+#endif
 
 #endif // GRID_CELL_H

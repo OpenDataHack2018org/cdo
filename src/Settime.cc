@@ -309,7 +309,7 @@ void *Settime(void *argument)
       size_t len = strlen(cname);
       if ( len < 3 ) len = 7;
       if      ( strcmp(cname, "standard")  == 0 ) newcalendar = CALENDAR_STANDARD;
-      else if ( strcmp(cname, "gregorian") == 0 ) newcalendar = CALENDAR_STANDARD;
+      else if ( strcmp(cname, "gregorian") == 0 ) newcalendar = CALENDAR_GREGORIAN;
       else if ( strcmp(cname, "proleptic") == 0 ) newcalendar = CALENDAR_PROLEPTIC;
       else if ( strcmp(cname, "proleptic_gregorian") == 0 ) newcalendar = CALENDAR_PROLEPTIC;
       else if ( strncmp(cname, "360days", len) == 0 ) newcalendar = CALENDAR_360DAYS;

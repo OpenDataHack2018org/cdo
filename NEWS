@@ -1,16 +1,27 @@
 CDO NEWS
 --------
 
-Version 1.9.0 (15 September 2017):
+Version 1.9.1 (27 September 2017):
+
+   New operators:
+     * tee - Duplicate a data stream
+   Changes operators:
+     * eof, eof3d: set default value of environment variable CDO_WEIGHT_MODE to off
+   Fixed bugs:
+     * --cmor option doesn't work for lon/lat bounds (introduced in 1.9.0)
+     * eof3d: weight array was allocated for only one level (bug fix)
+
+Version 1.9.0 (27 July 2017):
 
    New features:
+     * Code changed from ANSI C99 to ISO C++11
+     * Added configure option for ecCodes --with-eccodes=<yes|no|directory>
      * Added range operator to all statistic modules (e.g. yearrange, zonrange)
-   New operators:
-     *
    Fixed bugs:
      * expr: improve ternary operator, no brackets needed anymore.
      * expr: added support for clev in ternary operator.
-     * mergetime: wrong time information if first input file does not contain the first time step (bug introduce in 1.8.1) [Bug #7760]
+     * remapcon/remapycon produces wrong results for some grid combinations (introduced in 1.8.0) [Bug #7821]
+     * mergetime: wrong time information if first input file does not contain the first time step (bug introduced in 1.8.1) [Bug #7760]
      * percentile: fix wrong result with method numpy (linear interpolation) and nist [Bug #7798]
 
 Version 1.8.2 (15 May 2017):

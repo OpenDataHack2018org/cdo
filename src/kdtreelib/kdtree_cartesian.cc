@@ -15,31 +15,20 @@
 
    ********************************************************************* */
 
-static
+static constexpr
 kdata_t square(const kdata_t x)
 {
   return x*x;
 }
 
-static
-kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b, int dim)
+static constexpr
+kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b)
 {
   return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
 }
 
-inline kdata_t
-kd_dist_sq_ori(kdata_t *x, kdata_t *y, int dim)
-{
-    if (!x || !y) return -1;
-
-    kdata_t dsq = 0;
-    for(int i = 0; i < dim; i++)
-        dsq += kd_sqr(x[i] - y[i]);
-    return dsq;
-}
-
-inline kdata_t
-kd_min(kdata_t x, kdata_t y)
+inline
+kdata_t kd_min(kdata_t x, kdata_t y)
 {
     return x < y ? x : y;
 }
@@ -259,7 +248,7 @@ kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int dim)
     else
         nearest = node;
 
-    kdata_t dist_sq = kd_dist_sq(nearest->location, p, dim);
+    kdata_t dist_sq = kd_dist_sq(nearest->location, p);
     if (*max_dist_sq > dist_sq)
 	*max_dist_sq = dist_sq;
 
@@ -280,7 +269,7 @@ kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int dim)
         else
             tmp_nearest = further;
 
-        kdata_t tmp_dist_sq = kd_dist_sq(tmp_nearest->location, p, dim);
+        kdata_t tmp_dist_sq = kd_dist_sq(tmp_nearest->location, p);
         if ( tmp_dist_sq < dist_sq ) {
             nearest = tmp_nearest;
             dist_sq = tmp_dist_sq;
@@ -342,9 +331,9 @@ kd_qnearest(struct kdNode *node, kdata_t *p,
 // Uwe Schulzweida: extract kd_check_dist() from kd_doQnearest()
 static int
 kd_check_dist(struct kdNode *node, kdata_t *p,
-              kdata_t *max_dist_sq, unsigned int q, int dim, struct pqueue *res)
+              kdata_t *max_dist_sq, unsigned int q, struct pqueue *res)
 {
-    kdata_t dist_sq = kd_dist_sq(node->location, p, dim);
+    kdata_t dist_sq = kd_dist_sq(node->location, p);
     if ( dist_sq < *max_dist_sq && kd_isleaf(node) ) {
         struct resItem *point = (struct resItem *) kd_malloc(sizeof(struct resItem), "kd_doQnearest: ");
         if ( point == NULL) return 0;
@@ -380,7 +369,7 @@ kd_doQnearest(struct kdNode *node, kdata_t *p,
 {
     if ( !node ) return 1;
 
-    if ( !kd_check_dist(node, p, max_dist_sq, q, dim, res) ) return 0;
+    if ( !kd_check_dist(node, p, max_dist_sq, q, res) ) return 0;
 
     struct kdNode *nearer, *further;
     if ( p[node->split] < node->location[node->split] ) {
@@ -404,7 +393,7 @@ kd_doQnearest(struct kdNode *node, kdata_t *p,
          */
         if (!kd_doQnearest(further, p, max_dist_sq, q, dim, res)) return 0;
 
-        if (!kd_check_dist(node, p, max_dist_sq, q, dim, res)) return 0;
+        if (!kd_check_dist(node, p, max_dist_sq, q, res)) return 0;
     }
     return 1;
 }
@@ -458,7 +447,7 @@ kd_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
     if (!node)
         return 1;
 
-    dist_sq = kd_dist_sq(node->location, p, dim);
+    dist_sq = kd_dist_sq(node->location, p);
     if (dist_sq < *max_dist_sq && kd_isleaf(node)) {
         if ((point = (struct resItem *)kd_malloc(sizeof(struct resItem), "kd_doRange:"))
             == NULL)
@@ -490,7 +479,7 @@ kd_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
          */
         if (!kd_doRange(further, p, max_dist_sq, dim, res, ordered))
             return 0;
-        dist_sq = kd_dist_sq(node->location, p, dim);
+        dist_sq = kd_dist_sq(node->location, p);
 
         if (dist_sq < *max_dist_sq && kd_isleaf(node)) {
             if ((point = (struct resItem *)kd_malloc(sizeof(struct resItem), "kd_doRange: "))

@@ -35,12 +35,6 @@
 #include "pstream.h"
 
 
-typedef struct {
-  short varID;
-  short levelID;
-} recinfo_t;
-
-
 void *Runstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
@@ -105,8 +99,7 @@ void *Runstat(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
-
-  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -147,6 +140,7 @@ void *Runstat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
 	    }
 	  
           field_type *psamp1 = samp1 ? &samp1[tsID][varID][levelID] : NULL;
@@ -228,14 +222,14 @@ void *Runstat(void *argument)
     {
       for ( int recID = 0; recID < maxrecs; recID++ )
         {
+          if ( recinfo[recID].lconst ) continue;
+
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = samp1 ? &samp1[0][varID][levelID] : NULL;
           field_type *pvars1 = &vars1[0][varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[0][varID][levelID] : NULL;
           int nsets = ndates;
-
-          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
           if ( lmean )
             {
@@ -266,11 +260,11 @@ void *Runstat(void *argument)
 
       for ( int recID = 0; recID < maxrecs; recID++ )
 	{
+          if ( otsID && recinfo[recID].lconst ) continue;
+
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *pvars1 = &vars1[0][varID][levelID];
-
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
@@ -394,8 +388,6 @@ void *Runstat(void *argument)
   if ( imask ) Free(imask);
 
   dtlist_delete(dtlist);
-
-  Free(recinfo);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

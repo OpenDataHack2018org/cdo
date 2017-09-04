@@ -9,6 +9,9 @@
 #include <pthread.h>
 #include <errno.h>
 #include "error.h"
+#include <mutex>
+#include <condition_variable>
+#include <iostream>
 
 
 #define POUT2(caller, x, a, b)     pout2(caller, #x, x, #a, a, #b, b)
@@ -193,7 +196,17 @@ void Pthread_mutex_lock(const char *caller, pthread_mutex_t *mutex)
 	}
     }
 }
-
+void Pthread_mutex_lock(const char *caller, std::mutex &p_mutex)
+{
+    try {
+      p_mutex.lock();
+    }
+    catch(const std::system_error& e)
+    {
+        std::cout << "locking failed in " << caller 
+                  << ". ErrorCode:" << e.code() << " " << e.what() << std::endl;
+    }
+}
 
 void Pthread_mutex_unlock(const char *caller, pthread_mutex_t *mutex)
 {
@@ -218,8 +231,25 @@ void Pthread_mutex_unlock(const char *caller, pthread_mutex_t *mutex)
 	}
     }
 }
+void Pthread_mutex_unlock(const char *caller, std::mutex &p_mutex)
+{
+    try {
+      p_mutex.unlock();
+    }
+    catch(const std::system_error& e)
+    {
+        std::cout << "unlocking failed in " << caller 
+                  << ". ErrorCode:" << e.code() << " " << e.what() << std::endl;
+    }
+}
 
 
+void Pthread_cond_signal(const char *caller,std::condition_variable &p_cond_var)
+{
+  if( PTHREAD_Debug)Message("+%s (cond = %p)", caller, (void *) &p_cond_var);
+    p_cond_var.notify_all();
+  if ( PTHREAD_Debug ) Message("-%s (cond = %p)", caller, (void *) &p_cond_var);
+}
 void Pthread_cond_signal(const char *caller, pthread_cond_t *cond)
 {
   if ( PTHREAD_Debug ) Message("+%s (cond = %p)", caller, (void *) cond);
@@ -227,6 +257,14 @@ void Pthread_cond_signal(const char *caller, pthread_cond_t *cond)
   pthread_cond_signal(cond);
 
   if ( PTHREAD_Debug ) Message("-%s (cond = %p)", caller, (void *) cond);
+}
+
+void Pthread_cond_wait(const char *caller, std::condition_variable &p_cond, std::unique_lock<std::mutex> &p_locked_mutex)
+{
+  if ( PTHREAD_Debug ) std::cout << caller << "waiting for condition "<< &p_cond << std::endl;
+    p_cond.wait(p_locked_mutex);
+
+  if ( PTHREAD_Debug ) std::cout << caller << "finished waiting " << &p_cond << std::endl;
 }
 
 
@@ -237,7 +275,7 @@ void Pthread_cond_wait(const char *caller, pthread_cond_t *cond, pthread_mutex_t
 
   pthread_cond_wait(cond, mutex);
 
-  if ( PTHREAD_Debug ) Message("-%s (cond = %p, mutex = %p)",
+   if ( PTHREAD_Debug ) Message("-%s (cond = %p, mutex = %p)",
 			       caller, (void *) cond, (void *) mutex);
 }
 

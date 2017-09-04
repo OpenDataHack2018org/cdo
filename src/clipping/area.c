@@ -12,7 +12,7 @@
  * Keywords:
  * Maintainer: Moritz Hanke <hanke@dkrz.de>
  *             Rene Redler <rene.redler@mpimet.mpg.de>
- * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ * URL: https://doc.redmine.dkrz.de/YAC/html/index.html
  *
  * This file is part of YAC.
  *
@@ -180,7 +180,7 @@ double yac_cell_area ( struct grid_cell cell ) {
   double * p[cell.num_corners];
   double u[cell.num_corners][3];
 
-  for (int i = 0; i < cell.num_corners; ++i)
+  for (unsigned i = 0; i < cell.num_corners; ++i)
     p[i] = cell.coordinates_xyz + i * 3;
 
   /* First, compute cross products Uij = Vi x Vj. */
@@ -376,7 +376,7 @@ static inline int compute_norm_vector(double a[], double b[], double norm[]) {
 }
 
 static double
-lat_edge_correction(double base_point[3], double a[3], double b[3],
+lat_edge_correction(double base_vec[3], double a[3], double b[3],
                     double lon_a, double lon_b) {
 
   double const tol = 1e-8;
@@ -413,7 +413,7 @@ lat_edge_correction(double base_point[3], double a[3], double b[3],
   // if the angle between a and b is to small to compute a norm vector
   if (compute_norm_vector(a, b, norm_ab)) return 0.0;
 
-  double scalar_base = scalar_product(norm_ab, base_point);
+  double scalar_base = scalar_product(norm_ab, base_vec);
   double scalar_middle_lat = scalar_product(norm_ab, middle_lat);
 
   // if the base point is on the same plane as a and b
@@ -527,7 +527,7 @@ double yac_planar_3dcell_area (struct grid_cell cell) {
 
   if (cell.num_corners < 3) return area;
 
-  for ( int i0=cell.num_corners-1, i1=0;  i1<cell.num_corners; i0=i1, ++i1) {
+  for ( unsigned i0=cell.num_corners-1, i1=0;  i1<cell.num_corners; i0=i1, ++i1) {
     norm[0] += cell.coordinates_xyz[1+i0*3]*cell.coordinates_xyz[2+i1*3] - cell.coordinates_xyz[1+i1*3]*cell.coordinates_xyz[2+i0*3];
     norm[1] += cell.coordinates_xyz[2+i0*3]*cell.coordinates_xyz[0+i1*3] - cell.coordinates_xyz[2+i1*3]*cell.coordinates_xyz[0+i0*3];
     norm[2] += cell.coordinates_xyz[0+i0*3]*cell.coordinates_xyz[1+i1*3] - cell.coordinates_xyz[0+i1*3]*cell.coordinates_xyz[1+i0*3];
@@ -551,7 +551,7 @@ double yac_huiliers_area (struct grid_cell cell) {
 
   int lat_flag = 0;
 
-  for (int i = 0; i < cell.num_corners; i++)
+  for (unsigned i = 0; i < cell.num_corners; i++)
     lat_flag |= cell.edge_type[i] == LAT_CIRCLE;
 
   if (cell.num_corners == 3 && !lat_flag)
@@ -563,7 +563,7 @@ double yac_huiliers_area (struct grid_cell cell) {
   // sum areas around cell
   double area = 0.0;
 
-  for (int i = 2; i < cell.num_corners; ++i) {
+  for (unsigned i = 2; i < cell.num_corners; ++i) {
 
     double tmp_area = tri_area(cell.coordinates_xyz + 0*3,
                                cell.coordinates_xyz + (i-1)*3,
@@ -585,11 +585,11 @@ double yac_huiliers_area (struct grid_cell cell) {
   // if there is at least one latitude circle edge
   if (lat_flag) {
 
-    for (int i = 0; i < cell.num_corners; ++i) {
+    for (unsigned i = 0; i < cell.num_corners; ++i) {
 
       if (cell.edge_type[i] == LAT_CIRCLE) {
 
-        int i_ = (i+1)%cell.num_corners;
+        unsigned i_ = (i+1)%cell.num_corners;
 
         area += lat_edge_correction(cell.coordinates_xyz + 0 * 3,
                                     cell.coordinates_xyz + i * 3,

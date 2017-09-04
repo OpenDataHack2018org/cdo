@@ -48,7 +48,7 @@ case "${HOSTNAME}" in
                     $CDOLIBS \
                     LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib -Wl,-rpath,/opt/intel/lib" \
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
-	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -fp-model strict"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
@@ -105,12 +105,12 @@ case "${HOSTNAME}" in
 
         if  test "$COMP" = intel ; then
 	  ${CONFPATH}configure --prefix=$HOME/local --disable-openmp \
-                    $CDOLIBS \
+                    $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
 	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure \
-                    $CDOLIBS \
+                    $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=clang++ CXXFLAGS="-g -Wall -pedantic -O3" \
 	            CC=clang    CFLAGS="-g -Wall -pedantic -O3"
         elif  test "$COMP" = clang4 ; then
@@ -120,7 +120,7 @@ case "${HOSTNAME}" in
 	            CC=clang-mp-4.0    CFLAGS="-g -Wall -pedantic -O3"
         elif  test "$COMP" = pgi ; then
 	  ${CONFPATH}configure --disable-openmp \
-                    $CDOLIBS \
+                    $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=pgc++ CXXFLAGS="-g -fast" \
 	            CC=pgcc   CFLAGS="-g -fast"
         else

@@ -154,7 +154,7 @@ void find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal
   unit_normal[2] = z / magnitude;
 }
 
-static
+
 int find_coordinate_to_ignore(double *cell_corners_xyz)
 {
   double corner_coordinates[3];
@@ -236,7 +236,7 @@ double is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2
   return answer;
 }
 
-static
+
 int winding_numbers_algorithm(double cell_corners[], int number_corners, double point[])
 {  
   /* 
@@ -313,7 +313,6 @@ bool is_simple_polygon_convex(double cell_corners[], int number_corners)
 }
 
 
-static
 double calculate_the_polygon_area(double cell_corners[], int number_corners)
 {
   /* This algorithm is based on the calculation from Wolfram Mathworld Polygon Area. It results in the area of planar non-self-intersecting polygon. */
@@ -326,7 +325,7 @@ double calculate_the_polygon_area(double cell_corners[], int number_corners)
   return twice_the_polygon_area / 2;
 }
 
-static
+
 bool are_polygon_vertices_arranged_in_clockwise_order(double cell_area)
 {
   bool status = false;
@@ -616,7 +615,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
       double polygon_area = calculate_the_polygon_area(cell_corners_plane_projection, actual_number_of_corners + 1);
       bool is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
-            
+
       /* If the direction of the vertices was flipped during the projection onto the two-dimensional plane, the previous result needs to be inverted now. */
 
       if ( invert_result ) is_clockwise = !is_clockwise;

@@ -46,19 +46,19 @@ typedef struct {
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-double smooth_knn_compute_weights(unsigned num_neighbors, const bool *restrict src_grid_mask, struct gsknn *knn, double search_radius, double weight0, double weightR)
+double smooth_knn_compute_weights(size_t num_neighbors, const bool *restrict src_grid_mask, struct gsknn *knn, double search_radius, double weight0, double weightR)
 {
   bool *restrict nbr_mask = knn->mask;
-  const int *restrict nbr_add = knn->add;
+  const size_t *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
   // Compute weights based on inverse distance if mask is false, eliminate those points
   double dist_tot = 0.; // sum of neighbor distances (for normalizing)
 
-  for ( unsigned n = 0; n < num_neighbors; ++n )
+  for ( size_t n = 0; n < num_neighbors; ++n )
     {
       nbr_mask[n] = false;
-      if ( nbr_add[n] >= 0 && src_grid_mask[nbr_add[n]] )
+      if ( nbr_add[n] < ULONG_MAX && src_grid_mask[nbr_add[n]] )
         {
           nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightR, search_radius);
           dist_tot += nbr_dist[n];
@@ -70,16 +70,16 @@ double smooth_knn_compute_weights(unsigned num_neighbors, const bool *restrict s
 }
 
 
-unsigned smooth_knn_normalize_weights(unsigned num_neighbors, double dist_tot, struct gsknn *knn)
+size_t smooth_knn_normalize_weights(unsigned num_neighbors, double dist_tot, struct gsknn *knn)
 {
   const bool *restrict nbr_mask = knn->mask;
-  int *restrict nbr_add = knn->add;
+  size_t *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
   // Normalize weights and store the link
   unsigned nadds = 0;
 
-  for ( unsigned n = 0; n < num_neighbors; ++n )
+  for ( size_t n = 0; n < num_neighbors; ++n )
     {
       if ( nbr_mask[n] )
         {
@@ -97,12 +97,12 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 {
   *nmiss = 0;
   int gridID0 = gridID;
-  unsigned gridsize = gridInqSize(gridID);
-  unsigned num_neighbors = spoint.maxpoints;
+  size_t gridsize = gridInqSize(gridID);
+  size_t num_neighbors = spoint.maxpoints;
   if ( num_neighbors > gridsize ) num_neighbors = gridsize;
 
   bool *mask = (bool*) Malloc(gridsize*sizeof(bool));
-  for ( unsigned i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     mask[i] = !DBL_IS_EQUAL(array1[i], missval);
   
   double *xvals = (double*) Malloc(gridsize*sizeof(double));
@@ -153,7 +153,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(dynamic) default(none) shared(cdoVerbose, knn, spoint, findex, mask, array1, array2, xvals, yvals, gs, gridsize, nmiss, missval)
 #endif
-  for ( unsigned i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       int ompthID = cdo_omp_get_thread_num();
       
@@ -163,7 +163,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
       findex++;
       if ( cdoVerbose && cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
      
-      unsigned nadds = gridsearch_knn(gs, knn[ompthID], xvals[i], yvals[i]);
+      size_t nadds = gridsearch_knn(gs, knn[ompthID], xvals[i], yvals[i]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       double dist_tot = smooth_knn_compute_weights(nadds, mask, knn[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
@@ -172,7 +172,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
       nadds = smooth_knn_normalize_weights(nadds, dist_tot, knn[ompthID]);
       if ( nadds )
         {
-          const int *restrict nbr_add = knn[ompthID]->add;
+          const size_t *restrict nbr_add = knn[ompthID]->add;
           const double *restrict nbr_dist = knn[ompthID]->dist;
           /*
           printf("n %u %d nadds %u dis %g\n", i, nbr_add[0], nadds, nbr_dist[0]);
@@ -180,7 +180,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
             printf("   n %u add %d dis %g\n", n, nbr_add[n], nbr_dist[n]);
           */
           double result = 0;
-          for ( unsigned n = 0; n < nadds; ++n ) result += array1[nbr_add[n]]*nbr_dist[n];
+          for ( size_t n = 0; n < nadds; ++n ) result += array1[nbr_add[n]]*nbr_dist[n];
           array2[i] = result;
         }
       else

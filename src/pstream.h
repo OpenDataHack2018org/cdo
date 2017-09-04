@@ -23,19 +23,25 @@
 #include "argument.h"
 
 #include <sys/types.h> /* off_t */
+#include <vector>
 
 class pstream_t
 {
 public:
-  pstream_t();
+  pstream_t(int id);
+  ~pstream_t();
   int inqVlist();
   int inqFileType();
   void defTimestep(int p_tsID);
   bool isPipe();
-  void pstreamOpenReadPipe(const argument_t *argument);
-  void pstreamOpenReadFile(const argument_t *argument);
+  void pstreamOpenReadPipe(const char* pipename);
+  void pstreamOpenReadFile(const char *argument);
   void openAppend(const char * p_filename);
-  int self;
+  void init();
+  void defVlist(int p_vlistID);
+  void close();
+  int self; //aka the id of the pstream
+  std::pair<int, int> m_id;
   int mode;
   int m_fileID;
   int m_vlistID;
@@ -47,14 +53,18 @@ public:
   int varID; /* next varID defined with streamDefVar */
   bool ispipe;
   bool isopen;
-  char *name;
-  char **mfnames;
+  std::string m_name;
+  std::vector<std::string> m_mfnames;
   varlist_t *m_varlist;
 #if defined(HAVE_LIBPTHREAD)
   void *argument;
   struct pipe_t *pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
+private:
+   void createFilelist(const char *p_args);
+   pstream_t();
+   void defVarList(int vlistID);
 #endif
 };
 
@@ -80,5 +90,7 @@ void pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum
 int pstreamFileID(int pstreamID);
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
+
+const int &getPthreadScope();
 
 #endif /* PSTREAM_H */
