@@ -164,6 +164,7 @@ void *Settime(void *argument);
 void *Setzaxis(void *argument);
 void *Shiftxy(void *argument);
 void *Showinfo(void *argument);
+void *Showattribute(void *argument);
 void *Sinfo(void *argument);
 void *Smooth(void *argument);
 void *Sort(void *argument);
@@ -433,7 +434,8 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  SetzaxisOperators      {"setzaxis", "genlevelbounds"}
 #define  ShiftxyOperators       {"shiftx", "shifty"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
-                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat", "showgrid"}
+                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat", "showgrid", "showatts", "showattsglob"}
+#define  ShowattributeOperators {"showattribute", "showattsvar"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
 #define  SmoothOperators        {"smooth", "smooth9"}
 #define  SortOperators          {"sortcode", "sortparam", "sortname", "sortlevel"}
@@ -944,6 +946,7 @@ void init_modules()
   add_module("Setzaxis"      , {Setzaxis      , SetzaxisHelp      , SetzaxisOperators      , 1 , CDI_BOTH , 1  , 1  });
   add_module("Shiftxy"       , {Shiftxy       , {}                , ShiftxyOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Showinfo"      , {Showinfo      , ShowinfoHelp      , ShowinfoOperators      , 1 , CDI_BOTH , 1  , 0  });
+  add_module("Showattribute" , {Showattribute , {}                , ShowattributeOperators , 1 , CDI_REAL , 1  , 0  });
   add_module("Sinfo"         , {Sinfo         , SinfoHelp         , SinfoOperators         , 1 , CDI_BOTH , -1 , 0  });
   add_module("Smooth"        , {Smooth        , SmoothHelp        , SmoothOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Sort"          , {Sort          , {}                , SortOperators          , 1 , CDI_REAL , 1  , 1  });
