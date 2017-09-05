@@ -231,7 +231,8 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Setpartab.$(OBJEXT) cdo-Setrcaname.$(OBJEXT) \
 	cdo-Settime.$(OBJEXT) cdo-Setzaxis.$(OBJEXT) \
 	cdo-Shiftxy.$(OBJEXT) cdo-Showinfo.$(OBJEXT) \
-	cdo-Sinfo.$(OBJEXT) cdo-Smooth.$(OBJEXT) cdo-Sort.$(OBJEXT) \
+	cdo-Showattribute.$(OBJEXT) cdo-Sinfo.$(OBJEXT) \
+	cdo-Smooth.$(OBJEXT) cdo-Sort.$(OBJEXT) \
 	cdo-Sorttimestamp.$(OBJEXT) cdo-Specinfo.$(OBJEXT) \
 	cdo-Spectral.$(OBJEXT) cdo-Spectrum.$(OBJEXT) \
 	cdo-Split.$(OBJEXT) cdo-Splitrec.$(OBJEXT) \
@@ -616,24 +617,25 @@ cdo_SOURCES = cdo.cc Adisit.cc Afterburner.cc Arith.cc Arithc.cc \
 	Selmulti.cc Seloperator.cc Selrec.cc Seltime.cc Selvar.cc \
 	Set.cc Setattribute.cc Setbox.cc Setgatt.cc Setgrid.cc \
 	Sethalo.cc Setmiss.cc Setpartab.cc Setrcaname.cc Settime.cc \
-	Setzaxis.cc Shiftxy.cc Showinfo.cc Sinfo.cc Smooth.cc Sort.cc \
-	Sorttimestamp.cc Specinfo.cc Spectral.cc Spectrum.cc Split.cc \
-	Splitrec.cc Splitsel.cc Splittime.cc Splityear.cc Subtrend.cc \
-	Tee.cc Templates.cc Test.cc Tests.cc Timcount.cc Timcumsum.cc \
-	Timpctl.cc Timselpctl.cc Timselstat.cc Timsort.cc Timstat.cc \
-	Timstat2.cc Timstat3.cc Tinfo.cc Tocomplex.cc Transpose.cc \
-	Trend.cc Trms.cc Tstepcount.cc Vargen.cc Varrms.cc \
-	Vertintml.cc Vertintap.cc Vertstat.cc Vertcum.cc Vertwind.cc \
-	Verifygrid.cc Wct.cc Wind.cc WindTrans.cc Writegrid.cc \
-	Writerandom.cc XTimstat.cc YAR.cc Yearmonstat.cc Ydayarith.cc \
-	Ydaypctl.cc Ydaystat.cc Ydrunpctl.cc Ydrunstat.cc \
-	Yhourarith.cc Yhourstat.cc Ymonarith.cc Ymonpctl.cc \
-	Ymonstat.cc Yseaspctl.cc Yseasstat.cc Zonstat.cc cdo.h \
-	nearpt3c.h Magplot.cc Magvector.cc Maggraph.cc \
-	template_parser.h template_parser.cc results_template_parser.h \
-	results_template_parser.cc magics_template_parser.h \
-	magics_template_parser.cc StringUtilities.h StringUtilities.cc \
-	CdoMagicsMapper.h CdoMagicsMapper.cc
+	Setzaxis.cc Shiftxy.cc Showinfo.cc Showattribute.cc Sinfo.cc \
+	Smooth.cc Sort.cc Sorttimestamp.cc Specinfo.cc Spectral.cc \
+	Spectrum.cc Split.cc Splitrec.cc Splitsel.cc Splittime.cc \
+	Splityear.cc Subtrend.cc Tee.cc Templates.cc Test.cc Tests.cc \
+	Timcount.cc Timcumsum.cc Timpctl.cc Timselpctl.cc \
+	Timselstat.cc Timsort.cc Timstat.cc Timstat2.cc Timstat3.cc \
+	Tinfo.cc Tocomplex.cc Transpose.cc Trend.cc Trms.cc \
+	Tstepcount.cc Vargen.cc Varrms.cc Vertintml.cc Vertintap.cc \
+	Vertstat.cc Vertcum.cc Vertwind.cc Verifygrid.cc Wct.cc \
+	Wind.cc WindTrans.cc Writegrid.cc Writerandom.cc XTimstat.cc \
+	YAR.cc Yearmonstat.cc Ydayarith.cc Ydaypctl.cc Ydaystat.cc \
+	Ydrunpctl.cc Ydrunstat.cc Yhourarith.cc Yhourstat.cc \
+	Ymonarith.cc Ymonpctl.cc Ymonstat.cc Yseaspctl.cc Yseasstat.cc \
+	Zonstat.cc cdo.h nearpt3c.h Magplot.cc Magvector.cc \
+	Maggraph.cc template_parser.h template_parser.cc \
+	results_template_parser.h results_template_parser.cc \
+	magics_template_parser.h magics_template_parser.cc \
+	StringUtilities.h StringUtilities.cc CdoMagicsMapper.h \
+	CdoMagicsMapper.cc
 #endif
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
@@ -975,6 +977,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Settime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setzaxis.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Shiftxy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Showattribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Showinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Sinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Smooth.Po@am__quote@
@@ -3855,6 +3858,20 @@ cdo-Showinfo.obj: Showinfo.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Showinfo.cc' object='cdo-Showinfo.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Showinfo.obj `if test -f 'Showinfo.cc'; then $(CYGPATH_W) 'Showinfo.cc'; else $(CYGPATH_W) '$(srcdir)/Showinfo.cc'; fi`
+
+cdo-Showattribute.o: Showattribute.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Showattribute.o -MD -MP -MF $(DEPDIR)/cdo-Showattribute.Tpo -c -o cdo-Showattribute.o `test -f 'Showattribute.cc' || echo '$(srcdir)/'`Showattribute.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Showattribute.Tpo $(DEPDIR)/cdo-Showattribute.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Showattribute.cc' object='cdo-Showattribute.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Showattribute.o `test -f 'Showattribute.cc' || echo '$(srcdir)/'`Showattribute.cc
+
+cdo-Showattribute.obj: Showattribute.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Showattribute.obj -MD -MP -MF $(DEPDIR)/cdo-Showattribute.Tpo -c -o cdo-Showattribute.obj `if test -f 'Showattribute.cc'; then $(CYGPATH_W) 'Showattribute.cc'; else $(CYGPATH_W) '$(srcdir)/Showattribute.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Showattribute.Tpo $(DEPDIR)/cdo-Showattribute.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Showattribute.cc' object='cdo-Showattribute.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Showattribute.obj `if test -f 'Showattribute.cc'; then $(CYGPATH_W) 'Showattribute.cc'; else $(CYGPATH_W) '$(srcdir)/Showattribute.cc'; fi`
 
 cdo-Sinfo.o: Sinfo.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Sinfo.o -MD -MP -MF $(DEPDIR)/cdo-Sinfo.Tpo -c -o cdo-Sinfo.o `test -f 'Sinfo.cc' || echo '$(srcdir)/'`Sinfo.cc
