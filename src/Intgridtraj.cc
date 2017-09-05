@@ -28,16 +28,16 @@
 #include "interpol.h"
 
 
+static
 int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double *ypos)
 {
   int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
-  int stat;
 
   *xpos = 0;
   *ypos = 0;
 
-  stat = fscanf(fp, "%d-%d-%d %d:%d:%d %lf %lf",
-		&year, &month, &day, &hour, &minute, &second, xpos, ypos);
+  int stat = fscanf(fp, "%d-%d-%d %d:%d:%d %lf %lf",
+                    &year, &month, &day, &hour, &minute, &second, xpos, ypos);
 
   if ( stat != EOF )
     {
@@ -53,16 +53,11 @@ int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double
 void *Intgridtraj(void *argument)
 {
   int gridID1;
-  int nlevel;
   int varID, levelID;
   int vdate, vtime;
-  int offset;
   int nmiss;
   double point;
-  double *single1, *single2;
-  double *vardatap;
   double xpos, ypos;
-  double missval;
   int calendar = CALENDAR_STANDARD;
 
   cdoInitialize(argument);
@@ -91,7 +86,7 @@ void *Intgridtraj(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
@@ -100,7 +95,7 @@ void *Intgridtraj(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      size_t nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
@@ -139,8 +134,8 @@ void *Intgridtraj(void *argument)
     {
       pstreamInqRecord(streamID1, &varID, &levelID);
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      offset   = gridsize*levelID;
-      single1  = vardata1[varID] + offset;
+      size_t offset = gridsize*levelID;
+      double *single1 = vardata1[varID] + offset;
       pstreamReadRecord(streamID1, single1, &nmiss);
       if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
     }
@@ -160,8 +155,8 @@ void *Intgridtraj(void *argument)
 	  recLevelID[recID] = levelID;
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
-	  single2  = vardata2[varID] + offset;
+	  size_t offset = gridsize*levelID;
+	  double *single2  = vardata2[varID] + offset;
 	  pstreamReadRecord(streamID1, single2, &nmiss);
 	  if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
 	}
@@ -189,14 +184,14 @@ void *Intgridtraj(void *argument)
 		{
 		  varID    = recVarID[recID];
 		  levelID  = recLevelID[recID];
-		  missval  = vlistInqVarMissval(vlistID1, varID);
+		  double missval = vlistInqVarMissval(vlistID1, varID);
 		  gridID1  = vlistInqVarGrid(vlistID1, varID);
 		  gridsize = gridInqSize(gridID1);
-		  offset   = gridsize*levelID;
-		  single1  = vardata1[varID] + offset;
-		  single2  = vardata2[varID] + offset;
+		  size_t offset = gridsize*levelID;
+		  double *single1 = vardata1[varID] + offset;
+		  double *single2 = vardata2[varID] + offset;
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    array[i] = single1[i]*fac1 + single2[i]*fac2;
 
 		  field1.grid    = gridID1;
@@ -221,7 +216,7 @@ void *Intgridtraj(void *argument)
       juldate1 = juldate2;
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  vardatap        = vardata1[varID];
+	  double *vardatap = vardata1[varID];
 	  vardata1[varID] = vardata2[varID];
 	  vardata2[varID] = vardatap;
 	}
