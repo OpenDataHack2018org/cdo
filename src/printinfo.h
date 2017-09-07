@@ -591,7 +591,7 @@ void printZaxisInfo(int vlistID)
           if ( number > 0 )
             {
               fprintf(stdout, "%33s : ", "zaxis");
-              fprintf(stdout, "number = %d\n", number);
+              fprintf(stdout, "number=%d\n", number);
             }
 
           unsigned char uuidOfVGrid[CDI_UUID_SIZE];
