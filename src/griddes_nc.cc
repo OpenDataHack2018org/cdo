@@ -88,7 +88,7 @@ int gridFromNCfile(const char *gridfile)
       if ( grid_rank == 1 )
 	{
 	  grid.type = GRID_UNSTRUCTURED;
-	  if ( (size_t)grid_dims[0] != grid_size ) return(gridID);
+	  if ( (size_t)grid_dims[0] != grid_size ) return gridID;
 	}
       else
 	{
@@ -98,7 +98,7 @@ int gridFromNCfile(const char *gridfile)
 
 	  grid.xsize = grid_dims[0];
 	  grid.ysize = grid_dims[1];
-	  if ( (size_t)grid_dims[0]*grid_dims[1] != grid_size ) return(gridID);
+	  if ( (size_t)grid_dims[0]*grid_dims[1] != grid_size ) return gridID;
 	}
 
       /* allocate grid coordinates and read data */

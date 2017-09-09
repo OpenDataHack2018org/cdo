@@ -4,9 +4,9 @@
 
 
 GRIB1 standard:
-  max record length: 2**23 - 1 (---> 8388607)
-     P8 : gridsize max: <8388607,    4000x2000
-     P16: gridsize max: <8388607/2,  2880x1440
+  max record length: 2**24  (---> 16777216)
+     P8 : gridsize max: <16777216,    5760x2880
+     P16: gridsize max: <16777216/2,  4000x2000
 
 ECMWF extension:
   max record length: (2**23 - 1)*120 (---> 1006632840)
