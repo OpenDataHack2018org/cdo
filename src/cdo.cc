@@ -1006,7 +1006,6 @@ void check_stacksize()
   {
     struct rlimit rlim;
     int status = getrlimit(RLIMIT_STACK, &rlim);
-
     if ( status == 0 )
       {
 #define  MIN_STACK_SIZE  67108864L  /* 64MB */
@@ -1026,6 +1025,7 @@ void check_stacksize()
                   }
                 else
                   fprintf(stderr, "Set stack size to %ld failed!\n", (long) min_stack_size);
+                fprintf(stderr, "\n");
               }
           }
       }

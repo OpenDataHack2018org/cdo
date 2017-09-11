@@ -160,6 +160,8 @@ void grid_copy_attributes(int gridID1, int gridID2)
   if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XUNITS, strlen(string)+1, string);
   string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, string);
   if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_YUNITS, strlen(string)+1, string);
+
+  if ( gridInqUvRelativeToGrid(gridID1) ) gridDefUvRelativeToGrid(gridID2, 1);
 }
 
 

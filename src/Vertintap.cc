@@ -64,7 +64,7 @@ void *Vertintap(void *argument)
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
   int nrecs;
-  int i, k, offset;
+  int i;
   int varID, levelID;
   int zaxisIDp, zaxisIDh = -1;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
@@ -72,15 +72,12 @@ void *Vertintap(void *argument)
   int apressID = -1, dpressID = -1;
   int psID = -1, tempID = -1;
   //int sortlevels = TRUE;
-  int *pnmiss = NULL;
   char paramstr[32];
   char stdname[CDI_MAX_NAME];
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
-  double *single1, *single2;
-  double *ps_prog = NULL, *full_press = NULL, *dpress = NULL;
-  double *hyb_press = NULL;
-  int Extrapolate = 0;
+  double *ps_prog = NULL, *full_press = NULL;
+  bool extrapolate = false;
   lista_t *flista = lista_new(FLT_LISTA);
 
   cdoInitialize(argument);
@@ -104,14 +101,14 @@ void *Vertintap(void *argument)
 
       if ( envstr && isdigit((int) envstr[0]) )
 	{
-          Extrapolate = atoi(envstr);
-          if ( Extrapolate == 1 )
+          if ( atoi(envstr) == 1 ) extrapolate = true;
+          if ( extrapolate )
             cdoPrint("Extrapolation of missing values enabled!");
 	}
     }
   else if ( operatorID == AP2PLX ||  operatorID == AP2HLX || operatorID == AP2PLX_LP )
     {
-      Extrapolate = 1;
+      extrapolate = true;
     }
 
   operatorInputArg(cdoOperatorEnter(operatorID));
@@ -231,8 +228,7 @@ void *Vertintap(void *argument)
 
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
-  if ( Extrapolate == 0 )
-    pnmiss = (int *) Malloc(nplev*sizeof(int));
+  int *pnmiss = extrapolate ? NULL : (int *) Malloc(nplev*sizeof(int));
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -259,14 +255,13 @@ void *Vertintap(void *argument)
       vert_index = (int *) Malloc(gridsize*nplev*sizeof(int));
       ps_prog    = (double *) Malloc(gridsize*sizeof(double));
       full_press = (double *) Malloc(gridsize*nhlevf*sizeof(double));
-      dpress     = (double *) Malloc(gridsize*nhlevf*sizeof(double));
     }
   else
     cdoWarning("No 3D variable with generalized height level found!");
 
   if ( operfunc == func_hl )
     {
-      double *phlev =(double*) Malloc(nplev*sizeof(double));
+      double *phlev = (double*) Malloc(nplev*sizeof(double));
       height2pressure(phlev, plev, nplev);
 
       if ( cdoVerbose )
@@ -278,7 +273,7 @@ void *Vertintap(void *argument)
     }
 
   if ( opertype == type_log )
-    for ( k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
+    for ( int k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -311,7 +306,7 @@ void *Vertintap(void *argument)
 	}
     }
   
-  if ( zaxisIDh != -1 && psID == -1 && dpressID )
+  if ( zaxisIDh != -1 && psID == -1 && dpressID != -1 )
     cdoWarning("Surface pressure not found - set to vertical sum of %s!", var_stdname(pressure_thickness));
   //  cdoWarning("Surface pressure not found - set to upper level of %s!", var_stdname(air_pressure));
 
@@ -351,9 +346,8 @@ void *Vertintap(void *argument)
 	      printf("levelID %d\n", levelID);
 	    }
 	  */
-	  offset   = gridsize*levelID;
-	  single1  = vardata1[varID] + offset;
-
+	  size_t offset = gridsize*levelID;
+	  double *single1 = vardata1[varID] + offset;
 	  pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 
 	  vars[varID] = true;
@@ -370,11 +364,10 @@ void *Vertintap(void *argument)
 	    }
           else if ( dpressID != -1 )
 	    {
-	      memcpy(dpress, vardata1[dpressID], gridsize*nhlevf*sizeof(double)); 
 	      for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
-	      for ( k = 0; k < nhlevf; ++k )
+	      for ( int k = 0; k < nhlevf; ++k )
 		for ( i = 0; i < gridsize; i++ )
-		  ps_prog[i] += dpress[k*gridsize+i];
+		  ps_prog[i] += vardata1[dpressID][k*gridsize+i];
 	    }
 	  else
 	    {
@@ -394,30 +387,27 @@ void *Vertintap(void *argument)
 	    {
 	      for ( i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
 
-	      for ( k = 0; k < nhlevf; k++ )
+	      for ( int k = 0; k < nhlevf; k++ )
 		for ( i = 0; i < gridsize; i++ )
 		  full_press[k*gridsize+i] = log(full_press[k*gridsize+i]);
 	    }
 
 	  genind(vert_index, plev, full_press, gridsize, nplev, nhlevf);
 
-	  if ( Extrapolate == 0 )
-	    genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
+	  if ( !extrapolate ) genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  if ( vars[varID] )
 	    {
-	      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	      int nlevel   = zaxisInqSize(zaxisID);
-	      double missval  = vlistInqVarMissval(vlistID1, varID);
+	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      int nlevel  = zaxisInqSize(zaxisID);
+	      double missval = vlistInqVarMissval(vlistID1, varID);
 	      if ( varinterp[varID] )
 		{
-		  if ( nlevel == nhlevf )
-		    {
-		      hyb_press = full_press;
-		    }
+                  double *hyb_press = NULL;
+		  if ( nlevel == nhlevf ) hyb_press = full_press;
 		  else
 		    {
 		      int param = vlistInqVarParam(vlistID1, varID);
@@ -434,8 +424,7 @@ void *Vertintap(void *argument)
 		  interp_X(vardata1[varID], vardata2[varID], hyb_press,
 			   vert_index, plev, nplev, gridsize, nlevel, missval);
 		  
-		  if ( Extrapolate == 0 )
-		    memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
+		  if ( !extrapolate ) memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
 		}
 	    }
 	}
@@ -447,8 +436,8 @@ void *Vertintap(void *argument)
 	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  offset   = gridsize*levelID;
-		  single2  = vardata2[varID] + offset;
+		  size_t offset = gridsize*levelID;
+		  double *single2 = vardata2[varID] + offset;
 		  pstreamDefRecord(streamID2, varID, levelID);
 		  pstreamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
 		}
@@ -472,7 +461,6 @@ void *Vertintap(void *argument)
   if ( ps_prog    ) Free(ps_prog);
   if ( vert_index ) Free(vert_index);
   if ( full_press ) Free(full_press);
-  if ( dpress     ) Free(dpress);
   if ( vct        ) Free(vct);
 
   Free(vars);
