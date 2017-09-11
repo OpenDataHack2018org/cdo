@@ -4490,7 +4490,7 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, const char *v
   char *key = NULL, *eqpos = NULL;
   char **values = NULL;
   int i = 1, j = 0;
-  while ( params[i] )
+  for ( i = 1; i < nparams; i++ )
     {
       if ( eqpos = strchr(params[i], '=')  )
         {
@@ -4533,7 +4533,6 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, const char *v
                 handleError(NULL, errh, NULL);
             }
         }
-      i++;
     }
   if ( key && values )
     {
