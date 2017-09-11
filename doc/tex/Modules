@@ -3,6 +3,7 @@ Sinfo	      Information
 Diff	      Information
 Ninfo	      Information
 Showinfo      Information
+Showattribute Information
 Filedes       Information
 Copy	      File operations
 Tee	      File operations

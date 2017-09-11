@@ -946,7 +946,7 @@ void init_modules()
   add_module("Setzaxis"      , {Setzaxis      , SetzaxisHelp      , SetzaxisOperators      , 1 , CDI_BOTH , 1  , 1  });
   add_module("Shiftxy"       , {Shiftxy       , {}                , ShiftxyOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Showinfo"      , {Showinfo      , ShowinfoHelp      , ShowinfoOperators      , 1 , CDI_BOTH , 1  , 0  });
-  add_module("Showattribute" , {Showattribute , {}                , ShowattributeOperators , 1 , CDI_REAL , 1  , 0  });
+  add_module("Showattribute" , {Showattribute , ShowattributeHelp , ShowattributeOperators , 1 , CDI_REAL , 1  , 0  });
   add_module("Sinfo"         , {Sinfo         , SinfoHelp         , SinfoOperators         , 1 , CDI_BOTH , -1 , 0  });
   add_module("Smooth"        , {Smooth        , SmoothHelp        , SmoothOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Sort"          , {Sort          , {}                , SortOperators          , 1 , CDI_REAL , 1  , 1  });

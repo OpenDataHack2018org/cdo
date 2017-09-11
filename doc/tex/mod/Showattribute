@@ -1,0 +1,46 @@
+@BeginModule
+@NewPage
+@Name      = Showattribute
+@Title     = Show a global attribute, a variable attribute or all attributes of one variable
+@Section   = Information
+@Class     = Information
+@Arguments = infile
+@Operators = showattribute showattsvar
+
+@BeginDescription
+This operator prints attributes of a dataset.
+If a global attribute should be printed, the attribute name can be specified as a parameter directly.
+If a variable attribute should be printed, the following format is requested:
+
+  @bold{var_nm}@@bold{att_nm}
+
+@IfMan
+   var_nm  Variable name. Example: pressure
+   att_nm  Attribute name. Example: units
+@EndifMan
+@IfDoc
+\begin{defalist}{\textbf{var_nm}}
+\item[\ \ \ \textbf{var_nm}\ \ \hfill]  Variable name. Example: pressure
+\item[\ \ \ \textbf{att_nm}\ \ \hfill]  Attribute name. Example: units
+\end{defalist}
+@EndifDoc
+
+@EndDescription
+@EndModule
+
+@BeginOperator_showattribute
+@Title     = Show a global attribute or a variable attribute
+@Parameter = attribute
+@EndOperator
+
+@BeginOperator_showattsvar
+@Title     = Show all variable attributes. If var_nm is specified, only for a subset of variables.
+@Parameter = [var_nm]
+@EndOperator
+
+@BeginParameter
+@Item = attribute
+STRING  Attribute in the format [var_nm@]att_nm
+@Item = var_nm
+STRING  Variable name
+@EndParameter
