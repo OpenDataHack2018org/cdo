@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.1
 	* Version 1.9.1 release
 
+2017-09-11  Uwe Schulzweida
+
+	* ap2pl: added support for input data on half levels
+
 2017-09-09  Uwe Schulzweida
 
 	* selindexbox: breaks uvRelativeToGrid flag [Bug #7901]
