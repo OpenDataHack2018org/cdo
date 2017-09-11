@@ -109,6 +109,26 @@ void *printAtts(int vlistID, int varOrGlobal, int natts, char *argument)
     }
 }
 
+void *check_varname_and_print(int vlistID, int nvars, char *checkvarname, char *attname)
+{
+  int varID = 0;
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      char filevarname[CDI_MAX_NAME];
+      vlistInqVarName(vlistID, varID, filevarname);  
+      if ( !checkvarname || STR_IS_EQ(checkvarname, filevarname) )
+        {
+          fprintf(stdout, "%s:\n", filevarname);
+	  int nfileattsvar;
+          cdiInqNatts(vlistID, varID, &nfileattsvar);
+          printAtts(vlistID, varID, nfileattsvar, attname);
+          break;
+        }
+    } 
+  if ( nvars == varID && checkvarname )
+    cdoAbort("Could not find variable %s in infile.", checkvarname);
+}
+
 void *Showattribute(void *argument)
 {
   const int delim = '@';
@@ -124,72 +144,46 @@ void *Showattribute(void *argument)
   int nvars   = vlistNvars(vlistID);
 
   int natts = operatorArgc();
-  if ( natts == 0 ) cdoAbort("Parameter missing!");
-
-  char **params = operatorArgv();
-  char buffer[CDI_MAX_NAME];
-  for ( int i = 0; i < natts; i++)
+  if ( natts == 0 && operatorID != SHOWATTSVAR)
+    cdoAbort("Parameter missing!");
+  else if ( natts == 0 )
+    check_varname_and_print(vlistID, nvars, NULL, NULL);
+  else
     {
-      strcpy(buffer, params[i]);
-      char *varname = NULL, *attname = NULL;
-      char *result = strrchr(buffer, delim);
-      if ( result == NULL )
+      char **params = operatorArgv();
+      char buffer[CDI_MAX_NAME];
+      for ( int i = 0; i < natts; i++)
         {
-          attname = buffer;
-          if ( operatorID == SHOWATTRIBUTE )
+          strcpy(buffer, params[i]);
+          char *varname = NULL, *input = NULL;
+          char *result = strrchr(buffer, delim);
+          input = buffer;
+          if ( result == NULL )
             {
-              fprintf(stdout, "Global:\n");
-              int nfileatts;
-              cdiInqNatts(vlistID, CDI_GLOBAL, &nfileatts);
-              printAtts(vlistID, CDI_GLOBAL, nfileatts, attname);
+              if ( operatorID == SHOWATTRIBUTE )
+                {
+                  fprintf(stdout, "Global:\n");
+                  int nfileatts;
+                  cdiInqNatts(vlistID, CDI_GLOBAL, &nfileatts);
+                  printAtts(vlistID, CDI_GLOBAL, nfileatts, input);
+                }
+              else if (operatorID == SHOWATTSVAR )
+                check_varname_and_print(vlistID, nvars, input, NULL);
             }
-          else if (operatorID == SHOWATTSVAR )
+          else
             {
-              int varID = 0;
-              for ( varID = 0; varID < nvars; varID++ )
-        	{
-        	  char filevarname[CDI_MAX_NAME];
-        	  vlistInqVarName(vlistID, varID, filevarname);  
-                  if ( STR_IS_EQ(attname, filevarname) )
-                    {
-                      fprintf(stdout, "%s:\n", attname);
-	              int nfileattsvar;
-                      cdiInqNatts(vlistID, varID, &nfileattsvar);
-                      printAtts(vlistID, varID, nfileattsvar, NULL);
-                      break;
-                    }
-                } 
-              if ( nvars == varID )
-                cdoAbort("Could not find variable %s in infile.", varname);
-            }
-        }
-      else
-        {
-          attname = result+1;
-          *result = 0;
-          varname = buffer;
-          if ( operatorID == SHOWATTRIBUTE )
-            {
-              int varID = 0;
-              for ( varID = 0; varID < nvars; varID++ )
-        	{
-        	  char filevarname[CDI_MAX_NAME];
-        	  vlistInqVarName(vlistID, varID, filevarname);  
-                  if ( STR_IS_EQ(varname, filevarname) )
-                    {
-                      fprintf(stdout, "%s:\n", varname);
-	              int nfileattsvar;
-                      cdiInqNatts(vlistID, varID, &nfileattsvar);
-                      printAtts(vlistID, varID, nfileattsvar, attname);
-                      break;
-                    }
-                } 
-              if ( nvars == varID )
-                cdoAbort("Could not find variable %s in infile.", varname);
+              if ( operatorID == SHOWATTRIBUTE )
+                {
+                  input = result+1;
+                  *result = 0;
+                  varname = buffer;
+                  check_varname_and_print(vlistID, nvars, varname, input);
+                }
+              else if ( operatorID == SHOWATTSVAR )
+                check_varname_and_print(vlistID, nvars, input, NULL);
             }
         }
     }
-
   pstreamClose(streamID);
 
   cdoFinish();
