@@ -8,7 +8,7 @@
 #include "gradsdeslib.h"
 
 
-static char pout[512];
+static char pout[1024];
 FILE *descr;             /* File descriptor pointer */
 int cal365 = -1;
 int fullyear = -999;

@@ -955,7 +955,7 @@ void *Gradsdes(void *argument)
   bool bigendian = false, littleendian = false;
   bool sequential = false;
   bool flt64 = false;
-  char Time[30], Incr[10] = {"1mn"};
+  char Time[30], Incr[12] = {"1mn"};
   const char *IncrKey[] = {"mn","hr","dy","mo","yr"};
   int isd, imn, ihh, iyy, imm, idd;
   int isds = 0, imns = 0, ihhs = 0, iyys = 0, imms = 0, idds = 0;
