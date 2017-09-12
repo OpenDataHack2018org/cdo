@@ -212,7 +212,7 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  sdate = parameter2int(datestr);
+	  sdate = *datestr ? parameter2int(datestr) : 10101;
 	}
 
       if ( operatorArgc() > 1 )
