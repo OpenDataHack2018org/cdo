@@ -36,7 +36,7 @@ Operator catalog:
    Showinfo      showtime        Show time information
    Showinfo      showtimestamp   Show timestamp
    Showattribute showattribute   Show a global attribute or a variable attribute
-   Showattribute showattsvar     Show all variable attributes. If var_nm is specified, only for a subset of variables.
+   Showattribute showattsvar     Show all variable attributes.
    Filedes       partab          Parameter table
    Filedes       codetab         Parameter code table
    Filedes       griddes         Grid description
@@ -581,14 +581,11 @@ Operator catalog:
    Strbre        strbre          Strong breeze days index per time period
    Strgal        strgal          Strong gale days index per time period
    Hurr          hurr            Hurricane days index per time period
+   CMORlite      cmorlite        CMOR lite
 -------------------------------------------------------------
    CMOR
 -------------------------------------------------------------
    CMOR          cmor            Climate Model Output Rewriting
--------------------------------------------------------------
-   Miscellaneous
--------------------------------------------------------------
-   CMORlite      cmorlite        CMOR lite
 -------------------------------------------------------------
    Magics
 -------------------------------------------------------------
