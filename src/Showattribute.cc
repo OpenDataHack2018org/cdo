@@ -20,7 +20,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-void *printAtts(int vlistID, int varOrGlobal, int natts, char *argument)
+void printAtts(int vlistID, int varOrGlobal, int natts, char *argument)
 {
   char stdname[CDI_MAX_NAME], longname[CDI_MAX_NAME], units[CDI_MAX_NAME];
   int found = 0;
@@ -109,7 +109,7 @@ void *printAtts(int vlistID, int varOrGlobal, int natts, char *argument)
     }
 }
 
-void *check_varname_and_print(int vlistID, int nvars, char *checkvarname, char *attname)
+void check_varname_and_print(int vlistID, int nvars, char *checkvarname, char *attname)
 {
   int varID = 0;
   for ( varID = 0; varID < nvars; varID++ )
