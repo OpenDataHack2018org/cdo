@@ -122,10 +122,6 @@ void *Vertintml(void *argument)
         }
       else
         {
-          /*
-            double stdlev[] = {100000, 92500, 85000, 77500, 70000, 60000, 50000, 40000, 30000, 25000, 20000,
-            15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
-          */
           double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
                              10000,  7000,  5000,  3000,  2000, 1000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
@@ -150,7 +146,8 @@ void *Vertintml(void *argument)
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  int zaxisIDp = (operfunc == func_hl) ? zaxisCreate(ZAXIS_HEIGHT, nplev) : zaxisCreate(ZAXIS_PRESSURE, nplev);
+  int zaxistype = (operfunc == func_hl) ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
+  int zaxisIDp = zaxisCreate(zaxistype, nplev);
   zaxisDefLevels(zaxisIDp, plev);
 
   int nvct = 0;
@@ -371,8 +368,12 @@ void *Vertintml(void *argument)
       else
 	{
 	  if ( zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && nlevel > 1 )
-	    cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
-		       varID+1, paramstr, nlevel);
+            {
+              vlistInqVarName(vlistID1, varID, varname);
+              cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
+                         varID+1, varname, nlevel);
+            }
+
 	  varinterp[varID] = false;
 	  vardata2[varID]  = vardata1[varID];
 	  varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
@@ -555,13 +556,12 @@ void *Vertintml(void *argument)
 		    }
 		  */
                   double *hyb_press = NULL;
-		  if      ( nlevel == nhlevh ) hyb_press = half_press;
-		  else if ( nlevel == nhlevf ) hyb_press = full_press;
+		  if      ( nlevel == nhlevf ) hyb_press = full_press;
+		  else if ( nlevel == nhlevh ) hyb_press = half_press;
 		  else
 		    {
-		      int param = vlistInqVarParam(vlistID1, varID);
-		      cdiParamToString(param, paramstr, sizeof(paramstr));
-		      cdoAbort("Number of hybrid level differ from full/half level (param=%s)!", paramstr);
+                      vlistInqVarName(vlistID1, varID, varname);
+		      cdoAbort("Number of hybrid level differ from full/half level (param=%s)!", varname);
 		    }
 
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
