@@ -461,10 +461,7 @@ void *Settime(void *argument)
 		  while ( month > 12 ) { month -= 12; year++; }
 		  while ( month <  1 ) { month += 12; year--; }
 
-		  if ( day0 == 31 )
-		    day = days_per_month(calendar, year, month);
-		  else
-		    day = day0;
+                  day = (day0 == 31) ? days_per_month(calendar, year, month) : day0;
 
 		  vdate = cdiEncodeDate(year, month, day);
 		}
@@ -534,6 +531,7 @@ void *Settime(void *argument)
 	  taxisDefNumavg(taxisID2, numavg);
 
 	  taxisDefVdate(taxisID2, vdate);
+
 	  taxisDefVtime(taxisID2, vtime);
 	  if ( taxis_has_bounds || operatorID == SETTBOUNDS )
 	    {
