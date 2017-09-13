@@ -52,6 +52,7 @@ void *Runpctl(void *argument)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());

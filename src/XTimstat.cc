@@ -233,6 +233,7 @@ void *XTimstat(void *argument)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID2);
   if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
@@ -269,6 +270,7 @@ void *XTimstat(void *argument)
 	}
 
       taxisID3 = taxisDuplicate(taxisID1);
+      taxisWithBounds(taxisID3);
       vlistDefTaxis(vlistID3, taxisID3);
 
       pstreamDefVlist(streamID3, vlistID3);

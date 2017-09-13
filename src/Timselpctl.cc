@@ -74,6 +74,7 @@ void *Timselpctl(void *argument)
   /* TODO - check that time axes 2 and 3 are equal */
 
   int taxisID4 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
   int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
