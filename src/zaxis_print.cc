@@ -55,10 +55,10 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
     }
   else if ( type == ZAXIS_CHAR )
     {
-      size_t clen = zaxisInqCLen(zaxisID);
+      int clen = zaxisInqCLen(zaxisID);
       zaxisInqCVals(zaxisID, &cvals);
-          fprintf(fp, "levels    = \n");
-      for ( size_t i = 0; i < nlevels; i++ )
+      fprintf(fp, "levels    = \n");
+      for ( int i = 0; i < nlevels; i++ )
         {
           fprintf(fp, "     [%2d] = %.*s\n", i, clen, cvals[i]);
           Free(cvals[i]);
