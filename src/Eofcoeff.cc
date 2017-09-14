@@ -32,7 +32,7 @@
 
 void *Eofcoeff(void * argument)
 {
-  char eof_name[8], oname[1024], filesuffix[32];
+  char eof_name[16], oname[1024], filesuffix[32];
   double missval1 = -999, missval2;
   field_type in;  
   field_type out;
