@@ -114,7 +114,7 @@ void *Vertcum(void *argument)
                       zaxisDefVct(zaxisIDhl, nvct, vct);
                       vlistChangeZaxisIndex(vlistID2, i, zaxisIDhl);
                     }
-                  else
+                  else if ( vct )
                     {
                       if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
                         vlistChangeZaxisIndex(vlistID2, i, zaxisIDhl);

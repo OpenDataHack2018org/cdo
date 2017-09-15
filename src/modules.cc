@@ -1237,6 +1237,30 @@ std::vector<std::string> get_sorted_operator_name_list() {
     return names;
 }
 
+std::vector<std::string> get_no_output_operator_list()
+{
+ std::vector<std::string> names;
+    for (std::pair<std::string, std::string> operator_module_names_pair : modules_map) {
+        if (modules[operator_module_names_pair.second].mode == 1 
+                && modules[operator_module_names_pair.second].streamOutCnt == 0) 
+        {
+            names.push_back(operator_module_names_pair.first);
+        }
+    }
+    // adding operators names from alias_map
+    std::string original;
+    for (std::pair<std::string, std::string> alias : aliases) {
+        original = alias.second;
+        if(modules[modules_map[original]].mode == 1
+                && modules[modules_map[original]].streamOutCnt == 0){
+            names.push_back(alias.first);
+        }
+    }
+    std::sort(names.begin(), names.end());
+    return names;
+
+}
+
 void operatorPrintAll(void) {
     int number_of_chars = 0;
     std::string tab = "   ";
@@ -1338,7 +1362,15 @@ std::string get_spacing_for(std::string str) {
  * If the operator is not documented the description is empty
  */
 void operatorPrintList(bool print_no_output) {
-    std::vector<std::string> output_list = get_sorted_operator_name_list();
+    std::vector<std::string> output_list ;
+    if(print_no_output)
+    {
+        output_list = get_no_output_operator_list();
+    }
+    else
+    {
+        output_list = get_sorted_operator_name_list();
+    }
     std::vector<std::string> help;
     unsigned long list_length = output_list.size();
     unsigned long cur_help_idx;
@@ -1418,16 +1450,18 @@ bool is_alias(char * operatorName)
     return (aliases.find(std::string(operatorName)) != aliases.end());
 }
 
-void get_original(char * operatorName)
+char* get_original(char * operatorName)
 {
+    char* original;
     if(is_alias(operatorName)){
         std::string opName = aliases[std::string(operatorName)];
-        operatorName = (char*)realloc(operatorName, opName.size());
-        strcpy(operatorName, opName.c_str());
+        original = (char*)realloc(operatorName, opName.size());
+        strcpy(original, opName.c_str());
     }
     else{
         Error("%s is not an alias", operatorName);
     }
+    return original; 
 }
 
 

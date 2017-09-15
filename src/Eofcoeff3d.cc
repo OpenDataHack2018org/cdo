@@ -32,7 +32,7 @@
 
 void *Eofcoeff3d(void * argument)
 {
-  char eof_name[8], oname[1024], filesuffix[32];
+  char eof_name[16], oname[1024], filesuffix[32];
   double missval1 = -999, missval2 = -999;
   field_type in;  
   int i, varID, levelID;    

@@ -238,7 +238,7 @@ const char *getOperatorName(const char *operatorArg)
   /*  return operatorName; */
   if(is_alias(operatorName))
   {
-    get_original(operatorName);
+    operatorName = get_original(operatorName);
   }
     return operatorName;
 }
