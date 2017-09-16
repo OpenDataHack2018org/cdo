@@ -1452,7 +1452,7 @@ bool is_alias(char * operatorName)
 
 char* get_original(char * operatorName)
 {
-    char* original;
+    char* original = NULL;
     if(is_alias(operatorName)){
         std::string opName = aliases[std::string(operatorName)];
         original = (char*)realloc(operatorName, opName.size());
