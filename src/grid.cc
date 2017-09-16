@@ -814,6 +814,47 @@ bool check_range(long n, double *vals, double valid_min, double valid_max)
 }
 
 
+bool grid_has_proj4param(int gridID)
+{
+  bool has_proj4param = false;
+
+  int gridtype = gridInqType(gridID);
+  if ( gridtype == GRID_PROJECTION )
+    {
+      int atttype, attlen, atttxtlen = 0;
+      char *atttxt = NULL;
+      char attname[CDI_MAX_NAME+1];
+
+      int natts;
+      cdiInqNatts(gridID, CDI_GLOBAL, &natts);
+
+      for ( int iatt = 0; iatt < natts; ++iatt )
+        {
+          cdiInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
+
+          if ( atttype == CDI_DATATYPE_TXT )
+            {
+              if ( attlen > atttxtlen )
+                {
+                  atttxt = (char*) Realloc(atttxt, (attlen+1));
+                  atttxtlen = attlen;
+                }
+              cdiInqAttTxt(gridID, CDI_GLOBAL, attname, attlen, atttxt);
+              atttxt[attlen] = 0;
+              if ( strcmp(attname, "proj4_params") == 0 )
+                {
+                  has_proj4param = true;
+                  break;
+                }
+            }
+        }
+      if ( atttxt ) Free(atttxt);
+    }
+
+  return has_proj4param;
+}
+
+static
 char *grid_get_proj4param(int gridID)
 {
   char *proj4param = NULL;

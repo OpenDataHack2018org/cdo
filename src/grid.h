@@ -94,6 +94,8 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
 
 void cdo_print_grid(int gridID, int opt);
 
+bool grid_has_proj4param(int gridID);
+
 // Define a de-staggered grid for U and V
 int cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagGridOffsets);
 

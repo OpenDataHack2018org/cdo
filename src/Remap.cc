@@ -499,8 +499,10 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, std::vector<bool>& rem
       int gridID = vlistGrid(vlistID, index);
       int gridtype = gridInqType(gridID);
       int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
+      bool lproj4param = (gridtype == GRID_PROJECTION) && grid_has_proj4param(gridID);
   
       if ( gridtype != GRID_LONLAT      &&
+           !lproj4param                 &&
            projtype != CDI_PROJ_RLL     &&
            projtype != CDI_PROJ_LAEA    &&
            projtype != CDI_PROJ_SINU    &&
@@ -513,9 +515,9 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, std::vector<bool>& rem
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
 	    {
 	      if ( !cdoRegulargrid && filetype == CDI_FILETYPE_GRB )
-		cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!", gridNamePtr(gridtype));
+		cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular Gaussian grid!", gridNamePtr(gridtype));
 	      else
-		cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular grid!", gridNamePtr(gridtype));
+		cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular Gaussian grid!", gridNamePtr(gridtype));
 	    }
 	  else if ( gridtype == GRID_GENERIC && gridInqSize(gridID) <= 2 )
             {
@@ -523,13 +525,15 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, std::vector<bool>& rem
             }
 	  else
             {
-              int nvars = vlistNvars(vlistID);
-              int varID;
-              for ( varID = 0; varID < nvars; ++varID )
-                if ( gridID == vlistInqVarGrid(vlistID, varID) ) break;
               char varname[CDI_MAX_NAME];
-              vlistInqVarName(vlistID, varID, varname);
-              cdoAbort("Variable %s has an unsupported %s grid!", varname, gridNamePtr(gridtype));
+              int nvars = vlistNvars(vlistID);
+              for ( int varID = 0; varID < nvars; ++varID )
+                if ( gridID == vlistInqVarGrid(vlistID, varID) )
+                  {
+                    vlistInqVarName(vlistID, varID, varname);
+                    break;
+                  }
+              cdoAbort("Unsupported %s coordinates (Variable: %s)!", gridNamePtr(gridtype), varname);
             }
 	}
     }

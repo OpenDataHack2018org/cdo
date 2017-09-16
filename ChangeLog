@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.1
 	* Version 1.9.1 release
 
+2017-09-16  Uwe Schulzweida
+
+	* remap: added support for grid_mapping attribute proj4_params (bug fix)
+
 2017-09-11  Uwe Schulzweida
 
 	* ap2pl: added support for input data on half levels
