@@ -71,7 +71,6 @@ void *Vertintap(void *argument)
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
   int nrecs;
-  int i;
   int varID, levelID;
   int zaxisIDh = -1;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
@@ -124,7 +123,7 @@ void *Vertintap(void *argument)
           double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
           plev  = (double *) Malloc(nplev*sizeof(double));
-          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+          for ( int i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
         }
       else
         {
@@ -132,7 +131,7 @@ void *Vertintap(void *argument)
                              10000,  7000,  5000,  3000,  2000, 1000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
           plev  = (double *) Malloc(nplev*sizeof(double));
-          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+          for ( int i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
         }
     }
   else
@@ -367,15 +366,15 @@ void *Vertintap(void *argument)
 	    }
           else if ( dpressID != -1 )
 	    {
-	      for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
+	      for ( int i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
 	      for ( int k = 0; k < nhlevf; ++k )
-		for ( i = 0; i < gridsize; i++ )
+		for ( int i = 0; i < gridsize; i++ )
 		  ps_prog[i] += vardata1[dpressID][k*gridsize+i];
 	    }
 	  else
 	    {
 	      memcpy(ps_prog, vardata1[apressID]+gridsize*(nhlevf-1), gridsize*sizeof(double)); 
-	      //for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
+	      //for ( int i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
 	    }
 
 	  /* check range of ps_prog */
@@ -388,20 +387,20 @@ void *Vertintap(void *argument)
 
           for ( int i = 0; i < gridsize; i++ ) half_press[i] = 0;
           for ( int k = 1; k < nhlevf; k++ )
-            for ( i = 0; i < gridsize; i++ )
+            for ( int i = 0; i < gridsize; i++ )
               half_press[k*gridsize+i] = 0.5*(full_press[(k-1)*gridsize+i]+full_press[k*gridsize+i]);
           for ( int i = 0; i < gridsize; i++ ) half_press[(nhlevh-1)*gridsize+i] = full_press[(nhlevf-1)*gridsize+i];
           
 	  if ( opertype == type_log )
 	    {
-	      for ( i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
+	      for ( int i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
 
 	      for ( int k = 0; k < nhlevh; k++ )
 		for ( int i = 0; i < gridsize; i++ )
 		  half_press[k*gridsize+i] = log(half_press[k*gridsize+i]);
 
 	      for ( int k = 0; k < nhlevf; k++ )
-		for ( i = 0; i < gridsize; i++ )
+		for ( int i = 0; i < gridsize; i++ )
 		  full_press[k*gridsize+i] = log(full_press[k*gridsize+i]);
 	    }
 
