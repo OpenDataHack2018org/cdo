@@ -286,6 +286,7 @@ void oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1, double m
     case AND:
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPAND(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPAND(cval, idat[i]);
+      break;
     case OR:
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPOR(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPOR(cval, idat[i]);
