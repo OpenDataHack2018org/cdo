@@ -32,6 +32,7 @@
 
 const char *tunit2str(int tunits)
 {
+  // clang-format off
   if      ( tunits == TUNIT_YEAR )       return ("years");
   else if ( tunits == TUNIT_MONTH )      return ("months");
   else if ( tunits == TUNIT_DAY )        return ("days");
@@ -44,11 +45,13 @@ const char *tunit2str(int tunits)
   else if ( tunits == TUNIT_MINUTE )     return ("minutes");
   else if ( tunits == TUNIT_SECOND )     return ("seconds");
   else                                   return ("unknown");
+  // clang-format on
 }
 
 
 const char *calendar2str(int calendar)
 {
+  // clang-format off
   if      ( calendar == CALENDAR_STANDARD )  return ("standard");
   else if ( calendar == CALENDAR_GREGORIAN ) return ("gregorian");
   else if ( calendar == CALENDAR_PROLEPTIC ) return ("proleptic_gregorian");
@@ -56,6 +59,7 @@ const char *calendar2str(int calendar)
   else if ( calendar == CALENDAR_365DAYS )   return ("365_day");
   else if ( calendar == CALENDAR_366DAYS )   return ("366_day");
   else                                       return ("unknown");
+  // clang-format on
 }
 
 static
@@ -106,7 +110,6 @@ void *Sinfo(void *argument)
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
       int streamID = pstreamOpenRead(cdoStreamName(indf));
-
       int vlistID = pstreamInqVlist(streamID);
 
       set_text_color(stdout, BRIGHT, BLACK);
@@ -166,6 +169,7 @@ void *Sinfo(void *argument)
 
 	  /* tsteptype */
 	  int tsteptype = vlistInqVarTsteptype(vlistID, varID);
+          // clang-format off
 	  if      ( tsteptype == TSTEP_CONSTANT ) fprintf(stdout, "%-8s ", "constant");
 	  else if ( tsteptype == TSTEP_INSTANT  ) fprintf(stdout, "%-8s ", "instant");
 	  else if ( tsteptype == TSTEP_INSTANT2 ) fprintf(stdout, "%-8s ", "instant");
@@ -177,6 +181,7 @@ void *Sinfo(void *argument)
 	  else if ( tsteptype == TSTEP_RANGE    ) fprintf(stdout, "%-8s ", "range");
 	  else if ( tsteptype == TSTEP_DIFF     ) fprintf(stdout, "%-8s ", "diff");
 	  else                                    fprintf(stdout, "%-8s ", "unknown");
+          // clang-format on
 
 	  /* ensemble information */
 	  if ( lensemble )

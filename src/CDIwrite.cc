@@ -34,6 +34,7 @@ const char *filetypestr(int filetype)
     case CDI_FILETYPE_NC2:  return ("NetCDF2");         break;
     case CDI_FILETYPE_NC4:  return ("NetCDF4");         break;
     case CDI_FILETYPE_NC4C: return ("NetCDF4 classic"); break;
+    case CDI_FILETYPE_NC5:  return ("NetCDF5");         break;
     case CDI_FILETYPE_SRV:  return ("SERVICE");         break;
     case CDI_FILETYPE_EXT:  return ("EXTRA");           break;
     case CDI_FILETYPE_IEG:  return ("IEG");             break;

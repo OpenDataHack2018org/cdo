@@ -557,6 +557,7 @@ void setDefaultFileType(const char *filetypestr, int labort)
       const char *ftstr = filetypestr;
       size_t len;
 
+      // clang-format off
       if      ( cmpstrlen(filetypestr, "grb2", len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB2;}
       else if ( cmpstrlen(filetypestr, "grb1", len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB; }
       else if ( cmpstrlen(filetypestr, "grb",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB; }
@@ -582,6 +583,7 @@ void setDefaultFileType(const char *filetypestr, int labort)
               return;
             }
         }
+      // clang-format on
 
       if ( cdoDefaultFileType != CDI_UNDEFID && *ftstr != 0 )
         {
@@ -1102,6 +1104,7 @@ int parse_options_long(int argc, char *argv[])
   int ldebLevel;
   int lscmode;
 
+  // clang-format off
   struct cdo_option opt_long[] =
     {
       { "precision",         required_argument,        &lprecision,   1  },
@@ -1140,6 +1143,7 @@ int parse_options_long(int argc, char *argv[])
       { "outputGribDataScanningMode", required_argument,  &lscmode,   1  },
       { NULL,                                0,                NULL,  0  }
     };
+  // clang-format on
 
   CDO_opterr = 1;
 

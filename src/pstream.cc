@@ -1126,15 +1126,17 @@ void pstream_t::defVarList(int p_vlistID)
       int datatype = varlist[varID].datatype;
 
       if (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4
-          || filetype == CDI_FILETYPE_NC4C)
+          || filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5)
         {
-          if (datatype == CDI_DATATYPE_UINT8 && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2))
+          if (datatype == CDI_DATATYPE_UINT8 &&
+              (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC5))
             {
               datatype = CDI_DATATYPE_INT16;
               varlist[varID].datatype = datatype;
             }
 
-          if (datatype == CDI_DATATYPE_UINT16 && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2))
+          if (datatype == CDI_DATATYPE_UINT16 &&
+              (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC5))
             {
               datatype = CDI_DATATYPE_INT32;
               varlist[varID].datatype = datatype;

@@ -143,6 +143,7 @@ void *Select(void *argument)
 
   sellist_t *sellist = sellist_create(kvlist);
 
+  // clang-format off
   SELLIST_ADD_INT(timestep_of_year, "Timestep of year");
   SELLIST_ADD_INT(timestep,         "Timestep");
   SELLIST_ADD_INT(year,             "Year");
@@ -166,6 +167,7 @@ void *Select(void *argument)
   SELLIST_ADD_WORD(season,          "Season");
   SELLIST_ADD_WORD(date,            "Date");
   SELLIST_ADD_WORD(timestepmask,    "Timestep mask");
+  // clang-format on
 
   if ( cdoVerbose ) sellist_print(sellist);
 

@@ -703,7 +703,8 @@ void after_control(struct Control *globs, struct Variable *vars)
       rtime = after_getTime(globs->StartDate);
     }
 
-  if ( ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 || ofiletype == CDI_FILETYPE_NC4 )
+  if ( ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 || ofiletype == CDI_FILETYPE_NC4 ||
+       ofiletype == CDI_FILETYPE_NC4C || ofiletype == CDI_FILETYPE_NC5 )
     {
       taxisDefCalendar(globs->taxisID2, CALENDAR_PROLEPTIC);
       taxisDefType(globs->taxisID2, TAXIS_RELATIVE);
@@ -1368,6 +1369,7 @@ void after_parini(struct Control *globs, struct Variable *vars)
     case  2: ofiletype = CDI_FILETYPE_NC;   break;
     case  3: ofiletype = CDI_FILETYPE_EXT;  break;
     case  4: ofiletype = CDI_FILETYPE_NC2;  break;
+    case  5: ofiletype = CDI_FILETYPE_NC5;  break;
     case  6: ofiletype = CDI_FILETYPE_NC4;  break;
     default: Error( "unknown file format %d", fileFormat);
     }
@@ -2165,7 +2167,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
       if ( ofiletype == CDI_FILETYPE_GRB )
 	Error("Can't write fourier coefficients to GRIB!");
       else if ( ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 ||
-		ofiletype == CDI_FILETYPE_NC4 )
+		ofiletype == CDI_FILETYPE_NC4 || ofiletype == CDI_FILETYPE_NC4C || ofiletype == CDI_FILETYPE_NC5 )
 	Error("Can't write fourier coefficients to NetCDF!");
     }
 

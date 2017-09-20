@@ -1031,7 +1031,8 @@ void *Gradsdes(void *argument)
   int filetype  = pstreamInqFiletype(streamID);
   int byteorder = pstreamInqByteorder(streamID);
 
-  if ( filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 ) filetype = CDI_FILETYPE_NC;
+  if ( filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 ||
+       filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5 ) filetype = CDI_FILETYPE_NC;
 
   if ( filetype != CDI_FILETYPE_SRV &&
        filetype != CDI_FILETYPE_EXT &&
