@@ -93,7 +93,14 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
           if ( grid->type == GRID_LONLAT || grid->type == GRID_GAUSSIAN ) grid->nvertex = 2;
           else if ( grid->type == GRID_CURVILINEAR ) grid->nvertex = 4;
         }
-      else if ( STR_IS_EQ(key, "gridprec") )       grid->prec = parameter2int(value);
+      else if ( STR_IS_EQ(key, "datatype") )
+        {
+          const char *datatype = parameter2word(value);
+
+          if      ( STR_IS_EQ(datatype, "double") )  grid->datatype = CDI_DATATYPE_FLT64;
+          else if ( STR_IS_EQ(datatype, "float") )   grid->datatype = CDI_DATATYPE_FLT32;
+	  else cdoAbort("Invalid datatype : %s (zaxis description file: %s)", datatype, dname);
+        }
       else if ( STR_IS_EQ(key, "gridsize") )       grid->size = parameter2int(value);
       else if ( STR_IS_EQ(key, "xsize") )          grid->xsize = parameter2int(value);
       else if ( STR_IS_EQ(key, "nlon") )           grid->xsize = parameter2int(value);
@@ -211,7 +218,7 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
         }
       else if ( STR_IS_EQ(key, "grid_mapping_name") ) { *igmap = ik; break; }
       else if ( STR_IS_EQ(key, "grid_mapping") ) { *igmap = ik; break; }
-      else cdoAbort("Invalid key word : >%s< (grid description file: %s)", key, dname);
+      else cdoAbort("Invalid key word >%s< (grid description file: %s)", key, dname);
     }
 }
 

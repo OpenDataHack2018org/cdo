@@ -23,7 +23,7 @@ typedef struct {
                         i and j scan positively, i points are consecutive (row-major)        */
   bool    uvRelativeToGrid;
   double  a;
-  int     prec;
+  int     datatype;
   int     isRotated;              /* TRUE for rotated grids         */
   int     type;
   int     ntr;

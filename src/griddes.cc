@@ -40,12 +40,12 @@ void gridInit(griddes_t *grid)
   grid->ybounds       = NULL;
   grid->area          = NULL;
   grid->type          = CDI_UNDEFID;
+  grid->datatype      = CDI_UNDEFID;
   grid->size          = 0;
   grid->xsize         = 0;
   grid->ysize         = 0;
   grid->np            = 0;
   grid->lcomplex      = 1;
-  grid->prec          = 0;
   grid->ntr           = 0;
   grid->nvertex       = 0;
   grid->genBounds     = false;
@@ -154,8 +154,6 @@ int gridDefine(griddes_t grid)
 	if ( grid.ysize > 0 ) gridDefYsize(gridID, grid.ysize);
 	if ( grid.np    > 0 ) gridDefNP(gridID, grid.np);
 
-	gridDefPrec(gridID, grid.prec);
-
         if ( grid.uvRelativeToGrid ) gridDefUvRelativeToGrid(gridID, 1);
 	if ( grid.nvertex ) gridDefNvertex(gridID, grid.nvertex);
 
@@ -223,8 +221,6 @@ int gridDefine(griddes_t grid)
 
 	gridID = gridCreate(grid.type, grid.size);
 
-	gridDefPrec(gridID, grid.prec);
-
 	if ( grid.type == GRID_CURVILINEAR )
 	  {
 	    if ( grid.xsize == 0 ) Error("xsize undefined!");
@@ -261,7 +257,6 @@ int gridDefine(griddes_t grid)
 
 	gridID = gridCreate(grid.type, grid.size);
 
-	gridDefPrec(gridID, grid.prec);
 	gridDefTrunc(gridID, grid.ntr);
 	gridDefComplexPacking(gridID, grid.lcomplex);
 
@@ -275,7 +270,6 @@ int gridDefine(griddes_t grid)
 
 	gridID = gridCreate(grid.type, grid.size);
 
-	gridDefPrec(gridID, grid.prec);
 	gridDefParamGME(gridID, grid.nd, grid.ni, grid.ni2, grid.ni3);
 	
 	if ( grid.mask ) { gridDefMask(gridID, grid.mask); Free(grid.mask); }
@@ -292,6 +286,8 @@ int gridDefine(griddes_t grid)
 	break;
       }
     }
+
+  if ( grid.datatype != CDI_UNDEFID ) gridDefPrec(gridID, grid.datatype);
 
   if ( grid.uuid[0] )      gridDefUUID(gridID, grid.uuid);
 
