@@ -47,13 +47,13 @@ int gentpngrid(int gridID1)
   nlat2 = nlat1+2;
 
   gridtype = gridInqType(gridID1);
-  prec     = gridInqPrec(gridID1);
+  prec     = gridInqDatatype(gridID1);
 
   gridID2 = gridCreate(gridtype, nlon2*nlat2);
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 
-  gridDefPrec(gridID2, prec);
+  gridDefDatatype(gridID2, prec);
 
   grid_copy_attributes(gridID1, gridID2);
 
@@ -199,13 +199,13 @@ int gengrid(int gridID1, int lhalo, int rhalo)
 	 nlon1, nlon2, lhalo, rhalo, nmin, nmax);
   */
   gridtype = gridInqType(gridID1);
-  prec     = gridInqPrec(gridID1);
+  prec     = gridInqDatatype(gridID1);
 
   gridID2 = gridCreate(gridtype, nlon2*nlat2);
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 
-  gridDefPrec(gridID2, prec);
+  gridDefDatatype(gridID2, prec);
 
   grid_copy_attributes(gridID1, gridID2);
 

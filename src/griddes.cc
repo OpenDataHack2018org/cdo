@@ -287,7 +287,7 @@ int gridDefine(griddes_t grid)
       }
     }
 
-  if ( grid.datatype != CDI_UNDEFID ) gridDefPrec(gridID, grid.datatype);
+  if ( grid.datatype != CDI_UNDEFID ) gridDefDatatype(gridID, grid.datatype);
 
   if ( grid.uuid[0] )      gridDefUUID(gridID, grid.uuid);
 

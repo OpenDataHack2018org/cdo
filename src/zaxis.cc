@@ -93,7 +93,7 @@ int zaxisDefine(zaxis_t zaxis)
 
   if ( zaxis.size == 1 && zaxis.scalar ) zaxisDefScalar(zaxisID);
 
-  if ( zaxis.datatype != CDI_UNDEFID ) zaxisDefPrec(zaxisID, zaxis.datatype);
+  if ( zaxis.datatype != CDI_UNDEFID ) zaxisDefDatatype(zaxisID, zaxis.datatype);
 
   if ( zaxis.vals )
     {

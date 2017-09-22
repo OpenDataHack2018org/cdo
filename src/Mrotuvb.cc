@@ -349,7 +349,7 @@ void *Mrotuvb(void *argument)
   if ( grid2y ) Free(grid2y);
 
   int gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
-  gridDefPrec(gridID3, gridInqPrec(gridID1));
+  gridDefDatatype(gridID3, gridInqDatatype(gridID1));
   gridDefXsize(gridID3, nlon);
   gridDefYsize(gridID3, nlat);
   gridDefXvals(gridID3, grid3x);

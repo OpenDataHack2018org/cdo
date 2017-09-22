@@ -144,7 +144,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   gridDefYsize(gridID2, nlat2);
 
   gridDefNP(gridID2, gridInqNP(gridID1));
-  gridDefPrec(gridID2, gridInqPrec(gridID1));
+  gridDefDatatype(gridID2, gridInqDatatype(gridID1));
 
   grid_copy_attributes(gridID1, gridID2);
 
@@ -249,7 +249,7 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
   int gridID2 = -1;
   int gridtype  = gridInqType(gridID1);
   int gridsize1 = gridInqSize(gridID1);
-  int prec      = gridInqPrec(gridID1);
+  int prec      = gridInqDatatype(gridID1);
 
   if ( gridtype == GRID_CURVILINEAR ) gridtype = GRID_UNSTRUCTURED;
 
@@ -258,7 +258,7 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
   else
     return gridID2;
 
-  gridDefPrec(gridID2, prec);
+  gridDefDatatype(gridID2, prec);
 
   grid_copy_attributes(gridID1, gridID2);
 

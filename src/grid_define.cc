@@ -194,7 +194,7 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
   gridDefYsize(gridID_sampled, ysize);
 
   gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
-  gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
+  gridDefDatatype(gridID_sampled, gridInqDatatype(gridSrcID));
   if ( gridInqUvRelativeToGrid(gridSrcID) ) gridDefUvRelativeToGrid(gridID_sampled, 1);
 
   grid_copy_attributes(gridSrcID, gridID_sampled);
@@ -375,7 +375,7 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
     }
 
   gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
-  gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
+  gridDefDatatype(gridID_sampled, gridInqDatatype(gridSrcID));
   if ( gridInqUvRelativeToGrid(gridSrcID) ) gridDefUvRelativeToGrid(gridID_sampled, 1);
 
   grid_copy_attributes(gridSrcID, gridID_sampled);

@@ -116,7 +116,7 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	gridDefYsize(gridID2, ylsize[iy]);
 
         gridDefNP(gridID2, gridInqNP(gridID1));
-        gridDefPrec(gridID2, gridInqPrec(gridID1));
+        gridDefDatatype(gridID2, gridInqDatatype(gridID1));
 
         grid_copy_attributes(gridID1, gridID2);
 

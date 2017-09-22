@@ -262,7 +262,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
   size_t ysize    = gridInqYsize(gridID);
   size_t xysize   = xsize*ysize;
 
-  // int prec     = gridInqPrec(gridID);
+  // int prec     = gridInqDatatype(gridID);
   // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
   int dig = 7;
 #ifdef CDO
@@ -462,7 +462,7 @@ void printZaxisInfo(int vlistID)
       int zaxistype = zaxisInqType(zaxisID);
       int ltype     = zaxisInqLtype(zaxisID);
       int levelsize = zaxisInqSize(zaxisID);
-      // int prec      = zaxisInqPrec(zaxisID);
+      // int prec      = zaxisInqDatatype(zaxisID);
       // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
       int dig = 7;
 #ifdef CDO

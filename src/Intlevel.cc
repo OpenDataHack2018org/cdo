@@ -276,7 +276,7 @@ void *Intlevel(void *argument)
     zaxisInqUnits(zaxisID1, str);
     if ( str[0] ) zaxisDefUnits(zaxisID2, str);
 
-    zaxisDefPrec(zaxisID2, zaxisInqPrec(zaxisID1));
+    zaxisDefDatatype(zaxisID2, zaxisInqDatatype(zaxisID1));
   }
 
   for ( int i = 0; i < nzaxis; i++ )

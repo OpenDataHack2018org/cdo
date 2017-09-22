@@ -79,9 +79,9 @@ void *Gengrid(void *argument)
   gridDefYvals(gridID3, array2);
 
   if ( datatype == CDI_DATATYPE_FLT64 )
-    gridDefPrec(gridID3, CDI_DATATYPE_FLT64);
+    gridDefDatatype(gridID3, CDI_DATATYPE_FLT64);
   else
-    gridDefPrec(gridID3, CDI_DATATYPE_FLT32);
+    gridDefDatatype(gridID3, CDI_DATATYPE_FLT32);
 
   double xminval = array1[0];
   double xmaxval = array1[0];

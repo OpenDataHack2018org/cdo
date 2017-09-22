@@ -175,7 +175,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   int gridtype = gridInqType(gridID);
   int gridsize = gridInqSize(gridID);
 
-  nc_type xtype = (gridInqPrec(gridID) == CDI_DATATYPE_FLT64) ? NC_DOUBLE : NC_FLOAT;
+  nc_type xtype = (gridInqDatatype(gridID) == CDI_DATATYPE_FLT64) ? NC_DOUBLE : NC_FLOAT;
 
   if ( gridtype == GRID_CURVILINEAR )
     {

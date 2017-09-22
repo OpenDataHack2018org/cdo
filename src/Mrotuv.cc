@@ -268,14 +268,14 @@ void *Mrotuv(void *argument)
   p_to_uv_grid(nlon, nlat, grid1x, grid1y, gridux, griduy, gridvx, gridvy);
 
   int gridIDu = gridCreate(GRID_CURVILINEAR, nlon*nlat);
-  gridDefPrec(gridIDu, gridInqPrec(gridID1));
+  gridDefDatatype(gridIDu, gridInqDatatype(gridID1));
   gridDefXsize(gridIDu, nlon);
   gridDefYsize(gridIDu, nlat);
   gridDefXvals(gridIDu, gridux);
   gridDefYvals(gridIDu, griduy);
 
   int gridIDv = gridCreate(GRID_CURVILINEAR, nlon*nlat);
-  gridDefPrec(gridIDv, gridInqPrec(gridID1));
+  gridDefDatatype(gridIDv, gridInqDatatype(gridID1));
   gridDefXsize(gridIDv, nlon);
   gridDefYsize(gridIDv, nlat);
   gridDefXvals(gridIDv, gridvx);

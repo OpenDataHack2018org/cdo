@@ -909,7 +909,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
   size_t gridsize = gridInqSize(gridID1);
   int gridID2 = gridCreate(GRID_CURVILINEAR, gridsize);
-  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
+  gridDefDatatype(gridID2, CDI_DATATYPE_FLT32);
 
   char *proj4param = NULL;
   bool lproj4     = false;
@@ -1240,7 +1240,7 @@ int gridToUnstructured(int gridID1, int lbounds)
   int gridtype = gridInqType(gridID1);
   size_t gridsize = gridInqSize(gridID1);
   int gridID2  = gridCreate(GRID_UNSTRUCTURED, gridsize);
-  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
+  gridDefDatatype(gridID2, CDI_DATATYPE_FLT32);
 	  
   bool lproj_rll = false;
   if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
@@ -1504,7 +1504,7 @@ int gridCurvilinearToRegular(int gridID1)
       gridDefXsize(gridID2, nx);
       gridDefYsize(gridID2, ny);
       
-      //  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
+      //  gridDefDatatype(gridID2, CDI_DATATYPE_FLT32);
 
       char xunits[CDI_MAX_NAME]; xunits[0] = 0;
       char yunits[CDI_MAX_NAME]; yunits[0] = 0;
