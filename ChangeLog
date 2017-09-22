@@ -5,6 +5,7 @@
 
 2017-09-22  Uwe Schulzweida
 
+	* setzaxis: added key word datatype (float/double)
 	* setzaxis: check attributes for reserved key names
 
 2017-09-20  Uwe Schulzweida
