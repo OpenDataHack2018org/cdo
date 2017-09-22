@@ -23,6 +23,7 @@ function fileformat()
   if [ "${FORMAT}" = nc   ] ; then  FILEFORMAT=netCDF;   fi
   if [ "${FORMAT}" = nc2  ] ; then  FILEFORMAT=netCDF2;  fi
   if [ "${FORMAT}" = nc4  ] ; then  FILEFORMAT=netCDF4;  fi
+  if [ "${FORMAT}" = nc5  ] ; then  FILEFORMAT=netCDF5;  fi
 
   if [ "@ENABLE_SERVICE@" = no -a "${FORMAT}" = srv  ] ; then  ENABLE_TEST=no; fi
   if [ "@ENABLE_EXTRA@" = no   -a "${FORMAT}" = ext  ] ; then  ENABLE_TEST=no; fi
@@ -32,6 +33,7 @@ function fileformat()
   if [ "@ENABLE_NETCDF@" = no  -a "${FORMAT}" = nc   ] ; then  ENABLE_TEST=no; fi
   if [ "@ENABLE_NETCDF@" = no  -a "${FORMAT}" = nc2  ] ; then  ENABLE_TEST=no; fi
   if [ "@ENABLE_NC4@" = no     -a "${FORMAT}" = nc4  ] ; then  ENABLE_TEST=no; fi
+  if [ "@ENABLE_NC5@" = no     -a "${FORMAT}" = nc5  ] ; then  ENABLE_TEST=no; fi
 }
 #
 for OPERATOR in write copy; do

@@ -211,7 +211,7 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
         }
       else if ( STR_IS_EQ(key, "grid_mapping_name") ) { *igmap = ik; break; }
       else if ( STR_IS_EQ(key, "grid_mapping") ) { *igmap = ik; break; }
-      else cdoAbort("Invalid parameter : >%s< (grid description file: %s)", key, dname);
+      else cdoAbort("Invalid key word : >%s< (grid description file: %s)", key, dname);
     }
 }
 
@@ -281,11 +281,11 @@ int grid_read(FILE *gfp, const char *dname)
     {
       keyValues_t *kv = *(keyValues_t **)kvnode->data;
       if ( ik == 0 && !STR_IS_EQ(kv->key, "gridtype") )
-        cdoAbort("First grid description parameter must be >gridtype< (found: %s)!", kv->key);
+        cdoAbort("First grid description key word must be >gridtype< (found: %s)!", kv->key);
 
       if ( kv->nvalues == 0 )
         {
-          cdoWarning("Grid description parameter %s has no values, skipped!", kv->key);
+          cdoWarning("Grid description key word %s has no values, skipped!", kv->key);
         }
       else
         {

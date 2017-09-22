@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.1
 	* Version 1.9.1 release
 
+2017-09-22  Uwe Schulzweida
+
+	* setzaxis: check attributes for reserved key names
+
 2017-09-20  Uwe Schulzweida
 
 	* Added support for NC_FORMAT_CDF5

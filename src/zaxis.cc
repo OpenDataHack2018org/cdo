@@ -201,6 +201,10 @@ void zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, size_t *iatt, c
 static
 void zaxis_read_attributes(size_t iatt, size_t nkv, kvmap_t *kvmap, int zaxisID)
 {
+  const char *reserved_keys[] = {"zaxistype", "size", "scalar", "vctsize", "name", "units", "longname", "levels", "lbounds", "ubounds", "vct"};
+  int num_rkeys = sizeof(reserved_keys) / sizeof(char*);
+  const char *attkey0 = NULL;
+
   for ( size_t ik = iatt; ik < nkv; ++ik )
     {
       if ( !kvmap[ik].isValid ) continue;
@@ -209,6 +213,14 @@ void zaxis_read_attributes(size_t iatt, size_t nkv, kvmap_t *kvmap, int zaxisID)
       const char *key = kv->key;
       size_t nvalues = kv->nvalues;
       const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
+
+      if ( ik == iatt ) attkey0 = key;
+      else
+        {
+          for ( int n = 0; n < num_rkeys; ++n )
+            if ( STR_IS_EQ(key, reserved_keys[n]) )
+              cdoAbort("Found reserved key word >%s< in attribute names! Check name or position of >%s<.", key, attkey0);
+        }
       
       int dtype = literals_find_datatype(nvalues, kv->values);
 
@@ -252,11 +264,11 @@ int zaxisFromFile(FILE *gfp, const char *dname)
     {
       keyValues_t *kv = *(keyValues_t **)kvnode->data;
       if ( ik == 0 && !STR_IS_EQ(kv->key, "zaxistype") )
-        cdoAbort("First zaxis description parameter must be >zaxistype< (found: %s)!", kv->key);
+        cdoAbort("First zaxis description key word must be >zaxistype< (found: %s)!", kv->key);
 
       if ( kv->nvalues == 0 )
         {
-          cdoWarning("Z-axis description parameter %s has no values, skipped!", kv->key);
+          cdoWarning("Z-axis description key word %s has no values, skipped!", kv->key);
         }
       else
         {
@@ -273,11 +285,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
   zaxis_read_data(nkv, kvmap, &zaxis, &iatt, dname);
 
   int zaxisID = (zaxis.type == CDI_UNDEFID) ? CDI_UNDEFID : zaxisDefine(zaxis);
-
-  if ( zaxisID != CDI_UNDEFID && iatt > 0 )
-    {
-      zaxis_read_attributes(iatt, nkv, kvmap, zaxisID);
-    }
+  if ( zaxisID != CDI_UNDEFID && iatt > 0 ) zaxis_read_attributes(iatt, nkv, kvmap, zaxisID);
 
   list_destroy(pmlist);
 
