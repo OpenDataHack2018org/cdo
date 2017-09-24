@@ -104,21 +104,21 @@ void *EstFreq(void *argument)
       if ( cdoVerbose )
         printf("Frequency is calculated by dividing the number of time steps '%d' included in the time axis by the covered years of the time axis\ncomputed by the difference of the year of the last time stamp '%d' and the year of the first time stamp '%d'.\n", ntsteps, lyear, fyear);
       double covered_years = lyear-fyear + 1.0;
-      if ( DBL_IS_EQUAL(ntsteps / covered_years, 1) )
+      if ( DBL_IS_EQUAL(ntsteps / covered_years, 1.) )
         strcpy(frequency, "yr");
-      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 12) )
+      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 12.) )
         strcpy(frequency, "mon");
-      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365) ||
+      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365.) ||
                 DBL_IS_EQUAL(ntsteps / covered_years, 365.25) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 366) )
+                DBL_IS_EQUAL(ntsteps / covered_years, 366.) )
         strcpy(frequency, "day");
-      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365*4) ||
+      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365.*4) ||
                 DBL_IS_EQUAL(ntsteps / covered_years, 365.25*4) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 366*4) )
+                DBL_IS_EQUAL(ntsteps / covered_years, 366.*4) )
         strcpy(frequency, "6hr");
-      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365*8) ||
+      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365.*8) ||
                 DBL_IS_EQUAL(ntsteps / covered_years, 365.25*8) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 366*8) )
+                DBL_IS_EQUAL(ntsteps / covered_years, 366.*8) )
         strcpy(frequency, "3hr");
       else 
         {
