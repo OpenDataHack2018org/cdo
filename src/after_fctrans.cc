@@ -10,10 +10,8 @@
 #  include "dmemory.h"
 #endif
 
-#define  OPENMP4  201307
-#if defined(_OPENMP) && defined(OPENMP4) && _OPENMP >= OPENMP4
-#define  HAVE_OPENMP4  1
-#endif
+
+#include "cdo_int.h"
 
 
 #if defined(SX)
@@ -2111,8 +2109,7 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 {
   long fou, ia, ifac, k, la;
   long lat, lev, lon, rix, wix;
-  double *wpt;
-  long nx, nblox, nvex, nvex0, nb;
+  long nb;
   long istart, i, j, ibase, jbase, jj, ii, ix;
   long *istartv;
 
@@ -2136,10 +2133,17 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   long jump = (nlon + 2);
   long lot  = nlev * nlat;
 
-  double *restrict wfc = (double*) Malloc(lot*jump*sizeof(double));
-#if ! defined(_OPENMP)
-  double *restrict wgp = (double*) Malloc(lot*jump*sizeof(double));
-#endif
+  long nx = nlon + 1;
+  if ( nlon%2 == 1 ) nx = nlon;
+  long nblox = 1 + (lot-1)/NFFT;
+  long nvex  = lot - (nblox-1)*NFFT;
+  long nvex0 = nvex;
+
+  long nthmax = (nblox < ompNumThreads) ? nblox : ompNumThreads;
+  long nvals = lot*jump;
+
+  double *restrict wfc = (double*) Malloc(nvals*sizeof(double));
+  NEW_2D(double, wgp2d, nthmax, nvals);
 
   for ( lev = 0; lev < nlev; ++lev )
     {
@@ -2156,12 +2160,6 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 	}
     }
 
-  nx = nlon + 1;
-  if ( nlon%2 == 1 ) nx = nlon;
-  nblox = 1 + (lot-1)/NFFT;
-  nvex  = lot - (nblox-1)*NFFT;
-  nvex0 = nvex;
-
   istartv = (long*) Malloc(nblox*sizeof(long));
 
   istart = 0;
@@ -2172,14 +2170,15 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
       nvex = NFFT;
     }
 
+  // printf("nblox %d\n",nblox);
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(istart, nvex, ix, ii, jj, i, j, k, ia, la, ifac, ibase, jbase)
 #endif
   for ( nb = 0; nb < nblox; nb++ )
     {
-#if defined(_OPENMP)
-      double *restrict wgp = (double*) Malloc(lot*jump*sizeof(double));
-#endif
+      int ompthID = cdo_omp_get_thread_num();
+      double *restrict wgp = wgp2d[ompthID];
+
       istart = istartv[nb];
       if ( nb == 0 ) nvex = nvex0;
       else           nvex = NFFT;
@@ -2251,13 +2250,9 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
           wfc[ix+1] = 0.0;
           ix = ix + jump;
 	}
-
-#if defined(_OPENMP)
-      Free(wgp);
-#endif
     }
 
-  wpt = wfc;
+  double *restrict wpt = wfc;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(j, lon)
@@ -2267,10 +2262,8 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
       gp[lon + j*nlon] = wpt[lon + j*jump];
 
   Free(istartv);
-#if ! defined(_OPENMP)
-  Free(wgp);
-#endif
   Free(wfc);
+  DELETE_2D(wgp2d);
 }
 
 

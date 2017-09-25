@@ -5,6 +5,10 @@
 
 2017-09-22  Uwe Schulzweida
 
+	* fc2gp: optimize memory handling for openmp version
+
+2017-09-22  Uwe Schulzweida
+
 	* setgrid: added key word datatype (float/double)
 	* setzaxis: added key word datatype (float/double)
 	* setzaxis: check attributes for reserved key names
