@@ -2107,12 +2107,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 /* ====================== */
 void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon, long nlev, long nfc)
 {
-  long fou, ia, ifac, k, la;
-  long lat, lev, lon, rix, wix;
-  long nb;
-  long istart, i, j, ibase, jbase, jj, ii, ix;
-  long *istartv;
-
   /* fc2gp performs fourier to gridpoint transforms using           */
   /* multiple fast fourier transform of length nlon                 */
   /*                                                                */
@@ -2145,25 +2139,25 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   double *restrict wfc = (double*) Malloc(nvals*sizeof(double));
   NEW_2D(double, wgp2d, nthmax, nvals);
 
-  for ( lev = 0; lev < nlev; ++lev )
+  for ( long lev = 0; lev < nlev; ++lev )
     {
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(lat, fou, wix, rix)
+#pragma omp parallel for default(shared)
 #endif
-      for ( lat = 0; lat < nlat; ++lat )
+      for ( long lat = 0; lat < nlat; ++lat )
 	{
-	  wix = jump * (lat + lev*nlat);
-	  rix = lat + lev*nlat*nfc;
-	  for ( fou = 0;   fou < nfc;  ++fou ) wfc[wix + fou] = fc[rix + fou*nlat];
-	  for ( fou = nfc; fou < jump; ++fou ) wfc[wix + fou] = 0.0;
+	  long wix = jump * (lat + lev*nlat);
+	  long rix = lat + lev*nlat*nfc;
+	  for ( long fou = 0;   fou < nfc;  ++fou ) wfc[wix + fou] = fc[rix + fou*nlat];
+	  for ( long fou = nfc; fou < jump; ++fou ) wfc[wix + fou] = 0.0;
 	  /*	  wfc[wix + 1] = 0.5 * wfc[wix]; */
 	}
     }
 
-  istartv = (long*) Malloc(nblox*sizeof(long));
+  long *istartv = (long*) Malloc(nblox*sizeof(long));
 
-  istart = 0;
-  for ( nb = 0; nb < nblox; nb++ )
+  long istart = 0;
+  for ( long nb = 0; nb < nblox; nb++ )
     {
       istartv[nb] = istart;
       istart = istart + nvex*jump;
@@ -2172,22 +2166,21 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 
   // printf("nblox %d\n",nblox);
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(istart, nvex, ix, ii, jj, i, j, k, ia, la, ifac, ibase, jbase)
+#pragma omp parallel for default(shared)
 #endif
-  for ( nb = 0; nb < nblox; nb++ )
+  for ( long nb = 0; nb < nblox; nb++ )
     {
       int ompthID = cdo_omp_get_thread_num();
       double *restrict wgp = wgp2d[ompthID];
 
-      istart = istartv[nb];
-      if ( nb == 0 ) nvex = nvex0;
-      else           nvex = NFFT;
+      long istart = istartv[nb];
+      long nvex = (nb == 0) ? nvex0 : NFFT;
 
-      i = istart;
+      long i = istart;
 #if defined(SX)
 #pragma vdir nodep
 #endif
-      for ( j = 0; j < nvex; j++ )
+      for ( long j = 0; j < nvex; j++ )
 	{
 	  wfc[i+1] = 0.5*wfc[i];
 	  i += jump;
@@ -2195,18 +2188,18 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
       if ( nlon%2 != 1 )
 	{
 	  i = istart + nlon;
-	  for ( j = 0; j < nvex; j++ )
+	  for ( long j = 0; j < nvex; j++ )
 	    {
 	      wfc[i] = 0.5*wfc[i];
 	      i += jump;
 	    }
 	}
 
-      ia = istart + 1;
-      la = 1;
-      for ( k = 0; k < nfax; ++k )
+      long ia = istart + 1;
+      long la = 1;
+      for ( long k = 0; k < nfax; ++k )
 	{
-	  ifac = ifax[k + 1];
+	  long ifac = ifax[k + 1];
 
 	  if ( k & 1 )
 	    rpassc(wgp, wgp+la, wfc+ia, wfc+ia+ifac*la, trig,
@@ -2223,16 +2216,13 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 
       if ( nfax%2 != 0 )
 	{
-	  ibase = 0;
-	  jbase = ia;
-	  for ( jj = 0; jj < nvex; jj++ )
+	  long ibase = 0;
+	  long jbase = ia;
+	  for ( long jj = 0; jj < nvex; jj++ )
 	    {
-	      i = ibase;
-	      j = jbase;
-	      for ( ii = 0; ii < nlon; ii++ )
-		{
-		  wfc[j++] = wgp[i++];
-		}
+	      long i = ibase;
+	      long j = jbase;
+	      for ( long ii = 0; ii < nlon; ii++ ) wfc[j++] = wgp[i++];
 	      ibase = ibase + nx;
 	      jbase = jbase + jump;
 	    }
@@ -2240,11 +2230,11 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 
       /* Fill in zeros at end */
 
-      ix = istart + nlon;
+      long ix = istart + nlon;
 #if defined(SX)
 #pragma vdir nodep
 #endif
-      for ( j = 0; j < nvex; j++ )
+      for ( long j = 0; j < nvex; j++ )
 	{
           wfc[ix]   = 0.0;
           wfc[ix+1] = 0.0;
@@ -2255,10 +2245,10 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   double *restrict wpt = wfc;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(j, lon)
+#pragma omp parallel for default(shared)
 #endif
-  for ( j = 0; j < lot; ++j )
-    for ( lon = 0; lon < nlon; ++lon )
+  for ( long j = 0; j < lot; ++j )
+    for ( long lon = 0; lon < nlon; ++lon )
       gp[lon + j*nlon] = wpt[lon + j*jump];
 
   Free(istartv);
