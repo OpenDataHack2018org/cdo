@@ -1665,8 +1665,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	    if ( vars[code].fourier == NULL )
 	      {
 		fieldSize = vars[code].hlev * globs->DimFC;
-		vars[code].fourier = alloc_dp(fieldSize,
-						FieldName(code,"fourier"));
+		vars[code].fourier = alloc_dp(fieldSize, FieldName(code,"fourier"));
 		sp2fc(vars[code].spectral, vars[code].fourier, globs->poli,
 		      vars[code].hlev, globs->Latitudes, globs->Fouriers, globs->Truncation);
 	      }
@@ -1766,8 +1765,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	    if ( vars[code].hybrid == NULL )
 	      {
 		fieldSize = globs->DimGP * vars[code].hlev;
-		vars[code].hybrid = alloc_dp(fieldSize,
-					       FieldName(code,"hybrid"));
+		vars[code].hybrid = alloc_dp(fieldSize, FieldName(code,"hybrid"));
 		after_FC2GP(vars[code].fourier,vars[code].hybrid,
 			    globs->Latitudes,globs->Longitudes,vars[code].hlev,globs->Fouriers);
 	      }
@@ -1795,7 +1793,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
       
       if ( globs->Orography == NULL )
 	{
-	  globs-> Orography = alloc_dp(globs->DimGP , "Orography");
+	  globs->Orography = alloc_dp(globs->DimGP , "Orography");
 	  if ( vars[GEOPOTENTIAL].hybrid )
 	    after_copy_array(globs->Orography, vars[GEOPOTENTIAL].hybrid, globs->DimGP);
 	  else
@@ -2221,11 +2219,9 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	   vars[VELOPOT].needed    || vars[STREAM].needed )
 	{
 	  if ( vars[DIVERGENCE].spectral == NULL )
-	    vars[DIVERGENCE].spectral = alloc_dp(globs->DimSP*globs->NumLevelRequest,
-						   "vars[DIVERGENCE].spectral");
+	    vars[DIVERGENCE].spectral = alloc_dp(globs->DimSP*globs->NumLevelRequest, "vars[DIVERGENCE].spectral");
 	  if ( vars[VORTICITY].spectral == NULL )
-	    vars[VORTICITY].spectral = alloc_dp(globs->DimSP*globs->NumLevelRequest,
-						  "vars[VORTICITY].spectral");
+	    vars[VORTICITY].spectral = alloc_dp(globs->DimSP*globs->NumLevelRequest, "vars[VORTICITY].spectral");
 	  if ( (vars[U_WIND].fourier == 0 || vars[V_WIND].fourier == 0) && globs->NumLevelRequest )
 	    Error("uwind or vwind missing!");
 	  uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier,
