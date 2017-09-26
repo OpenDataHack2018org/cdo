@@ -134,6 +134,7 @@ void gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, in
     {
       if ( incperiod == 0 ) incperiod = 1;
       if ( incperiod > 24 ) cdoAbort("Time period must be less equal 24!");
+
       if      ( tunit == TUNIT_3HOURS  ) incperiod = 3;
       else if ( tunit == TUNIT_6HOURS  ) incperiod = 6;
       else if ( tunit == TUNIT_12HOURS ) incperiod = 12;
@@ -332,7 +333,7 @@ void *Settime(void *argument)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
-  int taxis_has_bounds = taxisHasBounds(taxisID1);
+  bool taxis_has_bounds = taxisHasBounds(taxisID1) > 0;
   int ntsteps  = vlistNtsteps(vlistID1);
   int nvars    = vlistNvars(vlistID1);
 
@@ -420,13 +421,17 @@ void *Settime(void *argument)
     {
       taxisDefCalendar(taxisID2, newcalendar);
     }
+  else if ( operatorID == SETTBOUNDS )
+    {
+      taxisWithBounds(taxisID2);
+    }
 
   if ( operatorID != SHIFTTIME )
     if ( taxis_has_bounds && !copy_timestep )
       {
 	cdoWarning("Time bounds unsupported by this operator, removed!");
 	taxisDeleteBounds(taxisID2);
-	taxis_has_bounds = FALSE;
+	taxis_has_bounds = false;
       }
 
   vlistDefTaxis(vlistID2, taxisID2);
@@ -531,8 +536,8 @@ void *Settime(void *argument)
 	  taxisDefNumavg(taxisID2, numavg);
 
 	  taxisDefVdate(taxisID2, vdate);
-
 	  taxisDefVtime(taxisID2, vtime);
+
 	  if ( taxis_has_bounds || operatorID == SETTBOUNDS )
 	    {
 	      taxisDefVdateBounds(taxisID2, vdateb[0], vdateb[1]);
