@@ -179,6 +179,8 @@ void *Select(void *argument)
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
 
+  dtlist_type *dtlist = dtlist_new();
+
   if ( !cdoVerbose && nfiles > 1 ) progressInit();
 
   timestep = 0;
@@ -527,8 +529,9 @@ void *Select(void *argument)
                     }
                 }
 
-	      int vdate = taxisInqVdate(taxisID1);
-	      int vtime = taxisInqVtime(taxisID1);
+              dtlist_taxisInqTimestep(dtlist, taxisID1, 0);
+              int vdate = dtlist_get_vdate(dtlist, 0);
+              int vtime = dtlist_get_vtime(dtlist, 0);
               int second;
 	      cdiDecodeDate(vdate, &year, &month, &day);
 	      cdiDecodeTime(vtime, &hour, &minute, &second);
@@ -691,6 +694,8 @@ void *Select(void *argument)
   SELLIST_CHECK_FLAG(date);
 
   if ( streamID2 != CDI_UNDEFID ) pstreamClose(streamID2);
+
+  dtlist_delete(dtlist);
 
   vlistDestroy(vlistID0);
   vlistDestroy(vlistID2);
