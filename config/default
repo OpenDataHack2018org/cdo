@@ -104,7 +104,7 @@ case "${HOSTNAME}" in
                  --with-proj=/opt/local"
 
         if  test "$COMP" = intel ; then
-	  ${CONFPATH}configure --prefix=$HOME/local --disable-openmp \
+	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
 	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
@@ -231,8 +231,8 @@ case "${HOSTNAME}" in
                     --with-fftw3 \
                     $CDOLIBS \
                     LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
-	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
-	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=core-avx2" \
+	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=core-avx2"
         elif  test "$COMP" = pgi ; then
           ${CONFPATH}configure --disable-openmp \
                     $CDOLIBS \
