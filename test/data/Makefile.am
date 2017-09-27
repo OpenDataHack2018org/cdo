@@ -39,7 +39,7 @@ GRADSDES_REF = pl_data.ctl pl_data.gmp
 ARITH_REF    = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
 MAPREDUCE    = r18x9_grid icon_cell_grid griddes.r18x9 griddes.icon_cell
 MERGETIME    = mergetime_ref mergetime_y1 mergetime_y2 mergetime_y12
-REMAPERA     = remapeta1.nc remapeta2.nc remapeta_ref VCT.L62
+REMAPETA     = remapeta1.nc remapeta2.nc remapeta_ref VCT.L62
 
 EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(EOF_REF) $(COMP_REF) $(YDRUNSTAT_REF) $(YMONSTAT_REF) $(YSEASSTAT_REF) $(SEASSTAT_REF) \
              $(RUNSTAT_REF) $(TIMSTAT_REF) $(YEARSTAT_REF) $(MONSTAT_REF) $(DAYSTAT_REF) $(VERTSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) \
