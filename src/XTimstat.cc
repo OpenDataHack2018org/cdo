@@ -295,7 +295,7 @@ void *XTimstat(void *argument)
   readarg.streamID = streamID1;
   readarg.vars = input_vars;
 
-  int lparallelread = CDO_Parallel_Read;
+  bool lparallelread = CDO_Parallel_Read > 0;
   bool ltsfirst = true;
   void *read_task = NULL;
   void *readresult = NULL;
@@ -305,7 +305,7 @@ void *XTimstat(void *argument)
       read_task = cdo_task_new();
       if ( read_task == NULL )
         {
-          lparallelread = FALSE;
+          lparallelread = false;
           cdoWarning("CDO tasks not available!");
         }
     }
@@ -335,7 +335,7 @@ void *XTimstat(void *argument)
           readarg.nrecs    = nrecs;
           readarg.recinfo  = recinfo;
 
-          if ( ltsfirst || lparallelread == FALSE )
+          if ( ltsfirst || lparallelread == false )
             {
               ltsfirst = false;
               readresult = cdoReadTimestep(&readarg);
