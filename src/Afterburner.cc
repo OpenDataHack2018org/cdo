@@ -136,13 +136,11 @@ void cdiError(int cdiErrno, const char *fmt, ...)
 static
 void lprintf(FILE *fp)
 {
-  int inum;
   int num = 67;
   int cval = '-';
 
   fprintf(fp, " ");
-  for (inum = 0; inum < num; inum++)
-    fprintf(fp, "%c", cval);
+  for ( int inum = 0; inum < num; inum++ ) fprintf(fp, "%c", cval);
   fprintf(fp, "\n");
 }
 
@@ -191,7 +189,7 @@ static
 void after_SwitchFile(struct Control *globs)
 {
   bool echam4 = false;
-  int i, n;
+  int n;
   char y3, y2, y1, y0;
   char         m1, m0;
   char         d1, d0;
@@ -200,7 +198,7 @@ void after_SwitchFile(struct Control *globs)
 
   if ( globs->Multi > 0 )
     {
-      i = strlen(ifile);
+      int i = strlen(ifile);
       if ( i < 10 )
 	{
 	  fprintf(stderr, " Not a valid filename: %s \n", ifile);
@@ -342,9 +340,7 @@ void after_printProcessStatus(int tsID)
 static
 int after_setNextDate(struct Control *globs)
 {
-  int nrecs;
-  int i;
-  int vdate, vtime;
+  int nrecs = 0;
 
   bool righttime = false;
   while ( TRUE )
@@ -367,12 +363,11 @@ int after_setNextDate(struct Control *globs)
 #if defined(CDO)
       //      processDefTimesteps(globs->istreamID);
 #endif
-      vdate = taxisInqVdate(globs->taxisID);
-      vtime = taxisInqVtime(globs->taxisID);
-
+      int vdate = taxisInqVdate(globs->taxisID);
+      int vtime = taxisInqVtime(globs->taxisID);
       after_setDateTime(&globs->NextDate, vdate, vtime);
 
-      for ( i = 0; i < nrqh; i++ )
+      for ( int i = 0; i < nrqh; i++ )
 	if ( hours[i] < 0 || hours[i] == globs->NextDate.hr )
 	  {
 	    righttime = true;
@@ -394,9 +389,7 @@ static int num_recs = 0;
 static
 void *after_readTimestep(void *arg)
 {
-  int i;
   int varID, gridID, zaxisID, levelID, timeID;
-  int code, leveltype;
   int nmiss;
   RARG *rarg = (RARG *) arg;
 
@@ -405,16 +398,13 @@ void *after_readTimestep(void *arg)
   struct Variable *vars = rarg->vars;
   struct Control *globs = rarg->globs;
 
-  for ( code = 0; code < MaxCodes; code++ ) vars[code].nmiss0 = 0;
-
-  int level = 0;
-  int levelOffset = 0;
+  for ( int code = 0; code < MaxCodes; code++ ) vars[code].nmiss0 = 0;
 
   for ( int recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(globs->istreamID, &varID, &levelID);
 
-      code = vlistInqVarCode(globs->ivlistID, varID);
+      int code = vlistInqVarCode(globs->ivlistID, varID);
       if ( code <= 0 || code >= MaxCodes ) continue;
 
       /* Skip records containing unneeded codes */
@@ -423,18 +413,18 @@ void *after_readTimestep(void *arg)
 
       vlistInqVar(globs->ivlistID, varID, &gridID, &zaxisID, &timeID);
 
-      leveltype = zaxisInqType(zaxisID);
+      int leveltype = zaxisInqType(zaxisID);
 	  
       /* Skip records with unselected levels */
 
-      levelOffset = -1;
+      int levelOffset = -1;
       /*
 	if ( vars[code].ozaxisID != vars[code].izaxisID && ! Lhybrid2pressure )
       */
       if ( (vars[code].ozaxisID != vars[code].izaxisID) && (leveltype == ZAXIS_PRESSURE) )
 	{
-	  level = (int) zaxisInqLevel(zaxisID, levelID);
-	  for ( i = 0; i < globs->NumLevelRequest; ++i )
+	  int level = (int) zaxisInqLevel(zaxisID, levelID);
+	  for ( int i = 0; i < globs->NumLevelRequest; ++i )
 	    {
 	      if ( IS_EQUAL(globs->LevelRequest[i], level) )
 		{
