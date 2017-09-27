@@ -2477,28 +2477,48 @@ void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int c
 }
 
 
+double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int levelID)
+{
+  int gridtype   = gridInqType(gridID);
+  int nlevel     = zaxisInqSize(zaxisID);
+  int gridSize   = gridInqSize(gridID);
+  int dataSize   = gridSize*nlevel;
+  int dataOffset = gridSize*levelID;
+
+  double *dataptr = NULL;
+
+  if ( gridtype == GRID_SPECTRAL )
+    {
+      if ( vars[code].spectral0 == NULL )
+	vars[code].spectral0 = alloc_dp(dataSize, FieldName(code, "spectral0"));
+
+      dataptr = vars[code].spectral0+dataOffset;
+    }
+  else
+    {
+      if ( vars[code].hybrid0 == NULL )
+	vars[code].hybrid0 = alloc_dp(dataSize, FieldName(code, "hybrid0"));
+
+      dataptr = vars[code].hybrid0+dataOffset;
+    }
+
+  return dataptr;
+}
+
+
 void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss)
 {
-  int dataSize;
-  int dataOffset;
-  int nlevel;
-  int gridSize;
-  int gridtype, leveltype;
-
-  gridtype   = gridInqType(gridID);
-  leveltype  = zaxisInqType(zaxisID);
-  nlevel     = zaxisInqSize(zaxisID);
-  gridSize   = gridInqSize(gridID);
-  dataSize   = gridSize*nlevel;
-  dataOffset = gridSize*levelID;
+  int gridtype   = gridInqType(gridID);
+  int leveltype  = zaxisInqType(zaxisID);
+  int nlevel     = zaxisInqSize(zaxisID);
+  int gridSize   = gridInqSize(gridID);
+  int dataSize   = gridSize*nlevel;
+  int dataOffset = gridSize*levelID;
 
   vars[code].nmiss0 += nmiss;
 
   if ( gridtype == GRID_SPECTRAL )
     {
-      /* ---------------------------------------------------------- */
-      /* Found spectral field ! If needed, allocate memory and copy */
-      /* ---------------------------------------------------------- */
       vars[code].sfit = TRUE;
       vars[code].hlev = nlevel;
       vars[code].plev = 1;
@@ -2507,11 +2527,6 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
 
       if ( gridInqTrunc(gridID) != globs->Truncation )
 	Error("Resolution error. Required %d - Found %d", globs->Truncation, gridInqTrunc(gridID));
-
-      if ( vars[code].spectral0 == NULL )
-	vars[code].spectral0 = alloc_dp(dataSize, FieldName(code, "spectral0"));
-
-      after_copy_array(vars[code].spectral0+dataOffset, globs->Field, gridSize);
     }
   else
     {
@@ -2533,14 +2548,10 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
 	      for ( i = 0; i < dataSize; i++ ) vars[code].samp[i] = globs->MeanCount0;
 	    }
 
+          double *dataptr = vars[code].hybrid0+dataOffset;
 	  for ( i = 0; i < gridSize; i++ )
-	    if ( IS_NOT_EQUAL(globs->Field[i], vars[code].missval) ) vars[code].samp[i+dataOffset]++;
+	    if ( IS_NOT_EQUAL(dataptr[i], vars[code].missval) ) vars[code].samp[i+dataOffset]++;
 	}
-
-      if ( vars[code].hybrid0 == NULL )
-	vars[code].hybrid0 = alloc_dp(dataSize, FieldName(code, "hybrid0"));
-
-      after_copy_array(vars[code].hybrid0+dataOffset, globs->Field, gridSize);
     }
 }
 

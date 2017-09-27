@@ -386,6 +386,7 @@ int after_setNextDate(struct Control *globs)
 
 static int num_recs = 0;
 
+
 static
 void *after_readTimestep(void *arg)
 {
@@ -448,12 +449,17 @@ void *after_readTimestep(void *arg)
 		  globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy, globs->OldDate.hr, globs->OldDate.mn);
 	}
 
-      streamReadRecord(globs->istreamID, globs->Field, &nmiss);
-
       if ( analysisData )
-	after_AnalysisAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
+        {
+          streamReadRecord(globs->istreamID, globs->Field, &nmiss);
+          after_AnalysisAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
+        }
       else
-	after_EchamAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
+        {
+          double *dataptr = after_get_dataptr(vars, code, gridID, zaxisID, levelID);
+          streamReadRecord(globs->istreamID, dataptr, &nmiss);
+          after_EchamAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
+        }
 
       if ( iVertID != -1 && oVertID != -1 && (vars[code].izaxisID == iVertID) )
 	vars[code].ozaxisID = oVertID;

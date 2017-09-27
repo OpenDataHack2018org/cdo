@@ -242,6 +242,7 @@ void after_processPL(struct Control *globs, struct Variable *vars);
 void after_processML(struct Control *globs, struct Variable *vars);
 
 void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss);
+double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int levelID);
 void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss);
 
 void  after_AnalysisDependencies(struct Variable *vars, int ncodes);
