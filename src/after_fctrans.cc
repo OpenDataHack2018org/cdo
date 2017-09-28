@@ -13,7 +13,7 @@
 #ifdef SX
 #define  NFFT  1024
 #else
-#define  NFFT    16
+#define  NFFT     8
 #endif
 
 #ifndef  M_SQRT2

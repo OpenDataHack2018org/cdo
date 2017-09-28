@@ -5,7 +5,7 @@
 
 2017-09-28  Uwe Schulzweida
 
-	* Changed NFFT from 64 to 16
+	* Changed NFFT from 64 to 8
 
 2017-09-22  Uwe Schulzweida
 
