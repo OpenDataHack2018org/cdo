@@ -1997,8 +1997,7 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   long jump = (nlon + 2);
   long lot  = nlev * nlat;
 
-  long nx = nlon + 1;
-  if ( nlon%2 == 1 ) nx = nlon;
+  long nx = (nlon%2 == 1) ? nlon : nlon+1;
   long nblox = 1 + (lot-1)/NFFT;
   long nvex  = lot - (nblox-1)*NFFT;
   long nvex0 = nvex;
