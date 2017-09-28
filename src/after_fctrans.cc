@@ -2016,10 +2016,10 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 #endif
       for ( long lat = 0; lat < nlat; ++lat )
 	{
-	  long wix = jump * (lat + lev*nlat);
-	  long rix = lat + lev*nlat*nfc;
-	  for ( long fou = 0;   fou < nfc;  ++fou ) wfc[wix + fou] = fc[rix + fou*nlat];
-	  for ( long fou = nfc; fou < jump; ++fou ) wfc[wix + fou] = 0.0;
+	  double *restrict wfcx = wfc + jump * (lat + lev*nlat);
+	  double *restrict fcx = fc + (lat + lev*nlat*nfc);
+	  for ( long fou = 0;   fou < nfc;  ++fou ) wfcx[fou] = fcx[fou*nlat];
+	  for ( long fou = nfc; fou < jump; ++fou ) wfcx[fou] = 0.0;
 	  /*	  wfc[wix + 1] = 0.5 * wfc[wix]; */
 	}
     }
