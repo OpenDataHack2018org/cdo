@@ -1,13 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#if defined(HAVE_CONFIG_H)
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #ifndef _DMEMORY_H
-#  include "dmemory.h"
+#include "dmemory.h"
 #endif
 
 
@@ -166,9 +162,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i] + a[i1 + i];
@@ -201,9 +194,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
 			    a0m1 = a[i0 + i] - a[i1 + i];
@@ -234,9 +224,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i];
@@ -256,9 +243,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -293,9 +277,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -335,9 +316,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -379,9 +357,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    a0mp = 0.5 * a[i0 + i];
@@ -405,9 +380,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -447,9 +419,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -494,9 +463,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -547,9 +513,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    a0m1 = a[i0 + i] - a[i1 + i];
@@ -575,9 +538,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -618,9 +578,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -678,9 +635,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -746,9 +700,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i] + a[i1 + i] + a[i2 + i];
@@ -783,9 +734,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -835,9 +783,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -897,9 +842,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -961,9 +903,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[ja + j] =  a[ib + i] + (a[ia + i] + a[ic + i]);
@@ -991,9 +930,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1053,9 +989,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 	    j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 	    for (ijk = 0; ijk < lot; ++ijk)
 	      {
@@ -1160,9 +1093,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i] + a[i1 + i];
@@ -1194,9 +1124,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
 			    c[j0 + j] = a[i0 + i] + c1 * a[i1 + i] + s1 * b[i1 + i];
@@ -1224,9 +1151,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i];
@@ -1247,9 +1171,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1283,9 +1204,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1322,9 +1240,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -1367,9 +1282,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    /* soweit */
@@ -1393,9 +1305,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1433,9 +1342,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1481,9 +1387,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -1532,9 +1435,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] =  a[i0 + i] + SQ2 * (a[i1 + i] - a[i3 + i]);
@@ -1557,9 +1457,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1604,9 +1501,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1661,9 +1555,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -1733,9 +1624,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    a1p4 = a[i1 + i] + a[i4 + i];
@@ -1772,9 +1660,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1833,9 +1718,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1896,9 +1778,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -1970,9 +1849,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    a1p5 = a[i1 + i] + a[i5 + i];
@@ -2003,9 +1879,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -2066,9 +1939,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 	    j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 	    for (ijk = 0; ijk < lot; ++ijk)
 	      {
