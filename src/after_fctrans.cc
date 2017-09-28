@@ -2009,18 +2009,17 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   double *restrict wfc = (double*) Malloc(nvals*sizeof(double));
   NEW_2D(double, wgp2d, nthmax, nvals);
 
-  for ( long lev = 0; lev < nlev; ++lev )
-    {
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
-      for ( long lat = 0; lat < nlat; ++lat )
-	{
+  for ( long lat = 0; lat < nlat; ++lat )
+    {
+      for ( long lev = 0; lev < nlev; ++lev )
+        {
 	  double *restrict wfcx = wfc + jump * (lat + lev*nlat);
 	  double *restrict fcx = fc + (lat + lev*nlat*nfc);
 	  for ( long fou = 0;   fou < nfc;  ++fou ) wfcx[fou] = fcx[fou*nlat];
 	  for ( long fou = nfc; fou < jump; ++fou ) wfcx[fou] = 0.0;
-	  /*	  wfc[wix + 1] = 0.5 * wfc[wix]; */
 	}
     }
 
@@ -2034,7 +2033,7 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
       nvex = NFFT;
     }
 
-  // printf("nblox %d\n",nblox);
+  // printf("nblox %ld nvex0 %ld  lot %ld\n",nblox, nvex0, lot);
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
