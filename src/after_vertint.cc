@@ -85,14 +85,16 @@ void genind(int *nx, const double *restrict plev, const double *restrict fullp, 
 #endif
   for ( long lp = 0; lp < nplev; lp++ )
     {
-      long i, lh;
       const double pres = plev[lp];
       int *restrict nxl = nx + lp*ngp;
-      for ( lh = 0; lh < nhlev; lh++ )
-	for ( i = 0; i < ngp ; i++ )
-	   {
-	     if ( pres > fullp[lh*ngp+i] ) nxl[i] = lh;
-	   }
+      for ( long lh = 0; lh < nhlev; lh++ )
+        {
+          const double *restrict fullpx = fullp + lh*ngp;
+          for ( long i = 0; i < ngp ; i++ )
+            {
+              if ( pres > fullpx[i] ) nxl[i] = lh;
+            }
+        }
     }
 
 }  /* genind */
