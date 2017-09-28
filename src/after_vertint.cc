@@ -265,12 +265,10 @@ void interp_X(const double *restrict gt, double *pt, const double *restrict hyb_
 	    {
 	      nl = nxl[i] * ngp + i;
 	      nh = nl + ngp;
-	      if ( nh >= ngp*nhlev )
-		ptl[i] =  gt[nl];
-	      else
-		ptl[i] =  gt[nl] + (pres-hyb_press[nl])
-		       * (gt[nh] - gt[nl])
-                       / (hyb_press[nh] - hyb_press[nl]);
+              ptl[i] = (nh >= ngp*nhlev) ? gt[nl] :
+                        gt[nl] + (pres-hyb_press[nl])
+		     * (gt[nh] - gt[nl])
+                     / (hyb_press[nh] - hyb_press[nl]);
 	    }
 	}
     }
