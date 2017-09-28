@@ -14,10 +14,10 @@
 #include "cdo_int.h"
 
 
-#if defined(SX)
-#  define  NFFT  1024
+#ifdef SX
+#define  NFFT  1024
 #else
-#  define  NFFT  64
+#define  NFFT    16
 #endif
 
 #ifndef  M_SQRT2
