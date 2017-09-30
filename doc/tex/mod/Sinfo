@@ -25,7 +25,8 @@ Prints short information of a dataset. The information is divided into
 information:
 @BeginItemize
 @Item = institute and source
-@Item = timestep type
+@Item = time c=constant v=varying
+@Item = type of statistical processing
 @Item = number of levels and z-axis number
 @Item = horizontal grid size and number
 @Item = data type
@@ -54,10 +55,10 @@ To print short information of a dataset use:
 @EndVerbatim
 This is the result of an ECHAM5 dataset with 3 parameter over 12 timesteps:
 @BeginListing
-    -1 : Institut Source  Steptype Levels Num   Points Num Dtype : Name 
-     1 : MPIMET   ECHAM5  constant      1   1     2048   1  F32  : GEOSP 
-     2 : MPIMET   ECHAM5  instant       4   2     2048   1  F32  : T     
-     3 : MPIMET   ECHAM5  instant       1   1     2048   1  F32  : TSURF 
+    -1 : Institut Source  T Steptype Levels Num   Points Num Dtype : Name 
+     1 : MPIMET   ECHAM5  c instant       1   1     2048   1  F32  : GEOSP 
+     2 : MPIMET   ECHAM5  v instant       4   2     2048   1  F32  : T     
+     3 : MPIMET   ECHAM5  v instant       1   1     2048   1  F32  : TSURF 
    Grid coordinates :
      1 : gaussian              : points=2048 (64x32)  np=16
                      longitude : 0 to 354.375 by 5.625 degrees_east  circular
