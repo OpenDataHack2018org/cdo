@@ -123,11 +123,11 @@ void *Sinfo(void *argument)
 
       set_text_color(stdout, BRIGHT, BLACK);
       if ( lensemble )
-	fprintf(stdout, "%6d : Institut Source   Steptype Einfo Levels Num    Points Num Dtype : ",  -(indf+1));
+	fprintf(stdout, "%6d : Institut Source   T Steptype Einfo Levels Num    Points Num Dtype : ",  -(indf+1));
       else if ( nsubtypes > 1 )
-	fprintf(stdout, "%6d : Institut Source   Steptype Subtypes Levels Num    Points Num Dtype : ",  -(indf+1));
+	fprintf(stdout, "%6d : Institut Source   T Steptype Subtypes Levels Num    Points Num Dtype : ",  -(indf+1));
       else
-	fprintf(stdout, "%6d : Institut Source   Steptype Levels Num    Points Num Dtype : ",  -(indf+1));
+	fprintf(stdout, "%6d : Institut Source   T Steptype Levels Num    Points Num Dtype : ",  -(indf+1));
 
       if      ( operfunc == func_name ) fprintf(stdout, "Parameter name");
       else if ( operfunc == func_code ) fprintf(stdout, "Table Code");
@@ -153,21 +153,25 @@ void *Sinfo(void *argument)
 	  reset_text_color(stdout);
 	      
 	  set_text_color(stdout, RESET, BLUE);
-	  /* institute info */
+	  // institute info
 	  const char *instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
 	  strcpy(tmpname, "unknown");
 	  if ( instptr ) strncpy(tmpname, instptr, CDI_MAX_NAME);
 	  limit_string_length(tmpname, CDI_MAX_NAME);
 	  fprintf(stdout, "%-8s ", tmpname);
 
-	  /* source info */
+	  // source info
 	  const char *modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
 	  strcpy(tmpname, "unknown");
 	  if ( modelptr ) strncpy(tmpname, modelptr, CDI_MAX_NAME);
 	  limit_string_length(tmpname, CDI_MAX_NAME);
 	  fprintf(stdout, "%-8s ", tmpname);
 
-	  /* tsteptype */
+          // timetype
+          int timetype = vlistInqVarTimetype(vlistID, varID);
+          fprintf(stdout, "%c ", timetype==TIME_CONSTANT ? 'c' : 'v');
+               
+	  // tsteptype
 	  int tsteptype = vlistInqVarTsteptype(vlistID, varID);
           // clang-format off
 	  if      ( tsteptype == TSTEP_INSTANT  ) fprintf(stdout, "%-8s ", "instant");

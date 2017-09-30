@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.1
 	* Version 1.9.1 release
 
+2017-09-30  Uwe Schulzweida
+
+	* sinfo: Added time type
+
 2017-09-28  Uwe Schulzweida
 
 	* Changed NFFT from 64 to 8
