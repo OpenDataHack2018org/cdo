@@ -575,11 +575,11 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
   int steptype1 = p1->param.steptype;
   int steptype2 = p2->param.steptype;
 
-  if ( p->param.steptype == TSTEP_CONSTANT )
+  if ( p->param.steptype == TIME_CONSTANT )
     {
-      if ( steptype1 != TSTEP_CONSTANT )
+      if ( steptype1 != TIME_CONSTANT )
         p->param.steptype = steptype1;
-      else if ( steptype2 != TSTEP_CONSTANT )
+      else if ( steptype2 != TIME_CONSTANT )
         p->param.steptype = steptype2;
     }
 
@@ -1376,7 +1376,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                     {
                       if ( i < maxout || (ngp > maxout && i >= (ngp-maxout)) )
                         {
-                          if ( steptype == TSTEP_CONSTANT )
+                          if ( steptype == TIME_CONSTANT )
                             fprintf(stdout, "   %s[lev=%lu:gp=%lu] = %g\n", vname, k+1, i+1, data[k*ngp+i]);
                           else
                             fprintf(stdout, "   %s[ts=%ld:lev=%lu:gp=%lu] = %g\n", vname, tsID, k+1, i+1, data[k*ngp+i]);
@@ -1436,7 +1436,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         params[nvarID].missval  = params[varID].missval;
                         params[nvarID].gridID   = params[varID].gridID;
                         params[nvarID].zaxisID  = parse_arg->surfaceID;
-                        params[nvarID].steptype = TSTEP_CONSTANT;
+                        params[nvarID].steptype = TIME_CONSTANT;
                         params[nvarID].ngp      = params[varID].ngp;
                         params[nvarID].nlev     = 1;
                         if ( units ) params[nvarID].units = strdup(units);
@@ -1472,7 +1472,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         params[nvarID].missval  = params[varID].missval;
                         params[nvarID].gridID   = parse_arg->pointID;
                         params[nvarID].zaxisID  = params[varID].zaxisID;
-                        params[nvarID].steptype = TSTEP_CONSTANT;
+                        params[nvarID].steptype = TIME_CONSTANT;
                         params[nvarID].ngp      = 1;
                         params[nvarID].nlev     = params[varID].nlev;
                         if ( units ) params[nvarID].units = strdup(units);

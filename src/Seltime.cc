@@ -314,7 +314,7 @@ void *Seltime(void *argument)
   int nvars = vlistNvars(vlistID1);
   int nconst = 0;
   for ( varID = 0; varID < nvars; varID++ )
-    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) nconst++;
+    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) nconst++;
       
   bool lnts1 = (operatorID == SELSMON) && (nts1 > 0);
 
@@ -338,7 +338,7 @@ void *Seltime(void *argument)
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      if ( lnts1 || (vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT) )
+	      if ( lnts1 || (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) )
 		{
 		  int gridID  = vlistInqVarGrid(vlistID1, varID);
 		  int nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
@@ -457,7 +457,7 @@ void *Seltime(void *argument)
 		  
 		  for ( varID = 0; varID < nvars; varID++ )
 		    {
-		      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT && tsID2 > 1 ) continue;
+		      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT && tsID2 > 1 ) continue;
 		      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
@@ -488,7 +488,7 @@ void *Seltime(void *argument)
 	      nts = nts1 - 1;
 	      for ( varID = 0; varID < nvars; varID++ )
 		{
-		  if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+		  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 		    {
 		      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -537,7 +537,7 @@ void *Seltime(void *argument)
 			vtime_list[it] = vtime_list[it+1];
 			for ( varID = 0; varID < nvars; varID++ )
 			  {
-			    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+			    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 			    int gridID   = vlistInqVarGrid(vlistID1, varID);
 			    int gridsize = gridInqSize(gridID);
 			    int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
@@ -560,7 +560,7 @@ void *Seltime(void *argument)
 	      for ( int recID = 0; recID < nrecs; recID++ )
 		{
 		  pstreamInqRecord(streamID1, &varID, &levelID);
-		  if ( lnts1 || (vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT) )
+		  if ( lnts1 || (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) )
 		    {
 		      single = vars[nts][varID][levelID].ptr;
 		      pstreamReadRecord(streamID1, single, &nmiss);

@@ -152,7 +152,7 @@ void *Seasstat(void *argument)
 		{
                   recinfo[recID].varID   = varID;
                   recinfo[recID].levelID = levelID;
-                  recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
+                  recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 		}
 
               field_type *psamp1 = &samp1[varID][levelID];

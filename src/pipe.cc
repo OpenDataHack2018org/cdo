@@ -245,7 +245,7 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
       numrecs = 0;
       for (int varID = 0; varID < vlistNvars(vlistID); varID++)
         {
-          if (vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT)
+          if (vlistInqVarTimetype(vlistID, varID) != TIME_CONSTANT)
             {
               numrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
             }

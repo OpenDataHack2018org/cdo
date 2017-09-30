@@ -113,7 +113,7 @@ int vlistConstVars(int vlistID)
   int nvars = vlistNvars(vlistID);
 
   for ( int varID = 0; varID < nvars; ++varID )
-    if ( vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT ) return 0;
+    if ( vlistInqVarTimetype(vlistID, varID) != TIME_CONSTANT ) return 0;
 
   return 1;
 }
@@ -199,7 +199,7 @@ void *Merge(void *argument)
 	    for ( int varID = 0; varID < nvars; ++varID )
 	      {
 		varID2 = vlistMergedVar(vlistID1, varID);
-		vlistDefVarTsteptype(vlistID2, varID2, TSTEP_CONSTANT);
+		vlistDefVarTimetype(vlistID2, varID2, TIME_CONSTANT);
 	      }
 	  }
       }

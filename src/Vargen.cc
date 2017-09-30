@@ -358,17 +358,16 @@ void *Vargen(void *argument)
 
   int vlistID = vlistCreate();
 
-  int tsteptype = TSTEP_CONSTANT;
-  if ( operatorID == FOR ) tsteptype = TSTEP_INSTANT;
+  int timetype = (operatorID == FOR) ? TIME_VARYING : TIME_CONSTANT;
 
-  varID = vlistDefVar(vlistID, gridID, zaxisID, tsteptype);
+  varID = vlistDefVar(vlistID, gridID, zaxisID, timetype);
   /*
      For the standard atmosphere two output variables are generated: pressure and
      temperatur. The first (varID) is pressure, second (varID2) is temperatur.
      Add an additional variable for the standard atmosphere.
    */
   if ( operatorID == STDATM )
-    varID2 = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_CONSTANT);
+    varID2 = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
 
   if ( operatorID == MASK )
     vlistDefVarDatatype(vlistID, varID, CDI_DATATYPE_INT8);

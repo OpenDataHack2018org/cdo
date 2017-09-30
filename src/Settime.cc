@@ -340,7 +340,7 @@ void *Settime(void *argument)
   if ( ntsteps == 1 )
     {
       for ( varID = 0; varID < nvars; ++varID )
-	if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
+	if ( vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT ) break;
 
       if ( varID == nvars ) ntsteps = 0;
     }
@@ -348,7 +348,7 @@ void *Settime(void *argument)
   if ( ntsteps == 0 )
     {
       for ( varID = 0; varID < nvars; ++varID )
-	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
   int calendar = taxisInqCalendar(taxisID1);

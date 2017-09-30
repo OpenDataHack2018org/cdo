@@ -132,8 +132,8 @@ void *Eofcoeff(void * argument)
     vlistChangeGridIndex(vlistID3, i, gridID3);     
   
   vlistDefTaxis(vlistID3, taxisID3);
-  for (varID =0; varID<nvars; varID++)
-    vlistDefVarTsteptype(vlistID3, varID, TSTEP_INSTANT);
+  for (varID = 0; varID<nvars; varID++)
+    vlistDefVarTimetype(vlistID3, varID, TIME_VARYING);
   
   // open streams for eofcoeff output
   int *streamIDs = (int*) Malloc(neof*sizeof(int)); 

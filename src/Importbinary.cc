@@ -252,7 +252,7 @@ void *Importbinary(void *argument)
       if ( nlevels == 0 )
 	{
 	  nlevels = 1;
-	  varID = vlistDefVar(vlistID, gridID, zaxisIDsfc, TSTEP_INSTANT);
+	  varID = vlistDefVar(vlistID, gridID, zaxisIDsfc, TIME_VARYING);
 	}
       else
 	{
@@ -269,10 +269,10 @@ void *Importbinary(void *argument)
 		}
 
 	      if ( vid == ivar ) zid = define_level(&pfi, nlevels);
-	      varID = vlistDefVar(vlistID, gridID, zid, TSTEP_INSTANT);
+	      varID = vlistDefVar(vlistID, gridID, zid, TIME_VARYING);
 	    }
 	  else
-	    varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+	    varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
 	}
 
       var_zaxisID[varID] = vlistInqVarZaxis(vlistID, varID);

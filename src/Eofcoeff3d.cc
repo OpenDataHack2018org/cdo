@@ -143,7 +143,7 @@ void *Eofcoeff3d(void * argument)
   
   vlistDefTaxis(vlistID3,taxisID3);
   for (varID =0; varID<nvars; varID++)
-    vlistDefVarTsteptype(vlistID3, varID, TSTEP_INSTANT);
+    vlistDefVarTimetype(vlistID3, varID, TIME_VARYING);
   
   // open streams for eofcoeff output
   int *streamIDs = (int*) Malloc(neof*sizeof(int)); 

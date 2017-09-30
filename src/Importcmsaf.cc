@@ -1518,9 +1518,9 @@ void *Importcmsaf(void *argument)
   for ( ivar = 0; ivar < dsets.nsets; ++ivar )
     {
       if ( dsets.obj[ivar].nt > 1 )
-	varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
       else
-	varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
 
       vlistDefVarName(vlistID, varID,  dsets.obj[ivar].name);
       if ( dsets.obj[ivar].description )
@@ -1529,7 +1529,7 @@ void *Importcmsaf(void *argument)
 	vlistDefVarUnits(vlistID, varID,  dsets.obj[ivar].units);
       if ( dsets.obj[ivar].title )
 	cdiDefAttTxt(vlistID, varID, "title", (int)strlen(dsets.obj[ivar].title),
-		       dsets.obj[ivar].title);
+                     dsets.obj[ivar].title);
 
       /*
       vlistDefVarUnits(vlistID, varID, units[i]);

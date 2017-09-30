@@ -67,7 +67,7 @@ void eca1(const ECA_REQUEST_1 *request)
   zaxisID = vlistInqVarZaxis(ivlistID, FIRST_VAR_ID);
   missval = vlistInqVarMissval(ivlistID, FIRST_VAR_ID);
 
-  varID   = vlistDefVar(ovlistID, gridID, zaxisID, TSTEP_INSTANT);
+  varID   = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARYING);
 
   vlistDefVarMissval(ovlistID, varID, missval);
   
@@ -80,7 +80,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
   if ( IS_SET(request->var2.h2) || IS_SET(request->var2.h3) )
     {
-      varID = vlistDefVar(ovlistID, gridID, zaxisID, TSTEP_INSTANT);
+      varID = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARYING);
   
       vlistDefVarMissval(ovlistID, varID, missval);
 
@@ -322,7 +322,7 @@ void eca1(const ECA_REQUEST_1 *request)
       taxisDefVtime(otaxisID, ovtime);
       pstreamDefTimestep(ostreamID, otsID);
 
-      if ( otsID && vlistInqVarTsteptype(ivlistID, FIRST_VAR_ID) == TSTEP_CONSTANT ) continue;
+      if ( otsID && vlistInqVarTimetype(ivlistID, FIRST_VAR_ID) == TIME_CONSTANT ) continue;
 
       varID = 0;
       for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -439,7 +439,7 @@ void eca2(const ECA_REQUEST_2 *request)
   missval1 = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
   missval2 = vlistInqVarMissval(ivlistID2, FIRST_VAR_ID);
 
-  varID   = vlistDefVar(ovlistID, gridID, zaxisID, TSTEP_INSTANT);
+  varID   = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARYING);
   
   vlistDefVarMissval(ovlistID, varID, missval1);
 
@@ -452,7 +452,7 @@ void eca2(const ECA_REQUEST_2 *request)
 
   if ( IS_SET(request->var2.h2) )
     {
-      varID = vlistDefVar(ovlistID, gridID, zaxisID, TSTEP_INSTANT);
+      varID = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARYING);
   
       vlistDefVarMissval(ovlistID, varID, missval1);
 
@@ -710,7 +710,7 @@ void eca2(const ECA_REQUEST_2 *request)
       taxisDefVtime(otaxisID, ovtime);
       pstreamDefTimestep(ostreamID, otsID);
 
-      if ( otsID && vlistInqVarTsteptype(ivlistID1, FIRST_VAR_ID) == TSTEP_CONSTANT ) continue;
+      if ( otsID && vlistInqVarTimetype(ivlistID1, FIRST_VAR_ID) == TIME_CONSTANT ) continue;
 
       varID = 0;
       for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -828,7 +828,7 @@ void eca3(const ECA_REQUEST_3 *request)
   zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
   missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
 
-  varID   = vlistDefVar(ovlistID, gridID, zaxisID, TSTEP_INSTANT);
+  varID   = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARYING);
 
   vlistDefVarMissval(ovlistID, varID, missval);
   
@@ -962,7 +962,7 @@ void eca3(const ECA_REQUEST_3 *request)
       taxisDefVtime(otaxisID, ovtime);
       pstreamDefTimestep(ostreamID, otsID);
 
-      if ( otsID && vlistInqVarTsteptype(ivlistID1, FIRST_VAR_ID) == TSTEP_CONSTANT ) continue;
+      if ( otsID && vlistInqVarTimetype(ivlistID1, FIRST_VAR_ID) == TIME_CONSTANT ) continue;
 
       varID = 0;
       for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -1026,7 +1026,7 @@ void eca4(const ECA_REQUEST_4 *request)
   int zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
   double missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
 
-  int ovarID1 = vlistDefVar(ovlistID, gridID, zaxisID, TSTEP_INSTANT);
+  int ovarID1 = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARYING);
 
   vlistDefVarMissval(ovlistID, ovarID1, missval);
 
@@ -1034,7 +1034,7 @@ void eca4(const ECA_REQUEST_4 *request)
   if ( IS_SET(request->longname) )  vlistDefVarLongname(ovlistID, ovarID1, request->longname);
   if ( IS_SET(request->units) )     vlistDefVarUnits(ovlistID, ovarID1, request->units);
 
-  int ovarID2 = vlistDefVar(ovlistID, gridID, zaxisID, TSTEP_INSTANT);
+  int ovarID2 = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARYING);
   
   vlistDefVarMissval(ovlistID, ovarID2, missval);
 

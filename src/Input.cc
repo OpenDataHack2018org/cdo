@@ -221,7 +221,7 @@ void *Input(void *argument)
             }
 
 	  vlistID = vlistCreate();
-	  varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+	  varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
 	  vlistDefVarParam(vlistID, varID, cdiEncodeParam(code, 255, 255));
 
 	  missval = vlistInqVarMissval(vlistID, varID);

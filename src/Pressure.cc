@@ -213,7 +213,7 @@ void *Pressure(void *argument)
   double *pdata = (double*) Malloc(gridsize*sizeof(double));
 
   int vlistID2 = vlistCreate();
-  varID = vlistDefVar(vlistID2, gridID, zaxisIDp, TSTEP_INSTANT);
+  varID = vlistDefVar(vlistID2, gridID, zaxisIDp, TIME_VARYING);
   vlistDefVarParam(vlistID2, varID, cdiEncodeParam(1, 255, 255));
   vlistDefVarName(vlistID2, varID, "pressure");
   vlistDefVarStdname(vlistID2, varID, "air_pressure");

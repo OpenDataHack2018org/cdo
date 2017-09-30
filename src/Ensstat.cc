@@ -236,8 +236,8 @@ void *Ensstat(void *argument)
 	  strcat(name, "_count");
 	  int gridID = vlistInqVarGrid(vlistID2, varID);
 	  int zaxisID = vlistInqVarZaxis(vlistID2, varID);
-	  int tsteptype = vlistInqVarTsteptype(vlistID2, varID);
-	  int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, tsteptype);
+	  int timetype = vlistInqVarTimetype(vlistID2, varID);
+	  int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, timetype);
 	  vlistDefVarName(vlistID2, cvarID, name);
 	  vlistDefVarDatatype(vlistID2, cvarID, CDI_DATATYPE_INT16);
 	  if ( cvarID != (varID+nvars) ) cdoAbort("Internal error, varIDs do not match!");

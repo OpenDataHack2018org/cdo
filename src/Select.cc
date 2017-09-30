@@ -257,8 +257,7 @@ void *Select(void *argument)
               gridname = gname;
 
               int tsteptype = vlistInqVarTsteptype(vlistID1, varID);
-              if      ( tsteptype == TSTEP_CONSTANT ) steptype = "constant";
-              else if ( tsteptype == TSTEP_INSTANT  ) steptype = "instant";
+              if      ( tsteptype == TSTEP_INSTANT  ) steptype = "instant";
               else if ( tsteptype == TSTEP_INSTANT2 ) steptype = "instant";
               else if ( tsteptype == TSTEP_INSTANT3 ) steptype = "instant";
               else if ( tsteptype == TSTEP_MIN      ) steptype = "min";
@@ -409,7 +408,7 @@ void *Select(void *argument)
                 {
                   for ( varID = 0; varID < nvars; ++varID )
                     {
-                      if ( vars[varID] == true && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                      if ( vars[varID] == true && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
                         {
                           lcopy_const = true;
                           break;
@@ -446,7 +445,7 @@ void *Select(void *argument)
 	  if ( ntsteps == 1 && nfiles == 1 )
 	    {
 	      for ( varID = 0; varID < nvars2; ++varID )
-		if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
+		if ( vlistInqVarTimetype(vlistID2, varID) != TIME_CONSTANT ) break;
 
 	      if ( varID == nvars2 ) ntsteps = 0;
 	    }
@@ -457,7 +456,7 @@ void *Select(void *argument)
 	    {
               lconstvars = false;
 	      for ( varID = 0; varID < nvars2; ++varID )
-		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+		vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
 	    }
 
 	  // support for negative timestep values
@@ -616,7 +615,7 @@ void *Select(void *argument)
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
                       if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
-                        if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                        if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
                           continue;
 
 		      int varID2   = vlistFindVar(vlistID2, varID);
@@ -653,7 +652,7 @@ void *Select(void *argument)
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
 		      int varID2 = vlistFindVar(vlistID2, varID);
-                      if ( vlistInqVarTsteptype(vlistID2, varID2) == TSTEP_CONSTANT )
+                      if ( vlistInqVarTimetype(vlistID2, varID2) == TIME_CONSTANT )
                         {
                           int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
                           int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));

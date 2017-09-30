@@ -146,7 +146,7 @@ void *Timcount(void *argument)
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
 
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);

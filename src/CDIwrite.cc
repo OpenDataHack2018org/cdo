@@ -199,7 +199,7 @@ void *CDIwrite(void *argument)
 
   for ( i = 0; i < nvars; ++i )
     {
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
       vlistDefVarParam(vlistID, varID, cdiEncodeParam(varID+1, 255, 255));
       //    vlistDefVarName(vlistID, varID, );
     }

@@ -114,7 +114,7 @@ void *Wct(void *argument)
   int vlistID3 = vlistCreate();
   int gridID   = vlistInqVarGrid(vlistID1, FIRST_VAR);
   int zaxisID  = vlistInqVarZaxis(vlistID1, FIRST_VAR);
-  int varID3   = vlistDefVar(vlistID3, gridID, zaxisID, TSTEP_INSTANT);
+  int varID3   = vlistDefVar(vlistID3, gridID, zaxisID, TIME_VARYING);
 
   int taxisID3 = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(taxisID3, TUNIT_MINUTE);

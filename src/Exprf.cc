@@ -104,7 +104,7 @@ paramType *params_new(int vlistID)
     {
       int gridID     = vlistInqVarGrid(vlistID, varID);
       int zaxisID    = vlistInqVarZaxis(vlistID, varID);
-      int steptype   = vlistInqVarTsteptype(vlistID, varID);
+      int steptype   = vlistInqVarTimetype(vlistID, varID);
       int ngp        = gridInqSize(gridID);
       int nlev       = zaxisInqSize(zaxisID);
       double missval = vlistInqVarMissval(vlistID, varID);
@@ -214,7 +214,7 @@ int params_add_ts(parse_param_t *parse_arg)
       params[varID].name     = strdup("_ts");
       params[varID].gridID   = parse_arg->pointID;
       params[varID].zaxisID  = parse_arg->surfaceID;
-      params[varID].steptype = TSTEP_INSTANT;
+      params[varID].steptype = TIME_VARYING;
       params[varID].ngp      = 1;
       params[varID].nlev     = 1;
       
@@ -505,7 +505,7 @@ void *Expr(void *argument)
       pstreamDefTimestep(streamID2, tsID);
 
       for ( int varID = 0; varID < nvars1; varID++ )
-        if ( tsID == 0 || params[varID].steptype != TSTEP_CONSTANT )
+        if ( tsID == 0 || params[varID].steptype != TIME_CONSTANT )
           params[varID].nmiss = 0;
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -540,7 +540,7 @@ void *Expr(void *argument)
 	{
           int pidx = varIDmap[varID];
 
-          if ( tsID > 0 && params[pidx].steptype == TSTEP_CONSTANT ) continue;
+          if ( tsID > 0 && params[pidx].steptype == TIME_CONSTANT ) continue;
 
 	  double missval = vlistInqVarMissval(vlistID2, varID);
 

@@ -925,7 +925,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
   zaxisDefLevels(subzaxisID, zvals); 
 
   struct mapping *var = new_var_mapping(vars);
-  var->cdi_varID = vlistDefVar(vlistID, subgridID, subzaxisID,  TSTEP_INSTANT); 
+  var->cdi_varID = vlistDefVar(vlistID, subgridID, subzaxisID,  TIME_VARYING);
   vlistDefVarName(vlistID, getVarIDToMap(vlistID, nvars+1, key, charvars->values[0]), "ChangedForMap");
   vlistDefVarName(vlistID, var->cdi_varID, charvars->values[0]);
   vlistDefVarDatatype(vlistID, var->cdi_varID,  DATATYPE_FLT64);

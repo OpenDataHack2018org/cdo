@@ -125,7 +125,7 @@ void *Gridcell(void *argument)
   int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
   int vlistID2 = vlistCreate();
-  int varID    = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_CONSTANT);
+  int varID    = vlistDefVar(vlistID2, gridID, zaxisID, TIME_CONSTANT);
   vlistDefNtsteps(vlistID2, 0);
 
   if ( operatorID == GRIDAREA )

@@ -314,8 +314,8 @@ void *Vertintap(void *argument)
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      if ( varinterp[varID] && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
-	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+      if ( varinterp[varID] && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
+	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());

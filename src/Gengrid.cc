@@ -117,7 +117,7 @@ void *Gengrid(void *argument)
   int zaxisID3 = zaxisCreate(ZAXIS_SURFACE, 1);
 
   int vlistID3 = vlistCreate();
-  vlistDefVar(vlistID3, gridID3, zaxisID3, TSTEP_CONSTANT);
+  vlistDefVar(vlistID3, gridID3, zaxisID3, TIME_CONSTANT);
   vlistDefVarMissval(vlistID3, 0, missval);
   vlistDefVarName(vlistID3, 0, "dummy");
   vlistDefVarDatatype(vlistID3, 0, CDI_DATATYPE_INT8);

@@ -98,7 +98,7 @@ void *Splitsel(void *argument)
   int nvars = vlistNvars(vlistID1);
   int nconst = 0;
   for ( varID = 0; varID < nvars; varID++ )
-    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) nconst++;
+    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) nconst++;
 
   if ( nconst )
     {
@@ -106,7 +106,7 @@ void *Splitsel(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 	    {
 	      gridID  = vlistInqVarGrid(vlistID1, varID);
 	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
@@ -141,7 +141,7 @@ void *Splitsel(void *argument)
 	for ( int recID = 0; recID < nrecs; recID++ )
 	  {
 	    pstreamInqRecord(streamID1, &varID, &levelID);
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
               {
                 pstreamReadRecord(streamID1, vars[varID][levelID].ptr, &nmiss);
                 vars[varID][levelID].nmiss = (size_t) nmiss;
@@ -175,7 +175,7 @@ void *Splitsel(void *argument)
 	    {
 	      for ( varID = 0; varID < nvars; varID++ )
 		{
-		  if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+		  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 		    {
 		      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -204,7 +204,7 @@ void *Splitsel(void *argument)
 
 		  if ( tsID == 0 && nconst )
 		    {
-		      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+		      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 			{
 			  gridID  = vlistInqVarGrid(vlistID1, varID);
 			  gridsize = gridInqSize(gridID);
@@ -248,7 +248,7 @@ void *Splitsel(void *argument)
     {
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  if ( vlistInqVarTsteptype(vlistID2, varID) == TSTEP_CONSTANT )
+	  if ( vlistInqVarTimetype(vlistID2, varID) == TIME_CONSTANT )
 	    {
 	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )

@@ -1769,12 +1769,11 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	    vlistInqVarUnits(globs->ivlistID, ivarID, units);
 	  }
 
-        int tsteptype = (globs->Mean) ? TSTEP_AVG : TSTEP_INSTANT;
-
         if ( globs->Mean != 2 )
 	  {
 	    vlistDefTaxis(globs->ovlistID, globs->taxisID2);
-	    ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, tsteptype);
+	    ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, TIME_VARYING);
+            if ( globs->Mean ) vlistDefVarTsteptype(globs->ovlistID, ovarID, TSTEP_AVG);
 	    vlistDefVarCode(globs->ovlistID, ovarID, code);
 	    vars[code].ovarID = ovarID;
 	    vlistDefVarInstitut(globs->ovlistID, ovarID, instID);
@@ -1790,7 +1789,8 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	if ( globs->Mean >= 2 )
 	  {
 	    vlistDefTaxis(globs->ovlistID2, globs->taxisID2);
-	    ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, tsteptype);
+	    ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, TIME_VARYING);
+            if ( globs->Mean ) vlistDefVarTsteptype(globs->ovlistID2, ovarID2, TSTEP_AVG);
 	    vlistDefVarCode(globs->ovlistID2, ovarID2, code);
 	    vars[code].ovarID2 = ovarID2;
 	    vlistDefVarInstitut(globs->ovlistID2, ovarID2, instID);

@@ -290,7 +290,7 @@ void *Sort(void *argument)
 	      levelID = varInfo[vindex].levInfo[lindex].levelID;
 	      nmiss   = varInfo[vindex].levInfo[lindex].nmiss;
 
-	      if ( tsID == 0 || vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT )
+	      if ( tsID == 0 || vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT )
 		{
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 		  offset   = gridsize*levelID;

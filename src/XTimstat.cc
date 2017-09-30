@@ -436,7 +436,7 @@ void *XTimstat(void *argument)
                 field_type *pvars1 = &vars1[varID][levelID];
                 field_type *pvars2 = &vars2[varID][levelID];
 
-		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+		if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
                 farmoq(pvars2, *pvars1);
 	      }
@@ -460,7 +460,7 @@ void *XTimstat(void *argument)
               int levelID = recinfo[recID].levelID;
               field_type *pvars1 = &vars1[varID][levelID];
 
-              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+              if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
               if ( samp1[varID][levelID].ptr == NULL )
                 farcdiv(pvars1, (double)nsets);
@@ -477,7 +477,7 @@ void *XTimstat(void *argument)
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = &vars2[varID][levelID];
 
-              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+              if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
               if ( samp1[varID][levelID].ptr == NULL )
                 {
@@ -507,7 +507,7 @@ void *XTimstat(void *argument)
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[varID][levelID];
 
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
             nwpv     = pvars1->nwpv;
             int gridsize = pvars1->size;
@@ -549,7 +549,7 @@ void *XTimstat(void *argument)
           int levelID = recinfo[recID].levelID;
           field_type *pvars1 = &vars1[varID][levelID];
 
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
           pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, pvars1->ptr,  pvars1->nmiss);
