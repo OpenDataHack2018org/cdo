@@ -963,7 +963,6 @@ void *Gradsdes(void *argument)
   int idmn, idhh, idmm, idyy, iddd;
   int dt=1, iik=0, mdt = 0;
   int gridsize = 0;
-  long checksize = 0;
   int nmiss;
   int prec;
   int map_version = 2;
@@ -1321,7 +1320,7 @@ void *Gradsdes(void *argument)
 
                   if ( map_version != 4 )
                     {
-                      checksize = (long)bignum[index*2] + (long)gridsize*intnum[index]/8;
+                      long checksize = (long)bignum[index*2] + (long)gridsize*intnum[index]/8;
                       if ( checksize < 0L || checksize > 2147483647L )
                         {
                           nrecords -= nrecsout;

@@ -1,7 +1,11 @@
-2017-10-27  Uwe Schulzweida
+2017-10-05  Uwe Schulzweida
 
 	* Using CDI library version 1.9.1
 	* Version 1.9.1 release
+
+2017-10-04  Uwe Schulzweida
+
+	* Added operator setmiss
 
 2017-09-30  Uwe Schulzweida
 

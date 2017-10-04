@@ -50,13 +50,14 @@ void *Arith(void *argument)
   cdoInitialize(argument);
 
   // clang-format off
-  cdoOperatorAdd("add",   func_add,   0, NULL);
-  cdoOperatorAdd("sub",   func_sub,   0, NULL);
-  cdoOperatorAdd("mul",   func_mul,   0, NULL);
-  cdoOperatorAdd("div",   func_div,   0, NULL);
-  cdoOperatorAdd("min",   func_min,   0, NULL);
-  cdoOperatorAdd("max",   func_max,   0, NULL);
-  cdoOperatorAdd("atan2", func_atan2, 0, NULL);
+  cdoOperatorAdd("add",     func_add,     0, NULL);
+  cdoOperatorAdd("sub",     func_sub,     0, NULL);
+  cdoOperatorAdd("mul",     func_mul,     0, NULL);
+  cdoOperatorAdd("div",     func_div,     0, NULL);
+  cdoOperatorAdd("min",     func_min,     0, NULL);
+  cdoOperatorAdd("max",     func_max,     0, NULL);
+  cdoOperatorAdd("atan2",   func_atan2,   0, NULL);
+  cdoOperatorAdd("setmiss", func_setmiss, 0, NULL);
   // clang-format on
 
   int operatorID = cdoOperatorID();

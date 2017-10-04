@@ -212,6 +212,7 @@ void farcstd(field_type *field1, field_type field2, int nsets, int divisor);
 void farmoq(field_type *field1, field_type field2);
 void farmoqw(field_type *field1, field_type field2, double w);
 void faratan2(field_type *field1, field_type field2);
+void farsetmiss(field_type *field1, field_type field2);
 
 void farcount(field_type *field1, field_type field2);
 

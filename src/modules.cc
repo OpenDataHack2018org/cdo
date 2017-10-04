@@ -286,7 +286,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 /* clang-format off */
 #define  AdisitOperators        {"adisit", "adipot"}
 #define  AfterburnerOperators   {"after"}
-#define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
+#define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2", "setmiss"}
 #define  ArithcOperators        {"addc", "subc", "mulc", "divc", "mod"}
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy", "muldoy"}
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
