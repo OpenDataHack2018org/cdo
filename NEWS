@@ -3,13 +3,20 @@ CDO NEWS
 
 Version 1.9.1 (27 September 2017):
 
+   New features:
+     * Added support for NC_FORMAT_CDF5
+     * Extend option --reduce_dim to all dimension for all operators
    New operators:
      * tee - Duplicate a data stream
    Changes operators:
      * eof, eof3d: set default value of environment variable CDO_WEIGHT_MODE to off
+     * sinfo: Added time type
+     * ap2pl: added support for input data on half levels
    Fixed bugs:
+     * selindexbox: breaks uvRelativeToGrid flag [Bug #7901]
+     * expr: AND fall through OR
      * --cmor option doesn't work for lon/lat bounds (introduced in 1.9.0)
-     * eof3d: weight array was allocated for only one level (bug fix)
+     * eof3d: weight array was allocated for only one level
 
 Version 1.9.0 (27 July 2017):
 
