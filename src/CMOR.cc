@@ -3719,7 +3719,7 @@ static void check_for_sfc_pressure(int *ps_index, struct mapping vars[], int vli
       else if ( zaxisInqType(vlistInqVarZaxis(vlistID, vars[j].cdi_varID)) == ZAXIS_HYBRID )
         ps_required ++;
     }
-  if ( ps_index < 0 && ps_required )
+  if ( *ps_index < 0 && ps_required )
     cdoAbort("In writing data with CMOR:\n          No surface pressure found for time step %d but required in Hybrid-sigma-pressure-coordinates. ", timestep);
 }
 
