@@ -6,6 +6,7 @@
 2017-10-04  Uwe Schulzweida
 
 	* Added operator setmiss
+	* CMOR: Fix building error [Bug #7936]
 
 2017-09-30  Uwe Schulzweida
 
