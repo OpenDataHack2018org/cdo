@@ -840,6 +840,7 @@ void *Remap(void *argument)
 	cdoPrint("Extrapolation disabled!");
     }
 
+  // open stream before calling cdoDefineGrid!!!
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   if ( lremapxxx )

@@ -166,6 +166,7 @@ void *Enlargegrid(void *argument)
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
   if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
 
+  // open stream before calling cdoDefineGrid!!!
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int gridID2 = cdoDefineGrid(operatorArgv()[0]);

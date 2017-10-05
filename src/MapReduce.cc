@@ -79,6 +79,7 @@ void *MapReduce(void *argument)
 
   cdoInitialize(argument);
 
+  // open stream before calling cdoDefineGrid!!!
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   /* check input grid type and size - this will be used for selecting relevant

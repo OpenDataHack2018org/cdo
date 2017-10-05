@@ -36,6 +36,7 @@ void *Enlarge(void *argument)
 
   operatorCheckArgc(1);
 
+  // open stream before calling cdoDefineGrid!!!
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int gridID2 = cdoDefineGrid(operatorArgv()[0]);

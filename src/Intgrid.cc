@@ -304,6 +304,7 @@ void *Intgrid(void *argument)
 
   int operatorID = cdoOperatorID();
 
+  // open stream before calling cdoDefineGrid!!!
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )
