@@ -25,7 +25,7 @@
 
    =============================================================================
    Created:  04/08/2010 11:58:01 AM
-    Author:  Ralf Mueller (ram), ralf.mueller@zmaw.de
+    Author:  Ralf Mueller (ram), ralf.mueller@mpimet.mpg.de
    Company:  Max-Planck-Institute for Meteorology
    =============================================================================
  */

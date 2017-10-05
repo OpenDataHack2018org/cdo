@@ -4,7 +4,7 @@ package:
 
 source:
   fn: cdo-1.6.7.tar.gz
-  url: https://code.zmaw.de/attachments/download/9444/cdo-1.6.7.tar.gz
+  url: https://code.mpimet.mpg.de/attachments/download/9444/cdo-1.6.7.tar.gz
   md5: 101f66b481903d7edfc134811f82b226 
 
 build:
@@ -28,5 +28,5 @@ test:
     - cdo -h
 
 about:
-  home: https://code.zmaw.de/projects/cdo
+  home: https://code.mpimet.mpg.de/projects/cdo
   license: GNU General Public License v2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)

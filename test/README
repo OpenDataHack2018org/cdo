@@ -11,7 +11,7 @@ or
 The cdo operators are tested with python-unittests using the python-bindings for cdo.
 The python-bindings are located at cdo/contrib/python/cdo.py.
 The use is roughly exlained at:
-    https://code.zmaw.de/projects/cdo/wiki/Cdo%7Brbpy%7D
+    https://code.mpimet.mpg.de/projects/cdo/wiki/Cdo%7Brbpy%7D
     TODO: Provide a more thorough documentation/tutorial.
 The documentation of the python unittest framework can be found at:
     http://docs.python.org/library/unittest.html
