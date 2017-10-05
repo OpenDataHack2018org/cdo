@@ -52,7 +52,7 @@ list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *m
               keyValues_t *kvcn = kvlist_search(kvlist, key);
               if ( kvcn && kvcn->nvalues > 0 && *(kvcn->values[0]) == *cmorname && strcmp(kvcn->values[0], cmorname) == 0 )
                 {
-                  keyValues_t *kvmt = kvlist_search(kvlist, "mip_table");
+                  keyValues_t *kvmt = kvlist_search(kvlist, "project_mip_table");
                   if ( ( kvmt && kvmt->nvalues > 0 && *(kvmt->values[0]) == *miptab && strcmp(kvmt->values[0], miptab) == 0 ) || !kvmt )
                     return kvlist;
                   else
@@ -64,7 +64,7 @@ list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *m
       if ( listlatest )
         {
           if ( cdoVerbose )
-            cdoPrint("No attribute 'mip_table' found in mapping table line for cmorname '%s'.\n          The latest line of the mapping table is used.", cmorname);
+            cdoPrint("No attribute 'project_mip_table' found in mapping table line for cmorname '%s'.\n          The latest line of the mapping table is used.", cmorname);
           return listlatest;
         }
     }
@@ -282,6 +282,14 @@ static int parse_line_to_list(list_t *list, char *pline, const char *kvlname, in
       pline = getElementName(pline, name, &errh);
       if ( strcmp(name, "conventions") == 0 )
         strcpy(name, "Conventions");
+      if ( strcmp(name, "cn") == 0 )
+        strcpy(name, "cmor_name");
+      if ( strcmp(name, "c") == 0 )
+        strcpy(name, "code");
+      if ( strcmp(name, "n") == 0 )
+        strcpy(name, "name");
+      if ( strcmp(name, "pmt") == 0 )
+        strcpy(name, "project_mip_table");
       if ( strcmp(name, "cordex_domain") == 0 )
         strcpy(name, "CORDEX_domain");
       if ( errh > 0 )
@@ -555,7 +563,7 @@ static void map_it(list_t *kvl, int vlistID, int varID, char *var2map)
       const char *key = ( check_short_key((char *)kv->key ) ) ? check_short_key((char *)kv->key) : NULL;
       if ( !key )
         {
-          if ( strcmp(kv->key, "mip_table") != 0 )
+          if ( strcmp(kv->key, "project_mip_table") != 0 )
             cdoWarning("In variable mapping:\n           you try to assign '%s' to variable '%s'.\n          This mapping table keyword is skipped. Check allowed mapping table keywords.", kv->key, var2map);
           continue;
          }
@@ -1013,7 +1021,8 @@ static int file_exist(const char *tfilename, int force, const char *fileart)
   
 static int parse_kv_file(list_t *kvl, const char *filename)
 {
-  file_exist(filename, 1, "Configuration");
+  if ( file_exist(filename, 0, "configuration") == 0 )
+    return 0;
 
   FILE *fp = fopen(filename, "r");
   size_t filesize = fileSize(filename);
@@ -1103,13 +1112,13 @@ static void attErr(const char **reqAtt, int errnum)
 static int check_attr(list_t *kvl, char *project_id)
 {
 /* Project id moved to main void fct */
-  const char *reqAtt[] = {"institution", "contact", "model_id", "source",
-            "experiment_id", "required_time_units", NULL};
+  const char *reqAtt[] = {"institution", "source", "experiment_id", "required_time_units", NULL};
+  const char *reqAttCMOR2[] = {"contact", "model_id", NULL};  
   const char *reqAttCMIP5[] = {"institute_id", "product", "member", NULL};
   const char *reqAttCMIP5CMOR3[] = {"modeling_realm", NULL};
   const char *reqAttCORDEX[] = {"institute_id", "product", "member", "CORDEX_domain", "driving_model_id", NULL};
-  const char *reqAttCMIP6CMOR3[] = {"outpath", "output_path_template", "output_file_template", "tracking_prefix", NULL};
-  const char *reqAttCMIP6[] = {"Conventions", "activity_id", "experiment", "further_info_url", "grid", "grid_label", "institution_id", "license", "mip_era", "nominal_resolution", "product", "source_id", "source_type", "variant_label", NULL};
+/*  const char *reqAttCMIP6CMOR3[] = {"outpath", "output_path_template", "output_file_template", "tracking_prefix", NULL}; */
+  const char *reqAttCMIP6[] = {"activity_id", "experiment", "further_info_url", "grid", "grid_label", "institution_id", "license", "nominal_resolution", "source_id", "source_type", "variant_label", NULL};
   const char *expdepAttCMIP6[] = {"parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label", "parent_time_units", "sub_experiment", "sub_experiment_id", "branch_method", NULL};
 /* In all Projects needed Attributes are tested first */
 
@@ -1119,6 +1128,7 @@ static int check_attr(list_t *kvl, char *project_id)
 /* Set default attributes */
   keyValues_t *kv = kvlist_search(kvl, "references");
 
+#if ( CMOR_VERSION_MAJOR == 2 )
   if ( !kv || strcmp(kv->key, "notSet") == 0 )
     {
       keyValues_t *kv_model_id = kvlist_search(kvl, "model_id");
@@ -1129,7 +1139,9 @@ static int check_attr(list_t *kvl, char *project_id)
       kv_insert_a_val(kvl, "references", references, 1);
       Free(references);
     }
-
+  if ( ( errnum = check_attarray(kvl, reqAttCMOR2) ) != -1 )
+    attErr(reqAttCMOR2, errnum);
+#endif
 /* Special check for CMIP or CORDEX projects */
   if ( strcmp(project_id, "CMIP5") == 0 )
     {
@@ -1401,7 +1413,7 @@ static void read_config_files(list_t *kvl)
 
   /* Config file in user's $cwd directory. */
   char cwd[1024];
-  getcwd(cwd, sizeof(cwd));
+  char *dummy =getcwd(cwd, sizeof(cwd));
   const char *dotconfig = ".cdocmorinfo";
   char *workfile = (char *)Malloc((strlen(cwd) + strlen(dotconfig) + 2 ) * sizeof(char));
   sprintf(workfile, "%s/%s", cwd, dotconfig);
@@ -1580,7 +1592,7 @@ static char *get_time_units(int taxisID)
        timeunit == TUNIT_12HOURS )
     timeunit = TUNIT_HOUR;
 
-  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d\0", tunitNamePtr(timeunit),
+  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d", tunitNamePtr(timeunit),
           year, month, day, hour, minute, second);
   return units;
 }
@@ -1843,13 +1855,12 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       char *filename = kv_get_a_val(kvl, "dj", NULL); */
 
       char cwd[1024];
-      getcwd(cwd, sizeof(cwd));
-      char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 3) * sizeof(char));;
+      char *dummy =getcwd(cwd, sizeof(cwd));
+      char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 7) * sizeof(char));;
       FILE *dataset_json;
       int procID = getpid();
 
-      sprintf(dataset_path, "%s/dataset%d.json\0", cwd,procID);
-
+      sprintf(dataset_path, "%s/dataset%d.json", cwd,procID);
       dataset_json = fopen(dataset_path, "w+");
       if ( !dataset_json )
         cdoAbort("In preparing cmor_dataset:\n          Could not open a dataset file '%s' for cmor_dataset.", dataset_path);
@@ -1863,7 +1874,6 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 "_cmip6_option", "Conventions", "activity_id", "branch_method", "experiment", "experiment_id", "forcing_index", "further_info_url", "grid", "grid_label", "initialization_index", "institution", "institution_id", "license", "mip_era", "nominal_resolution", "physics_index", "product", "realization_index", "source", "source_id", "source_type", "sub_experiment", "sub_experiment_id", "table_id", "variant_label", "parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label",
 "parent_time_units", NULL};
       int i = 0;
-
       while ( allneeded[i] )
         {
           char *tmp = kv_get_a_val(kvl, allneeded[i], "notSet");
@@ -1947,6 +1957,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       Free(branch_time_in_child);
 /*      Free(freq); */
     }
+
 #else
     cdoAbort("Cmor version %d not yet enabled!", (int) CMOR_VERSION_MAJOR);
 #endif
@@ -2062,11 +2073,11 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           char blanks[maxlen];
           for ( int i = 0; i < maxlen; i++)
             blanks[i] = ' ';
-          sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[0]), blanks);         
+          sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, (int) (maxlen-strlen(charvals[0])), blanks);         
           for ( int i = 1; i < numchar; i++ )
             {
               sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
-              sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[i]), blanks);         
+              sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, (int) (maxlen-strlen(charvals[i])), blanks);         
             }
           if ( numchar == zsize )
             cmf = cmor_axis(new_axis_id(axis_ids), chardim, (char *)"", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
@@ -2409,9 +2420,9 @@ static void get_cmor_table(list_t *kvl, char *project_id)
   if ( mip_table_dir && project_id )
     {
 #if ( CMOR_VERSION_MAJOR == 2 )
-      sprintf(gridtable, "%s/%s_grids\0", mip_table_dir, project_id);
+      sprintf(gridtable, "%s/%s_grids", mip_table_dir, project_id);
 #elif ( CMOR_VERSION_MAJOR == 3 )
-      sprintf(gridtable, "%s/%s_grids.json\0", mip_table_dir, project_id);
+      sprintf(gridtable, "%s/%s_grids.json", mip_table_dir, project_id);
 #endif
       if ( file_exist(gridtable, 0, "Cmor-grid_table") )  
         {
@@ -2757,15 +2768,15 @@ static void register_char_axis(int numchar, char **charvals, int *axis_ids, char
 {
   int maxlen = get_strmaxlen(charvals, numchar);
   void *charcmor = (void *) Malloc ( numchar * maxlen * sizeof(char));
-  sprintf((char *)charcmor, "%.*s", strlen(charvals[0]), charvals[0]);
+  sprintf((char *)charcmor, "%.*s", (int) strlen(charvals[0]), charvals[0]);
   char blanks[maxlen];
   for ( int i = 0; i < maxlen; i++)
     blanks[i] = ' ';
-  sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[0]), blanks);
+  sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, (int) (maxlen-strlen(charvals[0])), blanks);
   for ( int i = 1; i < numchar; i++ )
     {
       sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
-      sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[i]), blanks);   
+      sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, (int) (maxlen-strlen(charvals[i])), blanks);   
     }
   int cmf = cmor_axis(new_axis_id(axis_ids), chardim, (char *) "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
   if ( cmf != 0 )
@@ -3424,21 +3435,22 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
           cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummytwo);
 
           double covered_years = lyear-fyear + 1.0;
-          if ( DBL_IS_EQUAL(ntsteps / covered_years, 1) )
+          double ntperyr = (double) (ntsteps / covered_years);
+          if ( DBL_IS_EQUAL(ntperyr, (double) 1) )
             strcpy(frequency, "yr");
-          else if ( DBL_IS_EQUAL(ntsteps / covered_years, 12) )
+          else if ( DBL_IS_EQUAL(ntperyr, (double) 12) )
             strcpy(frequency, "mon");
-          else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365) ||
-                    DBL_IS_EQUAL(ntsteps / covered_years, 365.25) ||
-                    DBL_IS_EQUAL(ntsteps / covered_years, 366) )
+          else if ( DBL_IS_EQUAL(ntperyr, (double) 365) ||
+                    DBL_IS_EQUAL(ntperyr, (double) 365.25) ||
+                    DBL_IS_EQUAL(ntperyr, (double) 366) )
             strcpy(frequency, "day");
-          else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365*4) ||
-                    DBL_IS_EQUAL(ntsteps / covered_years, 365.25*4) ||
-                    DBL_IS_EQUAL(ntsteps / covered_years, 366*4) )
+          else if ( DBL_IS_EQUAL(ntperyr, (double) 365*4) ||
+                    DBL_IS_EQUAL(ntperyr, (double) 365.25*4) ||
+                    DBL_IS_EQUAL(ntperyr, (double) 366*4) )
             strcpy(frequency, "6hr");
-          else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365*8) ||
-                    DBL_IS_EQUAL(ntsteps / covered_years, 365.25*8) ||
-                    DBL_IS_EQUAL(ntsteps / covered_years, 366*8) )
+          else if ( DBL_IS_EQUAL(ntperyr, (double) 365*8) ||
+                    DBL_IS_EQUAL(ntperyr, (double) 365.25*8) ||
+                    DBL_IS_EQUAL(ntperyr, (double) 366*8) )
             strcpy(frequency, "3hr");
           else 
             {
@@ -3719,7 +3731,7 @@ static void check_for_sfc_pressure(int *ps_index, struct mapping vars[], int vli
       else if ( zaxisInqType(vlistInqVarZaxis(vlistID, vars[j].cdi_varID)) == ZAXIS_HYBRID )
         ps_required ++;
     }
-  if ( ps_index < 0 && ps_required )
+  if ( *ps_index < 0 && ps_required )
     cdoAbort("In writing data with CMOR:\n          No surface pressure found for time step %d but required in Hybrid-sigma-pressure-coordinates. ", timestep);
 }
 
@@ -3936,7 +3948,7 @@ static char **get_chunk_des_files(list_t *kvl, struct mapping vars[], char *mipt
       else
         vlistInqVarName(vlistID, vars[j].cdi_varID, name);
       chunk_des_files[j] = (char *) Malloc(CMOR_MAX_STRING * sizeof(char));
-      sprintf(chunk_des_files[j], "CHUNK_FILE_%s_%s.txt\0", name, trunk);
+      sprintf(chunk_des_files[j], "CHUNK_FILE_%s_%s.txt", name, trunk);
       Free(name);
     }
   return chunk_des_files;  
@@ -4112,7 +4124,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                       void *dataslice = (void *) Malloc(gridsize * zsize * sizeof(double));
                       for ( int j = 0; j < gridsize * zsize; j++ )
                         ((double *)dataslice)[j] = ((double *)vars[i].data)[(tsID-1)*gridsize*zsize+j];
-                      #if ( CMOR_VERSION_MAJOR == 2 )
+ /*                     #if ( CMOR_VERSION_MAJOR == 2 ) */
                         cmf = cmor_write(vars[i].cmor_varID,
                        dataslice,
                        vars[i].datatype,
@@ -4122,7 +4134,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        time_bndsp,
                        NULL);
                       Free(dataslice);
-                      #elif ( CMOR_VERSION_MAJOR == 3 )
+/*                      #elif ( CMOR_VERSION_MAJOR == 3 ) 
                         cmf = cmor_write(vars[i].cmor_varID,
                        dataslice,
                        vars[i].datatype,
@@ -4131,11 +4143,11 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        time_bndsp,
                        NULL);
                       Free(dataslice);
-                      #endif
+                      #endif */
                     } 
                   else
                     {
-                      #if ( CMOR_VERSION_MAJOR == 2 )
+ /*                     #if ( CMOR_VERSION_MAJOR == 2 ) */
                         cmf = cmor_write(vars[i].cmor_varID,
                      vars[i].data,
                      vars[i].datatype,
@@ -4144,7 +4156,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                      &time_val,
                      time_bndsp,
                      NULL); 
-                      #elif ( CMOR_VERSION_MAJOR == 3 )
+/*                      #elif ( CMOR_VERSION_MAJOR == 3 )
                         cmf = cmor_write(vars[i].cmor_varID,
                      vars[i].data,
                      vars[i].datatype,
@@ -4152,11 +4164,11 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                      &time_val,
                      time_bndsp,
                      NULL); 
-                      #endif
+                      #endif */
                     }
                   if ( vars[i].zfactor_id > 0 )
                     {
-                      #if ( CMOR_VERSION_MAJOR == 2 )
+ /*                     #if ( CMOR_VERSION_MAJOR == 2 ) */
                         cmf = cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
@@ -4165,7 +4177,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        &time_val,
                        time_bndsp,
                        &vars[i].cmor_varID);
-                     #elif ( CMOR_VERSION_MAJOR == 3 )
+/*                     #elif ( CMOR_VERSION_MAJOR == 3 )
                         cmf = cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
@@ -4173,28 +4185,29 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        &time_val,
                        time_bndsp,
                        &vars[i].cmor_varID);
-                     #endif
+                     #endif */
                     }
                 }
               else
                 {
-                  #if ( CMOR_VERSION_MAJOR == 2 )
+ /*                     #if ( CMOR_VERSION_MAJOR == 2 ) */
                     cmf = cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
                    chunk_files[i], 0, 0, 0, NULL);
-                  #elif ( CMOR_VERSION_MAJOR == 3 )
+/*                  #elif ( CMOR_VERSION_MAJOR == 3 )
                     cmf = cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
                    0, 0, 0, NULL);
-                  #endif 
+                  #endif */
                 }
             }
+          if ( cmf != 0 )
+            cdoAbort("Function cmor_write failed!");
         }
     }
-  if ( cmf != 0 )
-    cdoAbort("Function cmor_write failed!");
+
   if ( cdoVerbose )
     cdoPrint("10.4. Successfully looped over time steps.");
   if ( cdoVerbose )
@@ -4337,7 +4350,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
   if ( maptab && maptabdir ) if ( maptab[0] != '/' )
     {
       maptabbuild = (char *) Malloc((strlen(maptab)+strlen(maptabdir)+2) * sizeof(char));
-      sprintf(maptabbuild, "%s/%s\0", maptabdir, maptab);
+      sprintf(maptabbuild, "%s/%s", maptabdir, maptab);
     }
   if ( maptab )
     {
@@ -4576,12 +4589,12 @@ static char *get_mip_table(char *params, list_t *kvl, char *project_id)
 #if ( CMOR_VERSION_MAJOR == 2 )
           {
           miptab = (char *)Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
-          sprintf(miptab, "%s/%s_%s\0", miptabdir, project_id, params);
+          sprintf(miptab, "%s/%s_%s", miptabdir, project_id, params);
           }
 #elif ( CMOR_VERSION_MAJOR == 3 )
           {
           miptab = (char *)Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+8) * sizeof(char));
-          sprintf(miptab, "%s/%s_%s.json\0", miptabdir, project_id, params);
+          sprintf(miptab, "%s/%s_%s.json", miptabdir, project_id, params);
           }
 #endif
           file_exist(miptab, 1, "MIP table");
@@ -4720,10 +4733,10 @@ static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, 
 static void removeDataset()
 {
   char cwd[1024];
-  getcwd(cwd, sizeof(cwd));
+  char *dummy = getcwd(cwd, sizeof(cwd));
   int procID = getpid();
-  char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 3) * sizeof(char));;
-  sprintf(dataset_path, "%s/dataset%d.json\0", cwd, procID);
+  char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 6) * sizeof(char));;
+  sprintf(dataset_path, "%s/dataset%d.json", cwd, procID);
   remove(dataset_path);
 }
 #endif
@@ -4735,13 +4748,14 @@ void *CMOR(void *argument)
 #if defined(HAVE_LIBCMOR)
   signal(SIGTERM, sigfunc);
   int nparams = operatorArgc();
+
+  if ( nparams < 1 ) cdoAbort("Too few arguments!");
+
   char **params = operatorArgv();
   char *miptableInput = strdup(params[0]);
 
   /* Definition of pml: */
   list_t *pml = list_new(sizeof(list_t *), free_kvlist, "pml");
-
-  if ( nparams < 1 ) cdoAbort("Too few arguments!");
 
   /* Define kvl and read cmdline */
   parse_cmdline(pml, params, nparams, "cmdline");
