@@ -507,7 +507,6 @@ void farsetmiss(field_type *field1, field_type field2)
   int grid2 = field2.grid;
   int nmiss1 = field1->nmiss;
   double missval1 = field1->missval;
-  double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;
   const double *restrict array2 = field2.ptr;
 
