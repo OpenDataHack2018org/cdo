@@ -74,11 +74,6 @@ void *Detrend(void *argument)
   double missval;
   field_type ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
-  typedef struct
-  {
-    double *array1;
-    double *array2;
-  } memory_t;
 
   cdoInitialize(argument);
 
