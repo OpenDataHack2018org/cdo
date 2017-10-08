@@ -34,7 +34,7 @@ void *Diff(void *argument)
   int nrecs, nrecs2;
   int varID1, varID2;
   int levelID;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
   char varname[CDI_MAX_NAME];
   char paramstr[32];

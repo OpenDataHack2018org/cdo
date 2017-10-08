@@ -3680,7 +3680,7 @@ static void read_record(int streamID, struct mapping vars[], int vlistID)
       int latdim = gridInqYsize(gridID);
       int levdim = zaxisInqSize(zaxisID);
       int chardim = gridsize/latdim;
-      int nmiss;
+      size_t nmiss;
       pstreamReadRecord(streamID, buffer, &nmiss);
       for ( size_t i = 0; i < gridsize; i++ )
         {

@@ -43,7 +43,7 @@ typedef struct
 {
   int streamID;
   int vlistID;
-  int nmiss[2];
+  size_t nmiss[2];
   double missval[2];
   double *array[2];
 } ens_file_t;
@@ -87,7 +87,7 @@ void *ensstat_func(void *ensarg)
   int gridsize = gridInqSize(gridID);
   double missval = vlistInqVarMissval(arg->vlistID1, arg->varID[t]);
 
-  int nmiss = 0;
+  size_t nmiss = 0;
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif

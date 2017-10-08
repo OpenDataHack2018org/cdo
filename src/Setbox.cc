@@ -64,7 +64,7 @@ void *Setbox(void *argument)
   int vlistID1, vlistID2;
   int gridID = -1;
   int index, ngrids, gridtype;
-  int nmiss;
+  size_t nmiss;
   int *vars;
   int i;
   int ndiffgrids;

@@ -44,7 +44,7 @@ void *Zonstat(void *argument)
   int gridID1 = -1, gridID2 = -1;
   int zongridID = -1;
   int index;
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   int varID, levelID;
 

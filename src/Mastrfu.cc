@@ -30,7 +30,7 @@
 
 
 static
-void mastrfu(int gridID, int zaxisID, double *array1, double *array2, int nmiss, double missval)
+void mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, double missval)
 {
   int ilev, ilat, n;
   double fact =  4*atan(1.0) * 6371000 / 9.81;
@@ -109,7 +109,7 @@ void *Mastrfu(void *argument)
   int nrecs;
   int varID, levelID;
   int offset;
-  int nmiss, nmiss1;
+  size_t nmiss, nmiss1;
 
   cdoInitialize(argument);
 

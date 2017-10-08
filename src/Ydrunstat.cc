@@ -64,7 +64,7 @@ void *Ydrunstat(void *argument)
   int levelID;
   int tsID;
   int inp, its;
-  int nmiss;
+  size_t nmiss;
     
   cdoInitialize(argument);
 

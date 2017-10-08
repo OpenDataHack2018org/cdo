@@ -34,7 +34,7 @@ void *Cond2(void *argument)
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   int offset;
-  int nmiss1, nmiss2, nmiss3, nmiss4;
+  size_t nmiss1, nmiss2, nmiss3, nmiss4;
   int i;
   double missval1 = -9.E33;
   double missval2 = -9.E33;

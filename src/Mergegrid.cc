@@ -160,7 +160,7 @@ void *Mergegrid(void *argument)
 {
   int varID, levelID;
   int nrecs = 0;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   int index;
 
   cdoInitialize(argument);

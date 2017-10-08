@@ -36,7 +36,7 @@ void *Cat(void *argument)
   int streamID2 = CDI_UNDEFID;
   int vlistID2 = CDI_UNDEFID;
   int taxisID2 = CDI_UNDEFID;
-  int nmiss;
+  size_t nmiss;
   double tw0 = 0, tw = 0;
   double *array = NULL;
 

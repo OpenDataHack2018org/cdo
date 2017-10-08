@@ -69,7 +69,7 @@ void *Trms(void *argument)
   int code = 0, oldcode = 0;
   int zaxisID;
   int nrecs;
-  int nmiss;
+  size_t nmiss;
   int varID, levelID;
   int pcode = 152, pvarID = -1;
   long offset;

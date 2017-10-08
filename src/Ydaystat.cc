@@ -45,7 +45,7 @@ void *Ydaystat(void *argument)
   int year, month, day;
   int nrecs;
   int dayoy_nsets[MAX_DOY];
-  int nmiss;
+  size_t nmiss;
   int vdates[MAX_DOY], vtimes[MAX_DOY];
   field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 

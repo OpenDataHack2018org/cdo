@@ -35,7 +35,7 @@ void *Monarith(void *argument)
   int nrecs, nrecs2, nlev;
   int varID, levelID;
   int offset;
-  int nmiss;
+  size_t nmiss;
   int yearmon2 = -1;
 
   cdoInitialize(argument);

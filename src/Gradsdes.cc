@@ -963,7 +963,7 @@ void *Gradsdes(void *argument)
   int idmn, idhh, idmm, idyy, iddd;
   int dt=1, iik=0, mdt = 0;
   int gridsize = 0;
-  int nmiss;
+  size_t nmiss;
   int prec;
   int map_version = 2;
   int maxrecs = 0;

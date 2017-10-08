@@ -188,7 +188,7 @@ int define_level(dsets_t *pfi, int nlev)
 void *Importbinary(void *argument)
 {
   int i;
-  int nmiss = 0, n_nan;
+  size_t nmiss = 0, n_nan;
   int ivar;
   int varID = -1, levelID, tsID;
   int gridsize;

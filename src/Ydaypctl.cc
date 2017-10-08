@@ -40,7 +40,7 @@ void *Ydaypctl(void *argument)
   int year, month, day, dayoy;
   int nrecs;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY];

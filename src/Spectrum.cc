@@ -169,7 +169,7 @@ void *Spectrum(void *argument)
   int gridID, varID, levelID;
   int i, k;
   int nalloc = 0;
-  int nmiss;
+  size_t nmiss;
   int nlevel;
   int *vdate = NULL, *vtime = NULL;
   int freq;

@@ -263,7 +263,7 @@ void *Info(void *argument)
   int fpeRaised = 0;
   int varID, levelID;
   int nrecs;
-  int nmiss;
+  size_t nmiss;
   long imiss = 0;
   char varname[CDI_MAX_NAME];
   char paramstr[32];

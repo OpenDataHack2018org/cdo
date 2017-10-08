@@ -444,7 +444,7 @@ void *Sethalo(void *argument)
   int gridsize, gridsize2;
   int gridID1 = -1, gridID2;
   int index, gridtype;
-  int nmiss;
+  size_t nmiss;
   int i;
   int lhalo = 0, rhalo = 0;
   double missval;

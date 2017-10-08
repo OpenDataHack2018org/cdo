@@ -391,7 +391,7 @@ static
 void *after_readTimestep(void *arg)
 {
   int varID, gridID, zaxisID, levelID, timeID;
-  int nmiss;
+  size_t nmiss;
   RARG *rarg = (RARG *) arg;
 
   int nrecs        = rarg->nrecs;

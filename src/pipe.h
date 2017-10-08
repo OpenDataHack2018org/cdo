@@ -63,7 +63,7 @@ public:
   int nrecs;
   int varID, levelID;
   int recIDr, recIDw, tsIDr, tsIDw;
-  int nmiss;
+  size_t nmiss;
   double *data;
   // pstream_t *pstreamptr_in;
   /* unsigned long */ off_t nvals;

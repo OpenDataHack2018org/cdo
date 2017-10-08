@@ -55,7 +55,7 @@ void *Split(void *argument)
   char filesuffix[32];
   char filename[8192];
   int nsplit = 0;
-  int nmiss;
+  size_t nmiss;
   bool swap_obase = false;
   const char *uuid_attribute = NULL;
 

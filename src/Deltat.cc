@@ -31,7 +31,7 @@
 void *Deltat(void *argument)
 {
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

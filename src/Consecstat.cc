@@ -127,7 +127,7 @@ void *Consecstat(void *argument)
   int nrecs;
   int varID;
   int levelID, nlevels;
-  int nmiss;
+  size_t nmiss;
   double refval = 0.0;
 
   cdoInitialize(argument);

@@ -30,7 +30,7 @@ void *CDItest(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int max_copy = 3;
   double s_utime, s_stime;
   double e_utime, e_stime;

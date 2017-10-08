@@ -30,7 +30,7 @@
 void *Gengrid(void *argument)
 {
   int varID, levelID;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   double missval = 0;
 
   cdoInitialize(argument);

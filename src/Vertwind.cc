@@ -37,7 +37,7 @@ void *Vertwind(void *argument)
   int nrecs;
   int varID, levelID;
   int nvct = 0;
-  int nmiss;
+  size_t nmiss;
   int tempID = -1, sqID = -1, psID = -1, omegaID = -1;
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
@@ -214,7 +214,7 @@ void *Vertwind(void *argument)
 	{
 	  size_t offset = (size_t)levelID*gridsize;
 
-	  int nmiss_out = 0;
+	  size_t nmiss_out = 0;
 	  for ( int i = 0; i < gridsize; i++ )
             if ( DBL_IS_EQUAL(wms[offset+i],missval_out) )
 	      nmiss_out++;

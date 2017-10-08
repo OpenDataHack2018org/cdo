@@ -34,7 +34,7 @@ void *Seascount(void *argument)
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int year, month, day, seas0 = 0;
   int oldmon = 0;
 

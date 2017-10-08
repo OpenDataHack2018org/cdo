@@ -54,7 +54,8 @@ void readNcFile(const char path[], double **vars, int nvars, int nts)
 {
   int taxisID;
   int vlistID, varID, streamID, tsID;
-  int nmiss, nrecs;
+  size_t nmiss;
+  int nrecs;
   
   streamID = streamOpenRead(path);
   if ( streamID < 0 )
@@ -93,7 +94,7 @@ void writeNcFile(const char path[], const double array[], int length)
 {
   int gridID, zaxisID, taxisID;
   int vlistID, varID, streamID, tsID;
-  int nmiss;
+  size_t nmiss;
   
   double lons[] = {0.0};
   double lats[] = {0.0};

@@ -33,7 +33,7 @@ void *Splitsel(void *argument)
   int nrecs = 0;
   int varID, levelID;
   int tsID;
-  int nmiss;
+  size_t nmiss;
   int gridID;
   int nlevel;
   int i2 = 0;

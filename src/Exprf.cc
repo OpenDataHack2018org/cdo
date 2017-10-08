@@ -516,7 +516,7 @@ void *Expr(void *argument)
 	    {
 	      size_t offset = params[varID].ngp*levelID;
 	      double *vardata = params[varID].data + offset;
-              int nmiss;
+              size_t nmiss;
 	      pstreamReadRecord(streamID1, vardata, &nmiss);
 	      params[varID].nmiss += nmiss;
 	    }
@@ -551,7 +551,7 @@ void *Expr(void *argument)
               size_t offset = ngp*levelID;
 	      double *vardata = params[pidx].data + offset;
 
-	      int nmiss = 0;
+	      size_t nmiss = 0;
 	      for ( size_t i = 0; i < ngp; i++ )
 		if ( DBL_IS_EQUAL(vardata[i], missval) ) nmiss++;
 

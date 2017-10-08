@@ -66,7 +66,7 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
       
       pstreamDefRecord(streamID, varID, 0);
 
-      int nmiss = 0;
+      size_t nmiss = 0;
       for ( int i = 0; i < gridsize; ++i )
 	if ( DBL_IS_EQUAL(data[varID][i], missval) ) nmiss++;
       

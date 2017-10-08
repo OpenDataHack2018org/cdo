@@ -34,7 +34,7 @@ void *Pardup(void *argument)
   int varID, varID2, levelID;
   long offset;
   int nmul = 0;
-  int nmiss;
+  size_t nmiss;
   int nlevel;
   double *single;
 

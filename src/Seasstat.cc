@@ -45,7 +45,7 @@ void *Seasstat(void *argument)
   int nrecs;
   int varID, levelID;
   int year, month, day, seas0 = 0;
-  int nmiss;
+  size_t nmiss;
   int oldmon = 0;
   int nseason = 0;
   const char *seas_name[4];

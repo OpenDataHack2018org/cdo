@@ -35,7 +35,7 @@ void *Timselpctl(void *argument)
   int nrecs = 0;
   int gridID, varID, levelID;
   int tsID;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
 
   cdoInitialize(argument);

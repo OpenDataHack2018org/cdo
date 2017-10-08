@@ -43,7 +43,7 @@ void *Ymonarith(void *argument)
   int nrecs, nlev;
   int varID, levelID;
   int offset;
-  int nmiss;
+  size_t nmiss;
   int vdate, year, mon, day;
   int **varnmiss2[MAX_MON];
   double **vardata2[MAX_MON];

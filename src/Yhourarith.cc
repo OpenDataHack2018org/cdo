@@ -64,7 +64,7 @@ void *Yhourarith(void *argument)
   int varID, levelID;
   int offset;
   int vdate, vtime;
-  int nmiss;
+  size_t nmiss;
   int houroy;
   int **varnmiss2[MAX_HOUR];
   double **vardata2[MAX_HOUR];

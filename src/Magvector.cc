@@ -316,7 +316,7 @@ void *Magvector(void *argument)
 #if defined(HAVE_LIBMAGICS)
   int nrecs;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   char varname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
   char vdatestr[32],vtimestr[32],datetimestr[64];

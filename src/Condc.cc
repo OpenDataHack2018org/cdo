@@ -33,7 +33,7 @@ void *Condc(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss, nmiss2;
+  size_t nmiss, nmiss2;
   int i;
   double missval;
 

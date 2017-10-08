@@ -40,7 +40,7 @@ void *Runstat(void *argument)
   int timestat_date = TIMESTAT_MEAN;
   int varID;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int runstat_nomiss = 0;
 
   cdoInitialize(argument);

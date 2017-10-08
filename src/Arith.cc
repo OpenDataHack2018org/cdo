@@ -37,7 +37,7 @@ void *Arith(void *argument)
 {
   enum {FILL_NONE, FILL_TS, FILL_VAR, FILL_VARTS, FILL_FILE};
   int filltype = FILL_NONE;
-  int nmiss;
+  size_t nmiss;
   int nrecs, nvars = 0;
   int nlevels2 = 1;
   int varID, levelID;

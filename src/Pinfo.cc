@@ -33,7 +33,7 @@ void *Pinfo(void *argument)
   int varID;
   int nrecs;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int ivals = 0, imiss = 0;
   char varname[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  

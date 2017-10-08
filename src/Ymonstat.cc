@@ -62,7 +62,7 @@ void *Ymonstat(void *argument)
   int nrecs;
   int levelID;
   int month_nsets[NMONTH];
-  int nmiss;
+  size_t nmiss;
   int vdates[NMONTH], vtimes[NMONTH];
   int mon[NMONTH];
   int nmon = 0;

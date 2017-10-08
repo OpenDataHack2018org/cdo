@@ -88,7 +88,7 @@ static void farexpr(field_type *field1, field_type field2, field_type field3, do
    
 void *Hi(void *argument)
 {
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   int varID1, varID2, varID3;
   int levelID1, levelID2, levelID3;

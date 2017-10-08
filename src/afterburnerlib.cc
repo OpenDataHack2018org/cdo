@@ -191,7 +191,7 @@ void Sub2Vectors(double *dest, const double *restrict srcA, const double *restri
 }
 
 static
-void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, int nmiss, double missval)
+void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, size_t nmiss, double missval)
 {
   if ( nmiss > 0 )
     {
@@ -1565,7 +1565,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
   int lindex, nlevel;
   int offset;
   int leveltype;
-  int nmiss;
+  size_t nmiss;
   double *pressureLevel = NULL;
 
   globs->MeanCount++;
@@ -2393,7 +2393,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
     }
 }
 
-void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss)
+void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
 {
   long fieldSize;
   int truncation;
@@ -2506,7 +2506,7 @@ double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxis
 }
 
 
-void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss)
+void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
 {
   int gridtype   = gridInqType(gridID);
   int leveltype  = zaxisInqType(zaxisID);

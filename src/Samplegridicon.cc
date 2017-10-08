@@ -586,7 +586,7 @@ void *Samplegridicon(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          int nmiss;
+          size_t nmiss;
           pstreamInqRecord(streamID1, &varID, &levelID);
           pstreamReadRecord(streamID1, array1, &nmiss);
 

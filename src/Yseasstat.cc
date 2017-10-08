@@ -67,7 +67,7 @@ void *Yseasstat(void *argument)
   int nrecs;
   int levelID;
   int seas_nsets[NSEAS];
-  int nmiss;
+  size_t nmiss;
   date_time_t datetime[NSEAS];
   field_type **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
 

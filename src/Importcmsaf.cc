@@ -769,7 +769,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   char varname[CDI_MAX_NAME];
   short *mask = NULL;
   double minval, maxval;
-  int nmiss;
+  size_t nmiss;
   int num_attrs;
 
   attstring[0] = 0;
@@ -1395,7 +1395,7 @@ void *Importcmsaf(void *argument)
   int streamID;
   int gridID = -1, zaxisID, taxisID, vlistID;
   int i, offset;
-  int nmiss;
+  size_t nmiss;
   int ivar;
   int varID, levelID, tsID;
   int nx, ny, nz, nt, gridsize;

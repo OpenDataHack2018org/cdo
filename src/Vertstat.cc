@@ -158,7 +158,7 @@ void *Vertstat(void *argument)
   int nrecs;
   int gridID;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   typedef struct {
     int zaxisID;
     int status;

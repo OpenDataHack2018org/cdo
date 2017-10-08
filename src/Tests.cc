@@ -26,7 +26,7 @@ void *Tests(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   double degree_of_freedom = 0, p = 0, q = 0, n = 0, d = 0;
   double missval;
 

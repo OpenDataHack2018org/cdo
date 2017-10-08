@@ -683,7 +683,7 @@ int qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast,
 }
 
 
-void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss, int lnearest)
+void field2regular(int gridID1, int gridID2, double missval, double *array, size_t nmiss, int lnearest)
 {
   int gridtype = gridInqType(gridID1);
   if ( gridtype != GRID_GAUSSIAN_REDUCED ) cdoAbort("Not a reduced Gaussian grid!");

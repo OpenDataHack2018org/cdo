@@ -36,7 +36,7 @@ void *Ydayarith(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int year, month, day;
   int **varnmiss2[MAX_DOY];
   double **vardata2[MAX_DOY];

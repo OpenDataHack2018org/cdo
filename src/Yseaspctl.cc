@@ -49,7 +49,7 @@ void *Yseaspctl(void *argument)
   int year, month, day, seas;
   int nrecs;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
   long nsets[NSEAS];
   date_time_t datetime1[NSEAS], datetime2[NSEAS];

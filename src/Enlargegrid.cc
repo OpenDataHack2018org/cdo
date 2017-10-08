@@ -226,7 +226,7 @@ void *Enlargegrid(void *argument)
 	    if ( gindex[i] >= 0 )
 	      array2[gindex[i]] = array1[i];		
 
-	  int nmiss2 = 0;
+	  size_t nmiss2 = 0;
 	  for ( int i = 0; i < gridsize2; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval1) ) nmiss2++;
 

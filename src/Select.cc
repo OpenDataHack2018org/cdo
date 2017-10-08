@@ -44,7 +44,7 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
           for ( int levelID2c = 0; levelID2c < nlevel; ++levelID2c )
             {
               double *pdata = vardata2[varID2c]+gridsize*levelID2c;
-              int nmiss = 0;
+              size_t nmiss = 0;
               for ( int i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
 
@@ -632,7 +632,7 @@ void *Select(void *argument)
 			}
 		      else
 			{
-                          int nmiss;
+                          size_t nmiss;
 			  pstreamReadRecord(streamID1, array, &nmiss);
 			  pstreamWriteRecord(streamID2, array, nmiss);
 			}
@@ -661,7 +661,7 @@ void *Select(void *argument)
                               int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
                               vardata2[varID2] = (double*) Malloc(gridsize*nlevel*sizeof(double));
                             }
-                          int nmiss;
+                          size_t nmiss;
                           pstreamReadRecord(streamID1, vardata2[varID2]+gridsize*levelID2, &nmiss);
                         }
 		    }

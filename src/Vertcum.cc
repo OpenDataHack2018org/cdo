@@ -60,7 +60,7 @@ void *Vertcum(void *argument)
   int nrecs;
   int i, nlevshl = 0;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

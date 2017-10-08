@@ -361,7 +361,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
-  int nmiss = 0;
+  size_t nmiss = 0;
   for ( int i = 0; i < gridInqSize(gridIDout); ++i )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
@@ -658,7 +658,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
 	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
-  int nmiss = 0;
+  size_t nmiss = 0;
   for ( int i = 0; i < gridInqSize(gridIDout); ++i )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
@@ -689,7 +689,7 @@ void *YAR(void *argument)
   int index;
   int varID, levelID;
   int gridID1 = -1;
-  int nmiss;
+  size_t nmiss;
   double missval;
 
   if ( cdoTimer )

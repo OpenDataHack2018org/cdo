@@ -83,7 +83,7 @@ static void farexpr(field_type *field1, field_type field2, double (*expression)(
 void *Wct(void *argument)
 {
   int nrecs, nrecs2;
-  int nmiss;
+  size_t nmiss;
   int varID1, varID2;
   int levelID1, levelID2;
 

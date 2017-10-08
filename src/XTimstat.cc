@@ -158,7 +158,7 @@ void *XTimstat(void *argument)
   int varID;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
-  int nmiss;
+  size_t nmiss;
   bool lvfrac = false;
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
@@ -370,7 +370,7 @@ void *XTimstat(void *argument)
 
                   int nwpv     = pvars1->nwpv;
                   int gridsize = pvars1->size;
-                  int nmiss    = pinput_var->nmiss;
+                  size_t nmiss    = pinput_var->nmiss;
 
                   farcpy(pvars1, *pinput_var);
                   pvars1->nmiss = nmiss;
@@ -399,7 +399,7 @@ void *XTimstat(void *argument)
 
                   int nwpv     = pvars1->nwpv;
                   int gridsize = pvars1->size;
-                  int nmiss    = pinput_var->nmiss;
+                  size_t nmiss    = pinput_var->nmiss;
 
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
                     {

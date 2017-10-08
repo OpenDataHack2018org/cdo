@@ -36,7 +36,7 @@ void eca1(const ECA_REQUEST_1 *request)
 {
   const int operatorID = cdoOperatorID();
   
-  int nmiss;
+  size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
@@ -403,7 +403,7 @@ void eca2(const ECA_REQUEST_2 *request)
 {
   const int operatorID = cdoOperatorID();
   
-  int nmiss;
+  size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
@@ -792,7 +792,7 @@ void eca3(const ECA_REQUEST_3 *request)
 {
   const int operatorID = cdoOperatorID();
 
-  int nmiss;
+  size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
@@ -999,7 +999,7 @@ void eca4(const ECA_REQUEST_4 *request)
 {
   const int operatorID = cdoOperatorID();
 
-  int nmiss;
+  size_t nmiss;
   int yearcnt = 0;
   int nrecs;
   int varID, levelID;

@@ -44,7 +44,7 @@ void *Spectral(void *argument)
   int gridIDsp = -1, gridIDgp = -1;
   int gridID1 = -1, gridID2 = -1;
   int gridID;
-  int nmiss;
+  size_t nmiss;
   int ncut = 0;
   int *wnums = NULL, *waves = NULL;
   int *vars;

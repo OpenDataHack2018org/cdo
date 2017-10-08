@@ -44,7 +44,7 @@ void *Merstat(void *argument)
   int gridID1, gridID2 = -1, lastgrid = -1;
   int wstatus = FALSE;
   int index;
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   int varID, levelID;
   char varname[CDI_MAX_NAME];

@@ -176,7 +176,7 @@ void *Importamsr(void *argument)
   int vtime = 0;
   double xvals[NLON], yvals[NLAT];
   double *data[MAX_VARS];
-  int nmiss[MAX_VARS];
+  size_t nmiss[MAX_VARS];
 
   cdoInitialize(argument);
 

@@ -72,7 +72,7 @@ int *fill_vars(int vlistID)
 
 void *Arithc(void *argument)
 {
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   int varID, levelID;
 

@@ -38,7 +38,7 @@ void *Timcount(void *argument)
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nwpv; // number of words per value; real:1  complex:2
 
   cdoInitialize(argument);

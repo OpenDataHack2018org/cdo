@@ -38,7 +38,7 @@ void *Replace(void *argument)
   int nchvars = 0;
   int idx;
   char varname1[CDI_MAX_NAME], varname2[CDI_MAX_NAME];
-  int nmiss;
+  size_t nmiss;
   int varlist1[MAX_VARS], varlist2[MAX_VARS];
   int **varlevel = NULL;
   int **varnmiss2 = NULL;

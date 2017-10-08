@@ -392,7 +392,7 @@ void *Smooth(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int xnsmooth = 1;
   smoothpoint_t spoint;
   spoint.maxpoints = INT_MAX;

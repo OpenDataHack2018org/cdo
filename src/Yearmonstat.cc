@@ -41,7 +41,7 @@ void *Yearmonstat(void *argument)
   int dpm;
   int year0 = 0, month0 = 0;
   int year, month, day;
-  int nmiss;
+  size_t nmiss;
   int nlevel;
   long nsets;
   double dsets;

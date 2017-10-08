@@ -540,7 +540,7 @@ void *DestaggerUV()
 
               if (UorV>=0)  // re-check again since it could mean that current record with U or V is not staggered
                 {
-                  int nmiss;
+                  size_t nmiss;
                   pstreamReadRecord(streamID1, ivar, &nmiss);
                   // read the original record with staggered u or v
                   gridsize = gridInqSize(gridID1);

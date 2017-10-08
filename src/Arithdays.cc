@@ -73,7 +73,7 @@ void *Arithdays(void *argument)
   int nrecs;
   int varID, levelID;
   int year, month, day;
-  int nmiss;
+  size_t nmiss;
   double rconst;
 
   cdoInitialize(argument);

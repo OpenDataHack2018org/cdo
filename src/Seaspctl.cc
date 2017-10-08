@@ -36,7 +36,7 @@ void *Seaspctl(void *argument)
   int nrecs;
   int gridID, varID, levelID;
   int year, month, day, seas0 = 0;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
   int oldmon = 0;
   int season_start;

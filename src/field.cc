@@ -63,7 +63,7 @@ double fldrank(field_type field)
   double *array  =  &(field.ptr[1]);
   double val     = array[-1];
   const double missval = field.missval;
-  int nmiss      = field.nmiss;
+  size_t nmiss      = field.nmiss;
   const size_t len       = field.size-1;
   size_t j;
   
@@ -145,7 +145,7 @@ double fldbrs(field_type field)
 
 double fldrange(field_type field)
 {
-  const int nmiss      = field.nmiss > 0;
+  const size_t nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
   const double missval = field.missval;
   const double *restrict array = field.ptr;
@@ -186,7 +186,7 @@ double fldrange(field_type field)
 
 double fldmin(field_type field)
 {
-  const int nmiss      = field.nmiss > 0;
+  const size_t nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
   const double missval = field.missval;
   const double *restrict array = field.ptr;
@@ -215,7 +215,7 @@ double fldmin(field_type field)
 
 double fldmax(field_type field)
 {
-  const int nmiss      = field.nmiss > 0;
+  const size_t nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
   const double missval = field.missval;
   const double *restrict array = field.ptr;
@@ -243,7 +243,7 @@ double fldmax(field_type field)
 
 double fldsum(field_type field)
 {
-  const int nmiss      = field.nmiss > 0;
+  const size_t nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
   const double missval = field.missval;
   const double *restrict array = field.ptr;
@@ -276,7 +276,7 @@ double fldsum(field_type field)
 
 double fldmean(field_type field)
 {
-  const int nmiss       = field.nmiss > 0;
+  const size_t nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
   const double missval1 = field.missval;
   const double missval2 = field.missval;
@@ -307,7 +307,7 @@ double fldmean(field_type field)
 
 double fldmeanw(field_type field)
 {
-  const int nmiss       = field.nmiss > 0;
+  const size_t nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
   const double missval1 = field.missval;
   const double missval2 = field.missval;
@@ -340,7 +340,7 @@ double fldmeanw(field_type field)
 
 double fldavg(field_type field)
 {
-  const int nmiss       = field.nmiss > 0;
+  const size_t nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
   const double missval1 = field.missval;
   const double missval2 = field.missval;
@@ -371,7 +371,7 @@ double fldavg(field_type field)
 
 double fldavgw(field_type field)
 {
-  const int nmiss       = field.nmiss > 0;
+  const size_t nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
   const double missval1 = field.missval;
   const double missval2 = field.missval;
@@ -406,7 +406,7 @@ double fldavgw(field_type field)
 }
 
 static
-void prevarsum(const double *restrict array, size_t len, int nmiss, 
+void prevarsum(const double *restrict array, size_t len, size_t nmiss, 
                double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
 { 
   assert(array!=NULL);
@@ -477,7 +477,7 @@ double fldvar1(field_type field)
 }
 
 static
-void prevarsumw(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
+void prevarsumw(const double *restrict array, const double *restrict w, size_t len, size_t nmiss, 
                 double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
 { 
   assert(array!=NULL);

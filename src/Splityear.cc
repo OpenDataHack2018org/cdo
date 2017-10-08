@@ -44,7 +44,7 @@ void *Splityear(void *argument)
   int gridsize;
   int ic = 0;
   int cyear[MAX_YEARS];
-  int nmiss;
+  size_t nmiss;
   int gridID;
   int nlevel;
   char filesuffix[32];

@@ -44,7 +44,7 @@ void *Timselstat(void *argument)
   int varID, levelID;
   int tsID;
   int nsets;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

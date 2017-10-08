@@ -33,7 +33,7 @@ void *Regres(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   double temp1, temp2;
   enum {nwork = 5};
   field_type **work[nwork];

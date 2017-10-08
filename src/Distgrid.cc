@@ -210,7 +210,7 @@ void *Distgrid(void *argument)
   char filename[8192];
   int index;
   int gridtype = -1;
-  int nmiss;
+  size_t nmiss;
   int i;
 
   cdoInitialize(argument);

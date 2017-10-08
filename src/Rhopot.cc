@@ -155,7 +155,7 @@ void *Rhopot(void *argument)
   int varID, levelID;
   int zaxisID;
   int offset;
-  int nmiss;
+  size_t nmiss;
   int toID = -1, saoID = -1, thoID = -1;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double pin = -1;

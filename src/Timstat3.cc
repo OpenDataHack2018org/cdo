@@ -42,7 +42,7 @@ void *Timstat3(void *argument)
   int nlevs;
   int is;
   int varID, levelID, gridID;
-  int nmiss;
+  size_t nmiss;
   double missval, missval1, missval2;
   double fractil_1, fractil_2, statistic;
   int ***iwork[NIWORK];

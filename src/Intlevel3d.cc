@@ -40,7 +40,7 @@ void *Intlevel3d(void *argument)
   int tsID, varID, levelID;
   int nvars,nvct;
   int nzaxis;
-  int nmiss;
+  size_t nmiss;
 
   int nlonIn, nlatIn, nlonOut, nlatOut;
   //double *lonIn, *latIn, *lonOut, *latOut;

@@ -227,7 +227,7 @@ void *Inttime(void *argument)
 		  single1  = vardata1[varID] + offset;
 		  single2  = vardata2[varID] + offset;
 
-		  int nmiss3 = 0;
+		  size_t nmiss3 = 0;
 
 		  if ( nmiss1[varID][levelID] > 0 || nmiss2[varID][levelID] > 0 )
 		    {

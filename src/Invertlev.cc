@@ -93,7 +93,7 @@ void *Invertlev(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nlev, nlevel;
   int gridID, zaxisID, offset;
   bool linvert = false;

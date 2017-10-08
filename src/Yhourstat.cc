@@ -71,7 +71,7 @@ void *Yhourstat(void *argument)
   int nrecs;
   int levelID;
   int houroy_nsets[MAX_HOUR];
-  int nmiss;
+  size_t nmiss;
   int vdates[MAX_HOUR], vtimes[MAX_HOUR];
   field_type **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
 

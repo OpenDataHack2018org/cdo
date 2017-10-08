@@ -29,7 +29,7 @@ void *Duplicate(void *argument)
   int nrecs;
   int varID, levelID;
   int nalloc = 0;
-  int nmiss;
+  size_t nmiss;
   int *vdate = NULL, *vtime = NULL;
   int ndup = 2;
   field_type ***vars = NULL;

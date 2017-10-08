@@ -159,7 +159,7 @@ void *Intlevel(void *argument)
   int nrecs;
   int i, offset;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int zaxisID1 = -1;
   int gridID, zaxisID;
   int nlevel = 0;

@@ -46,7 +46,7 @@ void *Math(void *argument)
   enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW, RECI};
   int nrecs;
   int varID, levelID;
-  int nmiss, nmiss2;
+  size_t nmiss, nmiss2;
   int i;
 
   cdoInitialize(argument);

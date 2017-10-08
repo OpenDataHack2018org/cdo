@@ -399,7 +399,7 @@ void *Maskbox(void *argument)
 
 	  if ( vars[varID] )
 	    {
-              int nmiss;
+              size_t nmiss;
 	      pstreamReadRecord(streamID1, array, &nmiss);
 
               double missval = vlistInqVarMissval(vlistID1, varID);             
