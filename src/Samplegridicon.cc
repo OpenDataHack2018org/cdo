@@ -90,7 +90,8 @@ cellindex_type *read_cellindex(const char *filename)
   int nrecs = streamInqTimestep(streamID, 0);
   for ( int recID = 0; recID < nrecs; recID++ )
     {
-      int varID, levelID, nmiss;
+      int varID, levelID;
+      size_t nmiss;
       streamInqRecord(streamID, &varID, &levelID);
       if ( varID == pid /* || varID == nid || varID == cid */ )
         {
@@ -586,7 +587,7 @@ void *Samplegridicon(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
         {
-          int nmiss;
+          size_t nmiss;
           pstreamInqRecord(streamID1, &varID, &levelID);
           pstreamReadRecord(streamID1, array1, &nmiss);
 

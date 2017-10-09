@@ -46,7 +46,7 @@ void *Ydrunpctl(void *argument)
   int nrecs;
   int levelID;
   int inp, its;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
   int year, month, day, dayoy;
   int vdate, vtime;

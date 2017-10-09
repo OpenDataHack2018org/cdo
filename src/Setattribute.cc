@@ -255,7 +255,7 @@ void *Setattribute(void *argument)
             }
           else
             {
-              int nmiss;
+              size_t nmiss;
               pstreamReadRecord(streamID1, array, &nmiss);
               pstreamWriteRecord(streamID2, array, nmiss);
             }

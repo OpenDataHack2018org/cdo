@@ -58,7 +58,7 @@ void *Samplegrid(void *argument)
   int resampleFactor;
   int subI0 = 0, subI1 = 0, subJ0 = 0, subJ1 = 0;
   int index;
-  int nmiss;
+  size_t nmiss;
   typedef struct {
     int gridSrcID, gridIDsampled;
     int *cellidx, nvals;

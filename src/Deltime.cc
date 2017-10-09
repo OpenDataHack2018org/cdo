@@ -29,7 +29,7 @@ void *Deltime(void *argument)
   int vdate /*, vtime */;
   int copytimestep;
   int gridsize;
-  int nmiss;
+  size_t nmiss;
   int year, month, day;
   int dday, dmon;
   double *array = NULL;

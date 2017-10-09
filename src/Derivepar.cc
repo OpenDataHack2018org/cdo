@@ -50,7 +50,7 @@ void *Derivepar(void *argument)
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
   // double *lwater = NULL, *iwater = NULL;
-  int nmiss, nmissout = 0;
+  size_t nmiss, nmissout = 0;
   double *full_press = NULL;
   double minval, maxval;
   int instNum, tableNum;

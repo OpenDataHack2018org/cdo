@@ -61,7 +61,7 @@ void *Sorttimestamp(void *argument)
   int tsID, lasttsID = -1;
   int nalloc = 0;
   int vlistID2 = -1, taxisID2 = -1;
-  int nmiss;
+  size_t nmiss;
   int nvars = 0, nlevel;
   int *vdate = NULL, *vtime = NULL;
   field_type ***vars = NULL;

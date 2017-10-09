@@ -185,7 +185,7 @@ void *Mergetime(void *argument)
 		}
 	      else
 		{
-                  int nmiss;
+                  size_t nmiss;
 		  pstreamReadRecord(sf[fileID].streamID, array, &nmiss);
 		  pstreamWriteRecord(streamID2, array, nmiss);
 		}

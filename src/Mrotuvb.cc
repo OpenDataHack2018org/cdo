@@ -258,7 +258,7 @@ void *Mrotuvb(void *argument)
   int nrecs, nrecs2;
   int levelID;
   int varID1, varID2;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   bool gpint = true;
 
   cdoInitialize(argument);

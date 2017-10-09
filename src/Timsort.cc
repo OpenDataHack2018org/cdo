@@ -50,7 +50,7 @@ void *Timsort(void *argument)
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
-  int nmiss;
+  size_t nmiss;
   int nlevel;
   int *vdate = NULL, *vtime = NULL;
   field_type ***vars = NULL;

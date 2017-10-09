@@ -241,7 +241,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 
 typedef struct {
   double min, max, sum, sumi;
-  long nvals, nmiss, nlevs;
+  size_t nvals, nmiss, nlevs;
 } infostat_type;
 
 static
@@ -263,8 +263,8 @@ void *Info(void *argument)
   int fpeRaised = 0;
   int varID, levelID;
   int nrecs;
-  int nmiss;
-  long imiss = 0;
+  size_t nmiss;
+  size_t imiss = 0;
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
@@ -351,7 +351,7 @@ void *Info(void *argument)
 	      int zaxisID  = vlistInqVarZaxis(vlistID, varID);
 	      int number   = vlistInqVarNumber(vlistID, varID);
 	      long gridsize = gridInqSize(gridID);
-              long nlevs    = zaxisInqSize(zaxisID);
+              size_t nlevs  = zaxisInqSize(zaxisID);
 	      double level = cdoZaxisInqLevel(zaxisID, levelID);
 	      double missval = vlistInqVarMissval(vlistID, varID);
               
@@ -383,11 +383,11 @@ void *Info(void *argument)
 
                   set_text_color(stdout, RESET, GREEN);
                   if ( operatorID == XINFON )
-                    fprintf(stdout, "%7ld ", nlevs);
+                    fprintf(stdout, "%7zu ", nlevs);
                   else
                     fprintf(stdout, "%7g ", level);
                  
-                  fprintf(stdout, "%8ld %7ld ", gridsize, infostatp->nmiss);
+                  fprintf(stdout, "%8ld %7zu ", gridsize, infostatp->nmiss);
 		
                   set_text_color(stdout, RESET, BLACK);
                   fprintf(stdout, ":");
@@ -402,7 +402,7 @@ void *Info(void *argument)
 
                   if ( infostatp->nmiss > 0 )
                     {
-                      long nvals   = 0;
+                      size_t nvals   = 0;
                       for ( long i = 0; i < gridsize; ++i )
                         {
                           if ( !DBL_IS_EQUAL(array[i], missval) )
@@ -452,7 +452,7 @@ void *Info(void *argument)
                 }
               else
                 {
-                  long nvals = 0;		      
+                  size_t nvals = 0;		      
                   for ( long i = 0; i < gridsize; i++ )
                     {
                       if ( !DBL_IS_EQUAL(array[i*2],   missval) && 
@@ -505,7 +505,7 @@ void *Info(void *argument)
                 }
 
 	      if ( imiss != nmiss && nmiss > 0 )
-		cdoPrint("Found %d of %d missing values!", imiss, nmiss);
+		cdoPrint("Found %zu of %zu missing values!", imiss, nmiss);
 
               if ( fpeRaised > 0 ) cdoWarning("floating-point exception reported: %s!", fpe_errstr(fpeRaised));
 

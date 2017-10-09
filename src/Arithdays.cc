@@ -73,7 +73,7 @@ void *Arithdays(void *argument)
   int nrecs;
   int varID, levelID;
   int year, month, day;
-  int nmiss;
+  size_t nmiss;
   double rconst;
 
   cdoInitialize(argument);
@@ -143,14 +143,14 @@ void *Arithdays(void *argument)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
 
-          field.nmiss   = (size_t)nmiss;
+          field.nmiss   = nmiss;
 	  field.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
 
 	  farcfun(&field, rconst, operfunc);
 
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, field.ptr, (int)field.nmiss);
+	  pstreamWriteRecord(streamID2, field.ptr, field.nmiss);
 	}
       tsID++;
     }

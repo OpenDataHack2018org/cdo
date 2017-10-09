@@ -149,7 +149,7 @@ static void count(field_type *field1, const field_type *field2, double mode)
 {
   int   i, len;
   const int     grid1    = field1->grid;
-  const int     nmiss1   = field1->nmiss;
+  const size_t  nmiss1   = field1->nmiss;
   const double  missval1 = field1->missval;
   double       *array1   = field1->ptr;
   const int     grid2    = field2->grid;
@@ -233,11 +233,11 @@ static void selcomp(field_type *field1, const field_type *field2, int (*compare)
 {
   int   i, len;
   const int     grid1    = field1->grid;
-  const int     nmiss1   = field1->nmiss;
+  const size_t  nmiss1   = field1->nmiss;
   const double  missval1 = field1->missval;
   double       *array1   = field1->ptr;
   const int     grid2    = field2->grid;
-  const int     nmiss2   = field2->nmiss;
+  const size_t  nmiss2   = field2->nmiss;
   const double  missval2 = field2->missval;
   const double *array2   = field2->ptr;
   
@@ -284,7 +284,7 @@ static void selcompc(field_type *field, double c, int (*compare)(double, double)
 {
   int   i, len;
   const int     grid    = field->grid;
-  const int     nmiss   = field->nmiss;
+  const size_t  nmiss   = field->nmiss;
   const double  missval = field->missval;
   double       *array   = field->ptr;
   
@@ -375,7 +375,7 @@ void farsel(field_type *field1, field_type field2)
   const double  missval1 = field1->missval;
   double       *array1   = field1->ptr;
   const int     grid2    = field2.grid;
-  const int     nmiss2   = field2.nmiss;
+  const size_t  nmiss2   = field2.nmiss;
   const double  missval2 = field2.missval;
   const double *array2   = field2.ptr;
   

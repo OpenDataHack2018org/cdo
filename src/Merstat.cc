@@ -44,7 +44,7 @@ void *Merstat(void *argument)
   int gridID1, gridID2 = -1, lastgrid = -1;
   int wstatus = FALSE;
   int index;
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   int varID, levelID;
   char varname[CDI_MAX_NAME];
@@ -139,7 +139,7 @@ void *Merstat(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss = nmiss;
 	  field1.grid = vlistInqVarGrid(vlistID1, varID);
 	  if ( needWeights && field1.grid != lastgrid )
 	    {
@@ -160,7 +160,7 @@ void *Merstat(void *argument)
 	    merfun(field1, &field2, operfunc);
 
 	  pstreamDefRecord(streamID2, varID,  levelID);
-	  pstreamWriteRecord(streamID2, field2.ptr, (int)field2.nmiss);
+	  pstreamWriteRecord(streamID2, field2.ptr, field2.nmiss);
 	}
 
       tsID++;

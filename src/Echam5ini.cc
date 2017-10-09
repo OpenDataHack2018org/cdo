@@ -1433,7 +1433,8 @@ void *Echam5ini(void *argument)
   int vlistID1, vlistID2;
   int nvars = 0;
   int iv, nlev;
-  int gridsize, nmiss;
+  int gridsize;
+  size_t nmiss;
   int taxisID, tsID;
 
   cdoInitialize(argument);

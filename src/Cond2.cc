@@ -34,11 +34,11 @@ void *Cond2(void *argument)
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   int offset;
-  int nmiss1, nmiss2, nmiss3, nmiss4;
+  size_t nmiss1, nmiss2, nmiss3, nmiss4;
   int i;
   double missval1 = -9.E33;
   double missval2 = -9.E33;
-  int **varnmiss1 = NULL;
+  size_t **varnmiss1 = NULL;
   double **vardata1 = NULL;
 
   cdoInitialize(argument);
@@ -106,13 +106,13 @@ void *Cond2(void *argument)
 
 	  nvars  = vlistNvars(vlistID1);
 	  vardata1  = (double **) Malloc(nvars*sizeof(double *));
-	  varnmiss1 = (int **) Malloc(nvars*sizeof(int *));
+	  varnmiss1 = (size_t **) Malloc(nvars*sizeof(size_t *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      vardata1[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-	      varnmiss1[varID] = (int*) Malloc(nlev*sizeof(int));
+	      varnmiss1[varID] = (size_t*) Malloc(nlev*sizeof(size_t));
 	    }
 	}
     }

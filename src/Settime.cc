@@ -164,7 +164,7 @@ void *Settime(void *argument)
   int vdateb[2], vtimeb[2];
   int sdate = 0, stime = 0;
   int taxisID2 = CDI_UNDEFID;
-  int nmiss;
+  size_t nmiss;
   int gridsize;
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 1, incunit = 86400;

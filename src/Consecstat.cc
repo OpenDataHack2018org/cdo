@@ -127,7 +127,7 @@ void *Consecstat(void *argument)
   int nrecs;
   int varID;
   int levelID, nlevels;
-  int nmiss;
+  size_t nmiss;
   double refval = 0.0;
 
   cdoInitialize(argument);
@@ -197,7 +197,7 @@ void *Consecstat(void *argument)
     {
       pstreamInqRecord(istreamID, &varID, &levelID);
       pstreamReadRecord(istreamID, field.ptr, &nmiss);
-      field.nmiss   = (size_t)nmiss;
+      field.nmiss   = nmiss;
       field.grid    = vlistInqVarGrid(ovlistID, varID);
       field.missval = vlistInqVarMissval(ovlistID, varID);
 
@@ -207,14 +207,14 @@ void *Consecstat(void *argument)
       {
         case CONSECSUM:
           pstreamDefRecord(ostreamID, varID, levelID);
-          pstreamWriteRecord(ostreamID, vars[varID][levelID].ptr, (int)vars[varID][levelID].nmiss);
+          pstreamWriteRecord(ostreamID, vars[varID][levelID].ptr, vars[varID][levelID].nmiss);
           break;
         case CONSECTS:
           if ( itsID != 0 )
           {
             selEndOfPeriod(&periods[varID][levelID], hist[varID][levelID], vars[varID][levelID], FALSE);
             pstreamDefRecord(ostreamID, varID, levelID);
-            pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, (int)periods[varID][levelID].nmiss);
+            pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, periods[varID][levelID].nmiss);
           }
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) schedule(static)
@@ -249,7 +249,7 @@ void *Consecstat(void *argument)
       {
         selEndOfPeriod(&periods[varID][levelID], hist[varID][levelID], vars[varID][levelID], TRUE);
         pstreamDefRecord(ostreamID, varID, levelID);
-        pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, (int)periods[varID][levelID].nmiss);
+        pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, periods[varID][levelID].nmiss);
       }
     }
   }

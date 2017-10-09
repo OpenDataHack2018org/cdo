@@ -86,7 +86,7 @@ void *Timstat(void *argument)
   int varID, levelID;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
-  int nmiss;
+  size_t nmiss;
   bool lvfrac = false;
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];

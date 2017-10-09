@@ -127,7 +127,7 @@ void *Rotuv(void *argument)
   int *recVarID   = (int*) Malloc(nrecs*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecs*sizeof(int));
 
-  int **varnmiss    = (int **) Malloc(nvars*sizeof(int *));
+  size_t **varnmiss = (size_t **) Malloc(nvars*sizeof(size_t *));
   double **vardata  = (double **) Malloc(nvars*sizeof(double *));
 
   bool lfound[MAXARG];
@@ -164,7 +164,7 @@ void *Rotuv(void *argument)
 
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      varnmiss[varID] = (int*) Malloc(nlevel*sizeof(int));
+      varnmiss[varID] = (size_t*) Malloc(nlevel*sizeof(size_t));
       vardata[varID]  = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 

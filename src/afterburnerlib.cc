@@ -148,7 +148,7 @@ void VarQuaSum(double *Variance, const double *restrict Sum, int len, int n)
 }
 
 static
-void AddVector(double * restrict dest, const double *restrict src, long len, int *nmiss, double missval)
+void AddVector(double * restrict dest, const double *restrict src, long len, size_t *nmiss, double missval)
 {
   if ( *nmiss > 0 )
     {
@@ -191,7 +191,7 @@ void Sub2Vectors(double *dest, const double *restrict srcA, const double *restri
 }
 
 static
-void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, int nmiss, double missval)
+void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, size_t nmiss, double missval)
 {
   if ( nmiss > 0 )
     {
@@ -210,7 +210,7 @@ void MultVectorScalar(double *dest, const double *restrict src, double factor, i
 }
 
 static
-void DivVectorIvector(double *dest, const double *restrict src, const int *samp, int len, int *nmiss, double missval)
+void DivVectorIvector(double *dest, const double *restrict src, const int *samp, int len, size_t *nmiss, double missval)
 {
   *nmiss = 0;
 
@@ -1565,7 +1565,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
   int lindex, nlevel;
   int offset;
   int leveltype;
-  int nmiss;
+  size_t nmiss;
   double *pressureLevel = NULL;
 
   globs->MeanCount++;
@@ -1923,7 +1923,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
       nmiss = 0;
       if ( ! globs->Extrapolate )
 	{
-	  if ( globs->pnmiss == NULL ) globs->pnmiss = (int *) Malloc(globs->NumLevelRequest*sizeof(int));  
+	  if ( globs->pnmiss == NULL ) globs->pnmiss = (size_t *) Malloc(globs->NumLevelRequest*sizeof(size_t));  
 	  genindmiss(globs->vert_index, pressureLevel, globs->DimGP, globs->NumLevelRequest, vars[PS_PROG].hybrid, globs->pnmiss);
 	  for ( i = 0; i < globs->NumLevelRequest; i++ ) nmiss += globs->pnmiss[i];
 	}
@@ -2393,7 +2393,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
     }
 }
 
-void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss)
+void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
 {
   long fieldSize;
   int truncation;
@@ -2506,7 +2506,7 @@ double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxis
 }
 
 
-void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss)
+void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
 {
   int gridtype   = gridInqType(gridID);
   int leveltype  = zaxisInqType(zaxisID);

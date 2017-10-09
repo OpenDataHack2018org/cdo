@@ -28,7 +28,7 @@ void *Complextorect(void *argument)
   int varID, levelID;
   int i;
   int datatype;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

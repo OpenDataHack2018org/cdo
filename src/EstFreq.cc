@@ -25,7 +25,8 @@ void *EstFreq(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int gridsize, nmiss;
+  int gridsize;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

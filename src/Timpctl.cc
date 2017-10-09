@@ -40,7 +40,7 @@ void timpctl(int operatorID)
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int nrecs;
   int gridID, varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
   
   operatorInputArg("percentile number");

@@ -1,5 +1,5 @@
-#ifndef _PAR_IO_H
-#define _PAR_IO_H
+#ifndef PAR_IO_H
+#define PAR_IO_H
 
 #if defined(HAVE_CONFIG_H)
 #  include "config.h"
@@ -12,14 +12,16 @@
 
 typedef struct {
   int streamID;
-  int *varID, *levelID, *nmiss;
+  int *varID, *levelID;
+  size_t *nmiss;
   double *array;
 }
 read_arg_t;
 
 
 typedef struct {
-  int varID, levelID, nmiss;
+  int varID, levelID;
+  size_t nmiss;
   double *array;
   int array_size;
   int recID, nrecs;
@@ -32,6 +34,6 @@ typedef struct {
 par_io_t;
 
 
-void parReadRecord(int streamID, int *varID, int *levelID, double *array, int *nmiss, par_io_t *parIO);
+void parReadRecord(int streamID, int *varID, int *levelID, double *array, size_t *nmiss, par_io_t *parIO);
 
-#endif  /* _PAR_IO_H */
+#endif  /* PAR_IO_H */

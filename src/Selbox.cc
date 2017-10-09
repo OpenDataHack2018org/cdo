@@ -847,7 +847,7 @@ void *Selbox(void *argument)
   int varID, levelID;
   int gridID1 = -1, gridID2;
   int index, gridtype = -1;
-  int nmiss;
+  size_t nmiss;
   double missval;
   typedef struct {
     int gridID1, gridID2;

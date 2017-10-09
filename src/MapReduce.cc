@@ -38,7 +38,8 @@
  * function definition */
 void read_first_record(char *filename, double *field)
 {
-  int nmiss,varID,levelID;
+  size_t nmiss;
+  int varID,levelID;
   int streamID = streamOpenRead(filename);
   streamInqTimestep(streamID,0);
   streamInqRecord(streamID,&varID,&levelID);
@@ -72,7 +73,7 @@ void *MapReduce(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nobounds = FALSE;
   int nocoords = FALSE;
   /*double missval1, missval2; */

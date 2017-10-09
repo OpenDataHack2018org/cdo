@@ -28,7 +28,7 @@ void    pstreamDefTimestep(int pstreamID, int tsID);
 
 void    pstreamDefRecord(int pstreamID, int  varID, int  levelID);
 
-void    pstreamWriteRecord(int pstreamID, double *data, int nmiss);
-void    pstreamWriteRecordF(int pstreamID, float *data, int nmiss);
+void    pstreamWriteRecord(int pstreamID, double *data, size_t nmiss);
+void    pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss);
 
 #endif  /* PSTREAM_WRITE_H */

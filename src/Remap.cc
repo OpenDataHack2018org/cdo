@@ -117,7 +117,7 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 } 
 
 static
-void print_remap_info(int operfunc, int remap_genweights, remapgrid_t *src_grid, remapgrid_t *tgt_grid, int nmiss)
+void print_remap_info(int operfunc, int remap_genweights, remapgrid_t *src_grid, remapgrid_t *tgt_grid, size_t nmiss)
 {
   char line[256], tmpstr[256];
 
@@ -155,7 +155,7 @@ void print_remap_info(int operfunc, int remap_genweights, remapgrid_t *src_grid,
 
   if ( nmiss > 0 )
     {
-      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%zu)", gridInqSize(src_grid->gridID)-nmiss);
       strcat(line, tmpstr);
     }
 
@@ -163,7 +163,7 @@ void print_remap_info(int operfunc, int remap_genweights, remapgrid_t *src_grid,
 }
 
 static
-void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_grid, int nmiss)
+void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_grid, size_t nmiss)
 {
   char line[256];
   char tmpstr[256];
@@ -196,7 +196,7 @@ void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_
 
   if ( nmiss > 0 )
     {
-      snprintf(tmpstr, sizeof(tmpstr), " with mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), " with mask (%zu)", gridInqSize(src_grid->gridID)-nmiss);
       strcat(line, tmpstr);
     }
 
@@ -780,7 +780,7 @@ void *Remap(void *argument)
   int varID, levelID;
   size_t gridsize, gridsize2;
   int gridID1 = -1, gridID2;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   size_t i, j;
   int r = -1;
   int nremaps = 0;

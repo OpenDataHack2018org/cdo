@@ -36,7 +36,8 @@ void *Eofcoeff3d(void * argument)
   double missval1 = -999, missval2 = -999;
   field_type in;  
   int i, varID, levelID;    
-  int nrecs, nmiss; 
+  int nrecs;
+  size_t nmiss; 
    
   cdoInitialize(argument);
 
@@ -106,7 +107,7 @@ void *Eofcoeff3d(void * argument)
            cdoAbort("Internal error - too high levelID");
          
          pstreamReadRecord(streamID1, eof[varID][levelID][eofID].ptr, &nmiss);
-         eof[varID][levelID][eofID].nmiss = (size_t) nmiss;
+         eof[varID][levelID][eofID].nmiss = nmiss;
        }
      eofID++;
    }
@@ -199,7 +200,7 @@ void *Eofcoeff3d(void * argument)
           pstreamInqRecord(streamID2, &varID, &levelID);
           pstreamReadRecord(streamID2, in.ptr, &nmiss);  
           missval2 = vlistInqVarMissval(vlistID2, varID);
-          in.nmiss = (size_t) nmiss;
+          in.nmiss = nmiss;
           
           for ( eofID = 0; eofID < neof; eofID++ )
             {
@@ -235,7 +236,7 @@ void *Eofcoeff3d(void * argument)
       for ( eofID = 0; eofID < neof; eofID++ ) {
 	for ( varID = 0; varID < nvars; varID++ ) {
 	  pstreamDefRecord(streamIDs[eofID], varID, 0);
-	  pstreamWriteRecord(streamIDs[eofID], out[varID][eofID].ptr, (int)out[varID][eofID].nmiss);
+	  pstreamWriteRecord(streamIDs[eofID], out[varID][eofID].ptr, out[varID][eofID].nmiss);
 	}
       }
 

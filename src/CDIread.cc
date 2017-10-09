@@ -83,7 +83,7 @@ void *CDIread(void *argument)
 {
   int memtype = CDO_Memtype;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   int filetype = -1, datatype = -1;
   int nruns = 1;

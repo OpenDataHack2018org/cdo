@@ -127,7 +127,7 @@ void *Merge(void *argument)
   int levelID, levelID2;
   int index;
   int gridsize;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

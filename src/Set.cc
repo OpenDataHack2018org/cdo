@@ -48,7 +48,7 @@ void *Set(void *argument)
 {
   int nrecs, nvars, newval = -1, tabnum = 0;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int index, zaxisID1, zaxisID2, nzaxis, nlevs;
   int zaxistype;
   int newparam    = 0;

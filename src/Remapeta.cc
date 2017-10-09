@@ -243,7 +243,7 @@ Remapeta(void *argument)
   double *t1 = NULL, *q1 = NULL;
   double *t2 = NULL, *q2 = NULL;
   double *tscor = NULL, *pscor = NULL, *secor = NULL;
-  int nmiss, nmissout = 0;
+  size_t nmiss, nmissout = 0;
   bool ltq = false;
   bool lfis2 = false;
   int varids[MAX_VARS3D];

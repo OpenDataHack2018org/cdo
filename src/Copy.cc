@@ -44,7 +44,7 @@ void *Copy(void *argument)
   int taxisID2 = CDI_UNDEFID;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int ntsteps, nvars;
   double *array = NULL;
   par_io_t parIO;

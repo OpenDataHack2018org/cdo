@@ -36,9 +36,9 @@ void *Ydayarith(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int year, month, day;
-  int **varnmiss2[MAX_DOY];
+  size_t **varnmiss2[MAX_DOY];
   double **vardata2[MAX_DOY];
 
   cdoInitialize(argument);
@@ -96,14 +96,14 @@ void *Ydayarith(void *argument)
       if ( vardata2[dayoy] != NULL ) cdoAbort("Day of year %d already allocatd (date=%d)!", dayoy, vdate);
 
       vardata2[dayoy]  = (double **) Malloc(nvars*sizeof(double *));
-      varnmiss2[dayoy] = (int **) Malloc(nvars*sizeof(int *));
+      varnmiss2[dayoy] = (size_t **) Malloc(nvars*sizeof(size_t *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  size_t nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	  vardata2[dayoy][varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[dayoy][varID] = (int*) Malloc(nlev*sizeof(int));
+	  varnmiss2[dayoy][varID] = (size_t*) Malloc(nlev*sizeof(size_t));
 	}
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -142,7 +142,7 @@ void *Ydayarith(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss = nmiss;
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           size_t offset   = gridsize*levelID;
@@ -158,7 +158,7 @@ void *Ydayarith(void *argument)
 
 	  farfun(&field1, field2, operfunc);
 
-          nmiss = (int) field1.nmiss;
+          nmiss = field1.nmiss;
 	  pstreamDefRecord(streamID3, varID, levelID);
 	  pstreamWriteRecord(streamID3, field1.ptr, nmiss);
 	}

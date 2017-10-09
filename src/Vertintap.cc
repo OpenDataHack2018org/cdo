@@ -217,13 +217,13 @@ void *Vertintap(void *argument)
   
   std::vector<bool> vars(nvars);
   std::vector<bool> varinterp(nvars);
-  std::vector<int *> varnmiss(nvars);
+  std::vector<size_t *> varnmiss(nvars);
   std::vector<double *> vardata1(nvars);
   std::vector<double *> vardata2(nvars);
 
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
-  int *pnmiss = extrapolate ? NULL : (int *) Malloc(nplev*sizeof(int));
+  size_t *pnmiss = extrapolate ? NULL : (size_t *) Malloc(nplev*sizeof(size_t));
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -286,8 +286,8 @@ void *Vertintap(void *argument)
 	{
 	  varinterp[varID] = true;
 	  vardata2[varID]  = (double *) Malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = (int *) Malloc(maxlev*sizeof(int));
-	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
+	  varnmiss[varID]  = (size_t *) Malloc(maxlev*sizeof(size_t));
+	  memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
 	}
       else
 	{
@@ -300,7 +300,7 @@ void *Vertintap(void *argument)
 
 	  varinterp[varID] = false;
 	  vardata2[varID]  = vardata1[varID];
-	  varnmiss[varID]  = (int *) Malloc(nlevel*sizeof(int));
+	  varnmiss[varID]  = (size_t *) Malloc(nlevel*sizeof(size_t));
 	}
     }
   
@@ -436,7 +436,7 @@ void *Vertintap(void *argument)
 		  interp_X(vardata1[varID], vardata2[varID], hyb_press,
 			   vert_index, plev, nplev, gridsize, nlevel, missval);
 		  
-		  if ( !extrapolate ) memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
+		  if ( !extrapolate ) memcpy(varnmiss[varID], pnmiss, nplev*sizeof(size_t));
 		}
 	    }
 	}

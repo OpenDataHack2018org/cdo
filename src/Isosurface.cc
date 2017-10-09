@@ -81,7 +81,7 @@ void *Isosurface(void *argument)
   int gridID;
   int i, offset;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int zaxisID, zaxisID1 = -1;
   double missval;
   double *single;

@@ -45,7 +45,7 @@ void *Ymonpctl(void *argument)
   int vdate, vtime;
   int year, month, day;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int nrecs, nlevels;
   int vdates1[NMONTH], vtimes1[NMONTH];
   int vdates2[NMONTH];

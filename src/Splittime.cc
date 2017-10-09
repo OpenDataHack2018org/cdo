@@ -62,7 +62,7 @@ void *Splittime(void *argument)
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   int index = 0;
   int gridsize;
-  int nmiss;
+  size_t nmiss;
   int gridID;
   int nlevel;
   char filesuffix[32];

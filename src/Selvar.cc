@@ -53,7 +53,7 @@ void *Selvar(void *argument)
   char zaxistypename[CDI_MAX_NAME];
   char zaxisname[CDI_MAX_NAME];
   char **argnames = NULL;
-  int nmiss;
+  size_t nmiss;
   int gridnum = 0;
   lista_t *ilista = lista_new(INT_LISTA);
   lista_t *flista = lista_new(FLT_LISTA);

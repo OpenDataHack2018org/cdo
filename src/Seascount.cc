@@ -34,7 +34,7 @@ void *Seascount(void *argument)
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int year, month, day, seas0 = 0;
   int oldmon = 0;
 
@@ -120,7 +120,7 @@ void *Seascount(void *argument)
                 }
 
               pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = (size_t)nmiss;
+              field.nmiss   = nmiss;
               field.grid    = vars1[varID][levelID].grid;
               field.missval = vars1[varID][levelID].missval;
 
@@ -147,7 +147,7 @@ void *Seascount(void *argument)
 	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr, (int)vars1[varID][levelID].nmiss);
+	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
         }
 
       if ( nrecs == 0 ) break;

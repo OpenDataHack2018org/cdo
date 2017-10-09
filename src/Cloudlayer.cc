@@ -127,7 +127,7 @@ void *Cloudlayer(void *argument)
   bool zrev = false;
   int i;
   int offset;
-  int nmiss;
+  size_t nmiss;
   int aclcacID = -1;
   int nvars2 = 0;
   int aclcac_code_found = 0;

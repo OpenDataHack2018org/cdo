@@ -160,7 +160,7 @@ void *Adisit(void *argument)
   int varID, levelID;
   int offset;
   int i;
-  int nmiss;
+  size_t nmiss;
   int thoID = -1, saoID = -1;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double pin = -1;

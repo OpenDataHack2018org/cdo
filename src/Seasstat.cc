@@ -45,7 +45,7 @@ void *Seasstat(void *argument)
   int nrecs;
   int varID, levelID;
   int year, month, day, seas0 = 0;
-  int nmiss;
+  size_t nmiss;
   int oldmon = 0;
   int nseason = 0;
   const char *seas_name[4];
@@ -164,7 +164,7 @@ void *Seasstat(void *argument)
 	      if ( nsets == 0 )
 		{
 		  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-		  pvars1->nmiss = (size_t)nmiss;
+		  pvars1->nmiss = nmiss;
                   if ( lrange )
                     {
                       pvars2->nmiss = pvars1->nmiss;
@@ -184,7 +184,7 @@ void *Seasstat(void *argument)
 	      else
 		{
 		  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = (size_t)nmiss;
+                  field.nmiss   = nmiss;
 		  field.grid    = pvars1->grid;
 		  field.missval = pvars1->missval;
 
@@ -306,7 +306,7 @@ void *Seasstat(void *argument)
           field_type *pvars1 = &vars1[varID][levelID];
 
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	}
 
       if ( nrecs == 0 ) break;

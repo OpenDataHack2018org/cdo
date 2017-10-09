@@ -79,7 +79,8 @@ void *Enlarge(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-          int varID, levelID, nmiss;
+          int varID, levelID;
+          size_t nmiss;
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array1, &nmiss);
 

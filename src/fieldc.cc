@@ -38,7 +38,7 @@ void farcmul(field_type *field, double rconst)
   int i, len;
   int    nwpv     = field->nwpv;
   int    grid     = field->grid;
-  int    nmiss    = field->nmiss;
+  size_t nmiss    = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
   double *array   = field->ptr;
@@ -69,7 +69,7 @@ void farcdiv(field_type *field, double rconst)
 {
   int i, len;
   int    grid     = field->grid;
-  int    nmiss    = field->nmiss;
+  size_t nmiss    = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
   double *array   = field->ptr;
@@ -95,7 +95,7 @@ void farcadd(field_type *field, double rconst)
 {
   int i, len;
   int    grid     = field->grid;
-  int    nmiss    = field->nmiss;
+  size_t nmiss    = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
   double *array   = field->ptr;

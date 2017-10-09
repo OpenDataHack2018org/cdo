@@ -35,7 +35,7 @@ void *Varrms(void *argument)
   int oldcode = 0;
   int nrecs;
   int gridsize;
-  int nmiss;
+  size_t nmiss;
   int varID, levelID;
   long offset;
   double *single;

@@ -173,7 +173,7 @@ void *Seltime(void *argument)
   int varID, levelID;
   int nsel = 0;
   int i;
-  int nmiss;
+  size_t nmiss;
   int ncts = 0, nts, it;
   int hour = 0, minute = 0, second = 0;
   int nts1 = 0, nts2 = 0;

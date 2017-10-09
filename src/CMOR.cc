@@ -941,7 +941,8 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
     {
       while ( nrecs-- )
         {
-          int varIDrw, levelIDrw, nmiss;
+          int varIDrw, levelIDrw;
+          size_t nmiss;
           pstreamInqRecord(streamID2, &varIDrw, &levelIDrw);
           for ( int i = 0; i < charvars->nvalues; i++ )
             if ( varIDrw == varIDs[i] )
@@ -3680,7 +3681,7 @@ static void read_record(int streamID, struct mapping vars[], int vlistID)
       int latdim = gridInqYsize(gridID);
       int levdim = zaxisInqSize(zaxisID);
       int chardim = gridsize/latdim;
-      int nmiss;
+      size_t nmiss;
       pstreamReadRecord(streamID, buffer, &nmiss);
       for ( size_t i = 0; i < gridsize; i++ )
         {

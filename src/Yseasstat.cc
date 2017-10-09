@@ -67,7 +67,7 @@ void *Yseasstat(void *argument)
   int nrecs;
   int levelID;
   int seas_nsets[NSEAS];
-  int nmiss;
+  size_t nmiss;
   date_time_t datetime[NSEAS];
   field_type **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
 
@@ -168,7 +168,7 @@ void *Yseasstat(void *argument)
 	  if ( nsets == 0 )
 	    {
 	      pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-	      pvars1->nmiss = (size_t)nmiss;
+	      pvars1->nmiss = nmiss;
               if ( lrange )
                 {
                   pvars2->nmiss = pvars1->nmiss;
@@ -188,7 +188,7 @@ void *Yseasstat(void *argument)
 	  else
 	    {
 	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = (size_t)nmiss;
+              field.nmiss   = nmiss;
 	      field.grid    = pvars1->grid;
 	      field.missval = pvars1->missval;
 
@@ -291,7 +291,7 @@ void *Yseasstat(void *argument)
             field_type *pvars1 = &vars1[seas][varID][levelID];
 
 	    pstreamDefRecord(streamID2, varID, levelID);
-	    pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	    pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	  }
 
 	otsID++;

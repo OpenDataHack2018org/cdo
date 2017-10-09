@@ -584,7 +584,7 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
     }
 
   p->param.name = p->u.var.nm;
-  //printf("%s %s nmiss %ld %ld\n", p->u.var.nm, px->param.name, nmiss1, nmiss2);
+  //printf("%s %s nmiss %zu %zu\n", p->u.var.nm, px->param.name, nmiss1, nmiss2);
 
   if ( ! init )
     {
@@ -601,7 +601,7 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
           const double *restrict idat1 = p1->param.data+loff1;
           const double *restrict idat2 = p2->param.data+loff2;
           double *restrict odat = p->param.data+loff;
-          int nmiss = nmiss1 > 0 || nmiss2 > 0;
+          size_t nmiss = nmiss1 > 0 || nmiss2 > 0;
 
           if ( ngp1 != ngp2 )
             {

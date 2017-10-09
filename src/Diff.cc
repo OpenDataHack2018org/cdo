@@ -34,7 +34,7 @@ void *Diff(void *argument)
   int nrecs, nrecs2;
   int varID1, varID2;
   int levelID;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
   char varname[CDI_MAX_NAME];
   char paramstr[32];
@@ -185,7 +185,7 @@ void *Diff(void *argument)
 		  set_text_color(stdout, RESET, GREEN);
                   double level = cdoZaxisInqLevel(zaxisID, levelID);
 		  fprintf(stdout, "%7g ", level);
-		  fprintf(stdout, "%8d %7d ", gridsize, MAX(nmiss1, nmiss2));
+		  fprintf(stdout, "%8d %7zu ", gridsize, MAX(nmiss1, nmiss2));
 		  fprintf(stdout, "%7d ", ndiff);
 		  reset_text_color(stdout);
 		

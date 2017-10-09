@@ -43,9 +43,9 @@ void zonfun(field_type field1, field_type *field2, int function)
 void zonmin(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double rmin = 0;
@@ -85,9 +85,9 @@ void zonmin(field_type field1, field_type *field2)
 void zonmax(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double rmax = 0;
@@ -127,9 +127,9 @@ void zonmax(field_type field1, field_type *field2)
 void zonrange(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double rmin = 0;
@@ -186,9 +186,9 @@ void zonsum(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   long   nvals   = 0;
-  int    rnmiss  = 0;
+  size_t rnmiss  = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double rsum = 0;
@@ -232,9 +232,9 @@ void zonsum(field_type field1, field_type *field2)
 void zonmean(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid     = field1.grid;
-  int    nmiss    = field1.nmiss;
+  size_t nmiss    = field1.nmiss;
   double missval1 = field1.missval;
   double missval2 = field1.missval;
   double *array   = field1.ptr;
@@ -279,9 +279,9 @@ void zonmean(field_type field1, field_type *field2)
 void zonavg(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid     = field1.grid;
-  int    nmiss    = field1.nmiss;
+  size_t nmiss    = field1.nmiss;
   double missval1 = field1.missval;
   double missval2 = field1.missval;
   double *array   = field1.ptr;
@@ -322,7 +322,7 @@ void zonavg(field_type field1, field_type *field2)
 }
 
 static
-void prevarsum_zon(const double *restrict array, int nx, int nmiss,  double missval, 
+void prevarsum_zon(const double *restrict array, int nx, size_t nmiss,  double missval, 
                    double *rsum, double *rsumw, double *rsumq, double *rsumwq)
 {
   double w = 1./nx;
@@ -358,9 +358,9 @@ void prevarsum_zon(const double *restrict array, int nx, int nmiss,  double miss
 
 void zonvar(field_type field1, field_type *field2)
 {
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid     = field1.grid;
-  int    nmiss    = field1.nmiss;
+  size_t nmiss    = field1.nmiss;
   double missval1 = field1.missval;
   double *array   = field1.ptr;
   double rsum = 0, rsumw = 0, rvar = 0;
@@ -387,9 +387,9 @@ void zonvar(field_type field1, field_type *field2)
 
 void zonvar1(field_type field1, field_type *field2)
 {
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid     = field1.grid;
-  int    nmiss    = field1.nmiss;
+  size_t nmiss    = field1.nmiss;
   double missval1 = field1.missval;
   double *array   = field1.ptr;
   double rsum = 0, rsumw = 0, rvar = 0;
@@ -416,7 +416,7 @@ void zonvar1(field_type field1, field_type *field2)
 
 void zonstd(field_type field1, field_type *field2)
 {
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
   double missval = field1.missval;
   double rstd;
@@ -440,7 +440,7 @@ void zonstd(field_type field1, field_type *field2)
 
 void zonstd1(field_type field1, field_type *field2)
 {
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
   double missval = field1.missval;
   double rstd;
@@ -465,9 +465,9 @@ void zonstd1(field_type field1, field_type *field2)
 void zonpctl(field_type field1, field_type *field2, int p)
 {
   long   i, j, l;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
 

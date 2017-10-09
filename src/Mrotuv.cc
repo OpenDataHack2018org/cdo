@@ -194,7 +194,7 @@ void *Mrotuv(void *argument)
   int nrecs;
   int levelID;
   int varID, varid;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   int uid = -1, vid = -1;
 
   cdoInitialize(argument);

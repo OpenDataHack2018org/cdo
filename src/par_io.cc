@@ -17,7 +17,8 @@
 void *readRecord(void *arg)
 {
   int streamID;
-  int *varID, *levelID, *nmiss;
+  int *varID, *levelID;
+  size_t *nmiss;
   double *array;
   read_arg_t *read_arg = (read_arg_t *) arg;
 
@@ -36,7 +37,7 @@ void *readRecord(void *arg)
 }
 
 
-void parReadRecord(int streamID, int *varID, int *levelID, double *array, int *nmiss, par_io_t *parIO)
+void parReadRecord(int streamID, int *varID, int *levelID, double *array, size_t *nmiss, par_io_t *parIO)
 {
   int lpario = FALSE;
   int recID = 0, nrecs = 0;

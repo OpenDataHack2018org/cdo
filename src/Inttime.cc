@@ -105,8 +105,8 @@ void *Inttime(void *argument)
   int gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  int **nmiss1   = (int **) Malloc(nvars*sizeof(int *));
-  int **nmiss2   = (int **) Malloc(nvars*sizeof(int *));
+  size_t **nmiss1   = (size_t **) Malloc(nvars*sizeof(size_t *));
+  size_t **nmiss2   = (size_t **) Malloc(nvars*sizeof(size_t *));
   double **vardata1 = (double **) Malloc(nvars*sizeof(double *));
   double **vardata2 = (double **) Malloc(nvars*sizeof(double *));
 
@@ -114,8 +114,8 @@ void *Inttime(void *argument)
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      nmiss1[varID]   = (int*) Malloc(nlevel*sizeof(int));
-      nmiss2[varID]   = (int*) Malloc(nlevel*sizeof(int));
+      nmiss1[varID]   = (size_t*) Malloc(nlevel*sizeof(size_t));
+      nmiss2[varID]   = (size_t*) Malloc(nlevel*sizeof(size_t));
       vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
@@ -227,7 +227,7 @@ void *Inttime(void *argument)
 		  single1  = vardata1[varID] + offset;
 		  single2  = vardata2[varID] + offset;
 
-		  int nmiss3 = 0;
+		  size_t nmiss3 = 0;
 
 		  if ( nmiss1[varID][levelID] > 0 || nmiss2[varID][levelID] > 0 )
 		    {
