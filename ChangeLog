@@ -1,3 +1,7 @@
+2017-10-08  Uwe Schulzweida
+
+	* changed type of nmiss to size_t
+
 2017-10-05  Uwe Schulzweida
 
 	* Using CDI library version 1.9.1
