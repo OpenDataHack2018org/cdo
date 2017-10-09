@@ -696,7 +696,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
     cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", __func__, gridNamePtr(gridInqType(gridID)), nx, ny );
 
   if (gridInqSize(gridID) != (nx*ny) )
-    cdoAbort("Incorrect gridsize (%d) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
+    cdoAbort("Incorrect gridsize (%zu) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
   // this should never happen
 
 #define OPTrotuvNorth 1   // ACTIVATE SPEED - OPTIMIZATION
@@ -995,7 +995,7 @@ void project_uv_latlon(int gridID, double *us, double *vs)
     cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", __func__, gridNamePtr(gridInqType(gridID)), nx, ny );
 
   if (gridInqSize(gridID) != (nx*ny) )
-    cdoAbort("Incorrect gridsize (%d) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
+    cdoAbort("Incorrect gridsize (%zu) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
   // this should never happen
 
   for ( j = 0; j < ny; j++ )
@@ -1124,7 +1124,7 @@ void *TransformUV(int operatorID)
   int *recVarID   = (int *) Malloc(nrecs*sizeof(int));
   int *recLevelID = (int *) Malloc(nrecs*sizeof(int));
 
-  int **varnmiss   = (int **) Malloc(nvars*sizeof(int *));
+  size_t **varnmiss = (size_t **) Malloc(nvars*sizeof(size_t *));
   double **vardata = (double **) Malloc(nvars*sizeof(double *));
 
   // 0: set to '0'; 1: set to '1'
@@ -1188,7 +1188,7 @@ void *TransformUV(int operatorID)
           if ( cdoDebugExt )
             cdoPrint("Allocating memory for variableID %4d (code=%3d): gridsize(%d)*nlevels(%d) = %ld [%4.3f MB]",
                      varID, vlistInqVarCode(vlistID2, varID), gridsize, nlevs, gridsize*nlevs,gridsize*nlevs*sizeof(double)/(1024.0*1024));
-          varnmiss[varID] = (int *)    Malloc(nlevs*sizeof(int));
+          varnmiss[varID] = (size_t *) Malloc(nlevs*sizeof(size_t));
           vardata[varID]  = (double *) Malloc(gridsize*nlevs*sizeof(double));
         }
     }
@@ -1356,7 +1356,7 @@ void *TransformUV(int operatorID)
                               cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) -1), gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) -1));
                               if ( cdoDebugExt>=20 )
                                 {
-                                  printf("Xvals (size=%d):\n",gridInqSize(gridIDcurvl));
+                                  printf("Xvals (size=%zu):\n",gridInqSize(gridIDcurvl));
                                   int ii;
                                   for (ii=0; ii< 10; ii++)
                                     printf("%4.3f ", gridInqXval(gridIDcurvl,ii));
@@ -1364,7 +1364,7 @@ void *TransformUV(int operatorID)
                                   for (ii=gridInqSize(gridIDcurvl)-10; ii< gridInqSize(gridIDcurvl); ii++)
                                     printf("%4.3f ", gridInqXval(gridIDcurvl,ii));
                                   printf("\n");
-                                  printf("Yvals (size=%d):\n",gridInqSize(gridIDcurvl));
+                                  printf("Yvals (size=%zu):\n",gridInqSize(gridIDcurvl));
                                   for (ii=0; ii< 10; ii++)
                                     printf("%4.3f ", gridInqYval(gridIDcurvl,ii));
                                   printf("\n...\n");

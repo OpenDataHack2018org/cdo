@@ -41,7 +41,7 @@ void *Replace(void *argument)
   size_t nmiss;
   int varlist1[MAX_VARS], varlist2[MAX_VARS];
   int **varlevel = NULL;
-  int **varnmiss2 = NULL;
+  size_t **varnmiss2 = NULL;
   double **vardata2 = NULL;
   double *parray;
 
@@ -102,7 +102,7 @@ void *Replace(void *argument)
   if ( nchvars )
     {
       vardata2  = (double **) Malloc(nchvars*sizeof(double *));
-      varnmiss2 = (int **) Malloc(nchvars*sizeof(int *));
+      varnmiss2 = (size_t **) Malloc(nchvars*sizeof(size_t *));
       varlevel  = (int **) Malloc(nchvars*sizeof(int *));
       for ( idx = 0; idx < nchvars; idx++ )
 	{
@@ -112,7 +112,7 @@ void *Replace(void *argument)
 	  int nlevel2  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
 	  int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
 	  vardata2[idx]  = (double*) Malloc(nlevel2*gridsize*sizeof(double));
-	  varnmiss2[idx] = (int*) Malloc(nlevel2*sizeof(int));
+	  varnmiss2[idx] = (size_t*) Malloc(nlevel2*sizeof(size_t));
 	  varlevel[idx] = (int*) Malloc(nlevel1*sizeof(int));
 	  /*
 	  for ( levelID = 0; levelID < nlevel1; levelID++ )

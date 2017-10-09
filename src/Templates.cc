@@ -25,7 +25,7 @@ void *Template1(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int gridsize, nmiss;
+  size_t gridsize, nmiss;
 
   cdoInitialize(argument);
 

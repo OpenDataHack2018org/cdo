@@ -74,7 +74,7 @@ void *Timcumsum(void *argument)
           if ( tsID == 0 )
             {
               pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-              // pvars1->nmiss = (size_t)nmiss;
+              // pvars1->nmiss = nmiss;
               if ( nmiss )
                 for ( int i = 0; i < gridsize; ++i )
                   if ( DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval) ) pvars1->ptr[i] = 0;
@@ -82,7 +82,7 @@ void *Timcumsum(void *argument)
           else
             {
               pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              // field.nmiss   = (size_t)nmiss;
+              // field.nmiss   = nmiss;
               field.size    = gridsize;
               field.grid    = pvars1->grid;
               field.missval = pvars1->missval;
@@ -95,7 +95,7 @@ void *Timcumsum(void *argument)
             }
           
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
         }
 
       tsID++;

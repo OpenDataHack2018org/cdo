@@ -92,7 +92,7 @@ double fldroc(field_type field)
 double fldcrps(field_type field)
 {
   const size_t len     = field.size;
-  const int    nmiss   = field.nmiss;
+  const size_t nmiss   = field.nmiss;
   double *array  = field.ptr;
 
   if ( nmiss > 0 ) 
@@ -112,7 +112,7 @@ double fldcrps(field_type field)
 
 double fldbrs(field_type field) 
 {
-  const int     nmiss   = field.nmiss;
+  const size_t  nmiss   = field.nmiss;
   const size_t    len   = field.size;
   double *array   = field.ptr;
   const double missval  = field.missval;
@@ -445,7 +445,7 @@ void prevarsum(const double *restrict array, size_t len, size_t nmiss,
 
 double fldvar(field_type field)
 {
-  const int    nmiss   = field.nmiss > 0;
+  const size_t nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
   const double missval = field.missval;
   double rsum, rsumw;
@@ -462,7 +462,7 @@ double fldvar(field_type field)
 
 double fldvar1(field_type field)
 {
-  const int    nmiss   = field.nmiss > 0;
+  const size_t nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
   const double missval = field.missval;
   double rsum, rsumw;
@@ -517,7 +517,7 @@ void prevarsumw(const double *restrict array, const double *restrict w, size_t l
 
 double fldvarw(field_type field)
 {
-  const int    nmiss   = field.nmiss > 0;
+  const size_t nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
   const double missval = field.missval;
   double rsum, rsumw;
@@ -534,7 +534,7 @@ double fldvarw(field_type field)
 
 double fldvar1w(field_type field)
 {
-  const int    nmiss   = field.nmiss > 0;
+  const size_t nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
   const double missval = field.missval;
   double rsum, rsumw;
@@ -594,12 +594,12 @@ void fldrms(field_type field, field_type field2, field_type *field3)
 {
   size_t   i;
   size_t len;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid1    = field.grid;
-  //  int    nmiss1   = field.nmiss;
+  //  size_t nmiss1   = field.nmiss;
   double *array1  = field.ptr;
   int    grid2    = field2.grid;
-  //  int    nmiss2   = field2.nmiss;
+  //  size_t nmiss2   = field2.nmiss;
   double *array2  = field2.ptr;
   const double missval1 = field.missval;
   const double missval2 = field2.missval;
@@ -645,13 +645,13 @@ void fldrms(field_type field, field_type field2, field_type *field3)
 void varrms(field_type field, field_type field2, field_type *field3)
 {
   size_t   i, k, nlev, len;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    zaxis    = field.zaxis;
   int    grid1    = field.grid;
-  //  int    nmiss1   = field.nmiss;
+  //  size_t nmiss1   = field.nmiss;
   double *array1  = field.ptr;
   int    grid2    = field2.grid;
-  //  int    nmiss2   = field2.nmiss;
+  //  size_t nmiss2   = field2.nmiss;
   double *array2  = field2.ptr;
   const double missval1 = field.missval;
   const double missval2 = field2.missval;
@@ -699,7 +699,7 @@ void varrms(field_type field, field_type field2, field_type *field3)
 double fldpctl(field_type field, const double pn)
 {
   const size_t len     = field.size;
-  const int    nmiss   = field.nmiss;
+  const size_t nmiss   = field.nmiss;
   const double missval = field.missval;
   double *array  = field.ptr;
   double pctl = missval;

@@ -49,15 +49,15 @@ static double humidityIndex(double t, double e, double r, double missval)
 static void farexpr(field_type *field1, field_type field2, field_type field3, double (*expression)(double, double, double, double))
 {
   const int     grid1    = field1->grid;
-  const int     nmiss1   = field1->nmiss;
+  const size_t  nmiss1   = field1->nmiss;
   const double  missval1 = field1->missval;
   double       *array1   = field1->ptr;
   const int     grid2    = field2.grid;
-  const int     nmiss2   = field2.nmiss;
+  const size_t  nmiss2   = field2.nmiss;
   const double  missval2 = field2.missval;
   const double *array2   = field2.ptr;
   const int     grid3    = field3.grid;
-  const int     nmiss3   = field3.nmiss;
+  const size_t  nmiss3   = field3.nmiss;
   const double  missval3 = field3.missval;
   const double *array3   = field3.ptr;
 
@@ -160,15 +160,15 @@ void *Hi(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID1, &levelID1);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss = nmiss;
           
 	  pstreamInqRecord(streamID2, &varID2, &levelID2);
 	  pstreamReadRecord(streamID2, field2.ptr, &nmiss);
-          field2.nmiss = (size_t) nmiss;
+          field2.nmiss = nmiss;
 	  
 	  pstreamInqRecord(streamID3, &varID3, &levelID3);
 	  pstreamReadRecord(streamID3, field3.ptr, &nmiss);
-          field3.nmiss = (size_t) nmiss;
+          field3.nmiss = nmiss;
 	  
 	  if ( varID1 != varID2 || varID1 != varID3 || levelID1 != levelID2 || levelID1 != levelID3 )
 	    cdoAbort("Input streams have different structure!");
@@ -187,7 +187,7 @@ void *Hi(void *argument)
 	  farexpr(&field1, field2, field3, humidityIndex);
 	  
 	  pstreamDefRecord(streamID4, varID4, levelID1);
-	  pstreamWriteRecord(streamID4, field1.ptr, (int)field1.nmiss);
+	  pstreamWriteRecord(streamID4, field1.ptr, field1.nmiss);
 	}
 
       tsID++;

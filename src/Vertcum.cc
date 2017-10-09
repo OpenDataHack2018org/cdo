@@ -77,7 +77,7 @@ void *Vertcum(void *argument)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
-  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));
+  size_t **varnmiss = (size_t**) Malloc(nvars*sizeof(size_t*));
   double ***vardata1 = (double***) Malloc(nvars*sizeof(double**));
   double ***vardata2 = (double***) Malloc(nvars*sizeof(double**));
 
@@ -131,7 +131,7 @@ void *Vertcum(void *argument)
       int nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       int nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
-      varnmiss[varID] = (int*) Malloc(nlevs*sizeof(int));
+      varnmiss[varID] = (size_t*) Malloc(nlevs*sizeof(size_t));
       vardata1[varID] = (double**) Malloc(nlevs*sizeof(double*));
       vardata2[varID] = (double**) Malloc(nlevs2*sizeof(double*));
       for ( levelID = 0; levelID < nlevs; ++levelID )

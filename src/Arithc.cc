@@ -125,7 +125,7 @@ void *Arithc(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-          field.nmiss = (size_t) nmiss;
+          field.nmiss = nmiss;
 
 	  if ( vars[varID] )
 	    {
@@ -141,7 +141,7 @@ void *Arithc(void *argument)
 		if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
 	    }
 
-          nmiss = (int) field.nmiss;
+          nmiss = field.nmiss;
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, field.ptr, nmiss);
 	}

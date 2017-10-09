@@ -87,7 +87,8 @@ static int num_recs = 0;
 static
 void *cdoReadTimestep(void *rarg)
 {
-  int varID, levelID, nmiss;
+  int varID, levelID;
+  size_t nmiss;
   readarg_t *readarg = (readarg_t *) rarg;
   field_type **input_vars = readarg->vars;
   recinfo_type *recinfo = readarg->recinfo;

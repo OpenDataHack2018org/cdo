@@ -941,7 +941,8 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
     {
       while ( nrecs-- )
         {
-          int varIDrw, levelIDrw, nmiss;
+          int varIDrw, levelIDrw;
+          size_t nmiss;
           pstreamInqRecord(streamID2, &varIDrw, &levelIDrw);
           for ( int i = 0; i < charvars->nvalues; i++ )
             if ( varIDrw == varIDs[i] )

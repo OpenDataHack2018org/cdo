@@ -215,7 +215,8 @@ void *Enlargegrid(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-          int varID, levelID, nmiss1;
+          int varID, levelID;
+          size_t nmiss1;
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array1, &nmiss1);
 

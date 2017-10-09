@@ -37,7 +37,8 @@ void *Eofcoeff(void * argument)
   field_type in;  
   field_type out;
   int i, varID, levelID;    
-  int nrecs, nmiss; 
+  int nrecs;
+  size_t nmiss; 
    
   cdoInitialize(argument);
 
@@ -108,7 +109,7 @@ void *Eofcoeff(void * argument)
            cdoAbort("Internal error - too high levelID");
          
          pstreamReadRecord(streamID1, eof[varID][levelID][eofID].ptr, &nmiss);
-         eof[varID][levelID][eofID].nmiss = (size_t) nmiss;
+         eof[varID][levelID][eofID].nmiss = nmiss;
        }
      eofID++;
    }
@@ -181,7 +182,7 @@ void *Eofcoeff(void * argument)
           pstreamInqRecord(streamID2, &varID, &levelID);
           missval2 = vlistInqVarMissval(vlistID2, varID);
           pstreamReadRecord(streamID2, in.ptr, &nmiss);  
-          in.nmiss = (size_t) nmiss;
+          in.nmiss = nmiss;
           
           for ( eofID = 0; eofID < neof; eofID++ )
             {

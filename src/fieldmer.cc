@@ -43,9 +43,9 @@ void merfun(field_type field1, field_type *field2, int function)
 void mermin(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double rmin = 0;
@@ -85,9 +85,9 @@ void mermin(field_type field1, field_type *field2)
 void mermax(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double rmax = 0;
@@ -127,9 +127,9 @@ void mermax(field_type field1, field_type *field2)
 void merrange(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double rmin = 0;
@@ -186,9 +186,9 @@ void mersum(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   long   nvals   = 0;
-  int    rnmiss  = 0;
+  size_t rnmiss  = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double rsum = 0;
@@ -232,9 +232,9 @@ void mersum(field_type field1, field_type *field2)
 void mermeanw(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval1 = field1.missval;
   double missval2 = field1.missval;
   double *array  = field1.ptr;
@@ -281,9 +281,9 @@ void mermeanw(field_type field1, field_type *field2)
 void meravgw(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid     = field1.grid;
-  int    nmiss    = field1.nmiss;
+  size_t nmiss    = field1.nmiss;
   double missval1 = field1.missval;
   double missval2 = field1.missval;
   double *array   = field1.ptr;
@@ -361,9 +361,9 @@ void prevarsum_merw(const double *restrict array, const double *restrict w, int 
 
 void mervarw(field_type field1, field_type *field2)
 {
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double *w      = field1.weight;
@@ -391,9 +391,9 @@ void mervarw(field_type field1, field_type *field2)
 
 void mervar1w(field_type field1, field_type *field2)
 {
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
   double *w      = field1.weight;
@@ -421,7 +421,7 @@ void mervar1w(field_type field1, field_type *field2)
 
 void merstdw(field_type field1, field_type *field2)
 {
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
   double missval = field1.missval;
   double rstd;
@@ -445,7 +445,7 @@ void merstdw(field_type field1, field_type *field2)
 
 void merstd1w(field_type field1, field_type *field2)
 {
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
   double missval = field1.missval;
   double rstd;
@@ -470,9 +470,9 @@ void merstd1w(field_type field1, field_type *field2)
 void merpctl(field_type field1, field_type *field2, int p)
 {
   long   i, j, l;
-  int    rnmiss = 0;
+  size_t rnmiss = 0;
   int    grid    = field1.grid;
-  int    nmiss   = field1.nmiss;
+  size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
 

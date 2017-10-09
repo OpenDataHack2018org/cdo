@@ -29,8 +29,8 @@
 
 typedef struct
 {
-  int        nmiss;
   int        levelID;
+  size_t     nmiss;
   double     level;
 }
 levinfo_t;

@@ -1593,7 +1593,7 @@ void *Importcmsaf(void *argument)
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
 	      if ( cdoVerbose )
-		cdoPrint(" Write var %d,  level %d, nmiss %d, missval %g, minval %g, maxval %g",
+		cdoPrint(" Write var %d,  level %d, nmiss %zu, missval %g, minval %g, maxval %g",
 			 varID, levelID, nmiss, missval, minval, maxval);
 	      /*
 		if ( ! (missval < minval || missval > maxval) )

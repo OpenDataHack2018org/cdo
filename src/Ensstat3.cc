@@ -52,7 +52,8 @@ double roc_curve_integrate(const double **roc, const int n);
 void *Ensstat3(void *argument)
 {
   int i,j;
-  int nrecs = 0, nrecs0, nmiss;
+  int nrecs = 0, nrecs0;
+  size_t nmiss;
   int cum;
   int chksum;                  // for check of histogram population 
   int levelID, varID, binID = 0;

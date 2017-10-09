@@ -100,7 +100,7 @@ void genind(int *nx, const double *restrict plev, const double *restrict fullp, 
 }  /* genind */
 
 
-void genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog, int *restrict pnmiss)
+void genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog, size_t *restrict pnmiss)
 {
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nx,plev,ngp,nplev,ps_prog,pnmiss)

@@ -76,14 +76,14 @@ void *Monarith(void *argument)
   int nvars  = vlistNvars(vlistID2);
 
   double **vardata2  = (double **) Malloc(nvars*sizeof(double *));
-  int **varnmiss2 = (int **) Malloc(nvars*sizeof(int *));
+  size_t **varnmiss2 = (size_t **) Malloc(nvars*sizeof(size_t *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
       nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
       vardata2[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-      varnmiss2[varID] = (int*) Malloc(nlev*sizeof(int));
+      varnmiss2[varID] = (size_t*) Malloc(nlev*sizeof(size_t));
     }
 
   int tsID  = 0;
@@ -138,7 +138,7 @@ void *Monarith(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss   = (size_t) nmiss;
+          field1.nmiss   = nmiss;
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
 
@@ -152,7 +152,7 @@ void *Monarith(void *argument)
 	  farfun(&field1, field2, operfunc);
 
 	  pstreamDefRecord(streamID3, varID, levelID);
-	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
 	}
 
       tsID++;

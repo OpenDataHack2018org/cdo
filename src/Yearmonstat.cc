@@ -135,7 +135,7 @@ void *Yearmonstat(void *argument)
 	      if ( nsets == 0 )
 		{
 		  pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
-		  vars1[varID][levelID].nmiss = (size_t) nmiss;
+		  vars1[varID][levelID].nmiss = nmiss;
 
 		  farcmul(&vars1[varID][levelID], dpm);
 
@@ -154,7 +154,7 @@ void *Yearmonstat(void *argument)
 	      else
 		{
 		  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = (size_t) nmiss;
+                  field.nmiss   = nmiss;
 		  field.grid    = vars1[varID][levelID].grid;
 		  field.missval = vars1[varID][levelID].missval;
 
@@ -219,7 +219,7 @@ void *Yearmonstat(void *argument)
 	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);
+	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;

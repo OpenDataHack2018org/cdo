@@ -93,7 +93,7 @@ size_t smooth_knn_normalize_weights(unsigned num_neighbors, double dist_tot, str
 }
 
 static
-void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss, smoothpoint_t spoint)
+void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss, smoothpoint_t spoint)
 {
   *nmiss = 0;
   int gridID0 = gridID;
@@ -216,7 +216,7 @@ void smooth9_sum(size_t ij, bool *mask, double sfac, const double *restrict arra
 }
 
 static
-void smooth9(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss)
+void smooth9(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss)
 {
   size_t gridsize = gridInqSize(gridID);
   size_t nlon = gridInqXsize(gridID);	 

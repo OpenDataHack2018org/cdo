@@ -29,7 +29,7 @@ void *Seloperator(void *argument)
   int levID, ltype = 0;
   int varID2, levelID2;
   int sellevel, selcode, selltype;
-  int gridsize, nmiss;
+  size_t gridsize, nmiss;
   double slevel = 0, level;
   double *array = NULL;
 

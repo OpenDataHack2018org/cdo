@@ -1312,7 +1312,7 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
 }
 
 void
-pstreamReadRecord(int pstreamID, double *data, int *nmiss)
+pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
 {
   if (data == NULL)
     cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
@@ -1348,7 +1348,7 @@ pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 }
 
 void
-pstreamReadRecordF(int pstreamID, float *data, int *nmiss)
+pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
 {
   if (data == NULL)
     cdoAbort("Data pointer not allocated (pstreamReadRecord)!");

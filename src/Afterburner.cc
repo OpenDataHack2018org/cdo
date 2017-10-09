@@ -1707,7 +1707,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	  gridID = vars[code].igridID;
 	  zaxisID = vars[code].izaxisID;
           zaxisName(zaxisInqType(zaxisID), zaxistypename);
-	  fprintf(stderr," Detected Code %3d  grid %-8s size %5d  level %2d %-8s\n",
+	  fprintf(stderr," Detected Code %3d  grid %-8s size %5zu  level %2d %-8s\n",
 		  code, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID),
 		  zaxisInqSize(zaxisID), zaxistypename);
 	}
@@ -1812,7 +1812,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	  gridID  = vars[code].ogridID;
 	  zaxisID = vars[code].ozaxisID;
           zaxisName(zaxisInqType(zaxisID), zaxistypename);
-	  fprintf(stderr," Selected Code %3d  grid %-8s size %5d  level %2d %-8s\n",
+	  fprintf(stderr," Selected Code %3d  grid %-8s size %5zu  level %2d %-8s\n",
 		  code, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID),
 		  zaxisInqSize(zaxisID), zaxistypename);
 	}

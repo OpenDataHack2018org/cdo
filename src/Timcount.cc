@@ -122,7 +122,7 @@ void *Timcount(void *argument)
 		}
 
               pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = (size_t)nmiss;
+              field.nmiss   = nmiss;
               field.grid    = vars1[varID][levelID].grid;
 	      field.missval = vars1[varID][levelID].missval;
 
@@ -149,7 +149,7 @@ void *Timcount(void *argument)
 	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);
+	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;

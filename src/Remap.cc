@@ -155,7 +155,7 @@ void print_remap_info(int operfunc, int remap_genweights, remapgrid_t *src_grid,
 
   if ( nmiss > 0 )
     {
-      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%zu)", gridInqSize(src_grid->gridID)-nmiss);
       strcat(line, tmpstr);
     }
 
@@ -196,7 +196,7 @@ void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_
 
   if ( nmiss > 0 )
     {
-      snprintf(tmpstr, sizeof(tmpstr), " with mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), " with mask (%zu)", gridInqSize(src_grid->gridID)-nmiss);
       strcat(line, tmpstr);
     }
 

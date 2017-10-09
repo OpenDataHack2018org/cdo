@@ -337,10 +337,10 @@ void *Vertstat(void *argument)
 	  if ( levelID == 0 )
 	    {
 	      pstreamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
-	      vars1[varID].nmiss = (size_t)nmiss;
+	      vars1[varID].nmiss = nmiss;
               if ( lrange )
                 {
-                  vars2[varID].nmiss = (size_t)nmiss;
+                  vars2[varID].nmiss = nmiss;
                   for ( int i = 0; i < gridsize; i++ )
                     vars2[varID].ptr[i] = vars1[varID].ptr[i];
                 }
@@ -376,7 +376,7 @@ void *Vertstat(void *argument)
 	  else
 	    {
 	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = (size_t)nmiss;
+              field.nmiss   = nmiss;
 	      field.grid    = vars1[varID].grid;
 	      field.missval = vars1[varID].missval;
 
@@ -456,7 +456,7 @@ void *Vertstat(void *argument)
                 }
 
 	      pstreamDefRecord(streamID2, varID, 0);
-	      pstreamWriteRecord(streamID2, vars1[varID].ptr, (int)vars1[varID].nmiss);
+	      pstreamWriteRecord(streamID2, vars1[varID].ptr, vars1[varID].nmiss);
 	      vars1[varID].nsamp = 0;
 	    }
 	}

@@ -111,7 +111,7 @@ void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
 }
 
 static
-void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
+void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], size_t *nmiss)
 {
   int varID, i, gridsize;
   unsigned char *amsr_data = NULL;
@@ -148,7 +148,7 @@ void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
 }
 
 static
-void write_data(int streamID, int nvars, double *data[], int *nmiss)
+void write_data(int streamID, int nvars, double *data[], size_t *nmiss)
 {
   for ( int varID = 0; varID < nvars; ++varID )
     {

@@ -53,7 +53,7 @@ void *Intlevel3d(void *argument)
   double *single1, *single2;
   int taxisID1, taxisID3;
   double *zlevels_in, *zlevels_out;
-  int zlevels_in_miss, zlevels_out_miss;
+  size_t zlevels_in_miss, zlevels_out_miss;
   char varname[10]; 
 
   cdoInitialize(argument);
@@ -319,7 +319,7 @@ void *Intlevel3d(void *argument)
   nvars     = vlistNvars(vlistID1);
   bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));   /* marker for variables to be interpolated       */
-  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
+  size_t **varnmiss = (size_t**) Malloc(nvars*sizeof(size_t*)); /* can for missing values of arbitrary variables */
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*)); /* input                                         */
   double **vardata2 = (double**) Malloc(nvars*sizeof(double*)); /* output                                        */
 
@@ -359,22 +359,22 @@ void *Intlevel3d(void *argument)
             {
               varinterp[varID] = false;
               vardata2[varID]  = vardata1[varID];
-              varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
+              varnmiss[varID]  = (size_t*) Malloc(nlevel*sizeof(size_t));
               if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels",varname,nlevel);
             }
           else
             {
               varinterp[varID] = true;
               vardata2[varID]  = (double*) Malloc(gridsize*nlevo*sizeof(double));
-              varnmiss[varID]  = (int*) Malloc(maxlev*sizeof(int));
-              memset(varnmiss[varID], 0, maxlev*sizeof(int));
+              varnmiss[varID]  = (size_t*) Malloc(maxlev*sizeof(size_t));
+              memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
             }
         }
       else
         {
           varinterp[varID] = false;
           vardata2[varID]  = vardata1[varID];
-          varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
+          varnmiss[varID]  = (size_t*) Malloc(nlevel*sizeof(size_t));
           if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels",varname,nlevel);
         }
     }

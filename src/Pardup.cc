@@ -75,14 +75,14 @@ void *Pardup(void *argument)
   int gridsize = vlistGridsizeMax(vlistID1);
   double *array    = (double*) Malloc(gridsize*sizeof(double));
   double **vardata = (double **) Malloc(nvars*sizeof(double *));
-  int **varnmiss   = (int **) Malloc(nvars*sizeof(int *));
+  size_t **varnmiss = (size_t **) Malloc(nvars*sizeof(size_t *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       vardata[varID]  = (double*) Malloc(gridsize*nlevel*sizeof(double));
-      varnmiss[varID] = (int*) Malloc(nlevel*sizeof(int));
+      varnmiss[varID] = (size_t*) Malloc(nlevel*sizeof(size_t));
     }
 
   for ( int i = 1; i < nmul; i++ )

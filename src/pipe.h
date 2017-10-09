@@ -53,9 +53,9 @@ public:
   int pipeInqTimestep(int p_tsID);
   int pipeInqRecord(int *varID, int *levelID);
 
-  void pipeWriteRecord(double *p_data, int p_nmiss);
-  void pipeReadRecord(int p_vlistID, double *data, int *nmiss);
-  void pipeReadPipeRecord(double *data, int vlistID, int *p_nmiss);
+  void pipeWriteRecord(double *p_data, size_t p_nmiss);
+  void pipeReadRecord(int p_vlistID, double *data, size_t *nmiss);
+  void pipeReadPipeRecord(double *data, int vlistID, size_t *p_nmiss);
 
   bool EOP;
   bool usedata;

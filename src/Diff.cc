@@ -185,7 +185,7 @@ void *Diff(void *argument)
 		  set_text_color(stdout, RESET, GREEN);
                   double level = cdoZaxisInqLevel(zaxisID, levelID);
 		  fprintf(stdout, "%7g ", level);
-		  fprintf(stdout, "%8d %7d ", gridsize, MAX(nmiss1, nmiss2));
+		  fprintf(stdout, "%8d %7zu ", gridsize, MAX(nmiss1, nmiss2));
 		  fprintf(stdout, "%7d ", ndiff);
 		  reset_text_color(stdout);
 		

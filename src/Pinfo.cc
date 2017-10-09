@@ -33,8 +33,8 @@ void *Pinfo(void *argument)
   int varID;
   int nrecs;
   int levelID;
-  size_t nmiss;
-  int ivals = 0, imiss = 0;
+  size_t nmiss, imiss = 0;
+  int ivals = 0;
   char varname[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
   double level;
@@ -113,7 +113,7 @@ void *Pinfo(void *argument)
 	  level = cdoZaxisInqLevel(zaxisID, levelID);
 	  fprintf(stdout, " %7g ", level);
 
-	  fprintf(stdout, "%7d %7d :", gridsize, nmiss);
+	  fprintf(stdout, "%7d %7zu :", gridsize, nmiss);
 
 	  if ( gridInqType(gridID) == GRID_SPECTRAL ||
 	       (gridsize == 1 && nmiss == 0) )
@@ -170,7 +170,7 @@ void *Pinfo(void *argument)
 		}
 
 	      if ( imiss != nmiss && nmiss > 0 )
-		fprintf(stdout, "Found %d of %d missing values!\n", imiss, nmiss);
+		fprintf(stdout, "Found %zu of %zu missing values!\n", imiss, nmiss);
 	    }
 
 	  for ( i = 0; i < gridsize; i++ ) array2[i] = array1[i];

@@ -47,11 +47,11 @@ static void farexpr(field_type *field1, field_type field2, double (*expression)(
 {
   int   i, len;
   const int     grid1    = field1->grid;
-  const int     nmiss1   = field1->nmiss;
+  const size_t  nmiss1   = field1->nmiss;
   const double  missval1 = field1->missval;
   double       *array1   = field1->ptr;
   const int     grid2    = field2.grid;
-  const int     nmiss2   = field2.nmiss;
+  const size_t  nmiss2   = field2.nmiss;
   const double  missval2 = field2.missval;
   const double *array2   = field2.ptr;
 
@@ -145,11 +145,11 @@ void *Wct(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID1, &levelID1);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss = nmiss;
           
 	  pstreamInqRecord(streamID2, &varID2, &levelID2);
 	  pstreamReadRecord(streamID2, field2.ptr, &nmiss);
-          field2.nmiss = (size_t) nmiss;
+          field2.nmiss = nmiss;
 	  
 	  if ( varID1 != varID2 || levelID1 != levelID2 )
 	    cdoAbort("Input streams have different structure!");
@@ -166,7 +166,7 @@ void *Wct(void *argument)
 	  farexpr(&field1, field2, windchillTemperature);
 	  
 	  pstreamDefRecord(streamID3, varID3, levelID1);
-	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
 	}
 
       tsID++;

@@ -45,7 +45,7 @@ void *Ymonarith(void *argument)
   int offset;
   size_t nmiss;
   int vdate, year, mon, day;
-  int **varnmiss2[MAX_MON];
+  size_t **varnmiss2[MAX_MON];
   double **vardata2[MAX_MON];
   const char *seas_name[4];
 
@@ -117,14 +117,14 @@ void *Ymonarith(void *argument)
 	}
 
       vardata2[mon]  = (double **) Malloc(nvars*sizeof(double *));
-      varnmiss2[mon] = (int **) Malloc(nvars*sizeof(int *));
+      varnmiss2[mon] = (size_t **) Malloc(nvars*sizeof(size_t *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	  vardata2[mon][varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[mon][varID] = (int*) Malloc(nlev*sizeof(int));
+	  varnmiss2[mon][varID] = (size_t*) Malloc(nlev*sizeof(size_t));
 	}
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -168,7 +168,7 @@ void *Ymonarith(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss   = nmiss;
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
           
@@ -176,14 +176,14 @@ void *Ymonarith(void *argument)
 	  offset   = gridsize*levelID;
 
 	  memcpy(field2.ptr, vardata2[mon][varID]+offset, gridsize*sizeof(double));
-	  field2.nmiss = varnmiss2[mon][varID][levelID];
+	  field2.nmiss   = varnmiss2[mon][varID][levelID];
 	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
 	  field2.missval = vlistInqVarMissval(vlistID2, varID);
 
 	  farfun(&field1, field2, operfunc);
 
 	  pstreamDefRecord(streamID3, varID, levelID);
-	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
 	}
       tsID++;
     }

@@ -80,7 +80,7 @@ struct Control
   double *vct;
 
   int    *vert_index;
-  int    *pnmiss;
+  size_t *pnmiss;
   double *Orography;
   double *p_of_height;
 
@@ -141,8 +141,8 @@ struct Variable
   int     ogridID;
   int     izaxisID;
   int     ozaxisID;
-  int     nmiss0;
-  int     nmiss;
+  size_t  nmiss0;
+  size_t  nmiss;
   double  missval;
   double *spectral;
   double *spectral0;
