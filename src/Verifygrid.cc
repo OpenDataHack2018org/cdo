@@ -157,26 +157,14 @@ void find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal
 
 int find_coordinate_to_ignore(double *cell_corners_xyz)
 {
-  double corner_coordinates[3];
-  double second_corner_coordinates[3];
-  double third_corner_coordinates[3];
-
   /* Takes the first three corners/vertices of the cell and calculates the unit normal via determinants. */
       
-  corner_coordinates[0] = cell_corners_xyz[0];
-  corner_coordinates[1] = cell_corners_xyz[1];
-  corner_coordinates[2] = cell_corners_xyz[2];
+  double *pcorner_coordinates1 = &cell_corners_xyz[0];
+  double *pcorner_coordinates2 = &cell_corners_xyz[3];
+  double *pcorner_coordinates3 = &cell_corners_xyz[6];
 
-  second_corner_coordinates[0] = cell_corners_xyz[3 + 0];
-  second_corner_coordinates[1] = cell_corners_xyz[3 + 1];
-  second_corner_coordinates[2] = cell_corners_xyz[3 + 2];
-
-  third_corner_coordinates[0] = cell_corners_xyz[6 + 0];
-  third_corner_coordinates[1] = cell_corners_xyz[6 + 1];
-  third_corner_coordinates[2] = cell_corners_xyz[6 + 2];
-      
   double surface_normal_of_the_cell[3];
-  find_unit_normal(corner_coordinates, second_corner_coordinates, third_corner_coordinates, surface_normal_of_the_cell);
+  find_unit_normal(pcorner_coordinates1, pcorner_coordinates2, pcorner_coordinates3, surface_normal_of_the_cell);
 
   /* The surface normal is used to choose the coordinate to ignore. */
 
