@@ -747,7 +747,6 @@ void
 processDefArgument(void *vargument)
 {
   process_t &process = processSelf();
-  char *operatorArg;
   std::vector<char*> &oargv = process.oargv;
   int argc = ((argument_t *) vargument)->argc;
   std::vector<char *> &argv = ((argument_t *) vargument)->argv;
@@ -755,7 +754,7 @@ processDefArgument(void *vargument)
   process.xoperator = argv[0];
   process.operatorName = getOperatorName(process.xoperator);
   process.operatorArg = getOperatorArg(process.xoperator);
-  operatorArg = process.operatorArg;
+  char *operatorArg = process.operatorArg;
 
   if (operatorArg)
     {
