@@ -2086,7 +2086,8 @@ static int get_strmaxlen(char **array, int len)
 
 static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname, int *axis_ids, int *zfactor_id, char *project_id, int miptab_freq)
 {
-
+  char zaxisunits[CDI_MAX_NAME];
+  zaxisInqUnits(zaxisID, zaxisunits); 
   *zfactor_id = 0;
   int cmf = 0;
   int zsize = zaxisInqSize(zaxisID);
@@ -2274,7 +2275,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           zcell_bounds[0] = (double) 0;
           cmf = cmor_axis(new_axis_id(axis_ids),
                         (char *) "depth_coord",
-                        (char *) "m",
+                        (char *) zaxisunits,
                         zsize,
                         (void *)levels,
                         'd', zcell_bounds,  2, NULL);
@@ -2295,8 +2296,6 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           zaxisInqName(zaxisID, zaxisname);
           if ( strcmp(zaxisname, "rho") == 0 )
             {
-              char *zaxisunits = (char *) Malloc(CDI_MAX_NAME * sizeof(char));
-              zaxisInqUnits(zaxisID, zaxisunits);
               if ( strcmp(zaxisunits, "kg m-3") != 0 )
                 {
                   cdoAbort("For zaxis with name 'rho' the units must be kg m-3 but are: '%s'", zaxisunits);
