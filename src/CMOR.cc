@@ -3469,7 +3469,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
           cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummytwo);
 
           double covered_years = lyear-fyear + 1.0;
-          double ntperyr = (double) (ntsteps / covered_years);
+          double ntperyr = (double) ((ntsteps+1) / covered_years);
           if ( DBL_IS_EQUAL(ntperyr, (double) 1) )
             strcpy(frequency, "yr");
           else if ( DBL_IS_EQUAL(ntperyr, (double) 12) )
@@ -3491,7 +3491,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
               int step_per_year = 0;
               reccounter = 0;
               if ( cdoVerbose )
-                cdoPrint("Frequency is calculated by counting all timesteps in year %d\n          in order to calculate time bounds in case they are not given.", fyear, fmonth);
+                cdoPrint("Frequency could not be determined by comparing all time steps (%d) divided by covered years (%f).\n          It is now calculated by counting all timesteps in year %d\n          in order to calculate time bounds in case they are not given.", ntsteps, covered_years, fyear);
               while ( recdummy = pstreamInqTimestep(streamID2, reccounter++) )
                 {
                   int reqyear;
@@ -4082,7 +4082,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
   if ( time_axis != 4 )
     frequency = get_frequency(kvl, *streamID, vlistID, taxisID, miptab_freq);
   if ( cdoVerbose )
-    cdoPrint("10.1. Successfully retrieved frequency.");
+    cdoPrint("10.1. Successfully retrieved frequency %s.", frequency);
 
 
   int ifreq = 0;
