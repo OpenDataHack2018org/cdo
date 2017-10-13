@@ -70,9 +70,9 @@ process_t::initProcess()
   a_utime = 0;
   a_stime = 0;
   cputime = 0;
-  nvals = NULL;
-  nvars = NULL;
-  ntimesteps = NULL;
+  nvals = 0;
+  nvars = 0;
+  ntimesteps = 0;
 
   streamCnt = 0;
 
