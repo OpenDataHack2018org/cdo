@@ -1117,8 +1117,9 @@ static int check_attr(list_t *kvl, char *project_id)
   const char *reqAttCMIP5[] = {"institute_id", "product", "member", NULL};
   const char *reqAttCMIP5CMOR3[] = {"modeling_realm", NULL};
   const char *reqAttCORDEX[] = {"institute_id", "product", "member", "CORDEX_domain", "driving_model_id", NULL};
-/*  const char *reqAttCMIP6CMOR3[] = {"outpath", "output_path_template", "output_file_template", "tracking_prefix", NULL}; */
-  const char *reqAttCMIP6[] = {"activity_id", "experiment", "further_info_url", "grid", "grid_label", "institution_id", "license", "nominal_resolution", "source_id", "source_type", "variant_label", NULL};
+/*  const char *reqAttCMIP6CMOR3[] = {"outpath", "output_path_template", "output_file_template", "tracking_prefix", NULL}; 
+"further_info_url", "variant_label",*/
+  const char *reqAttCMIP6[] = {"activity_id", "experiment", "grid", "grid_label", "institution_id", "license", "nominal_resolution", "source_id", "source_type",  NULL};
   const char *expdepAttCMIP6[] = {"parent_experiment_id", "parent_activity_id", "parent_mip_era", "parent_source_id", "parent_variant_label", "parent_time_units", "sub_experiment", "sub_experiment_id", "branch_method", NULL};
 /* In all Projects needed Attributes are tested first */
 
@@ -1191,17 +1192,34 @@ static int check_mem(list_t *kvl, char *project_id)
 {
   const char *ripcharCMIP5[] = {"realization", "initialization_method", "physics_version"};
   const char *ripcharCMIP6[] = {"realization_index","initialization_index","physics_index","forcing_index"};
-  char ripchar[5];
+  char ripchar[5], membermix[9];
   strcpy(ripchar, "ripf");
 
   char *kv_member = kv_get_a_val(kvl, "member", "");
   int ripcharlen = 3;
   if ( strcmp(project_id, "CMIP6") == 0 )
     {
-      kv_member= kv_get_a_val(kvl, "variant_label", "");
+      kv_member = kv_get_a_val(kvl, "variant_label", "");
       kv_insert_a_val(kvl, (char *)"member", kv_member, 1);
       ripcharlen = 4;
+      if ( kv_member[0] != 'r' )
+        {
+          int j = 0;
+          while ( j < ripcharlen )
+	    {
+	      if ( !kv_get_a_val(kvl, ripcharCMIP6[j], NULL) )
+                break;
+              j++; 
+            }
+          if ( j == 4 )
+            {
+              sprintf(membermix, "r%di%dp%df%d", atoi(kv_get_a_val(kvl, ripcharCMIP6[0], NULL)), atoi(kv_get_a_val(kvl, ripcharCMIP6[1], NULL)), atoi(kv_get_a_val(kvl, ripcharCMIP6[2], NULL)), atoi(kv_get_a_val(kvl, ripcharCMIP6[3], NULL)));
+              kv_insert_a_val(kvl, (char *)"member", membermix, 1);
+              kv_member = membermix;
+            }
+        }
     }
+
   int memberlen = strlen(kv_member);
   char ripvaluechar[memberlen][CMOR_MAX_STRING];
   for ( int k = 0; k < memberlen; k++ )
