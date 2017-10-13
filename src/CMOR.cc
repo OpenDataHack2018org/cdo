@@ -1785,6 +1785,16 @@ static char *check_calendar(list_t *kvl, int taxisID, int *calendar)
 /* main: */
 /*********/
 
+static void removeDataset()
+{
+  char cwd[1024];
+  char *dummy = getcwd(cwd, sizeof(cwd));
+  int procID = getpid();
+  char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 7) * sizeof(char));;
+  sprintf(dataset_path, "%s/dataset%d.json", cwd, procID);
+  remove(dataset_path);
+}
+
 static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 {
   if ( cdoVerbose )
@@ -1858,7 +1868,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       if ( cmf != 0 )
         cdoAbort("Function cmor_dataset failed!");
     }
-  const char *allneeded2[] = {"cordex_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id", NULL};
+  const char *allneeded2[] = {"CORDEX_domain",  "driving_experiment", "driving_model_id", "driving_model_ensemble_member", "driving_experiment_name", "rcm_version_id", NULL};
   int ind = 0;
   if ( strcmp(kv_get_a_val(kvl, "project_id", NULL),"CORDEX") == 0 )
     while ( allneeded2[ind] )
@@ -1978,8 +1988,9 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
           cmf = cmor_dataset_json(dataset_path);
           if ( cmf != 0 )
             cdoAbort("Function cmor_dataset_json failed!");
-          Free(dataset_path);
 
+          Free(dataset_path);
+          removeDataset();  
 
       Free(branch_time_in_parent);
       Free(branch_time_in_child);
