@@ -2391,7 +2391,7 @@ static void register_character_dimension(int *axis_ids, char *filename)
 static void change_grid(char *grid_file, int gridID, int vlistID)
 {
   if ( cdoVerbose )
-    cdoPrint("You configured a grid_info file: '%s'. It is tested for a valid use as substitution.\n");
+    cdoPrint("You configured a grid_info file: '%s'. It is tested for a valid use as substitution.\n", grid_file);
   argument_t *fileargument = file_argument_new(grid_file);
   int streamID2 = pstreamOpenRead(fileargument); 
   int vlistID2 = pstreamInqVlist(streamID2);
@@ -2455,10 +2455,11 @@ static void get_cmor_table(list_t *kvl, char *project_id)
   int cmf = 0;
   char gridtable[CMOR_MAX_STRING];
   char *mip_table_dir = kv_get_a_val(kvl, "mip_table_dir", NULL);
-  if ( mip_table_dir && project_id )
-    {
 #if ( CMOR_VERSION_MAJOR == 2 )
-      sprintf(gridtable, "%s/%s_grids", mip_table_dir, project_id);
+      if ( mip_table_dir[strlen(mip_table_dir)-1] == '/' )
+        sprintf(gridtable, "%s%s_grids", mip_table_dir, project_id);
+      else
+        sprintf(gridtable, "%s/%s_grids", mip_table_dir, project_id);
 #elif ( CMOR_VERSION_MAJOR == 3 )
       sprintf(gridtable, "%s/%s_grids.json", mip_table_dir, project_id);
 #endif
@@ -2469,11 +2470,6 @@ static void get_cmor_table(list_t *kvl, char *project_id)
         }
       else
         cdoAbort("In grid registration:\n          A project grid table is required for this type of grid but not found in the mip table directory '%s'.", mip_table_dir);
-    }
-  else
-    {
-      cdoAbort("In grid registration:\n          A project grid table is required for this type of grid but not found in the mip table directory. Check attributes 'mip_table_dir' and 'project_id' !");
-    } 
   if ( cmf != 0 )
     cdoAbort("Function cmor_load_table or cmor_set_table failed!"); 
 }
