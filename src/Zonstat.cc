@@ -44,7 +44,7 @@ void *Zonstat(void *argument)
   int gridID1 = -1, gridID2 = -1;
   int zongridID = -1;
   int index;
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   int varID, levelID;
 
@@ -156,7 +156,7 @@ void *Zonstat(void *argument)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
 
-          field1.nmiss   = (size_t) nmiss;
+          field1.nmiss   = nmiss;
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
 	  field2.missval = vlistInqVarMissval(vlistID1, varID);
@@ -175,7 +175,7 @@ void *Zonstat(void *argument)
 	    }
 
 	  pstreamDefRecord(streamID2, varID,  levelID);
-	  pstreamWriteRecord(streamID2, field2.ptr, (int)field2.nmiss);
+	  pstreamWriteRecord(streamID2, field2.ptr, field2.nmiss);
 	}
 
       tsID++;

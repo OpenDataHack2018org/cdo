@@ -46,7 +46,7 @@ void *Ydrunpctl(void *argument)
   int nrecs;
   int levelID;
   int inp, its;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
   int year, month, day, dayoy;
   int vdate, vtime;
@@ -230,7 +230,7 @@ void *Ydrunpctl(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 	  nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      
 	  for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -292,7 +292,7 @@ void *Ydrunpctl(void *argument)
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      
 	    for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -308,7 +308,7 @@ void *Ydrunpctl(void *argument)
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	    if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	    pstreamDefRecord(streamID4, varID, levelID);
 	    pstreamWriteRecord(streamID4, vars2[dayoy][varID][levelID].ptr,

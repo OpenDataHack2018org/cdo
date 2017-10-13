@@ -5,6 +5,32 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Test GRIB files
+#
+IFILES="testfile01 testfile02 testfile03"
+for FILE in $IFILES; do
+  IFILE=grib_${FILE}.grb
+  OFILE=grib_${FILE}_sinfo_ref
+  $CDO sinfo $IFILE > $OFILE
+  OFILE=grib_${FILE}_info_ref
+  $CDO info $IFILE > $OFILE
+done
+#
+########################################################################
+#
+# Test netCDF files
+#
+IFILES="testfile01 testfile02"
+for FILE in $IFILES; do
+  IFILE=netcdf_${FILE}.nc
+  OFILE=netcdf_${FILE}_sinfon_ref
+  $CDO sinfon $IFILE > $OFILE
+  OFILE=netcdf_${FILE}_infon_ref
+  $CDO infon $IFILE > $OFILE
+done
+exit
+########################################################################
+#
 # Mergetime
 #
 $CDO $FORMAT settaxis,2001-01-01,,1year -const,1,r1x1 mergetime_y1
@@ -18,7 +44,7 @@ exit
 # Timstat Yearstat Monstat Daystat Runstat
 #
 IFILE=$HOME/data/cdt/cera/EH5_AMIP_1_TSURF_6H_1991-1995.grb
-OFILE=ts_6h_5years
+ OFILE=ts_6h_5years
 $CDO $FORMAT remapnn,lon=55_lat=10 $IFILE $OFILE
 #
 IFILE=$OFILE
@@ -232,32 +258,6 @@ exit
 #
 $CDO $FORMAT cdiwrite,1,global_10,3,3,3 file_F32_srv_ref
 #
-########################################################################
-#
-# Test GRIB files
-#
-IFILES="testfile01 testfile02"
-for FILE in $IFILES; do
-  IFILE=grib_${FILE}.grb
-  OFILE=grib_${FILE}_sinfon_ref
-  $CDO sinfo $IFILE > $OFILE
-  OFILE=grib_${FILE}_infon_ref
-  $CDO info $IFILE > $OFILE
-done
-#
-########################################################################
-#
-# Test netCDF files
-#
-IFILES="testfile01 testfile02"
-for FILE in $IFILES; do
-  IFILE=netcdf_${FILE}.nc
-  OFILE=netcdf_${FILE}_sinfon_ref
-  $CDO sinfon $IFILE > $OFILE
-  OFILE=netcdf_${FILE}_infon_ref
-  $CDO infon $IFILE > $OFILE
-done
-exit
 ########################################################################
 #
 # Vertint

@@ -55,7 +55,7 @@ void *Intgridtraj(void *argument)
   int gridID1;
   int varID, levelID;
   int vdate, vtime;
-  int nmiss;
+  size_t nmiss;
   double point;
   double xpos, ypos;
   int calendar = CALENDAR_STANDARD;

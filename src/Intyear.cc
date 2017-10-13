@@ -34,7 +34,7 @@ void *Intyear(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss1, nmiss2, nmiss3;
+  size_t nmiss1, nmiss2, nmiss3;
   char filesuffix[32];
   char filename[8192];
 

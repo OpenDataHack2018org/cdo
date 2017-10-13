@@ -34,8 +34,11 @@ If a variable attribute should be printed, the following format is requested:
 @EndOperator
 
 @BeginOperator_showattsvar
-@Title     = Show all variable attributes. If var_nm is specified, only for a subset of variables.
+@Title     = Show all variable attributes.
 @Parameter = [var_nm]
+@BeginDescription
+If var_nm is specified, only for a subset of variables.
+@EndDescription
 @EndOperator
 
 @BeginParameter

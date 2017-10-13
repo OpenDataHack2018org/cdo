@@ -245,7 +245,7 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
       numrecs = 0;
       for (int varID = 0; varID < vlistNvars(vlistID); varID++)
         {
-          if (vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT)
+          if (vlistInqVarTimetype(vlistID, varID) != TIME_CONSTANT)
             {
               numrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
             }
@@ -402,7 +402,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
  * @param pipe pipe that has the wanted data
  */
 void
-pipe_t::pipeReadPipeRecord(double *p_data, int vlistID, int *p_nmiss)
+pipe_t::pipeReadPipeRecord(double *p_data, int vlistID, size_t *p_nmiss)
 {
   if (!p_data)
     Error("No data pointer for %s", name.c_str());
@@ -443,7 +443,7 @@ pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
 }
 */
 void
-pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
+pipe_t::pipeReadRecord(int p_vlistID, double *data, size_t *nmiss)
 {
   *nmiss = 0;
 
@@ -477,7 +477,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, int *nmiss)
 }
 
 void
-pipe_t::pipeWriteRecord(double *p_data, int p_nmiss)
+pipe_t::pipeWriteRecord(double *p_data, size_t p_nmiss)
 {
   /*
   if ( ! usedata ) return;

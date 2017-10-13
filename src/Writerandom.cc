@@ -58,7 +58,7 @@ void *Writerandom(void *argument)
       double **recdata = (double**) Malloc(nrecs*sizeof(double*));
       int *recvarID   = (int*) Malloc(nrecs*sizeof(int));
       int *reclevelID = (int*) Malloc(nrecs*sizeof(int));
-      int *recnmiss   = (int*) Malloc(nrecs*sizeof(int));
+      size_t *recnmiss = (size_t*) Malloc(nrecs*sizeof(size_t));
       int *recindex   = (int*) Malloc(nrecs*sizeof(int));
 
       for ( int recID = 0; recID < nrecs; recID++ )

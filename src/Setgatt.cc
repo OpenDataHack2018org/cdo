@@ -33,7 +33,7 @@ void *Setgatt(void *argument)
   int nrecs;
   int varID, levelID;
   int gridsize;
-  int nmiss;
+  size_t nmiss;
   char *attname = NULL, *attstring = NULL, *attfile = NULL;
 
   cdoInitialize(argument);

@@ -179,7 +179,7 @@ void *Comp(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-          int nmiss1;
+          size_t nmiss1;
 	  pstreamInqRecord(streamIDx1, &varID, &levelID);
 	  pstreamReadRecord(streamIDx1, arrayx1, &nmiss1);
 
@@ -187,7 +187,7 @@ void *Comp(void *argument)
 	    {
 	      if ( recID == 0 || filltype != FILL_REC )
 		{
-                  int nmiss2;
+                  size_t nmiss2;
 		  pstreamInqRecord(streamIDx2, &varID, &levelID);
 		  pstreamReadRecord(streamIDx2, arrayx2, &nmiss2);
 		}
@@ -266,7 +266,7 @@ void *Comp(void *argument)
 	      cdoAbort("Operator not implemented!");
 	    }
 
-	  int nmiss3 = 0;
+	  size_t nmiss3 = 0;
 	  for ( int i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array3[i], missval1) ) nmiss3++;
 

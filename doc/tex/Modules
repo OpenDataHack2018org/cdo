@@ -147,8 +147,8 @@ Strwin        Miscellaneous
 Strbre        Miscellaneous
 Strgal        Miscellaneous
 Hurr          Miscellaneous
-CMOR          Miscellaneous
 CMORlite      Miscellaneous
+CMOR          CMOR
 Magplot       Magics
 Magvector     Magics
 Maggraph      Magics

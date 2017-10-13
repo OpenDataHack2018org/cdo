@@ -519,6 +519,7 @@ while (<MOFILE>) {
     if ( $istart > 0 )  {
       $parameter = @oper_parameter[0];
       print HELPFILE "    \"    <operator>${parameter}  ${marguments}\",\n";
+      $parameter =~ s/_/\\_/g;
       print TRFILE "\\hspace*{8mm}{\$<\\!operator\\!>\$}\\textsl{$parameter} \\ \\texttt{$marguments}\n\n";
     }
 
@@ -528,6 +529,7 @@ while (<MOFILE>) {
       printf HELPFILE ("    \"    %s%s  %s\",\n", $operator, $parameter, $marguments);
       $operatorx = $operator;
       $operatorx =~ s/_/\\_/g;
+      $parameter =~ s/_/\\_/g;
       print TRFILE "\\hspace*{8mm}\\textbf{$operatorx}\\textsl{$parameter} \\ \\texttt{$marguments}\n\n";
     }
 
@@ -631,10 +633,12 @@ while (<MOFILE>) {
 	if ( $refskip == 0 && $xopercnt > 1 && "$oparameter" ne "$operpara" ) {
 #	  print TRCARD "\\rowcolor[gray]{.9}\n";
 	  print TRCARD "\\multicolumn{2}{|>{\\columncolor{pcolor3}}l|}";
+          $operparax = $operpara;
+          $operparax =~ s/_/\\_/g;
 	  if ( $xopercnt == 2 ) {
-	    print TRCARD "{\\textbf{$opernamex}\\textsl{$operpara} \ \\texttt{$marguments}} ";
+	    print TRCARD "{\\textbf{$opernamex}\\textsl{$operparax} \ \\texttt{$marguments}} ";
 	  } else {
-	    print TRCARD "{{\$<\\!operator\\!>\$}\\textsl{$operpara} \ \\texttt{$marguments}} ";
+	    print TRCARD "{{\$<\\!operator\\!>\$}\\textsl{$operparax} \ \\texttt{$marguments}} ";
 	  }
 	  print TRCARD "\\\\ \\hline \n";
 	  $xopercnt = 1;
@@ -1038,11 +1042,13 @@ while (<MOFILE>) {
     }
     $opernamex = $opername;
     $opernamex =~ s/_/\\_/g;
+    $operparax = $operpara;
+    $operparax =~ s/_/\\_/g;
     if ( $refskip == 0 ) {
       if ( $xopercnt == 1 ) {
-	print TRCARD "{\\textbf{$opernamex}\\textsl{$operpara} \ \\texttt{$marguments}} ";
+	print TRCARD "{\\textbf{$opernamex}\\textsl{$operparax} \ \\texttt{$marguments}} ";
       } else {
-	print TRCARD "{{\$<\\!operator\\!>\$}\\textsl{$operpara} \ \\texttt{$marguments}} ";
+	print TRCARD "{{\$<\\!operator\\!>\$}\\textsl{$operparax} \ \\texttt{$marguments}} ";
       }
       print TRCARD "\\\\ \\hline \n";
 

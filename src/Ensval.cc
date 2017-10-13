@@ -43,7 +43,8 @@ enum RESTYPE_CRPS { CRPS_RES,CRPS_RELI,CRPS_POT };
 void *Ensval(void *argument)
 {
   int i,k;
-  int nrecs = 0, nrecs0, nmiss, nostreams = 0, ngrids;
+  int nrecs = 0, nrecs0, nostreams = 0, ngrids;
+  size_t nmiss;
   int levelID, varID;
   int gridsize = 0;
   int vlistID;

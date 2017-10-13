@@ -364,7 +364,7 @@ void *CMOR_lite(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   bool delvars = false;
   double missval;
 

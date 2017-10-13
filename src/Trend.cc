@@ -32,7 +32,7 @@ void *Trend(void *argument)
 {
   int vdate = 0, vtime = 0;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   double temp1, temp2;
   enum {nwork = 5};

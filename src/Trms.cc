@@ -30,7 +30,8 @@
 
 void trms(field_type field1, field_type field2, double *dp, field_type *field3)
 {
-  int i, k, nlev, len, rnmiss = 0;
+  int i, k, nlev, len;
+  size_t rnmiss = 0;
   int    zaxis    = field1.zaxis;
   int    grid1    = field1.grid;
   double *array1  = field1.ptr;
@@ -69,7 +70,7 @@ void *Trms(void *argument)
   int code = 0, oldcode = 0;
   int zaxisID;
   int nrecs;
-  int nmiss;
+  size_t nmiss;
   int varID, levelID;
   int pcode = 152, pvarID = -1;
   long offset;

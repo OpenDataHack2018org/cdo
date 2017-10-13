@@ -57,7 +57,7 @@ void *Setzaxis(void *argument)
   int varID, levelID;
   int zaxisID1, zaxisID2 = -1;
   int nzaxis, index;
-  int nmiss;
+  size_t nmiss;
   int found;
   bool lztop = false, lzbot = false;
   double ztop = 0, zbot = 0;

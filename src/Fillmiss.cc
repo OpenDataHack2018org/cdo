@@ -41,7 +41,7 @@ extern "C" {
 void fillmiss(field_type *field1, field_type *field2, int nfill)
 {
   int nx, ny, i, j;
-  int nmiss2 = 0;
+  size_t nmiss2 = 0;
   int kr, ku, kl, ko;
   int ir, iu, il, io;
   int kh, kv, k1, k2, kk;
@@ -51,7 +51,7 @@ void fillmiss(field_type *field1, field_type *field2, int nfill)
   double **matrix1, **matrix2;
 
   int gridID = field1->grid;
-  int nmiss1 = field1->nmiss;
+  size_t nmiss1 = field1->nmiss;
   double missval  = field1->missval;
   double *array1  = field1->ptr;
   double *array2  = field2->ptr;
@@ -156,7 +156,7 @@ void fillmiss(field_type *field1, field_type *field2, int nfill)
 void fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
 {
   int gridID, nx, ny, i, j;
-  int nmiss2 = 0;
+  size_t nmiss2 = 0;
   int kr, ku, kl, ko;
   int ir, iu, il, io;
   int kh, kv, k1, k2, kk;
@@ -419,7 +419,7 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
 void *Fillmiss(void *argument)
 {
-  int nmiss;
+  size_t nmiss;
   int nrecs, varID, levelID;
   void (*fill_method) (field_type *fin , field_type *fout , int) = NULL;
 
@@ -528,7 +528,7 @@ void *Fillmiss(void *argument)
               fill_method(&field1, &field2, nfill);
 
               int gridsize = gridInqSize(field2.grid);
-              int nmiss = 0;
+              size_t nmiss = 0;
               for ( int i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
               

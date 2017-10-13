@@ -62,52 +62,32 @@ void printFiletype(int streamID, int vlistID)
 {
   int filetype = streamInqFiletype(streamID);
 
+  // clang-format off
   switch ( filetype )
     {
-    case CDI_FILETYPE_GRB:
-      printf("GRIB");
-      break;
-    case CDI_FILETYPE_GRB2:
-      printf("GRIB2");
-      break;
-    case CDI_FILETYPE_NC:
-      printf("NetCDF");
-      break;
-    case CDI_FILETYPE_NC2:
-      printf("NetCDF2");
-      break;
-    case CDI_FILETYPE_NC4:
-      printf("NetCDF4");
-      break;
-    case CDI_FILETYPE_NC4C:
-      printf("NetCDF4 classic");
-      break;
-    case CDI_FILETYPE_SRV:
-      printf("SERVICE");
-      break;
-    case CDI_FILETYPE_EXT:
-      printf("EXTRA");
-      break;
-    case CDI_FILETYPE_IEG:
-      printf("IEG");
-      break;
-    default:
-      printf("  File format: unsupported filetype %d" , filetype);
-      break;
+    case CDI_FILETYPE_GRB:  printf("GRIB");  break;
+    case CDI_FILETYPE_GRB2: printf("GRIB2");  break;
+    case CDI_FILETYPE_NC:   printf("NetCDF");  break;
+    case CDI_FILETYPE_NC2:  printf("NetCDF2");  break;
+    case CDI_FILETYPE_NC4:  printf("NetCDF4");  break;
+    case CDI_FILETYPE_NC4C: printf("NetCDF4 classic");  break;
+    case CDI_FILETYPE_NC5:  printf("NetCDF5");  break;
+    case CDI_FILETYPE_SRV:  printf("SERVICE");  break;
+    case CDI_FILETYPE_EXT:  printf("EXTRA");  break;
+    case CDI_FILETYPE_IEG:  printf("IEG");  break;
+    default: printf("  File format: unsupported filetype %d" , filetype);  break;
     }
 
   if ( filetype == CDI_FILETYPE_SRV || filetype == CDI_FILETYPE_EXT || filetype == CDI_FILETYPE_IEG )
     {
       switch ( streamInqByteorder(streamID) )
 	{
-	case CDI_BIGENDIAN:
-	  printf("  BIGENDIAN"); break;
-	case CDI_LITTLEENDIAN:
-	  printf("  LITTLEENDIAN"); break;
-	default:
-	  printf("  byteorder: %d undefined", streamInqByteorder(streamID)); break;
+	case CDI_BIGENDIAN:    printf("  BIGENDIAN");  break;
+	case CDI_LITTLEENDIAN: printf("  LITTLEENDIAN");  break;
+	default: printf("  byteorder: %d undefined", streamInqByteorder(streamID));  break;
 	}
     }
+  // clang-format on
 
   if ( filetype == CDI_FILETYPE_GRB || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
     {
@@ -282,7 +262,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
   size_t ysize    = gridInqYsize(gridID);
   size_t xysize   = xsize*ysize;
 
-  // int prec     = gridInqPrec(gridID);
+  // int prec     = gridInqDatatype(gridID);
   // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
   int dig = 7;
 #ifdef CDO
@@ -482,7 +462,7 @@ void printZaxisInfo(int vlistID)
       int zaxistype = zaxisInqType(zaxisID);
       int ltype     = zaxisInqLtype(zaxisID);
       int levelsize = zaxisInqSize(zaxisID);
-      // int prec      = zaxisInqPrec(zaxisID);
+      // int prec      = zaxisInqDatatype(zaxisID);
       // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
       int dig = 7;
 #ifdef CDO

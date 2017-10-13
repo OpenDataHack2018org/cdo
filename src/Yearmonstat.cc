@@ -41,7 +41,7 @@ void *Yearmonstat(void *argument)
   int dpm;
   int year0 = 0, month0 = 0;
   int year, month, day;
-  int nmiss;
+  size_t nmiss;
   int nlevel;
   long nsets;
   double dsets;
@@ -64,6 +64,7 @@ void *Yearmonstat(void *argument)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -134,7 +135,7 @@ void *Yearmonstat(void *argument)
 	      if ( nsets == 0 )
 		{
 		  pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
-		  vars1[varID][levelID].nmiss = (size_t) nmiss;
+		  vars1[varID][levelID].nmiss = nmiss;
 
 		  farcmul(&vars1[varID][levelID], dpm);
 
@@ -153,7 +154,7 @@ void *Yearmonstat(void *argument)
 	      else
 		{
 		  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = (size_t) nmiss;
+                  field.nmiss   = nmiss;
 		  field.grid    = vars1[varID][levelID].grid;
 		  field.missval = vars1[varID][levelID].missval;
 
@@ -189,8 +190,8 @@ void *Yearmonstat(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
+	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      if ( samp1[varID][levelID].ptr == NULL )
@@ -215,10 +216,10 @@ void *Yearmonstat(void *argument)
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
 
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);
+	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;

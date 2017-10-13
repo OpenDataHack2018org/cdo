@@ -26,7 +26,7 @@ void *Tocomplex(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

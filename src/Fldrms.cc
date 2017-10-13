@@ -34,7 +34,7 @@ void *Fldrms(void *argument)
   int index;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   double sglval;
 
   cdoInitialize(argument);
@@ -116,10 +116,10 @@ void *Fldrms(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss = nmiss;
 	  pstreamInqRecord(streamID2, &varID, &levelID);
 	  pstreamReadRecord(streamID2, field2.ptr, &nmiss);
-          field2.nmiss = (size_t) nmiss;
+          field2.nmiss = nmiss;
 
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
@@ -147,7 +147,7 @@ void *Fldrms(void *argument)
 	  fldrms(field1, field2, &field3);
 
 	  pstreamDefRecord(streamID3, varID,  levelID);
-	  pstreamWriteRecord(streamID3, &sglval, (int)field3.nmiss);
+	  pstreamWriteRecord(streamID3, &sglval, field3.nmiss);
 	}
       tsID++;
     }

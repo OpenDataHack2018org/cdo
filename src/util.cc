@@ -238,7 +238,7 @@ const char *getOperatorName(const char *operatorArg)
   /*  return operatorName; */
   if(is_alias(operatorName))
   {
-    get_original(operatorName);
+    operatorName = get_original(operatorName);
   }
     return operatorName;
 }
@@ -665,6 +665,7 @@ const char *filetypeext(int filetype)
     case CDI_FILETYPE_GRB2: return ".grb";
     case CDI_FILETYPE_NC:
     case CDI_FILETYPE_NC2:
+    case CDI_FILETYPE_NC5:
     case CDI_FILETYPE_NC4:
     case CDI_FILETYPE_NC4C: return ".nc";
     case CDI_FILETYPE_SRV:  return ".srv";
@@ -742,7 +743,8 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
                           break;
                         case 'n':
                           if ( cdoDefaultFileType == CDI_FILETYPE_NC || cdoDefaultFileType == CDI_FILETYPE_NC2 ||
-                               cdoDefaultFileType == CDI_FILETYPE_NC4 || cdoDefaultFileType == CDI_FILETYPE_NC4C ) lready = true;
+                               cdoDefaultFileType == CDI_FILETYPE_NC4 || cdoDefaultFileType == CDI_FILETYPE_NC4C ||
+                               cdoDefaultFileType == CDI_FILETYPE_NC5 ) lready = true;
                           break;
                         case 's':
                           if ( cdoDefaultFileType == CDI_FILETYPE_SRV ) lready = true;

@@ -188,7 +188,7 @@ int define_level(dsets_t *pfi, int nlev)
 void *Importbinary(void *argument)
 {
   int i;
-  int nmiss = 0, n_nan;
+  size_t nmiss = 0, n_nan;
   int ivar;
   int varID = -1, levelID, tsID;
   int gridsize;
@@ -252,7 +252,7 @@ void *Importbinary(void *argument)
       if ( nlevels == 0 )
 	{
 	  nlevels = 1;
-	  varID = vlistDefVar(vlistID, gridID, zaxisIDsfc, TSTEP_INSTANT);
+	  varID = vlistDefVar(vlistID, gridID, zaxisIDsfc, TIME_VARYING);
 	}
       else
 	{
@@ -269,10 +269,10 @@ void *Importbinary(void *argument)
 		}
 
 	      if ( vid == ivar ) zid = define_level(&pfi, nlevels);
-	      varID = vlistDefVar(vlistID, gridID, zid, TSTEP_INSTANT);
+	      varID = vlistDefVar(vlistID, gridID, zid, TIME_VARYING);
 	    }
 	  else
-	    varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+	    varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
 	}
 
       var_zaxisID[varID] = vlistInqVarZaxis(vlistID, varID);
@@ -536,7 +536,7 @@ void *Importbinary(void *argument)
 		}
 	      /*
 	      if ( cdoVerbose )
-		printf("%3d %4d %3d %6d %6d %12.5g %12.5g\n", tsID, recID, recoffset, nmiss, n_nan, fmin, fmax);
+		printf("%3d %4d %3d %6zu %6zu %12.5g %12.5g\n", tsID, recID, recoffset, nmiss, n_nan, fmin, fmax);
 	      */
 	      varID   = recVarID[recID];
 	      levelID = recLevelID[recID];

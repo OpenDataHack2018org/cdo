@@ -204,7 +204,7 @@ void *Outputgmt(void *argument)
   int gridsize2 = 0;
   int nrecs;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int ninc = 1;
   bool lzon = false, lmer = false, lhov = false;
   bool lgrid_gen_bounds = false, luse_grid_corner = false;

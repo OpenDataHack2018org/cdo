@@ -49,7 +49,7 @@ void *Yseaspctl(void *argument)
   int year, month, day, seas;
   int nrecs;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
   long nsets[NSEAS];
   date_time_t datetime1[NSEAS], datetime2[NSEAS];
@@ -216,7 +216,7 @@ void *Yseaspctl(void *argument)
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    
 	    for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -232,7 +232,7 @@ void *Yseaspctl(void *argument)
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	    if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	    pstreamDefRecord(streamID4, varID, levelID);
 	    pstreamWriteRecord(streamID4, vars1[seas][varID][levelID].ptr, vars1[seas][varID][levelID].nmiss);

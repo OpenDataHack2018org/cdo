@@ -35,7 +35,7 @@ void *Splitrec(void *argument)
   char filename[8192];
   const char *refname;
   int gridsize;
-  int nmiss;
+  size_t nmiss;
   double *array = NULL;
 
   cdoInitialize(argument);

@@ -258,6 +258,7 @@ void filedes(int streamID)
     case CDI_FILETYPE_NC2:  printf("  NetCDF2 data\n"); break;
     case CDI_FILETYPE_NC4:  printf("  NetCDF4 data\n"); break;
     case CDI_FILETYPE_NC4C: printf("  NetCDF4 classic data\n"); break;
+    case CDI_FILETYPE_NC5:  printf("  NetCDF5 data\n"); break;
     case CDI_FILETYPE_SRV:  printf("  SERVICE data\n"); break;
     case CDI_FILETYPE_EXT:  printf("  EXTRA data\n"); break;
     case CDI_FILETYPE_IEG:  printf("  IEG data\n"); break;

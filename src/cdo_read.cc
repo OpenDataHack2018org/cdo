@@ -45,7 +45,7 @@ bool *cdo_read_timestepmask(const char *maskfile, int *n)
       if ( nrecs != 1 ) cdoAbort("Internal error; unexprected number of records!");
 
       int varID, levelID;
-      int nmiss;
+      size_t nmiss;
       double value;
       streamInqRecord(streamID, &varID, &levelID);
       streamReadRecord(streamID, &value, &nmiss);
@@ -86,7 +86,7 @@ bool *cdo_read_mask(const char *maskfile, int *n)
   if ( nrecs != 1 ) cdoAbort("Internal error; unexprected number of records!");
 
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   streamInqRecord(streamID, &varID, &levelID);
   streamReadRecord(streamID, dmask, &nmiss);
 

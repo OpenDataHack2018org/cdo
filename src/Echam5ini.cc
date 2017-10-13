@@ -1433,7 +1433,8 @@ void *Echam5ini(void *argument)
   int vlistID1, vlistID2;
   int nvars = 0;
   int iv, nlev;
-  int gridsize, nmiss;
+  int gridsize;
+  size_t nmiss;
   int taxisID, tsID;
 
   cdoInitialize(argument);
@@ -1475,7 +1476,7 @@ void *Echam5ini(void *argument)
 	{/*
 	  fprintf(stderr, "%d %s %d %d %d %d\n", iv, vars[iv].name, vars[iv].gridID, vars[iv].zaxisID, gridInqSize(vars[iv].gridID), zaxisInqSize(vars[iv].zaxisID));
 	 */
-	  varID = vlistDefVar(vlistID2, vars[iv].gridID, vars[iv].zaxisID, TSTEP_CONSTANT);
+	  varID = vlistDefVar(vlistID2, vars[iv].gridID, vars[iv].zaxisID, TIME_CONSTANT);
 	  if ( vars[iv].code > 0 ) vlistDefVarCode(vlistID2, varID, vars[iv].code);
 	  if ( vars[iv].name )     vlistDefVarName(vlistID2, varID, vars[iv].name);
 	  if ( vars[iv].longname ) vlistDefVarLongname(vlistID2, varID, vars[iv].longname);

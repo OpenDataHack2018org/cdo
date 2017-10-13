@@ -210,7 +210,8 @@ void *Selgridcell(void *argument)
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-          int nmiss, varID, levelID;
+          size_t nmiss;
+          int varID, levelID;
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array1, &nmiss);
 

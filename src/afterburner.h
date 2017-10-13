@@ -80,7 +80,7 @@ struct Control
   double *vct;
 
   int    *vert_index;
-  int    *pnmiss;
+  size_t *pnmiss;
   double *Orography;
   double *p_of_height;
 
@@ -141,8 +141,8 @@ struct Variable
   int     ogridID;
   int     izaxisID;
   int     ozaxisID;
-  int     nmiss0;
-  int     nmiss;
+  size_t  nmiss0;
+  size_t  nmiss;
   double  missval;
   double *spectral;
   double *spectral0;
@@ -241,8 +241,9 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars);
 void after_processPL(struct Control *globs, struct Variable *vars);
 void after_processML(struct Control *globs, struct Variable *vars);
 
-void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss);
-void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss);
+void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss);
+double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int levelID);
+void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss);
 
 void  after_AnalysisDependencies(struct Variable *vars, int ncodes);
 void  after_EchamDependencies(struct Variable *vars, int ncodes, int type, int source);

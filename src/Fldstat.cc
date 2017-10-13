@@ -87,7 +87,7 @@ void *Fldstat(void *argument)
   int index;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   double sglval;
 
   cdoInitialize(argument);

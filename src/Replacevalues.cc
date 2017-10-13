@@ -34,7 +34,7 @@ void *Replacevalues(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nvals = 0;
   lista_t *flista = lista_new(FLT_LISTA);
   double *fltarr = NULL;

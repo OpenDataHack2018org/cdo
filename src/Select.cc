@@ -44,7 +44,7 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
           for ( int levelID2c = 0; levelID2c < nlevel; ++levelID2c )
             {
               double *pdata = vardata2[varID2c]+gridsize*levelID2c;
-              int nmiss = 0;
+              size_t nmiss = 0;
               for ( int i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
 
@@ -143,6 +143,7 @@ void *Select(void *argument)
 
   sellist_t *sellist = sellist_create(kvlist);
 
+  // clang-format off
   SELLIST_ADD_INT(timestep_of_year, "Timestep of year");
   SELLIST_ADD_INT(timestep,         "Timestep");
   SELLIST_ADD_INT(year,             "Year");
@@ -166,6 +167,7 @@ void *Select(void *argument)
   SELLIST_ADD_WORD(season,          "Season");
   SELLIST_ADD_WORD(date,            "Date");
   SELLIST_ADD_WORD(timestepmask,    "Timestep mask");
+  // clang-format on
 
   if ( cdoVerbose ) sellist_print(sellist);
 
@@ -176,6 +178,8 @@ void *Select(void *argument)
 
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
+
+  dtlist_type *dtlist = dtlist_new();
 
   if ( !cdoVerbose && nfiles > 1 ) progressInit();
 
@@ -253,8 +257,7 @@ void *Select(void *argument)
               gridname = gname;
 
               int tsteptype = vlistInqVarTsteptype(vlistID1, varID);
-              if      ( tsteptype == TSTEP_CONSTANT ) steptype = "constant";
-              else if ( tsteptype == TSTEP_INSTANT  ) steptype = "instant";
+              if      ( tsteptype == TSTEP_INSTANT  ) steptype = "instant";
               else if ( tsteptype == TSTEP_INSTANT2 ) steptype = "instant";
               else if ( tsteptype == TSTEP_INSTANT3 ) steptype = "instant";
               else if ( tsteptype == TSTEP_MIN      ) steptype = "min";
@@ -405,7 +408,7 @@ void *Select(void *argument)
                 {
                   for ( varID = 0; varID < nvars; ++varID )
                     {
-                      if ( vars[varID] == true && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                      if ( vars[varID] == true && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
                         {
                           lcopy_const = true;
                           break;
@@ -442,7 +445,7 @@ void *Select(void *argument)
 	  if ( ntsteps == 1 && nfiles == 1 )
 	    {
 	      for ( varID = 0; varID < nvars2; ++varID )
-		if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
+		if ( vlistInqVarTimetype(vlistID2, varID) != TIME_CONSTANT ) break;
 
 	      if ( varID == nvars2 ) ntsteps = 0;
 	    }
@@ -453,7 +456,7 @@ void *Select(void *argument)
 	    {
               lconstvars = false;
 	      for ( varID = 0; varID < nvars2; ++varID )
-		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+		vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
 	    }
 
 	  // support for negative timestep values
@@ -525,8 +528,9 @@ void *Select(void *argument)
                     }
                 }
 
-	      int vdate = taxisInqVdate(taxisID1);
-	      int vtime = taxisInqVtime(taxisID1);
+              dtlist_taxisInqTimestep(dtlist, taxisID1, 0);
+              int vdate = dtlist_get_vdate(dtlist, 0);
+              int vtime = dtlist_get_vtime(dtlist, 0);
               int second;
 	      cdiDecodeDate(vdate, &year, &month, &day);
 	      cdiDecodeTime(vtime, &hour, &minute, &second);
@@ -611,7 +615,7 @@ void *Select(void *argument)
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
                       if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
-                        if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                        if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
                           continue;
 
 		      int varID2   = vlistFindVar(vlistID2, varID);
@@ -628,7 +632,7 @@ void *Select(void *argument)
 			}
 		      else
 			{
-                          int nmiss;
+                          size_t nmiss;
 			  pstreamReadRecord(streamID1, array, &nmiss);
 			  pstreamWriteRecord(streamID2, array, nmiss);
 			}
@@ -648,7 +652,7 @@ void *Select(void *argument)
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
 		      int varID2 = vlistFindVar(vlistID2, varID);
-                      if ( vlistInqVarTsteptype(vlistID2, varID2) == TSTEP_CONSTANT )
+                      if ( vlistInqVarTimetype(vlistID2, varID2) == TIME_CONSTANT )
                         {
                           int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
                           int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
@@ -657,7 +661,7 @@ void *Select(void *argument)
                               int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
                               vardata2[varID2] = (double*) Malloc(gridsize*nlevel*sizeof(double));
                             }
-                          int nmiss;
+                          size_t nmiss;
                           pstreamReadRecord(streamID1, vardata2[varID2]+gridsize*levelID2, &nmiss);
                         }
 		    }
@@ -689,6 +693,8 @@ void *Select(void *argument)
   SELLIST_CHECK_FLAG(date);
 
   if ( streamID2 != CDI_UNDEFID ) pstreamClose(streamID2);
+
+  dtlist_delete(dtlist);
 
   vlistDestroy(vlistID0);
   vlistDestroy(vlistID2);

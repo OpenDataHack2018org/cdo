@@ -1126,15 +1126,17 @@ void pstream_t::defVarList(int p_vlistID)
       int datatype = varlist[varID].datatype;
 
       if (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4
-          || filetype == CDI_FILETYPE_NC4C)
+          || filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5)
         {
-          if (datatype == CDI_DATATYPE_UINT8 && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2))
+          if (datatype == CDI_DATATYPE_UINT8 &&
+              (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC5))
             {
               datatype = CDI_DATATYPE_INT16;
               varlist[varID].datatype = datatype;
             }
 
-          if (datatype == CDI_DATATYPE_UINT16 && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2))
+          if (datatype == CDI_DATATYPE_UINT16 &&
+              (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC5))
             {
               datatype = CDI_DATATYPE_INT32;
               varlist[varID].datatype = datatype;
@@ -1310,7 +1312,7 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
 }
 
 void
-pstreamReadRecord(int pstreamID, double *data, int *nmiss)
+pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
 {
   if (data == NULL)
     cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
@@ -1346,7 +1348,7 @@ pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 }
 
 void
-pstreamReadRecordF(int pstreamID, float *data, int *nmiss)
+pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
 {
   if (data == NULL)
     cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
@@ -1379,7 +1381,7 @@ pstreamReadRecordF(int pstreamID, float *data, int *nmiss)
 }
 
 void
-pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int nmiss)
+pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, size_t nmiss)
 {
   long i;
   long gridsize = pstreamptr->m_varlist[varID].gridsize;
@@ -1455,7 +1457,7 @@ pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int nmiss
 }
 
 void
-pstreamWriteRecord(int pstreamID, double *data, int nmiss)
+pstreamWriteRecord(int pstreamID, double *data, size_t nmiss)
 {
   if (data == NULL)
     cdoAbort("Data pointer not allocated (%s)!", __func__);
@@ -1498,7 +1500,7 @@ pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 }
 
 void
-pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
+pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss)
 {
   if (data == NULL)
     cdoAbort("Data pointer not allocated (%s)!", __func__);

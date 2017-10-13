@@ -148,7 +148,7 @@ void VarQuaSum(double *Variance, const double *restrict Sum, int len, int n)
 }
 
 static
-void AddVector(double * restrict dest, const double *restrict src, long len, int *nmiss, double missval)
+void AddVector(double * restrict dest, const double *restrict src, long len, size_t *nmiss, double missval)
 {
   if ( *nmiss > 0 )
     {
@@ -191,7 +191,7 @@ void Sub2Vectors(double *dest, const double *restrict srcA, const double *restri
 }
 
 static
-void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, int nmiss, double missval)
+void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, size_t nmiss, double missval)
 {
   if ( nmiss > 0 )
     {
@@ -210,7 +210,7 @@ void MultVectorScalar(double *dest, const double *restrict src, double factor, i
 }
 
 static
-void DivVectorIvector(double *dest, const double *restrict src, const int *samp, int len, int *nmiss, double missval)
+void DivVectorIvector(double *dest, const double *restrict src, const int *samp, int len, size_t *nmiss, double missval)
 {
   *nmiss = 0;
 
@@ -1565,7 +1565,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
   int lindex, nlevel;
   int offset;
   int leveltype;
-  int nmiss;
+  size_t nmiss;
   double *pressureLevel = NULL;
 
   globs->MeanCount++;
@@ -1665,8 +1665,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	    if ( vars[code].fourier == NULL )
 	      {
 		fieldSize = vars[code].hlev * globs->DimFC;
-		vars[code].fourier = alloc_dp(fieldSize,
-						FieldName(code,"fourier"));
+		vars[code].fourier = alloc_dp(fieldSize, FieldName(code,"fourier"));
 		sp2fc(vars[code].spectral, vars[code].fourier, globs->poli,
 		      vars[code].hlev, globs->Latitudes, globs->Fouriers, globs->Truncation);
 	      }
@@ -1766,8 +1765,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	    if ( vars[code].hybrid == NULL )
 	      {
 		fieldSize = globs->DimGP * vars[code].hlev;
-		vars[code].hybrid = alloc_dp(fieldSize,
-					       FieldName(code,"hybrid"));
+		vars[code].hybrid = alloc_dp(fieldSize, FieldName(code,"hybrid"));
 		after_FC2GP(vars[code].fourier,vars[code].hybrid,
 			    globs->Latitudes,globs->Longitudes,vars[code].hlev,globs->Fouriers);
 	      }
@@ -1795,7 +1793,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
       
       if ( globs->Orography == NULL )
 	{
-	  globs-> Orography = alloc_dp(globs->DimGP , "Orography");
+	  globs->Orography = alloc_dp(globs->DimGP , "Orography");
 	  if ( vars[GEOPOTENTIAL].hybrid )
 	    after_copy_array(globs->Orography, vars[GEOPOTENTIAL].hybrid, globs->DimGP);
 	  else
@@ -1925,7 +1923,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
       nmiss = 0;
       if ( ! globs->Extrapolate )
 	{
-	  if ( globs->pnmiss == NULL ) globs->pnmiss = (int *) Malloc(globs->NumLevelRequest*sizeof(int));  
+	  if ( globs->pnmiss == NULL ) globs->pnmiss = (size_t *) Malloc(globs->NumLevelRequest*sizeof(size_t));  
 	  genindmiss(globs->vert_index, pressureLevel, globs->DimGP, globs->NumLevelRequest, vars[PS_PROG].hybrid, globs->pnmiss);
 	  for ( i = 0; i < globs->NumLevelRequest; i++ ) nmiss += globs->pnmiss[i];
 	}
@@ -2221,11 +2219,9 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	   vars[VELOPOT].needed    || vars[STREAM].needed )
 	{
 	  if ( vars[DIVERGENCE].spectral == NULL )
-	    vars[DIVERGENCE].spectral = alloc_dp(globs->DimSP*globs->NumLevelRequest,
-						   "vars[DIVERGENCE].spectral");
+	    vars[DIVERGENCE].spectral = alloc_dp(globs->DimSP*globs->NumLevelRequest, "vars[DIVERGENCE].spectral");
 	  if ( vars[VORTICITY].spectral == NULL )
-	    vars[VORTICITY].spectral = alloc_dp(globs->DimSP*globs->NumLevelRequest,
-						  "vars[VORTICITY].spectral");
+	    vars[VORTICITY].spectral = alloc_dp(globs->DimSP*globs->NumLevelRequest, "vars[VORTICITY].spectral");
 	  if ( (vars[U_WIND].fourier == 0 || vars[V_WIND].fourier == 0) && globs->NumLevelRequest )
 	    Error("uwind or vwind missing!");
 	  uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier,
@@ -2397,7 +2393,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
     }
 }
 
-void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss)
+void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
 {
   long fieldSize;
   int truncation;
@@ -2481,28 +2477,48 @@ void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int c
 }
 
 
-void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, int nmiss)
+double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int levelID)
 {
-  int dataSize;
-  int dataOffset;
-  int nlevel;
-  int gridSize;
-  int gridtype, leveltype;
+  int gridtype   = gridInqType(gridID);
+  int nlevel     = zaxisInqSize(zaxisID);
+  int gridSize   = gridInqSize(gridID);
+  int dataSize   = gridSize*nlevel;
+  int dataOffset = gridSize*levelID;
 
-  gridtype   = gridInqType(gridID);
-  leveltype  = zaxisInqType(zaxisID);
-  nlevel     = zaxisInqSize(zaxisID);
-  gridSize   = gridInqSize(gridID);
-  dataSize   = gridSize*nlevel;
-  dataOffset = gridSize*levelID;
+  double *dataptr = NULL;
+
+  if ( gridtype == GRID_SPECTRAL )
+    {
+      if ( vars[code].spectral0 == NULL )
+	vars[code].spectral0 = alloc_dp(dataSize, FieldName(code, "spectral0"));
+
+      dataptr = vars[code].spectral0+dataOffset;
+    }
+  else
+    {
+      if ( vars[code].hybrid0 == NULL )
+	vars[code].hybrid0 = alloc_dp(dataSize, FieldName(code, "hybrid0"));
+
+      dataptr = vars[code].hybrid0+dataOffset;
+    }
+
+  return dataptr;
+}
+
+
+void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
+{
+  int gridtype   = gridInqType(gridID);
+  int leveltype  = zaxisInqType(zaxisID);
+  int nlevel     = zaxisInqSize(zaxisID);
+  int gridSize   = gridInqSize(gridID);
+  int dataSize   = gridSize*nlevel;
+  int dataOffset = gridSize*levelID;
 
   vars[code].nmiss0 += nmiss;
 
   if ( gridtype == GRID_SPECTRAL )
     {
-      /* ---------------------------------------------------------- */
-      /* Found spectral field ! If needed, allocate memory and copy */
-      /* ---------------------------------------------------------- */
       vars[code].sfit = TRUE;
       vars[code].hlev = nlevel;
       vars[code].plev = 1;
@@ -2511,11 +2527,6 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
 
       if ( gridInqTrunc(gridID) != globs->Truncation )
 	Error("Resolution error. Required %d - Found %d", globs->Truncation, gridInqTrunc(gridID));
-
-      if ( vars[code].spectral0 == NULL )
-	vars[code].spectral0 = alloc_dp(dataSize, FieldName(code, "spectral0"));
-
-      after_copy_array(vars[code].spectral0+dataOffset, globs->Field, gridSize);
     }
   else
     {
@@ -2537,14 +2548,10 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
 	      for ( i = 0; i < dataSize; i++ ) vars[code].samp[i] = globs->MeanCount0;
 	    }
 
+          double *dataptr = vars[code].hybrid0+dataOffset;
 	  for ( i = 0; i < gridSize; i++ )
-	    if ( IS_NOT_EQUAL(globs->Field[i], vars[code].missval) ) vars[code].samp[i+dataOffset]++;
+	    if ( IS_NOT_EQUAL(dataptr[i], vars[code].missval) ) vars[code].samp[i+dataOffset]++;
 	}
-
-      if ( vars[code].hybrid0 == NULL )
-	vars[code].hybrid0 = alloc_dp(dataSize, FieldName(code, "hybrid0"));
-
-      after_copy_array(vars[code].hybrid0+dataOffset, globs->Field, gridSize);
     }
 }
 

@@ -44,7 +44,7 @@ void *Timselstat(void *argument)
   int varID, levelID;
   int tsID;
   int nsets;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 
@@ -86,6 +86,7 @@ void *Timselstat(void *argument)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -122,7 +123,7 @@ void *Timselstat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
+              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 	    }
 	}
     }
@@ -151,7 +152,7 @@ void *Timselstat(void *argument)
 		{
                   recinfo[recID].varID   = varID;
                   recinfo[recID].levelID = levelID;
-                  recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
+                  recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 		}
 
               field_type *psamp1 = &samp1[varID][levelID];
@@ -163,10 +164,10 @@ void *Timselstat(void *argument)
 	      if ( nsets == 0 )
 		{
 		  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-		  pvars1->nmiss = (size_t)nmiss;
+		  pvars1->nmiss = nmiss;
                   if ( lrange )
                     {
-                      pvars2->nmiss = (size_t)nmiss;
+                      pvars2->nmiss = nmiss;
 		      for ( int i = 0; i < gridsize; i++ )
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
@@ -183,7 +184,7 @@ void *Timselstat(void *argument)
 	      else
 		{
 		  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = (size_t)nmiss;
+                  field.nmiss   = nmiss;
 		  field.grid    = pvars1->grid;
 		  field.missval = pvars1->missval;
 
@@ -282,7 +283,7 @@ void *Timselstat(void *argument)
           field_type *pvars1 = &vars1[varID][levelID];
 
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	}
 
       if ( nrecs == 0 ) break;

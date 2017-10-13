@@ -127,7 +127,7 @@ void *Cloudlayer(void *argument)
   bool zrev = false;
   int i;
   int offset;
-  int nmiss;
+  size_t nmiss;
   int aclcacID = -1;
   int nvars2 = 0;
   int aclcac_code_found = 0;
@@ -276,7 +276,7 @@ void *Cloudlayer(void *argument)
 
   if ( nvars2 == 1 )
     {
-      varID = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
+      varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARYING);
       vlistDefVarParam(vlistID2, varID, cdiEncodeParam(33, 128, 255));
       vlistDefVarName(vlistID2, varID, "cld_lay");
       vlistDefVarLongname(vlistID2, varID, "cloud layer");
@@ -284,19 +284,19 @@ void *Cloudlayer(void *argument)
     }
   else
     {
-      varID = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
+      varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARYING);
       vlistDefVarParam(vlistID2, varID, cdiEncodeParam(34, 128, 255));
       vlistDefVarName(vlistID2, varID, "low_cld");
       vlistDefVarLongname(vlistID2, varID, "low cloud");
       vlistDefVarMissval(vlistID2, varID, missval);
 
-      varID = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
+      varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARYING);
       vlistDefVarParam(vlistID2, varID, cdiEncodeParam(35, 128, 255));
       vlistDefVarName(vlistID2, varID, "mid_cld");
       vlistDefVarLongname(vlistID2, varID, "mid cloud");
       vlistDefVarMissval(vlistID2, varID, missval);
 
-      varID = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
+      varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARYING);
       vlistDefVarParam(vlistID2, varID, cdiEncodeParam(36, 128, 255));
       vlistDefVarName(vlistID2, varID, "hih_cld");
       vlistDefVarLongname(vlistID2, varID, "high cloud");

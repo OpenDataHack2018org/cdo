@@ -36,7 +36,7 @@ void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
 
   for ( int i = 0; i < nvars; ++i )
     {
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
       vlistDefVarParam(vlistID, varID, cdiEncodeParam(code[i], 255, 255));
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);
@@ -66,7 +66,7 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
       
       pstreamDefRecord(streamID, varID, 0);
 
-      int nmiss = 0;
+      size_t nmiss = 0;
       for ( int i = 0; i < gridsize; ++i )
 	if ( DBL_IS_EQUAL(data[varID][i], missval) ) nmiss++;
       

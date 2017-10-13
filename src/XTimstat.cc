@@ -87,7 +87,8 @@ static int num_recs = 0;
 static
 void *cdoReadTimestep(void *rarg)
 {
-  int varID, levelID, nmiss;
+  int varID, levelID;
+  size_t nmiss;
   readarg_t *readarg = (readarg_t *) rarg;
   field_type **input_vars = readarg->vars;
   recinfo_type *recinfo = readarg->recinfo;
@@ -158,7 +159,7 @@ void *XTimstat(void *argument)
   int varID;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
-  int nmiss;
+  size_t nmiss;
   bool lvfrac = false;
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
@@ -233,6 +234,7 @@ void *XTimstat(void *argument)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID2);
   if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
@@ -269,6 +271,7 @@ void *XTimstat(void *argument)
 	}
 
       taxisID3 = taxisDuplicate(taxisID1);
+      taxisWithBounds(taxisID3);
       vlistDefTaxis(vlistID3, taxisID3);
 
       pstreamDefVlist(streamID3, vlistID3);
@@ -293,7 +296,7 @@ void *XTimstat(void *argument)
   readarg.streamID = streamID1;
   readarg.vars = input_vars;
 
-  int lparallelread = CDO_Parallel_Read;
+  bool lparallelread = CDO_Parallel_Read > 0;
   bool ltsfirst = true;
   void *read_task = NULL;
   void *readresult = NULL;
@@ -303,7 +306,7 @@ void *XTimstat(void *argument)
       read_task = cdo_task_new();
       if ( read_task == NULL )
         {
-          lparallelread = FALSE;
+          lparallelread = false;
           cdoWarning("CDO tasks not available!");
         }
     }
@@ -333,7 +336,7 @@ void *XTimstat(void *argument)
           readarg.nrecs    = nrecs;
           readarg.recinfo  = recinfo;
 
-          if ( ltsfirst || lparallelread == FALSE )
+          if ( ltsfirst || lparallelread == false )
             {
               ltsfirst = false;
               readresult = cdoReadTimestep(&readarg);
@@ -368,7 +371,7 @@ void *XTimstat(void *argument)
 
                   int nwpv     = pvars1->nwpv;
                   int gridsize = pvars1->size;
-                  int nmiss    = pinput_var->nmiss;
+                  size_t nmiss    = pinput_var->nmiss;
 
                   farcpy(pvars1, *pinput_var);
                   pvars1->nmiss = nmiss;
@@ -397,7 +400,7 @@ void *XTimstat(void *argument)
 
                   int nwpv     = pvars1->nwpv;
                   int gridsize = pvars1->size;
-                  int nmiss    = pinput_var->nmiss;
+                  size_t nmiss    = pinput_var->nmiss;
 
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
                     {
@@ -434,7 +437,7 @@ void *XTimstat(void *argument)
                 field_type *pvars1 = &vars1[varID][levelID];
                 field_type *pvars2 = &vars2[varID][levelID];
 
-		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+		if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
                 farmoq(pvars2, *pvars1);
 	      }
@@ -458,7 +461,7 @@ void *XTimstat(void *argument)
               int levelID = recinfo[recID].levelID;
               field_type *pvars1 = &vars1[varID][levelID];
 
-              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+              if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
               if ( samp1[varID][levelID].ptr == NULL )
                 farcdiv(pvars1, (double)nsets);
@@ -475,7 +478,7 @@ void *XTimstat(void *argument)
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = &vars2[varID][levelID];
 
-              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+              if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
               if ( samp1[varID][levelID].ptr == NULL )
                 {
@@ -505,7 +508,7 @@ void *XTimstat(void *argument)
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[varID][levelID];
 
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
             nwpv     = pvars1->nwpv;
             int gridsize = pvars1->size;
@@ -547,7 +550,7 @@ void *XTimstat(void *argument)
           int levelID = recinfo[recID].levelID;
           field_type *pvars1 = &vars1[varID][levelID];
 
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
           pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, pvars1->ptr,  pvars1->nmiss);

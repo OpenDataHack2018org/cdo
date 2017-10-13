@@ -36,6 +36,7 @@ void *Enlarge(void *argument)
 
   operatorCheckArgc(1);
 
+  // open stream before calling cdoDefineGrid!!!
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int gridID2 = cdoDefineGrid(operatorArgv()[0]);
@@ -78,7 +79,8 @@ void *Enlarge(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-          int varID, levelID, nmiss;
+          int varID, levelID;
+          size_t nmiss;
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array1, &nmiss);
 

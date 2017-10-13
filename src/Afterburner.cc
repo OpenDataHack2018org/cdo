@@ -19,6 +19,7 @@
 #if defined(CDO)
 #include "cdo.h"
 #include "cdo_int.h"
+#include "cdo_task.h"
 #include "pstream_write.h"
 #define  streamOpenWrite          pstreamOpenWrite
 #define  streamDefVlist           pstreamDefVlist
@@ -33,10 +34,6 @@
 #include "constants.h"
 #include "compare.h"
 #include "vct_l191.h"
-
-#if  defined  (HAVE_LIBPTHREAD)
-#include <pthread.h>
-#endif
 
 #if defined (_OPENMP)
 #include <omp.h>
@@ -105,11 +102,7 @@ static int oVertID = -1;
 static int Lhybrid2pressure = FALSE;
 
 static int TsID;
-#if  defined  (HAVE_LIBPTHREAD)
-static bool ParallelRead = true;
-#else
-static bool ParallelRead = false;
-#endif
+static bool lparallelread = true;
 
 #define TIMESTEP_INTERVAL  -1
 #define MONTHLY_INTERVAL    0
@@ -143,13 +136,11 @@ void cdiError(int cdiErrno, const char *fmt, ...)
 static
 void lprintf(FILE *fp)
 {
-  int inum;
   int num = 67;
   int cval = '-';
 
   fprintf(fp, " ");
-  for (inum = 0; inum < num; inum++)
-    fprintf(fp, "%c", cval);
+  for ( int inum = 0; inum < num; inum++ ) fprintf(fp, "%c", cval);
   fprintf(fp, "\n");
 }
 
@@ -198,7 +189,7 @@ static
 void after_SwitchFile(struct Control *globs)
 {
   bool echam4 = false;
-  int i, n;
+  int n;
   char y3, y2, y1, y0;
   char         m1, m0;
   char         d1, d0;
@@ -207,7 +198,7 @@ void after_SwitchFile(struct Control *globs)
 
   if ( globs->Multi > 0 )
     {
-      i = strlen(ifile);
+      int i = strlen(ifile);
       if ( i < 10 )
 	{
 	  fprintf(stderr, " Not a valid filename: %s \n", ifile);
@@ -349,9 +340,7 @@ void after_printProcessStatus(int tsID)
 static
 int after_setNextDate(struct Control *globs)
 {
-  int nrecs;
-  int i;
-  int vdate, vtime;
+  int nrecs = 0;
 
   bool righttime = false;
   while ( TRUE )
@@ -374,12 +363,11 @@ int after_setNextDate(struct Control *globs)
 #if defined(CDO)
       //      processDefTimesteps(globs->istreamID);
 #endif
-      vdate = taxisInqVdate(globs->taxisID);
-      vtime = taxisInqVtime(globs->taxisID);
-
+      int vdate = taxisInqVdate(globs->taxisID);
+      int vtime = taxisInqVtime(globs->taxisID);
       after_setDateTime(&globs->NextDate, vdate, vtime);
 
-      for ( i = 0; i < nrqh; i++ )
+      for ( int i = 0; i < nrqh; i++ )
 	if ( hours[i] < 0 || hours[i] == globs->NextDate.hr )
 	  {
 	    righttime = true;
@@ -398,13 +386,12 @@ int after_setNextDate(struct Control *globs)
 
 static int num_recs = 0;
 
+
 static
 void *after_readTimestep(void *arg)
 {
-  int i;
   int varID, gridID, zaxisID, levelID, timeID;
-  int code, leveltype;
-  int nmiss;
+  size_t nmiss;
   RARG *rarg = (RARG *) arg;
 
   int nrecs        = rarg->nrecs;
@@ -412,16 +399,13 @@ void *after_readTimestep(void *arg)
   struct Variable *vars = rarg->vars;
   struct Control *globs = rarg->globs;
 
-  for ( code = 0; code < MaxCodes; code++ ) vars[code].nmiss0 = 0;
-
-  int level = 0;
-  int levelOffset = 0;
+  for ( int code = 0; code < MaxCodes; code++ ) vars[code].nmiss0 = 0;
 
   for ( int recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(globs->istreamID, &varID, &levelID);
 
-      code = vlistInqVarCode(globs->ivlistID, varID);
+      int code = vlistInqVarCode(globs->ivlistID, varID);
       if ( code <= 0 || code >= MaxCodes ) continue;
 
       /* Skip records containing unneeded codes */
@@ -430,18 +414,18 @@ void *after_readTimestep(void *arg)
 
       vlistInqVar(globs->ivlistID, varID, &gridID, &zaxisID, &timeID);
 
-      leveltype = zaxisInqType(zaxisID);
+      int leveltype = zaxisInqType(zaxisID);
 	  
       /* Skip records with unselected levels */
 
-      levelOffset = -1;
+      int levelOffset = -1;
       /*
 	if ( vars[code].ozaxisID != vars[code].izaxisID && ! Lhybrid2pressure )
       */
       if ( (vars[code].ozaxisID != vars[code].izaxisID) && (leveltype == ZAXIS_PRESSURE) )
 	{
-	  level = (int) zaxisInqLevel(zaxisID, levelID);
-	  for ( i = 0; i < globs->NumLevelRequest; ++i )
+	  int level = (int) zaxisInqLevel(zaxisID, levelID);
+	  for ( int i = 0; i < globs->NumLevelRequest; ++i )
 	    {
 	      if ( IS_EQUAL(globs->LevelRequest[i], level) )
 		{
@@ -465,12 +449,17 @@ void *after_readTimestep(void *arg)
 		  globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy, globs->OldDate.hr, globs->OldDate.mn);
 	}
 
-      streamReadRecord(globs->istreamID, globs->Field, &nmiss);
-
       if ( analysisData )
-	after_AnalysisAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
+        {
+          streamReadRecord(globs->istreamID, globs->Field, &nmiss);
+          after_AnalysisAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
+        }
       else
-	after_EchamAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
+        {
+          double *dataptr = after_get_dataptr(vars, code, gridID, zaxisID, levelID);
+          streamReadRecord(globs->istreamID, dataptr, &nmiss);
+          after_EchamAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
+        }
 
       if ( iVertID != -1 && oVertID != -1 && (vars[code].izaxisID == iVertID) )
 	vars[code].ozaxisID = oVertID;
@@ -646,25 +635,17 @@ void after_control(struct Control *globs, struct Variable *vars)
   int code;
   RARG rarg;
   void *statusp = NULL;
-#if  defined  (HAVE_LIBPTHREAD)
-  pthread_t thrID;
-  pthread_attr_t attr;
-  int rval;
+  void *read_task = NULL;
 
-  if ( ParallelRead )
+  if ( lparallelread )
     {
-      size_t stacksize;
-
-      pthread_attr_init(&attr);
-      pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-      int status = pthread_attr_getstacksize(&attr, &stacksize);
-      if ( status && stacksize < 2097152 )
-	{
-	  stacksize = 2097152;
-	  pthread_attr_setstacksize(&attr, stacksize);
-	}
+      read_task = cdo_task_new();
+      if ( read_task == NULL )
+        {
+          lparallelread = false;
+          cdoWarning("CDO tasks not available!");
+        }
     }
-#endif
 
   for ( code = 0; code < MaxCodes; code++ )
     vars[code].needed0 = vars[code].needed;
@@ -703,7 +684,8 @@ void after_control(struct Control *globs, struct Variable *vars)
       rtime = after_getTime(globs->StartDate);
     }
 
-  if ( ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 || ofiletype == CDI_FILETYPE_NC4 )
+  if ( ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 || ofiletype == CDI_FILETYPE_NC4 ||
+       ofiletype == CDI_FILETYPE_NC4C || ofiletype == CDI_FILETYPE_NC5 )
     {
       taxisDefCalendar(globs->taxisID2, CALENDAR_PROLEPTIC);
       taxisDefType(globs->taxisID2, TAXIS_RELATIVE);
@@ -723,43 +705,34 @@ void after_control(struct Control *globs, struct Variable *vars)
       rarg.vars  = vars;
       rarg.globs = globs;
 
-      if ( tsFirst || ParallelRead == false )
+      if ( tsFirst || lparallelread == false )
 	{
-	  if ( ParallelRead == false )
+	  if ( lparallelread == false )
 	    {
 	      statusp = after_readTimestep(&rarg);
 	    }
-#if defined(HAVE_LIBPTHREAD)
 	  else
 	    {
-	      rval = pthread_create(&thrID, &attr, after_readTimestep, &rarg);
-	      if ( rval != 0 ) Error("pthread_create failed!");
-	    }
-#endif
-
-	  if ( tsFirst )
-	    {
-	      if ( globs->Type >  0 ) after_legini_setup(globs, vars);
+              cdo_task_start(read_task, after_readTimestep, &rarg);
 	    }
 
-#if defined(HAVE_LIBPTHREAD)
-	  if ( ParallelRead )
+	  if ( tsFirst && globs->Type >  0 ) after_legini_setup(globs, vars);
+
+	  if ( lparallelread )
 	    {
-	      pthread_join(thrID, &statusp);
+              statusp = cdo_task_wait(read_task);
 	      if ( *(int *)statusp < 0 )
 		Error("after_readTimestep error! (status = %d)", *(int *)statusp);
 	    }
-#endif
 	  tsFirst = false;
 	}
-#if defined(HAVE_LIBPTHREAD)
       else
 	{
-	  pthread_join(thrID, &statusp);
+          statusp = cdo_task_wait(read_task);
 	  if ( *(int *)statusp < 0 )
 	    Error("after_readTimestep error! (status = %d)", *(int *)statusp);
 	}
-#endif
+
       nrecs = *(int *)statusp;
 
       globs->MeanCount0 = globs->MeanCount;
@@ -767,13 +740,10 @@ void after_control(struct Control *globs, struct Variable *vars)
 
       after_moveTimestep(vars);
 
-#if  defined  (HAVE_LIBPTHREAD)
-      if ( nrecs && ParallelRead )
+      if ( nrecs && lparallelread )
 	{
-	  rval = pthread_create(&thrID, &attr, after_readTimestep, &rarg);
-	  if ( rval != 0 ) Error("pthread_create failed!");
+          cdo_task_start(read_task, after_readTimestep, &rarg);
 	}
-#endif
 
       after_setEndOfInterval(globs, nrecs);
       
@@ -805,12 +775,7 @@ void after_control(struct Control *globs, struct Variable *vars)
       globs->OldDate = globs->NewDate;
     }
 
-#if  defined  (HAVE_LIBPTHREAD)
-  if ( ParallelRead )
-    {
-      pthread_attr_destroy(&attr);
-    }
-#endif
+  if ( read_task ) cdo_task_delete(read_task);
 }
 
 static
@@ -1368,6 +1333,7 @@ void after_parini(struct Control *globs, struct Variable *vars)
     case  2: ofiletype = CDI_FILETYPE_NC;   break;
     case  3: ofiletype = CDI_FILETYPE_EXT;  break;
     case  4: ofiletype = CDI_FILETYPE_NC2;  break;
+    case  5: ofiletype = CDI_FILETYPE_NC5;  break;
     case  6: ofiletype = CDI_FILETYPE_NC4;  break;
     default: Error( "unknown file format %d", fileFormat);
     }
@@ -1741,7 +1707,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	  gridID = vars[code].igridID;
 	  zaxisID = vars[code].izaxisID;
           zaxisName(zaxisInqType(zaxisID), zaxistypename);
-	  fprintf(stderr," Detected Code %3d  grid %-8s size %5d  level %2d %-8s\n",
+	  fprintf(stderr," Detected Code %3d  grid %-8s size %5zu  level %2d %-8s\n",
 		  code, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID),
 		  zaxisInqSize(zaxisID), zaxistypename);
 	}
@@ -1803,12 +1769,11 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	    vlistInqVarUnits(globs->ivlistID, ivarID, units);
 	  }
 
-        int tsteptype = (globs->Mean) ? TSTEP_AVG : TSTEP_INSTANT;
-
         if ( globs->Mean != 2 )
 	  {
 	    vlistDefTaxis(globs->ovlistID, globs->taxisID2);
-	    ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, tsteptype);
+	    ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, TIME_VARYING);
+            if ( globs->Mean ) vlistDefVarTsteptype(globs->ovlistID, ovarID, TSTEP_AVG);
 	    vlistDefVarCode(globs->ovlistID, ovarID, code);
 	    vars[code].ovarID = ovarID;
 	    vlistDefVarInstitut(globs->ovlistID, ovarID, instID);
@@ -1824,7 +1789,8 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	if ( globs->Mean >= 2 )
 	  {
 	    vlistDefTaxis(globs->ovlistID2, globs->taxisID2);
-	    ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, tsteptype);
+	    ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, TIME_VARYING);
+            if ( globs->Mean ) vlistDefVarTsteptype(globs->ovlistID2, ovarID2, TSTEP_AVG);
 	    vlistDefVarCode(globs->ovlistID2, ovarID2, code);
 	    vars[code].ovarID2 = ovarID2;
 	    vlistDefVarInstitut(globs->ovlistID2, ovarID2, instID);
@@ -1846,7 +1812,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	  gridID  = vars[code].ogridID;
 	  zaxisID = vars[code].ozaxisID;
           zaxisName(zaxisInqType(zaxisID), zaxistypename);
-	  fprintf(stderr," Selected Code %3d  grid %-8s size %5d  level %2d %-8s\n",
+	  fprintf(stderr," Selected Code %3d  grid %-8s size %5zu  level %2d %-8s\n",
 		  code, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID),
 		  zaxisInqSize(zaxisID), zaxistypename);
 	}
@@ -2165,7 +2131,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
       if ( ofiletype == CDI_FILETYPE_GRB )
 	Error("Can't write fourier coefficients to GRIB!");
       else if ( ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 ||
-		ofiletype == CDI_FILETYPE_NC4 )
+		ofiletype == CDI_FILETYPE_NC4 || ofiletype == CDI_FILETYPE_NC4C || ofiletype == CDI_FILETYPE_NC5 )
 	Error("Can't write fourier coefficients to NetCDF!");
     }
 
@@ -2330,7 +2296,7 @@ int afterburner(int argc, char *argv[])
       case 'b': Message( "option -b not longer needed!"); break;
       case 'c': after_printCodes(); break;
       case 'd': globs->Debug = 1; break;
-      case 'p': ParallelRead = true; break;
+      case 'p': lparallelread = true; break;
       case 'P': numThreads = atoi(optarg); break;
       case 'V': after_version(); break;
       case 'v': Vctfile = optarg; break;
@@ -2339,8 +2305,6 @@ int afterburner(int argc, char *argv[])
       }
 
 #if defined (_OPENMP)
-  /* ParallelRead = true; */
-
   lprintf(stdout);
   if ( numThreads <= 0 ) numThreads = 1;
   omp_set_num_threads(numThreads);
@@ -2355,15 +2319,7 @@ int afterburner(int argc, char *argv[])
     }
 #endif
 
-  if ( ParallelRead )
-    {
-#if  defined  (HAVE_LIBPTHREAD)
-      fprintf(stdout, " Parallel read enabled\n");
-#else
-      fprintf(stdout, " Parallel read disabled\n");
-      ParallelRead = false;
-#endif
-    }
+  if ( lparallelread ) fprintf(stdout, " Parallel read enabled\n");
 
   fargc0 = optind;
   fargcn = argc;
@@ -2450,6 +2406,8 @@ int afterburner(int argc, char *argv[])
 void *Afterburner(void *argument)
 {
   cdoInitialize(argument);
+
+  CDO_task = true;
 
   lstdout = !cdoSilentMode;
 

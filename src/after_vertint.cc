@@ -85,20 +85,22 @@ void genind(int *nx, const double *restrict plev, const double *restrict fullp, 
 #endif
   for ( long lp = 0; lp < nplev; lp++ )
     {
-      long i, lh;
       const double pres = plev[lp];
       int *restrict nxl = nx + lp*ngp;
-      for ( lh = 0; lh < nhlev; lh++ )
-	for ( i = 0; i < ngp ; i++ )
-	   {
-	     if ( pres > fullp[lh*ngp+i] ) nxl[i] = lh;
-	   }
+      for ( long lh = 0; lh < nhlev; lh++ )
+        {
+          const double *restrict fullpx = fullp + lh*ngp;
+          for ( long i = 0; i < ngp ; i++ )
+            {
+              if ( pres > fullpx[i] ) nxl[i] = lh;
+            }
+        }
     }
 
 }  /* genind */
 
 
-void genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog, int *restrict pnmiss)
+void genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog, size_t *restrict pnmiss)
 {
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nx,plev,ngp,nplev,ps_prog,pnmiss)
@@ -263,12 +265,10 @@ void interp_X(const double *restrict gt, double *pt, const double *restrict hyb_
 	    {
 	      nl = nxl[i] * ngp + i;
 	      nh = nl + ngp;
-	      if ( nh >= ngp*nhlev )
-		ptl[i] =  gt[nl];
-	      else
-		ptl[i] =  gt[nl] + (pres-hyb_press[nl])
-		       * (gt[nh] - gt[nl])
-                       / (hyb_press[nh] - hyb_press[nl]);
+              ptl[i] = (nh >= ngp*nhlev) ? gt[nl] :
+                        gt[nl] + (pres-hyb_press[nl])
+		     * (gt[nh] - gt[nl])
+                     / (hyb_press[nh] - hyb_press[nl]);
 	    }
 	}
     }

@@ -1,7 +1,50 @@
-2017-09-27  Uwe Schulzweida
+2017-10-08  Uwe Schulzweida
+
+	* changed type of nmiss to size_t
+
+2017-10-05  Uwe Schulzweida
 
 	* Using CDI library version 1.9.1
 	* Version 1.9.1 release
+
+2017-10-04  Uwe Schulzweida
+
+	* Added operator setmiss
+	* CMOR: Fix building error [Bug #7936]
+
+2017-09-30  Uwe Schulzweida
+
+	* sinfo: Added time type
+
+2017-09-28  Uwe Schulzweida
+
+	* Changed NFFT from 64 to 8
+
+2017-09-22  Uwe Schulzweida
+
+	* fc2gp: optimize memory handling for openmp version
+
+2017-09-22  Uwe Schulzweida
+
+	* setgrid: added key word datatype (float/double)
+	* setzaxis: added key word datatype (float/double)
+	* setzaxis: check attributes for reserved key names
+
+2017-09-20  Uwe Schulzweida
+
+	* Added support for NC_FORMAT_CDF5
+
+2017-09-19  Uwe Schulzweida
+
+	* expr: AND fall through OR (bug fix)
+
+2017-09-16  Uwe Schulzweida
+
+	* remap: added support for grid_mapping attribute proj4_params (bug fix)
+
+2017-09-11  Uwe Schulzweida
+
+	* ap2pl: added support for input data on half levels
 
 2017-09-09  Uwe Schulzweida
 

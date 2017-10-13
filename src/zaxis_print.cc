@@ -27,7 +27,7 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
   char attstr[CDI_MAX_NAME];
   int type    = zaxisInqType(zaxisID);
   int nlevels = zaxisInqSize(zaxisID);
-  int prec    = zaxisInqPrec(zaxisID);
+  int prec    = zaxisInqDatatype(zaxisID);
   size_t nvals = (size_t) zaxisInqLevels(zaxisID, NULL);
 
   int dig = (prec == CDI_DATATYPE_FLT64) ? CDO_dbl_digits : CDO_flt_digits;
@@ -55,10 +55,10 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
     }
   else if ( type == ZAXIS_CHAR )
     {
-      size_t clen = zaxisInqCLen(zaxisID);
+      int clen = zaxisInqCLen(zaxisID);
       zaxisInqCVals(zaxisID, &cvals);
-          fprintf(fp, "levels    = \n");
-      for ( size_t i = 0; i < nlevels; i++ )
+      fprintf(fp, "levels    = \n");
+      for ( int i = 0; i < nlevels; i++ )
         {
           fprintf(fp, "     [%2d] = %.*s\n", i, clen, cvals[i]);
           Free(cvals[i]);

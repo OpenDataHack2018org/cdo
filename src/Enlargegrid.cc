@@ -166,6 +166,7 @@ void *Enlargegrid(void *argument)
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
   if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
 
+  // open stream before calling cdoDefineGrid!!!
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int gridID2 = cdoDefineGrid(operatorArgv()[0]);
@@ -214,7 +215,8 @@ void *Enlargegrid(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-          int varID, levelID, nmiss1;
+          int varID, levelID;
+          size_t nmiss1;
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array1, &nmiss1);
 
@@ -225,7 +227,7 @@ void *Enlargegrid(void *argument)
 	    if ( gindex[i] >= 0 )
 	      array2[gindex[i]] = array1[i];		
 
-	  int nmiss2 = 0;
+	  size_t nmiss2 = 0;
 	  for ( int i = 0; i < gridsize2; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval1) ) nmiss2++;
 

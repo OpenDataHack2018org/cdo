@@ -32,7 +32,7 @@ void *Change_e5slm(void *argument)
   char name[CDI_MAX_NAME];
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 
@@ -80,13 +80,7 @@ void *Change_e5slm(void *argument)
 
   pstreamClose(streamIDslm);
 
-  for ( long i = 0; i < gridsize; ++i )
-    {
-      if ( cland[i] > 0 )
-	lsea[i] = false;
-      else
-	lsea[i] = true;
-    }
+  for ( long i = 0; i < gridsize; ++i ) lsea[i] = !(cland[i] > 0);
 
 
   int nvars = vlistNvars(vlistID1);

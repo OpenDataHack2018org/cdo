@@ -769,7 +769,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   char varname[CDI_MAX_NAME];
   short *mask = NULL;
   double minval, maxval;
-  int nmiss;
+  size_t nmiss;
   int num_attrs;
 
   attstring[0] = 0;
@@ -1395,7 +1395,7 @@ void *Importcmsaf(void *argument)
   int streamID;
   int gridID = -1, zaxisID, taxisID, vlistID;
   int i, offset;
-  int nmiss;
+  size_t nmiss;
   int ivar;
   int varID, levelID, tsID;
   int nx, ny, nz, nt, gridsize;
@@ -1518,9 +1518,9 @@ void *Importcmsaf(void *argument)
   for ( ivar = 0; ivar < dsets.nsets; ++ivar )
     {
       if ( dsets.obj[ivar].nt > 1 )
-	varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
       else
-	varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
 
       vlistDefVarName(vlistID, varID,  dsets.obj[ivar].name);
       if ( dsets.obj[ivar].description )
@@ -1529,7 +1529,7 @@ void *Importcmsaf(void *argument)
 	vlistDefVarUnits(vlistID, varID,  dsets.obj[ivar].units);
       if ( dsets.obj[ivar].title )
 	cdiDefAttTxt(vlistID, varID, "title", (int)strlen(dsets.obj[ivar].title),
-		       dsets.obj[ivar].title);
+                     dsets.obj[ivar].title);
 
       /*
       vlistDefVarUnits(vlistID, varID, units[i]);
@@ -1593,7 +1593,7 @@ void *Importcmsaf(void *argument)
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
 	      if ( cdoVerbose )
-		cdoPrint(" Write var %d,  level %d, nmiss %d, missval %g, minval %g, maxval %g",
+		cdoPrint(" Write var %d,  level %d, nmiss %zu, missval %g, minval %g, maxval %g",
 			 varID, levelID, nmiss, missval, minval, maxval);
 	      /*
 		if ( ! (missval < minval || missval > maxval) )

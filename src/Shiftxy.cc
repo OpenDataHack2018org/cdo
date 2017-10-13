@@ -161,7 +161,7 @@ void *Shiftxy(void *argument)
   bool lcoord = false;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

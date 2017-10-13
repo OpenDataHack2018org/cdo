@@ -151,7 +151,7 @@ typedef struct {
   int      nused;
   int      gridID;
   size_t   gridsize;
-  int      nmiss;
+  size_t   nmiss;
   remapgrid_t src_grid;
   remapgrid_t tgt_grid;
   remapvars_t vars;

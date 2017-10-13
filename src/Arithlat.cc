@@ -36,7 +36,7 @@ void *Arithlat(void *argument)
   int gridID0 = -1;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   long i;
   char units[CDI_MAX_NAME];
   double *scale = NULL;

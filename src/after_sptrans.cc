@@ -417,26 +417,25 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
 
 
 /* to slow for nec, 2.0 instead of 2.3 GFlops ( vector length too small ) */
-void sp2fctest(const double *sa, double *fa, const double *poli, int nlev, int nlat, int nfc, int nt)
+void sp2fctest(const double *sa, double *fa, const double *poli, long nlev, long nlat, long nfc, long nt)
 {
-  int lev, jm, jn, latn, lats, is;
+  long lats, is;
   double sar, sai;
   double saris, saiis;
-  double pval;
   double *restrict far, *restrict fai;
 
   long nsp2 = (nt+1)*(nt+2);
 
-  for ( lev = 0; lev < nlev; lev++ )
+  for ( long lev = 0; lev < nlev; lev++ )
     {
       const double *restrict pol = poli;
       const double *restrict sal = sa + lev*nsp2;
       double *fal = fa + lev*nfc*nlat;
       memset(fal, 0, nfc*nlat*sizeof(double));
 
-      for ( jm = 0; jm <= nt; jm++ )
+      for ( long jm = 0; jm <= nt; jm++ )
 	{
-	  for ( jn = 0; jn <= nt - jm; jn++ )
+	  for ( long jn = 0; jn <= nt - jm; jn++ )
 	    {
 	      is = (jn+1)%2 * 2 - 1;
 	      sar = *sal++;
@@ -451,14 +450,13 @@ void sp2fctest(const double *sa, double *fa, const double *poli, int nlev, int n
 #if defined(HAVE_OPENMP4)
 #pragma omp simd
 #endif
-	      for ( latn = 0; latn < nlat/2; latn++ )
+	      for ( long latn = 0; latn < nlat/2; latn++ )
 		{
 		  lats = nlat - latn - 1;
-		  pval = pol[latn];
-		  far[latn] += pval * sar;
-		  fai[latn] += pval * sai;
-		  far[lats] += pval * saris;
-		  fai[lats] += pval * saiis;
+		  far[latn] += pol[latn] * sar;
+		  fai[latn] += pol[latn] * sai;
+		  far[lats] += pol[latn] * saris;
+		  fai[lats] += pol[latn] * saiis;
 		}
 	      pol += nlat;
 	    }
@@ -484,11 +482,10 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 
       double *restrict far, *restrict fai;
       double sar, sai;
-      long jmm, jfc, lat;
 
-      for ( jmm = 0; jmm <= nt; jmm++ )
+      for ( long jmm = 0; jmm <= nt; jmm++ )
 	{
-	  for ( jfc = jmm; jfc <= nt; jfc++ )
+	  for ( long jfc = jmm; jfc <= nt; jfc++ )
 	    {
 	      sar = *sal++;
 	      sai = *sal++;
@@ -499,7 +496,7 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 #pragma omp simd
 #endif
               */
-	      for ( lat = 0; lat < nlat; lat++ )
+	      for ( long lat = 0; lat < nlat; lat++ )
 		{
 		  far[lat] += pol[lat] * sar;
 		  fai[lat] += pol[lat] * sai;

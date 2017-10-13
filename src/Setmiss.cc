@@ -44,7 +44,7 @@ void *Setmiss(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int i;
   double missval, missval2 = 0;
   double rconst = 0, rmin = 0, rmax = 0;

@@ -94,7 +94,7 @@ void *Fldstat2(void *argument)
   int gridID3;
   int nrecs, nrecs2;
   int varID, levelID;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   bool wstatus = false;
   bool needWeights = true;
   double sglval = 0;
@@ -193,7 +193,7 @@ void *Fldstat2(void *argument)
 	      sglval = covariance_s(array1, array2, weight, missval1, missval2, gridsize);
 	    }
 
-          int nmiss3 = DBL_IS_EQUAL(sglval, missval1) ? 1 : 0;
+          size_t nmiss3 = DBL_IS_EQUAL(sglval, missval1) ? 1 : 0;
 
 	  pstreamDefRecord(streamID3, varID,  levelID);
 	  pstreamWriteRecord(streamID3, &sglval, nmiss3);

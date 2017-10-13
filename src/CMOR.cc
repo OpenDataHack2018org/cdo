@@ -933,7 +933,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
   zaxisDefLevels(subzaxisID, zvals); 
 
   struct mapping *var = new_var_mapping(vars);
-  var->cdi_varID = vlistDefVar(vlistID, subgridID, subzaxisID,  TSTEP_INSTANT); 
+  var->cdi_varID = vlistDefVar(vlistID, subgridID, subzaxisID,  TIME_VARYING);
   vlistDefVarName(vlistID, getVarIDToMap(vlistID, nvars+1, key, charvars->values[0]), "ChangedForMap");
   vlistDefVarName(vlistID, var->cdi_varID, charvars->values[0]);
   vlistDefVarDatatype(vlistID, var->cdi_varID,  DATATYPE_FLT64);
@@ -949,7 +949,8 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
     {
       while ( nrecs-- )
         {
-          int varIDrw, levelIDrw, nmiss;
+          int varIDrw, levelIDrw;
+          size_t nmiss;
           pstreamInqRecord(streamID2, &varIDrw, &levelIDrw);
           for ( int i = 0; i < charvars->nvalues; i++ )
             if ( varIDrw == varIDs[i] )
@@ -3726,7 +3727,7 @@ static void read_record(int streamID, struct mapping vars[], int vlistID)
       int latdim = gridInqYsize(gridID);
       int levdim = zaxisInqSize(zaxisID);
       int chardim = gridsize/latdim;
-      int nmiss;
+      size_t nmiss;
       pstreamReadRecord(streamID, buffer, &nmiss);
       for ( size_t i = 0; i < gridsize; i++ )
         {

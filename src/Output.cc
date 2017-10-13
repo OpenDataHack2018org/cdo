@@ -40,7 +40,7 @@ void *Output(void *argument)
   int gridID;
   int nrecs;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int nelem = 1;
   int len;
   int index;

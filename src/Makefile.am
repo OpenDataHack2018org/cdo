@@ -332,6 +332,7 @@ cdo_SOURCES += Adisit.cc        \
                Setzaxis.cc      \
                Shiftxy.cc       \
                Showinfo.cc      \
+               Showattribute.h  \
                Showattribute.cc \
                Sinfo.cc         \
                Smooth.cc        \

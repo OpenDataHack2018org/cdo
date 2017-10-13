@@ -737,7 +737,7 @@ void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
               int xyz = vlistInqVarXYZ(vlistID, varID);
 
               fprintf(gdp, "  ");
-              if ( vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT )
+              if ( vlistInqVarTimetype(vlistID, varID) != TIME_CONSTANT )
                 fprintf(gdp, "t,");
               if ( xyz == 321 )
                 {
@@ -955,7 +955,7 @@ void *Gradsdes(void *argument)
   bool bigendian = false, littleendian = false;
   bool sequential = false;
   bool flt64 = false;
-  char Time[30], Incr[10] = {"1mn"};
+  char Time[30], Incr[12] = {"1mn"};
   const char *IncrKey[] = {"mn","hr","dy","mo","yr"};
   int isd, imn, ihh, iyy, imm, idd;
   int isds = 0, imns = 0, ihhs = 0, iyys = 0, imms = 0, idds = 0;
@@ -963,8 +963,7 @@ void *Gradsdes(void *argument)
   int idmn, idhh, idmm, idyy, iddd;
   int dt=1, iik=0, mdt = 0;
   int gridsize = 0;
-  long checksize = 0;
-  int nmiss;
+  size_t nmiss;
   int prec;
   int map_version = 2;
   int maxrecs = 0;
@@ -1031,7 +1030,8 @@ void *Gradsdes(void *argument)
   int filetype  = pstreamInqFiletype(streamID);
   int byteorder = pstreamInqByteorder(streamID);
 
-  if ( filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 ) filetype = CDI_FILETYPE_NC;
+  if ( filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 ||
+       filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5 ) filetype = CDI_FILETYPE_NC;
 
   if ( filetype != CDI_FILETYPE_SRV &&
        filetype != CDI_FILETYPE_EXT &&
@@ -1082,7 +1082,7 @@ void *Gradsdes(void *argument)
           recoffset[varID] = nrecsout;
           nvarsout++;
           nrecsout += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
-          if ( ntsteps != 1 && ntsteps != 0 && vlistInqVarTsteptype(vlistID, varID) == TSTEP_CONSTANT )
+          if ( ntsteps != 1 && ntsteps != 0 && vlistInqVarTimetype(vlistID, varID) == TIME_CONSTANT )
             cdoAbort("Unsupported GrADS record structure! Variable %d has only 1 time step.",
                      vlistInqVarCode(vlistID, varID));
         }
@@ -1320,7 +1320,7 @@ void *Gradsdes(void *argument)
 
                   if ( map_version != 4 )
                     {
-                      checksize = (long)bignum[index*2] + (long)gridsize*intnum[index]/8;
+                      long checksize = (long)bignum[index*2] + (long)gridsize*intnum[index]/8;
                       if ( checksize < 0L || checksize > 2147483647L )
                         {
                           nrecords -= nrecsout;
