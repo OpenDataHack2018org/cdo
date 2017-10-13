@@ -1019,16 +1019,15 @@ process_t::print_process()
     {
       std::cout << "    " << outputStreams[i]->self << std::endl;
     }
-  if (s_utime)
+  if ( s_utime > 0 )
     {
       std::cout << " s_utime         : " << s_utime << std::endl;
     }
   else
     {
-      std::cout << " s_utime         : "
-                << "UNINITALIZED" << std::endl;
+      std::cout << " s_utime         : " << "UNINITALIZED" << std::endl;
     }
-  if (s_stime)
+  if ( s_stime > 0 )
     {
       std::cout << " s_stime         : " << s_stime << std::endl;
     }
