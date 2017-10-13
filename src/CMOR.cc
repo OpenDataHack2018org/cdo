@@ -4612,8 +4612,24 @@ static char *get_mip_table(char *params, list_t *kvl, char *project_id)
   if ( file_exist(params, 0, "MIP table") )
     {
       miptab = strdup(params);
+      int i = 0, j = 0;
+      while ( params[i] )
+        {
+          if ( params[i] == '/' )
+            j = i;
+          i++;
+        }
+      char *miptabdir = (char *) Malloc((j+2)*sizeof(char));
+      if ( j > 0 )
+        {
+          strncpy(miptabdir, params, j+1);
+          miptabdir[j+1] = '\0';
+          kv_insert_a_val(kvl, "mip_table_dir", miptabdir, 0);
+        }
+      else
+        Free(miptabdir);
       if ( cdoVerbose )
-        cdoPrint("2.2. MIP table file '%s' exists.", miptab);
+        cdoPrint("2.2. MIP table file '%s' exists in MIP table directory '%s'.", miptab, miptabdir);
       return miptab;
     }
   else
@@ -4673,9 +4689,9 @@ static int get_miptab_freq(list_t *kvl, char *mip_table, char *project_id)
         miptab_freq = 12;
       else if ( strstr(freq, "day") || strstr(freq, "Day") )
         miptab_freq = 13;
-      else if ( strstr(freq, "6hr") )
+      else if ( strstr(freq, "6h") )
         miptab_freq = 14;
-      else if ( strstr(freq, "3hr") )
+      else if ( strstr(freq, "3h") )
         miptab_freq = 15;
 
       if ( strcmp(freq, "Oclim") == 0 )
@@ -4766,15 +4782,6 @@ static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, 
   return table_id;
 }
 
-static void removeDataset()
-{
-  char cwd[1024];
-  char *dummy = getcwd(cwd, sizeof(cwd));
-  int procID = getpid();
-  char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 6) * sizeof(char));;
-  sprintf(dataset_path, "%s/dataset%d.json", cwd, procID);
-  remove(dataset_path);
-}
 #endif
 
 void *CMOR(void *argument)
@@ -4854,9 +4861,6 @@ void *CMOR(void *argument)
   register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq, &time_axis);
   write_variables(kvl, &streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
 
-#if ( CMOR_VERSION_MAJOR == 3 )
-  removeDataset();  
-#endif
   destruct_var_mapping(vars);
   Free(mip_table);
   Free(project_id); 
