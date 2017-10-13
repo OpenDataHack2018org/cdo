@@ -4258,6 +4258,8 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
       if ( !vars[i].help_var )
         {
           cmf = cmor_close_variable(vars[i].cmor_varID, file_name, NULL);
+          if ( strcmp(file_name, "") == 0 )
+            cdoAbort("Function cmor_write failed!");
           cdoPrint("     File stored in:  '%s' with cmor!", file_name);
           if ( chunkdf )
             {
