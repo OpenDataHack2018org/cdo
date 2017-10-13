@@ -1534,6 +1534,7 @@ static char *get_calendar_ptr(int calendar)
   switch ( calendar )
     {
     case CALENDAR_STANDARD:
+      strcpy(calendar_ptr, "standard"); break;
     case CALENDAR_GREGORIAN:
       strcpy(calendar_ptr, "gregorian"); break;
     case CALENDAR_PROLEPTIC:
@@ -1554,8 +1555,10 @@ static int get_calendar_int(char *calendar)
 {
   if ( !calendar )
     return 0;
-  if ( strcmp(calendar, "gregorian") == 0 )
+  else if ( strcmp(calendar, "standard") == 0 )
     return CALENDAR_STANDARD;
+  else if ( strcmp(calendar, "gregorian") == 0 )
+    return CALENDAR_GREGORIAN;
   else if ( strcmp(calendar, "proleptic_gregorian") == 0 )
     return CALENDAR_PROLEPTIC;
   else if ( strcmp(calendar, "360_day") == 0 )
@@ -1755,19 +1758,26 @@ static char *check_calendar(list_t *kvl, int taxisID, int *calendar)
     cdoPrint("6.1.1. Start to check attribute 'calendar'.");
   char *attcalendar = kv_get_a_val(kvl, "calendar", NULL);
   char *calendarptr = get_calendar_ptr(taxisInqCalendar(taxisID));
-  if ( *calendar = get_calendar_int(attcalendar) )
+  if ( (*calendar = get_calendar_int(attcalendar)) > -1 )
     check_compare_set(&calendarptr, attcalendar, "calendar", NULL);
-  else 
+  else
     {
       if ( cdoVerbose )
-        cdoPrint("Try to use infile calendar.");
-      if ( !get_calendar_int(calendarptr) )
-        cdoAbort("In validating calendar:\n          No valid configuration calendar and no valid infile calendar found.");
+        cdoPrint("Your configured calendar '%s' is not a valid calendar. Valid calendars are:\n          'standard', 'gregorian', 'proleptic_gregorian', '360_day', 'noleap' and 'all_leap'.", attcalendar);
+      if ( calendarptr )
+        {
+          if ( cdoVerbose )
+            cdoPrint("Try to use infile calendar '%s'.", attcalendar, calendarptr);
+          if ( !get_calendar_int(calendarptr) )
+            cdoAbort("In validating calendar:\n          No valid configuration calendar and no valid infile calendar found. Valid calendars are:\n          'standard', 'gregorian', 'proleptic_gregorian', '360_day', 'noleap' and 'all_leap'.");
+          else
+            *calendar = get_calendar_int(calendarptr);
+        }
       else
-        *calendar = get_calendar_int(calendarptr);
+        cdoAbort("In validating calendar:\n          No valid configuration calendar and no valid infile calendar found. Valid calendars are:\n          'standard', 'gregorian', 'proleptic_gregorian', '360_day', 'noleap' and 'all_leap'.");
     }
   if ( cdoVerbose )
-    cdoPrint("6.1.1. Successfully checked attribute 'calendar'.");
+    cdoPrint("6.1.1. Successfully retrived calendar: '%s'.", calendarptr);
   return calendarptr;
 }
 
