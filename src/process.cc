@@ -748,7 +748,6 @@ processDefArgument(void *vargument)
 {
   process_t &process = processSelf();
   char *operatorArg;
-  char *commapos;
   std::vector<char*> &oargv = process.oargv;
   int argc = ((argument_t *) vargument)->argc;
   std::vector<char *> &argv = ((argument_t *) vargument)->argv;
@@ -763,11 +762,11 @@ processDefArgument(void *vargument)
       oargv.push_back(operatorArg);
       // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
 
-      commapos = operatorArg;
+      char *commapos = operatorArg;
       while ((commapos = strchr(commapos, ',')) != NULL)
         {
           *commapos = '\0';
-          *commapos++;
+          commapos++;
           if (strlen(commapos))
             {
               oargv.push_back(commapos);
