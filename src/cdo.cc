@@ -1205,7 +1205,7 @@ int parse_options_long(int argc, char *argv[])
               else if ( strcmp(CDO_optarg, "UNDERFLOW")  == 0 ) except = FE_UNDERFLOW;
               else if ( strcmp(CDO_optarg, "ALL_EXCEPT") == 0 ) except = FE_ALL_EXCEPT;
               if ( except < 0 ) cdoAbort("option --%s: unsupported argument: %s", "enableexcept", CDO_optarg);
-              cdo_feenableexcept((unsigned)except);
+              cdo_feenableexcept(except);
               if ( signal(SIGFPE, cdo_sig_handler) == SIG_ERR ) cdoWarning("can't catch SIGFPE!");
             }
           else if ( ltimestat_date )
