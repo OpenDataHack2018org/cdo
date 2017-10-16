@@ -21715,6 +21715,12 @@ case "$CC" in
   *)      C_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
 esac
 
+case "$F77" in
+  pgf*)      F77_VERSION=`$F77 -V | head -2 | tail -n 1`;;
+  gfortran*) F77_VERSION=`$F77 --version | head -n 1`;;
+  *)         F77_VERSION=`$F77 -V 2>&1   | head -n 1 | grep -v error`;;
+esac
+
 if test -z "$CXX_VERSION" ; then CXX_VERSION="unknown"; fi;
 
 cat >>confdefs.h <<_ACEOF
@@ -21726,6 +21732,13 @@ if test -z "$C_VERSION" ; then C_VERSION="unknown"; fi;
 
 cat >>confdefs.h <<_ACEOF
 #define C_VERSION "$C_VERSION"
+_ACEOF
+
+
+if test -z "$F77_VERSION" ; then F77_VERSION="unknown"; fi;
+
+cat >>confdefs.h <<_ACEOF
+#define F77_VERSION "$F77_VERSION"
 _ACEOF
 
 
@@ -25354,6 +25367,12 @@ CXX_COMPILER="$CXX $CXXFLAGS"
 
 cat >>confdefs.h <<_ACEOF
 #define CXX_COMPILER "$CXX_COMPILER"
+_ACEOF
+
+F77_COMPILER="$F77 $FFLAGS"
+
+cat >>confdefs.h <<_ACEOF
+#define F77_COMPILER "$F77_COMPILER"
 _ACEOF
 
 

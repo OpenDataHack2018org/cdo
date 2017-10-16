@@ -103,11 +103,20 @@ case "$CC" in
   *)      C_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
 esac
 
+case "$F77" in
+  pgf*)      F77_VERSION=`$F77 -V | head -2 | tail -n 1`;;
+  gfortran*) F77_VERSION=`$F77 --version | head -n 1`;;
+  *)         F77_VERSION=`$F77 -V 2>&1   | head -n 1 | grep -v error`;;
+esac
+
 if test -z "$CXX_VERSION" ; then CXX_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(CXX_VERSION, ["$CXX_VERSION"], [CXX Compiler version])
 
 if test -z "$C_VERSION" ; then C_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(C_VERSION, ["$C_VERSION"], [C Compiler version])
+
+if test -z "$F77_VERSION" ; then F77_VERSION="unknown"; fi;
+AC_DEFINE_UNQUOTED(F77_VERSION, ["$F77_VERSION"], [F77 Compiler version])
 
 # Checks for username, hostname and system type
 USERNAME=$LOGNAME
@@ -253,6 +262,8 @@ C_COMPILER="$CC $CFLAGS"
 AC_DEFINE_UNQUOTED(C_COMPILER, ["$C_COMPILER"], [C Compiler])
 CXX_COMPILER="$CXX $CXXFLAGS"
 AC_DEFINE_UNQUOTED(CXX_COMPILER, ["$CXX_COMPILER"], [CXX Compiler])
+F77_COMPILER="$F77 $FFLAGS"
+AC_DEFINE_UNQUOTED(F77_COMPILER, ["$F77_COMPILER"], [F77 Compiler])
 
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_PROG_AWK
