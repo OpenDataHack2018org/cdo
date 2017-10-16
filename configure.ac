@@ -34,6 +34,7 @@ AC_CHECK_TOOL([CXX],[g++],[:])
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
 AC_PROG_CXX
+AC_PROG_F77
 AC_C_RESTRICT
 AX_CXX_COMPILE_STDCXX_11
 AC_OPENMP
@@ -49,8 +50,6 @@ AC_CHECK_TOOL([STRIP],[strip],[:])
 AC_CHECK_TOOL([RANLIB],[ranlib],[:])
 AC_PROG_INSTALL
 #
-FC=no
-export FC
 #  ----------------------------------------------------------------------
 # Check large file support on 32 bit system
 AC_SYS_LARGEFILE
@@ -268,7 +267,7 @@ AC_CONFIG_FILES([test/Merstat.test test/Zonstat.test test/Mergetime.test],[chmod
 AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/MapReduce.test test/Ninfo.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings])
+AC_CONFIG_FILES([Makefile src/lib/ncl/Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings])
 AC_OUTPUT
 
 #  ----------------------------------------------------------------------

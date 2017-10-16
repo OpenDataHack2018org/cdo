@@ -256,7 +256,9 @@ ENABLE_NETCDF = @ENABLE_NETCDF@
 ENABLE_SERVICE = @ENABLE_SERVICE@
 ENABLE_THREADS = @ENABLE_THREADS@
 EXEEXT = @EXEEXT@
+F77 = @F77@
 FCFLAGS = @FCFLAGS@
+FFLAGS = @FFLAGS@
 FGREP = @FGREP@
 GREP = @GREP@
 GRIB_API_INCLUDE = @GRIB_API_INCLUDE@
@@ -333,6 +335,7 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_F77 = @ac_ct_F77@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -382,7 +385,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Process this file with automake to produce Makefile.in
-SUBDIRS = libcdi src contrib test/data test
+SUBDIRS = libcdi src/lib/ncl src contrib test/data test
 #
 EXTRA_DIST = config/default OPERATORS doc/cdo.pdf doc/cdo_cmor.pdf doc/cdo_eca.pdf doc/cdo_magics.pdf doc/cdo_refcard.pdf cdo.spec README
 #

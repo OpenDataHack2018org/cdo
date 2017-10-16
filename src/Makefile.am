@@ -289,6 +289,7 @@ cdo_SOURCES += Adisit.cc        \
                Monarith.cc      \
                Mrotuv.cc        \
                Mrotuvb.cc       \
+               NCL.cc           \
                Ninfo.cc         \
                Nmldump.cc       \
                Output.cc        \
@@ -423,7 +424,7 @@ cdo_SOURCES += Magplot.cc       \
 #endif
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
-cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+cdo_LDADD    = libcdo.la $(top_builddir)/src/lib/ncl/libncl.la $(top_builddir)/libcdi/src/libcdi.la
 cdo_LDFLAGS  =
 
 if ENABLE_ALL_STATIC

@@ -13,6 +13,7 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
@@ -77,7 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = test/data
+subdir = src/lib/ncl
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/config/mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -94,6 +95,14 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+libncl_la_LIBADD =
+am_libncl_la_OBJECTS = rvdv.lo
+libncl_la_OBJECTS = $(am_libncl_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -106,14 +115,48 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-SOURCES =
-DIST_SOURCES =
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
+F77COMPILE = $(F77) $(AM_FFLAGS) $(FFLAGS)
+LTF77COMPILE = $(LIBTOOL) $(AM_V_lt) --tag=F77 $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(F77) $(AM_FFLAGS) $(FFLAGS)
+AM_V_F77 = $(am__v_F77_@AM_V@)
+am__v_F77_ = $(am__v_F77_@AM_DEFAULT_V@)
+am__v_F77_0 = @echo "  F77     " $@;
+am__v_F77_1 = 
+F77LD = $(F77)
+F77LINK = $(LIBTOOL) $(AM_V_lt) --tag=F77 $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(F77LD) $(AM_FFLAGS) $(FFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_F77LD = $(am__v_F77LD_@AM_V@)
+am__v_F77LD_ = $(am__v_F77LD_@AM_DEFAULT_V@)
+am__v_F77LD_0 = @echo "  F77LD   " $@;
+am__v_F77LD_1 = 
+SOURCES = $(libncl_la_SOURCES)
+DIST_SOURCES = $(libncl_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
+# Read a list of newline-separated strings from the standard input,
+# and print each of them once, without duplicates.  Input order is
+# *not* preserved.
+am__uniquify_input = $(AWK) '\
+  BEGIN { nonempty = 0; } \
+  { items[$$0] = 1; nonempty = 1; } \
+  END { if (nonempty) { for (i in items) print i; }; } \
+'
+# Make sure the list of sources is unique.  This is necessary because,
+# e.g., the same source file might be shared among _SOURCES variables
+# for different programs/libraries.
+am__define_uniq_tagged_files = \
+  list='$(am__tagged_files)'; \
+  unique=`for i in $$list; do \
+    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+  done | $(am__uniquify_input)`
+ETAGS = etags
+CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -293,58 +336,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INPUTDATA = ts_mm_5years ts_6h_1mon ts_1d_1year hl_l19.grb t21_geosp_tsurf.grb bathy4.grb pl_data pl_data.grb detrend_data \
-            grib_testfile01.grb grib_testfile02.grb grib_testfile03.grb netcdf_testfile01.nc netcdf_testfile02.nc testfile01c.nc \
-            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.grb tsurf_spain.grb spain.grid
-
-FILE_REF = file_F32_srv_ref
-GRIB_REF = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile02_sinfo_ref grib_testfile02_info_ref grib_testfile03_sinfo_ref grib_testfile03_info_ref
-NETCDF_REF = netcdf_testfile01_sinfon_ref netcdf_testfile01_infon_ref netcdf_testfile02_sinfon_ref netcdf_testfile02_infon_ref
-COMP_REF = comp_eqc_ref comp_gec_ref comp_gtc_ref comp_lec_ref comp_ltc_ref comp_nec_ref comptest.srv
-EOF_REF = eval_ref eof_ref pcoeff00000
-YDRUNSTAT_REF = ydrunmin_ref ydrunmax_ref ydrunsum_ref ydrunavg_ref ydrunmean_ref ydrunstd_ref ydrunstd1_ref ydrunvar_ref ydrunvar1_ref
-YMONSTAT_REF = ymonmin_ref ymonmax_ref ymonsum_ref ymonavg_ref ymonmean_ref ymonstd_ref ymonstd1_ref ymonvar_ref ymonvar1_ref ymonrange_ref
-YSEASSTAT_REF = yseasmin_ref yseasmax_ref yseassum_ref yseasavg_ref yseasmean_ref yseasstd_ref yseasstd1_ref yseasvar_ref yseasvar1_ref yseasrange_ref
-SEASSTAT_REF = seasmin_ref seasmax_ref seassum_ref seasavg_ref seasmean_ref seasstd_ref seasstd1_ref seasvar_ref seasvar1_ref seasrange_ref
-RUNSTAT_REF = runmin_ref runmax_ref runsum_ref runavg_ref runmean_ref runstd_ref runstd1_ref runvar_ref runvar1_ref runrange_ref
-TIMSTAT_REF = timmin_ref timmax_ref timsum_ref timavg_ref timmean_ref timstd_ref timstd1_ref timvar_ref timvar1_ref timrange_ref
-YEARSTAT_REF = yearmin_ref yearmax_ref yearsum_ref yearavg_ref yearmean_ref yearstd_ref yearstd1_ref yearvar_ref yearvar1_ref yearrange_ref
-MONSTAT_REF = monmin_ref monmax_ref monsum_ref monavg_ref monmean_ref monstd_ref monstd1_ref monvar_ref monvar1_ref monrange_ref
-DAYSTAT_REF = daymin_ref daymax_ref daysum_ref dayavg_ref daymean_ref daystd_ref daystd1_ref dayvar_ref dayvar1_ref dayrange_ref
-VERTSTAT_REF = vertmin_ref vertmax_ref vertsum_ref vertavg_ref vertmean_ref vertstd_ref vertstd1_ref vertvar_ref vertvar1_ref vertint_ref vertrange_ref
-FLDSTAT_REF = fldmin_ref fldmax_ref fldsum_ref fldavg_ref fldmean_ref fldstd_ref fldstd1_ref fldvar_ref fldvar1_ref fldrange_ref
-FLDPSTAT_REF = fldpctl1_ref fldpctl20_ref fldpctl25_ref fldpctl33_ref fldpctl50_ref fldpctl66_ref fldpctl75_ref fldpctl80_ref fldpctl99_ref fldpctl100_ref
-MERSTAT_REF = mermin_ref mermax_ref mersum_ref meravg_ref mermean_ref merstd_ref merstd1_ref mervar_ref mervar1_ref merrange_ref
-ZONSTAT_REF = zonmin_ref zonmax_ref zonsum_ref zonavg_ref zonmean_ref zonstd_ref zonstd1_ref zonvar_ref zonvar1_ref zonrange_ref
-ENSPSTAT_REF = enspctl1_ref enspctl20_ref enspctl25_ref enspctl33_ref enspctl50_ref enspctl66_ref enspctl75_ref enspctl80_ref enspctl99_ref enspctl100_ref
-SPECTRAL_REF = sp2gp_ref sp2gpl_ref gp2sp_ref gp2spl_ref
-VERTINT_REF = ml2pl_ref
-REMAP_REF = n16_bic_ref n16_bil_ref n16_con_ref n16_ycon_ref n16_laf_ref n16_nn_ref n16_dis_ref \
-               n32_bic_ref n32_bil_ref n32_con_ref n32_ycon_ref n32_laf_ref n32_nn_ref n32_dis_ref
-
-REMAP2_REF = tsurf_spain_bic_def_ref  tsurf_spain_bil_on_ref   tsurf_spain_dis_off_ref  tsurf_spain_nn_def_ref  tsurf_spain_ycon_on_ref \
-               tsurf_spain_bic_off_ref  tsurf_spain_con_def_ref  tsurf_spain_dis_on_ref   tsurf_spain_nn_off_ref \
-               tsurf_spain_bic_on_ref   tsurf_spain_con_off_ref  tsurf_spain_laf_def_ref  tsurf_spain_nn_on_ref \
-               tsurf_spain_bil_def_ref  tsurf_spain_con_on_ref   tsurf_spain_laf_off_ref  tsurf_spain_ycon_def_ref \
-               tsurf_spain_bil_off_ref  tsurf_spain_dis_def_ref  tsurf_spain_laf_on_ref   tsurf_spain_ycon_off_ref
-
-SELECT_REF = select1_ref select2_ref select3_ref select4_ref select5_ref
-DETREND_REF = detrend_ref
-EXPR_REF = expr1_ref aexpr1_ref expr2_ref aexpr2_ref
-THREAD_REF = thread1_ref tsformat1_ref
-GRADSDES_REF = pl_data.ctl pl_data.gmp
-ARITH_REF = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
-MAPREDUCE = r18x9_grid icon_cell_grid griddes.r18x9 griddes.icon_cell
-MERGETIME = mergetime_ref mergetime_y1 mergetime_y2 mergetime_y12
-REMAPETA = remapeta1.nc remapeta2.nc remapeta_ref VCT.L62
-EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(EOF_REF) $(COMP_REF) $(YDRUNSTAT_REF) $(YMONSTAT_REF) $(YSEASSTAT_REF) $(SEASSTAT_REF) \
-             $(RUNSTAT_REF) $(TIMSTAT_REF) $(YEARSTAT_REF) $(MONSTAT_REF) $(DAYSTAT_REF) $(VERTSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) \
-             $(MERSTAT_REF) $(ZONSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(REMAP2_REF) $(SELECT_REF) $(DETREND_REF) \
-             $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE) $(MERGETIME) $(REMAPETA)
-
+noinst_LTLIBRARIES = libncl.la
+libncl_la_SOURCES = rvdv.f
 all: all-am
 
 .SUFFIXES:
+.SUFFIXES: .f .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -354,9 +351,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign test/data/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/lib/ncl/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign test/data/Makefile
+	  $(AUTOMAKE) --foreign src/lib/ncl/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -376,17 +373,92 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; \
+	locs=`for p in $$list; do echo $$p; done | \
+	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
+	      sort -u`; \
+	test -z "$$locs" || { \
+	  echo rm -f $${locs}; \
+	  rm -f $${locs}; \
+	}
+
+libncl.la: $(libncl_la_OBJECTS) $(libncl_la_DEPENDENCIES) $(EXTRA_libncl_la_DEPENDENCIES) 
+	$(AM_V_F77LD)$(F77LINK)  $(libncl_la_OBJECTS) $(libncl_la_LIBADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+.f.o:
+	$(AM_V_F77)$(F77COMPILE) -c -o $@ $<
+
+.f.obj:
+	$(AM_V_F77)$(F77COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.f.lo:
+	$(AM_V_F77)$(LTF77COMPILE) -c -o $@ $<
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-tags TAGS:
 
-ctags CTAGS:
+ID: $(am__tagged_files)
+	$(am__define_uniq_tagged_files); mkid -fID $$unique
+tags: tags-am
+TAGS: tags
 
-cscope cscopelist:
+tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
+	set x; \
+	here=`pwd`; \
+	$(am__define_uniq_tagged_files); \
+	shift; \
+	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
+	  test -n "$$unique" || unique=$$empty_fix; \
+	  if test $$# -gt 0; then \
+	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+	      "$$@" $$unique; \
+	  else \
+	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
+	      $$unique; \
+	  fi; \
+	fi
+ctags: ctags-am
 
+CTAGS: ctags
+ctags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
+	$(am__define_uniq_tagged_files); \
+	test -z "$(CTAGS_ARGS)$$unique" \
+	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
+	     $$unique
+
+GTAGS:
+	here=`$(am__cd) $(top_builddir) && pwd` \
+	  && $(am__cd) $(top_srcdir) \
+	  && gtags -i $(GTAGS_ARGS) "$$here"
+cscopelist: cscopelist-am
+
+cscopelist-am: $(am__tagged_files)
+	list='$(am__tagged_files)'; \
+	case "$(srcdir)" in \
+	  [\\/]* | ?:[\\/]*) sdir="$(srcdir)" ;; \
+	  *) sdir=$(subdir)/$(srcdir) ;; \
+	esac; \
+	for i in $$list; do \
+	  if test -f "$$i"; then \
+	    echo "$(subdir)/$$i"; \
+	  else \
+	    echo "$$sdir/$$i"; \
+	  fi; \
+	done >> $(top_builddir)/cscope.files
+
+distclean-tags:
+	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -420,7 +492,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile
+all-am: Makefile $(LTLIBRARIES)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -454,11 +526,13 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
+	mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-tags
 
 dvi: dvi-am
 
@@ -506,7 +580,8 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -520,17 +595,19 @@ uninstall-am:
 
 .MAKE: install-am install-strip
 
-.PHONY: all all-am check check-am clean clean-generic clean-libtool \
-	cscopelist-am ctags-am distclean distclean-generic \
-	distclean-libtool distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
+.PHONY: CTAGS GTAGS TAGS all all-am check check-am clean clean-generic \
+	clean-libtool clean-noinstLTLIBRARIES cscopelist-am ctags \
+	ctags-am distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags-am uninstall uninstall-am
+	tags tags-am uninstall uninstall-am
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

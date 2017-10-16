@@ -1,0 +1,167 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+
+#include <limits.h>
+
+#include <cdi.h>
+#include "cdo.h"
+#include "cdo_int.h"
+#include "pstream.h"
+
+
+void uv2dv_cfd_W(double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev, int iopt, double *div)
+{
+  int *bound_opt = &iopt;
+  int has_missing_u;
+  double missing_u, missing_du, missing_ru;
+
+  // Declare various variables for random purposes.
+  size_t i, index_uv;
+  int inlat, inlon, ier;
+
+  size_t nlatnlon = nlat * nlon;
+
+  // Test dimension sizes.
+  if ((nlon > INT_MAX) || (nlat > INT_MAX))
+    cdoAbort("nlat and/or nlon is greater than INT_MAX!");
+  inlon = (int) nlon;
+  inlat = (int) nlat;
+
+  // Compute the total size of the q array.
+  size_t size_leftmost = nlev;
+  size_t size_uv = size_leftmost * nlatnlon;
+
+  // Check for missing values.
+  // coerce_missing(type_u,has_missing_u,&missing_u,&missing_du,&missing_ru);
+
+  // Init output array.
+  memset(div, 0, size_uv*sizeof(double));
+
+  for ( size_t k = 0; k < nlev; ++k )
+    {
+      double *tmp_u = u + k*size_uv;
+      double *tmp_v = v + k*size_uv;
+      double *tmp_div = div + k*size_uv;
+      // Call the Fortran routine.
+      // NGCALLF(ddvfidf,DDVFIDF)(tmp_u, tmp_v, lat, lon, &inlon, &inlat,
+      //                         &missing_du, bound_opt, tmp_div, &ier);
+    }
+}
+
+
+void *NCL(void *argument)
+{
+  int iopt = 0;
+  int nrecs;
+  int varID, levelID;
+  size_t nmiss, nmissu, nmissv;
+
+  cdoInitialize(argument);
+
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
+
+  int varIDu = 1;
+  int varIDv = 2;
+
+  int gridIDu = vlistInqVarGrid(vlistID1, varIDu);
+  int gridIDv = vlistInqVarGrid(vlistID1, varIDv);
+  int gridtype = gridInqType(gridIDu);
+  size_t gridsizeuv = gridInqSize(gridIDu);
+
+  if ( !((gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN) && gridtype == gridInqType(gridIDv)) )
+    cdoAbort("u and v must be on a regular lonlat or Gaussian grid!");
+  
+  if ( !(gridsizeuv == gridInqSize(gridIDv)) )
+    cdoAbort("u and v must have the same grid size!");
+
+  size_t nlon = gridInqXsize(gridIDu);
+  size_t nlat = gridInqYsize(gridIDu);
+
+  double *lon = (double*) Malloc(nlon*sizeof(double));
+  double *lat = (double*) Malloc(nlat*sizeof(double));
+
+  gridInqXvals(gridIDu, lon);
+  gridInqYvals(gridIDu, lat);
+
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID2, taxisID2);
+
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+
+  pstreamDefVlist(streamID2, vlistID2);
+
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  double *array = (double*) Malloc(gridsizemax*sizeof(double));
+  // level missing
+  double *arrayu = (double*) Malloc(gridsizeuv*sizeof(double));
+  double *arrayv = (double*) Malloc(gridsizeuv*sizeof(double));
+  double *arrayd = (double*) Malloc(gridsizeuv*sizeof(double));
+
+  int tsID = 0;
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+    {
+      taxisCopyTimestep(taxisID2, taxisID1);
+      pstreamDefTimestep(streamID2, tsID);
+	       
+      for ( int recID = 0; recID < nrecs; recID++ )
+	{
+	  pstreamInqRecord(streamID1, &varID, &levelID);         
+          pstreamReadRecord(streamID1, array, &nmiss);
+
+          if ( varID == varIDu || varID == varIDv )
+            {
+              if ( varID == varIDu ) { memcpy(arrayu, array, gridsizeuv*sizeof(double)); nmissu = nmiss; }
+              if ( varID == varIDv ) { memcpy(arrayv, array, gridsizeuv*sizeof(double)); nmissv = nmiss; }
+            }
+          else
+            {
+              pstreamDefRecord(streamID2,  varID,  levelID);
+	      pstreamCopyRecord(streamID2, streamID1);
+	    }
+	}
+
+      uv2dv_cfd_W(arrayu, arrayv, lon, lat, nlon, nlat, 1, iopt, arrayd);
+
+      nmiss = 0;
+      levelID = 0;
+      pstreamDefRecord(streamID2,  varIDu,  levelID);
+      pstreamWriteRecord(streamID2, arrayu, nmiss);
+
+      pstreamDefRecord(streamID2,  varIDv,  levelID);
+      pstreamWriteRecord(streamID2, arrayv, nmiss);
+
+      tsID++;
+    }
+
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
+
+  vlistDestroy(vlistID2);
+
+  if ( array ) Free(array);
+  if ( arrayu ) Free(arrayu);
+  if ( arrayv ) Free(arrayv);
+  if ( arrayd ) Free(arrayd);
+
+  cdoFinish();
+
+  return 0;
+}
