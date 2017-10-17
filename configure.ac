@@ -174,6 +174,35 @@ CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
 ACX_OPTIONS
 
 #  ----------------------------------------------------------------------
+#  Create the CDI Fortran77 Interface via cfortran.h
+AC_ARG_ENABLE([fortran],
+              [AS_HELP_STRING([--disable-fortran],
+                              [Omit building of Fortran routines])],
+              [enable_fortran=${enableval}],[enable_fortran=yes])
+AS_IF([test "x${enable_fortran}" = "xyes"], [
+dnl ######################################################################
+dnl Test whether cfortran.h works correctly
+dnl ######################################################################
+ACX_FIND_CFORTRAN_DEF
+ACX_XLF_QEXTNAME_ADD_APPENDUS
+AS_IF([test -n "$FC" -a X"$FC" != Xno -o -n "$F77" -a X"$F77" != Xno],
+  [ACX_CHECK_CFORTRAN([$srcdir/src],
+    [AC_DEFINE([HAVE_CF_INTERFACE],[1],
+       [Defined to 1 if C / Fortran interface cfortran.h works])],
+    [AS_CASE([x"$acx_cv_cfortran_works"],
+       [x"error"],
+       [AC_MSG_NOTICE([Linking/Running with C EXTERNAL built with cfortran.h does not work!])],
+       [x"compiling with cfortran.h failed"],
+       [AC_MSG_NOTICE([Compilation with cfortran.h is not working!])],
+       [x"error compiling Fortran subroutine"],
+       [AC_MSG_NOTICE([compilation of simple Fortran source failed!])],
+       [AC_MSG_NOTICE([Unexpected error when linking C and Fortran via cfortran.h!])])
+     AC_MSG_NOTICE([Disabling cfortran.h bindings generation])
+     acx_cv_cfortran_works=no])])
+])
+AM_CONDITIONAL([USE_FC],[test -n "$FC" -a X"$FC" != Xno -a x"$acx_cv_cfortran_works" = xyes])
+
+#  ----------------------------------------------------------------------
 
 # configure code from valgrind
 

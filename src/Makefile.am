@@ -7,6 +7,10 @@ libcdo_la_SOURCES =            \
                array.cc         \
                cdo_int.h       \
                compare.h       \
+               cfortran.h       \
+               libncl.h         \
+               cfortran.h       \
+               cf_interface.h   \
                cdo_pthread.cc   \
                cdo_vlist.cc     \
                cdo_getopt.cc    \

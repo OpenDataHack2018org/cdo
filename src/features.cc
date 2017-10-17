@@ -40,6 +40,9 @@
 void printFeatures(void)
 {
   fprintf(stderr, "Features:");
+#if defined(HAVE_CF_INTERFACE)
+  fprintf(stderr, " Fortran");
+#endif
 #if defined(ENABLE_DATA)
   fprintf(stderr, " DATA");
 #endif

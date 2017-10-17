@@ -21,25 +21,24 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "libncl.h"
 
 
 void uv2dv_cfd_W(double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev, int iopt, double *div)
 {
-  int *bound_opt = &iopt;
+  int ierror;
+  int bound_opt = iopt;
   int has_missing_u;
-  double missing_u, missing_du, missing_ru;
-
-  // Declare various variables for random purposes.
-  size_t i, index_uv;
-  int inlat, inlon, ier;
+  double missing_u = 0, missing_du = 0, missing_ru = 0;
 
   size_t nlatnlon = nlat * nlon;
 
   // Test dimension sizes.
-  if ((nlon > INT_MAX) || (nlat > INT_MAX))
+  if ( (nlon > INT_MAX) || (nlat > INT_MAX) )
     cdoAbort("nlat and/or nlon is greater than INT_MAX!");
-  inlon = (int) nlon;
-  inlat = (int) nlat;
+
+  int inlon = (int) nlon;
+  int inlat = (int) nlat;
 
   // Compute the total size of the q array.
   size_t size_leftmost = nlev;
@@ -57,15 +56,18 @@ void uv2dv_cfd_W(double *u, double *v, double *lon, double *lat, size_t nlon, si
       double *tmp_v = v + k*size_uv;
       double *tmp_div = div + k*size_uv;
       // Call the Fortran routine.
-      // NGCALLF(ddvfidf,DDVFIDF)(tmp_u, tmp_v, lat, lon, &inlon, &inlat,
-      //                         &missing_du, bound_opt, tmp_div, &ier);
+#ifdef HAVE_CF_INTERFACE
+      DDVFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missing_du, bound_opt, tmp_div, ierror);
+#else
+      cdoAbort("Fortran support not compiled in!");
+#endif
     }
 }
 
 
 void *NCL(void *argument)
 {
-  int iopt = 0;
+  int iopt = 1;
   int nrecs;
   int varID, levelID;
   size_t nmiss, nmissu, nmissv;
@@ -134,7 +136,7 @@ void *NCL(void *argument)
           else
             {
               pstreamDefRecord(streamID2,  varID,  levelID);
-	      pstreamCopyRecord(streamID2, streamID1);
+	      pstreamWriteRecord(streamID2, array, nmiss);
 	    }
 	}
 
@@ -143,7 +145,7 @@ void *NCL(void *argument)
       nmiss = 0;
       levelID = 0;
       pstreamDefRecord(streamID2,  varIDu,  levelID);
-      pstreamWriteRecord(streamID2, arrayu, nmiss);
+      pstreamWriteRecord(streamID2, arrayd, nmiss);
 
       pstreamDefRecord(streamID2,  varIDv,  levelID);
       pstreamWriteRecord(streamID2, arrayv, nmiss);

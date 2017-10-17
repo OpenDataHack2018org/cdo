@@ -88,7 +88,9 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/config.h.in $(top_srcdir)/config/mkinstalldirs \
 	$(top_srcdir)/config/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/acx_cfortran_flags.m4 \
+	$(top_srcdir)/m4/acx_check_cfortran.m4 \
+	$(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -538,20 +540,21 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
-	compare.h cdo_pthread.cc cdo_vlist.cc cdo_getopt.cc \
-	cdo_getopt.h cdo_task.cc cdo_task.h cdo_history.cc cdo_read.cc \
-	cdi_uuid.h cmortable_parser.cc after_sptrans.cc \
-	after_fctrans.cc after_dvtrans.cc after_vertint.cc \
-	after_vertint.h after_namelist.cc afterburnerlib.cc \
-	afterburner.h vct_l191.h calendar.h constants.h constants.cc \
-	color.cc color.h commandline.cc const.h convert_units.cc \
-	convert_units.h counter.h datetime.cc datetime.h dmemory.h \
-	ecacore.cc ecacore.h ecautil.cc ecautil.h error.h etopo.h \
-	temp.h mask.h exception.cc expr.cc expr.h expr_fun.cc \
-	expr_fun.h expr_lex.cc expr_yacc.cc expr_yacc.h features.cc \
-	field.cc field.h field2.cc fieldc.cc fieldmem.cc fieldmer.cc \
-	fieldzon.cc functs.h gradsdeslib.cc gradsdeslib.h grid.cc \
-	grid.h grid_proj.cc grid_proj.h grid_area.cc grid_define.cc \
+	compare.h cfortran.h libncl.h cfortran.h cf_interface.h \
+	cdo_pthread.cc cdo_vlist.cc cdo_getopt.cc cdo_getopt.h \
+	cdo_task.cc cdo_task.h cdo_history.cc cdo_read.cc cdi_uuid.h \
+	cmortable_parser.cc after_sptrans.cc after_fctrans.cc \
+	after_dvtrans.cc after_vertint.cc after_vertint.h \
+	after_namelist.cc afterburnerlib.cc afterburner.h vct_l191.h \
+	calendar.h constants.h constants.cc color.cc color.h \
+	commandline.cc const.h convert_units.cc convert_units.h \
+	counter.h datetime.cc datetime.h dmemory.h ecacore.cc \
+	ecacore.h ecautil.cc ecautil.h error.h etopo.h temp.h mask.h \
+	exception.cc expr.cc expr.h expr_fun.cc expr_fun.h expr_lex.cc \
+	expr_yacc.cc expr_yacc.h features.cc field.cc field.h \
+	field2.cc fieldc.cc fieldmem.cc fieldmer.cc fieldzon.cc \
+	functs.h gradsdeslib.cc gradsdeslib.h grid.cc grid.h \
+	grid_proj.cc grid_proj.h grid_area.cc grid_define.cc \
 	grid_gme.cc grid_rot.cc grid_from_name.cc grid_read.cc \
 	grid_read_pingo.cc grid_print.cc gridreference.cc griddes.cc \
 	griddes.h griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
