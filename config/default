@@ -128,6 +128,7 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
+                    F77=gfortran FFLAGS="-g -O2" \
 	            CXX=g++ CXXFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3  -fstack-protector" \
 	            CC=gcc  CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3  -fstack-protector"
 #                    --with-libxml2=/usr \

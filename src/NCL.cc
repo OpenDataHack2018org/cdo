@@ -40,21 +40,19 @@ void uv2dv_cfd_W(double *u, double *v, double *lon, double *lat, size_t nlon, si
   int inlon = (int) nlon;
   int inlat = (int) nlat;
 
-  // Compute the total size of the q array.
-  size_t size_leftmost = nlev;
-  size_t size_uv = size_leftmost * nlatnlon;
+  size_t gridsize_uv = nlatnlon;
 
   // Check for missing values.
   // coerce_missing(type_u,has_missing_u,&missing_u,&missing_du,&missing_ru);
 
-  // Init output array.
-  memset(div, 0, size_uv*sizeof(double));
-
   for ( size_t k = 0; k < nlev; ++k )
     {
-      double *tmp_u = u + k*size_uv;
-      double *tmp_v = v + k*size_uv;
-      double *tmp_div = div + k*size_uv;
+      printf("level: %zu\n", k+1);
+      double *tmp_u = u + k*gridsize_uv;
+      double *tmp_v = v + k*gridsize_uv;
+      double *tmp_div = div + k*gridsize_uv;
+      // Init output array.
+      memset(tmp_div, 0, gridsize_uv*sizeof(double));
       // Call the Fortran routine.
 #ifdef HAVE_CF_INTERFACE
       DDVFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missing_du, bound_opt, tmp_div, ierror);
@@ -102,6 +100,11 @@ void *NCL(void *argument)
   gridInqXvals(gridIDu, lon);
   gridInqYvals(gridIDu, lat);
 
+  size_t nlev = zaxisInqSize(vlistInqVarZaxis(vlistID1, varIDu));
+
+  if ( nlev != (size_t)zaxisInqSize(vlistInqVarZaxis(vlistID1, varIDv)) )
+    cdoAbort("u and v must have the same number of level!");
+
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
@@ -113,9 +116,9 @@ void *NCL(void *argument)
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsizemax*sizeof(double));
   // level missing
-  double *arrayu = (double*) Malloc(gridsizeuv*sizeof(double));
-  double *arrayv = (double*) Malloc(gridsizeuv*sizeof(double));
-  double *arrayd = (double*) Malloc(gridsizeuv*sizeof(double));
+  double *arrayu = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
+  double *arrayv = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
+  double *arrayd = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -130,8 +133,8 @@ void *NCL(void *argument)
 
           if ( varID == varIDu || varID == varIDv )
             {
-              if ( varID == varIDu ) { memcpy(arrayu, array, gridsizeuv*sizeof(double)); nmissu = nmiss; }
-              if ( varID == varIDv ) { memcpy(arrayv, array, gridsizeuv*sizeof(double)); nmissv = nmiss; }
+              if ( varID == varIDu ) { memcpy(arrayu+levelID*gridsizeuv, array, gridsizeuv*sizeof(double)); nmissu = nmiss; }
+              if ( varID == varIDv ) { memcpy(arrayv+levelID*gridsizeuv, array, gridsizeuv*sizeof(double)); nmissv = nmiss; }
             }
           else
             {
@@ -140,15 +143,20 @@ void *NCL(void *argument)
 	    }
 	}
 
-      uv2dv_cfd_W(arrayu, arrayv, lon, lat, nlon, nlat, 1, iopt, arrayd);
+      uv2dv_cfd_W(arrayu, arrayv, lon, lat, nlon, nlat, nlev, iopt, arrayd);
 
-      nmiss = 0;
-      levelID = 0;
-      pstreamDefRecord(streamID2,  varIDu,  levelID);
-      pstreamWriteRecord(streamID2, arrayd, nmiss);
+      for ( levelID = 0; levelID < nlev; ++levelID )
+        {
+          nmiss = 0;
+          pstreamDefRecord(streamID2,  varIDu,  levelID);
+          pstreamWriteRecord(streamID2, arrayd+levelID*gridsizeuv, nmiss);
+        }
 
-      pstreamDefRecord(streamID2,  varIDv,  levelID);
-      pstreamWriteRecord(streamID2, arrayv, nmiss);
+      for ( levelID = 0; levelID < nlev; ++levelID )
+        {
+          pstreamDefRecord(streamID2,  varIDv,  levelID);
+          pstreamWriteRecord(streamID2, arrayv+levelID*gridsizeuv, nmiss);
+        }
 
       tsID++;
     }
