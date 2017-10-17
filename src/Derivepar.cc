@@ -50,7 +50,7 @@ void *Derivepar(void *argument)
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
   // double *lwater = NULL, *iwater = NULL;
-  int nmiss, nmissout = 0;
+  size_t nmiss, nmissout = 0;
   double *full_press = NULL;
   double minval, maxval;
   int instNum, tableNum;
@@ -271,12 +271,12 @@ void *Derivepar(void *argument)
   if ( operatorID == GHEIGHT )
     {
       var_id = geopotential_height;
-      varID  = vlistDefVar(vlistID2, gridID, zaxisIDh, TSTEP_INSTANT);
+      varID  = vlistDefVar(vlistID2, gridID, zaxisIDh, TIME_VARYING);
     }
   else if ( operatorID == SEALEVELPRESSURE )
     {
       var_id = air_pressure_at_sea_level;
-      varID  = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
+      varID  = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARYING);
     }
   else
     cdoAbort("Internal problem, invalid operatorID: %d!", operatorID);

@@ -103,9 +103,9 @@ process_t::initProcess()
   a_utime = 0;
   a_stime = 0;
   cputime = 0;
-  nvals = NULL;
-  nvars = NULL;
-  ntimesteps = NULL;
+  nvals = 0;
+  nvars = 0;
+  ntimesteps = 0;
 
   m_streamCnt = 0;
 
@@ -877,14 +877,15 @@ createProcesses(int argc, char **argv)
 void
 processDefArgument(void *vargument)
 {
+<<<<<<< HEAD
   /*
 process_t &process = processSelf();
 char *operatorArg;
 char *commapos;
 std::vector< char*> &oargv = process.oargv;
 */
-  int argc = ((argument_t *) vargument)->argc;
-  std::vector<char *> &argv = ((argument_t *) vargument)->argv;
+  process_t &process = processSelf();
+  std::vector<char*> &oargv = process.oargv;
   /*
 
   process.m_operatorCommand = argv[0];
@@ -897,11 +898,11 @@ std::vector< char*> &oargv = process.oargv;
       orgv.push_back(operatorArg);
       // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
 
-      commapos = operatorArg;
+      char *commapos = operatorArg;
       while ((commapos = strchr(commapos, ',')) != NULL)
         {
           *commapos = '\0';
-          *commapos++;
+          commapos++;
           if (strlen(commapos))
             {
               oargv.push_back(commapos);
@@ -1151,16 +1152,15 @@ process_t::print_process()
     {
       std::cout << "    " << parentProcesses[i]->m_ID << std::endl;
     }
-  if (s_utime)
+  if ( s_utime > 0 )
     {
       std::cout << " s_utime         : " << s_utime << std::endl;
     }
   else
     {
-      std::cout << " s_utime         : "
-                << "UNINITALIZED" << std::endl;
+      std::cout << " s_utime         : " << "UNINITALIZED" << std::endl;
     }
-  if (s_stime)
+  if ( s_stime > 0 )
     {
       std::cout << " s_stime         : " << s_stime << std::endl;
     }

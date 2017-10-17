@@ -37,7 +37,7 @@ void *Setgrid(void *argument)
   int varID, levelID;
   int gridID2 = -1;
   int gridtype = -1;
-  int nmiss;
+  size_t nmiss;
   int areasize = 0;
   int  masksize = 0;
   bool lregular = false;
@@ -66,6 +66,9 @@ void *Setgrid(void *argument)
   // clang-format on
 
   int operatorID = cdoOperatorID();
+
+  // open stream before calling cdoDefineGrid!!!
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   if ( operatorID != UNSETGRIDMASK )
     operatorInputArg(cdoOperatorEnter(operatorID));  
@@ -176,8 +179,6 @@ void *Setgrid(void *argument)
       operatorCheckArgc(1);
       griduri = operatorArgv()[0];
     }
-
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

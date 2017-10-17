@@ -32,7 +32,7 @@ void *Harmonic(void *argument)
   int gridsize;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int offset;
   int nlevel;
   int vdate = 0, vtime = 0;

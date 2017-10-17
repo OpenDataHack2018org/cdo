@@ -26,6 +26,8 @@ Operator catalog:
    Showinfo      showcode        Show code numbers
    Showinfo      showname        Show variable names
    Showinfo      showstdname     Show standard names
+   Showinfo      showatts        Show all attributes
+   Showinfo      showattsglob    Show all global attributes
    Showinfo      showlevel       Show levels
    Showinfo      showltype       Show GRIB level types
    Showinfo      showyear        Show years
@@ -33,6 +35,8 @@ Operator catalog:
    Showinfo      showdate        Show date information
    Showinfo      showtime        Show time information
    Showinfo      showtimestamp   Show timestamp
+   Showattribute showattribute   Show a global attribute or a variable attribute
+   Showattribute showattsvar     Show all variable attributes.
    Filedes       partab          Parameter table
    Filedes       codetab         Parameter code table
    Filedes       griddes         Grid description
@@ -578,6 +582,10 @@ Operator catalog:
    Strgal        strgal          Strong gale days index per time period
    Hurr          hurr            Hurricane days index per time period
    CMORlite      cmorlite        CMOR lite
+-------------------------------------------------------------
+   CMOR
+-------------------------------------------------------------
+   CMOR          cmor            Climate Model Output Rewriting
 -------------------------------------------------------------
    Magics
 -------------------------------------------------------------

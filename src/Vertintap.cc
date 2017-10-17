@@ -48,39 +48,37 @@ bool is_height_axis(int zaxisID, int nlevel)
     }
   return isheight;
 }
-/*
+
 static
-int is_hybrid_axis(int zaxisID, int nlevel)
+void change_height_zaxis(int vlistID1, int vlistID2, int zaxisID2)
 {
-  int ishybrid = FALSE;
-  if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
-       nlevel > 1 ) ishybrid = TRUE;
-  return ishybrid;
+  int nzaxis = vlistNzaxis(vlistID1);
+  for ( int iz = 0; iz < nzaxis; ++iz )
+    {
+      int zaxisID = vlistZaxis(vlistID1, iz);
+      int nlevel  = zaxisInqSize(zaxisID);
+
+      if ( is_height_axis(zaxisID, nlevel) && nlevel > 1 )
+	{
+          vlistChangeZaxisIndex(vlistID2, iz, zaxisID2);
+	}
+    }
 }
-*/
+
 
 void *Vertintap(void *argument)
 {
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
   int nrecs;
-  int i, k, offset;
   int varID, levelID;
-  int zaxisIDp, zaxisIDh = -1;
+  int zaxisIDh = -1;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
-  int *vert_index = NULL;
   int apressID = -1, dpressID = -1;
   int psID = -1, tempID = -1;
   //int sortlevels = TRUE;
-  int *pnmiss = NULL;
-  char paramstr[32];
-  char stdname[CDI_MAX_NAME];
-  char varname[CDI_MAX_NAME];
-  double *vct = NULL;
-  double *single1, *single2;
-  double *ps_prog = NULL, *full_press = NULL, *dpress = NULL;
-  double *hyb_press = NULL;
-  int Extrapolate = 0;
+  char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
+  bool extrapolate = false;
   lista_t *flista = lista_new(FLT_LISTA);
 
   cdoInitialize(argument);
@@ -104,14 +102,14 @@ void *Vertintap(void *argument)
 
       if ( envstr && isdigit((int) envstr[0]) )
 	{
-          Extrapolate = atoi(envstr);
-          if ( Extrapolate == 1 )
+          if ( atoi(envstr) == 1 ) extrapolate = true;
+          if ( extrapolate )
             cdoPrint("Extrapolation of missing values enabled!");
 	}
     }
   else if ( operatorID == AP2PLX ||  operatorID == AP2HLX || operatorID == AP2PLX_LP )
     {
-      Extrapolate = 1;
+      extrapolate = true;
     }
 
   operatorInputArg(cdoOperatorEnter(operatorID));
@@ -125,19 +123,15 @@ void *Vertintap(void *argument)
           double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
           plev  = (double *) Malloc(nplev*sizeof(double));
-          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+          for ( int i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
         }
       else
         {
-          /*
-            double stdlev[] = {100000, 92500, 85000, 77500, 70000, 60000, 50000, 40000, 30000, 25000, 20000,
-            15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
-          */
           double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
                              10000,  7000,  5000,  3000,  2000, 1000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
           plev  = (double *) Malloc(nplev*sizeof(double));
-          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+          for ( int i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
         }
     }
   else
@@ -157,11 +151,8 @@ void *Vertintap(void *argument)
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  if ( operfunc == func_hl )
-    zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);
-  else
-    zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
-
+  int zaxistype = (operfunc == func_hl) ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
+  int zaxisIDp = zaxisCreate(zaxistype, nplev);
   zaxisDefLevels(zaxisIDp, plev);
 
   int nvars = vlistNvars(vlistID1);
@@ -195,7 +186,7 @@ void *Vertintap(void *argument)
       if ( zaxisID == vlistInqVarZaxis(vlistID1, apressID) )
         {
           bool mono_level = true;
-          nlevel  = zaxisInqSize(zaxisID);
+          nlevel = zaxisInqSize(zaxisID);
 
           if ( is_height_axis(zaxisID, nlevel) )
             {
@@ -217,30 +208,30 @@ void *Vertintap(void *argument)
               nhlevf   = nhlev;
               nhlevh   = nhlevf + 1;
 
-              vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
               break;
             }
         }
     }
+
+  change_height_zaxis(vlistID1, vlistID2, zaxisIDp);
   
-  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
-  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));
-  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
-  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
-  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));
+  std::vector<bool> vars(nvars);
+  std::vector<bool> varinterp(nvars);
+  std::vector<size_t *> varnmiss(nvars);
+  std::vector<double *> vardata1(nvars);
+  std::vector<double *> vardata2(nvars);
 
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
-  if ( Extrapolate == 0 )
-    pnmiss = (int *) Malloc(nplev*sizeof(int));
+  size_t *pnmiss = extrapolate ? NULL : (size_t *) Malloc(nplev*sizeof(size_t));
 
   // check levels
   if ( zaxisIDh != -1 )
     {
       int nlev = zaxisInqSize(zaxisIDh);
       if ( nlev != nhlev ) cdoAbort("Internal error, wrong number of height level!");
-      double *levels = (double*) Malloc(nlev*sizeof(double));
-      zaxisInqLevels(zaxisIDh, levels);
+      std::vector<double> levels(nlev);
+      cdoZaxisInqLevels(zaxisIDh, levels.data());
 
       for ( int ilev = 0; ilev < nlev; ++ilev )
 	{
@@ -250,35 +241,34 @@ void *Vertintap(void *argument)
 	      break;
 	    }
 	}
-
-      Free(levels);
     }
 
+  int *vert_index = NULL;
+  double *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   if ( zaxisIDh != -1 && gridsize > 0 )
     {
-      vert_index = (int *) Malloc(gridsize*nplev*sizeof(int));
-      ps_prog    = (double *) Malloc(gridsize*sizeof(double));
-      full_press = (double *) Malloc(gridsize*nhlevf*sizeof(double));
-      dpress     = (double *) Malloc(gridsize*nhlevf*sizeof(double));
+      vert_index = (int*) Malloc(gridsize*nplev*sizeof(int));
+      ps_prog    = (double*) Malloc(gridsize*sizeof(double));
+      full_press = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+      half_press = (double*) Malloc(gridsize*nhlevh*sizeof(double));
     }
   else
     cdoWarning("No 3D variable with generalized height level found!");
 
   if ( operfunc == func_hl )
     {
-      double *phlev =(double*) Malloc(nplev*sizeof(double));
-      height2pressure(phlev, plev, nplev);
+      std::vector<double> phlev(nplev);
+      height2pressure(phlev.data(), plev, nplev);
 
       if ( cdoVerbose )
 	for ( int i = 0; i < nplev; ++i )
 	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
 
-      memcpy(plev, phlev, nplev*sizeof(double));
-      Free(phlev);
+      memcpy(plev, phlev.data(), nplev*sizeof(double));
     }
 
   if ( opertype == type_log )
-    for ( k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
+    for ( int k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -291,34 +281,41 @@ void *Vertintap(void *argument)
 
       vardata1[varID] = (double *) Malloc(gridsize*nlevel*sizeof(double));
            
-      if ( zaxisID == zaxisIDh )
+      if ( zaxisID == zaxisIDh ||
+	   (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)) )
 	{
 	  varinterp[varID] = true;
 	  vardata2[varID]  = (double *) Malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = (int *) Malloc(maxlev*sizeof(int));
-	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
+	  varnmiss[varID]  = (size_t *) Malloc(maxlev*sizeof(size_t));
+	  memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
 	}
       else
 	{
-          vlistInqVarName(vlistID1, varID, varname);
+	  if ( is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && nlevel > 1 )
+            {
+              vlistInqVarName(vlistID1, varID, varname);
+              cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
+                         varID+1, varname, nlevel);
+            }
 
-          if ( is_height_axis(zaxisID, nlevel) && nlevel == nhlevh )
-            cdoWarning("Interpolation from half level not supported, parameter %s not interpolated!", varname);
-          
 	  varinterp[varID] = false;
 	  vardata2[varID]  = vardata1[varID];
-	  varnmiss[varID]  = (int *) Malloc(nlevel*sizeof(int));
+	  varnmiss[varID]  = (size_t *) Malloc(nlevel*sizeof(size_t));
 	}
     }
   
-  if ( zaxisIDh != -1 && psID == -1 && dpressID )
-    cdoWarning("Surface pressure not found - set to vertical sum of %s!", var_stdname(pressure_thickness));
-  //  cdoWarning("Surface pressure not found - set to upper level of %s!", var_stdname(air_pressure));
+  if ( zaxisIDh != -1 && psID == -1 )
+    {
+      if ( dpressID != -1 )
+        cdoWarning("Surface pressure not found - set to vertical sum of %s!", var_stdname(pressure_thickness));
+      else
+        cdoWarning("Surface pressure not found - set to lower bound of %s!", var_stdname(air_pressure));
+    }
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      if ( varinterp[varID] && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
-	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+      if ( varinterp[varID] && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
+	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -351,10 +348,9 @@ void *Vertintap(void *argument)
 	      printf("levelID %d\n", levelID);
 	    }
 	  */
-	  offset   = gridsize*levelID;
-	  single1  = vardata1[varID] + offset;
-
-	  pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
+	  size_t offset = gridsize*levelID;
+	  double *single1 = vardata1[varID] + offset;
+ 	  pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 
 	  vars[varID] = true;
 	}
@@ -370,16 +366,15 @@ void *Vertintap(void *argument)
 	    }
           else if ( dpressID != -1 )
 	    {
-	      memcpy(dpress, vardata1[dpressID], gridsize*nhlevf*sizeof(double)); 
-	      for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
-	      for ( k = 0; k < nhlevf; ++k )
-		for ( i = 0; i < gridsize; i++ )
-		  ps_prog[i] += dpress[k*gridsize+i];
+	      for ( int i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
+	      for ( int k = 0; k < nhlevf; ++k )
+		for ( int i = 0; i < gridsize; i++ )
+		  ps_prog[i] += vardata1[dpressID][k*gridsize+i];
 	    }
 	  else
 	    {
 	      memcpy(ps_prog, vardata1[apressID]+gridsize*(nhlevf-1), gridsize*sizeof(double)); 
-	      //for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
+	      //for ( int i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
 	    }
 
 	  /* check range of ps_prog */
@@ -390,39 +385,46 @@ void *Vertintap(void *argument)
 
 	  memcpy(full_press, vardata1[apressID], gridsize*nhlevf*sizeof(double)); 
 
+          for ( int i = 0; i < gridsize; i++ ) half_press[i] = 0;
+          for ( int k = 1; k < nhlevf; k++ )
+            for ( int i = 0; i < gridsize; i++ )
+              half_press[k*gridsize+i] = 0.5*(full_press[(k-1)*gridsize+i]+full_press[k*gridsize+i]);
+          for ( int i = 0; i < gridsize; i++ ) half_press[(nhlevh-1)*gridsize+i] = full_press[(nhlevf-1)*gridsize+i];
+          
 	  if ( opertype == type_log )
 	    {
-	      for ( i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
+	      for ( int i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
 
-	      for ( k = 0; k < nhlevf; k++ )
-		for ( i = 0; i < gridsize; i++ )
+	      for ( int k = 0; k < nhlevh; k++ )
+		for ( int i = 0; i < gridsize; i++ )
+		  half_press[k*gridsize+i] = log(half_press[k*gridsize+i]);
+
+	      for ( int k = 0; k < nhlevf; k++ )
+		for ( int i = 0; i < gridsize; i++ )
 		  full_press[k*gridsize+i] = log(full_press[k*gridsize+i]);
 	    }
 
 	  genind(vert_index, plev, full_press, gridsize, nplev, nhlevf);
 
-	  if ( Extrapolate == 0 )
-	    genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
+	  if ( !extrapolate ) genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  if ( vars[varID] )
 	    {
-	      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	      int nlevel   = zaxisInqSize(zaxisID);
-	      double missval  = vlistInqVarMissval(vlistID1, varID);
+	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      int nlevel  = zaxisInqSize(zaxisID);
+	      double missval = vlistInqVarMissval(vlistID1, varID);
 	      if ( varinterp[varID] )
 		{
-		  if ( nlevel == nhlevf )
-		    {
-		      hyb_press = full_press;
-		    }
+                  double *hyb_press = NULL;
+		  if      ( nlevel == nhlevf ) hyb_press = full_press;
+		  else if ( nlevel == nhlevh ) hyb_press = half_press;
 		  else
 		    {
-		      int param = vlistInqVarParam(vlistID1, varID);
-		      cdiParamToString(param, paramstr, sizeof(paramstr));
-		      cdoAbort("Number of generalized height level differ from full/half level (param=%s)!", paramstr);
+                      vlistInqVarName(vlistID1, varID, varname);
+		      cdoAbort("Number of generalized height level differ from full/half level (param=%s)!", varname);
 		    }
 
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -434,8 +436,7 @@ void *Vertintap(void *argument)
 		  interp_X(vardata1[varID], vardata2[varID], hyb_press,
 			   vert_index, plev, nplev, gridsize, nlevel, missval);
 		  
-		  if ( Extrapolate == 0 )
-		    memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
+		  if ( !extrapolate ) memcpy(varnmiss[varID], pnmiss, nplev*sizeof(size_t));
 		}
 	    }
 	}
@@ -447,8 +448,8 @@ void *Vertintap(void *argument)
 	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  offset   = gridsize*levelID;
-		  single2  = vardata2[varID] + offset;
+		  size_t offset = gridsize*levelID;
+		  double *single2 = vardata2[varID] + offset;
 		  pstreamDefRecord(streamID2, varID, levelID);
 		  pstreamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
 		}
@@ -472,14 +473,7 @@ void *Vertintap(void *argument)
   if ( ps_prog    ) Free(ps_prog);
   if ( vert_index ) Free(vert_index);
   if ( full_press ) Free(full_press);
-  if ( dpress     ) Free(dpress);
-  if ( vct        ) Free(vct);
-
-  Free(vars);
-  Free(varinterp);
-  Free(vardata1);
-  Free(vardata2);
-  Free(varnmiss);
+  if ( half_press ) Free(half_press);
 
   lista_destroy(flista);
 

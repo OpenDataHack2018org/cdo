@@ -57,7 +57,7 @@ void *Tstepcount(void *argument)
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
-  int nmiss;
+  size_t nmiss;
   int nlevel;
   int vdate = 0, vtime = 0;
   double missval;

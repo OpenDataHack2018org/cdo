@@ -37,7 +37,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
+#include "Showattribute.h"
 
 void *Showinfo(void *argument)
 {
@@ -62,6 +62,8 @@ void *Showinfo(void *argument)
   int SHOWLTYPE     = cdoOperatorAdd("showltype",     0, 0, NULL);
   int SHOWFORMAT    = cdoOperatorAdd("showformat",    0, 0, NULL);
   int SHOWGRID      = cdoOperatorAdd("showgrid",      0, 0, NULL); 
+  int SHOWATTS      = cdoOperatorAdd("showatts",      0, 0, NULL);
+  int SHOWATTSGLOB  = cdoOperatorAdd("showattsglob",  0, 0, NULL);
   // clang-format on
 
   int operatorID = cdoOperatorID();
@@ -258,7 +260,38 @@ void *Showinfo(void *argument)
     {
       printFiletype(streamID, vlistID);
     }
+  else if ( operatorID == SHOWSTDNAME )
+    {
+      char stdname[CDI_MAX_NAME];
+      for ( int varID = 0; varID < nvars; varID++ )
+	{
+	  vlistInqVarStdname(vlistID, varID, stdname);
+          fprintf(stdout, " %s", stdname[0] != 0 ? stdname : "unknown");
+	}
+      fprintf(stdout, "\n");
+    }
+  else if ( operatorID == SHOWATTS || operatorID == SHOWATTSGLOB )
+    {
+      if ( operatorID == SHOWATTS )
+        {
+          int vlistID = pstreamInqVlist(streamID);
+          int nvars = vlistNvars(vlistID);
+          for ( int varID = 0; varID < nvars; varID++ )
+            {
+              char varname[CDI_MAX_NAME];
+              vlistInqVarName(vlistID, varID, varname);
+              fprintf(stdout, "%s:\n", varname);
 
+    	      int nattsvar;
+    	      cdiInqNatts(vlistID, varID, &nattsvar);
+    	      printAtts(vlistID, varID, nattsvar, NULL);
+    	    }
+        }
+      fprintf(stdout, "Global:\n");
+      int natts;
+      cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
+      printAtts(vlistID, CDI_GLOBAL, natts, NULL);
+    }
   pstreamClose(streamID);
 
   cdoFinish();

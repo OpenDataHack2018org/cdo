@@ -37,6 +37,7 @@
 #define  func_mod      45
 
 #define  func_atan2    50
+#define  func_setmiss  51
 
 #define  func_read     60
 #define  func_write    61

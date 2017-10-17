@@ -1,0 +1,24 @@
+\chapter{Introduction}
+
+The Climate Data Operators ({\CDO}) software is a collection of operators
+for standard processing of climate and forecast model data. Here, the single
+operator \textbf{cdo cmor} is documented which demands a separate explanation 
+because of its many options to rearrange model output and add Metadata.
+It represents an interface to the Climate Model Output Rewriter library \href{https://pcmdi.github.io/cmor-site/}{CMOR} developed at PCMDI. This library comprises a set of functions which can be used to produce NetCDF files that fulfill the requirements of many of the climate community's standard model experiments. The output resulting from CMOR is "self-describing" and
+facilitates analysis of results across models. 
+
+CMOR functions feature a specific processing and require much input. 
+The objective of \textbf{cdo cmor} is to provide an easy interface to CMOR in order
+to automate and simplify its usage.
+\textbf{cdo cmor} can guarantee the right CMOR configuration by calling the
+CMOR functions internally in the right order in which CMOR labels and input attributes
+are inserted correctly. A reduction of input can be achieved by exploiting 
+the information gained by the climate data interface CDI. The final \textbf{cdo cmor} has a minimum requirement of one argument and an input file to apply CMOR accurately
+
+Different versions of the CMOR library have been published over the years. 
+The operator is based on CMOR version 2 which is appropriate to build CMIP5 compliant netcdf model output. The data standard of CMIP5 is fixed so that the project's database could be used to validate and improve the operator's functionality. Besides, there will be no update to another CMOR 2 version which guarantees a stable source package.
+
+This documentation is about the operator which uses CMOR version 2. In next {\CDO} releases, the operator will be upgraded by the support for more recent CMOR versions in order to achieve the long term goal of facilitating the preparation of project compliant output for all CMIP phases and other projects. 
+
+The  {\CDO} operator \textbf{cmor} was developed at the DKRZ and MPI for
+Meteorology and will be enhanced at the DKRZ for the CMIP6 project. 

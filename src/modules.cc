@@ -78,6 +78,7 @@ void *Eofcoeff(void *argument);
 void *Eofcoeff3d(void *argument);
 void *EOFs(void *argument);
 void *EOF3d(void *argument);
+void *EstFreq(void *argument);
 void *Expr(void *argument);
 void *FC(void *argument);
 void *Filedes(void *argument);
@@ -163,6 +164,7 @@ void *Settime(void *argument);
 void *Setzaxis(void *argument);
 void *Shiftxy(void *argument);
 void *Showinfo(void *argument);
+void *Showattribute(void *argument);
 void *Sinfo(void *argument);
 void *Smooth(void *argument);
 void *Sort(void *argument);
@@ -284,7 +286,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 /* clang-format off */
 #define  AdisitOperators        {"adisit", "adipot"}
 #define  AfterburnerOperators   {"after"}
-#define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
+#define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2", "setmiss"}
 #define  ArithcOperators        {"addc", "subc", "mulc", "divc", "mod"}
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy", "muldoy"}
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
@@ -325,6 +327,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  Eofcoeff3dOperators    {"eofcoeff3d"}
 #define  EOFsOperators          {"eof", "eofspatial", "eoftime"}
 #define  EOF3dOperators         {"eof3d","eof3dspatial","eof3dtime"}
+#define  EstFreqOperators       {"estfreq"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
 #define  FCOperators            {"fc2sp", "sp2fc", "fc2gp", "gp2fc"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "codetab", \
@@ -431,7 +434,8 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  SetzaxisOperators      {"setzaxis", "genlevelbounds"}
 #define  ShiftxyOperators       {"shiftx", "shifty"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
-                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat", "showgrid"}
+                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat", "showgrid", "showatts", "showattsglob"}
+#define  ShowattributeOperators {"showattribute", "showattsvar"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
 #define  SmoothOperators        {"smooth", "smooth9"}
 #define  SortOperators          {"sortcode", "sortparam", "sortname", "sortlevel"}
@@ -812,6 +816,7 @@ void init_modules()
   add_module("Change"        , {Change        , ChangeHelp        , ChangeOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Change_e5slm"  , {Change_e5slm  , {}                , Change_e5slmOperators  , 0 , CDI_REAL , 1  , 1  });
   add_module("Cloudlayer"    , {Cloudlayer    , {}                , CloudlayerOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("CMOR"          , {CMOR          , CMORHelp          , CMOROperators          , 1 , CDI_REAL , 1  , 0  });
   add_module("CMOR_lite"     , {CMOR_lite     , CMORliteHelp      , CMORliteOperators      , 1 , CDI_REAL , 1  , 1  });
   add_module("CMOR_table"    , {CMOR_table    , {}                , CMORtableOperators     , 1 , CDI_REAL , 0  , 0  });
   add_module("Collgrid"      , {Collgrid      , CollgridHelp      , CollgridOperators      , 1 , CDI_REAL , -1 , 1  });
@@ -841,6 +846,7 @@ void init_modules()
   add_module("Eofcoeff3d"    , {Eofcoeff3d    , EofcoeffHelp      , Eofcoeff3dOperators    , 1 , CDI_REAL , 2  , -1 });
   add_module("EOFs"          , {EOFs          , EOFsHelp          , EOFsOperators          , 1 , CDI_REAL , 1  , 2  });
   add_module("EOF3d"         , {EOF3d         , EOFsHelp          , EOF3dOperators         , 1 , CDI_REAL , 1  , 2  });
+  add_module("EstFreq"       , {EstFreq       , {}                , EstFreqOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Expr"          , {Expr          , ExprHelp          , ExprOperators          , 1 , CDI_REAL , 1  , 1  });
   add_module("FC"            , {FC            , {}                , FCOperators            , 1 , CDI_REAL , 1  , 1  });
   add_module("Filedes"       , {Filedes       , FiledesHelp       , FiledesOperators       , 1 , CDI_BOTH , 1  , 0  });
@@ -940,6 +946,7 @@ void init_modules()
   add_module("Setzaxis"      , {Setzaxis      , SetzaxisHelp      , SetzaxisOperators      , 1 , CDI_BOTH , 1  , 1  });
   add_module("Shiftxy"       , {Shiftxy       , {}                , ShiftxyOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Showinfo"      , {Showinfo      , ShowinfoHelp      , ShowinfoOperators      , 1 , CDI_BOTH , 1  , 0  });
+  add_module("Showattribute" , {Showattribute , ShowattributeHelp , ShowattributeOperators , 1 , CDI_REAL , 1  , 0  });
   add_module("Sinfo"         , {Sinfo         , SinfoHelp         , SinfoOperators         , 1 , CDI_BOTH , -1 , 0  });
   add_module("Smooth"        , {Smooth        , SmoothHelp        , SmoothOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Sort"          , {Sort          , {}                , SortOperators          , 1 , CDI_REAL , 1  , 1  });
@@ -1230,6 +1237,30 @@ std::vector<std::string> get_sorted_operator_name_list() {
     return names;
 }
 
+std::vector<std::string> get_no_output_operator_list()
+{
+ std::vector<std::string> names;
+    for (std::pair<std::string, std::string> operator_module_names_pair : modules_map) {
+        if (modules[operator_module_names_pair.second].mode == 1 
+                && modules[operator_module_names_pair.second].streamOutCnt == 0) 
+        {
+            names.push_back(operator_module_names_pair.first);
+        }
+    }
+    // adding operators names from alias_map
+    std::string original;
+    for (std::pair<std::string, std::string> alias : aliases) {
+        original = alias.second;
+        if(modules[modules_map[original]].mode == 1
+                && modules[modules_map[original]].streamOutCnt == 0){
+            names.push_back(alias.first);
+        }
+    }
+    std::sort(names.begin(), names.end());
+    return names;
+
+}
+
 void operatorPrintAll(void) {
     int number_of_chars = 0;
     std::string tab = "   ";
@@ -1331,7 +1362,15 @@ std::string get_spacing_for(std::string str) {
  * If the operator is not documented the description is empty
  */
 void operatorPrintList(bool print_no_output) {
-    std::vector<std::string> output_list = get_sorted_operator_name_list();
+    std::vector<std::string> output_list ;
+    if(print_no_output)
+    {
+        output_list = get_no_output_operator_list();
+    }
+    else
+    {
+        output_list = get_sorted_operator_name_list();
+    }
     std::vector<std::string> help;
     unsigned long list_length = output_list.size();
     unsigned long cur_help_idx;
@@ -1411,16 +1450,18 @@ bool is_alias(char * operatorName)
     return (aliases.find(std::string(operatorName)) != aliases.end());
 }
 
-void get_original(char * operatorName)
+char* get_original(char * operatorName)
 {
+    char* original = NULL;
     if(is_alias(operatorName)){
         std::string opName = aliases[std::string(operatorName)];
-        operatorName = (char*)realloc(operatorName, opName.size());
-        strcpy(operatorName, opName.c_str());
+        original = (char*)realloc(operatorName, opName.size());
+        strcpy(original, opName.c_str());
     }
     else{
         Error("%s is not an alias", operatorName);
     }
+    return original; 
 }
 
 

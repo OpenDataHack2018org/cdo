@@ -104,12 +104,13 @@ case "${HOSTNAME}" in
                  --with-proj=/opt/local"
 
         if  test "$COMP" = intel ; then
-	  ${CONFPATH}configure --prefix=$HOME/local --disable-openmp \
+	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
 	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang ; then
-	  ${CONFPATH}configure \
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
                     $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
 	            CXX=clang++ CXXFLAGS="-g -Wall -pedantic -O3" \
 	            CC=clang    CFLAGS="-g -Wall -pedantic -O3"
@@ -127,8 +128,8 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
-	            CXX=g++ CXXFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q -fstack-protector" \
-	            CC=gcc  CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q -fstack-protector"
+	            CXX=g++ CXXFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3  -fstack-protector" \
+	            CC=gcc  CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3  -fstack-protector"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi
@@ -231,8 +232,8 @@ case "${HOSTNAME}" in
                     --with-fftw3 \
                     $CDOLIBS \
                     LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
-	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
-	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=core-avx2" \
+	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=core-avx2"
         elif  test "$COMP" = pgi ; then
           ${CONFPATH}configure --disable-openmp \
                     $CDOLIBS \

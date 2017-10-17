@@ -43,7 +43,7 @@ typedef struct
 {
   int streamID;
   int vlistID;
-  int nmiss[2];
+  size_t nmiss[2];
   double missval[2];
   double *array[2];
 } ens_file_t;
@@ -87,7 +87,7 @@ void *ensstat_func(void *ensarg)
   int gridsize = gridInqSize(gridID);
   double missval = vlistInqVarMissval(arg->vlistID1, arg->varID[t]);
 
-  int nmiss = 0;
+  size_t nmiss = 0;
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
@@ -236,8 +236,8 @@ void *Ensstat(void *argument)
 	  strcat(name, "_count");
 	  int gridID = vlistInqVarGrid(vlistID2, varID);
 	  int zaxisID = vlistInqVarZaxis(vlistID2, varID);
-	  int tsteptype = vlistInqVarTsteptype(vlistID2, varID);
-	  int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, tsteptype);
+	  int timetype = vlistInqVarTimetype(vlistID2, varID);
+	  int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, timetype);
 	  vlistDefVarName(vlistID2, cvarID, name);
 	  vlistDefVarDatatype(vlistID2, cvarID, CDI_DATATYPE_INT16);
 	  if ( cvarID != (varID+nvars) ) cdoAbort("Internal error, varIDs do not match!");

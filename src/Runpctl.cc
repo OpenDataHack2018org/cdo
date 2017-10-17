@@ -33,7 +33,7 @@ void *Runpctl(void *argument)
   int timestat_date = TIMESTAT_MEAN;
   int varID;
   int levelID;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 
@@ -52,6 +52,7 @@ void *Runpctl(void *argument)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -101,7 +102,7 @@ void *Runpctl(void *argument)
     {
       for ( varID = 0; varID < nvars; varID++ )
         {
-          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+          if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
           
           int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           double missval  = vlistInqVarMissval(vlistID1, varID);
@@ -141,7 +142,7 @@ void *Runpctl(void *argument)
           varID    = recVarID[recID];
           levelID  = recLevelID[recID];
 
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, vars1[0][varID][levelID].ptr, vars1[0][varID][levelID].nmiss);

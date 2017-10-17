@@ -245,6 +245,7 @@ cdo_SOURCES += Adisit.cc        \
                Ensval.cc        \
                Eofcoeff.cc      \
 	       Eofcoeff3d.cc    \
+               EstFreq.cc       \
                Exprf.cc         \
                FC.cc            \
                Filedes.cc       \
@@ -333,6 +334,8 @@ cdo_SOURCES += Adisit.cc        \
                Setzaxis.cc      \
                Shiftxy.cc       \
                Showinfo.cc      \
+               Showattribute.h  \
+               Showattribute.cc \
                Sinfo.cc         \
                Smooth.cc        \
                Sort.cc          \

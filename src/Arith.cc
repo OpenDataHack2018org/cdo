@@ -37,26 +37,27 @@ void *Arith(void *argument)
 {
   enum {FILL_NONE, FILL_TS, FILL_VAR, FILL_VARTS, FILL_FILE};
   int filltype = FILL_NONE;
-  int nmiss;
+  size_t nmiss;
   int nrecs, nvars = 0;
   int nlevels2 = 1;
   int varID, levelID;
   int levelID2;
-  int *varnmiss2 = NULL;
-  int **varnmiss = NULL;
+  size_t *varnmiss2 = NULL;
+  size_t **varnmiss = NULL;
   double *vardata2 = NULL;
   double **vardata = NULL;
 
   cdoInitialize(argument);
 
   // clang-format off
-  cdoOperatorAdd("add",   func_add,   0, NULL);
-  cdoOperatorAdd("sub",   func_sub,   0, NULL);
-  cdoOperatorAdd("mul",   func_mul,   0, NULL);
-  cdoOperatorAdd("div",   func_div,   0, NULL);
-  cdoOperatorAdd("min",   func_min,   0, NULL);
-  cdoOperatorAdd("max",   func_max,   0, NULL);
-  cdoOperatorAdd("atan2", func_atan2, 0, NULL);
+  cdoOperatorAdd("add",     func_add,     0, NULL);
+  cdoOperatorAdd("sub",     func_sub,     0, NULL);
+  cdoOperatorAdd("mul",     func_mul,     0, NULL);
+  cdoOperatorAdd("div",     func_div,     0, NULL);
+  cdoOperatorAdd("min",     func_min,     0, NULL);
+  cdoOperatorAdd("max",     func_max,     0, NULL);
+  cdoOperatorAdd("atan2",   func_atan2,   0, NULL);
+  cdoOperatorAdd("setmiss", func_setmiss, 0, NULL);
   // clang-format on
 
   int operatorID = cdoOperatorID();
@@ -151,7 +152,7 @@ void *Arith(void *argument)
   if ( filltype == FILL_VAR || filltype == FILL_VARTS )
     {
       vardata2 = (double*) Malloc(gridsize*nlevels2*sizeof(double));
-      varnmiss2 = (int*) Malloc(nlevels2*sizeof(int));
+      varnmiss2 = (size_t*) Malloc(nlevels2*sizeof(size_t));
     }
 
   if ( cdoVerbose ) cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
@@ -180,13 +181,13 @@ void *Arith(void *argument)
 	{
 	  nvars  = vlistNvars(vlistIDx2);
 	  vardata  = (double **) Malloc(nvars*sizeof(double *));
-	  varnmiss = (int **) Malloc(nvars*sizeof(int *));
+	  varnmiss = (size_t **) Malloc(nvars*sizeof(size_t *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 	      int nlev     = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
 	      vardata[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-	      varnmiss[varID] = (int*) Malloc(nlev*sizeof(int));
+	      varnmiss[varID] = (size_t*) Malloc(nlev*sizeof(size_t));
 	    }
 	}
     }
@@ -249,7 +250,7 @@ void *Arith(void *argument)
 	{
 	  pstreamInqRecord(streamIDx1, &varID, &levelID);
 	  pstreamReadRecord(streamIDx1, fieldx1->ptr, &nmiss);
-          fieldx1->nmiss = (size_t) nmiss;
+          fieldx1->nmiss = nmiss;
           int varID2 = varID;
           
 	  if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS )
@@ -260,7 +261,7 @@ void *Arith(void *argument)
 		{
 		  pstreamInqRecord(streamIDx2, &varID2, &levelID2);
 		  pstreamReadRecord(streamIDx2, fieldx2->ptr, &nmiss);
-                  fieldx2->nmiss = (size_t) nmiss;
+                  fieldx2->nmiss = nmiss;
                   if ( varID   != varID2 ) cdoAbort("Internal error, varIDs of input streams differ!");
                   if ( levelID != levelID2 ) cdoAbort("Internal error, levelIDs of input streams differ!");
 		}
@@ -310,7 +311,7 @@ void *Arith(void *argument)
 	  farfun(&field1, field2, operfunc);
 
 	  pstreamDefRecord(streamID3, varID, levelID);
-	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
 	}
 
       tsID++;

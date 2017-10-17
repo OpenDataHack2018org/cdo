@@ -86,7 +86,7 @@ void *Timstat(void *argument)
   int varID, levelID;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
-  int nmiss;
+  size_t nmiss;
   bool lvfrac = false;
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
@@ -184,14 +184,11 @@ void *Timstat(void *argument)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID2);
   if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars   = vlistNvars(vlistID1);
-
-  if ( cmplen == 0 && CDO_Reduce_Dim )
-    for ( varID = 0; varID < nvars; ++varID )
-      vlistDefVarTsteptype(vlistID2, varID, TSTEP_CONSTANT);
 
   const char *freq = NULL;
   if      ( comparelen == DAY_LEN )  freq = "day";
@@ -225,6 +222,7 @@ void *Timstat(void *argument)
 	}
 
       taxisID3 = taxisDuplicate(taxisID1);
+      taxisWithBounds(taxisID3);
       vlistDefTaxis(vlistID3, taxisID3);
 
       pstreamDefVlist(streamID3, vlistID3);
@@ -280,7 +278,7 @@ void *Timstat(void *argument)
 		{
                   recinfo[recID].varID   = varID;
                   recinfo[recID].levelID = levelID;
-                  recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
+                  recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 		}
 
               field_type *psamp1 = &samp1[varID][levelID];

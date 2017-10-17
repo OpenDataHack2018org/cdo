@@ -53,7 +53,8 @@ void *EOF3d(void * argument)
   size_t temp_size = 0, npack = 0;
   int varID, levelID;
   bool missval_warning = false;
-  int nmiss, ngrids;
+  size_t nmiss;
+  int ngrids;
   int n = 0;
   size_t nlevs = 0;
   int timer_cov = 0, timer_eig = 0;

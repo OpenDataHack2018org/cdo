@@ -168,7 +168,7 @@ void *EOFs(void * argument)
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
 
   int nlevs = 0 ;
-  int nmiss;
+  size_t nmiss;
   int varID, levelID;
   int nts = 0;
   size_t n = 0;

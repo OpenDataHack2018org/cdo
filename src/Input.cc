@@ -221,7 +221,7 @@ void *Input(void *argument)
             }
 
 	  vlistID = vlistCreate();
-	  varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+	  varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
 	  vlistDefVarParam(vlistID, varID, cdiEncodeParam(code, 255, 255));
 
 	  missval = vlistInqVarMissval(vlistID, varID);
@@ -245,7 +245,7 @@ void *Input(void *argument)
 	  pstreamDefRecord(streamID, varID, levelID);
 
           int offset = gridsize*levelID;
-	  int nmiss = 0;
+	  size_t nmiss = 0;
 	  for ( i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(array[offset+i], missval) ) nmiss++;
 

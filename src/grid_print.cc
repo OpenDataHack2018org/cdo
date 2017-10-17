@@ -152,7 +152,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
   int xsize    = gridInqXsize(gridID);
   int ysize    = gridInqYsize(gridID);
   int nvertex  = gridInqNvertex(gridID);
-  int prec     = gridInqPrec(gridID);
+  int prec     = gridInqDatatype(gridID);
   int xstrlen  = gridInqXIsc(gridID);
   int ystrlen  = gridInqYIsc(gridID);
 

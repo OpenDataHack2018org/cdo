@@ -22,26 +22,29 @@
 
 void farfun(field_type *field1, field_type field2, int function)
 {
+  // clang-format off
   switch (function)
     {
-    case func_add:   faradd(field1, field2);   break;
-    case func_min:   farmin(field1, field2);   break;
-    case func_max:   farmax(field1, field2);   break;
-    case func_sum:   farsum(field1, field2);   break;
-    case func_mean:  farsum(field1, field2);   break;
-    case func_avg:   faradd(field1, field2);   break;
-    case func_sub:   farsub(field1, field2);   break;
-    case func_mul:   farmul(field1, field2);   break;
-    case func_div:   fardiv(field1, field2);   break;
-    case func_atan2: faratan2(field1, field2); break;
+    case func_add:     faradd(field1, field2);   break;
+    case func_min:     farmin(field1, field2);   break;
+    case func_max:     farmax(field1, field2);   break;
+    case func_sum:     farsum(field1, field2);   break;
+    case func_mean:    farsum(field1, field2);   break;
+    case func_avg:     faradd(field1, field2);   break;
+    case func_sub:     farsub(field1, field2);   break;
+    case func_mul:     farmul(field1, field2);   break;
+    case func_div:     fardiv(field1, field2);   break;
+    case func_atan2:   faratan2(field1, field2); break;
+    case func_setmiss: farsetmiss(field1, field2); break;
     default: cdoAbort("%s: function %d not implemented!", __func__, function);
     }
+  // clang-format on
 }
 
 static
 int farsetnmiss(int len, double *restrict array, double missval)
 {
-  int nmiss = 0;
+  size_t nmiss = 0;
 
   if ( DBL_IS_NAN(missval) )
     {
@@ -97,8 +100,8 @@ void faradd(field_type *field1, field_type field2)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;
@@ -140,8 +143,8 @@ void farsum(field_type *field1, field_type field2)
   int nwpv = field1->nwpv;
   int gridsize1 = field1->size;
   int gridsize2 = field2.size;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;
@@ -192,8 +195,8 @@ void farsumw(field_type *field1, field_type field2, double w)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1  = field1->ptr;
@@ -289,8 +292,8 @@ void farsumq(field_type *field1, field_type field2)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1  = field1->ptr;
@@ -338,8 +341,8 @@ void farsumqw(field_type *field1, field_type field2, double w)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1  = field1->ptr;
@@ -380,8 +383,8 @@ void farsub(field_type *field1, field_type field2)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1  = field1->ptr;
@@ -416,8 +419,8 @@ void farmul(field_type *field1, field_type field2)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1  = field1->ptr;
@@ -426,7 +429,6 @@ void farmul(field_type *field1, field_type field2)
   if ( nwpv != 2 ) nwpv = 1;
 
   int len = nwpv*gridInqSize(grid1);
-
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
@@ -460,7 +462,6 @@ void fardiv(field_type *field1, field_type field2)
   if ( nwpv != 2 ) nwpv = 1;
 
   int len = nwpv*gridInqSize(grid1);
-
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
@@ -499,13 +500,41 @@ void faratan2(field_type *field1, field_type field2)
 }
 
 
+void farsetmiss(field_type *field1, field_type field2)
+{
+  int nwpv  = field1->nwpv;
+  int grid1 = field1->grid;
+  int grid2 = field2.grid;
+  size_t nmiss1 = field1->nmiss;
+  double missval1 = field1->missval;
+  double *restrict array1 = field1->ptr;
+  const double *restrict array2 = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
+
+  int len = nwpv*gridInqSize(grid1);
+  if ( len != (nwpv*gridInqSize(grid2)) )
+    cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  if ( nmiss1 )
+    {
+      for ( int i = 0; i < len; i++ ) 
+        array1[i] = DBL_IS_EQUAL(array1[i],missval1) ? array2[i] : array1[i];
+
+      field1->nmiss = 0;
+      for ( int i = 0; i < len; i++ )
+        if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+    }
+}
+
+
 void farmin(field_type *field1, field_type field2)
 {
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;
@@ -544,8 +573,8 @@ void farmax(field_type *field1, field_type field2)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;
@@ -584,8 +613,8 @@ void farvar(field_type *field1, field_type field2, field_type field3, int diviso
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1  = field1->ptr;
@@ -640,7 +669,7 @@ void farstd(field_type *field1, field_type field2, field_type field3, int diviso
 
   farvar(field1, field2, field3, divisor);
 
-  int nmiss = 0;
+  size_t nmiss = 0;
   for ( int i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
       {
@@ -660,8 +689,8 @@ void farcvar(field_type *field1, field_type field2, int nsets, int divisor)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   const int nsetx = nsets - divisor;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
@@ -720,7 +749,7 @@ void farcstd(field_type *field1, field_type field2, int nsets, int divisor)
 
   farcvar(field1, field2, nsets, divisor);
 
-  int nmiss = 0;
+  size_t nmiss = 0;
   for ( int i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
       {
@@ -740,7 +769,7 @@ void farmoq(field_type *field1, field_type field2)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;
@@ -778,7 +807,7 @@ void farmoqw(field_type *field1, field_type field2, double w)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;
@@ -828,8 +857,8 @@ void farcount(field_type *field1, field_type field2)
   int nwpv   = field1->nwpv;
   int grid1  = field1->grid;
   int grid2  = field2.grid;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
+  size_t nmiss1 = field1->nmiss;
+  size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;

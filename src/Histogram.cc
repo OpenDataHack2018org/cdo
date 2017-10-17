@@ -30,7 +30,7 @@
 void *Histogram(void *argument)
 {
   int nrecs, varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int offset;
   int nlevel, zaxisID;
   double missval;

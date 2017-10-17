@@ -283,7 +283,7 @@ void *Invert(void *argument)
   int nrecs;
   int varID, levelID;
   int gridID1;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

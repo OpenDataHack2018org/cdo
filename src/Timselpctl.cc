@@ -35,7 +35,7 @@ void *Timselpctl(void *argument)
   int nrecs = 0;
   int gridID, varID, levelID;
   int tsID;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
 
   cdoInitialize(argument);
@@ -74,6 +74,7 @@ void *Timselpctl(void *argument)
   /* TODO - check that time axes 2 and 3 are equal */
 
   int taxisID4 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
   int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
@@ -193,7 +194,7 @@ void *Timselpctl(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
         {
-          if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+          if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
           nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           
           for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -208,7 +209,7 @@ void *Timselpctl(void *argument)
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
 
-	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	  pstreamDefRecord(streamID4, varID, levelID);
 	  pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);

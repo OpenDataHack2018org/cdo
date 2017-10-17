@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -165,7 +165,7 @@ void *Selmulti(void *argument)
   int varID2, levelID2;
   int sellevel, selcode, selltype;
   bool lcopy = false;
-  int nmiss;
+  size_t nmiss;
   int simpleMath=0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
   float scale = 1.0;
   float offset = 0.0; // If SCALE and/or OFFSET are defined, then the data values are scaled as SCALE*(VALUE-OFFSET).
@@ -332,7 +332,7 @@ void *Selmulti(void *argument)
 
   nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; ++varID )
-    if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
+    if ( vlistInqVarTimetype(vlistID2, varID) != TIME_CONSTANT ) break;
   if ( varID == nvars ) vlistDefNtsteps(vlistID2, 0);
 
   int taxisID1 = vlistInqTaxis(vlistID1);

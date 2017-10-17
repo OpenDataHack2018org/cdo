@@ -157,26 +157,14 @@ void find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal
 
 int find_coordinate_to_ignore(double *cell_corners_xyz)
 {
-  double corner_coordinates[3];
-  double second_corner_coordinates[3];
-  double third_corner_coordinates[3];
-
   /* Takes the first three corners/vertices of the cell and calculates the unit normal via determinants. */
       
-  corner_coordinates[0] = cell_corners_xyz[0];
-  corner_coordinates[1] = cell_corners_xyz[1];
-  corner_coordinates[2] = cell_corners_xyz[2];
+  double *pcorner_coordinates1 = &cell_corners_xyz[0];
+  double *pcorner_coordinates2 = &cell_corners_xyz[3];
+  double *pcorner_coordinates3 = &cell_corners_xyz[6];
 
-  second_corner_coordinates[0] = cell_corners_xyz[3 + 0];
-  second_corner_coordinates[1] = cell_corners_xyz[3 + 1];
-  second_corner_coordinates[2] = cell_corners_xyz[3 + 2];
-
-  third_corner_coordinates[0] = cell_corners_xyz[6 + 0];
-  third_corner_coordinates[1] = cell_corners_xyz[6 + 1];
-  third_corner_coordinates[2] = cell_corners_xyz[6 + 2];
-      
   double surface_normal_of_the_cell[3];
-  find_unit_normal(corner_coordinates, second_corner_coordinates, third_corner_coordinates, surface_normal_of_the_cell);
+  find_unit_normal(pcorner_coordinates1, pcorner_coordinates2, pcorner_coordinates3, surface_normal_of_the_cell);
 
   /* The surface normal is used to choose the coordinate to ignore. */
 
@@ -433,6 +421,12 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   
   Free(center_point_array);
 
+  // used only actual_number_of_corners
+  int *marked_duplicate_indices = (int*) Malloc(ncorner*sizeof(int)); 
+  double *cell_corners_xyz_without_duplicates = (double*) Malloc(3*ncorner*sizeof(double));
+  double *cell_corners_xyz = (double*) Malloc(3*(ncorner+1)*sizeof(double));
+  double *cell_corners_plane_projection = (double*) Malloc(2*(ncorner+1)*sizeof(double));
+
   /* 
      Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a triple of Cartesian coordinates in Euclidean space. 
      This is first done for the presumed center point of the cell and then for all the corners of the cell. LLtoXYZ is defined in clipping/geometry.h 
@@ -494,7 +488,6 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       
       /* Checks if there are any duplicate vertices in the list of corners. Note that the last (additional) corner has not been set yet. */
 
-      int *marked_duplicate_indices = (int*) Malloc(actual_number_of_corners*sizeof(int));
       for ( int i = 0; i < actual_number_of_corners; i++ ) marked_duplicate_indices[i] = 0;
 
       int no_duplicates = 0;
@@ -514,8 +507,6 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
             }
 
       /* Writes the unique corner vertices in a new array. */
-
-      double *cell_corners_xyz_without_duplicates = (double*) Malloc(3*(actual_number_of_corners - no_duplicates)*sizeof(double));
       
       int unique_corner_number = 0;
       
@@ -548,8 +539,6 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
       /* We are creating a closed polygon/cell by setting the additional last corner to be the same as the first one. */
 
-      double *cell_corners_xyz = (double*) Malloc(3*(actual_number_of_corners + 1)*sizeof(double));
-
       for ( int corner_no = 0; corner_no < actual_number_of_corners; corner_no++ )
         {
           int off = corner_no * 3;
@@ -565,8 +554,6 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       int coordinate_to_ignore = find_coordinate_to_ignore(cell_corners_xyz);
      
       /* The remaining two-dimensional coordinates are extracted into one array for all the cell's corners and into one array for the center point. */
-
-      double *cell_corners_plane_projection = (double*) Malloc(2*(actual_number_of_corners +1)*sizeof(double));
       
       /* The following projection on the plane that two coordinate axes lie on changes the arrangement of
          the polygon vertices if the coordinate to be ignored along the third axis is smaller than 0.
@@ -643,12 +630,12 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
             printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no]);
           printf("\n");
         }
-
-      Free(cell_corners_plane_projection);
-      Free(cell_corners_xyz);
-      Free(cell_corners_xyz_without_duplicates);
-      Free(marked_duplicate_indices);
     }
+
+  Free(marked_duplicate_indices);
+  Free(cell_corners_plane_projection);
+  Free(cell_corners_xyz);
+  Free(cell_corners_xyz_without_duplicates);
 
   int no_nonunique_cells = gridsize - no_unique_center_points;
   int no_nonconvex_cells = (int) gridsize - no_convex_cells;

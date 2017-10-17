@@ -1,0 +1,206 @@
+\appendix
+
+\chapter{Table of all keywords except global attributes}
+\label{chap:AllKeys}
+\begin{tabular}{|p{3cm}|p{2.5cm}|p{1cm}|p{2cm}|p{3cm}|p{2cm}|}
+\hline 
+\textbf{Function} & \textbf{Key name} Italic: Internally processed like a global Attribute & \textbf{Key short name} & \textbf{Type} & \textbf{Necessary either via key or Ifile information (Y = yes, N = no ) and restrictions} & \textbf{Default if no key is configured} ( - = irrelevant ) \\ 
+\hline 
+Variable selector & cmor\_name & cn & Strings & N & - \\ 
+\hline 
+Variable selector & name & n & String & N & - \\ 
+\hline 
+Variable selector & code & c & Three digits integer & N & - \\ 
+\hline 
+\hline 
+Main control & info & i & Strings & N & /\$HOME
+/.cdocmorinfo \\ 
+\hline 
+Main control & drs & d & Character & N & yes \\ 
+\hline 
+Main control & drs\_root & dr & String & N & Working directory \\ 
+\hline 
+\hline 
+Temporal/spatial description & \textit{grid\_info} & gi & String & Y and must fit to variable array & Ifile variable grid \\ 
+\hline 
+Temporal/spatial description & \textit{required\_
+time\_units} & rtu & String & Y and format controlled & Ifile time units \\ 
+\hline 
+Temporal/spatial description & \textit{calendar} & l & String & Y and 5 options & Ifile calendar \\ 
+\hline 
+\hline 
+Operational control & \textit{mapping\_table} & - & String & N & N \\ 
+\hline 
+Operational control & \textit{mapping\_table\_
+dir} & - & String & N & N \\ 
+\hline 
+Operational control & \textit{mip\_table\_dir} & - & String & N & N \\ 
+\hline 
+Operational control & \textit{grid\_info\_dir} & - & String & N & N \\ 
+\hline 
+Operational control & output\_mode & om & Character & N and 2 options & Replace mode \\
+\hline 
+Operational control & last\_chunk & lc & Strings & N & For CMIP5 \\
+\hline 
+Operational control & max\_size & ms & Integer & N and in Gb & 4Gb \\
+\hline 
+\hline 
+Variable attribute & units & u & String & Y and UD\_unit compatible & Ifile variable units \\ 
+\hline 
+Variable attribute & cell\_methods & cm & String & N and 4 options & mean \\ 
+\hline 
+Variable attribute & positive & p & Character & N and 3 options & blank \\ 
+\hline 
+Variable attribute & variable\_comment & vc & String & N & N \\ 
+\hline 
+\hline 
+Special
+variable attribute & scalar
+\_z\_coordinate) & szc & String and form controlled & N & N \\ 
+\hline 
+Special
+ variable attribute & character\_axis & ca & String and 3 options & N & N \\ 
+\hline 
+\end{tabular} 
+
+\chapter{Table of all global attribute keywords}
+\label{chap:AllKeys}
+\begin{tabular}{|p{4cm}|p{2cm}|p{2cm}|p{3.2cm}|p{2.3cm}|}
+\hline  
+\textbf{Global attributes.} Default type is String, otherwise mentioned. Italic: Not a glob. att. but denotable on the same level. & \textbf{Associated with:
+E: Experiment, M: Model, U: User.} & \textbf{CMIP6 changes if available} & \textbf{Necessary either via key or Ifile information (Y = yes, N = no, D = Depends on project ) and restrictions (CV: Controlled vocabulary)} & \textbf{Default if no information via key or Ifile is available} \\
+\hline
+\textit{required\_
+time\_units} & E &  & Y & N \\
+\hline
+project\_id & E & activity\_id & Y & N \\
+\hline 
+experiment\_id & E &  & Y and CV & N \\
+\hline 
+member & E & Format with forcing & D and format controlled & N \\
+\hline 
+product & E &  & D and CV & N \\
+\hline 
+cordex\_domain & E & & D and CV & N \\
+\hline 
+driving\_model\_id & E & & D and CV & N \\
+\hline 
+driving\_experiment\_name & E & & D and CV & N \\
+\hline 
+history & E & & N & N \\
+\hline 
+parent\_experiment\_id & E & & N and CV & N \\
+\hline 
+parent\_experiment\_rip & E & & N and CV & N \\
+\hline 
+forcing & E & & N & N \\
+\hline 
+branch\_times (Format: Double) & E & branch\_time\_
+in\_parent& N & 0.0 \\
+\hline 
+\hline 
+model\_id & M & source\_id & Y & N \\
+\hline
+source & M & & Y & N \\
+\hline
+\textit{mapping\_table} & M & & N & N \\
+\hline
+\textit{mapping\_table\_dir} & M & & N & N  \\
+\hline
+\textit{grid\_info} & M & & N & N \\
+\hline
+\textit{grid\_info\_dir} & M & & N & N  \\
+\hline
+\textit{calendar} & M & & Y and 5 options & "standard" (gregorian) \\
+\hline
+rcm\_version\_id & M & & N & N  \\
+\hline
+references & M & & N & "No references available for \$model\_id"  \\
+\hline
+\hline
+institude\_id & U & institution\_id & Y and CV & N  \\
+\hline
+institution & U & & Y and CV & N  \\
+\hline
+contact & U & & Y and CV & N  \\
+\hline
+\textit{mip\_table\_dir} & U & & N & N  \\
+\hline
+\end{tabular} 
+
+\chapter{Script to install cdo with CMOR support on a unix system DYNAMIC?}
+\label{chap:Script}
+
+\begin{verbatim}
+
+#!/bin/sh
+
+#Choose your installation directory HOME:
+HOME=/home/
+
+#Download the packages zlib-1.2.8, hdf5-1.8.13, expat-2.2.0, udunits-2.2.20, 
+# uuid-1.6.2, netcdf-4.4.1.1, jasper-1.900.1, grib_api-1.14.4-Source
+# and, of course, cmor2_v292 and cdo-1.8.0rc5 to $HOME
+
+cd zlib-1.2.8/
+./configure --prefix=${HOME}
+make; make check; make install
+cd ../
+
+cd hdf5-1.8.13/
+./configure --with-zlib=/${HOME} --prefix=${HOME} CFLAGS=-fPIC
+make; make check; make install
+cd ../
+
+cd expat-2.2.0/
+./configure --prefix=${HOME} CFLAGS=-fPIC
+make; make check; make install
+cd ..
+
+cd udunits-2.2.20/
+CPPFLAGS=-I${HOME}include LDFLAGS=-L${HOME}lib 
+./configure --prefix=${HOME} CFLAGS=-fPIC
+make; make check; make install
+cd ..
+
+cd uuid-1.6.2/
+./configure --prefix=${HOME} CFLAGS=-fPIC
+make; make check; make install
+cd ..
+
+cd netcdf-4.4.1.1/
+CPPFLAGS=-I${HOME}include LDFLAGS=-L${HOME}lib 
+./configure --prefix=${HOME} 
+--enable-netcdf-4 CFLAGS=-fPIC
+make; make check; make install
+cd ..
+
+cd jasper-1.900.1/
+./configure --prefix=${HOME} CFLAGS=-fPIC
+make; make check; make install
+cd ..
+
+cd grib_api-1.14.4-Source
+./configure --prefix=${HOME} CFLAGS=-fPIC --with-netcdf=${HOME} --with-jasper=${HOME}
+make; make check; make install
+cd ..
+
+cd cmor2_v292/
+CFLAGS=-fPIC CPPFLAGS=-I${HOME}include LDFLAGS=-L${HOME}lib 
+./configure --prefix=${HOME}local
+--with-udunits2=${HOME} --with-uuid=${HOME} --with-netcdf=${HOME}
+make
+make install
+cd ..
+
+cd cdo-1.8.0rc5
+CPPFLAGS="-I${HOME}include -I${HOME}include/cdTime" LDFLAGS="-L${HOME}lib"
+./configure --prefix=${HOME}
+--with-cmor=${HOME}local LIBS="-L${HOME}/lib -lnetcdf -ludunits2 -luuid"
+--with-netcdf=${HOME} --with-jasper=${HOME} --with-hdf5=${HOME} 
+--with-grib_api=${HOME} --with-udunits2=${HOME}
+make -j8
+cd ..
+
+
+\end{verbatim}

@@ -33,6 +33,7 @@ const char *filetypestr(int filetype)
     case CDI_FILETYPE_NC2:  return ("NetCDF2");
     case CDI_FILETYPE_NC4:  return ("NetCDF4");
     case CDI_FILETYPE_NC4C: return ("NetCDF4 classic");
+    case CDI_FILETYPE_NC5:  return ("NetCDF5");
     case CDI_FILETYPE_SRV:  return ("SERVICE");
     case CDI_FILETYPE_EXT:  return ("EXTRA");
     case CDI_FILETYPE_IEG:  return ("IEG");
@@ -82,7 +83,7 @@ void *CDIread(void *argument)
 {
   int memtype = CDO_Memtype;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nrecs;
   int filetype = -1, datatype = -1;
   int nruns = 1;

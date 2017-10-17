@@ -3,6 +3,7 @@ Sinfo	      Information
 Diff	      Information
 Ninfo	      Information
 Showinfo      Information
+Showattribute Information
 Filedes       Information
 Copy	      File operations
 Tee	      File operations
@@ -147,6 +148,7 @@ Strbre        Miscellaneous
 Strgal        Miscellaneous
 Hurr          Miscellaneous
 CMORlite      Miscellaneous
+CMOR          CMOR
 Magplot       Magics
 Magvector     Magics
 Maggraph      Magics

@@ -224,7 +224,7 @@ void boxavg(field_type *field1, field_type *field2, int xinc, int yinc)
 	xfield2[ilat][ilon] /= in;
       }
 
-  int nmiss = 0;
+  size_t nmiss = 0;
   for ( int i = 0; i < nlat2*nlon2; i++ )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
@@ -271,7 +271,7 @@ void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
       olat++;
     }
 
-  int nmiss = 0;
+  size_t nmiss = 0;
   for ( int i = 0; i < nlat2*nlon2; i++ )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
   
@@ -288,7 +288,7 @@ void *Intgrid(void *argument)
   int nrecs;
   int varID, levelID;
   int gridID1 = -1, gridID2 = -1;
-  int nmiss;
+  size_t nmiss;
   int xinc = 0, yinc = 0;
   double missval;
 
@@ -304,6 +304,7 @@ void *Intgrid(void *argument)
 
   int operatorID = cdoOperatorID();
 
+  // open stream before calling cdoDefineGrid!!!
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )

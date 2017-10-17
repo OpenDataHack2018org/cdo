@@ -41,7 +41,7 @@ void *FC(void *argument)
   int gridIDsp = -1, gridIDgp = -1, gridIDfc = -1;
   int gridID1 = -1, gridID2 = -1;
   int gridID;
-  int nmiss;
+  size_t nmiss;
   int nlon = 0, nlat = 0, ntr = 0;
   int nsp = 0, nfc = 0;
   double *array2 = NULL;

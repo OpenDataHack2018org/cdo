@@ -44,7 +44,7 @@ void *Copy(void *argument)
   int taxisID2 = CDI_UNDEFID;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int ntsteps, nvars;
   double *array = NULL;
   par_io_t parIO;
@@ -102,7 +102,7 @@ void *Copy(void *argument)
 	  if ( ntsteps == 1 )
 	    {
 	      for ( varID = 0; varID < nvars; ++varID )
-		if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
+		if ( vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT ) break;
 	      
 	      if ( varID == nvars ) ntsteps = 0;
 	    }
@@ -111,7 +111,7 @@ void *Copy(void *argument)
 	    {	      
               lconstvars = false;
 	      for ( varID = 0; varID < nvars; ++varID )
-		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+		vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
 	    }
 
 	  pstreamDefVlist(streamID2, vlistID2);
@@ -144,7 +144,7 @@ void *Copy(void *argument)
 		  pstreamInqRecord(streamID1, &varID, &levelID);
 
                   if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
-                    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
                       continue;
                   
 		  pstreamDefRecord(streamID2,  varID,  levelID);
@@ -164,7 +164,7 @@ void *Copy(void *argument)
 		      pstreamInqRecord(streamID1, &varID, &levelID);
 
                       if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
-                        if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                        if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
                           continue;
 
 		      pstreamReadRecord(streamID1, array, &nmiss);

@@ -1,6 +1,6 @@
    File format : GRIB
-    -1 : Institut Source   Steptype Levels Num    Points Num Dtype : Parameter ID
-     1 : unknown  unknown  instant       1   1      2592   1  P16  : 1             
+    -1 : Institut Source   T Steptype Levels Num    Points Num Dtype : Parameter ID
+     1 : unknown  unknown  v instant       1   1      2592   1  P16  : 1             
    Grid coordinates :
      1 : lonlat                   : points=2592 (72x36)
                               lon : -177.5 to 177.5 by 5 degrees_east  circular

@@ -302,7 +302,7 @@ void *Setpartab(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int tableID = -1;
   int tableformat = 0;
   bool delvars = false;

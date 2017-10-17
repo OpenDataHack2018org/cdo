@@ -65,7 +65,7 @@ int gridToUnstructuredSelecton(int gridID1, size_t selectionSize, int *selection
 int gridToCurvilinear(int gridID, int lbounds);
 int gridCurvilinearToRegular(int gridID);
 int gridToRegular(int gridID);
-void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss, int lnearest);
+void field2regular(int gridID1, int gridID2, double missval, double *array, size_t nmiss, int lnearest);
 
 /* GME grid */
 struct cart {
@@ -93,6 +93,8 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
 		double polphi, double pollam, double *u, double *v);
 
 void cdo_print_grid(int gridID, int opt);
+
+bool grid_has_proj4param(int gridID);
 
 // Define a de-staggered grid for U and V
 int cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagGridOffsets);

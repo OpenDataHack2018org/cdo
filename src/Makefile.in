@@ -189,28 +189,28 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Enlarge.$(OBJEXT) cdo-Enlargegrid.$(OBJEXT) \
 	cdo-Ensstat.$(OBJEXT) cdo-Ensstat3.$(OBJEXT) \
 	cdo-Ensval.$(OBJEXT) cdo-Eofcoeff.$(OBJEXT) \
-	cdo-Eofcoeff3d.$(OBJEXT) cdo-Exprf.$(OBJEXT) cdo-FC.$(OBJEXT) \
-	cdo-Filedes.$(OBJEXT) cdo-Fillmiss.$(OBJEXT) \
-	cdo-Filter.$(OBJEXT) cdo-Fldrms.$(OBJEXT) \
-	cdo-Fldstat.$(OBJEXT) cdo-Fldstat2.$(OBJEXT) \
-	cdo-Fourier.$(OBJEXT) cdo-Gengrid.$(OBJEXT) \
-	cdo-Gradsdes.$(OBJEXT) cdo-Gridboxstat.$(OBJEXT) \
-	cdo-Gridcell.$(OBJEXT) cdo-Gridsearch.$(OBJEXT) \
-	cdo-Harmonic.$(OBJEXT) cdo-Hi.$(OBJEXT) \
-	cdo-Histogram.$(OBJEXT) cdo-Importamsr.$(OBJEXT) \
-	cdo-Importbinary.$(OBJEXT) cdo-Importcmsaf.$(OBJEXT) \
-	cdo-Importobs.$(OBJEXT) cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) \
-	cdo-Intgrid.$(OBJEXT) cdo-Intgridtraj.$(OBJEXT) \
-	cdo-Intlevel.$(OBJEXT) cdo-Intlevel3d.$(OBJEXT) \
-	cdo-Intntime.$(OBJEXT) cdo-Inttime.$(OBJEXT) \
-	cdo-Intyear.$(OBJEXT) cdo-Invert.$(OBJEXT) \
-	cdo-Invertlev.$(OBJEXT) cdo-Isosurface.$(OBJEXT) \
-	cdo-Log.$(OBJEXT) cdo-MapReduce.$(OBJEXT) \
-	cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) \
-	cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
-	cdo-Mergetime.$(OBJEXT) cdo-Merstat.$(OBJEXT) \
-	cdo-Monarith.$(OBJEXT) cdo-Mrotuv.$(OBJEXT) \
-	cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
+	cdo-Eofcoeff3d.$(OBJEXT) cdo-EstFreq.$(OBJEXT) \
+	cdo-Exprf.$(OBJEXT) cdo-FC.$(OBJEXT) cdo-Filedes.$(OBJEXT) \
+	cdo-Fillmiss.$(OBJEXT) cdo-Filter.$(OBJEXT) \
+	cdo-Fldrms.$(OBJEXT) cdo-Fldstat.$(OBJEXT) \
+	cdo-Fldstat2.$(OBJEXT) cdo-Fourier.$(OBJEXT) \
+	cdo-Gengrid.$(OBJEXT) cdo-Gradsdes.$(OBJEXT) \
+	cdo-Gridboxstat.$(OBJEXT) cdo-Gridcell.$(OBJEXT) \
+	cdo-Gridsearch.$(OBJEXT) cdo-Harmonic.$(OBJEXT) \
+	cdo-Hi.$(OBJEXT) cdo-Histogram.$(OBJEXT) \
+	cdo-Importamsr.$(OBJEXT) cdo-Importbinary.$(OBJEXT) \
+	cdo-Importcmsaf.$(OBJEXT) cdo-Importobs.$(OBJEXT) \
+	cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) cdo-Intgrid.$(OBJEXT) \
+	cdo-Intgridtraj.$(OBJEXT) cdo-Intlevel.$(OBJEXT) \
+	cdo-Intlevel3d.$(OBJEXT) cdo-Intntime.$(OBJEXT) \
+	cdo-Inttime.$(OBJEXT) cdo-Intyear.$(OBJEXT) \
+	cdo-Invert.$(OBJEXT) cdo-Invertlev.$(OBJEXT) \
+	cdo-Isosurface.$(OBJEXT) cdo-Log.$(OBJEXT) \
+	cdo-MapReduce.$(OBJEXT) cdo-Maskbox.$(OBJEXT) \
+	cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) cdo-Merge.$(OBJEXT) \
+	cdo-Mergegrid.$(OBJEXT) cdo-Mergetime.$(OBJEXT) \
+	cdo-Merstat.$(OBJEXT) cdo-Monarith.$(OBJEXT) \
+	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
 	cdo-Nmldump.$(OBJEXT) cdo-Output.$(OBJEXT) \
 	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) \
 	cdo-Pardup.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
@@ -231,7 +231,8 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Setpartab.$(OBJEXT) cdo-Setrcaname.$(OBJEXT) \
 	cdo-Settime.$(OBJEXT) cdo-Setzaxis.$(OBJEXT) \
 	cdo-Shiftxy.$(OBJEXT) cdo-Showinfo.$(OBJEXT) \
-	cdo-Sinfo.$(OBJEXT) cdo-Smooth.$(OBJEXT) cdo-Sort.$(OBJEXT) \
+	cdo-Showattribute.$(OBJEXT) cdo-Sinfo.$(OBJEXT) \
+	cdo-Smooth.$(OBJEXT) cdo-Sort.$(OBJEXT) \
 	cdo-Sorttimestamp.$(OBJEXT) cdo-Specinfo.$(OBJEXT) \
 	cdo-Spectral.$(OBJEXT) cdo-Spectrum.$(OBJEXT) \
 	cdo-Split.$(OBJEXT) cdo-Splitrec.$(OBJEXT) \
@@ -599,27 +600,28 @@ cdo_SOURCES = cdo.cc Adisit.cc Afterburner.cc Arith.cc Arithc.cc \
 	Detrend.cc Diff.cc Distgrid.cc Duplicate.cc EOFs.cc Eof3d.cc \
 	EcaIndices.cc Echam5ini.cc Enlarge.cc Enlargegrid.cc \
 	Ensstat.cc Ensstat3.cc Ensval.cc Eofcoeff.cc Eofcoeff3d.cc \
-	Exprf.cc FC.cc Filedes.cc Fillmiss.cc Filter.cc Fldrms.cc \
-	Fldstat.cc Fldstat2.cc Fourier.cc Gengrid.cc Gradsdes.cc \
-	Gridboxstat.cc Gridcell.cc Gridsearch.cc Harmonic.cc Hi.cc \
-	Histogram.cc Importamsr.cc Importbinary.cc Importcmsaf.cc \
-	Importobs.cc Info.cc Input.cc Intgrid.cc Intgridtraj.cc \
-	Intlevel.cc Intlevel3d.cc Intntime.cc Inttime.cc Intyear.cc \
-	Invert.cc Invertlev.cc Isosurface.cc Log.cc MapReduce.cc \
-	Maskbox.cc Mastrfu.cc Math.cc Merge.cc Mergegrid.cc \
-	Mergetime.cc Merstat.cc Monarith.cc Mrotuv.cc Mrotuvb.cc \
-	Ninfo.cc Nmldump.cc Output.cc Outputgmt.cc Pack.cc Pardup.cc \
-	Pinfo.cc Pressure.cc Regres.cc Remap.cc Remapeta.cc Replace.cc \
-	Replacevalues.cc Rhopot.cc Rotuv.cc Runpctl.cc Runstat.cc \
-	Samplegrid.cc Samplegridicon.cc Seascount.cc Seaspctl.cc \
-	Seasstat.cc Selbox.cc Selgridcell.cc Select.cc Selmulti.cc \
-	Seloperator.cc Selrec.cc Seltime.cc Selvar.cc Set.cc \
-	Setattribute.cc Setbox.cc Setgatt.cc Setgrid.cc Sethalo.cc \
-	Setmiss.cc Setpartab.cc Setrcaname.cc Settime.cc Setzaxis.cc \
-	Shiftxy.cc Showinfo.cc Sinfo.cc Smooth.cc Sort.cc \
-	Sorttimestamp.cc Specinfo.cc Spectral.cc Spectrum.cc Split.cc \
-	Splitrec.cc Splitsel.cc Splittime.cc Splityear.cc Subtrend.cc \
-	Tee.cc Templates.cc Test.cc Tests.cc Timcount.cc Timcumsum.cc \
+	EstFreq.cc Exprf.cc FC.cc Filedes.cc Fillmiss.cc Filter.cc \
+	Fldrms.cc Fldstat.cc Fldstat2.cc Fourier.cc Gengrid.cc \
+	Gradsdes.cc Gridboxstat.cc Gridcell.cc Gridsearch.cc \
+	Harmonic.cc Hi.cc Histogram.cc Importamsr.cc Importbinary.cc \
+	Importcmsaf.cc Importobs.cc Info.cc Input.cc Intgrid.cc \
+	Intgridtraj.cc Intlevel.cc Intlevel3d.cc Intntime.cc \
+	Inttime.cc Intyear.cc Invert.cc Invertlev.cc Isosurface.cc \
+	Log.cc MapReduce.cc Maskbox.cc Mastrfu.cc Math.cc Merge.cc \
+	Mergegrid.cc Mergetime.cc Merstat.cc Monarith.cc Mrotuv.cc \
+	Mrotuvb.cc Ninfo.cc Nmldump.cc Output.cc Outputgmt.cc Pack.cc \
+	Pardup.cc Pinfo.cc Pressure.cc Regres.cc Remap.cc Remapeta.cc \
+	Replace.cc Replacevalues.cc Rhopot.cc Rotuv.cc Runpctl.cc \
+	Runstat.cc Samplegrid.cc Samplegridicon.cc Seascount.cc \
+	Seaspctl.cc Seasstat.cc Selbox.cc Selgridcell.cc Select.cc \
+	Selmulti.cc Seloperator.cc Selrec.cc Seltime.cc Selvar.cc \
+	Set.cc Setattribute.cc Setbox.cc Setgatt.cc Setgrid.cc \
+	Sethalo.cc Setmiss.cc Setpartab.cc Setrcaname.cc Settime.cc \
+	Setzaxis.cc Shiftxy.cc Showinfo.cc Showattribute.h \
+	Showattribute.cc Sinfo.cc Smooth.cc Sort.cc Sorttimestamp.cc \
+	Specinfo.cc Spectral.cc Spectrum.cc Split.cc Splitrec.cc \
+	Splitsel.cc Splittime.cc Splityear.cc Subtrend.cc Tee.cc \
+	Templates.cc Test.cc Tests.cc Timcount.cc Timcumsum.cc \
 	Timpctl.cc Timselpctl.cc Timselstat.cc Timsort.cc Timstat.cc \
 	Timstat2.cc Timstat3.cc Tinfo.cc Tocomplex.cc Transpose.cc \
 	Trend.cc Trms.cc Tstepcount.cc Vargen.cc Varrms.cc \
@@ -884,6 +886,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eof3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eofcoeff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eofcoeff3d.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-EstFreq.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Exprf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-FC.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Filedes.Po@am__quote@
@@ -974,6 +977,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Settime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setzaxis.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Shiftxy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Showattribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Showinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Sinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Smooth.Po@am__quote@
@@ -2609,6 +2613,20 @@ cdo-Eofcoeff3d.obj: Eofcoeff3d.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Eofcoeff3d.obj `if test -f 'Eofcoeff3d.cc'; then $(CYGPATH_W) 'Eofcoeff3d.cc'; else $(CYGPATH_W) '$(srcdir)/Eofcoeff3d.cc'; fi`
 
+cdo-EstFreq.o: EstFreq.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-EstFreq.o -MD -MP -MF $(DEPDIR)/cdo-EstFreq.Tpo -c -o cdo-EstFreq.o `test -f 'EstFreq.cc' || echo '$(srcdir)/'`EstFreq.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-EstFreq.Tpo $(DEPDIR)/cdo-EstFreq.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='EstFreq.cc' object='cdo-EstFreq.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-EstFreq.o `test -f 'EstFreq.cc' || echo '$(srcdir)/'`EstFreq.cc
+
+cdo-EstFreq.obj: EstFreq.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-EstFreq.obj -MD -MP -MF $(DEPDIR)/cdo-EstFreq.Tpo -c -o cdo-EstFreq.obj `if test -f 'EstFreq.cc'; then $(CYGPATH_W) 'EstFreq.cc'; else $(CYGPATH_W) '$(srcdir)/EstFreq.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-EstFreq.Tpo $(DEPDIR)/cdo-EstFreq.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='EstFreq.cc' object='cdo-EstFreq.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-EstFreq.obj `if test -f 'EstFreq.cc'; then $(CYGPATH_W) 'EstFreq.cc'; else $(CYGPATH_W) '$(srcdir)/EstFreq.cc'; fi`
+
 cdo-Exprf.o: Exprf.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Exprf.o -MD -MP -MF $(DEPDIR)/cdo-Exprf.Tpo -c -o cdo-Exprf.o `test -f 'Exprf.cc' || echo '$(srcdir)/'`Exprf.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Exprf.Tpo $(DEPDIR)/cdo-Exprf.Po
@@ -3840,6 +3858,20 @@ cdo-Showinfo.obj: Showinfo.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Showinfo.cc' object='cdo-Showinfo.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Showinfo.obj `if test -f 'Showinfo.cc'; then $(CYGPATH_W) 'Showinfo.cc'; else $(CYGPATH_W) '$(srcdir)/Showinfo.cc'; fi`
+
+cdo-Showattribute.o: Showattribute.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Showattribute.o -MD -MP -MF $(DEPDIR)/cdo-Showattribute.Tpo -c -o cdo-Showattribute.o `test -f 'Showattribute.cc' || echo '$(srcdir)/'`Showattribute.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Showattribute.Tpo $(DEPDIR)/cdo-Showattribute.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Showattribute.cc' object='cdo-Showattribute.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Showattribute.o `test -f 'Showattribute.cc' || echo '$(srcdir)/'`Showattribute.cc
+
+cdo-Showattribute.obj: Showattribute.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Showattribute.obj -MD -MP -MF $(DEPDIR)/cdo-Showattribute.Tpo -c -o cdo-Showattribute.obj `if test -f 'Showattribute.cc'; then $(CYGPATH_W) 'Showattribute.cc'; else $(CYGPATH_W) '$(srcdir)/Showattribute.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Showattribute.Tpo $(DEPDIR)/cdo-Showattribute.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Showattribute.cc' object='cdo-Showattribute.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Showattribute.obj `if test -f 'Showattribute.cc'; then $(CYGPATH_W) 'Showattribute.cc'; else $(CYGPATH_W) '$(srcdir)/Showattribute.cc'; fi`
 
 cdo-Sinfo.o: Sinfo.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Sinfo.o -MD -MP -MF $(DEPDIR)/cdo-Sinfo.Tpo -c -o cdo-Sinfo.o `test -f 'Sinfo.cc' || echo '$(srcdir)/'`Sinfo.cc

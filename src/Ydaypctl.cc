@@ -40,7 +40,7 @@ void *Ydaypctl(void *argument)
   int year, month, day, dayoy;
   int nrecs;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int nlevels;
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY];
@@ -212,7 +212,7 @@ void *Ydaypctl(void *argument)
         
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      
 	    for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -228,7 +228,7 @@ void *Ydaypctl(void *argument)
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+	    if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
 	    pstreamDefRecord(streamID4, varID, levelID);
 	    pstreamWriteRecord(streamID4, vars1[dayoy][varID][levelID].ptr, vars1[dayoy][varID][levelID].nmiss);

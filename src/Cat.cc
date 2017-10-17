@@ -36,7 +36,7 @@ void *Cat(void *argument)
   int streamID2 = CDI_UNDEFID;
   int vlistID2 = CDI_UNDEFID;
   int taxisID2 = CDI_UNDEFID;
-  int nmiss;
+  size_t nmiss;
   double tw0 = 0, tw = 0;
   double *array = NULL;
 
@@ -67,7 +67,7 @@ void *Cat(void *argument)
           if ( ntsteps == 1 )
             {
               for ( varID = 0; varID < nvars; ++varID )
-                if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
+                if ( vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT ) break;
 		  
               if ( varID == nvars ) ntsteps = 0;
             }
@@ -102,7 +102,7 @@ void *Cat(void *argument)
 		{
                   lconstvars = false;
 		  for ( varID = 0; varID < nvars; ++varID )
-		    vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+		    vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
 		}
 
 	      pstreamDefVlist(streamID2, vlistID2);
@@ -136,7 +136,7 @@ void *Cat(void *argument)
 	      pstreamInqRecord(streamID1, &varID, &levelID);
 
               if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
-                if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
                   continue;
 
 	      pstreamDefRecord(streamID2, varID, levelID);

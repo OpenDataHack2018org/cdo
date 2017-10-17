@@ -48,9 +48,10 @@ The following options are available for all operators:
                GRIB version 1            & \texttt{grb1/grb}  \\
                GRIB version 2            & \texttt{ grb2} \\
                NetCDF                    & \texttt{nc1}   \\
-               NetCDF version 2 (64-bit) & \texttt{nc2/nc}  \\
+               NetCDF version 2 (64-bit offset) & \texttt{nc2/nc}  \\
                NetCDF-4 (HDF5)           & \texttt{nc4}  \\
                NetCDF-4 classic          & \texttt{nc4c} \\
+               NetCDF version 5 (64-bit data) & \texttt{nc5}  \\
                SERVICE                   & \texttt{srv}  \\
                EXTRA                     & \texttt{ext}  \\
                IEG                       & \texttt{ieg}  \\
@@ -91,7 +92,7 @@ The following options are available for all operators:
 \makebox[1.5in][l]{\hspace*{1cm}}
          \> Percentile method: \texttt{nrank nist numpy numpy\_lower numpy\_higher numpy\_nearest} \\
 \makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-reduce\_dim}}
-         \> Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT). \\
+         \> Reduce NetCDF dimensions. \\
 \makebox[1.5in][l]{\hspace*{1cm}\textsl{-R, -\,-regular}}
          \> Convert GRIB1 data from reduced to regular grid (only with cgribex lib). \\
 \makebox[1.5in][l]{\hspace*{1cm}\textsl{-r}}

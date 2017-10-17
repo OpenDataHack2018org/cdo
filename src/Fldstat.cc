@@ -87,7 +87,7 @@ void *Fldstat(void *argument)
   int index;
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   double sglval;
 
   cdoInitialize(argument);
@@ -145,22 +145,13 @@ void *Fldstat(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  if ( CDO_Reduce_Dim )
-    {
-      gridID2 = gridCreate(GRID_GENERIC, 1);
-      gridDefXsize(gridID2, 0);
-      gridDefYsize(gridID2, 0);
-    }
-  else
-    {
-      double slon = 0;
-      double slat = 0;
-      gridID2 = gridCreate(GRID_LONLAT, 1);
-      gridDefXsize(gridID2, 1);
-      gridDefYsize(gridID2, 1);
-      gridDefXvals(gridID2, &slon);
-      gridDefYvals(gridID2, &slat);
-    }
+  double slon = 0;
+  double slat = 0;
+  gridID2 = gridCreate(GRID_LONLAT, 1);
+  gridDefXsize(gridID2, 1);
+  gridDefYsize(gridID2, 1);
+  gridDefXvals(gridID2, &slon);
+  gridDefYvals(gridID2, &slat);
 
   int ngrids = vlistNgrids(vlistID1);
 

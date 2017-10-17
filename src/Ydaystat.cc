@@ -45,7 +45,7 @@ void *Ydaystat(void *argument)
   int year, month, day;
   int nrecs;
   int dayoy_nsets[MAX_DOY];
-  int nmiss;
+  size_t nmiss;
   int vdates[MAX_DOY], vtimes[MAX_DOY];
   field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
@@ -139,7 +139,7 @@ void *Ydaystat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
+              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 	    }
 
           field_type *psamp1 = &samp1[dayoy][varID][levelID];
@@ -152,7 +152,7 @@ void *Ydaystat(void *argument)
 	  if ( nsets == 0 )
 	    {
 	      pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-	      pvars1->nmiss = (size_t)nmiss;
+	      pvars1->nmiss = nmiss;
               if ( lrange )
                 {
                   pvars2->nmiss = pvars1->nmiss;
@@ -172,7 +172,7 @@ void *Ydaystat(void *argument)
 	  else
 	    {
 	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = (size_t)nmiss;
+              field.nmiss   = nmiss;
 	      field.grid    = pvars1->grid;
 	      field.missval = pvars1->missval;
 
@@ -291,7 +291,7 @@ void *Ydaystat(void *argument)
             field_type *pvars1 = &vars1[dayoy][varID][levelID];
 
 	    pstreamDefRecord(streamID2, varID, levelID);
-	    pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	    pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	  }
 
 	otsID++;

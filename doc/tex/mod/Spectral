@@ -8,7 +8,8 @@
 @Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp
 
 @BeginDescription
-This module transforms fields on Gaussian grids to spectral coefficients and vice versa.
+This module transforms fields on a global regular Gaussian grids to spectral coefficients and vice versa.
+Missing values are not supported.
 @EndDescription
 @EndModule
 
@@ -17,7 +18,7 @@ This module transforms fields on Gaussian grids to spectral coefficients and vic
 @Title     = Spectral to gridpoint
 
 @BeginDescription
-Convert all fields with spectral coefficients to a regular Gaussian grid. The number of 
+Convert all fields with spectral coefficients to a global regular Gaussian grid. The number of 
 latitudes of the resulting Gaussian grid is calculated from the triangular truncation by:
 @IfMan
 
@@ -37,7 +38,7 @@ latitudes of the resulting Gaussian grid is calculated from the triangular trunc
 @Title     = Spectral to gridpoint (linear)
 
 @BeginDescription
-Convert all fields with spectral coefficients to a regular Gaussian grid. The number of 
+Convert all fields with spectral coefficients to a global regular Gaussian grid. The number of 
 latitudes of the resulting Gaussian grid is calculated from the triangular truncation by:
 @IfMan
 

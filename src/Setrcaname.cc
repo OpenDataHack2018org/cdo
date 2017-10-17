@@ -32,7 +32,7 @@ void *Setrcaname(void *argument)
   int scode, sltype, slevel;
   int zaxisID, ltype, code, nlev;
   int level;
-  int gridsize, nmiss;
+  size_t gridsize, nmiss;
   double *array = NULL;
 
   cdoInitialize(argument);

@@ -29,8 +29,8 @@
 
 typedef struct
 {
-  int        nmiss;
   int        levelID;
+  size_t     nmiss;
   double     level;
 }
 levinfo_t;
@@ -106,7 +106,7 @@ int cmpvarlevelrev(const void *s1, const void *s2)
 }
 
 static
-void setNmiss(int varID, int levelID, int nvars, varinfo_t *varInfo, int nmiss)
+void setNmiss(int varID, int levelID, int nvars, varinfo_t *varInfo, size_t nmiss)
 {
   int vindex, lindex;
 
@@ -151,7 +151,7 @@ void *Sort(void *argument)
   int vindex, lindex;
   int nrecs, nlevs, offset;
   int gridsize;
-  int nmiss;
+  size_t nmiss;
   double *single;
   int (*cmpvarlev)(const void *, const void *) = cmpvarlevel;
 
@@ -290,7 +290,7 @@ void *Sort(void *argument)
 	      levelID = varInfo[vindex].levInfo[lindex].levelID;
 	      nmiss   = varInfo[vindex].levInfo[lindex].nmiss;
 
-	      if ( tsID == 0 || vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT )
+	      if ( tsID == 0 || vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT )
 		{
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 		  offset   = gridsize*levelID;

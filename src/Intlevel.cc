@@ -159,7 +159,7 @@ void *Intlevel(void *argument)
   int nrecs;
   int i, offset;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int zaxisID1 = -1;
   int gridID, zaxisID;
   int nlevel = 0;
@@ -276,7 +276,7 @@ void *Intlevel(void *argument)
     zaxisInqUnits(zaxisID1, str);
     if ( str[0] ) zaxisDefUnits(zaxisID2, str);
 
-    zaxisDefPrec(zaxisID2, zaxisInqPrec(zaxisID1));
+    zaxisDefDatatype(zaxisID2, zaxisInqDatatype(zaxisID1));
   }
 
   for ( int i = 0; i < nzaxis; i++ )
@@ -290,7 +290,7 @@ void *Intlevel(void *argument)
 
   bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));
-  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));
+  size_t **varnmiss = (size_t**) Malloc(nvars*sizeof(size_t*));
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
   double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
 
@@ -309,14 +309,14 @@ void *Intlevel(void *argument)
 	{
 	  varinterp[varID] = true;
 	  vardata2[varID]  = (double*) Malloc(gridsize*nlev2*sizeof(double));
-	  varnmiss[varID]  = (int*) Malloc(maxlev*sizeof(int));
-	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
+	  varnmiss[varID]  = (size_t*) Malloc(maxlev*sizeof(size_t));
+	  memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
 	}
       else
 	{
 	  varinterp[varID] = false;
 	  vardata2[varID]  = vardata1[varID];
-	  varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
+	  varnmiss[varID]  = (size_t*) Malloc(nlevel*sizeof(size_t));
 	}
     }
 

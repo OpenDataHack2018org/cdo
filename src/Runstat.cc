@@ -40,7 +40,7 @@ void *Runstat(void *argument)
   int timestat_date = TIMESTAT_MEAN;
   int varID;
   int levelID;
-  int nmiss;
+  size_t nmiss;
   int runstat_nomiss = 0;
 
   cdoInitialize(argument);
@@ -85,6 +85,7 @@ void *Runstat(void *argument)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
+  taxisWithBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
   /*  Number of timestep will be reduced compared to the input
    *  error handling in case of not enough timesteps is done per record */
@@ -140,7 +141,7 @@ void *Runstat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
+              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 	    }
 	  
           field_type *psamp1 = samp1 ? &samp1[tsID][varID][levelID] : NULL;

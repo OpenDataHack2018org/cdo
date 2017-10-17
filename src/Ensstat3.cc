@@ -52,7 +52,8 @@ double roc_curve_integrate(const double **roc, const int n);
 void *Ensstat3(void *argument)
 {
   int i,j;
-  int nrecs = 0, nrecs0, nmiss;
+  int nrecs = 0, nrecs0;
+  size_t nmiss;
   int cum;
   int chksum;                  // for check of histogram population 
   int levelID, varID, binID = 0;
@@ -149,7 +150,7 @@ void *Ensstat3(void *argument)
   zaxisDefLevels(zaxisID2,levs);
   zaxisDefName(zaxisID2, "histogram_binID");
 
-  int time_mode = datafunc == TIME? TSTEP_INSTANT : TSTEP_CONSTANT;
+  int time_mode = datafunc == TIME? TIME_VARYING : TIME_CONSTANT;
 
   for ( varID=0; varID<nvars; varID++) {
 

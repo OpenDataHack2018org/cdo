@@ -34,6 +34,7 @@ const char *filetypestr(int filetype)
     case CDI_FILETYPE_NC2:  return ("NetCDF2");         break;
     case CDI_FILETYPE_NC4:  return ("NetCDF4");         break;
     case CDI_FILETYPE_NC4C: return ("NetCDF4 classic"); break;
+    case CDI_FILETYPE_NC5:  return ("NetCDF5");         break;
     case CDI_FILETYPE_SRV:  return ("SERVICE");         break;
     case CDI_FILETYPE_EXT:  return ("EXTRA");           break;
     case CDI_FILETYPE_IEG:  return ("IEG");             break;
@@ -198,7 +199,7 @@ void *CDIwrite(void *argument)
 
   for ( i = 0; i < nvars; ++i )
     {
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
+      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
       vlistDefVarParam(vlistID, varID, cdiEncodeParam(varID+1, 255, 255));
       //    vlistDefVarName(vlistID, varID, );
     }

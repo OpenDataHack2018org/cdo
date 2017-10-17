@@ -1,25 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#if defined(HAVE_CONFIG_H)
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #ifndef _DMEMORY_H
-#  include "dmemory.h"
-#endif
-
-#define  OPENMP4  201307
-#if defined(_OPENMP) && defined(OPENMP4) && _OPENMP >= OPENMP4
-#define  HAVE_OPENMP4  1
+#include "dmemory.h"
 #endif
 
 
-#if defined(SX)
-#  define  NFFT  1024
+#include "cdo_int.h"
+
+
+#ifdef SX
+#define  NFFT  1024
 #else
-#  define  NFFT  64
+#define  NFFT     8
 #endif
 
 #ifndef  M_SQRT2
@@ -168,9 +162,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i] + a[i1 + i];
@@ -203,9 +194,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
 			    a0m1 = a[i0 + i] - a[i1 + i];
@@ -236,9 +224,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i];
@@ -258,9 +243,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -295,9 +277,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -337,9 +316,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -381,9 +357,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    a0mp = 0.5 * a[i0 + i];
@@ -407,9 +380,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -449,9 +419,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -496,9 +463,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -549,9 +513,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    a0m1 = a[i0 + i] - a[i1 + i];
@@ -577,9 +538,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -620,9 +578,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -680,9 +635,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -748,9 +700,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i] + a[i1 + i] + a[i2 + i];
@@ -785,9 +734,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -837,9 +783,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -899,9 +842,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -963,9 +903,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[ja + j] =  a[ib + i] + (a[ia + i] + a[ic + i]);
@@ -993,9 +930,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1055,9 +989,6 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 	    j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 	    for (ijk = 0; ijk < lot; ++ijk)
 	      {
@@ -1162,9 +1093,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i] + a[i1 + i];
@@ -1196,9 +1124,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
 			    c[j0 + j] = a[i0 + i] + c1 * a[i1 + i] + s1 * b[i1 + i];
@@ -1226,9 +1151,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] = a[i0 + i];
@@ -1249,9 +1171,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1285,9 +1204,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1324,9 +1240,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -1369,9 +1282,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    /* soweit */
@@ -1395,9 +1305,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1435,9 +1342,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1483,9 +1387,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -1534,9 +1435,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    c[j0 + j] =  a[i0 + i] + SQ2 * (a[i1 + i] - a[i3 + i]);
@@ -1559,9 +1457,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1606,9 +1501,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1663,9 +1555,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -1735,9 +1624,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    a1p4 = a[i1 + i] + a[i4 + i];
@@ -1774,9 +1660,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1835,9 +1718,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -1898,9 +1778,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 			j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 			for (ijk = 0; ijk < lot; ++ijk)
 			  {
@@ -1972,9 +1849,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
 		    a1p5 = a[i1 + i] + a[i5 + i];
@@ -2005,9 +1879,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 		j = jbase;
 #if defined(SX)
 #pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
@@ -2069,9 +1940,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
 	    for (ijk = 0; ijk < lot; ++ijk)
 	      {
 		a0p4 = a[i0 + i] + a[i4 + i];
@@ -2109,13 +1977,6 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 /* ====================== */
 void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon, long nlev, long nfc)
 {
-  long fou, ia, ifac, k, la;
-  long lat, lev, lon, rix, wix;
-  double *wpt;
-  long nx, nblox, nvex, nvex0, nb;
-  long istart, i, j, ibase, jbase, jj, ii, ix;
-  long *istartv;
-
   /* fc2gp performs fourier to gridpoint transforms using           */
   /* multiple fast fourier transform of length nlon                 */
   /*                                                                */
@@ -2136,59 +1997,58 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   long jump = (nlon + 2);
   long lot  = nlev * nlat;
 
-  double *restrict wfc = (double*) Malloc(lot*jump*sizeof(double));
-#if ! defined(_OPENMP)
-  double *restrict wgp = (double*) Malloc(lot*jump*sizeof(double));
-#endif
+  long nx = (nlon%2 == 1) ? nlon : nlon+1;
+  long nblox = 1 + (lot-1)/NFFT;
+  long nvex  = lot - (nblox-1)*NFFT;
+  long nvex0 = nvex;
 
-  for ( lev = 0; lev < nlev; ++lev )
-    {
+  long nthmax = (nblox < ompNumThreads) ? nblox : ompNumThreads;
+  long nvals = lot*jump;
+
+  double *restrict wfc = (double*) Malloc(nvals*sizeof(double));
+  NEW_2D(double, wgp2d, nthmax, nvals);
+
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(lat, fou, wix, rix)
+#pragma omp parallel for default(shared)
 #endif
-      for ( lat = 0; lat < nlat; ++lat )
-	{
-	  wix = jump * (lat + lev*nlat);
-	  rix = lat + lev*nlat*nfc;
-	  for ( fou = 0;   fou < nfc;  ++fou ) wfc[wix + fou] = fc[rix + fou*nlat];
-	  for ( fou = nfc; fou < jump; ++fou ) wfc[wix + fou] = 0.0;
-	  /*	  wfc[wix + 1] = 0.5 * wfc[wix]; */
+  for ( long lat = 0; lat < nlat; ++lat )
+    {
+      for ( long lev = 0; lev < nlev; ++lev )
+        {
+	  double *restrict wfcx = wfc + jump * (lat + lev*nlat);
+	  double *restrict fcx = fc + (lat + lev*nlat*nfc);
+	  for ( long fou = 0;   fou < nfc;  ++fou ) wfcx[fou] = fcx[fou*nlat];
+	  for ( long fou = nfc; fou < jump; ++fou ) wfcx[fou] = 0.0;
 	}
     }
 
-  nx = nlon + 1;
-  if ( nlon%2 == 1 ) nx = nlon;
-  nblox = 1 + (lot-1)/NFFT;
-  nvex  = lot - (nblox-1)*NFFT;
-  nvex0 = nvex;
+  long *istartv = (long*) Malloc(nblox*sizeof(long));
 
-  istartv = (long*) Malloc(nblox*sizeof(long));
-
-  istart = 0;
-  for ( nb = 0; nb < nblox; nb++ )
+  long istart = 0;
+  for ( long nb = 0; nb < nblox; nb++ )
     {
       istartv[nb] = istart;
       istart = istart + nvex*jump;
       nvex = NFFT;
     }
 
+  // printf("nblox %ld nvex0 %ld  lot %ld\n",nblox, nvex0, lot);
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(istart, nvex, ix, ii, jj, i, j, k, ia, la, ifac, ibase, jbase)
+#pragma omp parallel for default(shared)
 #endif
-  for ( nb = 0; nb < nblox; nb++ )
+  for ( long nb = 0; nb < nblox; nb++ )
     {
-#if defined(_OPENMP)
-      double *restrict wgp = (double*) Malloc(lot*jump*sizeof(double));
-#endif
-      istart = istartv[nb];
-      if ( nb == 0 ) nvex = nvex0;
-      else           nvex = NFFT;
+      int ompthID = cdo_omp_get_thread_num();
+      double *restrict wgp = wgp2d[ompthID];
 
-      i = istart;
+      long istart = istartv[nb];
+      long nvex = (nb == 0) ? nvex0 : NFFT;
+
+      long i = istart;
 #if defined(SX)
 #pragma vdir nodep
 #endif
-      for ( j = 0; j < nvex; j++ )
+      for ( long j = 0; j < nvex; j++ )
 	{
 	  wfc[i+1] = 0.5*wfc[i];
 	  i += jump;
@@ -2196,18 +2056,18 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
       if ( nlon%2 != 1 )
 	{
 	  i = istart + nlon;
-	  for ( j = 0; j < nvex; j++ )
+	  for ( long j = 0; j < nvex; j++ )
 	    {
 	      wfc[i] = 0.5*wfc[i];
 	      i += jump;
 	    }
 	}
 
-      ia = istart + 1;
-      la = 1;
-      for ( k = 0; k < nfax; ++k )
+      long ia = istart + 1;
+      long la = 1;
+      for ( long k = 0; k < nfax; ++k )
 	{
-	  ifac = ifax[k + 1];
+	  long ifac = ifax[k + 1];
 
 	  if ( k & 1 )
 	    rpassc(wgp, wgp+la, wfc+ia, wfc+ia+ifac*la, trig,
@@ -2224,16 +2084,13 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 
       if ( nfax%2 != 0 )
 	{
-	  ibase = 0;
-	  jbase = ia;
-	  for ( jj = 0; jj < nvex; jj++ )
+	  long ibase = 0;
+	  long jbase = ia;
+	  for ( long jj = 0; jj < nvex; jj++ )
 	    {
-	      i = ibase;
-	      j = jbase;
-	      for ( ii = 0; ii < nlon; ii++ )
-		{
-		  wfc[j++] = wgp[i++];
-		}
+	      long i = ibase;
+	      long j = jbase;
+	      for ( long ii = 0; ii < nlon; ii++ ) wfc[j++] = wgp[i++];
 	      ibase = ibase + nx;
 	      jbase = jbase + jump;
 	    }
@@ -2241,36 +2098,30 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 
       /* Fill in zeros at end */
 
-      ix = istart + nlon;
+      long ix = istart + nlon;
 #if defined(SX)
 #pragma vdir nodep
 #endif
-      for ( j = 0; j < nvex; j++ )
+      for ( long j = 0; j < nvex; j++ )
 	{
           wfc[ix]   = 0.0;
           wfc[ix+1] = 0.0;
           ix = ix + jump;
 	}
-
-#if defined(_OPENMP)
-      Free(wgp);
-#endif
     }
 
-  wpt = wfc;
+  double *restrict wpt = wfc;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(j, lon)
+#pragma omp parallel for default(shared)
 #endif
-  for ( j = 0; j < lot; ++j )
-    for ( lon = 0; lon < nlon; ++lon )
+  for ( long j = 0; j < lot; ++j )
+    for ( long lon = 0; lon < nlon; ++lon )
       gp[lon + j*nlon] = wpt[lon + j*jump];
 
   Free(istartv);
-#if ! defined(_OPENMP)
-  Free(wgp);
-#endif
   Free(wfc);
+  DELETE_2D(wgp2d);
 }
 
 

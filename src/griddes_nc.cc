@@ -88,7 +88,7 @@ int gridFromNCfile(const char *gridfile)
       if ( grid_rank == 1 )
 	{
 	  grid.type = GRID_UNSTRUCTURED;
-	  if ( (size_t)grid_dims[0] != grid_size ) return(gridID);
+	  if ( (size_t)grid_dims[0] != grid_size ) return gridID;
 	}
       else
 	{
@@ -98,7 +98,7 @@ int gridFromNCfile(const char *gridfile)
 
 	  grid.xsize = grid_dims[0];
 	  grid.ysize = grid_dims[1];
-	  if ( (size_t)grid_dims[0]*grid_dims[1] != grid_size ) return(gridID);
+	  if ( (size_t)grid_dims[0]*grid_dims[1] != grid_size ) return gridID;
 	}
 
       /* allocate grid coordinates and read data */
@@ -109,8 +109,7 @@ int gridFromNCfile(const char *gridfile)
       grid.ybounds = (double*) Malloc(grid.nvertex*grid.size*sizeof(double));
 
       nce(nc_inq_vartype(nc_file_id, nc_gridlat_id, &xtype));
-      if ( xtype == NC_FLOAT )  grid.prec = CDI_DATATYPE_FLT32;
-      else                      grid.prec = CDI_DATATYPE_FLT64;
+      grid.datatype = (xtype == NC_FLOAT) ? CDI_DATATYPE_FLT32 : CDI_DATATYPE_FLT64;
 
       nce(nc_get_var_double(nc_file_id, nc_gridlon_id, grid.xvals));
       nce(nc_get_var_double(nc_file_id, nc_gridlat_id, grid.yvals));
@@ -166,21 +165,17 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   int nc_gridlon_id;   /* NetCDF grid center lon var id */
   int nc_gridxsize_id, nc_gridysize_id, nc_grdimask_id;
 
-  nc_type xtype;
   size_t grid_rank = 0, len;
   int grid_dims[2];
   int nc_dims_id[3], ndims;
-  int gridtype;
-  int gridsize;
   double *vals;
   char units[CDI_MAX_NAME];
 
 
-  gridtype = gridInqType(gridID);
-  gridsize = gridInqSize(gridID);
+  int gridtype = gridInqType(gridID);
+  int gridsize = gridInqSize(gridID);
 
-  if ( gridInqPrec(gridID) == CDI_DATATYPE_FLT64 ) xtype = NC_DOUBLE;
-  else                                         xtype = NC_FLOAT;
+  nc_type xtype = (gridInqDatatype(gridID) == CDI_DATATYPE_FLT64) ? NC_DOUBLE : NC_FLOAT;
 
   if ( gridtype == GRID_CURVILINEAR )
     {

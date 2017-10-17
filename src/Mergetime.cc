@@ -174,7 +174,7 @@ void *Mergetime(void *argument)
 	      pstreamInqRecord(sf[fileID].streamID, &varID, &levelID);
 
               if ( tsID2 > 0 && sf[fileID].tsID == 0 )
-                if ( vlistInqVarTsteptype(sf[fileID].vlistID, varID) == TSTEP_CONSTANT )
+                if ( vlistInqVarTimetype(sf[fileID].vlistID, varID) == TIME_CONSTANT )
                   continue;
 
               pstreamDefRecord(streamID2, varID, levelID);
@@ -185,7 +185,7 @@ void *Mergetime(void *argument)
 		}
 	      else
 		{
-                  int nmiss;
+                  size_t nmiss;
 		  pstreamReadRecord(sf[fileID].streamID, array, &nmiss);
 		  pstreamWriteRecord(streamID2, array, nmiss);
 		}

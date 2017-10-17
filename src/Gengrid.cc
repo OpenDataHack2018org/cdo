@@ -30,7 +30,7 @@
 void *Gengrid(void *argument)
 {
   int varID, levelID;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   double missval = 0;
 
   cdoInitialize(argument);
@@ -79,9 +79,9 @@ void *Gengrid(void *argument)
   gridDefYvals(gridID3, array2);
 
   if ( datatype == CDI_DATATYPE_FLT64 )
-    gridDefPrec(gridID3, CDI_DATATYPE_FLT64);
+    gridDefDatatype(gridID3, CDI_DATATYPE_FLT64);
   else
-    gridDefPrec(gridID3, CDI_DATATYPE_FLT32);
+    gridDefDatatype(gridID3, CDI_DATATYPE_FLT32);
 
   double xminval = array1[0];
   double xmaxval = array1[0];
@@ -117,7 +117,7 @@ void *Gengrid(void *argument)
   int zaxisID3 = zaxisCreate(ZAXIS_SURFACE, 1);
 
   int vlistID3 = vlistCreate();
-  vlistDefVar(vlistID3, gridID3, zaxisID3, TSTEP_CONSTANT);
+  vlistDefVar(vlistID3, gridID3, zaxisID3, TIME_CONSTANT);
   vlistDefVarMissval(vlistID3, 0, missval);
   vlistDefVarName(vlistID3, 0, "dummy");
   vlistDefVarDatatype(vlistID3, 0, CDI_DATATYPE_INT8);

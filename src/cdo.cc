@@ -189,8 +189,8 @@ void cdo_set_digits(const char *optarg)
 static
 void cdo_version(void)
 {
-  const int   filetypes[] = {CDI_FILETYPE_SRV, CDI_FILETYPE_EXT, CDI_FILETYPE_IEG, CDI_FILETYPE_GRB, CDI_FILETYPE_GRB2, CDI_FILETYPE_NC, CDI_FILETYPE_NC2, CDI_FILETYPE_NC4, CDI_FILETYPE_NC4C};
-  const char* typenames[] = {        "srv",        "ext",        "ieg",       "grb1",        "grb2",       "nc1",        "nc2",        "nc4",        "nc4c"};
+  const int   filetypes[] = {CDI_FILETYPE_SRV, CDI_FILETYPE_EXT, CDI_FILETYPE_IEG, CDI_FILETYPE_GRB, CDI_FILETYPE_GRB2, CDI_FILETYPE_NC, CDI_FILETYPE_NC2, CDI_FILETYPE_NC4, CDI_FILETYPE_NC4C, CDI_FILETYPE_NC5};
+  const char* typenames[] = {        "srv",        "ext",        "ieg",       "grb1",        "grb2",       "nc1",        "nc2",        "nc4",        "nc4c",        "nc5"};
 
   fprintf(stderr, "%s\n", CDO_Version);
 #if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
@@ -236,14 +236,14 @@ void cdo_usage(void)
   set_text_color(stderr, RESET, BLUE);
   fprintf(stderr, "    -a             Generate an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
-  fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2)\n");
+  fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c/nc5; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
   fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
   fprintf(stderr, "    -C, --color    Colorized output messages\n");
   fprintf(stderr, "    --enableexcept <except>\n");
   fprintf(stderr, "                   Set individual floating-point traps (DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
   fprintf(stderr, "    -f, --format <format>\n");
-  fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/srv/ext/ieg)\n");
+  fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h, --help     Help information for the operators\n");
@@ -273,7 +273,7 @@ void cdo_usage(void)
   fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
   fprintf(stderr, "    --precision <float_digits[,double_digits]>\n");
   fprintf(stderr, "                   Precision to use in displaying floating-point data (default: 7,15)\n");
-  fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
+  fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions\n");
   if ( ITSME )
     fprintf(stderr, "    --remap_genweights 0/1\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (cgribex only)\n");
@@ -436,7 +436,7 @@ void setDefaultDataType(const char *datatypestr)
           else
             {
               fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
-              fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2.\n");
+              fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c/nc5; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2.\n");
               exit(EXIT_FAILURE);
             }
         }
@@ -559,12 +559,14 @@ void setDefaultFileType(const char *filetypestr, int labort)
       const char *ftstr = filetypestr;
       size_t len;
 
+      // clang-format off
       if      ( cmpstrlen(filetypestr, "grb2", len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB2;}
       else if ( cmpstrlen(filetypestr, "grb1", len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB; }
       else if ( cmpstrlen(filetypestr, "grb",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB; }
       else if ( cmpstrlen(filetypestr, "nc2",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC2; }
       else if ( cmpstrlen(filetypestr, "nc4c", len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC4C;}
       else if ( cmpstrlen(filetypestr, "nc4",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC4; }
+      else if ( cmpstrlen(filetypestr, "nc5",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC5; }
       else if ( cmpstrlen(filetypestr, "nc1",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC;  }
       else if ( cmpstrlen(filetypestr, "nc",   len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC2; }
       else if ( cmpstrlen(filetypestr, "srv",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_SRV; }
@@ -575,7 +577,7 @@ void setDefaultFileType(const char *filetypestr, int labort)
           if ( labort )
             {
               fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
-              fprintf(stderr, "Available filetypes: grb1/grb2/nc1/nc2/nc4/nc4c/srv/ext/ieg\n");
+              fprintf(stderr, "Available filetypes: grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg\n");
               exit(EXIT_FAILURE);
             }
           else
@@ -583,6 +585,7 @@ void setDefaultFileType(const char *filetypestr, int labort)
               return;
             }
         }
+      // clang-format on
 
       if ( cdoDefaultFileType != CDI_UNDEFID && *ftstr != 0 )
         {
@@ -596,8 +599,8 @@ void setDefaultFileType(const char *filetypestr, int labort)
             {
               fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
               fprintf(stderr, "Use format[_nbits] with:\n");
-              fprintf(stderr, "    format = grb1, grb2, nc1, nc2, nc4, nc4c, srv, ext or ieg\n");
-              fprintf(stderr, "    nbits  = 32/64 for grb2/nc1/nc2/nc4/nc4c/srv/ext/ieg; 1 - 24 for grb1/grb2\n");
+              fprintf(stderr, "    format = grb1, grb2, nc1, nc2, nc4, nc4c, nc5, srv, ext or ieg\n");
+              fprintf(stderr, "    nbits  = 32/64 for grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg; 1 - 24 for grb1/grb2\n");
               exit(EXIT_FAILURE);
             }
         }
@@ -1008,7 +1011,6 @@ void check_stacksize()
   {
     struct rlimit rlim;
     int status = getrlimit(RLIMIT_STACK, &rlim);
-
     if ( status == 0 )
       {
 #define  MIN_STACK_SIZE  67108864L  /* 64MB */
@@ -1028,6 +1030,7 @@ void check_stacksize()
                   }
                 else
                   fprintf(stderr, "Set stack size to %ld failed!\n", (long) min_stack_size);
+                fprintf(stderr, "\n");
               }
           }
       }
@@ -1047,6 +1050,7 @@ void cdo_set_options(void)
     }
   
   if ( CDO_CMOR_Mode )          cdiDefGlobal("CMOR_MODE", CDO_CMOR_Mode);
+  if ( CDO_Reduce_Dim )         cdiDefGlobal("REDUCE_DIM", CDO_Reduce_Dim);
   if ( CDO_netcdf_hdr_pad > 0 ) cdiDefGlobal("NETCDF_HDR_PAD", CDO_netcdf_hdr_pad);  
 }
 
@@ -1103,6 +1107,7 @@ int parse_options_long(int argc, char *argv[])
   int lscmode;
   bool sepDebugFromLog;
 
+  // clang-format off
   struct cdo_option opt_long[] =
     {
       { "precision",         required_argument,        &lprecision,   1  },
@@ -1142,6 +1147,7 @@ int parse_options_long(int argc, char *argv[])
       { "seperateDebugFromLog", required_argument,             NULL,  2  },
       { NULL,                                0,                NULL,  0  }
     };
+  // clang-format on
 
   CDO_opterr = 1;
 
@@ -1203,7 +1209,7 @@ int parse_options_long(int argc, char *argv[])
               else if ( strcmp(CDO_optarg, "UNDERFLOW")  == 0 ) except = FE_UNDERFLOW;
               else if ( strcmp(CDO_optarg, "ALL_EXCEPT") == 0 ) except = FE_ALL_EXCEPT;
               if ( except < 0 ) cdoAbort("option --%s: unsupported argument: %s", "enableexcept", CDO_optarg);
-              cdo_feenableexcept((unsigned)except);
+              cdo_feenableexcept(except);
               if ( signal(SIGFPE, cdo_sig_handler) == SIG_ERR ) cdoWarning("can't catch SIGFPE!");
             }
           else if ( ltimestat_date )

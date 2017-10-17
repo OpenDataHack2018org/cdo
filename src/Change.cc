@@ -48,7 +48,7 @@ void *Change(void *argument)
   int chcode = 0;
   int param;
   int code, tabnum, i;
-  int nmiss;
+  size_t nmiss;
   int nfound;
   int nzaxis, zaxisID1, zaxisID2, k, nlevs, index; 
   double chlevels[MAXARG];

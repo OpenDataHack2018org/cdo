@@ -124,7 +124,7 @@ void *Filter(void *argument)
   int nrecs;
   int varID, levelID;
   int nalloc = 0;
-  int nmiss;
+  size_t nmiss;
   int incperiod0, incunit0, incunit;
   int year0, month0, day0;
   bool use_fftw = false;
@@ -396,7 +396,7 @@ void *Filter(void *argument)
             {
               if ( vars[tsID][varID][levelID].ptr )
                 {
-                  int nmiss = vars[tsID][varID][levelID].nmiss;
+                  size_t nmiss = vars[tsID][varID][levelID].nmiss;
                   pstreamDefRecord(streamID2, varID, levelID);
                   pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 

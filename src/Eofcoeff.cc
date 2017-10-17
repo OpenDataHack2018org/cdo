@@ -32,12 +32,13 @@
 
 void *Eofcoeff(void * argument)
 {
-  char eof_name[8], oname[1024], filesuffix[32];
+  char eof_name[16], oname[1024], filesuffix[32];
   double missval1 = -999, missval2;
   field_type in;  
   field_type out;
   int i, varID, levelID;    
-  int nrecs, nmiss; 
+  int nrecs;
+  size_t nmiss; 
    
   cdoInitialize(argument);
 
@@ -108,7 +109,7 @@ void *Eofcoeff(void * argument)
            cdoAbort("Internal error - too high levelID");
          
          pstreamReadRecord(streamID1, eof[varID][levelID][eofID].ptr, &nmiss);
-         eof[varID][levelID][eofID].nmiss = (size_t) nmiss;
+         eof[varID][levelID][eofID].nmiss = nmiss;
        }
      eofID++;
    }
@@ -132,8 +133,8 @@ void *Eofcoeff(void * argument)
     vlistChangeGridIndex(vlistID3, i, gridID3);     
   
   vlistDefTaxis(vlistID3, taxisID3);
-  for (varID =0; varID<nvars; varID++)
-    vlistDefVarTsteptype(vlistID3, varID, TSTEP_INSTANT);
+  for (varID = 0; varID<nvars; varID++)
+    vlistDefVarTimetype(vlistID3, varID, TIME_VARYING);
   
   // open streams for eofcoeff output
   int *streamIDs = (int*) Malloc(neof*sizeof(int)); 
@@ -181,7 +182,7 @@ void *Eofcoeff(void * argument)
           pstreamInqRecord(streamID2, &varID, &levelID);
           missval2 = vlistInqVarMissval(vlistID2, varID);
           pstreamReadRecord(streamID2, in.ptr, &nmiss);  
-          in.nmiss = (size_t) nmiss;
+          in.nmiss = nmiss;
           
           for ( eofID = 0; eofID < neof; eofID++ )
             {

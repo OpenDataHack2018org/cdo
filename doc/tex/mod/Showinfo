@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = infile
-@Operators = showformat showcode showname showstdname showlevel showltype showyear showmon showdate showtime showtimestamp
+@Operators = showformat showcode showname showstdname showatts showattsglob showlevel showltype showyear showmon showdate showtime showtimestamp
 
 @BeginDescription
 This module prints the format, variables, levels or times of the input dataset.
@@ -45,6 +45,22 @@ Prints the name of all variables.
 @Title     = Show standard names
 @BeginDescription
 Prints the standard name of all variables.
+@EndDescription
+@EndOperator
+
+@BeginOperator_showatts
+
+@Title     = Show all attributes
+@BeginDescription
+Prints all variable and global attributes.
+@EndDescription
+@EndOperator
+
+@BeginOperator_showattsglob
+
+@Title     = Show all global attributes
+@BeginDescription
+Prints all global attributes.
 @EndDescription
 @EndOperator
 

@@ -160,7 +160,7 @@ void *Adisit(void *argument)
   int varID, levelID;
   int offset;
   int i;
-  int nmiss;
+  size_t nmiss;
   int thoID = -1, saoID = -1;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double pin = -1;
@@ -261,7 +261,7 @@ void *Adisit(void *argument)
 
   int vlistID2 = vlistCreate();
 
-  int tisID2 = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_INSTANT);
+  int tisID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARYING);
   if ( operatorID == ADISIT )
     {
       vlistDefVarParam(vlistID2, tisID2, cdiEncodeParam(20, 255, 255));
@@ -280,7 +280,7 @@ void *Adisit(void *argument)
   vlistDefVarMissval(vlistID2, tisID2, tis.missval);
   vlistDefVarDatatype(vlistID2, tisID2, datatype);
 
-  int saoID2 = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_INSTANT);
+  int saoID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARYING);
   vlistDefVarParam(vlistID2, saoID2, cdiEncodeParam(5, 255, 255));
   vlistDefVarName(vlistID2, saoID2, "s");
   vlistDefVarLongname(vlistID2, saoID2, "Sea water salinity");

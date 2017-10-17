@@ -42,7 +42,7 @@ void *Wind(void *argument)
   int gridIDsp = -1, gridIDgp = -1;
   int gridID1 = -1, gridID2 = -1;
   int gridID;
-  int nmiss;
+  size_t nmiss;
   int nlon, nlat, ntr = -1;
   int code, param;
   int pnum, pcat, pdis;

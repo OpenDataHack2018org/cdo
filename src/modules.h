@@ -75,7 +75,7 @@ int operatorStreamNumber(const char *operatorName);
 void operatorPrintAll(void);
 void operatorPrintList(bool print_no_output);
 bool is_alias(char * operatorName);
-void get_original(char* operatorName);
+char* get_original(char* operatorName);
 #ifdef CUSTOM_MODULES
 void load_custom_module(std::string path);
 void load_custom_modules(std::string folder_path);

@@ -116,7 +116,7 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	gridDefYsize(gridID2, ylsize[iy]);
 
         gridDefNP(gridID2, gridInqNP(gridID1));
-        gridDefPrec(gridID2, gridInqPrec(gridID1));
+        gridDefDatatype(gridID2, gridInqDatatype(gridID1));
 
         grid_copy_attributes(gridID1, gridID2);
 
@@ -210,7 +210,7 @@ void *Distgrid(void *argument)
   char filename[8192];
   int index;
   int gridtype = -1;
-  int nmiss;
+  size_t nmiss;
   int i;
 
   cdoInitialize(argument);

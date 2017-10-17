@@ -81,8 +81,8 @@ int pstreamInqTimestep(int pstreamID, int tsID);
 
 int pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
-void pstreamReadRecord(int pstreamID, double *data, int *nmiss);
-void pstreamReadRecordF(int pstreamID, float *data, int *nmiss);
+void pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
+void pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
 void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
 void pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);

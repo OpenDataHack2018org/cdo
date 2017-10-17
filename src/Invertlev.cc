@@ -93,7 +93,7 @@ void *Invertlev(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
   int nlev, nlevel;
   int gridID, zaxisID, offset;
   bool linvert = false;
@@ -129,7 +129,7 @@ void *Invertlev(void *argument)
   int nvars = vlistNvars(vlistID1);
 
   double **vardata  = (double**) Malloc(nvars*sizeof(double*));
-  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));
+  size_t **varnmiss = (size_t**) Malloc(nvars*sizeof(size_t*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -147,7 +147,7 @@ void *Invertlev(void *argument)
 	{
 	  linvert = true;
 	  vardata[varID]  = (double*) Malloc(gridsize*nlev*sizeof(double));
-	  varnmiss[varID] = (int*) Malloc(nlev*sizeof(int));
+	  varnmiss[varID] = (size_t*) Malloc(nlev*sizeof(size_t));
 	}
     }
 

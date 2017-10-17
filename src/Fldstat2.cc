@@ -94,7 +94,7 @@ void *Fldstat2(void *argument)
   int gridID3;
   int nrecs, nrecs2;
   int varID, levelID;
-  int nmiss1, nmiss2;
+  size_t nmiss1, nmiss2;
   bool wstatus = false;
   bool needWeights = true;
   double sglval = 0;
@@ -123,22 +123,13 @@ void *Fldstat2(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  if ( CDO_Reduce_Dim )
-    {
-      gridID3 = gridCreate(GRID_GENERIC, 1);
-      gridDefXsize(gridID3, 0);
-      gridDefYsize(gridID3, 0);
-    }
-  else
-    {
-      double slon = 0;
-      double slat = 0;
-      gridID3 = gridCreate(GRID_LONLAT, 1);
-      gridDefXsize(gridID3, 1);
-      gridDefYsize(gridID3, 1);
-      gridDefXvals(gridID3, &slon);
-      gridDefYvals(gridID3, &slat);
-    }
+  double slon = 0;
+  double slat = 0;
+  gridID3 = gridCreate(GRID_LONLAT, 1);
+  gridDefXsize(gridID3, 1);
+  gridDefYsize(gridID3, 1);
+  gridDefXvals(gridID3, &slon);
+  gridDefYvals(gridID3, &slat);
 
   int ngrids = vlistNgrids(vlistID1);
 
@@ -202,7 +193,7 @@ void *Fldstat2(void *argument)
 	      sglval = covariance_s(array1, array2, weight, missval1, missval2, gridsize);
 	    }
 
-          int nmiss3 = DBL_IS_EQUAL(sglval, missval1) ? 1 : 0;
+          size_t nmiss3 = DBL_IS_EQUAL(sglval, missval1) ? 1 : 0;
 
 	  pstreamDefRecord(streamID3, varID,  levelID);
 	  pstreamWriteRecord(streamID3, &sglval, nmiss3);

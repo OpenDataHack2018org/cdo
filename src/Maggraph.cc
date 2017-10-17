@@ -882,7 +882,7 @@ void *Maggraph(void *argument)
   int gridID;
   int nrecs;
   int vlistID0 = -1;
-  int nmiss;
+  size_t nmiss;
   long nts_alloc;
   
   int nparam = operatorArgc();

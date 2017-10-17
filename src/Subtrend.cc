@@ -31,7 +31,7 @@
 void *Subtrend(void *argument)
 {
   int gridID, varID, levelID;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

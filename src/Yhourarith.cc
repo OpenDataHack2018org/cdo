@@ -64,9 +64,9 @@ void *Yhourarith(void *argument)
   int varID, levelID;
   int offset;
   int vdate, vtime;
-  int nmiss;
+  size_t nmiss;
   int houroy;
-  int **varnmiss2[MAX_HOUR];
+  size_t **varnmiss2[MAX_HOUR];
   double **vardata2[MAX_HOUR];
 
   cdoInitialize(argument);
@@ -118,14 +118,14 @@ void *Yhourarith(void *argument)
       if ( vardata2[houroy] != NULL ) cdoAbort("Hour of year %d already allocatd!", houroy);
 
       vardata2[houroy]  = (double **) Malloc(nvars*sizeof(double *));
-      varnmiss2[houroy] = (int **) Malloc(nvars*sizeof(int *));
+      varnmiss2[houroy] = (size_t **) Malloc(nvars*sizeof(size_t *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	  vardata2[houroy][varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[houroy][varID] = (int*) Malloc(nlev*sizeof(int));
+	  varnmiss2[houroy][varID] = (size_t*) Malloc(nlev*sizeof(size_t));
 	}
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -159,7 +159,7 @@ void *Yhourarith(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss   = nmiss;
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
 
@@ -173,7 +173,7 @@ void *Yhourarith(void *argument)
 	  farfun(&field1, field2, operfunc);
 
 	  pstreamDefRecord(streamID3, varID, levelID);
-	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
 	}
 
       tsID++;

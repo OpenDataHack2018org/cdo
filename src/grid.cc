@@ -160,6 +160,8 @@ void grid_copy_attributes(int gridID1, int gridID2)
   if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XUNITS, strlen(string)+1, string);
   string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, string);
   if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_YUNITS, strlen(string)+1, string);
+
+  if ( gridInqUvRelativeToGrid(gridID1) ) gridDefUvRelativeToGrid(gridID2, 1);
 }
 
 
@@ -681,7 +683,7 @@ int qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast,
 }
 
 
-void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss, int lnearest)
+void field2regular(int gridID1, int gridID2, double missval, double *array, size_t nmiss, int lnearest)
 {
   int gridtype = gridInqType(gridID1);
   if ( gridtype != GRID_GAUSSIAN_REDUCED ) cdoAbort("Not a reduced Gaussian grid!");
@@ -812,6 +814,47 @@ bool check_range(long n, double *vals, double valid_min, double valid_max)
 }
 
 
+bool grid_has_proj4param(int gridID)
+{
+  bool has_proj4param = false;
+
+  int gridtype = gridInqType(gridID);
+  if ( gridtype == GRID_PROJECTION )
+    {
+      int atttype, attlen, atttxtlen = 0;
+      char *atttxt = NULL;
+      char attname[CDI_MAX_NAME+1];
+
+      int natts;
+      cdiInqNatts(gridID, CDI_GLOBAL, &natts);
+
+      for ( int iatt = 0; iatt < natts; ++iatt )
+        {
+          cdiInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
+
+          if ( atttype == CDI_DATATYPE_TXT )
+            {
+              if ( attlen > atttxtlen )
+                {
+                  atttxt = (char*) Realloc(atttxt, (attlen+1));
+                  atttxtlen = attlen;
+                }
+              cdiInqAttTxt(gridID, CDI_GLOBAL, attname, attlen, atttxt);
+              atttxt[attlen] = 0;
+              if ( strcmp(attname, "proj4_params") == 0 )
+                {
+                  has_proj4param = true;
+                  break;
+                }
+            }
+        }
+      if ( atttxt ) Free(atttxt);
+    }
+
+  return has_proj4param;
+}
+
+static
 char *grid_get_proj4param(int gridID)
 {
   char *proj4param = NULL;
@@ -866,7 +909,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
   size_t gridsize = gridInqSize(gridID1);
   int gridID2 = gridCreate(GRID_CURVILINEAR, gridsize);
-  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
+  gridDefDatatype(gridID2, CDI_DATATYPE_FLT32);
 
   char *proj4param = NULL;
   bool lproj4     = false;
@@ -1197,7 +1240,7 @@ int gridToUnstructured(int gridID1, int lbounds)
   int gridtype = gridInqType(gridID1);
   size_t gridsize = gridInqSize(gridID1);
   int gridID2  = gridCreate(GRID_UNSTRUCTURED, gridsize);
-  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
+  gridDefDatatype(gridID2, CDI_DATATYPE_FLT32);
 	  
   bool lproj_rll = false;
   if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
@@ -1461,7 +1504,7 @@ int gridCurvilinearToRegular(int gridID1)
       gridDefXsize(gridID2, nx);
       gridDefYsize(gridID2, ny);
       
-      //  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
+      //  gridDefDatatype(gridID2, CDI_DATATYPE_FLT32);
 
       char xunits[CDI_MAX_NAME]; xunits[0] = 0;
       char yunits[CDI_MAX_NAME]; yunits[0] = 0;

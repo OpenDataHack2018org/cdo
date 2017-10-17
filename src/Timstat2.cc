@@ -106,7 +106,7 @@ void *Timstat2(void *argument)
   int vdate = 0, vtime = 0;
   int nrecs2, nlevs;
   int varID, levelID;
-  int nmiss;
+  size_t nmiss;
 
   cdoInitialize(argument);
 

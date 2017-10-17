@@ -134,6 +134,7 @@ void gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, in
     {
       if ( incperiod == 0 ) incperiod = 1;
       if ( incperiod > 24 ) cdoAbort("Time period must be less equal 24!");
+
       if      ( tunit == TUNIT_3HOURS  ) incperiod = 3;
       else if ( tunit == TUNIT_6HOURS  ) incperiod = 6;
       else if ( tunit == TUNIT_12HOURS ) incperiod = 12;
@@ -163,7 +164,7 @@ void *Settime(void *argument)
   int vdateb[2], vtimeb[2];
   int sdate = 0, stime = 0;
   int taxisID2 = CDI_UNDEFID;
-  int nmiss;
+  size_t nmiss;
   int gridsize;
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 1, incunit = 86400;
@@ -212,7 +213,7 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  sdate = parameter2int(datestr);
+	  sdate = *datestr ? parameter2int(datestr) : 10101;
 	}
 
       if ( operatorArgc() > 1 )
@@ -332,14 +333,14 @@ void *Settime(void *argument)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
-  int taxis_has_bounds = taxisHasBounds(taxisID1);
+  bool taxis_has_bounds = taxisHasBounds(taxisID1) > 0;
   int ntsteps  = vlistNtsteps(vlistID1);
   int nvars    = vlistNvars(vlistID1);
 
   if ( ntsteps == 1 )
     {
       for ( varID = 0; varID < nvars; ++varID )
-	if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
+	if ( vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT ) break;
 
       if ( varID == nvars ) ntsteps = 0;
     }
@@ -347,7 +348,7 @@ void *Settime(void *argument)
   if ( ntsteps == 0 )
     {
       for ( varID = 0; varID < nvars; ++varID )
-	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
   int calendar = taxisInqCalendar(taxisID1);
@@ -420,13 +421,17 @@ void *Settime(void *argument)
     {
       taxisDefCalendar(taxisID2, newcalendar);
     }
+  else if ( operatorID == SETTBOUNDS )
+    {
+      taxisWithBounds(taxisID2);
+    }
 
   if ( operatorID != SHIFTTIME )
     if ( taxis_has_bounds && !copy_timestep )
       {
 	cdoWarning("Time bounds unsupported by this operator, removed!");
 	taxisDeleteBounds(taxisID2);
-	taxis_has_bounds = FALSE;
+	taxis_has_bounds = false;
       }
 
   vlistDefTaxis(vlistID2, taxisID2);
@@ -461,10 +466,7 @@ void *Settime(void *argument)
 		  while ( month > 12 ) { month -= 12; year++; }
 		  while ( month <  1 ) { month += 12; year--; }
 
-		  if ( day0 == 31 )
-		    day = days_per_month(calendar, year, month);
-		  else
-		    day = day0;
+                  day = (day0 == 31) ? days_per_month(calendar, year, month) : day0;
 
 		  vdate = cdiEncodeDate(year, month, day);
 		}
@@ -535,6 +537,7 @@ void *Settime(void *argument)
 
 	  taxisDefVdate(taxisID2, vdate);
 	  taxisDefVtime(taxisID2, vtime);
+
 	  if ( taxis_has_bounds || operatorID == SETTBOUNDS )
 	    {
 	      taxisDefVdateBounds(taxisID2, vdateb[0], vdateb[1]);

@@ -167,7 +167,7 @@ int com_stat(const char *arg)
       else
 	{
 	  int i;
-	  int nmiss;
+	  size_t nmiss;
 	  int gridsize;
 	  double fmin = 1.e50 , fmax = -1.e50, fmean = 0;
 	  counter_t counter;
@@ -321,7 +321,7 @@ void command_init()
 void *Command(void *argument)
 {
   // int recID, varID, levelID;
-  // int nmiss;
+  // size_t nmiss;
   double s_utime, s_stime;
   double e_utime, e_stime;
   double c_cputime = 0, c_usertime = 0, c_systime = 0;

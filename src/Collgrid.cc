@@ -29,7 +29,7 @@ typedef struct
   int streamID;
   int vlistID;
   int gridID;
-  int nmiss;
+  size_t nmiss;
   int gridsize;
   int *gridindex;
   double *array;
@@ -535,7 +535,7 @@ void *Collgrid(void *argument)
 
 	      if ( vars[varID2] )
 		{
-		  int nmiss = 0;
+		  size_t nmiss = 0;
 		  for ( int i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 

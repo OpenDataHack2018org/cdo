@@ -53,7 +53,7 @@ void *Selvar(void *argument)
   char zaxistypename[CDI_MAX_NAME];
   char zaxisname[CDI_MAX_NAME];
   char **argnames = NULL;
-  int nmiss;
+  size_t nmiss;
   int gridnum = 0;
   lista_t *ilista = lista_new(INT_LISTA);
   lista_t *flista = lista_new(FLT_LISTA);
@@ -291,7 +291,7 @@ void *Selvar(void *argument)
 
   nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; ++varID )
-    if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
+    if ( vlistInqVarTimetype(vlistID2, varID) != TIME_CONSTANT ) break;
   if ( varID == nvars ) vlistDefNtsteps(vlistID2, 0);
 
   int taxisID1 = vlistInqTaxis(vlistID1);

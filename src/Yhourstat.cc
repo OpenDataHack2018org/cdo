@@ -71,7 +71,7 @@ void *Yhourstat(void *argument)
   int nrecs;
   int levelID;
   int houroy_nsets[MAX_HOUR];
-  int nmiss;
+  size_t nmiss;
   int vdates[MAX_HOUR], vtimes[MAX_HOUR];
   field_type **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
 
@@ -159,7 +159,7 @@ void *Yhourstat(void *argument)
 	    {
               recinfo[recID].varID   = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT;
+              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 	    }
 
           field_type *psamp1 = &samp1[houroy][varID][levelID];
@@ -172,7 +172,7 @@ void *Yhourstat(void *argument)
 	  if ( nsets == 0 )
 	    {
 	      pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-	      pvars1->nmiss = (size_t) nmiss;
+	      pvars1->nmiss = nmiss;
               if ( lrange )
                 {
                   pvars2->nmiss = pvars1->nmiss;
@@ -192,7 +192,7 @@ void *Yhourstat(void *argument)
 	  else
 	    {
 	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = (size_t) nmiss;
+              field.nmiss   = nmiss;
 	      field.grid    = pvars1->grid;
 	      field.missval = pvars1->missval;
 
@@ -295,7 +295,7 @@ void *Yhourstat(void *argument)
             field_type *pvars1 = &vars1[houroy][varID][levelID];
 
 	    pstreamDefRecord(streamID2, varID, levelID);
-	    pstreamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
+	    pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	  }
 
 	otsID++;
