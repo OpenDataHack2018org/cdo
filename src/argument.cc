@@ -109,7 +109,7 @@ void argument_fill(argument_t *argument, int argc, char *argv[])
     argument->argv[iarg] = strdup(argv[iarg]);
 }
 
-void print_argument(argument_t * p_argument)
+std::string print_argument(argument_t * p_argument)
 {
     std::string output = "";
     output += "argv with " + std::to_string(p_argument->argc) + " arguments:\n" ;
@@ -138,5 +138,5 @@ void print_argument(argument_t * p_argument)
     {
         output += " not set\n";
     }
-    std::cout << output;
+    return output;
 }
