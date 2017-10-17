@@ -49,6 +49,7 @@
 #include "cdo_task.h"
 
 #include "cdo_getopt.h"
+#include "cdoDebugOutput.h"
 
 #if defined(HAVE_LIBPTHREAD)
 #include "pstream_int.h"
@@ -341,7 +342,7 @@ void cdoPrintHelp(std::vector<std::string> help/*, char *xoperator*/)
       for(unsigned long i =  0; i < help.size(); i++)
         {
           lprint = !(help[i][0] == '\0'  && help[i+1][0] == ' ');
-          
+
           if ( lprint )
             {
               if ( COLOR_STDOUT )
@@ -1100,6 +1101,7 @@ int parse_options_long(int argc, char *argv[])
   int lsortparam;
   int ldebLevel;
   int lscmode;
+  bool sepDebugFromLog;
 
   struct cdo_option opt_long[] =
     {
@@ -1137,6 +1139,7 @@ int parse_options_long(int argc, char *argv[])
       { "version",                 no_argument,                NULL, 'V' },
       { "Dkext",             required_argument,          &ldebLevel,  1  },
       { "outputGribDataScanningMode", required_argument,  &lscmode,   1  },
+      { "seperateDebugFromLog", required_argument,             NULL,  2  },
       { NULL,                                0,                NULL,  0  }
     };
 
@@ -1408,6 +1411,12 @@ int parse_options_long(int argc, char *argv[])
         case 'z':
           defineCompress(CDO_optarg);
           break;
+        case 2:
+#ifdef DEBUG
+          CdoDebug::outfile = CDO_optarg;
+          CdoDebug::print_to_seperate_file = true;
+#endif
+          break;
         }
     }
 
@@ -1603,15 +1612,18 @@ int main(int argc, char *argv[])
 
       timer_start(timer_total);
 
+#ifdef DEBUG
+    CdoDebug::Message_(":==CDO==","Start");
+#endif
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
       operatorModule(operatorName)(argument);
       close_library_handles();
 #else
-      createProcesses(argc - CDO_optind, argv + CDO_optind);
-      clearProcesses();
       operatorModule(operatorName)(argument);
-
+#endif
+#ifdef DEBUG
+    CdoDebug::Message_(":==CDO==","End\n");
 #endif
 
       timer_stop(timer_total);
