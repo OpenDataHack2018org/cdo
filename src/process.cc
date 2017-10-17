@@ -877,7 +877,6 @@ createProcesses(int argc, char **argv)
 void
 processDefArgument(void *vargument)
 {
-<<<<<<< HEAD
   /*
 process_t &process = processSelf();
 char *operatorArg;
