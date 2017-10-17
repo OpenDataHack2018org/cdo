@@ -38,6 +38,8 @@ libcdo_la_SOURCES =            \
                counter.h       \
                datetime.cc      \
                datetime.h      \
+			   cdoDebugOutput.cc\
+			   cdoDebugOutput.h\
                dmemory.h       \
                ecacore.cc       \
                ecacore.h       \
