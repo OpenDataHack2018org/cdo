@@ -350,7 +350,7 @@ int convert_form(const char *formstr)
 }
 
 static
-void smooth_set_parameter(int *xnsmooth, smoothpoint_t *spoint)
+void set_parameter(int *xnsmooth, smoothpoint_t *spoint)
 {
   int pargc = operatorArgc();
 
@@ -410,7 +410,7 @@ void *Smooth(void *argument)
   
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == SMOOTH ) smooth_set_parameter(&xnsmooth, &spoint);
+  if ( operatorID == SMOOTH ) set_parameter(&xnsmooth, &spoint);
 
   if ( spoint.radius < 0 || spoint.radius > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "radius", spoint.radius);
 
