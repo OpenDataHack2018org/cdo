@@ -116,23 +116,24 @@ am_libcdo_la_OBJECTS = libcdo_la-argument.lo libcdo_la-array.lo \
 	libcdo_la-afterburnerlib.lo libcdo_la-constants.lo \
 	libcdo_la-color.lo libcdo_la-commandline.lo \
 	libcdo_la-convert_units.lo libcdo_la-datetime.lo \
-	libcdo_la-ecacore.lo libcdo_la-ecautil.lo \
-	libcdo_la-exception.lo libcdo_la-expr.lo libcdo_la-expr_fun.lo \
-	libcdo_la-expr_lex.lo libcdo_la-expr_yacc.lo \
-	libcdo_la-features.lo libcdo_la-field.lo libcdo_la-field2.lo \
-	libcdo_la-fieldc.lo libcdo_la-fieldmem.lo \
-	libcdo_la-fieldmer.lo libcdo_la-fieldzon.lo \
-	libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
-	libcdo_la-grid_proj.lo libcdo_la-grid_area.lo \
-	libcdo_la-grid_define.lo libcdo_la-grid_gme.lo \
-	libcdo_la-grid_rot.lo libcdo_la-grid_from_name.lo \
-	libcdo_la-grid_read.lo libcdo_la-grid_read_pingo.lo \
-	libcdo_la-grid_print.lo libcdo_la-gridreference.lo \
-	libcdo_la-griddes.lo libcdo_la-griddes_h5.lo \
-	libcdo_la-griddes_nc.lo libcdo_la-hetaeta.lo \
-	libcdo_la-institution.lo libcdo_la-interpol.lo \
-	libcdo_la-job.lo libcdo_la-juldate.lo libcdo_la-grid_search.lo \
-	libcdo_la-listarray.lo libcdo_la-list.lo libcdo_la-listbuf.lo \
+	libcdo_la-cdoDebugOutput.lo libcdo_la-ecacore.lo \
+	libcdo_la-ecautil.lo libcdo_la-exception.lo libcdo_la-expr.lo \
+	libcdo_la-expr_fun.lo libcdo_la-expr_lex.lo \
+	libcdo_la-expr_yacc.lo libcdo_la-features.lo \
+	libcdo_la-field.lo libcdo_la-field2.lo libcdo_la-fieldc.lo \
+	libcdo_la-fieldmem.lo libcdo_la-fieldmer.lo \
+	libcdo_la-fieldzon.lo libcdo_la-gradsdeslib.lo \
+	libcdo_la-grid.lo libcdo_la-grid_proj.lo \
+	libcdo_la-grid_area.lo libcdo_la-grid_define.lo \
+	libcdo_la-grid_gme.lo libcdo_la-grid_rot.lo \
+	libcdo_la-grid_from_name.lo libcdo_la-grid_read.lo \
+	libcdo_la-grid_read_pingo.lo libcdo_la-grid_print.lo \
+	libcdo_la-gridreference.lo libcdo_la-griddes.lo \
+	libcdo_la-griddes_h5.lo libcdo_la-griddes_nc.lo \
+	libcdo_la-hetaeta.lo libcdo_la-institution.lo \
+	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
+	libcdo_la-grid_search.lo libcdo_la-listarray.lo \
+	libcdo_la-list.lo libcdo_la-listbuf.lo \
 	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
 	libcdo_la-namelist.lo libcdo_la-namelist_parser.lo \
 	libcdo_la-normal.lo libcdo_la-nth_element.lo \
@@ -1062,6 +1063,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-afterburnerlib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-argument.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-array.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdoDebugOutput.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_getopt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_pthread.Plo@am__quote@
@@ -1402,6 +1404,13 @@ libcdo_la-datetime.lo: datetime.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='datetime.cc' object='libcdo_la-datetime.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-datetime.lo `test -f 'datetime.cc' || echo '$(srcdir)/'`datetime.cc
+
+libcdo_la-cdoDebugOutput.lo: cdoDebugOutput.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-cdoDebugOutput.lo -MD -MP -MF $(DEPDIR)/libcdo_la-cdoDebugOutput.Tpo -c -o libcdo_la-cdoDebugOutput.lo `test -f 'cdoDebugOutput.cc' || echo '$(srcdir)/'`cdoDebugOutput.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-cdoDebugOutput.Tpo $(DEPDIR)/libcdo_la-cdoDebugOutput.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cdoDebugOutput.cc' object='libcdo_la-cdoDebugOutput.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-cdoDebugOutput.lo `test -f 'cdoDebugOutput.cc' || echo '$(srcdir)/'`cdoDebugOutput.cc
 
 libcdo_la-ecacore.lo: ecacore.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-ecacore.lo -MD -MP -MF $(DEPDIR)/libcdo_la-ecacore.Tpo -c -o libcdo_la-ecacore.lo `test -f 'ecacore.cc' || echo '$(srcdir)/'`ecacore.cc

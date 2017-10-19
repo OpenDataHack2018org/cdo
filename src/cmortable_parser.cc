@@ -32,7 +32,7 @@ char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t le
       line[ipos++] = ichar;
       if ( ipos >= len )
         {
-          fprintf(stderr, "readLineFromBuffer: end of line not found (maxlen = %ld)!\n", len);
+          fprintf(stderr, "readLineFromBuffer: end of line not found (maxlen = %zu)!\n", len);
           break;
         }
     }

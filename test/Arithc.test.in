@@ -15,17 +15,20 @@ NTEST=1
 for STAT in $STATS; do
   RSTAT=0
 
+  rm Arithc_${STAT}.debug
+  DEBUG_OUT="--seperateDebugFromLog Arithc_${STAT}.debug"
+
   OFILE=stat${STAT}_res
 
   for VAR in -777 -1 0 1 777; do
     VAL=1
     CFILE=constval
-    $CDO -f srv -b 64 const,$VAL,$IFILE $CFILE
+    $CDO $DEBUG_OUT -f srv -b 64 const,$VAL,$IFILE $CFILE
 
 # stat var const
 
     CDOTEST="$STAT"
-    CDOCOMMAND="$CDO $FORMAT ${STAT} $IFILE $CFILE $OFILE"
+    CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT ${STAT} $IFILE $CFILE $OFILE"
 
     echo "Running test: $NTEST - $CDOTEST"
     echo "$CDOCOMMAND"
@@ -36,12 +39,12 @@ for STAT in $STATS; do
 # stat,const var
 
     OFILE2=stat${STAT}c_res
-    CDOCOMMAND="$CDO $FORMAT ${STAT}c,$VAL $IFILE $OFILE2"
+    CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT ${STAT}c,$VAL $IFILE $OFILE2"
 
     $CDOCOMMAND
     test $? -eq 0 || let RSTAT+=1
 
-    $CDO diff $OFILE $OFILE2 > $CDOOUT 2> $CDOERR
+    $CDO $DEBUG_OUT diff $OFILE $OFILE2 > $CDOOUT 2> $CDOERR
     test $? -eq 0 || let RSTAT+=1
     test -s $CDOOUT && let RSTAT+=1
     cat $CDOOUT $CDOERR
@@ -56,12 +59,12 @@ for STAT in $STATS; do
     OFILE3=arithc_expr${STAT}_res
     INSTR="var130=var130${OP}${VAL};var152=var152${OP}${VAL};var129=var129${OP}${VAL};"
     echo $INSTR
-    CDOCOMMAND="$CDO $FORMAT expr,$INSTR $IFILE $OFILE3"
+    CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT expr,$INSTR $IFILE $OFILE3"
 
     $CDOCOMMAND
     test $? -eq 0 || let RSTAT+=1
 
-    $CDO diff $OFILE $OFILE3 > $CDOOUT 2> $CDOERR
+    $CDO $DEBUG_OUT diff $OFILE $OFILE3 > $CDOOUT 2> $CDOERR
     test $? -eq 0 || let RSTAT+=1
     test -s $CDOOUT && let RSTAT+=1
     cat $CDOOUT $CDOERR

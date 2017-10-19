@@ -22,5 +22,5 @@ void        file_argument_free(argument_t *argument);
 argument_t *argument_new(size_t argc, size_t len);
 void        argument_free(argument_t *argument);
 void        argument_fill(argument_t *argument, int argc, char *argv[]);
-void print_argument(argument_t *argument);
+std::string print_argument(argument_t *argument);
 #endif

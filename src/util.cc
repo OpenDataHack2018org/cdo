@@ -216,22 +216,22 @@ char *getOperator(const char *argument)
 }
 
 
-const char *getOperatorName(const char *operatorArg)
+const char *getOperatorName(const char *operatorCommand)
 {
   char *operatorName = NULL;
 
-  if ( operatorArg )
+  if ( operatorCommand )
     {
-      if ( operatorArg[0] == '-' )
+      if ( operatorCommand[0] == '-' )
       {
-          operatorArg++;
+          operatorCommand++;
       }
-      char *commapos = (char *)strchr(operatorArg, ',');
-      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorArg) : strlen(operatorArg);
+      char *commapos = (char *)strchr(operatorCommand, ',');
+      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand) : strlen(operatorCommand);
 
       operatorName = (char*) Malloc(len+1);
 
-      memcpy(operatorName, operatorArg, len);
+      memcpy(operatorName, operatorCommand, len);
       operatorName[len] = '\0';
     }
 
@@ -243,26 +243,26 @@ const char *getOperatorName(const char *operatorArg)
     return operatorName;
 }
 
-char *getOperatorArg(const char *xoperator)
+char *getOperatorArg(const char *p_operatorCommand)
 {
-  char *operatorArg = NULL;
+  char *operatorCommand = NULL;
 
-  if ( xoperator )
+  if ( p_operatorCommand )
     {
-      char *commapos = (char *)strchr(xoperator, ',');
+      char *commapos = (char *)strchr(p_operatorCommand, ',');
 
       if ( commapos )
         {
           size_t len = strlen(commapos+1);
           if ( len )
             {
-              operatorArg = (char*) Malloc(len+1);
-              strcpy(operatorArg, commapos+1);
+              operatorCommand = (char*) Malloc(len+1);
+              strcpy(operatorCommand, commapos+1);
             }
         }
     }
 
-  return operatorArg;
+  return operatorCommand;
 }
 
 char *getFileArg(char *argument)
