@@ -206,12 +206,12 @@ processNumsActive(void)
 }
 
 void
-processAddNvals(off_t nvals)
+processAddNvals(size_t nvals)
 {
   processSelf().nvals += nvals;
 }
 
-off_t
+size_t
 processInqNvals(int processID)
 {
   return Process.find(processID)->second.nvals;
@@ -1268,7 +1268,7 @@ cdoFinish(void)
       reset_text_color(stderr);
       if (nvals > 0)
         {
-          if (sizeof(int64_t) > sizeof(long))
+          if (sizeof(int64_t) > sizeof(size_t))
 #if defined(_WIN32)
             fprintf(stderr,
                     "Processed %I64d value%s from %d variable%s",
@@ -1282,8 +1282,8 @@ cdoFinish(void)
                     ADD_PLURAL(nvars));
           else
             fprintf(stderr,
-                    "Processed %ld value%s from %d variable%s",
-                    (long) nvals,
+                    "Processed %zu value%s from %d variable%s",
+                    (size_t) nvals,
                     ADD_PLURAL(nvals),
                     nvars,
                     ADD_PLURAL(nvars));
