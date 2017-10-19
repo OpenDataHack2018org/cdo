@@ -18,7 +18,6 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
 
-#include <sys/types.h> /* off_t */
 #include <vector>
 #include "util.h"
 #include "pstream.h"
