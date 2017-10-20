@@ -123,6 +123,7 @@ void *Merstat(void *argument);
 void *Monarith(void *argument);
 void *Mrotuv(void *argument);
 void *Mrotuvb(void *argument);
+void *NCL(void *argument);
 void *Ninfo(void *argument);
 void *Nmldump(void *argument);
 void *Output(void *argument);
@@ -376,6 +377,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  MonarithOperators      {"monadd", "monsub", "monmul", "mondiv"}
 #define  MrotuvOperators        {"mrotuv"}
 #define  MrotuvbOperators       {"mrotuvb"}
+#define  NCLOperators           {"uv2dv_cfd"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel", "ngridpoints", "ngrids"}
 #define  NmldumpOperators       {"nmldump", "kvldump"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
@@ -893,6 +895,7 @@ void init_modules()
   add_module("Monarith"      , {Monarith      , MonarithHelp      , MonarithOperators      , 1 , CDI_REAL , 2  , 1  });
   add_module("Mrotuv"        , {Mrotuv        , {}                , MrotuvOperators        , 1 , CDI_REAL , 1  , 2  });
   add_module("Mrotuvb"       , {Mrotuvb       , {}                , MrotuvbOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("NCL"           , {NCL           , {}                , NCLOperators           , 1 , CDI_REAL , 1  , 1  });
   add_module("Ninfo"         , {Ninfo         , NinfoHelp         , NinfoOperators         , 1 , CDI_BOTH , 1  , 0  });
   add_module("Nmldump"       , {Nmldump       , {}                , NmldumpOperators       , 0 , CDI_REAL , 0  , 0  });
   add_module("Output"        , {Output        , OutputHelp        , OutputOperators        , 1 , CDI_REAL , -1 , 0  });

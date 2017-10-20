@@ -18,8 +18,17 @@
 /* Define to 1 for DATA support */
 #undef ENABLE_DATA
 
+/* F77 Compiler */
+#undef F77_COMPILER
+
+/* F77 Compiler version */
+#undef F77_VERSION
+
 /* Define to 1 if you have the `backtrace' function. */
 #undef HAVE_BACKTRACE
+
+/* Defined to 1 if C / Fortran interface cfortran.h works */
+#undef HAVE_CF_INTERFACE
 
 /* Define to 1 if you have the <cmor.h> header file. */
 #undef HAVE_CMOR_H

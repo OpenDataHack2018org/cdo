@@ -18,7 +18,6 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
 
-#include <sys/types.h> /* off_t */
 #include <vector>
 #include "util.h"
 #include "pstream.h"
@@ -60,7 +59,7 @@ public:
   double a_stime;
   double cputime;
 
-  off_t nvals;
+  size_t nvals;
   short nvars;
   int ntimesteps;
   short m_streamCnt;
@@ -121,8 +120,8 @@ void processAccuTime(double utime, double stime);
 void processDefCputime(int processID, double cputime);
 double processInqCputime(int processID);
 
-void processAddNvals(off_t nvals);
-off_t processInqNvals(int processID);
+void processAddNvals(size_t nvals);
+size_t processInqNvals(int processID);
 int processNums(void);
 
 int processInqChildNum(void);

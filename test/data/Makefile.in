@@ -89,7 +89,9 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = test/data
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/acx_cfortran_flags.m4 \
+	$(top_srcdir)/m4/acx_check_cfortran.m4 \
+	$(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -177,7 +179,8 @@ ENABLE_NETCDF = @ENABLE_NETCDF@
 ENABLE_SERVICE = @ENABLE_SERVICE@
 ENABLE_THREADS = @ENABLE_THREADS@
 EXEEXT = @EXEEXT@
-FCFLAGS = @FCFLAGS@
+F77 = @F77@
+FFLAGS = @FFLAGS@
 FGREP = @FGREP@
 GREP = @GREP@
 GRIB_API_INCLUDE = @GRIB_API_INCLUDE@
@@ -254,6 +257,7 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_F77 = @ac_ct_F77@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@

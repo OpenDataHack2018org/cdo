@@ -198,15 +198,21 @@ void cdo_version(void)
 #endif
 #if defined(CXX_COMPILER)
   fprintf(stderr, "CXX Compiler: %s\n", CXX_COMPILER);
-#endif
 #if defined(CXX_VERSION)
   fprintf(stderr, "CXX version : %s\n", CXX_VERSION);
 #endif
+#endif
 #if defined(C_COMPILER)
   fprintf(stderr, "C Compiler: %s\n", C_COMPILER);
-#endif
 #if defined(C_VERSION)
   fprintf(stderr, "C version : %s\n", C_VERSION);
+#endif
+#endif
+#if defined(F77_COMPILER)
+  fprintf(stderr, "F77 Compiler: %s\n", F77_COMPILER);
+#if defined(F77_VERSION)
+  fprintf(stderr, "F77 version : %s\n", F77_VERSION);
+#endif
 #endif
 
   printFeatures();
