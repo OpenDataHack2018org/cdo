@@ -27,7 +27,9 @@ for RMOD in $RMODS; do
     OFILE=tsurf_spain_${RMOD}_${extra}$$
     RFILE=$DATAPATH/tsurf_spain_${RMOD}_${extra}_ref
 
-    CDOCOMMAND="$CDO $FORMAT remap${RMOD},$GRID  $IFILE ${OFILE}"
+    -rm -f Remap2_${RMOD}_${extra}.debug
+    DEBUG_OUT="--seperateDebugFromLog Remap2_${RMOD}_${extra}.debug"
+    CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT remap${RMOD},$GRID  $IFILE ${OFILE}"
 
     echo "Running test: $NTEST"
     echo "$CDOCOMMAND"
@@ -35,7 +37,7 @@ for RMOD in $RMODS; do
     REMAP_EXTRAPOLATE=$EXTRA $CDOCOMMAND
     test $? -eq 0 || let RSTAT+=1
 
-    $CDO diff,$ABSLIM $OFILE $RFILE > $CDOOUT 2> $CDOERR
+    $CDO $DEBUG_OUT diff,$ABSLIM $OFILE $RFILE > $CDOOUT 2> $CDOERR
     test $? -eq 0 || let RSTAT+=1
     test -s $CDOOUT && let RSTAT+=1
     cat $CDOOUT $CDOERR

@@ -15,7 +15,7 @@ NTEST=1
 for STAT in $STATS; do
   RSTAT=0
 
-  rm Arithc_${STAT}.debug
+  rm -f Arithc_${STAT}.debug
   DEBUG_OUT="--seperateDebugFromLog Arithc_${STAT}.debug"
 
   OFILE=stat${STAT}_res

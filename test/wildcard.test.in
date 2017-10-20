@@ -36,7 +36,9 @@ for IFILE in $IFILES; do
   echo $INFILE
 
   for OPERATOR in info sinfo; do
-    CDOCOMMAND="$CDO ${OPERATOR} $INFILE"
+    rm -f Wildcard_${OPERATOR}.debug
+    DEBUG_OUT="--seperateDebugFromLog Wildcard_${OPERATOR}.debug"
+    CDOCOMMAND="$CDO $DEBUG_OUT ${OPERATOR} $INFILE"
     echo "$CDOCOMMAND"
 
     $CDOCOMMAND  > $CDOOUT 2> $CDOERR
@@ -44,10 +46,10 @@ for IFILE in $IFILES; do
     cat $CDOOUT $CDOERR
     mv $CDOOUT ref1
 
-    CDOCOMMAND="$CDO ${OPERATOR} $DATAPATH/grib_${IFILE}.grb"
+    CDOCOMMAND="$CDO $DEBUG_OUT ${OPERATOR} $DATAPATH/grib_${IFILE}.grb"
     echo "$CDOCOMMAND"
 
-    $CDO ${OPERATOR} "$DATAPATH/grib_${IFILE}.grb" > $CDOOUT 2> $CDOERR
+    $CDO $DEBUG_OUT ${OPERATOR} "$DATAPATH/grib_${IFILE}.grb" > $CDOOUT 2> $CDOERR
     #$CDOCOMMAND  > $CDOOUT 2> $CDOERR
     test $? -eq 0 || let RSTAT+=1
     cat $CDOOUT $CDOERR

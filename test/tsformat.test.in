@@ -47,21 +47,24 @@ function testfunc()
   RFILE=$DATAPATH/tsformat${INSET}_ref
   OFILE=thread${NTEST}_res
 
-  CDOCOMMAND="$CDO $INSTR ${IFILE}(${FORMAT}) $OFILE"
-      
+  rm -f tsformat_${FORMAT}.debug
+  DEBUG_OUT="--seperateDebugFromLog tsformat_${FORMAT}.debug"
+
+  CDOCOMMAND="$CDO $DEBUG_OUT $INSTR ${IFILE}(${FORMAT}) $OFILE"
+
   echo "$CDOCOMMAND"
 
   if [ "${ENABLE_TEST}" = yes ] ; then
     if [ "@ENABLE_THREADS@" = yes ] ; then
-      $CDO -f $FORMAT setgrid,r12x6 ${IFILE} ifile$$
-      CDOCOMMAND="$CDO $INSTR ifile$$ $OFILE"
+      $CDO $DEBUG_OUT -f $FORMAT setgrid,r12x6 ${IFILE} ifile$$
+      CDOCOMMAND="$CDO $DEBUG_OUT $INSTR ifile$$ $OFILE"
 
       for i in {1..5} ; do
         $CDOCOMMAND
         test $? -eq 0 || let RSTAT+=1
       done
 
-      $CDO diff -selcode,130 $RFILE $OFILE > $CDOOUT 2> $CDOERR
+      $CDO $DEBUG_OUT diff -selcode,130 $RFILE $OFILE > $CDOOUT 2> $CDOERR
       test $? -eq 0 || let RSTAT+=1
       test -s $CDOOUT && let RSTAT+=1
       cat $CDOOUT $CDOERR

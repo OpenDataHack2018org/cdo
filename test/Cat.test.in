@@ -7,6 +7,8 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout$$
 CDOERR=cerr$$
 FORMAT="-f srv -b 32"
+  rm Cat.debug
+  DEBUG_OUT="--seperateDebugFromLog Cat.debug"
 RSTAT=0
 #
 IFILE=$DATAPATH/t21_geosp_tsurf.grb
@@ -21,14 +23,14 @@ cat $IFILE >> ${RFILE}
 rm -f ${OFILE}
 #
 CDOTEST="cat"
-CDOCOMMAND="$CDO cat $IFILE ${OFILE}"
+CDOCOMMAND="$CDO $DEBUG_OUT cat $IFILE ${OFILE}"
 #
 $CDOCOMMAND
 test $? -eq 0 || let RSTAT+=1
 $CDOCOMMAND
 test $? -eq 0 || let RSTAT+=1
 #
-$CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+$CDO $DEBUG_OUT diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
 test $? -eq 0 || let RSTAT+=1
 test -s $CDOOUT && let RSTAT+=1
 cat $CDOOUT $CDOERR

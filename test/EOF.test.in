@@ -29,28 +29,35 @@ if [ $X = 2 ] ; then DIM=3d ; fi
 for MODE in jacobi danielson_lanczos; do
   export CDO_SVD_MODE=$MODE
   RSTAT=0
+  
+  rm -f EOF_DIM_${X}_${MODE}.debug
+  DEBUG_OUT="--seperateDebugFromLog EOF_DIM_${X}_${MODE}.debug"
+
   CDOTEST="eof${DIM}/eofcoeff${DIM} - $MODE"
-  CDOCOMMAND="$CDO $FORMAT eof${DIM},1 $IFILE $OFILE1 $OFILE2"
+  CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT eof${DIM},1 $IFILE $OFILE1 $OFILE2"
   echo "$CDOCOMMAND"
 
   $CDOCOMMAND
   test $? -eq 0 || let RSTAT+=1
 #
-  $CDO diff,1e-8 $OFILE1 $RFILE1 > $CDOOUT 2> $CDOERR
+  $CDO $DEBUG_OUT diff,1e-8 $OFILE1 $RFILE1 > $CDOOUT 2> $CDOERR
   test $? -eq 0 || let RSTAT+=1
   test -s $CDOOUT && let RSTAT+=1
 #
-  $CDO diff,1e-7 -abs $OFILE2 -abs $RFILE2 > $CDOOUT 2> $CDOERR
+  $CDO $DEBUG_OUT diff,1e-7 -abs $OFILE2 -abs $RFILE2 > $CDOOUT 2> $CDOERR
   test $? -eq 0 || let RSTAT+=1
   test -s $CDOOUT && let RSTAT+=1
 
-  CDOCOMMAND="$CDO $FORMAT eofcoeff${DIM} $OFILE2 $IFILE $OFILE3"
+  rm -f EOFCOEFF_DIM_${X}_${MODE}.debug
+  DEBUG_OUT="--seperateDebugFromLog EOFCOEFF_DIM-${X}_${MODE}.debug"
+
+  CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT eofcoeff${DIM} $OFILE2 $IFILE $OFILE3"
   echo "$CDOCOMMAND"
 
   $CDOCOMMAND
   test $? -eq 0 || let RSTAT+=1
 #
-  $CDO diff,0.02 -abs ${OFILE3}00000 -abs $RFILE3 > $CDOOUT 2> $CDOERR
+  $CDO $DEBUG_OUT diff,0.02 -abs ${OFILE3}00000 -abs $RFILE3 > $CDOOUT 2> $CDOERR
   test $? -eq 0 || let RSTAT+=1
   test -s $CDOOUT && let RSTAT+=1
 

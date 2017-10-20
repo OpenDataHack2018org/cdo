@@ -13,6 +13,8 @@ if [ "@ENABLE_NETCDF@" = no ] ; then  FMS="srv grb"; fi
 #
 IFILE=$DATAPATH/ts_mm_5years
 NTEST=1
+rm -rf MultiyearstatDebugOutput
+mkdir MultiyearstatDebugOutput
 #
 for TYPE in $TYPES; do
   for STAT in $STATS; do
@@ -27,7 +29,9 @@ for TYPE in $TYPES; do
     CDOTEST="${TYPE}$STAT"
 
     for FM in $FMS; do
-      CDOCOMMAND="$CDO -f $FM ${TYPE}${STAT} $IFILE $OFILE"
+      rm -f Multiyerarstat_${TYPE}_${STAT}_${FM}.debug
+      DEBUG_OUT="--seperateDebugFromLog MultiyearstatDebugOutput/Multiyerarstat_${TYPE}_${STAT}_${FM}.debug"
+      CDOCOMMAND="$CDO $DEBUG_OUT -f $FM ${TYPE}${STAT} $IFILE $OFILE"
 
       echo "Running test: $NTEST"
       echo "$CDOCOMMAND"
@@ -35,7 +39,7 @@ for TYPE in $TYPES; do
       $CDOCOMMAND
       test $? -eq 0 || let RSTAT+=1
 
-      $CDO diff,0.004 $OFILE $RFILE > $CDOOUT 2> $CDOERR
+      $CDO $DEBUG_OUT diff,0.004 $OFILE $RFILE > $CDOOUT 2> $CDOERR
       test $? -eq 0 || let RSTAT+=1
       test -s $CDOOUT && let RSTAT+=1
       cat $CDOOUT $CDOERR

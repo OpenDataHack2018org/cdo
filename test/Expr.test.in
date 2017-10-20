@@ -13,6 +13,9 @@ NTEST=1
 #
 FINSTR=finstr
 #
+rm -f Expr.debug
+DEBUG_OUT="--seperateDebugFromLog Expr.debug"
+#
 function testfunc()
 {
   RSTAT=0
@@ -28,9 +31,9 @@ function testfunc()
 
       if [ "$FILE" = "f" ] ; then
         echo $INSTR > $FINSTR
-        CDOCOMMAND="$CDO $FORMAT $EXPR${FILE},$FINSTR $IFILE $OFILE"
+        CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT $EXPR${FILE},$FINSTR $IFILE $OFILE"
       else
-        CDOCOMMAND="$CDO $FORMAT $EXPR,$INSTR $IFILE $OFILE"
+        CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT $EXPR,$INSTR $IFILE $OFILE"
       fi
       
       echo "$CDOCOMMAND"
@@ -38,7 +41,7 @@ function testfunc()
       $CDOCOMMAND
       test $? -eq 0 || let RSTAT+=1
 
-      $CDO diff $RFILE $OFILE > $CDOOUT 2> $CDOERR
+      $CDO $DEBUG_OUT diff $RFILE $OFILE > $CDOOUT 2> $CDOERR
       test $? -eq 0 || let RSTAT+=1
       test -s $CDOOUT && let RSTAT+=1
       cat $CDOOUT $CDOERR

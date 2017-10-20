@@ -27,7 +27,9 @@ for SELECT in $SELARGS; do
   OFILE=${OPERATOR}${TNUM}_res
 
   CDOTEST="${OPERATOR}"
-  CDOCOMMAND="$CDO ${OPERATOR},${SELECT} $IFILE $OFILE"
+  rm -f Select_${SELECT}.debug
+  DEBUG_OUT="--seperateDebugFromLog Select_${SELECT}.debug"
+  CDOCOMMAND="$CDO $DEBUG_OUT ${OPERATOR},${SELECT} $IFILE $OFILE"
 
   echo "Running test: $NTEST"
   echo "$CDOCOMMAND"
@@ -35,7 +37,7 @@ for SELECT in $SELARGS; do
   $CDOCOMMAND
   test $? -eq 0 || let RSTAT+=1
 
-  $CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+  $CDO $DEBUG_OUT diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
   test $? -eq 0 || let RSTAT+=1
   test -s $CDOOUT && let RSTAT+=1
   cat $CDOOUT $CDOERR

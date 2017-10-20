@@ -21,7 +21,9 @@ for STAT in $STATS; do
   OFILE=${TYPE}${STAT}_res
 
   CDOTEST="${TYPE}$STAT"
-  CDOCOMMAND="$CDO $FORMAT ${TYPE}${STAT} $IFILE $OFILE"
+  rm -f Merstat_${STAT}.debug
+  DEBUG_OUT="--seperateDebugFromLog Merstat_${STAT}.debug"
+  CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT ${TYPE}${STAT} $IFILE $OFILE"
 
   echo "Running test: $NTEST"
   echo "$CDOCOMMAND"
@@ -29,7 +31,7 @@ for STAT in $STATS; do
   $CDOCOMMAND
   test $? -eq 0 || let RSTAT+=1
 
-  $CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+  $CDO $DEBUG_OUT diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
   test $? -eq 0 || let RSTAT+=1
   test -s $CDOOUT && let RSTAT+=1
   cat $CDOOUT $CDOERR

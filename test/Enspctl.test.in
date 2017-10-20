@@ -10,7 +10,8 @@ PCTLS="1 20 25 33 50 66 75 80 99 100"
 #
 IFILE=$DATAPATH/ts_mm_5years
 export CDO_FILE_SUFFIX=NULL
-$CDO splityear $IFILE ${$}ts_year
+rm -f Enspctl_Ifilegeneration.debug
+$CDO --seperateDebugFromLog Enspctl_Ifilegeneration.debug splityear $IFILE ${$}ts_year
 IFILES="${$}ts_year????"
 #
 NTEST=1
@@ -18,18 +19,22 @@ RSTAT=0
 echo "Running test: $NTEST"
 #
 for PCTL in $PCTLS; do
+
+  rm -f Enspctl_${PCTL}.debug
+  DEBUG_OUT="--seperateDebugFromLog Enspctl_${PCTL}.debug"
+
   RFILE=$DATAPATH/enspctl${PCTL}_ref
   OFILE=enspctl${STAT}_res
 
   CDOTEST="enspctl"
-  CDOCOMMAND="$CDO enspctl,${PCTL} $IFILES $OFILE"
+  CDOCOMMAND="$CDO $DEBUG_OUT enspctl,${PCTL} $IFILES $OFILE"
 
   echo "$CDOCOMMAND"
 
   $CDOCOMMAND
   test $? -eq 0 || let RSTAT+=1
 
-  $CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+  $CDO $DEBUG_OUT diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
   test $? -eq 0 || let RSTAT+=1
   test -s $CDOOUT && let RSTAT+=1
   cat $CDOOUT $CDOERR

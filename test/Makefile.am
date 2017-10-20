@@ -43,6 +43,6 @@ PYTHONPATH = $(top_srcdir)/contrib/python:$(top_srcdir)/test
 
 #.PHONY: $(TESTS)
 
-CLEANFILES += `ls *.pyc`
+CLEANFILES += `ls *.pyc *.debug cerr* cout* ifile* ofile*`
 
 #AUTOMAKE_OPTIONS = color-tests
