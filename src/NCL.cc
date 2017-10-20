@@ -71,11 +71,25 @@ int find_name(int vlistID, char *name)
   return CDI_UNDEFID;
 }
 
+enum OUTMODE {OUTMODE_NEW, OUTMODE_APPEND, OUTMODE_REPLACE};
+
+// Parameter
+int outMode = OUTMODE_NEW;
+int boundOpt = -1;
+char name_u[CDI_MAX_NAME], name_v[CDI_MAX_NAME];
+
 static
-void set_parameter(char *name_u, char *name_v, int *boundOpt)
+void print_parameter(void)
 {
-  name_u[0] = 0;
-  name_v[0] = 0;
+  cdoPrint("u=%s, v=%s, boundOpt=%d, outMode=%s", name_u, name_v, boundOpt,
+           outMode==OUTMODE_NEW?"new":outMode==OUTMODE_APPEND?"append":"replace");
+}
+
+static
+void set_parameter(void)
+{
+  strcpy(name_u, "u");
+  strcpy(name_v, "v");
 
   int pargc = operatorArgc();
   if ( pargc )
@@ -96,37 +110,44 @@ void set_parameter(char *name_u, char *name_v, int *boundOpt)
           
           if      ( STR_IS_EQ(key, "u") ) strcpy(name_u, value);
           else if ( STR_IS_EQ(key, "v") ) strcpy(name_v, value);
-          else if ( STR_IS_EQ(key, "boundOpt") ) *boundOpt = parameter2int(value);
+          else if ( STR_IS_EQ(key, "boundOpt") ) boundOpt = parameter2int(value);
+          else if ( STR_IS_EQ(key, "outMode") )
+            {
+              if      ( STR_IS_EQ(value, "new") ) outMode = OUTMODE_NEW;
+              else if ( STR_IS_EQ(value, "append") ) outMode = OUTMODE_APPEND;
+              else if ( STR_IS_EQ(value, "replace") ) outMode = OUTMODE_REPLACE;
+              else cdoAbort("Invalid parameter key value: outMode=%s (valid are: new/append/replace)", value);
+          }
           else cdoAbort("Invalid parameter key >%s<!", key);
         }          
           
       list_destroy(kvlist);
     }
-      
-  if ( cdoVerbose )
-    cdoPrint("u = %s, v = %s", name_u, name_v);
+
+  if ( cdoVerbose ) print_parameter();
 }
 
 
 void *NCL(void *argument)
 {
-  int boundOpt = -1;
   int nrecs;
   int varID, levelID;
   size_t nmiss;
-  char name_u[CDI_MAX_NAME], name_v[CDI_MAX_NAME];
 
   cdoInitialize(argument);
 
-  set_parameter(name_u, name_v, &boundOpt);
-
-  if ( !name_u[0] ) strcpy(name_u, "u");
-  if ( !name_v[0] ) strcpy(name_v, "v");
+  set_parameter();
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID2 = CDI_UNDEFID;
+  if ( outMode == OUTMODE_NEW )
+    vlistID2 = vlistCreate();
+  else if ( outMode == OUTMODE_APPEND )
+    vlistID2 = vlistDuplicate(vlistID1);
+  else
+    cdoAbort("outMode=%d unsupported!", outMode);
 
   int varIDu = find_name(vlistID1, name_u);
   int varIDv = find_name(vlistID1, name_v);
@@ -146,6 +167,7 @@ void *NCL(void *argument)
     cdoAbort("u and v must have the same grid size!");
 
   if ( boundOpt == -1 ) boundOpt = gridIsCircular(gridIDu) ? 1 : 0;
+  if ( cdoVerbose ) print_parameter();
   if ( boundOpt < 0 || boundOpt > 3 ) cdoAbort("Parameter boundOpt=%d out of bounds (0-3)!", boundOpt);
 
   size_t nlon = gridInqXsize(gridIDu);
@@ -161,7 +183,6 @@ void *NCL(void *argument)
   double missvalu = vlistInqVarMissval(vlistID1, varIDu);
   double missvalv = vlistInqVarMissval(vlistID1, varIDv);
 
-  
   int timetype = vlistInqVarTimetype(vlistID1, varIDu);
   int varIDdiv = vlistDefVar(vlistID2, gridIDu, zaxisIDu, timetype);
   vlistDefVarName(vlistID2, varIDdiv, "d");
@@ -208,9 +229,12 @@ void *NCL(void *argument)
               if ( varID == varIDv ) { memcpy(arrayv+levelID*gridsizeuv, array, gridsizeuv*sizeof(double)); nmissv += nmiss; }
             }
 
-          pstreamDefRecord(streamID2,  varID,  levelID);
-          pstreamWriteRecord(streamID2, array, nmiss);
-	}
+          if ( outMode == OUTMODE_APPEND )
+            {
+              pstreamDefRecord(streamID2,  varID,  levelID);
+              pstreamWriteRecord(streamID2, array, nmiss);
+            }
+        }
 
       if ( nmissu != nmissv )
         {
