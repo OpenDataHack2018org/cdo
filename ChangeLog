@@ -1,3 +1,7 @@
+2017-10-20  Uwe Schulzweida
+
+	* Ydaystat: don't adjust the output year if the last input year is incomplete (bug fix)
+
 2017-10-08  Uwe Schulzweida
 
 	* changed type of nmiss to size_t

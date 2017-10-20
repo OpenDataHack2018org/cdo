@@ -117,7 +117,7 @@ void set_parameter(void)
               else if ( STR_IS_EQ(value, "append") ) outMode = OUTMODE_APPEND;
               else if ( STR_IS_EQ(value, "replace") ) outMode = OUTMODE_REPLACE;
               else cdoAbort("Invalid parameter key value: outMode=%s (valid are: new/append/replace)", value);
-          }
+            }
           else cdoAbort("Invalid parameter key >%s<!", key);
         }          
           
@@ -231,7 +231,7 @@ void *NCL(void *argument)
 
           if ( outMode == OUTMODE_APPEND )
             {
-              pstreamDefRecord(streamID2,  varID,  levelID);
+              pstreamDefRecord(streamID2, varID, levelID);
               pstreamWriteRecord(streamID2, array, nmiss);
             }
         }
