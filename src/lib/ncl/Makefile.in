@@ -99,12 +99,14 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libncl_la_LIBADD =
-am_libncl_la_OBJECTS = rvdv.lo
+am__libncl_la_SOURCES_DIST = rvdv.f
+@USE_F77_TRUE@am_libncl_la_OBJECTS = rvdv.lo
 libncl_la_OBJECTS = $(am_libncl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+@USE_F77_TRUE@am_libncl_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -134,7 +136,7 @@ am__v_F77LD_ = $(am__v_F77LD_@AM_DEFAULT_V@)
 am__v_F77LD_0 = @echo "  F77LD   " $@;
 am__v_F77LD_1 = 
 SOURCES = $(libncl_la_SOURCES)
-DIST_SOURCES = $(libncl_la_SOURCES)
+DIST_SOURCES = $(am__libncl_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -212,7 +214,6 @@ ENABLE_SERVICE = @ENABLE_SERVICE@
 ENABLE_THREADS = @ENABLE_THREADS@
 EXEEXT = @EXEEXT@
 F77 = @F77@
-FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
 FGREP = @FGREP@
 GREP = @GREP@
@@ -338,8 +339,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_LTLIBRARIES = libncl.la
-libncl_la_SOURCES = rvdv.f
+
+#
+@USE_F77_TRUE@noinst_LTLIBRARIES = libncl.la
+@USE_F77_TRUE@libncl_la_SOURCES = rvdv.f
 all: all-am
 
 .SUFFIXES:
@@ -387,7 +390,7 @@ clean-noinstLTLIBRARIES:
 	}
 
 libncl.la: $(libncl_la_OBJECTS) $(libncl_la_DEPENDENCIES) $(EXTRA_libncl_la_DEPENDENCIES) 
-	$(AM_V_F77LD)$(F77LINK)  $(libncl_la_OBJECTS) $(libncl_la_LIBADD) $(LIBS)
+	$(AM_V_F77LD)$(F77LINK) $(am_libncl_la_rpath) $(libncl_la_OBJECTS) $(libncl_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

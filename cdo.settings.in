@@ -5,6 +5,8 @@
    "CPPFLAGS"           : "@CPPFLAGS@",
    "CXXFLAGS"           : "@CXXFLAGS@",
    "CFLAGS"             : "@CFLAGS@",
+   "F77"                : "@F77@",
+   "FFLAGS"             : "@FFLAGS@",
    "LDFLAGS"            : "@LDFLAGS@",
    "LIBS"               : "@LIBS@",
    "FCFLAGS"            : "@FCFLAGS@",

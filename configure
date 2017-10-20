@@ -620,15 +620,14 @@ LIBOBJS
 AM_CPPFLAGS
 CLIBS
 CLDFLAGS
-FCFLAGS
 BUILD_AVX2_TESTS_FALSE
 BUILD_AVX2_TESTS_TRUE
 BUILD_AVX_TESTS_FALSE
 BUILD_AVX_TESTS_TRUE
 BUILD_SSE42_TESTS_FALSE
 BUILD_SSE42_TESTS_TRUE
-USE_FC_FALSE
-USE_FC_TRUE
+USE_F77_FALSE
+USE_F77_TRUE
 ENABLE_HIRLAM_EXTENSIONS_FALSE
 ENABLE_HIRLAM_EXTENSIONS_TRUE
 ENABLE_ALL_STATIC_FALSE
@@ -21141,6 +21140,9 @@ fi
 
 
 #
+FC=no
+export FC
+#
 #  ----------------------------------------------------------------------
 # Check large file support on 32 bit system
 # Check whether --enable-largefile was given.
@@ -25241,7 +25243,7 @@ fi
 
 
 #  ----------------------------------------------------------------------
-#  Create the CDI Fortran77 Interface via cfortran.h
+#  Create the Interface to Fortran77 routines via cfortran.h
 # Check whether --enable-fortran was given.
 if test "${enable_fortran+set}" = set; then :
   enableval=$enable_fortran; enable_fortran=${enableval}
@@ -25371,7 +25373,7 @@ fi ;; #(
   *) :
      ;;
 esac
-if test -n "$FC" -a X"$FC" != Xno -o -n "$F77" -a X"$F77" != Xno; then :
+if test -n "$F77" -a X"$F77" != Xno; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if C externals constructed with cfortran.h work" >&5
 $as_echo_n "checking if C externals constructed with cfortran.h work... " >&6; }
 if ${acx_cv_cfortran_works+:} false; then :
@@ -25577,12 +25579,12 @@ fi
 fi
 
 fi
- if test -n "$FC" -a X"$FC" != Xno -a x"$acx_cv_cfortran_works" = xyes; then
-  USE_FC_TRUE=
-  USE_FC_FALSE='#'
+ if test -n "$F77" -a X"$F77" != Xno -a x"$acx_cv_cfortran_works" = xyes; then
+  USE_F77_TRUE=
+  USE_F77_FALSE='#'
 else
-  USE_FC_TRUE='#'
-  USE_FC_FALSE=
+  USE_F77_TRUE='#'
+  USE_F77_FALSE=
 fi
 
 
@@ -25991,8 +25993,8 @@ if test -z "${ENABLE_HIRLAM_EXTENSIONS_TRUE}" && test -z "${ENABLE_HIRLAM_EXTENS
   as_fn_error $? "conditional \"ENABLE_HIRLAM_EXTENSIONS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${USE_FC_TRUE}" && test -z "${USE_FC_FALSE}"; then
-  as_fn_error $? "conditional \"USE_FC\" was never defined.
+if test -z "${USE_F77_TRUE}" && test -z "${USE_F77_FALSE}"; then
+  as_fn_error $? "conditional \"USE_F77\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BUILD_SSE42_TESTS_TRUE}" && test -z "${BUILD_SSE42_TESTS_FALSE}"; then

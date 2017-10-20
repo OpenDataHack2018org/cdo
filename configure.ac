@@ -50,6 +50,9 @@ AC_CHECK_TOOL([STRIP],[strip],[:])
 AC_CHECK_TOOL([RANLIB],[ranlib],[:])
 AC_PROG_INSTALL
 #
+FC=no
+export FC
+#
 #  ----------------------------------------------------------------------
 # Check large file support on 32 bit system
 AC_SYS_LARGEFILE
@@ -174,7 +177,7 @@ CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
 ACX_OPTIONS
 
 #  ----------------------------------------------------------------------
-#  Create the CDI Fortran77 Interface via cfortran.h
+#  Create the Interface to Fortran77 routines via cfortran.h
 AC_ARG_ENABLE([fortran],
               [AS_HELP_STRING([--disable-fortran],
                               [Omit building of Fortran routines])],
@@ -185,7 +188,7 @@ dnl Test whether cfortran.h works correctly
 dnl ######################################################################
 ACX_FIND_CFORTRAN_DEF
 ACX_XLF_QEXTNAME_ADD_APPENDUS
-AS_IF([test -n "$FC" -a X"$FC" != Xno -o -n "$F77" -a X"$F77" != Xno],
+AS_IF([test -n "$F77" -a X"$F77" != Xno],
   [ACX_CHECK_CFORTRAN([$srcdir/src],
     [AC_DEFINE([HAVE_CF_INTERFACE],[1],
        [Defined to 1 if C / Fortran interface cfortran.h works])],
@@ -200,7 +203,7 @@ AS_IF([test -n "$FC" -a X"$FC" != Xno -o -n "$F77" -a X"$F77" != Xno],
      AC_MSG_NOTICE([Disabling cfortran.h bindings generation])
      acx_cv_cfortran_works=no])])
 ])
-AM_CONDITIONAL([USE_FC],[test -n "$FC" -a X"$FC" != Xno -a x"$acx_cv_cfortran_works" = xyes])
+AM_CONDITIONAL([USE_F77],[test -n "$F77" -a X"$F77" != Xno -a x"$acx_cv_cfortran_works" = xyes])
 
 #  ----------------------------------------------------------------------
 
@@ -279,7 +282,7 @@ AM_CONDITIONAL(BUILD_AVX2_TESTS, test x$ac_have_as_avx2 = xyes)
 #  ----------------------------------------------------------------------
 AC_SUBST([CXXFLAGS])
 AC_SUBST([CPPFLAGS])
-AC_SUBST([FCFLAGS])
+AC_SUBST([FFLAGS])
 AC_SUBST([CLDFLAGS])
 AC_SUBST([CLIBS])
 #AC_SUBST([INCLUDES])

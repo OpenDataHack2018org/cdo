@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES =            \
-			   argument.h		\
-			   argument.cc		\
-			   array.h         \
+               argument.h		\
+               argument.cc		\
+               array.h         \
                array.cc         \
                cdo_int.h       \
                compare.h       \
@@ -26,8 +26,8 @@ libcdo_la_SOURCES =            \
                after_dvtrans.cc \
                after_vertint.cc \
                after_vertint.h \
-               after_namelist.cc\
-               afterburnerlib.cc\
+               after_namelist.cc \
+               afterburnerlib.cc \
                afterburner.h   \
                vct_l191.h      \
                calendar.h      \
@@ -42,8 +42,8 @@ libcdo_la_SOURCES =            \
                counter.h       \
                datetime.cc      \
                datetime.h      \
-			   cdoDebugOutput.cc\
-			   cdoDebugOutput.h\
+               cdoDebugOutput.cc \
+               cdoDebugOutput.h\
                dmemory.h       \
                ecacore.cc       \
                ecacore.h       \
@@ -430,7 +430,10 @@ cdo_SOURCES += Magplot.cc       \
 #endif
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
-cdo_LDADD    = libcdo.la $(top_builddir)/src/lib/ncl/libncl.la $(top_builddir)/libcdi/src/libcdi.la
+cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+if USE_F77
+cdo_LDADD   += $(top_builddir)/src/lib/ncl/libncl.la
+endif
 cdo_LDFLAGS  =
 
 if ENABLE_ALL_STATIC
