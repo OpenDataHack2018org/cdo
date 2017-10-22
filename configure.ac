@@ -167,7 +167,7 @@ AS_IF([test "x$enable_data" != 'xno'], [
   AC_DEFINE(ENABLE_DATA, [1], [Define to 1 for DATA support])
 ])
 AC_MSG_RESULT([$enable_data])
-AC_SUBST([ENABLE_DATA],[$enable_data])
+AS_IF([test x$enable_data = 'xno'],[AC_SUBST([ENABLE_DATA],[false])],[AC_SUBST([ENABLE_DATA],[true])])
 #  ----------------------------------------------------------------------
 CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
 CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
@@ -203,8 +203,10 @@ AS_IF([test -n "$F77" -a X"$F77" != Xno],
      AC_MSG_NOTICE([Disabling cfortran.h bindings generation])
      acx_cv_cfortran_works=no])])
 ])
+AS_IF([test x$enable_fortran = 'xno'],[AC_SUBST([ENABLE_FORTRAN],[false])],[AC_SUBST([ENABLE_FORTRAN],[true])])
+#
 AM_CONDITIONAL([USE_F77],[test -n "$F77" -a X"$F77" != Xno -a x"$acx_cv_cfortran_works" = xyes])
-
+AS_IF([test x$acx_cv_cfortran_works = 'xno'],[AC_SUBST([FORTRAN_WORKS],[no])],[AC_SUBST([FORTRAN_WORKS],[yes])])
 #  ----------------------------------------------------------------------
 
 # configure code from valgrind

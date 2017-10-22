@@ -626,8 +626,10 @@ BUILD_AVX_TESTS_FALSE
 BUILD_AVX_TESTS_TRUE
 BUILD_SSE42_TESTS_FALSE
 BUILD_SSE42_TESTS_TRUE
+FORTRAN_WORKS
 USE_F77_FALSE
 USE_F77_TRUE
+ENABLE_FORTRAN
 ENABLE_HIRLAM_EXTENSIONS_FALSE
 ENABLE_HIRLAM_EXTENSIONS_TRUE
 ENABLE_ALL_STATIC_FALSE
@@ -21961,8 +21963,13 @@ $as_echo "#define ENABLE_DATA 1" >>confdefs.h
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_data" >&5
 $as_echo "$enable_data" >&6; }
-ENABLE_DATA=$enable_data
+if test x$enable_data = 'xno'; then :
+  ENABLE_DATA=false
 
+else
+  ENABLE_DATA=true
+
+fi
 #  ----------------------------------------------------------------------
 CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
 CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
@@ -25579,6 +25586,14 @@ fi
 fi
 
 fi
+if test x$enable_fortran = 'xno'; then :
+  ENABLE_FORTRAN=false
+
+else
+  ENABLE_FORTRAN=true
+
+fi
+#
  if test -n "$F77" -a X"$F77" != Xno -a x"$acx_cv_cfortran_works" = xyes; then
   USE_F77_TRUE=
   USE_F77_FALSE='#'
@@ -25587,7 +25602,13 @@ else
   USE_F77_FALSE=
 fi
 
+if test x$acx_cv_cfortran_works = 'xno'; then :
+  FORTRAN_WORKS=no
 
+else
+  FORTRAN_WORKS=yes
+
+fi
 #  ----------------------------------------------------------------------
 
 # configure code from valgrind
