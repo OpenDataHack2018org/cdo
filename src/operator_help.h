@@ -5146,12 +5146,31 @@ std::vector<std::string> CMORliteHelp = {
     "    convert  STRING   Converts the units if necessary",
 };
 
+std::vector<std::string> NCL_windHelp = {
+    "NAME",
+    "    uv2dv_cfd - Wind transformation",
+    "",
+    "SYNOPSIS",
+    "    uv2dv_cfd[,u,v,boundOpt,outMode]  infile outfile",
+    "",
+    "DESCRIPTION",
+    "    This module contains CDO operators with an interface to NCL functions with the same name.  ",
+    "    Computes divergence for a latitude-longitude grid using centered finite differences.",
+    "    The grid need not be global and missing values are allowed.",
+    "",
+    "PARAMETER",
+    "    u         STRING   Name of variable u (default: u)",
+    "    v         STRING   Name of variable v (default: v)",
+    "    boundOpt  INTEGER  Boundary condition option (0-3) (default: 0/1 for cyclic grids)",
+    "    outMode   STRING   Output mode new/append (default: new)",
+};
+
 std::vector<std::string> CMORHelp = {
     "NAME",
     "    cmor - Climate Model Output Rewriting to produce CMIP-compliant data",
     "",
     "SYNOPSIS",
-    "    cmor,MIPtable[,cmor_name=VarList,[key=value,...]]  infile",
+    "    cmor,MIPtable[,cmor_name=VarList[,key=value[,...]]]  infile",
     "",
     "DESCRIPTION",
     "    ",

@@ -583,6 +583,10 @@ Operator catalog:
    Hurr          hurr            Hurricane days index per time period
    CMORlite      cmorlite        CMOR lite
 -------------------------------------------------------------
+   NCL
+-------------------------------------------------------------
+   NCL_wind      uv2dv_cfd       U and V wind to divergence
+-------------------------------------------------------------
    CMOR
 -------------------------------------------------------------
    CMOR          cmor            Climate Model Output Rewriting
