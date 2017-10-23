@@ -585,6 +585,7 @@ Operator catalog:
 -------------------------------------------------------------
    NCL
 -------------------------------------------------------------
+   NCL_wind      uv2vr_cfd       U and V wind to relative vorticity
    NCL_wind      uv2dv_cfd       U and V wind to divergence
 -------------------------------------------------------------
    CMOR

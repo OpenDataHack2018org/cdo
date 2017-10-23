@@ -1,5 +1,7 @@
 2017-10-23  Uwe Schulzweida
 
+	* Added operator uv2vr_cfd: U and V wind to relative vorticity (interface to NCL)
+	* Added operator uv2dv_cfd: U and V wind to divergence (interface to NCL)
 	* gengrid: bug fix
 
 2017-10-20  Uwe Schulzweida
