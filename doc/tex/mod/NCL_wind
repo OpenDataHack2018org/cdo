@@ -1,0 +1,36 @@
+@BeginModule
+@NewPage
+@Name      = NCL_wind
+@Title     = Wind transformation
+@Section   = NCL
+@Class     = NCL
+@Arguments = infile outfile
+@Operators = uv2dv_cfd
+
+@BeginDescription
+This module contains CDO operators with an interface to NCL functions with the same name.  
+@EndDescription
+@EndModule
+
+
+@BeginOperator_uv2dv_cfd
+@Title     = U and V wind to divergence
+@Parameter = [u v boundOpt outMode]
+
+@BeginDescription
+Computes divergence for a latitude-longitude grid using centered finite differences.
+The grid need not be global and missing values are allowed.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter boundOpt
+@Item = u
+STRING   Name of variable u (default: u)
+@Item = v
+STRING   Name of variable v (default: v)
+@Item = boundOpt
+INTEGER  Boundary condition option (0-3) (default: 0/1 for cyclic grids)
+@Item = outMode
+STRING   Output mode new/append (default: new)
+@EndParameter
