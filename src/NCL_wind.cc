@@ -128,7 +128,7 @@ void set_parameter(void)
 }
 
 
-void *NCL(void *argument)
+void *NCL_wind(void *argument)
 {
   int nrecs;
   int varID, levelID;

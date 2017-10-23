@@ -233,7 +233,7 @@ case "${HOSTNAME}" in
                     --with-fftw3 \
                     $CDOLIBS \
                     LDFLAGS="-Wl,-rpath,/sw/rhel6-x64/eccodes/eccodes-2.3.0-gcc48/lib" \
-                    F77=ifort FFLAGS="-g -O2" \
+                    F77=gfortran FFLAGS="-g -O2" \
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=core-avx2" \
 	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=core-avx2"
         elif  test "$COMP" = pgi ; then

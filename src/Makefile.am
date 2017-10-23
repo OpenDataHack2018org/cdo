@@ -295,7 +295,7 @@ cdo_SOURCES += Adisit.cc        \
                Monarith.cc      \
                Mrotuv.cc        \
                Mrotuvb.cc       \
-               NCL.cc           \
+               NCL_wind.cc      \
                Ninfo.cc         \
                Nmldump.cc       \
                Output.cc        \

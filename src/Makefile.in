@@ -214,8 +214,9 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) cdo-Merge.$(OBJEXT) \
 	cdo-Mergegrid.$(OBJEXT) cdo-Mergetime.$(OBJEXT) \
 	cdo-Merstat.$(OBJEXT) cdo-Monarith.$(OBJEXT) \
-	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) cdo-NCL.$(OBJEXT) \
-	cdo-Ninfo.$(OBJEXT) cdo-Nmldump.$(OBJEXT) cdo-Output.$(OBJEXT) \
+	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) \
+	cdo-NCL_wind.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
+	cdo-Nmldump.$(OBJEXT) cdo-Output.$(OBJEXT) \
 	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) \
 	cdo-Pardup.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
@@ -620,10 +621,10 @@ cdo_SOURCES = cdo.cc Adisit.cc Afterburner.cc Arith.cc Arithc.cc \
 	Inttime.cc Intyear.cc Invert.cc Invertlev.cc Isosurface.cc \
 	Log.cc MapReduce.cc Maskbox.cc Mastrfu.cc Math.cc Merge.cc \
 	Mergegrid.cc Mergetime.cc Merstat.cc Monarith.cc Mrotuv.cc \
-	Mrotuvb.cc NCL.cc Ninfo.cc Nmldump.cc Output.cc Outputgmt.cc \
-	Pack.cc Pardup.cc Pinfo.cc Pressure.cc Regres.cc Remap.cc \
-	Remapeta.cc Replace.cc Replacevalues.cc Rhopot.cc Rotuv.cc \
-	Runpctl.cc Runstat.cc Samplegrid.cc Samplegridicon.cc \
+	Mrotuvb.cc NCL_wind.cc Ninfo.cc Nmldump.cc Output.cc \
+	Outputgmt.cc Pack.cc Pardup.cc Pinfo.cc Pressure.cc Regres.cc \
+	Remap.cc Remapeta.cc Replace.cc Replacevalues.cc Rhopot.cc \
+	Rotuv.cc Runpctl.cc Runstat.cc Samplegrid.cc Samplegridicon.cc \
 	Seascount.cc Seaspctl.cc Seasstat.cc Selbox.cc Selgridcell.cc \
 	Select.cc Selmulti.cc Seloperator.cc Selrec.cc Seltime.cc \
 	Selvar.cc Set.cc Setattribute.cc Setbox.cc Setgatt.cc \
@@ -947,7 +948,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Monarith.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Mrotuv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Mrotuvb.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-NCL.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-NCL_wind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Ninfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Nmldump.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Output.Po@am__quote@
@@ -3278,19 +3279,19 @@ cdo-Mrotuvb.obj: Mrotuvb.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Mrotuvb.obj `if test -f 'Mrotuvb.cc'; then $(CYGPATH_W) 'Mrotuvb.cc'; else $(CYGPATH_W) '$(srcdir)/Mrotuvb.cc'; fi`
 
-cdo-NCL.o: NCL.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-NCL.o -MD -MP -MF $(DEPDIR)/cdo-NCL.Tpo -c -o cdo-NCL.o `test -f 'NCL.cc' || echo '$(srcdir)/'`NCL.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-NCL.Tpo $(DEPDIR)/cdo-NCL.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NCL.cc' object='cdo-NCL.o' libtool=no @AMDEPBACKSLASH@
+cdo-NCL_wind.o: NCL_wind.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-NCL_wind.o -MD -MP -MF $(DEPDIR)/cdo-NCL_wind.Tpo -c -o cdo-NCL_wind.o `test -f 'NCL_wind.cc' || echo '$(srcdir)/'`NCL_wind.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-NCL_wind.Tpo $(DEPDIR)/cdo-NCL_wind.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NCL_wind.cc' object='cdo-NCL_wind.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-NCL.o `test -f 'NCL.cc' || echo '$(srcdir)/'`NCL.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-NCL_wind.o `test -f 'NCL_wind.cc' || echo '$(srcdir)/'`NCL_wind.cc
 
-cdo-NCL.obj: NCL.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-NCL.obj -MD -MP -MF $(DEPDIR)/cdo-NCL.Tpo -c -o cdo-NCL.obj `if test -f 'NCL.cc'; then $(CYGPATH_W) 'NCL.cc'; else $(CYGPATH_W) '$(srcdir)/NCL.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-NCL.Tpo $(DEPDIR)/cdo-NCL.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NCL.cc' object='cdo-NCL.obj' libtool=no @AMDEPBACKSLASH@
+cdo-NCL_wind.obj: NCL_wind.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-NCL_wind.obj -MD -MP -MF $(DEPDIR)/cdo-NCL_wind.Tpo -c -o cdo-NCL_wind.obj `if test -f 'NCL_wind.cc'; then $(CYGPATH_W) 'NCL_wind.cc'; else $(CYGPATH_W) '$(srcdir)/NCL_wind.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-NCL_wind.Tpo $(DEPDIR)/cdo-NCL_wind.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NCL_wind.cc' object='cdo-NCL_wind.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-NCL.obj `if test -f 'NCL.cc'; then $(CYGPATH_W) 'NCL.cc'; else $(CYGPATH_W) '$(srcdir)/NCL.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-NCL_wind.obj `if test -f 'NCL_wind.cc'; then $(CYGPATH_W) 'NCL_wind.cc'; else $(CYGPATH_W) '$(srcdir)/NCL_wind.cc'; fi`
 
 cdo-Ninfo.o: Ninfo.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Ninfo.o -MD -MP -MF $(DEPDIR)/cdo-Ninfo.Tpo -c -o cdo-Ninfo.o `test -f 'Ninfo.cc' || echo '$(srcdir)/'`Ninfo.cc
