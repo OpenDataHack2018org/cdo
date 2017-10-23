@@ -55,6 +55,9 @@ void *Gengrid(void *argument)
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
   double *array3 = (double*) Malloc(gridsize*sizeof(double));
 
+  pstreamInqTimestep(streamID1, 0);
+  pstreamInqTimestep(streamID2, 0);
+
   pstreamInqRecord(streamID1, &varID, &levelID);
   pstreamReadRecord(streamID1, array1, &nmiss1);
   pstreamInqRecord(streamID2, &varID, &levelID);
