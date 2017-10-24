@@ -39,16 +39,16 @@
 
 
 static
-int genBoxGrid(int gridID1, int xinc, int yinc)
+int genBoxGrid(int gridID1, size_t xinc, size_t yinc)
 {
-  int i, j, i1;
+  size_t i, j, i1;
   int gridID2 = -1;
-  int nlon1 = 0, nlat1 = 0;
-  int gridsize2 = 0, nlon2 = 0, nlat2 = 0;
-  int x1, y1, x2, y2;
-  int use_x1, use_y1;
-  int corner, add, g2_add; 
-  int g1_add;
+  size_t nlon1 = 0, nlat1 = 0;
+  size_t gridsize2 = 0, nlon2 = 0, nlat2 = 0;
+  size_t x1, y1, x2, y2;
+  size_t use_x1, use_y1;
+  size_t g1_add, g2_add;
+  int corner, add; 
   int circular = gridIsCircular(gridID1) ;
   double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
   double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
@@ -57,7 +57,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
   double area_norm;  
 
   int gridtype  = gridInqType(gridID1);
-  int gridsize1 = gridInqSize(gridID1);
+  size_t gridsize1 = gridInqSize(gridID1);
 
   if ( xinc < 1 || yinc < 1 )
     cdoAbort("xinc and yinc must not be smaller than 1!");
@@ -330,7 +330,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 				  lon = grid1_corner_lon[add];
 				  lat = grid1_corner_lat[add]; 
 				  g1_add2 = g1_add-1;
-				  if ( g1_add-nlon1 < 0 ) 
+				  if ( g1_add < nlon1 ) 
 				    {
 				      cdoWarning("Can't find cell above lower right left");
 				      continue; 
@@ -365,7 +365,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 				  lon = grid1_corner_lon[add];
 				  lat = grid1_corner_lat[add]; 
 				  g1_add2 = g1_add+1;
-				  if ( g1_add-nlon1 < 0 ) 
+				  if ( g1_add < nlon1 ) 
 				    {
 				      cdoWarning("Can't find cell above lower right left");
 				      continue; 
@@ -446,7 +446,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 }
 
 static
-void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int statfunc)
+void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yinc, int statfunc)
 {
   bool useWeight = (field1->weight != NULL);
   /*
@@ -455,7 +455,7 @@ void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int
   progressInit();
   */
 
-  int gridsize = xinc*yinc;
+  size_t gridsize = xinc*yinc;
   field_type *field = (field_type*) Malloc(ompNumThreads*sizeof(field_type));
   for ( int i = 0; i < ompNumThreads; i++ )
     {
@@ -472,16 +472,16 @@ void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int
   double *array2 = field2->ptr;
   double missval = field1->missval;
 
-  int nlon1 = gridInqXsize(gridID1);
-  int nlat1 = gridInqYsize(gridID1);
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
 
-  int nlon2 = gridInqXsize(gridID2);
-  int nlat2 = gridInqYsize(gridID2);
+  size_t nlon2 = gridInqXsize(gridID2);
+  size_t nlat2 = gridInqYsize(gridID2);
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
-  for ( int ig = 0; ig < nlat2*nlon2; ++ig )
+  for ( size_t ig = 0; ig < nlat2*nlon2; ++ig )
     {
       int ompthID = cdo_omp_get_thread_num();
 
@@ -496,19 +496,19 @@ void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/nlat2*nlon2);
       */
-      int ilat = ig/nlon2;
-      int ilon = ig - ilat*nlon2;
+      size_t ilat = ig/nlon2;
+      size_t ilon = ig - ilat*nlon2;
 
-      int isize = 0;
+      size_t isize = 0;
       field[ompthID].nmiss = 0;
-      for ( int j = 0; j < yinc; ++j )
+      for ( size_t j = 0; j < yinc; ++j )
 	{
-	  int jj = ilat*yinc+j;
+	  size_t jj = ilat*yinc+j;
 	  if ( jj >= nlat1 ) break;
-	  for ( int i = 0; i < xinc; ++i )
+	  for ( size_t i = 0; i < xinc; ++i )
 	    {
-	      int ii = ilon*xinc+i;
-	      int index = jj*nlon1 + ii;
+	      size_t ii = ilon*xinc+i;
+	      size_t index = jj*nlon1 + ii;
 	      if ( ii >= nlon1 ) break;
 	      field[ompthID].ptr[isize] = array1[index];
 	      if ( useWeight ) field[ompthID].weight[isize] = field1->weight[index];
@@ -522,7 +522,7 @@ void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int
     }
   
   size_t nmiss = 0;
-  for ( int i = 0; i < nlat2*nlon2; i++ )
+  for ( size_t i = 0; i < nlat2*nlon2; i++ )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
   
   field2->nmiss = nmiss;
@@ -596,11 +596,11 @@ void *Gridboxstat(void *argument)
   field_init(&field1);
   field_init(&field2);
 
-  int gridsize1 = gridInqSize(gridID1);
+  size_t gridsize1 = gridInqSize(gridID1);
   field1.ptr    = (double*) Malloc(gridsize1*sizeof(double));
   field1.weight = needWeights ? (double*) Malloc(gridsize1*sizeof(double)) : NULL;
 
-  int gridsize2 = gridInqSize(gridID2);
+  size_t gridsize2 = gridInqSize(gridID2);
   field2.ptr    = (double*) Malloc(gridsize2*sizeof(double));
   field2.weight = NULL;
 
