@@ -202,18 +202,18 @@ double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const 
 
 static
 void intlinarr2(double missval, int lon_is_circular,
-		long nxm, long nym,  const double *restrict fieldm, const double *restrict xm, const double *restrict ym,
-		long gridsize2, double *field, const double *restrict x, const double *restrict y)
+		size_t nxm, size_t nym,  const double *restrict fieldm, const double *restrict xm, const double *restrict ym,
+		size_t gridsize2, double *field, const double *restrict x, const double *restrict y)
 {
-  long nlon1 = nxm;
+  size_t nlon1 = nxm;
   double findex = 0;
 
   if ( lon_is_circular ) nlon1--;
-  long gridsize1 = nlon1*nym;
+  size_t gridsize1 = nlon1*nym;
 
   bool *grid1_mask = (bool*) Malloc(gridsize1*sizeof(bool));
-  for ( long jj = 0; jj < nym; ++jj )
-    for ( long ii = 0; ii < nlon1; ++ii )
+  for ( size_t jj = 0; jj < nym; ++jj )
+    for ( size_t ii = 0; ii < nlon1; ++ii )
       grid1_mask[jj*nlon1+ii] = !DBL_IS_EQUAL(fieldm[jj*nlon1+ii], missval);
 
   progressInit();
@@ -222,7 +222,7 @@ void intlinarr2(double missval, int lon_is_circular,
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask)
 #endif
-  for ( int i = 0; i < gridsize2; ++i )
+  for ( size_t i = 0; i < gridsize2; ++i )
     {
       int src_add[4];                /*  address for the four source points    */
       int lprogress = 1;
@@ -241,7 +241,7 @@ void intlinarr2(double missval, int lon_is_circular,
 
       if ( lfound )
 	{
-	  long iix = ii;
+	  size_t iix = ii;
 	  if ( lon_is_circular && iix == (nxm-1) ) iix = 0;
 	  src_add[0] = (jj-1)*nlon1+(ii-1);
 	  src_add[1] = (jj-1)*nlon1+(iix);
@@ -325,8 +325,8 @@ void intgridbil(field_type *field1, field_type *field2)
   double *array2 = field2->ptr;
   double missval = field1->missval;
 
-  int nlon1 = gridInqXsize(gridID1);
-  int nlat1 = gridInqYsize(gridID1);
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
 
   int lon_is_circular = 0;
   
@@ -334,7 +334,7 @@ void intgridbil(field_type *field1, field_type *field2)
   if ( grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2) ) lgeorefgrid = false;
 
   double **array1_2D = (double **) Malloc(nlat1*sizeof(double *));
-  for ( int ilat = 0; ilat < nlat1; ilat++ )
+  for ( size_t ilat = 0; ilat < nlat1; ilat++ )
     array1_2D[ilat] = array1 + ilat*nlon1;
 
   if ( lgeorefgrid )
@@ -364,8 +364,8 @@ void intgridbil(field_type *field1, field_type *field2)
       if ( lon_is_circular ) lon1[nlon1-1] = lon1[0] + 2*M_PI;
     }
   
-  int xsize2 = gridInqXsize(gridID2);
-  int ysize2 = gridInqYsize(gridID2);
+  size_t xsize2 = gridInqXsize(gridID2);
+  size_t ysize2 = gridInqYsize(gridID2);
 
   if ( xsize2 == 1 && ysize2 == 1 )
     {
@@ -387,7 +387,7 @@ void intgridbil(field_type *field1, field_type *field2)
 	  lon1 = (double*) Realloc(lon1, (nlon1+1)*sizeof(double));
 	  double *array = (double*) Malloc(nlat1*(nlon1+1)*sizeof(double));
 
-	  for ( int ilat = 0; ilat < nlat1; ilat++ )
+	  for ( size_t ilat = 0; ilat < nlat1; ilat++ )
 	    {
 	      array1_2D[ilat] = array + ilat*(nlon1+1);  
 	      memcpy(array1_2D[ilat], field[ilat], nlon1*sizeof(double));
@@ -424,7 +424,7 @@ void intgridbil(field_type *field1, field_type *field2)
             cdoAbort("Target grid has no coordinate values!");
         }
       
-      int gridsize2 = gridInqSize(gridID2);
+      size_t gridsize2 = gridInqSize(gridID2);
 
       double *xvals2 = (double*) Malloc(gridsize2*sizeof(double));
       double *yvals2 = (double*) Malloc(gridsize2*sizeof(double));
@@ -439,7 +439,7 @@ void intgridbil(field_type *field1, field_type *field2)
           grid_to_radian(xunits, gridsize2, xvals2, "grid2 center lon"); 
           grid_to_radian(xunits, gridsize2, yvals2, "grid2 center lat"); 
 
-          for ( int i = 0; i < gridsize2; ++i )
+          for ( size_t i = 0; i < gridsize2; ++i )
             {
               if ( xvals2[i] < lon1[0]       ) xvals2[i] += 2*M_PI;
               if ( xvals2[i] > lon1[nlon1-1] ) xvals2[i] -= 2*M_PI;
@@ -453,8 +453,8 @@ void intgridbil(field_type *field1, field_type *field2)
           gridInqXvals(gridID2, xcoord);
           gridInqYvals(gridID2, ycoord);
   
-          for ( int j = 0; j < ysize2; ++j )
-            for ( int i = 0; i < xsize2; ++i )
+          for ( size_t j = 0; j < ysize2; ++j )
+            for ( size_t i = 0; i < xsize2; ++i )
               {
                 xvals2[j*xsize2+i] = xcoord[i]; 
                 yvals2[j*xsize2+i] = ycoord[j]; 
@@ -469,7 +469,7 @@ void intgridbil(field_type *field1, field_type *field2)
 		 gridsize2, array2, xvals2, yvals2);
 
       size_t nmiss = 0;
-      for ( int i = 0; i < gridsize2; ++i )
+      for ( size_t i = 0; i < gridsize2; ++i )
 	if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
       field2->nmiss = nmiss;
