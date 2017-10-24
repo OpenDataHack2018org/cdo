@@ -224,7 +224,7 @@ void intlinarr2(double missval, int lon_is_circular,
 #endif
   for ( size_t i = 0; i < gridsize2; ++i )
     {
-      int src_add[4];                /*  address for the four source points    */
+      size_t src_add[4];                /*  address for the four source points    */
       int lprogress = 1;
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
 
