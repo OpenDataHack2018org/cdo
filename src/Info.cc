@@ -304,7 +304,7 @@ void *Info(void *argument)
 
       infostat_type *infostat = (infostat_type*) Malloc(nvars*sizeof(infostat_type));
                   
-      int gridsizemax = vlistGridsizeMax(vlistID);
+      size_t gridsizemax = vlistGridsizeMax(vlistID);
       if ( vlistNumber(vlistID) != CDI_REAL ) gridsizemax *= 2;
 
       double *array = (double*) Malloc(gridsizemax*sizeof(double));
@@ -350,7 +350,7 @@ void *Info(void *argument)
 	      int gridID   = vlistInqVarGrid(vlistID, varID);
 	      int zaxisID  = vlistInqVarZaxis(vlistID, varID);
 	      int number   = vlistInqVarNumber(vlistID, varID);
-	      long gridsize = gridInqSize(gridID);
+	      size_t gridsize = gridInqSize(gridID);
               size_t nlevs  = zaxisInqSize(zaxisID);
 	      double level = cdoZaxisInqLevel(zaxisID, levelID);
 	      double missval = vlistInqVarMissval(vlistID, varID);
@@ -387,7 +387,7 @@ void *Info(void *argument)
                   else
                     fprintf(stdout, "%7g ", level);
                  
-                  fprintf(stdout, "%8ld %7zu ", gridsize, infostatp->nmiss);
+                  fprintf(stdout, "%8zu %7zu ", gridsize, infostatp->nmiss);
 		
                   set_text_color(stdout, RESET, BLACK);
                   fprintf(stdout, ":");
@@ -403,7 +403,7 @@ void *Info(void *argument)
                   if ( infostatp->nmiss > 0 )
                     {
                       size_t nvals   = 0;
-                      for ( long i = 0; i < gridsize; ++i )
+                      for ( size_t i = 0; i < gridsize; ++i )
                         {
                           if ( !DBL_IS_EQUAL(array[i], missval) )
                             {
@@ -453,7 +453,7 @@ void *Info(void *argument)
               else
                 {
                   size_t nvals = 0;		      
-                  for ( long i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     {
                       if ( !DBL_IS_EQUAL(array[i*2],   missval) && 
                            !DBL_IS_EQUAL(array[i*2+1], missval) )
@@ -511,8 +511,8 @@ void *Info(void *argument)
 
 	      if ( operatorID == MAP )
 		{		  
-		  int nlon = gridInqXsize(gridID);
-		  int nlat = gridInqYsize(gridID);
+		  size_t nlon = gridInqXsize(gridID);
+		  size_t nlat = gridInqYsize(gridID);
 
 		  if ( gridInqType(gridID) == GRID_GAUSSIAN    ||
 		       gridInqType(gridID) == GRID_LONLAT      ||
