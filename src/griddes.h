@@ -30,9 +30,9 @@ typedef struct {
   int    *rowlon;
   bool    genBounds;
   int     nvertex;
-  long    size;
-  int     xsize;
-  int     ysize;
+  size_t  size;
+  size_t  xsize;
+  size_t  ysize;
   int     np;
   int     lcomplex;
   bool    def_xfirst;
