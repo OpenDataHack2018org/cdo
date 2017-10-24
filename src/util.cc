@@ -15,22 +15,23 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 
-#if defined(HAVE_FNMATCH_H)
+#ifdef  HAVE_FNMATCH_H
 #include <fnmatch.h>
 #endif
 
 
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>   /* tolower */
+#include <ctype.h>    /* tolower  */
+#include <inttypes.h> /* intmax_t */
 
 #include "cdi.h"
 #include "cdo.h"
@@ -39,7 +40,7 @@
 #include "util.h"
 
 
-#if ! defined(VERSION)
+#ifndef  VERSION
 #define  VERSION  "0.0.1"
 #endif
  
@@ -400,6 +401,18 @@ int parameter2int(const char *string)
 {
   char *endptr = NULL;
   int ival = (int) strtol(string, &endptr, 10);
+  if ( *endptr != 0 )
+    cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
+	     string, (int)(endptr-string+1));
+
+  return ival;
+}
+
+
+size_t parameter2sizet(const char *string)
+{
+  char *endptr = NULL;
+  size_t ival = (size_t) strtoimax(string, &endptr, 10);
   if ( *endptr != 0 )
     cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));

@@ -139,18 +139,18 @@ void grid_print_attributes(FILE *fp, int gridID)
 static
 void grid_print_kernel(int gridID, int opt, FILE *fp)
 {
-  int xdim, ydim;
+  size_t xdim, ydim;
   char attstr[CDI_MAX_NAME];
   char attstr2[CDI_MAX_NAME];
-  size_t nxvals = (size_t) gridInqXvals(gridID, NULL);
-  size_t nyvals = (size_t) gridInqYvals(gridID, NULL);
+  size_t nxvals = gridInqXvals(gridID, NULL);
+  size_t nyvals = gridInqYvals(gridID, NULL);
   size_t nxbounds = (size_t) gridInqXbounds(gridID, NULL);
   size_t nybounds = (size_t) gridInqYbounds(gridID, NULL);
 
+  size_t gridsize = gridInqSize(gridID);
+  size_t xsize    = gridInqXsize(gridID);
+  size_t ysize    = gridInqYsize(gridID);
   int type     = gridInqType(gridID);
-  int gridsize = gridInqSize(gridID);
-  int xsize    = gridInqXsize(gridID);
-  int ysize    = gridInqYsize(gridID);
   int nvertex  = gridInqNvertex(gridID);
   int prec     = gridInqDatatype(gridID);
   int xstrlen  = gridInqXIsc(gridID);
@@ -159,35 +159,35 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
   char **xcvals = NULL;
   if ( xstrlen )
     {
-      xcvals = (char **) Malloc(xsize * sizeof(char *));
-      for ( int i = 0; i < xsize; i++ ) xcvals[i] = (char*) Malloc((xstrlen+1) * sizeof(char));
+      xcvals = (char **) Malloc(xsize*sizeof(char *));
+      for ( size_t i = 0; i < xsize; i++ ) xcvals[i] = (char*) Malloc((xstrlen+1)*sizeof(char));
       gridInqXCvals(gridID, xcvals);
-      for ( int i = 0; i < xsize; i++ ) xcvals[i][xstrlen] = 0;
-      for ( int i = 0; i < xsize; i++ ) 
+      for ( size_t i = 0; i < xsize; i++ ) xcvals[i][xstrlen] = 0;
+      for ( size_t i = 0; i < xsize; i++ ) 
         for ( int k = xstrlen-1; k; k-- ) if ( xcvals[i][k] == ' ' ) xcvals[i][k] = 0; else break;
     }
 
   char **ycvals = NULL;
   if ( ystrlen )
     {
-      ycvals = (char **) Malloc(ysize * sizeof(char *));
-      for ( int i = 0; i < ysize; i++ ) ycvals[i] = (char*) Malloc((ystrlen+1) * sizeof(char));
+      ycvals = (char **) Malloc(ysize*sizeof(char *));
+      for ( size_t i = 0; i < ysize; i++ ) ycvals[i] = (char*) Malloc((ystrlen+1)*sizeof(char));
       gridInqYCvals(gridID, ycvals);
-      for ( int i = 0; i < ysize; i++ ) ycvals[i][ystrlen] = 0;
-      for ( int i = 0; i < ysize; i++ ) 
+      for ( size_t i = 0; i < ysize; i++ ) ycvals[i][ystrlen] = 0;
+      for ( size_t i = 0; i < ysize; i++ ) 
         for ( int k = ystrlen-1; k; k-- ) if ( ycvals[i][k] == ' ' ) ycvals[i][k] = 0; else break;
     }
 
   int dig = (prec == CDI_DATATYPE_FLT64) ? CDO_dbl_digits : CDO_flt_digits;
 
-  fprintf(fp, "gridtype  = %s\n" "gridsize  = %d\n", gridNamePtr(type), gridsize);
+  fprintf(fp, "gridtype  = %s\n" "gridsize  = %zu\n", gridNamePtr(type), gridsize);
 
   if ( type != GRID_GME )
     {
       if ( type != GRID_UNSTRUCTURED && type != GRID_SPECTRAL && type != GRID_FOURIER )
         {
-          if ( xsize > 0 ) fprintf(fp, "xsize     = %d\n", xsize);
-          if ( ysize > 0 ) fprintf(fp, "ysize     = %d\n", ysize);
+          if ( xsize > 0 ) fprintf(fp, "xsize     = %zu\n", xsize);
+          if ( ysize > 0 ) fprintf(fp, "ysize     = %zu\n", ysize);
         }
 
       if ( nxvals > 0 || xcvals )
@@ -312,11 +312,11 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
               fprintf(fp, "x%ss  = \"%.*s\"", attstr, xstrlen, xcvals[0]);
             else
               fprintf(fp, "xstrings  = \"%.*s\"", xstrlen, xcvals[0]);
-            for ( int i = 1; i < xsize; i++ )
+            for ( size_t i = 1; i < xsize; i++ )
               fprintf(fp, ", \"%.*s\"", xstrlen, xcvals[i]);
             fprintf(fp, "\n");
 
-            for ( int i = 0; i < xsize; i++ ) Free(xcvals[i]);
+            for ( size_t i = 0; i < xsize; i++ ) Free(xcvals[i]);
             Free(xcvals);
           }
 
@@ -362,11 +362,11 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
               fprintf(fp, "x%ss  = \"%.*s\"", attstr, ystrlen, ycvals[0]);
             else
               fprintf(fp, "ystrings  = \"%.*s\"", ystrlen, ycvals[0]);
-            for ( int i = 1; i < ysize; i++ )
+            for ( size_t i = 1; i < ysize; i++ )
               fprintf(fp, ", \"%.*s\"", ystrlen, ycvals[i]);
             fprintf(fp, "\n");
 
-            for ( int i = 0; i < ysize; i++ ) Free(ycvals[i]);
+            for ( size_t i = 0; i < ysize; i++ ) Free(ycvals[i]);
             Free(ycvals);
           }
 

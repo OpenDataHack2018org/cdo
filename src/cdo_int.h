@@ -15,11 +15,11 @@
   GNU General Public License for more details.
 */
 
-#ifndef _CDO_INT_H
-#define _CDO_INT_H
+#ifndef  CDO_INT_H
+#define  CDO_INT_H
 
-#if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#ifdef  HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -163,6 +163,7 @@ const char *parameter2word(const char *string);
 double parameter2double(const char *string);
 bool   parameter2bool(const char *string);
 int    parameter2int(const char *string);
+size_t parameter2sizet(const char *string);
 int    parameter2intlist(const char *string);
 
 int referenceToGrid(int gridID1);
@@ -204,4 +205,4 @@ int  vlistCompareX(int vlistID1, int vlistID2, int flag);
 }
 #endif
 
-#endif  /* _CDO_INT_H */
+#endif  /* CDO_INT_H */
