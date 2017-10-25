@@ -89,35 +89,38 @@ void *Compc(void *argument)
 
 	  bool rc_is_missval = DBL_IS_EQUAL(rc, missval);
 
+          int datatype = vlistInqVarDatatype(vlistID1, varID);
+          double rcv = (datatype == CDI_DATATYPE_FLT32) ? (float)rc : rc;
+
 	  if ( operatorID == EQC )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : DBL_IS_EQUAL(array1[i], rc);
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : DBL_IS_EQUAL(array1[i], rcv);
 	    }
 	  else if ( operatorID == NEC )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : !DBL_IS_EQUAL(array1[i], rc);
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : !DBL_IS_EQUAL(array1[i], rcv);
 	    }
 	  else if ( operatorID == LEC )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] <= rc;
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] <= rcv;
 	    }
 	  else if ( operatorID == LTC )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] < rc;
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] < rcv;
 	    }
 	  else if ( operatorID == GEC )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] >= rc;
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] >= rcv;
 	    }
 	  else if ( operatorID == GTC )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] > rc;
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] > rcv;
 	    }
 	  else
 	    {
