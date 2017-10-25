@@ -1502,6 +1502,7 @@ std::vector<std::string> ExprHelp = {
     "    abs(x)  "    "    Absolute value of x",
     "    floor(x)"    "    Round to largest integral value not greater than x",
     "    ceil(x) "    "    Round to smallest integral value not less than x",
+    "    float(x)"    "    32-bit float value of x",
     "    int(x)  "    "    Integer value of x",
     "    nint(x) "    "    Nearest integer value of x",
     "    sqr(x)  "    "    Square of x",

@@ -58,6 +58,7 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 #define MVCOMPAND(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPAND(x,y))
 #define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
 
+static double f_float(double x)        { return (float)(x); }
 static double f_int(double x)          { return (int)(x); }
 static double f_nint(double x)         { return round(x); }
 static double f_sqr(double x)          { return x*x;      }
@@ -101,6 +102,7 @@ static func_t fun_sym_tbl[] =
   {FT_STD, 0, "acosh", (double (*)()) (double (*)(double)) acosh},
   {FT_STD, 0, "atanh", (double (*)()) (double (*)(double)) atanh},
   {FT_STD, 0, "gamma", (double (*)()) (double (*)(double)) tgamma},
+  {FT_STD, 0, "float", (double (*)()) f_float},
   {FT_STD, 0, "int",   (double (*)()) f_int},
   {FT_STD, 0, "nint",  (double (*)()) f_nint},
   {FT_STD, 0, "sqr",   (double (*)()) f_sqr},
