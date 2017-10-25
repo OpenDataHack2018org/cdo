@@ -104,6 +104,7 @@ paramType *params_new(int vlistID)
     {
       int gridID     = vlistInqVarGrid(vlistID, varID);
       int zaxisID    = vlistInqVarZaxis(vlistID, varID);
+      int datatype   = vlistInqVarDatatype(vlistID, varID);
       int steptype   = vlistInqVarTimetype(vlistID, varID);
       int ngp        = gridInqSize(gridID);
       int nlev       = zaxisInqSize(zaxisID);
@@ -119,6 +120,7 @@ paramType *params_new(int vlistID)
       params[varID].coord    = 0;
       params[varID].gridID   = gridID;
       params[varID].zaxisID  = zaxisID;
+      params[varID].datatype = datatype;
       params[varID].steptype = steptype;
       params[varID].ngp      = ngp;
       params[varID].nlev     = nlev;
@@ -217,7 +219,7 @@ int params_add_ts(parse_param_t *parse_arg)
       params[varID].steptype = TIME_VARYING;
       params[varID].ngp      = 1;
       params[varID].nlev     = 1;
-      
+
       parse_arg->nparams++;
     }
 

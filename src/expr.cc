@@ -191,6 +191,7 @@ void param_meta_copy(paramType *out, paramType *in)
 {
   out->gridID   = in->gridID;
   out->zaxisID  = in->zaxisID;
+  out->datatype = in->datatype;
   out->steptype = in->steptype;
   out->ngp      = in->ngp;
   out->nlev     = in->nlev;
@@ -452,6 +453,7 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
   size_t ngp   = p2->param.ngp;
   size_t nlev  = p2->param.nlev;
   size_t nmiss = p2->param.nmiss;
+  int datatype = p2->param.datatype;
   double missval1 = p2->param.missval;
   double missval2 = p2->param.missval;
 
@@ -471,6 +473,7 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
       double *restrict odat = p->param.data;
       const double *restrict idat = p2->param.data;
       double cval = p1->u.con.value;
+      if ( datatype == CDI_DATATYPE_FLT32 ) cval = (float) cval;
 
       oper_expr_con_var(oper, nmiss>0, n, missval1, missval2, odat, cval, idat);
 
@@ -490,6 +493,7 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
   size_t ngp   = p1->param.ngp;
   size_t nlev  = p1->param.nlev;
   size_t nmiss = p1->param.nmiss;
+  int datatype = p1->param.datatype;
   double missval1 = p1->param.missval;
   double missval2 = p1->param.missval;
 
@@ -509,6 +513,7 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
       double *restrict odat = p->param.data;
       const double *restrict idat = p1->param.data;
       double cval = p2->u.con.value;
+      if ( datatype == CDI_DATATYPE_FLT32 ) cval = (float) cval;
 
       oper_expr_var_con(oper, nmiss>0, n, missval1, missval2, odat, idat, cval);
 
