@@ -781,7 +781,7 @@ void *Remap(void *argument)
   size_t gridsize, gridsize2;
   int gridID1 = -1, gridID2;
   size_t nmiss1, nmiss2;
-  size_t i, j;
+  size_t j;
   int r = -1;
   int nremaps = 0;
   int norm_opt = NORM_OPT_NONE;
@@ -906,15 +906,13 @@ void *Remap(void *argument)
 
   if ( lremapxxx )
     {
-      size_t gridsize2;
-
       read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &submap_type, &num_neighbors,
 		       &remap_order, &remaps[0].src_grid, &remaps[0].tgt_grid, &remaps[0].vars);
 
       if ( remaps[0].vars.links_per_value == 0 ) links_per_value(&remaps[0].vars);
             
       nremaps = 1;
-      gridsize = remaps[0].src_grid.size;
+      size_t gridsize = remaps[0].src_grid.size;
       remaps[0].gridID   = gridID1;
       remaps[0].gridsize = gridInqSize(gridID1);
 
@@ -934,7 +932,7 @@ void *Remap(void *argument)
 
       if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].src_grid.size;
 
-      for ( i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
         if ( remaps[0].src_grid.mask[i] == FALSE )
           remaps[0].nmiss++;
 
@@ -1064,7 +1062,7 @@ void *Remap(void *argument)
 	      nmiss1 += 4*(nx+2) + 4*(ny+2);
 	    }
 
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
             imask[i] = DBL_IS_EQUAL(array1[i], missval) ? FALSE : TRUE;
 
 	  for ( r = nremaps-1; r >= 0; r-- )
@@ -1152,7 +1150,7 @@ void *Remap(void *argument)
 	      if ( gridInqType(gridID1) == GRID_GME )
 		{
 		  j = 0;
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( remaps[r].src_grid.vgpm[i] ) imask[j++] = imask[i];
 		}
 
@@ -1196,7 +1194,7 @@ void *Remap(void *argument)
 	  if ( gridInqType(gridID1) == GRID_GME )
 	    {
 	      j = 0;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( remaps[r].src_grid.vgpm[i] ) array1[j++] = array1[i];
 	    }
 	  
@@ -1243,16 +1241,16 @@ void *Remap(void *argument)
 
 	  if ( operfunc == REMAPSUM )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		printf("1 %zd %g %g %g %g\n", i, array1[i], remaps[r].src_grid.cell_frac[i], remaps[r].src_grid.cell_area[i],remaps[r].src_grid.cell_frac[i]);
 	      double array1sum = 0;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array1sum += remaps[r].src_grid.cell_area[i];
 
-	      for ( i = 0; i < gridsize2; i++ )
+	      for ( size_t i = 0; i < gridsize2; i++ )
 		printf("2 %zd %g %g %g %g\n", i, array2[i], remaps[r].tgt_grid.cell_frac[i],remaps[r].tgt_grid.cell_area[i],remaps[r].tgt_grid.cell_frac[i]);
 	      double array2sum = 0;
-	      for ( i = 0; i < gridsize2; i++ )
+	      for ( size_t i = 0; i < gridsize2; i++ )
 		array2sum += remaps[r].tgt_grid.cell_area[i];
 
 	      printf("array1sum %g, array2sum %g\n", array1sum, array2sum);
@@ -1275,14 +1273,14 @@ void *Remap(void *argument)
  	      gridInqParamGME(gridID2, &nd, &ni, &ni2, &ni3);
 	      j = remaps[r].tgt_grid.size;
 
-	      for ( i = gridsize2; i > 0 ; i-- )
+	      for ( size_t i = gridsize2; i > 0 ; i-- )
 		if ( remaps[r].tgt_grid.vgpm[i-1] ) array2[i-1] = array2[--j];
 
 	      gme_grid_restore(array2, ni, nd);
 	    }
 
 	  nmiss2 = 0;
-	  for ( i = 0; i < gridsize2; i++ )
+	  for ( size_t i = 0; i < gridsize2; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss2++;
 
 	SKIPVAR:
