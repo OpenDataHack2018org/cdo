@@ -37,10 +37,7 @@ void *Compc(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  size_t nmiss, nmiss2;
-  int i;
-  double missval;
-  int rc_is_missval;
+  size_t nmiss;
 
   cdoInitialize(argument);
 
@@ -67,10 +64,10 @@ void *Compc(void *argument)
 
   nospec(vlistID1);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
+  double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -87,39 +84,39 @@ void *Compc(void *argument)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  double missval  = vlistInqVarMissval(vlistID1, varID);
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  rc_is_missval = DBL_IS_EQUAL(rc, missval);
+	  bool rc_is_missval = DBL_IS_EQUAL(rc, missval);
 
 	  if ( operatorID == EQC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : DBL_IS_EQUAL(array1[i], rc);
 	    }
 	  else if ( operatorID == NEC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : !DBL_IS_EQUAL(array1[i], rc);
 	    }
 	  else if ( operatorID == LEC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] <= rc;
 	    }
 	  else if ( operatorID == LTC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] < rc;
 	    }
 	  else if ( operatorID == GEC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] >= rc;
 	    }
 	  else if ( operatorID == GTC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] > rc;
 	    }
 	  else
@@ -127,8 +124,8 @@ void *Compc(void *argument)
 	      cdoAbort("Operator not implemented!");
 	    }
 
-	  nmiss2 = 0;
-	  for ( i = 0; i < gridsize; i++ )
+          size_t nmiss2 = 0;
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss2++;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
