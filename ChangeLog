@@ -1,6 +1,7 @@
 2017-10-25  Uwe Schulzweida
 
 	* Condc: convert parameter const to float for 32-bit float data (bug fix)
+	* Cond: convert data to float for 32-bit float data (bug fix)
 
 2017-10-23  Uwe Schulzweida
 

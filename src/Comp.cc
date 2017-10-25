@@ -225,6 +225,22 @@ void *Comp(void *argument)
 
 	  size_t gridsize = gridsize1;
 
+          int datatype1 = vlistInqVarDatatype(vlistIDx1, varID);
+          int datatype2 = vlistInqVarDatatype(vlistIDx2, varID);
+          if ( datatype1 != datatype2 )
+            {
+              if ( datatype1 == CDI_DATATYPE_FLT32 && datatype2 == CDI_DATATYPE_FLT64 )
+                {
+                  missval2 = (float) missval2;
+                  for ( size_t i = 0; i < gridsize; i++ ) array2[i] = (float) array2[i];
+                }
+              else if ( datatype1 == CDI_DATATYPE_FLT64 && datatype2 == CDI_DATATYPE_FLT32 )
+                {
+                  missval1 = (float) missval1;
+                  for ( size_t i = 0; i < gridsize; i++ ) array1[i] = (float) array1[i];
+                }
+            }
+
 	  if ( operatorID == EQ )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ )
