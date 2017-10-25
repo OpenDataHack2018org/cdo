@@ -7,6 +7,7 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout$$
 CDOERR=cerr$$
 FORMAT="-f srv -b 32"
+ABSLIMMAX=0.001
 #
 IFILE=$DATAPATH/pl_data
 NTEST=1
@@ -38,7 +39,7 @@ function testfunc()
       $CDOCOMMAND
       test $? -eq 0 || let RSTAT+=1
 
-      $CDO diff $RFILE $OFILE > $CDOOUT 2> $CDOERR
+      $CDO diff,$ABSLIMMAX $RFILE $OFILE > $CDOOUT 2> $CDOERR
       test $? -eq 0 || let RSTAT+=1
       test -s $CDOOUT && let RSTAT+=1
       cat $CDOOUT $CDOERR
