@@ -103,11 +103,11 @@ void *Comp(void *argument)
   nospec(vlistID1);
   nospec(vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistIDx1);
+  size_t gridsizemax = vlistGridsizeMax(vlistIDx1);
 
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
-  double *array3 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
+  double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
+  double *array3 = (double*) Malloc(gridsizemax*sizeof(double));
 
   double *arrayx1 = array1;
   double *arrayx2 = array2;
@@ -140,7 +140,7 @@ void *Comp(void *argument)
 	  vardata = (double **) Malloc(nvars*sizeof(double *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+	      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
 	      vardata[varID] = (double*) Malloc(nlev*gridsize*sizeof(double));
 	    }
@@ -194,15 +194,15 @@ void *Comp(void *argument)
 
 	      if ( filltype == FILL_TS )
 		{
-		  int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-		  int offset = gridsize*levelID;
+		  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+		  size_t offset = gridsize*levelID;
 		  memcpy(vardata[varID]+offset, arrayx2, gridsize*sizeof(double));
 		}
 	    }
 	  else if ( filltype == FILL_TS )
 	    {
-	      int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-	      int offset = gridsize*levelID;
+	      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+	      size_t offset = gridsize*levelID;
 	      memcpy(arrayx2, vardata[varID]+offset, gridsize*sizeof(double));
 	    }
 
@@ -220,44 +220,44 @@ void *Comp(void *argument)
 	      *missvalx2 = vlistInqVarMissval(vlistIDx2, varID);
 	    }
 
-	  if ( gridsize1 != gridsize2 ) cdoAbort("Streams have different gridsize (gridsize1 = %d; gridsize2 = %d!",
+	  if ( gridsize1 != gridsize2 ) cdoAbort("Streams have different gridsize (gridsize1 = %zu; gridsize2 = %zu!",
 						 gridsize1, gridsize2);
 
-	  gridsize = gridsize1;
+	  size_t gridsize = gridsize1;
 
 	  if ( operatorID == EQ )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
-			     missval1 : DBL_IS_EQUAL(array1[i], array2[i]));
+			     missval1 : IS_EQUAL(array1[i], array2[i]));
 	    }
 	  else if ( operatorID == NE )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
-			     missval1 : !DBL_IS_EQUAL(array1[i], array2[i]));
+			     missval1 : IS_NOT_EQUAL(array1[i], array2[i]));
 	    }
 	  else if ( operatorID == LE )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] <= array2[i]);
 	    }
 	  else if ( operatorID == LT )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] < array2[i]);
 	    }
 	  else if ( operatorID == GE )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] >= array2[i]);
 	    }
 	  else if ( operatorID == GT )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] > array2[i]);
 	    }
@@ -267,7 +267,7 @@ void *Comp(void *argument)
 	    }
 
 	  size_t nmiss3 = 0;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array3[i], missval1) ) nmiss3++;
 
 	  pstreamDefRecord(streamID3, varID, levelID);
