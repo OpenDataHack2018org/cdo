@@ -187,6 +187,12 @@ int get_funcID(const char *fun)
 }
 
 static
+bool isCompare(int oper)
+{
+  return oper==LEG||oper==GE||oper==LE||oper==EQ||oper==NE||oper==GT||oper==LT;
+}
+
+static
 void param_meta_copy(paramType *out, paramType *in)
 {
   out->gridID   = in->gridID;
@@ -473,7 +479,7 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
       double *restrict odat = p->param.data;
       const double *restrict idat = p2->param.data;
       double cval = p1->u.con.value;
-      if ( datatype == CDI_DATATYPE_FLT32 ) cval = (float) cval;
+      if ( datatype == CDI_DATATYPE_FLT32 && isCompare(oper) ) cval = (float) cval;
 
       oper_expr_con_var(oper, nmiss>0, n, missval1, missval2, odat, cval, idat);
 
@@ -513,7 +519,7 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
       double *restrict odat = p->param.data;
       const double *restrict idat = p1->param.data;
       double cval = p2->u.con.value;
-      if ( datatype == CDI_DATATYPE_FLT32 ) cval = (float) cval;
+      if ( datatype == CDI_DATATYPE_FLT32 && isCompare(oper) ) cval = (float) cval;
 
       oper_expr_var_con(oper, nmiss>0, n, missval1, missval2, odat, idat, cval);
 
