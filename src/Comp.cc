@@ -206,16 +206,20 @@ void *Comp(void *argument)
 	      memcpy(arrayx2, vardata[varID]+offset, gridsize*sizeof(double));
 	    }
 
+          int datatype1 = vlistInqVarDatatype(vlistIDx1, varID);
+          int datatype2 = CDI_UNDEFID;
 	  gridsize1 = gridInqSize(vlistInqVarGrid(vlistIDx1, varID));
 	  *missvalx1 = vlistInqVarMissval(vlistIDx1, varID);
 
 	  if ( filltype == FILL_REC )
 	    {
-	      gridsize2 = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
+              datatype2 = vlistInqVarDatatype(vlistIDx2, 0);
+              gridsize2 = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
 	      *missvalx2 = vlistInqVarMissval(vlistIDx2, 0);
 	    }
 	  else
 	    {
+              datatype2 = vlistInqVarDatatype(vlistIDx2, varID);
 	      gridsize2 = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 	      *missvalx2 = vlistInqVarMissval(vlistIDx2, varID);
 	    }
@@ -225,8 +229,6 @@ void *Comp(void *argument)
 
 	  size_t gridsize = gridsize1;
 
-          int datatype1 = vlistInqVarDatatype(vlistIDx1, varID);
-          int datatype2 = vlistInqVarDatatype(vlistIDx2, varID);
           if ( datatype1 != datatype2 )
             {
               if ( datatype1 == CDI_DATATYPE_FLT32 && datatype2 == CDI_DATATYPE_FLT64 )
