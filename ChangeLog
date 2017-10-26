@@ -1,3 +1,7 @@
+2017-10-26  Uwe Schulzweida
+
+	* select with start=end range aborts with 'Invalid character' [Bug #7976]
+
 2017-10-25  Uwe Schulzweida
 
 	* Expr: convert constanst parameter to float for 32-bit float data (bug fix)
