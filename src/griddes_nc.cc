@@ -72,7 +72,7 @@ int gridFromNCfile(const char *gridfile)
        nc_inq_dimid(nc_file_id, "grid_rank", &nc_gridrank_id)    == NC_NOERR &&
        nc_inq_dimid(nc_file_id, "grid_corners", &nc_gridcorn_id) == NC_NOERR )
     {
-      nce(nc_inq_dimlen(nc_file_id, nc_gridsize_id, &grid_size)); grid.size = (int) grid_size;
+      nce(nc_inq_dimlen(nc_file_id, nc_gridsize_id, &grid_size)); grid.size = grid_size;
       nce(nc_inq_dimlen(nc_file_id, nc_gridrank_id, &grid_rank));
       nce(nc_inq_dimlen(nc_file_id, nc_gridcorn_id, &grid_nvertex)); grid.nvertex = (int) grid_nvertex;
   
@@ -125,7 +125,7 @@ int gridFromNCfile(const char *gridfile)
 
       if ( nc_inq_varid(nc_file_id, "grid_imask", &nc_gridmask_id) == NC_NOERR )
 	{
-	  int i;
+	  size_t i;
 	  grid.mask = (int*) Malloc(grid.size*sizeof(int));
 	  nce(nc_get_var_int(nc_file_id, nc_gridmask_id, grid.mask));
 	  for ( i = 0; i < grid.size; ++i )
@@ -173,7 +173,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 
 
   int gridtype = gridInqType(gridID);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   nc_type xtype = (gridInqDatatype(gridID) == CDI_DATATYPE_FLT64) ? NC_DOUBLE : NC_FLOAT;
 

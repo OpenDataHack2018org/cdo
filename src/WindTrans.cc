@@ -14,7 +14,7 @@
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; version 2 of the License.
 
-  This program is distributed in the hope that it will be useful,
+  This program is distributed in the hope that it will be useful
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
@@ -78,9 +78,9 @@ int PROJUVLATLON;
 
 static
 void destaggerUorV(double *fu, double *fuOut,
-                   int klev, int nlat, int nlon, int UorV, long offset)
+                   int klev, long nlat, long nlon, long UorV, long offset)
 {
-  int lat0, lon0;
+  long lat0, lon0;
   double u0,u1;
   double u_dstg;
   long  next;
@@ -132,9 +132,9 @@ void destaggerUorV(double *fu, double *fuOut,
 
 static
 void destaggerUorV_positiveOrder(double *fu, double *fuOut,
-                   int klev, int nlat, int nlon, int UorV, long offset)
+                   int klev, long nlat, long nlon, int UorV, long offset)
 {
-  int latE, lonE;
+  long latE, lonE;
   double u0,u1;
   double u_dstg;
   long next;
@@ -157,9 +157,9 @@ void destaggerUorV_positiveOrder(double *fu, double *fuOut,
 
   for ( int lev = 0; lev < klev; lev++ )
     {
-      for ( int lat = 0; lat < latE; lat++ )
+      for ( long lat = 0; lat < latE; lat++ )
         {
-          for ( int lon = 0; lon < lonE; lon++ )
+          for ( long lon = 0; lon < lonE; lon++ )
             {
               u0 = fu[idx];
               u1 = fu[idx+next];
@@ -175,7 +175,7 @@ void destaggerUorV_positiveOrder(double *fu, double *fuOut,
             }
         }
       if (latE<nlat)   // the last row we let as it is
-        for ( int lon = 0; lon < nlon; lon++ )
+        for ( long lon = 0; lon < nlon; lon++ )
           {
             u0 = fu[idx];
             fuOut[idx] = u0;
@@ -192,7 +192,7 @@ void *DestaggerUV()
   int varID1 = CDI_UNDEFID, varID2 = CDI_UNDEFID;
   int zaxisID1 = CDI_UNDEFID, zaxisID2 = CDI_UNDEFID;
   int varID1stg = CDI_UNDEFID, varID2stg = CDI_UNDEFID;
-  int gridsize;
+  size_t gridsize;
   int chcodes[MAXARG];
   char *chvars[MAXARG];
   char varname[CDI_MAX_NAME];
@@ -202,7 +202,7 @@ void *DestaggerUV()
   int gridID;
   bool lcopy = false;
   int UorV;
-  int nlon = 0, nlat = 0;
+  size_t nlon = 0, nlat = 0;
   double *ivar = NULL, *ovar = NULL;
   double dxU = 0, dyU = 0, dxV = 0, dyV = 0;
 
@@ -410,7 +410,7 @@ void *DestaggerUV()
           cdoPrint("Grid info: (xfirst_R = %3.2f; yfirst_R = %3.2f); (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f);",
                    xfirst_R,yfirst_R,xfirst_U,yfirst_U,xfirst_V,yfirst_V);
           cdoPrint("Grid info: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) ", dxU, dyU, dxV, dyV);
-          cdoPrint("Grid info: nlon=%d, nlat=%d ", nlon, nlat);
+          cdoPrint("Grid info: nlon=%zu, nlat=%zu ", nlon, nlat);
         }
       if ( cdoDebugExt )
         {
@@ -460,7 +460,7 @@ void *DestaggerUV()
 
       gridsize = gridInqSize(gridID1);  // actual size of U-wind should be same as V-wind
       if ( cdoDebugExt )
-        cdoPrint("Allocating memory for gridsize (destaggered output)= %ld; nlon=%d, nlat=%d",gridsize,nlon,nlat );
+        cdoPrint("Allocating memory for gridsize (destaggered output)= %ld; nlon=%zu, nlat=%zu",gridsize,nlon,nlat );
       ovar = (double *) Malloc(gridsize*sizeof(double));
     } // end of  if (!lcopy)
 
@@ -665,8 +665,8 @@ void rot_uv_north(int gridID, double *us, double *vs)
         iDirectionIncrementInDegrees = 0.1;
   */
 
-  int nx = gridInqXsize(gridID);
-  int ny = gridInqYsize(gridID);
+  size_t nx = gridInqXsize(gridID);
+  size_t ny = gridInqYsize(gridID);
     
   double *xvals = (double *) Malloc(nx*ny*sizeof(double));
   double *yvals = (double *) Malloc(nx*ny*sizeof(double));
@@ -693,10 +693,10 @@ void rot_uv_north(int gridID, double *us, double *vs)
 
 
   if (cdoDebugExt)
-    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", __func__, gridNamePtr(gridInqType(gridID)), nx, ny );
+    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%zu * %zu)", __func__, gridNamePtr(gridInqType(gridID)), nx, ny );
 
   if (gridInqSize(gridID) != (nx*ny) )
-    cdoAbort("Incorrect gridsize (%zu) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
+    cdoAbort("Incorrect gridsize (%zu) != nx*ny (%zu * %zu)", gridInqSize(gridID), nx, ny);
   // this should never happen
 
 #define OPTrotuvNorth 1   // ACTIVATE SPEED - OPTIMIZATION
@@ -980,8 +980,8 @@ void project_uv_latlon(int gridID, double *us, double *vs)
   double uu;
   double vv;
 
-  int nx = gridInqXsize(gridID);
-  int ny = gridInqYsize(gridID);
+  size_t nx = gridInqXsize(gridID);
+  size_t ny = gridInqYsize(gridID);
     
   double *xvals = (double *) Malloc(nx*ny*sizeof(double));
   double *yvals = (double *) Malloc(nx*ny*sizeof(double));
@@ -992,10 +992,10 @@ void project_uv_latlon(int gridID, double *us, double *vs)
   int signLat=( (yvals[1] - yvals[0]) < 0 )?-1:1;
 
   if (cdoDebugExt)
-    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", __func__, gridNamePtr(gridInqType(gridID)), nx, ny );
+    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%zu * %zu)", __func__, gridNamePtr(gridInqType(gridID)), nx, ny );
 
   if (gridInqSize(gridID) != (nx*ny) )
-    cdoAbort("Incorrect gridsize (%zu) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
+    cdoAbort("Incorrect gridsize (%zu) != nx*ny (%zu * %zu)", gridInqSize(gridID), nx, ny);
   // this should never happen
 
   for ( j = 0; j < ny; j++ )
@@ -1072,11 +1072,11 @@ void *TransformUV(int operatorID)
 {
   int varID, levelID;
   int varID1, varID2, nlevel1, nlevel2;
-  int gridsize = 0;
+  size_t gridsize = 0;
   int code, gridID;
   int param, ltype, level, nlevs, zaxisID;
   int pnum, pcat, pdis;
-  int offset;
+  size_t offset;
   int chcodes[MAXARG];
   char *chvars[MAXARG];
   char varname[CDI_MAX_NAME];
@@ -1186,7 +1186,7 @@ void *TransformUV(int operatorID)
         {
           gridsize = gridInqSize(gridID);
           if ( cdoDebugExt )
-            cdoPrint("Allocating memory for variableID %4d (code=%3d): gridsize(%d)*nlevels(%d) = %ld [%4.3f MB]",
+            cdoPrint("Allocating memory for variableID %4d (code=%3d): gridsize(%zu)*nlevels(%d) = %zu [%4.3f MB]",
                      varID, vlistInqVarCode(vlistID2, varID), gridsize, nlevs, gridsize*nlevs,gridsize*nlevs*sizeof(double)/(1024.0*1024));
           varnmiss[varID] = (size_t *) Malloc(nlevs*sizeof(size_t));
           vardata[varID]  = (double *) Malloc(gridsize*nlevs*sizeof(double));

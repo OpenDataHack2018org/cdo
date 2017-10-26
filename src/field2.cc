@@ -42,13 +42,13 @@ void farfun(field_type *field1, field_type field2, int function)
 }
 
 static
-int farsetnmiss(int len, double *restrict array, double missval)
+int farsetnmiss(size_t len, double *restrict array, double missval)
 {
   size_t nmiss = 0;
 
   if ( DBL_IS_NAN(missval) )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         if ( DBL_IS_EQUAL(array[i], missval) || array[i] < 0 )
           {
             array[i] = missval;
@@ -57,7 +57,7 @@ int farsetnmiss(int len, double *restrict array, double missval)
     }
   else
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         if ( IS_EQUAL(array[i], missval) || array[i] < 0 )
           {
             array[i] = missval;
@@ -72,8 +72,8 @@ int farsetnmiss(int len, double *restrict array, double missval)
 void farcpy(field_type *field1, field_type field2)
 {
   int nwpv = field1->nwpv;
-  int gridsize1 = field1->size;
-  int gridsize2 = field2.size;
+  size_t gridsize1 = field1->size;
+  size_t gridsize2 = field2.size;
   double *restrict array1 = field1->ptr;
   const double *restrict array2 = field2.ptr;
   const float *restrict array2f = field2.ptrf;
@@ -83,15 +83,14 @@ void farcpy(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridsize1;
-
+  size_t len = nwpv*gridsize1;
   if ( len != nwpv*gridsize2 )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( field2.memtype == MEMTYPE_FLOAT )
-    for ( int i = 0; i < len; i++ ) array1[i] = array2f[i];
+    for ( size_t i = 0; i < len; i++ ) array1[i] = array2f[i];
   else
-    for ( int i = 0; i < len; i++ ) array1[i] = array2[i];
+    for ( size_t i = 0; i < len; i++ ) array1[i] = array2[i];
 }
 
 
@@ -110,25 +109,24 @@ void faradd(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] = ADDMN(array1[i], array2[i]);
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
       if ( field2.memtype == MEMTYPE_FLOAT )
         {
-          for ( int i = 0; i < len; i++ ) array1[i] += array2f[i];
+          for ( size_t i = 0; i < len; i++ ) array1[i] += array2f[i];
         }
       else
         {
@@ -141,8 +139,8 @@ void faradd(field_type *field1, field_type field2)
 void farsum(field_type *field1, field_type field2)
 {
   int nwpv = field1->nwpv;
-  int gridsize1 = field1->size;
-  int gridsize2 = field2.size;
+  size_t gridsize1 = field1->size;
+  size_t gridsize2 = field2.size;
   size_t nmiss1 = field1->nmiss;
   size_t nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
@@ -156,14 +154,14 @@ void farsum(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridsize1;
+  size_t len = nwpv*gridsize1;
 
   if ( len != nwpv*gridsize2 )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array2[i], missval2) )
 	  {
 	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
@@ -173,14 +171,14 @@ void farsum(field_type *field1, field_type field2)
 	  }
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
       if ( field2.memtype == MEMTYPE_FLOAT )
         {
-          for ( int i = 0; i < len; i++ ) array1[i] += array2f[i];
+          for ( size_t i = 0; i < len; i++ ) array1[i] += array2f[i];
         }
       else
         {
@@ -204,14 +202,13 @@ void farsumw(field_type *field1, field_type field2, double w)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array2[i], missval2) )
 	  {
 	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
@@ -221,7 +218,7 @@ void farsumw(field_type *field1, field_type field2, double w)
 	  }
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
@@ -229,7 +226,7 @@ void farsumw(field_type *field1, field_type field2, double w)
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(array1,array2,w,len)
 #endif
-      for ( int i = 0; i < len; i++ ) array1[i] += w*array2[i];
+      for ( size_t i = 0; i < len; i++ ) array1[i] += w*array2[i];
     }
 }
 
@@ -248,8 +245,7 @@ void farsumtr(field_type *occur, field_type field, const double refval)
   double *restrict oarray = occur->ptr;
   double *restrict farray = field.ptr;
 
-  int len = gridInqSize(occur->grid);
-
+  size_t len = gridInqSize(occur->grid);
   if ( len != gridInqSize(field.grid) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
@@ -258,7 +254,7 @@ void farsumtr(field_type *occur, field_type field, const double refval)
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) schedule(static)
 #endif
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(farray[i], fmissval) )
 	  {
 	    if ( !DBL_IS_EQUAL(oarray[i], omissval) )
@@ -273,7 +269,7 @@ void farsumtr(field_type *occur, field_type field, const double refval)
 	}
 
       occur->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(oarray[i], omissval) ) occur->nmiss++;
     }
   else
@@ -281,7 +277,7 @@ void farsumtr(field_type *occur, field_type field, const double refval)
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	oarray[i] = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : oarray[i] + 1.0;
     }
 }
@@ -302,14 +298,13 @@ void farsumq(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array2[i], missval2) )
 	  {
 	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
@@ -319,18 +314,18 @@ void farsumq(field_type *field1, field_type field2)
 	  }
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
       if ( field2.memtype == MEMTYPE_FLOAT )
         {
-          for ( int i = 0; i < len; i++ ) array1[i] += ((double)array2f[i])*array2f[i];
+          for ( size_t i = 0; i < len; i++ ) array1[i] += ((double)array2f[i])*array2f[i];
         }
       else
         {
-          for ( int i = 0; i < len; i++ ) array1[i] += array2[i]*array2[i];
+          for ( size_t i = 0; i < len; i++ ) array1[i] += array2[i]*array2[i];
         }
     }
 }
@@ -350,14 +345,13 @@ void farsumqw(field_type *field1, field_type field2, double w)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array2[i], missval2) )
 	  {
 	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
@@ -367,12 +361,12 @@ void farsumqw(field_type *field1, field_type field2, double w)
 	  }
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] += w*array2[i]*array2[i];
     }
 }
@@ -392,23 +386,22 @@ void farsub(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] = SUBMN(array1[i], array2[i]);
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] -= array2[i];
     }
 }
@@ -428,22 +421,22 @@ void farmul(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] = MULMN(array1[i], array2[i]);
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] *= array2[i];
     }
 }
@@ -461,15 +454,15 @@ void fardiv(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  for ( int i = 0; i < len; i++ ) 
+  for ( size_t i = 0; i < len; i++ ) 
     array1[i] = DIVMN(array1[i], array2[i]);
 
   field1->nmiss = 0;
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
 }
 
@@ -486,16 +479,15 @@ void faratan2(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  for ( int i = 0; i < len; i++ ) 
+  for ( size_t i = 0; i < len; i++ ) 
     array1[i] = DBL_IS_EQUAL(array1[i],missval1) || DBL_IS_EQUAL(array2[i],missval2) ? missval1 : atan2(array1[i], array2[i]);
 
   field1->nmiss = 0;
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
 }
 
@@ -512,17 +504,17 @@ void farsetmiss(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 )
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
         array1[i] = DBL_IS_EQUAL(array1[i],missval1) ? array2[i] : array1[i];
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
 }
@@ -542,14 +534,13 @@ void farmin(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	{
 	  array1[i] = DBL_IS_EQUAL(array2[i], missval2) ? array1[i] :
 	              DBL_IS_EQUAL(array1[i], missval1) ? array2[i] :
@@ -557,12 +548,12 @@ void farmin(field_type *field1, field_type field2)
 	}
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	array1[i] = MIN(array1[i], array2[i]);
     }
 }
@@ -582,14 +573,13 @@ void farmax(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	{
 	  array1[i] = DBL_IS_EQUAL(array2[i], missval2) ? array1[i] :
 	              DBL_IS_EQUAL(array1[i], missval1) ? array2[i] :
@@ -597,12 +587,12 @@ void farmax(field_type *field1, field_type field2)
 	}
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	array1[i] = MAX(array1[i], array2[i]);
     }
 }
@@ -624,14 +614,13 @@ void farvar(field_type *field1, field_type field2, field_type field3, int diviso
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( (nmiss1 || nmiss2) /*&& (DBL_IS_NAN(missval1) || DBL_IS_NAN(missval2))*/ )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         {
           temp      = DIV( MULMN(array1[i], array1[i]), array3[i]);
           array1[i] = DIV( SUBMN(array2[i], temp), array3[i]-divisor);
@@ -640,7 +629,7 @@ void farvar(field_type *field1, field_type field2, field_type field3, int diviso
     }
   else
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         {
           temp      = DIV( MUL(array1[i], array1[i]), array3[i]);
           array1[i] = DIV( SUB(array2[i], temp), array3[i]-divisor);
@@ -662,15 +651,14 @@ void farstd(field_type *field1, field_type field2, field_type field3, int diviso
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   farvar(field1, field2, field3, divisor);
 
   size_t nmiss = 0;
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
       {
 	array1[i] = missval1;
@@ -700,18 +688,17 @@ void farcvar(field_type *field1, field_type field2, int nsets, int divisor)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nsetx == 0 )
     {
-      for ( int i = 0; i < len; i++ ) array1[i] = missval1;
+      for ( size_t i = 0; i < len; i++ ) array1[i] = missval1;
     }
   else if ( (nmiss1 || nmiss2) /*&& (DBL_IS_NAN(missval1) || DBL_IS_NAN(missval2))*/ )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         {
           temp      = MULMN(array1[i], array1[i]) / nsets;
           array1[i] = SUBMN(array2[i], temp) / nsetx;
@@ -720,7 +707,7 @@ void farcvar(field_type *field1, field_type field2, int nsets, int divisor)
     }
   else
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         {
           temp      = MUL(array1[i], array1[i]) / nsets;
           array1[i] = SUB(array2[i], temp) / nsetx;
@@ -742,15 +729,14 @@ void farcstd(field_type *field1, field_type field2, int nsets, int divisor)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   farcvar(field1, field2, nsets, divisor);
 
   size_t nmiss = 0;
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
       {
 	array1[i] = missval1;
@@ -777,26 +763,25 @@ void farmoq(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array2[i], missval2) )
 	  array1[i] = array2[i]*array2[i];
 	else
 	  array1[i] = missval1;
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] = array2[i]*array2[i];
     }
 }
@@ -815,26 +800,25 @@ void farmoqw(field_type *field1, field_type field2, double w)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array2[i], missval2) )
 	  array1[i] = w*array2[i]*array2[i];
 	else
 	  array1[i] = missval1;
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] = w*array2[i]*array2[i];
     }
 }
@@ -866,14 +850,13 @@ void farcount(field_type *field1, field_type field2)
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  int len = nwpv*gridInqSize(grid1);
-
+  size_t len = nwpv*gridInqSize(grid1);
   if ( len != (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array2[i], missval2) )
 	  {
 	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
@@ -883,12 +866,12 @@ void farcount(field_type *field1, field_type field2)
 	  }
 
       field1->nmiss = 0;
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
     {
-      for ( int i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	array1[i] += 1.0;
     }
 }

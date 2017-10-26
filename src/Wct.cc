@@ -45,7 +45,7 @@ static double windchillTemperature(double t, double ff, double missval)
 
 static void farexpr(field_type *field1, field_type field2, double (*expression)(double, double, double))
 {
-  int   i, len;
+  size_t i, len;
   const int     grid1    = field1->grid;
   const size_t  nmiss1   = field1->nmiss;
   const double  missval1 = field1->missval;
@@ -56,7 +56,6 @@ static void farexpr(field_type *field1, field_type field2, double (*expression)(
   const double *array2   = field2.ptr;
 
   len = gridInqSize(grid1);
-
   if ( len != gridInqSize(grid2) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 

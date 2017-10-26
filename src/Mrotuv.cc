@@ -228,7 +228,7 @@ void *Mrotuv(void *argument)
 
   int gridID1 = vlistInqVarGrid(vlistID1, uid);
   int gridID2 = vlistInqVarGrid(vlistID1, vid);
-  int gridsize = gridInqSize(gridID1);
+  size_t gridsize = gridInqSize(gridID1);
   if ( gridID1 != gridID2 ) cdoAbort("Input grids differ!");
 
   if ( gridInqType(gridID1) != GRID_LONLAT      &&
@@ -241,8 +241,8 @@ void *Mrotuv(void *argument)
 
   if ( gridsize != gridInqSize(gridID1) ) cdoAbort("Internal problem: gridsize changed!");
 
-  int nlon    = gridInqXsize(gridID1);
-  int nlat    = gridInqYsize(gridID1);
+  size_t nlon    = gridInqXsize(gridID1);
+  size_t nlat    = gridInqYsize(gridID1);
 
   double *grid1x  = (double*) Malloc(gridsize*sizeof(double));
   double *grid1y  = (double*) Malloc(gridsize*sizeof(double));
@@ -251,7 +251,7 @@ void *Mrotuv(void *argument)
   double *gridvx  = (double*) Malloc(gridsize*sizeof(double));
   double *gridvy  = (double*) Malloc(gridsize*sizeof(double));
 
-  int gridsizex = (nlon+2)*nlat;
+  size_t gridsizex = (nlon+2)*nlat;
 
   gridInqXvals(gridID1, grid1x);
   gridInqYvals(gridID1, grid1y);
@@ -281,7 +281,7 @@ void *Mrotuv(void *argument)
   gridDefXvals(gridIDv, gridvx);
   gridDefYvals(gridIDv, gridvy);
 
-  for ( int i = 0; i < gridsize; i++ )
+  for ( size_t i = 0; i < gridsize; i++ )
     {
       grid1x[i] *= DEG2RAD;
       grid1y[i] *= DEG2RAD;
@@ -349,7 +349,7 @@ void *Mrotuv(void *argument)
 	  /* remove missing values */
 	  if ( nmiss1 || nmiss2 )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  if ( DBL_IS_EQUAL(urfield[levelID][i], missval1) ) urfield[levelID][i] = 0;
 		  if ( DBL_IS_EQUAL(vrfield[levelID][i], missval2) ) vrfield[levelID][i] = 0;
@@ -361,15 +361,15 @@ void *Mrotuv(void *argument)
 	  rotate_uv(urfield[levelID], vrfield[levelID], nlon, nlat, grid1x, grid1y, ufield, vfield);
 
 	  /* load to a help field */
-	  for ( int j = 0; j < nlat; j++ )
-	    for ( int i = 0; i < nlon; i++ )
+	  for ( size_t j = 0; j < nlat; j++ )
+	    for ( size_t i = 0; i < nlon; i++ )
 	      {
 		uhelp[IX2D(j,i+1,nlon+2)] = ufield[IX2D(j,i,nlon)];
 		vhelp[IX2D(j,i+1,nlon+2)] = vfield[IX2D(j,i,nlon)];
 	      }
 
 	  /* make help field cyclic */
-	  for ( int j = 0; j < nlat; j++ )
+	  for ( size_t j = 0; j < nlat; j++ )
 	    {
 	      uhelp[IX2D(j,0,nlon+2)]      = uhelp[IX2D(j,nlon,nlon+2)];
 	      uhelp[IX2D(j,nlon+1,nlon+2)] = uhelp[IX2D(j,1,nlon+2)];
@@ -378,19 +378,19 @@ void *Mrotuv(void *argument)
 	    }
 
 	  /* interpolate on u/v points */
-	  for ( int j = 0; j < nlat; j++ )
-	    for ( int i = 0; i < nlon; i++ )
+	  for ( size_t j = 0; j < nlat; j++ )
+	    for ( size_t i = 0; i < nlon; i++ )
 	      {
 		ufield[IX2D(j,i,nlon)] = (uhelp[IX2D(j,i+1,nlon+2)]+uhelp[IX2D(j,i+2,nlon+2)])*0.5;
 	      }
 
-	  for ( int j = 0; j < nlat-1; j++ )
-	    for ( int i = 0; i < nlon; i++ )
+	  for ( size_t j = 0; j < nlat-1; j++ )
+	    for ( size_t i = 0; i < nlon; i++ )
 	      {
 		vfield[IX2D(j,i,nlon)] = (vhelp[IX2D(j,i+1,nlon+2)]+vhelp[IX2D(j+1,i+1,nlon+2)])*0.5;
 	      }
 
-	  for ( int i = 0; i < nlon; i++ )
+	  for ( size_t i = 0; i < nlon; i++ )
 	    {
 	      vfield[IX2D(nlat-1,i,nlon)] = vhelp[IX2D(nlat-1,i+1,nlon+2)];
 	    }
