@@ -15,7 +15,7 @@ for OPERATOR in copy; do
   for FILE in $FILES; do
     RSTAT=0
 
-    rm -f Copy_netcdf_${OPERATOR}_${FILE}
+    rm -f Copy_netcdf_${OPERATOR}_${FILE}.debug
     DEBUG_OUT="--seperateDebugFromLog Copy_netcdf_${OPERATOR}_${FILE}.debug"
 
     IFILE=$DATAPATH/${FILE}

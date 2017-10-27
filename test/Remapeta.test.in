@@ -18,7 +18,7 @@ for X in 1 2; do
   OFILE=remapeta_res
 
   CDOTEST="remapeta"
-  rm -f Remapeta_{X}.debug
+  rm -f Remapeta_${X}.debug
   DEBUG_OUT="--seperateDebugFromLog Remapeta_${X}.debug"
   CDOCOMMAND="$CDO $DEBUG_OUT remapeta,$VCT $IFILE $OFILE"
 

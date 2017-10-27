@@ -54,6 +54,7 @@ if test 1 -eq $($CDOCOMMAND -topo,global_1) ; then  echo "ok $NTEST - $CDOCOMMAN
 
 # create temporary data
 if [ "@ENABLE_NETCDF@" = yes ] ; then
+  rm -f Ninfo_tempDataGeneration.debug
   $CDO --seperateDebugFromLog Ninfo_tempDataGeneration.debug -O -f nc -temp,r18x9 temp.small
   $CDO --seperateDebugFromLog Ninfo_tempDataGeneration.debug -O -f nc -temp,global_10 temp.global
   $CDO --seperateDebugFromLog Ninfo_tempDataGeneration.debug -O -f nc -merge temp.small temp.global temp.2grids

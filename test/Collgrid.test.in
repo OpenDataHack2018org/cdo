@@ -16,7 +16,7 @@ for GRIDTYPE in $GRIDTYPES; do
   for DIST in $DISTS; do
     RSTAT=0
 
-    rm -f Collgrid_${GRIDTYPE}_${DIST}
+    rm -f Collgrid_${GRIDTYPE}_${DIST}.debug
     DEBUG_OUT="--seperateDebugFromLog Collgrid_${GRIDTYPE}_${DIST}.debug"
     GT=$(echo $GRIDTYPE | cut -c1)
     FILE=data${GT}.nc

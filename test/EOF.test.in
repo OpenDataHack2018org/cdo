@@ -49,7 +49,7 @@ for MODE in jacobi danielson_lanczos; do
   test -s $CDOOUT && let RSTAT+=1
 
   rm -f EOFCOEFF_DIM_${X}_${MODE}.debug
-  DEBUG_OUT="--seperateDebugFromLog EOFCOEFF_DIM-${X}_${MODE}.debug"
+  DEBUG_OUT="--seperateDebugFromLog EOFCOEFF_DIM_${X}_${MODE}.debug"
 
   CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT eofcoeff${DIM} $OFILE2 $IFILE $OFILE3"
   echo "$CDOCOMMAND"

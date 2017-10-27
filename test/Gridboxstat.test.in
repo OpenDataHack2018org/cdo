@@ -21,7 +21,7 @@ for STAT in $STATS; do
   OFILE=${TYPE}${STAT}_res
 
   rm -f Gridboxstat_${STAT}.debug
-  DEBUG_OUT="--seperateDebugFromLog GridBoxstat_${STAT}.debug"
+  DEBUG_OUT="--seperateDebugFromLog Gridboxstat_${STAT}.debug"
 
   CDOTEST="${TYPE}$STAT"
   CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT ${TYPE}${STAT},64,32 $IFILE $OFILE"

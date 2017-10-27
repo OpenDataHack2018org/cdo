@@ -27,7 +27,7 @@ for RMOD in $RMODS; do
     OFILE=tsurf_spain_${RMOD}_${extra}$$
     RFILE=$DATAPATH/tsurf_spain_${RMOD}_${extra}_ref
 
-    -rm -f Remap2_${RMOD}_${extra}.debug
+    rm -f Remap2_${RMOD}_${extra}.debug
     DEBUG_OUT="--seperateDebugFromLog Remap2_${RMOD}_${extra}.debug"
     CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT remap${RMOD},$GRID  $IFILE ${OFILE}"
 

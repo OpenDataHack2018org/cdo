@@ -16,7 +16,7 @@ CDOERR=cerr$$
 FORMAT=""
 NTEST=1
 ######################################################
-rm afterburner_${SELECT}.debug
+rm afterburner.debug
 DEBUG_OUT="--seperateDebugFromLog afterburner.debug"
 IFILE=$DATAPATH/gp2sp_ref
 RFILE=$DATAPATH/sp2gp_ref

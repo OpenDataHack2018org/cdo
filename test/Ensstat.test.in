@@ -10,6 +10,7 @@ STATS="min max range sum avg mean std std1 var var1"
 #
 IFILE=$DATAPATH/ts_mm_5years
 export CDO_FILE_SUFFIX=NULL
+rm -f Ensstat_Ifilegeneration.debug
 $CDO $DEBUG_OUT --seperateDebugFromLog Ensstat_Ifilegeneration.debug splityear $IFILE ${$}ts_year
 IFILES="${$}ts_year????"
 #

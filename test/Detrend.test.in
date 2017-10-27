@@ -17,7 +17,7 @@ OFILE=detrend_res
 # detrend
 #
 CDOTEST="detrend"
-rm -f Deternd_detrend.debug
+rm -f Detrend_detrend.debug
 DEBUG_OUT="--seperateDebugFromLog Detrend_detrend.debug"
 CDOCOMMAND="$CDO $DEBUG_OUT $CDOTEST $IFILE $OFILE"
 
@@ -41,8 +41,8 @@ rm -f $OFILE
 # trend
 #
 CDOTEST="trend/subtrend"
-rm -f Deternd_trend.debug
-DEBUG_OUT="--seperateDebugFromLog trend_trend.debug"
+rm -f Detrend_trend.debug
+DEBUG_OUT="--seperateDebugFromLog Detrend_trend.debug"
 CDOCOMMAND="$CDO $DEBUG_OUT trend $IFILE ta tb"
 
 echo "Running test: $NTEST"
@@ -51,8 +51,8 @@ echo "$CDOCOMMAND"
 $CDOCOMMAND
 test $? -eq 0 || let RSTAT+=1
 #
-rm -f Deternd_subtrend.debug
-DEBUG_OUT="--seperateDebugFromLog subtrend_subtrend.debug"
+rm -f Detrend_subtrend.debug
+DEBUG_OUT="--seperateDebugFromLog Detrend_subtrend.debug"
 CDOCOMMAND="$CDO $DEBUG_OUT subtrend $IFILE ta tb $OFILE"
 
 echo "Running test: $NTEST"
