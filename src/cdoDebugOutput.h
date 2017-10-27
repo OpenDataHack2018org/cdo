@@ -4,28 +4,14 @@
 #include <sstream>
 
 #include <fstream>
+#include <string.h>
 
-namespace CdoDebug
+namespace CdoLog
 {
-    extern int  PSTREAM;
-    extern bool PROCESS;
-    extern std::string outfile;
-    extern bool print_to_seperate_file;
-
-    namespace{
-        void printMessageToFile(std::stringstream &p_message)
-        {
-            if(!outfile.empty()){
-                std::fstream outfile_stream(outfile,std::fstream::in | std::fstream::app );
-
-                outfile_stream <<  p_message.str();
-            }
-        }
-    }
-
+    void StdOut(std::stringstream &message);
 
     template <typename ...T>
-    void Message_ (std::stringstream &p_message, T&& ...args)
+    void  expand(std::stringstream &p_message, T&& ...args)
     {
            //for showing that the dummy array is never used
            using expander = int[];
@@ -36,20 +22,78 @@ namespace CdoDebug
     }
 
     template <typename ...T>
+    void StdOut(T&& ...args)
+    {
+        std::stringstream message;
+        expand(message, args...);
+        std::cout << message.str();
+    }
+ 
+    template <typename ...T>
+    void StdErr(T&& ...args)
+    {
+        std::stringstream message;
+        expand(message, args...);
+        std::cout << message.str();
+    }
+
+
+
+   
+}
+
+namespace CdoDebug
+{
+    extern int  PSTREAM;
+    extern bool PROCESS;
+    extern bool PIPE;
+    extern int ARGUMENT;
+    extern std::string outfile;
+    extern bool print_to_seperate_file;
+    extern std::fstream outfile_stream;
+    extern int PTHREAD;
+
+    std::string get_padding(const char *p_func);
+
+    void CdoStartMessage();
+    void CdoEndMessage();
+
+   namespace{
+        void printMessage(std::stringstream &p_message)
+        {
+            if(!print_to_seperate_file)
+            {
+                std::cout << p_message.str();
+            }
+            else 
+            {
+                outfile_stream <<  p_message.str();
+            }
+        }
+    }
+
+
+   
+    template <typename ...T>
     void Message_ (const char * p_func, T&& ...args)
     {
         std::stringstream message;
-        message << p_func <<": ";
-        Message_(message, args...);
-        if(print_to_seperate_file)
-        {
-            printMessageToFile(message);
-        }
-        else
-        {
-            std::cout << message.str();
-        }
+        message << p_func <<": " << get_padding(p_func);
+        CdoLog::expand(message, args...);
+        printMessage(message);
     }
+
+    
+    template <typename ...T>
+    void Warning_(T&& ...args)
+    {
+        std::stringstream message;
+        message << "Warning: ";
+        CdoLog::expand(message, args...);
+        std::cout << message.str();
+    }
+
+
 }
 
 namespace CdoError{
@@ -60,22 +104,14 @@ namespace CdoError{
     {
           std::stringstream message;
           message << "Error in: " << p_file << ":" << p_line << " ";
-          CdoDebug::Message_(message, args...);
-          std::cout << message.str();
+          CdoLog::expand(message, args...);
+          CdoLog::StdOut(message);
           if ( CdoError::_ExitOnError )
           {
               exit(EXIT_FAILURE);
           }
     }
-    template <typename ...T>
-    void Warning_(T&& ...args)
-    {
-        std::stringstream message;
-        message << "Warning: ";
-        CdoDebug::Message_(message, args...);
-        std::cout << message.str();
-    }
-
+    
     template <typename ...T>
     void SysError_(const char* p_file, const int p_line,  const char* p_func, T&& ...args)
     {
@@ -83,8 +119,8 @@ namespace CdoError{
         std::stringstream message;
         message << "SysError in:" << p_file << std::endl;
         message << "    " << "in function: p_func ,line: " << p_line << std::endl;
-        CdoDebug::Message_(message, args...);
-
+        CdoLog::StdOut(message, args...);
+        CdoLog::StdOut(message);
         if(saved_errno)
         {
             errno = saved_errno;
