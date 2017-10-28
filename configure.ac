@@ -185,14 +185,14 @@ AS_IF([test x$acx_cv_cfortran_works = 'xno'],[AC_SUBST([FORTRAN_WORKS],[no])],[A
 
 #  ----------------------------------------------------------------------
 #  Enable NEARPT3 support
-# AC_MSG_CHECKING([for nearpt3 support])
-# AC_ARG_ENABLE([nearpt3], AS_HELP_STRING([--enable-nearpt3],[nearpt3 support [default=no]]))
-# AS_IF([test "x$enable_nearpt3" = "xyes"], [
-#   AC_DEFINE(ENABLE_NEARPT3, [1], [Define to 1 for nearpt3 support])
-# ])
-# AC_MSG_RESULT([$enable_nearpt3])
-# AC_SUBST([ENABLE_NEARPT3],[$enable_nearpt3])
-# AM_CONDITIONAL([ENABLE_NEARPT3],[test x$enable_nearpt3 = 'xyes'])
+AC_MSG_CHECKING([for nearpt3 support])
+AC_ARG_ENABLE([nearpt3], AS_HELP_STRING([--enable-nearpt3],[nearpt3 support [default=no]]))
+AS_IF([test "x$enable_nearpt3" = "xyes"], [
+  AC_DEFINE(ENABLE_NEARPT3, [1], [Define to 1 for nearpt3 support])
+])
+AC_MSG_RESULT([$enable_nearpt3])
+AC_SUBST([ENABLE_NEARPT3],[$enable_nearpt3])
+AM_CONDITIONAL([ENABLE_NEARPT3],[test x$enable_nearpt3 = 'xyes'])
 #  ----------------------------------------------------------------------
 #  Enable DATA support
 AC_MSG_CHECKING([for DATA support])
