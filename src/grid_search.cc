@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -84,7 +84,7 @@ struct gridsearch *gridsearch_create_reg2d(bool lcyclic, size_t nx, size_t ny, c
   gs->nx = nx;
   gs->ny = ny;
 
-  unsigned nxm = nx;
+  size_t nxm = nx;
   if ( lcyclic ) nxm++;
 
   double *reg2d_center_lon = (double *) Malloc(nxm*sizeof(double));
@@ -397,7 +397,7 @@ kdNode *gs_nearest_kdsph(kdNode *kdt, double lon, double lat, double *prange)
 }
 
 
-unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double *prange)
+size_t gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double *prange)
 {
   size_t index = GS_NOT_FOUND;
   if ( near == NULL ) return index;
@@ -423,7 +423,7 @@ unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double 
       float range = distance(point, point0);
       if ( range < range0 )
         {
-           index = (unsigned) closestpt;
+          index = (size_t) closestpt;
            *prange = range;
         }
     }
@@ -588,7 +588,7 @@ void knn_check_distance(size_t num_neighbors, const size_t *restrict nbr_add, do
 
 void gridsearch_knn_init(struct gsknn *knn)
 {
-  unsigned ndist = knn->ndist;
+  size_t ndist = knn->ndist;
   size_t *restrict add = knn->add;
   double *restrict dist = knn->dist;
 

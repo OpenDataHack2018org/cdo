@@ -11,14 +11,14 @@
 enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_KDTREE, GS_KDSPH, GS_NEARPT3};
 
 struct gsFull {
-  unsigned n;
+  size_t n;
   const double *plons;
   const double *plats;
   float **pts;
 };
 
 struct gsNear {
-  unsigned n;
+  size_t n;
   const double *plons;
   const double *plats;
   Coord_T **pts;
@@ -43,8 +43,8 @@ struct gridsearch {
 };
 
 struct gsknn {
-  unsigned ndist;
-  unsigned size;
+  size_t   ndist;
+  size_t   size;
   bool    *mask;
   size_t  *add;
   size_t  *tmpadd;
