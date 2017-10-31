@@ -24,10 +24,10 @@ kdata_t square(const kdata_t x)
 static constexpr
 kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b)
 {
-  return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
+  return square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2]));
 }
 
-inline
+
 kdata_t kd_min(kdata_t x, kdata_t y)
 {
     return x < y ? x : y;

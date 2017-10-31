@@ -164,10 +164,8 @@ struct kd_thread_data *kd_buildArg(struct kd_point *points,
 struct kdNode *kd_buildTree(struct kd_point *points, unsigned long nPoints,
                             kdata_t *min, kdata_t *max, int dim, int max_threads);
 void *kd_doBuildTree(void *threadarg);
-struct kdNode *kd_sph_buildTree(struct kd_point *points,
-                                unsigned long nPoints,
-                                kdata_t *min, kdata_t *max,
-                                int max_threads);
+struct kdNode *kd_sph_buildTree(struct kd_point *points, unsigned long nPoints,
+                                kdata_t *min, kdata_t *max, int max_threads);
 void *kd_sph_doBuildTree(void *threadarg);
 
 /* Functions for range searches 
