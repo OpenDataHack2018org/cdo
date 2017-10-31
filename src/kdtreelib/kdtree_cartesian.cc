@@ -163,12 +163,11 @@ struct pqueue *
 kd_ortRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max, int dim)
 {
     struct pqueue *res;
-    uint32_t i;
 
     if ((res = pqinit(NULL, 1)) == NULL)
         return NULL;
     if (!kd_doOrtRangeSearch(node, min, max, dim, res)) {
-        for(i = 0; i < res->size; i++) {
+        for(size_t i = 0; i < res->size; i++) {
             free(res->d[i]);
         }
         free(res->d);
@@ -304,13 +303,13 @@ kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int dim)
  */
 struct pqueue *
 kd_qnearest(struct kdNode *node, kdata_t *p,
-            kdata_t *max_dist_sq, unsigned int q, int dim)
+            kdata_t *max_dist_sq, size_t q, int dim)
 {
     struct pqueue *res = pqinit(NULL, q + 2);
     if ( res == NULL) return NULL;
     
     if ( !kd_doQnearest(node, p, max_dist_sq, q + 1, dim, res) ) {
-        for ( uint32_t i = 0; i < res->size; ++i ) free(res->d[i]);
+        for ( size_t i = 0; i < res->size; ++i ) free(res->d[i]);
         free(res->d);
         free(res);
         return NULL;
@@ -365,7 +364,7 @@ kd_check_dist(struct kdNode *node, kdata_t *p,
 
 int
 kd_doQnearest(struct kdNode *node, kdata_t *p,
-              kdata_t *max_dist_sq, unsigned int q, int dim, struct pqueue *res)
+              kdata_t *max_dist_sq, size_t q, int dim, struct pqueue *res)
 {
     if ( !node ) return 1;
 
@@ -423,7 +422,7 @@ kd_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
     if ( res == NULL ) return NULL;
     
     if ( !kd_doRange(node, p, max_dist_sq, dim, res, ordered) ) {
-        for( uint32_t i = 0; i < res->size; ++i ) {
+        for( size_t i = 0; i < res->size; ++i ) {
             free(res->d[i]);
         }
         free(res->d);

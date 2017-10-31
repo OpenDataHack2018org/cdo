@@ -59,7 +59,7 @@ kd_printNode(struct kdNode *node)
   printf("Corners: (%f, %f)\t(%f, %f)\n", node->min[0], node->min[1],
          node->max[0], node->max[1]);
   printf("Children: %p\t%p\n", (void *) node->left, (void *) node->right);
-  printf("Index: %u\n", node->index);
+  printf("Index: %zu\n", node->index);
 
   printf("\n");
 }

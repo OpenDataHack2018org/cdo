@@ -12,8 +12,8 @@
                              _compPoints: compare index if points[axis] are equal
                              replace qsortR by libc:qsort (speedup 25%)
 */
-#ifndef _KDTREE_H_
-#define _KDTREE_H_
+#ifndef  KDTREE_H_
+#define  KDTREE_H_
 
 #include <math.h>
 #include <pthread.h>
@@ -59,7 +59,7 @@ typedef long kdata_t;
 
 typedef struct kd_point {
     kdata_t point[KD_MAX_DIM];
-    unsigned index;
+    size_t index;
 } kd_point;
 
 
@@ -84,7 +84,7 @@ typedef struct kdNode {
     kdata_t min[KD_MAX_DIM];      /*!<vector to the min coordinates of the hyperrectangle */
     kdata_t max[KD_MAX_DIM];      /*!<vector to the max coordinates of the hyperrectangle */
     int split;                    /*!<axis along which the tree bifurcates */
-    unsigned index;               /*!<optional index value */
+    size_t index;                 /*!<optional index value */
 } kdNode;
 
 /*!
@@ -102,9 +102,9 @@ typedef struct resItem {
  */
 typedef struct pqueue {
     struct resItem **d;         /*!<pointer to an array of result items */
-    uint32_t size;              /*!<current length of the queue */
-    uint32_t avail;             /*!<currently allocated queue elements */
-    uint32_t step;              /*!<step size in which new elements are allocated */
+    size_t size;              /*!<current length of the queue */
+    size_t avail;             /*!<currently allocated queue elements */
+    size_t step;              /*!<step size in which new elements are allocated */
 } pqueue;
 
 /*!
@@ -126,7 +126,7 @@ typedef struct kd_thread_data {
 #define KD_UNORDERED (0)
 
 /* functions for the priority queue */
-struct pqueue *pqinit(struct pqueue *q, uint32_t n);
+struct pqueue *pqinit(struct pqueue *q, size_t n);
 int pqinsert(struct pqueue *q, struct resItem *d);
 struct resItem **pqremove_min(struct pqueue *q, struct resItem **d);
 struct resItem **pqremove_max(struct pqueue *q, struct resItem **d);
@@ -178,12 +178,11 @@ struct pqueue *kd_ortRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max
                                  int dim);
 int kd_doOrtRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max, int dim,
                         struct pqueue *res);
-struct kdNode *kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
-                          int dim);
+struct kdNode *kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int dim);
 struct pqueue *kd_qnearest(struct kdNode *node, kdata_t *p,
-                           kdata_t *max_dist_sq, unsigned int q, int dim);
+                           kdata_t *max_dist_sq, size_t q, int dim);
 int kd_doQnearest(struct kdNode *node, kdata_t *p,
-                  kdata_t *max_dist_sq, unsigned int q, int dim,
+                  kdata_t *max_dist_sq, size_t q, int dim,
                   struct pqueue *res);
 struct pqueue *kd_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                         int dim, int ordered);
@@ -200,9 +199,9 @@ int kd_sph_doOrtRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max,
 struct kdNode *kd_sph_nearest(struct kdNode *node, kdata_t *p,
                               kdata_t *max_dist_sq);
 struct pqueue *kd_sph_qnearest(struct kdNode *node, kdata_t *p,
-                               kdata_t *max_dist_sq, unsigned int q);
+                               kdata_t *max_dist_sq, size_t q);
 int kd_sph_doQnearest(struct kdNode *node, kdata_t *p,
-                      kdata_t *max_dist_sq, unsigned int q, struct pqueue *res);
+                      kdata_t *max_dist_sq, size_t q, struct pqueue *res);
 struct pqueue *kd_sph_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                             int ordered);
 int kd_sph_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
@@ -212,4 +211,4 @@ int kd_sph_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
 int kd_insertResTree(struct kdNode *node, struct pqueue *res);
 
 
-#endif                          /* _KDTREE_H_ */
+#endif                          /* KDTREE_H_ */
