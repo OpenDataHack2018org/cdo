@@ -1471,7 +1471,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 #endif
   for ( size_t n = 0; n < rv.num_links; ++n ) tgt_count[rv.tgt_cell_add[n]]++;
 
-  size_t imin = ULONG_MAX;
+  size_t imin = UINT64_MAX;
   size_t imax = 0;
   for ( size_t n = 0; n < tgt_grid.size; ++n )
     {

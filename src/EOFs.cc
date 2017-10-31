@@ -32,7 +32,7 @@
 #include <omp.h>
 #endif
 
-#include <limits.h>  // LONG_MAX
+#include <stdint.h>  // UINT64_MAX
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -279,7 +279,7 @@ void *EOFs(void * argument)
     }
   else if ( grid_space )
     {
-      if ( ((double)gridsize)*gridsize > (double)LONG_MAX ) cdoAbort("Grid space too large!");
+      if ( ((double)gridsize)*gridsize > (double)UINT64_MAX ) cdoAbort("Grid space too large!");
 
       if ( (size_t)n_eig > gridsize )
         {
@@ -310,7 +310,7 @@ void *EOFs(void * argument)
     }
 
   /* allocation of temporary fields and output structures */
-  size_t npack = ULONG_MAX;
+  size_t npack = UINT64_MAX;
   size_t *pack         = (size_t *) Malloc(gridsize*sizeof(size_t));
   double *in           = (double *) Malloc(gridsize*sizeof(double));
   eofdata_t **eofdata  = (eofdata_t **) Malloc(nvars*sizeof(eofdata_t*));
@@ -357,7 +357,7 @@ void *EOFs(void * argument)
 
 	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           double missval = vlistInqVarMissval(vlistID1, varID);
-	  if ( npack == ULONG_MAX )
+	  if ( npack == UINT64_MAX )
 	    {
 	      npack = 0;
 	      for ( size_t i = 0; i < gridsize; ++i )

@@ -2,11 +2,11 @@
 #define _GRID_SEARCH_H_
 
 #include <stdbool.h>
-#include <limits.h>
+#include <stdint.h>
 #include "kdtreelib/kdtree.h"
 #include "nearpt3c.h"
 
-#define GS_NOT_FOUND  ULONG_MAX
+#define GS_NOT_FOUND  UINT64_MAX
 
 
 enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_KDTREE, GS_KDSPH, GS_NEARPT3};

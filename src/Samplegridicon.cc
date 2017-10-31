@@ -378,7 +378,7 @@ void compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double 
       for ( int i = 0; i < MAX_SEARCH; ++i )
         {
           size_t cell_no1 = nbr_add[i];
-          if ( cell_no1 < ULONG_MAX )
+          if ( cell_no1 < UINT64_MAX )
             {
               LLtoXYZ(grid_center_lon1[cell_no1], grid_center_lat1[cell_no1], center_point_xyz);
 
