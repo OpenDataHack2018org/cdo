@@ -58,7 +58,7 @@ double smooth_knn_compute_weights(size_t num_neighbors, const bool *restrict src
   for ( size_t n = 0; n < num_neighbors; ++n )
     {
       nbr_mask[n] = false;
-      if ( nbr_add[n] < UINT64_MAX && src_grid_mask[nbr_add[n]] )
+      if ( nbr_add[n] < SIZE_MAX && src_grid_mask[nbr_add[n]] )
         {
           nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightR, search_radius);
           dist_tot += nbr_dist[n];
@@ -395,7 +395,7 @@ void *Smooth(void *argument)
   size_t nmiss;
   int xnsmooth = 1;
   smoothpoint_t spoint;
-  spoint.maxpoints = UINT64_MAX;
+  spoint.maxpoints = SIZE_MAX;
   spoint.radius    = 1;
   spoint.form      = FORM_LINEAR;
   spoint.weight0   = 0.25;

@@ -46,7 +46,7 @@ void nbr_check_distance(size_t num_neighbors, const size_t *restrict nbr_add, do
 {
   // If distance is zero, set to small number
   for ( size_t nchk = 0; nchk < num_neighbors; ++nchk )
-    if ( nbr_add[nchk] < UINT64_MAX && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
+    if ( nbr_add[nchk] < SIZE_MAX && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
 }
 
 
@@ -61,7 +61,7 @@ double nbr_compute_weights(size_t num_neighbors, const int *restrict src_grid_ma
       for ( size_t n = 0; n < num_neighbors; ++n )
         {
           nbr_mask[n] = false;
-          if ( nbr_add[n] < UINT64_MAX )
+          if ( nbr_add[n] < SIZE_MAX )
             if ( src_grid_mask[nbr_add[n]] )
               {
                 nbr_dist[n] = 1./nbr_dist[n];
@@ -75,7 +75,7 @@ double nbr_compute_weights(size_t num_neighbors, const int *restrict src_grid_ma
       for ( size_t n = 0; n < num_neighbors; ++n )
         {
           nbr_mask[n] = false;
-          if ( nbr_add[n] < UINT64_MAX )
+          if ( nbr_add[n] < SIZE_MAX )
             {
               nbr_dist[n] = 1./nbr_dist[n];
               dist_tot += nbr_dist[n];
@@ -197,7 +197,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, remapgri
   // Initialize distance and address arrays
   for ( n = 0; n < num_neighbors; ++n )
     {
-      nbr_add[n]  = UINT64_MAX;
+      nbr_add[n]  = SIZE_MAX;
       nbr_dist[n] = BIGNUM;
     }
 
@@ -240,7 +240,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, remapgri
 	{
 	  size_t nbr_add4[4];
 	  double nbr_dist4[4];
-	  for ( n = 0; n < num_neighbors; ++n ) nbr_add4[n] = UINT64_MAX;
+	  for ( n = 0; n < num_neighbors; ++n ) nbr_add4[n] = SIZE_MAX;
 	  search_result = grid_search_reg2d_nn(nx, ny, nbr_add4, nbr_dist4, plat, plon, src_center_lat, src_center_lon);
 	  if ( search_result < 0 )
 	    {
@@ -254,7 +254,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, remapgri
 	}
 
       if ( search_result >= 0 )
-	for ( n = 0; n < num_neighbors; ++n ) nbr_add[n] = UINT64_MAX;
+	for ( n = 0; n < num_neighbors; ++n ) nbr_add[n] = SIZE_MAX;
     }
 } // grid_search_nbr_reg2d
 
@@ -276,7 +276,7 @@ int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restric
   double search_radius = gs->search_radius;
 
   // Initialize distance and address arrays
-  for ( size_t n = 0; n < num_neighbors; ++n ) nbr_add[n]  = UINT64_MAX;
+  for ( size_t n = 0; n < num_neighbors; ++n ) nbr_add[n]  = SIZE_MAX;
   for ( size_t n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
 
   size_t ndist = num_neighbors;
