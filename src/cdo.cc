@@ -920,6 +920,7 @@ void print_system_info()
 #endif 
   fprintf(stderr, "\n");
 
+  fprintf(stderr, "sizeof(size_t)      = %zu\n", sizeof(size_t));
   fprintf(stderr, "mem alignment       = %d\n\n", getMemAlignment());
 
 #if defined(HAVE_MMAP)
