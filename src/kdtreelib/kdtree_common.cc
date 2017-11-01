@@ -212,6 +212,11 @@ kd_buildArg(struct kd_point *points,
   return d;
 }
 
+//#define TEST_BIGMEM 1
+#ifdef  TEST_BIGMEM
+size_t num_nodes = 0;
+struct kdNode *mem_pool = NULL;
+#endif
 
 struct kdNode *
 kd_allocNode(struct kd_point *points, unsigned long pivot,
@@ -219,8 +224,13 @@ kd_allocNode(struct kd_point *points, unsigned long pivot,
 {
   struct kdNode *node;
 
+#ifdef  TEST_BIGMEM
+  if ( mem_pool == NULL ) mem_pool = (kdNode *) malloc(2*25920000*sizeof(kdNode)); // 2*gridsize
+  node = &mem_pool[num_nodes++];
+#else
   if ((node = (kdNode *)kd_malloc(sizeof(kdNode), "kd_allocNode (node): ")) == NULL)
     return NULL;
+#endif
 
   node->split = axis;
   memcpy(node->location, points[pivot].point, dim * sizeof(kdata_t));
@@ -246,9 +256,17 @@ kd_destroyTree(struct kdNode *node)
 {
   if ( node == NULL ) return;
 
+#ifdef  TEST_BIGMEM
+  if ( mem_pool )
+    {
+      free(mem_pool);
+      num_nodes = 0;
+    }
+#else
   kd_destroyTree(node->left);
   kd_destroyTree(node->right);
   kd_freeNode(node);
+#endif
 }
 
 /* end of tree construction and destruction */
