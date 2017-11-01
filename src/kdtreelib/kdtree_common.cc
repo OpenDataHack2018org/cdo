@@ -95,7 +95,7 @@ void *kd_doBuildTree(void *threadarg)
   struct kd_thread_data *my_data = (struct kd_thread_data *) threadarg;
 
   struct kd_point *points = my_data->points;
-  unsigned long nPoints = my_data->nPoints;
+  size_t nPoints = my_data->nPoints;
   kdata_t *min = my_data->min;
   kdata_t *max = my_data->max;
   int depth = my_data->depth;
@@ -120,7 +120,7 @@ void *kd_doBuildTree(void *threadarg)
    */
   pmergesort(points, nPoints, sortaxis, max_threads);
 
-  unsigned long pivot = nPoints / 2;
+  size_t pivot = nPoints / 2;
   if ((node = kd_allocNode(points, pivot, min, max, sortaxis, dim)) == NULL)
     return NULL;
 
@@ -192,7 +192,7 @@ kd_freeNode(kdNode *node)
 
 struct kd_thread_data *
 kd_buildArg(struct kd_point *points,
-            unsigned long nPoints,
+            size_t nPoints,
             kdata_t *min, kdata_t *max,
             int depth, int max_threads, int dim)
 {
@@ -219,7 +219,7 @@ struct kdNode *mem_pool = NULL;
 #endif
 
 struct kdNode *
-kd_allocNode(struct kd_point *points, unsigned long pivot,
+kd_allocNode(struct kd_point *points, size_t pivot,
              kdata_t *min, kdata_t *max, int axis, int dim)
 {
   struct kdNode *node;

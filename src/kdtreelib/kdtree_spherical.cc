@@ -128,14 +128,11 @@ kd_sph_orth_dist(kdata_t *p1, kdata_t *p2, int split)
  * \return root node of the tree
  */
 struct kdNode *
-kd_sph_buildTree(struct kd_point *points, unsigned long nPoints,
+kd_sph_buildTree(struct kd_point *points, size_t nPoints,
                  kdata_t *min, kdata_t *max, int max_threads)
 {
-    struct kd_thread_data *my_data;
-    struct kdNode *tree;
-
-    my_data = kd_buildArg(points, nPoints, min, max, 0,max_threads, 2);
-    tree = (kdNode *)kd_doBuildTree(my_data);
+    struct kd_thread_data *my_data = kd_buildArg(points, nPoints, min, max, 0,max_threads, 2);
+    struct kdNode *tree = (kdNode *)kd_doBuildTree(my_data);
     free(my_data);
     return tree;
 }

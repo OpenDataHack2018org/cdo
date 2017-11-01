@@ -115,7 +115,7 @@ typedef struct kd_thread_data {
     struct kd_point *points;
     kdata_t min[KD_MAX_DIM];
     kdata_t max[KD_MAX_DIM];
-    unsigned long nPoints;
+    size_t nPoints;
     int max_threads;
     int depth;
     int dim;
@@ -153,18 +153,18 @@ void kd_printTree(struct kdNode *node);
 
 /* Functions for building and destroying trees */
 void kd_freeNode(kdNode * node);
-struct kdNode *kd_allocNode(struct kd_point *points, unsigned long pivot,
+struct kdNode *kd_allocNode(struct kd_point *points, size_t pivot,
                             kdata_t *min, kdata_t *max, int dim, int axis);
 void kd_destroyTree(struct kdNode *node);
 struct kd_thread_data *kd_buildArg(struct kd_point *points,
-                                   unsigned long nPoints,
+                                   size_t nPoints,
                                    kdata_t *min, kdata_t *max,
                                    int depth, int max_threads,
                                    int dim);
-struct kdNode *kd_buildTree(struct kd_point *points, unsigned long nPoints,
+struct kdNode *kd_buildTree(struct kd_point *points, size_t nPoints,
                             kdata_t *min, kdata_t *max, int dim, int max_threads);
 void *kd_doBuildTree(void *threadarg);
-struct kdNode *kd_sph_buildTree(struct kd_point *points, unsigned long nPoints,
+struct kdNode *kd_sph_buildTree(struct kd_point *points, size_t nPoints,
                                 kdata_t *min, kdata_t *max, int max_threads);
 void *kd_sph_doBuildTree(void *threadarg);
 
