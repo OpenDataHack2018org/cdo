@@ -18,6 +18,10 @@
 #ifndef PSTREAM_H
 #define PSTREAM_H
 
+#ifdef  HAVE_CONFIG_H
+#include "config.h" /* _FILE_OFFSET_BITS influence off_t */
+#endif
+
 #include "pstream_write.h"
 #include "varlist.h"
 #include "argument.h"
