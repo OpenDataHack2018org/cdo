@@ -70,6 +70,7 @@ libcdo_la_SOURCES =            \
                fieldmer.cc      \
                fieldzon.cc      \
                functs.h        \
+               getMemorySize.c \
                gradsdeslib.cc   \
                gradsdeslib.h   \
                grid.cc          \
