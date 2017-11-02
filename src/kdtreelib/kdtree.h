@@ -10,7 +10,7 @@
                              changed *min to min[KD_MAX_DIM]
                              changed *max to max[KD_MAX_DIM]
                              _compPoints: compare index if points[axis] are equal
-                             replace qsortR by libc:qsort (speedup 25%)
+                   20171102: renamed kd_buildArg() to kd_initArg(), changed interface and memory handling
 */
 #ifndef  KDTREE_H_
 #define  KDTREE_H_
@@ -156,11 +156,8 @@ void kd_freeNode(kdNode * node);
 struct kdNode *kd_allocNode(struct kd_point *points, size_t pivot,
                             kdata_t *min, kdata_t *max, int dim, int axis);
 void kd_destroyTree(struct kdNode *node);
-struct kd_thread_data *kd_buildArg(struct kd_point *points,
-                                   size_t nPoints,
-                                   kdata_t *min, kdata_t *max,
-                                   int depth, int max_threads,
-                                   int dim);
+void kd_initArg(struct kd_thread_data *d, struct kd_point *points, size_t nPoints,
+                kdata_t *min, kdata_t *max, int depth, int max_threads, int dim);
 struct kdNode *kd_buildTree(struct kd_point *points, size_t nPoints,
                             kdata_t *min, kdata_t *max, int dim, int max_threads);
 void *kd_doBuildTree(void *threadarg);

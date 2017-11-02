@@ -131,10 +131,10 @@ struct kdNode *
 kd_sph_buildTree(struct kd_point *points, size_t nPoints,
                  kdata_t *min, kdata_t *max, int max_threads)
 {
-    struct kd_thread_data *my_data = kd_buildArg(points, nPoints, min, max, 0,max_threads, 2);
-    struct kdNode *tree = (kdNode *)kd_doBuildTree(my_data);
-    free(my_data);
-    return tree;
+  struct kd_thread_data my_data;
+  kd_initArg(&my_data, points, nPoints, min, max, 0,max_threads, 2);
+  struct kdNode *tree = (kdNode *)kd_doBuildTree(&my_data);
+  return tree;
 }
 
 
