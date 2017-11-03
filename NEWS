@@ -1,6 +1,14 @@
 CDO NEWS
 --------
 
+Version 1.9.2 (23 November 2017):
+
+   Fixed bugs:
+     * sign of grid size increment changes [Bug #7974]
+     * compilation fails on OpenBSD [Bug #7961]
+     * expr: nesting of ?: operator lost in cdo-1.9.1 [Bug #7992]
+     * select with start=end range aborts with 'Invalid character' [Bug #7976]
+
 Version 1.9.1 (27 September 2017):
 
    New features:

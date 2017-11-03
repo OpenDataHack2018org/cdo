@@ -1,3 +1,8 @@
+2017-11-23  Uwe Schulzweida
+
+	* Using CDI library version 1.9.2
+	* Version 1.9.2 release
+
 2017-11-02  Uwe Schulzweida
 
 	* expr: nesting of ?: operator lost in cdo-1.9.1 [Bug #7992]
@@ -8,8 +13,8 @@
 
 2017-10-25  Uwe Schulzweida
 
-	* Expr: convert constanst parameter to float for 32-bit float data (bug fix)
-	* Condc: convert constanst parameter to float for 32-bit float data (bug fix)
+	* Expr: convert constant parameter to float for 32-bit float data (bug fix)
+	* Condc: convert constant parameter to float for 32-bit float data (bug fix)
 	* Cond: convert data to float for 32-bit float data (bug fix)
 
 2017-10-23  Uwe Schulzweida
