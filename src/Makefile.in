@@ -130,7 +130,7 @@ am_libcdo_la_OBJECTS = libcdo_la-argument.lo libcdo_la-array.lo \
 	libcdo_la-field.lo libcdo_la-field2.lo libcdo_la-fieldc.lo \
 	libcdo_la-fieldmem.lo libcdo_la-fieldmer.lo \
 	libcdo_la-fieldzon.lo libcdo_la-getMemorySize.lo \
-	libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
+	libcdo_la-getRSS.lo libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
 	libcdo_la-grid_proj.lo libcdo_la-grid_area.lo \
 	libcdo_la-grid_define.lo libcdo_la-grid_gme.lo \
 	libcdo_la-grid_rot.lo libcdo_la-grid_from_name.lo \
@@ -613,11 +613,11 @@ libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
 	expr.h expr_fun.cc expr_fun.h expr_lex.cc expr_yacc.cc \
 	expr_yacc.h features.cc field.cc field.h field2.cc fieldc.cc \
 	fieldmem.cc fieldmer.cc fieldzon.cc functs.h getMemorySize.c \
-	gradsdeslib.cc gradsdeslib.h grid.cc grid.h grid_proj.cc \
-	grid_proj.h grid_area.cc grid_define.cc grid_gme.cc \
-	grid_rot.cc grid_from_name.cc grid_read.cc grid_read_pingo.cc \
-	grid_print.cc gridreference.cc griddes.cc griddes.h \
-	griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
+	getRSS.c gradsdeslib.cc gradsdeslib.h grid.cc grid.h \
+	grid_proj.cc grid_proj.h grid_area.cc grid_define.cc \
+	grid_gme.cc grid_rot.cc grid_from_name.cc grid_read.cc \
+	grid_read_pingo.cc grid_print.cc gridreference.cc griddes.cc \
+	griddes.h griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
 	institution.cc interpol.cc interpol.h job.cc juldate.cc \
 	grid_search.cc grid_search.h listarray.cc listarray.h list.cc \
 	list.h listbuf.cc listbuf.h merge_sort2.cc merge_sort2.h \
@@ -1145,6 +1145,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fieldmer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fieldzon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-getMemorySize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-getRSS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-gradsdeslib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_area.Plo@am__quote@
@@ -1253,6 +1254,13 @@ libcdo_la-getMemorySize.lo: getMemorySize.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='getMemorySize.c' object='libcdo_la-getMemorySize.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-getMemorySize.lo `test -f 'getMemorySize.c' || echo '$(srcdir)/'`getMemorySize.c
+
+libcdo_la-getRSS.lo: getRSS.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-getRSS.lo -MD -MP -MF $(DEPDIR)/libcdo_la-getRSS.Tpo -c -o libcdo_la-getRSS.lo `test -f 'getRSS.c' || echo '$(srcdir)/'`getRSS.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-getRSS.Tpo $(DEPDIR)/libcdo_la-getRSS.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='getRSS.c' object='libcdo_la-getRSS.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-getRSS.lo `test -f 'getRSS.c' || echo '$(srcdir)/'`getRSS.c
 
 json/libcdo_la-jsmn.lo: json/jsmn.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT json/libcdo_la-jsmn.lo -MD -MP -MF json/$(DEPDIR)/libcdo_la-jsmn.Tpo -c -o json/libcdo_la-jsmn.lo `test -f 'json/jsmn.c' || echo '$(srcdir)/'`json/jsmn.c

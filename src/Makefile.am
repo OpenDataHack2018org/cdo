@@ -71,6 +71,7 @@ libcdo_la_SOURCES =            \
                fieldzon.cc      \
                functs.h        \
                getMemorySize.c \
+               getRSS.c        \
                gradsdeslib.cc   \
                gradsdeslib.h   \
                grid.cc          \

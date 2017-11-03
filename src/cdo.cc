@@ -81,7 +81,7 @@ static int numThreads = 0;
 static int timer_total;
 static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
-static const char *username;
+const char *CDO_username;
 
 #ifdef __cplusplus
 extern "C" {
@@ -113,7 +113,7 @@ void gridsearch_set_method(const char *methodstr);
           } \
       }
 
-#define ITSME  (strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
+#define ITSME  (strcmp(CDO_username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
 
 static
 void cdo_stackframe(void)
@@ -192,7 +192,7 @@ void cdo_version(void)
   const int   filetypes[] = {CDI_FILETYPE_SRV, CDI_FILETYPE_EXT, CDI_FILETYPE_IEG, CDI_FILETYPE_GRB, CDI_FILETYPE_GRB2, CDI_FILETYPE_NC, CDI_FILETYPE_NC2, CDI_FILETYPE_NC4, CDI_FILETYPE_NC4C, CDI_FILETYPE_NC5};
   const char* typenames[] = {        "srv",        "ext",        "ieg",       "grb1",        "grb2",       "nc1",        "nc2",        "nc4",        "nc4c",        "nc5"};
 
-  fprintf(stderr, "%s\n", CDO_Version);
+  fprintf(stderr, "%s\n", CDO_version);
 #if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
   fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
@@ -234,7 +234,7 @@ void cdo_usage(void)
 {
   const char *name;
 
-  /*  fprintf(stderr, "%s\n", CDO_Version);*/
+  /*  fprintf(stderr, "%s\n", CDO_version);*/
   /*  fprintf(stderr, "\n");*/
   fprintf(stderr, "usage : cdo  [Options]  Operator1  [-Operator2  [-OperatorN]]\n");
   fprintf(stderr, "\n");
@@ -733,11 +733,11 @@ void defineVarnames(const char *arg)
 static
 void get_env_vars(void)
 {
-  username = getenv("LOGNAME");
-  if ( username == NULL )
+  CDO_username = getenv("LOGNAME");
+  if ( CDO_username == NULL )
     {
-      username = getenv("USER");
-      if ( username == NULL ) username = "unknown";
+      CDO_username = getenv("USER");
+      if ( CDO_username == NULL ) CDO_username = "unknown";
     }
 
   char *envstr = getenv("CDO_GRID_SEARCH_DIR");
@@ -1491,11 +1491,9 @@ int main(int argc, char *argv[])
  
   setCommandLine(argc, argv);
 
-  Progname = getProgname(argv[0]);
-
-  if ( strncmp(Progname, "cdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
-
-  if ( noff ) setDefaultFileType(Progname+noff, 0);
+  CDO_progname = getProgname(argv[0]);
+  if ( strncmp(CDO_progname, "cdo", 3) == 0 && strlen(CDO_progname) > 3 ) noff = 3;
+  if ( noff ) setDefaultFileType(CDO_progname+noff, 0);
 
   get_env_vars();
   init_modules();

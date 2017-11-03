@@ -45,17 +45,12 @@
 #endif
  
 
-/* refactor: moved here from *.c */
+int CDO_opterr = 0; 
+const char *CDO_optarg = NULL;
+int CDO_optind = 1;
 
-int CDO_opterr = 0;      // refactor: moved here from cdo_getopt.cc
-const char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.cc
-int CDO_optind = 1;      // refactor: moved here from cdo_getopt.cc
-
-
-/* refactor: moved here from cdo.cc */
-
-char *Progname;
-const char *CDO_Version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
+const char *CDO_progname = NULL;
+const char *CDO_version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
 
 int ompNumThreads = 1;
 
@@ -69,7 +64,7 @@ int cdoDefaultFileType   = CDI_UNDEFID;
 int cdoDefaultDataType   = CDI_UNDEFID;
 int cdoDefaultByteorder  = CDI_UNDEFID;
 int cdoDefaultTableID    = CDI_UNDEFID;
-int cdoDefaultInstID     = CDI_UNDEFID;     // moved here from institution.cc, was UNDEFID
+int cdoDefaultInstID     = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;
 
 int cdoLockIO            = FALSE;
@@ -113,7 +108,7 @@ char **cdoVarnames       = NULL;
 char CDO_File_Suffix[32];
 
 int cdoExpMode           = -1;
-const char *cdoExpName         = NULL;
+const char *cdoExpName   = NULL;
 
 int timer_read, timer_write;
 
@@ -126,8 +121,8 @@ const char *cdoComment(void)
     {
       init = true;
 
-      int size = strlen(CDO_Version);
-      strncat(comment, CDO_Version, size);
+      int size = strlen(CDO_version);
+      strncat(comment, CDO_version, size);
       comment[size] = 0;
     }
 
@@ -185,7 +180,7 @@ void cdo_omp_set_num_threads(int nthreads)
 }
 
 
-char *getProgname(char *string)
+const char *getProgname(char *string)
 {
 #if defined(_WIN32)
   /*  progname = strrchr(string, '\\'); */
@@ -194,8 +189,10 @@ char *getProgname(char *string)
   char *progname = strrchr(string, '/');
 #endif
 
-  if ( progname == NULL ) progname = string;
-  else                    progname++;
+  if ( progname == NULL )
+    progname = string;
+  else
+    progname++;
 
   return progname;
 }
@@ -223,10 +220,7 @@ const char *getOperatorName(const char *operatorCommand)
 
   if ( operatorCommand )
     {
-      if ( operatorCommand[0] == '-' )
-      {
-          operatorCommand++;
-      }
+      if ( operatorCommand[0] == '-' ) operatorCommand++;
       char *commapos = (char *)strchr(operatorCommand, ',');
       size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand) : strlen(operatorCommand);
 
@@ -238,10 +232,11 @@ const char *getOperatorName(const char *operatorCommand)
 
   /*  return operatorName; */
   if(is_alias(operatorName))
-  {
-    operatorName = get_original(operatorName);
-  }
-    return operatorName;
+    {
+      operatorName = get_original(operatorName);
+    }
+
+  return operatorName;
 }
 
 char *getOperatorArg(const char *p_operatorCommand)
@@ -251,7 +246,6 @@ char *getOperatorArg(const char *p_operatorCommand)
   if ( p_operatorCommand )
     {
       char *commapos = (char *)strchr(p_operatorCommand, ',');
-
       if ( commapos )
         {
           size_t len = strlen(commapos+1);
@@ -273,7 +267,6 @@ char *getFileArg(char *argument)
   if ( argument )
     {
       char *blankpos = strchr(argument, ' ');
-
       if ( blankpos )
         {
           char *parg = blankpos + 1;
@@ -328,13 +321,11 @@ void input_int(char *arg, int intarr[], int maxint, int *nintfound)
 
 std::string string2lower(std::string str)
 {
-    std::string lower_case_string = str;
-    for(char c : str)
-    {
-       c = tolower(c); 
-    }
-    return lower_case_string;
+  std::string lower_case_string = str;
+  for(char c : str) c = tolower(c); 
+  return lower_case_string;
 }
+
 void strtolower(char *str)
 {
   if ( str )
@@ -502,9 +493,7 @@ int month_to_season(int month)
   return seas;
 }
 
-//#include <sys/types.h>
 #include <sys/stat.h>
-//#include <unistd.h>
 
 bool fileExists(const char *restrict filename)
 {

@@ -103,10 +103,10 @@ enum T_EIGEN_MODE  {JACOBI, DANIELSON_LANCZOS};
 #endif
 
 
-#define NEW_2D(T, P2D, N, M)     T **P2D = (N)?new T*[(N)]:nullptr;                          \
-                                 if ((N)) { P2D[0] = (M)?new T[(N)*(M)]:nullptr;             \
-                                            for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
-#define DELETE_2D(P2D) if (P2D) { if (P2D[0]) delete[] P2D[0]; delete[] P2D; P2D = nullptr; }
+#define  NEW_2D(T, P2D, N, M)     T **P2D = (N)?new T*[(N)]:nullptr;                          \
+                                  if ((N)) { P2D[0] = (M)?new T[(N)*(M)]:nullptr;             \
+                                             for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
+#define  DELETE_2D(P2D) if (P2D) { if (P2D[0]) delete[] P2D[0]; delete[] P2D; P2D = nullptr; }
 
 
 #define  IX2D(y,x,nx)  ((y)*(nx)+(x))

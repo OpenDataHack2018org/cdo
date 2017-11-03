@@ -43,8 +43,12 @@
 
 #define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
+#define  ITSME  (strcmp(CDO_username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
+
 #include <string>
-extern char *Progname;
+extern const char *CDO_progname;
+extern const char *CDO_version;
+extern const char *CDO_username;
 extern char *cdoGridSearchDir;
 extern int CDO_Reduce_Dim;
 extern int CDO_Memtype;
@@ -109,12 +113,9 @@ extern int cdoNumVarnames;
 extern char **cdoVarnames;
 extern char CDO_File_Suffix[32]; // refactor: added keyword extern
 
-extern const char *CDO_Version;
 
 
-
-
-char *getProgname(char *string);
+const char *getProgname(char *string);
 char *GetOperator(const char *argument);
 const char *getOperatorName(const char *operatorCommand);
 char *getOperatorArg(const char *operatorCommand);
