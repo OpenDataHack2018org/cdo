@@ -355,10 +355,11 @@ double gs_set_range(double *prange)
   return range;
 }
 
-
-kdNode *gs_nearest_kdtree(kdNode *kdt, double lon, double lat, double *prange)
+static
+size_t gs_nearest_kdtree(kdNode *kdt, double lon, double lat, double *prange)
 {
-  if ( kdt == NULL ) return NULL;
+  size_t index = GS_NOT_FOUND;
+  if ( kdt == NULL ) return index;
   
   float range0 = gs_set_range(prange);
   kdata_t range = KDATA_SCALE(range0);
@@ -372,13 +373,16 @@ kdNode *gs_nearest_kdtree(kdNode *kdt, double lon, double lat, double *prange)
   if ( !(frange < range0) ) node = NULL;
   if ( prange ) *prange = frange;
 
-  return node;
+  if ( node ) index = node->index;
+
+  return index;
 }
 
-
-kdNode *gs_nearest_kdsph(kdNode *kdt, double lon, double lat, double *prange)
+static
+size_t gs_nearest_kdsph(kdNode *kdt, double lon, double lat, double *prange)
 {
-  if ( kdt == NULL ) return NULL;
+  size_t index = GS_NOT_FOUND;
+  if ( kdt == NULL ) return index;
   
   float range0 = gs_set_range(prange);
   kdata_t range = KDATA_SCALE(range0);
@@ -393,7 +397,9 @@ kdNode *gs_nearest_kdsph(kdNode *kdt, double lon, double lat, double *prange)
   if ( !(frange < range0) ) node = NULL;
   if ( prange ) *prange = frange;
 
-  return node;
+  if ( node ) index = node->index;
+
+  return index;
 }
 
 
@@ -480,28 +486,13 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
 
   if ( gs )
     {
-      if ( gs->method_nn == GS_KDTREE )
-        {
-          kdNode *node = gs_nearest_kdtree(gs->kdt, lon, lat, prange);
-          if ( node ) index = (int) node->index;
-        }
-      else if ( gs->method_nn == GS_KDSPH )
-        {
-          kdNode *node = gs_nearest_kdsph(gs->kdt, lon, lat, prange);
-          if ( node ) index = (int) node->index;
-        }
-      else if ( gs->method_nn == GS_NEARPT3 )
-        {
-          index = gs_nearest_nearpt3(gs->near, lon, lat, prange);
-        }
-      else if ( gs->method_nn == GS_FULL )
-        {
-          index = gs_nearest_full(gs->full, lon, lat, prange);
-        }
-      else
-        {
-          cdoAbort("gridsearch_nearest::method_nn undefined!");
-        }
+      // clang-format off
+      if      ( gs->method_nn == GS_KDTREE )  index = gs_nearest_kdtree(gs->kdt, lon, lat, prange);
+      else if ( gs->method_nn == GS_KDSPH )   index = gs_nearest_kdsph(gs->kdt, lon, lat, prange);
+      else if ( gs->method_nn == GS_NEARPT3 ) index = gs_nearest_nearpt3(gs->near, lon, lat, prange);
+      else if ( gs->method_nn == GS_FULL )    index = gs_nearest_full(gs->full, lon, lat, prange);
+      else cdoAbort("gridsearch_nearest::method_nn undefined!");
+      // clang-format on
     }
 
   return index;
