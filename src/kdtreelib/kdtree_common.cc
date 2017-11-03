@@ -178,12 +178,10 @@ void *kd_doBuildTree(void *threadarg)
   return (void *) node;
 }
 
-
-void
-kd_freeNode(kdNode *node)
+static
+void kd_freeNode(kdNode *node)
 {
   if ( node ) free(node);
-  return;
 }
 
 
@@ -191,6 +189,7 @@ kd_freeNode(kdNode *node)
 #ifdef  TEST_BIGMEM
 size_t num_nodes = 0;
 struct kdNode *mem_pool = NULL;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 struct kdNode *
@@ -200,8 +199,11 @@ kd_allocNode(struct kd_point *points, size_t pivot,
   struct kdNode *node;
 
 #ifdef  TEST_BIGMEM
+  if ( num_nodes > 2*25920000 ) fprintf(stderr, "number of nodes exceeded!\n");
   if ( mem_pool == NULL ) mem_pool = (kdNode *) malloc(2*25920000*sizeof(kdNode)); // 2*gridsize
+  pthread_mutex_lock(&mutex);
   node = &mem_pool[num_nodes++];
+  pthread_mutex_unlock(&mutex);
 #else
   if ((node = (kdNode *)kd_malloc(sizeof(kdNode), "kd_allocNode (node): ")) == NULL)
     return NULL;
@@ -234,8 +236,8 @@ kd_destroyTree(struct kdNode *node)
 #ifdef  TEST_BIGMEM
   if ( mem_pool )
     {
-      free(mem_pool);
-      num_nodes = 0;
+      //  free(mem_pool);
+      //  num_nodes = 0;
     }
 #else
   kd_destroyTree(node->left);

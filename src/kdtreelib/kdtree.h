@@ -11,6 +11,7 @@
                              changed *max to max[KD_MAX_DIM]
                              _compPoints: compare index if points[axis] are equal
                    20171102: renamed kd_buildArg() to kd_initArg(), changed interface and memory handling
+                             changed data pointer to size_t
 */
 #ifndef  KDTREE_H_
 #define  KDTREE_H_
@@ -152,7 +153,6 @@ void kd_printNode(struct kdNode *node);
 void kd_printTree(struct kdNode *node);
 
 /* Functions for building and destroying trees */
-void kd_freeNode(kdNode * node);
 struct kdNode *kd_allocNode(struct kd_point *points, size_t pivot,
                             kdata_t *min, kdata_t *max, int dim, int axis);
 void kd_destroyTree(struct kdNode *node);
