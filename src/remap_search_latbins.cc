@@ -45,22 +45,17 @@ void calc_bin_addr(size_t gridsize, size_t nbins, const restr_t* restrict bin_la
 
 void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type)
 {
-  size_t nbins;
-  size_t n;      /* Loop counter                  */
   size_t n2;
-  double dlat;                /* lat/lon intervals for search bins  */
-  restr_t *bin_lats = NULL;
-
-  nbins = src_grid->num_srch_bins;
-  dlat = PI/nbins;
+  size_t nbins = src_grid->num_srch_bins;
+  double dlat = PI/nbins;  // lat/lon intervals for search bins
 
   if ( cdoVerbose ) cdoPrint("Using %d latitude bins to restrict search.", nbins);
 
   if ( nbins > 0 )
     {
-      bin_lats = src_grid->bin_lats = (restr_t*) Realloc(src_grid->bin_lats, 2*nbins*sizeof(restr_t));
+      restr_t *bin_lats = src_grid->bin_lats = (restr_t*) Realloc(src_grid->bin_lats, 2*nbins*sizeof(restr_t));
 
-      for ( n = 0; n < nbins; ++n )
+      for ( size_t n = 0; n < nbins; ++n )
 	{
 	  n2 = n<<1;
 	  bin_lats[n2  ] = RESTR_SCALE((n  )*dlat - PIH);
@@ -96,20 +91,15 @@ void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type)
 size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2,
                       restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, size_t src_grid_size, size_t *srch_add)
 {
-  size_t num_srch_cells;  /* num cells in restricted search arrays   */
-  size_t min_add;         /* addresses for restricting search of     */
-  size_t max_add;         /* destination grid                        */
-  size_t n, n2;           /* generic counters                        */
-  size_t src_cell_add;    /* current linear address for src cell     */
+  size_t n2;
   size_t src_cell_addm4;
-  restr_t bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2;
 
   /* Restrict searches first using search bins */
 
-  min_add = src_grid_size - 1;
-  max_add = 0;
+  size_t min_add = src_grid_size - 1;
+  size_t max_add = 0;
 
-  for ( n = 0; n < nbins; ++n )
+  for ( size_t n = 0; n < nbins; ++n )
     {
       n2 = n<<1;
       if ( tgt_cell_add >= bin_addr1[n2] && tgt_cell_add <= bin_addr1[n2+1] )
@@ -121,13 +111,13 @@ size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size
 
   /* Further restrict searches using bounding boxes */
 
-  bound_box_lat1 = tgt_cell_bound_box[0];
-  bound_box_lat2 = tgt_cell_bound_box[1];
-  bound_box_lon1 = tgt_cell_bound_box[2];
-  bound_box_lon2 = tgt_cell_bound_box[3];
+  restr_t bound_box_lat1 = tgt_cell_bound_box[0];
+  restr_t bound_box_lat2 = tgt_cell_bound_box[1];
+  restr_t bound_box_lon1 = tgt_cell_bound_box[2];
+  restr_t bound_box_lon2 = tgt_cell_bound_box[3];
 
-  num_srch_cells = 0;
-  for ( src_cell_add = min_add; src_cell_add <= max_add; ++src_cell_add )
+  size_t num_srch_cells = 0;
+  for ( size_t src_cell_add = min_add; src_cell_add <= max_add; ++src_cell_add )
     {
       src_cell_addm4 = src_cell_add<<2;
       if ( (src_cell_bound_box[src_cell_addm4+2] <= bound_box_lon2)  &&
@@ -155,7 +145,7 @@ size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size
 	  bound_box_lon2 -= RESTR_SCALE(PI2);
 	}
 
-      for ( src_cell_add = min_add; src_cell_add <= max_add; ++src_cell_add )
+      for ( size_t src_cell_add = min_add; src_cell_add <= max_add; ++src_cell_add )
 	{
 	  src_cell_addm4 = src_cell_add<<2;
 	  if ( (src_cell_bound_box[src_cell_addm4+2] <= bound_box_lon2)  &&
@@ -187,17 +177,15 @@ int grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, dou
 		   const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
-  size_t n, srch_add;
-  size_t i;
-  double dist_min, distance; /* For computing dist-weighted avg */
+  double distance; /* For computing dist-weighted avg */
   double coslat_dst = cos(plat);
   double sinlat_dst = sin(plat);
   double coslon_dst = cos(plon);
   double sinlon_dst = sin(plon);
 
-  dist_min = BIGNUM;
-  for ( n = 0; n < 4; ++n ) nbr_dist[n] = BIGNUM;
-  for ( srch_add = min_add; srch_add <= max_add; ++srch_add )
+  double dist_min = BIGNUM;
+  for ( unsigned n = 0; n < 4; ++n ) nbr_dist[n] = BIGNUM;
+  for ( size_t srch_add = min_add; srch_add <= max_add; ++srch_add )
     {
       distance = acos(coslat_dst*cos(src_center_lat[srch_add])*
 		     (coslon_dst*cos(src_center_lon[srch_add]) +
@@ -206,11 +194,11 @@ int grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, dou
 
       if ( distance < dist_min )
 	{
-          for ( n = 0; n < 4; ++n )
+          for ( unsigned n = 0; n < 4; ++n )
 	    {
 	      if ( distance < nbr_dist[n] )
 		{
-		  for ( i = 3; i > n; --i )
+		  for ( unsigned i = 3; i > n; --i )
 		    {
 		      nbr_add [i] = nbr_add [i-1];
 		      nbr_dist[i] = nbr_dist[i-1];
@@ -225,10 +213,10 @@ int grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, dou
         }
     }
 
-  for ( n = 0; n < 4; ++n ) nbr_dist[n] = ONE/(nbr_dist[n] + TINY);
+  for ( unsigned n = 0; n < 4; ++n ) nbr_dist[n] = ONE/(nbr_dist[n] + TINY);
   distance = 0.0;
-  for ( n = 0; n < 4; ++n ) distance += nbr_dist[n];
-  for ( n = 0; n < 4; ++n ) nbr_dist[n] /= distance;
+  for ( unsigned n = 0; n < 4; ++n ) distance += nbr_dist[n];
+  for ( unsigned n = 0; n < 4; ++n ) nbr_dist[n] /= distance;
 
   return search_result;
 }
@@ -261,7 +249,7 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
     int src_bin_add[][2]           ! latitude bins for restricting
   */
   /*  Local variables */
-  size_t n, n2, next_n, srch_add, srch_add4;    /* dummy indices                    */
+  size_t n2, next_n, srch_add, srch_add4;    /* dummy indices                    */
   /* Vectors for cross-product check */
   double vec1_lat, vec1_lon;
   double vec2_lat, vec2_lon;
@@ -276,7 +264,7 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
 
   // restrict search first using bins
 
-  for ( n = 0; n < 4; ++n ) src_add[n] = 0;
+  for ( unsigned n = 0; n < 4; ++n ) src_add[n] = 0;
 
   // addresses for restricting search
   size_t min_add = src_grid->size-1;
@@ -307,6 +295,8 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
 	   rlat >= src_grid_bound_box[srch_add4  ] &&
 	   rlat <= src_grid_bound_box[srch_add4+1])
 	{
+          unsigned n;
+
 	  /* We are within bounding box so get really serious */
 
           /* Determine neighbor addresses */

@@ -523,7 +523,7 @@ int expand_curvilinear_grid(int gridID)
 /*****************************************************************************/
 
 static
-void grid_check_lat_borders_rad(int n, double *ybounds)
+void grid_check_lat_borders_rad(size_t n, double *ybounds)
 {
 #define  YLIM  (88*DEG2RAD)
   if ( ybounds[0] > ybounds[n-1] )
@@ -982,7 +982,7 @@ void remap_vars_init(int map_type, size_t src_grid_size, size_t tgt_grid_size, r
 /*
    This routine resizes remapping arrays by increasing(decreasing) the max_links by increment
 */
-void resize_remap_vars(remapvars_t *rv, int increment)
+void resize_remap_vars(remapvars_t *rv, int64_t increment)
 {
   /*
     Input variables:
@@ -1171,7 +1171,7 @@ size_t get_max_add(size_t num_links, size_t size, const size_t *restrict add)
 static 
 size_t binary_search_int(const size_t *array, size_t len, size_t value)
 {       
-  long low = 0, high = len - 1, midpoint = 0;
+  int64_t low = 0, high = len - 1, midpoint = 0;
  
   while ( low <= high )
     {

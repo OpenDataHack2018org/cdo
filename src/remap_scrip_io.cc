@@ -694,7 +694,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   rv->max_links = rv->num_links;
 
-  rv->resize_increment = (int) (0.1 * MAX(src_grid->size, tgt_grid->size));
+  rv->resize_increment = (size_t) (0.1 * MAX(src_grid->size, tgt_grid->size));
 
   // Allocate address and weight arrays for mapping 1
 

@@ -1,6 +1,7 @@
-#ifndef _REMAP_H
-#define _REMAP_H
+#ifndef  REMAP_H
+#define  REMAP_H
 
+#include <stdint.h>
 #include <math.h>
 
 #ifndef  M_PI
@@ -197,7 +198,7 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
 void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array, double *restrict tgt_array, double missval);
 
 
-void resize_remap_vars(remapvars_t *rv, int increment);
+void resize_remap_vars(remapvars_t *rv, int64_t increment);
 
 void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv, const double *restrict array1, 
 		const double *restrict array2, double missval);
@@ -238,4 +239,4 @@ void remapgrid_get_lonlat(remapgrid_t *grid, size_t cell_add, double *plon, doub
 void remapCheckArea(size_t grid_size, double *restrict cell_area, const char *name);
 void remapCheckWeights(size_t num_links, size_t num_wts, int norm_opt, size_t *src_cell_add, size_t *tgt_cell_add, double *wts);
 
-#endif  /* _REMAP_H */
+#endif  /* REMAP_H */
