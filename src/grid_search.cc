@@ -83,16 +83,19 @@ void gridsearch_extrapolate(struct gridsearch *gs)
 }
 
 
-struct gridsearch *gridsearch_create_reg2d(bool lcyclic, size_t nx, size_t ny, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
-  gs->reg2d = true;
-  gs->nx = nx;
-  gs->ny = ny;
+  gs->is_cyclic = is_cyclic;
+  gs->is_reg2d = true;
+  gs->dims[0] = dims[0];
+  gs->dims[1] = dims[1];
+  size_t nx = dims[0];
+  size_t ny = dims[0];
 
   size_t nxm = nx;
-  if ( lcyclic ) nxm++;
+  if ( is_cyclic ) nxm++;
 
   double *reg2d_center_lon = (double *) Malloc(nxm*sizeof(double));
   double *reg2d_center_lat = (double *) Malloc(ny*sizeof(double));

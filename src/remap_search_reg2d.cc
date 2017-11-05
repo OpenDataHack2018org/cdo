@@ -85,7 +85,7 @@ int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double 
 
 
 int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
-		      double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
+		      double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
 		      const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   /*

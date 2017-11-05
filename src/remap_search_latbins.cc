@@ -223,7 +223,7 @@ int grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, dou
 
 
 int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
-		double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
+		double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
 		const double *restrict src_center_lat, const double *restrict src_center_lon,
 		const restr_t *restrict src_grid_bound_box, const size_t *restrict src_bin_add)
 {

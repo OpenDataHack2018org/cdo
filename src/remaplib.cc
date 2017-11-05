@@ -413,6 +413,7 @@ void check_lat_boundbox_range(size_t nlats, restr_t *restrict bound_box, double 
 static
 int expand_lonlat_grid(int gridID)
 {
+  if ( cdoVerbose ) cdoPrint("expand_lonlat_grid");
   size_t nx = gridInqXsize(gridID);
   size_t ny = gridInqYsize(gridID);
   size_t nxp4 = nx+4;
@@ -459,6 +460,7 @@ int expand_lonlat_grid(int gridID)
 static
 int expand_curvilinear_grid(int gridID)
 {
+  if ( cdoVerbose ) cdoPrint("expand_curvilinear_grid");
   size_t gridsize = gridInqSize(gridID);
   long nx = (long) gridInqXsize(gridID);
   long ny = (long) gridInqYsize(gridID);

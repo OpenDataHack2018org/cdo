@@ -1031,6 +1031,7 @@ void *Remap(void *argument)
 	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = true;
 	  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 && !is_global_grid(gridID1) )
 	    {
+              if ( cdoVerbose ) cdoPrint("---> Expand array!");
 	      long nx = gridInqXsize(gridID1);
 	      long ny = gridInqYsize(gridID1);
 	      size_t gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);

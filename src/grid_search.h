@@ -27,10 +27,11 @@ struct gsNear {
 
 struct gridsearch {
   bool extrapolate;
-  bool reg2d;
+  bool is_cyclic;
+  bool is_reg2d;
   int method_nn;
   size_t n;
-  size_t nx, ny;
+  size_t dims[2];
 
   struct gsNear *near;
   struct kdNode *kdt;
@@ -58,7 +59,7 @@ struct gsknn *gridsearch_knn_new(size_t size);
 void gridsearch_knn_delete(struct gsknn *knn);
 size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat);
 
-struct gridsearch *gridsearch_create_reg2d(bool lcyclic, size_t nx, size_t ny, const double *restrict lons, const double *restrict lats);
+struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, const double *restrict lats);
 void gridsearch_delete(struct gridsearch *gs);

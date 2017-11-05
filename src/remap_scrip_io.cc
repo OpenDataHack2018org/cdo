@@ -384,8 +384,11 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 
   // Write mapping data
 
-  nce(nc_put_var_int(nc_file_id, nc_srcgrddims_id, src_grid.dims));
-  nce(nc_put_var_int(nc_file_id, nc_dstgrddims_id, tgt_grid.dims));
+  int dims[2];
+  dims[0] = (int)src_grid.dims[0]; dims[1] = (int)src_grid.dims[1];
+  nce(nc_put_var_int(nc_file_id, nc_srcgrddims_id, dims));
+  dims[0] = (int)tgt_grid.dims[0]; dims[1] = (int)tgt_grid.dims[1];
+  nce(nc_put_var_int(nc_file_id, nc_dstgrddims_id, dims));
 
   nce(nc_put_var_int(nc_file_id, nc_srcgrdimask_id, src_grid.mask));
   nce(nc_put_var_int(nc_file_id, nc_dstgrdimask_id, tgt_grid.mask));
@@ -747,7 +750,9 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   // Read all variables
 
-  nce(nc_get_var_int(nc_file_id, nc_srcgrddims_id, src_grid->dims));
+  int dims[2];
+  nce(nc_get_var_int(nc_file_id, nc_srcgrddims_id, dims));
+  src_grid->dims[0] = dims[0]; src_grid->dims[1] = dims[1];
 
   nce(nc_get_var_int(nc_file_id, nc_srcgrdimask_id, src_grid->mask));
 
@@ -779,7 +784,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   nce(nc_get_var_double(nc_file_id, nc_srcgrdfrac_id, src_grid->cell_frac));
 
-  nce(nc_get_var_int(nc_file_id, nc_dstgrddims_id, tgt_grid->dims));
+  nce(nc_get_var_int(nc_file_id, nc_dstgrddims_id, dims));
+  tgt_grid->dims[0] = dims[0]; tgt_grid->dims[1] = dims[1];
 
   nce(nc_get_var_int(nc_file_id, nc_dstgrdimask_id, tgt_grid->mask));
 
