@@ -117,7 +117,7 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 } 
 
 static
-void print_remap_info(int operfunc, int remap_genweights, remapgrid_t *src_grid, remapgrid_t *tgt_grid, size_t nmiss)
+void print_remap_info(int operfunc, bool remap_genweights, remapgrid_t *src_grid, remapgrid_t *tgt_grid, size_t nmiss)
 {
   char line[256], tmpstr[256];
 
@@ -218,7 +218,7 @@ static bool lextrapolate = false;
 int max_remaps = -1;
 int sort_mode = HEAP_SORT;
 double remap_frac_min = 0;
-int remap_genweights = TRUE;
+bool REMAP_genweights = true;
 
 static
 void get_remap_env(void)
@@ -417,19 +417,15 @@ void get_remap_env(void)
       if ( *envstr )
 	{
 	  if ( memcmp(envstr, "ON", 2) == 0 || memcmp(envstr, "on", 2) == 0 )
-	    {
-	      remap_genweights = TRUE;
-	    }
+            REMAP_genweights = true;
 	  else if ( memcmp(envstr, "OFF", 3) == 0 || memcmp(envstr, "off", 3) == 0 )
-	    {
-	      remap_genweights = FALSE;
-	    }
+            REMAP_genweights = false;
 	  else
 	    cdoWarning("Environment variable CDO_REMAP_GENWEIGHTS has wrong value!");
 
 	  if ( cdoVerbose )
 	    {
-	      if ( remap_genweights == TRUE )
+	      if ( REMAP_genweights )
 		cdoPrint("Generation of weights enabled!");
 	      else
 		cdoPrint("Generation of weights disabled!");
@@ -775,6 +771,8 @@ void sort_remap_add(remapvars_t *remapvars)
 
 void *Remap(void *argument)
 {
+  bool remap_genweights = REMAP_genweights;
+  bool need_gradiants = false;
   int streamID2 = -1;
   int nrecs;
   int varID, levelID;
@@ -788,7 +786,6 @@ void *Remap(void *argument)
   int map_type = -1;
   int submap_type = SUBMAP_TYPE_NONE;
   int num_neighbors = 0;
-  int need_gradiants = FALSE;
   char varname[CDI_MAX_NAME];
   double missval;
   remap_t *remaps = NULL;
@@ -901,8 +898,7 @@ void *Remap(void *argument)
 	}
     }
 
-  if ( lwrite_remap || lremapxxx )
-    remap_genweights = TRUE;
+  if ( lwrite_remap || lremapxxx ) remap_genweights = true;
 
   if ( lremapxxx )
     {
@@ -963,22 +959,22 @@ void *Remap(void *argument)
       get_map_type(operfunc, &map_type, &submap_type, &num_neighbors, &remap_order);
     }
 
-  if ( remap_genweights == FALSE &&
+  if ( !remap_genweights &&
        map_type != MAP_TYPE_BILINEAR && map_type != MAP_TYPE_BICUBIC &&
        map_type != MAP_TYPE_DISTWGT  && map_type != MAP_TYPE_CONSERV_YAC )
-    remap_genweights = TRUE;
+    remap_genweights = true;
 
-  remap_set_int(REMAP_GENWEIGHTS, remap_genweights);
+  remap_set_int(REMAP_GENWEIGHTS, (int)remap_genweights);
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC ) norm_opt = get_norm_opt();
 
   size_t grid1sizemax = vlistGridsizeMax(vlistID1);
 
-  if ( map_type == MAP_TYPE_BICUBIC ) need_gradiants = TRUE;
+  if ( map_type == MAP_TYPE_BICUBIC ) need_gradiants = true;
   if ( map_type == MAP_TYPE_CONSERV && remap_order == 2 )
     {
       if ( cdoVerbose ) cdoPrint("Second order remapping");
-      need_gradiants = TRUE;
+      need_gradiants = true;
     }
   else
     remap_order = 1;
@@ -1043,13 +1039,6 @@ void *Remap(void *argument)
 		  grid1sizemax = gridsize_new;
 		  array1 = (double*) Realloc(array1, grid1sizemax*sizeof(double));
 		  imask  = (int*) Realloc(imask, grid1sizemax*sizeof(int));
-
-		  if ( need_gradiants )
-		    {
-		      grad1_lat    = (double*) Realloc(grad1_lat, grid1sizemax*sizeof(double));
-		      grad1_lon    = (double*) Realloc(grad1_lon, grid1sizemax*sizeof(double));
-		      grad1_latlon = (double*) Realloc(grad1_latlon, grid1sizemax*sizeof(double));
-		    }
 		}
 	      
 	      for ( long j = ny-1; j >= 0; j-- )
@@ -1106,9 +1095,7 @@ void *Remap(void *argument)
 		  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = true;
 		  remaps[r].src_grid.non_global = false;
 		  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 && !is_global_grid(gridID1) )
-		    {
-		      remaps[r].src_grid.non_global = true;
-		    }
+                    remaps[r].src_grid.non_global = true;
 		  /*
 		    remaps[r].src_grid.luse_cell_area = FALSE;
 		    remaps[r].tgt_grid.luse_cell_area = FALSE;
@@ -1205,7 +1192,7 @@ void *Remap(void *argument)
 	      if ( need_gradiants )
 		{
 		  if ( remaps[r].src_grid.rank != 2 && remap_order == 2 )
-		    cdoAbort("Second order remapping is not only available for unstructured grids!");
+		    cdoAbort("Second order remapping is not available for unstructured grids!");
 
 		  remap_gradients(remaps[r].src_grid, array1, grad1_lat, grad1_lon, grad1_latlon);
 		}

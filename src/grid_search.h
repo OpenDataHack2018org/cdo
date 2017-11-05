@@ -26,6 +26,8 @@ struct gsNear {
 };
 
 struct gridsearch {
+  bool extrapolate;
+  bool reg2d;
   int method_nn;
   size_t n;
   size_t nx, ny;
@@ -62,5 +64,6 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
 void gridsearch_delete(struct gridsearch *gs);
 size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
 struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn);
+void gridsearch_extrapolate(struct gridsearch *gs);
 
 #endif

@@ -77,10 +77,17 @@ void gridsearch_set_method(const char *methodstr)
 }
 
 
+void gridsearch_extrapolate(struct gridsearch *gs)
+{
+  gs->extrapolate = true;
+}
+
+
 struct gridsearch *gridsearch_create_reg2d(bool lcyclic, size_t nx, size_t ny, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
+  gs->reg2d = true;
   gs->nx = nx;
   gs->ny = ny;
 

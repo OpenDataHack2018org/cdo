@@ -726,14 +726,11 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 	}
       else /* full grid search */
 	{
-	  size_t gridsize;
-	  size_t i, i4;
-	  
-	  gridsize = grid->size;
-  
 	  if ( cdoVerbose ) cdoPrint("Grid: bounds missing -> full grid search!");
 
-	  for ( i = 0; i < gridsize; ++i )
+	  size_t gridsize = grid->size;
+	  size_t i4;
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      i4 = i<<2;
 	      grid->cell_bound_box[i4  ] = RESTR_SCALE(-PIH);
@@ -794,10 +791,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
       if ( map_type == MAP_TYPE_BILINEAR && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
     }
 
-  if ( lextrapolate )
-    src_grid->lextrapolate = true;
-  else
-    src_grid->lextrapolate = false;
+  src_grid->lextrapolate = lextrapolate;
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
     {
@@ -869,7 +863,6 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
   remap_define_grid(map_type, gridID1, src_grid, "Source");
-
   remap_define_grid(map_type, gridID2, tgt_grid, "Target");
 
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )

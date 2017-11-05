@@ -1258,7 +1258,7 @@ int parse_options_long(int argc, char *argv[])
               int intarg = parameter2int(CDO_optarg);
               if ( intarg != 0 && intarg != 1 )
                 cdoAbort("Unsupported value for option --remap_genweights %d [0/1]", intarg);
-              remap_genweights = intarg;
+              REMAP_genweights = intarg;
             }
           else if ( lsortname )
             {

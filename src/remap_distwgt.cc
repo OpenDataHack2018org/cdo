@@ -127,14 +127,13 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, remapgri
     double plat,         ! latitude  of the search point
     double plon,         ! longitude of the search point
   */
-  size_t n, nadd;
+  size_t n;
   size_t ii, jj;
   long i, j, ix;
   size_t src_add[MAX_SEARCH_CELLS];
   size_t *src_add_tmp = NULL;
   size_t *psrc_add = src_add;
   size_t num_add = 0;
-  double distance;   //  Angular distance
   double cos_search_radius = cos(gs->search_radius);
   double coslat_dst = cos(plat);  // cos(lat)  of the search point
   double coslon_dst = cos(plon);  // cos(lon)  of the search point
@@ -204,11 +203,12 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, remapgri
   if ( lfound )
     {
       size_t ix, iy;
+      size_t nadd;
+      double distance;   //  Angular distance
 
       for ( size_t na = 0; na < num_add; ++na )
 	{
 	  nadd = psrc_add[na];
-
 	  iy = nadd/nx;
 	  ix = nadd - iy*nx;
 
@@ -232,7 +232,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, remapgri
 
       if ( src_add_tmp ) Free(src_add_tmp);
     }
-  else if ( src_grid->lextrapolate )
+  else if ( gs->extrapolate )
     {
       int search_result;
 
@@ -397,6 +397,8 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
   else
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
+  if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
+
 #if defined(_OPENMP)
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);
   if ( cdoVerbose ) start = omp_get_wtime();
@@ -505,6 +507,8 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
     gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
   else
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+
+  if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
 
 #if defined(_OPENMP)
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);

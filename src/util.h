@@ -64,7 +64,7 @@ extern int CDO_opterr;
 extern int CDO_flt_digits;
 extern int CDO_dbl_digits;
 
-extern int remap_genweights;
+extern bool REMAP_genweights;
 
 extern const char *cdoExpName;
 extern int ompNumThreads;
