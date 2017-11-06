@@ -407,7 +407,7 @@ pipe_t::pipeReadPipeRecord(double *p_data, int vlistID, size_t *p_nmiss)
   if (!p_data)
     Error("No data pointer for %s", name.c_str());
 
-  int datasize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+  size_t datasize = gridInqSize(vlistInqVarGrid(vlistID, varID));
   nvals += datasize;
   if (vlistNumber(vlistID) != CDI_REAL)
     datasize *= 2;

@@ -108,7 +108,7 @@ void search_free(search_t *search)
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm);
 
 static
-size_t get_srch_cells_reg2d(const int *restrict src_grid_dims, 
+size_t get_srch_cells_reg2d(const size_t *restrict src_grid_dims, 
                             const double *restrict src_corner_lat, const double *restrict src_corner_lon,
                             const double *restrict tgt_cell_bound_box, size_t *srch_add)
 {
@@ -219,7 +219,7 @@ void restrict_boundbox(const double *restrict grid_bound_box, double *restrict b
 }
 
 static
-void boundbox_from_corners_reg2d(size_t grid_add, const int *restrict grid_dims, const double *restrict corner_lon,
+void boundbox_from_corners_reg2d(size_t grid_add, const size_t *restrict grid_dims, const double *restrict corner_lon,
 				 const double *restrict corner_lat, double *restrict bound_box)
 {
   size_t nx = grid_dims[0];

@@ -15,11 +15,11 @@
   GNU General Public License for more details.
 */
 
-#ifndef _COMPARE_H
-#define _COMPARE_H
+#ifndef  COMPARE_H
+#define  COMPARE_H
 
-#if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#ifdef  HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include <math.h>
@@ -52,4 +52,4 @@
 
 #define STR_IS_EQ(x,y) ((*x)==(*y) && strcmp(x,y) == 0)
 
-#endif  /* _COMPARE_H */
+#endif  /* COMPARE_H */

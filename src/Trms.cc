@@ -30,7 +30,7 @@
 
 void trms(field_type field1, field_type field2, double *dp, field_type *field3)
 {
-  int i, k, nlev, len;
+  int k, nlev;
   size_t rnmiss = 0;
   int    zaxis    = field1.zaxis;
   int    grid1    = field1.grid;
@@ -43,12 +43,12 @@ void trms(field_type field1, field_type field2, double *dp, field_type *field3)
   double rsum = 0, rsumw = 0, ravg = 0, wp;
 
   nlev   = zaxisInqSize(zaxis);
-  len    = gridInqSize(grid1);
+  size_t len = gridInqSize(grid1);
   if ( len != gridInqSize(grid2) )
     cdoAbort("fields have different size!");
 
   for ( k = 0; k < nlev; k++ ) 
-    for ( i = 0; i < len; i++ ) 
+    for ( size_t i = 0; i < len; i++ ) 
       {
 	wp = w[i]*dp[k*len+i];
 	rsum  = ADDMN(rsum, MULMN(wp, MULMN( SUBMN(array2[k*len+i], array1[k*len+i]),
@@ -73,7 +73,7 @@ void *Trms(void *argument)
   size_t nmiss;
   int varID, levelID;
   int pcode = 152, pvarID = -1;
-  long offset;
+  size_t offset;
   size_t vctsize = 0;
   const double *va = NULL, *vb = NULL;
   double *single;
@@ -158,7 +158,7 @@ void *Trms(void *argument)
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
   double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
 
-  int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, pvarID));
+  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, pvarID));
   int nlevel   = vctsize/2 - 1;
   double *dp = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
@@ -175,7 +175,7 @@ void *Trms(void *argument)
   field_init(&field2);
   field_init(&field3);
 
-  int lim = vlistGridsizeMax(vlistID1);
+  size_t lim = vlistGridsizeMax(vlistID1);
   field1.weight = NULL;
   if ( needWeights )
     field1.weight = (double*) Malloc(lim*sizeof(double));
@@ -212,7 +212,7 @@ void *Trms(void *argument)
 	}
 
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, pvarID));
-      for ( int i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
 	{
 	  vardata1[pvarID][i] = exp(vardata1[pvarID][i]);
 	  vardata2[pvarID][i] = exp(vardata2[pvarID][i]);
@@ -222,7 +222,7 @@ void *Trms(void *argument)
       for ( int k = 0; k < nlevel; k++ )
 	{
 	  offset = gridsize*k;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      double dp1 = (va[k+1] + vb[k+1]*vardata1[pvarID][i]) - (va[k] + vb[k]*vardata1[pvarID][i]);
 	      double dp2 = (va[k+1] + vb[k+1]*vardata2[pvarID][i]) - (va[k] + vb[k]*vardata2[pvarID][i]);

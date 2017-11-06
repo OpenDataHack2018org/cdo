@@ -80,10 +80,16 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cdo$(EXEEXT)
-@USE_F77_TRUE@am__append_1 = $(top_builddir)/src/lib/ncl/libncl.la
-@ENABLE_ALL_STATIC_TRUE@am__append_2 = -all-static
-noinst_PROGRAMS = cdotest$(EXEEXT)
+@ENABLE_NEARPT3_TRUE@am__append_1 = \
+@ENABLE_NEARPT3_TRUE@               nearpt3x.h      \
+@ENABLE_NEARPT3_TRUE@               nearpt3c.h      \
+@ENABLE_NEARPT3_TRUE@               nearpt3c.cc     \
+@ENABLE_NEARPT3_TRUE@               cellsearchorder.h
+
+@USE_F77_TRUE@am__append_2 = $(top_builddir)/src/lib/ncl/libncl.la
 @ENABLE_ALL_STATIC_TRUE@am__append_3 = -all-static
+noinst_PROGRAMS = cdotest$(EXEEXT)
+@ENABLE_ALL_STATIC_TRUE@am__append_4 = -all-static
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/config.h.in $(top_srcdir)/config/mkinstalldirs \
@@ -123,18 +129,18 @@ am_libcdo_la_OBJECTS = libcdo_la-argument.lo libcdo_la-array.lo \
 	libcdo_la-expr_yacc.lo libcdo_la-features.lo \
 	libcdo_la-field.lo libcdo_la-field2.lo libcdo_la-fieldc.lo \
 	libcdo_la-fieldmem.lo libcdo_la-fieldmer.lo \
-	libcdo_la-fieldzon.lo libcdo_la-gradsdeslib.lo \
-	libcdo_la-grid.lo libcdo_la-grid_proj.lo \
-	libcdo_la-grid_area.lo libcdo_la-grid_define.lo \
-	libcdo_la-grid_gme.lo libcdo_la-grid_rot.lo \
-	libcdo_la-grid_from_name.lo libcdo_la-grid_read.lo \
-	libcdo_la-grid_read_pingo.lo libcdo_la-grid_print.lo \
-	libcdo_la-gridreference.lo libcdo_la-griddes.lo \
-	libcdo_la-griddes_h5.lo libcdo_la-griddes_nc.lo \
-	libcdo_la-hetaeta.lo libcdo_la-institution.lo \
-	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
-	libcdo_la-grid_search.lo libcdo_la-listarray.lo \
-	libcdo_la-list.lo libcdo_la-listbuf.lo \
+	libcdo_la-fieldzon.lo libcdo_la-getMemorySize.lo \
+	libcdo_la-getRSS.lo libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
+	libcdo_la-grid_proj.lo libcdo_la-grid_area.lo \
+	libcdo_la-grid_define.lo libcdo_la-grid_gme.lo \
+	libcdo_la-grid_rot.lo libcdo_la-grid_from_name.lo \
+	libcdo_la-grid_read.lo libcdo_la-grid_read_pingo.lo \
+	libcdo_la-grid_print.lo libcdo_la-gridreference.lo \
+	libcdo_la-griddes.lo libcdo_la-griddes_h5.lo \
+	libcdo_la-griddes_nc.lo libcdo_la-hetaeta.lo \
+	libcdo_la-institution.lo libcdo_la-interpol.lo \
+	libcdo_la-job.lo libcdo_la-juldate.lo libcdo_la-grid_search.lo \
+	libcdo_la-listarray.lo libcdo_la-list.lo libcdo_la-listbuf.lo \
 	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
 	libcdo_la-namelist.lo libcdo_la-namelist_parser.lo \
 	libcdo_la-normal.lo libcdo_la-nth_element.lo \
@@ -172,6 +178,53 @@ am__v_lt_0 = --silent
 am__v_lt_1 = 
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
+am__cdo_SOURCES_DIST = cdo.cc Adisit.cc Afterburner.cc Arith.cc \
+	Arithc.cc Arithdays.cc Arithlat.cc CDItest.cc CDIread.cc \
+	CDIwrite.cc Cat.cc Change.cc Change_e5slm.cc Cloudlayer.cc \
+	CMOR.cc CMOR_lite.cc CMOR_table.cc Collgrid.cc Command.cc \
+	Comp.cc Compc.cc Complextorect.cc Cond.cc Cond2.cc Condc.cc \
+	Consecstat.cc Copy.cc Deltat.cc Deltime.cc Derivepar.cc \
+	Detrend.cc Diff.cc Distgrid.cc Duplicate.cc EOFs.cc Eof3d.cc \
+	EcaIndices.cc Echam5ini.cc Enlarge.cc Enlargegrid.cc \
+	Ensstat.cc Ensstat3.cc Ensval.cc Eofcoeff.cc Eofcoeff3d.cc \
+	EstFreq.cc Exprf.cc FC.cc Filedes.cc Fillmiss.cc Filter.cc \
+	Fldrms.cc Fldstat.cc Fldstat2.cc Fourier.cc Gengrid.cc \
+	Gradsdes.cc Gridboxstat.cc Gridcell.cc Gridsearch.cc \
+	Harmonic.cc Hi.cc Histogram.cc Importamsr.cc Importbinary.cc \
+	Importcmsaf.cc Importobs.cc Info.cc Input.cc Intgrid.cc \
+	Intgridtraj.cc Intlevel.cc Intlevel3d.cc Intntime.cc \
+	Inttime.cc Intyear.cc Invert.cc Invertlev.cc Isosurface.cc \
+	Log.cc MapReduce.cc Maskbox.cc Mastrfu.cc Math.cc Merge.cc \
+	Mergegrid.cc Mergetime.cc Merstat.cc Monarith.cc Mrotuv.cc \
+	Mrotuvb.cc NCL_wind.cc Ninfo.cc Nmldump.cc Output.cc \
+	Outputgmt.cc Pack.cc Pardup.cc Pinfo.cc Pressure.cc Regres.cc \
+	Remap.cc Remapeta.cc Replace.cc Replacevalues.cc Rhopot.cc \
+	Rotuv.cc Runpctl.cc Runstat.cc Samplegrid.cc Samplegridicon.cc \
+	Seascount.cc Seaspctl.cc Seasstat.cc Selbox.cc Selgridcell.cc \
+	Select.cc Selmulti.cc Seloperator.cc Selrec.cc Seltime.cc \
+	Selvar.cc Set.cc Setattribute.cc Setbox.cc Setgatt.cc \
+	Setgrid.cc Sethalo.cc Setmiss.cc Setpartab.cc Setrcaname.cc \
+	Settime.cc Setzaxis.cc Shiftxy.cc Showinfo.cc Showattribute.h \
+	Showattribute.cc Sinfo.cc Smooth.cc Sort.cc Sorttimestamp.cc \
+	Specinfo.cc Spectral.cc Spectrum.cc Split.cc Splitrec.cc \
+	Splitsel.cc Splittime.cc Splityear.cc Subtrend.cc Tee.cc \
+	Templates.cc Test.cc Tests.cc Timcount.cc Timcumsum.cc \
+	Timpctl.cc Timselpctl.cc Timselstat.cc Timsort.cc Timstat.cc \
+	Timstat2.cc Timstat3.cc Tinfo.cc Tocomplex.cc Transpose.cc \
+	Trend.cc Trms.cc Tstepcount.cc Vargen.cc Varrms.cc \
+	Vertintml.cc Vertintap.cc Vertstat.cc Vertcum.cc Vertwind.cc \
+	Verifygrid.cc Wct.cc Wind.cc WindTrans.cc Writegrid.cc \
+	Writerandom.cc XTimstat.cc YAR.cc Yearmonstat.cc Ydayarith.cc \
+	Ydaypctl.cc Ydaystat.cc Ydrunpctl.cc Ydrunstat.cc \
+	Yhourarith.cc Yhourstat.cc Ymonarith.cc Ymonpctl.cc \
+	Ymonstat.cc Yseaspctl.cc Yseasstat.cc Zonstat.cc cdo.h \
+	nearpt3c.h nearpt3x.h nearpt3c.cc cellsearchorder.h Magplot.cc \
+	Magvector.cc Maggraph.cc template_parser.h template_parser.cc \
+	results_template_parser.h results_template_parser.cc \
+	magics_template_parser.h magics_template_parser.cc \
+	StringUtilities.h StringUtilities.cc CdoMagicsMapper.h \
+	CdoMagicsMapper.cc
+@ENABLE_NEARPT3_TRUE@am__objects_1 = cdo-nearpt3c.$(OBJEXT)
 am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Afterburner.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Arithc.$(OBJEXT) cdo-Arithdays.$(OBJEXT) \
@@ -214,8 +267,9 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) cdo-Merge.$(OBJEXT) \
 	cdo-Mergegrid.$(OBJEXT) cdo-Mergetime.$(OBJEXT) \
 	cdo-Merstat.$(OBJEXT) cdo-Monarith.$(OBJEXT) \
-	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) cdo-NCL.$(OBJEXT) \
-	cdo-Ninfo.$(OBJEXT) cdo-Nmldump.$(OBJEXT) cdo-Output.$(OBJEXT) \
+	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) \
+	cdo-NCL_wind.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
+	cdo-Nmldump.$(OBJEXT) cdo-Output.$(OBJEXT) \
 	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) \
 	cdo-Pardup.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
@@ -264,7 +318,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
 	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
 	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
-	cdo-Zonstat.$(OBJEXT) cdo-Magplot.$(OBJEXT) \
+	cdo-Zonstat.$(OBJEXT) $(am__objects_1) cdo-Magplot.$(OBJEXT) \
 	cdo-Magvector.$(OBJEXT) cdo-Maggraph.$(OBJEXT) \
 	cdo-template_parser.$(OBJEXT) \
 	cdo-results_template_parser.$(OBJEXT) \
@@ -272,7 +326,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-StringUtilities.$(OBJEXT) cdo-CdoMagicsMapper.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES = libcdo.la $(top_builddir)/libcdi/src/libcdi.la \
-	$(am__append_1)
+	$(am__append_2)
 cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(cdo_LDFLAGS) $(LDFLAGS) -o $@
@@ -335,7 +389,8 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(libcdo_la_SOURCES) $(cdo_SOURCES) $(cdotest_SOURCES)
-DIST_SOURCES = $(libcdo_la_SOURCES) $(cdo_SOURCES) $(cdotest_SOURCES)
+DIST_SOURCES = $(libcdo_la_SOURCES) $(am__cdo_SOURCES_DIST) \
+	$(cdotest_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -403,12 +458,14 @@ ENABLE_CDI_LIB = @ENABLE_CDI_LIB@
 ENABLE_CGRIBEX = @ENABLE_CGRIBEX@
 ENABLE_DATA = @ENABLE_DATA@
 ENABLE_EXTRA = @ENABLE_EXTRA@
+ENABLE_FORTRAN = @ENABLE_FORTRAN@
 ENABLE_GRIB = @ENABLE_GRIB@
 ENABLE_GRIBAPI = @ENABLE_GRIBAPI@
 ENABLE_IEG = @ENABLE_IEG@
 ENABLE_NC2 = @ENABLE_NC2@
 ENABLE_NC4 = @ENABLE_NC4@
 ENABLE_NC4HDF5 = @ENABLE_NC4HDF5@
+ENABLE_NEARPT3 = @ENABLE_NEARPT3@
 ENABLE_NETCDF = @ENABLE_NETCDF@
 ENABLE_SERVICE = @ENABLE_SERVICE@
 ENABLE_THREADS = @ENABLE_THREADS@
@@ -416,6 +473,7 @@ EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 FGREP = @FGREP@
+FORTRAN_WORKS = @FORTRAN_WORKS@
 GREP = @GREP@
 GRIB_API_INCLUDE = @GRIB_API_INCLUDE@
 GRIB_API_LIBS = @GRIB_API_LIBS@
@@ -554,12 +612,12 @@ libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
 	ecautil.h error.h etopo.h temp.h mask.h exception.cc expr.cc \
 	expr.h expr_fun.cc expr_fun.h expr_lex.cc expr_yacc.cc \
 	expr_yacc.h features.cc field.cc field.h field2.cc fieldc.cc \
-	fieldmem.cc fieldmer.cc fieldzon.cc functs.h gradsdeslib.cc \
-	gradsdeslib.h grid.cc grid.h grid_proj.cc grid_proj.h \
-	grid_area.cc grid_define.cc grid_gme.cc grid_rot.cc \
-	grid_from_name.cc grid_read.cc grid_read_pingo.cc \
-	grid_print.cc gridreference.cc griddes.cc griddes.h \
-	griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
+	fieldmem.cc fieldmer.cc fieldzon.cc functs.h getMemorySize.c \
+	getRSS.c gradsdeslib.cc gradsdeslib.h grid.cc grid.h \
+	grid_proj.cc grid_proj.h grid_area.cc grid_define.cc \
+	grid_gme.cc grid_rot.cc grid_from_name.cc grid_read.cc \
+	grid_read_pingo.cc grid_print.cc gridreference.cc griddes.cc \
+	griddes.h griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
 	institution.cc interpol.cc interpol.h job.cc juldate.cc \
 	grid_search.cc grid_search.h listarray.cc listarray.h list.cc \
 	list.h listbuf.cc listbuf.h merge_sort2.cc merge_sort2.h \
@@ -591,13 +649,6 @@ libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
 	clipping/grid_cell.c clipping/grid_cell.h \
 	clipping/intersection.c clipping/utils.c clipping/utils.h
 #
-#if ENABLE_NEARPT3
-#cdo_SOURCES +=           \
-#               nearpt3x.h      \
-#               nearpt3c.h      \
-#               nearpt3c.cc     \
-#               cellsearchorder.h
-#endif
 
 #if ENABLE_MAGICS
 cdo_SOURCES = cdo.cc Adisit.cc Afterburner.cc Arith.cc Arithc.cc \
@@ -618,10 +669,10 @@ cdo_SOURCES = cdo.cc Adisit.cc Afterburner.cc Arith.cc Arithc.cc \
 	Inttime.cc Intyear.cc Invert.cc Invertlev.cc Isosurface.cc \
 	Log.cc MapReduce.cc Maskbox.cc Mastrfu.cc Math.cc Merge.cc \
 	Mergegrid.cc Mergetime.cc Merstat.cc Monarith.cc Mrotuv.cc \
-	Mrotuvb.cc NCL.cc Ninfo.cc Nmldump.cc Output.cc Outputgmt.cc \
-	Pack.cc Pardup.cc Pinfo.cc Pressure.cc Regres.cc Remap.cc \
-	Remapeta.cc Replace.cc Replacevalues.cc Rhopot.cc Rotuv.cc \
-	Runpctl.cc Runstat.cc Samplegrid.cc Samplegridicon.cc \
+	Mrotuvb.cc NCL_wind.cc Ninfo.cc Nmldump.cc Output.cc \
+	Outputgmt.cc Pack.cc Pardup.cc Pinfo.cc Pressure.cc Regres.cc \
+	Remap.cc Remapeta.cc Replace.cc Replacevalues.cc Rhopot.cc \
+	Rotuv.cc Runpctl.cc Runstat.cc Samplegrid.cc Samplegridicon.cc \
 	Seascount.cc Seaspctl.cc Seasstat.cc Selbox.cc Selgridcell.cc \
 	Select.cc Selmulti.cc Seloperator.cc Selrec.cc Seltime.cc \
 	Selvar.cc Set.cc Setattribute.cc Setbox.cc Setgatt.cc \
@@ -640,7 +691,7 @@ cdo_SOURCES = cdo.cc Adisit.cc Afterburner.cc Arith.cc Arithc.cc \
 	Ydaypctl.cc Ydaystat.cc Ydrunpctl.cc Ydrunstat.cc \
 	Yhourarith.cc Yhourstat.cc Ymonarith.cc Ymonpctl.cc \
 	Ymonstat.cc Yseaspctl.cc Yseasstat.cc Zonstat.cc cdo.h \
-	nearpt3c.h Magplot.cc Magvector.cc Maggraph.cc \
+	nearpt3c.h $(am__append_1) Magplot.cc Magvector.cc Maggraph.cc \
 	template_parser.h template_parser.cc results_template_parser.h \
 	results_template_parser.cc magics_template_parser.h \
 	magics_template_parser.cc StringUtilities.h StringUtilities.cc \
@@ -648,15 +699,15 @@ cdo_SOURCES = cdo.cc Adisit.cc Afterburner.cc Arith.cc Arithc.cc \
 #endif
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la \
-	$(am__append_1)
-cdo_LDFLAGS = $(am__append_2)
+	$(am__append_2)
+cdo_LDFLAGS = $(am__append_3)
 libcdo_la_CPPFLAGS = $(cdo_CPPFLAGS)
 cdotest_SOURCES = cdo_int.h	\
 	           cdotest.cc
 
 cdotest_LDADD = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
-cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_3)
+cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_4)
 
 #cdo-userlog.o: userlog.cc config.h
 #	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.cc' || echo '$(srcdir)/'`userlog.cc
@@ -945,7 +996,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Monarith.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Mrotuv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Mrotuvb.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-NCL.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-NCL_wind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Ninfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Nmldump.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Output.Po@am__quote@
@@ -1054,6 +1105,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Zonstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-cdo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-magics_template_parser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-nearpt3c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-results_template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdotest-cdotest.Po@am__quote@
@@ -1092,6 +1144,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fieldmem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fieldmer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fieldzon.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-getMemorySize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-getRSS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-gradsdeslib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_area.Plo@am__quote@
@@ -1193,6 +1247,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+libcdo_la-getMemorySize.lo: getMemorySize.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-getMemorySize.lo -MD -MP -MF $(DEPDIR)/libcdo_la-getMemorySize.Tpo -c -o libcdo_la-getMemorySize.lo `test -f 'getMemorySize.c' || echo '$(srcdir)/'`getMemorySize.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-getMemorySize.Tpo $(DEPDIR)/libcdo_la-getMemorySize.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='getMemorySize.c' object='libcdo_la-getMemorySize.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-getMemorySize.lo `test -f 'getMemorySize.c' || echo '$(srcdir)/'`getMemorySize.c
+
+libcdo_la-getRSS.lo: getRSS.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-getRSS.lo -MD -MP -MF $(DEPDIR)/libcdo_la-getRSS.Tpo -c -o libcdo_la-getRSS.lo `test -f 'getRSS.c' || echo '$(srcdir)/'`getRSS.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-getRSS.Tpo $(DEPDIR)/libcdo_la-getRSS.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='getRSS.c' object='libcdo_la-getRSS.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-getRSS.lo `test -f 'getRSS.c' || echo '$(srcdir)/'`getRSS.c
 
 json/libcdo_la-jsmn.lo: json/jsmn.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT json/libcdo_la-jsmn.lo -MD -MP -MF json/$(DEPDIR)/libcdo_la-jsmn.Tpo -c -o json/libcdo_la-jsmn.lo `test -f 'json/jsmn.c' || echo '$(srcdir)/'`json/jsmn.c
@@ -3276,19 +3344,19 @@ cdo-Mrotuvb.obj: Mrotuvb.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Mrotuvb.obj `if test -f 'Mrotuvb.cc'; then $(CYGPATH_W) 'Mrotuvb.cc'; else $(CYGPATH_W) '$(srcdir)/Mrotuvb.cc'; fi`
 
-cdo-NCL.o: NCL.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-NCL.o -MD -MP -MF $(DEPDIR)/cdo-NCL.Tpo -c -o cdo-NCL.o `test -f 'NCL.cc' || echo '$(srcdir)/'`NCL.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-NCL.Tpo $(DEPDIR)/cdo-NCL.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NCL.cc' object='cdo-NCL.o' libtool=no @AMDEPBACKSLASH@
+cdo-NCL_wind.o: NCL_wind.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-NCL_wind.o -MD -MP -MF $(DEPDIR)/cdo-NCL_wind.Tpo -c -o cdo-NCL_wind.o `test -f 'NCL_wind.cc' || echo '$(srcdir)/'`NCL_wind.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-NCL_wind.Tpo $(DEPDIR)/cdo-NCL_wind.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NCL_wind.cc' object='cdo-NCL_wind.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-NCL.o `test -f 'NCL.cc' || echo '$(srcdir)/'`NCL.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-NCL_wind.o `test -f 'NCL_wind.cc' || echo '$(srcdir)/'`NCL_wind.cc
 
-cdo-NCL.obj: NCL.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-NCL.obj -MD -MP -MF $(DEPDIR)/cdo-NCL.Tpo -c -o cdo-NCL.obj `if test -f 'NCL.cc'; then $(CYGPATH_W) 'NCL.cc'; else $(CYGPATH_W) '$(srcdir)/NCL.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-NCL.Tpo $(DEPDIR)/cdo-NCL.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NCL.cc' object='cdo-NCL.obj' libtool=no @AMDEPBACKSLASH@
+cdo-NCL_wind.obj: NCL_wind.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-NCL_wind.obj -MD -MP -MF $(DEPDIR)/cdo-NCL_wind.Tpo -c -o cdo-NCL_wind.obj `if test -f 'NCL_wind.cc'; then $(CYGPATH_W) 'NCL_wind.cc'; else $(CYGPATH_W) '$(srcdir)/NCL_wind.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-NCL_wind.Tpo $(DEPDIR)/cdo-NCL_wind.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NCL_wind.cc' object='cdo-NCL_wind.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-NCL.obj `if test -f 'NCL.cc'; then $(CYGPATH_W) 'NCL.cc'; else $(CYGPATH_W) '$(srcdir)/NCL.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-NCL_wind.obj `if test -f 'NCL_wind.cc'; then $(CYGPATH_W) 'NCL_wind.cc'; else $(CYGPATH_W) '$(srcdir)/NCL_wind.cc'; fi`
 
 cdo-Ninfo.o: Ninfo.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Ninfo.o -MD -MP -MF $(DEPDIR)/cdo-Ninfo.Tpo -c -o cdo-Ninfo.o `test -f 'Ninfo.cc' || echo '$(srcdir)/'`Ninfo.cc
@@ -4759,6 +4827,20 @@ cdo-Zonstat.obj: Zonstat.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Zonstat.cc' object='cdo-Zonstat.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Zonstat.obj `if test -f 'Zonstat.cc'; then $(CYGPATH_W) 'Zonstat.cc'; else $(CYGPATH_W) '$(srcdir)/Zonstat.cc'; fi`
+
+cdo-nearpt3c.o: nearpt3c.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-nearpt3c.o -MD -MP -MF $(DEPDIR)/cdo-nearpt3c.Tpo -c -o cdo-nearpt3c.o `test -f 'nearpt3c.cc' || echo '$(srcdir)/'`nearpt3c.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-nearpt3c.Tpo $(DEPDIR)/cdo-nearpt3c.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nearpt3c.cc' object='cdo-nearpt3c.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-nearpt3c.o `test -f 'nearpt3c.cc' || echo '$(srcdir)/'`nearpt3c.cc
+
+cdo-nearpt3c.obj: nearpt3c.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-nearpt3c.obj -MD -MP -MF $(DEPDIR)/cdo-nearpt3c.Tpo -c -o cdo-nearpt3c.obj `if test -f 'nearpt3c.cc'; then $(CYGPATH_W) 'nearpt3c.cc'; else $(CYGPATH_W) '$(srcdir)/nearpt3c.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-nearpt3c.Tpo $(DEPDIR)/cdo-nearpt3c.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nearpt3c.cc' object='cdo-nearpt3c.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-nearpt3c.obj `if test -f 'nearpt3c.cc'; then $(CYGPATH_W) 'nearpt3c.cc'; else $(CYGPATH_W) '$(srcdir)/nearpt3c.cc'; fi`
 
 cdo-Magplot.o: Magplot.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Magplot.o -MD -MP -MF $(DEPDIR)/cdo-Magplot.Tpo -c -o cdo-Magplot.o `test -f 'Magplot.cc' || echo '$(srcdir)/'`Magplot.cc

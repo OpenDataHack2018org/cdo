@@ -213,9 +213,9 @@ void *Sinfo(void *argument)
 	  fprintf(stdout, "%3d ", vlistZaxisIndex(vlistID, zaxisID) + 1);
 
 	  /* grid info */
-	  int gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 	  set_text_color(stdout, RESET, GREEN);
-	  fprintf(stdout, "%9d ", gridsize);
+	  fprintf(stdout, "%9zu ", gridsize);
 	  reset_text_color(stdout);
 	  fprintf(stdout, "%3d ", vlistGridIndex(vlistID, gridID) + 1);
 

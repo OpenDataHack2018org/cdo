@@ -626,8 +626,6 @@ BUILD_AVX_TESTS_FALSE
 BUILD_AVX_TESTS_TRUE
 BUILD_SSE42_TESTS_FALSE
 BUILD_SSE42_TESTS_TRUE
-USE_F77_FALSE
-USE_F77_TRUE
 ENABLE_HIRLAM_EXTENSIONS_FALSE
 ENABLE_HIRLAM_EXTENSIONS_TRUE
 ENABLE_ALL_STATIC_FALSE
@@ -680,6 +678,13 @@ PTHREAD_LIBS
 PTHREAD_CC
 ax_pthread_config
 ENABLE_DATA
+ENABLE_NEARPT3_FALSE
+ENABLE_NEARPT3_TRUE
+ENABLE_NEARPT3
+FORTRAN_WORKS
+USE_F77_FALSE
+USE_F77_TRUE
+ENABLE_FORTRAN
 SYSTEM_TYPE
 HOST_NAME
 USER_NAME
@@ -827,6 +832,8 @@ with_sysroot
 enable_libtool_lock
 enable_openmp
 enable_largefile
+enable_fortran
+enable_nearpt3
 enable_data
 with_threads
 with_szlib
@@ -849,7 +856,6 @@ with_libxml2
 enable_cdi_lib
 enable_all_static
 enable_hirlam_extensions
-enable_fortran
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1502,6 +1508,8 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --disable-openmp        do not use OpenMP
   --disable-largefile     omit support for large files
+  --disable-fortran       Omit building of Fortran routines
+  --enable-nearpt3        nearpt3 support [default=no]
   --enable-data           DATA support [default=yes]
   --enable-grib           GRIB support [default=yes]
   --enable-cgribex        Use the CGRIBEX library [default=yes]
@@ -1514,7 +1522,6 @@ Optional Features:
                           [default=no]
   --enable-hirlam-extensions
                           HIRLAM extensions [default=no]
-  --disable-fortran       Omit building of Fortran routines
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -21933,16 +21940,397 @@ _ACEOF
 
 fi
 
+
+#  ----------------------------------------------------------------------
+#  Create the Interface to Fortran77 routines via cfortran.h
+# Check whether --enable-fortran was given.
+if test "${enable_fortran+set}" = set; then :
+  enableval=$enable_fortran; enable_fortran=${enableval}
+else
+  enable_fortran=yes
+fi
+
+if test "x${enable_fortran}" = "xyes"; then :
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking C preprocessor flags for Fortran calling convention cfortran.h" >&5
+$as_echo_n "checking C preprocessor flags for Fortran calling convention cfortran.h... " >&6; }
+if ${acx_cv_cf_flag+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  acx_cv_cf_flag=''
+      for macro in pgiFortran NAGf90Fortran f2cFortran hpuxFortran apolloFortran sunFortran IBMR2Fortran CRAYFortran PATHSCALE_COMPILER gFortran mipsFortran DECFortran vmsFortran CONVEXFortran PowerStationFortran AbsoftUNIXFortran AbsoftProFortran SXFortran
+do :
+  acx_temp=`echo "$CPPFLAGS $CFLAGS" | sed -n 's/^\(.* \)*-D\('"$macro"'\)\( .*\)*$/\2/;t print
+b
+: print
+p'`
+         if test x"$acx_temp" != x; then :
+  if test x"$acx_cv_cf_flag" = x; then :
+  acx_cv_cf_flag="$acx_temp (user-specified)"
+else
+  echo ; echo '"'"$acx_cv_cf_flag $acx_temp"'"'
+               as_fn_error $? "Multiple specification of cfortran.h flags" "$LINENO" 5
+fi
+fi
+done
+      if test x"$acx_cv_cf_flag" = x; then :
+
+         if test -n "$F77" -a X"$F77" != Xno; then :
+  ac_ext=f
+ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
+ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_f77_compiler_gnu
+
+
+
+
+   save_F77=$F77 ; acx_FC=$F77
+   case $host in #(
+  x86_64-*-linux-*|i*86-*-linux-*|*-apple-darwin*|ia64-*-linux-*|x86_64-*-freebsd*|i*86-*-freebsd*) :
+    acx_temp=`$acx_FC -V 2>&1`
+      if echo "$acx_temp" | grep '^Copyright.*\(The Portland Group\|NVIDIA CORPORATION\)' >/dev/null; then :
+  acx_cv_f77_cf_flag=-DgFortran
+elif echo "$acx_temp" | grep '^NAG Fortran Compiler Release' >/dev/null; then :
+  acx_cv_f77_cf_flag=-DNAGf90Fortran
+elif echo "$acx_temp" | grep '^Intel(R) Fortran.*Compiler' >/dev/null; then :
+  acx_cv_f77_cf_flag=-DgFortran
+elif echo "$acx_temp" | grep '^Cray Fortran' >/dev/null; then :
+  acx_cv_f77_cf_flag=-DgFortran
+elif acx_temp=`$acx_FC --version 2>&1` \
+         && echo $acx_temp | grep '^GNU Fortran' >/dev/null; then :
+  if echo $acx_temp | grep g77 >/dev/null; then :
+  acx_cv_f77_cf_flag=-Dg77Fortran
+else
+              if echo "$FFLAGS" | grep '^\(.* \)*-ff2c\( .*\)*$' >/dev/null; then :
+  acx_cv_f77_cf_flag=-Df2cFortran
+else
+  acx_cv_f77_cf_flag=-DgFortran
+fi
+fi
+elif acx_temp=`$acx_FC -v 2>&1` \
+         && echo $acx_temp | grep '^f2c'; then :
+  acx_cv_f77_cf_flag=-Df2cFortran
+fi ;; #(
+  *-ibm-aix*) :
+          if $CC -qversion 2>&1 | grep '^IBM XL C' >/dev/null; then :
+
+else
+           acx_cv_f77_cf_flag=-DIBMR2Fortran
+fi
+      ;; #(
+  *-*-hpux*) :
+    acx_cv_f77_cf_flag=-DhpuxFortran ;; #(
+  sx*-*-*|es*-*-*) :
+          acx_cv_f77_cf_flag=-DSXFortran ;; #(
+  *) :
+     ;;
+esac
+
+               ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+fi
+         acx_cv_cf_flag="$acx_cv_f77_cf_flag (probed)"
+
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acx_cv_cf_flag" >&5
+$as_echo "$acx_cv_cf_flag" >&6; }
+   if echo "$acx_cv_cf_flag" | grep ' (probed)$' >/dev/null; then :
+  CPPFLAGS="${CPPFLAGS+$CPPFLAGS }`echo "$acx_cv_cf_flag" | sed 's/ (probed)$//'`"
+fi
+
+case $host in #(
+  *-ibm-aix*) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if -Dappendus needs to be added to CPPFLAGS for cfortran.h" >&5
+$as_echo_n "checking if -Dappendus needs to be added to CPPFLAGS for cfortran.h... " >&6; }
+      if $CC -qversion 2>&1 | grep '^IBM XL C' >/dev/null; then :
+  acx_temp_qextname_f77flags=`echo "$FFLAGS" | sed -n '/-qextname/{ s/^\(.* \)*-qextname\( .*\)*$/-qextname/;p;}'`
+         acx_temp_qextname_fcflags=`echo "$FCFLAGS" | sed -n '/-qextname/{ s/^\(.* \)*-qextname\( .*\)*$/-qextname/;p;}'`
+
+               acx_temp_qextname_fcflags=$acx_temp_qextname_f77flags
+         case x"$acx_temp_qextname_fcflags$acx_temp_qextname_f77flags" in #(
+  x-qextname) :
+    as_fn_error $? "Option -qextname must be provided consistently to F77 and FC" "$LINENO" 5 ;; #(
+  x-qextname-qextname) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+            CPPFLAGS="${CPPFLAGS+$CPPFLAGS }-Dappendus" ;; #(
+  *) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; } ;;
+esac
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi ;; #(
+  *) :
+     ;;
+esac
+if test -n "$F77" -a X"$F77" != Xno; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if C externals constructed with cfortran.h work" >&5
+$as_echo_n "checking if C externals constructed with cfortran.h work... " >&6; }
+if ${acx_cv_cfortran_works+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  acx_cv_cfortran_works=no
+      save_CPPFLAGS=$CPPFLAGS
+      CPPFLAGS="-I$srcdir/src $CPPFLAGS"
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include "cfortran.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+PROTOCCALLSFFUN1(FLOAT,CFTSTF,cftstf,FLOAT)
+#define conftest_F(v) \
+  CCALLSFFUN1(CFTSTF,cftstf,FLOAT,(v));
+
+static float
+cftstC(int i, float v, int *p, float *q)
+{
+  float f;
+  *p = (int)roundf(v * i);
+  *q = f = conftest_F(v * i);
+  return f;
+}
+
+FCALLSCFUN4(FLOAT,cftstC,CFTSTC,cftstc,INT,FLOAT,PINT,PFLOAT)
+
+/* test string returns */
+static const char *
+conftest_str_C(void)
+{
+  static const char msg[100] = "AAAAAAAAAAAAAAAAAAAA"
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+  return msg;
+}
+
+FCALLSCFUN0(STRING,conftest_str_C,CHTST,chtst)
+
+/* This function is required simply because some Fortran compilers
+ * won't stop with exit code n when encountering STOP n */
+static void
+errExit(void)
+{
+  exit(1);
+}
+
+FCALLSCSUB0(errExit,ERR_EXIT,err_exit)
+
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: Renaming C object file." >&5; } >&5
+  (mv "conftest.$ac_objext" "conftest_c.$ac_objext") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+
+         ac_ext=f
+ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
+ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_f77_compiler_gnu
+
+         cat > conftest.$ac_ext <<_ACEOF
+      REAL FUNCTION CFTSTF(v)
+      REAL RI
+      COMMON /CFTSTD/ RI
+      REAL V
+      REAL R
+      CFTSTF = V * 100.0
+      RI = 1.0 / V
+      END FUNCTION CFTSTF
+_ACEOF
+if ac_fn_f77_try_compile "$LINENO"; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: Renaming Fortran object file." >&5; } >&5
+  (mv "conftest.$ac_objext" "conftest_f.$ac_objext") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }
+            save_LIBS=$LIBS
+            LIBS="conftest_c.$ac_objext conftest_f.$ac_objext $LIBS"
+            if test "$cross_compiling" = yes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: Skipping run test for cfortran.h in cross-compilation mode," >&5
+$as_echo "$as_me: Skipping run test for cfortran.h in cross-compilation mode," >&6;}
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: link test succeeded." >&5
+$as_echo "$as_me: link test succeeded." >&6;}
+               acx_cv_cfortran_works=yes
+else
+  cat > conftest.$ac_ext <<_ACEOF
+      program main
+      REAL RI
+      COMMON /CFTSTD/ RI
+      REAL EPS
+      PARAMETER(EPS=10E-6)
+      REAL FOO, BOO, TOO
+      INTEGER BAR, BAZ, I
+      CHARACTER(99) AAAAAA
+      EXTERNAL CFTSTC, CFTSTF, CHTST, ERR_EXIT
+      REAL CFTSTC, CFTSTF
+      CHARACTER(99) CHTST
+      BAR = 5
+      FOO = 0.3
+      TOO = CFTSTC(BAR, FOO, BAZ, BOO)
+      IF (ABS(BAZ - NINT(BAR * FOO)) /= 0) THEN
+        WRITE (0, '(2(A,I0))') "ERROR CHECKING, WHEN BAZ, BAZ=", BAZ,
+     &       ", NINT(BAR * FOO) =", NINT(BAR * FOO)
+        CALL ERR_EXIT
+      END IF
+      IF (ABS((RI - 1.0 / (BAR * FOO)) / ABS(RI)) > EPS)  THEN
+        WRITE (0, '(2(A,F24.15))') "ERROR CHECKING RI, RI=", RI, ",
+     &       1.0 / (BAR * FOO) = ", 1.0 / (BAR * FOO)
+        CALL err_exit
+      END IF
+      IF (ABS((BOO - (BAR * FOO * 100.0))/ABS(BOO)) > EPS)  THEN
+        WRITE (0, '(2(A,F24.15))') "ERROR CHECKING BOO, BOO=", BOO,
+     &       ", BAR * FOO * 100.0 = ", BAR * FOO * 100.0
+        CALL ERR_EXIT
+      END IF
+      IF (TOO /= BOO) THEN
+        WRITE (0, '(2(A,F24.15))') "ERROR CHECKING TOO VS. BOO, TOO=",
+     &       TOO, ", BOO = ", BOO
+        CALL ERR_EXIT
+      END IF
+      AAAAAA = CHTST()
+      DO i = 1, 99
+        IF (AAAAAA(I:I) /= 'A') THEN
+          WRITE (0, '(A,I0,2A)') "ERROR CHECKING AAAAAA(", I, ")=",
+     &        AAAAAA(I:I)
+          CALL ERR_EXIT
+        END IF
+      END DO
+      end
+_ACEOF
+if ac_fn_f77_try_run "$LINENO"; then :
+  acx_cv_cfortran_works=yes
+else
+  acx_cv_cfortran_works="error"
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+	    LIBS=$save_LIBS
+else
+  acx_cv_cfortran_works="error compiling Fortran subroutine"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+         ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+else
+  acx_cv_cfortran_works="compiling with cfortran.h failed"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+      ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+      CPPFLAGS=$save_CPPFLAGS
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acx_cv_cfortran_works" >&5
+$as_echo "$acx_cv_cfortran_works" >&6; }
+   if test x"$acx_cv_cfortran_works" = xyes; then :
+
+$as_echo "#define HAVE_CF_INTERFACE 1" >>confdefs.h
+
+else
+  case x"$acx_cv_cfortran_works" in #(
+  x"error") :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Linking/Running with C EXTERNAL built with cfortran.h does not work!" >&5
+$as_echo "$as_me: Linking/Running with C EXTERNAL built with cfortran.h does not work!" >&6;} ;; #(
+  x"compiling with cfortran.h failed") :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Compilation with cfortran.h is not working!" >&5
+$as_echo "$as_me: Compilation with cfortran.h is not working!" >&6;} ;; #(
+  x"error compiling Fortran subroutine") :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: compilation of simple Fortran source failed!" >&5
+$as_echo "$as_me: compilation of simple Fortran source failed!" >&6;} ;; #(
+  *) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Unexpected error when linking C and Fortran via cfortran.h!" >&5
+$as_echo "$as_me: Unexpected error when linking C and Fortran via cfortran.h!" >&6;} ;;
+esac
+     { $as_echo "$as_me:${as_lineno-$LINENO}: Disabling cfortran.h bindings generation" >&5
+$as_echo "$as_me: Disabling cfortran.h bindings generation" >&6;}
+     acx_cv_cfortran_works=no
+fi
+
+fi
+
+fi
+if test x$enable_fortran = 'xno'; then :
+  ENABLE_FORTRAN=false
+
+else
+  ENABLE_FORTRAN=true
+
+fi
+#
+ if test -n "$F77" -a X"$F77" != Xno -a x"$acx_cv_cfortran_works" = xyes; then
+  USE_F77_TRUE=
+  USE_F77_FALSE='#'
+else
+  USE_F77_TRUE='#'
+  USE_F77_FALSE=
+fi
+
+if test x$acx_cv_cfortran_works = 'xno'; then :
+  FORTRAN_WORKS=no
+
+else
+  FORTRAN_WORKS=yes
+
+fi
+#  ----------------------------------------------------------------------
+
 #  ----------------------------------------------------------------------
 #  Enable NEARPT3 support
-# AC_MSG_CHECKING([for nearpt3 support])
-# AC_ARG_ENABLE([nearpt3], AS_HELP_STRING([--enable-nearpt3],[nearpt3 support [default=no]]))
-# AS_IF([test "x$enable_nearpt3" = "xyes"], [
-#   AC_DEFINE(ENABLE_NEARPT3, [1], [Define to 1 for nearpt3 support])
-# ])
-# AC_MSG_RESULT([$enable_nearpt3])
-# AC_SUBST([ENABLE_NEARPT3],[$enable_nearpt3])
-# AM_CONDITIONAL([ENABLE_NEARPT3],[test x$enable_nearpt3 = 'xyes'])
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for nearpt3 support" >&5
+$as_echo_n "checking for nearpt3 support... " >&6; }
+# Check whether --enable-nearpt3 was given.
+if test "${enable_nearpt3+set}" = set; then :
+  enableval=$enable_nearpt3;
+fi
+
+if test "x$enable_nearpt3" = "xyes"; then :
+
+
+$as_echo "#define ENABLE_NEARPT3 1" >>confdefs.h
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_nearpt3" >&5
+$as_echo "$enable_nearpt3" >&6; }
+ENABLE_NEARPT3=$enable_nearpt3
+
+ if test x$enable_nearpt3 = 'xyes'; then
+  ENABLE_NEARPT3_TRUE=
+  ENABLE_NEARPT3_FALSE='#'
+else
+  ENABLE_NEARPT3_TRUE='#'
+  ENABLE_NEARPT3_FALSE=
+fi
+
 #  ----------------------------------------------------------------------
 #  Enable DATA support
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for DATA support" >&5
@@ -21961,8 +22349,13 @@ $as_echo "#define ENABLE_DATA 1" >>confdefs.h
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_data" >&5
 $as_echo "$enable_data" >&6; }
-ENABLE_DATA=$enable_data
+if test x$enable_data = 'xno'; then :
+  ENABLE_DATA=false
 
+else
+  ENABLE_DATA=true
+
+fi
 #  ----------------------------------------------------------------------
 CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
 CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
@@ -25242,354 +25635,6 @@ fi
 #
 
 
-#  ----------------------------------------------------------------------
-#  Create the Interface to Fortran77 routines via cfortran.h
-# Check whether --enable-fortran was given.
-if test "${enable_fortran+set}" = set; then :
-  enableval=$enable_fortran; enable_fortran=${enableval}
-else
-  enable_fortran=yes
-fi
-
-if test "x${enable_fortran}" = "xyes"; then :
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking C preprocessor flags for Fortran calling convention cfortran.h" >&5
-$as_echo_n "checking C preprocessor flags for Fortran calling convention cfortran.h... " >&6; }
-if ${acx_cv_cf_flag+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  acx_cv_cf_flag=''
-      for macro in pgiFortran NAGf90Fortran f2cFortran hpuxFortran apolloFortran sunFortran IBMR2Fortran CRAYFortran PATHSCALE_COMPILER gFortran mipsFortran DECFortran vmsFortran CONVEXFortran PowerStationFortran AbsoftUNIXFortran AbsoftProFortran SXFortran
-do :
-  acx_temp=`echo "$CPPFLAGS $CFLAGS" | sed -n 's/^\(.* \)*-D\('"$macro"'\)\( .*\)*$/\2/;t print
-b
-: print
-p'`
-         if test x"$acx_temp" != x; then :
-  if test x"$acx_cv_cf_flag" = x; then :
-  acx_cv_cf_flag="$acx_temp (user-specified)"
-else
-  echo ; echo '"'"$acx_cv_cf_flag $acx_temp"'"'
-               as_fn_error $? "Multiple specification of cfortran.h flags" "$LINENO" 5
-fi
-fi
-done
-      if test x"$acx_cv_cf_flag" = x; then :
-
-         if test -n "$F77" -a X"$F77" != Xno; then :
-  ac_ext=f
-ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
-ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_f77_compiler_gnu
-
-
-
-
-   save_F77=$F77 ; acx_FC=$F77
-   case $host in #(
-  x86_64-*-linux-*|i*86-*-linux-*|*-apple-darwin*|ia64-*-linux-*|x86_64-*-freebsd*|i*86-*-freebsd*) :
-    acx_temp=`$acx_FC -V 2>&1`
-      if echo "$acx_temp" | grep '^Copyright.*\(The Portland Group\|NVIDIA CORPORATION\)' >/dev/null; then :
-  acx_cv_f77_cf_flag=-DgFortran
-elif echo "$acx_temp" | grep '^NAG Fortran Compiler Release' >/dev/null; then :
-  acx_cv_f77_cf_flag=-DNAGf90Fortran
-elif echo "$acx_temp" | grep '^Intel(R) Fortran.*Compiler' >/dev/null; then :
-  acx_cv_f77_cf_flag=-DgFortran
-elif echo "$acx_temp" | grep '^Cray Fortran' >/dev/null; then :
-  acx_cv_f77_cf_flag=-DgFortran
-elif acx_temp=`$acx_FC --version 2>&1` \
-         && echo $acx_temp | grep '^GNU Fortran' >/dev/null; then :
-  if echo $acx_temp | grep g77 >/dev/null; then :
-  acx_cv_f77_cf_flag=-Dg77Fortran
-else
-              if echo "$FFLAGS" | grep '^\(.* \)*-ff2c\( .*\)*$' >/dev/null; then :
-  acx_cv_f77_cf_flag=-Df2cFortran
-else
-  acx_cv_f77_cf_flag=-DgFortran
-fi
-fi
-elif acx_temp=`$acx_FC -v 2>&1` \
-         && echo $acx_temp | grep '^f2c'; then :
-  acx_cv_f77_cf_flag=-Df2cFortran
-fi ;; #(
-  *-ibm-aix*) :
-          if $CC -qversion 2>&1 | grep '^IBM XL C' >/dev/null; then :
-
-else
-           acx_cv_f77_cf_flag=-DIBMR2Fortran
-fi
-      ;; #(
-  *-*-hpux*) :
-    acx_cv_f77_cf_flag=-DhpuxFortran ;; #(
-  sx*-*-*|es*-*-*) :
-          acx_cv_f77_cf_flag=-DSXFortran ;; #(
-  *) :
-     ;;
-esac
-
-               ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-fi
-         acx_cv_cf_flag="$acx_cv_f77_cf_flag (probed)"
-
-fi
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acx_cv_cf_flag" >&5
-$as_echo "$acx_cv_cf_flag" >&6; }
-   if echo "$acx_cv_cf_flag" | grep ' (probed)$' >/dev/null; then :
-  CPPFLAGS="${CPPFLAGS+$CPPFLAGS }`echo "$acx_cv_cf_flag" | sed 's/ (probed)$//'`"
-fi
-
-case $host in #(
-  *-ibm-aix*) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if -Dappendus needs to be added to CPPFLAGS for cfortran.h" >&5
-$as_echo_n "checking if -Dappendus needs to be added to CPPFLAGS for cfortran.h... " >&6; }
-      if $CC -qversion 2>&1 | grep '^IBM XL C' >/dev/null; then :
-  acx_temp_qextname_f77flags=`echo "$FFLAGS" | sed -n '/-qextname/{ s/^\(.* \)*-qextname\( .*\)*$/-qextname/;p;}'`
-         acx_temp_qextname_fcflags=`echo "$FCFLAGS" | sed -n '/-qextname/{ s/^\(.* \)*-qextname\( .*\)*$/-qextname/;p;}'`
-
-               acx_temp_qextname_fcflags=$acx_temp_qextname_f77flags
-         case x"$acx_temp_qextname_fcflags$acx_temp_qextname_f77flags" in #(
-  x-qextname) :
-    as_fn_error $? "Option -qextname must be provided consistently to F77 and FC" "$LINENO" 5 ;; #(
-  x-qextname-qextname) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-            CPPFLAGS="${CPPFLAGS+$CPPFLAGS }-Dappendus" ;; #(
-  *) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; } ;;
-esac
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi ;; #(
-  *) :
-     ;;
-esac
-if test -n "$F77" -a X"$F77" != Xno; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking if C externals constructed with cfortran.h work" >&5
-$as_echo_n "checking if C externals constructed with cfortran.h work... " >&6; }
-if ${acx_cv_cfortran_works+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  acx_cv_cfortran_works=no
-      save_CPPFLAGS=$CPPFLAGS
-      CPPFLAGS="-I$srcdir/src $CPPFLAGS"
-      ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include "cfortran.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-PROTOCCALLSFFUN1(FLOAT,CFTSTF,cftstf,FLOAT)
-#define conftest_F(v) \
-  CCALLSFFUN1(CFTSTF,cftstf,FLOAT,(v));
-
-static float
-cftstC(int i, float v, int *p, float *q)
-{
-  float f;
-  *p = (int)roundf(v * i);
-  *q = f = conftest_F(v * i);
-  return f;
-}
-
-FCALLSCFUN4(FLOAT,cftstC,CFTSTC,cftstc,INT,FLOAT,PINT,PFLOAT)
-
-/* test string returns */
-static const char *
-conftest_str_C(void)
-{
-  static const char msg[100] = "AAAAAAAAAAAAAAAAAAAA"
-    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-  return msg;
-}
-
-FCALLSCFUN0(STRING,conftest_str_C,CHTST,chtst)
-
-/* This function is required simply because some Fortran compilers
- * won't stop with exit code n when encountering STOP n */
-static void
-errExit(void)
-{
-  exit(1);
-}
-
-FCALLSCSUB0(errExit,ERR_EXIT,err_exit)
-
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: Renaming C object file." >&5; } >&5
-  (mv "conftest.$ac_objext" "conftest_c.$ac_objext") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-
-         ac_ext=f
-ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
-ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_f77_compiler_gnu
-
-         cat > conftest.$ac_ext <<_ACEOF
-      REAL FUNCTION CFTSTF(v)
-      REAL RI
-      COMMON /CFTSTD/ RI
-      REAL V
-      REAL R
-      CFTSTF = V * 100.0
-      RI = 1.0 / V
-      END FUNCTION CFTSTF
-_ACEOF
-if ac_fn_f77_try_compile "$LINENO"; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: Renaming Fortran object file." >&5; } >&5
-  (mv "conftest.$ac_objext" "conftest_f.$ac_objext") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-            save_LIBS=$LIBS
-            LIBS="conftest_c.$ac_objext conftest_f.$ac_objext $LIBS"
-            if test "$cross_compiling" = yes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Skipping run test for cfortran.h in cross-compilation mode," >&5
-$as_echo "$as_me: Skipping run test for cfortran.h in cross-compilation mode," >&6;}
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: link test succeeded." >&5
-$as_echo "$as_me: link test succeeded." >&6;}
-               acx_cv_cfortran_works=yes
-else
-  cat > conftest.$ac_ext <<_ACEOF
-      program main
-      REAL RI
-      COMMON /CFTSTD/ RI
-      REAL EPS
-      PARAMETER(EPS=10E-6)
-      REAL FOO, BOO, TOO
-      INTEGER BAR, BAZ, I
-      CHARACTER(99) AAAAAA
-      EXTERNAL CFTSTC, CFTSTF, CHTST, ERR_EXIT
-      REAL CFTSTC, CFTSTF
-      CHARACTER(99) CHTST
-      BAR = 5
-      FOO = 0.3
-      TOO = CFTSTC(BAR, FOO, BAZ, BOO)
-      IF (ABS(BAZ - NINT(BAR * FOO)) /= 0) THEN
-        WRITE (0, '(2(A,I0))') "ERROR CHECKING, WHEN BAZ, BAZ=", BAZ,
-     &       ", NINT(BAR * FOO) =", NINT(BAR * FOO)
-        CALL ERR_EXIT
-      END IF
-      IF (ABS((RI - 1.0 / (BAR * FOO)) / ABS(RI)) > EPS)  THEN
-        WRITE (0, '(2(A,F24.15))') "ERROR CHECKING RI, RI=", RI, ",
-     &       1.0 / (BAR * FOO) = ", 1.0 / (BAR * FOO)
-        CALL err_exit
-      END IF
-      IF (ABS((BOO - (BAR * FOO * 100.0))/ABS(BOO)) > EPS)  THEN
-        WRITE (0, '(2(A,F24.15))') "ERROR CHECKING BOO, BOO=", BOO,
-     &       ", BAR * FOO * 100.0 = ", BAR * FOO * 100.0
-        CALL ERR_EXIT
-      END IF
-      IF (TOO /= BOO) THEN
-        WRITE (0, '(2(A,F24.15))') "ERROR CHECKING TOO VS. BOO, TOO=",
-     &       TOO, ", BOO = ", BOO
-        CALL ERR_EXIT
-      END IF
-      AAAAAA = CHTST()
-      DO i = 1, 99
-        IF (AAAAAA(I:I) /= 'A') THEN
-          WRITE (0, '(A,I0,2A)') "ERROR CHECKING AAAAAA(", I, ")=",
-     &        AAAAAA(I:I)
-          CALL ERR_EXIT
-        END IF
-      END DO
-      end
-_ACEOF
-if ac_fn_f77_try_run "$LINENO"; then :
-  acx_cv_cfortran_works=yes
-else
-  acx_cv_cfortran_works="error"
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-	    LIBS=$save_LIBS
-else
-  acx_cv_cfortran_works="error compiling Fortran subroutine"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-         ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-else
-  acx_cv_cfortran_works="compiling with cfortran.h failed"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-      ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-      CPPFLAGS=$save_CPPFLAGS
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acx_cv_cfortran_works" >&5
-$as_echo "$acx_cv_cfortran_works" >&6; }
-   if test x"$acx_cv_cfortran_works" = xyes; then :
-
-$as_echo "#define HAVE_CF_INTERFACE 1" >>confdefs.h
-
-else
-  case x"$acx_cv_cfortran_works" in #(
-  x"error") :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Linking/Running with C EXTERNAL built with cfortran.h does not work!" >&5
-$as_echo "$as_me: Linking/Running with C EXTERNAL built with cfortran.h does not work!" >&6;} ;; #(
-  x"compiling with cfortran.h failed") :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Compilation with cfortran.h is not working!" >&5
-$as_echo "$as_me: Compilation with cfortran.h is not working!" >&6;} ;; #(
-  x"error compiling Fortran subroutine") :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: compilation of simple Fortran source failed!" >&5
-$as_echo "$as_me: compilation of simple Fortran source failed!" >&6;} ;; #(
-  *) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: Unexpected error when linking C and Fortran via cfortran.h!" >&5
-$as_echo "$as_me: Unexpected error when linking C and Fortran via cfortran.h!" >&6;} ;;
-esac
-     { $as_echo "$as_me:${as_lineno-$LINENO}: Disabling cfortran.h bindings generation" >&5
-$as_echo "$as_me: Disabling cfortran.h bindings generation" >&6;}
-     acx_cv_cfortran_works=no
-fi
-
-fi
-
-fi
- if test -n "$F77" -a X"$F77" != Xno -a x"$acx_cv_cfortran_works" = xyes; then
-  USE_F77_TRUE=
-  USE_F77_FALSE='#'
-else
-  USE_F77_TRUE='#'
-  USE_F77_FALSE=
-fi
-
-
-#  ----------------------------------------------------------------------
-
 # configure code from valgrind
 
 # does the x86/amd64 assembler understand SSE 4.2 instructions?
@@ -25977,6 +26022,14 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${USE_F77_TRUE}" && test -z "${USE_F77_FALSE}"; then
+  as_fn_error $? "conditional \"USE_F77\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_NEARPT3_TRUE}" && test -z "${ENABLE_NEARPT3_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_NEARPT3\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${ENABLE_MAGICS_TRUE}" && test -z "${ENABLE_MAGICS_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_MAGICS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -25991,10 +26044,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_HIRLAM_EXTENSIONS_TRUE}" && test -z "${ENABLE_HIRLAM_EXTENSIONS_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_HIRLAM_EXTENSIONS\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${USE_F77_TRUE}" && test -z "${USE_F77_FALSE}"; then
-  as_fn_error $? "conditional \"USE_F77\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BUILD_SSE42_TESTS_TRUE}" && test -z "${BUILD_SSE42_TESTS_FALSE}"; then

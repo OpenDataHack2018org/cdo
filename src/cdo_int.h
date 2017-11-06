@@ -15,11 +15,11 @@
   GNU General Public License for more details.
 */
 
-#ifndef _CDO_INT_H
-#define _CDO_INT_H
+#ifndef  CDO_INT_H
+#define  CDO_INT_H
 
-#if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#ifdef  HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -103,10 +103,10 @@ enum T_EIGEN_MODE  {JACOBI, DANIELSON_LANCZOS};
 #endif
 
 
-#define NEW_2D(T, P2D, N, M)     T **P2D = (N)?new T*[(N)]:nullptr;                          \
-                                 if ((N)) { P2D[0] = (M)?new T[(N)*(M)]:nullptr;             \
-                                            for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
-#define DELETE_2D(P2D) if (P2D) { if (P2D[0]) delete[] P2D[0]; delete[] P2D; P2D = nullptr; }
+#define  NEW_2D(T, P2D, N, M)     T **P2D = (N)?new T*[(N)]:nullptr;                          \
+                                  if ((N)) { P2D[0] = (M)?new T[(N)*(M)]:nullptr;             \
+                                             for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
+#define  DELETE_2D(P2D) if (P2D) { if (P2D[0]) delete[] P2D[0]; delete[] P2D; P2D = nullptr; }
 
 
 #define  IX2D(y,x,nx)  ((y)*(nx)+(x))
@@ -163,6 +163,7 @@ const char *parameter2word(const char *string);
 double parameter2double(const char *string);
 bool   parameter2bool(const char *string);
 int    parameter2int(const char *string);
+size_t parameter2sizet(const char *string);
 int    parameter2intlist(const char *string);
 
 int referenceToGrid(int gridID1);
@@ -204,4 +205,4 @@ int  vlistCompareX(int vlistID1, int vlistID2, int flag);
 }
 #endif
 
-#endif  /* _CDO_INT_H */
+#endif  /* CDO_INT_H */

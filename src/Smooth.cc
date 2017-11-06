@@ -36,7 +36,7 @@ enum {FORM_LINEAR};
 static const char *Form[] = {"linear"};
 
 typedef struct {
-  int maxpoints;
+  size_t maxpoints;
   int form;
   double radius;
   double weight0;
@@ -58,7 +58,7 @@ double smooth_knn_compute_weights(size_t num_neighbors, const bool *restrict src
   for ( size_t n = 0; n < num_neighbors; ++n )
     {
       nbr_mask[n] = false;
-      if ( nbr_add[n] < ULONG_MAX && src_grid_mask[nbr_add[n]] )
+      if ( nbr_add[n] < SIZE_MAX && src_grid_mask[nbr_add[n]] )
         {
           nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightR, search_radius);
           dist_tot += nbr_dist[n];
@@ -371,7 +371,7 @@ void set_parameter(int *xnsmooth, smoothpoint_t *spoint)
           const char *value = kv->values[0];
           
           if      ( STR_IS_EQ(key, "nsmooth")   ) *xnsmooth = parameter2int(value);
-          else if ( STR_IS_EQ(key, "maxpoints") ) spoint->maxpoints = parameter2int(value);
+          else if ( STR_IS_EQ(key, "maxpoints") ) spoint->maxpoints = parameter2sizet(value);
           else if ( STR_IS_EQ(key, "weight0")   ) spoint->weight0 = parameter2double(value);
           else if ( STR_IS_EQ(key, "weightR")   ) spoint->weightR = parameter2double(value);
           else if ( STR_IS_EQ(key, "radius")    ) spoint->radius = radius_str_to_deg(value);
@@ -383,7 +383,7 @@ void set_parameter(int *xnsmooth, smoothpoint_t *spoint)
     }
       
   if ( cdoVerbose )
-    cdoPrint("nsmooth = %d, maxpoints = %d, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
+    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
              *xnsmooth, spoint->maxpoints, spoint->radius, Form[spoint->form], spoint->weight0, spoint->weightR);
 }
 
@@ -395,7 +395,7 @@ void *Smooth(void *argument)
   size_t nmiss;
   int xnsmooth = 1;
   smoothpoint_t spoint;
-  spoint.maxpoints = INT_MAX;
+  spoint.maxpoints = SIZE_MAX;
   spoint.radius    = 1;
   spoint.form      = FORM_LINEAR;
   spoint.weight0   = 0.25;

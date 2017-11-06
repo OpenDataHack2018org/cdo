@@ -147,7 +147,7 @@ unsigned long day_of_year(int date)
  */  
 static void count(field_type *field1, const field_type *field2, double mode)
 {
-  int   i, len;
+  size_t i;
   const int     grid1    = field1->grid;
   const size_t  nmiss1   = field1->nmiss;
   const double  missval1 = field1->missval;
@@ -156,7 +156,7 @@ static void count(field_type *field1, const field_type *field2, double mode)
   const double  missval2 = field2->missval;
   const double *array2   = field2->ptr;
   
-  len = gridInqSize(grid1);
+  size_t len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
@@ -231,7 +231,7 @@ static void count(field_type *field1, const field_type *field2, double mode)
  */  
 static void selcomp(field_type *field1, const field_type *field2, int (*compare)(double, double))
 {
-  int   i, len;
+  size_t i;
   const int     grid1    = field1->grid;
   const size_t  nmiss1   = field1->nmiss;
   const double  missval1 = field1->missval;
@@ -241,7 +241,7 @@ static void selcomp(field_type *field1, const field_type *field2, int (*compare)
   const double  missval2 = field2->missval;
   const double *array2   = field2->ptr;
   
-  len = gridInqSize(grid1);
+  size_t len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
@@ -282,13 +282,13 @@ static void selcomp(field_type *field1, const field_type *field2, int (*compare)
  */  
 static void selcompc(field_type *field, double c, int (*compare)(double, double))
 {
-  int   i, len;
+  size_t i;
   const int     grid    = field->grid;
   const size_t  nmiss   = field->nmiss;
   const double  missval = field->missval;
   double       *array   = field->ptr;
   
-  len = gridInqSize(grid);
+  size_t len = gridInqSize(grid);
 
   if ( DBL_IS_EQUAL(c, missval) )
     {
@@ -370,7 +370,7 @@ void farnum3(field_type *field1, field_type field2, double n)
 
 void farsel(field_type *field1, field_type field2)
 {
-  int   i, len;
+  size_t i;
   const int     grid1    = field1->grid;
   const double  missval1 = field1->missval;
   double       *array1   = field1->ptr;
@@ -379,7 +379,7 @@ void farsel(field_type *field1, field_type field2)
   const double  missval2 = field2.missval;
   const double *array2   = field2.ptr;
   
-  len = gridInqSize(grid1);
+  size_t len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
     cdoAbort("Fields have different gridsize (%s)", __func__);

@@ -217,7 +217,7 @@ int referenceToGrid(int gridID1)
 	{
 	  if ( cdoVerbose ) cdoPrint("Horizontal grid file used: %s", gridpath);
       
-	  int gridsize = gridInqSize(gridID1);
+	  size_t gridsize = gridInqSize(gridID1);
 
 	  // int number = gridInqNumber(gridID1);
 	  int position = gridInqPosition(gridID1);
@@ -233,7 +233,7 @@ int referenceToGrid(int gridID1)
 	      if ( gridInqSize(gridID) == gridsize )
 		gridID2 = gridDuplicate(gridID);
 	      else
-		cdoWarning("Grid size %d on position %d do not match! Reference=%s", gridsize, position, gridpath);
+		cdoWarning("Grid size %zu on position %d do not match! Reference=%s", gridsize, position, gridpath);
 	    }
 	  else if ( position == 0 )
 	    {

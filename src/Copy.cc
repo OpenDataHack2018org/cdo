@@ -116,7 +116,7 @@ void *Copy(void *argument)
 
 	  pstreamDefVlist(streamID2, vlistID2);
 
-	  int gridsize = vlistGridsizeMax(vlistID1);
+	  size_t gridsize = vlistGridsizeMax(vlistID1);
 	  array = (double*) Malloc(gridsize*sizeof(double));
 	  if ( cdoParIO )
 	    {

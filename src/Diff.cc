@@ -65,7 +65,7 @@ void *Diff(void *argument)
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
@@ -97,7 +97,7 @@ void *Diff(void *argument)
 	  int code     = vlistInqVarCode(vlistID1, varID1);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID1);
 	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID1);
-	  int gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 	  double missval1 = vlistInqVarMissval(vlistID1, varID1);
 	  double missval2 = vlistInqVarMissval(vlistID2, varID2);
 
@@ -116,7 +116,7 @@ void *Diff(void *argument)
 	  double relm = 0.0;
           double absdiff;
 
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      if ( (DBL_IS_NAN(array1[i]) && !DBL_IS_NAN(array2[i])) ||
 		  (!DBL_IS_NAN(array1[i]) &&  DBL_IS_NAN(array2[i])) )
@@ -185,7 +185,7 @@ void *Diff(void *argument)
 		  set_text_color(stdout, RESET, GREEN);
                   double level = cdoZaxisInqLevel(zaxisID, levelID);
 		  fprintf(stdout, "%7g ", level);
-		  fprintf(stdout, "%8d %7zu ", gridsize, MAX(nmiss1, nmiss2));
+		  fprintf(stdout, "%8zu %7zu ", gridsize, MAX(nmiss1, nmiss2));
 		  fprintf(stdout, "%7d ", ndiff);
 		  reset_text_color(stdout);
 		

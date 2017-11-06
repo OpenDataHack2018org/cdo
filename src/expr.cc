@@ -58,6 +58,7 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 #define MVCOMPAND(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPAND(x,y))
 #define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
 
+static double f_float(double x)        { return (float)(x); }
 static double f_int(double x)          { return (int)(x); }
 static double f_nint(double x)         { return round(x); }
 static double f_sqr(double x)          { return x*x;      }
@@ -101,6 +102,7 @@ static func_t fun_sym_tbl[] =
   {FT_STD, 0, "acosh", (double (*)()) (double (*)(double)) acosh},
   {FT_STD, 0, "atanh", (double (*)()) (double (*)(double)) atanh},
   {FT_STD, 0, "gamma", (double (*)()) (double (*)(double)) tgamma},
+  {FT_STD, 0, "float", (double (*)()) f_float},
   {FT_STD, 0, "int",   (double (*)()) f_int},
   {FT_STD, 0, "nint",  (double (*)()) f_nint},
   {FT_STD, 0, "sqr",   (double (*)()) f_sqr},
@@ -185,10 +187,17 @@ int get_funcID(const char *fun)
 }
 
 static
+bool isCompare(int oper)
+{
+  return oper==LEG||oper==GE||oper==LE||oper==EQ||oper==NE||oper==GT||oper==LT;
+}
+
+static
 void param_meta_copy(paramType *out, paramType *in)
 {
   out->gridID   = in->gridID;
   out->zaxisID  = in->zaxisID;
+  out->datatype = in->datatype;
   out->steptype = in->steptype;
   out->ngp      = in->ngp;
   out->nlev     = in->nlev;
@@ -450,6 +459,7 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
   size_t ngp   = p2->param.ngp;
   size_t nlev  = p2->param.nlev;
   size_t nmiss = p2->param.nmiss;
+  int datatype = p2->param.datatype;
   double missval1 = p2->param.missval;
   double missval2 = p2->param.missval;
 
@@ -469,6 +479,7 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
       double *restrict odat = p->param.data;
       const double *restrict idat = p2->param.data;
       double cval = p1->u.con.value;
+      if ( datatype == CDI_DATATYPE_FLT32 && isCompare(oper) ) cval = (float) cval;
 
       oper_expr_con_var(oper, nmiss>0, n, missval1, missval2, odat, cval, idat);
 
@@ -488,6 +499,7 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
   size_t ngp   = p1->param.ngp;
   size_t nlev  = p1->param.nlev;
   size_t nmiss = p1->param.nmiss;
+  int datatype = p1->param.datatype;
   double missval1 = p1->param.missval;
   double missval2 = p1->param.missval;
 
@@ -507,6 +519,7 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
       double *restrict odat = p->param.data;
       const double *restrict idat = p1->param.data;
       double cval = p2->u.con.value;
+      if ( datatype == CDI_DATATYPE_FLT32 && isCompare(oper) ) cval = (float) cval;
 
       oper_expr_var_con(oper, nmiss>0, n, missval1, missval2, odat, idat, cval);
 

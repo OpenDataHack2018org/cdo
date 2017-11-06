@@ -151,26 +151,26 @@ void rotate_uv2(double *u_i, double *v_j, int ix, int iy,
 
 
 static
-void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y, 
+void uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y, 
 		  double *grid2x, double *grid2y, double *grid3x, double *grid3y)
 {
   double gx, gy;
   double gx2, gy2;
 
-  int gridsizex = (nlon+2)*nlat;
+  size_t gridsizex = (nlon+2)*nlat;
   double *gxhelp = (double*) Malloc(gridsizex*sizeof(double));
   double *gyhelp = (double*) Malloc(gridsizex*sizeof(double));
 
   /* load to a help field */
-  for ( int j = 0; j < nlat; j++ )
-    for ( int i = 0; i < nlon; i++ )
+  for ( size_t j = 0; j < nlat; j++ )
+    for ( size_t i = 0; i < nlon; i++ )
       {
 	gxhelp[IX2D(j,i+1,nlon+2)] = grid1x[IX2D(j,i,nlon)];
 	gyhelp[IX2D(j,i+1,nlon+2)] = grid1y[IX2D(j,i,nlon)];
       }
 
   /* make help field cyclic */
-  for ( int j = 0; j < nlat; j++ )
+  for ( size_t j = 0; j < nlat; j++ )
     {
       gxhelp[IX2D(j,0,nlon+2)]      = gxhelp[IX2D(j,nlon,nlon+2)];
       gxhelp[IX2D(j,nlon+1,nlon+2)] = gxhelp[IX2D(j,1,nlon+2)];
@@ -179,8 +179,8 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
     }
 
   /* interpolate u to scalar points */
-  for ( int j = 0; j < nlat; j++ )
-    for ( int i = 0; i < nlon; i++ )
+  for ( size_t j = 0; j < nlat; j++ )
+    for ( size_t i = 0; i < nlon; i++ )
       {
 	grid3x[IX2D(j,i,nlon)] = (gxhelp[IX2D(j,i,nlon+2)]+gxhelp[IX2D(j,i+1,nlon+2)])*0.5;
 	if ( (gxhelp[IX2D(j,i,nlon+2)] > 340 && gxhelp[IX2D(j,i+1,nlon+2)] <  20) ||
@@ -196,15 +196,15 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
       }
 
   /* load to a help field */
-  for ( int j = 0; j < nlat; j++ )
-    for ( int i = 0; i < nlon; i++ )
+  for ( size_t j = 0; j < nlat; j++ )
+    for ( size_t i = 0; i < nlon; i++ )
       {
 	gxhelp[IX2D(j,i+1,nlon+2)] = grid2x[IX2D(j,i,nlon)];
 	gyhelp[IX2D(j,i+1,nlon+2)] = grid2y[IX2D(j,i,nlon)];
       }
 
   /* make help field cyclic */
-  for ( int j = 0; j < nlat; j++ )
+  for ( size_t j = 0; j < nlat; j++ )
     {
       gxhelp[IX2D(j,0,nlon+2)]      = gxhelp[IX2D(j,nlon,nlon+2)];
       gxhelp[IX2D(j,nlon+1,nlon+2)] = gxhelp[IX2D(j,1,nlon+2)];
@@ -213,8 +213,8 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
     }
 
   /* interpolate v to scalar points */
-  for ( int j = 1; j < nlat-1; j++ )
-    for ( int i = 0; i < nlon; i++ )
+  for ( size_t j = 1; j < nlat-1; j++ )
+    for ( size_t i = 0; i < nlon; i++ )
       {
 	gx = (gxhelp[IX2D(j,i+1,nlon+2)]+gxhelp[IX2D(j-1,i+1,nlon+2)])*0.5;
 	if ( (gxhelp[IX2D(j,i+1,nlon+2)] > 340 && gxhelp[IX2D(j-1,i+1,nlon+2)] <  20) ||
@@ -279,7 +279,7 @@ void *Mrotuvb(void *argument)
 
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
-  int gridsize = gridInqSize(gridID1);
+  size_t gridsize = gridInqSize(gridID1);
   if ( gpint == true  && gridID1 == gridID2 ) cdoAbort("Input grids are the same, use parameter >noint< to disable interpolation!");
   if ( gpint == false && gridID1 != gridID2 ) cdoAbort("Input grids are not the same!");
   if ( gridsize != gridInqSize(gridID2) ) cdoAbort("Grids have different size!");
@@ -299,8 +299,8 @@ void *Mrotuvb(void *argument)
 
   if ( gridsize != gridInqSize(gridID2) ) cdoAbort("Internal problem: gridsize changed!");
 
-  int nlon    = gridInqXsize(gridID1);
-  int nlat    = gridInqYsize(gridID1);
+  size_t nlon = gridInqXsize(gridID1);
+  size_t nlat = gridInqYsize(gridID1);
 
   double *grid1x = (double*) Malloc(gridsize*sizeof(double));
   double *grid1y = (double*) Malloc(gridsize*sizeof(double));
@@ -355,7 +355,7 @@ void *Mrotuvb(void *argument)
   gridDefXvals(gridID3, grid3x);
   gridDefYvals(gridID3, grid3y);
 
-  for ( int i = 0; i < gridsize; i++ )
+  for ( size_t i = 0; i < gridsize; i++ )
     {
       grid3x[i] *= DEG2RAD;
       grid3y[i] *= DEG2RAD;
@@ -393,7 +393,7 @@ void *Mrotuvb(void *argument)
   double *uhelp = NULL, *vhelp = NULL;
   if ( gpint )
     {
-      int gridsizex = (nlon+2)*nlat;
+      size_t gridsizex = (nlon+2)*nlat;
       uhelp   = (double*) Malloc(gridsizex*sizeof(double));
       vhelp   = (double*) Malloc(gridsizex*sizeof(double));
     }
@@ -420,7 +420,7 @@ void *Mrotuvb(void *argument)
 	  /* remove missing values */
 	  if ( nmiss1 || nmiss2 )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  if ( DBL_IS_EQUAL(ufield[i], missval1) ) ufield[i] = 0;
 		  if ( DBL_IS_EQUAL(vfield[i], missval2) ) vfield[i] = 0;
@@ -430,15 +430,15 @@ void *Mrotuvb(void *argument)
 	  if ( gpint )
 	    {
 	      /* load to a help field */
-	      for ( int j = 0; j < nlat; j++ )
-		for ( int i = 0; i < nlon; i++ )
+	      for ( size_t j = 0; j < nlat; j++ )
+		for ( size_t i = 0; i < nlon; i++ )
 		  {
 		    uhelp[IX2D(j,i+1,nlon+2)] = ufield[IX2D(j,i,nlon)];
 		    vhelp[IX2D(j,i+1,nlon+2)] = vfield[IX2D(j,i,nlon)];
 		  }
 
 	      /* make help field cyclic */
-	      for ( int j = 0; j < nlat; j++ )
+	      for ( size_t j = 0; j < nlat; j++ )
 		{
 		  uhelp[IX2D(j,0,nlon+2)]      = uhelp[IX2D(j,nlon,nlon+2)];
 		  uhelp[IX2D(j,nlon+1,nlon+2)] = uhelp[IX2D(j,1,nlon+2)];
@@ -447,15 +447,15 @@ void *Mrotuvb(void *argument)
 		}
 
 	      /* interpolate on pressure points */
-	      for ( int j = 1; j < nlat; j++ )
-		for ( int i = 0; i < nlon; i++ )
+	      for ( size_t j = 1; j < nlat; j++ )
+		for ( size_t i = 0; i < nlon; i++ )
 		  {
 		    ufield[IX2D(j,i,nlon)] = (uhelp[IX2D(j,i,nlon+2)]+uhelp[IX2D(j,i+1,nlon+2)])*0.5;
 		    vfield[IX2D(j,i,nlon)] = (vhelp[IX2D(j-1,i+1,nlon+2)]+vhelp[IX2D(j,i+1,nlon+2)])*0.5;
 		  }
 	    }
 
-	  for ( int i = 0; i < nlon; i++ )
+	  for ( size_t i = 0; i < nlon; i++ )
 	    {
 	      ufield[IX2D(0,i,nlon)] = 0;
 	      vfield[IX2D(0,i,nlon)] = 0;

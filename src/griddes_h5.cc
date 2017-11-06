@@ -1,11 +1,11 @@
-#if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#ifdef  HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #define H5_USE_16_API
 
-#if defined(HAVE_LIBHDF5)
-#  include "hdf5.h"
+#ifdef  HAVE_LIBHDF5
+#include "hdf5.h"
 #endif
 
 #include <cdi.h>
@@ -42,7 +42,7 @@ herr_t obj_info(hid_t loc_id, const char *name, void *objname)
 	/*cdoAbort(" Unable to identify an object %s", name);*/
 	break;
       }
-  }
+    }
 
   return lexist;
 }
@@ -58,10 +58,10 @@ int h5find_object(hid_t file_id, const  char *name)
 #endif
 
 static
-void fill_gridvals(int xsize, int ysize, double *xvals, double *yvals)
+void fill_gridvals(size_t xsize, size_t ysize, double *xvals, double *yvals)
 {
-  int i, j, ii, jj;
-  int index, index2;
+  size_t i, j, ii, jj;
+  size_t index, index2;
 
   double xmin = -180;
   double xmax =  180;
@@ -361,8 +361,8 @@ int gridFromH5file(const char *gridfile)
 	}
       H5Tclose(native_type);
 
-      grid.xsize = (int)dims_out[1];
-      grid.ysize = (int)dims_out[0];
+      grid.xsize = dims_out[1];
+      grid.ysize = dims_out[0];
       grid.size  = grid.xsize*grid.ysize;
 
       grid.xvals = (double*) Malloc(grid.size*sizeof(double));
@@ -377,9 +377,9 @@ int gridFromH5file(const char *gridfile)
 	{
 	  int *iarray = (int*) Malloc(grid.size*sizeof(int));
 	  status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	  for ( int i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
+	  for ( size_t i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
 	  status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	  for ( int i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
+	  for ( size_t i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
 	  Free(iarray);
 	}
 
@@ -401,7 +401,7 @@ int gridFromH5file(const char *gridfile)
       double xscale = 1, yscale = 1;
       double xoffset = 0, yoffset = 0;
       hid_t grp_id;
-      int i;
+      size_t i;
 
       grp_id = H5Gopen(file_id, "/where/lon/what");
       if ( grp_id >= 0 )
@@ -483,8 +483,8 @@ int gridFromH5file(const char *gridfile)
 	    }
 	  H5Tclose(native_type);
 
-	  grid.xsize = (int)dims_out[1];
-	  grid.ysize = (int)dims_out[0];
+	  grid.xsize = dims_out[1];
+	  grid.ysize = dims_out[0];
 	  grid.size  = grid.xsize*grid.ysize;
 
 	  grid.xvals = (double*) Malloc(grid.size*sizeof(double));
@@ -499,9 +499,9 @@ int gridFromH5file(const char *gridfile)
 	    {
 	      int *iarray = (int*) Malloc(grid.size*sizeof(int));
 	      status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	      for ( int i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
+	      for ( size_t i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
 	      status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	      for ( int i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
+	      for ( size_t i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
 	      Free(iarray);
 	    }
 

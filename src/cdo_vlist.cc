@@ -50,7 +50,7 @@ int cdoZaxisInqLevels(int zaxisID, double *levels)
 }
 
 static
-void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
+void compare_lat_reg2d(size_t ysize, int gridID1, int gridID2)
 {
   if ( ysize > 1 )
     {      
@@ -70,7 +70,7 @@ void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
 	}
       else
 	{
-	  for ( int i = 0; i < ysize; ++i )
+	  for ( size_t i = 0; i < ysize; ++i )
 	    if ( fabs(yvals1[i] - yvals2[i]) > 3.e-5 )
 	      {
 		cdoWarning("Grid latitudes differ!");
@@ -84,7 +84,7 @@ void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
 }
 
 static
-void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
+void compare_lon_reg2d(size_t xsize, int gridID1, int gridID2)
 {
   if ( xsize > 1 )
     {
@@ -94,7 +94,7 @@ void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
       gridInqXvals(gridID1, xvals1);
       gridInqXvals(gridID2, xvals2);
 		  
-      for ( int i = 0; i < xsize; ++i )
+      for ( size_t i = 0; i < xsize; ++i )
 	if ( fabs(xvals1[i] - xvals2[i]) > 3.e-5 )
 	  {
 	    cdoWarning("Grid longitudes differ!");
@@ -112,7 +112,7 @@ void compare_grid_unstructured(int gridID1, int gridID2)
   if ( gridInqXvals(gridID1, NULL) && gridInqXvals(gridID1, NULL) == gridInqXvals(gridID2, NULL) &&
        gridInqYvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) == gridInqYvals(gridID2, NULL) )
     {
-      int gridsize = gridInqSize(gridID1);
+      size_t gridsize = gridInqSize(gridID1);
       
       double *xvals1 = (double*) Malloc(gridsize*sizeof(double));
       double *xvals2 = (double*) Malloc(gridsize*sizeof(double));
@@ -125,7 +125,7 @@ void compare_grid_unstructured(int gridID1, int gridID2)
       gridInqYvals(gridID2, yvals2);
 
       int inc = gridsize > 10000 ? gridsize/1000 : 1;
-      for ( int i = 0; i < gridsize; i += inc )
+      for ( size_t i = 0; i < gridsize; i += inc )
         if ( fabs(xvals1[i] - xvals2[i]) > 2.e-5 || fabs(yvals1[i] - yvals2[i]) > 2.e-5 )
           {
             // printf("%d %g %g %g %g %g %g\n", i, xvals1[i], xvals2[i], yvals1[i], yvals2[i], xvals1[i] - xvals2[i], yvals1[i] - yvals2[i]);
@@ -149,8 +149,8 @@ void cdoCompareGrids(int gridID1, int gridID2)
     {
       if ( gridInqType(gridID1) == GRID_GAUSSIAN || gridInqType(gridID1) == GRID_LONLAT )
 	{
-	  int xsize = gridInqXsize(gridID1);
-	  int ysize = gridInqYsize(gridID1);
+	  size_t xsize = gridInqXsize(gridID1);
+	  size_t ysize = gridInqYsize(gridID1);
 		
 	  if ( ysize == gridInqYsize(gridID2) )
 	    compare_lat_reg2d(ysize, gridID1, gridID2);
@@ -367,12 +367,12 @@ int vlistInqNWPV(int vlistID, int varID)
 }
 
 
-int vlist_check_gridsize(int vlistID)
+size_t vlist_check_gridsize(int vlistID)
 {
   bool lerror = false;
   int ngrids = vlistNgrids(vlistID);
   int gridID = vlistGrid(vlistID, 0);
-  int ngp    = gridInqSize(gridID);
+  size_t ngp    = gridInqSize(gridID);
 
   /* check gridsize */
   for ( int index = 0; index < ngrids; ++index )
@@ -392,7 +392,7 @@ int vlist_check_gridsize(int vlistID)
       for ( int index = 0; index < ngrids; ++index )
 	{
 	  gridID = vlistGrid(vlistID, index);
-	  cdoPrint("  grid=%d  type=%s  points=%d", index+1, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID));
+	  cdoPrint("  grid=%d  type=%s  points=%zu", index+1, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID));
 	}
       cdoAbort("The input stream contains variables on different horizontal grids!");
     }

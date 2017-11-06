@@ -14,19 +14,19 @@ extern "C" {
 constexpr int MAX_CHILDS = 9;
 
 typedef struct {
-  int ncells;
-  int *neighbor; // neighbor cell index
-  int *parent;   // parent cell index
-  int *child;    // child cell index
+  long ncells;
+  long *neighbor; // neighbor cell index
+  long *parent;   // parent cell index
+  long *child;    // child cell index
   const char *filename;
 } cellindex_type;
 
 
 static
-void copy_data_to_index(int ncells, const double *restrict data, int *restrict cellindex)
+void copy_data_to_index(long ncells, const double *restrict data, long *restrict cellindex)
 {
-  for ( int i = 0; i < ncells; ++i )
-    cellindex[i] = (int) lround(data[i]);
+  for ( long i = 0; i < ncells; ++i )
+    cellindex[i] = lround(data[i]);
 }
 
 static
@@ -75,14 +75,14 @@ cellindex_type *read_cellindex(const char *filename)
   if ( pid == CDI_UNDEFID ) cdoAbort("parent_cell_index not found in %s!", filename);
   // if ( cid == CDI_UNDEFID ) cdoAbort("child_cell_index not found in %s!", filename);
 
-  int ncells = gridInqSize(gridID);
+  long ncells = gridInqSize(gridID);
 
   cellindex_type *cellindex = (cellindex_type*) Malloc(sizeof(cellindex_type));
   cellindex->ncells = ncells;
 
   cellindex->neighbor = NULL;
-  // cellindex->neighbor = (int*) Malloc(3*ncells*sizeof(int));
-  cellindex->parent   = (int*) Malloc(  ncells*sizeof(int));
+  // cellindex->neighbor = (long*) Malloc(3*ncells*sizeof(long));
+  cellindex->parent   = (long*) Malloc(  ncells*sizeof(long));
   cellindex->child    = NULL;
   // cellindex->child    = (cid != CDI_UNDEFID) ? (int*) Malloc(MAX_CHILDS*ncells*sizeof(int)) : NULL;
   double *data = (double *) Malloc(ncells*sizeof(double));
@@ -103,8 +103,8 @@ cellindex_type *read_cellindex(const char *filename)
     }
 
   // Fortran to C index
-  for ( int i = 0; i < ncells; ++i ) cellindex->parent[i] -= 1;
-  // for ( int i = 0; i < 3*ncells; ++i ) cellindex->neighbor[i] -= 1;
+  for ( long i = 0; i < ncells; ++i ) cellindex->parent[i] -= 1;
+  // for ( long i = 0; i < 3*ncells; ++i ) cellindex->neighbor[i] -= 1;
 
   streamClose(streamID);
 
@@ -150,11 +150,11 @@ int read_grid(const char *filename)
 * @param search the element to find a position for 
 */
 static
-int find_index(int search, int n, const int *restrict array)
+long find_index(int search, long n, const long *restrict array)
 {
-  int first = 0;
-  int last = n - 1;
-  int middle = (first+last)/2;
+  long first = 0;
+  long last = n - 1;
+  long middle = (first+last)/2;
  
   while ( first <= last )
     {
@@ -162,7 +162,7 @@ int find_index(int search, int n, const int *restrict array)
         first = middle + 1;    
       else if ( array[middle] == search )
         {
-          for ( int i = middle; i >= 0; i-- )
+          for ( long i = middle; i >= 0; i-- )
             {
               if ( array[i] == search ) middle = i;
               else break;
@@ -200,23 +200,23 @@ int cmpsinfo(const void *s1, const void *s2)
 static
 void compute_child_from_parent(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
-  int ncells1 = cellindex1->ncells;
-  int *parent1 = cellindex1->parent;
+  long ncells1 = cellindex1->ncells;
+  long *parent1 = cellindex1->parent;
 
-  int *idx1 = (int*) Malloc(ncells1*sizeof(int));
-  for ( int i = 0; i < ncells1; ++i ) idx1[i] = i;
-  for ( int i = 1; i < ncells1; ++i )
+  long *idx1 = (long*) Malloc(ncells1*sizeof(long));
+  for ( long i = 0; i < ncells1; ++i ) idx1[i] = i;
+  for ( long i = 1; i < ncells1; ++i )
     if ( parent1[i] < parent1[i-1] )
       {
         if ( cdoVerbose ) cdoPrint("Sort parent index of %s!", cellindex1->filename);
         sinfo_t *sinfo = (sinfo_t*)Malloc(ncells1*sizeof(sinfo_t));
-        for ( int j = 0; j < ncells1; ++j )
+        for ( long j = 0; j < ncells1; ++j )
           {
             sinfo[j].p = parent1[j];
             sinfo[j].i = idx1[j];
           }
         qsort(sinfo, ncells1, sizeof(sinfo_t), cmpsinfo);
-        for ( int j = 0; j < ncells1; ++j )
+        for ( long j = 0; j < ncells1; ++j )
           {
             parent1[j] = sinfo[j].p;
             idx1[j] = sinfo[j].i;
@@ -225,15 +225,15 @@ void compute_child_from_parent(cellindex_type *cellindex1, cellindex_type *celli
         break;
       }
 
-  int ncells2 = cellindex2->ncells;
-  int *child2 = (int*) Malloc(MAX_CHILDS*ncells2*sizeof(int));
+  long ncells2 = cellindex2->ncells;
+  long *child2 = (long*) Malloc(MAX_CHILDS*ncells2*sizeof(long));
   cellindex2->child = child2;
-  for ( int i = 0; i< ncells2; ++i )
+  for ( long i = 0; i< ncells2; ++i )
     {
-      for ( int k = 0; k < MAX_CHILDS; ++k ) child2[i*MAX_CHILDS+k] = -1;
-      int j = find_index(i, ncells1, parent1);
+      for ( long k = 0; k < MAX_CHILDS; ++k ) child2[i*MAX_CHILDS+k] = -1;
+      long j = find_index(i, ncells1, parent1);
       if ( j < 0 ) continue;
-      for ( int k = 0; k < MAX_CHILDS; ++k )
+      for ( long k = 0; k < MAX_CHILDS; ++k )
         {
           if ( i != parent1[j+k] ) break;
           //  child2[i*MAX_CHILDS+k] = j+k;
@@ -245,7 +245,7 @@ void compute_child_from_parent(cellindex_type *cellindex1, cellindex_type *celli
 }
 
 static
-void read_coordinates(const char *filename, int n, double *lon, double *lat, int nv, double *lon_bnds, double *lat_bnds)
+void read_coordinates(const char *filename, long n, double *lon, double *lat, int nv, double *lon_bnds, double *lat_bnds)
 {
   openLock();
   int streamID = streamOpenRead(filename);
@@ -260,7 +260,7 @@ void read_coordinates(const char *filename, int n, double *lon, double *lat, int
     {
       gridID = vlistGrid(vlistID, index);
       if ( gridInqType(gridID) == GRID_UNSTRUCTURED &&
-           gridInqSize(gridID) == n &&
+           (long)gridInqSize(gridID) == n &&
            gridInqNvertex(gridID) == 3 ) break;
     }
 
@@ -300,8 +300,8 @@ int winding_numbers_algorithm(double cell_corners[], int number_corners, double 
 #define MAX_SEARCH 128 // the triangles are distorted!
 
 static
-void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *grid_center_lon2, double *grid_center_lat2, double *grid_corner_lon2,
-                               double *grid_corner_lat2, int ncells1, double *grid_center_lon1, double *grid_center_lat1)
+void compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid_center_lon2, double *grid_center_lat2, double *grid_corner_lon2,
+                               double *grid_corner_lat2, long ncells1, double *grid_center_lon1, double *grid_center_lat1)
 {
   struct gridsearch *gs = gridsearch_create(ncells1, grid_center_lon1, grid_center_lat1);
   size_t nbr_add[MAX_SEARCH];  // source address at nearest neighbors
@@ -314,9 +314,9 @@ void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *
   double cell_corners_plane_projection[8];
   double center_point_plane_projection[2];
 
-  int *child2 = (int*) Malloc(MAX_CHILDS*ncells2*sizeof(int));
+  long *child2 = (long*) Malloc(MAX_CHILDS*ncells2*sizeof(long));
   cellindex2->child = child2;
-  for ( int cell_no2 = 0; cell_no2 < ncells2; ++cell_no2 )
+  for ( long cell_no2 = 0; cell_no2 < ncells2; ++cell_no2 )
     {
       for ( int k = 0; k < MAX_CHILDS; ++k ) child2[cell_no2*MAX_CHILDS+k] = -1;
 
@@ -378,7 +378,7 @@ void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *
       for ( int i = 0; i < MAX_SEARCH; ++i )
         {
           size_t cell_no1 = nbr_add[i];
-          if ( cell_no1 < ULONG_MAX )
+          if ( cell_no1 < SIZE_MAX )
             {
               LLtoXYZ(grid_center_lon1[cell_no1], grid_center_lat1[cell_no1], center_point_xyz);
 
@@ -402,7 +402,7 @@ void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *
               if ( winding_number != 0 )
                 {
                   if ( k >= MAX_CHILDS ) cdoAbort("Internal problem, limit of MAX_CHILDS reached (limit=9).");
-                  child2[cell_no2*MAX_CHILDS+k++] = (int)cell_no1;
+                  child2[cell_no2*MAX_CHILDS+k++] = (long)cell_no1;
                 }
             }
         }
@@ -413,8 +413,8 @@ void compute_child_from_bounds(cellindex_type *cellindex2, int ncells2, double *
 static
 void compute_child_from_coordinates(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
-  int ncells1 = cellindex1->ncells;
-  int ncells2 = cellindex2->ncells;
+  long ncells1 = cellindex1->ncells;
+  long ncells2 = cellindex2->ncells;
 
   double *lon1 = (double*) Malloc(ncells1*sizeof(double));
   double *lat1 = (double*) Malloc(ncells1*sizeof(double));
@@ -440,10 +440,10 @@ static
 void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
   bool lparent = true;
-  int ncells1 = cellindex1->ncells;
-  int *parent1 = cellindex1->parent;
+  long ncells1 = cellindex1->ncells;
+  long *parent1 = cellindex1->parent;
   {
-    int i;
+    long i;
     for ( i = 0; i < ncells1; ++i ) if ( parent1[i] >= 0 ) break;
     if ( i == ncells1 ) lparent = false;
   }
@@ -458,15 +458,15 @@ void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
 }
 
 static
-void compute_sum(int i, int *n, double *sum, double *sumq, int kci, cellindex_type **cellindex, double *array)
+void compute_sum(long i, long *n, double *sum, double *sumq, long kci, cellindex_type **cellindex, double *array)
 {
   // printf("compute: i, kci %d %d\n", i, kci);
-  int ncells2 = cellindex[kci]->ncells;
-  if ( i < 0 || i > ncells2 ) cdoAbort("Child grid cell index %d out of bounds %d!", i, ncells2);
+  long ncells2 = cellindex[kci]->ncells;
+  if ( i < 0 || i > ncells2 ) cdoAbort("Child grid cell index %ld out of bounds %ld!", i, ncells2);
 
   for ( int k = 0; k < MAX_CHILDS; ++k )
     {
-      int index = cellindex[kci]->child[i*MAX_CHILDS+k];
+      long index = cellindex[kci]->child[i*MAX_CHILDS+k];
       if ( index == -1 ) break;
       if ( kci == 1 )
         {
@@ -479,19 +479,19 @@ void compute_sum(int i, int *n, double *sum, double *sumq, int kci, cellindex_ty
 }
 
 static
-void samplegrid(double missval, int nci, cellindex_type **cellindex, double *array1, double *array2, double *array3)
+void samplegrid(double missval, long nci, cellindex_type **cellindex, double *array1, double *array2, double *array3)
 {
   static bool lstat = true;
-  int kci = nci-1;
-  int ncells2 = cellindex[kci]->ncells;
-  int nx = 0;
+  long kci = nci-1;
+  long ncells2 = cellindex[kci]->ncells;
+  long nx = 0;
   double x = 0;
 #if defined(_OPENMP)
   //#pragma omp parallel for default(none) shared(missval, ncells2, kci, cellindex, array1, array2, array3)
 #endif
-  for ( int i = 0; i < ncells2; ++i )
+  for ( long i = 0; i < ncells2; ++i )
     {
-      int n = 0;
+      long n = 0;
       double sum = 0, sumq = 0;
       compute_sum(i, &n, &sum, &sumq, kci, cellindex, array1);
       array2[i] = n ? sum/n : missval;  // mean
@@ -525,7 +525,7 @@ void *Samplegridicon(void *argument)
     {
       cellindex[i] = read_cellindex(operatorArgv()[i]);
       cellindex[i]->filename = operatorArgv()[i];
-      if ( cdoVerbose ) cdoPrint("Found %d grid cells in %s", cellindex[i]->ncells, cellindex[i]->filename);
+      if ( cdoVerbose ) cdoPrint("Found %ld grid cells in %s", cellindex[i]->ncells, cellindex[i]->filename);
     }
 
   for ( int i = 0; i < nsamplegrids-1; ++i )
@@ -537,10 +537,10 @@ void *Samplegridicon(void *argument)
 
   int vlistID1 = pstreamInqVlist(streamID1);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
-  if ( cdoVerbose ) cdoPrint("Source gridsize = %d", gridsize);
+  long gridsize = vlistGridsizeMax(vlistID1);
+  if ( cdoVerbose ) cdoPrint("Source gridsize = %zu", gridsize);
   if ( gridsize != cellindex[0]->ncells )
-    cdoAbort("Gridsize (%d) of input stream and first grid (%d) differ!", gridsize, cellindex[0]->ncells);
+    cdoAbort("Gridsize (%ls) of input stream and first grid (%ld) differ!", gridsize, cellindex[0]->ncells);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array1 = (double *) Malloc(gridsize*sizeof(double));
 
@@ -571,8 +571,8 @@ void *Samplegridicon(void *argument)
   int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  int gridsize2 = gridInqSize(gridID2);
-  if ( cdoVerbose ) cdoPrint("Target gridsize = %d", gridsize2);
+  long gridsize2 = gridInqSize(gridID2);
+  if ( cdoVerbose ) cdoPrint("Target gridsize = %ld", gridsize2);
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
   double *array2 = (double *) Malloc(gridsize2*sizeof(double));
   double *array3 = (double *) Malloc(gridsize2*sizeof(double));
@@ -596,14 +596,14 @@ void *Samplegridicon(void *argument)
           samplegrid(missval, nsamplegrids, cellindex.data(), array1, array2, array3);
 
           nmiss = 0;
-          for ( int i = 0; i < gridsize2; ++i )
+          for ( long i = 0; i < gridsize2; ++i )
             if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, array2, nmiss);
 
           nmiss = 0;
-          for ( int i = 0; i < gridsize2; ++i )
+          for ( long i = 0; i < gridsize2; ++i )
             if ( DBL_IS_EQUAL(array3[i], missval) ) nmiss++;
 
           pstreamDefRecord(streamID3, varID, levelID);

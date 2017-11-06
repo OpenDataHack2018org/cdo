@@ -413,6 +413,7 @@ void check_lat_boundbox_range(size_t nlats, restr_t *restrict bound_box, double 
 static
 int expand_lonlat_grid(int gridID)
 {
+  if ( cdoVerbose ) cdoPrint("expand_lonlat_grid");
   size_t nx = gridInqXsize(gridID);
   size_t ny = gridInqYsize(gridID);
   size_t nxp4 = nx+4;
@@ -459,6 +460,7 @@ int expand_lonlat_grid(int gridID)
 static
 int expand_curvilinear_grid(int gridID)
 {
+  if ( cdoVerbose ) cdoPrint("expand_curvilinear_grid");
   size_t gridsize = gridInqSize(gridID);
   long nx = (long) gridInqXsize(gridID);
   long ny = (long) gridInqYsize(gridID);
@@ -523,7 +525,7 @@ int expand_curvilinear_grid(int gridID)
 /*****************************************************************************/
 
 static
-void grid_check_lat_borders_rad(int n, double *ybounds)
+void grid_check_lat_borders_rad(size_t n, double *ybounds)
 {
 #define  YLIM  (88*DEG2RAD)
   if ( ybounds[0] > ybounds[n-1] )
@@ -726,14 +728,11 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 	}
       else /* full grid search */
 	{
-	  size_t gridsize;
-	  size_t i, i4;
-	  
-	  gridsize = grid->size;
-  
 	  if ( cdoVerbose ) cdoPrint("Grid: bounds missing -> full grid search!");
 
-	  for ( i = 0; i < gridsize; ++i )
+	  size_t gridsize = grid->size;
+	  size_t i4;
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      i4 = i<<2;
 	      grid->cell_bound_box[i4  ] = RESTR_SCALE(-PIH);
@@ -794,10 +793,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
       if ( map_type == MAP_TYPE_BILINEAR && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
     }
 
-  if ( lextrapolate )
-    src_grid->lextrapolate = true;
-  else
-    src_grid->lextrapolate = false;
+  src_grid->lextrapolate = lextrapolate;
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
     {
@@ -869,7 +865,6 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
   remap_define_grid(map_type, gridID1, src_grid, "Source");
-
   remap_define_grid(map_type, gridID2, tgt_grid, "Target");
 
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -982,7 +977,7 @@ void remap_vars_init(int map_type, size_t src_grid_size, size_t tgt_grid_size, r
 /*
    This routine resizes remapping arrays by increasing(decreasing) the max_links by increment
 */
-void resize_remap_vars(remapvars_t *rv, int increment)
+void resize_remap_vars(remapvars_t *rv, int64_t increment)
 {
   /*
     Input variables:
@@ -1171,7 +1166,7 @@ size_t get_max_add(size_t num_links, size_t size, const size_t *restrict add)
 static 
 size_t binary_search_int(const size_t *array, size_t len, size_t value)
 {       
-  long low = 0, high = len - 1, midpoint = 0;
+  int64_t low = 0, high = len - 1, midpoint = 0;
  
   while ( low <= high )
     {
@@ -1471,7 +1466,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 #endif
   for ( size_t n = 0; n < rv.num_links; ++n ) tgt_count[rv.tgt_cell_add[n]]++;
 
-  size_t imin = ULONG_MAX;
+  size_t imin = SIZE_MAX;
   size_t imax = 0;
   for ( size_t n = 0; n < tgt_grid.size; ++n )
     {

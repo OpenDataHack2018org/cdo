@@ -90,14 +90,14 @@ void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1
   if ( lon1 >= lon2 || lat1 >= lat2 )
     cdoAbort("Invalid grid box: lon1=%g lon2=%g lat1=%g lat2=%g", lon1, lon2, lat1, lat2);
 
-  int nlon = (int) ((lon2 - lon1)/inc + 0.5);
-  int nlat = (int) ((lat2 - lat1)/inc + 0.5);
+  size_t nlon = (size_t) ((lon2 - lon1)/inc + 0.5);
+  size_t nlat = (size_t) ((lat2 - lat1)/inc + 0.5);
 
   double *xvals = (double*) Malloc(nlon*sizeof(double));
   double *yvals = (double*) Malloc(nlat*sizeof(double));
 
-  for ( int i = 0; i < nlon; ++i ) xvals[i] = lon1 + inc/2 + i*inc;
-  for ( int i = 0; i < nlat; ++i ) yvals[i] = lat1 + inc/2 + i*inc;
+  for ( size_t i = 0; i < nlon; ++i ) xvals[i] = lon1 + inc/2 + i*inc;
+  for ( size_t i = 0; i < nlat; ++i ) yvals[i] = lat1 + inc/2 + i*inc;
 
   if ( gridtype == GRID_LONLAT )
     {
@@ -110,11 +110,11 @@ void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1
     }
   else
     {
-      double gridsize = nlon*nlat;
+      size_t gridsize = nlon*nlat;
       double *xvals2D = (double*) Malloc(gridsize*sizeof(double));
       double *yvals2D = (double*) Malloc(gridsize*sizeof(double));
-      for ( int j = 0; j < nlat; j++ )
-        for ( int i = 0; i < nlon; i++ )
+      for ( size_t j = 0; j < nlat; j++ )
+        for ( size_t i = 0; i < nlon; i++ )
           {
             xvals2D[j*nlon+i] = xvals[i];
             yvals2D[j*nlon+i] = yvals[j];

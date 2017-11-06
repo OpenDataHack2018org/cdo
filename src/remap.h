@@ -1,6 +1,7 @@
-#ifndef _REMAP_H
-#define _REMAP_H
+#ifndef  REMAP_H
+#define  REMAP_H
 
+#include <stdint.h>
 #include <math.h>
 
 #ifndef  M_PI
@@ -86,7 +87,7 @@ typedef struct {
   bool     non_global;
   bool     is_cyclic;
 
-  int      dims[2];               /* size of grid dimension */
+  size_t   dims[2];               /* size of grid dimension */
 
   int      nvgp;                  /* size of vgpm           */
   int*     vgpm;                  /* flag which cells are valid   */
@@ -197,7 +198,7 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
 void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array, double *restrict tgt_array, double missval);
 
 
-void resize_remap_vars(remapvars_t *rv, int increment);
+void resize_remap_vars(remapvars_t *rv, int64_t increment);
 
 void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv, const double *restrict array1, 
 		const double *restrict array2, double missval);
@@ -222,11 +223,11 @@ int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double 
                          const double *restrict src_center_lat, const double *restrict src_center_lon);
 
 int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
-                      double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
+                      double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
                       const double *restrict src_center_lat, const double *restrict src_center_lon);
 
 int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
-		double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
+		double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
 		const double *restrict src_center_lat, const double *restrict src_center_lon,
 		const restr_t *restrict src_grid_bound_box, const size_t *restrict src_bin_add);
 
@@ -238,4 +239,4 @@ void remapgrid_get_lonlat(remapgrid_t *grid, size_t cell_add, double *plon, doub
 void remapCheckArea(size_t grid_size, double *restrict cell_area, const char *name);
 void remapCheckWeights(size_t num_links, size_t num_wts, int norm_opt, size_t *src_cell_add, size_t *tgt_cell_add, double *wts);
 
-#endif  /* _REMAP_H */
+#endif  /* REMAP_H */

@@ -140,13 +140,13 @@ int gridDefine(griddes_t grid)
 	    if ( grid.ysize == 0 ) Error("ysize undefined!");
 	  }
 
-	if ( grid.size == 0 ) grid.size = (long)grid.xsize*grid.ysize;
+	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
-	if ( grid.size != (long)grid.xsize*grid.ysize )
-	  Error("Inconsistent grid declaration: xsize*ysize!=gridsize (xsize=%d ysize=%d gridsize=%d)",
+	if ( grid.size != grid.xsize*grid.ysize )
+	  Error("Inconsistent grid declaration: xsize*ysize!=gridsize (xsize=%zu ysize=%zu gridsize=%zu)",
 		grid.xsize, grid.ysize, grid.size);
 
-	if ( grid.size < 0 || grid.size > INT_MAX ) Error("grid size (%ld) out of bounds (0 - %d)!", grid.size, INT_MAX);
+	//if ( grid.size < 0 || grid.size > INT_MAX ) Error("grid size (%ld) out of bounds (0 - %d)!", grid.size, INT_MAX);
 
 	gridID = gridCreate(grid.type, grid.size);
 
@@ -166,7 +166,7 @@ int gridDefine(griddes_t grid)
 	      {
 		grid.nvertex = 2;
 		grid.xbounds = (double*) Malloc(grid.xsize*grid.nvertex*sizeof(double));
-		for ( int i = 0; i < (int) grid.xsize-1; i++ )
+		for ( size_t i = 0; i < grid.xsize-1; ++i )
 		  {
 		    grid.xbounds[2*i+1]   = 0.5*(grid.xvals[i] + grid.xvals[i+1]);
 		    grid.xbounds[2*(i+1)] = 0.5*(grid.xvals[i] + grid.xvals[i+1]);
@@ -186,7 +186,7 @@ int gridDefine(griddes_t grid)
 	      {
 		grid.nvertex = 2;
 		grid.ybounds = (double*) Malloc(grid.ysize*grid.nvertex*sizeof(double));
-		for ( int i = 0; i < (int) grid.ysize-1; i++ )
+		for ( size_t i = 0; i < grid.ysize-1; ++i )
 		  {
 		    grid.ybounds[2*i+1]   = 0.5*(grid.yvals[i] + grid.yvals[i+1]);
 		    grid.ybounds[2*(i+1)] = 0.5*(grid.yvals[i] + grid.yvals[i+1]);

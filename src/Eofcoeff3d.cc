@@ -58,7 +58,7 @@ void *Eofcoeff3d(void * argument)
   int gridID1 = vlistInqVarGrid(vlistID1, 0);
   int gridID2 = vlistInqVarGrid(vlistID2, 0);
   
-  int gridsize = vlistGridsizeMax(vlistID1);  
+  size_t gridsize = vlistGridsizeMax(vlistID1);  
   if ( gridsize != vlistGridsizeMax(vlistID2) )
     cdoAbort("Gridsize of input files does not match!");     
   
@@ -207,7 +207,7 @@ void *Eofcoeff3d(void * argument)
               if ( recID == 0 ) pstreamDefTimestep(streamIDs[eofID],tsID);
 
 	      nmiss = 0;
-              for( i=0; i<gridsize; i++ )
+              for( size_t i=0; i<gridsize; i++ )
                 {                  
                   if (! DBL_IS_EQUAL(in.ptr[i],missval2) && 
                       ! DBL_IS_EQUAL(eof[varID][levelID][eofID].ptr[i],missval1 ) )

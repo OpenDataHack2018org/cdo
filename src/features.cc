@@ -23,13 +23,9 @@
 #endif
 
 #if defined(HAVE_LIBCMOR)
-#ifdef __cplusplus
-  extern "C" {
-#endif
+extern "C" {
 #include "cmor.h"
-#ifdef __cplusplus
-  }
-#endif
+}
 #endif
 
 #include <stdio.h>
@@ -37,9 +33,18 @@
 
 #include "cdo_int.h" // HAVE_OPENMP4
 
+extern "C" {
+size_t getMemorySize(void);
+}
+
 void printFeatures(void)
 {
   fprintf(stderr, "Features:");
+  size_t memory_size = getMemorySize();
+  memory_size /= 1024;
+  memory_size /= 1024;
+  memory_size /= 1024;
+  if ( memory_size > 0 ) fprintf(stderr, " %zuGB", memory_size);
 #if defined(HAVE_CF_INTERFACE)
   fprintf(stderr, " Fortran");
 #endif

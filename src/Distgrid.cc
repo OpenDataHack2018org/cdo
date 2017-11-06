@@ -24,8 +24,8 @@
 #define  MAX_BLOCKS  65536
 
 static
-void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, int nyblocks,
-	      int **gridindex, int *ogridsize, int nsplit)
+void genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals, size_t nxblocks, size_t nyblocks,
+	      size_t **gridindex, size_t *ogridsize, size_t nsplit)
 {
   double *xpvals = NULL, *ypvals = NULL;
   int gridtype = gridInqType(gridID1);
@@ -37,8 +37,8 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
   else
     cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
-  int nx = gridInqXsize(gridID1);
-  int ny = gridInqYsize(gridID1);
+  size_t nx = gridInqXsize(gridID1);
+  size_t ny = gridInqYsize(gridID1);
 
   bool lxcoord = gridInqXvals(gridID1, NULL) > 0;
   bool lycoord = gridInqYvals(gridID1, NULL) > 0;
@@ -76,30 +76,30 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
       gridInqYvals(gridID1, yvals);
     }
  
-  int *xlsize = (int*) Malloc(nxblocks*sizeof(int));
-  int *ylsize = (int*) Malloc(nyblocks*sizeof(int));
+  size_t *xlsize = (size_t*) Malloc(nxblocks*sizeof(size_t));
+  size_t *ylsize = (size_t*) Malloc(nyblocks*sizeof(size_t));
 
-  for ( int ix = 0; ix < nxblocks; ++ix ) xlsize[ix] = nxvals;
+  for ( size_t ix = 0; ix < nxblocks; ++ix ) xlsize[ix] = nxvals;
   if ( nx%nxblocks != 0 ) xlsize[nxblocks-1] = nx - (nxblocks-1)*nxvals;
-  if ( cdoVerbose ) for ( int ix = 0; ix < nxblocks; ++ix ) cdoPrint("xblock %d: %d", ix, xlsize[ix]);
+  if ( cdoVerbose ) for ( size_t ix = 0; ix < nxblocks; ++ix ) cdoPrint("xblock %zu: %zu", ix, xlsize[ix]);
 
-  for ( int iy = 0; iy < nyblocks; ++iy ) ylsize[iy] = nyvals;
+  for ( size_t iy = 0; iy < nyblocks; ++iy ) ylsize[iy] = nyvals;
   if ( ny%nyblocks != 0 ) ylsize[nyblocks-1] = ny - (nyblocks-1)*nyvals;
-  if ( cdoVerbose ) for ( int iy = 0; iy < nyblocks; ++iy ) cdoPrint("yblock %d: %d", iy, ylsize[iy]);
+  if ( cdoVerbose ) for ( size_t iy = 0; iy < nyblocks; ++iy ) cdoPrint("yblock %zu: %zu", iy, ylsize[iy]);
 
-  int index = 0;
-  for ( int iy = 0; iy < nyblocks; ++iy )
-    for ( int ix = 0; ix < nxblocks; ++ix )
+  size_t index = 0;
+  for ( size_t iy = 0; iy < nyblocks; ++iy )
+    for ( size_t ix = 0; ix < nxblocks; ++ix )
       {
-	int offset = iy*nyvals*nx + ix*nxvals;
+	size_t offset = iy*nyvals*nx + ix*nxvals;
 
-	int gridsize2 = xlsize[ix]*ylsize[iy];
-	gridindex[index] = (int*) Malloc(gridsize2*sizeof(int));
+	size_t gridsize2 = xlsize[ix]*ylsize[iy];
+	gridindex[index] = (size_t*) Malloc(gridsize2*sizeof(size_t));
 
 	gridsize2 = 0;
         // printf("iy %d, ix %d offset %d\n", iy, ix,  offset);
-	for ( int j = 0; j < ylsize[iy]; ++j )
-          for ( int i = 0; i < xlsize[ix]; ++i )
+	for ( size_t j = 0; j < ylsize[iy]; ++j )
+          for ( size_t i = 0; i < xlsize[ix]; ++i )
             {
               // printf(">> %d %d %d\n", j, i, offset + j*nx + i);
               if ( !lregular )
@@ -186,9 +186,9 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 }
 
 static
-void window_cell(double *array1, double *array2, long gridsize2, int *cellidx)
+void window_cell(double *array1, double *array2, size_t gridsize2, size_t *cellidx)
 {
-  for ( long i = 0; i < gridsize2; ++i )
+  for ( size_t i = 0; i < gridsize2; ++i )
     array2[i] = array1[cellidx[i]];
 }
 
@@ -196,8 +196,8 @@ typedef struct
 {
   int gridID;
   int *gridIDs;
-  int *gridsize;
-  int **gridindex;
+  size_t *gridsize;
+  size_t **gridindex;
 } sgrid_t;
 
 
@@ -218,12 +218,12 @@ void *Distgrid(void *argument)
   operatorInputArg("nxblocks, [nyblocks]");
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
   if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
-  int nxblocks = parameter2int(operatorArgv()[0]);
-  int nyblocks = 1;
+  size_t nxblocks = parameter2int(operatorArgv()[0]);
+  size_t nyblocks = 1;
   if ( operatorArgc() == 2 ) nyblocks = parameter2int(operatorArgv()[1]);
 
-  if ( nxblocks <= 0 ) cdoAbort("nxblocks has to be greater than 0!");
-  if ( nyblocks <= 0 ) cdoAbort("nyblocks has to be greater than 0!");
+  if ( nxblocks == 0 ) cdoAbort("nxblocks has to be greater than 0!");
+  if ( nyblocks == 0 ) cdoAbort("nyblocks has to be greater than 0!");
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
@@ -244,9 +244,9 @@ void *Distgrid(void *argument)
     cdoAbort("No Lon/Lat, Gaussian, curvilinear or generic grid found (%s data unsupported)!", gridNamePtr(gridtype));
 
   gridID1 = vlistGrid(vlistID1, 0);
-  int gridsize = gridInqSize(gridID1);
-  int nx = gridInqXsize(gridID1);
-  int ny = gridInqYsize(gridID1);
+  size_t gridsize = gridInqSize(gridID1);
+  size_t nx = gridInqXsize(gridID1);
+  size_t ny = gridInqYsize(gridID1);
   for ( int i = 1; i < ngrids; i++ )
     {
       gridID1 = vlistGrid(vlistID1, i);
@@ -256,22 +256,22 @@ void *Distgrid(void *argument)
 
   if ( nxblocks > nx )
     {
-      cdoPrint("nxblocks (%d) greater than nx (%d), set to %d!", nxblocks, nx, nx);
+      cdoPrint("nxblocks (%zu) greater than nx (%zu), set to %zu!", nxblocks, nx, nx);
       nxblocks = nx;
     }
   if ( nyblocks > ny )
     {
-      cdoPrint("nyblocks (%d) greater than ny (%d), set to %d!", nyblocks, ny, ny);
+      cdoPrint("nyblocks (%zu) greater than ny (%zu), set to %zu!", nyblocks, ny, ny);
       nyblocks = ny;
     }
 
-  int xinc = nx/nxblocks;
-  int yinc = ny/nyblocks;
+  size_t xinc = nx/nxblocks;
+  size_t yinc = ny/nyblocks;
 
   if ( nx%xinc && nx%(xinc+1) ) xinc++;
   if ( ny%yinc && ny%(yinc+1) ) yinc++;
 
-  int nsplit = nxblocks*nyblocks;
+  size_t nsplit = nxblocks*nyblocks;
   if ( nsplit > MAX_BLOCKS ) cdoAbort("Too many blocks (max = %d)!", MAX_BLOCKS);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
@@ -284,13 +284,13 @@ void *Distgrid(void *argument)
     {  
       grids[i].gridID    = vlistGrid(vlistID1, i);
       grids[i].gridIDs   = (int*) Malloc(nsplit*sizeof(int));
-      grids[i].gridsize  = (int*) Malloc(nsplit*sizeof(int));
-      grids[i].gridindex = (int**) Malloc(nsplit*sizeof(int*));
+      grids[i].gridsize  = (size_t*) Malloc(nsplit*sizeof(size_t));
+      grids[i].gridindex = (size_t**) Malloc(nsplit*sizeof(size_t*));
 
-      for ( int index = 0; index < nsplit; index++ ) grids[i].gridindex[index] = NULL;
+      for ( size_t index = 0; index < nsplit; index++ ) grids[i].gridindex[index] = NULL;
     }
 
-  for ( int index = 0; index < nsplit; index++ )
+  for ( size_t index = 0; index < nsplit; index++ )
     vlistIDs[index] = vlistDuplicate(vlistID1);
 
   if ( cdoVerbose ) cdoPrint("ngrids=%d  nsplit=%d", ngrids, nsplit);
@@ -301,15 +301,15 @@ void *Distgrid(void *argument)
       genGrids(gridID1, grids[i].gridIDs, xinc, yinc, nxblocks, nyblocks, grids[i].gridindex, grids[i].gridsize, nsplit);
       /*
       if ( cdoVerbose )
-	for ( int index = 0; index < nsplit; index++ )
-	  cdoPrint("Block %d,  gridID %d,  gridsize %d", index+1, grids[i].gridIDs[index], gridInqSize(grids[i].gridIDs[index]));
+	for ( size_t index = 0; index < nsplit; index++ )
+	  cdoPrint("Block %d,  gridID %d,  gridsize %zu", index+1, grids[i].gridIDs[index], gridInqSize(grids[i].gridIDs[index]));
       */
-      for ( int index = 0; index < nsplit; index++ )
+      for ( size_t index = 0; index < nsplit; index++ )
 	vlistChangeGridIndex(vlistIDs[index], i, grids[i].gridIDs[index]);
     }
 
-  int gridsize2max = 0;
-  for ( int index = 0; index < nsplit; index++ )
+  size_t gridsize2max = 0;
+  for ( size_t index = 0; index < nsplit; index++ )
     if ( grids[0].gridsize[index] > gridsize2max ) gridsize2max = grids[0].gridsize[index];
 
   double *array2 = (double*) Malloc(gridsize2max*sizeof(double));
@@ -321,9 +321,9 @@ void *Distgrid(void *argument)
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
-  for ( int index = 0; index < nsplit; index++ )
+  for ( size_t index = 0; index < nsplit; index++ )
     {
-      sprintf(filename+nchars, "%05d", index);
+      sprintf(filename+nchars, "%05ld", (long)index);
       if ( filesuffix[0] )
 	sprintf(filename+nchars+5, "%s", filesuffix);
 
@@ -338,7 +338,7 @@ void *Distgrid(void *argument)
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
-      for ( int index = 0; index < nsplit; index++ )
+      for ( size_t index = 0; index < nsplit; index++ )
 	pstreamDefTimestep(streamIDs[index], tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -348,7 +348,7 @@ void *Distgrid(void *argument)
 
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 
-	  for ( int index = 0; index < nsplit; index++ )
+	  for ( size_t index = 0; index < nsplit; index++ )
 	    {
 	      i = 0;
 	      window_cell(array1, array2, grids[i].gridsize[index], grids[i].gridindex[index]);
@@ -356,7 +356,7 @@ void *Distgrid(void *argument)
 	      if ( nmiss > 0 )
 		{
 		  nmiss = 0;
-		  for ( int k = 0; k < grids[i].gridsize[index]; ++k )
+		  for ( size_t k = 0; k < grids[i].gridsize[index]; ++k )
 		    if ( DBL_IS_EQUAL(array2[k], missval) ) nmiss++;
 		}
 	      pstreamWriteRecord(streamIDs[index], array2, nmiss);
@@ -368,7 +368,7 @@ void *Distgrid(void *argument)
 
   pstreamClose(streamID1);
 
-  for ( int index = 0; index < nsplit; index++ )
+  for ( size_t index = 0; index < nsplit; index++ )
     {
       pstreamClose(streamIDs[index]);
       vlistDestroy(vlistIDs[index]);
@@ -382,12 +382,12 @@ void *Distgrid(void *argument)
 
   for ( int i = 0; i < ngrids; i++ )
     {
-      for ( int index = 0; index < nsplit; index++ )
+      for ( size_t index = 0; index < nsplit; index++ )
 	gridDestroy(grids[i].gridIDs[index]);
       Free(grids[i].gridIDs);
       Free(grids[i].gridsize);
 
-      for ( int index = 0; index < nsplit; index++ )
+      for ( size_t index = 0; index < nsplit; index++ )
         Free(grids[i].gridindex[index]);
       Free(grids[i].gridindex);
     }

@@ -23,11 +23,10 @@
 #include "pstream.h"
 #include "libncl.h"
 
-
+static
 void uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev, int boundOpt, double *div)
 {
   int ierror;
-  size_t nlatnlon = nlat * nlon;
 
   // Test dimension sizes.
   if ( (nlon > INT_MAX) || (nlat > INT_MAX) )
@@ -36,10 +35,7 @@ void uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat,
   int inlon = (int) nlon;
   int inlat = (int) nlat;
 
-  size_t gridsize_uv = nlatnlon;
-
-  // Check for missing values.
-  // coerce_missing(type_u,has_missing_u,&missing_u,&missing_du,&missing_ru);
+  size_t gridsize_uv = nlat * nlon;
 
   for ( size_t k = 0; k < nlev; ++k )
     {
@@ -57,6 +53,37 @@ void uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat,
     }
 }
 
+static
+void uv2vr_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev, int boundOpt, double *vort)
+{
+  int ierror;
+
+  // Test dimension sizes.
+  if ( (nlon > INT_MAX) || (nlat > INT_MAX) )
+    cdoAbort("nlat and/or nlon is greater than INT_MAX!");
+
+  int inlon = (int) nlon;
+  int inlat = (int) nlat;
+
+  size_t gridsize_uv = nlat * nlon;
+
+  for ( size_t k = 0; k < nlev; ++k )
+    {
+      double *tmp_u = u + k*gridsize_uv;
+      double *tmp_v = v + k*gridsize_uv;
+      double *tmp_vort = vort + k*gridsize_uv;
+      // Init output array.
+      memset(tmp_vort, 0, gridsize_uv*sizeof(double));
+      // Call the Fortran routine.
+#ifdef HAVE_CF_INTERFACE
+      DVRFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missval, boundOpt, tmp_vort, ierror);
+#else
+      cdoAbort("Fortran support not compiled in!");
+#endif
+    }
+}
+
+static
 int find_name(int vlistID, char *name)
 {
   char varname[CDI_MAX_NAME];
@@ -128,13 +155,18 @@ void set_parameter(void)
 }
 
 
-void *NCL(void *argument)
+void *NCL_wind(void *argument)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
   cdoInitialize(argument);
+
+  int UV2DV_CFD = cdoOperatorAdd("uv2dv_cfd", 0,     0, "[u, v, boundsOpt, outMode]");
+  int UV2VR_CFD = cdoOperatorAdd("uv2vr_cfd", 0,     0, "[u, v, boundsOpt, outMode]");
+
+  int operatorID = cdoOperatorID();
 
   set_parameter();
 
@@ -184,11 +216,21 @@ void *NCL(void *argument)
   double missvalv = vlistInqVarMissval(vlistID1, varIDv);
 
   int timetype = vlistInqVarTimetype(vlistID1, varIDu);
-  int varIDdiv = vlistDefVar(vlistID2, gridIDu, zaxisIDu, timetype);
-  vlistDefVarName(vlistID2, varIDdiv, "d");
-  vlistDefVarLongname(vlistID2, varIDdiv, "divergence");
-  vlistDefVarUnits(vlistID2, varIDdiv, "1/s");
-  vlistDefVarMissval(vlistID2, varIDdiv, missvalu);
+  int varIDo = vlistDefVar(vlistID2, gridIDu, zaxisIDu, timetype);
+  if ( operatorID == UV2DV_CFD )
+    {
+      vlistDefVarName(vlistID2, varIDo, "d");
+      vlistDefVarLongname(vlistID2, varIDo, "divergence");
+      vlistDefVarUnits(vlistID2, varIDo, "1/s");
+    }
+  else if ( operatorID == UV2VR_CFD )
+    {
+      vlistDefVarName(vlistID2, varIDo, "vo");
+      vlistDefVarLongname(vlistID2, varIDo, "vorticity");
+      vlistDefVarUnits(vlistID2, varIDo, "1/s");
+    }
+
+  vlistDefVarMissval(vlistID2, varIDo, missvalu);
   
   double *lon = (double*) Malloc(nlon*sizeof(double));
   double *lat = (double*) Malloc(nlat*sizeof(double));
@@ -208,7 +250,7 @@ void *NCL(void *argument)
   double *array = (double*) Malloc(gridsizemax*sizeof(double));
   double *arrayu = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
   double *arrayv = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
-  double *arrayd = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
+  double *arrayo = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -251,16 +293,19 @@ void *NCL(void *argument)
             }
         }
 
-      uv2dv_cfd_W(missvalu, arrayu, arrayv, lon, lat, nlon, nlat, nlev, boundOpt, arrayd);
+      if ( operatorID == UV2DV_CFD )
+        uv2dv_cfd_W(missvalu, arrayu, arrayv, lon, lat, nlon, nlat, nlev, boundOpt, arrayo);
+      else if ( operatorID == UV2VR_CFD )
+        uv2vr_cfd_W(missvalu, arrayu, arrayv, lon, lat, nlon, nlat, nlev, boundOpt, arrayo);
 
       for ( levelID = 0; levelID < nlev; ++levelID )
         {
-          double *parray = arrayd+levelID*gridsizeuv;
+          double *parray = arrayo+levelID*gridsizeuv;
           nmiss = 0;
           for ( size_t i = 0; i < gridsizeuv; ++i )
             if ( DBL_IS_EQUAL(parray[i], missvalu) ) nmiss++;
 
-          pstreamDefRecord(streamID2, varIDdiv, levelID);
+          pstreamDefRecord(streamID2, varIDo, levelID);
           pstreamWriteRecord(streamID2, parray, nmiss);
         }
 
@@ -275,7 +320,7 @@ void *NCL(void *argument)
   if ( array ) Free(array);
   if ( arrayu ) Free(arrayu);
   if ( arrayv ) Free(arrayv);
-  if ( arrayd ) Free(arrayd);
+  if ( arrayo ) Free(arrayo);
 
   cdoFinish();
 

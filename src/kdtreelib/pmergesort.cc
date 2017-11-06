@@ -25,13 +25,15 @@ void *mergesort_t(void *args);
 
 int pmergesort(struct kd_point *base, size_t nmemb, int axis, int max_threads)
 {
-    struct kd_point *tmp;
-    param_t args;
+    struct kd_point *tmp = NULL;
 
-    if ((tmp = (struct kd_point*)calloc(nmemb, sizeof(struct kd_point))) == NULL) {
+    if ( max_threads > 1 )
+      if ((tmp = (struct kd_point*)calloc(nmemb, sizeof(struct kd_point))) == NULL) {
         perror("malloc");
         return 0;
-    }
+      }
+
+    param_t args;
     args.a = base;
     args.b = tmp;
     args.first = 0;
@@ -41,7 +43,8 @@ int pmergesort(struct kd_point *base, size_t nmemb, int axis, int max_threads)
 
     mergesort_t(&args);
 
-    free(tmp);
+    if (tmp) free(tmp);
+
     return 1;
 }
 

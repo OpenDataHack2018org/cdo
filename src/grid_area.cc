@@ -286,9 +286,8 @@ int gridGenArea(int gridID, double* area)
   int status = 0;
   bool lgrid_gen_bounds = false;
   bool lgriddestroy = false;
-  long nv;
 
-  long gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int gridtype = gridInqType(gridID);
   int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1; 
 
@@ -340,10 +339,7 @@ int gridGenArea(int gridID, double* area)
 
   gridtype = gridInqType(gridID);
 
-  if ( gridtype == GRID_UNSTRUCTURED )
-    nv = gridInqNvertex(gridID);
-  else
-    nv = 4;
+  size_t nv = ( gridtype == GRID_UNSTRUCTURED ) ? gridInqNvertex(gridID) : 4;
 
   if ( gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0 )
     {
@@ -382,8 +378,8 @@ int gridGenArea(int gridID, double* area)
     {
       if ( lgrid_gen_bounds )
 	{
-	  int nlon = gridInqXsize(gridID);
-	  int nlat = gridInqYsize(gridID);
+	  size_t nlon = gridInqXsize(gridID);
+	  size_t nlat = gridInqYsize(gridID);
 	  double dlon = 0;
 	  if ( nlon == 1 ) dlon = 1;
 
@@ -413,7 +409,7 @@ int gridGenArea(int gridID, double* area)
 #pragma omp parallel for default(none)  \
   shared(findex,gridsize,area,nv,grid_corner_lon,grid_corner_lat,grid_center_lon,grid_center_lat)
 #endif
-  for ( long i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       int lprogress = 1;
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
@@ -434,16 +430,16 @@ int gridGenArea(int gridID, double* area)
   if ( cdoVerbose )
     {
       double total_area = 0;
-      for ( long i = 0; i < gridsize; ++i ) total_area += area[i];
+      for ( size_t i = 0; i < gridsize; ++i ) total_area += area[i];
       cdoPrint("Total area = %g steradians", total_area);
     }
 
   if ( gridsize < 20 )
     {
       double total_area = 0;
-      for ( long i = 0; i < gridsize; ++i ) total_area += area[i];
+      for ( size_t i = 0; i < gridsize; ++i ) total_area += area[i];
       int nzero = 0;
-      for ( long i = 0; i < gridsize; ++i ) if ( IS_EQUAL(area[i], 0.) ) nzero++;
+      for ( size_t i = 0; i < gridsize; ++i ) if ( IS_EQUAL(area[i], 0.) ) nzero++;
       if ( IS_EQUAL(total_area, 0.) ) status = 2;
     }
 

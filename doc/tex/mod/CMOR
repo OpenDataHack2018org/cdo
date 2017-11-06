@@ -35,7 +35,7 @@ If questions remain, do not hesitate to ask and send an email to wachsmannATdkrz
 
 @BeginOperator_cmor
 @Title     = Climate Model Output Rewriting
-@Parameter = MIPtable [cmor_name=VarList,[key=value,...]]
+@Parameter = MIPtable [cmor_name=VarList] [key=value] [...]
 @EndOperator
 
 

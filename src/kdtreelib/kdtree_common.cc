@@ -59,7 +59,7 @@ kd_printNode(struct kdNode *node)
   printf("Corners: (%f, %f)\t(%f, %f)\n", node->min[0], node->min[1],
          node->max[0], node->max[1]);
   printf("Children: %p\t%p\n", (void *) node->left, (void *) node->right);
-  printf("Index: %u\n", node->index);
+  printf("Index: %zu\n", node->index);
 
   printf("\n");
 }
@@ -79,6 +79,18 @@ kd_printTree(struct kdNode *node)
 
 /* End helper functions */
 
+void kd_initArg(struct kd_thread_data *d, struct kd_point *points, size_t nPoints,
+                kdata_t *min, kdata_t *max, int depth, int max_threads, int dim)
+{
+  d->points = points;
+  d->nPoints = nPoints;
+  memcpy(d->min, min, dim*sizeof(kdata_t));
+  memcpy(d->max, max, dim*sizeof(kdata_t));
+  d->depth = depth;
+  d->max_threads = max_threads;
+  d->dim = dim;
+}
+
 /* ******************************************************************
    
    Functions for building and destroying trees 
@@ -87,15 +99,15 @@ kd_printTree(struct kdNode *node)
 
 void *kd_doBuildTree(void *threadarg)
 {
-  kdata_t tmpMinLeft[KD_MAX_DIM], tmpMaxLeft[KD_MAX_DIM], tmpMinRight[KD_MAX_DIM], tmpMaxRight[KD_MAX_DIM];
+  kdata_t tmpMaxLeft[KD_MAX_DIM], tmpMinRight[KD_MAX_DIM];
   struct kdNode *node;
   pthread_t threads[2];
   pthread_attr_t attr;
-  struct kd_thread_data *argleft, *argright;
+  struct kd_thread_data argleft, argright;
   struct kd_thread_data *my_data = (struct kd_thread_data *) threadarg;
 
   struct kd_point *points = my_data->points;
-  unsigned long nPoints = my_data->nPoints;
+  size_t nPoints = my_data->nPoints;
   kdata_t *min = my_data->min;
   kdata_t *max = my_data->max;
   int depth = my_data->depth;
@@ -120,25 +132,19 @@ void *kd_doBuildTree(void *threadarg)
    */
   pmergesort(points, nPoints, sortaxis, max_threads);
 
-  unsigned long pivot = nPoints / 2;
+  size_t pivot = nPoints / 2;
   if ((node = kd_allocNode(points, pivot, min, max, sortaxis, dim)) == NULL)
     return NULL;
 
-  memcpy(tmpMinLeft, min, dim * sizeof(kdata_t));
   memcpy(tmpMaxLeft, max, dim * sizeof(kdata_t));
   tmpMaxLeft[sortaxis] = node->location[sortaxis];
-  argleft = kd_buildArg(points, pivot, tmpMinLeft, tmpMaxLeft,
-                        depth + 1, max_threads / 2, dim);
-  if (!argleft) {
-    kd_destroyTree(node);
-    return NULL;
-  }
+  kd_initArg(&argleft, points, pivot, min, tmpMaxLeft,
+             depth + 1, max_threads / 2, dim);
 
   if (max_threads > 1) {
-    pthread_create(&threads[0], &attr, kd_doBuildTree, (void *) argleft);
+    pthread_create(&threads[0], &attr, kd_doBuildTree, (void *) &argleft);
   } else {
-    node->left = (kdNode *)kd_doBuildTree((void *) argleft);
-    free(argleft);
+    node->left = (kdNode *)kd_doBuildTree((void *) &argleft);
     if (!node->left) {
       kd_destroyTree(node);
       return NULL;
@@ -146,21 +152,14 @@ void *kd_doBuildTree(void *threadarg)
   }
 
   memcpy(tmpMinRight, min, dim * sizeof(kdata_t));
-  memcpy(tmpMaxRight, max, dim * sizeof(kdata_t));
   tmpMinRight[sortaxis] = node->location[sortaxis];
-  argright = kd_buildArg(&points[pivot], nPoints - pivot,
-                         tmpMinRight, tmpMaxRight, depth + 1,
-                         max_threads / 2, dim);
-  if (!argright) {
-    kd_destroyTree(node);
-    return NULL;
-  }
+  kd_initArg(&argright, &points[pivot], nPoints - pivot, tmpMinRight, max,
+             depth + 1, max_threads / 2, dim);
 
   if (max_threads > 1) {
-    pthread_create(&threads[1], &attr, kd_doBuildTree, (void *) argright);
+    pthread_create(&threads[1], &attr, kd_doBuildTree, (void *) &argright);
   } else {
-    node->right = (kdNode *)kd_doBuildTree((void *) argright);
-    free(argright);
+    node->right = (kdNode *)kd_doBuildTree((void *) &argright);
     if (!node->right) {
       kd_destroyTree(node);
       return NULL;
@@ -169,9 +168,7 @@ void *kd_doBuildTree(void *threadarg)
 
   if (max_threads > 1) {
     pthread_join(threads[0], (void **) (&node->left));
-    free(argleft);
     pthread_join(threads[1], (void **) (&node->right));
-    free(argright);
     if (!node->left || !node->right) {
       kd_destroyTree(node);
       return NULL;
@@ -181,40 +178,15 @@ void *kd_doBuildTree(void *threadarg)
   return (void *) node;
 }
 
-
-void
-kd_freeNode(kdNode *node)
+static
+void kd_freeNode(kdNode *node)
 {
   if ( node ) free(node);
-  return;
-}
-
-
-struct kd_thread_data *
-kd_buildArg(struct kd_point *points,
-            unsigned long nPoints,
-            kdata_t *min, kdata_t *max,
-            int depth, int max_threads, int dim)
-{
-  struct kd_thread_data *d;
-
-  if ((d = (kd_thread_data *)kd_malloc(sizeof(kd_thread_data), "kd_thread_data")) == NULL)
-    return NULL;
-
-  d->points = points;
-  d->nPoints = nPoints;
-  memcpy(d->min, min, dim*sizeof(kdata_t));
-  memcpy(d->max, max, dim*sizeof(kdata_t));
-  d->depth = depth;
-  d->max_threads = max_threads;
-  d->dim = dim;
-
-  return d;
 }
 
 
 struct kdNode *
-kd_allocNode(struct kd_point *points, unsigned long pivot,
+kd_allocNode(struct kd_point *points, size_t pivot,
              kdata_t *min, kdata_t *max, int axis, int dim)
 {
   struct kdNode *node;
