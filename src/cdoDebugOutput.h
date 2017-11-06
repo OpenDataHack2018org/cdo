@@ -40,19 +40,27 @@ namespace CdoLog
 
 namespace CdoDebug
 {
+    //Debug Switches
+    extern int cdoDebug;
+    extern int cdoDebugExt; //  Debug level for the KNMI extensions
+    //Subsystem Debug Switches
     extern int  PSTREAM;
     extern bool PROCESS;
     extern bool PIPE;
     extern int ARGUMENT;
+    extern int PTHREAD;
+
+    //File switches and streams
     extern std::string outfile;
     extern bool print_to_seperate_file;
     extern std::fstream outfile_stream;
-    extern int PTHREAD;
+
 
     std::string get_padding(const char *p_func);
 
     void CdoStartMessage();
     void CdoEndMessage();
+    void SetDebug(int p_debug_level);
 
    namespace{
         void printMessage(std::stringstream &p_message)

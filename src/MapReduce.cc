@@ -31,6 +31,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
+#include "cdoDebugOutput.h"
 
 /* read only the first data variable from input filename into a given double
  * pointer */
@@ -88,7 +89,7 @@ void *MapReduce(void *argument)
   int inputGridID   = cdoDefineGrid(operatorArgv()[0]);
   size_t inputGridSize = gridInqSize(inputGridID);
   int inputGridType = gridInqType(inputGridID);
-  if ( cdoDebug ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
+  if ( CdoDebug::cdoDebug ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
 
   /* creata an index list of the relevant locations  {{{ */
   double *inputMaskField = (double*) Malloc(inputGridSize*sizeof(double));
@@ -96,7 +97,7 @@ void *MapReduce(void *argument)
 
   /* non-zero values mark the relevant points */
   int maskSize = countMask(inputMaskField, inputGridSize, 0.0);
-  if ( cdoDebug ) cdoPrint("MapReduce: maskSize = %d",maskSize);
+  if ( CdoDebug::cdoDebug ) cdoPrint("MapReduce: maskSize = %d",maskSize);
 
   int *maskIndexList = (int *) Malloc(maskSize*sizeof(int));
   for (int m = 0; m < maskSize; m++) maskIndexList[m] = -1;

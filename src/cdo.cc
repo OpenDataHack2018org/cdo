@@ -397,7 +397,7 @@ void cdoSetDebug(int level)
    */
   cdiDebug(level);
 
-  if ( level == 1 || (level &  32) ) cdoDebug = 1;
+  if ( level == 1 || (level &  32) ) CdoDebug::cdoDebug = 1;
   if ( level == 1 || (level &  64) ) CdoDebug::PSTREAM = 1;
   if ( level == 1 || (level &  512) ) CdoDebug::PROCESS = 1;
 #if defined(HAVE_LIBPTHREAD)
@@ -1276,14 +1276,14 @@ int parse_options_long(int argc, char *argv[])
               if ( newDebLevelVal > 0 )
                 {
                   extern int cdiDebugExt;
-                  cdoDebugExt = newDebLevelVal;
+                  CdoDebug::cdoDebugExt = newDebLevelVal;
                   cdiDebugExt = newDebLevelVal;
                 }
             }
           else if ( lscmode )
             {
               int scanningModeValue = atoi(CDO_optarg);
-              if ( cdoDebugExt ) printf("scanningModeValue=%d\n", scanningModeValue);
+              if ( CdoDebug::cdoDebugExt ) printf("scanningModeValue=%d\n", scanningModeValue);
               
               if ( (scanningModeValue==0) || (scanningModeValue==64) || (scanningModeValue==96) )
                 {
@@ -1429,8 +1429,6 @@ int parse_options_long(int argc, char *argv[])
 #ifdef DEBUG
           CdoDebug::outfile = CDO_optarg;
           CdoDebug::print_to_seperate_file = true;
-          CdoDebug::PSTREAM = 1;
-          CdoDebug::PROCESS = 1;
 #endif
           break;
         }
@@ -1620,7 +1618,8 @@ int main(int argc, char *argv[])
       if ( Debug )
         {
           if ( DebugLevel == 0 ) DebugLevel = 1;
-          cdoSetDebug(DebugLevel);
+          cdiDebug(DebugLevel);
+          CdoDebug::SetDebug(DebugLevel);
         }
 
       timer_total  = timer_new("total");

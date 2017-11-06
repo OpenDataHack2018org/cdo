@@ -25,6 +25,7 @@
 #include "grid.h"
 #include "griddes.h"
 #include "error.h"
+#include "cdoDebugOutput.h"
 
 
 int grid_read(FILE *gfp, const char *dname);
@@ -344,7 +345,7 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( cmpstrlen(buffer, "CDF", len) == 0 )
 	{
-	  if ( cdoDebug ) cdoPrint("Grid from NetCDF file");
+	  if ( CdoDebug::cdoDebug ) cdoPrint("Grid from NetCDF file");
 	  gridID = gridFromNCfile(filename);
 	}
 
@@ -352,7 +353,7 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cmpstrlen(buffer+1, "HDF", len) == 0 )
 	    {
-	      if ( cdoDebug ) cdoPrint("Grid from HDF5 file");
+	      if ( CdoDebug::cdoDebug ) cdoPrint("Grid from HDF5 file");
 	      gridID = gridFromH5file(filename);
 	    }
 	}
@@ -361,14 +362,14 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cmpstrlen(buffer+1, "HDF", len) == 0 )
 	    {
-	      if ( cdoDebug ) cdoPrint("Grid from NetCDF4 file");
+	      if ( CdoDebug::cdoDebug ) cdoPrint("Grid from NetCDF4 file");
 	      gridID = gridFromNCfile(filename);
 	    }
 	}
 
       if ( gridID == -1 )
 	{
-	  if ( cdoDebug ) cdoPrint("Grid from CDI file");
+	  if ( CdoDebug::cdoDebug ) cdoPrint("Grid from CDI file");
 	  openLock();
 	  int streamID = streamOpenRead(filename);
 	  openUnlock();
@@ -382,7 +383,7 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( gridID == -1 )
 	{
-	  if ( cdoDebug ) cdoPrint("grid from ASCII file");
+	  if ( CdoDebug::cdoDebug ) cdoPrint("grid from ASCII file");
 	  FILE *gfp = fopen(filename, "r");
 	  //size_t buffersize = 20*1024*1024;
 	  //char *buffer = (char*) Malloc(buffersize);
@@ -394,7 +395,7 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( gridID == -1 )
 	{
-	  if ( cdoDebug ) cdoPrint("grid from PINGO file");
+	  if ( CdoDebug::cdoDebug ) cdoPrint("grid from PINGO file");
 	  FILE *gfp = fopen(filename, "r");
 	  gridID = grid_read_pingo(gfp, filename);
 	  fclose(gfp);

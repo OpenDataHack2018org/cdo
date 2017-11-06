@@ -1221,7 +1221,7 @@ processClosePipes(void)
       pstream_t *pstreamptr = processInqInputStream(sindex);
 
       if (CdoDebug::PROCESS)
-        Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
+        MESSAGE("process ",processSelf().m_ID,"  instream ",sindex,"  close streamID ", pstreamptr->self);
 
       if (pstreamptr)
         pstreamptr->close();
@@ -1233,15 +1233,12 @@ processClosePipes(void)
       pstream_t *pstreamptr = processInqOutputStream(sindex);
 
       if (CdoDebug::PROCESS)
-        Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
+        MESSAGE("process ",processSelf().m_ID,"  outstream ",sindex,"  close streamID ", pstreamptr->self);
+
 
       if (pstreamptr)
         pstreamptr->close();
     }
-}
-
-extern "C" {
-size_t getPeakRSS( );
 }
 
 void
@@ -1257,7 +1254,7 @@ cdoFinish(void)
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PROCESS)
-    Message("process %d  thread %ld", processID, pthread_self());
+    MESSAGE("process ",processID," thread %ld", pthread_self());
 #endif
 
   int64_t nvals = processInqNvals(processID);
@@ -1330,8 +1327,9 @@ cdoFinish(void)
     {
       int mu[] = { 'b', 'k', 'm', 'g', 't' };
       int muindex = 0;
-      // size_t memmax = memTotal();
-      size_t memmax = getPeakRSS();
+      long memmax;
+
+      memmax = memTotal();
       while (memmax > 9999)
         {
           memmax /= 1024;
@@ -1339,7 +1337,7 @@ cdoFinish(void)
         }
 
       if (memmax)
-        snprintf(memstring, sizeof(memstring), " %zu%c", memmax, mu[muindex]);
+        snprintf(memstring, sizeof(memstring), " %ld%c ", memmax, mu[muindex]);
 
       processEndTime(&p_usertime, &p_systime);
       p_cputime = p_usertime + p_systime;
@@ -1354,11 +1352,11 @@ cdoFinish(void)
 
 #if defined(HAVE_SYS_TIMES_H)
   if (cdoBenchmark)
-    fprintf(stderr, " ( %.2fs %.2fs %.2fs%s )\n", c_usertime, c_systime, c_cputime, memstring);
+    fprintf(stderr, " ( %.2fs %.2fs %.2fs %s)\n", c_usertime, c_systime, c_cputime, memstring);
   else
     {
       if (!cdoSilentMode)
-        fprintf(stderr, " ( %.2fs%s )\n", c_cputime, memstring);
+        fprintf(stderr, " ( %.2fs )\n", c_cputime);
     }
   if (cdoBenchmark && processID == 0)
     fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_usertime, p_systime, p_cputime, memstring);

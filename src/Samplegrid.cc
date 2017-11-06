@@ -7,6 +7,7 @@
 */
 
 #include <cdi.h>
+#include "cdoDebugOutput.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
@@ -21,7 +22,7 @@ void sampleData(double *array1, int gridID1, double *array2, int gridID2, int re
   long nlon2 = gridInqXsize(gridID2);
   long nlat2 = gridInqYsize(gridID2);
 
-  if ( cdoDebugExt >= 100 )
+  if ( CdoDebug::cdoDebugExt >= 100 )
     cdoPrint("%s(): (nlon1: %d; nlat1: %d) => (nlon2: %d; nlat2: %d); gridID1: %d; gridID2: %d; resampleFactor: %d)",
              __func__, nlon1, nlat1, nlon2,nlat2, gridID1, gridID2, resampleFactor);
 
@@ -40,7 +41,7 @@ void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI
   if ( rowLen!= nlon2 )
     cdoAbort("cropData() rowLen!= nlon2 [%d != %d]", rowLen, nlon2);
 
-  if ( cdoDebugExt>=10 ) cdoPrint("cropData(%d,%d,%d,%d) ...", subI0, subI1, subJ0, subJ1 );
+  if ( CdoDebug::cdoDebugExt>=10 ) cdoPrint("cropData(%d,%d,%d,%d) ...", subI0, subI1, subJ0, subJ1 );
 
   long array2Idx = 0;
   for ( long ilat1 = subJ0; ilat1 <= subJ1; ilat1++ ) // copy the last row as well..
@@ -76,15 +77,15 @@ void *Samplegrid(void *argument)
 
   if ( operatorID == SAMPLEGRID )
     {
-      if ( cdoDebugExt ) cdoPrint("samplegrid operator requested..");
+      if ( CdoDebug::cdoDebugExt ) cdoPrint("samplegrid operator requested..");
       if ( nch < 1 ) cdoAbort("Number of input arguments < 1; At least 1 argument needed: resample-factor (2,3,4, .. etc)");
       resampleFactor = parameter2int(operatorArgv()[0]);
 
-      if ( cdoDebugExt ) cdoPrint("resampleFactor = %d", resampleFactor);
+      if ( CdoDebug::cdoDebugExt ) cdoPrint("resampleFactor = %d", resampleFactor);
     }
   else if ( operatorID == SUBGRID )
     {
-      if ( cdoDebugExt ) cdoPrint("subgrid operator requested..");
+      if ( CdoDebug::cdoDebugExt ) cdoPrint("subgrid operator requested..");
       if ( nch < 4 ) cdoAbort("Number of input arguments < 4; Must specify sub-grid indices: i0,i1,j0,j1; This works only with LCC grid. For other grids use: selindexbox");
       subI0 = parameter2int(operatorArgv()[0]);
       subI1 = parameter2int(operatorArgv()[1]);
@@ -109,7 +110,7 @@ void *Samplegrid(void *argument)
 
   int ngrids = vlistNgrids(vlistID1);
 
-  if ( cdoDebugExt ) cdoPrint("ngrids = %d", ngrids);
+  if ( CdoDebug::cdoDebugExt ) cdoPrint("ngrids = %d", ngrids);
 
   sbox_t *sbox = (sbox_t *) Malloc(ngrids*sizeof(sbox_t));
 
@@ -137,8 +138,8 @@ void *Samplegrid(void *argument)
       sbox[index].gridSrcID = gridSrcID;
       sbox[index].gridIDsampled = gridIDsampled;
 
-      // if ( cdoDebugExt>=10 ) cdo_print_grid(gridSrcID, 1);
-      // if ( cdoDebugExt>=10 ) cdo_print_grid(gridIDsampled, 1);
+      // if ( CdoDebug::cdoDebugExt>=10 ) cdo_print_grid(gridSrcID, 1);
+      // if ( CdoDebug::cdoDebugExt>=10 ) cdo_print_grid(gridIDsampled, 1);
       
       vlistChangeGridIndex(vlistID2, index, gridIDsampled);
 
@@ -147,7 +148,7 @@ void *Samplegrid(void *argument)
           vars[varID] = true;
     }
 
-  if ( cdoDebugExt )
+  if ( CdoDebug::cdoDebugExt )
     {
       if ( operatorID == SAMPLEGRID ) cdoPrint("Resampled grid has been created.");
       if ( operatorID == SUBGRID    ) cdoPrint("Sub-grid has been created.");
@@ -164,7 +165,7 @@ void *Samplegrid(void *argument)
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
   double *array2 = (double *) Malloc(gridsize2*sizeof(double));
 
-  if ( cdoDebugExt ) cdoPrint("gridsize = %ld, gridsize2 = %ld", gridsize, gridsize2);
+  if ( CdoDebug::cdoDebugExt ) cdoPrint("gridsize = %ld, gridsize2 = %ld", gridsize, gridsize2);
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -179,7 +180,7 @@ void *Samplegrid(void *argument)
 
           pstreamDefRecord(streamID2, varID, levelID);
 
-          if ( cdoDebugExt>=20 ) cdoPrint("Processing record (%d) of %d.",recID, nrecs);
+          if ( CdoDebug::cdoDebugExt>=20 ) cdoPrint("Processing record (%d) of %d.",recID, nrecs);
 
           if ( vars[varID] )
             {

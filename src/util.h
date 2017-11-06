@@ -90,11 +90,9 @@ extern int cdoRegulargrid;
 extern int cdoBenchmark;
 extern int cdoTimer;
 extern int cdoVerbose;
-extern int cdoDebug;
 extern int cdoCompress;
 extern int cdoInteractive;
 extern int cdoParIO;
-extern int cdoDebugExt;
 
 extern int cdoCompType;
 extern int cdoCompLevel;

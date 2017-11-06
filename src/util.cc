@@ -101,7 +101,6 @@ int cdoCompress          = FALSE;
 int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
-int cdoDebugExt          = 0;     //  Debug level for the KNMI extensions
 int cdoNumVarnames       = 0;
 char **cdoVarnames       = NULL;
 
