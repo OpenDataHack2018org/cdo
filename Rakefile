@@ -332,7 +332,7 @@ end
 
 desc "generate tags database for vim and emacs"
 task :tags do |t|
-  srcFiles = Dir.glob("src/**/*.{h,c}") + Dir.glob("libcdi/**/*.{c,h,cpp,hpp,f90,f}")
+  srcFiles = Dir.glob("src/**/*.{h,c,cc}") + Dir.glob("libcdi/**/*.{c,h,cpp,hpp,f90,f}")
   Parallel.map(["","-e"]) {|ctagsOutputMode|
     sh "ctags #{ctagsOutputMode} #{srcFiles.join(' ')}"
   }
