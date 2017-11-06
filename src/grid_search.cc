@@ -138,7 +138,7 @@ struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const
 
 struct kdNode *gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats)
 {
-  struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));  
+  struct kd_point *pointlist = (struct kd_point *) Malloc(n*sizeof(struct kd_point));  
   // see  example_cartesian.c
   if ( cdoVerbose ) printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
   kdata_t min[3], max[3];
@@ -169,7 +169,7 @@ struct kdNode *gs_create_kdtree(size_t n, const double *restrict lons, const dou
 
 struct kdNode *gs_create_kdsph(size_t n, const double *restrict lons, const double *restrict lats)
 {
-  struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point)); // kd_point contains 3d point
+  struct kd_point *pointlist = (struct kd_point *) Malloc(n*sizeof(struct kd_point)); // kd_point contains 3d point
   // see  example_cartesian.c
   if ( cdoVerbose ) printf("kdtree lib spherical init: n=%zu  nthreads=%d\n", n, ompNumThreads);
   kdata_t min[2], max[2];
@@ -293,6 +293,148 @@ struct gsFull *gs_create_full(size_t n, const double *restrict lons, const doubl
   return full;
 }
 
+static
+void cal_bound_box(struct gridsearch *gs, size_t n, const double *restrict lons, const double *restrict lats)
+{
+  enum {mlon=180, mlat=90};
+  const size_t masksize = mlon*mlat;
+  bool *mask1 = (bool*) Malloc(masksize*sizeof(bool));
+  for ( size_t i = 0; i < masksize; ++i ) mask1[i] = 0;
+
+  for ( size_t i = 0; i < n; ++i )
+    {
+      double fi = lons[i];
+      double fj = lats[i]+0.5*M_PI;
+      if ( fi < 0 ) fi += 2*M_PI;
+      fi *= mlon/(2*M_PI);
+      fj *= mlat/M_PI;
+      int64_t ii = (int64_t) llround(fi);
+      int64_t jj = (int64_t) llround(fj);
+      if ( i < 1000 )
+        printf("lon=%g/lat=%g  ii=%ld  jj=%ld  fi=%g fj=%g\n", lons[i]*RAD2DEG, lats[i]*RAD2DEG, ii, jj, fi, fj);
+      mask1[jj*mlon+ii] = 1;
+    }
+
+  double xlonmin = 999., xlonmax = 999.;
+  double xlatmin = 999., xlatmax = 999.;
+  for ( size_t j = 0; j < mlat; ++j )
+    {
+      for ( size_t i = 0; i < mlon; ++i )
+        if ( mask1[j*mlon+i] )
+          {
+            xlatmin = (j+0.)*M_PI/mlat - 0.5*M_PI;
+            break;
+          }
+      if ( IS_NOT_EQUAL(xlatmin, 999.) ) break;
+    }
+  for ( size_t jj = 0; jj < mlat; ++jj )
+    {
+      size_t j = mlat-jj-1;
+      for ( size_t i = 0; i < mlon; ++i )
+        if ( mask1[j*mlon+i] )
+          {
+            xlatmax = (j+1.)*M_PI/mlat - 0.5*M_PI;
+            break;
+          }
+      if ( IS_NOT_EQUAL(xlatmax, 999.) ) break;
+    }
+
+  size_t ii = mlon;
+  for ( size_t i = 0; i < mlon; ++i )
+    {
+      for ( size_t j = 0; j < mlat; ++j )
+        if ( mask1[j*mlon+i] )
+          {
+            ii = i;
+            xlonmin = (i+.0)*2*M_PI/mlon;
+            break;
+          }
+      if ( IS_NOT_EQUAL(xlonmin, 999.) ) break;
+    }
+  if ( cdoVerbose ) printf("ii= %zu\n", ii);
+  for ( size_t i = ii; i < mlon; ++i )
+    {
+      ii = mlon;
+      size_t imask = 0;
+      for ( size_t j = 0; j < mlat; ++j )
+        {
+          if ( mask1[j*mlon+i] )
+            {
+              imask++;
+              xlonmax = (i+1.)*2*M_PI/mlon;
+            }
+        }
+      if ( imask == 0 )
+        {
+          ii = i+1;
+          break;
+        }
+    }
+  if ( cdoVerbose ) cdoPrint("boundbox: lonmin=%g lonmax=%g latmin=%g latmax=%g",
+                             xlonmin*RAD2DEG, xlonmax*RAD2DEG, xlatmin*RAD2DEG, xlatmax*RAD2DEG);
+  if ( cdoVerbose ) printf("ii= %zu\n", ii);
+  for ( size_t i = ii; i < mlon; ++i )
+    {
+      bool lfound = false;
+      for ( size_t j = 0; j < mlat; ++j )
+        if ( mask1[j*mlon+i] )
+          {
+            lfound = true;
+            xlonmin = (i+.0)*2*M_PI/mlon;
+            break;
+          }
+      if ( lfound ) break;
+    }
+
+  if ( xlonmin > xlonmax ) xlonmin -= 2*M_PI;
+
+  if ( cdoVerbose ) cdoPrint("boundbox: lonmin=%g lonmax=%g latmin=%g latmax=%g",
+                             xlonmin*RAD2DEG, xlonmax*RAD2DEG, xlatmin*RAD2DEG, xlatmax*RAD2DEG);
+
+  for ( size_t j = 0; j < mlat; ++j )
+    {
+      for ( size_t i = 0; i < mlon; ++i )
+        {
+           printf("%1d", mask1[j*mlon+i]);
+        }
+        printf("\n");
+    }
+
+  double lonmin = 1.e33, lonmax = -1.e33;
+  double latmin = 1.e33, latmax = -1.e33;
+  for ( size_t i = 0; i < n; ++i )
+    {
+      if ( lons[i] < lonmin ) lonmin = lons[i];
+      if ( lons[i] > lonmax ) lonmax = lons[i];
+      if ( lats[i] < latmin ) latmin = lats[i];
+      if ( lats[i] > latmax ) latmax = lats[i];
+    }
+
+  gs->lonmin = xlonmin;
+  gs->lonmax = xlonmax;
+  gs->latmin = xlatmin;
+  gs->latmax = xlatmax;
+  if ( cdoVerbose ) cdoPrint("boundbox: lonmin=%g lonmax=%g latmin=%g latmax=%g",
+                             lonmin*RAD2DEG, lonmax*RAD2DEG, latmin*RAD2DEG, latmax*RAD2DEG);
+
+  if ( mask1 ) free(mask1);
+}
+
+static
+void cal_mask(struct gridsearch *gs)
+{
+  enum {mmin = 100};
+  const double fact = 1;
+  double dlon = gs->lonmax - gs->lonmin;
+  double dlat = gs->latmax - gs->latmin;
+  if ( cdoVerbose ) cdoPrint("mask: dlon=%g, dlat=%g", dlon*RAD2DEG, dlat*RAD2DEG);
+  size_t sqrtn = (size_t) sqrt((double)gs->n);
+  if ( cdoVerbose ) cdoPrint("n=%zu  sqrt(n)=%zu", gs->n, sqrtn);
+  size_t mlat = fact*(sqrtn/2.)*(1+dlat/dlon);
+  size_t mlon = mlat*dlon/dlat;
+  if ( cdoVerbose ) cdoPrint("mlon=%zu mlat=%zu mn=%zu", mlon, mlat, mlon*mlat);
+}
+
 
 struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, const double *restrict lats)
 {
@@ -323,6 +465,9 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
   else if ( gs->method_nn == GS_FULL    ) gs->full = gs_create_full(n, lons, lats);
 
   gs->search_radius = cdo_default_search_radius();
+
+  cal_bound_box(gs, n, lons, lats);
+  cal_mask(gs);
 
   return gs;
 }
