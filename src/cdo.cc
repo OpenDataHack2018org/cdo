@@ -393,14 +393,16 @@ void cdoSetDebug(int level)
     level  64: stream
     level 128: pipe
     level 256: pthread
+    level 512: process
    */
   cdiDebug(level);
 
   if ( level == 1 || (level &  32) ) cdoDebug = 1;
-  if ( level == 1 || (level &  64) ) pstreamDebug(1);
+  if ( level == 1 || (level &  64) ) CdoDebug::PSTREAM = 1;
+  if ( level == 1 || (level &  512) ) CdoDebug::PROCESS = 1;
 #if defined(HAVE_LIBPTHREAD)
-  if ( level == 1 || (level & 128) ) pipeDebug(1);
-  if ( level == 1 || (level & 256) ) Pthread_debug(1);
+  if ( level == 1 || (level & 128) ) CdoDebug::PIPE = 1;
+  if ( level == 1 || (level & 256) ) CdoDebug::PTHREAD = 1;
 #endif
 }
 
@@ -1111,7 +1113,6 @@ int parse_options_long(int argc, char *argv[])
   int lsortparam;
   int ldebLevel;
   int lscmode;
-  bool sepDebugFromLog;
 
   // clang-format off
   struct cdo_option opt_long[] =
@@ -1427,6 +1428,8 @@ int parse_options_long(int argc, char *argv[])
 #ifdef DEBUG
           CdoDebug::outfile = CDO_optarg;
           CdoDebug::print_to_seperate_file = true;
+          CdoDebug::PSTREAM = 1;
+          CdoDebug::PROCESS = 1;
 #endif
           break;
         }
@@ -1473,6 +1476,7 @@ void cdo_rusage(void)
 
 int main(int argc, char *argv[])
 {
+
   int lstop = FALSE;
   int noff = 0;
   int status = 0;
@@ -1503,7 +1507,9 @@ int main(int argc, char *argv[])
   if ( status != 0 ) return -1;
 
   cdo_set_options();
-
+#ifdef DEBUG
+    CdoDebug::CdoStartMessage();
+#endif
   if ( Debug || Version ) cdo_version();
 
   if ( Debug )
@@ -1624,18 +1630,14 @@ int main(int argc, char *argv[])
 
       timer_start(timer_total);
 
-#ifdef DEBUG
-    CdoDebug::Message_(":==CDO==","Start");
-#endif
+
+
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
       operatorModule(operatorName)(argument);
       close_library_handles();
 #else
       operatorModule(operatorName)(argument);
-#endif
-#ifdef DEBUG
-    CdoDebug::Message_(":==CDO==","End\n");
 #endif
 
       timer_stop(timer_total);
@@ -1658,6 +1660,8 @@ int main(int argc, char *argv[])
   if ( cdoGridSearchDir ) Free(cdoGridSearchDir);
 
   if ( CDO_Rusage ) cdo_rusage();
-
+#ifdef DEBUG
+    CdoDebug::CdoEndMessage();
+#endif
   return status;
 }

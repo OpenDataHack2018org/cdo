@@ -75,9 +75,6 @@ public:
 
   std::string name;
 };
-
-void pipeDebug(int debug);
-
 #endif
 
 #endif /* PIPE_H */

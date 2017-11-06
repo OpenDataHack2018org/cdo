@@ -41,6 +41,7 @@
 #include "pstream.h"
 #include "dmemory.h"
 #include "pthread.h"
+#include "cdoDebugOutput.h"
 
 #include <map>
 #include <stack>
@@ -48,8 +49,6 @@
 #if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
-
-constexpr bool PROCESS_DEBUG = false;
 
 static process_t *root_process;
 static std::map<int, process_t> Process;
@@ -1221,7 +1220,7 @@ processClosePipes(void)
     {
       pstream_t *pstreamptr = processInqInputStream(sindex);
 
-      if (PROCESS_DEBUG)
+      if (CdoDebug::PROCESS)
         Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
 
       if (pstreamptr)
@@ -1233,7 +1232,7 @@ processClosePipes(void)
     {
       pstream_t *pstreamptr = processInqOutputStream(sindex);
 
-      if (PROCESS_DEBUG)
+      if (CdoDebug::PROCESS)
         Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
 
       if (pstreamptr)
@@ -1253,7 +1252,7 @@ cdoFinish(void)
   double p_cputime = 0, p_usertime = 0, p_systime = 0;
 
 #if defined(HAVE_LIBPTHREAD)
-  if (PROCESS_DEBUG)
+  if (CdoDebug::PROCESS)
     Message("process %d  thread %ld", processID, pthread_self());
 #endif
 

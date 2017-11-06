@@ -534,7 +534,7 @@ pstream_t::pstreamOpenReadFile(const char* p_args)
     }
 
   if (CdoDebug::PSTREAM)
-    MESSAGE("file ", filename.c_str());
+    MESSAGE("Opening (r) file: ", filename.c_str());
 
 #if defined(HAVE_LIBPTHREAD)
   if (cdoLockIO)
@@ -579,8 +579,8 @@ pstreamOpenRead(const argument_t *argument)
 {
   if(CdoDebug::PSTREAM)
   {
-      MESSAGE("Opening new pstream for reading with argument:");
-      MESSAGE(print_argument((argument_t*)argument));
+      MESSAGE("Opening new pstream for reading with argument:",
+              print_argument((argument_t*)argument));
   }
 
   pstream_t *pstreamptr = create_pstream();
@@ -752,7 +752,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
   int pstreamID = pstreamptr->self;
 
   if (CdoDebug::PSTREAM)
-    MESSAGE("file ", argument->args);
+    MESSAGE("Opening (w) file ", argument->args);
 
   if (filetype == CDI_UNDEFID)
     filetype = CDI_FILETYPE_GRB;
