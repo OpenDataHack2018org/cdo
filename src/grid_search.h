@@ -43,6 +43,8 @@ struct gridsearch {
   double *reg2d_center_lon, *reg2d_center_lat;
   double *coslat, *sinlat;   // cosine, sine of grid lats (for distance)
   double *coslon, *sinlon;   // cosine, sine of grid lons (for distance)
+
+  double lonmin, lonmax, latmin, latmax;
 };
 
 struct gsknn {
