@@ -36,10 +36,6 @@ namespace CdoLog
         expand(message, args...);
         std::cout << message.str();
     }
-
-
-
-   
 }
 
 namespace CdoDebug
