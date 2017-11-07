@@ -4101,7 +4101,7 @@ static void sigfunc(int sig)
     cdoAbort("Program terminated by CMOR. A temporary ofile can outlive which needs to be deleted manually.");
 }
 
-static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_freq, int time_axis, int calendar, char *miptab_freqptr)
+static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_freq, int time_axis, int calendar, char *miptab_freqptr, char *project_id)
 {
   int cmf = 0;
   int vlistID = pstreamInqVlist(*streamID);
@@ -4198,7 +4198,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                       void *dataslice = (void *) Malloc(gridsize * zsize * sizeof(double));
                       for ( int j = 0; j < gridsize * zsize; j++ )
                         ((double *)dataslice)[j] = ((double *)vars[i].data)[(tsID-1)*gridsize*zsize+j];
- /*                     #if ( CMOR_VERSION_MAJOR == 2 ) */
+                      #if ( CMOR_VERSION_MAJOR == 2 ) 
                         cmf = cmor_write(vars[i].cmor_varID,
                        dataslice,
                        vars[i].datatype,
@@ -4208,7 +4208,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        time_bndsp,
                        NULL);
                       Free(dataslice);
-/*                      #elif ( CMOR_VERSION_MAJOR == 3 ) 
+                     #elif ( CMOR_VERSION_MAJOR == 3 ) 
                         cmf = cmor_write(vars[i].cmor_varID,
                        dataslice,
                        vars[i].datatype,
@@ -4217,11 +4217,11 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        time_bndsp,
                        NULL);
                       Free(dataslice);
-                      #endif */
+                      #endif 
                     } 
                   else
                     {
- /*                     #if ( CMOR_VERSION_MAJOR == 2 ) */
+                      #if ( CMOR_VERSION_MAJOR == 2 ) 
                         cmf = cmor_write(vars[i].cmor_varID,
                      vars[i].data,
                      vars[i].datatype,
@@ -4230,7 +4230,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                      &time_val,
                      time_bndsp,
                      NULL); 
-/*                      #elif ( CMOR_VERSION_MAJOR == 3 )
+                      #elif ( CMOR_VERSION_MAJOR == 3 )
                         cmf = cmor_write(vars[i].cmor_varID,
                      vars[i].data,
                      vars[i].datatype,
@@ -4238,11 +4238,11 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                      &time_val,
                      time_bndsp,
                      NULL); 
-                      #endif */
+                      #endif 
                     }
                   if ( vars[i].zfactor_id > 0 )
                     {
- /*                     #if ( CMOR_VERSION_MAJOR == 2 ) */
+                      #if ( CMOR_VERSION_MAJOR == 2 ) 
                         cmf = cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
@@ -4251,7 +4251,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        &time_val,
                        time_bndsp,
                        &vars[i].cmor_varID);
-/*                     #elif ( CMOR_VERSION_MAJOR == 3 )
+                     #elif ( CMOR_VERSION_MAJOR == 3 )
                         cmf = cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
@@ -4259,22 +4259,22 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        &time_val,
                        time_bndsp,
                        &vars[i].cmor_varID);
-                     #endif */
+                     #endif 
                     }
                 }
               else
                 {
- /*                     #if ( CMOR_VERSION_MAJOR == 2 ) */
+                      #if ( CMOR_VERSION_MAJOR == 2 ) 
                     cmf = cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
                    chunk_files[i], 0, 0, 0, NULL);
-/*                  #elif ( CMOR_VERSION_MAJOR == 3 )
+                  #elif ( CMOR_VERSION_MAJOR == 3 )
                     cmf = cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
                    0, 0, 0, NULL);
-                  #endif */
+                  #endif 
                 }
             }
           if ( cmf != 0 )
@@ -4300,7 +4300,51 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
           cmf = cmor_close_variable(vars[i].cmor_varID, file_name, NULL);
           if ( strcmp(file_name, "") == 0 )
             cdoAbort("Function cmor_write failed!");
-          cdoPrint("     File stored in:  '%s' with cmor!", file_name);
+          if ( strcmp(project_id, "CORDEX") == 0 && kv_get_a_val(kvl, "cordexDir", NULL) && kv_get_a_val(kvl, "cordexFileTem", NULL) )
+            {
+              char varname[CMOR_MAX_STRING], timename[CMOR_MAX_STRING];
+              char *dummy = file_name;
+              int count = 0, firsts = 0, lasts;
+              while ( file_name[count] )
+                {
+                  if ( file_name[count] == '_' )
+                    {
+                      if ( firsts == 0 )
+                        firsts = count;
+
+                      lasts = count;
+                    }
+                  count++;
+                }
+              strncpy(varname, file_name, firsts);
+              varname[firsts] = '\0';
+              dummy+=lasts;
+              strcpy(timename, dummy);
+
+              char command[CDI_MAX_NAME];
+              sprintf(command,"mkdir -p %s/%s", kv_get_a_val(kvl, "cordexDir", NULL), varname);
+
+              int dir_err = system(command);
+              if ( dir_err != 0 )
+                {
+                  cdoWarning("Could not create CORDEX compliant path for output files of cdo cmor. Files are created in current working directory.");
+                }
+
+              char cordex_file_name[CMOR_MAX_STRING];
+              sprintf(cordex_file_name, "%s/%s/%s_%s%s", kv_get_a_val(kvl, "cordexDir", NULL), varname, varname, kv_get_a_val(kvl, "cordexFileTem", NULL), timename);
+
+              sprintf(command,"mv %s %s", file_name, cordex_file_name);
+              dir_err = system(command);
+              if ( dir_err != 0 )
+                {
+                   cdoWarning("Could not move cdo cmor output file to CORDEX compliant path.");
+                   cdoPrint("     File stored in:  '%s' with cmor!", file_name);
+                }
+              else
+                cdoPrint("     File stored in:  '%s' with cmor!", cordex_file_name);
+            }
+          else    
+            cdoPrint("     File stored in:  '%s' with cmor!", file_name);
           if ( chunkdf )
             {
               if ( cdoVerbose )
@@ -4468,7 +4512,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
         {
           if ( filetype == FILETYPE_GRB || filetype ==  FILETYPE_GRB2 )
             cdoPrint("5.1. In applying the mapping table:\n          Note that you use 'name' as selector keyword allthough the type of infile is GRB.");
-          if ( charvarlist = check_for_charvars(pml, "name") )
+          if ( ( charvarlist = check_for_charvars(pml, "name") ) )
             {
               keyValues_t *charkvn = kvlist_search(charvarlist, "name");
               keyValues_t *charkvcn = kvlist_search(charvarlist, "cmor_name");
@@ -4484,7 +4528,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
         }
       else if ( kvc )
         {
-          if ( charvarlist = check_for_charvars(pml, "code") )
+          if ( ( charvarlist = check_for_charvars(pml, "code") ) )
             {
               keyValues_t *charkvc = kvlist_search(charvarlist, "code");
               keyValues_t *charkvcn = kvlist_search(charvarlist, "cmor_name");
@@ -4500,7 +4544,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
         }
       else if ( kvcn )
         { 
-          if ( charvarlist = check_for_charvars(pml, NULL) )
+          if ( ( charvarlist = check_for_charvars(pml, NULL) ) )
             {
               keyValues_t *charkvn = kvlist_search(charvarlist, "name");
               keyValues_t *charkvcn = kvlist_search(charvarlist, "cmor_name");
@@ -4514,7 +4558,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
         }
       else
         {
-          if ( charvarlist = check_for_charvars(pml, NULL) )
+          if ( ( charvarlist = check_for_charvars(pml, NULL) ) )
             {
               keyValues_t *charkvn = kvlist_search(charvarlist, "name");
               keyValues_t *charkvcn = kvlist_search(charvarlist, "cmor_name");
@@ -4581,7 +4625,7 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, const char *v
   int i = 1, j = 0;
   for ( i = 1; i < nparams; i++ )
     {
-      if ( eqpos = strchr(params[i], '=')  )
+      if ( ( eqpos = strchr(params[i], '=') ) )
         {
           if ( key && values[0] )
             {
@@ -4667,9 +4711,10 @@ static char *get_mip_table(char *params, list_t *kvl, char *project_id)
           kv_insert_a_val(kvl, "mip_table_dir", miptabdir, 0);
         }
       else
-        Free(miptabdir);
+        strcpy(miptabdir, "./");
       if ( cdoVerbose )
         cdoPrint("2.2. MIP table file '%s' exists in MIP table directory '%s'.", miptab, miptabdir);
+      Free(miptabdir);
       return miptab;
     }
   else
@@ -4733,6 +4778,8 @@ static int get_miptab_freq(list_t *kvl, char *mip_table, char *project_id)
         miptab_freq = 14;
       else if ( strstr(freq, "3h") )
         miptab_freq = 15;
+      else if ( strstr(freq, "1h") )
+        miptab_freq = 16;
 
       if ( strcmp(freq, "Oclim") == 0 )
         miptab_freq = 1;
