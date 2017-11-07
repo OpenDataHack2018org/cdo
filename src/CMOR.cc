@@ -118,7 +118,7 @@ char *skipSeparator(char *pline)
   return pline;
 }
 
-static void *handleError(list_t *kvl, int errnum, char *argument)
+static void handleError(list_t *kvl, int errnum, char *argument)
 {
   char *filename = NULL;
   if ( kvl )
@@ -191,7 +191,7 @@ static void quote_replace(char **values, int nvalues, int i)
 {
   char *source = values[nvalues];
   char *useful;
-  *source++;
+  source++;
   source[i-2] = 0;
   useful = strdup(source);
   free(values[nvalues]);
@@ -369,6 +369,7 @@ static int add_lines(char *line, char **buffer, size_t *buffersize)
           if ( strlen(nexttester) + len > 4096 )
             return 8;
           strcat(line, nextline);
+          return 0;
         }
       else
         return 9;
@@ -1056,7 +1057,7 @@ static void check_compare_set(char **finalset, char *attribute, const char *attn
     {
       if ( strcmp(attribute, *finalset) != 0 )
         {
-          cdoPrint("In comparison of configuration attribute and infile attribute:\n          '%s' of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\n          Cmor libary is called with attribute unit '%s'.", attname, *finalset, attname, attribute, attribute);
+          cdoPrint("In comparison of configuration attribute and infile attribute:\n          '%s' of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\n          Cmor library is called with attribute unit '%s'.", attname, *finalset, attname, attribute, attribute);
           Free(*finalset);
           *finalset = strdup(attribute);
         }
