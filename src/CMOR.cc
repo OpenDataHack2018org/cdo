@@ -4199,20 +4199,20 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                       void *dataslice = (void *) Malloc(gridsize * zsize * sizeof(double));
                       for ( int j = 0; j < gridsize * zsize; j++ )
                         ((double *)dataslice)[j] = ((double *)vars[i].data)[(tsID-1)*gridsize*zsize+j];
-                      #if ( CMOR_VERSION_MAJOR == 2 ) 
+                     #if ( CMOR_VERSION_MAJOR == 3 && CMOR_VERSION_MINOR <= 2 && CMOR_VERSION_PATCH <= 7 ) 
                         cmf = cmor_write(vars[i].cmor_varID,
                        dataslice,
                        vars[i].datatype,
-                       chunk_files[i],
                        1,
                        &time_val,
                        time_bndsp,
                        NULL);
                       Free(dataslice);
-                     #elif ( CMOR_VERSION_MAJOR == 3 ) 
+                      #else 
                         cmf = cmor_write(vars[i].cmor_varID,
                        dataslice,
                        vars[i].datatype,
+                       chunk_files[i],
                        1,
                        &time_val,
                        time_bndsp,
@@ -4222,7 +4222,15 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                     } 
                   else
                     {
-                      #if ( CMOR_VERSION_MAJOR == 2 ) 
+                      #if ( CMOR_VERSION_MAJOR == 3 && CMOR_VERSION_MINOR <= 2 && CMOR_VERSION_PATCH <= 7 )
+                        cmf = cmor_write(vars[i].cmor_varID,
+                     vars[i].data,
+                     vars[i].datatype,
+                     1,
+                     &time_val,
+                     time_bndsp,
+                     NULL); 
+                      #else
                         cmf = cmor_write(vars[i].cmor_varID,
                      vars[i].data,
                      vars[i].datatype,
@@ -4231,31 +4239,24 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                      &time_val,
                      time_bndsp,
                      NULL); 
-                      #elif ( CMOR_VERSION_MAJOR == 3 )
-                        cmf = cmor_write(vars[i].cmor_varID,
-                     vars[i].data,
-                     vars[i].datatype,
-                     1,
-                     &time_val,
-                     time_bndsp,
-                     NULL); 
+
                       #endif 
                     }
                   if ( vars[i].zfactor_id > 0 )
                     {
-                      #if ( CMOR_VERSION_MAJOR == 2 ) 
+                     #if ( CMOR_VERSION_MAJOR == 3 && CMOR_VERSION_MINOR <= 2 && CMOR_VERSION_PATCH <= 7 )
                         cmf = cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
-                       chunk_files[i],
                        1,
                        &time_val,
                        time_bndsp,
                        &vars[i].cmor_varID);
-                     #elif ( CMOR_VERSION_MAJOR == 3 )
+                      #else
                         cmf = cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
+                       chunk_files[i],
                        1,
                        &time_val,
                        time_bndsp,
@@ -4265,16 +4266,16 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                 }
               else
                 {
-                      #if ( CMOR_VERSION_MAJOR == 2 ) 
-                    cmf = cmor_write(vars[i].cmor_varID,
-                   vars[i].data,
-                   vars[i].datatype,
-                   chunk_files[i], 0, 0, 0, NULL);
-                  #elif ( CMOR_VERSION_MAJOR == 3 )
+                  #if ( CMOR_VERSION_MAJOR == 3 && CMOR_VERSION_MINOR <= 2 && CMOR_VERSION_PATCH <= 7 )
                     cmf = cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
                    0, 0, 0, NULL);
+                      #else
+                    cmf = cmor_write(vars[i].cmor_varID,
+                   vars[i].data,
+                   vars[i].datatype,
+                   chunk_files[i], 0, 0, 0, NULL);
                   #endif 
                 }
             }
