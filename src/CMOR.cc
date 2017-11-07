@@ -4873,13 +4873,23 @@ static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, 
 
 void *CMOR(void *argument)
 {
+  if ( cdoVerbose )
+    {
+      int argc = ((argument_t *) argument)->argc;
+      std::vector<char *> &argv = ((argument_t *) argument)->argv;
+
+      cdoPrint("You want to use the following streams for conversion to a project standard:");
+      for ( int args = 1; args < argc; args++)
+        cdoPrint("%s\n", (char *)argv[args]);
+    }
+
   cdoInitialize(argument);
 
 #if defined(HAVE_LIBCMOR)
   signal(SIGTERM, sigfunc);
   int nparams = operatorArgc();
 
-  if ( nparams < 1 ) cdoAbort("Too few arguments!");
+  if ( nparams < 1 ) cdoAbort("No parameter found. Need at least a MIP-table.");
 
   char **params = operatorArgv();
   char *miptableInput = strdup(params[0]);
@@ -4946,7 +4956,7 @@ void *CMOR(void *argument)
   int table_id = cmor_load_and_set_table(kvl, miptableInput, project_id, &mip_table);
 
   register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq, &time_axis);
-  write_variables(kvl, &streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
+  write_variables(kvl, &streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr, project_id);
 
   destruct_var_mapping(vars);
   Free(mip_table);
