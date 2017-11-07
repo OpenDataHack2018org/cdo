@@ -2525,7 +2525,7 @@ static void check_and_gen_bounds(int gridID, int nbounds, int length, double *co
 
 static double lonbnds_mids_trans_check(double value1, double value2)
 {
-  if ( abs(value1 - value2) < 180.0 )
+  if ( fabs(value1 - value2) < 180.0 )
     return (value1 + value2) * 0.5;
   else 
     {
@@ -2538,7 +2538,7 @@ static double lonbnds_mids_trans_check(double value1, double value2)
 
 static double lonbnds_bnds_trans_check(double value1, double value2)
 {
-  if ( abs(value1 - value2) < 180 )
+  if ( fabs(value1 - value2) < 180 )
     {
       if ( 2*value1 < value2 )
         return (2*value1 - value2 + 360.0);
@@ -2937,18 +2937,21 @@ static void register_projection(int *grid_ids, int projID, double *ycoord_vals, 
                       for ( i = 0; i < p_len; i++ )
                         {
                           if ( projtype == CDI_PROJ_RLL )
-                            if ( strcmp(attname, p_rll[i]) == 0 )
+                            {
+                              if ( strcmp(attname, p_rll[i]) == 0 )
                                 {
                                   parameter_values[i] = attflt[0];
                                   break;
                                 }
+                            }
                           else if ( projtype == CDI_PROJ_LCC ) 
-                            if ( strcmp(attname, p_lcc[i]) == 0 )
+                            {
+                              if ( strcmp(attname, p_lcc[i]) == 0 )
                                 {
                                   parameter_values[i] = attflt[0];
                                   break;
                                 }
-
+                            }
                         }
                       if ( i == p_len )
                         cdoWarning("In grid registration:\n          grid mapping attribute '%s' is neglected.", attname);
@@ -3016,8 +3019,8 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       gridID = vlistInqVarGrid(vlistID, varID);
     }
 
-  int type = gridInqType(gridID);
   int projID = gridInqProj(gridID);
+  int type = gridInqType(gridID);
   int ylength = gridInqYsize(gridID);
   int xlength = gridInqXsize(gridID);
   int totalsize = gridInqSize(gridID);
@@ -3171,7 +3174,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
               if ( strcmp(xdimname, "line") == 0 )
                 strcpy(xdimname, "oline");
               int dimstrlen;   
-              if ( dimstrlen = gridInqXIsc(gridID) )
+              if ( ( dimstrlen = gridInqXIsc(gridID) ) )
                 {
                   char **xchars = (char **)Malloc( (xlength+1) * sizeof(char *));
                   for ( int i = 0; i < xlength; i++ )
@@ -3186,7 +3189,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
               else if ( xlength)
                 register_lon_axis(gridID, xlength, axis_ids);
 
-              if ( dimstrlen = gridInqYIsc(gridID) )
+              if ( ( dimstrlen = gridInqYIsc(gridID) ) )
                 {
                   char **ychars = (char **) Malloc( (ylength + 1) * sizeof(char));
                   for ( int i = 0; i < ylength; i++ )
@@ -3339,9 +3342,9 @@ static void register_all_dimensions(list_t *kvl, int streamID,
   char *mapname, *mapcode;
   if ( !kv_get_a_val(kvl, "mt", NULL) && numvals )
     {
-      if ( mapname = kv_get_a_val(kvl, "n", NULL) )
+      if ( ( mapname = kv_get_a_val(kvl, "n", NULL) ) )
         change_name_via_name(vlistID, mapname, cmor_names[0]);
-      else if ( mapcode = kv_get_a_val(kvl, "c", NULL) )
+      else if ( ( mapcode = kv_get_a_val(kvl, "c", NULL) ) )
         change_name_via_code(vlistID, mapcode, cmor_names[0]);
     }
 
