@@ -3470,6 +3470,8 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
     case 5: strcpy(frequency, "6hr"); break;
     case 6: strcpy(frequency, "6hr"); break;
     case 15: strcpy(frequency, "3hr"); break;
+    case 7: strcpy(frequency, "1hr"); break;
+    case 16: strcpy(frequency, "1hr"); break;
     default:
     {
       if ( cdoStreamName(0)->args[0] == '-' )
@@ -3492,7 +3494,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
       int taxisID2 = vlistInqTaxis(vlistID2);
       if ( ntsteps < 0 )
         {
-          while ( recdummy = pstreamInqTimestep(streamID2, reccounter++) );
+          while ( ( recdummy = pstreamInqTimestep(streamID2, reccounter++) ) );
           ntsteps = reccounter;
         }    
       ntsteps-=1;
@@ -3529,7 +3531,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
               reccounter = 0;
               if ( cdoVerbose )
                 cdoPrint("Frequency could not be determined by comparing all time steps (%d) divided by covered years (%f).\n          It is now calculated by counting all timesteps in year %d\n          in order to calculate time bounds in case they are not given.", ntsteps, covered_years, fyear);
-              while ( recdummy = pstreamInqTimestep(streamID2, reccounter++) )
+              while ( ( recdummy = pstreamInqTimestep(streamID2, reccounter++) ) )
                 {
                   int reqyear;
                   cdiDecodeDate(taxisInqVdate(taxisID2), &reqyear, &lmonth, &dummytwo);
@@ -3588,7 +3590,7 @@ static juldate_t get_cmor_time_val(int taxisID, juldate_t ref_date, int tunitsec
   juldate_t juldate = juldate_encode(calendar, taxisInqVdate(taxisID),
                                      taxisInqVtime(taxisID));
 
-  if ( month == 0 || day == 0 || year == 0 )
+  if ( month == 0 || day == 0 )
     {
       int rdate, rtime;
       int ryear, rmonth, rday, addseconds = 0;
@@ -3657,7 +3659,11 @@ static double *get_time_bounds(list_t *kvl, int taxisID, char *frequency, juldat
       vtime0b = 0;
       vtime1b = 0;
   
-      if ( time_axis == 2 || time_axis == 3 )
+/***/
+/* Climatologies */
+/***/
+
+      if ( time_axis == 2  )
         {
           int numdates;
           char **climyears = kv_get_vals(kvl, "climatology_interval", &numdates);
@@ -3665,30 +3671,24 @@ static double *get_time_bounds(list_t *kvl, int taxisID, char *frequency, juldat
             cdoAbort("In writing model output:\n          Could not calculate time bounds for climatology time axis because attribute 'climatology_interval' has not two values.");
           int expstartyear = atol(climyears[0]);
           int expendyear = atol(climyears[1]);
-/***/
-/* Climatologies */
-/***/
-          if ( time_axis == 2 )
-            {
-              vdate0b = cdiEncodeDate(expstartyear, month, 1);
-              month++;
-              if ( month > 12 ) { month = 1; year++; }
-              vdate1b = cdiEncodeDate(expendyear, month, 1);
-            }
+
+          vdate0b = cdiEncodeDate(expstartyear, month, 1);
+          month++;
+          if ( month > 12 ) { month = 1; year++; }
+          vdate1b = cdiEncodeDate(expendyear, month, 1);
+        }
 /***/
 /* Diurnal cycle */
 /***/
-          if ( time_axis == 3 )
-            {
-              vdate0b = cdiEncodeDate(expstartyear, month, day);
-              cdiDecodeTime(taxisInqVtime(taxisID), & hour, &min, &sec);
-              vtime0b = cdiEncodeTime(hour,0,0);
+      else if ( time_axis == 3 )
+        {
+          vdate0b = cdiEncodeDate(year, month, 1);
+          cdiDecodeTime(taxisInqVtime(taxisID), &hour, &min, &sec);
+          vtime0b = cdiEncodeTime(hour,0,0);
 
-              hour++;
-              if ( hour > 23 ) { hour = 0; day++; }
-              vtime1b = cdiEncodeTime(hour,0,0);
-              vdate1b = cdiEncodeDate(expendyear, month, day);
-            }
+          hour++; month++;
+          vtime1b = cdiEncodeTime(hour,0,0);
+          vdate1b = ( hour > 23 ) ? cdiEncodeDate(year, month, 2) : cdiEncodeDate(year, month, 1);
         }
       else
         {
@@ -3742,6 +3742,9 @@ static double *get_time_bounds(list_t *kvl, int taxisID, char *frequency, juldat
   juldate = juldate_encode(calendar, vdate1b, vtime1b);
   time_bnds[1] = juldate_to_seconds(juldate_sub(juldate, ref_date))
               / tunitsec;
+  if ( time_axis == 3 )
+    time_bnds[1] -= 1;
+
   return time_bnds;
 }
 
