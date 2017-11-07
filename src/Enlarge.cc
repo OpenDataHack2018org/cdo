@@ -36,15 +36,13 @@ void *Enlarge(void *argument)
 
   operatorCheckArgc(1);
 
-  // open stream before calling cdoDefineGrid!!!
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-
   int gridID2 = cdoDefineGrid(operatorArgv()[0]);
   size_t xsize2 = gridInqXsize(gridID2);
   size_t ysize2 = gridInqYsize(gridID2);
 
   if ( cdoVerbose ) fprintf(stderr, "gridID2 %d, xsize2 %zu, ysize2 %zu\n", gridID2, xsize2, ysize2);
 
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

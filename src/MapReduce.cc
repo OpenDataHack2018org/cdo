@@ -55,9 +55,7 @@ void read_first_record(char *filename, double *field)
  * */
 int countMask(double *maskField, int gridSize, double falseVal)
 {
-  int counter;
-
-  counter = 0;
+  int counter = 0;
 
   for (int i = 0; i < gridSize; i++)
     {
@@ -80,9 +78,6 @@ void *MapReduce(void *argument)
   /*double missval1, missval2; */
 
   cdoInitialize(argument);
-
-  // open stream before calling cdoDefineGrid!!!
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   /* check input grid type and size - this will be used for selecting relevant
    * variables from the input file*/
@@ -126,6 +121,8 @@ void *MapReduce(void *argument)
   /* create output vlist: Only variabes which have the same gridtype and
    * gridsize as the input mask should be proessed. Everything else is ignoreds
    * {{{ */
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+
   int vlistID1  = pstreamInqVlist(streamID1);
   int nvars     = vlistNvars(vlistID1);
   int *vars     = (int*) Malloc(nvars*sizeof(int));

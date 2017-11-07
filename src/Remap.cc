@@ -140,16 +140,16 @@ void print_remap_info(int operfunc, bool remap_genweights, remapgrid_t *src_grid
 
   strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
   if ( src_grid->rank == 2 )
-    snprintf(tmpstr, sizeof(tmpstr), " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid->dims[0], src_grid->dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%d)", src_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid->dims[0]);
   strcat(line, tmpstr);
   strcat(line, " to ");
   strcat(line, gridNamePtr(gridInqType(tgt_grid->gridID)));
   if ( tgt_grid->rank == 2 )
-    snprintf(tmpstr, sizeof(tmpstr), " (%dx%d)", tgt_grid->dims[0], tgt_grid->dims[1]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", tgt_grid->dims[0], tgt_grid->dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%d)", tgt_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", tgt_grid->dims[0]);
   strcat(line, tmpstr);
   strcat(line, " grid");
 
@@ -188,9 +188,9 @@ void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_
   strcat(line, " not used, ");
   strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
   if ( src_grid->rank == 2 )
-    snprintf(tmpstr, sizeof(tmpstr), " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid->dims[0], src_grid->dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%d)", src_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid->dims[0]);
   strcat(line, tmpstr);
   strcat(line, " grid");
 
@@ -829,16 +829,7 @@ void *Remap(void *argument)
 
   get_remap_env();
 
-  if ( cdoVerbose )
-    {
-      if ( remap_extrapolate )
-	cdoPrint("Extrapolation enabled!");
-      else
-	cdoPrint("Extrapolation disabled!");
-    }
-
-  // open stream before calling cdoDefineGrid!!!
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  if ( cdoVerbose ) cdoPrint("Extrapolation %s!", remap_extrapolate?"enabled":"disables");
 
   if ( lremapxxx )
     {
@@ -865,6 +856,8 @@ void *Remap(void *argument)
     }
 
   if ( gridInqType(gridID2) == GRID_GENERIC ) cdoAbort("Unsupported target grid type (generic)!");
+
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int filetype = pstreamInqFiletype(streamID1);
 
