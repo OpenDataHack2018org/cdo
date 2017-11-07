@@ -12,9 +12,9 @@
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 
-int find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
+bool find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
 {
-  int lfound = 0;
+  bool lfound = false;
   long iter;                     /*  iteration counters   */
   double deli, delj;             /*  corrections to iw,jw                   */
   double dthp, dphp;             /*  difference between point and sw corner */
@@ -77,7 +77,7 @@ int find_ij_weights(double plon, double plat, double *restrict src_lats, double 
   *ig = iguess;
   *jg = jguess;
 
-  if ( iter < remap_max_iter ) lfound = 1;
+  if ( iter < remap_max_iter ) lfound = true;
 
   return lfound;
 }
@@ -123,16 +123,16 @@ void bilinear_warning(double plon, double plat, double iw, double jw, size_t* sr
 
   if ( cdoVerbose )
     {
-      cdoPrint("Point coords: %g %g", plat, plon);
-      cdoPrint("Src grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
-      cdoPrint("Src grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
+      cdoPrint("Point coords: %g %g", plat*RAD2DEG, plon*RAD2DEG);
+      cdoPrint("Src grid lats: %g %g %g %g", src_lats[0]*RAD2DEG, src_lats[1]*RAD2DEG, src_lats[2]*RAD2DEG, src_lats[3]*RAD2DEG);
+      cdoPrint("Src grid lons: %g %g %g %g", src_lons[0]*RAD2DEG, src_lons[1]*RAD2DEG, src_lons[2]*RAD2DEG, src_lons[3]*RAD2DEG);
       cdoPrint("Src grid addresses: %zu %zu %zu %zu", src_add[0], src_add[1], src_add[2], src_add[3]);
       cdoPrint("Src grid lats: %g %g %g %g",
-	       src_grid->cell_center_lat[src_add[0]], src_grid->cell_center_lat[src_add[1]],
-	       src_grid->cell_center_lat[src_add[2]], src_grid->cell_center_lat[src_add[3]]);
+	       src_grid->cell_center_lat[src_add[0]]*RAD2DEG, src_grid->cell_center_lat[src_add[1]]*RAD2DEG,
+	       src_grid->cell_center_lat[src_add[2]]*RAD2DEG, src_grid->cell_center_lat[src_add[3]]*RAD2DEG);
       cdoPrint("Src grid lons: %g %g %g %g",
-	       src_grid->cell_center_lon[src_add[0]], src_grid->cell_center_lon[src_add[1]],
-	       src_grid->cell_center_lon[src_add[2]], src_grid->cell_center_lon[src_add[3]]);
+	       src_grid->cell_center_lon[src_add[0]]*RAD2DEG, src_grid->cell_center_lon[src_add[1]]*RAD2DEG,
+	       src_grid->cell_center_lon[src_add[2]]*RAD2DEG, src_grid->cell_center_lon[src_add[3]]*RAD2DEG);
       cdoPrint("Current iw,jw : %g %g", iw, jw);
     }
 
