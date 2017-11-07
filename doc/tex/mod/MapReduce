@@ -20,7 +20,7 @@ coordinates a completely suppressed.
 @Name      = reducegrid
 @Title     = Reduce input file variables to locations, where mask is non-zero.
              Horizontal grids of @file{mask} and @file{infile} must be identical
-@Parameter = mask[,limitCoordsOutput]
+@Parameter = mask [limitCoordsOutput]
 
 @EndOperator
 @BeginParameter

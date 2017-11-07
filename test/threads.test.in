@@ -21,7 +21,11 @@ function testfunc()
   RFILE=$DATAPATH/thread${NTEST}_ref
   OFILE=tsformat${NTEST}_res
 
-  CDOCOMMAND="$CDO $OFORMAT $INSTR $IFILE $OFILE"
+  rm -f Threads.debug
+
+  DEBUG_OUT="--seperateDebugFromLog Threads.debug"
+
+  CDOCOMMAND="$CDO $DEBUG_OUT $OFORMAT $INSTR $IFILE $OFILE"
       
   echo "$CDOCOMMAND"
 
@@ -30,7 +34,7 @@ function testfunc()
     $CDOCOMMAND
     test $? -eq 0 || let RSTAT+=1
 
-    $CDO diff $RFILE $OFILE > $CDOOUT 2> $CDOERR
+    $CDO $DEBUG_OUT diff $RFILE $OFILE > $CDOOUT 2> $CDOERR
     test $? -eq 0 || let RSTAT+=1
     test -s $CDOOUT && let RSTAT+=1
     cat $CDOOUT $CDOERR

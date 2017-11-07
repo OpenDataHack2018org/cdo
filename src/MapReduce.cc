@@ -31,6 +31,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
+#include "cdoDebugOutput.h"
 
 /* read only the first data variable from input filename into a given double
  * pointer */
@@ -54,9 +55,7 @@ void read_first_record(char *filename, double *field)
  * */
 int countMask(double *maskField, int gridSize, double falseVal)
 {
-  int counter;
-
-  counter = 0;
+  int counter = 0;
 
   for (int i = 0; i < gridSize; i++)
     {
@@ -80,15 +79,12 @@ void *MapReduce(void *argument)
 
   cdoInitialize(argument);
 
-  // open stream before calling cdoDefineGrid!!!
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-
   /* check input grid type and size - this will be used for selecting relevant
    * variables from the input file*/
   int inputGridID   = cdoDefineGrid(operatorArgv()[0]);
-  int inputGridSize = gridInqSize(inputGridID);
+  size_t inputGridSize = gridInqSize(inputGridID);
   int inputGridType = gridInqType(inputGridID);
-  if ( cdoDebug ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
+  if ( CdoDebug::cdoDebug ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
 
   /* creata an index list of the relevant locations  {{{ */
   double *inputMaskField = (double*) Malloc(inputGridSize*sizeof(double));
@@ -96,13 +92,13 @@ void *MapReduce(void *argument)
 
   /* non-zero values mark the relevant points */
   int maskSize = countMask(inputMaskField, inputGridSize, 0.0);
-  if ( cdoDebug ) cdoPrint("MapReduce: maskSize = %d",maskSize);
+  if ( CdoDebug::cdoDebug ) cdoPrint("MapReduce: maskSize = %d",maskSize);
 
   int *maskIndexList = (int *) Malloc(maskSize*sizeof(int));
   for (int m = 0; m < maskSize; m++) maskIndexList[m] = -1;
 
-  int k = 0;
-  for (int i = 0; i < inputGridSize; i++)
+  size_t k = 0;
+  for (size_t i = 0; i < inputGridSize; i++)
     {
       if (!DBL_IS_EQUAL(inputMaskField[i],0.0))
         {
@@ -125,6 +121,8 @@ void *MapReduce(void *argument)
   /* create output vlist: Only variabes which have the same gridtype and
    * gridsize as the input mask should be proessed. Everything else is ignoreds
    * {{{ */
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+
   int vlistID1  = pstreamInqVlist(streamID1);
   int nvars     = vlistNvars(vlistID1);
   int *vars     = (int*) Malloc(nvars*sizeof(int));

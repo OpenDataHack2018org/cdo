@@ -103,7 +103,9 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/tsformat.test.in $(srcdir)/wildcard.test.in \
 	$(srcdir)/MapReduce.test.in $(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/acx_cfortran_flags.m4 \
+	$(top_srcdir)/m4/acx_check_cfortran.m4 \
+	$(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -389,18 +391,22 @@ ENABLE_CDI_LIB = @ENABLE_CDI_LIB@
 ENABLE_CGRIBEX = @ENABLE_CGRIBEX@
 ENABLE_DATA = @ENABLE_DATA@
 ENABLE_EXTRA = @ENABLE_EXTRA@
+ENABLE_FORTRAN = @ENABLE_FORTRAN@
 ENABLE_GRIB = @ENABLE_GRIB@
 ENABLE_GRIBAPI = @ENABLE_GRIBAPI@
 ENABLE_IEG = @ENABLE_IEG@
 ENABLE_NC2 = @ENABLE_NC2@
 ENABLE_NC4 = @ENABLE_NC4@
 ENABLE_NC4HDF5 = @ENABLE_NC4HDF5@
+ENABLE_NEARPT3 = @ENABLE_NEARPT3@
 ENABLE_NETCDF = @ENABLE_NETCDF@
 ENABLE_SERVICE = @ENABLE_SERVICE@
 ENABLE_THREADS = @ENABLE_THREADS@
 EXEEXT = @EXEEXT@
-FCFLAGS = @FCFLAGS@
+F77 = @F77@
+FFLAGS = @FFLAGS@
 FGREP = @FGREP@
+FORTRAN_WORKS = @FORTRAN_WORKS@
 GREP = @GREP@
 GRIB_API_INCLUDE = @GRIB_API_INCLUDE@
 GRIB_API_LIBS = @GRIB_API_LIBS@
@@ -476,6 +482,7 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_F77 = @ac_ct_F77@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -525,7 +532,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #.PHONY: $(TESTS)
-CLEANFILES = `ls *.pyc`
+CLEANFILES = `ls *.pyc *.debug cerr* cout* ifile* ofile*`
 
 # COLOR ALWAYS also if no color capable terminal detected
 #     this is needed i.e. to run the tests via a oneline ssh cmd:
@@ -538,6 +545,7 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 # tests which should pass
 TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test \
         Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
+        MapReduce.test Ninfo.test Gradsdes.test  \
         Detrend.test Genweights.test Remap.test Remap2.test Remapeta.test Select.test Spectral.test \
         Ensstat.test Enspctl.test Gridboxstat.test \
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
@@ -545,7 +553,7 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Runstat.test Multiyearstat.test Ydrunstat.test \
         Mergetime.test EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
-        Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
+        Collgrid.test
 
 
 #        $(top_srcdir)/test/test_Remap.sh \

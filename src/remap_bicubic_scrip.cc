@@ -32,12 +32,12 @@ void set_bicubic_weights(double iw, double jw, double wgts[4][4])
   wgts[3][3] =     iw*(iw-1.)*(iw-1.) *     jw*jw*(jw-1.);
 }
 
-int num_src_points(const int* restrict mask, const size_t src_add[4], double src_lats[4]);
+unsigned num_src_points(const int* restrict mask, const size_t src_add[4], double src_lats[4]);
 
 static
 void renormalize_weights(const double src_lats[4], double wgts[4][4])
 {
-  int n;
+  unsigned n;
   double sum_wgts = 0.0; /* sum of weights for normalization */
   /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
   for ( n = 0; n < 4; ++n ) sum_wgts  += fabs(src_lats[n]);
@@ -50,11 +50,11 @@ void renormalize_weights(const double src_lats[4], double wgts[4][4])
 static
 void bicubic_warning(void)
 {
-  static int lwarn = TRUE;
+  static bool lwarn = true;
 
   if ( cdoVerbose || lwarn )
     {
-      lwarn = FALSE;
+      lwarn = false;
       // cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
       cdoWarning("Bicubic interpolation failed for some grid points - used a distance-weighted average instead!");
     }
@@ -65,7 +65,7 @@ void bicubic_remap(double* restrict tgt_point, const double* restrict src_array,
 		   const double* restrict grad1, const double* restrict grad2, const double* restrict grad3)
 {
   *tgt_point = 0.;
-  for ( int n = 0; n < 4; ++n )
+  for ( unsigned n = 0; n < 4; ++n )
     *tgt_point += src_array[src_add[n]]*wgts[n][0] +
                       grad1[src_add[n]]*wgts[n][1] +
                       grad2[src_add[n]]*wgts[n][2] +
@@ -81,13 +81,6 @@ void bicubic_remap(double* restrict tgt_point, const double* restrict src_array,
 */
 void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
-  /*   Local variables */
-  int  search_result;
-  size_t src_add[4];   /*  address for the four source points     */
-  double src_lats[4];  /*  latitudes  of four bilinear corners    */
-  double src_lons[4];  /*  longitudes of four bilinear corners    */
-  double wgts[4][4];   /*  bicubic weights for four corners       */
-  double plat, plon;   /*  lat/lon coords of destination point    */
   extern int timer_remap_bic;
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -102,7 +95,7 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   if ( src_grid->rank != 2 )
     cdoAbort("Can not do bicubic interpolation when source grid rank != 2"); 
 
-  long tgt_grid_size = tgt_grid->size;
+  size_t tgt_grid_size = tgt_grid->size;
 
   weightlinks4_t *weightlinks = (weightlinks4_t *) Malloc(tgt_grid_size*sizeof(weightlinks4_t));
   weightlinks[0].addweights = (addweight4_t *) Malloc(4*tgt_grid_size*sizeof(addweight4_t));
@@ -115,10 +108,9 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
-  private(src_add, src_lats, src_lons, wgts, plat, plon, search_result)
+  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex)
 #endif
-  for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
@@ -130,10 +122,16 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
       if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
 
-      plat = tgt_grid->cell_center_lat[tgt_cell_add];
-      plon = tgt_grid->cell_center_lon[tgt_cell_add];
+      double plat = tgt_grid->cell_center_lat[tgt_cell_add];
+      double plon = tgt_grid->cell_center_lon[tgt_cell_add];
+
+      size_t src_add[4];   //  address for the four source points
+      double src_lats[4];  //  latitudes  of four bilinear corners
+      double src_lons[4];  //  longitudes of four bilinear corners
+      double wgts[4][4];   //  bicubic weights for four corners
 
       /* Find nearest square of grid points on source grid  */
+      int search_result;
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, 
 					  plat, plon, src_grid->dims,
@@ -147,17 +145,16 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       /* Check to see if points are land points */
       if ( search_result > 0 )
 	{
-	  for ( int n = 0; n < 4; ++n )
+	  for ( unsigned n = 0; n < 4; ++n )
 	    if ( ! src_grid->mask[src_add[n]] ) search_result = 0;
 	}
 
       /* If point found, find local iw,jw coordinates for weights  */
       if ( search_result > 0 )
 	{
-	  double iw, jw;  /*  current guess for bilinear coordinate  */
-
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
+	  double iw, jw;  /*  current guess for bilinear coordinate  */
           if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
 	    {
 	      /* Successfully found iw,jw - compute weights */
@@ -207,20 +204,13 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 */
 void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
 {
-  /*   Local variables */
-  int  search_result;
-  size_t src_add[4];      /*  address for the four source points   */
-  double src_lats[4];  /*  latitudes  of four bilinear corners  */
-  double src_lons[4];  /*  longitudes of four bilinear corners  */
-  double wgts[4][4];   /*  bicubic weights for four corners     */
-  double plat, plon;   /*  lat/lon coords of destination point  */
   int remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
 
   progressInit();
 
-  long tgt_grid_size = tgt_grid->size;
+  size_t tgt_grid_size = tgt_grid->size;
 
   /* Compute mappings from source to target grid */
 
@@ -239,10 +229,9 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, grad1_lat, grad1_lon, grad1_latlon, findex) \
-  private(src_add, src_lats, src_lons, wgts, plat, plon, search_result)
+  shared(remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, grad1_lat, grad1_lon, grad1_latlon, findex)
 #endif
-  for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
@@ -254,10 +243,16 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 
       if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
 
-      plat = tgt_grid->cell_center_lat[tgt_cell_add];
-      plon = tgt_grid->cell_center_lon[tgt_cell_add];
+      double plat = tgt_grid->cell_center_lat[tgt_cell_add];
+      double plon = tgt_grid->cell_center_lon[tgt_cell_add];
+
+      size_t src_add[4];   //  address for the four source points
+      double src_lats[4];  //  latitudes  of four bilinear corners
+      double src_lons[4];  //  longitudes of four bilinear corners
+      double wgts[4][4];   //  bicubic weights for four corners
 
       /* Find nearest square of grid points on source grid  */
+      int search_result;
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, 
 					  plat, plon, src_grid->dims,
@@ -271,17 +266,16 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
       /* Check to see if points are land points */
       if ( search_result > 0 )
 	{
-	  for ( int n = 0; n < 4; ++n )
+	  for ( unsigned n = 0; n < 4; ++n )
 	    if ( ! src_grid->mask[src_add[n]] ) search_result = 0;
 	}
 
       /* If point found, find local iw,jw coordinates for weights  */
       if ( search_result > 0 )
 	{
-	  double iw, jw;  /*  current guess for bilinear coordinate  */
-
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
+	  double iw, jw;  /*  current guess for bilinear coordinate  */
           if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
 	    {
 	      /* Successfully found iw,jw - compute weights */

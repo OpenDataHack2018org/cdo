@@ -1292,7 +1292,7 @@ static int check_mem(list_t *kvl, char *project_id)
   char workchar[CMOR_MAX_STRING]; 
   int realization, initialization_method, physics_version, forcing;
   int ipos=0, ppos=0;
-
+*/
 /* Test for the right member, else abort or warn */
 /*
   
@@ -1322,6 +1322,7 @@ static int check_mem(list_t *kvl, char *project_id)
       for ( int i = 0; i < 3; i++ )   
         kv_insert_a_val(kvl, ripchar[i], (char *)"-1", 1);
     }
+*/
 /* Now abort or warn */
 /* 
   if (strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CORDEX") == 0)
@@ -1913,7 +1914,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 #elif ( CMOR_VERSION_MAJOR == 3 )
     {
 /***/
-/* Could not give CMOR all attributes separately because some are required to be in a json file (outpath,...). /
+/* Could not give CMOR all attributes separately because some are required to be in a json file (outpath,...). */
 /* Better collect them in this file. */
 /* todo this **/
 /* If a Json file is denoted, read this file and check attributes */
@@ -4499,7 +4500,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
 /***/
 /* However, if the mapping table contains a keyvalue pair for name or code with more than one value, */
 /* the corresponding variable has a character coordinate and requires special treatment */
-/* This is tested once before mapping. If the special variable equals the variable which is to map,
+/* This is tested once before mapping. If the special variable equals the variable which is to map, */
 /* the special treatment begins with fct addcharvar */
 /***/
 /* Different CMOR variables are built with one model variable. */

@@ -264,7 +264,7 @@ while (<MOFILE>) {
       print TRLIST "Here is a short overview of all operators in this section:\\\\\n";
       print TRLIST "\n";
 
-      if ( $shortname ne "climat" && $shortname ne "magics" && $shortname ne "cmor" ) {
+      if ( $shortname ne "climat" && $shortname ne "magics" && $shortname ne "cmor" && $shortname ne "ncl" ) {
         print TROVER "\\newpage\n";
         print TROVER "\\section{$chap}\n";
         print TROVER "\\input{ref_intro_${shortname}}\n";
@@ -476,8 +476,14 @@ while (<MOFILE>) {
 	    if ( index($tag, "[") == 0 ) {
 	      $nopt++;
 	      $x1 = 1;
-              $len = $len - 2;
+              $len = $len - 1;
 	      $oparameter = "$oparameter\[";
+	    }
+	    if ( $x1 == 1 && index($tag, "]") == $len ) {
+              $len = $len - 1;
+	    }
+	    if ( $x1 == 0 && index($tag, "]") == $len-1 ) {
+              $len = $len - 1;
 	    }
 	    $otag = substr $tag, $x1, $len;
 	    $oparameter = "$oparameter,$otag";

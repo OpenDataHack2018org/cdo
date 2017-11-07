@@ -49,6 +49,7 @@
 #include "cdo_task.h"
 
 #include "cdo_getopt.h"
+#include "cdoDebugOutput.h"
 
 #if defined(HAVE_LIBPTHREAD)
 #include "pstream_int.h"
@@ -56,6 +57,7 @@
 #endif
 
 #include "modules.h"
+#include "process.h"
 #include "error.h"
 #include "grid_proj.h"
 
@@ -79,7 +81,7 @@ static int numThreads = 0;
 static int timer_total;
 static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
-static const char *username;
+const char *CDO_username;
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,7 +113,7 @@ void gridsearch_set_method(const char *methodstr);
           } \
       }
 
-#define ITSME  (strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
+#define ITSME  (strcmp(CDO_username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
 
 static
 void cdo_stackframe(void)
@@ -190,21 +192,27 @@ void cdo_version(void)
   const int   filetypes[] = {CDI_FILETYPE_SRV, CDI_FILETYPE_EXT, CDI_FILETYPE_IEG, CDI_FILETYPE_GRB, CDI_FILETYPE_GRB2, CDI_FILETYPE_NC, CDI_FILETYPE_NC2, CDI_FILETYPE_NC4, CDI_FILETYPE_NC4C, CDI_FILETYPE_NC5};
   const char* typenames[] = {        "srv",        "ext",        "ieg",       "grb1",        "grb2",       "nc1",        "nc2",        "nc4",        "nc4c",        "nc5"};
 
-  fprintf(stderr, "%s\n", CDO_Version);
+  fprintf(stderr, "%s\n", CDO_version);
 #if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
   fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
 #if defined(CXX_COMPILER)
   fprintf(stderr, "CXX Compiler: %s\n", CXX_COMPILER);
-#endif
 #if defined(CXX_VERSION)
   fprintf(stderr, "CXX version : %s\n", CXX_VERSION);
 #endif
+#endif
 #if defined(C_COMPILER)
   fprintf(stderr, "C Compiler: %s\n", C_COMPILER);
-#endif
 #if defined(C_VERSION)
   fprintf(stderr, "C version : %s\n", C_VERSION);
+#endif
+#endif
+#if defined(F77_COMPILER)
+  fprintf(stderr, "F77 Compiler: %s\n", F77_COMPILER);
+#if defined(F77_VERSION)
+  fprintf(stderr, "F77 version : %s\n", F77_VERSION);
+#endif
 #endif
 
   printFeatures();
@@ -226,7 +234,7 @@ void cdo_usage(void)
 {
   const char *name;
 
-  /*  fprintf(stderr, "%s\n", CDO_Version);*/
+  /*  fprintf(stderr, "%s\n", CDO_version);*/
   /*  fprintf(stderr, "\n");*/
   fprintf(stderr, "usage : cdo  [Options]  Operator1  [-Operator2  [-OperatorN]]\n");
   fprintf(stderr, "\n");
@@ -340,7 +348,7 @@ void cdoPrintHelp(std::vector<std::string> help/*, char *xoperator*/)
       for(unsigned long i =  0; i < help.size(); i++)
         {
           lprint = !(help[i][0] == '\0'  && help[i+1][0] == ' ');
-          
+
           if ( lprint )
             {
               if ( COLOR_STDOUT )
@@ -385,14 +393,16 @@ void cdoSetDebug(int level)
     level  64: stream
     level 128: pipe
     level 256: pthread
+    level 512: process
    */
   cdiDebug(level);
 
-  if ( level == 1 || (level &  32) ) cdoDebug = 1;
-  if ( level == 1 || (level &  64) ) pstreamDebug(1);
+  if ( level == 1 || (level &  32) ) CdoDebug::cdoDebug = 1;
+  if ( level == 1 || (level &  64) ) CdoDebug::PSTREAM = 1;
+  if ( level == 1 || (level &  512) ) CdoDebug::PROCESS = 1;
 #if defined(HAVE_LIBPTHREAD)
-  if ( level == 1 || (level & 128) ) pipeDebug(1);
-  if ( level == 1 || (level & 256) ) Pthread_debug(1);
+  if ( level == 1 || (level & 128) ) CdoDebug::PIPE = 1;
+  if ( level == 1 || (level & 256) ) CdoDebug::PTHREAD = 1;
 #endif
 }
 
@@ -725,11 +735,11 @@ void defineVarnames(const char *arg)
 static
 void get_env_vars(void)
 {
-  username = getenv("LOGNAME");
-  if ( username == NULL )
+  CDO_username = getenv("LOGNAME");
+  if ( CDO_username == NULL )
     {
-      username = getenv("USER");
-      if ( username == NULL ) username = "unknown";
+      CDO_username = getenv("USER");
+      if ( CDO_username == NULL ) CDO_username = "unknown";
     }
 
   char *envstr = getenv("CDO_GRID_SEARCH_DIR");
@@ -912,6 +922,7 @@ void print_system_info()
 #endif 
   fprintf(stderr, "\n");
 
+  fprintf(stderr, "sizeof(size_t)      = %zu\n", sizeof(size_t));
   fprintf(stderr, "mem alignment       = %d\n\n", getMemAlignment());
 
 #if defined(HAVE_MMAP)
@@ -1141,6 +1152,7 @@ int parse_options_long(int argc, char *argv[])
       { "version",                 no_argument,                NULL, 'V' },
       { "Dkext",             required_argument,          &ldebLevel,  1  },
       { "outputGribDataScanningMode", required_argument,  &lscmode,   1  },
+      { "seperateDebugFromLog", required_argument,             NULL,  2  },
       { NULL,                                0,                NULL,  0  }
     };
   // clang-format on
@@ -1247,7 +1259,7 @@ int parse_options_long(int argc, char *argv[])
               int intarg = parameter2int(CDO_optarg);
               if ( intarg != 0 && intarg != 1 )
                 cdoAbort("Unsupported value for option --remap_genweights %d [0/1]", intarg);
-              remap_genweights = intarg;
+              REMAP_genweights = intarg;
             }
           else if ( lsortname )
             {
@@ -1264,14 +1276,14 @@ int parse_options_long(int argc, char *argv[])
               if ( newDebLevelVal > 0 )
                 {
                   extern int cdiDebugExt;
-                  cdoDebugExt = newDebLevelVal;
+                  CdoDebug::cdoDebugExt = newDebLevelVal;
                   cdiDebugExt = newDebLevelVal;
                 }
             }
           else if ( lscmode )
             {
               int scanningModeValue = atoi(CDO_optarg);
-              if ( cdoDebugExt ) printf("scanningModeValue=%d\n", scanningModeValue);
+              if ( CdoDebug::cdoDebugExt ) printf("scanningModeValue=%d\n", scanningModeValue);
               
               if ( (scanningModeValue==0) || (scanningModeValue==64) || (scanningModeValue==96) )
                 {
@@ -1413,6 +1425,12 @@ int parse_options_long(int argc, char *argv[])
         case 'z':
           defineCompress(CDO_optarg);
           break;
+        case 2:
+#ifdef DEBUG
+          CdoDebug::outfile = CDO_optarg;
+          CdoDebug::print_to_seperate_file = true;
+#endif
+          break;
         }
     }
 
@@ -1457,6 +1475,7 @@ void cdo_rusage(void)
 
 int main(int argc, char *argv[])
 {
+
   int lstop = FALSE;
   int noff = 0;
   int status = 0;
@@ -1474,11 +1493,9 @@ int main(int argc, char *argv[])
  
   setCommandLine(argc, argv);
 
-  Progname = getProgname(argv[0]);
-
-  if ( strncmp(Progname, "cdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
-
-  if ( noff ) setDefaultFileType(Progname+noff, 0);
+  CDO_progname = getProgname(argv[0]);
+  if ( strncmp(CDO_progname, "cdo", 3) == 0 && strlen(CDO_progname) > 3 ) noff = 3;
+  if ( noff ) setDefaultFileType(CDO_progname+noff, 0);
 
   get_env_vars();
   init_modules();
@@ -1487,7 +1504,9 @@ int main(int argc, char *argv[])
   if ( status != 0 ) return -1;
 
   cdo_set_options();
-
+#ifdef DEBUG
+    CdoDebug::CdoStartMessage();
+#endif
   if ( Debug || Version ) cdo_version();
 
   if ( Debug )
@@ -1599,7 +1618,8 @@ int main(int argc, char *argv[])
       if ( Debug )
         {
           if ( DebugLevel == 0 ) DebugLevel = 1;
-          cdoSetDebug(DebugLevel);
+          cdiDebug(DebugLevel);
+          CdoDebug::SetDebug(DebugLevel);
         }
 
       timer_total  = timer_new("total");
@@ -1608,13 +1628,14 @@ int main(int argc, char *argv[])
 
       timer_start(timer_total);
 
+
+
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
       operatorModule(operatorName)(argument);
       close_library_handles();
 #else
       operatorModule(operatorName)(argument);
-
 #endif
 
       timer_stop(timer_total);
@@ -1637,6 +1658,8 @@ int main(int argc, char *argv[])
   if ( cdoGridSearchDir ) Free(cdoGridSearchDir);
 
   if ( CDO_Rusage ) cdo_rusage();
-
+#ifdef DEBUG
+    CdoDebug::CdoEndMessage();
+#endif
   return status;
 }

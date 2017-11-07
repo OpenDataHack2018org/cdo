@@ -17,6 +17,7 @@
 
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
+#include "cdoDebugOutput.h"
 #endif
 
 #include <stdio.h>
@@ -31,7 +32,6 @@
 
 #if defined(HAVE_LIBPTHREAD)
 
-static int PipeDebug = 0;
 
 pipe_t::pipe_t() { pipe_init(); }
 
@@ -46,7 +46,7 @@ pipe_t::pipe_init()
   */
   /*
 #if defined(_POSIX_THREAD_PROCESS_SHARED)
-  if ( PipeDebug )
+  if ( CdoDebug::PIPE )
     {
       Message("setpshared mutexattr to PTHREAD_PROCESS_SHARED");
       Message("setpshared condattr to PTHREAD_PROCESS_SHARED");
@@ -55,7 +55,7 @@ pipe_t::pipe_init()
   pthread_mutexattr_setpshared(&m_attr, PTHREAD_PROCESS_SHARED);
   pthread_condattr_setpshared(&c_attr, PTHREAD_PROCESS_SHARED);
 
-  if ( PipeDebug )
+  if ( CdoDebug::PIPE )
     {
       int pshared;
       pthread_mutexattr_getpshared(&m_attr, &pshared);
@@ -71,7 +71,7 @@ pipe_t::pipe_init()
         Message("getpshared condattr is PTHREAD_PROCESS_PRIVATE");
     }
 #else
-  if ( PipeDebug )
+  if ( CdoDebug::PIPE )
     Message("_POSIX_THREAD_PROCESS_SHARED undefined");
 #endif
   */
@@ -135,24 +135,24 @@ pipe_t::pipeInqTimestep(int p_tsID)
     {
       if (EOP)
         {
-          if (PipeDebug)
+          if (CdoDebug::PIPE)
             Message("%s EOP", name.c_str());
           break;
         }
       if (hasdata)
         {
-          if (PipeDebug)
+          if (CdoDebug::PIPE)
             Message("%s has data", name.c_str());
           hasdata = false;
           data = NULL;
           readCond.notify_all();
         }
-      else if (PipeDebug)
+      else if (CdoDebug::PIPE)
         Message("%s has no data", name.c_str());
 
       recInq.notify_all(); /* o.k. ??? */
 
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         Message("%s wait of tsDef", name.c_str());
       tsDef.wait(locked_mutex);
     }
@@ -201,7 +201,7 @@ pipe_t::pipeInqVlist(int &p_vlistID)
     {
       time_to_wait += TIMEOUT;
       // fprintf(stderr, "tvsec %g\n", (double) time_to_wait.tv_sec);
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         Message("%s wait of vlistDef", name.c_str());
       // pthread_cond_wait(pipe->vlistDef, pipe->mutex);
       retcode = vlistDef.wait_for(locked_mutex, time_to_wait);
@@ -217,7 +217,7 @@ pipe_t::pipeInqVlist(int &p_vlistID)
 
   if (retcode == std::cv_status::timeout)
     vlistID = p_vlistID;
-  else if (PipeDebug)
+  else if (CdoDebug::PIPE)
     Message("%s timeout!", name.c_str());
 
   // UNLOCK
@@ -250,12 +250,12 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
               numrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
             }
         }
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         Message("%s numrecs = %d nvars = %d", name.c_str(), numrecs, vlistNvars(vlistID));
     }
 
   nrecs = numrecs;
-  if (PipeDebug)
+  if (CdoDebug::PIPE)
     Message("%s numrecs %d p_tsID %d %d %d", name.c_str(), numrecs, p_tsID, tsIDw, tsIDr);
   if (numrecs == 0)
     EOP = true;
@@ -271,11 +271,11 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
     {
       if (EOP)
         {
-          if (PipeDebug)
+          if (CdoDebug::PIPE)
             Message("EOP");
           break;
         }
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         Message("%s wait of tsInq (p_tsID %d %d)", name.c_str(), p_tsID, tsIDr);
       tsInq.wait(locked_mutex);
     }
@@ -287,11 +287,11 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
 {
   bool condSignal = false;
 
-  // if (PipeDebug)
+  // if (CdoDebug::PIPE)
 
   // LOCK
   m_mutex.lock();
-  if (PipeDebug)
+  if (CdoDebug::PIPE)
     Message("%s has no data %d %d", name.c_str(), recIDr, recIDw);
   if (hasdata || usedata)
     {
@@ -311,18 +311,18 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
   usedata = true;
   recIDr++;
 
-  if (PipeDebug)
+  if (CdoDebug::PIPE)
     Message("%s recID %d %d", name.c_str(), recIDr, recIDw);
 
   while (recIDw != recIDr)
     {
       if (EOP)
         {
-          if (PipeDebug)
+          if (CdoDebug::PIPE)
             Message("EOP");
           break;
         }
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         Message("%s wait of recDef", name.c_str());
       recDef.wait(locked_mutex);
     }
@@ -353,7 +353,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
 
   // LOCK
   m_mutex.lock();
-  if (PipeDebug)
+  if (CdoDebug::PIPE)
     Message("%s has data %d %d", name.c_str(), recIDr, recIDw);
   if (hasdata)
     {
@@ -373,7 +373,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
   recIDw++;
   varID = p_varID;
   levelID = p_levelID;
-  if (PipeDebug)
+  if (CdoDebug::PIPE)
     Message("%s recID %d %d", name.c_str(), recIDr, recIDw);
   m_mutex.unlock();
   // UNLOCK
@@ -388,7 +388,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
         break;
       if (EOP)
         break;
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         Message("%s wait of recInq %d", name.c_str(), recIDr);
       recInq.wait(locked_mutex);
     }
@@ -407,7 +407,7 @@ pipe_t::pipeReadPipeRecord(double *p_data, int vlistID, size_t *p_nmiss)
   if (!p_data)
     Error("No data pointer for %s", name.c_str());
 
-  int datasize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+  size_t datasize = gridInqSize(vlistInqVarGrid(vlistID, varID));
   nvals += datasize;
   if (vlistNumber(vlistID) != CDI_REAL)
     datasize *= 2;
@@ -424,7 +424,7 @@ pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
   pstreamptr = pstreamptr_in;
   while (pstreamptr_in->ispipe)
     {
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         fprintf(stderr, "%s: istream %d is pipe\n", __func__, pstreamptr_in->self);
       pstreamptr = pstreamptr_in;
       pstreamptr_in = pstreamptr_in->pipe->pstreamptr_in;
@@ -451,7 +451,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, size_t *nmiss)
   std::unique_lock<std::mutex> locked_mutex(m_mutex);
   while (!hasdata)
     {
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         Message("%s wait of writeCond", name.c_str());
       writeCond.wait(locked_mutex);
     }
@@ -465,7 +465,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, size_t *nmiss)
       Error("data type %d not implemented", hasdata);
     }
 
-  if (PipeDebug)
+  if (CdoDebug::PIPE)
     Message("%s read record %d", name.c_str(), recIDr);
 
   hasdata = false;
@@ -492,7 +492,7 @@ pipe_t::pipeWriteRecord(double *p_data, size_t p_nmiss)
 
   writeCond.notify_all();
 
-  if (PipeDebug)
+  if (CdoDebug::PIPE)
     Message("%s write record %d", name.c_str(), recIDw);
 
   // LOCK
@@ -510,21 +510,14 @@ pipe_t::pipeWriteRecord(double *p_data, size_t p_nmiss)
 
       if (EOP)
         {
-          if (PipeDebug)
+          if (CdoDebug::PIPE)
             Message("EOP");
           break;
         }
-      if (PipeDebug)
+      if (CdoDebug::PIPE)
         Message("%s wait of readCond", name.c_str());
       readCond.wait(locked_mutex);
     }
   // UNLOCK
 }
-
-void
-pipeDebug(int debug)
-{
-  PipeDebug = debug;
-}
-
 #endif

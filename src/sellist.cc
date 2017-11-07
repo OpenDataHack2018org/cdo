@@ -115,7 +115,7 @@ int sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
 
                   if ( first == last )
                     {
-                      ((int*)e->cvalues)[j++] = parameter2int(e->values[i]);
+                      ((int*)e->cvalues)[j++] = first;
                     }
                   else
                     {
@@ -126,17 +126,20 @@ int sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
                         for ( int ival = first; ival >= last; ival += inc ) k++;
 
                       e->nvalues += k-1;
-                      e->cvalues = Realloc(e->cvalues, e->nvalues*sizeof(int));
+                      if ( e->nvalues )
+                        {
+                          e->cvalues = Realloc(e->cvalues, e->nvalues*sizeof(int));
 
-                      if ( inc >= 0 )
-                        {
-                          for ( int ival = first; ival <= last; ival += inc )
-                            ((int*)e->cvalues)[j++] = ival;
-                        }
-                      else
-                        {
-                          for ( int ival = first; ival >= last; ival += inc )
-                            ((int*)e->cvalues)[j++] = ival;
+                          if ( inc >= 0 )
+                            {
+                              for ( int ival = first; ival <= last; ival += inc )
+                                ((int*)e->cvalues)[j++] = ival;
+                            }
+                          else
+                            {
+                              for ( int ival = first; ival >= last; ival += inc )
+                                ((int*)e->cvalues)[j++] = ival;
+                            }
                         }
                     }
 
@@ -358,8 +361,11 @@ void sellist_print(sellist_t *sellist)
           int nvalues = e->nvalues;
           if ( nvalues > 12 ) nvalues = 11;
           for ( int i = 0; i < nvalues; ++i ) sellist_print_val(e->type, (cvalues_t *)e->cvalues, i);
-          if ( nvalues < e->nvalues ) printf(" ...");
-          sellist_print_val(e->type, (cvalues_t *)e->cvalues, e->nvalues-1);
+          if ( nvalues < e->nvalues )
+            {
+              printf(" ...");
+              sellist_print_val(e->type, (cvalues_t *)e->cvalues, e->nvalues-1);
+            }
           printf("\n");
         }
     }

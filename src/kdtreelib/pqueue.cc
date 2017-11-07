@@ -22,9 +22,9 @@
    Ripped off wikipedia.
 */
 inline int
-floorLog2(uint32_t n)
+floorLog2(size_t n)
 {
-    uint32_t pos = 0;
+    size_t pos = 0;
     if (n >= 1 << 16) {
         n >>= 16;
         pos += 16;
@@ -54,7 +54,7 @@ floorLog2(uint32_t n)
    (min-sorted level). 
 */
 inline int
-is_max_level(int i)
+is_max_level(size_t i)
 {
     return floorLog2(i) % 2;
 }
@@ -63,7 +63,7 @@ is_max_level(int i)
 
 /* Swap nodes i and j in the priority queue q */
 void
-pq_swap_nodes(struct pqueue *q, uint32_t i, uint32_t j)
+pq_swap_nodes(struct pqueue *q, size_t i, size_t j)
 {
     struct resItem *tmp;
 
@@ -74,11 +74,11 @@ pq_swap_nodes(struct pqueue *q, uint32_t i, uint32_t j)
 
 
 /* Return the array index of the maximum node */
-uint32_t
+size_t
 get_max_index(struct pqueue *q)
 {
 
-    uint32_t i;
+    size_t i;
     if (!q)
         return 0;
 
@@ -128,7 +128,7 @@ get_max_index(struct pqueue *q)
 
 /* Move a node up the tree */
 void
-bubble_up_min(struct pqueue *q, uint32_t i)
+bubble_up_min(struct pqueue *q, size_t i)
 {
     /*
      * if node has a grandparent 
@@ -141,7 +141,7 @@ bubble_up_min(struct pqueue *q, uint32_t i)
 
 
 void
-bubble_up_max(struct pqueue *q, uint32_t i)
+bubble_up_max(struct pqueue *q, size_t i)
 {
     /*
      * if node has a grandparent 
@@ -154,7 +154,7 @@ bubble_up_max(struct pqueue *q, uint32_t i)
 
 
 void
-bubble_up(struct pqueue *q, uint32_t i)
+bubble_up(struct pqueue *q, size_t i)
 {
     if (!is_max_level(i)) {
         if (i > 1 && PQPRIO(q->d[i]) > PQPRIO(q->d[i / 2])) {
@@ -182,10 +182,10 @@ bubble_up(struct pqueue *q, uint32_t i)
 
 /* Get index of the smallest child or grandchild of q->d[i].
    Caller must ensure that q->d[i] has at least one child. */
-uint32_t
-pq_get_min_child_index(struct pqueue *q, uint32_t i)
+size_t
+pq_get_min_child_index(struct pqueue *q, size_t i)
 {
-    uint32_t m;
+    size_t m;
 
     /*
      * First Child 
@@ -226,10 +226,10 @@ pq_get_min_child_index(struct pqueue *q, uint32_t i)
 
 /* Get index of the largest children and grandchildren of q->d[i].
    Caller must ensure that q->d[i] has at least one child. */
-uint32_t
-pq_get_max_child_index(struct pqueue * q, uint32_t i)
+size_t
+pq_get_max_child_index(struct pqueue * q, size_t i)
 {
-    uint32_t m;
+    size_t m;
 
     /*
      * First Child 
@@ -271,7 +271,7 @@ pq_get_max_child_index(struct pqueue * q, uint32_t i)
 
 /* Move a node down the tree */
 void
-trickle_down(struct pqueue *q, uint32_t i)
+trickle_down(struct pqueue *q, size_t i)
 {
     if (is_max_level(i))
         trickle_down_max(q, i);
@@ -281,9 +281,9 @@ trickle_down(struct pqueue *q, uint32_t i)
 
 
 void
-trickle_down_max(struct pqueue *q, uint32_t i)
+trickle_down_max(struct pqueue *q, size_t i)
 {
-    uint32_t m;
+    size_t m;
 
     /*
      * if A[i] has children 
@@ -313,9 +313,9 @@ trickle_down_max(struct pqueue *q, uint32_t i)
 }
 
 void
-trickle_down_min(struct pqueue *q, uint32_t i)
+trickle_down_min(struct pqueue *q, size_t i)
 {
-    uint32_t m;
+    size_t m;
 
     /*
      * if A[i] has children 
@@ -369,7 +369,7 @@ trickle_down_min(struct pqueue *q, uint32_t i)
  *
  */
 struct pqueue *
-pqinit(struct pqueue *q, uint32_t n)
+pqinit(struct pqueue *q, size_t n)
 {
     struct pqueue *tmp = q;
 
@@ -403,7 +403,7 @@ int
 pqinsert(struct pqueue *q, struct resItem *d)
 {
     struct resItem **tmp;
-    uint32_t i, newsize;
+    size_t i, newsize;
 
     if (!q)
         return 0;
@@ -473,7 +473,7 @@ pqremove_min(struct pqueue *q, struct resItem **d)
 struct resItem **
 pqremove_max(struct pqueue *q, struct resItem **d)
 {
-    uint32_t i;
+    size_t i;
 
     if (!q || q->size == 1)
         return NULL;

@@ -7,11 +7,15 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout$$
 CDOERR=cerr$$
 FORMAT="-f srv -b 32"
+ABSLIMMAX=0.001
 #
 IFILE=$DATAPATH/pl_data
 NTEST=1
 #
 FINSTR=finstr
+#
+rm -f Expr.debug
+DEBUG_OUT="--seperateDebugFromLog Expr.debug"
 #
 function testfunc()
 {
@@ -28,9 +32,9 @@ function testfunc()
 
       if [ "$FILE" = "f" ] ; then
         echo $INSTR > $FINSTR
-        CDOCOMMAND="$CDO $FORMAT $EXPR${FILE},$FINSTR $IFILE $OFILE"
+        CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT $EXPR${FILE},$FINSTR $IFILE $OFILE"
       else
-        CDOCOMMAND="$CDO $FORMAT $EXPR,$INSTR $IFILE $OFILE"
+        CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT $EXPR,$INSTR $IFILE $OFILE"
       fi
       
       echo "$CDOCOMMAND"
@@ -38,7 +42,7 @@ function testfunc()
       $CDOCOMMAND
       test $? -eq 0 || let RSTAT+=1
 
-      $CDO diff $RFILE $OFILE > $CDOOUT 2> $CDOERR
+      $CDO $DEBUG_OUT diff,$ABSLIMMAX $RFILE $OFILE > $CDOOUT 2> $CDOERR
       test $? -eq 0 || let RSTAT+=1
       test -s $CDOOUT && let RSTAT+=1
       cat $CDOOUT $CDOERR

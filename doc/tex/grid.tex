@@ -298,6 +298,31 @@ The grid cell corners xbounds and ybounds have to rotate counterclockwise.
 
 \vspace{2mm}
 
+The description for a projection is somewhat more complicated.
+Use the first section to describe the coordinates of the projection with the above keywords.
+Add the keyword \textbf{grid\_mapping\_name} to descibe the mapping between the given coordinates and the true
+latitude and longitude coordinates. \textbf{grid\_mapping\_name} takes a string
+value that contains the name of the projection. A list of attributes can be added to define the mapping.
+The name of the attributes depend on the projection. The valid names
+of the projection and there attributes follow the NetCDF CF-Convention.
+
+{\CDO} supports the special grid mapping attribute \textbf{proj4\_params}. 
+These parameter will be passed directly to the proj4 library to
+generate the geographic coordinates if needed.
+
+The geographic coordinates of the following projections can be
+generated without the attribute \textbf{proj4\_params}, if all other
+attributes are available:
+
+\begin{itemize}
+\item \textbf{rotated\_latitude\_longitude}
+\item \textbf{lambert\_conformal\_conic}
+\item \textbf{lambert\_azimuthal\_equal\_area}
+\item \textbf{sinusoidal}
+\end{itemize}
+
+\vspace{2mm}
+
 %\begin{minipage}[t]{\textwidth}
 {\CDO} grid description example of a regional rotated lon/lat grid:
 \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]

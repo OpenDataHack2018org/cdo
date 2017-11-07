@@ -35,8 +35,11 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
       OFILE=${GRID}_${RMOD}_$$
       RFILE=$DATAPATH/${GRID}_${RMOD}_ref
 
+      rm -f Genweights_${GRIDTYPE}_${GRID}_${RMOD}.debug
+      DEBUG_OUT="--seperateDebugFromLog Genweights_${GRIDTYPE}_${GRID}_${RMOD}.debug"
+
       CDOTEST="gen${RMOD} $GRID $GRIDTYPE"
-      CDOCOMMAND="$CDO $FORMAT gen${RMOD},$GRID $SETGRID $IFILE remapweights"
+      CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT gen${RMOD},$GRID $SETGRID $IFILE remapweights"
 
       if [ "@ENABLE_THREADS@" = no -a "$GRIDTYPE" != "regular" ]; then
         test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP POSIX threads not enabled"
@@ -48,10 +51,10 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
           $CDOCOMMAND
           test $? -eq 0 || let RSTAT+=1
 
-          $CDO $FORMAT remap,$GRID,remapweights $SETGRID $IFILE ${OFILE}
+          $CDO $DEBUG_OUT $FORMAT remap,$GRID,remapweights $SETGRID $IFILE ${OFILE}
           test $? -eq 0 || let RSTAT+=1
 
-          $CDO diff,$ABSLIM $OFILE $RFILE > $CDOOUT 2> $CDOERR
+          $CDO $DEBUG_OUT diff,$ABSLIM $OFILE $RFILE > $CDOOUT 2> $CDOERR
           test $? -eq 0 || let RSTAT+=1
           test -s $CDOOUT && let RSTAT+=1
           cat $CDOOUT $CDOERR

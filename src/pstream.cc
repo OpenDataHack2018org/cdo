@@ -16,12 +16,13 @@
 */
 
 
-#include <thread>
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if defined(_OPENMP)
+#include <thread>
+
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 
@@ -43,8 +44,8 @@ int pclose(FILE *stream);
 #include "util.h"
 #include "pipe.h"
 #include "error.h"
+#include "cdoDebugOutput.h"
 
-static int PSTREAM_Debug = 0;
 
 //#define MAX_PSTREAMS 4096
 
@@ -135,7 +136,7 @@ pstream_init_pointer(void)
 }
 */
 
-static pstream_t *create_pstream()
+ pstream_t *create_pstream()
 {
     PSTREAM_LOCK();
     auto new_entry  = _pstream_map.insert(
@@ -200,7 +201,7 @@ pstream_from_pointer(pstream_t *ptr)
           idx = newptr->idx;
           newptr->ptr = ptr;
 
-          if (PSTREAM_Debug)
+          if (CdoDebug::PSTREAM)
             Message("Pointer %p has idx %d from pstream list", ptr, idx);
         }
       else
@@ -252,8 +253,8 @@ pstream_delete_entry(pstream_t *pstreamptr)
 
   PSTREAM_UNLOCK();
 
-  if (PSTREAM_Debug)
-    Message("Removed idx %d from pstream list", idx);
+  if (CdoDebug::PSTREAM)
+    MESSAGE("Removed idx ", idx," from pstream list");
 }
 /*
 static void
@@ -266,13 +267,13 @@ pstream_initialize(void)
 
   char *env = getenv("PSTREAM_DEBUG");
   if (env)
-    PSTREAM_Debug = atoi(env);
+    CdoDebug::PSTREAM = atoi(env);
 
   env = getenv("PSTREAM_MAX");
   if (env)
     _pstream_max = atoi(env);
 
-  if (PSTREAM_Debug)
+  if (CdoDebug::PSTREAM)
     Message("PSTREAM_MAX = %d", _pstream_max);
 
   pstream_list_new();
@@ -384,8 +385,8 @@ pstream_t::pstreamOpenReadPipe(const char *pipename)
 
     /* Free(operatorName); */
   /*      pipeInqInfo(pstreamID); */
-  if (PSTREAM_Debug)
-    Message("pipe %s", pipename);
+  if (CdoDebug::PSTREAM)
+    MESSAGE("pipe ", pipename, " %s");
 #else
   cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
@@ -533,8 +534,8 @@ pstream_t::pstreamOpenReadFile(const char* p_args)
      filename = std::string(p_args);
     }
 
-  if (PSTREAM_Debug)
-    Message("file %s", filename.c_str());
+  if (CdoDebug::PSTREAM)
+    MESSAGE("Opening (r) file: ", filename.c_str());
 
 #if defined(HAVE_LIBPTHREAD)
   if (cdoLockIO)
@@ -577,6 +578,11 @@ void createPipeName(char *pipename, int pnlen)
 int
 pstreamOpenRead(const argument_t *argument)
 {
+  if(CdoDebug::PSTREAM)
+  {
+      MESSAGE("Opening new pstream for reading with argument:",
+              print_argument((argument_t*)argument));
+  }
 
   pstream_t *pstreamptr = create_pstream();
   if (!pstreamptr)
@@ -680,9 +686,9 @@ pstreamOpenWritePipe(const argument_t *argument, int filetype)
   int pstreamID = -1;
 
 #if defined(HAVE_LIBPTHREAD)
-  if (PSTREAM_Debug)
+  if (CdoDebug::PSTREAM)
     {
-      Message("pipe %s", argument->args);
+      MESSAGE("pipe ", argument->args);
     }
   pstreamID = pstreamFindID(argument->args);
   if (pstreamID == -1)
@@ -746,8 +752,8 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
 
   int pstreamID = pstreamptr->self;
 
-  if (PSTREAM_Debug)
-    Message("file %s", argument->args);
+  if (CdoDebug::PSTREAM)
+    MESSAGE("Opening (w) file ", argument->args);
 
   if (filetype == CDI_UNDEFID)
     filetype = CDI_FILETYPE_GRB;
@@ -834,9 +840,9 @@ pstreamOpenAppend(const argument_t *argument)
 
   if (ispipe)
     {
-      if (PSTREAM_Debug)
+      if (CdoDebug::PSTREAM)
         {
-          Message("pipe %s", argument->args);
+          MESSAGE("pipe ", argument->args);
         }
       cdoAbort("this operator doesn't work with pipes!");
     }
@@ -844,10 +850,10 @@ pstreamOpenAppend(const argument_t *argument)
   pstream_t *pstreamptr = create_pstream();
 
   if (!pstreamptr)
-    Error("No memory");
+    ERROR("No memory");
 
-  if (PSTREAM_Debug)
-    Message("file %s", argument->args);
+  if (CdoDebug::PSTREAM)
+    MESSAGE("file ", argument->args);
 
   pstreamptr->openAppend(argument->args);
 
@@ -908,8 +914,8 @@ pstreamCloseChildStream(pstream_t *pstreamptr)
   pipe_t *pipe = pstreamptr->pipe;
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
-  if (PSTREAM_Debug)
-    Message("%s read closed", pstreamptr->m_name.c_str());
+  if (CdoDebug::PSTREAM)
+    MESSAGE(pstreamptr->m_name.c_str(), " read closed");
   pthread_mutex_unlock(pipe->m_mutex);
   pthread_cond_signal(pipe->tsDef);
   pthread_cond_signal(pipe->tsInq);
@@ -942,8 +948,8 @@ pstreamCloseParentStream(pstream_t *pstreamptr)
   pipe_t *pipe = pstreamptr->pipe;
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
-  if (PSTREAM_Debug)
-    Message("%s write closed", pstreamptr->m_name.c_str());
+  if (CdoDebug::PSTREAM)
+    MESSAGE(pstreamptr->m_name.c_str(), " write closed");
   pthread_mutex_unlock(pipe->m_mutex);
   pthread_cond_signal(pipe->tsDef);
   pthread_cond_signal(pipe->tsInq);
@@ -951,8 +957,8 @@ pstreamCloseParentStream(pstream_t *pstreamptr)
   std::unique_lock<std::mutex> locked_mutex(pipe->m_mutex);
   while (pstreamptr->isopen)
     {
-      if (PSTREAM_Debug)
-        Message("wait of read close");
+      if (CdoDebug::PSTREAM)
+        MESSAGE("wait of read close");
       pthread_cond_wait(pipe->isclosed, locked_mutex);
     }
   locked_mutex.unlock();
@@ -964,7 +970,7 @@ pstreamClose(int pstreamID)
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
   if (pstreamptr == NULL)
-    Error("Internal problem, stream %d not open!", pstreamID);
+    ERROR("Internal problem, stream ", pstreamID ," not open!");
 
   pstreamptr->close();
 
@@ -985,7 +991,7 @@ void pstream_t::close(){
       else if (pthread_equal(threadID, wthreadID))
         pstreamCloseParentStream(this);
       else
-        Error("Internal problem! Close pipe %s", m_name.c_str());
+        Error("Internal problem! Close pipe ", m_name.c_str());
 
      // processDelStream(pstreamID);
 #else
@@ -994,8 +1000,8 @@ void pstream_t::close(){
     }
   else
     {
-      if (PSTREAM_Debug)
-        Message("%s fileID %d", m_name.c_str(), m_fileID);
+      if (CdoDebug::PSTREAM)
+        MESSAGE(m_name.c_str(), " fileID ", m_fileID);
 
       if (mode == 'r')
         {
@@ -1170,8 +1176,8 @@ void pstream_t::defVlist(int p_vlistID){
 #if defined(HAVE_LIBPTHREAD)
   if (ispipe)
     {
-      if (PSTREAM_Debug)
-        Message("%s pstreamID %d", m_name.c_str(), self);
+      if (CdoDebug::PSTREAM)
+       MESSAGE(m_name.c_str()," pstreamID ",  self);
       int vlistIDcp = vlistDuplicate(p_vlistID);
       /*    pipeDefVlist(pstreamptr, p_vlistID);*/
       pipe->pipeDefVlist(m_vlistID, vlistIDcp);
@@ -1245,9 +1251,9 @@ pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 #if defined(HAVE_LIBPTHREAD)
   if (pstreamptr->ispipe)
     {
-      if (PSTREAM_Debug)
+      if (CdoDebug::PSTREAM)
         {
-          Message("%s pstreamID %d", pstreamptr->pipe->name.c_str(), pstreamptr->self);
+          MESSAGE( pstreamptr->pipe->name.c_str()," pstreamID ", pstreamptr->self);
         }
       pstreamptr->pipe->pipeInqRecord(varID, levelID);
     }
@@ -1286,9 +1292,9 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
   if (pstreamptr->ispipe)
     {
 
-      if (PSTREAM_Debug)
+      if (CdoDebug::PSTREAM)
         {
-          Message("%s pstreamid %d", pstreamptr->m_name.c_str(), pstreamptr->self);
+          MESSAGE( pstreamptr->m_name.c_str()," pstreamid ", pstreamptr->self);
         }
       pstreamptr->pipe->pipeDefRecord(varID, levelID);
     }
@@ -1322,9 +1328,9 @@ pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
 #if defined(HAVE_LIBPTHREAD)
   if (pstreamptr->ispipe)
     {
-      if (PSTREAM_Debug)
+      if (CdoDebug::PSTREAM)
         {
-          Message("%s pstreamID %d", pstreamptr->pipe->name.c_str(), pstreamptr->self);
+          MESSAGE( pstreamptr->pipe->name.c_str()," pstreamID ", pstreamptr->self);
         }
       pstreamptr->pipe->pipeReadRecord(pstreamptr->m_vlistID, data, nmiss);
     }
@@ -1467,9 +1473,9 @@ pstreamWriteRecord(int pstreamID, double *data, size_t nmiss)
 #if defined(HAVE_LIBPTHREAD)
   if (pstreamptr->ispipe)
     {
-      if (PSTREAM_Debug)
+      if (CdoDebug::PSTREAM)
         {
-          Message("%s pstreamID %d", pstreamptr->pipe->name.c_str(), pstreamptr->self);
+          MESSAGE(pstreamptr->pipe->name.c_str()," pstreamID ", pstreamptr->self);
         }
       pstreamptr->pipe->pipeWriteRecord(data, nmiss);
     }
@@ -1511,9 +1517,9 @@ pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss)
   if (pstreamptr->ispipe)
     {
       cdoAbort("pipeWriteRecord not implemented for memtype float!");
-      if (PSTREAM_Debug)
+      if (CdoDebug::PSTREAM)
         {
-          Message("%s pstreamID %d", pstreamptr->pipe->name.c_str(), pstreamptr->self);
+          MESSAGE( pstreamptr->pipe->name.c_str()," pstreamID ", pstreamptr->self);
         }
       // pipeWriteRecord(pstreamptr, data, nmiss);
     }
@@ -1552,9 +1558,9 @@ pstreamInqTimestep(int pstreamID, int tsID)
 #if defined(HAVE_LIBPTHREAD)
   if (pstreamptr->ispipe)
     {
-      if (PSTREAM_Debug)
+      if (CdoDebug::PSTREAM)
         {
-          Message("%s pstreamID %d", pstreamptr->pipe->name.c_str(), pstreamptr->self);
+          MESSAGE(pstreamptr->pipe->name.c_str(), " pstreamID ",  pstreamptr->self);
         }
       nrecs = pstreamptr->pipe->pipeInqTimestep(tsID);
     }
@@ -1664,9 +1670,9 @@ pstream_t::defTimestep(int p_tsID)
 #if defined(HAVE_LIBPTHREAD)
   if (ispipe)
     {
-      if (PSTREAM_Debug)
+      if (CdoDebug::PSTREAM)
         {
-          Message("%s pstreamID %d", pipe->name.c_str(), self);
+          MESSAGE(pipe->name.c_str()," pstreamID ", self);
         }
       pipe->pipeDefTimestep(m_vlistID, p_tsID);
     }
@@ -1702,8 +1708,8 @@ pstream_t::defTimestep(int p_tsID)
 void
 pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 {
-  if (PSTREAM_Debug)
-    Message("pstreamIDdest = %d  pstreamIDsrc = %d", pstreamIDdest, pstreamIDsrc);
+  if (CdoDebug::PSTREAM)
+    MESSAGE("pstreamIDdest = ",pstreamIDdest,"  pstreamIDsrc = ", pstreamIDsrc);
 
   pstream_t *pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
   pstream_t *pstreamptr_src = pstream_to_pointer(pstreamIDsrc);
@@ -1725,24 +1731,26 @@ pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 void
 pstreamDebug(int debug)
 {
-  PSTREAM_Debug = debug;
+  CdoDebug::PSTREAM = debug;
 }
 
 void
 cdoInitialize(void *argument)
 {
+    argument_t* argu = (argument_t *)argument;
 #if defined(_OPENMP)
   omp_set_num_threads(ompNumThreads); /* Have to be called for every module (pthread)! */
 #endif
 
-  processCreate();
+  process_t* process = processCreate(argu->argv[0]);
+  process->setStreams(argu->argc, argu->argv);
+
 
 #if defined(HAVE_LIBPTHREAD)
-  if (PSTREAM_Debug)
-    Message("process %d  thread %ld", processSelf().m_ID, pthread_self());
+  if (CdoDebug::PSTREAM)
+    MESSAGE("process ", processSelf().m_ID," thread ", pthread_self());
 #endif
 
-  processDefArgument(argument);
 }
 
 void
@@ -1752,8 +1760,8 @@ pstreamCloseAll()
     {
       if ( pstream_iter.second.m_fileID != CDI_UNDEFID )
         {
-          if (PSTREAM_Debug)
-            Message("Close file %s id %d", pstream_iter.second.m_name.c_str(), pstream_iter.second.m_fileID);
+          if (CdoDebug::PSTREAM)
+            MESSAGE("Close file ", pstream_iter.second.m_name," id ", pstream_iter.second.m_fileID);
           streamClose(pstream_iter.second.m_fileID);
         }
     }
@@ -1772,7 +1780,7 @@ pstreamCloseAll(void)
         {
           if (!pstreamptr->ispipe && pstreamptr->m_fileID != CDI_UNDEFID)
             {
-              if (PSTREAM_Debug)
+              if (CdoDebug::PSTREAM)
                 Message("Close file %s id %d", pstreamptr->m_name.c_str(), pstreamptr->m_fileID);
               streamClose(pstreamptr->m_fileID);
             }

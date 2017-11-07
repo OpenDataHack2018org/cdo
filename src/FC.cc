@@ -42,7 +42,8 @@ void *FC(void *argument)
   int gridID1 = -1, gridID2 = -1;
   int gridID;
   size_t nmiss;
-  int nlon = 0, nlat = 0, ntr = 0;
+  size_t nlon = 0, nlat = 0;
+  int ntr = 0;
   int nsp = 0, nfc = 0;
   double *array2 = NULL;
   SPTRANS *sptrans = NULL;
@@ -218,17 +219,12 @@ void *FC(void *argument)
 	}
     }
 
-  // printf("nfc %d, ntr %d, nlat %d, nlon %d\n", nfc, ntr, nlat, nlon);
+  // printf("nfc %d, ntr %d, nlat %zu, nlon %zu\n", nfc, ntr, nlat, nlon);
 
   int nvars = vlistNvars(vlistID2);
-  int *vars  = (int*) Malloc(nvars*sizeof(int));
+  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ )
-    {
-      if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
-	vars[varID] = TRUE;
-      else
-	vars[varID] = FALSE;
-    }
+    vars[varID] = gridID1 == vlistInqVarGrid(vlistID1, varID);
 
   if ( gridID1 != -1 ) vlistChangeGrid(vlistID2, gridID1, gridID2);
 
@@ -236,12 +232,12 @@ void *FC(void *argument)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
 
   if ( gridID2 != -1 )
     {
-      gridsize = gridInqSize(gridID2);
+      size_t gridsize = gridInqSize(gridID2);
       array2 = (double*) Malloc(gridsize*sizeof(double));
     }
 

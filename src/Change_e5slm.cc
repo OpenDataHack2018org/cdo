@@ -60,7 +60,7 @@ void *Change_e5slm(void *argument)
 
   int vlistIDslm = pstreamInqVlist(streamIDslm);
 
-  long gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
+  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
 
   double *array = (double*) Malloc(gridsize*sizeof(double));
   double *cland = (double*) Malloc(gridsize*sizeof(double));
@@ -80,7 +80,7 @@ void *Change_e5slm(void *argument)
 
   pstreamClose(streamIDslm);
 
-  for ( long i = 0; i < gridsize; ++i ) lsea[i] = !(cland[i] > 0);
+  for ( size_t i = 0; i < gridsize; ++i ) lsea[i] = !(cland[i] > 0);
 
 
   int nvars = vlistNvars(vlistID1);

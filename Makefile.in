@@ -92,7 +92,9 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/config/missing \
 	$(top_srcdir)/config/tap-driver.sh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/acx_cfortran_flags.m4 \
+	$(top_srcdir)/m4/acx_check_cfortran.m4 \
+	$(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
 	$(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -246,18 +248,22 @@ ENABLE_CDI_LIB = @ENABLE_CDI_LIB@
 ENABLE_CGRIBEX = @ENABLE_CGRIBEX@
 ENABLE_DATA = @ENABLE_DATA@
 ENABLE_EXTRA = @ENABLE_EXTRA@
+ENABLE_FORTRAN = @ENABLE_FORTRAN@
 ENABLE_GRIB = @ENABLE_GRIB@
 ENABLE_GRIBAPI = @ENABLE_GRIBAPI@
 ENABLE_IEG = @ENABLE_IEG@
 ENABLE_NC2 = @ENABLE_NC2@
 ENABLE_NC4 = @ENABLE_NC4@
 ENABLE_NC4HDF5 = @ENABLE_NC4HDF5@
+ENABLE_NEARPT3 = @ENABLE_NEARPT3@
 ENABLE_NETCDF = @ENABLE_NETCDF@
 ENABLE_SERVICE = @ENABLE_SERVICE@
 ENABLE_THREADS = @ENABLE_THREADS@
 EXEEXT = @EXEEXT@
-FCFLAGS = @FCFLAGS@
+F77 = @F77@
+FFLAGS = @FFLAGS@
 FGREP = @FGREP@
+FORTRAN_WORKS = @FORTRAN_WORKS@
 GREP = @GREP@
 GRIB_API_INCLUDE = @GRIB_API_INCLUDE@
 GRIB_API_LIBS = @GRIB_API_LIBS@
@@ -333,6 +339,7 @@ ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_ct_F77 = @ac_ct_F77@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -382,7 +389,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Process this file with automake to produce Makefile.in
-SUBDIRS = libcdi src contrib test/data test
+SUBDIRS = libcdi src/lib/ncl src contrib test/data test
 #
 EXTRA_DIST = config/default OPERATORS doc/cdo.pdf doc/cdo_cmor.pdf doc/cdo_eca.pdf doc/cdo_magics.pdf doc/cdo_refcard.pdf cdo.spec README
 #

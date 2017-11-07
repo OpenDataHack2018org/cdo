@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include "error.h"
+#include "cdoDebugOutput.h"
 #include <mutex>
 #include <condition_variable>
 #include <iostream>
@@ -124,24 +125,14 @@ void print_pthread_condattr(const char *caller, pthread_condattr_t *c_attr)
 #endif
 }
 
-
-int PTHREAD_Debug = 0;
-
-
-void Pthread_debug(int debug)
-{
-  PTHREAD_Debug = debug;
-}
-
-
 int Pthread_create(const char *caller, pthread_t *th,
 		   pthread_attr_t *attr, void * (*start_routine)(void *), void *arg)
 {
   int status;
 
-  if ( PTHREAD_Debug ) Message("%s", caller);
+  if ( CdoDebug::PTHREAD ) Message("%s", caller);
 
-  if ( PTHREAD_Debug )
+  if ( CdoDebug::PTHREAD )
     {
       Message("%s attributes:", caller);
       if ( attr )
@@ -152,7 +143,7 @@ int Pthread_create(const char *caller, pthread_t *th,
 
   status = pthread_create(th, attr, start_routine, arg);
 
-  //if ( PTHREAD_Debug ) Message("-%s (thID = %ld, status = %d)", caller, (long) *th, status);
+  //if ( CdoDebug::PTHREAD ) Message("-%s (thID = %ld, status = %d)", caller, (long) *th, status);
 
   return status;
 }
@@ -163,11 +154,11 @@ int Pthread_join(const char *caller, pthread_t th, void **thread_return)
   int status;
   (void) caller;
 
-  //  if ( PTHREAD_Debug ) Message("+%s (thID = %ld)", caller, (void *) th);
+  //  if ( CdoDebug::PTHREAD ) Message("+%s (thID = %ld)", caller, (void *) th);
 
   status = pthread_join(th, thread_return);
 
-  // if ( PTHREAD_Debug ) Message("-%s (thID = %ld, status = %d)", caller, (void *) th, status);
+  // if ( CdoDebug::PTHREAD ) Message("-%s (thID = %ld, status = %d)", caller, (void *) th, status);
 
   return status;
 }
@@ -177,7 +168,7 @@ void Pthread_mutex_lock(const char *caller, pthread_mutex_t *mutex)
 {
   int status;
 
-  if ( PTHREAD_Debug ) Message("%s (mutex = %p)", caller, (void *) mutex);
+  if ( CdoDebug::PTHREAD ) Message("%s (mutex = %p)", caller, (void *) mutex);
 
   status = pthread_mutex_lock(mutex);
   if ( status != 0 )
@@ -212,7 +203,7 @@ void Pthread_mutex_unlock(const char *caller, pthread_mutex_t *mutex)
 {
   int status;
 
-  if ( PTHREAD_Debug ) Message("%s (mutex = %p)", caller, (void *) mutex);
+  if ( CdoDebug::PTHREAD ) Message("%s (mutex = %p)", caller, (void *) mutex);
 
   status = pthread_mutex_unlock(mutex);
   if ( status != 0 )
@@ -246,36 +237,36 @@ void Pthread_mutex_unlock(const char *caller, std::mutex &p_mutex)
 
 void Pthread_cond_signal(const char *caller,std::condition_variable &p_cond_var)
 {
-  if( PTHREAD_Debug)Message("+%s (cond = %p)", caller, (void *) &p_cond_var);
+  if( CdoDebug::PTHREAD)Message("+%s (cond = %p)", caller, (void *) &p_cond_var);
     p_cond_var.notify_all();
-  if ( PTHREAD_Debug ) Message("-%s (cond = %p)", caller, (void *) &p_cond_var);
+  if ( CdoDebug::PTHREAD ) Message("-%s (cond = %p)", caller, (void *) &p_cond_var);
 }
 void Pthread_cond_signal(const char *caller, pthread_cond_t *cond)
 {
-  if ( PTHREAD_Debug ) Message("+%s (cond = %p)", caller, (void *) cond);
+  if ( CdoDebug::PTHREAD ) Message("+%s (cond = %p)", caller, (void *) cond);
 
   pthread_cond_signal(cond);
 
-  if ( PTHREAD_Debug ) Message("-%s (cond = %p)", caller, (void *) cond);
+  if ( CdoDebug::PTHREAD ) Message("-%s (cond = %p)", caller, (void *) cond);
 }
 
 void Pthread_cond_wait(const char *caller, std::condition_variable &p_cond, std::unique_lock<std::mutex> &p_locked_mutex)
 {
-  if ( PTHREAD_Debug ) std::cout << caller << "waiting for condition "<< &p_cond << std::endl;
+  if ( CdoDebug::PTHREAD ) std::cout << caller << "waiting for condition "<< &p_cond << std::endl;
     p_cond.wait(p_locked_mutex);
 
-  if ( PTHREAD_Debug ) std::cout << caller << "finished waiting " << &p_cond << std::endl;
+  if ( CdoDebug::PTHREAD ) std::cout << caller << "finished waiting " << &p_cond << std::endl;
 }
 
 
 void Pthread_cond_wait(const char *caller, pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
-  if ( PTHREAD_Debug ) Message("+%s (cond = %p, mutex =  %p)",
+  if ( CdoDebug::PTHREAD ) Message("+%s (cond = %p, mutex =  %p)",
 			       caller, (void *) cond, (void *) mutex);
 
   pthread_cond_wait(cond, mutex);
 
-   if ( PTHREAD_Debug ) Message("-%s (cond = %p, mutex = %p)",
+   if ( CdoDebug::PTHREAD ) Message("-%s (cond = %p, mutex = %p)",
 			       caller, (void *) cond, (void *) mutex);
 }
 

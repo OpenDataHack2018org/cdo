@@ -30,17 +30,17 @@
 #include "grid.h"
 
 
-int genThinoutGrid(int gridID1, int xinc, int yinc)
+int genThinoutGrid(int gridID1, size_t xinc, size_t yinc)
 {
   int gridtype = gridInqType(gridID1);
-  int nlon1 = gridInqXsize(gridID1);
-  int nlat1 = gridInqYsize(gridID1);
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
 
-  int nlon2 = nlon1/xinc;
-  int nlat2 = nlat1/yinc;
+  size_t nlon2 = nlon1/xinc;
+  size_t nlat2 = nlat1/yinc;
   if ( nlon1%xinc ) nlon2++;
   if ( nlat1%yinc ) nlat2++;
-  int gridsize2 = nlon2*nlat2;
+  size_t gridsize2 = nlon2*nlat2;
 
   int gridID2 = gridCreate(GRID_LONLAT, gridsize2);
   gridDefXsize(gridID2, nlon2);
@@ -55,15 +55,15 @@ int genThinoutGrid(int gridID1, int xinc, int yinc)
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
 
-      int olat = 0;
-      for ( int ilat = 0; ilat < nlat1; ilat+=yinc )
+      size_t olat = 0;
+      for ( size_t ilat = 0; ilat < nlat1; ilat+=yinc )
 	{
 	  yvals2[olat] = yvals1[ilat];
 	  olat++;
 	}
 
-      int olon = 0;
-      for ( int ilon = 0; ilon < nlon1; ilon+=xinc )
+      size_t olon = 0;
+      for ( size_t ilon = 0; ilon < nlon1; ilon+=xinc )
 	{
 	  xvals2[olon] = xvals1[ilon];
 	  olon++;
@@ -88,17 +88,17 @@ int genThinoutGrid(int gridID1, int xinc, int yinc)
 
 int genBoxavgGrid(int gridID1, int xinc, int yinc)
 {
-  int i, j, i1;
+  size_t i, j, i1;
 
   int gridtype = gridInqType(gridID1);
-  int nlon1 = gridInqXsize(gridID1);
-  int nlat1 = gridInqYsize(gridID1);
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
 
-  int nlon2 = nlon1/xinc;
-  int nlat2 = nlat1/yinc;
+  size_t nlon2 = nlon1/xinc;
+  size_t nlat2 = nlat1/yinc;
   if ( nlon1%xinc ) nlon2++;
   if ( nlat1%yinc ) nlat2++;
-  int gridsize2 = nlon2*nlat2;
+  size_t gridsize2 = nlon2*nlat2;
 
   int gridID2 = gridCreate(GRID_LONLAT, gridsize2);
   gridDefXsize(gridID2, nlon2);
@@ -179,7 +179,7 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
 }
 
 static
-void boxavg(field_type *field1, field_type *field2, int xinc, int yinc)
+void boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
 {
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
@@ -187,35 +187,35 @@ void boxavg(field_type *field1, field_type *field2, int xinc, int yinc)
   double *array2  = field2->ptr;
   double missval = field1->missval;
 
-  int nlon1 = gridInqXsize(gridID1);
-  int nlat1 = gridInqYsize(gridID1);
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
 
-  int nlon2 = gridInqXsize(gridID2);
-  int nlat2 = gridInqYsize(gridID2);
+  size_t nlon2 = gridInqXsize(gridID2);
+  size_t nlat2 = gridInqYsize(gridID2);
 
   double **xfield1 = (double **) Malloc(nlat1*sizeof(double *));
 
-  for ( int ilat = 0; ilat < nlat1; ilat++ )
+  for ( size_t ilat = 0; ilat < nlat1; ilat++ )
     xfield1[ilat] = array1 + ilat*nlon1;
 
   double **xfield2 = (double **) Malloc(nlat2 * sizeof(double *));
 
-  for ( int ilat = 0; ilat < nlat2; ilat++ )
+  for ( size_t ilat = 0; ilat < nlat2; ilat++ )
     xfield2[ilat] = array2 + ilat*nlon2;
 
-  for ( int ilat = 0; ilat < nlat2; ilat++ )
-    for ( int ilon = 0; ilon < nlon2; ilon++ )
+  for ( size_t ilat = 0; ilat < nlat2; ilat++ )
+    for ( size_t ilon = 0; ilon < nlon2; ilon++ )
       {
 	xfield2[ilat][ilon] = 0;
 
-	int in = 0;
-	for ( int j = 0; j < yinc; ++j )
+	size_t in = 0;
+	for ( size_t j = 0; j < yinc; ++j )
 	  {
-	    int jj = ilat*yinc+j;
+	    size_t jj = ilat*yinc+j;
 	    if ( jj >= nlat1 ) break;
-	    for ( int i = 0; i < xinc; ++i )
+	    for ( size_t i = 0; i < xinc; ++i )
 	      {
-		int ii = ilon*xinc+i;
+		size_t ii = ilon*xinc+i;
 		if ( ii >= nlon1 ) break;
 		in++;
 		xfield2[ilat][ilon] += xfield1[jj][ii];
@@ -225,7 +225,7 @@ void boxavg(field_type *field1, field_type *field2, int xinc, int yinc)
       }
 
   size_t nmiss = 0;
-  for ( int i = 0; i < nlat2*nlon2; i++ )
+  for ( size_t i = 0; i < nlat2*nlon2; i++ )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
   field2->nmiss = nmiss;
@@ -243,27 +243,27 @@ void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
   double *array2  = field2->ptr;
   double missval = field1->missval;
 
-  int nlon1 = gridInqXsize(gridID1);
-  int nlat1 = gridInqYsize(gridID1);
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
 
-  int nlon2 = gridInqXsize(gridID2);
-  int nlat2 = gridInqYsize(gridID2);
+  size_t nlon2 = gridInqXsize(gridID2);
+  size_t nlat2 = gridInqYsize(gridID2);
 
   double **xfield1 = (double **) Malloc(nlat1*sizeof(double *));
 
-  for ( int ilat = 0; ilat < nlat1; ilat++ )
+  for ( size_t ilat = 0; ilat < nlat1; ilat++ )
     xfield1[ilat] = array1 + ilat*nlon1;
 
   double **xfield2 = (double **) Malloc(nlat2*sizeof(double *));
 
-  for ( int ilat = 0; ilat < nlat2; ilat++ )
+  for ( size_t ilat = 0; ilat < nlat2; ilat++ )
     xfield2[ilat] = array2 + ilat*nlon2;
 
-  int olat = 0;
-  for ( int ilat = 0; ilat < nlat1; ilat+=yinc )
+  size_t olat = 0;
+  for ( size_t ilat = 0; ilat < nlat1; ilat+=yinc )
     {
-      int olon = 0;
-      for ( int ilon = 0; ilon < nlon1; ilon+=xinc )
+      size_t olon = 0;
+      for ( size_t ilon = 0; ilon < nlon1; ilon+=xinc )
 	{
 	  xfield2[olat][olon] = xfield1[ilat][ilon];
 	  olon++;
@@ -272,7 +272,7 @@ void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
     }
 
   size_t nmiss = 0;
-  for ( int i = 0; i < nlat2*nlon2; i++ )
+  for ( size_t i = 0; i < nlat2*nlon2; i++ )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
   
   field2->nmiss = nmiss;
@@ -304,9 +304,6 @@ void *Intgrid(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  // open stream before calling cdoDefineGrid!!!
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-
   if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )
     {
       operatorInputArg("grid description file or name");
@@ -331,6 +328,8 @@ void *Intgrid(void *argument)
       xinc = parameter2int(operatorArgv()[0]);
       yinc = parameter2int(operatorArgv()[1]);
     }
+
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
@@ -375,7 +374,7 @@ void *Intgrid(void *argument)
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   gridsize = gridInqSize(gridID2);

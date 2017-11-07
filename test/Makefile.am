@@ -13,6 +13,7 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 # tests which should pass
 TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test \
         Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
+        MapReduce.test Ninfo.test Gradsdes.test  \
         Detrend.test Genweights.test Remap.test Remap2.test Remapeta.test Select.test Spectral.test \
         Ensstat.test Enspctl.test Gridboxstat.test \
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
@@ -20,7 +21,7 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Runstat.test Multiyearstat.test Ydrunstat.test \
         Mergetime.test EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
-        Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
+        Collgrid.test
 
 # tests which should fail
 XFAIL_TESTS = 
@@ -43,6 +44,6 @@ PYTHONPATH = $(top_srcdir)/contrib/python:$(top_srcdir)/test
 
 #.PHONY: $(TESTS)
 
-CLEANFILES += `ls *.pyc`
+CLEANFILES += `ls *.pyc *.debug cerr* cout* ifile* ofile*`
 
 #AUTOMAKE_OPTIONS = color-tests

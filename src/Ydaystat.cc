@@ -38,6 +38,36 @@
 
 #define  MAX_DOY       373
 
+int yearMode = 0;
+
+static
+void set_parameter(void)
+{
+  int pargc = operatorArgc();
+  if ( pargc )
+    { 
+      char **pargv = operatorArgv();
+
+      list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "PARAMETER");
+      if ( kvlist_parse_cmdline(kvlist, pargc, pargv) != 0 ) cdoAbort("Parse error!");
+      if ( cdoVerbose ) kvlist_print(kvlist);
+
+      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
+        {
+          keyValues_t *kv = *(keyValues_t **)kvnode->data;
+          const char *key = kv->key;
+          if ( kv->nvalues > 1 ) cdoAbort("Too many values for parameter key >%s<!", key);
+          if ( kv->nvalues < 1 ) cdoAbort("Missing value for parameter key >%s<!", key);
+          const char *value = kv->values[0];
+          
+          if ( STR_IS_EQ(key, "yearMode") ) yearMode = parameter2int(value);
+          else cdoAbort("Invalid parameter key >%s<!", key);
+        }          
+          
+      list_destroy(kvlist);
+    }
+}
+
 
 void *Ydaystat(void *argument)
 {
@@ -50,6 +80,8 @@ void *Ydaystat(void *argument)
   field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
   cdoInitialize(argument);
+
+  set_parameter();
 
   // clang-format off
   cdoOperatorAdd("ydayrange", func_range, 0, NULL);
@@ -225,20 +257,23 @@ void *Ydaystat(void *argument)
     }
 
   // set the year to the minimum of years found on output timestep
-  int outyear = 1e9;
-  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-    if ( dayoy_nsets[dayoy] )
-      {
-        cdiDecodeDate(vdates[dayoy], &year, &month, &day);
-        if ( year < outyear ) outyear = year;
-      }
-  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-    if ( dayoy_nsets[dayoy] )
-      {
-        cdiDecodeDate(vdates[dayoy], &year, &month, &day);
-        if ( year > outyear ) vdates[dayoy] = cdiEncodeDate(outyear, month, day);
-        //  printf("vdates[%d] = %d  nsets = %d\n", dayoy, vdates[dayoy], nsets[dayoy]);
-      }
+  if ( yearMode )
+    {
+      int outyear = 1e9;
+      for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
+        if ( dayoy_nsets[dayoy] )
+          {
+            cdiDecodeDate(vdates[dayoy], &year, &month, &day);
+            if ( year < outyear ) outyear = year;
+          }
+      for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
+        if ( dayoy_nsets[dayoy] )
+          {
+            cdiDecodeDate(vdates[dayoy], &year, &month, &day);
+            if ( year > outyear ) vdates[dayoy] = cdiEncodeDate(outyear, month, day);
+            //  printf("vdates[%d] = %d  nsets = %d\n", dayoy, vdates[dayoy], nsets[dayoy]);
+          }
+    }
 
   for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     if ( dayoy_nsets[dayoy] )

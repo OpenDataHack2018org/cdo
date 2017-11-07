@@ -17,18 +17,20 @@ for OPERATOR in reducegrid; do
 
     if [ "@ENABLE_NETCDF@" = yes ] ; then
 
-      $CDO -f nc -temp,$REFGRID data_${grid}.nc
-      $CDO -f nc -gtc,273.15 -temp,$REFGRID mask_${grid}.nc
+      $CDO $DEBUG_OUT -f nc -temp,$REFGRID data_${grid}.nc
+      $CDO $DEBUG_OUT -f nc -gtc,273.15 -temp,$REFGRID mask_${grid}.nc
 
       echo "Running test: $NTEST"
-      CDOCOMMAND="$CDO -f nc reducegrid,mask_${grid}.nc data_${grid}.nc reduced_${grid}.nc"
+      rm -f MapReduce_${OPERATOR}_${grid}.debug
+      DEBUG_OUT="--seperateDebugFromLog MapReduce_${OPERATOR}_${grid}.debug"
+      CDOCOMMAND="$CDO $DEBUG_OUT -f nc reducegrid,mask_${grid}.nc data_${grid}.nc reduced_${grid}.nc"
       echo "$CDOCOMMAND"
 
       $CDOCOMMAND
       test $? -eq 0 || let RSTAT+=1
 
-#      $CDO griddes reduced_${grid}.nc > griddes.${grid}
-      $CDO griddes reduced_${grid}.nc | sed -e s-\"--g | grep -v scanningMode > griddes.${grid}
+#      $CDO $DEBUG_OUT griddes reduced_${grid}.nc > griddes.${grid}
+      $CDO $DEBUG_OUT griddes reduced_${grid}.nc | sed -e s-\"--g | grep -v scanningMode > griddes.${grid}
       diff griddes.${grid} $REF
       test $? -eq 0 || let RSTAT+=1
 

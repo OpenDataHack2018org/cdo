@@ -691,7 +691,7 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, size
   int lmiss = nmiss > 0;
   int lperio = 1;
 
-  int ny = gridInqYsize(gridID1);
+  size_t ny = gridInqYsize(gridID1);
   int np = gridInqNP(gridID1);
 
   int *rowlon = (int*) Malloc(ny*sizeof(int));
@@ -703,7 +703,7 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, size
   double xlast  = xfirstandlast[1];
 
   int iret;
-  int nx = 0;
+  size_t nx = 0;
   if ( fabs(xfirst) > 0 || (np > 0 && fabs(xlast - (360.0-90.0/np)) > 90.0/np) )
     {
       nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon, ny, missval, &iret, lmiss, lperio, lnearest);
@@ -1531,7 +1531,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
   int *grid_mask = NULL;
 
   int gridtype = gridInqType(gridID);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   
   if ( gridtype == GRID_GME )
     {
@@ -1542,7 +1542,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 
   double total_area = 0;
   int nvals = 0;
-  for ( int i = 0; i < gridsize; i++ )
+  for ( size_t i = 0; i < gridsize; i++ )
     {
       if ( grid_mask )
 	if ( grid_mask[i] == 0 ) continue;
@@ -1552,7 +1552,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 
   if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
 
-  for ( int i = 0; i < gridsize; i++ )
+  for ( size_t i = 0; i < gridsize; i++ )
     {
       if ( grid_mask )
 	if ( grid_mask[i] == 0 )
@@ -1653,7 +1653,7 @@ int gridWeights(int gridID, double *grid_wgts)
   int w_status = 1;
   int a_status = 0;
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int gridtype = gridInqType(gridID);
   int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1; 
   
@@ -1690,7 +1690,7 @@ int gridWeights(int gridID, double *grid_wgts)
     }
   else
     {
-      for ( int i = 0; i < gridsize; ++i ) grid_wgts[i] = 1./gridsize;
+      for ( size_t i = 0; i < gridsize; ++i ) grid_wgts[i] = 1./gridsize;
     }
   /*
   for ( i = 0; i < gridsize; ++i ) 

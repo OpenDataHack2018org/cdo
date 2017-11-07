@@ -6,20 +6,13 @@ int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double 
 			 const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
-  size_t n, srch_add;
-  size_t i;
-  size_t ii, jj;
-  size_t jjskip;
-  double coslat, sinlat;
-  double dist_min, distance; /* For computing dist-weighted avg */
-  double *sincoslon;
   double coslat_dst = cos(plat);
   double sinlat_dst = sin(plat);
   double coslon_dst = cos(plon);
   double sinlon_dst = sin(plon);
 
-  dist_min = BIGNUM;
-  for ( n = 0; n < 4; ++n ) nbr_dist[n] = BIGNUM;  
+  double dist_min = BIGNUM;
+  for ( unsigned n = 0; n < 4; ++n ) nbr_dist[n] = BIGNUM;  
 
   size_t jjf = 0, jjl = ny-1;
   if ( plon >= src_center_lon[0] && plon <= src_center_lon[nx-1] )
@@ -40,33 +33,31 @@ int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double 
 	}
     }
 
-  sincoslon = (double*) Malloc(nx*sizeof(double));
+  double *sincoslon = (double*) Malloc(nx*sizeof(double));
 
-  for ( ii = 0; ii < nx; ++ii )
+  for ( size_t ii = 0; ii < nx; ++ii )
     sincoslon[ii] = coslon_dst*cos(src_center_lon[ii]) + sinlon_dst*sin(src_center_lon[ii]);
 
-  for ( jj = jjf; jj <= jjl; ++jj )
+  for ( size_t jj = jjf; jj <= jjl; ++jj )
     {
-      coslat = coslat_dst*cos(src_center_lat[jj]);
-      sinlat = sinlat_dst*sin(src_center_lat[jj]);
+      double coslat = coslat_dst*cos(src_center_lat[jj]);
+      double sinlat = sinlat_dst*sin(src_center_lat[jj]);
 
-      jjskip = jj > 1 && jj < (ny-2);
+      size_t jjskip = jj > 1 && jj < (ny-2);
 
-      for ( ii = 0; ii < nx; ++ii )
+      for ( size_t ii = 0; ii < nx; ++ii )
 	{
 	  if ( jjskip && ii > 1 && ii < (nx-2) ) continue;
 
-	  srch_add = jj*nx + ii;
-
-	  distance = acos(coslat*sincoslon[ii] + sinlat);
-
+	  double distance = acos(coslat*sincoslon[ii] + sinlat);
 	  if ( distance < dist_min )
 	    {
-	      for ( n = 0; n < 4; ++n )
+              size_t srch_add = jj*nx + ii;
+	      for ( unsigned n = 0; n < 4; ++n )
 		{
 		  if ( distance < nbr_dist[n] )
 		    {
-		      for ( i = 3; i > n; --i )
+		      for ( unsigned i = 3; i > n; --i )
 			{
 			  nbr_add [i] = nbr_add [i-1];
 			  nbr_dist[i] = nbr_dist[i-1];
@@ -84,17 +75,17 @@ int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double 
 
   Free(sincoslon);
 
-  for ( n = 0; n < 4; ++n ) nbr_dist[n] = ONE/(nbr_dist[n] + TINY);
-  distance = 0.0;
-  for ( n = 0; n < 4; ++n ) distance += nbr_dist[n];
-  for ( n = 0; n < 4; ++n ) nbr_dist[n] /= distance;
+  for ( unsigned n = 0; n < 4; ++n ) nbr_dist[n] = ONE/(nbr_dist[n] + TINY);
+  double distance = 0.0;
+  for ( unsigned n = 0; n < 4; ++n ) distance += nbr_dist[n];
+  for ( unsigned n = 0; n < 4; ++n ) nbr_dist[n] /= distance;
 
-  return (search_result);
+  return search_result;
 }
 
 
 int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
-		      double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
+		      double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
 		      const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   /*
@@ -114,12 +105,9 @@ int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *r
     double src_center_lat[]        ! latitude  of each src grid center 
     double src_center_lon[]        ! longitude of each src grid center
   */
-  /*  Local variables */
   int search_result = 0;
-  long n;
-  size_t ii, iix, jj;
 
-  for ( n = 0; n < 4; ++n ) src_add[n] = 0;
+  for ( unsigned n = 0; n < 4; ++n ) src_add[n] = 0;
 
   size_t nx = src_grid_dims[0];
   size_t ny = src_grid_dims[1];
@@ -130,11 +118,12 @@ int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *r
   if ( /*plon < 0   &&*/ plon < src_center_lon[0]     ) plon += PI2;
   if ( /*plon > PI2 &&*/ plon > src_center_lon[nxm-1] ) plon -= PI2;
 
+  size_t ii, jj;
   int lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon, src_center_lat);
 
   if ( lfound )
     {
-      iix = ii;
+      size_t iix = ii;
       if ( src_grid->is_cyclic && iix == (nxm-1) ) iix = 0;
       src_add[0] = (jj-1)*nx+(ii-1);
       src_add[1] = (jj-1)*nx+(iix);
@@ -175,5 +164,5 @@ int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *r
   */
   search_result = grid_search_reg2d_nn(nx, ny, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
 
-  return (search_result);
+  return search_result;
 }  /* grid_search_reg2d */

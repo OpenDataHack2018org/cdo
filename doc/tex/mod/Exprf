@@ -55,6 +55,8 @@ Absolute value of x
 Round to largest integral value not greater than x
 @Item = ceil(x)
 Round to smallest integral value not less than x
+@Item = float(x)
+32-bit float value of x
 @Item = int(x)
 Integer value of x
 @Item = nint(x)

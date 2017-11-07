@@ -43,8 +43,12 @@
 
 #define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
+#define  ITSME  (strcmp(CDO_username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
+
 #include <string>
-extern char *Progname;
+extern const char *CDO_progname;
+extern const char *CDO_version;
+extern const char *CDO_username;
 extern char *cdoGridSearchDir;
 extern int CDO_Reduce_Dim;
 extern int CDO_Memtype;
@@ -60,7 +64,7 @@ extern int CDO_opterr;
 extern int CDO_flt_digits;
 extern int CDO_dbl_digits;
 
-extern int remap_genweights;
+extern bool REMAP_genweights;
 
 extern const char *cdoExpName;
 extern int ompNumThreads;
@@ -86,11 +90,9 @@ extern int cdoRegulargrid;
 extern int cdoBenchmark;
 extern int cdoTimer;
 extern int cdoVerbose;
-extern int cdoDebug;
 extern int cdoCompress;
 extern int cdoInteractive;
 extern int cdoParIO;
-extern int cdoDebugExt;
 
 extern int cdoCompType;
 extern int cdoCompLevel;
@@ -109,15 +111,12 @@ extern int cdoNumVarnames;
 extern char **cdoVarnames;
 extern char CDO_File_Suffix[32]; // refactor: added keyword extern
 
-extern const char *CDO_Version;
 
 
-
-
-char *getProgname(char *string);
+const char *getProgname(char *string);
 char *GetOperator(const char *argument);
-const char *getOperatorName(const char *xoperator);
-char *getOperatorArg(const char *xoperator);
+const char *getOperatorName(const char *operatorCommand);
+char *getOperatorArg(const char *operatorCommand);
 const char *cdoComment(void);
 
 char *getFileArg(char *argument);
@@ -194,7 +193,7 @@ int     cdoDefineZaxis(const char *zaxisfile);
 
 int     vlistInqNWPV(int vlistID, int varID);
 int     vlistIsSzipped(int vlistID);
-int     vlist_check_gridsize(int vlistID);
+size_t  vlist_check_gridsize(int vlistID);
 int     vlist_get_psvarid(int vlistID, int zaxisID);
 double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlevf, int *rnhlevh);
 void vlist_change_hybrid_zaxis(int vlistID1, int vlistID2, int zaxisID1, int zaxisID2);

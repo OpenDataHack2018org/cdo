@@ -15,22 +15,23 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 
-#if defined(HAVE_FNMATCH_H)
+#ifdef  HAVE_FNMATCH_H
 #include <fnmatch.h>
 #endif
 
 
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>   /* tolower */
+#include <ctype.h>    /* tolower  */
+#include <inttypes.h> /* intmax_t */
 
 #include "cdi.h"
 #include "cdo.h"
@@ -39,22 +40,17 @@
 #include "util.h"
 
 
-#if ! defined(VERSION)
+#ifndef  VERSION
 #define  VERSION  "0.0.1"
 #endif
  
 
-/* refactor: moved here from *.c */
+int CDO_opterr = 0; 
+const char *CDO_optarg = NULL;
+int CDO_optind = 1;
 
-int CDO_opterr = 0;      // refactor: moved here from cdo_getopt.cc
-const char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.cc
-int CDO_optind = 1;      // refactor: moved here from cdo_getopt.cc
-
-
-/* refactor: moved here from cdo.cc */
-
-char *Progname;
-const char *CDO_Version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
+const char *CDO_progname = NULL;
+const char *CDO_version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
 
 int ompNumThreads = 1;
 
@@ -68,7 +64,7 @@ int cdoDefaultFileType   = CDI_UNDEFID;
 int cdoDefaultDataType   = CDI_UNDEFID;
 int cdoDefaultByteorder  = CDI_UNDEFID;
 int cdoDefaultTableID    = CDI_UNDEFID;
-int cdoDefaultInstID     = CDI_UNDEFID;     // moved here from institution.cc, was UNDEFID
+int cdoDefaultInstID     = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;
 
 int cdoLockIO            = FALSE;
@@ -105,14 +101,13 @@ int cdoCompress          = FALSE;
 int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
-int cdoDebugExt          = 0;     //  Debug level for the KNMI extensions
 int cdoNumVarnames       = 0;
 char **cdoVarnames       = NULL;
 
 char CDO_File_Suffix[32];
 
 int cdoExpMode           = -1;
-const char *cdoExpName         = NULL;
+const char *cdoExpName   = NULL;
 
 int timer_read, timer_write;
 
@@ -125,8 +120,8 @@ const char *cdoComment(void)
     {
       init = true;
 
-      int size = strlen(CDO_Version);
-      strncat(comment, CDO_Version, size);
+      int size = strlen(CDO_version);
+      strncat(comment, CDO_version, size);
       comment[size] = 0;
     }
 
@@ -184,7 +179,7 @@ void cdo_omp_set_num_threads(int nthreads)
 }
 
 
-char *getProgname(char *string)
+const char *getProgname(char *string)
 {
 #if defined(_WIN32)
   /*  progname = strrchr(string, '\\'); */
@@ -193,8 +188,10 @@ char *getProgname(char *string)
   char *progname = strrchr(string, '/');
 #endif
 
-  if ( progname == NULL ) progname = string;
-  else                    progname++;
+  if ( progname == NULL )
+    progname = string;
+  else
+    progname++;
 
   return progname;
 }
@@ -216,53 +213,50 @@ char *getOperator(const char *argument)
 }
 
 
-const char *getOperatorName(const char *operatorArg)
+const char *getOperatorName(const char *operatorCommand)
 {
   char *operatorName = NULL;
 
-  if ( operatorArg )
+  if ( operatorCommand )
     {
-      if ( operatorArg[0] == '-' )
-      {
-          operatorArg++;
-      }
-      char *commapos = (char *)strchr(operatorArg, ',');
-      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorArg) : strlen(operatorArg);
+      if ( operatorCommand[0] == '-' ) operatorCommand++;
+      char *commapos = (char *)strchr(operatorCommand, ',');
+      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand) : strlen(operatorCommand);
 
       operatorName = (char*) Malloc(len+1);
 
-      memcpy(operatorName, operatorArg, len);
+      memcpy(operatorName, operatorCommand, len);
       operatorName[len] = '\0';
     }
 
   /*  return operatorName; */
   if(is_alias(operatorName))
-  {
-    operatorName = get_original(operatorName);
-  }
-    return operatorName;
+    {
+      operatorName = get_original(operatorName);
+    }
+
+  return operatorName;
 }
 
-char *getOperatorArg(const char *xoperator)
+char *getOperatorArg(const char *p_operatorCommand)
 {
-  char *operatorArg = NULL;
+  char *operatorCommand = NULL;
 
-  if ( xoperator )
+  if ( p_operatorCommand )
     {
-      char *commapos = (char *)strchr(xoperator, ',');
-
+      char *commapos = (char *)strchr(p_operatorCommand, ',');
       if ( commapos )
         {
           size_t len = strlen(commapos+1);
           if ( len )
             {
-              operatorArg = (char*) Malloc(len+1);
-              strcpy(operatorArg, commapos+1);
+              operatorCommand = (char*) Malloc(len+1);
+              strcpy(operatorCommand, commapos+1);
             }
         }
     }
 
-  return operatorArg;
+  return operatorCommand;
 }
 
 char *getFileArg(char *argument)
@@ -272,7 +266,6 @@ char *getFileArg(char *argument)
   if ( argument )
     {
       char *blankpos = strchr(argument, ' ');
-
       if ( blankpos )
         {
           char *parg = blankpos + 1;
@@ -327,13 +320,11 @@ void input_int(char *arg, int intarr[], int maxint, int *nintfound)
 
 std::string string2lower(std::string str)
 {
-    std::string lower_case_string = str;
-    for(char c : str)
-    {
-       c = tolower(c); 
-    }
-    return lower_case_string;
+  std::string lower_case_string = str;
+  for(char c : str) c = tolower(c); 
+  return lower_case_string;
 }
+
 void strtolower(char *str)
 {
   if ( str )
@@ -400,6 +391,18 @@ int parameter2int(const char *string)
 {
   char *endptr = NULL;
   int ival = (int) strtol(string, &endptr, 10);
+  if ( *endptr != 0 )
+    cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
+	     string, (int)(endptr-string+1));
+
+  return ival;
+}
+
+
+size_t parameter2sizet(const char *string)
+{
+  char *endptr = NULL;
+  size_t ival = (size_t) strtoimax(string, &endptr, 10);
   if ( *endptr != 0 )
     cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));
@@ -489,9 +492,7 @@ int month_to_season(int month)
   return seas;
 }
 
-//#include <sys/types.h>
 #include <sys/stat.h>
-//#include <unistd.h>
 
 bool fileExists(const char *restrict filename)
 {

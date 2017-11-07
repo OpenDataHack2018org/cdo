@@ -54,7 +54,9 @@ for OPERATOR in write copy; do
         RFILE=$DATAPATH/file_F32_srv_ref
 
 	if [ $OPERATOR = write ] ; then
-          CDOCOMMAND="$CDO -f $FORMAT -b $DATATYPE cdi${OPERATOR},1,global_10,3,3,3 $FILE"
+          rm -f File_${OPERATOR}_${FORMAT}.debug
+          DEBUG_OUT="--seperateDebugFromLog File_${OPERATOR}_${FORMAT}.debug"
+          CDOCOMMAND="$CDO $DEBUG_OUT -f $FORMAT -b $DATATYPE cdi${OPERATOR},1,global_10,3,3,3 $FILE"
           echo "$CDOCOMMAND"
 
           $CDOCOMMAND  > $CDOOUT 2> $CDOERR
@@ -62,20 +64,22 @@ for OPERATOR in write copy; do
           test -s $FILE || let RSTAT+=1
           cat $CDOOUT $CDOERR
 
-          $CDO diff,0.0001 $FILE $RFILE > $CDOOUT 2> $CDOERR
+          $CDO $DEBUG_OUT diff,0.0001 $FILE $RFILE > $CDOOUT 2> $CDOERR
           test $? -eq 0 || let RSTAT+=1
           test -s $CDOOUT && let RSTAT+=1
           cat $CDOOUT $CDOERR
         else
           OFILE=file_${DATATYPE}_${FORMAT}_res
-          CDOCOMMAND="$CDO ${OPERATOR} $FILE $OFILE"
+          rm -f File_${OPERATOR}_${FORMAT}.debug
+          DEBUG_OUT="--seperateDebugFromLog File_${OPERATOR}_${FORMAT}.debug"
+          CDOCOMMAND="$CDO $DEBUG_OUT ${OPERATOR} $FILE $OFILE"
           echo "$CDOCOMMAND"
 
           $CDOCOMMAND  > $CDOOUT 2> $CDOERR
           test $? -eq 0 || let RSTAT+=1
           cat $CDOOUT $CDOERR
 
-          $CDO diff,0.0001 $FILE $OFILE > $CDOOUT 2> $CDOERR
+          $CDO $DEBUG_OUT diff,0.0001 $FILE $OFILE > $CDOOUT 2> $CDOERR
           test $? -eq 0 || let RSTAT+=1
           test -s $CDOOUT && let RSTAT+=1
           cat $CDOOUT $CDOERR

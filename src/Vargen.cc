@@ -88,10 +88,10 @@ double std_atm_pressure(double height)
 }
 
 static
-void conv_generic_grid(int gridID, int gridsize, double *xvals2D, double *yvals2D)
+void conv_generic_grid(int gridID, size_t gridsize, double *xvals2D, double *yvals2D)
 {
-  int xsize = gridInqXsize(gridID);
-  int ysize = gridInqYsize(gridID);
+  size_t xsize = gridInqXsize(gridID);
+  size_t ysize = gridInqYsize(gridID);
 
   assert(gridsize==xsize*ysize);
 
@@ -103,7 +103,7 @@ void conv_generic_grid(int gridID, int gridsize, double *xvals2D, double *yvals2
 
   double xmin = xcoord[0];
   double xmax = xcoord[0];
-  for ( int i = 1; i < xsize; ++i )
+  for ( size_t i = 1; i < xsize; ++i )
     {
       if ( xcoord[i] < xmin ) xmin = xcoord[i];
       if ( xcoord[i] > xmax ) xmax = xcoord[i];
@@ -111,7 +111,7 @@ void conv_generic_grid(int gridID, int gridsize, double *xvals2D, double *yvals2
 
   double ymin = ycoord[0];
   double ymax = ycoord[0];
-  for ( int i = 1; i < ysize; ++i )
+  for ( size_t i = 1; i < ysize; ++i )
     {
       if ( ycoord[i] < ymin ) ymin = ycoord[i];
       if ( ycoord[i] > ymax ) ymax = ycoord[i];
@@ -120,8 +120,8 @@ void conv_generic_grid(int gridID, int gridsize, double *xvals2D, double *yvals2
   double xrange = xmax - xmin;
   double yrange = ymax - ymin;
   
-  for ( int j = 0; j < ysize; ++j )
-    for ( int i = 0; i < xsize; ++i )
+  for ( size_t j = 0; j < ysize; ++j )
+    for ( size_t i = 0; i < xsize; ++i )
       {
         xvals2D[j*xsize+i] = xcoord[i]*M_PI/xrange; 
         yvals2D[j*xsize+i] = ycoord[j]*M_PI/yrange; 
@@ -132,13 +132,13 @@ void conv_generic_grid(int gridID, int gridsize, double *xvals2D, double *yvals2
 }
 
 static
-void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
+void remap_nn_reg2d_reg2d(size_t nx, size_t ny, const double *restrict data, int gridID, double *restrict array)
 {
   if ( gridInqType(gridID) != GRID_LONLAT )
     cdoAbort("Internal error, wrong grid type!");
 
-  int nxvals = gridInqXsize(gridID);
-  int nyvals = gridInqYsize(gridID);
+  size_t nxvals = gridInqXsize(gridID);
+  size_t nyvals = gridInqYsize(gridID);
   double *xvals = (double*) Malloc(nxvals*sizeof(double));
   double *yvals = (double*) Malloc(nyvals*sizeof(double));
 
@@ -152,12 +152,12 @@ void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridI
   gridInqYunits(gridID, units);
   grid_to_degree(units, nyvals, yvals, "grid center lat");
 
-  int ii, jj;
+  size_t ii, jj;
   double xval, yval;
-  for ( int j = 0; j < nyvals; j++ )
+  for ( size_t j = 0; j < nyvals; j++ )
     {
       yval = yvals[j];
-      for ( int i = 0; i < nxvals; i++ )
+      for ( size_t i = 0; i < nxvals; i++ )
         {
           xval = xvals[i];
           if ( xval >=  180 ) xval -= 360;
@@ -175,10 +175,10 @@ void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridI
 }
 
 static
-void remap_nn_reg2d_nonreg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
+void remap_nn_reg2d_nonreg2d(size_t nx, size_t ny, const double *restrict data, int gridID, double *restrict array)
 {
   int gridID2 = gridID;
-  int gridsize = gridInqSize(gridID2);
+  size_t gridsize = gridInqSize(gridID2);
   double *xvals = (double*) Malloc(gridsize*sizeof(double));
   double *yvals = (double*) Malloc(gridsize*sizeof(double));
 
@@ -197,9 +197,9 @@ void remap_nn_reg2d_nonreg2d(int nx, int ny, const double *restrict data, int gr
   gridInqYunits(gridID2, units);
   grid_to_degree(units, gridsize, yvals, "grid center lat");
 
-  int ii, jj;
+  size_t ii, jj;
   double xval, yval;
-  for ( int i = 0; i < gridsize; i++ )
+  for ( size_t i = 0; i < gridsize; i++ )
     {
       xval = xvals[i];
       yval = yvals[i];
@@ -219,7 +219,7 @@ void remap_nn_reg2d_nonreg2d(int nx, int ny, const double *restrict data, int gr
 }
 
 static
-void remap_nn_reg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
+void remap_nn_reg2d(size_t nx, size_t ny, const double *restrict data, int gridID, double *restrict array)
 {
   if ( gridInqType(gridID) == GRID_LONLAT )
     remap_nn_reg2d_reg2d(nx, ny, data, gridID, array);
@@ -239,8 +239,8 @@ void *Vargen(void *argument)
   double rconst = 0;
   double *levels = NULL;
   double lon[NLON], lat[NLAT];
-  int nlon = NLON;
-  int nlat = NLAT;
+  size_t nlon = NLON;
+  size_t nlat = NLAT;
 
   cdoInitialize(argument);
 
@@ -291,8 +291,8 @@ void *Vargen(void *argument)
       gridDefXsize(gridIDdata, nlon);
       gridDefYsize(gridIDdata, nlat);
 
-      for ( int i = 0; i < nlon; i++ ) lon[i] = -179.75 + i*0.5;
-      for ( int i = 0; i < nlat; i++ ) lat[i] = -89.75 + i*0.5;
+      for ( size_t i = 0; i < nlon; i++ ) lon[i] = -179.75 + i*0.5;
+      for ( size_t i = 0; i < nlat; i++ ) lat[i] = -89.75 + i*0.5;
 
       gridDefXvals(gridIDdata, lon);
       gridDefYvals(gridIDdata, lat);
@@ -404,8 +404,8 @@ void *Vargen(void *argument)
 
   pstreamDefVlist(streamID, vlistID);
 
-  int gridsize = gridInqSize(gridID);
-  int datasize = gridsize;
+  size_t gridsize = gridInqSize(gridID);
+  size_t datasize = gridsize;
   double *array = (double*) Malloc(gridsize*sizeof(double));
   double *data = array;
   if ( gridID != gridIDdata && gridIDdata != -1 )
@@ -444,7 +444,7 @@ void *Vargen(void *argument)
 
               if ( operatorID == RANDOM )
                 {
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     array[i] = ((double)rand())/((double)RAND_MAX);
                 }
               else if ( operatorID == SINCOS || operatorID == COSHILL )
@@ -476,12 +476,12 @@ void *Vargen(void *argument)
                   
 		  if ( operatorID == SINCOS )
 		    {
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			array[i] = cos(1.0 * xvals[i]) * sin(2.0 * yvals[i]);
 		    }
 		  else if ( operatorID == COSHILL )
 		    {		     
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
 		    }
 
@@ -490,13 +490,13 @@ void *Vargen(void *argument)
 		}
               else if ( operatorID == CONST )
                 {
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     array[i] = rconst;
                 }
               else if ( operatorID == TOPO )
                 {
 #if defined(ENABLE_DATA)
-                  for ( int i = 0; i < datasize; i++ )
+                  for ( size_t i = 0; i < datasize; i++ )
                     data[i] = etopo[i]/etopo_scale - etopo_offset;
 #else
                   cdoAbort("Operator support disabled!");
@@ -505,7 +505,7 @@ void *Vargen(void *argument)
               else if ( operatorID == TEMP )
                 {
 #if defined(ENABLE_DATA)
-                  for ( int i = 0; i < datasize; i++ )
+                  for ( size_t i = 0; i < datasize; i++ )
                     data[i] = temp[i]/temp_scale - temp_offset;
 #else
                   cdoAbort("Operator support disabled!");
@@ -514,7 +514,7 @@ void *Vargen(void *argument)
               else if ( operatorID == MASK )
                 {
 #if defined(ENABLE_DATA)
-                  for ( int i = 0; i < datasize; i++ )
+                  for ( size_t i = 0; i < datasize; i++ )
                     data[i] = mask[i]/mask_scale - mask_offset;
 #else
                   cdoAbort("Operator support disabled!");

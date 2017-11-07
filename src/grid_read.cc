@@ -101,11 +101,11 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
           else if ( STR_IS_EQ(datatype, "float") )   grid->datatype = CDI_DATATYPE_FLT32;
 	  else cdoAbort("Invalid datatype : %s (zaxis description file: %s)", datatype, dname);
         }
-      else if ( STR_IS_EQ(key, "gridsize") )       grid->size = parameter2int(value);
-      else if ( STR_IS_EQ(key, "xsize") )          grid->xsize = parameter2int(value);
-      else if ( STR_IS_EQ(key, "nlon") )           grid->xsize = parameter2int(value);
-      else if ( STR_IS_EQ(key, "ysize") )          grid->ysize = parameter2int(value);
-      else if ( STR_IS_EQ(key, "nlat") )           grid->ysize = parameter2int(value);
+      else if ( STR_IS_EQ(key, "gridsize") )       grid->size = parameter2sizet(value);
+      else if ( STR_IS_EQ(key, "xsize") )          grid->xsize = parameter2sizet(value);
+      else if ( STR_IS_EQ(key, "nlon") )           grid->xsize = parameter2sizet(value);
+      else if ( STR_IS_EQ(key, "ysize") )          grid->ysize = parameter2sizet(value);
+      else if ( STR_IS_EQ(key, "nlat") )           grid->ysize = parameter2sizet(value);
       else if ( STR_IS_EQ(key, "truncation") )     grid->ntr = parameter2int(value);
       else if ( STR_IS_EQ(key, "np") )             grid->np = parameter2int(value);
       else if ( STR_IS_EQ(key, "complexpacking") ) grid->lcomplex = parameter2int(value);

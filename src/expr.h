@@ -73,6 +73,7 @@ typedef struct {
   int        coord;
   int        gridID;
   int        zaxisID;
+  int        datatype;
   int        steptype;
   size_t     ngp;
   size_t     nlev;

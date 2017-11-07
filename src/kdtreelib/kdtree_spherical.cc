@@ -128,16 +128,13 @@ kd_sph_orth_dist(kdata_t *p1, kdata_t *p2, int split)
  * \return root node of the tree
  */
 struct kdNode *
-kd_sph_buildTree(struct kd_point *points, unsigned long nPoints,
+kd_sph_buildTree(struct kd_point *points, size_t nPoints,
                  kdata_t *min, kdata_t *max, int max_threads)
 {
-    struct kd_thread_data *my_data;
-    struct kdNode *tree;
-
-    my_data = kd_buildArg(points, nPoints, min, max, 0,max_threads, 2);
-    tree = (kdNode *)kd_doBuildTree(my_data);
-    free(my_data);
-    return tree;
+  struct kd_thread_data my_data;
+  kd_initArg(&my_data, points, nPoints, min, max, 0,max_threads, 2);
+  struct kdNode *tree = (kdNode *)kd_doBuildTree(&my_data);
+  return tree;
 }
 
 
@@ -277,12 +274,11 @@ struct pqueue *
 kd_sph_ortRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max)
 {
     struct pqueue *res;
-    uint32_t i;
 
     if ((res = pqinit(NULL, 1)) == NULL)
         return NULL;
     if (!kd_sph_doOrtRangeSearch(node, min, max, res)) {
-        for(i = 0; i < res->size; i++) {
+        for(size_t i = 0; i < res->size; i++) {
             free(res->d[i]);
         }
         free(res->d);
@@ -432,15 +428,14 @@ kd_sph_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq)
  */
 struct pqueue *
 kd_sph_qnearest(struct kdNode *node, kdata_t *p,
-                kdata_t *max_dist_sq, unsigned int q)
+                kdata_t *max_dist_sq, size_t q)
 {
     struct pqueue *res;
-    uint32_t i;
 
     if ((res = pqinit(NULL, q + 2)) == NULL)
         return NULL;
     if (!kd_sph_doQnearest(node, p, max_dist_sq, q + 1, res)) {
-        for(i = 0; i < res->size; i++) {
+        for(size_t i = 0; i < res->size; i++) {
             free(res->d[i]);
         }
         free(res->d);
@@ -461,7 +456,7 @@ kd_sph_qnearest(struct kdNode *node, kdata_t *p,
  */
 int
 kd_sph_doQnearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
-                  unsigned int q, struct pqueue *res)
+                  size_t q, struct pqueue *res)
 {
     struct kdNode *nearer, *further;
     struct resItem *point, *item;
@@ -588,12 +583,11 @@ struct pqueue *
 kd_sph_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int ordered)
 {
     struct pqueue *res;
-    uint32_t i;
 
     if ((res = pqinit(NULL, 1)) == NULL)
         return NULL;
     if (!kd_sph_doRange(node, p, max_dist_sq, res, ordered)) {
-        for(i = 0; i < res->size; i++) {
+        for(size_t i = 0; i < res->size; i++) {
             free(res->d[i]);
         }
         free(res->d);

@@ -41,21 +41,53 @@
 #include "pstream.h"
 #include "dmemory.h"
 #include "pthread.h"
+#include "cdoDebugOutput.h"
 
 #include <map>
+#include <stack>
 
 #if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
-constexpr bool PROCESS_DEBUG = false;
-
+static process_t *root_process;
 static std::map<int, process_t> Process;
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
 
-process_t::process_t(int p_ID) : m_ID(p_ID) { initProcess(); }
+process_t::process_t(int p_ID, char *operatorCommand) : m_ID(p_ID)
+{
+  initProcess();
+  operatorName = getOperatorName(operatorCommand);
+  setOperatorArgv(operatorCommand);
+  m_operatorCommand = operatorCommand;
+
+  defPrompt();  // has to be called after get operatorName
+
+  m_module = getModule(operatorName);
+}
+
+void
+process_t::setOperatorArgv(char *operatorArguments)
+{
+  if (operatorArguments)
+    {
+      char *operatorArg = operatorArguments;
+      // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
+
+      while ((operatorArg = strchr(operatorArg, ',')) != NULL)
+        {
+          *operatorArg = '\0';
+          *operatorArg++;
+          if (strlen(operatorArg))
+            {
+              oargv.push_back(operatorArg);
+            }
+        }
+    }
+  oargc = oargv.size();
+}
 
 void
 process_t::initProcess()
@@ -74,11 +106,10 @@ process_t::initProcess()
   nvars = 0;
   ntimesteps = 0;
 
-  streamCnt = 0;
+  m_streamCnt = 0;
 
   oargc = 0;
-  xoperator = "UNINITALIZED";
-  operatorName = "UNINITALIZED";
+  m_operatorCommand = "UNINITALIZED";
   operatorArg = "UNINITALIZED";
 
   noper = 0;
@@ -95,15 +126,15 @@ process_t::getOutStreamCnt()
   return outputStreams.size();
 }
 
-int
-processCreate(void)
+process_t *
+processCreate(char *command)
 {
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
 
   int processID = NumProcess++;
-  Process.insert(std::make_pair(processID, process_t(processID)));
+  Process.insert(std::make_pair(processID, process_t(processID, command)));
 
   NumProcessActive++;
 
@@ -114,7 +145,7 @@ processCreate(void)
   if (processID >= MAX_PROCESS)
     Error("Limit of %d processes reached!", MAX_PROCESS);
 
-  return processID;
+  return &Process.find(processID)->second;
 }
 
 process_t &
@@ -125,7 +156,7 @@ processSelf(void)
 
   pthread_mutex_lock(&processMutex);
 
-  for ( auto &id_process_pair : Process)
+  for (auto &id_process_pair : Process)
     if (id_process_pair.second.l_threadID)
       {
         if (pthread_equal(id_process_pair.second.threadID, thID))
@@ -135,11 +166,9 @@ processSelf(void)
           }
       }
 
-  std::cout << "returning the 0th process" << std::endl;
   pthread_mutex_unlock(&processMutex);
 
 #endif
-  std::cout << "returning the std process 0" << std::endl;
   return Process.find(0)->second;
 }
 
@@ -176,12 +205,12 @@ processNumsActive(void)
 }
 
 void
-processAddNvals(off_t nvals)
+processAddNvals(size_t nvals)
 {
   processSelf().nvals += nvals;
 }
 
-off_t
+size_t
 processInqNvals(int processID)
 {
   return Process.find(processID)->second.nvals;
@@ -302,14 +331,12 @@ processInqOpername(void)
 }
 
 void
-processDefPrompt(const char *opername)
+process_t::defPrompt()
 {
-  process_t &process = processSelf();
-
-  if (process.m_ID == 0)
-    sprintf(process.prompt, "%s %s", Progname, opername);
+  if (m_ID == 0)
+    sprintf(prompt, "%s %s", CDO_progname, operatorName);
   else
-    sprintf(process.prompt, "%s(%d) %s", Progname, process.m_ID + 1, opername);
+    sprintf(prompt, "%s(%d) %s", CDO_progname, m_ID + 1, operatorName);
 }
 
 const char *
@@ -385,7 +412,7 @@ glob_pattern(const char *restrict string)
 int
 cdoStreamCnt(void)
 {
-  int cnt = processSelf().streamCnt;
+  int cnt = processSelf().m_streamCnt;
   return cnt;
 }
 
@@ -394,7 +421,7 @@ cdoStreamName(int cnt)
 {
   process_t &process = processSelf();
 
-  if (cnt > process.streamCnt || cnt < 0)
+  if (cnt > process.m_streamCnt || cnt < 0)
     Error("count %d out of range!", cnt);
 
   return &(process.streamNames[cnt]);
@@ -403,13 +430,13 @@ cdoStreamName(int cnt)
 const char *
 processOperator(void)
 {
-  return processSelf().xoperator;
+  return processSelf().m_operatorCommand;
 }
 
-static int skipInputStreams(int argc,  std::vector<char *> &argv, int globArgc, int nstreams);
+static int skipInputStreams(int argc, std::vector<char *> &argv, int globArgc, int nstreams);
 
 static int
-getGlobArgc(int argc,  std::vector<char *> &argv, int globArgc)
+getGlobArgc(int argc, std::vector<char *> &argv, int globArgc)
 {
   char *opername = &argv[globArgc][1];
   char *comma_position = strchr(opername, ',');
@@ -436,7 +463,7 @@ getGlobArgc(int argc,  std::vector<char *> &argv, int globArgc)
 }
 
 static int
-skipInputStreams(int argc, std::vector<char*>& argv, int globArgc, int nstreams)
+skipInputStreams(int argc, std::vector<char *> &argv, int globArgc, int nstreams)
 {
   while (nstreams > 0)
     {
@@ -459,7 +486,7 @@ skipInputStreams(int argc, std::vector<char*>& argv, int globArgc, int nstreams)
 }
 
 static int
-getStreamCnt(int argc, std::vector<char *>& argv)
+getStreamCnt(int argc, std::vector<char *> &argv)
 {
   int streamCnt = 0;
   int globArgc = 1;
@@ -479,10 +506,49 @@ getStreamCnt(int argc, std::vector<char *>& argv)
   return streamCnt;
 }
 
-static void
-setStreamNames(int argc, std::vector<char *> &argv)
+/*
+static void setStreamNames(int argc, std::vector<char *> *argv)
 {
-  process_t &process = processSelf();
+    //check for output of first
+    int current_argv_entry;
+    std::vector<pstream_t*> &current_instreams = root_process->inputStreams;
+    std::vector<pstream_t*> &current_outstreams = root_process->outputStreams;
+
+}
+*/
+void
+process_t::setStreams(int argc, std::vector<char *> &argv)
+{
+  int streamCnt = getStreamCnt(argc, argv);
+
+  nvals = 0;
+  nvars = 0;
+  ntimesteps = 0;
+
+  m_streamCnt = 0; /* filled in setStreamNames */
+  if (streamCnt)
+    streamNames = std::vector<argument_t>(streamCnt);
+  for (int i = 0; i < streamCnt; i++)
+    {
+      streamNames[i].argc = 0;
+      streamNames[i].args = NULL;
+    }
+
+  setStreamNames(argc, argv);
+
+  int status = checkStreamCnt();
+
+  if (status == 0 && streamCnt != streamCnt)
+    Error("Internal problem with stream count %d %d", streamCnt, streamCnt);
+  /*
+  for ( i = 0; i < streamCnt; i++ )
+    fprintf(stderr, "setStreams: stream %d %s\n", i+1, process.streamNames[i].args);
+  */
+}
+
+void
+process_t::setStreamNames(int argc, std::vector<char *> &argv)
+{
   int i, ac;
   int globArgc = 1;
   int globArgcStart;
@@ -498,25 +564,34 @@ setStreamNames(int argc, std::vector<char *> &argv)
           globArgc = getGlobArgc(argc, argv, globArgc);
           len = 0;
           for (i = globArgcStart; i < globArgc; i++)
-            len += strlen(argv[i]) + 1;
+            {
+              len += strlen(argv[i]) + 1;
+            }
           streamname = (char *) Calloc(1, len);
           for (i = globArgcStart; i < globArgc; i++)
             {
               strcat(streamname, argv[i]);
               if (i < globArgc - 1)
-                strcat(streamname, " ");
+                {
+                  strcat(streamname, " ");
+                }
             }
           for (i = 1; i < len - 1; i++)
-            if (streamname[i] == '\0')
-              streamname[i] = ' ';
-          process.streamNames[process.streamCnt].args = streamname;
+            {
+              if (streamname[i] == '\0')
+                {
+                  streamname[i] = ' ';
+                }
+            }
+
+          streamNames[m_streamCnt].args = streamname;
           ac = globArgc - globArgcStart;
           // printf("setStreamNames:  ac %d  streamname1: %s\n", ac, streamname);
-          process.streamNames[process.streamCnt].argv.resize(ac);
+          streamNames[m_streamCnt].argv.resize(ac);
           for (i = 0; i < ac; ++i)
-            process.streamNames[process.streamCnt].argv[i] = argv[i + globArgcStart];
-          process.streamNames[process.streamCnt].argc = ac;
-          process.streamCnt++;
+            streamNames[m_streamCnt].argv[i] = argv[i + globArgcStart];
+          streamNames[m_streamCnt].argc = ac;
+          m_streamCnt++;
           // printf("setStreamNames:  streamname1: %s\n", streamname);
         }
       else
@@ -524,13 +599,13 @@ setStreamNames(int argc, std::vector<char *> &argv)
           len = strlen(argv[globArgc]) + 1;
           streamname = (char *) Malloc(len);
           strcpy(streamname, argv[globArgc]);
-          process.streamNames[process.streamCnt].args = streamname;
+          streamNames[m_streamCnt].args = streamname;
           ac = 1;
-          process.streamNames[process.streamCnt].argv.resize(ac);
-          process.streamNames[process.streamCnt].argv[0] = argv[globArgc];
-          process.streamNames[process.streamCnt].argc = ac;
-          process.streamNames[process.streamCnt].args = streamname;
-          process.streamCnt++;
+          streamNames[m_streamCnt].argv.resize(ac);
+          streamNames[m_streamCnt].argv[0] = argv[globArgc];
+          streamNames[m_streamCnt].argc = ac;
+          streamNames[m_streamCnt].args = streamname;
+          m_streamCnt++;
           // printf("setStreamNames:  streamname2: %s\n", streamname);
           globArgc++;
         }
@@ -610,7 +685,7 @@ expand_wildcards(process_t &process, int streamCnt)
       process.streamNames.resize(streamCnt);
 
       // move output streams to the end
-      for (int i = 1; i < process.streamCnt; ++i)
+      for (int i = 1; i < process.m_streamCnt; ++i)
         process.streamNames[i + glob_arg->argc - 1] = process.streamNames[i];
 
       for (int i = 0; i < glob_arg->argc; ++i)
@@ -624,7 +699,7 @@ expand_wildcards(process_t &process, int streamCnt)
             cdoPrint("         >%s<", glob_arg->argv[i]);
         }
 
-      process.streamCnt = streamCnt;
+      process.m_streamCnt = streamCnt;
     }
 
   Free(glob_arg);
@@ -633,7 +708,7 @@ expand_wildcards(process_t &process, int streamCnt)
   return 1;
 }
 
-static int
+int
 checkStreamCnt(void)
 {
   process_t &process = processSelf();
@@ -661,29 +736,29 @@ checkStreamCnt(void)
   // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
   if (streamInCnt == -1)
     {
-      streamInCnt = process.streamCnt - streamOutCnt;
+      streamInCnt = process.m_streamCnt - streamOutCnt;
       if (streamInCnt < 1)
         cdoAbort("Input streams missing!");
     }
 
   if (streamOutCnt == -1)
     {
-      streamOutCnt = process.streamCnt - streamInCnt;
+      streamOutCnt = process.m_streamCnt - streamInCnt;
       if (streamOutCnt < 1)
         cdoAbort("Output streams missing!");
     }
   // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
 
   streamCnt = streamInCnt + streamOutCnt;
-  // printf(" streamCnt %d %d\n", process.streamCnt, streamCnt);
+  // printf(" streamCnt %d %d\n", process.m_streamCnt, streamCnt);
 
-  if (process.streamCnt > streamCnt)
+  if (process.m_streamCnt > streamCnt)
     cdoAbort("Too many streams!"
              " Operator needs %d input and %d output streams.",
              streamInCnt,
              streamOutCnt);
 
-  if (process.streamCnt < streamCnt)
+  if (process.m_streamCnt < streamCnt)
     cdoAbort("Too few streams specified!"
              " Operator needs %d input and %d output streams.",
              streamInCnt,
@@ -712,53 +787,113 @@ checkStreamCnt(void)
   return status;
 }
 
-static void
-setStreams(int argc, std::vector<char *> &argv)
+bool
+process_t::hasAllInputs()
 {
-  process_t &process = processSelf();
-  int streamCnt = getStreamCnt(argc, argv);
+  // std::cout << m_module.streamInCnt << " " << childProcesses.size() + inputStreams.size() << std::endl;
+  return m_module.streamInCnt == (childProcesses.size() + inputStreams.size());
+}
 
-  process.nvals = 0;
-  process.nvars = 0;
-  process.ntimesteps = 0;
-
-  process.streamCnt = 0; /* filled in setStreamNames */
-  if (streamCnt)
-    process.streamNames = std::vector<argument_t>(streamCnt);
-  for (int i = 0; i < streamCnt; i++)
+#include <fstream>
+void print_creation_results(std::ofstream &p_outfile)
+{
+ p_outfile << std::endl << "RESULTS:" << std::endl;
+  for (auto &process : Process)
     {
-      process.streamNames[i].argc = 0;
-      process.streamNames[i].args = NULL;
+      p_outfile << "process: " << process.second.operatorName << " has children: " << std::endl;
+      for (auto child : process.second.childProcesses)
+        {
+          p_outfile << child->m_ID << ", ";
+        }
+      for (auto outstream : process.second.inputStreams)
+        {
+          p_outfile << "S: " << outstream->self << " ";
+        }
     }
+  p_outfile << std::endl;
 
-  setStreamNames(argc, argv);
+}
 
-  int status = checkStreamCnt();
+void
+createProcesses(int argc, char **argv)
+{
+  std::ofstream outfile("processCreation.txt");
 
-  if (status == 0 && process.streamCnt != streamCnt)
-    Error("Internal problem with stream count %d %d", process.streamCnt, streamCnt);
-  /*
-  for ( i = 0; i < streamCnt; i++ )
-    fprintf(stderr, "setStreams: stream %d %s\n", i+1, process.streamNames[i].args);
-  */
+  for (int i = 0; i < argc; i++)
+    {
+      outfile << argv[i] << " ";
+    }
+  outfile << std::endl;
+
+  root_process = processCreate(argv[0]);
+
+  process_t *current_process;
+  process_t *parent_process;
+
+  int idx = 1;
+  std::stack<process_t *> call_stack;
+
+  call_stack.push(root_process);
+  current_process = call_stack.top();
+  // root_process.addOutputStream();
+  do
+    {
+      outfile << "iteration " << idx << " start" << std::endl
+              << "current argv: " << argv[idx] << "  current_process: " << current_process->operatorName << std::endl;
+      if (argv[idx][0] == '-')
+        {
+          outfile << "found new operator: creating process: ";
+          parent_process = current_process;
+          current_process = processCreate(argv[idx]);
+          parent_process->addChild(current_process);
+          current_process->addParent(parent_process);
+          call_stack.push(current_process);
+          outfile << current_process->operatorName << std::endl;
+        }
+      else
+        {
+          outfile << "added file " << argv[idx] << std::endl;
+          pstream_t *new_pstream = create_pstream();
+          // new_pstream->pstreamOpenReadFile(argv[i]);
+          current_process->inputStreams.push_back(new_pstream);
+        }
+      while (current_process->hasAllInputs() && current_process != root_process)
+        {
+          outfile << "process " << current_process->operatorName << "poped" << std::endl;
+          call_stack.pop();
+          current_process = call_stack.top();
+        }
+      outfile << "iteration " << idx << " end"
+              << "current_process: " << current_process->operatorName << std::endl;
+      idx++;
+    }
+  while ((current_process != root_process || !root_process->hasAllInputs()) && idx < argc - 1);
+
+  print_creation_results(outfile);
+  outfile.close();
 }
 
 void
 processDefArgument(void *vargument)
 {
+  /*
+process_t &process = processSelf();
+char *operatorArg;
+char *commapos;
+std::vector< char*> &oargv = process.oargv;
+*/
   process_t &process = processSelf();
   std::vector<char*> &oargv = process.oargv;
-  int argc = ((argument_t *) vargument)->argc;
-  std::vector<char *> &argv = ((argument_t *) vargument)->argv;
+  /*
 
-  process.xoperator = argv[0];
-  process.operatorName = getOperatorName(process.xoperator);
-  process.operatorArg = getOperatorArg(process.xoperator);
-  char *operatorArg = process.operatorArg;
+  process.m_operatorCommand = argv[0];
+  process.operatorName = getOperatorName(process.m_operatorCommand);
+  process.operatorArg = getOperatorArg(process.m_operatorCommand);
+  operatorArg = process.operatorArg;
 
   if (operatorArg)
     {
-      oargv.push_back(operatorArg);
+      orgv.push_back(operatorArg);
       // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
 
       char *commapos = operatorArg;
@@ -776,9 +911,7 @@ processDefArgument(void *vargument)
 
   processDefPrompt(process.operatorName);
 
-  process.module = getModule(process.operatorName);
-
-  setStreams(argc, argv);
+*/
 }
 
 void
@@ -1011,11 +1144,11 @@ process_t::print_process()
   std::cout << " nOutStream      : " << nOutStream << std::endl;
   for (int i = 0; i < nInStream; i++)
     {
-      std::cout << "    " << inputStreams[i]->self << std::endl;
+      std::cout << "    " << childProcesses[i]->m_ID << std::endl;
     }
   for (int i = 0; i < nOutStream; i++)
     {
-      std::cout << "    " << outputStreams[i]->self << std::endl;
+      std::cout << "    " << parentProcesses[i]->m_ID << std::endl;
     }
   if ( s_utime > 0 )
     {
@@ -1070,9 +1203,9 @@ process_t::print_process()
                 << "UNINITALIZED" << std::endl;
     }
   std::cout << " ntimesteps      : " << ntimesteps << std::endl;
-  std::cout << " streamCnt       : " << streamCnt << std::endl;
+  std::cout << " streamCnt       : " << m_streamCnt << std::endl;
   // std::cout << " streamNames     : " << streamNames                  <<  std::endl;
-  std::cout << " xoperator       : " << xoperator << std::endl;
+  std::cout << " m_operatorCommand       : " << m_operatorCommand << std::endl;
   std::cout << " operatorName    : " << operatorName << std::endl;
   std::cout << " operatorArg     : " << operatorArg << std::endl;
   std::cout << " oargc           : " << oargc << std::endl;
@@ -1087,8 +1220,8 @@ processClosePipes(void)
     {
       pstream_t *pstreamptr = processInqInputStream(sindex);
 
-      if (PROCESS_DEBUG)
-        Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
+      if (CdoDebug::PROCESS)
+        MESSAGE("process ",processSelf().m_ID,"  instream ",sindex,"  close streamID ", pstreamptr->self);
 
       if (pstreamptr)
         pstreamptr->close();
@@ -1099,17 +1232,20 @@ processClosePipes(void)
     {
       pstream_t *pstreamptr = processInqOutputStream(sindex);
 
-      if (PROCESS_DEBUG)
-        Message("process %d  stream %d  close streamID %d", processSelf().m_ID, sindex, pstreamptr->self);
+      if (CdoDebug::PROCESS)
+        MESSAGE("process ",processSelf().m_ID,"  outstream ",sindex,"  close streamID ", pstreamptr->self);
+
 
       if (pstreamptr)
-          pstreamptr->close();
+        pstreamptr->close();
     }
 }
 
+extern "C" {
+size_t getPeakRSS( );
+}
 
-void
-cdoFinish(void)
+void cdoFinish(void)
 {
   int processID = processSelf().m_ID;
   int nvars, ntimesteps;
@@ -1120,8 +1256,8 @@ cdoFinish(void)
   double p_cputime = 0, p_usertime = 0, p_systime = 0;
 
 #if defined(HAVE_LIBPTHREAD)
-  if (PROCESS_DEBUG)
-    Message("process %d  thread %ld", processID, pthread_self());
+  if (CdoDebug::PROCESS)
+    MESSAGE("process ",processID," thread %ld", pthread_self());
 #endif
 
   int64_t nvals = processInqNvals(processID);
@@ -1135,7 +1271,7 @@ cdoFinish(void)
       reset_text_color(stderr);
       if (nvals > 0)
         {
-          if (sizeof(int64_t) > sizeof(long))
+          if (sizeof(int64_t) > sizeof(size_t))
 #if defined(_WIN32)
             fprintf(stderr,
                     "Processed %I64d value%s from %d variable%s",
@@ -1149,8 +1285,8 @@ cdoFinish(void)
                     ADD_PLURAL(nvars));
           else
             fprintf(stderr,
-                    "Processed %ld value%s from %d variable%s",
-                    (long) nvals,
+                    "Processed %zu value%s from %d variable%s",
+                    (size_t) nvals,
                     ADD_PLURAL(nvals),
                     nvars,
                     ADD_PLURAL(nvars));
@@ -1192,19 +1328,14 @@ cdoFinish(void)
 
   if (processID == 0)
     {
-      int mu[] = { 'b', 'k', 'm', 'g', 't' };
-      int muindex = 0;
-      long memmax;
-
-      memmax = memTotal();
-      while (memmax > 9999)
-        {
-          memmax /= 1024;
-          muindex++;
-        }
-
+      size_t memmax = getPeakRSS();
       if (memmax)
-        snprintf(memstring, sizeof(memstring), " %ld%c ", memmax, mu[muindex]);
+        {
+          int muindex = 0;
+          while (memmax > 9999) { memmax /= 1024; muindex++; }
+          const char *mu[] = { "B", "KB", "MB", "GB", "TB" };
+          snprintf(memstring, sizeof(memstring), " %zu%s", memmax, mu[muindex]);
+        }
 
       processEndTime(&p_usertime, &p_systime);
       p_cputime = p_usertime + p_systime;
@@ -1219,11 +1350,11 @@ cdoFinish(void)
 
 #if defined(HAVE_SYS_TIMES_H)
   if (cdoBenchmark)
-    fprintf(stderr, " ( %.2fs %.2fs %.2fs %s)\n", c_usertime, c_systime, c_cputime, memstring);
+    fprintf(stderr, " ( %.2fs %.2fs %.2fs%s )\n", c_usertime, c_systime, c_cputime, memstring);
   else
     {
       if (!cdoSilentMode)
-        fprintf(stderr, " ( %.2fs )\n", c_cputime);
+        fprintf(stderr, " ( %.2fs%s )\n", c_cputime, memstring);
     }
   if (cdoBenchmark && processID == 0)
     fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_usertime, p_systime, p_cputime, memstring);
@@ -1234,4 +1365,24 @@ cdoFinish(void)
   processClosePipes();
 
   processDelete();
+}
+
+void
+process_t::addChild(process_t *childProcess)
+{
+  childProcesses.push_back(childProcess);
+  nchild = childProcesses.size();
+}
+
+void
+process_t::addParent(process_t *parentProcess)
+{
+  parentProcesses.push_back(parentProcess);
+}
+void
+clearProcesses()
+{
+  Process.clear();
+  NumProcess = 0;
+  NumProcessActive = 0;
 }

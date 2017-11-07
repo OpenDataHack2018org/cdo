@@ -1,4 +1,5 @@
 
+#include "cdoDebugOutput.h"
 #include "argument.h"
 #include "dmemory.h"
 #include "util.h"
@@ -11,6 +12,10 @@
 
 argument_t *file_argument_new(const char *filename)
 {
+  if(CdoDebug::ARGUMENT > 0)
+  {
+    MESSAGE("Creating new file argument for file ", filename);
+  }
   argument_t *argument = new argument_t();
 
   argument->argc = 1;
@@ -25,6 +30,11 @@ argument_t *file_argument_new(const char *filename)
 argument_t * pipe_argument_new(const argument_t *argument,  char *pipename, int pnlen)
 {
   // struct sched_param param;
+  if(CdoDebug::ARGUMENT > 0)
+  {
+    MESSAGE("Creating new pipe argument for pipename ", pipename );
+  }
+
 
   argument_t *newargument = argument_new(argument->argc + 1, argument->argc *sizeof(char *));
   newargument->operatorName = "";
@@ -59,6 +69,11 @@ void file_argument_free(argument_t *argument)
 
 argument_t *argument_new(size_t argc, size_t len)
 {
+  if(CdoDebug::ARGUMENT > 0)
+  {
+    MESSAGE("Creating new argument");
+  }
+
   argument_t *argument = new argument_t();
 
   if ( argc > 0 )
@@ -97,7 +112,7 @@ void argument_free(argument_t *argument)
           argument->args = NULL;
         }
 
-      Free(argument);
+      delete(argument);
     }
 }
 
@@ -109,16 +124,34 @@ void argument_fill(argument_t *argument, int argc, char *argv[])
     argument->argv[iarg] = strdup(argv[iarg]);
 }
 
-void print_argument(argument_t * p_argument)
+std::string print_argument(argument_t * p_argument)
 {
-    std::cout << "argv with " << p_argument->argc << " arguments:" << std::endl;
+    std::string output = "";
+    output += " argv with " + std::to_string(p_argument->argc) + " arguments:\n";
     for(int i = 0; i < p_argument->argc; i++)
     {
-        std::cout << p_argument->argv[i] << " ";
+        output += "     " + std::string(p_argument->argv[i]) + " ";
     }
-    std::cout << std::endl;
+    output += "\n";
 
-    std::cout << "OperatorName: "<< p_argument->operatorName << std::endl;
+    output += "     OperatorName: " + p_argument->operatorName + "\n";
 
-    std::cout << "operatorArguments: " << p_argument->operatorArguments << std::endl;
+    output += "     operatorArguments";
+    if(p_argument->operatorArguments){
+        output += ": " + std::string(p_argument->operatorArguments) + "\n";
+    }
+    else
+    {
+        output += " not set\n";
+    }
+
+    output += "     args";
+    if(p_argument->operatorArguments){
+        output += ": " + std::string(p_argument->args);
+    }
+    else
+    {
+        output += " not set";
+    }
+    return output;
 }

@@ -451,7 +451,7 @@ void *Collgrid(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int gridsize2 = 0;
+  size_t gridsize2 = 0;
   for ( int i = 0; i < ngrids2; ++i )
     {
       if ( gridIDs[i] != -1 ) 
@@ -514,7 +514,7 @@ void *Collgrid(void *argument)
 	      if ( cdoVerbose && tsID == 0 ) printf("varID %d %d levelID %d %d\n", varID, varID2, levelID, levelID2);
 
 	      double missval = vlistInqVarMissval(vlistID2, varID2);
-	      for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval;
+	      for ( size_t i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
@@ -525,8 +525,8 @@ void *Collgrid(void *argument)
 
 		  if ( vars[varID2] )
 		    {
-                      int gridsize = ef[fileID].gridsize;
-		      for ( int i = 0; i < gridsize; ++i )
+                      size_t gridsize = ef[fileID].gridsize;
+		      for ( size_t i = 0; i < gridsize; ++i )
 			array2[ef[fileID].gridindex[i]] = ef[fileID].array[i];
 		    }
 		}
@@ -536,7 +536,7 @@ void *Collgrid(void *argument)
 	      if ( vars[varID2] )
 		{
 		  size_t nmiss = 0;
-		  for ( int i = 0; i < gridsize2; i++ )
+		  for ( size_t i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
 		  pstreamWriteRecord(streamID2, array2, nmiss);

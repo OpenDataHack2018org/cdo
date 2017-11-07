@@ -34,9 +34,8 @@ void *Cond(void *argument)
   int filltype = FILL_NONE;
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
-  int offset;
+  size_t offset;
   size_t nmiss1, nmiss2, nmiss3;
-  int i;
   double missval1 = -9.E33;
   double missval2 = -9.E33;
   size_t **varnmiss1 = NULL;
@@ -82,7 +81,7 @@ void *Cond(void *argument)
   int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  int gridsize = vlistGridsizeMax(vlistID2);
+  size_t gridsize = vlistGridsizeMax(vlistID2);
 
   if ( filltype == FILL_REC && gridsize != gridInqSize(vlistGrid(vlistID1, 0)) )
     cdoAbort("Stream1 >%s< has wrong gridsize!", cdoStreamName(0)->args);
@@ -166,12 +165,12 @@ void *Cond(void *argument)
 
 	  if ( operatorID == IFTHEN )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array3[i] = !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : missval2;
 	    }
 	  else if ( operatorID == IFNOTTHEN )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array3[i] = !DBL_IS_EQUAL(array1[i], missval1) && DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : missval2;
 	    }
 	  else
@@ -180,7 +179,7 @@ void *Cond(void *argument)
 	    }
 
 	  nmiss3 = 0;
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array3[i], missval2) ) nmiss3++;
 
 	  pstreamDefRecord(streamID3, varID, levelID);

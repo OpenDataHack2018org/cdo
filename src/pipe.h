@@ -66,7 +66,7 @@ public:
   size_t nmiss;
   double *data;
   // pstream_t *pstreamptr_in;
-  /* unsigned long */ off_t nvals;
+  size_t nvals;
 
   std::mutex m_mutex;
   std::condition_variable tsDef, tsInq, vlistDef, isclosed;
@@ -75,9 +75,6 @@ public:
 
   std::string name;
 };
-
-void pipeDebug(int debug);
-
 #endif
 
 #endif /* PIPE_H */

@@ -100,6 +100,7 @@ expr:
         | expr AND expr           { $$ = expr_opr(AND, 2, $1, $3); }
         | expr OR  expr           { $$ = expr_opr(OR,  2, $1, $3); }
         | '(' expr ')'            { $$ = $2; }
+        | '(' ternary ')'         { $$ = $2; }
         | FUNCTION '(' expr ',' '-' CONSTANT ')'   { $$ = expr_fun1c($1, $3, - $6); }
         | FUNCTION '(' expr ',' CONSTANT ')'   { $$ = expr_fun1c($1, $3, $5); }
         | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }

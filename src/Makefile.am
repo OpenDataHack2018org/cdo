@@ -1,12 +1,16 @@
 ## Process this file with automake to produce Makefile.in
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES =            \
-			   argument.h		\
-			   argument.cc		\
-			   array.h         \
+               argument.h		\
+               argument.cc		\
+               array.h         \
                array.cc         \
                cdo_int.h       \
                compare.h       \
+               cfortran.h       \
+               libncl.h         \
+               cfortran.h       \
+               cf_interface.h   \
                cdo_pthread.cc   \
                cdo_vlist.cc     \
                cdo_getopt.cc    \
@@ -22,8 +26,8 @@ libcdo_la_SOURCES =            \
                after_dvtrans.cc \
                after_vertint.cc \
                after_vertint.h \
-               after_namelist.cc\
-               afterburnerlib.cc\
+               after_namelist.cc \
+               afterburnerlib.cc \
                afterburner.h   \
                vct_l191.h      \
                calendar.h      \
@@ -38,6 +42,8 @@ libcdo_la_SOURCES =            \
                counter.h       \
                datetime.cc      \
                datetime.h      \
+               cdoDebugOutput.cc \
+               cdoDebugOutput.h\
                dmemory.h       \
                ecacore.cc       \
                ecacore.h       \
@@ -64,6 +70,8 @@ libcdo_la_SOURCES =            \
                fieldmer.cc      \
                fieldzon.cc      \
                functs.h        \
+               getMemorySize.c \
+               getRSS.c        \
                gradsdeslib.cc   \
                gradsdeslib.h   \
                grid.cc          \
@@ -289,6 +297,7 @@ cdo_SOURCES += Adisit.cc        \
                Monarith.cc      \
                Mrotuv.cc        \
                Mrotuvb.cc       \
+               NCL_wind.cc      \
                Ninfo.cc         \
                Nmldump.cc       \
                Output.cc        \
@@ -398,13 +407,13 @@ cdo_SOURCES += Adisit.cc        \
                cdo.h
 
 cdo_SOURCES += nearpt3c.h
-#if ENABLE_NEARPT3
-#cdo_SOURCES +=           \
-#               nearpt3x.h      \
-#               nearpt3c.h      \
-#               nearpt3c.cc     \
-#               cellsearchorder.h
-#endif
+if ENABLE_NEARPT3
+cdo_SOURCES +=           \
+               nearpt3x.h      \
+               nearpt3c.h      \
+               nearpt3c.cc     \
+               cellsearchorder.h
+endif
 
 #if ENABLE_MAGICS
 cdo_SOURCES += Magplot.cc       \
@@ -424,6 +433,9 @@ cdo_SOURCES += Magplot.cc       \
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+if USE_F77
+cdo_LDADD   += $(top_builddir)/src/lib/ncl/libncl.la
+endif
 cdo_LDFLAGS  =
 
 if ENABLE_ALL_STATIC

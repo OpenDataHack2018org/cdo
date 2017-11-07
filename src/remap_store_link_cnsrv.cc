@@ -27,7 +27,7 @@ void grid_store_init(grid_store_t* grid_store, long gridsize)
   if ( grid_store->max_size%grid_store->blk_size > 0 ) grid_store->nblocks++;
 
   if ( cdoVerbose )
-    fprintf(stdout, "blksize = %zu  lastblksize = %zu  max_size = %zu  nblocks = %zu\n", 
+    fprintf(stdout, "blksize = %ld  lastblksize = %ld  max_size = %ld  nblocks = %ld\n",
 	    grid_store->blk_size, grid_store->max_size%grid_store->blk_size, 
 	    grid_store->max_size, grid_store->nblocks);
 

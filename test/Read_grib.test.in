@@ -17,7 +17,9 @@ for OPERATOR in sinfo info; do
     RFILE=$DATAPATH/${OFILE}_ref
 
     CDOTEST="$OPERATOR $FILE"
-    CDOCOMMAND="$CDO $OPERATOR $IFILE"
+    rm -f Read_grib_${OPERATOR}_${FILE}.debug
+    DEBUG_OUT="--seperateDebugFromLog Read_grib_${OPERATOR}_${FILE}.debug"
+    CDOCOMMAND="$CDO $DEBUG_OUT $OPERATOR $IFILE"
 
     if [ "@ENABLE_GRIB@" = yes ] ; then
       echo "Running test: $NTEST"

@@ -16,7 +16,11 @@ NTEST=1
 #
 for GRID in $GRIDS; do
   CDOTEST="gridarea $GRID"
-  CDOCOMMAND="$CDO outputf,%10.7f -fldsum -gridarea -random,$GRID"
+
+  rm -f Gridarea_${GRID}.debug
+  DEBUG_OUT="--seperateDebugFromLog Gridarea_${GRID}.debug"
+
+  CDOCOMMAND="$CDO $DEBUG_OUT outputf,%10.7f -fldsum -gridarea -random,$GRID"
 
   if [ "@ENABLE_THREADS@" = yes ] ; then
     echo "Running test: $NTEST"

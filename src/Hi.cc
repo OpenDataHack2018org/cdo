@@ -61,14 +61,14 @@ static void farexpr(field_type *field1, field_type field2, field_type field3, do
   const double  missval3 = field3.missval;
   const double *array3   = field3.ptr;
 
-  int len = gridInqSize(grid1);
+  size_t len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) || len != gridInqSize(grid3) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 || nmiss3 > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         if ( DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) || DBL_IS_EQUAL(array3[i], missval3))  
 	  array1[i] = missval1;
 	else
@@ -76,12 +76,12 @@ static void farexpr(field_type *field1, field_type field2, field_type field3, do
     }
   else
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         array1[i] = expression(array1[i], array2[i], array3[i], missval1);  
     }
 
   field1->nmiss = 0;
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
 }
 
@@ -111,7 +111,7 @@ void *Hi(void *argument)
   vlistCompare(vlistID1, vlistID2, CMP_DIM);
   vlistCompare(vlistID1, vlistID3, CMP_DIM);
   
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2, field3;
   field_init(&field1);

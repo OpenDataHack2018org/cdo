@@ -18,7 +18,9 @@ NTEST=1
 RSTAT=0
 #
 CDOTEST="gradsdes GRIB1"
-CDOCOMMAND="$CDO gradsdes $OFILE"
+
+rm -f Graddes.debug
+CDOCOMMAND="$CDO --seperateDebugFromLog Graddes.debug $DEBUG_OUT gradsdes $OFILE"
 
 echo "Running test: $NTEST - $CDOTEST"
 echo "$CDOCOMMAND"

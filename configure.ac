@@ -34,6 +34,7 @@ AC_CHECK_TOOL([CXX],[g++],[:])
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
 AC_PROG_CXX
+AC_PROG_F77
 AC_C_RESTRICT
 AX_CXX_COMPILE_STDCXX_11
 AC_OPENMP
@@ -51,6 +52,7 @@ AC_PROG_INSTALL
 #
 FC=no
 export FC
+#
 #  ----------------------------------------------------------------------
 # Check large file support on 32 bit system
 AC_SYS_LARGEFILE
@@ -104,11 +106,20 @@ case "$CC" in
   *)      C_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
 esac
 
+case "$F77" in
+  pgf*)      F77_VERSION=`$F77 -V | head -2 | tail -n 1`;;
+  gfortran*) F77_VERSION=`$F77 --version | head -n 1`;;
+  *)         F77_VERSION=`$F77 -V 2>&1   | head -n 1 | grep -v error`;;
+esac
+
 if test -z "$CXX_VERSION" ; then CXX_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(CXX_VERSION, ["$CXX_VERSION"], [CXX Compiler version])
 
 if test -z "$C_VERSION" ; then C_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(C_VERSION, ["$C_VERSION"], [C Compiler version])
+
+if test -z "$F77_VERSION" ; then F77_VERSION="unknown"; fi;
+AC_DEFINE_UNQUOTED(F77_VERSION, ["$F77_VERSION"], [F77 Compiler version])
 
 # Checks for username, hostname and system type
 USERNAME=$LOGNAME
@@ -138,16 +149,50 @@ AC_CHECK_FUNCS(sqrtl)
 AC_CHECK_FUNCS(feenableexcept)
 #
 AC_CHECK_MEMBERS([fenv_t.__control, fenv_t.__mxcsr],,,[[#include <fenv.h>]])
+
+#  ----------------------------------------------------------------------
+#  Create the Interface to Fortran77 routines via cfortran.h
+AC_ARG_ENABLE([fortran],
+              [AS_HELP_STRING([--disable-fortran],
+                              [Omit building of Fortran routines])],
+              [enable_fortran=${enableval}],[enable_fortran=yes])
+AS_IF([test "x${enable_fortran}" = "xyes"], [
+dnl ######################################################################
+dnl Test whether cfortran.h works correctly
+dnl ######################################################################
+ACX_FIND_CFORTRAN_DEF
+ACX_XLF_QEXTNAME_ADD_APPENDUS
+AS_IF([test -n "$F77" -a X"$F77" != Xno],
+  [ACX_CHECK_CFORTRAN([$srcdir/src],
+    [AC_DEFINE([HAVE_CF_INTERFACE],[1],
+       [Defined to 1 if C / Fortran interface cfortran.h works])],
+    [AS_CASE([x"$acx_cv_cfortran_works"],
+       [x"error"],
+       [AC_MSG_NOTICE([Linking/Running with C EXTERNAL built with cfortran.h does not work!])],
+       [x"compiling with cfortran.h failed"],
+       [AC_MSG_NOTICE([Compilation with cfortran.h is not working!])],
+       [x"error compiling Fortran subroutine"],
+       [AC_MSG_NOTICE([compilation of simple Fortran source failed!])],
+       [AC_MSG_NOTICE([Unexpected error when linking C and Fortran via cfortran.h!])])
+     AC_MSG_NOTICE([Disabling cfortran.h bindings generation])
+     acx_cv_cfortran_works=no])])
+])
+AS_IF([test x$enable_fortran = 'xno'],[AC_SUBST([ENABLE_FORTRAN],[false])],[AC_SUBST([ENABLE_FORTRAN],[true])])
+#
+AM_CONDITIONAL([USE_F77],[test -n "$F77" -a X"$F77" != Xno -a x"$acx_cv_cfortran_works" = xyes])
+AS_IF([test x$acx_cv_cfortran_works = 'xno'],[AC_SUBST([FORTRAN_WORKS],[no])],[AC_SUBST([FORTRAN_WORKS],[yes])])
+#  ----------------------------------------------------------------------
+
 #  ----------------------------------------------------------------------
 #  Enable NEARPT3 support
-# AC_MSG_CHECKING([for nearpt3 support])
-# AC_ARG_ENABLE([nearpt3], AS_HELP_STRING([--enable-nearpt3],[nearpt3 support [default=no]]))
-# AS_IF([test "x$enable_nearpt3" = "xyes"], [
-#   AC_DEFINE(ENABLE_NEARPT3, [1], [Define to 1 for nearpt3 support])
-# ])
-# AC_MSG_RESULT([$enable_nearpt3])
-# AC_SUBST([ENABLE_NEARPT3],[$enable_nearpt3])
-# AM_CONDITIONAL([ENABLE_NEARPT3],[test x$enable_nearpt3 = 'xyes'])
+AC_MSG_CHECKING([for nearpt3 support])
+AC_ARG_ENABLE([nearpt3], AS_HELP_STRING([--enable-nearpt3],[nearpt3 support [default=no]]))
+AS_IF([test "x$enable_nearpt3" = "xyes"], [
+  AC_DEFINE(ENABLE_NEARPT3, [1], [Define to 1 for nearpt3 support])
+])
+AC_MSG_RESULT([$enable_nearpt3])
+AC_SUBST([ENABLE_NEARPT3],[$enable_nearpt3])
+AM_CONDITIONAL([ENABLE_NEARPT3],[test x$enable_nearpt3 = 'xyes'])
 #  ----------------------------------------------------------------------
 #  Enable DATA support
 AC_MSG_CHECKING([for DATA support])
@@ -156,7 +201,7 @@ AS_IF([test "x$enable_data" != 'xno'], [
   AC_DEFINE(ENABLE_DATA, [1], [Define to 1 for DATA support])
 ])
 AC_MSG_RESULT([$enable_data])
-AC_SUBST([ENABLE_DATA],[$enable_data])
+AS_IF([test x$enable_data = 'xno'],[AC_SUBST([ENABLE_DATA],[false])],[AC_SUBST([ENABLE_DATA],[true])])
 #  ----------------------------------------------------------------------
 CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
 CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
@@ -164,8 +209,6 @@ CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
 
 # Add configure options
 ACX_OPTIONS
-
-#  ----------------------------------------------------------------------
 
 # configure code from valgrind
 
@@ -242,7 +285,7 @@ AM_CONDITIONAL(BUILD_AVX2_TESTS, test x$ac_have_as_avx2 = xyes)
 #  ----------------------------------------------------------------------
 AC_SUBST([CXXFLAGS])
 AC_SUBST([CPPFLAGS])
-AC_SUBST([FCFLAGS])
+AC_SUBST([FFLAGS])
 AC_SUBST([CLDFLAGS])
 AC_SUBST([CLIBS])
 #AC_SUBST([INCLUDES])
@@ -254,6 +297,8 @@ C_COMPILER="$CC $CFLAGS"
 AC_DEFINE_UNQUOTED(C_COMPILER, ["$C_COMPILER"], [C Compiler])
 CXX_COMPILER="$CXX $CXXFLAGS"
 AC_DEFINE_UNQUOTED(CXX_COMPILER, ["$CXX_COMPILER"], [CXX Compiler])
+F77_COMPILER="$F77 $FFLAGS"
+AC_DEFINE_UNQUOTED(F77_COMPILER, ["$F77_COMPILER"], [F77 Compiler])
 
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_PROG_AWK
@@ -268,7 +313,7 @@ AC_CONFIG_FILES([test/Merstat.test test/Zonstat.test test/Mergetime.test],[chmod
 AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/MapReduce.test test/Ninfo.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings])
+AC_CONFIG_FILES([Makefile src/lib/ncl/Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings])
 AC_OUTPUT
 
 #  ----------------------------------------------------------------------

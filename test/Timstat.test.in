@@ -11,6 +11,10 @@ STATS="min max range sum avg mean std std1 var var1"
 FMS="srv grb nc"
 if [ "@ENABLE_NETCDF@" = no ] ; then  FMS="srv grb"; fi
 NTEST=1
+
+rm -rf TimstatDebugOutput
+mkdir TimstatDebugOutput
+
 #
 for TYPE in $TYPES; do
   if [ $TYPE = day ] ; then
@@ -29,7 +33,8 @@ for TYPE in $TYPES; do
     CDOTEST="${TYPE}$STAT"
 
     for FM in $FMS; do
-      CDOCOMMAND="$CDO -f $FM ${TYPE}${STAT} $IFILE $OFILE"
+      DEBUG_OUT="--seperateDebugFromLog TimstatDebugOutput/Timstat_${TYPE}_${STAT}.debug"
+      CDOCOMMAND="$CDO $DEBUG_OUT -f $FM ${TYPE}${STAT} $IFILE $OFILE"
 
       echo "Running test: $NTEST"
       echo "$CDOCOMMAND"
@@ -37,7 +42,7 @@ for TYPE in $TYPES; do
       $CDOCOMMAND
       test $? -eq 0 || let RSTAT+=1
 
-      $CDO diff,0.004 $OFILE $RFILE > $CDOOUT 2> $CDOERR
+      $CDO $DEBUG_OUT diff,0.004 $OFILE $RFILE > $CDOOUT 2> $CDOERR
       test $? -eq 0 || let RSTAT+=1
       test -s $CDOOUT && let RSTAT+=1
       cat $CDOOUT $CDOERR

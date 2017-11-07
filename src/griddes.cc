@@ -25,6 +25,7 @@
 #include "grid.h"
 #include "griddes.h"
 #include "error.h"
+#include "cdoDebugOutput.h"
 
 
 int grid_read(FILE *gfp, const char *dname);
@@ -140,13 +141,13 @@ int gridDefine(griddes_t grid)
 	    if ( grid.ysize == 0 ) Error("ysize undefined!");
 	  }
 
-	if ( grid.size == 0 ) grid.size = (long)grid.xsize*grid.ysize;
+	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
-	if ( grid.size != (long)grid.xsize*grid.ysize )
-	  Error("Inconsistent grid declaration: xsize*ysize!=gridsize (xsize=%d ysize=%d gridsize=%d)",
+	if ( grid.size != grid.xsize*grid.ysize )
+	  Error("Inconsistent grid declaration: xsize*ysize!=gridsize (xsize=%zu ysize=%zu gridsize=%zu)",
 		grid.xsize, grid.ysize, grid.size);
 
-	if ( grid.size < 0 || grid.size > INT_MAX ) Error("grid size (%ld) out of bounds (0 - %d)!", grid.size, INT_MAX);
+	//if ( grid.size < 0 || grid.size > INT_MAX ) Error("grid size (%ld) out of bounds (0 - %d)!", grid.size, INT_MAX);
 
 	gridID = gridCreate(grid.type, grid.size);
 
@@ -166,7 +167,7 @@ int gridDefine(griddes_t grid)
 	      {
 		grid.nvertex = 2;
 		grid.xbounds = (double*) Malloc(grid.xsize*grid.nvertex*sizeof(double));
-		for ( int i = 0; i < (int) grid.xsize-1; i++ )
+		for ( size_t i = 0; i < grid.xsize-1; ++i )
 		  {
 		    grid.xbounds[2*i+1]   = 0.5*(grid.xvals[i] + grid.xvals[i+1]);
 		    grid.xbounds[2*(i+1)] = 0.5*(grid.xvals[i] + grid.xvals[i+1]);
@@ -186,7 +187,7 @@ int gridDefine(griddes_t grid)
 	      {
 		grid.nvertex = 2;
 		grid.ybounds = (double*) Malloc(grid.ysize*grid.nvertex*sizeof(double));
-		for ( int i = 0; i < (int) grid.ysize-1; i++ )
+		for ( size_t i = 0; i < grid.ysize-1; ++i )
 		  {
 		    grid.ybounds[2*i+1]   = 0.5*(grid.yvals[i] + grid.yvals[i+1]);
 		    grid.ybounds[2*(i+1)] = 0.5*(grid.yvals[i] + grid.yvals[i+1]);
@@ -344,7 +345,7 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( cmpstrlen(buffer, "CDF", len) == 0 )
 	{
-	  if ( cdoDebug ) cdoPrint("Grid from NetCDF file");
+	  if ( CdoDebug::cdoDebug ) cdoPrint("Grid from NetCDF file");
 	  gridID = gridFromNCfile(filename);
 	}
 
@@ -352,7 +353,7 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cmpstrlen(buffer+1, "HDF", len) == 0 )
 	    {
-	      if ( cdoDebug ) cdoPrint("Grid from HDF5 file");
+	      if ( CdoDebug::cdoDebug ) cdoPrint("Grid from HDF5 file");
 	      gridID = gridFromH5file(filename);
 	    }
 	}
@@ -361,14 +362,14 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cmpstrlen(buffer+1, "HDF", len) == 0 )
 	    {
-	      if ( cdoDebug ) cdoPrint("Grid from NetCDF4 file");
+	      if ( CdoDebug::cdoDebug ) cdoPrint("Grid from NetCDF4 file");
 	      gridID = gridFromNCfile(filename);
 	    }
 	}
 
       if ( gridID == -1 )
 	{
-	  if ( cdoDebug ) cdoPrint("Grid from CDI file");
+	  if ( CdoDebug::cdoDebug ) cdoPrint("Grid from CDI file");
 	  openLock();
 	  int streamID = streamOpenRead(filename);
 	  openUnlock();
@@ -382,7 +383,7 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( gridID == -1 )
 	{
-	  if ( cdoDebug ) cdoPrint("grid from ASCII file");
+	  if ( CdoDebug::cdoDebug ) cdoPrint("grid from ASCII file");
 	  FILE *gfp = fopen(filename, "r");
 	  //size_t buffersize = 20*1024*1024;
 	  //char *buffer = (char*) Malloc(buffersize);
@@ -394,7 +395,7 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( gridID == -1 )
 	{
-	  if ( cdoDebug ) cdoPrint("grid from PINGO file");
+	  if ( CdoDebug::cdoDebug ) cdoPrint("grid from PINGO file");
 	  FILE *gfp = fopen(filename, "r");
 	  gridID = grid_read_pingo(gfp, filename);
 	  fclose(gfp);

@@ -104,6 +104,7 @@ paramType *params_new(int vlistID)
     {
       int gridID     = vlistInqVarGrid(vlistID, varID);
       int zaxisID    = vlistInqVarZaxis(vlistID, varID);
+      int datatype   = vlistInqVarDatatype(vlistID, varID);
       int steptype   = vlistInqVarTimetype(vlistID, varID);
       int ngp        = gridInqSize(gridID);
       int nlev       = zaxisInqSize(zaxisID);
@@ -119,6 +120,7 @@ paramType *params_new(int vlistID)
       params[varID].coord    = 0;
       params[varID].gridID   = gridID;
       params[varID].zaxisID  = zaxisID;
+      params[varID].datatype = datatype;
       params[varID].steptype = steptype;
       params[varID].ngp      = ngp;
       params[varID].nlev     = nlev;
@@ -217,7 +219,7 @@ int params_add_ts(parse_param_t *parse_arg)
       params[varID].steptype = TIME_VARYING;
       params[varID].ngp      = 1;
       params[varID].nlev     = 1;
-      
+
       parse_arg->nparams++;
     }
 
@@ -322,7 +324,7 @@ void *Expr(void *argument)
 
   if ( cdoVerbose )
     for ( int varID = 0; varID < parse_arg.nparams; varID++ )
-      cdoPrint("var: %d %s ngp=%lu nlev=%lu coord=%c",
+      cdoPrint("var: %d %s ngp=%zu nlev=%zu coord=%c",
                varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord==0?' ':params[varID].coord);
 
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));

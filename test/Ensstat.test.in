@@ -10,19 +10,24 @@ STATS="min max range sum avg mean std std1 var var1"
 #
 IFILE=$DATAPATH/ts_mm_5years
 export CDO_FILE_SUFFIX=NULL
-$CDO splityear $IFILE ${$}ts_year
+rm -f Ensstat_Ifilegeneration.debug
+$CDO $DEBUG_OUT --seperateDebugFromLog Ensstat_Ifilegeneration.debug splityear $IFILE ${$}ts_year
 IFILES="${$}ts_year????"
 #
 NTEST=1
 #
 for STAT in $STATS; do
   RSTAT=0
+
+  rm -f Ensstat_${STAT}.debug
+  DEBUG_OUT="--seperateDebugFromLog Ensstat_${STAT}.debug"
+
   RFILE=$DATAPATH/ymon${STAT}_ref
   OFILE=ens${STAT}_res
 
   CDOTEST="ens$STAT"
 
-  CDOCOMMAND="$CDO ens${STAT} $IFILES $OFILE"
+  CDOCOMMAND="$CDO $DEBUG_OUT ens${STAT} $IFILES $OFILE"
 
   echo "Running test: $NTEST"
   echo "$CDOCOMMAND"
@@ -30,7 +35,7 @@ for STAT in $STATS; do
   $CDOCOMMAND
   test $? -eq 0 || let RSTAT+=1
 
-  $CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+  $CDO $DEBUG_OUT diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
   test $? -eq 0 || let RSTAT+=1
   test -s $CDOOUT && let RSTAT+=1
   cat $CDOOUT $CDOERR

@@ -31,6 +31,8 @@
 #include <limits.h>
 #include <float.h>
 
+#include "compare.h"
+
 
 using namespace std;
 //using boost::array;
@@ -365,7 +367,7 @@ namespace nearpt3 {   // start of namespace nearpt3
 	const int hibase=base[i1+1];
 	for (int i=base[i0]; i<hibase; i++) {
 	  const double d2 = (double) Distance2(pts[cells[i]], q);
-	  if (d2 < dist2 || (d2==dist2 && cells[i]<closestpt)) {
+	  if (d2 < dist2 || (IS_EQUAL(d2,dist2) && cells[i]<closestpt)) {
 	    dist2 = d2;
 	    closestpt = cells[i];
 	  }
@@ -597,7 +599,7 @@ namespace nearpt3 {   // start of namespace nearpt3
 	  // If two fixed points are the same distance from the query, then return the one with the
 	  // smallest index.  This removes ambiguities, but complicates the code in several places.
 
-	  if (thisdist<dist || (thisdist==dist && thisclosest<closestpt)) {
+	  if (thisdist<dist || (IS_EQUAL(thisdist,dist) && thisclosest<closestpt)) {
 	    dist = thisdist;
 	    closestpt = thisclosest;
 	    if (!foundit) {
@@ -623,7 +625,7 @@ namespace nearpt3 {   // start of namespace nearpt3
     // No nearby points, so exhaustively search over all the fixed points.   
     for (int i=0; i< g->nfixpts; i++) {
       double d = (double) Distance2(q, g->pts[i]);
-      if (d< dist || (d==dist && i < closestpt)) {
+      if (d< dist || (IS_EQUAL(d,dist) && i < closestpt)) {
 	dist = d;
 	closestpt = i;
       }
