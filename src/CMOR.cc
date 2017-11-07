@@ -2446,8 +2446,12 @@ static void change_grid(char *grid_file, int gridID, int vlistID)
   if ( a != b )
     cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n          because xsize of $IFILE: '%d' is not identical to xsize of ginfo file: '%d'.", grid_file, a, b);
 
-  vlistChangeGrid(vlistID, gridID, gridID2);
+  if ( gridID != gridID2 )
+    {
+      vlistChangeGrid(vlistID, gridID, gridID2);
+    }
   cdoPrint("Successfully substituted grid.");
+  
 
   pstreamClose(streamID2);
 }
