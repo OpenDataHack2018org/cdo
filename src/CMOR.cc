@@ -1118,7 +1118,7 @@ static int check_attr(list_t *kvl, char *project_id)
   const char *reqAttCMOR2[] = {"contact", "model_id", NULL};  
   const char *reqAttCMIP5[] = {"institute_id", "product", "member", NULL};
   const char *reqAttCMIP5CMOR3[] = {"modeling_realm", NULL};
-  const char *reqAttCORDEX[] = {"institute_id", "product", "member", "CORDEX_domain", "driving_model_id", NULL};
+  const char *reqAttCORDEX[] = {"institute_id", "product", "member", "CORDEX_domain", "driving_model_id", "rcm_version_id", NULL};
 /*  const char *reqAttCMIP6CMOR3[] = {"outpath", "output_path_template", "output_file_template", "tracking_prefix", NULL}; 
 "further_info_url", "variant_label",*/
   const char *reqAttCMIP6[] = {"activity_id", "experiment", "grid", "grid_label", "institution_id", "license", "nominal_resolution", "source_id", "source_type",  NULL};
@@ -1180,10 +1180,14 @@ static int check_attr(list_t *kvl, char *project_id)
         {
           keyValues_t *kv_reqatt = kvlist_search(kvl, expdepAttCMIP6[j]);
           if ( !kv_reqatt || strcmp(kv_reqatt->values[0], "notSet") == 0 )
-            if ( cdoVerbose )
-              cdoPrint("Depending on the experiment, attribute '%s' may be required. Either it is missing or notSet", expdepAttCMIP6[j]);
+            {
+              if ( cdoVerbose )
+                cdoPrint("Depending on the experiment, attribute '%s' may be required. Either it is missing or notSet", expdepAttCMIP6[j]);
+            }
           else if ( cdoVerbose )
-            cdoPrint("Attribute '%s' is '%s'. ", expdepAttCMIP6[j], kv_reqatt->values[0]);
+            {
+              cdoPrint("Attribute '%s' is '%s'. ", expdepAttCMIP6[j], kv_reqatt->values[0]);
+            }
           j++;
         }
     }
@@ -1812,6 +1816,30 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
     {
       cdoWarning("In preparing cmor_setup:\n          You set 'd' = '%s' which is not valid.\n          Allowed are: 'n' or 'y'. d is set to 'y'.", drs);
       kv_insert_a_val(kvl, "d", (char *)"y", 1);
+    }
+  if ( strcmp(kv_get_a_val(kvl, "project_id", ""), "CORDEX") == 0 && creat_subs )
+    {
+      if ( cdoVerbose )
+        cdoPrint("Since you produce CORDEX compliant output, a path is constructed with DRS elements according to the project defined template.");
+
+      char *miptabfreq = kv_get_a_val(kvl, "miptab_freq", NULL);
+      char freq[CDI_MAX_NAME];
+      if ( strcmp(miptabfreq, "6h") == 0)
+        strcpy(freq, "6hr");
+      else if ( strcmp(miptabfreq, "3h") == 0 )
+        strcpy(freq, "3hr");
+      else
+        strcpy(freq, miptabfreq);
+
+      char cordexDir[CDI_MAX_NAME];
+      char cordexFileTem[CDI_MAX_NAME];
+      sprintf(cordexDir,"%s/%s/%s/%s/%s/%s/%s/%s/%s/%s/%s", kv_get_a_val(kvl, "dr", "./"), kv_get_a_val(kvl, "project_id", NULL), kv_get_a_val(kvl, "product", NULL), kv_get_a_val(kvl, "CORDEX_domain", NULL), kv_get_a_val(kvl, "institute_id", NULL), kv_get_a_val(kvl, "driving_model_id", NULL), kv_get_a_val(kvl, "experiment_id", NULL), kv_get_a_val(kvl, "member", NULL), kv_get_a_val(kvl, "model_id", NULL), kv_get_a_val(kvl, "rcm_version_id", NULL), freq);
+      sprintf(cordexFileTem,"%s_%s_%s_%s_%s_%s_%s", kv_get_a_val(kvl, "CORDEX_domain", NULL), kv_get_a_val(kvl, "driving_model_id", NULL),  kv_get_a_val(kvl, "experiment_id", NULL), kv_get_a_val(kvl, "member", NULL), kv_get_a_val(kvl, "model_id", NULL), kv_get_a_val(kvl, "rcm_version_id", NULL), freq);
+
+      kv_insert_a_val(kvl, "dr", (char *)"./", 1);
+      kv_insert_a_val(kvl, "cordexDir", cordexDir, 1);
+      kv_insert_a_val(kvl, "cordexFileTem", cordexFileTem, 1);
+      creat_subs = 0;
     }
 
   int vlistID = pstreamInqVlist(streamID);
