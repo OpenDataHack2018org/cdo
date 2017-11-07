@@ -466,8 +466,8 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
 
   gs->search_radius = cdo_default_search_radius();
 
-  cal_bound_box(gs, n, lons, lats);
-  cal_mask(gs);
+  // cal_bound_box(gs, n, lons, lats);
+  // cal_mask(gs);
 
   return gs;
 }
