@@ -1328,17 +1328,14 @@ void cdoFinish(void)
 
   if (processID == 0)
     {
-      int mu[] = { 'b', 'k', 'm', 'g', 't' };
-      int muindex = 0;
       size_t memmax = getPeakRSS();
-      while (memmax > 9999)
-        {
-          memmax /= 1024;
-          muindex++;
-        }
-
       if (memmax)
-        snprintf(memstring, sizeof(memstring), " %zu%c", memmax, mu[muindex]);
+        {
+          int muindex = 0;
+          while (memmax > 9999) { memmax /= 1024; muindex++; }
+          const char *mu[] = { "B", "KB", "MB", "GB", "TB" };
+          snprintf(memstring, sizeof(memstring), " %zu%s", memmax, mu[muindex]);
+        }
 
       processEndTime(&p_usertime, &p_systime);
       p_cputime = p_usertime + p_systime;
