@@ -97,8 +97,8 @@ void printFiletype(int streamID, int vlistID)
 	  int comptype = vlistInqVarCompType(vlistID, varID);
 	  if ( comptype )
 	    {
-	      if      ( comptype == CDI_COMPRESS_SZIP ) printf(" SZIP");
-	      else if ( comptype == CDI_COMPRESS_ZIP  ) printf(" ZIP");
+	      if      ( comptype == CDI_COMPRESS_SZIP ) printf(" szip");
+	      else if ( comptype == CDI_COMPRESS_ZIP  ) printf(" zip");
 
 	      break;
 	    }
@@ -113,7 +113,8 @@ void printFiletype(int streamID, int vlistID)
 	  int comptype = vlistInqVarCompType(vlistID, varID);
 	  if ( comptype )
 	    {
-	      if ( comptype == CDI_COMPRESS_JPEG ) printf(" JPEG");
+	      if      ( comptype == CDI_COMPRESS_JPEG ) printf(" jpeg");
+	      else if ( comptype == CDI_COMPRESS_SZIP ) printf(" ccsds");
 	      break;
 	    }
 	}
