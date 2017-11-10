@@ -11,45 +11,30 @@
    general utility functions 
 
    ********************************************************************* */
-inline kdata_t
-kd_sph_dist_sq(kdata_t *x, kdata_t *y)
+
+inline
+kdata_t kd_sph_dist(kdata_t *x, kdata_t *y)
 {
-    kdata_t ds;
-    /*kdata_t arg;*/
-
-    if (!x || !y)
-        return -1;
-
-    ds = acos(sin(x[1]) * sin(y[1]) +
-               cos(x[1]) * cos(y[1]) * cos(x[0] - y[0]));
-    /*    arg = sqrt(kd_sqr(sin((x[1] - y[1])/2)) + cos(x[1]) * cos(y[1]) *
-	       kd_sqr(sin((x[0] - y[0])/2)));
-	       ds = 2 * asin(arg);
-    */
-    return kd_sqr(ds);
+  if (!x || !y) return -1;
+  return acos(sin(x[1]) * sin(y[1]) + cos(x[1]) * cos(y[1]) * cos(x[0] - y[0]));
 }
 
-inline kdata_t
-kd_sph_dist(kdata_t *x, kdata_t *y)
+inline
+kdata_t kd_sph_dist_sq(kdata_t *x, kdata_t *y)
 {
-    kdata_t ds;
-
-    if (!x || !y)
-        return -1;
-
-    ds = acos(sin(x[1]) * sin(y[1]) +
-               cos(x[1]) * cos(y[1]) * cos(x[0] - y[0]));
-    return ds;
+  if (!x || !y) return -1;
+  /*    arg = sqrt(kd_sqr(sin((x[1] - y[1])/2)) + cos(x[1]) * cos(y[1]) *
+        kd_sqr(sin((x[0] - y[0])/2)));
+        ds = 2 * asin(arg);
+  */
+  return kd_sqr(kd_sph_dist(x, y));
 }
 
-kdata_t
-kd_sph_bearing(kdata_t *p1, kdata_t *p2)
-{
-    kdata_t x, y;
-    
-    x = cos(p1[1]) * sin(p2[1]) - sin(p1[1]) * cos(p2[1]) * cos(p2[0] - p1[0]);
-    y = sin(p2[0] - p1[0]) * cos(p2[1]);
-    return atan2(y, x);
+kdata_t kd_sph_bearing(kdata_t *p1, kdata_t *p2)
+{    
+  kdata_t x = cos(p1[1]) * sin(p2[1]) - sin(p1[1]) * cos(p2[1]) * cos(p2[0] - p1[0]);
+  kdata_t y = sin(p2[0] - p1[0]) * cos(p2[1]);
+  return atan2(y, x);
 }
 
 
@@ -64,33 +49,31 @@ kd_sph_bearing(kdata_t *p1, kdata_t *p2)
  */
 kdata_t 
 kd_sph_xtd(kdata_t *p1, kdata_t *p2, kdata_t *p3)
-{
-    kdata_t d13, theta13, theta12;
-    
-    d13 = kd_sph_dist(p1, p3);
-    theta13 = kd_sph_bearing(p1, p3);
-    theta12 = kd_sph_bearing(p1, p2);
-    return asin(sin(d13) * sin(theta13 - theta12));
+{    
+  kdata_t d13 = kd_sph_dist(p1, p3);
+  kdata_t theta13 = kd_sph_bearing(p1, p3);
+  kdata_t theta12 = kd_sph_bearing(p1, p2);
+  return asin(sin(d13) * sin(theta13 - theta12));
 }
 
 
 kdata_t
 kd_sph_orth_dist(kdata_t *p1, kdata_t *p2, int split)
 {
+  kdata_t ra2, dec2;
 
-    kdata_t ra2, dec2;
-    kdata_t dx;
-
-    if (split == 1) {
-        ra2 = p1[0];
-        dec2 = p2[1];
-    } else {
-        ra2 = p2[0];
-        dec2 = p1[1];
+  if (split == 1)
+    {
+      ra2 = p1[0];
+      dec2 = p2[1];
     }
-    dx = acos(sin(p1[1]) * sin(dec2) +
-              cos(p1[1]) * cos(dec2) * cos(p1[0] - ra2));
-    return dx;
+  else
+    {
+      ra2 = p2[0];
+      dec2 = p1[1];
+    }
+
+  return acos(sin(p1[1]) * sin(dec2) + cos(p1[1]) * cos(dec2) * cos(p1[0] - ra2));
 }
 
 /* end utility functions */
@@ -107,13 +90,6 @@ kd_sph_orth_dist(kdata_t *p1, kdata_t *p2, int split)
  * and data container).
  *
  * \param nPoints the length of the points array.
- *
- * \param constr a pointer to a void *constructor() function to include
- * data container in tree; optional, can be NULL
- *
- * \param destr a pointer to a void destructor() function to free()
- * data container in the tree; optional, can be NULL, but should be
- * given if the constr argument is non-NULL.
  *
  * \param min a vector with the minimum positions of the corners of the
  * hyperrectangle containing the data.
@@ -133,8 +109,7 @@ kd_sph_buildTree(struct kd_point *points, size_t nPoints,
 {
   struct kd_thread_data my_data;
   kd_initArg(&my_data, points, nPoints, min, max, 0,max_threads, 2);
-  struct kdNode *tree = (kdNode *)kd_doBuildTree(&my_data);
-  return tree;
+  return (kdNode *)kd_doBuildTree(&my_data);
 }
 
 
@@ -289,8 +264,7 @@ kd_sph_ortRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max)
 }
 
 
-/* This is the orthogonal range search. Returns 1 if okay, 0 in case
-   of problems. */
+/* This is the orthogonal range search. Returns 1 if okay, 0 in case of problems. */
 int
 kd_sph_doOrtRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max,
                         struct pqueue *res)

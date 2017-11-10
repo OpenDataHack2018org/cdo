@@ -58,6 +58,7 @@ typedef long kdata_t;
 
 #define KD_MAX_DIM 3
 
+
 typedef struct kd_point {
     kdata_t point[KD_MAX_DIM];
     size_t index;
@@ -73,7 +74,6 @@ int qcmp(struct kd_point *a, struct kd_point *b, int axis)
   return ret;
 }
 
-
 /*!
  * \struct kdNode 
  * \brief kd-tree node structure definition 
@@ -81,9 +81,9 @@ int qcmp(struct kd_point *a, struct kd_point *b, int axis)
 typedef struct kdNode {
     struct kdNode *left;          /*!<the left child of the tree node */
     struct kdNode *right;         /*!<the right child of the tree node */
-    kdata_t location[KD_MAX_DIM]; /*!<vector to the node's location */
     kdata_t min[KD_MAX_DIM];      /*!<vector to the min coordinates of the hyperrectangle */
     kdata_t max[KD_MAX_DIM];      /*!<vector to the max coordinates of the hyperrectangle */
+    kdata_t location[KD_MAX_DIM]; /*!<vector to the node's location */
     int split;                    /*!<axis along which the tree bifurcates */
     size_t index;                 /*!<optional index value */
 } kdNode;
@@ -102,7 +102,7 @@ typedef struct resItem {
  * \brief priority queue (min-max heap)
  */
 typedef struct pqueue {
-    struct resItem **d;         /*!<pointer to an array of result items */
+    struct resItem **d;       /*!<pointer to an array of result items */
     size_t size;              /*!<current length of the queue */
     size_t avail;             /*!<currently allocated queue elements */
     size_t step;              /*!<step size in which new elements are allocated */
