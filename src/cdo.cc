@@ -301,8 +301,8 @@ void cdo_usage(void)
   fprintf(stderr, "    -v, --verbose  Print extra details for some operators\n");
   fprintf(stderr, "    -W             Print extra warning messages\n");
   fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
+  fprintf(stderr, "       aec         AEC compression of GRIB2 records\n");
   fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
-  fprintf(stderr, "       ccsds       CCSDS compression of GRIB2 records\n");
   fprintf(stderr, "        zip[_1-9]  Deflate compression of NetCDF4 variables\n");
 #ifdef HIRLAM_EXTENSIONS
   fprintf(stderr, "    --Dkext <debLev>   Setting debugLevel for extensions\n");
@@ -658,20 +658,15 @@ void defineCompress(const char *arg)
       cdoCompType  = CDI_COMPRESS_SZIP;
       cdoCompLevel = 0;
     }
-  else if ( strncmp(arg, "ccsds", len) == 0 )
+  else if ( strncmp(arg, "aec", len) == 0 )
     {
-      cdoCompType = CDI_COMPRESS_SZIP;
+      cdoCompType = CDI_COMPRESS_AEC;
       cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "jpeg", len) == 0 )
     {
       cdoCompType = CDI_COMPRESS_JPEG;
       cdoCompLevel = 0;
-    }
-  else if ( strncmp(arg, "gzip", len) == 0 )
-    {
-      cdoCompType  = CDI_COMPRESS_GZIP;
-      cdoCompLevel = 6;
     }
   else if ( strncmp(arg, "zip", 3) == 0 )
     {

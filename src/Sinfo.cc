@@ -226,10 +226,11 @@ void *Sinfo(void *argument)
 	  set_text_color(stdout, RESET, BLUE);
 	  fprintf(stdout, " %-3s", pstr);
 
-	  if ( vlistInqVarCompType(vlistID, varID) == CDI_COMPRESS_NONE )
+          int comptype = vlistInqVarCompType(vlistID, varID);
+	  if ( comptype == CDI_COMPRESS_NONE )
 	    fprintf(stdout, "  ");
 	  else
-	    fprintf(stdout, "z ");
+	    fprintf(stdout, "%c ", (int)comp_name(comptype)[0]);
 
 	  reset_text_color(stdout);
 	      
