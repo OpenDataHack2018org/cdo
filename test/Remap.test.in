@@ -1,8 +1,8 @@
 #! @BASH@
 if [ "$USER" = "m214003" ]; then
-echo 1..32 # Number of tests to be executed.
+echo 1..36 # Number of tests to be executed.
 else
-echo 1..20 # Number of tests to be executed.
+echo 1..24 # Number of tests to be executed.
 fi
 #
 test -n "$CDO"      || CDO=cdo
@@ -24,7 +24,7 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
   if [ "$GRIDTYPE" != "regular" ]; then SETGRID="-setgridtype,$GRIDTYPE"; fi
   for GRID in $GRIDS; do
 # remaplaf: sort could give different results"
-    RMODS="bil bic con ycon"
+    RMODS="bil bic con con2 ycon"
     if [ "$GRIDTYPE" = "unstructured" ]; then RMODS="con ycon"; fi
     if [ "$USER" = "m214003" ]; then RMODS="dis nn $RMODS"; fi
     for RMOD in $RMODS; do

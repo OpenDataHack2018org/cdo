@@ -1,5 +1,5 @@
 #! @BASH@
-echo 1..7 # Number of tests to be executed.
+echo 1..8 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -14,7 +14,7 @@ GRID=$DATAPATH/spain.grid
 IFILE=$DATAPATH/tsurf_spain.grb
 NTEST=1
 #
-RMODS="dis nn bil bic con ycon laf"
+RMODS="dis nn bil bic con con2 ycon laf"
 for RMOD in $RMODS; do
   ABSLIM=$ABSLIMMAX
   if [ $RMOD = dis ];  then ABSLIM=$ABSLIMDIS; fi

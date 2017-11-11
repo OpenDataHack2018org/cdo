@@ -5,6 +5,48 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Remap
+#
+cdo -f grb setrtomiss,0,10000  -gridboxmean,8,8 -topo bathy4.grb
+#
+GRIDS="n16 n32"
+RMODS="bil bic dis nn con con2 laf"
+RMODS="con2"
+IFILE=bathy4.grb
+for GRID in $GRIDS; do
+  for RMOD in $RMODS; do
+    OFILE=${GRID}_${RMOD}
+    $CDO $FORMAT remap${RMOD},$GRID $IFILE ${OFILE}_ref
+  done
+done
+exit
+########################################################################
+#
+# Remap regional grid
+#
+GRID=spain.grid
+cat > $GRID <<EOF
+gridtype=lonlat
+xsize=20
+ysize=18
+xfirst=-13
+yfirst=33
+xinc=.8
+yinc=.8
+EOF
+RMODS="bil bic dis nn con con2 ycon laf"
+IFILE=tsurf_spain.grb
+for RMOD in $RMODS; do
+  OFILE=tsurf_spain_${RMOD}
+  for extra in def off on; do
+      EXTRA="$extra"
+      if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
+      REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},${GRID} $IFILE ${OFILE}_${extra}_ref
+  done
+done
+exit
+########################################################################
+#
 # Test GRIB files
 #
 IFILES="testfile01 testfile02 testfile03"
@@ -87,31 +129,6 @@ done
 IFILE=ts_6h_1mon
 for STAT in $STATS; do
   $CDO $FORMAT day$STAT $IFILE day${STAT}_ref
-done
-exit
-########################################################################
-#
-# Remap regional grid
-#
-GRID=spain.grid
-cat > $GRID <<EOF
-gridtype=lonlat
-xsize=20
-ysize=18
-xfirst=-13
-yfirst=33
-xinc=.8
-yinc=.8
-EOF
-RMODS="bil bic dis nn con ycon laf"
-IFILE=tsurf_spain.grb
-for RMOD in $RMODS; do
-  OFILE=tsurf_spain_${RMOD}
-  for extra in def off on; do
-      EXTRA="$extra"
-      if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
-      REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},${GRID} $IFILE ${OFILE}_${extra}_ref
-  done
 done
 exit
 ########################################################################
@@ -287,21 +304,6 @@ $CDO sp2gp $IFILE $OFILE
 IFILE=gp2spl_ref
 OFILE=sp2gpl_ref
 $CDO sp2gpl $IFILE $OFILE
-########################################################################
-#
-# Remap
-#
-cdo -f grb setrtomiss,0,10000  -gridboxmean,8,8 -topo bathy4.grb
-#
-GRIDS="n16 n32"
-RMODS="bil bic dis nn con laf"
-IFILE=bathy4.grb
-for GRID in $GRIDS; do
-  for RMOD in $RMODS; do
-    OFILE=${GRID}_${RMOD}
-    $CDO $FORMAT remap${RMOD},$GRID $IFILE ${OFILE}_ref
-  done
-done
 ########################################################################
 #
 # Select
