@@ -534,9 +534,7 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, std::vector<bool>& rem
 	}
     }
 
-  for ( index = 0; index < ngrids; index++ )
-    if ( remapgrids[index] ) break;
-
+  for ( index = 0; index < ngrids; index++ ) if ( remapgrids[index] ) break;
   if ( index == ngrids ) cdoAbort("No remappable grid found!");
 
   return index;
@@ -776,10 +774,8 @@ void *Remap(void *argument)
   int streamID2 = -1;
   int nrecs;
   int varID, levelID;
-  size_t gridsize, gridsize2;
-  int gridID1 = -1, gridID2;
+  size_t gridsize2;
   size_t nmiss1, nmiss2;
-  size_t j;
   int r = -1;
   int nremaps = 0;
   int norm_opt = NORM_OPT_NONE;
@@ -835,7 +831,6 @@ void *Remap(void *argument)
     {
       operatorInputArg("grid description file or name, remap weights file (SCRIP NetCDF)");
       operatorCheckArgc(2);
-      gridID2 = cdoDefineGrid(operatorArgv()[0]);
       remap_file = operatorArgv()[1];
     }
   else
@@ -843,7 +838,6 @@ void *Remap(void *argument)
       operatorInputArg("grid description file or name");
       if ( operfunc == REMAPDIS && operatorArgc() == 2 )
         {
-          gridID2 = cdoDefineGrid(operatorArgv()[0]);
           int inum = parameter2int(operatorArgv()[1]);
           //  if ( inum < 1 || inum > 9 ) cdoAbort("Number of nearest neighbors out of range (1-9)!", inum);
           num_neighbors = inum;
@@ -851,9 +845,10 @@ void *Remap(void *argument)
       else
         {
           operatorCheckArgc(1);
-          gridID2 = cdoDefineGrid(operatorArgv()[0]);
         }
     }
+  
+  int gridID2 = cdoDefineGrid(operatorArgv()[0]);
 
   if ( gridInqType(gridID2) == GRID_GENERIC ) cdoAbort("Unsupported target grid type (generic)!");
 
@@ -871,7 +866,7 @@ void *Remap(void *argument)
   int ngrids = vlistNgrids(vlistID1);
   std::vector<bool> remapgrids(ngrids);
   int index = set_remapgrids(filetype, vlistID1, ngrids, remapgrids);
-  gridID1 = vlistGrid(vlistID1, index);
+  int gridID1 = vlistGrid(vlistID1, index);
 
   for ( index = 0; index < ngrids; index++ )
     if ( remapgrids[index] )
@@ -979,7 +974,7 @@ void *Remap(void *argument)
   double *array1 = (double*) Malloc(grid1sizemax*sizeof(double));
   int *imask = (int*) Malloc(grid1sizemax*sizeof(int));
 
-  gridsize = gridInqSize(gridID2);
+  size_t gridsize = gridInqSize(gridID2);
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( ! lwrite_remap )
@@ -1119,7 +1114,7 @@ void *Remap(void *argument)
 		       (gridInqType(gridID1) == GRID_GME || gridInqType(gridID1) == GRID_UNSTRUCTURED) )
 		    cdoAbort("Bilinear/bicubic interpolation doesn't support unstructured source grids!");
 
-		  /* initialize grid information for both grids */
+		  // Initialize grid information for both grids
 		  if ( cdoTimer ) timer_start(timer_remap_init);
 		  remap_grids_init(map_type, remap_extrapolate, gridID1, &remaps[r].src_grid, gridID2, &remaps[r].tgt_grid);
 		  if ( cdoTimer ) timer_stop(timer_remap_init);
@@ -1130,7 +1125,7 @@ void *Remap(void *argument)
 
 	      if ( gridInqType(gridID1) == GRID_GME )
 		{
-		  j = 0;
+		  size_t j = 0;
 		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( remaps[r].src_grid.vgpm[i] ) imask[j++] = imask[i];
 		}
@@ -1174,7 +1169,7 @@ void *Remap(void *argument)
 
 	  if ( gridInqType(gridID1) == GRID_GME )
 	    {
-	      j = 0;
+	      size_t j = 0;
 	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( remaps[r].src_grid.vgpm[i] ) array1[j++] = array1[i];
 	    }
@@ -1252,8 +1247,8 @@ void *Remap(void *argument)
 	    {
 	      int nd, ni, ni2, ni3;
  	      gridInqParamGME(gridID2, &nd, &ni, &ni2, &ni3);
-	      j = remaps[r].tgt_grid.size;
 
+	      size_t j = remaps[r].tgt_grid.size;
 	      for ( size_t i = gridsize2; i > 0 ; i-- )
 		if ( remaps[r].tgt_grid.vgpm[i-1] ) array2[i-1] = array2[--j];
 
