@@ -34,7 +34,7 @@ struct gridsearch {
   size_t dims[2];
 
   struct gsNear *near;
-  struct kdNode *kdt;
+  struct kdTree *kdt;
   struct gsFull *full;
 
   double search_radius;

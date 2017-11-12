@@ -103,13 +103,19 @@ kd_sph_orth_dist(kdata_t *p1, kdata_t *p2, int split)
  *
  * \return root node of the tree
  */
-struct kdNode *
+kdTree_t *
 kd_sph_buildTree(struct kd_point *points, size_t nPoints,
                  kdata_t *min, kdata_t *max, int max_threads)
 {
+  kdTree_t *tree = (kdTree_t *) malloc(sizeof(kdTree_t));
+#ifdef MEMPOOL
+  tree->nodepool = kd_nodepool_new(nPoints*2);
+#endif
   struct kd_thread_data my_data;
-  kd_initArg(&my_data, points, nPoints, min, max, 0,max_threads, 2);
-  return (kdNode *)kd_doBuildTree(&my_data);
+  kd_initArg(&my_data, tree->nodepool, points, nPoints, min, max, 0,max_threads, 2);
+  tree->node = (kdNode *)kd_doBuildTree(&my_data);
+
+  return tree;
 }
 
 
@@ -176,7 +182,7 @@ kd_sph_isRectInRect(struct kdNode *node, kdata_t *min, kdata_t *max)
     point->point[1] = node->min[1];
     tmpNode = kd_allocNode(point, 0, point->point, point->point, 0, 2);
     if (!kd_sph_isPointInRect(tmpNode, min, max)) {
-	kd_destroyTree(tmpNode);	
+	kd_doDestroyTree(tmpNode);	
 	free(point);
 	return 0;
     }
@@ -184,7 +190,7 @@ kd_sph_isRectInRect(struct kdNode *node, kdata_t *min, kdata_t *max)
     point->point[1] = node->max[1];
     tmpNode = kd_allocNode(point, 0, point->point, point->point, 0, 2);
     if (!kd_sph_isPointInRect(tmpNode, min, max)) {
-	kd_destroyTree(tmpNode);	
+	kd_doDestroyTree(tmpNode);	
 	free(point);
 	return 0;
     }
@@ -192,7 +198,7 @@ kd_sph_isRectInRect(struct kdNode *node, kdata_t *min, kdata_t *max)
     point->point[1] = node->min[1];
     tmpNode = kd_allocNode(point, 0, point->point, point->point, 0, 2);
     if (!kd_sph_isPointInRect(tmpNode, min, max)) {
-	kd_destroyTree(tmpNode);	
+	kd_doDestroyTree(tmpNode);	
 	free(point);
 	return 0;
     }
@@ -200,11 +206,11 @@ kd_sph_isRectInRect(struct kdNode *node, kdata_t *min, kdata_t *max)
     point->point[1] = node->max[1];
     tmpNode = kd_allocNode(point, 0, point->point, point->point, 0, 2);
     if (!kd_sph_isPointInRect(tmpNode, min, max)) {
-	kd_destroyTree(tmpNode);	
+	kd_doDestroyTree(tmpNode);	
 	free(point);
 	return 0;
     }
-    kd_destroyTree(tmpNode);	
+    kd_doDestroyTree(tmpNode);	
     free(point);
 
     return 1;

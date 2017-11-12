@@ -12,6 +12,7 @@
                              _compPoints: compare index if points[axis] are equal
                    20171102: renamed kd_buildArg() to kd_initArg(), changed interface and memory handling
                              changed data pointer to size_t
+                   20171112: added node pool
 */
 #ifndef  KDTREE_H_
 #define  KDTREE_H_
@@ -22,6 +23,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <atomic>
+
+//#define  MEMPOOL   1
 
 #define  KD_FLOAT  1
 #define  KD_INT    2
@@ -81,12 +85,30 @@ int qcmp(struct kd_point *a, struct kd_point *b, int axis)
 typedef struct kdNode {
     struct kdNode *left;          /*!<the left child of the tree node */
     struct kdNode *right;         /*!<the right child of the tree node */
+    kdata_t location[KD_MAX_DIM]; /*!<vector to the node's location */
     kdata_t min[KD_MAX_DIM];      /*!<vector to the min coordinates of the hyperrectangle */
     kdata_t max[KD_MAX_DIM];      /*!<vector to the max coordinates of the hyperrectangle */
-    kdata_t location[KD_MAX_DIM]; /*!<vector to the node's location */
     int split;                    /*!<axis along which the tree bifurcates */
     size_t index;                 /*!<optional index value */
 } kdNode;
+
+
+typedef struct kdNodePool {
+  size_t size;
+  std::atomic<size_t>  imp;
+  kdNode *pool;
+} kdNodePool_t;
+
+
+typedef struct kdTree {
+  kdNode *node;
+  kdNodePool_t *nodepool;
+} kdTree_t;
+
+
+kdNodePool_t *kd_nodepool_new(size_t n);
+void kd_nodepool_delete(kdNodePool_t *pool);
+
 
 /*!
  * \struct resItem
@@ -113,13 +135,14 @@ typedef struct pqueue {
  * \brief arguments passed to the threaded kd-Tree construction
  */
 typedef struct kd_thread_data {
-    struct kd_point *points;
-    kdata_t min[KD_MAX_DIM];
-    kdata_t max[KD_MAX_DIM];
-    size_t nPoints;
-    int max_threads;
-    int depth;
-    int dim;
+  kdNodePool_t *nodepool;
+  struct kd_point *points;
+  kdata_t min[KD_MAX_DIM];
+  kdata_t max[KD_MAX_DIM];
+  size_t nPoints;
+  int max_threads;
+  int depth;
+  int dim;
 } kd_thread_data;
 
 
@@ -153,16 +176,19 @@ void kd_printNode(struct kdNode *node);
 void kd_printTree(struct kdNode *node);
 
 /* Functions for building and destroying trees */
+struct kdNode *kd_allocNodeP(kdNodePool *nodepool, struct kd_point *points, size_t pivot,
+                            kdata_t *min, kdata_t *max, int dim, int axis);
 struct kdNode *kd_allocNode(struct kd_point *points, size_t pivot,
                             kdata_t *min, kdata_t *max, int dim, int axis);
-void kd_destroyTree(struct kdNode *node);
-void kd_initArg(struct kd_thread_data *d, struct kd_point *points, size_t nPoints,
+void kd_doDestroyTree(struct kdNode *node);
+void kd_destroyTree(kdTree_t *tree);
+void kd_initArg(struct kd_thread_data *d, kdNodePool_t *nodepool, struct kd_point *points, size_t nPoints,
                 kdata_t *min, kdata_t *max, int depth, int max_threads, int dim);
-struct kdNode *kd_buildTree(struct kd_point *points, size_t nPoints,
+kdTree_t *kd_buildTree(struct kd_point *points, size_t nPoints,
                             kdata_t *min, kdata_t *max, int dim, int max_threads);
 void *kd_doBuildTree(void *threadarg);
-struct kdNode *kd_sph_buildTree(struct kd_point *points, size_t nPoints,
-                                kdata_t *min, kdata_t *max, int max_threads);
+kdTree_t *kd_sph_buildTree(struct kd_point *points, size_t nPoints,
+                           kdata_t *min, kdata_t *max, int max_threads);
 void *kd_sph_doBuildTree(void *threadarg);
 
 /* Functions for range searches 
@@ -208,4 +234,4 @@ int kd_sph_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
 int kd_insertResTree(struct kdNode *node, struct pqueue *res);
 
 
-#endif                          /* KDTREE_H_ */
+#endif  /* KDTREE_H_ */

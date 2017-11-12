@@ -2310,7 +2310,7 @@ int afterburner(int argc, char *argv[])
   omp_set_num_threads(numThreads);
   if ( omp_get_max_threads() > omp_get_num_procs() )
     fprintf(stdout, " Number of threads is greater than number of Cores=%d!\n", omp_get_num_procs());
-  fprintf(stdout, " OpenMP:  num_procs = %d  max_threads = %d\n", omp_get_num_procs(), omp_get_max_threads());
+  fprintf(stdout, " OpenMP:  num_procs=%d  max_threads=%d\n", omp_get_num_procs(), omp_get_max_threads());
 #else
   if ( numThreads > 0 )
     {

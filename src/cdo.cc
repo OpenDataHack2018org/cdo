@@ -1557,10 +1557,10 @@ int main(int argc, char *argv[])
     fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", ompNumThreads);
   if ( cdoVerbose )
     {
-      fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d", omp_get_num_procs(), omp_get_max_threads());
+      fprintf(stderr, " OpenMP:  num_procs=%d  max_threads=%d", omp_get_num_procs(), omp_get_max_threads());
 #if defined(HAVE_OPENMP4)
 #if !defined(__ICC)
-      fprintf(stderr, "  num_devices = %d", omp_get_num_devices());
+      fprintf(stderr, "  num_devices=%d", omp_get_num_devices());
 #endif
 #endif
       fprintf(stderr, "\n");
