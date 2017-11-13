@@ -31,8 +31,8 @@ namespace CdoDebug
      int cdoDebug;
      int cdoDebugExt = 0;     //  Debug level for the KNMI extensions
     //Subsystem Debug Switches
-     int  PSTREAM;
-     bool PROCESS;
+     int  PSTREAM = 0;
+     bool PROCESS = 0;
      bool PIPE;
      int ARGUMENT;
      int PTHREAD;
@@ -53,7 +53,7 @@ namespace CdoDebug
     CdoStartMessage()
     {
       std::stringstream message;
-      outfile_stream = std::fstream(outfile, std::fstream::in | std::fstream::app);
+      outfile_stream.open(outfile, std::fstream::in | std::fstream::app);
 
       message << std::string(30, ' ') << "  == CDO Start ==" << std::endl;
       printMessage(message);
@@ -65,6 +65,18 @@ namespace CdoDebug
       message << std::string(30, ' ') << "  == CDO End ==" << std::endl;
       printMessage(message);
       outfile_stream.close();
+    }
+
+    std::string argvToString(int argc, char ** argv)
+    {
+        std::string input_string = "";
+        for (int i = 0; i < argc; i++)
+        {
+            input_string += argv[i];
+            input_string += " ";
+        }
+        return input_string;
+
     }
 }
 namespace CdoLog

@@ -61,6 +61,7 @@ namespace CdoDebug
     void CdoStartMessage();
     void CdoEndMessage();
     void SetDebug(int p_debug_level);
+    std::string argvToString(int argc, char** argv);
 
    namespace{
         void printMessage(std::stringstream &p_message)
