@@ -53,7 +53,7 @@ namespace CdoDebug
     CdoStartMessage()
     {
       std::stringstream message;
-      outfile_stream = std::fstream(outfile, std::fstream::in | std::fstream::app);
+      outfile_stream.open(outfile, std::fstream::in | std::fstream::app);
 
       message << std::string(30, ' ') << "  == CDO Start ==" << std::endl;
       printMessage(message);
