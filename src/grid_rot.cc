@@ -7,6 +7,8 @@
 double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam, double polgam)
 {
   /*
+    Name of the original Fortran function: PHTOPHS
+
     This function converts lambda from one rotated system to lambda in another system. 
     If the optional argument polgam is present, the other system can also be a rotated one, 
     where polgam is the angle between the two north poles.
@@ -20,8 +22,6 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
     result : longitude in the geographical system
   */
   double zarg1, zarg2;
-  double zgam;
-  double result = 0;
 
   double zsinpol = sin(DEG2RAD*polphi);
   double zcospol = cos(DEG2RAD*polphi);
@@ -32,8 +32,10 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
   double zlamrot = DEG2RAD*lamrot;
 
   if ( fabs(polgam) > 0 )
+  //X  if ( polgam > 0 )
     {
-      zgam  = -DEG2RAD*polgam;
+      double zgam  = -DEG2RAD*polgam;
+      //X  double zgam  = DEG2RAD*polgam;
       zarg1 = sin(zlampol) *                                               
  	    (- zsinpol*cos(zphirot) * (cos(zlamrot)*cos(zgam) - sin(zlamrot)*sin(zgam)) 
  	     + zcospol*sin(zphirot))                                              
@@ -54,6 +56,7 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
               sin(zlampol)*           sin(zlamrot)*cos(zphirot);
     }
 
+  double result = 0;
   if ( fabs(zarg2) > 0 ) result = RAD2DEG*atan2(zarg1, zarg2);
   if ( fabs(result) < 9.e-14 ) result = 0;
 
@@ -64,6 +67,8 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
 double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
 {
   /*
+    Name of the original Fortran function: PHSTOPH
+
     This function converts phi from one rotated system to phi in another
     system. If the optional argument polgam is present, the other system
     can also be a rotated one, where polgam is the angle between the two
@@ -79,18 +84,19 @@ double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
     result : latitude in the geographical system
   */
   double zarg;
-  double zgam;
 
   double zsinpol = sin(DEG2RAD*polphi);
   double zcospol = cos(DEG2RAD*polphi);
 
-  double zphirot   = DEG2RAD*phirot;
+  double zphirot = DEG2RAD*phirot;
   if ( lamrot > 180.0 ) lamrot -= 360.0;
-  double zlamrot   = DEG2RAD*lamrot;
+  double zlamrot = DEG2RAD*lamrot;
 
   if ( fabs(polgam) > 0 )
+  //X if ( polgam > 0 )
     {
-      zgam = -DEG2RAD*polgam;
+      double zgam = -DEG2RAD*polgam;
+      //X double zgam = DEG2RAD*polgam;
       zarg = zsinpol*sin(zphirot) +
              zcospol*cos(zphirot)*(cos(zlamrot)*cos(zgam) - sin(zgam)*sin(zlamrot));
     }
@@ -104,6 +110,8 @@ static
 double lam_to_lamrot(double phi, double rla, double polphi, double pollam)
 {
   /*
+    Name of the original Fortran function: RLSTORL
+
     Umrechnung von rla (geo. System) auf rlas (rot. System)
 
     phi    : Breite im geographischen System (N>0)
@@ -130,14 +138,17 @@ double lam_to_lamrot(double phi, double rla, double polphi, double pollam)
   return RAD2DEG*atan2(zarg1,zarg2);
 }
 
+#ifdef TEST_GRID_ROT
 static
-double phi_to_phirot(double phi, double rla, double polphi, double pollam)
+double phi_to_phirot(double phi, double lam, double polphi, double pollam)
 {
   /*
+    Name of the original Fortran function: PHTOPHS
+
     Umrechnung von phi (geo. System) auf phis (rot. System)
 
     phi    : Breite im geographischen System (N>0)
-    rla    : Laenge im geographischen System (E>0)
+    lam    : Laenge im geographischen System (E>0)
     polphi : Geographische Breite des Nordpols des rot. Systems
     pollam : Geographische Laenge des Nordpols des rot. Systems
 
@@ -147,29 +158,29 @@ double phi_to_phirot(double phi, double rla, double polphi, double pollam)
   double zcospol = cos(DEG2RAD*polphi);
   double zlampol =     DEG2RAD*pollam;
 
-  double zphi = DEG2RAD*phi;
-  if ( rla > 180.0 ) rla -= 360.0;
-  double zrla = DEG2RAD*rla;
+   double zphi = DEG2RAD*phi;
+  if ( lam > 180.0 ) lam -= 360.0;
+  double zlam = DEG2RAD*lam;
 
-  double zarg = zcospol*cos(zphi)*cos(zrla-zlampol) + zsinpol*sin(zphi);
+  double zarg = zcospol*cos(zphi)*cos(zlam-zlampol) + zsinpol*sin(zphi);
 
   return RAD2DEG*asin(zarg);
 }
-
+#endif
 
 void usvs_to_uv(double us, double vs, double phi, double rla,
 		double polphi, double pollam, double *u, double *v)
 {
   /*
-    Umrechnen der windkomponente us, vs im rotierten sphaerischen
+    Umrechnen der windkomponenten us, vs im rotierten sphaerischen
     system in die windkomponenten u, v, im geographischen system
 
     us     : 'zonaler wind im rotierten system
     vs     : 'merid. wind im rotierten  system
-    phi    : breite im geographischen system (n>0)
-    rla    : laenge im geographischen system (e>0)
-    polphi : geographische breite des n-pols des rot. sys.
-    pollam : geographische laenge des n-pols des rot. sys.
+    phi    : Breite im geographischen system (N>0)
+    rla    : Laenge im geographischen system (E>0)
+    polphi : Geographische breite des Nordpols des rot. Systems
+    pollam : Geographische laenge des Nordpols des rot. Systems
  
     u      : zonaler wind im geographischen system
     v      : merid. wind im geographischen system
@@ -178,6 +189,7 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   double zpolphi = polphi*DEG2RAD;
   double zpollam = pollam*DEG2RAD;
   if ( rla < 0.0 ) rla += 360.0;
+  //X if ( rla < 0.0 ) rla += 360.0;
   double zrla    = rla   *DEG2RAD;
   double pollamd = pollam;
   if ( pollamd < 0.0 ) pollamd += 360.0;
@@ -194,7 +206,7 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   zbeta = sign(zbeta, -(rla - (pollamd-180.0)));
   */
   double zbeta = fabs(acos(zarg));
-  /* if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta; */
+  // if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta;
   if ( (-(rla - (pollamd-180.0)) < 0) && (-(rla - (pollamd-180.0)) >= -180) ) zbeta = -zbeta;
 
   /* us - wind transformieren */
