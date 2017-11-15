@@ -68,10 +68,11 @@ float distance(const float *restrict a, const float *restrict b)
 
 void gridsearch_set_method(const char *methodstr)
 {
-  if      ( strcmp(methodstr, "kdtree")  == 0 ) gridsearch_method_nn = GS_KDTREE;
-  else if ( strcmp(methodstr, "kdsph")   == 0 ) gridsearch_method_nn = GS_KDSPH;
-  else if ( strcmp(methodstr, "nearpt3") == 0 ) gridsearch_method_nn = GS_NEARPT3;
-  else if ( strcmp(methodstr, "full")    == 0 ) gridsearch_method_nn = GS_FULL;
+  if      ( strcmp(methodstr, "kdtree")    == 0 ) gridsearch_method_nn = GS_KDTREE;
+  else if ( strcmp(methodstr, "nanoflann") == 0 ) gridsearch_method_nn = GS_NANOFLANN;
+  else if ( strcmp(methodstr, "kdsph")     == 0 ) gridsearch_method_nn = GS_KDSPH;
+  else if ( strcmp(methodstr, "nearpt3")   == 0 ) gridsearch_method_nn = GS_NEARPT3;
+  else if ( strcmp(methodstr, "full")      == 0 ) gridsearch_method_nn = GS_FULL;
   else
     cdoAbort("gridsearch method %s not available!", methodstr);
 }
@@ -163,6 +164,41 @@ kdTree_t *gs_create_kdtree(size_t n, const double *restrict lons, const double *
   kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
   if ( pointlist ) Free(pointlist);
   if ( kdt == NULL ) cdoAbort("kd_buildTree failed!");
+
+  return kdt;
+}
+
+static
+nfTree_t *gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
+{
+  PointCloud<float> *pointcloud = new PointCloud<float>();
+  if ( cdoVerbose ) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
+
+  float min[3], max[3];
+  min[0] = min[1] = min[2] =  1e9;
+  max[0] = max[1] = max[2] = -1e9;
+  // Generating  Point Cloud
+  float restrict point[3];
+  pointcloud->pts.resize(n);
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
+  for ( size_t i = 0; i < n; i++ ) 
+    {
+      LLtoXYZ_f(lons[i], lats[i], point);
+      pointcloud->pts[i].x = point[0];
+      pointcloud->pts[i].y = point[1];
+      pointcloud->pts[i].z = point[2];
+      for ( unsigned j = 0; j < 3; ++j )
+        {
+          min[j] = point[j] < min[j] ? point[j] : min[j];
+          max[j] = point[j] > max[j] ? point[j] : max[j];
+        }
+    }
+
+  // construct a kd-tree index:
+  nfTree_t *kdt = new nfTree_t(3 /*dim*/, *pointcloud, nanoflann::KDTreeSingleIndexAdaptorParams(50 /* max leaf */) );
+  kdt->buildIndex();
 
   return kdt;
 }
@@ -460,10 +496,11 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
   gs->n = n;
   if ( n == 0 ) return gs;
 
-  if      ( gs->method_nn == GS_KDTREE  ) gs->kdt  = gs_create_kdtree(n, lons, lats);
-  else if ( gs->method_nn == GS_KDSPH   ) gs->kdt  = gs_create_kdsph(n, lons, lats);
-  else if ( gs->method_nn == GS_NEARPT3 ) gs->near = gs_create_nearpt3(n, lons, lats);
-  else if ( gs->method_nn == GS_FULL    ) gs->full = gs_create_full(n, lons, lats);
+  if      ( gs->method_nn == GS_KDTREE    ) gs->kdt  = gs_create_kdtree(n, lons, lats);
+  else if ( gs->method_nn == GS_NANOFLANN ) gs->nft  = gs_create_nanoflann(n, lons, lats, gs);
+  else if ( gs->method_nn == GS_KDSPH     ) gs->kdt  = gs_create_kdsph(n, lons, lats);
+  else if ( gs->method_nn == GS_NEARPT3   ) gs->near = gs_create_nearpt3(n, lons, lats);
+  else if ( gs->method_nn == GS_FULL      ) gs->full = gs_create_full(n, lons, lats);
 
   gs->search_radius = cdo_default_search_radius();
 
@@ -530,6 +567,36 @@ size_t gs_nearest_kdtree(kdTree_t *kdt, double lon, double lat, double *prange)
   if ( prange ) *prange = frange;
 
   if ( node ) index = node->index;
+
+  return index;
+}
+
+static
+size_t gs_nearest_nanoflann(nfTree_t *nft, double lon, double lat, double *prange)
+{
+  size_t index = GS_NOT_FOUND;
+  if ( nft == NULL ) return index;
+  
+  float range0 = gs_set_range(prange);
+  float range = range0;
+
+  float query_pt[3];
+  LLtoXYZ_f(lon, lat, query_pt);
+
+  const size_t num_results = 1;
+  size_t ret_index;
+  float out_dist_sqr;
+  nanoflann::KNNResultSet<float> resultSet(num_results);
+  resultSet.init(&ret_index, &out_dist_sqr);
+  nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
+
+  index = ret_index;
+  *prange = out_dist_sqr;
+  //float frange = range;
+  //if ( !(frange < range0) ) node = NULL;
+  //if ( prange ) *prange = frange;
+
+  //if ( node ) index = node->index;
 
   return index;
 }
@@ -643,10 +710,11 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
   if ( gs )
     {
       // clang-format off
-      if      ( gs->method_nn == GS_KDTREE )  index = gs_nearest_kdtree(gs->kdt, lon, lat, prange);
-      else if ( gs->method_nn == GS_KDSPH )   index = gs_nearest_kdsph(gs->kdt, lon, lat, prange);
-      else if ( gs->method_nn == GS_NEARPT3 ) index = gs_nearest_nearpt3(gs->near, lon, lat, prange);
-      else if ( gs->method_nn == GS_FULL )    index = gs_nearest_full(gs->full, lon, lat, prange);
+      if      ( gs->method_nn == GS_KDTREE )    index = gs_nearest_kdtree(gs->kdt, lon, lat, prange);
+      else if ( gs->method_nn == GS_NANOFLANN ) index = gs_nearest_nanoflann(gs->nft, lon, lat, prange);
+      else if ( gs->method_nn == GS_KDSPH )     index = gs_nearest_kdsph(gs->kdt, lon, lat, prange);
+      else if ( gs->method_nn == GS_NEARPT3 )   index = gs_nearest_nearpt3(gs->near, lon, lat, prange);
+      else if ( gs->method_nn == GS_FULL )      index = gs_nearest_full(gs->full, lon, lat, prange);
       else cdoAbort("gridsearch_nearest::method_nn undefined!");
       // clang-format on
     }
