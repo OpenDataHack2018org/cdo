@@ -150,7 +150,7 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
           size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->xsize;
           if ( size == 0 ) cdoAbort("xsize or gridsize undefined (grid description file: %s)!", dname);
           if ( size != nvalues )
-            cdoAbort("Number of xvals=%zu and size of xvals=%zu differ (grid description file: %s)!", nvalues, size, dname);
+            cdoAbort("xsize=%zu and size of xvals=%zu differ (grid description file: %s)!", nvalues, size, dname);
 
           grid->xvals = (double*) Malloc(size*sizeof(double));
           for ( size_t i = 0; i < size; ++i ) grid->xvals[i] = parameter2double(kv->values[i]);
@@ -160,7 +160,7 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
           size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->ysize;
           if ( size == 0 ) cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
           if ( size != nvalues )
-            cdoAbort("Number of yvals=%zu and size of yvals=%zu differ (grid description file: %s)!", nvalues, size, dname);
+            cdoAbort("ysize=%zu and size of yvals=%zu differ (grid description file: %s)!", nvalues, size, dname);
 
           grid->yvals = (double*) Malloc(size*sizeof(double));
           for ( size_t i = 0; i < size; ++i ) grid->yvals[i] = parameter2double(kv->values[i]);
