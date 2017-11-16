@@ -46,6 +46,8 @@
 #ifndef  NANOFLANN_HPP_
 #define  NANOFLANN_HPP_
 
+#define  NANOFLANN_FIRST_MATCH 1
+
 #include <vector>
 #include <cassert>
 #include <algorithm>
@@ -93,8 +95,10 @@ namespace nanoflann
 			indices = indices_;
 			dists = dists_;
 			count = 0;
-            if (capacity)
-                dists[capacity-1] = (std::numeric_limits<DistanceType>::max)();
+                        if (capacity)
+                          dists[capacity-1] = (std::numeric_limits<DistanceType>::max)();
+                        if (capacity)
+                          indices[capacity-1] = (std::numeric_limits<IndexType>::max)();
 		}
 
 		inline CountType size() const
@@ -117,7 +121,7 @@ namespace nanoflann
 			CountType i;
 			for (i = count; i > 0; --i) {
 #ifdef NANOFLANN_FIRST_MATCH   // If defined and two points have the same distance, the one with the lowest-index will be returned first.
-				if ( (dists[i-1] > dist) || ((dist == dists[i-1]) && (indices[i-1] > index)) ) {
+				if ( (dists[i-1] > dist) || ((dist <= dists[i-1]) && (indices[i-1] > index)) ) {
 #else
 				if (dists[i-1] > dist) {
 #endif
@@ -141,6 +145,11 @@ namespace nanoflann
 		inline DistanceType worstDist() const
 		{
 			return dists[capacity-1];
+		}
+                // Uwe Schulzweida
+		inline IndexType worstIndex() const
+		{
+			return indices[capacity-1];
 		}
 	};
 
@@ -1354,10 +1363,15 @@ namespace nanoflann
 			if ((node->child1 == NULL) && (node->child2 == NULL)) {
 				//count_leaf += (node->lr.right-node->lr.left);  // Removed since was neither used nor returned to the user.
 				DistanceType worst_dist = result_set.worstDist();
+				IndexType worst_index = result_set.worstIndex();
 				for (IndexType i = node->node_type.lr.left; i<node->node_type.lr.right; ++i) {
 					const IndexType index = BaseClassRef::vind[i];// reorder... : i;
 					DistanceType dist = distance.evalMetric(vec, index, (DIM > 0 ? DIM : BaseClassRef::dim));
+#ifdef NANOFLANN_FIRST_MATCH  // Uwe Schulzweida
+                                        if (dist < worst_dist || (dist <= worst_dist && index < worst_index) ) {
+#else
 					if (dist < worst_dist) {
+#endif
                                                 if(!result_set.addPoint(dist, BaseClassRef::vind[i])) {
                                                     // the resultset doesn't want to receive any more points, we're done searching!
                                                     return false;
