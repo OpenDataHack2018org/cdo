@@ -567,6 +567,7 @@ size_t gs_nearest_kdtree(kdTree_t *kdt, double lon, double lat, double *prange)
   if ( prange ) *prange = frange;
 
   if ( node ) index = node->index;
+  //printf("%zu %g\n", index, range);
 
   return index;
 }
@@ -589,6 +590,7 @@ size_t gs_nearest_nanoflann(nfTree_t *nft, double lon, double lat, double *prang
   nanoflann::KNNResultSet<float> resultSet(num_results);
   resultSet.init(&ret_index, &out_dist_sqr);
   nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
+  //printf("%zu %g\n", ret_index, out_dist_sqr);
 
   index = ret_index;
   *prange = out_dist_sqr;
@@ -740,6 +742,53 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
       // printf("range %g %g %g %p\n", lon, lat, range, node);
 
       float frange = KDATA_INVSCALE(range);
+      /*
+      if ( !(frange < range0) )
+        {
+          if ( result )
+            {
+              struct resItem *p;
+              while ( pqremove_min(result, &p) ) Free(p); // Free the result node taken from the heap
+              Free(result->d); // free the heap
+              Free(result);    // and free the heap information structure
+            }
+          result = NULL;
+        }
+      */
+      if ( prange ) *prange = frange;
+    }
+  
+  return result;
+}
+
+
+struct pqueue *gridsearch_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
+{
+  if ( gs->nft == NULL ) return NULL;
+  
+  float range0 = gs_set_range(prange);
+  float range = range0;
+  struct pqueue *result = NULL;
+
+  float query_pt[3];
+  LLtoXYZ_f(lon, lat, query_pt);
+
+  if ( gs )
+    {
+      const size_t num_results = nnn;
+      //size_t ret_index;
+      //float out_dist_sqr;
+      //nanoflann::KNNResultSet<float> resultSet(num_results);
+      //resultSet.init(&ret_index, &out_dist_sqr);
+      //nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
+      // Unsorted radius search:
+      const float radius = 1;
+      std::vector<std::pair<size_t, float> > indices_dists;
+      //nanoflann::RadiusResultSet<float, size_t> resultSet(radius, indices_dists);
+      //gs->nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams());
+      // printf("range %g %g %g %p\n", lon, lat, range, node);
+
+      float frange = range;
       /*
       if ( !(frange < range0) )
         {
