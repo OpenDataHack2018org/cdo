@@ -944,7 +944,7 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
 {  
   const char *funcname = fun_sym_tbl[funcID].name;            
   if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
-  if ( p1->ltmpobj ) cdoAbort("Temorary objects not allowed in function %s()!", funcname);
+  if ( p1->ltmpobj ) cdoAbort("Temporary objects not allowed in function %s()!", funcname);
 
   size_t ngp   = p1->param.ngp;
   size_t nlev  = p1->param.nlev;
@@ -1030,7 +1030,7 @@ nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg
 {  
   const char *funcname = fun_sym_tbl[funcID].name;            
   if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
-  if ( p1->ltmpobj ) cdoAbort("Temorary objects not allowed in function %s()!", funcname);
+  if ( p1->ltmpobj ) cdoAbort("Temporary objects not allowed in function %s()!", funcname);
             
   size_t len = 3 + strlen(p1->u.var.nm);
   char *cname = (char*) Calloc(len, 1);
