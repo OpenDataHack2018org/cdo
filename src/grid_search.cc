@@ -178,7 +178,7 @@ nfTree_t *gs_create_nanoflann(size_t n, const double *restrict lons, const doubl
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
   // Generating  Point Cloud
-  float restrict point[3];
+  float point[3];
   pointcloud->pts.resize(n);
 #if defined(HAVE_OPENMP4)
 #pragma omp simd
