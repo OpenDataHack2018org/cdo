@@ -268,11 +268,8 @@ void *Expr(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  char *exprs = NULL;
-  if ( READS_COMMAND_LINE(operatorID) )
-    exprs = exprs_from_arg(operatorArgv()[0]);
-  else
-    exprs = exprs_from_file(operatorArgv()[0]);
+  char *exprs = READS_COMMAND_LINE(operatorID) ?
+    exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
 
   if ( cdoVerbose ) cdoPrint(exprs);
 
