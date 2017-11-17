@@ -31,11 +31,9 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
   if ( lamrot > 180.0 ) lamrot -= 360.0;
   double zlamrot = DEG2RAD*lamrot;
 
-  if ( fabs(polgam) > 0 )
-  //X  if ( polgam > 0 )
+  if ( polgam > 0 )
     {
-      double zgam  = -DEG2RAD*polgam;
-      //X  double zgam  = DEG2RAD*polgam;
+      double zgam  = DEG2RAD*polgam;
       zarg1 = sin(zlampol) *                                               
  	    (- zsinpol*cos(zphirot) * (cos(zlamrot)*cos(zgam) - sin(zlamrot)*sin(zgam)) 
  	     + zcospol*sin(zphirot))                                              
@@ -92,11 +90,9 @@ double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
   if ( lamrot > 180.0 ) lamrot -= 360.0;
   double zlamrot = DEG2RAD*lamrot;
 
-  if ( fabs(polgam) > 0 )
-  //X if ( polgam > 0 )
+  if ( polgam > 0 )
     {
-      double zgam = -DEG2RAD*polgam;
-      //X double zgam = DEG2RAD*polgam;
+      double zgam = DEG2RAD*polgam;
       zarg = zsinpol*sin(zphirot) +
              zcospol*cos(zphirot)*(cos(zlamrot)*cos(zgam) - sin(zgam)*sin(zlamrot));
     }
@@ -188,16 +184,17 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   /* umrechnung von grad in bogenmass */
   double zpolphi = polphi*DEG2RAD;
   double zpollam = pollam*DEG2RAD;
-  if ( rla < 0.0 ) rla += 360.0;
-  //X if ( rla < 0.0 ) rla += 360.0;
+  // Added by Uwe Schulzweida (17/11/2017)
+  if ( pollam < 0 && rla < pollam ) rla += 360.0;
+  //if ( pollam < 0 && rla < 0 ) rla += 360.0;
   double zrla    = rla   *DEG2RAD;
   double pollamd = pollam;
   if ( pollamd < 0.0 ) pollamd += 360.0;
 
-  /* laenge im rotierten system berechnen */
+  // laenge im rotierten system berechnen
   double zrlas = lam_to_lamrot(phi, rla, polphi, pollam)*DEG2RAD;
 
-  /* winkel zbeta berechen (schnittwinkel der breitenkreise) */
+  // winkel zbeta berechen (schnittwinkel der breitenkreise)
   double zarg = - sin(zpolphi)*sin(zrla-zpollam)*sin(zrlas) - cos(zrla-zpollam)*cos(zrlas);
   if ( zarg >  1.0 ) zarg =  1.0;
   if ( zarg < -1.0 ) zarg = -1.0;
@@ -209,10 +206,10 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   // if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta;
   if ( (-(rla - (pollamd-180.0)) < 0) && (-(rla - (pollamd-180.0)) >= -180) ) zbeta = -zbeta;
 
-  /* us - wind transformieren */
+  // us - wind transformieren
   *u = us*cos(zbeta) - vs*sin(zbeta);
   
-  /* vs - wind transformieren */
+  // vs - wind transformieren
   *v = us*sin(zbeta) + vs*cos(zbeta);
 }
 

@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.2
 	* Version 1.9.2 release
 
+2017-11-17  Uwe Schulzweida
+
+	* rotuvb changed behavior in different versions [Bug #8084]
+
 2017-11-02  Uwe Schulzweida
 
 	* expr: nesting of ?: operator lost in cdo-1.9.1 [Bug #7992]

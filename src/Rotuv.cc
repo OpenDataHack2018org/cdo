@@ -32,7 +32,7 @@
 static
 void rot_uv_back(int gridID, double *us, double *vs)
 {
-  double xpole, ypole, angle;
+  double xpole = 0, ypole = 0, angle = 0;
   if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
     gridInqParamRLL(gridID, &xpole, &ypole, &angle);
 
@@ -47,11 +47,15 @@ void rot_uv_back(int gridID, double *us, double *vs)
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID, units);
+  grid_to_degree(units, 1, &angle, "angle");
   grid_to_degree(units, 1, &xpole, "xpole");
   grid_to_degree(units, nlon, xvals, "grid center lon");
   gridInqYunits(gridID, units);
   grid_to_degree(units, 1, &ypole, "ypole");
   grid_to_degree(units, nlat, yvals, "grid center lat");
+
+  if ( xpole > 180 ) xpole-=360;
+  if ( angle > 180 ) angle-=360;
 
   double u, v;
   for ( size_t ilat = 0; ilat < nlat; ilat++ )
