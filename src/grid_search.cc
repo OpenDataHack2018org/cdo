@@ -137,7 +137,7 @@ struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const
 }
 
 static
-kdTree_t *gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats)
+kdTree_t *gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n*sizeof(struct kd_point));  
   // see  example_cartesian.c
@@ -145,13 +145,12 @@ kdTree_t *gs_create_kdtree(size_t n, const double *restrict lons, const double *
   kdata_t min[3], max[3];
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
-  kdata_t *restrict point;
 #if defined(HAVE_OPENMP4)
-#pragma omp simd
+#pragma omp parallel for reduction(min: min) reduction(max: max)
 #endif
   for ( size_t i = 0; i < n; i++ ) 
     {
-      point = pointlist[i].point;
+      kdata_t *restrict point = pointlist[i].point;
       LLtoXYZ_kd(lons[i], lats[i], point);
       for ( unsigned j = 0; j < 3; ++j )
         {
@@ -161,6 +160,16 @@ kdTree_t *gs_create_kdtree(size_t n, const double *restrict lons, const double *
       pointlist[i].index = i;
     }
 
+#ifdef  TEST_BBOX
+  for ( unsigned j = 0; j < 3; ++j )
+    {
+      gs->min[j] = min[j];
+      gs->max[j] = max[j];
+    }
+#endif
+
+  // printf("min %g %g %g  max %g %g %g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
+  
   kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
   if ( pointlist ) Free(pointlist);
   if ( kdt == NULL ) cdoAbort("kd_buildTree failed!");
@@ -178,13 +187,13 @@ nfTree_t *gs_create_nanoflann(size_t n, const double *restrict lons, const doubl
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
   // Generating  Point Cloud
-  float point[3];
   pointcloud->pts.resize(n);
 #if defined(HAVE_OPENMP4)
-#pragma omp simd
+#pragma omp parallel for reduction(min: min) reduction(max: max)
 #endif
   for ( size_t i = 0; i < n; i++ ) 
     {
+      float point[3];
       LLtoXYZ_f(lons[i], lats[i], point);
       pointcloud->pts[i].x = point[0];
       pointcloud->pts[i].y = point[1];
@@ -214,7 +223,7 @@ kdTree_t *gs_create_kdsph(size_t n, const double *restrict lons, const double *r
   max[0] = max[1] = -1e9;
   kdata_t *restrict point;
 #if defined(HAVE_OPENMP4)
-#pragma omp simd
+  //#pragma omp simd
 #endif
   for ( size_t i = 0; i < n; i++ ) 
     {
@@ -480,7 +489,7 @@ struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, cons
   gs->n = n;
   if ( n == 0 ) return gs;
 
-  gs->kdt = gs_create_kdtree(n, lons, lats);
+  gs->kdt = gs_create_kdtree(n, lons, lats, gs);
 
   gs->search_radius = cdo_default_search_radius();
 
@@ -496,7 +505,7 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
   gs->n = n;
   if ( n == 0 ) return gs;
 
-  if      ( gs->method_nn == GS_KDTREE    ) gs->kdt  = gs_create_kdtree(n, lons, lats);
+  if      ( gs->method_nn == GS_KDTREE    ) gs->kdt  = gs_create_kdtree(n, lons, lats, gs);
   else if ( gs->method_nn == GS_NANOFLANN ) gs->nft  = gs_create_nanoflann(n, lons, lats, gs);
   else if ( gs->method_nn == GS_KDSPH     ) gs->kdt  = gs_create_kdsph(n, lons, lats);
   else if ( gs->method_nn == GS_NEARPT3   ) gs->near = gs_create_nearpt3(n, lons, lats);
@@ -549,7 +558,7 @@ double gs_set_range(double *prange)
 }
 
 static
-size_t gs_nearest_kdtree(kdTree_t *kdt, double lon, double lat, double *prange)
+size_t gs_nearest_kdtree(kdTree_t *kdt, double lon, double lat, double *prange, struct gridsearch *gs)
 {
   size_t index = GS_NOT_FOUND;
   if ( kdt == NULL ) return index;
@@ -557,10 +566,15 @@ size_t gs_nearest_kdtree(kdTree_t *kdt, double lon, double lat, double *prange)
   float range0 = gs_set_range(prange);
   kdata_t range = KDATA_SCALE(range0);
 
-  kdata_t point[3];
-  LLtoXYZ_kd(lon, lat, point);
+  kdata_t query_pt[3];
+  LLtoXYZ_kd(lon, lat, query_pt);
 
-  kdNode *node = kd_nearest(kdt->node, point, &range, 3);
+#ifdef  TEST_BBOX
+  for ( unsigned j = 0; j < 3; ++j )
+    if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] ) return index;
+#endif
+
+  kdNode *node = kd_nearest(kdt->node, query_pt, &range, 3);
 
   float frange = KDATA_INVSCALE(range);
   if ( !(frange < range0) ) node = NULL;
@@ -612,11 +626,11 @@ size_t gs_nearest_kdsph(kdTree_t *kdt, double lon, double lat, double *prange)
   float range0 = gs_set_range(prange);
   kdata_t range = KDATA_SCALE(range0);
 
-  kdata_t point[2];
-  point[0] = lon;
-  point[1] = lat;
+  kdata_t query_pt[2];
+  query_pt[0] = lon;
+  query_pt[1] = lat;
 
-  kdNode *node = kd_nearest(kdt->node, point, &range, 3);
+  kdNode *node = kd_nearest(kdt->node, query_pt, &range, 3);
 
   float frange = KDATA_INVSCALE(range);
   if ( !(frange < range0) ) node = NULL;
@@ -636,22 +650,22 @@ size_t gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double *p
 #if defined(ENABLE_NEARPT3)
   float range0 = gs_set_range(prange);
 
-  float point[3];
-  LLtoXYZ_f(lon, lat, point);
+  float query_pt[3];
+  LLtoXYZ_f(lon, lat, query_pt);
 
   Coord_T q[3];
-  q[0] = NPT3SCALE(point[0]);
-  q[1] = NPT3SCALE(point[1]);
-  q[2] = NPT3SCALE(point[2]);
+  q[0] = NPT3SCALE(query_pt[0]);
+  q[1] = NPT3SCALE(query_pt[1]);
+  q[2] = NPT3SCALE(query_pt[2]);
 
   int closestpt = nearpt3_query(near->nearpt3, q);
 
   if ( closestpt >= 0 )
     {
-      float point0[3];
-      LLtoXYZ_f(near->plons[closestpt], near->plats[closestpt], point0);
+      float query_pt0[3];
+      LLtoXYZ_f(near->plons[closestpt], near->plats[closestpt], query_pt0);
       
-      float range = distance(point, point0);
+      float range = distance(query_pt, query_pt0);
       if ( range < range0 )
         {
           index = (size_t) closestpt;
@@ -675,8 +689,8 @@ size_t gs_nearest_full(struct  gsFull *full, double lon, double lat, double *pra
   
   float range0 = gs_set_range(prange);
 
-  float point[3];
-  LLtoXYZ_f(lon, lat, point);
+  float query_pt[3];
+  LLtoXYZ_f(lon, lat, query_pt);
 
   size_t n = full->n;
   float **pts = full->pts;
@@ -684,7 +698,7 @@ size_t gs_nearest_full(struct  gsFull *full, double lon, double lat, double *pra
   float dist = FLT_MAX;
   for ( size_t i = 0; i < n; i++ )
     {
-      float d = distance(point, pts[i]);
+      float d = distance(query_pt, pts[i]);
       if ( closestpt >=n || d < dist || (d<=dist && i < closestpt) )
         {
           dist = d;
@@ -712,7 +726,7 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
   if ( gs )
     {
       // clang-format off
-      if      ( gs->method_nn == GS_KDTREE )    index = gs_nearest_kdtree(gs->kdt, lon, lat, prange);
+      if      ( gs->method_nn == GS_KDTREE )    index = gs_nearest_kdtree(gs->kdt, lon, lat, prange, gs);
       else if ( gs->method_nn == GS_NANOFLANN ) index = gs_nearest_nanoflann(gs->nft, lon, lat, prange);
       else if ( gs->method_nn == GS_KDSPH )     index = gs_nearest_kdsph(gs->kdt, lon, lat, prange);
       else if ( gs->method_nn == GS_NEARPT3 )   index = gs_nearest_nearpt3(gs->near, lon, lat, prange);
@@ -729,16 +743,16 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
 {
   if ( gs->kdt == NULL ) return NULL;
   
-  kdata_t point[3];
+  kdata_t query_pt[3];
   float range0 = gs_set_range(prange);
   kdata_t range = KDATA_SCALE(range0);
   struct pqueue *result = NULL;
 
-  LLtoXYZ_kd(lon, lat, point);
+  LLtoXYZ_kd(lon, lat, query_pt);
 
   if ( gs )
     {
-      result = kd_qnearest(gs->kdt->node, point, &range, nnn, 3);
+      result = kd_qnearest(gs->kdt->node, query_pt, &range, nnn, 3);
       // printf("range %g %g %g %p\n", lon, lat, range, node);
 
       float frange = KDATA_INVSCALE(range);

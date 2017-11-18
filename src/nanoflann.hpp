@@ -46,7 +46,7 @@
 #ifndef  NANOFLANN_HPP_
 #define  NANOFLANN_HPP_
 
-#define  NANOFLANN_FIRST_MATCH 1
+#define  NANOFLANN_FIRST_MATCH  1
 
 #include <vector>
 #include <cassert>
