@@ -36,13 +36,9 @@
 
 #define  MAXARG 10
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 void streamGrbChangeModeUvRelativeToGrid(int mode);
-#if defined (__cplusplus)
 }
-#endif
 
 int UVDESTAG;
 int ROTUVNORTH;

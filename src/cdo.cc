@@ -83,13 +83,9 @@ static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 const char *CDO_username;
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 void streamGrbDefDataScanningMode(int scanmode);
-#if defined (__cplusplus)
 }
-#endif
 
 void gridsearch_set_method(const char *methodstr);
 

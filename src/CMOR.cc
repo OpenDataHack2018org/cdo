@@ -9,13 +9,9 @@
 #include "uthash.h"
 #include "util.h"
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+extern "C" {
 #include "cmor.h"
-#ifdef __cplusplus
-  }
-#endif
+}
 
 #include "netcdf.h"
 #include "pmlist.h"

@@ -18,10 +18,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
 #ifndef fileno
 int fileno(FILE *stream);
-#endif
 #endif
 
 extern int CDO_parser_errorno;

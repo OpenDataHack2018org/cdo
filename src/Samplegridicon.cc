@@ -3,13 +3,9 @@
 #include "grid.h"
 #include "grid_search.h"
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 #include "clipping/geometry.h"
-#ifdef __cplusplus
 }
-#endif
 
 constexpr int MAX_CHILDS = 9;
 

@@ -3,10 +3,6 @@
 
 #include <stdbool.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 void height2pressure(double *restrict phlev, const double *restrict hlev, long nphlev);
 
 void presh(double *restrict fullp, double *halfp, const double *restrict vct,
@@ -34,9 +30,5 @@ void vert_gen_weights3d(bool expol, int nlev1, int gridsize, double *lev1, int n
 			int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
 void vert_gen_weights3d1d(bool expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
 			  int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
-
-#if defined(__cplusplus)
-}
-#endif
 
 #endif  /* VINTERP_H */

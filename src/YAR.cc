@@ -24,9 +24,7 @@
 #include "remap.h"
 
 #if defined(HAVE_LIBYAC)
-#ifdef __cplusplus
 extern "C" {
-#endif
 #include "points.h"
 #include "grid_reg2d.h"
 #include "grid_search.h"
@@ -34,9 +32,7 @@ extern "C" {
 #include "search.h"
 #include "clipping.h"
 #include "area.h"
-#ifdef __cplusplus
 }
-#endif
 #endif
 
 int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort, timer_yar_remap_con, timer_yar_remap_bil;
