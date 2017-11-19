@@ -447,13 +447,6 @@ int expand_lonlat_grid(int gridID)
   Free(xvals);
   Free(yvals);
 
-  if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
-    {
-      double xpole, ypole, angle;
-      gridInqParamRLL(gridID, &xpole, &ypole, &angle);
-      gridDefParamRLL(gridIDnew, xpole, ypole, angle);
-    }
-
   return gridIDnew;
 }
 
