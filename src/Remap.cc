@@ -599,8 +599,7 @@ int get_norm_opt(void)
 static
 void remap_normalize(int norm_opt, size_t gridsize, double *array, double missval, remapgrid_t *tgt_grid)
 {
-  /* used only to check the result of remapcon */
-  double grid_err;
+  // used only to check the result of remapcon
 
   if ( norm_opt == NORM_OPT_NONE )
     {
@@ -608,7 +607,7 @@ void remap_normalize(int norm_opt, size_t gridsize, double *array, double missva
 	{
 	  if ( !DBL_IS_EQUAL(array[i], missval) )
 	    {
-	      grid_err = tgt_grid->cell_frac[i]*tgt_grid->cell_area[i];
+	      double grid_err = tgt_grid->cell_frac[i]*tgt_grid->cell_area[i];
 
 	      if ( fabs(grid_err) > 0 )
 		array[i] /= grid_err;
@@ -770,7 +769,6 @@ void sort_remap_add(remapvars_t *remapvars)
 void *Remap(void *argument)
 {
   bool remap_genweights = REMAP_genweights;
-  bool need_gradiants = false;
   int streamID2 = -1;
   int nrecs;
   int varID, levelID;
@@ -958,6 +956,7 @@ void *Remap(void *argument)
 
   size_t grid1sizemax = vlistGridsizeMax(vlistID1);
 
+  bool need_gradiants = false;
   if ( map_type == MAP_TYPE_BICUBIC ) need_gradiants = true;
   if ( map_type == MAP_TYPE_CONSERV && remap_order == 2 )
     {
@@ -1209,7 +1208,7 @@ void *Remap(void *argument)
 
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON )
 	    {
-	      /* used only to check the result of remapcon */
+	      // used only to check the result of remapcon
 	      if ( 0 ) remap_normalize(remaps[r].vars.norm_opt, gridsize2, array2, missval, &remaps[r].tgt_grid);
 
 	      remap_set_frac_min(gridsize2, array2, missval, &remaps[r].tgt_grid);
