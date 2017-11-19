@@ -813,8 +813,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 
   if ( !src_grid->lextrapolate && gridInqSize(src_grid->gridID) > 1 &&
        map_type == MAP_TYPE_DISTWGT &&
-       ((gridInqType(gridID1) == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
-	(gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global)) )
+       (gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global) )
     {
       src_grid->gridID = gridID1 = expand_lonlat_grid(gridID1);
       reg2d_src_gridID = gridID1;
@@ -847,6 +846,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
   int sgridID = src_grid->gridID;
   if ( gridInqSize(sgridID) > 1 && 
        ((gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LCC) || 
+	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_RLL) || 
 	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LAEA) || 
 	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_SINU)) )
     {

@@ -136,6 +136,14 @@ struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const
   return gs;
 }
 
+#ifdef  TEST_BBOX
+static inline void XYZtoLL (kdata_t p_in[], double * lon, double * lat) {
+
+   *lon = atan2(p_in[1] , p_in[0]);
+   *lat = M_PI_2 - acos(p_in[2]);
+}
+#endif
+
 static
 kdTree_t *gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
 {
@@ -166,9 +174,19 @@ kdTree_t *gs_create_kdtree(size_t n, const double *restrict lons, const double *
       gs->min[j] = min[j];
       gs->max[j] = max[j];
     }
+  double lon1, lat1, lon2, lat2;
+  float point1[3], point2[3];
+  LLtoXYZ_kd(-29.8*DEG2RAD, 30.2*DEG2RAD, point1);
+  LLtoXYZ_kd(59.8*DEG2RAD, 79.8*DEG2RAD, point2);
+  printf("1: min %g %g %g  max %g %g %g\n", point1[0], point1[1], point1[2], point2[0], point2[1], point2[2]);
+  XYZtoLL(point1, &lon1, &lat1);
+  XYZtoLL(point2, &lon2, &lat2);
+  printf("lon1=%g, lat1=%g, lon2=%g, lat2=%g\n", lon1*RAD2DEG, lat1*RAD2DEG, lon2*RAD2DEG, lat2*RAD2DEG);
+  printf("2: min %g %g %g  max %g %g %g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
+  XYZtoLL(min, &lon1, &lat1);
+  XYZtoLL(max, &lon2, &lat2);
+  printf("lon1=%g, lat1=%g, lon2=%g, lat2=%g\n", lon1*RAD2DEG, lat1*RAD2DEG, lon2*RAD2DEG, lat2*RAD2DEG);
 #endif
-
-  // printf("min %g %g %g  max %g %g %g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
   
   kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
   if ( pointlist ) Free(pointlist);
