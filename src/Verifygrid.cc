@@ -35,9 +35,9 @@ extern "C" {
 
 /* Quicksort is called with a pointer to the array to be sorted and an integer indicating its length. */
 static
-void quick_sort(double * array, int array_length)
+void quick_sort(double * array, size_t array_length)
 {
-  int i, j;
+  size_t i, j;
   double temp;
   
   if (array_length < 2) return;
@@ -57,14 +57,14 @@ void quick_sort(double * array, int array_length)
 
 /* Quicksort is called with a pointer to the array of center points to be sorted and an integer indicating its length. It sorts the array by its longitude coordinates */
 static
-void quick_sort_by_lon(double * array, int array_length)
+void quick_sort_by_lon(double * array, size_t array_length)
 {
   if ( array_length < 4 ) return;
 
   double p = ((array_length / 2) % 2) ?  array[(array_length / 2) + 1] : array[array_length / 2];      
       
   double temp_lon, temp_lat;
-  int i, j;
+  size_t i, j;
   for ( i = 0, j = array_length - 2;; i += 2, j -= 2 )
     {
       while (array[i] < p) i += 2;
@@ -87,13 +87,13 @@ void quick_sort_by_lon(double * array, int array_length)
 
 /* This uses quicksort to sort the latitude coordinates in a subarray of all coordinates. */
 static
-void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subarray_end)
+void quick_sort_of_subarray_by_lat(double * array, size_t subarray_start, size_t subarray_end)
 {
-  int subarray_length = (subarray_end - subarray_start) / 2 + 1;     
+  size_t subarray_length = (subarray_end - subarray_start) / 2 + 1;     
   double *subarray = (double*) Malloc(subarray_length*sizeof(double));
-  int subarray_index = 0;
+  size_t subarray_index = 0;
   
-  for(int index = subarray_start + 1; index <= subarray_end + 1; index += 2){	 
+  for(size_t index = subarray_start + 1; index <= subarray_end + 1; index += 2){	 
     subarray[subarray_index] = array[index];
     subarray_index += 1;	  
   }
@@ -102,7 +102,7 @@ void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subar
   
   subarray_index = 0;
   
-  for(int index = subarray_start + 1; index <= subarray_end + 1; index += 2){
+  for(size_t index = subarray_start + 1; index <= subarray_end + 1; index += 2){
     array[index] = subarray[subarray_index];
     subarray_index += 1;	  
   }
@@ -182,22 +182,22 @@ int find_coordinate_to_ignore(double *cell_corners_xyz)
 
   return coordinate_to_ignore;
 }
-
+/*
 static
-int no_of_duplicates_in_this_list_of_vertices(double cell_corners[], int array_length)
+size_t no_of_duplicates_in_this_list_of_vertices(double cell_corners[], size_t array_length)
 {
-  /* Returns the number of coordinate duplicates found in a list of Cartesian coordinates, the cell corners or vertices. */
+  // Returns the number of coordinate duplicates found in a list of Cartesian coordinates, the cell corners or vertices.
   
-  /* Ensure that the lenght of the array is a multiple of 3. */
+  // Ensure that the lenght of the array is a multiple of 3.
 
   if ( (array_length % 3) != 0 ) return -1;
 
-  /* A brute force search for duplicate Cartesian coordinates. */
+  // A brute force search for duplicate Cartesian coordinates.
 
-  int no_duplicates = 0;
+  size_t no_duplicates = 0;
 
-  for (int i = 0; i < array_length; i = i + 3){
-    for (int j = i + 3; j < array_length; j = j + 3 ){
+  for (size_t i = 0; i < array_length; i = i + 3){
+    for (size_t j = i + 3; j < array_length; j = j + 3 ){
       if ( IS_EQUAL(cell_corners[i + 0], cell_corners[j])     &&
            IS_EQUAL(cell_corners[i + 1], cell_corners[j + 1]) &&
            IS_EQUAL(cell_corners[i + 2], cell_corners[j + 2]) ){
@@ -207,7 +207,7 @@ int no_of_duplicates_in_this_list_of_vertices(double cell_corners[], int array_l
   }
   return no_duplicates;
 }
-
+*/
 static
 double is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2])
 {
@@ -325,7 +325,7 @@ bool are_polygon_vertices_arranged_in_clockwise_order(double cell_area)
 }
 
 static
-void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon, double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat)
+void verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon, double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat)
 {
   /* 
      First, this function performs the following test:
@@ -346,13 +346,13 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   double corner_coordinates[3];
   double center_point_plane_projection[2];
 
-  int no_of_cells_with_duplicates = 0;
-  int no_usable_cells = 0;
-  int no_convex_cells = 0;
-  int no_clockwise_cells = 0;
-  int no_counterclockwise_cells = 0;
-  int no_of_cells_with_center_points_out_of_bounds = 0;
-  int no_unique_center_points = 1;
+  size_t no_of_cells_with_duplicates = 0;
+  size_t no_usable_cells = 0;
+  size_t no_convex_cells = 0;
+  size_t no_clockwise_cells = 0;
+  size_t no_counterclockwise_cells = 0;
+  size_t no_of_cells_with_center_points_out_of_bounds = 0;
+  size_t no_unique_center_points = 1;
 
   int *no_cells_with_a_specific_no_of_corners = (int*) Malloc(ncorner*sizeof(int));
 
@@ -360,16 +360,16 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
     no_cells_with_a_specific_no_of_corners[i] = 0;
 
   if ( ngrids == 1 )
-    cdoPrintBlue("Grid consists of %d cells (type: %s), of which", gridsize, gridNamePtr(gridtype));
+    cdoPrintBlue("Grid consists of %zu cells (type: %s), of which", gridsize, gridNamePtr(gridtype));
   else
-    cdoPrintBlue("Grid no %u (of %u) consists of %d cells (type: %s), of which", gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
+    cdoPrintBlue("Grid no %u (of %u) consists of %zu cells (type: %s), of which", gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
   //cdoPrint("");
 
   /* For performing the first test, an array of all center point coordinates is built. */
 
   double *center_point_array = (double *)Malloc(gridsize * 2 * sizeof(double));
   
-  for ( int cell_no = 0; cell_no < gridsize; cell_no++ )
+  for ( size_t cell_no = 0; cell_no < gridsize; cell_no++ )
     {
       center_point_array[cell_no * 2 + 0] = grid_center_lon[cell_no];
       center_point_array[cell_no * 2 + 1] = grid_center_lat[cell_no];
@@ -384,7 +384,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   int subarray_start = 0;
   int subarray_end = 0;
 
-  for ( int cell_no = 0; cell_no < gridsize - 1; cell_no++ )
+  for ( size_t cell_no = 0; cell_no < gridsize - 1; cell_no++ )
     {
       if ( cell_no == gridsize - 2 )
         {    
@@ -404,7 +404,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
   /* Now checking for the number of unique center point coordinates. */
 
-  for ( int cell_no = 0; cell_no < gridsize - 1; cell_no++ )
+  for ( size_t cell_no = 0; cell_no < gridsize - 1; cell_no++ )
     {
       if ( fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) < 0.0001 )
         {
@@ -432,7 +432,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
      This is first done for the presumed center point of the cell and then for all the corners of the cell. LLtoXYZ is defined in clipping/geometry.h 
   */
 
-  for ( int cell_no = 0; cell_no < gridsize; cell_no++ )
+  for ( size_t cell_no = 0; cell_no < gridsize; cell_no++ )
     {    
       /* Conversion of center point spherical coordinates to Cartesian coordinates. */
 
@@ -479,7 +479,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       if ( actual_number_of_corners < 3 )
         {
           if ( cdoVerbose )
-            fprintf(stdout,"Less than three vertices found in cell no %u. This cell is considered degenerate and will be omitted from further computation!\n", cell_no + 1);
+            fprintf(stdout,"Less than three vertices found in cell no %zu. This cell is considered degenerate and will be omitted from further computation!\n", cell_no + 1);
           
           continue;
         }
@@ -499,7 +499,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
                fabs(cell_corners_xyz_open_cell[i + 2] - cell_corners_xyz_open_cell[j + 2]) < 0.000001 )
             {
               if ( cdoVerbose )
-                fprintf(stdout,"The duplicate vertex %f, %f, %f was found in cell no %u.\n",
+                fprintf(stdout,"The duplicate vertex %f, %f, %f was found in cell no %zu.\n",
                         cell_corners_xyz_open_cell[j],  cell_corners_xyz_open_cell[j + 1],  cell_corners_xyz_open_cell[j + 2], cell_no + 1);
 
               no_duplicates += 1;
@@ -532,7 +532,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       if ( actual_number_of_corners < 3 )
         {
           if ( cdoVerbose )
-            fprintf(stdout,"Less than three vertices found in cell no %u. This cell is considered degenerate and will be omitted from further computation!\n", cell_no + 1);
+            fprintf(stdout,"Less than three vertices found in cell no %zu. This cell is considered degenerate and will be omitted from further computation!\n", cell_no + 1);
 
           continue;
         }
@@ -624,7 +624,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
       if ( cdoVerbose && winding_number == 0 )
         {
-          printf("cell_no %d: ", cell_no+1);
+          printf("cell_no %zu: ", cell_no+1);
           printf(" lon=%g lat=%g : ", grid_center_lon[cell_no], grid_center_lat[cell_no]);
           for ( int corner_no = 0; corner_no < ncorner; corner_no++ )
             printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no]);
@@ -637,31 +637,31 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   Free(cell_corners_xyz);
   Free(cell_corners_xyz_without_duplicates);
 
-  int no_nonunique_cells = gridsize - no_unique_center_points;
-  int no_nonconvex_cells = (int) gridsize - no_convex_cells;
-  int no_nonusable_cells = (int) gridsize - no_usable_cells;
+  size_t no_nonunique_cells = gridsize - no_unique_center_points;
+  size_t no_nonconvex_cells = gridsize - no_convex_cells;
+  size_t no_nonusable_cells = gridsize - no_usable_cells;
 
   for ( int i = 2; i < ncorner; i++ )
     if ( no_cells_with_a_specific_no_of_corners[i] )
       cdoPrintBlue("%9d cells have %d vertices", no_cells_with_a_specific_no_of_corners[i], i + 1);
 
   if ( no_of_cells_with_duplicates )
-    cdoPrintBlue("%9d cells have duplicate vertices", no_of_cells_with_duplicates);
+    cdoPrintBlue("%9zu cells have duplicate vertices", no_of_cells_with_duplicates);
 
   if ( no_nonusable_cells )
-    cdoPrintRed("%9d cells have unusable vertices", no_nonusable_cells);
+    cdoPrintRed("%9zu cells have unusable vertices", no_nonusable_cells);
 
   if ( no_nonunique_cells )
-    cdoPrintRed("%9d cells are not unique", no_nonunique_cells);
+    cdoPrintRed("%9zu cells are not unique", no_nonunique_cells);
   
   if ( no_nonconvex_cells )
-    cdoPrintRed("%9d cells are non-convex", no_nonconvex_cells);
+    cdoPrintRed("%9zu cells are non-convex", no_nonconvex_cells);
 
   if ( no_clockwise_cells )
-    cdoPrintRed("%9d cells have their vertices arranged in a clockwise order", no_clockwise_cells);
+    cdoPrintRed("%9zu cells have their vertices arranged in a clockwise order", no_clockwise_cells);
   
   if ( no_of_cells_with_center_points_out_of_bounds )
-    cdoPrintRed("%9d cells have their center points located outside their boundaries", no_of_cells_with_center_points_out_of_bounds);
+    cdoPrintRed("%9zu cells have their center points located outside their boundaries", no_of_cells_with_center_points_out_of_bounds);
 
   // cdoPrint("");
 
@@ -708,7 +708,7 @@ void *Verifygrid(void *argument)
             }
         }
 
-      int gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
       /*
         if ( gridInqMaskGME(gridID, NULL) )
         {
@@ -739,7 +739,7 @@ void *Verifygrid(void *argument)
           if ( luse_grid_corner )
             {
               if ( ncorner == 0 ) cdoAbort("grid corner missing!");
-              int nalloc = ncorner*gridsize;
+              size_t nalloc = ncorner*gridsize;
               grid_corner_lat = (double*) Realloc(grid_corner_lat, nalloc*sizeof(double));
               grid_corner_lon = (double*) Realloc(grid_corner_lon, nalloc*sizeof(double));
           
@@ -777,9 +777,9 @@ void *Verifygrid(void *argument)
       else
         {
           if ( ngrids == 1 )
-            cdoPrintBlue("Grid consists of %d points (type: %s)", gridsize, gridNamePtr(gridtype));
+            cdoPrintBlue("Grid consists of %zu points (type: %s)", gridsize, gridNamePtr(gridtype));
           else
-            cdoPrintBlue("Grid no %u (of %u) consists of %d points (type: %s)", gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
+            cdoPrintBlue("Grid no %u (of %u) consists of %zu points (type: %s)", gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
           // cdoPrint("");
         }
     }
