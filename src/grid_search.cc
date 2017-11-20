@@ -154,7 +154,8 @@ kdTree_t *gs_create_kdtree(size_t n, const double *restrict lons, const double *
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
 #if defined(HAVE_OPENMP4)
-#pragma omp parallel for reduction(min: min) reduction(max: max)
+  // failed with INTEL CC: error: 'min' has invalid type for 'reduction'
+  // #pragma omp parallel for reduction(min: min) reduction(max: max)
 #endif
   for ( size_t i = 0; i < n; i++ ) 
     {
@@ -207,7 +208,8 @@ nfTree_t *gs_create_nanoflann(size_t n, const double *restrict lons, const doubl
   // Generating  Point Cloud
   pointcloud->pts.resize(n);
 #if defined(HAVE_OPENMP4)
-#pragma omp parallel for reduction(min: min) reduction(max: max)
+  // failed with INTEL CC: error: 'min' has invalid type for 'reduction'
+  // #pragma omp parallel for reduction(min: min) reduction(max: max)
 #endif
   for ( size_t i = 0; i < n; i++ ) 
     {
