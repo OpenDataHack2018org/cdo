@@ -377,7 +377,7 @@ void cal_bound_box(struct gridsearch *gs, size_t n, const double *restrict lons,
       int64_t ii = (int64_t) llround(fi);
       int64_t jj = (int64_t) llround(fj);
       if ( i < 1000 )
-        printf("lon=%g/lat=%g  ii=%ld  jj=%ld  fi=%g fj=%g\n", lons[i]*RAD2DEG, lats[i]*RAD2DEG, ii, jj, fi, fj);
+        printf("lon=%g/lat=%g  ii=%ld  jj=%ld  fi=%g fj=%g\n", lons[i]*RAD2DEG, lats[i]*RAD2DEG, (long)ii, (long)jj, fi, fj);
       mask1[jj*mlon+ii] = 1;
     }
 
