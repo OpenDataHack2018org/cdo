@@ -26,13 +26,10 @@
 */
 
 
-#if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#ifdef  HAVE_CONFIG_H
+#include "config.h"
 #endif
 
-#if defined(HAVE_ISNAN) && ! defined(__cplusplus)
-int isnan(const double x);
-#endif
 
 #include <cdi.h>
 #include "cdo.h"
@@ -45,8 +42,7 @@ void *Setmiss(void *argument)
   int nrecs;
   int varID, levelID;
   size_t nmiss;
-  int i;
-  double missval, missval2 = 0;
+  double missval2 = 0;
   double rconst = 0, rmin = 0, rmax = 0;
 
   cdoInitialize(argument);
@@ -108,7 +104,7 @@ void *Setmiss(void *argument)
       int nvars = vlistNvars(vlistID2);
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  missval = vlistInqVarMissval(vlistID2, varID);
+	  double missval = vlistInqVarMissval(vlistID2, varID);
 	  if ( DBL_IS_EQUAL(rconst, missval) )
 	    {
 	      cdoWarning("Missing value and constant have the same value!");
@@ -132,9 +128,8 @@ void *Setmiss(void *argument)
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
-
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  double *array = (double*) Malloc(gridsizemax*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -147,13 +142,13 @@ void *Setmiss(void *argument)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array, &nmiss);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  missval = vlistInqVarMissval(vlistID1, varID);
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  double missval = vlistInqVarMissval(vlistID1, varID);
 
 	  if ( operatorID == SETMISSVAL )
 	    {
 	      nmiss = 0;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval)  || DBL_IS_EQUAL(array[i], (float)missval) ||
 		     DBL_IS_EQUAL(array[i], missval2) || DBL_IS_EQUAL(array[i], (float)missval2) )
 		  {
@@ -166,7 +161,7 @@ void *Setmiss(void *argument)
 #if defined(HAVE_ISNAN)
 	      if ( isnan(rconst) )
 		{
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( isnan(array[i]) )
 		      {
 			array[i] = missval;
@@ -176,7 +171,7 @@ void *Setmiss(void *argument)
 	      else
 #endif
 		{
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(array[i], rconst) || DBL_IS_EQUAL(array[i], (float)rconst) )
 		      {
 			array[i] = missval;
@@ -187,7 +182,7 @@ void *Setmiss(void *argument)
 	  else if ( operatorID == SETMISSTOC )
 	    {
 	      nmiss = 0;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) || DBL_IS_EQUAL(array[i], (float)missval) )
 		  {
 		    array[i] = rconst;
@@ -195,7 +190,7 @@ void *Setmiss(void *argument)
 	    }
 	  else if ( operatorID == SETRTOMISS )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( array[i] >= rmin && array[i] <= rmax )
 		  {
 		    array[i] = missval;
@@ -204,11 +199,11 @@ void *Setmiss(void *argument)
 	    }
 	  else if ( operatorID == SETVRANGE )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( array[i] < rmin || array[i] > rmax ) array[i] = missval;
 
 	      nmiss = 0;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 	    }
 
