@@ -130,19 +130,19 @@ void *Change_e5slm(void *argument)
 	  if ( code == 172 )
 	    {
 	      cdoPrint("SLM changed!");
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		array[i] = cland[i];
 	    }
 	  else if ( code == 99 )
 	    {
 	      cdoPrint("ALAKE set all values to zero!");
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		array[i] = 0;
 	    }
 	  else if ( code == 232 )
 	    {
 	      cdoPrint("GLAC set sea points to %g!", array[0]);
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		if ( cland[i] < 0.5 ) array[i] = array[0];
 	    }
 	  else if ( code ==  70 || code ==  71 || code == 140 ||
@@ -151,7 +151,7 @@ void *Change_e5slm(void *argument)
 		    code == 229 )
 	    {
 	      cdoPrint("Code %d set sea points to %g!", code, array[0]);
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		if ( lsea[i] ) array[i] = array[0];
 	    }
 
