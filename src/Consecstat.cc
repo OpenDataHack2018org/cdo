@@ -40,7 +40,7 @@ enum {CONSECSUM, CONSECTS};
 
 static void selEndOfPeriod(field_type *periods, field_type history, field_type current, int isLastTimestep)
 {
-  long   i;
+  size_t i;
   double pmissval = periods->missval;
   double  *parray = periods->ptr;
   double hmissval = history.missval;
@@ -48,7 +48,7 @@ static void selEndOfPeriod(field_type *periods, field_type history, field_type c
   double cmissval = current.missval;
   double  *carray = current.ptr;
 
-  long len = gridInqSize(periods->grid);
+  size_t len = gridInqSize(periods->grid);
   if ( len != gridInqSize(current.grid) || (gridInqSize(current.grid) != gridInqSize(history.grid)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
@@ -218,7 +218,7 @@ void *Consecstat(void *argument)
           }
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) schedule(static)
-          for ( int i = 0; i < gridInqSize(vars[varID][levelID].grid); i++ )
+          for ( size_t i = 0; i < gridInqSize(vars[varID][levelID].grid); i++ )
             hist[varID][levelID].ptr[i] = vars[varID][levelID].ptr[i];
 #else
           memcpy(hist[varID][levelID].ptr,
