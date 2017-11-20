@@ -54,7 +54,8 @@
 #include <stdexcept>
 #include <cstdio>  // for fwrite()
 #define _USE_MATH_DEFINES // Required by MSVC to define M_PI,etc. in <cmath>
-#include <cmath>   // for abs()
+// Uwe Schulzweida: changed cmath to math.h (cmath causes problems with isnan())
+#include <math.h>   // for abs()
 #include <cstdlib> // for abs()
 #include <limits>
 
