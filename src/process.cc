@@ -1331,9 +1331,10 @@ void cdoFinish(void)
       size_t memmax = getPeakRSS();
       if (memmax)
         {
-          int muindex = 0;
-          while (memmax > 9999) { memmax /= 1024; muindex++; }
-          const char *mu[] = { "B", "KB", "MB", "GB", "TB" };
+          size_t muindex = 0;
+          const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
+          const size_t nmu = sizeof(mu)/sizeof(char*);
+          while (memmax > 9999 && muindex < nmu-1) { memmax /= 1024; muindex++; }
           snprintf(memstring, sizeof(memstring), " %zu%s", memmax, mu[muindex]);
         }
 
