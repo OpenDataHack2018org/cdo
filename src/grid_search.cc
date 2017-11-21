@@ -661,7 +661,7 @@ size_t gs_nearest_kdsph(kdTree_t *kdt, double lon, double lat, double *prange)
   return index;
 }
 
-
+static
 size_t gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double *prange)
 {
   size_t index = GS_NOT_FOUND;
@@ -701,7 +701,7 @@ size_t gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double *p
   return index;
 }
 
-
+static
 size_t gs_nearest_full(struct  gsFull *full, double lon, double lat, double *prange)
 {
   size_t index = GS_NOT_FOUND;
@@ -751,15 +751,15 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
       else if ( gs->method_nn == GS_KDSPH )     index = gs_nearest_kdsph(gs->kdt, lon, lat, prange);
       else if ( gs->method_nn == GS_NEARPT3 )   index = gs_nearest_nearpt3(gs->near, lon, lat, prange);
       else if ( gs->method_nn == GS_FULL )      index = gs_nearest_full(gs->full, lon, lat, prange);
-      else cdoAbort("gridsearch_nearest::method_nn undefined!");
+      else cdoAbort("%s::method_nn undefined!", __func__);
       // clang-format on
     }
 
   return index;
 }
 
-
-struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
+static
+struct pqueue *gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
 {
   if ( gs->kdt == NULL ) return NULL;
   
@@ -795,8 +795,8 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
   return result;
 }
 
-
-struct pqueue *gridsearch_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
+static
+struct pqueue *gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
 {
   if ( gs->nft == NULL ) return NULL;
   
@@ -839,6 +839,23 @@ struct pqueue *gridsearch_qnearest_nanoflann(struct gridsearch *gs, double lon, 
       if ( prange ) *prange = frange;
     }
   
+  return result;
+}
+
+
+struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
+{
+  struct pqueue *result = NULL;
+
+  if ( gs )
+    {
+      // clang-format off
+      if      ( gs->method_nn == GS_KDTREE )    result = gs_qnearest_kdtree(gs, lon, lat, prange, nnn);
+      else if ( gs->method_nn == GS_NANOFLANN ) result = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn);
+      else cdoAbort("%s::method_nn undefined!", __func__);
+      // clang-format on
+    }
+
   return result;
 }
 
