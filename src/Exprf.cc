@@ -87,6 +87,79 @@ char *exprs_from_file(const char *exprf)
 
 #define MAX_PARAMS 4096
 
+char *str_replace(char *target, const char *needle, const char *replacement)
+{
+  char buffer[1024] = { 0 };
+  char *insert_point = &buffer[0];
+  const char *tmp = target;
+  size_t needle_len = strlen(needle);
+  size_t repl_len = strlen(replacement);
+
+  while (1)
+    {
+      const char *p = strstr(tmp, needle);
+
+      // walked past last occurrence of needle; copy remaining part
+      if (p == NULL)
+        {
+          strcpy(insert_point, tmp);
+          break;
+        }
+
+      // copy part before needle
+      memcpy(insert_point, tmp, p - tmp);
+      insert_point += p - tmp;
+
+      // copy replacement string
+      memcpy(insert_point, replacement, repl_len);
+      insert_point += repl_len;
+
+      // adjust pointers, move on
+      tmp = p + needle_len;
+    }
+
+  // write altered string back to target
+  strcpy(target, buffer);
+
+  return target;
+}
+
+static
+char *exprs_expand(char *exprs, int vlistID)
+{
+  size_t len = strlen(exprs);
+  unsigned nequal = 0, nsemi = 0;
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( exprs[i] == '=' ) nequal++;
+      if ( exprs[i] == ';' ) nsemi++;
+    }
+
+  const char *needle = "_T";
+  if ( nequal == 0 && nsemi == 1 && strstr(exprs, needle) )
+    {
+      char varname[CDI_MAX_NAME];
+      int nvars = vlistNvars(vlistID);
+      const size_t bufsize = 1024;
+      char *sbuf = (char*) Malloc(bufsize);
+      char *buf = (char*) Malloc(nvars*bufsize);
+      buf[0] = 0;
+      for ( int varID = 0; varID < nvars; ++varID )
+        {
+          vlistInqVarName(vlistID, varID, varname);
+          strcpy(sbuf, exprs);
+          str_replace(sbuf, needle, varname);
+          strcat(buf, varname);
+          strcat(buf, "=");
+          strcat(buf, sbuf);
+        }
+      Free(sbuf);
+      Free(exprs);
+      exprs = buf;
+    }
+
+  return exprs;
+}
 
 static
 paramType *params_new(int vlistID)
@@ -271,10 +344,12 @@ void *Expr(void *argument)
   char *exprs = READS_COMMAND_LINE(operatorID) ?
     exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
 
-  if ( cdoVerbose ) cdoPrint(exprs);
-
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
   int vlistID1 = pstreamInqVlist(streamID1);
+
+  exprs = exprs_expand(exprs, vlistID1);
+  if ( cdoVerbose ) cdoPrint(exprs);
+
   int nvars1 = vlistNvars(vlistID1);
   int ngrids = vlistNgrids(vlistID1);
   int nzaxis = vlistNzaxis(vlistID1);

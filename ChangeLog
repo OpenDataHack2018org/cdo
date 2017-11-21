@@ -5,6 +5,7 @@
 
 2017-11-21  Uwe Schulzweida
 
+	* expr: added variable name template _T
 	* expr: added operator ! (NOT)
 
 2017-11-17  Uwe Schulzweida

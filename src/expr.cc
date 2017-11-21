@@ -1205,12 +1205,12 @@ nodeType *ex_not(int init, nodeType *p1)
 
   if ( p1->type == typeVar )
     {
-      if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%s)", ExIn[init], p1->u.var.nm);
+      if ( cdoVerbose ) cdoPrint("\t%s\tnot\t! (%s)", ExIn[init], p1->u.var.nm);
       p = ex_not_var(init, p1);
     }
   else if ( p1->type == typeCon )
     {
-      if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%g)", ExIn[init], p1->u.con.value);
+      if ( cdoVerbose ) cdoPrint("\t%s\tnot\t! (%g)", ExIn[init], p1->u.con.value);
       p = ex_not_con(p1);
     }
   else
