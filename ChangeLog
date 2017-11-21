@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.2
 	* Version 1.9.2 release
 
+2017-11-21  Uwe Schulzweida
+
+	* expr: added operator ! (NOT)
+
 2017-11-17  Uwe Schulzweida
 
 	* rotuvb changed behavior in different versions [Bug #8084]

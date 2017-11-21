@@ -726,6 +726,7 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
         case LEG:  coper = "<=>"; break;
         case AND:  coper = "&&"; break;
         case OR:   coper = "||"; break;
+        default: cdoAbort("Internal error, expr operator >%c< not implemented!\n", oper);
         }
     }
 
@@ -1136,6 +1137,81 @@ nodeType *ex_uminus(int init, nodeType *p1)
     {
       if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%g)", ExIn[init], p1->u.con.value);
       p = ex_uminus_con(p1);
+    }
+  else
+    cdoAbort("Internal problem!");
+
+  return p;
+}
+
+static
+nodeType *ex_not_var(int init, nodeType *p1)
+{
+  size_t ngp   = p1->param.ngp;
+  size_t nlev  = p1->param.nlev;
+  size_t nmiss = p1->param.nmiss;
+  double missval = p1->param.missval;
+
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+
+  p->type     = typeVar;
+  p->ltmpobj  = true;
+  p->u.var.nm = strdup(tmpvnm);
+  param_meta_copy(&p->param, &p1->param);
+  p->param.name = p->u.var.nm;
+
+  if ( ! init )
+    {
+      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
+      double *restrict pdata = p->param.data;
+      const double *restrict p1data = p1->param.data;
+
+      if ( nmiss > 0 )
+        {
+          for ( size_t i = 0; i < ngp*nlev; ++i )
+            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : !(p1data[i]);
+        }
+      else
+        {
+          for ( size_t i = 0; i < ngp*nlev; ++i )
+            pdata[i] = !(p1data[i]);
+        }
+
+      p->param.nmiss = nmiss;
+    }
+
+  if ( p1->ltmpobj ) node_delete(p1);
+  
+  return p;
+}
+
+static
+nodeType *ex_not_con(nodeType *p1)
+{
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+
+  p->type    = typeCon;
+  p->ltmpobj = true;
+
+  p->u.con.value = !(p1->u.con.value);
+
+  return p;
+}
+
+static
+nodeType *ex_not(int init, nodeType *p1)
+{
+  nodeType *p = NULL;
+
+  if ( p1->type == typeVar )
+    {
+      if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%s)", ExIn[init], p1->u.var.nm);
+      p = ex_not_var(init, p1);
+    }
+  else if ( p1->type == typeCon )
+    {
+      if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%g)", ExIn[init], p1->u.con.value);
+      p = ex_not_con(p1);
     }
   else
     cdoAbort("Internal problem!");
@@ -1650,6 +1726,12 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
         case UMINUS:
           {
             rnode = ex_uminus(init, expr_run(p->u.opr.op[0], parse_arg));
+
+            break;
+          }
+        case NOT:
+          {
+            rnode = ex_not(init, expr_run(p->u.opr.op[0], parse_arg));
 
             break;
           }
