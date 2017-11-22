@@ -51,7 +51,7 @@ pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 static process_t *root_process;
-static std::map<int, process_t> Process;
+std::map<int, process_t> Process;
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
@@ -133,10 +133,20 @@ processCreate(char *command)
   pthread_mutex_lock(&processMutex);
 #endif
 
+  if(CdoDebug::PROCESS){
+    MESSAGE("Creating new process for command: ", command);
+  }
   int processID = NumProcess++;
-  Process.insert(std::make_pair(processID, process_t(processID, command)));
+  auto success = Process.insert(std::make_pair(processID, process_t(processID, command)));
+  if(success.second == false)
+  {
+    ERROR("Process ", processID," could not be created");
+  }
 
   NumProcessActive++;
+  if(CdoDebug::PROCESS){
+    MESSAGE("NumProcessActive: ", NumProcessActive);
+  }
 
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);
@@ -145,7 +155,7 @@ processCreate(char *command)
   if (processID >= MAX_PROCESS)
     Error("Limit of %d processes reached!", MAX_PROCESS);
 
-  return &Process.find(processID)->second;
+  return &success.first->second;
 }
 
 process_t &
@@ -179,7 +189,7 @@ processNums(void)
   pthread_mutex_lock(&processMutex);
 #endif
 
-  int pnums = NumProcess;
+  int pnums = Process.size();
 
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);
@@ -817,14 +827,11 @@ void print_creation_results(std::ofstream &p_outfile)
 void
 createProcesses(int argc, char **argv)
 {
-  std::ofstream outfile("processCreation.txt");
-
-  for (int i = 0; i < argc; i++)
-    {
-      outfile << argv[i] << " ";
-    }
-  outfile << std::endl;
-
+  if(CdoDebug::PROCESS){
+  std::string input_string = "";
+     MESSAGE("== Process Creation Start ==");
+    MESSAGE("operators:  ",CdoDebug::argvToString(argc, argv));
+  }
   root_process = processCreate(argv[0]);
 
   process_t *current_process;
@@ -835,42 +842,57 @@ createProcesses(int argc, char **argv)
 
   call_stack.push(root_process);
   current_process = call_stack.top();
-  // root_process.addOutputStream();
+  for(int i = 0; i < root_process->m_module.streamOutCnt; i++)
+  {
+    pstream_t *new_out_stream =  create_pstream();
+    root_process->outputStreams.push_back(new_out_stream);
+  }
   do
     {
-      outfile << "iteration " << idx << " start" << std::endl
-              << "current argv: " << argv[idx] << "  current_process: " << current_process->operatorName << std::endl;
-      if (argv[idx][0] == '-')
+      if(CdoDebug::PROCESS){
+      MESSAGE(
+              "iteration " , idx , ", current argv: " , argv[idx] ,
+              ",  current_process: " , current_process->operatorName
+              );
+      }
+    if (argv[idx][0] == '-')
         {
-          outfile << "found new operator: creating process: ";
+          if(CdoDebug::PROCESS){
+            MESSAGE("Found new Operator: ", argv[idx]);
+          }
           parent_process = current_process;
           current_process = processCreate(argv[idx]);
           parent_process->addChild(current_process);
           current_process->addParent(parent_process);
           call_stack.push(current_process);
-          outfile << current_process->operatorName << std::endl;
         }
       else
         {
-          outfile << "added file " << argv[idx] << std::endl;
-          pstream_t *new_pstream = create_pstream();
+          if(CdoDebug::PROCESS){
+            MESSAGE("adding file to ", current_process->operatorName);
+          }
+          pstream_t *new_in_stream = create_pstream();
           // new_pstream->pstreamOpenReadFile(argv[i]);
-          current_process->inputStreams.push_back(new_pstream);
+          current_process->inputStreams.push_back(new_in_stream);
         }
-      while (current_process->hasAllInputs() && current_process != root_process)
+
+    while (current_process->hasAllInputs() && current_process != root_process)
+      {
+        if(CdoDebug::PROCESS)
         {
-          outfile << "process " << current_process->operatorName << "poped" << std::endl;
-          call_stack.pop();
-          current_process = call_stack.top();
+            MESSAGE("Removing ", current_process->operatorName, " from stack");
         }
-      outfile << "iteration " << idx << " end"
-              << "current_process: " << current_process->operatorName << std::endl;
+        call_stack.pop();
+        current_process = call_stack.top();
+      }
       idx++;
     }
   while ((current_process != root_process || !root_process->hasAllInputs()) && idx < argc - 1);
 
-  print_creation_results(outfile);
-  outfile.close();
+  if(CdoDebug::PROCESS)
+  {
+    MESSAGE("== Process Creation End ==");
+  }
 }
 
 void
