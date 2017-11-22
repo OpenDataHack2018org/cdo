@@ -19,6 +19,10 @@
 #include "config.h"
 #endif
 
+#include "module_definitions.h"
+#include <iostream>
+#include <vector>
+#include "operator_help.h"
 #if defined (HAVE_EXECINFO_H)
 #include <execinfo.h>
 #endif
@@ -34,7 +38,6 @@
 #endif
 #endif
 #include <unistd.h>         /* sysconf, gethostname */
-
 #include <thread>
 
 #if defined(SX)
@@ -1472,6 +1475,344 @@ void cdo_rusage(void)
 #endif
 }
 
+/* clang-format off */
+// stream in  -1 means: unlimited number of input streams
+// stream out -1 means: usage of obase
+/***
+ * Initializes all hardcoded modules.
+ */
+void init_modules()
+{
+/*                             function        help function      operator names          mode number     num streams
+                                                                                                  type       in out      */
+  add_module("Adisit"        , {Adisit        , AdisitHelp        , AdisitOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Afterburner"   , {Afterburner   , AfterburnerHelp   , AfterburnerOperators   , 1 , CDI_REAL , -1 , 1  });
+  add_module("Arith"         , {Arith         , ArithHelp         , ArithOperators         , 1 , CDI_REAL , 2  , 1  });
+  add_module("Arithc"        , {Arithc        , ArithcHelp        , ArithcOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Arithdays"     , {Arithdays     , ArithdaysHelp     , ArithdaysOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Arithlat"      , {Arithlat      , {}                , ArithlatOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Cat"           , {Cat           , CopyHelp          , CatOperators           , 1 , CDI_REAL , -1 , 1  });
+  add_module("CDItest"       , {CDItest       , {}                , CDItestOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("CDIread"       , {CDIread       , {}                , CDIreadOperators       , 1 , CDI_REAL , 1  , 0  });
+  add_module("CDIwrite"      , {CDIwrite      , {}                , CDIwriteOperators      , 1 , CDI_REAL , 0  , 1  });
+  add_module("Change"        , {Change        , ChangeHelp        , ChangeOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Change_e5slm"  , {Change_e5slm  , {}                , Change_e5slmOperators  , 0 , CDI_REAL , 1  , 1  });
+  add_module("Cloudlayer"    , {Cloudlayer    , {}                , CloudlayerOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("CMOR"          , {CMOR          , CMORHelp          , CMOROperators          , 1 , CDI_REAL , 1  , 0  });
+  add_module("CMOR_lite"     , {CMOR_lite     , CMORliteHelp      , CMORliteOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("CMOR_table"    , {CMOR_table    , {}                , CMORtableOperators     , 1 , CDI_REAL , 0  , 0  });
+  add_module("Collgrid"      , {Collgrid      , CollgridHelp      , CollgridOperators      , 1 , CDI_REAL , -1 , 1  });
+  add_module("Command"       , {Command       , {}                , CommandOperators       , 0 , CDI_REAL , 1  , 0  });
+  add_module("Comp"          , {Comp          , CompHelp          , CompOperators          , 1 , CDI_REAL , 2  , 1  });
+  add_module("Compc"         , {Compc         , CompcHelp         , CompcOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("Complextorect" , {Complextorect , {}                , ComplextorectOperators , 1 , CDI_COMP , 1  , 2  });
+  add_module("Cond"          , {Cond          , CondHelp          , CondOperators          , 1 , CDI_REAL , 2  , 1  });
+  add_module("Cond2"         , {Cond2         , Cond2Help         , Cond2Operators         , 1 , CDI_REAL , 3  , 1  });
+  add_module("Condc"         , {Condc         , CondcHelp         , CondcOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("Consecstat"    , {Consecstat    , ConsecstatHelp    , ConsecstatOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("Copy"          , {Copy          , CopyHelp          , CopyOperators          , 1 , CDI_REAL , -1 , 1  });
+  add_module("Deltat"        , {Deltat        , {}                , DeltatOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Deltime"       , {Deltime       , {}                , DeltimeOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Derivepar"     , {Derivepar     , DeriveparHelp     , DeriveparOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Detrend"       , {Detrend       , DetrendHelp       , DetrendOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Diff"          , {Diff          , DiffHelp          , DiffOperators          , 1 , CDI_REAL , 2  , 0  });
+  add_module("Distgrid"      , {Distgrid      , DistgridHelp      , DistgridOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Duplicate"     , {Duplicate     , DuplicateHelp     , DuplicateOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Echam5ini"     , {Echam5ini     , {}                , Echam5iniOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Enlarge"       , {Enlarge       , EnlargeHelp       , EnlargeOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Enlargegrid"   , {Enlargegrid   , {}                , EnlargegridOperators   , 0 , CDI_REAL , 1  , 1  });
+  add_module("Ensstat"       , {Ensstat       , EnsstatHelp       , EnsstatOperators       , 1 , CDI_REAL , -1 , 1  });
+  add_module("Ensstat3"      , {Ensstat3      , Ensstat2Help      , Ensstat3Operators      , 1 , CDI_REAL , -1 , 1  });
+  add_module("Ensval"        , {Ensval        , EnsvalHelp        , EnsvalOperators        , 1 , CDI_REAL , -1 , 1  });
+  add_module("Eofcoeff"      , {Eofcoeff      , EofcoeffHelp      , EofcoeffOperators      , 1 , CDI_REAL , 2  , -1 });
+  add_module("Eofcoeff3d"    , {Eofcoeff3d    , EofcoeffHelp      , Eofcoeff3dOperators    , 1 , CDI_REAL , 2  , -1 });
+  add_module("EOFs"          , {EOFs          , EOFsHelp          , EOFsOperators          , 1 , CDI_REAL , 1  , 2  });
+  add_module("EOF3d"         , {EOF3d         , EOFsHelp          , EOF3dOperators         , 1 , CDI_REAL , 1  , 2  });
+  add_module("EstFreq"       , {EstFreq       , {}                , EstFreqOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Expr"          , {Expr          , ExprHelp          , ExprOperators          , 1 , CDI_REAL , 1  , 1  });
+  add_module("FC"            , {FC            , {}                , FCOperators            , 1 , CDI_REAL , 1  , 1  });
+  add_module("Filedes"       , {Filedes       , FiledesHelp       , FiledesOperators       , 1 , CDI_BOTH , 1  , 0  });
+  add_module("Fillmiss"      , {Fillmiss      , {}                , FillmissOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Filter"        , {Filter        , FilterHelp        , FilterOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Fldrms"        , {Fldrms        , {}                , FldrmsOperators        , 1 , CDI_REAL , 2  , 1  });
+  add_module("Fldstat"       , {Fldstat       , FldstatHelp       , FldstatOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Fldstatcor"    , {Fldstat2      , FldcorHelp        , FldcorOperators        , 1 , CDI_REAL , 2  , 1  });
+  add_module("Fldstatvar"    , {Fldstat2      , FldcovarHelp      , FldcovarOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("Fourier"       , {Fourier       , {}                , FourierOperators       , 1 , CDI_COMP , 1  , 1  });
+  add_module("Gengrid"       , {Gengrid       , {}                , GengridOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("Gradsdes"      , {Gradsdes      , GradsdesHelp      , GradsdesOperators      , 1 , CDI_REAL , 1  , 0  });
+  add_module("Gridboxstat"   , {Gridboxstat   , GridboxstatHelp   , GridboxstatOperators   , 1 , CDI_REAL , 1  , 1  });
+  add_module("Gridcell"      , {Gridcell      , GridcellHelp      , GridcellOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Gridsearch"    , {Gridsearch    , {}                , GridsearchOperators    , 0 , CDI_REAL , 0  , 0  });
+  add_module("Harmonic"      , {Harmonic      , {}                , HarmonicOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Histogram"     , {Histogram     , HistogramHelp     , HistogramOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Importamsr"    , {Importamsr    , ImportamsrHelp    , ImportamsrOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("Importbinary"  , {Importbinary  , ImportbinaryHelp  , ImportbinaryOperators  , 1 , CDI_REAL , 1  , 1  });
+  add_module("Importcmsaf"   , {Importcmsaf   , ImportcmsafHelp   , ImportcmsafOperators   , 1 , CDI_REAL , 1  , 1  });
+  add_module("Importobs"     , {Importobs     , {}                , ImportobsOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Info"          , {Info          , InfoHelp          , InfoOperators          , 1 , CDI_BOTH , -1 , 0  });
+  add_module("Input"         , {Input         , InputHelp         , InputOperators         , 1 , CDI_REAL , 0  , 1  });
+  add_module("Intgrid"       , {Intgrid       , {}                , IntgridOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Intgridtraj"   , {Intgridtraj   , {}                , IntgridtrajOperators   , 1 , CDI_REAL , 1  , 1  });
+  add_module("Intlevel"      , {Intlevel      , IntlevelHelp      , IntlevelOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Intlevel3d"    , {Intlevel3d    , Intlevel3dHelp    , Intlevel3dOperators    , 1 , CDI_REAL , 2  , 1  });
+  add_module("Inttime"       , {Inttime       , InttimeHelp       , InttimeOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Intntime"      , {Intntime      , InttimeHelp       , IntntimeOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Intyear"       , {Intyear       , IntyearHelp       , IntyearOperators       , 1 , CDI_REAL , 2  , -1 });
+  add_module("Invert"        , {Invert        , InvertHelp        , InvertOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Invertlev"     , {Invertlev     , InvertlevHelp     , InvertlevOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Isosurface"    , {Isosurface    , {}                , IsosurfaceOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("Log"           , {Log           , {}                , LogOperators           , 0 , CDI_REAL , 1  , 0  });
+  add_module("MapReduce"     , {MapReduce     , MapReduceHelp     , MapReduceOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Maskbox"       , {Maskbox       , MaskboxHelp       , MaskboxOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Maskregion"    , {Maskbox       , MaskregionHelp    , MaskregionOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("Mastrfu"       , {Mastrfu       , MastrfuHelp       , MastrfuOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Math"          , {Math          , MathHelp          , MathOperators          , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Merge"         , {Merge         , MergeHelp         , MergeOperators         , 1 , CDI_REAL , -1 , 1  });
+  add_module("Mergetime"     , {Mergetime     , MergeHelp         , MergetimeOperators     , 1 , CDI_REAL , -1 , 1  });
+  add_module("Mergegrid"     , {Mergegrid     , MergegridHelp     , MergegridOperators     , 1 , CDI_REAL , 2  , 1  });
+  add_module("Merstat"       , {Merstat       , MerstatHelp       , MerstatOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Monarith"      , {Monarith      , MonarithHelp      , MonarithOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("Mrotuv"        , {Mrotuv        , {}                , MrotuvOperators        , 1 , CDI_REAL , 1  , 2  });
+  add_module("Mrotuvb"       , {Mrotuvb       , {}                , MrotuvbOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("NCL_wind"      , {NCL_wind      , NCL_windHelp      , NCL_windOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Ninfo"         , {Ninfo         , NinfoHelp         , NinfoOperators         , 1 , CDI_BOTH , 1  , 0  });
+  add_module("Nmldump"       , {Nmldump       , {}                , NmldumpOperators       , 0 , CDI_REAL , 0  , 0  });
+  add_module("Output"        , {Output        , OutputHelp        , OutputOperators        , 1 , CDI_REAL , -1 , 0  });
+  add_module("Outputtab"     , {Output        , OutputtabHelp     , OutputtabOperators     , 1 , CDI_REAL , -1 , 0  });
+  add_module("Outputgmt"     , {Outputgmt     , OutputgmtHelp     , OutputgmtOperators     , 1 , CDI_REAL , 1  , 0  });
+  add_module("Pack"          , {Pack          , {}                , PackOperators          , 1 , CDI_REAL , 1  , 1  });
+  add_module("Pardup"        , {Pardup        , {}                , PardupOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Pinfo"         , {Pinfo         , {}                , PinfoOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("Pressure"      , {Pressure      , {}                , PressureOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Regres"        , {Regres        , RegresHelp        , RegresOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remap"         , {Remap         , RemapHelp         , RemapOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapbil"      , {Remap         , RemapbilHelp      , RemapbilOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapbic"      , {Remap         , RemapbicHelp      , RemapbicOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapnn"       , {Remap         , RemapnnHelp       , RemapnnOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapdis"      , {Remap         , RemapdisHelp      , RemapdisOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapycon"     , {Remap         , RemapyconHelp     , RemapyconOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapcon"      , {Remap         , RemapconHelp      , RemapconOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapcon2"     , {Remap         , Remapcon2Help     , Remapcon2Operators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remaplaf"      , {Remap         , RemaplafHelp      , RemaplafOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapgrid"     , {Remap         , {}                , RemapgridOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Remapeta"      , {Remapeta      , RemapetaHelp      , RemapetaOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Replace"       , {Replace       , ReplaceHelp       , ReplaceOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("Replacevalues" , {Replacevalues , ReplacevaluesHelp , ReplacevaluesOperators , 1 , CDI_REAL , 1  , 1  });
+  add_module("Rhopot"        , {Rhopot        , RhopotHelp        , RhopotOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Rotuv"         , {Rotuv         , RotuvbHelp        , RotuvOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("Runpctl"       , {Runpctl       , RunpctlHelp       , RunpctlOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Runstat"       , {Runstat       , RunstatHelp       , RunstatOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Samplegridicon", {Samplegridicon, {}                , SamplegridiconOperators, 1,  CDI_REAL,  1  , 2  });
+  add_module("Seascount"     , {Seascount     , {}                , SeascountOperators     , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Seaspctl"      , {Seaspctl      , SeaspctlHelp      , SeaspctlOperators      , 1 , CDI_REAL , 3  , 1  });
+  add_module("Seasstat"      , {Seasstat      , SeasstatHelp      , SeasstatOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Selbox"        , {Selbox        , SelboxHelp        , SelboxOperators        , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Selgridcell"   , {Selgridcell   , {}                , SelgridcellOperators   , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Select"        , {Select        , SelectHelp        , SelectOperators        , 1 , CDI_BOTH , -1 , 1  });
+  add_module("Selvar"        , {Selvar        , SelvarHelp        , SelvarOperators        , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Selrec"        , {Selrec        , SelvarHelp        , SelrecOperators        , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Seloperator"   , {Seloperator   , {}                , SeloperatorOperators   , 1 , CDI_REAL , 1  , 1  });
+  add_module("Seltime"       , {Seltime       , SeltimeHelp       , SeltimeOperators       , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Set"           , {Set           , SetHelp           , SetOperators           , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Setattribute"  , {Setattribute  , SetattributeHelp  , SetattributeOperators  , 1 , CDI_REAL , 1  , 1  });
+  add_module("Setbox"        , {Setbox        , SetboxHelp        , SetboxOperators        , 1 , CDI_REAL , 1  , 1  });
+  //add_module("Setgatt"       , {Setgatt       , SetgattHelp       , SetgattOperators       , 1 , CDI_BOTH , 1  , 1  });  
+  add_module("Setgrid"       , {Setgrid       , SetgridHelp       , SetgridOperators       , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Sethalo"       , {Sethalo       , SethaloHelp       , SethaloOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Setmiss"       , {Setmiss       , SetmissHelp       , SetmissOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Setmisstonn"   , {Fillmiss      , SetmissHelp       , SetmisstonnOperators   , 1 , CDI_REAL , 1  , 1  });
+  add_module("Setcodetab"    , {Setpartab     , SetHelp           , SetcodetabOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("Setpartab"     , {Setpartab     , SetpartabHelp     , SetpartabOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Setrcaname"    , {Setrcaname    , {}                , SetrcanameOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("Settime"       , {Settime       , SettimeHelp       , SettimeOperators       , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Setzaxis"      , {Setzaxis      , SetzaxisHelp      , SetzaxisOperators      , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Shiftxy"       , {Shiftxy       , {}                , ShiftxyOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Showinfo"      , {Showinfo      , ShowinfoHelp      , ShowinfoOperators      , 1 , CDI_BOTH , 1  , 0  });
+  add_module("Showattribute" , {Showattribute , ShowattributeHelp , ShowattributeOperators , 1 , CDI_REAL , 1  , 0  });
+  add_module("Sinfo"         , {Sinfo         , SinfoHelp         , SinfoOperators         , 1 , CDI_BOTH , -1 , 0  });
+  add_module("Smooth"        , {Smooth        , SmoothHelp        , SmoothOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Sort"          , {Sort          , {}                , SortOperators          , 1 , CDI_REAL , 1  , 1  });
+  add_module("Sorttimestamp" , {Sorttimestamp , {}                , SorttimestampOperators , 1 , CDI_REAL , -1 , 1  });
+  add_module("Specinfo"      , {Specinfo      , {}                , SpecinfoOperators      , 1 , CDI_REAL , 0  , 0  });
+  add_module("Spectral"      , {Spectral      , SpectralHelp      , SpectralOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Spectrum"      , {Spectrum      , {}                , SpectrumOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Split"         , {Split         , SplitHelp         , SplitOperators         , 1 , CDI_BOTH , 1  , -1 });
+  add_module("Splitrec"      , {Splitrec      , SplitHelp         , SplitrecOperators      , 1 , CDI_BOTH , 1  , -1 });
+  add_module("Splitsel"      , {Splitsel      , SplitselHelp      , SplitselOperators      , 1 , CDI_BOTH , 1  , -1 });
+  add_module("Splittime"     , {Splittime     , SplittimeHelp     , SplittimeOperators     , 1 , CDI_BOTH , 1  , -1 });
+  add_module("Splityear"     , {Splityear     , SplittimeHelp     , SplityearOperators     , 1 , CDI_BOTH , 1  , -1 });
+  add_module("Subtrend"      , {Subtrend      , SubtrendHelp      , SubtrendOperators      , 1 , CDI_REAL , 3  , 1  });
+  add_module("Tee"           , {Tee           , TeeHelp           , TeeOperators           , 1 , CDI_REAL , 2  , 1  });
+  add_module("Template1"     , {Template1     , {}                , Template1Operators     , 0 , CDI_REAL , 1  , 1  });
+  add_module("Template2"     , {Template2     , {}                , Template2Operators     , 0 , CDI_REAL , 1  , 1  });
+  add_module("Test"          , {Test          , {}                , TestOperators          , 0 , CDI_REAL , 1  , 1  });
+  add_module("Test2"         , {Test2         , {}                , Test2Operators         , 0 , CDI_REAL , 2  , 1  });
+  add_module("Testdata"      , {Testdata      , {}                , TestdataOperators      , 0 , CDI_REAL , 1  , 1  });
+  add_module("Tests"         , {Tests         , {}                , TestsOperators         , 0 , CDI_REAL , 1  , 1  });
+  add_module("Timcount"      , {Timcount      , {}                , TimcountOperators      , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Yearcount"     , {Timcount      , {}                , YearcountOperators     , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Moncount"      , {Timcount      , {}                , MoncountOperators      , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Daycount"      , {Timcount      , {}                , DaycountOperators      , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Hourcount"     , {Timcount      , {}                , HourcountOperators     , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Timcumsum"     , {Timcumsum     , TimcumsumHelp     , TimcumsumOperators     , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Timpctl"       , {Timpctl       , TimpctlHelp       , TimpctlOperators       , 1 , CDI_REAL , 3  , 1  });
+  add_module("Yearpctl"      , {Timpctl       , YearpctlHelp      , YearpctlOperators      , 1 , CDI_REAL , 3  , 1  });
+  add_module("Monpctl"       , {Timpctl       , MonpctlHelp       , MonpctlOperators       , 1 , CDI_REAL , 3  , 1  });
+  add_module("Daypctl"       , {Timpctl       , DaypctlHelp       , DaypctlOperators       , 1 , CDI_REAL , 3  , 1  });
+  add_module("Hourpctl"      , {Timpctl       , HourpctlHelp      , HourpctlOperators      , 1 , CDI_REAL , 3  , 1  });
+  add_module("Timselpctl"    , {Timselpctl    , TimselpctlHelp    , TimselpctlOperators    , 1 , CDI_REAL , 3  , 1  });
+  add_module("Timsort"       , {Timsort       , TimsortHelp       , TimsortOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Timselstat"    , {Timselstat    , TimselstatHelp    , TimselstatOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("XTimstat"      , {XTimstat      , {}                , XTimstatOperators      , 0 , CDI_BOTH , 1  , 1  });
+  add_module("Timstat"       , {Timstat       , TimstatHelp       , TimstatOperators       , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Yearstat"      , {Timstat       , YearstatHelp      , YearstatOperators      , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Monstat"       , {Timstat       , MonstatHelp       , MonstatOperators       , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Daystat"       , {Timstat       , DaystatHelp       , DaystatOperators       , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Hourstat"      , {Timstat       , HourstatHelp      , HourstatOperators      , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Timcor"        , {Timstat2      , TimcorHelp        , TimcorOperators        , 1 , CDI_REAL , 2  , 1  });
+  add_module("Timscorvar"    , {Timstat2      , TimcovarHelp      , TimcovarOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("Timstat3"      , {Timstat3      , {}                , Timstat3Operators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("Tinfo"         , {Tinfo         , {}                , TinfoOperators         , 1 , CDI_BOTH , 1  , 0  });
+  add_module("Tocomplex"     , {Tocomplex     , {}                , TocomplexOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Transpose"     , {Transpose     , {}                , TransposeOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Trend"         , {Trend         , TrendHelp         , TrendOperators         , 1 , CDI_REAL , 1  , 2  });
+  add_module("Trms"          , {Trms          , {}                , TrmsOperators          , 0 , CDI_REAL , 2  , 1  });
+  add_module("Tstepcount"    , {Tstepcount    , {}                , TstepcountOperators    , 1 , CDI_REAL , 1  , 1  });
+  add_module("Vargen"        , {Vargen        , VargenHelp        , VargenOperators        , 1 , CDI_REAL , 0  , 1  });
+  add_module("Varrms"        , {Varrms        , {}                , VarrmsOperators        , 0 , CDI_REAL , 2  , 1  });
+  add_module("Vertintml"     , {Vertintml     , VertintmlHelp     , VertintmlOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Vertintap"     , {Vertintap     , VertintapHelp     , VertintapOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Vertstat"      , {Vertstat      , VertstatHelp      , VertstatOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Vertcum"       , {Vertcum       , {}                , VertcumOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Vertwind"      , {Vertwind      , {}                , VertwindOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Verifygrid"    , {Verifygrid    , {}                , VerifygridOperators    , 1 , CDI_REAL , 1  , 0  });
+  add_module("Wind"          , {Wind          , WindHelp          , WindOperators          , 1 , CDI_REAL , 1  , 1  });
+  add_module("Writegrid"     , {Writegrid     , {}                , WritegridOperators     , 1 , CDI_REAL , 1  , 1  }); // no cdi output
+  add_module("Writerandom"   , {Writerandom   , {}                , WriterandomOperators   , 1 , CDI_REAL , 1  , 1  });
+  add_module("YAR"           , {YAR           , {}                , YAROperators           , 0 , CDI_REAL , 1  , 1  });
+  add_module("Yearmonstat"   , {Yearmonstat   , YearmonstatHelp   , YearmonstatOperators   , 1 , CDI_REAL , 1  , 1  });
+  add_module("Ydayarith"     , {Ydayarith     , YdayarithHelp     , YdayarithOperators     , 1 , CDI_REAL , 2  , 1  });
+  add_module("Ydaypctl"      , {Ydaypctl      , YdaypctlHelp      , YdaypctlOperators      , 1 , CDI_REAL , 3  , 1  });
+  add_module("Ydaystat"      , {Ydaystat      , YdaystatHelp      , YdaystatOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Ydrunpctl"     , {Ydrunpctl     , YdrunpctlHelp     , YdrunpctlOperators     , 1 , CDI_REAL , 3  , 1  });
+  add_module("Ydrunstat"     , {Ydrunstat     , YdrunstatHelp     , YdrunstatOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Yhourarith"    , {Yhourarith    , YhourarithHelp    , YhourarithOperators    , 1 , CDI_REAL , 2  , 1  });
+  add_module("Yhourstat"     , {Yhourstat     , YhourstatHelp     , YhourstatOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Ymonarith"     , {Ymonarith     , YmonarithHelp     , YmonarithOperators     , 1 , CDI_REAL , 2  , 1  });
+  add_module("Yseasarith"    , {Ymonarith     , YseasarithHelp    , YseasarithOperators    , 1 , CDI_REAL , 2  , 1  });
+  add_module("Ymonpctl"      , {Ymonpctl      , YmonpctlHelp      , YmonpctlOperators      , 1 , CDI_REAL , 3  , 1  });
+  add_module("Ymonstat"      , {Ymonstat      , YmonstatHelp      , YmonstatOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Yseaspctl"     , {Yseaspctl     , YseaspctlHelp     , YseaspctlOperators     , 1 , CDI_REAL , 3  , 1  });
+  add_module("Yseasstat"     , {Yseasstat     , YseasstatHelp     , YseasstatOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Zonstat"       , {Zonstat       , ZonstatHelp       , ZonstatOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaCfd"        , {EcaCfd        , EcaCfdHelp        , EcaCfdOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaCsu"        , {EcaCsu        , EcaCsuHelp        , EcaCsuOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaCwdi"       , {EcaCwdi       , EcaCwdiHelp       , EcaCwdiOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaCwfi"       , {EcaCwfi       , EcaCwfiHelp       , EcaCwfiOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaEtr"        , {EcaEtr        , EcaEtrHelp        , EcaEtrOperators        , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaFd"         , {EcaFd         , EcaFdHelp         , EcaFdOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaGsl"        , {EcaGsl        , EcaGslHelp        , EcaGslOperators        , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaHd"         , {EcaHd         , EcaHdHelp         , EcaHdOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaHwdi"       , {EcaHwdi       , EcaHwdiHelp       , EcaHwdiOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaHwfi"       , {EcaHwfi       , EcaHwfiHelp       , EcaHwfiOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaId"         , {EcaId         , EcaIdHelp         , EcaIdOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaSu"         , {EcaSu         , EcaSuHelp         , EcaSuOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaTr"         , {EcaTr         , EcaTrHelp         , EcaTrOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaTg10p"      , {EcaTg10p      , EcaTg10pHelp      , EcaTg10pOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaTg90p"      , {EcaTg90p      , EcaTg90pHelp      , EcaTg90pOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaTn10p"      , {EcaTn10p      , EcaTn10pHelp      , EcaTn10pOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaTn90p"      , {EcaTn90p      , EcaTn90pHelp      , EcaTn90pOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaTx10p"      , {EcaTx10p      , EcaTx10pHelp      , EcaTx10pOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaTx90p"      , {EcaTx90p      , EcaTx90pHelp      , EcaTx90pOperators      , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaCdd"        , {EcaCdd        , EcaCddHelp        , EcaCddOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaCwd"        , {EcaCwd        , EcaCwdHelp        , EcaCwdOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaRr1"        , {EcaRr1        , EcaRr1Help        , EcaRr1Operators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaPd"         , {EcaPd         , EcaPdHelp         , EcaPdOperators         , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaR75p"       , {EcaR75p       , EcaR75pHelp       , EcaR75pOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaR75ptot"    , {EcaR75ptot    , EcaR75ptotHelp    , EcaR75ptotOperators    , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaR90p"       , {EcaR90p       , EcaR90pHelp       , EcaR90pOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaR90ptot"    , {EcaR90ptot    , EcaR90ptotHelp    , EcaR90ptotOperators    , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaR95p"       , {EcaR95p       , EcaR95pHelp       , EcaR95pOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaR95ptot"    , {EcaR95ptot    , EcaR95ptotHelp    , EcaR95ptotOperators    , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaR99p"       , {EcaR99p       , EcaR99pHelp       , EcaR99pOperators       , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaR99ptot"    , {EcaR99ptot    , EcaR99ptotHelp    , EcaR99ptotOperators    , 1 , CDI_REAL , 2  , 1  });
+  add_module("EcaRx1day"     , {EcaRx1day     , EcaRx1dayHelp     , EcaRx1dayOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaRx5day"     , {EcaRx5day     , EcaRx5dayHelp     , EcaRx5dayOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("EcaSdii"       , {EcaSdii       , EcaSdiiHelp       , EcaSdiiOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Fdns"          , {Fdns          , FdnsHelp          , FdnsOperators          , 1 , CDI_REAL , 2  , 1  });
+  add_module("Strwin"        , {Strwin        , StrwinHelp        , StrwinOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Strbre"        , {Strbre        , StrbreHelp        , StrbreOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Strgal"        , {Strgal        , StrgalHelp        , StrgalOperators        , 1 , CDI_REAL , 1  , 1  });
+  add_module("Hurr"          , {Hurr          , HurrHelp          , HurrOperators          , 1 , CDI_REAL , 1  , 1  });
+  // add_module("Hi"         , { Hi           , {}                , HiOperators            , 1 , CDI_REAL , 3  , 1   });
+  add_module("Wct"           , {Wct           , WctHelp           , WctOperators           , 1 , CDI_REAL , 2  , 1  });
+  add_module("Magplot"       , {Magplot       , MagplotHelp       , MagplotOperators       , 1 , CDI_REAL , 1  , 1  });
+  add_module("Magvector"     , {Magvector     , MagvectorHelp     , MagvectorOperators     , 1 , CDI_REAL , 1  , 1  });
+  add_module("Maggraph"      , {Maggraph      , MaggraphHelp      , MaggraphOperators      , 1 , CDI_REAL , -1 , 1  });
+  // HIRLAM_EXTENSIONS
+  add_module( "Samplegrid"   , { Samplegrid   , SamplegridHelp    , SamplegridOperators    , 1 , CDI_REAL , 1  , 1 });
+  add_module( "Selmulti "    , { Selmulti     , SelmultiHelp      , SelmultiOperators      , 1 , CDI_REAL , 1  , 1 });
+  add_module( "WindTrans"    , { WindTrans    , WindTransHelp     , WindTransOperators     , 1 , CDI_REAL , 1  , 1 });
+
+  init_aliases();
+}
+
+/**
+ * Initializes all hardcoded aliases
+ */
+void init_aliases()
+{
+  add_alias("afterburner"     , "after");
+  add_alias("anomaly"         , "ymonsub");
+  add_alias("deltap_fl"       , "deltap");
+  add_alias("diffv"           , "diffn");
+  add_alias("covar0"          , "timcovar");
+  add_alias("covar0r"         , "fldcovar");
+  add_alias("gather"          , "collgrid");
+  add_alias("geopotheight"    , "gheight");
+  add_alias("globavg"         , "fldavg");
+  add_alias("import_grads"    , "import_binary");
+  add_alias("infos"           , "sinfo");
+  add_alias("infov"           , "infon");
+  add_alias("intgrid"         , "intgridbil");
+  add_alias("log"             , "ln");
+  add_alias("lmean"           , "ymonmean");
+  add_alias("lmmean"          , "ymonmean");
+  add_alias("lmavg"           , "ymonavg");
+  add_alias("lmstd"           , "ymonstd");
+  add_alias("lsmean"          , "yseasmean");
+  add_alias("chvar"           , "chname");
+  add_alias("nvar"            , "npar");
+  add_alias("outputkey"       , "outputtab");
+  add_alias("vardes"          , "codetab");
+  add_alias("pardes"          , "codetab");
+  add_alias("selvar"          , "selname");
+  add_alias("delvar"          , "delname");
+  add_alias("selindex"        , "selgridcell");
+  add_alias("remapcon1"       , "remaplaf");
+  add_alias("remapdis1"       , "remapnn");
+  add_alias("scatter"         , "distgrid");
+  add_alias("showvar"         , "showname");
+  add_alias("selgridname"     , "selgrid");
+  add_alias("setvar"          , "setname");
+  add_alias("setpartabv"      , "setpartabn");
+  add_alias("setpartab"       , "setcodetab");
+  add_alias("sinfov"          , "sinfon");
+  add_alias("sortvar"         , "sortname");
+  add_alias("splitvar"        , "splitname");
+  add_alias("sort"            , "timsort");
+  add_alias("eca_r1mm"        , "eca_rr1");
+  add_alias("fpressure"       , "pressure_fl");
+  add_alias("hpressure"       , "pressure_hl");
+  add_alias("ensrkhist_space" , "ensrkhistspace");
+  add_alias("ensrkhist_time"  , "ensrkhisttime");
+  add_alias("gridverify"      , "verifygrid");
+  add_alias("outputcenter"    , "gmtxyz");
+  add_alias("outputbounds"    , "gmtcells");
+  add_alias("selseas"         , "selseason");
+  add_alias("selmon"          , "selmonth");
+}
 
 int main(int argc, char *argv[])
 {
