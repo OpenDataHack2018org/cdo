@@ -506,6 +506,7 @@ struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, cons
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
+  gs->method_nn = gridsearch_method_nn;
   gs->n = n;
   if ( n == 0 ) return gs;
 
