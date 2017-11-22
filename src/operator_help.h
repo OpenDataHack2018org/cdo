@@ -4714,7 +4714,7 @@ std::vector<std::string> SmoothHelp = {
     "PARAMETER",
     "    nsmooth    INTEGER  Number of times to smooth, default nsmooth=1",
     "    radius     STRING   Search radius, default radius=1deg (units: deg, rad, km, m)",
-    "    maxpoints  INTEGER  Maximum number of points, default maxpoints=2147483647",
+    "    maxpoints  INTEGER  Maximum number of points, default maxpoints=<gridsize>",
     "    form       STRING   Form of the curve, default form=linear",
     "    weight0    FLOAT    Weight at distance 0, default weight0=0.25",
     "    weightR    FLOAT    Weight at the search radius, default weightR=0.25",
