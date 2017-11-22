@@ -32,6 +32,7 @@ constexpr int MAX_OPERATOR = 128;
 constexpr int MAX_OARGC = 4096;
 constexpr int MAX_FILES = 65536;
 
+
 typedef struct
 {
   int f1;
@@ -96,6 +97,8 @@ private:
   void setStreamNames(int argc, std::vector<char *> &argv);
 };
 
+extern std::map<int, process_t> Process;
+
 pstream_t *processInqInputStream(int streamindex);
 pstream_t *processInqOutputStream(int streamindex);
 process_t &processSelf(void);
@@ -135,5 +138,6 @@ const argument_t *cdoStreamName(int cnt);
 int checkStreamCnt();
 void createProcesses(int argc, char **argv);
 void clearProcesses();
+int processNumsActive();
 
 #endif /* _PROCESS_H */
