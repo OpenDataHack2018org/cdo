@@ -76,10 +76,13 @@ void operatorPrintAll(void);
 void operatorPrintList(bool print_no_output);
 bool is_alias(char * operatorName);
 char* get_original(char* operatorName);
+void add_module(std::string module_name, modules_t new_module);
+int add_alias(std::string alias, std::string original);
 #ifdef CUSTOM_MODULES
 void load_custom_module(std::string path);
 void load_custom_modules(std::string folder_path);
 void close_library_handles();
+
 #endif
 
 #endif /* MODULES_H */
