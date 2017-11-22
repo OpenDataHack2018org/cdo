@@ -510,7 +510,8 @@ struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, cons
   gs->n = n;
   if ( n == 0 ) return gs;
 
-  gs->kdt = gs_create_kdtree(n, lons, lats, gs);
+  if      ( gs->method_nn == GS_KDTREE    ) gs->kdt  = gs_create_kdtree(n, lons, lats, gs);
+  else if ( gs->method_nn == GS_NANOFLANN ) gs->nft  = gs_create_nanoflann(n, lons, lats, gs);
 
   gs->search_radius = cdo_default_search_radius();
 
@@ -760,9 +761,11 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
 }
 
 static
-struct pqueue *gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
+size_t gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
 {
-  if ( gs->kdt == NULL ) return NULL;
+  size_t nadds = 0;
+
+  if ( gs->kdt == NULL ) return nadds;
   
   kdata_t query_pt[3];
   float range0 = gs_set_range(prange);
@@ -777,87 +780,76 @@ struct pqueue *gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat,
       // printf("range %g %g %g %p\n", lon, lat, range, node);
 
       float frange = KDATA_INVSCALE(range);
-      /*
-      if ( !(frange < range0) )
+
+      if ( result )
         {
-          if ( result )
+          size_t index;
+          struct resItem *p;
+          while ( pqremove_min(result, &p) )
             {
-              struct resItem *p;
-              while ( pqremove_min(result, &p) ) Free(p); // Free the result node taken from the heap
-              Free(result->d); // free the heap
-              Free(result);    // and free the heap information structure
+              index = p->node->index;
+              range = p->dist_sq;
+              Free(p); // Free the result node taken from the heap
+
+              if ( range < range0 )
+                {
+                  dist[nadds] = range;
+                  adds[nadds] = index;
+                  nadds++;
+                }
             }
-          result = NULL;
+          Free(result->d); // free the heap
+          Free(result);    // and free the heap information structure
         }
-      */
+
       if ( prange ) *prange = frange;
     }
   
-  return result;
+  return nadds;
 }
 
 static
-struct pqueue *gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
+size_t gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
 {
-  if ( gs->nft == NULL ) return NULL;
+  size_t nadds = 0;
+
+  if ( gs->nft == NULL ) return nadds;
   
   float range0 = gs_set_range(prange);
   float range = range0;
-  struct pqueue *result = NULL;
 
   float query_pt[3];
   LLtoXYZ_f(lon, lat, query_pt);
 
   if ( gs )
     {
-      const size_t num_results = nnn;
-      //size_t ret_index;
-      //float out_dist_sqr;
-      //nanoflann::KNNResultSet<float> resultSet(num_results);
-      //resultSet.init(&ret_index, &out_dist_sqr);
-      //nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
-      // Unsorted radius search:
-      const float radius = 1;
-      std::vector<std::pair<size_t, float> > indices_dists;
-      //nanoflann::RadiusResultSet<float, size_t> resultSet(radius, indices_dists);
-      //gs->nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams());
-      // printf("range %g %g %g %p\n", lon, lat, range, node);
+      std::vector<float> out_dist_sqr(nnn);
+      nadds = gs->nft->knnSearch(&query_pt[0], nnn, &adds[0], &out_dist_sqr[0]);
+
+      for ( size_t i = 0; i < nadds; ++i ) dist[i] = out_dist_sqr[i];
 
       float frange = range;
-      /*
-      if ( !(frange < range0) )
-        {
-          if ( result )
-            {
-              struct resItem *p;
-              while ( pqremove_min(result, &p) ) Free(p); // Free the result node taken from the heap
-              Free(result->d); // free the heap
-              Free(result);    // and free the heap information structure
-            }
-          result = NULL;
-        }
-      */
       if ( prange ) *prange = frange;
     }
   
-  return result;
+  return nadds;
 }
 
 
-struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn)
+size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
 {
-  struct pqueue *result = NULL;
+  size_t nadds = 0;
 
   if ( gs )
     {
       // clang-format off
-      if      ( gs->method_nn == GS_KDTREE )    result = gs_qnearest_kdtree(gs, lon, lat, prange, nnn);
-      else if ( gs->method_nn == GS_NANOFLANN ) result = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn);
+      if      ( gs->method_nn == GS_KDTREE )    nadds = gs_qnearest_kdtree(gs, lon, lat, prange, nnn, adds, dist);
+      else if ( gs->method_nn == GS_NANOFLANN ) nadds = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn, adds, dist);
       else cdoAbort("%s::method_nn undefined!", __func__);
       // clang-format on
     }
 
-  return result;
+  return nadds;
 }
 
 #define  BIGNUM   1.e+20
@@ -975,7 +967,7 @@ size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, dou
   size_t ndist = num_neighbors;
   // check some more points if distance is the same use the smaller index (nadd)
   if ( ndist > 8 ) ndist += 8;
-  else             ndist *= 2; 
+  else             ndist *= 2;
   if ( ndist > gs->n ) ndist = gs->n;
 
   if ( knn->tmpadd  == NULL ) knn->tmpadd  = (size_t*) Malloc(ndist*sizeof(size_t));
@@ -987,51 +979,32 @@ size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, dou
   const double range0 = SQR(search_radius);
   double range = range0;
 
-  size_t j = 0;
+  size_t nadds = 0;
 
   if ( num_neighbors == 1 )
     {
-      size_t nadd = gridsearch_nearest(gs, plon, plat, &range);
-      if ( nadd != GS_NOT_FOUND )
+      size_t add = gridsearch_nearest(gs, plon, plat, &range);
+      if ( add != GS_NOT_FOUND )
         {
           //if ( range < range0 )
             {
-              dist[j] = sqrt(range);
-              adds[j] = nadd;
-              j++;
+              dist[nadds] = sqrt(range);
+              adds[nadds] = add;
+              nadds++;
             }
         }
     }
   else
     {
-      struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, ndist);
-      if ( gs_result )
-        {
-          size_t nadd;
-          struct resItem *p;
-          while ( pqremove_min(gs_result, &p) )
-            {
-              nadd  = p->node->index;
-              range = p->dist_sq;
-              Free(p); // Free the result node taken from the heap
-
-              if ( range < range0 )
-                {
-                  dist[j] = sqrt(range);
-                  adds[j] = nadd;
-                  j++;
-                }
-            }
-          Free(gs_result->d); // free the heap
-          Free(gs_result);    // and free the heap information structure
-        }
+      nadds = gridsearch_qnearest(gs, plon, plat, &range, ndist, adds, dist);
+      for ( size_t i = 0; i < nadds; ++i ) dist[i] = sqrt(dist[i]);
     }
 
-  ndist = j;
+  ndist = nadds;
   size_t max_neighbors = (ndist < num_neighbors) ? ndist : num_neighbors;
 
-  for ( j = 0; j < ndist; ++j )
-    knn_store_distance(adds[j], dist[j], max_neighbors, nbr_add, nbr_dist);
+  for ( size_t i = 0; i < ndist; ++i )
+    knn_store_distance(adds[i], dist[i], max_neighbors, nbr_add, nbr_dist);
 
   knn_check_distance(max_neighbors, nbr_add, nbr_dist);
 

@@ -103,7 +103,7 @@ struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, cons
 struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, const double *restrict lats);
 void gridsearch_delete(struct gridsearch *gs);
 size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
-struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn);
+size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist);
 void gridsearch_extrapolate(struct gridsearch *gs);
 
 #endif
