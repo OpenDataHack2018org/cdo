@@ -1,5 +1,9 @@
 2017-11-23  Uwe Schulzweida
 
+	* Fix read error on grid description file [Bug #8099]
+
+2017-11-21  Uwe Schulzweida
+
 	* Using CDI library version 1.9.2
 	* Version 1.9.2 release
 
