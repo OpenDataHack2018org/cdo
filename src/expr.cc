@@ -145,6 +145,7 @@ static func_t fun_sym_tbl[] =
 
   {FT_1C, 0, "sellevel",  NULL},
   {FT_1C, 0, "sellevidx", NULL},
+  {FT_1C, 0, "gridindex", NULL},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -173,7 +174,7 @@ int get_funcID(const char *fun)
 {
   int funcID = -1;
   for ( int i = 0; i < NumFunc; i++ )
-    if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
+    if ( STR_IS_EQ(fun, fun_sym_tbl[i].name) )
       { 
 	funcID = i;
 	break;
@@ -181,7 +182,7 @@ int get_funcID(const char *fun)
 
   if ( funcID == -1 ) cdoAbort("Function >%s< not available!", fun);
 
-  if ( strcmp(fun_sym_tbl[funcID].name, "nint") == 0 ) cdo_check_round();
+  if ( STR_IS_EQ(fun_sym_tbl[funcID].name, "nint") ) cdo_check_round();
 
   return funcID;
 }
@@ -942,7 +943,7 @@ size_t get_levidx(size_t nlev, const double *data, double value, const char *fun
 
 static
 nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t *parse_arg)
-{  
+{
   const char *funcname = fun_sym_tbl[funcID].name;            
   if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
   if ( p1->ltmpobj ) cdoAbort("Temporary objects not allowed in function %s()!", funcname);
@@ -979,14 +980,14 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
       data = parse_arg->coords[coordID].data;
     }
 
-  if ( strcmp(funcname, "sellevidx") == 0 )
+  if ( STR_IS_EQ(funcname, "sellevidx") )
     {
       long ilevidx = lround(value);
       if ( ilevidx < 1 || ilevidx > (long)nlev )
         cdoAbort("%s(): level index %ld out of range (range: 1-%zu)!", funcname, ilevidx, nlev);
       levidx = (size_t) ilevidx - 1;
     }
-  else if ( strcmp(funcname, "sellevel") == 0 )
+  else if ( STR_IS_EQ(funcname, "sellevel") )
     {
       levidx = get_levidx(nlev, data, value, funcname);
     }
@@ -1037,11 +1038,11 @@ nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg
   char *cname = (char*) Calloc(len, 1);
   strcpy(cname, p1->u.var.nm);
             
-  if      ( strcmp(funcname, "clon") == 0 ) strcat(cname, ".x");
-  else if ( strcmp(funcname, "clat") == 0 ) strcat(cname, ".y");
-  else if ( strcmp(funcname, "clev") == 0 ) strcat(cname, ".z");
-  else if ( strcmp(funcname, "gridarea")   == 0 ) strcat(cname, ".a");
-  else if ( strcmp(funcname, "gridweight") == 0 ) strcat(cname, ".w");
+  if      ( STR_IS_EQ(funcname, "clon") ) strcat(cname, ".x");
+  else if ( STR_IS_EQ(funcname, "clat") ) strcat(cname, ".y");
+  else if ( STR_IS_EQ(funcname, "clev") ) strcat(cname, ".z");
+  else if ( STR_IS_EQ(funcname, "gridarea")   ) strcat(cname, ".a");
+  else if ( STR_IS_EQ(funcname, "gridweight") ) strcat(cname, ".w");
   else cdoAbort("Implementation missing for function %s!", funcname);
   
   Free(p1->u.var.nm);
@@ -1411,7 +1412,7 @@ int param_search_name(int nparam, paramType *params, const char *name)
 
   for ( varID = nparam-1; varID >= 0; --varID )
     {
-      if ( strcmp(params[varID].name, name) == 0 ) break;
+      if ( STR_IS_EQ(params[varID].name, name) ) break;
     }
 
   return varID;
@@ -1444,14 +1445,14 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
         if ( init )
           {
-            if ( strcmp(cname, "remove") == 0 )
+            if ( STR_IS_EQ(cname, "remove") )
               {
                 params[varID].remove = true;
               }
           }
         else
           {
-            if ( strcmp(cname, "print") == 0 )
+            if ( STR_IS_EQ(cname, "print") )
               {
                 size_t maxout = 100;
                 int vartsID = parse_arg->tsID;
