@@ -48,6 +48,7 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 #define   COMPLEG(x,y)  ((x) < (y) ? -1. : ((x) > (y)))
 #define   COMPAND(x,y)  (IS_NOT_EQUAL(x,0) && IS_NOT_EQUAL(y,0))
 #define    COMPOR(x,y)  (IS_NOT_EQUAL(x,0) || IS_NOT_EQUAL(y,0))
+#define   COMPNOT(x)    (!IS_NOT_EQUAL(x,0))
 #define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
 #define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
 #define  MVCOMPLE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLE(x,y))
@@ -145,7 +146,7 @@ static func_t fun_sym_tbl[] =
 
   {FT_1C, 0, "sellevel",  NULL},
   {FT_1C, 0, "sellevidx", NULL},
-  {FT_1C, 0, "gridindex", NULL},
+  // {FT_1C, 0, "gridindex", NULL},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -223,6 +224,7 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
   double cval1 = p1->u.con.value;
   double cval2 = p2->u.con.value;
 
+  // clang-format off
   switch ( oper )
     {
     case '+':  cval1 = cval1 + cval2; break;
@@ -232,6 +234,7 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
     case '^':  cval1 = pow(cval1, cval2); break;
     default:   cdoAbort("%s: operator %c unsupported!", __func__, oper); break;
     }
+  // clang-format on
 
   p->u.con.value = cval1;
 
@@ -244,6 +247,7 @@ void oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1, double m
 {
   size_t i;
 
+  // clang-format off
   switch ( oper )
     {
     case '+':
@@ -305,6 +309,7 @@ void oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1, double m
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
       break;
     }
+  // clang-format on
 }
 
 static
@@ -313,6 +318,7 @@ void oper_expr_var_con(int oper, bool nmiss, size_t n, double missval1, double m
 {
   size_t i;
 
+  // clang-format off
   switch ( oper )
     {
     case '+':
@@ -375,6 +381,7 @@ void oper_expr_var_con(int oper, bool nmiss, size_t n, double missval1, double m
       cdoAbort("%s: operator '%c' unsupported!", __func__, oper);
       break;
     }
+  // clang-format on
 }
 
 static
@@ -383,6 +390,7 @@ void oper_expr_var_var(int oper, bool nmiss, size_t ngp, double missval1, double
 {
   size_t i;
 
+  // clang-format off
   switch ( oper )
     {
     case '+':
@@ -452,6 +460,7 @@ void oper_expr_var_var(int oper, bool nmiss, size_t ngp, double missval1, double
       cdoAbort("%s: operator %d (%c) unsupported!", __func__, oper, oper);
       break;
     }
+  // clang-format on
 }
 
 static
@@ -1170,12 +1179,12 @@ nodeType *ex_not_var(int init, nodeType *p1)
       if ( nmiss > 0 )
         {
           for ( size_t i = 0; i < ngp*nlev; ++i )
-            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : !(p1data[i]);
+            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : COMPNOT(p1data[i]);
         }
       else
         {
           for ( size_t i = 0; i < ngp*nlev; ++i )
-            pdata[i] = !(p1data[i]);
+            pdata[i] = COMPNOT(p1data[i]);
         }
 
       p->param.nmiss = nmiss;
@@ -1194,7 +1203,7 @@ nodeType *ex_not_con(nodeType *p1)
   p->type    = typeCon;
   p->ltmpobj = true;
 
-  p->u.con.value = !(p1->u.con.value);
+  p->u.con.value = COMPNOT(p1->u.con.value);
 
   return p;
 }
