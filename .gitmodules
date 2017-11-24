@@ -1,3 +1,6 @@
 [submodule "libcdi"]
 	path = libcdi
 	url = git@git.mpimet.mpg.de:libcdi.git
+[submodule "test/bandit_tests/bandit"]
+	path = test/bandit_tests/bandit
+	url = https://github.com/banditcpp/bandit.git
