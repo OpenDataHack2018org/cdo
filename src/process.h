@@ -64,7 +64,7 @@ public:
   short nvars;
   int ntimesteps;
   short m_streamCnt;
-  std::vector<argument_t> streamNames;
+  std::vector<argument_t> streamArguments;
   char *m_operatorCommand;
   const char *operatorName;
   char *operatorArg;
