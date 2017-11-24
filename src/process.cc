@@ -434,7 +434,7 @@ cdoStreamName(int cnt)
   if (cnt > process.m_streamCnt || cnt < 0)
     Error("count %d out of range!", cnt);
 
-  return &(process.streamNames[cnt]);
+  return &(process.streamArguments[cnt]);
 }
 
 const char *
@@ -537,11 +537,11 @@ process_t::setStreams(int argc, std::vector<char *> &argv)
 
   m_streamCnt = 0; /* filled in setStreamNames */
   if (streamCnt)
-    streamNames = std::vector<argument_t>(streamCnt);
+    streamArguments = std::vector<argument_t>(streamCnt);
   for (int i = 0; i < streamCnt; i++)
     {
-      streamNames[i].argc = 0;
-      streamNames[i].args = NULL;
+      streamArguments[i].argc = 0;
+      streamArguments[i].args = NULL;
     }
 
   setStreamNames(argc, argv);
@@ -552,7 +552,7 @@ process_t::setStreams(int argc, std::vector<char *> &argv)
     Error("Internal problem with stream count %d %d", streamCnt, streamCnt);
   /*
   for ( i = 0; i < streamCnt; i++ )
-    fprintf(stderr, "setStreams: stream %d %s\n", i+1, process.streamNames[i].args);
+    fprintf(stderr, "setStreams: stream %d %s\n", i+1, process.streamArguments[i].args);
   */
 }
 
@@ -594,13 +594,13 @@ process_t::setStreamNames(int argc, std::vector<char *> &argv)
                 }
             }
 
-          streamNames[m_streamCnt].args = streamname;
+          streamArguments[m_streamCnt].args = streamname;
           ac = globArgc - globArgcStart;
           // printf("setStreamNames:  ac %d  streamname1: %s\n", ac, streamname);
-          streamNames[m_streamCnt].argv.resize(ac);
+          streamArguments[m_streamCnt].argv.resize(ac);
           for (i = 0; i < ac; ++i)
-            streamNames[m_streamCnt].argv[i] = argv[i + globArgcStart];
-          streamNames[m_streamCnt].argc = ac;
+            streamArguments[m_streamCnt].argv[i] = argv[i + globArgcStart];
+          streamArguments[m_streamCnt].argc = ac;
           m_streamCnt++;
           // printf("setStreamNames:  streamname1: %s\n", streamname);
         }
@@ -609,12 +609,12 @@ process_t::setStreamNames(int argc, std::vector<char *> &argv)
           len = strlen(argv[globArgc]) + 1;
           streamname = (char *) Malloc(len);
           strcpy(streamname, argv[globArgc]);
-          streamNames[m_streamCnt].args = streamname;
+          streamArguments[m_streamCnt].args = streamname;
           ac = 1;
-          streamNames[m_streamCnt].argv.resize(ac);
-          streamNames[m_streamCnt].argv[0] = argv[globArgc];
-          streamNames[m_streamCnt].argc = ac;
-          streamNames[m_streamCnt].args = streamname;
+          streamArguments[m_streamCnt].argv.resize(ac);
+          streamArguments[m_streamCnt].argv[0] = argv[globArgc];
+          streamArguments[m_streamCnt].argc = ac;
+          streamArguments[m_streamCnt].args = streamname;
           m_streamCnt++;
           // printf("setStreamNames:  streamname2: %s\n", streamname);
           globArgc++;
@@ -672,7 +672,7 @@ expand_filename(const char *string)
 static int
 expand_wildcards(process_t &process, int streamCnt)
 {
-  const char *streamname0 = process.streamNames[0].args;
+  const char *streamname0 = process.streamArguments[0].args;
 
   if (streamname0[0] == '-')
     return 1;
@@ -686,21 +686,21 @@ expand_wildcards(process_t &process, int streamCnt)
   if (glob_arg->argc > 1 && glob_arg->argv[0][0] != '-')
     {
       if (cdoVerbose)
-        cdoPrint("Replaced >%s< by", process.streamNames[0].args);
+        cdoPrint("Replaced >%s< by", process.streamArguments[0].args);
 
       streamCnt = streamCnt - 1 + glob_arg->argc;
 
-      Free(process.streamNames[0].args);
+      Free(process.streamArguments[0].args);
 
-      process.streamNames.resize(streamCnt);
+      process.streamArguments.resize(streamCnt);
 
       // move output streams to the end
       for (int i = 1; i < process.m_streamCnt; ++i)
-        process.streamNames[i + glob_arg->argc - 1] = process.streamNames[i];
+        process.streamArguments[i + glob_arg->argc - 1] = process.streamArguments[i];
 
       for (int i = 0; i < glob_arg->argc; ++i)
         {
-          argument_t &current_argument = process.streamNames[i];
+          argument_t &current_argument = process.streamArguments[i];
           current_argument.argc = 1;
           current_argument.argv.resize(current_argument.argc);
           current_argument.argv[0] = strdupx(glob_arg->argv[i]);
@@ -776,17 +776,17 @@ checkStreamCnt(void)
 
   for (i = streamInCnt; i < streamCnt; i++)
     {
-      if (process.streamNames[i].args[0] == '-')
+      if (process.streamArguments[i].args[0] == '-')
         {
-          cdoAbort("Output file name %s must not begin with \"-\"!", process.streamNames[i].args);
+          cdoAbort("Output file name %s must not begin with \"-\"!", process.streamArguments[i].args);
         }
       else if (!obase)
         {
           for (j = 0; j < streamInCnt; j++) /* does not work with files in pipes */
-            if (strcmp(process.streamNames[i].args, process.streamNames[j].args) == 0)
+            if (strcmp(process.streamArguments[i].args, process.streamArguments[j].args) == 0)
               cdoAbort("Output file name %s is equal to input file name"
                        " on position %d!\n",
-                       process.streamNames[i].args,
+                       process.streamArguments[i].args,
                        j + 1);
         }
     }
@@ -1226,7 +1226,7 @@ process_t::print_process()
     }
   std::cout << " ntimesteps      : " << ntimesteps << std::endl;
   std::cout << " streamCnt       : " << m_streamCnt << std::endl;
-  // std::cout << " streamNames     : " << streamNames                  <<  std::endl;
+  // std::cout << " streamArguments     : " << streamArguments                  <<  std::endl;
   std::cout << " m_operatorCommand       : " << m_operatorCommand << std::endl;
   std::cout << " operatorName    : " << operatorName << std::endl;
   std::cout << " operatorArg     : " << operatorArg << std::endl;
