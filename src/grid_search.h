@@ -1,29 +1,13 @@
-#ifndef _GRID_SEARCH_H_
-#define _GRID_SEARCH_H_
+#ifndef  GRID_SEARCH_H_
+#define  GRID_SEARCH_H_
 
 #include <stdbool.h>
-#include "kdtreelib/kdtree.h"
-#include "nearpt3c.h"
 
-#define GS_NOT_FOUND  SIZE_MAX
+//#define  TEST_BBOX  1
+#define  GS_NOT_FOUND  SIZE_MAX
 
+enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_NANOFLANN, GS_KDTREE, GS_KDSPH, GS_NEARPT3};
 
-enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_KDTREE, GS_KDSPH, GS_NEARPT3};
-
-struct gsFull {
-  size_t n;
-  const double *plons;
-  const double *plats;
-  float **pts;
-};
-
-struct gsNear {
-  size_t n;
-  const double *plons;
-  const double *plats;
-  Coord_T **pts;
-  void *nearpt3;
-};
 
 struct gridsearch {
   bool extrapolate;
@@ -33,10 +17,7 @@ struct gridsearch {
   size_t n;
   size_t dims[2];
 
-  struct gsNear *near;
-  struct kdNode *kdt;
-  struct gsFull *full;
-
+  void *search_container;
   double search_radius;
 
   // reg2d search
@@ -45,6 +26,9 @@ struct gridsearch {
   double *coslon, *sinlon;   // cosine, sine of grid lons (for distance)
 
   double lonmin, lonmax, latmin, latmax;
+#ifdef  TEST_BBOX
+  float min[3], max[3];
+#endif
 };
 
 struct gsknn {
@@ -66,7 +50,7 @@ struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, cons
 struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, const double *restrict lats);
 void gridsearch_delete(struct gridsearch *gs);
 size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
-struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn);
+size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist);
 void gridsearch_extrapolate(struct gridsearch *gs);
 
 #endif

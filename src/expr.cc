@@ -48,6 +48,7 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 #define   COMPLEG(x,y)  ((x) < (y) ? -1. : ((x) > (y)))
 #define   COMPAND(x,y)  (IS_NOT_EQUAL(x,0) && IS_NOT_EQUAL(y,0))
 #define    COMPOR(x,y)  (IS_NOT_EQUAL(x,0) || IS_NOT_EQUAL(y,0))
+#define   COMPNOT(x)    (!IS_NOT_EQUAL(x,0))
 #define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
 #define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
 #define  MVCOMPLE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLE(x,y))
@@ -145,6 +146,7 @@ static func_t fun_sym_tbl[] =
 
   {FT_1C, 0, "sellevel",  NULL},
   {FT_1C, 0, "sellevidx", NULL},
+  // {FT_1C, 0, "gridindex", NULL},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -173,7 +175,7 @@ int get_funcID(const char *fun)
 {
   int funcID = -1;
   for ( int i = 0; i < NumFunc; i++ )
-    if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
+    if ( STR_IS_EQ(fun, fun_sym_tbl[i].name) )
       { 
 	funcID = i;
 	break;
@@ -181,7 +183,7 @@ int get_funcID(const char *fun)
 
   if ( funcID == -1 ) cdoAbort("Function >%s< not available!", fun);
 
-  if ( strcmp(fun_sym_tbl[funcID].name, "nint") == 0 ) cdo_check_round();
+  if ( STR_IS_EQ(fun_sym_tbl[funcID].name, "nint") ) cdo_check_round();
 
   return funcID;
 }
@@ -222,6 +224,7 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
   double cval1 = p1->u.con.value;
   double cval2 = p2->u.con.value;
 
+  // clang-format off
   switch ( oper )
     {
     case '+':  cval1 = cval1 + cval2; break;
@@ -231,6 +234,7 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
     case '^':  cval1 = pow(cval1, cval2); break;
     default:   cdoAbort("%s: operator %c unsupported!", __func__, oper); break;
     }
+  // clang-format on
 
   p->u.con.value = cval1;
 
@@ -243,6 +247,7 @@ void oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1, double m
 {
   size_t i;
 
+  // clang-format off
   switch ( oper )
     {
     case '+':
@@ -304,6 +309,7 @@ void oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1, double m
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
       break;
     }
+  // clang-format on
 }
 
 static
@@ -312,6 +318,7 @@ void oper_expr_var_con(int oper, bool nmiss, size_t n, double missval1, double m
 {
   size_t i;
 
+  // clang-format off
   switch ( oper )
     {
     case '+':
@@ -374,6 +381,7 @@ void oper_expr_var_con(int oper, bool nmiss, size_t n, double missval1, double m
       cdoAbort("%s: operator '%c' unsupported!", __func__, oper);
       break;
     }
+  // clang-format on
 }
 
 static
@@ -382,6 +390,7 @@ void oper_expr_var_var(int oper, bool nmiss, size_t ngp, double missval1, double
 {
   size_t i;
 
+  // clang-format off
   switch ( oper )
     {
     case '+':
@@ -451,6 +460,7 @@ void oper_expr_var_var(int oper, bool nmiss, size_t ngp, double missval1, double
       cdoAbort("%s: operator %d (%c) unsupported!", __func__, oper, oper);
       break;
     }
+  // clang-format on
 }
 
 static
@@ -726,6 +736,7 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
         case LEG:  coper = "<=>"; break;
         case AND:  coper = "&&"; break;
         case OR:   coper = "||"; break;
+        default: cdoAbort("Internal error, expr operator >%c< not implemented!\n", oper);
         }
     }
 
@@ -941,10 +952,10 @@ size_t get_levidx(size_t nlev, const double *data, double value, const char *fun
 
 static
 nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t *parse_arg)
-{  
+{
   const char *funcname = fun_sym_tbl[funcID].name;            
   if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
-  if ( p1->ltmpobj ) cdoAbort("Temorary objects not allowed in function %s()!", funcname);
+  if ( p1->ltmpobj ) cdoAbort("Temporary objects not allowed in function %s()!", funcname);
 
   size_t ngp   = p1->param.ngp;
   size_t nlev  = p1->param.nlev;
@@ -978,14 +989,14 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
       data = parse_arg->coords[coordID].data;
     }
 
-  if ( strcmp(funcname, "sellevidx") == 0 )
+  if ( STR_IS_EQ(funcname, "sellevidx") )
     {
       long ilevidx = lround(value);
       if ( ilevidx < 1 || ilevidx > (long)nlev )
         cdoAbort("%s(): level index %ld out of range (range: 1-%zu)!", funcname, ilevidx, nlev);
       levidx = (size_t) ilevidx - 1;
     }
-  else if ( strcmp(funcname, "sellevel") == 0 )
+  else if ( STR_IS_EQ(funcname, "sellevel") )
     {
       levidx = get_levidx(nlev, data, value, funcname);
     }
@@ -1030,17 +1041,17 @@ nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg
 {  
   const char *funcname = fun_sym_tbl[funcID].name;            
   if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
-  if ( p1->ltmpobj ) cdoAbort("Temorary objects not allowed in function %s()!", funcname);
+  if ( p1->ltmpobj ) cdoAbort("Temporary objects not allowed in function %s()!", funcname);
             
   size_t len = 3 + strlen(p1->u.var.nm);
   char *cname = (char*) Calloc(len, 1);
   strcpy(cname, p1->u.var.nm);
             
-  if      ( strcmp(funcname, "clon") == 0 ) strcat(cname, ".x");
-  else if ( strcmp(funcname, "clat") == 0 ) strcat(cname, ".y");
-  else if ( strcmp(funcname, "clev") == 0 ) strcat(cname, ".z");
-  else if ( strcmp(funcname, "gridarea")   == 0 ) strcat(cname, ".a");
-  else if ( strcmp(funcname, "gridweight") == 0 ) strcat(cname, ".w");
+  if      ( STR_IS_EQ(funcname, "clon") ) strcat(cname, ".x");
+  else if ( STR_IS_EQ(funcname, "clat") ) strcat(cname, ".y");
+  else if ( STR_IS_EQ(funcname, "clev") ) strcat(cname, ".z");
+  else if ( STR_IS_EQ(funcname, "gridarea")   ) strcat(cname, ".a");
+  else if ( STR_IS_EQ(funcname, "gridweight") ) strcat(cname, ".w");
   else cdoAbort("Implementation missing for function %s!", funcname);
   
   Free(p1->u.var.nm);
@@ -1136,6 +1147,81 @@ nodeType *ex_uminus(int init, nodeType *p1)
     {
       if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%g)", ExIn[init], p1->u.con.value);
       p = ex_uminus_con(p1);
+    }
+  else
+    cdoAbort("Internal problem!");
+
+  return p;
+}
+
+static
+nodeType *ex_not_var(int init, nodeType *p1)
+{
+  size_t ngp   = p1->param.ngp;
+  size_t nlev  = p1->param.nlev;
+  size_t nmiss = p1->param.nmiss;
+  double missval = p1->param.missval;
+
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+
+  p->type     = typeVar;
+  p->ltmpobj  = true;
+  p->u.var.nm = strdup(tmpvnm);
+  param_meta_copy(&p->param, &p1->param);
+  p->param.name = p->u.var.nm;
+
+  if ( ! init )
+    {
+      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
+      double *restrict pdata = p->param.data;
+      const double *restrict p1data = p1->param.data;
+
+      if ( nmiss > 0 )
+        {
+          for ( size_t i = 0; i < ngp*nlev; ++i )
+            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : COMPNOT(p1data[i]);
+        }
+      else
+        {
+          for ( size_t i = 0; i < ngp*nlev; ++i )
+            pdata[i] = COMPNOT(p1data[i]);
+        }
+
+      p->param.nmiss = nmiss;
+    }
+
+  if ( p1->ltmpobj ) node_delete(p1);
+  
+  return p;
+}
+
+static
+nodeType *ex_not_con(nodeType *p1)
+{
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+
+  p->type    = typeCon;
+  p->ltmpobj = true;
+
+  p->u.con.value = COMPNOT(p1->u.con.value);
+
+  return p;
+}
+
+static
+nodeType *ex_not(int init, nodeType *p1)
+{
+  nodeType *p = NULL;
+
+  if ( p1->type == typeVar )
+    {
+      if ( cdoVerbose ) cdoPrint("\t%s\tnot\t! (%s)", ExIn[init], p1->u.var.nm);
+      p = ex_not_var(init, p1);
+    }
+  else if ( p1->type == typeCon )
+    {
+      if ( cdoVerbose ) cdoPrint("\t%s\tnot\t! (%g)", ExIn[init], p1->u.con.value);
+      p = ex_not_con(p1);
     }
   else
     cdoAbort("Internal problem!");
@@ -1335,7 +1421,7 @@ int param_search_name(int nparam, paramType *params, const char *name)
 
   for ( varID = nparam-1; varID >= 0; --varID )
     {
-      if ( strcmp(params[varID].name, name) == 0 ) break;
+      if ( STR_IS_EQ(params[varID].name, name) ) break;
     }
 
   return varID;
@@ -1368,14 +1454,14 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
         if ( init )
           {
-            if ( strcmp(cname, "remove") == 0 )
+            if ( STR_IS_EQ(cname, "remove") )
               {
                 params[varID].remove = true;
               }
           }
         else
           {
-            if ( strcmp(cname, "print") == 0 )
+            if ( STR_IS_EQ(cname, "print") )
               {
                 size_t maxout = 100;
                 int vartsID = parse_arg->tsID;
@@ -1650,6 +1736,12 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
         case UMINUS:
           {
             rnode = ex_uminus(init, expr_run(p->u.opr.op[0], parse_arg));
+
+            break;
+          }
+        case NOT:
+          {
+            rnode = ex_not(init, expr_run(p->u.opr.op[0], parse_arg));
 
             break;
           }

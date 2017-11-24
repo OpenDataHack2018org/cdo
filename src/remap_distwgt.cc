@@ -298,51 +298,32 @@ int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restric
   const double range0 = SQR(search_radius);
   double range = range0;
 
-  size_t j = 0;
+  size_t nadds = 0;
 
   if ( num_neighbors == 1 )
     {
-      size_t nadd = gridsearch_nearest(gs, plon, plat, &range);
-      if ( nadd != GS_NOT_FOUND )
+      size_t add = gridsearch_nearest(gs, plon, plat, &range);
+      if ( add != GS_NOT_FOUND )
         {
           //if ( range < range0 )
             {
-              dist[j] = sqrt(range);
-              adds[j] = nadd;
-              j++;
+              dist[nadds] = sqrt(range);
+              adds[nadds] = add;
+              nadds++;
             }
         }
     }
   else
     {
-      struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, ndist);
-      if ( gs_result )
-        {
-          size_t nadd;
-          struct resItem *p;
-          while ( pqremove_min(gs_result, &p) )
-            {
-              nadd  = p->node->index;
-              range = p->dist_sq;
-              Free(p); // Free the result node taken from the heap
-
-              if ( range < range0 )
-                {
-                  dist[j] = sqrt(range);
-                  adds[j] = nadd;
-                  j++;
-                }
-            }
-          Free(gs_result->d); // free the heap
-          Free(gs_result);    // and free the heap information structure
-        }
+      nadds = gridsearch_qnearest(gs, plon, plat, &range, ndist, adds, dist);
+      for ( size_t i = 0; i < nadds; ++i ) dist[i] = sqrt(dist[i]);
     }
 
-  ndist = j;
+  ndist = nadds;
   size_t max_neighbors = (ndist < num_neighbors) ? ndist : num_neighbors;
 
-  for ( j = 0; j < ndist; ++j )
-    nbr_store_distance(adds[j], dist[j], max_neighbors, nbr_add, nbr_dist);
+  for ( size_t i = 0; i < ndist; ++i )
+    nbr_store_distance(adds[i], dist[i], max_neighbors, nbr_add, nbr_dist);
 
   nbr_check_distance(max_neighbors, nbr_add, nbr_dist);
 

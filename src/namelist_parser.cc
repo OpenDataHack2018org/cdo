@@ -6,17 +6,17 @@ static
 void kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, namelisttok_t *t, int nvalues)
 {
   char vbuf[4096];
-  keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));
+  keyValues_t *keyval = (keyValues_t *) Malloc(sizeof(keyValues_t));
   keyval->key = strdup(key);
   keyval->nvalues = nvalues;
   keyval->values = NULL;
 
-  if ( nvalues > 0 ) keyval->values = (char **) malloc(nvalues*sizeof(char*));
+  if ( nvalues > 0 ) keyval->values = (char **) Malloc(nvalues*sizeof(char*));
   for ( int i = 0; i < nvalues; ++i )
     {
       size_t len = t[i].end - t[i].start;
-      char *value = (char*) malloc((len+1)*sizeof(char));
-      //printf(" value >%.*s<\n", len, buffer+t[i].start);
+      char *value = (char*) Malloc((len+1)*sizeof(char));
+      // printf(" value[%d] >%.*s<\n", i, (int)len, buffer+t[i].start);
       const char *pval = buffer+t[i].start;
       if ( len < sizeof(vbuf) ) // snprintf seems to call strlen(pval)
         {
@@ -28,6 +28,7 @@ void kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer,
       value[len] = 0;
       keyval->values[i] = value;
     }
+
   list_append(kvlist, &keyval);
 }
 
@@ -83,6 +84,7 @@ int namelist_to_pml(list_t *pmlist, namelist_parser *parser, char *buf)
           snprintf(name, sizeof(name), "%.*s", t->end - t->start, buf+t->start);
           name[sizeof(name)-1] = 0;
           int nvalues = get_number_of_values(ntok-it-1, &tokens[it+1]);
+          // printf("nvalues %d\n", nvalues);
           kvlist_append_namelist(kvlist, name, buf, &tokens[it+1], nvalues);
           it += nvalues;
         }
@@ -130,7 +132,7 @@ list_t *namelistbuf_to_pmlist(listbuf_t *listbuf)
 
   namelist_to_pml(pmlist, p, listbuf->buffer);
   namelist_destroy(p);
-  
+
   return pmlist;
 }
 
@@ -139,7 +141,7 @@ list_t *namelist_to_pmlist(FILE *fp, const char *name)
 {
   listbuf_t *listbuf = listbuf_new();
   if ( listbuf_read(listbuf, fp, name) ) cdoAbort("Read error on namelist %s!", name);
-  
+
   list_t *pmlist = namelistbuf_to_pmlist(listbuf);
   if ( pmlist == NULL ) cdoAbort("Namelist not found!");
 

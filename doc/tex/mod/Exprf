@@ -41,6 +41,7 @@ The following operators are supported:
      <=>    & less equal greater  & x <=> y   & -1, if x less y; 1, if x greater y; else 0 
      \and     & logical AND         & x \and y    &  1, if x and y not equal 0; else 0
      \or     & logical OR          & x \or y    &  1, if x or y not equal 0; else 0
+     !      & logical NOT         & !x        &  1, if x equal 0; else 1
      ?:     & ternary conditional & x ? y : z & y, if x not equal 0, else z 
 @EndTable
 

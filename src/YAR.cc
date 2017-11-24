@@ -24,9 +24,7 @@
 #include "remap.h"
 
 #if defined(HAVE_LIBYAC)
-#ifdef __cplusplus
 extern "C" {
-#endif
 #include "points.h"
 #include "grid_reg2d.h"
 #include "grid_search.h"
@@ -34,9 +32,7 @@ extern "C" {
 #include "search.h"
 #include "clipping.h"
 #include "area.h"
-#ifdef __cplusplus
 }
-#endif
 #endif
 
 int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort, timer_yar_remap_con, timer_yar_remap_bil;
@@ -714,10 +710,9 @@ void *YAR(void *argument)
   field_init(&field1);
   field_init(&field2);
 
-  // open stream before calling cdoDefineGrid!!!
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-
   int gridID2 = cdoDefineGrid(operatorArgv()[0]);
+
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

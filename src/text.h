@@ -1,25 +1,10 @@
-#ifndef _TEXT_H
-#define _TEXT_H
+#ifndef  TEXT_H
+#define  TEXT_H
 
 #include <stdio.h>
 
-#define RESET		0
-#define BRIGHT 		1
-#define DIM		2
-#define UNDERLINE 	4
-#define BLINK		5
-#define REVERSE		7
-#define HIDDEN		8
-
-#define BLACK 		0
-#define RED		1
-#define GREEN		2
-#define YELLOW		3
-#define BLUE		4
-#define MAGENTA		5
-#define CYAN		6
-#define	WHITE		7
-
+enum text_mode {RESET=0, BRIGHT=1, DIM=2, UNDERLINE=4, BLINK=5, REVERSE=7, HIDDEN=8};
+enum text_color {BLACK=0, RED=1, GREEN=2, YELLOW=3, BLUE=4, MAGENTA=5, CYAN=6, WHITE=7};
 
 #define COLOR_STDOUT (stdout_is_tty && CDO_Color)
 #define COLOR_STDERR (stderr_is_tty && CDO_Color)
@@ -27,4 +12,4 @@
 void set_text_color(FILE *fp, int attr, int fg);
 void reset_text_color(FILE *fp);
 
-#endif  /* _TEXT_H */
+#endif  /* TEXT_H */

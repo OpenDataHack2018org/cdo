@@ -113,6 +113,7 @@ libcdo_la_SOURCES =            \
                namelist.cc      \
                namelist.h      \
                namelist_parser.cc     \
+               nanoflann.hpp    \
                normal.cc        \
                nth_element.cc   \
                nth_element.h   \

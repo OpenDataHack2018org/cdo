@@ -70,14 +70,14 @@ double smooth_knn_compute_weights(size_t num_neighbors, const bool *restrict src
 }
 
 
-size_t smooth_knn_normalize_weights(unsigned num_neighbors, double dist_tot, struct gsknn *knn)
+size_t smooth_knn_normalize_weights(size_t num_neighbors, double dist_tot, struct gsknn *knn)
 {
   const bool *restrict nbr_mask = knn->mask;
   size_t *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
   // Normalize weights and store the link
-  unsigned nadds = 0;
+  size_t nadds = 0;
 
   for ( size_t n = 0; n < num_neighbors; ++n )
     {
@@ -176,7 +176,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
           const double *restrict nbr_dist = knn[ompthID]->dist;
           /*
           printf("n %u %d nadds %u dis %g\n", i, nbr_add[0], nadds, nbr_dist[0]);
-          for ( unsigned n = 0; n < nadds; ++n )
+          for ( size_t n = 0; n < nadds; ++n )
             printf("   n %u add %d dis %g\n", n, nbr_add[n], nbr_dist[n]);
           */
           double result = 0;
@@ -324,8 +324,8 @@ double radius_str_to_deg(const char *string)
 
   if ( *endptr != 0 )
     {
-      if      ( strcmp(endptr, "km") == 0 )      radius = 360*((radius*1000)/(2*PlanetRadius*M_PI));
-      else if ( strncmp(endptr, "m", 1) == 0 )   radius = 360*((radius)/(2*PlanetRadius*M_PI));
+      if      ( strncmp(endptr, "km",  2) == 0 ) radius = 360*((radius*1000)/(2*PlanetRadius*M_PI));
+      else if ( strncmp(endptr, "m",   1) == 0 ) radius = 360*((radius)/(2*PlanetRadius*M_PI));
       else if ( strncmp(endptr, "deg", 3) == 0 ) ;
       else if ( strncmp(endptr, "rad", 3) == 0 ) radius *= RAD2DEG;
       else
@@ -353,7 +353,6 @@ static
 void set_parameter(int *xnsmooth, smoothpoint_t *spoint)
 {
   int pargc = operatorArgc();
-
   if ( pargc )
     { 
       char **pargv = operatorArgv();
@@ -381,18 +380,12 @@ void set_parameter(int *xnsmooth, smoothpoint_t *spoint)
           
       list_destroy(kvlist);
     }
-      
-  if ( cdoVerbose )
-    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
-             *xnsmooth, spoint->maxpoints, spoint->radius, Form[spoint->form], spoint->weight0, spoint->weightR);
 }
 
 
 void *Smooth(void *argument)
 {
   int nrecs;
-  int varID, levelID;
-  size_t nmiss;
   int xnsmooth = 1;
   smoothpoint_t spoint;
   spoint.maxpoints = SIZE_MAX;
@@ -414,8 +407,6 @@ void *Smooth(void *argument)
 
   if ( spoint.radius < 0 || spoint.radius > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "radius", spoint.radius);
 
-  spoint.radius *= DEG2RAD;
-
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
@@ -428,7 +419,7 @@ void *Smooth(void *argument)
   int nvars = vlistNvars(vlistID1);
   int *varIDs = (int*) Malloc(nvars*sizeof(int)); 
   
-  for ( varID = 0; varID < nvars; ++varID )
+  for ( int varID = 0; varID < nvars; ++varID )
     {
       int gridID = vlistInqVarGrid(vlistID1, varID);
       int gridtype = gridInqType(gridID);
@@ -451,9 +442,16 @@ void *Smooth(void *argument)
 	}
     }
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  if ( gridsizemax < spoint.maxpoints ) spoint.maxpoints = gridsizemax;
+  if ( cdoVerbose )
+    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
+             xnsmooth, spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
+
+  spoint.radius *= DEG2RAD;
+
+  double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
+  double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
  
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -466,6 +464,9 @@ void *Smooth(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
+          int varID, levelID;
+          size_t nmiss;
+
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array1, &nmiss);
 	
@@ -481,7 +482,7 @@ void *Smooth(void *argument)
                   else if ( operatorID == SMOOTH9 )
                     smooth9(gridID, missval, array1, array2, &nmiss);
 
-                  memcpy(array1, array2, gridsize*sizeof(double));
+                  memcpy(array1, array2, gridsizemax*sizeof(double));
                 }
           
 	      pstreamDefRecord(streamID2, varID, levelID);

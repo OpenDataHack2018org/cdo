@@ -264,7 +264,7 @@ while (<MOFILE>) {
       print TRLIST "Here is a short overview of all operators in this section:\\\\\n";
       print TRLIST "\n";
 
-      if ( $shortname ne "climat" && $shortname ne "magics" && $shortname ne "cmor" ) {
+      if ( $shortname ne "climat" && $shortname ne "magics" && $shortname ne "cmor" && $shortname ne "ncl" ) {
         print TROVER "\\newpage\n";
         print TROVER "\\section{$chap}\n";
         print TROVER "\\input{ref_intro_${shortname}}\n";

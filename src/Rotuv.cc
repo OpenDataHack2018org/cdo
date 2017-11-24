@@ -32,12 +32,12 @@
 static
 void rot_uv_back(int gridID, double *us, double *vs)
 {
-  double xpole, ypole, angle;
+  double xpole = 0, ypole = 0, angle = 0;
   if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
     gridInqParamRLL(gridID, &xpole, &ypole, &angle);
 
-  long nlon = gridInqXsize(gridID);
-  long nlat = gridInqYsize(gridID);
+  size_t nlon = gridInqXsize(gridID);
+  size_t nlat = gridInqYsize(gridID);
 
   double *xvals = (double*) Malloc(nlon*sizeof(double));
   double *yvals = (double*) Malloc(nlat*sizeof(double));
@@ -47,17 +47,21 @@ void rot_uv_back(int gridID, double *us, double *vs)
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID, units);
+  grid_to_degree(units, 1, &angle, "angle");
   grid_to_degree(units, 1, &xpole, "xpole");
   grid_to_degree(units, nlon, xvals, "grid center lon");
   gridInqYunits(gridID, units);
   grid_to_degree(units, 1, &ypole, "ypole");
   grid_to_degree(units, nlat, yvals, "grid center lat");
 
+  if ( xpole > 180 ) xpole-=360;
+  if ( angle > 180 ) angle-=360;
+
   double u, v;
-  for ( long ilat = 0; ilat < nlat; ilat++ )
-    for ( long ilon = 0; ilon < nlon; ilon++ )
+  for ( size_t ilat = 0; ilat < nlat; ilat++ )
+    for ( size_t ilon = 0; ilon < nlon; ilon++ )
       {
-	long i = ilat*nlon + ilon;
+	size_t i = ilat*nlon + ilon;
 
         double xval = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
         double yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
@@ -78,9 +82,8 @@ void *Rotuv(void *argument)
 {
   int varID, levelID;
   int varID1, varID2, nlevel1, nlevel2;
-  int gridsize;
+  size_t gridsize;
   int code, gridID;
-  int offset;
   int nlevel;
   int chcodes[MAXARG];
   char *chvars[MAXARG];
@@ -189,7 +192,7 @@ void *Rotuv(void *argument)
 	  recLevelID[recID] = levelID;
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));	  
-	  offset  = gridsize*levelID;
+	  size_t offset  = gridsize*levelID;
 	  single  = vardata[varID] + offset;
 	  pstreamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
 	  if ( varnmiss[varID][levelID] )
@@ -266,7 +269,7 @@ void *Rotuv(void *argument)
 
 	  for ( levelID = 0; levelID < nlevel1; levelID++ )
 	    {
-	      offset = gridsize*levelID;
+	      size_t offset = gridsize*levelID;
 	      rot_uv_back(gridID, usvar + offset, vsvar + offset);
 	    }
 	}
@@ -276,7 +279,7 @@ void *Rotuv(void *argument)
 	  varID    = recVarID[recID];
 	  levelID  = recLevelID[recID];
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
+	  size_t offset   = gridsize*levelID;
 	  single   = vardata[varID] + offset;
 
 	  pstreamDefRecord(streamID2, varID,  levelID);

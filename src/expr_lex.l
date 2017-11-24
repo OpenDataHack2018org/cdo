@@ -95,6 +95,7 @@ M_E          {
 "!="            return NE;
 "&&"            return AND;
 "||"            return OR;
+"!"             return NOT;
 "?"             return QUESTION;
 ":"             return COLON;
 

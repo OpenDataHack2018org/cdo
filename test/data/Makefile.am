@@ -24,13 +24,16 @@ ZONSTAT_REF  = zonmin_ref zonmax_ref zonsum_ref zonavg_ref zonmean_ref zonstd_re
 ENSPSTAT_REF = enspctl1_ref enspctl20_ref enspctl25_ref enspctl33_ref enspctl50_ref enspctl66_ref enspctl75_ref enspctl80_ref enspctl99_ref enspctl100_ref
 SPECTRAL_REF = sp2gp_ref sp2gpl_ref gp2sp_ref gp2spl_ref
 VERTINT_REF  = ml2pl_ref
-REMAP_REF    = n16_bic_ref n16_bil_ref n16_con_ref n16_ycon_ref n16_laf_ref n16_nn_ref n16_dis_ref \
-               n32_bic_ref n32_bil_ref n32_con_ref n32_ycon_ref n32_laf_ref n32_nn_ref n32_dis_ref
-REMAP2_REF   = tsurf_spain_bic_def_ref  tsurf_spain_bil_on_ref   tsurf_spain_dis_off_ref  tsurf_spain_nn_def_ref  tsurf_spain_ycon_on_ref \
-               tsurf_spain_bic_off_ref  tsurf_spain_con_def_ref  tsurf_spain_dis_on_ref   tsurf_spain_nn_off_ref \
-               tsurf_spain_bic_on_ref   tsurf_spain_con_off_ref  tsurf_spain_laf_def_ref  tsurf_spain_nn_on_ref \
-               tsurf_spain_bil_def_ref  tsurf_spain_con_on_ref   tsurf_spain_laf_off_ref  tsurf_spain_ycon_def_ref \
-               tsurf_spain_bil_off_ref  tsurf_spain_dis_def_ref  tsurf_spain_laf_on_ref   tsurf_spain_ycon_off_ref
+REMAP_REF    = n16_bic_ref n16_bil_ref n16_con_ref n16_con2_ref n16_ycon_ref n16_laf_ref n16_nn_ref n16_dis_ref \
+               n32_bic_ref n32_bil_ref n32_con_ref n32_con2_ref n32_ycon_ref n32_laf_ref n32_nn_ref n32_dis_ref
+REMAP2_REF   = tsurf_spain_bic_def_ref   tsurf_spain_bic_off_ref   tsurf_spain_bic_on_ref  \
+               tsurf_spain_bil_def_ref   tsurf_spain_bil_off_ref   tsurf_spain_bil_on_ref  \
+               tsurf_spain_dis_def_ref   tsurf_spain_dis_off_ref   tsurf_spain_dis_on_ref  \
+               tsurf_spain_nn_def_ref    tsurf_spain_nn_off_ref    tsurf_spain_nn_on_ref   \
+               tsurf_spain_laf_def_ref   tsurf_spain_laf_off_ref   tsurf_spain_laf_on_ref  \
+               tsurf_spain_ycon_def_ref  tsurf_spain_ycon_off_ref  tsurf_spain_ycon_on_ref \
+               tsurf_spain_con_def_ref   tsurf_spain_con_off_ref   tsurf_spain_con_on_ref  \
+               tsurf_spain_con2_def_ref  tsurf_spain_con2_off_ref  tsurf_spain_con2_on_ref
 SELECT_REF   = select1_ref select2_ref select3_ref select4_ref select5_ref
 DETREND_REF  = detrend_ref
 EXPR_REF     = expr1_ref aexpr1_ref expr2_ref aexpr2_ref

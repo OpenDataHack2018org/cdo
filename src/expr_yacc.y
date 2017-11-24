@@ -49,7 +49,7 @@ void freeNode(nodeType *p);
 %left LEG GE LE EQ NE GT LT
 %left '+' '-'
 %left '*' '/'
-%precedence UMINUS
+%precedence UMINUS NOT
 %right '^'
 
 %type <nPtr> stmt expr stmt_list ternary
@@ -84,7 +84,8 @@ stmt_list:
 expr:
           CONSTANT                { $$ = expr_con($1); }
         | VARIABLE                { $$ = expr_var($1); }
-        | '-' expr %prec UMINUS   { $$ = expr_opr(UMINUS, 1, $2); }
+        | '-' expr %prec UMINUS   { $$ = expr_opr(UMINUS,  1, $2); }
+        | NOT expr %prec NOT      { $$ = expr_opr(NOT,     1, $2); }
         | expr '+' expr           { $$ = expr_opr('+', 2, $1, $3); }
         | expr '-' expr           { $$ = expr_opr('-', 2, $1, $3); }
         | expr '*' expr           { $$ = expr_opr('*', 2, $1, $3); }

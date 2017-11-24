@@ -304,9 +304,6 @@ void *Intgrid(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  // open stream before calling cdoDefineGrid!!!
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-
   if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )
     {
       operatorInputArg("grid description file or name");
@@ -331,6 +328,8 @@ void *Intgrid(void *argument)
       xinc = parameter2int(operatorArgv()[0]);
       yinc = parameter2int(operatorArgv()[1]);
     }
+
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -31,8 +31,8 @@
 #include <fenv.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
 #include <sys/stat.h>
-#if defined(HAVE_GETRLIMIT)
-#if defined(HAVE_SYS_RESOURCE_H)
+#ifdef  HAVE_GETRLIMIT
+#ifdef  HAVE_SYS_RESOURCE_H
 #include <sys/time.h>       /* getrlimit */
 #include <sys/resource.h>   /* getrlimit */
 #endif
@@ -86,13 +86,9 @@ static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 const char *CDO_username;
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 void streamGrbDefDataScanningMode(int scanmode);
-#if defined (__cplusplus)
 }
-#endif
 
 void gridsearch_set_method(const char *methodstr);
 
@@ -116,7 +112,7 @@ void gridsearch_set_method(const char *methodstr);
           } \
       }
 
-#define ITSME  (strcmp(CDO_username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
+#define ITSME  (STR_IS_EQ(CDO_username, "\x6d\x32\x31\x34\x30\x30\x33"))
 
 static
 void cdo_stackframe(void)
@@ -304,6 +300,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -v, --verbose  Print extra details for some operators\n");
   fprintf(stderr, "    -W             Print extra warning messages\n");
   fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
+  fprintf(stderr, "       aec         AEC compression of GRIB2 records\n");
   fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
   fprintf(stderr, "        zip[_1-9]  Deflate compression of NetCDF4 variables\n");
 #ifdef HIRLAM_EXTENSIONS
@@ -602,9 +599,7 @@ void setDefaultFileType(const char *filetypestr, int labort)
         {
           if ( *ftstr == '_' )
             {
-              ftstr++;
-
-              setDefaultDataType(ftstr);
+              setDefaultDataType(++ftstr);
             }
           else
             {
@@ -662,15 +657,15 @@ void defineCompress(const char *arg)
       cdoCompType  = CDI_COMPRESS_SZIP;
       cdoCompLevel = 0;
     }
+  else if ( strncmp(arg, "aec", len) == 0 )
+    {
+      cdoCompType = CDI_COMPRESS_AEC;
+      cdoCompLevel = 0;
+    }
   else if ( strncmp(arg, "jpeg", len) == 0 )
     {
       cdoCompType = CDI_COMPRESS_JPEG;
       cdoCompLevel = 0;
-    }
-  else if ( strncmp(arg, "gzip", len) == 0 )
-    {
-      cdoCompType  = CDI_COMPRESS_GZIP;
-      cdoCompLevel = 6;
     }
   else if ( strncmp(arg, "zip", 3) == 0 )
     {
@@ -690,9 +685,9 @@ void defineCompress(const char *arg)
 static
 void defineChunktype(const char *arg)
 {
-  if      ( strcmp("auto",  arg)   == 0 ) cdoChunkType = CDI_CHUNK_AUTO;
-  else if ( strcmp("grid",  arg)   == 0 ) cdoChunkType = CDI_CHUNK_GRID;
-  else if ( strcmp("lines", arg)   == 0 ) cdoChunkType = CDI_CHUNK_LINES;
+  if      ( STR_IS_EQ("auto",  arg) ) cdoChunkType = CDI_CHUNK_AUTO;
+  else if ( STR_IS_EQ("grid",  arg) ) cdoChunkType = CDI_CHUNK_GRID;
+  else if ( STR_IS_EQ("lines", arg) ) cdoChunkType = CDI_CHUNK_LINES;
   else
     {
       fprintf(stderr, "Chunk type '%s' unsupported!\n", arg);
@@ -1213,12 +1208,12 @@ int parse_options_long(int argc, char *argv[])
           else if ( lenableexcept )
             {
               int except = -1;
-              if      ( strcmp(CDO_optarg, "DIVBYZERO")  == 0 ) except = FE_DIVBYZERO;
-              else if ( strcmp(CDO_optarg, "INEXACT")    == 0 ) except = FE_INEXACT;
-              else if ( strcmp(CDO_optarg, "INVALID")    == 0 ) except = FE_INVALID;
-              else if ( strcmp(CDO_optarg, "OVERFLOW")   == 0 ) except = FE_OVERFLOW;
-              else if ( strcmp(CDO_optarg, "UNDERFLOW")  == 0 ) except = FE_UNDERFLOW;
-              else if ( strcmp(CDO_optarg, "ALL_EXCEPT") == 0 ) except = FE_ALL_EXCEPT;
+              if      ( STR_IS_EQ(CDO_optarg, "DIVBYZERO")  ) except = FE_DIVBYZERO;
+              else if ( STR_IS_EQ(CDO_optarg, "INEXACT")    ) except = FE_INEXACT;
+              else if ( STR_IS_EQ(CDO_optarg, "INVALID")    ) except = FE_INVALID;
+              else if ( STR_IS_EQ(CDO_optarg, "OVERFLOW")   ) except = FE_OVERFLOW;
+              else if ( STR_IS_EQ(CDO_optarg, "UNDERFLOW")  ) except = FE_UNDERFLOW;
+              else if ( STR_IS_EQ(CDO_optarg, "ALL_EXCEPT") ) except = FE_ALL_EXCEPT;
               if ( except < 0 ) cdoAbort("option --%s: unsupported argument: %s", "enableexcept", CDO_optarg);
               cdo_feenableexcept(except);
               if ( signal(SIGFPE, cdo_sig_handler) == SIG_ERR ) cdoWarning("can't catch SIGFPE!");
@@ -1226,10 +1221,10 @@ int parse_options_long(int argc, char *argv[])
           else if ( ltimestat_date )
             {
               int timestatdate = -1;
-              if      ( strcmp(CDO_optarg, "first")   == 0 ) timestatdate = TIMESTAT_FIRST;
-              else if ( strcmp(CDO_optarg, "last")    == 0 ) timestatdate = TIMESTAT_LAST;
-              else if ( strcmp(CDO_optarg, "middle")  == 0 ) timestatdate = TIMESTAT_MEAN;
-              else if ( strcmp(CDO_optarg, "midhigh") == 0 ) timestatdate = TIMESTAT_MIDHIGH;
+              if      ( STR_IS_EQ(CDO_optarg, "first")   ) timestatdate = TIMESTAT_FIRST;
+              else if ( STR_IS_EQ(CDO_optarg, "last")    ) timestatdate = TIMESTAT_LAST;
+              else if ( STR_IS_EQ(CDO_optarg, "middle")  ) timestatdate = TIMESTAT_MEAN;
+              else if ( STR_IS_EQ(CDO_optarg, "midhigh") ) timestatdate = TIMESTAT_MIDHIGH;
               if ( timestatdate < 0 ) cdoAbort("option --%s: unsupported argument: %s", "timestat_date", CDO_optarg);
               extern int CDO_Timestat_Date;
               CDO_Timestat_Date = timestatdate;
@@ -1329,10 +1324,7 @@ int parse_options_long(int argc, char *argv[])
           gethostname(host, sizeof(host));
           cdoExpName = CDO_optarg;
           /* printf("host: %s %s\n", host, cdoExpName); */
-          if ( strcmp(host, cdoExpName) == 0 )
-            cdoExpMode = CDO_EXP_REMOTE;
-          else
-            cdoExpMode = CDO_EXP_LOCAL;
+          cdoExpMode = STR_IS_EQ(host, cdoExpName) ? CDO_EXP_REMOTE : CDO_EXP_LOCAL;
 #else
           fprintf(stderr, "Function gethostname not available!\n");
           exit(EXIT_FAILURE);
@@ -1899,10 +1891,10 @@ int main(int argc, char *argv[])
     fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", ompNumThreads);
   if ( cdoVerbose )
     {
-      fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d", omp_get_num_procs(), omp_get_max_threads());
+      fprintf(stderr, " OpenMP:  num_procs=%d  max_threads=%d", omp_get_num_procs(), omp_get_max_threads());
 #if defined(HAVE_OPENMP4)
 #if !defined(__ICC)
-      fprintf(stderr, "  num_devices = %d", omp_get_num_devices());
+      fprintf(stderr, "  num_devices=%d", omp_get_num_devices());
 #endif
 #endif
       fprintf(stderr, "\n");

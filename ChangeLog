@@ -1,7 +1,20 @@
 2017-11-23  Uwe Schulzweida
 
+	* Fix read error on grid description file [Bug #8099]
+
+2017-11-21  Uwe Schulzweida
+
 	* Using CDI library version 1.9.2
 	* Version 1.9.2 release
+
+2017-11-21  Uwe Schulzweida
+
+	* expr: added variable name template _T
+	* expr: added operator ! (NOT)
+
+2017-11-17  Uwe Schulzweida
+
+	* rotuvb changed behavior in different versions [Bug #8084]
 
 2017-11-02  Uwe Schulzweida
 

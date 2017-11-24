@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include "dmemory.h"
 #include "listbuf.h"
 
 listbuf_t *listbuf_new(void)
@@ -24,23 +25,18 @@ int listbuf_read(listbuf_t *listbuf, FILE *fp, const char *name)
   size_t filesize = 0;
   if ( fstat(filedes, &buf) == 0 ) filesize = (size_t) buf.st_size;
 
-  if ( filesize > MAX_LISTBUF_SIZE )
-    {
-      fprintf(stderr, "%s: max buffer size of %d exceeded (%s)!\n", __func__, (int)MAX_LISTBUF_SIZE, name);
-      return -1;
-    }
-  else if ( filesize == 0 )
+  if ( filesize == 0 )
     {
       fprintf(stderr, "%s: empty stream: %s\n", __func__, name);
       return -1;
     }
 
-  char *buffer = (char*) malloc(filesize);
+  char *buffer = (char*) Malloc(filesize);
   size_t nitems = fread(buffer, 1, filesize, fp);
 
   if ( nitems != filesize )
     {
-      free(buffer);
+      Free(buffer);
       fprintf(stderr, "%s: read failed on %s!\n", __func__, name);
       return -1;
     }

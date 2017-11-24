@@ -28,13 +28,9 @@
 #include "pstream.h"
 
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 int streamGrbInqDataScanningMode(void);
-#if defined (__cplusplus)
 }
-#endif
 
 void *Copy(void *argument)
 {

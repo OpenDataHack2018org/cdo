@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-#define MAX_LISTBUF_SIZE (128*1024*1024)
 
 typedef struct
 {

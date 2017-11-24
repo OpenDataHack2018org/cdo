@@ -4,15 +4,11 @@
 #include "remap.h"
 #include "remap_store_link.h"
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 #include "clipping/clipping.h"
 #include "clipping/area.h"
 #include "clipping/geometry.h"
-#ifdef __cplusplus
 }
-#endif
 
 //#define STIMER
 

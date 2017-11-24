@@ -61,7 +61,8 @@ extern int yydebug;
     NE = 271,
     GT = 272,
     LT = 273,
-    UMINUS = 274
+    UMINUS = 274,
+    NOT = 275
   };
 #endif
 /* Tokens.  */
@@ -82,6 +83,7 @@ extern int yydebug;
 #define GT 272
 #define LT 273
 #define UMINUS 274
+#define NOT 275
 
 /* Value type.  */
 

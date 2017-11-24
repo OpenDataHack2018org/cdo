@@ -69,13 +69,23 @@ kdata_t kd_min(kdata_t x, kdata_t y)
  *
  * \return root node of the tree
  */
-struct kdNode *
+kdTree_t *
 kd_buildTree(struct kd_point *points, size_t nPoints,
              kdata_t *min, kdata_t *max, int dim, int max_threads)
 {
+  kdTree_t *tree = (kdTree_t *) calloc(1, sizeof(kdTree_t));
+#ifdef MEMPOOL
+  tree->nodepool = kd_nodepool_new(nPoints*2);
+#endif
   struct kd_thread_data my_data;
-  kd_initArg(&my_data, points, nPoints, min, max, 0, max_threads, dim);
-  struct kdNode *tree = (kdNode *)kd_doBuildTree(&my_data);
+  kd_initArg(&my_data, tree->nodepool, points, nPoints, min, max, 0, max_threads, dim);
+  tree->node = (kdNode *)kd_doBuildTree(&my_data);
+  if ( tree->node == NULL )
+    {
+      free(tree);
+      tree = NULL;
+    }
+  
   return tree;
 }
 

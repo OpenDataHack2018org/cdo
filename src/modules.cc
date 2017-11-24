@@ -464,13 +464,66 @@ void close_library_handles() {
 #endif
 	
 // helper function for setting the spacing in operatorPrintList
-std::string get_spacing_for(std::string str) {
-    int max = 16;
+std::string get_spacing_for(int p_space, std::string str) {
     std::string spacing = "";
-    for (int i = str.size(); i <= max; i++) {
+    for (int i = str.size(); i <= p_space; i++) {
         spacing += " ";
     }
     return spacing;
+}
+std::string get_operator_description(std::string p_current_op_name, std::vector<std::string> help)
+{
+    std::string description = "";
+    unsigned long cur_help_idx;
+    bool help_contains_name;
+    std::string line;
+    unsigned long operator_section = 0;
+
+    cur_help_idx = 0;
+    //search for operator section
+    while (operator_section == 0 && cur_help_idx < help.size() - 1) {
+        line = help[++cur_help_idx];
+        if (line.find("OPERATORS") != std::string::npos) {
+            operator_section = cur_help_idx;
+        }
+    }
+    //if no operator section is found
+    if (operator_section == 0) {
+        cur_help_idx = 0;
+        line = help[0];
+        std::string name_section = help[0];
+        help_contains_name = false;
+        //search for the operator name in the description
+        while (!line.empty()) {
+            line = help[++cur_help_idx];
+            if (line.find(p_current_op_name) != std::string::npos) {
+                help_contains_name = true;
+            }
+            name_section += line;
+        }
+        //if the name was found save description for later use
+        if (help_contains_name) {
+            description = name_section.substr(name_section.find_first_of('-') + 2,
+                                              name_section.size());
+        }
+    } else {
+
+        line = help.at(++operator_section);
+        //search the operator section for current operator line
+        while (line.find(p_current_op_name + " ") == std::string::npos && !line.empty() &&
+               operator_section < help.size() - 1) {
+            line = help.at(++operator_section);
+        }
+        //if operator line found save description for later use
+        if (!line.empty() && operator_section < help.size()) {
+            auto op_name_start = line.find_first_not_of(" \t");
+
+            description = line.substr(
+                line.find_first_not_of(" \t", op_name_start + p_current_op_name.size()),
+                line.size());
+        }
+    }
+    return description;
 }
 /***
  * Prints all operator names and their short descriptions
@@ -489,73 +542,29 @@ void operatorPrintList(bool print_no_output) {
     {
         output_list = get_sorted_operator_name_list();
     }
-    std::vector<std::string> help;
+
     unsigned long list_length = output_list.size();
-    unsigned long cur_help_idx;
-    std::string line;
-    std::string description;
-    bool help_contains_name;
+    modules_t *current_module;
+
+    //help variables
 
     for (unsigned long out_list_idx = 0; out_list_idx < list_length; out_list_idx++) {
         std::string current_op_name = output_list[out_list_idx];
-        help = modules[get_module_name_to(current_op_name)].help;
+        current_module = &modules[get_module_name_to(current_op_name)];
         if (aliases.find(current_op_name) != aliases.end()) {
 
             output_list[out_list_idx] +=
-                std::string(get_spacing_for(current_op_name) + "--> " + aliases[current_op_name]);
+                std::string(get_spacing_for(16, current_op_name) + "--> " + aliases[current_op_name]);
         }
-        else if (!help.empty()) {
-            description = "";
-
-            unsigned long operator_section = 0;
-            cur_help_idx = 0;
-            //search for operator section
-            while (operator_section == 0 && cur_help_idx < help.size() - 1) {
-                line = help[++cur_help_idx];
-                if (line.find("OPERATORS") != std::string::npos) {
-                    operator_section = cur_help_idx;
-                }
-            }
-            //if no operator section is found
-            if (operator_section == 0) {
-                cur_help_idx = 0;
-                line = help[0];
-                std::string name_section = help[0];
-                help_contains_name = false;
-                //search for the operator name in the description
-                while (!line.empty()) {
-                    line = help[++cur_help_idx];
-                    if (line.find(current_op_name) != std::string::npos) {
-                        help_contains_name = true;
-                    }
-                    name_section += line;
-                }
-                //if the name was found save description for later use
-                if (help_contains_name) {
-                    description = name_section.substr(name_section.find_first_of('-') + 2,
-                                                      name_section.size());
-                }
-            } else {
-
-                line = help[++operator_section];
-                //search the operator section for current operator line
-                while (line.find(current_op_name + " ") == std::string::npos && !line.empty() &&
-                       operator_section < help.size()) {
-                    line = help[++operator_section];
-                    ;
-                }
-                //if operator line found save description for later use
-                if (!line.empty() && operator_section < help.size()) {
-                    auto op_name_start = line.find_first_not_of(" \t");
-
-                    description = line.substr(
-                        line.find_first_not_of(" \t", op_name_start + current_op_name.size()),
-                        line.size());
-                }
-            }
+        else if (!current_module->help.empty()) {
             //add spaceing and saving output line to the output list
-            output_list[out_list_idx] += get_spacing_for(current_op_name) + description;
+            std::string description = get_operator_description(current_op_name, current_module->help);
+            output_list[out_list_idx] += get_spacing_for(16, current_op_name) + description;
         }
+        std::string in_out_info = "(" + std::to_string(current_module->streamInCnt) 
+                                      + "|" + std::to_string(current_module->streamOutCnt) 
+                                      + ")";
+        output_list[out_list_idx] += get_spacing_for(90, output_list[out_list_idx]) + in_out_info;
     }
     //print generated output list
     for (std::string str : output_list) {

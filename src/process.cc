@@ -1263,8 +1263,11 @@ processClosePipes(void)
     }
 }
 
-void
-cdoFinish(void)
+extern "C" {
+size_t getPeakRSS( );
+}
+
+void cdoFinish(void)
 {
   int processID = processSelf().m_ID;
   int nvars, ntimesteps;
@@ -1347,19 +1350,15 @@ cdoFinish(void)
 
   if (processID == 0)
     {
-      int mu[] = { 'b', 'k', 'm', 'g', 't' };
-      int muindex = 0;
-      long memmax;
-
-      memmax = memTotal();
-      while (memmax > 9999)
-        {
-          memmax /= 1024;
-          muindex++;
-        }
-
+      size_t memmax = getPeakRSS();
       if (memmax)
-        snprintf(memstring, sizeof(memstring), " %ld%c ", memmax, mu[muindex]);
+        {
+          size_t muindex = 0;
+          const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
+          const size_t nmu = sizeof(mu)/sizeof(char*);
+          while (memmax > 9999 && muindex < nmu-1) { memmax /= 1024; muindex++; }
+          snprintf(memstring, sizeof(memstring), " %zu%s", memmax, mu[muindex]);
+        }
 
       processEndTime(&p_usertime, &p_systime);
       p_cputime = p_usertime + p_systime;
@@ -1374,11 +1373,11 @@ cdoFinish(void)
 
 #if defined(HAVE_SYS_TIMES_H)
   if (cdoBenchmark)
-    fprintf(stderr, " ( %.2fs %.2fs %.2fs %s)\n", c_usertime, c_systime, c_cputime, memstring);
+    fprintf(stderr, " ( %.2fs %.2fs %.2fs%s )\n", c_usertime, c_systime, c_cputime, memstring);
   else
     {
       if (!cdoSilentMode)
-        fprintf(stderr, " ( %.2fs )\n", c_cputime);
+        fprintf(stderr, " ( %.2fs%s )\n", c_cputime, memstring);
     }
   if (cdoBenchmark && processID == 0)
     fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_usertime, p_systime, p_cputime, memstring);

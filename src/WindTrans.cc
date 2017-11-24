@@ -36,13 +36,9 @@
 
 #define  MAXARG 10
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 void streamGrbChangeModeUvRelativeToGrid(int mode);
-#if defined (__cplusplus)
 }
-#endif
 
 int UVDESTAG;
 int ROTUVNORTH;
@@ -633,8 +629,8 @@ void rot_uv_north(int gridID, double *us, double *vs)
   double xnormSph, ynormSph, znormSph;
   double xncross,  yncross,  zncross;
   double vecAngle;
-  long idx, idx4;
-  int i,j;
+  size_t idx, idx4;
+  size_t i,j;
   double VJaa,VJab,VJba,VJbb;
   double u,v;
   double magnitude, newMagnitude;
@@ -971,8 +967,8 @@ void project_uv_latlon(int gridID, double *us, double *vs)
   double xpnt0,ypnt0;
   double xpntEast,ypntEast;
   double xpntNorth, ypntNorth;
-  long idx;
-  int i, j;
+  size_t idx;
+  size_t i, j;
   double distLon;
   double distLat;
   double VJaa,VJab,VJba,VJbb;
@@ -1358,7 +1354,7 @@ void *TransformUV(int operatorID)
                               if ( CdoDebug::cdoDebugExt>=20 )
                                 {
                                   printf("Xvals (size=%zu):\n",gridInqSize(gridIDcurvl));
-                                  int ii;
+                                  size_t ii;
                                   for (ii=0; ii< 10; ii++)
                                     printf("%4.3f ", gridInqXval(gridIDcurvl,ii));
                                   printf("\n...\n");

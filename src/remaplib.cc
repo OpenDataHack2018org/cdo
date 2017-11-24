@@ -447,13 +447,6 @@ int expand_lonlat_grid(int gridID)
   Free(xvals);
   Free(yvals);
 
-  if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
-    {
-      double xpole, ypole, angle;
-      gridInqParamRLL(gridID, &xpole, &ypole, &angle);
-      gridDefParamRLL(gridIDnew, xpole, ypole, angle);
-    }
-
   return gridIDnew;
 }
 
@@ -562,8 +555,7 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
   gridInqXvals(gridID, grid->reg2d_center_lon);
   gridInqYvals(gridID, grid->reg2d_center_lat);
 
-  /* Convert lat/lon units if required */
-
+  // Convert lat/lon units if required
   char yunits[CDI_MAX_NAME]; yunits[0] = 0;
   cdiGridInqKeyStr(gridID, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
@@ -584,9 +576,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
   grid_gen_corners(ny, grid->reg2d_center_lat, grid->reg2d_corner_lat);
   grid_check_lat_borders_rad(ny+1, grid->reg2d_corner_lat);
 
-  //for ( size_t i = 0; i < nxp1; ++i ) printf("lon %zu %g\n", i, grid->reg2d_corner_lon[i]);
-  //for ( size_t i = 0; i < nyp1; ++i ) printf("lat %zu %g\n", i, grid->reg2d_corner_lat[i]);
-
+  // for ( size_t i = 0; i < nxp1; ++i ) printf("lon %zu %g\n", i, grid->reg2d_corner_lon[i]);
+  // for ( size_t i = 0; i < nyp1; ++i ) printf("lat %zu %g\n", i, grid->reg2d_corner_lat[i]);
 }
 
 static
@@ -815,8 +806,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 
   if ( !src_grid->lextrapolate && gridInqSize(src_grid->gridID) > 1 &&
        map_type == MAP_TYPE_DISTWGT &&
-       ((gridInqType(gridID1) == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
-	(gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global)) )
+       (gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global) )
     {
       src_grid->gridID = gridID1 = expand_lonlat_grid(gridID1);
       reg2d_src_gridID = gridID1;
@@ -849,6 +839,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
   int sgridID = src_grid->gridID;
   if ( gridInqSize(sgridID) > 1 && 
        ((gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LCC) || 
+	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_RLL) || 
 	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LAEA) || 
 	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_SINU)) )
     {
@@ -884,9 +875,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
     {
       cell_bounding_boxes(src_grid, REMAP_GRID_BASIS_SRC);
       cell_bounding_boxes(tgt_grid, REMAP_GRID_BASIS_TGT);
-      /*
-	Set up and assign address ranges to search bins in order to further restrict later searches
-      */
+      // Set up and assign address ranges to search bins in order to further restrict later searches
       calc_lat_bins(src_grid, tgt_grid, map_type);
     }
 
@@ -1515,10 +1504,6 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 void remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict grad_lat,
 		     double *restrict grad_lon, double *restrict grad_latlon)
 {
-  size_t i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw;
-  double delew, delns;
-  double grad_lat_zero, grad_lon_zero;
-
   if ( grid.rank != 2 )
     cdoAbort("Internal problem (remap_gradients), grid rank = %d!", grid.rank);
 
@@ -1528,8 +1513,7 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
-  shared(grid_size, grad_lat, grad_lon, grad_latlon, grid, nx, ny, array) \
-  private(i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw, delew, delns, grad_lat_zero, grad_lon_zero)
+  shared(grid_size, grad_lat, grad_lon, grad_latlon, grid, nx, ny, array)
 #endif
   for ( size_t n = 0; n < grid_size; ++n )
     {
@@ -1539,77 +1523,47 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
 
       if ( grid.mask[n] )
 	{
-	  delew = HALF;
-	  delns = HALF;
+	  double delew = HALF;
+	  double delns = HALF;
 
-	  j = n/nx + 1;
-	  i = n - (j-1)*nx + 1;
+	  size_t j = n/nx + 1;
+	  size_t i = n - (j-1)*nx + 1;
 
-	  ip1 = i + 1;
-	  im1 = i - 1;
-	  jp1 = j + 1;
-	  jm1 = j - 1;
+	  size_t ip1 = i + 1;
+	  size_t im1 = i - 1;
+	  size_t jp1 = j + 1;
+	  size_t jm1 = j - 1;
 
 	  if ( ip1 > nx ) ip1 = ip1 - nx;
 	  if ( im1 <  1 ) im1 = nx;
-	  if ( jp1 > ny )
-	    {
-              jp1 = j;
-              delns = ONE;
-            }
-	  if ( jm1 < 1 )
-	    {
-              jm1 = j;
-              delns = ONE;
-            }
+	  if ( jp1 > ny ) { jp1 = j; delns = ONE; }
+	  if ( jm1 <  1 ) { jm1 = j; delns = ONE; }
 
-	  in  = (jp1-1)*nx + i - 1;
-	  is  = (jm1-1)*nx + i - 1;
-	  ie  = (j  -1)*nx + ip1 - 1;
-	  iw  = (j  -1)*nx + im1 - 1;
+	  size_t in  = (jp1-1)*nx + i - 1;
+	  size_t is  = (jm1-1)*nx + i - 1;
+	  size_t ie  = (j  -1)*nx + ip1 - 1;
+	  size_t iw  = (j  -1)*nx + im1 - 1;
 
-	  ine = (jp1-1)*nx + ip1 - 1;
-	  inw = (jp1-1)*nx + im1 - 1;
-	  ise = (jm1-1)*nx + ip1 - 1;
-	  isw = (jm1-1)*nx + im1 - 1;
+	  size_t ine = (jp1-1)*nx + ip1 - 1;
+	  size_t inw = (jp1-1)*nx + im1 - 1;
+	  size_t ise = (jm1-1)*nx + ip1 - 1;
+	  size_t isw = (jm1-1)*nx + im1 - 1;
 
-	  /* Compute i-gradient */
-
-	  if ( ! grid.mask[ie] )
-	    {
-              ie = n;
-              delew = ONE;
-            }
-	  if ( ! grid.mask[iw] )
-	    {
-              iw = n;
-              delew = ONE;
-            }
+	  // Compute i-gradient
+	  if ( ! grid.mask[ie] ) { ie = n; delew = ONE; }
+	  if ( ! grid.mask[iw] ) { iw = n; delew = ONE; }
  
 	  grad_lat[n] = delew*(array[ie] - array[iw]);
 
-	  /* Compute j-gradient */
-
-	  if ( ! grid.mask[in] )
-	    {
-              in = n;
-              delns = ONE;
-            }
-	  if ( ! grid.mask[is] )
-	    {
-              is = n;
-              delns = ONE;
-            }
+	  // Compute j-gradient
+	  if ( ! grid.mask[in] ) { in = n; delns = ONE; }
+	  if ( ! grid.mask[is] ) { is = n; delns = ONE; }
  
 	  grad_lon[n] = delns*(array[in] - array[is]);
 
-	  /* Compute ij-gradient */
-
+	  // Compute ij-gradient
 	  delew = HALF;
-	  if ( jp1 == j || jm1 == j )
-	    delns = ONE;
-	  else 
-	    delns = HALF;
+	  delns = (jp1 == j || jm1 == j) ? ONE : HALF;
 
 	  if ( ! grid.mask[ine] )
 	    {
@@ -1657,7 +1611,7 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
 		}
 	    }
 
-	  grad_lat_zero = delew*(array[ine] - array[inw]);
+	  double grad_lat_zero = delew*(array[ine] - array[inw]);
 
 	  if ( ! grid.mask[ise] )
 	    {
@@ -1705,7 +1659,7 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
 		}
 	    }
 
-	  grad_lon_zero = delew*(array[ise] - array[isw]);
+	  double grad_lon_zero = delew*(array[ise] - array[isw]);
 
 	  grad_latlon[n] = delns*(grad_lat_zero - grad_lon_zero);
 	}

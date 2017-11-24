@@ -58,6 +58,16 @@ void time2str(int time, char *timestr, int maxlen)
 }
 
 
+const char *comp_name(int comptype)
+{
+  if ( comptype == CDI_COMPRESS_SZIP  ) return "szip";
+  if ( comptype == CDI_COMPRESS_ZIP   ) return "zip";
+  if ( comptype == CDI_COMPRESS_JPEG  ) return "jpeg";
+  if ( comptype == CDI_COMPRESS_AEC   ) return "aec";
+  return " ";
+}
+
+
 void printFiletype(int streamID, int vlistID)
 {
   int filetype = streamInqFiletype(streamID);
@@ -89,35 +99,22 @@ void printFiletype(int streamID, int vlistID)
     }
   // clang-format on
 
-  if ( filetype == CDI_FILETYPE_GRB || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
-    {
-      int nvars = vlistNvars(vlistID);
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  int comptype = vlistInqVarCompType(vlistID, varID);
-	  if ( comptype )
-	    {
-	      if      ( comptype == CDI_COMPRESS_SZIP ) printf(" SZIP");
-	      else if ( comptype == CDI_COMPRESS_ZIP  ) printf(" ZIP");
 
-	      break;
-	    }
-	}
-    }
-
-  if ( filetype == CDI_FILETYPE_GRB2 )
-    {
-      int nvars = vlistNvars(vlistID);
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  int comptype = vlistInqVarCompType(vlistID, varID);
-	  if ( comptype )
-	    {
-	      if ( comptype == CDI_COMPRESS_JPEG ) printf(" JPEG");
-	      break;
-	    }
-	}
-    }
+  int nvars = vlistNvars(vlistID);
+  int comps[] = {CDI_COMPRESS_ZIP, CDI_COMPRESS_JPEG, CDI_COMPRESS_SZIP, CDI_COMPRESS_AEC};
+  unsigned kk = 0;
+  for ( unsigned k = 0; k < sizeof(comps)/sizeof(int); ++k )
+    for ( int varID = 0; varID < nvars; varID++ )
+      {
+        int comptype = vlistInqVarCompType(vlistID, varID);
+        if ( comptype == comps[k] )
+          {
+            if ( kk++ == 0 ) printf(" ");
+            else printf("/");
+            printf("%s", comp_name(comptype));
+            break;
+          }
+      }
 
   printf("\n");
 }
