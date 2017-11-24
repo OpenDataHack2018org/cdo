@@ -43,21 +43,21 @@
   "remoteUser": "m300064",
 
   "builders": {
-    "localCLANG_4.0_Debug": {
+    "localCLANG_noOpenMP": {
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp CC=clang CXX=clang++ CFLAGS='-g -O0' LDFLAGS=-lhdf5",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp CC=clang CXX=clang++  LDFLAGS=-lhdf5",
       "makeCall": "make -j 12",
       "sync": false
     },
     "localCLANG": {
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --with-netcdf CC=clang CXX=clang++ CFLAGS='-g -O0' LDFLAGS=-lhdf5",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf CC=clang CXX=clang++ CFLAGS='-g -O0' CXXFLAGS='-g -fopenmp' LDFLAGS='-lhdf5 -fopenmp=libiomp5'",
       "makeCall": "make -j 12",
       "sync": false
     },
-    "localCLANG++_3.8_Debug": {
+    "localCLANG_Debug": {
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp --enable-cxx CC=clang CXX=clang++ CFLAGS='-g -O0'",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf CC=clang CXX=clang++ CFLAGS='-g -O0 -Wall -fopenmp' CXXFLAGS='-g -O0 -Wall -fopenmp=libiomp5'",
       "makeCall": "make -j 12",
       "sync": false
     },
