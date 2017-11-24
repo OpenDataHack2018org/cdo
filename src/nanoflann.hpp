@@ -54,7 +54,7 @@
 #include <stdexcept>
 #include <cstdio>  // for fwrite()
 #define _USE_MATH_DEFINES // Required by MSVC to define M_PI,etc. in <cmath>
-#include <math.h>   // for abs()
+#include <cmath>   // for abs()
 #include <cstdlib> // for abs()
 #include <limits>
 
@@ -80,25 +80,29 @@ namespace nanoflann
 	template <typename DistanceType, typename IndexType = size_t, typename CountType = size_t>
 	class KNNResultSet
 	{
-		IndexType * indices;
-		DistanceType* dists;
+		IndexType *indices;
+		DistanceType *dists;
+		DistanceType radius;
 		CountType capacity;
 		CountType count;
 
 	public:
-		inline KNNResultSet(CountType capacity_) : indices(0), dists(0), capacity(capacity_), count(0)
+		inline KNNResultSet(CountType capacity_) : indices(0), dists(0), radius((std::numeric_limits<DistanceType>::max)()), capacity(capacity_), count(0)
 		{
 		}
 
-		inline void init(IndexType* indices_, DistanceType* dists_)
+                inline void setRadius(DistanceType radius_)
+                  {
+                    radius = radius_;
+                  }
+
+                inline void init(IndexType* indices_, DistanceType* dists_)
 		{
 			indices = indices_;
 			dists = dists_;
 			count = 0;
-                        if (capacity)
-                          dists[capacity-1] = (std::numeric_limits<DistanceType>::max)();
-                        if (capacity)
-                          indices[capacity-1] = (std::numeric_limits<IndexType>::max)();
+                        if (capacity) dists[capacity-1] = radius;
+                        if (capacity) indices[capacity-1] = (std::numeric_limits<IndexType>::max)();
 		}
 
 		inline CountType size() const
@@ -118,6 +122,7 @@ namespace nanoflann
                  */
                 inline bool addPoint(DistanceType dist, IndexType index)
 		{
+                  // if ( dist >= radius ) return true;
 			CountType i;
 			for (i = count; i > 0; --i) {
 #ifdef NANOFLANN_FIRST_MATCH   // If defined and two points have the same distance, the one with the lowest-index will be returned first.
@@ -1276,6 +1281,14 @@ namespace nanoflann
 		size_t knnSearch(const ElementType *query_point, const size_t num_closest, IndexType *out_indices, DistanceType *out_distances_sq, const int /* nChecks_IGNORED */ = 10) const
 		{
 			nanoflann::KNNResultSet<DistanceType,IndexType> resultSet(num_closest);
+			resultSet.init(out_indices, out_distances_sq);
+			this->findNeighbors(resultSet, query_point, nanoflann::SearchParams());
+			return resultSet.size();
+		}
+		size_t knnRangeSearch(const ElementType *query_point, const DistanceType radius, const size_t num_closest, IndexType *out_indices, DistanceType *out_distances_sq, const int /* nChecks_IGNORED */ = 10) const
+		{
+			nanoflann::KNNResultSet<DistanceType,IndexType> resultSet(num_closest);
+                        resultSet.setRadius(radius);
 			resultSet.init(out_indices, out_distances_sq);
 			this->findNeighbors(resultSet, query_point, nanoflann::SearchParams());
 			return resultSet.size();
