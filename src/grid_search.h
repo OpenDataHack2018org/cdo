@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-//#define  TEST_BBOX  1
 #define  GS_NOT_FOUND  SIZE_MAX
 
 enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_NANOFLANN, GS_KDTREE, GS_KDSPH, GS_NEARPT3};
@@ -26,9 +25,7 @@ struct gridsearch {
   double *coslon, *sinlon;   // cosine, sine of grid lons (for distance)
 
   double lonmin, lonmax, latmin, latmax;
-#ifdef  TEST_BBOX
   float min[3], max[3];
-#endif
 };
 
 struct gsknn {
