@@ -25879,7 +25879,7 @@ ac_config_files="$ac_config_files test/Gradsdes.test test/Collgrid.test test/thr
 
 ac_config_files="$ac_config_files test/MapReduce.test test/Ninfo.test"
 
-ac_config_files="$ac_config_files Makefile src/lib/ncl/Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings"
+ac_config_files="$ac_config_files Makefile src/lib/ncl/Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile test/bandit_tests/Makefile cdo.spec cdo.settings"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -27175,6 +27175,7 @@ do
     "contrib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/Makefile" ;;
     "test/Makefile") CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
     "test/data/Makefile") CONFIG_FILES="$CONFIG_FILES test/data/Makefile" ;;
+    "test/bandit_tests/Makefile") CONFIG_FILES="$CONFIG_FILES test/bandit_tests/Makefile" ;;
     "cdo.spec") CONFIG_FILES="$CONFIG_FILES cdo.spec" ;;
     "cdo.settings") CONFIG_FILES="$CONFIG_FILES cdo.settings" ;;
 
