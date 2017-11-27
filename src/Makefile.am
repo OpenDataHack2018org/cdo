@@ -110,6 +110,7 @@ libcdo_la_SOURCES =            \
 	       merge_sort2.h   \
                modules.cc       \
                modules.h       \
+               module_definitions.h   \
                namelist.cc      \
                namelist.h      \
                namelist_parser.cc     \

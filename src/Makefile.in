@@ -621,13 +621,14 @@ libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
 	institution.cc interpol.cc interpol.h job.cc juldate.cc \
 	grid_search.cc grid_search.h listarray.cc listarray.h list.cc \
 	list.h listbuf.cc listbuf.h merge_sort2.cc merge_sort2.h \
-	modules.cc modules.h namelist.cc namelist.h namelist_parser.cc \
-	nanoflann.hpp normal.cc nth_element.cc nth_element.h \
-	operator_help.h par_io.cc par_io.h parse_literal.cc \
-	percentiles_hist.cc percentiles_hist.h percentiles.cc \
-	percentiles.h pipe.cc pipe.h pmlist.cc pmlist.h sellist.cc \
-	sellist.h pragma_omp_atomic_update.h printinfo.h process.cc \
-	process.h pstream.cc pstream.h pstream_write.h pstream_int.h \
+	modules.cc modules.h module_definitions.h namelist.cc \
+	namelist.h namelist_parser.cc nanoflann.hpp normal.cc \
+	nth_element.cc nth_element.h operator_help.h par_io.cc \
+	par_io.h parse_literal.cc percentiles_hist.cc \
+	percentiles_hist.h percentiles.cc percentiles.h pipe.cc pipe.h \
+	pmlist.cc pmlist.h sellist.cc sellist.h \
+	pragma_omp_atomic_update.h printinfo.h process.cc process.h \
+	pstream.cc pstream.h pstream_write.h pstream_int.h \
 	pthread_debug.cc pthread_debug.h readline.cc realtime.cc \
 	remap.h remaplib.cc remapsort.cc remap_scrip_io.cc \
 	remap_search_reg2d.cc remap_search_latbins.cc \
