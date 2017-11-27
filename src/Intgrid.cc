@@ -296,7 +296,6 @@ void *Intgrid(void *argument)
 
   // clang-format off
   int INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
-  int INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
   int INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
   int BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
   int THINOUT     = cdoOperatorAdd("thinout",     0, 0, NULL);
@@ -308,18 +307,6 @@ void *Intgrid(void *argument)
     {
       operatorInputArg("grid description file or name");
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
-    }
-  else if ( operatorID == INTPOINT )
-    {
-      operatorInputArg("longitude and latitude");
-      operatorCheckArgc(2);
-      double slon = parameter2double(operatorArgv()[0]);
-      double slat = parameter2double(operatorArgv()[1]);
-      gridID2 = gridCreate(GRID_LONLAT, 1);
-      gridDefXsize(gridID2, 1);
-      gridDefYsize(gridID2, 1);
-      gridDefXvals(gridID2, &slon);
-      gridDefYvals(gridID2, &slat);
     }
   else if ( operatorID == THINOUT || operatorID == BOXAVG )
     {
@@ -407,7 +394,7 @@ void *Intgrid(void *argument)
 	  field2.ptr     = array2;
 	  field2.nmiss   = 0;
 
-	  if ( operatorID == INTGRIDBIL || operatorID == INTPOINT )
+	  if ( operatorID == INTGRIDBIL )
 	    intgridbil(&field1, &field2);
 	  else if ( operatorID == INTERPOLATE )
 	    interpolate(&field1, &field2);
