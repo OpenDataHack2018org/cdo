@@ -52,7 +52,6 @@ int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double
 
 void *Intgridtraj(void *argument)
 {
-  int gridID1;
   int varID, levelID;
   int vdate, vtime;
   size_t nmiss;
@@ -86,15 +85,15 @@ void *Intgridtraj(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  double *array = (double*) Malloc(gridsizemax*sizeof(double));
 
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
   double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       size_t nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
@@ -111,7 +110,7 @@ void *Intgridtraj(void *argument)
   int ngrids = vlistNgrids(vlistID1);
   for ( int index = 0; index < ngrids; index++ )
     {
-      gridID1 = vlistGrid(vlistID1, index);
+      int gridID1 = vlistGrid(vlistID1, index);
 
       if ( gridInqType(gridID1) != GRID_LONLAT &&
 	   gridInqType(gridID1) != GRID_GAUSSIAN )
@@ -124,8 +123,7 @@ void *Intgridtraj(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
-  pstreamDefVlist(streamID2, vlistID2);
+  int streamID2 = CDI_UNDEFID;
 
   int tsID = 0;
   int nrecs = pstreamInqTimestep(streamID1, tsID++);
@@ -133,7 +131,7 @@ void *Intgridtraj(void *argument)
   for ( int recID = 0; recID < nrecs; recID++ )
     {
       pstreamInqRecord(streamID1, &varID, &levelID);
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       size_t offset = gridsize*levelID;
       double *single1 = vardata1[varID] + offset;
       pstreamReadRecord(streamID1, single1, &nmiss);
@@ -154,7 +152,7 @@ void *Intgridtraj(void *argument)
 	  recVarID[recID]   = varID;
 	  recLevelID[recID] = levelID;
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  size_t offset = gridsize*levelID;
 	  double *single2  = vardata2[varID] + offset;
 	  pstreamReadRecord(streamID1, single2, &nmiss);
@@ -166,6 +164,12 @@ void *Intgridtraj(void *argument)
 	  if ( juldate_to_seconds(juldate) >= juldate_to_seconds(juldate1) && 
 	       juldate_to_seconds(juldate) <  juldate_to_seconds(juldate2) )
 	    {
+              if ( streamID2 == CDI_UNDEFID )
+                {
+                  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+                  pstreamDefVlist(streamID2, vlistID2);
+                }
+
 	      juldate_decode(calendar, juldate, &vdate, &vtime);
 	      taxisDefVdate(taxisID2, vdate);
 	      taxisDefVtime(taxisID2, vtime);
@@ -185,8 +189,8 @@ void *Intgridtraj(void *argument)
 		  varID    = recVarID[recID];
 		  levelID  = recLevelID[recID];
 		  double missval = vlistInqVarMissval(vlistID1, varID);
-		  gridID1  = vlistInqVarGrid(vlistID1, varID);
-		  gridsize = gridInqSize(gridID1);
+		  int gridID1 = vlistInqVarGrid(vlistID1, varID);
+		  size_t gridsize = gridInqSize(gridID1);
 		  size_t offset = gridsize*levelID;
 		  double *single1 = vardata1[varID] + offset;
 		  double *single2 = vardata2[varID] + offset;
@@ -222,8 +226,17 @@ void *Intgridtraj(void *argument)
 	}
     }
 
+  if ( tsIDo == 0 )
+    {
+      juldate_decode(calendar, juldate, &vdate, &vtime);
+      char vdatestr[32], vtimestr[32];
+      date2str(vdate, vdatestr, sizeof(vdatestr));
+      time2str(vtime, vtimestr, sizeof(vtimestr));
+      cdoWarning("Date/time %s %s not found!", vdatestr, vtimestr);
+    }
+
   fclose(fp);
-  pstreamClose(streamID2);
+  if ( streamID2 != CDI_UNDEFID ) pstreamClose(streamID2);
   pstreamClose(streamID1);
 
   for ( varID = 0; varID < nvars; varID++ )
