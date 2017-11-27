@@ -26,7 +26,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "interpol.h"
 #include "listarray.h"
 
 

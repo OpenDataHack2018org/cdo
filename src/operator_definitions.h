@@ -70,7 +70,7 @@
 #define  ImportobsOperators     {"import_obs"}
 #define  InfoOperators          {"info", "infop", "infon", "infoc", "xinfon", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
-#define  IntgridOperators       {"intgridbil", "interpolate", "boxavg", "thinout"}
+#define  IntgridOperators       {"intgridbil", "intgriddis", "intgridnn", "interpolate", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  IntlevelOperators      {"intlevel", "intlevelx"}
 #define  Intlevel3dOperators    {"intlevel3d", "intlevelx3d"}

@@ -296,6 +296,8 @@ void *Intgrid(void *argument)
 
   // clang-format off
   int INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
+  int INTGRIDDIS  = cdoOperatorAdd("intgriddis",  0, 0, NULL);
+  int INTGRIDNN   = cdoOperatorAdd("intgridnn",   0, 0, NULL);
   int INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
   int BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
   int THINOUT     = cdoOperatorAdd("thinout",     0, 0, NULL);
@@ -303,7 +305,8 @@ void *Intgrid(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )
+  if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE ||
+       operatorID == INTGRIDDIS || operatorID == INTGRIDNN )
     {
       operatorInputArg("grid description file or name");
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
@@ -329,14 +332,15 @@ void *Intgrid(void *argument)
   for ( int index = 0; index < ngrids; index++ )
     {
       gridID1 = vlistGrid(vlistID1, index);
+      int gridtype = gridInqType(gridID1);
 
       if ( operatorID == BOXAVG || operatorID == THINOUT )
 	{
 	  if ( index == 0 )
 	    {
-	      if ( gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN 
+	      if ( gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN 
 		   /* && gridInqType(gridID1) != GRID_CURVILINEAR */ )
-		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
+		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype) );
 
 	      if ( operatorID == BOXAVG )
 		gridID2 = genBoxavgGrid(gridID1, xinc, yinc);
@@ -346,13 +350,16 @@ void *Intgrid(void *argument)
 	  else
 	    cdoAbort("Too many different grids!");
 	}
+      else if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
+        {
+        }
+      else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
+        {
+        }
       else
 	{
-          bool ldistgen = false;
-          if ( grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2) ) ldistgen = true;
-          
-	  if ( !ldistgen && gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
-	    cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
+          bool ldistgen = (grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2));
+	  if ( !ldistgen ) cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype));
 	}
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
@@ -396,6 +403,10 @@ void *Intgrid(void *argument)
 
 	  if ( operatorID == INTGRIDBIL )
 	    intgridbil(&field1, &field2);
+	  else if ( operatorID == INTGRIDNN )
+	    intgriddis(&field1, &field2, 1);
+	  else if ( operatorID == INTGRIDDIS )
+	    intgriddis(&field1, &field2, 4);
 	  else if ( operatorID == INTERPOLATE )
 	    interpolate(&field1, &field2);
 	  else if ( operatorID == BOXAVG )
