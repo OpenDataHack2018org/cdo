@@ -399,6 +399,7 @@ void *Intgrid(void *argument)
 	  field1.ptr     = array1;
 	  field2.grid    = gridID2;
 	  field2.ptr     = array2;
+	  field2.missval = missval;
 	  field2.nmiss   = 0;
 
 	  if ( operatorID == INTGRIDBIL )

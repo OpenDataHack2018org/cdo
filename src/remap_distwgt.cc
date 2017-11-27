@@ -362,9 +362,8 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
   NEW_2D(size_t, nbr_add, ompNumThreads, num_neighbors);  // source address at nearest neighbors
   NEW_2D(double, nbr_dist, ompNumThreads, num_neighbors); // angular distance four nearest neighbors
 
-#if defined(_OPENMP)
-  double start = 0;
-  if ( cdoVerbose ) start = omp_get_wtime();
+#ifdef  _OPENMP
+  double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
   struct gridsearch *gs = NULL;
@@ -377,7 +376,7 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
 
   if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);
   if ( cdoVerbose ) start = omp_get_wtime();
 #endif
@@ -386,14 +385,14 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
 
   double findex = 0;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   shared(nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include "pragma_omp_atomic_update.h"
 #endif
       findex++;
@@ -438,16 +437,16 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
 
   if ( weightlinks ) Free(weightlinks);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime()-start);
 #endif
 } // remap_distwgt_weights
 
 static
-void distwgt_remap(double* restrict tgt_point, const double* restrict src_array, size_t nadds, const double wgts[4], const size_t src_add[4])
+void distwgt_remap(double *restrict tgt_point, const double* restrict src_array, size_t nadds, const double wgts[4], const size_t src_add[4])
 {
-  *tgt_point = 0.;
-  for ( size_t n = 0; n < nadds; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
+  if ( nadds ) *tgt_point = src_array[src_add[0]]*wgts[0];
+  for ( size_t n = 1; n < nadds; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
 }
 
 
@@ -468,9 +467,8 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
   NEW_2D(size_t, nbr_add, ompNumThreads, num_neighbors);  // source address at nearest neighbors
   NEW_2D(double, nbr_dist, ompNumThreads, num_neighbors); // angular distance four nearest neighbors
 
-#if defined(_OPENMP)
-  double start = 0;
-  if ( cdoVerbose ) start = omp_get_wtime();
+#ifdef  _OPENMP
+  double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
   struct gridsearch *gs = NULL;
@@ -483,7 +481,7 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
 
   if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);
   if ( cdoVerbose ) start = omp_get_wtime();
 #endif
@@ -492,14 +490,14 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
 
   double findex = 0;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(gs, num_neighbors, src_remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   shared(src_array, tgt_array, missval, nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include "pragma_omp_atomic_update.h"
 #endif
       findex++;
@@ -539,19 +537,22 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
 
   if ( gs ) gridsearch_delete(gs);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime()-start);
 #endif
 } // remap_distwgt
 
 
+#include <cdi.h>
+
 void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
 {
-  /*
-  int gridID1 = field1.grid;
-  int gridID2 = field2.grid;
-  double *src_array = field1.ptr;
-  double *tgt_array = field2.ptr;
+  int gridID1 = field1->grid;
+  int gridID2 = field2->grid;
+  double src_missval = field1->missval;
+  double tgt_missval = field2->missval;
+  double *src_array = field1->ptr;
+  double *tgt_array = field2->ptr;
   // int src_remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
@@ -570,55 +571,74 @@ void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
   size_t src_grid_size = gridInqSize(gridID1);
   size_t tgt_grid_size = gridInqSize(gridID2);
 
+  int *src_mask = (int*) Malloc(src_grid_size*sizeof(int));
+  for ( size_t i = 0; i < src_grid_size; ++i ) src_mask[i] = 1;
+  int *tgt_mask = (int*) Malloc(tgt_grid_size*sizeof(int));
+  for ( size_t i = 0; i < tgt_grid_size; ++i ) tgt_mask[i] = 1;
+
+  double *src_cell_center_lon = (double*) Malloc(src_grid_size*sizeof(double));
+  double *src_cell_center_lat = (double*) Malloc(src_grid_size*sizeof(double));
+  gridInqXvals(gridID1, src_cell_center_lon);
+  gridInqYvals(gridID1, src_cell_center_lat);
+
+  double *tgt_cell_center_lon = (double*) Malloc(tgt_grid_size*sizeof(double));
+  double *tgt_cell_center_lat = (double*) Malloc(tgt_grid_size*sizeof(double));
+  gridInqXvals(gridID2, tgt_cell_center_lon);
+  gridInqYvals(gridID2, tgt_cell_center_lat);
+
   NEW_2D(bool, nbr_mask, ompNumThreads, num_neighbors);   // mask at nearest neighbors
   NEW_2D(size_t, nbr_add, ompNumThreads, num_neighbors);  // source address at nearest neighbors
   NEW_2D(double, nbr_dist, ompNumThreads, num_neighbors); // angular distance four nearest neighbors
 
-#if defined(_OPENMP)
-  double start = 0;
-  if ( cdoVerbose ) start = omp_get_wtime();
+#ifdef  _OPENMP
+  double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
   struct gridsearch *gs = NULL;
   // if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
   //  gs = gridsearch_create_reg2d(src_grid->is_cyclic, src_grid->dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   if ( num_neighbors == 1 )
-    gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    gs = gridsearch_create_nn(src_grid_size, src_cell_center_lon, src_cell_center_lat);
   else
-    gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    gs = gridsearch_create(src_grid_size, src_cell_center_lon, src_cell_center_lat);
 
   // if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);
   if ( cdoVerbose ) start = omp_get_wtime();
 #endif
 
   // Loop over destination grid
 
+  size_t nmiss = 0;
   double findex = 0;
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(gs, num_neighbors, src_grid, tgt_grid, tgt_grid_size, findex) \
+#ifdef  _OPENMP
+  /*
+#pragma omp parallel for default(none)                                  \
+  shared(gs, num_neighbors, src_grid, tgt_grid, tgt_grid_size, findex)  \
   shared(src_array, tgt_array, missval, nbr_mask, nbr_add, nbr_dist)
+  */
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
+#ifdef  _OPENMP
+      //#include "pragma_omp_atomic_update.h"
 #endif
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
       
       int ompthID = cdo_omp_get_thread_num();
 
-      tgt_array[tgt_cell_add] = missval;
+      tgt_array[tgt_cell_add] = tgt_missval;
 
-      if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
+      if ( ! tgt_mask[tgt_cell_add] ) continue;
 
       double plon = 0, plat = 0;
-      remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
+      // remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
+      plat = tgt_cell_center_lat[tgt_cell_add];
+      plon = tgt_cell_center_lon[tgt_cell_add];
 
       // Find nearest grid points on source grid and distances to each point
       // if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -627,7 +647,7 @@ void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
         grid_search_nbr(gs, num_neighbors, nbr_add[ompthID], nbr_dist[ompthID], plon, plat);
       
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      double dist_tot = nbr_compute_weights(num_neighbors, src_grid->mask, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
+      double dist_tot = nbr_compute_weights(num_neighbors, src_mask, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
 
       // Normalize weights and store the link
       size_t nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
@@ -635,9 +655,12 @@ void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
       if ( nadds > 1 ) sort_add_and_wgts(nadds, nbr_add[ompthID], nbr_dist[ompthID]);
 
       if ( nadds ) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbr_dist[ompthID], nbr_add[ompthID]);
+      else nmiss++;
     }
 
   progressStatus(0, 1, 1);
+  
+  field2->nmiss = nmiss;
 
   DELETE_2D(nbr_mask);
   DELETE_2D(nbr_add);
@@ -645,8 +668,14 @@ void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
 
   if ( gs ) gridsearch_delete(gs);
 
-#if defined(_OPENMP)
+  Free(src_mask);
+  Free(tgt_mask);
+  Free(src_cell_center_lon);
+  Free(src_cell_center_lat);
+  Free(tgt_cell_center_lon);
+  Free(tgt_cell_center_lat);
+
+#ifdef  _OPENMP
   if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime()-start);
 #endif
-  */
 } // intgriddis
