@@ -572,7 +572,7 @@ void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
   size_t tgt_grid_size = gridInqSize(gridID2);
 
   int *src_mask = (int*) Malloc(src_grid_size*sizeof(int));
-  for ( size_t i = 0; i < src_grid_size; ++i ) src_mask[i] = 1;
+  for ( size_t i = 0; i < src_grid_size; ++i ) src_mask[i] = !DBL_IS_EQUAL(src_array[i], src_missval);
   int *tgt_mask = (int*) Malloc(tgt_grid_size*sizeof(int));
   for ( size_t i = 0; i < tgt_grid_size; ++i ) tgt_mask[i] = 1;
 
