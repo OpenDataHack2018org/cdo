@@ -586,6 +586,19 @@ void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
   gridInqXvals(gridID2, tgt_cell_center_lon);
   gridInqYvals(gridID2, tgt_cell_center_lat);
 
+  char xunits[CDI_MAX_NAME]; xunits[0] = 0;
+  char yunits[CDI_MAX_NAME]; yunits[0] = 0;
+  cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
+  cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
+  grid_to_radian(xunits, src_grid_size, src_cell_center_lon, "src cell center lon");
+  grid_to_radian(yunits, src_grid_size, src_cell_center_lat, "src cell center lat");
+  xunits[0] = 0; yunits[0] = 0;
+  cdiGridInqKeyStr(gridID2, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
+  cdiGridInqKeyStr(gridID2, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
+  grid_to_radian(xunits, tgt_grid_size, tgt_cell_center_lon, "tgt cell center lon");
+  grid_to_radian(yunits, tgt_grid_size, tgt_cell_center_lat, "tgt cell center lat");
+
+
   NEW_2D(bool, nbr_mask, ompNumThreads, num_neighbors);   // mask at nearest neighbors
   NEW_2D(size_t, nbr_add, ompNumThreads, num_neighbors);  // source address at nearest neighbors
   NEW_2D(double, nbr_dist, ompNumThreads, num_neighbors); // angular distance four nearest neighbors
@@ -603,6 +616,7 @@ void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
     gs = gridsearch_create(src_grid_size, src_cell_center_lon, src_cell_center_lat);
 
   // if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
+  // gridsearch_extrapolate(gs);
 
 #ifdef  _OPENMP
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);
