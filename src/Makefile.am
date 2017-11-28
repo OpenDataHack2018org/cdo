@@ -118,6 +118,7 @@ libcdo_la_SOURCES =            \
                normal.cc        \
                nth_element.cc   \
                nth_element.h   \
+               operator_definitions.h \
                operator_help.h \
                par_io.cc        \
                par_io.h        \
