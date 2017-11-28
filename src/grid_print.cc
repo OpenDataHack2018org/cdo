@@ -231,6 +231,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
     case GRID_PROJECTION:
     case GRID_CURVILINEAR:
     case GRID_UNSTRUCTURED:
+    case GRID_TRAJECTORY:
     case GRID_CHARXY:
       {
         if ( type == GRID_GAUSSIAN || type == GRID_GAUSSIAN_REDUCED ) fprintf(fp, "np        = %d\n", gridInqNP(gridID));

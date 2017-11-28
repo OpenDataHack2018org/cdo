@@ -90,11 +90,9 @@ namespace nanoflann
 		inline KNNResultSet(CountType capacity_) : indices(0), dists(0), radius((std::numeric_limits<DistanceType>::max)()), capacity(capacity_), count(0)
 		{
 		}
-
-                inline void setRadius(DistanceType radius_)
-                  {
-                    radius = radius_;
-                  }
+                inline KNNResultSet(DistanceType radius_, CountType capacity_) : indices(0), dists(0), radius(radius_), capacity(capacity_), count(0)
+		{
+		}
 
                 inline void init(IndexType* indices_, DistanceType* dists_)
 		{
@@ -1287,8 +1285,7 @@ namespace nanoflann
 		}
 		size_t knnRangeSearch(const ElementType *query_point, const DistanceType radius, const size_t num_closest, IndexType *out_indices, DistanceType *out_distances_sq, const int /* nChecks_IGNORED */ = 10) const
 		{
-			nanoflann::KNNResultSet<DistanceType,IndexType> resultSet(num_closest);
-                        resultSet.setRadius(radius);
+                        nanoflann::KNNResultSet<DistanceType,IndexType> resultSet(radius, num_closest);
 			resultSet.init(out_indices, out_distances_sq);
 			this->findNeighbors(resultSet, query_point, nanoflann::SearchParams());
 			return resultSet.size();

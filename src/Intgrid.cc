@@ -288,15 +288,16 @@ void *Intgrid(void *argument)
   int nrecs;
   int varID, levelID;
   int gridID1 = -1, gridID2 = -1;
-  size_t nmiss;
   int xinc = 0, yinc = 0;
+  size_t nmiss;
   double missval;
 
   cdoInitialize(argument);
 
   // clang-format off
   int INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
-  int INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
+  int INTGRIDDIS  = cdoOperatorAdd("intgriddis",  0, 0, NULL);
+  int INTGRIDNN   = cdoOperatorAdd("intgridnn",   0, 0, NULL);
   int INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
   int BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
   int THINOUT     = cdoOperatorAdd("thinout",     0, 0, NULL);
@@ -304,22 +305,11 @@ void *Intgrid(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )
+  if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE ||
+       operatorID == INTGRIDDIS || operatorID == INTGRIDNN )
     {
       operatorInputArg("grid description file or name");
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
-    }
-  else if ( operatorID == INTPOINT )
-    {
-      operatorInputArg("longitude and latitude");
-      operatorCheckArgc(2);
-      double slon = parameter2double(operatorArgv()[0]);
-      double slat = parameter2double(operatorArgv()[1]);
-      gridID2 = gridCreate(GRID_LONLAT, 1);
-      gridDefXsize(gridID2, 1);
-      gridDefYsize(gridID2, 1);
-      gridDefXvals(gridID2, &slon);
-      gridDefYvals(gridID2, &slat);
     }
   else if ( operatorID == THINOUT || operatorID == BOXAVG )
     {
@@ -342,14 +332,15 @@ void *Intgrid(void *argument)
   for ( int index = 0; index < ngrids; index++ )
     {
       gridID1 = vlistGrid(vlistID1, index);
+      int gridtype = gridInqType(gridID1);
 
       if ( operatorID == BOXAVG || operatorID == THINOUT )
 	{
 	  if ( index == 0 )
 	    {
-	      if ( gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN 
+	      if ( gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN 
 		   /* && gridInqType(gridID1) != GRID_CURVILINEAR */ )
-		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
+		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype) );
 
 	      if ( operatorID == BOXAVG )
 		gridID2 = genBoxavgGrid(gridID1, xinc, yinc);
@@ -359,14 +350,17 @@ void *Intgrid(void *argument)
 	  else
 	    cdoAbort("Too many different grids!");
 	}
-      else
-	{
-          bool ldistgen = false;
-          if ( grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2) ) ldistgen = true;
-          
-	  if ( !ldistgen && gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
+      else if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )
+        {
+          bool ldistgen = (grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2));
+	  if ( !ldistgen && gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN )
 	    cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
-	}
+        }
+      else if ( operatorID == INTGRIDNN || operatorID == INTGRIDDIS )
+        {
+	  if ( gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED )
+	    cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
+        }
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
@@ -400,21 +394,22 @@ void *Intgrid(void *argument)
 	  missval = vlistInqVarMissval(vlistID1, varID);
 
 	  field1.grid    = gridID1;
+	  field1.ptr     = array1;
 	  field1.nmiss   = nmiss;
 	  field1.missval = missval;
-	  field1.ptr     = array1;
 	  field2.grid    = gridID2;
 	  field2.ptr     = array2;
+	  field2.missval = missval;
 	  field2.nmiss   = 0;
 
-	  if ( operatorID == INTGRIDBIL || operatorID == INTPOINT )
-	    intgridbil(&field1, &field2);
-	  else if ( operatorID == INTERPOLATE )
-	    interpolate(&field1, &field2);
-	  else if ( operatorID == BOXAVG )
-	    boxavg(&field1, &field2, xinc, yinc);
-	  else if ( operatorID == THINOUT )
-	    thinout(&field1, &field2, xinc, yinc);
+// clang-format off
+	  if      ( operatorID == INTGRIDBIL )  intgridbil(&field1, &field2);
+	  else if ( operatorID == INTGRIDNN )   intgriddis(&field1, &field2, 1);
+	  else if ( operatorID == INTGRIDDIS )  intgriddis(&field1, &field2, 4);
+	  else if ( operatorID == INTERPOLATE ) interpolate(&field1, &field2);
+	  else if ( operatorID == BOXAVG )      boxavg(&field1, &field2, xinc, yinc);
+	  else if ( operatorID == THINOUT )     thinout(&field1, &field2, xinc, yinc);
+// clang-format on
 
 	  nmiss = field2.nmiss;
 

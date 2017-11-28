@@ -54,7 +54,8 @@ void *Derivepar(void *argument)
   double *full_press = NULL;
   double minval, maxval;
   int instNum, tableNum;
-  gribcode_t gribcodes = {};
+  gribcode_t gribcodes;
+  memset(&gribcodes, 0, sizeof(gribcode_t));
 
   cdoInitialize(argument);
 

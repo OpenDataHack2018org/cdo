@@ -36,7 +36,6 @@
 void *Pressure(void *argument)
 {
   int mode;
-  gribcode_t gribcodes = {};
   int nrecs;
   int i, k, offset;
   int varID, levelID;
@@ -49,6 +48,8 @@ void *Pressure(void *argument)
   char varname[CDI_MAX_NAME];
   double minval, maxval;
   double *pout = NULL;
+  gribcode_t gribcodes;
+  memset(&gribcodes, 0, sizeof(gribcode_t));
 
   cdoInitialize(argument);
 

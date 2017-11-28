@@ -621,8 +621,9 @@ libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
 	institution.cc interpol.cc interpol.h job.cc juldate.cc \
 	grid_search.cc grid_search.h listarray.cc listarray.h list.cc \
 	list.h listbuf.cc listbuf.h merge_sort2.cc merge_sort2.h \
-	modules.cc modules.h namelist.cc namelist.h namelist_parser.cc \
-	nanoflann.hpp normal.cc nth_element.cc nth_element.h \
+	modules.cc modules.h module_definitions.h namelist.cc \
+	namelist.h namelist_parser.cc nanoflann.hpp normal.cc \
+	nth_element.cc nth_element.h operator_definitions.h \
 	operator_help.h par_io.cc par_io.h parse_literal.cc \
 	percentiles_hist.cc percentiles_hist.h percentiles.cc \
 	percentiles.h pipe.cc pipe.h pmlist.cc pmlist.h sellist.cc \

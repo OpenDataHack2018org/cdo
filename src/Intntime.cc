@@ -26,7 +26,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "interpol.h"
 
 
 void *Intntime(void *argument)

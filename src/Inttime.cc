@@ -26,7 +26,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "interpol.h"
 
 
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit);

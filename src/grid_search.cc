@@ -44,6 +44,7 @@ struct PointCloud
 {
   struct Point { T  x,y,z; };
   std::vector<Point>  pts;
+  T min[3], max[3];
 
   // Must return the number of data points
   inline size_t kdtree_get_point_count() const { return pts.size(); }
@@ -62,7 +63,16 @@ struct PointCloud
   //   Return true if the BBOX was already computed by the class and returned in "bb" so it can be avoided to redo it again.
   //   Look at bb.size() to find out the expected dimensionality (e.g. 2 or 3 for point clouds)
   template <class BBOX>
-  bool kdtree_get_bbox(BBOX& /* bb */) const { return false; }
+  bool kdtree_get_bbox(BBOX& bb) const
+  {
+    for ( unsigned j = 0; j < 3; ++j )
+      {
+        bb[j].low  = min[j];
+        bb[j].high = max[j];
+      }
+    return true;
+  }
+  // bool kdtree_get_bbox(BBOX& /* bb */) const { return false; }
 };
 
 typedef nanoflann::KDTreeSingleIndexAdaptor<
@@ -188,14 +198,6 @@ struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const
   return gs;
 }
 
-#ifdef  TEST_BBOX
-static inline void XYZtoLL (kdata_t p_in[], double * lon, double * lat) {
-
-   *lon = atan2(p_in[1] , p_in[0]);
-   *lat = M_PI_2 - acos(p_in[2]);
-}
-#endif
-
 static
 void *gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
 {
@@ -221,26 +223,12 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
       pointlist[i].index = i;
     }
 
-#ifdef  TEST_BBOX
   for ( unsigned j = 0; j < 3; ++j )
     {
       gs->min[j] = min[j];
       gs->max[j] = max[j];
     }
-  double lon1, lat1, lon2, lat2;
-  float point1[3], point2[3];
-  LLtoXYZ_kd(-29.8*DEG2RAD, 30.2*DEG2RAD, point1);
-  LLtoXYZ_kd(59.8*DEG2RAD, 79.8*DEG2RAD, point2);
-  printf("1: min %g %g %g  max %g %g %g\n", point1[0], point1[1], point1[2], point2[0], point2[1], point2[2]);
-  XYZtoLL(point1, &lon1, &lat1);
-  XYZtoLL(point2, &lon2, &lat2);
-  printf("lon1=%g, lat1=%g, lon2=%g, lat2=%g\n", lon1*RAD2DEG, lat1*RAD2DEG, lon2*RAD2DEG, lat2*RAD2DEG);
-  printf("2: min %g %g %g  max %g %g %g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
-  XYZtoLL(min, &lon1, &lat1);
-  XYZtoLL(max, &lon2, &lat2);
-  printf("lon1=%g, lat1=%g, lon2=%g, lat2=%g\n", lon1*RAD2DEG, lat1*RAD2DEG, lon2*RAD2DEG, lat2*RAD2DEG);
-#endif
-  
+
   kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
   if ( pointlist ) Free(pointlist);
   if ( kdt == NULL ) cdoAbort("kd_buildTree failed!");
@@ -275,6 +263,18 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
           min[j] = point[j] < min[j] ? point[j] : min[j];
           max[j] = point[j] > max[j] ? point[j] : max[j];
         }
+    }
+
+  for ( unsigned j = 0; j < 3; ++j )
+    {
+      gs->min[j] = min[j];
+      gs->max[j] = max[j];
+    }
+
+  for ( unsigned j = 0; j < 3; ++j )
+    {
+      pointcloud->min[j] = min[j];
+      pointcloud->max[j] = max[j];
     }
 
   // construct a kd-tree index:
@@ -654,10 +654,9 @@ size_t gs_nearest_kdtree(void *search_container, double lon, double lat, double 
   kdata_t query_pt[3];
   LLtoXYZ_kd(lon, lat, query_pt);
 
-#ifdef  TEST_BBOX
-  for ( unsigned j = 0; j < 3; ++j )
-    if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] ) return index;
-#endif
+  if ( !gs->extrapolate )
+    for ( unsigned j = 0; j < 3; ++j )
+      if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] ) return index;
 
   kdNode *node = kd_nearest(kdt->node, query_pt, &range, 3);
 
@@ -672,10 +671,10 @@ size_t gs_nearest_kdtree(void *search_container, double lon, double lat, double 
 }
 
 static
-size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, double *prange)
+size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, double *prange, struct gridsearch *gs)
 {
-  nfTree_t *nft = (nfTree_t *) search_container;
   size_t index = GS_NOT_FOUND;
+  nfTree_t *nft = (nfTree_t *) search_container;
   if ( nft == NULL ) return index;
   
   float range0 = gs_set_range(prange);
@@ -684,10 +683,14 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
   float query_pt[3];
   LLtoXYZ_f(lon, lat, query_pt);
 
+  if ( !gs->extrapolate )
+    for ( unsigned j = 0; j < 3; ++j )
+      if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] ) return index;
+
   const size_t num_results = 1;
   size_t ret_index;
   float out_dist_sqr;
-  nanoflann::KNNResultSet<float> resultSet(num_results);
+  nanoflann::KNNResultSet<float> resultSet(range, num_results);
   resultSet.init(&ret_index, &out_dist_sqr);
   nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
   //printf("%zu %g\n", ret_index, out_dist_sqr);
@@ -817,7 +820,7 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
       void *sc = gs->search_container;
       // clang-format off
       if      ( gs->method_nn == GS_KDTREE )    index = gs_nearest_kdtree(sc, lon, lat, prange, gs);
-      else if ( gs->method_nn == GS_NANOFLANN ) index = gs_nearest_nanoflann(sc, lon, lat, prange);
+      else if ( gs->method_nn == GS_NANOFLANN ) index = gs_nearest_nanoflann(sc, lon, lat, prange, gs);
       else if ( gs->method_nn == GS_KDSPH )     index = gs_nearest_kdsph(sc, lon, lat, prange);
       else if ( gs->method_nn == GS_NEARPT3 )   index = gs_nearest_nearpt3(sc, lon, lat, prange);
       else if ( gs->method_nn == GS_FULL )      index = gs_nearest_full(sc, lon, lat, prange);
