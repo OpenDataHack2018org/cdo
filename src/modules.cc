@@ -515,7 +515,7 @@ std::string get_operator_description(std::string p_current_op_name, std::vector<
             line = help.at(++operator_section);
         }
         //if operator line found save description for later use
-        if (!line.empty() && operator_section < help.size()) {
+        if (!line.empty() && line.find(p_current_op_name + " ") != std::string::npos) {
             auto op_name_start = line.find_first_not_of(" \t");
 
             description = line.substr(
