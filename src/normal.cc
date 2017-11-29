@@ -4,14 +4,11 @@
 
 void nospec(int vlistID)
 {
-  int gridID, gridtype;
-  int varID, nvars;
-
-  nvars = vlistNvars(vlistID);
-  for ( varID = 0; varID < nvars; varID++ )
+  int nvars = vlistNvars(vlistID);
+  for ( int varID = 0; varID < nvars; varID++ )
     {
-      gridID = vlistInqVarGrid(vlistID, varID);
-      gridtype = gridInqType(gridID);
+      int gridID = vlistInqVarGrid(vlistID, varID);
+      int gridtype = gridInqType(gridID);
       if ( gridtype == GRID_SPECTRAL )
 	cdoAbort("Operator not defined for spectral fields");
     }

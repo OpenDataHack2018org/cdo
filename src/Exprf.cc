@@ -179,8 +179,8 @@ paramType *params_new(int vlistID)
       int zaxisID    = vlistInqVarZaxis(vlistID, varID);
       int datatype   = vlistInqVarDatatype(vlistID, varID);
       int steptype   = vlistInqVarTimetype(vlistID, varID);
-      int ngp        = gridInqSize(gridID);
-      int nlev       = zaxisInqSize(zaxisID);
+      size_t ngp     = gridInqSize(gridID);
+      size_t nlev    = zaxisInqSize(zaxisID);
       double missval = vlistInqVarMissval(vlistID, varID);
 
       vlistInqVarName(vlistID, varID, name);
@@ -209,7 +209,7 @@ paramType *params_new(int vlistID)
 }
 
 static
-void params_add_coord(parse_param_t *parse_arg, int coord, int cdiID, int size, const char *units, const char *longname)
+void params_add_coord(parse_param_t *parse_arg, int coord, int cdiID, size_t size, const char *units, const char *longname)
 {
   int ncoords = parse_arg->ncoords;
   if ( ncoords >= parse_arg->maxcoords )
@@ -254,7 +254,7 @@ void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
   for ( int index = 0; index < ngrids; ++index )
     {
       int gridID = vlistGrid(vlistID, index);
-      int size   = gridInqSize(gridID);
+      size_t size = gridInqSize(gridID);
       gridInqXunits(gridID, units);
       params_add_coord(parse_arg, 'x', gridID, size, units, "longitude");
       gridInqYunits(gridID, units);

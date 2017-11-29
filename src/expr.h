@@ -108,7 +108,7 @@ typedef struct {
   bool       needed;
   int        coord;
   int        cdiID;
-  int        size;
+  size_t     size;
   char      *units;
   char      *longname;
   double    *data;
