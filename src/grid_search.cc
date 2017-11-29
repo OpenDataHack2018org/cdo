@@ -132,7 +132,6 @@ void gridsearch_set_method(const char *methodstr)
 {
   if      ( strcmp(methodstr, "kdtree")    == 0 ) gridsearch_method_nn = GS_KDTREE;
   else if ( strcmp(methodstr, "nanoflann") == 0 ) gridsearch_method_nn = GS_NANOFLANN;
-  else if ( strcmp(methodstr, "kdsph")     == 0 ) gridsearch_method_nn = GS_KDSPH;
   else if ( strcmp(methodstr, "nearpt3")   == 0 ) gridsearch_method_nn = GS_NEARPT3;
   else if ( strcmp(methodstr, "full")      == 0 ) gridsearch_method_nn = GS_FULL;
   else
@@ -282,39 +281,6 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
   nft->buildIndex();
 
   return (void*)nft;
-}
-
-static
-void *gs_create_kdsph(size_t n, const double *restrict lons, const double *restrict lats)
-{
-  struct kd_point *pointlist = (struct kd_point *) Malloc(n*sizeof(struct kd_point)); // kd_point contains 3d point
-  // see  example_cartesian.c
-  if ( cdoVerbose ) printf("kdtree lib spherical init: n=%zu  nthreads=%d\n", n, ompNumThreads);
-  kdata_t min[2], max[2];
-  min[0] = min[1] =  1e9;
-  max[0] = max[1] = -1e9;
-  kdata_t *restrict point;
-#if defined(HAVE_OPENMP4)
-  //#pragma omp simd
-#endif
-  for ( size_t i = 0; i < n; i++ ) 
-    {
-      point = pointlist[i].point;
-      point[0] = lons[i];
-      point[1] = lats[i];
-      point[2] = 0; // dummy
-      for ( unsigned j = 0; j < 2; ++j )
-        {
-          min[j] = point[j] < min[j] ? point[j] : min[j];
-          max[j] = point[j] > max[j] ? point[j] : max[j];
-        }
-      pointlist[i].index = i;
-    }
-
-  kdTree_t *kdt = kd_sph_buildTree(pointlist, n, min, max, ompNumThreads);
-  if ( pointlist ) Free(pointlist);
-
-  return (void*)kdt;
 }
 
 static
@@ -590,7 +556,6 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
 
   if      ( gs->method_nn == GS_KDTREE    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
   else if ( gs->method_nn == GS_NANOFLANN ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
-  else if ( gs->method_nn == GS_KDSPH     ) gs->search_container = gs_create_kdsph(n, lons, lats);
   else if ( gs->method_nn == GS_NEARPT3   ) gs->search_container = gs_create_nearpt3(n, lons, lats);
   else if ( gs->method_nn == GS_FULL      ) gs->search_container = gs_create_full(n, lons, lats);
 
@@ -615,9 +580,8 @@ void gridsearch_delete(struct gridsearch *gs)
       if ( gs->sinlat ) Free(gs->sinlat);
       if ( gs->sinlon ) Free(gs->sinlon);
 
-      if      ( gs->method_nn == GS_KDTREE    ) gs_destroy_kdtree(gs->search_container );
+      if      ( gs->method_nn == GS_KDTREE    ) gs_destroy_kdtree(gs->search_container);
       else if ( gs->method_nn == GS_NANOFLANN ) ;
-      else if ( gs->method_nn == GS_KDSPH     ) gs_destroy_kdtree(gs->search_container);
       else if ( gs->method_nn == GS_NEARPT3   ) gs_destroy_nearpt3(gs->search_container);
       else if ( gs->method_nn == GS_FULL      ) gs_destroy_full(gs->search_container);
 
@@ -702,31 +666,6 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
   //if ( prange ) *prange = frange;
 
   //if ( node ) index = node->index;
-
-  return index;
-}
-
-static
-size_t gs_nearest_kdsph(void *search_container, double lon, double lat, double *prange)
-{
-  size_t index = GS_NOT_FOUND;
-  kdTree_t *kdt = (kdTree_t *) search_container;
-  if ( kdt == NULL ) return index;
-  
-  float range0 = gs_set_range(prange);
-  kdata_t range = KDATA_SCALE(range0);
-
-  kdata_t query_pt[2];
-  query_pt[0] = lon;
-  query_pt[1] = lat;
-
-  kdNode *node = kd_nearest(kdt->node, query_pt, &range, 3);
-
-  float frange = KDATA_INVSCALE(range);
-  if ( !(frange < range0) ) node = NULL;
-  if ( prange ) *prange = frange;
-
-  if ( node ) index = node->index;
 
   return index;
 }
@@ -821,7 +760,6 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
       // clang-format off
       if      ( gs->method_nn == GS_KDTREE )    index = gs_nearest_kdtree(sc, lon, lat, prange, gs);
       else if ( gs->method_nn == GS_NANOFLANN ) index = gs_nearest_nanoflann(sc, lon, lat, prange, gs);
-      else if ( gs->method_nn == GS_KDSPH )     index = gs_nearest_kdsph(sc, lon, lat, prange);
       else if ( gs->method_nn == GS_NEARPT3 )   index = gs_nearest_nearpt3(sc, lon, lat, prange);
       else if ( gs->method_nn == GS_FULL )      index = gs_nearest_full(sc, lon, lat, prange);
       else cdoAbort("%s::method_nn undefined!", __func__);
