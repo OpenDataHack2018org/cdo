@@ -21,6 +21,9 @@
 #define  PI2      (2.0*PI)
 
 
+#define  NFDATATYPE  double
+
+
 static int gridsearch_method_nn = GS_KDTREE;
 
 
@@ -76,8 +79,8 @@ struct PointCloud
 };
 
 typedef nanoflann::KDTreeSingleIndexAdaptor<
-    nanoflann::L2_Simple_Adaptor<float, PointCloud<float> > ,
-    PointCloud<float>,
+    nanoflann::L2_Simple_Adaptor<NFDATATYPE, PointCloud<NFDATATYPE> > ,
+    PointCloud<NFDATATYPE>,
     3 /* dim */
     > nfTree_t;
 
@@ -95,6 +98,16 @@ double cdo_default_search_radius(void)
   search_radius = search_radius*DEG2RAD;
 
   return search_radius;
+}
+
+template <typename T>
+static inline
+void LLtoXYZ(double lon, double lat, T *restrict xyz)
+{
+   double cos_lat = cos(lat);
+   xyz[0] = cos_lat * cos(lon);
+   xyz[1] = cos_lat * sin(lon);
+   xyz[2] = sin(lat);
 }
 
 static inline
@@ -222,6 +235,8 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
       pointlist[i].index = i;
     }
 
+  if ( cdoVerbose ) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
+
   for ( unsigned j = 0; j < 3; ++j )
     {
       gs->min[j] = min[j];
@@ -238,10 +253,10 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
 static
 void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
 {
-  PointCloud<float> *pointcloud = new PointCloud<float>();
+  PointCloud<NFDATATYPE> *pointcloud = new PointCloud<NFDATATYPE>();
   if ( cdoVerbose ) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
 
-  float min[3], max[3];
+  NFDATATYPE min[3], max[3];
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
   // Generating  Point Cloud
@@ -252,8 +267,8 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
 #endif
   for ( size_t i = 0; i < n; i++ ) 
     {
-      float point[3];
-      LLtoXYZ_f(lons[i], lats[i], point);
+      NFDATATYPE point[3];
+      LLtoXYZ<NFDATATYPE>(lons[i], lats[i], point);
       pointcloud->pts[i].x = point[0];
       pointcloud->pts[i].y = point[1];
       pointcloud->pts[i].z = point[2];
@@ -641,11 +656,11 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
   nfTree_t *nft = (nfTree_t *) search_container;
   if ( nft == NULL ) return index;
   
-  float range0 = gs_set_range(prange);
-  float range = range0;
+  NFDATATYPE range0 = gs_set_range(prange);
+  NFDATATYPE range = range0;
 
-  float query_pt[3];
-  LLtoXYZ_f(lon, lat, query_pt);
+  NFDATATYPE query_pt[3];
+  LLtoXYZ<NFDATATYPE>(lon, lat, query_pt);
 
   if ( !gs->extrapolate )
     for ( unsigned j = 0; j < 3; ++j )
@@ -653,8 +668,8 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
 
   const size_t num_results = 1;
   size_t ret_index;
-  float out_dist_sqr;
-  nanoflann::KNNResultSet<float> resultSet(range, num_results);
+  NFDATATYPE out_dist_sqr;
+  nanoflann::KNNResultSet<NFDATATYPE> resultSet(range, num_results);
   resultSet.init(&ret_index, &out_dist_sqr);
   nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
   //printf("%zu %g\n", ret_index, out_dist_sqr);
@@ -826,20 +841,20 @@ size_t gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, doub
   nfTree_t *nft = (nfTree_t*) gs->search_container;
   if ( nft == NULL ) return nadds;
   
-  float range0 = gs_set_range(prange);
-  float range = range0;
+  NFDATATYPE range0 = gs_set_range(prange);
+  NFDATATYPE range = range0;
 
-  float query_pt[3];
-  LLtoXYZ_f(lon, lat, query_pt);
+  NFDATATYPE query_pt[3];
+  LLtoXYZ<NFDATATYPE>(lon, lat, query_pt);
 
   if ( gs )
     {
-      std::vector<float> out_dist_sqr(nnn);
+      std::vector<NFDATATYPE> out_dist_sqr(nnn);
       nadds = nft->knnRangeSearch(&query_pt[0], range, nnn, &adds[0], &out_dist_sqr[0]);
 
       for ( size_t i = 0; i < nadds; ++i ) dist[i] = out_dist_sqr[i];
 
-      float frange = range;
+      NFDATATYPE frange = range;
       if ( prange ) *prange = frange;
     }
   
