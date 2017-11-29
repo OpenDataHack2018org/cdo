@@ -583,8 +583,8 @@ libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
 	remap_bicubic_scrip.cc remap_bilinear_scrip.cc stdnametable.cc \
 	stdnametable.h specspace.cc specspace.h statistic.cc \
 	statistic.h table.cc text.cc text.h timebase.h timer.cc \
-	userlog.cc uthash.h util.cc util.h varlist.h zaxis_print.cc \
-	zaxis.cc json/jsmn.h json/jsmn.c kdtreelib/kdtree.h \
+	userlog.cc util.cc util.h varlist.h zaxis_print.cc zaxis.cc \
+	json/jsmn.h json/jsmn.c kdtreelib/kdtree.h \
 	kdtreelib/kdtree_cartesian.cc kdtreelib/kdtree_common.cc \
 	kdtreelib/kdtree_spherical.cc kdtreelib/qsort.cc \
 	kdtreelib/pmergesort.cc kdtreelib/pqueue.cc kdtreelib/pqueue.h \

@@ -172,7 +172,6 @@ libcdo_la_SOURCES =            \
                timebase.h      \
                timer.cc         \
                userlog.cc       \
-               uthash.h        \
                util.cc          \
                util.h          \
 			   varlist.h		\

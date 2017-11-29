@@ -6,7 +6,6 @@
 
 #if defined(HAVE_LIBCMOR)
 #include <unistd.h>
-#include "uthash.h"
 #include "util.h"
 
 extern "C" {
