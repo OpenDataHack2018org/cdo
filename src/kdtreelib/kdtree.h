@@ -27,37 +27,13 @@
 
 //#define  MEMPOOL   1
 
-#define  KD_FLOAT  1
-#define  KD_INT    2
-#define  KD_DOUBLE 3
-#define  KD_LONG   4
+//#define  KDDATATYPE     double
+//#define  KDATA_ABS(x)   fabs(x)
 
-#define  KD_TYPE  KD_FLOAT
-//#define  KD_TYPE  KD_INT
+#define  KDDATATYPE     float
+#define  KDATA_ABS(x)   fabsf(x)
 
-#if KD_TYPE == KD_INT
-typedef int kdata_t;
-#  define KDATA_SFAC     44000.
-#  define KDATA_SCALE(x) ((int) lround(KDATA_SFAC*(x)))
-#  define KDATA_INVSCALE(x) ((x)/KDATA_SFAC)
-#  define KDATA_ABS(x)   abs(x)
-#elif KD_TYPE == KD_FLOAT
-typedef float kdata_t;
-#  define KDATA_SCALE(x) (x)
-#  define KDATA_INVSCALE(x) (x)
-#  define KDATA_ABS(x)   fabsf(x)
-#elif KD_TYPE == KD_DOUBLE
-typedef double kdata_t;
-#  define KDATA_SCALE(x) (x)
-#  define KDATA_INVSCALE(x) (x)
-#  define KDATA_ABS(x)   fabs(x)
-#elif KD_TYPE == KD_LONG
-typedef long kdata_t;
-#  define KDATA_SFAC     3000000.
-#  define KDATA_SCALE(x) (lround(KDATA_SFAC*(x)))
-#  define KDATA_INVSCALE(x) ((x)/KDATA_SFAC)
-#  define KDATA_ABS(x)   labs(x)
-#endif
+typedef KDDATATYPE kdata_t;
 
 
 #define KD_MAX_DIM 3
