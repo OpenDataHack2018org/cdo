@@ -375,7 +375,11 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
   if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
-
+  //else
+  /*
+   if ( remap_grid_type != REMAP_GRID_TYPE_REG2D )
+    gridsearch_bound_poly(gs, src_grid->dims,  src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+  */
 #ifdef  _OPENMP
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);
   if ( cdoVerbose ) start = omp_get_wtime();

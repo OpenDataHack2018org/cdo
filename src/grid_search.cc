@@ -465,6 +465,31 @@ void cal_mask(struct gridsearch *gs)
 }
 
 
+void gridsearch_bound_poly(struct gridsearch *gs, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
+{
+  printf("%s\n", __func__);
+  size_t nx = dims[0];
+  size_t ny = dims[1];
+  printf("nx %zu  ny %zu\n", nx, ny);
+  if ( n == 1 || nx*ny != n ) return;
+
+#define PMAX  40
+  size_t pmax = PMAX;
+  size_t pn = 0;
+  double px[PMAX];
+  double py[PMAX];
+
+  for ( size_t i = 0; i < nx; ++i )
+    printf("x1 %zu lon/lat %g/%g\n", i+1, lons[0*nx+i]*RAD2DEG, lats[0*nx+i]*RAD2DEG);
+  for ( size_t i = 0; i < nx; ++i )
+    printf("x2 %zu lon/lat %g/%g\n", i+1, lons[(ny-1)*nx+i]*RAD2DEG, lats[(ny-1)*nx+i]*RAD2DEG);
+  for ( size_t i = 0; i < ny; ++i )
+    printf("y1 %zu lon/lat %g/%g\n", i+1, lons[i*nx+0]*RAD2DEG, lats[i*nx+0]*RAD2DEG);
+  for ( size_t i = 0; i < ny; ++i )
+    printf("y2 %zu lon/lat %g/%g\n", i+1, lons[i*nx+(nx-1)]*RAD2DEG, lats[i*nx+(nx-1)]*RAD2DEG);
+}
+
+
 struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));

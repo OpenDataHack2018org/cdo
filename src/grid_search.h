@@ -49,5 +49,6 @@ void gridsearch_delete(struct gridsearch *gs);
 size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
 size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist);
 void gridsearch_extrapolate(struct gridsearch *gs);
+void gridsearch_bound_poly(struct gridsearch *gs, size_t dims[2],  size_t n, const double *restrict lons, const double *restrict lats);
 
 #endif
