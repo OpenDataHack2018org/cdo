@@ -18,9 +18,6 @@
 /* Define to 1 for DATA support */
 #undef ENABLE_DATA
 
-/* Define to 1 for nearpt3 support */
-#undef ENABLE_NEARPT3
-
 /* F77 Compiler */
 #undef F77_COMPILER
 

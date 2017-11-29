@@ -14,7 +14,6 @@
 #include "grid_search.h"
 #include "kdtreelib/kdtree.h"
 #include "nanoflann.hpp"
-#include "nearpt3c.h"
 
 
 #define  PI       M_PI
@@ -35,13 +34,6 @@ struct gsFull {
   FLDATATYPE **pts;
 };
 
-struct gsNear {
-  size_t n;
-  const double *plons;
-  const double *plats;
-  float **pts;
-  void *nearpt3;
-};
 
 template <typename T>
 struct PointCloud
@@ -130,7 +122,6 @@ void gridsearch_set_method(const char *methodstr)
 {
   if      ( strcmp(methodstr, "kdtree")    == 0 ) gridsearch_method_nn = GS_KDTREE;
   else if ( strcmp(methodstr, "nanoflann") == 0 ) gridsearch_method_nn = GS_NANOFLANN;
-  else if ( strcmp(methodstr, "nearpt3")   == 0 ) gridsearch_method_nn = GS_NEARPT3;
   else if ( strcmp(methodstr, "full")      == 0 ) gridsearch_method_nn = GS_FULL;
   else
     cdoAbort("gridsearch method %s not available!", methodstr);
@@ -288,61 +279,6 @@ void gs_destroy_kdtree(void *search_container)
 {
   kdTree_t *kdt = (kdTree_t *) search_container;
   if ( kdt ) kd_destroyTree(kdt);
-}
-
-static
-void gs_destroy_nearpt3(void *search_container)
-{
-  struct gsNear *near = (struct gsNear*) search_container;
-  if ( near )
-    {
-#if defined(ENABLE_NEARPT3)
-      if ( near->nearpt3 ) nearpt3_destroy(near->nearpt3);
-#endif
-      if ( near->pts )
-        {
-          Free(near->pts[0]);
-          Free(near->pts);
-        }
-
-      Free(near);
-    }
-}
-
-static
-void *gs_create_nearpt3(size_t n, const double *restrict lons, const double *restrict lats)
-{
-  struct gsNear *near = (struct gsNear *) Calloc(1, sizeof(struct gsNear));
-
-  Coord_T **p = (Coord_T **) Malloc(n*sizeof(Coord_T *));
-  p[0] = (Coord_T *) Malloc(3*n*sizeof(Coord_T));
-  for ( size_t i = 1; i < n; i++ ) p[i] = p[0] + i*3;
-
-  Coord_T point[3];
-
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
-  for ( size_t i = 0; i < n; i++ )
-    {
-      LLtoXYZ<Coord_T>(lons[i], lats[i], point);
-
-      p[i][0] = NPT3SCALE(point[0]);
-      p[i][1] = NPT3SCALE(point[1]);
-      p[i][2] = NPT3SCALE(point[2]);
-    }
-
-  near->n = n;
-  near->plons = lons;
-  near->plats = lats;
-  near->pts = p;
-#if defined(ENABLE_NEARPT3)
-  near->nearpt3 = nearpt3_preprocess(n, p);
-#else
-  cdoAbort("nearpt3 support not compiled in!");
-#endif
-  
-  return (void*)near;
 }
 
 static
@@ -556,7 +492,6 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
 
   if      ( gs->method_nn == GS_KDTREE    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
   else if ( gs->method_nn == GS_NANOFLANN ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
-  else if ( gs->method_nn == GS_NEARPT3   ) gs->search_container = gs_create_nearpt3(n, lons, lats);
   else if ( gs->method_nn == GS_FULL      ) gs->search_container = gs_create_full(n, lons, lats);
 
   gs->search_radius = cdo_default_search_radius();
@@ -582,7 +517,6 @@ void gridsearch_delete(struct gridsearch *gs)
 
       if      ( gs->method_nn == GS_KDTREE    ) gs_destroy_kdtree(gs->search_container);
       else if ( gs->method_nn == GS_NANOFLANN ) ;
-      else if ( gs->method_nn == GS_NEARPT3   ) gs_destroy_nearpt3(gs->search_container);
       else if ( gs->method_nn == GS_FULL      ) gs_destroy_full(gs->search_container);
 
       Free(gs);
@@ -671,46 +605,6 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
 }
 
 static
-size_t gs_nearest_nearpt3(void *search_container, double lon, double lat, double *prange)
-{
-  size_t index = GS_NOT_FOUND;
-  struct gsNear *near = (struct gsNear *) search_container;
-  if ( near == NULL ) return index;
-  
-#if defined(ENABLE_NEARPT3)
-  Coord_T range0 = gs_set_range(prange);
-
-  Coord_T query_pt[3];
-  LLtoXYZ<Coord_T>(lon, lat, query_pt);
-
-  Coord_T q[3];
-  q[0] = NPT3SCALE(query_pt[0]);
-  q[1] = NPT3SCALE(query_pt[1]);
-  q[2] = NPT3SCALE(query_pt[2]);
-
-  int closestpt = nearpt3_query(near->nearpt3, q);
-  if ( closestpt >= 0 )
-    {
-      Coord_T query_pt0[3];
-      LLtoXYZ<Coord_T>(near->plons[closestpt], near->plats[closestpt], query_pt0);
-      
-      Coord_T range = distance<Coord_T>(query_pt, query_pt0);
-      if ( range < range0 )
-        {
-          index = (size_t) closestpt;
-           *prange = range;
-        }
-    }
-#else
-  UNUSED(lon);
-  UNUSED(lat);
-  UNUSED(prange);
-#endif
-
-  return index;
-}
-
-static
 size_t gs_nearest_full(void *search_container, double lon, double lat, double *prange)
 {
   size_t index = GS_NOT_FOUND;
@@ -759,7 +653,6 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
       // clang-format off
       if      ( gs->method_nn == GS_KDTREE )    index = gs_nearest_kdtree(sc, lon, lat, prange, gs);
       else if ( gs->method_nn == GS_NANOFLANN ) index = gs_nearest_nanoflann(sc, lon, lat, prange, gs);
-      else if ( gs->method_nn == GS_NEARPT3 )   index = gs_nearest_nearpt3(sc, lon, lat, prange);
       else if ( gs->method_nn == GS_FULL )      index = gs_nearest_full(sc, lon, lat, prange);
       else cdoAbort("%s::method_nn undefined!", __func__);
       // clang-format on
