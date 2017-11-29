@@ -42,7 +42,7 @@ void *Copy(void *argument)
   int varID, levelID;
   size_t nmiss;
   int ntsteps, nvars;
-  double *array = NULL;
+  void *array = NULL;
   par_io_t parIO;
 
   cdoInitialize(argument);
@@ -113,7 +113,11 @@ void *Copy(void *argument)
 	  pstreamDefVlist(streamID2, vlistID2);
 
 	  size_t gridsize = vlistGridsizeMax(vlistID1);
-	  array = (double*) Malloc(gridsize*sizeof(double));
+          if ( CDO_Memtype == MEMTYPE_FLOAT )
+            array = Malloc(gridsize*sizeof(float));
+          else
+            array = Malloc(gridsize*sizeof(double));
+
 	  if ( cdoParIO )
 	    {
 	      fprintf(stderr, "Parallel reading enabled!\n");
@@ -152,7 +156,7 @@ void *Copy(void *argument)
 		    {
 		      parIO.recID = recID; parIO.nrecs = nrecs;
 		      /* fprintf(stderr, "in1 streamID %d varID %d levelID %d\n", streamID1, varID, levelID);*/
-		      parReadRecord(streamID1, &varID, &levelID, array, &nmiss, &parIO);
+		      parReadRecord(streamID1, &varID, &levelID, (double*)array, &nmiss, &parIO);
 		      /* fprintf(stderr, "in2 streamID %d varID %d levelID %d\n", streamID1, varID, levelID);*/
 		    }
 		  else
@@ -163,14 +167,20 @@ void *Copy(void *argument)
                         if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
                           continue;
 
-		      pstreamReadRecord(streamID1, array, &nmiss);
+                      if ( CDO_Memtype == MEMTYPE_FLOAT )
+                        pstreamReadRecordF(streamID1, (float*)array, &nmiss);
+                      else
+                        pstreamReadRecord(streamID1, (double*)array, &nmiss);
 		    }
 		  /*
 		  if ( cdoParIO )
 		    fprintf(stderr, "out1 %d %d %d\n", streamID2,  varID,  levelID);
 		  */
 		  pstreamDefRecord(streamID2,  varID,  levelID);
-		  pstreamWriteRecord(streamID2, array, nmiss);
+                  if ( CDO_Memtype == MEMTYPE_FLOAT )
+                    pstreamWriteRecordF(streamID2, (float*)array, nmiss);
+                  else
+                    pstreamWriteRecord(streamID2, (double*)array, nmiss);
 		  /*
 		  if ( cdoParIO )
 		    fprintf(stderr, "out2 %d %d %d\n", streamID2,  varID,  levelID);
