@@ -28,11 +28,10 @@
 #include "pstream.h"
 #include "interpol.h"
 #include "grid.h"
-
+#include <vector>
 
 int genThinoutGrid(int gridID1, size_t xinc, size_t yinc)
 {
-  int gridtype = gridInqType(gridID1);
   size_t nlon1 = gridInqXsize(gridID1);
   size_t nlat1 = gridInqYsize(gridID1);
 
@@ -46,36 +45,26 @@ int genThinoutGrid(int gridID1, size_t xinc, size_t yinc)
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 
+  int gridtype = gridInqType(gridID1);
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
     {
-      double *xvals1 = (double*) Malloc(nlon1*sizeof(double));
-      double *yvals1 = (double*) Malloc(nlat1*sizeof(double));
-      double *xvals2 = (double*) Malloc(nlon2*sizeof(double));
-      double *yvals2 = (double*) Malloc(nlat2*sizeof(double));
-      gridInqXvals(gridID1, xvals1);
-      gridInqYvals(gridID1, yvals1);
+      std::vector<double> xvals1(nlon1);
+      std::vector<double> yvals1(nlat1);
+      std::vector<double> xvals2(nlon2);
+      std::vector<double> yvals2(nlat2);
+      gridInqXvals(gridID1, &xvals1[0]);
+      gridInqYvals(gridID1, &yvals1[0]);
 
       size_t olat = 0;
       for ( size_t ilat = 0; ilat < nlat1; ilat+=yinc )
-	{
-	  yvals2[olat] = yvals1[ilat];
-	  olat++;
-	}
+        yvals2[olat++] = yvals1[ilat];
 
       size_t olon = 0;
       for ( size_t ilon = 0; ilon < nlon1; ilon+=xinc )
-	{
-	  xvals2[olon] = xvals1[ilon];
-	  olon++;
-	}
+        xvals2[olon++] = xvals1[ilon];
 
-      gridDefXvals(gridID2, xvals2);
-      gridDefYvals(gridID2, yvals2);
-
-      Free(xvals1);
-      Free(yvals1);
-      Free(xvals2);
-      Free(yvals2);
+      gridDefXvals(gridID2, &xvals2[0]);
+      gridDefYvals(gridID2, &yvals2[0]);
     }
   else
     {
@@ -86,11 +75,10 @@ int genThinoutGrid(int gridID1, size_t xinc, size_t yinc)
 }
 
 
-int genBoxavgGrid(int gridID1, int xinc, int yinc)
+int genBoxavgGrid(int gridID1, size_t xinc, size_t yinc)
 {
   size_t i, j, i1;
 
-  int gridtype = gridInqType(gridID1);
   size_t nlon1 = gridInqXsize(gridID1);
   size_t nlat1 = gridInqYsize(gridID1);
 
@@ -104,25 +92,26 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 
+  int gridtype = gridInqType(gridID1);
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
     {
-      double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
-      double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
-      double *xvals1 = (double*) Malloc(nlon1*sizeof(double));
-      double *yvals1 = (double*) Malloc(nlat1*sizeof(double));
-      double *xvals2 = (double*) Malloc(nlon2*sizeof(double));
-      double *yvals2 = (double*) Malloc(nlat2*sizeof(double));
-      gridInqXvals(gridID1, xvals1);
-      gridInqYvals(gridID1, yvals1);
+      std::vector<double> xvals1(nlon1);
+      std::vector<double> yvals1(nlat1);
+      std::vector<double> xvals2(nlon2);
+      std::vector<double> yvals2(nlat2);
+      gridInqXvals(gridID1, &xvals1[0]);
+      gridInqYvals(gridID1, &yvals1[0]);
 
+      std::vector<double> grid1_corner_lon, grid1_corner_lat;
+      std::vector<double> grid2_corner_lon, grid2_corner_lat;
       if ( gridInqYbounds(gridID1, NULL) && gridInqXbounds(gridID1, NULL) )
 	{
-	  grid1_corner_lon = (double*) Malloc(2*nlon1*sizeof(double));
-	  grid1_corner_lat = (double*) Malloc(2*nlat1*sizeof(double));
-	  grid2_corner_lon = (double*) Malloc(2*nlon2*sizeof(double));
-	  grid2_corner_lat = (double*) Malloc(2*nlat2*sizeof(double));
-	  gridInqXbounds(gridID1, grid1_corner_lon);
-	  gridInqYbounds(gridID1, grid1_corner_lat);
+	  grid1_corner_lon.reserve(2*nlon1);
+	  grid1_corner_lat.reserve(2*nlat1);
+	  grid2_corner_lon.reserve(2*nlon2);
+	  grid2_corner_lat.reserve(2*nlat2);
+	  gridInqXbounds(gridID1, &grid1_corner_lon[0]);
+	  gridInqYbounds(gridID1, &grid1_corner_lat[0]);
 	}
 
       j = 0;
@@ -131,7 +120,7 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
 	  i1 = i+(xinc-1);
 	  if ( i1 >= nlon1-1 ) i1 = nlon1-1; 
 	  xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i])/2;
-	  if ( grid2_corner_lon )
+	  if ( !grid2_corner_lon.empty() )
 	    {
 	      grid2_corner_lon[2*j] = grid1_corner_lon[2*i];
 	      grid2_corner_lon[2*j+1] = grid1_corner_lon[2*i1+1];
@@ -144,7 +133,7 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
 	  i1 = i+(yinc-1);
 	  if ( i1 >= nlat1-1 ) i1 = nlat1-1; 
 	  yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i])/2;
-	  if ( grid2_corner_lat )
+	  if ( !grid2_corner_lat.empty() )
 	    {
 	      grid2_corner_lat[2*j] = grid1_corner_lat[2*i];
 	      grid2_corner_lat[2*j+1] = grid1_corner_lat[2*i1+1];
@@ -152,22 +141,14 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
 	  j++;
 	}
 
-      gridDefXvals(gridID2, xvals2);
-      gridDefYvals(gridID2, yvals2);
+      gridDefXvals(gridID2, &xvals2[0]);
+      gridDefYvals(gridID2, &yvals2[0]);
 
-      Free(xvals1);
-      Free(yvals1);
-      Free(xvals2);
-      Free(yvals2);
-
-      if ( grid2_corner_lon && grid2_corner_lat )
+      if ( !grid2_corner_lon.empty() && !grid2_corner_lat.empty() )
 	{
 	  gridDefNvertex(gridID2, 2);
-	  gridDefXbounds(gridID2, grid2_corner_lon);
-	  gridDefYbounds(gridID2, grid2_corner_lat);
-
-	  Free(grid2_corner_lon);
-	  Free(grid2_corner_lat);
+	  gridDefXbounds(gridID2, &grid2_corner_lon[0]);
+	  gridDefYbounds(gridID2, &grid2_corner_lat[0]);
 	}
     }
   else
@@ -183,8 +164,8 @@ void boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
 {
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
-  double *array1  = field1->ptr;
-  double *array2  = field2->ptr;
+  double *array1 = field1->ptr;
+  double *array2 = field2->ptr;
   double missval = field1->missval;
 
   size_t nlon1 = gridInqXsize(gridID1);
@@ -193,13 +174,11 @@ void boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
   size_t nlon2 = gridInqXsize(gridID2);
   size_t nlat2 = gridInqYsize(gridID2);
 
-  double **xfield1 = (double **) Malloc(nlat1*sizeof(double *));
-
+  std::vector<double*> xfield1(nlat1);
   for ( size_t ilat = 0; ilat < nlat1; ilat++ )
     xfield1[ilat] = array1 + ilat*nlon1;
 
-  double **xfield2 = (double **) Malloc(nlat2 * sizeof(double *));
-
+  std::vector<double*> xfield2(nlat2);
   for ( size_t ilat = 0; ilat < nlat2; ilat++ )
     xfield2[ilat] = array2 + ilat*nlon2;
 
@@ -229,9 +208,6 @@ void boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
   field2->nmiss = nmiss;
-
-  Free(xfield2);
-  Free(xfield1);
 }
 
 static
@@ -249,13 +225,11 @@ void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
   size_t nlon2 = gridInqXsize(gridID2);
   size_t nlat2 = gridInqYsize(gridID2);
 
-  double **xfield1 = (double **) Malloc(nlat1*sizeof(double *));
-
+  std::vector<double*> xfield1(nlat1);
   for ( size_t ilat = 0; ilat < nlat1; ilat++ )
     xfield1[ilat] = array1 + ilat*nlon1;
 
-  double **xfield2 = (double **) Malloc(nlat2*sizeof(double *));
-
+  std::vector<double*> xfield2(nlat2);
   for ( size_t ilat = 0; ilat < nlat2; ilat++ )
     xfield2[ilat] = array2 + ilat*nlon2;
 
@@ -276,9 +250,6 @@ void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
   
   field2->nmiss = nmiss;
-
-  Free(xfield2);
-  Free(xfield1);
 }
 
 
