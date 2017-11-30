@@ -76,7 +76,7 @@ void yac_copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell);
  */
 void yac_free_grid_cell(struct grid_cell * cell);
 
-#ifdef DEBUG
+#ifdef YAC_DEBUG_GRIC_CELL
 /**
  * prints out info about a grid_cell object and reinitialised, used for debugging
  * interpolation_method_conserv and interpolation_method_patch

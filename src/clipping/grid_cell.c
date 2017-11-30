@@ -92,7 +92,7 @@ void yac_free_grid_cell(struct grid_cell * cell) {
    yac_init_grid_cell(cell);
 }
 
-#ifdef DEBUG
+#ifdef YAC_DEBUG_GRID_CELL
 void print_grid_cell(FILE * stream, struct grid_cell cell, char * name) {
 
   char * out = NULL;

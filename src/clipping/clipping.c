@@ -41,7 +41,7 @@
 #include "ensure_array_size.h"
 #include "utils.h"
 
-//#define VERBOSE
+//#define YAC_VERBOSE_CLIPPING
 
 static double const tol = 1.0e-12;
 
@@ -126,7 +126,7 @@ void yac_compute_overlap_areas (unsigned N,
     //partial_areas[n] = pole_area (overlap_buffer[n]);
   }
 
-#ifdef VERBOSE
+#ifdef YAC_VERBOSE_CLIPPING
   for (unsigned n = 0; n < N; n++)
     printf("overlap area : %lf\n", partial_areas[n]);
 #endif
@@ -244,7 +244,7 @@ void yac_compute_concave_overlap_areas (unsigned N,
     }
   }
 
-#ifdef VERBOSE
+#ifdef YAC_VERBOSE_CLIPPING
   for (unsigned n = 0; n < N; n++)
 	    printf("overlap area %i: %lf \n", n, partial_areas[n]);
 #endif
@@ -1071,7 +1071,7 @@ void yac_correct_weights ( unsigned nSourceCells, double * weight ) {
   unsigned iter;
 
   double weight_diff;
-#ifdef VERBOSE
+#ifdef YAC_VERBOSE_CLIPPING
   double weight_sum;
 #endif
 
@@ -1082,7 +1082,7 @@ void yac_correct_weights ( unsigned nSourceCells, double * weight ) {
     for ( n = 0; n < nSourceCells; n++ )
       weight_diff -= weight[n];
 
-#ifdef VERBOSE
+#ifdef YAC_VERBOSE_CLIPPING
     for ( n = 0; n < nSourceCells; n++ )
       weight_sum += weight[n];
 
@@ -1098,7 +1098,7 @@ void yac_correct_weights ( unsigned nSourceCells, double * weight ) {
     for ( n = 0; n < nSourceCells; n++ )
       weight[n] += weight[n] * weight_diff;
   }
-#ifdef VERBOSE
+#ifdef YAC_VERBOSE_CLIPPING
   if ( fabs(weight_diff) > tol )
     printf ("weight sum is %.15f \n", weight_sum);
 #endif

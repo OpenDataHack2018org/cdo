@@ -1481,6 +1481,8 @@ int yac_gcxlatc(struct edge edge_a, struct edge edge_b,
  *          p and q will be identically, but only the p bits will be set
  **/
 
+#pragma intel optimization_level 0
+
 int yac_gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
                     double p[3], double q[3]) {
 
