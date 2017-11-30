@@ -31,7 +31,7 @@ typedef struct
   int vwind;
 } gribcode_t;
 
-enum {ECHAM_MODE, WMO_MODE, HIRLAM_MODE};
+enum struct ModelMode {UNDEF, ECHAM, WMO, HIRLAM};
 
 void echam_gribcodes(gribcode_t *gribcodes);
 void wmo_gribcodes(gribcode_t *gribcodes);

@@ -35,7 +35,7 @@
 
 void *Pressure(void *argument)
 {
-  int mode;
+  ModelMode mode(ModelMode::UNDEF);
   int nrecs;
   int i, k, offset;
   int varID, levelID;
@@ -127,12 +127,12 @@ void *Pressure(void *argument)
 	{
 	  if ( tableNum == 2 )
 	    {
-	      mode = WMO_MODE;
+	      mode = ModelMode::WMO;
 	      wmo_gribcodes(&gribcodes);
 	    }
 	  else if ( tableNum == 128 )
 	    {
-	      mode = ECHAM_MODE;
+	      mode = ModelMode::ECHAM;
 	      echam_gribcodes(&gribcodes);
 	    }
           //  KNMI: HIRLAM model version 7.2 uses tableNum=1    (LAMH_D11*)
@@ -140,15 +140,13 @@ void *Pressure(void *argument)
           //  KNMI: HARMONIE model version 38 uses tableNum=253 (grib,grib_md) and tableNum=1 (grib_sfx) (research version)
 	  else if ( tableNum == 1 || tableNum == 253 )
 	    {
-	      mode = HIRLAM_MODE;
+	      mode = ModelMode::HIRLAM;
 	      hirlam_harmonie_gribcodes(&gribcodes);
 	    }
-	  else
-	    mode = -1;
 	}
       else
 	{
-	  mode = ECHAM_MODE;
+	  mode = ModelMode::ECHAM;
 	  echam_gribcodes(&gribcodes);
 	}
 
@@ -174,16 +172,12 @@ void *Pressure(void *argument)
 	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
 	}
 
-      if ( mode == ECHAM_MODE )
+      if ( mode == ModelMode::ECHAM )
 	{
 	  if      ( code == gribcodes.ps   && nlevel == 1 ) psID    = varID;
 	  else if ( code == gribcodes.lsp  && nlevel == 1 ) lnpsID  = varID;
 	}
-      else if ( mode == WMO_MODE )
-	{
-	  if ( code == gribcodes.ps        && nlevel == 1 ) psID    = varID;
-	}
-      else if ( mode == HIRLAM_MODE )
+      else if ( mode == ModelMode::WMO || mode == ModelMode::HIRLAM )
 	{
 	  if ( code == gribcodes.ps        && nlevel == 1 ) psID    = varID;
         }

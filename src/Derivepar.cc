@@ -35,7 +35,7 @@ double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf);
 
 void *Derivepar(void *argument)
 {
-  int mode;
+  ModelMode mode(ModelMode::UNDEF);
   int nrecs;
   int i, offset;
   int varID, levelID;
@@ -123,12 +123,12 @@ void *Derivepar(void *argument)
 	{
 	  if ( tableNum == 2 )
 	    {
-	      mode = WMO_MODE;
+	      mode = ModelMode::WMO;
 	      wmo_gribcodes(&gribcodes);
 	    }
 	  else if ( tableNum == 128 || tableNum == 0 )
 	    {
-	      mode = ECHAM_MODE;
+	      mode = ModelMode::ECHAM;
 	      echam_gribcodes(&gribcodes);
 	    }
           //  KNMI: HIRLAM model version 7.2 uses tableNum=1    (LAMH_D11*)
@@ -136,20 +136,18 @@ void *Derivepar(void *argument)
           //  KNMI: HARMONIE model version 38 uses tableNum=253 (grib,grib_md) and tableNum=1 (grib_sfx) (research version)
 	  else if ( tableNum == 1 || tableNum == 253 )
 	    {
-	      mode = HIRLAM_MODE;
+	      mode = ModelMode::HIRLAM;
 	      hirlam_harmonie_gribcodes(&gribcodes);
 	    }
-	  else
-	    mode = -1;
 	}
       else
 	{
-	  mode = ECHAM_MODE;
+	  mode = ModelMode::ECHAM;
 	  echam_gribcodes(&gribcodes);
 	}
 
       if ( cdoVerbose )
-	cdoPrint("Mode = %d  Center = %d  Param = %s", mode, instNum, paramstr);
+	cdoPrint("Mode = %d  Center = %d  Param = %s", static_cast<int>(mode), instNum, paramstr);
 
       if ( code <= 0 || code == 255 )
 	{
