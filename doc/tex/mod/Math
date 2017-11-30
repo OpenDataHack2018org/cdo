@@ -5,7 +5,7 @@
 @Section   = Arithmetic
 @Class     = Arithmetic
 @Arguments = infile outfile
-@Operators = abs int nint pow sqr sqrt exp ln log10 sin cos tan asin acos atan reci
+@Operators = abs int nint pow sqr sqrt exp ln log10 sin cos tan asin acos atan reci not
 
 @BeginDescription
 This module contains some standard mathematical functions.
@@ -282,6 +282,22 @@ o(t,x) = 1 / i(t,x)
 @EndMath
 @EndifDoc
 @C Calculates the reciprocal value of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_not
+@Title     = Logical NOT
+
+@BeginDescription
+@IfMan
+o(t,x) = 1, if x equal 0; else 0
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = 1, if x equal 0; else 0
+@EndMath
+@EndifDoc
 @EndDescription
 @EndOperator
 

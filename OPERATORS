@@ -205,6 +205,7 @@ Operator catalog:
    Math          acos            Arc cosine
    Math          atan            Arc tangent
    Math          reci            Reciprocal value
+   Math          not             Logical NOT
    Arithc        addc            Add a constant
    Arithc        subc            Subtract a constant
    Arithc        mulc            Multiply with a constant

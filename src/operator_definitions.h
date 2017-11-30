@@ -86,7 +86,7 @@
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
 #define  MathOperators          {"abs", "int", "nint", "sqr", "sqrt", "exp", "ln", "log10", "sin", \
-                                 "cos", "tan", "asin", "acos", "atan", "pow", "reci"}
+                                 "cos", "tan", "asin", "acos", "atan", "pow", "reci", "not"}
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}

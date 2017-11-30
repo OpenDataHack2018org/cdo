@@ -48,7 +48,7 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 #define   COMPLEG(x,y)  ((x) < (y) ? -1. : ((x) > (y)))
 #define   COMPAND(x,y)  (IS_NOT_EQUAL(x,0) && IS_NOT_EQUAL(y,0))
 #define    COMPOR(x,y)  (IS_NOT_EQUAL(x,0) || IS_NOT_EQUAL(y,0))
-#define   COMPNOT(x)    (!IS_NOT_EQUAL(x,0))
+#define   COMPNOT(x)    (IS_EQUAL(x,0))
 #define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
 #define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
 #define  MVCOMPLE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLE(x,y))

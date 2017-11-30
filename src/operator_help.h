@@ -1493,7 +1493,7 @@ std::vector<std::string> ExprHelp = {
     "         <=>    & less equal greater  & x <=> y   & -1, if x less y; 1, if x greater y; else 0 ",
     "         &&     & logical AND         & x && y    &  1, if x and y not equal 0; else 0",
     "         ||     & logical OR          & x || y    &  1, if x or y not equal 0; else 0",
-    "         !      & logical NOT         & !x        &  1, if x equal 0; else 1",
+    "         !      & logical NOT         & !x        &  1, if x equal 0; else 0",
     "         ?:     & ternary conditional & x ? y : z & y, if x not equal 0, else z ",
     "    ",
     "    The following functions are supported:",
@@ -1571,7 +1571,7 @@ std::vector<std::string> ExprHelp = {
 std::vector<std::string> MathHelp = {
     "NAME",
     "    abs, int, nint, pow, sqr, sqrt, exp, ln, log10, sin, cos, tan, asin, acos, ",
-    "    atan, reci - Mathematical functions",
+    "    atan, reci, not - Mathematical functions",
     "",
     "SYNOPSIS",
     "    <operator>  infile outfile",
@@ -1613,6 +1613,8 @@ std::vector<std::string> MathHelp = {
     "           o(t,x) = atan(i(t,x))",
     "    reci   Reciprocal value",
     "           o(t,x) = 1 / i(t,x)",
+    "    not    Logical NOT",
+    "           o(t,x) = 1, if x equal 0; else 0",
 };
 
 std::vector<std::string> ArithcHelp = {

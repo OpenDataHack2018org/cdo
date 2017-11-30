@@ -43,7 +43,7 @@
 
 void *Math(void *argument)
 {
-  enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW, RECI};
+  enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW, RECI, NOT};
   int nrecs;
   int varID, levelID;
   size_t nmiss, nmiss2;
@@ -68,6 +68,7 @@ void *Math(void *argument)
   cdoOperatorAdd("atan",  ATAN,  0, NULL);
   cdoOperatorAdd("pow",   POW,   0, NULL);
   cdoOperatorAdd("reci",  RECI,  0, NULL);
+  cdoOperatorAdd("not",   NOT,   0, NULL);
   // clang-format on
  
   int operatorID = cdoOperatorID();
@@ -184,6 +185,10 @@ void *Math(void *argument)
                 case RECI:
                   for ( i = 0; i < gridsize; i++ )
                     array2[i] = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array1[i], 0.) ? missval1 : 1/array1[i];
+                  break;
+                case NOT:
+                  for ( i = 0; i < gridsize; i++ )
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : IS_EQUAL(array1[i], 0);
                   break;
                 default:
                   cdoAbort("operator not implemented!");

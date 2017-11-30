@@ -1,3 +1,7 @@
+2017-11-30  Uwe Schulzweida
+
+	* New operator  not: logical NOT (1, if x equal 0; else 0)
+
 2017-11-23  Uwe Schulzweida
 
 	* Fix read error on grid description file [Bug #8099]
