@@ -1,6 +1,6 @@
 
 noinst_PROGRAMS = cdo_process_creation_test operator_1_to_1 operator_1_to_2
-bin_PROGRAMS = cdo_process_creation_test operator_1_to_1 operator_1_to_2
+# bin_PROGRAMS = cdo_process_creation_test operator_1_to_1 operator_1_to_2
 
 
 tests_CPPFLAGS = -I $(top_srcdir)/test/bandit_tests/bandit
