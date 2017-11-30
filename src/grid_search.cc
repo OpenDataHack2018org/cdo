@@ -24,7 +24,7 @@
 #define  NFDATATYPE  float
 
 
-static int gridsearch_method_nn = GS_KDTREE;
+static GridsearchMethod gridsearch_method_nn(GridsearchMethod::kdtree);
 
 
 struct gsFull {
@@ -120,9 +120,9 @@ T distance(const T *restrict a, const T *restrict b)
 
 void gridsearch_set_method(const char *methodstr)
 {
-  if      ( strcmp(methodstr, "kdtree")    == 0 ) gridsearch_method_nn = GS_KDTREE;
-  else if ( strcmp(methodstr, "nanoflann") == 0 ) gridsearch_method_nn = GS_NANOFLANN;
-  else if ( strcmp(methodstr, "full")      == 0 ) gridsearch_method_nn = GS_FULL;
+  if      ( strcmp(methodstr, "kdtree")    == 0 ) gridsearch_method_nn = GridsearchMethod::kdtree;
+  else if ( strcmp(methodstr, "nanoflann") == 0 ) gridsearch_method_nn = GridsearchMethod::nanoflann;
+  else if ( strcmp(methodstr, "full")      == 0 ) gridsearch_method_nn = GridsearchMethod::full;
   else
     cdoAbort("gridsearch method %s not available!", methodstr);
 }
@@ -498,8 +498,8 @@ struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, cons
   gs->n = n;
   if ( n == 0 ) return gs;
 
-  if      ( gs->method_nn == GS_KDTREE    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
-  else if ( gs->method_nn == GS_NANOFLANN ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
+  if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
+  else if ( gs->method_nn == GridsearchMethod::nanoflann ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
 
   gs->search_radius = cdo_default_search_radius();
 
@@ -515,9 +515,9 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
   gs->n = n;
   if ( n == 0 ) return gs;
 
-  if      ( gs->method_nn == GS_KDTREE    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
-  else if ( gs->method_nn == GS_NANOFLANN ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
-  else if ( gs->method_nn == GS_FULL      ) gs->search_container = gs_create_full(n, lons, lats);
+  if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
+  else if ( gs->method_nn == GridsearchMethod::nanoflann ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
+  else if ( gs->method_nn == GridsearchMethod::full      ) gs->search_container = gs_create_full(n, lons, lats);
 
   gs->search_radius = cdo_default_search_radius();
 
@@ -540,9 +540,9 @@ void gridsearch_delete(struct gridsearch *gs)
       if ( gs->sinlat ) Free(gs->sinlat);
       if ( gs->sinlon ) Free(gs->sinlon);
 
-      if      ( gs->method_nn == GS_KDTREE    ) gs_destroy_kdtree(gs->search_container);
-      else if ( gs->method_nn == GS_NANOFLANN ) ;
-      else if ( gs->method_nn == GS_FULL      ) gs_destroy_full(gs->search_container);
+      if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs_destroy_kdtree(gs->search_container);
+      else if ( gs->method_nn == GridsearchMethod::nanoflann ) ;
+      else if ( gs->method_nn == GridsearchMethod::full      ) gs_destroy_full(gs->search_container);
 
       Free(gs);
     }
@@ -676,9 +676,9 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
     {
       void *sc = gs->search_container;
       // clang-format off
-      if      ( gs->method_nn == GS_KDTREE )    index = gs_nearest_kdtree(sc, lon, lat, prange, gs);
-      else if ( gs->method_nn == GS_NANOFLANN ) index = gs_nearest_nanoflann(sc, lon, lat, prange, gs);
-      else if ( gs->method_nn == GS_FULL )      index = gs_nearest_full(sc, lon, lat, prange);
+      if      ( gs->method_nn == GridsearchMethod::kdtree )    index = gs_nearest_kdtree(sc, lon, lat, prange, gs);
+      else if ( gs->method_nn == GridsearchMethod::nanoflann ) index = gs_nearest_nanoflann(sc, lon, lat, prange, gs);
+      else if ( gs->method_nn == GridsearchMethod::full )      index = gs_nearest_full(sc, lon, lat, prange);
       else cdoAbort("%s::method_nn undefined!", __func__);
       // clang-format on
     }
@@ -771,8 +771,8 @@ size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double
   if ( gs )
     {
       // clang-format off
-      if      ( gs->method_nn == GS_KDTREE )    nadds = gs_qnearest_kdtree(gs, lon, lat, prange, nnn, adds, dist);
-      else if ( gs->method_nn == GS_NANOFLANN ) nadds = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn, adds, dist);
+      if      ( gs->method_nn == GridsearchMethod::kdtree )    nadds = gs_qnearest_kdtree(gs, lon, lat, prange, nnn, adds, dist);
+      else if ( gs->method_nn == GridsearchMethod::nanoflann ) nadds = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn, adds, dist);
       else cdoAbort("%s::method_nn undefined!", __func__);
       // clang-format on
     }

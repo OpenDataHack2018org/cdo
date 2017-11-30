@@ -5,14 +5,14 @@
 
 #define  GS_NOT_FOUND  SIZE_MAX
 
-enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_NANOFLANN, GS_KDTREE};
+enum struct GridsearchMethod {full, nanoflann, kdtree};
 
 
 struct gridsearch {
   bool extrapolate;
   bool is_cyclic;
   bool is_reg2d;
-  int method_nn;
+  GridsearchMethod method_nn;
   size_t n;
   size_t dims[2];
 
