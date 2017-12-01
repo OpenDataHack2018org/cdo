@@ -3,7 +3,7 @@ noinst_PROGRAMS = cdo_process_creation_test operator_1_to_1 operator_1_to_2
 # bin_PROGRAMS = cdo_process_creation_test operator_1_to_1 operator_1_to_2
 
 
-tests_CPPFLAGS = -I $(top_srcdir)/test/bandit_tests/bandit
+tests_CPPFLAGS = -I$(top_srcdir)/test/bandit_tests
 tests_LDADD = $(top_builddir)/src/libcdo.la $(top_builddir)/libcdi/src/libcdi.la
 
 cdo_process_creation_test_SOURCES = process_creation_tests.cc
