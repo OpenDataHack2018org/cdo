@@ -12,7 +12,7 @@
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 
-bool find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
+bool find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
 {
   bool lfound = false;
   long iter;                     /*  iteration counters   */
@@ -236,7 +236,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
 	  double iw, jw;  // current guess for bilinear coordinate 
-          if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
+          if ( find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw) )
 	    {
 	      // Successfully found iw,jw - compute weights
 	      set_bilinear_weights(iw, jw, wgts);
@@ -353,7 +353,7 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
 	  double iw, jw;  // current guess for bilinear coordinate
-          if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
+          if ( find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw) )
 	    {
 	      // Successfully found iw,jw - compute weights
 	      set_bilinear_weights(iw, jw, wgts);
