@@ -330,7 +330,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 	    }
 
 	  // try it with do_point_search_p3
-	  if ( find_ij_weights(plon, plat, src_lats, src_lons, &iguess, &jguess) )
+	  if ( find_ij_weights(plon, plat, src_lons, src_lats, &iguess, &jguess) )
 	    {
 
 	      wgts[0] = (1.-iguess)*(1.-jguess);
