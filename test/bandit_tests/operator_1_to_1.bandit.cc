@@ -6,9 +6,9 @@
 #include <iostream>
 
 
-void *Test(void *ptr){}
+void *Test(void *ptr){return ptr;}
 std::vector<std::string> TestHelp = {"TEST", "HELP"};
-std::vector<char *> test_argv{"-test", "in_file","out_file" };
+std::vector<const char *> test_argv{"-test", "in_file","out_file" };
 
 go_bandit([]() {
   bandit::describe("Process: 1 input, 1 output", []() {

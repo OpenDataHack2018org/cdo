@@ -56,7 +56,7 @@ std::map<int, process_t> Process;
 static int NumProcess = 0;
 static int NumProcessActive = 0;
 
-process_t::process_t(int p_ID, char *operatorCommand) : m_ID(p_ID)
+process_t::process_t(int p_ID, const char *operatorCommand) : m_ID(p_ID)
 {
   initProcess();
   operatorName = getOperatorName(operatorCommand);
@@ -69,11 +69,11 @@ process_t::process_t(int p_ID, char *operatorCommand) : m_ID(p_ID)
 }
 
 void
-process_t::setOperatorArgv(char *operatorArguments)
+process_t::setOperatorArgv(const char *operatorArguments)
 {
   if (operatorArguments)
     {
-      char *operatorArg = operatorArguments;
+      char *operatorArg = strdup(operatorArguments);
       // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
 
       while ((operatorArg = strchr(operatorArg, ',')) != NULL)
@@ -127,7 +127,7 @@ process_t::getOutStreamCnt()
 }
 
 process_t *
-processCreate(char *command)
+processCreate(const char *command)
 {
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
@@ -825,7 +825,7 @@ void print_creation_results(std::ofstream &p_outfile)
 }
 
 void
-createProcesses(int argc, char **argv)
+createProcesses(int argc, const char **argv)
 {
   if(CdoDebug::PROCESS){
   std::string input_string = "";

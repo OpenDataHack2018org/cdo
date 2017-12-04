@@ -65,7 +65,7 @@ public:
   int ntimesteps;
   short m_streamCnt;
   std::vector<argument_t> streamArguments;
-  char *m_operatorCommand;
+  const char *m_operatorCommand;
   const char *operatorName;
   char *operatorArg;
   int oargc;
@@ -81,12 +81,12 @@ public:
   void initProcess();
   void print_process();
   void defArgument();
-  process_t(int p_ID, char *operatorCommand);
-  void setOperatorArgv(char *operatorArguments);
+  void setOperatorArgv(const char *operatorArguments);
   void setStreams(int argc, std::vector<char *> &argv);
   void addChild(process_t *child_process);
   void addParent(process_t *parent_process);
   bool hasAllInputs();
+  process_t(int p_ID, const char *operatorCommand);
 
 private:
   void defPrompt();
@@ -103,7 +103,7 @@ pstream_t *processInqInputStream(int streamindex);
 pstream_t *processInqOutputStream(int streamindex);
 process_t &processSelf(void);
 process_t *processCreate(void);
-process_t *processCreate(char *command);
+process_t *processCreate(const char *command);
 void processDelete(void);
 int processInqTimesteps(void);
 void processDefTimesteps(int streamID);
@@ -136,7 +136,7 @@ const char *processInqPrompt(void);
 
 const argument_t *cdoStreamName(int cnt);
 int checkStreamCnt();
-void createProcesses(int argc, char **argv);
+void createProcesses(int argc, const char **argv);
 void clearProcesses();
 int processNumsActive();
 

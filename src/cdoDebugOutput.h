@@ -61,24 +61,9 @@ namespace CdoDebug
     void CdoStartMessage();
     void CdoEndMessage();
     void SetDebug(int p_debug_level);
-    std::string argvToString(int argc, char** argv);
+    std::string argvToString(int argc, const char** argv);
 
-   namespace{
-        void printMessage(std::stringstream &p_message)
-        {
-            if(!print_to_seperate_file)
-            {
-                std::cout << p_message.str();
-            }
-            else 
-            {
-                outfile_stream <<  p_message.str();
-            }
-        }
-    }
-
-
-   
+    void printMessage(std::stringstream &p_message);
     template <typename ...T>
     void Message_ (const char * p_func, T&& ...args)
     {

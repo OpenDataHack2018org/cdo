@@ -67,7 +67,7 @@ namespace CdoDebug
       outfile_stream.close();
     }
 
-    std::string argvToString(int argc, char ** argv)
+    std::string argvToString(int argc, const char ** argv)
     {
         std::string input_string = "";
         for (int i = 0; i < argc; i++)
@@ -78,6 +78,18 @@ namespace CdoDebug
         return input_string;
 
     }
+
+        void printMessage(std::stringstream &p_message)
+        {
+            if(!print_to_seperate_file)
+            {
+                std::cout << p_message.str();
+            }
+            else 
+            {
+                outfile_stream <<  p_message.str();
+            }
+        }
 }
 namespace CdoLog
 {

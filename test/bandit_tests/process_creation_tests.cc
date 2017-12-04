@@ -6,12 +6,12 @@
 #include <iostream>
 
 
-void *Info(void *ptr){}
+void *Info(void *test){return test;}
 
 go_bandit([]() {
   bandit::describe("Process creation", []() {
 
-    std::vector<char *> test_argv{"-info", "some_test_bs"};
+    std::vector<const char *> test_argv{"-info", "some_test_bs"};
     add_module("Info", {Info, InfoHelp, {"info"}, 1, 0, -1, 0});
     process_t *test_process = processCreate(test_argv[0]);
 
