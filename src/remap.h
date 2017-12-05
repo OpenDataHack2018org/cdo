@@ -226,6 +226,8 @@ int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *r
                       double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
                       const double *restrict src_center_lat, const double *restrict src_center_lon);
 
+unsigned quad_cross_products(double plon, double plat, double lons[4], double lats[4]);
+
 int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
 		double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
 		const double *restrict src_center_lat, const double *restrict src_center_lon,
