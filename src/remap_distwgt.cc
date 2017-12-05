@@ -366,13 +366,15 @@ void remap_distwgt_weights(size_t num_neighbors, remapgrid_t *src_grid, remapgri
   double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
+  bool xIsCyclic = src_grid->is_cyclic;
+  size_t *dims = src_grid->dims;
   struct gridsearch *gs = NULL;
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    gs = gridsearch_create_reg2d(src_grid->is_cyclic, src_grid->dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+    gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else if ( num_neighbors == 1 )
-    gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    gs = gridsearch_create_nn(xIsCyclic, dims, src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
   else
-    gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    gs = gridsearch_create(xIsCyclic, dims, src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
   if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
   //else
@@ -475,13 +477,15 @@ void remap_distwgt(size_t num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt
   double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
+  bool xIsCyclic = src_grid->is_cyclic;
+  size_t *dims = src_grid->dims;
   struct gridsearch *gs = NULL;
   if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    gs = gridsearch_create_reg2d(src_grid->is_cyclic, src_grid->dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+    gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else if ( num_neighbors == 1 )
-    gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    gs = gridsearch_create_nn(xIsCyclic, dims, src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
   else
-    gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    gs = gridsearch_create(xIsCyclic, dims, src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
   if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
 
@@ -611,13 +615,15 @@ void intgriddis(field_type *field1, field_type *field2, size_t num_neighbors)
   double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
+  bool xIsCyclic = gridIsCircular(gridID1);
+  size_t dims[2] = {src_grid_size, 0};
   struct gridsearch *gs = NULL;
   // if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-  //  gs = gridsearch_create_reg2d(src_grid->is_cyclic, src_grid->dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+  //  gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   if ( num_neighbors == 1 )
-    gs = gridsearch_create_nn(src_grid_size, src_cell_center_lon, src_cell_center_lat);
+    gs = gridsearch_create_nn(xIsCyclic, dims, src_grid_size, src_cell_center_lon, src_cell_center_lat);
   else
-    gs = gridsearch_create(src_grid_size, src_cell_center_lon, src_cell_center_lat);
+    gs = gridsearch_create(xIsCyclic, dims, src_grid_size, src_cell_center_lon, src_cell_center_lat);
 
   // if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
   // gridsearch_extrapolate(gs);

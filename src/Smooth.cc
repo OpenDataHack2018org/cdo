@@ -133,10 +133,12 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
   struct gridsearch *gs = NULL;
 
+  bool xIsCyclic = false;
+  size_t dims[2] = {gridsize, 0};
   if ( num_neighbors == 1 )
-    gs = gridsearch_create_nn(gridsize, xvals, yvals);
+    gs = gridsearch_create_nn(xIsCyclic, dims, gridsize, xvals, yvals);
   else
-    gs = gridsearch_create(gridsize, xvals, yvals);
+    gs = gridsearch_create(xIsCyclic, dims, gridsize, xvals, yvals);
 
   gs->search_radius = spoint.radius;
 

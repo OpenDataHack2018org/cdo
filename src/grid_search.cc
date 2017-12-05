@@ -134,11 +134,11 @@ void gridsearch_extrapolate(struct gridsearch *gs)
 }
 
 
-struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
-  gs->is_cyclic = is_cyclic;
+  gs->is_cyclic = xIsCyclic;
   gs->is_reg2d = true;
   gs->dims[0] = dims[0];
   gs->dims[1] = dims[1];
@@ -146,7 +146,7 @@ struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const
   size_t ny = dims[0];
 
   size_t nxm = nx;
-  if ( is_cyclic ) nxm++;
+  if ( xIsCyclic ) nxm++;
 
   double *reg2d_center_lon = (double *) Malloc(nxm*sizeof(double));
   double *reg2d_center_lat = (double *) Malloc(ny*sizeof(double));
@@ -490,9 +490,14 @@ void gridsearch_bound_poly(struct gridsearch *gs, size_t dims[2], size_t n, cons
 }
 
 
-struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
+
+  gs->is_cyclic = xIsCyclic;
+  gs->is_curve = n!=1 && n==dims[0]*dims[1];
+  gs->dims[0] = dims[0];
+  gs->dims[1] = dims[1];
 
   gs->method_nn = gridsearch_method_nn;
   gs->n = n;
@@ -507,9 +512,14 @@ struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, cons
 }
 
 
-struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_nn(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
+
+  gs->is_cyclic = xIsCyclic;
+  gs->is_curve = n!=1 && n==dims[0]*dims[1];
+  gs->dims[0] = dims[0];
+  gs->dims[1] = dims[1];
 
   gs->method_nn = gridsearch_method_nn;
   gs->n = n;
@@ -629,33 +639,39 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
   //printf("%zu %g\n", ret_index, out_dist_sqr);
 
 #ifdef  TEST_QUAD
-  if ( ret_index != GS_NOT_FOUND )
+  if ( !gs->extrapolate && gs->is_curve )
     {
-      size_t nx = 450;
-      size_t ny = 250;
-      size_t adds[4];
-      double lons[4];
-      double lats[4];
-      bool is_cyclic = false;
-      for ( unsigned k = 0; k < 4; ++k )
+      if ( ret_index != GS_NOT_FOUND )
         {
-          /* Determine neighbor addresses */
-          size_t j = ret_index/nx;
-          size_t i = ret_index - j*nx;
-          if ( k == 1 || k == 3 )  i = (i > 0) ? i - 1 : (is_cyclic) ? nx-1 : 0;
-          if ( k == 2 || k == 3 )  j = (j > 0) ? j - 1 : 0;
-
-          if ( point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats,
-                             lon, lat, gs->plons, gs->plats) )
+          size_t nx = gs->dims[0];
+          size_t ny = gs->dims[1];
+          size_t adds[4];
+          double lons[4];
+          double lats[4];
+          bool is_cyclic = gs->is_cyclic;
+          for ( unsigned k = 0; k < 4; ++k )
             {
-              index = ret_index;
-              break;
+              /* Determine neighbor addresses */
+              size_t j = ret_index/nx;
+              size_t i = ret_index - j*nx;
+              if ( k == 1 || k == 3 )  i = (i > 0) ? i - 1 : (is_cyclic) ? nx-1 : 0;
+              if ( k == 2 || k == 3 )  j = (j > 0) ? j - 1 : 0;
+
+              if ( point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats,
+                                 lon, lat, gs->plons, gs->plats) )
+                {
+                  index = ret_index;
+                  break;
+                }
             }
         }
     }
+  else
 #else
-  index = ret_index;
-  *prange = out_dist_sqr; 
+    {
+      index = ret_index;
+      *prange = out_dist_sqr;
+    }
 #endif
 
   //float frange = range;
