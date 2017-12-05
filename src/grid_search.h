@@ -24,6 +24,8 @@ struct gridsearch {
   double *coslat, *sinlat;   // cosine, sine of grid lats (for distance)
   double *coslon, *sinlon;   // cosine, sine of grid lons (for distance)
 
+  const double *plons, *plats;
+
   double lonmin, lonmax, latmin, latmax;
   float min[3], max[3];
 };

@@ -515,6 +515,9 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
   gs->n = n;
   if ( n == 0 ) return gs;
 
+  gs->plons = lons;
+  gs->plats = lats;
+
   if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
   else if ( gs->method_nn == GridsearchMethod::nanoflann ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
   else if ( gs->method_nn == GridsearchMethod::full      ) gs->search_container = gs_create_full(n, lons, lats);
@@ -593,6 +596,13 @@ size_t gs_nearest_kdtree(void *search_container, double lon, double lat, double 
   return index;
 }
 
+//#define TEST_QUAD
+
+#ifdef  TEST_QUAD
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+                   double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
+#endif
+
 static
 size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, double *prange, struct gridsearch *gs)
 {
@@ -618,8 +628,36 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
   nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
   //printf("%zu %g\n", ret_index, out_dist_sqr);
 
+#ifdef  TEST_QUAD
+  if ( ret_index != GS_NOT_FOUND )
+    {
+      size_t nx = 450;
+      size_t ny = 250;
+      size_t adds[4];
+      double lons[4];
+      double lats[4];
+      bool is_cyclic = false;
+      for ( unsigned k = 0; k < 4; ++k )
+        {
+          /* Determine neighbor addresses */
+          size_t j = ret_index/nx;
+          size_t i = ret_index - j*nx;
+          if ( k == 1 || k == 3 )  i = (i > 0) ? i - 1 : (is_cyclic) ? nx-1 : 0;
+          if ( k == 2 || k == 3 )  j = (j > 0) ? j - 1 : 0;
+
+          if ( point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats,
+                             lon, lat, gs->plons, gs->plats) )
+            {
+              index = ret_index;
+              break;
+            }
+        }
+    }
+#else
   index = ret_index;
-  *prange = out_dist_sqr;
+  *prange = out_dist_sqr; 
+#endif
+
   //float frange = range;
   //if ( !(frange < range0) ) node = NULL;
   //if ( prange ) *prange = frange;

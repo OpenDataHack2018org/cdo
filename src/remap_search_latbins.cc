@@ -231,7 +231,6 @@ unsigned quad_cross_products(double plon, double plat, double lons[4], double la
   double vec2_lat, vec2_lon;
 
   /* For consistency, we must make sure all lons are in same 2pi interval */
-
   vec1_lon = lons[0] - plon;
   if      ( vec1_lon >  PI ) lons[0] -= PI2;
   else if ( vec1_lon < -PI ) lons[0] += PI2;
@@ -258,7 +257,6 @@ unsigned quad_cross_products(double plon, double plat, double lons[4], double la
       vec2_lon = plon - lons[n];
 
       /* Check for 0,2pi crossings */
-
       if      ( vec1_lon >  THREE*PIH ) vec1_lon -= PI2;
       else if ( vec1_lon < -THREE*PIH ) vec1_lon += PI2;
 
@@ -295,6 +293,8 @@ bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, siz
   bool search_result = false;
   size_t ip1 = (i < (nx-1)) ? i + 1 : is_cyclic ? 0 : i;
   size_t jp1 = (j < (ny-1)) ? j + 1 : j;
+
+  if ( i == ip1 || j == jp1 ) return search_result;
 
   size_t idx[4];
   idx[0] = j  *nx + i;
@@ -348,7 +348,6 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
   size_t n2, srch_add, srch_add4;    /* dummy indices                    */
   int search_result = 0;
   restr_t *bin_lats = src_grid->bin_lats;
-  size_t idx[4];
 
   size_t nbins = src_grid->num_srch_bins;
 
