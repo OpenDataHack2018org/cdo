@@ -51,12 +51,12 @@ double fldfun(field_type field, int function)
     case func_roc:    rval = fldroc(field);    break;
     default: cdoAbort("%s: function %d not implemented!", __func__, function);
     }
-  
+
   return rval;
 }
 
 
-double fldrank(field_type field) 
+double fldrank(field_type field)
 {
   double res = 0;
   // Using first value as reference (observation)
@@ -66,17 +66,17 @@ double fldrank(field_type field)
   size_t nmiss      = field.nmiss;
   const size_t len       = field.size-1;
   size_t j;
-  
+
   if ( nmiss ) return missval;
 
   sort_iter_single(len,array, 1);
 
-  if ( val > array[len-1] ) 
+  if ( val > array[len-1] )
     res=(double)len;
-  else 
+  else
     for ( j=0; j<len; j++ )
       if ( array[j] >= val ) {
-	res=(double)j; 
+	res=(double)j;
 	break;
       }
 
@@ -84,7 +84,7 @@ double fldrank(field_type field)
 }
 
 
-double fldroc(field_type field) 
+double fldroc(field_type field)
 {
   return field.missval;
 }
@@ -95,7 +95,7 @@ double fldcrps(field_type field)
   const size_t nmiss   = field.nmiss;
   double *array  = field.ptr;
 
-  if ( nmiss > 0 ) 
+  if ( nmiss > 0 )
     cdoAbort("Missing values not implemented in crps calculation");
   // possible handling of missing values:
   // (1) strip them off, and sort array without missing values
@@ -110,7 +110,7 @@ double fldcrps(field_type field)
 }
 
 
-double fldbrs(field_type field) 
+double fldbrs(field_type field)
 {
   const size_t  nmiss   = field.nmiss;
   const size_t    len   = field.size;
@@ -121,18 +121,18 @@ double fldbrs(field_type field)
   size_t i, count=0;
 
   // Using first value as reference
-  if ( nmiss == 0 ) 
+  if ( nmiss == 0 )
     {
       for ( i=1; i<len; i++ )
 	brs += (array[i] - array[0]) * (array[i] - array[0]);
       count = i-1;
     }
-  else 
+  else
     {
       if ( DBL_IS_EQUAL(array[0], missval) ) return missval;
 
       for ( i=1; i<len; i++ )
-	if ( !DBL_IS_EQUAL(array[i], missval) ) 
+	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  {
 	    brs += (array[i] - array[0]) * (array[i] - array[0]);
 	    count ++;
@@ -157,7 +157,7 @@ double fldrange(field_type field)
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array[i], missval) )
           {
             if ( array[i] < rmin ) rmin = array[i];
@@ -171,7 +171,7 @@ double fldrange(field_type field)
     }
   else
     {
-      //#pragma simd reduction(min:rmin) 
+      //#pragma simd reduction(min:rmin)
       for ( size_t i = 0; i < len; i++ )
         {
           if ( array[i] < rmin ) rmin = array[i];
@@ -196,7 +196,7 @@ double fldmin(field_type field)
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  if ( array[i] < rmin ) rmin = array[i];
 
@@ -204,8 +204,8 @@ double fldmin(field_type field)
     }
   else
     {
-      //#pragma simd reduction(min:rmin) 
-      for ( size_t i = 0; i < len; i++ ) 
+      //#pragma simd reduction(min:rmin)
+      for ( size_t i = 0; i < len; i++ )
 	if ( array[i] < rmin ) rmin = array[i];
     }
 
@@ -228,12 +228,12 @@ double fldmax(field_type field)
       for ( size_t i = 0; i < len; i++ )
         if ( !DBL_IS_EQUAL(array[i], missval) )
           if ( array[i] > rmax ) rmax = array[i];
-      
+
       if ( IS_EQUAL(rmax, -DBL_MAX) ) rmax = missval;
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ )
         if ( array[i] > rmax ) rmax = array[i];
     }
 
@@ -255,7 +255,7 @@ double fldsum(field_type field)
     {
       size_t nvals = 0;
 
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  {
 	    rsum += array[i];
@@ -266,7 +266,7 @@ double fldsum(field_type field)
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ )
 	rsum += array[i];
     }
 
@@ -288,7 +288,7 @@ double fldmean(field_type field)
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; ++i ) 
+      for ( size_t i = 0; i < len; ++i )
 	if ( !DBL_IS_EQUAL(array[i], missval1) )
 	  {
 	    rsum  += array[i];
@@ -321,7 +321,7 @@ double fldmeanw(field_type field)
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; ++i ) 
+      for ( size_t i = 0; i < len; ++i )
 	if ( !DBL_IS_EQUAL(array[i], missval1) && !DBL_IS_EQUAL(w[i], missval1) )
 	  {
 	    rsum  += w[i] * array[i];
@@ -352,7 +352,7 @@ double fldavg(field_type field)
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; ++i ) 
+      for ( size_t i = 0; i < len; ++i )
         {
           rsum  = ADDMN(rsum, array[i]);
           rsumw += 1;
@@ -384,7 +384,7 @@ double fldavgw(field_type field)
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(w[i], missval1) )
 	  {
 	    rsum  = ADDMN(rsum, MULMN(w[i], array[i]));
@@ -393,7 +393,7 @@ double fldavgw(field_type field)
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ )
 	{
 	  rsum  += w[i] * array[i];
 	  rsumw += w[i];
@@ -406,9 +406,9 @@ double fldavgw(field_type field)
 }
 
 static
-void prevarsum(const double *restrict array, size_t len, size_t nmiss, 
+void prevarsum(const double *restrict array, size_t len, size_t nmiss,
                double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
-{ 
+{
   assert(array!=NULL);
 
   double xsum = 0, xsumw = 0;
@@ -416,7 +416,7 @@ void prevarsum(const double *restrict array, size_t len, size_t nmiss,
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; ++i ) 
+      for ( size_t i = 0; i < len; ++i )
         if ( !DBL_IS_EQUAL(array[i], missval) )
           {
             xsum   += array[i];
@@ -427,7 +427,7 @@ void prevarsum(const double *restrict array, size_t len, size_t nmiss,
     }
   else
     {
-      for ( size_t i = 0; i < len; ++i ) 
+      for ( size_t i = 0; i < len; ++i )
         {
           xsum   += array[i];
           xsumq  += array[i] * array[i];
@@ -440,6 +440,50 @@ void prevarsum(const double *restrict array, size_t len, size_t nmiss,
   *rsumq  = xsumq;
   *rsumw  = xsumw;
   *rsumwq = xsumwq;
+}
+
+static
+void preskewsum(const double *restrict array, size_t len, size_t nmiss, const double mean,
+               double missval, double *rsum3, double *rsum3w, double *rsum4, double *rsum4w,
+               double *rsum3diff, double *rsum4diff)
+{
+  assert(array!=NULL);
+
+  double xsum3 = 0, xsum3w = 0, xsum3diff = 0;
+  double xsum4 = 0, xsum4w = 0, xsum4diff = 0;
+
+  if ( nmiss )
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( !DBL_IS_EQUAL(array[i], missval) )
+          {
+            xsum3     += array[i] * array[i] * array[i];
+            xsum4     += array[i] * array[i] * array[i] * array[i];
+            xsum3diff += (array[i]-mean) * (array[i]-mean) * (array[i]-mean);
+            xsum4diff += (array[i]-mean) * (array[i]-mean) * (array[i]-mean) * (array[i]-mean);
+            xsum3w    += 1;
+            xsum4w    += 1;
+          }
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i )
+        {
+          xsum3     += array[i] * array[i] * array[i];
+          xsum4     += array[i] * array[i] * array[i] * array[i];
+          xsum3diff += (array[i]-mean) * (array[i]-mean) * (array[i]-mean);
+          xsum4diff += (array[i]-mean) * (array[i]-mean) * (array[i]-mean) * (array[i]-mean);
+        }
+      xsum3w = len;
+      xsum4w = len;
+    }
+
+  *rsum3     = xsum3;
+  *rsum4     = xsum4;
+  *rsum3diff = xsum3diff;
+  *rsum4diff = xsum4diff;
+  *rsum3w    = xsum3w;
+  *rsum4w    = xsum4w;
 }
 
 
@@ -476,10 +520,34 @@ double fldvar1(field_type field)
   return rvar;
 }
 
+double fldskew(field_type field)
+{
+  const size_t nmiss   = field.nmiss > 0;
+  const size_t len     = field.size;
+  const double missval = field.missval;
+  double rsum, rsumw;
+  double rsumq, rsumwq;
+  double rsum3, rsum3w;  /* 3rd moment variables */
+  double rsum4, rsum4w;  /* 4th moment variables */
+  double rsum3diff, rsum4diff;
+
+  prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+  preskewsum(field.ptr, len, nmiss, (rsum/rsumw), missval, &rsum3, &rsum3w, &rsum4, &rsum4w, &rsum3diff, &rsum4diff);
+
+
+  double sumOfSquarDiffs = (rsumq*rsumw - rsum*rsum) / rsumw;
+
+  double rvar = IS_NOT_EQUAL(rsum3w,0) ? (rsum3diff/rsum3w)/pow((sumOfSquarDiffs)/(rsum3w-1.0),1.5) : missval;
+
+  if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+
+  return rvar;
+}
+
 static
-void prevarsumw(const double *restrict array, const double *restrict w, size_t len, size_t nmiss, 
+void prevarsumw(const double *restrict array, const double *restrict w, size_t len, size_t nmiss,
                 double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
-{ 
+{
   assert(array!=NULL);
   assert(w!=NULL);
 
@@ -488,7 +556,7 @@ void prevarsumw(const double *restrict array, const double *restrict w, size_t l
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; ++i ) 
+      for ( size_t i = 0; i < len; ++i )
         if ( !DBL_IS_EQUAL(array[i], missval) && !DBL_IS_EQUAL(w[i], missval) )
           {
             xsum   += w[i] * array[i];
@@ -499,7 +567,7 @@ void prevarsumw(const double *restrict array, const double *restrict w, size_t l
     }
   else
     {
-      for ( size_t i = 0; i < len; ++i ) 
+      for ( size_t i = 0; i < len; ++i )
         {
           xsum   += w[i] * array[i];
           xsumq  += w[i] * array[i] * array[i];
@@ -614,7 +682,7 @@ void fldrms(field_type field, field_type field2, field_type *field3)
   if ( nmiss1 > 0 )
   */
     {
-      for ( i = 0; i < len; i++ ) 
+      for ( i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(w[i], missval1) )
 	  {
 	    rsum  = ADDMN(rsum, MULMN(w[i], MULMN( SUBMN(array2[i], array1[i]),
@@ -625,7 +693,7 @@ void fldrms(field_type field, field_type field2, field_type *field3)
     /*
   else
     {
-      for ( i = 0; i < len; i++ ) 
+      for ( i = 0; i < len; i++ )
 	{
 	  rsum  += w[i] * array1[i];
 	  rsumw += w[i];
@@ -711,7 +779,7 @@ double fldpctl(field_type field, const double pn)
           double *array2 = (double*) Malloc((len - nmiss)*sizeof(double));
 
           size_t j = 0;
-          for ( size_t i = 0; i < len; i++ ) 
+          for ( size_t i = 0; i < len; i++ )
             if ( !DBL_IS_EQUAL(array[i], missval) )
               array2[j++] = array[i];
 
@@ -771,12 +839,12 @@ double crps_det_integrate(double *a, const double d, const size_t n)
   /*     double     - area under the curve in units of a                         */
   /* *************************************************************************** */
 
-  double area = 0; 
+  double area = 0;
   //  double tmp;
   size_t i;
 #if defined(_OPENMP)
 #pragma omp parallel for if ( n>10000 ) shared(a) private(i) \
-  reduction(+:area) schedule(static,10000) 
+  reduction(+:area) schedule(static,10000)
 #endif                                                         /* **************************** */
   for ( i=1; i<n; i++ ) {                                      /* INTEGRATE CURVE AREA         */
     if ( a[i] < d )                                            /* left of heavyside            */
