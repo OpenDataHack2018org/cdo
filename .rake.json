@@ -30,7 +30,9 @@
     },
     "wanglung": {
       "hostname": "wanglung.mpimet.mpg.de",
-      "dir": "/home/zmaw/m300064/builds/remote"
+      "dir": "/home/zmaw/m300064/builds/remote",
+      "username": "m300064",
+      "CC": ["icc","pgcc","cray","gcc"]
     },
     "ubuntu-32bit": {
       "hostname": "cdo4windows-ubuntu.mpimet.mpg.de",
