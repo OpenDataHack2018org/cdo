@@ -226,7 +226,8 @@ int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *r
                       double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
                       const double *restrict src_center_lat, const double *restrict src_center_lon);
 
-unsigned quad_cross_products(double plon, double plat, double lons[4], double lats[4]);
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+                   double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
 
 int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
 		double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,

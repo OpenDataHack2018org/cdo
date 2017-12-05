@@ -289,6 +289,35 @@ unsigned quad_cross_products(double plon, double plat, double lons[4], double la
 }
 
 
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+                   double plon, double plat, const double *restrict center_lon, const double *restrict center_lat)
+{
+  bool search_result = false;
+  size_t ip1 = (i < (nx-1)) ? i + 1 : is_cyclic ? 0 : i;
+  size_t jp1 = (j < (ny-1)) ? j + 1 : j;
+
+  size_t idx[4];
+  idx[0] = j  *nx + i;
+  idx[1] = j  *nx + ip1; // east
+  idx[2] = jp1*nx + ip1; // north-east
+  idx[3] = jp1*nx + i;   // north
+
+  for ( unsigned j = 0; j < 4; ++j ) lons[j] = center_lon[idx[j]];
+  for ( unsigned j = 0; j < 4; ++j ) lats[j] = center_lat[idx[j]];
+
+  unsigned n = quad_cross_products(plon, plat, lons, lats);
+
+  /* If cross products all same sign, we found the location */
+  if ( n >= 4 )
+    {
+      for ( unsigned j = 0; j < 4; ++j ) adds[j] = idx[j];
+      search_result = true;
+    }
+
+  return search_result;
+}
+
+
 int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
 		double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
 		const double *restrict src_center_lat, const double *restrict src_center_lon,
@@ -319,6 +348,7 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
   size_t n2, srch_add, srch_add4;    /* dummy indices                    */
   int search_result = 0;
   restr_t *bin_lats = src_grid->bin_lats;
+  size_t idx[4];
 
   size_t nbins = src_grid->num_srch_bins;
 
@@ -348,8 +378,6 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
   size_t nx = src_grid_dims[0];
   size_t ny = src_grid_dims[1];
 
-  size_t idx[4];
-
   /* srch_loop */
   for ( srch_add = min_add; srch_add <= max_add; ++srch_add )
     {
@@ -366,24 +394,9 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
           size_t j = srch_add/nx;
           size_t i = srch_add - j*nx;
 
-          size_t ip1 = (i < (nx-1)) ? i + 1 : (src_grid->is_cyclic) ? 0 : i;
-          size_t jp1 = (j < (ny-1)) ? j + 1 : j;
-
-          idx[0] = j  *nx + i;
-          idx[1] = j  *nx + ip1; // east
-	  idx[2] = jp1*nx + ip1; // north-east
-          idx[3] = jp1*nx + i;   // north
-
-          for ( unsigned j = 0; j < 4; ++j ) src_lons[j] = src_center_lon[idx[j]];
-          for ( unsigned j = 0; j < 4; ++j ) src_lats[j] = src_center_lat[idx[j]];
-
-          unsigned n = quad_cross_products(plon, plat, src_lons, src_lats);
-
-	  /* If cross products all same sign, we found the location */
-          if ( n >= 4 )
+          if ( point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats,
+                             plon, plat, src_center_lon, src_center_lat) )
 	    {
-              for ( unsigned j = 0; j < 4; ++j ) src_add[j] = idx[j];
-
 	      search_result = 1;
 	      return search_result;
 	    }

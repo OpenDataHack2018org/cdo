@@ -332,24 +332,9 @@ int grid_search_test(struct gridsearch *gs, size_t *restrict src_add, double *re
           if ( k == 1 || k == 3 )  i = (i > 0) ? i - 1 : (is_cyclic) ? nx-1 : 0;
           if ( k == 2 || k == 3 )  j = (j > 0) ? j - 1 : 0;
 
-          size_t ip1 = (i < (nx-1)) ? i + 1 : (is_cyclic) ? 0 : i;
-          size_t jp1 = (j < (ny-1)) ? j + 1 : j;
-
-          idx[0] = j  *nx + i;
-          idx[1] = j  *nx + ip1; // east
-	  idx[2] = jp1*nx + ip1; // north-east
-          idx[3] = jp1*nx + i;   // north
-
-          for ( unsigned j = 0; j < 4; ++j ) src_lons[j] = src_center_lon[idx[j]];
-          for ( unsigned j = 0; j < 4; ++j ) src_lats[j] = src_center_lat[idx[j]];
-
-          unsigned n = quad_cross_products(plon, plat, src_lons, src_lats);
-
-	  /* If cross products all same sign, we found the location */
-          if ( n >= 4 )
+          if ( point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats,
+                             plon, plat, src_center_lon, src_center_lat) )
 	    {
-              for ( unsigned j = 0; j < 4; ++j ) src_add[j] = idx[j];
-
 	      search_result = 1;
 	      return search_result;
 	    }
