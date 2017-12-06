@@ -30,7 +30,9 @@
     },
     "wanglung": {
       "hostname": "wanglung.mpimet.mpg.de",
-      "dir": "/home/zmaw/m300064/builds/remote"
+      "dir": "/home/zmaw/m300064/builds/remote",
+      "username": "m300064",
+      "CC": ["icc","pgcc","cray","gcc"]
     },
     "ubuntu-32bit": {
       "hostname": "cdo4windows-ubuntu.mpimet.mpg.de",
@@ -43,15 +45,21 @@
   "remoteUser": "m300064",
 
   "builders": {
-    "localCLANG_4.0_Debug": {
+    "localCLANG_noOpenMP": {
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp CC=clang CXX=clang++ CFLAGS='-g -O0' LDFLAGS=-lhdf5",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp CC=clang CXX=clang++  LDFLAGS=-lhdf5",
       "makeCall": "make -j 12",
       "sync": false
     },
-    "localCLANG++_3.8_Debug": {
+    "localCLANG": {
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp --enable-cxx CC=clang CXX=clang++ CFLAGS='-g -O0'",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf CC=clang CXX=clang++ CFLAGS='-g -O0' CXXFLAGS='-g -fopenmp' LDFLAGS='-lhdf5 -fopenmp=libiomp5'",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
+    "localCLANG_Debug": {
+      "hostname": "luthien",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf CC=clang CXX=clang++ CFLAGS='-g -O0 -Wall -fopenmp' CXXFLAGS='-g -O0 -Wall -fopenmp=libiomp5'",
       "makeCall": "make -j 12",
       "sync": false
     },
@@ -90,7 +98,7 @@
     "AUR":{
       "doc": "local buildder for testing AUR-package",
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --prefix=/usr --with-netcdf=/usr --with-udunits2=/usr --with-hdf5=/usr --with-szlib=/usr --with-proj=/usr --with-fftw3 --with-curl=/usr --with-grib_api=/usr --with-magics=/usr --with-libxml2=/usr CFLAGS='-g -O3 -std=gnu99 -Wall -fopenmp -march=native'  LIBS='-lhdf5 -ljasper -lpng -lopenjpeg' CPPFLAGS='-I/usr/include/magics -I/usr/include/libxml2' LIBS='-leccodes -lhdf5'",
+      "configureCall": "/home/ram/src/cdo/configure --prefix=/usr --with-netcdf=/usr --with-udunits2=/usr --with-hdf5=/usr --with-szlib=/usr --with-proj=/usr --with-fftw3 --with-curl=/usr --with-eccodes=/usr --with-magics=/usr --with-libxml2=/usr CFLAGS='-g -O3 -std=gnu99 -Wall -fopenmp -march=native'  CXXFLAGS='-g -O3 -std=c++11 -Wall -fopenmp -march=native' LIBS='-lhdf5 -ljasper -lpng -lopenjpeg' CPPFLAGS='-I/usr/include/magics -I/usr/include/libxml2'",
       "makeCall": "make -j 12",
       "sync": false
     },
