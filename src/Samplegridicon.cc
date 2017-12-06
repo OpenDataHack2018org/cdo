@@ -300,7 +300,7 @@ void compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double 
                                double *grid_corner_lat2, long ncells1, double *grid_center_lon1, double *grid_center_lat1)
 {
   bool xIsCyclic = false;
-  size_t dims[2] = {ncells1, 0};
+  size_t dims[2]; dims[0] = ncells1; dims[1] = 0;
   struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, ncells1, grid_center_lon1, grid_center_lat1);
   size_t nbr_add[MAX_SEARCH];  // source address at nearest neighbors
   double nbr_dist[MAX_SEARCH]; // angular distance four nearest neighbors
