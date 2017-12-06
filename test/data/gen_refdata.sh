@@ -5,23 +5,6 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
-# Remap
-#
-cdo -f grb setrtomiss,0,10000  -gridboxmean,8,8 -topo bathy4.grb
-#
-GRIDS="n16 n32"
-RMODS="bil bic dis nn con con2 laf"
-RMODS="con2"
-IFILE=bathy4.grb
-for GRID in $GRIDS; do
-  for RMOD in $RMODS; do
-    OFILE=${GRID}_${RMOD}
-    $CDO $FORMAT remap${RMOD},$GRID $IFILE ${OFILE}_ref
-  done
-done
-exit
-########################################################################
-#
 # Remap regional grid
 #
 GRID=spain.grid
@@ -42,6 +25,23 @@ for RMOD in $RMODS; do
       EXTRA="$extra"
       if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
       REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},${GRID} $IFILE ${OFILE}_${extra}_ref
+  done
+done
+exit
+########################################################################
+#
+# Remap
+#
+cdo -f grb setrtomiss,0,10000  -gridboxmean,8,8 -topo bathy4.grb
+#
+GRIDS="n16 n32"
+RMODS="bil bic dis nn con con2 laf"
+RMODS="con2"
+IFILE=bathy4.grb
+for GRID in $GRIDS; do
+  for RMOD in $RMODS; do
+    OFILE=${GRID}_${RMOD}
+    $CDO $FORMAT remap${RMOD},$GRID $IFILE ${OFILE}_ref
   done
 done
 exit
