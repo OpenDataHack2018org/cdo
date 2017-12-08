@@ -1045,6 +1045,7 @@ operatorInputArg(const char *enter)
           lreadline = 0;
           while (1)
             {
+
               pos = 0;
               while (pline[pos] == ' ' || pline[pos] == ',')
                 pos++;
@@ -1061,7 +1062,7 @@ operatorInputArg(const char *enter)
                   while (pline[len] != ' ' && pline[len] != ',' && pline[len] != '\\' && len < linelen)
                     len++;
 
-                  process.oargv[oargc] = (char *) Malloc(len + 1);
+                  process.oargv.push_back((char*)Malloc(len + 1));
                   memcpy(process.oargv[oargc], pline, len);
                   process.oargv[oargc][len] = '\0';
                   oargc++;
