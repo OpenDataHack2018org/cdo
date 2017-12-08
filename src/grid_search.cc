@@ -134,11 +134,11 @@ void gridsearch_extrapolate(struct gridsearch *gs)
 }
 
 
-struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
-  gs->is_cyclic = is_cyclic;
+  gs->is_cyclic = xIsCyclic;
   gs->is_reg2d = true;
   gs->dims[0] = dims[0];
   gs->dims[1] = dims[1];
@@ -146,7 +146,7 @@ struct gridsearch *gridsearch_create_reg2d(bool is_cyclic, size_t dims[2], const
   size_t ny = dims[0];
 
   size_t nxm = nx;
-  if ( is_cyclic ) nxm++;
+  if ( xIsCyclic ) nxm++;
 
   double *reg2d_center_lon = (double *) Malloc(nxm*sizeof(double));
   double *reg2d_center_lat = (double *) Malloc(ny*sizeof(double));
@@ -322,181 +322,22 @@ void *gs_create_full(size_t n, const double *restrict lons, const double *restri
   return (void*) full;
 }
 
-static
-void cal_bound_box(struct gridsearch *gs, size_t n, const double *restrict lons, const double *restrict lats)
-{
-  enum {mlon=180, mlat=90};
-  const size_t masksize = mlon*mlat;
-  bool *mask1 = (bool*) Malloc(masksize*sizeof(bool));
-  for ( size_t i = 0; i < masksize; ++i ) mask1[i] = 0;
 
-  for ( size_t i = 0; i < n; ++i )
-    {
-      double fi = lons[i];
-      double fj = lats[i]+0.5*M_PI;
-      if ( fi < 0 ) fi += 2*M_PI;
-      fi *= mlon/(2*M_PI);
-      fj *= mlat/M_PI;
-      int64_t ii = (int64_t) llround(fi);
-      int64_t jj = (int64_t) llround(fj);
-      if ( i < 1000 )
-        printf("lon=%g/lat=%g  ii=%ld  jj=%ld  fi=%g fj=%g\n", lons[i]*RAD2DEG, lats[i]*RAD2DEG, (long)ii, (long)jj, fi, fj);
-      mask1[jj*mlon+ii] = 1;
-    }
-
-  double xlonmin = 999., xlonmax = 999.;
-  double xlatmin = 999., xlatmax = 999.;
-  for ( size_t j = 0; j < mlat; ++j )
-    {
-      for ( size_t i = 0; i < mlon; ++i )
-        if ( mask1[j*mlon+i] )
-          {
-            xlatmin = (j+0.)*M_PI/mlat - 0.5*M_PI;
-            break;
-          }
-      if ( IS_NOT_EQUAL(xlatmin, 999.) ) break;
-    }
-  for ( size_t jj = 0; jj < mlat; ++jj )
-    {
-      size_t j = mlat-jj-1;
-      for ( size_t i = 0; i < mlon; ++i )
-        if ( mask1[j*mlon+i] )
-          {
-            xlatmax = (j+1.)*M_PI/mlat - 0.5*M_PI;
-            break;
-          }
-      if ( IS_NOT_EQUAL(xlatmax, 999.) ) break;
-    }
-
-  size_t ii = mlon;
-  for ( size_t i = 0; i < mlon; ++i )
-    {
-      for ( size_t j = 0; j < mlat; ++j )
-        if ( mask1[j*mlon+i] )
-          {
-            ii = i;
-            xlonmin = (i+.0)*2*M_PI/mlon;
-            break;
-          }
-      if ( IS_NOT_EQUAL(xlonmin, 999.) ) break;
-    }
-  if ( cdoVerbose ) printf("ii= %zu\n", ii);
-  for ( size_t i = ii; i < mlon; ++i )
-    {
-      ii = mlon;
-      size_t imask = 0;
-      for ( size_t j = 0; j < mlat; ++j )
-        {
-          if ( mask1[j*mlon+i] )
-            {
-              imask++;
-              xlonmax = (i+1.)*2*M_PI/mlon;
-            }
-        }
-      if ( imask == 0 )
-        {
-          ii = i+1;
-          break;
-        }
-    }
-  if ( cdoVerbose ) cdoPrint("boundbox: lonmin=%g lonmax=%g latmin=%g latmax=%g",
-                             xlonmin*RAD2DEG, xlonmax*RAD2DEG, xlatmin*RAD2DEG, xlatmax*RAD2DEG);
-  if ( cdoVerbose ) printf("ii= %zu\n", ii);
-  for ( size_t i = ii; i < mlon; ++i )
-    {
-      bool lfound = false;
-      for ( size_t j = 0; j < mlat; ++j )
-        if ( mask1[j*mlon+i] )
-          {
-            lfound = true;
-            xlonmin = (i+.0)*2*M_PI/mlon;
-            break;
-          }
-      if ( lfound ) break;
-    }
-
-  if ( xlonmin > xlonmax ) xlonmin -= 2*M_PI;
-
-  if ( cdoVerbose ) cdoPrint("boundbox: lonmin=%g lonmax=%g latmin=%g latmax=%g",
-                             xlonmin*RAD2DEG, xlonmax*RAD2DEG, xlatmin*RAD2DEG, xlatmax*RAD2DEG);
-
-  for ( size_t j = 0; j < mlat; ++j )
-    {
-      for ( size_t i = 0; i < mlon; ++i )
-        {
-           printf("%1d", mask1[j*mlon+i]);
-        }
-        printf("\n");
-    }
-
-  double lonmin = 1.e33, lonmax = -1.e33;
-  double latmin = 1.e33, latmax = -1.e33;
-  for ( size_t i = 0; i < n; ++i )
-    {
-      if ( lons[i] < lonmin ) lonmin = lons[i];
-      if ( lons[i] > lonmax ) lonmax = lons[i];
-      if ( lats[i] < latmin ) latmin = lats[i];
-      if ( lats[i] > latmax ) latmax = lats[i];
-    }
-
-  gs->lonmin = xlonmin;
-  gs->lonmax = xlonmax;
-  gs->latmin = xlatmin;
-  gs->latmax = xlatmax;
-  if ( cdoVerbose ) cdoPrint("boundbox: lonmin=%g lonmax=%g latmin=%g latmax=%g",
-                             lonmin*RAD2DEG, lonmax*RAD2DEG, latmin*RAD2DEG, latmax*RAD2DEG);
-
-  if ( mask1 ) free(mask1);
-}
-
-static
-void cal_mask(struct gridsearch *gs)
-{
-  enum {mmin = 100};
-  const double fact = 1;
-  double dlon = gs->lonmax - gs->lonmin;
-  double dlat = gs->latmax - gs->latmin;
-  if ( cdoVerbose ) cdoPrint("mask: dlon=%g, dlat=%g", dlon*RAD2DEG, dlat*RAD2DEG);
-  size_t sqrtn = (size_t) sqrt((double)gs->n);
-  if ( cdoVerbose ) cdoPrint("n=%zu  sqrt(n)=%zu", gs->n, sqrtn);
-  size_t mlat = fact*(sqrtn/2.)*(1+dlat/dlon);
-  size_t mlon = mlat*dlon/dlat;
-  if ( cdoVerbose ) cdoPrint("mlon=%zu mlat=%zu mn=%zu", mlon, mlat, mlon*mlat);
-}
-
-
-void gridsearch_bound_poly(struct gridsearch *gs, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
-{
-  printf("%s\n", __func__);
-  size_t nx = dims[0];
-  size_t ny = dims[1];
-  printf("nx %zu  ny %zu\n", nx, ny);
-  if ( n == 1 || nx*ny != n ) return;
-
-#define PMAX  40
-  size_t pmax = PMAX;
-  size_t pn = 0;
-  double px[PMAX];
-  double py[PMAX];
-
-  for ( size_t i = 0; i < nx; ++i )
-    printf("x1 %zu lon/lat %g/%g\n", i+1, lons[0*nx+i]*RAD2DEG, lats[0*nx+i]*RAD2DEG);
-  for ( size_t i = 0; i < nx; ++i )
-    printf("x2 %zu lon/lat %g/%g\n", i+1, lons[(ny-1)*nx+i]*RAD2DEG, lats[(ny-1)*nx+i]*RAD2DEG);
-  for ( size_t i = 0; i < ny; ++i )
-    printf("y1 %zu lon/lat %g/%g\n", i+1, lons[i*nx+0]*RAD2DEG, lats[i*nx+0]*RAD2DEG);
-  for ( size_t i = 0; i < ny; ++i )
-    printf("y2 %zu lon/lat %g/%g\n", i+1, lons[i*nx+(nx-1)]*RAD2DEG, lats[i*nx+(nx-1)]*RAD2DEG);
-}
-
-
-struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
+
+  gs->is_cyclic = xIsCyclic;
+  gs->is_curve = n!=1 && n==dims[0]*dims[1];
+  gs->dims[0] = dims[0];
+  gs->dims[1] = dims[1];
 
   gs->method_nn = gridsearch_method_nn;
   gs->n = n;
   if ( n == 0 ) return gs;
+
+  gs->plons = lons;
+  gs->plats = lats;
 
   if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
   else if ( gs->method_nn == GridsearchMethod::nanoflann ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
@@ -507,9 +348,14 @@ struct gridsearch *gridsearch_create(size_t n, const double *restrict lons, cons
 }
 
 
-struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_nn(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
+
+  gs->is_cyclic = xIsCyclic;
+  gs->is_curve = n!=1 && n==dims[0]*dims[1];
+  gs->dims[0] = dims[0];
+  gs->dims[1] = dims[1];
 
   gs->method_nn = gridsearch_method_nn;
   gs->n = n;
@@ -523,9 +369,6 @@ struct gridsearch *gridsearch_create_nn(size_t n, const double *restrict lons, c
   else if ( gs->method_nn == GridsearchMethod::full      ) gs->search_container = gs_create_full(n, lons, lats);
 
   gs->search_radius = cdo_default_search_radius();
-
-  // cal_bound_box(gs, n, lons, lats);
-  // cal_mask(gs);
 
   return gs;
 }
@@ -596,12 +439,42 @@ size_t gs_nearest_kdtree(void *search_container, double lon, double lat, double 
   return index;
 }
 
-//#define TEST_QUAD
 
-#ifdef  TEST_QUAD
 bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
                    double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
-#endif
+
+static
+size_t llindex_in_quad(struct gridsearch *gs, size_t index, double lon, double lat)
+{
+  size_t ret_index = index;
+  if ( ret_index != GS_NOT_FOUND )
+    {
+      ret_index = GS_NOT_FOUND;
+      size_t nx = gs->dims[0];
+      size_t ny = gs->dims[1];
+      size_t adds[4];
+      double lons[4];
+      double lats[4];
+      bool is_cyclic = gs->is_cyclic;
+      for ( unsigned k = 0; k < 4; ++k )
+        {
+          /* Determine neighbor addresses */
+          size_t j = index/nx;
+          size_t i = index - j*nx;
+          if ( k == 1 || k == 3 )  i = (i > 0) ? i - 1 : (is_cyclic) ? nx-1 : 0;
+          if ( k == 2 || k == 3 )  j = (j > 0) ? j - 1 : 0;
+
+          if ( point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats,
+                             lon, lat, gs->plons, gs->plats) )
+            {
+              ret_index = index;
+              break;
+            }
+        }
+    }
+
+  return ret_index;
+}
 
 static
 size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, double *prange, struct gridsearch *gs)
@@ -628,35 +501,8 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
   nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
   //printf("%zu %g\n", ret_index, out_dist_sqr);
 
-#ifdef  TEST_QUAD
-  if ( ret_index != GS_NOT_FOUND )
-    {
-      size_t nx = 450;
-      size_t ny = 250;
-      size_t adds[4];
-      double lons[4];
-      double lats[4];
-      bool is_cyclic = false;
-      for ( unsigned k = 0; k < 4; ++k )
-        {
-          /* Determine neighbor addresses */
-          size_t j = ret_index/nx;
-          size_t i = ret_index - j*nx;
-          if ( k == 1 || k == 3 )  i = (i > 0) ? i - 1 : (is_cyclic) ? nx-1 : 0;
-          if ( k == 2 || k == 3 )  j = (j > 0) ? j - 1 : 0;
-
-          if ( point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats,
-                             lon, lat, gs->plons, gs->plats) )
-            {
-              index = ret_index;
-              break;
-            }
-        }
-    }
-#else
   index = ret_index;
-  *prange = out_dist_sqr; 
-#endif
+  *prange = out_dist_sqr;
 
   //float frange = range;
   //if ( !(frange < range0) ) node = NULL;
@@ -719,6 +565,8 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
       else if ( gs->method_nn == GridsearchMethod::full )      index = gs_nearest_full(sc, lon, lat, prange);
       else cdoAbort("%s::method_nn undefined!", __func__);
       // clang-format on
+
+      if ( !gs->extrapolate && gs->is_curve ) index = llindex_in_quad(gs, index, lon, lat);
     }
 
   return index;
@@ -732,12 +580,16 @@ size_t gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat, double 
   kdTree_t *kdt = (kdTree_t *) gs->search_container;
   if ( kdt == NULL ) return nadds;
   
-  kdata_t query_pt[3];
   kdata_t range0 = gs_set_range(prange);
   kdata_t range = range0;
   struct pqueue *result = NULL;
 
+  kdata_t query_pt[3];
   LLtoXYZ<kdata_t>(lon, lat, query_pt);
+
+  if ( !gs->extrapolate )
+    for ( unsigned j = 0; j < 3; ++j )
+      if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] ) return nadds;
 
   if ( gs )
     {
@@ -787,6 +639,10 @@ size_t gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, doub
   NFDATATYPE query_pt[3];
   LLtoXYZ<NFDATATYPE>(lon, lat, query_pt);
 
+  if ( !gs->extrapolate )
+    for ( unsigned j = 0; j < 3; ++j )
+      if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] ) return nadds;
+
   if ( gs )
     {
       std::vector<NFDATATYPE> out_dist_sqr(nnn);
@@ -813,6 +669,23 @@ size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double
       else if ( gs->method_nn == GridsearchMethod::nanoflann ) nadds = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn, adds, dist);
       else cdoAbort("%s::method_nn undefined!", __func__);
       // clang-format on
+      
+      if ( !gs->extrapolate && gs->is_curve )
+        {
+          size_t nadds_old = nadds;
+          nadds = 0;
+          for ( size_t i = 0; i < nadds_old; ++i )
+            {
+              size_t index = adds[i];
+              index = llindex_in_quad(gs, index, lon, lat);
+              if ( index != GS_NOT_FOUND )
+                {
+                  dist[nadds] = dist[i];
+                  adds[nadds] = adds[i];
+                  nadds++;
+                }
+            }
+        }
     }
 
   return nadds;

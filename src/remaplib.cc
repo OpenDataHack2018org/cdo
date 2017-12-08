@@ -450,71 +450,6 @@ int expand_lonlat_grid(int gridID)
   return gridIDnew;
 }
 
-static
-int expand_curvilinear_grid(int gridID)
-{
-  if ( cdoVerbose ) cdoPrint("expand_curvilinear_grid");
-  size_t gridsize = gridInqSize(gridID);
-  long nx = (long) gridInqXsize(gridID);
-  long ny = (long) gridInqYsize(gridID);
-  long nxp4 = nx+4;
-  long nyp4 = ny+4;
-  size_t gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
-
-  double *xvals = (double*) Malloc(gridsize_new*sizeof(double));
-  double *yvals = (double*) Malloc(gridsize_new*sizeof(double));
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
-
-  int gridIDnew = gridCreate(GRID_CURVILINEAR, nxp4*nyp4);
-  gridDefXsize(gridIDnew, nxp4);
-  gridDefYsize(gridIDnew, nyp4);
-
-  grid_copy_attributes(gridID, gridIDnew);
-
-  for ( long j = ny-1; j >= 0; j-- )
-    for ( long i = nx-1; i >= 0; i-- )
-      xvals[(j+2)*(nx+4)+i+2] = xvals[j*nx+i];
-
-  for ( long j = ny-1; j >= 0; j-- )
-    for ( long i = nx-1; i >= 0; i-- )
-      yvals[(j+2)*(nx+4)+i+2] = yvals[j*nx+i];
-
-  for ( long j = 2; j < nyp4-2; j++ )
-    {
-      xvals[j*nxp4  ] = intlin(3.0, xvals[j*nxp4+3], 0.0, xvals[j*nxp4+2], 1.0);
-      xvals[j*nxp4+1] = intlin(2.0, xvals[j*nxp4+3], 0.0, xvals[j*nxp4+2], 1.0); 
-      yvals[j*nxp4  ] = intlin(3.0, yvals[j*nxp4+3], 0.0, yvals[j*nxp4+2], 1.0); 
-      yvals[j*nxp4+1] = intlin(2.0, yvals[j*nxp4+3], 0.0, yvals[j*nxp4+2], 1.0); 
-
-      xvals[j*nxp4+nxp4-2] = intlin(2.0, xvals[j*nxp4+nxp4-4], 0.0, xvals[j*nxp4+nxp4-3], 1.0); 
-      xvals[j*nxp4+nxp4-1] = intlin(3.0, xvals[j*nxp4+nxp4-4], 0.0, xvals[j*nxp4+nxp4-3], 1.0); 
-      yvals[j*nxp4+nxp4-2] = intlin(2.0, yvals[j*nxp4+nxp4-4], 0.0, yvals[j*nxp4+nxp4-3], 1.0); 
-      yvals[j*nxp4+nxp4-1] = intlin(3.0, yvals[j*nxp4+nxp4-4], 0.0, yvals[j*nxp4+nxp4-3], 1.0); 
-    }
-
-  for ( long i = 0; i < nxp4; i++ )
-    {
-      xvals[0*nxp4+i] = intlin(3.0, xvals[3*nxp4+i], 0.0, xvals[2*nxp4+i], 1.0);
-      xvals[1*nxp4+i] = intlin(2.0, xvals[3*nxp4+i], 0.0, xvals[2*nxp4+i], 1.0);
-      yvals[0*nxp4+i] = intlin(3.0, yvals[3*nxp4+i], 0.0, yvals[2*nxp4+i], 1.0);
-      yvals[1*nxp4+i] = intlin(2.0, yvals[3*nxp4+i], 0.0, yvals[2*nxp4+i], 1.0);
-
-      xvals[(nyp4-2)*nxp4+i] = intlin(2.0, xvals[(nyp4-4)*nxp4+i], 0.0, xvals[(nyp4-3)*nxp4+i], 1.0);
-      xvals[(nyp4-1)*nxp4+i] = intlin(3.0, xvals[(nyp4-4)*nxp4+i], 0.0, xvals[(nyp4-3)*nxp4+i], 1.0);
-      yvals[(nyp4-2)*nxp4+i] = intlin(2.0, yvals[(nyp4-4)*nxp4+i], 0.0, yvals[(nyp4-3)*nxp4+i], 1.0);
-      yvals[(nyp4-1)*nxp4+i] = intlin(3.0, yvals[(nyp4-4)*nxp4+i], 0.0, yvals[(nyp4-3)*nxp4+i], 1.0);
-    }
-
-  gridDefXvals(gridIDnew, xvals);
-  gridDefYvals(gridIDnew, yvals);
-  
-  Free(xvals);
-  Free(yvals);
-
-  return gridIDnew;
-}
-
 /*****************************************************************************/
 
 static
@@ -845,13 +780,6 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
     {
       int lbounds = TRUE;
       src_grid->gridID = gridID1 = gridToCurvilinear(src_grid->gridID, lbounds);
-    }
-
-  if ( !src_grid->lextrapolate && gridInqSize(src_grid->gridID) > 1 &&
-       map_type == MAP_TYPE_DISTWGT &&
-       (gridInqType(gridID1) == GRID_CURVILINEAR && src_grid->non_global) )
-    {
-      src_grid->gridID = gridID1 = expand_curvilinear_grid(gridID1);
     }
 
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )

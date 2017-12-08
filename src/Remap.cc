@@ -435,19 +435,6 @@ void get_remap_env(void)
 }
 
 static
-void set_halo_to_missval(size_t nx, size_t ny, double *array, double missval)
-{
-  for ( size_t j = 0; j < ny+4; j++ ) array[j*(nx+4)+0]      = missval;
-  for ( size_t j = 0; j < ny+4; j++ ) array[j*(nx+4)+1]      = missval;
-  for ( size_t j = 0; j < ny+4; j++ ) array[j*(nx+4)+nx+2]   = missval;
-  for ( size_t j = 0; j < ny+4; j++ ) array[j*(nx+4)+nx+3]   = missval;
-  for ( size_t i = 0; i < nx+4; i++ ) array[     0*(nx+4)+i] = missval;
-  for ( size_t i = 0; i < nx+4; i++ ) array[     1*(nx+4)+i] = missval;
-  for ( size_t i = 0; i < nx+4; i++ ) array[(ny+2)*(nx+4)+i] = missval;
-  for ( size_t i = 0; i < nx+4; i++ ) array[(ny+3)*(nx+4)+i] = missval;
-}
-
-static
 bool is_global_grid(int gridID)
 {
   bool global_grid = true;
@@ -901,12 +888,6 @@ void *Remap(void *argument)
       if ( map_type == MAP_TYPE_DISTWGT && !lextrapolate ) remap_extrapolate = true;
       if ( gridIsCircular(gridID1)      && !lextrapolate ) remap_extrapolate = true;
 
-      if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 && !is_global_grid(gridID1) )
-	{
-	  remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
-	  remaps[0].src_grid.non_global = true;
-	}
-
       if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].src_grid.nvgp;
 
       if ( gridsize != remaps[0].gridsize )
@@ -1016,28 +997,6 @@ void *Remap(void *argument)
 	  gridsize = gridInqSize(gridID1);
 
 	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = true;
-	  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 && !is_global_grid(gridID1) )
-	    {
-              if ( cdoVerbose ) cdoPrint("---> Expand array!");
-	      long nx = gridInqXsize(gridID1);
-	      long ny = gridInqYsize(gridID1);
-	      size_t gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
-	      if ( gridsize_new > grid1sizemax )
-		{
-		  grid1sizemax = gridsize_new;
-		  array1 = (double*) Realloc(array1, grid1sizemax*sizeof(double));
-		  imask  = (int*) Realloc(imask, grid1sizemax*sizeof(int));
-		}
-	      
-	      for ( long j = ny-1; j >= 0; j-- )
-		for ( long i = nx-1; i >= 0; i-- )
-		  array1[(j+2)*(nx+4)+i+2] = array1[j*nx+i];
-
-	      set_halo_to_missval(nx, ny, array1, missval);
-
-	      gridsize = gridsize_new;
-	      nmiss1 += 4*(nx+2) + 4*(ny+2);
-	    }
 
 	  for ( size_t i = 0; i < gridsize; i++ )
             imask[i] = DBL_IS_EQUAL(array1[i], missval) ? FALSE : TRUE;
