@@ -38,7 +38,7 @@
 #define  Echam5iniOperators     {"import_e5ml", "import_e5res", "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
-#define  EnsstatOperators       {"ensrange", "ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensvar1", "ensstd", "ensstd1", "enspctl"}
+#define  EnsstatOperators       {"ensrange", "ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensvar1", "ensstd", "ensstd1", "enspctl", "ensskew"}
 #define  Ensstat3Operators      {"ensrkhistspace", "ensrkhisttime", "ensroc"}
 #define  EnsvalOperators        {"enscrps", "ensbrs"}
 #define  EofcoeffOperators      {"eofcoeff"}
