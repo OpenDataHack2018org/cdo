@@ -7,7 +7,7 @@
     "breeze": {
       "hostname": "breeze.mpimet.mpg.de",
       "dir": "/home/mpim/m300064/builds/remote",
-      "envConfigFiles": ["/etc/profile",".profile"],
+      "envConfigFiles": ["/etc/profile","~/.profile"],
       "CC": ["gcc","g++","clang","clang++","icc","icpc","pgcc"]
     },
     "mistral": {
