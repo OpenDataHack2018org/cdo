@@ -147,6 +147,20 @@ pstream_init_pointer(void)
 
     return &new_entry.first->second;
 }
+//temporary function: will be replaced by according pstream_t::pstream_t(..)
+pstream_t *create_pstream(std::vector<std::string> p_filenameList)
+{
+    pstream_t* new_entry = create_pstream();
+    new_entry->m_mfnames = p_filenameList;
+    return new_entry;
+
+}
+//temporary function: will be replaced by according pstream_t::pstream_t(..)
+ pstream_t *create_pstream(std::string p_filename)
+{
+    return create_pstream(std::vector<std::string>{p_filename});
+}
+
 
 static pstream_t * pstream_to_pointer(int idx)
 {

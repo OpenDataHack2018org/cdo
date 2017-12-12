@@ -5,8 +5,7 @@
 #include "../../src/process.h"
 #include <iostream>
 
-
-void *Info(void *test){return test;}
+void *Info(void *test) { return test; }
 
 go_bandit([]() {
   bandit::describe("Process creation", []() {

@@ -54,6 +54,9 @@ public:
   std::vector<process_t *> parentProcesses;
   std::vector<pstream_t *> inputStreams;
   std::vector<pstream_t *> outputStreams;
+  short m_cntIn;
+  short m_cntOut;
+
   double s_utime;
   double s_stime;
   double a_utime;
@@ -62,19 +65,20 @@ public:
 
   size_t nvals;
   short nvars;
+
   int ntimesteps;
   short m_streamCnt;
   std::vector<argument_t> streamArguments;
   const char *m_operatorCommand;
   const char *operatorName;
   char *operatorArg;
-  int oargc;
-  std::vector<char *> oargv;
   char prompt[64];
   short noper;
-  oper_t oper[MAX_OPERATOR];
 
   modules_t m_module;
+  std::vector<char *> oargv;
+  int oargc;
+  oper_t oper[MAX_OPERATOR];
 
   int getInStreamCnt();
   int getOutStreamCnt();

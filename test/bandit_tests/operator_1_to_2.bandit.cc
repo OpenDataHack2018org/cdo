@@ -5,15 +5,14 @@
 #include "../../src/process.h"
 #include <iostream>
 
-
-void *Test(void *ptr){return ptr;}
+void *Test(void *ptr) { return ptr; }
 std::vector<std::string> TestHelp = {"TEST", "HELP"};
-std::vector<const char *> test_argv{"-test", "in_file","out_file" };
+std::vector<const char *> test_argv{"-test", "in_file", "out_file"};
 
 go_bandit([]() {
   bandit::describe("Process: 1 input, 1 output", []() {
 
-    add_module("Test", {Test, TestHelp, {"test"}, 1,0,1, 1});
+    add_module("Test", {Test, TestHelp, {"test"}, 1, 0, 1, 1});
 
     createProcesses(test_argv.size(), &test_argv[0]);
 

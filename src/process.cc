@@ -248,6 +248,9 @@ processAddInputStream(pstream_t *p_pstream_ptr)
     {
       process.nchild++;
     }
+  else
+  {
+    }
   int sindex = process.getInStreamCnt();
 
   if (sindex >= MAX_STREAM)
@@ -844,8 +847,11 @@ createProcesses(int argc, const char **argv)
   current_process = call_stack.top();
   for(int i = 0; i < root_process->m_module.streamOutCnt; i++)
   {
-    pstream_t *new_out_stream =  create_pstream();
-    root_process->outputStreams.push_back(new_out_stream);
+    if(CdoDebug::PROCESS)
+    {
+        MESSAGE("Creating new pstream for output file: ", argv[argc - (i + 1)]);
+    }
+    root_process->outputStreams.push_back(create_pstream(std::string(argv[argc - (i + 1)])));
   }
   do
     {
@@ -871,9 +877,8 @@ createProcesses(int argc, const char **argv)
           if(CdoDebug::PROCESS){
             MESSAGE("adding file to ", current_process->operatorName);
           }
-          pstream_t *new_in_stream = create_pstream();
-          // new_pstream->pstreamOpenReadFile(argv[i]);
-          current_process->inputStreams.push_back(new_in_stream);
+          MESSAGE(argv[idx]);
+          current_process->inputStreams.push_back(create_pstream(argv[idx]));
         }
 
     while (current_process->hasAllInputs() && current_process != root_process)
@@ -1038,6 +1043,7 @@ operatorInputArg(const char *enter)
           // reset_text_color(stderr);
         }
 
+
       while (lreadline)
         {
           readline(stdin, pline, 1024);
@@ -1060,6 +1066,7 @@ operatorInputArg(const char *enter)
                   len = 0;
                   while (pline[len] != ' ' && pline[len] != ',' && pline[len] != '\\' && len < linelen)
                     len++;
+
 
                   process.oargv[oargc] = (char *) Malloc(len + 1);
                   memcpy(process.oargv[oargc], pline, len);
