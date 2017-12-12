@@ -50,6 +50,7 @@ double fldfun(field_type field, int function)
     case func_rank:   rval = fldrank(field);   break;
     case func_roc:    rval = fldroc(field);    break;
     case func_skew:   rval = fldskew(field);   break;
+    case func_kurt:   rval = fldkurt(field);   break;
     default: cdoAbort("%s: function %d not implemented!", __func__, function);
     }
 
@@ -445,21 +446,19 @@ void prevarsum(const double *restrict array, size_t len, size_t nmiss,
 
 static
 void preskewsum(const double *restrict array, size_t len, size_t nmiss, const double mean,
-               double missval, double *rsum3, double *rsum3w, double *rsum4, double *rsum4w,
+               double missval, double *rsum3w, double *rsum4w,
                double *rsum3diff, double *rsum2diff)
 {
   assert(array!=NULL);
 
-  double xsum3 = 0, xsum3w = 0, xsum3diff = 0;
-  double xsum4 = 0, xsum4w = 0, xsum2diff = 0;
+  double xsum3w = 0, xsum3diff = 0;
+  double xsum4w = 0, xsum2diff = 0;
 
   if ( nmiss )
     {
       for ( size_t i = 0; i < len; ++i )
         if ( !DBL_IS_EQUAL(array[i], missval) )
           {
-            xsum3     += array[i] * array[i] * array[i];
-            xsum4     += array[i] * array[i] * array[i] * array[i];
             xsum3diff += (array[i]-mean) * (array[i]-mean) * (array[i]-mean);
             xsum2diff += (array[i]-mean) * (array[i]-mean);
             xsum3w    += 1;
@@ -470,8 +469,6 @@ void preskewsum(const double *restrict array, size_t len, size_t nmiss, const do
     {
       for ( size_t i = 0; i < len; ++i )
         {
-          xsum3     += array[i] * array[i] * array[i];
-          xsum4     += array[i] * array[i] * array[i] * array[i];
           xsum3diff += (array[i]-mean) * (array[i]-mean) * (array[i]-mean);
           xsum2diff += (array[i]-mean) * (array[i]-mean);
         }
@@ -479,14 +476,49 @@ void preskewsum(const double *restrict array, size_t len, size_t nmiss, const do
       xsum4w = len;
     }
 
-  *rsum3     = xsum3;
-  *rsum4     = xsum4;
   *rsum3diff = xsum3diff;
   *rsum2diff = xsum2diff;
   *rsum3w    = xsum3w;
   *rsum4w    = xsum4w;
 }
 
+static
+void prekurtsum(const double *restrict array, size_t len, size_t nmiss, const double mean,
+               double missval, double *rsum3w, double *rsum4w,
+               double *rsum2diff, double *rsum4diff)
+{
+  assert(array!=NULL);
+
+  double xsum3w = 0, xsum4diff = 0;
+  double xsum4w = 0, xsum2diff = 0;
+
+  if ( nmiss )
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( !DBL_IS_EQUAL(array[i], missval) )
+          {
+            xsum2diff += (array[i]-mean) * (array[i]-mean);
+            xsum4diff += (array[i]-mean) * (array[i]-mean) * (array[i]-mean) * (array[i]-mean);
+            xsum3w    += 1;
+            xsum4w    += 1;
+          }
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i )
+        {
+          xsum2diff += (array[i]-mean) * (array[i]-mean);
+          xsum4diff += (array[i]-mean) * (array[i]-mean) * (array[i]-mean) * (array[i]-mean);
+        }
+      xsum3w = len;
+      xsum4w = len;
+    }
+
+  *rsum4diff = xsum4diff;
+  *rsum2diff = xsum2diff;
+  *rsum3w    = xsum3w;
+  *rsum4w    = xsum4w;
+}
 
 double fldvar(field_type field)
 {
@@ -520,6 +552,28 @@ double fldvar1(field_type field)
 
   return rvar;
 }
+double fldkurt(field_type field)
+{
+  const size_t nmiss   = field.nmiss > 0;
+  const size_t len     = field.size;
+  const double missval = field.missval;
+  double rsum, rsumw;
+  double rsumq, rsumwq;
+  double rsum3w;  /* 3rd moment variables */
+  double rsum4w;  /* 4th moment variables */
+  double rsum2diff, rsum4diff;
+
+
+  prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+  prekurtsum(field.ptr, len, nmiss, (rsum/rsumw), missval, &rsum3w, &rsum4w, &rsum2diff, &rsum4diff);
+
+  if(IS_EQUAL(rsum3w,0.0)|| IS_EQUAL(rsum2diff,0.0)) return missval;
+  double rvar = ((rsum4diff/rsum3w)/ pow((rsum2diff)/(rsum3w),2)) - 3.0;
+
+  if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+
+  return rvar;
+}
 
 double fldskew(field_type field)
 {
@@ -528,14 +582,15 @@ double fldskew(field_type field)
   const double missval = field.missval;
   double rsum, rsumw;
   double rsumq, rsumwq;
-  double rsum3, rsum3w;  /* 3rd moment variables */
-  double rsum4, rsum4w;  /* 4th moment variables */
+  double rsum3w;  /* 3rd moment variables */
+  double rsum4w;  /* 4th moment variables */
   double rsum3diff, rsum2diff;
 
   prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
-  preskewsum(field.ptr, len, nmiss, (rsum/rsumw), missval, &rsum3, &rsum3w, &rsum4, &rsum4w, &rsum3diff, &rsum2diff);
+  preskewsum(field.ptr, len, nmiss, (rsum/rsumw), missval, &rsum3w, &rsum4w, &rsum3diff, &rsum2diff);
 
-  double rvar = IS_NOT_EQUAL(rsum3w,0) ? (rsum3diff/rsum3w)/pow((rsum2diff)/(rsum3w-1.0),1.5) : missval;
+  if(IS_EQUAL(rsum3w, 0.0) || IS_EQUAL(rsum3w, 1.0) || IS_EQUAL(rsum2diff,0.0)) return missval; 
+  double rvar = (rsum3diff/rsum3w)/pow((rsum2diff)/(rsum3w-1.0),1.5);
 
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
 
