@@ -346,10 +346,12 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
   if ( nmiss )
     {
+      bool xIsCyclic = false;
+      size_t dims[2] = {nvals, 0};
       if ( num_neighbors == 1 )
-        gs = gridsearch_create_nn(nvals, lons, lats);
+        gs = gridsearch_create_nn(xIsCyclic, dims, nvals, lons, lats);
       else
-        gs = gridsearch_create(nvals, lons, lats);
+        gs = gridsearch_create(xIsCyclic, dims, nvals, lons, lats);
     }
   
   finish = clock();

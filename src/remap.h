@@ -226,12 +226,15 @@ int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *r
                       double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
                       const double *restrict src_center_lat, const double *restrict src_center_lon);
 
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+                   double plon, double plat, const double *restrict center_lon, const double *restrict center_lat);
+
 int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
 		double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
 		const double *restrict src_center_lat, const double *restrict src_center_lon,
 		const restr_t *restrict src_grid_bound_box, const size_t *restrict src_bin_add);
 
-bool find_ij_weights(double plon, double plat, double* restrict src_lats, double* restrict src_lons, double *ig, double *jg);
+bool find_ij_weights(double plon, double plat, double* restrict src_lons, double* restrict src_lats, double *ig, double *jg);
 int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, size_t nym, const double *restrict xm, const double *restrict ym);
 
 void remapgrid_get_lonlat(remapgrid_t *grid, size_t cell_add, double *plon, double *plat);

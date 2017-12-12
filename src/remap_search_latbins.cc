@@ -222,6 +222,102 @@ int grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, dou
 }
 
 
+unsigned quad_cross_products(double plon, double plat, double lons[4], double lats[4])
+{
+  unsigned n;
+  int scross[4], scross_last = 0;
+  // Vectors for cross-product check
+  double vec1_lat, vec1_lon;
+  double vec2_lat, vec2_lon;
+
+  /* For consistency, we must make sure all lons are in same 2pi interval */
+  vec1_lon = lons[0] - plon;
+  if      ( vec1_lon >  PI ) lons[0] -= PI2;
+  else if ( vec1_lon < -PI ) lons[0] += PI2;
+
+  for ( n = 1; n < 4; ++n )
+    {
+      vec1_lon = lons[n] - lons[0];
+      if      ( vec1_lon >  PI ) lons[n] -= PI2;
+      else if ( vec1_lon < -PI ) lons[n] += PI2;
+    }
+
+  /* corner_loop */
+  for ( n = 0; n < 4; ++n )
+    {
+      unsigned next_n = (n+1)%4;
+      /*
+        Here we take the cross product of the vector making up each box side 
+        with the vector formed by the vertex and search point.
+        If all the cross products are positive, the point is contained in the box.
+      */
+      vec1_lat = lats[next_n] - lats[n];
+      vec1_lon = lons[next_n] - lons[n];
+      vec2_lat = plat - lats[n];
+      vec2_lon = plon - lons[n];
+
+      /* Check for 0,2pi crossings */
+      if      ( vec1_lon >  THREE*PIH ) vec1_lon -= PI2;
+      else if ( vec1_lon < -THREE*PIH ) vec1_lon += PI2;
+
+      if      ( vec2_lon >  THREE*PIH ) vec2_lon -= PI2;
+      else if ( vec2_lon < -THREE*PIH ) vec2_lon += PI2;
+
+      double cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
+
+      /* If cross product is less than ZERO, this cell doesn't work    */
+      /* 2008-10-16 Uwe Schulzweida: bug fix for cross_product eq zero */
+      scross[n] = cross_product < 0 ? -1 : cross_product > 0 ? 1 : 0;
+
+      if ( n == 0 ) scross_last = scross[n];
+
+      if ( (scross[n] < 0 && scross_last > 0) || (scross[n] > 0 && scross_last < 0) ) break;
+
+      scross_last = scross[n];
+    }
+
+  if ( n >= 4 )
+    {
+      n = 0;
+      if      ( scross[0]>=0 && scross[1]>=0 && scross[2]>=0 && scross[3]>=0 ) n = 4;
+      else if ( scross[0]<=0 && scross[1]<=0 && scross[2]<=0 && scross[3]<=0 ) n = 4;
+    }
+
+  return n;
+}
+
+
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+                   double plon, double plat, const double *restrict center_lon, const double *restrict center_lat)
+{
+  bool search_result = false;
+  size_t ip1 = (i < (nx-1)) ? i + 1 : is_cyclic ? 0 : i;
+  size_t jp1 = (j < (ny-1)) ? j + 1 : j;
+
+  if ( i == ip1 || j == jp1 ) return search_result;
+
+  size_t idx[4];
+  idx[0] = j  *nx + i;
+  idx[1] = j  *nx + ip1; // east
+  idx[2] = jp1*nx + ip1; // north-east
+  idx[3] = jp1*nx + i;   // north
+
+  for ( unsigned j = 0; j < 4; ++j ) lons[j] = center_lon[idx[j]];
+  for ( unsigned j = 0; j < 4; ++j ) lats[j] = center_lat[idx[j]];
+
+  unsigned n = quad_cross_products(plon, plat, lons, lats);
+
+  /* If cross products all same sign, we found the location */
+  if ( n >= 4 )
+    {
+      for ( unsigned j = 0; j < 4; ++j ) adds[j] = idx[j];
+      search_result = true;
+    }
+
+  return search_result;
+}
+
+
 int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, 
 		double *restrict src_lons,  double plat, double plon, const size_t *restrict src_grid_dims,
 		const double *restrict src_center_lat, const double *restrict src_center_lon,
@@ -249,11 +345,7 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
     int src_bin_add[][2]           ! latitude bins for restricting
   */
   /*  Local variables */
-  size_t n2, next_n, srch_add, srch_add4;    /* dummy indices                    */
-  /* Vectors for cross-product check */
-  double vec1_lat, vec1_lon;
-  double vec2_lat, vec2_lon;
-  int scross[4], scross_last = 0;
+  size_t n2, srch_add, srch_add4;    /* dummy indices                    */
   int search_result = 0;
   restr_t *bin_lats = src_grid->bin_lats;
 
@@ -295,97 +387,16 @@ int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restric
 	   rlat >= src_grid_bound_box[srch_add4  ] &&
 	   rlat <= src_grid_bound_box[srch_add4+1])
 	{
-          unsigned n;
-
 	  /* We are within bounding box so get really serious */
 
           /* Determine neighbor addresses */
           size_t j = srch_add/nx;
           size_t i = srch_add - j*nx;
 
-          size_t ip1 = (i < (nx-1)) ? i + 1 : (src_grid->is_cyclic) ? 0 : i;
-          size_t jp1 = (j < (ny-1)) ? j + 1 : j;
-
-          size_t n_add  = jp1*nx + i;
-          size_t e_add  = j  *nx + ip1;
-	  size_t ne_add = jp1*nx + ip1;
-
-          src_lons[0] = src_center_lon[srch_add];
-          src_lons[1] = src_center_lon[e_add];
-          src_lons[2] = src_center_lon[ne_add];
-          src_lons[3] = src_center_lon[n_add];
-
-          src_lats[0] = src_center_lat[srch_add];
-          src_lats[1] = src_center_lat[e_add];
-          src_lats[2] = src_center_lat[ne_add];
-          src_lats[3] = src_center_lat[n_add];
-
-	  /* For consistency, we must make sure all lons are in same 2pi interval */
-
-          vec1_lon = src_lons[0] - plon;
-          if      ( vec1_lon >  PI ) src_lons[0] -= PI2;
-          else if ( vec1_lon < -PI ) src_lons[0] += PI2;
-
-          for ( n = 1; n < 4; ++n )
+          if ( point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats,
+                             plon, plat, src_center_lon, src_center_lat) )
 	    {
-	      vec1_lon = src_lons[n] - src_lons[0];
-	      if      ( vec1_lon >  PI ) src_lons[n] -= PI2;
-	      else if ( vec1_lon < -PI ) src_lons[n] += PI2;
-	    }
-
-          /* corner_loop */
-          for ( n = 0; n < 4; ++n )
-	    {
-	      next_n = (n+1)%4;
-
-	      /*
-		Here we take the cross product of the vector making up each box side 
-                with the vector formed by the vertex and search point.
-                If all the cross products are positive, the point is contained in the box.
-	      */
-	      vec1_lat = src_lats[next_n] - src_lats[n];
-	      vec1_lon = src_lons[next_n] - src_lons[n];
-	      vec2_lat = plat - src_lats[n];
-	      vec2_lon = plon - src_lons[n];
-
-	      /* Check for 0,2pi crossings */
-
-	      if      ( vec1_lon >  THREE*PIH ) vec1_lon -= PI2;
-	      else if ( vec1_lon < -THREE*PIH ) vec1_lon += PI2;
-
-	      if      ( vec2_lon >  THREE*PIH ) vec2_lon -= PI2;
-	      else if ( vec2_lon < -THREE*PIH ) vec2_lon += PI2;
-
-	      double cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
-
-	      /* If cross product is less than ZERO, this cell doesn't work    */
-	      /* 2008-10-16 Uwe Schulzweida: bug fix for cross_product eq zero */
-	      scross[n] = cross_product < 0 ? -1 : cross_product > 0 ? 1 : 0;
-
-	      if ( n == 0 ) scross_last = scross[n];
-
-	      if ( (scross[n] < 0 && scross_last > 0) || (scross[n] > 0 && scross_last < 0) ) break;
-
-	      scross_last = scross[n];
-	    } /* corner_loop */
-
-	  if ( n >= 4 )
-	    {
-	      n = 0;
-	      if      ( scross[0]>=0 && scross[1]>=0 && scross[2]>=0 && scross[3]>=0 ) n = 4;
-	      else if ( scross[0]<=0 && scross[1]<=0 && scross[2]<=0 && scross[3]<=0 ) n = 4;
-	    }
-
-	  /* If cross products all same sign, we found the location */
-          if ( n >= 4 )
-	    {
-	      src_add[0] = srch_add;
-	      src_add[1] = e_add;
-	      src_add[2] = ne_add;
-	      src_add[3] = n_add;
-
 	      search_result = 1;
-
 	      return search_result;
 	    }
 

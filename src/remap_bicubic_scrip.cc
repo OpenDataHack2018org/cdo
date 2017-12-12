@@ -155,7 +155,7 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
 	  double iw, jw;  /*  current guess for bilinear coordinate  */
-          if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
+          if ( find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw) )
 	    {
 	      /* Successfully found iw,jw - compute weights */
 	      set_bicubic_weights(iw, jw, wgts);
@@ -276,7 +276,7 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
 	  double iw, jw;  /*  current guess for bilinear coordinate  */
-          if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
+          if ( find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw) )
 	    {
 	      /* Successfully found iw,jw - compute weights */
 	      set_bicubic_weights(iw, jw, wgts);

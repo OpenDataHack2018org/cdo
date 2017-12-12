@@ -134,6 +134,8 @@ double fldvar1w(field_type field);
 double fldpctl(field_type field, const double pn);
 void   fldunm(field_type *field);
 int    fldhvs(field_type *field, const size_t nlevels);
+double fldskew(field_type field);
+double fldkurt(field_type field);
 
 /* ENS VALIDATION */
 double fldcrps(field_type field);

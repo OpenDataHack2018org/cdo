@@ -91,6 +91,8 @@ def executeRemote(command, builder)
     ssh.loop
   end
 end
+def executeRemoteSimple
+end
 #
 # execution wrapper
 def execute(command, builder)
@@ -332,9 +334,15 @@ end
 
 desc "generate tags database for vim and emacs"
 task :tags do |t|
-  srcFiles = Dir.glob("src/**/*.{h,c}") + Dir.glob("libcdi/**/*.{c,h,cpp,hpp,f90,f}")
+  srcFiles = Dir.glob("src/**/*.{h,c,cc}") + Dir.glob("libcdi/**/*.{c,h,cpp,hpp,f90,f}")
   Parallel.map(["","-e"]) {|ctagsOutputMode|
     sh "ctags #{ctagsOutputMode} #{srcFiles.join(' ')}"
+  }
+end
+# build tags
+task :tagList do
+  `git tag -l`.split.each {|tag|
+    puts tag
   }
 end
 # check connections {{{

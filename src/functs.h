@@ -24,6 +24,8 @@
 #define  func_std1w    26
 #define  func_varw     27
 #define  func_var1w    28
+#define  func_skew     29
+#define  func_kurt     100
 
 #define  func_crps     30
 #define  func_brs      31
