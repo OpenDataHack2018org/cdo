@@ -88,9 +88,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = cdo_process_creation_test$(EXEEXT) \
-	operator_1_to_1$(EXEEXT) operator_1_to_2$(EXEEXT) \
-	chained_operators$(EXEEXT)
+noinst_PROGRAMS = chained_operators$(EXEEXT) \
+	variable_inputs_operators$(EXEEXT)
 subdir = test/bandit_tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_cfortran_flags.m4 \
@@ -110,27 +109,19 @@ CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_cdo_process_creation_test_OBJECTS =  \
-	cdo_process_creation_test-process_creation_tests.$(OBJEXT)
-cdo_process_creation_test_OBJECTS =  \
-	$(am_cdo_process_creation_test_OBJECTS)
-cdo_process_creation_test_DEPENDENCIES = $(tests_LDADD)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 am_chained_operators_OBJECTS =  \
 	chained_operators-chained_operators.$(OBJEXT)
 chained_operators_OBJECTS = $(am_chained_operators_OBJECTS)
 chained_operators_DEPENDENCIES = $(tests_LDADD)
-am_operator_1_to_1_OBJECTS =  \
-	operator_1_to_1-operator_1_to_1.bandit.$(OBJEXT)
-operator_1_to_1_OBJECTS = $(am_operator_1_to_1_OBJECTS)
-operator_1_to_1_DEPENDENCIES = $(tests_LDADD)
-am_operator_1_to_2_OBJECTS =  \
-	operator_1_to_2-operator_1_to_2.bandit.$(OBJEXT)
-operator_1_to_2_OBJECTS = $(am_operator_1_to_2_OBJECTS)
-operator_1_to_2_DEPENDENCIES = $(tests_LDADD)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
+am_variable_inputs_operators_OBJECTS =  \
+	variable_inputs_operators-variable_inputs_operators.$(OBJEXT)
+variable_inputs_operators_OBJECTS =  \
+	$(am_variable_inputs_operators_OBJECTS)
+variable_inputs_operators_DEPENDENCIES = $(tests_LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -165,12 +156,10 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(cdo_process_creation_test_SOURCES) \
-	$(chained_operators_SOURCES) $(operator_1_to_1_SOURCES) \
-	$(operator_1_to_2_SOURCES)
-DIST_SOURCES = $(cdo_process_creation_test_SOURCES) \
-	$(chained_operators_SOURCES) $(operator_1_to_1_SOURCES) \
-	$(operator_1_to_2_SOURCES)
+SOURCES = $(chained_operators_SOURCES) \
+	$(variable_inputs_operators_SOURCES)
+DIST_SOURCES = $(chained_operators_SOURCES) \
+	$(variable_inputs_operators_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -585,20 +574,14 @@ top_srcdir = @top_srcdir@
 # bin_PROGRAMS = cdo_process_creation_test operator_1_to_1 operator_1_to_2
 tests_CPPFLAGS = -I$(top_srcdir)/test/bandit_tests -I$(top_srcdir)/test/bandit_tests/bandit
 tests_LDADD = $(top_builddir)/src/libcdo.la $(top_builddir)/libcdi/src/libcdi.la
-cdo_process_creation_test_SOURCES = process_creation_tests.cc
-cdo_process_creation_test_CPPFLAGS = $(tests_CPPFLAGS)
-cdo_process_creation_test_LDADD = $(tests_LDADD)
-operator_1_to_1_SOURCES = operator_1_to_1.bandit.cc
-operator_1_to_1_CPPFLAGS = $(tests_CPPFLAGS)
-operator_1_to_1_LDADD = $(tests_LDADD)
-operator_1_to_2_SOURCES = operator_1_to_2.bandit.cc
-operator_1_to_2_CPPFLAGS = $(tests_CPPFLAGS)
-operator_1_to_2_LDADD = $(tests_LDADD)
 chained_operators_SOURCES = chained_operators.cc
 chained_operators_CPPFLAGS = $(tests_CPPFLAGS)
 chained_operators_LDADD = $(tests_LDADD)
+variable_inputs_operators_SOURCES = variable_inputs_operators.cc
+variable_inputs_operators_CPPFLAGS = $(tests_CPPFLAGS)
+variable_inputs_operators_LDADD = $(tests_LDADD)
 LD_LIBRARY_PATH = $(tests_LDADD)
-TESTS = ./cdo_process_creation_test ./operator_1_to_1 ./operator_1_to_2 ./chained_operators
+TESTS = ./chained_operators ./variable_inputs_operators
 all: all-am
 
 .SUFFIXES:
@@ -642,21 +625,13 @@ clean-noinstPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-cdo_process_creation_test$(EXEEXT): $(cdo_process_creation_test_OBJECTS) $(cdo_process_creation_test_DEPENDENCIES) $(EXTRA_cdo_process_creation_test_DEPENDENCIES) 
-	@rm -f cdo_process_creation_test$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(cdo_process_creation_test_OBJECTS) $(cdo_process_creation_test_LDADD) $(LIBS)
-
 chained_operators$(EXEEXT): $(chained_operators_OBJECTS) $(chained_operators_DEPENDENCIES) $(EXTRA_chained_operators_DEPENDENCIES) 
 	@rm -f chained_operators$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(chained_operators_OBJECTS) $(chained_operators_LDADD) $(LIBS)
 
-operator_1_to_1$(EXEEXT): $(operator_1_to_1_OBJECTS) $(operator_1_to_1_DEPENDENCIES) $(EXTRA_operator_1_to_1_DEPENDENCIES) 
-	@rm -f operator_1_to_1$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(operator_1_to_1_OBJECTS) $(operator_1_to_1_LDADD) $(LIBS)
-
-operator_1_to_2$(EXEEXT): $(operator_1_to_2_OBJECTS) $(operator_1_to_2_DEPENDENCIES) $(EXTRA_operator_1_to_2_DEPENDENCIES) 
-	@rm -f operator_1_to_2$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(operator_1_to_2_OBJECTS) $(operator_1_to_2_LDADD) $(LIBS)
+variable_inputs_operators$(EXEEXT): $(variable_inputs_operators_OBJECTS) $(variable_inputs_operators_DEPENDENCIES) $(EXTRA_variable_inputs_operators_DEPENDENCIES) 
+	@rm -f variable_inputs_operators$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(variable_inputs_operators_OBJECTS) $(variable_inputs_operators_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -664,10 +639,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_process_creation_test-process_creation_tests.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chained_operators-chained_operators.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/operator_1_to_1-operator_1_to_1.bandit.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/operator_1_to_2-operator_1_to_2.bandit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variable_inputs_operators-variable_inputs_operators.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -693,20 +666,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-cdo_process_creation_test-process_creation_tests.o: process_creation_tests.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_process_creation_test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo_process_creation_test-process_creation_tests.o -MD -MP -MF $(DEPDIR)/cdo_process_creation_test-process_creation_tests.Tpo -c -o cdo_process_creation_test-process_creation_tests.o `test -f 'process_creation_tests.cc' || echo '$(srcdir)/'`process_creation_tests.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo_process_creation_test-process_creation_tests.Tpo $(DEPDIR)/cdo_process_creation_test-process_creation_tests.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='process_creation_tests.cc' object='cdo_process_creation_test-process_creation_tests.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_process_creation_test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo_process_creation_test-process_creation_tests.o `test -f 'process_creation_tests.cc' || echo '$(srcdir)/'`process_creation_tests.cc
-
-cdo_process_creation_test-process_creation_tests.obj: process_creation_tests.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_process_creation_test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo_process_creation_test-process_creation_tests.obj -MD -MP -MF $(DEPDIR)/cdo_process_creation_test-process_creation_tests.Tpo -c -o cdo_process_creation_test-process_creation_tests.obj `if test -f 'process_creation_tests.cc'; then $(CYGPATH_W) 'process_creation_tests.cc'; else $(CYGPATH_W) '$(srcdir)/process_creation_tests.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo_process_creation_test-process_creation_tests.Tpo $(DEPDIR)/cdo_process_creation_test-process_creation_tests.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='process_creation_tests.cc' object='cdo_process_creation_test-process_creation_tests.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_process_creation_test_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo_process_creation_test-process_creation_tests.obj `if test -f 'process_creation_tests.cc'; then $(CYGPATH_W) 'process_creation_tests.cc'; else $(CYGPATH_W) '$(srcdir)/process_creation_tests.cc'; fi`
-
 chained_operators-chained_operators.o: chained_operators.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(chained_operators_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT chained_operators-chained_operators.o -MD -MP -MF $(DEPDIR)/chained_operators-chained_operators.Tpo -c -o chained_operators-chained_operators.o `test -f 'chained_operators.cc' || echo '$(srcdir)/'`chained_operators.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/chained_operators-chained_operators.Tpo $(DEPDIR)/chained_operators-chained_operators.Po
@@ -721,33 +680,19 @@ chained_operators-chained_operators.obj: chained_operators.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(chained_operators_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o chained_operators-chained_operators.obj `if test -f 'chained_operators.cc'; then $(CYGPATH_W) 'chained_operators.cc'; else $(CYGPATH_W) '$(srcdir)/chained_operators.cc'; fi`
 
-operator_1_to_1-operator_1_to_1.bandit.o: operator_1_to_1.bandit.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(operator_1_to_1_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT operator_1_to_1-operator_1_to_1.bandit.o -MD -MP -MF $(DEPDIR)/operator_1_to_1-operator_1_to_1.bandit.Tpo -c -o operator_1_to_1-operator_1_to_1.bandit.o `test -f 'operator_1_to_1.bandit.cc' || echo '$(srcdir)/'`operator_1_to_1.bandit.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/operator_1_to_1-operator_1_to_1.bandit.Tpo $(DEPDIR)/operator_1_to_1-operator_1_to_1.bandit.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='operator_1_to_1.bandit.cc' object='operator_1_to_1-operator_1_to_1.bandit.o' libtool=no @AMDEPBACKSLASH@
+variable_inputs_operators-variable_inputs_operators.o: variable_inputs_operators.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(variable_inputs_operators_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT variable_inputs_operators-variable_inputs_operators.o -MD -MP -MF $(DEPDIR)/variable_inputs_operators-variable_inputs_operators.Tpo -c -o variable_inputs_operators-variable_inputs_operators.o `test -f 'variable_inputs_operators.cc' || echo '$(srcdir)/'`variable_inputs_operators.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/variable_inputs_operators-variable_inputs_operators.Tpo $(DEPDIR)/variable_inputs_operators-variable_inputs_operators.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='variable_inputs_operators.cc' object='variable_inputs_operators-variable_inputs_operators.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(operator_1_to_1_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o operator_1_to_1-operator_1_to_1.bandit.o `test -f 'operator_1_to_1.bandit.cc' || echo '$(srcdir)/'`operator_1_to_1.bandit.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(variable_inputs_operators_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o variable_inputs_operators-variable_inputs_operators.o `test -f 'variable_inputs_operators.cc' || echo '$(srcdir)/'`variable_inputs_operators.cc
 
-operator_1_to_1-operator_1_to_1.bandit.obj: operator_1_to_1.bandit.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(operator_1_to_1_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT operator_1_to_1-operator_1_to_1.bandit.obj -MD -MP -MF $(DEPDIR)/operator_1_to_1-operator_1_to_1.bandit.Tpo -c -o operator_1_to_1-operator_1_to_1.bandit.obj `if test -f 'operator_1_to_1.bandit.cc'; then $(CYGPATH_W) 'operator_1_to_1.bandit.cc'; else $(CYGPATH_W) '$(srcdir)/operator_1_to_1.bandit.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/operator_1_to_1-operator_1_to_1.bandit.Tpo $(DEPDIR)/operator_1_to_1-operator_1_to_1.bandit.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='operator_1_to_1.bandit.cc' object='operator_1_to_1-operator_1_to_1.bandit.obj' libtool=no @AMDEPBACKSLASH@
+variable_inputs_operators-variable_inputs_operators.obj: variable_inputs_operators.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(variable_inputs_operators_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT variable_inputs_operators-variable_inputs_operators.obj -MD -MP -MF $(DEPDIR)/variable_inputs_operators-variable_inputs_operators.Tpo -c -o variable_inputs_operators-variable_inputs_operators.obj `if test -f 'variable_inputs_operators.cc'; then $(CYGPATH_W) 'variable_inputs_operators.cc'; else $(CYGPATH_W) '$(srcdir)/variable_inputs_operators.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/variable_inputs_operators-variable_inputs_operators.Tpo $(DEPDIR)/variable_inputs_operators-variable_inputs_operators.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='variable_inputs_operators.cc' object='variable_inputs_operators-variable_inputs_operators.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(operator_1_to_1_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o operator_1_to_1-operator_1_to_1.bandit.obj `if test -f 'operator_1_to_1.bandit.cc'; then $(CYGPATH_W) 'operator_1_to_1.bandit.cc'; else $(CYGPATH_W) '$(srcdir)/operator_1_to_1.bandit.cc'; fi`
-
-operator_1_to_2-operator_1_to_2.bandit.o: operator_1_to_2.bandit.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(operator_1_to_2_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT operator_1_to_2-operator_1_to_2.bandit.o -MD -MP -MF $(DEPDIR)/operator_1_to_2-operator_1_to_2.bandit.Tpo -c -o operator_1_to_2-operator_1_to_2.bandit.o `test -f 'operator_1_to_2.bandit.cc' || echo '$(srcdir)/'`operator_1_to_2.bandit.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/operator_1_to_2-operator_1_to_2.bandit.Tpo $(DEPDIR)/operator_1_to_2-operator_1_to_2.bandit.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='operator_1_to_2.bandit.cc' object='operator_1_to_2-operator_1_to_2.bandit.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(operator_1_to_2_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o operator_1_to_2-operator_1_to_2.bandit.o `test -f 'operator_1_to_2.bandit.cc' || echo '$(srcdir)/'`operator_1_to_2.bandit.cc
-
-operator_1_to_2-operator_1_to_2.bandit.obj: operator_1_to_2.bandit.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(operator_1_to_2_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT operator_1_to_2-operator_1_to_2.bandit.obj -MD -MP -MF $(DEPDIR)/operator_1_to_2-operator_1_to_2.bandit.Tpo -c -o operator_1_to_2-operator_1_to_2.bandit.obj `if test -f 'operator_1_to_2.bandit.cc'; then $(CYGPATH_W) 'operator_1_to_2.bandit.cc'; else $(CYGPATH_W) '$(srcdir)/operator_1_to_2.bandit.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/operator_1_to_2-operator_1_to_2.bandit.Tpo $(DEPDIR)/operator_1_to_2-operator_1_to_2.bandit.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='operator_1_to_2.bandit.cc' object='operator_1_to_2-operator_1_to_2.bandit.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(operator_1_to_2_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o operator_1_to_2-operator_1_to_2.bandit.obj `if test -f 'operator_1_to_2.bandit.cc'; then $(CYGPATH_W) 'operator_1_to_2.bandit.cc'; else $(CYGPATH_W) '$(srcdir)/operator_1_to_2.bandit.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(variable_inputs_operators_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o variable_inputs_operators-variable_inputs_operators.obj `if test -f 'variable_inputs_operators.cc'; then $(CYGPATH_W) 'variable_inputs_operators.cc'; else $(CYGPATH_W) '$(srcdir)/variable_inputs_operators.cc'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -948,30 +893,16 @@ recheck: all
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-./cdo_process_creation_test.log: ./cdo_process_creation_test
-	@p='./cdo_process_creation_test'; \
-	b='./cdo_process_creation_test'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-./operator_1_to_1.log: ./operator_1_to_1
-	@p='./operator_1_to_1'; \
-	b='./operator_1_to_1'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-./operator_1_to_2.log: ./operator_1_to_2
-	@p='./operator_1_to_2'; \
-	b='./operator_1_to_2'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
 ./chained_operators.log: ./chained_operators
 	@p='./chained_operators'; \
 	b='./chained_operators'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+./variable_inputs_operators.log: ./variable_inputs_operators
+	@p='./variable_inputs_operators'; \
+	b='./variable_inputs_operators'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

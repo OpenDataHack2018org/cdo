@@ -1,62 +1,116 @@
 #include "bandit/bandit/bandit.h"
-//BANDIT NEEDS TO BE INCLUDED FIRST!!!
+// BANDIT NEEDS TO BE INCLUDED FIRST!!!
 
 #include "../../src/cdoDebugOutput.h"
 #include "../../src/modules.h"
 #include "../../src/operator_help.h"
 #include "../../src/process.h"
 #include <iostream>
-void *Oper1(void *test) { return test; }
-void *Oper2(void *test) { return test; }
-void *Oper3(void *test) { return test; }
-void *Oper4(void *test) { return test; }
+void *in1_out1(void *test) { return test; }
+void *in2_out1(void *test) { return test; }
+void *inVariable_out1(void *test) { return test; }
 
 go_bandit([]() {
-  bandit::describe("Process creation", []() {
-    // oper1: child oper 2
-    // oper2: child oper3 and oper4:
-    // oper3: infile: 1
-    // oper4: infile 2
-    // outfile: filled by oper1
-    std::vector<const char *> test_argv{"-oper1",      "-oper2", "-oper3",
-                                        "input_file1", "-oper4", "input_file2",
+  add_module("in1_out1", {in1_out1, {}, {"in1_out1"}, 1, 0, 1, 1});
+  add_module("in2_out1", {in2_out1, {}, {"in2_out1"}, 1, 0, 2, 1});
+  add_module("inVariable_out1", {inVariable_out1, {}, {"inVariable_out1"}, 1, 0, -1, 0});
+
+
+  // this test checks if operators with non variable input numbers can be chained
+  bandit::describe("Process creation for non variable operators", []() {
+    // in1_out1: child oper 2
+    // in2_out1: child in1_out1 and in1_out1:
+    // in1_out1: infile: 1
+    // in1_out1: infile 2
+    // outfile: filled by in1_out1
+    std::vector<const char *> test_argv{"-in1_out1","-in2_out1", "-in1_out1",
+                                        "input_file1", "-in1_out1", "input_file2",
                                         "output_file"};
 
-    std::vector<int> expectedInputs{1,2,1,1};
-    std::vector<int> expectedOutputs{1,1,1,1};
-
+    std::vector<int> expectedInputs{1, 2, 1, 1};
+    std::vector<int> expectedOutputs{1, 1, 1, 1};
 
     /*clang-format off*/
     //          Name     Func  Help   oper    mod    in
     //                                           num    out
-    add_module("Oper1", {Oper1, {}, {"oper1"}, 1, 0, 1, 1});
-    add_module("Oper2", {Oper2, {}, {"oper2"}, 1, 0, 2, 1});
-    add_module("Oper3", {Oper3, {}, {"oper3"}, 1, 0, 1, 1});
-    add_module("Oper4", {Oper4, {}, {"oper4"}, 1, 0, 1, 1});
     /*clang-format on*/
 
     createProcesses(test_argv.size(), &test_argv[0]);
 
-    for (unsigned int i = 0; i < Process.size(); i++) {
-        auto process = Process.at(i);
-      bandit::it("created inputs for:"+ std::string(Process.at(i).operatorName), [&]() {
-        AssertThat(
-            process.childProcesses.size() + process.inputStreams.size(),
-            snowhouse::Equals(expectedInputs[i]));
-      });
-      bandit::it("created outputs for: " + std::string(Process.at(i).operatorName) , [&]() {
-        AssertThat(
-            process.parentProcesses.size() + process.outputStreams.size(),
-            snowhouse::Equals(expectedOutputs[i]));
-      });
-
+    unsigned int i;
+    for (i = 0; i < Process.size(); i++) {
+      auto process = Process.at(i);
+      bandit::it("created inputs for:" +
+                     std::string(Process.at(i).operatorName),
+                 [&]() {
+                   AssertThat(
+                                  process.inputStreams.size(),
+                              snowhouse::Equals(expectedInputs[i]));
+                 });
+      bandit::it("created outputs for: " +
+                     std::string(Process.at(i).operatorName),
+                 [&]() {
+                   AssertThat(process.parentProcesses.size() +
+                                  process.outputStreams.size(),
+                              snowhouse::Equals(expectedOutputs[i]));
+                 });
     }
-    CdoDebug::CdoEndMessage();
+    bandit::it("created right amount of processes",
+               [&]() { AssertThat(i, snowhouse::Equals(Process.size())); });
   });
+
+  clearProcesses();
+
+  // this test checks if multiple operators can be chained if the first operator is part of a module with variable number ob input streams
+  bandit::describe("Process creation containing operators with variable number of input streams", []() {
+    // in1_out1: child oper 2
+    // in2_out1: child in1_out1 and in1_out1:
+    // in1_out1: infile: 1
+    // in1_out1: infile 2
+    // outfile: filled by in1_out1
+    std::vector<const char *> test_argv{"-inVariable_out1"      , "-in2_out1"      , "-in1_out1"      ,
+                                        "input_file1" , "-in1_out1"      , "input_file2" ,
+                                        "-in1_out1"      , "input_file3" , "-in1_out1"      ,
+                                        "input_file4"};
+
+    std::vector<int> expectedInputs{3, 2, 1, 1,1, 1};
+    std::vector<int> expectedOutputs{0, 1, 1, 1, 1, 1};
+
+    createProcesses(test_argv.size(), &test_argv[0]);
+
+    unsigned int i;
+    for (i = 0; i < Process.size(); i++) {
+      auto process = Process.at(i);
+      std::string runInfo = std::string(Process.at(i).operatorName) + " in run: " + std::to_string(i + 1);
+      bandit::it("created inputs for:" + runInfo
+                     ,
+                 [&]() {
+                   AssertThat(
+                                  process.inputStreams.size(),
+                              snowhouse::Equals(expectedInputs[i]));
+                 });
+      bandit::it("created outputs for: " +
+                     runInfo,
+                 [&]() {
+                   AssertThat(process.parentProcesses.size() +
+                                  process.outputStreams.size(),
+                              snowhouse::Equals(expectedOutputs[i]));
+                 });
+    }
+    bandit::it("created right amount of processes",
+               [&]() { AssertThat(i, snowhouse::Equals(Process.size())); });
+  });
+
 });
 int main(int argc, char **argv) {
-  CdoDebug::outfile = "chained_debug.txt";
+  CdoDebug::outfile = "chainedOperators.debug";
   CdoDebug::print_to_seperate_file = true;
+
   CdoDebug::CdoStartMessage();
-  return bandit::run(argc, argv);
+  CdoDebug::PROCESS = 1;
+  CdoDebug::PSTREAM = 1;
+  int result = bandit::run(argc, argv);
+  CdoDebug::CdoEndMessage();
+
+  return result;
 }
