@@ -32,6 +32,7 @@ constexpr int MAX_OPERATOR = 128;
 constexpr int MAX_OARGC = 4096;
 constexpr int MAX_FILES = 65536;
 
+enum class ProcessCheckResult{UNLIMITED_STREAM_COUNTS, INPUT_STREAM_MISSING, OUTPUT_STREAM_MISSING, TOO_MANY_STREAMS, TOO_FEW_STREAMS, FILENAME_HAS_OPERATOR_MARKER, OUTFILE_IS_INFILE, SUCCESS};
 
 typedef struct
 {
@@ -67,7 +68,7 @@ public:
   short nvars;
 
   int ntimesteps;
-  short m_streamCnt;
+  int m_streamCnt;
   std::vector<argument_t> streamArguments;
   const char *m_operatorCommand;
   const char *operatorName;
@@ -99,6 +100,8 @@ private:
   void OpenWrite(int p_input_idx);
   void OpenAppend(int p_input_idx);
   void setStreamNames(int argc, std::vector<char *> &argv);
+  int expand_wildcards(int streamCnt);
+  int checkStreamCnt();
 };
 
 extern std::map<int, process_t> Process;
@@ -139,9 +142,9 @@ const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
 const argument_t *cdoStreamName(int cnt);
-int checkStreamCnt();
 void createProcesses(int argc, const char **argv);
 void clearProcesses();
 int processNumsActive();
 
+  int checkStreamCnt();
 #endif /* _PROCESS_H */
