@@ -1839,6 +1839,7 @@ int main(int argc, char *argv[])
   cdo_set_options();
 #ifdef DEBUG
     CdoDebug::CdoStartMessage();
+    MESSAGE(CdoDebug::argvToString(argc,(const char**) argv));
 #endif
   if ( Debug || Version ) cdo_version();
 
@@ -1968,6 +1969,8 @@ int main(int argc, char *argv[])
       operatorModule(operatorName)(argument);
       close_library_handles();
 #else
+      createProcesses(argc - CDO_optind,(const char **) &argv[CDO_optind]);
+      clearProcesses();
       operatorModule(operatorName)(argument);
 #endif
 

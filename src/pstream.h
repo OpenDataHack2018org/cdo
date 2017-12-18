@@ -100,4 +100,7 @@ pstream_t *create_pstream();
 pstream_t *create_pstream(std::vector<std::string> p_filenameList);
 pstream_t *create_pstream(std::string p_filename);
 
+int get_glob_argc();
+void pstreamCloseAll();
+
 #endif /* PSTREAM_H */

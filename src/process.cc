@@ -56,6 +56,7 @@ std::map<int, process_t> Process;
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
+static int NumCreatedStreams;
 
 process_t::process_t(int p_ID, const char *operatorCommand) : m_ID(p_ID)
 {
@@ -89,6 +90,16 @@ process_t::setOperatorArgv(const char *operatorArguments)
     }
   oargc = oargv.size();
 }
+/*
+void process_t::openRead(int p_input_idx)
+{
+    pstream_t *pstream = inputStreams[p_input_idx];
+    if(pstream->isPipe())
+    {
+         
+    }
+}
+*/
 
 void
 process_t::initProcess()
@@ -517,7 +528,7 @@ getStreamCnt(int argc, std::vector<char *> &argv)
       streamCnt++;
     }
 
-  return streamCnt;
+  return NumCreatedStreams;
 }
 
 /*
@@ -714,6 +725,7 @@ process_t::expand_wildcards(int streamCnt)
         }
 
       m_streamCnt = streamCnt;
+      NumCreatedStreams += streamCnt;
     }
 
   Free(glob_arg);
@@ -847,7 +859,11 @@ createProcesses(int argc, const char **argv)
 
   call_stack.push(root_process);
   current_process = call_stack.top();
-  int cntOutFiles = std::max(0, (int)current_process->m_module.streamOutCnt);
+  int cntOutFiles = (int)current_process->m_module.streamOutCnt;
+  if(cntOutFiles == -1)
+  {
+    cntOutFiles = 1;
+  }
   for(int i = 0; i < cntOutFiles; i++)
   {
     if(CdoDebug::PROCESS)
@@ -901,6 +917,8 @@ createProcesses(int argc, const char **argv)
   {
     MESSAGE("== Process Creation End ==");
   }
+
+  NumCreatedStreams = get_glob_argc();
 }
 
 void
@@ -1405,7 +1423,9 @@ process_t::addChild(process_t *childProcess)
 {
   childProcesses.push_back(childProcess);
   nchild = childProcesses.size();
-  inputStreams.push_back(create_pstream());
+  pstream_t* new_pstream = create_pstream();
+  inputStreams.push_back(new_pstream);
+  childProcess->outputStreams.push_back(new_pstream);
 }
 
 void
@@ -1419,4 +1439,5 @@ clearProcesses()
   Process.clear();
   NumProcess = 0;
   NumProcessActive = 0;
+      pstreamCloseAll();
 }

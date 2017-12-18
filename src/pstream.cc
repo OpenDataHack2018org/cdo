@@ -105,6 +105,7 @@ static pstreamPtrToIdx *_pstreamAvail = NULL;
 */
 static std::map<int,pstream_t> _pstream_map;
 static int next_pstream_id = 1;
+static int createdPstreams = 0;
 /*
 static void
 pstream_list_new(void)
@@ -143,6 +144,8 @@ pstream_init_pointer(void)
             std::make_pair(next_pstream_id, pstream_t(next_pstream_id))
             );
     next_pstream_id++;
+    createdPstreams++;
+    new_entry.first->second.ispipe = true;
     PSTREAM_UNLOCK();
 
     return &new_entry.first->second;
@@ -152,6 +155,7 @@ pstream_t *create_pstream(std::vector<std::string> p_filenameList)
 {
     pstream_t* new_entry = create_pstream();
     new_entry->m_mfnames = p_filenameList;
+    new_entry->ispipe = false;
     return new_entry;
 
 }
@@ -612,6 +616,7 @@ pstreamOpenRead(const argument_t *argument)
   */
   if (ispipe)
     {
+      pstreamptr->ispipe = true;
       size_t pnlen = 16;
       char *pipename = (char *) Malloc(pnlen);
       createPipeName(pipename, pnlen);
@@ -627,6 +632,7 @@ pstreamOpenRead(const argument_t *argument)
     }
   else
     {
+      pstreamptr->ispipe = false;
       pstreamptr->pstreamOpenReadFile(argument->args);
     }
 
@@ -761,6 +767,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
   char *filename = (char *) Malloc(strlen(argument->args) + 1);
 
   pstream_t *pstreamptr = create_pstream();
+  pstreamptr->ispipe = false;
   if (!pstreamptr)
     Error("No memory");
 
@@ -862,6 +869,7 @@ pstreamOpenAppend(const argument_t *argument)
     }
 
   pstream_t *pstreamptr = create_pstream();
+  pstreamptr->ispipe = false;
 
   if (!pstreamptr)
     ERROR("No memory");
@@ -1748,12 +1756,33 @@ pstreamDebug(int debug)
   CdoDebug::PSTREAM = debug;
 }
 
+/*
+void
+cdoInitialize(void *argument)
+{
+#if defined(_OPENMP)
+  omp_set_num_threads(ompNumThreads); // Have to be called for every module (pthread)!
+#endif
+  process_t *process = Process.at(argument->processID);
+
+  process->threadID = pthread_self();
+  process->setStreams(argu->argc, argu->argv);
+
+
+#if defined(HAVE_LIBPTHREAD)
+  if (CdoDebug::PSTREAM)
+    MESSAGE("process ", processSelf().m_ID," thread ", pthread_self());
+#endif
+
+}
+*/
+
 void
 cdoInitialize(void *argument)
 {
     argument_t* argu = (argument_t *)argument;
 #if defined(_OPENMP)
-  omp_set_num_threads(ompNumThreads); /* Have to be called for every module (pthread)! */
+  omp_set_num_threads(ompNumThreads); // Have to be called for every module (pthread)! 
 #endif
 
   process_t* process = processCreate(argu->argv[0]);
@@ -1779,6 +1808,7 @@ pstreamCloseAll()
           streamClose(pstream_iter.second.m_fileID);
         }
     }
+  _pstream_map.clear();
 }
 /*
 void
@@ -1902,3 +1932,7 @@ const int &getPthreadScope()
     return pthreadScope;
 }
 
+int get_glob_argc()
+{
+    return createdPstreams;
+}

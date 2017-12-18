@@ -7,7 +7,7 @@
 struct argument_t
 {
   //argument_t();
-  int process_id;
+  int processID;
   int    argc;
   std::vector<char *> argv;
   char  *args;
