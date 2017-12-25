@@ -255,6 +255,7 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
         }
     }
 
+  gs->pointcloud = (void*) pointcloud;
   for ( unsigned j = 0; j < 3; ++j )
     {
       gs->min[j] = min[j];
@@ -387,7 +388,7 @@ void gridsearch_delete(struct gridsearch *gs)
       if ( gs->sinlon ) Free(gs->sinlon);
 
       if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs_destroy_kdtree(gs->search_container);
-      else if ( gs->method_nn == GridsearchMethod::nanoflann ) ;
+      else if ( gs->method_nn == GridsearchMethod::nanoflann ) delete((PointCloud<NFDATATYPE> *)gs->pointcloud);
       else if ( gs->method_nn == GridsearchMethod::full      ) gs_destroy_full(gs->search_container);
 
       Free(gs);

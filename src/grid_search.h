@@ -29,6 +29,7 @@ struct gridsearch {
 
   double lonmin, lonmax, latmin, latmax;
   float min[3], max[3];
+  void *pointcloud;
 };
 
 struct gsknn {
