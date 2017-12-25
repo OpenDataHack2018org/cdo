@@ -14,11 +14,12 @@ void calc_bin_addr(size_t gridsize, size_t nbins, const restr_t* restrict bin_la
       bin_addr[n2  ] = gridsize;
       bin_addr[n2+1] = 0;
     }
-
+  /*
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   private(n2)  shared(gridsize, nbins, bin_lats, bin_addr, cell_bound_box)
 #endif
+  */
   for ( size_t nele = 0; nele < gridsize; ++nele )
     {
       size_t nele4 = nele<<2;
@@ -30,9 +31,11 @@ void calc_bin_addr(size_t gridsize, size_t nbins, const restr_t* restrict bin_la
 	  if ( cell_bound_box_lat1 <= bin_lats[n2+1] &&
 	       cell_bound_box_lat2 >= bin_lats[n2  ] )
 	    {
+              /*
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
+              */
               {
                 bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
                 bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
