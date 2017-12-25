@@ -20,8 +20,8 @@
 #define  PI2      (2.0*PI)
 
 
-#define  FLDATATYPE  float
-#define  NFDATATYPE  float
+#define  FLDATATYPE  double
+#define  NFDATATYPE  double
 
 
 static GridsearchMethod gridsearch_method_nn(GridsearchMethod::kdtree);
@@ -145,8 +145,7 @@ struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const
   size_t nx = dims[0];
   size_t ny = dims[0];
 
-  size_t nxm = nx;
-  if ( xIsCyclic ) nxm++;
+  size_t nxm = xIsCyclic ? nx+1 : nx;
 
   double *reg2d_center_lon = (double *) Malloc(nxm*sizeof(double));
   double *reg2d_center_lat = (double *) Malloc(ny*sizeof(double));
@@ -167,6 +166,7 @@ struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const
       coslon[n] = cos(rlon);
       sinlon[n] = sin(rlon);
     }
+
   for ( size_t n = 0; n < ny; ++n )
     {
       coslat[n] = cos(lats[n]);
@@ -531,8 +531,8 @@ size_t gs_nearest_full(void *search_container, double lon, double lat, double *p
   FLDATATYPE dist = FLT_MAX;
   for ( size_t i = 0; i < n; i++ )
     {
-      FLDATATYPE d = distance<FLDATATYPE>(query_pt, pts[i]);
-      if ( closestpt >=n || d < dist || (d<=dist && i < closestpt) )
+      FLDATATYPE d = (float) distance<FLDATATYPE>(query_pt, pts[i]);
+      if ( closestpt >= n || d < dist || (d<=dist && i < closestpt) )
         {
           dist = d;
           closestpt = i;
