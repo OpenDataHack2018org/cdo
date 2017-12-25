@@ -111,6 +111,31 @@ size_t nbr_normalize_weights(size_t num_neighbors, double dist_tot, const bool *
 
 //  This routine finds the closest num_neighbor points to a search point and computes a distance to each of the neighbors.
 
+template <typename T>
+static inline
+void LLtoXYZ(double lon, double lat, T *restrict xyz)
+{
+   double cos_lat = cos(lat);
+   xyz[0] = cos_lat * cos(lon);
+   xyz[1] = cos_lat * sin(lon);
+   xyz[2] = sin(lat);
+}
+
+template <typename T>
+static constexpr
+T square(const T x)
+{
+  return x*x;
+}
+
+template <typename T>
+static constexpr
+T distance(const T *restrict a, const T *restrict b)
+{
+  return square(a[0]-b[0]) + square(a[1]-b[1]) + square(a[2]-b[2]);
+}
+
+
 #define MAX_SEARCH_CELLS 25
 static
 void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist, 
@@ -127,43 +152,30 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, size_t *
     double plat,         ! latitude  of the search point
     double plon,         ! longitude of the search point
   */
-  size_t n;
-  size_t ii, jj;
-  long i, j, ix;
   size_t src_add[MAX_SEARCH_CELLS];
   size_t *src_add_tmp = NULL;
   size_t *psrc_add = src_add;
   size_t num_add = 0;
-  double cos_search_radius = cos(gs->search_radius);
-  double coslat_dst = cos(plat);  // cos(lat)  of the search point
-  double coslon_dst = cos(plon);  // cos(lon)  of the search point
-  double sinlat_dst = sin(plat);  // sin(lat)  of the search point
-  double sinlon_dst = sin(plon);  // sin(lon)  of the search point
-  double *restrict coslon = gs->coslon;
-  double *restrict sinlon = gs->sinlon;
-  double *restrict coslat = gs->coslat;
-  double *restrict sinlat = gs->sinlat;
   double *restrict src_center_lon = gs->reg2d_center_lon;
   double *restrict src_center_lat = gs->reg2d_center_lat;
 
   long nx = gs->dims[0];
   long ny = gs->dims[1];
 
-  size_t nxm = nx;
-  if ( gs->is_cyclic ) nxm++;
+  size_t nxm = gs->is_cyclic ? nx+1 : nx;
 
   if ( plon < src_center_lon[0]     ) plon += PI2;
   if ( plon > src_center_lon[nxm-1] ) plon -= PI2;
 
+  size_t ii, jj;
   int lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon, src_center_lat);
-
   if ( lfound )
     {
       if ( gs->is_cyclic && ii == (nxm-1) ) ii = 0;
 
       long k;
       for ( k = 3; k < 10000; k+=2 )
-        if ( num_neighbors <= ((k-2)*(k-2)) ) break;
+        if ( num_neighbors <= (k-2)*(k-2) ) break;
 
       if ( (k*k) > MAX_SEARCH_CELLS ) psrc_add = src_add_tmp = (size_t *) Malloc(k*k*sizeof(size_t));
 
@@ -177,11 +189,10 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, size_t *
       if ( jn >= ny ) jn = ny-1;
       if ( (in-i0) > nx ) { i0 = 0; in = nx-1; }
       
-      for ( j = j0; j <= jn; ++j )
-	for ( i = i0; i <= in; ++i )
+      for ( long j = j0; j <= jn; ++j )
+	for ( long i = i0; i <= in; ++i )
 	  {
-	    ix = i;
-	    
+	    long ix = i;
 	    if ( gs->is_cyclic )
 	      {
 		if ( ix <   0 ) ix += nx;
@@ -194,7 +205,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, size_t *
     }
 
   // Initialize distance and address arrays
-  for ( n = 0; n < num_neighbors; ++n )
+  for ( size_t n = 0; n < num_neighbors; ++n )
     {
       nbr_add[n]  = SIZE_MAX;
       nbr_dist[n] = BIGNUM;
@@ -202,35 +213,35 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, size_t *
 
   if ( lfound )
     {
-      size_t ix, iy;
-      size_t nadd;
-      double distance;   //  Angular distance
+      double *restrict coslon = gs->coslon;
+      double *restrict sinlon = gs->sinlon;
+      double *restrict coslat = gs->coslat;
+      double *restrict sinlat = gs->sinlat;
+
+      double xyz[3];
+      double query_pt[3];
+      LLtoXYZ<double>(plon, plat, query_pt);
+      double search_radius = SQR(gs->search_radius);
 
       for ( size_t na = 0; na < num_add; ++na )
 	{
-	  nadd = psrc_add[na];
-	  iy = nadd/nx;
-	  ix = nadd - iy*nx;
+	  size_t nadd = psrc_add[na];
+	  size_t iy = nadd/nx;
+	  size_t ix = nadd - iy*nx;
 
+          xyz[0] = coslat[iy] * coslon[ix];
+          xyz[1] = coslat[iy] * sinlon[ix];
+          xyz[2] = sinlat[iy];
 	  // Find distance to this point
-	  distance =  sinlat_dst*sinlat[iy] + coslat_dst*coslat[iy]*
-	             (coslon_dst*coslon[ix] + sinlon_dst*sinlon[ix]);
-
-	  // Check that distance is inside the range of -1 to 1, otherwise the result of acos(distance) is NaN
-	  if ( distance > 1. ) distance =  1.;
-
-	  if ( distance >= cos_search_radius )
+          double dist = (float) distance<double>(query_pt, xyz);
+	  if ( dist <= search_radius )
 	    {
-	      distance = acos(distance);
-
-	      // Store the address and distance if this is one of the smallest four so far
-	      nbr_store_distance(nadd, distance, num_neighbors, nbr_add, nbr_dist);
+	      // Store the address and distance if this is one of the smallest so far
+	      nbr_store_distance(nadd, sqrt(dist), num_neighbors, nbr_add, nbr_dist);
 	    }
 	}
 
       nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
-
-      if ( src_add_tmp ) Free(src_add_tmp);
     }
   else if ( gs->extrapolate )
     {
@@ -240,12 +251,12 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, size_t *
 	{
 	  size_t nbr_add4[4];
 	  double nbr_dist4[4];
-	  for ( n = 0; n < num_neighbors; ++n ) nbr_add4[n] = SIZE_MAX;
+	  for ( size_t n = 0; n < num_neighbors; ++n ) nbr_add4[n] = SIZE_MAX;
 	  search_result = grid_search_reg2d_nn(nx, ny, nbr_add4, nbr_dist4, plat, plon, src_center_lat, src_center_lon);
 	  if ( search_result < 0 )
 	    {
-	      for ( n = 0; n < num_neighbors; ++n ) nbr_add[n]  = nbr_add4[n];
-	      for ( n = 0; n < num_neighbors; ++n ) nbr_dist[n] = nbr_dist4[n];
+	      for ( size_t n = 0; n < num_neighbors; ++n ) nbr_add[n]  = nbr_add4[n];
+	      for ( size_t n = 0; n < num_neighbors; ++n ) nbr_dist[n] = nbr_dist4[n];
 	    }
 	}
       else
@@ -254,8 +265,10 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t num_neighbors, size_t *
 	}
 
       if ( search_result >= 0 )
-	for ( n = 0; n < num_neighbors; ++n ) nbr_add[n] = SIZE_MAX;
+	for ( size_t n = 0; n < num_neighbors; ++n ) nbr_add[n] = SIZE_MAX;
     }
+
+  if ( src_add_tmp ) Free(src_add_tmp);
 } // grid_search_nbr_reg2d
 
 
@@ -273,8 +286,6 @@ int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restric
     double plon,         ! longitude of the search point
   */
 
-  double search_radius = gs->search_radius;
-
   // Initialize distance and address arrays
   for ( size_t n = 0; n < num_neighbors; ++n ) nbr_add[n]  = SIZE_MAX;
   for ( size_t n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
@@ -287,15 +298,10 @@ int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restric
 
   double zdist[32];
   size_t zadds[32];
-  double *dist = zdist;
-  size_t *adds = zadds;
-  if ( num_neighbors > 16 )
-    {
-      dist = (double*) Malloc(ndist*sizeof(double));
-      adds = (size_t*) Malloc(ndist*sizeof(size_t));
-    }
+  double *dist = num_neighbors > 16 ? (double*) Malloc(ndist*sizeof(double)) : zdist;
+  size_t *adds = num_neighbors > 16 ? (size_t*) Malloc(ndist*sizeof(size_t)) : zadds;
   
-  const double range0 = SQR(search_radius);
+  const double range0 = SQR(gs->search_radius);
   double range = range0;
 
   size_t nadds = 0;
