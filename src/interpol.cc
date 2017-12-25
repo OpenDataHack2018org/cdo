@@ -20,6 +20,7 @@
 * @param nelem  length of the sorted list
 * @param x      the element to find a position for 
 */
+static
 long find_element(double x, long nelem, const double *restrict array)
 {
   long ii;
@@ -29,10 +30,10 @@ long find_element(double x, long nelem, const double *restrict array)
 
   if ( array[0] < array[nelem-1] ) // ascending order
     {
-      /* return the length of the array if x is out of bounds */
+      // return the length of the array if x is out of bounds
       if ( x < array[0] || x > array[nelem-1] ) return nelem;
 
-      /* search for the interval in which x fits */
+      // search for the interval in which x fits
       // implementation: binary search algorithm
       for ( ii = 1; ii < nelem; ++ii )
 	{
@@ -41,7 +42,7 @@ long find_element(double x, long nelem, const double *restrict array)
 	  // faster!
 	  mid = (first + last) >> 1;
       
-	  /* return the bigger interval border of the interval in which x fits */
+	  // return the bigger interval border of the interval in which x fits
 	  // if ( x >= array[mid-1] && x <= array[mid] ) break;
 	  // faster!
 	  if ( !(x < array[mid-1] || x > array[mid]) ) break;
@@ -55,10 +56,10 @@ long find_element(double x, long nelem, const double *restrict array)
     }
   else
     {
-      /* return the length of the array if x is out of bounds */
+      // return the length of the array if x is out of bounds
       if ( x < array[nelem-1] || x > array[0] ) return nelem;
 
-      /* search for the interval in which x fits */
+      // search for the interval in which x fits
       // implementation: binary search algorithm
       for ( ii = 1; ii < nelem; ++ii )
 	{
@@ -67,7 +68,7 @@ long find_element(double x, long nelem, const double *restrict array)
 	  // faster!
 	  mid = (first + last) >> 1;
       
-	  /* return the bigger interval border of the interval in which x fits */
+	  // return the bigger interval border of the interval in which x fits
 	  // if ( x >= array[mid] && x <= array[mid-1] ) break;
 	  // faster!
 	  if ( !(x < array[mid] || x > array[mid-1]) ) break;
@@ -93,12 +94,12 @@ long find_element(double x, long nelem, const double *array)
   if ( array[0] < array[nelem-1] )
     {
       for ( ii = 1; ii < nelem; ii++ )
-	if ( x >= array[ii-1] && x <= array[ii] ) break;
+        if ( x >= array[ii-1] && x <= array[ii] ) break;
     }
   else
     {
       for ( ii = 1; ii < nelem; ii++ )
-	if ( x >= array[ii] && x <= array[ii-1] ) break;
+        if ( x >= array[ii] && x <= array[ii-1] ) break;
     }
 
   return ii;
