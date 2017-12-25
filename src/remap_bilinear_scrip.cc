@@ -374,7 +374,7 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
   bool xIsCyclic = false;
   size_t dims[2] = {src_grid->size, 0};
   struct gridsearch *gs = NULL;
-  if (remap_grid_type != REMAP_GRID_TYPE_REG2D )
+  if ( remap_grid_type != REMAP_GRID_TYPE_REG2D )
     gs = gridsearch_create_nn(xIsCyclic, dims, src_grid->size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 #endif
 
@@ -391,7 +391,7 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)  schedule(static)  \
-  shared(cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex)  
+  shared(cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {

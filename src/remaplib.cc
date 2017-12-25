@@ -799,7 +799,9 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
     {
       remap_define_reg2d(reg2d_tgt_gridID, tgt_grid);
     }
-  else if ( map_type != MAP_TYPE_DISTWGT )
+  else if ( map_type != MAP_TYPE_DISTWGT
+            //            && map_type != MAP_TYPE_BILINEAR
+            )
     {
       cell_bounding_boxes(src_grid, REMAP_GRID_BASIS_SRC);
       cell_bounding_boxes(tgt_grid, REMAP_GRID_BASIS_TGT);
