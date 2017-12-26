@@ -133,7 +133,6 @@ libcdo_la_SOURCES =            \
                pmlist.h        \
                sellist.cc       \
                sellist.h       \
-               pragma_omp_atomic_update.h \
                printinfo.h     \
                process.cc       \
                process.h       \
