@@ -97,5 +97,7 @@ void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
 const int &getPthreadScope();
 pstream_t *create_pstream();
+pstream_t *create_pstream(std::vector<std::string> p_filenameList);
+pstream_t *create_pstream(std::string p_filename);
 
 #endif /* PSTREAM_H */

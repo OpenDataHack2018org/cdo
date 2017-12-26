@@ -32,6 +32,7 @@ constexpr int MAX_OPERATOR = 128;
 constexpr int MAX_OARGC = 4096;
 constexpr int MAX_FILES = 65536;
 
+enum class ProcessCheckResult{UNLIMITED_STREAM_COUNTS, INPUT_STREAM_MISSING, OUTPUT_STREAM_MISSING, TOO_MANY_STREAMS, TOO_FEW_STREAMS, FILENAME_HAS_OPERATOR_MARKER, OUTFILE_IS_INFILE, SUCCESS};
 
 typedef struct
 {
@@ -54,6 +55,9 @@ public:
   std::vector<process_t *> parentProcesses;
   std::vector<pstream_t *> inputStreams;
   std::vector<pstream_t *> outputStreams;
+  short m_cntIn;
+  short m_cntOut;
+
   double s_utime;
   double s_stime;
   double a_utime;
@@ -62,31 +66,32 @@ public:
 
   size_t nvals;
   short nvars;
+
   int ntimesteps;
-  short m_streamCnt;
+  int m_streamCnt;
   std::vector<argument_t> streamArguments;
-  char *m_operatorCommand;
+  const char *m_operatorCommand;
   const char *operatorName;
   char *operatorArg;
-  int oargc;
-  std::vector<char *> oargv;
   char prompt[64];
   short noper;
-  oper_t oper[MAX_OPERATOR];
 
   modules_t m_module;
+  std::vector<char *> oargv;
+  int oargc;
+  oper_t oper[MAX_OPERATOR];
 
   int getInStreamCnt();
   int getOutStreamCnt();
   void initProcess();
   void print_process();
   void defArgument();
-  process_t(int p_ID, char *operatorCommand);
-  void setOperatorArgv(char *operatorArguments);
+  void setOperatorArgv(const char *operatorArguments);
   void setStreams(int argc, std::vector<char *> &argv);
   void addChild(process_t *child_process);
   void addParent(process_t *parent_process);
   bool hasAllInputs();
+  process_t(int p_ID, const char *operatorCommand);
 
 private:
   void defPrompt();
@@ -95,6 +100,8 @@ private:
   void OpenWrite(int p_input_idx);
   void OpenAppend(int p_input_idx);
   void setStreamNames(int argc, std::vector<char *> &argv);
+  int expand_wildcards(int streamCnt);
+  int checkStreamCnt();
 };
 
 extern std::map<int, process_t> Process;
@@ -103,7 +110,7 @@ pstream_t *processInqInputStream(int streamindex);
 pstream_t *processInqOutputStream(int streamindex);
 process_t &processSelf(void);
 process_t *processCreate(void);
-process_t *processCreate(char *command);
+process_t *processCreate(const char *command);
 void processDelete(void);
 int processInqTimesteps(void);
 void processDefTimesteps(int streamID);
@@ -135,9 +142,9 @@ const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
 const argument_t *cdoStreamName(int cnt);
-int checkStreamCnt();
-void createProcesses(int argc, char **argv);
+void createProcesses(int argc, const char **argv);
 void clearProcesses();
 int processNumsActive();
 
+  int checkStreamCnt();
 #endif /* _PROCESS_H */

@@ -148,6 +148,7 @@ void *Ensstat(void *argument)
   cdoOperatorAdd("ensvar1",  func_var1,  0, NULL);
   cdoOperatorAdd("enspctl",  func_pctl,  0, NULL);
   cdoOperatorAdd("ensskew",  func_skew,  0, NULL);
+  cdoOperatorAdd("enskurt",  func_kurt,  0, NULL);
   // clang-format on
 
   int operatorID = cdoOperatorID();

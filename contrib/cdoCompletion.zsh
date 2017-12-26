@@ -1,17 +1,20 @@
 compctl -k "(
 --cmor \
+--enableexcept \
 --history \
 --netcdf_hdr_pad, \
 --no_warnings \
 --operators \
 --percentile \
+--precision \
 --reduce_dim \
+--sortname \
 --timestat_date \
+-C, \
 -L \
 -M \
 -O \
 -P \
--Q \
 -R, \
 -S \
 -V, \
@@ -53,6 +56,7 @@ boxavg -boxavg \
 cat -cat \
 cdiread -cdiread \
 cdiwrite -cdiwrite \
+changemulti -changemulti \
 chcode -chcode \
 chlevel -chlevel \
 chlevelc -chlevelc \
@@ -65,6 +69,8 @@ chunit -chunit \
 chvar -chvar \
 cloudlayer -cloudlayer \
 cmor -cmor \
+cmorlite -cmorlite \
+codetab -codetab \
 collgrid -collgrid \
 complextorect -complextorect \
 consecsum -consecsum \
@@ -83,6 +89,7 @@ daymax -daymax \
 daymean -daymean \
 daymin -daymin \
 daypctl -daypctl \
+dayrange -dayrange \
 daystd -daystd \
 daystd1 -daystd1 \
 daysum -daysum \
@@ -92,10 +99,13 @@ del29feb -del29feb \
 delcode -delcode \
 delday -delday \
 delete -delete \
+delgridcell -delgridcell \
+delmulti -delmulti \
 delname -delname \
 delparam -delparam \
 deltap -deltap \
 deltap_fl -deltap_fl \
+deltat -deltat \
 delvar -delvar \
 detrend -detrend \
 diff -diff \
@@ -109,6 +119,7 @@ divc -divc \
 divcoslat -divcoslat \
 divdpm -divdpm \
 divdpy -divdpy \
+dump_cmor_table -dump_cmor_table \
 dumpmap -dumpmap \
 duplicate -duplicate \
 dv2ps -dv2ps \
@@ -159,11 +170,13 @@ ensmax -ensmax \
 ensmean -ensmean \
 ensmin -ensmin \
 enspctl -enspctl \
+ensrange -ensrange \
 ensrkhist_space -ensrkhist_space \
 ensrkhist_time -ensrkhist_time \
 ensrkhistspace -ensrkhistspace \
 ensrkhisttime -ensrkhisttime \
 ensroc -ensroc \
+ensskew -ensskew \
 ensstd -ensstd \
 ensstd1 -ensstd1 \
 enssum -enssum \
@@ -179,6 +192,7 @@ eofspatial -eofspatial \
 eoftime -eoftime \
 eq -eq \
 eqc -eqc \
+estfreq -estfreq \
 exp -exp \
 export_e5ml -export_e5ml \
 export_e5res -export_e5res \
@@ -197,6 +211,7 @@ fldmax -fldmax \
 fldmean -fldmean \
 fldmin -fldmin \
 fldpctl -fldpctl \
+fldrange -fldrange \
 fldrms -fldrms \
 fldstd -fldstd \
 fldstd1 -fldstd1 \
@@ -220,8 +235,6 @@ genlevelbounds -genlevelbounds \
 gennn -gennn \
 genycon -genycon \
 geopotheight -geopotheight \
-ggstat -ggstat \
-ggstats -ggstats \
 gheight -gheight \
 globavg -globavg \
 gmtcells -gmtcells \
@@ -237,6 +250,7 @@ gridboxavg -gridboxavg \
 gridboxmax -gridboxmax \
 gridboxmean -gridboxmean \
 gridboxmin -gridboxmin \
+gridboxrange -gridboxrange \
 gridboxstd -gridboxstd \
 gridboxstd1 -gridboxstd1 \
 gridboxsum -gridboxsum \
@@ -263,6 +277,7 @@ hourmax -hourmax \
 hourmean -hourmean \
 hourmin -hourmin \
 hourpctl -hourpctl \
+hourrange -hourrange \
 hourstd -hourstd \
 hourstd1 -hourstd1 \
 hoursum -hoursum \
@@ -296,14 +311,14 @@ int -int \
 interpolate -interpolate \
 intgrid -intgrid \
 intgridbil -intgridbil \
-intgridcon -intgridcon \
+intgriddis -intgriddis \
+intgridnn -intgridnn \
 intgridtraj -intgridtraj \
 intlevel -intlevel \
 intlevel3d -intlevel3d \
 intlevelx -intlevelx \
 intlevelx3d -intlevelx3d \
 intntime -intntime \
-intpoint -intpoint \
 inttime -inttime \
 intyear -intyear \
 invertlat -invertlat \
@@ -343,6 +358,7 @@ mermax -mermax \
 mermean -mermean \
 mermin -mermin \
 merpctl -merpctl \
+merrange -merrange \
 merstd -merstd \
 merstd1 -merstd1 \
 mersum -mersum \
@@ -367,6 +383,7 @@ monmean -monmean \
 monmin -monmin \
 monmul -monmul \
 monpctl -monpctl \
+monrange -monrange \
 monstd -monstd \
 monstd1 -monstd1 \
 monsub -monsub \
@@ -382,7 +399,6 @@ muldoy -muldoy \
 muldpm -muldpm \
 muldpy -muldpy \
 ncode -ncode \
-ncode -ncode \
 ncopy -ncopy \
 ndate -ndate \
 ne -ne \
@@ -392,6 +408,7 @@ ngrids -ngrids \
 nint -nint \
 nlevel -nlevel \
 nmon -nmon \
+not -not \
 npar -npar \
 ntime -ntime \
 nvar -nvar \
@@ -426,8 +443,8 @@ pinfov -pinfov \
 pow -pow \
 pressure_fl -pressure_fl \
 pressure_hl -pressure_hl \
+projuvLatLon -projuvLatLon \
 random -random \
-read_cmor_table -read_cmor_table \
 reci -reci \
 reducegrid -reducegrid \
 regres -regres \
@@ -449,17 +466,22 @@ remapycon -remapycon \
 replace -replace \
 retocomplex -retocomplex \
 rhopot -rhopot \
+rotuvN -rotuvN \
+rotuvNorth -rotuvNorth \
 rotuvb -rotuvb \
 runavg -runavg \
 runmax -runmax \
 runmean -runmean \
 runmin -runmin \
 runpctl -runpctl \
+runrange -runrange \
 runstd -runstd \
 runstd1 -runstd1 \
 runsum -runsum \
 runvar -runvar \
 runvar1 -runvar1 \
+samplegrid -samplegrid \
+samplegridicon -samplegridicon \
 scatter -scatter \
 sealevelpressure -sealevelpressure \
 seasavg -seasavg \
@@ -468,6 +490,7 @@ seasmax -seasmax \
 seasmean -seasmean \
 seasmin -seasmin \
 seaspctl -seaspctl \
+seasrange -seasrange \
 seasstd -seasstd \
 seasstd1 -seasstd1 \
 seassum -seassum \
@@ -483,8 +506,10 @@ seldate -seldate \
 selday -selday \
 select -select \
 selgrid -selgrid \
+selgridcell -selgridcell \
 selgridname -selgridname \
 selhour -selhour \
+selindex -selindex \
 selindexbox -selindexbox \
 sellevel -sellevel \
 sellevidx -sellevidx \
@@ -492,6 +517,7 @@ sellonlatbox -sellonlatbox \
 selltype -selltype \
 selmon -selmon \
 selmonth -selmonth \
+selmulti -selmulti \
 selname -selname \
 seloperator -seloperator \
 selparam -selparam \
@@ -507,15 +533,15 @@ selvar -selvar \
 selyear -selyear \
 selzaxis -selzaxis \
 selzaxisname -selzaxisname \
+setattribute -setattribute \
 setcalendar -setcalendar \
 setcindexbox -setcindexbox \
 setclonlatbox -setclonlatbox \
 setcode -setcode \
+setcodetab -setcodetab \
 setctomiss -setctomiss \
 setdate -setdate \
 setday -setday \
-setgatt -setgatt \
-setgatts -setgatts \
 setgrid -setgrid \
 setgridarea -setgridarea \
 setgridmask -setgridmask \
@@ -525,6 +551,7 @@ setgriduri -setgriduri \
 sethalo -sethalo \
 setlevel -setlevel \
 setltype -setltype \
+setmiss -setmiss \
 setmisstoc -setmisstoc \
 setmisstodis -setmisstodis \
 setmisstonn -setmisstonn \
@@ -555,9 +582,16 @@ setyear -setyear \
 setzaxis -setzaxis \
 shaded -shaded \
 shifttime -shifttime \
+shiftx -shiftx \
+shifty -shifty \
+showattribute -showattribute \
+showatts -showatts \
+showattsglob -showattsglob \
+showattsvar -showattsvar \
 showcode -showcode \
 showdate -showdate \
 showformat -showformat \
+showgrid -showgrid \
 showlevel -showlevel \
 showltype -showltype \
 showmon -showmon \
@@ -618,6 +652,7 @@ strgal -strgal \
 strwin -strwin \
 sub -sub \
 subc -subc \
+subgrid -subgrid \
 subtrend -subtrend \
 szip -szip \
 tan -tan \
@@ -628,16 +663,18 @@ timavg -timavg \
 timcor -timcor \
 timcount -timcount \
 timcovar -timcovar \
-timedt -timedt \
+timcumsum -timcumsum \
 timmax -timmax \
 timmean -timmean \
 timmin -timmin \
 timpctl -timpctl \
+timrange -timrange \
 timselavg -timselavg \
 timselmax -timselmax \
 timselmean -timselmean \
 timselmin -timselmin \
 timselpctl -timselpctl \
+timselrange -timselrange \
 timselstd -timselstd \
 timselstd1 -timselstd1 \
 timselsum -timselsum \
@@ -656,8 +693,12 @@ transxy -transxy \
 trend -trend \
 tstepcount -tstepcount \
 unsetgridmask -unsetgridmask \
+usegridnumber -usegridnumber \
 uv2dv -uv2dv \
+uv2dv_cfd -uv2dv_cfd \
 uv2dvl -uv2dvl \
+uv2vr_cfd -uv2vr_cfd \
+uvDestag -uvDestag \
 vardes -vardes \
 varquot2test -varquot2test \
 vct -vct \
@@ -671,6 +712,7 @@ vertint -vertint \
 vertmax -vertmax \
 vertmean -vertmean \
 vertmin -vertmin \
+vertrange -vertrange \
 vertstd -vertstd \
 vertstd1 -vertstd1 \
 vertsum -vertsum \
@@ -681,6 +723,7 @@ vlist -vlist \
 wct -wct \
 writegrid -writegrid \
 writerandom -writerandom \
+xinfon -xinfon \
 ydayadd -ydayadd \
 ydayavg -ydayavg \
 ydaydiv -ydaydiv \
@@ -689,6 +732,7 @@ ydaymean -ydaymean \
 ydaymin -ydaymin \
 ydaymul -ydaymul \
 ydaypctl -ydaypctl \
+ydayrange -ydayrange \
 ydaystd -ydaystd \
 ydaystd1 -ydaystd1 \
 ydaysub -ydaysub \
@@ -713,6 +757,7 @@ yearmin -yearmin \
 yearmonavg -yearmonavg \
 yearmonmean -yearmonmean \
 yearpctl -yearpctl \
+yearrange -yearrange \
 yearstd -yearstd \
 yearstd1 -yearstd1 \
 yearsum -yearsum \
@@ -725,6 +770,7 @@ yhourmax -yhourmax \
 yhourmean -yhourmean \
 yhourmin -yhourmin \
 yhourmul -yhourmul \
+yhourrange -yhourrange \
 yhourstd -yhourstd \
 yhourstd1 -yhourstd1 \
 yhoursub -yhoursub \
@@ -739,6 +785,7 @@ ymonmean -ymonmean \
 ymonmin -ymonmin \
 ymonmul -ymonmul \
 ymonpctl -ymonpctl \
+ymonrange -ymonrange \
 ymonstd -ymonstd \
 ymonstd1 -ymonstd1 \
 ymonsub -ymonsub \
@@ -753,6 +800,7 @@ yseasmean -yseasmean \
 yseasmin -yseasmin \
 yseasmul -yseasmul \
 yseaspctl -yseaspctl \
+yseasrange -yseasrange \
 yseasstd -yseasstd \
 yseasstd1 -yseasstd1 \
 yseassub -yseassub \

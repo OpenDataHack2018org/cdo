@@ -178,12 +178,12 @@ case "${HOSTNAME}" in
 	;;
 # jessie workstation x64
     breeze*)
-        CDOLIBS="--with-grib_api=/sw/jessie-x64/grib_api-1.14.3-static-gccsys \
+        CDOLIBS="--with-eecodes=/sw/jessie-x64/eccodes/eccodes-2.4.1-gccsys \
                  --with-netcdf=/sw/jessie-x64/netcdf-4.3.3.1-gccsys \
                  --with-udunits2=/sw/jessie-x64/udunits-2.2.20-gccsys \
                  --with-proj=/sw/jessie-x64/proj4-4.9.3-gccsys LIBS=-lz"
         if  test "$COMP" = icpc ; then
-          ${CONFPATH}configure --enable-cxx --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     --with-fftw3 \
                     $CDOLIBS \
 	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
@@ -202,12 +202,12 @@ case "${HOSTNAME}" in
                     $CDOLIBS \
 	            CC=clang CXX=clang++ CFLAGS="-g -O2"
         elif  test "$COMP" = clang++ ; then
-          ${CONFPATH}configure --enable-cxx --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     --with-fftw3 \
                     $CDOLIBS \
 	            CC=clang CXX=clang++ CFLAGS="-g -O2"
         elif  test "$COMP" = g++ ; then
-	  ${CONFPATH}configure --enable-cxx \
+	  ${CONFPATH}configure \
                     $CDOLIBS \
 	            CC=gcc CXX=g++ CFLAGS="-g -Wall -O3"
 	else
@@ -295,7 +295,7 @@ case "${HOSTNAME}" in
 	              --with-hdf5 \
                      --with-szlib \
                   --with-grib_api \
-                  --with-udunits2 \
+                  --with-eccodes  \
                   --with-grib_api \
                   --with-fftw3    \
                   --with-proj     \
@@ -319,9 +319,8 @@ case "${HOSTNAME}" in
 	            --with-netcdf \
 	              --with-hdf5 \
                      --with-szlib \
-                  --with-grib_api \
+                  --with-eccodes  \
                   --with-udunits2 \
-                  --with-grib_api \
                   --with-fftw3    \
                   --with-proj     \
                       --with-pic  \
