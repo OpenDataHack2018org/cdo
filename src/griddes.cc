@@ -39,6 +39,7 @@ void gridInit(griddes_t *grid)
   grid->yvals         = NULL;
   grid->xbounds       = NULL;
   grid->ybounds       = NULL;
+  grid->rowlon        = NULL;
   grid->area          = NULL;
   grid->type          = CDI_UNDEFID;
   grid->datatype      = CDI_UNDEFID;
@@ -133,17 +134,18 @@ int gridDefine(griddes_t grid)
     case GRID_GENERIC:
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
+    case GRID_GAUSSIAN_REDUCED:
     case GRID_PROJECTION:
       {
 	if ( grid.size != 1 )
 	  {
-	    if ( grid.xsize == 0 ) Error("xsize undefined!");
+	    if ( grid.xsize == 0 && grid.type != GRID_GAUSSIAN_REDUCED ) Error("xsize undefined!");
 	    if ( grid.ysize == 0 ) Error("ysize undefined!");
 	  }
 
 	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
-	if ( grid.size != grid.xsize*grid.ysize )
+	if ( grid.xsize && grid.size != grid.xsize*grid.ysize )
 	  Error("Inconsistent grid declaration: xsize*ysize!=gridsize (xsize=%zu ysize=%zu gridsize=%zu)",
 		grid.xsize, grid.ysize, grid.size);
 
@@ -211,6 +213,7 @@ int gridDefine(griddes_t grid)
 	if ( grid.xbounds ) { gridDefXbounds(gridID, grid.xbounds); Free(grid.xbounds); }
 	if ( grid.ybounds ) { gridDefYbounds(gridID, grid.ybounds); Free(grid.ybounds); }
 	if ( grid.mask )    { gridDefMask(gridID, grid.mask); Free(grid.mask); }
+        if ( grid.rowlon )  { gridDefRowlon(gridID, grid.ysize, grid.rowlon); Free(grid.rowlon); }
 
 	break;
       }

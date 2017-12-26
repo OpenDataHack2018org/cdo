@@ -271,7 +271,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
               }
           }
 
-	if ( nxvals > 0 )
+	if ( nxvals > 0 && type != GRID_GAUSSIAN_REDUCED )
 	  {
 	    double xfirst = 0.0, xinc = 0.0;
 
