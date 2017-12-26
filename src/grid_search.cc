@@ -195,7 +195,7 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
   kdata_t min[3], max[3];
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
-#if defined(HAVE_OPENMP45)
+#ifdef  HAVE_OPENMP45
 #pragma omp parallel for reduction(min: min[:3]) reduction(max: max[:3])
 #endif
   for ( size_t i = 0; i < n; i++ ) 
@@ -236,7 +236,7 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
   max[0] = max[1] = max[2] = -1e9;
   // Generating  Point Cloud
   pointcloud->pts.resize(n);
-#if defined(HAVE_OPENMP45)
+#ifdef  HAVE_OPENMP45
 #pragma omp parallel for reduction(min: min[:3]) reduction(max: max[:3])
 #endif
   for ( size_t i = 0; i < n; i++ ) 

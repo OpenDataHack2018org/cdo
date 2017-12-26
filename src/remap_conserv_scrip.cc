@@ -1330,20 +1330,17 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( cdoTimer ) timer_start(timer_remap_con_l1);
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex) \
   shared(nbins, num_wts, src_centroid_lon, src_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat, srch_corner_lon, max_srch_cells, 		\
-	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add, findex)
+	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for ( long src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add )
     {
       int ompthID = cdo_omp_get_thread_num();
 
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( ompthID == 0 ) progressStatus(0, 0.5, findex/src_grid_size);
 
@@ -1537,20 +1534,17 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   findex = 0;
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex) \
   shared(nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat, srch_corner_lon, max_srch_cells, 		\
-	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add, findex)
+	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       int ompthID = cdo_omp_get_thread_num();
 
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( ompthID == 0 ) progressStatus(0.5, 0.5, findex/tgt_grid_size);
 

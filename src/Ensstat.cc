@@ -88,8 +88,8 @@ void *ensstat_func(void *ensarg)
   double missval = vlistInqVarMissval(arg->vlistID1, arg->varID[t]);
 
   size_t nmiss = 0;
-#if defined(_OPENMP)
-#pragma omp parallel for default(shared)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(shared)  reduction(+:nmiss)
 #endif
   for ( int i = 0; i < gridsize; ++i )
     {
@@ -109,13 +109,7 @@ void *ensstat_func(void *ensarg)
 
       arg->array2[i] = arg->lpctl ? fldpctl(field[ompthID], arg->pn) : fldfun(field[ompthID], arg->operfunc);
 
-      if ( DBL_IS_EQUAL(arg->array2[i], field[ompthID].missval) )
-        {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
-          nmiss++;
-        }
+      if ( DBL_IS_EQUAL(arg->array2[i], field[ompthID].missval) ) nmiss++;
 
       if ( arg->count_data ) arg->count2[i] = nfiles - field[ompthID].nmiss;
     }

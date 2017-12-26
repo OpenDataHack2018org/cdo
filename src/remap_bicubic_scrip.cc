@@ -106,15 +106,12 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   double findex = 0;
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex) \
+  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
 
@@ -312,15 +309,12 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 
   double findex = 0;
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, grad1_lat, grad1_lon, grad1_latlon, findex)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex) \
+  shared(remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, grad1_lat, grad1_lon, grad1_latlon)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
 

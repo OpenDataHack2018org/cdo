@@ -187,15 +187,12 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 
   /* Loop over destination grid */
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none)  schedule(static)  \
-  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  schedule(static)  reduction(+:findex) \
+  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
 
@@ -389,15 +386,12 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
 
   /* Loop over destination grid */
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none)  schedule(static)  \
-  shared(cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  schedule(static)  reduction(+:findex) \
+  shared(cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
 

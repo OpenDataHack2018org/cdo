@@ -95,7 +95,6 @@ size_t smooth_knn_normalize_weights(size_t num_neighbors, double dist_tot, struc
 static
 void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss, smoothpoint_t spoint)
 {
-  *nmiss = 0;
   int gridID0 = gridID;
   size_t gridsize = gridInqSize(gridID);
   size_t num_neighbors = spoint.maxpoints;
@@ -150,18 +149,17 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
   start = clock();
 
+  size_t nmissx = 0;
   double findex = 0;
 
-#if defined(_OPENMP)
-#pragma omp parallel for schedule(dynamic) default(none) shared(cdoVerbose, knn, spoint, findex, mask, array1, array2, xvals, yvals, gs, gridsize, nmiss, missval)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for schedule(dynamic) default(none)  reduction(+:findex)  reduction(+:nmissx) \
+  shared(cdoVerbose, knn, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
 #endif
   for ( size_t i = 0; i < gridsize; ++i )
     {
       int ompthID = cdo_omp_get_thread_num();
       
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( cdoVerbose && cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
      
@@ -187,13 +185,12 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
         }
       else
         {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
-          (*nmiss)++;
+          nmissx++;
           array2[i] = missval;
         }
     }
+
+  *nmiss = nmissx;
 
   finish = clock();
 

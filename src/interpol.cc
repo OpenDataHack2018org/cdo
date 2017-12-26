@@ -219,9 +219,9 @@ void intlinarr2(double missval, int lon_is_circular,
 
   progressInit();
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex) \
+  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
 #endif
   for ( size_t i = 0; i < gridsize2; ++i )
     {
@@ -231,9 +231,6 @@ void intlinarr2(double missval, int lon_is_circular,
 
       field[i] = missval;
 
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
 

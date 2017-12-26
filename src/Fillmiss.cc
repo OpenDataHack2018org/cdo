@@ -364,15 +364,12 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
   double findex = 0;
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(nbr_mask, nbr_add, nbr_dist)  \
-  shared(findex, mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, num_neighbors)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex)  shared(nbr_mask, nbr_add, nbr_dist)  \
+  shared(mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, num_neighbors)
 #endif
   for ( unsigned i = 0; i < nmiss; ++i )
     {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/nmiss);
 
