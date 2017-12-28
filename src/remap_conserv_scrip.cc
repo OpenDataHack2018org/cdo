@@ -1143,7 +1143,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
   double *weights = rv->wts;
   double norm_factor = 0;  /* factor for normalizing wts */
 
-  if ( rv->norm_opt == NORM_OPT_DESTAREA )
+  if ( rv->normOpt == NormOpt::DESTAREA )
     {
 #if defined(SX)
 #pragma vdir nodep
@@ -1165,7 +1165,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
 	  norm_weight(norm_factor, &weights[n*3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
 	}
     }
-  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
+  else if ( rv->normOpt == NormOpt::FRACAREA )
     {
 #if defined(SX)
 #pragma vdir nodep
@@ -1187,7 +1187,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
 	  norm_weight(norm_factor, &weights[n*3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
 	}
     }
-  else if ( rv->norm_opt == NORM_OPT_NONE )
+  else if ( rv->normOpt == NormOpt::NONE )
     {
 #if defined(SX)
 #pragma vdir nodep
@@ -1836,7 +1836,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	  tgt_centroid_lon[n] = 0;
 	}
 
-      remapCheckWeights(num_links, 3, rv->norm_opt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
+      remapCheckWeights(num_links, 3, rv->normOpt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
 
       for ( long n = 0; n < num_links; ++n )
 	{
@@ -1848,11 +1848,11 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       double norm_factor = 0;    // factor for normalizing wts
       for ( long n = 0; n < tgt_grid_size; ++n )
 	{
-	  if ( rv->norm_opt == NORM_OPT_DESTAREA )
+	  if ( rv->normOpt == NormOpt::DESTAREA )
 	    norm_factor = tgt_grid->cell_frac[n];
-	  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
+	  else if ( rv->normOpt == NormOpt::FRACAREA )
 	    norm_factor = ONE;
-	  else if ( rv->norm_opt == NORM_OPT_NONE )
+	  else if ( rv->normOpt == NormOpt::NONE )
 	    norm_factor = tgt_grid->cell_area[n];
 	    
 	  if ( tgt_centroid_lat[n] > 0 && fabs(tgt_centroid_lat[n] - norm_factor) > .01 )

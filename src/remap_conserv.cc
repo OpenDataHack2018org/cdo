@@ -584,7 +584,7 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
   size_t tgt_cell_add;       // current linear address for target grid cell
   double norm_factor = 0; // factor for normalizing wts
 
-  if ( rv->norm_opt == NORM_OPT_DESTAREA )
+  if ( rv->normOpt == NormOpt::DESTAREA )
     {
 #if defined(SX)
 #pragma vdir nodep
@@ -606,7 +606,7 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 	  rv->wts[n*num_wts] *= norm_factor;
 	}
     }
-  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
+  else if ( rv->normOpt == NormOpt::FRACAREA )
     {
 #if defined(SX)
 #pragma vdir nodep
@@ -628,7 +628,7 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 	  rv->wts[n*num_wts] *= norm_factor;
 	}
     }
-  else if ( rv->norm_opt == NORM_OPT_NONE )
+  else if ( rv->normOpt == NormOpt::NONE )
     {
     }
 }
@@ -916,7 +916,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       for ( n = 0; n < num_weights; ++n )
 	partial_weights[n] = partial_areas[n] / tgt_area;
 
-      if ( rv->norm_opt == NORM_OPT_FRACAREA )
+      if ( rv->normOpt == NormOpt::FRACAREA )
 	yac_correct_weights((unsigned)num_weights, partial_weights);
 
       for ( n = 0; n < num_weights; ++n )
@@ -1029,7 +1029,7 @@ printf("stime = %gs\n", stimer);
       remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
       remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
 
-      remapCheckWeights(rv->num_links, rv->num_wts, rv->norm_opt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
+      remapCheckWeights(rv->num_links, rv->num_wts, rv->normOpt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
     }
 
   if ( cdoTimer ) timer_stop(timer_remap_con);

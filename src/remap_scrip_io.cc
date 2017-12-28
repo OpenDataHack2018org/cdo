@@ -123,15 +123,15 @@ void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType su
   int writemode = NC_CLOBBER;
   nc_type sizetype = NC_INT;
 
-  switch ( rv.norm_opt )
+  switch ( rv.normOpt )
     {
-    case NORM_OPT_NONE:
+    case NormOpt::NONE:
       strcpy(normalize_opt, "none");
       break;
-    case NORM_OPT_FRACAREA:
+    case NormOpt::FRACAREA:
       strcpy(normalize_opt, "fracarea");
       break;
-    case NORM_OPT_DESTAREA:
+    case NormOpt::DESTAREA:
       strcpy(normalize_opt, "destarea");
       break;
     }
@@ -531,11 +531,11 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapTy
   rv->sort_add = false;
 
   if ( strcmp(normalize_opt, "none") == 0 )
-    rv->norm_opt = NORM_OPT_NONE;
+    rv->normOpt = NormOpt::NONE;
   else if ( strcmp(normalize_opt, "fracarea") == 0 )
-    rv->norm_opt = NORM_OPT_FRACAREA;
+    rv->normOpt = NormOpt::FRACAREA;
   else if ( strcmp(normalize_opt, "destarea") == 0 )
-    rv->norm_opt = NORM_OPT_DESTAREA;
+    rv->normOpt = NormOpt::DESTAREA;
   else
     {
       cdoPrint("normalize_opt = %s", normalize_opt);

@@ -170,19 +170,7 @@ void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_
 
   line[0] = 0;
   (void)operfunc;
-  /*
-  if      ( operfunc == REMAPBIL  || operfunc == GENBIL  )  strcpy(line, "SCRIP bilinear");
-  else if ( operfunc == REMAPBIC  || operfunc == GENBIC  )  strcpy(line, "SCRIP bicubic");
-  else if ( operfunc == REMAPNN   || operfunc == GENNN   )  strcpy(line, "SCRIP nearest neighbor");
-  else if ( operfunc == REMAPDIS  || operfunc == GENDIS  )  strcpy(line, "SCRIP distance-weighted average");
-  else if ( operfunc == REMAPCON  || operfunc == GENCON  )  strcpy(line, "SCRIP first order conservative");
-  else if ( operfunc == REMAPCON2 || operfunc == GENCON2 )  strcpy(line, "SCRIP second order conservative");
-  else if ( operfunc == REMAPLAF  || operfunc == GENLAF  )  strcpy(line, "YAC largest area fraction");
-  else if ( operfunc == REMAPYCON || operfunc == GENYCON )  strcpy(line, "YAC first order conservative");
-  else                                                      strcpy(line, "Unknown");
 
-  strcat(line, " remap weights from ");
-  */
   strcat(line, "Remap weights from ");
   strcat(line, remap_file);
   strcat(line, " not used, ");
@@ -536,8 +524,8 @@ int set_max_remaps(int vlistID)
   for ( int index = 0; index < nzaxis; index++ )
     {
       const int zaxisID = vlistZaxis(vlistID, index);
-      const int zaxissize = zaxisInqSize(zaxisID);
-      if ( zaxissize > max_remaps ) max_remaps = zaxissize;
+      const int zaxisSize = zaxisInqSize(zaxisID);
+      if ( zaxisSize > max_remaps ) max_remaps = zaxisSize;
     }
   
   const int nvars = vlistNvars(vlistID);
@@ -551,44 +539,44 @@ int set_max_remaps(int vlistID)
 }
 
 static
-int get_norm_opt(void)
+NormOpt get_normOpt(void)
 {
-  int norm_opt = NORM_OPT_FRACAREA;
+  NormOpt normOpt(NormOpt::FRACAREA);
 
   char *envstr = getenv("CDO_REMAP_NORMALIZE_OPT"); // obsolate
   if ( envstr && *envstr )
     {
-      if      ( memcmp(envstr, "frac", 4) == 0 ) norm_opt = NORM_OPT_FRACAREA;
-      else if ( memcmp(envstr, "dest", 4) == 0 ) norm_opt = NORM_OPT_DESTAREA;
-      else if ( memcmp(envstr, "none", 4) == 0 ) norm_opt = NORM_OPT_NONE;
+      if      ( memcmp(envstr, "frac", 4) == 0 ) normOpt = NormOpt::FRACAREA;
+      else if ( memcmp(envstr, "dest", 4) == 0 ) normOpt = NormOpt::DESTAREA;
+      else if ( memcmp(envstr, "none", 4) == 0 ) normOpt = NormOpt::NONE;
       else cdoWarning("CDO_REMAP_NORMALIZE_OPT=%s unsupported!", envstr);
     }
 
   envstr = getenv("CDO_REMAP_NORM");
   if ( envstr && *envstr )
     {
-      if      ( memcmp(envstr, "frac", 4) == 0 ) norm_opt = NORM_OPT_FRACAREA;
-      else if ( memcmp(envstr, "dest", 4) == 0 ) norm_opt = NORM_OPT_DESTAREA;
-      else if ( memcmp(envstr, "none", 4) == 0 ) norm_opt = NORM_OPT_NONE;
+      if      ( memcmp(envstr, "frac", 4) == 0 ) normOpt = NormOpt::FRACAREA;
+      else if ( memcmp(envstr, "dest", 4) == 0 ) normOpt = NormOpt::DESTAREA;
+      else if ( memcmp(envstr, "none", 4) == 0 ) normOpt = NormOpt::NONE;
       else cdoWarning("CDO_REMAP_NORM=%s unsupported!", envstr);
     }
 
   if ( cdoVerbose )
     {
-      if      ( norm_opt == NORM_OPT_FRACAREA ) cdoPrint("Normalization option: frac");
-      else if ( norm_opt == NORM_OPT_DESTAREA ) cdoPrint("Normalization option: dest");
+      if      ( normOpt == NormOpt::FRACAREA ) cdoPrint("Normalization option: frac");
+      else if ( normOpt == NormOpt::DESTAREA ) cdoPrint("Normalization option: dest");
       else                                      cdoPrint("Normalization option: none");
     }
 
-  return norm_opt;
+  return normOpt;
 }
 
 static
-void remap_normalize(int norm_opt, size_t gridsize, double *array, double missval, remapgrid_t *tgt_grid)
+void remap_normalize(NormOpt normOpt, size_t gridsize, double *array, double missval, remapgrid_t *tgt_grid)
 {
   // used only to check the result of remapcon
 
-  if ( norm_opt == NORM_OPT_NONE )
+  if ( normOpt == NormOpt::NONE )
     {
       for ( size_t i = 0; i < gridsize; i++ )
 	{
@@ -603,7 +591,7 @@ void remap_normalize(int norm_opt, size_t gridsize, double *array, double missva
 	    }
 	}
     }
-  else if ( norm_opt == NORM_OPT_DESTAREA )
+  else if ( normOpt == NormOpt::DESTAREA )
     {
       for ( size_t i = 0; i < gridsize; i++ )
 	{
@@ -752,6 +740,15 @@ void sort_remap_add(remapvars_t *remapvars)
   if ( cdoTimer ) timer_stop(timer_remap_sort);
 }
 
+static
+void remapInit(remap_t *remap)
+{
+  remap->nused    = 0;
+  remap->gridID   = -1;
+  remap->gridsize = 0;
+  remap->nmiss    = 0;        
+}
+
 
 void *Remap(void *argument)
 {
@@ -763,13 +760,12 @@ void *Remap(void *argument)
   size_t nmiss1, nmiss2;
   int r = -1;
   int nremaps = 0;
-  int norm_opt = NORM_OPT_NONE;
+  NormOpt normOpt(NormOpt::NONE);
   RemapType mapType(RemapType::UNDEF);
-  SubmapType submapType = SubmapType::NONE;
+  SubmapType submapType(SubmapType::NONE);
   int num_neighbors = 0;
   char varname[CDI_MAX_NAME];
   double missval;
-  remap_t *remaps = NULL;
   char *remap_file = NULL;
 
   if ( cdoTimer ) init_remap_timer();
@@ -777,6 +773,8 @@ void *Remap(void *argument)
   cdoInitialize(argument);
 
   // clang-format off
+  cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
+  cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
   cdoOperatorAdd("remapcon",     REMAPCON,     0, NULL);
   cdoOperatorAdd("remapcon2",    REMAPCON2,    0, NULL);
   cdoOperatorAdd("remapbil",     REMAPBIL,     0, NULL);
@@ -785,6 +783,7 @@ void *Remap(void *argument)
   cdoOperatorAdd("remapnn",      REMAPNN,      0, NULL);
   cdoOperatorAdd("remaplaf",     REMAPLAF,     0, NULL);
   cdoOperatorAdd("remapsum",     REMAPSUM,     0, NULL);
+  cdoOperatorAdd("genycon",      GENYCON,      1, NULL);
   cdoOperatorAdd("gencon",       GENCON,       1, NULL);
   cdoOperatorAdd("gencon2",      GENCON2,      1, NULL);
   cdoOperatorAdd("genbil",       GENBIL,       1, NULL);
@@ -792,15 +791,12 @@ void *Remap(void *argument)
   cdoOperatorAdd("gendis",       GENDIS,       1, NULL);
   cdoOperatorAdd("gennn",        GENNN,        1, NULL);
   cdoOperatorAdd("genlaf",       GENLAF,       1, NULL);
-  cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
-  cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
-  cdoOperatorAdd("genycon",      GENYCON,      1, NULL);
   // clang-format on
 
-  int operatorID   = cdoOperatorID();
-  int operfunc     = cdoOperatorF1(operatorID);
-  int lwrite_remap = cdoOperatorF2(operatorID);
-  int lremapxxx    = operfunc == REMAPXXX;
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
+  bool lwrite_remap = cdoOperatorF2(operatorID);
+  bool lremapxxx = operfunc == REMAPXXX;
 
   remap_set_int(REMAP_WRITE_REMAP, lwrite_remap);
 
@@ -824,7 +820,7 @@ void *Remap(void *argument)
       if ( operfunc == REMAPDIS && operatorArgc() == 2 )
         {
           int inum = parameter2int(operatorArgv()[1]);
-          //  if ( inum < 1 || inum > 9 ) cdoAbort("Number of nearest neighbors out of range (1-9)!", inum);
+          if ( inum < 1 ) cdoAbort("Number of nearest neighbors out of range (>0)!");
           num_neighbors = inum;
         }
       else
@@ -858,18 +854,10 @@ void *Remap(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
 
   if ( max_remaps == -1 ) max_remaps = set_max_remaps(vlistID1);
+  if ( max_remaps < 1 ) cdoAbort("max_remaps out of range (>0)!");
 
-  if ( max_remaps > 0 )
-    {
-      remaps = (remap_t*) Malloc(max_remaps*sizeof(remap_t));
-      for ( r = 0; r < max_remaps; r++ )
-	{
-	  remaps[r].nused    = 0;
-	  remaps[r].gridID   = -1;
-	  remaps[r].gridsize = 0;
-	  remaps[r].nmiss    = 0;
-	}
-    }
+  remap_t *remaps = (remap_t*) Malloc(max_remaps*sizeof(remap_t));
+  for ( r = 0; r < max_remaps; r++ ) remapInit(&remaps[r]);
 
   if ( lwrite_remap || lremapxxx ) remap_genweights = true;
 
@@ -930,23 +918,22 @@ void *Remap(void *argument)
 
   remap_set_int(REMAP_GENWEIGHTS, (int)remap_genweights);
 
-  if ( mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC ) norm_opt = get_norm_opt();
+  if ( mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC ) normOpt = get_normOpt();
 
   size_t grid1sizemax = vlistGridsizeMax(vlistID1);
 
-  bool need_gradiants = false;
-  if ( mapType == RemapType::BICUBIC ) need_gradiants = true;
+  bool needGradiants = (mapType == RemapType::BICUBIC);
   if ( mapType == RemapType::CONSERV && remap_order == 2 )
     {
       if ( cdoVerbose ) cdoPrint("Second order remapping");
-      need_gradiants = true;
+      needGradiants = true;
     }
   else
     remap_order = 1;
 
-  double *grad1_lat    = need_gradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
-  double *grad1_lon    = need_gradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
-  double *grad1_latlon = need_gradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
+  double *grad1_lat    = needGradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
+  double *grad1_lon    = needGradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
+  double *grad1_latlon = needGradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
 
   double *array1 = (double*) Malloc(grid1sizemax*sizeof(double));
   int *imask = (int*) Malloc(grid1sizemax*sizeof(int));
@@ -1021,17 +1008,13 @@ void *Remap(void *argument)
 		}
 	      else
 		{
-                  int n0 = 0;
-                  if ( max_remaps > 1 && remaps[0].nused > remaps[1].nused ) n0 = 1;
+                  int n0 = (max_remaps > 1 && remaps[0].nused > remaps[1].nused);
                   remapVarsFree(&remaps[n0].vars);
                   remapGridFree(&remaps[n0].src_grid);
                   remapGridFree(&remaps[n0].tgt_grid);
                   for ( r = n0+1; r < nremaps; r++ ) memcpy(&remaps[r-1], &remaps[r], sizeof(remap_t));
                   r = nremaps - 1;
-                  remaps[r].nused    = 0;
-                  remaps[r].gridID   = -1;
-                  remaps[r].gridsize = 0;
-                  remaps[r].nmiss    = 0;
+                  remapInit(&remaps[r]);
 		}
 
 	      if ( remaps[r].gridID != gridID1 )
@@ -1062,7 +1045,7 @@ void *Remap(void *argument)
 
 		  remap_set_int(REMAP_NUM_SRCH_BINS, remap_num_srch_bins);
 
-		  remaps[r].vars.norm_opt = norm_opt;
+		  remaps[r].vars.normOpt = normOpt;
 		  remaps[r].vars.pinit = false;
 		  
 		  if ( (mapType == RemapType::BILINEAR || mapType == RemapType::BICUBIC) &&
@@ -1133,7 +1116,7 @@ void *Remap(void *argument)
 	    {
               remaps[r].nused++;
 
-	      if ( need_gradiants )
+	      if ( needGradiants )
 		{
 		  if ( remaps[r].src_grid.rank != 2 && remap_order == 2 )
 		    cdoAbort("Second order remapping is not available for unstructured grids!");
@@ -1165,7 +1148,7 @@ void *Remap(void *argument)
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON )
 	    {
 	      // used only to check the result of remapcon
-	      if ( 0 ) remap_normalize(remaps[r].vars.norm_opt, gridsize2, array2, missval, &remaps[r].tgt_grid);
+	      if ( 0 ) remap_normalize(remaps[r].vars.normOpt, gridsize2, array2, missval, &remaps[r].tgt_grid);
 
 	      remap_set_frac_min(gridsize2, array2, missval, &remaps[r].tgt_grid);
 	    }
@@ -1241,20 +1224,17 @@ void *Remap(void *argument)
   if ( grad1_lon ) Free(grad1_lon);
   if ( grad1_lat ) Free(grad1_lat);
 
-  if ( max_remaps > 0 )
+  if ( lremapxxx && remap_genweights && remaps[0].nused == 0 )
+    print_remap_warning(remap_file, operfunc, &remaps[0].src_grid, remaps[0].nmiss);
+      
+  for ( r = 0; r < nremaps; r++ )
     {
-      if ( lremapxxx && remap_genweights && remaps[0].nused == 0 )
-        print_remap_warning(remap_file, operfunc, &remaps[0].src_grid, remaps[0].nmiss);
-      
-      for ( r = 0; r < nremaps; r++ )
-	{
-	  remapVarsFree(&remaps[r].vars);
-	  remapGridFree(&remaps[r].src_grid);
-	  remapGridFree(&remaps[r].tgt_grid);
-	}
-      
-      if ( remaps ) Free(remaps);
+      remapVarsFree(&remaps[r].vars);
+      remapGridFree(&remaps[r].src_grid);
+      remapGridFree(&remaps[r].tgt_grid);
     }
+      
+  if ( remaps ) Free(remaps);
 
   cdoFinish();
 

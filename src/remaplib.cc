@@ -1683,7 +1683,7 @@ void remapCheckArea(size_t grid_size, double *restrict cell_area, const char *na
 }
 
 
-void remapCheckWeights(size_t num_links, size_t num_wts, int norm_opt, size_t *src_cell_add, size_t *tgt_cell_add, double *wts)
+void remapCheckWeights(size_t num_links, size_t num_wts, NormOpt normOpt, size_t *src_cell_add, size_t *tgt_cell_add, double *wts)
 {
   for ( size_t n = 0; n < num_links; ++n )
     {
@@ -1691,7 +1691,7 @@ void remapCheckWeights(size_t num_links, size_t num_wts, int norm_opt, size_t *s
         cdoPrint("Map weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
                  src_cell_add[n], tgt_cell_add[n], n, wts[n*num_wts]);
 
-      if ( norm_opt != NORM_OPT_NONE && wts[n*num_wts] > 1.01 )
+      if ( normOpt != NormOpt::NONE && wts[n*num_wts] > 1.01 )
         cdoPrint("Map weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
                  src_cell_add[n], tgt_cell_add[n], n, wts[n*num_wts]);
     }

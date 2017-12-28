@@ -58,9 +58,7 @@ typedef RESTR_TYPE restr_t;
 
 #define  TINY_FRAC     1.e-10
 
-#define  NORM_OPT_NONE        1
-#define  NORM_OPT_DESTAREA    2
-#define  NORM_OPT_FRACAREA    3
+enum struct NormOpt     {NONE, DESTAREA, FRACAREA};
 
 enum struct RemapType   {UNDEF, BILINEAR, BICUBIC, DISTWGT, CONSERV, CONSERV_YAC};
 enum struct SubmapType  {NONE, LAF, SUM};
@@ -129,7 +127,7 @@ typedef struct {
   size_t    num_links;        /* actual number of links for remapping     */
   size_t    num_wts;          /* num of weights used in remapping         */
   RemapType mapType;          /* identifier for remapping method          */
-  int       norm_opt;         /* option for normalization (conserv only)  */
+  NormOpt   normOpt;          /* option for normalization (conserv only)  */
   size_t    resize_increment; /* default amount to increase array size    */
 
   size_t   *src_cell_add;     /* source grid address for each link        */
@@ -233,6 +231,6 @@ int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, siz
 void remapgrid_get_lonlat(remapgrid_t *grid, size_t cell_add, double *plon, double *plat);
 
 void remapCheckArea(size_t grid_size, double *restrict cell_area, const char *name);
-void remapCheckWeights(size_t num_links, size_t num_wts, int norm_opt, size_t *src_cell_add, size_t *tgt_cell_add, double *wts);
+void remapCheckWeights(size_t num_links, size_t num_wts, NormOpt normOpt, size_t *src_cell_add, size_t *tgt_cell_add, double *wts);
 
 #endif  /* REMAP_H */
