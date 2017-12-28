@@ -46,7 +46,7 @@ void calc_bin_addr(size_t gridsize, size_t nbins, const restr_t* restrict bin_la
 }
 
 
-void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type)
+void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, RemapType mapType)
 {
   size_t n2;
   size_t nbins = src_grid->num_srch_bins;
@@ -69,7 +69,7 @@ void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type)
 
       calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
 
-      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
+      if ( mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC )
 	{
 	  tgt_grid->bin_addr = (size_t*) Realloc(tgt_grid->bin_addr, 2*nbins*sizeof(size_t));
 
@@ -79,12 +79,12 @@ void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type)
 	}
    }
 
-  if ( map_type == MAP_TYPE_CONSERV_YAC )
+  if ( mapType == RemapType::CONSERV_YAC )
     {
       Free(tgt_grid->cell_bound_box); tgt_grid->cell_bound_box = NULL;
     }
  
-  if ( map_type == MAP_TYPE_DISTWGT )
+  if ( mapType == RemapType::DISTWGT )
     {
       Free(src_grid->cell_bound_box); src_grid->cell_bound_box = NULL;
     }

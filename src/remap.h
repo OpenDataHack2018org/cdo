@@ -62,15 +62,8 @@ typedef RESTR_TYPE restr_t;
 #define  NORM_OPT_DESTAREA    2
 #define  NORM_OPT_FRACAREA    3
 
-#define  MAP_TYPE_CONSERV     1
-#define  MAP_TYPE_BILINEAR    2
-#define  MAP_TYPE_BICUBIC     3
-#define  MAP_TYPE_DISTWGT     4
-#define  MAP_TYPE_CONSERV_YAC 5
-
-#define  SUBMAP_TYPE_NONE     0
-#define  SUBMAP_TYPE_LAF      1
-#define  SUBMAP_TYPE_SUM      2
+enum struct RemapType   {UNDEF, BILINEAR, BICUBIC, DISTWGT, CONSERV, CONSERV_YAC};
+enum struct SubmapType  {NONE, LAF, SUM};
 
 
 typedef struct {
@@ -129,20 +122,20 @@ typedef struct {
 remaplink_t;
 
 typedef struct {
-  long     links_per_value;
-  bool     sort_add;
-  bool     pinit;            /* true: if the pointers are initialized    */
-  size_t   max_links;        /* current size of link arrays              */
-  size_t   num_links;        /* actual number of links for remapping     */
-  size_t   num_wts;          /* num of weights used in remapping         */
-  int      map_type;         /* identifier for remapping method          */
-  int      norm_opt;         /* option for normalization (conserv only)  */
-  size_t   resize_increment; /* default amount to increase array size    */
+  long      links_per_value;
+  bool      sort_add;
+  bool      pinit;            /* true: if the pointers are initialized    */
+  size_t    max_links;        /* current size of link arrays              */
+  size_t    num_links;        /* actual number of links for remapping     */
+  size_t    num_wts;          /* num of weights used in remapping         */
+  RemapType mapType;          /* identifier for remapping method          */
+  int       norm_opt;         /* option for normalization (conserv only)  */
+  size_t    resize_increment; /* default amount to increase array size    */
 
-  size_t  *src_cell_add;     /* source grid address for each link        */
-  size_t  *tgt_cell_add;     /* target grid address for each link        */
+  size_t   *src_cell_add;     /* source grid address for each link        */
+  size_t   *tgt_cell_add;     /* target grid address for each link        */
 
-  double  *wts;              /* map weights for each link [max_links*num_wts] */
+  double   *wts;              /* map weights for each link [max_links*num_wts] */
 
   remaplink_t links;
 }
@@ -169,8 +162,8 @@ void remap_set_threshhold(double threshhold);
 void remap_set_int(int remapvar, int value);
 
 
-void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid);
-void remap_vars_init(int map_type, size_t src_grid_size, size_t tgt_grid_size, remapvars_t *rv);
+void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid);
+void remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapvars_t *rv);
 
 void remapVarsFree(remapvars_t *rv);
 void remapGridFree(remapgrid_t *grid);
@@ -210,12 +203,12 @@ void reorder_links(remapvars_t *rv);
 void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights);
 void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights, int parent);
 
-void write_remap_scrip(const char *interp_file, int map_type, int submap_type, int num_neighbors,
+void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int num_neighbors,
 		       int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv);
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type, int *num_neighbors,
+void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType, int *num_neighbors,
 		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
-void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type);
+void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, RemapType mapType);
 size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2,
                       restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, size_t src_grid_size, size_t *srch_add);
 

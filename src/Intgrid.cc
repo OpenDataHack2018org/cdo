@@ -313,10 +313,7 @@ void *Intgrid(void *argument)
 		   /* && gridInqType(gridID1) != GRID_CURVILINEAR */ )
 		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype) );
 
-	      if ( operatorID == BOXAVG )
-		gridID2 = genBoxavgGrid(gridID1, xinc, yinc);
-	      else
-		gridID2 = genThinoutGrid(gridID1, xinc, yinc);
+              gridID2 = operatorID == BOXAVG ? genBoxavgGrid(gridID1, xinc, yinc) : genThinoutGrid(gridID1, xinc, yinc);
 	    }
 	  else
 	    cdoAbort("Too many different grids!");

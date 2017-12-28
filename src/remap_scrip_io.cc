@@ -16,7 +16,7 @@
 
 
 void remapgrid_init(remapgrid_t *grid);
-void remapgrid_alloc(int map_type, remapgrid_t *grid);
+void remapgrid_alloc(RemapType mapType, remapgrid_t *grid);
 
 
 #if defined(HAVE_LIBNETCDF)
@@ -67,7 +67,7 @@ void read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_ad
 #endif
 
 
-void write_remap_scrip(const char *interp_file, int map_type, int submap_type, int num_neighbors,
+void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int num_neighbors,
 		       int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv)
 {
   // Writes remap data to a NetCDF file using SCRIP conventions
@@ -136,11 +136,11 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
       break;
     }
 
-  switch ( map_type )
+  switch ( mapType )
     {
-    case MAP_TYPE_CONSERV:
+    case RemapType::CONSERV:
       lgridarea = true;
-      if ( submap_type == SUBMAP_TYPE_LAF )
+      if ( submapType == SubmapType::LAF )
 	{
 	  strcpy(map_method, "Largest area fraction");
 	  break;
@@ -150,10 +150,10 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 	  strcpy(map_method, "Conservative remapping");
 	  break;
 	}
-    case MAP_TYPE_CONSERV_YAC:
+    case RemapType::CONSERV_YAC:
       lgridarea = true;
       /*
-      if ( submap_type == SUBMAP_TYPE_LAF )
+      if ( submapType == SubmapType::LAF )
 	{
 	  strcpy(map_method, "Largest area fraction");
 	  break;
@@ -164,17 +164,19 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 	  strcpy(map_method, "Conservative remapping using clipping on sphere");
 	  break;
 	}
-    case MAP_TYPE_BILINEAR:
+    case RemapType::BILINEAR:
       strcpy(map_method, "Bilinear remapping");
       break;
-    case MAP_TYPE_BICUBIC:
+    case RemapType::BICUBIC:
       strcpy(map_method, "Bicubic remapping");
       break;
-    case MAP_TYPE_DISTWGT:
+    case RemapType::DISTWGT:
       if ( num_neighbors == 1 )
 	strcpy(map_method, "Nearest neighbor");
       else
 	strcpy(map_method, "Distance weighted avg of nearest neighbors");
+      break;
+    case RemapType::UNDEF:
       break;
     }
 
@@ -241,7 +243,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "map_method", strlen(map_method), map_method));
 
   // Remap order
-  if ( map_type == MAP_TYPE_CONSERV && submap_type == SUBMAP_TYPE_NONE )
+  if ( mapType == RemapType::CONSERV && submapType == SubmapType::NONE )
     nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "remap_order", NC_INT, 1L, &remap_order));
 
   // File convention
@@ -447,7 +449,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 
 /*****************************************************************************/
 
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type, int *num_neighbors,
+void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType, int *num_neighbors,
 		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   // The routine reads a NetCDF file to extract remapping info in SCRIP format
@@ -492,7 +494,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   int nc_rmpmatrix_id;      /* id for remapping matrix                  */
 
   char map_name[1024];
-  char map_method[64];      /* character string for map_type             */
+  char map_method[64];      /* character string for mapType             */
   char normalize_opt[64];   /* character string for normalization option */
   char convention[64];      /* character string for output convention    */
   char src_grid_name[64];      /* grid name for source grid                 */
@@ -548,49 +550,49 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "map_method", &attlen));
   map_method[attlen] = 0;
 
-  *submap_type = SUBMAP_TYPE_NONE;
+  *submapType = SubmapType::NONE;
   *remap_order = 1;
 
   if ( cmpstr(map_method, "Conservative") == 0 )
     {
       int iatt;
       if ( cmpstr(map_method, "Conservative remapping using clipping on sphere") == 0 )
-	rv->map_type = MAP_TYPE_CONSERV_YAC;
+	rv->mapType = RemapType::CONSERV_YAC;
       else
-	rv->map_type = MAP_TYPE_CONSERV;
+	rv->mapType = RemapType::CONSERV;
 
       status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
       if ( status == NC_NOERR ) *remap_order = iatt;
     }
-  else if ( cmpstr(map_method, "Bilinear") == 0 ) rv->map_type = MAP_TYPE_BILINEAR;
-  else if ( cmpstr(map_method, "Bicubic")  == 0 ) rv->map_type = MAP_TYPE_BICUBIC;
+  else if ( cmpstr(map_method, "Bilinear") == 0 ) rv->mapType = RemapType::BILINEAR;
+  else if ( cmpstr(map_method, "Bicubic")  == 0 ) rv->mapType = RemapType::BICUBIC;
   else if ( cmpstr(map_method, "Distance") == 0 )
     {
-      rv->map_type = MAP_TYPE_DISTWGT;
+      rv->mapType = RemapType::DISTWGT;
       *num_neighbors = 4;
     }
   else if ( cmpstr(map_method, "Nearest") == 0 )
     {
-      rv->map_type = MAP_TYPE_DISTWGT;
+      rv->mapType = RemapType::DISTWGT;
       *num_neighbors = 1;
     }
   else if ( cmpstr(map_method, "Largest") == 0 )
     {
-      rv->map_type = MAP_TYPE_CONSERV;
-      *submap_type = SUBMAP_TYPE_LAF;
+      rv->mapType = RemapType::CONSERV;
+      *submapType = SubmapType::LAF;
     }
   else
     {
-      cdoPrint("map_type = %s", map_method);
+      cdoPrint("mapType = %s", map_method);
       cdoAbort("Invalid Map Type");
     }
 
   if ( cdoVerbose )
-    cdoPrint("map_type = %s", map_method);
+    cdoPrint("mapType = %s", map_method);
 
-  if ( rv->map_type == MAP_TYPE_CONSERV ) lgridarea = true;
+  if ( rv->mapType == RemapType::CONSERV ) lgridarea = true;
 
-  *map_type = rv->map_type;
+  *mapType = rv->mapType;
 
   // File convention
   nce(nc_get_att_text (nc_file_id, NC_GLOBAL, "conventions", convention));
@@ -687,8 +689,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       gridID1_gme_c = gridToUnstructured(gridID1, 1);
     }
 
-  remapgrid_alloc(rv->map_type, src_grid);
-  remapgrid_alloc(rv->map_type, tgt_grid);
+  remapgrid_alloc(rv->mapType, src_grid);
+  remapgrid_alloc(rv->mapType, tgt_grid);
 
   if ( gridInqType(gridID1) == GRID_GME ) gridInqMaskGME(gridID1_gme_c, src_grid->vgpm);    
 
