@@ -32,15 +32,6 @@
 #define  RESTR_TYPE  int  /* restrict data types: 0 -> double, float; 1 -> int */
 
 typedef RESTR_TYPE restr_t;
-/*
-#if RESTR_TYPE == int
-#  define RESTR_SCALE(x) ((int) (0.5+100000000*(x)))
-#  define RESTR_ABS(x)   abs(x)
-#else
-#  define RESTR_SCALE(x) (x)
-#  define RESTR_ABS(x)   fabs(x)
-#endif
-*/
 /* short
 #  define RESTR_SFAC     4000
 #  define RESTR_SCALE(x) ((short) (0.5+RESTR_SFAC*(x)))
@@ -58,10 +49,9 @@ typedef RESTR_TYPE restr_t;
 
 #define  TINY_FRAC     1.e-10
 
-enum struct NormOpt     {NONE, DESTAREA, FRACAREA};
-
 enum struct RemapType   {UNDEF, BILINEAR, BICUBIC, DISTWGT, CONSERV, CONSERV_YAC};
 enum struct SubmapType  {NONE, LAF, SUM};
+enum struct NormOpt     {NONE, DESTAREA, FRACAREA};
 
 
 typedef struct {
@@ -92,18 +82,15 @@ typedef struct {
 
   double*  cell_center_lon;       /* lon/lat coordinates for       */
   double*  cell_center_lat;       /* each grid center in radians   */
-  double*  cell_corner_lon;       /* lon/lat coordinates for         */
-  double*  cell_corner_lat;       /* each grid corner in radians     */
+  double*  cell_corner_lon;       /* lon/lat coordinates for       */
+  double*  cell_corner_lat;       /* each grid corner in radians   */
 
-  double*  cell_area;             /* tot area of each grid cell     */
+  double*  cell_area;             /* tot area of each grid cell    */
   double*  cell_frac;             /* fractional area of grid cells participating in remapping  */
 
   restr_t *cell_bound_box;        /* lon/lat bounding box for use    */
-
   int      num_srch_bins;         /* num of bins for restricted srch */
-
   size_t  *bin_addr;              /* min,max adds for grid cells in this lat bin  */
-
   restr_t* bin_lats;              /* min,max latitude for each search bin   */
 }
 remapgrid_t;
