@@ -140,9 +140,6 @@ void    cdo_set_grids(const char *gridarg);
 void    defineInstitution(const char *instarg);
 int     defineTable(const char *tablearg);
 
-void    cdolog(const char *prompt, double cputime);
-void    cdologs(int noper);
-void    cdologo(int noper);
 void    nospec(int vlistID);
 void    gridWrite(FILE *fp, int gridID);
 

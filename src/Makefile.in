@@ -154,8 +154,7 @@ am_libcdo_la_OBJECTS = libcdo_la-argument.lo libcdo_la-array.lo \
 	libcdo_la-remap_bilinear_scrip.lo libcdo_la-stdnametable.lo \
 	libcdo_la-specspace.lo libcdo_la-statistic.lo \
 	libcdo_la-table.lo libcdo_la-text.lo libcdo_la-timer.lo \
-	libcdo_la-userlog.lo libcdo_la-util.lo \
-	libcdo_la-zaxis_print.lo libcdo_la-zaxis.lo \
+	libcdo_la-util.lo libcdo_la-zaxis_print.lo libcdo_la-zaxis.lo \
 	json/libcdo_la-jsmn.lo kdtreelib/libcdo_la-kdtree_cartesian.lo \
 	kdtreelib/libcdo_la-kdtree_common.lo \
 	kdtreelib/libcdo_la-kdtree_spherical.lo \
@@ -209,14 +208,13 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Intlevel3d.$(OBJEXT) cdo-Intntime.$(OBJEXT) \
 	cdo-Inttime.$(OBJEXT) cdo-Intyear.$(OBJEXT) \
 	cdo-Invert.$(OBJEXT) cdo-Invertlev.$(OBJEXT) \
-	cdo-Isosurface.$(OBJEXT) cdo-Log.$(OBJEXT) \
-	cdo-MapReduce.$(OBJEXT) cdo-Maskbox.$(OBJEXT) \
-	cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) cdo-Merge.$(OBJEXT) \
-	cdo-Mergegrid.$(OBJEXT) cdo-Mergetime.$(OBJEXT) \
-	cdo-Merstat.$(OBJEXT) cdo-Monarith.$(OBJEXT) \
-	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) \
-	cdo-NCL_wind.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
-	cdo-Nmldump.$(OBJEXT) cdo-Output.$(OBJEXT) \
+	cdo-Isosurface.$(OBJEXT) cdo-MapReduce.$(OBJEXT) \
+	cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) \
+	cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
+	cdo-Mergetime.$(OBJEXT) cdo-Merstat.$(OBJEXT) \
+	cdo-Monarith.$(OBJEXT) cdo-Mrotuv.$(OBJEXT) \
+	cdo-Mrotuvb.$(OBJEXT) cdo-NCL_wind.$(OBJEXT) \
+	cdo-Ninfo.$(OBJEXT) cdo-Nmldump.$(OBJEXT) cdo-Output.$(OBJEXT) \
 	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) \
 	cdo-Pardup.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
@@ -582,13 +580,12 @@ libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
 	remap_bicubic_scrip.cc remap_bilinear_scrip.cc stdnametable.cc \
 	stdnametable.h specspace.cc specspace.h statistic.cc \
 	statistic.h table.cc text.cc text.h timebase.h timer.cc \
-	userlog.cc util.cc util.h varlist.h zaxis_print.cc zaxis.cc \
-	json/jsmn.h json/jsmn.c kdtreelib/kdtree.h \
-	kdtreelib/kdtree_cartesian.cc kdtreelib/kdtree_common.cc \
-	kdtreelib/kdtree_spherical.cc kdtreelib/qsort.cc \
-	kdtreelib/pmergesort.cc kdtreelib/pqueue.cc kdtreelib/pqueue.h \
-	clipping/clipping.c clipping/clipping.h clipping/area.c \
-	clipping/area.h clipping/ensure_array_size.c \
+	util.cc util.h varlist.h zaxis_print.cc zaxis.cc json/jsmn.h \
+	json/jsmn.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.cc \
+	kdtreelib/kdtree_common.cc kdtreelib/kdtree_spherical.cc \
+	kdtreelib/qsort.cc kdtreelib/pmergesort.cc kdtreelib/pqueue.cc \
+	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
+	clipping/area.c clipping/area.h clipping/ensure_array_size.c \
 	clipping/ensure_array_size.h clipping/geometry.h \
 	clipping/grid.h clipping/points.h clipping/dep_list.h \
 	clipping/grid_cell.c clipping/grid_cell.h \
@@ -612,7 +609,7 @@ cdo_SOURCES = cdo.cc Adisit.cc Afterburner.cc Arith.cc Arithc.cc \
 	Importcmsaf.cc Importobs.cc Info.cc Input.cc Intgrid.cc \
 	Intgridtraj.cc Intlevel.cc Intlevel3d.cc Intntime.cc \
 	Inttime.cc Intyear.cc Invert.cc Invertlev.cc Isosurface.cc \
-	Log.cc MapReduce.cc Maskbox.cc Mastrfu.cc Math.cc Merge.cc \
+	MapReduce.cc Maskbox.cc Mastrfu.cc Math.cc Merge.cc \
 	Mergegrid.cc Mergetime.cc Merstat.cc Monarith.cc Mrotuv.cc \
 	Mrotuvb.cc NCL_wind.cc Ninfo.cc Nmldump.cc Output.cc \
 	Outputgmt.cc Pack.cc Pardup.cc Pinfo.cc Pressure.cc Regres.cc \
@@ -653,12 +650,6 @@ cdotest_SOURCES = cdo_int.h	\
 cdotest_LDADD = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
 cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_3)
-
-#cdo-userlog.o: userlog.cc config.h
-#	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.cc' || echo '$(srcdir)/'`userlog.cc
-#cdo_static-userlog.o: userlog.cc config.h
-#	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo_static-userlog.o `test -f 'userlog.cc' || echo '$(srcdir)/'`userlog.cc
-#
 CLEANFILES = `ls *~ 2> /dev/null`
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -926,7 +917,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Invert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Invertlev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Isosurface.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Maggraph.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Magplot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Magvector.Po@am__quote@
@@ -1150,7 +1140,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-table.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-text.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-timer.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-userlog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis_print.Plo@am__quote@
@@ -1943,13 +1932,6 @@ libcdo_la-timer.lo: timer.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='timer.cc' object='libcdo_la-timer.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-timer.lo `test -f 'timer.cc' || echo '$(srcdir)/'`timer.cc
-
-libcdo_la-userlog.lo: userlog.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-userlog.lo -MD -MP -MF $(DEPDIR)/libcdo_la-userlog.Tpo -c -o libcdo_la-userlog.lo `test -f 'userlog.cc' || echo '$(srcdir)/'`userlog.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-userlog.Tpo $(DEPDIR)/libcdo_la-userlog.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='userlog.cc' object='libcdo_la-userlog.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-userlog.lo `test -f 'userlog.cc' || echo '$(srcdir)/'`userlog.cc
 
 libcdo_la-util.lo: util.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-util.lo -MD -MP -MF $(DEPDIR)/libcdo_la-util.Tpo -c -o libcdo_la-util.lo `test -f 'util.cc' || echo '$(srcdir)/'`util.cc
@@ -3119,20 +3101,6 @@ cdo-Isosurface.obj: Isosurface.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Isosurface.cc' object='cdo-Isosurface.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Isosurface.obj `if test -f 'Isosurface.cc'; then $(CYGPATH_W) 'Isosurface.cc'; else $(CYGPATH_W) '$(srcdir)/Isosurface.cc'; fi`
-
-cdo-Log.o: Log.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Log.o -MD -MP -MF $(DEPDIR)/cdo-Log.Tpo -c -o cdo-Log.o `test -f 'Log.cc' || echo '$(srcdir)/'`Log.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Log.Tpo $(DEPDIR)/cdo-Log.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Log.cc' object='cdo-Log.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Log.o `test -f 'Log.cc' || echo '$(srcdir)/'`Log.cc
-
-cdo-Log.obj: Log.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-Log.obj -MD -MP -MF $(DEPDIR)/cdo-Log.Tpo -c -o cdo-Log.obj `if test -f 'Log.cc'; then $(CYGPATH_W) 'Log.cc'; else $(CYGPATH_W) '$(srcdir)/Log.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Log.Tpo $(DEPDIR)/cdo-Log.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Log.cc' object='cdo-Log.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-Log.obj `if test -f 'Log.cc'; then $(CYGPATH_W) 'Log.cc'; else $(CYGPATH_W) '$(srcdir)/Log.cc'; fi`
 
 cdo-MapReduce.o: MapReduce.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-MapReduce.o -MD -MP -MF $(DEPDIR)/cdo-MapReduce.Tpo -c -o cdo-MapReduce.o `test -f 'MapReduce.cc' || echo '$(srcdir)/'`MapReduce.cc

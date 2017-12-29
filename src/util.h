@@ -15,11 +15,12 @@
   GNU General Public License for more details.
 */
 
-#ifndef _UTIL_H
-#define _UTIL_H
+#ifndef  UTIL_H
+#define  UTIL_H
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <string>
 #include "percentiles.h"
 
 /* dummy use of unused parameters to silence compiler warnings */
@@ -44,7 +45,6 @@
 #define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
-#include <string>
 extern const char *CDO_progname;
 extern const char *CDO_version;
 extern const char *CDO_username;
@@ -78,7 +78,6 @@ extern int cdoDefaultByteorder;
 extern int cdoDefaultTableID;
 extern int cdoDefaultInstID;
 extern int cdoDefaultTimeType;
-extern int cdoLogOff;
 
 extern int cdoLockIO;
 extern int cdoCheckDatarange;
@@ -221,4 +220,4 @@ int wildcardmatch(const char *w, const char *s);
 
 void cdo_check_round(void);
 
-#endif  /* _UTIL_H */
+#endif  /* UTIL_H */

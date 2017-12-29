@@ -91,7 +91,6 @@ int cdoCompType          = CDI_COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
 int cdoDebug             = 0;
 int cdoChunkType         = CDI_UNDEFID;
-int cdoLogOff            = FALSE;
 int cdoSilentMode        = FALSE;
 int cdoOverwriteMode     = FALSE;
 int cdoBenchmark         = FALSE;

@@ -1372,13 +1372,6 @@ void cdoFinish(void)
 
       processEndTime(&p_usertime, &p_systime);
       p_cputime = p_usertime + p_systime;
-
-      if (cdoLogOff == 0)
-        {
-          cdologs(processNums());
-          cdologo(processNums());
-          cdolog(processInqPrompt(), p_cputime);
-        }
     }
 
 #if defined(HAVE_SYS_TIMES_H)

@@ -757,17 +757,6 @@ void get_env_vars(void)
         }
     }
 
-  envstr = getenv("CDO_LOG_OFF");
-  if ( envstr )
-    {
-      if ( atoi(envstr) == 1 )
-        {
-          cdoLogOff = TRUE;
-          if ( cdoVerbose )
-            fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
-        }
-    }
-
   envstr = getenv("CDO_DISABLE_HISTORY");
   if ( envstr )
     {
@@ -1554,7 +1543,6 @@ void init_modules()
   add_module("Invert"        , {Invert        , InvertHelp        , InvertOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Invertlev"     , {Invertlev     , InvertlevHelp     , InvertlevOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Isosurface"    , {Isosurface    , {}                , IsosurfaceOperators    , 1 , CDI_REAL , 1  , 1  });
-  add_module("Log"           , {Log           , {}                , LogOperators           , 0 , CDI_REAL , 1  , 0  });
   add_module("MapReduce"     , {MapReduce     , MapReduceHelp     , MapReduceOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Maskbox"       , {Maskbox       , MaskboxHelp       , MaskboxOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Maskregion"    , {Maskbox       , MaskregionHelp    , MaskregionOperators    , 1 , CDI_REAL , 1  , 1  });

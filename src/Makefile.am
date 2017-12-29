@@ -170,7 +170,6 @@ libcdo_la_SOURCES =            \
                text.h          \
                timebase.h      \
                timer.cc         \
-               userlog.cc       \
                util.cc          \
                util.h          \
 			   varlist.h		\
@@ -286,7 +285,6 @@ cdo_SOURCES += Adisit.cc        \
                Invert.cc        \
                Invertlev.cc     \
                Isosurface.cc    \
-               Log.cc           \
 	       MapReduce.cc     \
                Maskbox.cc       \
                Mastrfu.cc       \
@@ -445,11 +443,6 @@ if ENABLE_ALL_STATIC
 cdotest_LDFLAGS  += -all-static
 endif
 
-#cdo-userlog.o: userlog.cc config.h
-#	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.cc' || echo '$(srcdir)/'`userlog.cc
-#cdo_static-userlog.o: userlog.cc config.h
-#	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo_static-userlog.o `test -f 'userlog.cc' || echo '$(srcdir)/'`userlog.cc
-#
 CLEANFILES  = `ls *~ 2> /dev/null`
 #
 clean-local: clean-local-dirs

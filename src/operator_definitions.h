@@ -80,7 +80,6 @@
 #define  InvertOperators        {"invertlat", "invertlon", "invertlatdes", "invertlondes", "invertlatdata", "invertlondata"}
 #define  InvertlevOperators     {"invertlev"}
 #define  IsosurfaceOperators    {"isosurface"}
-#define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
 #define  MapReduceOperators     {"reducegrid"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MaskregionOperators    {"maskregion"}
