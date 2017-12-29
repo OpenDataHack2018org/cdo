@@ -27,6 +27,7 @@
 #include "calendar.h"
 #include "pstream.h"
 #include "percentiles_hist.h"
+#include "percentiles.h"
 
 
 #define NDAY 373

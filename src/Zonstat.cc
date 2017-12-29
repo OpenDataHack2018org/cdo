@@ -37,6 +37,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
+#include "percentiles.h"
 
 
 void *Zonstat(void *argument)

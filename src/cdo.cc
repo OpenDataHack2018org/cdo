@@ -63,6 +63,7 @@
 #include "process.h"
 #include "error.h"
 #include "grid_proj.h"
+#include "percentiles.h"
 
 #if defined(_OPENMP)
 #  include <omp.h>

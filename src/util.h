@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string>
-#include "percentiles.h"
 
 /* dummy use of unused parameters to silence compiler warnings */
 #define  UNUSED(x) (void)x

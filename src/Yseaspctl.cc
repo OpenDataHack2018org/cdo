@@ -26,7 +26,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "percentiles_hist.h"
-#include "util.h"
+#include "percentiles.h"
 
 #define  NSEAS       4
 

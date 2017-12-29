@@ -37,6 +37,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
+#include "percentiles.h"
 
 
 void *Merstat(void *argument)

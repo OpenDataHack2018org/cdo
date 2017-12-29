@@ -37,6 +37,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
+#include "percentiles.h"
 
 static
 void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr,
