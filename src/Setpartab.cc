@@ -25,7 +25,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "util.h"
 #include "pmlist.h"
 #include "convert_units.h"
 

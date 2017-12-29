@@ -6,7 +6,6 @@
 
 #if defined(HAVE_LIBCMOR)
 #include <unistd.h>
-#include "util.h"
 
 extern "C" {
 #include "cmor.h"
