@@ -72,7 +72,7 @@ void sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts)
           addweights[n].weight = wgts[n];
         }
 
-      qsort(addweights.data(), num_weights, sizeof(addweight_t), cmp_adds);
+      qsort(&addweights[0], num_weights, sizeof(addweight_t), cmp_adds);
 
       for ( n = 0; n < num_weights; ++n )
         {
@@ -102,7 +102,7 @@ void sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
             addweights[n].weight[k] = wgts[n][k];
         }
 
-      qsort(addweights.data(), num_weights, sizeof(addweight4_t), cmp_adds4);
+      qsort(&addweights[0], num_weights, sizeof(addweight4_t), cmp_adds4);
 
       for ( n = 0; n < num_weights; ++n )
         {

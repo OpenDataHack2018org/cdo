@@ -231,7 +231,7 @@ void *Vertintap(void *argument)
       int nlev = zaxisInqSize(zaxisIDh);
       if ( nlev != nhlev ) cdoAbort("Internal error, wrong number of height level!");
       std::vector<double> levels(nlev);
-      cdoZaxisInqLevels(zaxisIDh, levels.data());
+      cdoZaxisInqLevels(zaxisIDh, &levels[0]);
 
       for ( int ilev = 0; ilev < nlev; ++ilev )
 	{
@@ -258,13 +258,13 @@ void *Vertintap(void *argument)
   if ( operfunc == func_hl )
     {
       std::vector<double> phlev(nplev);
-      height2pressure(phlev.data(), plev, nplev);
+      height2pressure(&phlev[0], plev, nplev);
 
       if ( cdoVerbose )
 	for ( int i = 0; i < nplev; ++i )
 	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
 
-      memcpy(plev, phlev.data(), nplev*sizeof(double));
+      memcpy(plev, &phlev[0], nplev*sizeof(double));
     }
 
   if ( opertype == type_log )

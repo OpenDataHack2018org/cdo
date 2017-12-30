@@ -326,7 +326,7 @@ bool cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int
   if ( atttype == CDI_DATATYPE_INT32 )
     {
       std::vector<int> attint(attlen);
-      cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, attint.data());
+      cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, &attint[0]);
       for ( int i = 0; i < attlen; ++i ) attflt[i] = (double)attint[i];
     }
   else if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )

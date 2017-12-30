@@ -591,7 +591,7 @@ void *Samplegridicon(void *argument)
 
           double missval = vlistInqVarMissval(vlistID1, varID);
 
-          samplegrid(missval, nsamplegrids, cellindex.data(), array1, array2, array3);
+          samplegrid(missval, nsamplegrids, &cellindex[0], array1, array2, array3);
 
           nmiss = 0;
           for ( long i = 0; i < gridsize2; ++i )

@@ -725,8 +725,8 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   enum yac_edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
 
-  enum yac_edge_type *src_edge_type = great_circle_type.data();
-  enum yac_edge_type *tgt_edge_type = great_circle_type.data();
+  enum yac_edge_type *src_edge_type = &great_circle_type[0];
+  enum yac_edge_type *tgt_edge_type = &great_circle_type[0];
 
   enum cell_type target_cell_type = UNDEF_CELL;
 
