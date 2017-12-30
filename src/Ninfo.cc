@@ -58,7 +58,7 @@ void *Ninfo(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(0);
 
   int vlistID = pstreamInqVlist(streamID);
 
@@ -153,6 +153,7 @@ void *Ninfo(void *argument)
     case NGRIDPOINTS:
       for ( varID = 0; varID < nvars; varID++ )
 	{
+        std::cout <<"here we should be" << std::endl;
 	  int gridID = vlistInqVarGrid(vlistID, varID);
 	  int gridsize = gridInqSize(gridID);
 	  fprintf(stdout, "%d\n", gridsize);

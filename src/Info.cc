@@ -294,7 +294,7 @@ void *Info(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      int streamID = pstreamOpenRead(cdoStreamName(indf));
+      int streamID = cdoStreamOpenRead(indf);
 
       int vlistID = pstreamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);

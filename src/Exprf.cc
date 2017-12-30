@@ -344,7 +344,7 @@ void *Expr(void *argument)
   char *exprs = READS_COMMAND_LINE(operatorID) ?
     exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(0);
   int vlistID1 = pstreamInqVlist(streamID1);
 
   exprs = exprs_expand(exprs, vlistID1);
@@ -566,7 +566,7 @@ void *Expr(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(0, cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int nrecs;
@@ -637,8 +637,8 @@ void *Expr(void *argument)
       tsID++;
     }
 
-  pstreamClose(streamID2);
-  pstreamClose(streamID1);
+//  pstreamClose(streamID2);
+//  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

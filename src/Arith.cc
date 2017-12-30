@@ -64,8 +64,8 @@ void *Arith(void *argument)
   int operfunc = cdoOperatorF1(operatorID);
   operatorCheckArgc(0);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(0);
+  int streamID2 = cdoStreamOpenRead(1);
 
   int streamIDx1 = streamID1;
   int streamIDx2 = streamID2;
@@ -110,12 +110,12 @@ void *Arith(void *argument)
       if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_VAR;
-	  cdoPrint("Filling up stream2 >%s< by copying the first variable.", cdoStreamName(1)->args);
+	  cdoPrint("Filling up stream2 >%s< by copying the first variable.", "PLACEHOLDER FIX LATER");
 	}
       else
 	{
 	  filltype = FILL_VARTS;
-	  cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.", cdoStreamName(1)->args);
+	  cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.", "PLACEHOLDER FIX LATER");
 	}
     }
   else if ( lfill1 )
@@ -125,12 +125,12 @@ void *Arith(void *argument)
       if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_VAR;
-	  cdoPrint("Filling up stream1 >%s< by copying the first variable.", cdoStreamName(0)->args);
+	  cdoPrint("Filling up stream1 >%s< by copying the first variable.", "PLACEHOLDER FIX LATER");
 	}
       else
 	{
 	  filltype = FILL_VARTS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.", cdoStreamName(0)->args);
+	  cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.", "PLACEHOLDER FIX LATER");
 	}
       streamIDx1 = streamID2;
       streamIDx2 = streamID1;
@@ -162,12 +162,12 @@ void *Arith(void *argument)
       if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1)->args);
+	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", 1);
 	}
       else if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
+	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", 0);
 	  streamIDx1 = streamID2;
           streamIDx2 = streamID1;
 	  vlistIDx1 = vlistID2;
@@ -203,7 +203,7 @@ void *Arith(void *argument)
   int taxisID3 = taxisDuplicate(taxisIDx1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(0, cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;
@@ -218,14 +218,14 @@ void *Arith(void *argument)
 	      if ( filltype == FILL_NONE && streamIDx2 == streamID2 )
 		{
 		  filltype = FILL_FILE;
-		  cdoPrint("Filling up stream2 >%s< by copying all timesteps.", cdoStreamName(1)->args);
+		  cdoPrint("Filling up stream2 >%s< by copying all timesteps.", 1);
 		}
 
 	      if ( filltype == FILL_FILE )
 		{
 		  tsID2 = 0;
 		  pstreamClose(streamID2);
-		  streamID2 = pstreamOpenRead(cdoStreamName(1));
+		  streamID2 = cdoStreamOpenRead(1);
 		  streamIDx2 = streamID2;
 
 		  vlistID2 = pstreamInqVlist(streamID2);
@@ -235,7 +235,7 @@ void *Arith(void *argument)
 
 		  nrecs2 = pstreamInqTimestep(streamIDx2, tsID2);
 		  if ( nrecs2 == 0 )
-		    cdoAbort("Empty input stream %s!", cdoStreamName(1)->args);
+		    cdoAbort("Empty input stream %s!", 1);
 		}
 	      else
 		cdoAbort("Input streams have different number of timesteps!");
@@ -318,10 +318,10 @@ void *Arith(void *argument)
       tsID2++;
     }
 
-  pstreamClose(streamID3);
-  pstreamClose(streamID2);
-  pstreamClose(streamID1);
-
+// pstreamClose(streamID3);
+// pstreamClose(streamID2);
+// pstreamClose(streamID1);
+//
   vlistDestroy(vlistID3);
 
   if ( vardata )

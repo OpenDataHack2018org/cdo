@@ -400,7 +400,7 @@ void *Vargen(void *argument)
        operatorID == TOPO || operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
-  int streamID = pstreamOpenWrite(cdoStreamName(0), cdoFiletype());
+  int streamID = cdoStreamOpenWrite(0, cdoFiletype());
 
   pstreamDefVlist(streamID, vlistID);
 

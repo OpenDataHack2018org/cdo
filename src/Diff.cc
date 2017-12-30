@@ -57,8 +57,8 @@ void *Diff(void *argument)
   if ( operatorArgc() == 2 ) rellim = parameter2double(operatorArgv()[1]);
   if ( rellim < -1.e33 || rellim > 1.e+33 ) cdoAbort("Rel. limit out of range!");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(0);
+  int streamID2 = cdoStreamOpenRead(1);
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = pstreamInqVlist(streamID2);
@@ -236,8 +236,8 @@ void *Diff(void *argument)
   if ( nrecs > 0 && nrecs2 == 0 )
     cdoWarning("stream1 has more time steps than stream2!");
 
-  pstreamClose(streamID1);
-  pstreamClose(streamID2);
+  //pstreamClose(streamID1);
+  //pstreamClose(streamID2);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);
