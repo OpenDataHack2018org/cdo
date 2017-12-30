@@ -25,6 +25,7 @@
 #include "pstream_write.h"
 #include "varlist.h"
 #include "argument.h"
+#include "pipe.h"
 
 #include <sys/types.h> /* off_t */
 #include <vector>
@@ -40,6 +41,8 @@ public:
   bool isPipe();
   void pstreamOpenReadPipe(const char* pipename);
   void pstreamOpenReadFile(const char *argument);
+  int pstreamOpenWriteFile(const char* p_filename, int filetype);
+  int pstreamOpenWritePipe(const char* filename, int filetype);
   void openAppend(const char * p_filename);
   void init();
   void defVlist(int p_vlistID);
@@ -62,7 +65,7 @@ public:
   varlist_t *m_varlist;
 #if defined(HAVE_LIBPTHREAD)
   void *argument;
-  struct pipe_t *pipe;
+  pipe_t *pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
 private:
@@ -99,6 +102,7 @@ const int &getPthreadScope();
 pstream_t *create_pstream();
 pstream_t *create_pstream(std::vector<std::string> p_filenameList);
 pstream_t *create_pstream(std::string p_filename);
+pstream_t *create_pstream(int processID, int pstreamIDX);
 
 int get_glob_argc();
 void pstreamCloseAll();

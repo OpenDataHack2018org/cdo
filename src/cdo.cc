@@ -75,6 +75,7 @@
 #define MAX_NUM_VARNAMES 256
 
 #include <string>
+#include <cstring>
 
 static int Debug = 0;
 static int Version = 0;
@@ -1808,7 +1809,7 @@ void init_aliases()
 
 int main(int argc, char *argv[])
 {
-
+ 
   int lstop = FALSE;
   int noff = 0;
   int status = 0;
@@ -1907,13 +1908,20 @@ int main(int argc, char *argv[])
       return -1;
     }
 #endif
-
+      std::vector<std::string> new_argv = expandWildCards(argc - CDO_optind,(const char **) &argv[CDO_optind]);
+      //temprorary: should not be needed when std::string is standart string 
+      std::vector<char*> new_cargv(new_argv.size());
+      for(int i = 0; i < new_argv.size(); i++)
+      {
+          new_cargv[i] = strdup(new_argv[i].c_str());
+      }
+      //temprorary end
 
   if ( CDO_optind < argc )
     {
-      operatorArg = argv[CDO_optind];
-      argument = argument_new(argc-CDO_optind, 0);
-      argument_fill(argument, argc-CDO_optind, &argv[CDO_optind]);
+      operatorArg = new_cargv[0];
+      argument = argument_new(new_cargv.size(), 0);
+      argument_fill(argument, new_cargv.size(), &new_cargv[0]);
     }
   else
     {
@@ -1968,10 +1976,10 @@ int main(int argc, char *argv[])
       load_custom_modules("custom_modules");
       operatorModule(operatorName)(argument);
       close_library_handles();
-#else
-      createProcesses(argc - CDO_optind,(const char **) &argv[CDO_optind]);
-      clearProcesses();
+#else 
+      createProcesses(new_argv.size(),(const char**) &new_cargv[0] );
       operatorModule(operatorName)(argument);
+      clearProcesses();
 #endif
 
       timer_stop(timer_total);

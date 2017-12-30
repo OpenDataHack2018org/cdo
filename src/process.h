@@ -25,14 +25,13 @@
 
 #include <vector>
 #include <iostream>
+#include <string>
 
 constexpr int MAX_PROCESS = 128;
 constexpr int MAX_STREAM = 64;
 constexpr int MAX_OPERATOR = 128;
 constexpr int MAX_OARGC = 4096;
 constexpr int MAX_FILES = 65536;
-
-enum class ProcessCheckResult{UNLIMITED_STREAM_COUNTS, INPUT_STREAM_MISSING, OUTPUT_STREAM_MISSING, TOO_MANY_STREAMS, TOO_FEW_STREAMS, FILENAME_HAS_OPERATOR_MARKER, OUTFILE_IS_INFILE, SUCCESS};
 
 typedef struct
 {
@@ -46,6 +45,7 @@ class process_t
 {
 public:
   int m_ID;
+  int m_posInParent;
 #if defined(HAVE_LIBPTHREAD)
   pthread_t threadID;
   int l_threadID;
@@ -55,6 +55,7 @@ public:
   std::vector<process_t *> parentProcesses;
   std::vector<pstream_t *> inputStreams;
   std::vector<pstream_t *> outputStreams;
+  int nChildActive = 0;
   short m_cntIn;
   short m_cntOut;
 
@@ -81,6 +82,8 @@ public:
   int oargc;
   oper_t oper[MAX_OPERATOR];
 
+  process_t(int p_ID, const char *operatorCommand);
+
   int getInStreamCnt();
   int getOutStreamCnt();
   void initProcess();
@@ -91,14 +94,15 @@ public:
   void addChild(process_t *child_process);
   void addParent(process_t *parent_process);
   bool hasAllInputs();
-  process_t(int p_ID, const char *operatorCommand);
+  void addFileInStream(std::string file);
+  void addFileOutStream(std::string file);
+  void addPipeInStream();
+  void addPipeOutStream();
+  pthread_t run(argument_t *p_argument);
 
 private:
   void defPrompt();
   process_t();
-  void OpenRead(int p_input_idx);
-  void OpenWrite(int p_input_idx);
-  void OpenAppend(int p_input_idx);
   void setStreamNames(int argc, std::vector<char *> &argv);
   int expand_wildcards(int streamCnt);
   int checkStreamCnt();
@@ -106,6 +110,7 @@ private:
 
 extern std::map<int, process_t> Process;
 
+std::vector<std::string> expandWildCards(int argc, const char **argv);
 pstream_t *processInqInputStream(int streamindex);
 pstream_t *processInqOutputStream(int streamindex);
 process_t &processSelf(void);
@@ -145,6 +150,9 @@ const argument_t *cdoStreamName(int cnt);
 void createProcesses(int argc, const char **argv);
 void clearProcesses();
 int processNumsActive();
+process_t* getProcess(int p_processID);
 
   int checkStreamCnt();
+int cdoStreamOpenRead(int inStreamIDX);
+int cdoStreamOpenWrite(int outStreamIDX, int filetype);
 #endif /* _PROCESS_H */

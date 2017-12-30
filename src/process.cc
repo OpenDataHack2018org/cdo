@@ -46,10 +46,14 @@
 #include <algorithm>
 #include <map>
 #include <stack>
+#include <iostream>
+#include <string>
 
 #if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
+
+static int pthreadScope = 0;
 
 static process_t *root_process;
 std::map<int, process_t> Process;
@@ -90,16 +94,6 @@ process_t::setOperatorArgv(const char *operatorArguments)
     }
   oargc = oargv.size();
 }
-/*
-void process_t::openRead(int p_input_idx)
-{
-    pstream_t *pstream = inputStreams[p_input_idx];
-    if(pstream->isPipe())
-    {
-         
-    }
-}
-*/
 
 void
 process_t::initProcess()
@@ -430,6 +424,7 @@ glob_pattern(const char *restrict string)
   if (status == 0)
     wordfree(&glob_results);
 
+  MESSAGE("GLOB_PATTERN: ",print_argument(argument),"\n",length);
   return argument;
 }
 #endif
@@ -521,6 +516,7 @@ getStreamCnt(int argc, std::vector<char *> &argv)
       if (argv[globArgc][0] == '-')
         {
           globArgc = getGlobArgc(argc, argv, globArgc);
+          MESSAGE("GlobArgc = ", globArgc);
         }
       else
         globArgc++;
@@ -806,9 +802,9 @@ int process_t::checkStreamCnt(void)
     }
 
   if (wantedStreamInCnt == 1 && streamInCnt0 == -1)
-    status = expand_wildcards( streamCnt);
+      return 1;
 
-  return status;
+  return 0;
 }
 
 bool
@@ -841,14 +837,47 @@ void print_creation_results(std::ofstream &p_outfile)
 
 }
 
+/* Expands all input file wildcards and removes the 
+ * wildcard while inserting all expanded files into argv
+ */
+std::vector<std::string> expandWildCards(int argc, const char **argv)
+{
+    int flags = WRDE_UNDEF;
+    char **p;
+    int status;
+    wordexp_t glob_results;
+
+    //rangebased construction of new_argv, copies all argv entries into new_arg
+    std::vector<std::string> new_argv(argv, argv + argc);
+    auto argv_iter = new_argv.begin();
+
+    for(int idx = 1; idx < new_argv.size(); idx++){
+        //if argv[idx] contains wildcard (* or [?]+)
+        //multiple ** are ignored
+      if(new_argv[idx][0] != '-' && new_argv[idx].find_first_of("*?") != std::string::npos)
+      {
+          wordexp(new_argv[idx].c_str(), &glob_results, flags);
+          //range based insert (glob_results.we_wordv is inserted before wildcard
+          new_argv.insert(new_argv.begin() + idx + 1,
+                  glob_results.we_wordv,
+                  glob_results.we_wordv + glob_results.we_wordc);
+          //delete wildcard
+          new_argv.erase(new_argv.begin() + idx);
+          wordfree(&glob_results);
+      }
+    }
+
+    return new_argv;
+}
+
 void
 createProcesses(int argc, const char **argv)
 {
-  if(CdoDebug::PROCESS){
-  std::string input_string = "";
-     MESSAGE("== Process Creation Start ==");
-    MESSAGE("operators:  ",CdoDebug::argvToString(argc, argv));
-  }
+  std::vector<std::string> expanded_argv = expandWildCards(argc, argv);
+    if(CdoDebug::PROCESS){
+      MESSAGE("== Process Creation Start ==");
+      MESSAGE("operators:  ",CdoDebug::argvToString(argc, argv));
+    }
   root_process = processCreate(argv[0]);
 
   process_t *current_process;
@@ -860,9 +889,10 @@ createProcesses(int argc, const char **argv)
   call_stack.push(root_process);
   current_process = call_stack.top();
   int cntOutFiles = (int)current_process->m_module.streamOutCnt;
+  int obase = 0;
   if(cntOutFiles == -1)
   {
-    cntOutFiles = 1;
+      obase = 1;
   }
   for(int i = 0; i < cntOutFiles; i++)
   {
@@ -870,25 +900,26 @@ createProcesses(int argc, const char **argv)
     {
         MESSAGE("Creating new pstream for output file: ", argv[argc - (i + 1)]);
     }
-    root_process->outputStreams.push_back(create_pstream(std::string(argv[argc - (i + 1)])));
+    root_process->addFileOutStream(argv[argc - (i + 1)]);
   }
   do
     {
-      if(CdoDebug::PROCESS){
-      MESSAGE(
+      if(CdoDebug::PROCESS){ MESSAGE(
               "iteration " , idx , ", current argv: " , argv[idx] ,
-              ",  current_process: " , current_process->operatorName
-              );
+              ",  current_process: " , current_process->operatorName); 
       }
     if (argv[idx][0] == '-')
         {
-          if(CdoDebug::PROCESS){
-            MESSAGE("Found new Operator: ", argv[idx]);
+          if(CdoDebug::PROCESS){ MESSAGE(
+                    "Found new Operator: ", argv[idx]);
           }
           parent_process = current_process;
           current_process = processCreate(argv[idx]);
+
+          //parent needs to be added first
           parent_process->addChild(current_process);
           current_process->addParent(parent_process);
+
           call_stack.push(current_process);
         }
       else
@@ -896,14 +927,12 @@ createProcesses(int argc, const char **argv)
           if(CdoDebug::PROCESS){
             MESSAGE("adding file to ", current_process->operatorName);
           }
-          MESSAGE(argv[idx]);
-          current_process->inputStreams.push_back(create_pstream(argv[idx]));
+          current_process->addFileInStream(argv[idx]);
         }
 
     while (current_process->hasAllInputs() && current_process != root_process)
       {
-        if(CdoDebug::PROCESS)
-        {
+        if(CdoDebug::PROCESS) {
             MESSAGE("Removing ", current_process->operatorName, " from stack");
         }
         call_stack.pop();
@@ -918,7 +947,7 @@ createProcesses(int argc, const char **argv)
     MESSAGE("== Process Creation End ==");
   }
 
-  NumCreatedStreams = get_glob_argc();
+  NumCreatedStreams = get_glob_argc() + obase;
 }
 
 void
@@ -1121,6 +1150,7 @@ cdoOperatorAdd(const char *name, int f1, int f2, const char *enter)
 
   process.noper++;
 
+  //std::cout << process.noper << std::endl;
   return operID;
 }
 
@@ -1128,18 +1158,24 @@ int
 cdoOperatorID(void)
 {
   process_t &process = processSelf();
+  ////std::cout << "|"<<process.operatorName <<"|"<< process.m_ID<<std::endl;
   int operID = -1;
 
   if (process.noper > 0)
     {
       for (operID = 0; operID < process.noper; operID++)
         {
-          if (process.oper[operID].name)
-            if (strcmp(process.operatorName, process.oper[operID].name) == 0)
+            //std::cout << "iter:" << operID << std::endl;
+          if (process.oper[operID].name){
+              //std::cout << process.operatorName << "|" << process.oper[operID].name <<"|"<< std::endl;
+            if (strcmp(process.operatorName, process.oper[operID].name) == 0){
               break;
+            }
+          }
         }
-      if (operID == process.noper)
+      if (operID == process.noper){
         cdoAbort("Operator not callable by this name!");
+      }
     }
   else
     {
@@ -1298,6 +1334,7 @@ size_t getPeakRSS( );
 void cdoFinish(void)
 {
   int processID = processSelf().m_ID;
+  if(CdoDebug::PROCESS) MESSAGE("Finishing process: processID");
   int nvars, ntimesteps;
   char memstring[32] = { "" };
   double s_utime, s_stime;
@@ -1364,7 +1401,7 @@ void cdoFinish(void)
   c_cputime = c_usertime + c_systime;
 
 #if defined(HAVE_LIBPTHREAD)
-  if (getPthreadScope() == PTHREAD_SCOPE_PROCESS)
+  if (pthreadScope == PTHREAD_SCOPE_PROCESS)
     {
       c_usertime /= processNums();
       c_systime /= processNums();
@@ -1418,26 +1455,156 @@ void cdoFinish(void)
   processDelete();
 }
 
+void process_t::addFileInStream(std::string file)
+{
+   inputStreams.push_back(create_pstream(file));
+}
+
+void process_t::addFileOutStream(std::string file)
+{
+   outputStreams.push_back(create_pstream(file));
+}
+
 void
 process_t::addChild(process_t *childProcess)
 {
   childProcesses.push_back(childProcess);
   nchild = childProcesses.size();
-  pstream_t* new_pstream = create_pstream();
-  inputStreams.push_back(new_pstream);
-  childProcess->outputStreams.push_back(new_pstream);
+  addPipeInStream();
+}
+void process_t::addPipeInStream()
+{
+#if defined(HAVE_LIBPTHREAD)
+    inputStreams.push_back(create_pstream(m_ID, inputStreams.size()));
+#else
+  cdoAbort("Cannot use pipes, pthread support not compiled in!");
+#endif
 }
 
 void
 process_t::addParent(process_t *parentProcess)
 {
   parentProcesses.push_back(parentProcess);
+  m_posInParent = parentProcess->inputStreams.size() - 1;
+  addPipeOutStream();
 }
+void process_t::addPipeOutStream()
+{
+   outputStreams.push_back(parentProcesses[0]->inputStreams[m_posInParent]);
+}
+
 void
 clearProcesses()
 {
   Process.clear();
   NumProcess = 0;
   NumProcessActive = 0;
-      pstreamCloseAll();
+      //pstreamCloseAll();
+}
+
+pthread_t process_t::run(argument_t* p_argument)
+{
+  pthread_attr_t attr;
+  int status = pthread_attr_init(&attr);
+  if (status)
+    SysError("pthread_attr_init failed for '%s'", operatorName);
+  status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+  if (status)
+    SysError("pthread_attr_setdetachstate failed for '%s'", operatorName);
+  /*
+    param.sched_priority = 0;
+    status = pthread_attr_setschedparam(&attr, &param);
+    if ( status ) SysError("pthread_attr_setschedparam failed for '%s'", newarg+1);
+  */
+  /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
+  /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'", newarg+1); */
+
+  pthread_attr_getscope(&attr, &pthreadScope);
+
+  /* status = pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS); */
+  /* if ( status ) SysError("pthread_attr_setscope failed for '%s'", newarg+1); */
+  /* If system scheduling scope is specified, then the thread is scheduled against all threads in the system */
+  /* pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
+
+  size_t stacksize = 0;
+  status = pthread_attr_getstacksize(&attr, &stacksize);
+  if (stacksize < 2097152)
+    {
+      stacksize = 2097152;
+      pthread_attr_setstacksize(&attr, stacksize);
+    }
+
+  pthread_t thrID;
+  //std::cout <<"starting thread : "<< operatorName << std::endl;
+  int rval = pthread_create(&thrID, &attr, operatorModule(operatorName), p_argument);
+  if (rval != 0)
+    {
+      errno = rval;
+      SysError("pthread_create failed for '%s'", operatorName);
+    }
+  return thrID;
+}
+
+
+char* createPipeName(size_t pnlen)
+{
+  char *pipename = (char *) Malloc(pnlen);
+  snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
+  return pipename;
+}
+
+int cdoStreamOpenRead(int inStreamIDX)
+{
+    if(CdoDebug::PROCESS) MESSAGE("Getting stream ", inStreamIDX, " of process ", processSelf().m_ID);
+    process_t &process = processSelf();
+    pstream_t *inStream = process.inputStreams[inStreamIDX];
+
+    if(inStream->ispipe)
+    {
+       size_t pnlen = 16;
+       char * pipename = createPipeName(pnlen);
+       if(CdoDebug::PROCESS) MESSAGE("Trying to open pipe: ",pipename);
+       inStream->pstreamOpenReadPipe(pipename);
+       argument_t * argument = argument_new(1, pnlen);
+       argument->processID = process.childProcesses[process.nChildActive]->m_ID;
+       process.childProcesses[process.nChildActive]->run(argument);
+    }
+    else
+    {
+       if(CdoDebug::PROCESS) MESSAGE("Trying to open file: ",inStream->m_mfnames[0]);
+       inStream->pstreamOpenReadFile(inStream->m_mfnames[0].c_str());
+    }
+
+    return inStream->self; // return ID
+}
+
+int cdoStreamOpenWrite(int outStreamIDX, int filetype)
+{
+    pstream_t* outStream = processSelf().outputStreams[outStreamIDX];
+
+    if(outStream->ispipe)
+    {
+        outStream->pstreamOpenWritePipe(outStream->pipe->name.c_str(), filetype);
+    }
+    else
+    {
+        if(CdoDebug::PROCESS) MESSAGE("Trying to open: ",outStream->m_mfnames[0]);
+        outStream->pstreamOpenWriteFile(outStream->m_mfnames[0].c_str(), filetype);
+    }
+    return outStream->self;
+}
+
+int cdoAddOutFile(std::string filename)
+{
+    process_t process = processSelf();
+    process.addFileOutStream(filename);
+}
+
+process_t* getProcess(int p_processID)
+{
+    auto process = Process.find(p_processID);
+    if(process == Process.end()){
+        ERROR("Process with ID: " , p_processID, "not found");
+    }
+    return &(process->second);
 }

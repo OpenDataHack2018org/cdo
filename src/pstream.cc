@@ -138,11 +138,16 @@ pstream_init_pointer(void)
 */
 
  pstream_t *create_pstream()
-{
+{ 
     PSTREAM_LOCK();
     auto new_entry  = _pstream_map.insert(
             std::make_pair(next_pstream_id, pstream_t(next_pstream_id))
             );
+    if(new_entry.second == false)
+    {
+        ERROR("A Pstream could not be created, ID: ", next_pstream_id);
+    }
+    if(CdoDebug::PSTREAM){ MESSAGE("Created new pstream with ID:",  next_pstream_id);}
     next_pstream_id++;
     createdPstreams++;
     new_entry.first->second.ispipe = true;
@@ -163,6 +168,16 @@ pstream_t *create_pstream(std::vector<std::string> p_filenameList)
  pstream_t *create_pstream(std::string p_filename)
 {
     return create_pstream(std::vector<std::string>{p_filename});
+}
+
+//temporary function: will be replaced by according pstream_t::pstream_t(..)
+pstream_t *create_pstream(int processID, int pstreamIDX)
+{
+    pstream_t *new_pstream = create_pstream();
+    new_pstream->pipe = new pipe_t();
+    new_pstream->pipe->pipeSetName(processID, pstreamIDX);
+    new_pstream->ispipe = true;
+
 }
 
 
@@ -404,7 +419,7 @@ pstream_t::pstreamOpenReadPipe(const char *pipename)
     /* Free(operatorName); */
   /*      pipeInqInfo(pstreamID); */
   if (CdoDebug::PSTREAM)
-    MESSAGE("pipe ", pipename, " %s");
+    MESSAGE("pipe ", pipename);
 #else
   cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
@@ -589,9 +604,9 @@ pstream_t::pstreamOpenReadFile(const char* p_args)
 
 void createPipeName(char *pipename, int pnlen)
 {
-
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
 }
+
 
 int
 pstreamOpenRead(const argument_t *argument)
@@ -700,30 +715,21 @@ query_user_exit(const char *argument)
     } /* end switch */
 }
 
-static int
-pstreamOpenWritePipe(const argument_t *argument, int filetype)
+int
+pstream_t::pstreamOpenWritePipe(const char* pipename, int filetype)
 {
-  int pstreamID = -1;
-
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PSTREAM)
     {
-      MESSAGE("pipe ", argument->args);
+      MESSAGE("pipe ",pipename);
     }
-  pstreamID = pstreamFindID(argument->args);
-  if (pstreamID == -1)
-    {
-      Error("%s is not open!", argument->args);
-    }
-
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-
-  pstreamptr->wthreadID = pthread_self();
-  pstreamptr->m_filetype = filetype;
-  processAddOutputStream(pstreamptr);
+  wthreadID = pthread_self();
+  m_filetype = filetype;
+  return self;
+#else
+  return -1;
 #endif
 
-  return pstreamID;
 }
 
 static void
@@ -761,20 +767,15 @@ set_comp(int fileID, int filetype)
     }
 }
 
-static int
-pstreamOpenWriteFile(const argument_t *argument, int filetype)
+ int
+pstream_t::pstreamOpenWriteFile(const char* p_filename, int filetype)
 {
-  char *filename = (char *) Malloc(strlen(argument->args) + 1);
+  char *filename = (char *) Malloc(strlen(p_filename) + 1);
 
-  pstream_t *pstreamptr = create_pstream();
-  pstreamptr->ispipe = false;
-  if (!pstreamptr)
-    Error("No memory");
-
-  int pstreamID = pstreamptr->self;
-
+  ispipe = false;
+  
   if (CdoDebug::PSTREAM)
-    MESSAGE("Opening (w) file ", argument->args);
+    MESSAGE("Opening (w) file ", p_filename);
 
   if (filetype == CDI_UNDEFID)
     filetype = CDI_FILETYPE_GRB;
@@ -783,10 +784,10 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
     {
       struct stat stbuf;
 
-      int rstatus = stat(argument->args, &stbuf);
+      int rstatus = stat(p_filename, &stbuf);
       /* If permanent file already exists, query user whether to overwrite or exit */
       if (rstatus != -1)
-        query_user_exit(argument->args);
+        query_user_exit(p_filename);
     }
 
   if (processNums() == 1 && ompNumThreads == 1)
@@ -799,7 +800,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
     pthread_mutex_lock(&streamOpenWriteMutex);
 #endif
 
-  int fileID = streamOpenWrite(argument->args, filetype);
+  int fileID = streamOpenWrite(p_filename, filetype);
 
 #if defined(HAVE_LIBPTHREAD)
   if (cdoLockIO)
@@ -811,7 +812,7 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
   if (processNums() == 1 && ompNumThreads == 1)
     timer_stop(timer_write);
   if (fileID < 0)
-    cdiOpenError(fileID, "Open failed on >%s<", argument->args);
+    cdiOpenError(fileID, "Open failed on >%s<", p_filename);
 
   cdoDefHistory(fileID, commandLine());
 
@@ -823,14 +824,14 @@ pstreamOpenWriteFile(const argument_t *argument, int filetype)
     if ( cdoDefaultInstID != CDI_UNDEFID )
     streamDefInstID(fileID, cdoDefaultInstID);
   */
-  strcpy(filename, argument->args);
+  strcpy(filename, p_filename);
 
-  pstreamptr->mode = 'w';
-  pstreamptr->m_name = filename;
-  pstreamptr->m_fileID = fileID;
-  pstreamptr->m_filetype = filetype;
+  mode = 'w';
+  m_name = filename;
+  m_fileID = fileID;
+  m_filetype = filetype;
 
-  return pstreamID;
+  return self;
 }
 
 int
@@ -844,11 +845,18 @@ pstreamOpenWrite(const argument_t *argument, int filetype)
 
   if (ispipe)
     {
-      pstreamID = pstreamOpenWritePipe(argument, filetype);
+      pstreamID = pstreamFindID(argument->args);
+      if (pstreamID == -1)
+        {
+          Error("%s is not open!", argument->args);
+        }
+      pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+      pstreamptr->pstreamOpenWritePipe(argument->args, filetype);
     }
   else
     {
-      pstreamID = pstreamOpenWriteFile(argument, filetype);
+      pstream_t *new_pstream = create_pstream();
+      pstreamID = new_pstream->pstreamOpenWriteFile(argument->args, filetype);
     }
 
   return pstreamID;
@@ -998,7 +1006,7 @@ pstreamClose(int pstreamID)
 
   if(!pstreamptr->ispipe)
   {
-    pstream_delete_entry(pstreamptr);
+    //pstream_delete_entry(pstreamptr);
   }
 }
 
@@ -1756,17 +1764,18 @@ pstreamDebug(int debug)
   CdoDebug::PSTREAM = debug;
 }
 
-/*
 void
 cdoInitialize(void *argument)
 {
 #if defined(_OPENMP)
-  omp_set_num_threads(ompNumThreads); // Have to be called for every module (pthread)!
+  omp_set_num_threads(ompNumThreads); // Has to be called for every module (pthread)!
 #endif
-  process_t *process = Process.at(argument->processID);
+  argument_t* arg = (argument_t*)(argument);
+  process_t *process = getProcess(arg->processID);
 
+  //std::cout << arg->processID << std::endl;
+  if(CdoDebug::PROCESS) MESSAGE("Initializing process: ", process->m_operatorCommand);
   process->threadID = pthread_self();
-  process->setStreams(argu->argc, argu->argv);
 
 
 #if defined(HAVE_LIBPTHREAD)
@@ -1775,8 +1784,8 @@ cdoInitialize(void *argument)
 #endif
 
 }
-*/
 
+/*
 void
 cdoInitialize(void *argument)
 {
@@ -1795,6 +1804,9 @@ cdoInitialize(void *argument)
 #endif
 
 }
+*/
+
+
 
 void
 pstreamCloseAll()
