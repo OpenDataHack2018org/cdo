@@ -57,6 +57,8 @@ public:
   void pipeReadRecord(int p_vlistID, double *data, size_t *nmiss);
   void pipeReadPipeRecord(double *data, int vlistID, size_t *p_nmiss);
 
+  void pipeSetName(int processID, int inputIDX);
+
   bool EOP;
   bool usedata;
   bool hasdata;

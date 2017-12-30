@@ -520,4 +520,8 @@ pipe_t::pipeWriteRecord(double *p_data, size_t p_nmiss)
     }
   // UNLOCK
 }
+void pipe_t::pipeSetName(int processID, int inputIDX)
+{
+    name = "(pipe" + std::to_string(processID + 1) + "." + std::to_string(inputIDX + 1) + ")"; 
+    }
 #endif
