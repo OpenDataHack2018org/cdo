@@ -101,8 +101,8 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Expr.test.in $(srcdir)/Gradsdes.test.in \
 	$(srcdir)/Collgrid.test.in $(srcdir)/threads.test.in \
 	$(srcdir)/tsformat.test.in $(srcdir)/wildcard.test.in \
-	$(srcdir)/Smooth.test.in $(srcdir)/MapReduce.test.in \
-	$(srcdir)/Ninfo.test.in README
+	$(srcdir)/Setmiss.test.in $(srcdir)/Smooth.test.in \
+	$(srcdir)/MapReduce.test.in $(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_cfortran_flags.m4 \
 	$(top_srcdir)/m4/acx_check_cfortran.m4 \
@@ -126,8 +126,8 @@ CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Fldpctl.test Ensstat.test Enspctl.test Merstat.test \
 	Zonstat.test Mergetime.test Afterburner.test Detrend.test \
 	Arithc.test Arith.test Expr.test Gradsdes.test Collgrid.test \
-	threads.test tsformat.test wildcard.test Smooth.test \
-	MapReduce.test Ninfo.test
+	threads.test tsformat.test wildcard.test Setmiss.test \
+	Smooth.test MapReduce.test Ninfo.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -553,7 +553,7 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Runstat.test Multiyearstat.test Ydrunstat.test \
         Mergetime.test EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
-        Gradsdes.test Collgrid.test Smooth.test MapReduce.test Ninfo.test
+        Gradsdes.test Collgrid.test Setmiss.test Smooth.test MapReduce.test Ninfo.test
 
 
 #        $(top_srcdir)/test/test_Remap.sh \
@@ -683,6 +683,8 @@ threads.test: $(top_builddir)/config.status $(srcdir)/threads.test.in
 tsformat.test: $(top_builddir)/config.status $(srcdir)/tsformat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 wildcard.test: $(top_builddir)/config.status $(srcdir)/wildcard.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Setmiss.test: $(top_builddir)/config.status $(srcdir)/Setmiss.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Smooth.test: $(top_builddir)/config.status $(srcdir)/Smooth.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

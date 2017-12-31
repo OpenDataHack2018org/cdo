@@ -5,6 +5,16 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# setmiss
+#
+IFILE=t21_geosp_tsurf_sea.grb
+#
+$CDO $FORMAT setmisstoc,0 $IFILE setmisstoc_ref
+$CDO $FORMAT setmisstonn $IFILE setmisstonn_ref
+$CDO $FORMAT setmisstodis $IFILE setmisstodis_ref
+exit
+########################################################################
+#
 # smooth
 #
 IFILE=t21_geosp_tsurf_sea.grb
