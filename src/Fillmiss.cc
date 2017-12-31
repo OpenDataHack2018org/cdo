@@ -273,12 +273,12 @@ void fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
 }
 
 
-int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
-double nbr_compute_weights(size_t num_neighbors, const int *restrict src_grid_mask, bool *restrict nbr_mask, const size_t *restrict nbr_add, double *restrict nbr_dist);
-size_t nbr_normalize_weights(size_t num_neighbors, double dist_tot, const bool *restrict nbr_mask, size_t *restrict nbr_add, double *restrict nbr_dist);
+int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+double nbr_compute_weights(size_t numNeighbors, const int *restrict src_grid_mask, bool *restrict nbr_mask, const size_t *restrict nbr_add, double *restrict nbr_dist);
+size_t nbr_normalize_weights(size_t numNeighbors, double dist_tot, const bool *restrict nbr_mask, size_t *restrict nbr_add, double *restrict nbr_dist);
 
 static
-void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
+void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 {
   int gridID = field1->grid;
   int gridID0 = gridID;
@@ -335,9 +335,9 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
   
 
-  NEW_2D(bool, nbr_mask, ompNumThreads, num_neighbors);   // mask at nearest neighbors
-  NEW_2D(size_t, nbr_add, ompNumThreads, num_neighbors);  // source address at nearest neighbors
-  NEW_2D(double, nbr_dist, ompNumThreads, num_neighbors); // angular distance four nearest neighbors
+  NEW_2D(bool, nbr_mask, ompNumThreads, numNeighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, ompNumThreads, numNeighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, ompNumThreads, numNeighbors); // angular distance four nearest neighbors
 
   clock_t start, finish;
   start = clock();
@@ -348,11 +348,7 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
     {
       bool xIsCyclic = false;
       size_t dims[2] = {nvals, 0};
-      if ( num_neighbors == 1 )
-        gs = gridsearch_create_nn(xIsCyclic, dims, nvals, lons, lats);
-      else
-        gs = gridsearch_create(xIsCyclic, dims, nvals, lons, lats);
-
+      gs = gridsearch_create(xIsCyclic, dims, nvals, lons, lats);
       gridsearch_extrapolate(gs);
     }
   
@@ -368,7 +364,7 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
 #ifdef  HAVE_OPENMP4
 #pragma omp parallel for default(none)  reduction(+:findex)  shared(nbr_mask, nbr_add, nbr_dist)  \
-  shared(mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, num_neighbors)
+  shared(mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
 #endif
   for ( unsigned i = 0; i < nmiss; ++i )
     {
@@ -377,13 +373,13 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      grid_search_nbr(gs, num_neighbors, nbr_add[ompthID], nbr_dist[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
+      grid_search_nbr(gs, numNeighbors, nbr_add[ompthID], nbr_dist[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
-      double dist_tot = nbr_compute_weights(num_neighbors, NULL, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
+      double dist_tot = nbr_compute_weights(numNeighbors, NULL, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
 
       /* Normalize weights and store the link */
-      size_t nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
+      size_t nadds = nbr_normalize_weights(numNeighbors, dist_tot, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
       if ( nadds )
         {
           double result = 0;

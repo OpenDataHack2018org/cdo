@@ -289,7 +289,7 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
   size_t dims[2] = {src_grid->size, 0};
   struct gridsearch *gs = NULL;
   if ( remap_grid_type != REMAP_GRID_TYPE_REG2D )
-    gs = gridsearch_create_nn(xIsCyclic, dims, src_grid->size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    gs = gridsearch_create(xIsCyclic, dims, src_grid->size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 #endif
 
   size_t tgt_grid_size = tgt_grid->size;

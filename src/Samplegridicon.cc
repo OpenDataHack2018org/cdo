@@ -286,7 +286,7 @@ void read_coordinates(const char *filename, long n, double *lon, double *lat, in
   streamClose(streamID);
 }
 
-int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
 
 int find_coordinate_to_ignore(double *cell_corners_xyz);
 double calculate_the_polygon_area(double cell_corners[], int number_corners);

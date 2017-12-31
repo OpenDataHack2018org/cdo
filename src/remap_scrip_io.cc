@@ -67,7 +67,7 @@ void read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_ad
 #endif
 
 
-void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int num_neighbors,
+void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors,
 		       int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv)
 {
   // Writes remap data to a NetCDF file using SCRIP conventions
@@ -171,7 +171,7 @@ void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType su
       strcpy(map_method, "Bicubic remapping");
       break;
     case RemapType::DISTWGT:
-      if ( num_neighbors == 1 )
+      if ( numNeighbors == 1 )
 	strcpy(map_method, "Nearest neighbor");
       else
 	strcpy(map_method, "Distance weighted avg of nearest neighbors");
@@ -449,7 +449,7 @@ void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType su
 
 /*****************************************************************************/
 
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType, int *num_neighbors,
+void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType, int *numNeighbors,
 		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   // The routine reads a NetCDF file to extract remapping info in SCRIP format
@@ -569,12 +569,12 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapTy
   else if ( cmpstr(map_method, "Distance") == 0 )
     {
       rv->mapType = RemapType::DISTWGT;
-      *num_neighbors = 4;
+      *numNeighbors = 4;
     }
   else if ( cmpstr(map_method, "Nearest") == 0 )
     {
       rv->mapType = RemapType::DISTWGT;
-      *num_neighbors = 1;
+      *numNeighbors = 1;
     }
   else if ( cmpstr(map_method, "Largest") == 0 )
     {

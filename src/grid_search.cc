@@ -340,31 +340,6 @@ struct gridsearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, c
 
   if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
   else if ( gs->method_nn == GridsearchMethod::nanoflann ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
-
-  gs->search_radius = cdo_default_search_radius();
-
-  return gs;
-}
-
-
-struct gridsearch *gridsearch_create_nn(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
-{
-  struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
-
-  gs->is_cyclic = xIsCyclic;
-  gs->is_curve = n!=1 && n==dims[0]*dims[1];
-  gs->dims[0] = dims[0];
-  gs->dims[1] = dims[1];
-
-  gs->method_nn = gridsearch_method_nn;
-  gs->n = n;
-  if ( n == 0 ) return gs;
-
-  gs->plons = lons;
-  gs->plats = lats;
-
-  if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs->search_container = gs_create_kdtree(n, lons, lats, gs);
-  else if ( gs->method_nn == GridsearchMethod::nanoflann ) gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
   else if ( gs->method_nn == GridsearchMethod::full      ) gs->search_container = gs_create_full(n, lons, lats);
 
   gs->search_radius = cdo_default_search_radius();
@@ -694,9 +669,9 @@ size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double
 #define  TINY     1.e-14
 
 static
-void knn_store_distance(size_t nadd, double distance, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist)
+void knn_store_distance(size_t nadd, double distance, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist)
 {
-  if ( num_neighbors == 1 )
+  if ( numNeighbors == 1 )
     {
       if ( distance < nbr_dist[0] || (distance <= nbr_dist[0] && nadd < nbr_add[0]) )
 	{
@@ -706,11 +681,11 @@ void knn_store_distance(size_t nadd, double distance, size_t num_neighbors, size
     }
   else
     {
-      for ( size_t nchk = 0; nchk < num_neighbors; ++nchk )
+      for ( size_t nchk = 0; nchk < numNeighbors; ++nchk )
 	{
 	  if ( distance < nbr_dist[nchk] || (distance <= nbr_dist[nchk] && nadd < nbr_add[nchk]) )
 	    {
-	      for ( size_t n = num_neighbors-1; n > nchk; --n )
+	      for ( size_t n = numNeighbors-1; n > nchk; --n )
 		{
 		  nbr_add[n]  = nbr_add[n-1];
 		  nbr_dist[n] = nbr_dist[n-1];
@@ -724,10 +699,10 @@ void knn_store_distance(size_t nadd, double distance, size_t num_neighbors, size
 }
 
 static
-void knn_check_distance(size_t num_neighbors, const size_t *restrict nbr_add, double *restrict nbr_dist)
+void knn_check_distance(size_t numNeighbors, const size_t *restrict nbr_add, double *restrict nbr_dist)
 {
   // If distance is zero, set to small number
-  for ( size_t nchk = 0; nchk < num_neighbors; ++nchk )
+  for ( size_t nchk = 0; nchk < numNeighbors; ++nchk )
     if ( nbr_add[nchk] != GS_NOT_FOUND && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
 }
 
@@ -784,8 +759,8 @@ size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, dou
   /*
     Output variables:
 
-    int nbr_add[num_neighbors]     ! address of each of the closest points
-    double nbr_dist[num_neighbors] ! distance to each of the closest points
+    int nbr_add[numNeighbors]     ! address of each of the closest points
+    double nbr_dist[numNeighbors] ! distance to each of the closest points
 
     Input variables:
 
@@ -798,11 +773,11 @@ size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, dou
   // Initialize distance and address arrays
   gridsearch_knn_init(knn);
 
-  size_t num_neighbors = knn->size;
+  size_t numNeighbors = knn->size;
   size_t *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
-  size_t ndist = num_neighbors;
+  size_t ndist = numNeighbors;
   // check some more points if distance is the same use the smaller index (nadd)
   if ( ndist > 8 ) ndist += 8;
   else             ndist *= 2;
@@ -819,7 +794,7 @@ size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, dou
 
   size_t nadds = 0;
 
-  if ( num_neighbors == 1 )
+  if ( numNeighbors == 1 )
     {
       size_t add = gridsearch_nearest(gs, plon, plat, &range);
       if ( add != GS_NOT_FOUND )
@@ -839,14 +814,14 @@ size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, dou
     }
 
   ndist = nadds;
-  size_t max_neighbors = (ndist < num_neighbors) ? ndist : num_neighbors;
+  size_t max_neighbors = (ndist < numNeighbors) ? ndist : numNeighbors;
 
   for ( size_t i = 0; i < ndist; ++i )
     knn_store_distance(adds[i], dist[i], max_neighbors, nbr_add, nbr_dist);
 
   knn_check_distance(max_neighbors, nbr_add, nbr_dist);
 
-  if ( ndist > num_neighbors ) ndist = num_neighbors;
+  if ( ndist > numNeighbors ) ndist = numNeighbors;
 
   knn->ndist = ndist;
 
