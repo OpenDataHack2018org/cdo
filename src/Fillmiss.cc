@@ -352,6 +352,8 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
         gs = gridsearch_create_nn(xIsCyclic, dims, nvals, lons, lats);
       else
         gs = gridsearch_create(xIsCyclic, dims, nvals, lons, lats);
+
+      gridsearch_extrapolate(gs);
     }
   
   finish = clock();
