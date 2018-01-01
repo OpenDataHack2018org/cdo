@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #include "cdoDebugOutput.h"
 #endif
@@ -30,7 +30,7 @@
 #include "dmemory.h"
 #include "pipe.h"
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 
 
 pipe_t::pipe_t() { pipe_init(); }

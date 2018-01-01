@@ -54,7 +54,7 @@
 #include "cdo_getopt.h"
 #include "cdoDebugOutput.h"
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 #include "pstream_int.h"
 #include "pthread_debug.h"
 #endif
@@ -65,7 +65,7 @@
 #include "grid_proj.h"
 #include "percentiles.h"
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #  include <omp.h>
 #endif
 
@@ -272,7 +272,7 @@ void cdo_usage(void)
   fprintf(stderr, "    --no_warnings  Inhibit warning messages\n");
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
   fprintf(stderr, "    --operators    List of all operators\n");
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
   fprintf(stderr, "    --percentile <method>\n");
@@ -900,7 +900,7 @@ void print_system_info()
 #endif
   /* OPENMP 3:  201107 */
   /* OPENMP 4:  201307 gcc 4.9 */
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif
 #if defined(__cplusplus)
@@ -1823,7 +1823,7 @@ int main(int argc, char *argv[])
       //      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
     }
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( numThreads <= 0 ) numThreads = 1;
   omp_set_num_threads(numThreads);
 
@@ -1839,7 +1839,7 @@ int main(int argc, char *argv[])
       omp_get_schedule(&kind, &modifer);
       fprintf(stderr, "OMP schedule        = %d (1:static; 2:dynamic; 3:guided; 4:auto)\n", (int) kind);
 #endif
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
       fprintf(stderr, "OMP proc bind       = %d (0:false; 1:true; 2:master; 3:close; 4:spread)\n", (int) omp_get_proc_bind());
 #if !defined(__ICC)
       fprintf(stderr, "OMP num devices     = %d\n", omp_get_num_devices());
@@ -1855,7 +1855,7 @@ int main(int argc, char *argv[])
   if ( cdoVerbose )
     {
       fprintf(stderr, " OpenMP:  num_procs=%d  max_threads=%d", omp_get_num_procs(), omp_get_max_threads());
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #if !defined(__ICC)
       fprintf(stderr, "  num_devices=%d", omp_get_num_devices());
 #endif

@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
@@ -1137,7 +1137,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
 
   if ( rv->normOpt == NormOpt::DESTAREA )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)		\
   private(src_cell_add, tgt_cell_add, norm_factor)
@@ -1151,7 +1151,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
     }
   else if ( rv->normOpt == NormOpt::FRACAREA )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)		\
   private(src_cell_add, tgt_cell_add, norm_factor)
@@ -1165,7 +1165,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
     }
   else if ( rv->normOpt == NormOpt::NONE )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)	\
   private(src_cell_add, norm_factor)
@@ -1443,7 +1443,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      if ( tgt_cell_add != -1 )
 		if ( src_grid->mask[src_cell_add] )
 		  {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp critical
 #endif
 		    {
@@ -1649,7 +1649,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      if ( ! lcoinc && src_cell_add != -1 )
 		if ( src_grid->mask[src_cell_add] )
 		  {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp critical
 #endif
 		    {

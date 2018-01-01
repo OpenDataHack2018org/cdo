@@ -60,7 +60,7 @@ public:
   std::string m_name;
   std::vector<std::string> m_mfnames;
   varlist_t *m_varlist;
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   void *argument;
   struct pipe_t *pipe;
   pthread_t rthreadID; /* read  thread ID */

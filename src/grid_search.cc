@@ -305,7 +305,7 @@ void *gs_create_full(size_t n, const double *restrict lons, const double *restri
   p[0] = (FLDATATYPE *) Malloc(3*n*sizeof(FLDATATYPE));
   for ( size_t i = 1; i < n; i++ ) p[i] = p[0] + i*3;
 
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
   for ( size_t i = 0; i < n; i++ )

@@ -130,7 +130,7 @@ void *Detrend(void *argument)
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(array1, array2, vars, varID, levelID, gridsize, nts, missval)
 #endif
 	  for ( i = 0; i < gridsize; i++ )

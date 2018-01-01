@@ -78,7 +78,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   add1s[0]   = &add1[add_srt[0]];  add1s[1]   = &add1[add_srt[1]];
   nl[0]      = num_links/nsplit;   nl[1]      = num_links-nl[0];
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   int depth = (int) (log(parent)/log(2));
 
   /* Allow for nested parallelism */
@@ -91,7 +91,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
     }                                    
 #endif
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for if(depth<par_depth) \
   private(i,who_am_i) \
   num_threads(2)
@@ -100,7 +100,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
     {
       who_am_i = nsplit*parent+i;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       /*      if ( 0 )
         {
           int my_depth = (int) (log(parent)/log(2))+1;
@@ -130,7 +130,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
 
   tmp = (double*) Malloc(num_links*sizeof(double));
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for if ( depth < par_depth /* && num_links > 4096*/ ) \
     private(i) num_threads(2) schedule(static,1024)
 #endif

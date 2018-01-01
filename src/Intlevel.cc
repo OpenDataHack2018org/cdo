@@ -47,7 +47,7 @@ void vert_interp_lev(int gridsize, double missval, double *vardata1, double *var
       double *var1L1 = vardata1+gridsize*idx1;
       double *var1L2 = vardata1+gridsize*idx2;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval)
 #endif
       for ( int i = 0; i < gridsize; ++i )

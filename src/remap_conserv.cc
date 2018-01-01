@@ -334,7 +334,7 @@ void boundbox_from_corners1r(size_t ic, size_t nc, const double *restrict corner
   */
 }
 
-//#if defined(HAVE_LIBYAC)
+//#ifdef  HAVE_LIBYAC
 
 static
 double gridcell_area(struct grid_cell cell)
@@ -586,7 +586,7 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 
   if ( rv->normOpt == NormOpt::DESTAREA )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(num_wts, num_links, rv, tgt_grid) \
   private(tgt_cell_add, norm_factor)
@@ -600,7 +600,7 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
     }
   else if ( rv->normOpt == NormOpt::FRACAREA )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(num_wts, num_links, rv, tgt_grid) \
   private(tgt_cell_add, norm_factor)
@@ -925,7 +925,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  partial_weight = partial_weights[n];
 	  src_cell_add = srch_add[ompthID][n];
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp atomic
 #endif
 	  src_grid->cell_area[src_cell_add] += partial_weight;
@@ -955,7 +955,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  partial_weight = partial_weights[n];
 	  src_cell_add = srch_add[ompthID][n];
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp atomic
 #endif
 	  src_grid->cell_frac[src_cell_add] += partial_weight;

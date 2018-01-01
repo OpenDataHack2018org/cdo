@@ -21,7 +21,7 @@ namespace CdoDebug
         if ( p_debug_level == 1 || (p_debug_level &  32) ) cdoDebug = 1;
         if ( p_debug_level == 1 || (p_debug_level &  64) ) PSTREAM = 1;
         if ( p_debug_level == 1 || (p_debug_level &  512) ) PROCESS = 1;
-        #if defined(HAVE_LIBPTHREAD)
+        #ifdef  HAVE_LIBPTHREAD
         if ( p_debug_level == 1 || (p_debug_level & 128) ) PIPE = 1;
         if ( p_debug_level == 1 || (p_debug_level & 256) ) PTHREAD = 1;
         #endif

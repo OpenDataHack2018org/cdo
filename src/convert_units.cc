@@ -1,12 +1,12 @@
 #include <errno.h>
 #include "convert_units.h"
 
-#if defined(HAVE_UDUNITS2)
+#ifdef  HAVE_UDUNITS2
 
 static void udunitsInitialize(void);
 static int udunitsInit = 0;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 #  include <pthread.h>
 
 static pthread_once_t  udunitsInitThread = PTHREAD_ONCE_INIT;
@@ -29,7 +29,7 @@ static ut_system *ut_read = NULL;
 static
 void udunitsInitialize(void)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   /* initialize global API mutex lock */
   pthread_mutex_init(&udunitsMutex, NULL);
 #endif
@@ -147,7 +147,7 @@ void cdoConvertUnits(void **ut_converter, bool *changeunits, char *units, char *
 {
   if ( *changeunits )
     {
-#if defined(HAVE_UDUNITS2)
+#ifdef  HAVE_UDUNITS2
       int status;
       UDUNITS_INIT();
       UDUNITS_LOCK();

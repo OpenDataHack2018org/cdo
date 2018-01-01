@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
@@ -27,7 +27,7 @@
 #include "pstream.h"
 
 
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
 #  include "netcdf.h"
 #endif
 
@@ -99,7 +99,7 @@ void inivars_ml(VAR **vars)
   inivar(&(*vars)[4], GRID_SPECTRAL, ZAXIS_SURFACE, 152, "LSP", "log surface pressure", "");
 }
 
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
 static
 void nce(int istat)
 {
@@ -115,7 +115,7 @@ static
 int import_e5ml(const char *filename, VAR **vars)
 {
   int nvars = 0;
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
   int nc_dim_id, nc_var_id;
   size_t dimlen, nvals;
   size_t start[3];
@@ -277,7 +277,7 @@ int import_e5ml(const char *filename, VAR **vars)
 static
 void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
 {
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
   int nc_var_id;
   size_t nvals;
   size_t start[3], count[3];
@@ -609,7 +609,7 @@ void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtim
 #endif
 }
 
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
 static
 void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID)
 {
@@ -647,7 +647,7 @@ void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxis
 }
 #endif
 
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
 static
 void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID, int nhgl, int nmp1)
 {
@@ -688,7 +688,7 @@ static
 int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 {
   int nvars = 0;
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
   int nc_var_id;
   int varid;
   size_t nvals;
@@ -1084,7 +1084,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 static
 void export_e5res(const char *filename, VAR *vars, int nvars)
 {
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
   int nc_var_id;
   int varid;
   size_t nvals;

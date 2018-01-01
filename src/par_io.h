@@ -1,11 +1,11 @@
 #ifndef PAR_IO_H
 #define PAR_IO_H
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 #  include <pthread.h>
 #endif
 
@@ -26,7 +26,7 @@ typedef struct {
   int array_size;
   int recID, nrecs;
   read_arg_t read_arg;
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_t thrID;
   pthread_attr_t attr;
 #endif

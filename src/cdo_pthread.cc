@@ -15,13 +15,13 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
 #include <stdio.h>
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 #include <limits.h>
 #include <pthread.h>
 #include "pthread_debug.h"
@@ -30,7 +30,7 @@
 
 void print_pthread_info()
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_attr_t attr;
   pthread_mutexattr_t m_attr;
   pthread_condattr_t c_attr;

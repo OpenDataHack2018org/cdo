@@ -358,7 +358,7 @@ void *XTimstat(void *argument)
 
           if ( nsets == 0 )
             {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(maxrecs, recinfo, input_vars, vars1, samp1) if(maxrecs>1)
 #endif
               for ( int recID = 0; recID < maxrecs; recID++ )
@@ -387,7 +387,7 @@ void *XTimstat(void *argument)
             }
           else
             {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, operfunc) if(maxrecs>1)
 #endif
               for ( int recID = 0; recID < maxrecs; recID++ )
@@ -452,7 +452,7 @@ void *XTimstat(void *argument)
 
       if ( lmean )
         {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(vlistID1, nsets, maxrecs, recinfo, vars1, samp1) if(maxrecs>1)
 #endif
           for ( int recID = 0; recID < maxrecs; recID++ )

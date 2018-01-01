@@ -46,7 +46,7 @@ class process_t
 {
 public:
   int m_ID;
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_t threadID;
   int l_threadID;
 #endif

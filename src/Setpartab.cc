@@ -533,7 +533,7 @@ void *Setpartab(void *argument)
 		}
 	    }
 
-#if defined(HAVE_UDUNITS2)
+#ifdef  HAVE_UDUNITS2
 	  if ( var->changeunits )
 	    {
 	      int nerr = 0;
@@ -567,7 +567,7 @@ void *Setpartab(void *argument)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-#if defined(HAVE_UDUNITS2)
+#ifdef  HAVE_UDUNITS2
   for ( int varID = 0; varID < nvars; varID++ )
     if ( vars[varID].ut_converter ) cdoConvertFree(vars[varID].ut_converter);
 

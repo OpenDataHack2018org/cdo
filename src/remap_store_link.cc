@@ -189,7 +189,7 @@ void weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *wei
       size_t *restrict tgt_cell_adds = rv->tgt_cell_add;
       double *restrict wts = rv->wts;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for schedule(static) default(none) shared(src_cell_adds,tgt_cell_adds,wts,weightlinks,tgt_grid_size) 
 #endif
       for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
@@ -248,7 +248,7 @@ void weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, 
       size_t *restrict tgt_cell_adds = rv->tgt_cell_add;
       double *restrict wts = rv->wts;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(src_cell_adds,tgt_cell_adds,wts,weightlinks,tgt_grid_size)
 #endif
       for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )

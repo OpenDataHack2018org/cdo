@@ -223,7 +223,7 @@ void farsumw(field_type *field1, field_type field2, double w)
     }
   else
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(array1,array2,w,len)
 #endif
       for ( size_t i = 0; i < len; i++ ) array1[i] += w*array2[i];
@@ -251,7 +251,7 @@ void farsumtr(field_type *occur, field_type field, const double refval)
 
   if ( occur->nmiss > 0 || field.nmiss > 0 )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared) schedule(static)
 #endif
       for ( size_t i = 0; i < len; i++ )
@@ -274,7 +274,7 @@ void farsumtr(field_type *occur, field_type field, const double refval)
     }
   else
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
       for ( size_t i = 0; i < len; i++ ) 

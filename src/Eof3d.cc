@@ -28,7 +28,7 @@
  * number of contributing values during summation.
  */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 
@@ -304,7 +304,7 @@ void *EOF3d(void * argument)
         }
 
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared) schedule(static,2000)
 #endif 
       for ( int j1 = 0; j1 < nts; j1++ )
@@ -349,7 +349,7 @@ void *EOF3d(void * argument)
 	{
 	  double *eigenvec = eigenvectors[varID][eofID];
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(varID,nts,eofID,npack,pack,cov,datafields,eigenvec)
 #endif 
 	  for ( size_t i = 0; i < npack; i++ )
@@ -364,7 +364,7 @@ void *EOF3d(void * argument)
 	  // NORMALIZING
 	  double sum = 0;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(eigenvec,weight,pack,npack,gridsizemax) reduction(+:sum)
 #endif 
 	  for ( size_t i = 0; i < npack; i++ )
@@ -374,7 +374,7 @@ void *EOF3d(void * argument)
 	  if ( sum > 0 )
 	    {
 	      sum = sqrt(sum);
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(sum,npack,eigenvec,pack)
 #endif
 	      for ( size_t i = 0; i < npack; i++ )
@@ -382,7 +382,7 @@ void *EOF3d(void * argument)
 	    }
 	  else
 	    {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(eigenvec,pack,missval,npack)
 #endif
 	      for ( size_t i = 0; i < npack; i++ )

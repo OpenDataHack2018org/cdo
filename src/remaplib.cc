@@ -45,7 +45,7 @@
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
  */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
@@ -224,7 +224,7 @@ static
 void boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon,
 			   const double *restrict corner_lat, restr_t *restrict bound_box)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(bound_box, corner_lat, corner_lon, nc, size)
 #endif
   for ( size_t i = 0; i < size; ++i )
@@ -257,7 +257,7 @@ void boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, c
   size_t n_add, e_add, ne_add;
   restr_t tmp_lats[4], tmp_lons[4];  /* temps for computing bounding boxes */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)        \
   shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box)	\
   private(n4, i, j, k, ip1, jp1, n_add, e_add, ne_add, tmp_lats, tmp_lons)
@@ -342,7 +342,7 @@ void check_lon_range(size_t nlons, double *lons)
 {
   assert(lons != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nlons, lons)
 #endif
   for ( size_t n = 0; n < nlons; ++n )
@@ -361,7 +361,7 @@ void check_lat_range(size_t nlats, double *lats)
 {
   assert(lats != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nlats, lats)
 #endif
   for ( size_t n = 0; n < nlats; ++n )
@@ -378,7 +378,7 @@ void check_lon_boundbox_range(size_t nlons, restr_t *bound_box)
 
   assert(bound_box != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nlons, bound_box) private(n4)
 #endif
   for ( size_t n = 0; n < nlons; ++n )
@@ -399,7 +399,7 @@ void check_lat_boundbox_range(size_t nlats, restr_t *restrict bound_box, double 
 
   assert(bound_box != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n4)
 #endif
   for ( size_t n = 0; n < nlats; ++n )
@@ -560,7 +560,7 @@ void remap_define_grid(RemapType mapType, int gridID, remapgrid_t *grid, const c
 
   /* Initialize logical mask */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize, grid)
 #endif
   for ( size_t i = 0; i < gridsize; ++i ) grid->mask[i] = TRUE;
@@ -831,7 +831,7 @@ void remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_si
 
   /* Determine the number of weights */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( ompNumThreads > 1 )
     {
       if      ( mapType == RemapType::CONSERV     ) rv->sort_add = true;
@@ -977,7 +977,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, size_t n
               const size_t *restrict src_addx = links.src_add[j];
               const size_t *restrict windex = links.w_index[j];
 
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
 	      for ( size_t n = 0; n < links.num_links[j]; ++n )
@@ -995,7 +995,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, size_t n
 
               if ( lpv == 4 )
                 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(dst_array, src_array, dst_add, src_add, map_wts, num_wts, nlinks, lpv)
 #endif
                   for ( size_t n = 0; n < nlinks; ++n )
@@ -1009,7 +1009,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, size_t n
                 }
               else
                 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(dst_array, src_array, dst_add, src_add, map_wts, num_wts, nlinks, lpv)
 #endif
                   for ( size_t n = 0; n < nlinks; ++n )
@@ -1137,7 +1137,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
 
   size_t max_cls = get_max_add(num_links, dst_size, dst_add);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   double **src_cls2 = (double **) Malloc(ompNumThreads*sizeof(double *));
   double **src_wts2 = (double **) Malloc(ompNumThreads*sizeof(double *));
   for ( int  i = 0; i < ompNumThreads; ++i )
@@ -1153,7 +1153,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
   for ( size_t n = 0; n < num_links; ++n )
     if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, num_wts, dst_array, max_cls)  \
   schedule(dynamic,1)
@@ -1162,7 +1162,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
     {
       size_t k;
       size_t ncls;
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       int ompthID = cdo_omp_get_thread_num();
       double *src_cls = src_cls2[ompthID];
       double *src_wts = src_wts2[ompthID];
@@ -1242,7 +1242,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
 	}
     }
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   for ( int  i = 0; i < ompNumThreads; ++i )
     {
       Free(src_cls2[i]);
@@ -1441,7 +1441,7 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
   size_t nx = grid.dims[0];
   size_t ny = grid.dims[1];
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)        \
   shared(grid_size, grad_lat, grad_lon, grad_latlon, grid, nx, ny, array)
 #endif

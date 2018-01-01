@@ -484,7 +484,7 @@ void samplegrid(double missval, long nci, cellindex_type **cellindex, double *ar
   long ncells2 = cellindex[kci]->ncells;
   long nx = 0;
   double x = 0;
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   //#pragma omp parallel for default(none) shared(missval, ncells2, kci, cellindex, array1, array2, array3)
 #endif
   for ( long i = 0; i < ncells2; ++i )

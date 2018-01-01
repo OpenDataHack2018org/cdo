@@ -515,7 +515,7 @@ void *Collgrid(void *argument)
 	      double missval = vlistInqVarMissval(vlistID2, varID2);
 	      for ( size_t i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
 	      for ( int fileID = 0; fileID < nfiles; fileID++ )

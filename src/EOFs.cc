@@ -28,7 +28,7 @@
  * number of contributing values during summation.
  */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 
@@ -52,7 +52,7 @@ static
 void scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack, const size_t *restrict pack, const double *restrict weight,
 		       double **covar, double **data, double missval, double sum_w)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(npack, nts, tsID, pack, data, covar, out)
 #endif
   for ( size_t i = 0; i < npack; ++i )
@@ -74,7 +74,7 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack, co
   // Normalizing
   double sum = 0;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) reduction(+:sum)	\
   shared(out,weight,pack,npack)
 #endif
@@ -87,14 +87,14 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack, co
   if ( sum > 0 )
     {
       sum = sqrt(sum/sum_w);
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(npack,pack,sum,out)
 #endif
       for ( size_t i = 0; i < npack; ++i ) out[pack[i]] /= sum;
     }
   else
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(npack,pack,out,missval)
 #endif
       for ( size_t i = 0; i < npack; ++i ) out[pack[i]] = missval;
@@ -126,7 +126,7 @@ enum T_EIGEN_MODE get_eigenmode(void)
 	     eigen_mode==JACOBI?"jacobi":"danielson_lanczos",
 	     envstr?"Environment":" default");  
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( omp_get_max_threads() > 1 && eigen_mode == DANIELSON_LANCZOS )  {
     cdoWarning("Requested parallel computation with %i Threads ",omp_get_max_threads());
     cdoWarning("  but environmental setting CDO_SVD_MODE causes sequential ");
@@ -406,7 +406,7 @@ void *EOFs(void * argument)
 		{
 		  covar = eofdata[varID][levelID].covar;
 		}
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
 	      for ( size_t ipack = 0; ipack < npack; ++ipack )
@@ -558,7 +558,7 @@ void *EOFs(void * argument)
 		      eofdata[varID][levelID].covar_array = covar_array;
 		      eofdata[varID][levelID].covar       = covar;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared) schedule(dynamic)
 #endif
 		      for ( int j1 = 0; j1 < nts; j1++ )

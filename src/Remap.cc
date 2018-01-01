@@ -264,7 +264,7 @@ void get_remap_env(void)
 	}
     }
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   sort_mode = (ompNumThreads == 1) ? HEAP_SORT : MERGE_SORT;
 #endif
 

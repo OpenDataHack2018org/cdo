@@ -478,7 +478,7 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
   size_t nlon2 = gridInqXsize(gridID2);
   size_t nlat2 = gridInqYsize(gridID2);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
   for ( size_t ig = 0; ig < nlat2*nlon2; ++ig )
@@ -487,7 +487,7 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
 
       /*
       int lprogress = 1;
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       if ( ompthID != 0 ) lprogress = 0;
 #endif
       findex++;

@@ -1,8 +1,8 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
 #  include "netcdf.h"
 #endif
 
@@ -19,7 +19,7 @@ void remapgrid_init(remapgrid_t *grid);
 void remapgrid_alloc(RemapType mapType, remapgrid_t *grid);
 
 
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
 static
 void nce(int istat)
 {
@@ -39,7 +39,7 @@ void write_links(int nc_file_id, int nc_add_id, nc_type sizetype, size_t num_lin
       nce(nc_put_var_int(nc_file_id, nc_add_id, intadd));
       Free(intadd);
     }
-#if defined (HAVE_NETCDF4)
+#ifdef  HAVE_NETCDF4
   else
     {
       nce(nc_put_var_ulonglong(nc_file_id, nc_add_id, (unsigned long long*) cell_add));
@@ -57,7 +57,7 @@ void read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_ad
       for ( size_t i = 0; i < num_links; ++i ) cell_add[i] = (size_t)intadd[i];
       Free(intadd);
     }
-#if defined (HAVE_NETCDF4)
+#ifdef  HAVE_NETCDF4
   else
     {
       nce(nc_get_var_ulonglong(nc_file_id, nc_add_id, (unsigned long long*) cell_add));
@@ -76,7 +76,7 @@ void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType su
 
     interp_file  ! filename for remap data
   */
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
 
   // Local variables
 
@@ -206,7 +206,7 @@ void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType su
         size_t gridsize_max = (src_grid.size > tgt_grid.size) ? src_grid.size : tgt_grid.size;
         if ( nlinks > maxlinks || filesize > 8*maxlinks || gridsize_max > 0x7FFFFC00 )
           {
-#if defined (HAVE_NETCDF4)
+#ifdef  HAVE_NETCDF4
             if ( cdoVerbose ) cdoPrint("Store weights and links to NetCDF4!");
             writemode |= NC_NETCDF4;
             if ( gridsize_max > 0x7FFFFC00 )
@@ -458,7 +458,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapTy
 
     interp_file        ! filename for remap data
   */
-#if defined(HAVE_LIBNETCDF)
+#ifdef  HAVE_LIBNETCDF
 
   // Local variables
 

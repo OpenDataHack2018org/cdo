@@ -14,18 +14,18 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 
 #include <stdio.h>
 #include <stdarg.h> /* va_list */
 
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
 #include "proj_api.h"
 #endif
 
@@ -129,7 +129,7 @@ int nlat_to_nlon(int nlat)
 static
 void scale_vec(double scalefactor, size_t nvals, double *restrict values)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nvals, scalefactor, values)
 #endif
   for ( size_t n = 0; n < nvals; ++n )
@@ -480,7 +480,7 @@ void gridGenRotBounds(double xpole, double ypole, double angle, size_t nx, size_
 
 void grid_gen_xbounds2D(size_t nx, size_t ny, const double *restrict xbounds, double *restrict xbounds2D)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nx, ny, xbounds, xbounds2D)
 #endif
   for ( size_t i = 0; i < nx; ++i )
@@ -502,7 +502,7 @@ void grid_gen_xbounds2D(size_t nx, size_t ny, const double *restrict xbounds, do
 
 void grid_gen_ybounds2D(size_t nx, size_t ny, const double *restrict ybounds, double *restrict ybounds2D)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nx, ny, ybounds, ybounds2D)
 #endif
   for ( size_t j = 0; j < ny; ++j )

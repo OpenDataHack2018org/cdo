@@ -115,7 +115,7 @@ void *Timsort(void *argument)
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize,nts,sarray,vars,varID,levelID)
 #endif
 	  for ( int i = 0; i < gridsize; i++ )

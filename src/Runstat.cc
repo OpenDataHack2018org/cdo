@@ -171,7 +171,7 @@ void *Runstat(void *argument)
 	      for ( int i = 0; i < gridsize; i++ )
 		psamp1->ptr[i] = (double) imask[i];
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(tsID,gridsize,imask,samp1,varID,levelID)
 #endif
 	      for ( int inp = 0; inp < tsID; inp++ )
@@ -185,7 +185,7 @@ void *Runstat(void *argument)
 	  if ( lvarstd )
 	    {
               farmoq(pvars2, *pvars1);
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(tsID,vars1,vars2,varID,levelID,pvars1)
 #endif
 	      for ( int inp = 0; inp < tsID; inp++ )
@@ -196,7 +196,7 @@ void *Runstat(void *argument)
 	    }
 	  else if ( lrange )
 	    {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(tsID,vars1,vars2,varID,levelID,pvars1)
 #endif
 	      for ( int inp = 0; inp < tsID; inp++ )
@@ -207,7 +207,7 @@ void *Runstat(void *argument)
 	    }
 	  else
 	    {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(tsID,vars1,operfunc,varID,levelID,pvars1)
 #endif
 	      for ( int inp = 0; inp < tsID; inp++ )
@@ -326,7 +326,7 @@ void *Runstat(void *argument)
 	      for ( int i = 0; i < gridsize; i++ )
 		psamp1->ptr[i] = (double) imask[i];
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(ndates,imask,gridsize,samp1,varID,levelID)
 #endif
 	      for ( int inp = 0; inp < ndates-1; inp++ )
@@ -340,7 +340,7 @@ void *Runstat(void *argument)
 	  if ( lvarstd )
 	    {
 	      farmoq(pvars2, *pvars1);
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(ndates,vars1,vars2,varID,levelID,pvars1)
 #endif
 	      for ( int inp = 0; inp < ndates-1; inp++ )
@@ -351,7 +351,7 @@ void *Runstat(void *argument)
 	    }
 	  else if ( lrange )
 	    {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(ndates,vars1,vars2,varID,levelID,pvars1)
 #endif
 	      for ( int inp = 0; inp < ndates-1; inp++ )
@@ -362,7 +362,7 @@ void *Runstat(void *argument)
 	    }
 	  else
 	    {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(ndates,vars1,varID,levelID,operfunc,pvars1)
 #endif
 	      for ( int inp = 0; inp < ndates-1; inp++ )

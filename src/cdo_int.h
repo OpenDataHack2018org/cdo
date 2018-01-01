@@ -45,7 +45,7 @@
 #include "util.h"
 #include "datetime.h"
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #define  OPENMP3   200805 
 #define  OPENMP4   201307
 #define  OPENMP45  201511

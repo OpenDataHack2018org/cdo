@@ -4,7 +4,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-#if defined(HAVE_LIBCMOR)
+#ifdef  HAVE_LIBCMOR
 #include <unistd.h>
 
 extern "C" {
@@ -4881,7 +4881,7 @@ void *CMOR(void *argument)
 
   cdoInitialize(argument);
 
-#if defined(HAVE_LIBCMOR)
+#ifdef  HAVE_LIBCMOR
   signal(SIGTERM, sigfunc);
   int nparams = operatorArgc();
 
