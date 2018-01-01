@@ -1791,7 +1791,7 @@ static void removeDataset()
   char cwd[1024];
   char *dummy = getcwd(cwd, sizeof(cwd));
   int procID = getpid();
-  char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 7) * sizeof(char));;
+  char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 7) * sizeof(char));
   sprintf(dataset_path, "%s/dataset%d.json", cwd, procID);
   remove(dataset_path);
 }
@@ -1919,7 +1919,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 
       char cwd[1024];
       char *dummy =getcwd(cwd, sizeof(cwd));
-      char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 7) * sizeof(char));;
+      char *dataset_path = (char *) Malloc( (strlen(cwd) + 1 + strlen("dataset.json") + 7) * sizeof(char));
       FILE *dataset_json;
       int procID = getpid();
 

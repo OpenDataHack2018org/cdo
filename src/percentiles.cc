@@ -31,7 +31,7 @@ double percentile_nist(double *array, size_t len, double pn)
   else
     {
       double vk1 = nth_element(array, len, k);
-      double vk  = nth_element(array, len, k-1);;
+      double vk  = nth_element(array, len, k-1);
       percentil = vk + d*(vk1 - vk);
     }
 
@@ -52,7 +52,7 @@ double percentile_numpy(double *array, size_t len, double pn)
       if ( interpolation_method == LINEAR )
         {
           double vk1 = nth_element(array, len, k);
-          double vk  = nth_element(array, len, k-1);;
+          double vk  = nth_element(array, len, k-1);
           percentil = vk + d*(vk1 - vk);
         }
       else

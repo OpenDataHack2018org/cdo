@@ -207,7 +207,7 @@ void *Setattribute(void *argument)
           if ( pmlist == NULL ) cdoAbort("Parse error!");
           list_destroy(kvlist);
           kvlist = *(list_t **)pmlist->head->data;
-          if ( kvlist == NULL ) cdoAbort("Parse error!");;
+          if ( kvlist == NULL ) cdoAbort("Parse error!");
           fclose(fp);
           if ( cdoVerbose ) kvlist_print(kvlist);
         }
