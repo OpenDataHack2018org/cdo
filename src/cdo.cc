@@ -380,32 +380,6 @@ void cdoPrintHelp(std::vector<std::string> help/*, char *xoperator*/)
         }
     }
 }
-static
-void cdoSetDebug(int level)
-{
-  /*
-    level   0: off
-    level   1: on
-    level   2: cdi
-    level   4: memory
-    level   8: file
-    level  16: format
-    level  32: cdo
-    level  64: stream
-    level 128: pipe
-    level 256: pthread
-    level 512: process
-   */
-  cdiDebug(level);
-
-  if ( level == 1 || (level &  32) ) CdoDebug::cdoDebug = 1;
-  if ( level == 1 || (level &  64) ) CdoDebug::PSTREAM = 1;
-  if ( level == 1 || (level &  512) ) CdoDebug::PROCESS = 1;
-#if defined(HAVE_LIBPTHREAD)
-  if ( level == 1 || (level & 128) ) CdoDebug::PIPE = 1;
-  if ( level == 1 || (level & 256) ) CdoDebug::PTHREAD = 1;
-#endif
-}
 
 #undef  IsBigendian
 #define IsBigendian()  ( u_byteorder.c[sizeof(long) - 1] )
