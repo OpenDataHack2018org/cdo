@@ -760,16 +760,10 @@ void interpolate(field_type *field1, field_type *field2)
 			      || lon[nlon] >= lon[ 0] + 360 - 0.001);
 
   for (ilat = 0; ilat < nlat; ilat++)
-#if defined(SX)
-#pragma vdir nodep
-#endif
     for (ilon = 0; ilon < nlon; ilon++)
       xin[2 * ilat + 1][2 * ilon + 1] = in0[ilat][ilon];
 
   for (ilat = 0; ilat < nxlat; ilat += 2)
-#if defined(SX)
-#pragma vdir nodep
-#endif
     for (ilon = 1; ilon < nxlon; ilon += 2)
       {
 	sum = 0;
@@ -788,9 +782,6 @@ void interpolate(field_type *field1, field_type *field2)
       }
 
   for ( ilat = 1; ilat < nxlat; ilat += 2 )
-#if defined(SX)
-#pragma vdir nodep
-#endif
     for ( ilon = 0; ilon < nxlon; ilon += 2 )
       {
 	sum = 0;
@@ -819,9 +810,6 @@ void interpolate(field_type *field1, field_type *field2)
       }
 
   for ( ilat = 0; ilat < nxlat; ilat += 2 )
-#if defined(SX)
-#pragma vdir nodep
-#endif
     for ( ilon = 0; ilon < nxlon; ilon += 2 )
       {
 	sum = 0;

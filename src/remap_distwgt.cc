@@ -24,17 +24,17 @@ void nbr_store_distance(size_t nadd, double distance, size_t numNeighbors, size_
     }
   else
     {
-      for ( size_t nchk = 0; nchk < numNeighbors; ++nchk )
+      for ( size_t i = 0; i < numNeighbors; ++i )
 	{
-	  if ( distance < nbr_dist[nchk] || (distance <= nbr_dist[nchk] && nadd < nbr_add[nchk]) )
+	  if ( distance < nbr_dist[i] || (distance <= nbr_dist[i] && nadd < nbr_add[i]) )
 	    {
-	      for ( size_t n = numNeighbors-1; n > nchk; --n )
+	      for ( size_t n = numNeighbors-1; n > i; --n )
 		{
 		  nbr_add[n]  = nbr_add[n-1];
 		  nbr_dist[n] = nbr_dist[n-1];
 		}
-	      nbr_add[nchk]  = nadd;
-	      nbr_dist[nchk] = distance;
+	      nbr_add[i]  = nadd;
+	      nbr_dist[i] = distance;
 	      break;
 	    }
 	}
@@ -45,8 +45,8 @@ static
 void nbr_check_distance(size_t numNeighbors, const size_t *restrict nbr_add, double *restrict nbr_dist)
 {
   // If distance is zero, set to small number
-  for ( size_t nchk = 0; nchk < numNeighbors; ++nchk )
-    if ( nbr_add[nchk] < SIZE_MAX && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
+  for ( size_t i = 0; i < numNeighbors; ++i )
+    if ( nbr_add[i] < SIZE_MAX && nbr_dist[i] <= 0. ) nbr_dist[i] = TINY;
 }
 
 

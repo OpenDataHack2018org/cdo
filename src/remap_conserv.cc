@@ -586,9 +586,6 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 
   if ( rv->normOpt == NormOpt::DESTAREA )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_wts, num_links, rv, tgt_grid) \
@@ -597,20 +594,12 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
       for ( size_t n = 0; n < num_links; ++n )
 	{
 	  tgt_cell_add = rv->tgt_cell_add[n];
-
-          if ( IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) )
-	    norm_factor = 1./tgt_grid->cell_area[tgt_cell_add];
-          else
-            norm_factor = 0.;
-
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? 1./tgt_grid->cell_area[tgt_cell_add] : 0.;
 	  rv->wts[n*num_wts] *= norm_factor;
 	}
     }
   else if ( rv->normOpt == NormOpt::FRACAREA )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_wts, num_links, rv, tgt_grid) \
@@ -619,12 +608,7 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
       for ( size_t n = 0; n < num_links; ++n )
 	{
 	  tgt_cell_add = rv->tgt_cell_add[n];
-
-          if ( IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) )
-	    norm_factor = 1./tgt_grid->cell_frac[tgt_cell_add];
-          else
-            norm_factor = 0.;
-
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? 1./tgt_grid->cell_frac[tgt_cell_add] : 0.;
 	  rv->wts[n*num_wts] *= norm_factor;
 	}
     }

@@ -1,8 +1,8 @@
-#ifdef HAVE_CONFIG_H
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#ifndef _DMEMORY_H
+#ifndef  _DMEMORY_H
 #include "dmemory.h"
 #endif
 
@@ -10,7 +10,7 @@
 #include "cdo_int.h"
 
 
-#ifdef SX
+#ifdef  SX
 #define  NFFT  1024
 #else
 #define  NFFT     8

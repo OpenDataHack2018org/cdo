@@ -1026,9 +1026,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] > ZERO )
       {
 	src_cell_add = n;
-#ifndef SX
 	break;
-#endif
       }
 
   tgt_cell_add = tgt_grid_size;
@@ -1037,9 +1035,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] > ZERO )
       {
 	tgt_cell_add = n;
-#ifndef SX
 	break;
-#endif
       }
 
   if ( src_cell_add != src_grid_size )
@@ -1081,9 +1077,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] < ZERO )
       {
 	src_cell_add = n;
-#ifndef SX
 	break;
-#endif
       }
 
   tgt_cell_add = tgt_grid_size;
@@ -1092,9 +1086,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] < ZERO )
       {
 	tgt_cell_add = n;
-#ifndef SX
 	break;
-#endif
       }
 
   if ( src_cell_add != src_grid_size )
@@ -1123,7 +1115,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     }
 }
 
-static
+static inline
 void norm_weight(double norm_factor, double *weights, double src_centroid_lat, double src_centroid_lon)
 {
   double weight0 = weights[0];
@@ -1145,9 +1137,6 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
 
   if ( rv->normOpt == NormOpt::DESTAREA )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)		\
@@ -1156,20 +1145,12 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
       for ( long n = 0; n < num_links; ++n )
 	{
 	  src_cell_add = rv->src_cell_add[n]; tgt_cell_add = rv->tgt_cell_add[n];
-
-          if ( IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) )
-	    norm_factor = ONE/tgt_grid->cell_area[tgt_cell_add];
-          else
-            norm_factor = ZERO;
-
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? ONE/tgt_grid->cell_area[tgt_cell_add] : ZERO;
 	  norm_weight(norm_factor, &weights[n*3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
 	}
     }
   else if ( rv->normOpt == NormOpt::FRACAREA )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)		\
@@ -1178,20 +1159,12 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
       for ( long n = 0; n < num_links; ++n )
 	{
 	  src_cell_add = rv->src_cell_add[n]; tgt_cell_add = rv->tgt_cell_add[n];
-
-          if ( IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) )
-	    norm_factor = ONE/tgt_grid->cell_frac[tgt_cell_add];
-          else
-            norm_factor = ZERO;
-
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? ONE/tgt_grid->cell_frac[tgt_cell_add] : ZERO;
 	  norm_weight(norm_factor, &weights[n*3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
 	}
     }
   else if ( rv->normOpt == NormOpt::NONE )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)	\
@@ -1199,10 +1172,8 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
 #endif
       for ( long n = 0; n < num_links; ++n )
 	{
-	  src_cell_add = rv->src_cell_add[n];;
-
+	  src_cell_add = rv->src_cell_add[n];
           norm_factor = ONE;
-
 	  norm_weight(norm_factor, &weights[n*3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
 	}
     }
@@ -1272,18 +1243,12 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       link_add2[0] = (long*) Malloc(tgt_grid_size*sizeof(long));
       link_add2[1] = (long*) Malloc(tgt_grid_size*sizeof(long));
 
-#if defined(SX)
-#pragma vdir nodep
-#endif
       for ( long n = 0; n < src_grid_size; ++n )
 	{
 	  link_add1[0][n] = -1;
 	  link_add1[1][n] = -1;
 	}
 
-#if defined(SX)
-#pragma vdir nodep
-#endif
       for ( long n = 0; n < tgt_grid_size; ++n )
 	{
 	  link_add2[0][n] = -1;

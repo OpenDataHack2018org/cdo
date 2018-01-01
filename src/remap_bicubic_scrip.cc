@@ -14,6 +14,7 @@
 static
 void set_bicubic_weights(double iw, double jw, double wgts[4][4])
 {
+  // clang-format off
   wgts[0][0] = (1.-jw*jw*(3.-2.*jw))  * (1.-iw*iw*(3.-2.*iw));
   wgts[1][0] = (1.-jw*jw*(3.-2.*jw))  *     iw*iw*(3.-2.*iw);
   wgts[2][0] =     jw*jw*(3.-2.*jw)   *     iw*iw*(3.-2.*iw);
@@ -30,6 +31,7 @@ void set_bicubic_weights(double iw, double jw, double wgts[4][4])
   wgts[1][3] =     iw*iw*(iw-1.)      *     jw*(jw-1.)*(jw-1.);
   wgts[2][3] =     iw*iw*(iw-1.)      *     jw*jw*(jw-1.);
   wgts[3][3] =     iw*(iw-1.)*(iw-1.) *     jw*jw*(jw-1.);
+  // clang-format on
 }
 
 unsigned num_src_points(const int* restrict mask, const size_t src_add[4], double src_lats[4]);
@@ -37,14 +39,13 @@ unsigned num_src_points(const int* restrict mask, const size_t src_add[4], doubl
 static
 void renormalize_weights(const double src_lats[4], double wgts[4][4])
 {
-  unsigned n;
   double sum_wgts = 0.0; /* sum of weights for normalization */
   /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
-  for ( n = 0; n < 4; ++n ) sum_wgts  += fabs(src_lats[n]);
-  for ( n = 0; n < 4; ++n ) wgts[n][0] = fabs(src_lats[n])/sum_wgts;
-  for ( n = 0; n < 4; ++n ) wgts[n][1] = 0.;
-  for ( n = 0; n < 4; ++n ) wgts[n][2] = 0.;
-  for ( n = 0; n < 4; ++n ) wgts[n][3] = 0.;
+  for ( unsigned n = 0; n < 4; ++n ) sum_wgts  += fabs(src_lats[n]);
+  for ( unsigned n = 0; n < 4; ++n ) wgts[n][0] = fabs(src_lats[n])/sum_wgts;
+  for ( unsigned n = 0; n < 4; ++n ) wgts[n][1] = 0.;
+  for ( unsigned n = 0; n < 4; ++n ) wgts[n][2] = 0.;
+  for ( unsigned n = 0; n < 4; ++n ) wgts[n][3] = 0.;
 }
 
 static

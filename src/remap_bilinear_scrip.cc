@@ -85,10 +85,12 @@ bool find_ij_weights(double plon, double plat, double *restrict src_lons, double
 static
 void set_bilinear_weights(double iw, double jw, double wgts[4])
 {
+  // clang-format off
   wgts[0] = (1.-iw) * (1.-jw);
   wgts[1] =     iw  * (1.-jw);
   wgts[2] =     iw  *     jw;
   wgts[3] = (1.-iw) *     jw;
+  // clang-format on
 }
 
 
