@@ -632,7 +632,7 @@ char *ch;
 
 void getwrd (char *ch1, char *ch2, int len) {
 
-  while (len>0 && *ch2!='\n' && *ch2!='\0' && *ch2!='\r' && *ch2!=' ' ) {
+  while (len>0 && *ch2!='\n' && *ch2!='\0' && *ch2!='\r' && *ch2!=' ' && *ch2!='\t' ) {
     *ch1 = *ch2;
     len--;
     ch1++;  ch2++;

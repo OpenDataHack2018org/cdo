@@ -279,13 +279,14 @@ void *Importbinary(void *argument)
 
       vlistDefVarName(vlistID, varID, pvar->abbrv);
       {
-	size_t len = strlen(pvar->varnm);
 	char *longname = pvar->varnm;
+	size_t len = strlen(longname);
 	if ( longname[0] == '\'' && longname[len-1] == '\'' )
 	  {
 	    longname[len-1] = 0;
 	    longname++;
 	  }
+        if ( longname[0] == '\t' ) longname++;
 	vlistDefVarLongname(vlistID, varID, longname);
       }
 
