@@ -188,9 +188,11 @@ void *Sinfo(void *argument)
 	  /* ensemble information */
 	  if ( lensemble )
 	    {
-	      int ensID, ensCount, forecast_type;
-	      if ( vlistInqVarEnsemble(vlistID, varID, &ensID, &ensCount, &forecast_type) )
-		fprintf(stdout, "%2d/%-2d ", ensID, ensCount);
+              int perturbationNumber, numberOfForecastsInEnsemble;
+              int r1 = cdiInqKeyInt(vlistID, varID, CDI_KEY_PERTURBATIONNUMBER, &perturbationNumber);
+              int r2 = cdiInqKeyInt(vlistID, varID, CDI_KEY_NUMBEROFFORECASTSINENSEMBLE, &numberOfForecastsInEnsemble);
+	      if ( r1 == 0 && r2 == 0 )
+		fprintf(stdout, "%2d/%-2d ", perturbationNumber, numberOfForecastsInEnsemble);
 	      else
 		fprintf(stdout, "--/-- ");
 	    }
