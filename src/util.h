@@ -41,7 +41,7 @@
 
 #define  ADD_PLURAL(n)  ((n)!=1 ? "s" : "")
 
-#define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
+#define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && processSelf().inputStreams[0]->ispipe == false && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
 #include <string>
