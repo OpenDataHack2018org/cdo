@@ -185,7 +185,7 @@ void *Ensstat(void *argument)
 
   if ( cdoVerbose ) cdoPrint("Ensemble over %d files.", nfiles);
 
-  const char *ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
@@ -278,18 +278,18 @@ void *Ensstat(void *argument)
 	      if ( nrecs == 0 )
                 {
                   lwarning = true;
-                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(fileID)->args);
+                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(fileID).c_str());
                 }
 	      else if ( nrecs0 == 0 )
                 {
                   lwarning = true;
-                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(0)->args);
+                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(0).c_str());
                 }
 	      else
                 {
                   lerror = true;
                   cdoWarning("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
-                             tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
+                             tsID+1, cdoGetStreamName(0), cdoStreamName(fileID));
                 }
               goto CLEANUP;
 	    }

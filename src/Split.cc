@@ -94,11 +94,11 @@ void *Split(void *argument)
 
   if ( !swap_obase )
     {
-      strcpy(filename, cdoStreamName(1)->args);
+      strcpy(filename, cdoGetStreamName(1).c_str());
       nchars = strlen(filename);
     }
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
   
@@ -148,17 +148,17 @@ void *Split(void *argument)
 	  if ( codes[index] > 9999 )
 	    {
 	      sprintf(filename+nchars, "%05d", codes[index]);
-	      gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	      gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 	    }
 	  else if ( codes[index] > 999 )
 	    {
 	      sprintf(filename+nchars, "%04d", codes[index]);
-	      gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	      gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 	    }
 	  else
 	    {
 	      sprintf(filename+nchars, "%03d", codes[index]);
-	      gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	      gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 	    }
 
 	  argument_t *fileargument = file_argument_new(filename);
@@ -214,7 +214,7 @@ void *Split(void *argument)
 
 	  filename[nchars] = '\0';
 	  strcat(filename, paramstr);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
@@ -264,7 +264,7 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%03d", tabnums[index]);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
@@ -297,7 +297,7 @@ void *Split(void *argument)
 	  filename[nchars] = '\0';
 	  vlistInqVarName(vlistID1, varID, varname);
 	  strcat(filename, varname);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
@@ -351,7 +351,7 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%06g", levels[index]);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
    
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
@@ -391,7 +391,7 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", vlistGridIndex(vlistID1, gridIDs[index])+1);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
@@ -429,7 +429,7 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", vlistZaxisIndex(vlistID1, zaxisIDs[index])+1);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());

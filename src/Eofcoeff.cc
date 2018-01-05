@@ -62,7 +62,7 @@ void *Eofcoeff(void * argument)
   
   size_t gridsize = vlistGridsizeMax(vlistID1);  
   if ( gridsize != vlistGridsizeMax(vlistID2) )
-    cdoAbort("Gridsize of input files does not match!");
+    cdoAbort("Gridsize of input files does not match! %d and %d", gridsize, vlistGridsizeMax(vlistID2));
       
   if ( vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1 )
     cdoAbort("Too many different grids in input!");
@@ -72,10 +72,10 @@ void *Eofcoeff(void * argument)
 
   if ( gridID1 != gridID2 ) cdoCompareGrids(gridID1, gridID2);
   
-  strcpy(oname, cdoStreamName(2)->args);
+  strcpy(oname, cdoGetObase());
   int nchars = strlen(oname);
   
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
   
@@ -116,7 +116,7 @@ void *Eofcoeff(void * argument)
 
   int neof = eofID;  
   
-  if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoStreamName(0)->args, neof);
+  if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoGetStreamName(0).c_str(), neof);
   // Create 1x1 Grid for output
   int gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);

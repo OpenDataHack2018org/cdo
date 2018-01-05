@@ -314,10 +314,10 @@ void *Distgrid(void *argument)
 
   double *array2 = (double*) Malloc(gridsize2max*sizeof(double));
 
-  strcpy(filename, cdoStreamName(1)->args);
+  strcpy(filename, cdoGetObase());
   int nchars = strlen(filename);
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 

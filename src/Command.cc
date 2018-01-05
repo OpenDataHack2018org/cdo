@@ -332,7 +332,7 @@ void *Command(void *argument)
 
   processStartTime(&s_utime, &s_stime);
 
-  gl_streamID = streamOpenRead(cdoStreamName(0)->args);
+  gl_streamID = streamOpenRead(cdoGetStreamName(0).c_str());
 
   command_init();
   

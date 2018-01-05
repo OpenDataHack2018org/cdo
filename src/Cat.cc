@@ -52,7 +52,7 @@ void *Cat(void *argument)
 
   for ( int indf = 0; indf < nfiles; ++indf )
     {
-      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
+      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
       if ( cdoTimer ) tw0 = timer_val(timer_cat);
 
       int streamID1 = pstreamOpenRead(cdoStreamName(indf));
@@ -72,17 +72,22 @@ void *Cat(void *argument)
               if ( varID == nvars ) ntsteps = 0;
             }
 	      
-	  bool file_exists = (!cdoOverwriteMode) ? fileExists(cdoStreamName(nfiles)->args) : false;
+	  bool file_exists = (!cdoOverwriteMode) ? fileExists(cdoGetStreamName(nfiles).c_str()) : false;
 	  if ( file_exists )
 	    {
+      std::cout << "here we are 1 " << std::endl;
 	      streamID2 = pstreamOpenAppend(cdoStreamName(nfiles));
+      std::cout << "here we are 2" << std::endl;
 
 	      vlistID2 = pstreamInqVlist(streamID2);
 	      taxisID2 = vlistInqTaxis(vlistID2);
+      std::cout << "here we are 3" << std::endl;
 
 	      vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
+      std::cout << "here we are 4" << std::endl;
 	      tsID2 = vlistNtsteps(vlistID2);
+      std::cout << "here we are 5" << std::endl;
 	      if ( tsID2 == 0 ) tsID2 = 1; /* bug fix for time constant data only */
 
               if ( ntsteps == 0 ) lconstvars = false;
@@ -90,7 +95,7 @@ void *Cat(void *argument)
 	  else
 	    {
 	      if ( cdoVerbose )
-		cdoPrint("Output file doesn't exist, creating: %s", cdoStreamName(nfiles)->args);
+		cdoPrint("Output file doesn't exist, creating: %s", cdoGetStreamName(nfiles).c_str());
 
 	      streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
@@ -159,7 +164,7 @@ void *Cat(void *argument)
       pstreamClose(streamID1);
 
       if ( cdoTimer ) tw = timer_val(timer_cat) - tw0;
-      if ( cdoTimer ) cdoPrint("Processed file: %s   %.2f seconds", cdoStreamName(indf)->args, tw);
+      if ( cdoTimer ) cdoPrint("Processed file: %s   %.2f seconds", cdoGetStreamName(indf).c_str(), tw);
     }
 
   pstreamClose(streamID2);

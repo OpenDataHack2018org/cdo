@@ -1245,7 +1245,7 @@ void *Magplot(void *argument)
 
                 if( DBG )
                   fprintf( stderr,"Plot %d\n",varID );
-	  	magplot(cdoStreamName(1)->args, operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr, lregular);
+	  	magplot(cdoGetStreamName(1).c_str(), operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr, lregular);
           }
 	  else
 	  	fprintf(stderr,"operator not implemented\n");

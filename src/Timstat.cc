@@ -205,7 +205,7 @@ void *Timstat(void *argument)
 
       strcpy(filename, cdoOperatorName(operatorID));
       strcat(filename, "_");
-      strcat(filename, cdoStreamName(1)->args);
+      strcat(filename, cdoGetStreamName(1).c_str());
       argument_t *fileargument = file_argument_new(filename);
       streamID3 = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);

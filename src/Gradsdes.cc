@@ -242,8 +242,8 @@ void dumpmap()
   indxb.bigpnt = NULL;
   indxb.bignum = 0;
 
-  mapfp = fopen(cdoStreamName(0)->args, "r");
-  if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoStreamName(0)->args);
+  mapfp = fopen(cdoGetStreamName(0).c_str(), "r");
+  if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoGetStreamName(0).c_str());
 
   /* check the version number */
 
@@ -985,12 +985,12 @@ void *Gradsdes(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  const char *datfile = cdoStreamName(0)->args;
+  const char *datfile = cdoGetStreamName(0).c_str();
   size_t len = strlen(datfile);
   char *ctlfile = (char *) Malloc(len+10);
   strcpy(ctlfile, datfile);
 
-  if ( cdoStreamName(0)->args[0] == '-' )
+  if ( cdoGetStreamName(0).c_str()[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
 
   if ( operatorID == DUMPMAP )
@@ -1010,7 +1010,7 @@ void *Gradsdes(void *argument)
     }
   else
     {
-      if ( fileSize(cdoStreamName(0)->args) > 2147483647L ) map_version = 4;
+      if ( fileSize(cdoGetStreamName(0).c_str()) > 2147483647L ) map_version = 4;
     }
 
   if ( cdoVerbose ) cdoPrint("GrADS GRIB map version: %d", map_version);
@@ -1147,7 +1147,7 @@ void *Gradsdes(void *argument)
   else
     {
       datfile = strrchr(datfile, '/');
-      if ( datfile == 0 ) datfile = cdoStreamName(0)->args;
+      if ( datfile == 0 ) datfile = cdoGetStreamName(0).c_str();
       else                datfile++;
       fprintf(gdp, "DSET  ^%s\n", datfile);
     }

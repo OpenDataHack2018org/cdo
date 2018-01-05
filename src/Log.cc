@@ -44,24 +44,24 @@ void *Log(void *argument)
   int operfunc   = cdoOperatorF1(operatorID);
   int dumptype   = cdoOperatorF2(operatorID);
 
-  if ( cdoStreamName(0)->args[0] == '-' )
+  if ( cdoGetStreamName(0).c_str()[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
 
   if ( operatorID == DUMPLOGS )
     {
-      dumplogs(cdoStreamName(0)->args);
+      dumplogs(cdoGetStreamName(0).c_str());
     }
   else if ( operatorID == DAYLOGS )
     {
-      daylogs(cdoStreamName(0)->args);
+      daylogs(cdoGetStreamName(0).c_str());
     }
   else if ( operatorID == MONLOGS )
     {
-      monlogs(cdoStreamName(0)->args);
+      monlogs(cdoGetStreamName(0).c_str());
     }
   else if ( operfunc == 1 )
     {
-      dumplogo(cdoStreamName(0)->args, dumptype);
+      dumplogo(cdoGetStreamName(0).c_str(), dumptype);
     }
 
   cdoFinish();

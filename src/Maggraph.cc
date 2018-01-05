@@ -891,7 +891,7 @@ void *Maggraph(void *argument)
   if ( nparam ) VerifyGraphParameters(nparam,pnames);
   
   int nfiles = cdoStreamCnt() - 1;
-  const char *ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoGetStreamName(nfiles).c_str();
   
   if( DBG )
     {
@@ -915,7 +915,7 @@ void *Maggraph(void *argument)
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       if( DBG )
-        fprintf( stderr," file %d is %s\n", fileID, cdoStreamName(fileID)->args );
+        fprintf( stderr," file %d is %s\n", fileID, cdoGetStreamName(fileID).c_str() );
       
       int streamID = pstreamOpenRead(cdoStreamName(fileID));
 

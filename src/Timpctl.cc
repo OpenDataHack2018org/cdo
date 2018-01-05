@@ -108,14 +108,14 @@ void timpctl(int operatorID)
     {      
       nrecs = pstreamInqTimestep(streamID2, otsID);
       if ( nrecs != pstreamInqTimestep(streamID3, otsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
+        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1), cdoStreamName(2));
 
       int vdate2 = taxisInqVdate(taxisID2);
       int vtime2 = taxisInqVtime(taxisID2);
       int vdate3 = taxisInqVdate(taxisID3);
       int vtime3 = taxisInqVtime(taxisID3);
       if ( vdate2 != vdate3 || vtime2 != vtime3 )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1), cdoStreamName(2));
       
       for ( int recID = 0; recID < nrecs; recID++ )
         {

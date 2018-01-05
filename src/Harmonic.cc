@@ -65,13 +65,13 @@ void *Harmonic(void *argument)
   int taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   int *streamIDs = (int*) Malloc(n_out*sizeof(int));
 
-  strcpy(filename, cdoStreamName(1)->args);
+  strcpy(filename, cdoGetStreamName(1).c_str());
   int nchars = strlen(filename);
 
   for ( int j = 0; j < n_out; ++j )

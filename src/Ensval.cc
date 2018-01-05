@@ -165,9 +165,9 @@ void *Ensval(void *argument)
   gridDefXvals(gridID2, &xval);
   gridDefYvals(gridID2, &yval);
 
-  const char *ofilebase = cdoStreamName(nfiles)->args;
+  const char *ofilebase = cdoGetStreamName(nfiles).c_str();
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   memset(file_suffix, 0, sizeof(file_suffix) );
   cdoGenFileSuffix(file_suffix, sizeof(file_suffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -235,7 +235,7 @@ void *Ensval(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = pstreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
+	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0), cdoStreamName(fileID));
 	}
       
       for ( stream = 0; stream < nostreams; stream++ ) {

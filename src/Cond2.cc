@@ -67,7 +67,7 @@ void *Cond2(void *argument)
   if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0)->args);
+      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoGetStreamName(0).c_str());
     }
 
   if ( filltype == FILL_NONE )
@@ -85,7 +85,7 @@ void *Cond2(void *argument)
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
   if ( filltype == FILL_REC && gridsize != gridInqSize(vlistGrid(vlistID1, 0)) )
-    cdoAbort("Stream1 >%s< has wrong gridsize!", cdoStreamName(0)->args);
+    cdoAbort("Stream1 >%s< has wrong gridsize!", cdoGetStreamName(0).c_str());
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
@@ -101,7 +101,7 @@ void *Cond2(void *argument)
       if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
+	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
 
 	  nvars  = vlistNvars(vlistID1);
 	  vardata1  = (double **) Malloc(nvars*sizeof(double *));

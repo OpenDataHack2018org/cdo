@@ -225,7 +225,7 @@ void *XTimstat(void *argument)
   int cmplen = DATE_LEN - comparelen;
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  //int streamID1 = pstreamOpenRead(cdoStreamName(0)->args);
+  //int streamID1 = pstreamOpenRead(cdoGetStreamName(0).c_str());
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
@@ -254,7 +254,7 @@ void *XTimstat(void *argument)
       char filename[8192];
       strcpy(filename, cdoOperatorName(operatorID));
       strcat(filename, "_");
-      strcat(filename, cdoStreamName(1)->args);
+      strcat(filename, cdoGetStreamName(1).c_str());
       argument_t *fileargument = file_argument_new(filename);
       streamID3 = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);

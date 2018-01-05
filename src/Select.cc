@@ -21,6 +21,7 @@
       Select      select         Select fields
 */
 
+#include "cdoDebugOutput.h"
 #include <cdi.h>
 #include "cdo_int.h"
 #include "pstream.h"
@@ -188,7 +189,7 @@ void *Select(void *argument)
   for ( int indf = 0; indf < nfiles; ++indf )
     {
       if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, (indf+1.)/nfiles);
-      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
+      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
 
       int streamID1 = pstreamOpenRead(cdoStreamName(indf));
 

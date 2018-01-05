@@ -269,7 +269,7 @@ void *CDIwrite(void *argument)
       tw = timer_val(timer_write) - tw0;
       twsum += tw;
 
-      file_size = (double) fileSize(cdoStreamName(0)->args);
+      file_size = (double) fileSize(cdoGetStreamName(0).c_str());
 
       if ( nruns > 1 ) snprintf(sinfo, sizeof(sinfo), "(run %d)", irun+1);
 

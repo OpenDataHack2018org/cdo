@@ -701,7 +701,7 @@ static void maptab_via_cmd(list_t *pml, const char *origValue, int vlistID, int 
 {
   int varIDToMap = getVarIDToMap(vlistID, nvars, key, origValue);
   if ( varIDToMap == CDI_UNDEFID )
-    cdoAbort("In variable mapping:\n          Variable with '%s': '%s' configured via cmdline could not be found in infile '%s'.", key, origValue, cdoStreamName(0)->args);
+    cdoAbort("In variable mapping:\n          Variable with '%s': '%s' configured via cmdline could not be found in infile '%s'.", key, origValue, cdoGetStreamName(0).c_str());
   list_t *kvl_maptab = maptab_search_miptab(pml, cmorName, miptabfreq, "cmor_name");
   if ( !kvl_maptab )
     {
@@ -841,7 +841,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
     {
       varIDs[i] = getVarIDToMap(vlistID, nvars, key, charvars->values[i]);
       if ( varIDs[i] == CDI_UNDEFID )
-        cdoAbort("In merging variables to a variable with a character coordinate:\n          Could not find '%s' in infile '%s' to build a variable with character coordinate.", charvars->values[i], cdoStreamName(0)->args);
+        cdoAbort("In merging variables to a variable with a character coordinate:\n          Could not find '%s' in infile '%s' to build a variable with character coordinate.", charvars->values[i], cdoGetStreamName(0).c_str());
     }
 
   int gridID = vlistInqVarGrid(vlistID, varIDs[0]);
@@ -850,7 +850,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
   int subzaxisID;
   int ntsteps = vlistNtsteps(vlistID);
 
-  if ( cdoStreamName(0)->args[0] == '-' )
+  if ( cdoGetStreamName(0).c_str()[0] == '-' )
     cdoAbort("No variables can be merged to one character axis since you piped several cdo operators.");
 
   int streamID2 = pstreamOpenRead(cdoStreamName(0));
@@ -2783,7 +2783,7 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
 /*
 static void select_and_register_character_dimension(char *grid_file, int *axis_ids)
 {
-  char *ifile = cdoStreamName(0)->args;
+  char *ifile = cdoGetStreamName(0).c_str();
   if ( ifile[0] == '-' )
     cdoAbort("Cdo cmor cannot register a character dimension when several cdo operators are piped.");
   if ( strcmp(grid_file, "") == 0 )  
@@ -3470,7 +3470,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
     case 16: strcpy(frequency, "1hr"); break;
     default:
     {
-      if ( cdoStreamName(0)->args[0] == '-' )
+      if ( cdoGetStreamName(0).c_str()[0] == '-' )
         {
             cdoAbort("No frequency could be determined from MIP-table and cdo cmor cannot check frequency of Ifile recs since you piped several cdo operators.");
 /*          char *dummy;
@@ -3887,7 +3887,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   if ( cdoVerbose) cdoPrint("Successfully calculated juldates.", old_start_date);
 /* Read in first vdate in case not piped */
   if ( cdoVerbose) cdoPrint("Start to calculate temporal gap between chunk and working file.");
-  if ( cdoStreamName(0)->args[0] == '-' )
+  if ( cdoGetStreamName(0).c_str()[0] == '-' )
     {
       cdoWarning("Cdo cmor cannot enable append mode since you piped several cdo operators.\n          Switched to replace mode for this variable.");
       return 0;
@@ -4462,7 +4462,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
   keyValues_t *kvc = kvlist_search(kvl, "c");
   keyValues_t *kvcn = kvlist_search(kvl, "cn");
   int byteorder;
-  int filetype = cdiGetFiletype(cdoStreamName(0)->args, &byteorder);
+  int filetype = cdiGetFiletype(cdoGetStreamName(0).c_str(), &byteorder);
 
   if ( maptab && maptabdir ) if ( maptab[0] != '/' )
     {
@@ -4924,10 +4924,10 @@ void *CMOR(void *argument)
     cdoPrint("2. Successfully found a MIP table '%s' and deduced a MIP table frequency '%s'.", mip_table, miptab_freqptr);
 
   if ( cdoVerbose )
-    cdoPrint("3. Start to open infile '%s'.", cdoStreamName(0)->args);
+    cdoPrint("3. Start to open infile '%s'.", cdoGetStreamName(0).c_str());
   int streamID = pstreamOpenRead(cdoStreamName(0));
   if ( cdoVerbose )
-    cdoPrint("3. Successfully opened infile '%s'.", cdoStreamName(0)->args);
+    cdoPrint("3. Successfully opened infile '%s'.", cdoGetStreamName(0).c_str());
   /* Short keys from rtu, mt, gi must be included similar to global atts */
   add_globalhybrids(kvl);
 

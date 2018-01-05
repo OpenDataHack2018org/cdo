@@ -136,7 +136,7 @@ void *Merge(void *argument)
   int streamCnt = cdoStreamCnt();
   int nmerge    = streamCnt - 1;
 
-  const char *ofilename = cdoStreamName(streamCnt-1)->args;
+  const char *ofilename = cdoGetStreamName(streamCnt-1).c_str();
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
@@ -173,7 +173,7 @@ void *Merge(void *argument)
   vlistCopy(vlistID2, vlistIDs[0]);
   for ( index = 1; index < nmerge; index++ )
     {
-      checkDupEntry(vlistID2, vlistIDs[index], cdoStreamName(index)->args);
+      checkDupEntry(vlistID2, vlistIDs[index], cdoGetStreamName(index).c_str());
       /* vlistCat(vlistID2, vlistIDs[index]); */
       vlistMerge(vlistID2, vlistIDs[index]);
     }

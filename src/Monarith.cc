@@ -104,7 +104,7 @@ void *Monarith(void *argument)
 
 	  nrecs2 = pstreamInqTimestep(streamID2, tsID2);
 	  if ( nrecs2 == 0 )
-	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoStreamName(1)->args);
+	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoGetStreamName(1).c_str());
 
 	  vdate = taxisInqVdate(taxisID2);
 	  yearmon2 = vdate / 100;
@@ -114,7 +114,7 @@ void *Monarith(void *argument)
 	      int year2 = yearmon2/100;
 	      int mon2  = yearmon2 - (yearmon2/100)*100;
 	      cdoAbort("Timestep %d in %s has wrong date! Current year=%4d mon=%2d, expected year=%4d mon=%2d",
-		       tsID2+1, cdoStreamName(1)->args, year2, mon2, year1, mon1);
+		       tsID2+1, cdoGetStreamName(1).c_str(), year2, mon2, year1, mon1);
 	    }
 
 	  for ( int recID = 0; recID < nrecs2; recID++ )

@@ -153,7 +153,6 @@ void *Ninfo(void *argument)
     case NGRIDPOINTS:
       for ( varID = 0; varID < nvars; varID++ )
 	{
-        std::cout <<"here we should be" << std::endl;
 	  int gridID = vlistInqVarGrid(vlistID, varID);
 	  int gridsize = gridInqSize(gridID);
 	  fprintf(stdout, "%d\n", gridsize);

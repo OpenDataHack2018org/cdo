@@ -69,7 +69,7 @@ void *Mergetime(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      if ( cdoVerbose ) cdoPrint("process: %s", cdoStreamName(fileID)->args);
+      if ( cdoVerbose ) cdoPrint("process: %s", cdoGetStreamName(fileID).c_str());
 
       sf[fileID].streamID = pstreamOpenRead(cdoStreamName(fileID));
       sf[fileID].vlistID = pstreamInqVlist(sf[fileID].streamID);
@@ -98,7 +98,7 @@ void *Mergetime(void *argument)
 	}
     }
 
-  const char *ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);

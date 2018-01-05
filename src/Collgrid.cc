@@ -311,7 +311,7 @@ void *Collgrid(void *argument)
   cdoInitialize(argument);
     
   int nfiles = cdoStreamCnt() - 1;
-  const char *ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
@@ -489,7 +489,7 @@ void *Collgrid(void *argument)
 	{
 	  int nrecs = pstreamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
+	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0), cdoStreamName(fileID));
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);

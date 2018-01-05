@@ -273,9 +273,9 @@ void *Mrotuvb(void *argument)
   int vlistID2 = pstreamInqVlist(streamID2);
 
   int nvars = vlistNvars(vlistID1);
-  if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoStreamName(0)->args);
+  if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoGetStreamName(0).c_str());
   nvars = vlistNvars(vlistID2);
-  if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoStreamName(1)->args);
+  if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoGetStreamName(1).c_str());
 
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);

@@ -182,14 +182,14 @@ void *Mergegrid(void *argument)
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
       ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(0)->args);
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoGetStreamName(0).c_str());
 
   ndiffgrids = 0;
   for ( index = 1; index < vlistNgrids(vlistID2); index++ )
     if ( vlistGrid(vlistID2, 0) != vlistGrid(vlistID2, index))
       ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(1)->args);
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoGetStreamName(1).c_str());
 
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);

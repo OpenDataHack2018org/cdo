@@ -214,7 +214,7 @@ void *Importbinary(void *argument)
 
   dsets_init(&pfi);
 
-  int status = read_gradsdes(cdoStreamName(0)->args, &pfi);
+  int status = read_gradsdes((char*)cdoGetStreamName(0).c_str(), &pfi);
   if ( cdoVerbose ) fprintf(stderr, "status %d\n", status);
   //if ( status ) cdoAbort("Open failed on %s!", pfi.name);
   if ( status ) cdoAbort("Open failed!");

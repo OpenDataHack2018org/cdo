@@ -1417,8 +1417,8 @@ void *Importcmsaf(void *argument)
   dsets_init(&dsets);
 
   /* Open an existing file. */
-  file_id = H5Fopen(cdoStreamName(0)->args, H5F_ACC_RDONLY, H5P_DEFAULT);
-  if ( file_id < 0 ) cdoAbort("H5Fopen failed on %s", cdoStreamName(0)->args);
+  file_id = H5Fopen(cdoGetStreamName(0).c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+  if ( file_id < 0 ) cdoAbort("H5Fopen failed on %s", cdoGetStreamName(0).c_str());
 
   /* cmsaf_type = get_cmsaf_type(file_id); */
 

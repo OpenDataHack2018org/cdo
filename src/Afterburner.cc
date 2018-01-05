@@ -2434,8 +2434,8 @@ void *Afterburner(void *argument)
 
   ofileidx = nfiles;
 
-  ifile = cdoStreamName(0)->args;
-  ofile = cdoStreamName(nfiles)->args;
+  ifile = strdup(cdoGetStreamName(0).c_str());
+  ofile = (char *)cdoGetStreamName(nfiles).c_str();
 
   globs->Nfiles = nfiles-1;
   if ( globs->Nfiles > 0 )
@@ -2445,7 +2445,7 @@ void *Afterburner(void *argument)
 
       ifiles = (char **) Malloc(globs->Nfiles*sizeof(char*));
       for ( int i = 0; i < globs->Nfiles; ++i )
-	ifiles[i] = cdoStreamName(--nfiles)->args;
+	ifiles[i] = (char *)cdoGetStreamName(--nfiles).c_str();
       for ( int i = 0; i < globs->Nfiles; ++i ) printf("files %d %s\n", i+1, ifiles[i]);
     }
 
@@ -2454,6 +2454,7 @@ void *Afterburner(void *argument)
   FreeMean(vars);
 
   Free(globs);
+  Free(ifile);
 
   cdoFinish();
 
