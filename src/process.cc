@@ -57,6 +57,7 @@ static int pthreadScope = 0;
 
 static process_t *root_process;
 std::map<int, process_t> Process;
+std::map<int, char*> obase;
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
@@ -263,6 +264,7 @@ processAddInputStream(pstream_t *p_pstream_ptr)
     Error("Limit of %d input streams per process reached (processID = %d)!", MAX_STREAM, process.m_ID);
 
   process.inputStreams.push_back(p_pstream_ptr);
+  process.m_streamCnt++;
 }
 
 void
@@ -436,15 +438,10 @@ cdoStreamCnt(void)
   return cnt;
 }
 
-const argument_t *
+int
 cdoStreamName(int cnt)
 {
-  process_t &process = processSelf();
-
-  if (cnt > process.m_streamCnt || cnt < 0)
-    Error("count %d out of range!", cnt);
-
-  return &(process.streamArguments[cnt]);
+    return cnt;
 }
 
 const char *
@@ -889,18 +886,19 @@ createProcesses(int argc, const char **argv)
   call_stack.push(root_process);
   current_process = call_stack.top();
   int cntOutFiles = (int)current_process->m_module.streamOutCnt;
-  int obase = 0;
+  MESSAGE("CNTOUTFILES: ", cntOutFiles);
   if(cntOutFiles == -1)
   {
-      obase = 1;
+    obase.insert({0, strdup(argv[argc - 1])});
   }
+  int temp_argc = argc - cntOutFiles;
   for(int i = 0; i < cntOutFiles; i++)
   {
     if(CdoDebug::PROCESS)
     {
-        MESSAGE("Creating new pstream for output file: ", argv[argc - (i + 1)]);
+        MESSAGE("Creating new pstream for output file: ", argv[temp_argc + i]);
     }
-    root_process->addFileOutStream(argv[argc - (i + 1)]);
+    root_process->addFileOutStream(argv[temp_argc + i]);
   }
   do
     {
@@ -908,7 +906,7 @@ createProcesses(int argc, const char **argv)
               "iteration " , idx , ", current argv: " , argv[idx] ,
               ",  current_process: " , current_process->operatorName); 
       }
-    if (argv[idx][0] == '-')
+      if (argv[idx][0] == '-')
         {
           if(CdoDebug::PROCESS){ MESSAGE(
                     "Found new Operator: ", argv[idx]);
@@ -916,20 +914,22 @@ createProcesses(int argc, const char **argv)
           parent_process = current_process;
           current_process = processCreate(argv[idx]);
 
-          //parent needs to be added first
           parent_process->addChild(current_process);
           current_process->addParent(parent_process);
 
           call_stack.push(current_process);
         }
-      else
+      else if(current_process->m_module.streamInCnt != 0)
         {
           if(CdoDebug::PROCESS){
-            MESSAGE("adding file to ", current_process->operatorName);
+            MESSAGE("adding in file to ", current_process->operatorName);
           }
           current_process->addFileInStream(argv[idx]);
         }
-
+      else
+      {
+      }
+    
     while (current_process->hasAllInputs() && current_process != root_process)
       {
         if(CdoDebug::PROCESS) {
@@ -938,7 +938,9 @@ createProcesses(int argc, const char **argv)
         call_stack.pop();
         current_process = call_stack.top();
       }
+
       idx++;
+
     }
   while ((current_process != root_process || !root_process->hasAllInputs()) && idx < argc - cntOutFiles);
 
@@ -947,7 +949,7 @@ createProcesses(int argc, const char **argv)
     MESSAGE("== Process Creation End ==");
   }
 
-  NumCreatedStreams = get_glob_argc() + obase;
+  NumCreatedStreams = get_glob_argc() + obase.size();
 }
 
 void
@@ -1029,7 +1031,7 @@ processInqTimesteps(void)
 }
 
 void
-processDelete(void)
+processSetInactive(void)
 {
   process_t &process = processSelf();
 
@@ -1055,6 +1057,16 @@ operatorArgc(void)
 char **
 operatorArgv(void)
 {
+  if(CdoDebug::PROCESS)
+  {
+      std::string oargv_str = "";
+      for( auto entry: processSelf().oargv)
+      {
+          oargv_str += std::string(entry) + " "; 
+      }
+      MESSAGE("Getting ",processSelf().oargv.size()," operator arguments: ", oargv_str);
+  }
+
   return &processSelf().oargv[0];
 }
 
@@ -1309,7 +1321,7 @@ processClosePipes(void)
       if (CdoDebug::PROCESS)
         MESSAGE("process ",processSelf().m_ID,"  instream ",sindex,"  close streamID ", pstreamptr->self);
 
-      if (pstreamptr)
+      if (!pstreamptr->isopen)
         pstreamptr->close();
     }
 
@@ -1322,7 +1334,7 @@ processClosePipes(void)
         MESSAGE("process ",processSelf().m_ID,"  outstream ",sindex,"  close streamID ", pstreamptr->self);
 
 
-      if (pstreamptr)
+      if (!pstreamptr->isopen)
         pstreamptr->close();
     }
 }
@@ -1334,7 +1346,7 @@ size_t getPeakRSS( );
 void cdoFinish(void)
 {
   int processID = processSelf().m_ID;
-  if(CdoDebug::PROCESS) MESSAGE("Finishing process: processID");
+  if(CdoDebug::PROCESS) MESSAGE("Finishing process: ", processID);
   int nvars, ntimesteps;
   char memstring[32] = { "" };
   double s_utime, s_stime;
@@ -1344,7 +1356,7 @@ void cdoFinish(void)
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PROCESS)
-    MESSAGE("process ",processID," thread %ld", pthread_self());
+    MESSAGE("process ",processID," thread ", pthread_self());
 #endif
 
   int64_t nvals = processInqNvals(processID);
@@ -1451,18 +1463,19 @@ void cdoFinish(void)
 #endif
 
   processClosePipes();
-
-  processDelete();
+  processSetInactive();
 }
 
 void process_t::addFileInStream(std::string file)
 {
    inputStreams.push_back(create_pstream(file));
+  m_streamCnt++;
 }
 
 void process_t::addFileOutStream(std::string file)
 {
    outputStreams.push_back(create_pstream(file));
+  m_streamCnt++;
 }
 
 void
@@ -1476,6 +1489,7 @@ void process_t::addPipeInStream()
 {
 #if defined(HAVE_LIBPTHREAD)
     inputStreams.push_back(create_pstream(m_ID, inputStreams.size()));
+    m_streamCnt++;
 #else
   cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
@@ -1491,6 +1505,7 @@ process_t::addParent(process_t *parentProcess)
 void process_t::addPipeOutStream()
 {
    outputStreams.push_back(parentProcesses[0]->inputStreams[m_posInParent]);
+   m_streamCnt++;
 }
 
 void
@@ -1499,7 +1514,7 @@ clearProcesses()
   Process.clear();
   NumProcess = 0;
   NumProcessActive = 0;
-      //pstreamCloseAll();
+     //pstreamCloseAll();
 }
 
 pthread_t process_t::run(argument_t* p_argument)
@@ -1553,9 +1568,29 @@ char* createPipeName(size_t pnlen)
   return pipename;
 }
 
+int pstreamOpenWrite(int p_streamIndex, int ft)
+{
+   process_t &p = processSelf();
+   int streamIndex = p_streamIndex - p.inputStreams.size();
+  MESSAGE(std::to_string(streamIndex));
+   return cdoStreamOpenWrite(streamIndex, ft);
+}
+
+int pstreamOpenRead(int p_streamIndex)
+{
+    return cdoStreamOpenRead(p_streamIndex);
+}
+
+int pstreamOpenAppend(int p_streamIndex)
+{
+   process_t &p = processSelf();
+   int streamIndex = p_streamIndex - p.inputStreams.size();
+   return cdoStreamOpenAppend(streamIndex);
+}
+
 int cdoStreamOpenRead(int inStreamIDX)
 {
-    if(CdoDebug::PROCESS) MESSAGE("Getting stream ", inStreamIDX, " of process ", processSelf().m_ID);
+    if(CdoDebug::PROCESS) MESSAGE("Getting in stream ", inStreamIDX, " of process ", processSelf().m_ID);
     process_t &process = processSelf();
     pstream_t *inStream = process.inputStreams[inStreamIDX];
 
@@ -1567,7 +1602,8 @@ int cdoStreamOpenRead(int inStreamIDX)
        inStream->pstreamOpenReadPipe(pipename);
        argument_t * argument = argument_new(1, pnlen);
        argument->processID = process.childProcesses[process.nChildActive]->m_ID;
-       process.childProcesses[process.nChildActive]->run(argument);
+       process.childProcesses[process.nChildActive]->run(argument); //new thread started in here!
+       process.nChildActive++;
     }
     else
     {
@@ -1580,8 +1616,9 @@ int cdoStreamOpenRead(int inStreamIDX)
 
 int cdoStreamOpenWrite(int outStreamIDX, int filetype)
 {
+    if(CdoDebug::PROCESS) MESSAGE("Getting out stream ", outStreamIDX, " of process ", processSelf().m_ID);
     pstream_t* outStream = processSelf().outputStreams[outStreamIDX];
-
+    
     if(outStream->ispipe)
     {
         outStream->pstreamOpenWritePipe(outStream->pipe->name.c_str(), filetype);
@@ -1592,6 +1629,40 @@ int cdoStreamOpenWrite(int outStreamIDX, int filetype)
         outStream->pstreamOpenWriteFile(outStream->m_mfnames[0].c_str(), filetype);
     }
     return outStream->self;
+}
+bool cdoInFileExists(int inStreamIDX)
+{
+    pstream_t* inStream = processSelf().inputStreams[inStreamIDX];
+    return fileExists(inStream->m_mfnames[0].c_str());
+}
+bool cdoOutFileExists(int outStreamIDX)
+{
+    pstream_t* outStream = processSelf().outputStreams[outStreamIDX];
+    return fileExists(outStream->m_mfnames[0].c_str());
+}
+int cdoStreamOpenAppend(int p_outFileIndex)
+{
+    process_t &process = processSelf();
+    pstream_t *outStream = process.outputStreams[p_outFileIndex];
+    int pstreamID = -1;
+    if(outStream->ispipe)
+    {
+     if (CdoDebug::PSTREAM)
+        {
+          MESSAGE("pipe ", outStream->pipe->name.c_str());
+        }
+      cdoAbort("this operator doesn't work with pipes!");
+    }
+    else
+    {
+       outStream->openAppend(outStream->m_mfnames[0].c_str());
+       pstreamID = outStream->self;
+    }
+    if(pstreamID == -1)
+    {
+        ERROR("could not append to ", outStream->m_mfnames[0]);
+    }
+    return pstreamID;
 }
 
 int cdoAddOutFile(std::string filename)
@@ -1607,4 +1678,40 @@ process_t* getProcess(int p_processID)
         ERROR("Process with ID: " , p_processID, "not found");
     }
     return &(process->second);
+}
+
+std::string cdoGetOutStreamName(int p_outStream)
+{
+    process_t &process = processSelf();
+    return process.outputStreams[p_outStream]->m_name;
+}
+
+std::string cdoGetInStreamName(int p_inStream)
+{
+    process_t &process = processSelf();
+    return process.inputStreams[p_inStream]->m_name;
+}
+std::string cdoGetStreamName(int p_streamIndex)
+{
+    std::string streamName;
+    process_t &process = processSelf();
+    MESSAGE("stridx " ,p_streamIndex);
+    if(p_streamIndex >= process.inputStreams.size())
+    {
+        if(CdoDebug::PROCESS) MESSAGE("Getting output stream name", p_streamIndex);
+        streamName = cdoGetOutStreamName(p_streamIndex - process.inputStreams.size());
+    }
+    else{
+        if(CdoDebug::PROCESS) MESSAGE("Getting input stream name", p_streamIndex);
+       streamName =  cdoGetInStreamName(p_streamIndex); 
+    }
+    if(CdoDebug::PROCESS) MESSAGE("StreamName is:",streamName);
+    return streamName;
+
+}
+char * cdoGetObase()
+{
+    process_t &process = processSelf();
+
+    return obase[process.m_ID];
 }

@@ -146,7 +146,7 @@ const char *processInqOpername(void);
 const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
-const argument_t *cdoStreamName(int cnt);
+int cdoStreamName(int cnt);
 void createProcesses(int argc, const char **argv);
 void clearProcesses();
 int processNumsActive();
@@ -155,4 +155,14 @@ process_t* getProcess(int p_processID);
   int checkStreamCnt();
 int cdoStreamOpenRead(int inStreamIDX);
 int cdoStreamOpenWrite(int outStreamIDX, int filetype);
+int cdoStreamOpenAppend(int outStreamIDX);
+bool cdoOutFileExists(int outStreamIDX);
+bool cdoInFileExists(int inStreamIDX);
+std::string cdoGetInStreamName(int p_inStream);
+std::string cdoGetOutStreamName(int p_outStream);
+std::string cdoGetStreamName(int p_streamIndex);
+char* cdoGetObase();
+int pstreamOpenRead(int p);
+int pstreamOpenWrite(int p, int ft);
+int pstreamOpenAppend(int p);
 #endif /* _PROCESS_H */

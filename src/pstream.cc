@@ -160,6 +160,7 @@ pstream_t *create_pstream(std::vector<std::string> p_filenameList)
 {
     pstream_t* new_entry = create_pstream();
     new_entry->m_mfnames = p_filenameList;
+    new_entry->m_name = p_filenameList[0];
     new_entry->ispipe = false;
     return new_entry;
 
@@ -176,6 +177,7 @@ pstream_t *create_pstream(int processID, int pstreamIDX)
     pstream_t *new_pstream = create_pstream();
     new_pstream->pipe = new pipe_t();
     new_pstream->pipe->pipeSetName(processID, pstreamIDX);
+    new_pstream->m_name = new_pstream->pipe->name;
     new_pstream->ispipe = true;
 
 }
@@ -553,7 +555,7 @@ void pstream_t::createFilelist(const char * p_args)
 void
 pstream_t::pstreamOpenReadFile(const char* p_args)
 {
-  createFilelist(p_args);
+  //createFilelist(p_args); experimental function (comment from 2.1.2018)
 
   std::string filename; 
 
@@ -606,7 +608,6 @@ void createPipeName(char *pipename, int pnlen)
 {
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
 }
-
 
 int
 pstreamOpenRead(const argument_t *argument)
@@ -998,16 +999,16 @@ void
 pstreamClose(int pstreamID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-
   if (pstreamptr == NULL)
     ERROR("Internal problem, stream ", pstreamID ," not open!");
 
   pstreamptr->close();
-
+/*
   if(!pstreamptr->ispipe)
   {
-    //pstream_delete_entry(pstreamptr);
+    pstream_delete_entry(pstreamptr);
   }
+  */
 }
 
 void pstream_t::close(){
@@ -1016,6 +1017,8 @@ void pstream_t::close(){
 #if defined(HAVE_LIBPTHREAD)
       pthread_t threadID = pthread_self();
 
+      if(CdoDebug::PSTREAM)
+      MESSAGE("thID: ", threadID, " rthID: ", rthreadID, " wthID: ", wthreadID);
       if (pthread_equal(threadID, rthreadID))
         pstreamCloseChildStream(this);
       else if (pthread_equal(threadID, wthreadID))
@@ -1071,6 +1074,7 @@ void pstream_t::close(){
 int
 pstreamInqVlist(int pstreamID)
 {
+  if(CdoDebug::PSTREAM) MESSAGE("Inquiring Vlist from pstream ", pstreamID);
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
   return pstreamptr->inqVlist();
 }
