@@ -23,6 +23,8 @@ argument_t *file_argument_new(const char *filename)
   argument->argv[0] = (char *) filename;
   argument->args = (char *) filename;
 
+  
+  MESSAGE("FILE_ARGUMENT: ",print_argument((argument_t*)argument));
   return argument;
 }
 
@@ -36,6 +38,7 @@ argument_t * pipe_argument_new(const argument_t *argument,  char *pipename, int 
   }
 
 
+  MESSAGE("ARGUMENT: ",print_argument((argument_t*)argument));
   argument_t *newargument = argument_new(argument->argc + 1, argument->argc *sizeof(char *));
   newargument->operatorName = "";
   newargument->argv = argument->argv;
@@ -52,6 +55,7 @@ argument_t * pipe_argument_new(const argument_t *argument,  char *pipename, int 
   newargument->argv[argument->argc] = pipename;
   newargument->args = newarg;
   newargument->operatorName = std::string(operatorName, strlen(operatorName));
+  MESSAGE("NEWARGUMENT: ",print_argument(newargument));
   return newargument;
 }
 
@@ -133,6 +137,7 @@ std::string print_argument(argument_t * p_argument)
         output += "     " + std::string(p_argument->argv[i]) + " ";
     }
     output += "\n";
+    output += "Size of argv: " + std::to_string((unsigned long)p_argument->argv.size()) + "\n";
 
     output += "     OperatorName: " + p_argument->operatorName + "\n";
 
