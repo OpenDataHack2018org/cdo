@@ -1318,7 +1318,7 @@ processClosePipes(void)
     {
       pstream_t *pstreamptr = processInqInputStream(sindex);
 
-      if (CdoDebug::PROCESS)
+      if (CdoDebug::PROCESS && !pstreamptr->isopen)
         MESSAGE("process ",processSelf().m_ID,"  instream ",sindex,"  close streamID ", pstreamptr->self);
 
       if (!pstreamptr->isopen)
@@ -1330,7 +1330,7 @@ processClosePipes(void)
     {
       pstream_t *pstreamptr = processInqOutputStream(sindex);
 
-      if (CdoDebug::PROCESS)
+      if (CdoDebug::PROCESS && !pstreamptr->isopen )
         MESSAGE("process ",processSelf().m_ID,"  outstream ",sindex,"  close streamID ", pstreamptr->self);
 
 
@@ -1514,7 +1514,6 @@ clearProcesses()
   Process.clear();
   NumProcess = 0;
   NumProcessActive = 0;
-     //pstreamCloseAll();
 }
 
 pthread_t process_t::run(argument_t* p_argument)
