@@ -1789,29 +1789,6 @@ cdoInitialize(void *argument)
 
 }
 
-/*
-void
-cdoInitialize(void *argument)
-{
-    argument_t* argu = (argument_t *)argument;
-#if defined(_OPENMP)
-  omp_set_num_threads(ompNumThreads); // Have to be called for every module (pthread)! 
-#endif
-
-  process_t* process = processCreate(argu->argv[0]);
-  process->setStreams(argu->argc, argu->argv);
-
-
-#ifdef  HAVE_LIBPTHREAD
-  if (CdoDebug::PSTREAM)
-    MESSAGE("process ", processSelf().m_ID," thread ", pthread_self());
-#endif
-
-}
-*/
-
-
-
 void
 pstreamCloseAll()
 {
