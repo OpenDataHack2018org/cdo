@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
       Filter    bandpass
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -34,7 +34,7 @@
 #include "statistic.h"
 #include "pstream.h"
 
-#if defined(HAVE_LIBFFTW3) 
+#ifdef  HAVE_LIBFFTW3 
 #include <fftw3.h>
 #endif
 
@@ -62,7 +62,7 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
     fmasc[i] = fmasc[nts-i] = 1; 
 }
 
-#if defined(HAVE_LIBFFTW3) 
+#ifdef  HAVE_LIBFFTW3 
 static
 void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
 {
@@ -136,7 +136,7 @@ void *Filter(void *argument)
   {
     double *array1;
     double *array2;
-#if defined(HAVE_LIBFFTW3) 
+#ifdef  HAVE_LIBFFTW3 
     fftw_complex *in_fft;
     fftw_complex *out_fft;
     fftw_plan p_T2S;
@@ -155,7 +155,7 @@ void *Filter(void *argument)
 
   if ( CDO_Use_FFTW )
     {
-#if defined(HAVE_LIBFFTW3) 
+#ifdef  HAVE_LIBFFTW3 
       if ( cdoVerbose ) cdoPrint("Using fftw3 lib");
       use_fftw = true;
 #else
@@ -253,7 +253,7 @@ void *Filter(void *argument)
 
   if ( use_fftw )
     {
-#if defined(HAVE_LIBFFTW3) 
+#ifdef  HAVE_LIBFFTW3 
       for ( int i = 0; i < ompNumThreads; i++ )
 	{
 	  ompmem[i].in_fft  = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
@@ -315,8 +315,8 @@ void *Filter(void *argument)
         {
           if ( use_fftw )
             {
-#if defined(HAVE_LIBFFTW3) 
-#if defined(_OPENMP)
+#ifdef  HAVE_LIBFFTW3 
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
               for ( int i = 0; i < gridsize; i++ )
@@ -338,7 +338,7 @@ void *Filter(void *argument)
             }
           else
             {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
               for ( int i = 0; i < gridsize; i++ )  
@@ -361,7 +361,7 @@ void *Filter(void *argument)
 
   if ( use_fftw )
     {
-#if defined(HAVE_LIBFFTW3) 
+#ifdef  HAVE_LIBFFTW3 
       for ( int i = 0; i < ompNumThreads; i++ )
 	{
 	  Free(ompmem[i].in_fft);

@@ -1,7 +1,6 @@
 #ifndef REMAP_STORE_LINK_H
 #define REMAP_STORE_LINK_H
 
-
 typedef struct
 {
   size_t add;
@@ -33,6 +32,5 @@ void weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *wei
 void weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remapvars_t *rv);
 void sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts);
 void sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4]);
-
 
 #endif  /* REMAP_STORE_LINK */

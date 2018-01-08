@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
@@ -7,7 +7,7 @@
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 xmlNode *root_node;
@@ -22,7 +22,7 @@ void *magics_node, *results_node;
 
 int init_XMLtemplate_parser( char *Filename )
 {
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
   param_doc = xmlReadFile( Filename, NULL, 0 );
   if ( param_doc == NULL )
     {
@@ -46,7 +46,7 @@ int init_XMLtemplate_parser( char *Filename )
 
 int updatemagics_and_results_nodes(void)
 {
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
   xmlNode *cur_node = NULL;
 	
   if( root_node == NULL )
@@ -91,7 +91,7 @@ int updatemagics_and_results_nodes(void)
 
 int quit_XMLtemplate_parser(void)
 {
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
   xmlFreeDoc( param_doc );
   xmlCleanupParser( );
   if( param_doc == NULL )

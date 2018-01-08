@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@
 #include "util.h"
 #include "datetime.h"
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #define  OPENMP3   200805 
 #define  OPENMP4   201307
 #define  OPENMP45  201511
@@ -140,9 +140,6 @@ void    cdo_set_grids(const char *gridarg);
 void    defineInstitution(const char *instarg);
 int     defineTable(const char *tablearg);
 
-void    cdolog(const char *prompt, double cputime);
-void    cdologs(int noper);
-void    cdologo(int noper);
 void    nospec(int vlistID);
 void    gridWrite(FILE *fp, int gridID);
 

@@ -1,8 +1,8 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 
@@ -632,7 +632,7 @@ void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
   nl[0]      = num_links/nsplit;   nl[1]      = num_links-nl[0];
   //add_end[0] = nl[0];              add_end[1] = num_links;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   int depth = (int) (log(parent)/log(2));
 
   /* Allow for nested parallelism */
@@ -651,7 +651,7 @@ void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
   //      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
   //	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for if ( depth < par_depth ) \
         private(n, m, wgttmp, who_am_i)    \
         shared(weights) num_threads(2)
@@ -662,7 +662,7 @@ void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
       who_am_i = nsplit*parent+i;
       //    my_depth = (int) (log(parent)/log(2))+1;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       //      if ( 1 )
       //	printf("I am %i (parent %i), my_depth is: %i thread_num %i (%i) \n",
       //	       who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
@@ -693,13 +693,13 @@ void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
                                                               /* ********************** */
   tmp = (size_t*) Malloc(num_links*sizeof(size_t));
   
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
   for ( i = 0; i < num_links; i++ )
     tmp[i] = add1[idx[i]];
   
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
   for ( i = 0; i < num_links; i++ )
@@ -708,7 +708,7 @@ void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
       tmp[i] = add2[idx[i]];
     }
   
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
   for ( i = 0; i < num_links; i++ )
@@ -719,14 +719,14 @@ void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
   
   tmp2 = (double*) Malloc(num_links*num_wts*sizeof(double));
   
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for if ( depth < par_depth ) private(i,n) num_threads(2)
 #endif
   for ( i = 0; i < num_links; i++ )
     for ( n = 0; n < num_wts; n++ )
       tmp2[num_wts*i + n] = weights[num_wts*idx[i]+n];
   
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for if ( depth < par_depth ) private(i,n) num_threads(2)
 #endif
   for ( i = 0; i < num_links; i++ )

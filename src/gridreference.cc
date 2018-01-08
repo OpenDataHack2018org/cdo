@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -14,11 +14,11 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if defined(HAVE_LIBCURL)
+#ifdef  HAVE_LIBCURL
 #include <curl/curl.h>
 #include <errno.h>
 #endif
@@ -30,7 +30,7 @@
 /*
  * callback function for curl for writing the network retrieved grid file
  */
-#if defined(HAVE_LIBCURL)
+#ifdef  HAVE_LIBCURL
 static
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
@@ -44,7 +44,7 @@ static
 int download_gridfile(const char *restrict uri, const char *restrict basename)
 {
   int rval = 1;
-#if defined(HAVE_LIBCURL)
+#ifdef  HAVE_LIBCURL
   // As curl_easy_init calls non-thread safe curl_global_init the libcurl developer advice
   // to call curl_global_init first and before potential thread spawning.
 

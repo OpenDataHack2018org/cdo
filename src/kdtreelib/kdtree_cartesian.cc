@@ -24,7 +24,7 @@ kdata_t square(const kdata_t x)
 static constexpr
 kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b)
 {
-  return square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2]));
+  return (float)(square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
 }
 
 
@@ -276,13 +276,7 @@ kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int dim)
             tmp_nearest = further;
 
         kdata_t tmp_dist_sq = kd_dist_sq(tmp_nearest->location, p);
-        if ( tmp_dist_sq < dist_sq ) {
-            nearest = tmp_nearest;
-            dist_sq = tmp_dist_sq;
-            *max_dist_sq = kd_min(dist_sq, *max_dist_sq);
-        }
-        // Uwe Schulzweida
-        else if ( tmp_dist_sq <= dist_sq && tmp_nearest->index < nearest->index ) {
+        if ( tmp_dist_sq < dist_sq || (tmp_dist_sq <= dist_sq && tmp_nearest->index < nearest->index) ) {
             nearest = tmp_nearest;
             dist_sq = tmp_dist_sq;
             *max_dist_sq = kd_min(dist_sq, *max_dist_sq);

@@ -4,7 +4,7 @@
 #  autoconf 2.68
 #  libtool  2.4.2
 
-AC_INIT([cdo], [1.9.3rc1], [http://mpimet.mpg.de/cdo])
+AC_INIT([cdo], [1.9.3rc2], [http://mpimet.mpg.de/cdo])
 
 AC_DEFINE_UNQUOTED(CDO, ["$PACKAGE_VERSION"], [CDO version])
 
@@ -300,7 +300,7 @@ AC_CONFIG_FILES([test/Gridboxstat.test test/Vertstat.test test/Fldstat.test test
 AC_CONFIG_FILES([test/Merstat.test test/Zonstat.test test/Mergetime.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([test/MapReduce.test test/Ninfo.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Setmiss.test test/Smooth.test test/MapReduce.test test/Ninfo.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([Makefile src/lib/ncl/Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile test/bandit_tests/Makefile cdo.spec cdo.settings])
 AC_OUTPUT
 

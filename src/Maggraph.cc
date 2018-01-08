@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
@@ -9,7 +9,7 @@
 #include "grid.h"
 #include "pstream.h"
 
-#if defined(HAVE_LIBMAGICS)
+#ifdef  HAVE_LIBMAGICS
 
 #include "magics_api.h"
 
@@ -876,7 +876,7 @@ void *Maggraph(void *argument)
 {
   cdoInitialize(argument);
 
-#if defined(HAVE_LIBMAGICS)
+#ifdef  HAVE_LIBMAGICS
   char varname[CDI_MAX_NAME], units[CDI_MAX_NAME];
   int varID, levelID;
   int gridID;

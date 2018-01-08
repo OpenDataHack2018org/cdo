@@ -29,6 +29,7 @@ struct gridsearch {
 
   double lonmin, lonmax, latmin, latmax;
   float min[3], max[3];
+  void *pointcloud;
 };
 
 struct gsknn {
@@ -47,7 +48,6 @@ size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, dou
 
 struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats);
-struct gridsearch *gridsearch_create_nn(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats);
 void gridsearch_delete(struct gridsearch *gs);
 size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
 size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist);

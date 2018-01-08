@@ -13,7 +13,7 @@
 #include "griddes.h"
 
 
-#if defined(HAVE_LIBHDF5)
+#ifdef  HAVE_LIBHDF5
 static
 herr_t obj_info(hid_t loc_id, const char *name, void *objname)
 {
@@ -49,7 +49,7 @@ herr_t obj_info(hid_t loc_id, const char *name, void *objname)
 #endif
 
 
-#if defined(HAVE_LIBHDF5)
+#ifdef  HAVE_LIBHDF5
 static
 int h5find_object(hid_t file_id, const  char *name)
 {
@@ -282,7 +282,7 @@ void correct_sinxvals(int xsize, int ysize, double *xvals)
 int gridFromH5file(const char *gridfile)
 {
   int       gridID = -1;
-#if defined(HAVE_LIBHDF5)
+#ifdef  HAVE_LIBHDF5
   hid_t	    lon_id = -1;    /* Dataset ID	        	*/
   hid_t	    lat_id = -1;    /* Dataset ID	        	*/
   hid_t     att_id;

@@ -1,3 +1,12 @@
+2018-02-25  Uwe Schulzweida
+
+	* Using CDI library version 1.9.3
+	* Version 1.9.3 release
+
+2017-12-26  Uwe Schulzweida
+
+	* read of reduced Gaussian grid description file failed [Bug #8146]
+
 2017-12-06  Uwe Schulzweida
 
 	* remapdis/remapnn without extrapolation on non global curvilinear grids:

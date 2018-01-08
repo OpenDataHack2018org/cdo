@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -401,18 +401,15 @@ int gridGenArea(int gridID, double* area)
 
   progressInit();
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none)  \
-  shared(findex,gridsize,area,nv,grid_corner_lon,grid_corner_lat,grid_center_lon,grid_center_lat)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex)  \
+  shared(gridsize,area,nv,grid_corner_lon,grid_corner_lat,grid_center_lon,grid_center_lat)
 #endif
   for ( size_t i = 0; i < gridsize; ++i )
     {
       int lprogress = 1;
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
 
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/gridsize);
 

@@ -1,8 +1,8 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 #  include <pthread.h>
 #endif
 
@@ -41,13 +41,13 @@ void parReadRecord(int streamID, int *varID, int *levelID, double *array, size_t
 {
   int lpario = FALSE;
   int recID = 0, nrecs = 0;
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_t thrID;
   /* pthread_attr_t attr; */
   int rval;
 #endif
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if ( parIO )
     {
       lpario = TRUE;
@@ -68,7 +68,7 @@ void parReadRecord(int streamID, int *varID, int *levelID, double *array, size_t
 
       readRecord(&read_arg);
     }
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   else
     {
       /* fprintf(stderr, "parIO1: %ld streamID %d %d %d\n", (long)thrID, streamID, recID, nrecs); */

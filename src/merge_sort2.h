@@ -7,7 +7,7 @@
 
 #include <time.h>
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 

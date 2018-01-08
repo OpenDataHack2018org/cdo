@@ -3,7 +3,7 @@
 
 #include "cdi.h"
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #if defined(CDO)
 #include "cdo_int.h"
@@ -12,7 +12,7 @@
 #define  streamWriteRecord        pstreamWriteRecord
 #else
 #define  OPENMP4  201307
-#if defined(_OPENMP) && defined(OPENMP4) && _OPENMP >= OPENMP4
+#ifdef  _OPENMP && defined(OPENMP4) && _OPENMP >= OPENMP4
 #define  HAVE_OPENMP4  1
 #endif
 #endif
@@ -1098,7 +1098,7 @@ void MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor
 #if defined (SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
         for ( i = nhor * (j-1) ; i < nhor * j ; i++ )
@@ -1107,7 +1107,7 @@ void MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor
 #if defined (SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
       for ( i = 0; i < nhor; i++ )

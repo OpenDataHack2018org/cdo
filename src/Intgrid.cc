@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -313,10 +313,7 @@ void *Intgrid(void *argument)
 		   /* && gridInqType(gridID1) != GRID_CURVILINEAR */ )
 		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype) );
 
-	      if ( operatorID == BOXAVG )
-		gridID2 = genBoxavgGrid(gridID1, xinc, yinc);
-	      else
-		gridID2 = genThinoutGrid(gridID1, xinc, yinc);
+              gridID2 = operatorID == BOXAVG ? genBoxavgGrid(gridID1, xinc, yinc) : genThinoutGrid(gridID1, xinc, yinc);
 	    }
 	  else
 	    cdoAbort("Too many different grids!");

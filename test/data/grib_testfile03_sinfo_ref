@@ -2,7 +2,7 @@
     -1 : Institut Source   T Steptype Levels Num    Points Num Dtype : Parameter ID
      1 : ECMWF    unknown  v instant       1   1     35718   1  P16  : 151.128       
    Grid coordinates :
-     1 : gaussian reduced         : points=35718  nlat=160  np=80
+     1 : gaussian_reduced         : points=35718  nlat=160  np=80
                               lat : 89.14152 to -89.14152 degrees_north
    Vertical coordinates :
      1 : surface                  : levels=1

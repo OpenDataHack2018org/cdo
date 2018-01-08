@@ -1378,6 +1378,7 @@ namespace nanoflann
 					const IndexType index = BaseClassRef::vind[i];// reorder... : i;
 					DistanceType dist = distance.evalMetric(vec, index, (DIM > 0 ? DIM : BaseClassRef::dim));
 #ifdef NANOFLANN_FIRST_MATCH  // Uwe Schulzweida
+                                        dist = (float) dist;
                                         if (dist < worst_dist || (dist <= worst_dist && index < worst_index) ) {
 #else
 					if (dist < worst_dist) {

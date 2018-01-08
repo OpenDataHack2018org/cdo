@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -91,7 +91,6 @@ int cdoCompType          = CDI_COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
 int cdoDebug             = 0;
 int cdoChunkType         = CDI_UNDEFID;
-int cdoLogOff            = FALSE;
 int cdoSilentMode        = FALSE;
 int cdoOverwriteMode     = FALSE;
 int cdoBenchmark         = FALSE;
@@ -163,7 +162,7 @@ int wildcardmatch(const char *w, const char *s)
 
 int cdo_omp_get_thread_num(void)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   return omp_get_thread_num();
 #else
   return 0;
@@ -173,7 +172,7 @@ int cdo_omp_get_thread_num(void)
 
 void cdo_omp_set_num_threads(int nthreads)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if (  omp_get_max_threads() != nthreads ) omp_set_num_threads(nthreads);
 #endif
 }

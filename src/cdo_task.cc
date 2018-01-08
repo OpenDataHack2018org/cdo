@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 #include <pthread.h>
 #endif
 
@@ -26,7 +26,7 @@ typedef struct cdo_task_info {
   void *arg;
   void *result;
   enum cdo_pt_state state;
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_t thread;
   pthread_cond_t work_cond;
   pthread_mutex_t work_mtx;
@@ -36,7 +36,7 @@ typedef struct cdo_task_info {
 } cdo_task_t;
 
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 static
 void *cdo_task(void *task)
 {
@@ -95,7 +95,7 @@ void cdo_task_start(void *task, void *(*task_routine)(void *), void *task_arg)
   cdo_task_t *task_info = (cdo_task_t *) task;
 
   // ensure worker is waiting
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if ( CDO_task ) pthread_mutex_lock(&(task_info->work_mtx));
 #endif
 
@@ -111,7 +111,7 @@ void cdo_task_start(void *task, void *(*task_routine)(void *), void *task_arg)
   if ( run_task ) task_info->result = task_info->routine(task_info->arg);
 
   // wake-up signal
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if ( CDO_task )
     {
       pthread_cond_signal(&(task_info->work_cond));
@@ -127,7 +127,7 @@ void *cdo_task_wait(void *task)
 
   cdo_task_t *task_info = (cdo_task_t *) task;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if ( CDO_task )
     {
       while (1)
@@ -155,7 +155,7 @@ void *cdo_task_new()
   task_info->result = NULL;
   task_info->state = SETUP;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if ( CDO_task )
     {
       pthread_attr_t attr;
@@ -190,7 +190,7 @@ void cdo_task_delete(void *task)
 {
   cdo_task_t *task_info = (cdo_task_t *) task;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if ( CDO_task )
     {
       // ensure the worker is waiting

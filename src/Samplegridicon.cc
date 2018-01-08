@@ -286,7 +286,7 @@ void read_coordinates(const char *filename, long n, double *lon, double *lat, in
   streamClose(streamID);
 }
 
-int grid_search_nbr(struct gridsearch *gs, size_t num_neighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
 
 int find_coordinate_to_ignore(double *cell_corners_xyz);
 double calculate_the_polygon_area(double cell_corners[], int number_corners);
@@ -484,7 +484,7 @@ void samplegrid(double missval, long nci, cellindex_type **cellindex, double *ar
   long ncells2 = cellindex[kci]->ncells;
   long nx = 0;
   double x = 0;
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   //#pragma omp parallel for default(none) shared(missval, ncells2, kci, cellindex, array1, array2, array3)
 #endif
   for ( long i = 0; i < ncells2; ++i )
@@ -591,7 +591,7 @@ void *Samplegridicon(void *argument)
 
           double missval = vlistInqVarMissval(vlistID1, varID);
 
-          samplegrid(missval, nsamplegrids, cellindex.data(), array1, array2, array3);
+          samplegrid(missval, nsamplegrids, &cellindex[0], array1, array2, array3);
 
           nmiss = 0;
           for ( long i = 0; i < gridsize2; ++i )

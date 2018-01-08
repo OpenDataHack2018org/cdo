@@ -27,11 +27,11 @@
 
 //#define  MEMPOOL   1
 
-//#define  KDDATATYPE     double
-//#define  KDATA_ABS(x)   fabs(x)
+#define  KDDATATYPE     double
+#define  KDATA_ABS(x)   fabs(x)
 
-#define  KDDATATYPE     float
-#define  KDATA_ABS(x)   fabsf(x)
+//#define  KDDATATYPE     float
+//#define  KDATA_ABS(x)   fabsf(x)
 
 typedef KDDATATYPE kdata_t;
 

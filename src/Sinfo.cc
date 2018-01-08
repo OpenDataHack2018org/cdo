@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "util.h"
 
 #include "cdi_uuid.h"
 #include "printinfo.h"
@@ -189,9 +188,11 @@ void *Sinfo(void *argument)
 	  /* ensemble information */
 	  if ( lensemble )
 	    {
-	      int ensID, ensCount, forecast_type;
-	      if ( vlistInqVarEnsemble(vlistID, varID, &ensID, &ensCount, &forecast_type) )
-		fprintf(stdout, "%2d/%-2d ", ensID, ensCount);
+              int perturbationNumber, numberOfForecastsInEnsemble;
+              int r1 = cdiInqKeyInt(vlistID, varID, CDI_KEY_PERTURBATIONNUMBER, &perturbationNumber);
+              int r2 = cdiInqKeyInt(vlistID, varID, CDI_KEY_NUMBEROFFORECASTSINENSEMBLE, &numberOfForecastsInEnsemble);
+	      if ( r1 == 0 && r2 == 0 )
+		fprintf(stdout, "%2d/%-2d ", perturbationNumber, numberOfForecastsInEnsemble);
 	      else
 		fprintf(stdout, "--/-- ");
 	    }

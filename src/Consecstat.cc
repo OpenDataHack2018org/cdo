@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ static void selEndOfPeriod(field_type *periods, field_type history, field_type c
   {
     if ( current.nmiss > 0 || history.nmiss > 0 )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
@@ -80,7 +80,7 @@ static void selEndOfPeriod(field_type *periods, field_type history, field_type c
     }
     else
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
@@ -91,7 +91,7 @@ static void selEndOfPeriod(field_type *periods, field_type history, field_type c
   {
     if ( current.nmiss > 0 )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
@@ -106,7 +106,7 @@ static void selEndOfPeriod(field_type *periods, field_type history, field_type c
     }
     else
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
@@ -216,7 +216,7 @@ void *Consecstat(void *argument)
             pstreamDefRecord(ostreamID, varID, levelID);
             pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, periods[varID][levelID].nmiss);
           }
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared) schedule(static)
           for ( size_t i = 0; i < gridInqSize(vars[varID][levelID].grid); i++ )
             hist[varID][levelID].ptr[i] = vars[varID][levelID].ptr[i];

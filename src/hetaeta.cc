@@ -4,7 +4,7 @@
 #define  OPOINT 34179
 */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #  include <omp.h>
 #endif
 
@@ -598,7 +598,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   epsm1i = 1.0/epsilon-1.0;
 
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) firstprivate(lpsmod)  private(vars_pbl)  schedule(dynamic,1) \
   shared(ngp, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, \
 	 fi2, pf2, rh_pbl, zt2, zq2, theta_pbl, rh2, wgt, idx, vars_pbl_2, \

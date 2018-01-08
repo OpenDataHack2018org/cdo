@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -300,12 +300,12 @@ void after_legini_full(int ntr, int nlat, double *restrict poli, double *restric
   double *ztemp2 = (double*) Malloc((waves<<1) * sizeof(double));
 #endif
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared) private(jm, jn, jsp, gmusq)
 #endif
   for ( jgl = 0; jgl < nlat; jgl++ )
     {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       double *pnm    = (double*) Malloc(dimsp * sizeof(double));
       double *hnm    = (double*) Malloc(dimsp * sizeof(double));
       double *ztemp1 = (double*) Malloc((waves<<1) * sizeof(double));
@@ -337,7 +337,7 @@ void after_legini_full(int ntr, int nlat, double *restrict poli, double *restric
 	    jsp += nlat;
 	  }
       
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       Free(ztemp2);
       Free(ztemp1);
       Free(pnm);
@@ -387,7 +387,7 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
 	  for ( int jn = 0; jn < waves - jm; jn++ )
@@ -443,7 +443,7 @@ void sp2fctest(const double *sa, double *fa, const double *poli, long nlev, long
 #if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
 	      for ( long latn = 0; latn < nlat/2; latn++ )
@@ -466,7 +466,7 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 {
   long nsp2 = (nt+1)*(nt+2);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
   for ( long lev = 0; lev < nlev; lev++ )
@@ -488,7 +488,7 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 	      far = fal;
 	      fai = fal + nlat;
               /* unaligned loop start
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
               */
@@ -509,7 +509,7 @@ void fc2sp(double *fa, double *sa, double *poli, int nlev, int nlat, int nfc, in
 {
   int nsp2 = (nt+1)*(nt+2);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
   for ( int lev = 0; lev < nlev; lev++ )
@@ -531,7 +531,7 @@ void fc2sp(double *fa, double *sa, double *poli, int nlev, int nlat, int nfc, in
 	      fai = fal + nlat;
 	      sar = 0.0;
 	      sai = 0.0;
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd reduction(+:sar) reduction(+:sai)
 #endif
 	      for ( lat = 0; lat < nlat; lat++ )

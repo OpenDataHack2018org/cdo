@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -279,13 +279,14 @@ void *Importbinary(void *argument)
 
       vlistDefVarName(vlistID, varID, pvar->abbrv);
       {
-	size_t len = strlen(pvar->varnm);
 	char *longname = pvar->varnm;
+	size_t len = strlen(longname);
 	if ( longname[0] == '\'' && longname[len-1] == '\'' )
 	  {
 	    longname[len-1] = 0;
 	    longname++;
 	  }
+        if ( longname[0] == '\t' ) longname++;
 	vlistDefVarLongname(vlistID, varID, longname);
       }
 

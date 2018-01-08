@@ -4,7 +4,7 @@
 /* HEADER FOR PARALLEL EIGEN SOLUTION */
 /*  -->SEE END OF ROUTINE             */
 /* ********************************** */
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -1294,7 +1294,7 @@ void annihilate_1side(double **M, long i, long j, long n)
   double *restrict Mi = M[i];
   double *restrict Mj = M[j];
 
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
   for ( r = 0; r < n; r++ )
@@ -1309,7 +1309,7 @@ void annihilate_1side(double **M, long i, long j, long n)
   double tmp = fabs(gamma/sqrt(alpha*beta));
 
   if ( tmp < fnorm_precision ) {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp atomic
 #endif
     n_finished++;
@@ -1398,7 +1398,7 @@ int jacobi_1side(double **M, double *A, long n)
     n_finished = 0;
     if ( n%2 == 1 ) {
       for ( m = 0; m < n; m++ ) {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for private(idx,i_ann,j_ann) shared(M,annihilations,n,n_finished)
 #endif
         for ( i = 0; i < n/2; i++) {
@@ -1412,7 +1412,7 @@ int jacobi_1side(double **M, double *A, long n)
     }
     else { // n%2 == 0                                                                               
       for( m = 0; m < n; m++) {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for private(idx,i_ann,j_ann) shared(M,annihilations,n,n_finished)
 #endif
         for( i = 0; i < n/2-(m%2); i++) {
