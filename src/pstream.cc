@@ -307,29 +307,7 @@ static int pstreamFindID(const char *p_name)
     }
     return -1;
 }
-/*
-static int
-pstreamFindID(const char *name)
-{
-  pstream_t *pstreamptr;
-  int pstreamID;
 
-  for (pstreamID = 0; pstreamID < _pstream_max; ++pstreamID)
-    {
-      pstreamptr = pstream_to_pointer(pstreamID);
-
-      if (pstreamptr)
-        if (pstreamptr->m_name)
-          if (strcmp(pstreamptr->m_name, m_name) == 0)
-            break;
-    }
-
-  if (pstreamID == _pstream_max)
-    pstreamID = -1;
-
-  return pstreamID;
-}
-*/
 bool
 pstream_t::isPipe()
 {
