@@ -236,8 +236,8 @@ void *Diff(void *argument)
   if ( nrecs > 0 && nrecs2 == 0 )
     cdoWarning("stream1 has more time steps than stream2!");
 
-  //pstreamClose(streamID1);
-  //pstreamClose(streamID2);
+  pstreamClose(streamID1);
+  pstreamClose(streamID2);
 
   if ( array1 ) Free(array1);
   if ( array2 ) Free(array2);
