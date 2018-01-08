@@ -1803,29 +1803,6 @@ pstreamCloseAll()
     }
   _pstream_map.clear();
 }
-/*
-void
-pstreamCloseAll(void)
-{
-  if (_pstreamList == NULL)
-    return;
-
-  for (int i = 0; i < _pstream_max; i++)
-    {
-      pstream_t *pstreamptr = _pstreamList[i].ptr;
-      if (pstreamptr && pstreamptr->isopen)
-        {
-          if (!pstreamptr->ispipe && pstreamptr->m_fileID != CDI_UNDEFID)
-            {
-              if (CdoDebug::PSTREAM)
-                Message("Close file %s id %d", pstreamptr->m_name.c_str(), pstreamptr->m_fileID);
-              streamClose(pstreamptr->m_fileID);
-            }
-        }
-    }
-}
-*/
-
 
 int
 pstreamInqFiletype(int pstreamID)
