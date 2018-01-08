@@ -291,34 +291,7 @@ pstream_delete_entry(pstream_t *pstreamptr)
   if (CdoDebug::PSTREAM)
     MESSAGE("Removed idx ", idx," from pstream list");
 }
-/*
-static void
-pstream_initialize(void)
-{
-#ifdef  HAVE_LIBPTHREAD
-  // initialize global API mutex lock 
-  pthread_mutex_init(&_pstream_mutex, NULL);
-#endif
 
-  char *env = getenv("PSTREAM_DEBUG");
-  if (env)
-    CdoDebug::PSTREAM = atoi(env);
-
-  env = getenv("PSTREAM_MAX");
-  if (env)
-    _pstream_max = atoi(env);
-
-  if (CdoDebug::PSTREAM)
-    Message("PSTREAM_MAX = %d", _pstream_max);
-
-  pstream_list_new();
-  atexit(pstream_list_delete);
-
-  pstream_init_pointer();
-
-  _pstream_init = true;
-}
-*/
 static int pstreamFindID(const char *p_name)
 {
     std::string cur_name;
