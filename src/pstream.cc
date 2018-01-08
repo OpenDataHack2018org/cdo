@@ -506,8 +506,6 @@ void pstream_t::createFilelist(const char * p_args)
 void
 pstream_t::pstreamOpenReadFile(const char* p_args)
 {
-  //createFilelist(p_args); experimental function (comment from 2.1.2018)
-
   std::string filename; 
 
   if (mfiles)
