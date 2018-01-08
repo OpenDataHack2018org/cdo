@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ int pclose(FILE *stream);
 
 //static bool _pstream_init = false;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 #include <pthread.h>
 #include "pthread_debug.h"
 
@@ -265,7 +265,7 @@ void pstream_t::init()
   nfiles = 0;
   varID = -1;
   m_varlist = NULL;
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   argument = NULL;
   pipe = NULL;
 //  pstreamptr->rthreadID  = 0;
@@ -295,7 +295,7 @@ pstream_delete_entry(pstream_t *pstreamptr)
 static void
 pstream_initialize(void)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   // initialize global API mutex lock 
   pthread_mutex_init(&_pstream_mutex, NULL);
 #endif
@@ -409,7 +409,7 @@ pCreateReadThread(argument_t *argument)
 void
 pstream_t::pstreamOpenReadPipe(const char *pipename)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   // int pstreamID = pstreamptr->self;
 
   ispipe = true;
@@ -572,7 +572,7 @@ pstream_t::pstreamOpenReadFile(const char* p_args)
   if (CdoDebug::PSTREAM)
     MESSAGE("Opening (r) file: ", filename.c_str());
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_lock(&streamMutex);
   else
@@ -592,7 +592,7 @@ pstream_t::pstreamOpenReadFile(const char* p_args)
     cdoDefaultInstID = streamInqInstID(fileID);
   */
   cdoInqHistory(fileID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_unlock(&streamMutex);
   else
@@ -719,7 +719,7 @@ query_user_exit(const char *argument)
 int
 pstream_t::pstreamOpenWritePipe(const char* pipename, int filetype)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (CdoDebug::PSTREAM)
     {
       MESSAGE("pipe ",pipename);
@@ -794,7 +794,7 @@ pstream_t::pstreamOpenWriteFile(const char* p_filename, int filetype)
   if (processNums() == 1 && ompNumThreads == 1)
     timer_start(timer_write);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_lock(&streamMutex);
   else
@@ -803,7 +803,7 @@ pstream_t::pstreamOpenWriteFile(const char* p_filename, int filetype)
 
   int fileID = streamOpenWrite(p_filename, filetype);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_unlock(&streamMutex);
   else
@@ -897,7 +897,7 @@ pstream_t::openAppend(const char *p_filename)
     {
       timer_start(timer_write);
     }
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     {
       pthread_mutex_lock(&streamMutex);
@@ -910,7 +910,7 @@ pstream_t::openAppend(const char *p_filename)
 
   int fileID = streamOpenAppend(p_filename);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     {
       pthread_mutex_unlock(&streamMutex);
@@ -1014,7 +1014,7 @@ pstreamClose(int pstreamID)
 void pstream_t::close(){
   if (ispipe)
     {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       pthread_t threadID = pthread_self();
 
       if(CdoDebug::PSTREAM)
@@ -1041,12 +1041,12 @@ void pstream_t::close(){
           processAddNvals(streamNvals(m_fileID));
         }
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamClose(m_fileID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1084,7 +1084,7 @@ pstream_t::inqVlist()
 {
   int vlistID = -1;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   // read from pipe
   if (ispipe)
     {
@@ -1098,7 +1098,7 @@ pstream_t::inqVlist()
     {
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_read);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
@@ -1107,7 +1107,7 @@ pstream_t::inqVlist()
         cdoAbort("Couldn't read data from input fileID %d!", m_fileID);
     }
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1207,7 +1207,7 @@ pstreamDefVlist(int pstreamID, int vlistID)
 }
 
 void pstream_t::defVlist(int p_vlistID){
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (ispipe)
     {
       if (CdoDebug::PSTREAM)
@@ -1253,7 +1253,7 @@ void pstream_t::defVlist(int p_vlistID){
       if (CDO_Version_Info)
         cdiDefAttTxt(p_vlistID, CDI_GLOBAL, "CDO", (int) strlen(cdoComment()), cdoComment());
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       if (ompNumThreads > 1)
         cdiDefAttInt(p_vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", CDI_DATATYPE_INT32, 1, &ompNumThreads);
 #endif
@@ -1261,12 +1261,12 @@ void pstream_t::defVlist(int p_vlistID){
 
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_write);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamDefVlist(m_fileID, p_vlistID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1282,7 +1282,7 @@ pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
     {
       if (CdoDebug::PSTREAM)
@@ -1297,12 +1297,12 @@ pstreamInqRecord(int pstreamID, int *varID, int *levelID)
     {
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_read);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamInqRecord(pstreamptr->m_fileID, varID, levelID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1322,7 +1322,7 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
 
   pstreamptr->varID = varID;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
     {
 
@@ -1337,12 +1337,12 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
     {
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_write);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamDefRecord(pstreamptr->m_fileID, varID, levelID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1359,7 +1359,7 @@ pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
     {
       if (CdoDebug::PSTREAM)
@@ -1373,12 +1373,12 @@ pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
     {
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_read);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamReadRecord(pstreamptr->m_fileID, data, nmiss);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1395,7 +1395,7 @@ pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
     {
       cdoAbort("pipeReadRecord not implemented for memtype float!");
@@ -1406,12 +1406,12 @@ pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
     {
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_read);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamReadRecordF(pstreamptr->m_fileID, data, nmiss);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1504,7 +1504,7 @@ pstreamWriteRecord(int pstreamID, double *data, size_t nmiss)
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
     {
       if (CdoDebug::PSTREAM)
@@ -1524,12 +1524,12 @@ pstreamWriteRecord(int pstreamID, double *data, size_t nmiss)
         if (pstreamptr->m_varlist[varID].check_datarange)
           pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamWriteRecord(pstreamptr->m_fileID, data, nmiss);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1547,7 +1547,7 @@ pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss)
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
     {
       cdoAbort("pipeWriteRecord not implemented for memtype float!");
@@ -1568,12 +1568,12 @@ if ( pstreamptr->m_varlist )
   if ( pstreamptr->m_varlist[varID].check_datarange )
     pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
 */
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamWriteRecordF(pstreamptr->m_fileID, data, nmiss);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1589,7 +1589,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
 
   int nrecs = 0;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
     {
       if (CdoDebug::PSTREAM)
@@ -1606,12 +1606,12 @@ pstreamInqTimestep(int pstreamID, int tsID)
 
       if (processNums() == 1 && ompNumThreads == 1)
         timer_start(timer_read);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       nrecs = streamInqTimestep(pstreamptr->m_fileID, tsID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1633,7 +1633,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
           filename = pstreamptr->m_mfnames[nfile];
           pstreamptr->nfiles++;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
           if (cdoLockIO)
             pthread_mutex_lock(&streamMutex);
           else
@@ -1651,7 +1651,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
 
           vlistCompare(vlistIDold, vlistIDnew, CMP_HRD);
           vlistDestroy(vlistIDold);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
           if (cdoLockIO)
             pthread_mutex_unlock(&streamMutex);
           else
@@ -1665,12 +1665,12 @@ pstreamInqTimestep(int pstreamID, int tsID)
 
           if (processNums() == 1 && ompNumThreads == 1)
             timer_start(timer_read);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
           if (cdoLockIO)
             pthread_mutex_lock(&streamMutex);
 #endif
           nrecs = streamInqTimestep(pstreamptr->m_fileID, 0);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
           if (cdoLockIO)
             pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1701,7 +1701,7 @@ pstreamDefTimestep(int pstreamID, int tsID)
 void
 pstream_t::defTimestep(int p_tsID)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (ispipe)
     {
       if (CdoDebug::PSTREAM)
@@ -1725,12 +1725,12 @@ pstream_t::defTimestep(int p_tsID)
         timer_start(timer_write);
 /* don't use sync -> very slow on GPFS */
 //  if ( p_tsID > 0 ) streamSync(fileID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamDefTimestep(m_fileID, p_tsID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1751,12 +1751,12 @@ pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
   if (pstreamptr_dest->ispipe || pstreamptr_src->ispipe)
     cdoAbort("This operator can't be combined with other operators!");
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_lock(&streamMutex);
 #endif
   streamCopyRecord(pstreamptr_dest->m_fileID, pstreamptr_src->m_fileID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_unlock(&streamMutex);
 #endif
@@ -1802,7 +1802,7 @@ cdoInitialize(void *argument)
   process->setStreams(argu->argc, argu->argv);
 
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (CdoDebug::PSTREAM)
     MESSAGE("process ", processSelf().m_ID," thread ", pthread_self());
 #endif
@@ -1860,7 +1860,7 @@ pstream_t::inqFileType()
 {
   int filetype;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (ispipe)
     {
       filetype = m_filetype;
@@ -1880,7 +1880,7 @@ pstreamInqByteorder(int pstreamID)
 
   int byteorder;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
     byteorder = pstreamptr->m_filetype;
   else
@@ -1909,13 +1909,13 @@ pstreamFileID(int pstreamID)
 void
 cdoVlistCopyFlag(int vlistID2, int vlistID1)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_lock(&streamMutex);
 #endif
 
   vlistCopyFlag(vlistID2, vlistID1);
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_unlock(&streamMutex);
 #endif
 }
@@ -1923,7 +1923,7 @@ cdoVlistCopyFlag(int vlistID2, int vlistID1)
 void
 openLock(void)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_lock(&streamMutex);
   else
@@ -1934,7 +1934,7 @@ openLock(void)
 void
 openUnlock(void)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_unlock(&streamMutex);
   else

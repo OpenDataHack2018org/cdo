@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,12 +15,12 @@
   GNU General Public License for more details.
 */
 
-#ifndef _UTIL_H
-#define _UTIL_H
+#ifndef  UTIL_H
+#define  UTIL_H
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "percentiles.h"
+#include <string>
 
 /* dummy use of unused parameters to silence compiler warnings */
 #define  UNUSED(x) (void)x
@@ -44,7 +44,6 @@
 #define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && processSelf().inputStreams[0]->ispipe == false && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
-#include <string>
 extern const char *CDO_progname;
 extern const char *CDO_version;
 extern const char *CDO_username;
@@ -78,7 +77,6 @@ extern int cdoDefaultByteorder;
 extern int cdoDefaultTableID;
 extern int cdoDefaultInstID;
 extern int cdoDefaultTimeType;
-extern int cdoLogOff;
 
 extern int cdoLockIO;
 extern int cdoCheckDatarange;
@@ -221,4 +219,4 @@ int wildcardmatch(const char *w, const char *s);
 
 void cdo_check_round(void);
 
-#endif  /* _UTIL_H */
+#endif  /* UTIL_H */

@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
@@ -1026,9 +1026,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] > ZERO )
       {
 	src_cell_add = n;
-#ifndef SX
 	break;
-#endif
       }
 
   tgt_cell_add = tgt_grid_size;
@@ -1037,9 +1035,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] > ZERO )
       {
 	tgt_cell_add = n;
-#ifndef SX
 	break;
-#endif
       }
 
   if ( src_cell_add != src_grid_size )
@@ -1081,9 +1077,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] < ZERO )
       {
 	src_cell_add = n;
-#ifndef SX
 	break;
-#endif
       }
 
   tgt_cell_add = tgt_grid_size;
@@ -1092,9 +1086,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] < ZERO )
       {
 	tgt_cell_add = n;
-#ifndef SX
 	break;
-#endif
       }
 
   if ( src_cell_add != src_grid_size )
@@ -1123,7 +1115,7 @@ void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
     }
 }
 
-static
+static inline
 void norm_weight(double norm_factor, double *weights, double src_centroid_lat, double src_centroid_lon)
 {
   double weight0 = weights[0];
@@ -1143,12 +1135,9 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
   double *weights = rv->wts;
   double norm_factor = 0;  /* factor for normalizing wts */
 
-  if ( rv->norm_opt == NORM_OPT_DESTAREA )
+  if ( rv->normOpt == NormOpt::DESTAREA )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)		\
   private(src_cell_add, tgt_cell_add, norm_factor)
@@ -1156,21 +1145,13 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
       for ( long n = 0; n < num_links; ++n )
 	{
 	  src_cell_add = rv->src_cell_add[n]; tgt_cell_add = rv->tgt_cell_add[n];
-
-          if ( IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) )
-	    norm_factor = ONE/tgt_grid->cell_area[tgt_cell_add];
-          else
-            norm_factor = ZERO;
-
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? ONE/tgt_grid->cell_area[tgt_cell_add] : ZERO;
 	  norm_weight(norm_factor, &weights[n*3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
 	}
     }
-  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
+  else if ( rv->normOpt == NormOpt::FRACAREA )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)		\
   private(src_cell_add, tgt_cell_add, norm_factor)
@@ -1178,31 +1159,21 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
       for ( long n = 0; n < num_links; ++n )
 	{
 	  src_cell_add = rv->src_cell_add[n]; tgt_cell_add = rv->tgt_cell_add[n];
-
-          if ( IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) )
-	    norm_factor = ONE/tgt_grid->cell_frac[tgt_cell_add];
-          else
-            norm_factor = ZERO;
-
+          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? ONE/tgt_grid->cell_frac[tgt_cell_add] : ZERO;
 	  norm_weight(norm_factor, &weights[n*3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
 	}
     }
-  else if ( rv->norm_opt == NORM_OPT_NONE )
+  else if ( rv->normOpt == NormOpt::NONE )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)	\
   private(src_cell_add, norm_factor)
 #endif
       for ( long n = 0; n < num_links; ++n )
 	{
-	  src_cell_add = rv->src_cell_add[n];;
-
+	  src_cell_add = rv->src_cell_add[n];
           norm_factor = ONE;
-
 	  norm_weight(norm_factor, &weights[n*3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
 	}
     }
@@ -1272,18 +1243,12 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       link_add2[0] = (long*) Malloc(tgt_grid_size*sizeof(long));
       link_add2[1] = (long*) Malloc(tgt_grid_size*sizeof(long));
 
-#if defined(SX)
-#pragma vdir nodep
-#endif
       for ( long n = 0; n < src_grid_size; ++n )
 	{
 	  link_add1[0][n] = -1;
 	  link_add1[1][n] = -1;
 	}
 
-#if defined(SX)
-#pragma vdir nodep
-#endif
       for ( long n = 0; n < tgt_grid_size; ++n )
 	{
 	  link_add2[0][n] = -1;
@@ -1330,20 +1295,17 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( cdoTimer ) timer_start(timer_remap_con_l1);
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex) \
   shared(nbins, num_wts, src_centroid_lon, src_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat, srch_corner_lon, max_srch_cells, 		\
-	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add, findex)
+	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for ( long src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add )
     {
       int ompthID = cdo_omp_get_thread_num();
 
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( ompthID == 0 ) progressStatus(0, 0.5, findex/src_grid_size);
 
@@ -1481,7 +1443,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      if ( tgt_cell_add != -1 )
 		if ( src_grid->mask[src_cell_add] )
 		  {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp critical
 #endif
 		    {
@@ -1537,20 +1499,17 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   findex = 0;
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for default(none)  reduction(+:findex) \
   shared(nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat, srch_corner_lon, max_srch_cells, 		\
-	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add, findex)
+	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       int ompthID = cdo_omp_get_thread_num();
 
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( ompthID == 0 ) progressStatus(0.5, 0.5, findex/tgt_grid_size);
 
@@ -1690,7 +1649,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      if ( ! lcoinc && src_cell_add != -1 )
 		if ( src_grid->mask[src_cell_add] )
 		  {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp critical
 #endif
 		    {
@@ -1842,7 +1801,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	  tgt_centroid_lon[n] = 0;
 	}
 
-      remapCheckWeights(num_links, 3, rv->norm_opt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
+      remapCheckWeights(num_links, 3, rv->normOpt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
 
       for ( long n = 0; n < num_links; ++n )
 	{
@@ -1854,11 +1813,11 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       double norm_factor = 0;    // factor for normalizing wts
       for ( long n = 0; n < tgt_grid_size; ++n )
 	{
-	  if ( rv->norm_opt == NORM_OPT_DESTAREA )
+	  if ( rv->normOpt == NormOpt::DESTAREA )
 	    norm_factor = tgt_grid->cell_frac[n];
-	  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
+	  else if ( rv->normOpt == NormOpt::FRACAREA )
 	    norm_factor = ONE;
-	  else if ( rv->norm_opt == NORM_OPT_NONE )
+	  else if ( rv->normOpt == NormOpt::NONE )
 	    norm_factor = tgt_grid->cell_area[n];
 	    
 	  if ( tgt_centroid_lat[n] > 0 && fabs(tgt_centroid_lat[n] - norm_factor) > .01 )

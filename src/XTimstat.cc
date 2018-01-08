@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -358,7 +358,7 @@ void *XTimstat(void *argument)
 
           if ( nsets == 0 )
             {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(maxrecs, recinfo, input_vars, vars1, samp1) if(maxrecs>1)
 #endif
               for ( int recID = 0; recID < maxrecs; recID++ )
@@ -387,7 +387,7 @@ void *XTimstat(void *argument)
             }
           else
             {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, operfunc) if(maxrecs>1)
 #endif
               for ( int recID = 0; recID < maxrecs; recID++ )
@@ -452,7 +452,7 @@ void *XTimstat(void *argument)
 
       if ( lmean )
         {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(vlistID1, nsets, maxrecs, recinfo, vars1, samp1) if(maxrecs>1)
 #endif
           for ( int recID = 0; recID < maxrecs; recID++ )

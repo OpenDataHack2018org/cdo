@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -49,7 +49,7 @@
 #include <iostream>
 #include <string>
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -99,7 +99,7 @@ process_t::setOperatorArgv(const char *operatorArguments)
 void
 process_t::initProcess()
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   threadID = pthread_self();
   l_threadID = 1;
 #endif
@@ -136,7 +136,7 @@ process_t::getOutStreamCnt()
 process_t *
 processCreate(const char *command)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 #endif
 
@@ -155,7 +155,7 @@ processCreate(const char *command)
     MESSAGE("NumProcessActive: ", NumProcessActive);
   }
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
 #endif
 
@@ -168,7 +168,7 @@ processCreate(const char *command)
 process_t &
 processSelf(void)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_t thID = pthread_self();
 
   pthread_mutex_lock(&processMutex);
@@ -192,13 +192,13 @@ processSelf(void)
 int
 processNums(void)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 #endif
 
   int pnums = Process.size();
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
 #endif
 
@@ -208,13 +208,13 @@ processNums(void)
 int
 processNumsActive(void)
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 #endif
 
   int pnums = NumProcessActive;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
 #endif
 
@@ -1036,14 +1036,14 @@ processSetInactive(void)
   process_t &process = processSelf();
 
 // fprintf(stderr, "delete processID %d\n", processID);
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 
   process.l_threadID = 0;
 #endif
   NumProcessActive--;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
 #endif
 }
@@ -1230,7 +1230,7 @@ cdoStreamNumber()
 void
 process_t::print_process()
 {
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   std::cout << " processID       : " << m_ID << std::endl;
   std::cout << " threadID        : " << threadID << std::endl;
   std::cout << " l_threadID      : " << l_threadID << std::endl;
@@ -1354,7 +1354,7 @@ void cdoFinish(void)
   double c_cputime = 0, c_usertime = 0, c_systime = 0;
   double p_cputime = 0, p_usertime = 0, p_systime = 0;
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   if (CdoDebug::PROCESS)
     MESSAGE("process ",processID," thread ", pthread_self());
 #endif
@@ -1412,8 +1412,8 @@ void cdoFinish(void)
   c_systime = e_stime - s_stime;
   c_cputime = c_usertime + c_systime;
 
-#if defined(HAVE_LIBPTHREAD)
-  if (pthreadScope == PTHREAD_SCOPE_PROCESS)
+#ifdef  HAVE_LIBPTHREAD
+  if (getPthreadScope() == PTHREAD_SCOPE_PROCESS)
     {
       c_usertime /= processNums();
       c_systime /= processNums();
@@ -1439,22 +1439,15 @@ void cdoFinish(void)
 
       processEndTime(&p_usertime, &p_systime);
       p_cputime = p_usertime + p_systime;
-
-      if (cdoLogOff == 0)
-        {
-          cdologs(processNums());
-          cdologo(processNums());
-          cdolog(processInqPrompt(), p_cputime);
-        }
     }
 
 #if defined(HAVE_SYS_TIMES_H)
   if (cdoBenchmark)
-    fprintf(stderr, " ( %.2fs %.2fs %.2fs%s )\n", c_usertime, c_systime, c_cputime, memstring);
+    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", c_usertime, c_systime, c_cputime, memstring);
   else
     {
       if (!cdoSilentMode)
-        fprintf(stderr, " ( %.2fs%s )\n", c_cputime, memstring);
+        fprintf(stderr, " [%.2fs%s]\n", c_cputime, memstring);
     }
   if (cdoBenchmark && processID == 0)
     fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_usertime, p_systime, p_cputime, memstring);

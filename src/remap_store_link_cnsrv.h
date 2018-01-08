@@ -1,9 +1,9 @@
-#ifndef _REMAP_STORE_LINK_CNSRV_H
-#define _REMAP_STORE_LINK_CNSRV_H
+#ifndef  REMAP_STORE_LINK_CNSRV_H
+#define  REMAP_STORE_LINK_CNSRV_H
 
 extern int  remap_store_link_fast;
 
-/* used for store_link_fast */
+// used for store_link_fast
 
 #define BLK_SIZE 4096
 #define BLK_NUM(x) (x/grid_store->blk_size)
@@ -32,4 +32,4 @@ void grid_store_delete(grid_store_t *grid_store);
 void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, double *weights, grid_store_t *grid_store);
 void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict weights, long *link_add1[2], long *link_add2[2]);
 
-#endif  /* _REMAP_STORE_LINK_CNSRV */
+#endif  /* REMAP_STORE_LINK_CNSRV */

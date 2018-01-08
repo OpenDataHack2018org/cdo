@@ -80,7 +80,7 @@ void genind(int *nx, const double *restrict plev, const double *restrict fullp, 
 {
   memset(nx, 0, ngp*nplev*sizeof(int));
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nx,plev,fullp,ngp,nplev,nhlev)
 #endif
   for ( long lp = 0; lp < nplev; lp++ )
@@ -102,7 +102,7 @@ void genind(int *nx, const double *restrict plev, const double *restrict fullp, 
 
 void genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog, size_t *restrict pnmiss)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nx,plev,ngp,nplev,ps_prog,pnmiss)
 #endif
   for ( long lp = 0; lp < nplev; lp++ )
@@ -248,7 +248,7 @@ double extra_Z(double pres, double halfp, double fullp, double geop, double temp
 void interp_X(const double *restrict gt, double *pt, const double *restrict hyb_press, const int *nx,
 	      const double *restrict plev, long nplev, long ngp, long nhlev, double missval)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gt,pt,hyb_press,nx,plev,nplev,ngp,nhlev,missval)
 #endif
   for ( long lp = 0; lp < nplev; lp++ )
@@ -279,7 +279,7 @@ void interp_T(const double *restrict geop, const double *restrict gt, double *pt
 	      const double *restrict halfp, const int *nx, const double *restrict plev, long nplev, long ngp,
 	      long nhlev, double missval)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(geop,gt,pt,fullp,halfp,nx,plev,nplev,ngp,nhlev,missval,Mars)
 #endif
   for ( long lp = 0; lp < nplev; lp++ )
@@ -333,7 +333,7 @@ void interp_Z(const double *restrict geop, const double *restrict gz, double *pz
   assert(fullp != NULL);
   assert(halfp != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(geop,gz,pz,fullp,halfp,nx,gt,plev,nplev,ngp,nhlev,missval,Mars)
 #endif
   for ( long lp = 0; lp < nplev; lp++ )

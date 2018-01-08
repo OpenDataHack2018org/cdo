@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -46,7 +46,7 @@ typedef struct {
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-double smooth_knn_compute_weights(size_t num_neighbors, const bool *restrict src_grid_mask, struct gsknn *knn, double search_radius, double weight0, double weightR)
+double smooth_knn_compute_weights(size_t numNeighbors, const bool *restrict src_grid_mask, struct gsknn *knn, double search_radius, double weight0, double weightR)
 {
   bool *restrict nbr_mask = knn->mask;
   const size_t *restrict nbr_add = knn->add;
@@ -55,7 +55,7 @@ double smooth_knn_compute_weights(size_t num_neighbors, const bool *restrict src
   // Compute weights based on inverse distance if mask is false, eliminate those points
   double dist_tot = 0.; // sum of neighbor distances (for normalizing)
 
-  for ( size_t n = 0; n < num_neighbors; ++n )
+  for ( size_t n = 0; n < numNeighbors; ++n )
     {
       nbr_mask[n] = false;
       if ( nbr_add[n] < SIZE_MAX && src_grid_mask[nbr_add[n]] )
@@ -70,7 +70,7 @@ double smooth_knn_compute_weights(size_t num_neighbors, const bool *restrict src
 }
 
 
-size_t smooth_knn_normalize_weights(size_t num_neighbors, double dist_tot, struct gsknn *knn)
+size_t smooth_knn_normalize_weights(size_t numNeighbors, double dist_tot, struct gsknn *knn)
 {
   const bool *restrict nbr_mask = knn->mask;
   size_t *restrict nbr_add = knn->add;
@@ -79,7 +79,7 @@ size_t smooth_knn_normalize_weights(size_t num_neighbors, double dist_tot, struc
   // Normalize weights and store the link
   size_t nadds = 0;
 
-  for ( size_t n = 0; n < num_neighbors; ++n )
+  for ( size_t n = 0; n < numNeighbors; ++n )
     {
       if ( nbr_mask[n] )
         {
@@ -95,11 +95,10 @@ size_t smooth_knn_normalize_weights(size_t num_neighbors, double dist_tot, struc
 static
 void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss, smoothpoint_t spoint)
 {
-  *nmiss = 0;
   int gridID0 = gridID;
   size_t gridsize = gridInqSize(gridID);
-  size_t num_neighbors = spoint.maxpoints;
-  if ( num_neighbors > gridsize ) num_neighbors = gridsize;
+  size_t numNeighbors = spoint.maxpoints;
+  if ( numNeighbors > gridsize ) numNeighbors = gridsize;
 
   bool *mask = (bool*) Malloc(gridsize*sizeof(bool));
   for ( size_t i = 0; i < gridsize; ++i )
@@ -125,20 +124,15 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
   
   struct gsknn **knn = (struct gsknn**) Malloc(ompNumThreads*sizeof(struct gsknn*));
   for ( int i = 0; i < ompNumThreads; i++ )
-    knn[i] = gridsearch_knn_new(num_neighbors);
+    knn[i] = gridsearch_knn_new(numNeighbors);
 
   clock_t start, finish;
 
   start = clock();
 
-  struct gridsearch *gs = NULL;
-
   bool xIsCyclic = false;
   size_t dims[2] = {gridsize, 0};
-  if ( num_neighbors == 1 )
-    gs = gridsearch_create_nn(xIsCyclic, dims, gridsize, xvals, yvals);
-  else
-    gs = gridsearch_create(xIsCyclic, dims, gridsize, xvals, yvals);
+  struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, gridsize, xvals, yvals);
 
   gs->search_radius = spoint.radius;
 
@@ -150,18 +144,17 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
   start = clock();
 
+  size_t nmissx = 0;
   double findex = 0;
 
-#if defined(_OPENMP)
-#pragma omp parallel for schedule(dynamic) default(none) shared(cdoVerbose, knn, spoint, findex, mask, array1, array2, xvals, yvals, gs, gridsize, nmiss, missval)
+#ifdef  HAVE_OPENMP4
+#pragma omp parallel for schedule(dynamic) default(none)  reduction(+:findex)  reduction(+:nmissx) \
+  shared(cdoVerbose, knn, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
 #endif
   for ( size_t i = 0; i < gridsize; ++i )
     {
       int ompthID = cdo_omp_get_thread_num();
       
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
       findex++;
       if ( cdoVerbose && cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
      
@@ -187,13 +180,12 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
         }
       else
         {
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
-          (*nmiss)++;
+          nmissx++;
           array2[i] = missval;
         }
     }
+
+  *nmiss = nmissx;
 
   finish = clock();
 

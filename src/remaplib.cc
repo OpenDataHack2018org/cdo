@@ -45,7 +45,7 @@
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
  */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
@@ -182,7 +182,7 @@ void remapgrid_init(remapgrid_t *grid)
 
 /*****************************************************************************/
 
-void remapgrid_alloc(int map_type, remapgrid_t *grid)
+void remapgrid_alloc(RemapType mapType, remapgrid_t *grid)
 {
   if ( grid->nvgp )
     grid->vgpm   = (int*) Malloc(grid->nvgp*sizeof(int));
@@ -195,7 +195,7 @@ void remapgrid_alloc(int map_type, remapgrid_t *grid)
       grid->cell_center_lat = (double*) Malloc(grid->size*sizeof(double));
     }
 
-  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
+  if ( mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC )
     {
       grid->cell_area = (double*) Malloc(grid->size*sizeof(double));
       memset(grid->cell_area, 0, grid->size*sizeof(double));
@@ -224,7 +224,7 @@ static
 void boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon,
 			   const double *restrict corner_lat, restr_t *restrict bound_box)
 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(bound_box, corner_lat, corner_lon, nc, size)
 #endif
   for ( size_t i = 0; i < size; ++i )
@@ -257,7 +257,7 @@ void boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, c
   size_t n_add, e_add, ne_add;
   restr_t tmp_lats[4], tmp_lons[4];  /* temps for computing bounding boxes */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)        \
   shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box)	\
   private(n4, i, j, k, ip1, jp1, n_add, e_add, ne_add, tmp_lats, tmp_lons)
@@ -342,7 +342,7 @@ void check_lon_range(size_t nlons, double *lons)
 {
   assert(lons != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nlons, lons)
 #endif
   for ( size_t n = 0; n < nlons; ++n )
@@ -361,7 +361,7 @@ void check_lat_range(size_t nlats, double *lats)
 {
   assert(lats != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nlats, lats)
 #endif
   for ( size_t n = 0; n < nlats; ++n )
@@ -378,7 +378,7 @@ void check_lon_boundbox_range(size_t nlons, restr_t *bound_box)
 
   assert(bound_box != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nlons, bound_box) private(n4)
 #endif
   for ( size_t n = 0; n < nlons; ++n )
@@ -399,7 +399,7 @@ void check_lat_boundbox_range(size_t nlats, restr_t *restrict bound_box, double 
 
   assert(bound_box != NULL);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n4)
 #endif
   for ( size_t n = 0; n < nlats; ++n )
@@ -516,7 +516,7 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 }
 
 static
-void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *txt)
+void remap_define_grid(RemapType mapType, int gridID, remapgrid_t *grid, const char *txt)
 {
   bool lgrid_destroy = false;
   bool lgrid_gen_bounds = false;
@@ -556,11 +556,11 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 
   grid->num_cell_corners = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? gridInqNvertex(gridID) : 4;
 
-  remapgrid_alloc(map_type, grid);
+  remapgrid_alloc(mapType, grid);
 
   /* Initialize logical mask */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize, grid)
 #endif
   for ( size_t i = 0; i < gridsize; ++i ) grid->mask[i] = TRUE;
@@ -691,7 +691,7 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 }
 
 
-void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid)
+void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid)
 {
   int reg2d_src_gridID = gridID1;
   int reg2d_tgt_gridID = gridID2;
@@ -700,8 +700,8 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
   remapgrid_init(src_grid);
   remapgrid_init(tgt_grid);
 
-  if ( map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC ||
-       map_type == MAP_TYPE_DISTWGT  || map_type == MAP_TYPE_CONSERV_YAC )
+  if ( mapType == RemapType::BILINEAR || mapType == RemapType::BICUBIC ||
+       mapType == RemapType::DISTWGT  || mapType == RemapType::CONSERV_YAC )
     {
       if ( IS_REG2D_GRID(gridID1) ) src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // src_grid->remap_grid_type = 0;
@@ -709,19 +709,19 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
-      if ( IS_REG2D_GRID(gridID2) && map_type == MAP_TYPE_CONSERV_YAC ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if ( IS_REG2D_GRID(gridID2) && mapType == RemapType::CONSERV_YAC ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // else src_grid->remap_grid_type = -1;
     }
 
   if ( !remap_gen_weights && IS_REG2D_GRID(gridID2) && tgt_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
-      if ( map_type == MAP_TYPE_DISTWGT ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
-      if ( map_type == MAP_TYPE_BILINEAR && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if ( mapType == RemapType::DISTWGT ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if ( mapType == RemapType::BILINEAR && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
     }
 
   src_grid->lextrapolate = lextrapolate;
 
-  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
+  if ( mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC )
     {
       if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
@@ -740,7 +740,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
   tgt_grid->gridID = gridID2;
 
   if ( !src_grid->lextrapolate && gridInqSize(src_grid->gridID) > 1 &&
-       map_type == MAP_TYPE_DISTWGT &&
+       mapType == RemapType::DISTWGT &&
        (gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global) )
     {
       src_grid->gridID = gridID1 = expand_lonlat_grid(gridID1);
@@ -783,8 +783,8 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
     }
 
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
-  remap_define_grid(map_type, gridID1, src_grid, "Source");
-  remap_define_grid(map_type, gridID2, tgt_grid, "Target");
+  remap_define_grid(mapType, gridID1, src_grid, "Source");
+  remap_define_grid(mapType, gridID2, tgt_grid, "Target");
 
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
@@ -799,12 +799,14 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
     {
       remap_define_reg2d(reg2d_tgt_gridID, tgt_grid);
     }
-  else if ( map_type != MAP_TYPE_DISTWGT )
+  else if ( mapType != RemapType::DISTWGT
+            //            && mapType != RemapType::BILINEAR
+            )
     {
       cell_bounding_boxes(src_grid, REMAP_GRID_BASIS_SRC);
       cell_bounding_boxes(tgt_grid, REMAP_GRID_BASIS_TGT);
       // Set up and assign address ranges to search bins in order to further restrict later searches
-      calc_lat_bins(src_grid, tgt_grid, map_type);
+      calc_lat_bins(src_grid, tgt_grid, mapType);
     }
 
 }  /* remapGridInit */
@@ -815,7 +817,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
     This routine initializes some variables and provides an initial
     allocation of arrays (fairly large so frequent resizing unnecessary).
 */
-void remap_vars_init(int map_type, size_t src_grid_size, size_t tgt_grid_size, remapvars_t *rv)
+void remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapvars_t *rv)
 {
   /* Initialize all pointer */
   if ( rv->pinit == false )
@@ -829,32 +831,32 @@ void remap_vars_init(int map_type, size_t src_grid_size, size_t tgt_grid_size, r
 
   /* Determine the number of weights */
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( ompNumThreads > 1 )
     {
-      if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = true;
-      else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = false;
-      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = false;
-      else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = false;
-      else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = false;
+      if      ( mapType == RemapType::CONSERV     ) rv->sort_add = true;
+      else if ( mapType == RemapType::CONSERV_YAC ) rv->sort_add = false;
+      else if ( mapType == RemapType::BILINEAR    ) rv->sort_add = false;
+      else if ( mapType == RemapType::BICUBIC     ) rv->sort_add = false;
+      else if ( mapType == RemapType::DISTWGT     ) rv->sort_add = false;
       else cdoAbort("Unknown mapping method!");
     }
   else
 #endif
     {
-      if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = true;
-      else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = false;
-      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = false;
-      else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = false;
-      else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = false;
+      if      ( mapType == RemapType::CONSERV     ) rv->sort_add = true;
+      else if ( mapType == RemapType::CONSERV_YAC ) rv->sort_add = false;
+      else if ( mapType == RemapType::BILINEAR    ) rv->sort_add = false;
+      else if ( mapType == RemapType::BICUBIC     ) rv->sort_add = false;
+      else if ( mapType == RemapType::DISTWGT     ) rv->sort_add = false;
       else cdoAbort("Unknown mapping method!");
     }
 
-  if      ( map_type == MAP_TYPE_CONSERV     ) rv->num_wts = 3;
-  else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->num_wts = 1;
-  else if ( map_type == MAP_TYPE_BILINEAR    ) rv->num_wts = 1;
-  else if ( map_type == MAP_TYPE_BICUBIC     ) rv->num_wts = 4;
-  else if ( map_type == MAP_TYPE_DISTWGT     ) rv->num_wts = 1;
+  if      ( mapType == RemapType::CONSERV     ) rv->num_wts = 3;
+  else if ( mapType == RemapType::CONSERV_YAC ) rv->num_wts = 1;
+  else if ( mapType == RemapType::BILINEAR    ) rv->num_wts = 1;
+  else if ( mapType == RemapType::BICUBIC     ) rv->num_wts = 4;
+  else if ( mapType == RemapType::DISTWGT     ) rv->num_wts = 1;
   else cdoAbort("Unknown mapping method!");
 
   rv->links_per_value = -1;
@@ -871,7 +873,7 @@ void remap_vars_init(int map_type, size_t src_grid_size, size_t tgt_grid_size, r
   rv->resize_increment = (size_t) (0.1 * MAX(src_grid_size, tgt_grid_size));
 
   /*  Allocate address and weight arrays for mapping 1 */
-  if ( map_type == MAP_TYPE_CONSERV )
+  if ( mapType == RemapType::CONSERV )
     {
       rv->src_cell_add = (size_t*) Malloc(rv->max_links*sizeof(size_t));
       rv->tgt_cell_add = (size_t*) Malloc(rv->max_links*sizeof(size_t));
@@ -975,7 +977,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, size_t n
               const size_t *restrict src_addx = links.src_add[j];
               const size_t *restrict windex = links.w_index[j];
 
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #pragma omp simd
 #endif
 	      for ( size_t n = 0; n < links.num_links[j]; ++n )
@@ -993,7 +995,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, size_t n
 
               if ( lpv == 4 )
                 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(dst_array, src_array, dst_add, src_add, map_wts, num_wts, nlinks, lpv)
 #endif
                   for ( size_t n = 0; n < nlinks; ++n )
@@ -1007,7 +1009,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, size_t n
                 }
               else
                 {
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)  shared(dst_array, src_array, dst_add, src_add, map_wts, num_wts, nlinks, lpv)
 #endif
                   for ( size_t n = 0; n < nlinks; ++n )
@@ -1135,7 +1137,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
 
   size_t max_cls = get_max_add(num_links, dst_size, dst_add);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   double **src_cls2 = (double **) Malloc(ompNumThreads*sizeof(double *));
   double **src_wts2 = (double **) Malloc(ompNumThreads*sizeof(double *));
   for ( int  i = 0; i < ompNumThreads; ++i )
@@ -1151,7 +1153,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
   for ( size_t n = 0; n < num_links; ++n )
     if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none) \
   shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, num_wts, dst_array, max_cls)  \
   schedule(dynamic,1)
@@ -1160,7 +1162,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
     {
       size_t k;
       size_t ncls;
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       int ompthID = cdo_omp_get_thread_num();
       double *src_cls = src_cls2[ompthID];
       double *src_wts = src_wts2[ompthID];
@@ -1240,7 +1242,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
 	}
     }
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   for ( int  i = 0; i < ompNumThreads; ++i )
     {
       Free(src_cls2[i]);
@@ -1439,7 +1441,7 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
   size_t nx = grid.dims[0];
   size_t ny = grid.dims[1];
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(none)        \
   shared(grid_size, grad_lat, grad_lon, grad_latlon, grid, nx, ny, array)
 #endif
@@ -1681,7 +1683,7 @@ void remapCheckArea(size_t grid_size, double *restrict cell_area, const char *na
 }
 
 
-void remapCheckWeights(size_t num_links, size_t num_wts, int norm_opt, size_t *src_cell_add, size_t *tgt_cell_add, double *wts)
+void remapCheckWeights(size_t num_links, size_t num_wts, NormOpt normOpt, size_t *src_cell_add, size_t *tgt_cell_add, double *wts)
 {
   for ( size_t n = 0; n < num_links; ++n )
     {
@@ -1689,7 +1691,7 @@ void remapCheckWeights(size_t num_links, size_t num_wts, int norm_opt, size_t *s
         cdoPrint("Map weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
                  src_cell_add[n], tgt_cell_add[n], n, wts[n*num_wts]);
 
-      if ( norm_opt != NORM_OPT_NONE && wts[n*num_wts] > 1.01 )
+      if ( normOpt != NormOpt::NONE && wts[n*num_wts] > 1.01 )
         cdoPrint("Map weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
                  src_cell_add[n], tgt_cell_add[n], n, wts[n*num_wts]);
     }

@@ -27,6 +27,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "percentiles_hist.h"
+#include "percentiles.h"
 
 
 void *Timselpctl(void *argument)

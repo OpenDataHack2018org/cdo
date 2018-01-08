@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -54,7 +54,7 @@
 #include "cdo_getopt.h"
 #include "cdoDebugOutput.h"
 
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
 #include "pstream_int.h"
 #include "pthread_debug.h"
 #endif
@@ -63,8 +63,9 @@
 #include "process.h"
 #include "error.h"
 #include "grid_proj.h"
+#include "percentiles.h"
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #  include <omp.h>
 #endif
 
@@ -272,7 +273,7 @@ void cdo_usage(void)
   fprintf(stderr, "    --no_warnings  Inhibit warning messages\n");
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
   fprintf(stderr, "    --operators    List of all operators\n");
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
   fprintf(stderr, "    --percentile <method>\n");
@@ -320,7 +321,7 @@ void cdo_usage(void)
   */
 
   fprintf(stderr, "\n");
-  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2017 Uwe Schulzweida\n", VERSION);
+  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2018 Uwe Schulzweida\n", VERSION);
   //  fprintf(stderr, "  Available from <http://mpimet.mpg.de/cdo>\n");
   fprintf(stderr, "  This is free software and comes with ABSOLUTELY NO WARRANTY\n");
   fprintf(stderr, "  Report bugs to <http://mpimet.mpg.de/cdo>\n");
@@ -379,32 +380,6 @@ void cdoPrintHelp(std::vector<std::string> help/*, char *xoperator*/)
             }
         }
     }
-}
-static
-void cdoSetDebug(int level)
-{
-  /*
-    level   0: off
-    level   1: on
-    level   2: cdi
-    level   4: memory
-    level   8: file
-    level  16: format
-    level  32: cdo
-    level  64: stream
-    level 128: pipe
-    level 256: pthread
-    level 512: process
-   */
-  cdiDebug(level);
-
-  if ( level == 1 || (level &  32) ) CdoDebug::cdoDebug = 1;
-  if ( level == 1 || (level &  64) ) CdoDebug::PSTREAM = 1;
-  if ( level == 1 || (level &  512) ) CdoDebug::PROCESS = 1;
-#if defined(HAVE_LIBPTHREAD)
-  if ( level == 1 || (level & 128) ) CdoDebug::PIPE = 1;
-  if ( level == 1 || (level & 256) ) CdoDebug::PTHREAD = 1;
-#endif
 }
 
 #undef  IsBigendian
@@ -758,17 +733,6 @@ void get_env_vars(void)
         }
     }
 
-  envstr = getenv("CDO_LOG_OFF");
-  if ( envstr )
-    {
-      if ( atoi(envstr) == 1 )
-        {
-          cdoLogOff = TRUE;
-          if ( cdoVerbose )
-            fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
-        }
-    }
-
   envstr = getenv("CDO_DISABLE_HISTORY");
   if ( envstr )
     {
@@ -937,7 +901,7 @@ void print_system_info()
 #endif
   /* OPENMP 3:  201107 */
   /* OPENMP 4:  201307 gcc 4.9 */
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif
 #if defined(__cplusplus)
@@ -1555,7 +1519,6 @@ void init_modules()
   add_module("Invert"        , {Invert        , InvertHelp        , InvertOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Invertlev"     , {Invertlev     , InvertlevHelp     , InvertlevOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Isosurface"    , {Isosurface    , {}                , IsosurfaceOperators    , 1 , CDI_REAL , 1  , 1  });
-  add_module("Log"           , {Log           , {}                , LogOperators           , 0 , CDI_REAL , 1  , 0  });
   add_module("MapReduce"     , {MapReduce     , MapReduceHelp     , MapReduceOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Maskbox"       , {Maskbox       , MaskboxHelp       , MaskboxOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Maskregion"    , {Maskbox       , MaskregionHelp    , MaskregionOperators    , 1 , CDI_REAL , 1  , 1  });
@@ -1862,7 +1825,7 @@ int main(int argc, char *argv[])
       //      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
     }
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   if ( numThreads <= 0 ) numThreads = 1;
   omp_set_num_threads(numThreads);
 
@@ -1878,7 +1841,7 @@ int main(int argc, char *argv[])
       omp_get_schedule(&kind, &modifer);
       fprintf(stderr, "OMP schedule        = %d (1:static; 2:dynamic; 3:guided; 4:auto)\n", (int) kind);
 #endif
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
       fprintf(stderr, "OMP proc bind       = %d (0:false; 1:true; 2:master; 3:close; 4:spread)\n", (int) omp_get_proc_bind());
 #if !defined(__ICC)
       fprintf(stderr, "OMP num devices     = %d\n", omp_get_num_devices());
@@ -1894,7 +1857,7 @@ int main(int argc, char *argv[])
   if ( cdoVerbose )
     {
       fprintf(stderr, " OpenMP:  num_procs=%d  max_threads=%d", omp_get_num_procs(), omp_get_max_threads());
-#if defined(HAVE_OPENMP4)
+#ifdef  HAVE_OPENMP4
 #if !defined(__ICC)
       fprintf(stderr, "  num_devices=%d", omp_get_num_devices());
 #endif

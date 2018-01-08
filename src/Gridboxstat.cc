@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -478,7 +478,7 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
   size_t nlon2 = gridInqXsize(gridID2);
   size_t nlat2 = gridInqYsize(gridID2);
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
   for ( size_t ig = 0; ig < nlat2*nlon2; ++ig )
@@ -487,11 +487,8 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
 
       /*
       int lprogress = 1;
-#if defined(_OPENMP)
+#ifdef  _OPENMP
       if ( ompthID != 0 ) lprogress = 0;
-#endif
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
 #endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/nlat2*nlon2);

@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
@@ -7,7 +7,7 @@
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #endif
@@ -24,7 +24,7 @@ extern int GetMagicsParameterInfo(  const char *user_name, char *param_value );
 
 int results_template_parser( void * node, const char *varname ) 
 {
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
     xmlNode *a_node = (xmlNode*) node;
     xmlNode *cur_node = NULL;
     xmlAttrPtr attr = NULL;

@@ -1,0 +1,59 @@
+#! @BASH@
+echo 1..3 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO=cdo
+test -n "$DATAPATH" || DATAPATH=./data
+#
+CDOOUT=cout$$
+CDOERR=cerr$$
+FORMAT="-f srv -b 32"
+ABSLIMMAX=0.001
+#
+IFILE=$DATAPATH/t21_geosp_tsurf_sea.grb
+NTEST=1
+#
+rm -f Smooth.debug
+DEBUG_OUT="--seperateDebugFromLog Expr.debug"
+#
+function testfunc()
+{
+  RSTAT=0
+
+  CDOTEST="parameter set $NTEST"
+  echo "Running test: $NTEST - $CDOTEST"
+
+  RFILE=$DATAPATH/smooth${NTEST}_ref
+  OFILE=smooth${NTEST}_res
+
+  CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT smooth,$SMOOTHOPT $IFILE $OFILE"
+      
+  echo "$CDOCOMMAND"
+
+  $CDOCOMMAND
+  test $? -eq 0 || let RSTAT+=1
+
+  $CDO $DEBUG_OUT diff,$ABSLIMMAX $RFILE $OFILE > $CDOOUT 2> $CDOERR
+  test $? -eq 0 || let RSTAT+=1
+  test -s $CDOOUT && let RSTAT+=1
+  cat $CDOOUT $CDOERR
+
+  rm -f $OFILE $FINSTR
+
+  test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+  test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+
+  let NTEST+=1
+}
+#
+SMOOTHOPT="radius=5deg"
+testfunc
+#
+SMOOTHOPT="radius=5deg,maxpoints=3"
+testfunc
+#
+SMOOTHOPT="radius=5deg,nsmooth=9"
+testfunc
+#
+rm -f $CDOOUT $CDOERR
+#
+exit 0

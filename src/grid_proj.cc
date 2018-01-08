@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -14,15 +14,15 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #include <omp.h>
 #endif
 
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
 #include "proj_api.h"
 #endif
 
@@ -75,7 +75,7 @@ int proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1,
                        double a, double rf, size_t nvals, double *xvals, double *yvals)
 {
   int status = 0;
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   char *params[20];
 
   int nbpar = 0;
@@ -133,7 +133,7 @@ void lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, dou
                    double a, double rf, size_t nvals, double *xvals, double *yvals)
 {
   int status = proj_lonlat_to_lcc(missval, lon_0, lat_0, lat_1, lat_2, a, rf, nvals, xvals, yvals);
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   if ( status == -1 ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 #else
   if ( status == -1 ) cdoAbort("proj4 support not compiled in!");
@@ -156,7 +156,7 @@ int proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1,
                        double a, double rf, double x_0, double y_0, size_t nvals, double *xvals, double *yvals)
 {
   int status = 0;
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   char *params[20];
 
   int nbpar = 0;
@@ -214,7 +214,7 @@ void lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1, dou
                    double a, double rf, double x_0, double y_0, size_t nvals, double *xvals, double *yvals)
 {
   int status = proj_lcc_to_lonlat(missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0, nvals, xvals, yvals);
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   if ( status == -1 ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 #else
   if ( status == -1 ) cdoAbort("proj4 support not compiled in!");
@@ -235,7 +235,7 @@ int cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
   if ( !status && IS_EQUAL(lat_1, grid_missval) ) { status = 1; cdoWarning("%s mapping parameter %s missing!", projection, "standard_parallel"); }
   if ( !status && IS_EQUAL(x_0, grid_missval) && IS_EQUAL(y_0, grid_missval) && IS_NOT_EQUAL(xval_0, grid_missval) && IS_NOT_EQUAL(yval_0, grid_missval) )
     {
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
       x_0 = xval_0; y_0 = yval_0;
       lonlat_to_lcc(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, 1, &x_0, &y_0);
       x_0 = -x_0; y_0 = -y_0;
@@ -282,7 +282,7 @@ void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
 
 void cdo_sinu_to_lonlat(size_t nvals, double *xvals, double *yvals)
 {
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   char *params[20];
 
   int nbpar = 0;
@@ -326,7 +326,7 @@ bool cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int
   if ( atttype == CDI_DATATYPE_INT32 )
     {
       std::vector<int> attint(attlen);
-      cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, attint.data());
+      cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, &attint[0]);
       for ( int i = 0; i < attlen; ++i ) attflt[i] = (double)attint[i];
     }
   else if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
@@ -384,7 +384,7 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
 
 void cdo_laea_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
 {
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   char *params[20];
   
   double a, lon_0, lat_0, x_0, y_0;
@@ -430,7 +430,7 @@ void cdo_laea_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
 
 void cdo_proj_to_lonlat(char *proj4param, size_t nvals, double *xvals, double *yvals)
 {
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   char *params[99];
 
   int nbpar;

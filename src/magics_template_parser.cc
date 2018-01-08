@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
@@ -6,12 +6,12 @@
 #include "magics_template_parser.h"
 #include "StringUtilities.h"
 
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #endif
 
-#if defined(HAVE_LIBMAGICS)
+#ifdef  HAVE_LIBMAGICS
 #include "magics_api.h"
 #endif
 
@@ -25,7 +25,7 @@ extern void *magics_node;
 
 int magics_template_parser( void *node ) 
 {
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
     xmlNode *a_node = (xmlNode*) node;
     int param_set_flag;
     xmlNode *cur_node = NULL;
@@ -105,14 +105,14 @@ int magics_template_parser( void *node )
 }
 
 
-#if defined(HAVE_LIBMAGICS)
+#ifdef  HAVE_LIBMAGICS
 int SetMagicsParameterValue( const char *param_name, const char *param_type, const char *param_value )
 #else
 int SetMagicsParameterValue( const char *, const char *, const char * )
 #endif  
 {
 	int ret_flag = 0;
-#if defined(HAVE_LIBMAGICS)
+#ifdef  HAVE_LIBMAGICS
 	int i;
 	int split_str_count = 0;
 	char **split_str = NULL;

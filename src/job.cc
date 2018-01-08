@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -348,7 +348,7 @@ int job_submit(const char *expname, const char *jobfilename, const char *jobname
 
 
 
-#if defined(HAVE_LIBCURL)
+#ifdef  HAVE_LIBCURL
 #include <curl/curl.h>
 #endif
 
@@ -392,7 +392,7 @@ int my_progress_func(void *stdout_is_tty,
 int ftpget(int flag, const char *url, const char *path, const char *target, const char *source)
 {
   int status = 0;
-#if defined(HAVE_LIBCURL)
+#ifdef  HAVE_LIBCURL
   CURL *curl;
   CURLcode res;
   struct curl_slist* commands = NULL ;
@@ -517,7 +517,7 @@ int ftpget(int flag, const char *url, const char *path, const char *target, cons
 int ftprmd(const char *url, const char *path)
 {
   int status = 0;
-#if defined(HAVE_LIBCURL)
+#ifdef  HAVE_LIBCURL
   CURL *curl;
   CURLcode res;
   struct curl_slist* commands = NULL ;

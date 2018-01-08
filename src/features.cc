@@ -1,4 +1,4 @@
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
@@ -10,7 +10,7 @@
 #include <zlib.h>
 #endif
 
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
 #include <libxml/xmlversion.h>
 #endif
 
@@ -22,7 +22,7 @@
 #include <proj_api.h>
 #endif
 
-#if defined(HAVE_LIBCMOR)
+#ifdef  HAVE_LIBCMOR
 extern "C" {
 #include "cmor.h"
 }
@@ -51,10 +51,10 @@ void printFeatures(void)
 #if defined(ENABLE_DATA)
   fprintf(stderr, " DATA");
 #endif
-#if defined(HAVE_LIBPTHREAD)
+#ifdef  HAVE_LIBPTHREAD
   fprintf(stderr, " PTHREADS");
 #endif
-#if defined(_OPENMP)
+#ifdef  _OPENMP
   fprintf(stderr, " OpenMP");
 #if defined(HAVE_OPENMP45)
   fprintf(stderr, "45");
@@ -90,25 +90,25 @@ void printFeatures(void)
 #if defined(HAVE_LIBUDUNITS2)
   fprintf(stderr, " UDUNITS2");
 #endif
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   fprintf(stderr, " PROJ.4");
 #endif
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
   fprintf(stderr, " XML2");
 #endif
-#if defined(HAVE_LIBMAGICS)
+#ifdef  HAVE_LIBMAGICS
   fprintf(stderr, " MAGICS");
 #endif
 #if defined(HAVE_LIBDRMAA)
   fprintf(stderr, " DRMAA");
 #endif
-#if defined(HAVE_LIBCURL)
+#ifdef  HAVE_LIBCURL
   fprintf(stderr, " CURL");
 #endif
-#if defined(HAVE_LIBFFTW3)
+#ifdef  HAVE_LIBFFTW3
   fprintf(stderr, " FFTW3");
 #endif
-#if defined(HAVE_LIBCMOR)
+#ifdef  HAVE_LIBCMOR
   fprintf(stderr, " CMOR");
 #endif
 #if defined(__AVX2__)
@@ -156,28 +156,28 @@ void printLibraries(void)
   }
 #endif
   */
-#if defined(HAVE_LIBPROJ)
+#ifdef  HAVE_LIBPROJ
   fprintf(stderr, " proj");
 #if defined(PJ_VERSION)
   fprintf(stderr, "/%g", PJ_VERSION*0.01);
 #endif
 #endif
   
-#if defined(HAVE_LIBCMOR)
+#ifdef  HAVE_LIBCMOR
   fprintf(stderr, " CMOR");
 #if defined(CMOR_VERSION_MAJOR)
   fprintf(stderr, "/%u.%u.%u", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR, CMOR_VERSION_PATCH);
 #endif
 #endif
 
-#if defined(HAVE_LIBXML2)
+#ifdef  HAVE_LIBXML2
   fprintf(stderr, " xml2");
 #if defined(LIBXML_DOTTED_VERSION)
   fprintf(stderr, "/%s", LIBXML_DOTTED_VERSION);
 #endif
 #endif
 
-#if defined(HAVE_LIBCURL)
+#ifdef  HAVE_LIBCURL
   {
     curl_version_info_data *version_data = curl_version_info(CURLVERSION_NOW);
     fprintf(stderr, " curl/%s", version_data->version);

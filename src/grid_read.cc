@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -81,6 +81,7 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
           if      ( STR_IS_EQ(gridtype, "lonlat") )       grid->type = GRID_LONLAT;
           else if ( STR_IS_EQ(gridtype, "latlon") )       grid->type = GRID_LONLAT;
           else if ( STR_IS_EQ(gridtype, "gaussian") )     grid->type = GRID_GAUSSIAN;
+          else if ( STR_IS_EQ(gridtype, "gaussian_reduced") ) grid->type = GRID_GAUSSIAN_REDUCED;
           else if ( STR_IS_EQ(gridtype, "curvilinear") )  grid->type = GRID_CURVILINEAR;
           else if ( STR_IS_EQ(gridtype, "unstructured") ) grid->type = GRID_UNSTRUCTURED;
           else if ( STR_IS_EQ(gridtype, "cell") )         grid->type = GRID_UNSTRUCTURED;
@@ -88,7 +89,7 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
           else if ( STR_IS_EQ(gridtype, "gme") )          grid->type = GRID_GME;
           else if ( STR_IS_EQ(gridtype, "projection") )   grid->type = GRID_PROJECTION;
           else if ( STR_IS_EQ(gridtype, "generic") )      grid->type = GRID_GENERIC;
-	  else cdoAbort("Invalid gridtype : %s (grid description file: %s)", gridtype, dname);
+	  else cdoAbort("Invalid gridtype: %s (grid description file: %s)", gridtype, dname);
             
           if ( grid->type == GRID_LONLAT || grid->type == GRID_GAUSSIAN ) grid->nvertex = 2;
           else if ( grid->type == GRID_CURVILINEAR ) grid->nvertex = 4;
@@ -99,7 +100,7 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
 
           if      ( STR_IS_EQ(datatype, "double") )  grid->datatype = CDI_DATATYPE_FLT64;
           else if ( STR_IS_EQ(datatype, "float") )   grid->datatype = CDI_DATATYPE_FLT32;
-	  else cdoAbort("Invalid datatype : %s (zaxis description file: %s)", datatype, dname);
+	  else cdoAbort("Invalid datatype: %s (zaxis description file: %s)", datatype, dname);
         }
       else if ( STR_IS_EQ(key, "gridsize") )       grid->size = parameter2sizet(value);
       else if ( STR_IS_EQ(key, "xsize") )          grid->xsize = parameter2sizet(value);
@@ -215,6 +216,16 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
               if ( grid->mask[i] == 1 ) count++;
             }
           if ( count == size ) { Free(grid->mask); grid->mask = NULL; }
+        }
+      else if ( STR_IS_EQ(key, "rowlon") )
+        {
+          size_t size = grid->ysize;
+          if ( size == 0 ) cdoAbort("ysize undefined (grid description file: %s)!", dname);
+          grid->rowlon = (int*) Malloc(size*sizeof(int));
+          for ( size_t i = 0; i < size; ++i )
+            {
+              grid->rowlon[i] = parameter2int(kv->values[i]);
+            }
         }
       else if ( STR_IS_EQ(key, "grid_mapping_name") ) { *igmap = ik; break; }
       else if ( STR_IS_EQ(key, "grid_mapping") ) { *igmap = ik; break; }

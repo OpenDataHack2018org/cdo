@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 #include "grid.h"
 #include "remap.h"
 
-#if defined(HAVE_LIBYAC)
+#ifdef  HAVE_LIBYAC
 extern "C" {
 #include "points.h"
 #include "grid_reg2d.h"
@@ -106,7 +106,7 @@ void set_source_data(double * source_data, double init_value,
   This routine stores the address and weight for four links associated with one destination
   point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
-#if defined(HAVE_LIBYAC)
+#ifdef  HAVE_LIBYAC
 static
 void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weights[4])
 {
@@ -154,8 +154,8 @@ void yar_remap_bil(field_type *field1, field_type *field2)
   remap.vars.pinit = false;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
-  remap_grids_init(MAP_TYPE_BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remap_vars_init(MAP_TYPE_BILINEAR, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
+  remap_grids_init(RemapType::BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
+  remap_vars_init(RemapType::BILINEAR, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
   if ( cdoTimer ) timer_stop(timer_yar_remap_init);
 
 
@@ -216,7 +216,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
   printf("lonOut: %g %g %g ... %g %g\n", lonOut[0]/DEG2RAD, lonOut[1]/DEG2RAD, lonOut[2]/DEG2RAD, lonOut[nlonOut-2]/DEG2RAD, lonOut[nlonOut-1]/DEG2RAD);
   printf("latOut: %g %g %g ... %g %g\n", latOut[0]/DEG2RAD, latOut[1]/DEG2RAD, latOut[2]/DEG2RAD, latOut[nlatOut-2]/DEG2RAD, latOut[nlatOut-1]/DEG2RAD);
 
-#if defined(HAVE_LIBYAC)
+#ifdef  HAVE_LIBYAC
 
   //--------------------------------------------
   // define a grid
@@ -338,7 +338,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 	      wgts[2] = iguess*jguess;
 	      wgts[3] = (1.-iguess)*jguess;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp critical
 #endif
 	      store_link_bilin(&remap.vars, dst_add, src_add, wgts);
@@ -396,8 +396,8 @@ void yar_remap_con(field_type *field1, field_type *field2)
   remap.vars.pinit = false;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
-  remap_grids_init(MAP_TYPE_CONSERV, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remap_vars_init(MAP_TYPE_CONSERV, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
+  remap_grids_init(RemapType::CONSERV, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
+  remap_vars_init(RemapType::CONSERV, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
   if ( cdoTimer ) timer_stop(timer_yar_remap_init);
 
 
@@ -452,7 +452,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
   printf("lonOut: %g %g %g ... %g %g\n", lonOut[0]/DEG2RAD, lonOut[1]/DEG2RAD, lonOut[2]/DEG2RAD, lonOut[nlonOut-2]/DEG2RAD, lonOut[nlonOut-1]/DEG2RAD);
   printf("latOut: %g %g %g ... %g %g\n", latOut[0]/DEG2RAD, latOut[1]/DEG2RAD, latOut[2]/DEG2RAD, latOut[nlatOut-2]/DEG2RAD, latOut[nlatOut-1]/DEG2RAD);
 
-#if defined(HAVE_LIBYAC)
+#ifdef  HAVE_LIBYAC
 
   //--------------------------------------------
   // define a grid

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,13 +15,13 @@
   GNU General Public License for more details.
 */
 
-#if defined(HAVE_CONFIG_H)
+#ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
 #define H5_USE_16_API
 
-#if defined(HAVE_LIBHDF5)
+#ifdef  HAVE_LIBHDF5
 #  include "hdf5.h"
 #endif
 
@@ -69,7 +69,7 @@ typedef struct {
 datasets_t;
 
 
-#if defined(HAVE_LIBHDF5)
+#ifdef  HAVE_LIBHDF5
 static
 void print_filter(hid_t dset_id, char *varname)
 {
@@ -1391,7 +1391,7 @@ void dsets_init(datasets_t *dsets)
 
 void *Importcmsaf(void *argument)
 {
-#if defined(HAVE_LIBHDF5)
+#ifdef  HAVE_LIBHDF5
   int streamID;
   int gridID = -1, zaxisID, taxisID, vlistID;
   int i, offset;
@@ -1413,7 +1413,7 @@ void *Importcmsaf(void *argument)
   if ( cdoDefaultFileType == CDI_UNDEFID )
     cdoDefaultFileType = CDI_FILETYPE_NC;
 
-#if defined(HAVE_LIBHDF5)
+#ifdef  HAVE_LIBHDF5
   dsets_init(&dsets);
 
   /* Open an existing file. */

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -29,8 +29,8 @@
 #define HAVE_UDUNITS2
 #endif
 
-#if defined(HAVE_UDUNITS2)
-#if defined(HAVE_UDUNITS2_UDUNITS2_H)
+#ifdef  HAVE_UDUNITS2
+#ifdef  HAVE_UDUNITS2_UDUNITS2_H
 #  include <udunits2/udunits2.h>
 #else
 #  include <udunits2.h>
@@ -42,7 +42,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "util.h"
 #include "pmlist.h"
 #include "convert_units.h"
 
@@ -522,7 +521,7 @@ void *CMOR_lite(void *argument)
 		}
 	    }
 
-#if defined(HAVE_UDUNITS2)
+#ifdef  HAVE_UDUNITS2
 	  if ( var->changeunits )
 	    {
 	      int nerr = 0;
@@ -556,7 +555,7 @@ void *CMOR_lite(void *argument)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-#if defined(HAVE_UDUNITS2)
+#ifdef  HAVE_UDUNITS2
   for ( int varID = 0; varID < nvars; varID++ )
     if ( vars[varID].ut_converter ) cdoConvertFree(vars[varID].ut_converter);
 

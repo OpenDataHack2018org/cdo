@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
-#include "util.h"
 
 
 typedef struct
@@ -516,7 +515,7 @@ void *Collgrid(void *argument)
 	      double missval = vlistInqVarMissval(vlistID2, varID2);
 	      for ( size_t i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
-#if defined(_OPENMP)
+#ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
 	      for ( int fileID = 0; fileID < nfiles; fileID++ )

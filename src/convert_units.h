@@ -9,8 +9,8 @@
 #define HAVE_UDUNITS2
 #endif
 
-#if defined(HAVE_UDUNITS2)
-#if defined(HAVE_UDUNITS2_UDUNITS2_H)
+#ifdef  HAVE_UDUNITS2
+#ifdef  HAVE_UDUNITS2_UDUNITS2_H
 #  include <udunits2/udunits2.h>
 #else
 #  include <udunits2.h>
