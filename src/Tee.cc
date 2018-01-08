@@ -31,7 +31,7 @@ void *Tee(void *argument)
 
   bool lcopy = UNCHANGED_RECORD;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);

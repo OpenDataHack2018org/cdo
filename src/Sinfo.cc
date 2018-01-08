@@ -108,7 +108,7 @@ void *Sinfo(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      int streamID = pstreamOpenRead(cdoStreamName(indf));
+      int streamID = cdoStreamOpenRead(cdoStreamName(indf));
       int vlistID = pstreamInqVlist(streamID);
 
       set_text_color(stdout, BRIGHT, BLACK);

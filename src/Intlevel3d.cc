@@ -71,8 +71,8 @@ void *Intlevel3d(void *argument)
 
   operatorInputArg("icoordinate");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));                 /*  input data */
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));                 /*  input data */
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
   int streamID3 = pstreamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
 
   /*  Read filename from Parameter */

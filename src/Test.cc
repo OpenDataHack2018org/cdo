@@ -30,7 +30,7 @@ void *Test(void *argument)
   cdoInitialize(argument);
 
   /*
-  streamID1 = pstreamOpenRead(cdoStreamName(0));
+  streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamClose(streamID2);
@@ -51,8 +51,8 @@ void *Test2(void *argument)
   cdoInitialize(argument);
 
   /*
-  streamID1 = pstreamOpenRead(cdoStreamName(0));
-  streamID2 = pstreamOpenRead(cdoStreamName(1));
+  streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  streamID2 = cdoStreamOpenRead(cdoStreamName(1));
   streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamClose(streamID3);
@@ -75,7 +75,7 @@ void *Testdata(void *argument)
 
   int tsID2 = 0;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);

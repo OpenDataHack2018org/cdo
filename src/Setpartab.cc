@@ -369,7 +369,7 @@ void *Setpartab(void *argument)
 
   if ( cdoVerbose ) cdoPrint("Table format version %d", tableformat);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

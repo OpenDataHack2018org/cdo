@@ -166,7 +166,7 @@ void *Rhopot(void *argument)
 
   if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
 

@@ -76,7 +76,7 @@ void *Timstat3(void *argument)
 
   for ( is = 0; is < NIN; ++is )
     {
-      streamID[is] = pstreamOpenRead(cdoStreamName(is));
+      streamID[is] = cdoStreamOpenRead(cdoStreamName(is));
 
       vlistID[is] = pstreamInqVlist(streamID[is]);
       if ( is > 0 )

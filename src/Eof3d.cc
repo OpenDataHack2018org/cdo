@@ -93,7 +93,7 @@ void *EOF3d(void * argument)
   if ( operfunc == EOF3D_SPATIAL )
     cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
 
-  int streamID1  = pstreamOpenRead(cdoStreamName(0));
+  int streamID1  = cdoStreamOpenRead(cdoStreamName(0));
   int vlistID1   = pstreamInqVlist(streamID1);
 
   /* COUNT NUMBER OF TIMESTEPS if EOF3D_ or EOF3D_TIME */
@@ -107,7 +107,7 @@ void *EOF3d(void * argument)
 
       pstreamClose(streamID1);
 
-      streamID1 = pstreamOpenRead(cdoStreamName(0));
+      streamID1 = cdoStreamOpenRead(cdoStreamName(0));
       vlistID1  = pstreamInqVlist(streamID1);
     }
   else

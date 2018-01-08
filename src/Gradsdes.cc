@@ -1019,7 +1019,7 @@ void *Gradsdes(void *argument)
     cdoAbort("GrADS GRIB map version %d requires size of off_t to be 8! The size of off_t is %ld.",
              map_version, sizeof(off_t));
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID = pstreamInqVlist(streamID);
 

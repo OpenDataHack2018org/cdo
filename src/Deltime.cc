@@ -80,7 +80,7 @@ void *Deltime(void *argument)
 
   if ( cdoVerbose ) cdoPrint("delete day %d%s", dday, cmons[dmon]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

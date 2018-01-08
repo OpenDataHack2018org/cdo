@@ -401,7 +401,7 @@ void *Smooth(void *argument)
 
   if ( spoint.radius < 0 || spoint.radius > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "radius", spoint.radius);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

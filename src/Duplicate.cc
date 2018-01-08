@@ -41,7 +41,7 @@ void *Duplicate(void *argument)
 
   if ( cdoVerbose ) cdoPrint("ndup = %d", ndup);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

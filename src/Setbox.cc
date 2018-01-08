@@ -85,7 +85,7 @@ void *Setbox(void *argument)
 
   constant = parameter2double(operatorArgv()[0]);
 
-  streamID1 = pstreamOpenRead(cdoStreamName(0));
+  streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   vlistID1 = pstreamInqVlist(streamID1);
 

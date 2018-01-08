@@ -852,7 +852,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
   if ( cdoGetStreamName(0).c_str()[0] == '-' )
     cdoAbort("No variables can be merged to one character axis since you piped several cdo operators.");
 
-  int streamID2 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(0));
   if ( ntsteps == -1 )
     {
       ntsteps = 0;
@@ -3484,7 +3484,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
 */
         } 
       
-      int streamID2 = pstreamOpenRead(cdoStreamName(0));
+      int streamID2 = cdoStreamOpenRead(cdoStreamName(0));
       int vlistID2 = pstreamInqVlist(streamID2);
       int taxisID2 = vlistInqTaxis(vlistID2);
       if ( ntsteps < 0 )
@@ -3892,7 +3892,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
       return 0;
     }
       
-  int streamID2 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(0));
   int vlistID2 = pstreamInqVlist(streamID2);
   int taxisID2 = vlistInqTaxis(vlistID2);
   juldate_t firstdate = juldate_encode(calendar, taxisInqVdate(taxisID2),
@@ -4151,7 +4151,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
         vlistInqVarName(vlistID, vars[i].cdi_varID, charname);
         
         pstreamClose(*streamID);
-        *streamID = pstreamOpenRead(cdoStreamName(0));
+        *streamID = cdoStreamOpenRead(cdoStreamName(0));
         pscheck = 0;
         if ( cdoVerbose )
           cdoPrint("10.3. Successfully retrieved auxiliary variables.");
@@ -4924,7 +4924,7 @@ void *CMOR(void *argument)
 
   if ( cdoVerbose )
     cdoPrint("3. Start to open infile '%s'.", cdoGetStreamName(0).c_str());
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
   if ( cdoVerbose )
     cdoPrint("3. Successfully opened infile '%s'.", cdoGetStreamName(0).c_str());
   /* Short keys from rtu, mt, gi must be included similar to global atts */

@@ -125,7 +125,7 @@ void *Ensstat3(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      streamID = pstreamOpenRead(cdoStreamName(fileID));
+      streamID = cdoStreamOpenRead(cdoStreamName(fileID));
 
       vlistID = pstreamInqVlist(streamID);
 

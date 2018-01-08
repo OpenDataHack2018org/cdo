@@ -266,8 +266,8 @@ void *Mrotuvb(void *argument)
   if ( operatorArgc() == 1 )
     if ( strcmp(operatorArgv()[0], "noint") == 0 ) gpint = false;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = pstreamInqVlist(streamID2);

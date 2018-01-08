@@ -147,7 +147,7 @@ void *Merge(void *argument)
 
   for ( index = 0; index < nmerge; index++ )
     {
-      streamIDs[index] = pstreamOpenRead(cdoStreamName(index));
+      streamIDs[index] = cdoStreamOpenRead(cdoStreamName(index));
       vlistIDs[index]  = pstreamInqVlist(streamIDs[index]);
     }
 

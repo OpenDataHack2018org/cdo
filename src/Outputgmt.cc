@@ -260,7 +260,7 @@ void *Outputgmt(void *argument)
       if ( cdoVerbose ) cptWrite(stderr, cpt);
     }
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID = pstreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);

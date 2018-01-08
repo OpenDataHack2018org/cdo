@@ -224,8 +224,8 @@ void *XTimstat(void *argument)
 
   int cmplen = DATE_LEN - comparelen;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  //int streamID1 = pstreamOpenRead(cdoGetStreamName(0).c_str());
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  //int streamID1 = cdoStreamOpenRead(cdoGetStreamName(0).c_str());
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

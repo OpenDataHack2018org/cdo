@@ -138,7 +138,7 @@ void *Consecstat(void *argument)
   if ( operatorID == CONSECSUM )
     if ( operatorArgc() > 0 ) refval = parameter2double(operatorArgv()[0]);
 
-  int istreamID = pstreamOpenRead(cdoStreamName(0));
+  int istreamID = cdoStreamOpenRead(cdoStreamName(0));
 
   int ivlistID = pstreamInqVlist(istreamID);
   int itaxisID = vlistInqTaxis(ivlistID);

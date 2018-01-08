@@ -139,7 +139,7 @@ void *Showattribute(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
   int vlistID = pstreamInqVlist(streamID);
   int nvars   = vlistNvars(vlistID);
 

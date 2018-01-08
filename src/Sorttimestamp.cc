@@ -73,7 +73,7 @@ void *Sorttimestamp(void *argument)
   int xtsID = 0;
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      int streamID1 = pstreamOpenRead(cdoStreamName(fileID));
+      int streamID1 = cdoStreamOpenRead(cdoStreamName(fileID));
 
       int vlistID1 = pstreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);

@@ -52,9 +52,9 @@ void *Seaspctl(void *argument)
 
   season_start = get_season_start();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
-  int streamID3 = pstreamOpenRead(cdoStreamName(2));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
+  int streamID3 = cdoStreamOpenRead(cdoStreamName(2));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = pstreamInqVlist(streamID2);

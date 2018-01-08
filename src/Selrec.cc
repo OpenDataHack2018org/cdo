@@ -49,7 +49,7 @@ void *Selrec(void *argument)
 	cdoPrint("intarr entry: %d %d", i, intarr[i]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int filetype = pstreamInqFiletype(streamID1);
 

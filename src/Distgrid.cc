@@ -225,7 +225,7 @@ void *Distgrid(void *argument)
   if ( nxblocks == 0 ) cdoAbort("nxblocks has to be greater than 0!");
   if ( nyblocks == 0 ) cdoAbort("nyblocks has to be greater than 0!");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
 

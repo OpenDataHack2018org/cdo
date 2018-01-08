@@ -191,7 +191,7 @@ void *Select(void *argument)
       if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, (indf+1.)/nfiles);
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
 
-      int streamID1 = pstreamOpenRead(cdoStreamName(indf));
+      int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
 
       int vlistID1 = pstreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);

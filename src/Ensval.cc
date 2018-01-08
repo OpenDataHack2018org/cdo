@@ -133,7 +133,7 @@ void *Ensval(void *argument)
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      streamID = pstreamOpenRead(cdoStreamName(fileID));
+      streamID = cdoStreamOpenRead(cdoStreamName(fileID));
       vlistID = pstreamInqVlist(streamID);
       
       ef[fileID].streamID = streamID;

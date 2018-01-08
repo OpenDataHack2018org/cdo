@@ -56,7 +56,7 @@ void *Harmonic(void *argument)
     cdoAbort("The wave length must be positive and smaller than "
 	     "2 times the number of requested harmonics (=%d)!", n_out);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

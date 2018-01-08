@@ -1127,7 +1127,7 @@ void *Magplot(void *argument)
       VerifyPlotParameters( nparam, pnames, operatorID );
     }
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID = pstreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);

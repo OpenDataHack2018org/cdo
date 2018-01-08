@@ -917,7 +917,7 @@ void *Maggraph(void *argument)
       if( DBG )
         fprintf( stderr," file %d is %s\n", fileID, cdoGetStreamName(fileID).c_str() );
       
-      int streamID = pstreamOpenRead(cdoStreamName(fileID));
+      int streamID = cdoStreamOpenRead(cdoStreamName(fileID));
 
       int vlistID = pstreamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);

@@ -52,7 +52,7 @@ void *Fourier(void *argument)
   operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse transformation)!");
   int sign = parameter2int(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

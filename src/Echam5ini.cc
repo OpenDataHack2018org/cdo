@@ -1528,7 +1528,7 @@ void *Echam5ini(void *argument)
       int taxisID, vdate, vtime;
       int ntr = 0;
 
-      streamID1 = pstreamOpenRead(cdoStreamName(0));
+      streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
       vlistID1 = pstreamInqVlist(streamID1);
       taxisID = vlistInqTaxis(vlistID1);

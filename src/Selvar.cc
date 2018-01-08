@@ -131,7 +131,7 @@ void *Selvar(void *argument)
   if ( nsel == 0 )
     cdoAbort("missing code argument!");
   */
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int nvars = vlistNvars(vlistID1);

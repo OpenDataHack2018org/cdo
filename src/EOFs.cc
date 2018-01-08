@@ -209,7 +209,7 @@ void *EOFs(void * argument)
   enum T_EIGEN_MODE eigen_mode = get_eigenmode();
   enum T_WEIGHT_MODE weight_mode = get_weightmode();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int vlistID1  = pstreamInqVlist(streamID1);
   int taxisID1  = vlistInqTaxis(vlistID1);
   int gridID1   = vlistInqVarGrid(vlistID1, 0);
@@ -239,7 +239,7 @@ void *EOFs(void * argument)
 
           pstreamClose(streamID1);
 
-          streamID1 = pstreamOpenRead(cdoStreamName(0));
+          streamID1 = cdoStreamOpenRead(cdoStreamName(0));
           vlistID1  = pstreamInqVlist(streamID1);
           taxisID1  = vlistInqTaxis(vlistID1);
 	}

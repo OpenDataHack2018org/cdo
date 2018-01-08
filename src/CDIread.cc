@@ -117,7 +117,7 @@ void *CDIread(void *argument)
       data_size = 0;
       nvalues = 0;
 
-      int streamID = pstreamOpenRead(cdoStreamName(0));
+      int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
       int vlistID = pstreamInqVlist(streamID);
 

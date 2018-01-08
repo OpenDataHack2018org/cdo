@@ -170,7 +170,7 @@ void *NCL_wind(void *argument)
 
   set_parameter();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = CDI_UNDEFID;

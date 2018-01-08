@@ -47,13 +47,13 @@ void *Replace(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
 
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
   int vlistID2 = pstreamInqVlist(streamID2);
 

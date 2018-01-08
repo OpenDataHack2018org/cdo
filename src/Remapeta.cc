@@ -297,7 +297,7 @@ Remapeta(void *argument)
     for (i = 0; i < nhlevf2 + 1; ++i)
       cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2 / 2 + i]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   if (operatorArgc() == 2)
     {
