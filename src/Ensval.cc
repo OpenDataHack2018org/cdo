@@ -234,7 +234,7 @@ void *Ensval(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = pstreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0), cdoStreamName(fileID));
+	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0).c_str(), cdoStreamName(fileID));
 	}
       
       for ( stream = 0; stream < nostreams; stream++ ) {

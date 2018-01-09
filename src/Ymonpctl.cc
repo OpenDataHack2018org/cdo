@@ -108,13 +108,13 @@ void *Ymonpctl(void *argument)
   while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
     {
       if ( nrecs != pstreamInqTimestep(streamID3, tsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1), cdoStreamName(2));
+        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
       
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
       
       if ( vdate != taxisInqVdate(taxisID3) )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1), cdoStreamName(2));
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
@@ -174,7 +174,7 @@ void *Ymonpctl(void *argument)
       vtimes1[month] = vtime;
 
       if ( vars1[month] == NULL )
-        cdoAbort("No data for month %d in %s and %s", month, cdoGetStreamName(1), cdoStreamName(2));
+        cdoAbort("No data for month %d in %s and %s", month, cdoGetStreamName(1).c_str(), cdoStreamName(2));
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
@@ -202,7 +202,7 @@ void *Ymonpctl(void *argument)
       {
         if ( getmonth(vdates1[month]) != getmonth(vdates2[month]) )
           cdoAbort("Verification dates for the month %d of %s and %s are different!",
-                   month, cdoGetStreamName(0), cdoStreamName(1));
+                   month, cdoGetStreamName(0).c_str(), cdoStreamName(1));
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {

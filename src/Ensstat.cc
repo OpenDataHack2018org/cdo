@@ -283,7 +283,7 @@ void *Ensstat(void *argument)
                 {
                   lerror = true;
                   cdoWarning("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
-                             tsID+1, cdoGetStreamName(0), cdoStreamName(fileID));
+                             tsID+1, cdoGetStreamName(0).c_str(), cdoStreamName(fileID));
                 }
               goto CLEANUP;
 	    }

@@ -243,7 +243,7 @@ void *Ensstat3(void *argument)
 		cdoAbort("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(fileID).c_str());
 	      else
 		cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
-			   tsID+1, cdoGetStreamName(0), cdoStreamName(fileID));
+			   tsID+1, cdoGetStreamName(0).c_str(), cdoStreamName(fileID));
 	    }
 	}
 

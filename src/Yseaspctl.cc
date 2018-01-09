@@ -114,13 +114,13 @@ void *Yseaspctl(void *argument)
   while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
     {
       if ( nrecs != pstreamInqTimestep(streamID3, tsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1), cdoStreamName(2));
+        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
       
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
       
       if ( vdate != taxisInqVdate(taxisID3) )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1), cdoStreamName(2));
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
@@ -184,7 +184,7 @@ void *Yseaspctl(void *argument)
       set_date(vdate, vtime, &datetime1[seas]);
 
       if ( vars1[seas] == NULL )
-        cdoAbort("No data for season %d in %s and %s", seas, cdoGetStreamName(1), cdoStreamName(2));
+        cdoAbort("No data for season %d in %s and %s", seas, cdoGetStreamName(1).c_str(), cdoStreamName(2));
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
@@ -212,7 +212,7 @@ void *Yseaspctl(void *argument)
       {
         if ( getmonthday(datetime1[seas].vdate) != getmonthday(datetime2[seas].vdate) )
           cdoAbort("Verification dates for the season %d of %s and %s are different!",
-                   seas, cdoGetStreamName(0), cdoStreamName(1));
+                   seas, cdoGetStreamName(0).c_str(), cdoStreamName(1));
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {

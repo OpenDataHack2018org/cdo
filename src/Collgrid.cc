@@ -488,7 +488,7 @@ void *Collgrid(void *argument)
 	{
 	  int nrecs = pstreamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0), cdoStreamName(fileID));
+	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0).c_str(), cdoStreamName(fileID));
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);
