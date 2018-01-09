@@ -147,7 +147,10 @@ pstream_init_pointer(void)
     {
         ERROR("A Pstream could not be created, ID: ", next_pstream_id);
     }
-    if(CdoDebug::PSTREAM){ MESSAGE("Created new pstream with ID:",  next_pstream_id);}
+    if(CdoDebug::PSTREAM)
+    {
+        MESSAGE("Created new pstream with ID:",  next_pstream_id);
+    }
     next_pstream_id++;
     createdPstreams++;
     new_entry.first->second.ispipe = true;
@@ -179,6 +182,8 @@ pstream_t *create_pstream(int processID, int pstreamIDX)
     new_pstream->pipe->pipeSetName(processID, pstreamIDX);
     new_pstream->m_name = new_pstream->pipe->name;
     new_pstream->ispipe = true;
+
+    return new_pstream;
 
 }
 
@@ -724,8 +729,9 @@ pstream_t::pstreamOpenWriteFile(const char* p_filename, int filetype)
 
   ispipe = false;
   
-  if (CdoDebug::PSTREAM)
+  if (CdoDebug::PSTREAM){
     MESSAGE("Opening (w) file ", p_filename);
+  }
 
   if (filetype == CDI_UNDEFID)
     filetype = CDI_FILETYPE_GRB;
@@ -966,8 +972,9 @@ void pstream_t::close(){
 #ifdef  HAVE_LIBPTHREAD
       pthread_t threadID = pthread_self();
 
-      if(CdoDebug::PSTREAM)
+      if(CdoDebug::PSTREAM){
       MESSAGE("thID: ", threadID, " rthID: ", rthreadID, " wthID: ", wthreadID);
+      }
       if (pthread_equal(threadID, rthreadID))
         pstreamCloseChildStream(this);
       else if (pthread_equal(threadID, wthreadID))
@@ -982,8 +989,9 @@ void pstream_t::close(){
     }
   else
     {
-      if (CdoDebug::PSTREAM)
+      if (CdoDebug::PSTREAM){
         MESSAGE(m_name.c_str(), " fileID ", m_fileID);
+      }
 
       if (mode == 'r')
         {
