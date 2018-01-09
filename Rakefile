@@ -206,9 +206,10 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   end
 
   @_help[:cmd] = "execute command within the target build dir, e.g. rake localGCC_cmd['pwd']" unless @_help.has_key?(:cmd)
-  task toDo[:cmd] ,:cmd do |t, args|
+  task toDo[:cmd] ,:cmd,:a,:b,:c,:d do |t, args|
     warn "No command given!!" && exit(1) if args.cmd.nil?
-    execute(args.cmd,builder)
+    cmd = args.to_hash.values.join(',')
+    execute(cmd,builder)
   end
 
   @_help[:mods] = "get the auto loaded modules on the target machine"
