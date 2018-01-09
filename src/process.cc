@@ -426,7 +426,6 @@ glob_pattern(const char *restrict string)
   if (status == 0)
     wordfree(&glob_results);
 
-  MESSAGE("GLOB_PATTERN: ",print_argument(argument),"\n",length);
   return argument;
 }
 #endif
@@ -513,7 +512,6 @@ getStreamCnt(int argc, std::vector<char *> &argv)
       if (argv[globArgc][0] == '-')
         {
           globArgc = getGlobArgc(argc, argv, globArgc);
-          MESSAGE("GlobArgc = ", globArgc);
         }
       else
         globArgc++;
@@ -886,7 +884,6 @@ createProcesses(int argc, const char **argv)
   call_stack.push(root_process);
   current_process = call_stack.top();
   int cntOutFiles = (int)current_process->m_module.streamOutCnt;
-  MESSAGE("CNTOUTFILES: ", cntOutFiles);
   if(cntOutFiles == -1)
   {
     obase.insert({0, strdup(argv[argc - 1])});
@@ -1064,7 +1061,10 @@ operatorArgv(void)
       {
           oargv_str += std::string(entry) + " "; 
       }
-      MESSAGE("Getting ",processSelf().oargv.size()," operator arguments: ", oargv_str);
+      if(CdoDebug::PROCESS)
+      {
+        MESSAGE("Getting ",processSelf().oargv.size()," operator arguments: ", oargv_str);
+      }
   }
 
   return &processSelf().oargv[0];
@@ -1564,7 +1564,6 @@ int pstreamOpenWrite(int p_streamIndex, int ft)
 {
    process_t &p = processSelf();
    int streamIndex = p_streamIndex - p.inputStreams.size();
-  MESSAGE(std::to_string(streamIndex));
    return cdoStreamOpenWrite(streamIndex, ft);
 }
 
