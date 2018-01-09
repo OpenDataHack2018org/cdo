@@ -20,10 +20,6 @@
 #define  PI2      (2.0*PI)
 
 
-#define  FLDATATYPE  double
-#define  NFDATATYPE  double
-
-
 static GridsearchMethod gridsearch_method_nn(GridsearchMethod::kdtree);
 
 
@@ -31,7 +27,7 @@ struct gsFull {
   size_t n;
   const double *plons;
   const double *plats;
-  FLDATATYPE **pts;
+  double **pts;
 };
 
 
@@ -72,8 +68,8 @@ struct PointCloud
 };
 
 typedef nanoflann::KDTreeSingleIndexAdaptor<
-    nanoflann::L2_Simple_Adaptor<NFDATATYPE, PointCloud<NFDATATYPE> > ,
-    PointCloud<NFDATATYPE>,
+    nanoflann::L2_Simple_Adaptor<double, PointCloud<double> > ,
+    PointCloud<double>,
     3 /* dim */
     > nfTree_t;
 
@@ -93,9 +89,8 @@ double cdo_default_search_radius(void)
   return search_radius;
 }
 
-template <typename T>
 static inline
-void LLtoXYZ(double lon, double lat, T *restrict xyz)
+void LLtoXYZ(double lon, double lat, double *restrict xyz)
 {
    double cos_lat = cos(lat);
    xyz[0] = cos_lat * cos(lon);
@@ -103,16 +98,14 @@ void LLtoXYZ(double lon, double lat, T *restrict xyz)
    xyz[2] = sin(lat);
 }
 
-template <typename T>
 static constexpr
-T square(const T x)
+double square(const double x)
 {
   return x*x;
 }
 
-template <typename T>
 static constexpr
-T distance(const T *restrict a, const T *restrict b)
+double distance(const double *restrict a, const double *restrict b)
 {
   return square(a[0]-b[0]) + square(a[1]-b[1]) + square(a[2]-b[2]);
 }
@@ -201,7 +194,7 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
   for ( size_t i = 0; i < n; i++ ) 
     {
       kdata_t *restrict point = pointlist[i].point;
-      LLtoXYZ<kdata_t>(lons[i], lats[i], point);
+      LLtoXYZ(lons[i], lats[i], point);
       for ( unsigned j = 0; j < 3; ++j )
         {
           min[j] = point[j] < min[j] ? point[j] : min[j];
@@ -228,10 +221,10 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
 static
 void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
 {
-  PointCloud<NFDATATYPE> *pointcloud = new PointCloud<NFDATATYPE>();
+  PointCloud<double> *pointcloud = new PointCloud<double>();
   if ( cdoVerbose ) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
 
-  NFDATATYPE min[3], max[3];
+  double min[3], max[3];
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
   // Generating  Point Cloud
@@ -241,8 +234,8 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
 #endif
   for ( size_t i = 0; i < n; i++ ) 
     {
-      NFDATATYPE point[3];
-      LLtoXYZ<NFDATATYPE>(lons[i], lats[i], point);
+      double point[3];
+      LLtoXYZ(lons[i], lats[i], point);
       pointcloud->pts[i].x = point[0];
       pointcloud->pts[i].y = point[1];
       pointcloud->pts[i].z = point[2];
@@ -301,8 +294,8 @@ void *gs_create_full(size_t n, const double *restrict lons, const double *restri
 {
   struct gsFull *full = (struct gsFull *) Calloc(1, sizeof(struct gsFull));
 
-  FLDATATYPE **p = (FLDATATYPE **) Malloc(n*sizeof(FLDATATYPE *));
-  p[0] = (FLDATATYPE *) Malloc(3*n*sizeof(FLDATATYPE));
+  double **p = (double **) Malloc(n*sizeof(double *));
+  p[0] = (double *) Malloc(3*n*sizeof(double));
   for ( size_t i = 1; i < n; i++ ) p[i] = p[0] + i*3;
 
 #ifdef  HAVE_OPENMP4
@@ -310,7 +303,7 @@ void *gs_create_full(size_t n, const double *restrict lons, const double *restri
 #endif
   for ( size_t i = 0; i < n; i++ )
     {
-      LLtoXYZ<FLDATATYPE>(lons[i], lats[i], p[i]);
+      LLtoXYZ(lons[i], lats[i], p[i]);
     }
   
   full->n = n;
@@ -361,7 +354,7 @@ void gridsearch_delete(struct gridsearch *gs)
       if ( gs->sinlon ) Free(gs->sinlon);
 
       if      ( gs->method_nn == GridsearchMethod::kdtree    ) gs_destroy_kdtree(gs->search_container);
-      else if ( gs->method_nn == GridsearchMethod::nanoflann ) delete((PointCloud<NFDATATYPE> *)gs->pointcloud);
+      else if ( gs->method_nn == GridsearchMethod::nanoflann ) delete((PointCloud<double> *)gs->pointcloud);
       else if ( gs->method_nn == GridsearchMethod::full      ) gs_destroy_full(gs->search_container);
 
       Free(gs);
@@ -395,7 +388,7 @@ size_t gs_nearest_kdtree(void *search_container, double lon, double lat, double 
   kdata_t range = range0;
 
   kdata_t query_pt[3];
-  LLtoXYZ<kdata_t>(lon, lat, query_pt);
+  LLtoXYZ(lon, lat, query_pt);
 
   if ( !gs->extrapolate )
     for ( unsigned j = 0; j < 3; ++j )
@@ -457,11 +450,11 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
   nfTree_t *nft = (nfTree_t *) search_container;
   if ( nft == NULL ) return index;
   
-  NFDATATYPE range0 = gs_set_range(prange);
-  NFDATATYPE range = range0;
+  double range0 = gs_set_range(prange);
+  double range = range0;
 
-  NFDATATYPE query_pt[3];
-  LLtoXYZ<NFDATATYPE>(lon, lat, query_pt);
+  double query_pt[3];
+  LLtoXYZ(lon, lat, query_pt);
 
   if ( !gs->extrapolate )
     for ( unsigned j = 0; j < 3; ++j )
@@ -469,8 +462,8 @@ size_t gs_nearest_nanoflann(void *search_container, double lon, double lat, doub
 
   const size_t num_results = 1;
   size_t ret_index;
-  NFDATATYPE out_dist_sqr;
-  nanoflann::KNNResultSet<NFDATATYPE> resultSet(range, num_results);
+  double out_dist_sqr;
+  nanoflann::KNNResultSet<double> resultSet(range, num_results);
   resultSet.init(&ret_index, &out_dist_sqr);
   nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
   //printf("%zu %g\n", ret_index, out_dist_sqr);
@@ -494,18 +487,18 @@ size_t gs_nearest_full(void *search_container, double lon, double lat, double *p
   struct gsFull *full = (struct  gsFull *) search_container;
   if ( full == NULL ) return index;
   
-  FLDATATYPE range0 = gs_set_range(prange);
+  double range0 = gs_set_range(prange);
 
-  FLDATATYPE query_pt[3];
-  LLtoXYZ<FLDATATYPE>(lon, lat, query_pt);
+  double query_pt[3];
+  LLtoXYZ(lon, lat, query_pt);
 
   size_t n = full->n;
   size_t closestpt = n;
-  FLDATATYPE **pts = full->pts;
-  FLDATATYPE dist = FLT_MAX;
+  double **pts = full->pts;
+  double dist = FLT_MAX;
   for ( size_t i = 0; i < n; i++ )
     {
-      FLDATATYPE d = (float) distance<FLDATATYPE>(query_pt, pts[i]);
+      double d = (float) distance(query_pt, pts[i]);
       if ( closestpt >= n || d < dist || (d<=dist && i < closestpt) )
         {
           dist = d;
@@ -559,7 +552,7 @@ size_t gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat, double 
   struct pqueue *result = NULL;
 
   kdata_t query_pt[3];
-  LLtoXYZ<kdata_t>(lon, lat, query_pt);
+  LLtoXYZ(lon, lat, query_pt);
 
   if ( !gs->extrapolate )
     for ( unsigned j = 0; j < 3; ++j )
@@ -607,11 +600,11 @@ size_t gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, doub
   nfTree_t *nft = (nfTree_t*) gs->search_container;
   if ( nft == NULL ) return nadds;
   
-  NFDATATYPE range0 = gs_set_range(prange);
-  NFDATATYPE range = range0;
+  double range0 = gs_set_range(prange);
+  double range = range0;
 
-  NFDATATYPE query_pt[3];
-  LLtoXYZ<NFDATATYPE>(lon, lat, query_pt);
+  double query_pt[3];
+  LLtoXYZ(lon, lat, query_pt);
 
   if ( !gs->extrapolate )
     for ( unsigned j = 0; j < 3; ++j )
@@ -619,12 +612,12 @@ size_t gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, doub
 
   if ( gs )
     {
-      std::vector<NFDATATYPE> out_dist_sqr(nnn);
+      std::vector<double> out_dist_sqr(nnn);
       nadds = nft->knnRangeSearch(&query_pt[0], range, nnn, &adds[0], &out_dist_sqr[0]);
 
       for ( size_t i = 0; i < nadds; ++i ) dist[i] = out_dist_sqr[i];
 
-      NFDATATYPE frange = range;
+      double frange = range;
       if ( prange ) *prange = frange;
     }
   
