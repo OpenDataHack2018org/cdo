@@ -1874,7 +1874,7 @@ int main(int argc, char *argv[])
       std::vector<std::string> new_argv = expandWildCards(argc - CDO_optind,(const char **) &argv[CDO_optind]);
       //temprorary: should not be needed when std::string is standart string 
       std::vector<char*> new_cargv(new_argv.size());
-      for(int i = 0; i < new_argv.size(); i++)
+      for(unsigned long i = 0; i < new_argv.size(); i++)
       {
           new_cargv[i] = strdup(new_argv[i].c_str());
       }
