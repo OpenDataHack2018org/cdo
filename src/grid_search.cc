@@ -99,13 +99,13 @@ void LLtoXYZ(double lon, double lat, double *restrict xyz)
 }
 
 static constexpr
-double square(const double x)
+double square(const double x)  noexcept
 {
   return x*x;
 }
 
 static constexpr
-double distance(const double *restrict a, const double *restrict b)
+double distance(const double *restrict a, const double *restrict b)  noexcept
 {
   return square(a[0]-b[0]) + square(a[1]-b[1]) + square(a[2]-b[2]);
 }
@@ -185,9 +185,10 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
   struct kd_point *pointlist = (struct kd_point *) Malloc(n*sizeof(struct kd_point));  
   // see  example_cartesian.c
   if ( cdoVerbose ) printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
-  kdata_t min[3], max[3];
-  min[0] = min[1] = min[2] =  1e9;
-  max[0] = max[1] = max[2] = -1e9;
+
+  kdata_t min[3] = { 1.e9,  1.e9,  1.e9};
+  kdata_t max[3] = {-1.e9, -1.e9, -1.e9};
+
 #ifdef  HAVE_OPENMP45
 #pragma omp parallel for reduction(min: min[:3]) reduction(max: max[:3])
 #endif
@@ -224,9 +225,9 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
   PointCloud<double> *pointcloud = new PointCloud<double>();
   if ( cdoVerbose ) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
 
-  double min[3], max[3];
-  min[0] = min[1] = min[2] =  1e9;
-  max[0] = max[1] = max[2] = -1e9;
+  double min[3] = { 1.e9,  1.e9,  1.e9};
+  double max[3] = {-1.e9, -1.e9, -1.e9};
+
   // Generating  Point Cloud
   pointcloud->pts.resize(n);
 #ifdef  HAVE_OPENMP45
