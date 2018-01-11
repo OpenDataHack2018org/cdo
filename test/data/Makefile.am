@@ -11,8 +11,9 @@ YDRUNSTAT    = ydrunmin_ref ydrunmax_ref ydrunsum_ref ydrunavg_ref ydrunmean_ref
 YMONSTAT     = ymonmin_ref ymonmax_ref ymonsum_ref ymonavg_ref ymonmean_ref ymonstd_ref ymonstd1_ref ymonvar_ref ymonvar1_ref ymonrange_ref ymonskew_ref ymonkurt_ref
 YSEASSTAT    = yseasmin_ref yseasmax_ref yseassum_ref yseasavg_ref yseasmean_ref yseasstd_ref yseasstd1_ref yseasvar_ref yseasvar1_ref yseasrange_ref
 SEASSTAT     = seasmin_ref seasmax_ref seassum_ref seasavg_ref seasmean_ref seasstd_ref seasstd1_ref seasvar_ref seasvar1_ref seasrange_ref
+TIMPCTL      = seaspctl50_ref timpctl50_ref yearpctl50_ref monpctl50_ref daypctl50_ref
 RUNSTAT      = runmin_ref runmax_ref runsum_ref runavg_ref runmean_ref runstd_ref runstd1_ref runvar_ref runvar1_ref runrange_ref
-RUNPSTAT     = runpctl1_ref runpctl20_ref runpctl25_ref runpctl33_ref runpctl50_ref runpctl66_ref runpctl75_ref runpctl80_ref runpctl99_ref runpctl100_ref
+RUNPCTL      = runpctl1_ref runpctl20_ref runpctl25_ref runpctl33_ref runpctl50_ref runpctl66_ref runpctl75_ref runpctl80_ref runpctl99_ref runpctl100_ref
 TIMSTAT      = timmin_ref timmax_ref timsum_ref timavg_ref timmean_ref timstd_ref timstd1_ref timvar_ref timvar1_ref timrange_ref
 YEARSTAT     = yearmin_ref yearmax_ref yearsum_ref yearavg_ref yearmean_ref yearstd_ref yearstd1_ref yearvar_ref yearvar1_ref yearrange_ref
 MONSTAT      = monmin_ref monmax_ref monsum_ref monavg_ref monmean_ref monstd_ref monstd1_ref monvar_ref monvar1_ref monrange_ref
@@ -47,7 +48,7 @@ REMAPETA     = remapeta1.nc remapeta2.nc remapeta_ref VCT.L62
 SMOOTH       = smooth1_ref smooth2_ref smooth3_ref
 SETMISS      = setmisstoc_ref setmisstonn_ref setmisstodis_ref
 
-EXTRA_DIST = $(INPUTDATA) $(FILE) $(GRIB) $(NETCDF) $(EOF) $(COMP) $(YDRUNSTAT) $(YMONSTAT) $(YSEASSTAT) $(SEASSTAT) \
-             $(RUNSTAT) $(RUNPSTAT) $(TIMSTAT) $(YEARSTAT) $(MONSTAT) $(DAYSTAT) $(VERTSTAT) $(FLDSTAT) $(FLDPSTAT) \
+EXTRA_DIST = $(INPUTDATA) $(FILE) $(GRIB) $(NETCDF) $(EOF) $(COMP) $(YDRUNSTAT) $(YMONSTAT) $(YSEASSTAT) $(SEASSTAT) $(TIMPCTL) \
+             $(RUNSTAT) $(RUNPCTL) $(TIMSTAT) $(YEARSTAT) $(MONSTAT) $(DAYSTAT) $(VERTSTAT) $(FLDSTAT) $(FLDPSTAT) \
              $(MERSTAT) $(ZONSTAT) $(ENSPSTAT) $(SPECTRAL) $(VERTINT) $(REMAP) $(REMAP2) $(SELECT) $(DETREND) \
              $(THREAD) $(EXPR) $(GRADSDES) $(ARITH) $(MAPREDUCE) $(MERGETIME) $(REMAPETA) $(SMOOTH) $(SETMISS)

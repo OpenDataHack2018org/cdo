@@ -18,7 +18,7 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Detrend.test Genweights.test Remap.test Remap2.test Remapeta.test Select.test Spectral.test \
         Ensstat.test Enspctl.test Gridboxstat.test \
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
-        Timstat.test Timselstat.test Seasstat.test \
+        Timstat.test Timselstat.test Seasstat.test Timpctl.test \
         Runstat.test Runpctl.test Multiyearstat.test Ydrunstat.test \
         Mergetime.test EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
