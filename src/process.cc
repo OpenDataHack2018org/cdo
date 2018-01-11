@@ -184,6 +184,7 @@ processSelf(void)
       }
 
   pthread_mutex_unlock(&processMutex);
+  ERROR("Could not find process for thread: ", thID);
 
 #endif
   return Process.find(0)->second;
@@ -1560,13 +1561,6 @@ char* createPipeName(size_t pnlen)
   return pipename;
 }
 
-int pstreamOpenWrite(int p_streamIndex, int ft)
-{
-   process_t &p = processSelf();
-   int streamIndex = p_streamIndex - p.inputStreams.size();
-   return cdoStreamOpenWrite(streamIndex, ft);
-}
-
 int pstreamOpenAppend(int p_streamIndex)
 {
    process_t &p = processSelf();
@@ -1600,11 +1594,14 @@ int cdoStreamOpenRead(int inStreamIDX)
     return inStream->self; // return ID
 }
 
-int cdoStreamOpenWrite(int outStreamIDX, int filetype)
+int cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
 {
-    if(CdoDebug::PROCESS) MESSAGE("Getting out stream ", outStreamIDX, " of process ", processSelf().m_ID);
-    pstream_t* outStream = processSelf().outputStreams[outStreamIDX];
-    
+    if(CdoDebug::PROCESS) MESSAGE("Getting out stream ", p_outStreamIDX, " of process ", processSelf().m_ID);
+
+    process_t& process = processSelf();
+    int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
+    pstream_t* outStream = process.outputStreams[outStreamIDX];
+
     if(outStream->ispipe)
     {
         outStream->pstreamOpenWritePipe(outStream->pipe->name.c_str(), filetype);
