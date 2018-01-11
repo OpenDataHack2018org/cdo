@@ -76,6 +76,7 @@ void *Runstat(void *argument)
   // clang-format on
 
   operatorInputArg("number of timesteps");
+  operatorCheckArgc(1);
   int ndates = parameter2int(operatorArgv()[0]);
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
