@@ -392,7 +392,7 @@ Remapeta(void *argument)
     for (i = 0; i < nvct1 / 2; ++i)
       cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1 / 2 + i]);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   if (zaxisIDh == -1)

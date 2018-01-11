@@ -78,7 +78,7 @@ void *Timselpctl(void *argument)
   taxisWithBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
   int nvars    = vlistNvars(vlistID1);

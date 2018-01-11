@@ -57,7 +57,7 @@ void *Tocomplex(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( cdoFiletype() != CDI_FILETYPE_EXT ) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);

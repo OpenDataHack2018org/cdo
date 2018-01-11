@@ -98,7 +98,7 @@ void *Math(void *argument)
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;

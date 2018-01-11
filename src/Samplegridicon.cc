@@ -563,10 +563,10 @@ void *Samplegridicon(void *argument)
       vlistChangeGridIndex(vlistID3, index, gridID2);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   long gridsize2 = gridInqSize(gridID2);

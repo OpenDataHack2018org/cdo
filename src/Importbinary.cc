@@ -335,7 +335,7 @@ void *Importbinary(void *argument)
 
   vlistDefTaxis(vlistID, taxisID);
 
-  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID, vlistID);
 

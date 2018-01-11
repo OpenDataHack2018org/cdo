@@ -96,7 +96,7 @@ void *Runstat(void *argument)
       if ( nsteps > 0 ) vlistDefNtsteps(vlistID2, nsteps);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);

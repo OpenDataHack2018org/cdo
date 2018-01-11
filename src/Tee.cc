@@ -36,8 +36,8 @@ void *Tee(void *argument)
   int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   int vlistID2 = vlistDuplicate(vlistID1);
   int vlistID3 = vlistDuplicate(vlistID1);

@@ -164,7 +164,7 @@ void *Consecstat(void *argument)
       vlistDefVarUnits(ovlistID, varID, "steps"); /* TODO */
     }
 
-  int ostreamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int ostreamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   int itsID = 0;

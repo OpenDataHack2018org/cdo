@@ -86,7 +86,7 @@ void *Copy(void *argument)
 
       if ( indf == 0 )
 	{
-	  streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+	  streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
 	  vlistID2 = vlistDuplicate(vlistID1);
 	  taxisID2 = taxisDuplicate(taxisID1);

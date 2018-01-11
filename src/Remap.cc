@@ -943,7 +943,7 @@ void *Remap(void *argument)
 
   if ( ! lwrite_remap )
     {
-      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+      streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
       pstreamDefVlist(streamID2, vlistID2);
     }
 

@@ -475,7 +475,7 @@ void *Collgrid(void *argument)
 	}
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 	  
   double *array2 = (gridsize2 > 0) ? (double*) Malloc(gridsize2*sizeof(double)) : NULL;

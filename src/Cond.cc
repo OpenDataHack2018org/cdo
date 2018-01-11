@@ -78,7 +78,7 @@ void *Cond(void *argument)
   nospec(vlistID1);
   nospec(vlistID2);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   size_t gridsize = vlistGridsizeMax(vlistID2);

@@ -111,7 +111,7 @@ void *Merstat(void *argument)
 
   vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   gridID1 = vlistInqVarGrid(vlistID1, 0);

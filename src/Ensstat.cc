@@ -240,7 +240,7 @@ void *Ensstat(void *argument)
 	}
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   ensstat_arg.vlistID1 = vlistID1;

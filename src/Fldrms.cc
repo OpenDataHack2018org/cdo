@@ -83,7 +83,7 @@ void *Fldrms(void *argument)
 
   if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   field_type field1, field2, field3;

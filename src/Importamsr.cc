@@ -190,7 +190,7 @@ void *Importamsr(void *argument)
   int vdate = getDate(cdoGetStreamName(0).c_str());
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
-  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   /*
     Longitude  is 0.25*xdim-0.125    degrees east

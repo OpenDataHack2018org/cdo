@@ -318,7 +318,7 @@ void *Vertintap(void *argument)
 	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 

@@ -209,7 +209,7 @@ void *Merge(void *argument)
       vlistPrint(vlistID2);
     }
        
-  int streamID2 = pstreamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
 
   vlistDefTaxis(vlistID2, taxisID2);
   pstreamDefVlist(streamID2, vlistID2);

@@ -461,7 +461,7 @@ void *DestaggerUV()
       ovar = (double *) Malloc(gridsize*sizeof(double));
     } // end of  if (!lcopy)
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   // The following code is NOT applicable here! Done already before.
   //if ( varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID )
@@ -1197,7 +1197,7 @@ void *TransformUV(int operatorID)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
   vlistID2 = pstreamInqVlist(streamID2); // refresh it

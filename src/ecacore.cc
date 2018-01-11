@@ -103,7 +103,7 @@ void eca1(const ECA_REQUEST_1 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  ostreamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID);
@@ -475,7 +475,7 @@ void eca2(const ECA_REQUEST_2 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  ostreamID = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID1);
@@ -851,7 +851,7 @@ void eca3(const ECA_REQUEST_3 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  ostreamID = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID1);
@@ -1053,7 +1053,7 @@ void eca4(const ECA_REQUEST_4 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  int ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int ostreamID = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   int nrecords    = vlistNrecs(ivlistID1);

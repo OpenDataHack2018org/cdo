@@ -315,7 +315,7 @@ void *Invert(void *argument)
       else                         invertLonDes(vlistID2);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 

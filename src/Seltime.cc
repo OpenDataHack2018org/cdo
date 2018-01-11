@@ -436,7 +436,7 @@ void *Seltime(void *argument)
 	{
 	  if ( tsID2 == 0 )
 	    {
-	      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+	      streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 

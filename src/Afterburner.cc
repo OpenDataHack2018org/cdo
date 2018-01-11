@@ -2057,7 +2057,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
   if ( globs->Mean != 2 )
     {
 #if defined(PSTREAM_WRITE_H)
-      globs->ostreamID = streamOpenWrite(cdoStreamName(ofileidx), ofiletype);
+      globs->ostreamID = cdoStreamOpenWrite(cdoStreamName(ofileidx), ofiletype);
 #else
       globs->ostreamID = streamOpenWrite(ofile, ofiletype);
       if ( globs->ostreamID < 0 ) cdiError(globs->ostreamID, "Open failed on %s", ofile);

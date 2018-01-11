@@ -118,7 +118,7 @@ void *Invertlev(void *argument)
 
   if ( operfunc == func_all || operfunc == func_hrd ) invertLevDes(vlistID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 

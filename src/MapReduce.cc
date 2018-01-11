@@ -158,7 +158,7 @@ void *MapReduce(void *argument)
   for ( int index = 0; index < ngrids; index++ ) vlistChangeGridIndex(vlistID2, index, outputGridID);
 
   /* loop over input fields and mask the data values {{{ */
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   double *arrayIn  = (double *)Malloc(inputGridSize*sizeof(double));

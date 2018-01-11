@@ -1497,7 +1497,7 @@ void *Echam5ini(void *argument)
       if ( cdoDefaultFileType == CDI_UNDEFID )
 	cdoDefaultFileType = CDI_FILETYPE_NC;
 
-      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+      streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
       pstreamDefVlist(streamID2, vlistID2);
 

@@ -51,10 +51,10 @@ void *Regres(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
   /*
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
   */
-  int streamID3 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID2);
 
   int nrecords = vlistNrecs(vlistID1);

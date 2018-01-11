@@ -136,7 +136,7 @@ void *Fldstat2(void *argument)
   for ( int index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID3, index, gridID3);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamDefVlist(streamID3, vlistID3);
 

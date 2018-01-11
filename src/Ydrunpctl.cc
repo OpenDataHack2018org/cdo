@@ -97,7 +97,7 @@ void *Ydrunpctl(void *argument)
   int calendar = taxisInqCalendar(taxisID1);
   int dpy      = calendar_dpy(calendar);
 
-  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
   int nvars    = vlistNvars(vlistID1);

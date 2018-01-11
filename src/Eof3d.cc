@@ -398,7 +398,7 @@ void *EOF3d(void * argument)
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
   /*  eigenvalues */
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int vlistID2 = vlistDuplicate(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -428,7 +428,7 @@ void *EOF3d(void * argument)
     vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 
   /*  eigenvectors */
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   int vlistID3 = vlistDuplicate(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);

@@ -96,7 +96,7 @@ void *Cat(void *argument)
 	      if ( cdoVerbose )
 		cdoPrint("Output file doesn't exist, creating: %s", cdoGetStreamName(nfiles).c_str());
 
-	      streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+	      streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
 	      vlistID2 = vlistDuplicate(vlistID1);
 	      taxisID2 = taxisDuplicate(taxisID1);

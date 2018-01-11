@@ -134,7 +134,7 @@ void *Setbox(void *argument)
 	vars[varID] = FALSE;
     }
 
-  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 

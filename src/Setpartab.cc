@@ -475,7 +475,7 @@ void *Setpartab(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   // vlistPrint(vlistID2);
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   long gridsize = vlistGridsizeMax(vlistID1);

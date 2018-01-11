@@ -99,7 +99,7 @@ void *Timstat3(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
  
   vlistDefTaxis(vlistID3, taxisID3);
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   for ( int i = 0; i < NIN; ++i ) reached_eof[i] = 0;

@@ -83,7 +83,7 @@ void *Varrms(void *argument)
   vlistChangeGridIndex(vlistID3, index, gridID3);
   if ( ngrids > 1 ) cdoAbort("Too many different grids!");
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*));

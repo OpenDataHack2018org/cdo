@@ -203,7 +203,7 @@ void *Arith(void *argument)
   int taxisID3 = taxisDuplicate(taxisIDx1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = cdoStreamOpenWrite(0, cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(2, cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;

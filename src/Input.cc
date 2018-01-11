@@ -229,7 +229,7 @@ void *Input(void *argument)
 	  taxisID = taxisCreate(TAXIS_RELATIVE);
 	  vlistDefTaxis(vlistID, taxisID);
 
-	  streamID = pstreamOpenWrite(cdoStreamName(0), output_filetype);
+	  streamID = cdoStreamOpenWrite(cdoStreamName(0), output_filetype);
 
 	  pstreamDefVlist(streamID, vlistID);
 	}

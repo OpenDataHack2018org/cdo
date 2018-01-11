@@ -604,7 +604,7 @@ void *Select(void *argument)
                   bool lasttimestep = (nfiles == 1) && (ntsteps2 > 1) && (ntsteps2 == (tsID1+1));
                   if ( lasttimestep && tsID2 == 0 ) ntsteps2 = 1;
                   if ( ntsteps2 == 0 || ntsteps2 == 1 ) vlistDefNtsteps(vlistID2, ntsteps2);
-		  streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+		  streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 		  pstreamDefVlist(streamID2, vlistID2);
 		}
 	      taxisCopyTimestep(taxisID2, taxisID1);

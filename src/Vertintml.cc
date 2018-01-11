@@ -443,7 +443,7 @@ void *Vertintml(void *argument)
       if ( !(suma>0&&sumb>0) ) cdoWarning("VCT is empty!");
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;

@@ -148,7 +148,7 @@ void *Sorttimestamp(void *argument)
 
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID2 = 0;

@@ -152,7 +152,7 @@ void *Mastrfu(void *argument)
   vlistDefVarUnits(vlistID2, 0, "kg/s");
   vlistDefVarDatatype(vlistID2, 0, CDI_DATATYPE_FLT32);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   double *array1 = (double*) Malloc(gridsize*nlev*sizeof(double));

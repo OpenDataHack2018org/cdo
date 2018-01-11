@@ -520,7 +520,7 @@ void *Sethalo(void *argument)
 	vars[varID] = FALSE;
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   gridsize = gridInqSize(gridID1);

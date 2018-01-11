@@ -125,7 +125,7 @@ void *Setmiss(void *argument)
 	cdiDefAttFlt(vlistID2, varID, "valid_range", CDI_DATATYPE_FLT64, 2, range);
     }
   */
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);

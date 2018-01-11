@@ -152,7 +152,7 @@ void *Trms(void *argument)
 
   if ( vctsize == 0 ) cdoAbort("VCT missing!");
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*));

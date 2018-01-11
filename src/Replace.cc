@@ -149,7 +149,7 @@ void *Replace(void *argument)
 
   int vlistID3 = vlistDuplicate(vlistID1);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   vlistDefTaxis(vlistID3, taxisID3);
   pstreamDefVlist(streamID3, vlistID3);

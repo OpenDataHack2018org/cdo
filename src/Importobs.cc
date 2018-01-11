@@ -142,7 +142,7 @@ void *Importobs(void *argument)
   int vdate = getDate(cdoGetStreamName(0).c_str());
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
-  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 

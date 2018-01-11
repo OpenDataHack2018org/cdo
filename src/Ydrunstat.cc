@@ -101,7 +101,7 @@ void *Ydrunstat(void *argument)
   int calendar = taxisInqCalendar(taxisID1);
   int dpy      = calendar_dpy(calendar);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);

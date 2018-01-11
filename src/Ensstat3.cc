@@ -188,7 +188,7 @@ void *Ensstat3(void *argument)
 
   if ( operfunc != func_roc )
     {
-      streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+      streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
       pstreamDefVlist(streamID2, vlistID2);
     }
 

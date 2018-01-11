@@ -57,8 +57,8 @@ void *Trend(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID2);

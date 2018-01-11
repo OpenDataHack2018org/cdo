@@ -215,7 +215,7 @@ void *CDIwrite(void *argument)
       data_size = 0;
       nvalues = 0;
 
-      int streamID = pstreamOpenWrite(cdoStreamName(0), cdoFiletype());
+      int streamID = cdoStreamOpenWrite(cdoStreamName(0), cdoFiletype());
 
       pstreamDefVlist(streamID, vlistID);
 

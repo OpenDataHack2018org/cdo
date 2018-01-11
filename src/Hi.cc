@@ -141,7 +141,7 @@ void *Hi(void *argument)
   vlistDefVarLongname(vlistID4, varID4, HI_LONGNAME);
   vlistDefVarUnits(vlistID4, varID4, HI_UNITS);
 
-  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
 
   pstreamDefVlist(streamID4, vlistID4);
 

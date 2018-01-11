@@ -126,7 +126,7 @@ void *Wct(void *argument)
   vlistDefVarLongname(vlistID3, varID3, WCT_LONGNAME);
   vlistDefVarUnits(vlistID3, varID3, WCT_UNITS);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamDefVlist(streamID3, vlistID3);
 

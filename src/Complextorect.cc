@@ -61,8 +61,8 @@ void *Complextorect(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID3);

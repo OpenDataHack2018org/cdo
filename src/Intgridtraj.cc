@@ -166,7 +166,7 @@ void *Intgridtraj(void *argument)
 	    {
               if ( streamID2 == CDI_UNDEFID )
                 {
-                  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+                  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
                   pstreamDefVlist(streamID2, vlistID2);
                 }
 

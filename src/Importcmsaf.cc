@@ -1549,7 +1549,7 @@ void *Importcmsaf(void *argument)
   vdate = get_vdate(vlistID);
   if ( vdate == 0 ) vdate = 10101;
 
-  streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID, vlistID);
 
