@@ -41,7 +41,7 @@ void *Runstat(void *argument)
   int varID;
   int levelID;
   size_t nmiss;
-  int runstat_nomiss = 0;
+  bool runstat_nomiss = false;
 
   cdoInitialize(argument);
 
@@ -50,7 +50,7 @@ void *Runstat(void *argument)
     {
       char *endptr;
       int envval = (int) strtol(envstr, &endptr, 10);
-      if ( envval == 1 ) runstat_nomiss = 1;
+      if ( envval == 1 ) runstat_nomiss = true;
     }
 
   // clang-format off
@@ -277,18 +277,14 @@ void *Runstat(void *argument)
       dtlist_shift(dtlist);
 
       vars1[ndates] = vars1[0];
-      if ( !runstat_nomiss )
-	samp1[ndates] = samp1[0];
-      if ( lvarstd || lrange )
-        vars2[ndates] = vars2[0];
+      if ( !runstat_nomiss )   samp1[ndates] = samp1[0];
+      if ( lvarstd || lrange ) vars2[ndates] = vars2[0];
 
       for ( int inp = 0; inp < ndates; inp++ )
 	{
 	  vars1[inp] = vars1[inp+1];
-	  if ( !runstat_nomiss )
-	    samp1[inp] = samp1[inp+1];
-	  if ( lvarstd || lrange )
-	    vars2[inp] = vars2[inp+1];
+	  if ( !runstat_nomiss )   samp1[inp] = samp1[inp+1];
+	  if ( lvarstd || lrange ) vars2[inp] = vars2[inp+1];
 	}
 
       int nrecs = pstreamInqTimestep(streamID1, tsID);
