@@ -58,7 +58,7 @@ void eca1(const ECA_REQUEST_1 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID = pstreamOpenRead(cdoStreamName(0));
+  istreamID = cdoStreamOpenRead(cdoStreamName(0));
 
   ivlistID = pstreamInqVlist(istreamID);
   ovlistID = vlistCreate();
@@ -425,8 +425,8 @@ void eca2(const ECA_REQUEST_2 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID1 = pstreamOpenRead(cdoStreamName(0));
-  istreamID2 = pstreamOpenRead(cdoStreamName(1));
+  istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
   ivlistID1 = pstreamInqVlist(istreamID1);
   ivlistID2 = pstreamInqVlist(istreamID2);
@@ -815,8 +815,8 @@ void eca3(const ECA_REQUEST_3 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID1 = pstreamOpenRead(cdoStreamName(0));
-  istreamID2 = pstreamOpenRead(cdoStreamName(1));
+  istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
   ivlistID1 = pstreamInqVlist(istreamID1);
   ivlistID2 = pstreamInqVlist(istreamID2);
@@ -1012,8 +1012,8 @@ void eca4(const ECA_REQUEST_4 *request)
 
   int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  int istreamID1 = pstreamOpenRead(cdoStreamName(0));
-  int istreamID2 = pstreamOpenRead(cdoStreamName(1));
+  int istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
   int ivlistID1 = pstreamInqVlist(istreamID1);
   int ivlistID2 = pstreamInqVlist(istreamID2);
