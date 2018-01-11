@@ -1567,11 +1567,6 @@ int pstreamOpenWrite(int p_streamIndex, int ft)
    return cdoStreamOpenWrite(streamIndex, ft);
 }
 
-int pstreamOpenRead(int p_streamIndex)
-{
-    return cdoStreamOpenRead(p_streamIndex);
-}
-
 int pstreamOpenAppend(int p_streamIndex)
 {
    process_t &p = processSelf();

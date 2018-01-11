@@ -162,7 +162,6 @@ std::string cdoGetInStreamName(int p_inStream);
 std::string cdoGetOutStreamName(int p_outStream);
 std::string cdoGetStreamName(int p_streamIndex);
 char* cdoGetObase();
-int pstreamOpenRead(int p);
 int pstreamOpenWrite(int p, int ft);
 int pstreamOpenAppend(int p);
 #endif /* _PROCESS_H */
