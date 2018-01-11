@@ -114,12 +114,12 @@ void *Runpctl(void *argument)
               for ( int i = 0; i < gridsize; i++ )
                 {
                   int j = 0;
-                  for ( int inp = 0, j = 0; inp < ndates; inp++ )
+                  for ( int inp = 0; inp < ndates; inp++ )
                     {
                       double val = vars1[inp][varID][levelID].ptr[i];
                       if ( !DBL_IS_EQUAL(val, missval) ) array[j++] = val;
                     }
-                  
+                  printf("j = %d  ndates = %d\n", j, ndates);
                   if ( j > 0 )
                     {
                       vars1[0][varID][levelID].ptr[i] = percentile(array, j, pn);
