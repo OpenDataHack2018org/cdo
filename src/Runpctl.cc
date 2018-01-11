@@ -119,7 +119,7 @@ void *Runpctl(void *argument)
                       double val = vars1[inp][varID][levelID].ptr[i];
                       if ( !DBL_IS_EQUAL(val, missval) ) array[j++] = val;
                     }
-                  printf("j = %d  ndates = %d\n", j, ndates);
+
                   if ( j > 0 )
                     {
                       vars1[0][varID][levelID].ptr[i] = percentile(array, j, pn);
