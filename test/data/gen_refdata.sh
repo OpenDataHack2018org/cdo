@@ -5,6 +5,17 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# runpctl
+#
+IFILE=ts_mm_5years
+PCTLS="1 20 25 33 50 66 75 80 99 100"
+for PCTL in $PCTLS; do
+  $CDO $FORMAT runpctl,$PCTL,12 $IFILE runpctl${PCTL}_ref
+done
+exit
+#
+########################################################################
+#
 # setmiss
 #
 IFILE=t21_geosp_tsurf_sea.grb
