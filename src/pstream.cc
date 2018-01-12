@@ -725,7 +725,6 @@ int pstream_t::pstreamOpenWriteFile(int filetype)
   return self;
 }
 
-/*TEMP*/
 int
 pstream_t::pstreamOpenWriteFile(const char* p_filename, int filetype)
 {
@@ -794,61 +793,6 @@ pstream_t::pstreamOpenWriteFile(const char* p_filename, int filetype)
   return self;
 }
 
-int
-pstreamOpenWrite(const argument_t *argument, int filetype)
-{
-  int pstreamID = -1;
-
-  //PSTREAM_INIT();
-
-  int ispipe = strncmp(argument->args, "(pipe", 5) == 0;
-
-  if (ispipe)
-    {
-      pstreamID = pstreamFindID(argument->args);
-      if (pstreamID == -1)
-        {
-          Error("%s is not open!", argument->args);
-        }
-      pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-      pstreamptr->pstreamOpenWritePipe(argument->args, filetype);
-    }
-  else
-    {
-      pstream_t *new_pstream = create_pstream();
-      pstreamID = new_pstream->pstreamOpenWriteFile(argument->args, filetype);
-    }
-
-  return pstreamID;
-}
-
-int
-pstreamOpenAppend(const argument_t *argument)
-{
-  int ispipe = strncmp(argument->args, "(pipe", 5) == 0;
-
-  if (ispipe)
-    {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE("pipe ", argument->args);
-        }
-      cdoAbort("this operator doesn't work with pipes!");
-    }
-
-  pstream_t *pstreamptr = create_pstream();
-  pstreamptr->ispipe = false;
-
-  if (!pstreamptr)
-    ERROR("No memory");
-
-  if (CdoDebug::PSTREAM)
-    MESSAGE("file ", argument->args);
-
-  pstreamptr->openAppend(argument->args);
-
-  return pstreamptr->self;
-}
 void
 pstream_t::openAppend(const char *p_filename)
 {
