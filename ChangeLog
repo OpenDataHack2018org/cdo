@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.3
 	* Version 1.9.3 release
 
+2018-01-11  Uwe Schulzweida
+
+	* runpctl: fails since release 1.8.0 (bug fix)
+
 2017-12-26  Uwe Schulzweida
 
 	* read of reduced Gaussian grid description file failed [Bug #8146]

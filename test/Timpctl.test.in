@@ -1,0 +1,58 @@
+#! @BASH@
+echo 1..5 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO=cdo
+test -n "$DATAPATH" || DATAPATH=./data
+#
+CDOOUT=cout$$
+CDOERR=cerr$$
+FORMAT="-f srv -b 32"
+#
+TYPES="seas tim year mon day"
+PCTL=50
+
+NTEST=1
+
+rm -rf TimpctlDebugOutput
+mkdir TimpctlDebugOutput
+
+#
+for TYPE in $TYPES; do
+  if [ $TYPE = day ] ; then
+    IFILE=$DATAPATH/ts_6h_1mon
+  elif [ $TYPE = mon ] ; then
+    IFILE=$DATAPATH/ts_1d_1year
+  else
+    IFILE=$DATAPATH/ts_mm_5years
+  fi
+#
+  RSTAT=0
+  RFILE=$DATAPATH/${TYPE}pctl${PCTL}_ref
+  OFILE=${TYPE}pctl${PCTL}_res
+
+  CDOTEST="${TYPE}pctl"
+
+  DEBUG_OUT="--seperateDebugFromLog TimpctlDebugOutput/Timpctl_${TYPE}.debug"
+  CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT ${TYPE}pctl,${PCTL} $IFILE $DATAPATH/${TYPE}min_ref $DATAPATH/${TYPE}max_ref $OFILE"
+
+  echo "Running test: $NTEST"
+  echo "$CDOCOMMAND"
+
+  $CDOCOMMAND
+  test $? -eq 0 || let RSTAT+=1
+
+  $CDO $DEBUG_OUT diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+  test $? -eq 0 || let RSTAT+=1
+  test -s $CDOOUT && let RSTAT+=1
+  cat $CDOOUT $CDOERR
+
+  test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+  test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+
+  let NTEST+=1
+  rm -f $OFILE
+done
+#
+rm -f $CDOOUT $CDOERR
+#
+exit 0

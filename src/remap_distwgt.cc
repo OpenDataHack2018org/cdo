@@ -111,9 +111,8 @@ size_t nbr_normalize_weights(size_t numNeighbors, double dist_tot, const bool *r
 
 //  This routine finds the closest num_neighbor points to a search point and computes a distance to each of the neighbors.
 
-template <typename T>
 static inline
-void LLtoXYZ(double lon, double lat, T *restrict xyz)
+void LLtoXYZ(double lon, double lat, double *restrict xyz)
 {
    double cos_lat = cos(lat);
    xyz[0] = cos_lat * cos(lon);
@@ -121,16 +120,14 @@ void LLtoXYZ(double lon, double lat, T *restrict xyz)
    xyz[2] = sin(lat);
 }
 
-template <typename T>
 static constexpr
-T square(const T x)
+double square(const double x)  noexcept
 {
   return x*x;
 }
 
-template <typename T>
 static constexpr
-T distance(const T *restrict a, const T *restrict b)
+double distance(const double *restrict a, const double *restrict b)  noexcept
 {
   return square(a[0]-b[0]) + square(a[1]-b[1]) + square(a[2]-b[2]);
 }
@@ -220,7 +217,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *r
 
       double xyz[3];
       double query_pt[3];
-      LLtoXYZ<double>(plon, plat, query_pt);
+      LLtoXYZ(plon, plat, query_pt);
       double search_radius = SQR(gs->search_radius);
 
       for ( size_t na = 0; na < num_add; ++na )
@@ -233,7 +230,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *r
           xyz[1] = coslat[iy] * sinlon[ix];
           xyz[2] = sinlat[iy];
 	  // Find distance to this point
-          double dist = (float) distance<double>(query_pt, xyz);
+          double dist = (float) distance(query_pt, xyz);
 	  if ( dist <= search_radius )
 	    {
 	      // Store the address and distance if this is one of the smallest so far
