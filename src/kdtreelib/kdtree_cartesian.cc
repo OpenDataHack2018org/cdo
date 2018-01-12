@@ -16,13 +16,13 @@
    ********************************************************************* */
 
 static constexpr
-kdata_t square(const kdata_t x)
+kdata_t square(const kdata_t x)  noexcept
 {
   return x*x;
 }
 
 static constexpr
-kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b)
+kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b)  noexcept
 {
   return (float)(square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
 }
@@ -30,7 +30,7 @@ kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b)
 
 kdata_t kd_min(kdata_t x, kdata_t y)
 {
-    return x < y ? x : y;
+  return x < y ? x : y;
 }
 
 

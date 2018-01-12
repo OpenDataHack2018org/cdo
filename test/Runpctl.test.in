@@ -1,0 +1,48 @@
+#! @BASH@
+echo 1..1 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO=cdo
+test -n "$DATAPATH" || DATAPATH=./data
+#
+CDOOUT=cout$$
+CDOERR=cerr$$
+FORMAT="-f srv -b 32"
+#
+PCTLS="1 20 25 33 50 66 75 80 99 100"
+#
+IFILE=$DATAPATH/ts_mm_5years
+#
+NTEST=1
+RSTAT=0
+#
+for PCTL in $PCTLS; do
+
+  rm -f Runpctl_${PCTL}.debug
+  DEBUG_OUT="--seperateDebugFromLog Runpctl_${PCTL}.debug"
+
+  RFILE=$DATAPATH/runpctl${PCTL}_ref
+  OFILE=runpctl${STAT}_res
+
+  CDOTEST="runpctl$STAT"
+
+  CDOCOMMAND="$CDO $DEBUG_OUT $FORMAT runpctl,${PCTL},12 $IFILE $OFILE"
+
+  echo "$CDOCOMMAND"
+
+  $CDOCOMMAND
+  test $? -eq 0 || let RSTAT+=1
+
+  $CDO $DEBUG_OUT diff,0.004 $OFILE $RFILE > $CDOOUT 2> $CDOERR
+  test $? -eq 0 || let RSTAT+=1
+  test -s $CDOOUT && let RSTAT+=1
+  cat $CDOOUT $CDOERR
+
+  rm -f $OFILE
+done
+#
+test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+#
+rm -f $CDOOUT $CDOERR
+#
+exit 0

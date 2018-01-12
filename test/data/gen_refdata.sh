@@ -5,6 +5,49 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Timpctl Yearpctl Monstat Daypctl
+#
+PCTLS="50"
+#
+IFILE=ts_mm_5years
+for PCTL in $PCTLS; do
+  $CDO $FORMAT seaspctl,${PCTL} $IFILE seasmin_ref seasmax_ref seaspctl${PCTL}_ref
+done
+#
+IFILE=ts_mm_5years
+for PCTL in $PCTLS; do
+  $CDO $FORMAT timpctl,$PCTL $IFILE timmin_ref timmax_ref timpctl${PCTL}_ref
+done
+#
+IFILE=ts_mm_5years
+for PCTL in $PCTLS; do
+  $CDO $FORMAT yearpctl,$PCTL $IFILE yearmin_ref yearmax_ref yearpctl${PCTL}_ref
+done
+#
+IFILE=ts_1d_1year
+for PCTL in $PCTLS; do
+  $CDO $FORMAT monpctl,$PCTL $IFILE monmin_ref monmax_ref monpctl${PCTL}_ref
+done
+#
+IFILE=ts_6h_1mon
+for PCTL in $PCTLS; do
+  $CDO $FORMAT daypctl,$PCTL $IFILE daymin_ref daymax_ref daypctl${PCTL}_ref
+done
+exit
+#
+########################################################################
+#
+# runpctl
+#
+IFILE=ts_mm_5years
+PCTLS="1 20 25 33 50 66 75 80 99 100"
+for PCTL in $PCTLS; do
+  $CDO $FORMAT runpctl,$PCTL,12 $IFILE runpctl${PCTL}_ref
+done
+exit
+#
+########################################################################
+#
 # setmiss
 #
 IFILE=t21_geosp_tsurf_sea.grb
