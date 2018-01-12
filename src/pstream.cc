@@ -664,7 +664,69 @@ set_comp(int fileID, int filetype)
     }
 }
 
- int
+int pstream_t::pstreamOpenWriteFile(int filetype)
+{
+  if (CdoDebug::PSTREAM){
+    MESSAGE("Opening (w) file ", m_name);
+  }
+
+  if (filetype == CDI_UNDEFID)
+    filetype = CDI_FILETYPE_GRB;
+
+  if (cdoInteractive)
+    {
+      struct stat stbuf;
+
+      int rstatus = stat(m_name.c_str(), &stbuf);
+      /* If permanent file already exists, query user whether to overwrite or exit */
+      if (rstatus != -1)
+        query_user_exit(m_name.c_str());
+    }
+
+  if (processNums() == 1 && ompNumThreads == 1)
+    timer_start(timer_write);
+
+#ifdef  HAVE_LIBPTHREAD
+  if (cdoLockIO)
+    pthread_mutex_lock(&streamMutex);
+  else
+    pthread_mutex_lock(&streamOpenWriteMutex);
+#endif
+
+  int fileID = streamOpenWrite(m_name.c_str(), filetype);
+
+#ifdef  HAVE_LIBPTHREAD
+  if (cdoLockIO)
+    pthread_mutex_unlock(&streamMutex);
+  else
+    pthread_mutex_unlock(&streamOpenWriteMutex);
+#endif
+
+  if (processNums() == 1 && ompNumThreads == 1)
+    timer_stop(timer_write);
+  if (fileID < 0)
+    cdiOpenError(fileID, "Open failed on >%s<", m_name.c_str());
+
+  cdoDefHistory(fileID, commandLine());
+
+  if (cdoDefaultByteorder != CDI_UNDEFID)
+    streamDefByteorder(fileID, cdoDefaultByteorder);
+
+  set_comp(fileID, filetype);
+  /*
+    if ( cdoDefaultInstID != CDI_UNDEFID )
+    streamDefInstID(fileID, cdoDefaultInstID);
+  */
+
+  mode = 'w';
+  m_fileID = fileID;
+  m_filetype = filetype;
+
+  return self;
+}
+
+/*TEMP*/
+int
 pstream_t::pstreamOpenWriteFile(const char* p_filename, int filetype)
 {
   char *filename = (char *) Malloc(strlen(p_filename) + 1);

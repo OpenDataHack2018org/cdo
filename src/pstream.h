@@ -41,6 +41,7 @@ public:
   void pstreamOpenReadPipe(const char* pipename);
   void pstreamOpenReadFile(const char *argument);
   int pstreamOpenWriteFile(const char* p_filename, int filetype);
+  int pstreamOpenWriteFile(int filetype);
   int pstreamOpenWritePipe(const char* filename, int filetype);
   void openAppend(const char * p_filename);
   void init();
