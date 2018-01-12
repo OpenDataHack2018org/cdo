@@ -76,6 +76,7 @@ public:
   char *operatorArg;
   char prompt[64];
   short noper;
+  bool m_isActive;  /*TEMP*/ //not used right now, maybe later (12.1.2018)
 
   modules_t m_module;
   std::vector<char *> oargv;
@@ -155,6 +156,7 @@ process_t* getProcess(int p_processID);
   int checkStreamCnt();
 int cdoStreamOpenRead(int inStreamIDX);
 int cdoStreamOpenWrite(int outStreamIDX, int filetype);
+int cdoStreamOpenWrite(std::string p_filename, int filetype);
 int cdoStreamOpenAppend(int outStreamIDX);
 bool cdoOutFileExists(int outStreamIDX);
 bool cdoInFileExists(int inStreamIDX);

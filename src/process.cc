@@ -114,6 +114,7 @@ process_t::initProcess()
   ntimesteps = 0;
 
   m_streamCnt = 0;
+  m_isActive = false;
 
   oargc = 0;
   m_operatorCommand = "UNINITALIZED";
@@ -1550,6 +1551,7 @@ pthread_t process_t::run(argument_t* p_argument)
       errno = rval;
       SysError("pthread_create failed for '%s'", operatorName);
     }
+  m_isActive = true;
   return thrID;
 }
 
@@ -1621,6 +1623,23 @@ int cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
     }
     return outStream->self;
 }
+
+/** function for operators with obase usage, will be called while operator execution */
+int cdoStreamOpenWrite(std::string p_filename, int filetype)
+{
+      int pstreamID = -1;
+      process_t& process = processSelf();
+      process.addFileOutStream(p_filename);
+      pstreamID = process.outputStreams.back()->pstreamOpenWriteFile(filetype);
+
+      if(pstreamID == -1)
+      {
+        ERROR("Could not create pstream for file: ", p_filename);
+      }
+
+      return pstreamID;
+}
+
 bool cdoInFileExists(int inStreamIDX)
 {
     pstream_t* inStream = processSelf().inputStreams[inStreamIDX];
