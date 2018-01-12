@@ -75,9 +75,8 @@ private:
 #endif
 };
 
-int pstreamOpenRead(const argument_t *argument);
-int pstreamOpenAppend(const argument_t *argument);
 void pstreamClose(int pstreamID);
+int pstreamOpenRead(const argument_t* arg);
 
 int pstreamInqFiletype(int pstreamID);
 int pstreamInqByteorder(int pstreamID);
