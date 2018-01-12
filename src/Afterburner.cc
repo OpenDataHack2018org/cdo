@@ -21,7 +21,7 @@
 #include "cdo_int.h"
 #include "cdo_task.h"
 #include "pstream_write.h"
-#define  streamOpenWrite          pstreamOpenWrite
+#define  streamOpenWrite          cdoStreamOpenWrite
 #define  streamDefVlist           pstreamDefVlist
 #define  streamDefTimestep        pstreamDefTimestep
 #endif

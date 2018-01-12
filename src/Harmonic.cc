@@ -80,9 +80,7 @@ void *Harmonic(void *argument)
       if ( filesuffix[0] )
 	sprintf(filename+nchars+1, "%s", filesuffix);
 
-      argument_t *fileargument = file_argument_new(filename);
-      int streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      int streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
       streamIDs[j] = streamID2;
 

@@ -198,9 +198,7 @@ void *Ensval(void *argument)
     if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
       cdoAbort("Outputfile %s already exists!", ofilename);
 
-    argument_t *fileargument = file_argument_new(ofilename);
-    streamID2[stream] = pstreamOpenWrite(fileargument, cdoFiletype());    
-    file_argument_free(fileargument);
+    streamID2[stream] = cdoStreamOpenWrite(ofilename, cdoFiletype());    
 
     Free(ofilename);
 

@@ -157,9 +157,7 @@ void *Eofcoeff3d(void * argument)
       if ( filesuffix[0] )
         strcat(oname, filesuffix);
       
-      argument_t *fileargument = file_argument_new(oname);
-      streamIDs[eofID] = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      streamIDs[eofID] = cdoStreamOpenWrite(oname, cdoFiletype());
 
       if (cdoVerbose) 
         cdoPrint("opened %s ('w')  as stream%i for %i. eof", oname, streamIDs[eofID], eofID+1);

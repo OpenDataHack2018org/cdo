@@ -205,9 +205,7 @@ void *Splittime(void *argument)
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
 	  pstreamDefVlist(streamID2, vlistID2);
 

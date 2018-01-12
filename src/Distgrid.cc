@@ -327,9 +327,7 @@ void *Distgrid(void *argument)
       if ( filesuffix[0] )
 	sprintf(filename+nchars+5, "%s", filesuffix);
 
-      argument_t *fileargument = file_argument_new(filename);
-      streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 
       pstreamDefVlist(streamIDs[index], vlistIDs[index]);
     }

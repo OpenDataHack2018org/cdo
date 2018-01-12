@@ -155,9 +155,7 @@ void *Splitsel(void *argument)
       sprintf(filename+nchars+6, "%s", filesuffix);
 	  
       if ( cdoVerbose ) cdoPrint("create file %s", filename);
-      argument_t *fileargument = file_argument_new(filename);
-      int streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      int streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
       pstreamDefVlist(streamID2, vlistID2);
 

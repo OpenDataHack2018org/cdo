@@ -81,9 +81,7 @@ void *Intyear(void *argument)
       if ( filesuffix[0] )
 	sprintf(filename+nchars+4, "%s", filesuffix);
 
-      argument_t *fileargument = file_argument_new(filename);
-      streamIDs[iy] = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      streamIDs[iy] = cdoStreamOpenWrite(filename, cdoFiletype());
 
       pstreamDefVlist(streamIDs[iy], vlistID3);
     }
