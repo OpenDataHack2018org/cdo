@@ -97,7 +97,7 @@ public:
   void addFileOutStream(std::string file);
   void addPipeInStream();
   void addPipeOutStream();
-  pthread_t run(argument_t *p_argument);
+  pthread_t run();
 
 private:
   void defPrompt();

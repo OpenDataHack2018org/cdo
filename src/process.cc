@@ -1097,7 +1097,7 @@ clearProcesses()
   NumProcessActive = 0;
 }
 
-pthread_t process_t::run(argument_t* p_argument)
+pthread_t process_t::run()
 {
   pthread_attr_t attr;
   int status = pthread_attr_init(&attr);
@@ -1131,7 +1131,7 @@ pthread_t process_t::run(argument_t* p_argument)
 
   pthread_t thrID;
   //std::cout <<"starting thread : "<< operatorName << std::endl;
-  int rval = pthread_create(&thrID, &attr, operatorModule(operatorName), p_argument);
+  int rval = pthread_create(&thrID, &attr, operatorModule(operatorName), this);
   if (rval != 0)
     {
       errno = rval;
@@ -1174,7 +1174,7 @@ int cdoStreamOpenRead(int inStreamIDX)
        inStream->pstreamOpenReadPipe(pipename);
        argument_t * argument = argument_new(1, pnlen);
        argument->processID = process.childProcesses[process.nChildActive]->m_ID;
-       process.childProcesses[process.nChildActive]->run(argument); //new thread started in here!
+       process.childProcesses[process.nChildActive]->run(); //new thread started in here!
        process.nChildActive++;
     }
     else
