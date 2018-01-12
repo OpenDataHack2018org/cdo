@@ -4870,12 +4870,12 @@ void *CMOR(void *argument)
 {
   if ( cdoVerbose )
     {
-      int argc = ((argument_t *) argument)->argc;
-      std::vector<char *> &argv = ((argument_t *) argument)->argv;
-
+        /*TEMP*/ //UNTESTED (12.Jan.2018)
+        /*
       cdoPrint("You want to use the following streams for conversion to a project standard:");
-      for ( int args = 1; args < argc; args++)
-        cdoPrint("%s\n", (char *)argv[args]);
+      for ( int streamIDX = 1; streamIDX < processSelf().getInStreamCnt(); streamIDX++)
+        cdoPrint("%s\n", (char *)cdoGetStreamName(streamIDX).c_str());
+        */
     }
 
   cdoInitialize(argument);
