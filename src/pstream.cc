@@ -178,7 +178,7 @@ pstream_t *create_pstream(std::vector<std::string> p_filenameList)
 pstream_t *create_pstream(int processID, int pstreamIDX)
 {
     pstream_t *new_pstream = create_pstream();
-    new_pstream->pipe = new pipe_t();
+    new_pstream->pipe = std::make_shared<pipe_t>();
     new_pstream->pipe->pipeSetName(processID, pstreamIDX);
     new_pstream->m_name = new_pstream->pipe->name;
     new_pstream->ispipe = true;
@@ -200,61 +200,6 @@ static pstream_t * pstream_to_pointer(int idx)
 
     return &pstream_iterator->second;
 }
-/*
-static pstream_t *
-pstream_to_pointer(int idx)
-{
-  pstream_t *pstreamptr = NULL;
-
-  PSTREAM_INIT();
-
-  if (idx >= 0 && idx < _pstream_max)
-    //{
-      PSTREAM_LOCK();
-
-      pstreamptr = _pstreamList[idx].ptr;
-
-      PSTREAM_UNLOCK();
-    }
-  else
-    Error("pstream index %d undefined!", idx);
-
-  return pstreamptr;
-}
-*/
-/* Create an index from a pointer */
-/*
-static int
-pstream_from_pointer(pstream_t *ptr)
-{
-  int idx = -1;
-
-  if (ptr)
-    {
-      PSTREAM_LOCK();
-
-      if (_pstreamAvail)
-        {
-          pstreamPtrToIdx *newptr = _pstreamAvail;
-          _pstreamAvail = _pstreamAvail->next;
-          newptr->next = 0;
-          idx = newptr->idx;
-          newptr->ptr = ptr;
-
-          if (CdoDebug::PSTREAM)
-            Message("Pointer %p has idx %d from pstream list", ptr, idx);
-        }
-      else
-        Error("Too many open pstreams (limit is %d)!", _pstream_max);
-
-      PSTREAM_UNLOCK();
-    }
-  else
-    Error("Internal problem (pointer %p undefined)", ptr);
-
-  return idx;
-}
-*/
 
 void pstream_t::init()
 {
@@ -278,9 +223,6 @@ void pstream_t::init()
 #endif
 }
 pstream_t::pstream_t(int p_id) : self(p_id) { init(); }
-pstream_t::~pstream_t(){
-  //vlistDestroy(m_vlistID);
-}
 
 static void
 pstream_delete_entry(pstream_t *pstreamptr)
@@ -371,7 +313,7 @@ pstream_t::pstreamOpenReadPipe(const char *pipename)
   ispipe = true;
   m_name = pipename;
   rthreadID = pthread_self();
-  pipe = new pipe_t();
+  pipe = std::make_shared<pipe_t>();
   pipe->name = std::string(pipename);
 
     /* Free(operatorName); */
@@ -897,7 +839,7 @@ pstream_t::openAppend(const char *p_filename)
 void
 pstreamCloseChildStream(pstream_t *pstreamptr)
 {
-  pipe_t *pipe = pstreamptr->pipe;
+  pipe_t *pipe = pstreamptr->pipe.get();
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
   if (CdoDebug::PSTREAM)
@@ -931,7 +873,7 @@ void
 pstreamCloseParentStream(pstream_t *pstreamptr)
 {
 
-  pipe_t *pipe = pstreamptr->pipe;
+  pipe_t *pipe = pstreamptr->pipe.get();
   pthread_mutex_lock(pipe->m_mutex);
   pipe->EOP = true;
   if (CdoDebug::PSTREAM)

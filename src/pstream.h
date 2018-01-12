@@ -34,7 +34,6 @@ class pstream_t
 {
 public:
   pstream_t(int id);
-  ~pstream_t();
   int inqVlist();
   int inqFileType();
   void defTimestep(int p_tsID);
@@ -65,7 +64,7 @@ public:
   varlist_t *m_varlist;
 #ifdef  HAVE_LIBPTHREAD
   void *argument;
-  pipe_t *pipe;
+  std::shared_ptr<pipe_t> pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
 private:
