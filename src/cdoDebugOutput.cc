@@ -35,7 +35,7 @@ namespace CdoDebug
      bool PROCESS = 0;
      bool PIPE = false;
      int ARGUMENT = 0;
-     int PTHREAD 0;
+     int PTHREAD = 0;
 
     //File switches and streams
      std::string outfile;
