@@ -2417,10 +2417,9 @@ static void change_grid(char *grid_file, int gridID, int vlistID)
 {
   if ( cdoVerbose )
     cdoPrint("You configured a grid_info file: '%s'. It is tested for a valid use as substitution.\n", grid_file);
-  argument_t *fileargument = file_argument_new(grid_file);
-  int streamID2 = pstreamOpenRead(fileargument); 
-  int vlistID2 = pstreamInqVlist(streamID2);
-  int gridID2 = vlistInqVarGrid(vlistID2, 0); 
+  int streamID2 = streamOpenRead(grid_file);
+  int vlistID2 = streamInqVlist(streamID2);
+  int gridID2 = vlistInqVarGrid(vlistID2, 0);
 
   if ( !gridID2 )
     cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n          because of internal problems.", grid_file);
@@ -2448,7 +2447,7 @@ static void change_grid(char *grid_file, int gridID, int vlistID)
   cdoPrint("Successfully substituted grid.");
   
 
-  pstreamClose(streamID2);
+  streamClose(streamID2);
 }
 
 static void move_lons(double *xcoord_vals, double *xcell_bounds, int xsize, int xboundsize, int xnbounds)

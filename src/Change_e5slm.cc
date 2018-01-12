@@ -54,11 +54,9 @@ void *Change_e5slm(void *argument)
   const char *fn_slm = operatorArgv()[0];
 
   /* read SLM */
-  argument_t *fileargument = file_argument_new(fn_slm);
-  int streamIDslm = pstreamOpenRead(fileargument);
-  file_argument_free(fileargument);
+  int streamIDslm = streamOpenRead(fn_slm);
 
-  int vlistIDslm = pstreamInqVlist(streamIDslm);
+  int vlistIDslm = streamInqVlist(streamIDslm);
 
   size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
 
@@ -66,10 +64,10 @@ void *Change_e5slm(void *argument)
   double *cland = (double*) Malloc(gridsize*sizeof(double));
   bool *lsea  = (bool*) Malloc(gridsize*sizeof(bool));
 
-  pstreamInqTimestep(streamIDslm, 0);
+  streamInqTimestep(streamIDslm, 0);
 
-  pstreamInqRecord(streamIDslm, &varID, &levelID);
-  pstreamReadRecord(streamIDslm, cland, &nmiss);
+  streamInqRecord(streamIDslm, &varID, &levelID);
+  streamReadRecord(streamIDslm, cland, &nmiss);
 
   if ( nmiss > 0 ) cdoAbort("SLM with missing values are unsupported!");
 
@@ -78,7 +76,7 @@ void *Change_e5slm(void *argument)
   if ( minval < 0 || maxval > 1 )
     cdoWarning("Values of SLM out of bounds! (minval=%g, maxval=%g)", minval , maxval);
 
-  pstreamClose(streamIDslm);
+  streamClose(streamIDslm);
 
   for ( size_t i = 0; i < gridsize; ++i ) lsea[i] = !(cland[i] > 0);
 

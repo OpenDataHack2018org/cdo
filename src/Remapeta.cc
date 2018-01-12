@@ -304,19 +304,17 @@ Remapeta(void *argument)
       lfis2 = true;
 
       const char *fname = operatorArgv()[1];
-      argument_t *fileargument = file_argument_new(fname);
-      int streamID = pstreamOpenRead(fileargument);
-      file_argument_free(fileargument);
+      int streamID = streamOpenRead(fname);
 
-      int vlistID1 = pstreamInqVlist(streamID);
+      int vlistID1 = streamInqVlist(streamID);
 
-      pstreamInqRecord(streamID, &varID, &levelID);
+      streamInqRecord(streamID, &varID, &levelID);
       int gridID = vlistInqVarGrid(vlistID1, varID);
       nfis2gp = gridInqSize(gridID);
 
       fis2 = (double *) Malloc(nfis2gp * sizeof(double));
 
-      pstreamReadRecord(streamID, fis2, &nmiss);
+      streamReadRecord(streamID, fis2, &nmiss);
 
       if (nmiss)
         {
@@ -341,7 +339,7 @@ Remapeta(void *argument)
       if (minval < -1.e10 || maxval > 1.e10)
         cdoAbort("%s out of range!", var_stdname(surface_geopotential));
 
-      pstreamClose(streamID);
+      streamClose(streamID);
     }
 
   int vlistID1 = pstreamInqVlist(streamID1);

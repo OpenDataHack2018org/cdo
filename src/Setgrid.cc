@@ -98,21 +98,19 @@ void *Setgrid(void *argument)
       operatorCheckArgc(1);
       char *areafile = operatorArgv()[0];
 
-      argument_t *fileargument = file_argument_new(areafile);
-      int streamID = pstreamOpenRead(fileargument);
-      file_argument_free(fileargument);
+      int streamID = streamOpenRead(areafile);
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
 
-      nrecs = pstreamInqTimestep(streamID, 0);
-      pstreamInqRecord(streamID, &varID, &levelID);
+      nrecs = streamInqTimestep(streamID, 0);
+      streamInqRecord(streamID, &varID, &levelID);
 
       int gridID = vlistInqVarGrid(vlistID, varID);
       areasize = gridInqSize(gridID);
       areaweight = (double*) Malloc(areasize*sizeof(double));
   
-      pstreamReadRecord(streamID, areaweight, &nmiss);
-      pstreamClose(streamID);
+      streamReadRecord(streamID, areaweight, &nmiss);
+      streamClose(streamID);
 
       if ( cdoVerbose )
 	{
@@ -134,22 +132,20 @@ void *Setgrid(void *argument)
     {
       operatorCheckArgc(1);
       char *maskfile = operatorArgv()[0];
-      argument_t *fileargument = file_argument_new(maskfile);
-      int streamID = pstreamOpenRead(fileargument);
-      file_argument_free(fileargument);
+      int streamID = streamOpenRead(maskfile);
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
 
-      nrecs = pstreamInqTimestep(streamID, 0);
-      pstreamInqRecord(streamID, &varID, &levelID);
+      nrecs = streamInqTimestep(streamID, 0);
+      streamInqRecord(streamID, &varID, &levelID);
 
       double missval  = vlistInqVarMissval(vlistID, varID);
       int gridID   = vlistInqVarGrid(vlistID, varID);
       masksize = gridInqSize(gridID);
       gridmask = (double*) Malloc(masksize*sizeof(double));
   
-      pstreamReadRecord(streamID, gridmask, &nmiss);
-      pstreamClose(streamID);
+      streamReadRecord(streamID, gridmask, &nmiss);
+      streamClose(streamID);
 
       for ( int i = 0; i < masksize; i++ )
 	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
