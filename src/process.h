@@ -76,7 +76,7 @@ public:
   char *operatorArg;
   char prompt[64];
   short noper;
-  bool m_isActive;  /*TEMP*/ //not used right now, maybe later (12.1.2018)
+  bool m_isActive;  /*TEMP*/ //not used right now, maybe later (12.Jan.2018)
 
   modules_t m_module;
   std::vector<char *> oargv;
@@ -89,9 +89,7 @@ public:
   int getOutStreamCnt();
   void initProcess();
   void print_process();
-  void defArgument();
   void setOperatorArgv(const char *operatorArguments);
-  void setStreams(int argc, std::vector<char *> &argv);
   void addChild(process_t *child_process);
   void addParent(process_t *parent_process);
   bool hasAllInputs();
@@ -104,8 +102,6 @@ public:
 private:
   void defPrompt();
   process_t();
-  void setStreamNames(int argc, std::vector<char *> &argv);
-  int expand_wildcards(int streamCnt);
   int checkStreamCnt();
 };
 

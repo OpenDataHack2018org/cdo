@@ -392,44 +392,6 @@ get_glob_flags(void)
 #endif
 
 #if defined(HAVE_WORDEXP_H)
-/* Convert a shell pattern into a list of filenames. */
-static argument_t *
-glob_pattern(const char *restrict string)
-{
-  size_t cnt, length = 0;
-  int flags = WRDE_UNDEF;
-  char **p;
-
-  wordexp_t glob_results;
-  glob_results.we_wordc = 0;
-  argument_t *argument = NULL;
-
-  // glob the input argument or do even more shell magic
-  int status = wordexp(string, &glob_results, flags);
-
-  // How much space do we need?
-  for (p = glob_results.we_wordv, cnt = glob_results.we_wordc; cnt; p++, cnt--)
-    {
-      length += strlen(*p) + 1;
-    }
-
-  // Allocate the space and generate the list.
-  argument = argument_new(glob_results.we_wordc, length);
-
-  // put all generated filenames into the argument_t data structure
-  for (cnt = 0; cnt < glob_results.we_wordc; cnt++)
-    {
-      argument->argv[cnt] = strdupx(glob_results.we_wordv[cnt]);
-      strcat(argument->args, glob_results.we_wordv[cnt]);
-      if (cnt < glob_results.we_wordc - 1)
-        strcat(argument->args, " ");
-    }
-
-  if (status == 0)
-    wordfree(&glob_results);
-
-  return argument;
-}
 #endif
 
 int
@@ -451,183 +413,10 @@ processOperator(void)
   return processSelf().m_operatorCommand;
 }
 
-static int skipInputStreams(int argc, std::vector<char *> &argv, int globArgc, int nstreams);
-
-static int
-getGlobArgc(int argc, std::vector<char *> &argv, int globArgc)
-{
-  char *opername = &argv[globArgc][1];
-  char *comma_position = strchr(opername, ',');
-  if (comma_position)
-    *comma_position = 0;
-
-  int streamInCnt = operatorStreamInCnt(opername);
-  int streamOutCnt = operatorStreamOutCnt(opername);
-
-  if (streamInCnt == -1)
-    streamInCnt = 1;
-
-  if (streamOutCnt > 1)
-    cdoAbort("More than one output stream not allowed in CDO pipes (Operator %s)!", opername);
-
-  globArgc++;
-
-  if (streamInCnt > 0)
-    globArgc = skipInputStreams(argc, argv, globArgc, streamInCnt);
-  if (comma_position)
-    *comma_position = ',';
-
-  return globArgc;
-}
-
-static int
-skipInputStreams(int argc, std::vector<char *> &argv, int globArgc, int nstreams)
-{
-  while (nstreams > 0)
-    {
-      if (globArgc >= argc)
-        {
-          cdoAbort("Too few arguments. Check command line!");
-          break;
-        }
-      if (argv[globArgc][0] == '-')
-        {
-          globArgc = getGlobArgc(argc, argv, globArgc);
-        }
-      else
-        globArgc++;
-
-      nstreams--;
-    }
-
-  return globArgc;
-}
-
 static int
 getStreamCnt(int argc, std::vector<char *> &argv)
 {
-  int streamCnt = 0;
-  int globArgc = 1;
-
-  while (globArgc < argc)
-    {
-      if (argv[globArgc][0] == '-')
-        {
-          globArgc = getGlobArgc(argc, argv, globArgc);
-        }
-      else
-        globArgc++;
-
-      streamCnt++;
-    }
-
-  return NumCreatedStreams;
-}
-
-/*
-static void setStreamNames(int argc, std::vector<char *> *argv)
-{
-    //check for output of first
-    int current_argv_entry;
-    std::vector<pstream_t*> &current_instreams = root_process->inputStreams;
-    std::vector<pstream_t*> &current_outstreams = root_process->outputStreams;
-
-}
-*/
-void
-process_t::setStreams(int argc, std::vector<char *> &argv)
-{
-  int streamCnt = getStreamCnt(argc, argv);
-
-  nvals = 0;
-  nvars = 0;
-  ntimesteps = 0;
-
-  m_streamCnt = 0; /* filled in setStreamNames */
-  if (streamCnt)
-    streamArguments = std::vector<argument_t>(streamCnt);
-  for (int i = 0; i < streamCnt; i++)
-    {
-      streamArguments[i].argc = 0;
-      streamArguments[i].args = NULL;
-    }
-
-  setStreamNames(argc, argv);
-
-  int status = checkStreamCnt();
-
-  if (status == 0 && streamCnt != streamCnt)
-    Error("Internal problem with stream count %d %d", streamCnt, streamCnt);
-  /*
-  for ( i = 0; i < streamCnt; i++ )
-    fprintf(stderr, "setStreams: stream %d %s\n", i+1, process.streamArguments[i].args);
-  */
-}
-
-void
-process_t::setStreamNames(int argc, std::vector<char *> &argv)
-{
-  int i, ac;
-  int globArgc = 1;
-  int globArgcStart;
-  char *streamname;
-  int len;
-
-  while (globArgc < argc)
-    {
-      if (argv[globArgc][0] == '-')
-        {
-          globArgcStart = globArgc;
-
-          globArgc = getGlobArgc(argc, argv, globArgc);
-          len = 0;
-          for (i = globArgcStart; i < globArgc; i++)
-            {
-              len += strlen(argv[i]) + 1;
-            }
-          streamname = (char *) Calloc(1, len);
-          for (i = globArgcStart; i < globArgc; i++)
-            {
-              strcat(streamname, argv[i]);
-              if (i < globArgc - 1)
-                {
-                  strcat(streamname, " ");
-                }
-            }
-          for (i = 1; i < len - 1; i++)
-            {
-              if (streamname[i] == '\0')
-                {
-                  streamname[i] = ' ';
-                }
-            }
-
-          streamArguments[m_streamCnt].args = streamname;
-          ac = globArgc - globArgcStart;
-          // printf("setStreamNames:  ac %d  streamname1: %s\n", ac, streamname);
-          streamArguments[m_streamCnt].argv.resize(ac);
-          for (i = 0; i < ac; ++i)
-            streamArguments[m_streamCnt].argv[i] = argv[i + globArgcStart];
-          streamArguments[m_streamCnt].argc = ac;
-          m_streamCnt++;
-          // printf("setStreamNames:  streamname1: %s\n", streamname);
-        }
-      else
-        {
-          len = strlen(argv[globArgc]) + 1;
-          streamname = (char *) Malloc(len);
-          strcpy(streamname, argv[globArgc]);
-          streamArguments[m_streamCnt].args = streamname;
-          ac = 1;
-          streamArguments[m_streamCnt].argv.resize(ac);
-          streamArguments[m_streamCnt].argv[0] = argv[globArgc];
-          streamArguments[m_streamCnt].argc = ac;
-          streamArguments[m_streamCnt].args = streamname;
-          m_streamCnt++;
-          // printf("setStreamNames:  streamname2: %s\n", streamname);
-          globArgc++;
-        }
-    }
+   return NumCreatedStreams;
 }
 
 static int
@@ -675,56 +464,6 @@ expand_filename(const char *string)
     }
 
   return filename;
-}
-
- int
-process_t::expand_wildcards(int streamCnt)
-{
-  const char *streamname0 = streamArguments[0].args;
-
-  if (streamname0[0] == '-')
-    return 1;
-
-#if defined(HAVE_WORDEXP_H)
-  argument_t *glob_arg = glob_pattern(streamname0);
-
-  // skip if the input argument starts with an operator (starts with -)
-  // otherwise adapt streams if there are several files (>1)
-  // in case of one filename skip, no adaption needed
-  if (glob_arg->argc > 1 && glob_arg->argv[0][0] != '-')
-    {
-      if (cdoVerbose)
-        cdoPrint("Replaced >%s< by", streamArguments[0].args);
-
-      streamCnt = streamCnt - 1 + glob_arg->argc;
-
-      Free(streamArguments[0].args);
-
-      streamArguments.resize(streamCnt);
-
-      // move output streams to the end
-      for (int i = 1; i < m_streamCnt; ++i)
-        streamArguments[i + glob_arg->argc - 1] = streamArguments[i];
-
-      for (int i = 0; i < glob_arg->argc; ++i)
-        {
-          argument_t &current_argument = streamArguments[i];
-          current_argument.argc = 1;
-          current_argument.argv.resize(current_argument.argc);
-          current_argument.argv[0] = strdupx(glob_arg->argv[i]);
-          current_argument.args = strdupx(glob_arg->argv[i]);
-          if (cdoVerbose)
-            cdoPrint("         >%s<", glob_arg->argv[i]);
-        }
-
-      m_streamCnt = streamCnt;
-      NumCreatedStreams += streamCnt;
-    }
-
-  Free(glob_arg);
-#endif
-
-  return 1;
 }
 
 int process_t::checkStreamCnt(void)
@@ -814,6 +553,8 @@ process_t::hasAllInputs()
   return  m_module.streamInCnt == (inputStreams.size());
 }
 
+
+/*TEMP*/ /* Needs update (12.Jan.2018) */
 #include <fstream>
 void print_creation_results(std::ofstream &p_outfile)
 {
@@ -831,14 +572,16 @@ void print_creation_results(std::ofstream &p_outfile)
         }
     }
   p_outfile << std::endl;
-
 }
 
+#if defined(HAVE_WORDEXP_H)
 /* Expands all input file wildcards and removes the 
  * wildcard while inserting all expanded files into argv
  */
+/*TEMP*/ /* MOVE TO namespace CDO (which does not exist yet)  (12.Jan.2018) */
 std::vector<std::string> expandWildCards(int argc, const char **argv)
 {
+
     int flags = WRDE_UNDEF;
     char **p;
     int status;
@@ -866,7 +609,8 @@ std::vector<std::string> expandWildCards(int argc, const char **argv)
 
     return new_argv;
 }
-
+#endif
+/*TEMP*/ /* MOVE TO namespace CDO (which does not exist yet)  (12.Jan.2018) */
 void
 createProcesses(int argc, const char **argv)
 {
@@ -949,47 +693,6 @@ createProcesses(int argc, const char **argv)
   }
 
   NumCreatedStreams = get_glob_argc() + obase.size();
-}
-
-void
-processDefArgument(void *vargument)
-{
-  /*
-process_t &process = processSelf();
-char *operatorArg;
-char *commapos;
-std::vector< char*> &oargv = process.oargv;
-*/
-  process_t &process = processSelf();
-  std::vector<char*> &oargv = process.oargv;
-  /*
-
-  process.m_operatorCommand = argv[0];
-  process.operatorName = getOperatorName(process.m_operatorCommand);
-  process.operatorArg = getOperatorArg(process.m_operatorCommand);
-  operatorArg = process.operatorArg;
-
-  if (operatorArg)
-    {
-      orgv.push_back(operatorArg);
-      // fprintf(stderr, "processDefArgument: %d %s\n", oargc, operatorArg);
-
-      char *commapos = operatorArg;
-      while ((commapos = strchr(commapos, ',')) != NULL)
-        {
-          *commapos = '\0';
-          commapos++;
-          if (strlen(commapos))
-            {
-              oargv.push_back(commapos);
-            }
-        }
-      process.oargc = oargv.size();
-    }
-
-  processDefPrompt(process.operatorName);
-
-*/
 }
 
 void
@@ -1232,6 +935,8 @@ cdoStreamNumber()
 void
 process_t::print_process()
 {
+    
+    /*TEMP*/ /*VERY OUTDATED*/ /*
 #ifdef  HAVE_LIBPTHREAD
   std::cout << " processID       : " << m_ID << std::endl;
   std::cout << " threadID        : " << threadID << std::endl;
@@ -1310,6 +1015,7 @@ process_t::print_process()
   std::cout << " operatorArg     : " << operatorArg << std::endl;
   std::cout << " oargc           : " << oargc << std::endl;
   std::cout << " noper           : " << noper << std::endl;
+  */
 }
 
 static void
@@ -1339,126 +1045,6 @@ processClosePipes(void)
       if (!pstreamptr->isopen)
         pstreamptr->close();
     }
-}
-
-extern "C" {
-size_t getPeakRSS( );
-}
-
-void cdoFinish(void)
-{
-  int processID = processSelf().m_ID;
-  if(CdoDebug::PROCESS) MESSAGE("Finishing process: ", processID);
-  int nvars, ntimesteps;
-  char memstring[32] = { "" };
-  double s_utime, s_stime;
-  double e_utime, e_stime;
-  double c_cputime = 0, c_usertime = 0, c_systime = 0;
-  double p_cputime = 0, p_usertime = 0, p_systime = 0;
-
-#ifdef  HAVE_LIBPTHREAD
-  if (CdoDebug::PROCESS)
-    MESSAGE("process ",processID," thread ", pthread_self());
-#endif
-
-  int64_t nvals = processInqNvals(processID);
-  nvars = processInqVarNum();
-  ntimesteps = processInqTimesteps();
-
-  if (!cdoSilentMode)
-    {
-      set_text_color(stderr, RESET, GREEN);
-      fprintf(stderr, "%s: ", processInqPrompt());
-      reset_text_color(stderr);
-      if (nvals > 0)
-        {
-          if (sizeof(int64_t) > sizeof(size_t))
-#if defined(_WIN32)
-            fprintf(stderr,
-                    "Processed %I64d value%s from %d variable%s",
-#else
-            fprintf(stderr,
-                    "Processed %jd value%s from %d variable%s",
-#endif
-                    (intmax_t) nvals,
-                    ADD_PLURAL(nvals),
-                    nvars,
-                    ADD_PLURAL(nvars));
-          else
-            fprintf(stderr,
-                    "Processed %zu value%s from %d variable%s",
-                    (size_t) nvals,
-                    ADD_PLURAL(nvals),
-                    nvars,
-                    ADD_PLURAL(nvars));
-        }
-      else if (nvars > 0)
-        {
-          fprintf(stderr, "Processed %d variable%s", nvars, ADD_PLURAL(nvars));
-        }
-
-      if (ntimesteps > 0)
-        fprintf(stderr, " over %d timestep%s", ntimesteps, ADD_PLURAL(ntimesteps));
-
-      //  fprintf(stderr, ".");
-    }
-  /*
-    fprintf(stderr, "%s: Processed %d variable%s %d timestep%s.",
-            processInqPrompt(), nvars, nvars > 1 ? "s" : "",
-            ntimesteps, ntimesteps > 1 ? "s" : "");
-  */
-  processStartTime(&s_utime, &s_stime);
-  cdoProcessTime(&e_utime, &e_stime);
-
-  c_usertime = e_utime - s_utime;
-  c_systime = e_stime - s_stime;
-  c_cputime = c_usertime + c_systime;
-
-#ifdef  HAVE_LIBPTHREAD
-  if (getPthreadScope() == PTHREAD_SCOPE_PROCESS)
-    {
-      c_usertime /= processNums();
-      c_systime /= processNums();
-      c_cputime /= processNums();
-    }
-#endif
-
-  processDefCputime(processID, c_cputime);
-
-  processAccuTime(c_usertime, c_systime);
-
-  if (processID == 0)
-    {
-      size_t memmax = getPeakRSS();
-      if (memmax)
-        {
-          size_t muindex = 0;
-          const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
-          const size_t nmu = sizeof(mu)/sizeof(char*);
-          while (memmax > 9999 && muindex < nmu-1) { memmax /= 1024; muindex++; }
-          snprintf(memstring, sizeof(memstring), " %zu%s", memmax, mu[muindex]);
-        }
-
-      processEndTime(&p_usertime, &p_systime);
-      p_cputime = p_usertime + p_systime;
-    }
-
-#if defined(HAVE_SYS_TIMES_H)
-  if (cdoBenchmark)
-    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", c_usertime, c_systime, c_cputime, memstring);
-  else
-    {
-      if (!cdoSilentMode)
-        fprintf(stderr, " [%.2fs%s]\n", c_cputime, memstring);
-    }
-  if (cdoBenchmark && processID == 0)
-    fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_usertime, p_systime, p_cputime, memstring);
-#else
-  fprintf(stderr, "\n");
-#endif
-
-  processClosePipes();
-  processSetInactive();
 }
 
 void process_t::addFileInStream(std::string file)
@@ -1675,12 +1261,6 @@ int cdoStreamOpenAppend(int p_outFileIndex)
     return pstreamID;
 }
 
-int cdoAddOutFile(std::string filename)
-{
-    process_t process = processSelf();
-    process.addFileOutStream(filename);
-}
-
 process_t* getProcess(int p_processID)
 {
     auto process = Process.find(p_processID);
@@ -1724,4 +1304,122 @@ char * cdoGetObase()
     process_t &process = processSelf();
 
     return obase[process.m_ID];
+}
+extern "C" {
+size_t getPeakRSS( );
+}
+void cdoFinish(void)
+{
+  int processID = processSelf().m_ID;
+  if(CdoDebug::PROCESS) MESSAGE("Finishing process: ", processID);
+  int nvars, ntimesteps;
+  char memstring[32] = { "" };
+  double s_utime, s_stime;
+  double e_utime, e_stime;
+  double c_cputime = 0, c_usertime = 0, c_systime = 0;
+  double p_cputime = 0, p_usertime = 0, p_systime = 0;
+
+#ifdef  HAVE_LIBPTHREAD
+  if (CdoDebug::PROCESS)
+    MESSAGE("process ",processID," thread ", pthread_self());
+#endif
+
+  int64_t nvals = processInqNvals(processID);
+  nvars = processInqVarNum();
+  ntimesteps = processInqTimesteps();
+
+  if (!cdoSilentMode)
+    {
+      set_text_color(stderr, RESET, GREEN);
+      fprintf(stderr, "%s: ", processInqPrompt());
+      reset_text_color(stderr);
+      if (nvals > 0)
+        {
+          if (sizeof(int64_t) > sizeof(size_t))
+#if defined(_WIN32)
+            fprintf(stderr,
+                    "Processed %I64d value%s from %d variable%s",
+#else
+            fprintf(stderr,
+                    "Processed %jd value%s from %d variable%s",
+#endif
+                    (intmax_t) nvals,
+                    ADD_PLURAL(nvals),
+                    nvars,
+                    ADD_PLURAL(nvars));
+          else
+            fprintf(stderr,
+                    "Processed %zu value%s from %d variable%s",
+                    (size_t) nvals,
+                    ADD_PLURAL(nvals),
+                    nvars,
+                    ADD_PLURAL(nvars));
+        }
+      else if (nvars > 0)
+        {
+          fprintf(stderr, "Processed %d variable%s", nvars, ADD_PLURAL(nvars));
+        }
+
+      if (ntimesteps > 0)
+        fprintf(stderr, " over %d timestep%s", ntimesteps, ADD_PLURAL(ntimesteps));
+
+      //  fprintf(stderr, ".");
+    }
+  /*
+    fprintf(stderr, "%s: Processed %d variable%s %d timestep%s.",
+            processInqPrompt(), nvars, nvars > 1 ? "s" : "",
+            ntimesteps, ntimesteps > 1 ? "s" : "");
+  */
+  processStartTime(&s_utime, &s_stime);
+  cdoProcessTime(&e_utime, &e_stime);
+
+  c_usertime = e_utime - s_utime;
+  c_systime = e_stime - s_stime;
+  c_cputime = c_usertime + c_systime;
+
+#ifdef  HAVE_LIBPTHREAD
+  if (getPthreadScope() == PTHREAD_SCOPE_PROCESS)
+    {
+      c_usertime /= processNums();
+      c_systime /= processNums();
+      c_cputime /= processNums();
+    }
+#endif
+
+  processDefCputime(processID, c_cputime);
+
+  processAccuTime(c_usertime, c_systime);
+
+  if (processID == 0)
+    {
+      size_t memmax = getPeakRSS();
+      if (memmax)
+        {
+          size_t muindex = 0;
+          const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
+          const size_t nmu = sizeof(mu)/sizeof(char*);
+          while (memmax > 9999 && muindex < nmu-1) { memmax /= 1024; muindex++; }
+          snprintf(memstring, sizeof(memstring), " %zu%s", memmax, mu[muindex]);
+        }
+
+      processEndTime(&p_usertime, &p_systime);
+      p_cputime = p_usertime + p_systime;
+    }
+
+#if defined(HAVE_SYS_TIMES_H)
+  if (cdoBenchmark)
+    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", c_usertime, c_systime, c_cputime, memstring);
+  else
+    {
+      if (!cdoSilentMode)
+        fprintf(stderr, " [%.2fs%s]\n", c_cputime, memstring);
+    }
+  if (cdoBenchmark && processID == 0)
+    fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_usertime, p_systime, p_cputime, memstring);
+#else
+  fprintf(stderr, "\n");
+#endif
+
+  processClosePipes();
+  processSetInactive();
 }

@@ -505,55 +505,6 @@ void createPipeName(char *pipename, int pnlen)
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
 }
 
-int
-pstreamOpenRead(const argument_t *argument)
-{
-  if(CdoDebug::PSTREAM)
-  {
-      MESSAGE("Opening new pstream for reading with argument:",
-              print_argument((argument_t*)argument));
-  }
-
-  pstream_t *pstreamptr = create_pstream();
-  if (!pstreamptr)
-    Error("No memory");
-
-  int pstreamID = pstreamptr->self;
-
-  int ispipe = argument->args[0] == '-';
-  /*
-  printf("pstreamOpenRead: args >%s<\n", argument->args);
-  for ( int i = 0; i < argument->argc; ++i )
-    printf("pstreamOpenRead: arg %d >%s<\n", i, argument->argv[i]);
-  */
-  if (ispipe)
-    {
-      pstreamptr->ispipe = true;
-      size_t pnlen = 16;
-      char *pipename = (char *) Malloc(pnlen);
-      createPipeName(pipename, pnlen);
-      argument_t * newargument = pipe_argument_new(argument, pipename, pnlen);
-      pstreamptr->pstreamOpenReadPipe(pipename);
-      pCreateReadThread(newargument);
-      if (!cdoSilentMode)
-      {
-        cdoPrint("Started child process \"%s\".", newargument->args + 1);
-      }
-
-      processAddInputStream(pstreamptr);
-    }
-  else
-    {
-      pstreamptr->ispipe = false;
-      pstreamptr->pstreamOpenReadFile(argument->args);
-    }
-
-  if (pstreamID < 0)
-    cdiOpenError(pstreamID, "Open failed on >%s<", argument->args);
-
-  return pstreamID;
-}
-
 static void
 query_user_exit(const char *argument)
 {
