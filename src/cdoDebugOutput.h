@@ -11,7 +11,7 @@ namespace CdoLog
     void StdOut(std::stringstream &message);
 
     template <typename ...T>
-    void  expand(std::stringstream &p_message, T&& ...args)
+    static void  expand(std::stringstream &p_message, T&& ...args)
     {
            //for showing that the dummy array is never used
            using expander = int[];
@@ -63,7 +63,7 @@ namespace CdoDebug
     void SetDebug(int p_debug_level);
     std::string argvToString(int argc, const char** argv);
 
-    void printMessage(std::stringstream &p_message);
+    void printMessage(std::stringstream &p_message,bool both = false);
     template <typename ...T>
     void Message_ (const char * p_func, T&& ...args)
     {
@@ -80,7 +80,7 @@ namespace CdoDebug
         std::stringstream message;
         message << "Warning: ";
         CdoLog::expand(message, args...);
-        std::cout << message.str();
+        printMessage(message, true);
     }
 
 
@@ -95,9 +95,10 @@ namespace CdoError{
           std::stringstream message;
           message << "Error in: " << p_file << ":" << p_line << " ";
           CdoLog::expand(message, args...);
-          CdoLog::StdOut(message);
+          CdoDebug::printMessage(message,true);
           if ( CdoError::_ExitOnError )
           {
+              if(CdoDebug::print_to_seperate_file) CdoDebug::outfile_stream.close();
               exit(EXIT_FAILURE);
           }
     }
@@ -110,7 +111,6 @@ namespace CdoError{
         message << "SysError in:" << p_file << std::endl;
         message << "    " << "in function: p_func ,line: " << p_line << std::endl;
         CdoLog::StdOut(message, args...);
-        CdoLog::StdOut(message);
         if(saved_errno)
         {
             errno = saved_errno;

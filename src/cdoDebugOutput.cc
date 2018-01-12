@@ -33,9 +33,9 @@ namespace CdoDebug
     //Subsystem Debug Switches
      int  PSTREAM = 0;
      bool PROCESS = 0;
-     bool PIPE;
-     int ARGUMENT;
-     int PTHREAD;
+     bool PIPE = false;
+     int ARGUMENT = 0;
+     int PTHREAD 0;
 
     //File switches and streams
      std::string outfile;
@@ -79,15 +79,16 @@ namespace CdoDebug
 
     }
 
-        void printMessage(std::stringstream &p_message)
+        void printMessage(std::stringstream &p_message, bool both )
         {
-            if(!print_to_seperate_file)
-            {
-                std::cout << p_message.str();
-            }
-            else 
+            if(print_to_seperate_file || (print_to_seperate_file && both))
             {
                 outfile_stream <<  p_message.str();
+            }
+
+            if(!print_to_seperate_file || both)
+            {
+                std::cout << p_message.str();
             }
         }
 }
