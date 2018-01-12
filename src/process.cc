@@ -1572,6 +1572,10 @@ int cdoStreamOpenRead(int inStreamIDX)
 {
     if(CdoDebug::PROCESS) MESSAGE("Getting in stream ", inStreamIDX, " of process ", processSelf().m_ID);
     process_t &process = processSelf();
+    if(process.getInStreamCnt() < inStreamIDX || inStreamIDX < 0)
+    {
+        ERROR("instream ", inStreamIDX, " of process ", process.m_ID ," not found");
+    }
     pstream_t *inStream = process.inputStreams[inStreamIDX];
 
     if(inStream->ispipe)
@@ -1600,6 +1604,10 @@ int cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
 
     process_t& process = processSelf();
     int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
+    if(outStreamIDX > process.getOutStreamCnt() || outStreamIDX < 0)
+    {
+        ERROR("outstream ", outStreamIDX, " of ", process.m_ID ," not found.", "Was called with streamIDX = ", p_outStreamIDX);
+    }
     pstream_t* outStream = process.outputStreams[outStreamIDX];
 
     if(outStream->ispipe)
