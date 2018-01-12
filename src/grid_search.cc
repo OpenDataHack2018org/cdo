@@ -204,13 +204,15 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
       pointlist[i].index = i;
     }
 
-  if ( cdoVerbose ) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
-
   for ( unsigned j = 0; j < 3; ++j )
     {
+      // min[j] = min[j] < 0 ? min[j]*1.01 : min[j]*0.99;
+      // max[j] = max[j] < 0 ? max[j]*0.99 : max[j]*1.01;
       gs->min[j] = min[j];
       gs->max[j] = max[j];
     }
+
+  if ( cdoVerbose ) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
 
   kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
   if ( pointlist ) Free(pointlist);
@@ -248,8 +250,11 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
     }
 
   gs->pointcloud = (void*) pointcloud;
+
   for ( unsigned j = 0; j < 3; ++j )
     {
+      min[j] = min[j] < 0 ? min[j]*1.01 : min[j]*0.99;
+      max[j] = max[j] < 0 ? max[j]*0.99 : max[j]*1.01;
       gs->min[j] = min[j];
       gs->max[j] = max[j];
     }
