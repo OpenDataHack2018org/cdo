@@ -17,9 +17,7 @@
 
 #ifndef PSTREAM_WRITE_H
 #define PSTREAM_WRITE_H
-#include "argument.h"
 
-int     pstreamOpenWrite(const argument_t *argument, int filetype);
 void    pstreamClose(int pstreamID);
 
 void    pstreamDefVlist(int pstreamID, int vlistID);
