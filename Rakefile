@@ -91,7 +91,8 @@ def executeRemote(command, builder)
     ssh.loop
   end
 end
-def executeRemoteSimple
+def executeRemoteSimple(command,builder)
+  sh "ssh #{builder.username}@#{builder.hostname} '#{command}'"
 end
 #
 # execution wrapper
@@ -108,7 +109,11 @@ def execute(command, builder)
   if builder.isLocal? then
     executeLocal(commands)
   else
-    executeRemote(commands,builder)
+    if ENV.include?('SIMPLE')
+      executeRemoteSimple(commands,builder)
+    else
+      executeRemote(commands,builder)
+    end
   end
 end
 #
