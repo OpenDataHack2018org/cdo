@@ -1,6 +1,7 @@
 INPUTDATA = ts_mm_5years ts_6h_1mon ts_1d_1year hl_l19.grb t21_geosp_tsurf.grb t21_geosp_tsurf_sea.grb bathy4.grb pl_data pl_data.grb detrend_data \
             grib_testfile01.grb grib_testfile02.grb grib_testfile03.grb netcdf_testfile01.nc netcdf_testfile02.nc testfile01c.nc \
-            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.grb tsurf_spain.grb spain.grid
+            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.grb tsurf_spain.grb spain.grid \
+            topo_eu5.grb
 
 FILE         = file_F32_srv_ref
 GRIB         = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile02_sinfo_ref grib_testfile02_info_ref grib_testfile03_sinfo_ref grib_testfile03_info_ref
@@ -36,6 +37,14 @@ REMAP2       = tsurf_spain_bic_def_ref   tsurf_spain_bic_off_ref   tsurf_spain_b
                tsurf_spain_ycon_def_ref  tsurf_spain_ycon_off_ref  tsurf_spain_ycon_on_ref \
                tsurf_spain_con_def_ref   tsurf_spain_con_off_ref   tsurf_spain_con_on_ref  \
                tsurf_spain_con2_def_ref  tsurf_spain_con2_off_ref  tsurf_spain_con2_on_ref
+REMAP3       = topo_eu5_bic_def_ref   topo_eu5_bic_off_ref   topo_eu5_bic_on_ref  \
+               topo_eu5_bil_def_ref   topo_eu5_bil_off_ref   topo_eu5_bil_on_ref  \
+               topo_eu5_dis_def_ref   topo_eu5_dis_off_ref   topo_eu5_dis_on_ref  \
+               topo_eu5_nn_def_ref    topo_eu5_nn_off_ref    topo_eu5_nn_on_ref   \
+               topo_eu5_laf_def_ref   topo_eu5_laf_off_ref   topo_eu5_laf_on_ref  \
+               topo_eu5_ycon_def_ref  topo_eu5_ycon_off_ref  topo_eu5_ycon_on_ref \
+               topo_eu5_con_def_ref   topo_eu5_con_off_ref   topo_eu5_con_on_ref  \
+               topo_eu5_con2_def_ref  topo_eu5_con2_off_ref  topo_eu5_con2_on_ref
 SELECT       = select1_ref select2_ref select3_ref select4_ref select5_ref
 DETREND      = detrend_ref
 EXPR         = expr1_ref aexpr1_ref expr2_ref aexpr2_ref
@@ -50,5 +59,5 @@ SETMISS      = setmisstoc_ref setmisstonn_ref setmisstodis_ref
 
 EXTRA_DIST = $(INPUTDATA) $(FILE) $(GRIB) $(NETCDF) $(EOF) $(COMP) $(YDRUNSTAT) $(YMONSTAT) $(YSEASSTAT) $(SEASSTAT) $(TIMPCTL) \
              $(RUNSTAT) $(RUNPCTL) $(TIMSTAT) $(YEARSTAT) $(MONSTAT) $(DAYSTAT) $(VERTSTAT) $(FLDSTAT) $(FLDPSTAT) \
-             $(MERSTAT) $(ZONSTAT) $(ENSPSTAT) $(SPECTRAL) $(VERTINT) $(REMAP) $(REMAP2) $(SELECT) $(DETREND) \
+             $(MERSTAT) $(ZONSTAT) $(ENSPSTAT) $(SPECTRAL) $(VERTINT) $(REMAP) $(REMAP2) $(REMAP3) $(SELECT) $(DETREND) \
              $(THREAD) $(EXPR) $(GRADSDES) $(ARITH) $(MAPREDUCE) $(MERGETIME) $(REMAPETA) $(SMOOTH) $(SETMISS)

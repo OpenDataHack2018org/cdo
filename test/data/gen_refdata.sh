@@ -5,6 +5,23 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Remap regional grid
+#
+RMODS="bil bic dis nn con con2 ycon laf"
+#cdo -f grb topo,europe_5 topo_eu5.grb
+IFILE=topo_eu5.grb
+$CDO -f grb -topo,europe_5 $IFILE
+for RMOD in $RMODS; do
+  OFILE=topo_eu5_${RMOD}
+  for extra in def off on; do
+      EXTRA="$extra"
+      if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
+      REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},global_5 $IFILE ${OFILE}_${extra}_ref
+  done
+done
+exit
+########################################################################
+#
 # Timpctl Yearpctl Monstat Daypctl
 #
 PCTLS="50"
