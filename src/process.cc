@@ -1172,8 +1172,6 @@ int cdoStreamOpenRead(int inStreamIDX)
        char * pipename = createPipeName(pnlen);
        if(CdoDebug::PROCESS) MESSAGE("Trying to open pipe: ",pipename);
        inStream->pstreamOpenReadPipe(pipename);
-       argument_t * argument = argument_new(1, pnlen);
-       argument->processID = process.childProcesses[process.nChildActive]->m_ID;
        process.childProcesses[process.nChildActive]->run(); //new thread started in here!
        process.nChildActive++;
     }
