@@ -32,7 +32,7 @@
 
 #define MAX_YEARS 99999
 
-void *Splityear(void *argument)
+void *Splityear(void *process)
 {
   int streamID2 = -1;
   int varID;
@@ -52,7 +52,7 @@ void *Splityear(void *argument)
   double *array = NULL;
   field_type **vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
   

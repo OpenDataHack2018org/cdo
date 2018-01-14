@@ -27,7 +27,7 @@
 #include "pstream.h"
 
 
-void *Splitrec(void *argument)
+void *Splitrec(void *process)
 {
   int varID;
   int levelID;
@@ -38,7 +38,7 @@ void *Splitrec(void *argument)
   size_t nmiss;
   double *array = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 

@@ -62,7 +62,7 @@ void detrend(long nts, double missval1, double *array1, double *array2)
 }
 
 
-void *Detrend(void *argument)
+void *Detrend(void *process)
 {
   int gridsize;
   int nrecs;
@@ -75,7 +75,7 @@ void *Detrend(void *argument)
   field_type ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

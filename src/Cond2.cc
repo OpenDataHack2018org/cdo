@@ -27,7 +27,7 @@
 #include "pstream.h"
 
 
-void *Cond2(void *argument)
+void *Cond2(void *process)
 {
   enum {FILL_NONE, FILL_TS, FILL_REC};
   int filltype = FILL_NONE;
@@ -40,7 +40,7 @@ void *Cond2(void *argument)
   size_t **varnmiss1 = NULL;
   double **vardata1 = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int IFTHENELSE = cdoOperatorAdd("ifthenelse",    0, 0, NULL);
 

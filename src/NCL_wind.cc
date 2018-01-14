@@ -155,13 +155,13 @@ void set_parameter(void)
 }
 
 
-void *NCL_wind(void *argument)
+void *NCL_wind(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int UV2DV_CFD = cdoOperatorAdd("uv2dv_cfd", 0,     0, "[u, v, boundsOpt, outMode]");
   int UV2VR_CFD = cdoOperatorAdd("uv2vr_cfd", 0,     0, "[u, v, boundsOpt, outMode]");

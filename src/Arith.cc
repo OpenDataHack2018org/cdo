@@ -33,7 +33,7 @@
 #include "pstream.h"
 
 
-void *Arith(void *argument)
+void *Arith(void *process)
 {
   enum {FILL_NONE, FILL_TS, FILL_VAR, FILL_VARTS, FILL_FILE};
   int filltype = FILL_NONE;
@@ -47,7 +47,7 @@ void *Arith(void *argument)
   double *vardata2 = NULL;
   double **vardata = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("add",     func_add,     0, NULL);

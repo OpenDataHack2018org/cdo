@@ -169,7 +169,7 @@ int getDate(const char *name)
 }
 
 
-void *Importamsr(void *argument)
+void *Importamsr(void *process)
 {
   int tsID;
   int nvars;
@@ -178,7 +178,7 @@ void *Importamsr(void *argument)
   double *data[MAX_VARS];
   size_t nmiss[MAX_VARS];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   FILE *fp = fopen(cdoGetStreamName(0).c_str(), "r");
   if ( fp == NULL ) { perror(cdoGetStreamName(0).c_str()); exit(EXIT_FAILURE); }

@@ -28,14 +28,14 @@
 #include "percentiles.h"
 
 
-void *Runpctl(void *argument)
+void *Runpctl(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int varID;
   int levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("runpctl", func_pctl, 0, NULL);
 

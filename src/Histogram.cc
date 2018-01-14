@@ -27,7 +27,7 @@
 #include "listarray.h"
 
 
-void *Histogram(void *argument)
+void *Histogram(void *process)
 {
   int nrecs, varID, levelID;
   size_t nmiss;
@@ -35,7 +35,7 @@ void *Histogram(void *argument)
   int nlevel, zaxisID;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int HISTCOUNT = cdoOperatorAdd("histcount", 0, 0, NULL);

@@ -270,7 +270,7 @@ void maskregion(bool *mask, int gridID, double *xcoords, double *ycoords, int no
 }
 
 
-void *Maskbox(void *argument)
+void *Maskbox(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -278,7 +278,7 @@ void *Maskbox(void *argument)
   int index, gridtype = -1;
   int lat1, lat2, lon11, lon12, lon21, lon22;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int MASKLONLATBOX = cdoOperatorAdd("masklonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");

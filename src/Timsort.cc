@@ -44,7 +44,7 @@ int cmpdarray(const void *s1, const void *s2)
 }
 
 
-void *Timsort(void *argument)
+void *Timsort(void *process)
 {
   int gridsize;
   int nrecs;
@@ -55,7 +55,7 @@ void *Timsort(void *argument)
   int *vdate = NULL, *vtime = NULL;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

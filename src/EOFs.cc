@@ -162,7 +162,7 @@ enum T_WEIGHT_MODE get_weightmode(void)
 }
 
 
-void *EOFs(void * argument)
+void *EOFs(void *process)
 {
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
 
@@ -192,7 +192,7 @@ void *EOFs(void * argument)
       timer_eig  = timer_new("Timeof eig");
     }
   
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("eof",        EOF_,        0, NULL);

@@ -170,12 +170,12 @@ void set_attributes(list_t *kvlist, int vlistID)
 }
 
 
-void *Setattribute(void *argument)
+void *Setattribute(void *process)
 {
   int nrecs;
   int varID, levelID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("setattribute", 0, 0, "attributes");
 

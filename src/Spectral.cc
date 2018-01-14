@@ -36,7 +36,7 @@
 #include "listarray.h"
 
 
-void *Spectral(void *argument)
+void *Spectral(void *process)
 {
   int nrecs, nvars;
   int varID, levelID;
@@ -53,7 +53,7 @@ void *Spectral(void *argument)
   SPTRANS *sptrans = NULL;
   lista_t *ilista = lista_new(INT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

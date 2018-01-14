@@ -156,14 +156,14 @@ void gen_index(int gridID1, int gridID2, int *index)
 }
 
 
-void *Mergegrid(void *argument)
+void *Mergegrid(void *process)
 {
   int varID, levelID;
   int nrecs = 0;
   size_t nmiss1, nmiss2;
   int index;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

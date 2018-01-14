@@ -30,7 +30,7 @@
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
-void *Eofcoeff(void * argument)
+void *Eofcoeff(void *process)
 {
   char eof_name[16], oname[1024], filesuffix[32];
   double missval1 = -999, missval2;
@@ -40,7 +40,7 @@ void *Eofcoeff(void * argument)
   int nrecs;
   size_t nmiss; 
    
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 

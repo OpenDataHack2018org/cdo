@@ -27,14 +27,14 @@
 #include "pstream.h"
 
 
-void *Change_e5slm(void *argument)
+void *Change_e5slm(void *process)
 {
   char name[CDI_MAX_NAME];
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

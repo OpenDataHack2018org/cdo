@@ -1389,7 +1389,7 @@ void dsets_init(datasets_t *dsets)
 }
 #endif
 
-void *Importcmsaf(void *argument)
+void *Importcmsaf(void *process)
 {
 #ifdef  HAVE_LIBHDF5
   int streamID;
@@ -1408,7 +1408,7 @@ void *Importcmsaf(void *argument)
   int *vtimes = NULL;
 #endif
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( cdoDefaultFileType == CDI_UNDEFID )
     cdoDefaultFileType = CDI_FILETYPE_NC;

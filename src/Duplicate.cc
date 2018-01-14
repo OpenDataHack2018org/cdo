@@ -24,7 +24,7 @@
 #define  NALLOC_INC  1024
 
 
-void *Duplicate(void *argument)
+void *Duplicate(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -34,7 +34,7 @@ void *Duplicate(void *argument)
   int ndup = 2;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if      ( operatorArgc()  > 1 ) cdoAbort("Too many arguments!");
   else if ( operatorArgc() == 1 ) ndup = parameter2int(operatorArgv()[0]);

@@ -41,7 +41,7 @@
 #include "pstream.h"
 
 
-void *Math(void *argument)
+void *Math(void *process)
 {
   enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW, RECI, NOT};
   int nrecs;
@@ -49,7 +49,7 @@ void *Math(void *argument)
   size_t nmiss, nmiss2;
   int i;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("abs",   ABS,   0, NULL);

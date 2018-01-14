@@ -201,7 +201,7 @@ typedef struct
 } sgrid_t;
 
 
-void *Distgrid(void *argument)
+void *Distgrid(void *process)
 {
   int gridID1;
   int varID, levelID;
@@ -213,7 +213,7 @@ void *Distgrid(void *argument)
   size_t nmiss;
   int i;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("nxblocks, [nyblocks]");
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");

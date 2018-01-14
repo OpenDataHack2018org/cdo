@@ -49,7 +49,7 @@ int input_iarray(int nval, int *array)
 int input_darray(FILE *gfp, int nval, double *array);
 
 
-void *Input(void *argument)
+void *Input(void *process)
 {
   int varID = 0;
   int gridsize0 = 0, gridsize = 0;
@@ -64,7 +64,7 @@ void *Input(void *argument)
   double levels[1];
   double *array = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INPUT    = cdoOperatorAdd("input",    0, 0, NULL);

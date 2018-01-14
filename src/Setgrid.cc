@@ -31,7 +31,7 @@
 #include "grid.h"
 
 
-void *Setgrid(void *argument)
+void *Setgrid(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -52,7 +52,7 @@ void *Setgrid(void *argument)
   double *gridmask = NULL;
   double *areaweight = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETGRID       = cdoOperatorAdd("setgrid",       0, 0, "grid description file or name");

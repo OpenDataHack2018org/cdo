@@ -30,7 +30,7 @@
 #include "pstream.h"
 
 
-void *Monarith(void *argument)
+void *Monarith(void *process)
 {
   int nrecs, nrecs2, nlev;
   int varID, levelID;
@@ -38,7 +38,7 @@ void *Monarith(void *argument)
   size_t nmiss;
   int yearmon2 = -1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("monadd", func_add, 0, NULL);
   cdoOperatorAdd("monsub", func_sub, 0, NULL);

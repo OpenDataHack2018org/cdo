@@ -37,7 +37,7 @@ int stringToParam(const char *paramstr);
 
 #define  MAXARG     16384
 
-void *Change(void *argument)
+void *Change(void *process)
 {
   int nrecs, nvars;
   int varID = 0, levelID;
@@ -56,7 +56,7 @@ void *Change(void *argument)
   double *levels = NULL;
   double *newlevels = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int CHCODE   = cdoOperatorAdd("chcode",   0, 0, "pairs of old and new code numbers");

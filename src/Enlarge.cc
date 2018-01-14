@@ -27,12 +27,12 @@
 #include "pstream.h"
 
 
-void *Enlarge(void *argument)
+void *Enlarge(void *process)
 {
   int nrecs;
   bool linfo = true;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorCheckArgc(1);
 

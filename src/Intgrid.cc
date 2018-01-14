@@ -254,7 +254,7 @@ void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
 
 
 
-void *Intgrid(void *argument)
+void *Intgrid(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -263,7 +263,7 @@ void *Intgrid(void *argument)
   size_t nmiss;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);

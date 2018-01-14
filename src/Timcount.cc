@@ -32,7 +32,7 @@
 #include "pstream.h"
 
 
-void *Timcount(void *argument)
+void *Timcount(void *process)
 {
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int vdate0 = 0, vtime0 = 0;
@@ -41,7 +41,7 @@ void *Timcount(void *argument)
   size_t nmiss;
   int nwpv; // number of words per value; real:1  complex:2
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("timcount",  0, 31, NULL);

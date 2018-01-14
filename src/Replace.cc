@@ -29,7 +29,7 @@
 
 #define  MAX_VARS  1024
 
-void *Replace(void *argument)
+void *Replace(void *process)
 {
   int varID, varID1, varID2;
   int nrecs = 0;
@@ -45,7 +45,7 @@ void *Replace(void *argument)
   double **vardata2 = NULL;
   double *parray;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

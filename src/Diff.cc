@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Diff(void *argument)
+void *Diff(void *process)
 {
   bool lhead = true;
   int nrecs, nrecs2;
@@ -41,7 +41,7 @@ void *Diff(void *argument)
   char vdatestr[32], vtimestr[32];
   double abslim = 0., abslim2 = 1.e-3, rellim = 1.0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int DIFF  = cdoOperatorAdd("diff",  0, 0, NULL);

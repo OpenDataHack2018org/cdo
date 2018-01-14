@@ -211,11 +211,11 @@ void timpctl(int operatorID)
   pstreamClose(streamID1);
 }
 
-void *Timpctl(void *argument)
+void *Timpctl(void *process)
 {
   int operatorID;
   
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("timpctl",  func_pctl, 31, NULL);

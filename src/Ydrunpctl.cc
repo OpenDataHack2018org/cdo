@@ -40,7 +40,7 @@ int getmonthday(int date)
 }
 
 
-void *Ydrunpctl(void *argument)
+void *Ydrunpctl(void *process)
 {
   int varID;
   int gridID;
@@ -57,7 +57,7 @@ void *Ydrunpctl(void *argument)
   field_type **vars2[NDAY];
   HISTOGRAM_SET *hsets[NDAY];
     
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("ydrunpctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number, number of timesteps");

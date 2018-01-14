@@ -35,14 +35,14 @@
 #include "pstream.h"
 
 
-void *Ninfo(void *argument)
+void *Ninfo(void *process)
 {
   enum {NYEAR, NMON, NDATE, NTIME, NPAR, NLEVEL, NGRIDPOINTS, NGRIDS};
   int varID;
   int date0 = 0;
   int day, mon0 = 0, mon, year0 = 0, year;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("nyear"       , NYEAR       , 0 , NULL);

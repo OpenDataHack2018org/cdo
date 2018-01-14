@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Trend(void *argument)
+void *Trend(void *process)
 {
   int vdate = 0, vtime = 0;
   int varID, levelID;
@@ -38,7 +38,7 @@ void *Trend(void *argument)
   enum {nwork = 5};
   field_type **work[5];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

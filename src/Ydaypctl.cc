@@ -33,7 +33,7 @@
 
 int getmonthday(int date);
 
-void *Ydaypctl(void *argument)
+void *Ydaypctl(void *process)
 {
   int varID;
   int gridID;
@@ -49,7 +49,7 @@ void *Ydaypctl(void *argument)
   field_type **vars1[NDAY];
   HISTOGRAM_SET *hsets[NDAY];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("ydaypctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number");

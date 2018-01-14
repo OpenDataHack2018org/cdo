@@ -70,13 +70,13 @@ int *fill_vars(int vlistID)
 }
 
 
-void *Arithc(void *argument)
+void *Arithc(void *process)
 {
   size_t nmiss;
   int nrecs;
   int varID, levelID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("addc", func_add, 0, "constant value");

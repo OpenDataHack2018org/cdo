@@ -27,7 +27,7 @@
 #include "pstream.h"
 
 
-void *Splitsel(void *argument)
+void *Splitsel(void *process)
 {
   int gridsize;
   int nrecs = 0;
@@ -46,7 +46,7 @@ void *Splitsel(void *argument)
   double *array = NULL;
   field_type **vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 

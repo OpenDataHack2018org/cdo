@@ -40,7 +40,7 @@
 #include "percentiles.h"
 
 
-void *Merstat(void *argument)
+void *Merstat(void *process)
 {
   int gridID1, gridID2 = -1, lastgrid = -1;
   int wstatus = FALSE;
@@ -50,7 +50,7 @@ void *Merstat(void *argument)
   int varID, levelID;
   char varname[CDI_MAX_NAME];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("merrange", func_range, 0, NULL);

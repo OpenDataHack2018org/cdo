@@ -938,7 +938,7 @@ void write_map_grib2(const char *ctlfile, int map_version, int nrecords, int *in
 }
 */
 
-void *Gradsdes(void *argument)
+void *Gradsdes(void *process)
 {
   int gridID = -1;
   int gridtype = -1;
@@ -974,7 +974,7 @@ void *Gradsdes(void *argument)
   double *array = NULL;
   const char *cmons[]={"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"};
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int GRADSDES = cdoOperatorAdd("gradsdes",  0, 0, NULL);

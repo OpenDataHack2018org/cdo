@@ -841,7 +841,7 @@ void window_cell(int nwpv, double *array1, int gridID1, double *array2, long gri
 }
 
 
-void *Selbox(void *argument)
+void *Selbox(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -855,7 +855,7 @@ void *Selbox(void *argument)
     int lat1, lat2, lon11, lon12, lon21, lon22; 
   } sbox_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SELLONLATBOX = cdoOperatorAdd("sellonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");

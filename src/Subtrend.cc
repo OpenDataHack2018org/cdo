@@ -28,12 +28,12 @@
 #include "pstream.h"
 
 
-void *Subtrend(void *argument)
+void *Subtrend(void *process)
 {
   int gridID, varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int streamID2 = cdoStreamOpenRead(cdoStreamName(1));

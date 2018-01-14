@@ -21,13 +21,13 @@
 #include "pstream.h"
 
 
-void *Test(void *argument)
+void *Test(void *process)
 {
   /*
   int streamID1, streamID2;
   */
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   /*
   streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -42,13 +42,13 @@ void *Test(void *argument)
 }
 
 
-void *Test2(void *argument)
+void *Test2(void *process)
 {
   /*
   int streamID1, streamID2, streamID3;
   */
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   /*
   streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -65,13 +65,13 @@ void *Test2(void *argument)
 }
 
 
-void *Testdata(void *argument)
+void *Testdata(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int tsID2 = 0;
 

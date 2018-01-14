@@ -44,7 +44,7 @@ int stringToParam(const char *paramstr)
 }
 
 
-void *Set(void *argument)
+void *Set(void *process)
 {
   int nrecs, nvars, newval = -1, tabnum = 0;
   int varID, levelID;
@@ -56,7 +56,7 @@ void *Set(void *argument)
   double newlevel = 0;
   double *levels  = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code number");

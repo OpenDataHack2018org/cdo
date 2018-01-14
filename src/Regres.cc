@@ -29,7 +29,7 @@
 
 
 /* Same code as Trend ! */
-void *Regres(void *argument)
+void *Regres(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -38,7 +38,7 @@ void *Regres(void *argument)
   enum {nwork = 5};
   field_type **work[nwork];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

@@ -28,12 +28,12 @@
 #include "pstream.h"
 
 
-void *Deltat(void *argument)
+void *Deltat(void *process)
 {
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

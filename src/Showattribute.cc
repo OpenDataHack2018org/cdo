@@ -129,10 +129,10 @@ void check_varname_and_print(int vlistID, int nvars, char *checkvarname, char *a
     cdoAbort("Could not find variable %s in infile.", checkvarname);
 }
 
-void *Showattribute(void *argument)
+void *Showattribute(void *process)
 {
   const int delim = '@';
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SHOWATTRIBUTE = cdoOperatorAdd("showattribute",   0, 0, NULL);
   int SHOWATTSVAR   = cdoOperatorAdd("showattsvar",   0, 0, NULL);

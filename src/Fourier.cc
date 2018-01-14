@@ -26,7 +26,7 @@
 #define  NALLOC_INC  1024
 
 
-void *Fourier(void *argument)
+void *Fourier(void *process)
 {
   int bit;
   int gridsize;
@@ -47,7 +47,7 @@ void *Fourier(void *argument)
   } memory_t;
 
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse transformation)!");
   int sign = parameter2int(operatorArgv()[0]);

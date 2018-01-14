@@ -22,7 +22,7 @@
 
 #define  MAX_LINE_LEN  4096
 
-void *Setrcaname(void *argument)
+void *Setrcaname(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -35,7 +35,7 @@ void *Setrcaname(void *argument)
   size_t gridsize, nmiss;
   double *array = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

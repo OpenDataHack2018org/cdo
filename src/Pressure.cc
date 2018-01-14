@@ -33,7 +33,7 @@
 #include "stdnametable.h"
 
 
-void *Pressure(void *argument)
+void *Pressure(void *process)
 {
   ModelMode mode(ModelMode::UNDEF);
   int nrecs;
@@ -51,7 +51,7 @@ void *Pressure(void *argument)
   gribcode_t gribcodes;
   memset(&gribcodes, 0, sizeof(gribcode_t));
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int PRESSURE_FL = cdoOperatorAdd("pressure_fl", 0, 0, NULL);

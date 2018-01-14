@@ -297,7 +297,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
 }
 
 
-void *Setpartab(void *argument)
+void *Setpartab(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -307,7 +307,7 @@ void *Setpartab(void *argument)
   bool delvars = false;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SETCODETAB = cdoOperatorAdd("setcodetab",  0, 0, "parameter code table name");
   int SETPARTABC = cdoOperatorAdd("setpartabc",  0, 0, "parameter table name");

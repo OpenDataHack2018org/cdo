@@ -53,7 +53,7 @@ int cmpdatetime(const void *s1, const void *s2)
 }
 
 
-void *Sorttimestamp(void *argument)
+void *Sorttimestamp(void *process)
 {
   int gridsize;
   int nrecs;
@@ -66,7 +66,7 @@ void *Sorttimestamp(void *argument)
   int *vdate = NULL, *vtime = NULL;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int nfiles = cdoStreamCnt() - 1;
 

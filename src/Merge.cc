@@ -118,7 +118,7 @@ int vlistConstVars(int vlistID)
 }
 */
 
-void *Merge(void *argument)
+void *Merge(void *process)
 {
   int streamID1 = -1;
   int varID, varID2;
@@ -128,7 +128,7 @@ void *Merge(void *argument)
   int gridsize;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

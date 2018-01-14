@@ -27,7 +27,7 @@
 #include "pstream.h"
 
 
-void *Pinfo(void *argument)
+void *Pinfo(void *process)
 {
   int i;
   int varID;
@@ -40,7 +40,7 @@ void *Pinfo(void *argument)
   double level;
   double arrmin, arrmax, arrmean, arrvar;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int PINFO  = cdoOperatorAdd("pinfo",  0, 0, NULL);

@@ -55,14 +55,14 @@ void add_vars_mv(int gridsize, double missval, const double *restrict var1, cons
 }
 
 
-void *Vertcum(void *argument)
+void *Vertcum(void *process)
 {
   int nrecs;
   int i, nlevshl = 0;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
                   cdoOperatorAdd("vertcum",    0,  0, NULL);

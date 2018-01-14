@@ -301,13 +301,13 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
 }
 
 
-void *Collgrid(void *argument)
+void *Collgrid(void *process)
 {
   int nxblocks = -1;
   int varID, levelID;
   int nrecs0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
     
   int nfiles = cdoStreamCnt() - 1;
   const char *ofilename = cdoGetStreamName(nfiles).c_str();

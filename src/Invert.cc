@@ -278,14 +278,14 @@ void invertLatData(double *array1, double *array2, int gridID1)
 }
 
 
-void *Invert(void *argument)
+void *Invert(void *process)
 {
   int nrecs;
   int varID, levelID;
   int gridID1;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("invertlat",     func_all, func_lat, NULL);

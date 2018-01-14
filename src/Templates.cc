@@ -21,13 +21,13 @@
 #include "pstream.h"
 
 
-void *Template1(void *argument)
+void *Template1(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t gridsize, nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -89,13 +89,13 @@ void *Template1(void *argument)
 }
 
 
-void *Template2(void *argument)
+void *Template2(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

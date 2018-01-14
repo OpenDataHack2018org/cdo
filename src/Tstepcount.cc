@@ -51,7 +51,7 @@ double tstepcount(long nts, double missval1, double *array1, double refval)
 }
 
 
-void *Tstepcount(void *argument)
+void *Tstepcount(void *process)
 {
   int gridsize;
   int nrecs;
@@ -68,7 +68,7 @@ void *Tstepcount(void *argument)
     double *array1;
   } memory_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( operatorArgc() == 1 ) refval = parameter2double(operatorArgv()[0]);
 

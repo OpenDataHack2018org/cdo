@@ -235,9 +235,9 @@ void point_search(int gridIDsrc, int gridIDtgt)
 }
 
 
-void *Gridsearch(void *argument)
+void *Gridsearch(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int PSEARCH = cdoOperatorAdd("testpointsearch",  0,   0, NULL);

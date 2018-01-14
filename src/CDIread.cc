@@ -79,7 +79,7 @@ void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_
 }
 
 
-void *CDIread(void *argument)
+void *CDIread(void *process)
 {
   int memtype = CDO_Memtype;
   int varID, levelID;
@@ -96,7 +96,7 @@ void *CDIread(void *argument)
 
   sinfo[0] = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( cdoVerbose ) cdoPrint("parameter: <nruns>");
 

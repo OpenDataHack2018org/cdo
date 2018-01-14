@@ -51,7 +51,7 @@ int getkeyval_dp(const char *keyval, const char *key, double *val)
 }
 
 
-void *Setzaxis(void *argument)
+void *Setzaxis(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -62,7 +62,7 @@ void *Setzaxis(void *argument)
   bool lztop = false, lzbot = false;
   double ztop = 0, zbot = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETZAXIS       = cdoOperatorAdd("setzaxis",        0, 0, "zaxis description file");

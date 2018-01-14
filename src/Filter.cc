@@ -116,7 +116,7 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 }
 
 
-void *Filter(void *argument)
+void *Filter(void *process)
 {
   enum {BANDPASS, HIGHPASS, LOWPASS};
   const char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
@@ -144,7 +144,7 @@ void *Filter(void *argument)
 #endif
   } memory_t;
   
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("bandpass",  BANDPASS,  0, NULL);
   cdoOperatorAdd("highpass",  HIGHPASS,  0, NULL);

@@ -156,11 +156,11 @@ void gen_index(int gridID1, int gridID2, int *index)
 }
 
 
-void *Enlargegrid(void *argument)
+void *Enlargegrid(void *process)
 {
   int nrecs = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("grid description file or name");
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");

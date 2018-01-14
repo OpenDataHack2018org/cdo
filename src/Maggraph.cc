@@ -872,9 +872,9 @@ void VerifyGraphParameters( int num_param, char **param_names )
 
 #define NINC_ALLOC 1024
 
-void *Maggraph(void *argument)
+void *Maggraph(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
 #ifdef  HAVE_LIBMAGICS
   char varname[CDI_MAX_NAME], units[CDI_MAX_NAME];

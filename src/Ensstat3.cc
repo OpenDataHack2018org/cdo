@@ -48,7 +48,7 @@ enum ROC_ENUM_TYPE {TPR, FPR};
 
 double roc_curve_integrate(const double **roc, const int n);
 
-void *Ensstat3(void *argument)
+void *Ensstat3(void *process)
 {
   int i,j;
   int nrecs = 0, nrecs0;
@@ -76,7 +76,7 @@ void *Ensstat3(void *argument)
     double *array;
   } ens_file_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("ensroc",          func_roc,  0,          NULL);

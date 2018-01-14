@@ -32,7 +32,7 @@
 
 
 
-void *Intlevel3d(void *argument)
+void *Intlevel3d(void *process)
 {
   int gridsize, gridSize, gridsizei, gridsizeo;
   int nrecs;
@@ -56,7 +56,7 @@ void *Intlevel3d(void *argument)
   size_t zlevels_in_miss, zlevels_out_miss;
   char varname[10]; 
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INTLEVEL3D  = cdoOperatorAdd("intlevel3d",  0, 0, NULL);

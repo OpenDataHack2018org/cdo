@@ -154,7 +154,7 @@ void calc_adipot(long gridsize, long nlevel, double *pressure, field_type t, fie
 }
 
 
-void *Adisit(void *argument)
+void *Adisit(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -166,7 +166,7 @@ void *Adisit(void *argument)
   double pin = -1;
   double *single;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   int ADISIT = cdoOperatorAdd("adisit", 1, 1, "");
   int ADIPOT = cdoOperatorAdd("adipot", 1, 1, "");
 

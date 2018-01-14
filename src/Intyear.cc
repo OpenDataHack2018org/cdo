@@ -29,7 +29,7 @@
 #include "listarray.h"
 
 
-void *Intyear(void *argument)
+void *Intyear(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -37,7 +37,7 @@ void *Intyear(void *argument)
   char filesuffix[32];
   char filename[8192];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("years");
 

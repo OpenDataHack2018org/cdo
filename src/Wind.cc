@@ -33,7 +33,7 @@
 #include "listarray.h"
 
 
-void *Wind(void *argument)
+void *Wind(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -53,7 +53,7 @@ void *Wind(void *argument)
   char varname[CDI_MAX_NAME];
   double *ivar1 = NULL, *ivar2 = NULL, *ovar1 = NULL, *ovar2 = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

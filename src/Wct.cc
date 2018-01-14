@@ -79,14 +79,14 @@ static void farexpr(field_type *field1, field_type field2, double (*expression)(
 }
 
    
-void *Wct(void *argument)
+void *Wct(void *process)
 {
   int nrecs, nrecs2;
   size_t nmiss;
   int varID1, varID2;
   int levelID1, levelID2;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("wct", 0, 0, NULL);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));

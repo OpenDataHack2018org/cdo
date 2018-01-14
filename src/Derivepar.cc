@@ -33,7 +33,7 @@ void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor
 
 double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf);
 
-void *Derivepar(void *argument)
+void *Derivepar(void *process)
 {
   ModelMode mode(ModelMode::UNDEF);
   int nrecs;
@@ -57,7 +57,7 @@ void *Derivepar(void *argument)
   gribcode_t gribcodes;
   memset(&gribcodes, 0, sizeof(gribcode_t));
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int GHEIGHT          = cdoOperatorAdd("gheight",            0, 0, NULL);

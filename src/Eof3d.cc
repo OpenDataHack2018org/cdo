@@ -46,7 +46,7 @@ enum T_WEIGHT_MODE get_weightmode(void);
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
-void *EOF3d(void * argument)
+void *EOF3d(void *process)
 {
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
@@ -71,7 +71,7 @@ void *EOF3d(void * argument)
       timer_eig  = timer_new("Timeof eig");
     }
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("eof3d",        EOF3D_,        0, NULL);

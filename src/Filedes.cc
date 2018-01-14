@@ -285,9 +285,9 @@ void filedes(int streamID)
 }
 
 
-void *Filedes(void *argument)
+void *Filedes(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int GRIDDES  = cdoOperatorAdd("griddes",   0, 0, NULL);

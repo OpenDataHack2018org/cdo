@@ -35,7 +35,7 @@
 #include "pstream.h"
 
 
-void *Runstat(void *argument)
+void *Runstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int varID;
@@ -43,7 +43,7 @@ void *Runstat(void *argument)
   size_t nmiss;
   bool runstat_nomiss = false;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   char *envstr = getenv("RUNSTAT_NOMISS");
   if ( envstr )

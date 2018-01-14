@@ -359,7 +359,7 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 }
 
 
-void *CMOR_lite(void *argument)
+void *CMOR_lite(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -367,7 +367,7 @@ void *CMOR_lite(void *argument)
   bool delvars = false;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   CDO_CMOR_Mode = 1;
   if ( CDO_CMOR_Mode ) cdiDefGlobal("CMOR_MODE", CDO_CMOR_Mode);

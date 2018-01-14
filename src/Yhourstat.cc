@@ -65,7 +65,7 @@ int hour_of_year(int vdate, int vtime)
 }
 
 
-void *Yhourstat(void *argument)
+void *Yhourstat(void *process)
 {
   int varID;
   int nrecs;
@@ -75,7 +75,7 @@ void *Yhourstat(void *argument)
   int vdates[MAX_HOUR], vtimes[MAX_HOUR];
   field_type **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("yhourrange", func_range, 0, NULL);

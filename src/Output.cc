@@ -34,7 +34,7 @@
 #include "pstream.h"
 
 
-void *Output(void *argument)
+void *Output(void *process)
 {
   int varID;
   int gridID;
@@ -59,7 +59,7 @@ void *Output(void *argument)
   const char *Keynames[] = {"nohead",  "value", "param", "code", "name", "lon", "lat", "lev", "bin", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
 
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int OUTPUT    = cdoOperatorAdd("output",    0, 0, NULL);
   int OUTPUTINT = cdoOperatorAdd("outputint", 0, 0, NULL);

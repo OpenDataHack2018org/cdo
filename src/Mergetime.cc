@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Mergetime(void *argument)
+void *Mergetime(void *process)
 {
   int tsID2 = 0;
   int taxisID2 = CDI_UNDEFID;
@@ -46,7 +46,7 @@ void *Mergetime(void *argument)
     int nrecs;
   } sfile_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   char *envstr = getenv("SKIP_SAME_TIME");
   if ( envstr )

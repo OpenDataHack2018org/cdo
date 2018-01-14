@@ -29,7 +29,7 @@
 #include "pstream.h"
 
 
-void *Condc(void *argument)
+void *Condc(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -37,7 +37,7 @@ void *Condc(void *argument)
   int i;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int IFTHENC    = cdoOperatorAdd("ifthenc",    0, 0, NULL);

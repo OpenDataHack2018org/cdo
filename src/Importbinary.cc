@@ -185,7 +185,7 @@ int define_level(dsets_t *pfi, int nlev)
 }
 
 
-void *Importbinary(void *argument)
+void *Importbinary(void *process)
 {
   int i;
   size_t nmiss = 0, n_nan;
@@ -210,7 +210,7 @@ void *Importbinary(void *argument)
   double sfclevel = 0;
   char vdatestr[32], vtimestr[32];	  
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   dsets_init(&pfi);
 

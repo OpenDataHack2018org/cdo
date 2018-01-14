@@ -30,7 +30,7 @@
 #include "grid.h"
 
 
-void *Arithlat(void *argument)
+void *Arithlat(void *process)
 {
   int gridtype;
   int gridID0 = -1;
@@ -41,7 +41,7 @@ void *Arithlat(void *argument)
   char units[CDI_MAX_NAME];
   double *scale = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("mulcoslat", func_mul, 0, NULL);
   cdoOperatorAdd("divcoslat", func_div, 0, NULL);

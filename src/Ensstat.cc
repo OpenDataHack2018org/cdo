@@ -127,13 +127,13 @@ void *ensstat_func(void *ensarg)
 }
 
 
-void *Ensstat(void *argument)
+void *Ensstat(void *process)
 {
   void *task = CDO_task ? cdo_task_new() : NULL;
   ensstat_arg_t ensstat_arg;
   int nrecs0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("ensrange", func_range, 0, NULL);

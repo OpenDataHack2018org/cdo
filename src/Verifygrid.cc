@@ -666,11 +666,11 @@ void verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncor
 }
 
 
-void *Verifygrid(void *argument)
+void *Verifygrid(void *process)
 {
   char units[CDI_MAX_NAME];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int VERIFYGRID = cdoOperatorAdd("verifygrid",  0,   0, NULL);
 

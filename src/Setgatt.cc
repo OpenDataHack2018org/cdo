@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Setgatt(void *argument)
+void *Setgatt(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -36,7 +36,7 @@ void *Setgatt(void *argument)
   size_t nmiss;
   char *attname = NULL, *attstring = NULL, *attfile = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SETGATT  = cdoOperatorAdd("setgatt",  0, 0, "attribute name and string");
                  cdoOperatorAdd("setgatts", 0, 0, NULL);

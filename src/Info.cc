@@ -257,7 +257,7 @@ void infostat_init(infostat_type *infostat)
 }
 
 
-void *Info(void *argument)
+void *Info(void *process)
 {
   enum {E_NAME, E_CODE, E_PARAM};
   int fpeRaised = 0;
@@ -269,7 +269,7 @@ void *Info(void *argument)
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INFO   = cdoOperatorAdd("info",   E_PARAM,  0, NULL);

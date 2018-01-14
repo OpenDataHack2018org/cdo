@@ -21,14 +21,14 @@
 #include "pstream.h"
 
 
-void *EstFreq(void *argument)
+void *EstFreq(void *process)
 {
   int nrecs;
   int varID, levelID;
   int gridsize;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

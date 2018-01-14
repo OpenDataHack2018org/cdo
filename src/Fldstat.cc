@@ -82,7 +82,7 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
 }
 
 
-void *Fldstat(void *argument)
+void *Fldstat(void *process)
 {
   int gridID2, lastgrid = -1;
   int index;
@@ -91,7 +91,7 @@ void *Fldstat(void *argument)
   size_t nmiss;
   double sglval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("fldrange", func_range,  0, NULL);

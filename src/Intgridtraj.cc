@@ -50,7 +50,7 @@ int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double
 }
 
 
-void *Intgridtraj(void *argument)
+void *Intgridtraj(void *process)
 {
   int varID, levelID;
   int vdate, vtime;
@@ -59,7 +59,7 @@ void *Intgridtraj(void *argument)
   double xpos, ypos;
   int calendar = CALENDAR_STANDARD;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("filename with grid trajectories");
   operatorCheckArgc(1);

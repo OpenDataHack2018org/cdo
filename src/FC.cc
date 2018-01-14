@@ -33,7 +33,7 @@
 #include "listarray.h"
 
 
-void *FC(void *argument)
+void *FC(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -48,7 +48,7 @@ void *FC(void *argument)
   double *array2 = NULL;
   SPTRANS *sptrans = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

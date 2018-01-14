@@ -68,7 +68,7 @@ int countMask(double *maskField, int gridSize, double falseVal)
  * the operators argument has to be a single horizontal field,
  * non-zero values are used to mark the relevant locations
  */
-void *MapReduce(void *argument)
+void *MapReduce(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -77,7 +77,7 @@ void *MapReduce(void *argument)
   int nocoords = FALSE;
   /*double missval1, missval2; */
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   /* check input grid type and size - this will be used for selecting relevant
    * variables from the input file*/

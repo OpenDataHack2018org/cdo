@@ -750,7 +750,7 @@ void remapInit(remap_t *remap)
 }
 
 
-void *Remap(void *argument)
+void *Remap(void *process)
 {
   bool remap_genweights = REMAP_genweights;
   int streamID2 = -1;
@@ -770,7 +770,7 @@ void *Remap(void *argument)
 
   if ( cdoTimer ) init_remap_timer();
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);

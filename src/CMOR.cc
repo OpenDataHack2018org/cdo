@@ -4866,7 +4866,7 @@ static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, 
 
 #endif
 
-void *CMOR(void *argument)
+void *CMOR(void *process)
 {
   if ( cdoVerbose )
     {
@@ -4878,7 +4878,7 @@ void *CMOR(void *argument)
         */
     }
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
 #ifdef  HAVE_LIBCMOR
   signal(SIGTERM, sigfunc);

@@ -53,7 +53,7 @@ void setcbox(double constant, double *array, int gridID,
 }
 
 
-void *Setbox(void *argument)
+void *Setbox(void *process)
 {
   int SETCLONLATBOX, SETCINDEXBOX;
   int operatorID;
@@ -74,7 +74,7 @@ void *Setbox(void *argument)
   double *array;
   int taxisID1, taxisID2;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0, "constant, western and eastern longitude and southern and northern latitude");
   SETCINDEXBOX  = cdoOperatorAdd("setcindexbox",  0, 0, "constant, index of first and last longitude and index of first and last latitude");

@@ -154,7 +154,7 @@ int getNumberOfDeleteSelectionTuples();
 int multiSelectionParser(const char *filenameOrString);
 
 
-void *Selmulti(void *argument)
+void *Selmulti(void *process)
 {
   int varID, levelID;
   int nlevs, code, zaxisID;
@@ -169,7 +169,7 @@ void *Selmulti(void *argument)
                       // The default value for SCALE is 1.0; the default for OFFSET is 0.0.
   double  missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SELMULTI    = cdoOperatorAdd("selmulti",    0, 0, "filename/string with selection specification ");

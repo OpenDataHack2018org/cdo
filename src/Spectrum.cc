@@ -162,7 +162,7 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 }
 
 
-void *Spectrum(void *argument)
+void *Spectrum(void *process)
 {
   int gridsize;
   int nrecs;
@@ -175,7 +175,7 @@ void *Spectrum(void *argument)
   int freq;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

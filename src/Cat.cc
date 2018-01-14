@@ -27,7 +27,7 @@
 #include "pstream.h"
 
 
-void *Cat(void *argument)
+void *Cat(void *process)
 {
   bool lconstvars = true;
   int nrecs;
@@ -39,7 +39,7 @@ void *Cat(void *argument)
   double tw0 = 0, tw = 0;
   double *array = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

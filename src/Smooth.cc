@@ -377,7 +377,7 @@ void set_parameter(int *xnsmooth, smoothpoint_t *spoint)
 }
 
 
-void *Smooth(void *argument)
+void *Smooth(void *process)
 {
   int nrecs;
   int xnsmooth = 1;
@@ -388,7 +388,7 @@ void *Smooth(void *argument)
   spoint.weight0   = 0.25;
   spoint.weightR   = 0.25;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SMOOTH  = cdoOperatorAdd("smooth",   0,   0, NULL);

@@ -37,7 +37,7 @@
 #include "pstream.h"
 
 
-void *Timselstat(void *argument)
+void *Timselstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int nrecs = 0;
@@ -46,7 +46,7 @@ void *Timselstat(void *argument)
   int nsets;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("timselrange", func_range, 0, NULL);

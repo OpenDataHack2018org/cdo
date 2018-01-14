@@ -22,7 +22,7 @@
 #include "pstream.h"
 
 
-void *Complextorect(void *argument)
+void *Complextorect(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -30,7 +30,7 @@ void *Complextorect(void *argument)
   int datatype;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // int COMPLEXTORECT = cdoOperatorAdd("complextorect", 0, 0, NULL);
 

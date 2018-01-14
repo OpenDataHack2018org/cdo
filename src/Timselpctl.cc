@@ -30,7 +30,7 @@
 #include "percentiles.h"
 
 
-void *Timselpctl(void *argument)
+void *Timselpctl(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int nrecs = 0;
@@ -39,7 +39,7 @@ void *Timselpctl(void *argument)
   size_t nmiss;
   int nlevels;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("timselpctl", func_pctl,  0, NULL);
 

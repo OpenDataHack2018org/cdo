@@ -150,7 +150,7 @@ void cdoUpdateVars(int nvars, int vlistID, field_type **vars)
 }
 
 
-void *XTimstat(void *argument)
+void *XTimstat(void *process)
 {
   enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
   int timestat_date = TIMESTAT_MEAN;
@@ -165,7 +165,7 @@ void *XTimstat(void *argument)
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   double vfrac = 1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("xtimmin",    func_min,   DATE_LEN, NULL);

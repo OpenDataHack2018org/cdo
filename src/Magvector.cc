@@ -309,9 +309,9 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID )
 #endif
 
 
-void *Magvector(void *argument)
+void *Magvector(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
 #ifdef  HAVE_LIBMAGICS
   int nrecs;

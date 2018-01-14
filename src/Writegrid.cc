@@ -28,9 +28,9 @@
 #include "grid.h"
 
 
-void *Writegrid(void *argument)
+void *Writegrid(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 

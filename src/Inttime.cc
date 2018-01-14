@@ -31,7 +31,7 @@
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit);
 
 
-void *Inttime(void *argument)
+void *Inttime(void *process)
 {
   int streamID2 = -1;
   int nlevel;
@@ -44,7 +44,7 @@ void *Inttime(void *argument)
   double *single1, *single2;
   double *vardatap;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
   if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");

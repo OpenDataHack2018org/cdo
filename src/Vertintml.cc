@@ -59,7 +59,7 @@ void change_hybrid_zaxis(int vlistID1, int vlistID2, int nvct, double *vct, int 
 }
 
 
-void *Vertintml(void *argument)
+void *Vertintml(void *process)
 {
   ModelMode mode(ModelMode::UNDEF);
   enum {func_pl, func_hl};
@@ -78,7 +78,7 @@ void *Vertintml(void *argument)
   memset(&gribcodes, 0, sizeof(gribcode_t));
   lista_t *flista = lista_new(FLT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int ML2PL     = cdoOperatorAdd("ml2pl",     func_pl, type_lin, "pressure levels in pascal");
   int ML2PLX    = cdoOperatorAdd("ml2plx",    func_pl, type_lin, "pressure levels in pascal");

@@ -32,7 +32,7 @@ extern "C" {
 int streamGrbInqDataScanningMode(void);
 }
 
-void *Copy(void *argument)
+void *Copy(void *process)
 {
   bool lconstvars = true;
   int streamID2 = CDI_UNDEFID;
@@ -45,7 +45,7 @@ void *Copy(void *argument)
   void *array = NULL;
   par_io_t parIO;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

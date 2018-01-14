@@ -78,7 +78,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
 
 #define  MAXARG     16384
 
-void *Rotuv(void *argument)
+void *Rotuv(void *process)
 {
   int varID, levelID;
   int varID1, varID2, nlevel1, nlevel2;
@@ -91,7 +91,7 @@ void *Rotuv(void *argument)
   char varname2[CDI_MAX_NAME];
   double *single, *usvar = NULL, *vsvar = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("pairs of u and v in the rotated system");
 

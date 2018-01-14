@@ -52,7 +52,7 @@ void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI
 }
 
 
-void *Samplegrid(void *argument)
+void *Samplegrid(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -66,7 +66,7 @@ void *Samplegrid(void *argument)
     int subI0, subI1, subJ0, subJ1;
   } sbox_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SAMPLEGRID = cdoOperatorAdd("samplegrid",  0, 0, "resample factor, typically 2 (which will half the resolution)");
   int SUBGRID    = cdoOperatorAdd("subgrid",  0, 0, " sub-grid indices: i0,i1,j0,j1");

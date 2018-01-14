@@ -37,7 +37,7 @@
 #define  MAX_MON    12
 
 
-void *Ymonarith(void *argument)
+void *Ymonarith(void *process)
 {
   enum {MONTHLY, SEASONAL};
   int nrecs, nlev;
@@ -49,7 +49,7 @@ void *Ymonarith(void *argument)
   double **vardata2[MAX_MON];
   const char *seas_name[4];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("ymonadd",  func_add, MONTHLY, NULL);

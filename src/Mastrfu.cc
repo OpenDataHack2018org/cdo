@@ -104,14 +104,14 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmi
 }
 
 
-void *Mastrfu(void *argument)
+void *Mastrfu(void *process)
 {
   int nrecs;
   int varID, levelID;
   int offset;
   size_t nmiss, nmiss1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

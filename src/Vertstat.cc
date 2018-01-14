@@ -153,7 +153,7 @@ int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *
 }
 
 
-void *Vertstat(void *argument)
+void *Vertstat(void *process)
 {
   int nrecs;
   int gridID;
@@ -168,7 +168,7 @@ void *Vertstat(void *argument)
   }
   vert_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
                  cdoOperatorAdd("vertrange", func_range, 0, NULL);

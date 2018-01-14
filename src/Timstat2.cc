@@ -101,14 +101,14 @@ size_t covariance_t(size_t gridsize, double missval1, double missval2, size_t *n
 }
 
 
-void *Timstat2(void *argument)
+void *Timstat2(void *process)
 {
   int vdate = 0, vtime = 0;
   int nrecs2, nlevs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("timcor",   func_cor,   0, NULL);

@@ -64,7 +64,7 @@ void trms(field_type field1, field_type field2, double *dp, field_type *field3)
   field3->nmiss  = rnmiss;
 }
 
-void *Trms(void *argument)
+void *Trms(void *process)
 {
   int gridID1, gridID3, lastgrid = -1;
   int code = 0, oldcode = 0;
@@ -79,7 +79,7 @@ void *Trms(void *argument)
   double *single;
   double sglval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool needWeights = true;
 

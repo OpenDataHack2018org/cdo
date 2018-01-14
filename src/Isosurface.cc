@@ -74,7 +74,7 @@ void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, fi
 }
 
 
-void *Isosurface(void *argument)
+void *Isosurface(void *process)
 {
   int nlevel = 0;
   int nrecs;
@@ -86,7 +86,7 @@ void *Isosurface(void *argument)
   double missval;
   double *single;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("isoval");
 

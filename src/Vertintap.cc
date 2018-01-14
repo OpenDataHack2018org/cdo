@@ -66,7 +66,7 @@ void change_height_zaxis(int vlistID1, int vlistID2, int zaxisID2)
 }
 
 
-void *Vertintap(void *argument)
+void *Vertintap(void *process)
 {
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
@@ -81,7 +81,7 @@ void *Vertintap(void *argument)
   bool extrapolate = false;
   lista_t *flista = lista_new(FLT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int AP2PL     = cdoOperatorAdd("ap2pl",     func_pl, type_lin, "pressure levels in pascal");

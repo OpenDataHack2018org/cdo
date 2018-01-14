@@ -198,7 +198,7 @@ void output_vrml(int nlon, int nlat, int ngp, double *restrict array, double mis
 }
 
 
-void *Outputgmt(void *argument)
+void *Outputgmt(void *process)
 {
   int varID0;
   int gridsize2 = 0;
@@ -218,7 +218,7 @@ void *Outputgmt(void *argument)
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int OUTPUTCENTER    = cdoOperatorAdd("gmtxyz",          0, 0, NULL);

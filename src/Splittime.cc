@@ -52,7 +52,7 @@ struct tm datetime_to_tm(int date, int time)
   return stime;
 }
 
-void *Splittime(void *argument)
+void *Splittime(void *process)
 {
   int streamID2;
   int varID;
@@ -70,7 +70,7 @@ void *Splittime(void *argument)
   field_type **vars = NULL;
   const char *format = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 

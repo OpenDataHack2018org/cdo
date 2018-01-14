@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Cond(void *argument)
+void *Cond(void *process)
 {
   enum {FILL_NONE, FILL_TS, FILL_REC};
   int filltype = FILL_NONE;
@@ -41,7 +41,7 @@ void *Cond(void *argument)
   size_t **varnmiss1 = NULL;
   double **vardata1 = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int IFTHEN    = cdoOperatorAdd("ifthen",    0, 0, NULL);

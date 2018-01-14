@@ -28,7 +28,7 @@
 #include "grid.h"
 
 
-void *Fldrms(void *argument)
+void *Fldrms(void *process)
 {
   int lastgrid = -1;
   int index;
@@ -37,7 +37,7 @@ void *Fldrms(void *argument)
   size_t nmiss;
   double sglval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool needWeights = true;
 

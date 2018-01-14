@@ -119,7 +119,7 @@ void pl_index(int *kmax, int *kmin, double pmax, double pmin, long nlevs, double
 
 #define NVARS  3
 
-void *Cloudlayer(void *argument)
+void *Cloudlayer(void *process)
 {
   int gridID, zaxisID;
   int nlevel, nlevs, nrecs, code;
@@ -137,7 +137,7 @@ void *Cloudlayer(void *argument)
   double *cloud[NVARS];
   double pmin = 0, pmax = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( operatorArgc() > 0 )
     {

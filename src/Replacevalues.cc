@@ -30,7 +30,7 @@
 #include "listarray.h"
 
 
-void *Replacevalues(void *argument)
+void *Replacevalues(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -41,7 +41,7 @@ void *Replacevalues(void *argument)
   double rmin = 0, rmax = 0;
   double newval = 0, newval2 = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETVALS  = cdoOperatorAdd("setvals",  0, 0, "I1,O1,...,In,On");

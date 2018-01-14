@@ -2403,9 +2403,9 @@ int afterburner(int argc, char *argv[])
 #endif
 
 #if defined(CDO)
-void *Afterburner(void *argument)
+void *Afterburner(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   CDO_task = true;
 

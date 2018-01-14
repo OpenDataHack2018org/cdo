@@ -120,7 +120,7 @@ static void selEndOfPeriod(field_type *periods, field_type history, field_type c
 }
 
 
-void *Consecstat(void *argument)
+void *Consecstat(void *process)
 {
   int vdate = 0, vtime = 0;
   int histvdate = 0, histvtime = 0;
@@ -130,7 +130,7 @@ void *Consecstat(void *argument)
   size_t nmiss;
   double refval = 0.0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("consecsum",CONSECSUM, 0, "refval");
   cdoOperatorAdd("consects" ,CONSECTS , 0, NULL);
   int operatorID = cdoOperatorID();

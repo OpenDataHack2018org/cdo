@@ -27,7 +27,7 @@
 #include "pstream.h"
 
 
-void *Harmonic(void *argument)
+void *Harmonic(void *process)
 {
   int gridsize;
   int nrecs;
@@ -41,7 +41,7 @@ void *Harmonic(void *argument)
   const char *refname;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("wave number and wave length of first harmonic in number of timesteps");
 

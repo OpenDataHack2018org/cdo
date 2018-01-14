@@ -153,7 +153,7 @@ void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev
 }
 
 
-void *Intlevel(void *argument)
+void *Intlevel(void *process)
 {
   int gridsize;
   int nrecs;
@@ -166,7 +166,7 @@ void *Intlevel(void *argument)
   double missval;
   double *single1, *single2;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INTLEVEL   = cdoOperatorAdd("intlevel",  0, 0, NULL);

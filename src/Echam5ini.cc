@@ -1425,7 +1425,7 @@ void export_e5res(const char *filename, VAR *vars, int nvars)
 }
 
 
-void *Echam5ini(void *argument)
+void *Echam5ini(void *process)
 {
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs = 0;
@@ -1437,7 +1437,7 @@ void *Echam5ini(void *argument)
   size_t nmiss;
   int taxisID, tsID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int IMPORT_E5ML  = cdoOperatorAdd("import_e5ml",  func_read,  0, NULL);

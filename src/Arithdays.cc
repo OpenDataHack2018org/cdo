@@ -68,7 +68,7 @@ double dayofyear(int calendar, int vdate, int vtime)
 }
 
 
-void *Arithdays(void *argument)
+void *Arithdays(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -76,7 +76,7 @@ void *Arithdays(void *argument)
   size_t nmiss;
   double rconst;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
                cdoOperatorAdd("muldpm", func_mul, func_month, NULL);

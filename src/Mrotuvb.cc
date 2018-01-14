@@ -253,7 +253,7 @@ void uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y,
 }
 
 
-void *Mrotuvb(void *argument)
+void *Mrotuvb(void *process)
 {
   int nrecs, nrecs2;
   int levelID;
@@ -261,7 +261,7 @@ void *Mrotuvb(void *argument)
   size_t nmiss1, nmiss2;
   bool gpint = true;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( operatorArgc() == 1 )
     if ( strcmp(operatorArgv()[0], "noint") == 0 ) gpint = false;

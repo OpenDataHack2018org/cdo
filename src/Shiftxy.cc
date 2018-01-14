@@ -155,7 +155,7 @@ int shifty_coord(bool lcyclic, int nshift, int gridID1)
 }
 
 
-void *Shiftxy(void *argument)
+void *Shiftxy(void *process)
 {
   bool lcyclic = false;
   bool lcoord = false;
@@ -163,7 +163,7 @@ void *Shiftxy(void *argument)
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SHIFTX = cdoOperatorAdd("shiftx", 0, 0, NULL);
   int SHIFTY = cdoOperatorAdd("shifty", 0, 0, NULL);

@@ -213,7 +213,7 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
 }
 
 
-void *Tinfo(void *argument)
+void *Tinfo(void *process)
 {
   int vdate_first = 0, vtime_first = 0;
   int vdate0 = 0, vtime0 = 0;
@@ -238,7 +238,7 @@ void *Tinfo(void *argument)
   int i, len;
   char vdatestr[32], vtimestr[32];	  
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 

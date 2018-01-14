@@ -87,7 +87,7 @@ int getDate(const char *name)
 
 #define  MAX_LINE_LEN  4096
 
-void *Importobs(void *argument)
+void *Importobs(void *process)
 {
   char line[MAX_LINE_LEN];
   int i, j;
@@ -102,7 +102,7 @@ void *Importobs(void *argument)
   double dx, dy;
   char *pstation;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("import_obs",     0, 0, "grid description file or name");
 

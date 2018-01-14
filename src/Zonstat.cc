@@ -40,7 +40,7 @@
 #include "percentiles.h"
 
 
-void *Zonstat(void *argument)
+void *Zonstat(void *process)
 {
   int gridID1 = -1, gridID2 = -1;
   int zongridID = -1;
@@ -49,7 +49,7 @@ void *Zonstat(void *argument)
   int nrecs;
   int varID, levelID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("zonmin",   func_min,   0, NULL);

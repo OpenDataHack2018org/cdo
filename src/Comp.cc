@@ -32,7 +32,7 @@
 #include "pstream.h"
 
 
-void *Comp(void *argument)
+void *Comp(void *process)
 {
   enum {FILL_NONE, FILL_TS, FILL_REC};
   int filltype = FILL_NONE;
@@ -42,7 +42,7 @@ void *Comp(void *argument)
   double missval1, missval2 = 0;
   double **vardata = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int EQ = cdoOperatorAdd("eq", 0, 0, NULL);
   int NE = cdoOperatorAdd("ne", 0, 0, NULL);

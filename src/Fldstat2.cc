@@ -88,7 +88,7 @@ double covariance_s(const double * restrict in0, const double * restrict in1,
 }
 
 
-void *Fldstat2(void *argument)
+void *Fldstat2(void *process)
 {
   int gridID, lastgridID = -1;
   int gridID3;
@@ -100,7 +100,7 @@ void *Fldstat2(void *argument)
   double sglval = 0;
   char varname[CDI_MAX_NAME];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("fldcor",   func_cor,   0, NULL);

@@ -58,7 +58,7 @@ int hour_of_year(int vdate, int vtime)
 }
 
 
-void *Yhourarith(void *argument)
+void *Yhourarith(void *process)
 {
   int nrecs, nlev;
   int varID, levelID;
@@ -69,7 +69,7 @@ void *Yhourarith(void *argument)
   size_t **varnmiss2[MAX_HOUR];
   double **vardata2[MAX_HOUR];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("yhouradd", func_add, 0, NULL);
   cdoOperatorAdd("yhoursub", func_sub, 0, NULL);

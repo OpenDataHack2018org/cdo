@@ -37,7 +37,7 @@
 #include "pstream.h"
 
 
-void *Setmiss(void *argument)
+void *Setmiss(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -45,7 +45,7 @@ void *Setmiss(void *argument)
   double missval2 = 0;
   double rconst = 0, rmin = 0, rmax = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETMISSVAL = cdoOperatorAdd("setmissval", 0, 0, "missing value");

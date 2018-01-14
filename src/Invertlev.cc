@@ -89,7 +89,7 @@ void invertLevDes(int vlistID)
 }
 
 
-void *Invertlev(void *argument)
+void *Invertlev(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -98,7 +98,7 @@ void *Invertlev(void *argument)
   int gridID, zaxisID, offset;
   bool linvert = false;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

@@ -410,13 +410,13 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 }
 
 
-void *Fillmiss(void *argument)
+void *Fillmiss(void *process)
 {
   size_t nmiss;
   int nrecs, varID, levelID;
   void (*fill_method) (field_type *fin , field_type *fout , int) = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int FILLMISS        = cdoOperatorAdd("fillmiss"   ,   0, 0, "nfill");

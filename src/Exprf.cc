@@ -316,9 +316,9 @@ void params_delete(paramType *params)
 }
 
 
-void *Expr(void *argument)
+void *Expr(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   parse_param_t parse_arg;
   void *scanner;

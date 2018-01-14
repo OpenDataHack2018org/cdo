@@ -327,7 +327,7 @@ void command_init()
 }
 
 
-void *Command(void *argument)
+void *Command(void *process)
 {
   // int recID, varID, levelID;
   // size_t nmiss;
@@ -336,7 +336,7 @@ void *Command(void *argument)
   double c_cputime = 0, c_usertime = 0, c_systime = 0;
   char line[MAX_LINE];
  
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   processStartTime(&s_utime, &s_stime);
 

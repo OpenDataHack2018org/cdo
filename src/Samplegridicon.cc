@@ -505,12 +505,12 @@ void samplegrid(double missval, long nci, cellindex_type **cellindex, double *ar
 #include "pstream.h"
 
 
-void *Samplegridicon(void *argument)
+void *Samplegridicon(void *process)
 {
   int nrecs;
   int varID, levelID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("samplegridicon",  0, 0, "sample grids");
 

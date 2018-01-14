@@ -34,7 +34,7 @@
 #define  NFWORK  4
 #define  NIWORK  2
 
-void *Timstat3(void *argument)
+void *Timstat3(void *process)
 {
   int streamID[NIN];
   int vlistID[NIN], vlistID2 = -1;
@@ -51,7 +51,7 @@ void *Timstat3(void *argument)
   int reached_eof[NIN];
   int n_in = NIN;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int VARQUOT2TEST  = cdoOperatorAdd("varquot2test",  0, 0, NULL);

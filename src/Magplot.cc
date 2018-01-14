@@ -1095,9 +1095,9 @@ int checkprojection( char *projection_in )
 #endif
 
 
-void *Magplot(void *argument)
+void *Magplot(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
 #ifdef  HAVE_LIBMAGICS
   int nrecs;

@@ -58,13 +58,13 @@ void transxy(int gridID, double *array1, double *array2)
 }
 
 
-void *Transpose(void *argument)
+void *Transpose(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

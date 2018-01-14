@@ -32,7 +32,7 @@
 
 #define  MAX_DOY   373
 
-void *Ydayarith(void *argument)
+void *Ydayarith(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -41,7 +41,7 @@ void *Ydayarith(void *argument)
   size_t **varnmiss2[MAX_DOY];
   double **vardata2[MAX_DOY];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("ydayadd", func_add, 0, NULL);
   cdoOperatorAdd("ydaysub", func_sub, 0, NULL);

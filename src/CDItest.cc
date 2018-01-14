@@ -26,7 +26,7 @@
 #include "pstream.h"
 
 
-void *CDItest(void *argument)
+void *CDItest(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -35,7 +35,7 @@ void *CDItest(void *argument)
   double s_utime, s_stime;
   double e_utime, e_stime;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = false;
   //bool lcopy = UNCHANGED_RECORD;

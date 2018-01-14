@@ -679,7 +679,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
 }
 
 
-void *YAR(void *argument)
+void *YAR(void *process)
 {
   int nrecs;
   int index;
@@ -697,7 +697,7 @@ void *YAR(void *argument)
       timer_yar_remap_bil    = timer_new("yar remap bil");
     }
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int YARBIL = cdoOperatorAdd("yarbil",  0, 0, NULL);
   int YARCON = cdoOperatorAdd("yarcon",  0, 0, NULL);

@@ -27,14 +27,14 @@
 #include "pstream.h"
 
 
-void *Writerandom(void *argument)
+void *Writerandom(void *process)
 {
   int gridsize;
   int nrecs;
   int varID, levelID;
   int rindex;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

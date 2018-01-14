@@ -41,7 +41,7 @@ void set_date(int vdate_new, int vtime_new, date_time_t *datetime);
 int getmonthday(int date);
 
 
-void *Yseaspctl(void *argument)
+void *Yseaspctl(void *process)
 {
   int varID;
   int gridID;
@@ -56,7 +56,7 @@ void *Yseaspctl(void *argument)
   field_type **vars1[NSEAS];
   HISTOGRAM_SET *hsets[NSEAS];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("yseaspctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number");

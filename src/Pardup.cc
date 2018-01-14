@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Pardup(void *argument)
+void *Pardup(void *process)
 {
   int nrecs;
   int varID, varID2, levelID;
@@ -38,7 +38,7 @@ void *Pardup(void *argument)
   int nlevel;
   double *single;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int PARDUP = cdoOperatorAdd("pardup", 0, 0, NULL);
   int PARMUL = cdoOperatorAdd("parmul", 0, 0, NULL);

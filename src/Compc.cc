@@ -33,13 +33,13 @@
 #include "pstream.h"
 
 
-void *Compc(void *argument)
+void *Compc(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int EQC = cdoOperatorAdd("eqc", 0, 0, NULL);
   int NEC = cdoOperatorAdd("nec", 0, 0, NULL);

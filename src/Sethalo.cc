@@ -437,7 +437,7 @@ void tpnhalo(double *array1, int gridID1, double *array2)
 }
 
 
-void *Sethalo(void *argument)
+void *Sethalo(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -449,7 +449,7 @@ void *Sethalo(void *argument)
   int lhalo = 0, rhalo = 0;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETHALO = cdoOperatorAdd("sethalo", 0, 0, NULL);

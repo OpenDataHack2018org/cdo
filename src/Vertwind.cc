@@ -32,7 +32,7 @@
 #define R  287.07  /* spezielle Gaskonstante fuer Luft */
 #define G  9.80665 /* Erdbeschleunigung */
 
-void *Vertwind(void *argument)
+void *Vertwind(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -43,7 +43,7 @@ void *Vertwind(void *argument)
   double *vct = NULL;
   double *hpress = NULL, *ps_prog = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

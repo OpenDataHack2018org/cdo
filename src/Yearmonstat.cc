@@ -30,7 +30,7 @@
 #include "pstream.h"
 
 
-void *Yearmonstat(void *argument)
+void *Yearmonstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int vdate = 0, vtime = 0;
@@ -47,7 +47,7 @@ void *Yearmonstat(void *argument)
   double dsets;
   char vdatestr[32], vtimestr[32];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("yearmonmean",  func_mean, 0, NULL);

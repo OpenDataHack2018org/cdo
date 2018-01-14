@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Intntime(void *argument)
+void *Intntime(void *process)
 {
   int nlevel;
   int varID, levelID;
@@ -37,7 +37,7 @@ void *Intntime(void *argument)
   double *single1, *single2;
   double *vardatap;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("number of timesteps between 2 timesteps");
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");

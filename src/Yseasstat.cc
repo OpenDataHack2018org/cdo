@@ -58,7 +58,7 @@ void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 }
 
 
-void *Yseasstat(void *argument)
+void *Yseasstat(void *process)
 {
   int varID;
   int year, month, day;
@@ -69,7 +69,7 @@ void *Yseasstat(void *argument)
   date_time_t datetime[NSEAS];
   field_type **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("yseasrange", func_range, 0, NULL);

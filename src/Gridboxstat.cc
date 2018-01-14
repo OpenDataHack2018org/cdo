@@ -534,7 +534,7 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
 }
 
 
-void *Gridboxstat(void *argument)
+void *Gridboxstat(void *process)
 {
   int lastgrid = -1;
   int nrecs;
@@ -542,7 +542,7 @@ void *Gridboxstat(void *argument)
   bool wstatus = false;
   char varname[CDI_MAX_NAME];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("xinc, yinc");
   operatorCheckArgc(2);

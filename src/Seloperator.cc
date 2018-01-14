@@ -21,7 +21,7 @@
 #include "pstream.h"
 
 
-void *Seloperator(void *argument)
+void *Seloperator(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -33,7 +33,7 @@ void *Seloperator(void *argument)
   double slevel = 0, level;
   double *array = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

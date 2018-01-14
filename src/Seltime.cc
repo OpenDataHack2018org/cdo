@@ -166,7 +166,7 @@ int datelist(lista_t *flista)
 }
 
 
-void *Seltime(void *argument)
+void *Seltime(void *process)
 {
   int streamID2 = -1;
   int nrecs;
@@ -190,7 +190,7 @@ void *Seltime(void *argument)
   double *single;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

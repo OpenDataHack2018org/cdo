@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Seascount(void *argument)
+void *Seascount(void *process)
 {
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
@@ -37,7 +37,7 @@ void *Seascount(void *argument)
   int year, month, day, seas0 = 0;
   int oldmon = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("seascount", 0, 0, NULL);
 

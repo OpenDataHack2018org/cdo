@@ -79,7 +79,7 @@ int compute_scale(int datatype, double fmin, double fmax, double *scale_factor, 
 }
 
 
-void *Pack(void *argument)
+void *Pack(void *process)
 {
   int gridsize;
   int nrecs;
@@ -92,7 +92,7 @@ void *Pack(void *argument)
   double missval1, missval2;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

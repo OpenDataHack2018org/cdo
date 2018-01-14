@@ -149,7 +149,7 @@ void calc_rhopot(long gridsize, long nlevel, double *pressure, field_type to, fi
 }
 
 
-void *Rhopot(void *argument)
+void *Rhopot(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -162,7 +162,7 @@ void *Rhopot(void *argument)
   double *single;
   field_type to, sao, rho;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   

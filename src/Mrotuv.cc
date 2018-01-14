@@ -189,7 +189,7 @@ void p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y,
 }
 
 
-void *Mrotuv(void *argument)
+void *Mrotuv(void *process)
 {
   int nrecs;
   int levelID;
@@ -197,7 +197,7 @@ void *Mrotuv(void *argument)
   size_t nmiss1, nmiss2;
   int uid = -1, vid = -1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

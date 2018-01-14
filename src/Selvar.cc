@@ -40,7 +40,7 @@
 #include "listarray.h"
 
 
-void *Selvar(void *argument)
+void *Selvar(void *process)
 {
   int varID2, levelID2;
   int varID, levelID;
@@ -58,7 +58,7 @@ void *Selvar(void *argument)
   lista_t *ilista = lista_new(INT_LISTA);
   lista_t *flista = lista_new(FLT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

@@ -157,7 +157,7 @@ void gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, in
 }
 
 
-void *Settime(void *argument)
+void *Settime(void *process)
 {
   int nrecs, newval = 0;
   int varID, levelID;
@@ -175,7 +175,7 @@ void *Settime(void *argument)
   // int nargs;
   juldate_t juldate;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETYEAR     = cdoOperatorAdd("setyear",      0,  1, "year");

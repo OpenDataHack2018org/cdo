@@ -39,7 +39,7 @@ enum OPERTYPE {CRPS, BRS};
 enum RESTYPE_BRS  { BRS_RES, BRS_RELI, BRS_RESOL, BRS_UNCTY };
 enum RESTYPE_CRPS { CRPS_RES,CRPS_RELI,CRPS_POT };
 
-void *Ensval(void *argument)
+void *Ensval(void *process)
 {
   int i,k;
   int nrecs = 0, nrecs0, nostreams = 0, ngrids;
@@ -81,7 +81,7 @@ void *Ensval(void *argument)
   weights = NULL; 
   //int vlistCheck, gridsizeCheck;
   
-  cdoInitialize(argument);
+  cdoInitialize(process);
   
   cdoOperatorAdd("enscrps",   CRPS,  0,   NULL);
   cdoOperatorAdd("ensbrs",    BRS,   0,   NULL);

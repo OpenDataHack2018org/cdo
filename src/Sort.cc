@@ -145,7 +145,7 @@ void paramToStringLong(int param, char *paramstr, int maxlen)
 }
 
 
-void *Sort(void *argument)
+void *Sort(void *process)
 {
   int varID, levelID, zaxisID;
   int vindex, lindex;
@@ -155,7 +155,7 @@ void *Sort(void *argument)
   double *single;
   int (*cmpvarlev)(const void *, const void *) = cmpvarlevel;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SORTCODE  = cdoOperatorAdd("sortcode",  0, 0, NULL);

@@ -30,7 +30,7 @@
 #include "percentiles.h"
 
 
-void *Seaspctl(void *argument)
+void *Seaspctl(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int nrecs;
@@ -42,7 +42,7 @@ void *Seaspctl(void *argument)
   int season_start;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("seaspctl", func_pctl, 0, NULL);
 

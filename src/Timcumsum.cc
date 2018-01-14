@@ -28,13 +28,13 @@
 #include "pstream.h"
 
 
-void *Timcumsum(void *argument)
+void *Timcumsum(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

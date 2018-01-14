@@ -92,7 +92,7 @@ void eval_timestepmask(const char *maskfile, list_t *kvlist)
 }
 
 
-void *Select(void *argument)
+void *Select(void *process)
 {
   bool lconstvars = true;
   int streamID2 = CDI_UNDEFID;
@@ -115,7 +115,7 @@ void *Select(void *argument)
   double fstartdate = -99999999999.;
   double fenddate   = -99999999999.;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SELECT = cdoOperatorAdd("select", 0, 0, "parameter list");
   int DELETE = cdoOperatorAdd("delete", 0, 0, "parameter list");

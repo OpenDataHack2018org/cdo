@@ -88,7 +88,7 @@ void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_
 }
 
 
-void *CDIwrite(void *argument)
+void *CDIwrite(void *process)
 {
   int memtype = CDO_Memtype;
   int nvars = 10, nlevs = 0, ntimesteps = 30;
@@ -111,7 +111,7 @@ void *CDIwrite(void *argument)
   srand(seed);
   sinfo[0] = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( cdoVerbose ) cdoPrint("parameter: <nruns, <grid, <nlevs, <ntimesteps, <nvars>>>>>");
 

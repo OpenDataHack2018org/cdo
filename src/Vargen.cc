@@ -230,7 +230,7 @@ void remap_nn_reg2d(size_t nx, size_t ny, const double *restrict data, int gridI
 #define NLON 720
 #define NLAT 360
 
-void *Vargen(void *argument)
+void *Vargen(void *process)
 {
   int ntimesteps, nlevels = 1;
   int varID, varID2 = -1, levelID;
@@ -242,7 +242,7 @@ void *Vargen(void *argument)
   size_t nlon = NLON;
   size_t nlat = NLAT;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int RANDOM  = cdoOperatorAdd("random",  0, 0, "grid description file or name, <seed>");

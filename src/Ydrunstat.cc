@@ -57,7 +57,7 @@ static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
 
-void *Ydrunstat(void *argument)
+void *Ydrunstat(void *process)
 {
   int varID;
   int nrecs;
@@ -66,7 +66,7 @@ void *Ydrunstat(void *argument)
   int inp, its;
   size_t nmiss;
     
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("ydrunmin",   func_min,   0, NULL);

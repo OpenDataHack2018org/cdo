@@ -37,7 +37,7 @@
 #include "pstream.h"
 
 
-void *Seasstat(void *argument)
+void *Seasstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int vdate0 = 0, vtime0 = 0;
@@ -50,7 +50,7 @@ void *Seasstat(void *argument)
   int nseason = 0;
   const char *seas_name[4];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("seasrange", func_range, 0, NULL);

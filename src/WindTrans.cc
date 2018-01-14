@@ -203,7 +203,7 @@ void *DestaggerUV()
   double *ivar = NULL, *ovar = NULL;
   double dxU = 0, dyU = 0, dxV = 0, dyV = 0;
 
-  //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
+  //Note: Already initialized by the caller! Don't call again: cdoInitialize(process);
 
   operatorInputArg("Pair of u and v in the staggered system:\n\
     Usage: uvDestag,u,v -or- uvDestag,33,34 -or- uvDestag,u,v,-0.5,-0.5 -or- uvDestag,33,34,-0.5,-0.5\n \
@@ -1081,7 +1081,7 @@ void *TransformUV(int operatorID)
   int gridIDcurvl = -1;
   int gridIDlastused = -1;
 
-  //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
+  //Note: Already initialized by the caller! Don't call again: cdoInitialize(process);
 
   operatorInputArg("Pairs of u and v in the rotated system;\n usage:  rotuvNorth,u,v  -or- rotuvNorth,33,34");
 
@@ -1449,9 +1449,9 @@ void *TransformUV(int operatorID)
 }
 
 
-void *WindTrans(void *argument)
+void *WindTrans(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   UVDESTAG     = cdoOperatorAdd("uvDestag",  0, 0, NULL);

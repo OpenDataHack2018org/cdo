@@ -42,7 +42,7 @@ void gen_filename(char *filename, bool swap_obase, const char *obase, const char
 }
 
 
-void *Split(void *argument)
+void *Split(void *process)
 {
   int nchars = 0;
   int varID;
@@ -59,7 +59,7 @@ void *Split(void *argument)
   bool swap_obase = false;
   const char *uuid_attribute = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 

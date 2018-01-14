@@ -79,7 +79,7 @@ void limit_string_length(char* string, size_t maxlen)
 }
 
 
-void *Sinfo(void *argument)
+void *Sinfo(void *process)
 {
   enum {func_generic, func_param, func_name, func_code};
   char tmpname[CDI_MAX_NAME];
@@ -88,7 +88,7 @@ void *Sinfo(void *argument)
   char vdatestr[32], vtimestr[32];
   char pstr[4];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("sinfo",   func_generic, 0, NULL);

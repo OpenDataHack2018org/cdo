@@ -62,7 +62,7 @@ void sel_index(double *array1, double *array2, int nind, int *indarr)
 }
 
 
-void *Selgridcell(void *argument)
+void *Selgridcell(void *process)
 {
   int nrecs;
   int varID;
@@ -73,7 +73,7 @@ void *Selgridcell(void *argument)
   } sindex_t;
   lista_t *ilista = lista_new(INT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
                     cdoOperatorAdd("selgridcell", 0, 0, "grid cell indices (1-N)");
   int DELGRIDCELL = cdoOperatorAdd("delgridcell", 0, 0, "grid cell indices (1-N)");

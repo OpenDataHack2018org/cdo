@@ -22,7 +22,7 @@
 #include "pstream.h"
 
 
-void *Deltime(void *argument)
+void *Deltime(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -35,7 +35,7 @@ void *Deltime(void *argument)
   double *array = NULL;
   const char *cmons[]={"", "jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"};
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

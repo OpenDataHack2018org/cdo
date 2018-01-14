@@ -77,7 +77,7 @@
 #include "pstream.h"
 
 
-void *Timstat(void *argument)
+void *Timstat(void *process)
 {
   enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
   int timestat_date = TIMESTAT_MEAN;
@@ -92,7 +92,7 @@ void *Timstat(void *argument)
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   double vfrac = 1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("timrange",  func_range, DATE_LEN, NULL);

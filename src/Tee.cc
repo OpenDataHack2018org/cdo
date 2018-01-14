@@ -21,13 +21,13 @@
 #include "pstream.h"
 
 
-void *Tee(void *argument)
+void *Tee(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 

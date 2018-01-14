@@ -27,13 +27,13 @@
 #include "pstream.h"
 
 
-void *Gengrid(void *argument)
+void *Gengrid(void *process)
 {
   int varID, levelID;
   size_t nmiss1, nmiss2;
   double missval = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int streamID2 = cdoStreamOpenRead(cdoStreamName(1));

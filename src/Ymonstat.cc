@@ -55,7 +55,7 @@ int cmpint(const void *s1, const void *s2)
 }
 */
 
-void *Ymonstat(void *argument)
+void *Ymonstat(void *process)
 {
   int varID;
   int year, month, day;
@@ -69,7 +69,7 @@ void *Ymonstat(void *argument)
   field_type **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
   field_type field;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("ymonrange", func_range, 0, NULL);

@@ -39,7 +39,7 @@ int getmonth(int date)
 }
 
 
-void *Ymonpctl(void *argument)
+void *Ymonpctl(void *process)
 {
   int varID;
   int gridID;
@@ -54,7 +54,7 @@ void *Ymonpctl(void *argument)
   field_type **vars1[NMONTH];
   HISTOGRAM_SET *hsets[NMONTH];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("ymonpctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number");

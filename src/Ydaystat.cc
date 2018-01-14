@@ -69,7 +69,7 @@ void set_parameter(void)
 }
 
 
-void *Ydaystat(void *argument)
+void *Ydaystat(void *process)
 {
   int varID, levelID;
   int year, month, day;
@@ -79,7 +79,7 @@ void *Ydaystat(void *argument)
   int vdates[MAX_DOY], vtimes[MAX_DOY];
   field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   set_parameter();
 

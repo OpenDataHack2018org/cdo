@@ -28,7 +28,7 @@
 #include "grid.h"
 
 
-void *Varrms(void *argument)
+void *Varrms(void *process)
 {
   int lastgrid = -1;
   int wstatus = FALSE;
@@ -41,7 +41,7 @@ void *Varrms(void *argument)
   double *single;
   double sglval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool needWeights = true;
 

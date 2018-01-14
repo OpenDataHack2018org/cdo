@@ -82,11 +82,11 @@ void grid_cell_area(int gridID, double *array)
 }
 
 
-void *Gridcell(void *argument)
+void *Gridcell(void *process)
 {
   int status;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int GRIDAREA = cdoOperatorAdd("gridarea",     1,  0, NULL);

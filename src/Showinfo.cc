@@ -39,13 +39,13 @@
 #include "pstream.h"
 #include "Showattribute.h"
 
-void *Showinfo(void *argument)
+void *Showinfo(void *process)
 {
   int date0 = 0;
   int year, month, day;
   int month0 = 0, year0 = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SHOWYEAR      = cdoOperatorAdd("showyear",      0, 0, NULL);

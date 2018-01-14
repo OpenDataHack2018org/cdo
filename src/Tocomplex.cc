@@ -22,13 +22,13 @@
 #include "pstream.h"
 
 
-void *Tocomplex(void *argument)
+void *Tocomplex(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int RETOCOMPLEX = cdoOperatorAdd("retocomplex", 0, 0, NULL);
   int IMTOCOMPLEX = cdoOperatorAdd("imtocomplex", 0, 0, NULL);

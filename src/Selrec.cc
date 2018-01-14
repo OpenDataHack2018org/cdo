@@ -27,13 +27,13 @@
 #include "listarray.h"
 
 
-void *Selrec(void *argument)
+void *Selrec(void *process)
 {
   int nrecs;
   int varID, levelID;
   lista_t *ilista = lista_new(INT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 

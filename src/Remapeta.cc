@@ -229,7 +229,7 @@ vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf)
 #define MAX_VARS3D 1024
 
 void *
-Remapeta(void *argument)
+Remapeta(void *process)
 {
   int nfis2gp = 0;
   int nrecs;
@@ -262,7 +262,7 @@ Remapeta(void *argument)
   if (cdoTimer)
     timer_hetaeta = timer_new("Remapeta_hetaeta");
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int REMAPETA  = cdoOperatorAdd("remapeta",   0, 0, "VCT file name");
