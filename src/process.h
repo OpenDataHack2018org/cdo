@@ -70,7 +70,6 @@ public:
 
   int ntimesteps;
   int m_streamCnt;
-  std::vector<argument_t> streamArguments;
   const char *m_operatorCommand;
   const char *operatorName;
   char *operatorArg;

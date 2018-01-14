@@ -1777,7 +1777,6 @@ int main(int argc, char *argv[])
   int noff = 0;
   int status = 0;
   const char *operatorArg = NULL;
-  argument_t *argument = NULL;
 
   cdo_init_is_tty();
 
@@ -1880,14 +1879,8 @@ int main(int argc, char *argv[])
       }
       //temprorary end
 
-  if ( CDO_optind < argc )
-    {
-      operatorArg = new_cargv[0];
-      argument = argument_new(new_cargv.size(), 0);
-      argument_fill(argument, new_cargv.size(), &new_cargv[0]);
-    }
-  else
-    {
+  if ( CDO_optind >= argc )
+      {
       if ( ! Version && ! Help )
         {
           fprintf(stderr, "\nNo operator given!\n\n");
@@ -1907,8 +1900,8 @@ int main(int argc, char *argv[])
   proj_lonlat_to_lcc_func = (int (*)()) proj_lonlat_to_lcc;
   extern int (*proj_lcc_to_lonlat_func)();
   proj_lcc_to_lonlat_func = (int (*)()) proj_lcc_to_lonlat;
-
-  const char *operatorName = getOperatorName(operatorArg);
+  
+  const char *operatorName = getOperatorName(argv[CDO_optind]);
 
   if ( Help )
     {
@@ -1937,20 +1930,18 @@ int main(int argc, char *argv[])
 
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
-      operatorModule(operatorName)(argument);
+      getProcess(0)->m_module.func(getProcess(0));
       close_library_handles();
 #else 
       createProcesses(new_argv.size(),(const char**) &new_cargv[0] );
       getProcess(0)->m_module.func(getProcess(0));
-      clearProcesses();
 #endif
+      clearProcesses();
 
       timer_stop(timer_total);
 
       if ( cdoTimer ) timer_report();
     }
-
-  if ( argument ) argument_free(argument);
 
   if ( cdoVarnames )
     {

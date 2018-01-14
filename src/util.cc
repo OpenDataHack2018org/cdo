@@ -195,23 +195,6 @@ const char *getProgname(char *string)
   return progname;
 }
 
-char *getOperator(const char *argument)
-{
-  char *operatorArg = NULL;
-
-  if ( argument )
-    {
-      size_t len = 1 + strlen(argument);
-
-      operatorArg = (char*) Malloc(len);
-
-      memcpy(operatorArg, argument, len);
-    }
-
-  return operatorArg;
-}
-
-
 const char *getOperatorName(const char *operatorCommand)
 {
   char *operatorName = NULL;

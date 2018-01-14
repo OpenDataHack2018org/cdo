@@ -39,10 +39,11 @@ public:
   void defTimestep(int p_tsID);
   bool isPipe();
   void pstreamOpenReadPipe(const char* pipename);
-  void pstreamOpenReadFile(const char *argument);
+  int pstreamOpenWritePipe(const char* filename, int filetype);
+
+  void pstreamOpenReadFile(const char* filename);
   int pstreamOpenWriteFile(const char* p_filename, int filetype);
   int pstreamOpenWriteFile(int filetype);
-  int pstreamOpenWritePipe(const char* filename, int filetype);
   void openAppend(const char * p_filename);
   void init();
   void defVlist(int p_vlistID);
@@ -64,7 +65,6 @@ public:
   std::vector<std::string> m_mfnames;
   varlist_t *m_varlist;
 #ifdef  HAVE_LIBPTHREAD
-  void *argument;
   std::shared_ptr<pipe_t> pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */

@@ -216,7 +216,6 @@ void pstream_t::init()
   varID = -1;
   m_varlist = NULL;
 #ifdef  HAVE_LIBPTHREAD
-  argument = NULL;
   pipe = NULL;
 //  pstreamptr->rthreadID  = 0;
 //  pstreamptr->wthreadID  = 0;
@@ -259,49 +258,6 @@ bool
 pstream_t::isPipe()
 {
   return ispipe;
-}
-
-pthread_t
-pCreateReadThread(argument_t *argument)
-{
-  pthread_attr_t attr;
-  int status = pthread_attr_init(&attr);
-  if (status)
-    SysError("pthread_attr_init failed for '%s'", argument->operatorName.c_str());
-  status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  if (status)
-    SysError("pthread_attr_setdetachstate failed for '%s'", argument->operatorName.c_str());
-  /*
-    param.sched_priority = 0;
-    status = pthread_attr_setschedparam(&attr, &param);
-    if ( status ) SysError("pthread_attr_setschedparam failed for '%s'", newarg+1);
-  */
-  /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
-  /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'", newarg+1); */
-
-  pthread_attr_getscope(&attr, &pthreadScope);
-
-  /* status = pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS); */
-  /* if ( status ) SysError("pthread_attr_setscope failed for '%s'", newarg+1); */
-  /* If system scheduling scope is specified, then the thread is scheduled against all threads in the system */
-  /* pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
-
-  size_t stacksize = 0;
-  status = pthread_attr_getstacksize(&attr, &stacksize);
-  if (stacksize < 2097152)
-    {
-      stacksize = 2097152;
-      pthread_attr_setstacksize(&attr, stacksize);
-    }
-
-  pthread_t thrID;
-  int rval = pthread_create(&thrID, &attr, operatorModule(argument->operatorName.c_str()), argument);
-  if (rval != 0)
-    {
-      errno = rval;
-      SysError("pthread_create failed for '%s'", argument->operatorName.c_str());
-    }
-  return thrID;
 }
 
 void
@@ -813,16 +769,6 @@ pstreamCloseChildStream(pstream_t *pstreamptr)
   pthread_cond_signal(pipe->isclosed);
 
   pthread_join(pstreamptr->wthreadID, NULL);
-
-  pthread_mutex_lock(pipe->m_mutex);
-    if (pstreamptr->argument)
-    {
-      argument_t *argument = (argument_t *) (pstreamptr->argument);
-      if (argument->args)
-        Free(argument->args);
-      delete (argument);
-    }
-  pthread_mutex_unlock(pipe->m_mutex);
 
   processAddNvals(pipe->nvals);
 }
@@ -1625,13 +1571,12 @@ pstreamDebug(int debug)
 }
 
 void
-cdoInitialize(void *argument)
+cdoInitialize(void *p_process)
 {
 #if defined(_OPENMP)
   omp_set_num_threads(ompNumThreads); // Has to be called for every module (pthread)!
 #endif
-  argument_t* arg = (argument_t*)(argument);
-  process_t *process = getProcess(arg->processID);
+  process_t *process = (process_t*)p_process;
 
   //std::cout << arg->processID << std::endl;
   if(CdoDebug::PROCESS) MESSAGE("Initializing process: ", process->m_operatorCommand);

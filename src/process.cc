@@ -520,15 +520,17 @@ int process_t::checkStreamCnt(void)
              wantedStreamInCnt,
              wantedStreamOutCnt);
 
+  /*TEMP*/ /*NEEDS REWORK streamArguments does not exist anymore*/
+  /*
   for (i = wantedStreamInCnt;i < streamCnt; i++)
     {
-      if (streamArguments[i].args[0] == '-')
+      if (childProcess[i].args[0] == '-')
         {
           cdoAbort("Output file name %s must not begin with \"-\"!", streamArguments[i].args);
         }
       else if (!obase)
         {
-          for (j = 0; j < wantedStreamInCnt;j++) /* does not work with files in pipes */
+          for (j = 0; j < wantedStreamInCnt;j++) /* does not work with files in pipes *//*
             if (strcmp(streamArguments[i].args, streamArguments[j].args) == 0)
               cdoAbort("Output file name %s is equal to input file name"
                        " on position %d!\n",
@@ -536,6 +538,7 @@ int process_t::checkStreamCnt(void)
                        j + 1);
         }
     }
+    */
 
   if (wantedStreamInCnt == 1 && streamInCnt0 == -1)
       return 1;
