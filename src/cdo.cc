@@ -55,7 +55,6 @@
 #include "cdoDebugOutput.h"
 
 #ifdef  HAVE_LIBPTHREAD
-#include "pstream_int.h"
 #include "pthread_debug.h"
 #endif
 

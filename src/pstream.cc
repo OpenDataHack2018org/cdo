@@ -40,7 +40,6 @@ int pclose(FILE *stream);
 #include "cdo_int.h"
 #include "modules.h"
 #include "pstream.h"
-#include "pstream_int.h"
 #include "util.h"
 #include "pipe.h"
 #include "error.h"

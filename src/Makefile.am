@@ -139,7 +139,6 @@ libcdo_la_SOURCES =            \
                pstream.cc       \
                pstream.h       \
                pstream_write.h \
-               pstream_int.h   \
                pthread_debug.cc \
                pthread_debug.h \
                readline.cc      \
