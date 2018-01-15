@@ -115,24 +115,24 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcdo_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
-am_libcdo_la_OBJECTS = libcdo_la-argument.lo libcdo_la-array.lo \
-	libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
-	libcdo_la-cdo_getopt.lo libcdo_la-cdo_task.lo \
-	libcdo_la-cdo_history.lo libcdo_la-cdo_read.lo \
-	libcdo_la-cmortable_parser.lo libcdo_la-after_sptrans.lo \
-	libcdo_la-after_fctrans.lo libcdo_la-after_dvtrans.lo \
-	libcdo_la-after_vertint.lo libcdo_la-after_namelist.lo \
-	libcdo_la-afterburnerlib.lo libcdo_la-constants.lo \
-	libcdo_la-color.lo libcdo_la-commandline.lo \
-	libcdo_la-convert_units.lo libcdo_la-datetime.lo \
-	libcdo_la-cdoDebugOutput.lo libcdo_la-ecacore.lo \
-	libcdo_la-ecautil.lo libcdo_la-exception.lo libcdo_la-expr.lo \
-	libcdo_la-expr_fun.lo libcdo_la-expr_lex.lo \
-	libcdo_la-expr_yacc.lo libcdo_la-features.lo \
-	libcdo_la-field.lo libcdo_la-field2.lo libcdo_la-fieldc.lo \
-	libcdo_la-fieldmem.lo libcdo_la-fieldmer.lo \
-	libcdo_la-fieldzon.lo libcdo_la-getMemorySize.lo \
-	libcdo_la-getRSS.lo libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
+am_libcdo_la_OBJECTS = libcdo_la-array.lo libcdo_la-cdo_pthread.lo \
+	libcdo_la-cdo_vlist.lo libcdo_la-cdo_getopt.lo \
+	libcdo_la-cdo_task.lo libcdo_la-cdo_history.lo \
+	libcdo_la-cdo_read.lo libcdo_la-cmortable_parser.lo \
+	libcdo_la-after_sptrans.lo libcdo_la-after_fctrans.lo \
+	libcdo_la-after_dvtrans.lo libcdo_la-after_vertint.lo \
+	libcdo_la-after_namelist.lo libcdo_la-afterburnerlib.lo \
+	libcdo_la-constants.lo libcdo_la-color.lo \
+	libcdo_la-commandline.lo libcdo_la-convert_units.lo \
+	libcdo_la-datetime.lo libcdo_la-cdoDebugOutput.lo \
+	libcdo_la-ecacore.lo libcdo_la-ecautil.lo \
+	libcdo_la-exception.lo libcdo_la-expr.lo libcdo_la-expr_fun.lo \
+	libcdo_la-expr_lex.lo libcdo_la-expr_yacc.lo \
+	libcdo_la-features.lo libcdo_la-field.lo libcdo_la-field2.lo \
+	libcdo_la-fieldc.lo libcdo_la-fieldmem.lo \
+	libcdo_la-fieldmer.lo libcdo_la-fieldzon.lo \
+	libcdo_la-getMemorySize.lo libcdo_la-getRSS.lo \
+	libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
 	libcdo_la-grid_proj.lo libcdo_la-grid_area.lo \
 	libcdo_la-grid_define.lo libcdo_la-grid_gme.lo \
 	libcdo_la-grid_rot.lo libcdo_la-grid_from_name.lo \
@@ -552,26 +552,26 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libcdo.la
-libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
-	compare.h cfortran.h libncl.h cfortran.h cf_interface.h \
-	cdo_pthread.cc cdo_vlist.cc cdo_getopt.cc cdo_getopt.h \
-	cdo_task.cc cdo_task.h cdo_history.cc cdo_read.cc cdi_uuid.h \
-	cmortable_parser.cc after_sptrans.cc after_fctrans.cc \
-	after_dvtrans.cc after_vertint.cc after_vertint.h \
-	after_namelist.cc afterburnerlib.cc afterburner.h vct_l191.h \
-	calendar.h constants.h constants.cc color.cc color.h \
-	commandline.cc const.h convert_units.cc convert_units.h \
-	counter.h datetime.cc datetime.h cdoDebugOutput.cc \
-	cdoDebugOutput.h dmemory.h ecacore.cc ecacore.h ecautil.cc \
-	ecautil.h error.h etopo.h temp.h mask.h exception.cc expr.cc \
-	expr.h expr_fun.cc expr_fun.h expr_lex.cc expr_yacc.cc \
-	expr_yacc.h features.cc field.cc field.h field2.cc fieldc.cc \
-	fieldmem.cc fieldmer.cc fieldzon.cc functs.h getMemorySize.c \
-	getRSS.c gradsdeslib.cc gradsdeslib.h grid.cc grid.h \
-	grid_proj.cc grid_proj.h grid_area.cc grid_define.cc \
-	grid_gme.cc grid_rot.cc grid_from_name.cc grid_read.cc \
-	grid_read_pingo.cc grid_print.cc gridreference.cc griddes.cc \
-	griddes.h griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
+libcdo_la_SOURCES = array.h array.cc cdo_int.h compare.h cfortran.h \
+	libncl.h cfortran.h cf_interface.h cdo_pthread.cc cdo_vlist.cc \
+	cdo_getopt.cc cdo_getopt.h cdo_task.cc cdo_task.h \
+	cdo_history.cc cdo_read.cc cdi_uuid.h cmortable_parser.cc \
+	after_sptrans.cc after_fctrans.cc after_dvtrans.cc \
+	after_vertint.cc after_vertint.h after_namelist.cc \
+	afterburnerlib.cc afterburner.h vct_l191.h calendar.h \
+	constants.h constants.cc color.cc color.h commandline.cc \
+	const.h convert_units.cc convert_units.h counter.h datetime.cc \
+	datetime.h cdoDebugOutput.cc cdoDebugOutput.h dmemory.h \
+	ecacore.cc ecacore.h ecautil.cc ecautil.h error.h etopo.h \
+	temp.h mask.h exception.cc expr.cc expr.h expr_fun.cc \
+	expr_fun.h expr_lex.cc expr_yacc.cc expr_yacc.h features.cc \
+	field.cc field.h field2.cc fieldc.cc fieldmem.cc fieldmer.cc \
+	fieldzon.cc functs.h getMemorySize.c getRSS.c gradsdeslib.cc \
+	gradsdeslib.h grid.cc grid.h grid_proj.cc grid_proj.h \
+	grid_area.cc grid_define.cc grid_gme.cc grid_rot.cc \
+	grid_from_name.cc grid_read.cc grid_read_pingo.cc \
+	grid_print.cc gridreference.cc griddes.cc griddes.h \
+	griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
 	institution.cc interpol.cc interpol.h job.cc juldate.cc \
 	grid_search.cc grid_search.h listarray.cc listarray.h list.cc \
 	list.h listbuf.cc listbuf.h merge_sort2.cc merge_sort2.h \
@@ -1059,7 +1059,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-after_sptrans.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-after_vertint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-afterburnerlib.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-argument.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-array.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdoDebugOutput.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_getopt.Plo@am__quote@
@@ -1277,13 +1276,6 @@ clipping/libcdo_la-utils.lo: clipping/utils.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
-
-libcdo_la-argument.lo: argument.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-argument.lo -MD -MP -MF $(DEPDIR)/libcdo_la-argument.Tpo -c -o libcdo_la-argument.lo `test -f 'argument.cc' || echo '$(srcdir)/'`argument.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-argument.Tpo $(DEPDIR)/libcdo_la-argument.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='argument.cc' object='libcdo_la-argument.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-argument.lo `test -f 'argument.cc' || echo '$(srcdir)/'`argument.cc
 
 libcdo_la-array.lo: array.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-array.lo -MD -MP -MF $(DEPDIR)/libcdo_la-array.Tpo -c -o libcdo_la-array.lo `test -f 'array.cc' || echo '$(srcdir)/'`array.cc
