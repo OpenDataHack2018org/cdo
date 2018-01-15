@@ -306,7 +306,7 @@ void *DestaggerUV()
       vlistInqVarName(vlistID1, varID, varname);
       int gridIDx = vlistInqVarGrid(vlistID1, varID);
       if ( CdoDebug::cdoDebugExt>=20 )
-        cdoPrint("Var.id [%4d] with grib code:3%d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",
+        cdoPrint("Var.id [%4d] with grib code:%3d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",
                  varID, code, varname, ltype, nlevs, gridIDx, zaxisID);
 
       CheckVarIsU(varID, varname, code);
@@ -325,8 +325,11 @@ void *DestaggerUV()
                 cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), varID2=%d (gridID2=%d)",varID1, gridID2, varID2, gridID1);
               varID1stg = varID1;
               varID2stg = varID2;
-              vlistChangeVarGrid(vlistID2, varID1stg, gridID0);   // set the variable onto the non-staggered grid
-              vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
+              if ( gridID0 != CDI_UNDEFID )
+                {
+                  vlistChangeVarGrid(vlistID2, varID1stg, gridID0);   // set the variable onto the non-staggered grid
+                  vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
+                }
               // Allow a next level-type UV-pair to be found;
               // NOTE: There may be separate CDO staggerd variables for (33/34; 109; *) and (33/34; 100; *)
               varID1 = varID2 = CDI_UNDEFID;
@@ -463,16 +466,16 @@ void *DestaggerUV()
 
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  // The following code is NOT applicable here! Done already before.
-  //if ( varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID )
-  //  {
-  //    vlistChangeVarGrid(vlistID2, varID1stg, gridID0);   // set the variable onto the non-staggered grid
-  //    vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
-  //  }
+  if ( varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID )
+    {
+      vlistChangeVarGrid(vlistID2, varID1stg, gridID0);   // set the variable onto the non-staggered grid
+      vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
+    }
 
   pstreamDefVlist(streamID2, vlistID2);  // from this point the stream is using a different vlistID !!!!!
+
   vlistID2 = pstreamInqVlist(streamID2); // refresh it
-  
+
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
