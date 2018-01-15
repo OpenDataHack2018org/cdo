@@ -29,7 +29,6 @@
 
 #include <pthread.h>
 #include "pthread_debug.h"
-//#include "pstream.h"
 #include <iostream>
 
 #endif
