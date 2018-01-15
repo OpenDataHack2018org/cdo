@@ -5,6 +5,34 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# smooth
+#
+IFILE=t21_geosp_tsurf_sea.grb
+#
+OFILE=smooth
+$CDO $FORMAT smooth,radius=5deg $IFILE ${OFILE}1_ref
+$CDO $FORMAT smooth,radius=5deg,maxpoints=3 $IFILE ${OFILE}2_ref
+$CDO $FORMAT smooth,radius=5deg,nsmooth=9 $IFILE ${OFILE}3_ref
+exit
+########################################################################
+#
+# Remap regional grid
+#
+RMODS="bil bic dis nn con con2 ycon laf"
+#cdo -f grb topo,europe_5 topo_eu5.grb
+IFILE=topo_eu5.grb
+$CDO -f grb -topo,europe_5 $IFILE
+for RMOD in $RMODS; do
+  OFILE=topo_eu5_${RMOD}
+  for extra in def off on; do
+      EXTRA="$extra"
+      if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
+      REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},global_5 $IFILE ${OFILE}_${extra}_ref
+  done
+done
+exit
+########################################################################
+#
 # Timpctl Yearpctl Monstat Daypctl
 #
 PCTLS="50"
@@ -55,17 +83,6 @@ IFILE=t21_geosp_tsurf_sea.grb
 $CDO $FORMAT setmisstoc,0 $IFILE setmisstoc_ref
 $CDO $FORMAT setmisstonn $IFILE setmisstonn_ref
 $CDO $FORMAT setmisstodis $IFILE setmisstodis_ref
-exit
-########################################################################
-#
-# smooth
-#
-IFILE=t21_geosp_tsurf_sea.grb
-#
-OFILE=smooth
-$CDO $FORMAT smooth,radius=5deg $IFILE ${OFILE}1_ref
-$CDO $FORMAT smooth,radius=5deg,maxpoints=3 $IFILE ${OFILE}2_ref
-$CDO $FORMAT smooth,radius=5deg,nsmooth=9 $IFILE ${OFILE}3_ref
 exit
 ########################################################################
 #

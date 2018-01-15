@@ -410,52 +410,12 @@ void check_lat_boundbox_range(size_t nlats, restr_t *restrict bound_box, double 
     }
 }
 
-static
-int expand_lonlat_grid(int gridID)
-{
-  if ( cdoVerbose ) cdoPrint("expand_lonlat_grid");
-  size_t nx = gridInqXsize(gridID);
-  size_t ny = gridInqYsize(gridID);
-  size_t nxp4 = nx+4;
-  size_t nyp4 = ny+4;
-
-  double *xvals = (double*) Malloc(nxp4*sizeof(double));
-  double *yvals = (double*) Malloc(nyp4*sizeof(double));
-  gridInqXvals(gridID, xvals+2);
-  gridInqYvals(gridID, yvals+2);
-
-  int gridtype = gridInqType(gridID);
-  int gridIDnew = gridCreate(gridtype, nxp4*nyp4);
-  gridDefXsize(gridIDnew, nxp4);
-  gridDefYsize(gridIDnew, nyp4);
-
-  grid_copy_attributes(gridID, gridIDnew);
-
-  xvals[0] = xvals[2] - 2*gridInqXinc(gridID);
-  xvals[1] = xvals[2] - gridInqXinc(gridID);
-  xvals[nxp4-2] = xvals[nx+1] + gridInqXinc(gridID);
-  xvals[nxp4-1] = xvals[nx+1] + 2*gridInqXinc(gridID);
-
-  yvals[0] = yvals[2] - 2*gridInqYinc(gridID);
-  yvals[1] = yvals[2] - gridInqYinc(gridID);
-  yvals[nyp4-2] = yvals[ny+1] + gridInqYinc(gridID);
-  yvals[nyp4-1] = yvals[ny+1] + 2*gridInqYinc(gridID);
-
-  gridDefXvals(gridIDnew, xvals);
-  gridDefYvals(gridIDnew, yvals);
-
-  Free(xvals);
-  Free(yvals);
-
-  return gridIDnew;
-}
-
 /*****************************************************************************/
 
 static
 void grid_check_lat_borders_rad(size_t n, double *ybounds)
 {
-#define  YLIM  (88*DEG2RAD)
+  constexpr double YLIM = 88*DEG2RAD;
   if ( ybounds[0] > ybounds[n-1] )
     {
       if ( ybounds[0]   >  YLIM ) ybounds[0]   =  PIH;
@@ -731,21 +691,13 @@ void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgr
 
       if ( tgt_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
-	  tgt_grid->luse_cell_corners  = true;
+	  tgt_grid->luse_cell_corners = true;
 	  tgt_grid->lneed_cell_corners = true;
 	}
     }
 
   src_grid->gridID = gridID1;
   tgt_grid->gridID = gridID2;
-
-  if ( !src_grid->lextrapolate && gridInqSize(src_grid->gridID) > 1 &&
-       mapType == RemapType::DISTWGT &&
-       (gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global) )
-    {
-      src_grid->gridID = gridID1 = expand_lonlat_grid(gridID1);
-      reg2d_src_gridID = gridID1;
-    }
 
   if ( gridInqType(gridID1) == GRID_UNSTRUCTURED )
     {

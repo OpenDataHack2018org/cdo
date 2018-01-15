@@ -69,9 +69,21 @@
       "makeCall": "make -j 12",
       "sync": false
     },
+    "localGCC_stackFail": {
+      "hostname": "luthien",
+      "configureCall": "/home/ram/src/cdo/configure --enable-hirlam-extensions --with-eccodes --with-netcdf --with-magics --with-udunits2 CFLAGS='-std=gnu99 -O2 -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -fopenmp' CXXFLAGS='-std=gnu++11 -O2 -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -fopenmp' CPPFLAGS='-I/usr/include/magics'",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
     "mpipcCLANG": {
       "hostname": "breeze",
       "configureCall": "./configure --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static --disable-openmp CC=clang CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
+    },
+    "breezeGCC_stackFail": {
+      "hostname": "breeze",
+      "configureCall": "./configure CFLAGS='-std=gnu99 -O2 -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -fopenmp' CXXFLAGS='-std=gnu++11 -O2 -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -fopenmp'",
       "makeCall": "make -j 12",
       "sync": true
     },

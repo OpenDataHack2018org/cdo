@@ -1063,8 +1063,7 @@ void *Remap(void *process)
 
 	      if ( gridInqType(gridID1) == GRID_GME )
 		{
-		  size_t j = 0;
-		  for ( size_t i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0, j = 0; i < gridsize; i++ )
 		    if ( remaps[r].src_grid.vgpm[i] ) imask[j++] = imask[i];
 		}
 

@@ -25828,7 +25828,7 @@ ac_config_files="$ac_config_files test/File.test test/Read_grib.test test/Read_n
 
 ac_config_files="$ac_config_files test/Comp.test test/Compc.test"
 
-ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test test/Remap2.test test/Remapeta.test"
+ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test test/Remap2.test test/Remap3.test test/Remapeta.test"
 
 ac_config_files="$ac_config_files test/EOF.test test/Select.test test/Spectral.test test/Vertint.test"
 
@@ -27098,6 +27098,7 @@ do
     "test/Genweights.test") CONFIG_FILES="$CONFIG_FILES test/Genweights.test" ;;
     "test/Remap.test") CONFIG_FILES="$CONFIG_FILES test/Remap.test" ;;
     "test/Remap2.test") CONFIG_FILES="$CONFIG_FILES test/Remap2.test" ;;
+    "test/Remap3.test") CONFIG_FILES="$CONFIG_FILES test/Remap3.test" ;;
     "test/Remapeta.test") CONFIG_FILES="$CONFIG_FILES test/Remapeta.test" ;;
     "test/EOF.test") CONFIG_FILES="$CONFIG_FILES test/EOF.test" ;;
     "test/Select.test") CONFIG_FILES="$CONFIG_FILES test/Select.test" ;;
@@ -28792,6 +28793,7 @@ _LT_EOF
     "test/Genweights.test":F) chmod a+x "$ac_file" ;;
     "test/Remap.test":F) chmod a+x "$ac_file" ;;
     "test/Remap2.test":F) chmod a+x "$ac_file" ;;
+    "test/Remap3.test":F) chmod a+x "$ac_file" ;;
     "test/Remapeta.test":F) chmod a+x "$ac_file" ;;
     "test/EOF.test":F) chmod a+x "$ac_file" ;;
     "test/Select.test":F) chmod a+x "$ac_file" ;;

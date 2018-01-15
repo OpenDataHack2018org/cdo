@@ -204,13 +204,15 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
       pointlist[i].index = i;
     }
 
-  if ( cdoVerbose ) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
-
   for ( unsigned j = 0; j < 3; ++j )
     {
+      min[j] = min[j] < 0 ? min[j]*1.01 : min[j]*0.99;
+      max[j] = max[j] < 0 ? max[j]*0.99 : max[j]*1.01;
       gs->min[j] = min[j];
       gs->max[j] = max[j];
     }
+
+  if ( cdoVerbose ) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
 
   kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
   if ( pointlist ) Free(pointlist);
@@ -248,8 +250,11 @@ void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *r
     }
 
   gs->pointcloud = (void*) pointcloud;
+
   for ( unsigned j = 0; j < 3; ++j )
     {
+      min[j] = min[j] < 0 ? min[j]*1.01 : min[j]*0.99;
+      max[j] = max[j] < 0 ? max[j]*0.99 : max[j]*1.01;
       gs->min[j] = min[j];
       gs->max[j] = max[j];
     }
@@ -390,7 +395,15 @@ size_t gs_nearest_kdtree(void *search_container, double lon, double lat, double 
 
   kdata_t query_pt[3];
   LLtoXYZ(lon, lat, query_pt);
-
+  /*
+  if ( lon*RAD2DEG > -27 && lon*RAD2DEG < 60 &&  lat*RAD2DEG > 30 &&  lat*RAD2DEG < 35 )
+    {
+      printf("lon %g lat %g\n", lon*RAD2DEG, lat*RAD2DEG);
+      for ( unsigned j = 0; j < 3; ++j )
+        if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] )
+          printf("  %g %g\n", query_pt[j] - gs->min[j],  query_pt[j] - gs->max[j]);
+    }
+  */
   if ( !gs->extrapolate )
     for ( unsigned j = 0; j < 3; ++j )
       if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] ) return index;
