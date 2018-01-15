@@ -672,10 +672,6 @@ createProcesses(int argc, const char **argv)
           }
           current_process->addFileInStream(argv[idx]);
         }
-      else
-      {
-      }
-    
     while (current_process->hasAllInputs() && current_process != root_process)
       {
         if(CdoDebug::PROCESS) {
@@ -870,7 +866,6 @@ cdoOperatorAdd(const char *name, int f1, int f2, const char *enter)
 
   process.noper++;
 
-  //std::cout << process.noper << std::endl;
   return operID;
 }
 
@@ -878,16 +873,13 @@ int
 cdoOperatorID(void)
 {
   process_t &process = processSelf();
-  ////std::cout << "|"<<process.operatorName <<"|"<< process.m_ID<<std::endl;
   int operID = -1;
 
   if (process.noper > 0)
     {
       for (operID = 0; operID < process.noper; operID++)
         {
-            //std::cout << "iter:" << operID << std::endl;
           if (process.oper[operID].name){
-              //std::cout << process.operatorName << "|" << process.oper[operID].name <<"|"<< std::endl;
             if (strcmp(process.operatorName, process.oper[operID].name) == 0){
               break;
             }
@@ -935,92 +927,6 @@ cdoStreamNumber()
   return operatorStreamNumber(processSelf().operatorName);
 }
 
-void
-process_t::print_process()
-{
-    
-    /*TEMP*/ /*VERY OUTDATED*/ /*
-#ifdef  HAVE_LIBPTHREAD
-  std::cout << " processID       : " << m_ID << std::endl;
-  std::cout << " threadID        : " << threadID << std::endl;
-  std::cout << " l_threadID      : " << l_threadID << std::endl;
-#endif
-  std::cout << " nchild          : " << nchild << std::endl;
-  int nInStream = getInStreamCnt();
-  int nOutStream = getOutStreamCnt();
-  std::cout << " nInStream       : " << nInStream << std::endl;
-  std::cout << " nOutStream      : " << nOutStream << std::endl;
-  for (int i = 0; i < nInStream; i++)
-    {
-      std::cout << "    " << childProcesses[i]->m_ID << std::endl;
-    }
-  for (int i = 0; i < nOutStream; i++)
-    {
-      std::cout << "    " << parentProcesses[i]->m_ID << std::endl;
-    }
-  if ( s_utime > 0 )
-    {
-      std::cout << " s_utime         : " << s_utime << std::endl;
-    }
-  else
-    {
-      std::cout << " s_utime         : " << "UNINITALIZED" << std::endl;
-    }
-  if ( s_stime > 0 )
-    {
-      std::cout << " s_stime         : " << s_stime << std::endl;
-    }
-  else
-    {
-      std::cout << " s_stime         : "
-                << "UNINITALIZED" << std::endl;
-    }
-
-  std::cout << " a_utime         : " << a_utime << std::endl;
-  std::cout << " a_stime         : " << a_stime << std::endl;
-  std::cout << " cputime         : " << cputime << std::endl;
-
-  if (nvals)
-    {
-      std::cout << " nvals           : " << nvals << std::endl;
-    }
-  else
-    {
-
-      std::cout << " nvals           : "
-                << "UNINITALIZED" << std::endl;
-    }
-  if (nvars)
-    {
-      std::cout << " nvars           : " << nvars << std::endl;
-    }
-  else
-    {
-
-      std::cout << " nvars           : "
-                << "UNINITALIZED" << std::endl;
-    }
-  if (ntimesteps)
-    {
-      std::cout << " ntimesteps      : " << ntimesteps << std::endl;
-    }
-  else
-    {
-
-      std::cout << " ntimesteps      : "
-                << "UNINITALIZED" << std::endl;
-    }
-  std::cout << " ntimesteps      : " << ntimesteps << std::endl;
-  std::cout << " streamCnt       : " << m_streamCnt << std::endl;
-  // std::cout << " streamArguments     : " << streamArguments                  <<  std::endl;
-  std::cout << " m_operatorCommand       : " << m_operatorCommand << std::endl;
-  std::cout << " operatorName    : " << operatorName << std::endl;
-  std::cout << " operatorArg     : " << operatorArg << std::endl;
-  std::cout << " oargc           : " << oargc << std::endl;
-  std::cout << " noper           : " << noper << std::endl;
-  */
-}
-
 static void
 processClosePipes(void)
 {
@@ -1053,13 +959,13 @@ processClosePipes(void)
 void process_t::addFileInStream(std::string file)
 {
    inputStreams.push_back(create_pstream(file));
-  m_streamCnt++;
+   m_streamCnt++;
 }
 
 void process_t::addFileOutStream(std::string file)
 {
    outputStreams.push_back(create_pstream(file));
-  m_streamCnt++;
+   m_streamCnt++;
 }
 
 void
@@ -1133,7 +1039,6 @@ pthread_t process_t::run()
     }
 
   pthread_t thrID;
-  //std::cout <<"starting thread : "<< operatorName << std::endl;
   int rval = pthread_create(&thrID, &attr, operatorModule(operatorName), this);
   if (rval != 0)
     {
@@ -1150,13 +1055,6 @@ char* createPipeName(size_t pnlen)
   char *pipename = (char *) Malloc(pnlen);
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
   return pipename;
-}
-
-int pstreamOpenAppend(int p_streamIndex)
-{
-   process_t &p = processSelf();
-   int streamIndex = p_streamIndex - p.inputStreams.size();
-   return cdoStreamOpenAppend(streamIndex);
 }
 
 int cdoStreamOpenRead(int inStreamIDX)
@@ -1240,7 +1138,8 @@ bool cdoOutFileExists(int outStreamIDX)
 int cdoStreamOpenAppend(int p_outFileIndex)
 {
     process_t &process = processSelf();
-    pstream_t *outStream = process.outputStreams[p_outFileIndex];
+    int streamIndex = p_outFileIndex - process.inputStreams.size();
+    pstream_t *outStream = process.outputStreams[streamIndex];
     int pstreamID = -1;
     if(outStream->ispipe)
     {

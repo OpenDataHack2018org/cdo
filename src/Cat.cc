@@ -74,19 +74,14 @@ void *Cat(void *process)
 	  bool file_exists = (!cdoOverwriteMode) ? fileExists(cdoGetStreamName(nfiles).c_str()) : false;
 	  if ( file_exists )
 	    {
-      std::cout << "here we are 1 " << std::endl;
-	      streamID2 = pstreamOpenAppend(cdoStreamName(nfiles));
-      std::cout << "here we are 2" << std::endl;
+	      streamID2 = cdoStreamOpenAppend(cdoStreamName(nfiles));
 
 	      vlistID2 = pstreamInqVlist(streamID2);
 	      taxisID2 = vlistInqTaxis(vlistID2);
-      std::cout << "here we are 3" << std::endl;
 
 	      vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-      std::cout << "here we are 4" << std::endl;
 	      tsID2 = vlistNtsteps(vlistID2);
-      std::cout << "here we are 5" << std::endl;
 	      if ( tsID2 == 0 ) tsID2 = 1; /* bug fix for time constant data only */
 
               if ( ntsteps == 0 ) lconstvars = false;

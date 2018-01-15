@@ -148,16 +148,21 @@ void clearProcesses();
 int processNumsActive();
 process_t* getProcess(int p_processID);
 
-  int checkStreamCnt();
+
+int checkStreamCnt();
 int cdoStreamOpenRead(int inStreamIDX);
 int cdoStreamOpenWrite(int outStreamIDX, int filetype);
 int cdoStreamOpenWrite(std::string p_filename, int filetype);
 int cdoStreamOpenAppend(int outStreamIDX);
+
 bool cdoOutFileExists(int outStreamIDX);
 bool cdoInFileExists(int inStreamIDX);
+
 std::string cdoGetInStreamName(int p_inStream);
 std::string cdoGetOutStreamName(int p_outStream);
 std::string cdoGetStreamName(int p_streamIndex);
+
 char* cdoGetObase();
-int pstreamOpenAppend(int p);
+
 #endif /* _PROCESS_H */
+
