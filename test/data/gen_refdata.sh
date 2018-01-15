@@ -5,6 +5,17 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# smooth
+#
+IFILE=t21_geosp_tsurf_sea.grb
+#
+OFILE=smooth
+$CDO $FORMAT smooth,radius=5deg $IFILE ${OFILE}1_ref
+$CDO $FORMAT smooth,radius=5deg,maxpoints=3 $IFILE ${OFILE}2_ref
+$CDO $FORMAT smooth,radius=5deg,nsmooth=9 $IFILE ${OFILE}3_ref
+exit
+########################################################################
+#
 # Remap regional grid
 #
 RMODS="bil bic dis nn con con2 ycon laf"
@@ -72,17 +83,6 @@ IFILE=t21_geosp_tsurf_sea.grb
 $CDO $FORMAT setmisstoc,0 $IFILE setmisstoc_ref
 $CDO $FORMAT setmisstonn $IFILE setmisstonn_ref
 $CDO $FORMAT setmisstodis $IFILE setmisstodis_ref
-exit
-########################################################################
-#
-# smooth
-#
-IFILE=t21_geosp_tsurf_sea.grb
-#
-OFILE=smooth
-$CDO $FORMAT smooth,radius=5deg $IFILE ${OFILE}1_ref
-$CDO $FORMAT smooth,radius=5deg,maxpoints=3 $IFILE ${OFILE}2_ref
-$CDO $FORMAT smooth,radius=5deg,nsmooth=9 $IFILE ${OFILE}3_ref
 exit
 ########################################################################
 #
