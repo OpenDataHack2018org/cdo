@@ -86,24 +86,25 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Compc.test.in $(srcdir)/Cat.test.in \
 	$(srcdir)/Gridarea.test.in $(srcdir)/Genweights.test.in \
 	$(srcdir)/Remap.test.in $(srcdir)/Remap2.test.in \
-	$(srcdir)/Remapeta.test.in $(srcdir)/EOF.test.in \
-	$(srcdir)/Select.test.in $(srcdir)/Spectral.test.in \
-	$(srcdir)/Vertint.test.in $(srcdir)/Timstat.test.in \
-	$(srcdir)/Timselstat.test.in $(srcdir)/Seasstat.test.in \
-	$(srcdir)/Timpctl.test.in $(srcdir)/Runstat.test.in \
-	$(srcdir)/Runpctl.test.in $(srcdir)/Multiyearstat.test.in \
-	$(srcdir)/Ydrunstat.test.in $(srcdir)/Gridboxstat.test.in \
-	$(srcdir)/Vertstat.test.in $(srcdir)/Fldstat.test.in \
-	$(srcdir)/Fldpctl.test.in $(srcdir)/Ensstat.test.in \
-	$(srcdir)/Enspctl.test.in $(srcdir)/Merstat.test.in \
-	$(srcdir)/Zonstat.test.in $(srcdir)/Mergetime.test.in \
-	$(srcdir)/Afterburner.test.in $(srcdir)/Detrend.test.in \
-	$(srcdir)/Arithc.test.in $(srcdir)/Arith.test.in \
-	$(srcdir)/Expr.test.in $(srcdir)/Gradsdes.test.in \
-	$(srcdir)/Collgrid.test.in $(srcdir)/threads.test.in \
-	$(srcdir)/tsformat.test.in $(srcdir)/wildcard.test.in \
-	$(srcdir)/Setmiss.test.in $(srcdir)/Smooth.test.in \
-	$(srcdir)/MapReduce.test.in $(srcdir)/Ninfo.test.in README
+	$(srcdir)/Remap3.test.in $(srcdir)/Remapeta.test.in \
+	$(srcdir)/EOF.test.in $(srcdir)/Select.test.in \
+	$(srcdir)/Spectral.test.in $(srcdir)/Vertint.test.in \
+	$(srcdir)/Timstat.test.in $(srcdir)/Timselstat.test.in \
+	$(srcdir)/Seasstat.test.in $(srcdir)/Timpctl.test.in \
+	$(srcdir)/Runstat.test.in $(srcdir)/Runpctl.test.in \
+	$(srcdir)/Multiyearstat.test.in $(srcdir)/Ydrunstat.test.in \
+	$(srcdir)/Gridboxstat.test.in $(srcdir)/Vertstat.test.in \
+	$(srcdir)/Fldstat.test.in $(srcdir)/Fldpctl.test.in \
+	$(srcdir)/Ensstat.test.in $(srcdir)/Enspctl.test.in \
+	$(srcdir)/Merstat.test.in $(srcdir)/Zonstat.test.in \
+	$(srcdir)/Mergetime.test.in $(srcdir)/Afterburner.test.in \
+	$(srcdir)/Detrend.test.in $(srcdir)/Arithc.test.in \
+	$(srcdir)/Arith.test.in $(srcdir)/Expr.test.in \
+	$(srcdir)/Gradsdes.test.in $(srcdir)/Collgrid.test.in \
+	$(srcdir)/threads.test.in $(srcdir)/tsformat.test.in \
+	$(srcdir)/wildcard.test.in $(srcdir)/Setmiss.test.in \
+	$(srcdir)/Smooth.test.in $(srcdir)/MapReduce.test.in \
+	$(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_cfortran_flags.m4 \
 	$(top_srcdir)/m4/acx_check_cfortran.m4 \
@@ -120,10 +121,10 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Comp.test Compc.test Cat.test Gridarea.test \
-	Genweights.test Remap.test Remap2.test Remapeta.test EOF.test \
-	Select.test Spectral.test Vertint.test Timstat.test \
-	Timselstat.test Seasstat.test Timpctl.test Runstat.test \
-	Runpctl.test Multiyearstat.test Ydrunstat.test \
+	Genweights.test Remap.test Remap2.test Remap3.test \
+	Remapeta.test EOF.test Select.test Spectral.test Vertint.test \
+	Timstat.test Timselstat.test Seasstat.test Timpctl.test \
+	Runstat.test Runpctl.test Multiyearstat.test Ydrunstat.test \
 	Gridboxstat.test Vertstat.test Fldstat.test Fldpctl.test \
 	Ensstat.test Enspctl.test Merstat.test Zonstat.test \
 	Mergetime.test Afterburner.test Detrend.test Arithc.test \
@@ -548,8 +549,8 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test \
         Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
         MapReduce.test Ninfo.test Gradsdes.test  \
-        Detrend.test Genweights.test Remap.test Remap2.test Remapeta.test Select.test Spectral.test \
-        Ensstat.test Enspctl.test Gridboxstat.test \
+        Detrend.test Genweights.test Remap.test Remap2.test Remap3.test Remapeta.test \
+        Select.test Spectral.test Ensstat.test Enspctl.test Gridboxstat.test \
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
         Timstat.test Timselstat.test Seasstat.test Timpctl.test \
         Runstat.test Runpctl.test Multiyearstat.test Ydrunstat.test \
@@ -625,6 +626,8 @@ Genweights.test: $(top_builddir)/config.status $(srcdir)/Genweights.test.in
 Remap.test: $(top_builddir)/config.status $(srcdir)/Remap.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Remap2.test: $(top_builddir)/config.status $(srcdir)/Remap2.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Remap3.test: $(top_builddir)/config.status $(srcdir)/Remap3.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Remapeta.test: $(top_builddir)/config.status $(srcdir)/Remapeta.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
