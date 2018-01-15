@@ -455,11 +455,6 @@ pstream_t::pstreamOpenReadFile(const char* p_args)
   m_fileID = fileID;
 }
 
-void createPipeName(char *pipename, int pnlen)
-{
-  snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
-}
-
 static void
 query_user_exit(const char *argument)
 {
