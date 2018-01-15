@@ -32,11 +32,10 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "cdoDebugOutput.h"
+#include "pstream.h"
 
 /* read only the first data variable from input filename into a given double
  * pointer */
-/* DON'T MOVE IT! is necessary to have the pstream.h file included AFTER this
- * function definition */
 void read_first_record(char *filename, double *field)
 {
   size_t nmiss;
@@ -48,7 +47,6 @@ void read_first_record(char *filename, double *field)
   streamClose(streamID);
 }
 
-#include "pstream.h"
 
 /*
  * count the number of locations, for which the mask is TRUE
