@@ -806,7 +806,7 @@ void *Remap(void *argument)
 
   get_remap_env();
 
-  if ( cdoVerbose ) cdoPrint("Extrapolation %s!", remap_extrapolate?"enabled":"disables");
+  if ( cdoVerbose ) cdoPrint("Extrapolation %s!", remap_extrapolate?"enabled":"disabled");
 
   if ( lremapxxx )
     {

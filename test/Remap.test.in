@@ -19,7 +19,7 @@ GRIDS="n16 n32"
 IFILE=$DATAPATH/bathy4.grb
 NTEST=1
 #
-for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
+for GRIDTYPE in regular curvilinear unstructured; do
   SETGRID=""
   if [ "$GRIDTYPE" != "regular" ]; then SETGRID="-setgridtype,$GRIDTYPE"; fi
   for GRID in $GRIDS; do
