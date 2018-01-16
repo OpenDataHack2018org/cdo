@@ -86,7 +86,6 @@ void *Pack(void *argument)
   int nalloc = 0;
   int datatype = CDI_DATATYPE_INT16;
   dtlist_type *dtlist = dtlist_new();
-  field_type ***vars = NULL;
 
   cdoInitialize(argument);
 
@@ -104,13 +103,15 @@ void *Pack(void *argument)
   for ( int varID = 0; varID < nvars; ++varID )
     varIsConst[varID] = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 
+  std::vector<field_type **> vars;
+
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
+          vars.reserve(nalloc);
 	}
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
@@ -258,8 +259,6 @@ void *Pack(void *argument)
 
       field_free(vars[tsID], vlistID1);
     }
-
-  if ( vars ) Free(vars);
 
   dtlist_delete(dtlist);
 
