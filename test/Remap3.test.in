@@ -21,7 +21,7 @@ for RMOD in $RMODS; do
   CDOTEST="remap${RMOD} regional"
   RSTAT=0
 # for extra in def off on; do
-  for extra in def; do
+  for extra in off; do
     EXTRA="$extra"
     if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
 
