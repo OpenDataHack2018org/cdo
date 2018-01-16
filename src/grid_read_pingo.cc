@@ -34,7 +34,7 @@ void skip_nondigit_lines(FILE *gfp)
 	c = fgetc(gfp);
       while ( (isspace(c) || c == ',') && c != EOF );
 
-      if ( c == EOF || isdigit (c) || c == '.' || c == '+' || c == '-' ) break;
+      if ( c == EOF || isdigit(c) || c == '.' || c == '+' || c == '-' || c == 'N' ) break;  // N: for NaN
       else
 	while ( c != '\n' && c != EOF )
 	  c = fgetc(gfp);
