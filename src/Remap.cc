@@ -914,7 +914,7 @@ void *Remap(void *argument)
       get_maptype(operfunc, &mapType, &submapType, &numNeighbors, &remap_order);
     }
 
-  if ( !remap_genweights && mapType != RemapType::CONSERV ) remap_genweights = true;
+  if ( !remap_genweights && mapType == RemapType::CONSERV ) remap_genweights = true;
 
   remap_set_int(REMAP_GENWEIGHTS, (int)remap_genweights);
 
