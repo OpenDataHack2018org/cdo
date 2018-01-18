@@ -29,6 +29,9 @@
 #include <stdio.h>
 #include <stdarg.h> /* va_list */
 
+#include <vector> 
+#include <iostream>
+
 #include <cdi.h>
 #include "cdo_int.h"
 #include "grid.h"
