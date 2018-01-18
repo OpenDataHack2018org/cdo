@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.3
 	* Version 1.9.3 release
 
+2018-01-18  Uwe Schulzweida
+
+	* expr: added function ctimestep(), cdate(), ctime(), cdeltat()
+
 2018-01-15  Uwe Schulzweida
 
 	* uvDestag: target grid undefined in output (bug fix)

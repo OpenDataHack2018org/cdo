@@ -72,6 +72,7 @@ static double pt_missval(paramType *p)   { return p->missval; }
 static double ts_ctimestep(double *data) { return lround(data[0]); }
 static double ts_cdate(double *data)     { return lround(data[1]); }
 static double ts_ctime(double *data)     { return lround(data[2]); }
+static double ts_cdeltat(double *data)   { return        data[3]; }
 
 typedef struct {
   int type;
@@ -150,6 +151,7 @@ static func_t fun_sym_tbl[] =
   {FT_0, 0, "ctimestep", (double (*)()) ts_ctimestep},
   {FT_0, 0, "cdate",     (double (*)()) ts_cdate},
   {FT_0, 0, "ctime",     (double (*)()) ts_ctime},
+  {FT_0, 0, "cdeltat",   (double (*)()) ts_cdeltat},
 
   {FT_1C, 0, "sellevel",  NULL},
   {FT_1C, 0, "sellevidx", NULL},

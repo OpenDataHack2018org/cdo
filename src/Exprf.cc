@@ -569,15 +569,32 @@ void *Expr(void *argument)
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
+  int vdate0 = 0, vtime0 = 0;
+  int calendar = taxisInqCalendar(taxisID1);
+
   int nrecs;
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
+
+      double jdelta = 0;
+
+      if ( tsID )
+        {
+          juldate_t juldate0 = juldate_encode(calendar, vdate0, vtime0);
+          juldate_t juldate  = juldate_encode(calendar, vdate, vtime);
+          jdelta = juldate_to_seconds(juldate_sub(juldate, juldate0));
+        }
+
+      vdate0 = vdate;
+      vtime0 = vtime;
+
       params[vartsID].data[0] = tsID+1;
       params[vartsID].data[1] = vdate;
       params[vartsID].data[2] = vtime;
+      params[vartsID].data[3] = jdelta;
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
