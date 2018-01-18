@@ -209,7 +209,7 @@ paramType *params_new(int vlistID)
 }
 
 static
-void params_add_coord(parse_param_t *parse_arg, int coord, int cdiID, size_t size, const char *units, const char *longname)
+void params_add_coord(parseParamType *parse_arg, int coord, int cdiID, size_t size, const char *units, const char *longname)
 {
   int ncoords = parse_arg->ncoords;
   if ( ncoords >= parse_arg->maxcoords )
@@ -229,7 +229,7 @@ void params_add_coord(parse_param_t *parse_arg, int coord, int cdiID, size_t siz
 }
 
 
-int params_get_coordID(parse_param_t *parse_arg, int coord, int cdiID)
+int params_get_coordID(parseParamType *parse_arg, int coord, int cdiID)
 {
   int ncoords = parse_arg->ncoords;
   for ( int coordID = 0; coordID < ncoords; ++coordID )
@@ -245,7 +245,7 @@ int params_get_coordID(parse_param_t *parse_arg, int coord, int cdiID)
 }
 
 static
-void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
+void params_add_coordinates(int vlistID, parseParamType *parse_arg)
 {
   char longname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
@@ -276,7 +276,7 @@ void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
 }
 
 static
-int params_add_ts(parse_param_t *parse_arg)
+int params_add_ts(parseParamType *parse_arg)
 {
   int varID = -1;
   paramType *params = parse_arg->params;
@@ -320,7 +320,7 @@ void *Expr(void *argument)
 {
   cdoInitialize(argument);
 
-  parse_param_t parse_arg;
+  parseParamType parse_arg;
   void *scanner;
   int yy_scan_string(const char *str, void *scanner);
 

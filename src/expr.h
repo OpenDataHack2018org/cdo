@@ -24,7 +24,6 @@ int fileno(FILE *stream);
 
 extern int CDO_parser_errorno;
 
-
 typedef enum { typeCon, typeVar, typeFun, typeFun1c, typeOpr, typeCom } nodeEnum;
 
 // commands
@@ -129,7 +128,7 @@ typedef struct {
   int        surfaceID;
   coordType *coords;
   paramType *params;
-} parse_param_t;
+} parseParamType;
 
 
 typedef union{
@@ -137,22 +136,22 @@ typedef union{
   char     *varnm;            // variable name 
   char     *fname;            // function name 
   nodeType *nPtr;             // node pointer  
-} stype_t;
+} yysType;
 
 
-#define YYSTYPE        stype_t
-#define YY_EXTRA_TYPE  parse_param_t *
+#define YYSTYPE        yysType
+#define YY_EXTRA_TYPE  parseParamType *
 
-#define YY_DECL int yylex(YYSTYPE *yylval_param, parse_param_t *parse_arg, void *yyscanner)
+#define YY_DECL int yylex(YYSTYPE *yylval_param, parseParamType *parse_arg, void *yyscanner)
 YY_DECL;
 
-int  yyparse(parse_param_t *parse_arg, void*);
+int  yyparse(parseParamType *parse_arg, void*);
 void yyerror(void *parse_arg, void *scanner, const char *errstr);
 
 int  yylex_init(void **);
 int  yylex_destroy(void *);
 void yyset_extra(YY_EXTRA_TYPE, void *);
 
-nodeType *expr_run(nodeType *p, parse_param_t *parse_arg);
-int params_get_coordID(parse_param_t *parse_arg, int coord, int cdiID);
+nodeType *expr_run(nodeType *p, parseParamType *parse_arg);
+int params_get_coordID(parseParamType *parse_arg, int coord, int cdiID);
 
