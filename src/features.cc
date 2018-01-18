@@ -40,11 +40,11 @@ size_t getMemorySize(void);
 void printFeatures(void)
 {
   fprintf(stderr, "Features:");
-  size_t memory_size = getMemorySize();
-  memory_size /= 1024;
-  memory_size /= 1024;
-  memory_size /= 1024;
+  size_t memory_size = getMemorySize()/(1024*1024*1024);
   if ( memory_size > 0 ) fprintf(stderr, " %zuGB", memory_size);
+#ifdef  __cplusplus
+  fprintf(stderr, " C++%d", (int)((__cplusplus -  (__cplusplus / 10000) * 10000) / 100));
+#endif
 #if defined(HAVE_CF_INTERFACE)
   fprintf(stderr, " Fortran");
 #endif
