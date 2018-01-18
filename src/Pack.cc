@@ -22,7 +22,7 @@
 */
 
 #ifdef  _OPENMP
-#  include <omp.h>
+#include <omp.h>
 #endif
 
 #include <limits.h>
@@ -81,16 +81,11 @@ int compute_scale(int datatype, double fmin, double fmax, double *scale_factor, 
 
 void *Pack(void *process)
 {
-  int gridsize;
   int nrecs;
-  int gridID, varID, levelID;
+  int varID, levelID;
   int nalloc = 0;
-  size_t nmiss;
-  int nlevel;
   int datatype = CDI_DATATYPE_INT16;
   dtlist_type *dtlist = dtlist_new();
-  double missval1, missval2;
-  field_type ***vars = NULL;
 
   cdoInitialize(process);
 
@@ -104,6 +99,11 @@ void *Pack(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
+  std::vector<bool> varIsConst(nvars);
+  for ( int varID = 0; varID < nvars; ++varID )
+    varIsConst[varID] = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+
+  std::vector<field_type **> vars;
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -111,7 +111,7 @@ void *Pack(void *process)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars   = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
+          vars.reserve(nalloc);
 	}
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
@@ -121,9 +121,10 @@ void *Pack(void *process)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
+	  int gridID = vlistInqVarGrid(vlistID1, varID);
+	  size_t gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
+          size_t nmiss;
 	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -154,24 +155,25 @@ void *Pack(void *process)
       double fmin =  1.e300;
       double fmax = -1.e300;
       double sf, ao;
-      long ivals = 0;
-      long nmisspv = 0;
+      size_t ivals = 0;
+      size_t nmisspv = 0;
 
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      missval1 = vlistInqVarMissval(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      int gridID = vlistInqVarGrid(vlistID1, varID);
+      double missval1 = vlistInqVarMissval(vlistID1, varID);
+      size_t gridsize = gridInqSize(gridID);
+      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
-	  for ( tsID = 0; tsID < nts; tsID++ )
+	  for ( int tsID = 0; tsID < nts; tsID++ )
 	    {
-	      double *array =  vars[tsID][varID][levelID].ptr;
-	      nmiss = vars[tsID][varID][levelID].nmiss;
+              if ( tsID > 0 && varIsConst[varID] ) continue;
+	      double *array = vars[tsID][varID][levelID].ptr;
+	      size_t nmiss = vars[tsID][varID][levelID].nmiss;
 	      if ( nmiss > 0 )
 		{
 		  nmisspv += nmiss;
-		  for ( int i = 0; i < gridsize; ++i )
+		  for ( size_t i = 0; i < gridsize; ++i )
 		    {
 		      if ( !DBL_IS_EQUAL(array[i], missval1) )
 			{
@@ -183,7 +185,7 @@ void *Pack(void *process)
 		}
 	      else
 		{
-		  for ( int i = 0; i < gridsize; ++i )
+		  for ( size_t i = 0; i < gridsize; ++i )
 		    {
 		      if ( array[i] < fmin ) fmin = array[i];
 		      if ( array[i] > fmax ) fmax = array[i];
@@ -194,7 +196,7 @@ void *Pack(void *process)
 	}
 
       vlistDefVarDatatype(vlistID2, varID, datatype);
-      missval2 = vlistInqVarMissval(vlistID2, varID);
+      double missval2 = vlistInqVarMissval(vlistID2, varID);
 
       if ( nmisspv > 0 )
 	{
@@ -206,12 +208,13 @@ void *Pack(void *process)
 
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  for ( tsID = 0; tsID < nts; tsID++ )
+		  for ( int tsID = 0; tsID < nts; tsID++ )
 		    {
-		      double *array =  vars[tsID][varID][levelID].ptr;
-		      nmiss = vars[tsID][varID][levelID].nmiss;
+                      if ( tsID > 0 && varIsConst[varID] ) continue;
+		      double *array = vars[tsID][varID][levelID].ptr;
+		      size_t nmiss = vars[tsID][varID][levelID].nmiss;
 		      if ( nmiss > 0 )
-			for ( int i = 0; i < gridsize; ++i )
+			for ( size_t i = 0; i < gridsize; ++i )
 			  if ( DBL_IS_EQUAL(array[i], missval1) ) array[i] = missval2;
 		    }
 		}	  
@@ -232,19 +235,20 @@ void *Pack(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  for ( tsID = 0; tsID < nts; tsID++ )
+  for ( int tsID = 0; tsID < nts; tsID++ )
     {
       dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
       pstreamDefTimestep(streamID2, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          if ( tsID > 0 && varIsConst[varID] ) continue;
+	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      if ( vars[tsID][varID][levelID].ptr )
 		{
-		  nmiss = vars[tsID][varID][levelID].nmiss;
+		  size_t nmiss = vars[tsID][varID][levelID].nmiss;
 		  pstreamDefRecord(streamID2, varID, levelID);
 		  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 		  Free(vars[tsID][varID][levelID].ptr);
@@ -255,8 +259,6 @@ void *Pack(void *process)
 
       field_free(vars[tsID], vlistID1);
     }
-
-  if ( vars  ) Free(vars);
 
   dtlist_delete(dtlist);
 

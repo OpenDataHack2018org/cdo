@@ -21768,6 +21768,7 @@ esac
 case "$F77" in
   pgf*)      F77_VERSION=`$F77 -V | head -2 | tail -n 1`;;
   gfortran*) F77_VERSION=`$F77 --version | head -n 1`;;
+  ifort*)    F77_VERSION=`$F77 --version | head -n 1`;;
   *)         F77_VERSION=`$F77 -V 2>&1   | head -n 1 | grep -v error`;;
 esac
 

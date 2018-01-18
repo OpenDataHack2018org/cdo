@@ -85,8 +85,8 @@ long find_element(double x, long nelem, const double *restrict array)
 
   return mid;
 }
-
 /*
+static
 long find_element(double x, long nelem, const double *array)
 {
   long ii;
@@ -108,13 +108,16 @@ long find_element(double x, long nelem, const double *array)
 
 int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, size_t nym, const double *restrict xm, const double *restrict ym)
 {
+  constexpr double rtol = 1.e-12;
   int lfound = 0;
 
-  *jj = find_element(y, nym, ym);
-	  
+  *jj = find_element(y, nym, ym);	  
+  if ( *jj >= nym && fabs(ym[0]-y) < rtol ) *jj = 1;  // fix rounding errors
+
   if ( *jj < nym )
     {
       *ii = find_element(x, nxm, xm);
+      if ( *ii >= nxm && fabs(xm[0]-x) < rtol ) *ii = 1;  // fix rounding errors
 	  
       if ( *ii < nxm ) lfound = 1;
     }

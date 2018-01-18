@@ -806,7 +806,7 @@ void *Remap(void *process)
 
   get_remap_env();
 
-  if ( cdoVerbose ) cdoPrint("Extrapolation %s!", remap_extrapolate?"enabled":"disables");
+  if ( cdoVerbose ) cdoPrint("Extrapolation %s!", remap_extrapolate?"enabled":"disabled");
 
   if ( lremapxxx )
     {
@@ -914,7 +914,7 @@ void *Remap(void *process)
       get_maptype(operfunc, &mapType, &submapType, &numNeighbors, &remap_order);
     }
 
-  if ( !remap_genweights && mapType != RemapType::CONSERV ) remap_genweights = true;
+  if ( !remap_genweights && mapType == RemapType::CONSERV ) remap_genweights = true;
 
   remap_set_int(REMAP_GENWEIGHTS, (int)remap_genweights);
 
