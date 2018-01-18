@@ -37,7 +37,7 @@ static const char *tmpvnm = "_tmp_";
 int pointID = -1;
 int surfaceID = -1;
 
-enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
+enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C, FT_0};
 
 #define    COMPLT(x,y)  ((x) < (y))
 #define    COMPGT(x,y)  ((x) > (y))
@@ -69,6 +69,9 @@ static double pt_ngp(paramType *p)     { return p->ngp;   }
 static double pt_nlev(paramType *p)    { return p->nlev;  }
 static double pt_size(paramType *p)    { return p->ngp*p->nlev; }
 static double pt_missval(paramType *p) { return p->missval; }
+static double ts_ctimestep(double *data) { return lround(data[0]); }
+static double ts_cdate(double *data)     { return lround(data[1]); }
+static double ts_ctime(double *data)     { return lround(data[2]); }
 
 typedef struct {
   int type;
@@ -143,6 +146,10 @@ static func_t fun_sym_tbl[] =
   {FT_COORD, 0, "clev",       NULL},
   {FT_COORD, 0, "gridarea",   NULL},
   {FT_COORD, 0, "gridweight", NULL},
+
+  {FT_0, 0, "ctimestep", (double (*)()) ts_ctimestep},
+  {FT_0, 0, "cdate",     (double (*)()) ts_cdate},
+  {FT_0, 0, "ctime",     (double (*)()) ts_ctime},
 
   {FT_1C, 0, "sellevel",  NULL},
   {FT_1C, 0, "sellevidx", NULL},
@@ -776,6 +783,28 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
 }
 
 static
+nodeType *ex_fun0_con(int init, int funcID, double *data)
+{
+  int functype = fun_sym_tbl[funcID].type;
+  if ( functype != FT_0 ) cdoAbort("Function %s not available for constant values!", fun_sym_tbl[funcID].name);
+
+  if ( cdoVerbose ) cdoPrint("\t%s\tfunc\t%s", ExIn[init], fun_sym_tbl[funcID].name);
+
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+
+  p->type    = typeCon;
+  p->ltmpobj = true;
+
+  if ( ! init )
+    {
+      double (*exprfunc)(double*) = (double (*)(double*)) fun_sym_tbl[funcID].func;
+      p->u.con.value = exprfunc(data);
+    }
+
+  return p;
+}
+
+static
 nodeType *ex_fun_con(int funcID, nodeType *p1)
 {
   int functype = fun_sym_tbl[funcID].type;
@@ -1038,7 +1067,7 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
 
 static
 nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg)
-{  
+{
   const char *funcname = fun_sym_tbl[funcID].name;            
   if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
   if ( p1->ltmpobj ) cdoAbort("Temporary objects not allowed in function %s()!", funcname);
@@ -1644,6 +1673,11 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
         if ( functype == FT_COORD )
           {
             rnode = coord_fun(init, funcID, fnode, parse_arg);
+          }
+        else if ( functype == FT_0 )
+          {
+            int vartsID = parse_arg->tsID;
+            rnode = ex_fun0_con(init, funcID, params[vartsID].data);
           }
         else
           {

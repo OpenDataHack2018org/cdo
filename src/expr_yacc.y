@@ -22,6 +22,7 @@
 nodeType *expr_opr(int oper, int nops, ...);
 nodeType *expr_var(char *nm);
 nodeType *expr_con(double value);
+nodeType *expr_fun0(char *fname);
 nodeType *expr_fun(char *fname, nodeType *p);
 nodeType *expr_fun1c(char *fname, nodeType *op, double value);
 nodeType *expr_com(const char *cname, char *vname);
@@ -105,6 +106,7 @@ expr:
         | FUNCTION '(' expr ',' '-' CONSTANT ')'   { $$ = expr_fun1c($1, $3, - $6); }
         | FUNCTION '(' expr ',' CONSTANT ')'   { $$ = expr_fun1c($1, $3, $5); }
         | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }
+        | FUNCTION '('  ')'   { $$ = expr_fun0($1); }
         ;
 
 ternary:  expr QUESTION expr COLON expr   { $$ = expr_opr('?', 3, $1, $3, $5); }
@@ -140,6 +142,22 @@ nodeType *expr_var(char *nm)
   /* copy information */
   p->type = typeVar;
   p->u.var.nm = strdup(nm);
+
+  return p;
+}
+
+nodeType *expr_fun0(char *fname)
+{
+  nodeType *p = NULL;
+  /* allocate node */
+  size_t nodeSize = SIZEOF_NODETYPE + sizeof(funNodeType);
+  if ( (p = (nodeType*) Calloc(1, nodeSize)) == NULL )
+    yyerror(NULL, NULL, "Out of memory");
+
+  /* copy information */
+  p->type = typeFun;
+  p->u.fun.name = strdup(fname);
+  p->u.fun.op   = NULL;
 
   return p;
 }

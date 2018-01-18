@@ -290,7 +290,7 @@ int params_add_ts(parse_param_t *parse_arg)
       params[varID].gridID   = parse_arg->pointID;
       params[varID].zaxisID  = parse_arg->surfaceID;
       params[varID].steptype = TIME_VARYING;
-      params[varID].ngp      = 1;
+      params[varID].ngp      = 3;
       params[varID].nlev     = 1;
 
       parse_arg->nparams++;
@@ -573,7 +573,12 @@ void *Expr(void *argument)
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
       params[vartsID].data[0] = tsID+1;
+      params[vartsID].data[1] = vdate;
+      params[vartsID].data[2] = vtime;
+
       taxisCopyTimestep(taxisID2, taxisID1);
 
       pstreamDefTimestep(streamID2, tsID);

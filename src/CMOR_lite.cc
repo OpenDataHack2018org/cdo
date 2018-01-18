@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Setpartab  setpartab       Set parameter table
+      CMORlite      cmorlite        CMOR lite
 */
 
 #if  defined(HAVE_CONFIG_H)
