@@ -18,11 +18,6 @@
 #ifndef PSTREAM_WRITE_H
 #define PSTREAM_WRITE_H
 
-void    pstreamClose(int pstreamID);
-
-void    pstreamDefVlist(int pstreamID, int vlistID);
-
-void    pstreamDefTimestep(int pstreamID, int tsID);
 
 void    pstreamDefRecord(int pstreamID, int  varID, int  levelID);
 

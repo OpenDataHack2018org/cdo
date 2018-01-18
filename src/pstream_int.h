@@ -15,11 +15,26 @@
   GNU General Public License for more details.
 */
 
-#ifndef _CDO_H
-#define _CDO_H
+#ifndef PSTREAM_INT_H
+#define PSTREAM_INT_H
 
-#include "text.h"
-#include "pstream_int.h"
 #include "process.h"
+#include "pstream.h"
+void
+pstreamClose(int pstreamID);
 
-#endif  /* _CDO_H */
+int
+pstreamInqVlist(int pstreamID);
+
+void
+pstreamDefVlist(int pstreamID, int vlistID);
+
+int
+pstreamInqTimestep(int pstreamID, int tsID);
+
+void
+pstreamDefTimestep(int pstreamID, int tsID);
+
+int
+pstreamInqFiletype(int pstreamID);
+#endif 

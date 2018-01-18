@@ -96,11 +96,14 @@ public:
   void addFileOutStream(std::string file);
   void addPipeInStream();
   void addPipeOutStream();
+  void addNvals(size_t p_nvals);
+  void query_user_exit(const char *argument);
+  const char *inqPrompt();
   pthread_t run();
 
 private:
-  void defPrompt();
   process_t();
+  void defPrompt();
   int checkStreamCnt();
 };
 
@@ -131,7 +134,6 @@ void processAccuTime(double utime, double stime);
 void processDefCputime(int processID, double cputime);
 double processInqCputime(int processID);
 
-void processAddNvals(size_t nvals);
 size_t processInqNvals(int processID);
 int processNums(void);
 
@@ -161,6 +163,8 @@ std::string cdoGetOutStreamName(int p_outStream);
 std::string cdoGetStreamName(int p_streamIndex);
 
 char* cdoGetObase();
+void cdoFinish();
+void cdoInitialize(void *process);
 
 #endif /* _PROCESS_H */
 

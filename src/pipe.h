@@ -57,6 +57,7 @@ public:
   void pipeReadPipeRecord(double *data, int vlistID, size_t *p_nmiss);
 
   void pipeSetName(int processID, int inputIDX);
+  void close();
 
   bool EOP;
   bool usedata;
@@ -66,7 +67,6 @@ public:
   int recIDr, recIDw, tsIDr, tsIDw;
   size_t nmiss;
   double *data;
-  // pstream_t *pstreamptr_in;
   size_t nvals;
 
   std::mutex m_mutex;

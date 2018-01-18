@@ -318,10 +318,10 @@ void *Arith(void *process)
       tsID2++;
     }
 
-// pstreamClose(streamID3);
-// pstreamClose(streamID2);
-// pstreamClose(streamID1);
-//
+ pstreamClose(streamID3);
+ pstreamClose(streamID2);
+ pstreamClose(streamID1);
+
   vlistDestroy(vlistID3);
 
   if ( vardata )

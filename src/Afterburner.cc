@@ -2204,7 +2204,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 #endif
 #if defined(CDO)
   processDefVarNum(vlistNvars(globs->ivlistID));
-  processAddNvals(streamNvals(globs->istreamID));
+  processSelf().addNvals(streamNvals(globs->istreamID));
 #endif
   streamClose(globs->istreamID);
 

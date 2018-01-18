@@ -1,4 +1,5 @@
 #include <cdi.h>
+#include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
 #include "grid_search.h"

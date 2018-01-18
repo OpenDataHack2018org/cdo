@@ -28,6 +28,7 @@
 */
 
 #include <cdi.h>
+#include "cdo.h"
 #include "cdoDebugOutput.h"
 #include "cdo_int.h"
 #include "pstream.h"

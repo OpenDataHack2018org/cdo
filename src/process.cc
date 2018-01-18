@@ -22,6 +22,9 @@
 #if defined(HAVE_PTHREAD_H)
 #include <pthread.h>
 #endif
+#ifdef  _OPENMP
+#include <omp.h>
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -48,6 +51,7 @@
 #include <stack>
 #include <iostream>
 #include <string>
+#include <sys/stat.h> /* stat */
 
 #ifdef  HAVE_LIBPTHREAD
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -224,9 +228,9 @@ processNumsActive(void)
 }
 
 void
-processAddNvals(size_t nvals)
+process_t::addNvals(size_t p_nvals)
 {
-  processSelf().nvals += nvals;
+  nvals += p_nvals;
 }
 
 size_t
@@ -366,12 +370,17 @@ const char *
 processInqPrompt(void)
 {
   process_t &process = processSelf();
+  return process.inqPrompt();
 
-  const char *prompt = "cdo";
-  if (process.prompt[0])
-    prompt = process.prompt;
+}
+const char *
+process_t::inqPrompt()
+{
+  const char *newPrompt = "cdo";
+  if (prompt[0])
+    newPrompt = prompt;
 
-  return prompt;
+  return newPrompt;
 }
 
 #if defined(HAVE_GLOB_H)
@@ -691,6 +700,7 @@ createProcesses(int argc, const char **argv)
     MESSAGE("== Process Creation End ==");
   }
 
+  setProcessNum(Process.size());
   NumCreatedStreams = get_glob_argc() + obase.size();
 }
 
@@ -927,6 +937,23 @@ cdoStreamNumber()
   return operatorStreamNumber(processSelf().operatorName);
 }
 
+void cdoCloseStream(int p_pstreamIDX)
+{
+    process_t &process = processSelf();
+    if(p_pstreamIDX >= process.getInStreamCnt())
+    {
+        process.outputStreams[p_pstreamIDX - process.getInStreamCnt()]->close();
+    }
+    else if (p_pstreamIDX < process.getInStreamCnt() + process.getOutStreamCnt())
+    {
+        pstream_t *pstream = process.inputStreams[p_pstreamIDX];
+        pstream->close();
+        process.addNvals(pstream->getNvals());
+    }
+}
+
+/*TEMP*
+/*
 static void
 processClosePipes(void)
 {
@@ -947,14 +974,14 @@ processClosePipes(void)
     {
       pstream_t *pstreamptr = processInqOutputStream(sindex);
 
-      if (CdoDebug::PROCESS && !pstreamptr->isopen )
-        MESSAGE("process ",processSelf().m_ID,"  outstream ",sindex,"  close streamID ", pstreamptr->self);
-
+      if (CdoDebug::PROCESS && !pstreamptr->isopen)
+        MESSAGE("process ",processSelf().m_ID,"  outstream ",sindex," close streamID ", pstreamptr->self);
 
       if (!pstreamptr->isopen)
         pstreamptr->close();
     }
 }
+*/
 
 void process_t::addFileInStream(std::string file)
 {
@@ -1067,12 +1094,10 @@ int cdoStreamOpenRead(int inStreamIDX)
     }
     pstream_t *inStream = process.inputStreams[inStreamIDX];
 
-    if(inStream->ispipe)
+    if(inStream->isPipe())
     {
-       size_t pnlen = 16;
-       char * pipename = createPipeName(pnlen);
-       if(CdoDebug::PROCESS) MESSAGE("Trying to open pipe: ",pipename);
-       inStream->pstreamOpenReadPipe(pipename);
+       if(CdoDebug::PROCESS) MESSAGE("Trying to open pipe: ",inStream->pipe->name);
+       inStream->pstreamOpenReadPipe();
        process.childProcesses[process.nChildActive]->run(); //new thread started in here!
        process.nChildActive++;
     }
@@ -1083,6 +1108,64 @@ int cdoStreamOpenRead(int inStreamIDX)
     }
 
     return inStream->self; // return ID
+}
+
+void
+process_t::query_user_exit(const char *argument)
+{
+/* modified code from NCO */
+#define USR_RPL_MAX_LNG 10 /* Maximum length for user reply */
+#define USR_RPL_MAX_NBR 10 /* Maximum number of chances for user to reply */
+  char usr_rpl[USR_RPL_MAX_LNG];
+  int usr_rpl_int;
+  short nbr_itr = 0;
+  size_t usr_rpl_lng = 0;
+
+  /* Initialize user reply string */
+  usr_rpl[0] = 'z';
+  usr_rpl[1] = '\0';
+
+  while (!(usr_rpl_lng == 1 && (*usr_rpl == 'o' || *usr_rpl == 'O' || *usr_rpl == 'e' || *usr_rpl == 'E')))
+    {
+      if (nbr_itr++ > USR_RPL_MAX_NBR)
+        {
+          (void) fprintf(stdout,
+                         "\n%s: ERROR %d failed attempts to obtain valid interactive input.\n",
+                         prompt,
+                         nbr_itr - 1);
+          exit(EXIT_FAILURE);
+        }
+
+      if (nbr_itr > 1)
+        (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
+      (void) fprintf(stdout,
+                     "%s: %s exists ---`e'xit, or `o'verwrite (delete existing file) (e/o)? ",
+                     prompt,
+                     argument);
+      (void) fflush(stdout);
+      if (fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL)
+        continue;
+
+      /* Ensure last character in input string is \n and replace that with \0 */
+      usr_rpl_lng = strlen(usr_rpl);
+      if (usr_rpl_lng >= 1)
+        if (usr_rpl[usr_rpl_lng - 1] == '\n')
+          {
+            usr_rpl[usr_rpl_lng - 1] = '\0';
+            usr_rpl_lng--;
+          }
+    }
+
+  /* Ensure one case statement for each exit condition in preceding while loop */
+  usr_rpl_int = (int) usr_rpl[0];
+  switch (usr_rpl_int)
+    {
+    case 'E':
+    case 'e': exit(EXIT_SUCCESS); break;
+    case 'O':
+    case 'o': break;
+    default: exit(EXIT_FAILURE); break;
+    } /* end switch */
 }
 
 int cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
@@ -1104,7 +1187,18 @@ int cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
     else
     {
         if(CdoDebug::PROCESS) MESSAGE("Trying to open: ",outStream->m_mfnames[0]);
-        outStream->pstreamOpenWriteFile(outStream->m_mfnames[0].c_str(), filetype);
+
+        if (cdoInteractive)
+          {
+            struct stat stbuf;
+
+            int rstatus = stat(outStream->m_name.c_str(), &stbuf);
+            /* If permanent file already exists, query user whether to overwrite or exit */
+            if (rstatus != -1)
+            process.query_user_exit(outStream->m_name.c_str());
+          }
+
+        outStream->pstreamOpenWriteFile(filetype);
     }
     return outStream->self;
 }
@@ -1208,6 +1302,27 @@ char * cdoGetObase()
 extern "C" {
 size_t getPeakRSS( );
 }
+
+void
+cdoInitialize(void *p_process)
+{
+#if defined(_OPENMP)
+  omp_set_num_threads(ompNumThreads); // Has to be called for every module (pthread)!
+#endif
+  process_t *process = (process_t*)p_process;
+
+  //std::cout << arg->processID << std::endl;
+  if(CdoDebug::PROCESS) MESSAGE("Initializing process: ", process->m_operatorCommand);
+  process->threadID = pthread_self();
+
+
+#if defined(HAVE_LIBPTHREAD)
+  if (CdoDebug::PSTREAM)
+    MESSAGE("process ", processSelf().m_ID," thread ", pthread_self());
+#endif
+
+}
+
 void cdoFinish(void)
 {
   int processID = processSelf().m_ID;
@@ -1278,7 +1393,7 @@ void cdoFinish(void)
   c_cputime = c_usertime + c_systime;
 
 #ifdef  HAVE_LIBPTHREAD
-  if (getPthreadScope() == PTHREAD_SCOPE_PROCESS)
+  if (pthreadScope == PTHREAD_SCOPE_PROCESS)
     {
       c_usertime /= processNums();
       c_systime /= processNums();
@@ -1320,6 +1435,6 @@ void cdoFinish(void)
   fprintf(stderr, "\n");
 #endif
 
-  processClosePipes();
   processSetInactive();
 }
+

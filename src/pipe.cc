@@ -35,6 +35,16 @@
 
 pipe_t::pipe_t() { pipe_init(); }
 
+
+void pipe_t::close()
+{
+  pthread_mutex_lock(m_mutex);
+  EOP = true;
+  if (CdoDebug::PSTREAM) {MESSAGE(name, " write closed");}
+  pthread_mutex_unlock(m_mutex);
+  pthread_cond_signal(tsDef);
+  pthread_cond_signal(tsInq);
+}
 void
 pipe_t::pipe_init()
 {

@@ -1810,18 +1810,16 @@ int main(int argc, char *argv[])
       fprintf(stderr, "stdin_is_tty:   %d\n", stdin_is_tty);
       fprintf(stderr, "stdout_is_tty:  %d\n", stdout_is_tty);
       fprintf(stderr, "stderr_is_tty:  %d\n", stderr_is_tty);
+      print_system_info();
     }
-
-  if ( Debug ) print_system_info();
 
   check_stacksize();
 
-  if ( Debug ) print_pthread_info();
-
-  if ( Debug )
-    {
+  if ( Debug ) 
+  { 
+      print_pthread_info();
       //      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
-    }
+  }
 
 #ifdef  _OPENMP
   if ( numThreads <= 0 ) numThreads = 1;
@@ -1871,6 +1869,7 @@ int main(int argc, char *argv[])
 #endif
       std::vector<std::string> new_argv = expandWildCards(argc - CDO_optind,(const char **) &argv[CDO_optind]);
       //temprorary: should not be needed when std::string is standart string 
+      ///*TEMP*/
       std::vector<char*> new_cargv(new_argv.size());
       for(unsigned long i = 0; i < new_argv.size(); i++)
       {
@@ -1926,12 +1925,11 @@ int main(int argc, char *argv[])
       timer_start(timer_total);
 
 
-
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
       getProcess(0)->m_module.func(getProcess(0));
       close_library_handles();
-#else 
+#else
       createProcesses(new_argv.size(),(const char**) &new_cargv[0] );
       getProcess(0)->m_module.func(getProcess(0));
 #endif

@@ -150,10 +150,10 @@ am_libcdo_la_OBJECTS = libcdo_la-array.lo libcdo_la-cdo_pthread.lo \
 	libcdo_la-percentiles_hist.lo libcdo_la-percentiles.lo \
 	libcdo_la-pipe.lo libcdo_la-pmlist.lo libcdo_la-sellist.lo \
 	libcdo_la-process.lo libcdo_la-pstream.lo \
-	libcdo_la-pthread_debug.lo libcdo_la-readline.lo \
-	libcdo_la-realtime.lo libcdo_la-remaplib.lo \
-	libcdo_la-remapsort.lo libcdo_la-remap_scrip_io.lo \
-	libcdo_la-remap_search_reg2d.lo \
+	libcdo_la-pstream_int.lo libcdo_la-pthread_debug.lo \
+	libcdo_la-readline.lo libcdo_la-realtime.lo \
+	libcdo_la-remaplib.lo libcdo_la-remapsort.lo \
+	libcdo_la-remap_scrip_io.lo libcdo_la-remap_search_reg2d.lo \
 	libcdo_la-remap_search_latbins.lo \
 	libcdo_la-remap_store_link.lo \
 	libcdo_la-remap_store_link_cnsrv.lo libcdo_la-remap_conserv.lo \
@@ -582,10 +582,11 @@ libcdo_la_SOURCES = array.h array.cc cdo_int.h compare.h cfortran.h \
 	percentiles_hist.cc percentiles_hist.h percentiles.cc \
 	percentiles.h pipe.cc pipe.h pmlist.cc pmlist.h sellist.cc \
 	sellist.h printinfo.h process.cc process.h pstream.cc \
-	pstream.h pstream_write.h pthread_debug.cc pthread_debug.h \
-	readline.cc realtime.cc remap.h remaplib.cc remapsort.cc \
-	remap_scrip_io.cc remap_search_reg2d.cc \
-	remap_search_latbins.cc remap_store_link.cc remap_store_link.h \
+	pstream.h pstream_int.cc pstream_int.h pstream_write.h \
+	pthread_debug.cc pthread_debug.h readline.cc realtime.cc \
+	remap.h remaplib.cc remapsort.cc remap_scrip_io.cc \
+	remap_search_reg2d.cc remap_search_latbins.cc \
+	remap_store_link.cc remap_store_link.h \
 	remap_store_link_cnsrv.cc remap_store_link_cnsrv.h \
 	remap_conserv.cc remap_conserv_scrip.cc remap_distwgt.cc \
 	remap_bicubic_scrip.cc remap_bilinear_scrip.cc stdnametable.cc \
@@ -1127,6 +1128,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pmlist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-process.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pstream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pstream_int.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pthread_debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-readline.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-realtime.Plo@am__quote@
@@ -1787,6 +1789,13 @@ libcdo_la-pstream.lo: pstream.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='pstream.cc' object='libcdo_la-pstream.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-pstream.lo `test -f 'pstream.cc' || echo '$(srcdir)/'`pstream.cc
+
+libcdo_la-pstream_int.lo: pstream_int.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-pstream_int.lo -MD -MP -MF $(DEPDIR)/libcdo_la-pstream_int.Tpo -c -o libcdo_la-pstream_int.lo `test -f 'pstream_int.cc' || echo '$(srcdir)/'`pstream_int.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-pstream_int.Tpo $(DEPDIR)/libcdo_la-pstream_int.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='pstream_int.cc' object='libcdo_la-pstream_int.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-pstream_int.lo `test -f 'pstream_int.cc' || echo '$(srcdir)/'`pstream_int.cc
 
 libcdo_la-pthread_debug.lo: pthread_debug.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-pthread_debug.lo -MD -MP -MF $(DEPDIR)/libcdo_la-pthread_debug.Tpo -c -o libcdo_la-pthread_debug.lo `test -f 'pthread_debug.cc' || echo '$(srcdir)/'`pthread_debug.cc

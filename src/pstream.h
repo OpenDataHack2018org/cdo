@@ -37,16 +37,18 @@ public:
   int inqFileType();
   void defTimestep(int p_tsID);
   bool isPipe();
-  void pstreamOpenReadPipe(const char* pipename);
+  int pstreamOpenReadPipe();
   int pstreamOpenWritePipe(const char* filename, int filetype);
-
-  void pstreamOpenReadFile(const char* filename);
-  int pstreamOpenWriteFile(const char* p_filename, int filetype);
   int pstreamOpenWriteFile(int filetype);
+  void pstreamOpenReadFile(const char* filename);
+
   void openAppend(const char * p_filename);
   void init();
   void defVlist(int p_vlistID);
   void close();
+  void waitForPipe();
+  void closePipe();
+  size_t getNvals();
   int self; //aka the id of the pstream
   std::pair<int, int> m_id;
   int mode;
@@ -74,14 +76,11 @@ private:
 #endif
 };
 
-void pstreamClose(int pstreamID);
+pstream_t *pstream_to_pointer(int pstreamID);
 
-int pstreamInqFiletype(int pstreamID);
 int pstreamInqByteorder(int pstreamID);
 
-int pstreamInqVlist(int pstreamID);
-
-int pstreamInqTimestep(int pstreamID, int tsID);
+int pstreamInqTimestep(pstream_t *p_pstreamptr, int tsID);
 
 int pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
@@ -95,7 +94,6 @@ int pstreamFileID(int pstreamID);
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
-const int &getPthreadScope();
 pstream_t *create_pstream();
 pstream_t *create_pstream(std::vector<std::string> p_filenameList);
 pstream_t *create_pstream(std::string p_filename);
@@ -103,5 +101,6 @@ pstream_t *create_pstream(int processID, int pstreamIDX);
 
 int get_glob_argc();
 void pstreamCloseAll();
+void setProcessNum(int p_num);
 
 #endif /* PSTREAM_H */

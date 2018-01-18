@@ -163,10 +163,6 @@ int     operatorArgc(void);
 char  **operatorArgv(void);
 void    operatorCheckArgc(int numargs);
 
-
-void    cdoInitialize(void *argument);
-void    cdoFinish(void);
-
 int     cdoStreamNumber(void);
 int     cdoStreamCnt(void);
 int     cdoOperatorAdd(const char *name, int func, int intval, const char *enter);
