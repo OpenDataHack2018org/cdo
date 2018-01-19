@@ -766,12 +766,7 @@ void pstream_t::defVlist(int p_vlistID){
     }
 }
 
-int
-pstreamInqRecord(int pstreamID, int *varID, int *levelID)
-{
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-  return pstreamptr->inqRecord(varID, levelID);
-}
+
 
 int
 pstream_t::inqRecord(int *varID, int *levelID){

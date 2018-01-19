@@ -87,7 +87,6 @@ private:
 
 pstream_t *pstream_to_pointer(int pstreamID);
 
-int pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 

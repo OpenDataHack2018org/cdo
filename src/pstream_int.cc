@@ -137,3 +137,10 @@ pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 
   pstreamptr_dest->copyRecord(pstream_to_pointer(pstreamIDsrc));
 }
+
+int
+pstreamInqRecord(int pstreamID, int *varID, int *levelID)
+{
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  return pstreamptr->inqRecord(varID, levelID);
+}

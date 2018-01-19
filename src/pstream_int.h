@@ -56,4 +56,6 @@ pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
 void
 pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
+int
+pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 #endif 
