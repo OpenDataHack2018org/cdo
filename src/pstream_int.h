@@ -20,42 +20,34 @@
 
 #include "process.h"
 #include "pstream.h"
-void
-pstreamClose(int pstreamID);
+/*clang-format off */
 
-int
-pstreamInqVlist(int pstreamID);
+void  pstreamClose(int pstreamID);
 
-void
-pstreamDefVlist(int pstreamID, int vlistID);
+int   pstreamInqVlist(int pstreamID);
+void  pstreamDefVlist(int pstreamID, int vlistID);
 
-int
-pstreamInqTimestep(int pstreamID, int tsID);
+int   pstreamInqRecord(int pstreamID, int *varID, int *levelID);
+void  pstreamDefRecord(int pstreamID, int varID, int levelID);
 
-void
-pstreamDefTimestep(int pstreamID, int tsID);
+void  pstreamDefRecord(int pstreamID, int varID, int levelID);
+int   pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
-int
-pstreamInqFiletype(int pstreamID);
+int   pstreamInqTimestep(int pstreamID, int tsID);
+void  pstreamDefTimestep(int pstreamID, int tsID);
 
-void
-pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
+void  pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
+int   pstreamInqFiletype(int pstreamID);
+int   pstreamInqByteorder(int pstreamID);
+int   pstreamFileID (int pstreamID);
 
-int
-pstreamFileID(int pstreamID);
+void  pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
+void  pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
+void  pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
-int
-pstreamInqByteorder(int pstreamID);
+void  pstreamWriteRecord(int pstreamID, double *data, size_t nmiss);
+void  pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss);
 
-void
-pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
+/*clang-format on */
 
-void
-pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
-
-void
-pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
-
-int
-pstreamInqRecord(int pstreamID, int *varID, int *levelID);
-#endif 
+#endif

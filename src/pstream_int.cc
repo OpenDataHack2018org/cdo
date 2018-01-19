@@ -144,3 +144,33 @@ pstreamInqRecord(int pstreamID, int *varID, int *levelID)
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
   return pstreamptr->inqRecord(varID, levelID);
 }
+
+void
+pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss)
+{
+  if (data == NULL)
+    cdoAbort("Data pointer not allocated (%s)!", __func__);
+
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->writeRecordF(data,nmiss);
+}
+
+void
+pstreamWriteRecord(int pstreamID, double *data, size_t nmiss)
+{
+  if (data == NULL)
+    cdoAbort("Data pointer not allocated (%s)!", __func__);
+
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->writeRecord(data,nmiss);
+}
+
+void
+pstreamDefRecord(int pstreamID, int varID, int levelID)
+{
+  pstream_t *pstreamptr;
+
+  pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->defRecord(varID, levelID);
+}
+

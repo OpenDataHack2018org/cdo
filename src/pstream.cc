@@ -802,14 +802,6 @@ pstream_t::inqRecord(int *varID, int *levelID){
 }
 
 void
-pstreamDefRecord(int pstreamID, int varID, int levelID)
-{
-  pstream_t *pstreamptr;
-
-  pstreamptr = pstream_to_pointer(pstreamID);
-  pstreamptr->defRecord(varID, levelID);
-}
-void
 pstream_t::defRecord(int varID, int levelID)
 {
   m_varID = varID;
@@ -977,16 +969,6 @@ pstream_t::checkDatarange(int varID, double *array, size_t nmiss)
     }
 }
 
-void
-pstreamWriteRecord(int pstreamID, double *data, size_t nmiss)
-{
-  if (data == NULL)
-    cdoAbort("Data pointer not allocated (%s)!", __func__);
-
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-  pstreamptr->writeRecord(data,nmiss);
-}
-
 void pstream_t::writeRecord(double *data, size_t nmiss){
 
 #ifdef  HAVE_LIBPTHREAD
@@ -1022,16 +1004,6 @@ void pstream_t::writeRecord(double *data, size_t nmiss){
       if (processNum == 1 && ompNumThreads == 1)
         timer_stop(timer_write);
     }
-}
-
-void
-pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss)
-{
-  if (data == NULL)
-    cdoAbort("Data pointer not allocated (%s)!", __func__);
-
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-  pstreamptr->writeRecordF(data,nmiss);
 }
 
 void pstream_t::writeRecordF(float *data, size_t nmiss){
