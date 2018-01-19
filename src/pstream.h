@@ -35,6 +35,7 @@ public:
   pstream_t(int id);
   int inqVlist();
   int inqFileType();
+  int inqTimestep(int tsID);
   void defTimestep(int p_tsID);
   bool isPipe();
   int pstreamOpenReadPipe();
@@ -80,7 +81,7 @@ pstream_t *pstream_to_pointer(int pstreamID);
 
 int pstreamInqByteorder(int pstreamID);
 
-int pstreamInqTimestep(pstream_t *p_pstreamptr, int tsID);
+int pstreamInqTimestep(int tsID);
 
 int pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 

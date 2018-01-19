@@ -1074,7 +1074,7 @@ if ( pstreamptr->m_varlist )
 }
 
 
-int pstreamInqTimestep(pstream_t *p_pstreamptr, int tsID)
+int pstream_t::inqTimestep(int p_tsID)
 {
 
   int nrecs = 0;
@@ -1086,7 +1086,7 @@ int pstreamInqTimestep(pstream_t *p_pstreamptr, int tsID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      nrecs = streamInqTimestep(p_pstreamptr->m_fileID, tsID);
+      nrecs = streamInqTimestep(m_fileID, p_tsID);
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1094,20 +1094,20 @@ int pstreamInqTimestep(pstream_t *p_pstreamptr, int tsID)
       if (processNum == 1 && ompNumThreads == 1)
         timer_stop(timer_read);
 
-      if (nrecs == 0 && p_pstreamptr->mfiles && (p_pstreamptr->nfiles < p_pstreamptr->mfiles))
+      if (nrecs == 0 && mfiles && (nfiles < mfiles))
         {
-          int nfile = p_pstreamptr->nfiles;
+          int nfile = nfiles;
           std::string filename; 
           int fileID;
           int vlistIDold, vlistIDnew;
 
-          p_pstreamptr->tsID0 += tsID;
+          tsID0 += p_tsID;
 
-          vlistIDold = vlistDuplicate(streamInqVlist(p_pstreamptr->m_fileID));
-          streamClose(p_pstreamptr->m_fileID);
+          vlistIDold = vlistDuplicate(streamInqVlist(m_fileID));
+          streamClose(m_fileID);
 
-          filename = p_pstreamptr->m_mfnames[nfile];
-          p_pstreamptr->nfiles++;
+          filename = m_mfnames[nfile];
+          nfiles++;
 
 #ifdef  HAVE_LIBPTHREAD
           if (cdoLockIO)
@@ -1136,8 +1136,8 @@ int pstreamInqTimestep(pstream_t *p_pstreamptr, int tsID)
           if (fileID < 0)
             cdiOpenError(fileID, "Open failed on >%s<", filename.c_str());
 
-          p_pstreamptr->m_name = filename;
-          p_pstreamptr->m_fileID = fileID;
+          m_name = filename;
+          m_fileID = fileID;
 
           if (processNum == 1 && ompNumThreads == 1)
             timer_start(timer_read);
@@ -1145,7 +1145,7 @@ int pstreamInqTimestep(pstream_t *p_pstreamptr, int tsID)
           if (cdoLockIO)
             pthread_mutex_lock(&streamMutex);
 #endif
-          nrecs = streamInqTimestep(p_pstreamptr->m_fileID, 0);
+          nrecs = streamInqTimestep(m_fileID, 0);
 #ifdef  HAVE_LIBPTHREAD
           if (cdoLockIO)
             pthread_mutex_unlock(&streamMutex);
@@ -1154,8 +1154,8 @@ int pstreamInqTimestep(pstream_t *p_pstreamptr, int tsID)
             timer_stop(timer_read);
         }
 
-      if (tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID)
-        taxisDefType(vlistInqTaxis(p_pstreamptr->m_vlistID), cdoDefaultTimeType);
+      if (p_tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID)
+        taxisDefType(vlistInqTaxis(m_vlistID), cdoDefaultTimeType);
   return nrecs;
 }
 

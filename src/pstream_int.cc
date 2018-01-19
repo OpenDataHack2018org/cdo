@@ -61,7 +61,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
 #endif
   {
       if (pstreamptr->mfiles){tsID -= pstreamptr->tsID0;}
-      nrecs = pstreamInqTimestep(pstreamptr, tsID);
+      nrecs = pstreamptr->inqTimestep(tsID);
       if (nrecs && tsID != pstreamptr->tsID){
           processDefTimesteps(pstreamID);
           pstreamptr->tsID = tsID;
