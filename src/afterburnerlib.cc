@@ -23,6 +23,7 @@
 #include "constants.h"
 #include "compare.h"
 #include "after_vertint.h"
+#include "pstream_int.h"
 
 int afterDebug = 0;
 int labort_after = TRUE;
