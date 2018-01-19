@@ -211,7 +211,7 @@ void pstream_t::init()
   tsID0 = 0;
   mfiles = 0;
   nfiles = 0;
-  varID = -1;
+  m_varID = -1;
   m_varlist = NULL;
 #ifdef  HAVE_LIBPTHREAD
   pipe = NULL;
@@ -808,7 +808,7 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
-  pstreamptr->varID = varID;
+  pstreamptr->m_varID = varID;
 
 #ifdef  HAVE_LIBPTHREAD
   if (pstreamptr->ispipe)
@@ -898,14 +898,14 @@ void pstream_t::readRecord(double *data, size_t *nmiss)
 }
 
 void
-pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, size_t nmiss)
+pstream_t::checkDatarange(int varID, double *array, size_t nmiss)
 {
   long i;
-  long gridsize = pstreamptr->m_varlist[varID].gridsize;
-  int datatype = pstreamptr->m_varlist[varID].datatype;
-  double missval = pstreamptr->m_varlist[varID].missval;
-  double addoffset = pstreamptr->m_varlist[varID].addoffset;
-  double scalefactor = pstreamptr->m_varlist[varID].scalefactor;
+  long gridsize = m_varlist[varID].gridsize;
+  int datatype = m_varlist[varID].datatype;
+  double missval = m_varlist[varID].missval;
+  double addoffset = m_varlist[varID].addoffset;
+  double scalefactor = m_varlist[varID].scalefactor;
 
   long ivals = 0;
   double arrmin = 1.e300;
@@ -980,32 +980,36 @@ pstreamWriteRecord(int pstreamID, double *data, size_t nmiss)
     cdoAbort("Data pointer not allocated (%s)!", __func__);
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->writeRecord(data,nmiss);
+}
+
+void pstream_t::writeRecord(double *data, size_t nmiss){
 
 #ifdef  HAVE_LIBPTHREAD
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
       if (CdoDebug::PSTREAM)
         {
-          MESSAGE(pstreamptr->pipe->name.c_str()," pstreamID ", pstreamptr->self);
+          MESSAGE(pipe->name.c_str()," pstreamID ", self);
         }
-      pstreamptr->pipe->pipeWriteRecord(data, nmiss);
+      pipe->pipeWriteRecord(data, nmiss);
     }
   else
 #endif
     {
-      int varID = pstreamptr->varID;
+      int varID = m_varID;
       if (processNum == 1 && ompNumThreads == 1)
         timer_start(timer_write);
 
-      if (pstreamptr->m_varlist)
-        if (pstreamptr->m_varlist[varID].check_datarange)
-          pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
+      if (m_varlist)
+        if (m_varlist[varID].check_datarange)
+          checkDatarange(varID, data, nmiss);
 
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamWriteRecord(pstreamptr->m_fileID, data, nmiss);
+      streamWriteRecord(m_fileID, data, nmiss);
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1023,33 +1027,36 @@ pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss)
     cdoAbort("Data pointer not allocated (%s)!", __func__);
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->writeRecordF(data,nmiss);
+}
 
+void pstream_t::writeRecordF(float *data, size_t nmiss){
 #ifdef  HAVE_LIBPTHREAD
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
-      cdoAbort("pipeWriteRecord not implemented for memtype float!");
       if (CdoDebug::PSTREAM)
         {
-          MESSAGE( pstreamptr->pipe->name.c_str()," pstreamID ", pstreamptr->self);
+          MESSAGE( pipe->name.c_str()," pstreamID ", self);
         }
+      cdoAbort("pipeWriteRecord not implemented for memtype float!");
       // pipeWriteRecord(pstreamptr, data, nmiss);
     }
   else
 #endif
     {
-      // int varID = pstreamptr->varID;
+      // int varID = m_varID;
       if (processNum == 1 && ompNumThreads == 1)
         timer_start(timer_write);
 /*
-if ( pstreamptr->m_varlist )
-  if ( pstreamptr->m_varlist[varID].check_datarange )
+if ( m_varlist )
+  if ( m_varlist[varID].check_datarange )
     pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
 */
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamWriteRecordF(pstreamptr->m_fileID, data, nmiss);
+      streamWriteRecordF(m_fileID, data, nmiss);
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);

@@ -47,6 +47,8 @@ public:
   void pstreamOpenReadFile(const char* filename);
   void openAppend(const char * p_filename);
 
+  void writeRecord(double *data, size_t nmiss);
+  void writeRecordF(float *data, size_t nmiss);
 
   void readRecord(double *data, size_t *nmiss);
   void readRecordF(float *data, size_t *nmiss);
@@ -70,7 +72,7 @@ public:
   int tsID0;
   int mfiles;
   int nfiles;
-  int varID; /* next varID defined with streamDefVar */
+  int m_varID; /* next varID defined with streamDefVar */
   bool ispipe;
   bool isopen;
   std::string m_name;
@@ -82,6 +84,7 @@ public:
   pthread_t wthreadID; /* write thread ID */
 private:
    pstream_t();
+   void checkDatarange(int varID, double *array, size_t nmiss);
 #endif
 };
 
