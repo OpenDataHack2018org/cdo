@@ -842,17 +842,35 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
     }
 }
 
-void
-pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
+void pstream_t::readRecordF(float *data, size_t *nmiss)
 {
-  if (data == NULL)
-    cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
-
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-  pstreamptr->readRecord(data, nmiss);
+#ifdef  HAVE_LIBPTHREAD
+ 
+if (ispipe)
+    {
+      cdoAbort("pipeReadRecord not implemented for memtype float!");
+      // pipeReadRecord(pstreamptr, data, nmiss);
+    }
+  else
+#endif
+    {
+      if (processNum == 1 && ompNumThreads == 1)
+        timer_start(timer_read);
+#ifdef  HAVE_LIBPTHREAD
+      if (cdoLockIO)
+        pthread_mutex_lock(&streamMutex);
+#endif
+      streamReadRecordF(m_fileID, data, nmiss);
+#ifdef  HAVE_LIBPTHREAD
+      if (cdoLockIO)
+        pthread_mutex_unlock(&streamMutex);
+#endif
+      if (processNum == 1 && ompNumThreads == 1)
+        timer_stop(timer_read);
+    }
 }
 
-void pstream_t::readRecord(double *data, size_t* nmiss)
+void pstream_t::readRecord(double *data, size_t *nmiss)
 {
 #ifdef  HAVE_LIBPTHREAD
   if (ispipe)
@@ -873,42 +891,6 @@ void pstream_t::readRecord(double *data, size_t* nmiss)
         pthread_mutex_lock(&streamMutex);
 #endif
       streamReadRecord(m_fileID, data, nmiss);
-#ifdef  HAVE_LIBPTHREAD
-      if (cdoLockIO)
-        pthread_mutex_unlock(&streamMutex);
-#endif
-      if (processNum == 1 && ompNumThreads == 1)
-        timer_stop(timer_read);
-    }
-}
-
-void
-pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
-{
-  if (data == NULL)
-    cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
-
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-  pstreamptr->readRecordF(data, nmiss);
-}
-
-void pstream_t::readRecordF(float *data, size_t *nmiss){
-#ifdef  HAVE_LIBPTHREAD
-  if (ispipe)
-    {
-      cdoAbort("pipeReadRecord not implemented for memtype float!");
-      // pipeReadRecord(pstreamptr, data, nmiss);
-    }
-  else
-#endif
-    {
-      if (processNum == 1 && ompNumThreads == 1)
-        timer_start(timer_read);
-#ifdef  HAVE_LIBPTHREAD
-      if (cdoLockIO)
-        pthread_mutex_lock(&streamMutex);
-#endif
-      streamReadRecordF(m_fileID, data, nmiss);
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1205,16 +1187,6 @@ pstream_t::defTimestep(int p_tsID)
     }
 }
 
-void
-pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
-{
-  if (CdoDebug::PSTREAM)
-    MESSAGE("pstreamIDdest = ",pstreamIDdest,"  pstreamIDsrc = ", pstreamIDsrc);
-
-  pstream_t *pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
-
-  pstreamptr_dest->copyRecord(pstream_to_pointer(pstreamIDsrc));
-}
 
 void pstream_t::copyRecord(pstream_t* src){
   if (ispipe || src->ispipe)

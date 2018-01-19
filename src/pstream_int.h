@@ -46,4 +46,14 @@ pstreamFileID(int pstreamID);
 
 int
 pstreamInqByteorder(int pstreamID);
+
+void
+pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
+
+void
+pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
+
+void
+pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
+
 #endif 

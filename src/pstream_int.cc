@@ -107,4 +107,33 @@ pstreamInqByteorder(int pstreamID)
   return pstreamptr->inqByteorder();
 }
 
+void
+pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
+{
+  if (data == NULL)
+    cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
 
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->readRecord(data, nmiss);
+}
+
+void
+pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
+{
+  if (data == NULL)
+    cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
+
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->readRecordF(data, nmiss);
+}
+
+void
+pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
+{
+  if (CdoDebug::PSTREAM)
+    MESSAGE("pstreamIDdest = ",pstreamIDdest,"  pstreamIDsrc = ", pstreamIDsrc);
+
+  pstream_t *pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
+
+  pstreamptr_dest->copyRecord(pstream_to_pointer(pstreamIDsrc));
+}

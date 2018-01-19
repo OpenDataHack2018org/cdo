@@ -86,13 +86,7 @@ private:
 
 pstream_t *pstream_to_pointer(int pstreamID);
 
-
 int pstreamInqRecord(int pstreamID, int *varID, int *levelID);
-
-void pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
-void pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
-void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
-
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
