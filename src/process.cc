@@ -65,7 +65,6 @@ std::map<int, char*> obase;   /*TEMP*/ //Possibly not the best solution (19.Jan.
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
-static int NumCreatedStreams;
 
 process_t::process_t(int p_ID, const char *operatorCommand) : m_ID(p_ID)
 {
@@ -423,12 +422,6 @@ processOperator(void)
 }
 
 static int
-getStreamCnt(int argc, std::vector<char *> &argv)
-{
-   return NumCreatedStreams;
-}
-
-static int
 find_wildcard(const char *string, size_t len)
 {
   int status = 0;
@@ -701,7 +694,6 @@ createProcesses(int argc, const char **argv)
   }
 
   setProcessNum(Process.size());
-  NumCreatedStreams = get_glob_argc() + obase.size();
 }
 
 void

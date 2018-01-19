@@ -70,6 +70,9 @@ static std::map<int,pstream_t> _pstream_map;
 static int next_pstream_id = 1;
 static int createdPstreams = 0;
 
+
+static void set_comp(int a, int b);  /*TEMP*/
+
 pstream_t *create_pstream()
 {
     PSTREAM_LOCK();
@@ -113,13 +116,11 @@ pstream_t *create_pstream(int processID, int pstreamIDX)
     pstream_t *new_pstream = create_pstream();
     new_pstream->pipe = std::make_shared<pipe_t>();
     new_pstream->pipe->pipeSetName(processID, pstreamIDX);
-    //new_pstream->m_name = new_pstream->pipe->name; /*TEMP*/
     new_pstream->ispipe = true;
 
     return new_pstream;
 
 }
-
 
 pstream_t * pstream_to_pointer(int idx)
 {
@@ -155,37 +156,6 @@ void pstream_t::init()
 #endif
 }
 pstream_t::pstream_t(int p_id) : self(p_id) { init(); }
-
-static void
-pstream_delete_entry(pstream_t *pstreamptr)
-{
-  int idx = pstreamptr->self;
-
-  PSTREAM_LOCK();
-
-  _pstream_map.erase(idx);
-
-  PSTREAM_UNLOCK();
-
-  if (CdoDebug::PSTREAM)
-    MESSAGE("Removed idx ", idx," from pstream list");
-}
-
-static int pstreamFindID(const char *p_name)
-{
-    std::string cur_name;
-    for(auto map_pair :  _pstream_map)
-    {
-        cur_name = map_pair.second.m_name;
-        if(!(cur_name.empty())){
-            if(cur_name.compare(p_name) == 0)
-            {
-                return map_pair.first;
-            }
-        }
-    }
-    return -1;
-}
 
 bool
 pstream_t::isPipe()
@@ -269,41 +239,6 @@ pstream_t::pstreamOpenWritePipe(const char* pipename, int filetype)
   return -1;
 #endif
 
-}
-
-static void
-set_comp(int fileID, int filetype)
-{
-  if (cdoCompress)
-    {
-      if (filetype == CDI_FILETYPE_GRB)
-        {
-          cdoCompType = CDI_COMPRESS_SZIP;
-          cdoCompLevel = 0;
-        }
-      else if (filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C)
-        {
-          cdoCompType = CDI_COMPRESS_ZIP;
-          cdoCompLevel = 1;
-        }
-    }
-
-  if (cdoCompType != CDI_COMPRESS_NONE)
-    {
-      streamDefCompType(fileID, cdoCompType);
-      streamDefCompLevel(fileID, cdoCompLevel);
-
-      if (cdoCompType == CDI_COMPRESS_SZIP
-          && (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2 && filetype != CDI_FILETYPE_NC4
-              && filetype != CDI_FILETYPE_NC4C))
-        cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
-
-      if (cdoCompType == CDI_COMPRESS_JPEG && filetype != CDI_FILETYPE_GRB2)
-        cdoWarning("JPEG compression not available for non GRIB2 data!");
-
-      if (cdoCompType == CDI_COMPRESS_ZIP && (filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C))
-        cdoWarning("Deflate compression not available for non NetCDF4 data!");
-    }
 }
 
 int pstream_t::pstreamOpenWriteFile(int filetype)
@@ -1086,12 +1021,6 @@ void pstream_t::copyRecord(pstream_t* src){
 #endif
 }
 
-void
-pstreamDebug(int debug)
-{
-  CdoDebug::PSTREAM = debug;
-}
-
 int
 pstream_t::inqFileType()
 {
@@ -1121,7 +1050,7 @@ int pstream_t::inqByteorder(){
 
   return byteorder;
 }
-
+//- - - - - - - - - - - - - - - - - - - - - - - - has to be moved 
 void
 cdoVlistCopyFlag(int vlistID2, int vlistID1)
 {
@@ -1158,11 +1087,7 @@ openUnlock(void)
 #endif
 }
 
-int get_glob_argc()
-{
-    return createdPstreams;
-}
-    void
+void
 pstreamCloseAll()
 {
   for (auto pstream_iter : _pstream_map)
@@ -1177,3 +1102,76 @@ pstreamCloseAll()
   _pstream_map.clear();
 }
 
+static void
+set_comp(int fileID, int filetype)
+{
+  if (cdoCompress)
+    {
+      if (filetype == CDI_FILETYPE_GRB)
+        {
+          cdoCompType = CDI_COMPRESS_SZIP;
+          cdoCompLevel = 0;
+        }
+      else if (filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C)
+        {
+          cdoCompType = CDI_COMPRESS_ZIP;
+          cdoCompLevel = 1;
+        }
+    }
+
+  if (cdoCompType != CDI_COMPRESS_NONE)
+    {
+      streamDefCompType(fileID, cdoCompType);
+      streamDefCompLevel(fileID, cdoCompLevel);
+
+      if (cdoCompType == CDI_COMPRESS_SZIP
+          && (filetype != CDI_FILETYPE_GRB
+              && filetype != CDI_FILETYPE_GRB2
+              && filetype != CDI_FILETYPE_NC4
+              && filetype != CDI_FILETYPE_NC4C))
+        cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
+
+      if (cdoCompType == CDI_COMPRESS_JPEG && filetype != CDI_FILETYPE_GRB2)
+        cdoWarning("JPEG compression not available for non GRIB2 data!");
+
+      if (cdoCompType == CDI_COMPRESS_ZIP && (filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C))
+        cdoWarning("Deflate compression not available for non NetCDF4 data!");
+    }
+}
+
+static int pstreamFindID(const char *p_name)
+{
+    std::string cur_name;
+    for(auto map_pair :  _pstream_map)
+    {
+        cur_name = map_pair.second.m_name;
+        if(!(cur_name.empty())){
+            if(cur_name.compare(p_name) == 0)
+            {
+                return map_pair.first;
+            }
+        }
+    }
+    return -1;
+}
+
+void
+pstreamDebug(int debug)
+{
+  CdoDebug::PSTREAM = debug;
+}
+
+static void
+pstream_delete_entry(pstream_t *pstreamptr)
+{
+  int idx = pstreamptr->self;
+
+  PSTREAM_LOCK();
+
+  _pstream_map.erase(idx);
+
+  PSTREAM_UNLOCK();
+
+  if (CdoDebug::PSTREAM)
+    MESSAGE("Removed idx ", idx," from pstream list");
+}
