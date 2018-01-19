@@ -36,21 +36,29 @@ public:
   int inqVlist();
   int inqFileType();
   int inqTimestep(int tsID);
-  void defTimestep(int p_tsID);
   bool isPipe();
   int inqByteorder();
+  size_t getNvals();
+
   int pstreamOpenReadPipe();
   int pstreamOpenWritePipe(const char* filename, int filetype);
   int pstreamOpenWriteFile(int filetype);
   void pstreamOpenReadFile(const char* filename);
-
   void openAppend(const char * p_filename);
-  void init();
+
+
+  void readRecord(double *data, size_t *nmiss);
+  void readRecordF(float *data, size_t *nmiss);
+  void copyRecord(pstream_t * dest);
+
+  void defVarList(int vlistID);
+  void defTimestep(int p_tsID);
   void defVlist(int p_vlistID);
+  void init();
   void close();
   void waitForPipe();
   void closePipe();
-  size_t getNvals();
+
   int self; //aka the id of the pstream
   std::pair<int, int> m_id;
   int mode;
@@ -72,9 +80,7 @@ public:
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
 private:
-   void createFilelist(const char *p_args);
    pstream_t();
-   void defVarList(int vlistID);
 #endif
 };
 

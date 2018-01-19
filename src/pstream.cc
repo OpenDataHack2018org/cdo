@@ -849,15 +849,19 @@ pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
     cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->readRecord(data, nmiss);
+}
 
+void pstream_t::readRecord(double *data, size_t* nmiss)
+{
 #ifdef  HAVE_LIBPTHREAD
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
       if (CdoDebug::PSTREAM)
         {
-          MESSAGE( pstreamptr->pipe->name.c_str()," pstreamID ", pstreamptr->self);
+          MESSAGE( pipe->name.c_str()," pstreamID ", self);
         }
-      pstreamptr->pipe->pipeReadRecord(pstreamptr->m_vlistID, data, nmiss);
+      pipe->pipeReadRecord(m_vlistID, data, nmiss);
     }
   else
 #endif
@@ -868,7 +872,7 @@ pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamReadRecord(pstreamptr->m_fileID, data, nmiss);
+      streamReadRecord(m_fileID, data, nmiss);
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -885,9 +889,12 @@ pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
     cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
 
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr->readRecordF(data, nmiss);
+}
 
+void pstream_t::readRecordF(float *data, size_t *nmiss){
 #ifdef  HAVE_LIBPTHREAD
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
       cdoAbort("pipeReadRecord not implemented for memtype float!");
       // pipeReadRecord(pstreamptr, data, nmiss);
@@ -901,7 +908,7 @@ pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamReadRecordF(pstreamptr->m_fileID, data, nmiss);
+      streamReadRecordF(m_fileID, data, nmiss);
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
@@ -1205,16 +1212,19 @@ pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
     MESSAGE("pstreamIDdest = ",pstreamIDdest,"  pstreamIDsrc = ", pstreamIDsrc);
 
   pstream_t *pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
-  pstream_t *pstreamptr_src = pstream_to_pointer(pstreamIDsrc);
 
-  if (pstreamptr_dest->ispipe || pstreamptr_src->ispipe)
+  pstreamptr_dest->copyRecord(pstream_to_pointer(pstreamIDsrc));
+}
+
+void pstream_t::copyRecord(pstream_t* src){
+  if (ispipe || src->ispipe)
     cdoAbort("This operator can't be combined with other operators!");
 
 #ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_lock(&streamMutex);
 #endif
-  streamCopyRecord(pstreamptr_dest->m_fileID, pstreamptr_src->m_fileID);
+  streamCopyRecord(m_fileID, src->m_fileID);
 #ifdef  HAVE_LIBPTHREAD
   if (cdoLockIO)
     pthread_mutex_unlock(&streamMutex);
