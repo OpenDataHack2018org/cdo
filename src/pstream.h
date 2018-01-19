@@ -89,9 +89,6 @@ void pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
 void pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
 void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
-void pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
-
-int pstreamFileID(int pstreamID);
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 

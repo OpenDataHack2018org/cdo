@@ -84,3 +84,19 @@ pstreamInqFiletype(int pstreamID)
   return pstream_to_pointer(pstreamID)->inqFileType();
 }
 
+void
+pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
+{
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+
+  streamInqGRIBinfo(pstreamptr->m_fileID, intnum, fltnum, bignum);
+}
+
+int
+pstreamFileID(int pstreamID)
+{
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+
+  return pstreamptr->m_fileID;
+}
+

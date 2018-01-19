@@ -1076,10 +1076,8 @@ if ( pstreamptr->m_varlist )
 
 int pstream_t::inqTimestep(int p_tsID)
 {
-
   int nrecs = 0;
 
-      
       if (processNum == 1 && ompNumThreads == 1)
         timer_start(timer_read);
 #ifdef  HAVE_LIBPTHREAD
@@ -1262,22 +1260,6 @@ pstreamInqByteorder(int pstreamID)
     byteorder = streamInqByteorder(pstreamptr->m_fileID);
 
   return byteorder;
-}
-
-void
-pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
-{
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-
-  streamInqGRIBinfo(pstreamptr->m_fileID, intnum, fltnum, bignum);
-}
-
-int
-pstreamFileID(int pstreamID)
-{
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-
-  return pstreamptr->m_fileID;
 }
 
 void
