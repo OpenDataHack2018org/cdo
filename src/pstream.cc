@@ -1245,13 +1245,6 @@ pstream_t::inqFileType()
   return filetype;
 }
 
-int
-pstreamInqByteorder(int pstreamID)
-{
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-  return pstreamptr->inqByteorder();
-}
-
 int pstream_t::inqByteorder(){
   int byteorder;
 

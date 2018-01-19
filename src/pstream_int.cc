@@ -100,3 +100,11 @@ pstreamFileID(int pstreamID)
   return pstreamptr->m_fileID;
 }
 
+int
+pstreamInqByteorder(int pstreamID)
+{
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  return pstreamptr->inqByteorder();
+}
+
+

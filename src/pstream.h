@@ -80,9 +80,6 @@ private:
 
 pstream_t *pstream_to_pointer(int pstreamID);
 
-int pstreamInqByteorder(int pstreamID);
-
-int pstreamInqTimestep(int tsID);
 
 int pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 

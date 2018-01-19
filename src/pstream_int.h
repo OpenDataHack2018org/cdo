@@ -43,4 +43,7 @@ pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
 
 int
 pstreamFileID(int pstreamID);
+
+int
+pstreamInqByteorder(int pstreamID);
 #endif 
