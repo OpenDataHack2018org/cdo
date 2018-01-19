@@ -807,18 +807,22 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
   pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
-
-  pstreamptr->m_varID = varID;
+  pstreamptr->defRecord(varID, levelID);
+}
+void
+pstream_t::defRecord(int varID, int levelID)
+{
+  m_varID = varID;
 
 #ifdef  HAVE_LIBPTHREAD
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
 
       if (CdoDebug::PSTREAM)
         {
-          MESSAGE( pstreamptr->m_name.c_str()," pstreamid ", pstreamptr->self);
+          MESSAGE( m_name.c_str()," pstreamid ", self);
         }
-      pstreamptr->pipe->pipeDefRecord(varID, levelID);
+      pipe->pipeDefRecord(varID, levelID);
     }
   else
 #endif
@@ -829,7 +833,7 @@ pstreamDefRecord(int pstreamID, int varID, int levelID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamDefRecord(pstreamptr->m_fileID, varID, levelID);
+      streamDefRecord(m_fileID, varID, levelID);
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);

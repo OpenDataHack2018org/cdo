@@ -57,6 +57,8 @@ public:
   void defVarList(int vlistID);
   void defTimestep(int p_tsID);
   void defVlist(int p_vlistID);
+  void defRecord(int varID,int levelID);
+
   void init();
   void close();
   void waitForPipe();
