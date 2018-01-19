@@ -38,6 +38,7 @@ public:
   int inqTimestep(int tsID);
   void defTimestep(int p_tsID);
   bool isPipe();
+  int inqByteorder();
   int pstreamOpenReadPipe();
   int pstreamOpenWritePipe(const char* filename, int filetype);
   int pstreamOpenWriteFile(int filetype);

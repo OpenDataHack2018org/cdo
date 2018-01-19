@@ -1249,15 +1249,18 @@ int
 pstreamInqByteorder(int pstreamID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  return pstreamptr->inqByteorder();
+}
 
+int pstream_t::inqByteorder(){
   int byteorder;
 
 #ifdef  HAVE_LIBPTHREAD
-  if (pstreamptr->ispipe)
-    byteorder = pstreamptr->m_filetype;
+  if (ispipe)
+    byteorder = m_filetype;
   else
 #endif
-    byteorder = streamInqByteorder(pstreamptr->m_fileID);
+    byteorder = streamInqByteorder(m_fileID);
 
   return byteorder;
 }

@@ -61,7 +61,7 @@ static int pthreadScope = 0;
 
 static process_t *root_process;
 std::map<int, process_t> Process;
-std::map<int, char*> obase;
+std::map<int, char*> obase;   /*TEMP*/ //Possibly not the best solution (19.Jan.2018)
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
