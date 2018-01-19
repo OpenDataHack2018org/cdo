@@ -769,18 +769,20 @@ void pstream_t::defVlist(int p_vlistID){
 int
 pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 {
-  pstream_t *pstreamptr;
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  return pstreamptr->inqRecord(varID, levelID);
+}
 
-  pstreamptr = pstream_to_pointer(pstreamID);
-
+int
+pstream_t::inqRecord(int *varID, int *levelID){
 #ifdef  HAVE_LIBPTHREAD
-  if (pstreamptr->ispipe)
+  if (ispipe)
     {
       if (CdoDebug::PSTREAM)
         {
-          MESSAGE( pstreamptr->pipe->name.c_str()," pstreamID ", pstreamptr->self);
+          MESSAGE( pipe->name.c_str()," pstreamID ", self);
         }
-      pstreamptr->pipe->pipeInqRecord(varID, levelID);
+      pipe->pipeInqRecord(varID, levelID);
     }
 
   else
@@ -792,7 +794,7 @@ pstreamInqRecord(int pstreamID, int *varID, int *levelID)
       if (cdoLockIO)
         pthread_mutex_lock(&streamMutex);
 #endif
-      streamInqRecord(pstreamptr->m_fileID, varID, levelID);
+      streamInqRecord(m_fileID, varID, levelID);
 #ifdef  HAVE_LIBPTHREAD
       if (cdoLockIO)
         pthread_mutex_unlock(&streamMutex);
