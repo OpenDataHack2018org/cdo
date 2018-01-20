@@ -752,7 +752,7 @@ void remapInit(remapType *remap)
 }
 
 static
-void genRemapWeights(RemapType mapType, remapType *remap, int numNeighbors)
+void remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
 {
   if      ( mapType == RemapType::CONSERV     ) scrip_remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
   else if ( mapType == RemapType::BILINEAR    ) scrip_remap_bilinear_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
@@ -765,6 +765,15 @@ void genRemapWeights(RemapType mapType, remapType *remap, int numNeighbors)
 		  
   if ( remap->vars.sort_add ) sort_remap_add(&remap->vars);
   if ( remap->vars.links_per_value == -1 ) links_per_value(&remap->vars);
+}
+
+static
+void remapField(RemapType mapType, remapType *remap, int numNeighbors, double *array1, double *array2, double missval)
+{
+  if      ( mapType == RemapType::BILINEAR    ) scrip_remap_bilinear(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+  else if ( mapType == RemapType::BICUBIC     ) scrip_remap_bicubic(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+  else if ( mapType == RemapType::DISTWGT     ) remap_distwgt(numNeighbors, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+  else if ( mapType == RemapType::CONSERV_YAC ) remap_conserv(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
 }
 
 void *Remap(void *argument)
@@ -1109,7 +1118,7 @@ void *Remap(void *argument)
 
                   if ( remap_genweights )
                     {
-                      genRemapWeights(mapType, &remaps[r], numNeighbors);
+                      remapGenWeights(mapType, &remaps[r], numNeighbors);
 
                       if ( writeRemap ) goto WRITE_REMAP;
 
@@ -1148,10 +1157,7 @@ void *Remap(void *argument)
                 }
               else
                 {
-                  if      ( mapType == RemapType::BILINEAR    ) scrip_remap_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, &array1[0], &array2[0], missval);
-                  else if ( mapType == RemapType::BICUBIC     ) scrip_remap_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, &array1[0], &array2[0], missval);
-                  else if ( mapType == RemapType::DISTWGT     ) remap_distwgt(numNeighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &array1[0], &array2[0], missval);
-                  else if ( mapType == RemapType::CONSERV_YAC ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &array1[0], &array2[0], missval);
+                  remapField(mapType, &remaps[r], numNeighbors, &array1[0], &array2[0], missval);
                 }
 
               gridsize2 = gridInqSize(gridID2);
