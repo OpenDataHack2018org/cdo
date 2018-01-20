@@ -98,10 +98,10 @@ int find_name(int vlistID, char *name)
   return CDI_UNDEFID;
 }
 
-enum OUTMODE {OUTMODE_NEW, OUTMODE_APPEND, OUTMODE_REPLACE};
+enum struct OutMode {NEW, APPEND, REPLACE};
 
 // Parameter
-int outMode = OUTMODE_NEW;
+OutMode outMode(OutMode::NEW);
 int boundOpt = -1;
 char name_u[CDI_MAX_NAME], name_v[CDI_MAX_NAME];
 
@@ -109,7 +109,7 @@ static
 void print_parameter(void)
 {
   cdoPrint("u=%s, v=%s, boundOpt=%d, outMode=%s", name_u, name_v, boundOpt,
-           outMode==OUTMODE_NEW?"new":outMode==OUTMODE_APPEND?"append":"replace");
+           outMode==OutMode::NEW?"new":outMode==OutMode::APPEND?"append":"replace");
 }
 
 static
@@ -140,9 +140,9 @@ void set_parameter(void)
           else if ( STR_IS_EQ(key, "boundOpt") ) boundOpt = parameter2int(value);
           else if ( STR_IS_EQ(key, "outMode") )
             {
-              if      ( STR_IS_EQ(value, "new") ) outMode = OUTMODE_NEW;
-              else if ( STR_IS_EQ(value, "append") ) outMode = OUTMODE_APPEND;
-              else if ( STR_IS_EQ(value, "replace") ) outMode = OUTMODE_REPLACE;
+              if      ( STR_IS_EQ(value, "new") ) outMode = OutMode::NEW;
+              else if ( STR_IS_EQ(value, "append") ) outMode = OutMode::APPEND;
+              else if ( STR_IS_EQ(value, "replace") ) outMode = OutMode::REPLACE;
               else cdoAbort("Invalid parameter key value: outMode=%s (valid are: new/append/replace)", value);
             }
           else cdoAbort("Invalid parameter key >%s<!", key);
@@ -174,9 +174,9 @@ void *NCL_wind(void *argument)
 
   int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = CDI_UNDEFID;
-  if ( outMode == OUTMODE_NEW )
+  if ( outMode == OutMode::NEW )
     vlistID2 = vlistCreate();
-  else if ( outMode == OUTMODE_APPEND )
+  else if ( outMode == OutMode::APPEND )
     vlistID2 = vlistDuplicate(vlistID1);
   else
     cdoAbort("outMode=%d unsupported!", outMode);
@@ -210,7 +210,6 @@ void *NCL_wind(void *argument)
 
   if ( nlev != zaxisInqSize(vlistInqVarZaxis(vlistID1, varIDv)) )
     cdoAbort("u and v must have the same number of level!");
-
 
   double missvalu = vlistInqVarMissval(vlistID1, varIDu);
   double missvalv = vlistInqVarMissval(vlistID1, varIDv);
@@ -271,7 +270,7 @@ void *NCL_wind(void *argument)
               if ( varID == varIDv ) { memcpy(arrayv+levelID*gridsizeuv, array, gridsizeuv*sizeof(double)); nmissv += nmiss; }
             }
 
-          if ( outMode == OUTMODE_APPEND )
+          if ( outMode == OutMode::APPEND )
             {
               pstreamDefRecord(streamID2, varID, levelID);
               pstreamWriteRecord(streamID2, array, nmiss);
