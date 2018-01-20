@@ -94,8 +94,8 @@ void *Vertintap(void *argument)
   // clang-format on
 
   int operatorID = cdoOperatorID();
-  int operfunc   = cdoOperatorF1(operatorID);
-  int opertype   = cdoOperatorF2(operatorID);
+  bool useHightLevel = cdoOperatorF1(operatorID) == func_hl;
+  bool useLogType = cdoOperatorF2(operatorID) == type_log;
 
   if ( operatorID == AP2PL || operatorID == AP2HL || operatorID == AP2PL_LP )
     {
@@ -119,7 +119,7 @@ void *Vertintap(void *argument)
   double *plev = NULL;
   if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
     {
-      if ( operfunc == func_hl )
+      if ( useHightLevel )
         {
           double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
@@ -152,7 +152,7 @@ void *Vertintap(void *argument)
 
   size_t gridsize = vlist_check_gridsize(vlistID1);
 
-  int zaxistype = (operfunc == func_hl) ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
+  int zaxistype = useHightLevel ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
   int zaxisIDp = zaxisCreate(zaxistype, nplev);
   zaxisDefLevels(zaxisIDp, plev);
 
@@ -260,7 +260,7 @@ void *Vertintap(void *argument)
   else
     cdoWarning("No 3D variable with generalized height level found!");
 
-  if ( operfunc == func_hl )
+  if ( useHightLevel )
     {
       std::vector<double> phlev(nplev);
       height2pressure(&phlev[0], plev, nplev);
@@ -272,7 +272,7 @@ void *Vertintap(void *argument)
       memcpy(plev, &phlev[0], nplev*sizeof(double));
     }
 
-  if ( opertype == type_log )
+  if ( useLogType )
     for ( int k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -396,7 +396,7 @@ void *Vertintap(void *argument)
               half_press[k*gridsize+i] = 0.5*(full_press[(k-1)*gridsize+i]+full_press[k*gridsize+i]);
           for ( size_t i = 0; i < gridsize; i++ ) half_press[(nhlevh-1)*gridsize+i] = full_press[(nhlevf-1)*gridsize+i];
           
-	  if ( opertype == type_log )
+	  if ( useLogType )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
 	      for ( size_t ki = 0; ki < nhlevh*gridsize; ki++ ) half_press[ki] = log(half_press[ki]);

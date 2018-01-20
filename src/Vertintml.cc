@@ -79,6 +79,7 @@ void *Vertintml(void *argument)
 
   cdoInitialize(argument);
 
+  // clang-format off
   int ML2PL     = cdoOperatorAdd("ml2pl",     func_pl, type_lin, "pressure levels in pascal");
   int ML2PLX    = cdoOperatorAdd("ml2plx",    func_pl, type_lin, "pressure levels in pascal");
   int ML2HL     = cdoOperatorAdd("ml2hl",     func_hl, type_lin, "height levels in meter");
@@ -87,10 +88,11 @@ void *Vertintml(void *argument)
   int ML2PLX_LP = cdoOperatorAdd("ml2plx_lp", func_pl, type_log, "pressure levels in pascal");
   int ML2HL_LP  = cdoOperatorAdd("ml2hl_lp",  func_hl, type_log, "height levels in meter");
   int ML2HLX_LP = cdoOperatorAdd("ml2hlx_lp", func_hl, type_log, "height levels in meter");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
-  int operfunc   = cdoOperatorF1(operatorID);
-  int opertype   = cdoOperatorF2(operatorID);
+  bool useHightLevel = cdoOperatorF1(operatorID) == func_hl;
+  bool useLogType = cdoOperatorF2(operatorID) == type_log;
 
   if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
     {
@@ -113,7 +115,7 @@ void *Vertintml(void *argument)
   double *plev = NULL;
   if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
     {
-      if ( operfunc == func_hl )
+      if ( useHightLevel )
         {
           double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
@@ -146,7 +148,7 @@ void *Vertintml(void *argument)
 
   size_t gridsize = vlist_check_gridsize(vlistID1);
 
-  int zaxistype = (operfunc == func_hl) ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
+  int zaxistype = useHightLevel ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
   int zaxisIDp = zaxisCreate(zaxistype, nplev);
   zaxisDefLevels(zaxisIDp, plev);
 
@@ -225,7 +227,7 @@ void *Vertintml(void *argument)
   else
     cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
 
-  if ( operfunc == func_hl )
+  if ( useHightLevel )
     {
       std::vector<double> phlev(nplev);
       height2pressure(&phlev[0], plev, nplev);
@@ -237,7 +239,7 @@ void *Vertintml(void *argument)
       memcpy(plev, &phlev[0], nplev*sizeof(double));
     }
 
-  if ( opertype == type_log )
+  if ( useLogType )
     for ( int k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
   bool useTable = false;
@@ -515,7 +517,7 @@ void *Vertintml(void *argument)
 
 	  presh(&full_press[0], &half_press[0], vct, &ps_prog[0], nhlevf, gridsize);
 
-	  if ( opertype == type_log )
+	  if ( useLogType )
 	    {
 	      for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
 	      for ( size_t ki = 0; ki < nhlevh*gridsize; ki++ ) half_press[ki] = log(half_press[ki]);
@@ -573,7 +575,7 @@ void *Vertintml(void *argument)
 		      if ( nlevel == nhlevh )
 			cdoAbort("Temperature on half level unsupported!");
 
-		      if ( opertype == type_log && extrapolate )
+		      if ( useLogType && extrapolate )
 			cdoAbort("Log. extrapolation of temperature unsupported!");
 
 		      interp_T(&sgeopot[0], vardata1[varID], vardata2[varID],
