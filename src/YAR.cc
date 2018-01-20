@@ -140,7 +140,7 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weigh
 void yar_remap_bil(field_type *field1, field_type *field2)
 {
   double dxIn, dxOut;
-  remap_t remap;
+  remapType remap;
   /* static int index = 0; */
 
   int gridIDin  = field1->grid;
@@ -382,7 +382,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
   double *xlonIn, *xlatIn;
   double *xlonOut, *xlatOut;
   double dxIn, dxOut;
-  remap_t remap;
+  remapType remap;
   /* static int index = 0; */
 
   gridIDin  = field1->grid;

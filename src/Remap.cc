@@ -743,7 +743,7 @@ void sort_remap_add(remapvars_t *remapvars)
 }
 
 static
-void remapInit(remap_t *remap)
+void remapInit(remapType *remap)
 {
   remap->nused    = 0;
   remap->gridID   = -1;
@@ -858,7 +858,7 @@ void *Remap(void *argument)
   if ( max_remaps == -1 ) max_remaps = set_max_remaps(vlistID1);
   if ( max_remaps < 1 ) cdoAbort("max_remaps out of range (>0)!");
 
-  std::vector<remap_t> remaps(max_remaps);
+  std::vector<remapType> remaps(max_remaps);
   for ( r = 0; r < max_remaps; r++ ) remapInit(&remaps[r]);
 
   if ( writeRemap || lremapxxx ) remap_genweights = true;
@@ -958,8 +958,7 @@ void *Remap(void *argument)
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      if ( ! writeRemap ) 
-	pstreamDefTimestep(streamID2, tsID);
+      if ( ! writeRemap ) pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
@@ -1017,7 +1016,7 @@ void *Remap(void *argument)
                   remapVarsFree(&remaps[n0].vars);
                   remapGridFree(&remaps[n0].src_grid);
                   remapGridFree(&remaps[n0].tgt_grid);
-                  for ( r = n0+1; r < nremaps; r++ ) memcpy(&remaps[r-1], &remaps[r], sizeof(remap_t));
+                  for ( r = n0+1; r < nremaps; r++ ) memcpy(&remaps[r-1], &remaps[r], sizeof(remapType));
                   r = nremaps - 1;
                   remapInit(&remaps[r]);
 		}
@@ -1111,8 +1110,7 @@ void *Remap(void *argument)
 
 	  if ( gridInqType(gridID1) == GRID_GME )
 	    {
-	      size_t j = 0;
-	      for ( size_t i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0, j = 0; i < gridsize; i++ )
 		if ( remaps[r].src_grid.vgpm[i] ) array1[j++] = array1[i];
 	    }
 	  
@@ -1177,9 +1175,7 @@ void *Remap(void *argument)
 	  vlistInqVarName(vlistID1, varID, varname);
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON )
 	    if ( strcmp(varname, "gridbox_area") == 0 )
-	      {
-		scale_gridbox_area(gridsize, &array1[0], gridsize2, &array2[0], remaps[r].tgt_grid.cell_area);
-	      }
+              scale_gridbox_area(gridsize, &array1[0], gridsize2, &array2[0], remaps[r].tgt_grid.cell_area);
 
 	  /* calculate some statistics */
 	  if ( cdoVerbose )

@@ -135,7 +135,7 @@ typedef struct {
   remapgrid_t tgt_grid;
   remapvars_t vars;
 }
-remap_t;
+remapType;
 
 #define  REMAP_STORE_LINK_FAST  1
 #define  REMAP_WRITE_REMAP      2
