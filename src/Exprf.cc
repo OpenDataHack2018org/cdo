@@ -315,20 +315,39 @@ void params_delete(paramType *params)
     }
 }
 
+static
+void parseParamInit(parseParamType *parse_arg, int vlistID, int pointID, int surfaceID, paramType *params)
+{
+  int nvars = vlistNvars(vlistID);
+  int ngrids = vlistNgrids(vlistID);
+  int nzaxis = vlistNzaxis(vlistID);
+  int maxcoords = ngrids*4+nzaxis;
+
+  parse_arg->maxparams  = MAX_PARAMS;
+  parse_arg->nparams    = nvars;
+  parse_arg->nvars1     = nvars;
+  parse_arg->init       = true;
+  parse_arg->debug      = cdoVerbose != 0;
+  parse_arg->params     = params;
+  parse_arg->pointID    = pointID;
+  parse_arg->surfaceID  = surfaceID;
+  parse_arg->needed     = (bool*) Malloc(nvars*sizeof(bool));
+  parse_arg->coords     = (coordType*) Malloc(maxcoords*sizeof(coordType));
+  parse_arg->maxcoords  = maxcoords;
+  parse_arg->ncoords    = 0;
+}
+
 
 void *Expr(void *argument)
 {
   cdoInitialize(argument);
 
-  parseParamType parse_arg;
   void *scanner;
   int yy_scan_string(const char *str, void *scanner);
-
   yylex_init(&scanner);
-  yyset_extra(&parse_arg, scanner);
 
-#define REPLACES_VARIABLES(id) cdoOperatorF1(id)
-#define READS_COMMAND_LINE(id) cdoOperatorF2(id)
+  parseParamType parse_arg;
+  yyset_extra(&parse_arg, scanner);
 
   // clang-format off
   cdoOperatorAdd("expr",   1, 1, "expressions");
@@ -338,11 +357,12 @@ void *Expr(void *argument)
   // clang-format on
 
   int operatorID = cdoOperatorID();
+  bool replacesVariables = cdoOperatorF1(operatorID);
+  bool readsCommandLine = cdoOperatorF2(operatorID);
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  char *exprs = READS_COMMAND_LINE(operatorID) ?
-    exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
+  char *exprs = readsCommandLine ? exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
   int vlistID1 = pstreamInqVlist(streamID1);
@@ -351,32 +371,17 @@ void *Expr(void *argument)
   if ( cdoVerbose ) cdoPrint(exprs);
 
   int nvars1 = vlistNvars(vlistID1);
-  int ngrids = vlistNgrids(vlistID1);
-  int nzaxis = vlistNzaxis(vlistID1);
-  int maxcoords = ngrids*4+nzaxis;
 
   int pointID   = gridCreate(GRID_GENERIC, 1);
   int surfaceID = getSurfaceID(vlistID1);
 
   paramType *params = params_new(vlistID1);
 
-  parse_arg.maxparams  = MAX_PARAMS;
-  parse_arg.nparams    = nvars1;
-  parse_arg.nvars1     = nvars1;
-  parse_arg.init       = true;
-  parse_arg.debug      = false;
-  if ( cdoVerbose ) parse_arg.debug = true;
-  parse_arg.params     = params;
-  parse_arg.pointID    = pointID;
-  parse_arg.surfaceID  = surfaceID;
-  parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
-  parse_arg.coords     = (coordType*) Malloc(maxcoords*sizeof(coordType));
-  parse_arg.maxcoords  = maxcoords;
-  parse_arg.ncoords    = 0;
+  parseParamInit(&parse_arg, vlistID1, pointID, surfaceID, params);
   
   /* Set all input variables to 'needed' if replacing is switched off */
   for ( int varID = 0; varID < nvars1; varID++ )
-    parse_arg.needed[varID] = ! REPLACES_VARIABLES(operatorID);
+    parse_arg.needed[varID] = ! replacesVariables;
 
   int vartsID = params_add_ts(&parse_arg);
   parse_arg.tsID = vartsID;
@@ -402,7 +407,7 @@ void *Expr(void *argument)
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
 
   int vlistID2 = vlistCreate();
-  if ( ! REPLACES_VARIABLES(operatorID) )
+  if ( ! replacesVariables )
     {
       vlistClearFlag(vlistID1);
       int pidx = 0;
@@ -682,6 +687,8 @@ void *Expr(void *argument)
       Free(parse_arg.coords);
     }
   if ( varIDmap ) Free(varIDmap);
+
+  gridDestroy(pointID);
 
   cdoFinish();
 
