@@ -751,6 +751,21 @@ void remapInit(remapType *remap)
   remap->nmiss    = 0;        
 }
 
+static
+void genRemapWeights(RemapType mapType, remapType *remap, int numNeighbors)
+{
+  if      ( mapType == RemapType::CONSERV     ) scrip_remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+  else if ( mapType == RemapType::BILINEAR    ) scrip_remap_bilinear_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+  else if ( mapType == RemapType::BICUBIC     ) scrip_remap_bicubic_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+  else if ( mapType == RemapType::DISTWGT     ) remap_distwgt_weights(numNeighbors, &remap->src_grid, &remap->tgt_grid, &remap->vars);
+  else if ( mapType == RemapType::CONSERV_YAC ) remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+
+  if ( mapType == RemapType::CONSERV && remap->vars.num_links != remap->vars.max_links )
+    resize_remap_vars(&remap->vars, remap->vars.num_links-remap->vars.max_links);
+		  
+  if ( remap->vars.sort_add ) sort_remap_add(&remap->vars);
+  if ( remap->vars.links_per_value == -1 ) links_per_value(&remap->vars);
+}
 
 void *Remap(void *argument)
 {
@@ -859,7 +874,7 @@ void *Remap(void *argument)
   if ( max_remaps < 1 ) cdoAbort("max_remaps out of range (>0)!");
 
   std::vector<remapType> remaps(max_remaps);
-  for ( r = 0; r < max_remaps; r++ ) remapInit(&remaps[r]);
+  for ( int r = 0; r < max_remaps; r++ ) remapInit(&remaps[r]);
 
   if ( writeRemap || lremapxxx ) remap_genweights = true;
 
@@ -1094,17 +1109,7 @@ void *Remap(void *argument)
 
                   if ( remap_genweights )
                     {
-                      if      ( mapType == RemapType::CONSERV     ) scrip_remap_conserv_weights(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-                      else if ( mapType == RemapType::BILINEAR    ) scrip_remap_bilinear_weights(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-                      else if ( mapType == RemapType::BICUBIC     ) scrip_remap_bicubic_weights(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-                      else if ( mapType == RemapType::DISTWGT     ) remap_distwgt_weights(numNeighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-                      else if ( mapType == RemapType::CONSERV_YAC ) remap_conserv_weights(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-
-                      if ( mapType == RemapType::CONSERV && remaps[r].vars.num_links != remaps[r].vars.max_links )
-                        resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
-		  
-                      if ( remaps[r].vars.sort_add ) sort_remap_add(&remaps[r].vars);
-                      if ( remaps[r].vars.links_per_value == -1 ) links_per_value(&remaps[r].vars);
+                      genRemapWeights(mapType, &remaps[r], numNeighbors);
 
                       if ( writeRemap ) goto WRITE_REMAP;
 
@@ -1222,7 +1227,7 @@ void *Remap(void *argument)
   if ( lremapxxx && remap_genweights && remaps[0].nused == 0 )
     print_remap_warning(remap_file, operfunc, &remaps[0].src_grid, remaps[0].nmiss);
       
-  for ( r = 0; r < nremaps; r++ )
+  for ( int r = 0; r < nremaps; r++ )
     {
       remapVarsFree(&remaps[r].vars);
       remapGridFree(&remaps[r].src_grid);
