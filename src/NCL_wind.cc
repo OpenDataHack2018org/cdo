@@ -15,6 +15,8 @@
   GNU General Public License for more details.
 */
 
+#include <algorithm>
+
 #include <limits.h>
 
 #include <cdi.h>
@@ -159,12 +161,11 @@ void *NCL_wind(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  size_t nmiss;
 
   cdoInitialize(argument);
 
-  int UV2DV_CFD = cdoOperatorAdd("uv2dv_cfd", 0,     0, "[u, v, boundsOpt, outMode]");
-  int UV2VR_CFD = cdoOperatorAdd("uv2vr_cfd", 0,     0, "[u, v, boundsOpt, outMode]");
+  int UV2DV_CFD = cdoOperatorAdd("uv2dv_cfd", 0, 0, "[u, v, boundsOpt, outMode]");
+  int UV2VR_CFD = cdoOperatorAdd("uv2vr_cfd", 0, 0, "[u, v, boundsOpt, outMode]");
 
   int operatorID = cdoOperatorID();
 
@@ -231,11 +232,11 @@ void *NCL_wind(void *argument)
 
   vlistDefVarMissval(vlistID2, varIDo, missvalu);
   
-  double *lon = (double*) Malloc(nlon*sizeof(double));
-  double *lat = (double*) Malloc(nlat*sizeof(double));
+  std::vector<double> lon(nlon);
+  std::vector<double> lat(nlat);
 
-  gridInqXvals(gridIDu, lon);
-  gridInqYvals(gridIDu, lat);
+  gridInqXvals(gridIDu, &lon[0]);
+  gridInqYvals(gridIDu, &lat[0]);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -246,10 +247,10 @@ void *NCL_wind(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
-  double *array = (double*) Malloc(gridsizemax*sizeof(double));
-  double *arrayu = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
-  double *arrayv = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
-  double *arrayo = (double*) Malloc(nlev*gridsizeuv*sizeof(double));
+  std::vector<double> array(gridsizemax);
+  std::vector<double> arrayu(nlev*gridsizeuv);
+  std::vector<double> arrayv(nlev*gridsizeuv);
+  std::vector<double> arrayo(nlev*gridsizeuv);
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -261,19 +262,20 @@ void *NCL_wind(void *argument)
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
+          size_t nmiss;
 	  pstreamInqRecord(streamID1, &varID, &levelID);         
-          pstreamReadRecord(streamID1, array, &nmiss);
+          pstreamReadRecord(streamID1, &array[0], &nmiss);
 
           if ( varID == varIDu || varID == varIDv )
             {
-              if ( varID == varIDu ) { memcpy(arrayu+levelID*gridsizeuv, array, gridsizeuv*sizeof(double)); nmissu += nmiss; }
-              if ( varID == varIDv ) { memcpy(arrayv+levelID*gridsizeuv, array, gridsizeuv*sizeof(double)); nmissv += nmiss; }
+              if ( varID == varIDu ) { std::copy_n(&array[0], gridsizeuv, &arrayu[levelID*gridsizeuv]); nmissu += nmiss; }
+              if ( varID == varIDv ) { std::copy_n(&array[0], gridsizeuv, &arrayv[levelID*gridsizeuv]); nmissv += nmiss; }
             }
 
           if ( outMode == OutMode::APPEND )
             {
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2, array, nmiss);
+              pstreamWriteRecord(streamID2, &array[0], nmiss);
             }
         }
 
@@ -284,7 +286,7 @@ void *NCL_wind(void *argument)
             {
               for ( levelID = 0; levelID < nlev; ++levelID )
                 {
-                  double *parray = arrayv+levelID*gridsizeuv;
+                  double *parray = &arrayv[levelID*gridsizeuv];
                   for ( size_t i = 0; i < gridsizeuv; ++i )
                     if ( DBL_IS_EQUAL(parray[i], missvalv) ) parray[i] = missvalu;
                   
@@ -293,14 +295,14 @@ void *NCL_wind(void *argument)
         }
 
       if ( operatorID == UV2DV_CFD )
-        uv2dv_cfd_W(missvalu, arrayu, arrayv, lon, lat, nlon, nlat, nlev, boundOpt, arrayo);
+        uv2dv_cfd_W(missvalu, &arrayu[0], &arrayv[0], &lon[0], &lat[0], nlon, nlat, nlev, boundOpt, &arrayo[0]);
       else if ( operatorID == UV2VR_CFD )
-        uv2vr_cfd_W(missvalu, arrayu, arrayv, lon, lat, nlon, nlat, nlev, boundOpt, arrayo);
+        uv2vr_cfd_W(missvalu, &arrayu[0], &arrayv[0], &lon[0], &lat[0], nlon, nlat, nlev, boundOpt, &arrayo[0]);
 
       for ( levelID = 0; levelID < nlev; ++levelID )
         {
-          double *parray = arrayo+levelID*gridsizeuv;
-          nmiss = 0;
+          double *parray = &arrayo[levelID*gridsizeuv];
+          size_t nmiss = 0;
           for ( size_t i = 0; i < gridsizeuv; ++i )
             if ( DBL_IS_EQUAL(parray[i], missvalu) ) nmiss++;
 
@@ -315,11 +317,6 @@ void *NCL_wind(void *argument)
   pstreamClose(streamID2);
 
   vlistDestroy(vlistID2);
-
-  if ( array ) Free(array);
-  if ( arrayu ) Free(arrayu);
-  if ( arrayv ) Free(arrayv);
-  if ( arrayo ) Free(arrayo);
 
   cdoFinish();
 
