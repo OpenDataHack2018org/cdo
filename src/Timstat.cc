@@ -77,23 +77,11 @@
 #include "pstream.h"
 
 
-void *Timstat(void *argument)
+enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
+
+static
+void timstatAddOperators(void)
 {
-  enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
-  int timestat_date = TIMESTAT_MEAN;
-  int vdate0 = 0, vtime0 = 0;
-  int nrecs;
-  int varID, levelID;
-  int streamID3 = -1;
-  int vlistID3, taxisID3 = -1;
-  size_t nmiss;
-  bool lvfrac = false;
-  int nwpv; // number of words per value; real:1  complex:2
-  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
-  double vfrac = 1;
-
-  cdoInitialize(argument);
-
   // clang-format off
   cdoOperatorAdd("timrange",  func_range, DATE_LEN, NULL);
   cdoOperatorAdd("timmin",    func_min,   DATE_LEN, NULL);
@@ -145,6 +133,26 @@ void *Timstat(void *argument)
   cdoOperatorAdd("hourvar1",  func_var1,  HOUR_LEN, NULL);
   cdoOperatorAdd("hourstd",   func_std,   HOUR_LEN, NULL);
   cdoOperatorAdd("hourstd1",  func_std1,  HOUR_LEN, NULL);
+}
+
+
+void *Timstat(void *argument)
+{
+  int timestat_date = TIMESTAT_MEAN;
+  int vdate0 = 0, vtime0 = 0;
+  int nrecs;
+  int varID, levelID;
+  int streamID3 = -1;
+  int vlistID3, taxisID3 = -1;
+  size_t nmiss;
+  bool lvfrac = false;
+  int nwpv; // number of words per value; real:1  complex:2
+  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
+  double vfrac = 1;
+
+  cdoInitialize(argument);
+
+  timstatAddOperators();
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
