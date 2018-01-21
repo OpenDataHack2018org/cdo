@@ -743,6 +743,19 @@ void sort_remap_add(remapvars_t *remapvars)
 }
 
 static
+void remapSum(remapgrid_t *remapGrid, size_t gridsize, double *array, const char *tag)
+{
+  for ( size_t i = 0; i < gridsize; i++ )
+    printf("1 %zd %g %g %g %g\n", i, array[i], remapGrid->cell_frac[i], remapGrid->cell_area[i], remapGrid->cell_frac[i]);
+
+  double sum = 0;
+  for ( size_t i = 0; i < gridsize; i++ )
+    sum += remapGrid->cell_area[i];
+
+  printf("%s array sum %g\n", tag, sum);
+}
+
+static
 void remapInit(remapType *remap)
 {
   remap->nused    = 0;
@@ -776,28 +789,9 @@ void remapField(RemapType mapType, remapType *remap, int numNeighbors, double *a
   else if ( mapType == RemapType::CONSERV_YAC ) remap_conserv(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
 }
 
-void *Remap(void *argument)
+static
+void remapAddOperators(void)
 {
-  NormOpt normOpt(NormOpt::NONE);
-  RemapType mapType(RemapType::UNDEF);
-  SubmapType submapType(SubmapType::NONE);
-  bool remap_genweights = REMAP_genweights;
-  int streamID2 = -1;
-  int nrecs;
-  int varID, levelID;
-  size_t gridsize2;
-  size_t nmiss1, nmiss2;
-  int r = -1;
-  int nremaps = 0;
-  int numNeighbors = 0;
-  char varname[CDI_MAX_NAME];
-  double missval;
-  char *remap_file = NULL;
-
-  if ( cdoTimer ) init_remap_timer();
-
-  cdoInitialize(argument);
-
   // clang-format off
   cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
   cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
@@ -818,6 +812,31 @@ void *Remap(void *argument)
   cdoOperatorAdd("gennn",        GENNN,        1, NULL);
   cdoOperatorAdd("genlaf",       GENLAF,       1, NULL);
   // clang-format on
+}
+
+
+void *Remap(void *argument)
+{
+  NormOpt normOpt(NormOpt::NONE);
+  RemapType mapType(RemapType::UNDEF);
+  SubmapType submapType(SubmapType::NONE);
+  bool remap_genweights = REMAP_genweights;
+  int streamID2 = -1;
+  int nrecs;
+  int varID, levelID;
+  size_t gridsize2;
+  size_t nmiss1, nmiss2;
+  int r = -1;
+  int nremaps = 0;
+  int numNeighbors = 0;
+  char varname[CDI_MAX_NAME];
+  char *remap_file = NULL;
+
+  if ( cdoTimer ) init_remap_timer();
+
+  cdoInitialize(argument);
+
+  remapAddOperators();
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -990,9 +1009,9 @@ void *Remap(void *argument)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, &array1[0], &nmiss1);
 
-	  gridID1 = vlistInqVarGrid(vlistID1, varID);
-	  missval = vlistInqVarMissval(vlistID1, varID);
-	  gridsize = gridInqSize(gridID1);
+	  int gridID1 = vlistInqVarGrid(vlistID1, varID);
+	  double missval = vlistInqVarMissval(vlistID1, varID);
+	  size_t gridsize = gridInqSize(gridID1);
 
           bool skipVar = false;
 	  if ( !remapgrids[vlistGridIndex(vlistID1, gridID1)] )
@@ -1015,7 +1034,7 @@ void *Remap(void *argument)
               if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = true;
 
               for ( size_t i = 0; i < gridsize; i++ )
-                imask[i] = DBL_IS_EQUAL(array1[i], missval) ? FALSE : TRUE;
+                imask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
               for ( r = nremaps-1; r >= 0; r-- )
                 {
@@ -1172,19 +1191,8 @@ void *Remap(void *argument)
 
               if ( operfunc == REMAPSUM )
                 {
-                  for ( size_t i = 0; i < gridsize; i++ )
-                    printf("1 %zd %g %g %g %g\n", i, array1[i], remaps[r].src_grid.cell_frac[i], remaps[r].src_grid.cell_area[i],remaps[r].src_grid.cell_frac[i]);
-                  double array1sum = 0;
-                  for ( size_t i = 0; i < gridsize; i++ )
-                    array1sum += remaps[r].src_grid.cell_area[i];
-
-                  for ( size_t i = 0; i < gridsize2; i++ )
-                    printf("2 %zd %g %g %g %g\n", i, array2[i], remaps[r].tgt_grid.cell_frac[i],remaps[r].tgt_grid.cell_area[i],remaps[r].tgt_grid.cell_frac[i]);
-                  double array2sum = 0;
-                  for ( size_t i = 0; i < gridsize2; i++ )
-                    array2sum += remaps[r].tgt_grid.cell_area[i];
-
-                  printf("array1sum %g, array2sum %g\n", array1sum, array2sum);
+                  remapSum(&remaps[r].src_grid, gridsize, &array1[0], "src");
+                  remapSum(&remaps[r].tgt_grid, gridsize2, &array2[0], "tgt");
                 }
 
               vlistInqVarName(vlistID1, varID, varname);
