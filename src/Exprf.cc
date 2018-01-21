@@ -290,7 +290,7 @@ int params_add_ts(parseParamType *parse_arg)
       params[varID].gridID   = parse_arg->pointID;
       params[varID].zaxisID  = parse_arg->surfaceID;
       params[varID].steptype = TIME_VARYING;
-      params[varID].ngp      = 3;
+      params[varID].ngp      = CLEN;
       params[varID].nlev     = 1;
 
       parse_arg->nparams++;
@@ -596,10 +596,10 @@ void *Expr(void *argument)
       vdate0 = vdate;
       vtime0 = vtime;
 
-      params[vartsID].data[0] = tsID+1;
-      params[vartsID].data[1] = vdate;
-      params[vartsID].data[2] = vtime;
-      params[vartsID].data[3] = jdelta;
+      params[vartsID].data[CTIMESTEP] = tsID+1;
+      params[vartsID].data[CDATE] = vdate;
+      params[vartsID].data[CTIME] = vtime;
+      params[vartsID].data[CDELTAT] = jdelta;
 
       taxisCopyTimestep(taxisID2, taxisID1);
 

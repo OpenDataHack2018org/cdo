@@ -69,10 +69,10 @@ static double pt_ngp(paramType *p)       { return p->ngp;   }
 static double pt_nlev(paramType *p)      { return p->nlev;  }
 static double pt_size(paramType *p)      { return p->ngp*p->nlev; }
 static double pt_missval(paramType *p)   { return p->missval; }
-static double ts_ctimestep(double *data) { return lround(data[0]); }
-static double ts_cdate(double *data)     { return lround(data[1]); }
-static double ts_ctime(double *data)     { return lround(data[2]); }
-static double ts_cdeltat(double *data)   { return        data[3]; }
+static double ts_ctimestep(double *data) { return lround(data[CTIMESTEP]); }
+static double ts_cdate(double *data)     { return lround(data[CDATE]); }
+static double ts_ctime(double *data)     { return lround(data[CTIME]); }
+static double ts_cdeltat(double *data)   { return        data[CDELTAT]; }
 
 typedef struct {
   int type;
