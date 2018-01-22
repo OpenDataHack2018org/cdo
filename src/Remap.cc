@@ -743,6 +743,16 @@ void sort_remap_add(remapvars_t *remapvars)
 }
 
 static
+int remapGenNumBins(int ysize)
+{
+  int maxbins = 720;
+  int num_srch_bins = ysize/2 + ysize%2;
+  if ( num_srch_bins > maxbins ) num_srch_bins = maxbins;
+  if ( num_srch_bins < 1 )       num_srch_bins = 1;
+  return num_srch_bins;
+}
+
+static
 void remapSum(remapgrid_t *remapGrid, size_t gridsize, double *array, const char *tag)
 {
   for ( size_t i = 0; i < gridsize; i++ )
@@ -840,10 +850,10 @@ void *Remap(void *argument)
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
-  bool writeRemap = cdoOperatorF2(operatorID);
+  bool writeRemapWeightsOnly = cdoOperatorF2(operatorID);
   bool lremapxxx = operfunc == REMAPXXX;
 
-  remap_set_int(REMAP_WRITE_REMAP, writeRemap);
+  remap_set_int(REMAP_WRITE_REMAP, writeRemapWeightsOnly);
 
   if ( operfunc == REMAPDIS || operfunc == GENDIS ||
        operfunc == REMAPNN  || operfunc == GENNN )
@@ -904,7 +914,7 @@ void *Remap(void *argument)
   std::vector<remapType> remaps(max_remaps);
   for ( int r = 0; r < max_remaps; r++ ) remapInit(&remaps[r]);
 
-  if ( writeRemap || lremapxxx ) remap_genweights = true;
+  if ( writeRemapWeightsOnly || lremapxxx ) remap_genweights = true;
 
   if ( lremapxxx )
     {
@@ -991,7 +1001,7 @@ void *Remap(void *argument)
   size_t gridsize = gridInqSize(gridID2);
   std::vector<double> array2(gridsize);
 
-  if ( ! writeRemap )
+  if ( ! writeRemapWeightsOnly )
     {
       streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
       pstreamDefVlist(streamID2, vlistID2);
@@ -1002,7 +1012,7 @@ void *Remap(void *argument)
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      if ( ! writeRemap ) pstreamDefTimestep(streamID2, tsID);
+      if ( ! writeRemapWeightsOnly ) pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
@@ -1016,7 +1026,7 @@ void *Remap(void *argument)
           bool skipVar = false;
 	  if ( !remapgrids[vlistGridIndex(vlistID1, gridID1)] )
 	    {
-	      if ( writeRemap ) continue;
+	      if ( writeRemapWeightsOnly ) continue;
 	      else
 		{
 		  nmiss2 = nmiss1;
@@ -1080,18 +1090,7 @@ void *Remap(void *argument)
                       */
                       if ( gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == false )
                         {
-                          if ( !remap_extrapolate && mapType == RemapType::DISTWGT )
-                            {
-                              remap_num_srch_bins = 1;
-                            }
-                          else
-                            {
-                              int maxbins = 720;
-                              int ysize1 = gridInqYsize(gridID1);
-                              remap_num_srch_bins = ysize1/2 + ysize1%2;
-                              if ( remap_num_srch_bins > maxbins ) remap_num_srch_bins = maxbins;
-                              if ( remap_num_srch_bins < 1 )       remap_num_srch_bins = 1;
-                            }
+                          remap_num_srch_bins = (!remap_extrapolate && mapType == RemapType::DISTWGT) ? 1 : remapGenNumBins(gridInqYsize(gridID1));
                         }
 
                       remap_set_int(REMAP_NUM_SRCH_BINS, remap_num_srch_bins);
@@ -1139,7 +1138,7 @@ void *Remap(void *argument)
                     {
                       remapGenWeights(mapType, &remaps[r], numNeighbors);
 
-                      if ( writeRemap ) goto WRITE_REMAP;
+                      if ( writeRemapWeightsOnly ) goto WRITE_REMAP;
 
                       if ( remap_test ) reorder_links(&remaps[r].vars);
                     }
@@ -1232,7 +1231,7 @@ void *Remap(void *argument)
 
  WRITE_REMAP:
  
-  if ( writeRemap ) 
+  if ( writeRemapWeightsOnly ) 
     write_remap_scrip(cdoStreamName(1)->args, mapType, submapType, numNeighbors, remap_order,
 		      remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars);
 
