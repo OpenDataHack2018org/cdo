@@ -1,6 +1,17 @@
 CDO NEWS
 --------
 
+Version 1.9.3 (23 February 2018):
+
+   New features:
+     * expr: added time coordinate function cdate(), ctime(), cdeltat(), ctimestep() ...
+   New operators:
+     * not - logical NOT (1, if x equal 0; else 0)
+   Fixed bugs:
+     * uvDestag: target grid undefined in output
+     * runpctl: fails since release 1.8.0
+     * read of reduced Gaussian grid description file failed [Bug #8146]
+
 Version 1.9.2 (23 November 2017):
 
    Fixed bugs:

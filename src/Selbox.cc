@@ -109,7 +109,7 @@ void gengridxyvals(int gridtype, int gridID1, int gridID2, int nlon, int nlat, i
 	  if ( xunits && strncmp(xunits, "degree", 6) == 0 ) correct_xvals(nlon2, 1, xvals2);
 	}
       
-      if ( lyvals ) for ( int i = lat1;  i <= lat2;  i++ ) *pyvals2++ = yvals1[i];
+      if ( lyvals ) for ( int i = lat1;  i <= lat2; i++ ) *pyvals2++ = yvals1[i];
     }
   /*
     for ( int i = 0; i < nlat2; i++ ) printf("lat : %d %g\n", i+1, yvals2[i]);

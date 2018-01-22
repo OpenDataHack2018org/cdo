@@ -685,7 +685,7 @@ void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgr
     {
       if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
-	  src_grid->luse_cell_corners  = true;
+	  src_grid->luse_cell_corners = true;
 	  src_grid->lneed_cell_corners = true;
 	}
 
@@ -738,18 +738,10 @@ void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgr
   remap_define_grid(mapType, gridID1, src_grid, "Source");
   remap_define_grid(mapType, gridID2, tgt_grid, "Target");
 
-  if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+  if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D || tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
-      remap_define_reg2d(reg2d_src_gridID, src_grid);
-      remap_define_reg2d(reg2d_tgt_gridID, tgt_grid);
-    }
-  else if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    {
-      remap_define_reg2d(reg2d_src_gridID, src_grid);
-    }
-  else if ( tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    {
-      remap_define_reg2d(reg2d_tgt_gridID, tgt_grid);
+      if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) remap_define_reg2d(reg2d_src_gridID, src_grid);
+      if ( tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) remap_define_reg2d(reg2d_tgt_gridID, tgt_grid);
     }
   else if ( mapType != RemapType::DISTWGT
             //            && mapType != RemapType::BILINEAR
@@ -783,33 +775,14 @@ void remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_si
 
   /* Determine the number of weights */
 
-#ifdef  _OPENMP
-  if ( ompNumThreads > 1 )
-    {
-      if      ( mapType == RemapType::CONSERV     ) rv->sort_add = true;
-      else if ( mapType == RemapType::CONSERV_YAC ) rv->sort_add = false;
-      else if ( mapType == RemapType::BILINEAR    ) rv->sort_add = false;
-      else if ( mapType == RemapType::BICUBIC     ) rv->sort_add = false;
-      else if ( mapType == RemapType::DISTWGT     ) rv->sort_add = false;
-      else cdoAbort("Unknown mapping method!");
-    }
-  else
-#endif
-    {
-      if      ( mapType == RemapType::CONSERV     ) rv->sort_add = true;
-      else if ( mapType == RemapType::CONSERV_YAC ) rv->sort_add = false;
-      else if ( mapType == RemapType::BILINEAR    ) rv->sort_add = false;
-      else if ( mapType == RemapType::BICUBIC     ) rv->sort_add = false;
-      else if ( mapType == RemapType::DISTWGT     ) rv->sort_add = false;
-      else cdoAbort("Unknown mapping method!");
-    }
-
   if      ( mapType == RemapType::CONSERV     ) rv->num_wts = 3;
   else if ( mapType == RemapType::CONSERV_YAC ) rv->num_wts = 1;
   else if ( mapType == RemapType::BILINEAR    ) rv->num_wts = 1;
   else if ( mapType == RemapType::BICUBIC     ) rv->num_wts = 4;
   else if ( mapType == RemapType::DISTWGT     ) rv->num_wts = 1;
   else cdoAbort("Unknown mapping method!");
+
+  rv->sort_add = (mapType == RemapType::CONSERV);
 
   rv->links_per_value = -1;
 

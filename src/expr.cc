@@ -59,19 +59,26 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C, FT_0};
 #define MVCOMPAND(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPAND(x,y))
 #define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
 
-static double f_float(double x)        { return (float)(x); }
-static double f_int(double x)          { return (int)(x); }
-static double f_nint(double x)         { return round(x); }
-static double f_sqr(double x)          { return x*x;      }
-static double f_rad(double x)          { return x*M_PI/180.; }
-static double f_deg(double x)          { return x*180./M_PI; }
-static double pt_ngp(paramType *p)     { return p->ngp;   }
-static double pt_nlev(paramType *p)    { return p->nlev;  }
-static double pt_size(paramType *p)    { return p->ngp*p->nlev; }
-static double pt_missval(paramType *p) { return p->missval; }
-static double ts_ctimestep(double *data) { return lround(data[0]); }
-static double ts_cdate(double *data)     { return lround(data[1]); }
-static double ts_ctime(double *data)     { return lround(data[2]); }
+static double f_float(double x)          { return (float)(x); }
+static double f_int(double x)            { return (int)(x); }
+static double f_nint(double x)           { return round(x); }
+static double f_sqr(double x)            { return x*x;      }
+static double f_rad(double x)            { return x*M_PI/180.; }
+static double f_deg(double x)            { return x*180./M_PI; }
+static double pt_ngp(paramType *p)       { return p->ngp;   }
+static double pt_nlev(paramType *p)      { return p->nlev;  }
+static double pt_size(paramType *p)      { return p->ngp*p->nlev; }
+static double pt_missval(paramType *p)   { return p->missval; }
+static double ts_ctimestep(double *data) { return lround(data[CTIMESTEP]); }
+static double ts_cdate(double *data)     { return lround(data[CDATE]); }
+static double ts_ctime(double *data)     { return lround(data[CTIME]); }
+static double ts_cdeltat(double *data)   { return        data[CDELTAT]; }
+static double ts_cday(double *data)      { return        data[CDAY]; }
+static double ts_cmonth(double *data)    { return        data[CMONTH]; }
+static double ts_cyear(double *data)     { return        data[CYEAR]; }
+static double ts_csecond(double *data)   { return        data[CSECOND]; }
+static double ts_cminute(double *data)   { return        data[CMINUTE]; }
+static double ts_chour(double *data)     { return        data[CHOUR]; }
 
 typedef struct {
   int type;
@@ -150,6 +157,13 @@ static func_t fun_sym_tbl[] =
   {FT_0, 0, "ctimestep", (double (*)()) ts_ctimestep},
   {FT_0, 0, "cdate",     (double (*)()) ts_cdate},
   {FT_0, 0, "ctime",     (double (*)()) ts_ctime},
+  {FT_0, 0, "cdeltat",   (double (*)()) ts_cdeltat},
+  {FT_0, 0, "cday",      (double (*)()) ts_cday},
+  {FT_0, 0, "cmonth",    (double (*)()) ts_cmonth},
+  {FT_0, 0, "cyear",     (double (*)()) ts_cyear},
+  {FT_0, 0, "csecond",   (double (*)()) ts_csecond},
+  {FT_0, 0, "cminute",   (double (*)()) ts_cminute},
+  {FT_0, 0, "chour",     (double (*)()) ts_chour},
 
   {FT_1C, 0, "sellevel",  NULL},
   {FT_1C, 0, "sellevidx", NULL},
@@ -980,7 +994,7 @@ size_t get_levidx(size_t nlev, const double *data, double value, const char *fun
 }
 
 static
-nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t *parse_arg)
+nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parseParamType *parse_arg)
 {
   const char *funcname = fun_sym_tbl[funcID].name;            
   if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
@@ -1066,7 +1080,7 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
 }
 
 static
-nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg)
+nodeType *coord_fun(int init, int funcID, nodeType *p1, parseParamType *parse_arg)
 {
   const char *funcname = fun_sym_tbl[funcID].name;            
   if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
@@ -1423,7 +1437,7 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 }
 /*
 static
-int exNode(nodeType *p, parse_param_t *parse_arg)
+int exNode(nodeType *p, parseParamType *parse_arg)
 {
   if ( ! p ) return 0;
 
@@ -1457,7 +1471,7 @@ int param_search_name(int nparam, paramType *params, const char *name)
 }
 
 
-nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
+nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
 {
   pointID = parse_arg->pointID;
   surfaceID = parse_arg->surfaceID;
