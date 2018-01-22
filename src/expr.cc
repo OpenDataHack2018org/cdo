@@ -73,6 +73,12 @@ static double ts_ctimestep(double *data) { return lround(data[CTIMESTEP]); }
 static double ts_cdate(double *data)     { return lround(data[CDATE]); }
 static double ts_ctime(double *data)     { return lround(data[CTIME]); }
 static double ts_cdeltat(double *data)   { return        data[CDELTAT]; }
+static double ts_cday(double *data)      { return        data[CDAY]; }
+static double ts_cmonth(double *data)    { return        data[CMONTH]; }
+static double ts_cyear(double *data)     { return        data[CYEAR]; }
+static double ts_csecond(double *data)   { return        data[CSECOND]; }
+static double ts_cminute(double *data)   { return        data[CMINUTE]; }
+static double ts_chour(double *data)     { return        data[CHOUR]; }
 
 typedef struct {
   int type;
@@ -152,6 +158,12 @@ static func_t fun_sym_tbl[] =
   {FT_0, 0, "cdate",     (double (*)()) ts_cdate},
   {FT_0, 0, "ctime",     (double (*)()) ts_ctime},
   {FT_0, 0, "cdeltat",   (double (*)()) ts_cdeltat},
+  {FT_0, 0, "cday",      (double (*)()) ts_cday},
+  {FT_0, 0, "cmonth",    (double (*)()) ts_cmonth},
+  {FT_0, 0, "cyear",     (double (*)()) ts_cyear},
+  {FT_0, 0, "csecond",   (double (*)()) ts_csecond},
+  {FT_0, 0, "cminute",   (double (*)()) ts_cminute},
+  {FT_0, 0, "chour",     (double (*)()) ts_chour},
 
   {FT_1C, 0, "sellevel",  NULL},
   {FT_1C, 0, "sellevidx", NULL},

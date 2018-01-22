@@ -24,7 +24,7 @@ int fileno(FILE *stream);
 
 extern int CDO_parser_errorno;
 
-enum {CTIMESTEP, CDATE, CTIME, CDELTAT, CLEN};
+enum {CTIMESTEP, CDATE, CTIME, CDELTAT, CDAY, CMONTH, CYEAR, CSECOND, CMINUTE, CHOUR, CLEN};
 
 typedef enum { typeCon, typeVar, typeFun, typeFun1c, typeOpr, typeCom } nodeEnum;
 

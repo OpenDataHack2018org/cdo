@@ -601,6 +601,18 @@ void *Expr(void *argument)
       params[vartsID].data[CTIME] = vtime;
       params[vartsID].data[CDELTAT] = jdelta;
 
+      int year, mon, day;
+      int hour, minute, second;
+      cdiDecodeDate(vdate, &year, &mon, &day);
+      cdiDecodeTime(vtime, &hour, &minute, &second);
+
+      params[vartsID].data[CDAY] = day;
+      params[vartsID].data[CMONTH] = mon;
+      params[vartsID].data[CYEAR] = year;
+      params[vartsID].data[CSECOND] = second;
+      params[vartsID].data[CMINUTE] = minute;
+      params[vartsID].data[CHOUR] = hour;
+
       taxisCopyTimestep(taxisID2, taxisID1);
 
       pstreamDefTimestep(streamID2, tsID);

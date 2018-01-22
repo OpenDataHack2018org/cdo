@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.3
 	* Version 1.9.3 release
 
+2018-01-22  Uwe Schulzweida
+
+	*expr: added function cday(), cmonth(), cyear(), csecond(), cminute(), chour()
+
 2018-01-18  Uwe Schulzweida
 
 	* expr: added function ctimestep(), cdate(), ctime(), cdeltat()
