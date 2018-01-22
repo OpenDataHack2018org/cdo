@@ -134,6 +134,8 @@ libcdo_la_SOURCES =            \
                printinfo.h     \
                process.cc       \
                process.h       \
+               process_int.cc       \
+               process_int.h       \
                pstream.cc       \
                pstream.h       \
 			   pstream_int.cc  \
