@@ -123,7 +123,7 @@ process_t::initProcess()
   m_operatorCommand = "UNINITALIZED";
   operatorArg = "UNINITALIZED";
 
-  noper = 0;
+  m_noper = 0;
 }
 
 int
@@ -693,9 +693,6 @@ processSetInactive(void)
 #endif
 }
 
-
-
-
 void process_t::inqUserInputForOpArg(const char *enter)
 {
   int oargc = m_oargc;
@@ -761,18 +758,23 @@ void process_t::inqUserInputForOpArg(const char *enter)
 int
 cdoOperatorAdd(const char *name, int f1, int f2, const char *enter)
 {
-  process_t &process = processSelf();
-  int operID = process.noper;
+    process_t &process = processSelf();
+    return process.operatorAdd(name, f1, f2, enter);
+}
+  
+int process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
+{
+    int operID = m_noper;
 
   if (operID >= MAX_OPERATOR)
     cdoAbort("Maximum number of %d operators reached!", MAX_OPERATOR);
 
-  process.oper[operID].f1 = f1;
-  process.oper[operID].f2 = f2;
-  process.oper[operID].name = name;
-  process.oper[operID].enter = enter;
+  oper[m_noper].f1 = f1;
+  oper[m_noper].f2 = f2;
+  oper[m_noper].name = name;
+  oper[m_noper].enter = enter;
 
-  process.noper++;
+  m_noper++;
 
   return operID;
 }
@@ -781,19 +783,23 @@ int
 cdoOperatorID(void)
 {
   process_t &process = processSelf();
+  return process.getOperatorID();
+}
+
+int process_t::getOperatorID(){
   int operID = -1;
 
-  if (process.noper > 0)
+  if (m_noper > 0)
     {
-      for (operID = 0; operID < process.noper; operID++)
+      for (operID = 0; operID < m_noper; operID++)
         {
-          if (process.oper[operID].name){
-            if (strcmp(process.operatorName, process.oper[operID].name) == 0){
+          if (oper[operID].name){
+            if (strcmp(operatorName, oper[operID].name) == 0){
               break;
             }
           }
         }
-      if (operID == process.noper){
+      if (operID == m_noper){
         cdoAbort("Operator not callable by this name!");
       }
     }

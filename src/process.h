@@ -74,7 +74,7 @@ public:
   const char *operatorName;
   char *operatorArg;
   char prompt[64];
-  short noper;
+  short m_noper;
   bool m_isActive;  /*TEMP*/ //not used right now, maybe later (12.Jan.2018)
 
   modules_t m_module;
@@ -99,6 +99,8 @@ public:
   void addNvals(size_t p_nvals);
   void query_user_exit(const char *argument);
   void inqUserInputForOpArg(const char *enter);
+  int operatorAdd(const char *name, int f1, int f2, const char *enter);
+  int getOperatorID();
   const char *inqPrompt();
   pthread_t run();
 
