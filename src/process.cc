@@ -237,40 +237,6 @@ processInqNvals(int processID)
 }
 
 void
-processAddOutputStream(pstream_t *p_pstream_ptr)
-{
-  process_t &process = processSelf();
-
-  int sindex = process.getOutStreamCnt();
-
-  if (sindex >= MAX_STREAM)
-    Error("Limit of %d output streams per process reached (processID = %d)!", MAX_STREAM, process.m_ID);
-
-  process.outputStreams.push_back(p_pstream_ptr);
-}
-
-void
-processAddInputStream(pstream_t *p_pstream_ptr)
-{
-  process_t &process = processSelf();
-
-  if (p_pstream_ptr->isPipe())
-    {
-      process.nchild++;
-    }
-  else
-  {
-    }
-  int sindex = process.getInStreamCnt();
-
-  if (sindex >= MAX_STREAM)
-    Error("Limit of %d input streams per process reached (processID = %d)!", MAX_STREAM, process.m_ID);
-
-  process.inputStreams.push_back(p_pstream_ptr);
-  process.m_streamCnt++;
-}
-
-void
 processDelStream(int streamID)
 {
   UNUSED(streamID);

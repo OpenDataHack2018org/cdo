@@ -122,8 +122,6 @@ int processInqTimesteps(void);
 void processDefTimesteps(int streamID);
 int processInqInputStreamNum(void);
 int processInqOutputStreamNum(void);
-void processAddInputStream(pstream_t *p_pstream_ptr);
-void processAddOutputStream(pstream_t *p_pstream_ptr);
 void processDelStream(int streamID);
 void processDefArgument(void *vargument);
 
