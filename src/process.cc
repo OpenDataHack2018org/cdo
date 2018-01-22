@@ -540,42 +540,6 @@ process_t::hasAllInputs()
   return  m_module.streamInCnt == (inputStreams.size());
 }
 
-#if defined(HAVE_WORDEXP_H)
-/* Expands all input file wildcards and removes the 
- * wildcard while inserting all expanded files into argv
- */
-/*TEMP*/ /* MOVE TO namespace CDO (which does not exist yet)  (12.Jan.2018) */
-std::vector<std::string> expandWildCards(int argc, const char **argv)
-{
-
-    int flags = WRDE_UNDEF;
-    char **p;
-    int status;
-    wordexp_t glob_results;
-
-    //rangebased construction of new_argv, copies all argv entries into new_arg
-    std::vector<std::string> new_argv(argv, argv + argc);
-    auto argv_iter = new_argv.begin();
-
-    for(int idx = 1; idx < new_argv.size(); idx++){
-        //if argv[idx] contains wildcard (* or [?]+)
-        //multiple ** are ignored
-      if(new_argv[idx][0] != '-' && new_argv[idx].find_first_of("*?") != std::string::npos)
-      {
-          wordexp(new_argv[idx].c_str(), &glob_results, flags);
-          //range based insert (glob_results.we_wordv is inserted before wildcard
-          new_argv.insert(new_argv.begin() + idx + 1,
-                  glob_results.we_wordv,
-                  glob_results.we_wordv + glob_results.we_wordc);
-          //delete wildcard
-          new_argv.erase(new_argv.begin() + idx);
-          wordfree(&glob_results);
-      }
-    }
-
-    return new_argv;
-}
-#endif
 /*TEMP*/ /* MOVE TO namespace CDO (which does not exist yet)  (12.Jan.2018) */
 void
 createProcesses(int argc, const char **argv)

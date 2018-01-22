@@ -112,7 +112,6 @@ private:
 
 extern std::map<int, process_t> Process;
 
-std::vector<std::string> expandWildCards(int argc, const char **argv);
 pstream_t *processInqInputStream(int streamindex);
 pstream_t *processInqOutputStream(int streamindex);
 process_t &processSelf(void);

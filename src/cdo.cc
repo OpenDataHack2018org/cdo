@@ -27,6 +27,10 @@
 #include <execinfo.h>
 #endif
 
+#if defined(HAVE_WORDEXP_H)
+#include <wordexp.h>
+#endif
+
 #include <signal.h>
 #include <fenv.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
@@ -1769,9 +1773,44 @@ void init_aliases()
   add_alias("selmon"          , "selmonth");
 }
 
+#if defined(HAVE_WORDEXP_H)
+/* Expands all input file wildcards and removes the 
+ * wildcard while inserting all expanded files into argv
+ */
+std::vector<std::string> expandWildCards(int argc, const char **argv)
+{
+
+    int flags = WRDE_UNDEF;
+    char **p;
+    int status;
+    wordexp_t glob_results;
+
+    //rangebased construction of new_argv, copies all argv entries into new_arg
+    std::vector<std::string> new_argv(argv, argv + argc);
+    auto argv_iter = new_argv.begin();
+
+    for(int idx = 1; idx < new_argv.size(); idx++){
+        //if argv[idx] contains wildcard (* or [?]+)
+        //multiple ** are ignored
+      if(new_argv[idx][0] != '-' && new_argv[idx].find_first_of("*?") != std::string::npos)
+      {
+          wordexp(new_argv[idx].c_str(), &glob_results, flags);
+          //range based insert (glob_results.we_wordv is inserted before wildcard
+          new_argv.insert(new_argv.begin() + idx + 1,
+                  glob_results.we_wordv,
+                  glob_results.we_wordv + glob_results.we_wordc);
+          //delete wildcard
+          new_argv.erase(new_argv.begin() + idx);
+          wordfree(&glob_results);
+      }
+    }
+
+    return new_argv;
+}
+#endif
+
 int main(int argc, char *argv[])
 {
- 
   int lstop = FALSE;
   int noff = 0;
   int status = 0;
@@ -1785,7 +1824,7 @@ int main(int argc, char *argv[])
   CDO_Reduce_Dim = 0;
 
   /* mallopt(M_MMAP_MAX, 0); */
- 
+
   setCommandLine(argc, argv);
 
   CDO_progname = getProgname(argv[0]);
