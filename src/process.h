@@ -98,7 +98,7 @@ public:
   void addPipeOutStream();
   void addNvals(size_t p_nvals);
   void query_user_exit(const char *argument);
-  void inqUserInputForOpArg(const char *enter);;
+  void inqUserInputForOpArg(const char *enter);
   int operatorAdd(const char *name, int f1, int f2, const char *enter);
   int getOperatorID();
   void setInactive();
