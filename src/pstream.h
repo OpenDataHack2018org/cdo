@@ -84,10 +84,10 @@ public:
   std::shared_ptr<pipe_t> pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
+#endif
 private:
    pstream_t();
    void checkDatarange(int varID, double *array, size_t nmiss);
-#endif
 };
 
 pstream_t *pstream_to_pointer(int pstreamID);

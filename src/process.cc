@@ -92,11 +92,11 @@ process_t::setOperatorArgv(const char *operatorArguments)
           *operatorArg++;
           if (strlen(operatorArg))
             {
-              oargv.push_back(operatorArg);
+              m_oargv.push_back(operatorArg);
             }
         }
     }
-  oargc = oargv.size();
+  m_oargc = m_oargv.size();
 }
 
 void
@@ -119,7 +119,7 @@ process_t::initProcess()
   m_streamCnt = 0;
   m_isActive = false;
 
-  oargc = 0;
+  m_oargc = 0;
   m_operatorCommand = "UNINITALIZED";
   operatorArg = "UNINITALIZED";
 
@@ -698,8 +698,12 @@ void
 operatorInputArg(const char *enter)
 {
   process_t &process = processSelf();
+  process.inqUserInputForOpArg(enter);
+}
 
-  int oargc = process.oargc;
+void process_t::inqUserInputForOpArg(const char *enter)
+{
+  int oargc = m_oargc;
 
   if (oargc == 0)
     {
@@ -711,7 +715,7 @@ operatorInputArg(const char *enter)
       if (enter)
         {
           set_text_color(stderr, BRIGHT, MAGENTA);
-          fprintf(stderr, "%-16s : ", processInqPrompt());
+          fprintf(stderr, "%-16s : ", prompt);
           reset_text_color(stderr);
           // set_text_color(stderr, BLINK, BLACK);
           fprintf(stderr, "Enter %s > ", enter);
@@ -743,9 +747,9 @@ operatorInputArg(const char *enter)
                   while (pline[len] != ' ' && pline[len] != ',' && pline[len] != '\\' && len < linelen)
                     len++;
 
-                  process.oargv.push_back((char*)Malloc(len + 1));
-                  memcpy(process.oargv[oargc], pline, len);
-                  process.oargv[oargc][len] = '\0';
+                  m_oargv.push_back((char*)Malloc(len + 1));
+                  memcpy(m_oargv[oargc], pline, len);
+                  m_oargv[oargc][len] = '\0';
                   oargc++;
 
                   pline += len;
@@ -755,7 +759,7 @@ operatorInputArg(const char *enter)
             }
         }
 
-      process.oargc = oargc;
+      m_oargc = oargc;
     }
 }
 

@@ -78,8 +78,8 @@ public:
   bool m_isActive;  /*TEMP*/ //not used right now, maybe later (12.Jan.2018)
 
   modules_t m_module;
-  std::vector<char *> oargv;
-  int oargc;
+  std::vector<char *> m_oargv;
+  int m_oargc;
   oper_t oper[MAX_OPERATOR];
 
   process_t(int p_ID, const char *operatorCommand);
@@ -98,6 +98,7 @@ public:
   void addPipeOutStream();
   void addNvals(size_t p_nvals);
   void query_user_exit(const char *argument);
+  void inqUserInputForOpArg(const char *enter);
   const char *inqPrompt();
   pthread_t run();
 
