@@ -15,4 +15,6 @@ const char *cdoOperatorEnter(int operID);
 int cdoStreamNumber();
 int cdoStreamCnt(void);
 int cdoStreamName(int cnt);
-
+void processSetInactive();  /*TEMP*/ // function is only used in cdoFinish.
+                                     // should not be in interface for operators
+                                     // (22.Jan.2018)

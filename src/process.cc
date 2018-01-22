@@ -619,13 +619,6 @@ createProcesses(int argc, const char **argv)
 }
 
 void
-processSetInactive(void)
-{
-  process_t &process = processSelf();
-  process.setInactive();
-}
-
-void
 process_t::setInactive(){
 #ifdef  HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);

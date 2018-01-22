@@ -128,3 +128,9 @@ cdoStreamName(int cnt)
     return cnt;
 }
 
+void
+processSetInactive(void)
+{
+  process_t &process = processSelf();
+  process.setInactive();
+}
