@@ -101,6 +101,26 @@ Latitude coordinate of x (available only if x has geographical coordinates)
 Grid cell area of x (available only if x has geographical coordinates) 
 @Item = clev(x)
 Level coordinate of x (0, if x is a 2D surface variable)
+@Item = ctimestep()
+Timestep number (1 to N)
+@Item = cdate()
+Verification date as YYYYMMDD
+@Item = ctime()
+Verification time as HHMMSS.millisecond
+@Item = cdeltat()
+Difference between current and last timestep in seconds
+@Item = cday()
+Day as DD
+@Item = cmonth()
+Month as MM
+@Item = cyear()
+Year as YYYY
+@Item = csecond()
+Second as SS.millisecond
+@Item = cminute()
+Minute as MM
+@Item = chour()
+Hour as HH
 @EndList
 
 Constants:
