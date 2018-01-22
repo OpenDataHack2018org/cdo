@@ -755,12 +755,7 @@ void process_t::inqUserInputForOpArg(const char *enter)
     }
 }
 
-int
-cdoOperatorAdd(const char *name, int f1, int f2, const char *enter)
-{
-    process_t &process = processSelf();
-    return process.operatorAdd(name, f1, f2, enter);
-}
+
   
 int process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
 {
@@ -777,13 +772,6 @@ int process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
   m_noper++;
 
   return operID;
-}
-
-int
-cdoOperatorID(void)
-{
-  process_t &process = processSelf();
-  return process.getOperatorID();
 }
 
 int process_t::getOperatorID(){

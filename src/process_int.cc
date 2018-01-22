@@ -72,3 +72,16 @@ operatorInputArg(const char *enter)
   process.inqUserInputForOpArg(enter);
 }
 
+int
+cdoOperatorAdd(const char *name, int f1, int f2, const char *enter)
+{
+    process_t &process = processSelf();
+    return process.operatorAdd(name, f1, f2, enter);
+}
+
+int
+cdoOperatorID(void)
+{
+  process_t &process = processSelf();
+  return process.getOperatorID();
+}

@@ -6,3 +6,5 @@ int operatorArgc(void);
 char ** operatorArgv(void);
 void operatorCheckArgc(int numargs);
 void operatorInputArg(const char *enter);
+int cdoOperatorID(void);
+int cdoOperatorAdd(const char *name, int f1, int f2, const char *enter);

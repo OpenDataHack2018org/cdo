@@ -160,8 +160,6 @@ double timer_val(int it);
 
 int     cdoStreamNumber(void);
 int     cdoStreamCnt(void);
-int     cdoOperatorAdd(const char *name, int func, int intval, const char *enter);
-int     cdoOperatorID(void);
 int     cdoOperatorF1(int operID);
 int     cdoOperatorF2(int operID);
 const char *cdoOperatorName(int operID);
