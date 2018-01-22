@@ -118,13 +118,11 @@ process_t *processCreate(const char *command);
 void processDelete(void);
 int processInqTimesteps(void);
 void processDefTimesteps(int streamID);
-int processInqVarNum(void);
 int processInqInputStreamNum(void);
 int processInqOutputStreamNum(void);
 void processAddInputStream(pstream_t *p_pstream_ptr);
 void processAddOutputStream(pstream_t *p_pstream_ptr);
 void processDelStream(int streamID);
-void processDefVarNum(int nvars);
 void processDefArgument(void *vargument);
 
 void processStartTime(double *utime, double *stime);

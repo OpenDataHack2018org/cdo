@@ -19,6 +19,7 @@
 #define PSTREAM_INT_H
 
 #include "process.h"
+#include "process_int.h"
 #include "pstream.h"
 /*clang-format off */
 

@@ -445,6 +445,7 @@ find_wildcard(const char *string, size_t len)
   return status;
 }
 
+//used in griddes.cc
 char *
 expand_filename(const char *string)
 {
@@ -558,27 +559,6 @@ process_t::hasAllInputs()
   return  m_module.streamInCnt == (inputStreams.size());
 }
 
-
-/*TEMP*/ /* Needs update (12.Jan.2018) */
-#include <fstream>
-void print_creation_results(std::ofstream &p_outfile)
-{
- p_outfile << std::endl << "RESULTS:" << std::endl;
-  for (auto &process : Process)
-    {
-      p_outfile << "process: " << process.second.operatorName << " has children: " << std::endl;
-      for (auto child : process.second.childProcesses)
-        {
-          p_outfile << child->m_ID << ", ";
-        }
-      for (auto outstream : process.second.inputStreams)
-        {
-          p_outfile << "S: " << outstream->self << " ";
-        }
-    }
-  p_outfile << std::endl;
-}
-
 #if defined(HAVE_WORDEXP_H)
 /* Expands all input file wildcards and removes the 
  * wildcard while inserting all expanded files into argv
@@ -619,7 +599,6 @@ std::vector<std::string> expandWildCards(int argc, const char **argv)
 void
 createProcesses(int argc, const char **argv)
 {
-  std::vector<std::string> expanded_argv = expandWildCards(argc, argv);
     if(CdoDebug::PROCESS){
       MESSAGE("== Process Creation Start ==");
       MESSAGE("operators:  ",CdoDebug::argvToString(argc, argv));
@@ -697,43 +676,6 @@ createProcesses(int argc, const char **argv)
 }
 
 void
-processDefVarNum(int nvars)
-{
-  process_t &process = processSelf();
-  /*  if ( streamID == process.streams[0] ) */
-  process.nvars += nvars;
-}
-
-int
-processInqVarNum(void)
-{
-  return processSelf().nvars;
-}
-
-void
-processDefTimesteps(int streamID)
-{
-  process_t &process = processSelf();
-
-  UNUSED(streamID);
-  /*
-  int i;
-  printf("streamID %d %d %d %d\n", streamID, Process[processID].streams[0], Process[processID].streams[1], processID);
-
-  for ( i = 0; i < Process[processID].nstream; i++)
-    printf("streamID %d %d %d %d << \n", processID, Process[processID].nstream, i, Process[processID].streams[i]);
-  */
-  /*  if ( streamID == Process[processID].streams[0] )*/
-  process.ntimesteps++;
-}
-
-int
-processInqTimesteps(void)
-{
-  return processSelf().ntimesteps;
-}
-
-void
 processSetInactive(void)
 {
   process_t &process = processSelf();
@@ -751,41 +693,6 @@ processSetInactive(void)
 #endif
 }
 
-int
-operatorArgc(void)
-{
-  return processSelf().oargc;
-}
-
-char **
-operatorArgv(void)
-{
-  if(CdoDebug::PROCESS)
-  {
-      std::string oargv_str = "";
-      for( auto entry: processSelf().oargv)
-      {
-          oargv_str += std::string(entry) + " "; 
-      }
-      if(CdoDebug::PROCESS)
-      {
-        MESSAGE("Getting ",processSelf().oargv.size()," operator arguments: ", oargv_str);
-      }
-  }
-
-  return &processSelf().oargv[0];
-}
-
-void
-operatorCheckArgc(int numargs)
-{
-  int argc = processSelf().oargc;
-
-  if (argc < numargs)
-    cdoAbort("Too few arguments! Need %d found %d.", numargs, argc);
-  else if (argc > numargs)
-    cdoAbort("Too many arguments! Need %d found %d.", numargs, argc);
-}
 
 void
 operatorInputArg(const char *enter)

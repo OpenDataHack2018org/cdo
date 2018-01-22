@@ -159,9 +159,6 @@ double timer_val(int it);
 
 
 void    operatorInputArg(const char *enter);
-int     operatorArgc(void);
-char  **operatorArgv(void);
-void    operatorCheckArgc(int numargs);
 
 int     cdoStreamNumber(void);
 int     cdoStreamCnt(void);
