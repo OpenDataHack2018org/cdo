@@ -26,6 +26,7 @@ pstreamClose(int pstreamID)
   if (pstreamptr == NULL)
     ERROR("Internal problem, stream ", pstreamID ," not open!");
 
+  processSelf().addNvals(pstreamptr->getNvals());
   pstreamptr->close();
 }
 int
