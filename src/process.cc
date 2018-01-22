@@ -32,9 +32,7 @@
 #if defined(HAVE_GLOB_H)
 #include <glob.h>
 #endif
-#if defined(HAVE_WORDEXP_H)
-#include <wordexp.h>
-#endif
+
 
 #include "cdo.h"
 #include "cdo_int.h"
@@ -624,12 +622,15 @@ void
 processSetInactive(void)
 {
   process_t &process = processSelf();
+  process.setInactive();
+}
 
-// fprintf(stderr, "delete processID %d\n", processID);
+void
+process_t::setInactive(){
 #ifdef  HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 
-  process.l_threadID = 0;
+  l_threadID = 0;
 #endif
   NumProcessActive--;
 
@@ -1131,7 +1132,8 @@ cdoInitialize(void *p_process)
 
 void cdoFinish(void)
 {
-  int processID = processSelf().m_ID;
+  process_t &process = processSelf();
+  int processID = process.m_ID;
   if(CdoDebug::PROCESS) MESSAGE("Finishing process: ", processID);
   int nvars, ntimesteps;
   char memstring[32] = { "" };
@@ -1241,6 +1243,6 @@ void cdoFinish(void)
   fprintf(stderr, "\n");
 #endif
 
-  processSetInactive();
+  process.setInactive();
 }
 
