@@ -445,6 +445,7 @@ find_wildcard(const char *string, size_t len)
   return status;
 }
 
+//used in griddes.cc
 char *
 expand_filename(const char *string)
 {
@@ -558,27 +559,6 @@ process_t::hasAllInputs()
   return  m_module.streamInCnt == (inputStreams.size());
 }
 
-
-/*TEMP*/ /* Needs update (12.Jan.2018) */
-#include <fstream>
-void print_creation_results(std::ofstream &p_outfile)
-{
- p_outfile << std::endl << "RESULTS:" << std::endl;
-  for (auto &process : Process)
-    {
-      p_outfile << "process: " << process.second.operatorName << " has children: " << std::endl;
-      for (auto child : process.second.childProcesses)
-        {
-          p_outfile << child->m_ID << ", ";
-        }
-      for (auto outstream : process.second.inputStreams)
-        {
-          p_outfile << "S: " << outstream->self << " ";
-        }
-    }
-  p_outfile << std::endl;
-}
-
 #if defined(HAVE_WORDEXP_H)
 /* Expands all input file wildcards and removes the 
  * wildcard while inserting all expanded files into argv
@@ -619,7 +599,6 @@ std::vector<std::string> expandWildCards(int argc, const char **argv)
 void
 createProcesses(int argc, const char **argv)
 {
-  std::vector<std::string> expanded_argv = expandWildCards(argc, argv);
     if(CdoDebug::PROCESS){
       MESSAGE("== Process Creation Start ==");
       MESSAGE("operators:  ",CdoDebug::argvToString(argc, argv));
@@ -700,7 +679,7 @@ void
 processDefVarNum(int nvars)
 {
   process_t &process = processSelf();
-  /*  if ( streamID == process.streams[0] ) */
+  /*  if ( streamID == process.streams[0] ) */  /*TEMP*/ // check this
   process.nvars += nvars;
 }
 
