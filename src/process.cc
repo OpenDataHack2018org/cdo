@@ -694,12 +694,7 @@ processSetInactive(void)
 }
 
 
-void
-operatorInputArg(const char *enter)
-{
-  process_t &process = processSelf();
-  process.inqUserInputForOpArg(enter);
-}
+
 
 void process_t::inqUserInputForOpArg(const char *enter)
 {

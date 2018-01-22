@@ -158,8 +158,6 @@ void timer_stop(int it);
 double timer_val(int it);
 
 
-void    operatorInputArg(const char *enter);
-
 int     cdoStreamNumber(void);
 int     cdoStreamCnt(void);
 int     cdoOperatorAdd(const char *name, int func, int intval, const char *enter);

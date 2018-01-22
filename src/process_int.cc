@@ -65,3 +65,10 @@ operatorCheckArgc(int numargs)
     cdoAbort("Too many arguments! Need %d found %d.", numargs, argc);
 }
 
+void
+operatorInputArg(const char *enter)
+{
+  process_t &process = processSelf();
+  process.inqUserInputForOpArg(enter);
+}
+
