@@ -136,7 +136,7 @@ void partab(FILE *fp, int streamID, int option)
       if ( natts > 0 )
 	{
 	  fprintf(fp, "&parameter\n");
-	  fprintf(fp, "  name = _GLOBAL_\n");
+	  fprintf(fp, "  name=_GLOBAL_\n");
           printHistory(fp, streamID);
           printSource(fp, vlistID, 0);
 	  cdo_print_attributes(fp, vlistID, CDI_GLOBAL, 2);
@@ -160,14 +160,14 @@ void partab(FILE *fp, int streamID, int option)
 	{
 	  fprintf(fp, "&parameter");
 	  if ( linebreak ) fprintf(fp, "\n");
-	  fprintf(fp, "  name = _default_");
+	  fprintf(fp, "  name=_default_");
 	  if ( linebreak ) fprintf(fp, "\n");
 	  if ( datatype2str(datatype, pstr) == 0 )
 	    {
-	      fprintf(fp, "  datatype = %s", pstr);
+	      fprintf(fp, "  datatype=%s", pstr);
 	      if ( linebreak ) fprintf(fp, "\n");
 	    }
-	  fprintf(fp, "/\n");
+	  fprintf(fp, " /\n");
 	}
     }
 
@@ -186,59 +186,59 @@ void partab(FILE *fp, int streamID, int option)
       vlistInqVarLongname(vlistID, varID, varlongname);
       vlistInqVarUnits(vlistID, varID, varunits);
             
-      fprintf(fp, "  name = %s", varname);
+      fprintf(fp, "  name=%s", varname);
       if ( linebreak ) fprintf(fp, "\n");
       // if ( code   > 0 ) fprintf(fp, "  code=%d\n", code);
       // if ( tabnum > 0 ) fprintf(fp, "  table=%d\n", tabnum);
       if ( param >= 0 )
 	{
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
-	  fprintf(fp, "  param = %s", paramstr);
+	  fprintf(fp, "  param=%s", paramstr);
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       if ( strlen(varstdname) )
 	{
-	  fprintf(fp, "  standard_name = %s", varstdname);
+	  fprintf(fp, "  standard_name=%s", varstdname);
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       if ( strlen(varlongname) )
 	{
-	  fprintf(fp, "  long_name = \"%s\"", varlongname);
+	  fprintf(fp, "  long_name=\"%s\"", varlongname);
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       if ( strlen(varunits) )
 	{
-	  fprintf(fp, "  units = \"%s\"", varunits);
+	  fprintf(fp, "  units=\"%s\"", varunits);
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
 
       if ( datatype == -1 )
 	if ( datatype2str(vlistInqVarDatatype(vlistID, varID), pstr) == 0 )
 	  {
-	    fprintf(fp, "  datatype = %s", pstr);
+	    fprintf(fp, "  datatype=%s", pstr);
 	    if ( linebreak ) fprintf(fp, "\n");
 	  }
 
       int chunktype = vlistInqVarChunkType(vlistID, varID);
       if ( chunktype == CDI_CHUNK_AUTO )
 	{
-	  fprintf(fp, "  chunktype = auto");
+	  fprintf(fp, "  chunktype=auto");
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       else if ( chunktype == CDI_CHUNK_GRID )
 	{
-	  fprintf(fp, "  chunktype = grid");
+	  fprintf(fp, "  chunktype=grid");
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       if ( chunktype == CDI_CHUNK_LINES )
 	{
-	  fprintf(fp, "  chunktype = lines");
+	  fprintf(fp, "  chunktype=lines");
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       
       if ( option == 2 ) cdo_print_attributes(fp, vlistID, varID, 2);
       if ( option == 2 ) 
-	fprintf(fp, "  missing_value = %g\n", missval);
+	fprintf(fp, "  missing_value=%g\n", missval);
       
       if ( !linebreak ) fprintf(fp, "  ");
       fprintf(fp, "/\n");

@@ -209,7 +209,7 @@ paramType *params_new(int vlistID)
 }
 
 static
-void params_add_coord(parse_param_t *parse_arg, int coord, int cdiID, size_t size, const char *units, const char *longname)
+void params_add_coord(parseParamType *parse_arg, int coord, int cdiID, size_t size, const char *units, const char *longname)
 {
   int ncoords = parse_arg->ncoords;
   if ( ncoords >= parse_arg->maxcoords )
@@ -229,7 +229,7 @@ void params_add_coord(parse_param_t *parse_arg, int coord, int cdiID, size_t siz
 }
 
 
-int params_get_coordID(parse_param_t *parse_arg, int coord, int cdiID)
+int params_get_coordID(parseParamType *parse_arg, int coord, int cdiID)
 {
   int ncoords = parse_arg->ncoords;
   for ( int coordID = 0; coordID < ncoords; ++coordID )
@@ -245,7 +245,7 @@ int params_get_coordID(parse_param_t *parse_arg, int coord, int cdiID)
 }
 
 static
-void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
+void params_add_coordinates(int vlistID, parseParamType *parse_arg)
 {
   char longname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
@@ -276,7 +276,7 @@ void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
 }
 
 static
-int params_add_ts(parse_param_t *parse_arg)
+int params_add_ts(parseParamType *parse_arg)
 {
   int varID = -1;
   paramType *params = parse_arg->params;
@@ -290,7 +290,7 @@ int params_add_ts(parse_param_t *parse_arg)
       params[varID].gridID   = parse_arg->pointID;
       params[varID].zaxisID  = parse_arg->surfaceID;
       params[varID].steptype = TIME_VARYING;
-      params[varID].ngp      = 3;
+      params[varID].ngp      = CLEN;
       params[varID].nlev     = 1;
 
       parse_arg->nparams++;
@@ -315,20 +315,39 @@ void params_delete(paramType *params)
     }
 }
 
+static
+void parseParamInit(parseParamType *parse_arg, int vlistID, int pointID, int surfaceID, paramType *params)
+{
+  int nvars = vlistNvars(vlistID);
+  int ngrids = vlistNgrids(vlistID);
+  int nzaxis = vlistNzaxis(vlistID);
+  int maxcoords = ngrids*4+nzaxis;
+
+  parse_arg->maxparams  = MAX_PARAMS;
+  parse_arg->nparams    = nvars;
+  parse_arg->nvars1     = nvars;
+  parse_arg->init       = true;
+  parse_arg->debug      = cdoVerbose != 0;
+  parse_arg->params     = params;
+  parse_arg->pointID    = pointID;
+  parse_arg->surfaceID  = surfaceID;
+  parse_arg->needed     = (bool*) Malloc(nvars*sizeof(bool));
+  parse_arg->coords     = (coordType*) Malloc(maxcoords*sizeof(coordType));
+  parse_arg->maxcoords  = maxcoords;
+  parse_arg->ncoords    = 0;
+}
+
 
 void *Expr(void *process)
 {
   cdoInitialize(process);
 
-  parse_param_t parse_arg;
   void *scanner;
   int yy_scan_string(const char *str, void *scanner);
-
   yylex_init(&scanner);
-  yyset_extra(&parse_arg, scanner);
 
-#define REPLACES_VARIABLES(id) cdoOperatorF1(id)
-#define READS_COMMAND_LINE(id) cdoOperatorF2(id)
+  parseParamType parse_arg;
+  yyset_extra(&parse_arg, scanner);
 
   // clang-format off
   cdoOperatorAdd("expr",   1, 1, "expressions");
@@ -338,11 +357,12 @@ void *Expr(void *process)
   // clang-format on
 
   int operatorID = cdoOperatorID();
+  bool replacesVariables = cdoOperatorF1(operatorID);
+  bool readsCommandLine = cdoOperatorF2(operatorID);
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  char *exprs = READS_COMMAND_LINE(operatorID) ?
-    exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
+  char *exprs = readsCommandLine ? exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
 
   int streamID1 = cdoStreamOpenRead(0);
   int vlistID1 = pstreamInqVlist(streamID1);
@@ -351,32 +371,17 @@ void *Expr(void *process)
   if ( cdoVerbose ) cdoPrint(exprs);
 
   int nvars1 = vlistNvars(vlistID1);
-  int ngrids = vlistNgrids(vlistID1);
-  int nzaxis = vlistNzaxis(vlistID1);
-  int maxcoords = ngrids*4+nzaxis;
 
   int pointID   = gridCreate(GRID_GENERIC, 1);
   int surfaceID = getSurfaceID(vlistID1);
 
   paramType *params = params_new(vlistID1);
 
-  parse_arg.maxparams  = MAX_PARAMS;
-  parse_arg.nparams    = nvars1;
-  parse_arg.nvars1     = nvars1;
-  parse_arg.init       = true;
-  parse_arg.debug      = false;
-  if ( cdoVerbose ) parse_arg.debug = true;
-  parse_arg.params     = params;
-  parse_arg.pointID    = pointID;
-  parse_arg.surfaceID  = surfaceID;
-  parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
-  parse_arg.coords     = (coordType*) Malloc(maxcoords*sizeof(coordType));
-  parse_arg.maxcoords  = maxcoords;
-  parse_arg.ncoords    = 0;
+  parseParamInit(&parse_arg, vlistID1, pointID, surfaceID, params);
   
   /* Set all input variables to 'needed' if replacing is switched off */
   for ( int varID = 0; varID < nvars1; varID++ )
-    parse_arg.needed[varID] = ! REPLACES_VARIABLES(operatorID);
+    parse_arg.needed[varID] = ! replacesVariables;
 
   int vartsID = params_add_ts(&parse_arg);
   parse_arg.tsID = vartsID;
@@ -402,7 +407,7 @@ void *Expr(void *process)
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
 
   int vlistID2 = vlistCreate();
-  if ( ! REPLACES_VARIABLES(operatorID) )
+  if ( ! replacesVariables )
     {
       vlistClearFlag(vlistID1);
       int pidx = 0;
@@ -569,15 +574,44 @@ void *Expr(void *process)
   int streamID2 = cdoStreamOpenWrite(1, cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
+  int vdate0 = 0, vtime0 = 0;
+  int calendar = taxisInqCalendar(taxisID1);
+
   int nrecs;
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
-      params[vartsID].data[0] = tsID+1;
-      params[vartsID].data[1] = vdate;
-      params[vartsID].data[2] = vtime;
+
+      double jdelta = 0;
+
+      if ( tsID )
+        {
+          juldate_t juldate0 = juldate_encode(calendar, vdate0, vtime0);
+          juldate_t juldate  = juldate_encode(calendar, vdate, vtime);
+          jdelta = juldate_to_seconds(juldate_sub(juldate, juldate0));
+        }
+
+      vdate0 = vdate;
+      vtime0 = vtime;
+
+      params[vartsID].data[CTIMESTEP] = tsID+1;
+      params[vartsID].data[CDATE] = vdate;
+      params[vartsID].data[CTIME] = vtime;
+      params[vartsID].data[CDELTAT] = jdelta;
+
+      int year, mon, day;
+      int hour, minute, second;
+      cdiDecodeDate(vdate, &year, &mon, &day);
+      cdiDecodeTime(vtime, &hour, &minute, &second);
+
+      params[vartsID].data[CDAY] = day;
+      params[vartsID].data[CMONTH] = mon;
+      params[vartsID].data[CYEAR] = year;
+      params[vartsID].data[CSECOND] = second;
+      params[vartsID].data[CMINUTE] = minute;
+      params[vartsID].data[CHOUR] = hour;
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
@@ -665,6 +699,8 @@ void *Expr(void *process)
       Free(parse_arg.coords);
     }
   if ( varIDmap ) Free(varIDmap);
+
+  gridDestroy(pointID);
 
   cdoFinish();
 

@@ -22,6 +22,7 @@
 */
 
 
+#include <array>
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -93,8 +94,8 @@ void *Vertintap(void *process)
   // clang-format on
 
   int operatorID = cdoOperatorID();
-  int operfunc   = cdoOperatorF1(operatorID);
-  int opertype   = cdoOperatorF2(operatorID);
+  bool useHightLevel = cdoOperatorF1(operatorID) == func_hl;
+  bool useLogType = cdoOperatorF2(operatorID) == type_log;
 
   if ( operatorID == AP2PL || operatorID == AP2HL || operatorID == AP2PL_LP )
     {
@@ -118,7 +119,7 @@ void *Vertintap(void *process)
   double *plev = NULL;
   if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
     {
-      if ( operfunc == func_hl )
+      if ( useHightLevel )
         {
           double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
@@ -149,9 +150,9 @@ void *Vertintap(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
-  int zaxistype = (operfunc == func_hl) ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
+  int zaxistype = useHightLevel ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
   int zaxisIDp = zaxisCreate(zaxistype, nplev);
   zaxisDefLevels(zaxisIDp, plev);
 
@@ -170,11 +171,15 @@ void *Vertintap(void *process)
 
   if ( cdoVerbose )
     {
+      std::vector<std::array<char, CDI_MAX_NAME>> varNames(nvars);
+      for ( varID = 0; varID < nvars; varID++ )
+        vlistInqVarName(vlistID1, varID, &varNames[varID][0]);
+
       cdoPrint("Found:");
-      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
-      if ( apressID  != -1 ) cdoPrint("  %s", var_stdname(air_pressure));
-      if ( dpressID  != -1 ) cdoPrint("  %s", var_stdname(pressure_thickness));
-      if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
+      if ( psID     != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), &varNames[psID][0]);
+      if ( apressID != -1 ) cdoPrint("  %s -> %s", var_stdname(air_pressure), &varNames[apressID][0]);
+      if ( dpressID != -1 ) cdoPrint("  %s -> %s", var_stdname(pressure_thickness), &varNames[dpressID][0]);
+      if ( tempID   != -1 ) cdoPrint("  %s -> %s", var_stdname(air_temperature), &varNames[tempID][0]);
     }
 
   if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));
@@ -190,15 +195,14 @@ void *Vertintap(void *process)
 
           if ( is_height_axis(zaxisID, nlevel) )
             {
-              double *level = (double *) Malloc(nlevel*sizeof(double));
-              cdoZaxisInqLevels(zaxisID, level);
+              std::vector<double> level(nlevel);
+              cdoZaxisInqLevels(zaxisID, &level[0]);
               int l;
               for ( l = 0; l < nlevel; l++ )
                 {
                   if ( (l+1) != (int) (level[l]+0.5) ) break;
                 }
               if ( l == nlevel ) mono_level = true; 
-              Free(level);          
             }
       
           if ( is_height_axis(zaxisID, nlevel) && mono_level )
@@ -223,7 +227,8 @@ void *Vertintap(void *process)
 
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
-  size_t *pnmiss = extrapolate ? NULL : (size_t *) Malloc(nplev*sizeof(size_t));
+  std::vector<size_t> pnmiss;
+  if ( !extrapolate ) pnmiss.resize(nplev);
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -243,19 +248,19 @@ void *Vertintap(void *process)
 	}
     }
 
-  int *vert_index = NULL;
-  double *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
+  std::vector<int> vert_index;
+  std::vector<double> ps_prog, full_press, half_press;
   if ( zaxisIDh != -1 && gridsize > 0 )
     {
-      vert_index = (int*) Malloc(gridsize*nplev*sizeof(int));
-      ps_prog    = (double*) Malloc(gridsize*sizeof(double));
-      full_press = (double*) Malloc(gridsize*nhlevf*sizeof(double));
-      half_press = (double*) Malloc(gridsize*nhlevh*sizeof(double));
+      vert_index.resize(gridsize*nplev);
+      ps_prog.resize(gridsize);
+      full_press.resize(gridsize*nhlevf);
+      half_press.resize(gridsize*nhlevh);
     }
   else
     cdoWarning("No 3D variable with generalized height level found!");
 
-  if ( operfunc == func_hl )
+  if ( useHightLevel )
     {
       std::vector<double> phlev(nplev);
       height2pressure(&phlev[0], plev, nplev);
@@ -267,7 +272,7 @@ void *Vertintap(void *process)
       memcpy(plev, &phlev[0], nplev*sizeof(double));
     }
 
-  if ( opertype == type_log )
+  if ( useLogType )
     for ( int k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -362,51 +367,45 @@ void *Vertintap(void *process)
 	{
 	  if ( psID != -1 )
 	    {
-	      memcpy(ps_prog, vardata1[psID], gridsize*sizeof(double)); 
+	      memcpy(&ps_prog[0], vardata1[psID], gridsize*sizeof(double)); 
 	    }
           else if ( dpressID != -1 )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
+	      for ( size_t i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
 	      for ( int k = 0; k < nhlevf; ++k )
-		for ( int i = 0; i < gridsize; i++ )
+		for ( size_t i = 0; i < gridsize; i++ )
 		  ps_prog[i] += vardata1[dpressID][k*gridsize+i];
 	    }
 	  else
 	    {
-	      memcpy(ps_prog, vardata1[apressID]+gridsize*(nhlevf-1), gridsize*sizeof(double)); 
-	      //for ( int i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
+	      memcpy(&ps_prog[0], vardata1[apressID]+gridsize*(nhlevf-1), gridsize*sizeof(double)); 
+	      //for ( size_t i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
 	    }
 
 	  /* check range of ps_prog */
           double minval, maxval;
-	  minmaxval(gridsize, ps_prog, NULL, &minval, &maxval);
+	  minmaxval(gridsize, &ps_prog[0], NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
-	  memcpy(full_press, vardata1[apressID], gridsize*nhlevf*sizeof(double)); 
+	  memcpy(&full_press[0], vardata1[apressID], gridsize*nhlevf*sizeof(double)); 
 
-          for ( int i = 0; i < gridsize; i++ ) half_press[i] = 0;
+          for ( size_t i = 0; i < gridsize; i++ ) half_press[i] = 0;
           for ( int k = 1; k < nhlevf; k++ )
-            for ( int i = 0; i < gridsize; i++ )
+            for ( size_t i = 0; i < gridsize; i++ )
               half_press[k*gridsize+i] = 0.5*(full_press[(k-1)*gridsize+i]+full_press[k*gridsize+i]);
-          for ( int i = 0; i < gridsize; i++ ) half_press[(nhlevh-1)*gridsize+i] = full_press[(nhlevf-1)*gridsize+i];
+          for ( size_t i = 0; i < gridsize; i++ ) half_press[(nhlevh-1)*gridsize+i] = full_press[(nhlevf-1)*gridsize+i];
           
-	  if ( opertype == type_log )
+	  if ( useLogType )
 	    {
-	      for ( int i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
-
-	      for ( int k = 0; k < nhlevh; k++ )
-		for ( int i = 0; i < gridsize; i++ )
-		  half_press[k*gridsize+i] = log(half_press[k*gridsize+i]);
-
-	      for ( int k = 0; k < nhlevf; k++ )
-		for ( int i = 0; i < gridsize; i++ )
-		  full_press[k*gridsize+i] = log(full_press[k*gridsize+i]);
+	      for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
+	      for ( size_t ki = 0; ki < nhlevh*gridsize; ki++ ) half_press[ki] = log(half_press[ki]);
+	      for ( size_t ki = 0; ki < nhlevf*gridsize; ki++ ) full_press[ki] = log(full_press[ki]);
 	    }
 
-	  genind(vert_index, plev, full_press, gridsize, nplev, nhlevf);
+	  genind(&vert_index[0], plev, &full_press[0], gridsize, nplev, nhlevf);
 
-	  if ( !extrapolate ) genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
+	  if ( !extrapolate ) genindmiss(&vert_index[0], plev, gridsize, nplev, &ps_prog[0], &pnmiss[0]);
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -419,8 +418,8 @@ void *Vertintap(void *process)
 	      if ( varinterp[varID] )
 		{
                   double *hyb_press = NULL;
-		  if      ( nlevel == nhlevf ) hyb_press = full_press;
-		  else if ( nlevel == nhlevh ) hyb_press = half_press;
+		  if      ( nlevel == nhlevf ) hyb_press = &full_press[0];
+		  else if ( nlevel == nhlevh ) hyb_press = &half_press[0];
 		  else
 		    {
                       vlistInqVarName(vlistID1, varID, varname);
@@ -434,9 +433,9 @@ void *Vertintap(void *process)
 		    }
 
 		  interp_X(vardata1[varID], vardata2[varID], hyb_press,
-			   vert_index, plev, nplev, gridsize, nlevel, missval);
+			   &vert_index[0], plev, nplev, gridsize, nlevel, missval);
 		  
-		  if ( !extrapolate ) memcpy(varnmiss[varID], pnmiss, nplev*sizeof(size_t));
+		  if ( !extrapolate ) memcpy(varnmiss[varID], &pnmiss[0], nplev*sizeof(size_t));
 		}
 	    }
 	}
@@ -468,12 +467,6 @@ void *Vertintap(void *process)
       Free(vardata1[varID]);
       if ( varinterp[varID] ) Free(vardata2[varID]);
     }
-
-  if ( pnmiss     ) Free(pnmiss);
-  if ( ps_prog    ) Free(ps_prog);
-  if ( vert_index ) Free(vert_index);
-  if ( full_press ) Free(full_press);
-  if ( half_press ) Free(half_press);
 
   lista_destroy(flista);
 

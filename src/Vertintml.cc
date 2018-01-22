@@ -73,13 +73,13 @@ void *Vertintml(void *process)
   char paramstr[32];
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double minval, maxval;
-  double *sgeopot = NULL;
   gribcode_t gribcodes;
   memset(&gribcodes, 0, sizeof(gribcode_t));
   lista_t *flista = lista_new(FLT_LISTA);
 
   cdoInitialize(process);
 
+  // clang-format off
   int ML2PL     = cdoOperatorAdd("ml2pl",     func_pl, type_lin, "pressure levels in pascal");
   int ML2PLX    = cdoOperatorAdd("ml2plx",    func_pl, type_lin, "pressure levels in pascal");
   int ML2HL     = cdoOperatorAdd("ml2hl",     func_hl, type_lin, "height levels in meter");
@@ -88,10 +88,11 @@ void *Vertintml(void *process)
   int ML2PLX_LP = cdoOperatorAdd("ml2plx_lp", func_pl, type_log, "pressure levels in pascal");
   int ML2HL_LP  = cdoOperatorAdd("ml2hl_lp",  func_hl, type_log, "height levels in meter");
   int ML2HLX_LP = cdoOperatorAdd("ml2hlx_lp", func_hl, type_log, "height levels in meter");
+  // clang-format on
 
   int operatorID = cdoOperatorID();
-  int operfunc   = cdoOperatorF1(operatorID);
-  int opertype   = cdoOperatorF2(operatorID);
+  bool useHightLevel = cdoOperatorF1(operatorID) == func_hl;
+  bool useLogType = cdoOperatorF2(operatorID) == type_log;
 
   if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
     {
@@ -114,7 +115,7 @@ void *Vertintml(void *process)
   double *plev = NULL;
   if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
     {
-      if ( operfunc == func_hl )
+      if ( useHightLevel )
         {
           double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
@@ -145,9 +146,9 @@ void *Vertintml(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
-  int zaxistype = (operfunc == func_hl) ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
+  int zaxistype = useHightLevel ? ZAXIS_HEIGHT : ZAXIS_PRESSURE;
   int zaxisIDp = zaxisCreate(zaxistype, nplev);
   zaxisDefLevels(zaxisIDp, plev);
 
@@ -193,7 +194,8 @@ void *Vertintml(void *process)
 
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
-  size_t *pnmiss = extrapolate ? NULL : (size_t*) Malloc(nplev*sizeof(size_t));
+  std::vector<size_t> pnmiss;
+  if ( !extrapolate ) pnmiss.resize(nplev);
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -213,19 +215,19 @@ void *Vertintml(void *process)
 	}
     }
 
-  int *vert_index = NULL;
-  double *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
+  std::vector<int> vert_index;
+  std::vector<double> ps_prog, full_press, half_press;
   if ( zaxisIDh != -1 && gridsize > 0 )
     {
-      vert_index = (int*) Malloc(gridsize*nplev*sizeof(int));
-      ps_prog    = (double*) Malloc(gridsize*sizeof(double));
-      full_press = (double*) Malloc(gridsize*nhlevf*sizeof(double));
-      half_press = (double*) Malloc(gridsize*nhlevh*sizeof(double));
+      vert_index.resize(gridsize*nplev);
+      ps_prog.resize(gridsize);
+      full_press.resize(gridsize*nhlevf);
+      half_press.resize(gridsize*nhlevh);
     }
   else
     cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
 
-  if ( operfunc == func_hl )
+  if ( useHightLevel )
     {
       std::vector<double> phlev(nplev);
       height2pressure(&phlev[0], plev, nplev);
@@ -237,7 +239,7 @@ void *Vertintml(void *process)
       memcpy(plev, &phlev[0], nplev*sizeof(double));
     }
 
-  if ( opertype == type_log )
+  if ( useLogType )
     for ( int k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
   bool useTable = false;
@@ -381,20 +383,25 @@ void *Vertintml(void *process)
 
   if ( cdoVerbose )
     {
+      std::vector<std::array<char, CDI_MAX_NAME>> varNames(nvars);
+      for ( varID = 0; varID < nvars; varID++ )
+        vlistInqVarName(vlistID1, varID, &varNames[varID][0]);
+
       cdoPrint("Found:");
-      if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
-      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
-      if ( lnpsID    != -1 ) cdoPrint("  LOG(%s)", var_stdname(surface_air_pressure));
-      if ( sgeopotID != -1 ) cdoPrint("  %s", var_stdname(surface_geopotential));
-      if ( geopotID  != -1 ) cdoPrint("  %s", var_stdname(geopotential));
-      if ( gheightID != -1 ) cdoPrint("  %s", var_stdname(geopotential_height));
+      if ( tempID    != -1 ) cdoPrint("  %s -> %s", var_stdname(air_temperature), &varNames[tempID][0]);
+      if ( psID      != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), &varNames[psID][0]);
+      if ( lnpsID    != -1 ) cdoPrint("  LOG(%s) -> %s", var_stdname(surface_air_pressure), &varNames[lnpsID][0]);
+      if ( sgeopotID != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_geopotential), &varNames[sgeopotID][0]);
+      if ( geopotID  != -1 ) cdoPrint("  %s -> %s", var_stdname(geopotential), &varNames[geopotID][0]);
+      if ( gheightID != -1 ) cdoPrint("  %s -> %s", var_stdname(geopotential_height), &varNames[gheightID][0]);
     }
 
   if ( tempID != -1 || gheightID != -1 ) sgeopot_needed = true;
 
+  std::vector<double> sgeopot;
   if ( zaxisIDh != -1 && sgeopot_needed )
     {
-      sgeopot = (double*) Malloc(gridsize*sizeof(double));
+      sgeopot.resize(gridsize);
       if ( sgeopotID == -1 )
 	{
           if ( extrapolate )
@@ -404,7 +411,7 @@ void *Vertintml(void *process)
               else
                 cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
             }
-	  memset(sgeopot, 0, gridsize*sizeof(double));
+	  memset(&sgeopot[0], 0, gridsize*sizeof(double));
 	}
     }
 
@@ -482,14 +489,14 @@ void *Vertintml(void *process)
 	  if ( sgeopot_needed )
 	    {
 	      if ( sgeopotID != -1 )
-		memcpy(sgeopot, vardata1[sgeopotID], gridsize*sizeof(double));
+		memcpy(&sgeopot[0], vardata1[sgeopotID], gridsize*sizeof(double));
 	      else if ( geopotID != -1 )
-		memcpy(sgeopot, vardata1[geopotID]+gridsize*(nhlevf-1), gridsize*sizeof(double));
+		memcpy(&sgeopot[0], vardata1[geopotID]+gridsize*(nhlevf-1), gridsize*sizeof(double));
 
 	      /* check range of surface geopot */
 	      if ( extrapolate && (sgeopotID != -1 || geopotID != -1) )
 		{
-		  minmaxval(gridsize, sgeopot, NULL, &minval, &maxval);
+		  minmaxval(gridsize, &sgeopot[0], NULL, &minval, &maxval);
 		  if ( minval < MIN_FIS || maxval > MAX_FIS )
 		    cdoWarning("Surface geopotential out of range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID+1);
 		  if ( gridsize > 1 && minval >= 0 && maxval <= 9000 )
@@ -498,34 +505,28 @@ void *Vertintml(void *process)
 	    }
 
 	  if ( presID == lnpsID )
-	    for ( int i = 0; i < gridsize; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
+	    for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
 	  else if ( presID != -1 )
-	    memcpy(ps_prog, vardata1[presID], gridsize*sizeof(double));
+	    memcpy(&ps_prog[0], vardata1[presID], gridsize*sizeof(double));
 
 	  /* check range of ps_prog */
-	  minmaxval(gridsize, ps_prog, NULL, &minval, &maxval);
+	  minmaxval(gridsize, &ps_prog[0], NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID+1);
 
 
-	  presh(full_press, half_press, vct, ps_prog, nhlevf, gridsize);
+	  presh(&full_press[0], &half_press[0], vct, &ps_prog[0], nhlevf, gridsize);
 
-	  if ( opertype == type_log )
+	  if ( useLogType )
 	    {
-	      for ( int i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
-
-	      for ( int k = 0; k < nhlevh; k++ )
-		for ( int i = 0; i < gridsize; i++ )
-		  half_press[k*gridsize+i] = log(half_press[k*gridsize+i]);
-
-	      for ( int k = 0; k < nhlevf; k++ )
-		for ( int i = 0; i < gridsize; i++ )
-		  full_press[k*gridsize+i] = log(full_press[k*gridsize+i]);
+	      for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
+	      for ( size_t ki = 0; ki < nhlevh*gridsize; ki++ ) half_press[ki] = log(half_press[ki]);
+	      for ( size_t ki = 0; ki < nhlevf*gridsize; ki++ ) full_press[ki] = log(full_press[ki]);
 	    }
 
-	  genind(vert_index, plev, full_press, gridsize, nplev, nhlevf);
+	  genind(&vert_index[0], plev, &full_press[0], gridsize, nplev, nhlevf);
 
-	  if ( !extrapolate ) genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
+	  if ( !extrapolate ) genindmiss(&vert_index[0], plev, gridsize, nplev, &ps_prog[0], &pnmiss[0]);
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -555,8 +556,8 @@ void *Vertintml(void *process)
 		    }
 		  */
                   double *hyb_press = NULL;
-		  if      ( nlevel == nhlevf ) hyb_press = full_press;
-		  else if ( nlevel == nhlevh ) hyb_press = half_press;
+		  if      ( nlevel == nhlevf ) hyb_press = &full_press[0];
+		  else if ( nlevel == nhlevh ) hyb_press = &half_press[0];
 		  else
 		    {
                       vlistInqVarName(vlistID1, varID, varname);
@@ -574,29 +575,29 @@ void *Vertintml(void *process)
 		      if ( nlevel == nhlevh )
 			cdoAbort("Temperature on half level unsupported!");
 
-		      if ( opertype == type_log && extrapolate )
+		      if ( useLogType && extrapolate )
 			cdoAbort("Log. extrapolation of temperature unsupported!");
 
-		      interp_T(sgeopot, vardata1[varID], vardata2[varID],
-			       full_press, half_press, vert_index,
+		      interp_T(&sgeopot[0], vardata1[varID], vardata2[varID],
+			       &full_press[0], &half_press[0], &vert_index[0],
 			       plev, nplev, gridsize, nlevel, missval);
 		    }
 		  else if ( varID == gheightID )
 		    {
-		      for ( int i = 0; i < gridsize; ++i )
+		      for ( size_t i = 0; i < gridsize; ++i )
 			vardata1[varID][gridsize*nlevel+i] = sgeopot[i]/PlanetGrav;
 
-		      interp_Z(sgeopot, vardata1[varID], vardata2[varID],
-			       full_press, half_press, vert_index, vardata1[tempID],
+		      interp_Z(&sgeopot[0], vardata1[varID], vardata2[varID],
+			       &full_press[0], &half_press[0], &vert_index[0], vardata1[tempID],
 			       plev, nplev, gridsize, nlevel, missval);
 		    }
 		  else
 		    {
 		      interp_X(vardata1[varID], vardata2[varID], hyb_press,
-			       vert_index, plev, nplev, gridsize, nlevel, missval);
+			       &vert_index[0], plev, nplev, gridsize, nlevel, missval);
 		    }
 		  
-		  if ( !extrapolate ) memcpy(varnmiss[varID], pnmiss, nplev*sizeof(size_t));
+		  if ( !extrapolate ) memcpy(varnmiss[varID], &pnmiss[0], nplev*sizeof(size_t));
 		}
 	    }
 	}
@@ -630,13 +631,7 @@ void *Vertintml(void *process)
       if ( varinterp[varID] ) Free(vardata2[varID]);
     }
 
-  if ( pnmiss     ) Free(pnmiss);
-  if ( sgeopot    ) Free(sgeopot);
-  if ( ps_prog    ) Free(ps_prog);
-  if ( vert_index ) Free(vert_index);
-  if ( full_press ) Free(full_press);
-  if ( half_press ) Free(half_press);
-  if ( vct        ) Free(vct);
+  if ( vct ) Free(vct);
 
   lista_destroy(flista);
 

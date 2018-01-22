@@ -39,17 +39,12 @@ int   iunits[] = {1, 60, 3600, 86400, 1, 12};
 
 void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit)
 {
-  int lperiod;
-  int sign = 1;
-
   *incperiod = 0;
   *incunit   = 0;
 
-  if ( jdelta < 0 )
-    lperiod = (int)(jdelta-0.5);
-  else
-    lperiod = (int)(jdelta+0.5);
+  int lperiod = (jdelta < 0) ? (int)(jdelta-0.5) : (int)(jdelta+0.5);
 
+  int sign = 1;
   if ( lperiod < 0 )
     {
       int tmp = vdate1;
@@ -219,10 +214,8 @@ void *Tinfo(void *process)
   int vdate0 = 0, vtime0 = 0;
   int vdate = 0, vtime = 0;
   int tsID = 0, ntimeout;
-  int calendar;
   int year0, month0, day0;
   int year, month, day;
-  int unit;
   bool lforecast = false;
   int incperiod0 = 0, incunit0 = 0;
   int incperiod = 0, incunit = 0;
@@ -268,10 +261,10 @@ void *Tinfo(void *process)
 
 	      fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 		      
-	      unit = taxisInqTunit(taxisID);
+	      int unit = taxisInqTunit(taxisID);
 	      if ( unit != CDI_UNDEFID )  fprintf(stdout, "  Units = %s", tunit2str(unit));
 	      
-	      calendar = taxisInqCalendar(taxisID);
+	      int calendar = taxisInqCalendar(taxisID);
 	      if ( calendar != CDI_UNDEFID )  fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
 
 	      if ( taxisHasBounds(taxisID) )

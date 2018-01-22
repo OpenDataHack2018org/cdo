@@ -63,17 +63,11 @@ void vert_interp_lev(int gridsize, double missval, double *vardata1, double *var
 	    }
 	  else if ( IS_EQUAL(w1, 0) )
 	    {
-	      if ( w2 >= 0.5 )
-		var2[i] = var1L2[i];
-	      else
-		var2[i] = missval;	      
+              var2[i] = (w2 >= 0.5) ? var1L2[i] : missval;	      
 	    }
 	  else if ( IS_EQUAL(w2, 0) )
 	    {
-	      if ( w1 >= 0.5 )
-		var2[i] = var1L1[i];
-	      else
-		var2[i] = missval;	      
+              var2[i] = (w1 >= 0.5) ? var1L1[i] : missval;	      
 	    }
 	  else
 	    {
@@ -88,7 +82,7 @@ void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev
 		      int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   int i1;
-  int    idx1 = 0, idx2 = 0;
+  int idx1 = 0, idx2 = 0;
   double val1, val2 = 0;
 
   for ( int i2 = 0; i2 < nlev2; ++i2 )
@@ -119,19 +113,13 @@ void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev
 	      lev_idx1[i2] = 1;
 	      lev_idx2[i2] = 1;
 	      lev_wgt1[i2] = 0;
-	      if ( expol || IS_EQUAL(lev2[i2], val2) )
-		lev_wgt2[i2] = 1;
-	      else
-		lev_wgt2[i2] = 0;
+              lev_wgt2[i2] = (expol || IS_EQUAL(lev2[i2], val2));
 	    }
 	  else if ( i1 == nlev1-1 )
 	    {
 	      lev_idx1[i2] = nlev1-2;
 	      lev_idx2[i2] = nlev1-2;
-	      if ( expol || IS_EQUAL(lev2[i2], val2) )
-		lev_wgt1[i2] = 1;
-	      else
-		lev_wgt1[i2] = 0;
+              lev_wgt1[i2] = (expol || IS_EQUAL(lev2[i2], val2));
 	      lev_wgt2[i2] = 0;
 	    }
 	  else
@@ -177,14 +165,13 @@ void *Intlevel(void *process)
 
   int operatorID = cdoOperatorID();
 
-  bool expol = false;
-  if ( operatorID == INTLEVELX ) expol = true;
+  bool expol = (operatorID == INTLEVELX);
 
   operatorInputArg("levels");
 
   lista_t *flista = lista_new(FLT_LISTA);
   int nlev2 = args2flt_lista(operatorArgc(), operatorArgv(), flista);
-  double *lev2  = (double *) lista_dataptr(flista);
+  double *lev2 = (double *) lista_dataptr(flista);
 
   if ( cdoVerbose ) for ( i = 0; i < nlev2; ++i ) printf("lev2 %d: %g\n", i, lev2[i]);
 
