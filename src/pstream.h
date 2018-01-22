@@ -92,7 +92,6 @@ private:
 
 pstream_t *pstream_to_pointer(int pstreamID);
 
-
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
 pstream_t *create_pstream();
@@ -100,7 +99,6 @@ pstream_t *create_pstream(std::vector<std::string> p_filenameList);
 pstream_t *create_pstream(std::string p_filename);
 pstream_t *create_pstream(int processID, int pstreamIDX);
 
-int get_glob_argc();
 void pstreamCloseAll();
 void setProcessNum(int p_num);
 
