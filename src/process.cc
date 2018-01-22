@@ -402,25 +402,6 @@ get_glob_flags(void)
 #if defined(HAVE_WORDEXP_H)
 #endif
 
-int
-cdoStreamCnt(void)
-{
-  int cnt = processSelf().m_streamCnt;
-  return cnt;
-}
-
-int
-cdoStreamName(int cnt)
-{
-    return cnt;
-}
-
-const char *
-processOperator(void)
-{
-  return processSelf().m_operatorCommand;
-}
-
 static int
 find_wildcard(const char *string, size_t len)
 {
@@ -755,8 +736,6 @@ void process_t::inqUserInputForOpArg(const char *enter)
     }
 }
 
-
-  
 int process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
 {
     int operID = m_noper;
@@ -778,7 +757,7 @@ int process_t::getOperatorID(){
   int operID = -1;
 
   if (m_noper > 0)
-    {
+ {
       for (operID = 0; operID < m_noper; operID++)
         {
           if (oper[operID].name){
@@ -799,35 +778,6 @@ int process_t::getOperatorID(){
   return operID;
 }
 
-int
-cdoOperatorF1(int operID)
-{
-  return processSelf().oper[operID].f1;
-}
-
-int
-cdoOperatorF2(int operID)
-{
-  return processSelf().oper[operID].f2;
-}
-
-const char *
-cdoOperatorName(int operID)
-{
-  return processSelf().oper[operID].name;
-}
-
-const char *
-cdoOperatorEnter(int operID)
-{
-  return processSelf().oper[operID].enter;
-}
-
-int
-cdoStreamNumber()
-{
-  return operatorStreamNumber(processSelf().operatorName);
-}
 
 void cdoCloseStream(int p_pstreamIDX)
 {

@@ -143,7 +143,6 @@ int processInqChildNum(void);
 const char *processOperatorArg(void);
 const char *processInqPrompt(void);
 
-int cdoStreamName(int cnt);
 void createProcesses(int argc, const char **argv);
 void clearProcesses();
 int processNumsActive();

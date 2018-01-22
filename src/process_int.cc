@@ -85,3 +85,46 @@ cdoOperatorID(void)
   process_t &process = processSelf();
   return process.getOperatorID();
 }
+
+int
+cdoOperatorF1(int operID)
+{
+  return processSelf().oper[operID].f1;
+}
+
+int
+cdoOperatorF2(int operID)
+{
+  return processSelf().oper[operID].f2;
+}
+
+const char *
+cdoOperatorName(int operID)
+{
+  return processSelf().oper[operID].name;
+}
+
+const char *
+cdoOperatorEnter(int operID)
+{
+  return processSelf().oper[operID].enter;
+}
+
+int
+cdoStreamNumber()
+{
+  return operatorStreamNumber(processSelf().operatorName);
+}
+int
+cdoStreamCnt(void)
+{
+  int cnt = processSelf().m_streamCnt;
+  return cnt;
+}
+
+int
+cdoStreamName(int cnt)
+{
+    return cnt;
+}
+

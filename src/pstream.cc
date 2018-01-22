@@ -472,12 +472,7 @@ pstream_t::inqVlist()
       m_vlistID = vlistID;
     }
 
-  if (vlistNumber(vlistID) == CDI_COMP && cdoStreamNumber() == CDI_REAL)
-    cdoAbort("Complex fields are not supported by this operator!");
-
-  if (vlistNumber(vlistID) == CDI_REAL && cdoStreamNumber() == CDI_COMP)
-    cdoAbort("This operator needs complex fields!");
-
+ 
   return vlistID;
 }
 

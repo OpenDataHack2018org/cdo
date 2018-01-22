@@ -158,12 +158,6 @@ void timer_stop(int it);
 double timer_val(int it);
 
 
-int     cdoStreamNumber(void);
-int     cdoStreamCnt(void);
-int     cdoOperatorF1(int operID);
-int     cdoOperatorF2(int operID);
-const char *cdoOperatorName(int operID);
-const char *cdoOperatorEnter(int operID);
 
 int     cdoFiletype(void);
 
