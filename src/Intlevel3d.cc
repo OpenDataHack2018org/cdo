@@ -108,7 +108,7 @@ void *Intlevel3d(void *argument)
   size_t gridsize, gridSize, gridsizei, gridsizeo;
   int nrecs;
   int i, offset;
-  int tsID, varID, levelID;
+  int varID, levelID;
   int nvars,nvct;
   size_t nmiss;
   int zaxisID1 = -1, zaxisID3;
@@ -401,7 +401,7 @@ void *Intlevel3d(void *argument)
     }
   if ( varID == nvars ) cdoAbort("No processable variable found!");
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = false;
