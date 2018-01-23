@@ -33,60 +33,37 @@
 
 bool levelDirUp(int nlev, double *lev);
 bool levelDirDown(int nlev, double *lev);
+double vert_interp_lev_kernel(double w1, double w2, double var1L1, double var1L2, double missval);
+void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
+		      int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
 
 /*
  * 3d vertical interpolation routine (see vert_interp_lev() in src/Intlevel.cc)
  */
 static
-void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *vardata2,
+void vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2,
 		       int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
-  int idx1, idx2;
-  int offset;
-  double wgt1, wgt2;
-  double w1, w2;
-  double var1L1, var1L2, *var2;
-
   for ( int ilev = 0; ilev < nlev2; ilev++ )
     {
-      offset = ilev*gridsize;
-      var2 = vardata2 + offset;
+      size_t offset = ilev*gridsize;
+      double *var2 = vardata2 + offset;
 
-      for ( int i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
 	{
-          idx1 = lev_idx1[offset+i];
-          idx2 = lev_idx2[offset+i];
-          wgt1 = lev_wgt1[offset+i];
-          wgt2 = lev_wgt2[offset+i];
+          int idx1 = lev_idx1[offset+i];
+          int idx2 = lev_idx2[offset+i];
+          double wgt1 = lev_wgt1[offset+i];
+          double wgt2 = lev_wgt2[offset+i];
 
           /* upper/lower values from input field */
-          var1L1 = *(vardata1+idx1);
-          var1L2 = *(vardata1+idx2);
+          double var1L1 = *(vardata1+idx1);
+          double var1L2 = *(vardata1+idx2);
 
           /* if (cdoVerbose) printf("i:%d level %d: idx1=%d idx2=%d (offset+i:%d) wgt1=%g wgt2=%g var1L1:%g var1L2:%g ",
            *                         i,       ilev, idx1,   idx2,    offset+i,    wgt1,   wgt2,   var1L1,   var1L2);
            */
-	  w1 = wgt1;
-	  w2 = wgt2;
-	  if ( DBL_IS_EQUAL(var1L1, missval) ) w1 = 0;
-	  if ( DBL_IS_EQUAL(var1L2, missval) ) w2 = 0;
-
-	  if ( IS_EQUAL(w1, 0) && IS_EQUAL(w2, 0) )
-	    {
-	      var2[i] = missval;
-	    }
-	  else if ( IS_EQUAL(w1, 0) )
-	    {
-              var2[i] = (w2 >= 0.5) ? var1L2 : missval;	      
-	    }
-	  else if ( IS_EQUAL(w2, 0) )
-	    {
-              var2[i] = (w1 >= 0.5) ? var1L1 : missval;	      
-	    }
-	  else
-	    {
-	      var2[i] = var1L1*w1 + var1L2*w2;
-	    }
+          var2[i] = vert_interp_lev_kernel(wgt1, wgt2, var1L1, var1L2, missval);
 	}
     }
 }
@@ -101,79 +78,27 @@ void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *v
  * 3d version of vert_gen_weights() (src/Intlevel.cc)
  */
 static
-void vert_gen_weights3d(bool expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
-			int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
+void vert_gen_weights3d(bool expol, int nlev1, size_t gridsize, double *xlev1, int nlev2, double *xlev2,
+			int *xlev_idx1, int *xlev_idx2, double *xlev_wgt1, double *xlev_wgt2)
 {
-  int i,i1, i2;
-  int idx1 = 0, idx2 = 0;
-  double val1, val2 = 0;
+  std::vector<double> lev1(nlev1);
+  std::vector<double> lev2(nlev2);
+  std::vector<int> lev_idx1(nlev2);
+  std::vector<int> lev_idx2(nlev2);
+  std::vector<double> lev_wgt1(nlev2);
+  std::vector<double> lev_wgt2(nlev2);
 
-  for ( i = 0; i < gridsize; i++ )
+  for ( size_t i = 0; i < gridsize; i++ )
     {
-      for ( i2 = 0; i2 < nlev2; i2++ )
-        {
-          /* Because 2 levels were added to the source vertical coordinate (one on
-           * top, one at the bottom), its loop starts at 1 */
-          for ( i1 = 1; i1 < nlev1; i1++ )
-            {
-              if ( lev1[(i1-1)*gridsize+i] < lev1[i1*gridsize+i] )
-                {
-                  idx1 = (i1-1)*gridsize+i;
-                  idx2 = i1*gridsize+i;
-                }
-              else
-                {
-                  idx1 = i1*gridsize+i;
-                  idx2 = (i1-1)*gridsize+i;
-                }
-              val1 = lev1[idx1];
-              val2 = lev1[idx2];
+      for ( int k = 0; k < nlev1; ++k ) lev1[k] = xlev1[k*gridsize+i];
+      for ( int k = 0; k < nlev2; ++k ) lev2[k] = xlev2[k*gridsize+i];
 
-              if ( lev2[i2*gridsize+i] > val1 && lev2[i2*gridsize+i] <= val2 ) break;
-            }
+      vert_gen_weights(expol, nlev1, &lev1[0], nlev2, &lev2[0], &lev_idx1[0], &lev_idx2[0], &lev_wgt1[0], &lev_wgt2[0]);
 
-          if ( i1 == nlev1 ) 
-            {
-              if ( expol )
-                cdoAbort("Level %g at index %d not found! Use extrapolation", lev2[i2*gridsize],i2);
-              else
-                cdoAbort("Level %g at index %d not found!");
-            }
-
-          if ( i1-1 == 0 ) /* destination levels ios not covert by the first two input z levels */
-            {
-              lev_idx1[i2*gridsize+i] = gridsize+i;
-              lev_idx2[i2*gridsize+i] = gridsize+i;
-              lev_wgt1[i2*gridsize+i] = 0;
-              lev_wgt2[i2*gridsize+i] = (expol || IS_EQUAL(lev2[i2*gridsize+i], val2));
-            }
-          else if ( i1 == nlev1-1 ) /* destination level is beyond the last value of the input z field */
-            {
-              lev_idx1[i2*gridsize+i] = (nlev1-2)*gridsize+i;
-              lev_idx2[i2*gridsize+i] = (nlev1-2)*gridsize+i;
-              lev_wgt1[i2*gridsize+i] = (expol || IS_EQUAL(lev2[i2*gridsize+i], val2));
-              lev_wgt2[i2*gridsize+i] = 0;
-            }
-          else /* target z values has two bounday values in input z field */
-            {
-              lev_idx1[i2*gridsize+i] = idx1;
-              lev_idx2[i2*gridsize+i] = idx2;
-              lev_wgt1[i2*gridsize+i] = (lev1[idx2]        - lev2[i2*gridsize+i]) / (lev1[idx2] - lev1[idx1]);
-              lev_wgt2[i2*gridsize+i] = (lev2[i2*gridsize+i] - lev1[idx1])        / (lev1[idx2] - lev1[idx1]);
-
-            }
-  /*         if (cdoVerbose)
-   *         {
-   *           printf("i:%d i2:%d\ti2*gridsize+i:%d\tlev2[i2*gridsize+i]:%g\tidx1:%d\tidx2:%d\tlev1[idx1]:%g\tlev1[idx2]:%g\t",
-   *                   i, i2, i2*gridsize+i,         lev2[i2*gridsize+i],    idx1,    idx2,    lev1[idx1],    lev1[idx2]);
-   *           printf("\tlev_wgt1:%g\tlev_wgt2:%g\n", lev_wgt1[i2*gridsize+i], lev_wgt2[i2*gridsize+i]);
-   *         }
-   */
-          /* backshift of the indices because of the two additional levels in input vertical coordinate */
-          lev_idx1[i2*gridsize+i] -= gridsize;
-          lev_idx2[i2*gridsize+i] -= gridsize;
-
-        }
+      for ( int k = 0; k < nlev2; ++k ) xlev_idx1[k*gridsize+i] = lev_idx1[k]*gridsize+i;
+      for ( int k = 0; k < nlev2; ++k ) xlev_idx2[k*gridsize+i] = lev_idx2[k]*gridsize+i;
+      for ( int k = 0; k < nlev2; ++k ) xlev_wgt1[k*gridsize+i] = lev_wgt1[k];
+      for ( int k = 0; k < nlev2; ++k ) xlev_wgt2[k*gridsize+i] = lev_wgt2[k];
     }
 }
 
@@ -442,7 +367,7 @@ void *Intlevel3d(void *argument)
   /* Add artificial values for intication of extrapolation areas (lowermost + upmost levels) */
   if ( lup )
     {
-      for ( size_t i = 0; i < gridSize ;i++)
+      for ( size_t i = 0; i < gridSize ;i++ )
       {
         zlevels_in[i]                      = -1.e33;
         zlevels_in[(nlevi+1)*gridSize + i] =  1.e33;
@@ -450,7 +375,7 @@ void *Intlevel3d(void *argument)
     }
   else if ( ldown )
     {
-      for ( size_t i = 0; i < gridSize ;i++)
+      for ( size_t i = 0; i < gridSize ;i++ )
       {
         zlevels_in[i]                      =  1.e33;
         zlevels_in[(nlevi+1)*gridSize + i] = -1.e33;
@@ -611,7 +536,7 @@ void *Intlevel3d(void *argument)
           else
           { 
             vlistInqVarName(vlistID1, varID, varname); 
-            if ( cdoVerbose ) cdoPrint("Perform no interpolation on variable %s",varname);
+            if ( cdoVerbose && tsID <= 1 ) cdoPrint("Perform no interpolation on variable %s", varname);
           }
 	}
 

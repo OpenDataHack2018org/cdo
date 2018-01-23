@@ -30,8 +30,35 @@
 #include "listarray.h"
 
 
+double vert_interp_lev_kernel(double w1, double w2, double var1L1, double var1L2, double missval)
+{
+  double var2 = missval;
+
+  if ( DBL_IS_EQUAL(var1L1, missval) ) w1 = 0;
+  if ( DBL_IS_EQUAL(var1L2, missval) ) w2 = 0;
+
+  if ( IS_EQUAL(w1, 0) && IS_EQUAL(w2, 0) )
+    {
+      var2 = missval;
+    }
+  else if ( IS_EQUAL(w1, 0) )
+    {
+      var2 = (w2 >= 0.5) ? var1L2 : missval;	      
+    }
+  else if ( IS_EQUAL(w2, 0) )
+    {
+      var2 = (w1 >= 0.5) ? var1L1 : missval;	      
+    }
+  else
+    {
+      var2 = var1L1*w1 + var1L2*w2;
+    }
+
+  return var2;
+}
+
 static
-void vert_interp_lev(int gridsize, double missval, double *vardata1, double *vardata2,
+void vert_interp_lev(size_t gridsize, double missval, double *vardata1, double *vardata2,
 		     int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   for ( int ilev = 0; ilev < nlev2; ++ilev )
@@ -50,34 +77,14 @@ void vert_interp_lev(int gridsize, double missval, double *vardata1, double *var
 #ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval)
 #endif
-      for ( int i = 0; i < gridsize; ++i )
+      for ( size_t i = 0; i < gridsize; ++i )
 	{
-	  double w1 = wgt1;
-	  double w2 = wgt2;
-	  if ( DBL_IS_EQUAL(var1L1[i], missval) ) w1 = 0;
-	  if ( DBL_IS_EQUAL(var1L2[i], missval) ) w2 = 0;
-
-	  if ( IS_EQUAL(w1, 0) && IS_EQUAL(w2, 0) )
-	    {
-	      var2[i] = missval;
-	    }
-	  else if ( IS_EQUAL(w1, 0) )
-	    {
-              var2[i] = (w2 >= 0.5) ? var1L2[i] : missval;	      
-	    }
-	  else if ( IS_EQUAL(w2, 0) )
-	    {
-              var2[i] = (w1 >= 0.5) ? var1L1[i] : missval;	      
-	    }
-	  else
-	    {
-	      var2[i] = var1L1[i]*w1 + var1L2[i]*w2;
-	    }
+          var2[i] = vert_interp_lev_kernel(wgt1, wgt2, var1L1[i], var1L2[i], missval);
 	}
     }
 }
 
-static
+
 void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
 		      int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
@@ -87,6 +94,7 @@ void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev
 
   for ( int i2 = 0; i2 < nlev2; ++i2 )
     {
+      // Because 2 levels were added to the source vertical coordinate (one on top, one at the bottom), its loop starts at 1
       for ( i1 = 1; i1 < nlev1; ++i1 )
 	{
 	  if ( lev1[i1-1] < lev1[i1] )
@@ -106,37 +114,36 @@ void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev
 	}
 
       if ( i1 == nlev1 ) cdoAbort("Level %g not found!", lev2[i2]);
-      else
-	{
-	  if ( i1-1 == 0 )
-	    {
-	      lev_idx1[i2] = 1;
-	      lev_idx2[i2] = 1;
-	      lev_wgt1[i2] = 0;
-              lev_wgt2[i2] = (expol || IS_EQUAL(lev2[i2], val2));
-	    }
-	  else if ( i1 == nlev1-1 )
-	    {
-	      lev_idx1[i2] = nlev1-2;
-	      lev_idx2[i2] = nlev1-2;
-              lev_wgt1[i2] = (expol || IS_EQUAL(lev2[i2], val2));
-	      lev_wgt2[i2] = 0;
-	    }
-	  else
-	    {
-	      lev_idx1[i2] = idx1;
-	      lev_idx2[i2] = idx2;
-	      lev_wgt1[i2] = (lev1[idx2] - lev2[i2]) / (lev1[idx2] - lev1[idx1]);
-	      lev_wgt2[i2] = (lev2[i2] - lev1[idx1]) / (lev1[idx2] - lev1[idx1]);
-	    }
-	  lev_idx1[i2]--;
-	  lev_idx2[i2]--;
-	  /*
-	  printf("%d %g %d %d %g %g %d %d %g %g\n",
-	  i2, lev2[i2], idx1, idx2, lev1[idx1], lev1[idx2], 
-	  lev_idx1[i2], lev_idx2[i2], lev_wgt1[i2], lev_wgt2[i2]);
-	  */
-	}
+
+      if ( i1-1 == 0 ) // destination levels ios not covert by the first two input z levels
+        {
+          lev_idx1[i2] = 1;
+          lev_idx2[i2] = 1;
+          lev_wgt1[i2] = 0;
+          lev_wgt2[i2] = (expol || IS_EQUAL(lev2[i2], val2));
+        }
+      else if ( i1 == nlev1-1 ) // destination level is beyond the last value of the input z field
+        {
+          lev_idx1[i2] = nlev1-2;
+          lev_idx2[i2] = nlev1-2;
+          lev_wgt1[i2] = (expol || IS_EQUAL(lev2[i2], val2));
+          lev_wgt2[i2] = 0;
+        }
+      else // target z values has two bounday values in input z field
+        {
+          lev_idx1[i2] = idx1;
+          lev_idx2[i2] = idx2;
+          lev_wgt1[i2] = (lev1[idx2] - lev2[i2]) / (lev1[idx2] - lev1[idx1]);
+          lev_wgt2[i2] = (lev2[i2] - lev1[idx1]) / (lev1[idx2] - lev1[idx1]);
+        }
+      // backshift of the indices because of the two additional levels in input vertical coordinate
+      lev_idx1[i2]--;
+      lev_idx2[i2]--;
+      /*
+        printf("%d %g %d %d %g %g %d %d %g %g\n",
+        i2, lev2[i2], idx1, idx2, lev1[idx1], lev1[idx2], 
+        lev_idx1[i2], lev_idx2[i2], lev_wgt1[i2], lev_wgt2[i2]);
+      */
     }
 }
 
