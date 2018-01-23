@@ -110,12 +110,12 @@ void *Arith(void *process)
       if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_VAR;
-	  cdoPrint("Filling up stream2 >%s< by copying the first variable.", "PLACEHOLDER FIX LATER");
+	  cdoPrint("Filling up stream2 >%s< by copying the first variable.", cdoGetStreamName(1).c_str());
 	}
       else
 	{
 	  filltype = FILL_VARTS;
-	  cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.", "PLACEHOLDER FIX LATER");
+	  cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.", cdoGetStreamName(1).c_str());
 	}
     }
   else if ( lfill1 )
@@ -125,12 +125,12 @@ void *Arith(void *process)
       if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_VAR;
-	  cdoPrint("Filling up stream1 >%s< by copying the first variable.", "PLACEHOLDER FIX LATER");
+	  cdoPrint("Filling up stream1 >%s< by copying the first variable.", cdoGetStreamName(0).c_str());
 	}
       else
 	{
 	  filltype = FILL_VARTS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.", "PLACEHOLDER FIX LATER");
+	  cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.", cdoGetStreamName(0).c_str());
 	}
       streamIDx1 = streamID2;
       streamIDx2 = streamID1;
