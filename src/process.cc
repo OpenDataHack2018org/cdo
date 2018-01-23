@@ -231,12 +231,6 @@ process_t::addNvals(size_t p_nvals)
   m_nvals += p_nvals;
 }
 
-size_t
-processInqNvals(int processID)
-{
-  return Process.find(processID)->second.m_nvals;
-}
-
 void
 processStartTime(double *utime, double *stime)
 {
