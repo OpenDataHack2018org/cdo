@@ -24,6 +24,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "process_int.h"
 
 
 void *CDItest(void *process)

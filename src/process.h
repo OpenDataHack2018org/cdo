@@ -91,6 +91,8 @@ public:
 
   process_t(int p_ID, const char *operatorCommand);
 
+  pthread_t run();
+
   int getInStreamCnt();
   int getOutStreamCnt();
   void initProcess();
@@ -111,7 +113,6 @@ public:
   void setInactive();
   const char *inqPrompt();
   cdoTimes getTimes(int p_processNums);
-  pthread_t run();
   void printProcessedValues();
   void printBenchmarks(cdoTimes p_times, char *p_memstring);
 
@@ -120,54 +121,6 @@ private:
   void defPrompt();
   int checkStreamCnt();
 };
-
-extern std::map<int, process_t> Process;
-
-pstream_t *processInqInputStream(int streamindex);
-pstream_t *processInqOutputStream(int streamindex);
-process_t &processSelf(void);
-process_t *processCreate(void);
-process_t *processCreate(const char *command);
-int processInqInputStreamNum(void);
-int processInqOutputStreamNum(void);
-void processDelStream(int streamID);
-void processDefArgument(void *vargument);
-
-void processStartTime(double *utime, double *stime);
-void processEndTime(double *utime, double *stime);
-void processAccuTime(double utime, double stime);
-
-int processNums(void);
-
-int processInqChildNum(void);
-
-const char *processOperatorArg(void);
-const char *processInqPrompt(void);
-
-void createProcesses(int argc, const char **argv);
-void clearProcesses();
-int processNumsActive();
-process_t* getProcess(int p_processID);
-
-
-int checkStreamCnt();
-int cdoStreamOpenRead(int inStreamIDX);
-int cdoStreamOpenWrite(int outStreamIDX, int filetype);
-int cdoStreamOpenWrite(std::string p_filename, int filetype);
-int cdoStreamOpenAppend(int outStreamIDX);
-
-bool cdoOutFileExists(int outStreamIDX);
-bool cdoInFileExists(int inStreamIDX);
-
-std::string cdoGetInStreamName(int p_inStream);
-std::string cdoGetOutStreamName(int p_outStream);
-std::string cdoGetStreamName(int p_streamIndex);
-
-char* cdoGetObase();
-void cdoFinish();
-void cdoInitialize(void *process);
-
-void printEndTimes(cdoTimes p_times, char *p_memstring);
 
 #endif /* _PROCESS_H */
 

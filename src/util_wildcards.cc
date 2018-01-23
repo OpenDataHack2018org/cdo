@@ -22,6 +22,23 @@
 #include <vector>
 #include <string>
 
+#if defined(HAVE_GLOB_H)
+static int
+get_glob_flags(void)
+{
+  int glob_flags = 0;
+
+#if defined(GLOB_NOCHECK)
+  glob_flags |= GLOB_NOCHECK;
+#endif
+#if defined(GLOB_TILDE)
+  glob_flags |= GLOB_TILDE;
+#endif
+
+  return glob_flags;
+}
+#endif
+
 int
 find_wildcard(const char *string, size_t len)
 {
