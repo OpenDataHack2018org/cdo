@@ -153,8 +153,6 @@ void minmaxval(long nvals, double *array, int *imiss, double *minval, double *ma
 
 off_t fileSize(const char *restrict filename);
 
-char *expand_filename(const char *string);
-
 const char *parameter2word(const char *string);
 double parameter2double(const char *string);
 bool   parameter2bool(const char *string);

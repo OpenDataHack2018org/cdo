@@ -173,6 +173,8 @@ libcdo_la_SOURCES =            \
                timer.cc         \
                util.cc          \
                util.h          \
+			   util_wildcards.cc\
+			   util_wildcards.h \
 			   varlist.h		\
                zaxis_print.cc   \
                zaxis.cc

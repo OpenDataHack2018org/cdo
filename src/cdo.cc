@@ -67,6 +67,7 @@
 #include "error.h"
 #include "grid_proj.h"
 #include "percentiles.h"
+#include "util_wildcards.h"
 
 #ifdef  _OPENMP
 #  include <omp.h>
@@ -1773,41 +1774,6 @@ void init_aliases()
   add_alias("selmon"          , "selmonth");
 }
 
-#if defined(HAVE_WORDEXP_H)
-/* Expands all input file wildcards and removes the 
- * wildcard while inserting all expanded files into argv
- */
-std::vector<std::string> expandWildCards(int argc, const char **argv)
-{
-
-    int flags = WRDE_UNDEF;
-    char **p;
-    int status;
-    wordexp_t glob_results;
-
-    //rangebased construction of new_argv, copies all argv entries into new_arg
-    std::vector<std::string> new_argv(argv, argv + argc);
-    auto argv_iter = new_argv.begin();
-
-    for(int idx = 1; idx < new_argv.size(); idx++){
-        //if argv[idx] contains wildcard (* or [?]+)
-        //multiple ** are ignored
-      if(new_argv[idx][0] != '-' && new_argv[idx].find_first_of("*?") != std::string::npos)
-      {
-          wordexp(new_argv[idx].c_str(), &glob_results, flags);
-          //range based insert (glob_results.we_wordv is inserted before wildcard
-          new_argv.insert(new_argv.begin() + idx + 1,
-                  glob_results.we_wordv,
-                  glob_results.we_wordv + glob_results.we_wordc);
-          //delete wildcard
-          new_argv.erase(new_argv.begin() + idx);
-          wordfree(&glob_results);
-      }
-    }
-
-    return new_argv;
-}
-#endif
 
 int main(int argc, char *argv[])
 {
@@ -1906,9 +1872,10 @@ int main(int argc, char *argv[])
       return -1;
     }
 #endif
-      std::vector<std::string> new_argv = expandWildCards(argc - CDO_optind,(const char **) &argv[CDO_optind]);
-      //temprorary: should not be needed when std::string is standart string 
-      ///*TEMP*/
+      std::vector<std::string> new_argv(&argv[CDO_optind], argv + argc);
+      new_argv = expandWildCards(new_argv);
+
+      ///*TEMP*/ // should not be needed when std::string is standart string 
       std::vector<char*> new_cargv(new_argv.size());
       for(unsigned long i = 0; i < new_argv.size(); i++)
       {

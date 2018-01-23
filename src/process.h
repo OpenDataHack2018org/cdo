@@ -128,8 +128,6 @@ pstream_t *processInqOutputStream(int streamindex);
 process_t &processSelf(void);
 process_t *processCreate(void);
 process_t *processCreate(const char *command);
-void processDelete(void);
-void processDefTimesteps(int streamID);
 int processInqInputStreamNum(void);
 int processInqOutputStreamNum(void);
 void processDelStream(int streamID);

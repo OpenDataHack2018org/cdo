@@ -237,27 +237,14 @@ processInqNvals(int processID)
   return Process.find(processID)->second.m_nvals;
 }
 
-double
-processInqCputime(int processID)
-{
-  return Process.find(processID)->second.cputime;
-}
-
 void
 processStartTime(double *utime, double *stime)
 {
+ // used in: Command.cc, CDItest.cc, process.cc
   process_t &process = processSelf();
 
   *utime = process.s_utime;
   *stime = process.s_stime;
-}
-
-void
-processEndTime(double *utime, double *stime)
-{
-  process_t &process = Process.find(0)->second;
-  *utime = process.a_utime;
-  *stime = process.a_stime;
 }
 
 void
@@ -266,47 +253,6 @@ processAccuTime(double utime, double stime)
   process_t &process = Process.find(0)->second;
   process.a_utime += utime;
   process.a_stime += stime;
-}
-
-int
-processInqOutputStreamNum(void)
-{
-  return processSelf().getOutStreamCnt();
-}
-
-int
-processInqInputStreamNum(void)
-{
-  return processSelf().getInStreamCnt();
-}
-
-int
-processInqChildNum(void)
-{
-  return processSelf().nchild;
-}
-
-pstream_t *
-processInqOutputStream(int streamindex)
-{
-  return (processSelf().outputStreams[streamindex]);
-}
-pstream_t *
-processInqInputStream(int streamindex)
-{
-  return (processSelf().inputStreams[streamindex]);
-}
-
-const char *
-processInqOpername2(process_t &process)
-{
-  return process.operatorName;
-}
-
-const char *
-processInqOpername(void)
-{
-  return processSelf().operatorName;
 }
 
 void
@@ -354,53 +300,6 @@ get_glob_flags(void)
 #if defined(HAVE_WORDEXP_H)
 #endif
 
-static int
-find_wildcard(const char *string, size_t len)
-{
-  int status = 0;
-
-  if (len > 0)
-    {
-      if (string[0] == '~')
-        status = 1;
-
-      if (status == 0)
-        {
-          for (size_t i = 0; i < len; ++i)
-            if (string[i] == '?' || string[i] == '*' || string[i] == '[')
-              {
-                status = 1;
-                break;
-              }
-        }
-    }
-
-  return status;
-}
-
-// used in griddes.cc
-char *
-expand_filename(const char *string)
-{
-  char *filename = NULL;
-
-  if (find_wildcard(string, strlen(string)))
-    {
-#if defined(HAVE_GLOB_H)
-      int glob_flags = get_glob_flags();
-      glob_t glob_results;
-
-      glob(string, glob_flags, 0, &glob_results);
-
-      if (glob_results.gl_pathc == 1)
-        filename = strdupx(glob_results.gl_pathv[0]);
-
-      globfree(&glob_results);
-#endif
-    }
-
-  return filename;
-}
 
 int
 process_t::checkStreamCnt(void)
@@ -718,37 +617,6 @@ cdoStreamClose(int p_pstreamIDX)
     }
 }
 
-/*TEMP*
-/*
-static void
-processClosePipes(void)
-{
-  int nstream = processInqInputStreamNum();
-  for (int sindex = 0; sindex < nstream; sindex++)
-    {
-      pstream_t *pstreamptr = processInqInputStream(sindex);
-
-      if (CdoDebug::PROCESS && !pstreamptr->isopen)
-        MESSAGE("process ",processSelf().m_ID,"  instream ",sindex,"  close streamID ", pstreamptr->self);
-
-      if (!pstreamptr->isopen)
-        pstreamptr->close();
-    }
-
-  nstream = processInqOutputStreamNum();
-  for (int sindex = 0; sindex < nstream; sindex++)
-    {
-      pstream_t *pstreamptr = processInqOutputStream(sindex);
-
-      if (CdoDebug::PROCESS && !pstreamptr->isopen)
-        MESSAGE("process ",processSelf().m_ID,"  outstream ",sindex," close streamID ", pstreamptr->self);
-
-      if (!pstreamptr->isopen)
-        pstreamptr->close();
-    }
-}
-*/
-
 void
 process_t::addFileInStream(std::string file)
 {
@@ -845,14 +713,6 @@ process_t::run()
     }
   m_isActive = true;
   return thrID;
-}
-
-char *
-createPipeName(size_t pnlen)
-{
-  char *pipename = (char *) Malloc(pnlen);
-  snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
-  return pipename;
 }
 
 int
@@ -1203,7 +1063,9 @@ process_t::printBenchmarks(cdoTimes p_times, char *p_memstring)
     }
   if (cdoBenchmark && m_ID == 0)
   {
-    processEndTime(&p_times.p_usertime, &p_times.p_systime);
+    p_times.p_usertime = a_utime;
+    p_times.p_systime = a_stime;
+
     p_times.p_cputime = p_times.p_usertime + p_times.p_systime;
     fprintf(stderr,
             "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n",

@@ -26,6 +26,7 @@
 #include "griddes.h"
 #include "error.h"
 #include "cdoDebugOutput.h"
+#include "util_wildcards.h"
 
 
 int grid_read(FILE *gfp, const char *dname);
