@@ -111,7 +111,6 @@ extern char CDO_File_Suffix[32]; // refactor: added keyword extern
 
 
 const char *getProgname(char *string);
-char *GetOperator(const char *argument);
 const char *getOperatorName(const char *operatorCommand);
 char *getOperatorArg(const char *operatorCommand);
 const char *cdoComment(void);
