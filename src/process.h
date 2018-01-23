@@ -32,13 +32,21 @@ constexpr int MAX_OPERATOR = 128;
 constexpr int MAX_OARGC = 4096;
 constexpr int MAX_FILES = 65536;
 
-typedef struct
+struct cdoTimes
+{
+  double s_utime, s_stime;
+  double e_utime, e_stime;
+  double c_cputime = 0, c_usertime = 0, c_systime = 0;
+  double p_cputime = 0, p_usertime = 0, p_systime = 0;
+};
+
+struct oper_t
 {
   int f1;
   int f2;
   const char *name;
   const char *enter;
-} oper_t;
+};
 
 class process_t
 {
@@ -64,7 +72,7 @@ public:
   double a_stime;
   double cputime;
 
-  size_t nvals;
+  size_t m_nvals;
   short nvars;
 
   int ntimesteps;
@@ -102,7 +110,10 @@ public:
   int getOperatorID();
   void setInactive();
   const char *inqPrompt();
+  cdoTimes getTimes(int p_processNums);
   pthread_t run();
+  void printProcessedValues();
+  void printBenchmarks(cdoTimes p_times, char *p_memstring);
 
 private:
   process_t();
@@ -118,7 +129,6 @@ process_t &processSelf(void);
 process_t *processCreate(void);
 process_t *processCreate(const char *command);
 void processDelete(void);
-int processInqTimesteps(void);
 void processDefTimesteps(int streamID);
 int processInqInputStreamNum(void);
 int processInqOutputStreamNum(void);
@@ -129,7 +139,6 @@ void processStartTime(double *utime, double *stime);
 void processEndTime(double *utime, double *stime);
 void processAccuTime(double utime, double stime);
 
-void processDefCputime(int processID, double cputime);
 double processInqCputime(int processID);
 
 size_t processInqNvals(int processID);
@@ -162,6 +171,8 @@ std::string cdoGetStreamName(int p_streamIndex);
 char* cdoGetObase();
 void cdoFinish();
 void cdoInitialize(void *process);
+
+void printEndTimes(cdoTimes p_times, char *p_memstring);
 
 #endif /* _PROCESS_H */
 

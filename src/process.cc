@@ -15,14 +15,14 @@
   GNU General Public License for more details.
 */
 
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #if defined(HAVE_PTHREAD_H)
 #include <pthread.h>
 #endif
-#ifdef  _OPENMP
+#ifdef _OPENMP
 #include <omp.h>
 #endif
 
@@ -32,7 +32,6 @@
 #if defined(HAVE_GLOB_H)
 #include <glob.h>
 #endif
-
 
 #include "cdo.h"
 #include "cdo_int.h"
@@ -51,7 +50,7 @@
 #include <string>
 #include <sys/stat.h> /* stat */
 
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -59,7 +58,7 @@ static int pthreadScope = 0;
 
 static process_t *root_process;
 std::map<int, process_t> Process;
-std::map<int, char*> obase;   /*TEMP*/ //Possibly not the best solution (19.Jan.2018)
+std::map<int, char *> obase; /*TEMP*/  // Possibly not the best solution (19.Jan.2018)
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
@@ -100,7 +99,7 @@ process_t::setOperatorArgv(const char *operatorArguments)
 void
 process_t::initProcess()
 {
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   threadID = pthread_self();
   l_threadID = 1;
 #endif
@@ -110,7 +109,7 @@ process_t::initProcess()
   a_utime = 0;
   a_stime = 0;
   cputime = 0;
-  nvals = 0;
+  m_nvals = 0;
   nvars = 0;
   ntimesteps = 0;
 
@@ -138,26 +137,28 @@ process_t::getOutStreamCnt()
 process_t *
 processCreate(const char *command)
 {
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 #endif
 
-  if(CdoDebug::PROCESS){
-    MESSAGE("Creating new process for command: ", command);
-  }
+  if (CdoDebug::PROCESS)
+    {
+      MESSAGE("Creating new process for command: ", command);
+    }
   int processID = NumProcess++;
   auto success = Process.insert(std::make_pair(processID, process_t(processID, command)));
-  if(success.second == false)
-  {
-    ERROR("Process ", processID," could not be created");
-  }
+  if (success.second == false)
+    {
+      ERROR("Process ", processID, " could not be created");
+    }
 
   NumProcessActive++;
-  if(CdoDebug::PROCESS){
-    MESSAGE("NumProcessActive: ", NumProcessActive);
-  }
+  if (CdoDebug::PROCESS)
+    {
+      MESSAGE("NumProcessActive: ", NumProcessActive);
+    }
 
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
 #endif
 
@@ -170,7 +171,7 @@ processCreate(const char *command)
 process_t &
 processSelf(void)
 {
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_t thID = pthread_self();
 
   pthread_mutex_lock(&processMutex);
@@ -195,13 +196,13 @@ processSelf(void)
 int
 processNums(void)
 {
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 #endif
 
   int pnums = Process.size();
 
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
 #endif
 
@@ -211,13 +212,13 @@ processNums(void)
 int
 processNumsActive(void)
 {
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 #endif
 
   int pnums = NumProcessActive;
 
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
 #endif
 
@@ -227,25 +228,13 @@ processNumsActive(void)
 void
 process_t::addNvals(size_t p_nvals)
 {
-  nvals += p_nvals;
+  m_nvals += p_nvals;
 }
 
 size_t
 processInqNvals(int processID)
 {
-  return Process.find(processID)->second.nvals;
-}
-
-void
-processDelStream(int streamID)
-{
-  UNUSED(streamID);
-}
-
-void
-processDefCputime(int processID, double cputime)
-{
-  Process.find(processID)->second.cputime = cputime;
+  return Process.find(processID)->second.m_nvals;
 }
 
 double
@@ -334,7 +323,6 @@ processInqPrompt(void)
 {
   process_t &process = processSelf();
   return process.inqPrompt();
-
 }
 const char *
 process_t::inqPrompt()
@@ -390,7 +378,7 @@ find_wildcard(const char *string, size_t len)
   return status;
 }
 
-//used in griddes.cc
+// used in griddes.cc
 char *
 expand_filename(const char *string)
 {
@@ -414,16 +402,17 @@ expand_filename(const char *string)
   return filename;
 }
 
-int process_t::checkStreamCnt(void)
+int
+process_t::checkStreamCnt(void)
 {
-  int wantedStreamInCnt,wantedStreamOutCnt;
+  int wantedStreamInCnt, wantedStreamOutCnt;
   int streamInCnt0;
   int streamCnt = 0;
   int i, j;
   int obase = FALSE;
   int status = 0;
 
-  wantedStreamInCnt= operatorStreamInCnt(operatorName);
+  wantedStreamInCnt = operatorStreamInCnt(operatorName);
   wantedStreamOutCnt = operatorStreamOutCnt(operatorName);
 
   streamInCnt0 = wantedStreamInCnt;
@@ -434,14 +423,14 @@ int process_t::checkStreamCnt(void)
       obase = TRUE;
     }
 
-  if (wantedStreamInCnt== -1 && wantedStreamOutCnt == -1)
+  if (wantedStreamInCnt == -1 && wantedStreamOutCnt == -1)
     cdoAbort("I/O stream counts unlimited no allowed!");
 
   // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n", wantedStreamInCnt,wantedStreamOutCnt);
-  if (wantedStreamInCnt== -1)
+  if (wantedStreamInCnt == -1)
     {
       wantedStreamInCnt = m_streamCnt - wantedStreamOutCnt;
-      if (wantedStreamInCnt< 1)
+      if (wantedStreamInCnt < 1)
         cdoAbort("Input streams missing!");
     }
 
@@ -453,7 +442,7 @@ int process_t::checkStreamCnt(void)
     }
   // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n", wantedStreamInCnt,wantedStreamOutCnt);
 
-  streamCnt = wantedStreamInCnt+ wantedStreamOutCnt;
+  streamCnt = wantedStreamInCnt + wantedStreamOutCnt;
   // printf(" streamCnt %d %d\n", m_streamCnt, streamCnt);
 
   if (m_streamCnt > streamCnt)
@@ -478,18 +467,18 @@ int process_t::checkStreamCnt(void)
         }
       else if (!obase)
         {
-          for (j = 0; j < wantedStreamInCnt;j++) /* does not work with files in pipes *//*
-            if (strcmp(streamArguments[i].args, streamArguments[j].args) == 0)
-              cdoAbort("Output file name %s is equal to input file name"
-                       " on position %d!\n",
-                       streamArguments[i].args,
-                       j + 1);
-        }
-    }
-    */
+          for (j = 0; j < wantedStreamInCnt;j++) /* does not work with files in pipes */ /*
+             if (strcmp(streamArguments[i].args, streamArguments[j].args) == 0)
+               cdoAbort("Output file name %s is equal to input file name"
+                        " on position %d!\n",
+                        streamArguments[i].args,
+                        j + 1);
+         }
+     }
+     */
 
   if (wantedStreamInCnt == 1 && streamInCnt0 == -1)
-      return 1;
+    return 1;
 
   return 0;
 }
@@ -497,20 +486,21 @@ int process_t::checkStreamCnt(void)
 bool
 process_t::hasAllInputs()
 {
-  if(m_module.streamInCnt == -1)
-  {
+  if (m_module.streamInCnt == -1)
+    {
       return false;
-  }
-  return  m_module.streamInCnt == (inputStreams.size());
+    }
+  return m_module.streamInCnt == (inputStreams.size());
 }
 
 /*TEMP*/ /* MOVE TO namespace CDO (which does not exist yet)  (12.Jan.2018) */
 void
 createProcesses(int argc, const char **argv)
 {
-    if(CdoDebug::PROCESS){
+  if (CdoDebug::PROCESS)
+    {
       MESSAGE("== Process Creation Start ==");
-      MESSAGE("operators:  ",CdoDebug::argvToString(argc, argv));
+      MESSAGE("operators:  ", CdoDebug::argvToString(argc, argv));
     }
   root_process = processCreate(argv[0]);
 
@@ -522,31 +512,33 @@ createProcesses(int argc, const char **argv)
 
   call_stack.push(root_process);
   current_process = call_stack.top();
-  int cntOutFiles = (int)current_process->m_module.streamOutCnt;
-  if(cntOutFiles == -1)
-  {
-    obase.insert({0, strdup(argv[argc - 1])});
-  }
-  int temp_argc = argc - cntOutFiles;
-  for(int i = 0; i < cntOutFiles; i++)
-  {
-    if(CdoDebug::PROCESS)
+  int cntOutFiles = (int) current_process->m_module.streamOutCnt;
+  if (cntOutFiles == -1)
     {
-        MESSAGE("Creating new pstream for output file: ", argv[temp_argc + i]);
+      obase.insert({ 0, strdup(argv[argc - 1]) });
     }
-    root_process->addFileOutStream(argv[temp_argc + i]);
-  }
+  int temp_argc = argc - cntOutFiles;
+  for (int i = 0; i < cntOutFiles; i++)
+    {
+      if (CdoDebug::PROCESS)
+        {
+          MESSAGE("Creating new pstream for output file: ", argv[temp_argc + i]);
+        }
+      root_process->addFileOutStream(argv[temp_argc + i]);
+    }
   do
     {
-      if(CdoDebug::PROCESS){ MESSAGE(
-              "iteration " , idx , ", current argv: " , argv[idx] ,
-              ",  current_process: " , current_process->operatorName); 
-      }
+      if (CdoDebug::PROCESS)
+        {
+          MESSAGE(
+              "iteration ", idx, ", current argv: ", argv[idx], ",  current_process: ", current_process->operatorName);
+        }
       if (argv[idx][0] == '-')
         {
-          if(CdoDebug::PROCESS){ MESSAGE(
-                    "Found new Operator: ", argv[idx]);
-          }
+          if (CdoDebug::PROCESS)
+            {
+              MESSAGE("Found new Operator: ", argv[idx]);
+            }
           parent_process = current_process;
           current_process = processCreate(argv[idx]);
 
@@ -555,50 +547,53 @@ createProcesses(int argc, const char **argv)
 
           call_stack.push(current_process);
         }
-      else if(current_process->m_module.streamInCnt != 0)
+      else if (current_process->m_module.streamInCnt != 0)
         {
-          if(CdoDebug::PROCESS){
-            MESSAGE("adding in file to ", current_process->operatorName);
-          }
+          if (CdoDebug::PROCESS)
+            {
+              MESSAGE("adding in file to ", current_process->operatorName);
+            }
           current_process->addFileInStream(argv[idx]);
         }
-    while (current_process->hasAllInputs() && current_process != root_process)
-      {
-        if(CdoDebug::PROCESS) {
-            MESSAGE("Removing ", current_process->operatorName, " from stack");
+      while (current_process->hasAllInputs() && current_process != root_process)
+        {
+          if (CdoDebug::PROCESS)
+            {
+              MESSAGE("Removing ", current_process->operatorName, " from stack");
+            }
+          call_stack.pop();
+          current_process = call_stack.top();
         }
-        call_stack.pop();
-        current_process = call_stack.top();
-      }
 
       idx++;
-
     }
   while ((current_process != root_process || !root_process->hasAllInputs()) && idx < argc - cntOutFiles);
 
-  if(CdoDebug::PROCESS)
-  {
-    MESSAGE("== Process Creation End ==");
-  }
+  if (CdoDebug::PROCESS)
+    {
+      MESSAGE("== Process Creation End ==");
+    }
 
   setProcessNum(Process.size());
 }
 
 void
-process_t::setInactive(){
-#ifdef  HAVE_LIBPTHREAD
+process_t::setInactive()
+{
+#ifdef HAVE_LIBPTHREAD
   pthread_mutex_lock(&processMutex);
 
   l_threadID = 0;
 #endif
   NumProcessActive--;
 
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
 #endif
 }
 
-void process_t::inqUserInputForOpArg(const char *enter)
+void
+process_t::inqUserInputForOpArg(const char *enter)
 {
   int oargc = m_oargc;
 
@@ -618,7 +613,6 @@ void process_t::inqUserInputForOpArg(const char *enter)
           fprintf(stderr, "Enter %s > ", enter);
           // reset_text_color(stderr);
         }
-
 
       while (lreadline)
         {
@@ -644,7 +638,7 @@ void process_t::inqUserInputForOpArg(const char *enter)
                   while (pline[len] != ' ' && pline[len] != ',' && pline[len] != '\\' && len < linelen)
                     len++;
 
-                  m_oargv.push_back((char*)Malloc(len + 1));
+                  m_oargv.push_back((char *) Malloc(len + 1));
                   memcpy(m_oargv[oargc], pline, len);
                   m_oargv[oargc][len] = '\0';
                   oargc++;
@@ -660,9 +654,10 @@ void process_t::inqUserInputForOpArg(const char *enter)
     }
 }
 
-int process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
+int
+process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
 {
-    int operID = m_noper;
+  int operID = m_noper;
 
   if (operID >= MAX_OPERATOR)
     cdoAbort("Maximum number of %d operators reached!", MAX_OPERATOR);
@@ -677,22 +672,27 @@ int process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
   return operID;
 }
 
-int process_t::getOperatorID(){
+int
+process_t::getOperatorID()
+{
   int operID = -1;
 
   if (m_noper > 0)
- {
+    {
       for (operID = 0; operID < m_noper; operID++)
         {
-          if (oper[operID].name){
-            if (strcmp(operatorName, oper[operID].name) == 0){
-              break;
+          if (oper[operID].name)
+            {
+              if (strcmp(operatorName, oper[operID].name) == 0)
+                {
+                  break;
+                }
             }
-          }
         }
-      if (operID == m_noper){
-        cdoAbort("Operator not callable by this name!");
-      }
+      if (operID == m_noper)
+        {
+          cdoAbort("Operator not callable by this name!");
+        }
     }
   else
     {
@@ -702,19 +702,19 @@ int process_t::getOperatorID(){
   return operID;
 }
 
-
-void cdoCloseStream(int p_pstreamIDX)
+void
+cdoStreamClose(int p_pstreamIDX)
 {
-    process_t &process = processSelf();
-    if(p_pstreamIDX >= process.getInStreamCnt())
+  process_t &process = processSelf();
+  if (p_pstreamIDX >= process.getInStreamCnt())
     {
-        process.outputStreams[p_pstreamIDX - process.getInStreamCnt()]->close();
+      process.outputStreams[p_pstreamIDX - process.getInStreamCnt()]->close();
     }
-    else if (p_pstreamIDX < process.getInStreamCnt() + process.getOutStreamCnt())
+  else if (p_pstreamIDX < process.getInStreamCnt() + process.getOutStreamCnt())
     {
-        pstream_t *pstream = process.inputStreams[p_pstreamIDX];
-        pstream->close();
-        process.addNvals(pstream->getNvals());
+      pstream_t *pstream = process.inputStreams[p_pstreamIDX];
+      pstream->close();
+      process.addNvals(pstream->getNvals());
     }
 }
 
@@ -749,16 +749,18 @@ processClosePipes(void)
 }
 */
 
-void process_t::addFileInStream(std::string file)
+void
+process_t::addFileInStream(std::string file)
 {
-   inputStreams.push_back(create_pstream(file));
-   m_streamCnt++;
+  inputStreams.push_back(create_pstream(file));
+  m_streamCnt++;
 }
 
-void process_t::addFileOutStream(std::string file)
+void
+process_t::addFileOutStream(std::string file)
 {
-   outputStreams.push_back(create_pstream(file));
-   m_streamCnt++;
+  outputStreams.push_back(create_pstream(file));
+  m_streamCnt++;
 }
 
 void
@@ -768,11 +770,12 @@ process_t::addChild(process_t *childProcess)
   nchild = childProcesses.size();
   addPipeInStream();
 }
-void process_t::addPipeInStream()
+void
+process_t::addPipeInStream()
 {
 #if defined(HAVE_LIBPTHREAD)
-    inputStreams.push_back(create_pstream(m_ID, inputStreams.size()));
-    m_streamCnt++;
+  inputStreams.push_back(create_pstream(m_ID, inputStreams.size()));
+  m_streamCnt++;
 #else
   cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
@@ -785,10 +788,11 @@ process_t::addParent(process_t *parentProcess)
   m_posInParent = parentProcess->inputStreams.size() - 1;
   addPipeOutStream();
 }
-void process_t::addPipeOutStream()
+void
+process_t::addPipeOutStream()
 {
-   outputStreams.push_back(parentProcesses[0]->inputStreams[m_posInParent]);
-   m_streamCnt++;
+  outputStreams.push_back(parentProcesses[0]->inputStreams[m_posInParent]);
+  m_streamCnt++;
 }
 
 void
@@ -799,7 +803,8 @@ clearProcesses()
   NumProcessActive = 0;
 }
 
-pthread_t process_t::run()
+pthread_t
+process_t::run()
 {
   pthread_attr_t attr;
   int status = pthread_attr_init(&attr);
@@ -842,38 +847,42 @@ pthread_t process_t::run()
   return thrID;
 }
 
-
-char* createPipeName(size_t pnlen)
+char *
+createPipeName(size_t pnlen)
 {
   char *pipename = (char *) Malloc(pnlen);
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf().m_ID + 1, processInqChildNum() + 1);
   return pipename;
 }
 
-int cdoStreamOpenRead(int inStreamIDX)
+int
+cdoStreamOpenRead(int inStreamIDX)
 {
-    if(CdoDebug::PROCESS) MESSAGE("Getting in stream ", inStreamIDX, " of process ", processSelf().m_ID);
-    process_t &process = processSelf();
-    if(process.getInStreamCnt() < inStreamIDX || inStreamIDX < 0)
+  if (CdoDebug::PROCESS)
+    MESSAGE("Getting in stream ", inStreamIDX, " of process ", processSelf().m_ID);
+  process_t &process = processSelf();
+  if (process.getInStreamCnt() < inStreamIDX || inStreamIDX < 0)
     {
-        ERROR("instream ", inStreamIDX, " of process ", process.m_ID ," not found");
+      ERROR("instream ", inStreamIDX, " of process ", process.m_ID, " not found");
     }
-    pstream_t *inStream = process.inputStreams[inStreamIDX];
+  pstream_t *inStream = process.inputStreams[inStreamIDX];
 
-    if(inStream->isPipe())
+  if (inStream->isPipe())
     {
-       if(CdoDebug::PROCESS) MESSAGE("Trying to open pipe: ",inStream->pipe->name);
-       inStream->pstreamOpenReadPipe();
-       process.childProcesses[process.nChildActive]->run(); //new thread started in here!
-       process.nChildActive++;
+      if (CdoDebug::PROCESS)
+        MESSAGE("Trying to open pipe: ", inStream->pipe->name);
+      inStream->pstreamOpenReadPipe();
+      process.childProcesses[process.nChildActive]->run();  // new thread started in here!
+      process.nChildActive++;
     }
-    else
+  else
     {
-       if(CdoDebug::PROCESS) MESSAGE("Trying to open file: ",inStream->m_mfnames[0]);
-       inStream->pstreamOpenReadFile(inStream->m_mfnames[0].c_str());
+      if (CdoDebug::PROCESS)
+        MESSAGE("Trying to open file: ", inStream->m_mfnames[0]);
+      inStream->pstreamOpenReadFile(inStream->m_mfnames[0].c_str());
     }
 
-    return inStream->self; // return ID
+  return inStream->self;  // return ID
 }
 
 void
@@ -895,19 +904,15 @@ process_t::query_user_exit(const char *argument)
     {
       if (nbr_itr++ > USR_RPL_MAX_NBR)
         {
-          (void) fprintf(stdout,
-                         "\n%s: ERROR %d failed attempts to obtain valid interactive input.\n",
-                         prompt,
-                         nbr_itr - 1);
+          (void) fprintf(
+              stdout, "\n%s: ERROR %d failed attempts to obtain valid interactive input.\n", prompt, nbr_itr - 1);
           exit(EXIT_FAILURE);
         }
 
       if (nbr_itr > 1)
         (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
-      (void) fprintf(stdout,
-                     "%s: %s exists ---`e'xit, or `o'verwrite (delete existing file) (e/o)? ",
-                     prompt,
-                     argument);
+      (void) fprintf(
+          stdout, "%s: %s exists ---`e'xit, or `o'verwrite (delete existing file) (e/o)? ", prompt, argument);
       (void) fflush(stdout);
       if (fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL)
         continue;
@@ -934,274 +939,322 @@ process_t::query_user_exit(const char *argument)
     } /* end switch */
 }
 
-int cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
+int
+cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
 {
-    if(CdoDebug::PROCESS) MESSAGE("Getting out stream ", p_outStreamIDX, " of process ", processSelf().m_ID);
+  if (CdoDebug::PROCESS)
+    MESSAGE("Getting out stream ", p_outStreamIDX, " of process ", processSelf().m_ID);
 
-    process_t& process = processSelf();
-    int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
-    if(outStreamIDX > process.getOutStreamCnt() || outStreamIDX < 0)
+  process_t &process = processSelf();
+  int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
+  if (outStreamIDX > process.getOutStreamCnt() || outStreamIDX < 0)
     {
-        ERROR("outstream ", outStreamIDX, " of ", process.m_ID ," not found.", "Was called with streamIDX = ", p_outStreamIDX);
+      ERROR("outstream ",
+            outStreamIDX,
+            " of ",
+            process.m_ID,
+            " not found.",
+            "Was called with streamIDX = ",
+            p_outStreamIDX);
     }
-    pstream_t* outStream = process.outputStreams[outStreamIDX];
+  pstream_t *outStream = process.outputStreams[outStreamIDX];
 
-    if(outStream->ispipe)
+  if (outStream->ispipe)
     {
-        outStream->pstreamOpenWritePipe(outStream->pipe->name.c_str(), filetype);
+      outStream->pstreamOpenWritePipe(outStream->pipe->name.c_str(), filetype);
     }
-    else
+  else
     {
-        if(CdoDebug::PROCESS) MESSAGE("Trying to open: ",outStream->m_mfnames[0]);
+      if (CdoDebug::PROCESS)
+        MESSAGE("Trying to open: ", outStream->m_mfnames[0]);
 
-        if (cdoInteractive)
-          {
-            struct stat stbuf;
+      if (cdoInteractive)
+        {
+          struct stat stbuf;
 
-            int rstatus = stat(outStream->m_name.c_str(), &stbuf);
-            /* If permanent file already exists, query user whether to overwrite or exit */
-            if (rstatus != -1)
+          int rstatus = stat(outStream->m_name.c_str(), &stbuf);
+          /* If permanent file already exists, query user whether to overwrite or exit */
+          if (rstatus != -1)
             process.query_user_exit(outStream->m_name.c_str());
-          }
+        }
 
-        outStream->pstreamOpenWriteFile(filetype);
+      outStream->pstreamOpenWriteFile(filetype);
     }
-    return outStream->self;
+  return outStream->self;
 }
 
 /** function for operators with obase usage, will be called while operator execution */
-int cdoStreamOpenWrite(std::string p_filename, int filetype)
+int
+cdoStreamOpenWrite(std::string p_filename, int filetype)
 {
-      int pstreamID = -1;
-      process_t& process = processSelf();
-      process.addFileOutStream(p_filename);
-      pstreamID = process.outputStreams.back()->pstreamOpenWriteFile(filetype);
+  int pstreamID = -1;
+  process_t &process = processSelf();
+  process.addFileOutStream(p_filename);
+  pstreamID = process.outputStreams.back()->pstreamOpenWriteFile(filetype);
 
-      if(pstreamID == -1)
-      {
-        ERROR("Could not create pstream for file: ", p_filename);
-      }
-
-      return pstreamID;
-}
-
-bool cdoInFileExists(int inStreamIDX)
-{
-    pstream_t* inStream = processSelf().inputStreams[inStreamIDX];
-    return fileExists(inStream->m_mfnames[0].c_str());
-}
-bool cdoOutFileExists(int outStreamIDX)
-{
-    pstream_t* outStream = processSelf().outputStreams[outStreamIDX];
-    return fileExists(outStream->m_mfnames[0].c_str());
-}
-int cdoStreamOpenAppend(int p_outFileIndex)
-{
-    process_t &process = processSelf();
-    int streamIndex = p_outFileIndex - process.inputStreams.size();
-    pstream_t *outStream = process.outputStreams[streamIndex];
-    int pstreamID = -1;
-    if(outStream->ispipe)
+  if (pstreamID == -1)
     {
-     if (CdoDebug::PSTREAM)
+      ERROR("Could not create pstream for file: ", p_filename);
+    }
+
+  return pstreamID;
+}
+
+bool
+cdoInFileExists(int inStreamIDX)
+{
+  pstream_t *inStream = processSelf().inputStreams[inStreamIDX];
+  return fileExists(inStream->m_mfnames[0].c_str());
+}
+bool
+cdoOutFileExists(int outStreamIDX)
+{
+  pstream_t *outStream = processSelf().outputStreams[outStreamIDX];
+  return fileExists(outStream->m_mfnames[0].c_str());
+}
+int
+cdoStreamOpenAppend(int p_outFileIndex)
+{
+  process_t &process = processSelf();
+  int streamIndex = p_outFileIndex - process.inputStreams.size();
+  pstream_t *outStream = process.outputStreams[streamIndex];
+  int pstreamID = -1;
+  if (outStream->ispipe)
+    {
+      if (CdoDebug::PSTREAM)
         {
           MESSAGE("pipe ", outStream->pipe->name.c_str());
         }
       cdoAbort("this operator doesn't work with pipes!");
     }
-    else
+  else
     {
-       outStream->openAppend(outStream->m_mfnames[0].c_str());
-       pstreamID = outStream->self;
+      outStream->openAppend(outStream->m_mfnames[0].c_str());
+      pstreamID = outStream->self;
     }
-    if(pstreamID == -1)
+  if (pstreamID == -1)
     {
-        ERROR("could not append to ", outStream->m_mfnames[0]);
+      ERROR("could not append to ", outStream->m_mfnames[0]);
     }
-    return pstreamID;
+  return pstreamID;
 }
 
-process_t* getProcess(int p_processID)
+process_t *
+getProcess(int p_processID)
 {
-    auto process = Process.find(p_processID);
-    if(process == Process.end()){
-        ERROR("Process with ID: " , p_processID, "not found");
-    }
-    return &(process->second);
-}
-
-std::string cdoGetOutStreamName(int p_outStream)
-{
-    process_t &process = processSelf();
-    return process.outputStreams[p_outStream]->m_name;
-}
-
-std::string cdoGetInStreamName(int p_inStream)
-{
-    process_t &process = processSelf();
-    return process.inputStreams[p_inStream]->m_name;
-}
-std::string cdoGetStreamName(int p_streamIndex)
-{
-    std::string streamName;
-    process_t &process = processSelf();
-    MESSAGE("stridx " ,p_streamIndex);
-    if(p_streamIndex >= process.inputStreams.size())
+  auto process = Process.find(p_processID);
+  if (process == Process.end())
     {
-        if(CdoDebug::PROCESS) MESSAGE("Getting output stream name", p_streamIndex);
-        streamName = cdoGetOutStreamName(p_streamIndex - process.inputStreams.size());
+      ERROR("Process with ID: ", p_processID, "not found");
     }
-    else{
-        if(CdoDebug::PROCESS) MESSAGE("Getting input stream name", p_streamIndex);
-       streamName =  cdoGetInStreamName(p_streamIndex); 
-    }
-    if(CdoDebug::PROCESS) MESSAGE("StreamName is:",streamName);
-    return streamName;
-
+  return &(process->second);
 }
-char * cdoGetObase()
-{
-    process_t &process = processSelf();
 
-    return obase[process.m_ID];
+std::string
+cdoGetOutStreamName(int p_outStream)
+{
+  process_t &process = processSelf();
+  return process.outputStreams[p_outStream]->m_name;
+}
+
+std::string
+cdoGetInStreamName(int p_inStream)
+{
+  process_t &process = processSelf();
+  return process.inputStreams[p_inStream]->m_name;
+}
+std::string
+cdoGetStreamName(int p_streamIndex)
+{
+  std::string streamName;
+  process_t &process = processSelf();
+  MESSAGE("stridx ", p_streamIndex);
+  if (p_streamIndex >= process.inputStreams.size())
+    {
+      if (CdoDebug::PROCESS)
+        MESSAGE("Getting output stream name", p_streamIndex);
+      streamName = cdoGetOutStreamName(p_streamIndex - process.inputStreams.size());
+    }
+  else
+    {
+      if (CdoDebug::PROCESS)
+        MESSAGE("Getting input stream name", p_streamIndex);
+      streamName = cdoGetInStreamName(p_streamIndex);
+    }
+  if (CdoDebug::PROCESS)
+    MESSAGE("StreamName is:", streamName);
+  return streamName;
+}
+char *
+cdoGetObase()
+{
+  process_t &process = processSelf();
+
+  return obase[process.m_ID];
 }
 extern "C" {
-size_t getPeakRSS( );
+size_t getPeakRSS();
 }
 
 void
 cdoInitialize(void *p_process)
 {
 #if defined(_OPENMP)
-  omp_set_num_threads(ompNumThreads); // Has to be called for every module (pthread)!
+  omp_set_num_threads(ompNumThreads);  // Has to be called for every module (pthread)!
 #endif
-  process_t *process = (process_t*)p_process;
+  process_t *process = (process_t *) p_process;
 
-  //std::cout << arg->processID << std::endl;
-  if(CdoDebug::PROCESS) MESSAGE("Initializing process: ", process->m_operatorCommand);
+  // std::cout << arg->processID << std::endl;
+  if (CdoDebug::PROCESS)
+    MESSAGE("Initializing process: ", process->m_operatorCommand);
   process->threadID = pthread_self();
-
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PSTREAM)
-    MESSAGE("process ", processSelf().m_ID," thread ", pthread_self());
+    MESSAGE("process ", processSelf().m_ID, " thread ", pthread_self());
 #endif
-
 }
 
-void cdoFinish(void)
+void
+cdoFinish(void)
 {
   process_t &process = processSelf();
-  int processID = process.m_ID;
-  if(CdoDebug::PROCESS) MESSAGE("Finishing process: ", processID);
-  int nvars, ntimesteps;
-  char memstring[32] = { "" };
-  double s_utime, s_stime;
-  double e_utime, e_stime;
-  double c_cputime = 0, c_usertime = 0, c_systime = 0;
-  double p_cputime = 0, p_usertime = 0, p_systime = 0;
 
-#ifdef  HAVE_LIBPTHREAD
   if (CdoDebug::PROCESS)
-    MESSAGE("process ",processID," thread ", pthread_self());
+    MESSAGE("Finishing process: ", process.m_ID);
+
+#ifdef HAVE_LIBPTHREAD
+  if (CdoDebug::PROCESS)
+    MESSAGE("process ", process.m_ID, " thread ", pthread_self());
 #endif
-
-  int64_t nvals = processInqNvals(processID);
-  nvars = processInqVarNum();
-  ntimesteps = processInqTimesteps();
-
   if (!cdoSilentMode)
+    process.printProcessedValues();
+
+  cdoTimes times = process.getTimes(processNums());
+
+  processAccuTime(times.c_usertime, times.c_systime);
+
+  process.setInactive();
+
+  char memstring[32] = { "" };
+
+  if (process.m_ID == 0)
     {
-      set_text_color(stderr, RESET, GREEN);
-      fprintf(stderr, "%s: ", processInqPrompt());
-      reset_text_color(stderr);
-      if (nvals > 0)
-        {
-          if (sizeof(int64_t) > sizeof(size_t))
-#if defined(_WIN32)
-            fprintf(stderr,
-                    "Processed %I64d value%s from %d variable%s",
-#else
-            fprintf(stderr,
-                    "Processed %jd value%s from %d variable%s",
-#endif
-                    (intmax_t) nvals,
-                    ADD_PLURAL(nvals),
-                    nvars,
-                    ADD_PLURAL(nvars));
-          else
-            fprintf(stderr,
-                    "Processed %zu value%s from %d variable%s",
-                    (size_t) nvals,
-                    ADD_PLURAL(nvals),
-                    nvars,
-                    ADD_PLURAL(nvars));
-        }
-      else if (nvars > 0)
-        {
-          fprintf(stderr, "Processed %d variable%s", nvars, ADD_PLURAL(nvars));
-        }
-
-      if (ntimesteps > 0)
-        fprintf(stderr, " over %d timestep%s", ntimesteps, ADD_PLURAL(ntimesteps));
-
-      //  fprintf(stderr, ".");
+      printEndTimes(times, memstring);
     }
-  /*
-    fprintf(stderr, "%s: Processed %d variable%s %d timestep%s.",
-            processInqPrompt(), nvars, nvars > 1 ? "s" : "",
-            ntimesteps, ntimesteps > 1 ? "s" : "");
-  */
-  processStartTime(&s_utime, &s_stime);
-  cdoProcessTime(&e_utime, &e_stime);
+  process.printBenchmarks(times, memstring);
+}
 
-  c_usertime = e_utime - s_utime;
-  c_systime = e_stime - s_stime;
-  c_cputime = c_usertime + c_systime;
+cdoTimes
+process_t::getTimes(int p_processNums)
+{
+  cdoTimes times;
+  times.s_utime = s_utime;
+  times.s_stime = s_stime;
 
-#ifdef  HAVE_LIBPTHREAD
+  // both variables are set in cdoProcessTime
+  cdoProcessTime(&times.e_utime, &times.e_stime);
+
+  times.c_usertime = times.e_utime - times.s_utime;
+  times.c_systime = times.e_stime - times.s_stime;
+  times.c_cputime = times.c_usertime + times.c_systime;
+
+#ifdef HAVE_LIBPTHREAD
   if (pthreadScope == PTHREAD_SCOPE_PROCESS)
     {
-      c_usertime /= processNums();
-      c_systime /= processNums();
-      c_cputime /= processNums();
+      times.c_usertime /= p_processNums;
+      times.c_systime /= p_processNums;
+      times.c_cputime /= p_processNums;
     }
 #endif
 
-  processDefCputime(processID, c_cputime);
+  cputime = times.c_cputime;
 
-  processAccuTime(c_usertime, c_systime);
-
-  if (processID == 0)
+  return times;
+}
+void
+printEndTimes(cdoTimes p_times, char *p_memstring)
+{
+  size_t memmax = getPeakRSS();
+  if (memmax)
     {
-      size_t memmax = getPeakRSS();
-      if (memmax)
+      size_t muindex = 0;
+      const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
+      const size_t nmu = sizeof(mu) / sizeof(char *);
+      while (memmax > 9999 && muindex < nmu - 1)
         {
-          size_t muindex = 0;
-          const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
-          const size_t nmu = sizeof(mu)/sizeof(char*);
-          while (memmax > 9999 && muindex < nmu-1) { memmax /= 1024; muindex++; }
-          snprintf(memstring, sizeof(memstring), " %zu%s", memmax, mu[muindex]);
+          memmax /= 1024;
+          muindex++;
         }
-
-      processEndTime(&p_usertime, &p_systime);
-      p_cputime = p_usertime + p_systime;
+      snprintf(p_memstring, sizeof(p_memstring), " %zu%s", memmax, mu[muindex]);
     }
+}
 
+void
+process_t::printBenchmarks(cdoTimes p_times, char *p_memstring)
+{
 #if defined(HAVE_SYS_TIMES_H)
   if (cdoBenchmark)
-    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", c_usertime, c_systime, c_cputime, memstring);
+    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime, p_times.c_systime, p_times.c_cputime, p_memstring);
   else
     {
       if (!cdoSilentMode)
-        fprintf(stderr, " [%.2fs%s]\n", c_cputime, memstring);
+        fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
     }
-  if (cdoBenchmark && processID == 0)
-    fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_usertime, p_systime, p_cputime, memstring);
+  if (cdoBenchmark && m_ID == 0)
+  {
+    processEndTime(&p_times.p_usertime, &p_times.p_systime);
+    p_times.p_cputime = p_times.p_usertime + p_times.p_systime;
+    fprintf(stderr,
+            "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n",
+            p_times.p_usertime,
+            p_times.p_systime,
+            p_times.p_cputime,
+            p_memstring);
+  }
 #else
   fprintf(stderr, "\n");
 #endif
-
-  process.setInactive();
 }
 
+void
+process_t::printProcessedValues()
+{
+  set_text_color(stderr, RESET, GREEN);
+  fprintf(stderr, "%s: ", processInqPrompt());
+  reset_text_color(stderr);
+
+  int64_t nvals = m_nvals;
+
+  if (nvals > 0)
+    {
+      if (sizeof(int64_t) > sizeof(size_t))
+#if defined(_WIN32)
+        fprintf(stderr,
+                "Processed %I64d value%s from %d variable%s",
+#else
+        fprintf(stderr,
+                "Processed %jd value%s from %d variable%s",
+#endif
+                (intmax_t) nvals,
+                ADD_PLURAL(nvals),
+                nvars,
+                ADD_PLURAL(nvars));
+      else
+        fprintf(stderr,
+                "Processed %zu value%s from %d variable%s",
+                (size_t) nvals,
+                ADD_PLURAL(nvals),
+                nvars,
+                ADD_PLURAL(nvars));
+    }
+  else if (nvars > 0)
+    {
+      fprintf(stderr, "Processed %d variable%s", nvars, ADD_PLURAL(nvars));
+    }
+
+  if (ntimesteps > 0)
+    fprintf(stderr, " over %d timestep%s", ntimesteps, ADD_PLURAL(ntimesteps));
+
+  //  fprintf(stderr, ".");
+}
