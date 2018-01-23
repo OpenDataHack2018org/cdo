@@ -42,7 +42,7 @@ void vert_interp_lev(int gridsize, double missval, double *vardata1, double *var
       double wgt2 = lev_wgt2[ilev];
       double *var2 = vardata2+gridsize*ilev;
 
-      if ( cdoVerbose ) cdoPrint("level %d: idx1=%d idx2=%d wgt1=%g wgt2=%g", ilev, idx1, idx2, wgt1, wgt2);
+      // if ( cdoVerbose ) cdoPrint("level %d: idx1=%d idx2=%d wgt1=%g wgt2=%g", ilev, idx1, idx2, wgt1, wgt2);
 
       double *var1L1 = vardata1+gridsize*idx1;
       double *var1L2 = vardata1+gridsize*idx2;
@@ -141,6 +141,25 @@ void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev
 }
 
 
+bool levelDirUp(int nlev, double *lev)
+{
+  bool lup = (nlev > 1 && lev[1] > lev[0]);
+  for ( int i = 1; i < nlev-1; ++i )
+    if ( lup && !(lev[i+1] > lev[i]) ) return false;
+        
+  return lup;
+}
+
+
+bool levelDirDown(int nlev, double *lev)
+{
+  bool ldown = (nlev > 1 && lev[1] < lev[0]);
+  for ( int i = 1; i < nlev-1; ++i )
+    if ( ldown && !(lev[i+1] < lev[i]) ) return false;
+
+  return ldown;
+}
+
 void *Intlevel(void *argument)
 {
   int gridsize;
@@ -167,13 +186,23 @@ void *Intlevel(void *argument)
 
   bool expol = (operatorID == INTLEVELX);
 
-  operatorInputArg("levels");
+  operatorInputArg("<zvar> levels");
 
+  int argc = operatorArgc();
+  char  **argv = operatorArgv();
+  const char *zvarname = NULL;
+  if ( argc > 1 && isalpha(*argv[0]) )
+    {
+      zvarname = argv[0];
+      argc--;
+      argv++;
+      if ( cdoVerbose ) cdoPrint("zvarname = %s", zvarname);
+    }
   lista_t *flista = lista_new(FLT_LISTA);
-  int nlev2 = args2flt_lista(operatorArgc(), operatorArgv(), flista);
+  int nlev2 = args2flt_lista(argc, argv, flista);
   double *lev2 = (double *) lista_dataptr(flista);
 
-  if ( cdoVerbose ) for ( i = 0; i < nlev2; ++i ) printf("lev2 %d: %g\n", i, lev2[i]);
+  if ( cdoVerbose ) for ( i = 0; i < nlev2; ++i ) cdoPrint("lev2 %d: %g", i, lev2[i]);
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
@@ -184,7 +213,7 @@ void *Intlevel(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int nzaxis  = vlistNzaxis(vlistID1);
+  int nzaxis = vlistNzaxis(vlistID1);
   for ( i = 0; i < nzaxis; i++ )
     {
       zaxisID = vlistZaxis(vlistID1, i);
@@ -196,36 +225,14 @@ void *Intlevel(void *argument)
 	    break;
 	  }
     }
-
   if ( i == nzaxis ) cdoAbort("No processable variable found!");
 
   int nlev1 = nlevel;
   double *lev1 = (double*) Malloc((nlev1+2)*sizeof(double));
   cdoZaxisInqLevels(zaxisID1, lev1+1);
 
-  bool lup = false;
-  bool ldown = false;
-  for ( i = 1; i < nlev1; ++i )
-    {
-      if ( i == 1 )
-	{
-	  if ( lev1[i+1] > lev1[i] )
-	    lup = true;
-	  else if ( lev1[i+1] < lev1[i] )
-	    ldown = true;	
-	}
-      else
-	{
-	  if ( lup )
-	    {
-	      if ( !(lev1[i+1] > lev1[i]) ) lup = false;
-	    }
-	  else if ( ldown )
-	    {
-	      if ( !(lev1[i+1] < lev1[i]) ) ldown = false;
-	    }
-	}
-    }
+  bool lup = levelDirUp(nlev1, lev1+1);
+  bool ldown = levelDirDown(nlev1, lev1+1);
 
   if ( lup )
     {
@@ -240,7 +247,7 @@ void *Intlevel(void *argument)
   else
     cdoWarning("Non monotonic zaxis!");
 
-  if ( cdoVerbose ) for ( i = 0; i < nlev1+2; ++i ) printf("lev1 %d: %g\n", i, lev1[i]);
+  if ( cdoVerbose ) for ( i = 0; i < nlev1+2; ++i ) cdoPrint("lev1 %d: %g", i, lev1[i]);
 
   int *lev_idx1 = (int*) Malloc(nlev2*sizeof(int));
   int *lev_idx2 = (int*) Malloc(nlev2*sizeof(int));
@@ -285,10 +292,10 @@ void *Intlevel(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(zaxisID);
+      int gridID = vlistInqVarGrid(vlistID1, varID);
+      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      size_t gridsize = gridInqSize(gridID);
+      int nlevel = zaxisInqSize(zaxisID);
 
       vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
