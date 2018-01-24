@@ -300,28 +300,6 @@ void input_int(char *arg, int intarr[], int maxint, int *nintfound)
   *nintfound = nint;
 }
 
-std::string string2lower(std::string str)
-{
-  std::string lower_case_string = str;
-  for(char c : str) c = tolower(c); 
-  return lower_case_string;
-}
-
-void strtolower(char *str)
-{
-  if ( str )
-    for ( size_t i = 0; str[i]; ++i )
-      str[i] = (char)tolower((int)str[i]);
-}
-
-void strtoupper(char *str)
-{
-  if ( str )
-    for ( size_t i = 0; str[i]; ++i )
-      str[i] = (char)toupper((int)str[i]);
-}
-
-
 const char *parameter2word(const char *string)
 {
   size_t len = strlen(string);

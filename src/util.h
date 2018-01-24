@@ -38,9 +38,6 @@
 #undef   SQR
 #define  SQR(a)    ((a)*(a))
 
-
-#define  ADD_PLURAL(n)  ((n)!=1 ? "s" : "")
-
 #define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && processSelf().inputStreams[0]->ispipe == false && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
@@ -188,9 +185,6 @@ int zaxisFromName(const char *zaxisname);
 /* refactor: moved here from cdo.h */
 int cdo_omp_get_thread_num(void);
 void cdo_omp_set_num_threads(int nthreads);
-std::string string2lower(std::string str);
-void strtolower(char *str);
-void strtoupper(char *str);
 
 /* refactor: moved here from cdo.cc */
 void exp_run(int argc, char *argv[], const char *cdoExpName); // job.cc

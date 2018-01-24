@@ -68,6 +68,7 @@
 #include "grid_proj.h"
 #include "percentiles.h"
 #include "util_wildcards.h"
+#include "util_string.h"
 
 #ifdef  _OPENMP
 #  include <omp.h>

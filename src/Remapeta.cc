@@ -28,6 +28,7 @@
 #include "after_vertint.h"
 #include "listarray.h"
 #include "stdnametable.h"
+#include "util_string.h"
 
 static void
 setmissval(long nvals, int *imiss, double missval, double *array)

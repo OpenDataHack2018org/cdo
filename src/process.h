@@ -18,7 +18,6 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
 
-#include "util.h"
 #include "pstream.h"
 #include "modules.h"
 

@@ -20,6 +20,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util_string.h"
 
 
 void *Deltime(void *process)

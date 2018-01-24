@@ -44,6 +44,7 @@
 #include "cdoDebugOutput.h"
 #include <iostream>
 #include <string>
+#include "util_string.h"
 
 
 static int pthreadScope = 0;

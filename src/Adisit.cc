@@ -28,6 +28,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
+#include "util_string.h"
 
 
 /*

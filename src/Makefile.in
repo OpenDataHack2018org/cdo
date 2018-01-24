@@ -163,9 +163,10 @@ am_libcdo_la_OBJECTS = libcdo_la-array.lo libcdo_la-cdo_pthread.lo \
 	libcdo_la-remap_bilinear_scrip.lo libcdo_la-stdnametable.lo \
 	libcdo_la-specspace.lo libcdo_la-statistic.lo \
 	libcdo_la-table.lo libcdo_la-text.lo libcdo_la-timer.lo \
-	libcdo_la-util.lo libcdo_la-util_wildcards.lo \
-	libcdo_la-zaxis_print.lo libcdo_la-zaxis.lo \
-	json/libcdo_la-jsmn.lo kdtreelib/libcdo_la-kdtree_cartesian.lo \
+	libcdo_la-util.lo libcdo_la-util_string.lo \
+	libcdo_la-util_wildcards.lo libcdo_la-zaxis_print.lo \
+	libcdo_la-zaxis.lo json/libcdo_la-jsmn.lo \
+	kdtreelib/libcdo_la-kdtree_cartesian.lo \
 	kdtreelib/libcdo_la-kdtree_common.lo \
 	kdtreelib/libcdo_la-kdtree_spherical.lo \
 	kdtreelib/libcdo_la-qsort.lo kdtreelib/libcdo_la-pmergesort.lo \
@@ -594,9 +595,9 @@ libcdo_la_SOURCES = array.h array.cc cdo_int.h compare.h cfortran.h \
 	remap_bicubic_scrip.cc remap_bilinear_scrip.cc stdnametable.cc \
 	stdnametable.h specspace.cc specspace.h statistic.cc \
 	statistic.h table.cc text.cc text.h timebase.h timer.cc \
-	util.cc util.h util_wildcards.cc util_wildcards.h varlist.h \
-	zaxis_print.cc zaxis.cc json/jsmn.h json/jsmn.c \
-	kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.cc \
+	util.cc util.h util_string.cc util_string.h util_wildcards.cc \
+	util_wildcards.h varlist.h zaxis_print.cc zaxis.cc json/jsmn.h \
+	json/jsmn.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.cc \
 	kdtreelib/kdtree_common.cc kdtreelib/kdtree_spherical.cc \
 	kdtreelib/qsort.cc kdtreelib/pmergesort.cc kdtreelib/pqueue.cc \
 	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
@@ -1156,6 +1157,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-text.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util_string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util_wildcards.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis_print.Plo@am__quote@
@@ -1962,6 +1964,13 @@ libcdo_la-util.lo: util.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util.cc' object='libcdo_la-util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-util.lo `test -f 'util.cc' || echo '$(srcdir)/'`util.cc
+
+libcdo_la-util_string.lo: util_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-util_string.lo -MD -MP -MF $(DEPDIR)/libcdo_la-util_string.Tpo -c -o libcdo_la-util_string.lo `test -f 'util_string.cc' || echo '$(srcdir)/'`util_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-util_string.Tpo $(DEPDIR)/libcdo_la-util_string.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util_string.cc' object='libcdo_la-util_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-util_string.lo `test -f 'util_string.cc' || echo '$(srcdir)/'`util_string.cc
 
 libcdo_la-util_wildcards.lo: util_wildcards.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-util_wildcards.lo -MD -MP -MF $(DEPDIR)/libcdo_la-util_wildcards.Tpo -c -o libcdo_la-util_wildcards.lo `test -f 'util_wildcards.cc' || echo '$(srcdir)/'`util_wildcards.cc

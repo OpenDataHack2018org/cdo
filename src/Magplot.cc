@@ -16,6 +16,7 @@
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 #include "StringUtilities.h"
+#include "util_string.h"
 
 #define DBG 0
 

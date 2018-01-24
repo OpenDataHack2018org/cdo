@@ -27,6 +27,7 @@
 #include "pstream.h"
 #include "after_vertint.h"
 #include "stdnametable.h"
+#include "util_string.h"
 
 
 void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor, int nlev);

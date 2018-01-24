@@ -17,6 +17,7 @@
 
 #include <cdi.h>
 #include "cdo_int.h"
+#include "util_string.h"
 
 
 double cdoZaxisInqLevel(int zaxisID, int levelID)

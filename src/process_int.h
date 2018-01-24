@@ -18,6 +18,7 @@
 #ifndef PROCESS_INT_H
 #define PROCESS_INT_H
 
+#include "util.h"
 #include "process.h"
 
 extern std::map<int, process_t> Process;

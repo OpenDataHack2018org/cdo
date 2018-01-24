@@ -31,7 +31,7 @@
 #include "pstream.h"
 #include "specspace.h"
 #include "listarray.h"
-
+#include "util_string.h"
 
 void *Wind(void *process)
 {

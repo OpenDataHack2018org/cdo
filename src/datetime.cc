@@ -1,6 +1,7 @@
 #include <cdi.h>
 #include "cdo_int.h"
 #include "datetime.h"
+#include "util_string.h"
 
 int  CDO_Timestat_Date = -1;
 bool CDO_Timestat_Bounds = false ;

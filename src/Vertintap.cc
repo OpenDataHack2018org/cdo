@@ -30,6 +30,7 @@
 #include "after_vertint.h"
 #include "listarray.h"
 #include "stdnametable.h"
+#include "util_string.h"
 
 static
 bool is_height_axis(int zaxisID, int nlevel)

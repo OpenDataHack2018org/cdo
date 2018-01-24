@@ -31,6 +31,7 @@
 #include "listarray.h"
 #include "stdnametable.h"
 #include "constants.h"
+#include "util_string.h"
 
 
 static

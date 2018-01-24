@@ -19,10 +19,10 @@
 #include "config.h"
 #endif
 
-#include "cdo_int.h"
 #include "error.h"
 #include "modules.h"
 #include <cdi.h>
+#include "util_string.h"
 
 #include <dirent.h>
 #include <dlfcn.h>
@@ -31,8 +31,6 @@
 #include <string>
 // for std::sort()
 #include <algorithm>
-
-
 
 
 

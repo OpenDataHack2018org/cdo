@@ -1,5 +1,6 @@
 #include "cdo_int.h"
 #include "StringUtilities.h"
+#include "util_string.h"
 
 #define DBG 0
 
