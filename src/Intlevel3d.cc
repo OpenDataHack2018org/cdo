@@ -105,22 +105,18 @@ void vert_gen_weights3d(bool expol, int nlev1, size_t gridsize, double *xlev1, i
 
 void *Intlevel3d(void *argument)
 {
-  size_t gridsize, gridSize, gridsizei, gridsizeo;
+  size_t gridsizei, gridsizeo;
   int nrecs;
-  int i, offset;
+  int i;
   int varID, levelID;
   int nvars,nvct;
-  size_t nmiss;
   int zaxisID1 = -1, zaxisID3;
-  int gridID3 = -1, gridID, zaxisID;
-  int nlevi, nlevo, nlevel = 0, maxlev;
-  double missval;
+  int gridID3 = -1;
+  int nlevi, nlevo, maxlev;
   double *lev2 = NULL;
-  double *single1, *single2;
-  int taxisID1, taxisID3;
   double *zlevels_in, *zlevels_out;
   size_t zlevels_in_miss, zlevels_out_miss;
-  char varname[10]; 
+  char varname[CDI_MAX_NAME]; 
 
   cdoInitialize(argument);
 
@@ -149,9 +145,11 @@ void *Intlevel3d(void *argument)
   file_argument_free(fileargument);
 
   int vlistID0 = pstreamInqVlist(streamID0);
-  int vlistID1 = pstreamInqVlist(streamID1); taxisID1 = vlistInqTaxis(vlistID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
   int vlistID2 = pstreamInqVlist(streamID2);
-  int vlistID3 = vlistDuplicate(vlistID1);  taxisID3 = taxisDuplicate(taxisID1);
+  int vlistID3 = vlistDuplicate(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID1);
 
   /*
@@ -162,10 +160,10 @@ void *Intlevel3d(void *argument)
     int nvars = vlistNvars(vlistID0);
     if ( nvars != 1 ) cdoAbort("Only one single variable is allowed!");
 
-    gridID     = vlistInqVarGrid(vlistID0, 0);
-    zaxisID    = vlistInqVarZaxis(vlistID0, 0);
-    gridsize   = gridInqSize(gridID);
-    nlevel     = zaxisInqSize(zaxisID);
+    int gridID = vlistInqVarGrid(vlistID0, 0);
+    int zaxisID = vlistInqVarZaxis(vlistID0, 0);
+    size_t gridsize = gridInqSize(gridID);
+    int nlevel = zaxisInqSize(zaxisID);
 
     zlevels_in = (double*) Malloc(gridsize*(nlevel+2)*sizeof(double));
     nlevi      = nlevel;   /* number of input levels for later use */
@@ -176,9 +174,8 @@ void *Intlevel3d(void *argument)
     for ( int recID = 0; recID < nrecs; recID++ )
       {
         pstreamInqRecord(streamID0, &varID, &levelID);
-        gridsize = gridInqSize(vlistInqVarGrid(vlistID0, varID));
-        offset   = gridsize + gridsize*levelID;
-        single1  = zlevels_in + offset;
+        size_t offset = gridsize + gridsize*levelID;
+        double *single1 = zlevels_in + offset;
         pstreamReadRecord(streamID0, single1, &zlevels_in_miss);
       }
   }
@@ -189,11 +186,12 @@ void *Intlevel3d(void *argument)
   {
     int nvars = vlistNvars(vlistID2);
     if (nvars != 1) cdoAbort("Only one single variable is allowed!");
-    gridID      = vlistInqVarGrid(vlistID2, varID);
-    gridID3     = gridID;
-    zaxisID     = vlistInqVarZaxis(vlistID2, varID);
-    gridsize    = gridInqSize(gridID);
-    nlevel      = zaxisInqSize(zaxisID);
+
+    int gridID = vlistInqVarGrid(vlistID2, varID);
+    gridID3 = gridID;
+    int zaxisID = vlistInqVarZaxis(vlistID2, varID);
+    size_t gridsize = gridInqSize(gridID);
+    int nlevel = zaxisInqSize(zaxisID);
 
     zlevels_out = (double*) Malloc(gridsize*nlevel*sizeof(double));
     nlevo       = nlevel;  /* number of output levels for later use */
@@ -204,9 +202,8 @@ void *Intlevel3d(void *argument)
     for ( int recID = 0; recID < nrecs; recID++ )
       {
 	pstreamInqRecord(streamID2, &varID, &levelID);
-	gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	offset   = gridsize*levelID;
-	single1  = zlevels_out + offset;
+	size_t offset = gridsize*levelID;
+	double *single1 = zlevels_out + offset;
 	pstreamReadRecord(streamID2, single1, &zlevels_out_miss);
       }
   }
@@ -214,18 +211,11 @@ void *Intlevel3d(void *argument)
   /* Missing values are not allowed for coordinate variables */
   if ( 0 != zlevels_in_miss  )
     cdoAbort("Input vertical coordinate variables are not allowed to contain missing values.");
-  else
-    {
-      if ( cdoVerbose ) cdoPrint("Input vertical coordinate has no missing values.");
-    }
+  else if ( cdoVerbose ) cdoPrint("Input vertical coordinate has no missing values.");
 
   if ( 0 != zlevels_out_miss )
     cdoAbort("Output vertical coordinate variables are not allowd to contain missing values.");
-  else
-    {
-      if ( cdoVerbose ) cdoPrint("Output vertical coordinate has no missing values.");
-    }
-
+  else if ( cdoVerbose ) cdoPrint("Output vertical coordinate has no missing values.");
 
   /*
    * gridsize of input and output vertical coordinate must be equal
@@ -234,7 +224,7 @@ void *Intlevel3d(void *argument)
   if ( gridsizei != gridsizeo )
     cdoAbort("Input and output vertical coordinate must have the same gridsize!");
 
-  gridSize = gridsizeo;
+  size_t gridSize = gridsizeo;
 
    /* input and output vertical coordinates must have exactly the same horizontal grid */
    if ( gridsizei != gridsizeo  )
@@ -251,8 +241,8 @@ void *Intlevel3d(void *argument)
   int nzaxis = vlistNzaxis(vlistID1);
   for ( i = 0; i < nzaxis; ++i )
     {
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
+      int zaxisID = vlistZaxis(vlistID1, i);
+      int nlevel = zaxisInqSize(zaxisID);
       if ( nlevel == nlevi )
         {
           zaxisID1 = zaxisID;
@@ -264,8 +254,7 @@ void *Intlevel3d(void *argument)
   int ngrids = vlistNgrids(vlistID1);
   for ( i = 0; i < ngrids; ++i )
     {
-      gridID = vlistGrid(vlistID1, i);
-      gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(vlistGrid(vlistID1, i));
       if ( gridsize == gridSize ) break;
     }
   if ( i == nzaxis ) cdoAbort("No processable variable found (grid coordinate differ)!");
@@ -314,30 +303,29 @@ void *Intlevel3d(void *argument)
   zaxisID3 = zaxisCreate(zaxisInqType(zaxisID1), nlevo);
   lev2 = (double*) Malloc(nlevo*sizeof(double));
   /* fill values with its indices */
-  for (i=0;i<nlevo;i++)
-    lev2[i] = (double) i+1;
+  for ( int i=0; i<nlevo; i++ ) lev2[i] = (double) i+1;
   zaxisDefLevels(zaxisID3, lev2);
   zaxisDefName(zaxisID3, "lev");
   /*  copy VCT from input vlistID1 to output vlistID3 if there is one */
   nvct = zaxisInqVctSize(zaxisID1);
   if ( nvct > 0 ) zaxisDefVct(zaxisID3,zaxisInqVctSize(zaxisID1), zaxisInqVctPtr(zaxisID1));
 
-  for ( i = 0; i < nzaxis; i++ )
+  for ( int i = 0; i < nzaxis; i++ )
     if ( zaxisID1 == vlistZaxis(vlistID1, i) )
       vlistChangeZaxisIndex(vlistID3, i, zaxisID3);
   /* add the vertical output field to the output stream */
   int oz3dvarID = vlistDefVar(vlistID3, gridID3, zaxisID3, TIME_VARYING);
   {
-    char str[256];
+    char str[CDI_MAX_NAME];
     str[0] = 0;
-    vlistInqVarName(vlistID2,0,str);
-    vlistDefVarName(vlistID3,oz3dvarID,str);
+    vlistInqVarName(vlistID2, 0, str);
+    vlistDefVarName(vlistID3, oz3dvarID, str);
     str[0] = 0;
-    vlistInqVarLongname(vlistID2,0,str);
-    if ( str[0] ) vlistDefVarLongname(vlistID3,oz3dvarID, str);
+    vlistInqVarLongname(vlistID2, 0, str);
+    if ( str[0] ) vlistDefVarLongname(vlistID3, oz3dvarID, str);
     str[0] = 0;
-    vlistInqVarUnits(vlistID2,0, str);
-    if ( str[0] ) vlistDefVarUnits(vlistID3,oz3dvarID, str);
+    vlistInqVarUnits(vlistID2, 0, str);
+    if ( str[0] ) vlistDefVarUnits(vlistID3, oz3dvarID, str);
   }
 
   pstreamDefVlist(streamID3, vlistID3);
@@ -415,11 +403,9 @@ void *Intlevel3d(void *argument)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-          vlistInqVarName(vlistID1, varID, varname); 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  offset   = gridsize*levelID;
-	  single1  = vardata1[varID] + offset;
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  size_t offset = gridsize*levelID;
+	  double *single1 = vardata1[varID] + offset;
           pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 	  vars[varID] = true;
 	}
@@ -429,29 +415,28 @@ void *Intlevel3d(void *argument)
 	{
 	  if ( vars[varID] && varinterp[varID] )
 	    {
-	      gridID   = vlistInqVarGrid(vlistID1, varID);
-	      missval  = vlistInqVarMissval(vlistID1, varID);
-	      gridsize = gridInqSize(gridID);
+	      int gridID = vlistInqVarGrid(vlistID1, varID);
+	      size_t gridsize = gridInqSize(gridID);
+	      double missval = vlistInqVarMissval(vlistID1, varID);
 
 	      vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID],
 				nlevo, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
 	      for ( levelID = 0; levelID < nlevo; levelID++ )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistID3, varID));
-		  offset   = gridsize*levelID;
-		  single2  = vardata2[varID] + offset;
-		  nmiss    = 0;
+		  size_t offset = gridsize*levelID;
+		  double *single2 = vardata2[varID] + offset;
+		  size_t nmiss = 0;
 		  for ( size_t i = 0; i < gridsize; ++i )
 		    if ( DBL_IS_EQUAL(single2[i], missval) ) nmiss++;
 		  varnmiss[varID][levelID] = nmiss;
 		}
 	    }
           else
-          { 
-            vlistInqVarName(vlistID1, varID, varname); 
-            if ( cdoVerbose && tsID <= 1 ) cdoPrint("Perform no interpolation on variable %s", varname);
-          }
+            { 
+              vlistInqVarName(vlistID1, varID, varname); 
+              if ( cdoVerbose && tsID <= 1 ) cdoPrint("Perform no interpolation on variable %s", varname);
+            }
 	}
 
       /* write the output */
@@ -459,13 +444,12 @@ void *Intlevel3d(void *argument)
 	{
 	  if ( vars[varID] )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID3, varID));
+              size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID3, varID));
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID3, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistID3, varID));
-		  offset   = gridsize*levelID;
-
-		  single2  = vardata2[varID] + offset;
+		  size_t offset   = gridsize*levelID;
+		  double *single2  = vardata2[varID] + offset;
 		  pstreamDefRecord(streamID3, varID, levelID);
 		  pstreamWriteRecord(streamID3, single2, varnmiss[varID][levelID]);
 		}
@@ -473,12 +457,12 @@ void *Intlevel3d(void *argument)
 	}
 
       /* copy output z coordinate to output stream */
-      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID3, oz3dvarID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID3, oz3dvarID));
+      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID3, oz3dvarID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
         {
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID3, oz3dvarID));
-          offset   = gridsize*levelID;
-          single2  = zlevels_out + offset;
+          size_t offset = gridsize*levelID;
+          double *single2 = zlevels_out + offset;
           pstreamDefRecord(streamID3, oz3dvarID, levelID);
           pstreamWriteRecord(streamID3, single2, 0);
 

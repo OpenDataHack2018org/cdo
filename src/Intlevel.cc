@@ -169,16 +169,10 @@ bool levelDirDown(int nlev, double *lev)
 
 void *Intlevel(void *argument)
 {
-  int gridsize;
   int nrecs;
-  int i, offset;
   int varID, levelID;
-  size_t nmiss;
   int zaxisID1 = -1;
-  int gridID, zaxisID;
   int nlevel = 0;
-  double missval;
-  double *single1, *single2;
 
   cdoInitialize(argument);
 
@@ -196,7 +190,7 @@ void *Intlevel(void *argument)
   operatorInputArg("<zvar> levels");
 
   int argc = operatorArgc();
-  char  **argv = operatorArgv();
+  char **argv = operatorArgv();
   const char *zvarname = NULL;
   if ( argc > 1 && isalpha(*argv[0]) )
     {
@@ -209,7 +203,7 @@ void *Intlevel(void *argument)
   int nlev2 = args2flt_lista(argc, argv, flista);
   double *lev2 = (double *) lista_dataptr(flista);
 
-  if ( cdoVerbose ) for ( i = 0; i < nlev2; ++i ) cdoPrint("lev2 %d: %g", i, lev2[i]);
+  if ( cdoVerbose ) for ( int i = 0; i < nlev2; ++i ) cdoPrint("lev2 %d: %g", i, lev2[i]);
 
   int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
@@ -220,11 +214,12 @@ void *Intlevel(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
+  int i;
   int nzaxis = vlistNzaxis(vlistID1);
   for ( i = 0; i < nzaxis; i++ )
     {
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
+      int zaxisID = vlistZaxis(vlistID1, i);
+      nlevel = zaxisInqSize(zaxisID);
       if ( zaxisInqType(zaxisID) != ZAXIS_HYBRID && zaxisInqType(zaxisID) != ZAXIS_HYBRID_HALF )
 	if ( nlevel > 1 )
 	  {
@@ -254,7 +249,7 @@ void *Intlevel(void *argument)
   else
     cdoWarning("Non monotonic zaxis!");
 
-  if ( cdoVerbose ) for ( i = 0; i < nlev1+2; ++i ) cdoPrint("lev1 %d: %g", i, lev1[i]);
+  if ( cdoVerbose ) for ( int i = 0; i < nlev1+2; ++i ) cdoPrint("lev1 %d: %g", i, lev1[i]);
 
   int *lev_idx1 = (int*) Malloc(nlev2*sizeof(int));
   int *lev_idx2 = (int*) Malloc(nlev2*sizeof(int));
@@ -334,9 +329,9 @@ void *Intlevel(void *argument)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
-	  single1  = vardata1[varID] + offset;
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  size_t offset = gridsize*levelID;
+	  double *single1 = vardata1[varID] + offset;
 	  
 	  pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 	  vars[varID] = true;
@@ -346,20 +341,19 @@ void *Intlevel(void *argument)
 	{
 	  if ( vars[varID] && varinterp[varID] )
 	    {
-	      gridID   = vlistInqVarGrid(vlistID1, varID);
-	      missval  = vlistInqVarMissval(vlistID1, varID);
-	      gridsize = gridInqSize(gridID);
+	      int gridID = vlistInqVarGrid(vlistID1, varID);
+	      double missval = vlistInqVarMissval(vlistID1, varID);
+	      size_t gridsize = gridInqSize(gridID);
 
 	      vert_interp_lev(gridsize, missval, vardata1[varID], vardata2[varID],
 			      nlev2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
 	      for ( levelID = 0; levelID < nlev2; levelID++ )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-		  offset   = gridsize*levelID;
-		  single2  = vardata2[varID] + offset;
-		  nmiss    = 0;
-		  for ( int i = 0; i < gridsize; ++i )
+		  size_t offset = gridsize*levelID;
+		  double *single2 = vardata2[varID] + offset;
+		  size_t nmiss = 0;
+		  for ( size_t i = 0; i < gridsize; ++i )
 		    if ( DBL_IS_EQUAL(single2[i], missval) ) nmiss++;
 		  varnmiss[varID][levelID] = nmiss;
 		}
@@ -370,12 +364,12 @@ void *Intlevel(void *argument)
 	{
 	  if ( vars[varID] )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+              size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-		  offset   = gridsize*levelID;
-		  single2  = vardata2[varID] + offset;
+		  size_t offset = gridsize*levelID;
+		  double *single2 = vardata2[varID] + offset;
 		  pstreamDefRecord(streamID2, varID, levelID);
 		  pstreamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
 		}
