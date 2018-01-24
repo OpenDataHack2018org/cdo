@@ -105,17 +105,17 @@ void vert_gen_weights3d(bool expol, int nlev1, size_t gridsize, double *xlev1, i
 
 void *Intlevel3d(void *argument)
 {
-  size_t gridsizei, gridsizeo;
+  size_t gridsizeo;
   int nrecs;
   int i;
   int varID, levelID;
   int nvars,nvct;
   int zaxisID1 = -1, zaxisID3;
   int gridID3 = -1;
-  int nlevi, nlevo, maxlev;
+  int nlevo, maxlev;
   double *lev2 = NULL;
-  double *zlevels_in, *zlevels_out;
-  size_t zlevels_in_miss, zlevels_out_miss;
+  double *zlevels_out;
+  size_t zlevels_out_miss;
   char varname[CDI_MAX_NAME]; 
 
   cdoInitialize(argument);
@@ -140,11 +140,7 @@ void *Intlevel3d(void *argument)
   /*  Read filename from Parameter */
   operatorInputArg("filename for vertical source coordinates variable");
   operatorCheckArgc(1);
-  argument_t *fileargument = file_argument_new(operatorArgv()[0]);
-  int streamID0 = pstreamOpenRead(fileargument);                     /*  3d vertical input coordinate */
-  file_argument_free(fileargument);
 
-  int vlistID0 = pstreamInqVlist(streamID0);
   int vlistID1 = pstreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
   int vlistID2 = pstreamInqVlist(streamID2);
@@ -156,28 +152,35 @@ void *Intlevel3d(void *argument)
    * Read 3d input coordinate (streamID0)
    * * two additional levels are added (top + bottom) for later extrapolation checking
    */
+  size_t gridsizei;
+  int nlevi;
+  double *zlevels_in = NULL;
+  size_t zlevels_in_miss;
   {
+    int streamID0 = streamOpenRead(operatorArgv()[0]);                /*  3d vertical input coordinate */
+    int vlistID0 = streamInqVlist(streamID0);
+
     int nvars = vlistNvars(vlistID0);
     if ( nvars != 1 ) cdoAbort("Only one single variable is allowed!");
 
     int gridID = vlistInqVarGrid(vlistID0, 0);
     int zaxisID = vlistInqVarZaxis(vlistID0, 0);
-    size_t gridsize = gridInqSize(gridID);
-    int nlevel = zaxisInqSize(zaxisID);
+    gridsizei = gridInqSize(gridID); // horizontal gridsize of input z coordinate
+    nlevi = zaxisInqSize(zaxisID); // number of input levels for later use
 
-    zlevels_in = (double*) Malloc(gridsize*(nlevel+2)*sizeof(double));
-    nlevi      = nlevel;   /* number of input levels for later use */
-    gridsizei  = gridsize; /* horizontal gridsize of input z coordinate */
-    nrecs      = pstreamInqTimestep(streamID0, 0);
-    if (cdoVerbose) cdoPrint("%d records input 3d vertical height",nrecs);
+    zlevels_in = (double*) Malloc(gridsizei*(nlevi+2)*sizeof(double));
+    nrecs = streamInqTimestep(streamID0, 0);
+    if ( cdoVerbose ) cdoPrint("%d records input 3d vertical height",nrecs);
 
     for ( int recID = 0; recID < nrecs; recID++ )
       {
-        pstreamInqRecord(streamID0, &varID, &levelID);
-        size_t offset = gridsize + gridsize*levelID;
+        streamInqRecord(streamID0, &varID, &levelID);
+        size_t offset = gridsizei + gridsizei*levelID;
         double *single1 = zlevels_in + offset;
-        pstreamReadRecord(streamID0, single1, &zlevels_in_miss);
+        streamReadRecord(streamID0, single1, &zlevels_in_miss);
       }
+
+    streamClose(streamID0);
   }
 
   /*
@@ -317,7 +320,6 @@ void *Intlevel3d(void *argument)
   int oz3dvarID = vlistDefVar(vlistID3, gridID3, zaxisID3, TIME_VARYING);
   {
     char str[CDI_MAX_NAME];
-    str[0] = 0;
     vlistInqVarName(vlistID2, 0, str);
     vlistDefVarName(vlistID3, oz3dvarID, str);
     str[0] = 0;
@@ -490,7 +492,6 @@ void *Intlevel3d(void *argument)
   Free(lev_wgt1);
   Free(lev_wgt2);
 
-  pstreamClose(streamID0);
   pstreamClose(streamID1);
   pstreamClose(streamID2);
   pstreamClose(streamID3);

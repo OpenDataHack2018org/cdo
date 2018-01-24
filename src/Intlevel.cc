@@ -262,7 +262,6 @@ void *Intlevel(void *argument)
   zaxisDefLevels(zaxisID2, lev2);
   {
     char str[CDI_MAX_NAME];
-    str[0] = 0;
     zaxisInqName(zaxisID1, str);
     zaxisDefName(zaxisID2, str);
     str[0] = 0;
@@ -283,6 +282,25 @@ void *Intlevel(void *argument)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
+
+  int zvarID = CDI_UNDEFID;
+  int zvarIsConstant = true;
+  if ( zvarname )
+    {
+      for ( varID = 0; varID < nvars; varID++ )
+        {
+          char varname[CDI_MAX_NAME]; 
+          vlistInqVarName(vlistID1, varID, varname);
+          if ( STR_IS_EQ(zvarname, varname) )
+            {
+              zvarID = varID;
+              break;
+            }
+        }
+
+      if ( zvarID == CDI_UNDEFID ) cdoAbort("Variable %s not found!", zvarname);
+      zvarIsConstant = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+    }
 
   bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));
