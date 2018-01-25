@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.3
 	* Version 1.9.3 release
 
+2018-01-25  Uwe Schulzweida
+
+	* Replaced isnan() by std::isnan()
+
 2018-01-22  Uwe Schulzweida
 
 	*expr: added function cday(), cmonth(), cyear(), csecond(), cminute(), chour()
