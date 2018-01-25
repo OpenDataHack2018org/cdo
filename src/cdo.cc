@@ -63,12 +63,12 @@
 #endif
 
 #include "modules.h"
-#include "process.h"
 #include "error.h"
 #include "grid_proj.h"
 #include "percentiles.h"
 #include "util_wildcards.h"
 #include "util_string.h"
+#include "process_int.h"
 
 #ifdef  _OPENMP
 #  include <omp.h>

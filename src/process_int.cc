@@ -11,9 +11,12 @@
 #include <vector>
 #include <stack>
 
-#include "process.h"
-#include "pstream_int.h"
+//Debug and message includes
 #include "cdoDebugOutput.h"
+#include "exception.h"
+
+#include "process_int.h"
+#include "pstream_int.h"
 
 std::map<int, process_t> Process;
 std::map<int, char *> obase; /*TEMP*/  // Possibly not the best solution (19.Jan.2018)

@@ -7,7 +7,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "process.h"
+#include "process_int.h"
 #include "error.h"
 
 void pstreamCloseAll(void);

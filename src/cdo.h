@@ -20,6 +20,6 @@
 
 #include "text.h"
 #include "pstream_int.h"
-#include "process.h"
+#include "process_int.h"
 
 #endif  /* _CDO_H */

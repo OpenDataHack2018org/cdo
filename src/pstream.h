@@ -22,7 +22,6 @@
 #include "config.h" /* _FILE_OFFSET_BITS influence off_t */
 #endif
 
-#include "pstream_write.h"
 #include "varlist.h"
 #include "pipe.h"
 

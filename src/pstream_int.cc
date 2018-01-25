@@ -18,6 +18,7 @@
 #include <cdi.h>
 #include "pstream_int.h"
 #include "cdoDebugOutput.h"
+#include "process_int.h"
 
     void
 pstreamClose(int pstreamID)

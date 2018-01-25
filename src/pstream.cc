@@ -43,7 +43,6 @@
 #include "cdoDebugOutput.h"
 
 #ifdef  HAVE_LIBPTHREAD
-//-----------
     #include <pthread.h>
     #include "pthread_debug.h"
 
