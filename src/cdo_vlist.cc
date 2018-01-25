@@ -19,9 +19,16 @@
 #include "cdo_int.h"
 
 
+char *cdoVlistInqVarName(int vlistID, int varID, char *name)
+{
+  vlistInqVarName(vlistID, varID, name);
+  return name;
+}
+
+
 double cdoZaxisInqLevel(int zaxisID, int levelID)
 {
-  int zaxistype  = zaxisInqType(zaxisID);
+  int zaxistype = zaxisInqType(zaxisID);
   double level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) :
                  (zaxistype == ZAXIS_SURFACE) ? 0 : levelID+1;
   return level;
