@@ -32,7 +32,8 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "statistic.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 #ifdef  HAVE_LIBFFTW3 
 #include <fftw3.h>
@@ -249,12 +250,12 @@ void *Filter(void *process)
   int nts = tsID;
   if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
 
-  memory_t *ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
+  memory_t *ompmem = (memory_t*) Malloc(Threading::ompNumThreads*sizeof(memory_t));
 
   if ( use_fftw )
     {
 #ifdef  HAVE_LIBFFTW3 
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
 	{
 	  ompmem[i].in_fft  = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
 	  ompmem[i].out_fft = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
@@ -265,7 +266,7 @@ void *Filter(void *process)
     }
   else
     {
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
 	{
 	  ompmem[i].array1 = (double*) Malloc(nts*sizeof(double));
 	  ompmem[i].array2 = (double*) Malloc(nts*sizeof(double));
@@ -362,7 +363,7 @@ void *Filter(void *process)
   if ( use_fftw )
     {
 #ifdef  HAVE_LIBFFTW3 
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
 	{
 	  Free(ompmem[i].in_fft);
 	  Free(ompmem[i].out_fft);
@@ -371,7 +372,7 @@ void *Filter(void *process)
     }
   else
     {
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
 	{
 	  Free(ompmem[i].array1);
 	  Free(ompmem[i].array2);

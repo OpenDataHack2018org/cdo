@@ -25,7 +25,8 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "par_io.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 
 extern "C" {
@@ -67,8 +68,8 @@ void *Copy(void *process)
 
   if ( operatorID == SZIP )
     {
-      cdoCompType  = CDI_COMPRESS_SZIP;
-      cdoCompLevel = 0;
+      Options::cdoCompType  = CDI_COMPRESS_SZIP;
+      Options::cdoCompLevel = 0;
     }
 
   int streamCnt = cdoStreamCnt();

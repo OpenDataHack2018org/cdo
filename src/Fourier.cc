@@ -19,8 +19,9 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "statistic.h"
+#include "cdoOptions.h"
 
 
 #define  NALLOC_INC  1024
@@ -100,8 +101,8 @@ void *Fourier(void *process)
 
   for ( bit = nts; !(bit & 1); bit >>= 1 );
 
-  memory_t *ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  memory_t *ompmem = (memory_t*) Malloc(Threading::ompNumThreads*sizeof(memory_t));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       ompmem[i].real = (double*) Malloc(nts*sizeof(double));
       ompmem[i].imag = (double*) Malloc(nts*sizeof(double));
@@ -161,7 +162,7 @@ void *Fourier(void *process)
 	}
     }
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       Free(ompmem[i].real);
       Free(ompmem[i].imag);

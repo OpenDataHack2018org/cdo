@@ -25,8 +25,8 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
-
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 #define  NALLOC_INC  1024
 
@@ -102,8 +102,8 @@ void *Timsort(void *process)
 
   int nts = tsID;
 
-  double **sarray = (double **) Malloc(ompNumThreads*sizeof(double *));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  double **sarray = (double **) Malloc(Threading::ompNumThreads*sizeof(double *));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     sarray[i] = (double*) Malloc(nts*sizeof(double));
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -133,7 +133,7 @@ void *Timsort(void *process)
 	}
     }
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     if ( sarray[i] ) Free(sarray[i]);
 
   if ( sarray ) Free(sarray);

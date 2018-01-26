@@ -20,6 +20,7 @@
 #include <cdi.h>
 #include "percentiles.h"
 #include "merge_sort2.h"
+#include "cdoOptions.h"
 
 double crps_det_integrate(double *a, const double d, const size_t n);
 
@@ -106,7 +107,7 @@ double fldcrps(field_type field)
   //     always go to the end of the list
 
   // Use first value as reference
-  sort_iter_single(len-1,&array[1],ompNumThreads);
+  sort_iter_single(len-1,&array[1],Threading::ompNumThreads);
 
   return crps_det_integrate(&array[1],array[0],len-1);
 }

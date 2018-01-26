@@ -34,7 +34,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "color.h"
 
 double intlin(double x, double y1, double x1, double y2, double x2);

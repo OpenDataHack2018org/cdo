@@ -8,6 +8,7 @@
 
 
 #include "cdo_int.h"
+#include "cdoOptions.h"
 
 
 #ifdef  SX
@@ -2002,7 +2003,7 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   long nvex  = lot - (nblox-1)*NFFT;
   long nvex0 = nvex;
 
-  long nthmax = (nblox < ompNumThreads) ? nblox : ompNumThreads;
+  long nthmax = (nblox < Threading::ompNumThreads) ? nblox : Threading::ompNumThreads;
   long nvals = lot*jump;
 
   double *restrict wfc = (double*) Malloc(nvals*sizeof(double));

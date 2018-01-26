@@ -11,7 +11,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "par_io.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 void *readRecord(void *arg)

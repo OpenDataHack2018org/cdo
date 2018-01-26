@@ -31,7 +31,7 @@
 #include "cdo.h"
 #include "cdoDebugOutput.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 

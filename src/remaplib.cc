@@ -58,6 +58,7 @@
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
+#include "cdoOptions.h"
 
 
 #define IS_REG2D_GRID(gridID)  (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN)
@@ -1063,9 +1064,9 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
   size_t max_cls = get_max_add(num_links, dst_size, dst_add);
 
 #ifdef  _OPENMP
-  double **src_cls2 = (double **) Malloc(ompNumThreads*sizeof(double *));
-  double **src_wts2 = (double **) Malloc(ompNumThreads*sizeof(double *));
-  for ( int  i = 0; i < ompNumThreads; ++i )
+  double **src_cls2 = (double **) Malloc(Threading::ompNumThreads*sizeof(double *));
+  double **src_wts2 = (double **) Malloc(Threading::ompNumThreads*sizeof(double *));
+  for ( int  i = 0; i < Threading::ompNumThreads; ++i )
     {
       src_cls2[i] = (double*) Malloc(max_cls*sizeof(double));
       src_wts2[i] = (double*) Malloc(max_cls*sizeof(double));
@@ -1168,7 +1169,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
     }
 
 #ifdef  _OPENMP
-  for ( int  i = 0; i < ompNumThreads; ++i )
+  for ( int  i = 0; i < Threading::ompNumThreads; ++i )
     {
       Free(src_cls2[i]);
       Free(src_wts2[i]);

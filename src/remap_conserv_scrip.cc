@@ -11,6 +11,7 @@
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
+#include "cdoOptions.h"
 
 /* #define  BABY_STEP  0.001 */ /* original value */
 #define  BABY_STEP  0.001
@@ -1275,21 +1276,21 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       tgt_centroid_lon[n] = 0;
     }
 
-  std::vector<double *> srch_corner_lat(ompNumThreads); // lat of each corner of srch cells
-  std::vector<double *> srch_corner_lon(ompNumThreads); // lon of each corner of srch cells
-  std::vector<long> max_srch_cells(ompNumThreads);      // num cells in restricted search arrays
+  std::vector<double *> srch_corner_lat(Threading::ompNumThreads); // lat of each corner of srch cells
+  std::vector<double *> srch_corner_lon(Threading::ompNumThreads); // lon of each corner of srch cells
+  std::vector<long> max_srch_cells(Threading::ompNumThreads);      // num cells in restricted search arrays
 
   /*  Integrate around each cell on source grid */
 
-  for ( i = 0; i < ompNumThreads; ++i )
+  for ( i = 0; i < Threading::ompNumThreads; ++i )
     {
       srch_corner_lat[i] = NULL;
       srch_corner_lon[i] = NULL;
       max_srch_cells[i] = 0;
     }
 
-  std::vector<size_t *> srch_add(ompNumThreads);  // global address of cells in srch arrays
-  for ( i = 0; i < ompNumThreads; ++i ) srch_add[i] = new size_t[tgt_grid_size];
+  std::vector<size_t *> srch_add(Threading::ompNumThreads);  // global address of cells in srch arrays
+  for ( i = 0; i < Threading::ompNumThreads; ++i ) srch_add[i] = new size_t[tgt_grid_size];
 
   srch_corners = tgt_num_cell_corners;
 
@@ -1473,25 +1474,25 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   /* Finished with all cells: deallocate search arrays */
 
-  for ( i = 0; i < ompNumThreads; ++i )
+  for ( i = 0; i < Threading::ompNumThreads; ++i )
     {
       free(srch_corner_lon[i]);
       free(srch_corner_lat[i]);
     }
 
-  for ( i = 0; i < ompNumThreads; ++i ) delete[] srch_add[i];
+  for ( i = 0; i < Threading::ompNumThreads; ++i ) delete[] srch_add[i];
 
   /* Integrate around each cell on target grid */
 
-  for ( i = 0; i < ompNumThreads; ++i )
+  for ( i = 0; i < Threading::ompNumThreads; ++i )
     {
       srch_corner_lat[i] = NULL;
       srch_corner_lon[i] = NULL;
     }
 
-  for ( i = 0; i < ompNumThreads; ++i ) max_srch_cells[i] = 0;
+  for ( i = 0; i < Threading::ompNumThreads; ++i ) max_srch_cells[i] = 0;
 
-  for ( i = 0; i < ompNumThreads; ++i ) srch_add[i] = new size_t[src_grid_size];
+  for ( i = 0; i < Threading::ompNumThreads; ++i ) srch_add[i] = new size_t[src_grid_size];
 
   srch_corners  = src_num_cell_corners;
 
@@ -1679,13 +1680,13 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   /* Finished with all cells: deallocate search arrays */
 
-  for ( i = 0; i < ompNumThreads; ++i )
+  for ( i = 0; i < Threading::ompNumThreads; ++i )
     {
       free(srch_corner_lon[i]);
       free(srch_corner_lat[i]);
     }
 
-  for ( i = 0; i < ompNumThreads; ++i ) delete[] srch_add[i];
+  for ( i = 0; i < Threading::ompNumThreads; ++i ) delete[] srch_add[i];
 
   /*
      Correct for situations where N/S pole not explicitly included in

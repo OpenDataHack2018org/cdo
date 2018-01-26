@@ -38,7 +38,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 void *Math(void *process)

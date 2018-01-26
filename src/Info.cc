@@ -26,7 +26,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 static
 void printMap(int nlon, int nlat, double *array, double missval, double min, double max)

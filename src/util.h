@@ -50,7 +50,6 @@ extern int CDO_Memtype;
 extern int CDO_Parallel_Read;
 extern int CDO_Append_History;
 extern int CDO_Reset_History;
-extern int timer_read, timer_write; // refactor: both pstream.cc and CDIread.cc CDIwrite.cc defined in cdo.cc
 
 extern int CDO_optind;
 extern const char *CDO_optarg;
@@ -62,7 +61,6 @@ extern int CDO_dbl_digits;
 extern bool REMAP_genweights;
 
 extern const char *cdoExpName;
-extern int ompNumThreads;
 
 extern int stdin_is_tty;
 extern int stdout_is_tty;
@@ -75,7 +73,6 @@ extern int cdoDefaultTableID;
 extern int cdoDefaultInstID;
 extern int cdoDefaultTimeType;
 
-extern int cdoLockIO;
 extern int cdoCheckDatarange;
 
 extern int cdoSilentMode;
@@ -84,12 +81,9 @@ extern int cdoRegulargrid;
 extern int cdoBenchmark;
 extern int cdoTimer;
 extern int cdoVerbose;
-extern int cdoCompress;
 extern int cdoInteractive;
 extern int cdoParIO;
 
-extern int cdoCompType;
-extern int cdoCompLevel;
 
 extern int cdoChunkType;
 

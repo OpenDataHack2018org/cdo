@@ -19,7 +19,7 @@
 #include "cdo.h"
 #include "cdoDebugOutput.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 
 // NOTE: All operators in this module works only on GRIB edition 1 files!

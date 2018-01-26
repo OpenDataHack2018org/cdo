@@ -25,9 +25,10 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "grid_search.h"
+#include "cdoOptions.h"
 
 extern "C" {
 #include "clipping/geometry.h"
@@ -335,9 +336,9 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
   
 
-  NEW_2D(bool, nbr_mask, ompNumThreads, numNeighbors);   // mask at nearest neighbors
-  NEW_2D(size_t, nbr_add, ompNumThreads, numNeighbors);  // source address at nearest neighbors
-  NEW_2D(double, nbr_dist, ompNumThreads, numNeighbors); // angular distance four nearest neighbors
+  NEW_2D(bool, nbr_mask, Threading::ompNumThreads, numNeighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, Threading::ompNumThreads, numNeighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, Threading::ompNumThreads, numNeighbors); // angular distance four nearest neighbors
 
   clock_t start, finish;
   start = clock();

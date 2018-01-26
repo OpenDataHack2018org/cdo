@@ -19,7 +19,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 #define  MAX_BLOCKS  65536
 

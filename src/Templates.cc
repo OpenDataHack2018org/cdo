@@ -18,7 +18,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 void *Template1(void *process)

@@ -11,6 +11,7 @@ libcdo_la_SOURCES =            \
                cf_interface.h   \
                cdo_pthread.cc   \
                cdo_vlist.cc     \
+			   cdo_vlist.h		\
                cdo_getopt.cc    \
                cdo_getopt.h    \
                cdo_task.cc      \
@@ -18,6 +19,8 @@ libcdo_la_SOURCES =            \
                cdo_history.cc   \
                cdo_read.cc      \
                cdi_uuid.h      \
+			   cdoOptions.h			\
+			   cdoOptions.cc  \
                cmortable_parser.cc   \
                after_sptrans.cc \
                after_fctrans.cc \
@@ -34,6 +37,7 @@ libcdo_la_SOURCES =            \
                color.cc         \
                color.h         \
                commandline.cc   \
+               commandline.h   \
                const.h         \
                convert_units.cc \
                convert_units.h \

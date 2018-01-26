@@ -32,7 +32,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "cdoDebugOutput.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 /* read only the first data variable from input filename into a given double
  * pointer */

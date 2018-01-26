@@ -15,10 +15,9 @@
   GNU General Public License for more details.
 */
 
-#ifndef _CDO_H
-#define _CDO_H
+#ifndef READLINE_H
+#define READLINE_H
 
-#include "text.h"
-#include "process_int.h"
+int     readline(FILE *fp, char *line, int len);
 
-#endif  /* _CDO_H */
+#endif

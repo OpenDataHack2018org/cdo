@@ -19,6 +19,7 @@
 #include "pstream_int.h"
 #include "cdoDebugOutput.h"
 #include "process_int.h"
+#include "exception.h"
 
     void
 pstreamClose(int pstreamID)

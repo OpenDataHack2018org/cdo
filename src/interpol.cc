@@ -3,6 +3,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "util.h"  /* progressStatus */
+#include "cdoOptions.h"
 
 
 #define  ZERO     0.0
@@ -224,7 +225,7 @@ void intlinarr2(double missval, int lon_is_circular,
 
 #ifdef  HAVE_OPENMP4
 #pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
+  shared(Threading::ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
 #endif
   for ( size_t i = 0; i < gridsize2; ++i )
     {

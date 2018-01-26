@@ -38,6 +38,7 @@
 #include "cdo_int.h"
 #include "modules.h"
 #include "util.h"
+#include "cdoOptions.h"
 
 
 #ifndef  VERSION
@@ -52,7 +53,6 @@ int CDO_optind = 1;
 const char *CDO_progname = NULL;
 const char *CDO_version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
 
-int ompNumThreads = 1;
 
 int stdin_is_tty  = 0;
 int stdout_is_tty = 0;
@@ -67,7 +67,6 @@ int cdoDefaultTableID    = CDI_UNDEFID;
 int cdoDefaultInstID     = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;
 
-int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
 
 int CDO_flt_digits       = 7;
@@ -87,8 +86,6 @@ int CDO_Reduce_Dim       = FALSE;
 int CDO_Append_History   = TRUE;
 int CDO_Reset_History    = FALSE;
 
-int cdoCompType          = CDI_COMPRESS_NONE;  // compression type
-int cdoCompLevel         = 0;              // compression level
 int cdoDebug             = 0;
 int cdoChunkType         = CDI_UNDEFID;
 int cdoSilentMode        = FALSE;
@@ -96,7 +93,6 @@ int cdoOverwriteMode     = FALSE;
 int cdoBenchmark         = FALSE;
 int cdoTimer             = FALSE;
 int cdoVerbose           = FALSE;
-int cdoCompress          = FALSE;
 int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
@@ -108,7 +104,6 @@ char CDO_File_Suffix[32];
 int cdoExpMode           = -1;
 const char *cdoExpName   = NULL;
 
-int timer_read, timer_write;
 
 const char *cdoComment(void)
 {
@@ -738,7 +733,7 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
               if ( cdoDefaultFileType == CDI_FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = true;
             }
 
-          if ( cdoDefaultFileType == CDI_FILETYPE_GRB && cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
+          if ( cdoDefaultFileType == CDI_FILETYPE_GRB && Options::cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
           if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
         }
     }

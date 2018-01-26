@@ -24,7 +24,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 void *Change_e5slm(void *process)

@@ -38,7 +38,7 @@
 #include "error.h"
 #include "modules.h"
 #include "util.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "dmemory.h"
 #include "pthread.h"
 #include "cdoDebugOutput.h"

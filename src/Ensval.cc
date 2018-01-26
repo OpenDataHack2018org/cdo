@@ -31,7 +31,7 @@
 #include "cdo.h"
 #include "statistic.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "merge_sort2.h"
 
 enum OPERTYPE {CRPS, BRS};

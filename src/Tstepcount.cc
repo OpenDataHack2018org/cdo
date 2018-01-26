@@ -24,7 +24,8 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 
 #define  NALLOC_INC  1024
@@ -121,8 +122,8 @@ void *Tstepcount(void *process)
 
   int nts = tsID;
 
-  memory_t *mem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  memory_t *mem = (memory_t*) Malloc(Threading::ompNumThreads*sizeof(memory_t));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       mem[i].array1 = (double*) Malloc(nts*sizeof(double));
     }
@@ -151,7 +152,7 @@ void *Tstepcount(void *process)
 	}
     }
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     Free(mem[i].array1);
   Free(mem);
 

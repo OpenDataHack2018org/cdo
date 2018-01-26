@@ -14,6 +14,7 @@
 #include "grid_search.h"
 #include "kdtreelib/kdtree.h"
 #include "nanoflann.hpp"
+#include "cdoOptions.h"
 
 
 #define  PI       M_PI
@@ -184,7 +185,7 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n*sizeof(struct kd_point));  
   // see  example_cartesian.c
-  if ( cdoVerbose ) printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
+  if ( cdoVerbose ) printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
 
   kdata_t min[3] = { 1.e9,  1.e9,  1.e9};
   kdata_t max[3] = {-1.e9, -1.e9, -1.e9};
@@ -214,7 +215,7 @@ void *gs_create_kdtree(size_t n, const double *restrict lons, const double *rest
 
   if ( cdoVerbose ) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
 
-  kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
+  kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, Threading::ompNumThreads);
   if ( pointlist ) Free(pointlist);
   if ( kdt == NULL ) cdoAbort("kd_buildTree failed!");
 
@@ -225,7 +226,7 @@ static
 void *gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
 {
   PointCloud<double> *pointcloud = new PointCloud<double>();
-  if ( cdoVerbose ) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, ompNumThreads);
+  if ( cdoVerbose ) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
 
   double min[3] = { 1.e9,  1.e9,  1.e9};
   double max[3] = {-1.e9, -1.e9, -1.e9};

@@ -26,7 +26,8 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 // Defines for rank histogram
 enum TDATA_TYPE {TIME, SPACE};
@@ -112,8 +113,8 @@ void *Ensstat3(void *process)
   /* ("first touch strategy")                            */
   /* --> #pragma omp parallel for ...                    */
   /* *************************************************** */
-  field_type *field = (field_type*) Malloc(ompNumThreads*sizeof(field_type));
-  for ( i = 0; i < ompNumThreads; i++ )
+  field_type *field = (field_type*) Malloc(Threading::ompNumThreads*sizeof(field_type));
+  for ( i = 0; i < Threading::ompNumThreads; i++ )
     {
       field_init(&field[i]);
       field[i].size   = nfiles;
@@ -484,7 +485,7 @@ void *Ensstat3(void *process)
     Free(array2);
   }
 
-  for ( i = 0; i < ompNumThreads; i++ )
+  for ( i = 0; i < Threading::ompNumThreads; i++ )
     {
       if ( field[i].ptr    ) Free(field[i].ptr);
       if ( field[i].weight ) Free(field[i].weight);

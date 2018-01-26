@@ -33,7 +33,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 enum {CONSECSUM, CONSECTS};
 #define SWITCHWARN "Hit default case!This should never happen (%s).\n"

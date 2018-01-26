@@ -503,7 +503,7 @@ void samplegrid(double missval, long nci, cellindex_type **cellindex, double *ar
 }
 
 
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 void *Samplegridicon(void *process)

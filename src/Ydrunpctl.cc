@@ -25,7 +25,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "calendar.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "percentiles_hist.h"
 #include "percentiles.h"
 

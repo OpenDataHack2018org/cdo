@@ -25,7 +25,8 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 
 #define  NALLOC_INC  1024
@@ -119,8 +120,8 @@ void *Detrend(void *process)
 
   int nts = tsID;
 
-  NEW_2D(double, array1, ompNumThreads, nts);
-  NEW_2D(double, array2, ompNumThreads, nts);
+  NEW_2D(double, array1, Threading::ompNumThreads, nts);
+  NEW_2D(double, array2, Threading::ompNumThreads, nts);
 
   for ( varID = 0; varID < nvars; varID++ )
     {

@@ -34,8 +34,9 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
+#include "cdoOptions.h"
 
 
 static
@@ -456,8 +457,8 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
   */
 
   size_t gridsize = xinc*yinc;
-  field_type *field = (field_type*) Malloc(ompNumThreads*sizeof(field_type));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  field_type *field = (field_type*) Malloc(Threading::ompNumThreads*sizeof(field_type));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       field[i].size    = gridsize;
       field[i].ptr     = (double*) Malloc(gridsize*sizeof(double));
@@ -524,7 +525,7 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
   
   field2->nmiss = nmiss;
   
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       if ( field[i].ptr    ) Free(field[i].ptr);
       if ( field[i].weight ) Free(field[i].weight);

@@ -8,6 +8,7 @@
 
 #include "cdo_int.h"
 #include "remap.h"
+#include "cdoOptions.h"
 
 /*****************************************************************************/
 
@@ -641,7 +642,7 @@ void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
       omp_set_nested(1);            
       if ( omp_get_nested() == 0 )
 	printf("Warning: OpenMP implementation seems to not support nested parallelism.\n"
-	       "Maximum of CPUs used is 2 instead of %i.\n", ompNumThreads);
+	       "Maximum of CPUs used is 2 instead of %i.\n", Threading::ompNumThreads);
     }                                    
 #endif
 

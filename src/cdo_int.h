@@ -43,6 +43,7 @@
 #include "const.h"
 #include "util.h"
 #include "datetime.h"
+#include "cdo_vlist.h"
 
 #ifdef  _OPENMP
 #define  OPENMP3   200805 
@@ -113,15 +114,11 @@ enum T_EIGEN_MODE  {JACOBI, DANIELSON_LANCZOS};
 #define  MEMTYPE_DOUBLE  1
 #define  MEMTYPE_FLOAT   2
 
-#define  CDO_EXP_LOCAL   1
-#define  CDO_EXP_REMOTE  2
 
 void print_pthread_info(void);
 
 void cdoProcessTime(double *utime, double *stime);
 
-void    setCommandLine(int argc, char **argv);
-char   *commandLine(void);
 int     readline(FILE *fp, char *line, int len);
 
 int zaxis2ltype(int zaxisID);
@@ -192,8 +189,6 @@ int qu2reg3_double(double *pfield, int *kpoint, int klat, int klon,
 		   double msval, int *kret, int omisng, int operio, int oveggy);
 
 void cdoCompareGrids(int gridID1, int gridID2);
-void vlistCompare(int vlistID1, int vlistID2, int flag);
-int  vlistCompareX(int vlistID1, int vlistID2, int flag);
 
 #if defined (__cplusplus)
 }

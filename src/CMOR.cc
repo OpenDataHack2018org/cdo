@@ -2,7 +2,7 @@
 #include <signal.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 #ifdef  HAVE_LIBCMOR
 #include <unistd.h>

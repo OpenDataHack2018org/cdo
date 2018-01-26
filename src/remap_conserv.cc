@@ -3,6 +3,7 @@
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link.h"
+#include "cdoOptions.h"
 
 extern "C" {
 #include "clipping/clipping.h"
@@ -737,8 +738,8 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
     }
 
 
-  std::vector<struct grid_cell> tgt_grid_cell(ompNumThreads);  
-  for ( int i = 0; i < ompNumThreads; ++i )
+  std::vector<struct grid_cell> tgt_grid_cell(Threading::ompNumThreads);  
+  for ( int i = 0; i < Threading::ompNumThreads; ++i )
     {
       tgt_grid_cell[i].array_size      = tgt_num_cell_corners;
       tgt_grid_cell[i].num_corners     = tgt_num_cell_corners;
@@ -748,8 +749,8 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       tgt_grid_cell[i].coordinates_xyz = new double[3*tgt_num_cell_corners];
     }
 
-  std::vector<search_t> search(ompNumThreads);
-  for ( int i = 0; i < ompNumThreads; ++i )
+  std::vector<search_t> search(Threading::ompNumThreads);
+  for ( int i = 0; i < Threading::ompNumThreads; ++i )
     {
       search[i].srch_corners    = src_num_cell_corners;
       search[i].src_edge_type   = src_edge_type;
@@ -760,8 +761,8 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       search[i].overlap_buffer  = NULL;
     }
 
-  std::vector<size_t *> srch_add(ompNumThreads);
-  for ( int i = 0; i < ompNumThreads; ++i ) srch_add[i] = new size_t[src_grid_size];
+  std::vector<size_t *> srch_add(Threading::ompNumThreads);
+  for ( int i = 0; i < Threading::ompNumThreads; ++i ) srch_add[i] = new size_t[src_grid_size];
 
   srch_corners = src_num_cell_corners;
 
@@ -784,7 +785,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
 #ifdef  HAVE_OPENMP4
 #pragma omp parallel for schedule(dynamic) default(none)  reduction(+:findex) \
-  shared(ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, \
+  shared(Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, \
 	 rv, cdoVerbose, tgt_num_cell_corners, target_cell_type, \
          weightlinks,  srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
 	 search, srch_add, tgt_grid_cell, sum_srch_cells, sum_srch_cells2)
@@ -981,7 +982,7 @@ printf("stime = %gs\n", stimer);
 
   // Finished with all cells: deallocate search arrays
 
-  for ( int ompthID = 0; ompthID < ompNumThreads; ++ompthID )
+  for ( int ompthID = 0; ompthID < Threading::ompNumThreads; ++ompthID )
     {
       search_free(&search[ompthID]);
 

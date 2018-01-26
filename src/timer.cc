@@ -26,6 +26,7 @@
 #include <sys/times.h>
 #endif
 
+int timer_read, timer_write;
 
 void cdoProcessTime(double *utime, double *stime)
 {

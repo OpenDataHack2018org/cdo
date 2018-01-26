@@ -23,7 +23,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 extern "C" {
 #include "clipping/geometry.h"
 }

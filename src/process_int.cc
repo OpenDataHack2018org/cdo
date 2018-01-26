@@ -17,6 +17,8 @@
 
 #include "process_int.h"
 #include "pstream_int.h"
+#include "cdoOptions.h"
+#include "exception.h"
 
 std::map<int, process_t> Process;
 std::map<int, char *> obase; /*TEMP*/  // Possibly not the best solution (19.Jan.2018)
@@ -523,7 +525,7 @@ void
 cdoInitialize(void *p_process)
 {
 #if defined(_OPENMP)
-  omp_set_num_threads(ompNumThreads);  // Has to be called for every module (pthread)!
+  omp_set_num_threads(Threading::ompNumThreads);  // Has to be called for every module (pthread)!
 #endif
   process_t *process = (process_t *) p_process;
 

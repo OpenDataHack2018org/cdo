@@ -35,8 +35,9 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "cdo_task.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "percentiles.h"
+#include "cdoOptions.h"
 
 
 typedef struct
@@ -72,7 +73,7 @@ typedef struct
 static
 void *ensstat_func(void *ensarg)
 {
-  if ( CDO_task ) cdo_omp_set_num_threads(ompNumThreads);
+  if ( CDO_task ) cdo_omp_set_num_threads(Threading::ompNumThreads);
 
   ensstat_arg_t *arg = (ensstat_arg_t*) ensarg;
   int t = arg->t;
@@ -186,8 +187,8 @@ void *Ensstat(void *process)
 
   ens_file_t *ef = (ens_file_t *) Malloc(nfiles*sizeof(ens_file_t));
 
-  field_type *field = (field_type *) Malloc(ompNumThreads*sizeof(field_type));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  field_type *field = (field_type *) Malloc(Threading::ompNumThreads*sizeof(field_type));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       field_init(&field[i]);
       field[i].size = nfiles;
@@ -349,7 +350,7 @@ void *Ensstat(void *process)
   if ( array2 ) Free(array2);
   if ( count2 ) Free(count2);
 
-  for ( int i = 0; i < ompNumThreads; i++ ) if ( field[i].ptr ) Free(field[i].ptr);
+  for ( int i = 0; i < Threading::ompNumThreads; i++ ) if ( field[i].ptr ) Free(field[i].ptr);
   if ( field ) Free(field);
 
   if ( task ) cdo_task_delete(task);

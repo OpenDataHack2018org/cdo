@@ -8,6 +8,7 @@
 #include "remap.h"
 #include "remap_store_link.h"
 #include "grid_search.h"
+#include "cdoOptions.h"
 
 //  Interpolation using a distance-weighted average
 
@@ -361,9 +362,9 @@ void remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid
   for ( size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + numNeighbors*tgt_cell_add;
 
-  NEW_2D(bool, nbr_mask, ompNumThreads, numNeighbors);   // mask at nearest neighbors
-  NEW_2D(size_t, nbr_add, ompNumThreads, numNeighbors);  // source address at nearest neighbors
-  NEW_2D(double, nbr_dist, ompNumThreads, numNeighbors); // angular distance four nearest neighbors
+  NEW_2D(bool, nbr_mask, Threading::ompNumThreads, numNeighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, Threading::ompNumThreads, numNeighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, Threading::ompNumThreads, numNeighbors); // angular distance four nearest neighbors
 
 #ifdef  _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -467,9 +468,9 @@ void remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_
   size_t src_grid_size = src_grid->size;
   size_t tgt_grid_size = tgt_grid->size;
 
-  NEW_2D(bool, nbr_mask, ompNumThreads, numNeighbors);   // mask at nearest neighbors
-  NEW_2D(size_t, nbr_add, ompNumThreads, numNeighbors);  // source address at nearest neighbors
-  NEW_2D(double, nbr_dist, ompNumThreads, numNeighbors); // angular distance four nearest neighbors
+  NEW_2D(bool, nbr_mask, Threading::ompNumThreads, numNeighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, Threading::ompNumThreads, numNeighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, Threading::ompNumThreads, numNeighbors); // angular distance four nearest neighbors
 
 #ifdef  _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -600,9 +601,9 @@ void intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   grid_to_radian(yunits, tgt_grid_size, tgt_cell_center_lat, "tgt cell center lat");
 
 
-  NEW_2D(bool, nbr_mask, ompNumThreads, numNeighbors);   // mask at nearest neighbors
-  NEW_2D(size_t, nbr_add, ompNumThreads, numNeighbors);  // source address at nearest neighbors
-  NEW_2D(double, nbr_dist, ompNumThreads, numNeighbors); // angular distance four nearest neighbors
+  NEW_2D(bool, nbr_mask, Threading::ompNumThreads, numNeighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, Threading::ompNumThreads, numNeighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, Threading::ompNumThreads, numNeighbors); // angular distance four nearest neighbors
 
 #ifdef  _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;

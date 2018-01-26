@@ -69,6 +69,9 @@
 #include "util_wildcards.h"
 #include "util_string.h"
 #include "process_int.h"
+#include "cdoOptions.h"
+#include "timer.h"
+#include "commandLine.h"
 
 #ifdef  _OPENMP
 #  include <omp.h>
@@ -635,26 +638,26 @@ void defineCompress(const char *arg)
 
   if      ( strncmp(arg, "szip", len) == 0 )
     {
-      cdoCompType  = CDI_COMPRESS_SZIP;
-      cdoCompLevel = 0;
+      Options::cdoCompType  = CDI_COMPRESS_SZIP;
+      Options::cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "aec", len) == 0 )
     {
-      cdoCompType = CDI_COMPRESS_AEC;
-      cdoCompLevel = 0;
+      Options::cdoCompType = CDI_COMPRESS_AEC;
+      Options::cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "jpeg", len) == 0 )
     {
-      cdoCompType = CDI_COMPRESS_JPEG;
-      cdoCompLevel = 0;
+      Options::cdoCompType = CDI_COMPRESS_JPEG;
+      Options::cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "zip", 3) == 0 )
     {
-      cdoCompType  = CDI_COMPRESS_ZIP;
+      Options::cdoCompType  = CDI_COMPRESS_ZIP;
       if ( len == 5 && arg[3] == '_' && isdigit(arg[4]) )
-        cdoCompLevel = atoi(&arg[4]);
+        Options::cdoCompLevel = atoi(&arg[4]);
       else
-        cdoCompLevel = 1;
+        Options::cdoCompLevel = 1;
     }
   else
     {
@@ -1317,7 +1320,7 @@ int parse_options_long(int argc, char *argv[])
           defineChunktype(CDO_optarg);
           break;
         case 'L':        
-          cdoLockIO = TRUE;
+          Threading::cdoLockIO = TRUE;
           break;
         case 'l':
           defineZaxis(CDO_optarg);
@@ -1385,7 +1388,7 @@ int parse_options_long(int argc, char *argv[])
           cdoParIO = TRUE;
           break;
         case 'Z':
-          cdoCompress = TRUE;
+          Options::cdoCompress = true;
           break;
         case 'z':
           defineCompress(CDO_optarg);
@@ -1851,11 +1854,11 @@ int main(int argc, char *argv[])
 #endif
     }
 
-  ompNumThreads = omp_get_max_threads();
+  Threading::ompNumThreads = omp_get_max_threads();
   if ( omp_get_max_threads() > omp_get_num_procs() )
     fprintf(stderr, "Warning: Number of OMP threads is greater than number of Cores=%d!\n", omp_get_num_procs());
-  if ( ompNumThreads < numThreads )
-    fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", ompNumThreads);
+  if ( Threading::ompNumThreads < numThreads )
+    fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", Threading::ompNumThreads);
   if ( cdoVerbose )
     {
       fprintf(stderr, " OpenMP:  num_procs=%d  max_threads=%d", omp_get_num_procs(), omp_get_max_threads());

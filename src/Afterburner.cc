@@ -20,7 +20,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "cdo_task.h"
-#include "pstream_write.h"
+#include "pstream_int.h"
 #define  streamOpenWrite          cdoStreamOpenWrite
 #define  streamDefVlist           pstreamDefVlist
 #define  streamDefTimestep        pstreamDefTimestep
@@ -2056,7 +2056,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   if ( globs->Mean != 2 )
     {
-#if defined(PSTREAM_WRITE_H)
+#if defined(CDO)
       globs->ostreamID = cdoStreamOpenWrite(cdoStreamName(ofileidx), ofiletype);
 #else
       globs->ostreamID = streamOpenWrite(ofile, ofiletype);
@@ -2196,7 +2196,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   after_control(globs, vars);
 
-#if defined(PSTREAM_WRITE_H)
+#if defined(CDO)
   if ( globs->ostreamID  != CDI_UNDEFID ) pstreamClose(globs->ostreamID);
 #else
   if ( globs->ostreamID2 != CDI_UNDEFID ) streamClose(globs->ostreamID2);

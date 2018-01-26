@@ -33,7 +33,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define  MAX_HOUR  9301  /* 31*12*25 + 1 */

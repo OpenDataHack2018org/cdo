@@ -40,9 +40,10 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "remap.h"
 #include "grid.h"
+#include "cdoOptions.h"
 
 
 enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
@@ -267,7 +268,7 @@ void get_remap_env(void)
     }
 
 #ifdef  _OPENMP
-  sort_mode = (ompNumThreads == 1) ? HEAP_SORT : MERGE_SORT;
+  sort_mode = (Threading::ompNumThreads == 1) ? HEAP_SORT : MERGE_SORT;
 #endif
 
   envstr = getenv("REMAP_SORT_MODE");
@@ -731,7 +732,7 @@ void sort_remap_add(remapvars_t *remapvars)
       */   
       sort_iter(remapvars->num_links, remapvars->num_wts,
 		remapvars->tgt_cell_add, remapvars->src_cell_add,
-		remapvars->wts, ompNumThreads);
+		remapvars->wts, Threading::ompNumThreads);
     }
   else
     { /* use a pure heap sort without any support of parallelism */

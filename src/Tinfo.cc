@@ -25,7 +25,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "calendar.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define MAX_GAPS   64
