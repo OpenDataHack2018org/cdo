@@ -416,11 +416,11 @@ void *Intlevel(void *argument)
   int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
-  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));
-  size_t **varnmiss = (size_t**) Malloc(nvars*sizeof(size_t*));
-  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
-  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
+  std::vector<bool> vars(nvars);
+  std::vector<bool> varinterp(nvars);
+  std::vector<size_t *> varnmiss(nvars);
+  std::vector<double *> vardata1(nvars);
+  std::vector<double *> vardata2(nvars);
 
   int maxlev = nlev1 > nlev2 ? nlev1 : nlev2;
 
@@ -541,12 +541,6 @@ void *Intlevel(void *argument)
       Free(vardata1[varID]);
       if ( varinterp[varID] ) Free(vardata2[varID]);
     }
-
-  Free(varinterp);
-  Free(varnmiss);
-  Free(vardata2);
-  Free(vardata1);
-  Free(vars);
 
   Free(lev_idx1);
   Free(lev_idx2);

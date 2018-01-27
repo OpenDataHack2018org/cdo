@@ -279,11 +279,12 @@ void *Intlevel3d(void *argument)
 
   maxlev = nlevi > nlevo ? nlevi : nlevo;
   nvars = vlistNvars(vlistID1);
-  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
-  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));   /* marker for variables to be interpolated       */
-  size_t **varnmiss = (size_t**) Malloc(nvars*sizeof(size_t*)); /* can for missing values of arbitrary variables */
-  double **vardata1 = (double**) Malloc(nvars*sizeof(double*)); /* input                                         */
-  double **vardata2 = (double**) Malloc(nvars*sizeof(double*)); /* output                                        */
+
+  std::vector<bool> vars(nvars);
+  std::vector<bool> varinterp(nvars);    /* marker for variables to be interpolated       */
+  std::vector<size_t *> varnmiss(nvars); /* can for missing values of arbitrary variables */
+  std::vector<double *> vardata1(nvars); /* input                                         */
+  std::vector<double *> vardata2(nvars); /* output                                        */
 
   /* by default no variable should be interpolated */
   for ( i = 0; i < nvars; i++ ) varinterp[varID] = false;
@@ -424,13 +425,6 @@ void *Intlevel3d(void *argument)
       Free(vardata1[varID]);
       if ( varinterp[varID] ) Free(vardata2[varID]);
     } 
-
-
-  Free(varinterp);
-  Free(varnmiss);
-  Free(vardata2);
-  Free(vardata1);
-  Free(vars);
 
   Free(lev_idx1);
   Free(lev_idx2);
