@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.3
 	* Version 1.9.3 release
 
+2018-01-27  Uwe Schulzweida
+
+	* intlevel: optionally use 3d z-var from input file
+
 2018-01-25  Uwe Schulzweida
 
 	* Replaced isnan() by std::isnan()

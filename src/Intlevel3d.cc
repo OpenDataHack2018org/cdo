@@ -33,40 +33,11 @@
 
 bool levelDirUp(int nlev, double *lev);
 bool levelDirDown(int nlev, double *lev);
-double vert_interp_lev_kernel(double w1, double w2, double var1L1, double var1L2, double missval);
+void vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2,
+		       int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
 void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
 		      int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
-
-/*
- * 3d vertical interpolation routine (see vert_interp_lev() in src/Intlevel.cc)
- */
-static
-void vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2,
-		       int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
-{
-  for ( int ilev = 0; ilev < nlev2; ilev++ )
-    {
-      size_t offset = ilev*gridsize;
-      double *var2 = vardata2 + offset;
-
-      for ( size_t i = 0; i < gridsize; i++ )
-	{
-          int idx1 = lev_idx1[offset+i];
-          int idx2 = lev_idx2[offset+i];
-          double wgt1 = lev_wgt1[offset+i];
-          double wgt2 = lev_wgt2[offset+i];
-
-          /* upper/lower values from input field */
-          double var1L1 = *(vardata1+idx1);
-          double var1L2 = *(vardata1+idx2);
-
-          /* if (cdoVerbose) printf("i:%d level %d: idx1=%d idx2=%d (offset+i:%d) wgt1=%g wgt2=%g var1L1:%g var1L2:%g ",
-           *                         i,       ilev, idx1,   idx2,    offset+i,    wgt1,   wgt2,   var1L1,   var1L2);
-           */
-          var2[i] = vert_interp_lev_kernel(wgt1, wgt2, var1L1, var1L2, missval);
-	}
-    }
-}
+void vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels);
 
 /*
  * Create weights for the 3d vertical coordinate
@@ -262,33 +233,7 @@ void *Intlevel3d(void *argument)
     }
   if ( i == nzaxis ) cdoAbort("No processable variable found (grid coordinate differ)!");
   
-  /*
-   * Check monotony of vertical levels
-   */
-  std::vector<double> lev1(nlevi);
-  for ( int i = 0; i < nlevi; ++i ) lev1[i] = zlevels_in[(i+1)*gridSize]; 
-  bool lup = levelDirUp(nlevi, &lev1[0]);
-  bool ldown = levelDirDown(nlevi, &lev1[0]);
-
-  /* Add artificial values for intication of extrapolation areas (lowermost + upmost levels) */
-  if ( lup )
-    {
-      for ( size_t i = 0; i < gridSize ;i++ )
-      {
-        zlevels_in[i]                      = -1.e33;
-        zlevels_in[(nlevi+1)*gridSize + i] =  1.e33;
-      }
-    }
-  else if ( ldown )
-    {
-      for ( size_t i = 0; i < gridSize ;i++ )
-      {
-        zlevels_in[i]                      =  1.e33;
-        zlevels_in[(nlevi+1)*gridSize + i] = -1.e33;
-      }
-    }
-  else
-    cdoWarning("Non monotonic zaxis!");
+  vert_init_level_0_and_N(nlevi, gridSize, zlevels_in);
 
   /*
    * Create weights for later interpolation - assumption: input vertical correct is constant in time
