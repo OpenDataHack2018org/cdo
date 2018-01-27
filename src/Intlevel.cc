@@ -30,6 +30,7 @@
 #include "listarray.h"
 
 
+static
 double vert_interp_lev_kernel(double w1, double w2, double var1L1, double var1L2, double missval)
 {
   double var2 = missval;
@@ -95,6 +96,9 @@ void vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double
       size_t offset = ilev*gridsize;
       double *var2 = vardata2 + offset;
 
+#ifdef  _OPENMP
+#pragma omp parallel for default(none) shared(offset, gridsize, vardata1, var2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2, missval)
+#endif
       for ( size_t i = 0; i < gridsize; i++ )
 	{
           int idx1 = lev_idx1[offset+i];
@@ -179,7 +183,7 @@ void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev
 
 static
 void vert_gen_weights3d1d(bool expol, int nlev1, size_t gridsize, double *xlev1, int nlev2, double *lev2,
-			int *xlev_idx1, int *xlev_idx2, double *xlev_wgt1, double *xlev_wgt2)
+                          int *xlev_idx1, int *xlev_idx2, double *xlev_wgt1, double *xlev_wgt2)
 {
   std::vector<double> lev1(nlev1);
   std::vector<int> lev_idx1(nlev2);
@@ -234,7 +238,7 @@ void vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels)
   /* Add artificial values for indication of extrapolation areas (lowermost + upmost levels) */
   if ( lup )
     {
-      for ( size_t i = 0; i < gridsize ;i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
         {
           zlevels[i]                     = -1.e33;
           zlevels[(nlev+1)*gridsize + i] =  1.e33;
@@ -242,7 +246,7 @@ void vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels)
     }
   else if ( ldown )
     {
-      for ( size_t i = 0; i < gridsize ;i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
         {
           zlevels[i]                     =  1.e33;
           zlevels[(nlev+1)*gridsize + i] = -1.e33;
@@ -253,6 +257,7 @@ void vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels)
 
   if ( cdoVerbose ) for ( int i = 0; i < nlev+2; ++i ) cdoPrint("lev1 %d: %g", i, zlevels[i*gridsize]);
 }
+
 
 void *Intlevel(void *argument)
 {
