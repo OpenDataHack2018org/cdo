@@ -1228,6 +1228,8 @@ namespace nanoflann
 		 */
 		void buildIndex()
 		{
+			BaseClassRef::m_size = dataset.kdtree_get_point_count();
+			BaseClassRef::m_size_at_index_build = BaseClassRef::m_size;
 			init_vind();
 			this->freeIndex(*this);
 			BaseClassRef::m_size_at_index_build = BaseClassRef::m_size;
@@ -1845,7 +1847,7 @@ namespace nanoflann
 			dataset(inputData), index_params(params), distance(inputData)
 		{
 			if (dataset.kdtree_get_point_count()) throw std::runtime_error("[nanoflann] cannot handle non empty point cloud.");
-			treeCount = log2(maximumPointCount);
+			treeCount = std::log2(maximumPointCount);
 			pointCount = 0U;
 			dim = dimensionality;
 			treeIndex.clear();
@@ -1865,7 +1867,7 @@ namespace nanoflann
 				index[pos].vind.clear();
 				treeIndex[pointCount]=pos;
 				for(int i = 0; i < pos; i++) {
-					for(int j = 0; j < index[i].vind.size(); j++) {
+					for(int j = 0; j < static_cast<int>(index[i].vind.size()); j++) {
 						index[pos].vind.push_back(index[i].vind[j]);
 						treeIndex[index[i].vind[j]] = pos;
 					}
