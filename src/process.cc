@@ -33,7 +33,7 @@
 #include <glob.h>
 #endif
 
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "error.h"
 #include "modules.h"

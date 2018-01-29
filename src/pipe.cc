@@ -24,7 +24,7 @@
 #include <string.h>
 #include <time.h>  // time()
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "error.h"
 #include "dmemory.h"

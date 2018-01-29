@@ -2,7 +2,7 @@
 #include <omp.h> // omp_get_wtime
 #endif
 
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
 #include "remap.h"

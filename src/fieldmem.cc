@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include <cdi.h>
-#include <cdo.h>
+
 #include <cdo_int.h>
 #include "dmemory.h"
 #include "field.h"

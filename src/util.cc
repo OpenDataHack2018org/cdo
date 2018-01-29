@@ -34,7 +34,7 @@
 #include <inttypes.h> /* intmax_t */
 
 #include "cdi.h"
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "modules.h"
 #include "util.h"

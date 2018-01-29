@@ -17,7 +17,7 @@
 #include <cdi.h>
 
 #if defined(CDO)
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "cdo_task.h"
 #include "pstream_int.h"

@@ -37,7 +37,7 @@ int max_jacobi_iter;
 #include <float.h>
 #include <math.h>
 
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "statistic.h"
 

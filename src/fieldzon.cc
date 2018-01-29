@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include <cdi.h>
 #include "percentiles.h"

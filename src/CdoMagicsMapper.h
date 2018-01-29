@@ -3,7 +3,7 @@
 
 /* void FindMagicsStruct ( const char *user_name ); */
 
-#include "cdo.h"
+
 
 int GetMagicsParameterInfo( const char *user_name, char *param_value );
 

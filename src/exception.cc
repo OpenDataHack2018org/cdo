@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "process_int.h"
 #include "error.h"

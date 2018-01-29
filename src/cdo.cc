@@ -51,7 +51,7 @@
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "cdo_task.h"
 

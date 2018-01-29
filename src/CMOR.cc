@@ -1,6 +1,6 @@
 #include <cdi.h>
 #include <signal.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "pstream_int.h"
 

@@ -1,5 +1,5 @@
 #include <cdi.h>
-#include "cdo.h"
+
 #include "util.h"
 
 void nospec(int vlistID)
