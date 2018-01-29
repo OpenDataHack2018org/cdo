@@ -4,7 +4,7 @@
 #include "../../src/cdoDebugOutput.h"
 #include "../../src/modules.h"
 #include "../../src/operator_help.h"
-#include "../../src/process.h"
+#include "../../src/process_int.h"
 #include <iostream>
 void *in1_out1(void *test) { return test; }
 void *in2_out1(void *test) { return test; }
