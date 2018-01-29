@@ -86,7 +86,7 @@ Selects all timesteps with a month of a season in a user given list.
 
 @BeginOperator_seldate
 @Title     = Select dates
-@Parameter = date1 [date2]
+@Parameter = startdate [enddate]
 
 @BeginDescription
 Selects all timesteps with a date in a user given range.
@@ -119,10 +119,10 @@ INTEGER  Comma separated list of months.
 INTEGER  Comma separated list of years.
 @Item = seasons
 STRING   Comma separated list of seasons (substring of DJFMAMJJASOND or ANN).
-@Item = date1
+@Item = startdate
 STRING   Start date (format YYYY-MM-DDThh:mm:ss).
-@Item = date2
-STRING   End date (format YYYY-MM-DDThh:mm:ss) [default: date1].
+@Item = enddate
+STRING   End date (format YYYY-MM-DDThh:mm:ss) [default: startdate].
 @Item = nts1
 INTEGER  Number of timesteps before the selected month [default: 0].
 @Item = nts2
