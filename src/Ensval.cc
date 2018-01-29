@@ -27,6 +27,7 @@
      pp. 559-570
 */
 
+#include <cmath>
 #include <cdi.h>
 
 #include "statistic.h"
@@ -459,7 +460,7 @@ void *Ensval(void *process)
 	  
 	  for ( stream =0; stream<nostreams; stream++ ) {
 	    pstreamDefRecord(streamID2[stream],varID,levelID);
-	    if ( isnan ( r[stream] )  ) {
+	    if ( std::isnan(r[stream]) ) {
 	      r[stream] = missval; 
 	      have_miss = 1;
 	    }

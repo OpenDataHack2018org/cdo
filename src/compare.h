@@ -22,8 +22,8 @@
 #include "config.h"
 #endif
 
+#include <cmath>
 #include <string.h>
-#include <math.h>
 
 #ifdef  __xlC__  /* performance problem on IBM */
 #ifndef DBL_IS_NAN
@@ -32,7 +32,7 @@
 #else
 #ifndef DBL_IS_NAN
 #if defined(HAVE_DECL_ISNAN)
-#  define DBL_IS_NAN(x)     (isnan(x))
+#  define DBL_IS_NAN(x)     (std::isnan(x))
 #elif defined(FP_NAN)
 #  define DBL_IS_NAN(x)     (fpclassify(x) == FP_NAN)
 #else

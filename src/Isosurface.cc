@@ -26,13 +26,11 @@ double intlin(double x, double y1, double x1, double y2, double x2);
 static
 void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, field_type *field2D)
 {
-  bool lmiss1, lmiss2;
-
   long gridsize = gridInqSize(field3D->grid);
-  long nmiss    = field3D->nmiss;
-  double missval  = field3D->missval;
-  double *data3D   = field3D->ptr;
-  double *data2D   = field2D->ptr;
+  long nmiss = field3D->nmiss;
+  double missval = field3D->missval;
+  double *data3D = field3D->ptr;
+  double *data2D = field2D->ptr;
 
   for ( long i = 0; i < gridsize; ++i )
     {
@@ -45,8 +43,8 @@ void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, fi
 
 	  if ( nmiss > 0 )
 	    {
-	      lmiss1 = DBL_IS_EQUAL(val1, missval);
-	      lmiss2 = DBL_IS_EQUAL(val2, missval);
+	      bool lmiss1 = DBL_IS_EQUAL(val1, missval);
+	      bool lmiss2 = DBL_IS_EQUAL(val2, missval);
 	      if ( lmiss1 && lmiss2 ) continue;
 	      if ( lmiss1 && IS_EQUAL(isoval, val2) ) data2D[i] = lev1[k+1];
 	      if ( lmiss2 && IS_EQUAL(isoval, val1) ) data2D[i] = lev1[k]  ;
@@ -55,11 +53,7 @@ void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, fi
 
 	  if ( (isoval >= val1 && isoval <= val2) || (isoval >= val2 && isoval <= val1) )
 	    {
-	      if ( IS_EQUAL(val1, val2) )
-		data2D[i] = lev1[k];
-	      else
-		data2D[i] = intlin(isoval, lev1[k], val1, lev1[k+1], val2);
-
+              data2D[i] = IS_EQUAL(val1, val2) ? lev1[k] : intlin(isoval, lev1[k], val1, lev1[k+1], val2);
 	      break;
 	    }
 	}
@@ -95,7 +89,6 @@ void *Isosurface(void *process)
   double isoval = parameter2double(operatorArgv()[0]);
 
   if ( cdoVerbose ) cdoPrint("Isoval: %g", isoval);
-
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 

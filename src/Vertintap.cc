@@ -172,15 +172,11 @@ void *Vertintap(void *process)
 
   if ( cdoVerbose )
     {
-      std::vector<std::array<char, CDI_MAX_NAME>> varNames(nvars);
-      for ( varID = 0; varID < nvars; varID++ )
-        vlistInqVarName(vlistID1, varID, &varNames[varID][0]);
-
       cdoPrint("Found:");
-      if ( psID     != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), &varNames[psID][0]);
-      if ( apressID != -1 ) cdoPrint("  %s -> %s", var_stdname(air_pressure), &varNames[apressID][0]);
-      if ( dpressID != -1 ) cdoPrint("  %s -> %s", var_stdname(pressure_thickness), &varNames[dpressID][0]);
-      if ( tempID   != -1 ) cdoPrint("  %s -> %s", var_stdname(air_temperature), &varNames[tempID][0]);
+      if ( psID     != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
+      if ( apressID != -1 ) cdoPrint("  %s -> %s", var_stdname(air_pressure), cdoVlistInqVarName(vlistID1, apressID, varname));
+      if ( dpressID != -1 ) cdoPrint("  %s -> %s", var_stdname(pressure_thickness), cdoVlistInqVarName(vlistID1, dpressID, varname));
+      if ( tempID   != -1 ) cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
     }
 
   if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));

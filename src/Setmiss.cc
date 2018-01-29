@@ -31,6 +31,7 @@
 #endif
 
 
+#include <cmath>
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -159,10 +160,10 @@ void *Setmiss(void *process)
 	  else if ( operatorID == SETCTOMISS )
 	    {
 #if defined(HAVE_ISNAN)
-	      if ( isnan(rconst) )
+	      if ( std::isnan(rconst) )
 		{
 		  for ( size_t i = 0; i < gridsize; i++ )
-		    if ( isnan(array[i]) )
+		    if ( std::isnan(array[i]) )
 		      {
 			array[i] = missval;
 			nmiss++;
