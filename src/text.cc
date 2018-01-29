@@ -1,6 +1,10 @@
-#include "cdo.h"
-#include "cdo_int.h"
+#include "text.h"
 
+int stdin_is_tty  = 0;
+int stdout_is_tty = 0;
+int stderr_is_tty = 0;
+
+int CDO_Color = 0;
 
 void set_text_color(FILE *fp, int attr, int fg)
 {

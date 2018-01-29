@@ -28,6 +28,7 @@
 
 #include "cdi_uuid.h"
 #include "printinfo.h"
+#include "text.h"
 
 const char *tunit2str(int tunits)
 {

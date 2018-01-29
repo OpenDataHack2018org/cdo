@@ -54,9 +54,6 @@ const char *CDO_progname = NULL;
 const char *CDO_version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
 
 
-int stdin_is_tty  = 0;
-int stdout_is_tty = 0;
-int stderr_is_tty = 0;
 
 char *cdoGridSearchDir   = NULL;
 
@@ -67,12 +64,11 @@ int cdoDefaultTableID    = CDI_UNDEFID;
 int cdoDefaultInstID     = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;
 
-int cdoCheckDatarange    = FALSE;
+int cdoCheckDatarange    = false;
 
 int CDO_flt_digits       = 7;
 int CDO_dbl_digits       = 15;
 
-int CDO_Color            = FALSE;
 int CDO_Use_FFTW         = TRUE;
 int CDO_Version_Info     = TRUE;
 int CDO_CMOR_Mode        = FALSE;

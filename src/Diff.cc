@@ -26,6 +26,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream_int.h"
+#include "text.h"
 
 
 void *Diff(void *process)

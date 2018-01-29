@@ -45,6 +45,7 @@
 #include <iostream>
 #include <string>
 #include "util_string.h"
+#include "text.h"
 
 
 static int pthreadScope = 0;

@@ -18,7 +18,5 @@
 #ifndef _CDO_H
 #define _CDO_H
 
-#include "text.h"
-#include "process_int.h"
 
 #endif  /* _CDO_H */

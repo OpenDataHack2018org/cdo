@@ -68,15 +68,15 @@ const char *processInqPrompt(void);
 int processNums(void);
 int processNumsActive();
 
-process_t *processCreate(const char *command);
 process_t &processSelf(void);
 process_t* getProcess(int p_processID);
 
-void createProcesses(int argc, const char **argv);
 void clearProcesses();
 
 void processAccuTime(double utime, double stime);
 void processStartTime(double *utime, double *stime);
 
+void createProcesses(int argc, const char **argv);
+process_t *processCreate(const char *command);
 
 #endif

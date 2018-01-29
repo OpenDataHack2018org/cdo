@@ -9,6 +9,7 @@
 #include "cdo_int.h"
 #include "process_int.h"
 #include "error.h"
+#include "text.h"
 
 void pstreamCloseAll(void);
 

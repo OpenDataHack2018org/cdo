@@ -5,6 +5,7 @@
 #endif
 
 #include <stdio.h>
+#include "text.h"
 
 #ifdef CDO
 #define  streamInqFiletype        pstreamInqFiletype

@@ -72,6 +72,7 @@
 #include "cdoOptions.h"
 #include "timer.h"
 #include "commandLine.h"
+#include "text.h"
 
 #ifdef  _OPENMP
 #  include <omp.h>
