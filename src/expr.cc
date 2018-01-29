@@ -15,13 +15,7 @@
   GNU General Public License for more details.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <errno.h>
-#include <ctype.h>
-#include <assert.h>
+#include <cmath>
 
 #include <cdi.h>
 #include "cdo.h"
@@ -891,7 +885,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
                   errno = -1;
                   pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : exprfunc(p1data[i]);
                   if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
-                  else if ( isnan(pdata[i]) ) pdata[i] = missval;
+                  else if ( std::isnan(pdata[i]) ) pdata[i] = missval;
                 }
             }
           else
@@ -901,7 +895,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
                   errno = -1;
                   pdata[i] = exprfunc(p1data[i]);
                   if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
-                  else if ( isnan(pdata[i]) ) pdata[i] = missval;
+                  else if ( std::isnan(pdata[i]) ) pdata[i] = missval;
                 }
             }
         }

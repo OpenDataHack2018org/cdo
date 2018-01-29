@@ -383,17 +383,13 @@ void *Vertintml(void *argument)
 
   if ( cdoVerbose )
     {
-      std::vector<std::array<char, CDI_MAX_NAME>> varNames(nvars);
-      for ( varID = 0; varID < nvars; varID++ )
-        vlistInqVarName(vlistID1, varID, &varNames[varID][0]);
-
       cdoPrint("Found:");
-      if ( tempID    != -1 ) cdoPrint("  %s -> %s", var_stdname(air_temperature), &varNames[tempID][0]);
-      if ( psID      != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), &varNames[psID][0]);
-      if ( lnpsID    != -1 ) cdoPrint("  LOG(%s) -> %s", var_stdname(surface_air_pressure), &varNames[lnpsID][0]);
-      if ( sgeopotID != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_geopotential), &varNames[sgeopotID][0]);
-      if ( geopotID  != -1 ) cdoPrint("  %s -> %s", var_stdname(geopotential), &varNames[geopotID][0]);
-      if ( gheightID != -1 ) cdoPrint("  %s -> %s", var_stdname(geopotential_height), &varNames[gheightID][0]);
+      if ( tempID    != -1 ) cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
+      if ( psID      != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
+      if ( lnpsID    != -1 ) cdoPrint("  LOG(%s) -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, lnpsID, varname));
+      if ( sgeopotID != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_geopotential), cdoVlistInqVarName(vlistID1, sgeopotID, varname));
+      if ( geopotID  != -1 ) cdoPrint("  %s -> %s", var_stdname(geopotential), cdoVlistInqVarName(vlistID1, geopotID, varname));
+      if ( gheightID != -1 ) cdoPrint("  %s -> %s", var_stdname(geopotential_height), cdoVlistInqVarName(vlistID1, gheightID, varname));
     }
 
   if ( tempID != -1 || gheightID != -1 ) sgeopot_needed = true;

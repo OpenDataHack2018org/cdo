@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.9.3 (23 February 2018):
+Version 1.9.3 (29 January 2018):
 
    New features:
      * expr: added time coordinate function cdate(), ctime(), cdeltat(), ctimestep() ...
@@ -11,6 +11,7 @@ Version 1.9.3 (23 February 2018):
      * uvDestag: target grid undefined in output
      * runpctl: fails since release 1.8.0
      * read of reduced Gaussian grid description file failed [Bug #8146]
+     * read error on grid description file [Bug #8099]
 
 Version 1.9.2 (23 November 2017):
 

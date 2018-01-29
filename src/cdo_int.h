@@ -179,6 +179,7 @@ int literal_get_datatype(const char *literal);
 int literal_to_int(const char *literal);
 double literal_to_double(const char *literal);
 
+char *cdoVlistInqVarName(int vlistID, int varID, char *name);
 
 #ifdef __cplusplus
 extern "C" {
