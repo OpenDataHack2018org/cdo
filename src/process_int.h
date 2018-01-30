@@ -79,4 +79,6 @@ void processStartTime(double *utime, double *stime);
 void createProcesses(int argc, const char **argv);
 process_t *processCreate(const char *command);
 
+int cdoStreamInqVlist(int pstreamID);
+
 #endif

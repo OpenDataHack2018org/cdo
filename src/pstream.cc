@@ -49,6 +49,7 @@
 #include "compare.h"
 #include "cdo_vlist.h"
 #include "functs.h"
+#include "cdoOptions.h"
 
 #ifdef  HAVE_LIBPTHREAD
     #include <pthread.h>

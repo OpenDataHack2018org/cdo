@@ -36,16 +36,7 @@ pstreamInqVlist(int pstreamID)
 {
   if(CdoDebug::PSTREAM) MESSAGE("Inquiring Vlist from pstream ", pstreamID);
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
-
   int vlistID =  pstreamptr->inqVlist();
-
-  if (vlistNumber(vlistID) == CDI_COMP && cdoStreamNumber() == CDI_REAL)
-    cdoAbort("Complex fields are not supported by this operator!");
-
-   if (vlistNumber(vlistID) == CDI_REAL && cdoStreamNumber() == CDI_COMP)
-    cdoAbort("This operator needs complex fields!");
-
-  processDefVarNum(vlistNvars(vlistID));
   return vlistID;
 }
 
