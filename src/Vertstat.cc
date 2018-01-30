@@ -198,7 +198,7 @@ void *Vertstat(void *process)
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);

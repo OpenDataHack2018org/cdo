@@ -150,7 +150,7 @@ void *Output(void *process)
     {
       int streamID = cdoStreamOpenRead(cdoStreamName(indf));
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
 
       int ngrids = vlistNgrids(vlistID);
       int ndiffgrids = 0;

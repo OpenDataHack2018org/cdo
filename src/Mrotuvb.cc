@@ -269,8 +269,8 @@ void *Mrotuvb(void *process)
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   int nvars = vlistNvars(vlistID1);
   if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoGetStreamName(0).c_str());

@@ -140,7 +140,7 @@ void *Consecstat(void *process)
 
   int istreamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int ivlistID = pstreamInqVlist(istreamID);
+  int ivlistID = cdoStreamInqVlist(istreamID);
   int itaxisID = vlistInqTaxis(ivlistID);
   int ovlistID = vlistDuplicate(ivlistID);
   int otaxisID = taxisDuplicate(itaxisID);

@@ -60,7 +60,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
   istreamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  ivlistID = pstreamInqVlist(istreamID);
+  ivlistID = cdoStreamInqVlist(istreamID);
   ovlistID = vlistCreate();
   
   gridID  = vlistInqVarGrid(ivlistID, FIRST_VAR_ID);
@@ -428,8 +428,8 @@ void eca2(const ECA_REQUEST_2 *request)
   istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
   istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  ivlistID1 = pstreamInqVlist(istreamID1);
-  ivlistID2 = pstreamInqVlist(istreamID2);
+  ivlistID1 = cdoStreamInqVlist(istreamID1);
+  ivlistID2 = cdoStreamInqVlist(istreamID2);
   ovlistID  = vlistCreate();
   
   vlistCompare(ivlistID1, ivlistID2, CMP_ALL);
@@ -818,8 +818,8 @@ void eca3(const ECA_REQUEST_3 *request)
   istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
   istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  ivlistID1 = pstreamInqVlist(istreamID1);
-  ivlistID2 = pstreamInqVlist(istreamID2);
+  ivlistID1 = cdoStreamInqVlist(istreamID1);
+  ivlistID2 = cdoStreamInqVlist(istreamID2);
   ovlistID  = vlistCreate();
   
   vlistCompare(ivlistID1, ivlistID2, CMP_ALL);
@@ -1015,8 +1015,8 @@ void eca4(const ECA_REQUEST_4 *request)
   int istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int ivlistID1 = pstreamInqVlist(istreamID1);
-  int ivlistID2 = pstreamInqVlist(istreamID2);
+  int ivlistID1 = cdoStreamInqVlist(istreamID1);
+  int ivlistID2 = cdoStreamInqVlist(istreamID2);
   int ovlistID = vlistCreate();
 
   int gridID = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);

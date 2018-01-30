@@ -242,7 +242,7 @@ void *DestaggerUV()
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -475,7 +475,7 @@ void *DestaggerUV()
 
   pstreamDefVlist(streamID2, vlistID2);  // from this point the stream is using a different vlistID !!!!!
 
-  vlistID2 = pstreamInqVlist(streamID2); // refresh it
+  vlistID2 = cdoStreamInqVlist(streamID2); // refresh it
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -1116,7 +1116,7 @@ void *TransformUV(int operatorID)
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
@@ -1204,7 +1204,7 @@ void *TransformUV(int operatorID)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
-  vlistID2 = pstreamInqVlist(streamID2); // refresh it
+  vlistID2 = cdoStreamInqVlist(streamID2); // refresh it
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )

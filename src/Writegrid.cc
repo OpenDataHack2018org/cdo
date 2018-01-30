@@ -34,7 +34,7 @@ void *Writegrid(void *process)
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int gridID  = vlistGrid(vlistID, 0);
 
   int gridtype = gridInqType(gridID);

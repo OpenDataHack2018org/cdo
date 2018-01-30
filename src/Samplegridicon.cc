@@ -534,7 +534,7 @@ void *Samplegridicon(void *process)
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   long gridsize = vlistGridsizeMax(vlistID1);
   if ( cdoVerbose ) cdoPrint("Source gridsize = %zu", gridsize);

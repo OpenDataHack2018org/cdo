@@ -227,7 +227,7 @@ void *XTimstat(void *process)
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   //int streamID1 = cdoStreamOpenRead(cdoGetStreamName(0).c_str());
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( cmplen == 0 ) vlistDefNtsteps(vlistID2, 1);

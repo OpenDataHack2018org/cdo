@@ -210,7 +210,7 @@ void *EOFs(void *process)
   enum T_WEIGHT_MODE weight_mode = get_weightmode();
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
-  int vlistID1  = pstreamInqVlist(streamID1);
+  int vlistID1  = cdoStreamInqVlist(streamID1);
   int taxisID1  = vlistInqTaxis(vlistID1);
   int gridID1   = vlistInqVarGrid(vlistID1, 0);
   size_t gridsize  = vlistGridsizeMax(vlistID1);
@@ -240,7 +240,7 @@ void *EOFs(void *process)
           pstreamClose(streamID1);
 
           streamID1 = cdoStreamOpenRead(cdoStreamName(0));
-          vlistID1  = pstreamInqVlist(streamID1);
+          vlistID1  = cdoStreamInqVlist(streamID1);
           taxisID1  = vlistInqTaxis(vlistID1);
 	}
       else

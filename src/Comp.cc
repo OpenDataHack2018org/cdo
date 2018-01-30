@@ -62,8 +62,8 @@ void *Comp(void *process)
   double *missvalx1 = &missval1;
   double *missvalx2 = &missval2;
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistIDx1 = vlistID1;
   int vlistIDx2 = vlistID2;
 

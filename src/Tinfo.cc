@@ -235,7 +235,7 @@ void *Tinfo(void *process)
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   fprintf(stdout, "\n");
 

@@ -72,9 +72,9 @@ void *Ymonpctl(void *process)
   int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
   int streamID3 = cdoStreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
-  int vlistID3 = pstreamInqVlist(streamID3);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
+  int vlistID3 = cdoStreamInqVlist(streamID3);
   int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);

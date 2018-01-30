@@ -94,7 +94,7 @@ void *EOF3d(void *process)
     cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
 
   int streamID1  = cdoStreamOpenRead(cdoStreamName(0));
-  int vlistID1   = pstreamInqVlist(streamID1);
+  int vlistID1   = cdoStreamInqVlist(streamID1);
 
   /* COUNT NUMBER OF TIMESTEPS if EOF3D_ or EOF3D_TIME */
   int nts = vlistNtsteps(vlistID1);
@@ -108,7 +108,7 @@ void *EOF3d(void *process)
       pstreamClose(streamID1);
 
       streamID1 = cdoStreamOpenRead(cdoStreamName(0));
-      vlistID1  = pstreamInqVlist(streamID1);
+      vlistID1  = cdoStreamInqVlist(streamID1);
     }
   else
     if ( cdoVerbose ) cdoPrint("Found %i timeSteps", nts);

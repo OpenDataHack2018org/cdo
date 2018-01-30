@@ -148,7 +148,7 @@ void *Merge(void *process)
   for ( index = 0; index < nmerge; index++ )
     {
       streamIDs[index] = cdoStreamOpenRead(cdoStreamName(index));
-      vlistIDs[index]  = pstreamInqVlist(streamIDs[index]);
+      vlistIDs[index]  = cdoStreamInqVlist(streamIDs[index]);
     }
 
   int taxisindex = 0;

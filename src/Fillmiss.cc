@@ -466,7 +466,7 @@ void *Fillmiss(void *process)
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);

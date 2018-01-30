@@ -128,7 +128,7 @@ void *Ensstat3(void *process)
     {
       streamID = cdoStreamOpenRead(cdoStreamName(fileID));
 
-      vlistID = pstreamInqVlist(streamID);
+      vlistID = cdoStreamInqVlist(streamID);
 
       ef[fileID].streamID = streamID;
       ef[fileID].vlistID = vlistID;

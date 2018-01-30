@@ -320,7 +320,7 @@ void *Collgrid(void *process)
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       ef[fileID].streamID = cdoStreamOpenRead(cdoStreamName(fileID));
-      ef[fileID].vlistID  = pstreamInqVlist(ef[fileID].streamID);
+      ef[fileID].vlistID  = cdoStreamInqVlist(ef[fileID].streamID);
     }
 
   int vlistID1 = ef[0].vlistID;

@@ -297,7 +297,7 @@ void *Info(void *process)
     {
       int streamID = cdoStreamOpenRead(indf);
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);
 
       int nvars = vlistNvars(vlistID);

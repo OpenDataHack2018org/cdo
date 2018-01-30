@@ -77,7 +77,7 @@ void *Testdata(void *process)
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());

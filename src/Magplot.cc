@@ -1130,7 +1130,7 @@ void *Magplot(void *process)
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   int varID = 0;

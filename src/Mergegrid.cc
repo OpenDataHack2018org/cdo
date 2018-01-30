@@ -167,13 +167,13 @@ void *Mergegrid(void *process)
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
 
   int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   vlistCompare(vlistID1, vlistID2, CMP_NAME | CMP_NLEVEL);
 

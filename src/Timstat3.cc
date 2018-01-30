@@ -78,10 +78,10 @@ void *Timstat3(void *process)
     {
       streamID[is] = cdoStreamOpenRead(cdoStreamName(is));
 
-      vlistID[is] = pstreamInqVlist(streamID[is]);
+      vlistID[is] = cdoStreamInqVlist(streamID[is]);
       if ( is > 0 )
 	{
-	  vlistID2 = pstreamInqVlist(streamID[is]);
+	  vlistID2 = cdoStreamInqVlist(streamID[is]);
 	  vlistCompare(vlistID[0], vlistID2, CMP_ALL);
 	}
     }

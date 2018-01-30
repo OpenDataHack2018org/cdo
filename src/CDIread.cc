@@ -120,7 +120,7 @@ void *CDIread(void *process)
 
       int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
 
       filetype = pstreamInqFiletype(streamID);
       datatype = vlistInqVarDatatype(vlistID, 0);

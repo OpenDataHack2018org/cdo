@@ -1531,7 +1531,7 @@ void *Echam5ini(void *process)
 
       streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-      vlistID1 = pstreamInqVlist(streamID1);
+      vlistID1 = cdoStreamInqVlist(streamID1);
       taxisID = vlistInqTaxis(vlistID1);
 
       nvars = vlistNvars(vlistID1);

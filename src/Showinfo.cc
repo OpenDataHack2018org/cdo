@@ -70,7 +70,7 @@ void *Showinfo(void *process)
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int nvars   = vlistNvars(vlistID);
   int taxisID = vlistInqTaxis(vlistID);
@@ -274,7 +274,7 @@ void *Showinfo(void *process)
     {
       if ( operatorID == SHOWATTS )
         {
-          int vlistID = pstreamInqVlist(streamID);
+          int vlistID = cdoStreamInqVlist(streamID);
           int nvars = vlistNvars(vlistID);
           for ( int varID = 0; varID < nvars; varID++ )
             {

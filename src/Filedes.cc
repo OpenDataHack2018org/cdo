@@ -120,7 +120,7 @@ void printSource(FILE *fp, int vlistID, int varID)
 static
 void partab(FILE *fp, int streamID, int option)
 {
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int varID, datatype = -1;
   char pstr[32];
   char paramstr[32];
@@ -307,7 +307,7 @@ void *Filedes(void *process)
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int nvars  = vlistNvars(vlistID);
   int ngrids = vlistNgrids(vlistID);

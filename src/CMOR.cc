@@ -781,7 +781,7 @@ struct mapping
 
 static struct mapping *construct_var_mapping(int streamID)
 {
-  int nvars_max = vlistNvars(pstreamInqVlist(streamID));
+  int nvars_max = vlistNvars(cdoStreamInqVlist(streamID));
   struct mapping *vars =
     (struct mapping *) Malloc((nvars_max + 1) * sizeof(struct mapping));
   vars[0].cdi_varID = CDI_UNDEFID;
@@ -1329,7 +1329,7 @@ static int check_mem(list_t *kvl, char *project_id)
 static void dump_global_attributes(list_t *pml, int streamID)
 {
   int natts;
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
   for ( int i = 0; i < natts; i++ )
     {
@@ -1366,7 +1366,7 @@ static void dump_global_attributes(list_t *pml, int streamID)
 
 static void dump_special_attributes(list_t *kvl, int streamID)
 {
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int fileID = pstreamFileID(streamID);
   size_t old_historysize;
   char *new_history = kv_get_a_val(kvl, "history", NULL);
@@ -1837,7 +1837,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       creat_subs = 0;
     }
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int cmf = cmor_setup(kv_get_a_val(kvl, "inpath", "/usr/share/cmor/"),
              &netcdf_file_action,
@@ -3321,7 +3321,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
                              struct mapping vars[], int table_id, char *project_id, int miptab_freq, int *time_axis)
 {
   int cmf = 0;
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   char *time_units = kv_get_a_val(kvl, "required_time_units", NULL);
@@ -3484,7 +3484,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
         } 
       
       int streamID2 = cdoStreamOpenRead(cdoStreamName(0));
-      int vlistID2 = pstreamInqVlist(streamID2);
+      int vlistID2 = cdoStreamInqVlist(streamID2);
       int taxisID2 = vlistInqTaxis(vlistID2);
       if ( ntsteps < 0 )
         {
@@ -3892,7 +3892,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
     }
       
   int streamID2 = cdoStreamOpenRead(cdoStreamName(0));
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int taxisID2 = vlistInqTaxis(vlistID2);
   juldate_t firstdate = juldate_encode(calendar, taxisInqVdate(taxisID2),
                                      taxisInqVtime(taxisID2));
@@ -4098,7 +4098,7 @@ static void sigfunc(int sig)
 static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_freq, int time_axis, int calendar, char *miptab_freqptr, char *project_id)
 {
   int cmf = 0;
-  int vlistID = pstreamInqVlist(*streamID);
+  int vlistID = cdoStreamInqVlist(*streamID);
   int taxisID = vlistInqTaxis(vlistID);
   int tsID = 0;
   int nrecs;
@@ -4470,7 +4470,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
   if ( maptab )
     {
       if ( maptabbuild ) maptab = maptabbuild;
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
 
 /***/
 /* Parse the table as a fortran namelist wich contains lists (=lines) of keyvalues */

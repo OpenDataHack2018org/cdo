@@ -194,7 +194,7 @@ void *Select(void *process)
 
       int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
 
-      int vlistID1 = pstreamInqVlist(streamID1);
+      int vlistID1 = cdoStreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       bool lcopy_const = false;

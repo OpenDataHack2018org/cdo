@@ -60,7 +60,7 @@ void *Ninfo(void *process)
 
   int streamID = cdoStreamOpenRead(0);
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int nvars   = vlistNvars(vlistID);
   int taxisID = vlistInqTaxis(vlistID);

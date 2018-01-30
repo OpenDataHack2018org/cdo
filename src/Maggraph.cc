@@ -919,7 +919,7 @@ void *Maggraph(void *process)
       
       int streamID = cdoStreamOpenRead(cdoStreamName(fileID));
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);
 
       vlistInqVarUnits(vlistID, 0, units);

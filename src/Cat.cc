@@ -56,7 +56,7 @@ void *Cat(void *process)
 
       int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
 
-      int vlistID1 = pstreamInqVlist(streamID1);
+      int vlistID1 = cdoStreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( indf == 0 )
@@ -76,7 +76,7 @@ void *Cat(void *process)
 	    {
 	      streamID2 = cdoStreamOpenAppend(cdoStreamName(nfiles));
 
-	      vlistID2 = pstreamInqVlist(streamID2);
+	      vlistID2 = cdoStreamInqVlist(streamID2);
 	      taxisID2 = vlistInqTaxis(vlistID2);
 
 	      vlistCompare(vlistID1, vlistID2, CMP_ALL);

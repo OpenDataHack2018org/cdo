@@ -73,7 +73,7 @@ void *Intgridtraj(void *process)
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   field_type field1, field2;
   field_init(&field1);

@@ -135,7 +135,7 @@ void *Ensval(void *process)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = cdoStreamOpenRead(cdoStreamName(fileID));
-      vlistID = pstreamInqVlist(streamID);
+      vlistID = cdoStreamInqVlist(streamID);
       
       ef[fileID].streamID = streamID;
       ef[fileID].vlistID  = vlistID;
@@ -215,7 +215,7 @@ void *Ensval(void *process)
     vlistDefTaxis(vlistID2[stream], taxisID2[stream]);
     pstreamDefVlist(streamID2[stream], vlistID2[stream]);
 
-    // vlistCheck = pstreamInqVlist(streamID2[stream]);
+    // vlistCheck = cdoStreamInqVlist(streamID2[stream]);
     // gridsizeCheck = vlistGridsizeMax(vlistCheck);
 
     //fprintf(stderr,"stream %i vlist %3i gridsize %4i\n",stream,vlistCheck,gridsizeCheck);

@@ -365,7 +365,7 @@ void *Expr(void *process)
   char *exprs = readsCommandLine ? exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
 
   int streamID1 = cdoStreamOpenRead(0);
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   exprs = exprs_expand(exprs, vlistID1);
   if ( cdoVerbose ) cdoPrint(exprs);

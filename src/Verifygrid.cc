@@ -678,7 +678,7 @@ void *Verifygrid(void *process)
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int ngrids = vlistNgrids(vlistID);
   for ( int gridno = 0; gridno < ngrids; ++gridno )

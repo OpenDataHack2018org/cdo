@@ -112,10 +112,10 @@ void *Intlevel3d(void *process)
   operatorInputArg("filename for vertical source coordinates variable");
   operatorCheckArgc(1);
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID1);

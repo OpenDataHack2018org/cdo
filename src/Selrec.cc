@@ -58,7 +58,7 @@ void *Selrec(void *process)
        filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5 )
     cdoAbort("This operator does not work on NetCDF data!");
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);

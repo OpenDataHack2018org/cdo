@@ -87,7 +87,7 @@ void *Setbox(void *process)
 
   streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  vlistID1 = pstreamInqVlist(streamID1);
+  vlistID1 = cdoStreamInqVlist(streamID1);
 
   ngrids = vlistNgrids(vlistID1);
   ndiffgrids = 0;

@@ -71,7 +71,7 @@ void *Mergetime(void *process)
       if ( cdoVerbose ) cdoPrint("process: %s", cdoGetStreamName(fileID).c_str());
 
       sf[fileID].streamID = cdoStreamOpenRead(cdoStreamName(fileID));
-      sf[fileID].vlistID = pstreamInqVlist(sf[fileID].streamID);
+      sf[fileID].vlistID = cdoStreamInqVlist(sf[fileID].streamID);
       sf[fileID].taxisID = vlistInqTaxis(sf[fileID].vlistID);
     }
 

@@ -61,8 +61,8 @@ void *Diff(void *process)
   int streamID1 = cdoStreamOpenRead(0);
   int streamID2 = cdoStreamOpenRead(1);
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 

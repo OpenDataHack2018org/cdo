@@ -141,7 +141,7 @@ void *Showattribute(void *process)
   int operatorID = cdoOperatorID();
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int nvars   = vlistNvars(vlistID);
 
   int natts = operatorArgc();

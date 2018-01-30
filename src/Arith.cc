@@ -74,8 +74,8 @@ void *Arith(void *process)
   field_type *fieldx1 = &field1;
   field_type *fieldx2 = &field2;
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistIDx1 = vlistID1;
   int vlistIDx2 = vlistID2;
 
@@ -228,7 +228,7 @@ void *Arith(void *process)
 		  streamID2 = cdoStreamOpenRead(1);
 		  streamIDx2 = streamID2;
 
-		  vlistID2 = pstreamInqVlist(streamID2);
+		  vlistID2 = cdoStreamInqVlist(streamID2);
 		  vlistIDx2 = vlistID2;
 
 		  vlistCompare(vlistID1, vlistID2, CMP_DIM);

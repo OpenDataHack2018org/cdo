@@ -110,7 +110,7 @@ void *Sinfo(void *process)
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
       int streamID = cdoStreamOpenRead(cdoStreamName(indf));
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
 
       set_text_color(stdout, BRIGHT, BLACK);
       fprintf(stdout, "   File format");
