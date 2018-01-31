@@ -153,7 +153,9 @@ processCreate(const char *command)
       MESSAGE("Creating new process for command: ", command);
     }
   int processID = NumProcess++;
-  auto success = Process.insert(std::make_pair(processID, process_t(processID, command)));
+
+  const char* operatorName = get_original(getOperatorName(command));
+  auto success = Process.insert(std::make_pair(processID, process_t(processID, operatorName, command)));
   if (success.second == false)
     {
       ERROR("Process ", processID, " could not be created");

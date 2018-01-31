@@ -50,6 +50,16 @@
 
 static int pthreadScope = 0;
 
+process_t::process_t(int p_ID, const char* p_operatorName, const char *operatorCommand) : m_ID(p_ID) , operatorName(p_operatorName)
+{
+  initProcess();
+  setOperatorArgv(operatorCommand);
+  m_operatorCommand = operatorCommand;
+
+  defPrompt();  // has to be called after get operatorName
+
+  m_module = getModule(p_operatorName);
+}
 
 process_t::process_t(int p_ID, const char *operatorCommand) : m_ID(p_ID)
 {
