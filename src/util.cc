@@ -36,7 +36,6 @@
 #include "cdi.h"
 
 #include "cdo_int.h"
-#include "modules.h"
 #include "util.h"
 #include "cdoOptions.h"
 
@@ -188,7 +187,7 @@ const char *getProgname(char *string)
 
 const char *getOperatorName(const char *operatorCommand)
 {
-  char *operatorName = NULL;
+   char *operatorName = NULL;
 
   if ( operatorCommand )
     {
@@ -202,13 +201,8 @@ const char *getOperatorName(const char *operatorCommand)
       operatorName[len] = '\0';
     }
 
-  /*  return operatorName; */
-  if(is_alias(operatorName))
-    {
-      operatorName = get_original(operatorName);
-    }
-
-  return operatorName;
+  const char* test = operatorName;
+  return test;
 }
 
 char *getOperatorArg(const char *p_operatorCommand)
@@ -223,7 +217,7 @@ char *getOperatorArg(const char *p_operatorCommand)
           size_t len = strlen(commapos+1);
           if ( len )
             {
-              operatorCommand = (char*) Malloc(len+1);
+              operatorCommand = ( char*) Malloc(len+1);
               strcpy(operatorCommand, commapos+1);
             }
         }

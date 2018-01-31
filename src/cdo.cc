@@ -1910,7 +1910,7 @@ int main(int argc, char *argv[])
   extern int (*proj_lcc_to_lonlat_func)();
   proj_lcc_to_lonlat_func = (int (*)()) proj_lcc_to_lonlat;
   
-  const char *operatorName = getOperatorName(argv[CDO_optind]);
+  const char *operatorName = get_original(getOperatorName(argv[CDO_optind]));
 
   if ( Help )
     {

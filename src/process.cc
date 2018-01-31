@@ -54,7 +54,7 @@ static int pthreadScope = 0;
 process_t::process_t(int p_ID, const char *operatorCommand) : m_ID(p_ID)
 {
   initProcess();
-  operatorName = getOperatorName(operatorCommand);
+  operatorName = get_original(getOperatorName(operatorCommand));
   setOperatorArgv(operatorCommand);
   m_operatorCommand = operatorCommand;
 
