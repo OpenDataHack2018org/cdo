@@ -36,7 +36,7 @@ typedef struct {
     short number;                        // Allowed number type
     short streamInCnt;                   // Number of input streams
     short streamOutCnt;                  // Number of output streams
-} modules_t;
+} module_t;
 
 
 /***
@@ -52,7 +52,7 @@ static std::map<std::string, std::string> modules_map;
 /***
   Contains added modules as values and their names as key
   */
-static std::map<std::string, modules_t> modules;
+static std::map<std::string, module_t> modules;
 
 /***
   Key: operator alias / Value: operator original name
@@ -62,7 +62,7 @@ static std::map<std::string, std::string> aliases;
 void *(*operatorModule(std::string operatorName))(void *);
 void *(*operatorModule(const char *operatorName))(void *);
 
-modules_t &getModule(const std::string &operatorName);
+module_t &getModule(const std::string &operatorName);
 void init_modules();
 
 void init_aliases();
@@ -76,7 +76,7 @@ void operatorPrintAll(void);
 void operatorPrintList(bool print_no_output);
 bool is_alias(const char * operatorName);
 const char* get_original(const char* operatorName);
-void add_module(std::string module_name, modules_t new_module);
+void add_module(std::string module_name, module_t new_module);
 int add_alias(std::string alias, std::string original);
 #ifdef CUSTOM_MODULES
 void load_custom_module(std::string path);

@@ -83,7 +83,7 @@ public:
   short m_noper;
   bool m_isActive;  /*TEMP*/ //not used right now, maybe later (12.Jan.2018)
 
-  modules_t m_module;
+  module_t m_module;
   std::vector<char *> m_oargv;
   int m_oargc;
   oper_t oper[MAX_OPERATOR];
