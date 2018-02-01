@@ -127,12 +127,6 @@ bool userFileOverwrite(const char *filename);
 int datatype2str(int datatype, char *datatypestr);
 int str2datatype(const char *datatypestr);
 
-/* filename manipulation */
-const char *filetypeext(int filetype);
-void rm_filetypeext(char *file, const char *ext);
-void repl_filetypeext(char file[], const char *oldext, const char *newext);
-
-
 /* moved here from cdo.h */
 void    cdiOpenError(int cdiErrno, const char *fmt, const char *path);
 void    cdoAbort(const char *fmt, ...);

@@ -31,6 +31,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream_int.h"
+#include "util_fileextensions.h"
 
 
 /*
