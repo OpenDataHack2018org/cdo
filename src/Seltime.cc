@@ -74,11 +74,13 @@ int seaslist(lista_t *ilista)
       for ( int i = 0; i < nsel; i++ )
         {
           int ival = parameter2int(operatorArgv()[i]);
+          // clang-format off
           if      ( ival == 1 ) { imon[12]++; imon[ 1]++; imon[ 2]++; }
           else if ( ival == 2 ) { imon[ 3]++; imon[ 4]++; imon[ 5]++; }
           else if ( ival == 3 ) { imon[ 6]++; imon[ 7]++; imon[ 8]++; }
           else if ( ival == 4 ) { imon[ 9]++; imon[10]++; imon[11]++; }
           else cdoAbort("Season %d not available!", ival);
+          // clang-format on
         }
     }
   else
@@ -99,7 +101,16 @@ double datestr_to_double(const char *datestr, int opt)
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   double fval = 0;
 
-  if ( opt ) {hour = 23; minute = 59; second = 59;}
+  size_t len = strlen(datestr);
+
+  for ( size_t i = 0; i < len; ++i )
+    {
+      int c = datestr[i];
+      if ( !(isdigit(c) || c == '-' || c == ':' || c == '.' || c == 'T') )
+        cdoAbort("Date string >%s< contains invalid character at position %d!", datestr, i+1);
+    }
+
+  if ( opt ) { hour = 23; minute = 59; second = 59; }
 
   if ( strchr(datestr, '-') == NULL )
     {
@@ -107,14 +118,16 @@ double datestr_to_double(const char *datestr, int opt)
     }
   else if ( strchr(datestr, 'T') )
     {
-      sscanf(datestr, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+      int status = sscanf(datestr, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+      if ( status != 6 ) cdoAbort("Invalid date string >%s<!", datestr);
       fval = cdiEncodeTime(hour, minute, second);
       if ( fabs(fval) > 0 ) fval /= 1000000;
       fval += cdiEncodeDate(year, month, day);
     }
   else
     {
-      sscanf(datestr, "%d-%d-%d", &year, &month, &day);
+      int status = sscanf(datestr, "%d-%d-%d", &year, &month, &day);
+      if ( status != 3 ) cdoAbort("Invalid date string >%s<!", datestr);
       fval = cdiEncodeTime(hour, minute, second);
       if ( fabs(fval) > 0 ) fval /= 1000000;
       fval += cdiEncodeDate(year, month, day);
@@ -137,11 +150,7 @@ int datelist(lista_t *flista)
     {
       if ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
 	{
-	  if ( i == 0 )
-	    fval = -99999999999.;
-	  else
-	    fval =  99999999999.;
-
+          fval = (i == 0) ? -99999999999. : 99999999999.;
 	  lista_set_flt(flista, i,  fval);
 	}
       else
@@ -183,12 +192,10 @@ void *Seltime(void *process)
   double *array = NULL;
   lista_t *ilista = lista_new(INT_LISTA);
   lista_t *flista = lista_new(FLT_LISTA);
-  bool copy_nts2 = false;
   bool lconstout = false;
   bool process_nts1 = false, process_nts2 = false;
   bool *selfound = NULL;
   int *vdate_list = NULL, *vtime_list = NULL;
-  double *single;
   field_type ***vars = NULL;
 
   cdoInitialize(process);
@@ -305,7 +312,7 @@ void *Seltime(void *process)
 
   if ( cdoVerbose )
     {
-      for ( i = 0; i < nsel; i++ )
+      for ( int i = 0; i < nsel; i++ )
 	if ( operatorID == SELDATE )
 	  cdoPrint("fltarr entry: %d %14.4f", i+1, fltarr[i]);
 	else
@@ -413,6 +420,7 @@ void *Seltime(void *process)
 	      }
 	}
 
+      bool copy_nts2 = false;
       if ( operatorID == SELSMON && copytimestep == false )
 	{
 	  copy_nts2 = false;
@@ -463,8 +471,8 @@ void *Seltime(void *process)
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
 			  pstreamDefRecord(streamID2, varID, levelID);
-			  single = vars[it][varID][levelID].ptr;
-			  nmiss  = vars[it][varID][levelID].nmiss;
+			  double *single = vars[it][varID][levelID].ptr;
+			  size_t nmiss = vars[it][varID][levelID].nmiss;
 			  pstreamWriteRecord(streamID2, single, nmiss);
 			}
 		    }
@@ -495,8 +503,8 @@ void *Seltime(void *process)
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
 			  pstreamDefRecord(streamID2, varID, levelID);
-			  single = vars[nts][varID][levelID].ptr;
-			  nmiss  = vars[nts][varID][levelID].nmiss;
+			  double *single = vars[nts][varID][levelID].ptr;
+			  size_t nmiss = vars[nts][varID][levelID].nmiss;
 			  pstreamWriteRecord(streamID2, single, nmiss);
 			}
 		    }
@@ -563,7 +571,7 @@ void *Seltime(void *process)
 		  pstreamInqRecord(streamID1, &varID, &levelID);
 		  if ( lnts1 || (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) )
 		    {
-		      single = vars[nts][varID][levelID].ptr;
+		      double *single = vars[nts][varID][levelID].ptr;
 		      pstreamReadRecord(streamID1, single, &nmiss);
 		      vars[nts][varID][levelID].nmiss = nmiss;
 		    }
