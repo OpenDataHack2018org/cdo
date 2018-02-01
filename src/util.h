@@ -147,16 +147,10 @@ void timer_start(int it);
 void timer_stop(int it);
 double timer_val(int it);
 
-
-
 int     cdoFiletype(void);
 
 void cdoSetNAN(double missval, size_t gridsize, double *array);
 
-void    cdoInqHistory(int fileID);
-void    cdoDefHistory(int fileID, char *histstring);
-void cdo_def_tracking_id(int vlistID, const char *uuid_attribute);
-void cdo_def_creation_date(int vlistID);
 
 int     cdoDefineGrid(const char *gridfile);
 int     cdoDefineZaxis(const char *zaxisfile);

@@ -50,6 +50,7 @@
 #include "cdo_vlist.h"
 #include "functs.h"
 #include "cdoOptions.h"
+#include "cdo_history.h"
 
 #ifdef  HAVE_LIBPTHREAD
     #include <pthread.h>

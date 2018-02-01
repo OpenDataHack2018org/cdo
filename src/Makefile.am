@@ -17,6 +17,7 @@ libcdo_la_SOURCES =            \
                cdo_task.cc      \
                cdo_task.h      \
                cdo_history.cc   \
+               cdo_history.h   \
                cdo_read.cc      \
                cdi_uuid.h      \
 			   cdoOptions.h			\

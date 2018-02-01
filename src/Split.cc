@@ -32,6 +32,7 @@
 
 #include "cdo_int.h"
 #include "pstream_int.h"
+#include "cdo_history.h"
 
 
 static
