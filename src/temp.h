@@ -1,3 +1,19 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 /* cdo outputf,"%6g",8 -int -mulc,500 -subc,220 -selcode,169 -seltimestep,3 r720x360testfile.nc > temp */
 10446,10450,10455,10464,10467,10472,10479,10483,
 10486,10493,10497,10500,10500,10501,10501,10501,
