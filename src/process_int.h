@@ -21,7 +21,7 @@
 #include "util.h"
 #include "process.h"
 
-extern std::map<int, process_t> Process;
+extern std::map<int, ProcessType> Process;
 
 void cdoInitialize(void *process);
 void cdoFinish();
@@ -68,8 +68,8 @@ const char *processInqPrompt(void);
 int processNums(void);
 int processNumsActive();
 
-process_t &processSelf(void);
-process_t* getProcess(int p_processID);
+ProcessType &processSelf(void);
+ProcessType* getProcess(int p_processID);
 
 void clearProcesses();
 
@@ -77,7 +77,7 @@ void processAccuTime(double utime, double stime);
 void processStartTime(double *utime, double *stime);
 
 void createProcesses(int argc, const char **argv);
-process_t *processCreate(const char *command);
+ProcessType *processCreate(const char *command);
 
 int cdoStreamInqVlist(int pstreamID);
 

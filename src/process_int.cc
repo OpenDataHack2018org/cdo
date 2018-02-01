@@ -21,7 +21,7 @@
 #include "cdoOptions.h"
 #include "exception.h"
 
-std::map<int, process_t> Process;
+std::map<int, ProcessType> Process;
 std::map<int, char *> obase; /*TEMP*/  // Possibly not the best solution (19.Jan.2018)
 
 static int NumProcess = 0;
@@ -33,7 +33,7 @@ pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void
 processDefVarNum(int nvars) {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   process.nvars += nvars;
 }
 
@@ -44,7 +44,7 @@ processInqVarNum(void) {
 
 void
 processDefTimesteps(int streamID) {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
 
   UNUSED(streamID);
   process.ntimesteps++;
@@ -90,19 +90,19 @@ operatorCheckArgc(int numargs) {
 
 void
 operatorInputArg(const char *enter) {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   process.inqUserInputForOpArg(enter);
 }
 
 int
 cdoOperatorAdd(const char *name, int f1, int f2, const char *enter) {
-    process_t &process = processSelf();
+    ProcessType &process = processSelf();
     return process.operatorAdd(name, f1, f2, enter);
 }
 
 int
 cdoOperatorID(void) {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   return process.getOperatorID();
 }
 
@@ -141,7 +141,7 @@ cdoStreamName(int cnt) {
     return cnt;
 }
 
-process_t *
+ProcessType *
 processCreate(const char *command)
 {
 #ifdef HAVE_LIBPTHREAD
@@ -155,7 +155,7 @@ processCreate(const char *command)
   int processID = NumProcess++;
 
   const char* operatorName = get_original(getOperatorName(command));
-  auto success = Process.insert(std::make_pair(processID, process_t(processID, operatorName, command)));
+  auto success = Process.insert(std::make_pair(processID, ProcessType(processID, operatorName, command)));
   if (success.second == false)
     {
       ERROR("Process ", processID, " could not be created");
@@ -177,7 +177,7 @@ processCreate(const char *command)
   return &success.first->second;
 }
 
-process_t &
+ProcessType &
 processSelf(void)
 {
 #ifdef HAVE_LIBPTHREAD
@@ -242,13 +242,13 @@ createProcesses(int argc, const char **argv)
       MESSAGE("== Process Creation Start ==");
       MESSAGE("operators:  ", CdoDebug::argvToString(argc, argv));
     }
-  process_t *root_process = processCreate(argv[0]);
+  ProcessType *root_process = processCreate(argv[0]);
 
-  process_t *current_process;
-  process_t *parent_process;
+  ProcessType *current_process;
+  ProcessType *parent_process;
 
   int idx = 1;
-  std::stack<process_t *> call_stack;
+  std::stack<ProcessType *> call_stack;
 
   call_stack.push(root_process);
   current_process = call_stack.top();
@@ -320,14 +320,14 @@ createProcesses(int argc, const char **argv)
 void
 cdoStreamClose(int p_pstreamIDX)
 {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   if (p_pstreamIDX >= process.getInStreamCnt())
     {
       process.outputStreams[p_pstreamIDX - process.getInStreamCnt()]->close();
     }
   else if (p_pstreamIDX < process.getInStreamCnt() + process.getOutStreamCnt())
     {
-      pstream_t *pstream = process.inputStreams[p_pstreamIDX];
+      PstreamType *pstream = process.inputStreams[p_pstreamIDX];
       pstream->close();
       process.addNvals(pstream->getNvals());
     }
@@ -346,12 +346,12 @@ cdoStreamOpenRead(int inStreamIDX)
 {
   if (CdoDebug::PROCESS)
     MESSAGE("Getting in stream ", inStreamIDX, " of process ", processSelf().m_ID);
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   if (process.getInStreamCnt() < inStreamIDX || inStreamIDX < 0)
     {
       ERROR("instream ", inStreamIDX, " of process ", process.m_ID, " not found");
     }
-  pstream_t *inStream = process.inputStreams[inStreamIDX];
+  PstreamType *inStream = process.inputStreams[inStreamIDX];
 
   if (inStream->isPipe())
     {
@@ -377,7 +377,7 @@ cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
   if (CdoDebug::PROCESS)
     MESSAGE("Getting out stream ", p_outStreamIDX, " of process ", processSelf().m_ID);
 
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
   if (outStreamIDX > process.getOutStreamCnt() || outStreamIDX < 0)
     {
@@ -389,7 +389,7 @@ cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
             "Was called with streamIDX = ",
             p_outStreamIDX);
     }
-  pstream_t *outStream = process.outputStreams[outStreamIDX];
+  PstreamType *outStream = process.outputStreams[outStreamIDX];
 
   if (outStream->ispipe)
     {
@@ -419,7 +419,7 @@ int
 cdoStreamOpenWrite(std::string p_filename, int filetype)
 {
   int pstreamID = -1;
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   process.addFileOutStream(p_filename);
   pstreamID = process.outputStreams.back()->pstreamOpenWriteFile(filetype);
 
@@ -434,21 +434,21 @@ cdoStreamOpenWrite(std::string p_filename, int filetype)
 bool
 cdoInFileExists(int inStreamIDX)
 {
-  pstream_t *inStream = processSelf().inputStreams[inStreamIDX];
+  PstreamType *inStream = processSelf().inputStreams[inStreamIDX];
   return fileExists(inStream->m_mfnames[0].c_str());
 }
 bool
 cdoOutFileExists(int outStreamIDX)
 {
-  pstream_t *outStream = processSelf().outputStreams[outStreamIDX];
+  PstreamType *outStream = processSelf().outputStreams[outStreamIDX];
   return fileExists(outStream->m_mfnames[0].c_str());
 }
 int
 cdoStreamOpenAppend(int p_outFileIndex)
 {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   int streamIndex = p_outFileIndex - process.inputStreams.size();
-  pstream_t *outStream = process.outputStreams[streamIndex];
+  PstreamType *outStream = process.outputStreams[streamIndex];
   int pstreamID = -1;
   if (outStream->ispipe)
     {
@@ -470,7 +470,7 @@ cdoStreamOpenAppend(int p_outFileIndex)
   return pstreamID;
 }
 
-process_t *
+ProcessType *
 getProcess(int p_processID)
 {
   auto process = Process.find(p_processID);
@@ -484,21 +484,21 @@ getProcess(int p_processID)
 std::string
 cdoGetOutStreamName(int p_outStream)
 {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   return process.outputStreams[p_outStream]->m_name;
 }
 
 std::string
 cdoGetInStreamName(int p_inStream)
 {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   return process.inputStreams[p_inStream]->m_name;
 }
 std::string
 cdoGetStreamName(int p_streamIndex)
 {
   std::string streamName;
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   MESSAGE("stridx ", p_streamIndex);
   if (p_streamIndex >= process.inputStreams.size())
     {
@@ -519,7 +519,7 @@ cdoGetStreamName(int p_streamIndex)
 char *
 cdoGetObase()
 {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
 
   return obase[process.m_ID];
 }
@@ -530,7 +530,7 @@ cdoInitialize(void *p_process)
 #if defined(_OPENMP)
   omp_set_num_threads(Threading::ompNumThreads);  // Has to be called for every module (pthread)!
 #endif
-  process_t *process = (process_t *) p_process;
+  ProcessType *process = (ProcessType *) p_process;
 
   // std::cout << arg->processID << std::endl;
   if (CdoDebug::PROCESS)
@@ -546,7 +546,7 @@ cdoInitialize(void *p_process)
 void
 cdoFinish(void)
 {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
 
   if (CdoDebug::PROCESS)
     MESSAGE("Finishing process: ", process.m_ID);
@@ -577,7 +577,7 @@ cdoFinish(void)
 const char *
 processInqPrompt(void)
 {
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
   return process.inqPrompt();
 }
 
@@ -606,7 +606,7 @@ printEndTimes(cdoTimes p_times, char *p_memstring)
 void
 processAccuTime(double utime, double stime)
 {
-  process_t *process = getProcess(0);
+  ProcessType *process = getProcess(0);
   process->a_utime += utime;
   process->a_stime += stime;
 }
@@ -615,7 +615,7 @@ void
 processStartTime(double *utime, double *stime)
 {
  // used in: Command.cc, CDItest.cc, process.cc
-  process_t &process = processSelf();
+  ProcessType &process = processSelf();
 
   *utime = process.s_utime;
   *stime = process.s_stime;

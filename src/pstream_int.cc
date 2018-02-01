@@ -24,7 +24,7 @@
     void
 pstreamClose(int pstreamID)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   if (pstreamptr == NULL)
     ERROR("Internal problem, stream ", pstreamID ," not open!");
 
@@ -35,7 +35,7 @@ int
 pstreamInqVlist(int pstreamID)
 {
   if(CdoDebug::PSTREAM) MESSAGE("Inquiring Vlist from pstream ", pstreamID);
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   int vlistID =  pstreamptr->inqVlist();
   return vlistID;
 }
@@ -43,14 +43,14 @@ pstreamInqVlist(int pstreamID)
 void
 pstreamDefVlist(int pstreamID, int vlistID)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   pstreamptr->defVlist(vlistID);
 }
 
 int
 pstreamInqTimestep(int pstreamID, int tsID)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   int nrecs = -1;
 #ifdef  HAVE_LIBPTHREAD
   if(pstreamptr->isPipe())
@@ -75,7 +75,7 @@ pstreamInqTimestep(int pstreamID, int tsID)
 void
 pstreamDefTimestep(int pstreamID, int tsID)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   pstreamptr->defTimestep(tsID);
 }
 
@@ -83,13 +83,13 @@ pstreamDefTimestep(int pstreamID, int tsID)
 int
 pstreamInqFiletype(int pstreamID)
 {
-  return pstream_to_pointer(pstreamID)->inqFileType();
+  return PstreamTypeo_pointer(pstreamID)->inqFileType();
 }
 
 void
 pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
 
   streamInqGRIBinfo(pstreamptr->m_fileID, intnum, fltnum, bignum);
 }
@@ -97,7 +97,7 @@ pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
 int
 pstreamFileID(int pstreamID)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
 
   return pstreamptr->m_fileID;
 }
@@ -105,7 +105,7 @@ pstreamFileID(int pstreamID)
 int
 pstreamInqByteorder(int pstreamID)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   return pstreamptr->inqByteorder();
 }
 
@@ -115,7 +115,7 @@ pstreamReadRecord(int pstreamID, double *data, size_t *nmiss)
   if (data == NULL)
     cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
 
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   pstreamptr->readRecord(data, nmiss);
 }
 
@@ -125,7 +125,7 @@ pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
   if (data == NULL)
     cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
 
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   pstreamptr->readRecordF(data, nmiss);
 }
 
@@ -135,15 +135,15 @@ pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
   if (CdoDebug::PSTREAM)
     MESSAGE("pstreamIDdest = ",pstreamIDdest,"  pstreamIDsrc = ", pstreamIDsrc);
 
-  pstream_t *pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
+  PstreamType *pstreamptr_dest = PstreamTypeo_pointer(pstreamIDdest);
 
-  pstreamptr_dest->copyRecord(pstream_to_pointer(pstreamIDsrc));
+  pstreamptr_dest->copyRecord(PstreamTypeo_pointer(pstreamIDsrc));
 }
 
 int
 pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 {
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   return pstreamptr->inqRecord(varID, levelID);
 }
 
@@ -153,7 +153,7 @@ pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss)
   if (data == NULL)
     cdoAbort("Data pointer not allocated (%s)!", __func__);
 
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   pstreamptr->writeRecordF(data,nmiss);
 }
 
@@ -163,16 +163,16 @@ pstreamWriteRecord(int pstreamID, double *data, size_t nmiss)
   if (data == NULL)
     cdoAbort("Data pointer not allocated (%s)!", __func__);
 
-  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+  PstreamType *pstreamptr = PstreamTypeo_pointer(pstreamID);
   pstreamptr->writeRecord(data,nmiss);
 }
 
 void
 pstreamDefRecord(int pstreamID, int varID, int levelID)
 {
-  pstream_t *pstreamptr;
+  PstreamType *pstreamptr;
 
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstreamptr = PstreamTypeo_pointer(pstreamID);
   pstreamptr->defRecord(varID, levelID);
 }
 

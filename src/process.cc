@@ -50,7 +50,7 @@
 
 static int pthreadScope = 0;
 
-process_t::process_t(int p_ID, const char* p_operatorName, const char *operatorCommand) : m_ID(p_ID) , operatorName(p_operatorName)
+ProcessType::ProcessType(int p_ID, const char* p_operatorName, const char *operatorCommand) : m_ID(p_ID) , operatorName(p_operatorName)
 {
   initProcess();
   setOperatorArgv(operatorCommand);
@@ -62,7 +62,7 @@ process_t::process_t(int p_ID, const char* p_operatorName, const char *operatorC
 }
 
 void
-process_t::setOperatorArgv(const char *operatorArguments)
+ProcessType::setOperatorArgv(const char *operatorArguments)
 {
   if (operatorArguments)
     {
@@ -83,7 +83,7 @@ process_t::setOperatorArgv(const char *operatorArguments)
 }
 
 void
-process_t::initProcess()
+ProcessType::initProcess()
 {
 #ifdef HAVE_LIBPTHREAD
   threadID = pthread_self();
@@ -110,24 +110,24 @@ process_t::initProcess()
 }
 
 int
-process_t::getInStreamCnt()
+ProcessType::getInStreamCnt()
 {
   return inputStreams.size();
 }
 int
-process_t::getOutStreamCnt()
+ProcessType::getOutStreamCnt()
 {
   return outputStreams.size();
 }
 
 void
-process_t::addNvals(size_t p_nvals)
+ProcessType::addNvals(size_t p_nvals)
 {
   m_nvals += p_nvals;
 }
 
 void
-process_t::defPrompt()
+ProcessType::defPrompt()
 {
   if (m_ID == 0)
     sprintf(prompt, "%s %s", CDO_progname, operatorName);
@@ -136,7 +136,7 @@ process_t::defPrompt()
 }
 
 const char *
-process_t::inqPrompt()
+ProcessType::inqPrompt()
 {
   const char *newPrompt = "cdo";
   if (prompt[0])
@@ -146,7 +146,7 @@ process_t::inqPrompt()
 }
 
 int
-process_t::checkStreamCnt(void)
+ProcessType::checkStreamCnt(void)
 {
   int wantedStreamInCnt, wantedStreamOutCnt;
   int streamInCnt0;
@@ -227,7 +227,7 @@ process_t::checkStreamCnt(void)
 }
 
 bool
-process_t::hasAllInputs()
+ProcessType::hasAllInputs()
 {
   if (m_module.streamInCnt == -1)
     {
@@ -238,13 +238,13 @@ process_t::hasAllInputs()
 
 
 void
-process_t::setInactive()
+ProcessType::setInactive()
 {
   l_threadID = 0;
 }
 
 void
-process_t::inqUserInputForOpArg(const char *enter)
+ProcessType::inqUserInputForOpArg(const char *enter)
 {
   int oargc = m_oargc;
 
@@ -306,7 +306,7 @@ process_t::inqUserInputForOpArg(const char *enter)
 }
 
 int
-process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
+ProcessType::operatorAdd(const char *name, int f1, int f2, const char *enter)
 {
   int operID = m_noper;
 
@@ -324,7 +324,7 @@ process_t::operatorAdd(const char *name, int f1, int f2, const char *enter)
 }
 
 int
-process_t::getOperatorID()
+ProcessType::getOperatorID()
 {
   int operID = -1;
 
@@ -354,28 +354,28 @@ process_t::getOperatorID()
 }
 
 void
-process_t::addFileInStream(std::string file)
+ProcessType::addFileInStream(std::string file)
 {
   inputStreams.push_back(create_pstream(file));
   m_streamCnt++;
 }
 
 void
-process_t::addFileOutStream(std::string file)
+ProcessType::addFileOutStream(std::string file)
 {
   outputStreams.push_back(create_pstream(file));
   m_streamCnt++;
 }
 
 void
-process_t::addChild(process_t *childProcess)
+ProcessType::addChild(ProcessType *childProcess)
 {
   childProcesses.push_back(childProcess);
   nchild = childProcesses.size();
   addPipeInStream();
 }
 void
-process_t::addPipeInStream()
+ProcessType::addPipeInStream()
 {
 #if defined(HAVE_LIBPTHREAD)
   inputStreams.push_back(create_pstream(m_ID, inputStreams.size()));
@@ -386,21 +386,21 @@ process_t::addPipeInStream()
 }
 
 void
-process_t::addParent(process_t *parentProcess)
+ProcessType::addParent(ProcessType *parentProcess)
 {
   parentProcesses.push_back(parentProcess);
   m_posInParent = parentProcess->inputStreams.size() - 1;
   addPipeOutStream();
 }
 void
-process_t::addPipeOutStream()
+ProcessType::addPipeOutStream()
 {
   outputStreams.push_back(parentProcesses[0]->inputStreams[m_posInParent]);
   m_streamCnt++;
 }
 
 pthread_t
-process_t::run()
+ProcessType::run()
 {
   pthread_attr_t attr;
   int status = pthread_attr_init(&attr);
@@ -445,7 +445,7 @@ process_t::run()
 
 
 void
-process_t::query_user_exit(const char *argument)
+ProcessType::query_user_exit(const char *argument)
 {
 /* modified code from NCO */
 #define USR_RPL_MAX_LNG 10 /* Maximum length for user reply */
@@ -502,7 +502,7 @@ process_t::query_user_exit(const char *argument)
 /** function for operators with obase usage, will be called while operator execution */
 
 cdoTimes
-process_t::getTimes(int p_processNums)
+ProcessType::getTimes(int p_processNums)
 {
   cdoTimes times;
   times.s_utime = s_utime;
@@ -532,7 +532,7 @@ process_t::getTimes(int p_processNums)
 
 
 void
-process_t::printBenchmarks(cdoTimes p_times, char *p_memstring)
+ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
 {
 #if defined(HAVE_SYS_TIMES_H)
   if (cdoBenchmark)
@@ -561,7 +561,7 @@ process_t::printBenchmarks(cdoTimes p_times, char *p_memstring)
 }
 
 void
-process_t::printProcessedValues()
+ProcessType::printProcessedValues()
 {
   set_text_color(stderr, RESET, GREEN);
   fprintf(stderr, "%s: ", processInqPrompt());

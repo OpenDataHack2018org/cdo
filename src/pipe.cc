@@ -427,7 +427,7 @@ pipe_t::pipeReadPipeRecord(double *p_data, int vlistID, size_t *p_nmiss)
 
 /*
 void
-pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
+pipeGetReadTarget(PstreamType *pstreamptr, PstreamType *pstreamptr_in)
 {
 
   pstreamptr_in = pstreamptr->pipe->pstreamptr_in;

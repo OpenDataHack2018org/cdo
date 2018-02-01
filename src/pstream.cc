@@ -75,18 +75,18 @@
 //-----------
 #endif
 
-static std::map<int,pstream_t> _pstream_map;
+static std::map<int,PstreamType> _pstream_map;
 static int next_pstream_id = 1;
 static int createdPstreams = 0;
 
 
 static void set_comp(int a, int b);  /*TEMP*/
 
-pstream_t *create_pstream()
+PstreamType *create_pstream()
 {
     PSTREAM_LOCK();
     auto new_entry  = _pstream_map.insert(
-            std::make_pair(next_pstream_id, pstream_t(next_pstream_id))
+            std::make_pair(next_pstream_id, PstreamType(next_pstream_id))
             );
     if(new_entry.second == false)
     {
@@ -103,26 +103,26 @@ pstream_t *create_pstream()
 
     return &new_entry.first->second;
 }
-//temporary function: will be replaced by according pstream_t::pstream_t(..)
-pstream_t *create_pstream(std::vector<std::string> p_filenameList)
+//temporary function: will be replaced by according PstreamType::PstreamType(..)
+PstreamType *create_pstream(std::vector<std::string> p_filenameList)
 {
-    pstream_t* new_entry = create_pstream();
+    PstreamType* new_entry = create_pstream();
     new_entry->m_mfnames = p_filenameList;
     new_entry->m_name = p_filenameList[0];
     new_entry->ispipe = false;
     return new_entry;
 
 }
-//temporary function: will be replaced by according pstream_t::pstream_t(..)
- pstream_t *create_pstream(std::string p_filename)
+//temporary function: will be replaced by according PstreamType::PstreamType(..)
+ PstreamType *create_pstream(std::string p_filename)
 {
     return create_pstream(std::vector<std::string>{p_filename});
 }
 
-//temporary function: will be replaced by according pstream_t::pstream_t(..)
-pstream_t *create_pstream(int processID, int pstreamIDX)
+//temporary function: will be replaced by according PstreamType::PstreamType(..)
+PstreamType *create_pstream(int processID, int pstreamIDX)
 {
-    pstream_t *new_pstream = create_pstream();
+    PstreamType *new_pstream = create_pstream();
     new_pstream->pipe = std::make_shared<pipe_t>();
     new_pstream->pipe->pipeSetName(processID, pstreamIDX);
     new_pstream->ispipe = true;
@@ -131,7 +131,7 @@ pstream_t *create_pstream(int processID, int pstreamIDX)
 
 }
 
-pstream_t * pstream_to_pointer(int idx)
+PstreamType * PstreamTypeo_pointer(int idx)
 {
     PSTREAM_LOCK();
     auto pstream_iterator = _pstream_map.find(idx);
@@ -144,7 +144,7 @@ pstream_t * pstream_to_pointer(int idx)
     return &pstream_iterator->second;
 }
 
-void pstream_t::init()
+void PstreamType::init()
 {
   isopen = true;
   ispipe = false;
@@ -164,15 +164,15 @@ void pstream_t::init()
 //  pstreamptr->wthreadID  = 0;
 #endif
 }
-pstream_t::pstream_t(int p_id) : self(p_id) { init(); }
+PstreamType::PstreamType(int p_id) : self(p_id) { init(); }
 
 bool
-pstream_t::isPipe()
+PstreamType::isPipe()
 {
   return ispipe;
 }
 
-int pstream_t::pstreamOpenReadPipe()
+int PstreamType::pstreamOpenReadPipe()
 {
 #ifdef  HAVE_LIBPTHREAD
   rthreadID = pthread_self();
@@ -187,7 +187,7 @@ int pstream_t::pstreamOpenReadPipe()
 }
 
 void
-pstream_t::pstreamOpenReadFile(const char* p_args)
+PstreamType::pstreamOpenReadFile(const char* p_args)
 {
   std::string filename; 
 
@@ -234,7 +234,7 @@ pstream_t::pstreamOpenReadFile(const char* p_args)
 }
 
 int
-pstream_t::pstreamOpenWritePipe(const char* pipename, int filetype)
+PstreamType::pstreamOpenWritePipe(const char* pipename, int filetype)
 {
 #ifdef  HAVE_LIBPTHREAD
   if (CdoDebug::PSTREAM)
@@ -250,7 +250,7 @@ pstream_t::pstreamOpenWritePipe(const char* pipename, int filetype)
 
 }
 
-int pstream_t::pstreamOpenWriteFile(int filetype)
+int PstreamType::pstreamOpenWriteFile(int filetype)
 {
   if (CdoDebug::PSTREAM){
     MESSAGE("Opening (w) file ", m_name);
@@ -298,7 +298,7 @@ int pstream_t::pstreamOpenWriteFile(int filetype)
 }
 
 void
-pstream_t::openAppend(const char *p_filename)
+PstreamType::openAppend(const char *p_filename)
 {
   if (processNum == 1 && Threading::ompNumThreads == 1)
     {
@@ -344,7 +344,7 @@ pstream_t::openAppend(const char *p_filename)
   m_fileID = fileID;
 }
 void
-pstream_t::closePipe()
+PstreamType::closePipe()
 {
   pipe->close();
   pthread_cond_signal(pipe->recInq);
@@ -358,7 +358,7 @@ pstream_t::closePipe()
 
 }
 
-size_t pstream_t::getNvals()
+size_t PstreamType::getNvals()
 {
     if(ispipe){
         return pipe->nvals;
@@ -368,7 +368,7 @@ size_t pstream_t::getNvals()
     }
 }
 
-void pstream_t::waitForPipe()
+void PstreamType::waitForPipe()
 {
   pipe->close();
   std::unique_lock<std::mutex> locked_mutex(pipe->m_mutex);
@@ -380,7 +380,7 @@ void pstream_t::waitForPipe()
   locked_mutex.unlock();
 }
 
-void pstream_t::close(){
+void PstreamType::close(){
   if (ispipe)
     {
 #ifdef  HAVE_LIBPTHREAD
@@ -437,7 +437,7 @@ void pstream_t::close(){
 }
 
 int
-pstream_t::inqVlist()
+PstreamType::inqVlist()
 {
   int vlistID = -1;
 
@@ -485,7 +485,7 @@ pstream_t::inqVlist()
   return vlistID;
 }
 
-void pstream_t::defVarList(int p_vlistID)
+void PstreamType::defVarList(int p_vlistID)
 {
   int filetype = m_filetype;
 
@@ -549,7 +549,7 @@ void pstream_t::defVarList(int p_vlistID)
   m_vlistID = p_vlistID; /* used for -r/-a */
 }
 
-void pstream_t::defVlist(int p_vlistID){
+void PstreamType::defVlist(int p_vlistID){
 #ifdef  HAVE_LIBPTHREAD
   if (ispipe)
     {
@@ -618,7 +618,7 @@ void pstream_t::defVlist(int p_vlistID){
 }
 
 int
-pstream_t::inqRecord(int *varID, int *levelID){
+PstreamType::inqRecord(int *varID, int *levelID){
 #ifdef  HAVE_LIBPTHREAD
   if (ispipe)
     {
@@ -651,7 +651,7 @@ pstream_t::inqRecord(int *varID, int *levelID){
 }
 
 void
-pstream_t::defRecord(int varID, int levelID)
+PstreamType::defRecord(int varID, int levelID)
 {
   m_varID = varID;
 
@@ -684,7 +684,7 @@ pstream_t::defRecord(int varID, int levelID)
     }
 }
 
-void pstream_t::readRecordF(float *data, size_t *nmiss)
+void PstreamType::readRecordF(float *data, size_t *nmiss)
 {
 #ifdef  HAVE_LIBPTHREAD
  
@@ -712,7 +712,7 @@ if (ispipe)
     }
 }
 
-void pstream_t::readRecord(double *data, size_t *nmiss)
+void PstreamType::readRecord(double *data, size_t *nmiss)
 {
 #ifdef  HAVE_LIBPTHREAD
   if (ispipe)
@@ -743,7 +743,7 @@ void pstream_t::readRecord(double *data, size_t *nmiss)
 }
 
 void
-pstream_t::checkDatarange(int varID, double *array, size_t nmiss)
+PstreamType::checkDatarange(int varID, double *array, size_t nmiss)
 {
   long i;
   long gridsize = m_varlist[varID].gridsize;
@@ -818,7 +818,7 @@ pstream_t::checkDatarange(int varID, double *array, size_t nmiss)
     }
 }
 
-void pstream_t::writeRecord(double *data, size_t nmiss){
+void PstreamType::writeRecord(double *data, size_t nmiss){
 
 #ifdef  HAVE_LIBPTHREAD
   if (ispipe)
@@ -855,7 +855,7 @@ void pstream_t::writeRecord(double *data, size_t nmiss){
     }
 }
 
-void pstream_t::writeRecordF(float *data, size_t nmiss){
+void PstreamType::writeRecordF(float *data, size_t nmiss){
 #ifdef  HAVE_LIBPTHREAD
   if (ispipe)
     {
@@ -885,7 +885,7 @@ void pstream_t::writeRecordF(float *data, size_t nmiss){
 }
 
 
-int pstream_t::inqTimestep(int p_tsID)
+int PstreamType::inqTimestep(int p_tsID)
 {
   int nrecs = 0;
 
@@ -969,7 +969,7 @@ int pstream_t::inqTimestep(int p_tsID)
 }
 
 void
-pstream_t::defTimestep(int p_tsID)
+PstreamType::defTimestep(int p_tsID)
 {
 #ifdef  HAVE_LIBPTHREAD
   if (ispipe)
@@ -1010,7 +1010,7 @@ pstream_t::defTimestep(int p_tsID)
 }
 
 
-void pstream_t::copyRecord(pstream_t* src){
+void PstreamType::copyRecord(PstreamType* src){
   if (ispipe || src->ispipe)
     cdoAbort("This operator can't be combined with other operators!");
 
@@ -1026,7 +1026,7 @@ void pstream_t::copyRecord(pstream_t* src){
 }
 
 int
-pstream_t::inqFileType()
+PstreamType::inqFileType()
 {
   int filetype;
 #ifdef  HAVE_LIBPTHREAD
@@ -1042,7 +1042,7 @@ pstream_t::inqFileType()
   return filetype;
 }
 
-int pstream_t::inqByteorder(){
+int PstreamType::inqByteorder(){
   int byteorder;
 
 #ifdef  HAVE_LIBPTHREAD
@@ -1166,7 +1166,7 @@ pstreamDebug(int debug)
 }
 
 static void
-pstream_delete_entry(pstream_t *pstreamptr)
+pstream_delete_entry(PstreamType *pstreamptr)
 {
   int idx = pstreamptr->self;
 

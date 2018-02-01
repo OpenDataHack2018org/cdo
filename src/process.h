@@ -47,7 +47,7 @@ struct oper_t
   const char *enter;
 };
 
-class process_t
+class ProcessType
 {
 public:
   int m_ID;
@@ -57,10 +57,10 @@ public:
   int l_threadID;
 #endif
   short nchild;
-  std::vector<process_t *> childProcesses;
-  std::vector<process_t *> parentProcesses;
-  std::vector<pstream_t *> inputStreams;
-  std::vector<pstream_t *> outputStreams;
+  std::vector<ProcessType *> childProcesses;
+  std::vector<ProcessType *> parentProcesses;
+  std::vector<PstreamType *> inputStreams;
+  std::vector<PstreamType *> outputStreams;
   int nChildActive = 0;
   short m_cntIn;
   short m_cntOut;
@@ -88,7 +88,7 @@ public:
   int m_oargc;
   oper_t oper[MAX_OPERATOR];
 
-  process_t(int p_ID, const char* p_operatorNamme, const char *operatorCommand);
+  ProcessType(int p_ID, const char* p_operatorNamme, const char *operatorCommand);
 
   pthread_t run();
 
@@ -97,8 +97,8 @@ public:
   void initProcess();
   void print_process();
   void setOperatorArgv(const char *operatorArguments);
-  void addChild(process_t *child_process);
-  void addParent(process_t *parent_process);
+  void addChild(ProcessType *child_process);
+  void addParent(ProcessType *parent_process);
   bool hasAllInputs();
   void addFileInStream(std::string file);
   void addFileOutStream(std::string file);
@@ -116,7 +116,7 @@ public:
   void printBenchmarks(cdoTimes p_times, char *p_memstring);
 
 private:
-  process_t();
+  ProcessType();
   void defPrompt();
   int checkStreamCnt();
 };

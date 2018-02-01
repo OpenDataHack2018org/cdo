@@ -28,10 +28,10 @@
 #include <sys/types.h> /* off_t */
 #include <vector>
 
-class pstream_t
+class PstreamType
 {
 public:
-  pstream_t(int id);
+  PstreamType(int id);
   int inqVlist();
   int inqFileType();
   int inqTimestep(int tsID);
@@ -51,7 +51,7 @@ public:
 
   void readRecord(double *data, size_t *nmiss);
   void readRecordF(float *data, size_t *nmiss);
-  void copyRecord(pstream_t * dest);
+  void copyRecord(PstreamType * dest);
 
   void defVarList(int vlistID);
   void defTimestep(int p_tsID);
@@ -85,18 +85,18 @@ public:
   pthread_t wthreadID; /* write thread ID */
 #endif
 private:
-   pstream_t();
+   PstreamType();
    void checkDatarange(int varID, double *array, size_t nmiss);
 };
 
-pstream_t *pstream_to_pointer(int pstreamID);
+PstreamType *PstreamTypeo_pointer(int pstreamID);
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
-pstream_t *create_pstream();
-pstream_t *create_pstream(std::vector<std::string> p_filenameList);
-pstream_t *create_pstream(std::string p_filename);
-pstream_t *create_pstream(int processID, int pstreamIDX);
+PstreamType *create_pstream();
+PstreamType *create_pstream(std::vector<std::string> p_filenameList);
+PstreamType *create_pstream(std::string p_filename);
+PstreamType *create_pstream(int processID, int pstreamIDX);
 
 void pstreamCloseAll();
 void setProcessNum(int p_num);
