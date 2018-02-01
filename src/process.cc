@@ -61,18 +61,6 @@ process_t::process_t(int p_ID, const char* p_operatorName, const char *operatorC
   m_module = getModule(p_operatorName);
 }
 
-process_t::process_t(int p_ID, const char *operatorCommand) : m_ID(p_ID)
-{
-  initProcess();
-  operatorName = get_original(getOperatorName(operatorCommand));
-  setOperatorArgv(operatorCommand);
-  m_operatorCommand = operatorCommand;
-
-  defPrompt();  // has to be called after get operatorName
-
-  m_module = getModule(operatorName);
-}
-
 void
 process_t::setOperatorArgv(const char *operatorArguments)
 {

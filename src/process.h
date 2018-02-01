@@ -88,7 +88,6 @@ public:
   int m_oargc;
   oper_t oper[MAX_OPERATOR];
 
-  process_t(int p_ID, const char *operatorCommand);
   process_t(int p_ID, const char* p_operatorNamme, const char *operatorCommand);
 
   pthread_t run();
