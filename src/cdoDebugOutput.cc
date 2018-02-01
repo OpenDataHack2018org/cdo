@@ -31,8 +31,8 @@ namespace CdoDebug
      int cdoDebug;
      int cdoDebugExt = 0;     //  Debug level for the KNMI extensions
     //Subsystem Debug Switches
-     int  PSTREAM = 1;
-     bool PROCESS = 1;
+     int  PSTREAM = 0;
+     bool PROCESS = 0;
      bool PIPE = false;
      int ARGUMENT = 0;
      int PTHREAD = 0;
