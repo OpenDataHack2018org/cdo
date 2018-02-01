@@ -1,5 +1,9 @@
 2018-01-29  Uwe Schulzweida
 
+	* seldate: check parameter
+
+2018-01-29  Uwe Schulzweida
+
 	* Using CDI library version 1.9.3
 	* Version 1.9.3 release
 
