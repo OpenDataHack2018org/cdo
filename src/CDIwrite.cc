@@ -23,47 +23,9 @@
 #include "grid.h"
 
 
-static
-const char *filetypestr(int filetype)
-{
-  switch ( filetype )
-    {
-    case CDI_FILETYPE_GRB:  return ("GRIB");            break;
-    case CDI_FILETYPE_GRB2: return ("GRIB2");           break;
-    case CDI_FILETYPE_NC:   return ("NetCDF");          break;
-    case CDI_FILETYPE_NC2:  return ("NetCDF2");         break;
-    case CDI_FILETYPE_NC4:  return ("NetCDF4");         break;
-    case CDI_FILETYPE_NC4C: return ("NetCDF4 classic"); break;
-    case CDI_FILETYPE_NC5:  return ("NetCDF5");         break;
-    case CDI_FILETYPE_SRV:  return ("SERVICE");         break;
-    case CDI_FILETYPE_EXT:  return ("EXTRA");           break;
-    case CDI_FILETYPE_IEG:  return ("IEG");             break;
-    default:            return ("");
-    }
-}
+const char *filetypestr(int filetype);
+const char *datatypestr(int datatype);
 
-static
-const char *datatypestr(int datatype)
-{
-  static char str[20];
-
-  str[0] = 0;
-  snprintf(str, sizeof(str), "%d bit packed", datatype);
-
-  if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
-  else if ( datatype > 0 && datatype <= 32  ) return (str);
-  else if ( datatype == CDI_DATATYPE_CPX32  ) return ("C32");
-  else if ( datatype == CDI_DATATYPE_CPX64  ) return ("C64");
-  else if ( datatype == CDI_DATATYPE_FLT32  ) return ("32 bit floats");
-  else if ( datatype == CDI_DATATYPE_FLT64  ) return ("64 bit floats");
-  else if ( datatype == CDI_DATATYPE_INT8   ) return ("I8");
-  else if ( datatype == CDI_DATATYPE_INT16  ) return ("I16");
-  else if ( datatype == CDI_DATATYPE_INT32  ) return ("I32");
-  else if ( datatype == CDI_DATATYPE_UINT8  ) return ("U8");
-  else if ( datatype == CDI_DATATYPE_UINT16 ) return ("U16");
-  else if ( datatype == CDI_DATATYPE_UINT32 ) return ("U32");
-  else                                        return ("");
-}
 
 static
 void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size, double tw)
