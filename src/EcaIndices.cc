@@ -70,6 +70,7 @@
 #define TO_DEG_CELSIUS(x) ((x) - 273.15)
 #define TO_KELVIN(x) ((x) + 273.15)
 
+// clang-format off
 
 static const char CFD_NAME[]         = "consecutive_frost_days_index_per_time_period";
 static const char CFD_LONGNAME[]     = "Consecutive frost days index is the greatest number of consecutive frost days in a given time period. Frost days is the number of days where minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
@@ -270,7 +271,6 @@ static const char HURR_NAME[]        = "hurricane_days_index_per_time_period";
 static const char HURR_LONGNAME[]    = "Hurricane days index is the number of days per time period where maximum wind speed is above 32.5 m/s. The time period should be defined by the bounds of the time coordinate.";
 static const char HURR_NAME2[]       = "consecutive_hurricane_days_index_per_time_period";
 static const char HURR_LONGNAME2[]   = "Greatest number of consecutive hurricane days per time period. The time period should be defined by the bounds of the time coordinate.";
-
 
 /* ECA temperature indices */
 
@@ -1602,3 +1602,4 @@ void *Hurr(void *process)
   
   return 0;
 }
+// clang-format on
