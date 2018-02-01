@@ -23,11 +23,11 @@
 #include "timer.h"
 
 
-static
 const char *filetypestr(int filetype)
 {
   switch ( filetype )
     {
+      // clang-format off
     case CDI_FILETYPE_GRB:  return ("GRIB");
     case CDI_FILETYPE_GRB2: return ("GRIB2");
     case CDI_FILETYPE_NC:   return ("NetCDF");
@@ -39,10 +39,11 @@ const char *filetypestr(int filetype)
     case CDI_FILETYPE_EXT:  return ("EXTRA");
     case CDI_FILETYPE_IEG:  return ("IEG");
     default:                return ("");
+      // clang-format on
     }
 }
 
-static
+
 const char *datatypestr(int datatype)
 {
   static char str[20];
@@ -50,6 +51,7 @@ const char *datatypestr(int datatype)
   str[0] = 0;
   snprintf(str, sizeof(str), "%d bit packed", datatype);
 
+  // clang-format off
   if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
   else if ( datatype > 0 && datatype <= 32  ) return (str);
   else if ( datatype == CDI_DATATYPE_CPX32  ) return ("C32");
@@ -63,6 +65,7 @@ const char *datatypestr(int datatype)
   else if ( datatype == CDI_DATATYPE_UINT16 ) return ("U16");
   else if ( datatype == CDI_DATATYPE_UINT32 ) return ("U32");
   else                                        return ("");
+  // clang-format on
 }
 
 static
