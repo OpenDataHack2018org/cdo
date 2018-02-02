@@ -43,7 +43,7 @@
 #include "exception.h"
 #include "cdoOptions.h"
 #include "util.h"
-#include "commandLine.h"
+#include "commandline.h"
 #include "assert.h"
 #include "dmemory.h"
 #include "compare.h"

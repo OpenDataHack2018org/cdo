@@ -25,7 +25,7 @@
 
 #include "cdo_int.h"
 #include "pstream_int.h"
-#include "commandLine.h"
+#include "commandline.h"
 
 
 #ifdef  HAVE_LIBNETCDF

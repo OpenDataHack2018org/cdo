@@ -71,7 +71,7 @@
 #include "process_int.h"
 #include "cdoOptions.h"
 #include "timer.h"
-#include "commandLine.h"
+#include "commandline.h"
 #include "text.h"
 
 #ifdef  _OPENMP

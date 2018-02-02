@@ -29,7 +29,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "remap.h"
-#include "commandLine.h"
+#include "commandline.h"
 
 
 void remapgrid_init(remapgrid_t *grid);
