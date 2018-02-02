@@ -19,9 +19,6 @@
 #define UTIL_WILDCARDS_H
 
 #include <vector>
-#include <wordexp.h>
-#include <string.h>
-#include <stddef.h>
 
 int find_wildcard(const char *args, size_t len);
 char *expand_filename(const char *args);

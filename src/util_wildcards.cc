@@ -15,12 +15,35 @@
   GNU General Public License for more details.
 */
 
-
+#include <wordexp.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <vector>
 #include <string>
+#include <glob.h>
+
+#ifdef  HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+
+#ifndef strdupx
+#ifndef strdup
+char *strdup(const char *s);
+#endif
+#define strdupx  strdup
+/*
+#define strdupx(s)			          \
+({					      	  \
+   const char *__old = (s);			  \
+   size_t __len = strlen(__old) + 1;		  \
+   char *__new = Malloc(__len);	  \
+   (char *) memcpy(__new, __old, __len);	  \
+})
+*/
+#endif
+
 
 #if defined(HAVE_GLOB_H)
 static int
