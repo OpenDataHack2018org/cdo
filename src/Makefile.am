@@ -57,6 +57,7 @@ libcdo_la_SOURCES =            \
                temp.h          \
                mask.h          \
                exception.cc     \
+               exception.h     \
                expr.cc          \
                expr.h          \
                expr_fun.cc      \
@@ -176,6 +177,7 @@ libcdo_la_SOURCES =            \
                text.h          \
                timebase.h      \
                timer.cc         \
+               timer.h         \
                util.cc          \
                util.h          \
 			   util_fileextensions.cc \
