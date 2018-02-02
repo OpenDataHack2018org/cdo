@@ -38,6 +38,7 @@
 #include "pstream_int.h"
 #include "grid.h"
 #include "statistic.h"
+#include "timer.h"
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 

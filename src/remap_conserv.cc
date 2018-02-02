@@ -20,6 +20,7 @@
 #include "remap.h"
 #include "remap_store_link.h"
 #include "cdoOptions.h"
+#include "timer.h"
 
 extern "C" {
 #include "clipping/clipping.h"

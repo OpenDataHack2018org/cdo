@@ -44,6 +44,7 @@
 #include "remap.h"
 #include "grid.h"
 #include "cdoOptions.h"
+#include "timer.h"
 
 
 enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,

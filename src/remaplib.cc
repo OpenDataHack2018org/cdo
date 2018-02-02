@@ -75,6 +75,7 @@
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
 #include "cdoOptions.h"
+#include "timer.h"
 
 
 #define IS_REG2D_GRID(gridID)  (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN)

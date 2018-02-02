@@ -43,6 +43,7 @@
 #endif
 #include <unistd.h>         /* sysconf, gethostname */
 #include <thread>
+#include "timer.h"
 
 #if defined(SX)
 #define RLIM_T  long long

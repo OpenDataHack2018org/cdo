@@ -28,6 +28,7 @@
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
 #include "cdoOptions.h"
+#include "timer.h"
 
 /* #define  BABY_STEP  0.001 */ /* original value */
 #define  BABY_STEP  0.001

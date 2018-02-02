@@ -127,12 +127,6 @@ bool userFileOverwrite(const char *filename);
 int datatype2str(int datatype, char *datatypestr);
 int str2datatype(const char *datatypestr);
 
-int  timer_new(const char *text);
-void timer_report(void);
-void timer_start(int it);
-void timer_stop(int it);
-double timer_val(int it);
-
 int     cdoFiletype(void);
 
 void cdoSetNAN(double missval, size_t gridsize, double *array);

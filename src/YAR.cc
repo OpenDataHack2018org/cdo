@@ -22,6 +22,7 @@
 #include "interpol.h"
 #include "grid.h"
 #include "remap.h"
+#include "timer.h"
 
 #ifdef  HAVE_LIBYAC
 extern "C" {

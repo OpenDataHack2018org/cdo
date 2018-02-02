@@ -38,6 +38,7 @@
 #include "pstream_int.h"
 #include "grid.h"
 #include "statistic.h"
+#include "timer.h"
 
 
 enum T_EIGEN_MODE get_eigenmode(void);

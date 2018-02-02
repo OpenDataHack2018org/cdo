@@ -29,6 +29,7 @@
 #include "listarray.h"
 #include "stdnametable.h"
 #include "util_string.h"
+#include "timer.h"
 
 static void
 setmissval(long nvals, int *imiss, double missval, double *array)
