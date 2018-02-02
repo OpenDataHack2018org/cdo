@@ -76,7 +76,6 @@ int main(int argc, char **argv) {
 #define SKIPPED_TEST 77
 int main(int argc, char **argv) {
   int result = SKIPPED_TEST;
-  std::cout << "ok $NTEST - $CDOTEST # SKIP $FILEFORMAT not enabled" << std::endl;
   return result;
 }
 #endif
