@@ -20,6 +20,7 @@
 #include "percentiles.h"
 #include "nth_element.h"
 #include "util_string.h"
+#include "exception.h"
 
 enum percentile_methods {NRANK=1, NIST, NUMPY};
 enum interpolation_methods {LINEAR=1, LOWER, HIGHER, NEAREST};

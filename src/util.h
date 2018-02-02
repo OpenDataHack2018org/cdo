@@ -127,14 +127,6 @@ bool userFileOverwrite(const char *filename);
 int datatype2str(int datatype, char *datatypestr);
 int str2datatype(const char *datatypestr);
 
-/* moved here from cdo.h */
-void    cdiOpenError(int cdiErrno, const char *fmt, const char *path);
-void    cdoAbort(const char *fmt, ...);
-void    cdoWarning(const char *fmt, ...);
-void    cdoPrint(const char *fmt, ...);
-void    cdoPrintBlue(const char *fmt, ...);
-void    cdoPrintRed(const char *fmt, ...);
-
 int  timer_new(const char *text);
 void timer_report(void);
 void timer_start(int it);

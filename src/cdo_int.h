@@ -45,6 +45,7 @@
 #include "datetime.h"
 #include "cdo_vlist.h"
 #include "process_int.h"
+#include "exception.h"
 
 #ifdef  _OPENMP
 #define  OPENMP3   200805 

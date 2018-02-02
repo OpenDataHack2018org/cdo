@@ -17,6 +17,7 @@
 #include <cdi.h>
 
 #include "util.h"
+#include "exception.h"
 
 void nospec(int vlistID)
 {
