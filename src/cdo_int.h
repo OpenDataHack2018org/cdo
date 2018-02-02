@@ -65,21 +65,6 @@
 #endif
 
 
-#ifndef strdupx
-#ifndef strdup
-char *strdup(const char *s);
-#endif
-#define strdupx  strdup
-/*
-#define strdupx(s)			          \
-({					      	  \
-   const char *__old = (s);			  \
-   size_t __len = strlen(__old) + 1;		  \
-   char *__new = Malloc(__len);	  \
-   (char *) memcpy(__new, __old, __len);	  \
-})
-*/
-#endif
 
 
 #define  cmpstr(s1, s2)          (strncmp(s1, s2, strlen(s2)))

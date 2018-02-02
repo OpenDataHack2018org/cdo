@@ -1,0 +1,82 @@
+#include "bandit/bandit/bandit.h"
+
+#ifdef HAVE_CONFIG_H
+#include "../../src/config.h"
+#endif
+
+#ifdef HAVE_WORDEXP_H
+#include "../../src/cdoDebugOutput.h"
+#include "../../src/util_wildcards.h"
+#include <fstream>
+
+//==========================================================================
+go_bandit([]() {
+
+  // File name rules
+  const std::string prefix = "testFile";
+  const std::string suffix = ".banditTestFile";
+  std::vector<std::string> wildcards = {"*", "?"};
+  std::vector<std::string> testArgv;
+  std::string toBeExpanded;
+
+  const int fileCount = 5;
+
+  // +1 because there has to be another string at the binning of testArgv since
+  // the first entry will be ignored by expand wildcards
+  unsigned int expectedFileCnt = fileCount * wildcards.size() + 1;
+
+  // storage for temp files;
+  std::ofstream files[fileCount];
+  std::vector<std::string> fileNames;
+
+  //--------------------------------------------------------------------------
+  std::string fileName;
+  // Creating test files
+  for (int fileID = 0; fileID < fileCount; fileID++) {
+    fileName = prefix + std::to_string(fileID) + suffix;
+    files[fileID].open(fileName);
+    fileNames.push_back(fileName);
+    files[fileID].close();
+  }
+  // see comment at definition of expectedFileCnt
+  testArgv.push_back("wildcards");
+  // setting the actual filenames
+  for (int wildCardIDX = 0; wildCardIDX < wildcards.size(); wildCardIDX++) {
+    testArgv.push_back(prefix + wildcards[wildCardIDX] + suffix);
+  }
+
+  //--------------------------------------------------------------------------
+  bandit::describe("Expanding wildcard", [&]() {
+    std::vector<std::string> expandedWildCards = expandWildCards(testArgv);
+    for (int j = 0; j < wildcards.size(); j++) {
+      for (int i = 0; i < fileCount; i++) {
+        int argvIdx = 1 + i + (fileCount * j);
+        bandit::it("has expanded the filename", [&]() {
+          AssertThat(expandedWildCards[argvIdx],
+                     snowhouse::Equals(fileNames[i]));
+        });
+      }
+    }
+    //--------------------------------------------------------------------------
+  });
+});
+
+int main(int argc, char **argv) {
+  CdoDebug::outfile = "wildcards.debug";
+  CdoDebug::print_to_seperate_file = true;
+
+  CdoDebug::CdoStartMessage();
+  CdoDebug::PROCESS = 1;
+  CdoDebug::PSTREAM = 1;
+  int result = bandit::run(argc, argv);
+  CdoDebug::CdoEndMessage();
+  return result;
+}
+#else
+#define SKIPPED_TEST 77
+int main(int argc, char **argv) {
+  int result = SKIPPED_TEST;
+  std::cout << "ok $NTEST - $CDOTEST # SKIP $FILEFORMAT not enabled" << std::endl;
+  return result;
+}
+#endif
