@@ -42,10 +42,11 @@
 #include "dmemory.h"
 #include "pthread.h"
 #include "cdoDebugOutput.h"
-#include <iostream>
-#include <string>
 #include "util_string.h"
 #include "text.h"
+#include "cdoOptions.h"
+#include <iostream>
+#include <string>
 
 
 static int pthreadScope = 0;
@@ -539,7 +540,7 @@ ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
     fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime, p_times.c_systime, p_times.c_cputime, p_memstring);
   else
     {
-      if (!cdoSilentMode)
+      if (!Options::silentMode)
         fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
     }
   if (cdoBenchmark && m_ID == 0)

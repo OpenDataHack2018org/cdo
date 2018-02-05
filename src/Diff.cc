@@ -27,6 +27,7 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "text.h"
+#include "cdoOptions.h"
 
 
 void *Diff(void *process)
@@ -147,7 +148,7 @@ void *Diff(void *process)
 		}
 	    }
 
-	  if ( ! cdoSilentMode || cdoVerbose )
+	  if ( ! Options::silentMode || cdoVerbose )
 	    {
 	      if ( absm > abslim || (checkrel && relm >= rellim) || cdoVerbose )
 		{

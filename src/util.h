@@ -75,13 +75,11 @@ extern int cdoDefaultTimeType;
 
 extern int cdoCheckDatarange;
 
-extern int cdoSilentMode;
 extern int cdoOverwriteMode;
 extern int cdoRegulargrid;
 extern int cdoBenchmark;
 extern int cdoTimer;
 extern int cdoVerbose;
-extern int cdoInteractive;
 extern int cdoParIO;
 
 
@@ -157,7 +155,7 @@ void cdo_omp_set_num_threads(int nthreads);
 /* refactor: moved here from cdo.cc */
 void exp_run(int argc, char *argv[], const char *cdoExpName); // job.cc
 void printFeatures(void); // features.cc
-void printLibraries(void);  // features.cc  
+void printLibraries(void);  // features.cc
 
 int wildcardmatch(const char *w, const char *s);
 

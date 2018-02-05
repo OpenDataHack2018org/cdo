@@ -50,6 +50,7 @@
 #include "constants.h"
 #include "compare.h"
 #include "vct_l191.h"
+#include "cdoOptions.h"
 
 #if defined (_OPENMP)
 #include <omp.h>
@@ -2425,7 +2426,7 @@ void *Afterburner(void *process)
 
   CDO_task = true;
 
-  lstdout = !cdoSilentMode;
+  lstdout = !Options::silentMode;
 
   struct Control *globs = (struct Control *) Malloc(sizeof(struct Control));
   after_control_init(globs);

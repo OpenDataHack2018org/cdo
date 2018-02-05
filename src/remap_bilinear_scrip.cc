@@ -20,6 +20,7 @@
 #include "remap.h"
 #include "remap_store_link.h"
 #include "timer.h"
+#include "cdoOptions.h"
 
 
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -410,7 +411,7 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
 #ifdef  HAVE_OPENMP4
 #pragma omp parallel for default(none)  schedule(static)  reduction(+:findex) \
   shared(gs) \
-  shared(cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
+  shared(Options::silentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
 #endif
   for ( size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {

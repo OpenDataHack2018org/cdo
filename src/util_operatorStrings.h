@@ -31,4 +31,4 @@ const char *getOperatorName(const char *operatorCommand);
 
 char *getOperatorArg(const char *p_operatorCommand);
 
-#endif;
+#endif

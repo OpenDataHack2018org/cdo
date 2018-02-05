@@ -34,8 +34,10 @@
 
 #include "process_int.h"
 #include "pstream_int.h"
+#include "util_files.h"
 #include "cdoOptions.h"
 #include "exception.h"
+#include "util_operatorStrings.h"
 
 std::map<int, ProcessType> Process;
 std::map<int, char *> obase; /*TEMP*/  // Possibly not the best solution (19.Jan.2018)
@@ -62,7 +64,7 @@ void
 processDefTimesteps(int streamID) {
   ProcessType &process = processSelf();
 
-  UNUSED(streamID);
+  (void*)streamID;
   process.ntimesteps++;
 }
 
@@ -416,7 +418,7 @@ cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
       if (CdoDebug::PROCESS)
         MESSAGE("Trying to open: ", outStream->m_mfnames[0]);
 
-      if (cdoInteractive)
+      if (Options::cdoInteractive)
         {
           struct stat stbuf;
 
@@ -571,7 +573,7 @@ cdoFinish(void)
   if (CdoDebug::PROCESS)
     MESSAGE("process ", process.m_ID, " thread ", pthread_self());
 #endif
-  if (!cdoSilentMode)
+  if (!Options::silentMode)
     process.printProcessedValues();
 
   cdoTimes times = process.getTimes(processNums());

@@ -83,12 +83,10 @@ int CDO_Reset_History    = FALSE;
 
 int cdoDebug             = 0;
 int cdoChunkType         = CDI_UNDEFID;
-int cdoSilentMode        = FALSE;
 int cdoOverwriteMode     = FALSE;
 int cdoBenchmark         = FALSE;
 int cdoTimer             = FALSE;
 int cdoVerbose           = FALSE;
-int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
 int cdoNumVarnames       = 0;
@@ -457,7 +455,7 @@ bool userFileOverwrite(const char *restrict filename)
 {
   bool status = false;
 
-  if ( !cdoSilentMode && stdin_is_tty && stderr_is_tty )
+  if ( !Options::silentMode && stdin_is_tty && stderr_is_tty )
     {
       fprintf(stderr, "File %s already exists, overwrite? (yes/no): ", filename);
       char line[1024];
@@ -496,7 +494,7 @@ void progressInit(void)
 
 void progressStatus(double offset, double refval, double curval)
 {
-  if ( cdoSilentMode ) return;
+  if ( Options::silentMode ) return;
   if ( !stdout_is_tty ) return;
 
   offset = offset < 0 ? 0: offset;
@@ -675,7 +673,7 @@ int cdoFiletype(void)
   if ( cdoDefaultFileType == CDI_UNDEFID )
     {
       cdoDefaultFileType = CDI_FILETYPE_GRB;
-      if ( ! cdoSilentMode )
+      if ( ! Options::silentMode )
         cdoPrint("Set default filetype to GRIB");
     }
 

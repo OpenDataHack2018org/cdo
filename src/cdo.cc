@@ -1365,7 +1365,7 @@ int parse_options_long(int argc, char *argv[])
           cdoDiag = TRUE;
           break;
         case 's':
-          cdoSilentMode = TRUE;
+          Options::silentMode = TRUE;
           break;
         case 'T':
           cdoTimer = TRUE;
@@ -1374,7 +1374,7 @@ int parse_options_long(int argc, char *argv[])
           cdoDefaultTableID = defineTable(CDO_optarg);
           break;
         case 'u':
-          cdoInteractive = TRUE;
+          Options::cdoInteractive = TRUE;
           break;
         case 'V':
           Version = 1;

@@ -33,6 +33,7 @@ namespace Options
     extern bool cdoCompress;
     extern int cdoCompType;
     extern int cdoCompLevel;
+    extern bool cdoInteractive;
 }
 
 namespace Threading

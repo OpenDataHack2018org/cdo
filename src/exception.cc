@@ -26,6 +26,7 @@
 #include "process_int.h"
 #include "error.h"
 #include "text.h"
+#include "cdoOptions.h"
 
 void pstreamCloseAll(void);
 
@@ -132,7 +133,7 @@ void cdoWarning(const char *fmt, ...)
 
 void cdoPrint(const char *fmt, ...)
 {
-  if ( ! cdoSilentMode )
+  if ( ! Options::silentMode )
     {
       set_text_color(stderr, RESET, GREEN);
       fprintf(stderr, "%s: ", processInqPrompt());
@@ -151,7 +152,7 @@ void cdoPrint(const char *fmt, ...)
 
 void cdoPrintBlue(const char *fmt, ...)
 {
-  if ( ! cdoSilentMode )
+  if ( ! Options::silentMode )
     {
       set_text_color(stderr, RESET, GREEN);
       fprintf(stderr, "%s: ", processInqPrompt());
@@ -170,7 +171,7 @@ void cdoPrintBlue(const char *fmt, ...)
 
 void cdoPrintRed(const char *fmt, ...)
 {
-  if ( ! cdoSilentMode )
+  if ( ! Options::silentMode )
     {
       set_text_color(stderr, RESET, GREEN);
       fprintf(stderr, "%s: ", processInqPrompt());
