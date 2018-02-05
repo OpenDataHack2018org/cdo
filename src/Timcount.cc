@@ -77,7 +77,7 @@ void *Timcount(void *process)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   field_type field;
@@ -116,7 +116,7 @@ void *Timcount(void *process)
 
 	      if ( nsets == 0 )
 		{
-		  for ( int i = 0; i < nwpv*gridsize; i++ )
+		  for ( size_t i = 0; i < nwpv*gridsize; i++ )
 		    vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
 		  vars1[varID][levelID].nmiss = gridsize;
 		}

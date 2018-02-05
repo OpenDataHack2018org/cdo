@@ -66,8 +66,8 @@ void grid_cell_area(int gridID, double *array)
           else if ( status == 2 )
             cdoAbort("%s: Can't compute grid cell area for this grid!", __func__);
 
-          int ngp = gridInqSize(gridID);
-          for ( int i = 0; i < ngp; ++i )
+          size_t ngp = gridInqSize(gridID);
+          for ( size_t i = 0; i < ngp; ++i )
             array[i] *= PlanetRadius*PlanetRadius;
         }
     }
@@ -163,7 +163,7 @@ void *Gridcell(void *process)
   vlistDefTaxis(vlistID2, taxisID);
 
 
-  long gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
 
@@ -185,10 +185,10 @@ void *Gridcell(void *process)
 	}
       else
 	{
-	  for ( int i = 0; i < gridsize; ++i ) mask[i] = 1;
+	  for ( size_t i = 0; i < gridsize; ++i ) mask[i] = 1;
 	}
 
-      for ( int i = 0; i < gridsize; ++i ) array[i] = mask[i];
+      for ( size_t i = 0; i < gridsize; ++i ) array[i] = mask[i];
       Free(mask);
     }
   else if ( operatorID == GRIDDX || operatorID == GRIDDY )

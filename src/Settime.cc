@@ -166,7 +166,7 @@ void *Settime(void *process)
   int sdate = 0, stime = 0;
   int taxisID2 = CDI_UNDEFID;
   size_t nmiss;
-  int gridsize;
+  size_t gridsize;
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 1, incunit = 86400;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;

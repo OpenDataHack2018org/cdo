@@ -29,10 +29,10 @@
 #include "pstream_int.h"
 
 
-int gengridcell(int gridID1, int gridsize2, int *cellidx);
+int gengridcell(int gridID1, size_t gridsize2, int *cellidx);
 
 static
-int genindexgrid(int gridID1, int gridsize2, int *cellidx)
+int genindexgrid(int gridID1, size_t gridsize2, int *cellidx)
 {
   int gridID0 = gridID1;
   int gridtype1 = gridInqType(gridID1);
@@ -142,13 +142,13 @@ void *Selgridcell(void *process)
   int *cellidx = indarr;
   if ( operatorID == DELGRIDCELL )
     {
-      int gridsize = vlistGridsizeMax(vlistID1);
+      size_t gridsize = vlistGridsizeMax(vlistID1);
       ncells = gridsize - nind;
       cellidx = (int*) Malloc(gridsize*sizeof(int));
-      for ( int i = 0; i < gridsize; ++i ) cellidx[i] = 1;
+      for ( size_t i = 0; i < gridsize; ++i ) cellidx[i] = 1;
       for ( int i = 0; i < nind; ++i ) cellidx[indarr[i]] = 0;
       int j = 0;
-      for ( int i = 0; i < gridsize; ++i )
+      for ( size_t i = 0; i < gridsize; ++i )
         if ( cellidx[i] == 1 ) cellidx[j++] = i;
       if ( j != ncells ) cdoAbort("Internal error; number of cells differ");
     }
@@ -159,9 +159,9 @@ void *Selgridcell(void *process)
       gridID1  = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
 
-      int gridsize = gridInqSize(gridID1);
+      size_t gridsize = gridInqSize(gridID1);
       if ( gridsize == 1 ) continue;
-      if ( indmax >= gridsize )
+      if ( indmax >= (int)gridsize )
         {
           cdoWarning("Max grid index is greater than grid size, skipped grid %d!", index+1);
           continue;
@@ -194,11 +194,11 @@ void *Selgridcell(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
-  int gridsize2 = vlistGridsizeMax(vlistID2);
+  size_t gridsize2 = vlistGridsizeMax(vlistID2);
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
   double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
@@ -234,7 +234,7 @@ void *Selgridcell(void *process)
 		{
 		  nmiss = 0;
                   double missval = vlistInqVarMissval(vlistID2, varID);
-		  for ( int i = 0; i < gridsize2; i++ )
+		  for ( size_t i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 		}
 

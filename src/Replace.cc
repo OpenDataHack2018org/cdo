@@ -74,10 +74,10 @@ void *Replace(void *process)
 
       if ( varID1 < nvars1 )
 	{
-	  int gridsize1 = gridInqSize(vlistInqVarGrid(vlistID1, varID1));
+	  size_t gridsize1 = gridInqSize(vlistInqVarGrid(vlistID1, varID1));
 	  int nlevel1   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 
-	  int gridsize2 = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+	  size_t gridsize2 = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
 	  int nlevel2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
 
 	  if ( gridsize1 != gridsize2 )
@@ -110,7 +110,7 @@ void *Replace(void *process)
 	  varID2 = varlist2[idx];
 	  int nlevel1  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 	  int nlevel2  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
-	  int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
 	  vardata2[idx]  = (double*) Malloc(nlevel2*gridsize*sizeof(double));
 	  varnmiss2[idx] = (size_t*) Malloc(nlevel2*sizeof(size_t));
 	  varlevel[idx] = (int*) Malloc(nlevel1*sizeof(int));
@@ -154,7 +154,7 @@ void *Replace(void *process)
   vlistDefTaxis(vlistID3, taxisID3);
   pstreamDefVlist(streamID3, vlistID3);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int nts2 = vlistNtsteps(vlistID2);
@@ -177,7 +177,7 @@ void *Replace(void *process)
 	      for ( idx = 0; idx < nchvars; idx++ )
 		if ( varlist2[idx] == varID )
 		  {
-		    int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		    size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 		    int offset   = gridsize*levelID;
 		    parray = vardata2[idx]+offset;
 		    pstreamReadRecord(streamID2, parray, &nmiss);
@@ -201,7 +201,7 @@ void *Replace(void *process)
 		levelID2 = varlevel[idx][levelID];
 		if ( levelID2 != -1 )
 		  {
-		    int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+		    size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 		    int offset   = gridsize*levelID2;
 		    parray   = vardata2[idx]+offset;
 		    nmiss    = varnmiss2[idx][levelID2];

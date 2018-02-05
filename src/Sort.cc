@@ -150,7 +150,7 @@ void *Sort(void *process)
   int varID, levelID, zaxisID;
   int vindex, lindex;
   int nrecs, nlevs, offset;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   double *single;
   int (*cmpvarlev)(const void *, const void *) = cmpvarlevel;

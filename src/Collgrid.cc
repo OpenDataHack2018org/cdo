@@ -29,7 +29,7 @@ typedef struct
   int vlistID;
   int gridID;
   size_t nmiss;
-  int gridsize;
+  size_t gridsize;
   int *gridindex;
   double *array;
 } ens_file_t;
@@ -204,7 +204,7 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
   if ( nx*ny != nfiles ) cdoAbort("Number of input files (%d) and number of blocks (%dx%d) differ!", nfiles, nx, ny);
  
   int xsize2 = 0;
-  for ( int i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
+  for ( size_t i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
   int ysize2 = 0;
   for ( int j = 0; j < ny; ++j ) ysize2 += ysize[xyinfo[j*nx].id];
   if ( cdoVerbose ) cdoPrint("xsize2 %d  ysize2 %d", xsize2, ysize2);
@@ -224,7 +224,7 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
   int *yoff = (int*) Malloc((ny+1)*sizeof(int));
 
   xoff[0] = 0;
-  for ( int i = 0; i < nx; ++i )
+  for ( size_t i = 0; i < nx; ++i )
     {
       int idx = xyinfo[i].id;
       if ( lregular ) memcpy(xvals2+xoff[i], xvals[idx], xsize[idx]*sizeof(double));
@@ -402,7 +402,7 @@ void *Collgrid(void *process)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      int gridsize = vlistGridsizeMax(ef[fileID].vlistID);
+      size_t gridsize = vlistGridsizeMax(ef[fileID].vlistID);
       ef[fileID].gridsize = gridsize;
       ef[fileID].gridindex = (int*) Malloc(gridsize*sizeof(int));
       ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));

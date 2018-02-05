@@ -465,7 +465,7 @@ void *CMOR_lite(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  long gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double *) Malloc(gridsize*sizeof(double));
 
@@ -507,7 +507,7 @@ void *CMOR_lite(void *process)
 
 	  if ( nmiss > 0 && var->changemissval )
 	    {
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( DBL_IS_EQUAL(array[i], var->missval_old) ) array[i] = missval;
 		}
@@ -515,7 +515,7 @@ void *CMOR_lite(void *process)
 
 	  if ( var->lfactor )
 	    {
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] *= var->factor;
 		}
@@ -525,7 +525,7 @@ void *CMOR_lite(void *process)
 	  if ( var->changeunits )
 	    {
 	      int nerr = 0;
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( !DBL_IS_EQUAL(array[i], missval) )
 		    {

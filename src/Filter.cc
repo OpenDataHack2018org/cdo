@@ -196,7 +196,7 @@ void *Filter(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
           int gridID   = vlistInqVarGrid(vlistID1, varID);
-          int gridsize = gridInqSize(gridID);
+          size_t gridsize = gridInqSize(gridID);
           vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
@@ -309,7 +309,7 @@ void *Filter(void *process)
   for ( int varID = 0; varID < nvars; varID++ )
     {
       int gridID   = vlistInqVarGrid(vlistID1, varID);
-      int gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
       int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       
       for ( int levelID = 0; levelID < nlevel; levelID++ )
@@ -320,7 +320,7 @@ void *Filter(void *process)
 #ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 {
             	  int ompthID = cdo_omp_get_thread_num();
 
@@ -342,7 +342,7 @@ void *Filter(void *process)
 #ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
-              for ( int i = 0; i < gridsize; i++ )  
+              for ( size_t i = 0; i < gridsize; i++ )  
                 {
             	  int ompthID = cdo_omp_get_thread_num();
 

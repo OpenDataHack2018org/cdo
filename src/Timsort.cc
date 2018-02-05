@@ -46,7 +46,7 @@ int cmpdarray(const void *s1, const void *s2)
 
 void *Timsort(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
@@ -118,7 +118,7 @@ void *Timsort(void *process)
 #ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize,nts,sarray,vars,varID,levelID)
 #endif
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 

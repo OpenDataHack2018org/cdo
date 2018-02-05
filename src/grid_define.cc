@@ -365,7 +365,7 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
   if ( CdoDebug::cdoDebugExt )
     {
       cdoPrint("%s() Original LCC grid as curvilinear (with lats-lons computed):", __func__);
-      cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
+      cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
       cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
       cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) -1), gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) -1));
       cdoPrint("xval_0 %4.3f, yval_0 %4.3f", xval_0, yval_0);
@@ -403,7 +403,7 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
   if ( CdoDebug::cdoDebugExt )
     {
       cdoPrint("%s()  Sub-grid:", __func__);
-      cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridID_sampled), gridInqYsize(gridID_sampled));
+      cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridID_sampled), gridInqYsize(gridID_sampled));
       cdoPrint("xval_0 %4.3f, yval_0 %4.3f", xval_0, yval_0);
     }
 

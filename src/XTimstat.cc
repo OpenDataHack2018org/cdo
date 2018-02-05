@@ -280,7 +280,7 @@ void *XTimstat(void *process)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
 
   int FIELD_MEMTYPE = 0;
@@ -369,7 +369,7 @@ void *XTimstat(void *process)
                   field_type *pinput_var = &input_vars[varID][levelID];
 
                   int nwpv     = pvars1->nwpv;
-                  int gridsize = pvars1->size;
+                  size_t gridsize = pvars1->size;
                   size_t nmiss    = pinput_var->nmiss;
 
                   farcpy(pvars1, *pinput_var);
@@ -379,7 +379,7 @@ void *XTimstat(void *process)
                       if ( samp1[varID][levelID].ptr == NULL )
                         samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
                       
-                      for ( int i = 0; i < nwpv*gridsize; i++ )
+                      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         samp1[varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
@@ -398,7 +398,7 @@ void *XTimstat(void *process)
                   field_type *pinput_var = &input_vars[varID][levelID];
 
                   int nwpv     = pvars1->nwpv;
-                  int gridsize = pvars1->size;
+                  size_t gridsize = pvars1->size;
                   size_t nmiss    = pinput_var->nmiss;
 
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
@@ -406,11 +406,11 @@ void *XTimstat(void *process)
                       if ( samp1[varID][levelID].ptr == NULL )
                         {
                           samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
-                          for ( int i = 0; i < nwpv*gridsize; i++ )
+                          for ( size_t i = 0; i < nwpv*gridsize; i++ )
                             samp1[varID][levelID].ptr[i] = nsets;
                         }
                           
-                      for ( int i = 0; i < nwpv*gridsize; i++ )
+                      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         if ( !DBL_IS_EQUAL(pinput_var->ptr[i], pvars1->missval) )
                           samp1[varID][levelID].ptr[i]++;
                     }
@@ -510,12 +510,12 @@ void *XTimstat(void *process)
 	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
             nwpv     = pvars1->nwpv;
-            int gridsize = pvars1->size;
+            size_t gridsize = pvars1->size;
             double missval = pvars1->missval;
             if ( samp1[varID][levelID].ptr )
               {
-                int irun = 0;
-                for ( int i = 0; i < nwpv*gridsize; ++i )
+                size_t irun = 0;
+                for ( size_t i = 0; i < nwpv*gridsize; ++i )
                   {
                     if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
                       {
@@ -527,7 +527,7 @@ void *XTimstat(void *process)
                 if ( irun )
                   {
                     nmiss = 0;
-                    for ( int i = 0; i < nwpv*gridsize; ++i )
+                    for ( size_t i = 0; i < nwpv*gridsize; ++i )
                       if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) nmiss++;
                     pvars1->nmiss = nmiss;
                   }

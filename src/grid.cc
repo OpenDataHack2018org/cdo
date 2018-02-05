@@ -753,7 +753,7 @@ int gridToRegular(int gridID1)
 
       nx = row_count;
       xvals = (double*) Malloc(nx*sizeof(double));
-      for ( int i = 0; i < nx; ++i )
+      for ( size_t i = 0; i < nx; ++i )
 	{
 	  xvals[i] = ((ilon_first+i)*360.)/np4;
 	  if ( xfirst > xlast ) xvals[i] -= 360.;
@@ -765,10 +765,10 @@ int gridToRegular(int gridID1)
     {
       nx = 2*ny;
       xvals = (double*) Malloc(nx*sizeof(double));
-      for ( int i = 0; i < nx; ++i ) xvals[i] = i * 360./nx;
+      for ( size_t i = 0; i < nx; ++i ) xvals[i] = i * 360./nx;
     }
 
-  int gridsize = nx*ny;
+  size_t gridsize = nx*ny;
   int gridID2  = gridCreate(GRID_GAUSSIAN, gridsize);
 	  
   gridDefXsize(gridID2, nx);
@@ -1454,11 +1454,11 @@ int gridCurvilinearToRegular(int gridID1)
   bool lx = true, ly = true;
 	
   int gridtype = gridInqType(gridID1);
-  int gridsize = gridInqSize(gridID1);
+  size_t gridsize = gridInqSize(gridID1);
 
   if ( gridtype != GRID_CURVILINEAR ) return gridID2;
 
-  int nx = gridInqXsize(gridID1);
+  size_t nx = gridInqXsize(gridID1);
   int ny = gridInqYsize(gridID1);
 	
   double *xvals2D = (double*) Malloc(gridsize*sizeof(double));
@@ -1470,11 +1470,11 @@ int gridCurvilinearToRegular(int gridID1)
   double *xvals = (double*) Malloc(nx*sizeof(double));
   double *yvals = (double*) Malloc(ny*sizeof(double));
 
-  for ( int i = 0; i < nx; i++ ) xvals[i] = xvals2D[i];
+  for ( size_t i = 0; i < nx; i++ ) xvals[i] = xvals2D[i];
   for ( int j = 0; j < ny; j++ ) yvals[j] = yvals2D[j*nx];
 
   for ( int j = 1; j < ny; j++ )
-    for ( int i = 0; i < nx; i++ )
+    for ( size_t i = 0; i < nx; i++ )
       {
 	if ( fabs(xvals[i] - xvals2D[j*nx+i]) > 1.e-6 )
 	  {
@@ -1574,7 +1574,7 @@ int gridWeightsOld(int gridID, double *weights)
 {
   int status = FALSE;
 
-  int len = gridInqSize(gridID);
+  size_t len = gridInqSize(gridID);
 
   if ( gridHasArea(gridID) )
     {
@@ -1585,7 +1585,7 @@ int gridWeightsOld(int gridID, double *weights)
       int gridtype = gridInqType(gridID);
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
 	{
-	  int nlon = gridInqXsize(gridID);
+	  size_t nlon = gridInqXsize(gridID);
 	  int nlat = gridInqYsize(gridID);
 
 	  double *lons = 1 + (double *) Malloc((nlon+2)*sizeof(double));
@@ -1640,7 +1640,7 @@ int gridWeightsOld(int gridID, double *weights)
 	{
 	  status = TRUE;
 
-	  for ( int i = 0; i < len; i++ ) weights[i] = 1./len;
+	  for ( size_t i = 0; i < len; i++ ) weights[i] = 1./len;
 	}
     }
 

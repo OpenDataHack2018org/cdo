@@ -295,13 +295,13 @@ void farselnec(field_type *field, double c);
  * @param yvals     list of latitudes
  * @param onlyNorth boolean for processing only the norther hemisphere
  */
-void updateHist(field_type *field[2], int nlevels, int gridsize, double *yvals, int onlyNorth);
+void updateHist(field_type *field[2], int nlevels, size_t gridsize, double *yvals, int onlyNorth);
 
 /*
  * Compute the Gsl and its starting day
  *
  * @param int nlevels
- * @param int gridsize
+ * @param size_t gridsize
  * @param double *yvals = array of latitudes
  * @param int ysize = number of gridpoints in lat-direction
  * @param double missval
@@ -317,7 +317,7 @@ void updateHist(field_type *field[2], int nlevels, int gridsize, double *yvals, 
  *                             gsl can only be computed for the northern
  *                             hemisphere (see definition of GSL: EcaGsl()
  */
-void computeGsl(int nlevels, int gridsize, double *yvals, double missval, 
+void computeGsl(int nlevels, size_t gridsize, double *yvals, double missval, 
                 field_type *startDateWithHist[2], field_type *endDateWithHist[2],
                 field_type *gslDuration, field_type *gslFirstDay,
                 int useCurrentYear);
@@ -328,7 +328,7 @@ void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
  * should be the last day of the corresponding year for norther and June, 30th
  * for southern hemisphere
  */
-void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int ovdate,
+void adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int ovdate,
                    field_type *startDateWithHist[2], field_type *endDateWithHist[2]);
 /*
  * Write GSL related fields to an output stream

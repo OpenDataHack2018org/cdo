@@ -46,7 +46,7 @@ typedef struct {
   int ny;
   int nz;
   int nt;
-  int gridsize;
+  size_t gridsize;
   int lscale;
   int loffset;
   int lmissval;
@@ -228,10 +228,10 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   double *xvals = (double*) Malloc(nx*sizeof(double));
   double *yvals = (double*) Malloc(ny*sizeof(double));
 
-  for ( int i = 0; i < nx; ++i )
+  for ( size_t i = 0; i < nx; ++i )
     xvals[i] = xmin + i*dx + dx/2;
 
-  for ( int i = 0; i < ny; ++i )
+  for ( size_t i = 0; i < ny; ++i )
     yvals[i] = ymax - i*dy - dy/2;
 
   int gridID = gridCreate(GRID_PROJECTION, nx*ny);
@@ -258,10 +258,10 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
   double *xvals = (double*) Malloc(nx*sizeof(double));
   double *yvals = (double*) Malloc(ny*sizeof(double));
 
-  for ( int i = 0; i < nx; ++i )
+  for ( size_t i = 0; i < nx; ++i )
     xvals[i] = xmin + i*dx + dx/2;
 
-  for ( int i = 0; i < ny; ++i )
+  for ( size_t i = 0; i < ny; ++i )
     yvals[i] = ymax - i*dy - dy/2;
 
   int gridID = gridCreate(GRID_PROJECTION, nx*ny);
@@ -756,7 +756,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   size_t atype_size;
   int     rank;
   int nx = 0, ny = 0, nz = 0, nt = 0;
-  int gridsize, offset;
+  size_t gridsize, offset;
   double *array;
   double addoffset = 0, scalefactor = 1, missval = cdiInqMissval();
   int laddoffset = 0, lscalefactor = 0, lmissval = 0;
@@ -1053,13 +1053,11 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	{
 	  if ( dtype == CDI_DATATYPE_FLT32 )
 	    {
-	      float *farray;
-	      int i;
-	      farray = (float*) Malloc(gridsize*nt*sizeof(float));
+	      float *farray = (float*) Malloc(gridsize*nt*sizeof(float));
 	      status = H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, farray);
 	      if ( status < 0 )
 		cdoAbort("Reading of NATIVE_FLOAT variable %s failed!", varname);
-	      for ( i = 0; i < gridsize*nt; ++i ) array[i] = farray[i];
+	      for ( size_t i = 0; i < gridsize*nt; ++i ) array[i] = farray[i];
 	      Free(farray);
 	    }
 	  else
@@ -1071,12 +1069,11 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	}
       else
 	{
-	  int *iarray, i;
-	  iarray = (int*) Malloc(gridsize*nt*sizeof(int));
+	  int *iarray = (int*) Malloc(gridsize*nt*sizeof(int));
 	  status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
 	  if ( status < 0 )
 	    cdoAbort("Reading of NATIVE_INT variable %s failed!", varname);
-	  for ( i = 0; i < gridsize*nt; ++i ) array[i] = iarray[i];
+	  for ( size_t i = 0; i < gridsize*nt; ++i ) array[i] = iarray[i];
 	  Free(iarray);
 	}
 
@@ -1111,7 +1108,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       minval =  1e35;
       maxval = -1e35;
-      for ( i = 0; i < gridsize*nt; i++ )
+      for ( size_t i = 0; i < gridsize*nt; i++ )
 	{
 	  if ( array[i] < minval ) minval = array[i];
 	  if ( array[i] > maxval ) maxval = array[i];
@@ -1139,7 +1136,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       if ( laddoffset || lscalefactor )
 	{
-	  for ( i = 0; i < gridsize*nt; i++ )
+	  for ( size_t i = 0; i < gridsize*nt; i++ )
 	    if ( !DBL_IS_EQUAL(array[i], missval) )
 	      {
 		mask[i] = 0;
@@ -1156,7 +1153,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       minval =  1e35;
       maxval = -1e35;
-      for ( i = 0; i < gridsize*nt; i++ )
+      for ( size_t i = 0; i < gridsize*nt; i++ )
 	if ( mask[i] == 0 )
 	  {
 	    if ( array[i] < minval ) minval = array[i];
@@ -1178,7 +1175,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		  cdoPrint("Dataset %s: changed missval to %g and datatype to INT16!",
 			   varname, missval);
 
-		  for ( i = 0; i < gridsize*nt; i++ )
+		  for ( size_t i = 0; i < gridsize*nt; i++ )
 		    if ( mask[i] ) array[i] = missval;
 		}
 	      else
@@ -1216,12 +1213,10 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 static herr_t
 obj_info(hid_t loc_id, const char *name, void *opdata)
 {
-  H5G_obj_t obj_type;
   H5G_stat_t statbuf;
-
   H5Gget_objinfo(loc_id, name, FALSE, &statbuf);
 
-  obj_type = statbuf.type;
+  H5G_obj_t obj_type = statbuf.type;
 
   switch (obj_type) {
   case H5G_GROUP:

@@ -30,7 +30,7 @@
 void *Fourier(void *process)
 {
   int bit;
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
@@ -124,7 +124,7 @@ void *Fourier(void *process)
 #ifdef  _OPENMP
 #pragma omp parallel for default(shared) private(tsID)
 #endif
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      int lmiss = 0;
               int ompthID = cdo_omp_get_thread_num();

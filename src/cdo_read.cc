@@ -30,7 +30,7 @@ bool *cdo_read_timestepmask(const char *maskfile, int *n)
   int nvars = vlistNvars(vlistID);
   if ( nvars > 1 ) cdoAbort("timestepmask %s contains more than one variable!", maskfile);
 
-  int gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
+  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
   if ( gridsize > 1 ) cdoAbort("timestepmask %s has more than one gridpoint!", maskfile);
 
   int nlev = zaxisInqSize(vlistInqVarZaxis(vlistID, 0));
@@ -89,7 +89,7 @@ bool *cdo_read_mask(const char *maskfile, int *n)
   int nvars = vlistNvars(vlistID);
   if ( nvars > 1 ) cdoAbort("Mask %s contains more than one variable!", maskfile);
 
-  int gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
+  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
 
   int nlev = zaxisInqSize(vlistInqVarZaxis(vlistID, 0));
   if ( nlev > 1 ) cdoAbort("Mask %s has more than one level!", maskfile);
@@ -106,7 +106,7 @@ bool *cdo_read_mask(const char *maskfile, int *n)
   streamInqRecord(streamID, &varID, &levelID);
   streamReadRecord(streamID, dmask, &nmiss);
 
-  for ( int i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     imask[i] = IS_NOT_EQUAL(dmask[i], 0);
       
       Free(dmask);

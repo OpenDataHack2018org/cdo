@@ -109,7 +109,7 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
 static
 void maskbox(bool *mask, int gridID, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
-  int nlon = gridInqXsize(gridID);
+  size_t nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
 
   for ( int ilat = 0; ilat < nlat; ilat++ )
@@ -127,7 +127,7 @@ void maskbox_cell(bool *mask, int gridID)
   double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
   getlonlatparams(0, &xlon1, &xlon2, &xlat1, &xlat2);
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   double *xvals = (double *) Malloc(gridsize*sizeof(double));
   double *yvals = (double *) Malloc(gridsize*sizeof(double));
@@ -154,7 +154,7 @@ void maskbox_cell(bool *mask, int gridID)
       xlat2 = xtemp;
     }
   
-  for ( int i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       mask[i] = true;
 
@@ -178,7 +178,7 @@ void maskbox_cell(bool *mask, int gridID)
 static
 void maskregion(bool *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
 {
-  int nlon = gridInqXsize(gridID);
+  size_t nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
 
   double *xvals = (double*) Malloc(nlon*sizeof(double));
@@ -339,10 +339,10 @@ void *Maskbox(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   double *array = (double *) Malloc(gridsize*sizeof(double));
   bool *mask = (bool*) Malloc(gridsize*sizeof(bool));
-  for ( int i = 0;  i < gridsize; ++i ) mask[i] = true;
+  for ( size_t i = 0; i < gridsize; ++i ) mask[i] = true;
  
   if ( operatorID == MASKLONLATBOX )
     {
@@ -403,11 +403,11 @@ void *Maskbox(void *process)
 	      pstreamReadRecord(streamID1, array, &nmiss);
 
               double missval = vlistInqVarMissval(vlistID1, varID);             
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
                 if ( mask[i] ) array[i] = missval;
 		
 	      nmiss = 0;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
 	      pstreamDefRecord(streamID2, varID, levelID);

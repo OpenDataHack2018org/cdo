@@ -48,7 +48,7 @@ void *Timcumsum(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   field_type field;
@@ -76,7 +76,7 @@ void *Timcumsum(void *process)
               pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
               // pvars1->nmiss = nmiss;
               if ( nmiss )
-                for ( int i = 0; i < gridsize; ++i )
+                for ( size_t i = 0; i < gridsize; ++i )
                   if ( DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval) ) pvars1->ptr[i] = 0;
             }
           else
@@ -88,7 +88,7 @@ void *Timcumsum(void *process)
               field.missval = pvars1->missval;
 
               if ( nmiss )
-                for ( int i = 0; i < gridsize; ++i )
+                for ( size_t i = 0; i < gridsize; ++i )
                   if ( DBL_IS_EQUAL(field.ptr[i], pvars1->missval) ) field.ptr[i] = 0;
 
               farfun(pvars1, field, func_sum);

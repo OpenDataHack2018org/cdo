@@ -29,7 +29,7 @@
 
 void *Harmonic(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int varID, levelID;
   size_t nmiss;
@@ -142,7 +142,7 @@ void *Harmonic(void *process)
 	    {
 	      double sine   = sin(2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
 	      double cosine = cos(2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  work[j][varID][i+offset]         += array[i] * sine;
 		  work[n_out + j][varID][i+offset] += array[i] * cosine;
@@ -174,7 +174,7 @@ void *Harmonic(void *process)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		out[j][varID][i+offset] = sqrt(work[j][varID][i+offset] * work[j][varID][i+offset] +
 					work[n_out+j][varID][i+offset] * work[n_out+j][varID][i+offset]) * 2 / nts;
 	    }
@@ -190,7 +190,7 @@ void *Harmonic(void *process)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		out[n_out - 1][varID][i+offset] = work[2 * n_out - 1][varID][i+offset] / nts;
 	    }
 	}
@@ -228,7 +228,7 @@ void *Harmonic(void *process)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  out[j][varID][i+offset] = work[j][varID][i+offset] || work[n_out+j][varID][i+offset]
 		              ? atan2 (work[j][varID][i+offset], work[n_out+j][varID][i+offset]) *
@@ -261,7 +261,7 @@ void *Harmonic(void *process)
 	      offset = gridsize*levelID;
 	      pstreamDefRecord(streamID2, varID, levelID);
 	      nmiss = 0;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(out[j][varID][i+offset], missval) ) nmiss++;
 	      pstreamWriteRecord(streamID2, out[j][varID]+offset, nmiss);
 	    }

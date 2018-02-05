@@ -60,7 +60,7 @@ void *Tocomplex(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(2*gridsize*sizeof(double));
       
@@ -82,7 +82,7 @@ void *Tocomplex(void *process)
 
 	  if ( operatorID == RETOCOMPLEX )
 	    {
-	      for ( int i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  array2[2*i]   = array1[i];
 		  array2[2*i+1] = 0;
@@ -90,7 +90,7 @@ void *Tocomplex(void *process)
 	    }
 	  else if ( operatorID == IMTOCOMPLEX )
 	    {
-	      for ( int i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  array2[2*i]   = 0;
 		  array2[2*i+1] = array1[i];

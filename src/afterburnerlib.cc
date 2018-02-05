@@ -1053,7 +1053,7 @@ void Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind,
 #endif
 	  for ( i = 0; i < dimgp; i++ )
 	    {
-	      if ( Cterm != 0.0 )
+	      if ( IS_NOT_EQUAL(Cterm, 0.0) )
 		Pterm = Cterm / (halfp[i+dimgp]-halfp[i]) * log(halfp[i+dimgp]/halfp[i]);
 	      else
 		Pterm = 0.0;
@@ -2412,20 +2412,15 @@ void after_processML(struct Control *globs, struct Variable *vars)
 
 void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss)
 {
-  long fieldSize;
+  size_t fieldSize;
   int truncation;
-  int dataSize;
-  int dataOffset;
-  int nlevel;
-  int gridSize;
-  int gridtype, leveltype;
 
-  gridtype   = gridInqType(gridID);
-  leveltype  = zaxisInqType(zaxisID);
-  nlevel     = zaxisInqSize(zaxisID);
-  gridSize   = gridInqSize(gridID);
-  dataSize   = gridSize*nlevel;
-  dataOffset = gridSize*levelID;
+  int gridtype   = gridInqType(gridID);
+  int leveltype  = zaxisInqType(zaxisID);
+  int nlevel     = zaxisInqSize(zaxisID);
+  size_t gridSize   = gridInqSize(gridID);
+  size_t dataSize   = gridSize*nlevel;
+  size_t dataOffset = gridSize*levelID;
 
   vars[code].nmiss0 += nmiss;
 
@@ -2480,14 +2475,13 @@ void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int c
 
       if ( globs->Mean > 0 && (nmiss > 0 || vars[code].samp) )
 	{
-	  int i;
 	  if ( vars[code].samp == NULL )
 	    {
 	      vars[code].samp = (int *) Malloc(dataSize*sizeof(int));
-	      for ( i = 0; i < dataSize; i++ ) vars[code].samp[i] = globs->MeanCount0;
+	      for ( size_t i = 0; i < dataSize; i++ ) vars[code].samp[i] = globs->MeanCount0;
 	    }
 
-	  for ( i = 0; i < gridSize; i++ )
+	  for ( size_t i = 0; i < gridSize; i++ )
 	    if ( IS_NOT_EQUAL(globs->Field[i], vars[code].missval) ) vars[code].samp[i+dataOffset]++;
 	}
     }
@@ -2498,9 +2492,9 @@ double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxis
 {
   int gridtype   = gridInqType(gridID);
   int nlevel     = zaxisInqSize(zaxisID);
-  int gridSize   = gridInqSize(gridID);
-  int dataSize   = gridSize*nlevel;
-  int dataOffset = gridSize*levelID;
+  size_t gridSize   = gridInqSize(gridID);
+  size_t dataSize   = gridSize*nlevel;
+  size_t dataOffset = gridSize*levelID;
 
   double *dataptr = NULL;
 
@@ -2528,9 +2522,9 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
   int gridtype   = gridInqType(gridID);
   int leveltype  = zaxisInqType(zaxisID);
   int nlevel     = zaxisInqSize(zaxisID);
-  int gridSize   = gridInqSize(gridID);
-  int dataSize   = gridSize*nlevel;
-  int dataOffset = gridSize*levelID;
+  size_t gridSize   = gridInqSize(gridID);
+  size_t dataSize   = gridSize*nlevel;
+  size_t dataOffset = gridSize*levelID;
 
   vars[code].nmiss0 += nmiss;
 
@@ -2558,15 +2552,14 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
 
       if ( globs->Mean > 0 && (nmiss > 0 || vars[code].samp) )
 	{
-	  int i;
 	  if ( vars[code].samp == NULL )
 	    {
 	      vars[code].samp = (int *) Malloc(dataSize*sizeof(int));
-	      for ( i = 0; i < dataSize; i++ ) vars[code].samp[i] = globs->MeanCount0;
+	      for ( size_t i = 0; i < dataSize; i++ ) vars[code].samp[i] = globs->MeanCount0;
 	    }
 
           double *dataptr = vars[code].hybrid0+dataOffset;
-	  for ( i = 0; i < gridSize; i++ )
+	  for ( size_t i = 0; i < gridSize; i++ )
 	    if ( IS_NOT_EQUAL(dataptr[i], vars[code].missval) ) vars[code].samp[i+dataOffset]++;
 	}
     }

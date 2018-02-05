@@ -41,7 +41,7 @@ field_type **field_allocate(int vlistID, int ptype, int init)
     {
       int nwpv     = vlistInqNWPV(vlistID, varID); // number of words per value; real:1  complex:2
       int gridID   = vlistInqVarGrid(vlistID, varID);
-      int gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
       int zaxisID  = vlistInqVarZaxis(vlistID, varID);
       int nlevel   = zaxisInqSize(zaxisID);
       double missval = vlistInqVarMissval(vlistID, varID);

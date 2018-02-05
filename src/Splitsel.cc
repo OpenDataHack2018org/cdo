@@ -29,7 +29,7 @@
 
 void *Splitsel(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs = 0;
   int varID, levelID;
   int tsID;

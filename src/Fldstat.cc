@@ -166,7 +166,7 @@ void *Fldstat(void *process)
   field_type field;
   field_init(&field);
 
-  int lim = vlistGridsizeMax(vlistID1);
+  size_t lim = vlistGridsizeMax(vlistID1);
   field.ptr    = (double*) Malloc(lim*sizeof(double));
   field.weight = NULL;
   if ( needWeights )
@@ -175,7 +175,7 @@ void *Fldstat(void *process)
       if ( !useweights )
 	{
 	  cdoPrint("Using constant grid cell area weights!");
-	  for ( int i = 0; i < lim; ++i ) field.weight[i] = 1;
+	  for ( size_t i = 0; i < lim; ++i ) field.weight[i] = 1;
 	}
     }
 

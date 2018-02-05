@@ -117,7 +117,7 @@ void *Ymonstat(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<recinfo_type> recinfo(maxrecs);
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   field_init(&field);
   field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
 
@@ -163,7 +163,7 @@ void *Ymonstat(void *process)
           field_type *pvars2 = vars2[month] ? &vars2[month][varID][levelID] : NULL;
           int nsets = month_nsets[month];
 
-          int gridsize = pvars1->size;
+          size_t gridsize = pvars1->size;
 
 	  if ( nsets == 0 )
 	    {
@@ -172,7 +172,7 @@ void *Ymonstat(void *process)
               if ( lrange )
                 {
                   pvars2->nmiss = pvars1->nmiss;
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     pvars2->ptr[i] = pvars1->ptr[i];
                 }
 
@@ -181,7 +181,7 @@ void *Ymonstat(void *process)
 		  if ( psamp1->ptr == NULL )
 		    psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
                     psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		}
 	    }
@@ -197,11 +197,11 @@ void *Ymonstat(void *process)
 		  if ( psamp1->ptr == NULL )
 		    {
 		      psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			psamp1->ptr[i] = nsets;
 		    }
 		  
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 		      psamp1->ptr[i]++;
 		}

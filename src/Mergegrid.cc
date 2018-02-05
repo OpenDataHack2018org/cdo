@@ -36,14 +36,14 @@ void gen_index(int gridID1, int gridID2, int *index)
   int gridtype1 = gridInqType(gridID1);
   int gridtype2 = gridInqType(gridID2);
 
-  int gridsize2 = gridInqSize(gridID2);
+  size_t gridsize2 = gridInqSize(gridID2);
 
   if ( gridtype1 != gridtype2 )
     cdoAbort("Input streams have different grid types!");
 
   if ( index == NULL ) cdoAbort("Internal problem, index not allocated!");
 
-  for ( i = 0; i < gridsize2; i++ ) index[i] = -1;
+  for ( size_t i = 0; i < gridsize2; i++ ) index[i] = -1;
 
   if ( gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN )
     {
@@ -194,8 +194,8 @@ void *Mergegrid(void *process)
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
 
-  int gridsize1 = gridInqSize(gridID1);
-  int gridsize2 = gridInqSize(gridID2);
+  size_t gridsize1 = gridInqSize(gridID1);
+  size_t gridsize2 = gridInqSize(gridID2);
 
   double *array1 = (double*) Malloc(gridsize1*sizeof(double));
   double *array2 = (double*) Malloc(gridsize2*sizeof(double));
@@ -236,7 +236,7 @@ void *Mergegrid(void *process)
 
 	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 
-	  for ( int i = 0; i < gridsize2; i++ )
+	  for ( size_t i = 0; i < gridsize2; i++ )
 	    {
 	      if ( gindex[i] >= 0 && !DBL_IS_EQUAL(array2[i], missval2) )
 		{
@@ -247,7 +247,7 @@ void *Mergegrid(void *process)
 	  if ( nmiss1 )
 	    {
 	      nmiss1 = 0;
-	      for ( int i = 0; i < gridsize1; i++ )
+	      for ( size_t i = 0; i < gridsize1; i++ )
 		if ( DBL_IS_EQUAL(array1[i], missval1) ) nmiss1++;
 	    }
 

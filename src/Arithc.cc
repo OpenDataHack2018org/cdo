@@ -107,7 +107,7 @@ void *Arithc(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -137,7 +137,7 @@ void *Arithc(void *process)
 	      /* recalculate number of missing values */
 	      gridsize = gridInqSize(field.grid);
 	      field.nmiss = 0;
-	      for ( int i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
 	    }
 

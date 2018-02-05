@@ -154,8 +154,8 @@ void *Ninfo(void *process)
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  int gridID = vlistInqVarGrid(vlistID, varID);
-	  int gridsize = gridInqSize(gridID);
-	  fprintf(stdout, "%d\n", gridsize);
+	  size_t gridsize = gridInqSize(gridID);
+	  fprintf(stdout, "%zu\n", gridsize);
 	}
       break;
     case NGRIDS:

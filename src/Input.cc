@@ -31,13 +31,13 @@
 
 
 static
-int input_iarray(int nval, int *array)
+size_t input_iarray(size_t nval, int *array)
 {
-  int ival = 0;
+  size_t ival = 0;
 
-  for ( int i = 0; i < nval; i++ )
+  for ( size_t i = 0; i < nval; i++ )
     {
-      int n = scanf("%d", &array[i]);
+      size_t n = scanf("%d", &array[i]);
       if ( n != 1 ) break;
 
       ival++;
@@ -46,17 +46,16 @@ int input_iarray(int nval, int *array)
   return ival;
 }
 
-int input_darray(FILE *gfp, int nval, double *array);
+size_t input_darray(FILE *gfp, size_t nval, double *array);
 
 
 void *Input(void *process)
 {
   int varID = 0;
-  int gridsize0 = 0, gridsize = 0;
+  size_t gridsize0 = 0, gridsize = 0;
   int taxisID = 0;
   int streamID = -1;
   int vlistID = -1;
-  int i;
   int code = 0, level = 0, date = 0, time = 0, nlon = 0, nlat = 0;
   int output_filetype = CDI_FILETYPE_GRB;
   int ihead[8];
@@ -110,12 +109,12 @@ void *Input(void *process)
 	  
 	  cdoPrint("Enter all %d elements of timestep %d!", gridsize*nlevs, nrecs+1);
 	  
-	  int rval = input_darray(stdin, gridsize*nlevs, array);
+	  size_t rval = input_darray(stdin, gridsize*nlevs, array);
 
 	  if ( nrecs > 0 && rval == 0 ) break;
 
 	  if ( rval != gridsize*nlevs )
-	    cdoAbort("Too few input elements (%d of %d)!", rval, gridsize*nlevs);
+	    cdoAbort("Too few input elements (%zu of %zu)!", rval, gridsize*nlevs);
 
 	  if ( feof(stdin) ) break;
 	}
@@ -145,9 +144,6 @@ void *Input(void *process)
 	      levels[0] = level;
 	      gridsize0 = gridsize;
 
-	      if ( gridsize < 0 )
-		cdoAbort("Gridsize must not be negative!", gridsize);
-
 	      array = (double*) Malloc(gridsize*sizeof(double));
 
 	      gridID = gridCreate(GRID_GENERIC, gridsize);
@@ -161,7 +157,7 @@ void *Input(void *process)
 	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
 	  
 	  rval = input_darray(stdin, gridsize, array);
-	  if ( rval != gridsize ) cdoAbort("Invalid data input!");
+	  if ( rval != (int)gridsize ) cdoAbort("Invalid data input!");
 	}
       else if ( operatorID == INPUTSRV )
 	{
@@ -190,9 +186,6 @@ void *Input(void *process)
 	    {
 	      levels[0] = level;
 	      gridsize0 = gridsize;
-	  
-	      if ( gridsize < 0 )
-		cdoAbort("Gridsize must not be negative!", gridsize);
 
 	      array = (double*) Malloc(gridsize*sizeof(double));
 
@@ -209,7 +202,7 @@ void *Input(void *process)
 	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
 	  
 	  rval = input_darray(stdin, gridsize, array);
-	  if ( rval != gridsize ) cdoAbort("Invalid data input!");
+	  if ( rval != (int)gridsize ) cdoAbort("Invalid data input!");
 	}
 
       if ( nrecs == 0 )
@@ -246,7 +239,7 @@ void *Input(void *process)
 
           int offset = gridsize*levelID;
 	  size_t nmiss = 0;
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(array[offset+i], missval) ) nmiss++;
 
 	  pstreamWriteRecord(streamID, array+offset, nmiss);

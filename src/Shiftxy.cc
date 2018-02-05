@@ -32,7 +32,7 @@
 static
 void shiftx(bool lcyclic, int nshift, int nx, int ny, const double *array1, double *array2, double missval)
 {
-  for ( int i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       bool is_cyclic = false;
       int ins = i + nshift%nx;
@@ -65,12 +65,12 @@ void shifty(bool lcyclic, int nshift, int nx, int ny, const double *array1, doub
 
       if ( !lcyclic && is_cyclic )
         {
-          for ( int i = 0; i < nx; i++ )
+          for ( size_t i = 0; i < nx; i++ )
             array2[IX2D(jns,i,nx)] = missval;
         }
       else
         {
-          for ( int i = 0; i < nx; i++ )
+          for ( size_t i = 0; i < nx; i++ )
             array2[IX2D(jns,i,nx)] = array1[IX2D(j,i,nx)];
         }
     }
@@ -81,7 +81,7 @@ int shiftx_coord(bool lcyclic, int nshift, int gridID1)
 {
   int gridID2 = gridDuplicate(gridID1);
 
-  int nx = gridInqXsize(gridID1);
+  size_t nx = gridInqXsize(gridID1);
   int ny = gridInqYsize(gridID1);
   if ( gridInqType(gridID1) != GRID_CURVILINEAR ) ny = 1;
 
@@ -101,9 +101,9 @@ int shiftx_coord(bool lcyclic, int nshift, int gridID1)
       gridInqXbounds(gridID1, bounds);
       for ( int k = 0; k < nv; ++k )
         {
-          for ( int i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
+          for ( size_t i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
           shiftx(lcyclic, nshift, nx, ny, array1, array2, 0);
-          for ( int i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
+          for ( size_t i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
         }
       gridDefXbounds(gridID2, bounds);
       Free(bounds);
@@ -120,7 +120,7 @@ int shifty_coord(bool lcyclic, int nshift, int gridID1)
 {
   int gridID2 = gridDuplicate(gridID1);
 
-  int nx = gridInqXsize(gridID1);
+  size_t nx = gridInqXsize(gridID1);
   int ny = gridInqYsize(gridID1);
   if ( gridInqType(gridID1) != GRID_CURVILINEAR ) nx = 1;
 
@@ -140,9 +140,9 @@ int shifty_coord(bool lcyclic, int nshift, int gridID1)
       gridInqYbounds(gridID1, bounds);
       for ( int k = 0; k < nv; ++k )
         {
-          for ( int i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
+          for ( size_t i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
           shifty(lcyclic, nshift, nx, ny, array1, array2, 0);
-          for ( int i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
+          for ( size_t i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
         }
       gridDefYbounds(gridID2, bounds);
       Free(bounds);
@@ -239,7 +239,7 @@ void *Shiftxy(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
@@ -259,17 +259,17 @@ void *Shiftxy(void *process)
 	  if ( vars[varID] )
 	    {	      
 	      int gridID1 = vlistInqVarGrid(vlistID1, varID);
-	      int gridsize = gridInqSize(gridID1);
+	      size_t gridsize = gridInqSize(gridID1);
               double missval = vlistInqVarMissval(vlistID2, varID);
                   
-              int nx = gridInqXsize(gridID1);
+              size_t nx = gridInqXsize(gridID1);
               int ny = gridInqYsize(gridID1);
 
               if      ( operatorID == SHIFTX ) shiftx(lcyclic, nshift, nx, ny, array1, array2, missval);
               else if ( operatorID == SHIFTY ) shifty(lcyclic, nshift, nx, ny, array1, array2, missval);
 
               nmiss = 0;
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
 	      pstreamWriteRecord(streamID2, array2, nmiss);

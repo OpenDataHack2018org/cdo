@@ -25,7 +25,7 @@ void *EstFreq(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
 
   cdoInitialize(process);

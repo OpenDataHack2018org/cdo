@@ -90,7 +90,7 @@ void *Replacevalues(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
@@ -110,7 +110,7 @@ void *Replacevalues(void *process)
 
 	  if ( operatorID == SETVALS )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    /* printf("\nelem %d val %f ",i,array[i]); */
@@ -127,7 +127,7 @@ void *Replacevalues(void *process)
 	    }
 	  else if ( operatorID == SETRTOC )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    if ( array[i] >= rmin && array[i] <= rmax)
@@ -136,7 +136,7 @@ void *Replacevalues(void *process)
 	    }
 	  else if ( operatorID == SETRTOC2 )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    if ( array[i] >= rmin && array[i] <= rmax )

@@ -26,7 +26,6 @@ void *Complextorect(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int i;
   int datatype;
   size_t nmiss;
 
@@ -67,7 +66,7 @@ void *Complextorect(void *process)
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID3);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(2*gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
   double *array3 = (double*) Malloc(gridsize*sizeof(double));
@@ -91,7 +90,7 @@ void *Complextorect(void *process)
 
 	  pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      array2[i] = array1[2*i];
 	      array3[i] = array1[2*i+1];

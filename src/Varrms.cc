@@ -34,7 +34,7 @@ void *Varrms(void *process)
   int wstatus = FALSE;
   int oldcode = 0;
   int nrecs;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   int varID, levelID;
   long offset;
@@ -91,7 +91,7 @@ void *Varrms(void *process)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
@@ -102,7 +102,7 @@ void *Varrms(void *process)
   field_init(&field2);
   field_init(&field2);
 
-  int lim = vlistGridsizeMax(vlistID1);
+  size_t lim = vlistGridsizeMax(vlistID1);
   field1.weight = NULL;
   if ( needWeights )
     field1.weight = (double*) Malloc(lim*sizeof(double));

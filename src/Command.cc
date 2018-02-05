@@ -163,16 +163,15 @@ int com_stat(const char *arg)
 	}
       else
 	{
-	  int i;
 	  size_t nmiss;
-	  int gridsize;
+	  size_t gridsize;
 	  double fmin = 1.e50 , fmax = -1.e50, fmean = 0;
 	  counter_t counter;
 	  
 	  counter_start(&counter);
 	  streamReadVarSlice(gl_streamID, gl_varID, levelID, gl_data, &nmiss);
 	  gridsize = gridInqSize(vlistInqVarGrid(gl_vlistID, gl_varID));
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      if ( gl_data[i] < fmin ) fmin = gl_data[i];
 	      if ( gl_data[i] > fmax ) fmax = gl_data[i];
@@ -312,7 +311,7 @@ void command_init()
 
   UNUSED(taxisID);
 
-  int gridsize = vlistGridsizeMax(gl_vlistID);
+  size_t gridsize = vlistGridsizeMax(gl_vlistID);
   gl_data = (double*) Malloc(gridsize*sizeof(double));
 
   gl_nvars = vlistNvars(gl_vlistID);

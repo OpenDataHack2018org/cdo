@@ -36,7 +36,6 @@ void *Comp(void *process)
 {
   enum {FILL_NONE, FILL_TS, FILL_REC};
   int filltype = FILL_NONE;
-  int gridsize1, gridsize2;
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   double missval1, missval2 = 0;
@@ -208,7 +207,8 @@ void *Comp(void *process)
 
           int datatype1 = vlistInqVarDatatype(vlistIDx1, varID);
           int datatype2 = CDI_UNDEFID;
-	  gridsize1 = gridInqSize(vlistInqVarGrid(vlistIDx1, varID));
+	  size_t gridsize1 = gridInqSize(vlistInqVarGrid(vlistIDx1, varID));
+          size_t gridsize2;
 	  *missvalx1 = vlistInqVarMissval(vlistIDx1, varID);
 
 	  if ( filltype == FILL_REC )

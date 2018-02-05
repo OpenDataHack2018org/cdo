@@ -545,7 +545,7 @@ void *Vertintml(void *process)
 			{
 			  vl1  = vardata1[varID] + gridsize*(k-1);
 			  vl2  = vardata1[varID] + gridsize*(k);
-			  for ( int i = 0; i < gridsize; i++ )
+			  for ( size_t i = 0; i < gridsize; i++ )
 			    vl1[i] = 0.5*(vl1[i] + vl2[i]);
 			}
 		      

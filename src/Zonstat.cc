@@ -137,7 +137,7 @@ void *Zonstat(void *process)
   gridID1 = vlistInqVarGrid(vlistID1, 0);
   int nlatmax = gridInqYsize(gridID1); /* max nlat ? */
 
-  int lim = vlistGridsizeMax(vlistID1);
+  size_t lim = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field2);

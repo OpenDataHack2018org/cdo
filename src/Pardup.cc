@@ -72,7 +72,7 @@ void *Pardup(void *process)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array    = (double*) Malloc(gridsize*sizeof(double));
   double **vardata = (double **) Malloc(nvars*sizeof(double *));
   size_t **varnmiss = (size_t **) Malloc(nvars*sizeof(size_t *));

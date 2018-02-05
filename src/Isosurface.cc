@@ -26,13 +26,13 @@ double intlin(double x, double y1, double x1, double y2, double x2);
 static
 void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, field_type *field2D)
 {
-  long gridsize = gridInqSize(field3D->grid);
-  long nmiss = field3D->nmiss;
+  size_t gridsize = gridInqSize(field3D->grid);
+  size_t nmiss = field3D->nmiss;
   double missval = field3D->missval;
   double *data3D = field3D->ptr;
   double *data2D = field2D->ptr;
 
-  for ( long i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       data2D[i] = missval;
 
@@ -60,7 +60,7 @@ void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, fi
     }
 
   nmiss = 0;
-  for ( long i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     if ( DBL_IS_EQUAL(data2D[i], missval) ) nmiss++;
 
   field2D->missval = missval;
@@ -127,7 +127,7 @@ void *Isosurface(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -205,7 +205,7 @@ void *Isosurface(void *process)
 		      single   = vars1[varID].ptr + offset;
 
 		      nmiss = 0;
-		      for ( i = 0; i < gridsize; ++i )
+		      for ( size_t i = 0; i < gridsize; ++i )
 			if ( DBL_IS_EQUAL(single[i], missval) ) nmiss++;
 
 		      pstreamDefRecord(streamID2, varID, levelID);

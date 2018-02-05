@@ -99,7 +99,7 @@ void *Vertwind(void *process)
   if ( psID == -1 && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
     cdoAbort("Surface pressure (code 134) not found!");
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int nlevel = zaxisInqSize(zaxisID);
   double *level = (double*) Malloc(nlevel*sizeof(double));
   cdoZaxisInqLevels(zaxisID, level);
@@ -116,7 +116,7 @@ void *Vertwind(void *process)
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
 	  size_t offset = (size_t)levelID*gridsize;
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    fpress[offset+i] = level[levelID];
 	}
     }
@@ -187,7 +187,7 @@ void *Vertwind(void *process)
 	{
 	  size_t offset = (size_t)levelID*gridsize;
 
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      if ( DBL_IS_EQUAL(temp[offset+i],missval_t)    || 
 		   DBL_IS_EQUAL(omega[offset+i],missval_wap) ||
@@ -216,7 +216,7 @@ void *Vertwind(void *process)
 	  size_t offset = (size_t)levelID*gridsize;
 
 	  size_t nmiss_out = 0;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
             if ( DBL_IS_EQUAL(wms[offset+i],missval_out) )
 	      nmiss_out++;
 

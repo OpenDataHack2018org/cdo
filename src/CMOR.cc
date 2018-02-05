@@ -3033,7 +3033,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   int type = gridInqType(gridID);
   int ylength = gridInqYsize(gridID);
   int xlength = gridInqXsize(gridID);
-  int totalsize = gridInqSize(gridID);
+  size_t totalsize = gridInqSize(gridID);
 
   double *xcoord_vals;
   double *ycoord_vals;
@@ -3766,7 +3766,7 @@ static void read_record(int streamID, struct mapping vars[], int vlistID)
 
   int gridID = vlistInqVarGrid(vlistID, varID);
   int type = gridInqType(gridID);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   double *buffer = (double *) Malloc(gridsize * sizeof(double));
 
   struct mapping *var = map_var(varID, vars);

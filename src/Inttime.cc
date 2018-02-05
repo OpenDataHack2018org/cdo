@@ -101,7 +101,7 @@ void *Inttime(void *process)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   size_t **nmiss1   = (size_t **) Malloc(nvars*sizeof(size_t *));
@@ -233,7 +233,7 @@ void *Inttime(void *process)
 		      double missval1 = vlistInqVarMissval(vlistID1, varID);
 		      double missval2 = vlistInqVarMissval(vlistID2, varID);
 
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			{
 			  if ( !DBL_IS_EQUAL(single1[i], missval1) &&
 			       !DBL_IS_EQUAL(single2[i], missval2) )
@@ -253,7 +253,7 @@ void *Inttime(void *process)
 		    }
 		  else
 		    {
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			array[i] = single1[i]*fac1 + single2[i]*fac2;
 		    }
 

@@ -38,7 +38,7 @@ void *Pressure(void *process)
 {
   ModelMode mode(ModelMode::UNDEF);
   int nrecs;
-  int i, k, offset;
+  int k;
   int varID, levelID;
   int zaxisIDp, zaxisIDh = -1;
   int nhlevf = 0, nhlevh = 0, nlevel = 0;
@@ -66,7 +66,7 @@ void *Pressure(void *process)
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int nhlev;
   double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
@@ -242,7 +242,7 @@ void *Pressure(void *process)
       if ( zaxisIDh != -1 )
 	{
 	  if ( lnpsID != -1 )
-	    for ( i = 0; i < gridsize; i++ ) ps_prog[i] = exp(pdata[i]);
+	    for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = exp(pdata[i]);
 	  else if ( psID != -1 )
 	    memcpy(ps_prog, pdata, gridsize*sizeof(double));
 
@@ -263,7 +263,7 @@ void *Pressure(void *process)
 	{
 	  nlevel = nhlevf;
 	  for ( k = 0; k < nhlevf; ++k )
-	    for ( i = 0; i < gridsize; ++i )
+	    for ( size_t i = 0; i < gridsize; ++i )
 	      {
 		deltap[k*gridsize+i] = half_press[(k+1)*gridsize+i] - half_press[k*gridsize+i];
 	      }
@@ -280,7 +280,7 @@ void *Pressure(void *process)
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  offset = levelID*gridsize;
+	  size_t offset = levelID*gridsize;
 	  pstreamWriteRecord(streamID2, pout+offset, 0);
 	}
 

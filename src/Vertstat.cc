@@ -254,7 +254,7 @@ void *Vertstat(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -341,7 +341,7 @@ void *Vertstat(void *process)
               if ( lrange )
                 {
                   vars2[varID].nmiss = nmiss;
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     vars2[varID].ptr[i] = vars1[varID].ptr[i];
                 }
 
@@ -366,7 +366,7 @@ void *Vertstat(void *process)
 		  if ( samp1[varID].ptr == NULL )
 		    samp1[varID].ptr = (double *) Malloc(gridsize*sizeof(double));
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(vars1[varID].ptr[i], vars1[varID].missval) )
 		      samp1[varID].ptr[i] = 0.;
 		    else
@@ -388,11 +388,11 @@ void *Vertstat(void *process)
 		  if ( samp1[varID].ptr == NULL )
 		    {
 		      samp1[varID].ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			samp1[varID].ptr[i] = vars1[varID].nsamp;
 		    }
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID].missval) )
 		      samp1[varID].ptr[i] += layer_weight;
 		}

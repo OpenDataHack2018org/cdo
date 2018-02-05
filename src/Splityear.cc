@@ -41,7 +41,7 @@ void *Splityear(void *process)
   int day;
   int year1, year2;
   int mon1, mon2;
-  int gridsize;
+  size_t gridsize;
   int ic = 0;
   int cyear[MAX_YEARS];
   size_t nmiss;

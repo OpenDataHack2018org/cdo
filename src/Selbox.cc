@@ -127,7 +127,7 @@ void gengridxyvals(int gridtype, int gridID1, int gridID2, int nlon, int nlat, i
 static
 int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
-  int nlon = gridInqXsize(gridID1);
+  size_t nlon = gridInqXsize(gridID1);
   int nlat = gridInqYsize(gridID1);
 
   int nlon21 = lon12 - lon11 + 1;
@@ -244,11 +244,11 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 }
 
 
-int gengridcell(int gridID1, int gridsize2, int *cellidx)
+int gengridcell(int gridID1, size_t gridsize2, int *cellidx)
 {
   int gridID2 = -1;
   int gridtype  = gridInqType(gridID1);
-  int gridsize1 = gridInqSize(gridID1);
+  size_t gridsize1 = gridInqSize(gridID1);
   int prec      = gridInqDatatype(gridID1);
 
   if ( gridtype == GRID_CURVILINEAR ) gridtype = GRID_UNSTRUCTURED;
@@ -272,7 +272,7 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
 
-      for ( int i = 0; i < gridsize2; ++i )
+      for ( size_t i = 0; i < gridsize2; ++i )
 	{
 	  xvals2[i] = xvals1[cellidx[i]];
 	  yvals2[i] = yvals1[cellidx[i]];
@@ -301,7 +301,7 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
 
       gridDefNvertex(gridID2, nv);
 
-      for ( int i = 0; i < gridsize2; ++i )
+      for ( size_t i = 0; i < gridsize2; ++i )
 	{
 	  for ( int k = 0; k < nv; ++k )
 	    {
@@ -326,7 +326,7 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
 void genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, double xlat2,
 		      int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  int nlon = gridInqXsize(gridID);
+  size_t nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
 
   double *xvals = (double*) Malloc(nlon*sizeof(double));
@@ -418,9 +418,9 @@ static
 void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, double xlat2,
                        int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {  
-  int nlon = gridInqXsize(gridID);
+  size_t nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
-  int gridsize = nlon*nlat;
+  size_t gridsize = nlon*nlat;
 
   int grid_is_circular = gridIsCircular(gridID);
 
@@ -631,7 +631,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
   if ( xlat1 >= xlat2 ) { x = xlat1; xlat1 = xlat2; xlat2 = x; }
 
   int gridtype = gridInqType(gridID1);
-  int gridsize1 = gridInqSize(gridID1);
+  size_t gridsize1 = gridInqSize(gridID1);
 
   if ( gridtype != GRID_UNSTRUCTURED ) cdoAbort("Internal problem, wrong grid type!");
 
@@ -653,7 +653,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
   *cellidx = NULL;
   int maxcell = 0;
   int nvals = 0;
-  for ( int i = 0; i < gridsize1; ++i )
+  for ( size_t i = 0; i < gridsize1; ++i )
     {
       double xval = xvals[i]*xfact;
       double yval = yvals[i]*yfact;
@@ -701,7 +701,7 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
       *lat2 = temp;
     }
 
-  int nlon = gridInqXsize(gridID1);
+  size_t nlon = gridInqXsize(gridID1);
   int nlat = gridInqYsize(gridID1);
 
   if ( *lat1 < 1 )
@@ -896,7 +896,7 @@ void *Selbox(void *process)
 	{
 	  if ( operatorID == SELLONLATBOX )
 	    {
-	      int gridsize = gridInqSize(gridID1);
+	      size_t gridsize = gridInqSize(gridID1);
 	      if ( gridsize == 1 ) continue;
 
 	      if ( gridtype == GRID_UNSTRUCTURED )
@@ -949,11 +949,11 @@ void *Selbox(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
-  int gridsize2 = vlistGridsizeMax(vlistID2);
+  size_t gridsize2 = vlistGridsizeMax(vlistID2);
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
   double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
@@ -994,7 +994,7 @@ void *Selbox(void *process)
 		{
 		  nmiss = 0;
 		  missval = vlistInqVarMissval(vlistID2, varID);
-		  for ( int i = 0; i < gridsize2; i++ )
+		  for ( size_t i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 		}
 

@@ -54,7 +54,7 @@ double tstepcount(long nts, double missval1, double *array1, double refval)
 
 void *Tstepcount(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
@@ -139,7 +139,7 @@ void *Tstepcount(void *process)
 #ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize,mem,vars,varID,levelID,nts,missval,refval) schedule(dynamic,1)
 #endif
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 
@@ -172,7 +172,7 @@ void *Tstepcount(void *process)
 	  pstreamDefRecord(streamID2, varID, levelID);
 
 	  nmiss = 0;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(vars[0][varID][levelID].ptr[i], missval) ) nmiss++;
 
 	  pstreamWriteRecord(streamID2, vars[0][varID][levelID].ptr, nmiss);

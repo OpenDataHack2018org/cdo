@@ -126,7 +126,6 @@ void *Cloudlayer(void *process)
   int nlevel, nlevs, nrecs, code;
   int varID, levelID;
   bool zrev = false;
-  int i;
   int offset;
   size_t nmiss;
   int aclcacID = -1;
@@ -156,7 +155,7 @@ void *Cloudlayer(void *process)
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int aclcac_code = 223;
 
@@ -336,7 +335,7 @@ void *Cloudlayer(void *process)
 
       for ( varID = 0; varID < nvars2; ++varID )
 	{
-	  for ( i = 0; i < gridsize; i++ ) cloud[varID][i] = missval;
+	  for ( size_t i = 0; i < gridsize; i++ ) cloud[varID][i] = missval;
 	}
 
       for ( varID = 0; varID < nvars2; ++varID )
@@ -348,7 +347,7 @@ void *Cloudlayer(void *process)
       for ( varID = 0; varID < nvars2; ++varID )
 	{
 	  nmiss = 0;
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(cloud[varID][i], missval) ) nmiss++;
 
 	  pstreamDefRecord(streamID2, varID, 0);

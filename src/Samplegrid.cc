@@ -174,11 +174,11 @@ void *Samplegrid(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array1 = (double *) Malloc(gridsize*sizeof(double));
 
-  int gridsize2 = vlistGridsizeMax(vlistID2);
+  size_t gridsize2 = vlistGridsizeMax(vlistID2);
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
   double *array2 = (double *) Malloc(gridsize2*sizeof(double));
 
@@ -224,7 +224,7 @@ void *Samplegrid(void *process)
                 {
                   nmiss = 0;
                   double missval = vlistInqVarMissval(vlistID2, varID);
-                  for ( int i = 0; i < gridsize2; i++ )
+                  for ( size_t i = 0; i < gridsize2; i++ )
                     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
                 }
 

@@ -196,7 +196,7 @@ void *Importamsr(void *process)
     Longitude  is 0.25*xdim-0.125    degrees east
     Latitude   is 0.25*ydim-90.125
   */
-  int gridsize = NLON*NLAT;
+  size_t gridsize = NLON*NLAT;
   int gridID = gridCreate(GRID_LONLAT, gridsize);
   gridDefXsize(gridID, NLON);
   gridDefYsize(gridID, NLAT);

@@ -106,7 +106,7 @@ void *Histogram(void *process)
   double **vartcount = (double **) Malloc(nvars*sizeof(double *));
   for ( varID = 0; varID < nvars; varID++ )
     {
-      int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
       vardata[varID]  = (double*) Malloc(nbins*gridsize*sizeof(double));
       varcount[varID] = (double*) Malloc(nbins*gridsize*sizeof(double));
       vartcount[varID] = (double*) Malloc(gridsize*sizeof(double));
@@ -115,7 +115,7 @@ void *Histogram(void *process)
       memset(vartcount[varID], 0, gridsize*sizeof(double));
     }
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID1 = 0;
@@ -132,7 +132,7 @@ void *Histogram(void *process)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
 	  nmiss=0;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      if ( !DBL_IS_EQUAL(array[i], missval) )
 		{
@@ -174,7 +174,7 @@ void *Histogram(void *process)
 	  nmiss = 0;
 	  offset = gridsize*index;
 
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      if ( vartcount[varID][i] > 0 )
 		{

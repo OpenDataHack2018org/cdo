@@ -49,10 +49,10 @@ void init_data(int vlistID, int nvars, double *data[])
 {
   for ( int varID = 0; varID < nvars; ++varID )
     {
-      int gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       double missval  = vlistInqVarMissval(vlistID, varID);
       
-      for ( int i = 0; i < gridsize; ++i ) data[varID][i] = missval;
+      for ( size_t i = 0; i < gridsize; ++i ) data[varID][i] = missval;
     } 
 }
 
@@ -61,13 +61,13 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
 {
   for ( int varID = 0; varID < nvars; ++varID )
     {
-      int gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       double missval  = vlistInqVarMissval(vlistID, varID);
       
       pstreamDefRecord(streamID, varID, 0);
 
       size_t nmiss = 0;
-      for ( int i = 0; i < gridsize; ++i )
+      for ( size_t i = 0; i < gridsize; ++i )
 	if ( DBL_IS_EQUAL(data[varID][i], missval) ) nmiss++;
       
       pstreamWriteRecord(streamID, data[varID], nmiss);
@@ -115,7 +115,7 @@ void *Importobs(void *process)
   if ( gridInqType(gridID) != GRID_LONLAT ) 
     cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID)));
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int xsize = gridInqXsize(gridID);
   int ysize = gridInqYsize(gridID);
 

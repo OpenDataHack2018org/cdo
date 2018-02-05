@@ -90,7 +90,7 @@ void *Tests(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
@@ -110,25 +110,25 @@ void *Tests(void *process)
 
 	  if ( operatorID == NORMAL )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  normal(array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == STUDENTT )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  student_t(degree_of_freedom, array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == CHISQUARE )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  chi_square(degree_of_freedom, array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == BETA )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  if ( array1[i] < 0 || array1[i] > 1 )
 		    cdoAbort("Value out of range (0-1)!");
@@ -139,7 +139,7 @@ void *Tests(void *process)
 	    }
 	  else if ( operatorID == FISHER )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  fisher(n, d, array1[i], processInqPrompt());
 	    }

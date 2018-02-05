@@ -88,7 +88,7 @@ void *Testdata(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
   float *fval = (float*) Malloc(gridsize*sizeof(float));
   int *ival = (int*) Malloc(gridsize*sizeof(int));
@@ -111,7 +111,7 @@ void *Testdata(void *process)
 	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      fval[i] = (float) array[i];
 
@@ -124,7 +124,7 @@ void *Testdata(void *process)
 	      cval2[i+gridsize*3] = cval[i*4+3];
 
 	      if ( tsID1 == 0 && recID == 0 )
-	      printf("%4d %3d %3d %3d %3d %d %g\n",
+	      printf("%4zu %3d %3d %3d %3d %d %g\n",
 		     i, (unsigned int)cval[4*i+0], (unsigned int)cval[4*i+1], (unsigned int)cval[4*i+2], (unsigned int)cval[4*i+3], ival[i], fval[i]);
 	    }
 

@@ -1363,12 +1363,12 @@ void *TransformUV(int operatorID)
                                 gridInqParamRLL(gridID, &xpole, &ypole, &angle);
                               
                               cdoPrint("GRID_PROJECTION(id: %d) && CDI_PROJ_RLL:",gridID);
-                              cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridID), gridInqYsize(gridID));
+                              cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridID), gridInqYsize(gridID));
                               cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridID, 0), gridInqYval(gridID, 0));
                               cdoPrint("grid Xinc   %4.3f, grid Yinc   %4.3f", gridInqXinc(gridID),gridInqYinc(gridID));
                               cdoPrint("grid Xpole   %4.3f, grid Ypole   %4.3f", xpole, ypole);
                               cdoPrint("GRID_CURVILINEAR (id: %d):",gridIDcurvl);
-                              cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
+                              cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
                               cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
                               cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) -1), gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) -1));
                               if ( CdoDebug::cdoDebugExt>=20 )

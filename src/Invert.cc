@@ -49,7 +49,7 @@ void invertLonDes(int vlistID)
 
       if ( gridInqXvals(gridID1, NULL) )
 	{
-	  int nlon = gridInqXsize(gridID1);
+	  size_t nlon = gridInqXsize(gridID1);
 	  int nlat = gridInqYsize(gridID1);
 	  int size = (gridtype == GRID_CURVILINEAR) ? nlon*nlat : nlon;
 
@@ -78,7 +78,7 @@ void invertLonDes(int vlistID)
 
       if ( gridInqXbounds(gridID1, NULL) )
 	{
-	  int nlon = gridInqXsize(gridID1);
+	  size_t nlon = gridInqXsize(gridID1);
 	  int nlat = gridInqYsize(gridID1);
 	  int nv   = gridInqNvertex(gridID1);
 	  int size = (gridtype == GRID_CURVILINEAR) ? nv*nlon*nlat : nv*nlon;
@@ -121,7 +121,7 @@ void invertLatCoord(int gridID)
 
   if ( gridInqYvals(gridID, NULL) )
     {
-      int nlon = gridInqXsize(gridID);
+      size_t nlon = gridInqXsize(gridID);
       int nlat = gridInqYsize(gridID);
       int size = (gridtype == GRID_CURVILINEAR) ? nlon*nlat : nlat;
 
@@ -162,7 +162,7 @@ void invertLatCoord(int gridID)
 
   if ( gridInqYbounds(gridID, NULL) )
     {
-      int nlon = gridInqXsize(gridID);
+      size_t nlon = gridInqXsize(gridID);
       int nlat = gridInqYsize(gridID);
       int nv   = gridInqNvertex(gridID);
       int size = (gridtype == GRID_CURVILINEAR) ? nv*nlon*nlat : nv*nlat;
@@ -222,7 +222,7 @@ void invertLatDes(int vlistID)
 static
 void invertLonData(double *array1, double *array2, int gridID1)
 {
-  int nlon = gridInqXsize(gridID1);
+  size_t nlon = gridInqXsize(gridID1);
   int nlat = gridInqYsize(gridID1);
 
   if ( nlat > 0 )
@@ -252,7 +252,7 @@ void invertLonData(double *array1, double *array2, int gridID1)
 static
 void invertLatData(double *array1, double *array2, int gridID1)
 {
-  int nlon = gridInqXsize(gridID1);
+  size_t nlon = gridInqXsize(gridID1);
   int nlat = gridInqYsize(gridID1);
 
   if ( nlat > 0 )
@@ -320,7 +320,7 @@ void *Invert(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));

@@ -151,9 +151,10 @@ vctFromFile(const char *filename, int *nvct)
 }
 
 static void
-vert_sum(double *sum, double *var3d, long gridsize, long nlevel)
+vert_sum(double *sum, double *var3d, size_t gridsize, long nlevel)
 {
-  long i, k;
+  size_t i;
+  int k;
 
   for (i = 0; i < gridsize; ++i)
     sum[i] = 0;
@@ -166,9 +167,10 @@ vert_sum(double *sum, double *var3d, long gridsize, long nlevel)
 }
 
 static void
-vert_sumw(double *sum, double *var3d, long gridsize, long nlevel, double *deltap)
+vert_sumw(double *sum, double *var3d, size_t gridsize, long nlevel, double *deltap)
 {
-  long i, k;
+  size_t i;
+  int k;
 
   for (i = 0; i < gridsize; ++i)
     sum[i] = 0;
@@ -233,9 +235,10 @@ vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf)
 void *
 Remapeta(void *process)
 {
-  int nfis2gp = 0;
+  size_t nfis2gp = 0;
   int nrecs;
-  int i, iv;
+  int i;
+  int iv;
   int varID, levelID;
   int nvars3D = 0;
   int sgeopotID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1;
@@ -322,12 +325,9 @@ Remapeta(void *process)
         {
           missval = vlistInqVarMissval(vlistID1, varID);
           imiss = (int *) Malloc(nfis2gp * sizeof(int));
-          for (i = 0; i < nfis2gp; ++i)
+          for (size_t i = 0; i < nfis2gp; ++i)
             {
-              if (DBL_IS_EQUAL(fis2[i], missval))
-                imiss[i] = 1;
-              else
-                imiss[i] = 0;
+              imiss[i] = (DBL_IS_EQUAL(fis2[i], missval));
             }
 
           nmissout = nmiss;
@@ -355,7 +355,7 @@ Remapeta(void *process)
   if (gridInqType(gridID) == GRID_SPECTRAL)
     cdoAbort("Spectral data unsupported!");
 
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nhlevf2);
   double *lev2 = (double *) Malloc(nhlevf2 * sizeof(double));
@@ -601,7 +601,7 @@ Remapeta(void *process)
               else if (varID == presID)
                 {
                   if (lnpsID != -1)
-                    for (i = 0; i < gridsize; ++i)
+                    for (size_t i = 0; i < gridsize; ++i)
                       ps1[i] = exp(array[i]);
                   else if (psID != -1)
                     memcpy(ps1, array, gridsize * sizeof(double));
@@ -649,7 +649,7 @@ Remapeta(void *process)
         }
 
       if (lfis2 == false)
-        for (int i = 0; i < gridsize; i++)
+        for (size_t i = 0; i < gridsize; i++)
           fis2[i] = fis1[i];
 
       if (ltq)
@@ -725,7 +725,7 @@ Remapeta(void *process)
         }
 
       if (zaxisIDh != -1 && lnpsID != -1)
-        for (i = 0; i < gridsize; ++i)
+        for (size_t i = 0; i < gridsize; ++i)
           ps2[i] = log(ps2[i]);
 
       if (zaxisIDh != -1 && presID != -1)
@@ -765,7 +765,7 @@ Remapeta(void *process)
               corr_hum(gridsize, single2, MIN_Q);
 
               if (levelID < nctop)
-                for (i = 0; i < gridsize; ++i)
+                for (size_t i = 0; i < gridsize; ++i)
                   single2[i] = cconst;
 
               minmaxval(gridsize, single2, imiss, &minval, &maxval);
@@ -795,7 +795,7 @@ Remapeta(void *process)
 
               presh(NULL, half_press1, vct1, ps1, nhlevf1, gridsize);
               for (k = 0; k < nhlevf1; ++k)
-                for (i = 0; i < gridsize; ++i)
+                for (size_t i = 0; i < gridsize; ++i)
                   {
                     deltap1[k * gridsize + i] = half_press1[(k + 1) * gridsize + i] - half_press1[k * gridsize + i];
                     deltap1[k * gridsize + i] = log(deltap1[k * gridsize + i]);
@@ -804,7 +804,7 @@ Remapeta(void *process)
 
               presh(NULL, half_press2, vct2, ps1, nhlevf2, gridsize);
               for (k = 0; k < nhlevf2; ++k)
-                for (i = 0; i < gridsize; ++i)
+                for (size_t i = 0; i < gridsize; ++i)
                   {
                     deltap2[k * gridsize + i] = half_press2[(k + 1) * gridsize + i] - half_press2[k * gridsize + i];
                     deltap2[k * gridsize + i] = log(deltap2[k * gridsize + i]);
@@ -820,12 +820,12 @@ Remapeta(void *process)
               if (operatorID == REMAPETAS || operatorID == REMAPETAZ)
                 {
                   /*
-                  for ( i = 0; i < gridsize; ++i )
+                  for ( size_t i = 0; i < gridsize; ++i )
                     if ( i %100 == 0 )
                       printf("%d %g %g %g %g %g\n",i, single2[i], sum1[i], sum2[i], sum1[i]/sum2[i],
                   single2[i]*sum1[i]/sum2[i]);
                   */
-                  for (i = 0; i < gridsize; ++i)
+                  for ( size_t i = 0; i < gridsize; ++i)
                     single2[i] = single2[i] * sum1[i] / sum2[i];
                 }
 

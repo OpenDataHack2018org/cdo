@@ -38,7 +38,7 @@ void *Writegrid(void *process)
   int gridID  = vlistGrid(vlistID, 0);
 
   int gridtype = gridInqType(gridID);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   if ( gridtype == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
 
@@ -56,7 +56,7 @@ void *Writegrid(void *process)
     }
   else
     {
-      for ( int i = 0; i < gridsize; i++ ) mask[i] = 1;
+      for ( size_t i = 0; i < gridsize; i++ ) mask[i] = 1;
     }
       
   writeNCgrid(cdoGetStreamName(1).c_str(), gridID, mask);

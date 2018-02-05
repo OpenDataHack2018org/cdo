@@ -57,12 +57,12 @@ int input_ival(FILE *gfp, int *ival)
 }
 
 
-int input_darray(FILE *gfp, int n_values, double *array)
+size_t input_darray(FILE *gfp, size_t n_values, double *array)
 {
   if ( n_values <= 0 ) return 0;
 
-  int read_items = 0;
-  for ( int i = 0; i < n_values; i++ )
+  size_t read_items = 0;
+  for ( size_t i = 0; i < n_values; i++ )
     {
       skip_nondigit_lines(gfp);
 
@@ -113,7 +113,7 @@ int grid_read_pingo(FILE *gfp, const char *dname)
 	}
       else if ( nlon == (int)grid.xsize )
 	{
-	  if ( input_darray(gfp, nlon, grid.xvals) != nlon ) return gridID;
+	  if ( input_darray(gfp, nlon, grid.xvals) != (size_t)nlon ) return gridID;
 	  for ( i = 0; i < nlon - 1; i++ )
 	    if ( grid.xvals[i+1] <= grid.xvals[i] ) break;
 
@@ -139,7 +139,7 @@ int grid_read_pingo(FILE *gfp, const char *dname)
 	}
       else if ( nlat == (int)grid.ysize )
 	{
-	  if ( input_darray(gfp, nlat, grid.yvals) != nlat ) return gridID;
+	  if ( input_darray(gfp, nlat, grid.yvals) != (size_t)nlat ) return gridID;
 	}
       else
 	return gridID;

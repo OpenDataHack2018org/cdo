@@ -34,7 +34,6 @@ void *Condc(void *process)
   int nrecs;
   int varID, levelID;
   size_t nmiss, nmiss2;
-  int i;
   double missval;
 
   cdoInitialize(process);
@@ -60,7 +59,7 @@ void *Condc(void *process)
 
   nospec(vlistID1);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
@@ -85,12 +84,12 @@ void *Condc(void *process)
 
 	  if ( operatorID == IFTHENC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = !DBL_IS_EQUAL(array1[i], missval) && !DBL_IS_EQUAL(array1[i], 0.) ? rc : missval;
 	    }
 	  else if ( operatorID == IFNOTTHENC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = !DBL_IS_EQUAL(array1[i], missval) && DBL_IS_EQUAL(array1[i], 0.) ? rc : missval;
 	    }
 	  else
@@ -99,7 +98,7 @@ void *Condc(void *process)
 	    }
 
 	  nmiss2 = 0;
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss2++;
 
 	  pstreamDefRecord(streamID2, varID, levelID);

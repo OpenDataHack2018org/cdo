@@ -29,7 +29,6 @@
 
 void *Pinfo(void *process)
 {
-  int i;
   int varID;
   int nrecs;
   int levelID;
@@ -63,7 +62,7 @@ void *Pinfo(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
@@ -100,7 +99,7 @@ void *Pinfo(void *process)
 	  int code     = vlistInqVarCode(vlistID1, varID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
 	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	  int gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 
 	  if ( operatorID == PINFOV ) vlistInqVarName(vlistID1, varID, varname);
@@ -113,7 +112,7 @@ void *Pinfo(void *process)
 	  level = cdoZaxisInqLevel(zaxisID, levelID);
 	  fprintf(stdout, " %7g ", level);
 
-	  fprintf(stdout, "%7d %7zu :", gridsize, nmiss);
+	  fprintf(stdout, "%7zu %7zu :", gridsize, nmiss);
 
 	  if ( gridInqType(gridID) == GRID_SPECTRAL ||
 	       (gridsize == 1 && nmiss == 0) )
@@ -129,7 +128,7 @@ void *Pinfo(void *process)
 		  arrvar  = 0;
 		  arrmin  =  1.e300;
 		  arrmax  = -1.e300;
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    {
 		      if ( !DBL_IS_EQUAL(array1[i], missval) )
 			{
@@ -149,7 +148,7 @@ void *Pinfo(void *process)
 		  arrvar  = array1[0];
 		  arrmin  = array1[0];
 		  arrmax  = array1[0];
-		  for ( i = 1; i < gridsize; i++ )
+		  for ( size_t i = 1; i < gridsize; i++ )
 		    {
 		      if ( array1[i] < arrmin ) arrmin = array1[i];
 		      if ( array1[i] > arrmax ) arrmax = array1[i];
@@ -173,7 +172,7 @@ void *Pinfo(void *process)
 		fprintf(stdout, "Found %zu of %zu missing values!\n", imiss, nmiss);
 	    }
 
-	  for ( i = 0; i < gridsize; i++ ) array2[i] = array1[i];
+	  for ( size_t i = 0; i < gridsize; i++ ) array2[i] = array1[i];
 
 	  pstreamDefRecord(streamID2,  varID,  levelID);
 	  pstreamWriteRecord(streamID2, array2, nmiss);

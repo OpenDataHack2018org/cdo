@@ -438,7 +438,7 @@ void *Split(void *process)
   double *array = NULL;
   if ( ! lcopy )
     {
-      int gridsize = vlistGridsizeMax(vlistID1);
+      size_t gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double *) Malloc(gridsize*sizeof(double));
     }

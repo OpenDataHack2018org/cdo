@@ -60,13 +60,12 @@ void *Setbox(void *process)
   int streamID1, streamID2;
   int nrecs, nvars;
   int tsID, varID, levelID;
-  int gridsize;
+  size_t gridsize;
   int vlistID1, vlistID2;
   int gridID = -1;
   int index, ngrids, gridtype;
   size_t nmiss;
   int *vars;
-  int i;
   int ndiffgrids;
   int lat1, lat2, lon11, lon12, lon21, lon22;
   double missval;
@@ -159,7 +158,7 @@ void *Setbox(void *process)
 	      setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
 
 	      nmiss = 0;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
 	      pstreamDefRecord(streamID2, varID, levelID);

@@ -98,7 +98,7 @@ void correct_sinxvals(int xsize, int ysize, double *xvals);
 struct cart gc2cc(struct geo *position);
 void factorni(int kni, int *kni2, int *kni3);
 void gme_grid_restore(double *p, int ni, int nd);
-void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
+void gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat,
 	      double *blon, double *blat, int *imask,
               int ni, int nd, int ni2, int ni3);
 

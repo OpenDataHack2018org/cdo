@@ -91,7 +91,7 @@ void *Fldrms(void *process)
   field_init(&field2);
   field_init(&field3);
 
-  int lim = vlistGridsizeMax(vlistID1);
+  size_t lim = vlistGridsizeMax(vlistID1);
   field1.ptr    = (double*) Malloc(lim*sizeof(double));
   field1.weight = NULL;
   if ( needWeights )

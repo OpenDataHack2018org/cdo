@@ -60,7 +60,7 @@ void *Splittime(void *process)
   int levelID;
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   int index = 0;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   int gridID;
   int nlevel;

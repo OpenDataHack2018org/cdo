@@ -41,13 +41,13 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
       if ( vardata2[varID2c] )
         {
           double missval = vlistInqVarMissval(vlistID2, varID2c);
-          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2c));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2c));
           int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2c));
           for ( int levelID2c = 0; levelID2c < nlevel; ++levelID2c )
             {
               double *pdata = vardata2[varID2c]+gridsize*levelID2c;
               size_t nmiss = 0;
-              for ( int i = 0; i < gridsize; ++i )
+              for ( size_t i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
 
               // if ( levelID2c == 0 ) printf("Write varID %d\n", varID2c);
@@ -480,7 +480,7 @@ void *Select(void *process)
 
 	  if ( ! lcopy )
 	    {
-	      int gridsize = vlistGridsizeMax(vlistID1);
+	      size_t gridsize = vlistGridsizeMax(vlistID1);
 	      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
@@ -657,7 +657,7 @@ void *Select(void *process)
                       if ( vlistInqVarTimetype(vlistID2, varID2) == TIME_CONSTANT )
                         {
                           int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
-                          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+                          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
                           if ( levelID == 0 )
                             {
                               int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));

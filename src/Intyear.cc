@@ -57,7 +57,7 @@ void *Intyear(void *process)
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
   double *array3 = (double*) Malloc(gridsize*sizeof(double));
@@ -133,7 +133,7 @@ void *Intyear(void *process)
 		  double missval1 = vlistInqVarMissval(vlistID1, varID);
 		  double missval2 = vlistInqVarMissval(vlistID2, varID);
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    {
 		      if ( !DBL_IS_EQUAL(array1[i], missval1) &&
 			   !DBL_IS_EQUAL(array2[i], missval2) )
@@ -155,7 +155,7 @@ void *Intyear(void *process)
 		}
 	      else
 		{
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    array3[i] = array1[i]*fac1 + array2[i]*fac2;
 		}
 
