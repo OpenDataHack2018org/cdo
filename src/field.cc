@@ -21,6 +21,7 @@
 #include "percentiles.h"
 #include "merge_sort2.h"
 #include "cdoOptions.h"
+#include "array.h"
 
 double crps_det_integrate(double *a, const double d, const size_t n);
 

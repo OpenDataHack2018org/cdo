@@ -18,6 +18,7 @@
 #include <cdi.h>
 
 #include "cdo_int.h"
+#include "array.h"
 
 
 void farfun(field_type *field1, field_type field2, int function)

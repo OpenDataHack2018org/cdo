@@ -35,7 +35,6 @@
 #include "pmlist.h"
 #include "listbuf.h"
 #include "compare.h"
-#include "array.h"
 #include "timebase.h"
 #include "field.h"
 #include "functs.h"
