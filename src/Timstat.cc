@@ -75,6 +75,7 @@
 
 #include "cdo_int.h"
 #include "pstream_int.h"
+#include "datetime.h"
 
 
 enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};

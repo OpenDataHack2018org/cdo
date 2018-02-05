@@ -26,6 +26,7 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "interpol.h"
+#include "datetime.h"
 
 
 static

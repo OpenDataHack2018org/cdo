@@ -26,6 +26,7 @@
 
 #include "cdo_int.h"
 #include "pstream_int.h"
+#include "datetime.h"
 
 
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit);

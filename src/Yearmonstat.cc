@@ -28,7 +28,7 @@
 #include "cdo_int.h"
 #include "calendar.h"
 #include "pstream_int.h"
-
+#include "datetime.h"
 
 void *Yearmonstat(void *process)
 {

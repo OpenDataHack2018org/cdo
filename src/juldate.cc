@@ -16,6 +16,7 @@
 */
 #include <cdi.h>
 #include "cdo_int.h"
+#include "datetime.h"
 #include "calendar.h"
 
 

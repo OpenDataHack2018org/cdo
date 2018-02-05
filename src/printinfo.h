@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include "text.h"
+#include "datetime.h"
 
 #ifdef CDO
 #define  streamInqFiletype        pstreamInqFiletype
