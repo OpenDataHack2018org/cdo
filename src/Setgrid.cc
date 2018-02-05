@@ -38,8 +38,8 @@ void *Setgrid(void *process)
   int gridID2 = -1;
   int gridtype = -1;
   size_t nmiss;
-  int areasize = 0;
-  int  masksize = 0;
+  size_t areasize = 0;
+  size_t masksize = 0;
   bool lregular = false;
   bool lregularnn = false;
   bool ldereference = false;
@@ -117,7 +117,7 @@ void *Setgrid(void *process)
 	  double arrmean = areaweight[0];
 	  double arrmin  = areaweight[0];
 	  double arrmax  = areaweight[0];
-	  for ( int i = 1; i < areasize; i++ )
+	  for ( size_t i = 1; i < areasize; i++ )
 	    {
 	      if ( areaweight[i] < arrmin ) arrmin = areaweight[i];
 	      if ( areaweight[i] > arrmax ) arrmax = areaweight[i];
@@ -147,7 +147,7 @@ void *Setgrid(void *process)
       streamReadRecord(streamID, gridmask, &nmiss);
       streamClose(streamID);
 
-      for ( int i = 0; i < masksize; i++ )
+      for ( size_t i = 0; i < masksize; i++ )
 	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
     }
   else if ( operatorID == USEGRIDNUMBER )
@@ -320,7 +320,7 @@ void *Setgrid(void *process)
       for ( int index = 0; index < ngrids; index++ )
 	{
 	  int gridID1  = vlistGrid(vlistID1, index);
-	  int gridsize = gridInqSize(gridID1);
+	  size_t gridsize = gridInqSize(gridID1);
 	  if ( gridsize == areasize )
 	    {
 	      gridID2 = gridDuplicate(gridID1);
@@ -335,11 +335,11 @@ void *Setgrid(void *process)
       for ( int index = 0; index < ngrids; index++ )
 	{
 	  int gridID1  = vlistGrid(vlistID1, index);
-	  int gridsize = gridInqSize(gridID1);
+	  size_t gridsize = gridInqSize(gridID1);
 	  if ( gridsize == masksize )
 	    {
 	      int *mask = (int*) Malloc(masksize*sizeof(int));
-	      for ( int i = 0; i < masksize; i++ )
+	      for ( size_t i = 0; i < masksize; i++ )
 		{
 		  if ( gridmask[i] < 0 || gridmask[i] > 255 )
 		    mask[i] = 0;
@@ -370,7 +370,7 @@ void *Setgrid(void *process)
   pstreamDefVlist(streamID2, vlistID2);
   //vlistPrint(vlistID2);
 
-  int gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2) : vlistGridsizeMax(vlistID1);
+  size_t gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2) : vlistGridsizeMax(vlistID1);
 
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double*) Malloc(gridsize*sizeof(double));
@@ -401,9 +401,9 @@ void *Setgrid(void *process)
 	    }
 	  else if ( gridInqType(gridID1) == GRID_GME )
 	    {
-	      int gridsize = gridInqSize(gridID1);
+	      size_t gridsize = gridInqSize(gridID1);
 	      int j = 0;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( grid2_vgpm[i] ) array[j++] = array[i];
 	    }
 

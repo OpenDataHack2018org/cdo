@@ -214,7 +214,7 @@ void *Adisit(void *process)
   if ( thoID == -1 ) cdoAbort("Potential or Insitu temperature not found!");
 
   int gridID = vlistGrid(vlistID1, 0);
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int zaxisID = vlistInqVarZaxis(vlistID1, saoID);
   int nlevel1 = zaxisInqSize(zaxisID);
@@ -337,7 +337,7 @@ void *Adisit(void *process)
 	  single = tis.ptr+offset;
 
 	  nmiss = 0;
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(single[i], tis.missval) ) nmiss++;
  
 	  pstreamDefRecord(streamID2, tisID2, levelID);
@@ -346,7 +346,7 @@ void *Adisit(void *process)
 	  single = sao.ptr+offset;
 
 	  nmiss = 0;
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(single[i], sao.missval) ) nmiss++;
  
 	  pstreamDefRecord(streamID2, saoID2, levelID);

@@ -201,7 +201,7 @@ void output_vrml(int nlon, int nlat, int ngp, double *restrict array, double mis
 void *Outputgmt(void *process)
 {
   int varID0;
-  int gridsize2 = 0;
+  size_t gridsize2 = 0;
   int nrecs;
   int levelID;
   size_t nmiss;
@@ -280,7 +280,7 @@ void *Outputgmt(void *process)
       lgrid_gen_bounds = true;
     }
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int nlon     = gridInqXsize(gridID);
   int nlat     = gridInqYsize(gridID);
   int nlev     = zaxisInqSize(zaxisID);
@@ -607,7 +607,7 @@ void *Outputgmt(void *process)
                   fprintf(stderr, "ps2pdf gmtplot.ps\n");
                 }
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  if ( grid_mask && grid_mask[i] == 0 ) continue;
 

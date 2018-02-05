@@ -477,7 +477,7 @@ void *Fillmiss(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field1);
@@ -521,9 +521,9 @@ void *Fillmiss(void *process)
 
               fill_method(&field1, &field2, nfill);
 
-              int gridsize = gridInqSize(field2.grid);
+              size_t gridsize = gridInqSize(field2.grid);
               size_t nmiss = 0;
-              for ( int i = 0; i < gridsize; ++i )
+              for ( size_t i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
               
               pstreamWriteRecord(streamID2, field2.ptr, nmiss);

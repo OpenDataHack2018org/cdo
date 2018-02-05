@@ -29,7 +29,7 @@ typedef struct
   int vlistID;
   int gridID;
   size_t nmiss;
-  int gridsize;
+  size_t gridsize;
   int *gridindex;
   double *array;
 } ens_file_t;
@@ -402,7 +402,7 @@ void *Collgrid(void *process)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      int gridsize = vlistGridsizeMax(ef[fileID].vlistID);
+      size_t gridsize = vlistGridsizeMax(ef[fileID].vlistID);
       ef[fileID].gridsize = gridsize;
       ef[fileID].gridindex = (int*) Malloc(gridsize*sizeof(int));
       ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));

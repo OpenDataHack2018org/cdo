@@ -47,9 +47,9 @@ void *Gengrid(void *process)
   if ( gridInqSize(gridID1) != gridInqSize(gridID2) )
     cdoAbort("Arrays have different grid size!");
 
-  int gridsize = gridInqSize(gridID1);
-  int xsize = gridInqXsize(gridID1);
-  int ysize = gridInqYsize(gridID1);
+  size_t gridsize = gridInqSize(gridID1);
+  size_t xsize = gridInqXsize(gridID1);
+  size_t ysize = gridInqYsize(gridID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
@@ -72,7 +72,7 @@ void *Gengrid(void *process)
 
   int gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
 
-  if ( cdoVerbose ) cdoPrint("xsize %d  ysize %d", xsize, ysize);
+  if ( cdoVerbose ) cdoPrint("xsize %zu  ysize %zu", xsize, ysize);
   if ( xsize*ysize != gridsize )
     cdoAbort("xsize*ysize != gridsize");
 
@@ -90,7 +90,7 @@ void *Gengrid(void *process)
   double xmaxval = array1[0];
   double yminval = array2[0];
   double ymaxval = array2[0];
-  for ( int i = 1; i < gridsize; ++i )
+  for ( size_t i = 1; i < gridsize; ++i )
     {
       if ( array1[i] < xminval ) xminval = array1[i];
       if ( array1[i] > xmaxval ) xmaxval = array1[i];
@@ -136,7 +136,7 @@ void *Gengrid(void *process)
   int tsID = 0;
   pstreamDefTimestep(streamID3, tsID);
 
-  for ( int i = 0; i < gridsize; ++i ) array3[i] = missval;
+  for ( size_t i = 0; i < gridsize; ++i ) array3[i] = missval;
 
   pstreamDefRecord(streamID3, 0, 0);
   pstreamWriteRecord(streamID3, array3, gridsize);

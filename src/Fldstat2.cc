@@ -140,7 +140,7 @@ void *Fldstat2(void *process)
 
   pstreamDefVlist(streamID3, vlistID3);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));

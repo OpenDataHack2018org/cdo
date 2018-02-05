@@ -187,11 +187,11 @@ int define_level(dsets_t *pfi, int nlev)
 
 void *Importbinary(void *process)
 {
-  int i;
+  size_t i;
   size_t nmiss = 0, n_nan;
   int ivar;
   int varID = -1, levelID, tsID;
-  int gridsize;
+  size_t gridsize;
   int datatype;
   dsets_t pfi;
   int vdate, vtime;

@@ -49,7 +49,7 @@ void *Deltat(void *process)
 
   field_type **vars = field_malloc(vlistID1, FIELD_PTR);
   
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
   double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
 
@@ -76,10 +76,10 @@ void *Deltat(void *process)
 
           double missval = vars[varID][levelID].missval;
           double *array0 = vars[varID][levelID].ptr;
-          int gridsize = vars[varID][levelID].size;
+          size_t gridsize = vars[varID][levelID].size;
           if ( nmiss || vars[varID][levelID].nmiss )
             {
-              for ( int i = 0; i < gridsize; ++i )
+              for ( size_t i = 0; i < gridsize; ++i )
                 {
                   if ( DBL_IS_EQUAL(array0[i], missval) || DBL_IS_EQUAL(array1[i], missval) )
                     array2[i] = missval;
@@ -88,16 +88,16 @@ void *Deltat(void *process)
                 }
 
               nmiss = 0;
-              for ( int i = 0; i < gridsize; ++i )
+              for ( size_t i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
             }
           else
             {
-              for ( int i = 0; i < gridsize; ++i )
+              for ( size_t i = 0; i < gridsize; ++i )
                 array2[i] = array1[i] - array0[i];
             }
           
-          for ( int i = 0; i < gridsize; ++i ) array0[i] = array1[i];
+          for ( size_t i = 0; i < gridsize; ++i ) array0[i] = array1[i];
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, array2, nmiss);

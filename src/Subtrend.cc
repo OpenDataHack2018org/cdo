@@ -54,7 +54,7 @@ void *Subtrend(void *process)
   int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field4;
   field_init(&field1);
@@ -102,11 +102,11 @@ void *Subtrend(void *process)
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 	  double missval1 = missval;
 	  double missval2 = missval;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    field4.ptr[i] = SUBMN(field1.ptr[i], ADDMN(vars2[varID][levelID].ptr[i], MULMN(vars3[varID][levelID].ptr[i], tsID)));
     
 	  nmiss = 0;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(field4.ptr[i], missval) ) nmiss++;
 
 	  pstreamDefRecord(streamID4, varID, levelID);

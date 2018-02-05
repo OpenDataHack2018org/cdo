@@ -153,7 +153,7 @@ void *Setzaxis(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double*) Malloc(gridsize*sizeof(double));
 

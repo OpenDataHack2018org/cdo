@@ -34,7 +34,7 @@ void *Splitrec(void *process)
   char filesuffix[32];
   char filename[8192];
   const char *refname;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   double *array = NULL;
 

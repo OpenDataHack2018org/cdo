@@ -92,7 +92,7 @@ void *Duplicate(void *process)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
-	  int gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;

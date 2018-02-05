@@ -128,13 +128,13 @@ void farinv(field_type *field)
   double missval2 = field->missval;
   double *array   = field->ptr;
 
-  int len = gridInqSize(grid);
+  size_t len = gridInqSize(grid);
 
-  for ( int i = 0; i < len; i++ ) 
+  for ( size_t i = 0; i < len; i++ ) 
     array[i] = DIVMN(1.0, array[i]);
 
   field->nmiss = 0;
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array[i], missval1) ) field->nmiss++;
 }
 
@@ -145,13 +145,13 @@ void farround(field_type *field)
   double missval1 = field->missval;
   double *array   = field->ptr;
 
-  int len = gridInqSize(grid);
+  size_t len = gridInqSize(grid);
 
-  for ( int i = 0; i < len; i++ ) 
+  for ( size_t i = 0; i < len; i++ ) 
     array[i] = round(array[i]);
 
   field->nmiss = 0;
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array[i], missval1) ) field->nmiss++;
 }
 
@@ -162,9 +162,9 @@ void farmod(field_type *field, double divisor)
   double missval1 = field->missval;
   double *array   = field->ptr;
 
-  int len = gridInqSize(grid);
+  size_t len = gridInqSize(grid);
 
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     {
       array[i] = DBL_IS_EQUAL(array[i], missval1) ? missval1 : fmod(array[i], divisor);
     }

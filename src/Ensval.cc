@@ -46,7 +46,7 @@ void *Ensval(void *process)
   int nrecs = 0, nrecs0, nostreams = 0, ngrids;
   size_t nmiss;
   int levelID, varID;
-  int gridsize = 0;
+  size_t gridsize = 0;
   int vlistID;
   int gridID = -1;
   int have_miss = 0;
@@ -274,7 +274,7 @@ void *Ensval(void *process)
 	      sum_weights += weights[i];
 	  }
 	  else*/ {
-	    for ( i=0; i< gridsize; i++ )
+	    for ( size_t i=0; i< gridsize; i++ )
 	      weights[i] = 1./gridsize;
 	    sum_weights=1.;
 	  }
@@ -283,7 +283,7 @@ void *Ensval(void *process)
 	  heavyside0 = 0;
 	  heavysideN = 0;
 	  
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      have_miss = 0;
 	      for ( fileID = 0; fileID < nfiles; fileID++ )

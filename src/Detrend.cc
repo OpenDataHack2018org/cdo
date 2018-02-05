@@ -65,10 +65,10 @@ void detrend(long nts, double missval1, double *array1, double *array2)
 
 void *Detrend(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
-  int i;
+  size_t i;
   int nalloc = 0;
   size_t nmiss;
   int nlevel;

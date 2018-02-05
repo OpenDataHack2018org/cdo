@@ -124,7 +124,7 @@ void *Runstat(void *process)
 	vars2[its] = field_malloc(vlistID1, FIELD_PTR);
     }
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   bool *imask = (bool*) Malloc(gridsizemax*sizeof(bool));
 
   int tsID = 0;
@@ -150,14 +150,14 @@ void *Runstat(void *process)
           field_type *pvars1 = &vars1[tsID][varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[tsID][varID][levelID] : NULL;
 
-          int gridsize = pvars1->size;
+          size_t gridsize = pvars1->size;
 
           pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
           if ( lrange )
             {
               pvars2->nmiss = pvars1->nmiss;
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 pvars2->ptr[i] = pvars1->ptr[i];
             }
 
@@ -167,10 +167,10 @@ void *Runstat(void *process)
 	    {
 	      double missval = pvars1->missval;
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
                 imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		psamp1->ptr[i] = (double) imask[i];
 
 #ifdef  _OPENMP
@@ -179,7 +179,7 @@ void *Runstat(void *process)
 	      for ( int inp = 0; inp < tsID; inp++ )
 		{
                   double *ptr = samp1[inp][varID][levelID].ptr;
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( imask[i] ) ptr[i]++;
 		}
 	    }
@@ -301,14 +301,14 @@ void *Runstat(void *process)
           field_type *pvars1 = &vars1[ndates-1][varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[ndates-1][varID][levelID] : NULL;
 
-          int gridsize = pvars1->size;
+          size_t gridsize = pvars1->size;
 
           pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
           if ( lrange )
             {
               pvars2->nmiss = pvars1->nmiss;
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 pvars2->ptr[i] = pvars1->ptr[i];
             }
 
@@ -318,10 +318,10 @@ void *Runstat(void *process)
 	    {
 	      double missval = pvars1->missval;
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
                 imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		psamp1->ptr[i] = (double) imask[i];
 
 #ifdef  _OPENMP
@@ -330,7 +330,7 @@ void *Runstat(void *process)
 	      for ( int inp = 0; inp < ndates-1; inp++ )
 		{
                   double *ptr = samp1[inp][varID][levelID].ptr;
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( imask[i] ) ptr[i]++;
 		}
 	    }

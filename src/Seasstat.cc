@@ -98,7 +98,7 @@ void *Seasstat(void *process)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -159,7 +159,7 @@ void *Seasstat(void *process)
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-	      int gridsize = pvars1->size;
+	      size_t gridsize = pvars1->size;
 
 	      if ( nsets == 0 )
 		{
@@ -168,7 +168,7 @@ void *Seasstat(void *process)
                   if ( lrange )
                     {
                       pvars2->nmiss = pvars1->nmiss;
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
@@ -177,7 +177,7 @@ void *Seasstat(void *process)
 		      if ( psamp1->ptr == NULL )
 			psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
                         psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		    }
 		}
@@ -193,11 +193,11 @@ void *Seasstat(void *process)
 		      if ( psamp1->ptr == NULL )
 			{
 			  psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-			  for ( int i = 0; i < gridsize; i++ )
+			  for ( size_t i = 0; i < gridsize; i++ )
 			    psamp1->ptr[i] = nsets;
 			}
 
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 			  psamp1->ptr[i]++;
 		    }

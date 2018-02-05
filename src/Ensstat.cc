@@ -85,14 +85,14 @@ void *ensstat_func(void *ensarg)
   for ( int fileID = 0; fileID < nfiles; fileID++ ) if ( ef[fileID].nmiss[t] > 0 ) lmiss = true;
 
   int gridID = vlistInqVarGrid(arg->vlistID1, arg->varID[t]);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   double missval = vlistInqVarMissval(arg->vlistID1, arg->varID[t]);
 
   size_t nmiss = 0;
 #ifdef  HAVE_OPENMP4
 #pragma omp parallel for default(shared)  reduction(+:nmiss)
 #endif
-  for ( int i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       int ompthID = cdo_omp_get_thread_num();
 
@@ -211,7 +211,7 @@ void *Ensstat(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {

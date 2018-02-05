@@ -372,7 +372,7 @@ void *Magvector(void *process)
   if ( gridInqType(gridID) != GRID_CURVILINEAR )
     gridID = gridToCurvilinear(gridID, 1);
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int nlon     = gridInqXsize(gridID);
   int nlat     = gridInqYsize(gridID);
   // int nlev     = zaxisInqSize(zaxisID);

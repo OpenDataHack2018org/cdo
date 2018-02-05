@@ -193,7 +193,7 @@ void *Ensstat3(void *process)
       pstreamDefVlist(streamID2, vlistID2);
     }
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
@@ -282,7 +282,7 @@ void *Ensstat3(void *process)
 #ifdef  _OPENMP
 #pragma omp parallel for default(shared) private(binID)
 #endif
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 

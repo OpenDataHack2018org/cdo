@@ -29,7 +29,7 @@
 
 void *Writerandom(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int varID, levelID;
   int rindex;

@@ -46,7 +46,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
       int gridID1  = vlistInqVarGrid(vlistID1, varID1);
       int zaxisID1 = vlistInqVarZaxis(vlistID1, varID1);
       int gtype1   = gridInqType(gridID1);
-      int gsize1   = gridInqSize(gridID1);
+      size_t gsize1 = gridInqSize(gridID1);
       int ztype1   = zaxisInqType(zaxisID1);
       int nlev1    = zaxisInqSize(zaxisID1);
       if ( nlev1 > mlev1 )
@@ -63,7 +63,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 	  int gridID2  = vlistInqVarGrid(vlistID2, varID2);
 	  int zaxisID2 = vlistInqVarZaxis(vlistID2, varID2);
 	  int gtype2   = gridInqType(gridID2);
-	  int gsize2   = gridInqSize(gridID2);
+	  size_t gsize2 = gridInqSize(gridID2);
 	  int ztype2   = zaxisInqType(zaxisID2);
 	  int nlev2    = zaxisInqSize(zaxisID2);
 	  if ( gtype1 == gtype2 && gsize1 == gsize2 && ztype1 == ztype2 && nlev1 == nlev2 )
@@ -125,7 +125,7 @@ void *Merge(void *process)
   int nrecs = 0;
   int levelID, levelID2;
   int index;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
 
   cdoInitialize(process);

@@ -55,7 +55,7 @@ int cmpdatetime(const void *s1, const void *s2)
 
 void *Sorttimestamp(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int tsID, lasttsID = -1;

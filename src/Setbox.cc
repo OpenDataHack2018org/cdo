@@ -29,17 +29,17 @@
 #include "grid.h"
 
 
-void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
 
-void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
 
 
 static
 void setcbox(double constant, double *array, int gridID,
-	     int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+	     long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
-  int nlon, nlat;
-  int ilat, ilon;
+  long nlon, nlat;
+  long ilat, ilon;
 
   nlon = gridInqXsize(gridID);
   nlat = gridInqYsize(gridID);
@@ -60,15 +60,14 @@ void *Setbox(void *process)
   int streamID1, streamID2;
   int nrecs, nvars;
   int tsID, varID, levelID;
-  int gridsize;
+  size_t gridsize;
   int vlistID1, vlistID2;
   int gridID = -1;
   int index, ngrids, gridtype;
   size_t nmiss;
   int *vars;
-  int i;
   int ndiffgrids;
-  int lat1, lat2, lon11, lon12, lon21, lon22;
+  long lat1, lat2, lon11, lon12, lon21, lon22;
   double missval;
   double constant;
   double *array;
@@ -159,7 +158,7 @@ void *Setbox(void *process)
 	      setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
 
 	      nmiss = 0;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
 	      pstreamDefRecord(streamID2, varID, levelID);

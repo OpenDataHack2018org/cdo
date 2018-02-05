@@ -46,7 +46,7 @@ typedef struct {
   char *units;
   int gridID;
   int zaxisID;
-  int gridsize;
+  size_t gridsize;
   int nlev;
   double *ptr;
 } VAR;
@@ -1434,7 +1434,7 @@ void *Echam5ini(void *process)
   int vlistID1, vlistID2;
   int nvars = 0;
   int iv, nlev;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   int taxisID, tsID;
 

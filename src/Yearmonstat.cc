@@ -37,7 +37,6 @@ void *Yearmonstat(void *process)
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID;
-  int i;
   int dpm;
   int year0 = 0, month0 = 0;
   int year, month, day;
@@ -81,7 +80,7 @@ void *Yearmonstat(void *process)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, calendar);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -144,7 +143,7 @@ void *Yearmonstat(void *process)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] = 0;
 			else
@@ -165,11 +164,11 @@ void *Yearmonstat(void *process)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			{
 			  samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-			  for ( i = 0; i < gridsize; i++ )
+			  for ( size_t i = 0; i < gridsize; i++ )
 			    samp1[varID][levelID].ptr[i] = dsets;
 			}
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] += dpm;
 		    }

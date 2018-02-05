@@ -473,12 +473,12 @@ void farselgtc(field_type *field, double c)
   selcompc(field, c, gt);
 }
 
-void updateHist(field_type *field[2], int nlevels, int gridsize, double *yvals, int onlyNorth)
+void updateHist(field_type *field[2], int nlevels, size_t gridsize, double *yvals, int onlyNorth)
 {
-  int levelID,i;
+  int levelID;
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
-    for ( i = 0; i < gridsize; i++ )
+    for ( size_t i = 0; i < gridsize; i++ )
       if ( onlyNorth )
       {
         if ( yvals[i] >= 0.0 )
@@ -488,16 +488,16 @@ void updateHist(field_type *field[2], int nlevels, int gridsize, double *yvals, 
         field[1][levelID].ptr[i] = field[0][levelID].ptr[i];
 }
 
-void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int ovdate,
+void adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int ovdate,
                 field_type *startDateWithHist[2], field_type *endDateWithHist[2])
 {
-  int levelID, i, ovdateSouth;
+  int levelID, ovdateSouth;
 
   ovdateSouth = MIN(cdiEncodeDate(ovdate/10000,6,30),ovdate);
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
   {
-    for ( i = 0; i < gridsize; i++ )
+    for ( size_t i = 0; i < gridsize; i++ )
     {
       /* start with southern sphere */
       if ( yvals[i] < 0 )
@@ -525,19 +525,19 @@ void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int
   }
 }
 
-void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
+void computeGsl(int nlevels, size_t gridsize, double *yvals, double missval,
                 field_type *startDateWithHist[2], field_type *endDateWithHist[2],
                 field_type *gslDuration, field_type *gslFirstDay,
                 int useCurrentYear)
 {
-  int levelID, i;
+  int levelID;
   double firstDay, duration;
 
   if ( !useCurrentYear )
     {
       for ( levelID = 0; levelID < nlevels; levelID++ )
         {
-          for ( i = 0; i < gridsize; i++ )
+          for ( size_t i = 0; i < gridsize; i++ )
             {
               /* start with southern sphere */
               if ( yvals[i] < 0.0 )
@@ -566,7 +566,7 @@ void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
       /* the current year can only have values for the northern hemisphere */
       for ( levelID = 0; levelID < nlevels; levelID++ )
         {
-          for ( i = 0; i < gridsize; i++ )
+          for ( size_t i = 0; i < gridsize; i++ )
             {
               /* start with southern sphere */
               if ( yvals[i] < 0.0 )
@@ -596,7 +596,7 @@ void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
     {
       gslDuration[levelID].nmiss = 0;
       gslFirstDay[levelID].nmiss = 0;
-      for ( i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
         {
           if ( DBL_IS_EQUAL(gslDuration[levelID].ptr[i], missval) )
             gslDuration[levelID].nmiss++;

@@ -37,7 +37,6 @@ void *Arithlat(void *process)
   int nrecs;
   int varID, levelID;
   size_t nmiss;
-  long i;
   char units[CDI_MAX_NAME];
   double *scale = NULL;
 
@@ -61,7 +60,7 @@ void *Arithlat(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  long gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
@@ -121,14 +120,14 @@ void *Arithlat(void *process)
 	      grid_to_radian(units, gridsize, scale, "grid latitudes");
 
 	      if ( operfunc == func_mul )
-		for ( i = 0; i < gridsize; ++i ) scale[i] = cos(scale[i]);
+		for ( size_t i = 0; i < gridsize; ++i ) scale[i] = cos(scale[i]);
 	      else
-		for ( i = 0; i < gridsize; ++i ) scale[i] = 1./cos(scale[i]);
+		for ( size_t i = 0; i < gridsize; ++i ) scale[i] = 1./cos(scale[i]);
 
-	      if ( cdoVerbose ) for ( i = 0; i < 10; ++i ) cdoPrint("coslat  %3d  %g", i+1, scale[i]);
+	      if ( cdoVerbose ) for ( unsigned i = 0; i < 10; ++i ) cdoPrint("coslat  %3d  %g", i+1, scale[i]);
 	    }
 
-	  for ( i = 0; i < gridsize; ++i ) array[i] *= scale[i];
+	  for ( size_t i = 0; i < gridsize; ++i ) array[i] *= scale[i];
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, array, nmiss);

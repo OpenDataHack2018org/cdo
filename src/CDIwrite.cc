@@ -96,7 +96,7 @@ void *CDIwrite(void *process)
   if ( nvars <= 0 ) nvars = 1;
 
   int gridID = cdoDefineGrid(gridfile);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   if ( nlevs == 1 )
     zaxisID  = zaxisCreate(ZAXIS_SURFACE, 1);
@@ -138,7 +138,7 @@ void *CDIwrite(void *process)
   gridInqYunits(gridID2, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-  for ( i = 0; i < gridsize; i++ )
+  for ( size_t i = 0; i < gridsize; i++ )
     array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
 
   Free(xvals);
@@ -151,7 +151,7 @@ void *CDIwrite(void *process)
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
 	  vars[varID][levelID] = (double*) Malloc(gridsize*sizeof(double));
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    vars[varID][levelID][i] = varID + array[i]*(levelID+1);
 	}
     }
@@ -207,7 +207,7 @@ void *CDIwrite(void *process)
 		  if ( memtype == MEMTYPE_FLOAT )
 		    {
 		      double *darray = vars[varID][levelID];
-		      for ( i = 0; i < gridsize; ++i ) farray[i] = darray[i];
+		      for ( size_t i = 0; i < gridsize; ++i ) farray[i] = darray[i];
 		      pstreamWriteRecordF(streamID, farray, 0);
 		      data_size += gridsize*4;
 		    }

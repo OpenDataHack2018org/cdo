@@ -161,7 +161,7 @@ void *Output(void *process)
       if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
 
       gridID   = vlistGrid(vlistID, 0);
-      int gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
       int gridtype = gridInqType(gridID);
 
       double *array = (double*) Malloc(gridsize*sizeof(double));
@@ -210,9 +210,9 @@ void *Output(void *process)
 	      int code     = vlistInqVarCode(vlistID, varID);
 	      int gridID   = vlistInqVarGrid(vlistID, varID);
 	      int zaxisID  = vlistInqVarZaxis(vlistID, varID);
-	      int gridsize = gridInqSize(gridID);
-	      int nlon     = gridInqXsize(gridID);
-	      int nlat     = gridInqYsize(gridID);
+	      size_t gridsize = gridInqSize(gridID);
+	      size_t nlon     = gridInqXsize(gridID);
+	      size_t nlat     = gridInqYsize(gridID);
 	      double level   = cdoZaxisInqLevel(zaxisID, levelID);
               double missval = vlistInqVarMissval(vlistID, varID);
    
@@ -223,15 +223,15 @@ void *Output(void *process)
 	      pstreamReadRecord(streamID, array, &nmiss);
 
 	      if ( operatorID == OUTPUTSRV )
-		fprintf(stdout, "%4d %8g %8d %4d %8d %8d %d %d\n", code, level, vdate, vtime, nlon, nlat, 0, 0);
+		fprintf(stdout, "%4d %8g %8d %4d %8zu %8zu %d %d\n", code, level, vdate, vtime, nlon, nlat, 0, 0);
 
 	      if ( operatorID == OUTPUTEXT )
-		fprintf(stdout, "%8d %4d %8g %8d\n", vdate, code, level, gridsize);
+		fprintf(stdout, "%8d %4d %8g %8zu\n", vdate, code, level, gridsize);
 		
 	      if ( operatorID == OUTPUTINT )
 		{
 		  int nout = 0;
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    {
 		      if ( nout == 8 )
 			{
@@ -246,7 +246,7 @@ void *Output(void *process)
 	      else if ( operatorID == OUTPUTF )
 		{
 		  int nout = 0;
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    {
 		      if ( nout == nelem )
 			{
@@ -275,7 +275,7 @@ void *Output(void *process)
 		  int hour, minute, second;
 		  cdiDecodeTime(vtime, &hour, &minute, &second);
 		  double xdate = vdate - (vdate/100)*100 + (hour*3600 + minute*60 + second)/86400.;
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(array[i], missval) )
 		      fprintf(stdout, "%g\t%g\t%g\t%g\n", xdate, 
 			      grid_center_lat[i], grid_center_lon[i], array[i]);
@@ -287,7 +287,7 @@ void *Output(void *process)
 		  // int ysize = gridInqYsize(gridID);
 		  if ( gridtype == GRID_CURVILINEAR ) l2d = true;
 		      
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    {
 		      int yind = i;
 		      int xind = i;
@@ -328,7 +328,7 @@ void *Output(void *process)
 		      const char *fname = "frontplane.xyz";
 		      double fmin = 0;
 		      double x, y, z;
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(array[i], missval) )
 			  {
 			    if ( array[i] < fmin ) fmin = array[i];
@@ -343,7 +343,7 @@ void *Output(void *process)
 		      double y0 = grid_center_lat[0]-dx/2;
                       double z0 = fmin;
 		      fprintf(fp, ">\n");
-		      for ( int i = 0; i < nlon; ++i )
+		      for ( size_t i = 0; i < nlon; ++i )
 			{
 			  x = x0;  y = y0; z = z0;
 			  fprintf(fp, "%g %g %g\n", x, y, z);
@@ -363,7 +363,7 @@ void *Output(void *process)
 		      y0 = grid_center_lat[0]-dx/2;
 		      z0 = fmin;
 		      fprintf(fp, ">\n");
-		      for ( int i = 0; i < nlat; ++i )
+		      for ( size_t i = 0; i < nlat; ++i )
 			{
 			  x = x0;  y = y0; z = z0;
 			  fprintf(fp, "%g %g %g\n", x, y, z);
@@ -383,9 +383,9 @@ void *Output(void *process)
 		}
 	      else if ( operatorID == OUTPUTARR )
 		{
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    {
-		      fprintf(stdout, "  arr[%d] = %12.6g;\n", i, array[i]);
+		      fprintf(stdout, "  arr[%zu] = %12.6g;\n", i, array[i]);
 		    }
 		}
 	      else
@@ -395,7 +395,7 @@ void *Output(void *process)
 		  maxval = array[0];
 		  if ( gridInqType(gridID) == GRID_SPECTRAL && gridsize <= 156 )
 		    {
-		      for ( int i = 1; i < gridsize; i++ )
+		      for ( size_t i = 1; i < gridsize; i++ )
 			{
 			  if ( array[i] < minval ) minval = array[i];
 			  if ( array[i] > maxval ) maxval = array[i];
@@ -421,7 +421,7 @@ void *Output(void *process)
 		  else
 		    {
 		      int nout = 0;
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			{
 			  if ( nout == 6 )
 			    {

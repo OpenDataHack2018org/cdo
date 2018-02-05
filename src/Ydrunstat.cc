@@ -355,7 +355,7 @@ void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
 		  field_type **vars1, field_type **vars2, int nsets, int operfunc)
 {
   int varID, levelID, nlevels;
-  int gridsize;
+  size_t gridsize;
   int year, month, day, dayoy;
 
   bool lvarstd = vars2 != NULL;

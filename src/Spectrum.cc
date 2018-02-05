@@ -164,10 +164,10 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 
 void *Spectrum(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
-  int i, k;
+  int k;
   int nalloc = 0;
   size_t nmiss;
   int nlevel;
@@ -303,7 +303,7 @@ void *Spectrum(void *process)
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      for ( tsID = 0; tsID < nts; tsID++ )
 		array1[tsID] = vars[tsID][varID][levelID].ptr[i];

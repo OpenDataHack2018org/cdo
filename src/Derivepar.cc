@@ -75,7 +75,7 @@ void *Derivepar(void *process)
   if ( gridInqType(gridID) == GRID_SPECTRAL )
     cdoAbort("Spectral data unsupported!");
  
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int zaxisIDh = -1;
   int nvct = 0;
@@ -321,7 +321,7 @@ void *Derivepar(void *process)
 	      else if ( varID == presID )
 		{
 		  if ( lnpsID != -1 )
-		    for ( i = 0; i < gridsize; ++i ) ps[i] = exp(array[i]);
+		    for ( size_t i = 0; i < gridsize; ++i ) ps[i] = exp(array[i]);
 		  else if ( psID != -1 )
 		    memcpy(ps, array, gridsize*sizeof(double));
 		}

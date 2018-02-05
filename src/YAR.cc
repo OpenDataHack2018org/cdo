@@ -163,7 +163,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
   int nlonIn = gridInqXsize(gridIDin);
   int nlatIn = gridInqYsize(gridIDin);
-  // int gridsize1 = gridInqSize(gridIDin);
+  // size_t gridsize1 = gridInqSize(gridIDin);
   double *lonIn = (double*) Malloc(nlonIn*sizeof(double));
   double *latIn = (double*) Malloc(nlatIn*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
@@ -188,7 +188,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 
   int nlonOut = gridInqXsize(gridIDout);
   int nlatOut = gridInqYsize(gridIDout);
-  // int gridsize2 = gridInqSize(gridIDout);
+  // size_t gridsize2 = gridInqSize(gridIDout);
   double *lonOut = (double*) Malloc(nlonOut*sizeof(double));
   double *latOut = (double*) Malloc(nlatOut*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
@@ -288,7 +288,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 	printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
     }
   */
-  for ( int i = 0; i < gridsize2; ++i )
+  for ( size_t i = 0; i < gridsize2; ++i )
     {
       double wgts[4];
       double plon;
@@ -359,7 +359,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
   size_t nmiss = 0;
-  for ( int i = 0; i < gridInqSize(gridIDout); ++i )
+  for ( size_t i = 0; i < gridInqSize(gridIDout); ++i )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
   field2->nmiss = nmiss;
@@ -405,7 +405,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
-  // int gridsize1 = gridInqSize(gridIDin);
+  // size_t gridsize1 = gridInqSize(gridIDin);
   lonIn = (double*) Malloc((nlonIn+1)*sizeof(double));
   latIn = (double*) Malloc((nlatIn+1)*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
@@ -427,7 +427,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
 
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
-  // int gridsize2 = gridInqSize(gridIDout);
+  // size_t gridsize2 = gridInqSize(gridIDout);
   lonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
   latOut = (double*) Malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
@@ -656,7 +656,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
   size_t nmiss = 0;
-  for ( int i = 0; i < gridInqSize(gridIDout); ++i )
+  for ( size_t i = 0; i < gridInqSize(gridIDout); ++i )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
   field2->nmiss = nmiss;
@@ -737,7 +737,7 @@ void *YAR(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   gridsize = gridInqSize(gridID2);

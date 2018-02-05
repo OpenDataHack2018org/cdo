@@ -342,7 +342,7 @@ void *Selmulti(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double *) malloc(gridsize*sizeof(double));
 
@@ -431,7 +431,7 @@ void *Selmulti(void *process)
                   else  // 1:  simple array arithmetics ( *,+)
                     {
                       if ( CdoDebug::cdoDebugExt ) cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f",recID, code, ltype, (int)(level), varID,levelID,scale,offset);
-                      for ( int li = 0; li < gridsize; ++li )
+                      for ( size_t li = 0; li < gridsize; ++li )
                         if (! DBL_IS_EQUAL(array[li], missval) )
                           {
                             array[li] = scale*(array[li] - offset);

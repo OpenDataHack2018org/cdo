@@ -208,7 +208,7 @@ void *Rhopot(void *process)
   if ( toID  == -1 ) cdoAbort("In-situ temperature not found!");
 
   int gridID = vlistGrid(vlistID1, 0);
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   zaxisID = vlistInqVarZaxis(vlistID1, saoID);
   int nlevel1 = zaxisInqSize(zaxisID);
@@ -302,7 +302,7 @@ void *Rhopot(void *process)
 	  single = rho.ptr+offset;
 
 	  nmiss = 0;
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(single[i], rho.missval) ) nmiss++;
  
 	  pstreamDefRecord(streamID2, 0, levelID);

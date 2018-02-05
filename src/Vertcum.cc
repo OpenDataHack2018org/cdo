@@ -33,15 +33,15 @@
 #define IS_SURFACE_LEVEL(zaxisID)  (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
 
 static
-void add_vars_mv(int gridsize, double missval, const double *restrict var1, const double *restrict var2, double *restrict var3)
+void add_vars_mv(size_t gridsize, double missval, const double *restrict var1, const double *restrict var2, double *restrict var3)
 {
   double missval1 = missval;
   double missval2 = missval;
   /*
-  for ( int i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     var3[i] = ADDMN(var2[i], var1[i]);
   */
-  for ( int i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       var3[i] = var2[i]; 
       if ( !DBL_IS_EQUAL(var1[i], missval1) )
@@ -58,7 +58,7 @@ void add_vars_mv(int gridsize, double missval, const double *restrict var1, cons
 void *Vertcum(void *process)
 {
   int nrecs;
-  int i, nlevshl = 0;
+  int nlevshl = 0;
   int varID, levelID;
   size_t nmiss;
 
@@ -127,7 +127,7 @@ void *Vertcum(void *process)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       int nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       int nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
@@ -161,17 +161,17 @@ void *Vertcum(void *process)
 
       for ( varID = 0; varID < nvars; ++varID )
 	{
-          double missval  = vlistInqVarMissval(vlistID2, varID);
-          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          int nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          double missval = vlistInqVarMissval(vlistID2, varID);
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          int nlevs2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
           if ( operatorID == VERTCUMHL && nlevs2 == nlevshl )
             {
-              for ( i = 0; i < gridsize; ++i ) vardata2[varID][0][i] = 0;
+              for ( size_t i = 0; i < gridsize; ++i ) vardata2[varID][0][i] = 0;
             }
           else
             {
-              for ( i = 0; i < gridsize; ++i ) vardata2[varID][0][i] = vardata1[varID][0][i];
+              for ( size_t i = 0; i < gridsize; ++i ) vardata2[varID][0][i] = vardata1[varID][0][i];
             }
 
           for ( levelID = 1; levelID < nlevs2; ++levelID )
@@ -188,7 +188,7 @@ void *Vertcum(void *process)
               for ( levelID = 0; levelID < nlevs2; ++levelID )
                 {
                   double *var2 = vardata2[varID][levelID];
-                  for ( i = 0; i < gridsize; ++i )
+                  for ( size_t i = 0; i < gridsize; ++i )
                     {
                       if ( IS_NOT_EQUAL(var1[i], 0) )
                         var2[i] /= var1[i];
@@ -202,14 +202,14 @@ void *Vertcum(void *process)
       for ( varID = 0; varID < nvars; ++varID )
 	{
           double missval  = vlistInqVarMissval(vlistID2, varID);
-          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           int nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
           for ( levelID = 0; levelID < nlevs2; ++levelID )
 	    {
               double *single = vardata2[varID][levelID];
 
               nmiss = 0;
-              for ( int i = 0; i < gridsize; ++i )
+              for ( size_t i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(single[i], missval) ) nmiss++;
 
               pstreamDefRecord(streamID2, varID, levelID);

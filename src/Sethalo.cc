@@ -421,16 +421,16 @@ void halo(double *array1, int gridID1, double *array2, int lhalo, int rhalo)
 static
 void tpnhalo(double *array1, int gridID1, double *array2)
 {
-  int nlon = gridInqXsize(gridID1);
-  int nlat = gridInqYsize(gridID1);
+  size_t nlon = gridInqXsize(gridID1);
+  size_t nlat = gridInqYsize(gridID1);
 
-  for ( int ilat = 0; ilat < nlat; ilat++ )
-    for ( int ilon = 0; ilon < nlon; ilon++ )
+  for ( size_t ilat = 0; ilat < nlat; ilat++ )
+    for ( size_t ilon = 0; ilon < nlon; ilon++ )
       array2[(ilat+2)*nlon + ilon] = array1[ilat*nlon + ilon];
 
-  for ( int ilon = 0; ilon < nlon; ilon++ )
+  for ( size_t ilon = 0; ilon < nlon; ilon++ )
     {
-      int ilonr = nlon - ilon - 1;
+      size_t ilonr = nlon - ilon - 1;
       array2[1*nlon + ilon] = array2[2*nlon + ilonr]; /* syncronise line 2 with line 3 */
       array2[0*nlon + ilon] = array2[3*nlon + ilonr]; /* syncronise line 1 with line 4 */
     }
@@ -441,11 +441,10 @@ void *Sethalo(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int gridsize, gridsize2;
+  size_t gridsize, gridsize2;
   int gridID1 = -1, gridID2;
   int index, gridtype;
   size_t nmiss;
-  int i;
   int lhalo = 0, rhalo = 0;
   double missval;
 
@@ -552,7 +551,7 @@ void *Sethalo(void *process)
 		{
 		  nmiss = 0;
 		  missval = vlistInqVarMissval(vlistID1, varID);
-		  for ( i = 0; i < gridsize2; i++ )
+		  for ( size_t i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 		}
 

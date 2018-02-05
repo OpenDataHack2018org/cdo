@@ -47,7 +47,7 @@ void *Math(void *process)
   int nrecs;
   int varID, levelID;
   size_t nmiss, nmiss2;
-  int i;
+  size_t i;
 
   cdoInitialize(process);
 
@@ -92,7 +92,7 @@ void *Math(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));

@@ -289,7 +289,7 @@ void *Seltime(void *process)
 
   if ( ! lcopy )
     {
-      int gridsize = vlistGridsizeMax(vlistID1);
+      size_t gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double*) Malloc(gridsize*sizeof(double));
     }
@@ -350,7 +350,7 @@ void *Seltime(void *process)
 		{
 		  int gridID  = vlistInqVarGrid(vlistID1, varID);
 		  int nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		  int gridsize = gridInqSize(gridID);
+		  size_t gridsize = gridInqSize(gridID);
 		  
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
@@ -548,7 +548,7 @@ void *Seltime(void *process)
 			  {
 			    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 			    int gridID   = vlistInqVarGrid(vlistID1, varID);
-			    int gridsize = gridInqSize(gridID);
+			    size_t gridsize = gridInqSize(gridID);
 			    int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 			    for ( levelID = 0; levelID < nlevel; levelID++ )
 			      {

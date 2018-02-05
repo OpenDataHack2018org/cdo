@@ -507,8 +507,8 @@ void interpolate(field_type *field1, field_type *field2)
   int i;
   double *lono_array, *lato_array, *lono, *lato;
   double *lon_array, *lat_array, *lon, *lat;
-  //int gridsize_i
-  int gridsize_o;
+  //size_t gridsize_i
+  size_t gridsize_o;
   int gridIDi;
   double *arrayIn;
   int gridIDo;
@@ -985,7 +985,7 @@ void interpolate(field_type *field1, field_type *field2)
     }
 
   nmiss = 0;
-  for ( i = 0; i < gridsize_o; i++ )
+  for ( size_t i = 0; i < gridsize_o; i++ )
     if ( DBL_IS_EQUAL(arrayOut[i], missval) ) nmiss++;
 
   field2->nmiss = nmiss;

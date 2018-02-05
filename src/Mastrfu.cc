@@ -32,11 +32,12 @@
 static
 void mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, double missval)
 {
-  int ilev, ilat, n;
+  size_t ilat;
+  int ilev, n;
   double fact =  4*atan(1.0) * 6371000 / 9.81;
   char units[CDI_MAX_NAME];
 
-  int nlat = gridInqSize(gridID);
+  size_t nlat = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
   double *phi    = (double*) Malloc(nlat*sizeof(double));
   double *dummy  = (double*) Malloc(nlat*sizeof(double));
@@ -137,7 +138,7 @@ void *Mastrfu(void *process)
   int gridID = vlistInqVarGrid(vlistID1, 0);
   if ( gridInqXsize(gridID) > 1 ) cdoAbort("Grid must be a zonal mean!");
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
 
   int vlistID2 = vlistDuplicate(vlistID1);

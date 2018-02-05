@@ -42,7 +42,6 @@ void merfun(field_type field1, field_type *field2, int function)
 
 void mermin(field_type field1, field_type *field2)
 {
-  long   i, j, nx, ny;
   size_t rnmiss = 0;
   int    grid    = field1.grid;
   size_t nmiss   = field1.nmiss;
@@ -50,15 +49,15 @@ void mermin(field_type field1, field_type *field2)
   double *array  = field1.ptr;
   double rmin = 0;
 
-  nx    = gridInqXsize(grid);
-  ny    = gridInqYsize(grid);
+  size_t nx = gridInqXsize(grid);
+  size_t ny = gridInqYsize(grid);
 
-  for ( i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       if ( nmiss > 0 )
 	{
 	  rmin = DBL_MAX;
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      if ( array[j*nx+i] < rmin ) rmin = array[j*nx+i];
 
@@ -71,7 +70,7 @@ void mermin(field_type field1, field_type *field2)
       else
 	{
 	  rmin = DBL_MAX;
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    if ( array[j*nx+i] < rmin )  rmin = array[j*nx+i];
 	}
 
@@ -84,7 +83,6 @@ void mermin(field_type field1, field_type *field2)
 
 void mermax(field_type field1, field_type *field2)
 {
-  long   i, j, nx, ny;
   size_t rnmiss = 0;
   int    grid    = field1.grid;
   size_t nmiss   = field1.nmiss;
@@ -92,15 +90,15 @@ void mermax(field_type field1, field_type *field2)
   double *array  = field1.ptr;
   double rmax = 0;
 
-  nx    = gridInqXsize(grid);
-  ny    = gridInqYsize(grid);
+  size_t nx = gridInqXsize(grid);
+  size_t ny = gridInqYsize(grid);
 
-  for ( i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       if ( nmiss > 0 )
 	{
 	  rmax = -DBL_MAX;
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      if ( array[j*nx+i] > rmax ) rmax = array[j*nx+i];
 
@@ -113,7 +111,7 @@ void mermax(field_type field1, field_type *field2)
       else
 	{
 	  rmax = DBL_MIN;
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    if ( array[j*nx+i] > rmax )  rmax = array[j*nx+i];
 	}
 
@@ -126,7 +124,6 @@ void mermax(field_type field1, field_type *field2)
 
 void merrange(field_type field1, field_type *field2)
 {
-  long   i, j, nx, ny;
   size_t rnmiss = 0;
   int    grid    = field1.grid;
   size_t nmiss   = field1.nmiss;
@@ -136,16 +133,16 @@ void merrange(field_type field1, field_type *field2)
   double rmax = 0;
   double rrange = 0;
 
-  nx    = gridInqXsize(grid);
-  ny    = gridInqYsize(grid);
+  size_t nx = gridInqXsize(grid);
+  size_t ny = gridInqYsize(grid);
 
-  for ( i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       if ( nmiss > 0 )
 	{
 	  rmin =  DBL_MAX;
 	  rmax = -DBL_MAX;
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
               {
 		if      ( array[j*nx+i] < rmin ) rmin = array[j*nx+i];
@@ -166,7 +163,7 @@ void merrange(field_type field1, field_type *field2)
 	{
 	  rmin = DBL_MAX;
 	  rmax = DBL_MIN;
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    {
 	      if      ( array[j*nx+i] < rmin )  rmin = array[j*nx+i];
 	      else if ( array[j*nx+i] > rmax )  rmax = array[j*nx+i];
@@ -184,8 +181,7 @@ void merrange(field_type field1, field_type *field2)
 
 void mersum(field_type field1, field_type *field2)
 {
-  long   i, j, nx, ny;
-  long   nvals   = 0;
+  size_t nvals   = 0;
   size_t rnmiss  = 0;
   int    grid    = field1.grid;
   size_t nmiss   = field1.nmiss;
@@ -193,16 +189,16 @@ void mersum(field_type field1, field_type *field2)
   double *array  = field1.ptr;
   double rsum = 0;
 
-  nx    = gridInqXsize(grid);
-  ny    = gridInqYsize(grid);
+  size_t nx    = gridInqXsize(grid);
+  size_t ny    = gridInqYsize(grid);
 
-  for ( i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       if ( nmiss > 0 )
 	{
 	  nvals = 0;
 	  rsum = 0;
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      {
 		rsum += array[j*nx+i];
@@ -218,7 +214,7 @@ void mersum(field_type field1, field_type *field2)
       else
 	{
 	  rsum = 0;
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    rsum += array[j*nx+i];
 	}
 
@@ -231,7 +227,6 @@ void mersum(field_type field1, field_type *field2)
 
 void mermeanw(field_type field1, field_type *field2)
 {
-  long   i, j, nx, ny;
   size_t rnmiss = 0;
   int    grid    = field1.grid;
   size_t nmiss   = field1.nmiss;
@@ -241,16 +236,16 @@ void mermeanw(field_type field1, field_type *field2)
   double *w      = field1.weight;
   double rsum = 0, rsumw = 0, ravg = 0;
 
-  nx    = gridInqXsize(grid);
-  ny    = gridInqYsize(grid);
+  size_t nx = gridInqXsize(grid);
+  size_t ny = gridInqYsize(grid);
 
-  for ( i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       rsum  = 0;
       rsumw = 0;
       if ( nmiss > 0 )
 	{
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval1) &&
 		 !DBL_IS_EQUAL(w[j*nx+i], missval1) )
 	      {
@@ -260,7 +255,7 @@ void mermeanw(field_type field1, field_type *field2)
 	}
       else
 	{
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    {
 	      rsum  += w[j*nx+i] * array[j*nx+i];
 	      rsumw += w[j*nx+i];
@@ -280,7 +275,6 @@ void mermeanw(field_type field1, field_type *field2)
 
 void meravgw(field_type field1, field_type *field2)
 {
-  long   i, j, nx, ny;
   size_t rnmiss = 0;
   int    grid     = field1.grid;
   size_t nmiss    = field1.nmiss;
@@ -290,16 +284,16 @@ void meravgw(field_type field1, field_type *field2)
   double *w       = field1.weight;
   double rsum = 0, rsumw = 0, ravg = 0;
 
-  nx    = gridInqXsize(grid);
-  ny    = gridInqYsize(grid);
+  size_t nx = gridInqXsize(grid);
+  size_t ny = gridInqYsize(grid);
 
-  for ( i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       rsum  = 0;
       rsumw = 0;
       if ( nmiss > 0 )
 	{
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(w[j*nx+i], missval1) )
 	      {
 		rsum  = ADDMN(rsum, MULMN(w[j*nx+i], array[j*nx+i]));
@@ -308,7 +302,7 @@ void meravgw(field_type field1, field_type *field2)
 	}
       else
 	{
-	  for ( j = 0; j < ny; j++ )
+	  for ( size_t j = 0; j < ny; j++ )
 	    {
 	      rsum  += w[j*nx+i] * array[j*nx+i];
 	      rsumw += w[j*nx+i];
@@ -326,7 +320,7 @@ void meravgw(field_type field1, field_type *field2)
 }
 
 static
-void prevarsum_merw(const double *restrict array, const double *restrict w, int nx, int ny, size_t nmiss, 
+void prevarsum_merw(const double *restrict array, const double *restrict w, size_t  nx, size_t  ny, size_t nmiss, 
                     double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
 { 
   *rsum   = 0;
@@ -336,7 +330,7 @@ void prevarsum_merw(const double *restrict array, const double *restrict w, int 
 
   if ( nmiss > 0 )
     {
-      for ( int j = 0; j < ny; j++ )
+      for ( size_t  j = 0; j < ny; j++ )
         if ( !DBL_IS_EQUAL(array[j*nx], missval) &&
              !DBL_IS_EQUAL(w[j*nx], missval) )
           {
@@ -348,7 +342,7 @@ void prevarsum_merw(const double *restrict array, const double *restrict w, int 
     }
   else
     {
-      for ( int j = 0; j < ny; j++ )
+      for ( size_t  j = 0; j < ny; j++ )
         {
           *rsum   += w[j*nx] * array[j*nx];
           *rsumq  += w[j*nx] * array[j*nx] * array[j*nx];
@@ -370,10 +364,10 @@ void mervarw(field_type field1, field_type *field2)
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
-  int nx = gridInqXsize(grid);
+  size_t nx = gridInqXsize(grid);
   int ny = gridInqYsize(grid);
 
-  for ( int i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       prevarsum_merw(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
@@ -400,10 +394,10 @@ void mervar1w(field_type field1, field_type *field2)
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
-  int nx = gridInqXsize(grid);
+  size_t nx = gridInqXsize(grid);
   int ny = gridInqYsize(grid);
 
-  for ( int i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       prevarsum_merw(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
@@ -426,11 +420,11 @@ void merstdw(field_type field1, field_type *field2)
   double missval = field1.missval;
   double rstd;
 
-  int nx = gridInqXsize(grid);
+  size_t nx = gridInqXsize(grid);
 
   mervarw(field1, field2);
 
-  for ( int i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       rstd = var_to_std(field2->ptr[i], missval);
 
@@ -450,11 +444,11 @@ void merstd1w(field_type field1, field_type *field2)
   double missval = field1.missval;
   double rstd;
 
-  int nx = gridInqXsize(grid);
+  size_t nx = gridInqXsize(grid);
 
   mervar1w(field1, field2);
 
-  for ( int i = 0; i < nx; i++ )
+  for ( size_t i = 0; i < nx; i++ )
     {
       rstd = var_to_std(field2->ptr[i], missval);
 
@@ -469,23 +463,23 @@ void merstd1w(field_type field1, field_type *field2)
 /* RQ */
 void merpctl(field_type field1, field_type *field2, int p)
 {
-  long   i, j, l;
   size_t rnmiss = 0;
   int    grid    = field1.grid;
   size_t nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
 
-  long nx = gridInqXsize(grid);
-  long ny = gridInqYsize(grid);
+  size_t nx = gridInqXsize(grid);
+  size_t ny = gridInqYsize(grid);
   
   double *array2 = (double*) Malloc(nx*sizeof(double));
   
   if ( nmiss > 0 )
     {
-      for ( i = 0; i < nx; i++ )
+      for ( size_t i = 0; i < nx; i++ )
         {
-          for ( j = 0, l = 0; j < ny; j++ )
+          size_t l = 0;
+          for ( size_t j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      array2[l++] = array[j*nx+i];
 	    
@@ -502,11 +496,11 @@ void merpctl(field_type field1, field_type *field2, int p)
     }
   else
     {
-      for ( i = 0; i < nx; i++ )
+      for ( size_t i = 0; i < nx; i++ )
       	{
           if ( ny > 0 )
             {
-              for ( j = 0; j < ny; j++ )
+              for ( size_t j = 0; j < ny; j++ )
                 array2[j] = array[j*nx+i];
               field2->ptr[i] = percentile(array2, ny, p);
             }

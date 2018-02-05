@@ -104,14 +104,14 @@ void *Runpctl(void *process)
         {
           if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
           
-          int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           int nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           double missval = vlistInqVarMissval(vlistID1, varID);
           
           for ( levelID = 0; levelID < nlevels; levelID++ )
             {
               nmiss = 0;  
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 {
                   int j = 0;
                   for ( int inp = 0; inp < ndates; inp++ )

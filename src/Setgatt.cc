@@ -32,7 +32,7 @@ void *Setgatt(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   char *attname = NULL, *attstring = NULL, *attfile = NULL;
 

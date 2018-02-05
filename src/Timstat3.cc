@@ -88,7 +88,7 @@ void *Timstat3(void *process)
 
   int vlistID3 = vlistDuplicate(vlistID[0]);
 
-  int gridsize = vlistGridsizeMax(vlistID[0]);
+  size_t gridsize = vlistGridsizeMax(vlistID[0]);
   int nvars = vlistNvars(vlistID[0]);
   int nrecs = vlistNrecs(vlistID[0]);
   int nrecs3 = nrecs;
@@ -188,7 +188,7 @@ void *Timstat3(void *process)
 	      pstreamReadRecord(streamID[is], in[is].ptr, &nmiss);
 	      in[is].nmiss = (size_t) nmiss;
               
-	      for ( int i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  /*
 		  if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
@@ -226,7 +226,7 @@ void *Timstat3(void *process)
 
       if ( operatorID == VARQUOT2TEST )
 	{
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      double fnvals0 = iwork[0][varID][levelID][i];
 	      double fnvals1 = iwork[1][varID][levelID][i];
@@ -256,7 +256,7 @@ void *Timstat3(void *process)
 	  mean_factor[1] = -1;
 	  var_factor[0] = var_factor[1] = 1;
 
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      double temp0 = 0;
 	      double deg_of_freedom = -n_in;
@@ -301,7 +301,7 @@ void *Timstat3(void *process)
 	}
 
       nmiss = 0;
-      for ( int i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
 	if ( DBL_IS_EQUAL(out[0].ptr[i], missval1) ) nmiss++;
 
       pstreamDefRecord(streamID3, varID, levelID);

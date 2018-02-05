@@ -128,7 +128,7 @@ void *CDIread(void *process)
       filetype = pstreamInqFiletype(streamID);
       datatype = vlistInqVarDatatype(vlistID, 0);
 	  
-      int gridsize = vlistGridsizeMax(vlistID);
+      size_t gridsize = vlistGridsizeMax(vlistID);
       
       if ( darray == NULL ) darray = (double*) Malloc(gridsize*sizeof(double));
       if ( farray == NULL && memtype == MEMTYPE_FLOAT ) farray = (float*) Malloc(gridsize*sizeof(float));
@@ -149,7 +149,7 @@ void *CDIread(void *process)
 	      if ( memtype == MEMTYPE_FLOAT )
 		{
                   pstreamReadRecordF(streamID, farray, &nmiss);
-                  //  for ( int i = 0; i < gridsize; ++i ) darray[i] = farray[i];
+                  //  for ( size_t i = 0; i < gridsize; ++i ) darray[i] = farray[i];
 		  data_size += gridsize*4;
 		}
 	      else

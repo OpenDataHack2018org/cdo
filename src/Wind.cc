@@ -299,7 +299,7 @@ void *Wind(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( varID1 != -1 && varID2 != -1 )

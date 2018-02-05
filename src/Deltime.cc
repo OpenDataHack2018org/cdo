@@ -29,7 +29,7 @@ void *Deltime(void *process)
   int varID, levelID;
   int vdate /*, vtime */;
   int copytimestep;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   int year, month, day;
   int dday, dmon;

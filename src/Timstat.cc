@@ -241,7 +241,7 @@ void *Timstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
 
   int FIELD_MEMTYPE = 0;
@@ -292,7 +292,7 @@ void *Timstat(void *argument)
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
 	      nwpv     = pvars1->nwpv;
-	      int gridsize = pvars1->size;
+	      size_t gridsize = pvars1->size;
 
 	      if ( nsets == 0 )
 		{
@@ -301,7 +301,7 @@ void *Timstat(void *argument)
                   if ( lrange )
                     {
                       pvars2->nmiss = (size_t)nmiss;
-		      for ( int i = 0; i < nwpv*gridsize; i++ )
+		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
@@ -310,7 +310,7 @@ void *Timstat(void *argument)
 		      if ( psamp1->ptr == NULL )
 			psamp1->ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 
-		      for ( int i = 0; i < nwpv*gridsize; i++ )
+		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		    }
 		}
@@ -329,11 +329,11 @@ void *Timstat(void *argument)
 		      if ( psamp1->ptr == NULL )
 			{
 			  psamp1->ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-			  for ( int i = 0; i < nwpv*gridsize; i++ )
+			  for ( size_t i = 0; i < nwpv*gridsize; i++ )
 			    psamp1->ptr[i] = nsets;
 			}
 
-		      for ( int i = 0; i < nwpv*gridsize; i++ )
+		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 			  psamp1->ptr[i]++;
 		    }
@@ -429,12 +429,12 @@ void *Timstat(void *argument)
             field_type *pvars1 = &vars1[varID][levelID];
 
             int nwpv     = pvars1->nwpv;
-            int gridsize = gridInqSize(pvars1->grid);
+            size_t gridsize = gridInqSize(pvars1->grid);
             double missval = pvars1->missval;
             if ( psamp1->ptr )
               {
                 int irun = 0;
-                for ( int i = 0; i < nwpv*gridsize; ++i )
+                for ( size_t i = 0; i < nwpv*gridsize; ++i )
                   {
                     if ( (psamp1->ptr[i] / nsets) < vfrac )
                       {
@@ -446,7 +446,7 @@ void *Timstat(void *argument)
                 if ( irun )
                   {
                     pvars1->nmiss = 0;
-                    for ( int i = 0; i < nwpv*gridsize; ++i )
+                    for ( size_t i = 0; i < nwpv*gridsize; ++i )
                       if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) pvars1->nmiss++;
                   }
 	      }
@@ -479,8 +479,8 @@ void *Timstat(void *argument)
 	      if ( psamp1->ptr ) sampptr = psamp1->ptr;
               else
                 {
-                  int gridsize = pvars1->size;
-                  for ( int i = 0; i < gridsize; ++i ) sampptr[i] = nsets;
+                  size_t gridsize = pvars1->size;
+                  for ( size_t i = 0; i < gridsize; ++i ) sampptr[i] = nsets;
                 }
 
               pstreamDefRecord(streamID3, varID, levelID);
