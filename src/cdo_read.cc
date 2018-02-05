@@ -77,7 +77,7 @@ bool *cdo_read_timestepmask(const char *maskfile, int *n)
 }
 
 
-bool *cdo_read_mask(const char *maskfile, int *n)
+bool *cdo_read_mask(const char *maskfile, size_t *n)
 {
   *n = 0;
 

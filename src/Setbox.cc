@@ -29,17 +29,17 @@
 #include "grid.h"
 
 
-void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
 
-void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
 
 
 static
 void setcbox(double constant, double *array, int gridID,
-	     int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+	     long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
-  int nlon, nlat;
-  int ilat, ilon;
+  long nlon, nlat;
+  long ilat, ilon;
 
   nlon = gridInqXsize(gridID);
   nlat = gridInqYsize(gridID);
@@ -67,7 +67,7 @@ void *Setbox(void *process)
   size_t nmiss;
   int *vars;
   int ndiffgrids;
-  int lat1, lat2, lon11, lon12, lon21, lon22;
+  long lat1, lat2, lon11, lon12, lon21, lon22;
   double missval;
   double constant;
   double *array;

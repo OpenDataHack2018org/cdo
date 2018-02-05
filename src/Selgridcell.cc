@@ -29,10 +29,10 @@
 #include "pstream_int.h"
 
 
-int gengridcell(int gridID1, size_t gridsize2, int *cellidx);
+int gengridcell(int gridID1, size_t gridsize2, long *cellidx);
 
 static
-int genindexgrid(int gridID1, size_t gridsize2, int *cellidx)
+int genindexgrid(int gridID1, size_t gridsize2, long *cellidx)
 {
   int gridID0 = gridID1;
   int gridtype1 = gridInqType(gridID1);
@@ -53,9 +53,9 @@ int genindexgrid(int gridID1, size_t gridsize2, int *cellidx)
 }
 
 static
-void sel_index(double *array1, double *array2, int nind, int *indarr)
+void sel_index(double *array1, double *array2, long nind, long *indarr)
 {
-  for ( int i = 0; i < nind; ++i )
+  for ( long i = 0; i < nind; ++i )
     {
       array2[i] = array1[indarr[i]];
     }
@@ -86,21 +86,21 @@ void *Selgridcell(void *process)
   int *indarr = NULL;
   if ( operatorArgc() == 1 && fileExists(operatorArgv()[0]) )
     {
-      bool *cdo_read_mask(const char *maskfile, int *n);
-      int n = 0;
+      bool *cdo_read_mask(const char *maskfile, size_t *n);
+      size_t n = 0;
       bool *mask = cdo_read_mask(operatorArgv()[0], &n);
       nind = 0;
-      for ( int i = 0; i < n; ++i ) if ( mask[i] ) nind++;
+      for ( size_t i = 0; i < n; ++i ) if ( mask[i] ) nind++;
       if ( nind == 0 ) cdoAbort("Mask is empty!");
       else
         {
-          indarr = (int*) Malloc(nind*sizeof(double));
+          indarr = (int*) Malloc(nind*sizeof(int));
           nind = 0;
-          for ( int i = 0; i < n; ++i ) if ( mask[i] ) indarr[nind++] = i;
+          for ( size_t i = 0; i < n; ++i ) if ( mask[i] ) indarr[nind++] = i;
         }
       if ( mask ) Free(mask);
     }
- else
+  else
     {
       nind = args2int_lista(operatorArgc(), operatorArgv(), ilista);
       indarr = (int*) lista_dataptr(ilista);
@@ -138,20 +138,27 @@ void *Selgridcell(void *process)
   int ngrids = vlistNgrids(vlistID1);
   sindex_t *sindex = (sindex_t *) Malloc(ngrids*sizeof(sindex_t));
 
-  int ncells = nind;
-  int *cellidx = indarr;
+  long ncells = nind;
+  long *cellidx = NULL;
   if ( operatorID == DELGRIDCELL )
     {
       size_t gridsize = vlistGridsizeMax(vlistID1);
       ncells = gridsize - nind;
-      cellidx = (int*) Malloc(gridsize*sizeof(int));
+      cellidx = (long*) Malloc(gridsize*sizeof(long));
       for ( size_t i = 0; i < gridsize; ++i ) cellidx[i] = 1;
-      for ( int i = 0; i < nind; ++i ) cellidx[indarr[i]] = 0;
-      int j = 0;
+      for ( long i = 0; i < nind; ++i ) cellidx[indarr[i]] = 0;
+      long j = 0;
       for ( size_t i = 0; i < gridsize; ++i )
         if ( cellidx[i] == 1 ) cellidx[j++] = i;
       if ( j != ncells ) cdoAbort("Internal error; number of cells differ");
     }
+  else
+    {
+      cellidx = (long*) Malloc(nind*sizeof(long));
+      for ( int i = 0; i < nind; ++i )
+        cellidx[i] = indarr[i];
+    }
+
   if ( ncells == 0 ) cdoAbort("Mask is empty!");
 
   for ( index = 0; index < ngrids; index++ )

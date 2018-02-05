@@ -32,7 +32,7 @@
 static
 void shiftx(bool lcyclic, int nshift, int nx, int ny, const double *array1, double *array2, double missval)
 {
-  for ( size_t i = 0; i < nx; i++ )
+  for ( int i = 0; i < nx; i++ )
     {
       bool is_cyclic = false;
       int ins = i + nshift%nx;
@@ -65,12 +65,12 @@ void shifty(bool lcyclic, int nshift, int nx, int ny, const double *array1, doub
 
       if ( !lcyclic && is_cyclic )
         {
-          for ( size_t i = 0; i < nx; i++ )
+          for ( int i = 0; i < nx; i++ )
             array2[IX2D(jns,i,nx)] = missval;
         }
       else
         {
-          for ( size_t i = 0; i < nx; i++ )
+          for ( int i = 0; i < nx; i++ )
             array2[IX2D(jns,i,nx)] = array1[IX2D(j,i,nx)];
         }
     }

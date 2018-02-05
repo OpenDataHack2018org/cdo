@@ -228,10 +228,10 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   double *xvals = (double*) Malloc(nx*sizeof(double));
   double *yvals = (double*) Malloc(ny*sizeof(double));
 
-  for ( size_t i = 0; i < nx; ++i )
+  for ( int i = 0; i < nx; ++i )
     xvals[i] = xmin + i*dx + dx/2;
 
-  for ( size_t i = 0; i < ny; ++i )
+  for ( int i = 0; i < ny; ++i )
     yvals[i] = ymax - i*dy - dy/2;
 
   int gridID = gridCreate(GRID_PROJECTION, nx*ny);
@@ -258,10 +258,10 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
   double *xvals = (double*) Malloc(nx*sizeof(double));
   double *yvals = (double*) Malloc(ny*sizeof(double));
 
-  for ( size_t i = 0; i < nx; ++i )
+  for ( int i = 0; i < nx; ++i )
     xvals[i] = xmin + i*dx + dx/2;
 
-  for ( size_t i = 0; i < ny; ++i )
+  for ( int i = 0; i < ny; ++i )
     yvals[i] = ymax - i*dy - dy/2;
 
   int gridID = gridCreate(GRID_PROJECTION, nx*ny);

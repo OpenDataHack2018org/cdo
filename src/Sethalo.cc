@@ -422,15 +422,15 @@ static
 void tpnhalo(double *array1, int gridID1, double *array2)
 {
   size_t nlon = gridInqXsize(gridID1);
-  int nlat = gridInqYsize(gridID1);
+  size_t nlat = gridInqYsize(gridID1);
 
-  for ( int ilat = 0; ilat < nlat; ilat++ )
-    for ( int ilon = 0; ilon < nlon; ilon++ )
+  for ( size_t ilat = 0; ilat < nlat; ilat++ )
+    for ( size_t ilon = 0; ilon < nlon; ilon++ )
       array2[(ilat+2)*nlon + ilon] = array1[ilat*nlon + ilon];
 
-  for ( int ilon = 0; ilon < nlon; ilon++ )
+  for ( size_t ilon = 0; ilon < nlon; ilon++ )
     {
-      int ilonr = nlon - ilon - 1;
+      size_t ilonr = nlon - ilon - 1;
       array2[1*nlon + ilon] = array2[2*nlon + ilonr]; /* syncronise line 2 with line 3 */
       array2[0*nlon + ilon] = array2[3*nlon + ilonr]; /* syncronise line 1 with line 4 */
     }
