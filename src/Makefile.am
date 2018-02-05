@@ -180,6 +180,8 @@ libcdo_la_SOURCES =            \
                timer.h         \
                util.cc          \
                util.h          \
+			   util_files.cc \
+			   util_files.h \
 			   util_fileextensions.cc \
 			   util_fileextensions.h \
 			   util_string.cc\

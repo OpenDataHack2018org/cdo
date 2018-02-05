@@ -22,6 +22,7 @@
 #include <cdi.h>
 #include "util.h"
 #include "exception.h"
+#include "util_files.h"
 
 
 int defineTable(const char *tablearg)

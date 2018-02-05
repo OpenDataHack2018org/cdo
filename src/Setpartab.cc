@@ -27,6 +27,7 @@
 #include "pstream_int.h"
 #include "pmlist.h"
 #include "convert_units.h"
+#include "util_files.h"
 
 int stringToParam(const char *paramstr);
 

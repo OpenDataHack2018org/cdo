@@ -38,6 +38,7 @@
 #include "cdoOptions.h"
 #include "exception.h"
 #include "util_operatorStrings.h"
+#include "util_files.h"
 
 std::map<int, ProcessType> Process;
 std::map<int, char *> obase; /*TEMP*/  // Possibly not the best solution (19.Jan.2018)

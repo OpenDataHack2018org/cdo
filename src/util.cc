@@ -435,51 +435,6 @@ int month_to_season(int month)
   return seas;
 }
 
-#include <sys/stat.h>
-
-bool fileExists(const char *restrict filename)
-{
-  bool status = false;
-  struct stat buf;
-
-  if ( stat(filename, &buf) == 0 )
-    {
-      if ( S_ISREG(buf.st_mode) && buf.st_size > 0 ) status = true;
-    }
-
-  return status;
-}
-
-
-bool userFileOverwrite(const char *restrict filename)
-{
-  bool status = false;
-
-  if ( !Options::silentMode && stdin_is_tty && stderr_is_tty )
-    {
-      fprintf(stderr, "File %s already exists, overwrite? (yes/no): ", filename);
-      char line[1024];
-      readline(stdin, line, 1024);
-      char *pline = line;
-      while ( isspace((int) *pline) ) pline++;
-      int len = (int) strlen(pline);
-      if ( len == 3 )
-        {
-          if ( pline[0] == 'y' && pline[1] == 'e' && pline[2] == 's' )
-            status = true;
-          else if ( pline[0] == 'Y' && pline[1] == 'E' && pline[2] == 'S' )
-            status = true;
-        }
-      else if ( len == 1 )
-        {
-          if ( pline[0] == 'y' || pline[0] == 'Y' ) status = true;
-        }
-    }
-
-  return status;
-}
-
-
 bool ps_lhead = false;
 int ps_nch   = 0;
 int ps_cval  = -1;
@@ -579,6 +534,7 @@ int str2datatype(const char *datatypestr)
   return datatype;
 }
 
+#include <sys/stat.h>
 
 off_t fileSize(const char *restrict filename)
 {

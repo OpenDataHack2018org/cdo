@@ -28,6 +28,7 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "cdoOptions.h"
+#include "util_files.h"
 
 // Defines for rank histogram
 enum TDATA_TYPE {TIME, SPACE};

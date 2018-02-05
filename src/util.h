@@ -118,9 +118,6 @@ char *double_to_attstr(int digits, char *str, size_t len, double value);
 void progressInit(void);
 void progressStatus(double offset, double refval, double curval);
 
-bool fileExists(const char *filename);
-bool userFileOverwrite(const char *filename);
-
 /* convert a CDI datatype to string */
 int datatype2str(int datatype, char *datatypestr);
 int str2datatype(const char *datatypestr);

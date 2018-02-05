@@ -27,6 +27,7 @@
 #include "grid.h"
 #include "listarray.h"
 #include "pstream_int.h"
+#include "util_files.h"
 
 
 int gengridcell(int gridID1, size_t gridsize2, long *cellidx);
