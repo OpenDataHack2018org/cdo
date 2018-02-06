@@ -458,7 +458,7 @@ double fldvar1w(field_type field)
 }
 
 
-double var_to_std(double rvar, double missval)
+double varToStd(double rvar, double missval)
 {
   double rstd;
 
@@ -477,25 +477,25 @@ double var_to_std(double rvar, double missval)
 
 double fldstd(field_type field)
 {
-  return var_to_std(fldvar(field), field.missval);
+  return varToStd(fldvar(field), field.missval);
 }
 
 
 double fldstd1(field_type field)
 {
-  return var_to_std(fldvar1(field), field.missval);
+  return varToStd(fldvar1(field), field.missval);
 }
 
 
 double fldstdw(field_type field)
 {
-  return var_to_std(fldvarw(field), field.missval);
+  return varToStd(fldvarw(field), field.missval);
 }
 
 
 double fldstd1w(field_type field)
 {
-  return var_to_std(fldvar1w(field), field.missval);
+  return varToStd(fldvar1w(field), field.missval);
 }
 
 

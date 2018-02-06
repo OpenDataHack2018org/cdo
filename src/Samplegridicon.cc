@@ -512,7 +512,7 @@ void samplegrid(double missval, long nci, cellindex_type **cellindex, double *ar
       array2[i] = n ? sum/n : missval;  // mean
       double var1 = (n*n > n) ? (sumq*n - sum*sum) / (n*n - n) : missval;
       if ( var1 < 0 && var1 > -1.e-5 ) var1 = 0;
-      array3[i] = var_to_std(var1, missval); // std1
+      array3[i] = varToStd(var1, missval); // std1
       if ( lstat && n ) { nx++; x+=n; }
     }
   if ( cdoVerbose && lstat ) { lstat = false; cdoPrint("Mean number of childs %g", nx?x/nx:0); }

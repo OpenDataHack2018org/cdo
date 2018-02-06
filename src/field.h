@@ -22,7 +22,7 @@
 #include "compare.h"
 #include "array.h"
 
-double var_to_std(double rvar, double missval);
+double varToStd(double rvar, double missval);
 
 enum field_flag {
   FIELD_NONE  =  1,

@@ -311,7 +311,7 @@ void zonstd(field_type field1, field_type *field2)
 
   for ( size_t j = 0; j < ny; j++ )
     {
-      rstd = var_to_std(field2->ptr[j], missval);
+      rstd = varToStd(field2->ptr[j], missval);
 
       if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
 
@@ -335,7 +335,7 @@ void zonstd1(field_type field1, field_type *field2)
 
   for ( size_t j = 0; j < ny; j++ )
     {
-      rstd = var_to_std(field2->ptr[j], missval);
+      rstd = varToStd(field2->ptr[j], missval);
 
       if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
 

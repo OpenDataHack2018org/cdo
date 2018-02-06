@@ -340,7 +340,7 @@ void merstdw(field_type field1, field_type *field2)
 
   for ( size_t i = 0; i < nx; i++ )
     {
-      rstd = var_to_std(field2->ptr[i], missval);
+      rstd = varToStd(field2->ptr[i], missval);
 
       if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
 
@@ -364,7 +364,7 @@ void merstd1w(field_type field1, field_type *field2)
 
   for ( size_t i = 0; i < nx; i++ )
     {
-      rstd = var_to_std(field2->ptr[i], missval);
+      rstd = varToStd(field2->ptr[i], missval);
 
       if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
 
