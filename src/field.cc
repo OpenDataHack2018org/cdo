@@ -294,17 +294,11 @@ double fldmeanw(field_type field)
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; ++i )
-	if ( !DBL_IS_EQUAL(array[i], missval1) && !DBL_IS_EQUAL(w[i], missval1) )
-	  {
-	    rsum  += w[i] * array[i];
-	    rsumw += w[i];
-	  }
-      ravg = DIVMN(rsum, rsumw);
+      ravg = arrayWeightedMeanMV(len, array, w, missval1);
     }
   else
     {
-      int fpeRaised = array_mean_val_weighted(len, array, w, missval1, &ravg);
+      ravg = arrayWeightedMean(len, array, w, missval1);
     }
 
   return ravg;

@@ -177,21 +177,37 @@ double arrayMeanMV(size_t len, const double *restrict array, double missval)
 }
 
 
-int array_mean_val_weighted(size_t len, const double *restrict array, const double *restrict w, double missval, double *rmean)
+double arrayWeightedMean(size_t len, const double *restrict array, const double *restrict w, double missval)
 {
-  // int excepts = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW;
-  // feclearexcept(FE_ALL_EXCEPT); // expensive !!!!
+  assert(array!=NULL);
+  assert(w!=NULL);
 
-  double rsum = 0, rsumw = 0;
+  double sum = 0, sumw = 0;
 
   for ( size_t i = 0; i < len; ++i ) 
     {
-      rsum  += w[i] * array[i];
-      rsumw += w[i];
+      sum  += w[i] * array[i];
+      sumw += w[i];
     }
 
-  *rmean = DBL_IS_EQUAL(rsumw, 0.) ? missval : rsum/rsumw;
+  return IS_EQUAL(sumw, 0.) ? missval : sum/sumw;
+}
 
-  // return fetestexcept(excepts);
-  return 0;
+
+double arrayWeightedMeanMV(size_t len, const double *restrict array, const double *restrict w, double missval)
+{
+  assert(array!=NULL);
+  assert(w!=NULL);
+
+  double missval1 = missval, missval2 = missval;
+  double sum = 0, sumw = 0;
+
+  for ( size_t i = 0; i < len; ++i ) 
+    if ( !DBL_IS_EQUAL(array[i], missval1) && !DBL_IS_EQUAL(w[i], missval1) )
+      {
+        sum  += w[i] * array[i];
+        sumw += w[i];
+      }
+
+  return DIVMN(sum, sumw);
 }
