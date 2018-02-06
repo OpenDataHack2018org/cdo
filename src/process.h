@@ -114,11 +114,11 @@ public:
   cdoTimes getTimes(int p_processNums);
   void printProcessedValues();
   void printBenchmarks(cdoTimes p_times, char *p_memstring);
+  int checkStreamCnt();
 
 private:
   ProcessType();
   void defPrompt();
-  int checkStreamCnt();
 };
 
 #endif /* _PROCESS_H */
