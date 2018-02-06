@@ -94,7 +94,6 @@ double fldskew(field_type field);
 double fldkurt(field_type field);
 
 /* ENS VALIDATION */
-double fldcrps(field_type field);
 double fldbrs(field_type field);
 double fldrank(field_type field);
 double fldroc(field_type field);
