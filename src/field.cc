@@ -246,31 +246,15 @@ double fldmax(field_type field)
 
 double fldsum(field_type field)
 {
-  const size_t nmiss      = field.nmiss > 0;
-  const size_t len     = field.size;
-  const double missval = field.missval;
-  const double *restrict array = field.ptr;
   double rsum = 0;
 
-  assert(array!=NULL);
-
-  if ( nmiss )
+  if ( field.nmiss > 0 )
     {
-      size_t nvals = 0;
-
-      for ( size_t i = 0; i < len; i++ )
-	if ( !DBL_IS_EQUAL(array[i], missval) )
-	  {
-	    rsum += array[i];
-	    nvals++;
-	  }
-
-      if ( !nvals ) rsum = missval;
+      rsum = arraySumMV(field.size, field.ptr, field.missval);
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ )
-	rsum += array[i];
+      rsum = arraySum(field.size, field.ptr);
     }
 
   return rsum;

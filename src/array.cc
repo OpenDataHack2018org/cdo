@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <float.h>
 #include <fenv.h>
+#include <assert.h>
 
 #include "compare.h"
 
@@ -132,4 +133,49 @@ int array_add_array(size_t len, double *restrict array1, const double *restrict 
 
   // return fetestexcept(excepts);
   return 0;
+}
+
+
+double arraySum(size_t len, double *restrict array)
+{
+  assert(array!=NULL);
+
+  double sum = 0;
+
+  for ( size_t i = 0; i < len; ++i )
+    sum += array[i];
+
+  return sum;
+}
+
+
+double arraySumMV(size_t len, double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double sum = 0;
+  size_t nvals = 0;
+
+  if ( DBL_IS_NAN(missval) )
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( !DBL_IS_EQUAL(array[i], missval) )
+          {
+            sum += array[i];
+            nvals++;
+          }
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( IS_NOT_EQUAL(array[i], missval) )
+          {
+            sum += array[i];
+            nvals++;
+          }
+    }
+
+  if ( !nvals ) sum = missval;
+
+  return sum;
 }

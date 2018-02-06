@@ -14,8 +14,8 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef _ARRAY_H
-#define _ARRAY_H
+#ifndef  ARRAY_H
+#define  ARRAY_H
 
 const char *fpe_errstr(int fpeRaised);
 
@@ -27,5 +27,8 @@ int array_mean_val_weighted(size_t len, const double *restrict array, const doub
 
 int array_add_array(size_t len, double *restrict array1, const double *restrict array2);
 
-#endif // _ARRAY_H
+double arraySum(size_t len, double *restrict array);
+double arraySumMV(size_t len, double *restrict array, double missval);
+
+#endif //  ARRAY_H
 

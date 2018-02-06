@@ -181,41 +181,26 @@ void zonrange(field_type field1, field_type *field2)
 
 void zonsum(field_type field1, field_type *field2)
 {
-  long   nvals   = 0;
-  size_t rnmiss  = 0;
-  int    grid    = field1.grid;
-  size_t nmiss   = field1.nmiss;
+  int grid = field1.grid;
+  bool nmiss = field1.nmiss > 0;
+  size_t rnmiss = 0;
   double missval = field1.missval;
-  double *array  = field1.ptr;
+  double *array = field1.ptr;
   double rsum = 0;
 
   size_t nx = gridInqXsize(grid);
   size_t ny = gridInqYsize(grid);
 
-  for ( size_t j = 0; j < ny; j++ )
+  for ( size_t j = 0; j < ny; ++j )
     {
       if ( nmiss > 0 )
 	{
-	  nvals = 0;
-	  rsum = 0;
-	  for ( size_t i = 0; i < nx; i++ )
-	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
-	      {
-		rsum += array[j*nx+i];
-		nvals++;
-	      }
-
-	  if ( !nvals )
-	    {
-	      rsum = missval;
-	      rnmiss++;
-	    }
+          rsum = arraySumMV(nx, &array[j*nx], missval);
+	  if ( DBL_IS_EQUAL(rsum, missval) ) rnmiss++;
  	}
       else
 	{
-	  rsum = 0;
-	  for ( size_t i = 0; i < nx; i++ )
-	    rsum += array[j*nx+i];
+          rsum = arraySum(nx, &array[j*nx]);
 	}
 
       field2->ptr[j] = rsum;
