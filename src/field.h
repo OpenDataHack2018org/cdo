@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include "compare.h"
+#include "array.h"
 
 double var_to_std(double rvar, double missval);
 
