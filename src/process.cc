@@ -365,6 +365,10 @@ ProcessType::addFileInStream(std::string file)
 void
 ProcessType::addFileOutStream(std::string file)
 {
+  if(file[0] == '-')
+  {
+      ERROR("Missing output file. Found an operator instead of filename: ", file);
+  }
   outputStreams.push_back(create_pstream(file));
   m_streamCnt++;
 }
