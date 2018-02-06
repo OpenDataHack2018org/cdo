@@ -78,5 +78,8 @@ double arrayMeanMV(size_t len, const double *restrict array, double missval);
 double arrayWeightedMean(size_t len, const double *restrict array, const double *restrict w, double missval);
 double arrayWeightedMeanMV(size_t len, const double *restrict array, const double *restrict w, double missval);
 
+double arrayAvgMV(size_t len, const double *restrict array, double missval);
+double arrayWeightedAvgMV(size_t len, const double *restrict array, const double *restrict w, double missval);
+
 #endif //  ARRAY_H
 

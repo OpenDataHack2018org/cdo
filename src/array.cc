@@ -211,3 +211,39 @@ double arrayWeightedMeanMV(size_t len, const double *restrict array, const doubl
 
   return DIVMN(sum, sumw);
 }
+
+
+double arrayAvgMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double missval1 = missval, missval2 = missval;
+  double sum = 0, sumw = 0;
+
+  for ( size_t i = 0; i < len; ++i )
+    {
+      sum  = ADDMN(sum, array[i]);
+      sumw += 1;
+    }
+
+  return DIVMN(sum, sumw);
+}
+
+
+double arrayWeightedAvgMV(size_t len, const double *restrict array, const double *restrict w, double missval)
+{
+  assert(array!=NULL);
+  assert(w!=NULL);
+
+  double missval1 = missval, missval2 = missval;
+  double sum = 0, sumw = 0;
+
+  for ( size_t i = 0; i < len; ++i ) 
+    if ( !DBL_IS_EQUAL(w[i], missval) )
+      {
+        sum  = ADDMN(sum, MULMN(w[i], array[i]));
+        sumw = ADDMN(sumw, w[i]);
+      }
+
+  return DIVMN(sum, sumw);
+}

@@ -280,52 +280,28 @@ double fldmean(field_type field)
 
 double fldmeanw(field_type field)
 {
-  const size_t nmiss       = field.nmiss > 0;
-  const size_t len      = field.size;
-  const double missval1 = field.missval;
-  const double missval2 = field.missval;
-  const double *restrict array = field.ptr;
-  const double *restrict w     = field.weight;
-  double rsum = 0, rsumw = 0;
-  double ravg = 0;
+  double rmean = 0;
 
-  assert(array!=NULL);
-  assert(w!=NULL);
-
-  if ( nmiss )
+  if ( field.nmiss )
     {
-      ravg = arrayWeightedMeanMV(len, array, w, missval1);
+      rmean = arrayWeightedMeanMV(field.size, field.ptr, field.weight, field.missval);
     }
   else
     {
-      ravg = arrayWeightedMean(len, array, w, missval1);
+      rmean = arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
     }
 
-  return ravg;
+  return rmean;
 }
 
 
 double fldavg(field_type field)
 {
-  const size_t nmiss       = field.nmiss > 0;
-  const size_t len      = field.size;
-  const double missval1 = field.missval;
-  const double missval2 = field.missval;
-  const double *restrict array = field.ptr;
-  double rsum = 0, rsumw = 0;
   double ravg = 0;
 
-  assert(array!=NULL);
-
-  if ( nmiss )
+  if ( field.nmiss )
     {
-      for ( size_t i = 0; i < len; ++i )
-        {
-          rsum  = ADDMN(rsum, array[i]);
-          rsumw += 1;
-        }
-
-      ravg = DIVMN(rsum, rsumw);
+      ravg = arrayMeanMV(field.size, field.ptr, field.missval);
     }
   else
     {
@@ -338,36 +314,16 @@ double fldavg(field_type field)
 
 double fldavgw(field_type field)
 {
-  const size_t nmiss       = field.nmiss > 0;
-  const size_t len      = field.size;
-  const double missval1 = field.missval;
-  const double missval2 = field.missval;
-  const double *restrict array = field.ptr;
-  const double *restrict w     = field.weight;
-  double rsum = 0, rsumw = 0;
+  double ravg = 0;
 
-  assert(array!=NULL);
-  assert(w!=NULL);
-
-  if ( nmiss )
+  if ( field.nmiss )
     {
-      for ( size_t i = 0; i < len; i++ )
-	if ( !DBL_IS_EQUAL(w[i], missval1) )
-	  {
-	    rsum  = ADDMN(rsum, MULMN(w[i], array[i]));
-	    rsumw = ADDMN(rsumw, w[i]);
-	  }
+      ravg = arrayWeightedAvgMV(field.size, field.ptr, field.weight, field.missval);
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ )
-	{
-	  rsum  += w[i] * array[i];
-	  rsumw += w[i];
-	}
+      ravg = arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
     }
-
-  double ravg = DIVMN(rsum, rsumw);
 
   return ravg;
 }
