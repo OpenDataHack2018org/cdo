@@ -37,6 +37,7 @@
 #include "calendar.h"
 #include "pstream_int.h"
 #include "util_string.h"
+#include "datetime.h"
 
 
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)

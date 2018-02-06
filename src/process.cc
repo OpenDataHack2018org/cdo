@@ -184,10 +184,10 @@ ProcessType::checkStreamCnt(void)
       if (wantedStreamOutCnt < 1)
         cdoAbort("Output streams missing!");
     }
-  // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n", wantedStreamInCnt,wantedStreamOutCnt);
+   //printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n", wantedStreamInCnt,wantedStreamOutCnt);
 
   streamCnt = wantedStreamInCnt + wantedStreamOutCnt;
-  // printf(" streamCnt %d %d\n", m_streamCnt, streamCnt);
+   //printf(" streamCnt %d %d\n", m_streamCnt, streamCnt);
 
   if (m_streamCnt > streamCnt)
     cdoAbort("Too many streams!"
@@ -195,9 +195,10 @@ ProcessType::checkStreamCnt(void)
              wantedStreamInCnt,
              wantedStreamOutCnt);
 
-  if (m_streamCnt < streamCnt)
+  if (m_streamCnt < streamCnt && !obase)
     cdoAbort("Too few streams specified!"
-             " Operator needs %d input and %d output streams.",
+             " Operator %s needs %d input and %d output streams.",
+             m_operatorCommand,
              wantedStreamInCnt,
              wantedStreamOutCnt);
 

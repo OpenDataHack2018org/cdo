@@ -34,6 +34,7 @@
 
 #include "cdo_int.h"
 #include "pstream_int.h"
+#include "datetime.h"
 
 
 void *Runstat(void *process)

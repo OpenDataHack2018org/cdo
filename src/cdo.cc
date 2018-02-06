@@ -74,6 +74,7 @@
 #include "timer.h"
 #include "commandline.h"
 #include "text.h"
+#include "datetime.h"
 
 #ifdef  _OPENMP
 #  include <omp.h>

@@ -34,6 +34,7 @@
 #include "statistic.h"
 #include "pstream_int.h"
 #include "cdoOptions.h"
+#include "datetime.h"
 
 #ifdef  HAVE_LIBFFTW3 
 #include <fftw3.h>

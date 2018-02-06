@@ -29,6 +29,7 @@ extern "C" {
 
 #include "netcdf.h"
 #include "pmlist.h"
+#include "datetime.h"
 
 #define CMOR_UNDEFID (CMOR_MAX_AXES + 1)
 

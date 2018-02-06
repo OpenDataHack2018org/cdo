@@ -40,6 +40,7 @@ Constansts: M_PI, M_E
 #include "pstream_int.h"
 #include "grid.h"
 #include "expr.h"
+#include "datetime.h"
 
 
 void grid_cell_area(int gridID, double *array);

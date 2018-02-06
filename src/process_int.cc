@@ -320,6 +320,7 @@ createProcesses(int argc, const char **argv)
             {
               MESSAGE("Removing ", current_process->operatorName, " from stack");
             }
+          call_stack.top()->checkStreamCnt();
           call_stack.pop();
           current_process = call_stack.top();
         }
@@ -328,6 +329,11 @@ createProcesses(int argc, const char **argv)
     }
   while ((current_process != root_process || !root_process->hasAllInputs()) && idx < argc - cntOutFiles);
 
+  while(!call_stack.empty())
+  {
+          call_stack.top()->checkStreamCnt();
+          call_stack.pop();
+  }
   if (CdoDebug::PROCESS)
     {
       MESSAGE("== Process Creation End ==");
