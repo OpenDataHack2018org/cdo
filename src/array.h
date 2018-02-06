@@ -70,6 +70,13 @@ int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *
 
 int array_add_array(size_t len, double *restrict array1, const double *restrict array2);
 
+double arrayMin(size_t len, const double *restrict array);
+double arrayMax(size_t len, const double *restrict array);
+double arrayRange(size_t len, const double *restrict array);
+double arrayMinMV(size_t len, const double *restrict array, double missval);
+double arrayMaxMV(size_t len, const double *restrict array, double missval);
+double arrayRangeMV(size_t len, const double *restrict array, double missval);
+
 double arraySum(size_t len, const double *restrict array);
 double arraySumMV(size_t len, const double *restrict array, double missval);
 

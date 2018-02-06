@@ -105,6 +105,109 @@ int array_add_array(size_t len, double *restrict array1, const double *restrict 
 }
 
 
+double arrayMin(size_t len, const double *restrict array)
+{
+  assert(array!=NULL);
+
+  double min = array[0];
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( array[i] < min ) min = array[i];
+
+  return min;
+}
+
+
+double arrayMax(size_t len, const double *restrict array)
+{
+  assert(array!=NULL);
+
+  double max = array[0];
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( array[i] > max ) max = array[i];
+
+  return max;
+}
+
+
+double arrayRange(size_t len, const double *restrict array)
+{
+  assert(array!=NULL);
+
+  double min = array[0];
+  double max = array[0];
+
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( array[i] < min ) min = array[i];
+      if ( array[i] > max ) max = array[i];
+    }
+
+  double range = max - min;
+  
+  return range;
+}
+
+
+double arrayMinMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double min = DBL_MAX;
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( !DBL_IS_EQUAL(array[i], missval) )
+      if ( array[i] < min ) min = array[i];
+
+  if ( IS_EQUAL(min, DBL_MAX) ) min = missval;
+
+  return min;
+}
+
+
+double arrayMaxMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double max = -DBL_MAX;
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( !DBL_IS_EQUAL(array[i], missval) )
+      if ( array[i] > max ) max = array[i];
+
+  if ( IS_EQUAL(max, -DBL_MAX) ) max = missval;
+
+  return max;
+}
+
+
+double arrayRangeMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( !DBL_IS_EQUAL(array[i], missval) )
+        {
+          if ( array[i] < min ) min = array[i];
+          if ( array[i] > max ) max = array[i];
+        }
+    }
+
+  double range;
+  if ( IS_EQUAL(min, DBL_MAX) && IS_EQUAL(max, -DBL_MAX) )
+    range = missval;
+  else
+    range = max-min;
+  
+  return range;
+}
+
+
 double arraySum(size_t len, const double *restrict array)
 {
   assert(array!=NULL);

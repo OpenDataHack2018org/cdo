@@ -23,6 +23,7 @@
 
 void merfun(field_type field1, field_type *field2, int function)
 {
+  // clang-format off
   switch (function)
     {
     case func_min:   mermin(field1, field2);    break;
@@ -37,6 +38,7 @@ void merfun(field_type field1, field_type *field2, int function)
     case func_var1w: mervar1w(field1, field2);  break;
     default: cdoAbort("function %d not implemented!", function);
     }
+  // clang-format on
 }
 
 
