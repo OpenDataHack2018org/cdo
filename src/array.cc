@@ -17,8 +17,10 @@
 #include <stdio.h>
 #include <float.h>
 #include <fenv.h>
+#include <assert.h>
 
 #include "compare.h"
+#include "array.h"
 
 //#pragma STDC FENV_ACCESS ON
 
@@ -88,38 +90,6 @@ int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *
 }
 
 
-int array_mean_val(size_t len, const double *restrict array, double *rmean)
-{
-  double rsum = 0;
-
-  for ( size_t i = 0; i < len; ++i ) rsum += array[i];
-
-  *rmean = rsum/len;
-
-  return 0;
-}
-
-
-int array_mean_val_weighted(size_t len, const double *restrict array, const double *restrict w, double missval, double *rmean)
-{
-  // int excepts = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW;
-  // feclearexcept(FE_ALL_EXCEPT); // expensive !!!!
-
-  double rsum = 0, rsumw = 0;
-
-  for ( size_t i = 0; i < len; ++i ) 
-    {
-      rsum  += w[i] * array[i];
-      rsumw += w[i];
-    }
-
-  *rmean = DBL_IS_EQUAL(rsumw, 0.) ? missval : rsum/rsumw;
-
-  // return fetestexcept(excepts);
-  return 0;
-}
-
-
 int array_add_array(size_t len, double *restrict array1, const double *restrict array2)
 {
   // int excepts = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW;
@@ -129,7 +99,115 @@ int array_add_array(size_t len, double *restrict array1, const double *restrict 
   //#pragma omp parallel for default(none) shared(array1,array2)
   //#endif
   for ( size_t i = 0; i < len; ++i ) array1[i] += array2[i];
-
+  
   // return fetestexcept(excepts);
   return 0;
+}
+
+
+double arraySum(size_t len, const double *restrict array)
+{
+  assert(array!=NULL);
+
+  double sum = 0;
+
+  for ( size_t i = 0; i < len; ++i ) sum += array[i];
+
+  return sum;
+}
+
+
+double arraySumMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double sum = 0;
+  size_t nvals = 0;
+
+  if ( DBL_IS_NAN(missval) )
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( !DBL_IS_EQUAL(array[i], missval) )
+          {
+            sum += array[i];
+            nvals++;
+          }
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( IS_NOT_EQUAL(array[i], missval) )
+          {
+            sum += array[i];
+            nvals++;
+          }
+    }
+
+  if ( !nvals ) sum = missval;
+
+  return sum;
+}
+
+
+double arrayMean(size_t len, const double *restrict array)
+{
+  assert(array!=NULL);
+
+  double sum = arraySum(len, array);
+
+  return sum/len;
+}
+
+
+double arrayMeanMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double sum = 0, sumw = 0;
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( !DBL_IS_EQUAL(array[i], missval) )
+      {
+        sum  += array[i];
+        sumw += 1;
+      }
+
+  double missval1 = missval, missval2 = missval;
+  return DIVMN(sum, sumw);
+}
+
+
+double arrayWeightedMean(size_t len, const double *restrict array, const double *restrict w, double missval)
+{
+  assert(array!=NULL);
+  assert(w!=NULL);
+
+  double sum = 0, sumw = 0;
+
+  for ( size_t i = 0; i < len; ++i ) 
+    {
+      sum  += w[i] * array[i];
+      sumw += w[i];
+    }
+
+  return IS_EQUAL(sumw, 0.) ? missval : sum/sumw;
+}
+
+
+double arrayWeightedMeanMV(size_t len, const double *restrict array, const double *restrict w, double missval)
+{
+  assert(array!=NULL);
+  assert(w!=NULL);
+
+  double missval1 = missval, missval2 = missval;
+  double sum = 0, sumw = 0;
+
+  for ( size_t i = 0; i < len; ++i ) 
+    if ( !DBL_IS_EQUAL(array[i], missval1) && !DBL_IS_EQUAL(w[i], missval1) )
+      {
+        sum  += w[i] * array[i];
+        sumw += w[i];
+      }
+
+  return DIVMN(sum, sumw);
 }

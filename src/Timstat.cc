@@ -298,10 +298,10 @@ void *Timstat(void *argument)
 	      if ( nsets == 0 )
 		{
 		  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-		  pvars1->nmiss = (size_t)nmiss;
+		  pvars1->nmiss = nmiss;
                   if ( lrange )
                     {
-                      pvars2->nmiss = (size_t)nmiss;
+                      pvars2->nmiss = nmiss;
 		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
@@ -321,7 +321,7 @@ void *Timstat(void *argument)
                     pstreamReadRecordF(streamID1, field.ptrf, &nmiss);
                   else
                     pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = (size_t)nmiss;
+                  field.nmiss   = nmiss;
 		  field.size    = gridsize;
 		  field.grid    = pvars1->grid;
 		  field.missval = pvars1->missval;

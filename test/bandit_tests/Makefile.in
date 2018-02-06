@@ -79,7 +79,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = chained_operators$(EXEEXT) \
-	variable_inputs_operators$(EXEEXT)
+	variable_inputs_operators$(EXEEXT) wildcards$(EXEEXT)
 subdir = test/bandit_tests
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/config/mkinstalldirs \
@@ -114,6 +114,9 @@ am_variable_inputs_operators_OBJECTS =  \
 variable_inputs_operators_OBJECTS =  \
 	$(am_variable_inputs_operators_OBJECTS)
 variable_inputs_operators_DEPENDENCIES = $(tests_LDADD)
+am_wildcards_OBJECTS = wildcards-wildcards.$(OBJEXT)
+wildcards_OBJECTS = $(am_wildcards_OBJECTS)
+wildcards_DEPENDENCIES = $(tests_LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -149,9 +152,9 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(chained_operators_SOURCES) \
-	$(variable_inputs_operators_SOURCES)
+	$(variable_inputs_operators_SOURCES) $(wildcards_SOURCES)
 DIST_SOURCES = $(chained_operators_SOURCES) \
-	$(variable_inputs_operators_SOURCES)
+	$(variable_inputs_operators_SOURCES) $(wildcards_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -569,8 +572,11 @@ chained_operators_LDADD = $(tests_LDADD)
 variable_inputs_operators_SOURCES = variable_inputs_operators.cc
 variable_inputs_operators_CPPFLAGS = $(tests_CPPFLAGS)
 variable_inputs_operators_LDADD = $(tests_LDADD)
+wildcards_SOURCES = wildcards.cc
+wildcards_CPPFLAGS = $(tests_CPPFLAGS)
+wildcards_LDADD = $(tests_LDADD)
 LD_LIBRARY_PATH = $(tests_LDADD)
-TESTS = ./chained_operators ./variable_inputs_operators
+TESTS = ./chained_operators ./variable_inputs_operators ./wildcards
 all: all-am
 
 .SUFFIXES:
@@ -623,6 +629,10 @@ variable_inputs_operators$(EXEEXT): $(variable_inputs_operators_OBJECTS) $(varia
 	@rm -f variable_inputs_operators$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(variable_inputs_operators_OBJECTS) $(variable_inputs_operators_LDADD) $(LIBS)
 
+wildcards$(EXEEXT): $(wildcards_OBJECTS) $(wildcards_DEPENDENCIES) $(EXTRA_wildcards_DEPENDENCIES) 
+	@rm -f wildcards$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(wildcards_OBJECTS) $(wildcards_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -631,6 +641,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chained_operators-chained_operators.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variable_inputs_operators-variable_inputs_operators.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wildcards-wildcards.Po@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -683,6 +694,20 @@ variable_inputs_operators-variable_inputs_operators.obj: variable_inputs_operato
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='variable_inputs_operators.cc' object='variable_inputs_operators-variable_inputs_operators.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(variable_inputs_operators_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o variable_inputs_operators-variable_inputs_operators.obj `if test -f 'variable_inputs_operators.cc'; then $(CYGPATH_W) 'variable_inputs_operators.cc'; else $(CYGPATH_W) '$(srcdir)/variable_inputs_operators.cc'; fi`
+
+wildcards-wildcards.o: wildcards.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wildcards_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wildcards-wildcards.o -MD -MP -MF $(DEPDIR)/wildcards-wildcards.Tpo -c -o wildcards-wildcards.o `test -f 'wildcards.cc' || echo '$(srcdir)/'`wildcards.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wildcards-wildcards.Tpo $(DEPDIR)/wildcards-wildcards.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wildcards.cc' object='wildcards-wildcards.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wildcards_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wildcards-wildcards.o `test -f 'wildcards.cc' || echo '$(srcdir)/'`wildcards.cc
+
+wildcards-wildcards.obj: wildcards.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wildcards_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT wildcards-wildcards.obj -MD -MP -MF $(DEPDIR)/wildcards-wildcards.Tpo -c -o wildcards-wildcards.obj `if test -f 'wildcards.cc'; then $(CYGPATH_W) 'wildcards.cc'; else $(CYGPATH_W) '$(srcdir)/wildcards.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/wildcards-wildcards.Tpo $(DEPDIR)/wildcards-wildcards.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wildcards.cc' object='wildcards-wildcards.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(wildcards_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wildcards-wildcards.obj `if test -f 'wildcards.cc'; then $(CYGPATH_W) 'wildcards.cc'; else $(CYGPATH_W) '$(srcdir)/wildcards.cc'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -893,6 +918,13 @@ recheck: all
 ./variable_inputs_operators.log: ./variable_inputs_operators
 	@p='./variable_inputs_operators'; \
 	b='./variable_inputs_operators'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+./wildcards.log: ./wildcards
+	@p='./wildcards'; \
+	b='./wildcards'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

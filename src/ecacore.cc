@@ -223,7 +223,7 @@ void eca1(const ECA_REQUEST_1 *request)
                 }
 
               pstreamReadRecord(istreamID, field1.ptr, &nmiss);
-              field1.nmiss   = (size_t)nmiss;
+              field1.nmiss   = nmiss;
               field1.grid    = var12[levelID].grid;
               field1.missval = var12[levelID].missval;
               
@@ -609,12 +609,12 @@ void eca2(const ECA_REQUEST_2 *request)
                 }
 
               pstreamReadRecord(istreamID1, field1.ptr, &nmiss);
-              field1.nmiss   = (size_t)nmiss;
+              field1.nmiss   = nmiss;
               field1.grid    = gridID;
               field1.missval = missval1;
               
               pstreamReadRecord(istreamID2, field2.ptr, &nmiss);
-              field2.nmiss   = (size_t)nmiss;
+              field2.nmiss   = nmiss;
               field2.grid    = gridID;
               field2.missval = missval2;
 
@@ -928,12 +928,12 @@ void eca3(const ECA_REQUEST_3 *request)
                 }
 
               pstreamReadRecord(istreamID1, field1.ptr, &nmiss);
-              field1.nmiss   = (size_t)nmiss;
+              field1.nmiss   = nmiss;
               field1.grid    = var1[levelID].grid;
               field1.missval = var1[levelID].missval;
 
               pstreamReadRecord(istreamID2, field2.ptr, &nmiss);
-              field2.nmiss   = (size_t)nmiss;
+              field2.nmiss   = nmiss;
               field2.grid    = var1[levelID].grid;
               field2.missval = var1[levelID].missval;
 
@@ -1165,7 +1165,7 @@ void eca4(const ECA_REQUEST_4 *request)
     {
       pstreamInqRecord(istreamID2, &varID, &levelID);
       pstreamReadRecord(istreamID2, mask.ptr, &nmiss);
-      mask.nmiss   = (size_t)nmiss;
+      mask.nmiss   = nmiss;
       mask.grid    = gridID;
       mask.missval = vlistInqVarMissval(ivlistID2, 0);
 
@@ -1233,7 +1233,7 @@ void eca4(const ECA_REQUEST_4 *request)
                 }
 
               pstreamReadRecord(istreamID1, fieldGt.ptr, &nmiss);
-              fieldGt.nmiss   = (size_t)nmiss;
+              fieldGt.nmiss   = nmiss;
               memcpy(fieldLt.ptr, fieldGt.ptr, gridsize*sizeof(double));
               fieldLt.nmiss   = fieldGt.nmiss;
               fieldGt.grid    = startCount[levelID].grid;
