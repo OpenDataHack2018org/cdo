@@ -181,123 +181,84 @@ void zonrange(field_type field1, field_type *field2)
 
 void zonsum(field_type field1, field_type *field2)
 {
-  int grid = field1.grid;
-  bool nmiss = field1.nmiss > 0;
   size_t rnmiss = 0;
-  double missval = field1.missval;
-  double *array = field1.ptr;
   double rsum = 0;
 
-  size_t nx = gridInqXsize(grid);
-  size_t ny = gridInqYsize(grid);
+  size_t nx = gridInqXsize(field1.grid);
+  size_t ny = gridInqYsize(field1.grid);
 
   for ( size_t j = 0; j < ny; ++j )
     {
-      if ( nmiss )
+      if ( field1.nmiss )
 	{
-          rsum = arraySumMV(nx, &array[j*nx], missval);
-	  if ( DBL_IS_EQUAL(rsum, missval) ) rnmiss++;
+          rsum = arraySumMV(nx, &field1.ptr[j*nx], field1.missval);
+	  if ( DBL_IS_EQUAL(rsum, field1.missval) ) rnmiss++;
  	}
       else
 	{
-          rsum = arraySum(nx, &array[j*nx]);
+          rsum = arraySum(nx, &field1.ptr[j*nx]);
 	}
 
       field2->ptr[j] = rsum;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
 
 void zonmean(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid     = field1.grid;
-  size_t nmiss    = field1.nmiss;
-  double missval1 = field1.missval;
-  double missval2 = field1.missval;
-  double *array   = field1.ptr;
-  double rsum = 0, rsumw = 0, ravg = 0;
+  double rmean = 0;
 
-  size_t nx = gridInqXsize(grid);
-  size_t ny = gridInqYsize(grid);
+  size_t nx = gridInqXsize(field1.grid);
+  size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t j = 0; j < ny; j++ )
+  for ( size_t j = 0; j < ny; ++j )
     {
-      rsum  = 0;
-      rsumw = 0;
-      if ( nmiss > 0 )
+      if ( field1.nmiss )
 	{
-	  for ( size_t i = 0; i < nx; i++ )
-	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval1) )
-	      {
-		rsum  += array[j*nx+i];
-		rsumw += 1;
-	      }
+          rmean = arrayMeanMV(nx, &field1.ptr[j*nx], field1.missval);
 	}
       else
 	{
-	  for ( size_t i = 0; i < nx; i++ )
-	    {
-	      rsum  += array[j*nx+i];
-	      rsumw += 1;
-	    }
+          rmean = arrayMean(nx, &field1.ptr[j*nx]);
 	}
 
-      ravg = DIVMN(rsum, rsumw);
+      if ( DBL_IS_EQUAL(rmean, field1.missval) ) rnmiss++;
 
-      if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
-
-      field2->ptr[j] = ravg;
+      field2->ptr[j] = rmean;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
 
 void zonavg(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid     = field1.grid;
-  size_t nmiss    = field1.nmiss;
-  double missval1 = field1.missval;
-  double missval2 = field1.missval;
-  double *array   = field1.ptr;
-  double rsum = 0, rsumw = 0, ravg = 0;
+  double ravg = 0;
 
-  size_t nx = gridInqXsize(grid);
-  size_t ny = gridInqYsize(grid);
+  size_t nx = gridInqXsize(field1.grid);
+  size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t j = 0; j < ny; j++ )
+  for ( size_t j = 0; j < ny; ++j )
     {
-      rsum  = 0;
-      rsumw = 0;
-      if ( nmiss > 0 )
+      if ( field1.nmiss > 0 )
 	{
-	  for ( size_t i = 0; i < nx; i++ )
-	    {
-	      rsum   = ADDMN(rsum, array[j*nx+i]);
-	      rsumw += 1;
-	    }
+          ravg = arrayAvgMV(nx, &field1.ptr[j*nx], field1.missval);
 	}
       else
 	{
-	  for ( size_t i = 0; i < nx; i++ )
-	    {
-	      rsum  += array[j*nx+i];
-	      rsumw += 1;
-	    }
+          ravg = arrayMean(nx, &field1.ptr[j*nx]);
 	}
 
-      ravg = DIVMN(rsum, rsumw);
-
-      if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
+      if ( DBL_IS_EQUAL(ravg, field1.missval) ) rnmiss++;
 
       field2->ptr[j] = ravg;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
 static
