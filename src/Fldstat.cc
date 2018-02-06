@@ -81,18 +81,9 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
     }
 }
 
-
-void *Fldstat(void *process)
+static
+void fldstatAddOperators(void)
 {
-  int gridID2, lastgrid = -1;
-  int index;
-  int nrecs;
-  int varID, levelID;
-  size_t nmiss;
-  double sglval;
-
-  cdoInitialize(process);
-
   // clang-format off
   cdoOperatorAdd("fldrange", func_range,  0, NULL);
   cdoOperatorAdd("fldmin",   func_min,    0, NULL);
@@ -106,6 +97,19 @@ void *Fldstat(void *process)
   cdoOperatorAdd("fldvar1",  func_var1w,  1, NULL);
   cdoOperatorAdd("fldpctl",  func_pctl,   0, NULL);
   // clang-format on
+}
+
+
+void *Fldstat(void *process)
+{
+  int lastgrid = -1;
+  int nrecs;
+  int varID, levelID;
+  size_t nmiss;
+
+  cdoInitialize(process);
+
+  fldstatAddOperators();
 
   int operatorID  = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -148,7 +152,7 @@ void *Fldstat(void *process)
 
   double slon = 0;
   double slat = 0;
-  gridID2 = gridCreate(GRID_LONLAT, 1);
+  int gridID2 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
   gridDefXvals(gridID2, &slon);
@@ -156,7 +160,7 @@ void *Fldstat(void *process)
 
   int ngrids = vlistNgrids(vlistID1);
 
-  for ( index = 0; index < ngrids; index++ )
+  for ( int index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -201,7 +205,7 @@ void *Fldstat(void *process)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
 
-          field.nmiss   = (size_t)nmiss;
+          field.nmiss = nmiss;
           field.grid = vlistInqVarGrid(vlistID1, varID);
 	  field.size = gridInqSize(field.grid);
 
@@ -223,18 +227,12 @@ void *Fldstat(void *process)
 
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( operfunc == func_pctl )
-	    sglval = fldpctl(field, pn);
-	  else  
-	    sglval = fldfun(field, operfunc);
+          double sglval = (operfunc == func_pctl) ? fldpctl(field, pn) : fldfun(field, operfunc);
 
 	  if ( cdoVerbose && (operfunc == func_min || operfunc == func_max) )
 	    print_location_LL(operfunc, vlistID1, varID, levelID, field.grid, sglval, field.ptr, vdate, vtime);
 
-	  if ( DBL_IS_EQUAL(sglval, field.missval) )
-	    nmiss = 1;
-	  else
-	    nmiss = 0;
+          nmiss = DBL_IS_EQUAL(sglval, field.missval);
 
 	  pstreamDefRecord(streamID2, varID,  levelID);
 	  pstreamWriteRecord(streamID2, &sglval, nmiss);

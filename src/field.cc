@@ -248,7 +248,7 @@ double fldsum(field_type field)
 {
   double rsum = 0;
 
-  if ( field.nmiss > 0 )
+  if ( field.nmiss )
     {
       rsum = arraySumMV(field.size, field.ptr, field.missval);
     }
@@ -263,32 +263,18 @@ double fldsum(field_type field)
 
 double fldmean(field_type field)
 {
-  const size_t nmiss       = field.nmiss > 0;
-  const size_t len      = field.size;
-  const double missval1 = field.missval;
-  const double missval2 = field.missval;
-  const double *restrict array = field.ptr;
-  double rsum = 0, rsumw = 0;
-  double ravg = 0;
+  double rmean = 0;
 
-  assert(array!=NULL);
-
-  if ( nmiss )
+  if ( field.nmiss )
     {
-      for ( size_t i = 0; i < len; ++i )
-	if ( !DBL_IS_EQUAL(array[i], missval1) )
-	  {
-	    rsum  += array[i];
-	    rsumw += 1;
-	  }
-      ravg = DIVMN(rsum, rsumw);
+      rmean = arrayMeanMV(field.size, field.ptr, field.missval);
     }
   else
     {
-      int fpeRaised = array_mean_val(len, array, &ravg);
+      rmean = arrayMean(field.size, field.ptr);
     }
 
-  return ravg;
+  return rmean;
 }
 
 
@@ -349,7 +335,7 @@ double fldavg(field_type field)
     }
   else
     {
-      int fpeRaised = array_mean_val(len, array, &ravg);
+      ravg = arrayMean(field.size, field.ptr);
     }
 
   return ravg;

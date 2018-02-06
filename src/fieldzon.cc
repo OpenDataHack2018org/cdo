@@ -193,7 +193,7 @@ void zonsum(field_type field1, field_type *field2)
 
   for ( size_t j = 0; j < ny; ++j )
     {
-      if ( nmiss > 0 )
+      if ( nmiss )
 	{
           rsum = arraySumMV(nx, &array[j*nx], missval);
 	  if ( DBL_IS_EQUAL(rsum, missval) ) rnmiss++;
