@@ -181,26 +181,22 @@ void merrange(field_type field1, field_type *field2)
 
 void mersum(field_type field1, field_type *field2)
 {
-  int grid = field1.grid;
-  bool nmiss = field1.nmiss > 0;
   size_t rnmiss = 0;
-  double missval = field1.missval;
-  double *array = field1.ptr;
   double rsum = 0;
 
-  size_t nx = gridInqXsize(grid);
-  size_t ny = gridInqYsize(grid);
+  size_t nx = gridInqXsize(field1.grid);
+  size_t ny = gridInqYsize(field1.grid);
 
   std::vector<double> v(ny);
 
   for ( size_t i = 0; i < nx; ++i )
     {
-      for ( size_t j = 0; j < ny; j++ ) v[j] = array[j*nx+i];
+      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
 
-      if ( nmiss > 0 )
+      if ( field1.nmiss > 0 )
 	{
-          rsum = arraySumMV(ny, &v[0], missval);
-	  if ( DBL_IS_EQUAL(rsum, missval) ) rnmiss++;
+          rsum = arraySumMV(ny, &v[0], field1.missval);
+	  if ( DBL_IS_EQUAL(rsum, field1.missval) ) rnmiss++;
 	}
       else
 	{
@@ -217,45 +213,31 @@ void mersum(field_type field1, field_type *field2)
 void mermeanw(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
-  size_t nmiss   = field1.nmiss;
-  double missval1 = field1.missval;
-  double missval2 = field1.missval;
-  double *array  = field1.ptr;
-  double *w      = field1.weight;
-  double rsum = 0, rsumw = 0, ravg = 0;
+  double rmean = 0;
 
-  size_t nx = gridInqXsize(grid);
-  size_t ny = gridInqYsize(grid);
+  size_t nx = gridInqXsize(field1.grid);
+  size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t i = 0; i < nx; i++ )
+  std::vector<double> v(ny);
+  std::vector<double> w(ny);
+
+  for ( size_t i = 0; i < nx; ++i )
     {
-      rsum  = 0;
-      rsumw = 0;
-      if ( nmiss > 0 )
+      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
+      for ( size_t j = 0; j < ny; j++ ) w[j] = field1.weight[j*nx+i];
+
+      if ( field1.nmiss )
 	{
-	  for ( size_t j = 0; j < ny; j++ )
-	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval1) &&
-		 !DBL_IS_EQUAL(w[j*nx+i], missval1) )
-	      {
-		rsum  += w[j*nx+i] * array[j*nx+i];
-		rsumw += w[j*nx+i];
-	      }
+          rmean = arrayWeightedMeanMV(ny, &v[0], &w[0], field1.missval);
 	}
       else
 	{
-	  for ( size_t j = 0; j < ny; j++ )
-	    {
-	      rsum  += w[j*nx+i] * array[j*nx+i];
-	      rsumw += w[j*nx+i];
-	    }
+          rmean = arrayWeightedMean(ny, &v[0], &w[0], field1.missval);
 	}
 
-      ravg = DIVMN(rsum, rsumw);
+      if ( DBL_IS_EQUAL(rmean, field1.missval) ) rnmiss++;
 
-      if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
-
-      field2->ptr[i] = ravg;
+      field2->ptr[i] = rmean;
     }
 
   field2->nmiss  = rnmiss;
@@ -265,42 +247,29 @@ void mermeanw(field_type field1, field_type *field2)
 void meravgw(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid     = field1.grid;
-  size_t nmiss    = field1.nmiss;
-  double missval1 = field1.missval;
-  double missval2 = field1.missval;
-  double *array   = field1.ptr;
-  double *w       = field1.weight;
-  double rsum = 0, rsumw = 0, ravg = 0;
+  double ravg = 0;
 
-  size_t nx = gridInqXsize(grid);
-  size_t ny = gridInqYsize(grid);
+  size_t nx = gridInqXsize(field1.grid);
+  size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t i = 0; i < nx; i++ )
+  std::vector<double> v(ny);
+  std::vector<double> w(ny);
+
+  for ( size_t i = 0; i < nx; ++i )
     {
-      rsum  = 0;
-      rsumw = 0;
-      if ( nmiss > 0 )
+      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
+      for ( size_t j = 0; j < ny; j++ ) w[j] = field1.weight[j*nx+i];
+
+      if ( field1.nmiss )
 	{
-	  for ( size_t j = 0; j < ny; j++ )
-	    if ( !DBL_IS_EQUAL(w[j*nx+i], missval1) )
-	      {
-		rsum  = ADDMN(rsum, MULMN(w[j*nx+i], array[j*nx+i]));
-		rsumw += w[j*nx+i];
-	      }
+          ravg = arrayWeightedAvgMV(ny, &v[0], &w[0], field1.missval);
 	}
       else
 	{
-	  for ( size_t j = 0; j < ny; j++ )
-	    {
-	      rsum  += w[j*nx+i] * array[j*nx+i];
-	      rsumw += w[j*nx+i];
-	    }
+          ravg = arrayWeightedMean(ny, &v[0], &w[0], field1.missval);
 	}
 
-      ravg = DIVMN(rsum, rsumw);
-
-      if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
+      if ( DBL_IS_EQUAL(ravg, field1.missval) ) rnmiss++;
 
       field2->ptr[i] = ravg;
     }
