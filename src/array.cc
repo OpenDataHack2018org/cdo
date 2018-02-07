@@ -59,6 +59,32 @@ void arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax,
 }
 
 
+size_t arrayMinMaxSumMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rsum)
+{
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+  double sum = 0;
+
+  size_t nvals = 0;
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( !DBL_IS_EQUAL(array[i], missval) )
+        {
+          if ( array[i] < min ) min = array[i];
+          if ( array[i] > max ) max = array[i];
+          sum += array[i];
+          nvals++;
+        }
+    }
+    
+  if ( rmin ) *rmin = min;
+  if ( rmax ) *rmax = max;
+  if ( rsum ) *rsum = sum;
+
+  return nvals;
+}
+
+
 void arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax, double *rmean)
 {
   double sum;

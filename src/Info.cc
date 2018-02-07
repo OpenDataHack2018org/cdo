@@ -405,17 +405,7 @@ void *Info(void *process)
 
                   if ( infostatp->nmiss > 0 )
                     {
-                      size_t nvals   = 0;
-                      for ( size_t i = 0; i < gridsize; ++i )
-                        {
-                          if ( !DBL_IS_EQUAL(array[i], missval) )
-                            {
-                              if ( array[i] < infostatp->min ) infostatp->min = array[i];
-                              if ( array[i] > infostatp->max ) infostatp->max = array[i];
-                              infostatp->sum += array[i];
-                              nvals++;
-                            }
-                        }
+                      size_t nvals = arrayMinMaxSumMV(gridsize, array, missval, &infostatp->min, &infostatp->max, &infostatp->sum);
                       imiss = gridsize - nvals;
                       infostatp->nvals += nvals;
                     }
