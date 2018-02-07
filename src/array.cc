@@ -38,11 +38,11 @@ const char *fpe_errstr(int fpeRaised)
 }
 
 
-int array_minmaxsum_val(size_t len, const double *array, double *rmin, double *rmax, double *rsum)
+void arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax, double *rsum)
 {
-  double min = *rmin;
-  double max = *rmax;
-  double sum = *rsum;
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+  double sum = 0;
 
   // #pragma omp parallel for default(none) shared(min, max, array, gridsize) reduction(+:mean)
   // #pragma omp simd reduction(+:mean) reduction(min:min) reduction(max:max) aligned(array:16)
@@ -56,37 +56,20 @@ int array_minmaxsum_val(size_t len, const double *array, double *rmin, double *r
   if ( rmin ) *rmin = min;
   if ( rmax ) *rmax = max;
   if ( rsum ) *rsum = sum;
-
-  return 0;
 }
 
 
-int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *rmax, double *rmean)
+void arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax, double *rmean)
 {
-  // int excepts = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW;
-  // feclearexcept(FE_ALL_EXCEPT); // expensive !!!!
+  double sum;
+  arrayMinMaxSum(len, array, rmin, rmax, &sum);
 
-  double min =  DBL_MAX;
-  double max = -DBL_MAX;
-  double mean = 0;
-
-  // #pragma omp parallel for default(none) shared(min, max, array, gridsize) reduction(+:mean)
-  // #pragma omp simd reduction(+:mean) reduction(min:min) reduction(max:max) aligned(array:16)
-  for ( size_t i = 0; i < len; ++i )
+  if ( rmean )
     {
-      if ( array[i] < min ) min = array[i];
-      if ( array[i] > max ) max = array[i];
-      mean += array[i];
+      double mean = 0;
+      if ( len ) mean = sum/(double)len;
+      *rmean = mean;
     }
-
-  if ( len ) mean /= (double)len;
-    
-  if ( rmin ) *rmin = min;
-  if ( rmax ) *rmax = max;
-  if ( rmean ) *rmean = mean;
-
-  // return fetestexcept(excepts);
-  return 0;
 }
 
 

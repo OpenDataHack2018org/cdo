@@ -429,7 +429,7 @@ void *Info(void *process)
                     }
                   else
                     {
-                      array_minmaxsum_val(gridsize, array, &infostatp->min, &infostatp->max, &infostatp->sum);
+                      arrayMinMaxSum(gridsize, array, &infostatp->min, &infostatp->max, &infostatp->sum);
                       infostatp->nvals += gridsize;
                     }
 

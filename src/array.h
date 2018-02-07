@@ -65,8 +65,8 @@ double FSQRTMN(double x, double missval1) { return MSQRTMN(x);}
 
 const char *fpe_errstr(int fpeRaised);
 
-int array_minmaxsum_val(size_t len, const double *array, double *rmin, double *rmax, double *rsum);
-int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *rmax, double *rmean);
+void arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax, double *rsum);
+void arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax, double *rmean);
 
 void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2);
 
