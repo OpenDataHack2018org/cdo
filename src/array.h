@@ -72,6 +72,8 @@ size_t arrayMinMaxSumMV(size_t len, const double *array, double missval, double 
 void arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax, double *rmean);
 size_t arrayMinMaxMeanMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rmean);
 
+void arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin, double *rmax);
+
 void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2);
 
 void arrayCopy(size_t len, const double *restrict array1, double *restrict array2);

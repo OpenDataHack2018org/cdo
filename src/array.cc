@@ -149,6 +149,36 @@ size_t arrayMinMaxMeanMV(size_t len, const double *array, double missval, double
 }
 
 
+void arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin, double *rmax)
+{
+  double xmin =  DBL_MAX;
+  double xmax = -DBL_MAX;
+
+  if ( mask )
+    {
+      for ( size_t i = 0; i < len; ++i )
+	{
+	  if ( ! mask[i] )
+	    {
+	      if      ( array[i] > xmax ) xmax = array[i];
+	      else if ( array[i] < xmin ) xmin = array[i];
+	    }
+	}
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i )
+	{
+	  if      ( array[i] > xmax ) xmax = array[i];
+	  else if ( array[i] < xmin ) xmin = array[i];
+	}
+    }
+
+  if ( rmin ) *rmin = xmin;
+  if ( rmax ) *rmax = xmax;
+}
+
+
 void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2)
 {
   //#ifdef  _OPENMP

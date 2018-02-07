@@ -131,8 +131,6 @@ int  cdf_openread(const char *filename);
 
 void printFiletype(int streamID, int vlistID);
 
-void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval);
-
 off_t fileSize(const char *restrict filename);
 
 const char *parameter2word(const char *string);

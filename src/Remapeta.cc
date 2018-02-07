@@ -334,7 +334,7 @@ Remapeta(void *process)
         }
 
       /* check range of surface_geopotential */
-      minmaxval(nfis2gp, fis2, imiss, &minval, &maxval);
+      arrayMinMaxMask(nfis2gp, fis2, imiss, &minval, &maxval);
       if (minval < MIN_FIS || maxval > MAX_FIS)
         cdoWarning("%s out of range (min=%g max=%g)!", var_stdname(surface_geopotential), minval, maxval);
 
@@ -638,12 +638,12 @@ Remapeta(void *process)
       if (zaxisIDh != -1)
         {
           /* check range of ps_prog */
-          minmaxval(gridsize, ps1, imiss, &minval, &maxval);
+          arrayMinMaxMask(gridsize, ps1, imiss, &minval, &maxval);
           if (minval < MIN_PS || maxval > MAX_PS)
             cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           /* check range of geop */
-          minmaxval(gridsize, fis1, imiss, &minval, &maxval);
+          arrayMinMaxMask(gridsize, fis1, imiss, &minval, &maxval);
           if (minval < MIN_FIS || maxval > MAX_FIS)
             cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
         }
@@ -661,7 +661,7 @@ Remapeta(void *process)
               int offset = gridsize * levelID;
               single2 = t1 + offset;
 
-              minmaxval(gridsize, single2, imiss, &minval, &maxval);
+              arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_T || maxval > MAX_T)
                 cdoWarning("Input temperature at level %d out of range (min=%g max=%g)!", levelID + 1, minval, maxval);
             }
@@ -675,7 +675,7 @@ Remapeta(void *process)
 
               corr_hum(gridsize, single2, MIN_Q);
 
-              minmaxval(gridsize, single2, imiss, &minval, &maxval);
+              arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_Q || maxval > MAX_Q)
                 cdoWarning("Input humidity at level %d out of range (min=%g max=%g)!", levelID + 1, minval, maxval);
             }
@@ -746,7 +746,7 @@ Remapeta(void *process)
               int offset = gridsize * levelID;
               single2 = t2 + offset;
 
-              minmaxval(gridsize, single2, imiss, &minval, &maxval);
+              arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_T || maxval > MAX_T)
                 cdoWarning("Output temperature at level %d out of range (min=%g max=%g)!", levelID + 1, minval, maxval);
 
@@ -768,7 +768,7 @@ Remapeta(void *process)
                 for (size_t i = 0; i < gridsize; ++i)
                   single2[i] = cconst;
 
-              minmaxval(gridsize, single2, imiss, &minval, &maxval);
+              arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_Q || maxval > MAX_Q)
                 cdoWarning("Output humidity at level %d out of range (min=%g max=%g)!", levelID + 1, minval, maxval);
 
