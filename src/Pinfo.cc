@@ -37,7 +37,7 @@ void *Pinfo(void *process)
   char varname[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
   double level;
-  double arrmin, arrmax, arrmean, arrvar;
+  double arrmin, arrmax, arrmean;
 
   cdoInitialize(process);
 
@@ -123,44 +123,17 @@ void *Pinfo(void *process)
 	    {
 	      if ( nmiss > 0 )
 		{
-		  ivals = 0;
-		  arrmean = 0;
-		  arrvar  = 0;
-		  arrmin  =  1.e300;
-		  arrmax  = -1.e300;
-		  for ( size_t i = 0; i < gridsize; i++ )
-		    {
-		      if ( !DBL_IS_EQUAL(array1[i], missval) )
-			{
-			  if ( array1[i] < arrmin ) arrmin = array1[i];
-			  if ( array1[i] > arrmax ) arrmax = array1[i];
-			  arrmean += array1[i];
-			  arrvar  += array1[i]*array1[i];
-			  ivals++;
-			}
-		    }
+                  ivals = arrayMinMaxMeanMV(gridsize, array1, missval, &arrmin, &arrmax, &arrmean);
 		  imiss = gridsize - ivals;
 		  gridsize = ivals;
 		}
 	      else
 		{
-		  arrmean = array1[0];
-		  arrvar  = array1[0];
-		  arrmin  = array1[0];
-		  arrmax  = array1[0];
-		  for ( size_t i = 1; i < gridsize; i++ )
-		    {
-		      if ( array1[i] < arrmin ) arrmin = array1[i];
-		      if ( array1[i] > arrmax ) arrmax = array1[i];
-		      arrmean += array1[i];
-		      arrvar  += array1[i]*array1[i];
-		    }
+                  arrayMinMaxMean(gridsize, array1, &arrmin, &arrmax, &arrmean);
 		}
 
 	      if ( gridsize )
 		{
-		  arrmean = arrmean/gridsize;
-		  arrvar  = arrvar/gridsize - arrmean*arrmean;
 		  fprintf(stdout, "%#12.5g%#12.5g%#12.5g\n", arrmin, arrmean, arrmax);
 		}
 	      else
@@ -172,7 +145,7 @@ void *Pinfo(void *process)
 		fprintf(stdout, "Found %zu of %zu missing values!\n", imiss, nmiss);
 	    }
 
-	  for ( size_t i = 0; i < gridsize; i++ ) array2[i] = array1[i];
+          arrayCopy(gridsize, array1, array2);
 
 	  pstreamDefRecord(streamID2,  varID,  levelID);
 	  pstreamWriteRecord(streamID2, array2, nmiss);

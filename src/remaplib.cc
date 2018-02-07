@@ -72,6 +72,7 @@
 
 #include "cdo_int.h"
 #include "grid.h"
+#include "array.h"
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
 #include "cdoOptions.h"
@@ -1257,46 +1258,19 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
     cdoPrint("First order mapping from grid1 to grid2:");
   cdoPrint("----------------------------------------");
 
-  size_t ns = 0;
-  double sum = 0;
-  double minval =  DBL_MAX;
-  double maxval = -DBL_MAX;
-  for ( size_t n = 0; n < src_grid.size; ++n )
-    {
-      if ( !DBL_IS_EQUAL(array1[n], missval) )
-	{
-	  if ( array1[n] < minval ) minval = array1[n];
-	  if ( array1[n] > maxval ) maxval = array1[n];
-	  sum += array1[n];
-	  ns++;
-	}
-    }
-  if ( ns > 0 ) sum /= ns;
-  cdoPrint("Grid1 min,mean,max: %g %g %g", minval, sum, maxval);
+  double mean, minval, maxval;
+  arrayMinMaxMeanMV(src_grid.size, array1, missval, &minval, &maxval, &mean);
+  cdoPrint("Grid1 min,mean,max: %g %g %g", minval, mean, maxval);
 
-  ns = 0;
-  sum = 0;
-  minval =  DBL_MAX;
-  maxval = -DBL_MAX;
-  for ( size_t n = 0; n < tgt_grid.size; ++n )
-    {
-      if ( !DBL_IS_EQUAL(array2[n], missval) )
-	{
-	  if ( array2[n] < minval ) minval = array2[n];
-	  if ( array2[n] > maxval ) maxval = array2[n];
-	  sum += array2[n];
-	  ns++;
-	}
-    }
-  if ( ns > 0 ) sum /= ns;
-  cdoPrint("Grid2 min,mean,max: %g %g %g", minval, sum, maxval);
+  arrayMinMaxMeanMV(tgt_grid.size, array2, missval, &minval, &maxval, &mean);
+  cdoPrint("Grid2 min,mean,max: %g %g %g", minval, mean, maxval);
 
   /* Conservation Test */
 
   if ( src_grid.cell_area )
     {
       cdoPrint("Conservation:");
-      sum = 0;
+      double sum = 0;
       for ( size_t n = 0; n < src_grid.size; ++n )
 	if ( !DBL_IS_EQUAL(array1[n], missval) )
 	  sum += array1[n]*src_grid.cell_area[n]*src_grid.cell_frac[n];

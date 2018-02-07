@@ -38,6 +38,47 @@ const char *fpe_errstr(int fpeRaised)
 }
 
 
+void arrayMinMax(size_t len, const double *array, double *rmin, double *rmax)
+{
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+
+  // #pragma omp parallel for default(none) shared(min, max, array, gridsize) reduction(+:mean)
+  // #pragma omp simd reduction(+:mean) reduction(min:min) reduction(max:max) aligned(array:16)
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( array[i] < min ) min = array[i];
+      if ( array[i] > max ) max = array[i];
+    }
+    
+  if ( rmin ) *rmin = min;
+  if ( rmax ) *rmax = max;
+}
+
+
+size_t arrayMinMaxMV(size_t len, const double *array, double missval, double *rmin, double *rmax)
+{
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+
+  size_t nvals = 0;
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( !DBL_IS_EQUAL(array[i], missval) )
+        {
+          if ( array[i] < min ) min = array[i];
+          if ( array[i] > max ) max = array[i];
+          nvals++;
+        }
+    }
+    
+  if ( rmin ) *rmin = min;
+  if ( rmax ) *rmax = max;
+
+  return nvals;
+}
+
+
 void arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax, double *rsum)
 {
   double min =  DBL_MAX;
@@ -76,7 +117,10 @@ size_t arrayMinMaxSumMV(size_t len, const double *array, double missval, double 
           nvals++;
         }
     }
-    
+
+  if ( nvals == 0 ) min = missval;
+  if ( nvals == 0 ) max = missval;
+
   if ( rmin ) *rmin = min;
   if ( rmax ) *rmax = max;
   if ( rsum ) *rsum = sum;
@@ -90,12 +134,18 @@ void arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax
   double sum;
   arrayMinMaxSum(len, array, rmin, rmax, &sum);
 
-  if ( rmean )
-    {
-      double mean = 0;
-      if ( len ) mean = sum/(double)len;
-      *rmean = mean;
-    }
+  if ( rmean ) *rmean = len ? sum/(double)len : 0;
+}
+
+
+size_t arrayMinMaxMeanMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rmean)
+{
+  double sum;
+  size_t nvals = arrayMinMaxSumMV(len, array, missval, rmin, rmax, &sum);
+
+  if ( rmean ) *rmean = nvals ? sum/(double)nvals : missval;
+
+  return nvals;
 }
 
 

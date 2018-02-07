@@ -395,11 +395,7 @@ void *Output(void *process)
 		  maxval = array[0];
 		  if ( gridInqType(gridID) == GRID_SPECTRAL && gridsize <= 156 )
 		    {
-		      for ( size_t i = 1; i < gridsize; i++ )
-			{
-			  if ( array[i] < minval ) minval = array[i];
-			  if ( array[i] > maxval ) maxval = array[i];
-			}
+                      arrayMinMax(gridsize, array, &minval, &maxval);
 		    }
 
 		  if ( gridInqType(gridID) == GRID_SPECTRAL && gridsize <= 156 /* T11 */ &&

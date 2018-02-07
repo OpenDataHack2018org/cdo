@@ -86,17 +86,10 @@ void *Gengrid(void *process)
   else
     gridDefDatatype(gridID3, CDI_DATATYPE_FLT32);
 
-  double xminval = array1[0];
-  double xmaxval = array1[0];
-  double yminval = array2[0];
-  double ymaxval = array2[0];
-  for ( size_t i = 1; i < gridsize; ++i )
-    {
-      if ( array1[i] < xminval ) xminval = array1[i];
-      if ( array1[i] > xmaxval ) xmaxval = array1[i];
-      if ( array2[i] < yminval ) yminval = array2[i];
-      if ( array2[i] > ymaxval ) ymaxval = array2[i];
-    }
+  double xminval, xmaxval;
+  double yminval, ymaxval;
+  arrayMinMax(gridsize, array1, &xminval, &xmaxval);
+  arrayMinMax(gridsize, array2, &yminval, &ymaxval);
 
   if ( cdoVerbose )
     cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g",
