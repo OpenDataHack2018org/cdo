@@ -90,18 +90,12 @@ int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *
 }
 
 
-int array_add_array(size_t len, double *restrict array1, const double *restrict array2)
+void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2)
 {
-  // int excepts = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW;
-  // feclearexcept(FE_ALL_EXCEPT); // expensive !!!!
-
   //#ifdef  _OPENMP
   //#pragma omp parallel for default(none) shared(array1,array2)
   //#endif
   for ( size_t i = 0; i < len; ++i ) array1[i] += array2[i];
-  
-  // return fetestexcept(excepts);
-  return 0;
 }
 
 

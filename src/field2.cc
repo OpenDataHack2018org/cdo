@@ -129,7 +129,7 @@ void faradd(field_type *field1, field_type field2)
         }
       else
         {
-          int fpeRaised = array_add_array(len, array1, array2);
+          arrayAddArray(len, array1, array2);
         }
     }
 }
@@ -179,7 +179,7 @@ void farsum(field_type *field1, field_type field2)
         }
       else
         {
-          array_add_array(len, array1, array2);
+          arrayAddArray(len, array1, array2);
         }
     }
 }

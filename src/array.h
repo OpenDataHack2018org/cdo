@@ -68,7 +68,7 @@ const char *fpe_errstr(int fpeRaised);
 int array_minmaxsum_val(size_t len, const double *array, double *rmin, double *rmax, double *rsum);
 int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *rmax, double *rmean);
 
-int array_add_array(size_t len, double *restrict array1, const double *restrict array2);
+void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2);
 
 void arrayCopy(size_t len, const double *restrict array1, double *restrict array2);
 size_t arrayNumMV(size_t len, const double *restrict array, double missval);
