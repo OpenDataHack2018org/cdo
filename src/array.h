@@ -70,6 +70,7 @@ int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *
 
 int array_add_array(size_t len, double *restrict array1, const double *restrict array2);
 
+void arrayCopy(size_t len, const double *restrict array1, double *restrict array2);
 size_t arrayNumMV(size_t len, const double *restrict array, double missval);
 
 double arrayMin(size_t len, const double *restrict array);
