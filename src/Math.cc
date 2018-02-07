@@ -46,7 +46,7 @@ void *Math(void *process)
   enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW, RECI, NOT};
   int nrecs;
   int varID, levelID;
-  size_t nmiss, nmiss2;
+  size_t nmiss;
   size_t i;
 
   cdoInitialize(process);
@@ -212,12 +212,9 @@ void *Math(void *process)
                 }
             }
 
-          nmiss2 = 0;
-	  for ( i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(array2[i], missval1) ) nmiss2++;
-
+          nmiss = arrayNumMV(gridsize, array2, missval1);
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, array2, nmiss2);
+	  pstreamWriteRecord(streamID2, array2, nmiss);
 	}
 
       tsID++;

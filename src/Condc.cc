@@ -33,8 +33,7 @@ void *Condc(void *process)
 {
   int nrecs;
   int varID, levelID;
-  size_t nmiss, nmiss2;
-  double missval;
+  size_t nmiss;
 
   cdoInitialize(process);
 
@@ -59,10 +58,9 @@ void *Condc(void *process)
 
   nospec(vlistID1);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
+  double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -79,8 +77,8 @@ void *Condc(void *process)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  double missval = vlistInqVarMissval(vlistID1, varID);
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
 	  if ( operatorID == IFTHENC )
 	    {
@@ -97,12 +95,9 @@ void *Condc(void *process)
 	      cdoAbort("Operator not implemented!");
 	    }
 
-	  nmiss2 = 0;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss2++;
-
+	  nmiss = arrayNumMV(gridsize, array2, missval);
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, array2, nmiss2);
+	  pstreamWriteRecord(streamID2, array2, nmiss);
 	}
       tsID++;
     }

@@ -35,7 +35,7 @@ void *Cond(void *process)
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   size_t offset;
-  size_t nmiss1, nmiss2, nmiss3;
+  size_t nmiss1, nmiss2;
   double missval1 = -9.E33;
   double missval2 = -9.E33;
   size_t **varnmiss1 = NULL;
@@ -160,7 +160,7 @@ void *Cond(void *process)
 	  missval2 = vlistInqVarMissval(vlistID2, varID);
 	  if ( recID == 0 || filltype != FILL_REC )
 	    {
-	      missval1  = vlistInqVarMissval(vlistID1, varID);
+	      missval1 = vlistInqVarMissval(vlistID1, varID);
 	    }
 
 	  if ( operatorID == IFTHEN )
@@ -178,10 +178,7 @@ void *Cond(void *process)
 	      cdoAbort("Operator not implemented!");
 	    }
 
-	  nmiss3 = 0;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(array3[i], missval2) ) nmiss3++;
-
+	  size_t nmiss3 = arrayNumMV(gridsize, array3, missval2);
 	  pstreamDefRecord(streamID3, varID, levelID);
 	  pstreamWriteRecord(streamID3, array3, nmiss3);
 	}
