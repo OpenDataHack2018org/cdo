@@ -87,9 +87,7 @@ void *Deltat(void *process)
                     array2[i] = array1[i] - array0[i];
                 }
 
-              nmiss = 0;
-              for ( size_t i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+              nmiss = arrayNumMV(gridsize, array2, missval);
             }
           else
             {

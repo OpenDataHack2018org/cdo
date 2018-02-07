@@ -207,11 +207,7 @@ void *Vertcum(void *process)
           for ( levelID = 0; levelID < nlevs2; ++levelID )
 	    {
               double *single = vardata2[varID][levelID];
-
-              nmiss = 0;
-              for ( size_t i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(single[i], missval) ) nmiss++;
-
+              nmiss = arrayNumMV(gridsize, single, missval);
               pstreamDefRecord(streamID2, varID, levelID);
               pstreamWriteRecord(streamID2, single, nmiss);
 	    }

@@ -303,7 +303,6 @@ void *Adisit(void *process)
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; ++recID )
@@ -314,13 +313,11 @@ void *Adisit(void *process)
 
 	  if ( varID == thoID )
             {
-              pstreamReadRecord(streamID1, tho.ptr+offset, &nmiss);
-              tho.nmiss = (size_t) nmiss;
+              pstreamReadRecord(streamID1, tho.ptr+offset, &tho.nmiss);
             }
 	  if ( varID == saoID )
             {
-              pstreamReadRecord(streamID1, sao.ptr+offset, &nmiss);
-              sao.nmiss = (size_t) nmiss;
+              pstreamReadRecord(streamID1, sao.ptr+offset, &sao.nmiss);
             }
         }
 
@@ -335,20 +332,12 @@ void *Adisit(void *process)
 	  offset = gridsize*levelID;
 
 	  single = tis.ptr+offset;
-
-	  nmiss = 0;
-	  for ( size_t i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(single[i], tis.missval) ) nmiss++;
- 
+	  nmiss = arrayNumMV(gridsize, single, tis.missval);
 	  pstreamDefRecord(streamID2, tisID2, levelID);
 	  pstreamWriteRecord(streamID2, single, nmiss);     
 
 	  single = sao.ptr+offset;
-
-	  nmiss = 0;
-	  for ( size_t i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(single[i], sao.missval) ) nmiss++;
- 
+	  nmiss = arrayNumMV(gridsize, single, sao.missval);
 	  pstreamDefRecord(streamID2, saoID2, levelID);
 	  pstreamWriteRecord(streamID2, single, nmiss);     
 	}

@@ -302,10 +302,7 @@ void *NCL_wind(void *process)
       for ( levelID = 0; levelID < nlev; ++levelID )
         {
           double *parray = &arrayo[levelID*gridsizeuv];
-          size_t nmiss = 0;
-          for ( size_t i = 0; i < gridsizeuv; ++i )
-            if ( DBL_IS_EQUAL(parray[i], missvalu) ) nmiss++;
-
+          size_t nmiss = arrayNumMV(gridsizeuv, parray, missvalu);
           pstreamDefRecord(streamID2, varIDo, levelID);
           pstreamWriteRecord(streamID2, parray, nmiss);
         }

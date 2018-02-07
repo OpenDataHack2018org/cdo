@@ -1571,7 +1571,6 @@ void *Importcmsaf(void *process)
 	      if ( nz == 1 ) offset = gridsize*tsID;
 	      array  = dsets.obj[ivar].array+offset;
 
-	      nmiss  = 0;
 	      minval =  1e35;
 	      maxval = -1e35;
 
@@ -1584,8 +1583,7 @@ void *Importcmsaf(void *process)
 		    }
 		}
 
-	      for ( i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+              nmiss = arrayNumMV(gridsize, array, missval);
 
 	      if ( cdoVerbose )
 		cdoPrint(" Write var %d,  level %d, nmiss %zu, missval %g, minval %g, maxval %g",

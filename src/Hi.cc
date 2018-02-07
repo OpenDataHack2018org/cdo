@@ -80,9 +80,7 @@ static void farexpr(field_type *field1, field_type field2, field_type field3, do
         array1[i] = expression(array1[i], array2[i], array3[i], missval1);  
     }
 
-  field1->nmiss = 0;
-  for ( size_t i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+  field1->nmiss = arrayNumMV(len, array1, missval1);
 }
 
    

@@ -259,10 +259,8 @@ void *Harmonic(void *process)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
+	      nmiss = arrayNumMV(gridsize, out[j][varID]+offset, missval);
 	      pstreamDefRecord(streamID2, varID, levelID);
-	      nmiss = 0;
-	      for ( size_t i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(out[j][varID][i+offset], missval) ) nmiss++;
 	      pstreamWriteRecord(streamID2, out[j][varID]+offset, nmiss);
 	    }
 	}

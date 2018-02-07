@@ -508,11 +508,7 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
 
       oper_expr_con_var(oper, nmiss>0, n, missval1, missval2, odat, cval, idat);
 
-      nmiss = 0;
-      for ( size_t i = 0; i < n; i++ )
-        if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
-
-      p->param.nmiss = nmiss;
+      p->param.nmiss = arrayNumMV(n, odat, missval1);
     }
   
   return p;
@@ -548,11 +544,7 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
 
       oper_expr_var_con(oper, nmiss>0, n, missval1, missval2, odat, idat, cval);
 
-      nmiss = 0;
-      for ( size_t i = 0; i < n; i++ )
-        if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
-
-      p->param.nmiss = nmiss;
+      p->param.nmiss = arrayNumMV(n, odat, missval1);
     }
   
   return p;
@@ -654,11 +646,7 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
             }
           }
 
-      size_t nmiss = 0;
-      for ( size_t i = 0; i < ngp*nlev; i++ )
-        if ( DBL_IS_EQUAL(p->param.data[i], missval1) ) nmiss++;
-
-      p->param.nmiss = nmiss;
+      p->param.nmiss = arrayNumMV(ngp*nlev, p->param.data, missval1);
     }
   
   return p;
@@ -940,11 +928,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
       else
         cdoAbort("Intermal error, wrong function type (%d) for %s()!", functype, funcname);
 
-      nmiss = 0;
-      for ( size_t i = 0; i < p->param.ngp*p->param.nlev; i++ )
-        if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
-
-      p->param.nmiss = nmiss;
+      p->param.nmiss = arrayNumMV(p->param.ngp*p->param.nlev, pdata, missval);
     }
 
   if ( p1->ltmpobj ) node_delete(p1);
@@ -1058,13 +1042,7 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parseParamType
 
       for ( size_t i = 0; i < ngp; i++ ) pdata[i] = p1data[i];
 
-      if ( nmiss > 0 )
-        {
-          nmiss = 0;
-          for ( size_t i = 0; i < ngp; i++ )
-            if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
-        }
-
+      if ( nmiss > 0 ) nmiss = arrayNumMV(ngp, pdata, missval);
       p->param.nmiss = nmiss;
     }
 
@@ -1416,8 +1394,7 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
                 odat[i] = DBL_IS_EQUAL(ival3, missval3) ? missval1 : ival3;
             }
 
-          for ( size_t i = 0; i < ngp; i++ )
-            if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
+          nmiss += arrayNumMV(ngp, odat, missval1);
         }
 
       p->param.nmiss = nmiss;

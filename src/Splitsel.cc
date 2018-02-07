@@ -144,7 +144,7 @@ void *Splitsel(void *process)
 	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
               {
                 pstreamReadRecord(streamID1, vars[varID][levelID].ptr, &nmiss);
-                vars[varID][levelID].nmiss = (size_t) nmiss;
+                vars[varID][levelID].nmiss = nmiss;
               }
           }
     }

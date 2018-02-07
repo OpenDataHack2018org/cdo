@@ -145,17 +145,11 @@ void *Trend(void *process)
 			      MULMN( DIVMN(work[0][varID][levelID].ptr[i], work[4][varID][levelID].ptr[i]), field2.ptr[i]));
 	}
 
-      nmiss = 0;
-      for ( size_t i = 0; i < gridsize; i++ )
-	if ( DBL_IS_EQUAL(field1.ptr[i], missval) ) nmiss++;
-
+      nmiss = arrayNumMV(gridsize, field1.ptr, missval);
       pstreamDefRecord(streamID2, varID, levelID);
       pstreamWriteRecord(streamID2, field1.ptr, nmiss);
 
-      nmiss = 0;
-      for ( size_t i = 0; i < gridsize; i++ )
-	if ( DBL_IS_EQUAL(field2.ptr[i], missval) ) nmiss++;
-
+      nmiss = arrayNumMV(gridsize, field2.ptr, missval);
       pstreamDefRecord(streamID3, varID, levelID);
       pstreamWriteRecord(streamID3, field2.ptr, nmiss);
     }

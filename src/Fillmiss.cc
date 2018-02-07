@@ -496,7 +496,7 @@ void *Fillmiss(void *process)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss = nmiss;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 
@@ -522,10 +522,7 @@ void *Fillmiss(void *process)
               fill_method(&field1, &field2, nfill);
 
               size_t gridsize = gridInqSize(field2.grid);
-              size_t nmiss = 0;
-              for ( size_t i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
-              
+              size_t nmiss = arrayNumMV(gridsize, field2.ptr, field2.missval);              
               pstreamWriteRecord(streamID2, field2.ptr, nmiss);
             }
         }

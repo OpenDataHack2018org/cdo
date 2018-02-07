@@ -190,9 +190,7 @@ static void count(field_type *field1, const field_type *field2, double mode)
             } 
         }
 
-      field1->nmiss = 0;
-      for ( i = 0; i < len; i++ )
-        if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else 
     {
@@ -259,9 +257,7 @@ static void selcomp(field_type *field1, const field_type *field2, int (*compare)
           array1[i] = missval1;
     }
       
-  field1->nmiss = 0;
-  for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+  field1->nmiss = arrayNumMV(len, array1, missval1);
 }
 
 
@@ -308,9 +304,7 @@ static void selcompc(field_type *field, double c, int (*compare)(double, double)
           array[i] = missval;
     }
       
-  field->nmiss = 0;
-  for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array[i], missval) ) field->nmiss++;
+  field->nmiss = arrayNumMV(len, array, missval);
 }
 
 
@@ -396,9 +390,7 @@ void farsel(field_type *field1, field_type field2)
         if ( IS_EQUAL(array2[i], 0.0) ) array1[i] = missval1;
     }
 
-  field1->nmiss = 0;
-  for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+  field1->nmiss = arrayNumMV(len, array1, missval1);
 }
 
 
@@ -594,15 +586,8 @@ void computeGsl(int nlevels, size_t gridsize, double *yvals, double missval,
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
-      gslDuration[levelID].nmiss = 0;
-      gslFirstDay[levelID].nmiss = 0;
-      for ( size_t i = 0; i < gridsize; i++ )
-        {
-          if ( DBL_IS_EQUAL(gslDuration[levelID].ptr[i], missval) )
-            gslDuration[levelID].nmiss++;
-          if ( DBL_IS_EQUAL(gslFirstDay[levelID].ptr[i], missval) )
-            gslFirstDay[levelID].nmiss++;
-        }
+      gslDuration[levelID].nmiss = arrayNumMV(gridsize, gslDuration[levelID].ptr, missval);
+      gslFirstDay[levelID].nmiss = arrayNumMV(gridsize, gslFirstDay[levelID].ptr, missval);
     }
 }
 

@@ -446,7 +446,6 @@ void *Sethalo(void *process)
   int index, gridtype;
   size_t nmiss;
   int lhalo = 0, rhalo = 0;
-  double missval;
 
   cdoInitialize(process);
 
@@ -513,10 +512,7 @@ void *Sethalo(void *process)
   int *vars  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
-      if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
-	vars[varID] = TRUE;
-      else
-	vars[varID] = FALSE;
+      vars[varID] = (gridID1 == vlistInqVarGrid(vlistID1, varID));
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -549,10 +545,8 @@ void *Sethalo(void *process)
 
 	      if ( nmiss )
 		{
-		  nmiss = 0;
-		  missval = vlistInqVarMissval(vlistID1, varID);
-		  for ( size_t i = 0; i < gridsize2; i++ )
-		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+		  double missval = vlistInqVarMissval(vlistID1, varID);
+                  nmiss = arrayNumMV(gridsize2, array2, missval);
 		}
 
 	      pstreamDefRecord(streamID2, varID, levelID);

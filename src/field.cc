@@ -705,9 +705,7 @@ double fldbrs(field_type field)
 /*  update the number non missing values */
 void fldunm(field_type *field)
 {
-  field->nmiss = 0;
-  for ( size_t i = 0; i < field->size; i++ )
-    if ( DBL_IS_EQUAL(field->ptr[i], field->missval) ) field->nmiss++;
+  field->nmiss = arrayNumMV(field->size, field->ptr, field->missval);
 }
 
 /*  check for non missval values */

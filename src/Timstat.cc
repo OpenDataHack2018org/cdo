@@ -444,12 +444,7 @@ void *Timstat(void *argument)
                       }
                   }
 
-                if ( irun )
-                  {
-                    pvars1->nmiss = 0;
-                    for ( size_t i = 0; i < nwpv*gridsize; ++i )
-                      if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) pvars1->nmiss++;
-                  }
+                if ( irun ) pvars1->nmiss = arrayNumMV(nwpv*gridsize, pvars1->ptr, missval);
 	      }
 	  }
 

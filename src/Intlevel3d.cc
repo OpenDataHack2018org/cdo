@@ -378,10 +378,7 @@ void *Intlevel3d(void *process)
 		{
 		  size_t offset = gridsize*levelID;
 		  double *single2 = vardata2[varID] + offset;
-		  size_t nmiss = 0;
-		  for ( size_t i = 0; i < gridsize; ++i )
-		    if ( DBL_IS_EQUAL(single2[i], missval) ) nmiss++;
-		  varnmiss[varID][levelID] = nmiss;
+		  varnmiss[varID][levelID] = arrayNumMV(gridsize, single2, missval);
 		}
 	    }
           else

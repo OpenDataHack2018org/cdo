@@ -610,17 +610,11 @@ void *Samplegridicon(void *process)
 
           samplegrid(missval, nsamplegrids, &cellindex[0], array1, array2, array3);
 
-          nmiss = 0;
-          for ( long i = 0; i < gridsize2; ++i )
-            if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
+          nmiss = arrayNumMV(gridsize2, array2, missval);
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, array2, nmiss);
 
-          nmiss = 0;
-          for ( long i = 0; i < gridsize2; ++i )
-            if ( DBL_IS_EQUAL(array3[i], missval) ) nmiss++;
-
+          nmiss = arrayNumMV(gridsize2, array3, missval);
           pstreamDefRecord(streamID3, varID, levelID);
           pstreamWriteRecord(streamID3, array3, nmiss);
         }

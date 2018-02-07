@@ -59,12 +59,8 @@ void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, fi
 	}
     }
 
-  nmiss = 0;
-  for ( size_t i = 0; i < gridsize; ++i )
-    if ( DBL_IS_EQUAL(data2D[i], missval) ) nmiss++;
-
   field2D->missval = missval;
-  field2D->nmiss   = nmiss;
+  field2D->nmiss = arrayNumMV(gridsize, data2D, missval);
 }
 
 
@@ -201,13 +197,9 @@ void *Isosurface(void *process)
 
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
-		      offset   = gridsize*levelID;
-		      single   = vars1[varID].ptr + offset;
-
-		      nmiss = 0;
-		      for ( size_t i = 0; i < gridsize; ++i )
-			if ( DBL_IS_EQUAL(single[i], missval) ) nmiss++;
-
+		      offset = gridsize*levelID;
+		      single = vars1[varID].ptr + offset;
+		      nmiss = arrayNumMV(gridsize, single, missval);
 		      pstreamDefRecord(streamID2, varID, levelID);
 		      pstreamWriteRecord(streamID2, single, nmiss);
 		    }

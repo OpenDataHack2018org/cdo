@@ -535,10 +535,7 @@ void *Collgrid(void *process)
 
 	      if ( vars[varID2] )
 		{
-		  size_t nmiss = 0;
-		  for ( size_t i = 0; i < gridsize2; i++ )
-		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
+		  size_t nmiss = arrayNumMV(gridsize2, array2, missval);
 		  pstreamWriteRecord(streamID2, array2, nmiss);
 		}
 	      else

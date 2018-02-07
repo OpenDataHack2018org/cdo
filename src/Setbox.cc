@@ -68,7 +68,6 @@ void *Setbox(void *process)
   int *vars;
   int ndiffgrids;
   long lat1, lat2, lon11, lon12, lon21, lon22;
-  double missval;
   double constant;
   double *array;
   int taxisID1, taxisID2;
@@ -127,10 +126,7 @@ void *Setbox(void *process)
   vars  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
-      if ( gridID == vlistInqVarGrid(vlistID1, varID) )
-	vars[varID] = TRUE;
-      else
-	vars[varID] = FALSE;
+      vars[varID] = (gridID == vlistInqVarGrid(vlistID1, varID));
     }
 
   streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -154,13 +150,10 @@ void *Setbox(void *process)
 	    {
 	      pstreamReadRecord(streamID1, array, &nmiss);
 
-	      missval = vlistInqVarMissval(vlistID1, varID);
 	      setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
 
-	      nmiss = 0;
-	      for ( size_t i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
-
+	      double missval = vlistInqVarMissval(vlistID1, varID);
+	      nmiss = arrayNumMV(gridsize, array, missval);
 	      pstreamDefRecord(streamID2, varID, levelID);
 	      pstreamWriteRecord(streamID2, array, nmiss);
 	    }

@@ -510,7 +510,7 @@ void *XTimstat(void *process)
 
 	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
-            nwpv     = pvars1->nwpv;
+            nwpv = pvars1->nwpv;
             size_t gridsize = pvars1->size;
             double missval = pvars1->missval;
             if ( samp1[varID][levelID].ptr )
@@ -525,13 +525,7 @@ void *XTimstat(void *process)
                       }
                   }
 
-                if ( irun )
-                  {
-                    nmiss = 0;
-                    for ( size_t i = 0; i < nwpv*gridsize; ++i )
-                      if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) nmiss++;
-                    pvars1->nmiss = nmiss;
-                  }
+                if ( irun ) pvars1->nmiss = arrayNumMV(nwpv*gridsize, pvars1->ptr, missval);
 	      }
 	  }
 

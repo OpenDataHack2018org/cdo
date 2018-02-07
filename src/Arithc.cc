@@ -72,7 +72,6 @@ int *fill_vars(int vlistID)
 
 void *Arithc(void *process)
 {
-  size_t nmiss;
   int nrecs;
   int varID, levelID;
 
@@ -111,21 +110,19 @@ void *Arithc(void *process)
 
   field_type field;
   field_init(&field);
-  field.ptr    = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
   field.weight = NULL;
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-          field.nmiss = nmiss;
+	  pstreamReadRecord(streamID1, field.ptr, &field.nmiss);
 
 	  if ( vars[varID] )
 	    {
@@ -134,17 +131,14 @@ void *Arithc(void *process)
 
 	      farcfun(&field, rconst, operfunc);
 
-	      /* recalculate number of missing values */
-	      gridsize = gridInqSize(field.grid);
-	      field.nmiss = 0;
-	      for ( size_t i = 0; i < gridsize; ++i )
-		if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
+	      // recalculate number of missing values
+              field.nmiss = arrayNumMV(gridsize, field.ptr, field.missval);
 	    }
 
-          nmiss = field.nmiss;
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, field.ptr, nmiss);
+	  pstreamWriteRecord(streamID2, field.ptr, field.nmiss);
 	}
+
       tsID++;
     }
 

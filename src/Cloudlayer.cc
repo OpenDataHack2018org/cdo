@@ -126,7 +126,6 @@ void *Cloudlayer(void *process)
   int nlevel, nlevs, nrecs, code;
   int varID, levelID;
   bool zrev = false;
-  int offset;
   size_t nmiss;
   int aclcacID = -1;
   int nvars2 = 0;
@@ -321,10 +320,7 @@ void *Cloudlayer(void *process)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( zrev )
-	    offset = (nlevel-1-levelID)*gridsize;
-	  else
-	    offset = levelID*gridsize;
+          size_t offset = zrev ? (nlevel-1-levelID)*gridsize : levelID*gridsize;
 
 	  if ( varID == aclcacID )
 	    {
@@ -346,9 +342,7 @@ void *Cloudlayer(void *process)
 
       for ( varID = 0; varID < nvars2; ++varID )
 	{
-	  nmiss = 0;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(cloud[varID][i], missval) ) nmiss++;
+	  nmiss = arrayNumMV(gridsize, cloud[varID], missval);
 
 	  pstreamDefRecord(streamID2, varID, 0);
 	  pstreamWriteRecord(streamID2, cloud[varID], nmiss);

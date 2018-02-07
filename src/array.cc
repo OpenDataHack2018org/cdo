@@ -105,6 +105,25 @@ int array_add_array(size_t len, double *restrict array1, const double *restrict 
 }
 
 
+size_t arrayNumMV(size_t len, const double *restrict array, double missval)
+{
+  size_t nmiss = 0;
+
+  if ( DBL_IS_NAN(missval) )
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( IS_EQUAL(array[i], missval) ) nmiss++;
+    }
+
+  return nmiss;
+}
+
+
 double arrayMin(size_t len, const double *restrict array)
 {
   assert(array!=NULL);

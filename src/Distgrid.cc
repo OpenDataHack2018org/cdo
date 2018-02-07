@@ -351,12 +351,7 @@ void *Distgrid(void *process)
 	      i = 0;
 	      window_cell(array1, array2, grids[i].gridsize[index], grids[i].gridindex[index]);
 	      pstreamDefRecord(streamIDs[index], varID, levelID);
-	      if ( nmiss > 0 )
-		{
-		  nmiss = 0;
-		  for ( size_t k = 0; k < grids[i].gridsize[index]; ++k )
-		    if ( DBL_IS_EQUAL(array2[k], missval) ) nmiss++;
-		}
+	      if ( nmiss > 0 ) nmiss = arrayNumMV(grids[i].gridsize[index], array2, missval);
 	      pstreamWriteRecord(streamIDs[index], array2, nmiss);
 	    }
 	}
