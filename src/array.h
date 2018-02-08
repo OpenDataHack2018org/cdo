@@ -65,10 +65,26 @@ double FSQRTMN(double x, double missval1) { return MSQRTMN(x);}
 
 const char *fpe_errstr(int fpeRaised);
 
-int array_minmaxsum_val(size_t len, const double *array, double *rmin, double *rmax, double *rsum);
-int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *rmax, double *rmean);
+void arrayMinMax(size_t len, const double *array, double *rmin, double *rmax);
+size_t arrayMinMaxMV(size_t len, const double *array, double missval, double *rmin, double *rmax);
+void arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax, double *rsum);
+size_t arrayMinMaxSumMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rsum);
+void arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax, double *rmean);
+size_t arrayMinMaxMeanMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rmean);
 
-int array_add_array(size_t len, double *restrict array1, const double *restrict array2);
+void arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin, double *rmax);
+
+void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2);
+
+void arrayCopy(size_t len, const double *restrict array1, double *restrict array2);
+size_t arrayNumMV(size_t len, const double *restrict array, double missval);
+
+double arrayMin(size_t len, const double *restrict array);
+double arrayMax(size_t len, const double *restrict array);
+double arrayRange(size_t len, const double *restrict array);
+double arrayMinMV(size_t len, const double *restrict array, double missval);
+double arrayMaxMV(size_t len, const double *restrict array, double missval);
+double arrayRangeMV(size_t len, const double *restrict array, double missval);
 
 double arraySum(size_t len, const double *restrict array);
 double arraySumMV(size_t len, const double *restrict array, double missval);

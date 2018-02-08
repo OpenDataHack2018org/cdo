@@ -222,10 +222,8 @@ void *Samplegrid(void *process)
 
               if ( nmiss )
                 {
-                  nmiss = 0;
                   double missval = vlistInqVarMissval(vlistID2, varID);
-                  for ( size_t i = 0; i < gridsize2; i++ )
-                    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+                  nmiss = arrayNumMV(gridsize2, array2, missval);
                 }
 
               pstreamWriteRecord(streamID2, array2, nmiss);

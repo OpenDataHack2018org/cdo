@@ -358,11 +358,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
-  size_t nmiss = 0;
-  for ( size_t i = 0; i < gridInqSize(gridIDout); ++i )
-    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
-  field2->nmiss = nmiss;
+  field2->nmiss = arrayNumMV(gridInqSize(gridIDout), array2, missval);
 
   // if (array) Free(array);
   //free(lonIn);
@@ -655,11 +651,7 @@ void yar_remap_con(field_type *field1, field_type *field2)
 	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
-  size_t nmiss = 0;
-  for ( size_t i = 0; i < gridInqSize(gridIDout); ++i )
-    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
-  field2->nmiss = nmiss;
+  field2->nmiss = arrayNumMV(gridInqSize(gridIDout), array2, missval);
 
   //---------------
   // cleanup

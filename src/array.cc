@@ -38,11 +38,52 @@ const char *fpe_errstr(int fpeRaised)
 }
 
 
-int array_minmaxsum_val(size_t len, const double *array, double *rmin, double *rmax, double *rsum)
+void arrayMinMax(size_t len, const double *array, double *rmin, double *rmax)
 {
-  double min = *rmin;
-  double max = *rmax;
-  double sum = *rsum;
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+
+  // #pragma omp parallel for default(none) shared(min, max, array, gridsize) reduction(+:mean)
+  // #pragma omp simd reduction(+:mean) reduction(min:min) reduction(max:max) aligned(array:16)
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( array[i] < min ) min = array[i];
+      if ( array[i] > max ) max = array[i];
+    }
+    
+  if ( rmin ) *rmin = min;
+  if ( rmax ) *rmax = max;
+}
+
+
+size_t arrayMinMaxMV(size_t len, const double *array, double missval, double *rmin, double *rmax)
+{
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+
+  size_t nvals = 0;
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( !DBL_IS_EQUAL(array[i], missval) )
+        {
+          if ( array[i] < min ) min = array[i];
+          if ( array[i] > max ) max = array[i];
+          nvals++;
+        }
+    }
+    
+  if ( rmin ) *rmin = min;
+  if ( rmax ) *rmax = max;
+
+  return nvals;
+}
+
+
+void arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax, double *rsum)
+{
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+  double sum = 0;
 
   // #pragma omp parallel for default(none) shared(min, max, array, gridsize) reduction(+:mean)
   // #pragma omp simd reduction(+:mean) reduction(min:min) reduction(max:max) aligned(array:16)
@@ -56,52 +97,222 @@ int array_minmaxsum_val(size_t len, const double *array, double *rmin, double *r
   if ( rmin ) *rmin = min;
   if ( rmax ) *rmax = max;
   if ( rsum ) *rsum = sum;
-
-  return 0;
 }
 
 
-int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *rmax, double *rmean)
+size_t arrayMinMaxSumMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rsum)
 {
-  // int excepts = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW;
-  // feclearexcept(FE_ALL_EXCEPT); // expensive !!!!
-
   double min =  DBL_MAX;
   double max = -DBL_MAX;
-  double mean = 0;
+  double sum = 0;
 
-  // #pragma omp parallel for default(none) shared(min, max, array, gridsize) reduction(+:mean)
-  // #pragma omp simd reduction(+:mean) reduction(min:min) reduction(max:max) aligned(array:16)
+  size_t nvals = 0;
   for ( size_t i = 0; i < len; ++i )
     {
-      if ( array[i] < min ) min = array[i];
-      if ( array[i] > max ) max = array[i];
-      mean += array[i];
+      if ( !DBL_IS_EQUAL(array[i], missval) )
+        {
+          if ( array[i] < min ) min = array[i];
+          if ( array[i] > max ) max = array[i];
+          sum += array[i];
+          nvals++;
+        }
     }
 
-  if ( len ) mean /= (double)len;
-    
+  if ( nvals == 0 ) min = missval;
+  if ( nvals == 0 ) max = missval;
+
   if ( rmin ) *rmin = min;
   if ( rmax ) *rmax = max;
-  if ( rmean ) *rmean = mean;
+  if ( rsum ) *rsum = sum;
 
-  // return fetestexcept(excepts);
-  return 0;
+  return nvals;
 }
 
 
-int array_add_array(size_t len, double *restrict array1, const double *restrict array2)
+void arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax, double *rmean)
 {
-  // int excepts = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW;
-  // feclearexcept(FE_ALL_EXCEPT); // expensive !!!!
+  double sum;
+  arrayMinMaxSum(len, array, rmin, rmax, &sum);
 
+  if ( rmean ) *rmean = len ? sum/(double)len : 0;
+}
+
+
+size_t arrayMinMaxMeanMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rmean)
+{
+  double sum;
+  size_t nvals = arrayMinMaxSumMV(len, array, missval, rmin, rmax, &sum);
+
+  if ( rmean ) *rmean = nvals ? sum/(double)nvals : missval;
+
+  return nvals;
+}
+
+
+void arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin, double *rmax)
+{
+  double xmin =  DBL_MAX;
+  double xmax = -DBL_MAX;
+
+  if ( mask )
+    {
+      for ( size_t i = 0; i < len; ++i )
+	{
+	  if ( ! mask[i] )
+	    {
+	      if      ( array[i] > xmax ) xmax = array[i];
+	      else if ( array[i] < xmin ) xmin = array[i];
+	    }
+	}
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i )
+	{
+	  if      ( array[i] > xmax ) xmax = array[i];
+	  else if ( array[i] < xmin ) xmin = array[i];
+	}
+    }
+
+  if ( rmin ) *rmin = xmin;
+  if ( rmax ) *rmax = xmax;
+}
+
+
+void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2)
+{
   //#ifdef  _OPENMP
   //#pragma omp parallel for default(none) shared(array1,array2)
   //#endif
   for ( size_t i = 0; i < len; ++i ) array1[i] += array2[i];
+}
+
+
+void arrayCopy(size_t len, const double *restrict array1, double *restrict array2)
+{
+  for ( size_t i = 0; i < len; ++i ) array2[i] = array1[i];
+}
+
+
+size_t arrayNumMV(size_t len, const double *restrict array, double missval)
+{
+  size_t nmiss = 0;
+
+  if ( DBL_IS_NAN(missval) )
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i )
+        if ( IS_EQUAL(array[i], missval) ) nmiss++;
+    }
+
+  return nmiss;
+}
+
+
+double arrayMin(size_t len, const double *restrict array)
+{
+  assert(array!=NULL);
+
+  double min = array[0];
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( array[i] < min ) min = array[i];
+
+  return min;
+}
+
+
+double arrayMax(size_t len, const double *restrict array)
+{
+  assert(array!=NULL);
+
+  double max = array[0];
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( array[i] > max ) max = array[i];
+
+  return max;
+}
+
+
+double arrayRange(size_t len, const double *restrict array)
+{
+  assert(array!=NULL);
+
+  double min = array[0];
+  double max = array[0];
+
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( array[i] < min ) min = array[i];
+      if ( array[i] > max ) max = array[i];
+    }
+
+  double range = max - min;
   
-  // return fetestexcept(excepts);
-  return 0;
+  return range;
+}
+
+
+double arrayMinMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double min = DBL_MAX;
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( !DBL_IS_EQUAL(array[i], missval) )
+      if ( array[i] < min ) min = array[i];
+
+  if ( IS_EQUAL(min, DBL_MAX) ) min = missval;
+
+  return min;
+}
+
+
+double arrayMaxMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double max = -DBL_MAX;
+
+  for ( size_t i = 0; i < len; ++i )
+    if ( !DBL_IS_EQUAL(array[i], missval) )
+      if ( array[i] > max ) max = array[i];
+
+  if ( IS_EQUAL(max, -DBL_MAX) ) max = missval;
+
+  return max;
+}
+
+
+double arrayRangeMV(size_t len, const double *restrict array, double missval)
+{
+  assert(array!=NULL);
+
+  double min =  DBL_MAX;
+  double max = -DBL_MAX;
+
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( !DBL_IS_EQUAL(array[i], missval) )
+        {
+          if ( array[i] < min ) min = array[i];
+          if ( array[i] > max ) max = array[i];
+        }
+    }
+
+  double range;
+  if ( IS_EQUAL(min, DBL_MAX) && IS_EQUAL(max, -DBL_MAX) )
+    range = missval;
+  else
+    range = max-min;
+  
+  return range;
 }
 
 

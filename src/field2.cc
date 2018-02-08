@@ -119,9 +119,7 @@ void faradd(field_type *field1, field_type field2)
       for ( size_t i = 0; i < len; i++ ) 
 	array1[i] = ADDMN(array1[i], array2[i]);
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -131,7 +129,7 @@ void faradd(field_type *field1, field_type field2)
         }
       else
         {
-          int fpeRaised = array_add_array(len, array1, array2);
+          arrayAddArray(len, array1, array2);
         }
     }
 }
@@ -171,9 +169,7 @@ void farsum(field_type *field1, field_type field2)
 	      array1[i] = array2[i];
 	  }
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -183,7 +179,7 @@ void farsum(field_type *field1, field_type field2)
         }
       else
         {
-          array_add_array(len, array1, array2);
+          arrayAddArray(len, array1, array2);
         }
     }
 }
@@ -218,9 +214,7 @@ void farsumw(field_type *field1, field_type field2, double w)
 	      array1[i] = w*array2[i];
 	  }
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -269,9 +263,7 @@ void farsumtr(field_type *occur, field_type field, const double refval)
 	    oarray[i] = 0.0;
 	}
 
-      occur->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(oarray[i], omissval) ) occur->nmiss++;
+      occur->nmiss = arrayNumMV(len, oarray, omissval);
     }
   else
     {
@@ -314,9 +306,7 @@ void farsumq(field_type *field1, field_type field2)
 	      array1[i] = array2[i]*array2[i];
 	  }
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -361,9 +351,7 @@ void farsumqw(field_type *field1, field_type field2, double w)
 	      array1[i] = w*array2[i]*array2[i];
 	  }
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -396,9 +384,7 @@ void farsub(field_type *field1, field_type field2)
       for ( size_t i = 0; i < len; i++ ) 
 	array1[i] = SUBMN(array1[i], array2[i]);
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -431,9 +417,7 @@ void farmul(field_type *field1, field_type field2)
       for ( size_t i = 0; i < len; i++ ) 
 	array1[i] = MULMN(array1[i], array2[i]);
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -462,9 +446,7 @@ void fardiv(field_type *field1, field_type field2)
   for ( size_t i = 0; i < len; i++ ) 
     array1[i] = DIVMN(array1[i], array2[i]);
 
-  field1->nmiss = 0;
-  for ( size_t i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+  field1->nmiss = arrayNumMV(len, array1, missval1);
 }
 
 
@@ -487,9 +469,7 @@ void faratan2(field_type *field1, field_type field2)
   for ( size_t i = 0; i < len; i++ ) 
     array1[i] = DBL_IS_EQUAL(array1[i],missval1) || DBL_IS_EQUAL(array2[i],missval2) ? missval1 : atan2(array1[i], array2[i]);
 
-  field1->nmiss = 0;
-  for ( size_t i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+  field1->nmiss = arrayNumMV(len, array1, missval1);
 }
 
 
@@ -514,9 +494,7 @@ void farsetmiss(field_type *field1, field_type field2)
       for ( size_t i = 0; i < len; i++ ) 
         array1[i] = DBL_IS_EQUAL(array1[i],missval1) ? array2[i] : array1[i];
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-        if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
 }
 
@@ -548,9 +526,7 @@ void farmin(field_type *field1, field_type field2)
 		      MIN(array1[i], array2[i]);
 	}
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -587,9 +563,7 @@ void farmax(field_type *field1, field_type field2)
 		      MAX(array1[i], array2[i]);
 	}
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -776,9 +750,7 @@ void farmoq(field_type *field1, field_type field2)
 	else
 	  array1[i] = missval1;
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -813,9 +785,7 @@ void farmoqw(field_type *field1, field_type field2, double w)
 	else
 	  array1[i] = missval1;
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {
@@ -866,9 +836,7 @@ void farcount(field_type *field1, field_type field2)
 	      array1[i] = 1.0;
 	  }
 
-      field1->nmiss = 0;
-      for ( size_t i = 0; i < len; i++ )
-	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+      field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else
     {

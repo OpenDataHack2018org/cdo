@@ -664,11 +664,7 @@ void *Expr(void *process)
 	    {
               size_t offset = ngp*levelID;
 	      double *vardata = params[pidx].data + offset;
-
-	      size_t nmiss = 0;
-	      for ( size_t i = 0; i < ngp; i++ )
-		if ( DBL_IS_EQUAL(vardata[i], missval) ) nmiss++;
-
+	      size_t nmiss = arrayNumMV(ngp, vardata, missval);
 	      pstreamDefRecord(streamID2, varID, levelID);
 	      pstreamWriteRecord(streamID2, vardata, nmiss);
 	    }

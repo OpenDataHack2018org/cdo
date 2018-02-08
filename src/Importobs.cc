@@ -63,13 +63,8 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
     {
       size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       double missval  = vlistInqVarMissval(vlistID, varID);
-      
+      size_t nmiss = arrayNumMV(gridsize, data[varID], missval);
       pstreamDefRecord(streamID, varID, 0);
-
-      size_t nmiss = 0;
-      for ( size_t i = 0; i < gridsize; ++i )
-	if ( DBL_IS_EQUAL(data[varID][i], missval) ) nmiss++;
-      
       pstreamWriteRecord(streamID, data[varID], nmiss);
     }
 }
@@ -78,10 +73,7 @@ static
 int getDate(const char *name)
 {
   char *pname = (char *)strchr(name, '_');
-
-  int date = 0;
-  if ( pname ) date = atoi(pname+1);
-
+  int date = pname ? atoi(pname+1) : 0;
   return date;
 }
 

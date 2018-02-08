@@ -649,38 +649,6 @@ void cdoSetNAN(double missval, size_t gridsize, double *array)
 }
 
 
-void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval)
-{
-  double xmin =  DBL_MAX;
-  double xmax = -DBL_MAX;
-
-  if ( imiss )
-    {
-      for ( long i = 0; i < nvals; ++i )
-	{
-	  if ( ! imiss[i] )
-	    {
-	      if      ( array[i] > xmax ) xmax = array[i];
-	      else if ( array[i] < xmin ) xmin = array[i];
-	    }
-	}
-    }
-  else
-    {
-      xmin = array[0];
-      xmax = array[0];
-      for ( long i = 1; i < nvals; ++i )
-	{
-	  if      ( array[i] > xmax ) xmax = array[i];
-	  else if ( array[i] < xmin ) xmin = array[i];
-	}
-    }
-
-  *minval = xmin;
-  *maxval = xmax;
-}
-
-
 void cdo_check_round(void)
 {
   static bool checked = false;

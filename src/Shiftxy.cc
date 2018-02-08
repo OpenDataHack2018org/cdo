@@ -263,15 +263,12 @@ void *Shiftxy(void *process)
               double missval = vlistInqVarMissval(vlistID2, varID);
                   
               size_t nx = gridInqXsize(gridID1);
-              int ny = gridInqYsize(gridID1);
+              size_t ny = gridInqYsize(gridID1);
 
               if      ( operatorID == SHIFTX ) shiftx(lcyclic, nshift, nx, ny, array1, array2, missval);
               else if ( operatorID == SHIFTY ) shifty(lcyclic, nshift, nx, ny, array1, array2, missval);
 
-              nmiss = 0;
-              for ( size_t i = 0; i < gridsize; i++ )
-                if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
+              nmiss = arrayNumMV(gridsize, array2, missval);
 	      pstreamWriteRecord(streamID2, array2, nmiss);
 	    }
 	  else

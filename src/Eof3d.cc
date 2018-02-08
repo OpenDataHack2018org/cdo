@@ -469,10 +469,7 @@ void *EOF3d(void *process)
 	      size_t offset = levelID * gridsizemax;
               if ( tsID < n_eig )
                 {
-                  nmiss = 0;
-                  for ( size_t i = 0; i < gridsizemax; i++ )
-                    if ( DBL_IS_EQUAL(eigenvectors[varID][tsID][offset + i], missval) ) nmiss++;
-
+                  nmiss = arrayNumMV(gridsizemax, &eigenvectors[varID][tsID][offset], missval);
                   pstreamDefRecord(streamID3, varID, levelID);
                   pstreamWriteRecord(streamID3, &eigenvectors[varID][tsID][offset], nmiss);
                 }

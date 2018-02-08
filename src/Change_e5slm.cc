@@ -72,7 +72,7 @@ void *Change_e5slm(void *process)
   if ( nmiss > 0 ) cdoAbort("SLM with missing values are unsupported!");
 
   double minval, maxval;
-  minmaxval(gridsize, cland, NULL, &minval, &maxval);
+  arrayMinMaxMask(gridsize, cland, NULL, &minval, &maxval);
   if ( minval < 0 || maxval > 1 )
     cdoWarning("Values of SLM out of bounds! (minval=%g, maxval=%g)", minval , maxval);
 

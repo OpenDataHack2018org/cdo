@@ -235,13 +235,9 @@ void *Input(void *process)
 
       for ( int levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  pstreamDefRecord(streamID, varID, levelID);
-
           int offset = gridsize*levelID;
-	  size_t nmiss = 0;
-	  for ( size_t i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(array[offset+i], missval) ) nmiss++;
-
+	  size_t nmiss = arrayNumMV(gridsize, array+offset, missval);
+	  pstreamDefRecord(streamID, varID, levelID);
 	  pstreamWriteRecord(streamID, array+offset, nmiss);
 	}
 

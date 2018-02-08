@@ -486,11 +486,7 @@ void intgridbil(field_type *field1, field_type *field2)
 		 nlon1, nlat1, array1, lon1, lat1,
 		 gridsize2, array2, xvals2, yvals2);
 
-      size_t nmiss = 0;
-      for ( size_t i = 0; i < gridsize2; ++i )
-	if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
-      field2->nmiss = nmiss;
+      field2->nmiss = arrayNumMV(gridsize2, array2, missval);
 
       Free(xvals2);
       Free(yvals2);
@@ -514,7 +510,6 @@ void interpolate(field_type *field1, field_type *field2)
   int gridIDo;
   double *arrayOut;
   double missval;
-  size_t nmiss;
   long ilon, ilat, nxlon, nxlat, olon, olat;
   long l11, l12, l21, l22, l1, l2;
   double volon1, volon2, volat1, volat2;
@@ -984,11 +979,7 @@ void interpolate(field_type *field1, field_type *field2)
 	}
     }
 
-  nmiss = 0;
-  for ( size_t i = 0; i < gridsize_o; i++ )
-    if ( DBL_IS_EQUAL(arrayOut[i], missval) ) nmiss++;
-
-  field2->nmiss = nmiss;
+  field2->nmiss = arrayNumMV(gridsize_o, arrayOut, missval);
 
   Free(lon_array);
   Free(lat_array);

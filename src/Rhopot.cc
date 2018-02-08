@@ -284,13 +284,11 @@ void *Rhopot(void *process)
 
 	  if ( varID == toID )
             {
-              pstreamReadRecord(streamID1, to.ptr+offset, &nmiss);
-              to.nmiss = (size_t) nmiss;
+              pstreamReadRecord(streamID1, to.ptr+offset, &to.nmiss);
             }
 	  if ( varID == saoID )
             {
-              pstreamReadRecord(streamID1, sao.ptr+offset, &nmiss);
-              sao.nmiss = (size_t) nmiss;
+              pstreamReadRecord(streamID1, sao.ptr+offset, &sao.nmiss);
             }
         }
 
@@ -300,11 +298,7 @@ void *Rhopot(void *process)
 	{
 	  offset = gridsize*levelID;
 	  single = rho.ptr+offset;
-
-	  nmiss = 0;
-	  for ( size_t i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(single[i], rho.missval) ) nmiss++;
- 
+	  nmiss = arrayNumMV(gridsize, single, rho.missval); 
 	  pstreamDefRecord(streamID2, 0, levelID);
 	  pstreamWriteRecord(streamID2, single, nmiss);     
 	}

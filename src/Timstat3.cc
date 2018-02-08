@@ -186,7 +186,7 @@ void *Timstat3(void *process)
 		}	 
 
 	      pstreamReadRecord(streamID[is], in[is].ptr, &nmiss);
-	      in[is].nmiss = (size_t) nmiss;
+	      in[is].nmiss = nmiss;
               
 	      for ( size_t i = 0; i < gridsize; ++i )
 		{
@@ -300,10 +300,7 @@ void *Timstat3(void *process)
 	    }
 	}
 
-      nmiss = 0;
-      for ( size_t i = 0; i < gridsize; i++ )
-	if ( DBL_IS_EQUAL(out[0].ptr[i], missval1) ) nmiss++;
-
+      nmiss = arrayNumMV(gridsize, out[0].ptr, missval1);
       pstreamDefRecord(streamID3, varID, levelID);
       pstreamWriteRecord(streamID3, out[0].ptr, nmiss);
     }

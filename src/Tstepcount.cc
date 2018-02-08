@@ -169,12 +169,8 @@ void *Tstepcount(void *process)
 
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
+	  nmiss = arrayNumMV(gridsize, vars[0][varID][levelID].ptr, missval);
 	  pstreamDefRecord(streamID2, varID, levelID);
-
-	  nmiss = 0;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(vars[0][varID][levelID].ptr[i], missval) ) nmiss++;
-
 	  pstreamWriteRecord(streamID2, vars[0][varID][levelID].ptr, nmiss);
 	}
     }

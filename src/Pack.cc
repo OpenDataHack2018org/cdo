@@ -174,23 +174,11 @@ void *Pack(void *process)
 	      if ( nmiss > 0 )
 		{
 		  nmisspv += nmiss;
-		  for ( size_t i = 0; i < gridsize; ++i )
-		    {
-		      if ( !DBL_IS_EQUAL(array[i], missval1) )
-			{
-			  if ( array[i] < fmin ) fmin = array[i];
-			  if ( array[i] > fmax ) fmax = array[i];
-			  ivals++;
-			}
-		    }
+                  ivals = arrayMinMaxMV(gridsize, array, missval1, &fmin, &fmax);
 		}
 	      else
 		{
-		  for ( size_t i = 0; i < gridsize; ++i )
-		    {
-		      if ( array[i] < fmin ) fmin = array[i];
-		      if ( array[i] > fmax ) fmax = array[i];
-		    }
+                  arrayMinMax(gridsize, array, &fmin, &fmax);
 		  ivals = gridsize;
 		}
 	    }

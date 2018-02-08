@@ -133,9 +133,7 @@ void farinv(field_type *field)
   for ( size_t i = 0; i < len; i++ ) 
     array[i] = DIVMN(1.0, array[i]);
 
-  field->nmiss = 0;
-  for ( size_t i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array[i], missval1) ) field->nmiss++;
+  field->nmiss = arrayNumMV(len, array, missval1);
 }
 
 
@@ -147,12 +145,9 @@ void farround(field_type *field)
 
   size_t len = gridInqSize(grid);
 
-  for ( size_t i = 0; i < len; i++ ) 
-    array[i] = round(array[i]);
-
-  field->nmiss = 0;
   for ( size_t i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array[i], missval1) ) field->nmiss++;
+    if ( !DBL_IS_EQUAL(array[i], missval1) )
+      array[i] = round(array[i]);
 }
 
 

@@ -1108,11 +1108,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       minval =  1e35;
       maxval = -1e35;
-      for ( size_t i = 0; i < gridsize*nt; i++ )
-	{
-	  if ( array[i] < minval ) minval = array[i];
-	  if ( array[i] > maxval ) maxval = array[i];
-	}
+      arrayMinMax(gridsize*nt, array, &minval, &maxval);
 
       if ( cdoVerbose )
 	cdoPrint("Dataset %s: missval = %g  addoffset = %g  scalefactor = %g",
@@ -1571,21 +1567,11 @@ void *Importcmsaf(void *process)
 	      if ( nz == 1 ) offset = gridsize*tsID;
 	      array  = dsets.obj[ivar].array+offset;
 
-	      nmiss  = 0;
 	      minval =  1e35;
 	      maxval = -1e35;
+              arrayMinMaxMV(gridsize, array, missval, &minval, &maxval);
 
-	      for ( i = 0; i < gridsize; i++ )
-		{
-		  if ( !DBL_IS_EQUAL(array[i], missval) )
-		    {
-		      if ( array[i] < minval ) minval = array[i];
-		      if ( array[i] > maxval ) maxval = array[i];
-		    }
-		}
-
-	      for ( i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+              nmiss = arrayNumMV(gridsize, array, missval);
 
 	      if ( cdoVerbose )
 		cdoPrint(" Write var %d,  level %d, nmiss %zu, missval %g, minval %g, maxval %g",

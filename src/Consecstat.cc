@@ -110,13 +110,11 @@ static void selEndOfPeriod(field_type *periods, field_type history, field_type c
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
-        parray[i] = ( DBL_IS_EQUAL(carray[i], 0.0) ) ? pmissval : carray[i];
+        parray[i] = DBL_IS_EQUAL(carray[i], 0.0) ? pmissval : carray[i];
     }
   }
 
-  periods->nmiss = 0;
-  for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(parray[i], pmissval) ) periods->nmiss++;
+  periods->nmiss = arrayNumMV(len, parray, pmissval);
 }
 
 

@@ -203,9 +203,7 @@ void *Setmiss(void *process)
 	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( array[i] < rmin || array[i] > rmax ) array[i] = missval;
 
-	      nmiss = 0;
-	      for ( size_t i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+	      nmiss = arrayNumMV(gridsize, array, missval);
 	    }
 
 	  pstreamDefRecord(streamID2, varID, levelID);

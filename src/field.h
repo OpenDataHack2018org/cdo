@@ -22,7 +22,7 @@
 #include "compare.h"
 #include "array.h"
 
-double var_to_std(double rvar, double missval);
+double varToStd(double rvar, double missval);
 
 enum field_flag {
   FIELD_NONE  =  1,
@@ -94,7 +94,6 @@ double fldskew(field_type field);
 double fldkurt(field_type field);
 
 /* ENS VALIDATION */
-double fldcrps(field_type field);
 double fldbrs(field_type field);
 double fldrank(field_type field);
 double fldroc(field_type field);

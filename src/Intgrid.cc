@@ -203,11 +203,7 @@ void boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
 	xfield2[ilat][ilon] /= in;
       }
 
-  size_t nmiss = 0;
-  for ( size_t i = 0; i < nlat2*nlon2; i++ )
-    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
-  field2->nmiss = nmiss;
+  field2->nmiss = arrayNumMV(nlat2*nlon2, array2, missval);
 }
 
 static
@@ -245,13 +241,8 @@ void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
       olat++;
     }
 
-  size_t nmiss = 0;
-  for ( size_t i = 0; i < nlat2*nlon2; i++ )
-    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-  
-  field2->nmiss = nmiss;
+  field2->nmiss = arrayNumMV(nlat2*nlon2, array2, missval);
 }
-
 
 
 void *Intgrid(void *process)

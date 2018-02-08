@@ -23,12 +23,12 @@
 #include "cdoOptions.h"
 #include "array.h"
 
-double crps_det_integrate(double *a, const double d, const size_t n);
 
 double fldfun(field_type field, int function)
 {
   double rval = 0;
 
+  // clang-format off
   switch (function)
     {
     case func_range:  rval = fldrange(field);  break;
@@ -47,7 +47,6 @@ double fldfun(field_type field, int function)
     case func_std1w:  rval = fldstd1w(field);  break;
     case func_varw:   rval = fldvarw(field);   break;
     case func_var1w:  rval = fldvar1w(field);  break;
-    case func_crps:   rval = fldcrps(field);   break;
     case func_brs:    rval = fldbrs(field);    break;
     case func_rank:   rval = fldrank(field);   break;
     case func_roc:    rval = fldroc(field);    break;
@@ -55,133 +54,23 @@ double fldfun(field_type field, int function)
     case func_kurt:   rval = fldkurt(field);   break;
     default: cdoAbort("%s: function %d not implemented!", __func__, function);
     }
+  // clang-format on
 
   return rval;
 }
 
 
-double fldrank(field_type field)
-{
-  double res = 0;
-  // Using first value as reference (observation)
-  double *array  =  &(field.ptr[1]);
-  double val     = array[-1];
-  const double missval = field.missval;
-  size_t nmiss      = field.nmiss;
-  const size_t len       = field.size-1;
-  size_t j;
-
-  if ( nmiss ) return missval;
-
-  sort_iter_single(len,array, 1);
-
-  if ( val > array[len-1] )
-    res=(double)len;
-  else
-    for ( j=0; j<len; j++ )
-      if ( array[j] >= val ) {
-	res=(double)j;
-	break;
-      }
-
-  return res;
-}
-
-
-double fldroc(field_type field)
-{
-  return field.missval;
-}
-
-double fldcrps(field_type field)
-{
-  const size_t len     = field.size;
-  const size_t nmiss   = field.nmiss;
-  double *array  = field.ptr;
-
-  if ( nmiss > 0 )
-    cdoAbort("Missing values not implemented in crps calculation");
-  // possible handling of missing values:
-  // (1) strip them off, and sort array without missing values
-  //     using only (len - 1 - nmiss) values
-  // (2) modify merge_sort in a way, that missing values will
-  //     always go to the end of the list
-
-  // Use first value as reference
-  sort_iter_single(len-1,&array[1],Threading::ompNumThreads);
-
-  return crps_det_integrate(&array[1],array[0],len-1);
-}
-
-
-double fldbrs(field_type field)
-{
-  const size_t  nmiss   = field.nmiss;
-  const size_t    len   = field.size;
-  double *array   = field.ptr;
-  const double missval  = field.missval;
-
-  double brs = 0;
-  size_t i, count=0;
-
-  // Using first value as reference
-  if ( nmiss == 0 )
-    {
-      for ( i=1; i<len; i++ )
-	brs += (array[i] - array[0]) * (array[i] - array[0]);
-      count = i-1;
-    }
-  else
-    {
-      if ( DBL_IS_EQUAL(array[0], missval) ) return missval;
-
-      for ( i=1; i<len; i++ )
-	if ( !DBL_IS_EQUAL(array[i], missval) )
-	  {
-	    brs += (array[i] - array[0]) * (array[i] - array[0]);
-	    count ++;
-	  }
-    }
-
-  return brs/count;
-}
-
-
 double fldrange(field_type field)
 {
-  const size_t nmiss      = field.nmiss > 0;
-  const size_t len     = field.size;
-  const double missval = field.missval;
-  const double *restrict array = field.ptr;
-  double rmin =  DBL_MAX;
-  double rmax = -DBL_MAX;
-  double range = 0;
+  double range;
 
-  assert(array!=NULL);
-
-  if ( nmiss )
+  if ( field.nmiss )
     {
-      for ( size_t i = 0; i < len; i++ )
-	if ( !DBL_IS_EQUAL(array[i], missval) )
-          {
-            if ( array[i] < rmin ) rmin = array[i];
-            if ( array[i] > rmax ) rmax = array[i];
-          }
-
-      if ( IS_EQUAL(rmin,  DBL_MAX) && IS_EQUAL(rmax, -DBL_MAX) )
-        range = missval;
-      else
-        range = rmax-rmin;
+      range = arrayRangeMV(field.size, field.ptr, field.missval);
     }
   else
     {
-      //#pragma simd reduction(min:rmin)
-      for ( size_t i = 0; i < len; i++ )
-        {
-          if ( array[i] < rmin ) rmin = array[i];
-          if ( array[i] > rmax ) rmax = array[i];
-        }
-      range = rmax-rmin;
+      range = arrayRange(field.size, field.ptr);
     }
 
   return range;
@@ -190,27 +79,15 @@ double fldrange(field_type field)
 
 double fldmin(field_type field)
 {
-  const size_t nmiss      = field.nmiss > 0;
-  const size_t len     = field.size;
-  const double missval = field.missval;
-  const double *restrict array = field.ptr;
-  double rmin = DBL_MAX;
+  double rmin;
 
-  assert(array!=NULL);
-
-  if ( nmiss )
+  if ( field.nmiss )
     {
-      for ( size_t i = 0; i < len; i++ )
-	if ( !DBL_IS_EQUAL(array[i], missval) )
-	  if ( array[i] < rmin ) rmin = array[i];
-
-      if ( IS_EQUAL(rmin, DBL_MAX) ) rmin = missval;
+      rmin = arrayMinMV(field.size, field.ptr, field.missval);
     }
   else
     {
-      //#pragma simd reduction(min:rmin)
-      for ( size_t i = 0; i < len; i++ )
-	if ( array[i] < rmin ) rmin = array[i];
+      rmin = arrayMin(field.size, field.ptr);
     }
 
   return rmin;
@@ -219,26 +96,15 @@ double fldmin(field_type field)
 
 double fldmax(field_type field)
 {
-  const size_t nmiss      = field.nmiss > 0;
-  const size_t len     = field.size;
-  const double missval = field.missval;
-  const double *restrict array = field.ptr;
-  double rmax = -DBL_MAX;
+  double rmax;
 
-  assert(array!=NULL);
-
-  if ( nmiss > 0 )
+  if ( field.nmiss )
     {
-      for ( size_t i = 0; i < len; i++ )
-        if ( !DBL_IS_EQUAL(array[i], missval) )
-          if ( array[i] > rmax ) rmax = array[i];
-
-      if ( IS_EQUAL(rmax, -DBL_MAX) ) rmax = missval;
+      rmax = arrayMaxMV(field.size, field.ptr, field.missval);
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ )
-        if ( array[i] > rmax ) rmax = array[i];
+      rmax = arrayMax(field.size, field.ptr);
     }
 
   return rmax;
@@ -442,6 +308,7 @@ void prekurtsum(const double *restrict array, size_t len, size_t nmiss, const do
   *rsum4w    = xsum4w;
 }
 
+
 double fldvar(field_type field)
 {
   const size_t nmiss   = field.nmiss > 0;
@@ -474,6 +341,8 @@ double fldvar1(field_type field)
 
   return rvar;
 }
+
+
 double fldkurt(field_type field)
 {
   const size_t nmiss   = field.nmiss > 0;
@@ -496,6 +365,7 @@ double fldkurt(field_type field)
 
   return rvar;
 }
+
 
 double fldskew(field_type field)
 {
@@ -592,7 +462,7 @@ double fldvar1w(field_type field)
 }
 
 
-double var_to_std(double rvar, double missval)
+double varToStd(double rvar, double missval)
 {
   double rstd;
 
@@ -611,25 +481,25 @@ double var_to_std(double rvar, double missval)
 
 double fldstd(field_type field)
 {
-  return var_to_std(fldvar(field), field.missval);
+  return varToStd(fldvar(field), field.missval);
 }
 
 
 double fldstd1(field_type field)
 {
-  return var_to_std(fldvar1(field), field.missval);
+  return varToStd(fldvar1(field), field.missval);
 }
 
 
 double fldstdw(field_type field)
 {
-  return var_to_std(fldvarw(field), field.missval);
+  return varToStd(fldvarw(field), field.missval);
 }
 
 
 double fldstd1w(field_type field)
 {
-  return var_to_std(fldvar1w(field), field.missval);
+  return varToStd(fldvar1w(field), field.missval);
 }
 
 
@@ -741,30 +611,24 @@ void varrms(field_type field, field_type field2, field_type *field3)
 /* RQ */
 double fldpctl(field_type field, const double pn)
 {
-  const size_t len     = field.size;
-  const size_t nmiss   = field.nmiss;
-  const double missval = field.missval;
-  double *array  = field.ptr;
-  double pctl = missval;
+  double pctl = field.missval;
 
-  if ( len - nmiss > 0 )
+  if ( (field.size - field.nmiss) > 0 )
     {
-      if ( nmiss > 0 )
+      if ( field.nmiss )
         {
-          double *array2 = (double*) Malloc((len - nmiss)*sizeof(double));
+          std::vector<double> v(field.size - field.nmiss);
 
           size_t j = 0;
-          for ( size_t i = 0; i < len; i++ )
-            if ( !DBL_IS_EQUAL(array[i], missval) )
-              array2[j++] = array[i];
+          for ( size_t i = 0; i < field.size; i++ )
+            if ( !DBL_IS_EQUAL(field.ptr[i], field.missval) )
+              v[j++] = field.ptr[i];
 
-          pctl = percentile(array2, j, pn);
-
-          Free(array2);
+          pctl = percentile(&v[0], j, pn);
         }
       else
         {
-          pctl = percentile(array, len, pn);
+          pctl = percentile(field.ptr, field.size, pn);
         }
     }
 
@@ -772,67 +636,89 @@ double fldpctl(field_type field, const double pn)
 }
 /* QR */
 
+double fldrank(field_type field)
+{
+  double res = 0;
+  // Using first value as reference (observation)
+  double *array  =  &(field.ptr[1]);
+  double val     = array[-1];
+  const double missval = field.missval;
+  size_t nmiss      = field.nmiss;
+  const size_t len       = field.size-1;
+  size_t j;
+
+  if ( nmiss ) return missval;
+
+  sort_iter_single(len,array, 1);
+
+  if ( val > array[len-1] )
+    res=(double)len;
+  else
+    for ( j=0; j<len; j++ )
+      if ( array[j] >= val ) {
+	res=(double)j;
+	break;
+      }
+
+  return res;
+}
+
+
+double fldroc(field_type field)
+{
+  return field.missval;
+}
+
+
+double fldbrs(field_type field)
+{
+  const size_t  nmiss   = field.nmiss;
+  const size_t    len   = field.size;
+  double *array   = field.ptr;
+  const double missval  = field.missval;
+
+  double brs = 0;
+  size_t i, count=0;
+
+  // Using first value as reference
+  if ( nmiss == 0 )
+    {
+      for ( i=1; i<len; i++ )
+	brs += (array[i] - array[0]) * (array[i] - array[0]);
+      count = i-1;
+    }
+  else
+    {
+      if ( DBL_IS_EQUAL(array[0], missval) ) return missval;
+
+      for ( i=1; i<len; i++ )
+	if ( !DBL_IS_EQUAL(array[i], missval) )
+	  {
+	    brs += (array[i] - array[0]) * (array[i] - array[0]);
+	    count ++;
+	  }
+    }
+
+  return brs/count;
+}
+
 /*  field_type UTILITIES */
 /*  update the number non missing values */
 void fldunm(field_type *field)
 {
-  size_t i;
-
-  field->nmiss = 0;
-  for ( i = 0; i < field->size; i++ )
-    if ( DBL_IS_EQUAL(field->ptr[i], field->missval) ) field->nmiss++;
+  field->nmiss = arrayNumMV(field->size, field->ptr, field->missval);
 }
 
 /*  check for non missval values */
 int fldhvs(field_type *fieldPtr, const size_t nlevels)
 {
-  size_t level;
   field_type field;
 
-  for ( level = 0; level < nlevels; level++)
+  for ( size_t level = 0; level < nlevels; level++ )
     {
       field = fieldPtr[level];
-      if ( (size_t)field.nmiss != field.size )
-        return TRUE;
+      if ( field.nmiss != field.size ) return TRUE;
     }
 
   return FALSE;
 }
-
-
-double crps_det_integrate(double *a, const double d, const size_t n)
-{
-  /* *************************************************************************** */
-  /* This routine finds the area between the cdf described by the ordered array  */
-  /* of doubles (double *a) and the Heavyside function H(d)                      */
-  /* INPUT ARGUMENTS:                                                            */
-  /*     double *a  - ordered array of doubles describing a cdf                  */
-  /*                  as cdf(a[i]) = ( (double)i )/ n                            */
-  /*     double d   - describing a reference value                               */
-  /*     int n      - the length of array a                                      */
-  /* RETURN VALUE:                                                               */
-  /*     double     - area under the curve in units of a                         */
-  /* *************************************************************************** */
-
-  double area = 0;
-  //  double tmp;
-  size_t i;
-#ifdef  _OPENMP
-#pragma omp parallel for if ( n>10000 ) shared(a) private(i) \
-  reduction(+:area) schedule(static,10000)
-#endif                                                         /* **************************** */
-  for ( i=1; i<n; i++ ) {                                      /* INTEGRATE CURVE AREA         */
-    if ( a[i] < d )                                            /* left of heavyside            */
-      area += (a[i]-a[i-1])*(double)i*i/n/n;                   /*                              */
-    else if ( a[i-1] > d )                                     /* right of heavyside           */
-      area += (a[i]-a[i-1])*(1.-(double)i/n)*(1.-(double)i/n); /*                              */
-    else if ( a[i-1] < d && a[i] > d ) {                       /* hitting jump pf heavyside    */
-      area += (d-a[i-1]) * (double)i*i/n/n;                    /* (occurs exactly once!)       */
-      area += (a[i]-d) * (1.-(double)i/n)*(1.-(double)i/n);    /* **************************** */
-    }
-  }
-
-
-  return area;
-}
-

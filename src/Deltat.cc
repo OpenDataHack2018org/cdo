@@ -87,17 +87,15 @@ void *Deltat(void *process)
                     array2[i] = array1[i] - array0[i];
                 }
 
-              nmiss = 0;
-              for ( size_t i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+              nmiss = arrayNumMV(gridsize, array2, missval);
             }
           else
             {
               for ( size_t i = 0; i < gridsize; ++i )
                 array2[i] = array1[i] - array0[i];
             }
-          
-          for ( size_t i = 0; i < gridsize; ++i ) array0[i] = array1[i];
+
+          arrayCopy(gridsize, array1, array0);
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, array2, nmiss);

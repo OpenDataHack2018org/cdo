@@ -105,10 +105,7 @@ void *Subtrend(void *process)
 	  for ( size_t i = 0; i < gridsize; i++ )
 	    field4.ptr[i] = SUBMN(field1.ptr[i], ADDMN(vars2[varID][levelID].ptr[i], MULMN(vars3[varID][levelID].ptr[i], tsID)));
     
-	  nmiss = 0;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(field4.ptr[i], missval) ) nmiss++;
-
+	  nmiss = arrayNumMV(gridsize, field4.ptr, missval);
 	  pstreamDefRecord(streamID4, varID, levelID);
 	  pstreamWriteRecord(streamID4, field4.ptr, nmiss);
 	}

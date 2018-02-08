@@ -22,7 +22,6 @@
 #include <time.h> // clock()
 
 #include <cdi.h>
-#include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
@@ -168,8 +167,8 @@ void fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
   array1  = field1->ptr;
   array2  = field2->ptr;
 
-  nx  = gridInqXsize(gridID);
-  ny  = gridInqYsize(gridID);
+  nx = gridInqXsize(gridID);
+  ny = gridInqYsize(gridID);
 
   matrix1 = (double **) Malloc(ny * sizeof(double *));
   matrix2 = (double **) Malloc(ny * sizeof(double *));
@@ -287,36 +286,36 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   double *array1 = field1->ptr;
   double *array2 = field2->ptr;
 
-  unsigned gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
-  unsigned nmiss = field1->nmiss;
-  unsigned nvals = gridsize - nmiss;
-
-  double *xvals = (double*) Malloc(gridsize*sizeof(double));
-  double *yvals = (double*) Malloc(gridsize*sizeof(double));
+  size_t nmiss = field1->nmiss;
+  size_t nvals = gridsize - nmiss;
 
   if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
 
   if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
     gridID = gridToCurvilinear(gridID, 0);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  std::vector<double> xvals(gridsize);
+  std::vector<double> yvals(gridsize);
+
+  gridInqXvals(gridID, &xvals[0]);
+  gridInqYvals(gridID, &yvals[0]);
 
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID, units);
-  grid_to_radian(units, gridsize, xvals, "grid center lon");
+  grid_to_radian(units, gridsize, &xvals[0], "grid center lon");
   gridInqYunits(gridID, units);
-  grid_to_radian(units, gridsize, yvals, "grid center lat");
+  grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
-  size_t *mindex = nmiss ? (size_t *) Calloc(1, nmiss*sizeof(size_t)) : NULL;
-  size_t *vindex = nvals ? (size_t *) Calloc(1, nvals*sizeof(size_t)) : NULL;
-  double *lons = nvals ? (double *) Malloc(nvals*sizeof(double)) : NULL;
-  double *lats = nvals ? (double *) Malloc(nvals*sizeof(double)) : NULL;
+  std::vector<size_t> mindex(nmiss, 1);
+  std::vector<size_t> vindex(nvals, 1);
+  std::vector<double> lons(nvals);
+  std::vector<double> lats(nvals);
   
-  unsigned nv = 0, nm = 0;
-  for ( unsigned i = 0; i < gridsize; ++i ) 
+  size_t nv = 0, nm = 0;
+  for ( size_t i = 0; i < gridsize; ++i ) 
     {
       array2[i] = array1[i];
       if ( DBL_IS_EQUAL(array1[i], missval) )
@@ -349,7 +348,7 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
     {
       bool xIsCyclic = false;
       size_t dims[2] = {nvals, 0};
-      gs = gridsearch_create(xIsCyclic, dims, nvals, lons, lats);
+      gs = gridsearch_create(xIsCyclic, dims, nvals, &lons[0], &lats[0]);
       gridsearch_extrapolate(gs);
     }
   
@@ -367,7 +366,7 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 #pragma omp parallel for default(none)  reduction(+:findex)  shared(nbr_mask, nbr_add, nbr_dist)  \
   shared(mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
 #endif
-  for ( unsigned i = 0; i < nmiss; ++i )
+  for ( size_t i = 0; i < nmiss; ++i )
     {
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/nmiss);
@@ -389,9 +388,6 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
         }
     }
 
-  if ( mindex ) Free(mindex);
-  if ( vindex ) Free(vindex);
-
   finish = clock();
 
   if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
@@ -403,11 +399,6 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   if ( gs ) gridsearch_delete(gs);
 
   if ( gridID0 != gridID ) gridDestroy(gridID);
-
-  if ( lons ) Free(lons);
-  if ( lats ) Free(lats);
-  Free(xvals);
-  Free(yvals);
 }
 
 
@@ -496,7 +487,7 @@ void *Fillmiss(void *process)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss = nmiss;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 
@@ -522,10 +513,7 @@ void *Fillmiss(void *process)
               fill_method(&field1, &field2, nfill);
 
               size_t gridsize = gridInqSize(field2.grid);
-              size_t nmiss = 0;
-              for ( size_t i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
-              
+              size_t nmiss = arrayNumMV(gridsize, field2.ptr, field2.missval);              
               pstreamWriteRecord(streamID2, field2.ptr, nmiss);
             }
         }

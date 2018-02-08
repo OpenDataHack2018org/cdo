@@ -284,10 +284,7 @@ void *Comp(void *process)
 	      cdoAbort("Operator not implemented!");
 	    }
 
-	  size_t nmiss3 = 0;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(array3[i], missval1) ) nmiss3++;
-
+	  size_t nmiss3 = arrayNumMV(gridsize, array3, missval1);
 	  pstreamDefRecord(streamID3, varID, levelID);
 	  pstreamWriteRecord(streamID3, array3, nmiss3);
 	}

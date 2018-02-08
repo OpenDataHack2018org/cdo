@@ -48,11 +48,7 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
           for ( int levelID2c = 0; levelID2c < nlevel; ++levelID2c )
             {
               double *pdata = vardata2[varID2c]+gridsize*levelID2c;
-              size_t nmiss = 0;
-              for ( size_t i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
-
-              // if ( levelID2c == 0 ) printf("Write varID %d\n", varID2c);
+              size_t nmiss = arrayNumMV(gridsize, pdata, missval);
               pstreamDefRecord(streamID2, varID2c, levelID2c);
               pstreamWriteRecord(streamID2, pdata, nmiss);
             }

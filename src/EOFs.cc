@@ -610,9 +610,7 @@ void *EOFs(void *process)
 		  if      ( grid_space ) scale_eigvec_grid(out, tsID, npack, pack, weight, covar, sum_w);
 		  else if ( time_space ) scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, data, missval, sum_w);
 
-                  nmiss = 0;
-                  for ( size_t i = 0; i < gridsize; i++ ) if ( DBL_IS_EQUAL(out[i], missval) ) nmiss++;
-
+                  nmiss = arrayNumMV(gridsize, out, missval);
                   pstreamDefRecord(streamID3, varID, levelID);
                   pstreamWriteRecord(streamID3, out, nmiss);
 		} // loop n_eig
