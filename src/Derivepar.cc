@@ -341,12 +341,12 @@ void *Derivepar(void *process)
       if ( zaxisIDh != -1 )
 	{
 	  /* check range of ps_prog */
-	  minmaxval(gridsize, ps, NULL, &minval, &maxval);
+	  arrayMinMaxMask(gridsize, ps, NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
 	  /* check range of surface geopot */
-	  minmaxval(gridsize, sgeopot, NULL, &minval, &maxval);
+	  arrayMinMaxMask(gridsize, sgeopot, NULL, &minval, &maxval);
 	  if ( minval < MIN_FIS || maxval > MAX_FIS )
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 	}
@@ -358,7 +358,7 @@ void *Derivepar(void *process)
 	  offset   = gridsize*levelID;
 	  single2  = temp + offset;
 
-	  minmaxval(gridsize, single2, NULL, &minval, &maxval);
+	  arrayMinMaxMask(gridsize, single2, NULL, &minval, &maxval);
 	  if ( minval < MIN_T || maxval > MAX_T )
 	    cdoWarning("Input temperature at level %d out of range (min=%g max=%g)!",
 		       levelID+1, minval, maxval);
@@ -375,7 +375,7 @@ void *Derivepar(void *process)
 
 	      // corr_hum(gridsize, single2, MIN_Q);
 
-	      minmaxval(gridsize, single2, NULL, &minval, &maxval);
+	      arrayMinMaxMask(gridsize, single2, NULL, &minval, &maxval);
 	      if ( minval < -0.1 || maxval > MAX_Q )
 		cdoWarning("Input humidity at level %d out of range (min=%g max=%g)!",
 			   levelID+1, minval, maxval);

@@ -308,6 +308,7 @@ void prekurtsum(const double *restrict array, size_t len, size_t nmiss, const do
   *rsum4w    = xsum4w;
 }
 
+
 double fldvar(field_type field)
 {
   const size_t nmiss   = field.nmiss > 0;
@@ -340,6 +341,8 @@ double fldvar1(field_type field)
 
   return rvar;
 }
+
+
 double fldkurt(field_type field)
 {
   const size_t nmiss   = field.nmiss > 0;
@@ -362,6 +365,7 @@ double fldkurt(field_type field)
 
   return rvar;
 }
+
 
 double fldskew(field_type field)
 {
@@ -607,27 +611,24 @@ void varrms(field_type field, field_type field2, field_type *field3)
 /* RQ */
 double fldpctl(field_type field, const double pn)
 {
-  double *array = field.ptr;
   double pctl = field.missval;
 
-  if ( field.size - field.nmiss > 0 )
+  if ( (field.size - field.nmiss) > 0 )
     {
       if ( field.nmiss )
         {
-          double *array2 = (double*) Malloc((field.size - field.nmiss)*sizeof(double));
+          std::vector<double> v(field.size - field.nmiss);
 
           size_t j = 0;
           for ( size_t i = 0; i < field.size; i++ )
-            if ( !DBL_IS_EQUAL(array[i], field.missval) )
-              array2[j++] = array[i];
+            if ( !DBL_IS_EQUAL(field.ptr[i], field.missval) )
+              v[j++] = field.ptr[i];
 
-          pctl = percentile(array2, j, pn);
-
-          Free(array2);
+          pctl = percentile(&v[0], j, pn);
         }
       else
         {
-          pctl = percentile(array, field.size, pn);
+          pctl = percentile(field.ptr, field.size, pn);
         }
     }
 

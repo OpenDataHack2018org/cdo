@@ -1217,9 +1217,7 @@ void *Remap(void *argument)
                   gme_grid_restore(&array2[0], ni, nd);
                 }
 
-              nmiss2 = 0;
-              for ( size_t i = 0; i < gridsize2; i++ )
-                if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss2++;
+              nmiss2 = arrayNumMV(gridsize2, &array2[0], missval);
             }
 
 	  pstreamDefRecord(streamID2, varID, levelID);

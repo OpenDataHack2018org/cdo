@@ -493,7 +493,7 @@ void *Vertintml(void *process)
 	      /* check range of surface geopot */
 	      if ( extrapolate && (sgeopotID != -1 || geopotID != -1) )
 		{
-		  minmaxval(gridsize, &sgeopot[0], NULL, &minval, &maxval);
+		  arrayMinMaxMask(gridsize, &sgeopot[0], NULL, &minval, &maxval);
 		  if ( minval < MIN_FIS || maxval > MAX_FIS )
 		    cdoWarning("Surface geopotential out of range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID+1);
 		  if ( gridsize > 1 && minval >= 0 && maxval <= 9000 )
@@ -507,7 +507,7 @@ void *Vertintml(void *process)
 	    memcpy(&ps_prog[0], vardata1[presID], gridsize*sizeof(double));
 
 	  /* check range of ps_prog */
-	  minmaxval(gridsize, &ps_prog[0], NULL, &minval, &maxval);
+	  arrayMinMaxMask(gridsize, &ps_prog[0], NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID+1);
 

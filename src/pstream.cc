@@ -49,6 +49,7 @@
 #include "compare.h"
 #include "cdo_vlist.h"
 #include "functs.h"
+#include "array.h"
 #include "cdoOptions.h"
 #include "cdo_history.h"
 
@@ -745,39 +746,22 @@ void PstreamType::readRecord(double *data, size_t *nmiss)
 void
 PstreamType::checkDatarange(int varID, double *array, size_t nmiss)
 {
-  long i;
   long gridsize = m_varlist[varID].gridsize;
   int datatype = m_varlist[varID].datatype;
   double missval = m_varlist[varID].missval;
   double addoffset = m_varlist[varID].addoffset;
   double scalefactor = m_varlist[varID].scalefactor;
 
-  long ivals = 0;
-  double arrmin = 1.e300;
-  double arrmax = -1.e300;
+  size_t ivals = 0;
+  double arrmin, arrmax;
+
   if (nmiss > 0)
     {
-      for (i = 0; i < gridsize; ++i)
-        {
-          if (!DBL_IS_EQUAL(array[i], missval))
-            {
-              if (array[i] < arrmin)
-                arrmin = array[i];
-              if (array[i] > arrmax)
-                arrmax = array[i];
-              ivals++;
-            }
-        }
+      ivals = arrayMinMaxMV(gridsize, array, missval, &arrmin, &arrmax);
     }
   else
     {
-      for (i = 0; i < gridsize; ++i)
-        {
-          if (array[i] < arrmin)
-            arrmin = array[i];
-          if (array[i] > arrmax)
-            arrmax = array[i];
-        }
+      arrayMinMax(gridsize, array, &arrmin, &arrmax);
       ivals = gridsize;
     }
 

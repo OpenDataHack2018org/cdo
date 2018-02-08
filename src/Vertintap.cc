@@ -381,7 +381,7 @@ void *Vertintap(void *process)
 
 	  /* check range of ps_prog */
           double minval, maxval;
-	  minmaxval(gridsize, &ps_prog[0], NULL, &minval, &maxval);
+	  arrayMinMaxMask(gridsize, &ps_prog[0], NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 

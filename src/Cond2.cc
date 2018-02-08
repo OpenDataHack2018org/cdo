@@ -34,7 +34,7 @@ void *Cond2(void *process)
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   size_t offset;
-  size_t nmiss1, nmiss2, nmiss3, nmiss4;
+  size_t nmiss1, nmiss2, nmiss3;
   double missval1 = -9.E33;
   double missval2 = -9.E33;
   size_t **varnmiss1 = NULL;
@@ -184,10 +184,7 @@ void *Cond2(void *process)
 	      cdoAbort("Operator not implemented!");
 	    }
 
-	  nmiss4 = 0;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(array4[i], missval2) ) nmiss4++;
-
+	  size_t nmiss4 = arrayNumMV(gridsize, array4, missval2);
 	  pstreamDefRecord(streamID4, varID, levelID);
 	  pstreamWriteRecord(streamID4, array4, nmiss4);
 	}

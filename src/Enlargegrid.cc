@@ -215,9 +215,9 @@ void *Enlargegrid(void *process)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
           int varID, levelID;
-          size_t nmiss1;
+          size_t nmiss;
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, array1, &nmiss1);
+	  pstreamReadRecord(streamID1, array1, &nmiss);
 
 	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 
@@ -226,12 +226,9 @@ void *Enlargegrid(void *process)
 	    if ( gindex[i] >= 0 )
 	      array2[gindex[i]] = array1[i];		
 
-	  size_t nmiss2 = 0;
-	  for ( size_t i = 0; i < gridsize2; i++ )
-	    if ( DBL_IS_EQUAL(array2[i], missval1) ) nmiss2++;
-
+	  nmiss = arrayNumMV(gridsize2, array2, missval1);
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, array2, nmiss2);
+	  pstreamWriteRecord(streamID2, array2, nmiss);
 	}
 
       tsID++;

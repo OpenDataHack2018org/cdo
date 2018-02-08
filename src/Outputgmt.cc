@@ -75,40 +75,10 @@ void make_cyclic(double *array1, double *array2, int nlon, int nlat)
 }
 
 static
-void array_stat(int ngp, double *restrict array, double missval, double *minval, double *maxval, double *meanval)
-{
-  double rmin = DBL_MAX;
-  double rmax = -DBL_MAX;
-  double rmean = 0;
-  
-  int nvals = 0;
-  for ( int i = 0; i < ngp; i++ )
-    {
-      if ( !DBL_IS_EQUAL(array[i], missval) )
-        {
-          if ( array[i] < rmin ) rmin = array[i];
-          if ( array[i] > rmax ) rmax = array[i];
-          rmean += array[i];
-          nvals++;
-        }
-    }
-
-  if ( IS_EQUAL(rmin,  DBL_MAX) ) rmin = missval;
-  if ( IS_EQUAL(rmax, -DBL_MAX) ) rmax = missval;
-
-  if ( nvals ) rmean /= nvals;
-  else         rmean = missval;
-
-  *minval = rmin;
-  *maxval = rmax;
-  *meanval = rmean;
-}
-
-static
 void output_vrml(int nlon, int nlat, int ngp, double *restrict array, double missval, CPT *cpt)
 {
   double minval, maxval, meanval;
-  array_stat(ngp, array, missval, &minval, &maxval, &meanval);
+  arrayMinMaxMeanMV(ngp, array, missval, &minval, &maxval, &meanval);
 
   double dx = 10./nlon;
 
@@ -497,7 +467,7 @@ void *Outputgmt(void *process)
               if ( cdoVerbose )
                 {
                   double minval, maxval, meanval;
-                  array_stat(gridsize, array, missval, &minval, &maxval, &meanval);
+                  arrayMinMaxMeanMV(gridsize, array, missval, &minval, &maxval, &meanval);
                   double range = maxval - minval;
                   fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range/20);
                   fprintf(stderr, "pscontour -K -JQ0/10i -Rd -I -Cgmt.cpt data.gmt > gmtplot.ps\n");
@@ -597,7 +567,7 @@ void *Outputgmt(void *process)
               if ( cdoVerbose )
                 {
                   double minval, maxval, meanval;
-                  array_stat(gridsize, array, missval, &minval, &maxval, &meanval);
+                  arrayMinMaxMeanMV(gridsize, array, missval, &minval, &maxval, &meanval);
                   double range = maxval - minval;
                   fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range/20);
                   fprintf(stderr, "psxy -K -JQ0/10i -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps\n");
