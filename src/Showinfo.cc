@@ -34,18 +34,18 @@
 
 #include <stdio.h>
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "Showattribute.h"
 
-void *Showinfo(void *argument)
+void *Showinfo(void *process)
 {
   int date0 = 0;
   int year, month, day;
   int month0 = 0, year0 = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SHOWYEAR      = cdoOperatorAdd("showyear",      0, 0, NULL);
@@ -68,9 +68,9 @@ void *Showinfo(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int nvars   = vlistNvars(vlistID);
   int taxisID = vlistInqTaxis(vlistID);
@@ -274,7 +274,7 @@ void *Showinfo(void *argument)
     {
       if ( operatorID == SHOWATTS )
         {
-          int vlistID = pstreamInqVlist(streamID);
+          int vlistID = cdoStreamInqVlist(streamID);
           int nvars = vlistNvars(vlistID);
           for ( int varID = 0; varID < nvars; varID++ )
             {

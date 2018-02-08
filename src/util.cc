@@ -34,10 +34,10 @@
 #include <inttypes.h> /* intmax_t */
 
 #include "cdi.h"
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "modules.h"
 #include "util.h"
+#include "cdoOptions.h"
 
 
 #ifndef  VERSION
@@ -52,11 +52,7 @@ int CDO_optind = 1;
 const char *CDO_progname = NULL;
 const char *CDO_version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
 
-int ompNumThreads = 1;
 
-int stdin_is_tty  = 0;
-int stdout_is_tty = 0;
-int stderr_is_tty = 0;
 
 char *cdoGridSearchDir   = NULL;
 
@@ -67,13 +63,11 @@ int cdoDefaultTableID    = CDI_UNDEFID;
 int cdoDefaultInstID     = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;
 
-int cdoLockIO            = FALSE;
-int cdoCheckDatarange    = FALSE;
+int cdoCheckDatarange    = false;
 
 int CDO_flt_digits       = 7;
 int CDO_dbl_digits       = 15;
 
-int CDO_Color            = FALSE;
 int CDO_Use_FFTW         = TRUE;
 int CDO_Version_Info     = TRUE;
 int CDO_CMOR_Mode        = FALSE;
@@ -87,17 +81,12 @@ int CDO_Reduce_Dim       = FALSE;
 int CDO_Append_History   = TRUE;
 int CDO_Reset_History    = FALSE;
 
-int cdoCompType          = CDI_COMPRESS_NONE;  // compression type
-int cdoCompLevel         = 0;              // compression level
 int cdoDebug             = 0;
 int cdoChunkType         = CDI_UNDEFID;
-int cdoSilentMode        = FALSE;
 int cdoOverwriteMode     = FALSE;
 int cdoBenchmark         = FALSE;
 int cdoTimer             = FALSE;
 int cdoVerbose           = FALSE;
-int cdoCompress          = FALSE;
-int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
 int cdoNumVarnames       = 0;
@@ -108,7 +97,6 @@ char CDO_File_Suffix[32];
 int cdoExpMode           = -1;
 const char *cdoExpName   = NULL;
 
-int timer_read, timer_write;
 
 const char *cdoComment(void)
 {
@@ -195,26 +183,9 @@ const char *getProgname(char *string)
   return progname;
 }
 
-char *getOperator(const char *argument)
-{
-  char *operatorArg = NULL;
-
-  if ( argument )
-    {
-      size_t len = 1 + strlen(argument);
-
-      operatorArg = (char*) Malloc(len);
-
-      memcpy(operatorArg, argument, len);
-    }
-
-  return operatorArg;
-}
-
-
 const char *getOperatorName(const char *operatorCommand)
 {
-  char *operatorName = NULL;
+   char *operatorName = NULL;
 
   if ( operatorCommand )
     {
@@ -228,13 +199,8 @@ const char *getOperatorName(const char *operatorCommand)
       operatorName[len] = '\0';
     }
 
-  /*  return operatorName; */
-  if(is_alias(operatorName))
-    {
-      operatorName = get_original(operatorName);
-    }
-
-  return operatorName;
+  const char* test = operatorName;
+  return test;
 }
 
 char *getOperatorArg(const char *p_operatorCommand)
@@ -249,7 +215,7 @@ char *getOperatorArg(const char *p_operatorCommand)
           size_t len = strlen(commapos+1);
           if ( len )
             {
-              operatorCommand = (char*) Malloc(len+1);
+              operatorCommand = ( char*) Malloc(len+1);
               strcpy(operatorCommand, commapos+1);
             }
         }
@@ -316,28 +282,6 @@ void input_int(char *arg, int intarr[], int maxint, int *nintfound)
     
   *nintfound = nint;
 }
-
-std::string string2lower(std::string str)
-{
-  std::string lower_case_string = str;
-  for(char c : str) c = tolower(c); 
-  return lower_case_string;
-}
-
-void strtolower(char *str)
-{
-  if ( str )
-    for ( size_t i = 0; str[i]; ++i )
-      str[i] = (char)tolower((int)str[i]);
-}
-
-void strtoupper(char *str)
-{
-  if ( str )
-    for ( size_t i = 0; str[i]; ++i )
-      str[i] = (char)toupper((int)str[i]);
-}
-
 
 const char *parameter2word(const char *string)
 {
@@ -491,51 +435,6 @@ int month_to_season(int month)
   return seas;
 }
 
-#include <sys/stat.h>
-
-bool fileExists(const char *restrict filename)
-{
-  bool status = false;
-  struct stat buf;
-
-  if ( stat(filename, &buf) == 0 )
-    {
-      if ( S_ISREG(buf.st_mode) && buf.st_size > 0 ) status = true;
-    }
-
-  return status;
-}
-
-
-bool userFileOverwrite(const char *restrict filename)
-{
-  bool status = false;
-
-  if ( !cdoSilentMode && stdin_is_tty && stderr_is_tty )
-    {
-      fprintf(stderr, "File %s already exists, overwrite? (yes/no): ", filename);
-      char line[1024];
-      readline(stdin, line, 1024);
-      char *pline = line;
-      while ( isspace((int) *pline) ) pline++;
-      int len = (int) strlen(pline);
-      if ( len == 3 )
-        {
-          if ( pline[0] == 'y' && pline[1] == 'e' && pline[2] == 's' )
-            status = true;
-          else if ( pline[0] == 'Y' && pline[1] == 'E' && pline[2] == 'S' )
-            status = true;
-        }
-      else if ( len == 1 )
-        {
-          if ( pline[0] == 'y' || pline[0] == 'Y' ) status = true;
-        }
-    }
-
-  return status;
-}
-
-
 bool ps_lhead = false;
 int ps_nch   = 0;
 int ps_cval  = -1;
@@ -550,7 +449,7 @@ void progressInit(void)
 
 void progressStatus(double offset, double refval, double curval)
 {
-  if ( cdoSilentMode ) return;
+  if ( Options::silentMode ) return;
   if ( !stdout_is_tty ) return;
 
   offset = offset < 0 ? 0: offset;
@@ -635,6 +534,7 @@ int str2datatype(const char *datatypestr)
   return datatype;
 }
 
+#include <sys/stat.h>
 
 off_t fileSize(const char *restrict filename)
 {
@@ -651,66 +551,6 @@ off_t fileSize(const char *restrict filename)
   
   return filesize;
 }
-
-
-/* 
- * Return the filetype extension (const char) for a given filetype (int)
- * TODO: handle lists of extensions i.e. grb and grb2 for GRIB2-format
- */
-const char *filetypeext(int filetype)
-{
-  switch ( filetype )
-    {
-    case CDI_FILETYPE_GRB:
-    case CDI_FILETYPE_GRB2: return ".grb";
-    case CDI_FILETYPE_NC:
-    case CDI_FILETYPE_NC2:
-    case CDI_FILETYPE_NC5:
-    case CDI_FILETYPE_NC4:
-    case CDI_FILETYPE_NC4C: return ".nc";
-    case CDI_FILETYPE_SRV:  return ".srv";
-    case CDI_FILETYPE_EXT:  return ".ext";
-    case CDI_FILETYPE_IEG:  return ".ieg";
-    default:                return "";
-    }
-}
-
-
-/*
- * Remove file extension:
- * -------------------------------------------------
- * Remove file extension if it is the expected one
- * Do nothing otherwise
- */
-void rm_filetypeext(char *file, const char *ext)
-{
-  // length of filename
-  int namelen = (int) strlen(file);
-  // length of the original file extension
-  int extlen =  (int) strlen(ext);
-
-  // delete original extension if it is the expected one
-  if ( strcmp(&file[namelen-extlen], ext) == 0 )
-      file[namelen-extlen] = 0;
-}
-
-
-/*
- * Replace or just add file extension:
- * -------------------------------------------------
- * Replace file extension with new one
- * or just add the new file extension 
- * if the original extension is not the expected one
- */
-void repl_filetypeext(char file[], const char *oldext, const char *newext)
-{
-  // delete original extension if it is the expected one
-  rm_filetypeext(file, oldext);
-
-  // add new file extension
-  strcat(file, newext);
-}
-
 
 void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname)
 {
@@ -777,7 +617,7 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
               if ( cdoDefaultFileType == CDI_FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = true;
             }
 
-          if ( cdoDefaultFileType == CDI_FILETYPE_GRB && cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
+          if ( cdoDefaultFileType == CDI_FILETYPE_GRB && Options::cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
           if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
         }
     }
@@ -789,7 +629,7 @@ int cdoFiletype(void)
   if ( cdoDefaultFileType == CDI_UNDEFID )
     {
       cdoDefaultFileType = CDI_FILETYPE_GRB;
-      if ( ! cdoSilentMode )
+      if ( ! Options::silentMode )
         cdoPrint("Set default filetype to GRIB");
     }
 

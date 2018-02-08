@@ -23,9 +23,10 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "util_files.h"
 
 
 static
@@ -46,7 +47,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
       int gridID1  = vlistInqVarGrid(vlistID1, varID1);
       int zaxisID1 = vlistInqVarZaxis(vlistID1, varID1);
       int gtype1   = gridInqType(gridID1);
-      int gsize1   = gridInqSize(gridID1);
+      size_t gsize1 = gridInqSize(gridID1);
       int ztype1   = zaxisInqType(zaxisID1);
       int nlev1    = zaxisInqSize(zaxisID1);
       if ( nlev1 > mlev1 )
@@ -63,7 +64,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 	  int gridID2  = vlistInqVarGrid(vlistID2, varID2);
 	  int zaxisID2 = vlistInqVarZaxis(vlistID2, varID2);
 	  int gtype2   = gridInqType(gridID2);
-	  int gsize2   = gridInqSize(gridID2);
+	  size_t gsize2 = gridInqSize(gridID2);
 	  int ztype2   = zaxisInqType(zaxisID2);
 	  int nlev2    = zaxisInqSize(zaxisID2);
 	  if ( gtype1 == gtype2 && gsize1 == gsize2 && ztype1 == ztype2 && nlev1 == nlev2 )
@@ -118,24 +119,24 @@ int vlistConstVars(int vlistID)
 }
 */
 
-void *Merge(void *argument)
+void *Merge(void *process)
 {
   int streamID1 = -1;
   int varID, varID2;
   int nrecs = 0;
   int levelID, levelID2;
   int index;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
   int streamCnt = cdoStreamCnt();
   int nmerge    = streamCnt - 1;
 
-  const char *ofilename = cdoStreamName(streamCnt-1)->args;
+  const char *ofilename = cdoGetStreamName(streamCnt-1).c_str();
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
@@ -147,8 +148,8 @@ void *Merge(void *argument)
 
   for ( index = 0; index < nmerge; index++ )
     {
-      streamIDs[index] = pstreamOpenRead(cdoStreamName(index));
-      vlistIDs[index]  = pstreamInqVlist(streamIDs[index]);
+      streamIDs[index] = cdoStreamOpenRead(cdoStreamName(index));
+      vlistIDs[index]  = cdoStreamInqVlist(streamIDs[index]);
     }
 
   int taxisindex = 0;
@@ -172,7 +173,7 @@ void *Merge(void *argument)
   vlistCopy(vlistID2, vlistIDs[0]);
   for ( index = 1; index < nmerge; index++ )
     {
-      checkDupEntry(vlistID2, vlistIDs[index], cdoStreamName(index)->args);
+      checkDupEntry(vlistID2, vlistIDs[index], cdoGetStreamName(index).c_str());
       /* vlistCat(vlistID2, vlistIDs[index]); */
       vlistMerge(vlistID2, vlistIDs[index]);
     }
@@ -209,7 +210,7 @@ void *Merge(void *argument)
       vlistPrint(vlistID2);
     }
        
-  int streamID2 = pstreamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
 
   vlistDefTaxis(vlistID2, taxisID2);
   pstreamDefVlist(streamID2, vlistID2);

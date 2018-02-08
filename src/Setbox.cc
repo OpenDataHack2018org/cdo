@@ -23,23 +23,23 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
-void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
 
-void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
 
 
 static
 void setcbox(double constant, double *array, int gridID,
-	     int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+	     long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
-  int nlon, nlat;
-  int ilat, ilon;
+  long nlon, nlat;
+  long ilat, ilon;
 
   nlon = gridInqXsize(gridID);
   nlat = gridInqYsize(gridID);
@@ -53,28 +53,26 @@ void setcbox(double constant, double *array, int gridID,
 }
 
 
-void *Setbox(void *argument)
+void *Setbox(void *process)
 {
   int SETCLONLATBOX, SETCINDEXBOX;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, nvars;
   int tsID, varID, levelID;
-  int gridsize;
+  size_t gridsize;
   int vlistID1, vlistID2;
   int gridID = -1;
   int index, ngrids, gridtype;
   size_t nmiss;
   int *vars;
-  int i;
   int ndiffgrids;
-  int lat1, lat2, lon11, lon12, lon21, lon22;
-  double missval;
+  long lat1, lat2, lon11, lon12, lon21, lon22;
   double constant;
   double *array;
   int taxisID1, taxisID2;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0, "constant, western and eastern longitude and southern and northern latitude");
   SETCINDEXBOX  = cdoOperatorAdd("setcindexbox",  0, 0, "constant, index of first and last longitude and index of first and last latitude");
@@ -85,9 +83,9 @@ void *Setbox(void *argument)
 
   constant = parameter2double(operatorArgv()[0]);
 
-  streamID1 = pstreamOpenRead(cdoStreamName(0));
+  streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  vlistID1 = pstreamInqVlist(streamID1);
+  vlistID1 = cdoStreamInqVlist(streamID1);
 
   ngrids = vlistNgrids(vlistID1);
   ndiffgrids = 0;
@@ -128,13 +126,10 @@ void *Setbox(void *argument)
   vars  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
-      if ( gridID == vlistInqVarGrid(vlistID1, varID) )
-	vars[varID] = TRUE;
-      else
-	vars[varID] = FALSE;
+      vars[varID] = (gridID == vlistInqVarGrid(vlistID1, varID));
     }
 
-  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
@@ -155,13 +150,10 @@ void *Setbox(void *argument)
 	    {
 	      pstreamReadRecord(streamID1, array, &nmiss);
 
-	      missval = vlistInqVarMissval(vlistID1, varID);
 	      setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
 
-	      nmiss = 0;
-	      for ( i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
-
+	      double missval = vlistInqVarMissval(vlistID1, varID);
+	      nmiss = arrayNumMV(gridsize, array, missval);
 	      pstreamDefRecord(streamID2, varID, levelID);
 	      pstreamWriteRecord(streamID2, array, nmiss);
 	    }

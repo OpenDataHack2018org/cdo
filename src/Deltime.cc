@@ -17,25 +17,26 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "util_string.h"
 
 
-void *Deltime(void *argument)
+void *Deltime(void *process)
 {
   int nrecs;
   int varID, levelID;
   int vdate /*, vtime */;
   int copytimestep;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   int year, month, day;
   int dday, dmon;
   double *array = NULL;
   const char *cmons[]={"", "jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"};
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -80,9 +81,9 @@ void *Deltime(void *argument)
 
   if ( cdoVerbose ) cdoPrint("delete day %d%s", dday, cmons[dmon]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -90,7 +91,7 @@ void *Deltime(void *argument)
   taxisDefCalendar(taxisID2, CALENDAR_365DAYS);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   if ( ! lcopy )

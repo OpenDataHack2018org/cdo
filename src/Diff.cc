@@ -23,12 +23,14 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "text.h"
+#include "cdoOptions.h"
 
 
-void *Diff(void *argument)
+void *Diff(void *process)
 {
   bool lhead = true;
   int nrecs, nrecs2;
@@ -41,7 +43,7 @@ void *Diff(void *argument)
   char vdatestr[32], vtimestr[32];
   double abslim = 0., abslim2 = 1.e-3, rellim = 1.0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int DIFF  = cdoOperatorAdd("diff",  0, 0, NULL);
@@ -57,11 +59,11 @@ void *Diff(void *argument)
   if ( operatorArgc() == 2 ) rellim = parameter2double(operatorArgv()[1]);
   if ( rellim < -1.e33 || rellim > 1.e+33 ) cdoAbort("Rel. limit out of range!");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(0);
+  int streamID2 = cdoStreamOpenRead(1);
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
@@ -146,7 +148,7 @@ void *Diff(void *argument)
 		}
 	    }
 
-	  if ( ! cdoSilentMode || cdoVerbose )
+	  if ( ! Options::silentMode || cdoVerbose )
 	    {
 	      if ( absm > abslim || (checkrel && relm >= rellim) || cdoVerbose )
 		{

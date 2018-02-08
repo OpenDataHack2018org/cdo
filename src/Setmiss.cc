@@ -33,12 +33,12 @@
 
 #include <cmath>
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Setmiss(void *argument)
+void *Setmiss(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -46,7 +46,7 @@ void *Setmiss(void *argument)
   double missval2 = 0;
   double rconst = 0, rmin = 0, rmax = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETMISSVAL = cdoOperatorAdd("setmissval", 0, 0, "missing value");
@@ -85,9 +85,9 @@ void *Setmiss(void *argument)
       rmax = parameter2double(operatorArgv()[1]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -126,7 +126,7 @@ void *Setmiss(void *argument)
 	cdiDefAttFlt(vlistID2, varID, "valid_range", CDI_DATATYPE_FLT64, 2, range);
     }
   */
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
@@ -203,9 +203,7 @@ void *Setmiss(void *argument)
 	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( array[i] < rmin || array[i] > rmax ) array[i] = missval;
 
-	      nmiss = 0;
-	      for ( size_t i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+	      nmiss = arrayNumMV(gridsize, array, missval);
 	    }
 
 	  pstreamDefRecord(streamID2, varID, levelID);

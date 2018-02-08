@@ -19,10 +19,10 @@
 #include "config.h"
 #endif
 
-#include "cdo_int.h"
 #include "error.h"
 #include "modules.h"
 #include <cdi.h>
+#include "util_string.h"
 
 #include <dirent.h>
 #include <dlfcn.h>
@@ -31,8 +31,6 @@
 #include <string>
 // for std::sort()
 #include <algorithm>
-
-
 
 
 
@@ -205,7 +203,7 @@ bool check_operator(std::string operatorName) {
  * @param new_module newly constructed module
  * @note: if an error happens while adding the new module cdo will exit.
  */
-void add_module(std::string module_name, modules_t new_module) {
+void add_module(std::string module_name, module_t new_module) {
     if (modules.find(module_name) == modules.end()) {
         modules[module_name] = new_module;
         for (std::string operatorName : new_module.operators) {
@@ -281,7 +279,7 @@ std::string get_module_name_to(std::string operatorName) {
 
  * returns the function of the module of \a operatorName
  * @param operatorName name of the operator
- * @returns the function of the #modules_t of \a operatorName
+ * @returns the function of the #module_t of \a operatorName
  */
 void *(*operatorModule(const char *operatorName))(void *) {
     std::string operator_name = std::string(operatorName);
@@ -544,7 +542,7 @@ void operatorPrintList(bool print_no_output) {
     }
 
     unsigned long list_length = output_list.size();
-    modules_t *current_module;
+    module_t *current_module;
 
     //help variables
 
@@ -572,27 +570,27 @@ void operatorPrintList(bool print_no_output) {
     }
 }
 
-bool is_alias(char * operatorName)
+bool is_alias(const char * operatorName)
 {
     return (aliases.find(std::string(operatorName)) != aliases.end());
 }
 
-char* get_original(char * operatorName)
+const char* get_original(const char * operatorName)
 {
     char* original = NULL;
     if(is_alias(operatorName)){
         std::string opName = aliases[std::string(operatorName)];
-        original = (char*)realloc(operatorName, opName.size());
+        original = (char*)malloc(opName.size());
         strcpy(original, opName.c_str());
     }
     else{
-        Error("%s is not an alias", operatorName);
+        return operatorName;
     }
     return original; 
 }
 
 
-modules_t &getModule(const std::string &operator_name)
+module_t &getModule(const std::string &operator_name)
 {
     return modules[get_module_name_to(operator_name)];
 }

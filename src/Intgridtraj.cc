@@ -22,10 +22,11 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "interpol.h"
+#include "datetime.h"
 
 
 static
@@ -50,7 +51,7 @@ int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double
 }
 
 
-void *Intgridtraj(void *argument)
+void *Intgridtraj(void *process)
 {
   int varID, levelID;
   int vdate, vtime;
@@ -59,7 +60,7 @@ void *Intgridtraj(void *argument)
   double xpos, ypos;
   int calendar = CALENDAR_STANDARD;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("filename with grid trajectories");
   operatorCheckArgc(1);
@@ -71,9 +72,9 @@ void *Intgridtraj(void *argument)
   juldate_t juldate;
   readnextpos(fp, calendar, &juldate, &xpos, &ypos);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   field_type field1, field2;
   field_init(&field1);
@@ -166,7 +167,7 @@ void *Intgridtraj(void *argument)
 	    {
               if ( streamID2 == CDI_UNDEFID )
                 {
-                  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+                  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
                   pstreamDefVlist(streamID2, vlistID2);
                 }
 

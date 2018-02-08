@@ -1,3 +1,19 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #ifndef _GRID_H
 #define _GRID_H
 
@@ -82,7 +98,7 @@ void correct_sinxvals(int xsize, int ysize, double *xvals);
 struct cart gc2cc(struct geo *position);
 void factorni(int kni, int *kni2, int *kni3);
 void gme_grid_restore(double *p, int ni, int nd);
-void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
+void gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat,
 	      double *blon, double *blat, int *imask,
               int ni, int nd, int ni2, int ni3);
 

@@ -1,8 +1,24 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #include <stdio.h>
 #include <string.h>
 
 #include <cdi.h>
-#include <cdo.h>
+
 #include <cdo_int.h>
 #include "dmemory.h"
 #include "field.h"
@@ -25,7 +41,7 @@ field_type **field_allocate(int vlistID, int ptype, int init)
     {
       int nwpv     = vlistInqNWPV(vlistID, varID); // number of words per value; real:1  complex:2
       int gridID   = vlistInqVarGrid(vlistID, varID);
-      int gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
       int zaxisID  = vlistInqVarZaxis(vlistID, varID);
       int nlevel   = zaxisInqSize(zaxisID);
       double missval = vlistInqVarMissval(vlistID, varID);

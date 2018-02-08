@@ -23,12 +23,13 @@
 #include <time.h> // clock()
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "constants.h" // planet radius
 #include "pmlist.h"
+#include "cdoOptions.h"
 
 #include "grid_search.h"
 
@@ -122,8 +123,8 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
   
-  struct gsknn **knn = (struct gsknn**) Malloc(ompNumThreads*sizeof(struct gsknn*));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  struct gsknn **knn = (struct gsknn**) Malloc(Threading::ompNumThreads*sizeof(struct gsknn*));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     knn[i] = gridsearch_knn_new(numNeighbors);
 
   clock_t start, finish;
@@ -193,7 +194,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
   if ( gs ) gridsearch_delete(gs);
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     gridsearch_knn_delete(knn[i]);
 
   if ( gridID0 != gridID ) gridDestroy(gridID);
@@ -377,7 +378,7 @@ void set_parameter(int *xnsmooth, smoothpoint_t *spoint)
 }
 
 
-void *Smooth(void *argument)
+void *Smooth(void *process)
 {
   int nrecs;
   int xnsmooth = 1;
@@ -388,7 +389,7 @@ void *Smooth(void *argument)
   spoint.weight0   = 0.25;
   spoint.weightR   = 0.25;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SMOOTH  = cdoOperatorAdd("smooth",   0,   0, NULL);
@@ -401,9 +402,9 @@ void *Smooth(void *argument)
 
   if ( spoint.radius < 0 || spoint.radius > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "radius", spoint.radius);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -447,7 +448,7 @@ void *Smooth(void *argument)
   double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
   double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
  
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;

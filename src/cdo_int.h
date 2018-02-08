@@ -35,15 +35,15 @@
 #include "pmlist.h"
 #include "listbuf.h"
 #include "compare.h"
-#include "array.h"
 #include "timebase.h"
 #include "field.h"
 #include "functs.h"
 #include "dmemory.h"
-#include "process.h"
 #include "const.h"
 #include "util.h"
-#include "datetime.h"
+#include "cdo_vlist.h"
+#include "process_int.h"
+#include "exception.h"
 
 #ifdef  _OPENMP
 #define  OPENMP3   200805 
@@ -64,21 +64,6 @@
 #endif
 
 
-#ifndef strdupx
-#ifndef strdup
-char *strdup(const char *s);
-#endif
-#define strdupx  strdup
-/*
-#define strdupx(s)			          \
-({					      	  \
-   const char *__old = (s);			  \
-   size_t __len = strlen(__old) + 1;		  \
-   char *__new = Malloc(__len);	  \
-   (char *) memcpy(__new, __old, __len);	  \
-})
-*/
-#endif
 
 
 #define  cmpstr(s1, s2)          (strncmp(s1, s2, strlen(s2)))
@@ -114,15 +99,11 @@ enum T_EIGEN_MODE  {JACOBI, DANIELSON_LANCZOS};
 #define  MEMTYPE_DOUBLE  1
 #define  MEMTYPE_FLOAT   2
 
-#define  CDO_EXP_LOCAL   1
-#define  CDO_EXP_REMOTE  2
 
 void print_pthread_info(void);
 
 void cdoProcessTime(double *utime, double *stime);
 
-void    setCommandLine(int argc, char **argv);
-char   *commandLine(void);
 int     readline(FILE *fp, char *line, int len);
 
 int zaxis2ltype(int zaxisID);
@@ -153,8 +134,6 @@ void printFiletype(int streamID, int vlistID);
 void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval);
 
 off_t fileSize(const char *restrict filename);
-
-char *expand_filename(const char *string);
 
 const char *parameter2word(const char *string);
 double parameter2double(const char *string);
@@ -196,8 +175,6 @@ int qu2reg3_double(double *pfield, int *kpoint, int klat, int klon,
 		   double msval, int *kret, int omisng, int operio, int oveggy);
 
 void cdoCompareGrids(int gridID1, int gridID2);
-void vlistCompare(int vlistID1, int vlistID2, int flag);
-int  vlistCompareX(int vlistID1, int vlistID2, int flag);
 
 #if defined (__cplusplus)
 }

@@ -22,18 +22,19 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "after_vertint.h"
 #include "stdnametable.h"
+#include "util_string.h"
 
 
 void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor, int nlev);
 
 double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf);
 
-void *Derivepar(void *argument)
+void *Derivepar(void *process)
 {
   ModelMode mode(ModelMode::UNDEF);
   int nrecs;
@@ -57,7 +58,7 @@ void *Derivepar(void *argument)
   gribcode_t gribcodes;
   memset(&gribcodes, 0, sizeof(gribcode_t));
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int GHEIGHT          = cdoOperatorAdd("gheight",            0, 0, NULL);
@@ -66,15 +67,15 @@ void *Derivepar(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int gridID = vlistGrid(vlistID1, 0);
   if ( gridInqType(gridID) == GRID_SPECTRAL )
     cdoAbort("Spectral data unsupported!");
  
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int zaxisIDh = -1;
   int nvct = 0;
@@ -289,7 +290,7 @@ void *Derivepar(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
@@ -320,7 +321,7 @@ void *Derivepar(void *argument)
 	      else if ( varID == presID )
 		{
 		  if ( lnpsID != -1 )
-		    for ( i = 0; i < gridsize; ++i ) ps[i] = exp(array[i]);
+		    for ( size_t i = 0; i < gridsize; ++i ) ps[i] = exp(array[i]);
 		  else if ( psID != -1 )
 		    memcpy(ps, array, gridsize*sizeof(double));
 		}

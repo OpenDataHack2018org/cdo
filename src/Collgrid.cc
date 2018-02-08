@@ -17,10 +17,11 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
+#include "util_files.h"
 
 
 typedef struct
@@ -29,7 +30,7 @@ typedef struct
   int vlistID;
   int gridID;
   size_t nmiss;
-  int gridsize;
+  size_t gridsize;
   int *gridindex;
   double *array;
 } ens_file_t;
@@ -301,16 +302,16 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
 }
 
 
-void *Collgrid(void *argument)
+void *Collgrid(void *process)
 {
   int nxblocks = -1;
   int varID, levelID;
   int nrecs0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
     
   int nfiles = cdoStreamCnt() - 1;
-  const char *ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
@@ -319,8 +320,8 @@ void *Collgrid(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      ef[fileID].streamID = pstreamOpenRead(cdoStreamName(fileID));
-      ef[fileID].vlistID  = pstreamInqVlist(ef[fileID].streamID);
+      ef[fileID].streamID = cdoStreamOpenRead(cdoStreamName(fileID));
+      ef[fileID].vlistID  = cdoStreamInqVlist(ef[fileID].streamID);
     }
 
   int vlistID1 = ef[0].vlistID;
@@ -402,7 +403,7 @@ void *Collgrid(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      int gridsize = vlistGridsizeMax(ef[fileID].vlistID);
+      size_t gridsize = vlistGridsizeMax(ef[fileID].vlistID);
       ef[fileID].gridsize = gridsize;
       ef[fileID].gridindex = (int*) Malloc(gridsize*sizeof(int));
       ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
@@ -475,7 +476,7 @@ void *Collgrid(void *argument)
 	}
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 	  
   double *array2 = (gridsize2 > 0) ? (double*) Malloc(gridsize2*sizeof(double)) : NULL;
@@ -488,7 +489,7 @@ void *Collgrid(void *argument)
 	{
 	  int nrecs = pstreamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
+	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0).c_str(), cdoStreamName(fileID));
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -534,10 +535,7 @@ void *Collgrid(void *argument)
 
 	      if ( vars[varID2] )
 		{
-		  size_t nmiss = 0;
-		  for ( size_t i = 0; i < gridsize2; i++ )
-		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
+		  size_t nmiss = arrayNumMV(gridsize2, array2, missval);
 		  pstreamWriteRecord(streamID2, array2, nmiss);
 		}
 	      else

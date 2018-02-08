@@ -22,14 +22,14 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define  MAX_VARS  1024
 
-void *Replace(void *argument)
+void *Replace(void *process)
 {
   int varID, varID1, varID2;
   int nrecs = 0;
@@ -45,17 +45,17 @@ void *Replace(void *argument)
   double **vardata2 = NULL;
   double *parray;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
 
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   /* compare all variables in vlistID2 */
 
@@ -74,10 +74,10 @@ void *Replace(void *argument)
 
       if ( varID1 < nvars1 )
 	{
-	  int gridsize1 = gridInqSize(vlistInqVarGrid(vlistID1, varID1));
+	  size_t gridsize1 = gridInqSize(vlistInqVarGrid(vlistID1, varID1));
 	  int nlevel1   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 
-	  int gridsize2 = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+	  size_t gridsize2 = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
 	  int nlevel2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
 
 	  if ( gridsize1 != gridsize2 )
@@ -110,7 +110,7 @@ void *Replace(void *argument)
 	  varID2 = varlist2[idx];
 	  int nlevel1  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 	  int nlevel2  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
-	  int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
 	  vardata2[idx]  = (double*) Malloc(nlevel2*gridsize*sizeof(double));
 	  varnmiss2[idx] = (size_t*) Malloc(nlevel2*sizeof(size_t));
 	  varlevel[idx] = (int*) Malloc(nlevel1*sizeof(int));
@@ -149,12 +149,12 @@ void *Replace(void *argument)
 
   int vlistID3 = vlistDuplicate(vlistID1);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   vlistDefTaxis(vlistID3, taxisID3);
   pstreamDefVlist(streamID3, vlistID3);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int nts2 = vlistNtsteps(vlistID2);
@@ -177,7 +177,7 @@ void *Replace(void *argument)
 	      for ( idx = 0; idx < nchvars; idx++ )
 		if ( varlist2[idx] == varID )
 		  {
-		    int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		    size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 		    int offset   = gridsize*levelID;
 		    parray = vardata2[idx]+offset;
 		    pstreamReadRecord(streamID2, parray, &nmiss);
@@ -201,7 +201,7 @@ void *Replace(void *argument)
 		levelID2 = varlevel[idx][levelID];
 		if ( levelID2 != -1 )
 		  {
-		    int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+		    size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 		    int offset   = gridsize*levelID2;
 		    parray   = vardata2[idx]+offset;
 		    nmiss    = varnmiss2[idx][levelID2];

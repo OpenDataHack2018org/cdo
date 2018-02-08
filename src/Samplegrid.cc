@@ -1,4 +1,20 @@
 /*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+/*
    This module "SampleGrid" contains the following operators:
 
     samplegrid      Resample current grid with given factor, typically 2 (which will half the resolution);
@@ -7,9 +23,10 @@
 */
 
 #include <cdi.h>
+
 #include "cdoDebugOutput.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -52,7 +69,7 @@ void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI
 }
 
 
-void *Samplegrid(void *argument)
+void *Samplegrid(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -66,7 +83,7 @@ void *Samplegrid(void *argument)
     int subI0, subI1, subJ0, subJ1;
   } sbox_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SAMPLEGRID = cdoOperatorAdd("samplegrid",  0, 0, "resample factor, typically 2 (which will half the resolution)");
   int SUBGRID    = cdoOperatorAdd("subgrid",  0, 0, " sub-grid indices: i0,i1,j0,j1");
@@ -95,9 +112,9 @@ void *Samplegrid(void *argument)
   else
     cdoAbort("Unknown operator ...");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -154,14 +171,14 @@ void *Samplegrid(void *argument)
       if ( operatorID == SUBGRID    ) cdoPrint("Sub-grid has been created.");
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array1 = (double *) Malloc(gridsize*sizeof(double));
 
-  int gridsize2 = vlistGridsizeMax(vlistID2);
+  size_t gridsize2 = vlistGridsizeMax(vlistID2);
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
   double *array2 = (double *) Malloc(gridsize2*sizeof(double));
 
@@ -205,10 +222,8 @@ void *Samplegrid(void *argument)
 
               if ( nmiss )
                 {
-                  nmiss = 0;
                   double missval = vlistInqVarMissval(vlistID2, varID);
-                  for ( int i = 0; i < gridsize2; i++ )
-                    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+                  nmiss = arrayNumMV(gridsize2, array2, missval);
                 }
 
               pstreamWriteRecord(streamID2, array2, nmiss);

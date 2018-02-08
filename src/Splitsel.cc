@@ -22,14 +22,14 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Splitsel(void *argument)
+void *Splitsel(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs = 0;
   int varID, levelID;
   int tsID;
@@ -46,7 +46,7 @@ void *Splitsel(void *argument)
   double *array = NULL;
   field_type **vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
@@ -71,9 +71,9 @@ void *Splitsel(void *argument)
 
   if ( cdoVerbose ) cdoPrint("nsets = %f, noffset = %f, nskip = %f", ndates, noffset, nskip);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -81,10 +81,10 @@ void *Splitsel(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  strcpy(filename, cdoStreamName(1)->args);
+  strcpy(filename, cdoGetStreamName(1).c_str());
   nchars = strlen(filename);
 
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -144,7 +144,7 @@ void *Splitsel(void *argument)
 	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
               {
                 pstreamReadRecord(streamID1, vars[varID][levelID].ptr, &nmiss);
-                vars[varID][levelID].nmiss = (size_t) nmiss;
+                vars[varID][levelID].nmiss = nmiss;
               }
           }
     }
@@ -155,9 +155,7 @@ void *Splitsel(void *argument)
       sprintf(filename+nchars+6, "%s", filesuffix);
 	  
       if ( cdoVerbose ) cdoPrint("create file %s", filename);
-      argument_t *fileargument = file_argument_new(filename);
-      int streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      int streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
       pstreamDefVlist(streamID2, vlistID2);
 

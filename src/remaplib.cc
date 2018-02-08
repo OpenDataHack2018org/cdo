@@ -1,4 +1,20 @@
 /*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+/*
   This is a C library of the Fortran SCRIP version 1.4
 
   ===>>> Please send bug reports to <http://mpimet.mpg.de/cdo> <<<===
@@ -53,11 +69,13 @@
 #include <time.h>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
+#include "cdoOptions.h"
+#include "timer.h"
 
 
 #define IS_REG2D_GRID(gridID)  (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN)
@@ -1063,9 +1081,9 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
   size_t max_cls = get_max_add(num_links, dst_size, dst_add);
 
 #ifdef  _OPENMP
-  double **src_cls2 = (double **) Malloc(ompNumThreads*sizeof(double *));
-  double **src_wts2 = (double **) Malloc(ompNumThreads*sizeof(double *));
-  for ( int  i = 0; i < ompNumThreads; ++i )
+  double **src_cls2 = (double **) Malloc(Threading::ompNumThreads*sizeof(double *));
+  double **src_wts2 = (double **) Malloc(Threading::ompNumThreads*sizeof(double *));
+  for ( int  i = 0; i < Threading::ompNumThreads; ++i )
     {
       src_cls2[i] = (double*) Malloc(max_cls*sizeof(double));
       src_wts2[i] = (double*) Malloc(max_cls*sizeof(double));
@@ -1168,7 +1186,7 @@ void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size
     }
 
 #ifdef  _OPENMP
-  for ( int  i = 0; i < ompNumThreads; ++i )
+  for ( int  i = 0; i < Threading::ompNumThreads; ++i )
     {
       Free(src_cls2[i]);
       Free(src_wts2[i]);

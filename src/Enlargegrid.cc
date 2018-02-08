@@ -22,9 +22,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -36,14 +36,14 @@ void gen_index(int gridID1, int gridID2, int *index)
   int gridtype1 = gridInqType(gridID1);
   int gridtype2 = gridInqType(gridID2);
 
-  int gridsize2 = gridInqSize(gridID2);
+  size_t gridsize2 = gridInqSize(gridID2);
 
   if ( gridtype1 != gridtype2 )
     cdoAbort("Input streams have different grid types!");
 
   if ( index == NULL ) cdoAbort("Internal problem, index not allocated!");
 
-  for ( int i = 0; i < gridsize2; i++ ) index[i] = -1;
+  for ( size_t i = 0; i < gridsize2; i++ ) index[i] = -1;
 
   if ( gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN )
     {
@@ -156,11 +156,11 @@ void gen_index(int gridID1, int gridID2, int *index)
 }
 
 
-void *Enlargegrid(void *argument)
+void *Enlargegrid(void *process)
 {
   int nrecs = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("grid description file or name");
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
@@ -168,9 +168,9 @@ void *Enlargegrid(void *argument)
 
   int gridID2 = cdoDefineGrid(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
 
@@ -179,12 +179,12 @@ void *Enlargegrid(void *argument)
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
       ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(0)->args);
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoGetStreamName(0).c_str());
 
   int gridID1 = vlistGrid(vlistID1, 0);
 
-  int gridsize1 = gridInqSize(gridID1);
-  int gridsize2 = gridInqSize(gridID2);
+  size_t gridsize1 = gridInqSize(gridID1);
+  size_t gridsize2 = gridInqSize(gridID2);
 
   double *array1 = (double*) Malloc(gridsize1*sizeof(double));
   double *array2 = (double*) Malloc(gridsize2*sizeof(double));
@@ -200,7 +200,7 @@ void *Enlargegrid(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   vlistDefTaxis(vlistID2, taxisID2);
   pstreamDefVlist(streamID2, vlistID2);
@@ -221,13 +221,13 @@ void *Enlargegrid(void *argument)
 
 	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 
-	  for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval1;
-	  for ( int i = 0; i < gridsize1; i++ )
+	  for ( size_t i = 0; i < gridsize2; i++ ) array2[i] = missval1;
+	  for ( size_t i = 0; i < gridsize1; i++ )
 	    if ( gindex[i] >= 0 )
 	      array2[gindex[i]] = array1[i];		
 
 	  size_t nmiss2 = 0;
-	  for ( int i = 0; i < gridsize2; i++ )
+	  for ( size_t i = 0; i < gridsize2; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval1) ) nmiss2++;
 
 	  pstreamDefRecord(streamID2, varID, levelID);

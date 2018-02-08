@@ -16,9 +16,10 @@
 */
 
 #include <cdi.h>
+
 #include "cdoDebugOutput.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 
 // NOTE: All operators in this module works only on GRIB edition 1 files!
@@ -154,7 +155,7 @@ int getNumberOfDeleteSelectionTuples();
 int multiSelectionParser(const char *filenameOrString);
 
 
-void *Selmulti(void *argument)
+void *Selmulti(void *process)
 {
   int varID, levelID;
   int nlevs, code, zaxisID;
@@ -169,7 +170,7 @@ void *Selmulti(void *argument)
                       // The default value for SCALE is 1.0; the default for OFFSET is 0.0.
   double  missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SELMULTI    = cdoOperatorAdd("selmulti",    0, 0, "filename/string with selection specification ");
@@ -207,9 +208,9 @@ void *Selmulti(void *argument)
     if (getNumberOfSelectionTuples()==0)
       cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'CHANGE,  .. or (/;;|;;;)'\nCheck the file: %s",filenameOrString);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);
@@ -338,10 +339,10 @@ void *Selmulti(void *argument)
 
   int nrecs = vlistNrecs(vlistID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double *) malloc(gridsize*sizeof(double));
 
@@ -430,7 +431,7 @@ void *Selmulti(void *argument)
                   else  // 1:  simple array arithmetics ( *,+)
                     {
                       if ( CdoDebug::cdoDebugExt ) cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f",recID, code, ltype, (int)(level), varID,levelID,scale,offset);
-                      for ( int li = 0; li < gridsize; ++li )
+                      for ( size_t li = 0; li < gridsize; ++li )
                         if (! DBL_IS_EQUAL(array[li], missval) )
                           {
                             array[li] = scale*(array[li] - offset);

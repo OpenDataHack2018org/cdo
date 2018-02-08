@@ -1,7 +1,23 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #ifndef _AFTERBURNER_H
 #define _AFTERBURNER_H
 
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 /* =============================================== */
@@ -14,14 +30,14 @@
 #include <stdarg.h>
 
 #ifndef _ERROR_H
-#  include "error.h"
+#include "error.h"
 #endif
 #ifndef _DMEMORY_H
-#  include "dmemory.h"
+#include "dmemory.h"
 #endif
 
 #ifndef TRUE
-#define TRUE  1
+#define TRUE 1
 #endif
 #ifndef FALSE
 #define FALSE 0
@@ -29,77 +45,77 @@
 
 #define MaxLevel 1024
 
-#define MaxCodes  277
+#define MaxCodes 277
 
-#define S_ECHAM5  1
+#define S_ECHAM5 1
 
 struct Date
 {
-   int yr;
-   int mo;
-   int dy;
-   int hr;
-   int mn;
+  int yr;
+  int mo;
+  int dy;
+  int hr;
+  int mn;
 };
 
 struct Control
 {
-  int    Verbose;
- 
-  int    Mean;
-  int    MeanCount0;
-  int    MeanCount;
-  int    Multi;
-  int    Nfiles;
-  int    TermCount;
+  int Verbose;
 
-  int    OutputInterval;
-  int    EndOfInterval;
+  int Mean;
+  int MeanCount0;
+  int MeanCount;
+  int Multi;
+  int Nfiles;
+  int TermCount;
 
-  int    AnalysisData; /* 0 = ECHAM Data, 1 = ECMWF Spectral Analyses */
-  int    DayIn;        /* day increment of infiles if Multi = TRUE    */
-  int    Debug;
-  int    Extrapolate;
-  int    Szip;
+  int OutputInterval;
+  int EndOfInterval;
 
-  int    istreamID;
-  int    ostreamID;
-  int    ostreamID2;
-  int    ivlistID;
-  int    ovlistID;
-  int    ovlistID2;
-  int    taxisID;
-  int    taxisID2;
+  int AnalysisData; /* 0 = ECHAM Data, 1 = ECMWF Spectral Analyses */
+  int DayIn;        /* day increment of infiles if Multi = TRUE    */
+  int Debug;
+  int Extrapolate;
+  int Szip;
+
+  int istreamID;
+  int ostreamID;
+  int ostreamID2;
+  int ivlistID;
+  int ovlistID;
+  int ovlistID2;
+  int taxisID;
+  int taxisID2;
 
   struct Date NextDate;
   struct Date NewDate;
   struct Date OldDate;
   struct Date StartDate;
 
-  int    nvct;
+  int     nvct;
   double *vct;
 
-  int    *vert_index;
+  int *   vert_index;
   size_t *pnmiss;
   double *Orography;
   double *p_of_height;
 
-  int    Type;
-  int    unitsel;
-  
-  int    Fouriers;
-  int    Latitudes;
-  int    Longitudes;
-  int    HalfLevels;
-  int    Gaussian;
-  int    Spectral;
+  int Type;
+  int unitsel;
 
-  int    Truncation;
-  int    Waves;
+  int Fouriers;
+  int Latitudes;
+  int Longitudes;
+  int HalfLevels;
+  int Gaussian;
+  int Spectral;
 
-  int    Dim3FC,    Dim3SP,    Dim3GP;
-  int    DimFC,     DimGP,     DimSP;
-  int    DimSP_half;
+  int Truncation;
+  int Waves;
+
+  int Dim3FC, Dim3SP, Dim3GP;
+  int DimFC, DimGP, DimSP;
+  int DimSP_half;
 
   double *poli;
   double *pold;
@@ -110,8 +126,8 @@ struct Control
   double *dv2uv_f1;
   double *dv2uv_f2;
 
-  int    NumCodesRequest;
-  
+  int NumCodesRequest;
+
   int    NumLevel;
   int    NumLevelFound;
   int    NumLevelRequest;
@@ -122,20 +138,20 @@ struct Control
   double *DerivationFactor;
   double *Field;
 };
-  
+
 struct Variable
 {
-  int     needed0;   /* var needed for process  */
-  int     needed;    /* var needed for process  */
-  int     selected;  /* var selected for output */
-  int     detected;  /* var detected in input   */
-  int     comp;      /* compute var if selected and not detected */
+  int     needed0;  /* var needed for process  */
+  int     needed;   /* var needed for process  */
+  int     selected; /* var selected for output */
+  int     detected; /* var detected in input   */
+  int     comp;     /* compute var if selected and not detected */
   int     sfit;
   int     hlev;
   int     plev;
   int     ivarID;
-  int     ovarID;    /* 1st variable ID */
-  int     ovarID2;   /* 2nd variable ID used for variance */
+  int     ovarID;  /* 1st variable ID */
+  int     ovarID2; /* 2nd variable ID used for variance */
   int     tableID;
   int     igridID;
   int     ogridID;
@@ -154,13 +170,15 @@ struct Variable
   double *grid0;
   double *mean;
   double *variance;
-  int    *samp;
+  int *   samp;
 };
 
 /* FFT */
 void fft_set(double *trigs, long *ifax, long n);
-void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon, long nlev, long nfc);
-void gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev, long nfc);
+void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon,
+           long nlev, long nfc);
+void gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev,
+           long nfc);
 
 /* Convert Spectral Array to new resolution */
 void sp2sp(double *arrayIn, int truncIn, double *arrayOut, int truncOut);
@@ -168,13 +186,13 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 void fc2sp(double *fa, double *sa, double *poli, int klev, int nlat, int nfc, int nt);
 
 /* Physc */
-void dv2ps(const double * restrict div, double * restrict pot, long nlev, long ntr);
+void dv2ps(const double *restrict div, double *restrict pot, long nlev, long ntr);
 void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g, int nt, int nsp, int nlev);
 void scaluv(double *fu, double rclat[], int nlat, int lot);
-void uv2dv(double *fu, double *fv, double *sd, double *sv,
-           double *pol2, double *pol3, int klev, int nlat, int nt);
+void uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2, double *pol3, int klev, int nlat, int nt);
 void geninx(long ntr, double *f, double *g);
 
+/* clang-format off */
 #define    LOW_CLOUD   34
 #define    MID_CLOUD   35
 #define    HIH_CLOUD   36
@@ -227,6 +245,7 @@ void geninx(long ntr, double *f, double *g);
 #define   FULL_PRESS  278
 #define       THETAH  279
 #define       THETAF  280
+/* clang-format on */
 
 void after_read_vct(const char *vctfile, double **vct, int *nvct);
 
@@ -241,12 +260,14 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars);
 void after_processPL(struct Control *globs, struct Variable *vars);
 void after_processML(struct Control *globs, struct Variable *vars);
 
-void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss);
+void    after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID,
+                                int levelID, size_t nmiss);
 double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int levelID);
-void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID, size_t nmiss);
+void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID,
+                          size_t nmiss);
 
-void  after_AnalysisDependencies(struct Variable *vars, int ncodes);
-void  after_EchamDependencies(struct Variable *vars, int ncodes, int type, int source);
+void after_AnalysisDependencies(struct Variable *vars, int ncodes);
+void after_EchamDependencies(struct Variable *vars, int ncodes, int type, int source);
 
 void after_legini_setup(struct Control *globs, struct Variable *vars);
 

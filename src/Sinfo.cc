@@ -22,12 +22,13 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 #include "cdi_uuid.h"
 #include "printinfo.h"
+#include "text.h"
 
 const char *tunit2str(int tunits)
 {
@@ -79,7 +80,7 @@ void limit_string_length(char* string, size_t maxlen)
 }
 
 
-void *Sinfo(void *argument)
+void *Sinfo(void *process)
 {
   enum {func_generic, func_param, func_name, func_code};
   char tmpname[CDI_MAX_NAME];
@@ -88,7 +89,7 @@ void *Sinfo(void *argument)
   char vdatestr[32], vtimestr[32];
   char pstr[4];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("sinfo",   func_generic, 0, NULL);
@@ -108,8 +109,8 @@ void *Sinfo(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      int streamID = pstreamOpenRead(cdoStreamName(indf));
-      int vlistID = pstreamInqVlist(streamID);
+      int streamID = cdoStreamOpenRead(cdoStreamName(indf));
+      int vlistID = cdoStreamInqVlist(streamID);
 
       set_text_color(stdout, BRIGHT, BLACK);
       fprintf(stdout, "   File format");

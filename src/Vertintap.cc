@@ -24,12 +24,13 @@
 
 #include <array>
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "after_vertint.h"
 #include "listarray.h"
 #include "stdnametable.h"
+#include "util_string.h"
 
 static
 bool is_height_axis(int zaxisID, int nlevel)
@@ -67,7 +68,7 @@ void change_height_zaxis(int vlistID1, int vlistID2, int zaxisID2)
 }
 
 
-void *Vertintap(void *argument)
+void *Vertintap(void *process)
 {
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
@@ -82,7 +83,7 @@ void *Vertintap(void *argument)
   bool extrapolate = false;
   lista_t *flista = lista_new(FLT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int AP2PL     = cdoOperatorAdd("ap2pl",     func_pl, type_lin, "pressure levels in pascal");
@@ -141,9 +142,9 @@ void *Vertintap(void *argument)
       plev  = (double *) lista_dataptr(flista);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -319,7 +320,7 @@ void *Vertintap(void *argument)
 	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 

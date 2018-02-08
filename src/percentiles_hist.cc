@@ -20,7 +20,7 @@
 #include <math.h>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "percentiles.h"
 #include "percentiles_hist.h"

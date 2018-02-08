@@ -32,12 +32,13 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
 
 
-void *Seasstat(void *argument)
+void *Seasstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int vdate0 = 0, vtime0 = 0;
@@ -50,7 +51,7 @@ void *Seasstat(void *argument)
   int nseason = 0;
   const char *seas_name[4];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("seasrange", func_range, 0, NULL);
@@ -77,9 +78,9 @@ void *Seasstat(void *argument)
   int season_start = get_season_start();
   get_season_name(seas_name);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -88,7 +89,7 @@ void *Seasstat(void *argument)
   if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
@@ -98,7 +99,7 @@ void *Seasstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -159,7 +160,7 @@ void *Seasstat(void *argument)
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-	      int gridsize = pvars1->size;
+	      size_t gridsize = pvars1->size;
 
 	      if ( nsets == 0 )
 		{
@@ -168,7 +169,7 @@ void *Seasstat(void *argument)
                   if ( lrange )
                     {
                       pvars2->nmiss = pvars1->nmiss;
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
@@ -177,7 +178,7 @@ void *Seasstat(void *argument)
 		      if ( psamp1->ptr == NULL )
 			psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
                         psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		    }
 		}
@@ -193,11 +194,11 @@ void *Seasstat(void *argument)
 		      if ( psamp1->ptr == NULL )
 			{
 			  psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-			  for ( int i = 0; i < gridsize; i++ )
+			  for ( size_t i = 0; i < gridsize; i++ )
 			    psamp1->ptr[i] = nsets;
 			}
 
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 			  psamp1->ptr[i]++;
 		    }

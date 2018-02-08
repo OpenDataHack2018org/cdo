@@ -1,12 +1,28 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #ifdef  HAVE_CONFIG_H
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #ifdef  HAVE_LIBMAGICS
@@ -16,6 +32,7 @@
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 #include "StringUtilities.h"
+#include "util_string.h"
 
 #define DBG 0
 
@@ -1095,9 +1112,9 @@ int checkprojection( char *projection_in )
 #endif
 
 
-void *Magplot(void *argument)
+void *Magplot(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
 #ifdef  HAVE_LIBMAGICS
   int nrecs;
@@ -1127,9 +1144,9 @@ void *Magplot(void *argument)
       VerifyPlotParameters( nparam, pnames, operatorID );
     }
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   int varID = 0;
@@ -1145,7 +1162,7 @@ void *Magplot(void *argument)
   
   if ( gridtype != GRID_CURVILINEAR ) gridID = gridToCurvilinear(gridID, 1);
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int nlon     = gridInqXsize(gridID);
   int nlat     = gridInqYsize(gridID);
   //int nlev     = zaxisInqSize(zaxisID);
@@ -1245,7 +1262,7 @@ void *Magplot(void *argument)
 
                 if( DBG )
                   fprintf( stderr,"Plot %d\n",varID );
-	  	magplot(cdoStreamName(1)->args, operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr, lregular);
+	  	magplot(cdoGetStreamName(1).c_str(), operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr, lregular);
           }
 	  else
 	  	fprintf(stderr,"operator not implemented\n");

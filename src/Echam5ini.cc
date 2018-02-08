@@ -22,9 +22,10 @@
 #include <time.h>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "commandline.h"
 
 
 #ifdef  HAVE_LIBNETCDF
@@ -45,7 +46,7 @@ typedef struct {
   char *units;
   int gridID;
   int zaxisID;
-  int gridsize;
+  size_t gridsize;
   int nlev;
   double *ptr;
 } VAR;
@@ -1425,7 +1426,7 @@ void export_e5res(const char *filename, VAR *vars, int nvars)
 }
 
 
-void *Echam5ini(void *argument)
+void *Echam5ini(void *process)
 {
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs = 0;
@@ -1433,11 +1434,11 @@ void *Echam5ini(void *argument)
   int vlistID1, vlistID2;
   int nvars = 0;
   int iv, nlev;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   int taxisID, tsID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int IMPORT_E5ML  = cdoOperatorAdd("import_e5ml",  func_read,  0, NULL);
@@ -1461,9 +1462,9 @@ void *Echam5ini(void *argument)
       iniatts(&atts);
 
       if ( operatorID == IMPORT_E5ML )
-	nvars = import_e5ml(cdoStreamName(0)->args, &vars);
+	nvars = import_e5ml(cdoGetStreamName(0).c_str(), &vars);
       else if ( operatorID == IMPORT_E5RES )
-	nvars = import_e5res(cdoStreamName(0)->args, &vars, &atts);
+	nvars = import_e5res(cdoGetStreamName(0).c_str(), &vars, &atts);
       else
 	cdoAbort("Operator not implemented!");
 
@@ -1497,7 +1498,7 @@ void *Echam5ini(void *argument)
       if ( cdoDefaultFileType == CDI_UNDEFID )
 	cdoDefaultFileType = CDI_FILETYPE_NC;
 
-      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+      streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
       pstreamDefVlist(streamID2, vlistID2);
 
@@ -1528,9 +1529,9 @@ void *Echam5ini(void *argument)
       int taxisID, vdate, vtime;
       int ntr = 0;
 
-      streamID1 = pstreamOpenRead(cdoStreamName(0));
+      streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-      vlistID1 = pstreamInqVlist(streamID1);
+      vlistID1 = cdoStreamInqVlist(streamID1);
       taxisID = vlistInqTaxis(vlistID1);
 
       nvars = vlistNvars(vlistID1);
@@ -1612,9 +1613,9 @@ void *Echam5ini(void *argument)
       pstreamClose(streamID1);
 
       if ( operatorID == EXPORT_E5ML )
-	export_e5ml(cdoStreamName(1)->args, vars, nvars, vdate, vtime, ntr);
+	export_e5ml(cdoGetStreamName(1).c_str(), vars, nvars, vdate, vtime, ntr);
       else if ( operatorID == EXPORT_E5RES )
-	export_e5res(cdoStreamName(1)->args, vars, nvars);
+	export_e5res(cdoGetStreamName(1).c_str(), vars, nvars);
       else
 	cdoAbort("Operator not implemented!");
     }

@@ -22,14 +22,14 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Harmonic(void *argument)
+void *Harmonic(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int varID, levelID;
   size_t nmiss;
@@ -41,7 +41,7 @@ void *Harmonic(void *argument)
   const char *refname;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("wave number and wave length of first harmonic in number of timesteps");
 
@@ -56,22 +56,22 @@ void *Harmonic(void *argument)
     cdoAbort("The wave length must be positive and smaller than "
 	     "2 times the number of requested harmonics (=%d)!", n_out);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   int *streamIDs = (int*) Malloc(n_out*sizeof(int));
 
-  strcpy(filename, cdoStreamName(1)->args);
+  strcpy(filename, cdoGetStreamName(1).c_str());
   int nchars = strlen(filename);
 
   for ( int j = 0; j < n_out; ++j )
@@ -80,9 +80,7 @@ void *Harmonic(void *argument)
       if ( filesuffix[0] )
 	sprintf(filename+nchars+1, "%s", filesuffix);
 
-      argument_t *fileargument = file_argument_new(filename);
-      int streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      int streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
       streamIDs[j] = streamID2;
 
@@ -144,7 +142,7 @@ void *Harmonic(void *argument)
 	    {
 	      double sine   = sin(2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
 	      double cosine = cos(2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  work[j][varID][i+offset]         += array[i] * sine;
 		  work[n_out + j][varID][i+offset] += array[i] * cosine;
@@ -176,7 +174,7 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		out[j][varID][i+offset] = sqrt(work[j][varID][i+offset] * work[j][varID][i+offset] +
 					work[n_out+j][varID][i+offset] * work[n_out+j][varID][i+offset]) * 2 / nts;
 	    }
@@ -192,7 +190,7 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		out[n_out - 1][varID][i+offset] = work[2 * n_out - 1][varID][i+offset] / nts;
 	    }
 	}
@@ -230,7 +228,7 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  out[j][varID][i+offset] = work[j][varID][i+offset] || work[n_out+j][varID][i+offset]
 		              ? atan2 (work[j][varID][i+offset], work[n_out+j][varID][i+offset]) *
@@ -261,10 +259,8 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
+	      nmiss = arrayNumMV(gridsize, out[j][varID]+offset, missval);
 	      pstreamDefRecord(streamID2, varID, levelID);
-	      nmiss = 0;
-	      for ( int i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(out[j][varID][i+offset], missval) ) nmiss++;
 	      pstreamWriteRecord(streamID2, out[j][varID]+offset, nmiss);
 	    }
 	}

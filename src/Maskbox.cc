@@ -25,9 +25,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 #define MAX_LINE 256
@@ -101,19 +101,19 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 }
 
 
-void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
 
-void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
 
 
 static
-void maskbox(bool *mask, int gridID, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+void maskbox(bool *mask, int gridID, long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
-  int nlon = gridInqXsize(gridID);
-  int nlat = gridInqYsize(gridID);
+  long nlon = gridInqXsize(gridID);
+  long nlat = gridInqYsize(gridID);
 
-  for ( int ilat = 0; ilat < nlat; ilat++ )
-    for ( int ilon = 0; ilon < nlon; ilon++ )
+  for ( long ilat = 0; ilat < nlat; ilat++ )
+    for ( long ilon = 0; ilon < nlon; ilon++ )
       if (  (lat1 <= ilat && ilat <= lat2 && 
 	      ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))) )
 	mask[nlon*ilat + ilon] = false;
@@ -127,7 +127,7 @@ void maskbox_cell(bool *mask, int gridID)
   double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
   getlonlatparams(0, &xlon1, &xlon2, &xlat1, &xlat2);
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   double *xvals = (double *) Malloc(gridsize*sizeof(double));
   double *yvals = (double *) Malloc(gridsize*sizeof(double));
@@ -154,7 +154,7 @@ void maskbox_cell(bool *mask, int gridID)
       xlat2 = xtemp;
     }
   
-  for ( int i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       mask[i] = true;
 
@@ -178,8 +178,8 @@ void maskbox_cell(bool *mask, int gridID)
 static
 void maskregion(bool *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
 {
-  int nlon = gridInqXsize(gridID);
-  int nlat = gridInqYsize(gridID);
+  long nlon = gridInqXsize(gridID);
+  long nlat = gridInqYsize(gridID);
 
   double *xvals = (double*) Malloc(nlon*sizeof(double));
   double *yvals = (double*) Malloc(nlat*sizeof(double));
@@ -201,24 +201,24 @@ void maskregion(bool *mask, int gridID, double *xcoords, double *ycoords, int no
   double ymin = yvals[0];
   double ymax = yvals[0];
 
-  for ( int i = 1; i < nlon; i++ )
+  for ( long i = 1; i < nlon; i++ )
     {
       if ( xvals[i] < xmin ) xmin = xvals[i];
       if ( xvals[i] > xmax ) xmax = xvals[i];
     }
 
-  for ( int i = 1; i < nlat; i++ )
+  for ( long i = 1; i < nlat; i++ )
     {
       if ( yvals[i] < ymin ) ymin = yvals[i];
       if ( yvals[i] > ymax ) ymax = yvals[i];
     }
 
-  for ( int ilat = 0; ilat < nlat; ilat++ )
+  for ( long ilat = 0; ilat < nlat; ilat++ )
     {
       double yval = yvals[ilat];
-      for ( int ilon = 0; ilon < nlon; ilon++ )
+      for ( long ilon = 0; ilon < nlon; ilon++ )
 	{
-          int i, j;
+          long i, j;
           int c = 0;
 	  double xval = xvals[ilon];
 	  if (!( ( ( xval > xmin ) || ( xval < xmax ) ) || ( (yval > ymin) || (yval < ymax) ) ) ) c = !c;
@@ -270,15 +270,15 @@ void maskregion(bool *mask, int gridID, double *xcoords, double *ycoords, int no
 }
 
 
-void *Maskbox(void *argument)
+void *Maskbox(void *process)
 {
   int nrecs;
   int varID, levelID;
   int gridID = -1;
   int index, gridtype = -1;
-  int lat1, lat2, lon11, lon12, lon21, lon22;
+  long lat1, lat2, lon11, lon12, lon21, lon22;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int MASKLONLATBOX = cdoOperatorAdd("masklonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");
@@ -290,9 +290,9 @@ void *Maskbox(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int ngrids = vlistNgrids(vlistID1);
   int ndiffgrids = 0;
@@ -336,13 +336,13 @@ void *Maskbox(void *argument)
 	vars[varID] = false;
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   double *array = (double *) Malloc(gridsize*sizeof(double));
   bool *mask = (bool*) Malloc(gridsize*sizeof(bool));
-  for ( int i = 0;  i < gridsize; ++i ) mask[i] = true;
+  for ( size_t i = 0; i < gridsize; ++i ) mask[i] = true;
  
   if ( operatorID == MASKLONLATBOX )
     {
@@ -403,13 +403,10 @@ void *Maskbox(void *argument)
 	      pstreamReadRecord(streamID1, array, &nmiss);
 
               double missval = vlistInqVarMissval(vlistID1, varID);             
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
                 if ( mask[i] ) array[i] = missval;
 		
-	      nmiss = 0;
-	      for ( int i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
-
+	      nmiss = arrayNumMV(gridsize, array, missval);
 	      pstreamDefRecord(streamID2, varID, levelID);
 	      pstreamWriteRecord(streamID2, array, nmiss);
 	    }

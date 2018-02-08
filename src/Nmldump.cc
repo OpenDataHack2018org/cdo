@@ -21,7 +21,7 @@
 */
 
 #include "cdi.h"
-#include "cdo.h"
+
 #include "cdo_int.h"
 
 
@@ -79,9 +79,9 @@ void kvldump(list_t *pmlist)
 }
 
 
-void *Nmldump(void *argument)
+void *Nmldump(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int NMLDUMP = cdoOperatorAdd("nmldump",  0, 0, NULL);
   int KVLDUMP = cdoOperatorAdd("kvldump",  0, 0, NULL);

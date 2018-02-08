@@ -33,9 +33,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "percentiles.h"
 
@@ -81,18 +81,9 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
     }
 }
 
-
-void *Fldstat(void *argument)
+static
+void fldstatAddOperators(void)
 {
-  int gridID2, lastgrid = -1;
-  int index;
-  int nrecs;
-  int varID, levelID;
-  size_t nmiss;
-  double sglval;
-
-  cdoInitialize(argument);
-
   // clang-format off
   cdoOperatorAdd("fldrange", func_range,  0, NULL);
   cdoOperatorAdd("fldmin",   func_min,    0, NULL);
@@ -106,6 +97,19 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldvar1",  func_var1w,  1, NULL);
   cdoOperatorAdd("fldpctl",  func_pctl,   0, NULL);
   // clang-format on
+}
+
+
+void *Fldstat(void *process)
+{
+  int lastgrid = -1;
+  int nrecs;
+  int varID, levelID;
+  size_t nmiss;
+
+  cdoInitialize(process);
+
+  fldstatAddOperators();
 
   int operatorID  = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -137,9 +141,9 @@ void *Fldstat(void *argument)
 	}
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -148,7 +152,7 @@ void *Fldstat(void *argument)
 
   double slon = 0;
   double slat = 0;
-  gridID2 = gridCreate(GRID_LONLAT, 1);
+  int gridID2 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
   gridDefXvals(gridID2, &slon);
@@ -156,17 +160,17 @@ void *Fldstat(void *argument)
 
   int ngrids = vlistNgrids(vlistID1);
 
-  for ( index = 0; index < ngrids; index++ )
+  for ( int index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
   field_type field;
   field_init(&field);
 
-  int lim = vlistGridsizeMax(vlistID1);
+  size_t lim = vlistGridsizeMax(vlistID1);
   field.ptr    = (double*) Malloc(lim*sizeof(double));
   field.weight = NULL;
   if ( needWeights )
@@ -175,7 +179,7 @@ void *Fldstat(void *argument)
       if ( !useweights )
 	{
 	  cdoPrint("Using constant grid cell area weights!");
-	  for ( int i = 0; i < lim; ++i ) field.weight[i] = 1;
+	  for ( size_t i = 0; i < lim; ++i ) field.weight[i] = 1;
 	}
     }
 
@@ -201,7 +205,7 @@ void *Fldstat(void *argument)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
 
-          field.nmiss   = (size_t)nmiss;
+          field.nmiss = nmiss;
           field.grid = vlistInqVarGrid(vlistID1, varID);
 	  field.size = gridInqSize(field.grid);
 
@@ -223,18 +227,12 @@ void *Fldstat(void *argument)
 
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( operfunc == func_pctl )
-	    sglval = fldpctl(field, pn);
-	  else  
-	    sglval = fldfun(field, operfunc);
+          double sglval = (operfunc == func_pctl) ? fldpctl(field, pn) : fldfun(field, operfunc);
 
 	  if ( cdoVerbose && (operfunc == func_min || operfunc == func_max) )
 	    print_location_LL(operfunc, vlistID1, varID, levelID, field.grid, sglval, field.ptr, vdate, vtime);
 
-	  if ( DBL_IS_EQUAL(sglval, field.missval) )
-	    nmiss = 1;
-	  else
-	    nmiss = 0;
+          nmiss = DBL_IS_EQUAL(sglval, field.missval);
 
 	  pstreamDefRecord(streamID2, varID,  levelID);
 	  pstreamWriteRecord(streamID2, &sglval, nmiss);

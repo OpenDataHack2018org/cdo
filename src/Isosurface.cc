@@ -16,9 +16,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 double intlin(double x, double y1, double x1, double y2, double x2);
@@ -26,13 +26,13 @@ double intlin(double x, double y1, double x1, double y2, double x2);
 static
 void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, field_type *field2D)
 {
-  long gridsize = gridInqSize(field3D->grid);
-  long nmiss = field3D->nmiss;
+  size_t gridsize = gridInqSize(field3D->grid);
+  size_t nmiss = field3D->nmiss;
   double missval = field3D->missval;
   double *data3D = field3D->ptr;
   double *data2D = field2D->ptr;
 
-  for ( long i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       data2D[i] = missval;
 
@@ -59,16 +59,12 @@ void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, fi
 	}
     }
 
-  nmiss = 0;
-  for ( long i = 0; i < gridsize; ++i )
-    if ( DBL_IS_EQUAL(data2D[i], missval) ) nmiss++;
-
   field2D->missval = missval;
-  field2D->nmiss   = nmiss;
+  field2D->nmiss = arrayNumMV(gridsize, data2D, missval);
 }
 
 
-void *Isosurface(void *argument)
+void *Isosurface(void *process)
 {
   int nlevel = 0;
   int nrecs;
@@ -80,7 +76,7 @@ void *Isosurface(void *argument)
   double missval;
   double *single;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("isoval");
 
@@ -90,9 +86,9 @@ void *Isosurface(void *argument)
 
   if ( cdoVerbose ) cdoPrint("Isoval: %g", isoval);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -123,11 +119,11 @@ void *Isosurface(void *argument)
     if ( zaxisID1 == vlistZaxis(vlistID1, i) )
       vlistChangeZaxisIndex(vlistID2, i, zaxisIDsfc);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -201,13 +197,9 @@ void *Isosurface(void *argument)
 
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
-		      offset   = gridsize*levelID;
-		      single   = vars1[varID].ptr + offset;
-
-		      nmiss = 0;
-		      for ( i = 0; i < gridsize; ++i )
-			if ( DBL_IS_EQUAL(single[i], missval) ) nmiss++;
-
+		      offset = gridsize*levelID;
+		      single = vars1[varID].ptr + offset;
+		      nmiss = arrayNumMV(gridsize, single, missval);
 		      pstreamDefRecord(streamID2, varID, levelID);
 		      pstreamWriteRecord(streamID2, single, nmiss);
 		    }

@@ -17,10 +17,11 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "after_vertint.h"
+#include "util_string.h"
 
 
 #define  SCALESLP        (101325.0)
@@ -119,14 +120,12 @@ void pl_index(int *kmax, int *kmin, double pmax, double pmin, long nlevs, double
 
 #define NVARS  3
 
-void *Cloudlayer(void *argument)
+void *Cloudlayer(void *process)
 {
   int gridID, zaxisID;
   int nlevel, nlevs, nrecs, code;
   int varID, levelID;
   bool zrev = false;
-  int i;
-  int offset;
   size_t nmiss;
   int aclcacID = -1;
   int nvars2 = 0;
@@ -137,7 +136,7 @@ void *Cloudlayer(void *argument)
   double *cloud[NVARS];
   double pmin = 0, pmax = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( operatorArgc() > 0 )
     {
@@ -151,11 +150,11 @@ void *Cloudlayer(void *argument)
       nvars2 = NVARS;
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int aclcac_code = 223;
 
@@ -307,7 +306,7 @@ void *Cloudlayer(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
@@ -321,10 +320,7 @@ void *Cloudlayer(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( zrev )
-	    offset = (nlevel-1-levelID)*gridsize;
-	  else
-	    offset = levelID*gridsize;
+          size_t offset = zrev ? (nlevel-1-levelID)*gridsize : levelID*gridsize;
 
 	  if ( varID == aclcacID )
 	    {
@@ -335,7 +331,7 @@ void *Cloudlayer(void *argument)
 
       for ( varID = 0; varID < nvars2; ++varID )
 	{
-	  for ( i = 0; i < gridsize; i++ ) cloud[varID][i] = missval;
+	  for ( size_t i = 0; i < gridsize; i++ ) cloud[varID][i] = missval;
 	}
 
       for ( varID = 0; varID < nvars2; ++varID )
@@ -346,9 +342,7 @@ void *Cloudlayer(void *argument)
 
       for ( varID = 0; varID < nvars2; ++varID )
 	{
-	  nmiss = 0;
-	  for ( i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(cloud[varID][i], missval) ) nmiss++;
+	  nmiss = arrayNumMV(gridsize, cloud[varID], missval);
 
 	  pstreamDefRecord(streamID2, varID, 0);
 	  pstreamWriteRecord(streamID2, cloud[varID], nmiss);

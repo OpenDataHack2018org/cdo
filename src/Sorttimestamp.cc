@@ -23,9 +23,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define  NALLOC_INC  1024
@@ -53,9 +53,9 @@ int cmpdatetime(const void *s1, const void *s2)
 }
 
 
-void *Sorttimestamp(void *argument)
+void *Sorttimestamp(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int tsID, lasttsID = -1;
@@ -66,16 +66,16 @@ void *Sorttimestamp(void *argument)
   int *vdate = NULL, *vtime = NULL;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int nfiles = cdoStreamCnt() - 1;
 
   int xtsID = 0;
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      int streamID1 = pstreamOpenRead(cdoStreamName(fileID));
+      int streamID1 = cdoStreamOpenRead(cdoStreamName(fileID));
 
-      int vlistID1 = pstreamInqVlist(streamID1);
+      int vlistID1 = cdoStreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( fileID == 0 )
@@ -148,7 +148,7 @@ void *Sorttimestamp(void *argument)
 
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID2 = 0;

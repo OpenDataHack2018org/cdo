@@ -1,3 +1,19 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #ifdef  HAVE_CONFIG_H
 #  include "config.h"
 #endif
@@ -8,6 +24,7 @@
 
 #include "cdo_int.h"
 #include "remap.h"
+#include "cdoOptions.h"
 
 /*****************************************************************************/
 
@@ -641,7 +658,7 @@ void sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
       omp_set_nested(1);            
       if ( omp_get_nested() == 0 )
 	printf("Warning: OpenMP implementation seems to not support nested parallelism.\n"
-	       "Maximum of CPUs used is 2 instead of %i.\n", ompNumThreads);
+	       "Maximum of CPUs used is 2 instead of %i.\n", Threading::ompNumThreads);
     }                                    
 #endif
 

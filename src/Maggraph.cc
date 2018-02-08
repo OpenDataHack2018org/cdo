@@ -1,13 +1,29 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #ifdef  HAVE_CONFIG_H
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
 #include <limits.h>
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 #ifdef  HAVE_LIBMAGICS
 
@@ -872,9 +888,9 @@ void VerifyGraphParameters( int num_param, char **param_names )
 
 #define NINC_ALLOC 1024
 
-void *Maggraph(void *argument)
+void *Maggraph(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
 #ifdef  HAVE_LIBMAGICS
   char varname[CDI_MAX_NAME], units[CDI_MAX_NAME];
@@ -891,7 +907,7 @@ void *Maggraph(void *argument)
   if ( nparam ) VerifyGraphParameters(nparam,pnames);
   
   int nfiles = cdoStreamCnt() - 1;
-  const char *ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoGetStreamName(nfiles).c_str();
   
   if( DBG )
     {
@@ -915,11 +931,11 @@ void *Maggraph(void *argument)
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       if( DBG )
-        fprintf( stderr," file %d is %s\n", fileID, cdoStreamName(fileID)->args );
+        fprintf( stderr," file %d is %s\n", fileID, cdoGetStreamName(fileID).c_str() );
       
-      int streamID = pstreamOpenRead(cdoStreamName(fileID));
+      int streamID = cdoStreamOpenRead(cdoStreamName(fileID));
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);
 
       vlistInqVarUnits(vlistID, 0, units);

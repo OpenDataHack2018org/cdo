@@ -28,15 +28,14 @@
 #include <limits.h>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
 #include "cdoDebugOutput.h"
+#include "pstream_int.h"
 
 /* read only the first data variable from input filename into a given double
  * pointer */
-/* DON'T MOVE IT! is necessary to have the pstream.h file included AFTER this
- * function definition */
 void read_first_record(char *filename, double *field)
 {
   size_t nmiss;
@@ -48,7 +47,6 @@ void read_first_record(char *filename, double *field)
   streamClose(streamID);
 }
 
-#include "pstream.h"
 
 /*
  * count the number of locations, for which the mask is TRUE
@@ -68,7 +66,7 @@ int countMask(double *maskField, int gridSize, double falseVal)
  * the operators argument has to be a single horizontal field,
  * non-zero values are used to mark the relevant locations
  */
-void *MapReduce(void *argument)
+void *MapReduce(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -77,7 +75,7 @@ void *MapReduce(void *argument)
   int nocoords = FALSE;
   /*double missval1, missval2; */
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   /* check input grid type and size - this will be used for selecting relevant
    * variables from the input file*/
@@ -121,9 +119,9 @@ void *MapReduce(void *argument)
   /* create output vlist: Only variabes which have the same gridtype and
    * gridsize as the input mask should be proessed. Everything else is ignoreds
    * {{{ */
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1  = pstreamInqVlist(streamID1);
+  int vlistID1  = cdoStreamInqVlist(streamID1);
   int nvars     = vlistNvars(vlistID1);
   int *vars     = (int*) Malloc(nvars*sizeof(int));
 
@@ -158,7 +156,7 @@ void *MapReduce(void *argument)
   for ( int index = 0; index < ngrids; index++ ) vlistChangeGridIndex(vlistID2, index, outputGridID);
 
   /* loop over input fields and mask the data values {{{ */
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   double *arrayIn  = (double *)Malloc(inputGridSize*sizeof(double));

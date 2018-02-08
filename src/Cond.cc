@@ -23,12 +23,12 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Cond(void *argument)
+void *Cond(void *process)
 {
   enum {FILL_NONE, FILL_TS, FILL_REC};
   int filltype = FILL_NONE;
@@ -41,7 +41,7 @@ void *Cond(void *argument)
   size_t **varnmiss1 = NULL;
   double **vardata1 = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int IFTHEN    = cdoOperatorAdd("ifthen",    0, 0, NULL);
@@ -50,11 +50,11 @@ void *Cond(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID2);
 
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -69,7 +69,7 @@ void *Cond(void *argument)
   if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0)->args);
+      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoGetStreamName(0).c_str());
     }
 
   if ( filltype == FILL_NONE )
@@ -78,13 +78,13 @@ void *Cond(void *argument)
   nospec(vlistID1);
   nospec(vlistID2);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   size_t gridsize = vlistGridsizeMax(vlistID2);
 
   if ( filltype == FILL_REC && gridsize != gridInqSize(vlistGrid(vlistID1, 0)) )
-    cdoAbort("Stream1 >%s< has wrong gridsize!", cdoStreamName(0)->args);
+    cdoAbort("Stream1 >%s< has wrong gridsize!", cdoGetStreamName(0).c_str());
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
@@ -98,7 +98,7 @@ void *Cond(void *argument)
       if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
+	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
 
 	  nvars  = vlistNvars(vlistID1);
 	  vardata1  = (double **) Malloc(nvars*sizeof(double *));

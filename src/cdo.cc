@@ -27,6 +27,10 @@
 #include <execinfo.h>
 #endif
 
+#if defined(HAVE_WORDEXP_H)
+#include <wordexp.h>
+#endif
+
 #include <signal.h>
 #include <fenv.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
@@ -39,6 +43,7 @@
 #endif
 #include <unistd.h>         /* sysconf, gethostname */
 #include <thread>
+#include "timer.h"
 
 #if defined(SX)
 #define RLIM_T  long long
@@ -47,7 +52,7 @@
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "cdo_task.h"
 
@@ -55,15 +60,21 @@
 #include "cdoDebugOutput.h"
 
 #ifdef  HAVE_LIBPTHREAD
-#include "pstream_int.h"
 #include "pthread_debug.h"
 #endif
 
 #include "modules.h"
-#include "process.h"
 #include "error.h"
 #include "grid_proj.h"
 #include "percentiles.h"
+#include "util_wildcards.h"
+#include "util_string.h"
+#include "process_int.h"
+#include "cdoOptions.h"
+#include "timer.h"
+#include "commandline.h"
+#include "text.h"
+#include "datetime.h"
 
 #ifdef  _OPENMP
 #  include <omp.h>
@@ -76,6 +87,7 @@
 #define MAX_NUM_VARNAMES 256
 
 #include <string>
+#include <cstring>
 
 static int Debug = 0;
 static int Version = 0;
@@ -629,26 +641,26 @@ void defineCompress(const char *arg)
 
   if      ( strncmp(arg, "szip", len) == 0 )
     {
-      cdoCompType  = CDI_COMPRESS_SZIP;
-      cdoCompLevel = 0;
+      Options::cdoCompType  = CDI_COMPRESS_SZIP;
+      Options::cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "aec", len) == 0 )
     {
-      cdoCompType = CDI_COMPRESS_AEC;
-      cdoCompLevel = 0;
+      Options::cdoCompType = CDI_COMPRESS_AEC;
+      Options::cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "jpeg", len) == 0 )
     {
-      cdoCompType = CDI_COMPRESS_JPEG;
-      cdoCompLevel = 0;
+      Options::cdoCompType = CDI_COMPRESS_JPEG;
+      Options::cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "zip", 3) == 0 )
     {
-      cdoCompType  = CDI_COMPRESS_ZIP;
+      Options::cdoCompType  = CDI_COMPRESS_ZIP;
       if ( len == 5 && arg[3] == '_' && isdigit(arg[4]) )
-        cdoCompLevel = atoi(&arg[4]);
+        Options::cdoCompLevel = atoi(&arg[4]);
       else
-        cdoCompLevel = 1;
+        Options::cdoCompLevel = 1;
     }
   else
     {
@@ -1311,7 +1323,7 @@ int parse_options_long(int argc, char *argv[])
           defineChunktype(CDO_optarg);
           break;
         case 'L':        
-          cdoLockIO = TRUE;
+          Threading::cdoLockIO = TRUE;
           break;
         case 'l':
           defineZaxis(CDO_optarg);
@@ -1354,7 +1366,7 @@ int parse_options_long(int argc, char *argv[])
           cdoDiag = TRUE;
           break;
         case 's':
-          cdoSilentMode = TRUE;
+          Options::silentMode = TRUE;
           break;
         case 'T':
           cdoTimer = TRUE;
@@ -1363,7 +1375,7 @@ int parse_options_long(int argc, char *argv[])
           cdoDefaultTableID = defineTable(CDO_optarg);
           break;
         case 'u':
-          cdoInteractive = TRUE;
+          Options::cdoInteractive = TRUE;
           break;
         case 'V':
           Version = 1;
@@ -1379,7 +1391,7 @@ int parse_options_long(int argc, char *argv[])
           cdoParIO = TRUE;
           break;
         case 'Z':
-          cdoCompress = TRUE;
+          Options::cdoCompress = true;
           break;
         case 'z':
           defineCompress(CDO_optarg);
@@ -1472,7 +1484,7 @@ void init_modules()
   add_module("Derivepar"     , {Derivepar     , DeriveparHelp     , DeriveparOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Detrend"       , {Detrend       , DetrendHelp       , DetrendOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Diff"          , {Diff          , DiffHelp          , DiffOperators          , 1 , CDI_REAL , 2  , 0  });
-  add_module("Distgrid"      , {Distgrid      , DistgridHelp      , DistgridOperators      , 1 , CDI_REAL , 1  , 1  });
+  add_module("Distgrid"      , {Distgrid      , DistgridHelp      , DistgridOperators      , 1 , CDI_REAL , 1  , -1  });
   add_module("Duplicate"     , {Duplicate     , DuplicateHelp     , DuplicateOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Echam5ini"     , {Echam5ini     , {}                , Echam5iniOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Enlarge"       , {Enlarge       , EnlargeHelp       , EnlargeOperators       , 1 , CDI_REAL , 1  , 1  });
@@ -1769,14 +1781,13 @@ void init_aliases()
   add_alias("selmon"          , "selmonth");
 }
 
+
 int main(int argc, char *argv[])
 {
-
   int lstop = FALSE;
   int noff = 0;
   int status = 0;
   const char *operatorArg = NULL;
-  argument_t *argument = NULL;
 
   cdo_init_is_tty();
 
@@ -1786,7 +1797,7 @@ int main(int argc, char *argv[])
   CDO_Reduce_Dim = 0;
 
   /* mallopt(M_MMAP_MAX, 0); */
- 
+
   setCommandLine(argc, argv);
 
   CDO_progname = getProgname(argv[0]);
@@ -1802,6 +1813,7 @@ int main(int argc, char *argv[])
   cdo_set_options();
 #ifdef DEBUG
     CdoDebug::CdoStartMessage();
+    MESSAGE(CdoDebug::argvToString(argc,(const char**) argv));
 #endif
   if ( Debug || Version ) cdo_version();
 
@@ -1810,18 +1822,16 @@ int main(int argc, char *argv[])
       fprintf(stderr, "stdin_is_tty:   %d\n", stdin_is_tty);
       fprintf(stderr, "stdout_is_tty:  %d\n", stdout_is_tty);
       fprintf(stderr, "stderr_is_tty:  %d\n", stderr_is_tty);
+      print_system_info();
     }
-
-  if ( Debug ) print_system_info();
 
   check_stacksize();
 
-  if ( Debug ) print_pthread_info();
-
-  if ( Debug )
-    {
+  if ( Debug ) 
+  { 
+      print_pthread_info();
       //      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
-    }
+  }
 
 #ifdef  _OPENMP
   if ( numThreads <= 0 ) numThreads = 1;
@@ -1847,11 +1857,11 @@ int main(int argc, char *argv[])
 #endif
     }
 
-  ompNumThreads = omp_get_max_threads();
+  Threading::ompNumThreads = omp_get_max_threads();
   if ( omp_get_max_threads() > omp_get_num_procs() )
     fprintf(stderr, "Warning: Number of OMP threads is greater than number of Cores=%d!\n", omp_get_num_procs());
-  if ( ompNumThreads < numThreads )
-    fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", ompNumThreads);
+  if ( Threading::ompNumThreads < numThreads )
+    fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", Threading::ompNumThreads);
   if ( cdoVerbose )
     {
       fprintf(stderr, " OpenMP:  num_procs=%d  max_threads=%d", omp_get_num_procs(), omp_get_max_threads());
@@ -1869,16 +1879,19 @@ int main(int argc, char *argv[])
       return -1;
     }
 #endif
+      std::vector<std::string> new_argv(&argv[CDO_optind], argv + argc);
+      new_argv = expandWildCards(new_argv);
 
+      ///*TEMP*/ // should not be needed when std::string is standart string 
+      std::vector<char*> new_cargv(new_argv.size());
+      for(unsigned long i = 0; i < new_argv.size(); i++)
+      {
+          new_cargv[i] = strdup(new_argv[i].c_str());
+      }
+      //temprorary end
 
-  if ( CDO_optind < argc )
-    {
-      operatorArg = argv[CDO_optind];
-      argument = argument_new(argc-CDO_optind, 0);
-      argument_fill(argument, argc-CDO_optind, &argv[CDO_optind]);
-    }
-  else
-    {
+  if ( CDO_optind >= argc )
+      {
       if ( ! Version && ! Help )
         {
           fprintf(stderr, "\nNo operator given!\n\n");
@@ -1898,8 +1911,8 @@ int main(int argc, char *argv[])
   proj_lonlat_to_lcc_func = (int (*)()) proj_lonlat_to_lcc;
   extern int (*proj_lcc_to_lonlat_func)();
   proj_lcc_to_lonlat_func = (int (*)()) proj_lcc_to_lonlat;
-
-  const char *operatorName = getOperatorName(operatorArg);
+  
+  const char *operatorName = get_original(getOperatorName(argv[CDO_optind]));
 
   if ( Help )
     {
@@ -1925,21 +1938,20 @@ int main(int argc, char *argv[])
       timer_start(timer_total);
 
 
-
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
-      operatorModule(operatorName)(argument);
+      getProcess(0)->m_module.func(getProcess(0));
       close_library_handles();
 #else
-      operatorModule(operatorName)(argument);
+      createProcesses(new_argv.size(),(const char**) &new_cargv[0] );
+      getProcess(0)->m_module.func(getProcess(0));
 #endif
+      clearProcesses();
 
       timer_stop(timer_total);
 
       if ( cdoTimer ) timer_report();
     }
-
-  if ( argument ) argument_free(argument);
 
   if ( cdoVarnames )
     {

@@ -25,15 +25,15 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "specspace.h"
 #include "listarray.h"
 
 
-void *FC(void *argument)
+void *FC(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -48,7 +48,7 @@ void *FC(void *argument)
   double *array2 = NULL;
   SPTRANS *sptrans = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -59,9 +59,9 @@ void *FC(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -228,7 +228,7 @@ void *FC(void *argument)
 
   if ( gridID1 != -1 ) vlistChangeGrid(vlistID2, gridID1, gridID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 

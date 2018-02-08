@@ -29,7 +29,6 @@
 
 #include <pthread.h>
 #include "pthread_debug.h"
-//#include "pstream.h"
 #include <iostream>
 
 #endif
@@ -57,6 +56,9 @@ public:
   void pipeReadRecord(int p_vlistID, double *data, size_t *nmiss);
   void pipeReadPipeRecord(double *data, int vlistID, size_t *p_nmiss);
 
+  void pipeSetName(int processID, int inputIDX);
+  void close();
+
   bool EOP;
   bool usedata;
   bool hasdata;
@@ -65,7 +67,6 @@ public:
   int recIDr, recIDw, tsIDr, tsIDw;
   size_t nmiss;
   double *data;
-  // pstream_t *pstreamptr_in;
   size_t nvals;
 
   std::mutex m_mutex;

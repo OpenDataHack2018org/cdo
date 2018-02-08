@@ -25,19 +25,20 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "after_vertint.h"
 #include "listarray.h"
 #include "stdnametable.h"
+#include "util_string.h"
 
 
-void *Pressure(void *argument)
+void *Pressure(void *process)
 {
   ModelMode mode(ModelMode::UNDEF);
   int nrecs;
-  int i, k, offset;
+  int k;
   int varID, levelID;
   int zaxisIDp, zaxisIDh = -1;
   int nhlevf = 0, nhlevh = 0, nlevel = 0;
@@ -51,7 +52,7 @@ void *Pressure(void *argument)
   gribcode_t gribcodes;
   memset(&gribcodes, 0, sizeof(gribcode_t));
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int PRESSURE_FL = cdoOperatorAdd("pressure_fl", 0, 0, NULL);
@@ -61,11 +62,11 @@ void *Pressure(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int nhlev;
   double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
@@ -218,7 +219,7 @@ void *Pressure(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
@@ -241,7 +242,7 @@ void *Pressure(void *argument)
       if ( zaxisIDh != -1 )
 	{
 	  if ( lnpsID != -1 )
-	    for ( i = 0; i < gridsize; i++ ) ps_prog[i] = exp(pdata[i]);
+	    for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = exp(pdata[i]);
 	  else if ( psID != -1 )
 	    memcpy(ps_prog, pdata, gridsize*sizeof(double));
 
@@ -262,7 +263,7 @@ void *Pressure(void *argument)
 	{
 	  nlevel = nhlevf;
 	  for ( k = 0; k < nhlevf; ++k )
-	    for ( i = 0; i < gridsize; ++i )
+	    for ( size_t i = 0; i < gridsize; ++i )
 	      {
 		deltap[k*gridsize+i] = half_press[(k+1)*gridsize+i] - half_press[k*gridsize+i];
 	      }
@@ -279,7 +280,7 @@ void *Pressure(void *argument)
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  offset = levelID*gridsize;
+	  size_t offset = levelID*gridsize;
 	  pstreamWriteRecord(streamID2, pout+offset, 0);
 	}
 

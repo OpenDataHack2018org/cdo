@@ -23,13 +23,13 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 /* Same code as Trend ! */
-void *Regres(void *argument)
+void *Regres(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -38,11 +38,11 @@ void *Regres(void *argument)
   enum {nwork = 5};
   field_type **work[nwork];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   vlistDefNtsteps(vlistID2, 1);
@@ -51,10 +51,10 @@ void *Regres(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
   /*
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
   */
-  int streamID3 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID2);
 
   int nrecords = vlistNrecs(vlistID1);
@@ -62,7 +62,7 @@ void *Regres(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field1);
@@ -96,9 +96,9 @@ void *Regres(void *argument)
 
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
-	  int gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( !DBL_IS_EQUAL(field1.ptr[i], missval) )
 	      {
 		work[0][varID][levelID].ptr[i] += tsID;
@@ -123,12 +123,12 @@ void *Regres(void *argument)
 
       double missval = vlistInqVarMissval(vlistID1, varID);
       int gridID   = vlistInqVarGrid(vlistID1, varID);
-      int gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
 
       double missval1  = missval;
       double missval2  = missval;
 
-      for ( int i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
 	{
 	  temp1 = SUBMN(work[2][varID][levelID].ptr[i],
 		      DIVMN( MULMN(work[0][varID][levelID].ptr[i], work[3][varID][levelID].ptr[i]), work[4][varID][levelID].ptr[i]));
@@ -141,17 +141,11 @@ void *Regres(void *argument)
 	}
 
       /*
-      nmiss = 0;
-      for ( i = 0; i < gridsize; i++ )
-	if ( DBL_IS_EQUAL(field1.ptr[i], missval) ) nmiss++;
-
+      nmiss = arrayNumMV(gridsize, field1.ptr, missval);
       pstreamDefRecord(streamID2, varID, levelID);
       pstreamWriteRecord(streamID2, field1.ptr, nmiss);
       */
-      nmiss = 0;
-      for ( int i = 0; i < gridsize; i++ )
-	if ( DBL_IS_EQUAL(field2.ptr[i], missval) ) nmiss++;
-
+      nmiss = arrayNumMV(gridsize, field2.ptr, missval);
       pstreamDefRecord(streamID3, varID, levelID);
       pstreamWriteRecord(streamID3, field2.ptr, nmiss);
     }

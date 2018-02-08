@@ -16,10 +16,10 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 #define  MAX_BLOCKS  65536
 
@@ -201,7 +201,7 @@ typedef struct
 } sgrid_t;
 
 
-void *Distgrid(void *argument)
+void *Distgrid(void *process)
 {
   int gridID1;
   int varID, levelID;
@@ -213,7 +213,7 @@ void *Distgrid(void *argument)
   size_t nmiss;
   int i;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("nxblocks, [nyblocks]");
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
@@ -225,9 +225,9 @@ void *Distgrid(void *argument)
   if ( nxblocks == 0 ) cdoAbort("nxblocks has to be greater than 0!");
   if ( nyblocks == 0 ) cdoAbort("nyblocks has to be greater than 0!");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int ngrids = vlistNgrids(vlistID1);
 
@@ -314,10 +314,10 @@ void *Distgrid(void *argument)
 
   double *array2 = (double*) Malloc(gridsize2max*sizeof(double));
 
-  strcpy(filename, cdoStreamName(1)->args);
+  strcpy(filename, cdoGetObase());
   int nchars = strlen(filename);
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -327,9 +327,7 @@ void *Distgrid(void *argument)
       if ( filesuffix[0] )
 	sprintf(filename+nchars+5, "%s", filesuffix);
 
-      argument_t *fileargument = file_argument_new(filename);
-      streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 
       pstreamDefVlist(streamIDs[index], vlistIDs[index]);
     }
@@ -353,12 +351,7 @@ void *Distgrid(void *argument)
 	      i = 0;
 	      window_cell(array1, array2, grids[i].gridsize[index], grids[i].gridindex[index]);
 	      pstreamDefRecord(streamIDs[index], varID, levelID);
-	      if ( nmiss > 0 )
-		{
-		  nmiss = 0;
-		  for ( size_t k = 0; k < grids[i].gridsize[index]; ++k )
-		    if ( DBL_IS_EQUAL(array2[k], missval) ) nmiss++;
-		}
+	      if ( nmiss > 0 ) nmiss = arrayNumMV(grids[i].gridsize[index], array2, missval);
 	      pstreamWriteRecord(streamIDs[index], array2, nmiss);
 	    }
 	}

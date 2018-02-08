@@ -22,9 +22,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -189,7 +189,7 @@ void p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y,
 }
 
 
-void *Mrotuv(void *argument)
+void *Mrotuv(void *process)
 {
   int nrecs;
   int levelID;
@@ -197,11 +197,11 @@ void *Mrotuv(void *argument)
   size_t nmiss1, nmiss2;
   int uid = -1, vid = -1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
   for ( varid = 0; varid < nvars; varid++ )
@@ -219,7 +219,7 @@ void *Mrotuv(void *argument)
 	  vid = 1;
 	}
       else
-	cdoAbort("U and V not found in %s",  cdoStreamName(0)->args);
+	cdoAbort("U and V not found in %s",  cdoGetStreamName(0).c_str());
     }
 
   int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, uid));
@@ -305,8 +305,8 @@ void *Mrotuv(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID3);

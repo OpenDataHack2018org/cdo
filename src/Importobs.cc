@@ -17,9 +17,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -49,10 +49,10 @@ void init_data(int vlistID, int nvars, double *data[])
 {
   for ( int varID = 0; varID < nvars; ++varID )
     {
-      int gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       double missval  = vlistInqVarMissval(vlistID, varID);
       
-      for ( int i = 0; i < gridsize; ++i ) data[varID][i] = missval;
+      for ( size_t i = 0; i < gridsize; ++i ) data[varID][i] = missval;
     } 
 }
 
@@ -61,15 +61,10 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
 {
   for ( int varID = 0; varID < nvars; ++varID )
     {
-      int gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       double missval  = vlistInqVarMissval(vlistID, varID);
-      
+      size_t nmiss = arrayNumMV(gridsize, data[varID], missval);
       pstreamDefRecord(streamID, varID, 0);
-
-      size_t nmiss = 0;
-      for ( int i = 0; i < gridsize; ++i )
-	if ( DBL_IS_EQUAL(data[varID][i], missval) ) nmiss++;
-      
       pstreamWriteRecord(streamID, data[varID], nmiss);
     }
 }
@@ -78,16 +73,13 @@ static
 int getDate(const char *name)
 {
   char *pname = (char *)strchr(name, '_');
-
-  int date = 0;
-  if ( pname ) date = atoi(pname+1);
-
+  int date = pname ? atoi(pname+1) : 0;
   return date;
 }
 
 #define  MAX_LINE_LEN  4096
 
-void *Importobs(void *argument)
+void *Importobs(void *process)
 {
   char line[MAX_LINE_LEN];
   int i, j;
@@ -102,7 +94,7 @@ void *Importobs(void *argument)
   double dx, dy;
   char *pstation;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("import_obs",     0, 0, "grid description file or name");
 
@@ -115,7 +107,7 @@ void *Importobs(void *argument)
   if ( gridInqType(gridID) != GRID_LONLAT ) 
     cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID)));
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int xsize = gridInqXsize(gridID);
   int ysize = gridInqYsize(gridID);
 
@@ -136,13 +128,13 @@ void *Importobs(void *argument)
     grid_to_degree(units, gridsize, yvals, "grid center lat");
   }
 
-  FILE *fp = fopen(cdoStreamName(0)->args, "r");
-  if ( fp == NULL ) { perror(cdoStreamName(0)->args); exit(EXIT_FAILURE); }
+  FILE *fp = fopen(cdoGetStreamName(0).c_str(), "r");
+  if ( fp == NULL ) { perror(cdoGetStreamName(0).c_str()); exit(EXIT_FAILURE); }
 
-  int vdate = getDate(cdoStreamName(0)->args);
+  int vdate = getDate(cdoGetStreamName(0).c_str());
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
-  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 

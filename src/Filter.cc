@@ -29,10 +29,12 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "statistic.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
+#include "datetime.h"
 
 #ifdef  HAVE_LIBFFTW3 
 #include <fftw3.h>
@@ -116,7 +118,7 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 }
 
 
-void *Filter(void *argument)
+void *Filter(void *process)
 {
   enum {BANDPASS, HIGHPASS, LOWPASS};
   const char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
@@ -144,7 +146,7 @@ void *Filter(void *argument)
 #endif
   } memory_t;
   
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("bandpass",  BANDPASS,  0, NULL);
   cdoOperatorAdd("highpass",  HIGHPASS,  0, NULL);
@@ -165,9 +167,9 @@ void *Filter(void *argument)
       
   if ( cdoVerbose && !use_fftw ) cdoPrint("Using intrinsic FFT function!");
   
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -195,7 +197,7 @@ void *Filter(void *argument)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
           int gridID   = vlistInqVarGrid(vlistID1, varID);
-          int gridsize = gridInqSize(gridID);
+          size_t gridsize = gridInqSize(gridID);
           vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
@@ -249,12 +251,12 @@ void *Filter(void *argument)
   int nts = tsID;
   if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
 
-  memory_t *ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
+  memory_t *ompmem = (memory_t*) Malloc(Threading::ompNumThreads*sizeof(memory_t));
 
   if ( use_fftw )
     {
 #ifdef  HAVE_LIBFFTW3 
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
 	{
 	  ompmem[i].in_fft  = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
 	  ompmem[i].out_fft = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
@@ -265,7 +267,7 @@ void *Filter(void *argument)
     }
   else
     {
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
 	{
 	  ompmem[i].array1 = (double*) Malloc(nts*sizeof(double));
 	  ompmem[i].array2 = (double*) Malloc(nts*sizeof(double));
@@ -308,7 +310,7 @@ void *Filter(void *argument)
   for ( int varID = 0; varID < nvars; varID++ )
     {
       int gridID   = vlistInqVarGrid(vlistID1, varID);
-      int gridsize = gridInqSize(gridID);
+      size_t gridsize = gridInqSize(gridID);
       int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       
       for ( int levelID = 0; levelID < nlevel; levelID++ )
@@ -319,7 +321,7 @@ void *Filter(void *argument)
 #ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 {
             	  int ompthID = cdo_omp_get_thread_num();
 
@@ -341,7 +343,7 @@ void *Filter(void *argument)
 #ifdef  _OPENMP
 #pragma omp parallel for default(shared)
 #endif
-              for ( int i = 0; i < gridsize; i++ )  
+              for ( size_t i = 0; i < gridsize; i++ )  
                 {
             	  int ompthID = cdo_omp_get_thread_num();
 
@@ -362,7 +364,7 @@ void *Filter(void *argument)
   if ( use_fftw )
     {
 #ifdef  HAVE_LIBFFTW3 
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
 	{
 	  Free(ompmem[i].in_fft);
 	  Free(ompmem[i].out_fft);
@@ -371,7 +373,7 @@ void *Filter(void *argument)
     }
   else
     {
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
 	{
 	  Free(ompmem[i].array1);
 	  Free(ompmem[i].array2);
@@ -380,7 +382,7 @@ void *Filter(void *argument)
 
   Free(ompmem);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   
   pstreamDefVlist(streamID2, vlistID2);
  

@@ -30,9 +30,9 @@
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 #include "grid.h"
 #include "constants.h"
@@ -230,7 +230,7 @@ void remap_nn_reg2d(size_t nx, size_t ny, const double *restrict data, int gridI
 #define NLON 720
 #define NLAT 360
 
-void *Vargen(void *argument)
+void *Vargen(void *process)
 {
   int ntimesteps, nlevels = 1;
   int varID, varID2 = -1, levelID;
@@ -242,7 +242,7 @@ void *Vargen(void *argument)
   size_t nlon = NLON;
   size_t nlat = NLAT;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int RANDOM  = cdoOperatorAdd("random",  0, 0, "grid description file or name, <seed>");
@@ -400,7 +400,7 @@ void *Vargen(void *argument)
        operatorID == TOPO || operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
-  int streamID = pstreamOpenWrite(cdoStreamName(0), cdoFiletype());
+  int streamID = cdoStreamOpenWrite(0, cdoFiletype());
 
   pstreamDefVlist(streamID, vlistID);
 

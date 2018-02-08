@@ -27,10 +27,11 @@
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "util_fileextensions.h"
 
 
 /*
@@ -242,8 +243,8 @@ void dumpmap()
   indxb.bigpnt = NULL;
   indxb.bignum = 0;
 
-  mapfp = fopen(cdoStreamName(0)->args, "r");
-  if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoStreamName(0)->args);
+  mapfp = fopen(cdoGetStreamName(0).c_str(), "r");
+  if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoGetStreamName(0).c_str());
 
   /* check the version number */
 
@@ -938,7 +939,7 @@ void write_map_grib2(const char *ctlfile, int map_version, int nrecords, int *in
 }
 */
 
-void *Gradsdes(void *argument)
+void *Gradsdes(void *process)
 {
   int gridID = -1;
   int gridtype = -1;
@@ -962,7 +963,7 @@ void *Gradsdes(void *argument)
   int imn0 = 0, ihh0 = 0, iyy0 = 0, imm0 = 0, idd0 = 0;
   int idmn, idhh, idmm, idyy, iddd;
   int dt=1, iik=0, mdt = 0;
-  int gridsize = 0;
+  size_t gridsize = 0;
   size_t nmiss;
   int prec;
   int map_version = 2;
@@ -974,7 +975,7 @@ void *Gradsdes(void *argument)
   double *array = NULL;
   const char *cmons[]={"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"};
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int GRADSDES = cdoOperatorAdd("gradsdes",  0, 0, NULL);
@@ -985,12 +986,12 @@ void *Gradsdes(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  const char *datfile = cdoStreamName(0)->args;
+  const char *datfile = cdoGetStreamName(0).c_str();
   size_t len = strlen(datfile);
   char *ctlfile = (char *) Malloc(len+10);
   strcpy(ctlfile, datfile);
 
-  if ( cdoStreamName(0)->args[0] == '-' )
+  if ( cdoGetStreamName(0).c_str()[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
 
   if ( operatorID == DUMPMAP )
@@ -1010,7 +1011,7 @@ void *Gradsdes(void *argument)
     }
   else
     {
-      if ( fileSize(cdoStreamName(0)->args) > 2147483647L ) map_version = 4;
+      if ( fileSize(cdoGetStreamName(0).c_str()) > 2147483647L ) map_version = 4;
     }
 
   if ( cdoVerbose ) cdoPrint("GrADS GRIB map version: %d", map_version);
@@ -1019,9 +1020,9 @@ void *Gradsdes(void *argument)
     cdoAbort("GrADS GRIB map version %d requires size of off_t to be 8! The size of off_t is %ld.",
              map_version, sizeof(off_t));
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int nvars   = vlistNvars(vlistID);
   int ntsteps = vlistNtsteps(vlistID);
@@ -1147,7 +1148,7 @@ void *Gradsdes(void *argument)
   else
     {
       datfile = strrchr(datfile, '/');
-      if ( datfile == 0 ) datfile = cdoStreamName(0)->args;
+      if ( datfile == 0 ) datfile = cdoGetStreamName(0).c_str();
       else                datfile++;
       fprintf(gdp, "DSET  ^%s\n", datfile);
     }

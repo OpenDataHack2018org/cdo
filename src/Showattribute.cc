@@ -16,9 +16,10 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 void printAtts(int vlistID, int varOrGlobal, int natts, char *argument)
 {
@@ -129,18 +130,18 @@ void check_varname_and_print(int vlistID, int nvars, char *checkvarname, char *a
     cdoAbort("Could not find variable %s in infile.", checkvarname);
 }
 
-void *Showattribute(void *argument)
+void *Showattribute(void *process)
 {
   const int delim = '@';
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SHOWATTRIBUTE = cdoOperatorAdd("showattribute",   0, 0, NULL);
   int SHOWATTSVAR   = cdoOperatorAdd("showattsvar",   0, 0, NULL);
 
   int operatorID = cdoOperatorID();
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
-  int vlistID = pstreamInqVlist(streamID);
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
+  int vlistID = cdoStreamInqVlist(streamID);
   int nvars   = vlistNvars(vlistID);
 
   int natts = operatorArgc();

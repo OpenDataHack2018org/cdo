@@ -23,12 +23,13 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "util_files.h"
 
 
-void *Mergetime(void *argument)
+void *Mergetime(void *process)
 {
   int tsID2 = 0;
   int taxisID2 = CDI_UNDEFID;
@@ -46,7 +47,7 @@ void *Mergetime(void *argument)
     int nrecs;
   } sfile_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   char *envstr = getenv("SKIP_SAME_TIME");
   if ( envstr )
@@ -68,10 +69,10 @@ void *Mergetime(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      if ( cdoVerbose ) cdoPrint("process: %s", cdoStreamName(fileID)->args);
+      if ( cdoVerbose ) cdoPrint("process: %s", cdoGetStreamName(fileID).c_str());
 
-      sf[fileID].streamID = pstreamOpenRead(cdoStreamName(fileID));
-      sf[fileID].vlistID = pstreamInqVlist(sf[fileID].streamID);
+      sf[fileID].streamID = cdoStreamOpenRead(cdoStreamName(fileID));
+      sf[fileID].vlistID = cdoStreamInqVlist(sf[fileID].streamID);
       sf[fileID].taxisID = vlistInqTaxis(sf[fileID].vlistID);
     }
 
@@ -97,12 +98,12 @@ void *Mergetime(void *argument)
 	}
     }
 
-  const char *ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
   if ( ! lcopy )
     {

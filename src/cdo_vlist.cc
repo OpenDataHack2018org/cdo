@@ -17,6 +17,8 @@
 
 #include <cdi.h>
 #include "cdo_int.h"
+#include "util_string.h"
+#include "cdo_vlist.h"
 
 
 char *cdoVlistInqVarName(int vlistID, int varID, char *name)

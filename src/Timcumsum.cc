@@ -23,32 +23,32 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Timcumsum(void *argument)
+void *Timcumsum(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   field_type field;
@@ -76,7 +76,7 @@ void *Timcumsum(void *argument)
               pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
               // pvars1->nmiss = nmiss;
               if ( nmiss )
-                for ( int i = 0; i < gridsize; ++i )
+                for ( size_t i = 0; i < gridsize; ++i )
                   if ( DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval) ) pvars1->ptr[i] = 0;
             }
           else
@@ -88,7 +88,7 @@ void *Timcumsum(void *argument)
               field.missval = pvars1->missval;
 
               if ( nmiss )
-                for ( int i = 0; i < gridsize; ++i )
+                for ( size_t i = 0; i < gridsize; ++i )
                   if ( DBL_IS_EQUAL(field.ptr[i], pvars1->missval) ) field.ptr[i] = 0;
 
               farfun(pvars1, field, func_sum);

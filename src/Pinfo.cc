@@ -22,14 +22,13 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Pinfo(void *argument)
+void *Pinfo(void *process)
 {
-  int i;
   int varID;
   int nrecs;
   int levelID;
@@ -40,7 +39,7 @@ void *Pinfo(void *argument)
   double level;
   double arrmin, arrmax, arrmean, arrvar;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int PINFO  = cdoOperatorAdd("pinfo",  0, 0, NULL);
@@ -51,19 +50,19 @@ void *Pinfo(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
@@ -100,7 +99,7 @@ void *Pinfo(void *argument)
 	  int code     = vlistInqVarCode(vlistID1, varID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
 	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	  int gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 
 	  if ( operatorID == PINFOV ) vlistInqVarName(vlistID1, varID, varname);
@@ -113,7 +112,7 @@ void *Pinfo(void *argument)
 	  level = cdoZaxisInqLevel(zaxisID, levelID);
 	  fprintf(stdout, " %7g ", level);
 
-	  fprintf(stdout, "%7d %7zu :", gridsize, nmiss);
+	  fprintf(stdout, "%7zu %7zu :", gridsize, nmiss);
 
 	  if ( gridInqType(gridID) == GRID_SPECTRAL ||
 	       (gridsize == 1 && nmiss == 0) )
@@ -129,7 +128,7 @@ void *Pinfo(void *argument)
 		  arrvar  = 0;
 		  arrmin  =  1.e300;
 		  arrmax  = -1.e300;
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    {
 		      if ( !DBL_IS_EQUAL(array1[i], missval) )
 			{
@@ -149,7 +148,7 @@ void *Pinfo(void *argument)
 		  arrvar  = array1[0];
 		  arrmin  = array1[0];
 		  arrmax  = array1[0];
-		  for ( i = 1; i < gridsize; i++ )
+		  for ( size_t i = 1; i < gridsize; i++ )
 		    {
 		      if ( array1[i] < arrmin ) arrmin = array1[i];
 		      if ( array1[i] > arrmax ) arrmax = array1[i];
@@ -173,7 +172,7 @@ void *Pinfo(void *argument)
 		fprintf(stdout, "Found %zu of %zu missing values!\n", imiss, nmiss);
 	    }
 
-	  for ( i = 0; i < gridsize; i++ ) array2[i] = array1[i];
+	  for ( size_t i = 0; i < gridsize; i++ ) array2[i] = array1[i];
 
 	  pstreamDefRecord(streamID2,  varID,  levelID);
 	  pstreamWriteRecord(streamID2, array2, nmiss);

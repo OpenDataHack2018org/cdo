@@ -22,12 +22,14 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "timer.h"
+#include "util_files.h"
 
 
-void *Cat(void *argument)
+void *Cat(void *process)
 {
   bool lconstvars = true;
   int nrecs;
@@ -39,7 +41,7 @@ void *Cat(void *argument)
   double tw0 = 0, tw = 0;
   double *array = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -51,12 +53,12 @@ void *Cat(void *argument)
 
   for ( int indf = 0; indf < nfiles; ++indf )
     {
-      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
+      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
       if ( cdoTimer ) tw0 = timer_val(timer_cat);
 
-      int streamID1 = pstreamOpenRead(cdoStreamName(indf));
+      int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
 
-      int vlistID1 = pstreamInqVlist(streamID1);
+      int vlistID1 = cdoStreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( indf == 0 )
@@ -71,12 +73,12 @@ void *Cat(void *argument)
               if ( varID == nvars ) ntsteps = 0;
             }
 	      
-	  bool file_exists = (!cdoOverwriteMode) ? fileExists(cdoStreamName(nfiles)->args) : false;
+	  bool file_exists = (!cdoOverwriteMode) ? fileExists(cdoGetStreamName(nfiles).c_str()) : false;
 	  if ( file_exists )
 	    {
-	      streamID2 = pstreamOpenAppend(cdoStreamName(nfiles));
+	      streamID2 = cdoStreamOpenAppend(cdoStreamName(nfiles));
 
-	      vlistID2 = pstreamInqVlist(streamID2);
+	      vlistID2 = cdoStreamInqVlist(streamID2);
 	      taxisID2 = vlistInqTaxis(vlistID2);
 
 	      vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -89,9 +91,9 @@ void *Cat(void *argument)
 	  else
 	    {
 	      if ( cdoVerbose )
-		cdoPrint("Output file doesn't exist, creating: %s", cdoStreamName(nfiles)->args);
+		cdoPrint("Output file doesn't exist, creating: %s", cdoGetStreamName(nfiles).c_str());
 
-	      streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+	      streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
 	      vlistID2 = vlistDuplicate(vlistID1);
 	      taxisID2 = taxisDuplicate(taxisID1);
@@ -158,7 +160,7 @@ void *Cat(void *argument)
       pstreamClose(streamID1);
 
       if ( cdoTimer ) tw = timer_val(timer_cat) - tw0;
-      if ( cdoTimer ) cdoPrint("Processed file: %s   %.2f seconds", cdoStreamName(indf)->args, tw);
+      if ( cdoTimer ) cdoPrint("Processed file: %s   %.2f seconds", cdoGetStreamName(indf).c_str(), tw);
     }
 
   pstreamClose(streamID2);

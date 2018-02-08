@@ -67,10 +67,12 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "cdo_task.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "timer.h"
+#include "datetime.h"
 //#include "pstream_write.h"
 
 
@@ -150,7 +152,7 @@ void cdoUpdateVars(int nvars, int vlistID, field_type **vars)
 }
 
 
-void *XTimstat(void *argument)
+void *XTimstat(void *process)
 {
   enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
   int timestat_date = TIMESTAT_MEAN;
@@ -165,7 +167,7 @@ void *XTimstat(void *argument)
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   double vfrac = 1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("xtimmin",    func_min,   DATE_LEN, NULL);
@@ -224,10 +226,10 @@ void *XTimstat(void *argument)
 
   int cmplen = DATE_LEN - comparelen;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  //int streamID1 = pstreamOpenRead(cdoStreamName(0)->args);
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  //int streamID1 = cdoStreamOpenRead(cdoGetStreamName(0).c_str());
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( cmplen == 0 ) vlistDefNtsteps(vlistID2, 1);
@@ -246,7 +248,7 @@ void *XTimstat(void *argument)
   else if ( comparelen == YEAR_LEN ) freq = "year";
   if ( freq ) cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int)strlen(freq), freq);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   if ( cdoDiag )
@@ -254,10 +256,8 @@ void *XTimstat(void *argument)
       char filename[8192];
       strcpy(filename, cdoOperatorName(operatorID));
       strcat(filename, "_");
-      strcat(filename, cdoStreamName(1)->args);
-      argument_t *fileargument = file_argument_new(filename);
-      streamID3 = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      strcat(filename, cdoGetStreamName(1).c_str());
+      streamID3 = cdoStreamOpenWrite(filename, cdoFiletype());
 
       vlistID3 = vlistDuplicate(vlistID1);
 
@@ -281,7 +281,7 @@ void *XTimstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
 
   int FIELD_MEMTYPE = 0;
@@ -370,7 +370,7 @@ void *XTimstat(void *argument)
                   field_type *pinput_var = &input_vars[varID][levelID];
 
                   int nwpv     = pvars1->nwpv;
-                  int gridsize = pvars1->size;
+                  size_t gridsize = pvars1->size;
                   size_t nmiss    = pinput_var->nmiss;
 
                   farcpy(pvars1, *pinput_var);
@@ -380,7 +380,7 @@ void *XTimstat(void *argument)
                       if ( samp1[varID][levelID].ptr == NULL )
                         samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
                       
-                      for ( int i = 0; i < nwpv*gridsize; i++ )
+                      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         samp1[varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
@@ -399,7 +399,7 @@ void *XTimstat(void *argument)
                   field_type *pinput_var = &input_vars[varID][levelID];
 
                   int nwpv     = pvars1->nwpv;
-                  int gridsize = pvars1->size;
+                  size_t gridsize = pvars1->size;
                   size_t nmiss    = pinput_var->nmiss;
 
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
@@ -407,11 +407,11 @@ void *XTimstat(void *argument)
                       if ( samp1[varID][levelID].ptr == NULL )
                         {
                           samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
-                          for ( int i = 0; i < nwpv*gridsize; i++ )
+                          for ( size_t i = 0; i < nwpv*gridsize; i++ )
                             samp1[varID][levelID].ptr[i] = nsets;
                         }
                           
-                      for ( int i = 0; i < nwpv*gridsize; i++ )
+                      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         if ( !DBL_IS_EQUAL(pinput_var->ptr[i], pvars1->missval) )
                           samp1[varID][levelID].ptr[i]++;
                     }
@@ -510,13 +510,13 @@ void *XTimstat(void *argument)
 
 	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 
-            nwpv     = pvars1->nwpv;
-            int gridsize = pvars1->size;
+            nwpv = pvars1->nwpv;
+            size_t gridsize = pvars1->size;
             double missval = pvars1->missval;
             if ( samp1[varID][levelID].ptr )
               {
-                int irun = 0;
-                for ( int i = 0; i < nwpv*gridsize; ++i )
+                size_t irun = 0;
+                for ( size_t i = 0; i < nwpv*gridsize; ++i )
                   {
                     if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
                       {
@@ -525,13 +525,7 @@ void *XTimstat(void *argument)
                       }
                   }
 
-                if ( irun )
-                  {
-                    nmiss = 0;
-                    for ( int i = 0; i < nwpv*gridsize; ++i )
-                      if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) nmiss++;
-                    pvars1->nmiss = nmiss;
-                  }
+                if ( irun ) pvars1->nmiss = arrayNumMV(nwpv*gridsize, pvars1->ptr, missval);
 	      }
 	  }
 

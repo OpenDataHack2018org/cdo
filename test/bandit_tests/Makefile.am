@@ -1,5 +1,5 @@
 
-noinst_PROGRAMS = chained_operators variable_inputs_operators
+noinst_PROGRAMS = chained_operators variable_inputs_operators wildcards
 # bin_PROGRAMS = cdo_process_creation_test operator_1_to_1 operator_1_to_2
 
 
@@ -13,6 +13,11 @@ chained_operators_LDADD = $(tests_LDADD)
 variable_inputs_operators_SOURCES = variable_inputs_operators.cc
 variable_inputs_operators_CPPFLAGS = $(tests_CPPFLAGS)
 variable_inputs_operators_LDADD = $(tests_LDADD)
+
+wildcards_SOURCES = wildcards.cc
+wildcards_CPPFLAGS = $(tests_CPPFLAGS)
+wildcards_LDADD = $(tests_LDADD)
+
 LD_LIBRARY_PATH = $(tests_LDADD)
-TESTS = ./chained_operators ./variable_inputs_operators
+TESTS = ./chained_operators ./variable_inputs_operators ./wildcards
 

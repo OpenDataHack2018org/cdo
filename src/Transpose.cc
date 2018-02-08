@@ -23,16 +23,16 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 void transxy(int gridID, double *array1, double *array2)
 {
-  int nx = gridInqXsize(gridID);
+  size_t nx = gridInqXsize(gridID);
   int ny = gridInqYsize(gridID);
-  int gridsize = nx*ny;
+  size_t gridsize = nx*ny;
 
   if ( gridsize > 0 )
     {
@@ -40,10 +40,10 @@ void transxy(int gridID, double *array1, double *array2)
       double **a2D2 = (double **) Malloc(nx*sizeof(double *));
 
       for ( int j = 0; j < ny; ++j ) a2D1[j] = array1+j*nx;
-      for ( int i = 0; i < nx; ++i ) a2D2[i] = array2+i*ny;
+      for ( size_t i = 0; i < nx; ++i ) a2D2[i] = array2+i*ny;
 
       for ( int j = 0; j < ny; ++j )
-        for ( int i = 0; i < nx; ++i )
+        for ( size_t i = 0; i < nx; ++i )
           a2D2[i][j] = a2D1[j][i];
 
       Free(a2D1);
@@ -52,32 +52,32 @@ void transxy(int gridID, double *array1, double *array2)
   else
     {
       gridsize = gridInqSize(gridID);
-      for ( int i = 0; i < gridsize; ++i )
+      for ( size_t i = 0; i < gridsize; ++i )
         array2[i] = array1[i];
     }
 }
 
 
-void *Transpose(void *argument)
+void *Transpose(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int ngrids = vlistNgrids(vlistID1);
   for ( int index = 0; index < ngrids; index++ )
     {
       int gridID1 = vlistGrid(vlistID1, index);
-      int nx = gridInqXsize(gridID1);
+      size_t nx = gridInqXsize(gridID1);
       int ny = gridInqYsize(gridID1);
-      int gridsize = nx*ny;
+      size_t gridsize = nx*ny;
       if ( gridsize > 0 )
         {
           int gridID2 = gridCreate(GRID_GENERIC, gridsize);
@@ -91,10 +91,10 @@ void *Transpose(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));

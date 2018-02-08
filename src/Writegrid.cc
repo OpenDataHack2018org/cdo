@@ -22,23 +22,23 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
-void *Writegrid(void *argument)
+void *Writegrid(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int gridID  = vlistGrid(vlistID, 0);
 
   int gridtype = gridInqType(gridID);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   if ( gridtype == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
 
@@ -56,10 +56,10 @@ void *Writegrid(void *argument)
     }
   else
     {
-      for ( int i = 0; i < gridsize; i++ ) mask[i] = 1;
+      for ( size_t i = 0; i < gridsize; i++ ) mask[i] = 1;
     }
       
-  writeNCgrid(cdoStreamName(1)->args, gridID, mask);
+  writeNCgrid(cdoGetStreamName(1).c_str(), gridID, mask);
 
   pstreamClose(streamID);
 

@@ -25,14 +25,14 @@
 #include <limits.h>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define MAX_YEARS 99999
 
-void *Splityear(void *argument)
+void *Splityear(void *process)
 {
   int streamID2 = -1;
   int varID;
@@ -41,7 +41,7 @@ void *Splityear(void *argument)
   int day;
   int year1, year2;
   int mon1, mon2;
-  int gridsize;
+  size_t gridsize;
   int ic = 0;
   int cyear[MAX_YEARS];
   size_t nmiss;
@@ -52,7 +52,7 @@ void *Splityear(void *argument)
   double *array = NULL;
   field_type **vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
   
@@ -68,19 +68,19 @@ void *Splityear(void *argument)
 
   memset(cyear, 0, MAX_YEARS*sizeof(int));
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  strcpy(filename, cdoStreamName(1)->args);
+  strcpy(filename, cdoGetObase());
   int nchars = strlen(filename);
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -157,9 +157,7 @@ void *Splityear(void *argument)
 	  
 	      if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
-	      argument_t *fileargument = file_argument_new(filename);
-	      streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-	      file_argument_free(fileargument);
+	      streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
 	      pstreamDefVlist(streamID2, vlistID2);
 	    }
@@ -184,9 +182,7 @@ void *Splityear(void *argument)
 	  
 	      if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
-	      argument_t *fileargument = file_argument_new(filename);
-	      streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-	      file_argument_free(fileargument);
+	      streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
 	      pstreamDefVlist(streamID2, vlistID2);
 	    }

@@ -23,10 +23,10 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
-#include "cdo_int.h"
-#include "pstream.h"
 
+#include "cdo_int.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 #define  NALLOC_INC  1024
 
@@ -44,9 +44,9 @@ int cmpdarray(const void *s1, const void *s2)
 }
 
 
-void *Timsort(void *argument)
+void *Timsort(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
@@ -55,18 +55,18 @@ void *Timsort(void *argument)
   int *vdate = NULL, *vtime = NULL;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
@@ -102,8 +102,8 @@ void *Timsort(void *argument)
 
   int nts = tsID;
 
-  double **sarray = (double **) Malloc(ompNumThreads*sizeof(double *));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  double **sarray = (double **) Malloc(Threading::ompNumThreads*sizeof(double *));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     sarray[i] = (double*) Malloc(nts*sizeof(double));
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -118,7 +118,7 @@ void *Timsort(void *argument)
 #ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize,nts,sarray,vars,varID,levelID)
 #endif
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 
@@ -133,7 +133,7 @@ void *Timsort(void *argument)
 	}
     }
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     if ( sarray[i] ) Free(sarray[i]);
 
   if ( sarray ) Free(sarray);

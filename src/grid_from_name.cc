@@ -19,7 +19,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "griddes.h"
-
+#include "util_string.h"
 
 static
 void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)

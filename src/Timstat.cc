@@ -72,9 +72,10 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
 
 
 enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
@@ -183,9 +184,9 @@ void *Timstat(void *argument)
 
   int cmplen = DATE_LEN - comparelen;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( cmplen == 0 ) vlistDefNtsteps(vlistID2, 1);
@@ -204,7 +205,7 @@ void *Timstat(void *argument)
   else if ( comparelen == YEAR_LEN ) freq = "year";
   if ( freq ) cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int)strlen(freq), freq);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   if ( cdoDiag )
@@ -213,10 +214,8 @@ void *Timstat(void *argument)
 
       strcpy(filename, cdoOperatorName(operatorID));
       strcat(filename, "_");
-      strcat(filename, cdoStreamName(1)->args);
-      argument_t *fileargument = file_argument_new(filename);
-      streamID3 = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      strcat(filename, cdoGetStreamName(1).c_str());
+      streamID3 = cdoStreamOpenWrite(filename, cdoFiletype());
 
       vlistID3 = vlistDuplicate(vlistID1);
 
@@ -243,7 +242,7 @@ void *Timstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
 
   int FIELD_MEMTYPE = 0;
@@ -294,16 +293,16 @@ void *Timstat(void *argument)
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
 	      nwpv     = pvars1->nwpv;
-	      int gridsize = pvars1->size;
+	      size_t gridsize = pvars1->size;
 
 	      if ( nsets == 0 )
 		{
 		  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-		  pvars1->nmiss = (size_t)nmiss;
+		  pvars1->nmiss = nmiss;
                   if ( lrange )
                     {
-                      pvars2->nmiss = (size_t)nmiss;
-		      for ( int i = 0; i < nwpv*gridsize; i++ )
+                      pvars2->nmiss = nmiss;
+		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
@@ -312,7 +311,7 @@ void *Timstat(void *argument)
 		      if ( psamp1->ptr == NULL )
 			psamp1->ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 
-		      for ( int i = 0; i < nwpv*gridsize; i++ )
+		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
                         psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		    }
 		}
@@ -322,7 +321,7 @@ void *Timstat(void *argument)
                     pstreamReadRecordF(streamID1, field.ptrf, &nmiss);
                   else
                     pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = (size_t)nmiss;
+                  field.nmiss   = nmiss;
 		  field.size    = gridsize;
 		  field.grid    = pvars1->grid;
 		  field.missval = pvars1->missval;
@@ -331,11 +330,11 @@ void *Timstat(void *argument)
 		      if ( psamp1->ptr == NULL )
 			{
 			  psamp1->ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-			  for ( int i = 0; i < nwpv*gridsize; i++ )
+			  for ( size_t i = 0; i < nwpv*gridsize; i++ )
 			    psamp1->ptr[i] = nsets;
 			}
 
-		      for ( int i = 0; i < nwpv*gridsize; i++ )
+		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 			  psamp1->ptr[i]++;
 		    }
@@ -431,12 +430,12 @@ void *Timstat(void *argument)
             field_type *pvars1 = &vars1[varID][levelID];
 
             int nwpv     = pvars1->nwpv;
-            int gridsize = gridInqSize(pvars1->grid);
+            size_t gridsize = gridInqSize(pvars1->grid);
             double missval = pvars1->missval;
             if ( psamp1->ptr )
               {
                 int irun = 0;
-                for ( int i = 0; i < nwpv*gridsize; ++i )
+                for ( size_t i = 0; i < nwpv*gridsize; ++i )
                   {
                     if ( (psamp1->ptr[i] / nsets) < vfrac )
                       {
@@ -445,12 +444,7 @@ void *Timstat(void *argument)
                       }
                   }
 
-                if ( irun )
-                  {
-                    pvars1->nmiss = 0;
-                    for ( int i = 0; i < nwpv*gridsize; ++i )
-                      if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) pvars1->nmiss++;
-                  }
+                if ( irun ) pvars1->nmiss = arrayNumMV(nwpv*gridsize, pvars1->ptr, missval);
 	      }
 	  }
 
@@ -481,8 +475,8 @@ void *Timstat(void *argument)
 	      if ( psamp1->ptr ) sampptr = psamp1->ptr;
               else
                 {
-                  int gridsize = pvars1->size;
-                  for ( int i = 0; i < gridsize; ++i ) sampptr[i] = nsets;
+                  size_t gridsize = pvars1->size;
+                  for ( size_t i = 0; i < gridsize; ++i ) sampptr[i] = nsets;
                 }
 
               pstreamDefRecord(streamID3, varID, levelID);

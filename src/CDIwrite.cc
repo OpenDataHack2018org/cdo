@@ -17,53 +17,16 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
+#include "timer.h"
 
 
-static
-const char *filetypestr(int filetype)
-{
-  switch ( filetype )
-    {
-    case CDI_FILETYPE_GRB:  return ("GRIB");            break;
-    case CDI_FILETYPE_GRB2: return ("GRIB2");           break;
-    case CDI_FILETYPE_NC:   return ("NetCDF");          break;
-    case CDI_FILETYPE_NC2:  return ("NetCDF2");         break;
-    case CDI_FILETYPE_NC4:  return ("NetCDF4");         break;
-    case CDI_FILETYPE_NC4C: return ("NetCDF4 classic"); break;
-    case CDI_FILETYPE_NC5:  return ("NetCDF5");         break;
-    case CDI_FILETYPE_SRV:  return ("SERVICE");         break;
-    case CDI_FILETYPE_EXT:  return ("EXTRA");           break;
-    case CDI_FILETYPE_IEG:  return ("IEG");             break;
-    default:            return ("");
-    }
-}
+const char *filetypestr(int filetype);
+const char *datatypestr(int datatype);
 
-static
-const char *datatypestr(int datatype)
-{
-  static char str[20];
-
-  str[0] = 0;
-  snprintf(str, sizeof(str), "%d bit packed", datatype);
-
-  if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
-  else if ( datatype > 0 && datatype <= 32  ) return (str);
-  else if ( datatype == CDI_DATATYPE_CPX32  ) return ("C32");
-  else if ( datatype == CDI_DATATYPE_CPX64  ) return ("C64");
-  else if ( datatype == CDI_DATATYPE_FLT32  ) return ("32 bit floats");
-  else if ( datatype == CDI_DATATYPE_FLT64  ) return ("64 bit floats");
-  else if ( datatype == CDI_DATATYPE_INT8   ) return ("I8");
-  else if ( datatype == CDI_DATATYPE_INT16  ) return ("I16");
-  else if ( datatype == CDI_DATATYPE_INT32  ) return ("I32");
-  else if ( datatype == CDI_DATATYPE_UINT8  ) return ("U8");
-  else if ( datatype == CDI_DATATYPE_UINT16 ) return ("U16");
-  else if ( datatype == CDI_DATATYPE_UINT32 ) return ("U32");
-  else                                        return ("");
-}
 
 static
 void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size, double tw)
@@ -88,7 +51,7 @@ void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_
 }
 
 
-void *CDIwrite(void *argument)
+void *CDIwrite(void *process)
 {
   int memtype = CDO_Memtype;
   int nvars = 10, nlevs = 0, ntimesteps = 30;
@@ -111,7 +74,7 @@ void *CDIwrite(void *argument)
   srand(seed);
   sinfo[0] = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( cdoVerbose ) cdoPrint("parameter: <nruns, <grid, <nlevs, <ntimesteps, <nvars>>>>>");
 
@@ -133,7 +96,7 @@ void *CDIwrite(void *argument)
   if ( nvars <= 0 ) nvars = 1;
 
   int gridID = cdoDefineGrid(gridfile);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   if ( nlevs == 1 )
     zaxisID  = zaxisCreate(ZAXIS_SURFACE, 1);
@@ -175,7 +138,7 @@ void *CDIwrite(void *argument)
   gridInqYunits(gridID2, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-  for ( i = 0; i < gridsize; i++ )
+  for ( size_t i = 0; i < gridsize; i++ )
     array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
 
   Free(xvals);
@@ -188,7 +151,7 @@ void *CDIwrite(void *argument)
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
 	  vars[varID][levelID] = (double*) Malloc(gridsize*sizeof(double));
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    vars[varID][levelID][i] = varID + array[i]*(levelID+1);
 	}
     }
@@ -215,7 +178,7 @@ void *CDIwrite(void *argument)
       data_size = 0;
       nvalues = 0;
 
-      int streamID = pstreamOpenWrite(cdoStreamName(0), cdoFiletype());
+      int streamID = cdoStreamOpenWrite(cdoStreamName(0), cdoFiletype());
 
       pstreamDefVlist(streamID, vlistID);
 
@@ -244,7 +207,7 @@ void *CDIwrite(void *argument)
 		  if ( memtype == MEMTYPE_FLOAT )
 		    {
 		      double *darray = vars[varID][levelID];
-		      for ( i = 0; i < gridsize; ++i ) farray[i] = darray[i];
+		      for ( size_t i = 0; i < gridsize; ++i ) farray[i] = darray[i];
 		      pstreamWriteRecordF(streamID, farray, 0);
 		      data_size += gridsize*4;
 		    }
@@ -269,7 +232,7 @@ void *CDIwrite(void *argument)
       tw = timer_val(timer_write) - tw0;
       twsum += tw;
 
-      file_size = (double) fileSize(cdoStreamName(0)->args);
+      file_size = (double) fileSize(cdoGetStreamName(0).c_str());
 
       if ( nruns > 1 ) snprintf(sinfo, sizeof(sinfo), "(run %d)", irun+1);
 

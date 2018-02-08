@@ -23,9 +23,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -78,7 +78,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
 
 #define  MAXARG     16384
 
-void *Rotuv(void *argument)
+void *Rotuv(void *process)
 {
   int varID, levelID;
   int varID1, varID2, nlevel1, nlevel2;
@@ -91,7 +91,7 @@ void *Rotuv(void *argument)
   char varname2[CDI_MAX_NAME];
   double *single, *usvar = NULL, *vsvar = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("pairs of u and v in the rotated system");
 
@@ -119,9 +119,9 @@ void *Rotuv(void *argument)
 	chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
@@ -175,7 +175,7 @@ void *Rotuv(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;

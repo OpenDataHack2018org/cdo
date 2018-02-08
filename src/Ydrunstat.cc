@@ -30,10 +30,11 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "calendar.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
 
 
 #define NDAY 373
@@ -57,7 +58,7 @@ static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
 
-void *Ydrunstat(void *argument)
+void *Ydrunstat(void *process)
 {
   int varID;
   int nrecs;
@@ -66,7 +67,7 @@ void *Ydrunstat(void *argument)
   int inp, its;
   size_t nmiss;
     
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("ydrunmin",   func_min,   0, NULL);
@@ -88,9 +89,9 @@ void *Ydrunstat(void *argument)
 
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -101,7 +102,7 @@ void *Ydrunstat(void *argument)
   int calendar = taxisInqCalendar(taxisID1);
   int dpy      = calendar_dpy(calendar);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
@@ -355,7 +356,7 @@ void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
 		  field_type **vars1, field_type **vars2, int nsets, int operfunc)
 {
   int varID, levelID, nlevels;
-  int gridsize;
+  size_t gridsize;
   int year, month, day, dayoy;
 
   bool lvarstd = vars2 != NULL;

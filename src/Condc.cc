@@ -24,20 +24,19 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Condc(void *argument)
+void *Condc(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss, nmiss2;
-  int i;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int IFTHENC    = cdoOperatorAdd("ifthenc",    0, 0, NULL);
@@ -49,9 +48,9 @@ void *Condc(void *argument)
   operatorInputArg("constant value");
   double rc = parameter2double(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -60,12 +59,12 @@ void *Condc(void *argument)
 
   nospec(vlistID1);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
@@ -85,12 +84,12 @@ void *Condc(void *argument)
 
 	  if ( operatorID == IFTHENC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = !DBL_IS_EQUAL(array1[i], missval) && !DBL_IS_EQUAL(array1[i], 0.) ? rc : missval;
 	    }
 	  else if ( operatorID == IFNOTTHENC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = !DBL_IS_EQUAL(array1[i], missval) && DBL_IS_EQUAL(array1[i], 0.) ? rc : missval;
 	    }
 	  else
@@ -99,7 +98,7 @@ void *Condc(void *argument)
 	    }
 
 	  nmiss2 = 0;
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss2++;
 
 	  pstreamDefRecord(streamID2, varID, levelID);

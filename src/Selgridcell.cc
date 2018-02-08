@@ -22,17 +22,18 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
 #include "listarray.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "util_files.h"
 
 
-int gengridcell(int gridID1, int gridsize2, int *cellidx);
+int gengridcell(int gridID1, size_t gridsize2, long *cellidx);
 
 static
-int genindexgrid(int gridID1, int gridsize2, int *cellidx)
+int genindexgrid(int gridID1, size_t gridsize2, long *cellidx)
 {
   int gridID0 = gridID1;
   int gridtype1 = gridInqType(gridID1);
@@ -53,16 +54,16 @@ int genindexgrid(int gridID1, int gridsize2, int *cellidx)
 }
 
 static
-void sel_index(double *array1, double *array2, int nind, int *indarr)
+void sel_index(double *array1, double *array2, long nind, long *indarr)
 {
-  for ( int i = 0; i < nind; ++i )
+  for ( long i = 0; i < nind; ++i )
     {
       array2[i] = array1[indarr[i]];
     }
 }
 
 
-void *Selgridcell(void *argument)
+void *Selgridcell(void *process)
 {
   int nrecs;
   int varID;
@@ -73,7 +74,7 @@ void *Selgridcell(void *argument)
   } sindex_t;
   lista_t *ilista = lista_new(INT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
                     cdoOperatorAdd("selgridcell", 0, 0, "grid cell indices (1-N)");
   int DELGRIDCELL = cdoOperatorAdd("delgridcell", 0, 0, "grid cell indices (1-N)");
@@ -86,21 +87,21 @@ void *Selgridcell(void *argument)
   int *indarr = NULL;
   if ( operatorArgc() == 1 && fileExists(operatorArgv()[0]) )
     {
-      bool *cdo_read_mask(const char *maskfile, int *n);
-      int n = 0;
+      bool *cdo_read_mask(const char *maskfile, size_t *n);
+      size_t n = 0;
       bool *mask = cdo_read_mask(operatorArgv()[0], &n);
       nind = 0;
-      for ( int i = 0; i < n; ++i ) if ( mask[i] ) nind++;
+      for ( size_t i = 0; i < n; ++i ) if ( mask[i] ) nind++;
       if ( nind == 0 ) cdoAbort("Mask is empty!");
       else
         {
-          indarr = (int*) Malloc(nind*sizeof(double));
+          indarr = (int*) Malloc(nind*sizeof(int));
           nind = 0;
-          for ( int i = 0; i < n; ++i ) if ( mask[i] ) indarr[nind++] = i;
+          for ( size_t i = 0; i < n; ++i ) if ( mask[i] ) indarr[nind++] = i;
         }
       if ( mask ) Free(mask);
     }
- else
+  else
     {
       nind = args2int_lista(operatorArgc(), operatorArgv(), ilista);
       indarr = (int*) lista_dataptr(ilista);
@@ -122,9 +123,9 @@ void *Selgridcell(void *argument)
 
   if ( indmin < 0 ) cdoAbort("Index < 1 not allowed!");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -138,20 +139,27 @@ void *Selgridcell(void *argument)
   int ngrids = vlistNgrids(vlistID1);
   sindex_t *sindex = (sindex_t *) Malloc(ngrids*sizeof(sindex_t));
 
-  int ncells = nind;
-  int *cellidx = indarr;
+  long ncells = nind;
+  long *cellidx = NULL;
   if ( operatorID == DELGRIDCELL )
     {
-      int gridsize = vlistGridsizeMax(vlistID1);
+      size_t gridsize = vlistGridsizeMax(vlistID1);
       ncells = gridsize - nind;
-      cellidx = (int*) Malloc(gridsize*sizeof(int));
-      for ( int i = 0; i < gridsize; ++i ) cellidx[i] = 1;
-      for ( int i = 0; i < nind; ++i ) cellidx[indarr[i]] = 0;
-      int j = 0;
-      for ( int i = 0; i < gridsize; ++i )
+      cellidx = (long*) Malloc(gridsize*sizeof(long));
+      for ( size_t i = 0; i < gridsize; ++i ) cellidx[i] = 1;
+      for ( long i = 0; i < nind; ++i ) cellidx[indarr[i]] = 0;
+      long j = 0;
+      for ( size_t i = 0; i < gridsize; ++i )
         if ( cellidx[i] == 1 ) cellidx[j++] = i;
       if ( j != ncells ) cdoAbort("Internal error; number of cells differ");
     }
+  else
+    {
+      cellidx = (long*) Malloc(nind*sizeof(long));
+      for ( int i = 0; i < nind; ++i )
+        cellidx[i] = indarr[i];
+    }
+
   if ( ncells == 0 ) cdoAbort("Mask is empty!");
 
   for ( index = 0; index < ngrids; index++ )
@@ -159,9 +167,9 @@ void *Selgridcell(void *argument)
       gridID1  = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
 
-      int gridsize = gridInqSize(gridID1);
+      size_t gridsize = gridInqSize(gridID1);
       if ( gridsize == 1 ) continue;
-      if ( indmax >= gridsize )
+      if ( indmax >= (int)gridsize )
         {
           cdoWarning("Max grid index is greater than grid size, skipped grid %d!", index+1);
           continue;
@@ -191,14 +199,14 @@ void *Selgridcell(void *argument)
   if ( varID >= nvars ) cdoAbort("No variables selected!");
 
   
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
-  int gridsize2 = vlistGridsizeMax(vlistID2);
+  size_t gridsize2 = vlistGridsizeMax(vlistID2);
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
   double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
@@ -232,10 +240,8 @@ void *Selgridcell(void *argument)
 
 	      if ( nmiss )
 		{
-		  nmiss = 0;
                   double missval = vlistInqVarMissval(vlistID2, varID);
-		  for ( int i = 0; i < gridsize2; i++ )
-		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+                  nmiss = arrayNumMV(gridsize2, array2, missval);
 		}
 
 	      pstreamWriteRecord(streamID2, array2, nmiss);

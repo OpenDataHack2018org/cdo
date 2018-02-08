@@ -35,11 +35,12 @@ Constansts: M_PI, M_E
 #include <unistd.h>    /* stat */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "expr.h"
+#include "datetime.h"
 
 
 void grid_cell_area(int gridID, double *array);
@@ -338,9 +339,9 @@ void parseParamInit(parseParamType *parse_arg, int vlistID, int pointID, int sur
 }
 
 
-void *Expr(void *argument)
+void *Expr(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   void *scanner;
   int yy_scan_string(const char *str, void *scanner);
@@ -364,8 +365,8 @@ void *Expr(void *argument)
 
   char *exprs = readsCommandLine ? exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int streamID1 = cdoStreamOpenRead(0);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   exprs = exprs_expand(exprs, vlistID1);
   if ( cdoVerbose ) cdoPrint(exprs);
@@ -571,7 +572,7 @@ void *Expr(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(1, cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int vdate0 = 0, vtime0 = 0;
@@ -663,11 +664,7 @@ void *Expr(void *argument)
 	    {
               size_t offset = ngp*levelID;
 	      double *vardata = params[pidx].data + offset;
-
-	      size_t nmiss = 0;
-	      for ( size_t i = 0; i < ngp; i++ )
-		if ( DBL_IS_EQUAL(vardata[i], missval) ) nmiss++;
-
+	      size_t nmiss = arrayNumMV(ngp, vardata, missval);
 	      pstreamDefRecord(streamID2, varID, levelID);
 	      pstreamWriteRecord(streamID2, vardata, nmiss);
 	    }
@@ -676,8 +673,8 @@ void *Expr(void *argument)
       tsID++;
     }
 
-  pstreamClose(streamID2);
-  pstreamClose(streamID1);
+//  pstreamClose(streamID2);
+//  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

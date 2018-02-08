@@ -32,10 +32,12 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "calendar.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "util_string.h"
+#include "datetime.h"
 
 
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
@@ -157,7 +159,7 @@ void gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, in
 }
 
 
-void *Settime(void *argument)
+void *Settime(void *process)
 {
   int nrecs, newval = 0;
   int varID, levelID;
@@ -165,7 +167,7 @@ void *Settime(void *argument)
   int sdate = 0, stime = 0;
   int taxisID2 = CDI_UNDEFID;
   size_t nmiss;
-  int gridsize;
+  size_t gridsize;
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 1, incunit = 86400;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
@@ -175,7 +177,7 @@ void *Settime(void *argument)
   // int nargs;
   juldate_t juldate;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETYEAR     = cdoOperatorAdd("setyear",      0,  1, "year");
@@ -327,9 +329,9 @@ void *Settime(void *argument)
       newval = parameter2int(operatorArgv()[0]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -436,7 +438,7 @@ void *Settime(void *argument)
 
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);

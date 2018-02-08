@@ -22,9 +22,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 static const char HI_NAME[]     = "hum_index";
@@ -80,29 +80,27 @@ static void farexpr(field_type *field1, field_type field2, field_type field3, do
         array1[i] = expression(array1[i], array2[i], array3[i], missval1);  
     }
 
-  field1->nmiss = 0;
-  for ( size_t i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+  field1->nmiss = arrayNumMV(len, array1, missval1);
 }
 
    
-void *Hi(void *argument)
+void *Hi(void *process)
 {
   size_t nmiss;
   int nrecs;
   int varID1, varID2, varID3;
   int levelID1, levelID2, levelID3;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("hi", 0, 0, NULL);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
-  int streamID3 = pstreamOpenRead(cdoStreamName(2));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
+  int streamID3 = cdoStreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
-  int vlistID3 = pstreamInqVlist(streamID3);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
+  int vlistID3 = cdoStreamInqVlist(streamID3);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   //taxisID2 = vlistInqTaxis(vlistID2);
@@ -141,7 +139,7 @@ void *Hi(void *argument)
   vlistDefVarLongname(vlistID4, varID4, HI_LONGNAME);
   vlistDefVarUnits(vlistID4, varID4, HI_UNITS);
 
-  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
 
   pstreamDefVlist(streamID4, vlistID4);
 

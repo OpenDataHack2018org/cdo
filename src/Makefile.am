@@ -1,8 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES =            \
-               argument.h		\
-               argument.cc		\
                array.h         \
                array.cc         \
                cdo_int.h       \
@@ -13,13 +11,17 @@ libcdo_la_SOURCES =            \
                cf_interface.h   \
                cdo_pthread.cc   \
                cdo_vlist.cc     \
+               cdo_vlist.h	\
                cdo_getopt.cc    \
                cdo_getopt.h    \
                cdo_task.cc      \
                cdo_task.h      \
                cdo_history.cc   \
+               cdo_history.h   \
                cdo_read.cc      \
                cdi_uuid.h      \
+               cdoOptions.h	\
+               cdoOptions.cc  \
                cmortable_parser.cc   \
                after_sptrans.cc \
                after_fctrans.cc \
@@ -36,6 +38,7 @@ libcdo_la_SOURCES =            \
                color.cc         \
                color.h         \
                commandline.cc   \
+               commandline.h   \
                const.h         \
                convert_units.cc \
                convert_units.h \
@@ -54,6 +57,7 @@ libcdo_la_SOURCES =            \
                temp.h          \
                mask.h          \
                exception.cc     \
+               exception.h     \
                expr.cc          \
                expr.h          \
                expr_fun.cc      \
@@ -136,10 +140,13 @@ libcdo_la_SOURCES =            \
                printinfo.h     \
                process.cc       \
                process.h       \
+               process_int.cc       \
+               process_int.h       \
                pstream.cc       \
                pstream.h       \
+			   pstream_int.cc  \
+			   pstream_int.h   \
                pstream_write.h \
-               pstream_int.h   \
                pthread_debug.cc \
                pthread_debug.h \
                readline.cc      \
@@ -170,8 +177,17 @@ libcdo_la_SOURCES =            \
                text.h          \
                timebase.h      \
                timer.cc         \
+               timer.h         \
                util.cc          \
                util.h          \
+			   util_files.cc \
+			   util_files.h \
+			   util_fileextensions.cc \
+			   util_fileextensions.h \
+			   util_string.cc\
+			   util_string.h \
+			   util_wildcards.cc\
+			   util_wildcards.h \
 			   varlist.h		\
                zaxis_print.cc   \
                zaxis.cc

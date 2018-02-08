@@ -19,10 +19,10 @@
 #include <string.h>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "ecacore.h"
 #include "ecautil.h"
 
@@ -39,7 +39,6 @@ void eca1(const ECA_REQUEST_1 *request)
   size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
-  int gridsize;
   int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
   int nrecs, nrecords;
@@ -47,7 +46,6 @@ void eca1(const ECA_REQUEST_1 *request)
   int itsID;
   int otsID;
   long nsets;
-  int i;
   int istreamID, ostreamID;
   int ivlistID, ovlistID, itaxisID, otaxisID;
   int nlevels;
@@ -58,9 +56,9 @@ void eca1(const ECA_REQUEST_1 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID = pstreamOpenRead(cdoStreamName(0));
+  istreamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  ivlistID = pstreamInqVlist(istreamID);
+  ivlistID = cdoStreamInqVlist(istreamID);
   ovlistID = vlistCreate();
   
   gridID  = vlistInqVarGrid(ivlistID, FIRST_VAR_ID);
@@ -103,14 +101,14 @@ void eca1(const ECA_REQUEST_1 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  ostreamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID);
   recVarID   = (int*) Malloc(nrecords*sizeof(int));
   recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   field_init(&field1);
   field_init(&field2);
@@ -208,7 +206,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
               if ( nsets == 0 )
                 {
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     {
                       var12[levelID].ptr[i] = missval;
                       samp1[levelID].ptr[i] = missval;
@@ -225,7 +223,7 @@ void eca1(const ECA_REQUEST_1 *request)
                 }
 
               pstreamReadRecord(istreamID, field1.ptr, &nmiss);
-              field1.nmiss   = (size_t)nmiss;
+              field1.nmiss   = nmiss;
               field1.grid    = var12[levelID].grid;
               field1.missval = var12[levelID].missval;
               
@@ -247,10 +245,10 @@ void eca1(const ECA_REQUEST_1 *request)
                   if ( IS_NOT_SET(samp2[levelID].ptr) )
                     {
                       samp2[levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-                      for ( i = 0; i < gridsize; i++ )
+                      for ( size_t i = 0; i < gridsize; i++ )
                         samp2[levelID].ptr[i] = nsets;
                     }
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     {
                       if ( DBL_IS_EQUAL(field1.ptr[i], field1.missval) )
                         continue;
@@ -406,7 +404,6 @@ void eca2(const ECA_REQUEST_2 *request)
   size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
-  int gridsize;
   int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
   int nrecs, nrecords;
@@ -414,7 +411,6 @@ void eca2(const ECA_REQUEST_2 *request)
   int itsID;
   int otsID;
   long nsets;
-  int i;
   int istreamID1, istreamID2, ostreamID;
   int ivlistID1, ivlistID2, ovlistID, itaxisID1, otaxisID;
   int nlevels;
@@ -425,11 +421,11 @@ void eca2(const ECA_REQUEST_2 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID1 = pstreamOpenRead(cdoStreamName(0));
-  istreamID2 = pstreamOpenRead(cdoStreamName(1));
+  istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  ivlistID1 = pstreamInqVlist(istreamID1);
-  ivlistID2 = pstreamInqVlist(istreamID2);
+  ivlistID1 = cdoStreamInqVlist(istreamID1);
+  ivlistID2 = cdoStreamInqVlist(istreamID2);
   ovlistID  = vlistCreate();
   
   vlistCompare(ivlistID1, ivlistID2, CMP_ALL);
@@ -475,14 +471,14 @@ void eca2(const ECA_REQUEST_2 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  ostreamID = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID1);
   recVarID   = (int*) Malloc(nrecords*sizeof(int));
   recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   field_init(&field1);
   field_init(&field2);
@@ -587,7 +583,7 @@ void eca2(const ECA_REQUEST_2 *request)
 
               if ( nsets == 0 )
                 {
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     {
                       var14[levelID].ptr[i] = missval1;
                       samp1[levelID].ptr[i] = missval1;
@@ -613,12 +609,12 @@ void eca2(const ECA_REQUEST_2 *request)
                 }
 
               pstreamReadRecord(istreamID1, field1.ptr, &nmiss);
-              field1.nmiss   = (size_t)nmiss;
+              field1.nmiss   = nmiss;
               field1.grid    = gridID;
               field1.missval = missval1;
               
               pstreamReadRecord(istreamID2, field2.ptr, &nmiss);
-              field2.nmiss   = (size_t)nmiss;
+              field2.nmiss   = nmiss;
               field2.grid    = gridID;
               field2.missval = missval2;
 
@@ -639,10 +635,10 @@ void eca2(const ECA_REQUEST_2 *request)
                   if ( IS_NOT_SET(samp3[levelID].ptr) )
                     {
                       samp3[levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-                      for ( i = 0; i < gridsize; i++ )
+                      for ( size_t i = 0; i < gridsize; i++ )
                         samp3[levelID].ptr[i] = nsets;
                     }
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     {
                       if ( DBL_IS_EQUAL(field1.ptr[i], field1.missval) )
                         continue;
@@ -795,7 +791,6 @@ void eca3(const ECA_REQUEST_3 *request)
   size_t nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
-  int gridsize;
   int ivdate1 = 0, ivtime1 = 0;
   int ivdate2 = 0, ivtime2 = 0;
   int ovdate = 0, ovtime = 0;
@@ -804,7 +799,6 @@ void eca3(const ECA_REQUEST_3 *request)
   int itsID;
   int otsID;
   long nsets;
-  int i;
   int istreamID1, istreamID2, ostreamID;
   int ivlistID1, ivlistID2, ovlistID, itaxisID1, itaxisID2, otaxisID;
   int nlevels;
@@ -815,11 +809,11 @@ void eca3(const ECA_REQUEST_3 *request)
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  istreamID1 = pstreamOpenRead(cdoStreamName(0));
-  istreamID2 = pstreamOpenRead(cdoStreamName(1));
+  istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  ivlistID1 = pstreamInqVlist(istreamID1);
-  ivlistID2 = pstreamInqVlist(istreamID2);
+  ivlistID1 = cdoStreamInqVlist(istreamID1);
+  ivlistID2 = cdoStreamInqVlist(istreamID2);
   ovlistID  = vlistCreate();
   
   vlistCompare(ivlistID1, ivlistID2, CMP_ALL);
@@ -851,14 +845,14 @@ void eca3(const ECA_REQUEST_3 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  ostreamID = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   nrecords   = vlistNrecs(ivlistID1);
   recVarID   = (int*) Malloc(nrecords*sizeof(int));
   recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
 
   field_init(&field1);
   field_init(&field2);
@@ -924,7 +918,7 @@ void eca3(const ECA_REQUEST_3 *request)
 
               if ( nsets == 0 )
                 {
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     {
                       var1[levelID].ptr[i] = missval;
                       var2[levelID].ptr[i] = missval;
@@ -934,12 +928,12 @@ void eca3(const ECA_REQUEST_3 *request)
                 }
 
               pstreamReadRecord(istreamID1, field1.ptr, &nmiss);
-              field1.nmiss   = (size_t)nmiss;
+              field1.nmiss   = nmiss;
               field1.grid    = var1[levelID].grid;
               field1.missval = var1[levelID].missval;
 
               pstreamReadRecord(istreamID2, field2.ptr, &nmiss);
-              field2.nmiss   = (size_t)nmiss;
+              field2.nmiss   = nmiss;
               field2.grid    = var1[levelID].grid;
               field2.missval = var1[levelID].missval;
 
@@ -1012,11 +1006,11 @@ void eca4(const ECA_REQUEST_4 *request)
 
   int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  int istreamID1 = pstreamOpenRead(cdoStreamName(0));
-  int istreamID2 = pstreamOpenRead(cdoStreamName(1));
+  int istreamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int istreamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int ivlistID1 = pstreamInqVlist(istreamID1);
-  int ivlistID2 = pstreamInqVlist(istreamID2);
+  int ivlistID1 = cdoStreamInqVlist(istreamID1);
+  int ivlistID2 = cdoStreamInqVlist(istreamID2);
   int ovlistID = vlistCreate();
 
   int gridID = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
@@ -1053,7 +1047,7 @@ void eca4(const ECA_REQUEST_4 *request)
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  int ostreamID = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int ostreamID = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   int nrecords    = vlistNrecs(ivlistID1);
@@ -1074,7 +1068,7 @@ void eca4(const ECA_REQUEST_4 *request)
     {
       lyvals = false;
     }
-  int gridsize  = gridInqSize(gridID);
+  size_t  gridsize = gridInqSize(gridID);
   /* for later check on northern\southern hemisphere */
   double *yvals = (double*) Malloc(gridsize*sizeof(double));
   if ( lyvals )
@@ -1083,7 +1077,7 @@ void eca4(const ECA_REQUEST_4 *request)
     }
   else
     {
-      for ( int i = 0; i < gridsize; ++i ) yvals[i] = 20; // Northern hemisphere
+      for ( size_t  i = 0; i < gridsize; ++i ) yvals[i] = 20; // Northern hemisphere
     }
 
   /* Two fields are needed because of the definition of gsl for northern and
@@ -1171,7 +1165,7 @@ void eca4(const ECA_REQUEST_4 *request)
     {
       pstreamInqRecord(istreamID2, &varID, &levelID);
       pstreamReadRecord(istreamID2, mask.ptr, &nmiss);
-      mask.nmiss   = (size_t)nmiss;
+      mask.nmiss   = nmiss;
       mask.grid    = gridID;
       mask.missval = vlistInqVarMissval(ivlistID2, 0);
 
@@ -1212,7 +1206,7 @@ void eca4(const ECA_REQUEST_4 *request)
 
               if ( nsets == 0 )
                 {
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t  i = 0; i < gridsize; i++ )
                     {
                       gslDuration[levelID].ptr[i]          = missval;
                       gslFirstDay[levelID].ptr[i]          = missval;
@@ -1229,7 +1223,7 @@ void eca4(const ECA_REQUEST_4 *request)
               /* init the history ONCE */
               if ( 0 == itsID )
                 {
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t  i = 0; i < gridsize; i++ )
                     {
                       startDateWithHist[1][levelID].ptr[i] = missval;
                       endDateWithHist[1][levelID].ptr[i]   = missval;
@@ -1239,7 +1233,7 @@ void eca4(const ECA_REQUEST_4 *request)
                 }
 
               pstreamReadRecord(istreamID1, fieldGt.ptr, &nmiss);
-              fieldGt.nmiss   = (size_t)nmiss;
+              fieldGt.nmiss   = nmiss;
               memcpy(fieldLt.ptr, fieldGt.ptr, gridsize*sizeof(double));
               fieldLt.nmiss   = fieldGt.nmiss;
               fieldGt.grid    = startCount[levelID].grid;
@@ -1252,7 +1246,7 @@ void eca4(const ECA_REQUEST_4 *request)
               if ( 1 == month && !resetAtJan )
               {
                 /* reset northern startCount */
-                for ( int i = 0; i < gridsize; i++ )
+                for ( size_t  i = 0; i < gridsize; i++ )
                   {
                     if ( yvals[i] >= 0.0 )
                       if ( !DBL_IS_EQUAL(startCount[levelID].ptr[i], missval) )
@@ -1262,7 +1256,7 @@ void eca4(const ECA_REQUEST_4 *request)
                       }
                   }
                 /* reset southern endCount */
-                for ( int i = 0; i < gridsize; i++ )
+                for ( size_t  i = 0; i < gridsize; i++ )
                   {
                     if ( yvals[i] < 0.0 )
                       if ( !DBL_IS_EQUAL(endCount[levelID].ptr[i], missval) )
@@ -1285,7 +1279,7 @@ void eca4(const ECA_REQUEST_4 *request)
 #endif
                   {
                     /* reset northern endCount  */
-                    for ( int i = 0; i < gridsize; i++ )
+                    for ( size_t  i = 0; i < gridsize; i++ )
                       {
                         if ( yvals[i] >= 0.0 )
                           {
@@ -1302,7 +1296,7 @@ void eca4(const ECA_REQUEST_4 *request)
 #endif
                   {
                     /* reset southern startCount */
-                    for ( int i = 0; i < gridsize; i++ )
+                    for ( size_t  i = 0; i < gridsize; i++ )
                     {
                       if ( yvals[i] < 0.0 )
                       {
@@ -1343,7 +1337,7 @@ void eca4(const ECA_REQUEST_4 *request)
 
               if ( month < 7 )
                 {
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t  i = 0; i < gridsize; i++ )
                     /* dictinct between northern and southern sphere */
                     /* start with south */
                     if ( yvals[i] < 0 )
@@ -1376,7 +1370,7 @@ void eca4(const ECA_REQUEST_4 *request)
                 }
               else
                 {
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t  i = 0; i < gridsize; i++ )
                   {
                     if ( yvals[i] < 0 )
                     {

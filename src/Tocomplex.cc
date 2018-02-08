@@ -17,27 +17,27 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Tocomplex(void *argument)
+void *Tocomplex(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int RETOCOMPLEX = cdoOperatorAdd("retocomplex", 0, 0, NULL);
   int IMTOCOMPLEX = cdoOperatorAdd("imtocomplex", 0, 0, NULL);
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID2);
@@ -57,10 +57,10 @@ void *Tocomplex(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( cdoFiletype() != CDI_FILETYPE_EXT ) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(2*gridsize*sizeof(double));
       
@@ -82,7 +82,7 @@ void *Tocomplex(void *argument)
 
 	  if ( operatorID == RETOCOMPLEX )
 	    {
-	      for ( int i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  array2[2*i]   = array1[i];
 		  array2[2*i+1] = 0;
@@ -90,7 +90,7 @@ void *Tocomplex(void *argument)
 	    }
 	  else if ( operatorID == IMTOCOMPLEX )
 	    {
-	      for ( int i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  array2[2*i]   = 0;
 		  array2[2*i+1] = array1[i];

@@ -31,11 +31,13 @@
 */
 
 #include <cdi.h>
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
 
 
-void *Runstat(void *argument)
+void *Runstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int varID;
@@ -43,7 +45,7 @@ void *Runstat(void *argument)
   size_t nmiss;
   bool runstat_nomiss = false;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   char *envstr = getenv("RUNSTAT_NOMISS");
   if ( envstr )
@@ -79,9 +81,9 @@ void *Runstat(void *argument)
   operatorCheckArgc(1);
   int ndates = parameter2int(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -97,7 +99,7 @@ void *Runstat(void *argument)
       if ( nsteps > 0 ) vlistDefNtsteps(vlistID2, nsteps);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
@@ -123,7 +125,7 @@ void *Runstat(void *argument)
 	vars2[its] = field_malloc(vlistID1, FIELD_PTR);
     }
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   bool *imask = (bool*) Malloc(gridsizemax*sizeof(bool));
 
   int tsID = 0;
@@ -149,14 +151,14 @@ void *Runstat(void *argument)
           field_type *pvars1 = &vars1[tsID][varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[tsID][varID][levelID] : NULL;
 
-          int gridsize = pvars1->size;
+          size_t gridsize = pvars1->size;
 
           pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
           if ( lrange )
             {
               pvars2->nmiss = pvars1->nmiss;
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 pvars2->ptr[i] = pvars1->ptr[i];
             }
 
@@ -166,10 +168,10 @@ void *Runstat(void *argument)
 	    {
 	      double missval = pvars1->missval;
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
                 imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		psamp1->ptr[i] = (double) imask[i];
 
 #ifdef  _OPENMP
@@ -178,7 +180,7 @@ void *Runstat(void *argument)
 	      for ( int inp = 0; inp < tsID; inp++ )
 		{
                   double *ptr = samp1[inp][varID][levelID].ptr;
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( imask[i] ) ptr[i]++;
 		}
 	    }
@@ -300,14 +302,14 @@ void *Runstat(void *argument)
           field_type *pvars1 = &vars1[ndates-1][varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[ndates-1][varID][levelID] : NULL;
 
-          int gridsize = pvars1->size;
+          size_t gridsize = pvars1->size;
 
           pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
           if ( lrange )
             {
               pvars2->nmiss = pvars1->nmiss;
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 pvars2->ptr[i] = pvars1->ptr[i];
             }
 
@@ -317,10 +319,10 @@ void *Runstat(void *argument)
 	    {
 	      double missval = pvars1->missval;
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
                 imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		psamp1->ptr[i] = (double) imask[i];
 
 #ifdef  _OPENMP
@@ -329,7 +331,7 @@ void *Runstat(void *argument)
 	      for ( int inp = 0; inp < ndates-1; inp++ )
 		{
                   double *ptr = samp1[inp][varID][levelID].ptr;
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( imask[i] ) ptr[i]++;
 		}
 	    }

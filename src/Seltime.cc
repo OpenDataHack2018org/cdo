@@ -31,10 +31,11 @@
 
 
 #include <cdi.h>
-#include "cdo_int.h"
-#include "pstream.h"
-#include "listarray.h"
 
+#include "cdo_int.h"
+#include "pstream_int.h"
+#include "listarray.h"
+#include "util_string.h"
 
 void season_to_months(const char *season, int *imonths)
 {
@@ -175,7 +176,7 @@ int datelist(lista_t *flista)
 }
 
 
-void *Seltime(void *argument)
+void *Seltime(void *process)
 {
   int streamID2 = -1;
   int nrecs;
@@ -197,7 +198,7 @@ void *Seltime(void *argument)
   int *vdate_list = NULL, *vtime_list = NULL;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -274,9 +275,9 @@ void *Seltime(void *argument)
       for ( i = 0; i < nsel; i++ ) selfound[i] = false;
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( nsel == 1 && operfunc == func_step )  vlistDefNtsteps(vlistID2,  1);
@@ -288,7 +289,7 @@ void *Seltime(void *argument)
 
   if ( ! lcopy )
     {
-      int gridsize = vlistGridsizeMax(vlistID1);
+      size_t gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double*) Malloc(gridsize*sizeof(double));
     }
@@ -349,7 +350,7 @@ void *Seltime(void *argument)
 		{
 		  int gridID  = vlistInqVarGrid(vlistID1, varID);
 		  int nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		  int gridsize = gridInqSize(gridID);
+		  size_t gridsize = gridInqSize(gridID);
 		  
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
@@ -444,7 +445,7 @@ void *Seltime(void *argument)
 	{
 	  if ( tsID2 == 0 )
 	    {
-	      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+	      streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 
@@ -547,7 +548,7 @@ void *Seltime(void *argument)
 			  {
 			    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
 			    int gridID   = vlistInqVarGrid(vlistID1, varID);
-			    int gridsize = gridInqSize(gridID);
+			    size_t gridsize = gridInqSize(gridID);
 			    int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 			    for ( levelID = 0; levelID < nlevel; levelID++ )
 			      {

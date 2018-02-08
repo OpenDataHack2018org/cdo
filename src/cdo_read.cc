@@ -1,3 +1,19 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #include <cdi.h>
 #include "cdo_int.h"
 
@@ -14,7 +30,7 @@ bool *cdo_read_timestepmask(const char *maskfile, int *n)
   int nvars = vlistNvars(vlistID);
   if ( nvars > 1 ) cdoAbort("timestepmask %s contains more than one variable!", maskfile);
 
-  int gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
+  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
   if ( gridsize > 1 ) cdoAbort("timestepmask %s has more than one gridpoint!", maskfile);
 
   int nlev = zaxisInqSize(vlistInqVarZaxis(vlistID, 0));
@@ -61,7 +77,7 @@ bool *cdo_read_timestepmask(const char *maskfile, int *n)
 }
 
 
-bool *cdo_read_mask(const char *maskfile, int *n)
+bool *cdo_read_mask(const char *maskfile, size_t *n)
 {
   *n = 0;
 
@@ -73,7 +89,7 @@ bool *cdo_read_mask(const char *maskfile, int *n)
   int nvars = vlistNvars(vlistID);
   if ( nvars > 1 ) cdoAbort("Mask %s contains more than one variable!", maskfile);
 
-  int gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
+  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
 
   int nlev = zaxisInqSize(vlistInqVarZaxis(vlistID, 0));
   if ( nlev > 1 ) cdoAbort("Mask %s has more than one level!", maskfile);
@@ -90,7 +106,7 @@ bool *cdo_read_mask(const char *maskfile, int *n)
   streamInqRecord(streamID, &varID, &levelID);
   streamReadRecord(streamID, dmask, &nmiss);
 
-  for ( int i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     imask[i] = IS_NOT_EQUAL(dmask[i], 0);
       
       Free(dmask);

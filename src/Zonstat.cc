@@ -33,14 +33,14 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "percentiles.h"
 
 
-void *Zonstat(void *argument)
+void *Zonstat(void *process)
 {
   int gridID1 = -1, gridID2 = -1;
   int zongridID = -1;
@@ -49,7 +49,7 @@ void *Zonstat(void *argument)
   int nrecs;
   int varID, levelID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("zonmin",   func_min,   0, NULL);
@@ -76,9 +76,9 @@ void *Zonstat(void *argument)
       percentile_check_number(pn);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -131,13 +131,13 @@ void *Zonstat(void *argument)
   for ( index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   gridID1 = vlistInqVarGrid(vlistID1, 0);
   int nlatmax = gridInqYsize(gridID1); /* max nlat ? */
 
-  int lim = vlistGridsizeMax(vlistID1);
+  size_t lim = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field2);

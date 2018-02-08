@@ -22,9 +22,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 void genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds);
 
@@ -51,7 +51,7 @@ int getkeyval_dp(const char *keyval, const char *key, double *val)
 }
 
 
-void *Setzaxis(void *argument)
+void *Setzaxis(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -62,7 +62,7 @@ void *Setzaxis(void *argument)
   bool lztop = false, lzbot = false;
   double ztop = 0, zbot = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETZAXIS       = cdoOperatorAdd("setzaxis",        0, 0, "zaxis description file");
@@ -92,16 +92,16 @@ void *Setzaxis(void *argument)
         }
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   if ( operatorID == SETZAXIS )
     {
@@ -153,7 +153,7 @@ void *Setzaxis(void *argument)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double*) Malloc(gridsize*sizeof(double));
 

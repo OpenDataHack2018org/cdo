@@ -22,18 +22,19 @@
 */
 
 #include <cdi.h>
+
 #include "cdo_int.h"  /* processSelf */
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 
 
-void *Selrec(void *argument)
+void *Selrec(void *process)
 {
   int nrecs;
   int varID, levelID;
   lista_t *ilista = lista_new(INT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
@@ -49,7 +50,7 @@ void *Selrec(void *argument)
 	cdoPrint("intarr entry: %d %d", i, intarr[i]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int filetype = pstreamInqFiletype(streamID1);
 
@@ -57,14 +58,14 @@ void *Selrec(void *argument)
        filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5 )
     cdoAbort("This operator does not work on NetCDF data!");
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int recordID = 0;

@@ -30,19 +30,19 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Ninfo(void *argument)
+void *Ninfo(void *process)
 {
   enum {NYEAR, NMON, NDATE, NTIME, NPAR, NLEVEL, NGRIDPOINTS, NGRIDS};
   int varID;
   int date0 = 0;
   int day, mon0 = 0, mon, year0 = 0, year;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("nyear"       , NYEAR       , 0 , NULL);
@@ -58,9 +58,9 @@ void *Ninfo(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(0);
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int nvars   = vlistNvars(vlistID);
   int taxisID = vlistInqTaxis(vlistID);
@@ -154,8 +154,8 @@ void *Ninfo(void *argument)
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  int gridID = vlistInqVarGrid(vlistID, varID);
-	  int gridsize = gridInqSize(gridID);
-	  fprintf(stdout, "%d\n", gridsize);
+	  size_t gridsize = gridInqSize(gridID);
+	  fprintf(stdout, "%zu\n", gridsize);
 	}
       break;
     case NGRIDS:

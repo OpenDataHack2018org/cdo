@@ -23,11 +23,12 @@
 
 #include <cdi.h>
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "grid_search.h"
+#include "cdoOptions.h"
 
 extern "C" {
 #include "clipping/geometry.h"
@@ -335,9 +336,9 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
   
 
-  NEW_2D(bool, nbr_mask, ompNumThreads, numNeighbors);   // mask at nearest neighbors
-  NEW_2D(size_t, nbr_add, ompNumThreads, numNeighbors);  // source address at nearest neighbors
-  NEW_2D(double, nbr_dist, ompNumThreads, numNeighbors); // angular distance four nearest neighbors
+  NEW_2D(bool, nbr_mask, Threading::ompNumThreads, numNeighbors);   // mask at nearest neighbors
+  NEW_2D(size_t, nbr_add, Threading::ompNumThreads, numNeighbors);  // source address at nearest neighbors
+  NEW_2D(double, nbr_dist, Threading::ompNumThreads, numNeighbors); // angular distance four nearest neighbors
 
   clock_t start, finish;
   start = clock();
@@ -410,13 +411,13 @@ void setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 }
 
 
-void *Fillmiss(void *argument)
+void *Fillmiss(void *process)
 {
   size_t nmiss;
   int nrecs, varID, levelID;
   void (*fill_method) (field_type *fin , field_type *fout , int) = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int FILLMISS        = cdoOperatorAdd("fillmiss"   ,   0, 0, "nfill");
@@ -463,20 +464,20 @@ void *Fillmiss(void *argument)
       cdoAbort("Too many arguments!");
   }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field1);
@@ -495,7 +496,7 @@ void *Fillmiss(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss = (size_t) nmiss;
+          field1.nmiss = nmiss;
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 
@@ -520,11 +521,8 @@ void *Fillmiss(void *argument)
 
               fill_method(&field1, &field2, nfill);
 
-              int gridsize = gridInqSize(field2.grid);
-              size_t nmiss = 0;
-              for ( int i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
-              
+              size_t gridsize = gridInqSize(field2.grid);
+              size_t nmiss = arrayNumMV(gridsize, field2.ptr, field2.missval);              
               pstreamWriteRecord(streamID2, field2.ptr, nmiss);
             }
         }

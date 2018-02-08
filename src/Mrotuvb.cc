@@ -22,9 +22,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 /*
@@ -253,7 +253,7 @@ void uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y,
 }
 
 
-void *Mrotuvb(void *argument)
+void *Mrotuvb(void *process)
 {
   int nrecs, nrecs2;
   int levelID;
@@ -261,21 +261,21 @@ void *Mrotuvb(void *argument)
   size_t nmiss1, nmiss2;
   bool gpint = true;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( operatorArgc() == 1 )
     if ( strcmp(operatorArgv()[0], "noint") == 0 ) gpint = false;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   int nvars = vlistNvars(vlistID1);
-  if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoStreamName(0)->args);
+  if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoGetStreamName(0).c_str());
   nvars = vlistNvars(vlistID2);
-  if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoStreamName(1)->args);
+  if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoGetStreamName(1).c_str());
 
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
@@ -379,7 +379,7 @@ void *Mrotuvb(void *argument)
 
   if ( cdoVerbose ) vlistPrint(vlistID3);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   double missval1 = vlistInqVarMissval(vlistID1, 0);

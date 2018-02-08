@@ -22,9 +22,10 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 
 #define  NALLOC_INC  1024
@@ -51,9 +52,9 @@ double tstepcount(long nts, double missval1, double *array1, double refval)
 }
 
 
-void *Tstepcount(void *argument)
+void *Tstepcount(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
@@ -68,13 +69,13 @@ void *Tstepcount(void *argument)
     double *array1;
   } memory_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( operatorArgc() == 1 ) refval = parameter2double(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   vlistDefNtsteps(vlistID2, 1);
@@ -89,7 +90,7 @@ void *Tstepcount(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
@@ -121,8 +122,8 @@ void *Tstepcount(void *argument)
 
   int nts = tsID;
 
-  memory_t *mem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  memory_t *mem = (memory_t*) Malloc(Threading::ompNumThreads*sizeof(memory_t));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       mem[i].array1 = (double*) Malloc(nts*sizeof(double));
     }
@@ -138,7 +139,7 @@ void *Tstepcount(void *argument)
 #ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(gridsize,mem,vars,varID,levelID,nts,missval,refval) schedule(dynamic,1)
 #endif
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 
@@ -151,7 +152,7 @@ void *Tstepcount(void *argument)
 	}
     }
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     Free(mem[i].array1);
   Free(mem);
 
@@ -168,12 +169,8 @@ void *Tstepcount(void *argument)
 
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
+	  nmiss = arrayNumMV(gridsize, vars[0][varID][levelID].ptr, missval);
 	  pstreamDefRecord(streamID2, varID, levelID);
-
-	  nmiss = 0;
-	  for ( int i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(vars[0][varID][levelID].ptr[i], missval) ) nmiss++;
-
 	  pstreamWriteRecord(streamID2, vars[0][varID][levelID].ptr, nmiss);
 	}
     }

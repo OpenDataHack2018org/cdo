@@ -26,9 +26,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 int stringToParam(const char *paramstr)
@@ -44,7 +44,7 @@ int stringToParam(const char *paramstr)
 }
 
 
-void *Set(void *argument)
+void *Set(void *process)
 {
   int nrecs, nvars, newval = -1, tabnum = 0;
   int varID, levelID;
@@ -56,7 +56,7 @@ void *Set(void *argument)
   double newlevel = 0;
   double *levels  = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code number");
@@ -96,9 +96,9 @@ void *Set(void *argument)
       newlevel = parameter2double(operatorArgv()[0]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
   /* vlistPrint(vlistID2);*/
 
@@ -164,10 +164,10 @@ void *Set(void *argument)
     }
 
   // vlistPrint(vlistID2);
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double*) Malloc(gridsize*sizeof(double));
 

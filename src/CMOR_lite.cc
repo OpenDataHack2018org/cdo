@@ -39,9 +39,9 @@
 
 #include <errno.h>
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "pmlist.h"
 #include "convert_units.h"
 
@@ -359,7 +359,7 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 }
 
 
-void *CMOR_lite(void *argument)
+void *CMOR_lite(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -367,7 +367,7 @@ void *CMOR_lite(void *argument)
   bool delvars = false;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   CDO_CMOR_Mode = 1;
   if ( CDO_CMOR_Mode ) cdiDefGlobal("CMOR_MODE", CDO_CMOR_Mode);
@@ -389,9 +389,9 @@ void *CMOR_lite(void *argument)
 
   if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
   /* vlistPrint(vlistID2);*/
 
@@ -462,10 +462,10 @@ void *CMOR_lite(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   /* vlistPrint(vlistID2);*/
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  long gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double *) Malloc(gridsize*sizeof(double));
 
@@ -507,7 +507,7 @@ void *CMOR_lite(void *argument)
 
 	  if ( nmiss > 0 && var->changemissval )
 	    {
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( DBL_IS_EQUAL(array[i], var->missval_old) ) array[i] = missval;
 		}
@@ -515,7 +515,7 @@ void *CMOR_lite(void *argument)
 
 	  if ( var->lfactor )
 	    {
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] *= var->factor;
 		}
@@ -525,7 +525,7 @@ void *CMOR_lite(void *argument)
 	  if ( var->changeunits )
 	    {
 	      int nerr = 0;
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( !DBL_IS_EQUAL(array[i], missval) )
 		    {

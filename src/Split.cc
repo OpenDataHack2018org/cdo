@@ -29,9 +29,10 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdo_history.h"
 
 
 static
@@ -42,7 +43,7 @@ void gen_filename(char *filename, bool swap_obase, const char *obase, const char
 }
 
 
-void *Split(void *argument)
+void *Split(void *process)
 {
   int nchars = 0;
   int varID;
@@ -59,7 +60,7 @@ void *Split(void *argument)
   bool swap_obase = false;
   const char *uuid_attribute = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
@@ -86,19 +87,19 @@ void *Split(void *argument)
       else cdoAbort("Unknown parameter: >%s<", operatorArgv()[0]); 
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars  = vlistNvars(vlistID1);
 
   if ( !swap_obase )
     {
-      strcpy(filename, cdoStreamName(1)->args);
+      strcpy(filename, cdoGetStreamName(1).c_str());
       nchars = strlen(filename);
     }
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
   
@@ -148,22 +149,20 @@ void *Split(void *argument)
 	  if ( codes[index] > 9999 )
 	    {
 	      sprintf(filename+nchars, "%05d", codes[index]);
-	      gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	      gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 	    }
 	  else if ( codes[index] > 999 )
 	    {
 	      sprintf(filename+nchars, "%04d", codes[index]);
-	      gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	      gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 	    }
 	  else
 	    {
 	      sprintf(filename+nchars, "%03d", codes[index]);
-	      gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	      gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 	    }
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 	}
     }
   else if ( operatorID == SPLITPARAM )
@@ -214,11 +213,9 @@ void *Split(void *argument)
 
 	  filename[nchars] = '\0';
 	  strcat(filename, paramstr);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 	}
     }
   else if ( operatorID == SPLITTABNUM )
@@ -264,11 +261,9 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%03d", tabnums[index]);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 	}
     }
   else if ( operatorID == SPLITNAME )
@@ -297,11 +292,9 @@ void *Split(void *argument)
 	  filename[nchars] = '\0';
 	  vlistInqVarName(vlistID1, varID, varname);
 	  strcat(filename, varname);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 	}
     }
   else if ( operatorID == SPLITLEVEL )
@@ -351,11 +344,9 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%06g", levels[index]);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
    
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 	}
     }
   else if ( operatorID == SPLITGRID )
@@ -391,11 +382,9 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", vlistGridIndex(vlistID1, gridIDs[index])+1);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 	}
     }
   else if ( operatorID == SPLITZAXIS )
@@ -429,11 +418,9 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", vlistZaxisIndex(vlistID1, zaxisIDs[index])+1);
-	  gen_filename(filename, swap_obase, cdoStreamName(1)->args, filesuffix);
+	  gen_filename(filename, swap_obase, cdoGetStreamName(1).c_str(), filesuffix);
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamIDs[index] = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
 	}
     }
   else
@@ -451,7 +438,7 @@ void *Split(void *argument)
   double *array = NULL;
   if ( ! lcopy )
     {
-      int gridsize = vlistGridsizeMax(vlistID1);
+      size_t gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double *) Malloc(gridsize*sizeof(double));
     }

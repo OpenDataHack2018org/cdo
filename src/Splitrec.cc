@@ -22,38 +22,38 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Splitrec(void *argument)
+void *Splitrec(void *process)
 {
   int varID;
   int levelID;
   char filesuffix[32];
   char filename[8192];
   const char *refname;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   double *array = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
   bool lcopy = UNCHANGED_RECORD;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nrecs  = vlistNrecs(vlistID1);
 
-  strcpy(filename, cdoStreamName(1)->args);
+  strcpy(filename, cdoGetStreamName(1).c_str());
   int nchars = strlen(filename);
 
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -85,9 +85,7 @@ void *Splitrec(void *argument)
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  int streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  int streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
 	  pstreamDefVlist(streamID2, vlistID2);
 

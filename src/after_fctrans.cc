@@ -1,3 +1,19 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #ifdef  HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -8,6 +24,7 @@
 
 
 #include "cdo_int.h"
+#include "cdoOptions.h"
 
 
 #ifdef  SX
@@ -2002,7 +2019,7 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   long nvex  = lot - (nblox-1)*NFFT;
   long nvex0 = nvex;
 
-  long nthmax = (nblox < ompNumThreads) ? nblox : ompNumThreads;
+  long nthmax = (nblox < Threading::ompNumThreads) ? nblox : Threading::ompNumThreads;
   long nvals = lot*jump;
 
   double *restrict wfc = (double*) Malloc(nvals*sizeof(double));

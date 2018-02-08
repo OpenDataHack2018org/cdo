@@ -23,15 +23,16 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
 
 
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit);
 
 
-void *Inttime(void *argument)
+void *Inttime(void *process)
 {
   int streamID2 = -1;
   int nlevel;
@@ -44,7 +45,7 @@ void *Inttime(void *argument)
   double *single1, *single2;
   double *vardatap;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
   if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
@@ -88,9 +89,9 @@ void *Inttime(void *argument)
   /* increment in seconds */
   int ijulinc = incperiod * incunit;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( ijulinc == 0 ) vlistDefNtsteps(vlistID2, 1);
@@ -101,7 +102,7 @@ void *Inttime(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   size_t **nmiss1   = (size_t **) Malloc(nvars*sizeof(size_t *));
@@ -204,7 +205,7 @@ void *Inttime(void *argument)
 
 	      if ( streamID2 == -1 )
 		{
-		  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+		  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 		  pstreamDefVlist(streamID2, vlistID2);
 		}
 
@@ -233,7 +234,7 @@ void *Inttime(void *argument)
 		      double missval1 = vlistInqVarMissval(vlistID1, varID);
 		      double missval2 = vlistInqVarMissval(vlistID2, varID);
 
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			{
 			  if ( !DBL_IS_EQUAL(single1[i], missval1) &&
 			       !DBL_IS_EQUAL(single2[i], missval2) )
@@ -253,7 +254,7 @@ void *Inttime(void *argument)
 		    }
 		  else
 		    {
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			array[i] = single1[i]*fac1 + single2[i]*fac2;
 		    }
 

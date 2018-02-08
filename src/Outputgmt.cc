@@ -31,10 +31,10 @@
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "color.h"
 
 double intlin(double x, double y1, double x1, double y2, double x2);
@@ -198,10 +198,10 @@ void output_vrml(int nlon, int nlat, int ngp, double *restrict array, double mis
 }
 
 
-void *Outputgmt(void *argument)
+void *Outputgmt(void *process)
 {
   int varID0;
-  int gridsize2 = 0;
+  size_t gridsize2 = 0;
   int nrecs;
   int levelID;
   size_t nmiss;
@@ -218,7 +218,7 @@ void *Outputgmt(void *argument)
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int OUTPUTCENTER    = cdoOperatorAdd("gmtxyz",          0, 0, NULL);
@@ -260,9 +260,9 @@ void *Outputgmt(void *argument)
       if ( cdoVerbose ) cptWrite(stderr, cpt);
     }
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   int varID = 0;
@@ -280,7 +280,7 @@ void *Outputgmt(void *argument)
       lgrid_gen_bounds = true;
     }
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int nlon     = gridInqXsize(gridID);
   int nlat     = gridInqYsize(gridID);
   int nlev     = zaxisInqSize(zaxisID);
@@ -462,7 +462,7 @@ void *Outputgmt(void *argument)
 	  if ( operatorID == OUTPUTVECTOR )
 	    fprintf(stdout, "# Increment = %d\n", ninc);
 	  fprintf(stdout, "#\n");
-	  fprintf(stdout, "# File  = %s\n", cdoStreamName(0)->args);
+	  fprintf(stdout, "# File  = %s\n", cdoGetStreamName(0).c_str());
 	  fprintf(stdout, "# Date  = %s\n", vdatestr);
 	  fprintf(stdout, "# Time  = %s\n", vtimestr);
 	  fprintf(stdout, "# Name  = %s\n", varname);
@@ -607,7 +607,7 @@ void *Outputgmt(void *argument)
                   fprintf(stderr, "ps2pdf gmtplot.ps\n");
                 }
 
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  if ( grid_mask && grid_mask[i] == 0 ) continue;
 

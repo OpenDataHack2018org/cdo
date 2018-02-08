@@ -16,12 +16,12 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Seloperator(void *argument)
+void *Seloperator(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -33,7 +33,7 @@ void *Seloperator(void *argument)
   double slevel = 0, level;
   double *array = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -45,9 +45,9 @@ void *Seloperator(void *argument)
   if ( operatorArgc() == 3 )
     slevel = parameter2double(operatorArgv()[2]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
@@ -95,7 +95,7 @@ void *Seloperator(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   if ( ! lcopy )

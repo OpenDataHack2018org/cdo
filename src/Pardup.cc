@@ -23,12 +23,12 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Pardup(void *argument)
+void *Pardup(void *process)
 {
   int nrecs;
   int varID, varID2, levelID;
@@ -38,7 +38,7 @@ void *Pardup(void *argument)
   int nlevel;
   double *single;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int PARDUP = cdoOperatorAdd("pardup", 0, 0, NULL);
   int PARMUL = cdoOperatorAdd("parmul", 0, 0, NULL);
@@ -57,9 +57,9 @@ void *Pardup(void *argument)
   else
     cdoAbort("operator not implemented!");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -72,7 +72,7 @@ void *Pardup(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array    = (double*) Malloc(gridsize*sizeof(double));
   double **vardata = (double **) Malloc(nvars*sizeof(double *));
   size_t **varnmiss = (size_t **) Malloc(nvars*sizeof(size_t *));
@@ -92,7 +92,7 @@ void *Pardup(void *argument)
 	vlistDefVarParam(vlistID2, varID+nvars*i, cdiEncodeParam(-(varID+nvars*i+1), 255, 255));
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;

@@ -24,9 +24,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 #include "after_vertint.h"
 
@@ -74,7 +74,7 @@ void vert_gen_weights3d(bool expol, int nlev1, size_t gridsize, double *xlev1, i
 }
 
 
-void *Intlevel3d(void *argument)
+void *Intlevel3d(void *process)
 {
   size_t gridsizeo;
   int nrecs;
@@ -89,7 +89,7 @@ void *Intlevel3d(void *argument)
   size_t zlevels_out_miss;
   char varname[CDI_MAX_NAME]; 
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INTLEVEL3D  = cdoOperatorAdd("intlevel3d",  0, 0, NULL);
@@ -104,17 +104,18 @@ void *Intlevel3d(void *argument)
 
   operatorInputArg("icoordinate");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));                 /*  input data */
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));                 /*  input data */
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
 
   /*  Read filename from Parameter */
   operatorInputArg("filename for vertical source coordinates variable");
   operatorCheckArgc(1);
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID1);
@@ -143,11 +144,14 @@ void *Intlevel3d(void *argument)
     nrecs = streamInqTimestep(streamID0, 0);
     if ( cdoVerbose ) cdoPrint("%d records input 3d vertical height",nrecs);
 
+
     for ( int recID = 0; recID < nrecs; recID++ )
       {
         streamInqRecord(streamID0, &varID, &levelID);
+
         size_t offset = gridsizei + gridsizei*levelID;
         double *single1 = zlevels_in + offset;
+
         streamReadRecord(streamID0, single1, &zlevels_in_miss);
       }
 
@@ -374,10 +378,7 @@ void *Intlevel3d(void *argument)
 		{
 		  size_t offset = gridsize*levelID;
 		  double *single2 = vardata2[varID] + offset;
-		  size_t nmiss = 0;
-		  for ( size_t i = 0; i < gridsize; ++i )
-		    if ( DBL_IS_EQUAL(single2[i], missval) ) nmiss++;
-		  varnmiss[varID][levelID] = nmiss;
+		  varnmiss[varID][levelID] = arrayNumMV(gridsize, single2, missval);
 		}
 	    }
           else

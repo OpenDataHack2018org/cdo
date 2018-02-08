@@ -29,24 +29,25 @@
 
 #include <cmath>
 #include <cdi.h>
-#include "cdo.h"
+
 #include "statistic.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "merge_sort2.h"
+#include "util_files.h"
 
 enum OPERTYPE {CRPS, BRS};
 
 enum RESTYPE_BRS  { BRS_RES, BRS_RELI, BRS_RESOL, BRS_UNCTY };
 enum RESTYPE_CRPS { CRPS_RES,CRPS_RELI,CRPS_POT };
 
-void *Ensval(void *argument)
+void *Ensval(void *process)
 {
   int i,k;
   int nrecs = 0, nrecs0, nostreams = 0, ngrids;
   size_t nmiss;
   int levelID, varID;
-  int gridsize = 0;
+  size_t gridsize = 0;
   int vlistID;
   int gridID = -1;
   int have_miss = 0;
@@ -82,7 +83,7 @@ void *Ensval(void *argument)
   weights = NULL; 
   //int vlistCheck, gridsizeCheck;
   
-  cdoInitialize(argument);
+  cdoInitialize(process);
   
   cdoOperatorAdd("enscrps",   CRPS,  0,   NULL);
   cdoOperatorAdd("ensbrs",    BRS,   0,   NULL);
@@ -134,8 +135,8 @@ void *Ensval(void *argument)
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      streamID = pstreamOpenRead(cdoStreamName(fileID));
-      vlistID = pstreamInqVlist(streamID);
+      streamID = cdoStreamOpenRead(cdoStreamName(fileID));
+      vlistID = cdoStreamInqVlist(streamID);
       
       ef[fileID].streamID = streamID;
       ef[fileID].vlistID  = vlistID;
@@ -165,9 +166,9 @@ void *Ensval(void *argument)
   gridDefXvals(gridID2, &xval);
   gridDefYvals(gridID2, &yval);
 
-  const char *ofilebase = cdoStreamName(nfiles)->args;
+  const char *ofilebase = cdoGetStreamName(nfiles).c_str();
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   memset(file_suffix, 0, sizeof(file_suffix) );
   cdoGenFileSuffix(file_suffix, sizeof(file_suffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -199,9 +200,7 @@ void *Ensval(void *argument)
     if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
       cdoAbort("Outputfile %s already exists!", ofilename);
 
-    argument_t *fileargument = file_argument_new(ofilename);
-    streamID2[stream] = pstreamOpenWrite(fileargument, cdoFiletype());    
-    file_argument_free(fileargument);
+    streamID2[stream] = cdoStreamOpenWrite(ofilename, cdoFiletype());    
 
     Free(ofilename);
 
@@ -217,7 +216,7 @@ void *Ensval(void *argument)
     vlistDefTaxis(vlistID2[stream], taxisID2[stream]);
     pstreamDefVlist(streamID2[stream], vlistID2[stream]);
 
-    // vlistCheck = pstreamInqVlist(streamID2[stream]);
+    // vlistCheck = cdoStreamInqVlist(streamID2[stream]);
     // gridsizeCheck = vlistGridsizeMax(vlistCheck);
 
     //fprintf(stderr,"stream %i vlist %3i gridsize %4i\n",stream,vlistCheck,gridsizeCheck);
@@ -235,7 +234,7 @@ void *Ensval(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = pstreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
+	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0).c_str(), cdoStreamName(fileID));
 	}
       
       for ( stream = 0; stream < nostreams; stream++ ) {
@@ -276,7 +275,7 @@ void *Ensval(void *argument)
 	      sum_weights += weights[i];
 	  }
 	  else*/ {
-	    for ( i=0; i< gridsize; i++ )
+	    for ( size_t i=0; i< gridsize; i++ )
 	      weights[i] = 1./gridsize;
 	    sum_weights=1.;
 	  }
@@ -285,7 +284,7 @@ void *Ensval(void *argument)
 	  heavyside0 = 0;
 	  heavysideN = 0;
 	  
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      have_miss = 0;
 	      for ( fileID = 0; fileID < nfiles; fileID++ )

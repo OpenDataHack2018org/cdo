@@ -23,33 +23,33 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Deltat(void *argument)
+void *Deltat(void *process)
 {
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   field_type **vars = field_malloc(vlistID1, FIELD_PTR);
   
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
   double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
 
@@ -76,10 +76,10 @@ void *Deltat(void *argument)
 
           double missval = vars[varID][levelID].missval;
           double *array0 = vars[varID][levelID].ptr;
-          int gridsize = vars[varID][levelID].size;
+          size_t gridsize = vars[varID][levelID].size;
           if ( nmiss || vars[varID][levelID].nmiss )
             {
-              for ( int i = 0; i < gridsize; ++i )
+              for ( size_t i = 0; i < gridsize; ++i )
                 {
                   if ( DBL_IS_EQUAL(array0[i], missval) || DBL_IS_EQUAL(array1[i], missval) )
                     array2[i] = missval;
@@ -87,17 +87,15 @@ void *Deltat(void *argument)
                     array2[i] = array1[i] - array0[i];
                 }
 
-              nmiss = 0;
-              for ( int i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+              nmiss = arrayNumMV(gridsize, array2, missval);
             }
           else
             {
-              for ( int i = 0; i < gridsize; ++i )
+              for ( size_t i = 0; i < gridsize; ++i )
                 array2[i] = array1[i] - array0[i];
             }
-          
-          for ( int i = 0; i < gridsize; ++i ) array0[i] = array1[i];
+
+          arrayCopy(gridsize, array1, array0);
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, array2, nmiss);

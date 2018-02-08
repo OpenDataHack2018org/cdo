@@ -24,24 +24,23 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
-void *Arithlat(void *argument)
+void *Arithlat(void *process)
 {
   int gridtype;
   int gridID0 = -1;
   int nrecs;
   int varID, levelID;
   size_t nmiss;
-  long i;
   char units[CDI_MAX_NAME];
   double *scale = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("mulcoslat", func_mul, 0, NULL);
   cdoOperatorAdd("divcoslat", func_div, 0, NULL);
@@ -49,19 +48,19 @@ void *Arithlat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  long gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
@@ -121,14 +120,14 @@ void *Arithlat(void *argument)
 	      grid_to_radian(units, gridsize, scale, "grid latitudes");
 
 	      if ( operfunc == func_mul )
-		for ( i = 0; i < gridsize; ++i ) scale[i] = cos(scale[i]);
+		for ( size_t i = 0; i < gridsize; ++i ) scale[i] = cos(scale[i]);
 	      else
-		for ( i = 0; i < gridsize; ++i ) scale[i] = 1./cos(scale[i]);
+		for ( size_t i = 0; i < gridsize; ++i ) scale[i] = 1./cos(scale[i]);
 
-	      if ( cdoVerbose ) for ( i = 0; i < 10; ++i ) cdoPrint("coslat  %3d  %g", i+1, scale[i]);
+	      if ( cdoVerbose ) for ( unsigned i = 0; i < 10; ++i ) cdoPrint("coslat  %3d  %g", i+1, scale[i]);
 	    }
 
-	  for ( i = 0; i < gridsize; ++i ) array[i] *= scale[i];
+	  for ( size_t i = 0; i < gridsize; ++i ) array[i] *= scale[i];
 
 	  pstreamDefRecord(streamID2, varID, levelID);
 	  pstreamWriteRecord(streamID2, array, nmiss);

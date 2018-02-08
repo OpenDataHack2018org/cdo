@@ -22,28 +22,47 @@
 #include "config.h" /* _FILE_OFFSET_BITS influence off_t */
 #endif
 
-#include "pstream_write.h"
 #include "varlist.h"
-#include "argument.h"
+#include "pipe.h"
 
 #include <sys/types.h> /* off_t */
 #include <vector>
 
-class pstream_t
+class PstreamType
 {
 public:
-  pstream_t(int id);
-  ~pstream_t();
+  PstreamType(int id);
   int inqVlist();
   int inqFileType();
-  void defTimestep(int p_tsID);
+  int inqTimestep(int tsID);
+  int inqRecord(int *varID, int *levelID);
   bool isPipe();
-  void pstreamOpenReadPipe(const char* pipename);
-  void pstreamOpenReadFile(const char *argument);
+  int inqByteorder();
+  size_t getNvals();
+
+  int pstreamOpenReadPipe();
+  int pstreamOpenWritePipe(const char* filename, int filetype);
+  int pstreamOpenWriteFile(int filetype);
+  void pstreamOpenReadFile(const char* filename);
   void openAppend(const char * p_filename);
-  void init();
+
+  void writeRecord(double *data, size_t nmiss);
+  void writeRecordF(float *data, size_t nmiss);
+
+  void readRecord(double *data, size_t *nmiss);
+  void readRecordF(float *data, size_t *nmiss);
+  void copyRecord(PstreamType * dest);
+
+  void defVarList(int vlistID);
+  void defTimestep(int p_tsID);
   void defVlist(int p_vlistID);
+  void defRecord(int varID,int levelID);
+
+  void init();
   void close();
+  void waitForPipe();
+  void closePipe();
+
   int self; //aka the id of the pstream
   std::pair<int, int> m_id;
   int mode;
@@ -54,50 +73,32 @@ public:
   int tsID0;
   int mfiles;
   int nfiles;
-  int varID; /* next varID defined with streamDefVar */
+  int m_varID; /* next varID defined with streamDefVar */
   bool ispipe;
   bool isopen;
   std::string m_name;
   std::vector<std::string> m_mfnames;
   varlist_t *m_varlist;
 #ifdef  HAVE_LIBPTHREAD
-  void *argument;
-  struct pipe_t *pipe;
+  std::shared_ptr<pipe_t> pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
-private:
-   void createFilelist(const char *p_args);
-   pstream_t();
-   void defVarList(int vlistID);
 #endif
+private:
+   PstreamType();
+   void checkDatarange(int varID, double *array, size_t nmiss);
 };
 
-int pstreamOpenRead(const argument_t *argument);
-int pstreamOpenAppend(const argument_t *argument);
-void pstreamClose(int pstreamID);
-
-int pstreamInqFiletype(int pstreamID);
-int pstreamInqByteorder(int pstreamID);
-
-int pstreamInqVlist(int pstreamID);
-
-int pstreamInqTimestep(int pstreamID, int tsID);
-
-int pstreamInqRecord(int pstreamID, int *varID, int *levelID);
-
-void pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
-void pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
-void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
-
-void pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
-
-int pstreamFileID(int pstreamID);
+PstreamType *PstreamTypeo_pointer(int pstreamID);
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
-const int &getPthreadScope();
-pstream_t *create_pstream();
-pstream_t *create_pstream(std::vector<std::string> p_filenameList);
-pstream_t *create_pstream(std::string p_filename);
+PstreamType *create_pstream();
+PstreamType *create_pstream(std::vector<std::string> p_filenameList);
+PstreamType *create_pstream(std::string p_filename);
+PstreamType *create_pstream(int processID, int pstreamIDX);
+
+void pstreamCloseAll();
+void setProcessNum(int p_num);
 
 #endif /* PSTREAM_H */

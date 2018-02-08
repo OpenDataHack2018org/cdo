@@ -22,11 +22,12 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "pmlist.h"
 #include "convert_units.h"
+#include "util_files.h"
 
 int stringToParam(const char *paramstr);
 
@@ -300,7 +301,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
 }
 
 
-void *Setpartab(void *argument)
+void *Setpartab(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -310,7 +311,7 @@ void *Setpartab(void *argument)
   bool delvars = false;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SETCODETAB = cdoOperatorAdd("setcodetab",  0, 0, "parameter code table name");
   int SETPARTABC = cdoOperatorAdd("setpartabc",  0, 0, "parameter table name");
@@ -372,9 +373,9 @@ void *Setpartab(void *argument)
 
   if ( cdoVerbose ) cdoPrint("Table format version %d", tableformat);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
   // vlistPrint(vlistID2);
 
@@ -478,10 +479,10 @@ void *Setpartab(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   // vlistPrint(vlistID2);
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  long gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double *) Malloc(gridsize*sizeof(double));
 
@@ -522,7 +523,7 @@ void *Setpartab(void *argument)
 
 	  if ( nmiss > 0 && var->changemissval )
 	    {
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( DBL_IS_EQUAL(array[i], var->missval_old) ) array[i] = missval;
 		}
@@ -530,7 +531,7 @@ void *Setpartab(void *argument)
 
 	  if ( var->lfactor )
 	    {
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] *= var->factor;
 		}
@@ -540,7 +541,7 @@ void *Setpartab(void *argument)
 	  if ( var->changeunits )
 	    {
 	      int nerr = 0;
-	      for ( long i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  if ( !DBL_IS_EQUAL(array[i], missval) )
 		    {

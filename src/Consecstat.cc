@@ -31,9 +31,9 @@
  */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 enum {CONSECSUM, CONSECTS};
 #define SWITCHWARN "Hit default case!This should never happen (%s).\n"
@@ -110,17 +110,15 @@ static void selEndOfPeriod(field_type *periods, field_type history, field_type c
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
-        parray[i] = ( DBL_IS_EQUAL(carray[i], 0.0) ) ? pmissval : carray[i];
+        parray[i] = DBL_IS_EQUAL(carray[i], 0.0) ? pmissval : carray[i];
     }
   }
 
-  periods->nmiss = 0;
-  for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(parray[i], pmissval) ) periods->nmiss++;
+  periods->nmiss = arrayNumMV(len, parray, pmissval);
 }
 
 
-void *Consecstat(void *argument)
+void *Consecstat(void *process)
 {
   int vdate = 0, vtime = 0;
   int histvdate = 0, histvtime = 0;
@@ -130,7 +128,7 @@ void *Consecstat(void *argument)
   size_t nmiss;
   double refval = 0.0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("consecsum",CONSECSUM, 0, "refval");
   cdoOperatorAdd("consects" ,CONSECTS , 0, NULL);
   int operatorID = cdoOperatorID();
@@ -138,9 +136,9 @@ void *Consecstat(void *argument)
   if ( operatorID == CONSECSUM )
     if ( operatorArgc() > 0 ) refval = parameter2double(operatorArgv()[0]);
 
-  int istreamID = pstreamOpenRead(cdoStreamName(0));
+  int istreamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int ivlistID = pstreamInqVlist(istreamID);
+  int ivlistID = cdoStreamInqVlist(istreamID);
   int itaxisID = vlistInqTaxis(ivlistID);
   int ovlistID = vlistDuplicate(ivlistID);
   int otaxisID = taxisDuplicate(itaxisID);
@@ -164,7 +162,7 @@ void *Consecstat(void *argument)
       vlistDefVarUnits(ovlistID, varID, "steps"); /* TODO */
     }
 
-  int ostreamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int ostreamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(ostreamID, ovlistID);
 
   int itsID = 0;

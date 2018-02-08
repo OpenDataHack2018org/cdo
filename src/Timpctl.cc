@@ -27,11 +27,12 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "percentiles_hist.h"
 #include "percentiles.h"
+#include "datetime.h"
 
 
 static
@@ -50,13 +51,13 @@ void timpctl(int operatorID)
 
   int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
-  int streamID3 = pstreamOpenRead(cdoStreamName(2));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
+  int streamID3 = cdoStreamOpenRead(cdoStreamName(2));
   
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
-  int vlistID3 = pstreamInqVlist(streamID3);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
+  int vlistID3 = cdoStreamInqVlist(streamID3);
   int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -73,7 +74,7 @@ void timpctl(int operatorID)
   taxisWithBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
   int nvars    = vlistNvars(vlistID1);
@@ -86,7 +87,7 @@ void timpctl(int operatorID)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -109,14 +110,14 @@ void timpctl(int operatorID)
     {      
       nrecs = pstreamInqTimestep(streamID2, otsID);
       if ( nrecs != pstreamInqTimestep(streamID3, otsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
+        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
 
       int vdate2 = taxisInqVdate(taxisID2);
       int vtime2 = taxisInqVtime(taxisID2);
       int vdate3 = taxisInqVdate(taxisID3);
       int vtime3 = taxisInqVtime(taxisID3);
       if ( vdate2 != vdate3 || vtime2 != vtime3 )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
       
       for ( int recID = 0; recID < nrecs; recID++ )
         {
@@ -211,11 +212,11 @@ void timpctl(int operatorID)
   pstreamClose(streamID1);
 }
 
-void *Timpctl(void *argument)
+void *Timpctl(void *process)
 {
   int operatorID;
   
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("timpctl",  func_pctl, 31, NULL);

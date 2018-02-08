@@ -38,10 +38,7 @@
 #undef   SQR
 #define  SQR(a)    ((a)*(a))
 
-
-#define  ADD_PLURAL(n)  ((n)!=1 ? "s" : "")
-
-#define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
+#define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && processSelf().inputStreams[0]->ispipe == false && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
 extern const char *CDO_progname;
@@ -53,7 +50,6 @@ extern int CDO_Memtype;
 extern int CDO_Parallel_Read;
 extern int CDO_Append_History;
 extern int CDO_Reset_History;
-extern int timer_read, timer_write; // refactor: both pstream.cc and CDIread.cc CDIwrite.cc defined in cdo.cc
 
 extern int CDO_optind;
 extern const char *CDO_optarg;
@@ -65,7 +61,6 @@ extern int CDO_dbl_digits;
 extern bool REMAP_genweights;
 
 extern const char *cdoExpName;
-extern int ompNumThreads;
 
 extern int stdin_is_tty;
 extern int stdout_is_tty;
@@ -78,21 +73,15 @@ extern int cdoDefaultTableID;
 extern int cdoDefaultInstID;
 extern int cdoDefaultTimeType;
 
-extern int cdoLockIO;
 extern int cdoCheckDatarange;
 
-extern int cdoSilentMode;
 extern int cdoOverwriteMode;
 extern int cdoRegulargrid;
 extern int cdoBenchmark;
 extern int cdoTimer;
 extern int cdoVerbose;
-extern int cdoCompress;
-extern int cdoInteractive;
 extern int cdoParIO;
 
-extern int cdoCompType;
-extern int cdoCompLevel;
 
 extern int cdoChunkType;
 
@@ -111,7 +100,6 @@ extern char CDO_File_Suffix[32]; // refactor: added keyword extern
 
 
 const char *getProgname(char *string);
-char *GetOperator(const char *argument);
 const char *getOperatorName(const char *operatorCommand);
 char *getOperatorArg(const char *operatorCommand);
 const char *cdoComment(void);
@@ -130,60 +118,14 @@ char *double_to_attstr(int digits, char *str, size_t len, double value);
 void progressInit(void);
 void progressStatus(double offset, double refval, double curval);
 
-bool fileExists(const char *filename);
-bool userFileOverwrite(const char *filename);
-
 /* convert a CDI datatype to string */
 int datatype2str(int datatype, char *datatypestr);
 int str2datatype(const char *datatypestr);
-
-/* filename manipulation */
-const char *filetypeext(int filetype);
-void rm_filetypeext(char *file, const char *ext);
-void repl_filetypeext(char file[], const char *oldext, const char *newext);
-
-
-/* moved here from cdo.h */
-void    cdiOpenError(int cdiErrno, const char *fmt, const char *path);
-void    cdoAbort(const char *fmt, ...);
-void    cdoWarning(const char *fmt, ...);
-void    cdoPrint(const char *fmt, ...);
-void    cdoPrintBlue(const char *fmt, ...);
-void    cdoPrintRed(const char *fmt, ...);
-
-int  timer_new(const char *text);
-void timer_report(void);
-void timer_start(int it);
-void timer_stop(int it);
-double timer_val(int it);
-
-
-void    operatorInputArg(const char *enter);
-int     operatorArgc(void);
-char  **operatorArgv(void);
-void    operatorCheckArgc(int numargs);
-
-
-void    cdoInitialize(void *argument);
-void    cdoFinish(void);
-
-int     cdoStreamNumber(void);
-int     cdoStreamCnt(void);
-int     cdoOperatorAdd(const char *name, int func, int intval, const char *enter);
-int     cdoOperatorID(void);
-int     cdoOperatorF1(int operID);
-int     cdoOperatorF2(int operID);
-const char *cdoOperatorName(int operID);
-const char *cdoOperatorEnter(int operID);
 
 int     cdoFiletype(void);
 
 void cdoSetNAN(double missval, size_t gridsize, double *array);
 
-void    cdoInqHistory(int fileID);
-void    cdoDefHistory(int fileID, char *histstring);
-void cdo_def_tracking_id(int vlistID, const char *uuid_attribute);
-void cdo_def_creation_date(int vlistID);
 
 int     cdoDefineGrid(const char *gridfile);
 int     cdoDefineZaxis(const char *zaxisfile);
@@ -206,14 +148,11 @@ int zaxisFromName(const char *zaxisname);
 /* refactor: moved here from cdo.h */
 int cdo_omp_get_thread_num(void);
 void cdo_omp_set_num_threads(int nthreads);
-std::string string2lower(std::string str);
-void strtolower(char *str);
-void strtoupper(char *str);
 
 /* refactor: moved here from cdo.cc */
 void exp_run(int argc, char *argv[], const char *cdoExpName); // job.cc
 void printFeatures(void); // features.cc
-void printLibraries(void);  // features.cc  
+void printLibraries(void);  // features.cc
 
 int wildcardmatch(const char *w, const char *s);
 

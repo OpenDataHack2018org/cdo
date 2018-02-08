@@ -24,9 +24,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -120,7 +120,7 @@ void printSource(FILE *fp, int vlistID, int varID)
 static
 void partab(FILE *fp, int streamID, int option)
 {
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int varID, datatype = -1;
   char pstr[32];
   char paramstr[32];
@@ -285,9 +285,9 @@ void filedes(int streamID)
 }
 
 
-void *Filedes(void *argument)
+void *Filedes(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int GRIDDES  = cdoOperatorAdd("griddes",   0, 0, NULL);
@@ -305,9 +305,9 @@ void *Filedes(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int nvars  = vlistNvars(vlistID);
   int ngrids = vlistNgrids(vlistID);

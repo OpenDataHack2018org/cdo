@@ -22,9 +22,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -64,7 +64,7 @@ void trms(field_type field1, field_type field2, double *dp, field_type *field3)
   field3->nmiss  = rnmiss;
 }
 
-void *Trms(void *argument)
+void *Trms(void *process)
 {
   int gridID1, gridID3, lastgrid = -1;
   int code = 0, oldcode = 0;
@@ -79,15 +79,15 @@ void *Trms(void *argument)
   double *single;
   double sglval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool needWeights = true;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   double slon = 0;
   double slat = 0;
@@ -152,7 +152,7 @@ void *Trms(void *argument)
 
   if ( vctsize == 0 ) cdoAbort("VCT missing!");
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*));

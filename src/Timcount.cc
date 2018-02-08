@@ -27,12 +27,12 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Timcount(void *argument)
+void *Timcount(void *process)
 {
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int vdate0 = 0, vtime0 = 0;
@@ -41,7 +41,7 @@ void *Timcount(void *argument)
   size_t nmiss;
   int nwpv; // number of words per value; real:1  complex:2
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("timcount",  0, 31, NULL);
@@ -55,9 +55,9 @@ void *Timcount(void *argument)
 
   int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
@@ -70,14 +70,14 @@ void *Timcount(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int nrecords = vlistNrecs(vlistID1);
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   field_type field;
@@ -116,7 +116,7 @@ void *Timcount(void *argument)
 
 	      if ( nsets == 0 )
 		{
-		  for ( int i = 0; i < nwpv*gridsize; i++ )
+		  for ( size_t i = 0; i < nwpv*gridsize; i++ )
 		    vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
 		  vars1[varID][levelID].nmiss = gridsize;
 		}

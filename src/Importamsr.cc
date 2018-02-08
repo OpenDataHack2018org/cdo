@@ -16,9 +16,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define  NLON    1440
@@ -169,7 +169,7 @@ int getDate(const char *name)
 }
 
 
-void *Importamsr(void *argument)
+void *Importamsr(void *process)
 {
   int tsID;
   int nvars;
@@ -178,25 +178,25 @@ void *Importamsr(void *argument)
   double *data[MAX_VARS];
   size_t nmiss[MAX_VARS];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  FILE *fp = fopen(cdoStreamName(0)->args, "r");
-  if ( fp == NULL ) { perror(cdoStreamName(0)->args); exit(EXIT_FAILURE); }
+  FILE *fp = fopen(cdoGetStreamName(0).c_str(), "r");
+  if ( fp == NULL ) { perror(cdoGetStreamName(0).c_str()); exit(EXIT_FAILURE); }
 
   fseek(fp, 0L, SEEK_END);
   size_t fsize = (size_t) ftell(fp);
   fseek(fp, 0L, SEEK_SET);
 
-  int vdate = getDate(cdoStreamName(0)->args);
+  int vdate = getDate(cdoGetStreamName(0).c_str());
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
-  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   /*
     Longitude  is 0.25*xdim-0.125    degrees east
     Latitude   is 0.25*ydim-90.125
   */
-  int gridsize = NLON*NLAT;
+  size_t gridsize = NLON*NLAT;
   int gridID = gridCreate(GRID_LONLAT, gridsize);
   gridDefXsize(gridID, NLON);
   gridDefYsize(gridID, NLAT);

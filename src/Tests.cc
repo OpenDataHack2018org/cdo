@@ -16,13 +16,13 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "statistic.h"
 
 
-void *Tests(void *argument)
+void *Tests(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -30,7 +30,7 @@ void *Tests(void *argument)
   double degree_of_freedom = 0, p = 0, q = 0, n = 0, d = 0;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int NORMAL    = cdoOperatorAdd("normal",    0, 0, NULL);
@@ -78,19 +78,19 @@ void *Tests(void *argument)
 	cdoAbort("both degrees must be positive!");
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
@@ -110,25 +110,25 @@ void *Tests(void *argument)
 
 	  if ( operatorID == NORMAL )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  normal(array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == STUDENTT )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  student_t(degree_of_freedom, array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == CHISQUARE )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  chi_square(degree_of_freedom, array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == BETA )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		{
 		  if ( array1[i] < 0 || array1[i] > 1 )
 		    cdoAbort("Value out of range (0-1)!");
@@ -139,7 +139,7 @@ void *Tests(void *argument)
 	    }
 	  else if ( operatorID == FISHER )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  fisher(n, d, array1[i], processInqPrompt());
 	    }

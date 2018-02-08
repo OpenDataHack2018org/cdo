@@ -21,9 +21,13 @@
       Select      select         Select fields
 */
 
+#include "cdoDebugOutput.h"
 #include <cdi.h>
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
+#include "datetime.h"
 #include "sellist.h"
 
 
@@ -39,16 +43,12 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
       if ( vardata2[varID2c] )
         {
           double missval = vlistInqVarMissval(vlistID2, varID2c);
-          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2c));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2c));
           int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2c));
           for ( int levelID2c = 0; levelID2c < nlevel; ++levelID2c )
             {
               double *pdata = vardata2[varID2c]+gridsize*levelID2c;
-              size_t nmiss = 0;
-              for ( int i = 0; i < gridsize; ++i )
-                if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
-
-              // if ( levelID2c == 0 ) printf("Write varID %d\n", varID2c);
+              size_t nmiss = arrayNumMV(gridsize, pdata, missval);
               pstreamDefRecord(streamID2, varID2c, levelID2c);
               pstreamWriteRecord(streamID2, pdata, nmiss);
             }
@@ -91,7 +91,7 @@ void eval_timestepmask(const char *maskfile, list_t *kvlist)
 }
 
 
-void *Select(void *argument)
+void *Select(void *process)
 {
   bool lconstvars = true;
   int streamID2 = CDI_UNDEFID;
@@ -114,7 +114,7 @@ void *Select(void *argument)
   double fstartdate = -99999999999.;
   double fenddate   = -99999999999.;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SELECT = cdoOperatorAdd("select", 0, 0, "parameter list");
   int DELETE = cdoOperatorAdd("delete", 0, 0, "parameter list");
@@ -188,11 +188,11 @@ void *Select(void *argument)
   for ( int indf = 0; indf < nfiles; ++indf )
     {
       if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, (indf+1.)/nfiles);
-      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
+      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
 
-      int streamID1 = pstreamOpenRead(cdoStreamName(indf));
+      int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
 
-      int vlistID1 = pstreamInqVlist(streamID1);
+      int vlistID1 = cdoStreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       bool lcopy_const = false;
@@ -478,7 +478,7 @@ void *Select(void *argument)
 
 	  if ( ! lcopy )
 	    {
-	      int gridsize = vlistGridsizeMax(vlistID1);
+	      size_t gridsize = vlistGridsizeMax(vlistID1);
 	      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
@@ -603,7 +603,7 @@ void *Select(void *argument)
                   bool lasttimestep = (nfiles == 1) && (ntsteps2 > 1) && (ntsteps2 == (tsID1+1));
                   if ( lasttimestep && tsID2 == 0 ) ntsteps2 = 1;
                   if ( ntsteps2 == 0 || ntsteps2 == 1 ) vlistDefNtsteps(vlistID2, ntsteps2);
-		  streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+		  streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 		  pstreamDefVlist(streamID2, vlistID2);
 		}
 	      taxisCopyTimestep(taxisID2, taxisID1);
@@ -655,7 +655,7 @@ void *Select(void *argument)
                       if ( vlistInqVarTimetype(vlistID2, varID2) == TIME_CONSTANT )
                         {
                           int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
-                          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+                          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
                           if ( levelID == 0 )
                             {
                               int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));

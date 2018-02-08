@@ -24,13 +24,14 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "after_vertint.h"
 #include "listarray.h"
 #include "stdnametable.h"
 #include "constants.h"
+#include "util_string.h"
 
 
 static
@@ -59,7 +60,7 @@ void change_hybrid_zaxis(int vlistID1, int vlistID2, int nvct, double *vct, int 
 }
 
 
-void *Vertintml(void *argument)
+void *Vertintml(void *process)
 {
   ModelMode mode(ModelMode::UNDEF);
   enum {func_pl, func_hl};
@@ -77,7 +78,7 @@ void *Vertintml(void *argument)
   memset(&gribcodes, 0, sizeof(gribcode_t));
   lista_t *flista = lista_new(FLT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int ML2PL     = cdoOperatorAdd("ml2pl",     func_pl, type_lin, "pressure levels in pascal");
@@ -137,9 +138,9 @@ void *Vertintml(void *argument)
       plev  = (double *) lista_dataptr(flista);
     }
   
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -446,7 +447,7 @@ void *Vertintml(void *argument)
       if ( !(suma>0&&sumb>0) ) cdoWarning("VCT is empty!");
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
@@ -544,7 +545,7 @@ void *Vertintml(void *argument)
 			{
 			  vl1  = vardata1[varID] + gridsize*(k-1);
 			  vl2  = vardata1[varID] + gridsize*(k);
-			  for ( int i = 0; i < gridsize; i++ )
+			  for ( size_t i = 0; i < gridsize; i++ )
 			    vl1[i] = 0.5*(vl1[i] + vl2[i]);
 			}
 		      

@@ -31,9 +31,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define  MAX_DOY       373
@@ -69,7 +69,7 @@ void set_parameter(void)
 }
 
 
-void *Ydaystat(void *argument)
+void *Ydaystat(void *process)
 {
   int varID, levelID;
   int year, month, day;
@@ -79,7 +79,7 @@ void *Ydaystat(void *argument)
   int vdates[MAX_DOY], vtimes[MAX_DOY];
   field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   set_parameter();
 
@@ -113,9 +113,9 @@ void *Ydaystat(void *argument)
       dayoy_nsets[dayoy] = 0;
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -123,13 +123,13 @@ void *Ydaystat(void *argument)
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<recinfo_type> recinfo(maxrecs);
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -179,7 +179,7 @@ void *Ydaystat(void *argument)
           field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
           int nsets = dayoy_nsets[dayoy];
 
-	  int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
 	  if ( nsets == 0 )
 	    {
@@ -188,7 +188,7 @@ void *Ydaystat(void *argument)
               if ( lrange )
                 {
                   pvars2->nmiss = pvars1->nmiss;
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     pvars2->ptr[i] = pvars1->ptr[i];
                 }
 
@@ -197,7 +197,7 @@ void *Ydaystat(void *argument)
 		  if ( psamp1->ptr == NULL )
 		    psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
                     psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		}
 	    }
@@ -213,11 +213,11 @@ void *Ydaystat(void *argument)
 		  if ( psamp1->ptr == NULL )
 		    {
 		      psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			psamp1->ptr[i] = nsets;
 		    }
 		  
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 		      psamp1->ptr[i]++;
 		}

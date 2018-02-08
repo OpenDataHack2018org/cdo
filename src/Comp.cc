@@ -27,22 +27,21 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Comp(void *argument)
+void *Comp(void *process)
 {
   enum {FILL_NONE, FILL_TS, FILL_REC};
   int filltype = FILL_NONE;
-  int gridsize1, gridsize2;
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   double missval1, missval2 = 0;
   double **vardata = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int EQ = cdoOperatorAdd("eq", 0, 0, NULL);
   int NE = cdoOperatorAdd("ne", 0, 0, NULL);
@@ -53,8 +52,8 @@ void *Comp(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
   int streamIDx1 = streamID1;
   int streamIDx2 = streamID2;
@@ -62,8 +61,8 @@ void *Comp(void *argument)
   double *missvalx1 = &missval1;
   double *missvalx2 = &missval2;
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistIDx1 = vlistID1;
   int vlistIDx2 = vlistID2;
 
@@ -81,13 +80,13 @@ void *Comp(void *argument)
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1)->args);
+      cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoGetStreamName(1).c_str());
       if ( ntsteps2 != 1 ) cdoAbort("stream2 has more than 1 timestep!");
     }
   else if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0)->args);
+      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoGetStreamName(0).c_str());
       if ( ntsteps1 != 1 ) cdoAbort("stream1 has more than 1 timestep!");
       fillstream1 = true;
       streamIDx1 = streamID2;
@@ -120,12 +119,12 @@ void *Comp(void *argument)
       if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1)->args);
+	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoGetStreamName(1).c_str());
 	}
       else if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
+	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
           fillstream1 = true;
 	  streamIDx1 = streamID2;
           streamIDx2 = streamID1;
@@ -160,7 +159,7 @@ void *Comp(void *argument)
   int taxisID3 = taxisDuplicate(taxisIDx1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;
@@ -208,7 +207,8 @@ void *Comp(void *argument)
 
           int datatype1 = vlistInqVarDatatype(vlistIDx1, varID);
           int datatype2 = CDI_UNDEFID;
-	  gridsize1 = gridInqSize(vlistInqVarGrid(vlistIDx1, varID));
+	  size_t gridsize1 = gridInqSize(vlistInqVarGrid(vlistIDx1, varID));
+          size_t gridsize2;
 	  *missvalx1 = vlistInqVarMissval(vlistIDx1, varID);
 
 	  if ( filltype == FILL_REC )

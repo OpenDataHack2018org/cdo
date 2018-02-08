@@ -27,10 +27,10 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "calendar.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 static
@@ -68,7 +68,7 @@ double dayofyear(int calendar, int vdate, int vtime)
 }
 
 
-void *Arithdays(void *argument)
+void *Arithdays(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -76,7 +76,7 @@ void *Arithdays(void *argument)
   size_t nmiss;
   double rconst;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
                cdoOperatorAdd("muldpm", func_mul, func_month, NULL);
@@ -90,9 +90,9 @@ void *Arithdays(void *argument)
   int operfunc = cdoOperatorF1(operatorID);
   int operfunc2 = cdoOperatorF2(operatorID);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -101,10 +101,10 @@ void *Arithdays(void *argument)
 
   int calendar = taxisInqCalendar(taxisID1);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);

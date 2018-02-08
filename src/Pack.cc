@@ -28,9 +28,10 @@
 #include <limits.h>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
 
 
 #define  NALLOC_INC  1024
@@ -79,7 +80,7 @@ int compute_scale(int datatype, double fmin, double fmax, double *scale_factor, 
 }
 
 
-void *Pack(void *argument)
+void *Pack(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -87,11 +88,11 @@ void *Pack(void *argument)
   int datatype = CDI_DATATYPE_INT16;
   dtlist_type *dtlist = dtlist_new();
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -232,7 +233,7 @@ void *Pack(void *argument)
 	}
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   for ( int tsID = 0; tsID < nts; tsID++ )

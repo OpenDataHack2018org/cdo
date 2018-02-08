@@ -25,12 +25,12 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Monarith(void *argument)
+void *Monarith(void *process)
 {
   int nrecs, nrecs2, nlev;
   int varID, levelID;
@@ -38,7 +38,7 @@ void *Monarith(void *argument)
   size_t nmiss;
   int yearmon2 = -1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("monadd", func_add, 0, NULL);
   cdoOperatorAdd("monsub", func_sub, 0, NULL);
@@ -48,16 +48,16 @@ void *Monarith(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
   
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field1);
@@ -70,7 +70,7 @@ void *Monarith(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   int nvars  = vlistNvars(vlistID2);
@@ -104,7 +104,7 @@ void *Monarith(void *argument)
 
 	  nrecs2 = pstreamInqTimestep(streamID2, tsID2);
 	  if ( nrecs2 == 0 )
-	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoStreamName(1)->args);
+	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoGetStreamName(1).c_str());
 
 	  vdate = taxisInqVdate(taxisID2);
 	  yearmon2 = vdate / 100;
@@ -114,7 +114,7 @@ void *Monarith(void *argument)
 	      int year2 = yearmon2/100;
 	      int mon2  = yearmon2 - (yearmon2/100)*100;
 	      cdoAbort("Timestep %d in %s has wrong date! Current year=%4d mon=%2d, expected year=%4d mon=%2d",
-		       tsID2+1, cdoStreamName(1)->args, year2, mon2, year1, mon1);
+		       tsID2+1, cdoGetStreamName(1).c_str(), year2, mon2, year1, mon1);
 	    }
 
 	  for ( int recID = 0; recID < nrecs2; recID++ )

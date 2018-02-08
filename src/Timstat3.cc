@@ -23,9 +23,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "statistic.h"
 
 
@@ -34,7 +34,7 @@
 #define  NFWORK  4
 #define  NIWORK  2
 
-void *Timstat3(void *argument)
+void *Timstat3(void *process)
 {
   int streamID[NIN];
   int vlistID[NIN], vlistID2 = -1;
@@ -51,7 +51,7 @@ void *Timstat3(void *argument)
   int reached_eof[NIN];
   int n_in = NIN;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int VARQUOT2TEST  = cdoOperatorAdd("varquot2test",  0, 0, NULL);
@@ -76,19 +76,19 @@ void *Timstat3(void *argument)
 
   for ( is = 0; is < NIN; ++is )
     {
-      streamID[is] = pstreamOpenRead(cdoStreamName(is));
+      streamID[is] = cdoStreamOpenRead(cdoStreamName(is));
 
-      vlistID[is] = pstreamInqVlist(streamID[is]);
+      vlistID[is] = cdoStreamInqVlist(streamID[is]);
       if ( is > 0 )
 	{
-	  vlistID2 = pstreamInqVlist(streamID[is]);
+	  vlistID2 = cdoStreamInqVlist(streamID[is]);
 	  vlistCompare(vlistID[0], vlistID2, CMP_ALL);
 	}
     }
 
   int vlistID3 = vlistDuplicate(vlistID[0]);
 
-  int gridsize = vlistGridsizeMax(vlistID[0]);
+  size_t gridsize = vlistGridsizeMax(vlistID[0]);
   int nvars = vlistNvars(vlistID[0]);
   int nrecs = vlistNrecs(vlistID[0]);
   int nrecs3 = nrecs;
@@ -99,7 +99,7 @@ void *Timstat3(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
  
   vlistDefTaxis(vlistID3, taxisID3);
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   for ( int i = 0; i < NIN; ++i ) reached_eof[i] = 0;
@@ -186,9 +186,9 @@ void *Timstat3(void *argument)
 		}	 
 
 	      pstreamReadRecord(streamID[is], in[is].ptr, &nmiss);
-	      in[is].nmiss = (size_t) nmiss;
+	      in[is].nmiss = nmiss;
               
-	      for ( int i = 0; i < gridsize; ++i )
+	      for ( size_t i = 0; i < gridsize; ++i )
 		{
 		  /*
 		  if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
@@ -226,7 +226,7 @@ void *Timstat3(void *argument)
 
       if ( operatorID == VARQUOT2TEST )
 	{
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      double fnvals0 = iwork[0][varID][levelID][i];
 	      double fnvals1 = iwork[1][varID][levelID][i];
@@ -256,7 +256,7 @@ void *Timstat3(void *argument)
 	  mean_factor[1] = -1;
 	  var_factor[0] = var_factor[1] = 1;
 
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      double temp0 = 0;
 	      double deg_of_freedom = -n_in;
@@ -300,10 +300,7 @@ void *Timstat3(void *argument)
 	    }
 	}
 
-      nmiss = 0;
-      for ( int i = 0; i < gridsize; i++ )
-	if ( DBL_IS_EQUAL(out[0].ptr[i], missval1) ) nmiss++;
-
+      nmiss = arrayNumMV(gridsize, out[0].ptr, missval1);
       pstreamDefRecord(streamID3, varID, levelID);
       pstreamWriteRecord(streamID3, out[0].ptr, nmiss);
     }

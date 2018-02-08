@@ -25,9 +25,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "constants.h"
 
@@ -66,8 +66,8 @@ void grid_cell_area(int gridID, double *array)
           else if ( status == 2 )
             cdoAbort("%s: Can't compute grid cell area for this grid!", __func__);
 
-          int ngp = gridInqSize(gridID);
-          for ( int i = 0; i < ngp; ++i )
+          size_t ngp = gridInqSize(gridID);
+          for ( size_t i = 0; i < ngp; ++i )
             array[i] *= PlanetRadius*PlanetRadius;
         }
     }
@@ -82,11 +82,11 @@ void grid_cell_area(int gridID, double *array)
 }
 
 
-void *Gridcell(void *argument)
+void *Gridcell(void *process)
 {
   int status;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int GRIDAREA = cdoOperatorAdd("gridarea",     1,  0, NULL);
@@ -111,9 +111,9 @@ void *Gridcell(void *argument)
 
   if ( cdoVerbose ) cdoPrint("PlanetRadius: %g", PlanetRadius);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int ngrids = vlistNgrids(vlistID1);
 
@@ -163,7 +163,7 @@ void *Gridcell(void *argument)
   vlistDefTaxis(vlistID2, taxisID);
 
 
-  long gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
 
@@ -185,10 +185,10 @@ void *Gridcell(void *argument)
 	}
       else
 	{
-	  for ( int i = 0; i < gridsize; ++i ) mask[i] = 1;
+	  for ( size_t i = 0; i < gridsize; ++i ) mask[i] = 1;
 	}
 
-      for ( int i = 0; i < gridsize; ++i ) array[i] = mask[i];
+      for ( size_t i = 0; i < gridsize; ++i ) array[i] = mask[i];
       Free(mask);
     }
   else if ( operatorID == GRIDDX || operatorID == GRIDDY )
@@ -286,7 +286,7 @@ void *Gridcell(void *argument)
     }
 
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 

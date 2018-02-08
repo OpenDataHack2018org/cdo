@@ -23,10 +23,10 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 static
@@ -81,7 +81,7 @@ int shiftx_coord(bool lcyclic, int nshift, int gridID1)
 {
   int gridID2 = gridDuplicate(gridID1);
 
-  int nx = gridInqXsize(gridID1);
+  size_t nx = gridInqXsize(gridID1);
   int ny = gridInqYsize(gridID1);
   if ( gridInqType(gridID1) != GRID_CURVILINEAR ) ny = 1;
 
@@ -101,9 +101,9 @@ int shiftx_coord(bool lcyclic, int nshift, int gridID1)
       gridInqXbounds(gridID1, bounds);
       for ( int k = 0; k < nv; ++k )
         {
-          for ( int i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
+          for ( size_t i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
           shiftx(lcyclic, nshift, nx, ny, array1, array2, 0);
-          for ( int i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
+          for ( size_t i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
         }
       gridDefXbounds(gridID2, bounds);
       Free(bounds);
@@ -120,7 +120,7 @@ int shifty_coord(bool lcyclic, int nshift, int gridID1)
 {
   int gridID2 = gridDuplicate(gridID1);
 
-  int nx = gridInqXsize(gridID1);
+  size_t nx = gridInqXsize(gridID1);
   int ny = gridInqYsize(gridID1);
   if ( gridInqType(gridID1) != GRID_CURVILINEAR ) nx = 1;
 
@@ -140,9 +140,9 @@ int shifty_coord(bool lcyclic, int nshift, int gridID1)
       gridInqYbounds(gridID1, bounds);
       for ( int k = 0; k < nv; ++k )
         {
-          for ( int i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
+          for ( size_t i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
           shifty(lcyclic, nshift, nx, ny, array1, array2, 0);
-          for ( int i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
+          for ( size_t i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
         }
       gridDefYbounds(gridID2, bounds);
       Free(bounds);
@@ -155,7 +155,7 @@ int shifty_coord(bool lcyclic, int nshift, int gridID1)
 }
 
 
-void *Shiftxy(void *argument)
+void *Shiftxy(void *process)
 {
   bool lcyclic = false;
   bool lcoord = false;
@@ -163,7 +163,7 @@ void *Shiftxy(void *argument)
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SHIFTX = cdoOperatorAdd("shiftx", 0, 0, NULL);
   int SHIFTY = cdoOperatorAdd("shifty", 0, 0, NULL);
@@ -183,9 +183,9 @@ void *Shiftxy(void *argument)
         }
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -236,10 +236,10 @@ void *Shiftxy(void *argument)
 
   if ( varID >= nvars ) cdoWarning("No variables selected!");
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
@@ -259,19 +259,16 @@ void *Shiftxy(void *argument)
 	  if ( vars[varID] )
 	    {	      
 	      int gridID1 = vlistInqVarGrid(vlistID1, varID);
-	      int gridsize = gridInqSize(gridID1);
+	      size_t gridsize = gridInqSize(gridID1);
               double missval = vlistInqVarMissval(vlistID2, varID);
                   
-              int nx = gridInqXsize(gridID1);
-              int ny = gridInqYsize(gridID1);
+              size_t nx = gridInqXsize(gridID1);
+              size_t ny = gridInqYsize(gridID1);
 
               if      ( operatorID == SHIFTX ) shiftx(lcyclic, nshift, nx, ny, array1, array2, missval);
               else if ( operatorID == SHIFTY ) shifty(lcyclic, nshift, nx, ny, array1, array2, missval);
 
-              nmiss = 0;
-              for ( int i = 0; i < gridsize; i++ )
-                if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
+              nmiss = arrayNumMV(gridsize, array2, missval);
 	      pstreamWriteRecord(streamID2, array2, nmiss);
 	    }
 	  else

@@ -17,19 +17,20 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "statistic.h"
+#include "cdoOptions.h"
 
 
 #define  NALLOC_INC  1024
 
 
-void *Fourier(void *argument)
+void *Fourier(void *process)
 {
   int bit;
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
@@ -47,21 +48,21 @@ void *Fourier(void *argument)
   } memory_t;
 
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse transformation)!");
   int sign = parameter2int(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
@@ -100,8 +101,8 @@ void *Fourier(void *argument)
 
   for ( bit = nts; !(bit & 1); bit >>= 1 );
 
-  memory_t *ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  memory_t *ompmem = (memory_t*) Malloc(Threading::ompNumThreads*sizeof(memory_t));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       ompmem[i].real = (double*) Malloc(nts*sizeof(double));
       ompmem[i].imag = (double*) Malloc(nts*sizeof(double));
@@ -123,7 +124,7 @@ void *Fourier(void *argument)
 #ifdef  _OPENMP
 #pragma omp parallel for default(shared) private(tsID)
 #endif
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      int lmiss = 0;
               int ompthID = cdo_omp_get_thread_num();
@@ -161,7 +162,7 @@ void *Fourier(void *argument)
 	}
     }
 
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       Free(ompmem[i].real);
       Free(ompmem[i].imag);

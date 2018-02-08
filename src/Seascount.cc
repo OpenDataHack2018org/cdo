@@ -23,12 +23,12 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Seascount(void *argument)
+void *Seascount(void *process)
 {
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
@@ -37,22 +37,22 @@ void *Seascount(void *argument)
   int year, month, day, seas0 = 0;
   int oldmon = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("seascount", 0, 0, NULL);
 
   int season_start = get_season_start();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int nrecords = vlistNrecs(vlistID1);
@@ -60,7 +60,7 @@ void *Seascount(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   field_type field;
@@ -113,7 +113,7 @@ void *Seascount(void *argument)
 
               if ( nsets == 0 )
                 {
-                  for ( int i = 0; i < nwpv*gridsize; i++ )
+                  for ( size_t i = 0; i < nwpv*gridsize; i++ )
                     vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
 		  vars1[varID][levelID].nmiss = gridsize;
                 }

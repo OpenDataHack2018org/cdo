@@ -1,8 +1,24 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #include <cdi.h>
 #include <signal.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 #ifdef  HAVE_LIBCMOR
 #include <unistd.h>
@@ -13,6 +29,7 @@ extern "C" {
 
 #include "netcdf.h"
 #include "pmlist.h"
+#include "datetime.h"
 
 #define CMOR_UNDEFID (CMOR_MAX_AXES + 1)
 
@@ -700,7 +717,7 @@ static void maptab_via_cmd(list_t *pml, const char *origValue, int vlistID, int 
 {
   int varIDToMap = getVarIDToMap(vlistID, nvars, key, origValue);
   if ( varIDToMap == CDI_UNDEFID )
-    cdoAbort("In variable mapping:\n          Variable with '%s': '%s' configured via cmdline could not be found in infile '%s'.", key, origValue, cdoStreamName(0)->args);
+    cdoAbort("In variable mapping:\n          Variable with '%s': '%s' configured via cmdline could not be found in infile '%s'.", key, origValue, cdoGetStreamName(0).c_str());
   list_t *kvl_maptab = maptab_search_miptab(pml, cmorName, miptabfreq, "cmor_name");
   if ( !kvl_maptab )
     {
@@ -781,7 +798,7 @@ struct mapping
 
 static struct mapping *construct_var_mapping(int streamID)
 {
-  int nvars_max = vlistNvars(pstreamInqVlist(streamID));
+  int nvars_max = vlistNvars(cdoStreamInqVlist(streamID));
   struct mapping *vars =
     (struct mapping *) Malloc((nvars_max + 1) * sizeof(struct mapping));
   vars[0].cdi_varID = CDI_UNDEFID;
@@ -840,7 +857,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
     {
       varIDs[i] = getVarIDToMap(vlistID, nvars, key, charvars->values[i]);
       if ( varIDs[i] == CDI_UNDEFID )
-        cdoAbort("In merging variables to a variable with a character coordinate:\n          Could not find '%s' in infile '%s' to build a variable with character coordinate.", charvars->values[i], cdoStreamName(0)->args);
+        cdoAbort("In merging variables to a variable with a character coordinate:\n          Could not find '%s' in infile '%s' to build a variable with character coordinate.", charvars->values[i], cdoGetStreamName(0).c_str());
     }
 
   int gridID = vlistInqVarGrid(vlistID, varIDs[0]);
@@ -849,10 +866,10 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
   int subzaxisID;
   int ntsteps = vlistNtsteps(vlistID);
 
-  if ( cdoStreamName(0)->args[0] == '-' )
+  if ( cdoGetStreamName(0).c_str()[0] == '-' )
     cdoAbort("No variables can be merged to one character axis since you piped several cdo operators.");
 
-  int streamID2 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(0));
   if ( ntsteps == -1 )
     {
       ntsteps = 0;
@@ -1329,7 +1346,7 @@ static int check_mem(list_t *kvl, char *project_id)
 static void dump_global_attributes(list_t *pml, int streamID)
 {
   int natts;
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
   for ( int i = 0; i < natts; i++ )
     {
@@ -1366,7 +1383,7 @@ static void dump_global_attributes(list_t *pml, int streamID)
 
 static void dump_special_attributes(list_t *kvl, int streamID)
 {
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int fileID = pstreamFileID(streamID);
   size_t old_historysize;
   char *new_history = kv_get_a_val(kvl, "history", NULL);
@@ -1837,7 +1854,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       creat_subs = 0;
     }
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int cmf = cmor_setup(kv_get_a_val(kvl, "inpath", "/usr/share/cmor/"),
              &netcdf_file_action,
@@ -2417,10 +2434,9 @@ static void change_grid(char *grid_file, int gridID, int vlistID)
 {
   if ( cdoVerbose )
     cdoPrint("You configured a grid_info file: '%s'. It is tested for a valid use as substitution.\n", grid_file);
-  argument_t *fileargument = file_argument_new(grid_file);
-  int streamID2 = pstreamOpenRead(fileargument); 
-  int vlistID2 = pstreamInqVlist(streamID2);
-  int gridID2 = vlistInqVarGrid(vlistID2, 0); 
+  int streamID2 = streamOpenRead(grid_file);
+  int vlistID2 = streamInqVlist(streamID2);
+  int gridID2 = vlistInqVarGrid(vlistID2, 0);
 
   if ( !gridID2 )
     cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n          because of internal problems.", grid_file);
@@ -2448,7 +2464,7 @@ static void change_grid(char *grid_file, int gridID, int vlistID)
   cdoPrint("Successfully substituted grid.");
   
 
-  pstreamClose(streamID2);
+  streamClose(streamID2);
 }
 
 static void move_lons(double *xcoord_vals, double *xcell_bounds, int xsize, int xboundsize, int xnbounds)
@@ -2782,7 +2798,7 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
 /*
 static void select_and_register_character_dimension(char *grid_file, int *axis_ids)
 {
-  char *ifile = cdoStreamName(0)->args;
+  char *ifile = cdoGetStreamName(0).c_str();
   if ( ifile[0] == '-' )
     cdoAbort("Cdo cmor cannot register a character dimension when several cdo operators are piped.");
   if ( strcmp(grid_file, "") == 0 )  
@@ -3018,7 +3034,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   int type = gridInqType(gridID);
   int ylength = gridInqYsize(gridID);
   int xlength = gridInqXsize(gridID);
-  int totalsize = gridInqSize(gridID);
+  size_t totalsize = gridInqSize(gridID);
 
   double *xcoord_vals;
   double *ycoord_vals;
@@ -3322,7 +3338,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
                              struct mapping vars[], int table_id, char *project_id, int miptab_freq, int *time_axis)
 {
   int cmf = 0;
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   char *time_units = kv_get_a_val(kvl, "required_time_units", NULL);
@@ -3469,7 +3485,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
     case 16: strcpy(frequency, "1hr"); break;
     default:
     {
-      if ( cdoStreamName(0)->args[0] == '-' )
+      if ( cdoGetStreamName(0).c_str()[0] == '-' )
         {
             cdoAbort("No frequency could be determined from MIP-table and cdo cmor cannot check frequency of Ifile recs since you piped several cdo operators.");
 /*          char *dummy;
@@ -3484,8 +3500,8 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
 */
         } 
       
-      int streamID2 = pstreamOpenRead(cdoStreamName(0));
-      int vlistID2 = pstreamInqVlist(streamID2);
+      int streamID2 = cdoStreamOpenRead(cdoStreamName(0));
+      int vlistID2 = cdoStreamInqVlist(streamID2);
       int taxisID2 = vlistInqTaxis(vlistID2);
       if ( ntsteps < 0 )
         {
@@ -3751,7 +3767,7 @@ static void read_record(int streamID, struct mapping vars[], int vlistID)
 
   int gridID = vlistInqVarGrid(vlistID, varID);
   int type = gridInqType(gridID);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   double *buffer = (double *) Malloc(gridsize * sizeof(double));
 
   struct mapping *var = map_var(varID, vars);
@@ -3886,14 +3902,14 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   if ( cdoVerbose) cdoPrint("Successfully calculated juldates.", old_start_date);
 /* Read in first vdate in case not piped */
   if ( cdoVerbose) cdoPrint("Start to calculate temporal gap between chunk and working file.");
-  if ( cdoStreamName(0)->args[0] == '-' )
+  if ( cdoGetStreamName(0).c_str()[0] == '-' )
     {
       cdoWarning("Cdo cmor cannot enable append mode since you piped several cdo operators.\n          Switched to replace mode for this variable.");
       return 0;
     }
       
-  int streamID2 = pstreamOpenRead(cdoStreamName(0));
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(0));
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int taxisID2 = vlistInqTaxis(vlistID2);
   juldate_t firstdate = juldate_encode(calendar, taxisInqVdate(taxisID2),
                                      taxisInqVtime(taxisID2));
@@ -4099,7 +4115,7 @@ static void sigfunc(int sig)
 static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_freq, int time_axis, int calendar, char *miptab_freqptr, char *project_id)
 {
   int cmf = 0;
-  int vlistID = pstreamInqVlist(*streamID);
+  int vlistID = cdoStreamInqVlist(*streamID);
   int taxisID = vlistInqTaxis(vlistID);
   int tsID = 0;
   int nrecs;
@@ -4151,7 +4167,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
         vlistInqVarName(vlistID, vars[i].cdi_varID, charname);
         
         pstreamClose(*streamID);
-        *streamID = pstreamOpenRead(cdoStreamName(0));
+        *streamID = cdoStreamOpenRead(cdoStreamName(0));
         pscheck = 0;
         if ( cdoVerbose )
           cdoPrint("10.3. Successfully retrieved auxiliary variables.");
@@ -4461,7 +4477,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
   keyValues_t *kvc = kvlist_search(kvl, "c");
   keyValues_t *kvcn = kvlist_search(kvl, "cn");
   int byteorder;
-  int filetype = cdiGetFiletype(cdoStreamName(0)->args, &byteorder);
+  int filetype = cdiGetFiletype(cdoGetStreamName(0).c_str(), &byteorder);
 
   if ( maptab && maptabdir ) if ( maptab[0] != '/' )
     {
@@ -4471,7 +4487,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
   if ( maptab )
     {
       if ( maptabbuild ) maptab = maptabbuild;
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
 
 /***/
 /* Parse the table as a fortran namelist wich contains lists (=lines) of keyvalues */
@@ -4867,19 +4883,19 @@ static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, 
 
 #endif
 
-void *CMOR(void *argument)
+void *CMOR(void *process)
 {
   if ( cdoVerbose )
     {
-      int argc = ((argument_t *) argument)->argc;
-      std::vector<char *> &argv = ((argument_t *) argument)->argv;
-
+        /*TEMP*/ //UNTESTED (12.Jan.2018)
+        /*
       cdoPrint("You want to use the following streams for conversion to a project standard:");
-      for ( int args = 1; args < argc; args++)
-        cdoPrint("%s\n", (char *)argv[args]);
+      for ( int streamIDX = 1; streamIDX < processSelf().getInStreamCnt(); streamIDX++)
+        cdoPrint("%s\n", (char *)cdoGetStreamName(streamIDX).c_str());
+        */
     }
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
 #ifdef  HAVE_LIBCMOR
   signal(SIGTERM, sigfunc);
@@ -4923,10 +4939,10 @@ void *CMOR(void *argument)
     cdoPrint("2. Successfully found a MIP table '%s' and deduced a MIP table frequency '%s'.", mip_table, miptab_freqptr);
 
   if ( cdoVerbose )
-    cdoPrint("3. Start to open infile '%s'.", cdoStreamName(0)->args);
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+    cdoPrint("3. Start to open infile '%s'.", cdoGetStreamName(0).c_str());
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
   if ( cdoVerbose )
-    cdoPrint("3. Successfully opened infile '%s'.", cdoStreamName(0)->args);
+    cdoPrint("3. Successfully opened infile '%s'.", cdoGetStreamName(0).c_str());
   /* Short keys from rtu, mt, gi must be included similar to global atts */
   add_globalhybrids(kvl);
 

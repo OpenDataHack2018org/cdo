@@ -25,21 +25,21 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
-void *Setgrid(void *argument)
+void *Setgrid(void *process)
 {
   int nrecs;
   int varID, levelID;
   int gridID2 = -1;
   int gridtype = -1;
   size_t nmiss;
-  int areasize = 0;
-  int  masksize = 0;
+  size_t areasize = 0;
+  size_t masksize = 0;
   bool lregular = false;
   bool lregularnn = false;
   bool ldereference = false;
@@ -52,7 +52,7 @@ void *Setgrid(void *argument)
   double *gridmask = NULL;
   double *areaweight = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETGRID       = cdoOperatorAdd("setgrid",       0, 0, "grid description file or name");
@@ -98,28 +98,26 @@ void *Setgrid(void *argument)
       operatorCheckArgc(1);
       char *areafile = operatorArgv()[0];
 
-      argument_t *fileargument = file_argument_new(areafile);
-      int streamID = pstreamOpenRead(fileargument);
-      file_argument_free(fileargument);
+      int streamID = streamOpenRead(areafile);
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
 
-      nrecs = pstreamInqTimestep(streamID, 0);
-      pstreamInqRecord(streamID, &varID, &levelID);
+      nrecs = streamInqTimestep(streamID, 0);
+      streamInqRecord(streamID, &varID, &levelID);
 
       int gridID = vlistInqVarGrid(vlistID, varID);
       areasize = gridInqSize(gridID);
       areaweight = (double*) Malloc(areasize*sizeof(double));
   
-      pstreamReadRecord(streamID, areaweight, &nmiss);
-      pstreamClose(streamID);
+      streamReadRecord(streamID, areaweight, &nmiss);
+      streamClose(streamID);
 
       if ( cdoVerbose )
 	{
 	  double arrmean = areaweight[0];
 	  double arrmin  = areaweight[0];
 	  double arrmax  = areaweight[0];
-	  for ( int i = 1; i < areasize; i++ )
+	  for ( size_t i = 1; i < areasize; i++ )
 	    {
 	      if ( areaweight[i] < arrmin ) arrmin = areaweight[i];
 	      if ( areaweight[i] > arrmax ) arrmax = areaweight[i];
@@ -134,24 +132,22 @@ void *Setgrid(void *argument)
     {
       operatorCheckArgc(1);
       char *maskfile = operatorArgv()[0];
-      argument_t *fileargument = file_argument_new(maskfile);
-      int streamID = pstreamOpenRead(fileargument);
-      file_argument_free(fileargument);
+      int streamID = streamOpenRead(maskfile);
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
 
-      nrecs = pstreamInqTimestep(streamID, 0);
-      pstreamInqRecord(streamID, &varID, &levelID);
+      nrecs = streamInqTimestep(streamID, 0);
+      streamInqRecord(streamID, &varID, &levelID);
 
       double missval  = vlistInqVarMissval(vlistID, varID);
       int gridID   = vlistInqVarGrid(vlistID, varID);
       masksize = gridInqSize(gridID);
       gridmask = (double*) Malloc(masksize*sizeof(double));
   
-      pstreamReadRecord(streamID, gridmask, &nmiss);
-      pstreamClose(streamID);
+      streamReadRecord(streamID, gridmask, &nmiss);
+      streamClose(streamID);
 
-      for ( int i = 0; i < masksize; i++ )
+      for ( size_t i = 0; i < masksize; i++ )
 	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
     }
   else if ( operatorID == USEGRIDNUMBER )
@@ -177,9 +173,9 @@ void *Setgrid(void *argument)
       griduri = operatorArgv()[0];
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -324,7 +320,7 @@ void *Setgrid(void *argument)
       for ( int index = 0; index < ngrids; index++ )
 	{
 	  int gridID1  = vlistGrid(vlistID1, index);
-	  int gridsize = gridInqSize(gridID1);
+	  size_t gridsize = gridInqSize(gridID1);
 	  if ( gridsize == areasize )
 	    {
 	      gridID2 = gridDuplicate(gridID1);
@@ -339,11 +335,11 @@ void *Setgrid(void *argument)
       for ( int index = 0; index < ngrids; index++ )
 	{
 	  int gridID1  = vlistGrid(vlistID1, index);
-	  int gridsize = gridInqSize(gridID1);
+	  size_t gridsize = gridInqSize(gridID1);
 	  if ( gridsize == masksize )
 	    {
 	      int *mask = (int*) Malloc(masksize*sizeof(int));
-	      for ( int i = 0; i < masksize; i++ )
+	      for ( size_t i = 0; i < masksize; i++ )
 		{
 		  if ( gridmask[i] < 0 || gridmask[i] > 255 )
 		    mask[i] = 0;
@@ -369,12 +365,12 @@ void *Setgrid(void *argument)
 	}
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
   //vlistPrint(vlistID2);
 
-  int gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2) : vlistGridsizeMax(vlistID1);
+  size_t gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2) : vlistGridsizeMax(vlistID1);
 
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double*) Malloc(gridsize*sizeof(double));
@@ -405,9 +401,9 @@ void *Setgrid(void *argument)
 	    }
 	  else if ( gridInqType(gridID1) == GRID_GME )
 	    {
-	      int gridsize = gridInqSize(gridID1);
+	      size_t gridsize = gridInqSize(gridID1);
 	      int j = 0;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( grid2_vgpm[i] ) array[j++] = array[i];
 	    }
 

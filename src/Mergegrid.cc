@@ -22,9 +22,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -36,14 +36,14 @@ void gen_index(int gridID1, int gridID2, int *index)
   int gridtype1 = gridInqType(gridID1);
   int gridtype2 = gridInqType(gridID2);
 
-  int gridsize2 = gridInqSize(gridID2);
+  size_t gridsize2 = gridInqSize(gridID2);
 
   if ( gridtype1 != gridtype2 )
     cdoAbort("Input streams have different grid types!");
 
   if ( index == NULL ) cdoAbort("Internal problem, index not allocated!");
 
-  for ( i = 0; i < gridsize2; i++ ) index[i] = -1;
+  for ( size_t i = 0; i < gridsize2; i++ ) index[i] = -1;
 
   if ( gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN )
     {
@@ -156,24 +156,24 @@ void gen_index(int gridID1, int gridID2, int *index)
 }
 
 
-void *Mergegrid(void *argument)
+void *Mergegrid(void *process)
 {
   int varID, levelID;
   int nrecs = 0;
   size_t nmiss1, nmiss2;
   int index;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID3 = taxisDuplicate(taxisID1);
 
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   vlistCompare(vlistID1, vlistID2, CMP_NAME | CMP_NLEVEL);
 
@@ -182,20 +182,20 @@ void *Mergegrid(void *argument)
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
       ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(0)->args);
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoGetStreamName(0).c_str());
 
   ndiffgrids = 0;
   for ( index = 1; index < vlistNgrids(vlistID2); index++ )
     if ( vlistGrid(vlistID2, 0) != vlistGrid(vlistID2, index))
       ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(1)->args);
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoGetStreamName(1).c_str());
 
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
 
-  int gridsize1 = gridInqSize(gridID1);
-  int gridsize2 = gridInqSize(gridID2);
+  size_t gridsize1 = gridInqSize(gridID1);
+  size_t gridsize2 = gridInqSize(gridID2);
 
   double *array1 = (double*) Malloc(gridsize1*sizeof(double));
   double *array2 = (double*) Malloc(gridsize2*sizeof(double));
@@ -205,7 +205,7 @@ void *Mergegrid(void *argument)
 
   int vlistID3 = vlistDuplicate(vlistID1);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   vlistDefTaxis(vlistID3, taxisID3);
   pstreamDefVlist(streamID3, vlistID3);
@@ -236,7 +236,7 @@ void *Mergegrid(void *argument)
 
 	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 
-	  for ( int i = 0; i < gridsize2; i++ )
+	  for ( size_t i = 0; i < gridsize2; i++ )
 	    {
 	      if ( gindex[i] >= 0 && !DBL_IS_EQUAL(array2[i], missval2) )
 		{
@@ -247,7 +247,7 @@ void *Mergegrid(void *argument)
 	  if ( nmiss1 )
 	    {
 	      nmiss1 = 0;
-	      for ( int i = 0; i < gridsize1; i++ )
+	      for ( size_t i = 0; i < gridsize1; i++ )
 		if ( DBL_IS_EQUAL(array1[i], missval1) ) nmiss1++;
 	    }
 

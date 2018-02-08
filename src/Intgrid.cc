@@ -23,9 +23,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "interpol.h"
 #include "grid.h"
 #include <vector>
@@ -203,11 +203,7 @@ void boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
 	xfield2[ilat][ilon] /= in;
       }
 
-  size_t nmiss = 0;
-  for ( size_t i = 0; i < nlat2*nlon2; i++ )
-    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
-  field2->nmiss = nmiss;
+  field2->nmiss = arrayNumMV(nlat2*nlon2, array2, missval);
 }
 
 static
@@ -245,16 +241,11 @@ void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
       olat++;
     }
 
-  size_t nmiss = 0;
-  for ( size_t i = 0; i < nlat2*nlon2; i++ )
-    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-  
-  field2->nmiss = nmiss;
+  field2->nmiss = arrayNumMV(nlat2*nlon2, array2, missval);
 }
 
 
-
-void *Intgrid(void *argument)
+void *Intgrid(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -263,7 +254,7 @@ void *Intgrid(void *argument)
   size_t nmiss;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
@@ -290,9 +281,9 @@ void *Intgrid(void *argument)
       yinc = parameter2int(operatorArgv()[1]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -333,7 +324,7 @@ void *Intgrid(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);

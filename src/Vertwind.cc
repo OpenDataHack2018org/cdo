@@ -23,16 +23,17 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "after_vertint.h"
+#include "util_string.h"
 
 
 #define R  287.07  /* spezielle Gaskonstante fuer Luft */
 #define G  9.80665 /* Erdbeschleunigung */
 
-void *Vertwind(void *argument)
+void *Vertwind(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -43,11 +44,11 @@ void *Vertwind(void *argument)
   double *vct = NULL;
   double *hpress = NULL, *ps_prog = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   vlist_check_gridsize(vlistID1);
 
@@ -98,7 +99,7 @@ void *Vertwind(void *argument)
   if ( psID == -1 && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
     cdoAbort("Surface pressure (code 134) not found!");
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int nlevel = zaxisInqSize(zaxisID);
   double *level = (double*) Malloc(nlevel*sizeof(double));
   cdoZaxisInqLevels(zaxisID, level);
@@ -115,7 +116,7 @@ void *Vertwind(void *argument)
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
 	  size_t offset = (size_t)levelID*gridsize;
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    fpress[offset+i] = level[levelID];
 	}
     }
@@ -153,7 +154,7 @@ void *Vertwind(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
@@ -186,7 +187,7 @@ void *Vertwind(void *argument)
 	{
 	  size_t offset = (size_t)levelID*gridsize;
 
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      if ( DBL_IS_EQUAL(temp[offset+i],missval_t)    || 
 		   DBL_IS_EQUAL(omega[offset+i],missval_wap) ||
@@ -215,7 +216,7 @@ void *Vertwind(void *argument)
 	  size_t offset = (size_t)levelID*gridsize;
 
 	  size_t nmiss_out = 0;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
             if ( DBL_IS_EQUAL(wms[offset+i],missval_out) )
 	      nmiss_out++;
 

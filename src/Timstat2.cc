@@ -22,9 +22,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 // correlation in time
 static
@@ -101,14 +101,14 @@ size_t covariance_t(size_t gridsize, double missval1, double missval2, size_t *n
 }
 
 
-void *Timstat2(void *argument)
+void *Timstat2(void *process)
 {
   int vdate = 0, vtime = 0;
   int nrecs2, nlevs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("timcor",   func_cor,   0, NULL);
@@ -122,11 +122,11 @@ void *Timstat2(void *argument)
   if      ( operfunc == func_cor   ) nwork = 5;
   else if ( operfunc == func_covar ) nwork = 3;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -142,7 +142,7 @@ void *Timstat2(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
  
   vlistDefTaxis(vlistID3, taxisID3);
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
  
   size_t gridsize = vlistGridsizeMax(vlistID1);

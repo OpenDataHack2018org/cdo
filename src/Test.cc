@@ -16,22 +16,22 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Test(void *argument)
+void *Test(void *process)
 {
   /*
   int streamID1, streamID2;
   */
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   /*
-  streamID1 = pstreamOpenRead(cdoStreamName(0));
-  streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
@@ -42,18 +42,18 @@ void *Test(void *argument)
 }
 
 
-void *Test2(void *argument)
+void *Test2(void *process)
 {
   /*
   int streamID1, streamID2, streamID3;
   */
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   /*
-  streamID1 = pstreamOpenRead(cdoStreamName(0));
-  streamID2 = pstreamOpenRead(cdoStreamName(1));
-  streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  streamID2 = cdoStreamOpenRead(cdoStreamName(1));
+  streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamClose(streamID3);
   pstreamClose(streamID2);
@@ -65,22 +65,22 @@ void *Test2(void *argument)
 }
 
 
-void *Testdata(void *argument)
+void *Testdata(void *process)
 {
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int tsID2 = 0;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int vlistID2 = vlistDuplicate(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -88,7 +88,7 @@ void *Testdata(void *argument)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
   float *fval = (float*) Malloc(gridsize*sizeof(float));
   int *ival = (int*) Malloc(gridsize*sizeof(int));
@@ -111,7 +111,7 @@ void *Testdata(void *argument)
 	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  for ( int i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      fval[i] = (float) array[i];
 
@@ -124,7 +124,7 @@ void *Testdata(void *argument)
 	      cval2[i+gridsize*3] = cval[i*4+3];
 
 	      if ( tsID1 == 0 && recID == 0 )
-	      printf("%4d %3d %3d %3d %3d %d %g\n",
+	      printf("%4zu %3d %3d %3d %3d %d %g\n",
 		     i, (unsigned int)cval[4*i+0], (unsigned int)cval[4*i+1], (unsigned int)cval[4*i+2], (unsigned int)cval[4*i+3], ival[i], fval[i]);
 	    }
 

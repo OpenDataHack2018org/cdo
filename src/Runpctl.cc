@@ -22,20 +22,21 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "percentiles.h"
+#include "datetime.h"
 
 
-void *Runpctl(void *argument)
+void *Runpctl(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int varID;
   int levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("runpctl", func_pctl, 0, NULL);
 
@@ -45,9 +46,9 @@ void *Runpctl(void *argument)
   percentile_check_number(pn);
   int ndates = parameter2int(operatorArgv()[1]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -55,7 +56,7 @@ void *Runpctl(void *argument)
   taxisWithBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars    = vlistNvars(vlistID1);
@@ -104,14 +105,14 @@ void *Runpctl(void *argument)
         {
           if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
           
-          int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           int nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           double missval = vlistInqVarMissval(vlistID1, varID);
           
           for ( levelID = 0; levelID < nlevels; levelID++ )
             {
               nmiss = 0;  
-              for ( int i = 0; i < gridsize; i++ )
+              for ( size_t i = 0; i < gridsize; i++ )
                 {
                   int j = 0;
                   for ( int inp = 0; inp < ndates; inp++ )

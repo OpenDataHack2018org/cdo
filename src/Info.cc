@@ -24,9 +24,12 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "text.h"
+#include "array.h"
+#include "datetime.h"
 
 static
 void printMap(int nlon, int nlat, double *array, double missval, double min, double max)
@@ -257,7 +260,7 @@ void infostat_init(infostat_type *infostat)
 }
 
 
-void *Info(void *argument)
+void *Info(void *process)
 {
   enum {E_NAME, E_CODE, E_PARAM};
   int fpeRaised = 0;
@@ -269,7 +272,7 @@ void *Info(void *argument)
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INFO   = cdoOperatorAdd("info",   E_PARAM,  0, NULL);
@@ -294,9 +297,9 @@ void *Info(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      int streamID = pstreamOpenRead(cdoStreamName(indf));
+      int streamID = cdoStreamOpenRead(indf);
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);
 
       int nvars = vlistNvars(vlistID);
@@ -402,17 +405,7 @@ void *Info(void *argument)
 
                   if ( infostatp->nmiss > 0 )
                     {
-                      size_t nvals   = 0;
-                      for ( size_t i = 0; i < gridsize; ++i )
-                        {
-                          if ( !DBL_IS_EQUAL(array[i], missval) )
-                            {
-                              if ( array[i] < infostatp->min ) infostatp->min = array[i];
-                              if ( array[i] > infostatp->max ) infostatp->max = array[i];
-                              infostatp->sum += array[i];
-                              nvals++;
-                            }
-                        }
+                      size_t nvals = arrayMinMaxSumMV(gridsize, array, missval, &infostatp->min, &infostatp->max, &infostatp->sum);
                       imiss = gridsize - nvals;
                       infostatp->nvals += nvals;
                     }
@@ -426,7 +419,7 @@ void *Info(void *argument)
                     }
                   else
                     {
-                      array_minmaxsum_val(gridsize, array, &infostatp->min, &infostatp->max, &infostatp->sum);
+                      arrayMinMaxSum(gridsize, array, &infostatp->min, &infostatp->max, &infostatp->sum);
                       infostatp->nvals += gridsize;
                     }
 

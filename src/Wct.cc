@@ -22,9 +22,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 static const char WCT_NAME[]     = "wind_chill_temperature";
@@ -73,33 +73,31 @@ static void farexpr(field_type *field1, field_type field2, double (*expression)(
         array1[i] = expression(array1[i], array2[i], missval1);  
     }
 
-  field1->nmiss = 0;
-  for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+  field1->nmiss = arrayNumMV(len, array1, missval1);
 }
 
    
-void *Wct(void *argument)
+void *Wct(void *process)
 {
   int nrecs, nrecs2;
   size_t nmiss;
   int varID1, varID2;
   int levelID1, levelID2;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("wct", 0, 0, NULL);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_DIM);
   
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   
   field_type field1, field2;
   field_init(&field1);
@@ -126,7 +124,7 @@ void *Wct(void *argument)
   vlistDefVarLongname(vlistID3, varID3, WCT_LONGNAME);
   vlistDefVarUnits(vlistID3, varID3, WCT_UNITS);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamDefVlist(streamID3, vlistID3);
 

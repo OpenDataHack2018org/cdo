@@ -15,12 +15,38 @@
   GNU General Public License for more details.
 */
 
-#ifndef _PSTREAM_INT_H
-#define _PSTREAM_INT_H
+#ifndef PSTREAM_INT_H
+#define PSTREAM_INT_H
 
-#include "pipe.h"
+#include "pstream.h"
+/*clang-format off */
 
-void  pstreamDebug(int debug);
-pthread_t  pCreateReadThread(argument_t *argument);
+void  pstreamClose(int pstreamID);
 
-#endif  /* _PSTREAM_INT_H */
+int   pstreamInqVlist(int pstreamID);
+void  pstreamDefVlist(int pstreamID, int vlistID);
+
+int   pstreamInqRecord(int pstreamID, int *varID, int *levelID);
+void  pstreamDefRecord(int pstreamID, int varID, int levelID);
+
+void  pstreamDefRecord(int pstreamID, int varID, int levelID);
+int   pstreamInqRecord(int pstreamID, int *varID, int *levelID);
+
+int   pstreamInqTimestep(int pstreamID, int tsID);
+void  pstreamDefTimestep(int pstreamID, int tsID);
+
+void  pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
+int   pstreamInqFiletype(int pstreamID);
+int   pstreamInqByteorder(int pstreamID);
+int   pstreamFileID (int pstreamID);
+
+void  pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
+void  pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
+void  pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
+
+void  pstreamWriteRecord(int pstreamID, double *data, size_t nmiss);
+void  pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss);
+
+/*clang-format on */
+
+#endif

@@ -27,9 +27,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 int *fill_vars(int vlistID)
@@ -70,13 +70,12 @@ int *fill_vars(int vlistID)
 }
 
 
-void *Arithc(void *argument)
+void *Arithc(void *process)
 {
-  size_t nmiss;
   int nrecs;
   int varID, levelID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("addc", func_add, 0, "constant value");
@@ -93,9 +92,9 @@ void *Arithc(void *argument)
   operatorCheckArgc(1);
   double rconst = parameter2double(operatorArgv()[0]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int *vars = fill_vars(vlistID1);
@@ -104,28 +103,26 @@ void *Arithc(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
-  field.ptr    = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
   field.weight = NULL;
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-          field.nmiss = nmiss;
+	  pstreamReadRecord(streamID1, field.ptr, &field.nmiss);
 
 	  if ( vars[varID] )
 	    {
@@ -134,17 +131,14 @@ void *Arithc(void *argument)
 
 	      farcfun(&field, rconst, operfunc);
 
-	      /* recalculate number of missing values */
-	      gridsize = gridInqSize(field.grid);
-	      field.nmiss = 0;
-	      for ( int i = 0; i < gridsize; ++i )
-		if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
+	      // recalculate number of missing values
+              field.nmiss = arrayNumMV(gridsize, field.ptr, field.missval);
 	    }
 
-          nmiss = field.nmiss;
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, field.ptr, nmiss);
+	  pstreamWriteRecord(streamID2, field.ptr, field.nmiss);
 	}
+
       tsID++;
     }
 

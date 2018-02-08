@@ -24,10 +24,11 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
+#include "util_string.h"
 
 
 /*
@@ -154,7 +155,7 @@ void calc_adipot(long gridsize, long nlevel, double *pressure, field_type t, fie
 }
 
 
-void *Adisit(void *argument)
+void *Adisit(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -166,7 +167,7 @@ void *Adisit(void *argument)
   double pin = -1;
   double *single;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   int ADISIT = cdoOperatorAdd("adisit", 1, 1, "");
   int ADIPOT = cdoOperatorAdd("adipot", 1, 1, "");
 
@@ -176,9 +177,9 @@ void *Adisit(void *argument)
 
   if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
 
@@ -213,7 +214,7 @@ void *Adisit(void *argument)
   if ( thoID == -1 ) cdoAbort("Potential or Insitu temperature not found!");
 
   int gridID = vlistGrid(vlistID1, 0);
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int zaxisID = vlistInqVarZaxis(vlistID1, saoID);
   int nlevel1 = zaxisInqSize(zaxisID);
@@ -294,7 +295,7 @@ void *Adisit(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
@@ -302,7 +303,6 @@ void *Adisit(void *argument)
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; ++recID )
@@ -313,13 +313,11 @@ void *Adisit(void *argument)
 
 	  if ( varID == thoID )
             {
-              pstreamReadRecord(streamID1, tho.ptr+offset, &nmiss);
-              tho.nmiss = (size_t) nmiss;
+              pstreamReadRecord(streamID1, tho.ptr+offset, &tho.nmiss);
             }
 	  if ( varID == saoID )
             {
-              pstreamReadRecord(streamID1, sao.ptr+offset, &nmiss);
-              sao.nmiss = (size_t) nmiss;
+              pstreamReadRecord(streamID1, sao.ptr+offset, &sao.nmiss);
             }
         }
 
@@ -334,20 +332,12 @@ void *Adisit(void *argument)
 	  offset = gridsize*levelID;
 
 	  single = tis.ptr+offset;
-
-	  nmiss = 0;
-	  for ( i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(single[i], tis.missval) ) nmiss++;
- 
+	  nmiss = arrayNumMV(gridsize, single, tis.missval);
 	  pstreamDefRecord(streamID2, tisID2, levelID);
 	  pstreamWriteRecord(streamID2, single, nmiss);     
 
 	  single = sao.ptr+offset;
-
-	  nmiss = 0;
-	  for ( i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(single[i], sao.missval) ) nmiss++;
- 
+	  nmiss = arrayNumMV(gridsize, single, sao.missval);
 	  pstreamDefRecord(streamID2, saoID2, levelID);
 	  pstreamWriteRecord(streamID2, single, nmiss);     
 	}

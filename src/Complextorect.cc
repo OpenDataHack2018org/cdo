@@ -17,28 +17,27 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Complextorect(void *argument)
+void *Complextorect(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int i;
   int datatype;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // int COMPLEXTORECT = cdoOperatorAdd("complextorect", 0, 0, NULL);
 
   // int operatorID = cdoOperatorID();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
   int vlistID3 = vlistDuplicate(vlistID1);
 
@@ -61,13 +60,13 @@ void *Complextorect(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID3);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(2*gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
   double *array3 = (double*) Malloc(gridsize*sizeof(double));
@@ -91,7 +90,7 @@ void *Complextorect(void *argument)
 
 	  pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      array2[i] = array1[2*i];
 	      array3[i] = array1[2*i+1];

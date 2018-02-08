@@ -20,7 +20,7 @@
 
 */
 
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "pmlist.h"
 
@@ -132,9 +132,9 @@ void conv_cmor_table(list_t *pmlist)
 }
 
 
-void *CMOR_table(void *argument)
+void *CMOR_table(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int DUMP_CMOR_TABLE = cdoOperatorAdd("dump_cmor_table",   0,   0, NULL);
   int CONV_CMOR_TABLE = cdoOperatorAdd("conv_cmor_table",   0,   0, NULL);

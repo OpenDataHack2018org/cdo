@@ -24,9 +24,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 
 
@@ -259,14 +259,14 @@ void vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels)
 }
 
 
-void *Intlevel(void *argument)
+void *Intlevel(void *process)
 {
   int nrecs;
   int varID, levelID;
   int zaxisID1 = -1;
   int nlevel = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int INTLEVEL   = cdoOperatorAdd("intlevel",  0, 0, NULL);
@@ -297,9 +297,9 @@ void *Intlevel(void *argument)
 
   if ( cdoVerbose ) for ( int i = 0; i < nlev2; ++i ) cdoPrint("lev2 %d: %g", i, lev2[i]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -418,7 +418,8 @@ void *Intlevel(void *argument)
   double *lev_wgt1 = (double*) Malloc(wisize*sizeof(double));
   double *lev_wgt2 = (double*) Malloc(wisize*sizeof(double));
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+
   pstreamDefVlist(streamID2, vlistID2);
 
   std::vector<bool> vars(nvars);
@@ -510,10 +511,7 @@ void *Intlevel(void *argument)
 		{
 		  size_t offset = gridsize*levelID;
 		  double *single2 = vardata2[varID] + offset;
-		  size_t nmiss = 0;
-		  for ( size_t i = 0; i < gridsize; ++i )
-		    if ( DBL_IS_EQUAL(single2[i], missval) ) nmiss++;
-		  varnmiss[varID][levelID] = nmiss;
+		  varnmiss[varID][levelID] = arrayNumMV(gridsize, single2, missval);
 		}
 	    }
 	}

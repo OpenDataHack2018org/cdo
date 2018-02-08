@@ -1,4 +1,20 @@
 /*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+/*
 #define  NGP    100000
 #define  OUTPUT 1
 #define  OPOINT 34179
@@ -10,6 +26,7 @@
 
 #include "cdo_int.h"
 #include "hetaeta.h"
+#include "cdoOptions.h"
 
 static const double apr  = 101325.0;   /* reference pressure */
 static const double aipr = 1.0/101325.0;
@@ -468,30 +485,30 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
   long nlev1p1 = nlev1+1;
   long nlev2p1 = nlev2+1;
 
-  NEW_2D(double, ph1, ompNumThreads, nlev1p1);
-  NEW_2D(double, lnph1, ompNumThreads, nlev1p1);
-  NEW_2D(double, fi1, ompNumThreads, nlev1p1);
+  NEW_2D(double, ph1, Threading::ompNumThreads, nlev1p1);
+  NEW_2D(double, lnph1, Threading::ompNumThreads, nlev1p1);
+  NEW_2D(double, fi1, Threading::ompNumThreads, nlev1p1);
 
-  NEW_2D(double, pf1, ompNumThreads, nlev1);
-  NEW_2D(double, lnpf1, ompNumThreads, nlev1);
-  NEW_2D(double, tv1, ompNumThreads, nlev1);
-  NEW_2D(double, theta1, ompNumThreads, nlev1);
-  NEW_2D(double, rh1, ompNumThreads, nlev1);
-  NEW_2D(double, zvar, ompNumThreads, nlev1);
+  NEW_2D(double, pf1, Threading::ompNumThreads, nlev1);
+  NEW_2D(double, lnpf1, Threading::ompNumThreads, nlev1);
+  NEW_2D(double, tv1, Threading::ompNumThreads, nlev1);
+  NEW_2D(double, theta1, Threading::ompNumThreads, nlev1);
+  NEW_2D(double, rh1, Threading::ompNumThreads, nlev1);
+  NEW_2D(double, zvar, Threading::ompNumThreads, nlev1);
 
-  NEW_2D(double, ph2, ompNumThreads, nlev2p1);
-  NEW_2D(double, lnph2, ompNumThreads, nlev2p1);
-  NEW_2D(double, fi2, ompNumThreads, nlev2p1);
+  NEW_2D(double, ph2, Threading::ompNumThreads, nlev2p1);
+  NEW_2D(double, lnph2, Threading::ompNumThreads, nlev2p1);
+  NEW_2D(double, fi2, Threading::ompNumThreads, nlev2p1);
 
-  NEW_2D(double, pf2, ompNumThreads, nlev2);
-  NEW_2D(double, rh2, ompNumThreads, nlev2);
-  NEW_2D(double, wgt, ompNumThreads, nlev2);
-  NEW_2D(long, idx, ompNumThreads, nlev2);
+  NEW_2D(double, pf2, Threading::ompNumThreads, nlev2);
+  NEW_2D(double, rh2, Threading::ompNumThreads, nlev2);
+  NEW_2D(double, wgt, Threading::ompNumThreads, nlev2);
+  NEW_2D(long, idx, Threading::ompNumThreads, nlev2);
 
-  NEW_2D(double, zt2, ompNumThreads, ltq?nlev2:0);
-  NEW_2D(double, zq2, ompNumThreads, ltq?nlev2:0);
-  NEW_2D(double, rh_pbl, ompNumThreads, ltq?nlev2:0);
-  NEW_2D(double, theta_pbl, ompNumThreads, ltq?nlev2:0);
+  NEW_2D(double, zt2, Threading::ompNumThreads, ltq?nlev2:0);
+  NEW_2D(double, zq2, Threading::ompNumThreads, ltq?nlev2:0);
+  NEW_2D(double, rh_pbl, Threading::ompNumThreads, ltq?nlev2:0);
+  NEW_2D(double, theta_pbl, Threading::ompNumThreads, ltq?nlev2:0);
 
   if ( nvars > MAX_VARS )
     {
@@ -499,11 +516,11 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
       exit(-1);
     }
   // if ( nvars > 0 )
-  double ***vars_pbl_2 = (double***) Malloc(ompNumThreads*sizeof(double**));
+  double ***vars_pbl_2 = (double***) Malloc(Threading::ompNumThreads*sizeof(double**));
 
   if ( nvars > 0 )
     {
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
         {
 	  vars_pbl_2[i]  = (double **) Malloc(nvars*sizeof(double *));
 	  for ( int iv = 0; iv < nvars; ++iv )
@@ -658,7 +675,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
   if ( nvars > 0 )
     {
-      for ( int i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < Threading::ompNumThreads; i++ )
         {
 	  for ( int iv = 0; iv < nvars; ++iv )
 	    Free(vars_pbl_2[i][iv]);
@@ -685,7 +702,7 @@ void hetaeta(bool ltq, int ngp, const int *imiss,
 
 #if defined(TEST_HETAETA)
 #define NGP  (512*1024)
-int ompNumThreads = 2;
+int Threading::ompNumThreads = 2;
 
 int main (int argc, char *argv[])
 {

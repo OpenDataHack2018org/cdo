@@ -22,12 +22,14 @@
 
 #include "hetaeta.h"
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "after_vertint.h"
 #include "listarray.h"
 #include "stdnametable.h"
+#include "util_string.h"
+#include "timer.h"
 
 static void
 setmissval(long nvals, int *imiss, double missval, double *array)
@@ -149,9 +151,10 @@ vctFromFile(const char *filename, int *nvct)
 }
 
 static void
-vert_sum(double *sum, double *var3d, long gridsize, long nlevel)
+vert_sum(double *sum, double *var3d, size_t gridsize, long nlevel)
 {
-  long i, k;
+  size_t i;
+  int k;
 
   for (i = 0; i < gridsize; ++i)
     sum[i] = 0;
@@ -164,9 +167,10 @@ vert_sum(double *sum, double *var3d, long gridsize, long nlevel)
 }
 
 static void
-vert_sumw(double *sum, double *var3d, long gridsize, long nlevel, double *deltap)
+vert_sumw(double *sum, double *var3d, size_t gridsize, long nlevel, double *deltap)
 {
-  long i, k;
+  size_t i;
+  int k;
 
   for (i = 0; i < gridsize; ++i)
     sum[i] = 0;
@@ -229,11 +233,12 @@ vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf)
 #define MAX_VARS3D 1024
 
 void *
-Remapeta(void *argument)
+Remapeta(void *process)
 {
-  int nfis2gp = 0;
+  size_t nfis2gp = 0;
   int nrecs;
-  int i, iv;
+  int i;
+  int iv;
   int varID, levelID;
   int nvars3D = 0;
   int sgeopotID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1;
@@ -262,7 +267,7 @@ Remapeta(void *argument)
   if (cdoTimer)
     timer_hetaeta = timer_new("Remapeta_hetaeta");
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int REMAPETA  = cdoOperatorAdd("remapeta",   0, 0, "VCT file name");
@@ -297,37 +302,32 @@ Remapeta(void *argument)
     for (i = 0; i < nhlevf2 + 1; ++i)
       cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2 / 2 + i]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   if (operatorArgc() == 2)
     {
       lfis2 = true;
 
       const char *fname = operatorArgv()[1];
-      argument_t *fileargument = file_argument_new(fname);
-      int streamID = pstreamOpenRead(fileargument);
-      file_argument_free(fileargument);
+      int streamID = streamOpenRead(fname);
 
-      int vlistID1 = pstreamInqVlist(streamID);
+      int vlistID1 = streamInqVlist(streamID);
 
-      pstreamInqRecord(streamID, &varID, &levelID);
+      streamInqRecord(streamID, &varID, &levelID);
       int gridID = vlistInqVarGrid(vlistID1, varID);
       nfis2gp = gridInqSize(gridID);
 
       fis2 = (double *) Malloc(nfis2gp * sizeof(double));
 
-      pstreamReadRecord(streamID, fis2, &nmiss);
+      streamReadRecord(streamID, fis2, &nmiss);
 
       if (nmiss)
         {
           missval = vlistInqVarMissval(vlistID1, varID);
           imiss = (int *) Malloc(nfis2gp * sizeof(int));
-          for (i = 0; i < nfis2gp; ++i)
+          for (size_t i = 0; i < nfis2gp; ++i)
             {
-              if (DBL_IS_EQUAL(fis2[i], missval))
-                imiss[i] = 1;
-              else
-                imiss[i] = 0;
+              imiss[i] = (DBL_IS_EQUAL(fis2[i], missval));
             }
 
           nmissout = nmiss;
@@ -341,10 +341,10 @@ Remapeta(void *argument)
       if (minval < -1.e10 || maxval > 1.e10)
         cdoAbort("%s out of range!", var_stdname(surface_geopotential));
 
-      pstreamClose(streamID);
+      streamClose(streamID);
     }
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -355,7 +355,7 @@ Remapeta(void *argument)
   if (gridInqType(gridID) == GRID_SPECTRAL)
     cdoAbort("Spectral data unsupported!");
 
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nhlevf2);
   double *lev2 = (double *) Malloc(nhlevf2 * sizeof(double));
@@ -392,7 +392,7 @@ Remapeta(void *argument)
     for (i = 0; i < nvct1 / 2; ++i)
       cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1 / 2 + i]);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   if (zaxisIDh == -1)
@@ -601,7 +601,7 @@ Remapeta(void *argument)
               else if (varID == presID)
                 {
                   if (lnpsID != -1)
-                    for (i = 0; i < gridsize; ++i)
+                    for (size_t i = 0; i < gridsize; ++i)
                       ps1[i] = exp(array[i]);
                   else if (psID != -1)
                     memcpy(ps1, array, gridsize * sizeof(double));
@@ -649,7 +649,7 @@ Remapeta(void *argument)
         }
 
       if (lfis2 == false)
-        for (int i = 0; i < gridsize; i++)
+        for (size_t i = 0; i < gridsize; i++)
           fis2[i] = fis1[i];
 
       if (ltq)
@@ -725,7 +725,7 @@ Remapeta(void *argument)
         }
 
       if (zaxisIDh != -1 && lnpsID != -1)
-        for (i = 0; i < gridsize; ++i)
+        for (size_t i = 0; i < gridsize; ++i)
           ps2[i] = log(ps2[i]);
 
       if (zaxisIDh != -1 && presID != -1)
@@ -765,7 +765,7 @@ Remapeta(void *argument)
               corr_hum(gridsize, single2, MIN_Q);
 
               if (levelID < nctop)
-                for (i = 0; i < gridsize; ++i)
+                for (size_t i = 0; i < gridsize; ++i)
                   single2[i] = cconst;
 
               minmaxval(gridsize, single2, imiss, &minval, &maxval);
@@ -795,7 +795,7 @@ Remapeta(void *argument)
 
               presh(NULL, half_press1, vct1, ps1, nhlevf1, gridsize);
               for (k = 0; k < nhlevf1; ++k)
-                for (i = 0; i < gridsize; ++i)
+                for (size_t i = 0; i < gridsize; ++i)
                   {
                     deltap1[k * gridsize + i] = half_press1[(k + 1) * gridsize + i] - half_press1[k * gridsize + i];
                     deltap1[k * gridsize + i] = log(deltap1[k * gridsize + i]);
@@ -804,7 +804,7 @@ Remapeta(void *argument)
 
               presh(NULL, half_press2, vct2, ps1, nhlevf2, gridsize);
               for (k = 0; k < nhlevf2; ++k)
-                for (i = 0; i < gridsize; ++i)
+                for (size_t i = 0; i < gridsize; ++i)
                   {
                     deltap2[k * gridsize + i] = half_press2[(k + 1) * gridsize + i] - half_press2[k * gridsize + i];
                     deltap2[k * gridsize + i] = log(deltap2[k * gridsize + i]);
@@ -820,12 +820,12 @@ Remapeta(void *argument)
               if (operatorID == REMAPETAS || operatorID == REMAPETAZ)
                 {
                   /*
-                  for ( i = 0; i < gridsize; ++i )
+                  for ( size_t i = 0; i < gridsize; ++i )
                     if ( i %100 == 0 )
                       printf("%d %g %g %g %g %g\n",i, single2[i], sum1[i], sum2[i], sum1[i]/sum2[i],
                   single2[i]*sum1[i]/sum2[i]);
                   */
-                  for (i = 0; i < gridsize; ++i)
+                  for ( size_t i = 0; i < gridsize; ++i)
                     single2[i] = single2[i] * sum1[i] / sum2[i];
                 }
 

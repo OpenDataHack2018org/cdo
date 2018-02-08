@@ -18,12 +18,12 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
 
-#include "util.h"
 #include "pstream.h"
 #include "modules.h"
 
 #include <vector>
 #include <iostream>
+#include <string>
 
 constexpr int MAX_PROCESS = 128;
 constexpr int MAX_STREAM = 64;
@@ -31,29 +31,37 @@ constexpr int MAX_OPERATOR = 128;
 constexpr int MAX_OARGC = 4096;
 constexpr int MAX_FILES = 65536;
 
-enum class ProcessCheckResult{UNLIMITED_STREAM_COUNTS, INPUT_STREAM_MISSING, OUTPUT_STREAM_MISSING, TOO_MANY_STREAMS, TOO_FEW_STREAMS, FILENAME_HAS_OPERATOR_MARKER, OUTFILE_IS_INFILE, SUCCESS};
+struct cdoTimes
+{
+  double s_utime, s_stime;
+  double e_utime, e_stime;
+  double c_cputime = 0, c_usertime = 0, c_systime = 0;
+  double p_cputime = 0, p_usertime = 0, p_systime = 0;
+};
 
-typedef struct
+struct oper_t
 {
   int f1;
   int f2;
   const char *name;
   const char *enter;
-} oper_t;
+};
 
-class process_t
+class ProcessType
 {
 public:
   int m_ID;
+  int m_posInParent;
 #ifdef  HAVE_LIBPTHREAD
   pthread_t threadID;
   int l_threadID;
 #endif
   short nchild;
-  std::vector<process_t *> childProcesses;
-  std::vector<process_t *> parentProcesses;
-  std::vector<pstream_t *> inputStreams;
-  std::vector<pstream_t *> outputStreams;
+  std::vector<ProcessType *> childProcesses;
+  std::vector<ProcessType *> parentProcesses;
+  std::vector<PstreamType *> inputStreams;
+  std::vector<PstreamType *> outputStreams;
+  int nChildActive = 0;
   short m_cntIn;
   short m_cntOut;
 
@@ -63,87 +71,55 @@ public:
   double a_stime;
   double cputime;
 
-  size_t nvals;
+  size_t m_nvals;
   short nvars;
 
   int ntimesteps;
   int m_streamCnt;
-  std::vector<argument_t> streamArguments;
   const char *m_operatorCommand;
   const char *operatorName;
   char *operatorArg;
   char prompt[64];
-  short noper;
+  short m_noper;
+  bool m_isActive;  /*TEMP*/ //not used right now, maybe later (12.Jan.2018)
 
-  modules_t m_module;
-  std::vector<char *> oargv;
-  int oargc;
+  module_t m_module;
+  std::vector<char *> m_oargv;
+  int m_oargc;
   oper_t oper[MAX_OPERATOR];
+
+  ProcessType(int p_ID, const char* p_operatorNamme, const char *operatorCommand);
+
+  pthread_t run();
 
   int getInStreamCnt();
   int getOutStreamCnt();
   void initProcess();
   void print_process();
-  void defArgument();
   void setOperatorArgv(const char *operatorArguments);
-  void setStreams(int argc, std::vector<char *> &argv);
-  void addChild(process_t *child_process);
-  void addParent(process_t *parent_process);
+  void addChild(ProcessType *child_process);
+  void addParent(ProcessType *parent_process);
   bool hasAllInputs();
-  process_t(int p_ID, const char *operatorCommand);
+  void addFileInStream(std::string file);
+  void addFileOutStream(std::string file);
+  void addPipeInStream();
+  void addPipeOutStream();
+  void addNvals(size_t p_nvals);
+  void query_user_exit(const char *argument);
+  void inqUserInputForOpArg(const char *enter);
+  int operatorAdd(const char *name, int f1, int f2, const char *enter);
+  int getOperatorID();
+  void setInactive();
+  const char *inqPrompt();
+  cdoTimes getTimes(int p_processNums);
+  void printProcessedValues();
+  void printBenchmarks(cdoTimes p_times, char *p_memstring);
+  int checkStreamCnt();
 
 private:
+  ProcessType();
   void defPrompt();
-  process_t();
-  void OpenRead(int p_input_idx);
-  void OpenWrite(int p_input_idx);
-  void OpenAppend(int p_input_idx);
-  void setStreamNames(int argc, std::vector<char *> &argv);
-  int expand_wildcards(int streamCnt);
-  int checkStreamCnt();
 };
 
-extern std::map<int, process_t> Process;
-
-pstream_t *processInqInputStream(int streamindex);
-pstream_t *processInqOutputStream(int streamindex);
-process_t &processSelf(void);
-process_t *processCreate(void);
-process_t *processCreate(const char *command);
-void processDelete(void);
-int processInqTimesteps(void);
-void processDefTimesteps(int streamID);
-int processInqVarNum(void);
-int processInqInputStreamNum(void);
-int processInqOutputStreamNum(void);
-void processAddInputStream(pstream_t *p_pstream_ptr);
-void processAddOutputStream(pstream_t *p_pstream_ptr);
-void processDelStream(int streamID);
-void processDefVarNum(int nvars);
-void processDefArgument(void *vargument);
-
-void processStartTime(double *utime, double *stime);
-void processEndTime(double *utime, double *stime);
-void processAccuTime(double utime, double stime);
-
-void processDefCputime(int processID, double cputime);
-double processInqCputime(int processID);
-
-void processAddNvals(size_t nvals);
-size_t processInqNvals(int processID);
-int processNums(void);
-
-int processInqChildNum(void);
-
-const char *processOperatorArg(void);
-const char *processInqOpername(void);
-const char *processInqOpername2(int processID);
-const char *processInqPrompt(void);
-
-const argument_t *cdoStreamName(int cnt);
-void createProcesses(int argc, const char **argv);
-void clearProcesses();
-int processNumsActive();
-
-  int checkStreamCnt();
 #endif /* _PROCESS_H */
+

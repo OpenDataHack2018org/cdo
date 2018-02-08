@@ -16,15 +16,15 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define  NALLOC_INC  1024
 
 
-void *Duplicate(void *argument)
+void *Duplicate(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -34,16 +34,16 @@ void *Duplicate(void *argument)
   int ndup = 2;
   field_type ***vars = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if      ( operatorArgc()  > 1 ) cdoAbort("Too many arguments!");
   else if ( operatorArgc() == 1 ) ndup = parameter2int(operatorArgv()[0]);
 
   if ( cdoVerbose ) cdoPrint("ndup = %d", ndup);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -67,7 +67,7 @@ void *Duplicate(void *argument)
 	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
  
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   nvars = vlistNvars(vlistID1);
@@ -92,7 +92,7 @@ void *Duplicate(void *argument)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
-	  int gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;

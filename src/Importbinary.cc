@@ -21,9 +21,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 #include "gradsdeslib.h"
@@ -185,13 +185,13 @@ int define_level(dsets_t *pfi, int nlev)
 }
 
 
-void *Importbinary(void *argument)
+void *Importbinary(void *process)
 {
-  int i;
+  size_t i;
   size_t nmiss = 0, n_nan;
   int ivar;
   int varID = -1, levelID, tsID;
-  int gridsize;
+  size_t gridsize;
   int datatype;
   dsets_t pfi;
   int vdate, vtime;
@@ -210,11 +210,11 @@ void *Importbinary(void *argument)
   double sfclevel = 0;
   char vdatestr[32], vtimestr[32];	  
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   dsets_init(&pfi);
 
-  int status = read_gradsdes(cdoStreamName(0)->args, &pfi);
+  int status = read_gradsdes((char*)cdoGetStreamName(0).c_str(), &pfi);
   if ( cdoVerbose ) fprintf(stderr, "status %d\n", status);
   //if ( status ) cdoAbort("Open failed on %s!", pfi.name);
   if ( status ) cdoAbort("Open failed!");
@@ -335,7 +335,7 @@ void *Importbinary(void *argument)
 
   vlistDefTaxis(vlistID, taxisID);
 
-  int streamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID, vlistID);
 

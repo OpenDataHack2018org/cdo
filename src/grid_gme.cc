@@ -1,3 +1,19 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #include "cdo_int.h"
 
 #ifndef M_PI
@@ -1281,17 +1297,17 @@ void gme_grid_restore(double *p, int ni, int nd)
 /*****************************************************************************/
 
 
-void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
+void gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat,
 	      double *blon, double *blat, int *imask,
               int ni, int nd, int ni2, int ni3)
 {
   /* check gridsize */
-  if ( (ni+1)*(ni+1)*nd != gridsize )
+  if ( (size_t)(ni+1)*(ni+1)*nd != gridsize )
     {
       fprintf(stderr, "gme_grid: Calculation of the global GME grid failed (ni=%d)!\n", ni);
-      if ( (ni+1)*(ni+1)*nd > gridsize )
+      if ( (size_t)(ni+1)*(ni+1)*nd > gridsize )
 	{
-	  fprintf(stderr, "gme_grid: Resulting grid size is greater than the predetermined grid size of %d.\n", gridsize);
+	  fprintf(stderr, "gme_grid: Resulting grid size is greater than the predetermined grid size of %zu.\n", gridsize);
 	  fprintf(stderr, "gme_grid: Maybe this is only a part of a global GME grid without further information.\n");
 	}
       exit (-1);
@@ -1321,7 +1337,7 @@ void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
 
       boundary(poly,im1s,im1e,im2s,im2e,nd);
 
-      for ( int i = 0; i < gridsize; i++ )
+      for ( size_t i = 0; i < gridsize; i++ )
 	{
 	  for ( int j = 0; j < poly[i].type; j++ )
 	    {

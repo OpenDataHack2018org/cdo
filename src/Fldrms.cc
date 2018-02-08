@@ -22,13 +22,13 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
-void *Fldrms(void *argument)
+void *Fldrms(void *process)
 {
   int lastgrid = -1;
   int index;
@@ -37,15 +37,15 @@ void *Fldrms(void *argument)
   size_t nmiss;
   double sglval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool needWeights = true;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -83,7 +83,7 @@ void *Fldrms(void *argument)
 
   if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   field_type field1, field2, field3;
@@ -91,7 +91,7 @@ void *Fldrms(void *argument)
   field_init(&field2);
   field_init(&field3);
 
-  int lim = vlistGridsizeMax(vlistID1);
+  size_t lim = vlistGridsizeMax(vlistID1);
   field1.ptr    = (double*) Malloc(lim*sizeof(double));
   field1.weight = NULL;
   if ( needWeights )

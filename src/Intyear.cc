@@ -23,13 +23,13 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 
 
-void *Intyear(void *argument)
+void *Intyear(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -37,7 +37,7 @@ void *Intyear(void *argument)
   char filesuffix[32];
   char filename[8192];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("years");
 
@@ -48,16 +48,16 @@ void *Intyear(void *argument)
 
   int *streamIDs = (int*) Malloc(nyears*sizeof(int));
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
   double *array2 = (double*) Malloc(gridsize*sizeof(double));
   double *array3 = (double*) Malloc(gridsize*sizeof(double));
@@ -68,10 +68,10 @@ void *Intyear(void *argument)
   if ( taxisHasBounds(taxisID3) ) taxisDeleteBounds(taxisID3);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  strcpy(filename, cdoStreamName(2)->args);
+  strcpy(filename, cdoGetStreamName(2).c_str());
   int nchars = strlen(filename);
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -81,9 +81,7 @@ void *Intyear(void *argument)
       if ( filesuffix[0] )
 	sprintf(filename+nchars+4, "%s", filesuffix);
 
-      argument_t *fileargument = file_argument_new(filename);
-      streamIDs[iy] = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      streamIDs[iy] = cdoStreamOpenWrite(filename, cdoFiletype());
 
       pstreamDefVlist(streamIDs[iy], vlistID3);
     }
@@ -135,7 +133,7 @@ void *Intyear(void *argument)
 		  double missval1 = vlistInqVarMissval(vlistID1, varID);
 		  double missval2 = vlistInqVarMissval(vlistID2, varID);
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    {
 		      if ( !DBL_IS_EQUAL(array1[i], missval1) &&
 			   !DBL_IS_EQUAL(array2[i], missval2) )
@@ -157,7 +155,7 @@ void *Intyear(void *argument)
 		}
 	      else
 		{
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    array3[i] = array1[i]*fac1 + array2[i]*fac2;
 		}
 

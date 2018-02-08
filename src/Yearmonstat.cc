@@ -24,20 +24,19 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "calendar.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
 
-
-void *Yearmonstat(void *argument)
+void *Yearmonstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID;
-  int i;
   int dpm;
   int year0 = 0, month0 = 0;
   int year, month, day;
@@ -47,7 +46,7 @@ void *Yearmonstat(void *argument)
   double dsets;
   char vdatestr[32], vtimestr[32];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("yearmonmean",  func_mean, 0, NULL);
@@ -57,9 +56,9 @@ void *Yearmonstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -67,7 +66,7 @@ void *Yearmonstat(void *argument)
   taxisWithBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars    = vlistNvars(vlistID1);
@@ -81,7 +80,7 @@ void *Yearmonstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, calendar);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -144,7 +143,7 @@ void *Yearmonstat(void *argument)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] = 0;
 			else
@@ -165,11 +164,11 @@ void *Yearmonstat(void *argument)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			{
 			  samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-			  for ( i = 0; i < gridsize; i++ )
+			  for ( size_t i = 0; i < gridsize; i++ )
 			    samp1[varID][levelID].ptr[i] = dsets;
 			}
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] += dpm;
 		    }

@@ -24,7 +24,7 @@
 #include <string.h>
 #include <time.h>  // time()
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "error.h"
 #include "dmemory.h"
@@ -35,6 +35,16 @@
 
 pipe_t::pipe_t() { pipe_init(); }
 
+
+void pipe_t::close()
+{
+  pthread_mutex_lock(m_mutex);
+  EOP = true;
+  if (CdoDebug::PSTREAM) {MESSAGE(name, " write closed");}
+  pthread_mutex_unlock(m_mutex);
+  pthread_cond_signal(tsDef);
+  pthread_cond_signal(tsInq);
+}
 void
 pipe_t::pipe_init()
 {
@@ -48,8 +58,8 @@ pipe_t::pipe_init()
 #if defined(_POSIX_THREAD_PROCESS_SHARED)
   if ( CdoDebug::PIPE )
     {
-      Message("setpshared mutexattr to PTHREAD_PROCESS_SHARED");
-      Message("setpshared condattr to PTHREAD_PROCESS_SHARED");
+      MESSAGE("setpshared mutexattr to PTHREAD_PROCESS_SHARED");
+      MESSAGE("setpshared condattr to PTHREAD_PROCESS_SHARED");
     }
 
   pthread_mutexattr_setpshared(&m_attr, PTHREAD_PROCESS_SHARED);
@@ -60,19 +70,19 @@ pipe_t::pipe_init()
       int pshared;
       pthread_mutexattr_getpshared(&m_attr, &pshared);
       if ( pshared == PTHREAD_PROCESS_SHARED )
-        Message("getpshared mutexattr is PTHREAD_PROCESS_SHARED");
+        MESSAGE("getpshared mutexattr is PTHREAD_PROCESS_SHARED");
       else if ( pshared == PTHREAD_PROCESS_PRIVATE )
-        Message("getpshared mutexattr is PTHREAD_PROCESS_PRIVATE");
+        MESSAGE("getpshared mutexattr is PTHREAD_PROCESS_PRIVATE");
 
       pthread_condattr_getpshared(&c_attr, &pshared);
       if ( pshared == PTHREAD_PROCESS_SHARED )
-        Message("getpshared condattr is PTHREAD_PROCESS_SHARED");
+        MESSAGE("getpshared condattr is PTHREAD_PROCESS_SHARED");
       else if ( pshared == PTHREAD_PROCESS_PRIVATE )
-        Message("getpshared condattr is PTHREAD_PROCESS_PRIVATE");
+        MESSAGE("getpshared condattr is PTHREAD_PROCESS_PRIVATE");
     }
 #else
   if ( CdoDebug::PIPE )
-    Message("_POSIX_THREAD_PROCESS_SHARED undefined");
+    MeSSAGE("_POSIX_THREAD_PROCESS_SHARED undefined");
 #endif
   */
   EOP = false;
@@ -136,24 +146,24 @@ pipe_t::pipeInqTimestep(int p_tsID)
       if (EOP)
         {
           if (CdoDebug::PIPE)
-            Message("%s EOP", name.c_str());
+            MESSAGE(name.c_str(), " EOP");
           break;
         }
       if (hasdata)
         {
           if (CdoDebug::PIPE)
-            Message("%s has data", name.c_str());
+            MESSAGE(name.c_str()," has data");
           hasdata = false;
           data = NULL;
           readCond.notify_all();
         }
       else if (CdoDebug::PIPE)
-        Message("%s has no data", name.c_str());
+        MESSAGE(name.c_str()," has no data");
 
       recInq.notify_all(); /* o.k. ??? */
 
       if (CdoDebug::PIPE)
-        Message("%s wait of tsDef", name.c_str());
+        MESSAGE(name.c_str()," wait of tsDef");
       tsDef.wait(locked_mutex);
     }
 
@@ -202,7 +212,7 @@ pipe_t::pipeInqVlist(int &p_vlistID)
       time_to_wait += TIMEOUT;
       // fprintf(stderr, "tvsec %g\n", (double) time_to_wait.tv_sec);
       if (CdoDebug::PIPE)
-        Message("%s wait of vlistDef", name.c_str());
+        MESSAGE(name.c_str()," wait of vlistDef" );
       // pthread_cond_wait(pipe->vlistDef, pipe->mutex);
       retcode = vlistDef.wait_for(locked_mutex, time_to_wait);
       // fprintf(stderr, "self %d retcode %d %d %d\n", pstreamptr->self, retcode, processNumsActive(),
@@ -218,7 +228,7 @@ pipe_t::pipeInqVlist(int &p_vlistID)
   if (retcode == std::cv_status::timeout)
     vlistID = p_vlistID;
   else if (CdoDebug::PIPE)
-    Message("%s timeout!", name.c_str());
+    MESSAGE(name.c_str()," timeout!" );
 
   // UNLOCK
 
@@ -251,12 +261,12 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
             }
         }
       if (CdoDebug::PIPE)
-        Message("%s numrecs = %d nvars = %d", name.c_str(), numrecs, vlistNvars(vlistID));
+        MESSAGE(name.c_str(), "numrecs = ",numrecs, "nvars = ",vlistNvars(vlistID));
     }
 
   nrecs = numrecs;
   if (CdoDebug::PIPE)
-    Message("%s numrecs %d p_tsID %d %d %d", name.c_str(), numrecs, p_tsID, tsIDw, tsIDr);
+    MESSAGE(name.c_str()," numrecs ",numrecs," p_tsID ",p_tsID, " " , tsIDw, " " , tsIDr);
   if (numrecs == 0)
     EOP = true;
   m_mutex.unlock();
@@ -272,11 +282,11 @@ pipe_t::pipeDefTimestep(int p_vlistID, int p_tsID)
       if (EOP)
         {
           if (CdoDebug::PIPE)
-            Message("EOP");
+            MESSAGE("EOP");
           break;
         }
       if (CdoDebug::PIPE)
-        Message("%s wait of tsInq (p_tsID %d %d)", name.c_str(), p_tsID, tsIDr);
+        MESSAGE( name.c_str()," wait of tsInq (p_tsID ", p_tsID," ", tsIDr,")");
       tsInq.wait(locked_mutex);
     }
   // UNLOCK
@@ -292,7 +302,7 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
   // LOCK
   m_mutex.lock();
   if (CdoDebug::PIPE)
-    Message("%s has no data %d %d", name.c_str(), recIDr, recIDw);
+    MESSAGE(name.c_str(), " has no data ",recIDr," ", recIDw); 
   if (hasdata || usedata)
     {
       hasdata = false;
@@ -312,18 +322,18 @@ pipe_t::pipeInqRecord(int *p_varID, int *p_levelID)
   recIDr++;
 
   if (CdoDebug::PIPE)
-    Message("%s recID %d %d", name.c_str(), recIDr, recIDw);
+    MESSAGE(name.c_str(), "recID",  recIDr, " ",recIDw);
 
   while (recIDw != recIDr)
     {
       if (EOP)
         {
           if (CdoDebug::PIPE)
-            Message("EOP");
+            MESSAGE("EOP");
           break;
         }
       if (CdoDebug::PIPE)
-        Message("%s wait of recDef", name.c_str());
+        MESSAGE(name.c_str(), "wait for recDef");
       recDef.wait(locked_mutex);
     }
 
@@ -354,7 +364,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
   // LOCK
   m_mutex.lock();
   if (CdoDebug::PIPE)
-    Message("%s has data %d %d", name.c_str(), recIDr, recIDw);
+    MESSAGE(name.c_str(), " has data ",recIDr," ", recIDw); //<- TODO: rethink positioning
   if (hasdata)
     {
       hasdata = false;
@@ -374,7 +384,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
   varID = p_varID;
   levelID = p_levelID;
   if (CdoDebug::PIPE)
-    Message("%s recID %d %d", name.c_str(), recIDr, recIDw);
+    MESSAGE(name.c_str(), "recID",  recIDr, " ",recIDw);
   m_mutex.unlock();
   // UNLOCK
 
@@ -389,7 +399,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
       if (EOP)
         break;
       if (CdoDebug::PIPE)
-        Message("%s wait of recInq %d", name.c_str(), recIDr);
+        MESSAGE(name.c_str(), "wait of recInq ", recIDr);
       recInq.wait(locked_mutex);
     }
   // UNLOCK
@@ -417,7 +427,7 @@ pipe_t::pipeReadPipeRecord(double *p_data, int vlistID, size_t *p_nmiss)
 
 /*
 void
-pipeGetReadTarget(pstream_t *pstreamptr, pstream_t *pstreamptr_in)
+pipeGetReadTarget(PstreamType *pstreamptr, PstreamType *pstreamptr_in)
 {
 
   pstreamptr_in = pstreamptr->pipe->pstreamptr_in;
@@ -452,7 +462,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, size_t *nmiss)
   while (!hasdata)
     {
       if (CdoDebug::PIPE)
-        Message("%s wait of writeCond", name.c_str());
+        MESSAGE(name.c_str()," wait of writeCond");
       writeCond.wait(locked_mutex);
     }
 
@@ -466,7 +476,7 @@ pipe_t::pipeReadRecord(int p_vlistID, double *data, size_t *nmiss)
     }
 
   if (CdoDebug::PIPE)
-    Message("%s read record %d", name.c_str(), recIDr);
+    MESSAGE(name.c_str(), " read record ", recIDr);
 
   hasdata = false;
   data = NULL;
@@ -493,7 +503,7 @@ pipe_t::pipeWriteRecord(double *p_data, size_t p_nmiss)
   writeCond.notify_all();
 
   if (CdoDebug::PIPE)
-    Message("%s write record %d", name.c_str(), recIDw);
+    MESSAGE(name.c_str()," write record ", recIDw);
 
   // LOCK
   std::unique_lock<std::mutex> locked_mutex(m_mutex);
@@ -511,13 +521,17 @@ pipe_t::pipeWriteRecord(double *p_data, size_t p_nmiss)
       if (EOP)
         {
           if (CdoDebug::PIPE)
-            Message("EOP");
+            MESSAGE("EOP");
           break;
         }
       if (CdoDebug::PIPE)
-        Message("%s wait of readCond", name.c_str());
+        MESSAGE(name.c_str()," wait of readCond");
       readCond.wait(locked_mutex);
     }
   // UNLOCK
 }
+void pipe_t::pipeSetName(int processID, int inputIDX)
+{
+    name = "(pipe" + std::to_string(processID + 1) + "." + std::to_string(inputIDX + 1) + ")"; 
+    }
 #endif

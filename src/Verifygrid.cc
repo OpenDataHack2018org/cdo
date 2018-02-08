@@ -20,10 +20,10 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 extern "C" {
 #include "clipping/geometry.h"
 }
@@ -1303,19 +1303,19 @@ void verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids, int n
 }
 
 
-void *Verifygrid(void *argument)
+void *Verifygrid(void *process)
 {
   char units[CDI_MAX_NAME];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int VERIFYGRID = cdoOperatorAdd("verifygrid",  0,   0, NULL);
 
   int operatorID = cdoOperatorID();
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   int ngrids = vlistNgrids(vlistID);
   for ( int gridno = 0; gridno < ngrids; ++gridno )

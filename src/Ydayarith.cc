@@ -25,14 +25,14 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define  MAX_DOY   373
 
-void *Ydayarith(void *argument)
+void *Ydayarith(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -41,7 +41,7 @@ void *Ydayarith(void *argument)
   size_t **varnmiss2[MAX_DOY];
   double **vardata2[MAX_DOY];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("ydayadd", func_add, 0, NULL);
   cdoOperatorAdd("ydaysub", func_sub, 0, NULL);
@@ -51,16 +51,16 @@ void *Ydayarith(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field1);
@@ -73,7 +73,7 @@ void *Ydayarith(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   int nvars = vlistNvars(vlistID2);

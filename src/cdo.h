@@ -18,6 +18,5 @@
 #ifndef _CDO_H
 #define _CDO_H
 
-#include "text.h"
 
 #endif  /* _CDO_H */

@@ -22,17 +22,18 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "par_io.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
 
 
 extern "C" {
 int streamGrbInqDataScanningMode(void);
 }
 
-void *Copy(void *argument)
+void *Copy(void *process)
 {
   bool lconstvars = true;
   int streamID2 = CDI_UNDEFID;
@@ -45,7 +46,7 @@ void *Copy(void *argument)
   void *array = NULL;
   par_io_t parIO;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -67,8 +68,8 @@ void *Copy(void *argument)
 
   if ( operatorID == SZIP )
     {
-      cdoCompType  = CDI_COMPRESS_SZIP;
-      cdoCompLevel = 0;
+      Options::cdoCompType  = CDI_COMPRESS_SZIP;
+      Options::cdoCompLevel = 0;
     }
 
   int streamCnt = cdoStreamCnt();
@@ -77,16 +78,16 @@ void *Copy(void *argument)
   int tsID2 = 0;
   for ( int indf = 0; indf < nfiles; indf++ )
     {
-      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
+      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
 
-      int streamID1 = pstreamOpenRead(cdoStreamName(indf));
+      int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
 
-      int vlistID1 = pstreamInqVlist(streamID1);
+      int vlistID1 = cdoStreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( indf == 0 )
 	{
-	  streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+	  streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
 	  vlistID2 = vlistDuplicate(vlistID1);
 	  taxisID2 = taxisDuplicate(taxisID1);

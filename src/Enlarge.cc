@@ -22,17 +22,17 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Enlarge(void *argument)
+void *Enlarge(void *process)
 {
   int nrecs;
   bool linfo = true;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorCheckArgc(1);
 
@@ -42,9 +42,9 @@ void *Enlarge(void *argument)
 
   if ( cdoVerbose ) fprintf(stderr, "gridID2 %d, xsize2 %zu, ysize2 %zu\n", gridID2, xsize2, ysize2);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -61,7 +61,7 @@ void *Enlarge(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 

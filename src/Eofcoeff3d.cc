@@ -22,15 +22,15 @@
 */
 
 #include "cdi.h"
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
-void *Eofcoeff3d(void * argument)
+void *Eofcoeff3d(void *process)
 {
   char eof_name[16], oname[1024], filesuffix[32];
   double missval1 = -999, missval2 = -999;
@@ -39,17 +39,17 @@ void *Eofcoeff3d(void * argument)
   int nrecs;
   size_t nmiss; 
    
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
   cdoOperatorAdd("eofcoeff3d",  0,  0, NULL);
      
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
   
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   
   //taxisID1 = vlistInqTaxis(vlistID1);  
   int taxisID2 = vlistInqTaxis(vlistID2); 
@@ -70,10 +70,10 @@ void *Eofcoeff3d(void * argument)
   
   if ( gridID1 != gridID2 ) cdoCompareGrids(gridID1, gridID2);
  
-  strcpy(oname, cdoStreamName(2)->args);
+  strcpy(oname, cdoGetObase());
   int nchars = strlen(oname);
   
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
  
@@ -114,7 +114,7 @@ void *Eofcoeff3d(void * argument)
 
   int neof = eofID;  
   
-  if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoStreamName(0)->args, neof);
+  if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoGetStreamName(0).c_str(), neof);
   // Create 1x1 Grid for output
   int gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
@@ -157,9 +157,7 @@ void *Eofcoeff3d(void * argument)
       if ( filesuffix[0] )
         strcat(oname, filesuffix);
       
-      argument_t *fileargument = file_argument_new(oname);
-      streamIDs[eofID] = pstreamOpenWrite(fileargument, cdoFiletype());
-      file_argument_free(fileargument);
+      streamIDs[eofID] = cdoStreamOpenWrite(oname, cdoFiletype());
 
       if (cdoVerbose) 
         cdoPrint("opened %s ('w')  as stream%i for %i. eof", oname, streamIDs[eofID], eofID+1);

@@ -33,9 +33,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define IS_SURFACE_LEVEL(zaxisID)  (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
@@ -153,7 +153,7 @@ int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *
 }
 
 
-void *Vertstat(void *argument)
+void *Vertstat(void *process)
 {
   int nrecs;
   int gridID;
@@ -168,7 +168,7 @@ void *Vertstat(void *argument)
   }
   vert_t;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
                  cdoOperatorAdd("vertrange", func_range, 0, NULL);
@@ -196,9 +196,9 @@ void *Vertstat(void *argument)
 
   //int applyWeights = lmean;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);
@@ -251,10 +251,10 @@ void *Vertstat(void *argument)
 	}
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -341,7 +341,7 @@ void *Vertstat(void *argument)
               if ( lrange )
                 {
                   vars2[varID].nmiss = nmiss;
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     vars2[varID].ptr[i] = vars1[varID].ptr[i];
                 }
 
@@ -366,7 +366,7 @@ void *Vertstat(void *argument)
 		  if ( samp1[varID].ptr == NULL )
 		    samp1[varID].ptr = (double *) Malloc(gridsize*sizeof(double));
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(vars1[varID].ptr[i], vars1[varID].missval) )
 		      samp1[varID].ptr[i] = 0.;
 		    else
@@ -388,11 +388,11 @@ void *Vertstat(void *argument)
 		  if ( samp1[varID].ptr == NULL )
 		    {
 		      samp1[varID].ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			samp1[varID].ptr[i] = vars1[varID].nsamp;
 		    }
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID].missval) )
 		      samp1[varID].ptr[i] += layer_weight;
 		}

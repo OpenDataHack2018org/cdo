@@ -25,9 +25,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define  MAX_HOUR  9301  /* 31*12*25 + 1 */
@@ -58,7 +58,7 @@ int hour_of_year(int vdate, int vtime)
 }
 
 
-void *Yhourarith(void *argument)
+void *Yhourarith(void *process)
 {
   int nrecs, nlev;
   int varID, levelID;
@@ -69,7 +69,7 @@ void *Yhourarith(void *argument)
   size_t **varnmiss2[MAX_HOUR];
   double **vardata2[MAX_HOUR];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   cdoOperatorAdd("yhouradd", func_add, 0, NULL);
   cdoOperatorAdd("yhoursub", func_sub, 0, NULL);
@@ -79,16 +79,16 @@ void *Yhourarith(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field1);
@@ -101,7 +101,7 @@ void *Yhourarith(void *argument)
   int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
   int nvars  = vlistNvars(vlistID2);

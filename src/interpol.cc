@@ -1,8 +1,25 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
 #include "util.h"  /* progressStatus */
+#include "cdoOptions.h"
 
 
 #define  ZERO     0.0
@@ -224,7 +241,7 @@ void intlinarr2(double missval, int lon_is_circular,
 
 #ifdef  HAVE_OPENMP4
 #pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
+  shared(Threading::ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, nlon1, lon_is_circular, grid1_mask)
 #endif
   for ( size_t i = 0; i < gridsize2; ++i )
     {
@@ -469,11 +486,7 @@ void intgridbil(field_type *field1, field_type *field2)
 		 nlon1, nlat1, array1, lon1, lat1,
 		 gridsize2, array2, xvals2, yvals2);
 
-      size_t nmiss = 0;
-      for ( size_t i = 0; i < gridsize2; ++i )
-	if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
-      field2->nmiss = nmiss;
+      field2->nmiss = arrayNumMV(gridsize2, array2, missval);
 
       Free(xvals2);
       Free(yvals2);
@@ -490,14 +503,13 @@ void interpolate(field_type *field1, field_type *field2)
   int i;
   double *lono_array, *lato_array, *lono, *lato;
   double *lon_array, *lat_array, *lon, *lat;
-  //int gridsize_i
-  int gridsize_o;
+  //size_t gridsize_i
+  size_t gridsize_o;
   int gridIDi;
   double *arrayIn;
   int gridIDo;
   double *arrayOut;
   double missval;
-  size_t nmiss;
   long ilon, ilat, nxlon, nxlat, olon, olat;
   long l11, l12, l21, l22, l1, l2;
   double volon1, volon2, volat1, volat2;
@@ -967,11 +979,7 @@ void interpolate(field_type *field1, field_type *field2)
 	}
     }
 
-  nmiss = 0;
-  for ( i = 0; i < gridsize_o; i++ )
-    if ( DBL_IS_EQUAL(arrayOut[i], missval) ) nmiss++;
-
-  field2->nmiss = nmiss;
+  field2->nmiss = arrayNumMV(gridsize_o, arrayOut, missval);
 
   Free(lon_array);
   Free(lat_array);

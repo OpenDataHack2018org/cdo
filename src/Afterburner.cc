@@ -1,3 +1,19 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 /* ============================================================= */
 /*                                                               */
 /* postprocessing program for ECHAM data and ECMWF analysis data */
@@ -17,11 +33,11 @@
 #include <cdi.h>
 
 #if defined(CDO)
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "cdo_task.h"
-#include "pstream_write.h"
-#define  streamOpenWrite          pstreamOpenWrite
+#include "pstream_int.h"
+#define  streamOpenWrite          cdoStreamOpenWrite
 #define  streamDefVlist           pstreamDefVlist
 #define  streamDefTimestep        pstreamDefTimestep
 #endif
@@ -34,6 +50,7 @@
 #include "constants.h"
 #include "compare.h"
 #include "vct_l191.h"
+#include "cdoOptions.h"
 
 #if defined (_OPENMP)
 #include <omp.h>
@@ -2056,8 +2073,8 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   if ( globs->Mean != 2 )
     {
-#if defined(PSTREAM_WRITE_H)
-      globs->ostreamID = streamOpenWrite(cdoStreamName(ofileidx), ofiletype);
+#if defined(CDO)
+      globs->ostreamID = cdoStreamOpenWrite(cdoStreamName(ofileidx), ofiletype);
 #else
       globs->ostreamID = streamOpenWrite(ofile, ofiletype);
       if ( globs->ostreamID < 0 ) cdiError(globs->ostreamID, "Open failed on %s", ofile);
@@ -2196,7 +2213,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   after_control(globs, vars);
 
-#if defined(PSTREAM_WRITE_H)
+#if defined(CDO)
   if ( globs->ostreamID  != CDI_UNDEFID ) pstreamClose(globs->ostreamID);
 #else
   if ( globs->ostreamID2 != CDI_UNDEFID ) streamClose(globs->ostreamID2);
@@ -2204,7 +2221,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 #endif
 #if defined(CDO)
   processDefVarNum(vlistNvars(globs->ivlistID));
-  processAddNvals(streamNvals(globs->istreamID));
+  processSelf().addNvals(streamNvals(globs->istreamID));
 #endif
   streamClose(globs->istreamID);
 
@@ -2403,13 +2420,13 @@ int afterburner(int argc, char *argv[])
 #endif
 
 #if defined(CDO)
-void *Afterburner(void *argument)
+void *Afterburner(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   CDO_task = true;
 
-  lstdout = !cdoSilentMode;
+  lstdout = !Options::silentMode;
 
   struct Control *globs = (struct Control *) Malloc(sizeof(struct Control));
   after_control_init(globs);
@@ -2434,8 +2451,8 @@ void *Afterburner(void *argument)
 
   ofileidx = nfiles;
 
-  ifile = cdoStreamName(0)->args;
-  ofile = cdoStreamName(nfiles)->args;
+  ifile = strdup(cdoGetStreamName(0).c_str());
+  ofile = (char *)cdoGetStreamName(nfiles).c_str();
 
   globs->Nfiles = nfiles-1;
   if ( globs->Nfiles > 0 )
@@ -2445,7 +2462,7 @@ void *Afterburner(void *argument)
 
       ifiles = (char **) Malloc(globs->Nfiles*sizeof(char*));
       for ( int i = 0; i < globs->Nfiles; ++i )
-	ifiles[i] = cdoStreamName(--nfiles)->args;
+	ifiles[i] = (char *)cdoGetStreamName(--nfiles).c_str();
       for ( int i = 0; i < globs->Nfiles; ++i ) printf("files %d %s\n", i+1, ifiles[i]);
     }
 
@@ -2454,6 +2471,7 @@ void *Afterburner(void *argument)
   FreeMean(vars);
 
   Free(globs);
+  Free(ifile);
 
   cdoFinish();
 

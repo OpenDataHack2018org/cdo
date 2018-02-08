@@ -23,9 +23,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "percentiles_hist.h"
 #include "percentiles.h"
 
@@ -33,7 +33,7 @@
 
 int getmonthday(int date);
 
-void *Ydaypctl(void *argument)
+void *Ydaypctl(void *process)
 {
   int varID;
   int gridID;
@@ -49,7 +49,7 @@ void *Ydaypctl(void *argument)
   field_type **vars1[NDAY];
   HISTOGRAM_SET *hsets[NDAY];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
   cdoOperatorAdd("ydaypctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number");
@@ -63,13 +63,13 @@ void *Ydaypctl(void *argument)
       nsets[dayoy] = 0;
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
-  int streamID3 = pstreamOpenRead(cdoStreamName(2));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
+  int streamID3 = cdoStreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
-  int vlistID3 = pstreamInqVlist(streamID3);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
+  int vlistID3 = cdoStreamInqVlist(streamID3);
   int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -84,7 +84,7 @@ void *Ydaypctl(void *argument)
   if ( taxisHasBounds(taxisID4) ) taxisDeleteBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
   int nvars    = vlistNvars(vlistID1);
@@ -93,7 +93,7 @@ void *Ydaypctl(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -103,13 +103,13 @@ void *Ydaypctl(void *argument)
   while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
     {
       if ( nrecs != pstreamInqTimestep(streamID3, tsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
+        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
       
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
       
       if ( vdate != taxisInqVdate(taxisID3) )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
@@ -181,7 +181,7 @@ void *Ydaypctl(void *argument)
       vtimes1[dayoy] = vtime;
       
       if ( vars1[dayoy] == NULL )
-        cdoAbort("No data for day %d in %s and %s", dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args);
+        cdoAbort("No data for day %d in %s and %s", dayoy, cdoGetStreamName(1).c_str(), cdoStreamName(2));
         
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
@@ -209,7 +209,7 @@ void *Ydaypctl(void *argument)
       {
         if ( getmonthday(vdates1[dayoy]) !=  getmonthday(vdates2[dayoy]) )
           cdoAbort("Verification dates for the day %d of %s and %s are different!",
-                   dayoy, cdoStreamName(0)->args, cdoStreamName(1)->args);
+                   dayoy, cdoGetStreamName(0).c_str(), cdoStreamName(1));
         
 	for ( varID = 0; varID < nvars; varID++ )
 	  {

@@ -33,11 +33,13 @@
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 #include "statistic.h"
+#include "timer.h"
+#include "datetime.h"
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
@@ -162,7 +164,7 @@ enum T_WEIGHT_MODE get_weightmode(void)
 }
 
 
-void *EOFs(void * argument)
+void *EOFs(void *process)
 {
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
 
@@ -192,7 +194,7 @@ void *EOFs(void * argument)
       timer_eig  = timer_new("Timeof eig");
     }
   
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("eof",        EOF_,        0, NULL);
@@ -209,8 +211,8 @@ void *EOFs(void * argument)
   enum T_EIGEN_MODE eigen_mode = get_eigenmode();
   enum T_WEIGHT_MODE weight_mode = get_weightmode();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int vlistID1  = pstreamInqVlist(streamID1);
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int vlistID1  = cdoStreamInqVlist(streamID1);
   int taxisID1  = vlistInqTaxis(vlistID1);
   int gridID1   = vlistInqVarGrid(vlistID1, 0);
   size_t gridsize  = vlistGridsizeMax(vlistID1);
@@ -239,8 +241,8 @@ void *EOFs(void * argument)
 
           pstreamClose(streamID1);
 
-          streamID1 = pstreamOpenRead(cdoStreamName(0));
-          vlistID1  = pstreamInqVlist(streamID1);
+          streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+          vlistID1  = cdoStreamInqVlist(streamID1);
           taxisID1  = vlistInqTaxis(vlistID1);
 	}
       else
@@ -435,7 +437,7 @@ void *EOFs(void * argument)
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
   /* eigenvalues */
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int vlistID2 = vlistDuplicate(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -453,7 +455,7 @@ void *EOFs(void * argument)
     vlistChangeGridIndex(vlistID2, i, gridID2);
 
   /*  eigenvectors */
-  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   int vlistID3  = vlistDuplicate(vlistID1);
   int taxisID3  = taxisDuplicate(taxisID1);
@@ -608,9 +610,7 @@ void *EOFs(void * argument)
 		  if      ( grid_space ) scale_eigvec_grid(out, tsID, npack, pack, weight, covar, sum_w);
 		  else if ( time_space ) scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, data, missval, sum_w);
 
-                  nmiss = 0;
-                  for ( size_t i = 0; i < gridsize; i++ ) if ( DBL_IS_EQUAL(out[i], missval) ) nmiss++;
-
+                  nmiss = arrayNumMV(gridsize, out, missval);
                   pstreamDefRecord(streamID3, varID, levelID);
                   pstreamWriteRecord(streamID3, out, nmiss);
 		} // loop n_eig

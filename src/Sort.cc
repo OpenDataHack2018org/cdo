@@ -22,9 +22,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 typedef struct
@@ -145,17 +145,17 @@ void paramToStringLong(int param, char *paramstr, int maxlen)
 }
 
 
-void *Sort(void *argument)
+void *Sort(void *process)
 {
   int varID, levelID, zaxisID;
   int vindex, lindex;
   int nrecs, nlevs, offset;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   double *single;
   int (*cmpvarlev)(const void *, const void *) = cmpvarlevel;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SORTCODE  = cdoOperatorAdd("sortcode",  0, 0, NULL);
@@ -174,9 +174,9 @@ void *Sort(void *argument)
       if ( iarg < 0 ) cmpvarlev = cmpvarlevelrev;
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -191,7 +191,7 @@ void *Sort(void *argument)
       ;
   */
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);

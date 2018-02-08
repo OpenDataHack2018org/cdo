@@ -22,10 +22,11 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "calendar.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "datetime.h"
 
 
 #define MAX_GAPS   64
@@ -208,7 +209,7 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
 }
 
 
-void *Tinfo(void *argument)
+void *Tinfo(void *process)
 {
   int vdate_first = 0, vtime_first = 0;
   int vdate0 = 0, vtime0 = 0;
@@ -231,11 +232,11 @@ void *Tinfo(void *argument)
   int i, len;
   char vdatestr[32], vtimestr[32];	  
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID = pstreamOpenRead(cdoStreamName(0));
+  int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = pstreamInqVlist(streamID);
+  int vlistID = cdoStreamInqVlist(streamID);
 
   fprintf(stdout, "\n");
 

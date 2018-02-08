@@ -21,13 +21,13 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 
 
-void *Histogram(void *argument)
+void *Histogram(void *process)
 {
   int nrecs, varID, levelID;
   size_t nmiss;
@@ -35,7 +35,7 @@ void *Histogram(void *argument)
   int nlevel, zaxisID;
   double missval;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int HISTCOUNT = cdoOperatorAdd("histcount", 0, 0, NULL);
@@ -62,9 +62,9 @@ void *Histogram(void *argument)
 	printf("flt %d = %g\n", i+1, fltarr[i]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
   int vlistID2 = vlistDuplicate(vlistID1);
@@ -93,7 +93,7 @@ void *Histogram(void *argument)
       vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
@@ -106,7 +106,7 @@ void *Histogram(void *argument)
   double **vartcount = (double **) Malloc(nvars*sizeof(double *));
   for ( varID = 0; varID < nvars; varID++ )
     {
-      int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
       vardata[varID]  = (double*) Malloc(nbins*gridsize*sizeof(double));
       varcount[varID] = (double*) Malloc(nbins*gridsize*sizeof(double));
       vartcount[varID] = (double*) Malloc(gridsize*sizeof(double));
@@ -115,7 +115,7 @@ void *Histogram(void *argument)
       memset(vartcount[varID], 0, gridsize*sizeof(double));
     }
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID1 = 0;
@@ -132,7 +132,7 @@ void *Histogram(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
 	  nmiss=0;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      if ( !DBL_IS_EQUAL(array[i], missval) )
 		{
@@ -174,7 +174,7 @@ void *Histogram(void *argument)
 	  nmiss = 0;
 	  offset = gridsize*index;
 
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    {
 	      if ( vartcount[varID][i] > 0 )
 		{

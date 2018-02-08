@@ -107,10 +107,10 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcdo_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
-am_libcdo_la_OBJECTS = libcdo_la-argument.lo libcdo_la-array.lo \
-	libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
-	libcdo_la-cdo_getopt.lo libcdo_la-cdo_task.lo \
-	libcdo_la-cdo_history.lo libcdo_la-cdo_read.lo \
+am_libcdo_la_OBJECTS = libcdo_la-array.lo libcdo_la-cdo_pthread.lo \
+	libcdo_la-cdo_vlist.lo libcdo_la-cdo_getopt.lo \
+	libcdo_la-cdo_task.lo libcdo_la-cdo_history.lo \
+	libcdo_la-cdo_read.lo libcdo_la-cdoOptions.lo \
 	libcdo_la-cmortable_parser.lo libcdo_la-after_sptrans.lo \
 	libcdo_la-after_fctrans.lo libcdo_la-after_dvtrans.lo \
 	libcdo_la-after_vertint.lo libcdo_la-after_namelist.lo \
@@ -141,7 +141,8 @@ am_libcdo_la_OBJECTS = libcdo_la-argument.lo libcdo_la-array.lo \
 	libcdo_la-par_io.lo libcdo_la-parse_literal.lo \
 	libcdo_la-percentiles_hist.lo libcdo_la-percentiles.lo \
 	libcdo_la-pipe.lo libcdo_la-pmlist.lo libcdo_la-sellist.lo \
-	libcdo_la-process.lo libcdo_la-pstream.lo \
+	libcdo_la-process.lo libcdo_la-process_int.lo \
+	libcdo_la-pstream.lo libcdo_la-pstream_int.lo \
 	libcdo_la-pthread_debug.lo libcdo_la-readline.lo \
 	libcdo_la-realtime.lo libcdo_la-remaplib.lo \
 	libcdo_la-remapsort.lo libcdo_la-remap_scrip_io.lo \
@@ -154,8 +155,11 @@ am_libcdo_la_OBJECTS = libcdo_la-argument.lo libcdo_la-array.lo \
 	libcdo_la-remap_bilinear_scrip.lo libcdo_la-stdnametable.lo \
 	libcdo_la-specspace.lo libcdo_la-statistic.lo \
 	libcdo_la-table.lo libcdo_la-text.lo libcdo_la-timer.lo \
-	libcdo_la-util.lo libcdo_la-zaxis_print.lo libcdo_la-zaxis.lo \
-	json/libcdo_la-jsmn.lo kdtreelib/libcdo_la-kdtree_cartesian.lo \
+	libcdo_la-util.lo libcdo_la-util_files.lo \
+	libcdo_la-util_fileextensions.lo libcdo_la-util_string.lo \
+	libcdo_la-util_wildcards.lo libcdo_la-zaxis_print.lo \
+	libcdo_la-zaxis.lo json/libcdo_la-jsmn.lo \
+	kdtreelib/libcdo_la-kdtree_cartesian.lo \
 	kdtreelib/libcdo_la-kdtree_common.lo \
 	kdtreelib/libcdo_la-kdtree_spherical.lo \
 	kdtreelib/libcdo_la-qsort.lo kdtreelib/libcdo_la-pmergesort.lo \
@@ -541,47 +545,52 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libcdo.la
-libcdo_la_SOURCES = argument.h argument.cc array.h array.cc cdo_int.h \
-	compare.h cfortran.h libncl.h cfortran.h cf_interface.h \
-	cdo_pthread.cc cdo_vlist.cc cdo_getopt.cc cdo_getopt.h \
-	cdo_task.cc cdo_task.h cdo_history.cc cdo_read.cc cdi_uuid.h \
-	cmortable_parser.cc after_sptrans.cc after_fctrans.cc \
-	after_dvtrans.cc after_vertint.cc after_vertint.h \
-	after_namelist.cc afterburnerlib.cc afterburner.h vct_l191.h \
-	calendar.h constants.h constants.cc color.cc color.h \
-	commandline.cc const.h convert_units.cc convert_units.h \
+libcdo_la_SOURCES = array.h array.cc cdo_int.h compare.h cfortran.h \
+	libncl.h cfortran.h cf_interface.h cdo_pthread.cc cdo_vlist.cc \
+	cdo_vlist.h cdo_getopt.cc cdo_getopt.h cdo_task.cc cdo_task.h \
+	cdo_history.cc cdo_history.h cdo_read.cc cdi_uuid.h \
+	cdoOptions.h cdoOptions.cc cmortable_parser.cc \
+	after_sptrans.cc after_fctrans.cc after_dvtrans.cc \
+	after_vertint.cc after_vertint.h after_namelist.cc \
+	afterburnerlib.cc afterburner.h vct_l191.h calendar.h \
+	constants.h constants.cc color.cc color.h commandline.cc \
+	commandline.h const.h convert_units.cc convert_units.h \
 	counter.h datetime.cc datetime.h cdoDebugOutput.cc \
 	cdoDebugOutput.h dmemory.h ecacore.cc ecacore.h ecautil.cc \
-	ecautil.h error.h etopo.h temp.h mask.h exception.cc expr.cc \
-	expr.h expr_fun.cc expr_fun.h expr_lex.cc expr_yacc.cc \
-	expr_yacc.h features.cc field.cc field.h field2.cc fieldc.cc \
-	fieldmem.cc fieldmer.cc fieldzon.cc functs.h getMemorySize.c \
-	getRSS.c gradsdeslib.cc gradsdeslib.h grid.cc grid.h \
-	grid_proj.cc grid_proj.h grid_area.cc grid_define.cc \
-	grid_gme.cc grid_rot.cc grid_from_name.cc grid_read.cc \
-	grid_read_pingo.cc grid_print.cc gridreference.cc griddes.cc \
-	griddes.h griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
-	institution.cc interpol.cc interpol.h job.cc juldate.cc \
-	grid_search.cc grid_search.h listarray.cc listarray.h list.cc \
-	list.h listbuf.cc listbuf.h merge_sort2.cc merge_sort2.h \
-	modules.cc modules.h module_definitions.h namelist.cc \
-	namelist.h namelist_parser.cc nanoflann.hpp normal.cc \
-	nth_element.cc nth_element.h operator_definitions.h \
+	ecautil.h error.h etopo.h temp.h mask.h exception.cc \
+	exception.h expr.cc expr.h expr_fun.cc expr_fun.h expr_lex.cc \
+	expr_yacc.cc expr_yacc.h features.cc field.cc field.h \
+	field2.cc fieldc.cc fieldmem.cc fieldmer.cc fieldzon.cc \
+	functs.h getMemorySize.c getRSS.c gradsdeslib.cc gradsdeslib.h \
+	grid.cc grid.h grid_proj.cc grid_proj.h grid_area.cc \
+	grid_define.cc grid_gme.cc grid_rot.cc grid_from_name.cc \
+	grid_read.cc grid_read_pingo.cc grid_print.cc gridreference.cc \
+	griddes.cc griddes.h griddes_h5.cc griddes_nc.cc hetaeta.cc \
+	hetaeta.h institution.cc interpol.cc interpol.h job.cc \
+	juldate.cc grid_search.cc grid_search.h listarray.cc \
+	listarray.h list.cc list.h listbuf.cc listbuf.h merge_sort2.cc \
+	merge_sort2.h modules.cc modules.h module_definitions.h \
+	namelist.cc namelist.h namelist_parser.cc nanoflann.hpp \
+	normal.cc nth_element.cc nth_element.h operator_definitions.h \
 	operator_help.h par_io.cc par_io.h parse_literal.cc \
 	percentiles_hist.cc percentiles_hist.h percentiles.cc \
 	percentiles.h pipe.cc pipe.h pmlist.cc pmlist.h sellist.cc \
-	sellist.h printinfo.h process.cc process.h pstream.cc \
-	pstream.h pstream_write.h pstream_int.h pthread_debug.cc \
-	pthread_debug.h readline.cc realtime.cc remap.h remaplib.cc \
-	remapsort.cc remap_scrip_io.cc remap_search_reg2d.cc \
+	sellist.h printinfo.h process.cc process.h process_int.cc \
+	process_int.h pstream.cc pstream.h pstream_int.cc \
+	pstream_int.h pstream_write.h pthread_debug.cc pthread_debug.h \
+	readline.cc realtime.cc remap.h remaplib.cc remapsort.cc \
+	remap_scrip_io.cc remap_search_reg2d.cc \
 	remap_search_latbins.cc remap_store_link.cc remap_store_link.h \
 	remap_store_link_cnsrv.cc remap_store_link_cnsrv.h \
 	remap_conserv.cc remap_conserv_scrip.cc remap_distwgt.cc \
 	remap_bicubic_scrip.cc remap_bilinear_scrip.cc stdnametable.cc \
 	stdnametable.h specspace.cc specspace.h statistic.cc \
 	statistic.h table.cc text.cc text.h timebase.h timer.cc \
-	util.cc util.h varlist.h zaxis_print.cc zaxis.cc json/jsmn.h \
-	json/jsmn.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.cc \
+	timer.h util.cc util.h util_files.cc util_files.h \
+	util_fileextensions.cc util_fileextensions.h util_string.cc \
+	util_string.h util_wildcards.cc util_wildcards.h varlist.h \
+	zaxis_print.cc zaxis.cc json/jsmn.h json/jsmn.c \
+	kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.cc \
 	kdtreelib/kdtree_common.cc kdtreelib/kdtree_spherical.cc \
 	kdtreelib/qsort.cc kdtreelib/pmergesort.cc kdtreelib/pqueue.cc \
 	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
@@ -1049,9 +1058,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-after_sptrans.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-after_vertint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-afterburnerlib.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-argument.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-array.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdoDebugOutput.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdoOptions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_getopt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_pthread.Plo@am__quote@
@@ -1117,7 +1126,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pipe.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pmlist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-process.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-process_int.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pstream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pstream_int.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pthread_debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-readline.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-realtime.Plo@am__quote@
@@ -1141,6 +1152,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-text.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util_fileextensions.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util_files.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util_wildcards.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis_print.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-area.Plo@am__quote@
@@ -1268,13 +1283,6 @@ clipping/libcdo_la-utils.lo: clipping/utils.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
 
-libcdo_la-argument.lo: argument.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-argument.lo -MD -MP -MF $(DEPDIR)/libcdo_la-argument.Tpo -c -o libcdo_la-argument.lo `test -f 'argument.cc' || echo '$(srcdir)/'`argument.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-argument.Tpo $(DEPDIR)/libcdo_la-argument.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='argument.cc' object='libcdo_la-argument.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-argument.lo `test -f 'argument.cc' || echo '$(srcdir)/'`argument.cc
-
 libcdo_la-array.lo: array.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-array.lo -MD -MP -MF $(DEPDIR)/libcdo_la-array.Tpo -c -o libcdo_la-array.lo `test -f 'array.cc' || echo '$(srcdir)/'`array.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-array.Tpo $(DEPDIR)/libcdo_la-array.Plo
@@ -1323,6 +1331,13 @@ libcdo_la-cdo_read.lo: cdo_read.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cdo_read.cc' object='libcdo_la-cdo_read.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-cdo_read.lo `test -f 'cdo_read.cc' || echo '$(srcdir)/'`cdo_read.cc
+
+libcdo_la-cdoOptions.lo: cdoOptions.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-cdoOptions.lo -MD -MP -MF $(DEPDIR)/libcdo_la-cdoOptions.Tpo -c -o libcdo_la-cdoOptions.lo `test -f 'cdoOptions.cc' || echo '$(srcdir)/'`cdoOptions.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-cdoOptions.Tpo $(DEPDIR)/libcdo_la-cdoOptions.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cdoOptions.cc' object='libcdo_la-cdoOptions.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-cdoOptions.lo `test -f 'cdoOptions.cc' || echo '$(srcdir)/'`cdoOptions.cc
 
 libcdo_la-cmortable_parser.lo: cmortable_parser.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-cmortable_parser.lo -MD -MP -MF $(DEPDIR)/libcdo_la-cmortable_parser.Tpo -c -o libcdo_la-cmortable_parser.lo `test -f 'cmortable_parser.cc' || echo '$(srcdir)/'`cmortable_parser.cc
@@ -1779,12 +1794,26 @@ libcdo_la-process.lo: process.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-process.lo `test -f 'process.cc' || echo '$(srcdir)/'`process.cc
 
+libcdo_la-process_int.lo: process_int.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-process_int.lo -MD -MP -MF $(DEPDIR)/libcdo_la-process_int.Tpo -c -o libcdo_la-process_int.lo `test -f 'process_int.cc' || echo '$(srcdir)/'`process_int.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-process_int.Tpo $(DEPDIR)/libcdo_la-process_int.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='process_int.cc' object='libcdo_la-process_int.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-process_int.lo `test -f 'process_int.cc' || echo '$(srcdir)/'`process_int.cc
+
 libcdo_la-pstream.lo: pstream.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-pstream.lo -MD -MP -MF $(DEPDIR)/libcdo_la-pstream.Tpo -c -o libcdo_la-pstream.lo `test -f 'pstream.cc' || echo '$(srcdir)/'`pstream.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-pstream.Tpo $(DEPDIR)/libcdo_la-pstream.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='pstream.cc' object='libcdo_la-pstream.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-pstream.lo `test -f 'pstream.cc' || echo '$(srcdir)/'`pstream.cc
+
+libcdo_la-pstream_int.lo: pstream_int.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-pstream_int.lo -MD -MP -MF $(DEPDIR)/libcdo_la-pstream_int.Tpo -c -o libcdo_la-pstream_int.lo `test -f 'pstream_int.cc' || echo '$(srcdir)/'`pstream_int.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-pstream_int.Tpo $(DEPDIR)/libcdo_la-pstream_int.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='pstream_int.cc' object='libcdo_la-pstream_int.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-pstream_int.lo `test -f 'pstream_int.cc' || echo '$(srcdir)/'`pstream_int.cc
 
 libcdo_la-pthread_debug.lo: pthread_debug.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-pthread_debug.lo -MD -MP -MF $(DEPDIR)/libcdo_la-pthread_debug.Tpo -c -o libcdo_la-pthread_debug.lo `test -f 'pthread_debug.cc' || echo '$(srcdir)/'`pthread_debug.cc
@@ -1939,6 +1968,34 @@ libcdo_la-util.lo: util.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util.cc' object='libcdo_la-util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-util.lo `test -f 'util.cc' || echo '$(srcdir)/'`util.cc
+
+libcdo_la-util_files.lo: util_files.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-util_files.lo -MD -MP -MF $(DEPDIR)/libcdo_la-util_files.Tpo -c -o libcdo_la-util_files.lo `test -f 'util_files.cc' || echo '$(srcdir)/'`util_files.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-util_files.Tpo $(DEPDIR)/libcdo_la-util_files.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util_files.cc' object='libcdo_la-util_files.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-util_files.lo `test -f 'util_files.cc' || echo '$(srcdir)/'`util_files.cc
+
+libcdo_la-util_fileextensions.lo: util_fileextensions.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-util_fileextensions.lo -MD -MP -MF $(DEPDIR)/libcdo_la-util_fileextensions.Tpo -c -o libcdo_la-util_fileextensions.lo `test -f 'util_fileextensions.cc' || echo '$(srcdir)/'`util_fileextensions.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-util_fileextensions.Tpo $(DEPDIR)/libcdo_la-util_fileextensions.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util_fileextensions.cc' object='libcdo_la-util_fileextensions.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-util_fileextensions.lo `test -f 'util_fileextensions.cc' || echo '$(srcdir)/'`util_fileextensions.cc
+
+libcdo_la-util_string.lo: util_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-util_string.lo -MD -MP -MF $(DEPDIR)/libcdo_la-util_string.Tpo -c -o libcdo_la-util_string.lo `test -f 'util_string.cc' || echo '$(srcdir)/'`util_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-util_string.Tpo $(DEPDIR)/libcdo_la-util_string.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util_string.cc' object='libcdo_la-util_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-util_string.lo `test -f 'util_string.cc' || echo '$(srcdir)/'`util_string.cc
+
+libcdo_la-util_wildcards.lo: util_wildcards.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-util_wildcards.lo -MD -MP -MF $(DEPDIR)/libcdo_la-util_wildcards.Tpo -c -o libcdo_la-util_wildcards.lo `test -f 'util_wildcards.cc' || echo '$(srcdir)/'`util_wildcards.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-util_wildcards.Tpo $(DEPDIR)/libcdo_la-util_wildcards.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='util_wildcards.cc' object='libcdo_la-util_wildcards.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-util_wildcards.lo `test -f 'util_wildcards.cc' || echo '$(srcdir)/'`util_wildcards.cc
 
 libcdo_la-zaxis_print.lo: zaxis_print.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-zaxis_print.lo -MD -MP -MF $(DEPDIR)/libcdo_la-zaxis_print.Tpo -c -o libcdo_la-zaxis_print.lo `test -f 'zaxis_print.cc' || echo '$(srcdir)/'`zaxis_print.cc

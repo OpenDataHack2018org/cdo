@@ -1,4 +1,20 @@
 /*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+/*
   This file is a extension of CDO.
   Created by M. Koutek, 2012, KNMI (NL)
 
@@ -28,9 +44,10 @@
 */
 
 #include <cdi.h>
+
 #include "cdoDebugOutput.h"
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
 
 
@@ -203,7 +220,7 @@ void *DestaggerUV()
   double *ivar = NULL, *ovar = NULL;
   double dxU = 0, dyU = 0, dxV = 0, dyV = 0;
 
-  //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
+  //Note: Already initialized by the caller! Don't call again: cdoInitialize(process);
 
   operatorInputArg("Pair of u and v in the staggered system:\n\
     Usage: uvDestag,u,v -or- uvDestag,33,34 -or- uvDestag,u,v,-0.5,-0.5 -or- uvDestag,33,34,-0.5,-0.5\n \
@@ -239,9 +256,9 @@ void *DestaggerUV()
 
   if ( CdoDebug::cdoDebugExt ) cdoPrint("destagGridOffsets = (%01.1f,%01.1f)", destagGridOffsets[0],destagGridOffsets[1]);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -464,7 +481,7 @@ void *DestaggerUV()
       ovar = (double *) Malloc(gridsize*sizeof(double));
     } // end of  if (!lcopy)
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   if ( varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID )
     {
@@ -474,7 +491,7 @@ void *DestaggerUV()
 
   pstreamDefVlist(streamID2, vlistID2);  // from this point the stream is using a different vlistID !!!!!
 
-  vlistID2 = pstreamInqVlist(streamID2); // refresh it
+  vlistID2 = cdoStreamInqVlist(streamID2); // refresh it
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -1084,7 +1101,7 @@ void *TransformUV(int operatorID)
   int gridIDcurvl = -1;
   int gridIDlastused = -1;
 
-  //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
+  //Note: Already initialized by the caller! Don't call again: cdoInitialize(process);
 
   operatorInputArg("Pairs of u and v in the rotated system;\n usage:  rotuvNorth,u,v  -or- rotuvNorth,33,34");
 
@@ -1113,9 +1130,9 @@ void *TransformUV(int operatorID)
 	chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
@@ -1200,10 +1217,10 @@ void *TransformUV(int operatorID)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
-  vlistID2 = pstreamInqVlist(streamID2); // refresh it
+  vlistID2 = cdoStreamInqVlist(streamID2); // refresh it
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -1346,12 +1363,12 @@ void *TransformUV(int operatorID)
                                 gridInqParamRLL(gridID, &xpole, &ypole, &angle);
                               
                               cdoPrint("GRID_PROJECTION(id: %d) && CDI_PROJ_RLL:",gridID);
-                              cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridID), gridInqYsize(gridID));
+                              cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridID), gridInqYsize(gridID));
                               cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridID, 0), gridInqYval(gridID, 0));
                               cdoPrint("grid Xinc   %4.3f, grid Yinc   %4.3f", gridInqXinc(gridID),gridInqYinc(gridID));
                               cdoPrint("grid Xpole   %4.3f, grid Ypole   %4.3f", xpole, ypole);
                               cdoPrint("GRID_CURVILINEAR (id: %d):",gridIDcurvl);
-                              cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
+                              cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
                               cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
                               cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) -1), gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) -1));
                               if ( CdoDebug::cdoDebugExt>=20 )
@@ -1452,9 +1469,9 @@ void *TransformUV(int operatorID)
 }
 
 
-void *WindTrans(void *argument)
+void *WindTrans(void *process)
 {
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   UVDESTAG     = cdoOperatorAdd("uvDestag",  0, 0, NULL);

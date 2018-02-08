@@ -23,20 +23,20 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Setgatt(void *argument)
+void *Setgatt(void *process)
 {
   int nrecs;
   int varID, levelID;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   char *attname = NULL, *attstring = NULL, *attfile = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int SETGATT  = cdoOperatorAdd("setgatt",  0, 0, "attribute name and string");
                  cdoOperatorAdd("setgatts", 0, 0, NULL);
@@ -54,16 +54,16 @@ void *Setgatt(void *argument)
       attfile   = operatorArgv()[0];
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   if ( operatorID == SETGATT )
     {

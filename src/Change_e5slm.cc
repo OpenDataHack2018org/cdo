@@ -22,30 +22,30 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Change_e5slm(void *argument)
+void *Change_e5slm(void *process)
 {
   char name[CDI_MAX_NAME];
   int nrecs;
   int varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int taxisID1 = vlistInqTaxis(vlistID1);
 
   int vlistID2 = vlistDuplicate(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   /* get filename of SLM */
@@ -54,11 +54,9 @@ void *Change_e5slm(void *argument)
   const char *fn_slm = operatorArgv()[0];
 
   /* read SLM */
-  argument_t *fileargument = file_argument_new(fn_slm);
-  int streamIDslm = pstreamOpenRead(fileargument);
-  file_argument_free(fileargument);
+  int streamIDslm = streamOpenRead(fn_slm);
 
-  int vlistIDslm = pstreamInqVlist(streamIDslm);
+  int vlistIDslm = streamInqVlist(streamIDslm);
 
   size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
 
@@ -66,10 +64,10 @@ void *Change_e5slm(void *argument)
   double *cland = (double*) Malloc(gridsize*sizeof(double));
   bool *lsea  = (bool*) Malloc(gridsize*sizeof(bool));
 
-  pstreamInqTimestep(streamIDslm, 0);
+  streamInqTimestep(streamIDslm, 0);
 
-  pstreamInqRecord(streamIDslm, &varID, &levelID);
-  pstreamReadRecord(streamIDslm, cland, &nmiss);
+  streamInqRecord(streamIDslm, &varID, &levelID);
+  streamReadRecord(streamIDslm, cland, &nmiss);
 
   if ( nmiss > 0 ) cdoAbort("SLM with missing values are unsupported!");
 
@@ -78,7 +76,7 @@ void *Change_e5slm(void *argument)
   if ( minval < 0 || maxval > 1 )
     cdoWarning("Values of SLM out of bounds! (minval=%g, maxval=%g)", minval , maxval);
 
-  pstreamClose(streamIDslm);
+  streamClose(streamIDslm);
 
   for ( size_t i = 0; i < gridsize; ++i ) lsea[i] = !(cland[i] > 0);
 

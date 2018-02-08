@@ -24,13 +24,13 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 
 
-void *Replacevalues(void *argument)
+void *Replacevalues(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -41,7 +41,7 @@ void *Replacevalues(void *argument)
   double rmin = 0, rmax = 0;
   double newval = 0, newval2 = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   int SETVALS  = cdoOperatorAdd("setvals",  0, 0, "I1,O1,...,In,On");
@@ -77,20 +77,20 @@ void *Replacevalues(void *argument)
       newval2 = parameter2double(operatorArgv()[3]);
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
@@ -110,7 +110,7 @@ void *Replacevalues(void *argument)
 
 	  if ( operatorID == SETVALS )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    /* printf("\nelem %d val %f ",i,array[i]); */
@@ -127,7 +127,7 @@ void *Replacevalues(void *argument)
 	    }
 	  else if ( operatorID == SETRTOC )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    if ( array[i] >= rmin && array[i] <= rmax)
@@ -136,7 +136,7 @@ void *Replacevalues(void *argument)
 	    }
 	  else if ( operatorID == SETRTOC2 )
 	    {
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    if ( array[i] >= rmin && array[i] <= rmax )

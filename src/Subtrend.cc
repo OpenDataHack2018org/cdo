@@ -23,25 +23,25 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
-void *Subtrend(void *argument)
+void *Subtrend(void *process)
 {
   int gridID, varID, levelID;
   size_t nmiss;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
-  int streamID2 = pstreamOpenRead(cdoStreamName(1));
-  int streamID3 = pstreamOpenRead(cdoStreamName(2));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
+  int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
+  int streamID3 = cdoStreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
-  int vlistID2 = pstreamInqVlist(streamID2);
-  int vlistID3 = pstreamInqVlist(streamID3);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int vlistID2 = cdoStreamInqVlist(streamID2);
+  int vlistID3 = cdoStreamInqVlist(streamID3);
   int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_DIM);
@@ -51,10 +51,10 @@ void *Subtrend(void *argument)
   int taxisID4 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field4;
   field_init(&field1);
@@ -102,13 +102,10 @@ void *Subtrend(void *argument)
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 	  double missval1 = missval;
 	  double missval2 = missval;
-	  for ( int i = 0; i < gridsize; i++ )
+	  for ( size_t i = 0; i < gridsize; i++ )
 	    field4.ptr[i] = SUBMN(field1.ptr[i], ADDMN(vars2[varID][levelID].ptr[i], MULMN(vars3[varID][levelID].ptr[i], tsID)));
     
-	  nmiss = 0;
-	  for ( int i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(field4.ptr[i], missval) ) nmiss++;
-
+	  nmiss = arrayNumMV(gridsize, field4.ptr, missval);
 	  pstreamDefRecord(streamID4, varID, levelID);
 	  pstreamWriteRecord(streamID4, field4.ptr, nmiss);
 	}

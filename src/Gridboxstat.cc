@@ -32,10 +32,11 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
+#include "cdoOptions.h"
 
 
 static
@@ -456,8 +457,8 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
   */
 
   size_t gridsize = xinc*yinc;
-  field_type *field = (field_type*) Malloc(ompNumThreads*sizeof(field_type));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  field_type *field = (field_type*) Malloc(Threading::ompNumThreads*sizeof(field_type));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       field[i].size    = gridsize;
       field[i].ptr     = (double*) Malloc(gridsize*sizeof(double));
@@ -518,13 +519,9 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
       field2->ptr[ig] = fldfun(field[ompthID], statfunc);
     }
   
-  size_t nmiss = 0;
-  for ( size_t i = 0; i < nlat2*nlon2; i++ )
-    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+  field2->nmiss = arrayNumMV(nlat2*nlon2, array2, missval);
   
-  field2->nmiss = nmiss;
-  
-  for ( int i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       if ( field[i].ptr    ) Free(field[i].ptr);
       if ( field[i].weight ) Free(field[i].weight);
@@ -534,7 +531,7 @@ void gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yin
 }
 
 
-void *Gridboxstat(void *argument)
+void *Gridboxstat(void *process)
 {
   int lastgrid = -1;
   int nrecs;
@@ -542,7 +539,7 @@ void *Gridboxstat(void *argument)
   bool wstatus = false;
   char varname[CDI_MAX_NAME];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("xinc, yinc");
   operatorCheckArgc(2);
@@ -566,9 +563,9 @@ void *Gridboxstat(void *argument)
   int operfunc = cdoOperatorF1(operatorID);
   bool needWeights = cdoOperatorF2(operatorID) != 0;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -586,7 +583,7 @@ void *Gridboxstat(void *argument)
   for ( int index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   field_type field1, field2;

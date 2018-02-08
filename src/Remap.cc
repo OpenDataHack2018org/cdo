@@ -38,11 +38,13 @@
 #include <algorithm>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "remap.h"
 #include "grid.h"
+#include "cdoOptions.h"
+#include "timer.h"
 
 
 enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
@@ -267,7 +269,7 @@ void get_remap_env(void)
     }
 
 #ifdef  _OPENMP
-  sort_mode = (ompNumThreads == 1) ? HEAP_SORT : MERGE_SORT;
+  sort_mode = (Threading::ompNumThreads == 1) ? HEAP_SORT : MERGE_SORT;
 #endif
 
   envstr = getenv("REMAP_SORT_MODE");
@@ -731,7 +733,7 @@ void sort_remap_add(remapvars_t *remapvars)
       */   
       sort_iter(remapvars->num_links, remapvars->num_wts,
 		remapvars->tgt_cell_add, remapvars->src_cell_add,
-		remapvars->wts, ompNumThreads);
+		remapvars->wts, Threading::ompNumThreads);
     }
   else
     { /* use a pure heap sort without any support of parallelism */
@@ -888,11 +890,11 @@ void *Remap(void *argument)
 
   if ( gridInqType(gridID2) == GRID_GENERIC ) cdoAbort("Unsupported target grid type (generic)!");
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int filetype = pstreamInqFiletype(streamID1);
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -1003,7 +1005,7 @@ void *Remap(void *argument)
 
   if ( ! writeRemapWeightsOnly )
     {
-      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+      streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
       pstreamDefVlist(streamID2, vlistID2);
     }
 
@@ -1232,7 +1234,7 @@ void *Remap(void *argument)
  WRITE_REMAP:
  
   if ( writeRemapWeightsOnly ) 
-    write_remap_scrip(cdoStreamName(1)->args, mapType, submapType, numNeighbors, remap_order,
+    write_remap_scrip(cdoGetStreamName(1).c_str(), mapType, submapType, numNeighbors, remap_order,
 		      remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars);
 
   pstreamClose(streamID1);

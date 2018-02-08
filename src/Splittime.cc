@@ -25,9 +25,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 #include <time.h>
 
@@ -52,7 +52,7 @@ struct tm datetime_to_tm(int date, int time)
   return stime;
 }
 
-void *Splittime(void *argument)
+void *Splittime(void *process)
 {
   int streamID2;
   int varID;
@@ -60,7 +60,7 @@ void *Splittime(void *argument)
   int levelID;
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   int index = 0;
-  int gridsize;
+  size_t gridsize;
   size_t nmiss;
   int gridID;
   int nlevel;
@@ -70,7 +70,7 @@ void *Splittime(void *argument)
   field_type **vars = NULL;
   const char *format = NULL;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
@@ -101,19 +101,19 @@ void *Splittime(void *argument)
   for ( int i = 0; i < MAX_STREAMS; i++ ) streamIDs[i] = -1;
   for ( int i = 0; i < MAX_STREAMS; i++ ) tsIDs[i] = 0;
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  strcpy(filename, cdoStreamName(1)->args);
+  strcpy(filename, cdoGetStreamName(1).c_str());
   int nchars = strlen(filename);
 
-  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -205,9 +205,7 @@ void *Splittime(void *argument)
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
-	  argument_t *fileargument = file_argument_new(filename);
-	  streamID2 = pstreamOpenWrite(fileargument, cdoFiletype());
-	  file_argument_free(fileargument);
+	  streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
 
 	  pstreamDefVlist(streamID2, vlistID2);
 

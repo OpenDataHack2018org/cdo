@@ -32,11 +32,13 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "cdo_task.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "percentiles.h"
+#include "cdoOptions.h"
+#include "util_files.h"
 
 
 typedef struct
@@ -72,7 +74,7 @@ typedef struct
 static
 void *ensstat_func(void *ensarg)
 {
-  if ( CDO_task ) cdo_omp_set_num_threads(ompNumThreads);
+  if ( CDO_task ) cdo_omp_set_num_threads(Threading::ompNumThreads);
 
   ensstat_arg_t *arg = (ensstat_arg_t*) ensarg;
   int t = arg->t;
@@ -84,14 +86,14 @@ void *ensstat_func(void *ensarg)
   for ( int fileID = 0; fileID < nfiles; fileID++ ) if ( ef[fileID].nmiss[t] > 0 ) lmiss = true;
 
   int gridID = vlistInqVarGrid(arg->vlistID1, arg->varID[t]);
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   double missval = vlistInqVarMissval(arg->vlistID1, arg->varID[t]);
 
   size_t nmiss = 0;
 #ifdef  HAVE_OPENMP4
 #pragma omp parallel for default(shared)  reduction(+:nmiss)
 #endif
-  for ( int i = 0; i < gridsize; ++i )
+  for ( size_t i = 0; i < gridsize; ++i )
     {
       int ompthID = cdo_omp_get_thread_num();
 
@@ -127,13 +129,13 @@ void *ensstat_func(void *ensarg)
 }
 
 
-void *Ensstat(void *argument)
+void *Ensstat(void *process)
 {
   void *task = CDO_task ? cdo_task_new() : NULL;
   ensstat_arg_t ensstat_arg;
   int nrecs0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("ensrange", func_range, 0, NULL);
@@ -179,15 +181,15 @@ void *Ensstat(void *argument)
 
   if ( cdoVerbose ) cdoPrint("Ensemble over %d files.", nfiles);
 
-  const char *ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
 
   ens_file_t *ef = (ens_file_t *) Malloc(nfiles*sizeof(ens_file_t));
 
-  field_type *field = (field_type *) Malloc(ompNumThreads*sizeof(field_type));
-  for ( int i = 0; i < ompNumThreads; i++ )
+  field_type *field = (field_type *) Malloc(Threading::ompNumThreads*sizeof(field_type));
+  for ( int i = 0; i < Threading::ompNumThreads; i++ )
     {
       field_init(&field[i]);
       field[i].size = nfiles;
@@ -196,8 +198,8 @@ void *Ensstat(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      ef[fileID].streamID = pstreamOpenRead(cdoStreamName(fileID));
-      ef[fileID].vlistID  = pstreamInqVlist(ef[fileID].streamID);
+      ef[fileID].streamID = cdoStreamOpenRead(cdoStreamName(fileID));
+      ef[fileID].vlistID  = cdoStreamInqVlist(ef[fileID].streamID);
     }
 
   /* check that the contents is always the same */
@@ -210,7 +212,7 @@ void *Ensstat(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -240,7 +242,7 @@ void *Ensstat(void *argument)
 	}
     }
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   ensstat_arg.vlistID1 = vlistID1;
@@ -272,18 +274,18 @@ void *Ensstat(void *argument)
 	      if ( nrecs == 0 )
                 {
                   lwarning = true;
-                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(fileID)->args);
+                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(fileID).c_str());
                 }
 	      else if ( nrecs0 == 0 )
                 {
                   lwarning = true;
-                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(0)->args);
+                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(0).c_str());
                 }
 	      else
                 {
                   lerror = true;
                   cdoWarning("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
-                             tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
+                             tsID+1, cdoGetStreamName(0).c_str(), cdoStreamName(fileID));
                 }
               goto CLEANUP;
 	    }
@@ -349,7 +351,7 @@ void *Ensstat(void *argument)
   if ( array2 ) Free(array2);
   if ( count2 ) Free(count2);
 
-  for ( int i = 0; i < ompNumThreads; i++ ) if ( field[i].ptr ) Free(field[i].ptr);
+  for ( int i = 0; i < Threading::ompNumThreads; i++ ) if ( field[i].ptr ) Free(field[i].ptr);
   if ( field ) Free(field);
 
   if ( task ) cdo_task_delete(task);

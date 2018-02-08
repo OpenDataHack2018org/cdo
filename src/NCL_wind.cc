@@ -20,9 +20,9 @@
 #include <limits.h>
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "libncl.h"
 
 static
@@ -157,12 +157,12 @@ void set_parameter(void)
 }
 
 
-void *NCL_wind(void *argument)
+void *NCL_wind(void *process)
 {
   int nrecs;
   int varID, levelID;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   int UV2DV_CFD = cdoOperatorAdd("uv2dv_cfd", 0, 0, "[u, v, boundsOpt, outMode]");
   int UV2VR_CFD = cdoOperatorAdd("uv2vr_cfd", 0, 0, "[u, v, boundsOpt, outMode]");
@@ -171,9 +171,9 @@ void *NCL_wind(void *argument)
 
   set_parameter();
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = CDI_UNDEFID;
   if ( outMode == OutMode::NEW )
     vlistID2 = vlistCreate();
@@ -242,7 +242,7 @@ void *NCL_wind(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
@@ -302,10 +302,7 @@ void *NCL_wind(void *argument)
       for ( levelID = 0; levelID < nlev; ++levelID )
         {
           double *parray = &arrayo[levelID*gridsizeuv];
-          size_t nmiss = 0;
-          for ( size_t i = 0; i < gridsizeuv; ++i )
-            if ( DBL_IS_EQUAL(parray[i], missvalu) ) nmiss++;
-
+          size_t nmiss = arrayNumMV(gridsizeuv, parray, missvalu);
           pstreamDefRecord(streamID2, varIDo, levelID);
           pstreamWriteRecord(streamID2, parray, nmiss);
         }

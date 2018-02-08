@@ -17,16 +17,17 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "timer.h"
 
 
-static
 const char *filetypestr(int filetype)
 {
   switch ( filetype )
     {
+      // clang-format off
     case CDI_FILETYPE_GRB:  return ("GRIB");
     case CDI_FILETYPE_GRB2: return ("GRIB2");
     case CDI_FILETYPE_NC:   return ("NetCDF");
@@ -38,10 +39,11 @@ const char *filetypestr(int filetype)
     case CDI_FILETYPE_EXT:  return ("EXTRA");
     case CDI_FILETYPE_IEG:  return ("IEG");
     default:                return ("");
+      // clang-format on
     }
 }
 
-static
+
 const char *datatypestr(int datatype)
 {
   static char str[20];
@@ -49,6 +51,7 @@ const char *datatypestr(int datatype)
   str[0] = 0;
   snprintf(str, sizeof(str), "%d bit packed", datatype);
 
+  // clang-format off
   if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
   else if ( datatype > 0 && datatype <= 32  ) return (str);
   else if ( datatype == CDI_DATATYPE_CPX32  ) return ("C32");
@@ -62,6 +65,7 @@ const char *datatypestr(int datatype)
   else if ( datatype == CDI_DATATYPE_UINT16 ) return ("U16");
   else if ( datatype == CDI_DATATYPE_UINT32 ) return ("U32");
   else                                        return ("");
+  // clang-format on
 }
 
 static
@@ -79,7 +83,7 @@ void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_
 }
 
 
-void *CDIread(void *argument)
+void *CDIread(void *process)
 {
   int memtype = CDO_Memtype;
   int varID, levelID;
@@ -96,7 +100,7 @@ void *CDIread(void *argument)
 
   sinfo[0] = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( cdoVerbose ) cdoPrint("parameter: <nruns>");
 
@@ -117,14 +121,14 @@ void *CDIread(void *argument)
       data_size = 0;
       nvalues = 0;
 
-      int streamID = pstreamOpenRead(cdoStreamName(0));
+      int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-      int vlistID = pstreamInqVlist(streamID);
+      int vlistID = cdoStreamInqVlist(streamID);
 
       filetype = pstreamInqFiletype(streamID);
       datatype = vlistInqVarDatatype(vlistID, 0);
 	  
-      int gridsize = vlistGridsizeMax(vlistID);
+      size_t gridsize = vlistGridsizeMax(vlistID);
       
       if ( darray == NULL ) darray = (double*) Malloc(gridsize*sizeof(double));
       if ( farray == NULL && memtype == MEMTYPE_FLOAT ) farray = (float*) Malloc(gridsize*sizeof(float));
@@ -145,7 +149,7 @@ void *CDIread(void *argument)
 	      if ( memtype == MEMTYPE_FLOAT )
 		{
                   pstreamReadRecordF(streamID, farray, &nmiss);
-                  //  for ( int i = 0; i < gridsize; ++i ) darray[i] = farray[i];
+                  //  for ( size_t i = 0; i < gridsize; ++i ) darray[i] = farray[i];
 		  data_size += gridsize*4;
 		}
 	      else
@@ -170,7 +174,7 @@ void *CDIread(void *argument)
       tw = timer_val(timer_read) - tw0;
       twsum += tw;
 
-      file_size = (double) fileSize(cdoStreamName(0)->args);
+      file_size = (double) fileSize(cdoGetStreamName(0).c_str());
 
       if ( nruns > 1 ) snprintf(sinfo, sizeof(sinfo), "(run %d)", irun+1);
 

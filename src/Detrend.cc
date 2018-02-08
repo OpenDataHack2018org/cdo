@@ -23,9 +23,11 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
+#include "cdoOptions.h"
+#include "datetime.h"
 
 
 #define  NALLOC_INC  1024
@@ -62,12 +64,12 @@ void detrend(long nts, double missval1, double *array1, double *array2)
 }
 
 
-void *Detrend(void *argument)
+void *Detrend(void *process)
 {
-  int gridsize;
+  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
-  int i;
+  size_t i;
   int nalloc = 0;
   size_t nmiss;
   int nlevel;
@@ -75,18 +77,18 @@ void *Detrend(void *argument)
   field_type ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
@@ -119,8 +121,8 @@ void *Detrend(void *argument)
 
   int nts = tsID;
 
-  NEW_2D(double, array1, ompNumThreads, nts);
-  NEW_2D(double, array2, ompNumThreads, nts);
+  NEW_2D(double, array1, Threading::ompNumThreads, nts);
+  NEW_2D(double, array2, Threading::ompNumThreads, nts);
 
   for ( varID = 0; varID < nvars; varID++ )
     {

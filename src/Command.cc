@@ -21,8 +21,9 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
+#include "process_int.h"
 #include "counter.h"
 
 
@@ -162,16 +163,15 @@ int com_stat(const char *arg)
 	}
       else
 	{
-	  int i;
 	  size_t nmiss;
-	  int gridsize;
+	  size_t gridsize;
 	  double fmin = 1.e50 , fmax = -1.e50, fmean = 0;
 	  counter_t counter;
 	  
 	  counter_start(&counter);
 	  streamReadVarSlice(gl_streamID, gl_varID, levelID, gl_data, &nmiss);
 	  gridsize = gridInqSize(vlistInqVarGrid(gl_vlistID, gl_varID));
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( size_t i = 0; i < gridsize; ++i )
 	    {
 	      if ( gl_data[i] < fmin ) fmin = gl_data[i];
 	      if ( gl_data[i] > fmax ) fmax = gl_data[i];
@@ -311,7 +311,7 @@ void command_init()
 
   UNUSED(taxisID);
 
-  int gridsize = vlistGridsizeMax(gl_vlistID);
+  size_t gridsize = vlistGridsizeMax(gl_vlistID);
   gl_data = (double*) Malloc(gridsize*sizeof(double));
 
   gl_nvars = vlistNvars(gl_vlistID);
@@ -327,7 +327,7 @@ void command_init()
 }
 
 
-void *Command(void *argument)
+void *Command(void *process)
 {
   // int recID, varID, levelID;
   // size_t nmiss;
@@ -336,11 +336,11 @@ void *Command(void *argument)
   double c_cputime = 0, c_usertime = 0, c_systime = 0;
   char line[MAX_LINE];
  
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   processStartTime(&s_utime, &s_stime);
 
-  gl_streamID = streamOpenRead(cdoStreamName(0)->args);
+  gl_streamID = streamOpenRead(cdoGetStreamName(0).c_str());
 
   command_init();
   

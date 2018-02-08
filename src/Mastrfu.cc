@@ -23,20 +23,21 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 static
 void mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, double missval)
 {
-  int ilev, ilat, n;
+  size_t ilat;
+  int ilev, n;
   double fact =  4*atan(1.0) * 6371000 / 9.81;
   char units[CDI_MAX_NAME];
 
-  int nlat = gridInqSize(gridID);
+  size_t nlat = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
   double *phi    = (double*) Malloc(nlat*sizeof(double));
   double *dummy  = (double*) Malloc(nlat*sizeof(double));
@@ -104,18 +105,18 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmi
 }
 
 
-void *Mastrfu(void *argument)
+void *Mastrfu(void *process)
 {
   int nrecs;
   int varID, levelID;
   int offset;
   size_t nmiss, nmiss1;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
   if ( nvars != 1 ) cdoAbort("This operator works only with one variable!");
@@ -137,7 +138,7 @@ void *Mastrfu(void *argument)
   int gridID = vlistInqVarGrid(vlistID1, 0);
   if ( gridInqXsize(gridID) > 1 ) cdoAbort("Grid must be a zonal mean!");
 
-  int gridsize = gridInqSize(gridID);
+  size_t gridsize = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
 
   int vlistID2 = vlistDuplicate(vlistID1);
@@ -152,7 +153,7 @@ void *Mastrfu(void *argument)
   vlistDefVarUnits(vlistID2, 0, "kg/s");
   vlistDefVarDatatype(vlistID2, 0, CDI_DATATYPE_FLT32);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   double *array1 = (double*) Malloc(gridsize*nlev*sizeof(double));

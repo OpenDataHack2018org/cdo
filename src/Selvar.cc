@@ -35,12 +35,13 @@
 
 
 #include <cdi.h>
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "listarray.h"
 
 
-void *Selvar(void *argument)
+void *Selvar(void *process)
 {
   int varID2, levelID2;
   int varID, levelID;
@@ -58,7 +59,7 @@ void *Selvar(void *argument)
   lista_t *ilista = lista_new(INT_LISTA);
   lista_t *flista = lista_new(FLT_LISTA);
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -131,9 +132,9 @@ void *Selvar(void *argument)
   if ( nsel == 0 )
     cdoAbort("missing code argument!");
   */
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int nvars = vlistNvars(vlistID1);
   bool *vars = (bool*) Malloc(nvars*sizeof(bool));
 
@@ -300,13 +301,13 @@ void *Selvar(void *argument)
 
   int nrecs = vlistNrecs(vlistID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   double *array = NULL;
   if ( ! lcopy )
     {
-      int gridsize = vlistGridsizeMax(vlistID1);
+      size_t gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double*) Malloc(gridsize*sizeof(double));
     }

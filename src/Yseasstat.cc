@@ -31,9 +31,9 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 #define  NSEAS       4
 
@@ -58,7 +58,7 @@ void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 }
 
 
-void *Yseasstat(void *argument)
+void *Yseasstat(void *process)
 {
   int varID;
   int year, month, day;
@@ -69,7 +69,7 @@ void *Yseasstat(void *argument)
   date_time_t datetime[NSEAS];
   field_type **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   // clang-format off
   cdoOperatorAdd("yseasrange", func_range, 0, NULL);
@@ -103,9 +103,9 @@ void *Yseasstat(void *argument)
       datetime[seas].vtime = 0;
     }
 
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -113,13 +113,13 @@ void *Yseasstat(void *argument)
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<recinfo_type> recinfo(maxrecs);
 
-  int gridsizemax = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
@@ -161,7 +161,7 @@ void *Yseasstat(void *argument)
           field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
           int nsets = seas_nsets[seas];
 
-	  int gridsize = pvars1->size;
+	  size_t gridsize = pvars1->size;
 
 	  if ( nsets == 0 )
 	    {
@@ -170,7 +170,7 @@ void *Yseasstat(void *argument)
               if ( lrange )
                 {
                   pvars2->nmiss = pvars1->nmiss;
-                  for ( int i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     pvars2->ptr[i] = pvars1->ptr[i];
                 }
 
@@ -179,7 +179,7 @@ void *Yseasstat(void *argument)
 		  if ( psamp1->ptr == NULL )
 		    psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
                     psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		}
 	    }
@@ -195,11 +195,11 @@ void *Yseasstat(void *argument)
 		  if ( psamp1->ptr == NULL )
 		    {
 		      psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( int i = 0; i < gridsize; i++ )
+		      for ( size_t i = 0; i < gridsize; i++ )
 			psamp1->ptr[i] = nsets;
 		    }
 		  
-		  for ( int i = 0; i < gridsize; i++ )
+		  for ( size_t i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 		      psamp1->ptr[i]++;
 		}

@@ -23,10 +23,11 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
-#include "pstream.h"
+#include "pstream_int.h"
 #include "grid.h"
+#include "util_string.h"
 
 
 /*
@@ -149,7 +150,7 @@ void calc_rhopot(long gridsize, long nlevel, double *pressure, field_type to, fi
 }
 
 
-void *Rhopot(void *argument)
+void *Rhopot(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -162,13 +163,13 @@ void *Rhopot(void *argument)
   double *single;
   field_type to, sao, rho;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   
-  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
 
@@ -202,12 +203,12 @@ void *Rhopot(void *argument)
     {   
       cdoPrint("Use the CDO operator 'adisit' to convert potential temperature to In-situ temperature.");
       cdoPrint("Here is an example:");
-      cdoPrint("   cdo rhopot -adisit %s %s", cdoStreamName(0)->args, cdoStreamName(1)->args);
+      cdoPrint("   cdo rhopot -adisit %s %s", cdoGetStreamName(0).c_str(), cdoStreamName(1));
     }
   if ( toID  == -1 ) cdoAbort("In-situ temperature not found!");
 
   int gridID = vlistGrid(vlistID1, 0);
-  int gridsize = vlist_check_gridsize(vlistID1);
+  size_t gridsize = vlist_check_gridsize(vlistID1);
 
   zaxisID = vlistInqVarZaxis(vlistID1, saoID);
   int nlevel1 = zaxisInqSize(zaxisID);
@@ -266,7 +267,7 @@ void *Rhopot(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
@@ -283,13 +284,11 @@ void *Rhopot(void *argument)
 
 	  if ( varID == toID )
             {
-              pstreamReadRecord(streamID1, to.ptr+offset, &nmiss);
-              to.nmiss = (size_t) nmiss;
+              pstreamReadRecord(streamID1, to.ptr+offset, &to.nmiss);
             }
 	  if ( varID == saoID )
             {
-              pstreamReadRecord(streamID1, sao.ptr+offset, &nmiss);
-              sao.nmiss = (size_t) nmiss;
+              pstreamReadRecord(streamID1, sao.ptr+offset, &sao.nmiss);
             }
         }
 
@@ -299,11 +298,7 @@ void *Rhopot(void *argument)
 	{
 	  offset = gridsize*levelID;
 	  single = rho.ptr+offset;
-
-	  nmiss = 0;
-	  for ( int i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(single[i], rho.missval) ) nmiss++;
- 
+	  nmiss = arrayNumMV(gridsize, single, rho.missval); 
 	  pstreamDefRecord(streamID2, 0, levelID);
 	  pstreamWriteRecord(streamID2, single, nmiss);     
 	}

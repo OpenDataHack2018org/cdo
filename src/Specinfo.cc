@@ -23,10 +23,10 @@
 
 
 #include <cdi.h>
-#include "cdo.h"
+
 #include "cdo_int.h"
 #include "grid.h"
-#include "pstream.h"
+#include "pstream_int.h"
 
 
 #define NTR2NSP(ntr)          ((ntr+1)*(ntr+2))
@@ -210,7 +210,7 @@ void lookup_rl(int nsp, int *nroot, int *nlevel)
 }
 
 
-void *Specinfo(void *argument)
+void *Specinfo(void *process)
 {
   char arg[128], *parg;
   bool nout1 = false, nout2 = false;
@@ -220,7 +220,7 @@ void *Specinfo(void *argument)
   int nlevel1 = 0, nlevel2 = 0, ngp_icon1 = 0, ngp_icon2 = 0;
   int nrootg1 = 0, nrooti1 = 0, nrootg2 = 0, nrooti2 = 0;
 
-  cdoInitialize(argument);
+  cdoInitialize(process);
 
   operatorInputArg("Txx, TLxx, NLON=xx, NLAT=xx, NIxx or ICONRyyLxx");
 
