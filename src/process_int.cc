@@ -541,6 +541,19 @@ cdoGetStreamName(int p_streamIndex)
     MESSAGE("StreamName is:", streamName);
   return streamName;
 }
+
+bool cdoStreamIsPipe(int p_streamIndex)
+{
+  ProcessType &process = processSelf();
+  if (p_streamIndex >= process.inputStreams.size())
+    {
+        return process.outputStreams[p_streamIndex - process.inputStreams.size()]->isPipe();
+    }
+  else
+    {
+        return process.inputStreams[p_streamIndex]->isPipe();
+    }
+}
 char *
 cdoGetObase()
 {

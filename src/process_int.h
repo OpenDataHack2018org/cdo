@@ -79,5 +79,6 @@ void createProcesses(int argc, const char **argv);
 ProcessType *processCreate(const char *command);
 
 int cdoStreamInqVlist(int pstreamID);
+bool cdoStreamIsPipe(int pstreamID);
 
 #endif
