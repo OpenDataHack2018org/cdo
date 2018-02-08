@@ -14,8 +14,8 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef _SELLIST_H
-#define _SELLIST_H
+#ifndef  SELLIST_H
+#define  SELLIST_H
 
 #include "pmlist.h"
 
