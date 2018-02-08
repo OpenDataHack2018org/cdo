@@ -20,7 +20,7 @@
 */
 
 #include <cdi.h>
-
+#include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream_int.h"
@@ -1303,11 +1303,11 @@ void verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids, int n
 }
 
 
-void *Verifygrid(void *process)
+void *Verifygrid(void *argument)
 {
   char units[CDI_MAX_NAME];
 
-  cdoInitialize(process);
+  cdoInitialize(argument);
 
   int VERIFYGRID = cdoOperatorAdd("verifygrid",  0,   0, NULL);
 
@@ -1315,7 +1315,7 @@ void *Verifygrid(void *process)
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID = cdoStreamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   int ngrids = vlistNgrids(vlistID);
   for ( int gridno = 0; gridno < ngrids; ++gridno )
