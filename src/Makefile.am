@@ -144,12 +144,13 @@ libcdo_la_SOURCES =            \
                process_int.h       \
                pstream.cc       \
                pstream.h       \
-			   pstream_int.cc  \
-			   pstream_int.h   \
+               pstream_int.cc  \
+               pstream_int.h   \
                pstream_write.h \
                pthread_debug.cc \
                pthread_debug.h \
                readline.cc      \
+               readline.h      \
                realtime.cc      \
                remap.h         \
                remaplib.cc      \
@@ -180,15 +181,16 @@ libcdo_la_SOURCES =            \
                timer.h         \
                util.cc          \
                util.h          \
-			   util_files.cc \
-			   util_files.h \
-			   util_fileextensions.cc \
-			   util_fileextensions.h \
-			   util_string.cc\
-			   util_string.h \
-			   util_wildcards.cc\
-			   util_wildcards.h \
-			   varlist.h		\
+               util_files.cc \
+               util_files.h \
+               util_operatorStrings.h \
+               util_fileextensions.cc \
+               util_fileextensions.h \
+               util_string.cc\
+               util_string.h \
+               util_wildcards.cc\
+               util_wildcards.h \
+               varlist.h		\
                zaxis_print.cc   \
                zaxis.cc
 libcdo_la_SOURCES +=           \
