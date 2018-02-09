@@ -578,8 +578,8 @@ libcdo_la_SOURCES = array.h array.cc cdo_int.h compare.h cfortran.h \
 	sellist.h printinfo.h process.cc process.h process_int.cc \
 	process_int.h pstream.cc pstream.h pstream_int.cc \
 	pstream_int.h pstream_write.h pthread_debug.cc pthread_debug.h \
-	readline.cc realtime.cc remap.h remaplib.cc remapsort.cc \
-	remap_scrip_io.cc remap_search_reg2d.cc \
+	readline.cc readline.h realtime.cc remap.h remaplib.cc \
+	remapsort.cc remap_scrip_io.cc remap_search_reg2d.cc \
 	remap_search_latbins.cc remap_store_link.cc remap_store_link.h \
 	remap_store_link_cnsrv.cc remap_store_link_cnsrv.h \
 	remap_conserv.cc remap_conserv_scrip.cc remap_distwgt.cc \
@@ -587,14 +587,15 @@ libcdo_la_SOURCES = array.h array.cc cdo_int.h compare.h cfortran.h \
 	stdnametable.h specspace.cc specspace.h statistic.cc \
 	statistic.h table.cc text.cc text.h timebase.h timer.cc \
 	timer.h util.cc util.h util_files.cc util_files.h \
-	util_fileextensions.cc util_fileextensions.h util_string.cc \
-	util_string.h util_wildcards.cc util_wildcards.h varlist.h \
-	zaxis_print.cc zaxis.cc json/jsmn.h json/jsmn.c \
-	kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.cc \
-	kdtreelib/kdtree_common.cc kdtreelib/kdtree_spherical.cc \
-	kdtreelib/qsort.cc kdtreelib/pmergesort.cc kdtreelib/pqueue.cc \
-	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
-	clipping/area.c clipping/area.h clipping/ensure_array_size.c \
+	util_operatorStrings.h util_fileextensions.cc \
+	util_fileextensions.h util_string.cc util_string.h \
+	util_wildcards.cc util_wildcards.h varlist.h zaxis_print.cc \
+	zaxis.cc json/jsmn.h json/jsmn.c kdtreelib/kdtree.h \
+	kdtreelib/kdtree_cartesian.cc kdtreelib/kdtree_common.cc \
+	kdtreelib/kdtree_spherical.cc kdtreelib/qsort.cc \
+	kdtreelib/pmergesort.cc kdtreelib/pqueue.cc kdtreelib/pqueue.h \
+	clipping/clipping.c clipping/clipping.h clipping/area.c \
+	clipping/area.h clipping/ensure_array_size.c \
 	clipping/ensure_array_size.h clipping/geometry.h \
 	clipping/grid.h clipping/points.h clipping/dep_list.h \
 	clipping/grid_cell.c clipping/grid_cell.h \
