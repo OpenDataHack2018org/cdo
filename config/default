@@ -112,8 +112,8 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
-	            CXX=clang++ CXXFLAGS="-g -Wall -pedantic -O3" \
-	            CC=clang    CFLAGS="-g -Wall -pedantic -O3"
+	            CXX=clang++ CXXFLAGS="-g -Wall -pedantic -O3 -march=native" \
+	            CC=clang    CFLAGS="-g -Wall -pedantic -O3 -march=native"
         elif  test "$COMP" = clang4 ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
@@ -129,8 +129,8 @@ case "${HOSTNAME}" in
                     --enable-maintainer-mode \
                     $CDOLIBS LDFLAGS="-Wl,-rpath,$HOME/local/eccodes-2.3.0/lib" \
                     F77=gfortran FFLAGS="-g -O2" \
-	            CXX=g++ CXXFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3  -fstack-protector" \
-	            CC=gcc  CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3  -fstack-protector"
+	            CXX=g++ CXXFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q" \
+	            CC=gcc  CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi
