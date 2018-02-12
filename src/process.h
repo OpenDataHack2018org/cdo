@@ -85,6 +85,7 @@ public:
 
   module_t m_module;
   std::vector<char *> m_oargv;
+  /*TEMP*/ //remove m_oargc and replace usage with m_oargv.size()/operatorArgc()
   int m_oargc;
   oper_t oper[MAX_OPERATOR];
 
@@ -92,22 +93,61 @@ public:
 
   pthread_t run();
 
+
+  /**
+   * returns the number of in streams this process currently has.
+   **/
   int getInStreamCnt();
+  /**
+   * returns the number of out streams this process currently has.
+   */
   int getOutStreamCnt();
-  void initProcess();
-  void print_process();
+  /**
+   * Splits the operator arguments stores them.
+   * Operator arguments are stored as char arrays and appended with
+   * a zero termination.
+   */
   void setOperatorArgv(const char *operatorArguments);
+  /**
+   * Adds a Process as child and creates and adds a new pipe stream.
+   */
   void addChild(ProcessType *child_process);
+  /**
+   * Adds a Process as parent and adds the parents input stream to out streams.
+   */
   void addParent(ProcessType *parent_process);
+  /**
+   * Compares the wanted and current stream counts.
+   * @return if the wanted count is -1 this function always returns false.
+   * Are the current and wanted stream counts equal 1 and if they differ false.
+   */
   bool hasAllInputs();
+  /**
+   * Adds and creates a new file pstream to the in streams
+   */
   void addFileInStream(std::string file);
+  /**
+   * Adds and creates a new file pstream to the out streams
+   */
   void addFileOutStream(std::string file);
+  /**
+   * Adds and creates a new pipe pstream to the in streams
+   */
   void addPipeInStream();
+  /**
+   * Adds and creates a new file pstream to the out streams
+   */
   void addPipeOutStream();
   void addNvals(size_t p_nvals);
   void query_user_exit(const char *argument);
   void inqUserInputForOpArg(const char *enter);
+  /**
+   * Adds an operator to the process
+   */
   int operatorAdd(const char *name, int f1, int f2, const char *enter);
+  /**
+   * returns the operatorID of the currently in use operator
+   */
   int getOperatorID();
   void setInactive();
   const char *inqPrompt();
@@ -117,6 +157,7 @@ public:
   int checkStreamCnt();
 
 private:
+  void initProcess();
   ProcessType();
   void defPrompt();
 };
