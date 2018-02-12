@@ -16,6 +16,8 @@
 */
 #include "cdoDebugOutput.h"
 
+constexpr int padding_width = 30;
+
 namespace CdoDebug
 {
     void SetDebug(int p_debug_level)
@@ -48,8 +50,8 @@ namespace CdoDebug
      int cdoDebugExt = 0;     //  Debug level for the KNMI extensions
     //Subsystem Debug Switches
      int  PSTREAM = 0;
-     bool PROCESS = 0;
-     bool PIPE = false;
+     int PROCESS = 0;
+     int PIPE = 0;
      int ARGUMENT = 0;
      int PTHREAD = 0;
 
@@ -62,7 +64,7 @@ namespace CdoDebug
     {
       size_t len = strlen(p_func);
 
-      return std::string(30 - len, ' ');
+      return std::string(padding_width - len, ' ');
     }
 
     void
@@ -71,14 +73,14 @@ namespace CdoDebug
       std::stringstream message;
       outfile_stream.open(outfile, std::fstream::in | std::fstream::app);
 
-      message << std::string(30, ' ') << "  == CDO Start ==" << std::endl;
+      message << std::string(padding_width, ' ') << "  == CDO Start ==" << std::endl;
       printMessage(message);
     }
     void
     CdoEndMessage()
     {
       std::stringstream message;
-      message << std::string(30, ' ') << "  == CDO End ==" << std::endl;
+      message << std::string(padding_width, ' ') << "  == CDO End ==" << std::endl;
       printMessage(message);
       outfile_stream.close();
     }
@@ -94,15 +96,23 @@ namespace CdoDebug
         return input_string;
 
     }
-
-        void printMessage(std::stringstream &p_message, bool both )
+        void printError(std::stringstream &p_message, bool printToBoth )
         {
-            if(print_to_seperate_file || (print_to_seperate_file && both))
+            if(print_to_seperate_file)
+            {
+                outfile_stream << p_message.str();
+            }
+            std::cerr << p_message.str();
+        }
+
+        void printMessage(std::stringstream &p_message, bool printToBoth )
+        {
+            if(print_to_seperate_file || (print_to_seperate_file && printToBoth))
             {
                 outfile_stream <<  p_message.str();
             }
 
-            if(!print_to_seperate_file || both)
+            if(!print_to_seperate_file || printToBoth)
             {
                 std::cout << p_message.str();
             }

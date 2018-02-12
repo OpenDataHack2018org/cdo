@@ -61,8 +61,8 @@ namespace CdoDebug
     extern int cdoDebugExt; //  Debug level for the KNMI extensions
     //Subsystem Debug Switches
     extern int  PSTREAM;
-    extern bool PROCESS;
-    extern bool PIPE;
+    extern int PROCESS;
+    extern int PIPE;
     extern int ARGUMENT;
     extern int PTHREAD;
 
@@ -80,6 +80,8 @@ namespace CdoDebug
     std::string argvToString(int argc, const char** argv);
 
     void printMessage(std::stringstream &p_message,bool both = false);
+    void printError(std::stringstream &p_message,bool both = false);
+
     template <typename ...T>
     void Message_ (const char * p_func, T&& ...args)
     {
@@ -89,7 +91,17 @@ namespace CdoDebug
         printMessage(message);
     }
 
-    
+    template <typename ...T>
+    void PrintDebug(const char * p_func, int p_debugScope ,T&& ...args)
+    {
+        if(p_debugScope > 0){
+        std::stringstream message;
+        message << p_func <<": " << get_padding(p_func);
+        CdoLog::expand(message, args...);
+        printMessage(message);
+        }
+    }
+
     template <typename ...T>
     void Warning_(T&& ...args)
     {
@@ -106,19 +118,33 @@ namespace CdoError{
     static int _ExitOnError = 1;
 
     template <typename ...T>
-    void Error_(const char* p_file, const int p_line, const char* caller, T&& ...args)
+    void Abort(T&& ...args)
     {
           std::stringstream message;
-          message << "Error in: " << p_file << ":" << p_line << " ";
+          message << " (Abort): ";
           CdoLog::expand(message, args...);
-          CdoDebug::printMessage(message,true);
+          CdoDebug::printError(message,true);
           if ( CdoError::_ExitOnError )
           {
               if(CdoDebug::print_to_seperate_file) CdoDebug::outfile_stream.close();
               exit(EXIT_FAILURE);
           }
     }
-    
+
+    template <typename ...T>
+    void Error_(const char* p_file, const int p_line, const char* caller, T&& ...args)
+    {
+          std::stringstream message;
+          message << "Error in: " << p_file << ":" << p_line << " ";
+          CdoLog::expand(message, args...);
+          CdoDebug::printError(message,true);
+          if ( CdoError::_ExitOnError )
+          {
+              if(CdoDebug::print_to_seperate_file) CdoDebug::outfile_stream.close();
+              exit(EXIT_FAILURE);
+          }
+    }
+
     template <typename ...T>
     void SysError_(const char* p_file, const int p_line,  const char* p_func, T&& ...args)
     {
@@ -150,5 +176,5 @@ namespace CdoError{
 #  define  MESSAGE_C(...)    CdoDebug::Message_(__VA_ARGS__)
 #  define   MESSAGE(...)     CdoDebug::Message_(__func__,__VA_ARGS__)
 #endif
-
+#  define Cdo_Debug(...) CdoDebug::PrintDebug(__func__,__VA_ARGS__)
 #endif

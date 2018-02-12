@@ -51,6 +51,31 @@ static int NumProcessActive = 0;
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
+ProcessType &
+processSelf(void)
+{
+#ifdef HAVE_LIBPTHREAD
+  pthread_t thID = pthread_self();
+
+  pthread_mutex_lock(&processMutex);
+
+  for (auto &id_process_pair : Process)
+    if (id_process_pair.second.l_threadID)
+      {
+        if (pthread_equal(id_process_pair.second.threadID, thID))
+          {
+            pthread_mutex_unlock(&processMutex);
+            return id_process_pair.second;
+          }
+      }
+
+  pthread_mutex_unlock(&processMutex);
+  ERROR("Could not find process for thread: ", thID);
+
+#endif
+  return Process.find(0)->second;
+}
+
 void
 processDefVarNum(int nvars)
 {
@@ -95,11 +120,8 @@ operatorArgv(void)
         {
           oargv_str += std::string(entry) + " ";
         }
-      if (CdoDebug::PROCESS)
-        {
-          MESSAGE("Getting ", processSelf().m_oargv.size(),
-                  " operator arguments: ", oargv_str);
-        }
+      Cdo_Debug(CdoDebug::PROCESS, "Getting ", processSelf().m_oargv.size(),
+                " operator arguments: ", oargv_str);
     }
 
   return &processSelf().m_oargv[0];
@@ -186,10 +208,7 @@ processCreate(const char *command)
   pthread_mutex_lock(&processMutex);
 #endif
 
-  if (CdoDebug::PROCESS)
-    {
-      MESSAGE("Creating new process for command: ", command);
-    }
+  Cdo_Debug(CdoDebug::PROCESS, "Creating new process for command: ", command);
   int processID = NumProcess++;
 
   const char *operatorName = get_original(getOperatorName(command));
@@ -201,10 +220,7 @@ processCreate(const char *command)
     }
 
   NumProcessActive++;
-  if (CdoDebug::PROCESS)
-    {
-      MESSAGE("NumProcessActive: ", NumProcessActive);
-    }
+  Cdo_Debug(CdoDebug::PROCESS, "NumProcessActive: ", NumProcessActive);
 
 #ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&processMutex);
@@ -214,31 +230,6 @@ processCreate(const char *command)
     ERROR("Limit of ", MAX_PROCESS, " processes reached!");
 
   return &success.first->second;
-}
-
-ProcessType &
-processSelf(void)
-{
-#ifdef HAVE_LIBPTHREAD
-  pthread_t thID = pthread_self();
-
-  pthread_mutex_lock(&processMutex);
-
-  for (auto &id_process_pair : Process)
-    if (id_process_pair.second.l_threadID)
-      {
-        if (pthread_equal(id_process_pair.second.threadID, thID))
-          {
-            pthread_mutex_unlock(&processMutex);
-            return id_process_pair.second;
-          }
-      }
-
-  pthread_mutex_unlock(&processMutex);
-  ERROR("Could not find process for thread: ", thID);
-
-#endif
-  return Process.find(0)->second;
 }
 
 int
@@ -276,11 +267,9 @@ processNumsActive(void)
 void
 createProcesses(int argc, const char **argv)
 {
-  if (CdoDebug::PROCESS)
-    {
-      MESSAGE("== Process Creation Start ==");
-      MESSAGE("operators:  ", CdoDebug::argvToString(argc, argv));
-    }
+  Cdo_Debug(CdoDebug::PROCESS, "== Process Creation Start ==");
+  Cdo_Debug(CdoDebug::PROCESS,
+            "operators:  ", CdoDebug::argvToString(argc, argv));
   ProcessType *root_process = processCreate(argv[0]);
 
   ProcessType *current_process;
@@ -299,11 +288,8 @@ createProcesses(int argc, const char **argv)
   int temp_argc = argc - cntOutFiles;
   for (int i = 0; i < cntOutFiles; i++)
     {
-      if (CdoDebug::PROCESS)
-        {
-          MESSAGE("Creating new pstream for output file: ",
-                  argv[temp_argc + i]);
-        }
+      Cdo_Debug(CdoDebug::PROCESS,
+                "Creating new pstream for output file: ", argv[temp_argc + i]);
       root_process->addFileOutStream(argv[temp_argc + i]);
     }
   if (cntOutFiles == -1)
@@ -316,24 +302,20 @@ createProcesses(int argc, const char **argv)
     {
       do
         {
-          if (CdoDebug::PROCESS)
-            {
-              MESSAGE("iteration ", idx, ", current argv: ", argv[idx],
-                      ",  current_process: ", current_process->operatorName);
-            }
+          Cdo_Debug(CdoDebug::PROCESS, "iteration ", idx,
+                    ", current argv: ", argv[idx],
+                    ",  current_process: ", current_process->operatorName);
           if (argv[idx][0] == '-')
             {
-              if (CdoDebug::PROCESS)
-                {
-                  MESSAGE("Found new Operator: ", argv[idx]);
-                }
+              Cdo_Debug(CdoDebug::PROCESS, "Found new Operator: ", argv[idx]);
               parent_process = current_process;
               current_process = processCreate(argv[idx]);
               if (current_process->m_module.streamOutCnt == 0)
                 {
-                  MESSAGE("operator -", parent_process->operatorName,
-                          " can not take -", current_process->operatorName,
-                          "  with 0 outputs as input");
+                  CdoError::Abort("operator -", parent_process->operatorName,
+                                  " can not take -",
+                                  current_process->operatorName,
+                                  "  with 0 outputs as input");
                   exit(EXIT_FAILURE);
                 }
 
@@ -344,20 +326,15 @@ createProcesses(int argc, const char **argv)
             }
           else if (current_process->m_module.streamInCnt != 0)
             {
-              if (CdoDebug::PROCESS)
-                {
-                  MESSAGE("adding in file to ", current_process->operatorName);
-                }
+              Cdo_Debug(CdoDebug::PROCESS, "adding in file to ",
+                        current_process->operatorName);
               current_process->addFileInStream(argv[idx]);
             }
           while (current_process->hasAllInputs()
                  && current_process != root_process)
             {
-              if (CdoDebug::PROCESS)
-                {
-                  MESSAGE("Removing ", current_process->operatorName,
-                          " from stack");
-                }
+              Cdo_Debug(CdoDebug::PROCESS, "Removing ",
+                        current_process->operatorName, " from stack");
               call_stack.top()->checkStreamCnt();
               call_stack.pop();
               current_process = call_stack.top();
@@ -379,10 +356,7 @@ createProcesses(int argc, const char **argv)
       call_stack.top()->checkStreamCnt();
       call_stack.pop();
     }
-  if (CdoDebug::PROCESS)
-    {
-      MESSAGE("== Process Creation End ==");
-    }
+  Cdo_Debug(CdoDebug::PROCESS, "== Process Creation End ==");
 
   setProcessNum(Process.size());
 }
@@ -414,9 +388,8 @@ clearProcesses()
 int
 cdoStreamOpenRead(int inStreamIDX)
 {
-  if (CdoDebug::PROCESS)
-    MESSAGE("Getting in stream ", inStreamIDX, " of process ",
-            processSelf().m_ID);
+  Cdo_Debug(CdoDebug::PROCESS, "Getting in stream ", inStreamIDX,
+            " of process ", processSelf().m_ID);
   ProcessType &process = processSelf();
   if (process.getInStreamCnt() < inStreamIDX || inStreamIDX < 0)
     {
@@ -427,8 +400,8 @@ cdoStreamOpenRead(int inStreamIDX)
 
   if (inStream->isPipe())
     {
-      if (CdoDebug::PROCESS)
-        MESSAGE("Trying to open pipe: ", inStream->pipe->name);
+      Cdo_Debug(CdoDebug::PROCESS,
+                "Trying to open pipe: ", inStream->pipe->name);
       inStream->pstreamOpenReadPipe();
       process.childProcesses[process.nChildActive]
           ->run();  // new thread started in here!
@@ -436,8 +409,8 @@ cdoStreamOpenRead(int inStreamIDX)
     }
   else
     {
-      if (CdoDebug::PROCESS)
-        MESSAGE("Trying to open file: ", inStream->m_mfnames[0]);
+      Cdo_Debug(CdoDebug::PROCESS,
+                "Trying to open file: ", inStream->m_mfnames[0]);
       inStream->pstreamOpenReadFile(inStream->m_mfnames[0].c_str());
     }
 
@@ -447,9 +420,8 @@ cdoStreamOpenRead(int inStreamIDX)
 int
 cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
 {
-  if (CdoDebug::PROCESS)
-    MESSAGE("Getting out stream ", p_outStreamIDX, " of process ",
-            processSelf().m_ID);
+  Cdo_Debug(CdoDebug::PROCESS, "Getting out stream ", p_outStreamIDX,
+            " of process ", processSelf().m_ID);
 
   ProcessType &process = processSelf();
   int outStreamIDX = p_outStreamIDX - process.inputStreams.size();
@@ -466,8 +438,7 @@ cdoStreamOpenWrite(int p_outStreamIDX, int filetype)
     }
   else
     {
-      if (CdoDebug::PROCESS)
-        MESSAGE("Trying to open: ", outStream->m_mfnames[0]);
+      Cdo_Debug(CdoDebug::PROCESS, "Trying to open: ", outStream->m_mfnames[0]);
 
       if (Options::cdoInteractive)
         {
@@ -521,10 +492,7 @@ cdoStreamOpenAppend(int p_outFileIndex)
   int pstreamID = -1;
   if (outStream->ispipe)
     {
-      if (CdoDebug::PSTREAM)
-        {
-          MESSAGE("pipe ", outStream->pipe->name.c_str());
-        }
+      Cdo_Debug(CdoDebug::PROCESS, "pipe ", outStream->pipe->name.c_str());
       cdoAbort("this operator doesn't work with pipes!");
     }
   else
@@ -568,21 +536,19 @@ cdoGetStreamName(int p_streamIndex)
 {
   std::string streamName;
   ProcessType &process = processSelf();
-  MESSAGE("stridx ", p_streamIndex);
+  Cdo_Debug(CdoDebug::PROCESS, "stridx ", p_streamIndex);
   if (p_streamIndex >= process.inputStreams.size())
     {
-      if (CdoDebug::PROCESS)
-        MESSAGE("Getting output stream name", p_streamIndex);
+      Cdo_Debug(CdoDebug::PROCESS, "Getting output stream name", p_streamIndex);
       streamName
           = cdoGetOutStreamName(p_streamIndex - process.inputStreams.size());
     }
   else
     {
-      if (CdoDebug::PROCESS)
-        MESSAGE("Getting input stream name", p_streamIndex);
+      Cdo_Debug(CdoDebug::PROCESS, "Getting input stream name", p_streamIndex);
       streamName = cdoGetInStreamName(p_streamIndex);
     }
-  if (CdoDebug::PROCESS) MESSAGE("StreamName is:", streamName);
+  Cdo_Debug(CdoDebug::PROCESS, "StreamName is:", streamName);
   return streamName;
 }
 
@@ -618,13 +584,14 @@ cdoInitialize(void *p_process)
   ProcessType *process = (ProcessType *) p_process;
 
   // std::cout << arg->processID << std::endl;
-  if (CdoDebug::PROCESS)
-    MESSAGE("Initializing process: ", process->m_operatorCommand);
+  Cdo_Debug(CdoDebug::PROCESS,
+            "Initializing process: ", process->m_operatorCommand);
   process->threadID = pthread_self();
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PSTREAM)
-    MESSAGE("process ", processSelf().m_ID, " thread ", pthread_self());
+    Cdo_Debug(CdoDebug::PROCESS, "process ", processSelf().m_ID, " thread ",
+              pthread_self());
 #endif
 }
 
@@ -633,11 +600,11 @@ cdoFinish(void)
 {
   ProcessType &process = processSelf();
 
-  if (CdoDebug::PROCESS) MESSAGE("Finishing process: ", process.m_ID);
+  Cdo_Debug(CdoDebug::PROCESS, "Finishing process: ", process.m_ID);
 
 #ifdef HAVE_LIBPTHREAD
-  if (CdoDebug::PROCESS)
-    MESSAGE("process ", process.m_ID, " thread ", pthread_self());
+  Cdo_Debug(CdoDebug::PROCESS, "process ", process.m_ID, " thread ",
+            pthread_self());
 #endif
   if (!Options::silentMode) process.printProcessedValues();
 
