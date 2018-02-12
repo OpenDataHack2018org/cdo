@@ -42,7 +42,7 @@
 
 std::map<int, ProcessType> Process;
 std::map<int, char *> obase;
-    /*TEMP*/  // Possibly not the best solution (19.Jan.2018)
+/*TEMP*/  // Possibly not the best solution (19.Jan.2018)
 
 static int NumProcess = 0;
 static int NumProcessActive = 0;
@@ -329,6 +329,13 @@ createProcesses(int argc, const char **argv)
                 }
               parent_process = current_process;
               current_process = processCreate(argv[idx]);
+              if (current_process->m_module.streamOutCnt == 0)
+                {
+                  MESSAGE("operator -", parent_process->operatorName,
+                          " can not take -", current_process->operatorName,
+                          "  with 0 outputs as input");
+                  exit(EXIT_FAILURE);
+                }
 
               parent_process->addChild(current_process);
               current_process->addParent(parent_process);
