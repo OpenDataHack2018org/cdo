@@ -570,6 +570,10 @@ char *
 cdoGetObase()
 {
   ProcessType &process = processSelf();
+  if(obase.find(process.m_ID) == obase.end())
+  {
+    ERROR("no obase found, please check the module if this operator is defined for obase usage");
+  }
 
   return obase[process.m_ID];
 }
