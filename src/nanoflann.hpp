@@ -911,6 +911,10 @@ namespace nanoflann
 		{
 			min_elem = dataset_get(obj, ind[0],element);
 			max_elem = dataset_get(obj, ind[0],element);
+#ifdef  HAVE_OPENMP45
+//#pragma omp parallel for if (count > 1000000) reduction(min:min_elem) reduction(max:max_elem) default(none) shared(element, ind, obj, count)
+//#pragma omp simd reduction(min:min_elem) reduction(max:max_elem)
+#endif
 			for (IndexType i = 1; i < count; ++i) {
 				ElementType val = dataset_get(obj, ind[i], element);
 				if (val < min_elem) min_elem = val;
