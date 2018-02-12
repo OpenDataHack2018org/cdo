@@ -63,7 +63,7 @@ const char *calendar2str(int calendar)
 }
 
 static
-void limit_string_length(char* string, size_t maxlen)
+void limitStringLength(char* string, size_t maxlen)
 {
   string[maxlen-1] = 0;
   size_t len = strlen(string);
@@ -157,14 +157,14 @@ void *Sinfo(void *process)
 	  const char *instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
 	  strcpy(tmpname, "unknown");
 	  if ( instptr ) strncpy(tmpname, instptr, CDI_MAX_NAME);
-	  limit_string_length(tmpname, CDI_MAX_NAME);
+	  limitStringLength(tmpname, 32);
 	  fprintf(stdout, "%-8s ", tmpname);
 
 	  // source info
 	  const char *modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
 	  strcpy(tmpname, "unknown");
 	  if ( modelptr ) strncpy(tmpname, modelptr, CDI_MAX_NAME);
-	  limit_string_length(tmpname, CDI_MAX_NAME);
+	  limitStringLength(tmpname, 32);
 	  fprintf(stdout, "%-8s ", tmpname);
 
           // timetype
