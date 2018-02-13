@@ -74,7 +74,6 @@ void *Detrend(void *process)
   size_t nmiss;
   int nlevel;
   double missval;
-  field_type ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
 
   cdoInitialize(process);
@@ -92,6 +91,7 @@ void *Detrend(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
+  std::vector<field_type**> vars;
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -99,7 +99,7 @@ void *Detrend(void *process)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars   = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
+	  vars.resize(nalloc);
 	}
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
@@ -176,8 +176,6 @@ void *Detrend(void *process)
 
       field_free(vars[tsID], vlistID1);
     }
-
-  if ( vars  ) Free(vars);
 
   dtlist_delete(dtlist);
 

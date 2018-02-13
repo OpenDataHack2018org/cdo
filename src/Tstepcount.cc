@@ -45,25 +45,18 @@ double tstepcount(long nts, double missval1, double *array1, double refval)
       if ( DBL_IS_EQUAL(array1[j], refval) ) break;  
     }
 
-  if ( j == nts )
-    return missval1;
-  else
-    return (double) n;
+  return (j == nts) ? missval1 : (double) n;
 }
 
 
 void *Tstepcount(void *process)
 {
-  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
   size_t nmiss;
-  int nlevel;
   int vdate = 0, vtime = 0;
-  double missval;
   double refval = 0;
-  field_type ***vars = NULL;
   typedef struct
   {
     double *array1;
@@ -82,9 +75,7 @@ void *Tstepcount(void *process)
 
   int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
-    {
-      vlistDefVarUnits(vlistID2, varID, "steps");
-    }
+    vlistDefVarUnits(vlistID2, varID, "steps");
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -93,13 +84,15 @@ void *Tstepcount(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
+  std::vector<field_type**> vars;
+
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars  = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
+          vars.resize(nalloc);
 	}
 
       vdate = taxisInqVdate(taxisID1);
@@ -111,7 +104,7 @@ void *Tstepcount(void *process)
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
+	  size_t gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
@@ -124,16 +117,14 @@ void *Tstepcount(void *process)
 
   memory_t *mem = (memory_t*) Malloc(Threading::ompNumThreads*sizeof(memory_t));
   for ( int i = 0; i < Threading::ompNumThreads; i++ )
-    {
-      mem[i].array1 = (double*) Malloc(nts*sizeof(double));
-    }
+    mem[i].array1 = (double*) Malloc(nts*sizeof(double));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      missval  = vlistInqVarMissval(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      gridID = vlistInqVarGrid(vlistID1, varID);
+      double missval  = vlistInqVarMissval(vlistID1, varID);
+      size_t gridsize = gridInqSize(gridID);
+      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 #ifdef  _OPENMP
@@ -163,10 +154,9 @@ void *Tstepcount(void *process)
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID   = vlistInqVarGrid(vlistID2, varID);
-      missval  = vlistInqVarMissval(vlistID2, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-
+      double missval = vlistInqVarMissval(vlistID2, varID);
+      size_t gridsize = gridInqSize(gridID);
+      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 	  nmiss = arrayNumMV(gridsize, vars[0][varID][levelID].ptr, missval);
@@ -176,8 +166,6 @@ void *Tstepcount(void *process)
     }
 
   for ( tsID = 0; tsID < nts; tsID++ ) field_free(vars[tsID], vlistID1);
-
-  if ( vars ) Free(vars);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
