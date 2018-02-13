@@ -89,7 +89,7 @@ private:
    void checkDatarange(int varID, double *array, size_t nmiss);
 };
 
-PstreamType *PstreamTypeo_pointer(int pstreamID);
+PstreamType *pstreamToPointer(int pstreamID);
 
 void cdoVlistCopyFlag(int vlistID2, int vlistID1);
 

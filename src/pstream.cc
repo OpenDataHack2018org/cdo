@@ -132,7 +132,7 @@ PstreamType *create_pstream(int processID, int pstreamIDX)
 
 }
 
-PstreamType * PstreamTypeo_pointer(int idx)
+PstreamType * pstreamToPointer(int idx)
 {
     PSTREAM_LOCK();
     auto pstream_iterator = _pstream_map.find(idx);
