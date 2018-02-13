@@ -127,14 +127,15 @@ am_libcdo_la_OBJECTS = libcdo_la-array.lo libcdo_la-cdo_pthread.lo \
 	libcdo_la-getRSS.lo libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
 	libcdo_la-grid_proj.lo libcdo_la-grid_area.lo \
 	libcdo_la-grid_define.lo libcdo_la-grid_gme.lo \
-	libcdo_la-grid_rot.lo libcdo_la-grid_from_name.lo \
-	libcdo_la-grid_read.lo libcdo_la-grid_read_pingo.lo \
-	libcdo_la-grid_print.lo libcdo_la-gridreference.lo \
-	libcdo_la-griddes.lo libcdo_la-griddes_h5.lo \
-	libcdo_la-griddes_nc.lo libcdo_la-hetaeta.lo \
-	libcdo_la-institution.lo libcdo_la-interpol.lo \
-	libcdo_la-job.lo libcdo_la-juldate.lo libcdo_la-grid_search.lo \
-	libcdo_la-listarray.lo libcdo_la-list.lo libcdo_la-listbuf.lo \
+	libcdo_la-grid_icosphere.lo libcdo_la-grid_rot.lo \
+	libcdo_la-grid_from_name.lo libcdo_la-grid_read.lo \
+	libcdo_la-grid_read_pingo.lo libcdo_la-grid_print.lo \
+	libcdo_la-gridreference.lo libcdo_la-griddes.lo \
+	libcdo_la-griddes_h5.lo libcdo_la-griddes_nc.lo \
+	libcdo_la-hetaeta.lo libcdo_la-institution.lo \
+	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
+	libcdo_la-grid_search.lo libcdo_la-listarray.lo \
+	libcdo_la-list.lo libcdo_la-listbuf.lo \
 	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
 	libcdo_la-namelist.lo libcdo_la-namelist_parser.lo \
 	libcdo_la-normal.lo libcdo_la-nth_element.lo \
@@ -563,15 +564,16 @@ libcdo_la_SOURCES = array.h array.cc cdo_int.h compare.h cfortran.h \
 	field2.cc fieldc.cc fieldmem.cc fieldmer.cc fieldzon.cc \
 	functs.h getMemorySize.c getRSS.c gradsdeslib.cc gradsdeslib.h \
 	grid.cc grid.h grid_proj.cc grid_proj.h grid_area.cc \
-	grid_define.cc grid_gme.cc grid_rot.cc grid_from_name.cc \
-	grid_read.cc grid_read_pingo.cc grid_print.cc gridreference.cc \
-	griddes.cc griddes.h griddes_h5.cc griddes_nc.cc hetaeta.cc \
-	hetaeta.h institution.cc interpol.cc interpol.h job.cc \
-	juldate.cc grid_search.cc grid_search.h listarray.cc \
-	listarray.h list.cc list.h listbuf.cc listbuf.h merge_sort2.cc \
-	merge_sort2.h modules.cc modules.h module_definitions.h \
-	namelist.cc namelist.h namelist_parser.cc nanoflann.hpp \
-	normal.cc nth_element.cc nth_element.h operator_definitions.h \
+	grid_define.cc grid_gme.cc grid_icosphere.cc grid_rot.cc \
+	grid_from_name.cc grid_read.cc grid_read_pingo.cc \
+	grid_print.cc gridreference.cc griddes.cc griddes.h \
+	griddes_h5.cc griddes_nc.cc hetaeta.cc hetaeta.h \
+	institution.cc interpol.cc interpol.h job.cc juldate.cc \
+	grid_search.cc grid_search.h listarray.cc listarray.h list.cc \
+	list.h listbuf.cc listbuf.h merge_sort2.cc merge_sort2.h \
+	modules.cc modules.h module_definitions.h namelist.cc \
+	namelist.h namelist_parser.cc nanoflann.hpp normal.cc \
+	nth_element.cc nth_element.h operator_definitions.h \
 	operator_help.h par_io.cc par_io.h parse_literal.cc \
 	percentiles_hist.cc percentiles_hist.h percentiles.cc \
 	percentiles.h pipe.cc pipe.h pmlist.cc pmlist.h sellist.cc \
@@ -1096,6 +1098,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_define.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_from_name.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_gme.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_icosphere.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_print.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_proj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_read.Plo@am__quote@
@@ -1570,6 +1573,13 @@ libcdo_la-grid_gme.lo: grid_gme.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='grid_gme.cc' object='libcdo_la-grid_gme.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-grid_gme.lo `test -f 'grid_gme.cc' || echo '$(srcdir)/'`grid_gme.cc
+
+libcdo_la-grid_icosphere.lo: grid_icosphere.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-grid_icosphere.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_icosphere.Tpo -c -o libcdo_la-grid_icosphere.lo `test -f 'grid_icosphere.cc' || echo '$(srcdir)/'`grid_icosphere.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-grid_icosphere.Tpo $(DEPDIR)/libcdo_la-grid_icosphere.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='grid_icosphere.cc' object='libcdo_la-grid_icosphere.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libcdo_la-grid_icosphere.lo `test -f 'grid_icosphere.cc' || echo '$(srcdir)/'`grid_icosphere.cc
 
 libcdo_la-grid_rot.lo: grid_rot.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libcdo_la-grid_rot.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_rot.Tpo -c -o libcdo_la-grid_rot.lo `test -f 'grid_rot.cc' || echo '$(srcdir)/'`grid_rot.cc
