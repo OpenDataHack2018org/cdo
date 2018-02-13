@@ -295,8 +295,14 @@ createProcesses(int argc, const char **argv)
     }
   if (cntOutFiles == -1)
     {
-      obase.insert({ 0, strdup(argv[argc - 1]) });
-      cntOutFiles = 1;
+      if(!fileExists(argv[argc - 1])){
+        obase.insert({ 0, strdup(argv[argc - 1]) });
+        cntOutFiles = 1;
+      }
+      else
+      {
+          CdoError::Abort("Obase missing. Found existing file: ", argv[argc - 1], "instead");
+      }
     }
 
   if (idx < argc - cntOutFiles)
