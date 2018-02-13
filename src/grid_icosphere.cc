@@ -1,3 +1,5 @@
+// modified code from: https://schneide.wordpress.com/2016/07/15/generating-an-icosphere-in-c
+
 #include <stdio.h>
 #include <cmath>
 #include <iostream>
@@ -18,7 +20,7 @@ void cc2gc(double xyz[], double *lon, double *lat)
 }
 
 
-using Index=int;
+using Index=size_t;
 using vec3=std::array<double,3>;
 
 struct Triangle
