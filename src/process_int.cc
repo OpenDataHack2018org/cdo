@@ -278,6 +278,23 @@ handleObase(const char *p_argvEntry)
     }
 }
 
+ProcessType *createNewProcess(ProcessType *p_parentProces, const char * argvEntry){
+  ProcessType *newProcess = processCreate(argvEntry);
+  if (newProcess->m_module.streamOutCnt == 0)
+    {
+      CdoError::Abort("operator -", p_parentProces->operatorName,
+                      " can not take -",
+                      newProcess->operatorName,
+                      "  with 0 outputs as input");
+      exit(EXIT_FAILURE);
+    }
+
+  p_parentProces->addChild(newProcess);
+  newProcess->addParent(p_parentProces);
+  return newProcess;
+}
+
+
 void
 createProcesses(int argc, const char **argv)
 {
@@ -286,15 +303,14 @@ createProcesses(int argc, const char **argv)
             "operators:  ", CdoDebug::argvToString(argc, argv));
   ProcessType *root_process = processCreate(argv[0]);
 
-  ProcessType *current_process;
-  ProcessType *parent_process;
+  ProcessType *currentProcess;
 
   int idx = 1;
   std::stack<ProcessType *> call_stack;
 
   call_stack.push(root_process);
-  current_process = call_stack.top();
-  int cntOutFiles = (int) current_process->m_module.streamOutCnt;
+  currentProcess = call_stack.top();
+  int cntOutFiles = (int) currentProcess->m_module.streamOutCnt;
 
   int temp_argc = argc - cntOutFiles;
 
@@ -313,49 +329,38 @@ createProcesses(int argc, const char **argv)
 
   if (idx < argc - cntOutFiles)
     {
+        const char *argvEntry;
       do
         {
+            argvEntry  = argv[idx];
           Cdo_Debug(CdoDebug::PROCESS, "iteration ", idx,
                     ", current argv: ", argv[idx],
-                    ",  current_process: ", current_process->operatorName);
-          if (argv[idx][0] == '-')
+                    ",  currentProcess: ", currentProcess->operatorName);
+          if (argvEntry[0] == '-')
             {
-              Cdo_Debug(CdoDebug::PROCESS, "Found new Operator: ", argv[idx]);
-              parent_process = current_process;
-              current_process = processCreate(argv[idx]);
-              if (current_process->m_module.streamOutCnt == 0)
-                {
-                  CdoError::Abort("operator -", parent_process->operatorName,
-                                  " can not take -",
-                                  current_process->operatorName,
-                                  "  with 0 outputs as input");
-                  exit(EXIT_FAILURE);
-                }
-
-              parent_process->addChild(current_process);
-              current_process->addParent(parent_process);
-
-              call_stack.push(current_process);
+              Cdo_Debug(CdoDebug::PROCESS, "Found new Operator: ", argvEntry);
+              currentProcess = createNewProcess(currentProcess, argvEntry);
+              call_stack.push(currentProcess);
             }
-          else if (current_process->m_module.streamInCnt != 0)
+          else if (currentProcess->m_module.streamInCnt != 0)
             {
               Cdo_Debug(CdoDebug::PROCESS, "adding in file to ",
-                        current_process->operatorName);
-              current_process->addFileInStream(argv[idx]);
+                        currentProcess->operatorName);
+              currentProcess->addFileInStream(argvEntry);
             }
-          while (current_process->hasAllInputs()
-                 && current_process != root_process)
+          while (currentProcess->hasAllInputs()
+                 && currentProcess != root_process)
             {
               Cdo_Debug(CdoDebug::PROCESS, "Removing ",
-                        current_process->operatorName, " from stack");
+                        currentProcess->operatorName, " from stack");
               call_stack.top()->checkStreamCnt();
               call_stack.pop();
-              current_process = call_stack.top();
+              currentProcess = call_stack.top();
             }
 
           idx++;
         }
-      while ((current_process != root_process || !root_process->hasAllInputs())
+      while ((currentProcess != root_process || !root_process->hasAllInputs())
              && idx < argc - cntOutFiles);
     }
 
