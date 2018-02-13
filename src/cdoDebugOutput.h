@@ -135,7 +135,7 @@ namespace CdoError{
     void Error_(const char* p_file, const int p_line, const char* caller, T&& ...args)
     {
           std::stringstream message;
-          message << "Error in: " << p_file << ":" << p_line << " ";
+          message << "Error in: " << p_file << ":" << p_line << " " << caller << " ";
           CdoLog::expand(message, args...);
           CdoDebug::printError(message,true);
           if ( CdoError::_ExitOnError )
