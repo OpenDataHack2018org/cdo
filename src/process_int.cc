@@ -283,7 +283,7 @@ createProcesses(int argc, const char **argv)
   int cntOutFiles = (int) current_process->m_module.streamOutCnt;
   if (cntOutFiles == -1)
     {
-        Cdo_Debug(CdoDebug::PROCESS, "Adding obase ", argv[argc - 1]);
+      Cdo_Debug(CdoDebug::PROCESS, "Adding obase ", argv[argc - 1]);
       obase.insert({ 0, strdup(argv[argc - 1]) });
     }
   int temp_argc = argc - cntOutFiles;
@@ -295,14 +295,16 @@ createProcesses(int argc, const char **argv)
     }
   if (cntOutFiles == -1)
     {
-      if(!fileExists(argv[argc - 1])){
-        obase.insert({ 0, strdup(argv[argc - 1]) });
-        cntOutFiles = 1;
-      }
+      if (!fileExists(argv[argc - 1]))
+        {
+          obase.insert({ 0, strdup(argv[argc - 1]) });
+          cntOutFiles = 1;
+        }
       else
-      {
-          CdoError::Abort("Obase missing. Found existing file: ", argv[argc - 1], "instead");
-      }
+        {
+          CdoError::Abort("Obase missing. Found existing file: ",
+                          argv[argc - 1], "instead");
+        }
     }
 
   if (idx < argc - cntOutFiles)
@@ -577,10 +579,11 @@ char *
 cdoGetObase()
 {
   ProcessType &process = processSelf();
-  if(obase.find(process.m_ID) == obase.end())
-  {
-    ERROR("no obase found, please check the module if this operator is defined for obase usage");
-  }
+  if (obase.find(process.m_ID) == obase.end())
+    {
+      ERROR("no obase found, please check the module if this operator is "
+            "defined for obase usage");
+    }
 
   return obase[process.m_ID];
 }
