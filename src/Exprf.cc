@@ -673,8 +673,8 @@ void *Expr(void *process)
       tsID++;
     }
 
-//  pstreamClose(streamID2);
-//  pstreamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 
