@@ -73,6 +73,10 @@ void gen_grid_icosphere(griddes_t *grid, const char *pline)
   size_t ncells = genIcosphereCoords(b+1, lbounds, &grid->xvals, &grid->yvals, &grid->xbounds, &grid->ybounds);
   grid->xsize = ncells;
   grid->ysize = ncells;
+  strcpy(grid->xname, "clon");
+  strcpy(grid->yname, "clat");
+  strcpy(grid->xunits, "radian");
+  strcpy(grid->yunits, "radian");
 }
 
 static
