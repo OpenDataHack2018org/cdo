@@ -85,6 +85,7 @@ libcdo_la_SOURCES =            \
                grid_area.cc     \
                grid_define.cc   \
                grid_gme.cc      \
+               grid_icosphere.cc  \
                grid_rot.cc      \
                grid_from_name.cc   \
                grid_read.cc        \

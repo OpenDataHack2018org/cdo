@@ -76,7 +76,7 @@
 #define  GengridOperators       {"gengrid"}
 #define  GradsdesOperators      {"gradsdes", "dumpmap"}
 #define  GridboxstatOperators   {"gridboxrange", "gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", "gridboxstd", "gridboxstd1", "gridboxvar", "gridboxvar1"}
-#define  GridcellOperators      {"gridarea", "gridweights", "gridmask", "griddx", "griddy"}
+#define  GridcellOperators      {"gridarea", "gridweights", "gridmask", "griddx", "griddy", "gridcellidx"}
 #define  GridsearchOperators    {"testpointsearch", "testcellsearch"}
 #define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}

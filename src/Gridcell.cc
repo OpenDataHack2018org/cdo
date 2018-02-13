@@ -31,7 +31,8 @@
 #include "grid.h"
 #include "constants.h"
 
-static
+
+static inline
 double orthodrome(double px1, double py1, double px2, double py2)
 {
   return acos(sin(py1)*sin(py2)+cos(py1)*cos(py2)*cos(px2-px1));
@@ -84,22 +85,21 @@ void grid_cell_area(int gridID, double *array)
 
 void *Gridcell(void *process)
 {
-  int status;
-
   cdoInitialize(process);
 
   // clang-format off
-  int GRIDAREA = cdoOperatorAdd("gridarea",     1,  0, NULL);
-  int GRIDWGTS = cdoOperatorAdd("gridweights",  1,  0, NULL);
-  int GRIDMASK = cdoOperatorAdd("gridmask",     0,  0, NULL);
-  int GRIDDX   = cdoOperatorAdd("griddx",       1,  0, NULL);
-  int GRIDDY   = cdoOperatorAdd("griddy",       1,  0, NULL);
+  int GRIDAREA    = cdoOperatorAdd("gridarea",     1,  0, NULL);
+  int GRIDWGTS    = cdoOperatorAdd("gridweights",  1,  0, NULL);
+  int GRIDMASK    = cdoOperatorAdd("gridmask",     0,  0, NULL);
+  int GRIDDX      = cdoOperatorAdd("griddx",       1,  0, NULL);
+  int GRIDDY      = cdoOperatorAdd("griddy",       1,  0, NULL);
+  int GRIDCELLIDX = cdoOperatorAdd("gridcellidx",  0,  0, NULL);
   // clang-format on
 
   int operatorID = cdoOperatorID();
 
-  bool need_radius = cdoOperatorF1(operatorID) > 0;
-  if ( need_radius )
+  bool needRadius = cdoOperatorF1(operatorID) > 0;
+  if ( needRadius )
     {
       char *envstr = getenv("PLANET_RADIUS");
       if ( envstr )
@@ -121,7 +121,6 @@ void *Gridcell(void *process)
     cdoWarning("Found more than 1 grid, using the first one!");
 
   int gridID  = vlistGrid(vlistID1, 0);
-
   int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
   int vlistID2 = vlistCreate();
@@ -158,30 +157,35 @@ void *Gridcell(void *process)
       vlistDefVarLongname(vlistID2, varID, "delta y");
       vlistDefVarUnits(vlistID2, varID, "m");
     }
+  else if ( operatorID == GRIDCELLIDX )
+    {
+      vlistDefVarName(vlistID2, varID, "gridcellidx");
+      vlistDefVarLongname(vlistID2, varID, "grid cell index");
+    }
 
   int taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID);
 
 
   size_t gridsize = gridInqSize(gridID);
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  std::vector<double> array(gridsize);
 
 
   if ( operatorID == GRIDAREA )
     {
-      grid_cell_area(gridID, array);
+      grid_cell_area(gridID, &array[0]);
     }
   else if ( operatorID == GRIDWGTS )
     {
-      status = gridWeights(gridID, array);
+      int status = gridWeights(gridID, &array[0]);
       if ( status != 0 ) cdoWarning("Using constant grid cell area weights!");
     }
   else if ( operatorID == GRIDMASK )
     {
-      int *mask = (int*) Malloc(gridsize*sizeof(int));
+      std::vector<int> mask(gridsize);
       if ( gridInqMask(gridID, NULL) )
 	{
-	  gridInqMask(gridID, mask);
+	  gridInqMask(gridID, &mask[0]);
 	}
       else
 	{
@@ -189,7 +193,10 @@ void *Gridcell(void *process)
 	}
 
       for ( size_t i = 0; i < gridsize; ++i ) array[i] = mask[i];
-      Free(mask);
+    }
+  else if ( operatorID == GRIDCELLIDX )
+    {
+      for ( size_t i = 0; i < gridsize; ++i ) array[i] = i+1;
     }
   else if ( operatorID == GRIDDX || operatorID == GRIDDY )
     {
@@ -207,26 +214,24 @@ void *Gridcell(void *process)
 	    gridID = gridToCurvilinear(gridID, 1);
 
 	  gridsize = gridInqSize(gridID);
-	  long xsize = gridInqXsize(gridID);
-	  long ysize = gridInqYsize(gridID);
+	  size_t xsize = gridInqXsize(gridID);
+	  size_t ysize = gridInqYsize(gridID);
 
-	  double *xv = (double*) Malloc(gridsize*sizeof(double));
-	  double *yv = (double*) Malloc(gridsize*sizeof(double));
+          std::vector<double> xv(gridsize);
+          std::vector<double> yv(gridsize);
 
-	  gridInqXvals(gridID, xv);
-	  gridInqYvals(gridID, yv);
+	  gridInqXvals(gridID, &xv[0]);
+	  gridInqYvals(gridID, &yv[0]);
 
-	  /* Convert lat/lon units if required */
-
+	  // Convert lat/lon units if required
 	  gridInqXunits(gridID, units);
-
-	  grid_to_radian(units, gridsize, xv, "grid longitudes");
-	  grid_to_radian(units, gridsize, yv, "grid latitudes");
+	  grid_to_radian(units, gridsize, &xv[0], "grid longitudes");
+	  grid_to_radian(units, gridsize, &yv[0], "grid latitudes");
 
 	  if ( operatorID == GRIDDX )
 	    {
-	      for ( long j = 0; j < ysize; ++j )
-		for ( long i = 0; i < xsize; ++i )
+	      for ( size_t j = 0; j < ysize; ++j )
+		for ( size_t i = 0; i < xsize; ++i )
 		  {
 		    if ( i == 0 )
 		      {
@@ -249,8 +254,8 @@ void *Gridcell(void *process)
 	    }
 	  else
 	    {
-	      for ( long i = 0; i < xsize; ++i )
-	        for ( long j = 0; j < ysize; ++j )
+	      for ( size_t i = 0; i < xsize; ++i )
+	        for ( size_t j = 0; j < ysize; ++j )
 		  {
 		    if ( j == 0 )
 		      {
@@ -271,9 +276,6 @@ void *Gridcell(void *process)
 		    array[j*xsize+i] = 0.5*(len1+len2)*PlanetRadius;
 		  }
 	    }
-
-	  Free(xv);
-	  Free(yv);
 	}
       else
 	{
@@ -287,21 +289,13 @@ void *Gridcell(void *process)
 
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-
   pstreamDefVlist(streamID2, vlistID2);
-
-  int tsID = 0;
-  pstreamDefTimestep(streamID2, tsID);
-
-  varID = 0;
-  int levelID = 0;
-  pstreamDefRecord(streamID2, varID, levelID);
-  pstreamWriteRecord(streamID2, array, 0);
+  pstreamDefTimestep(streamID2, 0);
+  pstreamDefRecord(streamID2, 0, 0);
+  pstreamWriteRecord(streamID2, &array[0], 0);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if ( array ) Free(array);
 
   cdoFinish();
 
