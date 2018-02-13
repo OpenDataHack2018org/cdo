@@ -265,6 +265,20 @@ processNumsActive(void)
 }
 
 void
+handleObase(const char *p_argvEntry)
+{
+  if (!fileExists(p_argvEntry))
+    {
+      obase.insert({ 0, strdup(p_argvEntry) });
+    }
+  else
+    {
+      CdoError::Abort("Obase missing. Found existing file: ", p_argvEntry,
+                      "instead");
+    }
+}
+
+void
 createProcesses(int argc, const char **argv)
 {
   Cdo_Debug(CdoDebug::PROCESS, "== Process Creation Start ==");
@@ -281,30 +295,20 @@ createProcesses(int argc, const char **argv)
   call_stack.push(root_process);
   current_process = call_stack.top();
   int cntOutFiles = (int) current_process->m_module.streamOutCnt;
-  if (cntOutFiles == -1)
-    {
-      Cdo_Debug(CdoDebug::PROCESS, "Adding obase ", argv[argc - 1]);
-      obase.insert({ 0, strdup(argv[argc - 1]) });
-    }
+
   int temp_argc = argc - cntOutFiles;
+
   for (int i = 0; i < cntOutFiles; i++)
     {
       Cdo_Debug(CdoDebug::PROCESS,
                 "Creating new pstream for output file: ", argv[temp_argc + i]);
       root_process->addFileOutStream(argv[temp_argc + i]);
     }
+
   if (cntOutFiles == -1)
     {
-      if (!fileExists(argv[argc - 1]))
-        {
-          obase.insert({ 0, strdup(argv[argc - 1]) });
-          cntOutFiles = 1;
-        }
-      else
-        {
-          CdoError::Abort("Obase missing. Found existing file: ",
-                          argv[argc - 1], "instead");
-        }
+      handleObase(argv[argc - 1]);
+      cntOutFiles = 1;
     }
 
   if (idx < argc - cntOutFiles)
