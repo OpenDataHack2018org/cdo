@@ -283,6 +283,7 @@ createProcesses(int argc, const char **argv)
   int cntOutFiles = (int) current_process->m_module.streamOutCnt;
   if (cntOutFiles == -1)
     {
+        Cdo_Debug(CdoDebug::PROCESS, "Adding obase ", argv[argc - 1]);
       obase.insert({ 0, strdup(argv[argc - 1]) });
     }
   int temp_argc = argc - cntOutFiles;
