@@ -164,15 +164,11 @@ void *Timstat2(void *process)
 
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  nofvals[varID][levelID] = (size_t*) Malloc(gridsize*sizeof(size_t));
-	  memset(nofvals[varID][levelID], 0, gridsize*sizeof(size_t));
+	  nofvals[varID][levelID] = (size_t*) Calloc(gridsize, sizeof(size_t));
       
 	  work[varID][levelID] = (double **) Malloc(nwork*sizeof(double *));
 	  for ( int i = 0; i < nwork; i++ )
-	    {
-	      work[varID][levelID][i] = (double*) Malloc(gridsize*sizeof(double));
-	      memset(work[varID][levelID][i], 0, gridsize*sizeof(double));
-	    }
+            work[varID][levelID][i] = (double*) Calloc(gridsize, sizeof(double));
 	}
     }
  

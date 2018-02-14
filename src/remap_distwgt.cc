@@ -109,7 +109,6 @@ double nbr_compute_weights(size_t numNeighbors, const int *restrict src_grid_mas
 size_t nbr_normalize_weights(size_t numNeighbors, double dist_tot, const bool *restrict nbr_mask, size_t *restrict nbr_add, double *restrict nbr_dist)
 {
   // Normalize weights and store the link
-
   size_t nadds = 0;
 
   for ( size_t n = 0; n < numNeighbors; ++n )

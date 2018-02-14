@@ -364,8 +364,7 @@ void *Vertintml(void *process)
 	{
 	  varinterp[varID] = true;
 	  vardata2[varID]  = (double*) Malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = (size_t*) Malloc(maxlev*sizeof(size_t));
-	  memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
+	  varnmiss[varID]  = (size_t*) Calloc(maxlev, sizeof(size_t));
 	}
       else
 	{
@@ -408,7 +407,7 @@ void *Vertintml(void *process)
               else
                 cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
             }
-	  memset(&sgeopot[0], 0, gridsize*sizeof(double));
+	  arrayFill(gridsize, &sgeopot[0], 0.0);
 	}
     }
 

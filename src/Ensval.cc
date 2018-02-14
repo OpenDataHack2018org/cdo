@@ -470,14 +470,14 @@ void *Ensval(void *process)
 	  
 	  switch ( operfunc ) {
 	  case ( CRPS ) :
-	    memset(alpha, 0, (nens+1) * sizeof(double) );
-	    memset(beta,  0, (nens+1) * sizeof(double) ); 
+	    arrayFill(nens+1, alpha, 0.0);
+	    arrayFill(nens+1, beta,  0.0); 
 	    heavyside0=0;
 	    heavysideN=0;	  
 	    break; 
 	  case ( BRS ):
-	    memset(brs_o, 0, (nens+1)*sizeof(double) );
-	    memset(brs_g, 0, (nens+1)*sizeof(double) );
+	    arrayFill(nens+1, brs_o, 0.0);
+	    arrayFill(nens+1, brs_g, 0.0);
 	    break;
 	  }
 	}   // for ( int recID = 0; recID < nrecs; recID++ ) 

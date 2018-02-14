@@ -204,9 +204,9 @@ void remapgrid_init(remapgrid_t *grid)
 void remapgrid_alloc(RemapType mapType, remapgrid_t *grid)
 {
   if ( grid->nvgp )
-    grid->vgpm   = (int*) Malloc(grid->nvgp*sizeof(int));
+    grid->vgpm = (int*) Malloc(grid->nvgp*sizeof(int));
 
-  grid->mask     = (int*) Malloc(grid->size*sizeof(int));
+  grid->mask = (int*) Malloc(grid->size*sizeof(int));
 
   if ( remap_write_remap || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
@@ -216,24 +216,18 @@ void remapgrid_alloc(RemapType mapType, remapgrid_t *grid)
 
   if ( mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC )
     {
-      grid->cell_area = (double*) Malloc(grid->size*sizeof(double));
-      memset(grid->cell_area, 0, grid->size*sizeof(double));
+      grid->cell_area = (double*) Calloc(grid->size, sizeof(double));
     }
 
-  grid->cell_frac = (double*) Malloc(grid->size*sizeof(double));
-  memset(grid->cell_frac, 0, grid->size*sizeof(double));
+  grid->cell_frac = (double*) Calloc(grid->size, sizeof(double));
 
   if ( grid->lneed_cell_corners )
     {
       if ( grid->num_cell_corners > 0 )
         {
 	  size_t nalloc = grid->num_cell_corners*grid->size;
-
-	  grid->cell_corner_lon = (double*) Malloc(nalloc*sizeof(double));
-	  memset(grid->cell_corner_lon, 0, nalloc*sizeof(double));
-
-	  grid->cell_corner_lat = (double*) Malloc(nalloc*sizeof(double));  
-	  memset(grid->cell_corner_lat, 0, nalloc*sizeof(double));
+	  grid->cell_corner_lon = (double*) Calloc(nalloc, sizeof(double));
+	  grid->cell_corner_lat = (double*) Calloc(nalloc, sizeof(double));  
 	}
     }
 }
@@ -1014,8 +1008,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, size_t n
 static
 size_t get_max_add(size_t num_links, size_t size, const size_t *restrict add)
 {
-  size_t *isum = (size_t*) Malloc(size*sizeof(size_t));
-  memset(isum, 0, size*sizeof(size_t));
+  size_t *isum = (size_t*) Calloc(size, sizeof(size_t));
 
   for ( size_t n = 0; n < num_links; ++n ) isum[add[n]]++;
 

@@ -341,7 +341,6 @@ void *Intgrid(void *process)
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -370,10 +369,8 @@ void *Intgrid(void *process)
 	  else if ( operatorID == THINOUT )     thinout(&field1, &field2, xinc, yinc);
 // clang-format on
 
-	  nmiss = field2.nmiss;
-
 	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, array2, nmiss);
+	  pstreamWriteRecord(streamID2, array2, field2.nmiss);
 	}
       tsID++;
     }

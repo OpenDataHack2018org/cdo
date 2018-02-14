@@ -69,12 +69,12 @@ field_type **field_allocate(int vlistID, int ptype, int init)
               if ( ptype & FIELD_FLT )
                 {
                   field[varID][levelID].ptrf = (float*) Malloc(nwpv*gridsize*sizeof(float));
-                  if ( init ) memset(field[varID][levelID].ptrf, 0, nwpv*gridsize*sizeof(float));
+                  if ( init ) arrayFill(nwpv*gridsize, field[varID][levelID].ptrf, 0.0f);
                 }
               else
                 {
                   field[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-                  if ( init ) memset(field[varID][levelID].ptr, 0, nwpv*gridsize*sizeof(double));
+                  if ( init ) arrayFill(nwpv*gridsize, field[varID][levelID].ptr, 0.0);
                 }
             }
 
@@ -83,19 +83,19 @@ field_type **field_allocate(int vlistID, int ptype, int init)
               if ( ptype & FIELD_FLT )
                 {
                   field[varID][levelID].ptr2 = Malloc(nwpv*gridsize*sizeof(float));
-                  if ( init ) memset(field[varID][levelID].ptr2, 0, nwpv*gridsize*sizeof(float));
+                  if ( init ) arrayFill(nwpv*gridsize, (float*)field[varID][levelID].ptr2, 0.0f);
                 }
               else
                 {
                   field[varID][levelID].ptr2 = Malloc(nwpv*gridsize*sizeof(double));
-                  if ( init ) memset(field[varID][levelID].ptr2, 0, nwpv*gridsize*sizeof(double));
+                  if ( init ) arrayFill(nwpv*gridsize, (double*)field[varID][levelID].ptr2, 0.0);
                 }
             }
 
 	  if ( ptype & FIELD_WGT )
 	    {
 	      field[varID][levelID].weight = (double*) Malloc(nwpv*gridsize*sizeof(double));
-	      if ( init ) memset(field[varID][levelID].weight, 0, nwpv*gridsize*sizeof(double));
+	      if ( init ) arrayFill(nwpv*gridsize, field[varID][levelID].weight, 0.0);
 	    }    
 	}
     }

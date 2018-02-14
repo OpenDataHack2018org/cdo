@@ -111,7 +111,7 @@ void *Harmonic(void *process)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  work[j][varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
-	  memset(work[j][varID], 0, gridsize*nlevel*sizeof(double));
+	  arrayFill(gridsize*nlevel, work[j][varID], 0.0);
 	}
     }
 

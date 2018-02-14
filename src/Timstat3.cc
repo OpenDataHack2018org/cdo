@@ -142,14 +142,12 @@ void *Timstat3(void *process)
 	      fwork[iw][varID][levelID].grid    = gridID;
 	      fwork[iw][varID][levelID].nmiss   = 0;
 	      fwork[iw][varID][levelID].missval = missval;
-	      fwork[iw][varID][levelID].ptr     = (double*) Malloc(gridsize*sizeof(double));
-	      memset(fwork[iw][varID][levelID].ptr, 0, gridsize*sizeof(double));
+	      fwork[iw][varID][levelID].ptr     = (double*) Calloc(gridsize, sizeof(double));
 	    }
 
 	  for ( int iw = 0; iw < NIWORK; ++iw )
 	    {
-	      iwork[iw][varID][levelID] = (int*) Malloc(gridsize*sizeof(int));
-	      memset(iwork[iw][varID][levelID], 0, gridsize*sizeof(int));
+	      iwork[iw][varID][levelID] = (int*) Calloc(gridsize, sizeof(int));
 	    }
 	}
     }

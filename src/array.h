@@ -76,7 +76,18 @@ void arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin, d
 
 void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2);
 
-void arrayCopy(size_t len, const double *restrict array1, double *restrict array2);
+template <typename T>
+void arrayFill(size_t len, T *restrict array, T value)
+{
+  for ( size_t i = 0; i < len; ++i ) array[i] = value;
+}
+
+template <typename T>
+void arrayCopy(size_t len, const T *restrict array1, T *restrict array2)
+{
+  for ( size_t i = 0; i < len; ++i ) array2[i] = array1[i];
+}
+
 size_t arrayNumMV(size_t len, const double *restrict array, double missval);
 
 double arrayMin(size_t len, const double *restrict array);

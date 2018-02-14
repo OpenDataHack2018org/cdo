@@ -557,7 +557,7 @@ Remapeta(void *process)
       if (ltq)
         cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
 
-      memset(fis1, 0, gridsize * sizeof(double));
+      arrayFill(gridsize, fis1, 0.0);
     }
 
   int presID = lnpsID;

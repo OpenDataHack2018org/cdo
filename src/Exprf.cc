@@ -644,7 +644,7 @@ void *Expr(void *process)
           size_t nlev = params[pidx].nlev;
 
           params[pidx].nmiss = 0;
-	  memset(params[pidx].data, 0, ngp*nlev*sizeof(double));
+	  arrayFill(ngp*nlev, params[pidx].data, 0.0);
 	}
 
       yy_scan_string(exprs, scanner);

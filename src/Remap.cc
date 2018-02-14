@@ -1119,15 +1119,15 @@ void *Remap(void *argument)
                         if ( remaps[r].src_grid.vgpm[i] ) imask[j++] = imask[i];
                     }
 
-                  memcpy(remaps[r].src_grid.mask, &imask[0], remaps[r].src_grid.size*sizeof(int));
+                  arrayCopy(remaps[r].src_grid.size, &imask[0], remaps[r].src_grid.mask);
 
                   if ( mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC )
                     {
-                      memset(remaps[r].src_grid.cell_area, 0, remaps[r].src_grid.size*sizeof(double));
-                      memset(remaps[r].src_grid.cell_frac, 0, remaps[r].src_grid.size*sizeof(double));
-                      memset(remaps[r].tgt_grid.cell_area, 0, remaps[r].tgt_grid.size*sizeof(double));
+                      arrayFill(remaps[r].src_grid.size, remaps[r].src_grid.cell_area, 0.0);
+                      arrayFill(remaps[r].src_grid.size, remaps[r].src_grid.cell_frac, 0.0);
+                      arrayFill(remaps[r].tgt_grid.size, remaps[r].tgt_grid.cell_area, 0.0);
                     }
-                  memset(remaps[r].tgt_grid.cell_frac, 0, remaps[r].tgt_grid.size*sizeof(double));
+                  arrayFill(remaps[r].tgt_grid.size, remaps[r].tgt_grid.cell_frac, 0.0);
 
                   // initialize some remapping variables
                   if ( cdoTimer ) timer_start(timer_remap_init);

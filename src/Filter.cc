@@ -350,7 +350,7 @@ void *Filter(void *process)
                   for ( int tsID = 0; tsID < nts; tsID++ )
                     ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
-                  memset(ompmem[ompthID].array2, 0, nts*sizeof(double));
+                  arrayFill(nts, ompmem[ompthID].array2, 0.0);
 
                   filter_intrinsic(nts, fmasc, ompmem[ompthID].array1, ompmem[ompthID].array2);
 
