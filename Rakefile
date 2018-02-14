@@ -23,7 +23,7 @@ end
 
 # helper methods {{{ ===========================================================
 # general debugging output
-def dbg(msg); pp msg if @debug; end
+def dbg(msg); if msg.kind_of?(String) then puts msg else pp msg end if @debug; end
 
 # return name of current branch
 def getBranchName; `git branch`.split("\n").grep(/^\*/)[0].split[-1].tr(')',''); end
@@ -58,6 +58,11 @@ def executeRemote(command, builder)
   Net::SSH.start(builder.hostname,builder.username,
                  :config => true, :compression => true) do |ssh|
 
+    remoteHostname = ssh.exec!('hostname -f')
+    puts "Connected to #{remoteHostname}".colorize(:green)
+    ssh.loop
+
+
     stdout_data = ""
     stderr_data = ""
     exit_code   = nil
@@ -86,7 +91,10 @@ def executeRemote(command, builder)
         channel.on_request("exit-signal") do |ch, data|
           exit_signal = data.read_long
         end
+
+        channel.on_close {puts "done!".colorize(:green)}
       end
+      channel.wait
     end
     ssh.loop
   end
@@ -104,7 +112,7 @@ def execute(command, builder)
              "cd #{builder.targetDir}",
              command]).join(';')
 
-  dbg(commands)
+  dbg(commands.colorize(:blue))
 
   if builder.isLocal? then
     executeLocal(commands)
