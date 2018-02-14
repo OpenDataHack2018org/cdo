@@ -137,7 +137,6 @@ size_t covariance(size_t gridsize, double missval1, double missval2, size_t *nof
 void *Timstat2(void *process)
 {
   int vdate = 0, vtime = 0;
-  int nrecs2;
   int varID, levelID;
   size_t nmiss;
 
@@ -182,7 +181,7 @@ void *Timstat2(void *process)
   std::vector<double> array1(gridsizemax);
   std::vector<double> array2(gridsizemax);
   				 
-  double ****work = (double ****) Malloc(nvars*sizeof(double ***));
+  std::vector<std::vector<std::vector<std::vector<double>>>> work(nvars);
   std::vector<std::vector<std::vector<size_t>>> nofvals(nvars);
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -191,16 +190,15 @@ void *Timstat2(void *process)
       size_t gridsize = gridInqSize(gridID);
       int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
-      work[varID]    = (double ***) Malloc(nlevs*sizeof(double **));
+      work[varID].resize(nlevs);
       nofvals[varID].resize(nlevs);  
 
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
           nofvals[varID][levelID].resize(gridsize, 0);
-      
-	  work[varID][levelID] = (double **) Malloc(nwork*sizeof(double *));
+	  work[varID][levelID].resize(nwork);
 	  for ( int i = 0; i < nwork; i++ )
-            work[varID][levelID][i] = (double*) Calloc(gridsize, sizeof(double));
+            work[varID][levelID][i].resize(gridsize);
 	}
     }
  
@@ -210,7 +208,7 @@ void *Timstat2(void *process)
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      nrecs2 = pstreamInqTimestep(streamID2, tsID);
+      int nrecs2 = pstreamInqTimestep(streamID2, tsID);
       if ( nrecs != nrecs2 )
         cdoWarning("Input streams have different number of records!");
 
@@ -236,15 +234,15 @@ void *Timstat2(void *process)
 	  if ( operfunc == func_cor )
 	    {
               correlationInit(gridsize, &array1[0], &array2[0], missval1, missval2, &nofvals[varID][levelID][0],
-                              work[varID][levelID][0], work[varID][levelID][1],
-                              work[varID][levelID][2], work[varID][levelID][3], 
-                              work[varID][levelID][4]);
+                              &work[varID][levelID][0][0], &work[varID][levelID][1][0],
+                              &work[varID][levelID][2][0], &work[varID][levelID][3][0], 
+                              &work[varID][levelID][4][0]);
 	    }
 	  else if ( operfunc == func_covar )
 	    {
               covarianceInit(gridsize, &array1[0], &array2[0], missval1, missval2, &nofvals[varID][levelID][0],
-                             work[varID][levelID][0], work[varID][levelID][1],
-                             work[varID][levelID][2]);
+                             &work[varID][levelID][0][0], &work[varID][levelID][1][0],
+                             &work[varID][levelID][2][0]);
 	    }
 	}
 
@@ -269,36 +267,20 @@ void *Timstat2(void *process)
       if ( operfunc == func_cor )
 	{
 	  nmiss = correlation(gridsize, missval1, missval2, &nofvals[varID][levelID][0],
-                              work[varID][levelID][0], work[varID][levelID][1],
-                              work[varID][levelID][2], work[varID][levelID][3], 
-                              work[varID][levelID][4]);
+                              &work[varID][levelID][0][0], &work[varID][levelID][1][0],
+                              &work[varID][levelID][2][0], &work[varID][levelID][3][0], 
+                              &work[varID][levelID][4][0]);
 	}
       else if ( operfunc == func_covar )
 	{
 	  nmiss = covariance(gridsize, missval1, missval2, &nofvals[varID][levelID][0],
-                             work[varID][levelID][0], work[varID][levelID][1],
-                             work[varID][levelID][2]);
+                             &work[varID][levelID][0][0], &work[varID][levelID][1][0],
+                             &work[varID][levelID][2][0]);
 	}
 
       pstreamDefRecord(streamID3, varID, levelID);
-      pstreamWriteRecord(streamID3, work[varID][levelID][0], nmiss);
+      pstreamWriteRecord(streamID3, &work[varID][levelID][0][0], nmiss);
     }
-
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      for ( levelID = 0; levelID < nlevs; levelID++ )
-	{
-	  for ( int i = 0; i < nwork; i++ )
-	    Free(work[varID][levelID][i]);
-	  Free(work[varID][levelID]);
-	}
-    
-      Free(work[varID]);
-    }
-    
-  //Free(nofvals);
-  Free(work);
 
   pstreamClose(streamID3);
   pstreamClose(streamID2);
