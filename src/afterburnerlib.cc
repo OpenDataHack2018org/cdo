@@ -165,25 +165,25 @@ void AddVector(double *dest, const double *src, size_t len, size_t *nmiss, doubl
 }
 
 static
-void Add2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, int len)
+void Add2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, size_t len)
 {
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     dest[i] = srcA[i] + srcB[i];
 }
 
 static
-void Sub2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, int len)
+void Sub2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, size_t len)
 {
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     dest[i] = srcA[i] - srcB[i];
 }
 
 static
-void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, size_t nmiss, double missval)
+void MultVectorScalar(double *dest, const double *restrict src, double factor, size_t len, size_t nmiss, double missval)
 {
   if ( nmiss > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	{
 	  if ( IS_EQUAL(src[i], missval) )
 	    dest[i] = missval;
@@ -193,16 +193,16 @@ void MultVectorScalar(double *dest, const double *restrict src, double factor, i
     }
   else
     {
-      for ( int i = 0; i < len; i++ ) dest[i] = src[i] * factor;
+      for ( size_t i = 0; i < len; i++ ) dest[i] = src[i] * factor;
     }
 }
 
 static
-void DivVectorIvector(double *dest, const double *restrict src, const int *samp, int len, size_t *nmiss, double missval)
+void DivVectorIvector(double *dest, const double *restrict src, const int *samp, size_t len, size_t *nmiss, double missval)
 {
   *nmiss = 0;
 
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     {
       if ( IS_EQUAL(src[i], missval) || samp[i] == 0 )
 	{
