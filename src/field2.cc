@@ -160,15 +160,7 @@ void farsum(field_type *field1, field_type field2)
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( size_t i = 0; i < len; i++ )
-	if ( !DBL_IS_EQUAL(array2[i], missval2) )
-	  {
-	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
-	      array1[i] += array2[i];
-	    else
-	      array1[i] = array2[i];
-	  }
-
+      arrayAddArrayMV(len, array1, array2, missval2);
       field1->nmiss = arrayNumMV(len, array1, missval1);
     }
   else

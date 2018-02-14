@@ -75,6 +75,7 @@ size_t arrayMinMaxMeanMV(size_t len, const double *array, double missval, double
 void arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin, double *rmax);
 
 void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2);
+void arrayAddArrayMV(size_t len, double *restrict array1, const double *restrict array2, double missval);
 
 template <typename T>
 void arrayFill(size_t len, T *restrict array, T value)

@@ -150,31 +150,17 @@ void VarQuaSum(double *Variance, const double *restrict Sum, int len, int n)
 }
 
 static
-void AddVector(double * restrict dest, const double *restrict src, long len, size_t *nmiss, double missval)
+void AddVector(double *dest, const double *src, size_t len, size_t *nmiss, double missval)
 {
   if ( *nmiss > 0 )
     {
-      for ( long i = 0; i < len; i++ )
-	if ( IS_NOT_EQUAL(src[i], missval) )
-	  {
-	    if ( IS_NOT_EQUAL(dest[i], missval) )
-	      dest[i] += src[i];
-	    else
-	      dest[i] = src[i];
-	  }
-
-      *nmiss = 0;
-      for ( long i = 0; i < len; i++ )
-	if ( IS_EQUAL(dest[i], missval) ) *nmiss = *nmiss + 1;
-
+      arrayAddArrayMV(len, dest, src, missval);
+      *nmiss = arrayNumMV(len, dest, missval);
       if ( *nmiss == 0 ) *nmiss = 1;
     }
   else
     {
-#if defined (_OPENMP)
-#pragma omp parallel for
-#endif
-      for ( long i = 0; i < len; i++ ) dest[i] += src[i];
+      arrayAddArray(len, dest, src);
     }
 }
 
