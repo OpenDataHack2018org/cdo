@@ -122,13 +122,6 @@ double *alloc_dp(int words, const char *array_name)
   return result;
 }
 
-/* after_zero_array -  Set array of type double to zero */
-static
-void after_zero_array(double *field, int words)
-{
-   memset((char *)field, 0, words*sizeof(double));
-}
-
 static
 void IniQuaSum(double *dest, const double *restrict src, int len)
 {
@@ -1154,7 +1147,7 @@ void LayerWater(double *ww, double *ll, double pmax, double pmin,
       if (pph[k] < pmin) break;
    MinLev = k;
 
-   after_zero_array (ll, DimGP);
+   arrayFill(DimGP, ll, 0.0);
 
    for (k = MaxLev; k <= MinLev; k++) {
      for (i = 0;     i < DimGP;  i++)
@@ -1810,7 +1803,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	      if ( vars[GEOPOTENTIAL].selected || globs->Type >= 30 )
 		{
 		  Warning("Orography not found - using zero orography!");
-		  after_zero_array(globs->Orography, globs->DimGP);
+		  arrayFill(globs->DimGP, globs->Orography, 0.0);
 		}
 	    }
 	}
