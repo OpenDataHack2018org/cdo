@@ -132,7 +132,6 @@ void *Filter(void *process)
   bool use_fftw = false;
   double fmin = 0, fmax = 0;
   double fdata = 0;
-  field_type ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
   typedef struct
   {
@@ -179,14 +178,15 @@ void *Filter(void *process)
   int calendar = taxisInqCalendar(taxisID1);  
  
   int nvars = vlistNvars(vlistID1);
-  
+  std::vector<field_type**> vars;
+
   int tsID = 0;    
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
-          vars   = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
+          vars.resize(nalloc);
         }
                        
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
@@ -410,8 +410,6 @@ void *Filter(void *process)
 
       field_free(vars[tsID], vlistID1);
     }
-
-  if ( vars ) Free(vars);
 
   dtlist_delete(dtlist);
 

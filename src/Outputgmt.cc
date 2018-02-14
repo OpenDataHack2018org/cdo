@@ -338,7 +338,7 @@ void *Outputgmt(void *process)
   if ( luse_grid_corner )
     {
       if ( ncorner == 0 ) cdoAbort("grid corner missing!");
-      int nalloc = ncorner*gridsize;
+      size_t nalloc = ncorner*gridsize;
       grid_corner_lat = (double*) Realloc(grid_corner_lat, nalloc*sizeof(double));
       grid_corner_lon = (double*) Realloc(grid_corner_lon, nalloc*sizeof(double));
 

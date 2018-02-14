@@ -112,7 +112,7 @@ void *Pack(void *process)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-          vars.reserve(nalloc);
+          vars.resize(nalloc);
 	}
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);

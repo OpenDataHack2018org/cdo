@@ -106,10 +106,10 @@ int genBoxavgGrid(int gridID1, size_t xinc, size_t yinc)
       std::vector<double> grid2_corner_lon, grid2_corner_lat;
       if ( gridInqYbounds(gridID1, NULL) && gridInqXbounds(gridID1, NULL) )
 	{
-	  grid1_corner_lon.reserve(2*nlon1);
-	  grid1_corner_lat.reserve(2*nlat1);
-	  grid2_corner_lon.reserve(2*nlon2);
-	  grid2_corner_lat.reserve(2*nlat2);
+	  grid1_corner_lon.resize(2*nlon1);
+	  grid1_corner_lat.resize(2*nlat1);
+	  grid2_corner_lon.resize(2*nlon2);
+	  grid2_corner_lat.resize(2*nlat2);
 	  gridInqXbounds(gridID1, &grid1_corner_lon[0]);
 	  gridInqYbounds(gridID1, &grid1_corner_lat[0]);
 	}

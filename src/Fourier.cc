@@ -30,15 +30,10 @@
 void *Fourier(void *process)
 {
   int bit;
-  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int nalloc = 0;
   size_t nmiss;
-  int nlevel;
-  int *vdate = NULL, *vtime = NULL;
-  double missval;
-  field_type ***vars = NULL;
   typedef struct
   {
     double *real;
@@ -67,6 +62,8 @@ void *Fourier(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
+  std::vector<field_type**> vars;
+  std::vector<int> vdate, vtime;
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -74,9 +71,9 @@ void *Fourier(void *process)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
-	  vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
+	  vdate.resize(nalloc);
+	  vtime.resize(nalloc);
+	  vars.resize(nalloc);
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);
@@ -87,8 +84,8 @@ void *Fourier(void *process)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
+	  gridID = vlistInqVarGrid(vlistID1, varID);
+	  size_t gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(2*gridsize*sizeof(double));
 	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
@@ -115,10 +112,10 @@ void *Fourier(void *process)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      missval  = vlistInqVarMissval(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      gridID = vlistInqVarGrid(vlistID1, varID);
+      double missval = vlistInqVarMissval(vlistID1, varID);
+      size_t gridsize = gridInqSize(gridID);
+      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 #ifdef  _OPENMP
@@ -182,7 +179,7 @@ void *Fourier(void *process)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      if ( vars[tsID][varID][levelID].ptr )
@@ -198,10 +195,6 @@ void *Fourier(void *process)
 
       field_free(vars[tsID], vlistID1);
     }
-
-  if ( vars  ) Free(vars);
-  if ( vdate ) Free(vdate);
-  if ( vtime ) Free(vtime);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

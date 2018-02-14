@@ -55,18 +55,18 @@ int cmpdatetime(const void *s1, const void *s2)
 
 void *Sorttimestamp(void *process)
 {
-  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int tsID, lasttsID = -1;
   int nalloc = 0;
   int vlistID2 = -1, taxisID2 = -1;
   size_t nmiss;
-  int nvars = 0, nlevel;
-  int *vdate = NULL, *vtime = NULL;
-  field_type ***vars = NULL;
+  int nvars = 0;
 
   cdoInitialize(process);
+
+  std::vector<field_type**> vars;
+  std::vector<int> vdate, vtime;
 
   int nfiles = cdoStreamCnt() - 1;
 
@@ -101,9 +101,9 @@ void *Sorttimestamp(void *process)
 	  if ( xtsID >= nalloc )
 	    {
 	      nalloc += NALLOC_INC;
-	      vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
-	      vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
-	      vars  = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
+	      vdate.resize(nalloc);
+	      vtime.resize(nalloc);
+	      vars.resize(nalloc);
 	    }
 
 	  vdate[xtsID] = taxisInqVdate(taxisID1);
@@ -114,8 +114,8 @@ void *Sorttimestamp(void *process)
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      pstreamInqRecord(streamID1, &varID, &levelID);
-	      gridID   = vlistInqVarGrid(vlistID1, varID);
-	      gridsize = gridInqSize(gridID);
+	      gridID = vlistInqVarGrid(vlistID1, varID);
+              size_t gridsize = gridInqSize(gridID);
 	      vars[xtsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	      pstreamReadRecord(streamID1, vars[xtsID][varID][levelID].ptr, &nmiss);
 	      vars[xtsID][varID][levelID].nmiss = nmiss;
@@ -179,7 +179,7 @@ void *Sorttimestamp(void *process)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      if ( vars[xtsID][varID][levelID].ptr )
@@ -193,10 +193,6 @@ void *Sorttimestamp(void *process)
 
       field_free(vars[xtsID], vlistID2);      
     }
-
-  if ( vars  ) Free(vars);
-  if ( vdate ) Free(vdate);
-  if ( vtime ) Free(vtime);
 
   pstreamClose(streamID2);
 

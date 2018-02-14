@@ -33,18 +33,14 @@ void *Cond2(void *process)
   int filltype = FILL_NONE;
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
-  size_t offset;
-  size_t nmiss1, nmiss2, nmiss3;
-  double missval1 = -9.E33;
-  double missval2 = -9.E33;
+  double missval1 = -9.E33;;
+  size_t nmiss1;
   size_t **varnmiss1 = NULL;
   double **vardata1 = NULL;
 
   cdoInitialize(process);
 
-  int IFTHENELSE = cdoOperatorAdd("ifthenelse",    0, 0, NULL);
-
-  int operatorID = cdoOperatorID();
+  cdoOperatorAdd("ifthenelse", 0, 0, NULL);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
@@ -103,7 +99,7 @@ void *Cond2(void *process)
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
 
-	  nvars  = vlistNvars(vlistID1);
+	  nvars = vlistNvars(vlistID1);
 	  vardata1  = (double **) Malloc(nvars*sizeof(double *));
 	  varnmiss1 = (size_t **) Malloc(nvars*sizeof(size_t *));
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -130,16 +126,16 @@ void *Cond2(void *process)
 	}
 
       taxisCopyTimestep(taxisID4, taxisID2);
-
       pstreamDefTimestep(streamID4, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
+          size_t nmiss;
 	  pstreamInqRecord(streamID2, &varID, &levelID);
-	  pstreamReadRecord(streamID2, array2, &nmiss2);
+	  pstreamReadRecord(streamID2, array2, &nmiss);
 
 	  pstreamInqRecord(streamID3, &varID, &levelID);
-	  pstreamReadRecord(streamID3, array3, &nmiss3);
+	  pstreamReadRecord(streamID3, array3, &nmiss);
 
 	  if ( tsID == 0 || filltype == FILL_NONE )
 	    {
@@ -152,7 +148,7 @@ void *Cond2(void *process)
 	      if ( filltype == FILL_TS )
 		{
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-		  offset   = gridsize*levelID;
+		  size_t offset = gridsize*levelID;
 		  memcpy(vardata1[varID]+offset, array1, gridsize*sizeof(double));
 		  varnmiss1[varID][levelID] = nmiss1;
 		}
@@ -160,33 +156,23 @@ void *Cond2(void *process)
 	  else if ( filltype == FILL_TS )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	      offset   = gridsize*levelID;
+	      size_t offset = gridsize*levelID;
 	      memcpy(array1, vardata1[varID]+offset, gridsize*sizeof(double));
 	      nmiss1 = varnmiss1[varID][levelID];
 	    }
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  missval2 = vlistInqVarMissval(vlistID2, varID);
-
+	  double missval2 = vlistInqVarMissval(vlistID2, varID);
 	  if ( recID == 0 || filltype != FILL_REC )
-	    {
-	      missval1  = vlistInqVarMissval(vlistID1, varID);
-	    }
+            missval1 = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( operatorID == IFTHENELSE )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array4[i] = DBL_IS_EQUAL(array1[i], missval1) ?
-		  missval2 : !DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : array3[i];
-	    }
-	  else
-	    {
-	      cdoAbort("Operator not implemented!");
-	    }
+          for ( size_t i = 0; i < gridsize; i++ )
+            array4[i] = DBL_IS_EQUAL(array1[i], missval1) ?
+              missval2 : !DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : array3[i];
 
-	  size_t nmiss4 = arrayNumMV(gridsize, array4, missval2);
+	  nmiss = arrayNumMV(gridsize, array4, missval2);
 	  pstreamDefRecord(streamID4, varID, levelID);
-	  pstreamWriteRecord(streamID4, array4, nmiss4);
+	  pstreamWriteRecord(streamID4, array4, nmiss);
 	}
 
       tsID++;

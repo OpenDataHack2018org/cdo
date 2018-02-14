@@ -164,16 +164,12 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 
 void *Spectrum(void *process)
 {
-  size_t gridsize;
   int nrecs;
   int gridID, varID, levelID;
   int k;
   int nalloc = 0;
   size_t nmiss;
-  int nlevel;
-  int *vdate = NULL, *vtime = NULL;
   int freq;
-  field_type ***vars = NULL;
 
   cdoInitialize(process);
 
@@ -190,6 +186,8 @@ void *Spectrum(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
+  std::vector<field_type**> vars;
+  std::vector<int> vdate, vtime;
 
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
@@ -197,9 +195,9 @@ void *Spectrum(void *process)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
-	  vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
+	  vdate.resize(nalloc);
+	  vtime.resize(nalloc);
+	  vars.resize(nalloc);
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);
@@ -210,8 +208,8 @@ void *Spectrum(void *process)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
+	  gridID = vlistInqVarGrid(vlistID1, varID);
+          size_t gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
@@ -254,7 +252,7 @@ void *Spectrum(void *process)
 
   int nfreq = seg_l/2 + 1;
 
-  field_type ***vars2 = (field_type ***) Malloc(nfreq*sizeof(field_type **));
+  std::vector<field_type**> vars2(nfreq);
   for ( freq = 0; freq < nfreq; freq++ )
     vars2[freq] = field_malloc(vlistID1, FIELD_PTR);
 
@@ -295,12 +293,11 @@ void *Spectrum(void *process)
   for ( k = 0; k < seg_l; k++ )
     wssum += window[k] * window[k];
 
-
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      gridID = vlistInqVarGrid(vlistID1, varID);
+      size_t gridsize = gridInqSize(gridID);
+      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 	  for ( size_t i = 0; i < gridsize; i++ )
@@ -331,7 +328,7 @@ void *Spectrum(void *process)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      if ( vars2[tsID][varID][levelID].ptr )
@@ -345,11 +342,6 @@ void *Spectrum(void *process)
 
       field_free(vars2[tsID], vlistID1);
     }
-
-  if ( vars  ) Free(vars);
-  if ( vars2 ) Free(vars2);
-  if ( vdate ) Free(vdate);
-  if ( vtime ) Free(vtime);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
