@@ -21,6 +21,7 @@
 #include <assert.h>
 
 #include "compare.h"
+#include "array.h"
 #include "constants.h"
 #include "after_vertint.h"
 
@@ -69,18 +70,15 @@ void presh(double *restrict fullp, double * halfp, const double *restrict vct,
       exit(EXIT_FAILURE);
     }
 
-  double zp, ze;
   double *halfpres = halfp;
   for ( long lh = 0; lh < nhlev; lh++ )
     {
-      zp = vct[lh];
-      ze = vct[lh+nhlev+1];
-
+      double zp = vct[lh];
+      double ze = vct[lh+nhlev+1];
       for ( long i = 0; i < ngp; i++ ) halfpres[i] = zp + ze * ps[i];
-
       halfpres += ngp;
     }
-  memcpy(halfpres, ps, ngp*sizeof(double));
+  arrayCopy(ngp, ps, halfpres);
 
   if ( fullp )
     {
@@ -89,12 +87,12 @@ void presh(double *restrict fullp, double * halfp, const double *restrict vct,
 	fullp[i] = 0.5 * (halfpres[i] + halfpres[i+ngp]);
     }
 
-} /* presh */
+}
 
 
 void genind(int *nx, const double *restrict plev, const double *restrict fullp, long ngp, long nplev, long nhlev)
 {
-  memset(nx, 0, ngp*nplev*sizeof(int));
+  arrayFill(ngp*nplev, nx, 0);
 
 #ifdef  _OPENMP
 #pragma omp parallel for default(none) shared(nx,plev,fullp,ngp,nplev,nhlev)
@@ -112,8 +110,7 @@ void genind(int *nx, const double *restrict plev, const double *restrict fullp, 
             }
         }
     }
-
-}  /* genind */
+}
 
 
 void genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog, size_t *restrict pnmiss)

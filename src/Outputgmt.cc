@@ -532,7 +532,7 @@ void *Outputgmt(void *process)
 	    {
 	      if ( nrecs < 2 ) cdoAbort("Too few fields!");
 
-	      memcpy(uf, array, gridsize*sizeof(double));
+	      arrayCopy(gridsize, array, uf);
 	      pstreamInqRecord(streamID, &varID, &levelID);
 	      pstreamReadRecord(streamID, vf, &nmiss);
 

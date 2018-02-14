@@ -228,7 +228,7 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
   for ( int i = 0; i < nx; ++i )
     {
       int idx = xyinfo[i].id;
-      if ( lregular ) memcpy(xvals2+xoff[i], xvals[idx], xsize[idx]*sizeof(double));
+      if ( lregular ) arrayCopy(xsize[idx], xvals[idx], xvals2+xoff[i]);
       xoff[i+1] = xoff[i] + xsize[idx];
     }
 
@@ -236,7 +236,7 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
   for ( int j = 0; j < ny; ++j )
     {
       int idx = xyinfo[j*nx].id;
-      if ( lregular ) memcpy(yvals2+yoff[j], yvals[idx], ysize[idx]*sizeof(double));
+      if ( lregular ) arrayCopy(ysize[idx], yvals[idx], yvals2+yoff[j]);
       yoff[j+1] = yoff[j] + ysize[idx];
     }
 

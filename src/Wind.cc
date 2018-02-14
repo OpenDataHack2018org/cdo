@@ -334,9 +334,9 @@ void *Wind(void *process)
 	      offset = gridsize*levelID;
 
 	      if      ( varID == varID1 )
-		memcpy(ivar1+offset, array1, gridsize*sizeof(double));
+		arrayCopy(gridsize, array1, ivar1+offset);
 	      else if ( varID == varID2 )
-	        memcpy(ivar2+offset, array1, gridsize*sizeof(double));
+	        arrayCopy(gridsize, array1, ivar2+offset);
 	    }   
 	  else
 	    {

@@ -231,7 +231,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
               if ( IS_SET(request->var2.h2) )
                 {
-                  memcpy(field2.ptr, field1.ptr, gridsize*sizeof(double));
+                  arrayCopy(gridsize, field1.ptr, field2.ptr);
                   field2.nmiss   = field1.nmiss;
                   field2.grid    = field1.grid;
                   field2.missval = field1.missval;
@@ -268,7 +268,7 @@ void eca1(const ECA_REQUEST_1 *request)
                   /* if h2 is null, use the output of f2 as input for h1 */
                   if ( IS_NOT_SET(request->var2.h2) )
                     {
-                      memcpy(field2.ptr, var12[levelID].ptr, gridsize*sizeof(double));
+                      arrayCopy(gridsize, var12[levelID].ptr, field2.ptr);
                       field2.nmiss   = var12[levelID].nmiss;
                       field2.grid    = var12[levelID].grid;
                       field2.missval = var12[levelID].missval;
@@ -651,7 +651,7 @@ void eca2(const ECA_REQUEST_2 *request)
 
               if ( IS_SET(request->var2.h2) )
                 {
-                  memcpy(field2.ptr, var14[levelID].ptr, gridsize*sizeof(double));
+                  arrayCopy(gridsize, var14[levelID].ptr, field2.ptr);
                   field2.nmiss   = var14[levelID].nmiss;
                   field2.grid    = var14[levelID].grid;
                   field2.missval = var14[levelID].missval;
@@ -1232,7 +1232,7 @@ void eca4(const ECA_REQUEST_4 *request)
 
               pstreamReadRecord(istreamID1, fieldGt.ptr, &nmiss);
               fieldGt.nmiss   = nmiss;
-              memcpy(fieldLt.ptr, fieldGt.ptr, gridsize*sizeof(double));
+              arrayCopy(gridsize, fieldGt.ptr, fieldLt.ptr);
               fieldLt.nmiss   = fieldGt.nmiss;
               fieldGt.grid    = startCount[levelID].grid;
               fieldGt.missval = startCount[levelID].missval;

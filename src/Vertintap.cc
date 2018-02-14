@@ -22,7 +22,6 @@
 */
 
 
-#include <array>
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -266,7 +265,7 @@ void *Vertintap(void *process)
 	for ( int i = 0; i < nplev; ++i )
 	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
 
-      memcpy(plev, &phlev[0], nplev*sizeof(double));
+      arrayCopy(nplev, &phlev[0], plev);
     }
 
   if ( useLogType )
@@ -288,8 +287,7 @@ void *Vertintap(void *process)
 	{
 	  varinterp[varID] = true;
 	  vardata2[varID]  = (double *) Malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = (size_t *) Malloc(maxlev*sizeof(size_t));
-	  memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
+	  varnmiss[varID]  = (size_t *) Calloc(maxlev, sizeof(size_t));
 	}
       else
 	{
@@ -364,7 +362,7 @@ void *Vertintap(void *process)
 	{
 	  if ( psID != -1 )
 	    {
-	      memcpy(&ps_prog[0], vardata1[psID], gridsize*sizeof(double)); 
+	      arrayCopy(gridsize, vardata1[psID], &ps_prog[0]); 
 	    }
           else if ( dpressID != -1 )
 	    {
@@ -375,7 +373,7 @@ void *Vertintap(void *process)
 	    }
 	  else
 	    {
-	      memcpy(&ps_prog[0], vardata1[apressID]+gridsize*(nhlevf-1), gridsize*sizeof(double)); 
+	      arrayCopy(gridsize, vardata1[apressID]+gridsize*(nhlevf-1), &ps_prog[0]); 
 	      //for ( size_t i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
 	    }
 
@@ -385,7 +383,7 @@ void *Vertintap(void *process)
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
-	  memcpy(&full_press[0], vardata1[apressID], gridsize*nhlevf*sizeof(double)); 
+	  arrayCopy(gridsize*nhlevf, vardata1[apressID], &full_press[0]); 
 
           for ( size_t i = 0; i < gridsize; i++ ) half_press[i] = 0;
           for ( int k = 1; k < nhlevf; k++ )
@@ -432,7 +430,7 @@ void *Vertintap(void *process)
 		  interp_X(vardata1[varID], vardata2[varID], hyb_press,
 			   &vert_index[0], plev, nplev, gridsize, nlevel, missval);
 		  
-		  if ( !extrapolate ) memcpy(varnmiss[varID], &pnmiss[0], nplev*sizeof(size_t));
+		  if ( !extrapolate ) arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);
 		}
 	    }
 	}

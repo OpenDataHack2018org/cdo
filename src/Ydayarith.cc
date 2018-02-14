@@ -147,7 +147,7 @@ void *Ydayarith(void *process)
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           size_t offset   = gridsize*levelID;
 	  if ( vardata2[dayoy] == NULL ) cdoAbort("Day of year %d not found (date=%d)!", dayoy, vdate);
-	  memcpy(field2.ptr, vardata2[dayoy][varID]+offset, gridsize*sizeof(double));
+	  arrayCopy(gridsize, vardata2[dayoy][varID]+offset, field2.ptr);
 	  field2.nmiss = varnmiss2[dayoy][varID][levelID];
 
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);

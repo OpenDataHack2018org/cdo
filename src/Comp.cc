@@ -195,14 +195,14 @@ void *Comp(void *process)
 		{
 		  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 		  size_t offset = gridsize*levelID;
-		  memcpy(vardata[varID]+offset, arrayx2, gridsize*sizeof(double));
+		  arrayCopy(gridsize, arrayx2, vardata[varID]+offset);
 		}
 	    }
 	  else if ( filltype == FILL_TS )
 	    {
 	      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 	      size_t offset = gridsize*levelID;
-	      memcpy(arrayx2, vardata[varID]+offset, gridsize*sizeof(double));
+	      arrayCopy(gridsize, vardata[varID]+offset, arrayx2);
 	    }
 
           int datatype1 = vlistInqVarDatatype(vlistIDx1, varID);

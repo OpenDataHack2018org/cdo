@@ -443,8 +443,7 @@ void *Intlevel(void *process)
 	{
 	  varinterp[varID] = true;
 	  vardata2[varID]  = (double*) Malloc(gridsize*nlev2*sizeof(double));
-	  varnmiss[varID]  = (size_t*) Malloc(maxlev*sizeof(size_t));
-	  memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
+	  varnmiss[varID]  = (size_t*) Calloc(maxlev, sizeof(size_t));
 	}
       else
 	{
@@ -460,7 +459,6 @@ void *Intlevel(void *process)
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = false;
 
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -482,7 +480,7 @@ void *Intlevel(void *process)
                 {
                   size_t offset1 = zvarGridsize*levelID;
                   size_t offset2 = zvarGridsize*(levelID+1);
-                  memcpy(lev1+offset2, vardata1[zvarID]+offset1, zvarGridsize*sizeof(double));
+                  arrayCopy(zvarGridsize, vardata1[zvarID]+offset1, lev1+offset2);
                 }
                   
               vert_init_level_0_and_N(nlev1, zvarGridsize, lev1);

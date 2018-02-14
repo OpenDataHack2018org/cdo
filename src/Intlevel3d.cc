@@ -147,11 +147,9 @@ void *Intlevel3d(void *process)
 
     for ( int recID = 0; recID < nrecs; recID++ )
       {
-        streamInqRecord(streamID0, &varID, &levelID);
-
         size_t offset = gridsizei + gridsizei*levelID;
         double *single1 = zlevels_in + offset;
-
+        streamInqRecord(streamID0, &varID, &levelID);
         streamReadRecord(streamID0, single1, &zlevels_in_miss);
       }
 
@@ -322,8 +320,7 @@ void *Intlevel3d(void *process)
             {
               varinterp[varID] = true;
               vardata2[varID]  = (double*) Malloc(gridsize*nlevo*sizeof(double));
-              varnmiss[varID]  = (size_t*) Malloc(maxlev*sizeof(size_t));
-              memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
+              varnmiss[varID]  = (size_t*) Calloc(maxlev, sizeof(size_t));
             }
         }
       else

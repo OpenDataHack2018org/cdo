@@ -206,7 +206,7 @@ void *Splitsel(void *process)
 			{
 			  gridID  = vlistInqVarGrid(vlistID1, varID);
 			  gridsize = gridInqSize(gridID);
-			  memcpy(vars[varID][levelID].ptr, array, gridsize*sizeof(double));
+			  arrayCopy(gridsize, array, vars[varID][levelID].ptr);
 			  vars[varID][levelID].nmiss = nmiss;
 			}
 		    }
