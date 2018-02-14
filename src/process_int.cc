@@ -291,13 +291,14 @@ handleObase(const char *p_argvEntry)
  * Also checks if \p p_parentProcess accepts another processes streams
  * as input and exits with error message if not.
  */
-ProcessType *createNewProcess(ProcessType *p_parentProces, const char * argvEntry){
+ProcessType *
+createNewProcess(ProcessType *p_parentProces, const char *argvEntry)
+{
   ProcessType *newProcess = processCreate(argvEntry);
   if (newProcess->m_module.streamOutCnt == 0)
     {
       CdoError::Abort("operator -", p_parentProces->operatorName,
-                      " can not take -",
-                      newProcess->operatorName,
+                      " can not take -", newProcess->operatorName,
                       "  with 0 outputs as input");
       exit(EXIT_FAILURE);
     }
@@ -306,7 +307,6 @@ ProcessType *createNewProcess(ProcessType *p_parentProces, const char * argvEntr
   newProcess->addParent(p_parentProces);
   return newProcess;
 }
-
 
 void
 createProcesses(int argc, const char **argv)
@@ -342,10 +342,10 @@ createProcesses(int argc, const char **argv)
 
   if (idx < argc - cntOutFiles)
     {
-        const char *argvEntry;
+      const char *argvEntry;
       do
         {
-            argvEntry  = argv[idx];
+          argvEntry = argv[idx];
           Cdo_Debug(CdoDebug::PROCESS, "iteration ", idx,
                     ", current argv: ", argv[idx],
                     ",  currentProcess: ", currentProcess->operatorName);
