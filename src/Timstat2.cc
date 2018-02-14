@@ -28,29 +28,46 @@
 
 // correlation in time
 static
-size_t correlation_t(size_t gridsize, double missval1, double missval2, size_t *nofvals, 
+void correlationInit(size_t gridsize, const double *array1, const double *array2,
+                     double missval1, double missval2, size_t *nofvals, 
                      double *work0, double *work1, double *work2, double *work3, double *work4)
 {
+  for ( size_t i = 0; i < gridsize; ++i )
+    {
+      if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
+           ( ! DBL_IS_EQUAL(array2[i], missval2) ) )
+        {
+          work0[i] += array1[i];
+          work1[i] += array2[i];
+          work2[i] += array1[i]*array1[i];
+          work3[i] += array2[i]*array2[i];
+          work4[i] += array1[i]*array2[i];
+          nofvals[i]++;
+        }
+    }	 
+}
+
+static
+size_t correlation(size_t gridsize, double missval1, double missval2, size_t *nofvals, 
+                   double *work0, double *work1, double *work2, double *work3, double *work4)
+{
   size_t nmiss = 0;
-  double temp0, temp1, temp2, temp3, temp4, temp5, temp6;
   double cor;
 
   for ( size_t i = 0; i < gridsize; ++i )
     {	  
       size_t nvals = nofvals[i];
-
       if ( nvals > 0 )
 	{
-	  temp0 = MULMN(work0[i], work1[i]);
-	  temp1 = SUBMN(work4[i], DIVMN(temp0, nvals));
-	  temp2 = MULMN(work0[i], work0[i]);
-	  temp3 = MULMN(work1[i], work1[i]);
-	  temp4 = SUBMN(work2[i], DIVMN(temp2, nvals));
-	  temp5 = SUBMN(work3[i], DIVMN(temp3, nvals));
-	  temp6 = MULMN(temp4, temp5);
+	  double temp0 = MULMN(work0[i], work1[i]);
+	  double temp1 = SUBMN(work4[i], DIVMN(temp0, nvals));
+	  double temp2 = MULMN(work0[i], work0[i]);
+	  double temp3 = MULMN(work1[i], work1[i]);
+	  double temp4 = SUBMN(work2[i], DIVMN(temp2, nvals));
+	  double temp5 = SUBMN(work3[i], DIVMN(temp3, nvals));
+	  double temp6 = MULMN(temp4, temp5);
 
 	  cor = DIVMN(temp1, SQRTMN(temp6));
-
           if      ( cor < -1 )  cor = -1;
           else if ( cor >  1 )  cor =  1;
 
@@ -70,8 +87,26 @@ size_t correlation_t(size_t gridsize, double missval1, double missval2, size_t *
 
 // covariance in time
 static
-size_t covariance_t(size_t gridsize, double missval1, double missval2, size_t *nofvals, 
+void covarianceInit(size_t gridsize, const double *array1, const double *array2,
+                    double missval1, double missval2, size_t *nofvals, 
                     double *work0, double *work1, double *work2)
+{
+  for ( size_t i = 0; i < gridsize; ++i )
+    {
+      if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
+           ( ! DBL_IS_EQUAL(array2[i], missval2) ) )
+        {
+          work0[i] += array1[i];
+          work1[i] += array2[i];
+          work2[i] += array1[i]*array2[i];
+          nofvals[i]++;
+        }
+    }	 
+}
+
+static
+size_t covariance(size_t gridsize, double missval1, double missval2, size_t *nofvals, 
+                  double *work0, double *work1, double *work2)
 {
   size_t nmiss = 0;
   double covar;
@@ -79,13 +114,11 @@ size_t covariance_t(size_t gridsize, double missval1, double missval2, size_t *n
   for ( size_t i = 0; i < gridsize; ++i )
     {	  
       size_t nvals = nofvals[i];
-
       if ( nvals > 0 )
 	{
           double dnvals = nvals;
 	  double temp = DIVMN( MULMN(work0[i], work1[i]), dnvals*dnvals);
 	  covar = SUBMN( DIVMN(work2[i], dnvals), temp);
-
 	  if ( DBL_IS_EQUAL(covar, missval1) ) nmiss++;
 	}
       else
@@ -104,7 +137,7 @@ size_t covariance_t(size_t gridsize, double missval1, double missval2, size_t *n
 void *Timstat2(void *process)
 {
   int vdate = 0, vtime = 0;
-  int nrecs2, nlevs;
+  int nrecs2;
   int varID, levelID;
   size_t nmiss;
 
@@ -134,8 +167,8 @@ void *Timstat2(void *process)
   int nvars  = vlistNvars(vlistID1);
   int nrecs  = vlistNrecs(vlistID1);
   int nrecs3 = nrecs;
-  int *recVarID   = (int*) Malloc(nrecs*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecs*sizeof(int));
+  std::vector<int> recVarID(nrecs);
+  std::vector<int> recLevelID(nrecs);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   //int taxisID2 = vlistInqTaxis(vlistID2);
@@ -145,26 +178,25 @@ void *Timstat2(void *process)
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
  
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-
-  double *array1  = (double*) Malloc(gridsize*sizeof(double));
-  double *array2  = (double*) Malloc(gridsize*sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  std::vector<double> array1(gridsizemax);
+  std::vector<double> array2(gridsizemax);
   				 
   double ****work = (double ****) Malloc(nvars*sizeof(double ***));
-  size_t ***nofvals = (size_t ***) Malloc(nvars*sizeof(size_t **));
+  std::vector<std::vector<std::vector<size_t>>> nofvals(nvars);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       int gridID = vlistInqVarGrid(vlistID1, 0);  
-      gridsize = gridInqSize(gridID);
-      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      size_t gridsize = gridInqSize(gridID);
+      int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
       work[varID]    = (double ***) Malloc(nlevs*sizeof(double **));
-      nofvals[varID] = (size_t **) Malloc(nlevs*sizeof(size_t *));  
+      nofvals[varID].resize(nlevs);  
 
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  nofvals[varID][levelID] = (size_t*) Calloc(gridsize, sizeof(size_t));
+          nofvals[varID][levelID].resize(gridsize, 0);
       
 	  work[varID][levelID] = (double **) Malloc(nwork*sizeof(double *));
 	  for ( int i = 0; i < nwork; i++ )
@@ -193,43 +225,26 @@ void *Timstat2(void *process)
 	      recLevelID[recID] = levelID;	     	     
 	    }	 
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
 	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 	  double missval2 = vlistInqVarMissval(vlistID2, varID);
 
-	  pstreamReadRecord(streamID1, array1, &nmiss);
-	  pstreamReadRecord(streamID2, array2, &nmiss);
+	  pstreamReadRecord(streamID1, &array1[0], &nmiss);
+	  pstreamReadRecord(streamID2, &array2[0], &nmiss);
 
 	  if ( operfunc == func_cor )
 	    {
-	      for ( size_t i = 0; i < gridsize; ++i )
-		{
-		  if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
-		       ( ! DBL_IS_EQUAL(array2[i], missval2) ) )
-		    {
-		      work[varID][levelID][0][i] += array1[i];
-		      work[varID][levelID][1][i] += array2[i];
-		      work[varID][levelID][2][i] += array1[i]*array1[i];
-		      work[varID][levelID][3][i] += array2[i]*array2[i];
-		      work[varID][levelID][4][i] += array1[i]*array2[i];
-		      nofvals[varID][levelID][i]++;
-		    }
-		}	 
+              correlationInit(gridsize, &array1[0], &array2[0], missval1, missval2, &nofvals[varID][levelID][0],
+                              work[varID][levelID][0], work[varID][levelID][1],
+                              work[varID][levelID][2], work[varID][levelID][3], 
+                              work[varID][levelID][4]);
 	    }
 	  else if ( operfunc == func_covar )
 	    {
-	      for ( size_t i = 0; i < gridsize; ++i )
-		{
-		  if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
-		       ( ! DBL_IS_EQUAL(array2[i], missval2) ) )
-		    {
-		      work[varID][levelID][0][i] += array1[i];
-		      work[varID][levelID][1][i] += array2[i];
-		      work[varID][levelID][2][i] += array1[i]*array2[i];
-		      nofvals[varID][levelID][i]++;
-		    }
-		}	 
+              covarianceInit(gridsize, &array1[0], &array2[0], missval1, missval2, &nofvals[varID][levelID][0],
+                             work[varID][levelID][0], work[varID][levelID][1],
+                             work[varID][levelID][2]);
 	    }
 	}
 
@@ -243,26 +258,26 @@ void *Timstat2(void *process)
 
   for ( int recID = 0; recID < nrecs3; recID++ )
     {
-      varID    = recVarID[recID];
-      levelID  = recLevelID[recID];
+      varID   = recVarID[recID];
+      levelID = recLevelID[recID];
    
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
       double missval1 = vlistInqVarMissval(vlistID1, varID);
       double missval2 = vlistInqVarMissval(vlistID2, varID);
 
       if ( operfunc == func_cor )
 	{
-	  nmiss = correlation_t(gridsize, missval1, missval2, nofvals[varID][levelID],
-				work[varID][levelID][0], work[varID][levelID][1],
-				work[varID][levelID][2], work[varID][levelID][3], 
-				work[varID][levelID][4]);
+	  nmiss = correlation(gridsize, missval1, missval2, &nofvals[varID][levelID][0],
+                              work[varID][levelID][0], work[varID][levelID][1],
+                              work[varID][levelID][2], work[varID][levelID][3], 
+                              work[varID][levelID][4]);
 	}
       else if ( operfunc == func_covar )
 	{
-	  nmiss = covariance_t(gridsize, missval1, missval2, nofvals[varID][levelID],
-			       work[varID][levelID][0], work[varID][levelID][1],
-			       work[varID][levelID][2]);
+	  nmiss = covariance(gridsize, missval1, missval2, &nofvals[varID][levelID][0],
+                             work[varID][levelID][0], work[varID][levelID][1],
+                             work[varID][levelID][2]);
 	}
 
       pstreamDefRecord(streamID3, varID, levelID);
@@ -271,30 +286,23 @@ void *Timstat2(void *process)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  Free(nofvals[varID][levelID]);
 	  for ( int i = 0; i < nwork; i++ )
 	    Free(work[varID][levelID][i]);
 	  Free(work[varID][levelID]);
 	}
     
-      Free(nofvals[varID]);
       Free(work[varID]);
     }
     
-  Free(nofvals);
+  //Free(nofvals);
   Free(work);
 
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if ( array1 )     Free(array1);
-  if ( array2 )     Free(array2);
-  if ( recVarID )   Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
     
   cdoFinish();   
  
