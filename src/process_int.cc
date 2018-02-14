@@ -264,6 +264,12 @@ processNumsActive(void)
   return pnums;
 }
 
+/**
+ * Checks if \p p_argvEntry is a name of a existing file.
+ * If no such file exists \p p_argvEntry is added to obase.
+ * Else Cdo exits with error message
+ * @return returns a pointer to the newly generated process
+ */
 void
 handleObase(const char *p_argvEntry)
 {
@@ -278,6 +284,13 @@ handleObase(const char *p_argvEntry)
     }
 }
 
+/**
+ * Handles process Creation for cdo command p_argvEntry
+ * Adds \p p_parentProcess as parent to the newly created process.
+ * Adds newly created process to \p p_parentProcess.
+ * Also checks if \p p_parentProcess accepts another processes streams
+ * as input and exits with error message if not.
+ */
 ProcessType *createNewProcess(ProcessType *p_parentProces, const char * argvEntry){
   ProcessType *newProcess = processCreate(argvEntry);
   if (newProcess->m_module.streamOutCnt == 0)
