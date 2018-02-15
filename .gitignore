@@ -31,18 +31,13 @@ aclocal.m4
 autom4te.cache
 #----- configure files ---
 configure
-src/config.h.in
+config.h.in
 config.log
 config.status
 config.h
 
 #---- Makefiles.in ---------------
 Makefile.in
-contrib/Makefile.in
-src/lib/ncl/Makefile.in
-test/Makefile.in
-test/bandit_tests/Makefile.in
-test/data/Makefile.in
 #=================================
 
 #==== Documentation pdfs =========
@@ -51,12 +46,7 @@ cdo_eca.pdf
 cdo_magics.pdf
 cdo_cmor.pdf
 cdo_refcard.pdf
-doc/cdo.pdf
-doc/cdo_eca.pdf
-doc/cdo_magics.pdf
-doc/cdo_cmor.pdf
-doc/cdo_refcard.pdf
-doc/cdo_libdep.pdf
+cdo_libdep.pdf
 
 #---- html folder ----------------
 doc/html/
