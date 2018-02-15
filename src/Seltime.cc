@@ -280,8 +280,7 @@ void *Seltime(void *process)
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
-  if ( nsel == 1 && operfunc == func_step )  vlistDefNtsteps(vlistID2,  1);
-  else                                       vlistDefNtsteps(vlistID2, -1);
+  vlistDefNtsteps(vlistID2, (nsel == 1 && operfunc == func_step) ? 1 : -1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -296,7 +295,7 @@ void *Seltime(void *process)
 
   int ntsteps = vlistNtsteps(vlistID1);
 
-  /* add support for negative timestep values */
+  // add support for negative timestep values
   if ( operatorID == SELTIMESTEP && ntsteps > 0 )
     {
       for ( i = 0; i < nsel; i++ )
@@ -443,6 +442,7 @@ void *Seltime(void *process)
 
       if ( copytimestep || copy_nts2 )
 	{
+	  taxisCopyTimestep(taxisID2, taxisID1);
 	  if ( tsID2 == 0 )
 	    {
 	      streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -467,7 +467,7 @@ void *Seltime(void *process)
 		  for ( varID = 0; varID < nvars; varID++ )
 		    {
 		      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT && tsID2 > 1 ) continue;
-		      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
 			  pstreamDefRecord(streamID2, varID, levelID);
@@ -488,7 +488,6 @@ void *Seltime(void *process)
 	      process_nts1 = true;
 	    }
 
-	  taxisCopyTimestep(taxisID2, taxisID1);
 	  pstreamDefTimestep(streamID2, tsID2++);
 
 	  if ( tsID > 0 && lconstout )

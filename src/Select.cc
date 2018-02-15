@@ -598,6 +598,7 @@ void *Select(void *process)
 
 	  if ( copytimestep == true )
 	    {
+	      taxisCopyTimestep(taxisID2, taxisID1);
 	      if ( streamID2 == CDI_UNDEFID )
 		{
                   bool lasttimestep = (nfiles == 1) && (ntsteps2 > 1) && (ntsteps2 == (tsID1+1));
@@ -606,7 +607,6 @@ void *Select(void *process)
 		  streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 		  pstreamDefVlist(streamID2, vlistID2);
 		}
-	      taxisCopyTimestep(taxisID2, taxisID1);
 	      pstreamDefTimestep(streamID2, tsID2);
               
 	      for ( int recID = 0; recID < nrecs; ++recID )
