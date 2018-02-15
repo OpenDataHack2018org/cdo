@@ -1,5 +1,6 @@
 2018-02-15  Uwe Schulzweida
 
+	* expr: removed character [LlDd] from definition of float constants (bug fix) [report; Simon Blessing]
 	* select timesteps: call taxisCopyTimestep() before pstreamDefVlist() (bug fix) [report; Renate Brokopf]
 
 2018-02-05  Uwe Schulzweida

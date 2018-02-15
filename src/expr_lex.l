@@ -47,7 +47,7 @@ M_E          {
                 return CONSTANT;
              }
 
-{DGT}*\.?{DGT}*({XPN})?[LlDd]?|{DGT}*({XPN})[LlDd]? {
+{DGT}*\.?{DGT}*({XPN})?|{DGT}*({XPN}) {
                /* constant */
                /* NB: Tempted to prepend lexer expressions for floats and doubles with [+-]? 
                 so that unary plus/minus is handled in lexer rather than parser.
