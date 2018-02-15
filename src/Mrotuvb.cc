@@ -339,8 +339,8 @@ void *Mrotuvb(void *process)
     }
   else
     {
-      memcpy(grid3x, grid1x, gridsize*sizeof(double));
-      memcpy(grid3y, grid1y, gridsize*sizeof(double));
+      arrayCopy(gridsize, grid1x, grid3x);
+      arrayCopy(gridsize, grid1y, grid3y);
     }
 
   if ( grid1x ) Free(grid1x);

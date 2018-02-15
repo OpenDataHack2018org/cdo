@@ -128,8 +128,7 @@ void *Pardup(void *process)
 	    single   = vardata[varID] + offset;
 	    nmiss    = varnmiss[varID][levelID];
 
-	    memcpy(array, single, gridsize*sizeof(double));
-
+	    arrayCopy(gridsize, single, array);
 	    pstreamDefRecord(streamID2,  varID2,  levelID);
 	    pstreamWriteRecord(streamID2, array, nmiss);
 	  }

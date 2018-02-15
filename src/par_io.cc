@@ -22,8 +22,6 @@
 #  include <pthread.h>
 #endif
 
-#include <string.h> /* memcpy */
-
 
 #include "cdo_int.h"
 #include "par_io.h"
@@ -95,7 +93,7 @@ void parReadRecord(int streamID, int *varID, int *levelID, double *array, size_t
       *levelID  = parIO->levelID;
       *nmiss    = parIO->nmiss;
       /* fprintf(stderr, "parIO2: %ld streamID %d %d %d\n", (long)thrID, streamID, *varID, *levelID); */
-      memcpy(array, parIO->array, parIO->array_size*sizeof(double));
+      arrayCopy(parIO->array_size, parIO->array, array);
     }
 
   if ( lpario && nrecs > 1 )

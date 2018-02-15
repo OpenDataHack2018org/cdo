@@ -394,12 +394,12 @@ void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
         {
 	  if ( stats->nsets[dayoy] == 0 )
 	    {
-	      memcpy(stats->vars1[dayoy][varID][levelID].ptr, vars1[varID][levelID].ptr, gridsize * sizeof(double));
+	      arrayCopy(gridsize, vars1[varID][levelID].ptr, stats->vars1[dayoy][varID][levelID].ptr);
 	      stats->vars1[dayoy][varID][levelID].nmiss = vars1[varID][levelID].nmiss;
 	       
 	      if ( lvarstd )
 	        {
-	          memcpy(stats->vars2[dayoy][varID][levelID].ptr, vars2[varID][levelID].ptr, gridsize * sizeof(double));
+	          arrayCopy(gridsize, vars2[varID][levelID].ptr, stats->vars2[dayoy][varID][levelID].ptr);
 	          stats->vars2[dayoy][varID][levelID].nmiss = vars2[varID][levelID].nmiss;
 	        }
 	    }

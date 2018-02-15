@@ -267,7 +267,7 @@ void invertLatData(double *array1, double *array2, int gridID1)
 	}
 
       for ( size_t ilat = 0; ilat < nlat; ilat++ )
-	memcpy(field2[nlat-ilat-1], field1[ilat], nlon*sizeof(double));
+	arrayCopy(nlon, field1[ilat], field2[nlat-ilat-1]);
       
       if ( field1 ) Free(field1);
       if ( field2 ) Free(field2);

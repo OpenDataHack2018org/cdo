@@ -237,7 +237,7 @@ void *Vertintml(void *process)
 	for ( int i = 0; i < nplev; ++i )
 	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
 
-      memcpy(plev, &phlev[0], nplev*sizeof(double));
+      arrayCopy(nplev, &phlev[0], plev);
     }
 
   if ( useLogType )
@@ -364,8 +364,7 @@ void *Vertintml(void *process)
 	{
 	  varinterp[varID] = true;
 	  vardata2[varID]  = (double*) Malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = (size_t*) Malloc(maxlev*sizeof(size_t));
-	  memset(varnmiss[varID], 0, maxlev*sizeof(size_t));
+	  varnmiss[varID]  = (size_t*) Calloc(maxlev, sizeof(size_t));
 	}
       else
 	{
@@ -408,7 +407,7 @@ void *Vertintml(void *process)
               else
                 cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
             }
-	  memset(&sgeopot[0], 0, gridsize*sizeof(double));
+	  arrayFill(gridsize, &sgeopot[0], 0.0);
 	}
     }
 
@@ -486,9 +485,9 @@ void *Vertintml(void *process)
 	  if ( sgeopot_needed )
 	    {
 	      if ( sgeopotID != -1 )
-		memcpy(&sgeopot[0], vardata1[sgeopotID], gridsize*sizeof(double));
+		arrayCopy(gridsize, vardata1[sgeopotID], &sgeopot[0]);
 	      else if ( geopotID != -1 )
-		memcpy(&sgeopot[0], vardata1[geopotID]+gridsize*(nhlevf-1), gridsize*sizeof(double));
+		arrayCopy(gridsize, vardata1[geopotID]+gridsize*(nhlevf-1), &sgeopot[0]);
 
 	      /* check range of surface geopot */
 	      if ( extrapolate && (sgeopotID != -1 || geopotID != -1) )
@@ -504,7 +503,7 @@ void *Vertintml(void *process)
 	  if ( presID == lnpsID )
 	    for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
 	  else if ( presID != -1 )
-	    memcpy(&ps_prog[0], vardata1[presID], gridsize*sizeof(double));
+	    arrayCopy(gridsize, vardata1[presID], &ps_prog[0]);
 
 	  /* check range of ps_prog */
 	  arrayMinMaxMask(gridsize, &ps_prog[0], NULL, &minval, &maxval);
@@ -594,7 +593,7 @@ void *Vertintml(void *process)
 			       &vert_index[0], plev, nplev, gridsize, nlevel, missval);
 		    }
 		  
-		  if ( !extrapolate ) memcpy(varnmiss[varID], &pnmiss[0], nplev*sizeof(size_t));
+		  if ( !extrapolate ) arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);
 		}
 	    }
 	}

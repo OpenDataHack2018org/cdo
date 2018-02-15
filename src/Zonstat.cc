@@ -164,7 +164,7 @@ void *Zonstat(void *process)
 
 	  if ( zongridID != -1 && zongridID == field1.grid )
 	    {
-	      memcpy(field2.ptr, field1.ptr, nlatmax*sizeof(double));
+	      arrayCopy(nlatmax, field1.ptr, field2.ptr);
 	      field2.nmiss = field1.nmiss;
 	    }
 	  else

@@ -107,12 +107,9 @@ void *Histogram(void *process)
   for ( varID = 0; varID < nvars; varID++ )
     {
       size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-      vardata[varID]  = (double*) Malloc(nbins*gridsize*sizeof(double));
-      varcount[varID] = (double*) Malloc(nbins*gridsize*sizeof(double));
-      vartcount[varID] = (double*) Malloc(gridsize*sizeof(double));
-      memset(vardata[varID], 0, nbins*gridsize*sizeof(double));
-      memset(varcount[varID], 0, nbins*gridsize*sizeof(double));
-      memset(vartcount[varID], 0, gridsize*sizeof(double));
+      vardata[varID] = (double*) Calloc(nbins*gridsize, sizeof(double));
+      varcount[varID] = (double*) Calloc(nbins*gridsize, sizeof(double));
+      vartcount[varID] = (double*) Calloc(gridsize, sizeof(double));
     }
 
   size_t gridsize = vlistGridsizeMax(vlistID1);

@@ -144,7 +144,7 @@ void *Cond(void *process)
 		{
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 		  offset   = gridsize*levelID;
-		  memcpy(vardata1[varID]+offset, array1, gridsize*sizeof(double));
+		  arrayCopy(gridsize, array1, vardata1[varID]+offset);
 		  varnmiss1[varID][levelID] = nmiss1;
 		}
 	    }
@@ -152,7 +152,7 @@ void *Cond(void *process)
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      offset   = gridsize*levelID;
-	      memcpy(array1, vardata1[varID]+offset, gridsize*sizeof(double));
+	      arrayCopy(gridsize, vardata1[varID]+offset, array1);
 	      nmiss1 = varnmiss1[varID][levelID];
 	    }
 

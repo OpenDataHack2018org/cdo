@@ -66,7 +66,7 @@ void *Splityear(void *process)
   int operatorID = cdoOperatorID();
   int operintval = cdoOperatorF2(operatorID);
 
-  memset(cyear, 0, MAX_YEARS*sizeof(int));
+  arrayFill(MAX_YEARS, cyear, 0);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -228,7 +228,7 @@ void *Splityear(void *process)
 		    {
 		      gridID  = vlistInqVarGrid(vlistID1, varID);
 		      gridsize = gridInqSize(gridID);
-		      memcpy(vars[varID][levelID].ptr, array, gridsize*sizeof(double));
+		      arrayCopy(gridsize, array, vars[varID][levelID].ptr);
 		      vars[varID][levelID].nmiss = nmiss;
 		    }
 		}

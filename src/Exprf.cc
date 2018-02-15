@@ -546,7 +546,7 @@ void *Expr(void *process)
               assert(gridID==params[varID].gridID);
               assert(data!=NULL);
 
-              memcpy(params[varID].data, data, ngp*sizeof(double));
+              arrayCopy(ngp, data, params[varID].data);
             }
           else if ( coord == 'z' )
             {
@@ -557,7 +557,7 @@ void *Expr(void *process)
               assert(zaxisID==params[varID].zaxisID);
               assert(data!=NULL);
 
-              memcpy(params[varID].data, data, nlev*sizeof(double));
+              arrayCopy(nlev, data, params[varID].data);
             }
           else
             cdoAbort("Computation of coordinate %c not implemented!", coord);
@@ -644,7 +644,7 @@ void *Expr(void *process)
           size_t nlev = params[pidx].nlev;
 
           params[pidx].nmiss = 0;
-	  memset(params[pidx].data, 0, ngp*nlev*sizeof(double));
+	  arrayFill(ngp*nlev, params[pidx].data, 0.0);
 	}
 
       yy_scan_string(exprs, scanner);

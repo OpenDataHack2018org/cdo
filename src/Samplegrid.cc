@@ -63,7 +63,7 @@ void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI
   long array2Idx = 0;
   for ( long ilat1 = subJ0; ilat1 <= subJ1; ilat1++ ) // copy the last row as well..
     {
-      memcpy((void*)&array2[array2Idx], (void*)&array1[ilat1*nlon1 + subI0], rowLen*sizeof(double));
+      arrayCopy(rowLen, &array1[ilat1*nlon1 + subI0], &array2[array2Idx]);
       array2Idx += rowLen;
     }
 }

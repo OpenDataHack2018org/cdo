@@ -477,7 +477,7 @@ void *Smooth(void *process)
                   else if ( operatorID == SMOOTH9 )
                     smooth9(gridID, missval, array1, array2, &nmiss);
 
-                  memcpy(array1, array2, gridsizemax*sizeof(double));
+                  arrayCopy(gridsizemax, array2, array1);
                 }
           
 	      pstreamDefRecord(streamID2, varID, levelID);

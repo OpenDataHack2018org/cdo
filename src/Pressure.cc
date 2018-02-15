@@ -244,7 +244,7 @@ void *Pressure(void *process)
 	  if ( lnpsID != -1 )
 	    for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = exp(pdata[i]);
 	  else if ( psID != -1 )
-	    memcpy(ps_prog, pdata, gridsize*sizeof(double));
+	    arrayCopy(gridsize, pdata, ps_prog);
 
 	  /* check range of ps_prog */
 	  arrayMinMaxMask(gridsize, ps_prog, NULL, &minval, &maxval);

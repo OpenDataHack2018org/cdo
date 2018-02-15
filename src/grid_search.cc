@@ -160,8 +160,8 @@ struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const
   double *reg2d_center_lon = (double *) Malloc(nxm*sizeof(double));
   double *reg2d_center_lat = (double *) Malloc(ny*sizeof(double));
 
-  memcpy(reg2d_center_lon, lons, nxm*sizeof(double));
-  memcpy(reg2d_center_lat, lats, ny*sizeof(double));
+  arrayCopy(nxm, lons, reg2d_center_lon);
+  arrayCopy(ny, lats, reg2d_center_lat);
 
   double *coslon = (double *) Malloc(nx*sizeof(double));
   double *sinlon = (double *) Malloc(nx*sizeof(double));

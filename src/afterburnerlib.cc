@@ -116,25 +116,10 @@ double *alloc_dp(int words, const char *array_name)
   if ( words > 0 )
     {
       result = (double *) Malloc(words * sizeof(double));
-
       if ( result == NULL ) SysError(array_name, "No Memory!");
     }
 
   return result;
-}
-
-/* after_copy_array - Copy array of type double */
-static
-void after_copy_array(void *destination, void *source, int words)
-{
-   memcpy(destination, source, words*sizeof(double));
-}
-
-/* after_zero_array -  Set array of type double to zero */
-static
-void after_zero_array(double *field, int words)
-{
-   memset((char *)field, 0, words*sizeof(double));
 }
 
 static
@@ -165,54 +150,40 @@ void VarQuaSum(double *Variance, const double *restrict Sum, int len, int n)
 }
 
 static
-void AddVector(double * restrict dest, const double *restrict src, long len, size_t *nmiss, double missval)
+void AddVector(double *dest, const double *src, size_t len, size_t *nmiss, double missval)
 {
   if ( *nmiss > 0 )
     {
-      for ( long i = 0; i < len; i++ )
-	if ( IS_NOT_EQUAL(src[i], missval) )
-	  {
-	    if ( IS_NOT_EQUAL(dest[i], missval) )
-	      dest[i] += src[i];
-	    else
-	      dest[i] = src[i];
-	  }
-
-      *nmiss = 0;
-      for ( long i = 0; i < len; i++ )
-	if ( IS_EQUAL(dest[i], missval) ) *nmiss = *nmiss + 1;
-
+      arrayAddArrayMV(len, dest, src, missval);
+      *nmiss = arrayNumMV(len, dest, missval);
       if ( *nmiss == 0 ) *nmiss = 1;
     }
   else
     {
-#if defined (_OPENMP)
-#pragma omp parallel for
-#endif
-      for ( long i = 0; i < len; i++ ) dest[i] += src[i];
+      arrayAddArray(len, dest, src);
     }
 }
 
 static
-void Add2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, int len)
+void Add2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, size_t len)
 {
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     dest[i] = srcA[i] + srcB[i];
 }
 
 static
-void Sub2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, int len)
+void Sub2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, size_t len)
 {
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     dest[i] = srcA[i] - srcB[i];
 }
 
 static
-void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, size_t nmiss, double missval)
+void MultVectorScalar(double *dest, const double *restrict src, double factor, size_t len, size_t nmiss, double missval)
 {
   if ( nmiss > 0 )
     {
-      for ( int i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	{
 	  if ( IS_EQUAL(src[i], missval) )
 	    dest[i] = missval;
@@ -222,16 +193,16 @@ void MultVectorScalar(double *dest, const double *restrict src, double factor, i
     }
   else
     {
-      for ( int i = 0; i < len; i++ ) dest[i] = src[i] * factor;
+      for ( size_t i = 0; i < len; i++ ) dest[i] = src[i] * factor;
     }
 }
 
 static
-void DivVectorIvector(double *dest, const double *restrict src, const int *samp, int len, size_t *nmiss, double missval)
+void DivVectorIvector(double *dest, const double *restrict src, const int *samp, size_t len, size_t *nmiss, double missval)
 {
   *nmiss = 0;
 
-  for ( int i = 0; i < len; i++ )
+  for ( size_t i = 0; i < len; i++ )
     {
       if ( IS_EQUAL(src[i], missval) || samp[i] == 0 )
 	{
@@ -844,7 +815,7 @@ void after_processPL(struct Control *globs, struct Variable *vars)
 	    vars[code].mean = alloc_dp(fieldSize,FieldName(code,"mean"));
 
 	  if (globs->MeanCount == 1)
-	    after_copy_array(vars[code].mean, vars[code].grid, fieldSize);
+	    arrayCopy(fieldSize, vars[code].grid, vars[code].mean);
 	  else
 	    AddVector(vars[code].mean, vars[code].grid, fieldSize,
 		      &vars[code].nmiss, vars[code].missval);
@@ -960,7 +931,7 @@ void theta(double *pthetaf, double *pthetah, double *ph, double *ps,
        thetah += dimgp;
      }
  
-   after_copy_array(thetah,ts,dimgp);
+   arrayCopy(dimgp, ts, thetah);
    thetah = pthetah;
    for ( int h = 0; h < dim3gp; h++ )
      thetaf[h] = 0.5 * (thetah[h] + thetah[h+dimgp]);
@@ -1162,7 +1133,7 @@ void LayerWater(double *ww, double *ll, double pmax, double pmin,
       if (pph[k] < pmin) break;
    MinLev = k;
 
-   after_zero_array (ll, DimGP);
+   arrayFill(DimGP, ll, 0.0);
 
    for (k = MaxLev; k <= MinLev; k++) {
      for (i = 0;     i < DimGP;  i++)
@@ -1245,7 +1216,7 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[GEOPOTHEIGHT].sfit = TRUE;
       vars[GEOPOTHEIGHT].hybrid = alloc_dp(globs->Dim3GP+globs->DimGP, "vars[GEOPOTHEIGHT].hybrid");
 
-      after_copy_array(vars[GEOPOTHEIGHT].hybrid+globs->Dim3GP, globs->Orography, globs->DimGP);
+      arrayCopy(globs->DimGP, globs->Orography, vars[GEOPOTHEIGHT].hybrid+globs->Dim3GP);
       MakeGeopotHeight(vars[GEOPOTHEIGHT].hybrid, vars[TEMPERATURE].hybrid,
 		       vars[HUMIDITY].hybrid, vars[HALF_PRESS].hybrid, globs->DimGP, globs->NumLevel);
 
@@ -1256,7 +1227,7 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[GEOPOTHEIGHT].hlev = globs->NumLevel+1;
       vars[GEOPOTHEIGHT].sfit = TRUE;
       vars[GEOPOTHEIGHT].hybrid = (double *) Realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP+globs->DimGP)*sizeof(double));
-      after_copy_array(vars[GEOPOTHEIGHT].hybrid+globs->Dim3GP, globs->Orography, globs->DimGP);
+      arrayCopy(globs->DimGP, globs->Orography, vars[GEOPOTHEIGHT].hybrid+globs->Dim3GP);
       for ( int i = 0; i < globs->DimGP; i++ ) vars[GEOPOTHEIGHT].hybrid[globs->Dim3GP+i] /= PlanetGrav;
     }
 
@@ -1799,7 +1770,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	  else if ( vars[PS].hybrid )
 	    {
 	      Warning("log surface pressure (code 152) not found - using surface pressure (code 134)!");
-	      after_copy_array(vars[PS_PROG].hybrid, vars[PS].hybrid, globs->DimGP);
+	      arrayCopy(globs->DimGP, vars[PS].hybrid, vars[PS_PROG].hybrid);
 	    }
 	  else
 	    {
@@ -1812,13 +1783,13 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	{
 	  globs->Orography = alloc_dp(globs->DimGP , "Orography");
 	  if ( vars[GEOPOTENTIAL].hybrid )
-	    after_copy_array(globs->Orography, vars[GEOPOTENTIAL].hybrid, globs->DimGP);
+	    arrayCopy(globs->DimGP, vars[GEOPOTENTIAL].hybrid, globs->Orography);
 	  else
 	    {
 	      if ( vars[GEOPOTENTIAL].selected || globs->Type >= 30 )
 		{
 		  Warning("Orography not found - using zero orography!");
-		  after_zero_array(globs->Orography, globs->DimGP);
+		  arrayFill(globs->DimGP, globs->Orography, 0.0);
 		}
 	    }
 	}
@@ -1851,7 +1822,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 
 		  if ( globs->MeanCount == 1 )
 		    {
-		      after_copy_array(vars[code].mean, vars[code].hybrid, fieldSize);
+		      arrayCopy(fieldSize, vars[code].hybrid, vars[code].mean);
 		      if ( globs->Mean > 1 )
 			IniQuaSum(vars[code].variance, vars[code].hybrid, fieldSize);
 		    }
@@ -2040,7 +2011,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 	    vars[code].mean = alloc_dp(fieldSize, FieldName(code, "mean"));
 
 	  if ( globs->MeanCount == 1 )
-	    after_copy_array(vars[code].mean, vars[code].grid, fieldSize);
+	    arrayCopy(fieldSize, vars[code].grid, vars[code].mean);
 	  else
 	    AddVector(vars[code].mean, vars[code].grid, fieldSize,
 		      &vars[code].nmiss, vars[code].missval);
@@ -2444,7 +2415,7 @@ void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int c
 	      fieldSize = globs->Dim3SP;
 	      if (vars[code].spectral0 == NULL)
 		vars[code].spectral0 = alloc_dp(fieldSize, FieldName(code,"spectral"));
-	      after_copy_array(vars[code].spectral0+levelID*globs->DimSP,globs->Field,globs->DimSP);
+	      arrayCopy(globs->DimSP, globs->Field, vars[code].spectral0+levelID*globs->DimSP);
 	    }
 	}
       else
@@ -2460,7 +2431,7 @@ void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int c
 	  vars[code].plev = globs->NumLevelRequest;
 	  if ( vars[code].grid0 == NULL )
 	    vars[code].grid0 = alloc_dp(fieldSize, FieldName(code,"grid0"));
-	  after_copy_array(vars[code].grid0+levelID*globs->DimGP, globs->Field, globs->DimGP);
+	  arrayCopy(globs->DimGP, globs->Field, vars[code].grid0+levelID*globs->DimGP);
 	}
       else
 	{
@@ -2470,7 +2441,7 @@ void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int c
 	  vars[code].plev = 1;
 	  if ( vars[code].grid0 == NULL )
 	    vars[code].grid0 = alloc_dp(fieldSize, FieldName(code,"grid0"));
-	  after_copy_array(vars[code].grid0, globs->Field, globs->DimGP);
+	  arrayCopy(globs->DimGP, globs->Field, vars[code].grid0);
 	}
 
       if ( globs->Mean > 0 && (nmiss > 0 || vars[code].samp) )

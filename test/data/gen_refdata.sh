@@ -5,6 +5,24 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Timstat2
+#
+IFILE=ts_mm_5years
+IFILE1=ts_mm_2years1
+$CDO selyear,1991,1992 $IFILE $IFILE1
+IFILE2=ts_mm_2years2
+$CDO selyear,1993,1994 $IFILE $IFILE2
+#
+OFILE=timcor_ref
+$CDO $FORMAT timcor $IFILE1 $IFILE2 $OFILE
+OFILE=timcovar_ref
+$CDO $FORMAT timcovar $IFILE1 $IFILE2 $OFILE
+#
+rm $IFILE1 $IFILE2
+#
+exit
+########################################################################
+#
 # Remap regional grid
 #
 RMODS="bil bic dis nn con con2 ycon laf"
@@ -167,7 +185,7 @@ exit
 # Timstat Yearstat Monstat Daystat Runstat
 #
 IFILE=$HOME/data/cdt/cera/EH5_AMIP_1_TSURF_6H_1991-1995.grb
- OFILE=ts_6h_5years
+OFILE=ts_6h_5years
 $CDO $FORMAT remapnn,lon=55_lat=10 $IFILE $OFILE
 #
 IFILE=$OFILE

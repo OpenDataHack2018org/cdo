@@ -557,7 +557,7 @@ Remapeta(void *process)
       if (ltq)
         cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
 
-      memset(fis1, 0, gridsize * sizeof(double));
+      arrayFill(gridsize, fis1, 0.0);
     }
 
   int presID = lnpsID;
@@ -597,19 +597,19 @@ Remapeta(void *process)
           if (zaxisIDh != -1)
             {
               if (varID == sgeopotID)
-                memcpy(fis1, array, gridsize * sizeof(double));
+                arrayCopy(gridsize, array, fis1);
               else if (varID == presID)
                 {
                   if (lnpsID != -1)
                     for (size_t i = 0; i < gridsize; ++i)
                       ps1[i] = exp(array[i]);
                   else if (psID != -1)
-                    memcpy(ps1, array, gridsize * sizeof(double));
+                    arrayCopy(gridsize, array, ps1);
                 }
               else if (ltq && varID == tempID)
-                memcpy(t1 + offset, array, gridsize * sizeof(double));
+                arrayCopy(gridsize, array, t1 + offset);
               else if (ltq && varID == sqID)
-                memcpy(q1 + offset, array, gridsize * sizeof(double));
+                arrayCopy(gridsize, array, q1 + offset);
               /* else if ( zaxisID == zaxisIDh ) */
               else if (zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == nhlevf1)
                 {
@@ -620,7 +620,7 @@ Remapeta(void *process)
                   if (i == nvars3D)
                     cdoAbort("Internal error, 3D variable not found!");
 
-                  memcpy(vars1[i] + offset, array, gridsize * sizeof(double));
+                  arrayCopy(gridsize, array, vars1[i] + offset);
                 }
               else
                 {

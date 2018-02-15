@@ -269,23 +269,23 @@ void *Arith(void *process)
 	      if ( filltype == FILL_TS )
 		{
 		  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-		  int offset   = gridsize*levelID;
-		  memcpy(vardata[varID]+offset, fieldx2->ptr, gridsize*sizeof(double));
+                  size_t offset = gridsize*levelID;
+		  arrayCopy(gridsize, fieldx2->ptr, vardata[varID]+offset);
 		  varnmiss[varID][levelID] = fieldx2->nmiss;
 		}
 	      else if ( lstatus && (filltype == FILL_VAR || filltype == FILL_VARTS) )
 		{
 		  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
-		  int offset   = gridsize*levelID2;
-		  memcpy(vardata2+offset, fieldx2->ptr, gridsize*sizeof(double));
+		  size_t offset   = gridsize*levelID2;
+		  arrayCopy(gridsize, fieldx2->ptr, vardata2+offset);
 		  varnmiss2[levelID2] = fieldx2->nmiss;
 		}
 	    }
 	  else if ( filltype == FILL_TS )
 	    {
 	      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID2));
-	      int offset   = gridsize*levelID;
-	      memcpy(fieldx2->ptr, vardata[varID]+offset, gridsize*sizeof(double));
+	      size_t offset   = gridsize*levelID;
+	      arrayCopy(gridsize, vardata[varID]+offset, fieldx2->ptr);
 	      fieldx2->nmiss = varnmiss[varID][levelID];
 	    }
 
@@ -296,8 +296,8 @@ void *Arith(void *process)
 	    {
 	      levelID2 = (nlevels2 > 1) ? levelID : 0;
 	      size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
-	      int offset   = gridsize*levelID2;
-	      memcpy(fieldx2->ptr, vardata2+offset, gridsize*sizeof(double));
+	      size_t offset   = gridsize*levelID2;
+	      arrayCopy(gridsize, vardata2+offset, fieldx2->ptr);
 	      fieldx2->nmiss   = varnmiss2[levelID2];
 	      fieldx2->grid    = vlistInqVarGrid(vlistIDx2, 0);
 	      fieldx2->missval = vlistInqVarMissval(vlistIDx2, 0);

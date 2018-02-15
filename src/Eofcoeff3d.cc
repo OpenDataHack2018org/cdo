@@ -99,7 +99,7 @@ void *Eofcoeff3d(void *process)
          eof[varID][levelID][eofID].nmiss  = 0;
          eof[varID][levelID][eofID].missval= missval1;
          eof[varID][levelID][eofID].ptr    = (double*) Malloc(gridsize*sizeof(double));
-         memset(&eof[varID][levelID][eofID].ptr[0], missval1, gridsize*sizeof(double));
+         arrayFill(gridsize, &eof[varID][levelID][eofID].ptr[0], missval1);
 
          if ( varID >= nvars )
            cdoAbort("Internal error - too high varID");

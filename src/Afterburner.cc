@@ -1573,7 +1573,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
 			  if ( globs->vct == NULL )
 			    {
 			      globs->vct = (double *) Malloc(globs->nvct*sizeof(double));
-			      memcpy(globs->vct, zaxisInqVctPtr(zaxisID), globs->nvct*sizeof(double));
+			      arrayCopy(globs->nvct, zaxisInqVctPtr(zaxisID), globs->vct);
 			    }
 			}
 		      else
@@ -1583,7 +1583,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
 			      fprintf(stderr," Using internal VCT for L191\n");
 			      globs->nvct = (191+1)*2;
 			      globs->vct = (double *) Malloc(globs->nvct*sizeof(double));
-			      memcpy(globs->vct, VCT_L191, globs->nvct*sizeof(double));
+			      arrayCopy(globs->nvct, VCT_L191, globs->vct);
 			      zaxisDefVct(zaxisID, globs->nvct, globs->vct);
 			    }
 			  else

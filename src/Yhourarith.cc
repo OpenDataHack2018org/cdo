@@ -165,7 +165,7 @@ void *Yhourarith(void *process)
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  offset   = gridsize*levelID;
-	  memcpy(field2.ptr, vardata2[houroy][varID]+offset, gridsize*sizeof(double));
+	  arrayCopy(gridsize, vardata2[houroy][varID]+offset, field2.ptr);
 	  field2.nmiss   = varnmiss2[houroy][varID][levelID];
 	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
 	  field2.missval = vlistInqVarMissval(vlistID2, varID);

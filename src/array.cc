@@ -188,9 +188,30 @@ void arrayAddArray(size_t len, double *restrict array1, const double *restrict a
 }
 
 
-void arrayCopy(size_t len, const double *restrict array1, double *restrict array2)
+void arrayAddArrayMV(size_t len, double *restrict array1, const double *restrict array2, double missval)
 {
-  for ( size_t i = 0; i < len; ++i ) array2[i] = array1[i];
+  if ( DBL_IS_NAN(missval) )
+    {
+      for ( size_t i = 0; i < len; i++ )
+	if ( !DBL_IS_EQUAL(array2[i], missval) )
+	  {
+	    if ( !DBL_IS_EQUAL(array1[i], missval) )
+	      array1[i] += array2[i];
+	    else
+	      array1[i] = array2[i];
+	  }
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; i++ )
+	if ( IS_NOT_EQUAL(array2[i], missval) )
+	  {
+	    if ( IS_NOT_EQUAL(array1[i], missval) )
+	      array1[i] += array2[i];
+	    else
+	      array1[i] = array2[i];
+	  }
+    }
 }
 
 

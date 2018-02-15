@@ -122,7 +122,7 @@ void *Enlarge(void *process)
 	    }
 	  else
 	    {
-	      memcpy(array2, array1, gridsize1*sizeof(double));
+	      arrayCopy(gridsize1, array1, array2);
 	      for ( size_t i = gridsize1; i < gridsize2; i++ )
                 array2[i] = array1[gridsize1-1];
 

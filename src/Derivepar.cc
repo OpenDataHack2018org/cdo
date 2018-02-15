@@ -223,7 +223,7 @@ void *Derivepar(void *process)
       if ( humID == -1 )
 	cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity), var_stdname(specific_humidity));
       else
-	hum    = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+	hum = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
       gheight = (double*) Malloc(gridsize*(nhlevf+1)*sizeof(double));
     }
@@ -244,7 +244,7 @@ void *Derivepar(void *process)
       else
 	cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
 
-      memset(sgeopot, 0, gridsize*sizeof(double));
+      arrayFill(gridsize, sgeopot, 0.0);
     }
 
   presID = lnpsID;
@@ -312,29 +312,23 @@ void *Derivepar(void *process)
 	    {
 	      if ( varID == sgeopotID )
 		{
-		  memcpy(sgeopot, array, gridsize*sizeof(double));
+		  arrayCopy(gridsize, array, sgeopot);
 		}
 	      else if ( varID == geopotID && sgeopotID == -1 && (levelID+1) == nhlevf )
 		{
-		  memcpy(sgeopot, array, gridsize*sizeof(double));
+		  arrayCopy(gridsize, array, sgeopot);
 		}
 	      else if ( varID == presID )
 		{
 		  if ( lnpsID != -1 )
 		    for ( size_t i = 0; i < gridsize; ++i ) ps[i] = exp(array[i]);
 		  else if ( psID != -1 )
-		    memcpy(ps, array, gridsize*sizeof(double));
+		    arrayCopy(gridsize, array, ps);
 		}
 	      else if ( varID == tempID )
-		memcpy(temp+offset, array, gridsize*sizeof(double));
+		arrayCopy(gridsize, array, temp+offset);
 	      else if ( varID == humID )
-		memcpy(hum+offset, array, gridsize*sizeof(double));
-	      /*
-	      else if ( varID == clwcID )
-		memcpy(lwater+offset, array, gridsize*sizeof(double));
-	      else if ( varID == ciwcID )
-		memcpy(iwater+offset, array, gridsize*sizeof(double));
-	      */
+		arrayCopy(gridsize, array, hum+offset);
 	    }
 	}
 
@@ -385,8 +379,7 @@ void *Derivepar(void *process)
       if ( operatorID == GHEIGHT )
 	{
 	  presh(NULL, half_press, vct, ps, nhlevf, gridsize);
-	  
-	  memcpy(gheight+gridsize*nhlevf, sgeopot, gridsize*sizeof(double));
+	  arrayCopy(gridsize, sgeopot, gheight+gridsize*nhlevf);
 	  MakeGeopotHeight(gheight, temp, hum, half_press, gridsize, nhlevf);
 
 	  nmissout = 0;
