@@ -18,6 +18,7 @@ Here is a list of all graph plot parameters:
  device     & STRING  & Output device (ps, eps, pdf, png, gif, gif_animation, jpeg, svg, kml)
  ymin       & FLOAT   & Minimum value of the y-axis data 
  ymax       & FLOAT   & Maximum value of the y-axis data 
+ linewidth  & INT     & Linewidth (default 8)
  stat       & STRING  & "TRUE" or "FALSE", to switch on the mean computation. Default is "FALSE".
             &         & Will be overridden to "FALSE", if input files have unequal number of time
             &         & steps or different start/end times. 

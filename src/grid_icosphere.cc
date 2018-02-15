@@ -42,7 +42,7 @@ namespace icosahedron
   {
     constexpr double pi_5 = M_PI*0.2;
     // first define the vertices of the icosahedron
-    constexpr double z_w = 2.0*acos(1.0/(2.0*sin(pi_5)));
+    const double z_w = 2.0*acos(1.0/(2.0*sin(pi_5)));
 
     // set poles first - it is simple
     vertices[ 0] = vec3{0.0, 0.0,  1.0};

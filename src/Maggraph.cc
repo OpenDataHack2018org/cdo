@@ -55,7 +55,7 @@ const char *line_colours[] = {"red", "green", "blue", "yellow", "cyan", "magenta
 			     "bluishpurple", "purple",
 			};
 
-const char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","device"};
+const char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","device","linewidth"};
 
 int graph_param_count = sizeof(graph_params)/sizeof(char*);
 int num_colours = sizeof( line_colours )/sizeof( char* );
@@ -95,6 +95,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   double *mean_val = NULL, *std_dev_val = NULL;
   double *spread_min = NULL, *spread_max = NULL;
   double y_min_val = 1.0e+200, y_max_val = -1.0e+200;
+  int linewidth_val = 8;
   
   if( DBG )
     {
@@ -148,6 +149,13 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	  y_max_val = atof( split_str[1] );
 	  if( DBG )
 	    fprintf(stderr,"Y max Val %g\n",y_max_val);
+	}
+
+      if( !strcmp( split_str[0],"linewidth" ) )
+	{
+	  linewidth_val = atoi( split_str[1] );
+	  if( DBG )
+	    fprintf(stderr,"linewidth Val %g\n",linewidth_val);
 	}
 	
       if( !strcmp( split_str[0],"sigma" ) )
@@ -571,7 +579,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   mag_setc("legend_text_colour", "black");
 
   mag_setc("graph_symbol","off");
-  mag_seti("graph_line_thickness", 8 );
+  mag_seti("graph_line_thickness", linewidth_val );
   
   if( DBG )
     fprintf(stderr, "FILE BEGIN %d\n", file_begin );
@@ -615,7 +623,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
       mag_set1r("graph_curve_y_values", datatab[0], nts[0]);
       mag_setc("graph_line_style", "dot" );
-      mag_seti("graph_line_thickness", 10 );
+      mag_seti("graph_line_thickness", linewidth_val+2 );
       mag_graph ();
     }
     
@@ -627,7 +635,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       if( DBG )
 	fprintf(stderr, "NTIME STEPS %ld\n", ntime_steps );
       
-      mag_seti("graph_line_thickness", 8 );
+      mag_seti("graph_line_thickness", linewidth_val );
       mag_setc("graph_line_colour", "grey" );
       mag_setc("graph_line_style", "dash" );
       mag_set1c("graph_curve_date_x_values", (const char**)date_time_str[0], ntime_steps);
@@ -802,7 +810,7 @@ void VerifyGraphParameters( int num_param, char **param_names )
 			}
 		    }	 
 		      
-		  if( !strcmp( split_str[0],"ymin" ) ||  !strcmp( split_str[0],"ymax" ) || !strcmp( split_str[0],"sigma" )  )
+		  if( !strcmp( split_str[0],"ymin" ) ||  !strcmp( split_str[0],"ymax" ) || !strcmp( split_str[0],"sigma" ) ||  !strcmp( split_str[0],"linewidth" )  )
 		    {
 		      if( !IsNumeric( split_str[1] ) )
 			syntax = FALSE;       
