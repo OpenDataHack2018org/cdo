@@ -38,7 +38,6 @@ void *Splitsel(void *process)
   int nchars;
   char filesuffix[32];
   char filename[8192];
-  const char *refname;
   double *array = NULL;
   field_type **vars = NULL;
 
@@ -80,7 +79,7 @@ void *Splitsel(void *process)
   strcpy(filename, cdoGetObase());
   nchars = strlen(filename);
 
-  refname = cdoGetObase();
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
@@ -151,9 +150,8 @@ void *Splitsel(void *process)
       sprintf(filename+nchars+6, "%s", filesuffix);
 	  
       if ( cdoVerbose ) cdoPrint("create file %s", filename);
-      int streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
-      pstreamDefVlist(streamID2, vlistID2);
 
+      int streamID2 = -1;
       int tsID2 = 0;
 
       for ( ; nsets < (int)(ndates*(index+1)); nsets++ ) 
@@ -162,6 +160,13 @@ void *Splitsel(void *process)
 	  if ( nrecs == 0 ) break;
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
+
+          if ( streamID2 < 0 )
+            {
+              streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
+              pstreamDefVlist(streamID2, vlistID2);
+            }
+
 	  pstreamDefTimestep(streamID2, tsID2);
 
 	  if ( tsID > 0 && tsID2 == 0 && nconst )

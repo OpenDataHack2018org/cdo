@@ -60,15 +60,11 @@ void *Splittime(void *process)
   int levelID;
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   int index = 0;
-  size_t gridsize;
   size_t nmiss;
-  int gridID;
-  int nlevel;
   char filesuffix[32];
   char filename[8192];
   double *array = NULL;
   field_type **vars = NULL;
-  const char *format = NULL;
 
   cdoInitialize(process);
 
@@ -90,10 +86,8 @@ void *Splittime(void *process)
   int operfunc   = cdoOperatorF1(operatorID);
   int operintval = cdoOperatorF2(operatorID);
 
-  if ( operatorID == SPLITMON )
-    {
-      if ( operatorArgc() == 1 ) format = operatorArgv()[0];
-    }
+  const char *format = NULL;
+  if ( operatorID == SPLITMON && operatorArgc() == 1 ) format = operatorArgv()[0];
 
   const char *seas_name[4];
   get_season_name(seas_name);
@@ -110,7 +104,7 @@ void *Splittime(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  strcpy(filename, cdoGetStreamName(1).c_str());
+  strcpy(filename, cdoGetObase());
   int nchars = strlen(filename);
 
   const char *refname = cdoGetObase();
@@ -119,9 +113,9 @@ void *Splittime(void *process)
 
   //  if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
-      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) Malloc(gridsize*sizeof(double));
+      int gridsizemax = vlistGridsizeMax(vlistID1);
+      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
+      array = (double*) Malloc(gridsizemax*sizeof(double));
     }
 
   int nvars = vlistNvars(vlistID1);
@@ -137,9 +131,9 @@ void *Splittime(void *process)
 	{
 	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 	    {
-	      gridID  = vlistInqVarGrid(vlistID1, varID);
-	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      gridsize = gridInqSize(gridID);
+	      int gridID = vlistInqVarGrid(vlistID1, varID);
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      size_t gridsize = gridInqSize(gridID);
 		  
 	      vars[varID] = (field_type*) Malloc(nlevel*sizeof(field_type));
 
@@ -156,6 +150,7 @@ void *Splittime(void *process)
   int tsID = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
+      taxisCopyTimestep(taxisID2, taxisID1);
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
@@ -206,13 +201,10 @@ void *Splittime(void *process)
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
 	  streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
-
 	  pstreamDefVlist(streamID2, vlistID2);
-
 	  streamIDs[index] = streamID2;
 	}
 
-      taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsIDs[index]);
 
       if ( tsID > 0 && tsIDs[index] == 0 && nconst )
@@ -221,7 +213,7 @@ void *Splittime(void *process)
 	    {
 	      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 		{
-		  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
 		      pstreamDefRecord(streamID2, varID, levelID);
@@ -250,8 +242,8 @@ void *Splittime(void *process)
 		{
 		  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 		    {
-		      gridID  = vlistInqVarGrid(vlistID1, varID);
-		      gridsize = gridInqSize(gridID);
+		      int gridID  = vlistInqVarGrid(vlistID1, varID);
+		      size_t gridsize = gridInqSize(gridID);
 		      arrayCopy(gridsize, array, vars[varID][levelID].ptr);
 		      vars[varID][levelID].nmiss = nmiss;
 		    }
@@ -273,7 +265,7 @@ void *Splittime(void *process)
 	{
 	  if ( vlistInqVarTimetype(vlistID2, varID) == TIME_CONSTANT )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		if ( vars[varID][levelID].ptr )
 		  Free(vars[varID][levelID].ptr);
@@ -287,8 +279,7 @@ void *Splittime(void *process)
 
   for ( index = 0; index < MAX_STREAMS; index++ )
     {
-      streamID2 = streamIDs[index];
-      if ( streamID2 >= 0 ) pstreamClose(streamID2);
+      if ( streamIDs[index] >= 0 ) pstreamClose(streamIDs[index]);
     }
 
   vlistDestroy(vlistID2);

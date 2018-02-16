@@ -39,14 +39,9 @@ void *Splityear(void *process)
   int nrecs;
   int levelID;
   int day;
-  int year1, year2;
-  int mon1, mon2;
-  size_t gridsize;
   int ic = 0;
   int cyear[MAX_YEARS];
   size_t nmiss;
-  int gridID;
-  int nlevel;
   char filesuffix[32];
   char filename[8192];
   double *array = NULL;
@@ -86,9 +81,9 @@ void *Splityear(void *process)
 
   // if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
-      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) Malloc(gridsize*sizeof(double));
+      int gridsizemax = vlistGridsizeMax(vlistID1);
+      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
+      array = (double*) Malloc(gridsizemax*sizeof(double));
     }
 
   int nvars = vlistNvars(vlistID1);
@@ -104,9 +99,9 @@ void *Splityear(void *process)
 	{
 	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 	    {
-	      gridID  = vlistInqVarGrid(vlistID1, varID);
-	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      gridsize = gridInqSize(gridID);
+	      int gridID = vlistInqVarGrid(vlistID1, varID);
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      size_t gridsize = gridInqSize(gridID);
 		  
 	      vars[varID] = (field_type*) Malloc(nlevel*sizeof(field_type));
 
@@ -122,12 +117,14 @@ void *Splityear(void *process)
 
   int index1 = -INT_MAX;
   int index2;
-  year1 = -1;
-  mon1  = -1;
+  int year1 = -1, year2;
+  int mon1 = -1, mon2;
   int tsID  = 0;
   int tsID2 = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
+      taxisCopyTimestep(taxisID2, taxisID1);
+
       int vdate = taxisInqVdate(taxisID1);
       cdiDecodeDate(vdate, &year2, &mon2, &day);
 
@@ -137,9 +134,7 @@ void *Splityear(void *process)
 	    {
 	      tsID2 = 0;
 
-	      if ( year1 != year2 ) ic = 0;
-	      else                  ic++;
-
+	      ic = (year1 != year2) ? 0 : ic+1;
 	      if ( year2 >= 0 && year2 < MAX_YEARS )
 		{
 		  ic = cyear[year2];
@@ -158,7 +153,6 @@ void *Splityear(void *process)
 	      if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
 	      streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
-
 	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 	  mon1 = mon2;
@@ -183,12 +177,10 @@ void *Splityear(void *process)
 	      if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
 	      streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
-
 	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 	}
       
-      taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID2);
 
       if ( tsID > 0 && tsID2 == 0 && nconst )
@@ -197,11 +189,11 @@ void *Splityear(void *process)
 	    {
 	      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 		{
-		  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
-		      pstreamDefRecord(streamID2, varID, levelID);
 		      nmiss = vars[varID][levelID].nmiss;
+		      pstreamDefRecord(streamID2, varID, levelID);
 		      pstreamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
 		    }
 		}
@@ -226,8 +218,8 @@ void *Splityear(void *process)
 		{
 		  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 		    {
-		      gridID  = vlistInqVarGrid(vlistID1, varID);
-		      gridsize = gridInqSize(gridID);
+		      int gridID  = vlistInqVarGrid(vlistID1, varID);
+		      size_t gridsize = gridInqSize(gridID);
 		      arrayCopy(gridsize, array, vars[varID][levelID].ptr);
 		      vars[varID][levelID].nmiss = nmiss;
 		    }
@@ -250,7 +242,7 @@ void *Splityear(void *process)
 	{
 	  if ( vlistInqVarTimetype(vlistID2, varID) == TIME_CONSTANT )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		if ( vars[varID][levelID].ptr )
 		  Free(vars[varID][levelID].ptr);
