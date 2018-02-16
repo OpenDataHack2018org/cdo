@@ -68,7 +68,7 @@ void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, RemapType mapTy
   size_t nbins = src_grid->num_srch_bins;
   double dlat = PI/nbins;  // lat/lon intervals for search bins
 
-  if ( cdoVerbose ) cdoPrint("Using %d latitude bins to restrict search.", nbins);
+  if ( cdoVerbose ) cdoPrint("Using %zu latitude bins to restrict search.", nbins);
 
   if ( nbins > 0 )
     {

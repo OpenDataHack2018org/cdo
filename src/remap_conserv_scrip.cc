@@ -1422,7 +1422,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 		  if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
 		    {
 		      if ( cdoVerbose )
-			cdoPrint("Skip very small region (grid1[%d]): lon=%g dlon=%g lat=%g dlat=%g",
+			cdoPrint("Skip very small region (grid1[%ld]): lon=%g dlon=%g lat=%g dlat=%g",
 				 src_cell_add, beglon, endlon-beglon, beglat, endlat-beglat);
 		      break;
 		    }
@@ -1625,7 +1625,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 		  if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
 		    {
 		      if ( cdoVerbose )
-			cdoPrint("Skip very small region (grid2[%d]): lon=%g dlon=%g lat=%g dlat=%g",
+			cdoPrint("Skip very small region (grid2[%ld]): lon=%g dlon=%g lat=%g dlat=%g",
 				 tgt_cell_add, beglon, endlon-beglon, beglat, endlat-beglat);
 		      break;
 		    }
@@ -1804,7 +1804,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       for ( long n = 0; n < src_grid_size; ++n )
 	{
 	  if ( src_centroid_lat[n] < -PIH-.01 || src_centroid_lat[n] > PIH+.01 )
-	    cdoPrint("Source grid centroid lat error: %d %g", n, src_centroid_lat[n]);
+	    cdoPrint("Source grid centroid lat error: %ld %g", n, src_centroid_lat[n]);
 
 	  src_centroid_lat[n] = 0;
 	  src_centroid_lon[n] = 0;
@@ -1813,7 +1813,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       for ( long n = 0; n < tgt_grid_size; ++n )
 	{
 	  if ( tgt_centroid_lat[n] < -PIH-.01 || tgt_centroid_lat[n] > PIH+.01 )
-	    cdoPrint("Target grid centroid lat error: %d %g", n, tgt_centroid_lat[n]);
+	    cdoPrint("Target grid centroid lat error: %ld %g", n, tgt_centroid_lat[n]);
 
 	  tgt_centroid_lat[n] = 0;
 	  tgt_centroid_lon[n] = 0;
@@ -1839,7 +1839,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	    norm_factor = tgt_grid->cell_area[n];
 	    
 	  if ( tgt_centroid_lat[n] > 0 && fabs(tgt_centroid_lat[n] - norm_factor) > .01 )
-	    cdoPrint("Error: sum of wts for map1 %d %g %g", n, tgt_centroid_lat[n], norm_factor);
+	    cdoPrint("Error: sum of wts for map1 %ld %g %g", n, tgt_centroid_lat[n], norm_factor);
 	}
     } // lcheck
 

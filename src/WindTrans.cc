@@ -113,7 +113,7 @@ void destaggerUorV(double *fu, double *fuOut,
     }
 
   if ( CdoDebug::cdoDebugExt>=20 )
-    cdoPrint("destaggerUorV(): (nlon=%d, nlat=%d);               [lat0=%d, lon0=%d, next=%d];    (default order destaggering)", nlon,nlat, lat0,lon0,next);
+    cdoPrint("destaggerUorV(): (nlon=%d, nlat=%d);               [lat0=%ld, lon0=%ld, next=%ld];    (default order destaggering)", nlon,nlat, lat0,lon0,next);
 
   for ( int lev = 0; lev < klev; lev++ )
     {
@@ -167,7 +167,7 @@ void destaggerUorV_positiveOrder(double *fu, double *fuOut,
     }
   
   if ( CdoDebug::cdoDebugExt>=20 )
-    cdoPrint("destaggerUorV(): (nlon=%d, nlat=%d);               [latE=%d, lonE=%d, next=%d];    (positive order destaggering)", nlon,nlat, latE,lonE,next);
+    cdoPrint("destaggerUorV(): (nlon=%ld, nlat=%ld);               [latE=%d, lonE=%d, next=%d];    (positive order destaggering)", nlon,nlat, latE,lonE,next);
 
   for ( int lev = 0; lev < klev; lev++ )
     {
@@ -731,7 +731,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
   if ( rotationMatrixArray == NULL )
     {
       if ( CdoDebug::cdoDebugExt>0 )
-        cdoPrint("About to compute rotationMatrixArray for the whole grid [%d x %d]", nx,ny);
+        cdoPrint("About to compute rotationMatrixArray for the whole grid [%zu x %zu]", nx,ny);
 
       rotationMatrixArray = (double *) Malloc(4*nx*ny*sizeof(double));
       for ( j = 0; j < ny; j++ )
@@ -853,9 +853,9 @@ void rot_uv_north(int gridID, double *us, double *vs)
             if ( CdoDebug::cdoDebugExt>=20 )
               if ( ((i<3) && (j<3)) || ((i>(nx-3)) && (j>(ny-3))  ) )
                 {
-                  cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntNorth, lat_pntNorth) = [%3.6f,%3.6f]; dLonNorth=%3.6f; dLatNorth=%3.6f (Northing grid relative) ",
+                  cdoPrint("grid point [%zu,%zu] with latlon[%3.6f,%3.6f]; (lon_pntNorth, lat_pntNorth) = [%3.6f,%3.6f]; dLonNorth=%3.6f; dLatNorth=%3.6f (Northing grid relative) ",
                            i,j, lon_pnt0, lat_pnt0,lon_pntNorth, lat_pntNorth, RAD2DEG*dLonNorth, RAD2DEG*dLatNorth );
-                  cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; dLonEast =%3.6f; dLatEast =%3.6f (Easting grid relative ) ",
+                  cdoPrint("grid point [%zu,%zu] with latlon[%3.6f,%3.6f]; (lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; dLonEast =%3.6f; dLatEast =%3.6f (Easting grid relative ) ",
                            i,j, lon_pnt0, lat_pnt0,lon_pntEast,lat_pntEast, RAD2DEG*dLonEast, RAD2DEG*dLatEast );
                   //cdoPrint("(xpntNorthSph, ypntNorthSph)= [%3.6f,%3.6f]; (xpntEastSph,ypntEastSph) = [%3.6f,%3.6f];",
                   //         xpntNorthSph, ypntNorthSph, xpntEastSph,ypntEastSph );
@@ -863,7 +863,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
                   //vecAngle = RAD2DEG * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph) );
                   cdoPrint("(xpntNorthSph, ypntNorthSph, zpntNorthSph)= [%3.6f,%3.6f,%3.6f]; (xpntEastSph,ypntEastSph, zpntEastSph) = [%3.6f,%3.6f,%3.6f]; vecAngle= %3.6f",
                            xpntNorthSph, ypntNorthSph, zpntNorthSph, xpntEastSph, ypntEastSph, zpntEastSph, vecAngle );
-                  cdoPrint("rotation matrix for grid point [%03d,%03d] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)",
+                  cdoPrint("rotation matrix for grid point [%zu,%zu] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)",
                            i,j, lon_pnt0, lat_pnt0, VJaa, VJab, VJba, VJbb);
                 }
 
@@ -1064,7 +1064,7 @@ void project_uv_latlon(int gridID, double *us, double *vs)
         VJbb = signLat*(ypntNorth-ypnt0)/distLat;
         if ( CdoDebug::cdoDebugExt>=20 )
           if ( ((i<3) && (j<3)) || ((i>(nx-3)) && (j>(ny-3))  ) )
-            cdoPrint("Jacobian for grid point [%03d,%03d] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)", i,j, xpnt0, ypnt0, VJaa, VJab, VJba, VJbb);
+            cdoPrint("Jacobian for grid point [%zu,%zu] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)", i,j, xpnt0, ypnt0, VJaa, VJab, VJba, VJbb);
         // 2) Transform the UV vector with jacobian matrix
         u = us[idx]; v = vs[idx];
         //u = 6.0;  v = 0.0; // test: 6 m/s along the easting direction of the grid

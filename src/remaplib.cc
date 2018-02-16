@@ -1282,9 +1282,9 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
       */
     }
 
-  cdoPrint("Number of weights %d", rv.num_wts);
-  cdoPrint("Number of sparse matrix entries %d", rv.num_links);
-  cdoPrint("Total number of dest cells %d", tgt_grid.size);
+  cdoPrint("Number of weights %zu", rv.num_wts);
+  cdoPrint("Number of sparse matrix entries %zu", rv.num_links);
+  cdoPrint("Total number of dest cells %zu", tgt_grid.size);
 
   size_t *tgt_count = (size_t*) Malloc(tgt_grid.size*sizeof(size_t));
 
@@ -1311,12 +1311,12 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   for ( size_t i = 0; i < tgt_grid.size; ++i )
     if ( tgt_count[i] > 0 ) icount++;
 
-  cdoPrint("Number of cells participating in remap %d", icount);
+  cdoPrint("Number of cells participating in remap %zu", icount);
 
   if ( icount )
     {
-      cdoPrint("Min no of entries/row = %d", imin);
-      cdoPrint("Max no of entries/row = %d", imax);
+      cdoPrint("Min no of entries/row = %zu", imin);
+      cdoPrint("Max no of entries/row = %zu", imax);
 
       imax = imin + idiff;
       for ( size_t n = 0; n < 10; ++n )
@@ -1326,7 +1326,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 	    if ( tgt_count[i] >= imin && tgt_count[i] < imax ) icount++;
 
 	  if ( icount )
-	    cdoPrint("Num of rows with entries between %d - %d  %d", imin, imax-1, icount);
+	    cdoPrint("Num of rows with entries between %zu - %zu  %zu", imin, imax-1, icount);
 
 	  imin = imin + idiff;
 	  imax = imax + idiff;
@@ -1588,7 +1588,7 @@ void remapCheckArea(size_t grid_size, double *restrict cell_area, const char *na
   for ( size_t n = 0; n < grid_size; ++n )
     {
       if ( cell_area[n] < -.01 )
-        cdoPrint("%s grid area error: %d %g", name, n, cell_area[n]);
+        cdoPrint("%s grid area error: %zu %g", name, n, cell_area[n]);
     }
 }
 
@@ -1598,11 +1598,11 @@ void remapCheckWeights(size_t num_links, size_t num_wts, NormOpt normOpt, size_t
   for ( size_t n = 0; n < num_links; ++n )
     {
       if ( wts[n*num_wts] < -0.01 )
-        cdoPrint("Map weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
+        cdoPrint("Map weight < 0! grid1idx=%zu grid2idx=%zu nlink=%zu wts=%g",
                  src_cell_add[n], tgt_cell_add[n], n, wts[n*num_wts]);
 
       if ( normOpt != NormOpt::NONE && wts[n*num_wts] > 1.01 )
-        cdoPrint("Map weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
+        cdoPrint("Map weight > 1! grid1idx=%zu grid2idx=%zu nlink=%zu wts=%g",
                  src_cell_add[n], tgt_cell_add[n], n, wts[n*num_wts]);
     }
 }

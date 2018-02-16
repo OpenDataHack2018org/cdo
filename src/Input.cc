@@ -107,7 +107,7 @@ void *Input(void *process)
 	  if ( nrecs == 0 )
 	    array = (double*) Malloc(gridsize*nlevs*sizeof(double));
 	  
-	  cdoPrint("Enter all %d elements of timestep %d!", gridsize*nlevs, nrecs+1);
+	  cdoPrint("Enter all %zu elements of timestep %d!", gridsize*nlevs, nrecs+1);
 	  
 	  size_t rval = input_darray(stdin, gridsize*nlevs, array);
 
@@ -154,7 +154,7 @@ void *Input(void *process)
 		cdoAbort("Gridsize must not change!");
 	    }
 	  
-	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
+	  cdoPrint("Enter all %zu elements of record %d!", gridsize, nrecs+1);
 	  
 	  rval = input_darray(stdin, gridsize, array);
 	  if ( rval != (int)gridsize ) cdoAbort("Invalid data input!");
@@ -199,7 +199,7 @@ void *Input(void *process)
 		cdoAbort("Gridsize must not change!");
 	    }
 	  
-	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
+	  cdoPrint("Enter all %zu elements of record %d!", gridsize, nrecs+1);
 	  
 	  rval = input_darray(stdin, gridsize, array);
 	  if ( rval != (int)gridsize ) cdoAbort("Invalid data input!");

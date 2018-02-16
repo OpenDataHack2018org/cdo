@@ -112,7 +112,7 @@ void cdoAbort(const char *fmt, ...)
 }
 
 
-void XXXWarning(const char *fmt, ...)
+void cdoWarning(const char *fmt, ...)
 {
   if ( _Verbose )
     {

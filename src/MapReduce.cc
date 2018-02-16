@@ -82,7 +82,7 @@ void *MapReduce(void *process)
   int inputGridID   = cdoDefineGrid(operatorArgv()[0]);
   size_t inputGridSize = gridInqSize(inputGridID);
   int inputGridType = gridInqType(inputGridID);
-  if ( CdoDebug::cdoDebug ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
+  if ( CdoDebug::cdoDebug ) cdoPrint("MapReduce: input gridSize: %zu", inputGridSize);
 
   /* creata an index list of the relevant locations  {{{ */
   double *inputMaskField = (double*) Malloc(inputGridSize*sizeof(double));

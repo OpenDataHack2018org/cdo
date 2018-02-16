@@ -294,7 +294,7 @@ void *EOFs(void *process)
     }
 
   if ( cdoVerbose ) 
-    cdoPrint("Calculating %d eigenvectors and %d eigenvalues in %s",
+    cdoPrint("Calculating %d eigenvectors and %zu eigenvalues in %s",
 	     n_eig, n, grid_space==1?"grid_space" : "time_space");
 
   double *weight = (double *) Malloc(gridsize*sizeof(double));

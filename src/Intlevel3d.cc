@@ -173,7 +173,7 @@ void *Intlevel3d(void *process)
     nlevo       = nlevel;  /* number of output levels for later use */
     gridsizeo   = gridsize;/* horizontal gridsize of output z coordinate */
     nrecs       = pstreamInqTimestep(streamID2, 0);
-    if (cdoVerbose) cdoPrint("%d records target 3d vertical height and gridsize %d",nrecs,gridsize);
+    if (cdoVerbose) cdoPrint("%d records target 3d vertical height and gridsize %zu",nrecs,gridsize);
 
     for ( int recID = 0; recID < nrecs; recID++ )
       {

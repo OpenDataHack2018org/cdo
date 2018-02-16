@@ -135,7 +135,7 @@ int gengrid(int gridID1, long lat1, long lat2, long lon11, long lon12, long lon2
   long nlon2 = nlon21 + nlon22;
   long nlat2 = lat2 - lat1 + 1;
 
-  if ( cdoVerbose ) cdoPrint("nlon=%d nlat=%d", nlon2, nlat2);
+  if ( cdoVerbose ) cdoPrint("nlon=%ld nlat=%ld", nlon2, nlat2);
 
   int gridtype = gridInqType(gridID1);
 
@@ -932,9 +932,9 @@ void *Selbox(void *process)
     {
       if ( gridtype != GRID_UNSTRUCTURED )
 	{
-	  cdoPrint("box1 - idx1,idx2,idy1,idy2: %d,%d,%d,%d",
+	  cdoPrint("box1 - idx1,idx2,idy1,idy2: %ld,%ld,%ld,%ld",
 		   sbox[0].lon21+1, sbox[0].lon22+1, sbox[0].lat1+1, sbox[0].lat2+1);
-	  cdoPrint("box2 - idx1,idx2,idy1,idy2: %d,%d,%d,%d",
+	  cdoPrint("box2 - idx1,idx2,idy1,idy2: %ld,%ld,%ld,%ld",
 		   sbox[0].lon11+1, sbox[0].lon12+1, sbox[0].lat1+1, sbox[0].lat2+1);
 	}
     }

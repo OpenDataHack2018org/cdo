@@ -112,7 +112,7 @@ void *CDIwrite(void *process)
   if ( cdoVerbose )
     {
       cdoPrint("nruns      : %d", nruns);
-      cdoPrint("gridsize   : %d", gridsize);
+      cdoPrint("gridsize   : %zu", gridsize);
       cdoPrint("nlevs      : %d", nlevs);
       cdoPrint("ntimesteps : %d", ntimesteps);
       cdoPrint("nvars      : %d", nvars);

@@ -293,7 +293,7 @@ void *Distgrid(void *process)
   for ( size_t index = 0; index < nsplit; index++ )
     vlistIDs[index] = vlistDuplicate(vlistID1);
 
-  if ( cdoVerbose ) cdoPrint("ngrids=%d  nsplit=%d", ngrids, nsplit);
+  if ( cdoVerbose ) cdoPrint("ngrids=%d  nsplit=%zu", ngrids, nsplit);
 
   for ( int i = 0; i < ngrids; i++ )
     {

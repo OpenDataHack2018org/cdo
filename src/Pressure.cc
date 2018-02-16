@@ -155,7 +155,7 @@ void *Pressure(void *process)
         {
 	  vlistInqVarName(vlistID1, varID, varname);
 	  cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s Varname = %s varID = %d",
-                   mode, instNum,tableNum,  code, paramstr, varname, varID);
+                   (int)mode, instNum, tableNum, code, paramstr, varname, varID);
         }
 
       if ( code <= 0 )

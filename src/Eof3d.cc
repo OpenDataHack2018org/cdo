@@ -340,7 +340,7 @@ void *EOF3d(void *process)
       /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
 
       if ( cdoVerbose ) 
-	cdoPrint("Processed SVD decomposition for var %i from %zu x %zu matrix",varID,n,n);
+	cdoPrint("Processed SVD decomposition for var %d from %d x %d matrix",varID,n,n);
 
       for( int eofID = 0; eofID < n; eofID++ )
 	eigenvalues[varID][eofID][0] = eigv[eofID];

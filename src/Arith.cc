@@ -218,7 +218,7 @@ void *Arith(void *process)
 	      if ( filltype == FILL_NONE && streamIDx2 == streamID2 )
 		{
 		  filltype = FILL_FILE;
-		  cdoPrint("Filling up stream2 >%s< by copying all timesteps.", 1);
+		  cdoPrint("Filling up stream2 >%s< by copying all timesteps.", cdoGetStreamName(1).c_str());
 		}
 
 	      if ( filltype == FILL_FILE )

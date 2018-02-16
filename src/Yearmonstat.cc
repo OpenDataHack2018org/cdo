@@ -204,7 +204,7 @@ void *Yearmonstat(void *process)
 	{
 	  date2str(vdate0, vdatestr, sizeof(vdatestr));
 	  time2str(vtime0, vtimestr, sizeof(vtimestr));
-	  cdoPrint("%s %s  nsets = %d", vdatestr, vtimestr, nsets);
+	  cdoPrint("%s %s  nsets = %ld", vdatestr, vtimestr, nsets);
 	}
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);

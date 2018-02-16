@@ -622,7 +622,7 @@ char *strContains(char *str, const char *substr)
   size_t lenstr = strlen(str);
 
   if (lensub>lenstr) {
-        if ( CdoDebug::cdoDebugExt>=100 ) cdoPrint("strContains():  substr('%s') NOT found in str('%s');  lensub(%d)>lenstr(%d) ", substr,str, lensub,lenstr);
+        if ( CdoDebug::cdoDebugExt>=100 ) cdoPrint("strContains():  substr('%s') NOT found in str('%s');  lensub(%zu)>lenstr(%zu) ", substr,str, lensub,lenstr);
         return NULL;
   }
   char *rv = strstr(str, substr);

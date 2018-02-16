@@ -99,7 +99,6 @@ void *Setgrid(void *process)
       char *areafile = operatorArgv()[0];
 
       int streamID = streamOpenRead(areafile);
-
       int vlistID = streamInqVlist(streamID);
 
       nrecs = streamInqTimestep(streamID, 0);
@@ -125,7 +124,7 @@ void *Setgrid(void *process)
 	    }
 	  arrmean = arrmean/areasize;
 
-	  cdoPrint("areaweights: %d %#12.5g%#12.5g%#12.5g", areasize, arrmin, arrmean, arrmax);
+	  cdoPrint("areaweights: %zu %#12.5g%#12.5g%#12.5g", areasize, arrmin, arrmean, arrmax);
 	}
     }
   else if ( operatorID == SETGRIDMASK )
