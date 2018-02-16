@@ -100,6 +100,13 @@
       "makeCall": "make -j 12",
       "sync": true
     },
+    "localPgi": {
+      "hostname": "luthien",
+      "configureCall": "loadPgi ; ./configure CC=pgcc CXX=pgc++ FC=pgfortran",
+      "envConfigFiles": ["/etc/zsh/zprofile","~/.zshrc"],
+      "makeCall": "make -j 12",
+      "sync": true
+    },
     "localGCC_static": {
       "doc": "local builder with default GCC - VPATH build - As-Static-As-Possible",
       "hostname": "luthien",
