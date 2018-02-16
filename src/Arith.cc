@@ -162,12 +162,12 @@ void *Arith(void *process)
       if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", 1);
+	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoGetStreamName(1).c_str());
 	}
       else if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", 0);
+	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
 	  streamIDx1 = streamID2;
           streamIDx2 = streamID1;
 	  vlistIDx1 = vlistID2;
