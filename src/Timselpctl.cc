@@ -137,14 +137,14 @@ void *Timselpctl(void *process)
     {
       nrecs = pstreamInqTimestep(streamID2, otsID);
       if ( nrecs != pstreamInqTimestep(streamID3, otsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
+        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
 
       int vdate2 = taxisInqVdate(taxisID2);
       int vtime2 = taxisInqVtime(taxisID2);
       int vdate3 = taxisInqVdate(taxisID3);
       int vtime3 = taxisInqVtime(taxisID3);
       if ( vdate2 != vdate3 || vtime2 != vtime3 )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoStreamName(2));
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
       
       for ( int recID = 0; recID < nrecs; recID++ )
         {
