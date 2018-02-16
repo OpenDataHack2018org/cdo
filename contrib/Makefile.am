@@ -16,8 +16,8 @@ test:
 	    cd python; python test/test_cdo.py \
 	fi
 
-#if MAINTAINER_MODE
+if MAINTAINER_MODE
 all-local: completions
 
 CLEANFILES += `ls cdoCompletion.*`
-#endif
+endif
