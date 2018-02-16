@@ -378,13 +378,13 @@ int genindexgrid(int gridID1, int *lhalo, int *rhalo)
   if ( *rhalo > nlon1 )
     {
       *rhalo = nlon1;
-      cdoWarning("right halo out of range. Set to %d.", rhalo);
+      cdoWarning("right halo out of range. Set to %d.", *rhalo);
     }
 
   if ( *rhalo < 0 && -(*rhalo) > nlon1/2 )
     {
       *rhalo = -nlon1/2;
-      cdoWarning("right halo out of range. Set to %d.", rhalo);
+      cdoWarning("right halo out of range. Set to %d.", *rhalo);
     }
 
   int gridID2 = gengrid(gridID1, *lhalo, *rhalo);

@@ -1338,7 +1338,8 @@ void *EcaRx1day(void *process)
       if ( 'm' == operatorArgv()[0][0] )
         cdoOperatorAdd("eca_rx1day", 0, 8,  NULL); /* monthly mode */
       else
-        cdoWarning("Parameter value '%s' is invalid. The only valid value is 'm' indicating monthly mode. Operating in yearly mode now.");
+        cdoWarning("Parameter value '%s' is invalid. The only valid value is 'm' indicating monthly mode. Operating in yearly mode now.",
+                   operatorArgv()[0]);
     }
   else 
     cdoOperatorAdd("eca_rx1day", 0, 31, NULL);

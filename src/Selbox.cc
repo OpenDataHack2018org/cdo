@@ -709,7 +709,7 @@ void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon
     }
   if ( *lat1 > nlat )
     {
-      cdoWarning("First latitude index out of range, set to %d!", nlat);
+      cdoWarning("First latitude index out of range, set to %ld!", nlat);
       *lat1 = nlat;
     }
   if ( *lat2 < 1 )
@@ -719,7 +719,7 @@ void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon
     }
   if ( *lat2 > nlat )
     {
-      cdoWarning("Last latitude index out of range, set to %d!", nlat);
+      cdoWarning("Last latitude index out of range, set to %ld!", nlat);
       *lat2 = nlat;
     }
   if ( *lon11 < 1 )
@@ -729,7 +729,7 @@ void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon
     }
   if ( *lon11 > nlon )
     {
-      cdoWarning("First longitude index out of range, set to %d!", nlon);
+      cdoWarning("First longitude index out of range, set to %ld!", nlon);
       *lon11 = nlon;
     }
   if ( *lon12 < 1 )
@@ -739,7 +739,7 @@ void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon
     }
   if ( *lon12 > nlon+1 )
     {
-      cdoWarning("Last longitude index out of range, set to %d!", nlon);
+      cdoWarning("Last longitude index out of range, set to %ld!", nlon);
       *lon12 = nlon;
     }
 

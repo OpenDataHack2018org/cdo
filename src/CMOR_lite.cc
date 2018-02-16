@@ -140,10 +140,10 @@ void cmor_check_eval(int vlistID, int nvars, var_t *vars)
           vlistInqVarName(vlistID, varID, varname);
 
           if ( n_lower_min > 0 )
-            cdoWarning("Invalid value(s) detected for variable '%s': %i values were lower than minimum valid value (%.4g).",
+            cdoWarning("Invalid value(s) detected for variable '%s': %ld values were lower than minimum valid value (%.4g).",
                        varname, n_lower_min, var->valid_min);
           if ( n_greater_max > 0 )
-            cdoWarning("Invalid value(s) detected for variable '%s': %i values were greater than maximum valid value (%.4g).",
+            cdoWarning("Invalid value(s) detected for variable '%s': %ld values were greater than maximum valid value (%.4g).",
                        varname, n_greater_max, var->valid_max);
 
           if ( var->check_min_mean_abs )

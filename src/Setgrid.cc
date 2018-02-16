@@ -196,7 +196,7 @@ void *Setgrid(void *process)
 	      found++;
 	    }
 	}
-      if ( ! found ) cdoWarning("No grid with %d points found!", gridInqSize(gridID2));
+      if ( ! found ) cdoWarning("No grid with %zu points found!", gridInqSize(gridID2));
     }
   else if ( operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI || operatorID == USEGRIDNUMBER )
     {
@@ -233,7 +233,7 @@ void *Setgrid(void *process)
 	      found++;
 	    }
 	}
-      if ( ! found ) cdoWarning("No horizontal grid with %d cells found!", gridInqSize(gridID2));
+      if ( ! found ) cdoWarning("No horizontal grid with %zu cells found!", gridInqSize(gridID2));
     }
   else if ( operatorID == SETGRIDTYPE )
     {

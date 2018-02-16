@@ -283,7 +283,7 @@ void *Seasstat(void *process)
 	  time2str(vtime0, vtimestr0, sizeof(vtimestr0));
 	  date2str(vdate1, vdatestr1, sizeof(vdatestr1));
 	  time2str(vtime1, vtimestr1, sizeof(vtimestr1));
-	  cdoPrint("season: %3d %3s  start: %s %s  end: %s %s ntimesteps: %d", 
+	  cdoPrint("season: %3d %3s  start: %s %s  end: %s %s ntimesteps: %ld", 
 		   nseason, seas_name[seas0], vdatestr0, vtimestr0, vdatestr1, vtimestr1, nsets);
 	}
 

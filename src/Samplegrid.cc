@@ -43,8 +43,8 @@ void sampleData(double *array1, int gridID1, double *array2, int gridID2, int re
     cdoPrint("%s(): (nlon1: %zu; nlat1: %zu) => (nlon2: %zu; nlat2: %zu); gridID1: %d; gridID2: %d; resampleFactor: %d)",
              __func__, nlon1, nlat1, nlon2,nlat2, gridID1, gridID2, resampleFactor);
 
-  for ( long ilat1 = 0; ilat1 < nlat1; ilat1+=resampleFactor )
-    for ( long ilon1 = 0; ilon1 < nlon1; ilon1+=resampleFactor )
+  for ( size_t ilat1 = 0; ilat1 < nlat1; ilat1+=resampleFactor )
+    for ( size_t ilon1 = 0; ilon1 < nlon1; ilon1+=resampleFactor )
       *array2++ = array1[ilat1*nlon1 + ilon1];
 }
 
