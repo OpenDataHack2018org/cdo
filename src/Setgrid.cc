@@ -113,17 +113,8 @@ void *Setgrid(void *process)
 
       if ( cdoVerbose )
 	{
-	  double arrmean = areaweight[0];
-	  double arrmin  = areaweight[0];
-	  double arrmax  = areaweight[0];
-	  for ( size_t i = 1; i < areasize; i++ )
-	    {
-	      if ( areaweight[i] < arrmin ) arrmin = areaweight[i];
-	      if ( areaweight[i] > arrmax ) arrmax = areaweight[i];
-	      arrmean += areaweight[i];
-	    }
-	  arrmean = arrmean/areasize;
-
+	  double arrmean, arrmin, arrmax;
+          arrayMinMaxMean(areasize, areaweight, &arrmin, &arrmax, &arrmean);
 	  cdoPrint("areaweights: %zu %#12.5g%#12.5g%#12.5g", areasize, arrmin, arrmean, arrmax);
 	}
     }
