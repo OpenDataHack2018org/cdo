@@ -33,14 +33,14 @@
 static
 void sampleData(double *array1, int gridID1, double *array2, int gridID2, int resampleFactor)
 {
-  long nlon1 = gridInqXsize(gridID1);
-  long nlat1 = gridInqYsize(gridID1);
+  size_t nlon1 = gridInqXsize(gridID1);
+  size_t nlat1 = gridInqYsize(gridID1);
 
-  long nlon2 = gridInqXsize(gridID2);
-  long nlat2 = gridInqYsize(gridID2);
+  size_t nlon2 = gridInqXsize(gridID2);
+  size_t nlat2 = gridInqYsize(gridID2);
 
   if ( CdoDebug::cdoDebugExt >= 100 )
-    cdoPrint("%s(): (nlon1: %d; nlat1: %d) => (nlon2: %d; nlat2: %d); gridID1: %d; gridID2: %d; resampleFactor: %d)",
+    cdoPrint("%s(): (nlon1: %zu; nlat1: %zu) => (nlon2: %zu; nlat2: %zu); gridID1: %d; gridID2: %d; resampleFactor: %d)",
              __func__, nlon1, nlat1, nlon2,nlat2, gridID1, gridID2, resampleFactor);
 
   for ( long ilat1 = 0; ilat1 < nlat1; ilat1+=resampleFactor )

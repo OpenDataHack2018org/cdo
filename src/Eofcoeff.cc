@@ -62,7 +62,7 @@ void *Eofcoeff(void *process)
   
   size_t gridsize = vlistGridsizeMax(vlistID1);  
   if ( gridsize != vlistGridsizeMax(vlistID2) )
-    cdoAbort("Gridsize of input files does not match! %d and %d", gridsize, vlistGridsizeMax(vlistID2));
+    cdoAbort("Gridsize of input files does not match! %zu and %zu", gridsize, vlistGridsizeMax(vlistID2));
       
   if ( vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1 )
     cdoAbort("Too many different grids in input!");

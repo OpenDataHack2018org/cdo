@@ -290,7 +290,7 @@ void *Ydrunpctl(void *process)
       {
         if ( getmonthday(vdates1[dayoy]) != getmonthday(vdates2[dayoy]) )
           cdoAbort("Verification dates for day %d of %s, %s and %s are different!",
-                   dayoy, cdoGetStreamName(0).c_str(), cdoStreamName(1));
+                   dayoy, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {

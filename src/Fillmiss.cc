@@ -142,7 +142,7 @@ void fillmiss(field_type *field1, field_type *field2, int nfill)
 	  }
       }
 
-  if ( nmiss1 != nmiss2 ) cdoAbort("found only %d of %d missing values!", nmiss2, nmiss1);
+  if ( nmiss1 != nmiss2 ) cdoAbort("found only %zu of %zu missing values!", nmiss2, nmiss1);
 
   Free(matrix2);
   Free(matrix1);

@@ -1043,7 +1043,7 @@ void *EcaPd(void *process)
 
       threshold = parameter2double(operatorArgv()[0]);
 
-      if ( threshold < 0 ) cdoAbort("Parameter out of range: threshold = %d", threshold);
+      if ( threshold < 0 ) cdoAbort("Parameter out of range: threshold = %g", threshold);
 
       sprintf(lnamebuffer, PD_LONGNAME, threshold);
       request.var1.name     = PD_NAME;

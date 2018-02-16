@@ -1413,7 +1413,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
 	      num_subseg++;
 	      if ( num_subseg >= max_subseg )
-		cdoAbort("Integration stalled: num_subseg exceeded limit (grid1[%d]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
+		cdoAbort("Integration stalled: num_subseg exceeded limit (grid1[%zu]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
 			 src_cell_add, beglon, endlon, beglat, endlat);
 
 	      /* Uwe Schulzweida: skip very small regions */
@@ -1616,7 +1616,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
 	      num_subseg++;
 	      if ( num_subseg >= max_subseg )
-		cdoAbort("Integration stalled: num_subseg exceeded limit (grid2[%d]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
+		cdoAbort("Integration stalled: num_subseg exceeded limit (grid2[%zu]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
 			 tgt_cell_add, beglon, endlon, beglat, endlat);
 
 	      /* Uwe Schulzweida: skip very small regions */

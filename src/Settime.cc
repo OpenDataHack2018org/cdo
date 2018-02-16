@@ -515,7 +515,7 @@ void *Settime(void *process)
 	  if ( operatorID == SETMON  ) month = newval;
 	  if ( operatorID == SETMON && (month < 0 || month > 16) ) cdoAbort("parameter month=%d out of range!", month);
 	  if ( operatorID == SETDAY  ) day   = newval;
-	  if ( operatorID == SETDAY && (day < 0 || day > 31) ) cdoAbort("parameter day=%d %d out of range!", day);
+	  if ( operatorID == SETDAY && (day < 0 || day > 31) ) cdoAbort("parameter day=%d out of range!", day);
       
 	  vdate = cdiEncodeDate(year, month, day);
 

@@ -235,7 +235,7 @@ void *Arith(void *process)
 
 		  nrecs2 = pstreamInqTimestep(streamIDx2, tsID2);
 		  if ( nrecs2 == 0 )
-		    cdoAbort("Empty input stream %s!", 1);
+		    cdoAbort("Empty input stream %s!", cdoGetStreamName(1).c_str());
 		}
 	      else
 		cdoAbort("Input streams have different number of timesteps!");

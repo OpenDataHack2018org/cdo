@@ -277,7 +277,7 @@ void read_coordinates(const char *filename, long n, double *lon, double *lat, in
            gridInqNvertex(gridID) == 3 ) break;
     }
 
-  if ( gridID == -1 ) cdoAbort("No ICON grid with %d cells found in %s!", filename, n);
+  if ( gridID == -1 ) cdoAbort("No ICON grid with %ld cells found in %s!", n, filename);
 
   gridInqXvals(gridID, lon);
   gridInqYvals(gridID, lat);
@@ -555,7 +555,7 @@ void *Samplegridicon(void *process)
   long gridsize = vlistGridsizeMax(vlistID1);
   if ( cdoVerbose ) cdoPrint("Source gridsize = %zu", gridsize);
   if ( gridsize != cellindex[0]->ncells )
-    cdoAbort("Gridsize (%ls) of input stream and first grid (%ld) differ!", gridsize, cellindex[0]->ncells);
+    cdoAbort("Gridsize (%ld) of input stream and first grid (%ld) differ!", gridsize, cellindex[0]->ncells);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array1 = (double *) Malloc(gridsize*sizeof(double));
 

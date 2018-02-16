@@ -291,7 +291,7 @@ const char *parameter2word(const char *string)
     {
       int c = string[i];
       if ( iscntrl(c) || isblank(c) )
-        cdoAbort("Word parameter >%s< contains invalid character at position %d!", string, i+1);
+        cdoAbort("Word parameter >%s< contains invalid character at position %zu!", string, i+1);
     }
 
   if ( len == 0 ) cdoAbort("Word parameter >%s< is empty!", string);
@@ -417,17 +417,11 @@ int month_to_season(int month)
 
   if ( season_start == START_DEC )
     {
-      if ( month <= 12 )
-        seas = (month % 12) / 3;
-      else
-        seas = month - 13;
+      seas = (month <= 12) ? (month % 12) / 3 : month - 13;
     }
   else
     {
-      if ( month <= 12 )
-        seas = (month - 1) / 3;
-      else
-        seas = month - 13;
+      seas = (month <= 12) ? (month - 1) / 3 : month - 13;
     }
 
   if ( seas < 0 || seas > 3 ) cdoAbort("Season %d out of range!", seas+1);

@@ -141,8 +141,7 @@ void *Selvar(void *process)
   if ( operatorID == SELGRID && !args_are_numeric && nsel == 1 && strncmp(argnames[0], "var=", 4) == 0 )
     {
       const char *gridvarname = argnames[0] + 4;
-
-      if ( *gridvarname == 0 ) cdoAbort("Variable name missing!", gridvarname);
+      if ( *gridvarname == 0 ) cdoAbort("Variable name missing!");
       
       for ( varID = 0; varID < nvars; varID++ )
         {

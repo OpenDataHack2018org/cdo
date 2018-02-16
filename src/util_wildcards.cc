@@ -117,11 +117,9 @@ std::vector<std::string> expandWildCards(std::vector<std::string> argv)
 {
 
     int flags = WRDE_UNDEF;
-    char **p;
-    int status;
     wordexp_t glob_results;
 
-    for(int idx = 1; idx < argv.size(); idx++){
+    for(size_t idx = 1; idx < argv.size(); idx++){
         //if argv[idx] contains wildcard (* or [?]+)
         //multiple ** are ignored
       if(argv[idx][0] != '-' && argv[idx].find_first_of("*?") != std::string::npos)

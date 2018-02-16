@@ -662,14 +662,14 @@ void ex_copy_var(int init, nodeType *p2, nodeType *p1)
   assert(ngp > 0);
 
   if ( ngp != p2->param.ngp )
-    cdoAbort("%s: Number of grid points differ (%s[%d] = %s[%d])",
+    cdoAbort("%s: Number of grid points differ (%s[%zu] = %s[%zu])",
              __func__, p2->param.name, p2->param.ngp, p1->param.name, ngp);
 
   size_t nlev = p1->param.nlev;
   assert(nlev > 0);
 
   if ( nlev != p2->param.nlev )
-    cdoAbort("%s: Number of levels differ (%s[%d] = %s[%d])",
+    cdoAbort("%s: Number of levels differ (%s[%zu] = %s[%zu])",
              __func__, p2->param.name, p2->param.nlev, p1->param.name, nlev);
 
   if ( ! init )

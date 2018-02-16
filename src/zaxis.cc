@@ -182,21 +182,21 @@ void zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, size_t *iatt, c
       else if ( STR_IS_EQ(key, "levels") )
         {
           if ( zaxis->size == 0 ) cdoAbort("size undefined (zaxis description file: %s)!", dname);
-          if ( zaxis->size != nvalues ) cdoAbort("size=%d and number of levels=%zu differ!", zaxis->size, nvalues);
+          if ( zaxis->size != nvalues ) cdoAbort("size=%zu and number of levels=%zu differ!", zaxis->size, nvalues);
           zaxis->vals = (double*) Malloc(zaxis->size*sizeof(double));
           for ( size_t i = 0; i < zaxis->size; ++i ) zaxis->vals[i] = parameter2double(kv->values[i]);
         }
       else if ( STR_IS_EQ(key, "lbounds") )
         {
           if ( zaxis->size == 0 ) cdoAbort("size undefined (zaxis description file: %s)!", dname);
-          if ( zaxis->size != nvalues ) cdoAbort("size=%d and number of lbounds=%zu differ!", zaxis->size, nvalues);
+          if ( zaxis->size != nvalues ) cdoAbort("size=%zu and number of lbounds=%zu differ!", zaxis->size, nvalues);
           zaxis->lbounds = (double*) Malloc(zaxis->size*sizeof(double));
           for ( size_t i = 0; i < zaxis->size; ++i ) zaxis->lbounds[i] = parameter2double(kv->values[i]);
         }
       else if ( STR_IS_EQ(key, "ubounds") )
         {
           if ( zaxis->size == 0 ) cdoAbort("size undefined (zaxis description file: %s)!", dname);
-          if ( zaxis->size != nvalues ) cdoAbort("size=%d and number of ubounds=%zu differ!", zaxis->size, nvalues);
+          if ( zaxis->size != nvalues ) cdoAbort("size=%zu and number of ubounds=%zu differ!", zaxis->size, nvalues);
           zaxis->ubounds = (double*) Malloc(zaxis->size*sizeof(double));
           for ( size_t i = 0; i < zaxis->size; ++i ) zaxis->ubounds[i] = parameter2double(kv->values[i]);
         }

@@ -202,7 +202,7 @@ void *Ymonpctl(void *process)
       {
         if ( getmonth(vdates1[month]) != getmonth(vdates2[month]) )
           cdoAbort("Verification dates for the month %d of %s and %s are different!",
-                   month, cdoGetStreamName(0).c_str(), cdoStreamName(1));
+                   month, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {

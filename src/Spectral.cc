@@ -211,7 +211,7 @@ void *Spectral(void *process)
 	    {
 	      j = wnums[i] - 1;
 	      if ( j < 0 || j >= maxntr )
-		cdoAbort("wave number %d out of range (min=1, max=%d)!", wnums[i], maxntr);
+		cdoAbort("wave number %ld out of range (min=1, max=%l qd)!", wnums[i], maxntr);
 	      waves[j] = 0;
 	    }
 	}

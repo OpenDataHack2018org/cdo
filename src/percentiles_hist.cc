@@ -297,7 +297,7 @@ void hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID, const fi
   grid = hset->grids[varID];
   
   if ( grid != field1->grid || grid != field2->grid )
-    cdoAbort("Grids are different", __func__);
+    cdoAbort("Grids are different (%s)", __func__);
   
   hists  = hset->histograms[varID][levelID];
   
@@ -346,7 +346,7 @@ void hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID, const fi
     
   grid = hset->grids[varID];
   if ( grid != field->grid )
-    cdoAbort("Grids are different", __func__);
+    cdoAbort("Grids are different (%s)", __func__);
 
   hists  = hset->histograms[varID][levelID];
   

@@ -107,7 +107,7 @@ double datestr_to_double(const char *datestr, int opt)
     {
       int c = datestr[i];
       if ( !(isdigit(c) || c == '-' || c == ':' || c == '.' || c == 'T') )
-        cdoAbort("Date string >%s< contains invalid character at position %d!", datestr, i+1);
+        cdoAbort("Date string >%s< contains invalid character at position %zu!", datestr, i+1);
     }
 
   if ( opt ) { hour = 23; minute = 59; second = 59; }
