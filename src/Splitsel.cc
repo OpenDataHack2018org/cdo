@@ -29,20 +29,16 @@
 
 void *Splitsel(void *process)
 {
-  size_t gridsize;
   int nrecs = 0;
   int varID, levelID;
   int tsID;
   size_t nmiss;
-  int gridID;
-  int nlevel;
   int i2 = 0;
   /* from Splittime.c */
   int nchars;
   char filesuffix[32];
   char filename[8192];
   const char *refname;
-  double ndates, noffset, nskip;
   double *array = NULL;
   field_type **vars = NULL;
 
@@ -64,8 +60,8 @@ void *Splitsel(void *process)
 /*   if ( nargc > 1 ) noffset = parameter2int(operatorArgv()[1]); */
 /*   if ( nargc > 2 ) nskip   = parameter2int(operatorArgv()[2]); */
 /*   printf("%s %s %s\n", operatorArgv()[0],operatorArgv()[1],operatorArgv()[2]); */
-  noffset = nskip = 0.0;
-  ndates = parameter2double(operatorArgv()[0]);
+  double noffset = 0.0, nskip = 0.0;
+  double ndates = parameter2double(operatorArgv()[0]);
   if ( nargc > 1 ) noffset = parameter2double(operatorArgv()[1]);
   if ( nargc > 2 ) nskip   = parameter2double(operatorArgv()[2]);
 
@@ -81,7 +77,7 @@ void *Splitsel(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  strcpy(filename, cdoGetStreamName(1).c_str());
+  strcpy(filename, cdoGetObase());
   nchars = strlen(filename);
 
   refname = cdoGetObase();
@@ -90,9 +86,9 @@ void *Splitsel(void *process)
 
   //  if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
-      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) Malloc(gridsize*sizeof(double));
+      size_t gridsizemax = vlistGridsizeMax(vlistID1);
+      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
+      array = (double*) Malloc(gridsizemax*sizeof(double));
     }
 
   int nvars = vlistNvars(vlistID1);
@@ -108,17 +104,17 @@ void *Splitsel(void *process)
 	{
 	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 	    {
-	      gridID  = vlistInqVarGrid(vlistID1, varID);
-	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      gridsize = gridInqSize(gridID);
+	      int gridID  = vlistInqVarGrid(vlistID1, varID);
+	      int nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      size_t gridsize = gridInqSize(gridID);
 		  
 	      vars[varID] = (field_type*) Malloc(nlevel*sizeof(field_type));
 
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  field_init(&vars[varID][levelID]);
-		  vars[varID][levelID].grid    = gridID;
-		  vars[varID][levelID].ptr     = (double*) Malloc(gridsize*sizeof(double));
+		  vars[varID][levelID].grid = gridID;
+		  vars[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 		}
 	    }
 	}
@@ -156,7 +152,6 @@ void *Splitsel(void *process)
 	  
       if ( cdoVerbose ) cdoPrint("create file %s", filename);
       int streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
-
       pstreamDefVlist(streamID2, vlistID2);
 
       int tsID2 = 0;
@@ -175,7 +170,7 @@ void *Splitsel(void *process)
 		{
 		  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 		    {
-		      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
 			  pstreamDefRecord(streamID2, varID, levelID);
@@ -204,8 +199,8 @@ void *Splitsel(void *process)
 		    {
 		      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
 			{
-			  gridID  = vlistInqVarGrid(vlistID1, varID);
-			  gridsize = gridInqSize(gridID);
+			  int gridID = vlistInqVarGrid(vlistID1, varID);
+			  size_t gridsize = gridInqSize(gridID);
 			  arrayCopy(gridsize, array, vars[varID][levelID].ptr);
 			  vars[varID][levelID].nmiss = nmiss;
 			}
@@ -248,7 +243,7 @@ void *Splitsel(void *process)
 	{
 	  if ( vlistInqVarTimetype(vlistID2, varID) == TIME_CONSTANT )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		if ( vars[varID][levelID].ptr )
 		  Free(vars[varID][levelID].ptr);
