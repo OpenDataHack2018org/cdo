@@ -33,8 +33,6 @@ void *Splitrec(void *process)
   int levelID;
   char filesuffix[32];
   char filename[8192];
-  const char *refname;
-  size_t gridsize;
   size_t nmiss;
   double *array = NULL;
 
@@ -45,23 +43,22 @@ void *Splitrec(void *process)
   bool lcopy = UNCHANGED_RECORD;
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
-
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nrecs  = vlistNrecs(vlistID1);
 
-  strcpy(filename, cdoGetStreamName(1).c_str());
+  strcpy(filename, cdoGetObase());
   int nchars = strlen(filename);
 
-  refname = cdoGetObase();
+  const char *refname = cdoGetObase();
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
-      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) Malloc(gridsize*sizeof(double));
+      size_t gridsizemax = vlistGridsizeMax(vlistID1);
+      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
+      array = (double*) Malloc(gridsizemax*sizeof(double));
     }
 
   int index = 0;
