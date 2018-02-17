@@ -17,6 +17,7 @@ or standard deviation is written to @file{outfile}.
 
 @BeginOperator_vertmin
 @Title     = Vertical minimum
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the minimum over all levels is computed.
@@ -26,6 +27,7 @@ For every gridpoint the minimum over all levels is computed.
 
 @BeginOperator_vertmax
 @Title     = Vertical maximum
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the maximum over all levels is computed.
@@ -35,6 +37,7 @@ For every gridpoint the maximum over all levels is computed.
 
 @BeginOperator_vertrange
 @Title     = Vertical range
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the range over all levels is computed.
@@ -44,6 +47,7 @@ For every gridpoint the range over all levels is computed.
 
 @BeginOperator_vertsum
 @Title     = Vertical sum
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the sum over all levels is computed.
@@ -53,6 +57,7 @@ For every gridpoint the sum over all levels is computed.
 
 @BeginOperator_vertmean
 @Title     = Vertical mean
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the layer weighted mean over all levels is computed.
@@ -62,6 +67,7 @@ For every gridpoint the layer weighted mean over all levels is computed.
 
 @BeginOperator_vertavg
 @Title     = Vertical average
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the layer weighted average over all levels is computed.
@@ -71,6 +77,7 @@ For every gridpoint the layer weighted average over all levels is computed.
 
 @BeginOperator_vertvar
 @Title     = Vertical variance
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the variance over all levels is computed. Normalize by n.
@@ -80,6 +87,7 @@ For every gridpoint the variance over all levels is computed. Normalize by n.
 
 @BeginOperator_vertvar1
 @Title     = Vertical variance (n-1)
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the variance over all levels is computed. Normalize by (n-1).
@@ -89,6 +97,7 @@ For every gridpoint the variance over all levels is computed. Normalize by (n-1)
 
 @BeginOperator_vertstd
 @Title     = Vertical standard deviation
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the standard deviation over all levels is computed. Normalize by n.
@@ -98,11 +107,18 @@ For every gridpoint the standard deviation over all levels is computed. Normaliz
 
 @BeginOperator_vertstd1
 @Title     = Vertical standard deviation (n-1)
+@Parameter = weights
 
 @BeginDescription
 For every gridpoint the standard deviation over all levels is computed. Normalize by (n-1).
 @EndDescription
 @EndOperator
+
+
+@BeginParameter
+@Item = weights
+BOOL   weights=FALSE disables weighting by layer thickness [default: weights=TRUE]
+@EndParameter
 
 
 @BeginExample

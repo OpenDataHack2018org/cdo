@@ -837,6 +837,7 @@ while (<MOFILE>) {
 	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\textsf{\\small FLOAT}}/;
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\textsf{\\small INTEGER}}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\textsf{\\small STRING}}/;
+	  $line =~ s/^BOOL/\\makebox[20mm][l]{\\textsf{\\small BOOL}}/;
 	  $line =~ s/_/\\_/g;
           $line =~ s/</\$<\$/og;
           $line =~ s/>/\$>\$/og;
@@ -921,6 +922,7 @@ while (<MOFILE>) {
 	  $line =~ s/^DOUBLE/\\makebox[20mm][l]\\textsf{\\small FLOAT}/;
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]\\textsf{\\small INTEGER}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]\\textsf{\\small STRING}/;
+	  $line =~ s/^BOOL/\\makebox[20mm][l]\\textsf{\\small BOOL}/;
 	  $line =~ s/_/\\_/g;
 	  $line =~ s/\@env\{([^}]*)\}/\\texttt{\1}/og;
 	  print TRFILE "$line\n";

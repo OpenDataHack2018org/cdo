@@ -1,19 +1,3 @@
-/*
-  This file is part of CDO. CDO is a collection of Operators to
-  manipulate and analyse Climate model Data.
-
-  Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
-  See COPYING file for copying and redistribution conditions.
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; version 2 of the License.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
 /* Automatically created with makedoc, don't edit! */
 
 std::vector<std::string> InfoHelp = {
@@ -2056,7 +2040,7 @@ std::vector<std::string> FldstatHelp = {
     "    fldvar1, fldpctl - Statistical values over a field",
     "",
     "SYNOPSIS",
-    "    <operator>  infile outfile",
+    "    <operator>,weights  infile outfile",
     "    fldpctl,p  infile outfile",
     "",
     "DESCRIPTION",
@@ -2117,7 +2101,8 @@ std::vector<std::string> FldstatHelp = {
     "              o(t,1) = pth percentile {i(t,x'), x_1<x'<=x_n}",
     "",
     "PARAMETER",
-    "    p  FLOAT  Percentile number in {0, ..., 100}",
+    "    weights  BOOL   weights=FALSE disables weighting by grid cell area [default: weights=TRUE]",
+    "    p        FLOAT  Percentile number in {0, ..., 100}",
 };
 
 std::vector<std::string> ZonstatHelp = {
@@ -2254,7 +2239,7 @@ std::vector<std::string> VertstatHelp = {
     "    vertvar, vertvar1 - Vertical statistical values",
     "",
     "SYNOPSIS",
-    "    <operator>  infile outfile",
+    "    <operator>,weights  infile outfile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over all levels of the input variables.",
@@ -2282,6 +2267,9 @@ std::vector<std::string> VertstatHelp = {
     "               For every gridpoint the variance over all levels is computed. Normalize by n.",
     "    vertvar1   Vertical variance (n-1)",
     "               For every gridpoint the variance over all levels is computed. Normalize by (n-1).",
+    "",
+    "PARAMETER",
+    "    weights  BOOL   weights=FALSE disables weighting by layer thickness [default: weights=TRUE]",
 };
 
 std::vector<std::string> TimselstatHelp = {
@@ -5419,6 +5407,7 @@ std::vector<std::string> MaggraphHelp = {
     "     device     & STRING  & Output device (ps, eps, pdf, png, gif, gif_animation, jpeg, svg, kml)",
     "     ymin       & FLOAT   & Minimum value of the y-axis data ",
     "     ymax       & FLOAT   & Maximum value of the y-axis data ",
+    "     linewidth  & INT     & Linewidth (default 8)",
     "     stat       & STRING  & \"TRUE\" or \"FALSE\", to switch on the mean computation. Default is \"FALSE\".",
     "                &         & Will be overridden to \"FALSE\", if input files have unequal number of time",
     "                &         & steps or different start/end times. ",

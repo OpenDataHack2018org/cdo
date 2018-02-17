@@ -245,6 +245,14 @@ of all fields to missing value:
    cdo setrtomiss,0,273.15 infile outfile
 \end{verbatim}
 
+\item BOOL
+
+Boolean parameter in the following representation TRUE/FALSE, T/F or 0/1.
+To disable the weighting by grid cell area in the calculation of a field mean, use:
+\begin{verbatim}
+   cdo fldmean,weights=FALSE infile outfile
+\end{verbatim}
+
 \item INTEGER
 
 A range of integer parameter can be specified by \textit{first}/\textit{last}[/\textit{inc}].

@@ -17,6 +17,7 @@ a certain percentile is written to @file{outfile}.
 
 @BeginOperator_fldmin
 @Title     = Field minimum
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -36,6 +37,7 @@ o(t,1) = \mbox{\textbf{min}}\{i(t,x'), x_1 < x' \leq x_n\}
 
 @BeginOperator_fldmax
 @Title     = Field maximum
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -55,6 +57,7 @@ o(t,1) = \mbox{\textbf{max}}\{i(t,x'), x_1 < x' \leq x_n\}
 
 @BeginOperator_fldrange
 @Title     = Field range
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -74,6 +77,7 @@ o(t,1) = \mbox{\textbf{range}}\{i(t,x'), x_1 < x' \leq x_n\}
 
 @BeginOperator_fldsum
 @Title     = Field sum
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -93,6 +97,7 @@ o(t,1) = \mbox{\textbf{sum}}\{i(t,x'), x_1 < x' \leq x_n\}
 
 @BeginOperator_fldmean
 @Title     = Field mean
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -113,6 +118,7 @@ weighted by area weights obtained by the input field.
 
 @BeginOperator_fldavg
 @Title     = Field average
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -133,6 +139,7 @@ weighted by area weights obtained by the input field.
 
 @BeginOperator_fldvar
 @Title     = Field variance
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -153,6 +160,7 @@ weighted by area weights obtained by the input field.
 
 @BeginOperator_fldvar1
 @Title     = Field variance (n-1)
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -173,6 +181,7 @@ weighted by area weights obtained by the input field.
 
 @BeginOperator_fldstd
 @Title     = Field standard deviation
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -193,6 +202,7 @@ weighted by area weights obtained by the input field.
 
 @BeginOperator_fldstd1
 @Title     = Field standard deviation (n-1)
+@Parameter = weights
 
 @BeginDescription
 @IfMan
@@ -232,6 +242,8 @@ o(t,1) = \mbox{\textbf{pth percentile}} \{i(t,x'), x_1 < x' \leq x_n\}
 
 
 @BeginParameter
+@Item = weights
+BOOL   weights=FALSE disables weighting by grid cell area [default: weights=TRUE]
 @Item = p
 FLOAT  Percentile number in {0, ..., 100}
 @EndParameter
