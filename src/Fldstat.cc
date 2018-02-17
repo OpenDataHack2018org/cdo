@@ -55,10 +55,10 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
     {
       int zaxisID = vlistInqVarZaxis(vlistID, varID);
       double level = cdoZaxisInqLevel(zaxisID, levelID);
-      int nlon  = gridInqXsize(gridID);
-      int nlat  = gridInqYsize(gridID);
-      for ( int j = 0; j < nlat; ++j )
-        for ( int i = 0; i < nlon; ++i )
+      size_t nlon = gridInqXsize(gridID);
+      size_t nlat = gridInqYsize(gridID);
+      for ( size_t j = 0; j < nlat; ++j )
+        for ( size_t i = 0; i < nlon; ++i )
           {
             if ( DBL_IS_EQUAL(fieldptr[j*nlon+i], sglval) )
               {
@@ -78,6 +78,34 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
                         year, month, day, hour, minute, second, code, level, xval, yval, sglval);
               }
           }
+    }
+}
+
+static
+void fldstatGetParameter(bool *weights)
+{
+  int pargc = operatorArgc();
+  if ( pargc )
+    { 
+      char **pargv = operatorArgv();
+
+      list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "FLDSTAT");
+      if ( kvlist_parse_cmdline(kvlist, pargc, pargv) != 0 ) cdoAbort("Parse error!");
+      if ( cdoVerbose ) kvlist_print(kvlist);
+
+      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
+        {
+          keyValues_t *kv = *(keyValues_t **)kvnode->data;
+          const char *key = kv->key;
+          if ( kv->nvalues > 1 ) cdoAbort("Too many values for parameter key >%s<!", key);
+          if ( kv->nvalues < 1 ) cdoAbort("Missing value for parameter key >%s<!", key);
+          const char *value = kv->values[0];
+          
+          if ( STR_IS_EQ(key, "weights")   ) *weights = parameter2bool(value);
+          else cdoAbort("Invalid parameter key >%s<!", key);
+        }          
+          
+      list_destroy(kvlist);
     }
 }
 
@@ -111,7 +139,7 @@ void *Fldstat(void *process)
 
   fldstatAddOperators();
 
-  int operatorID  = cdoOperatorID();
+  int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
   bool needWeights = cdoOperatorF2(operatorID) != 0;
 
@@ -124,22 +152,7 @@ void *Fldstat(void *process)
     }
 
   bool useweights = true;
-
-  if ( needWeights )
-    {
-      unsigned npar = operatorArgc();
-      if ( npar > 0 )
-	{
-	  char **parnames = operatorArgv();
-
-	  if ( cdoVerbose )
-	    for ( unsigned i = 0; i < npar; i++ )
-	      cdoPrint("key %u = %s", i+1, parnames[i]);
-
-	  if ( strcmp(parnames[0], "noweights") == 0 ) useweights = false;
-	  else cdoAbort("Parameter >%s< unsupported! Supported parameter are: noweights", parnames[0]);
-	}
-    }
+  if ( needWeights ) fldstatGetParameter(&useweights);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -170,16 +183,16 @@ void *Fldstat(void *process)
   field_type field;
   field_init(&field);
 
-  size_t lim = vlistGridsizeMax(vlistID1);
-  field.ptr    = (double*) Malloc(lim*sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  field.ptr    = (double*) Malloc(gridsizemax*sizeof(double));
   field.weight = NULL;
   if ( needWeights )
     {
-      field.weight = (double*) Malloc(lim*sizeof(double));
+      field.weight = (double*) Malloc(gridsizemax*sizeof(double));
       if ( !useweights )
 	{
 	  cdoPrint("Using constant grid cell area weights!");
-	  for ( size_t i = 0; i < lim; ++i ) field.weight[i] = 1;
+	  for ( size_t i = 0; i < gridsizemax; ++i ) field.weight[i] = 1;
 	}
     }
 
@@ -226,7 +239,6 @@ void *Fldstat(void *process)
 	    }
 
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
-
           double sglval = (operfunc == func_pctl) ? fldpctl(field, pn) : fldfun(field, operfunc);
 
 	  if ( cdoVerbose && (operfunc == func_min || operfunc == func_max) )

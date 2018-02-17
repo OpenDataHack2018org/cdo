@@ -44,8 +44,8 @@
 int getSurfaceID(int vlistID)
 {
   int surfID = -1;
-  int nzaxis = vlistNzaxis(vlistID);
 
+  int nzaxis = vlistNzaxis(vlistID);
   for ( int index = 0; index < nzaxis; ++index )
     {
       int zaxisID = vlistZaxis(vlistID, index);
@@ -65,7 +65,6 @@ static
 void setSurfaceID(int vlistID, int surfID)
 {
   int nzaxis = vlistNzaxis(vlistID);
-
   for ( int index = 0; index < nzaxis; ++index )
     {
       int zaxisID = vlistZaxis(vlistID, index);
@@ -96,7 +95,7 @@ void genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds)
 }
 
 
-int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights)
+int getLayerThickness(bool useweights, bool genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights)
 {
   int status = 0;
   int i;
@@ -110,7 +109,7 @@ int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *
       status = 2;
       genLayerBounds(nlev, levels, lbounds, ubounds);
     }
-  else if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
+  else if ( useweights && zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
     {
       status = 1;
       zaxisInqLbounds(zaxisID, lbounds);
@@ -128,13 +127,10 @@ int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *
   for ( i = 0; i < nlev; ++i ) thickness[i] = fabs(ubounds[i]-lbounds[i]);
 
   double lsum = 0;
-  for ( i = 0; i < nlev; ++i ) lsum += thickness[i];
-
-  for ( i = 0; i < nlev; ++i ) weights[i] = thickness[i];
-  
-  for ( i = 0; i < nlev; ++i ) weights[i] /= (lsum/nlev);
-
   double wsum = 0;
+  for ( i = 0; i < nlev; ++i ) lsum += thickness[i];
+  for ( i = 0; i < nlev; ++i ) weights[i] = thickness[i];
+  for ( i = 0; i < nlev; ++i ) weights[i] /= (lsum/nlev);
   for ( i = 0; i < nlev; ++i ) wsum += weights[i];
 
   if ( cdoVerbose )
@@ -150,6 +146,35 @@ int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *
   Free(ubounds);
 
   return status;
+}
+
+static
+void vertstatGetParameter(bool *weights, bool *genbounds)
+{
+  int pargc = operatorArgc();
+  if ( pargc )
+    { 
+      char **pargv = operatorArgv();
+
+      list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "FLDSTAT");
+      if ( kvlist_parse_cmdline(kvlist, pargc, pargv) != 0 ) cdoAbort("Parse error!");
+      if ( cdoVerbose ) kvlist_print(kvlist);
+
+      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
+        {
+          keyValues_t *kv = *(keyValues_t **)kvnode->data;
+          const char *key = kv->key;
+          if ( kv->nvalues > 1 ) cdoAbort("Too many values for parameter key >%s<!", key);
+          if ( kv->nvalues < 1 ) cdoAbort("Missing value for parameter key >%s<!", key);
+          const char *value = kv->values[0];
+          
+          if      ( STR_IS_EQ(key, "weights")   ) *weights = parameter2bool(value);
+          else if ( STR_IS_EQ(key, "genbounds") ) *genbounds = parameter2bool(value);
+          else cdoAbort("Invalid parameter key >%s<!", key);
+        }          
+          
+      list_destroy(kvlist);
+    }
 }
 
 
@@ -197,7 +222,6 @@ void *Vertstat(void *process)
   //int applyWeights = lmean;
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
-
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   vlistClearFlag(vlistID1);
@@ -220,19 +244,15 @@ void *Vertstat(void *process)
   vert_t *vert = (vert_t*) Malloc(nzaxis*sizeof(vert_t));
   if ( needWeights )
     {
+      bool useweights = true;
       bool genbounds = false;
-      unsigned npar = operatorArgc();
-      if ( npar > 0 )
-	{
-	  char **parnames = operatorArgv();
+      if ( needWeights ) vertstatGetParameter(&useweights, &genbounds);
 
-	  if ( cdoVerbose )
-	    for ( unsigned i = 0; i < npar; i++ )
-	      cdoPrint("key %d = %s", i+1, parnames[i]);
-
-	  if ( strcmp(parnames[0], "genbounds") == 0 ) genbounds = true;
-	  else cdoAbort("Parameter >%s< unsupported! Supported parameter are: genbounds", parnames[0]);
-	}
+      if ( !useweights )
+        {
+          genbounds = false;
+          cdoPrint("Using constant vertical weights!");
+        }
       
       for ( int index = 0; index < nzaxis; ++index )
 	{
@@ -246,8 +266,9 @@ void *Vertstat(void *process)
 	      vert[index].numlevel = nlev;
 	      vert[index].thickness = (double *) Malloc(nlev*sizeof(double));
 	      vert[index].weights = (double *) Malloc(nlev*sizeof(double));
-	      vert[index].status = getLayerThickness(genbounds, index, zaxisID, nlev, vert[index].thickness, vert[index].weights); 
+	      vert[index].status = getLayerThickness(useweights, genbounds, index, zaxisID, nlev, vert[index].thickness, vert[index].weights); 
 	    }
+          if ( !useweights ) vert[index].status = 3;
 	}
     }
 
