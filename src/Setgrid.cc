@@ -80,6 +80,7 @@ void *Setgrid(void *process)
       operatorCheckArgc(1);
       gridname = operatorArgv()[0];
 
+      // clang-format off
       if      ( strcmp(gridname, "curvilinear0") == 0 )  {gridtype = GRID_CURVILINEAR; lbounds = 0;}
       else if ( strcmp(gridname, "curvilinear") == 0 )   {gridtype = GRID_CURVILINEAR; lbounds = 1;}
       else if ( strcmp(gridname, "cell") == 0 )           gridtype = GRID_UNSTRUCTURED;
@@ -92,6 +93,7 @@ void *Setgrid(void *process)
       else if ( strcmp(gridname, "regularnn") == 0 )     {gridtype = GRID_GAUSSIAN; lregularnn = true;}
       else if ( strcmp(gridname, "regular") == 0 )       {gridtype = GRID_GAUSSIAN; lregular = true;}
       else cdoAbort("Unsupported grid name: %s", gridname);
+      // clang-format on
     }
   else if ( operatorID == SETGRIDAREA )
     {
@@ -232,13 +234,14 @@ void *Setgrid(void *process)
       for ( int index = 0; index < ngrids; index++ )
 	{
 	  int gridID1 = vlistGrid(vlistID1, index);
+          int gridtype1 = gridInqType(gridID1);
 	  gridID2 = -1;
 
-	  if ( gridInqType(gridID1) == GRID_GENERIC && gridInqSize(gridID1) == 1 ) continue;
+	  if ( gridtype1 == GRID_GENERIC && gridInqSize(gridID1) == 1 ) continue;
 	  
 	  if ( lregular || lregularnn )
 	    {
-	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
+	      if ( gridtype1 == GRID_GAUSSIAN_REDUCED )
                 gridID2 = gridToRegular(gridID1);
 	    }
 	  else if ( ldereference )
@@ -248,14 +251,14 @@ void *Setgrid(void *process)
 	    }
 	  else
 	    {
-	      if      ( gridtype == GRID_CURVILINEAR  )
+	      if ( gridtype == GRID_CURVILINEAR )
 		{
-		  gridID2 = gridToCurvilinear(gridID1, lbounds);
+                  gridID2 = (gridtype1 == GRID_CURVILINEAR) ? gridID1 : gridToCurvilinear(gridID1, lbounds);
 		}
 	      else if ( gridtype == GRID_UNSTRUCTURED )
 		{
                   bool ligme = false;
-		  if ( gridInqType(gridID1) == GRID_GME ) ligme = true;
+		  if ( gridtype1 == GRID_GME ) ligme = true;
 		  gridID2 = gridToUnstructured(gridID1, 1);
 
 		  if ( ligme )
@@ -266,22 +269,22 @@ void *Setgrid(void *process)
 		      gridCompress(gridID2);
 		    }
 		}
-	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_CURVILINEAR )
+	      else if ( gridtype == GRID_LONLAT && gridtype1 == GRID_CURVILINEAR )
 		{
 		  gridID2 = gridCurvilinearToRegular(gridID1);
 		  if ( gridID2 == -1 ) cdoWarning("Conversion of curvilinear grid to regular grid failed!");
  		}
-	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_UNSTRUCTURED )
+	      else if ( gridtype == GRID_LONLAT && gridtype1 == GRID_UNSTRUCTURED )
 		{
 		  gridID2 = -1;
 		  if ( gridID2 == -1 ) cdoWarning("Conversion of unstructured grid to regular grid failed!");
  		}
-	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_GENERIC )
+	      else if ( gridtype == GRID_LONLAT && gridtype1 == GRID_GENERIC )
 		{
 		  gridID2 = -1;
 		  if ( gridID2 == -1 ) cdoWarning("Conversion of generic grid to regular grid failed!");
  		}
-	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_LONLAT )
+	      else if ( gridtype == GRID_LONLAT && gridtype1 == GRID_LONLAT )
 		{
 		  gridID2 = gridID1;
 		}
@@ -309,7 +312,7 @@ void *Setgrid(void *process)
       int ngrids = vlistNgrids(vlistID1);
       for ( int index = 0; index < ngrids; index++ )
 	{
-	  int gridID1  = vlistGrid(vlistID1, index);
+	  int gridID1 = vlistGrid(vlistID1, index);
 	  size_t gridsize = gridInqSize(gridID1);
 	  if ( gridsize == areasize )
 	    {
@@ -324,7 +327,7 @@ void *Setgrid(void *process)
       int ngrids = vlistNgrids(vlistID1);
       for ( int index = 0; index < ngrids; index++ )
 	{
-	  int gridID1  = vlistGrid(vlistID1, index);
+	  int gridID1 = vlistGrid(vlistID1, index);
 	  size_t gridsize = gridInqSize(gridID1);
 	  if ( gridsize == masksize )
 	    {
@@ -348,7 +351,7 @@ void *Setgrid(void *process)
       int ngrids = vlistNgrids(vlistID1);
       for ( int index = 0; index < ngrids; index++ )
 	{
-	  int gridID1  = vlistGrid(vlistID1, index);
+	  int gridID1 = vlistGrid(vlistID1, index);
 	  gridID2 = gridDuplicate(gridID1);
 	  gridDefMask(gridID2, NULL);
 	  vlistChangeGridIndex(vlistID2, index, gridID2);
@@ -392,7 +395,7 @@ void *Setgrid(void *process)
 	  else if ( gridInqType(gridID1) == GRID_GME )
 	    {
 	      size_t gridsize = gridInqSize(gridID1);
-	      int j = 0;
+	      size_t j = 0;
 	      for ( size_t i = 0; i < gridsize; i++ )
 		if ( grid2_vgpm[i] ) array[j++] = array[i];
 	    }
