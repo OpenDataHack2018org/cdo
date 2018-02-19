@@ -118,10 +118,10 @@ namespace CdoError{
     static int _ExitOnError = 1;
 
     template <typename ...T>
-    void Abort(T&& ...args)
+    void Abort(const char* progname, T&& ...args)
     {
           std::stringstream message;
-          message << " (Abort): ";
+          message << progname << " (Abort): ";
           CdoLog::expand(message, args...);
           CdoDebug::printError(message,true);
           if ( CdoError::_ExitOnError )
