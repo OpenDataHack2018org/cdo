@@ -49,7 +49,6 @@ int CDO_opterr = 0;
 const char *CDO_optarg = NULL;
 int CDO_optind = 1;
 
-const char *CDO_progname = NULL;
 const char *CDO_version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
 
 

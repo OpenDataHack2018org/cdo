@@ -41,7 +41,6 @@
 #define  UNCHANGED_RECORD  (processSelf().m_ID == 0 && processSelf().inputStreams[0]->ispipe == false && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
-extern const char *CDO_progname;
 extern const char *CDO_version;
 extern const char *CDO_username;
 extern char *cdoGridSearchDir;

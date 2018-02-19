@@ -1800,9 +1800,9 @@ int main(int argc, char *argv[])
 
   setCommandLine(argc, argv);
 
-  CDO_progname = getProgname(argv[0]);
-  if ( strncmp(CDO_progname, "cdo", 3) == 0 && strlen(CDO_progname) > 3 ) noff = 3;
-  if ( noff ) setDefaultFileType(CDO_progname+noff, 0);
+  Cdo::progname = getProgname(argv[0]);
+  if ( strncmp(Cdo::progname, "cdo", 3) == 0 && strlen(Cdo::progname) > 3 ) noff = 3;
+  if ( noff ) setDefaultFileType(Cdo::progname+noff, 0);
 
   get_env_vars();
   init_modules();
