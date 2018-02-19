@@ -95,27 +95,17 @@ void conv_generic_grid(int gridID, size_t gridsize, double *xvals2D, double *yva
 
   assert(gridsize==xsize*ysize);
 
-  double *xcoord = (double*) Malloc(xsize*sizeof(double));
-  double *ycoord = (double*) Malloc(ysize*sizeof(double));
+  std::vector<double> xcoord(xsize);
+  std::vector<double> ycoord(ysize);
 
-  gridInqXvals(gridID, xcoord);
-  gridInqYvals(gridID, ycoord);
+  gridInqXvals(gridID, &xcoord[0]);
+  gridInqYvals(gridID, &ycoord[0]);
 
-  double xmin = xcoord[0];
-  double xmax = xcoord[0];
-  for ( size_t i = 1; i < xsize; ++i )
-    {
-      if ( xcoord[i] < xmin ) xmin = xcoord[i];
-      if ( xcoord[i] > xmax ) xmax = xcoord[i];
-    }
+  double xmin, xmax;
+  arrayMinMax(xsize, &xcoord[0], &xmin, &xmax);
 
-  double ymin = ycoord[0];
-  double ymax = ycoord[0];
-  for ( size_t i = 1; i < ysize; ++i )
-    {
-      if ( ycoord[i] < ymin ) ymin = ycoord[i];
-      if ( ycoord[i] > ymax ) ymax = ycoord[i];
-    }
+  double ymin, ymax;
+  arrayMinMax(ysize, &ycoord[0], &ymin, &ymax);
 
   double xrange = xmax - xmin;
   double yrange = ymax - ymin;
@@ -126,9 +116,6 @@ void conv_generic_grid(int gridID, size_t gridsize, double *xvals2D, double *yva
         xvals2D[j*xsize+i] = xcoord[i]*M_PI/xrange; 
         yvals2D[j*xsize+i] = ycoord[j]*M_PI/yrange; 
       }
-  
-  Free(xcoord);
-  Free(ycoord);
 }
 
 static
@@ -139,39 +126,34 @@ void remap_nn_reg2d_reg2d(size_t nx, size_t ny, const double *restrict data, int
 
   size_t nxvals = gridInqXsize(gridID);
   size_t nyvals = gridInqYsize(gridID);
-  double *xvals = (double*) Malloc(nxvals*sizeof(double));
-  double *yvals = (double*) Malloc(nyvals*sizeof(double));
+  std::vector<double> xvals(nxvals);
+  std::vector<double> yvals(nyvals);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  gridInqXvals(gridID, &xvals[0]);
+  gridInqYvals(gridID, &yvals[0]);
 
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID, units);
-  grid_to_degree(units, nxvals, xvals, "grid center lon");
+  grid_to_degree(units, nxvals, &xvals[0], "grid center lon");
   gridInqYunits(gridID, units);
-  grid_to_degree(units, nyvals, yvals, "grid center lat");
+  grid_to_degree(units, nyvals, &yvals[0], "grid center lat");
 
-  size_t ii, jj;
-  double xval, yval;
   for ( size_t j = 0; j < nyvals; j++ )
     {
-      yval = yvals[j];
+      double yval = yvals[j];
       for ( size_t i = 0; i < nxvals; i++ )
         {
-          xval = xvals[i];
+          double xval = xvals[i];
           if ( xval >=  180 ) xval -= 360;
           if ( xval <  -180 ) xval += 360;
-          ii = (xval + 180)*2;
-          jj = (yval +  90)*2;
+          size_t ii = (xval + 180)*2;
+          size_t jj = (yval +  90)*2;
           if ( ii >= nx ) ii = nx-1;
           if ( jj >= ny ) jj = ny-1;
           array[j*nxvals+i] = data[jj*nx+ii];
         }
     }
-
-  Free(xvals);
-  Free(yvals);
 }
 
 static
@@ -179,41 +161,36 @@ void remap_nn_reg2d_nonreg2d(size_t nx, size_t ny, const double *restrict data, 
 {
   int gridID2 = gridID;
   size_t gridsize = gridInqSize(gridID2);
-  double *xvals = (double*) Malloc(gridsize*sizeof(double));
-  double *yvals = (double*) Malloc(gridsize*sizeof(double));
+  std::vector<double> xvals(gridsize);
+  std::vector<double> yvals(gridsize);
 
   if ( gridInqType(gridID2) == GRID_GME ) gridID2 = gridToUnstructured(gridID2, 0);
 
   if ( gridInqType(gridID2) != GRID_UNSTRUCTURED && gridInqType(gridID2) != GRID_CURVILINEAR )
     gridID2 = gridToCurvilinear(gridID2, 0);
 
-  gridInqXvals(gridID2, xvals);
-  gridInqYvals(gridID2, yvals);
+  gridInqXvals(gridID2, &xvals[0]);
+  gridInqYvals(gridID2, &yvals[0]);
 
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID2, units);
-  grid_to_degree(units, gridsize, xvals, "grid center lon");
+  grid_to_degree(units, gridsize, &xvals[0], "grid center lon");
   gridInqYunits(gridID2, units);
-  grid_to_degree(units, gridsize, yvals, "grid center lat");
+  grid_to_degree(units, gridsize, &yvals[0], "grid center lat");
 
-  size_t ii, jj;
-  double xval, yval;
   for ( size_t i = 0; i < gridsize; i++ )
     {
-      xval = xvals[i];
-      yval = yvals[i];
+      double xval = xvals[i];
+      double yval = yvals[i];
       if ( xval >=  180 ) xval -= 360;
       if ( xval <  -180 ) xval += 360;
-      ii = (xval + 180)*2;
-      jj = (yval +  90)*2;
+      size_t ii = (xval + 180)*2;
+      size_t jj = (yval +  90)*2;
       if ( ii >= nx ) ii = nx-1;
       if ( jj >= ny ) jj = ny-1;
       array[i] = data[jj*nx+ii];
     }
-
-  Free(xvals);
-  Free(yvals);
 
   if ( gridID != gridID2 ) gridDestroy(gridID2);
 }
@@ -406,8 +383,8 @@ void *Vargen(void *process)
 
   size_t gridsize = gridInqSize(gridID);
   size_t datasize = gridsize;
-  double *array = (double*) Malloc(gridsize*sizeof(double));
-  double *data = array;
+  std::vector<double> array(gridsize);
+  double *data = &array[0];
   if ( gridID != gridIDdata && gridIDdata != -1 )
     {
       datasize = gridInqSize(gridIDdata);
@@ -531,10 +508,10 @@ void *Vargen(void *process)
 
               if ( gridID != gridIDdata && (operatorID == TOPO || operatorID == TEMP || operatorID == MASK) )
                 {
-                  remap_nn_reg2d(nlon, nlat, data, gridID, array);
+                  remap_nn_reg2d(nlon, nlat, data, gridID, &array[0]);
                 }
 
-              pstreamWriteRecord(streamID, array, 0);
+              pstreamWriteRecord(streamID, &array[0], 0);
             }
         }
     }
@@ -544,7 +521,6 @@ void *Vargen(void *process)
   vlistDestroy(vlistID);
 
   if ( gridID != gridIDdata && gridIDdata != -1 ) Free(data);
-  if ( array ) Free(array);
   if ( levels ) Free(levels); 
 
   cdoFinish();

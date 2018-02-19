@@ -31,9 +31,9 @@ typedef struct
   int gridID;
   size_t nmiss;
   size_t gridsize;
-  int *gridindex;
-  double *array;
-} ens_file_t;
+  std::vector<long> gridindex;
+  std::vector<double> array;
+} ensfileType;
 
 
 typedef struct
@@ -41,14 +41,14 @@ typedef struct
   double x, y;
   int id;
 }
-xyinfo_t;
+xyinfoType;
 
 static
 int cmpx(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const xyinfo_t *xy1 = (const xyinfo_t *) s1;
-  const xyinfo_t *xy2 = (const xyinfo_t *) s2;
+  const xyinfoType *xy1 = (const xyinfoType *) s1;
+  const xyinfoType *xy2 = (const xyinfoType *) s2;
 
   if      ( xy1->x < xy2->x ) cmp = -1;
   else if ( xy1->x > xy2->x ) cmp =  1;
@@ -60,8 +60,8 @@ static
 int cmpxy_lt(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const xyinfo_t *xy1 = (const xyinfo_t *) s1;
-  const xyinfo_t *xy2 = (const xyinfo_t *) s2;
+  const xyinfoType *xy1 = (const xyinfoType *) s1;
+  const xyinfoType *xy2 = (const xyinfoType *) s2;
 
   if      ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
   else if ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
@@ -73,8 +73,8 @@ static
 int cmpxy_gt(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const xyinfo_t *xy1 = (const xyinfo_t *) s1;
-  const xyinfo_t *xy2 = (const xyinfo_t *) s2;
+  const xyinfoType *xy1 = (const xyinfoType *) s1;
+  const xyinfoType *xy2 = (const xyinfoType *) s2;
 
   if      ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
   else if ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
@@ -83,15 +83,14 @@ int cmpxy_gt(const void *s1, const void *s2)
 }
 
 static
-int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int nxblocks)
+int genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit, int igrid, long nxblocks)
 {
   bool lsouthnorth = true;
   bool lregular = false;
   bool lcurvilinear = false;
   int gridID2 = -1;
-  double *xvals2 = NULL, *yvals2 = NULL;
 
-  int nx = -1;
+  long nx = -1;
   if ( nxblocks != -1 ) nx = nxblocks;
 
   int gridID   = vlistGrid(ef[0].vlistID, igrid);
@@ -99,15 +98,15 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
   if ( ngrids > 1 && gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
     return gridID2;
 
-  int *xsize = (int*) Malloc(nfiles*sizeof(int));
-  int *ysize = (int*) Malloc(nfiles*sizeof(int));
-  xyinfo_t *xyinfo = (xyinfo_t*) Malloc(nfiles*sizeof(xyinfo_t));
-  double **xvals = (double**) Malloc(nfiles*sizeof(double*));
-  double **yvals = (double**) Malloc(nfiles*sizeof(double*));
+  std::vector<long> xsize(nfiles);
+  std::vector<long> ysize(nfiles);
+  xyinfoType *xyinfo = (xyinfoType*) Malloc(nfiles*sizeof(xyinfoType));
+  std::vector<std::vector<double>> xvals(nfiles);
+  std::vector<std::vector<double>> yvals(nfiles);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      gridID   = vlistGrid(ef[fileID].vlistID, igrid);
+      gridID = vlistGrid(ef[fileID].vlistID, igrid);
       int gridtype = gridInqType(gridID);
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
         lregular = true;
@@ -125,24 +124,19 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
 
       if ( lregular )
         {
-          xvals[fileID] = (double*) Malloc(xsize[fileID]*sizeof(double));
-          yvals[fileID] = (double*) Malloc(ysize[fileID]*sizeof(double));
+          xvals[fileID].resize(xsize[fileID]);
+          yvals[fileID].resize(ysize[fileID]);
         }
       else if ( lcurvilinear )
         {
-          xvals[fileID] = (double*) Malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
-          yvals[fileID] = (double*) Malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
+          xvals[fileID].resize(xsize[fileID]*ysize[fileID]);
+          yvals[fileID].resize(xsize[fileID]*ysize[fileID]);
         }
-      else
-        {
-          xvals[fileID] = NULL;
-          yvals[fileID] = NULL;
-        }
-        
+       
       if ( lregular || lcurvilinear )
         {
-          gridInqXvals(gridID, xvals[fileID]);
-          gridInqYvals(gridID, yvals[fileID]);
+          gridInqXvals(gridID, &xvals[fileID][0]);
+          gridInqYvals(gridID, &yvals[fileID][0]);
         }
       // printf("fileID %d, gridID %d\n", fileID, gridID);
 
@@ -171,16 +165,16 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
 
   if ( lregular )
     {
-      qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
+      qsort(xyinfo, nfiles, sizeof(xyinfoType), cmpx);  	      
 
       if ( cdoVerbose )
         for ( int fileID = 0; fileID < nfiles; fileID++ )
           printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
       if ( lsouthnorth )
-        qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_lt);  
+        qsort(xyinfo, nfiles, sizeof(xyinfoType), cmpxy_lt);  
       else
-        qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_gt);  	      
+        qsort(xyinfo, nfiles, sizeof(xyinfoType), cmpxy_gt);  	      
 
       if ( cdoVerbose )
         for ( int fileID = 0; fileID < nfiles; fileID++ )
@@ -201,42 +195,43 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
       if ( nx <= 0 ) nx = nfiles;
     }
 
-  int ny = nfiles/nx;
-  if ( nx*ny != nfiles ) cdoAbort("Number of input files (%d) and number of blocks (%dx%d) differ!", nfiles, nx, ny);
+  long ny = nfiles/nx;
+  if ( nx*ny != nfiles ) cdoAbort("Number of input files (%ld) and number of blocks (%ldx%ld) differ!", nfiles, nx, ny);
  
-  int xsize2 = 0;
-  for ( int i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
-  int ysize2 = 0;
-  for ( int j = 0; j < ny; ++j ) ysize2 += ysize[xyinfo[j*nx].id];
-  if ( cdoVerbose ) cdoPrint("xsize2 %d  ysize2 %d", xsize2, ysize2);
+  long xsize2 = 0;
+  for ( long i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
+  long ysize2 = 0;
+  for ( long j = 0; j < ny; ++j ) ysize2 += ysize[xyinfo[j*nx].id];
+  if ( cdoVerbose ) cdoPrint("xsize2 %ld  ysize2 %ld", xsize2, ysize2);
 
+  std::vector<double> xvals2, yvals2;
   if ( lregular )
     {
-      xvals2 = (double*) Malloc(xsize2*sizeof(double));
-      yvals2 = (double*) Malloc(ysize2*sizeof(double));
+      xvals2.resize(xsize2);
+      yvals2.resize(ysize2);
     }
   else if ( lcurvilinear )
     {
-      xvals2 = (double*) Malloc(xsize2*ysize2*sizeof(double));
-      yvals2 = (double*) Malloc(xsize2*ysize2*sizeof(double));
+      xvals2.resize(xsize2*ysize2);
+      yvals2.resize(xsize2*ysize2);
     }
     
-  int *xoff = (int*) Malloc((nx+1)*sizeof(int));
-  int *yoff = (int*) Malloc((ny+1)*sizeof(int));
+  std::vector<long> xoff(nx+1);
+  std::vector<long> yoff(ny+1);
 
   xoff[0] = 0;
-  for ( int i = 0; i < nx; ++i )
+  for ( long i = 0; i < nx; ++i )
     {
-      int idx = xyinfo[i].id;
-      if ( lregular ) arrayCopy(xsize[idx], xvals[idx], xvals2+xoff[i]);
+      long idx = xyinfo[i].id;
+      if ( lregular ) arrayCopy(xsize[idx], &xvals[idx][0], &xvals2[xoff[i]]);
       xoff[i+1] = xoff[i] + xsize[idx];
     }
 
   yoff[0] = 0;
-  for ( int j = 0; j < ny; ++j )
+  for ( long j = 0; j < ny; ++j )
     {
-      int idx = xyinfo[j*nx].id;
-      if ( lregular ) arrayCopy(ysize[idx], yvals[idx], yvals2+yoff[j]);
+      long idx = xyinfo[j*nx].id;
+      if ( lregular ) arrayCopy(ysize[idx], &yvals[idx][0], &yvals2[yoff[j]]);
       yoff[j+1] = yoff[j] + ysize[idx];
     }
 
@@ -244,18 +239,18 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
     {
       for ( int fileID = 0; fileID < nfiles; fileID++ )
 	{
-	  int idx = xyinfo[fileID].id;
-	  int iy = fileID/nx;
-	  int ix = fileID - iy*nx;
+	  long idx = xyinfo[fileID].id;
+	  long iy = fileID/nx;
+	  long ix = fileID - iy*nx;
 
-          int offset = yoff[iy]*xsize2 + xoff[ix];
+          long offset = yoff[iy]*xsize2 + xoff[ix];
 	  /*
 	  printf("fileID %d %d, iy %d, ix %d, offset %d\n",
 		 fileID, xyinfo[fileID].id, iy, ix, offset);
 	  */
-	  int ij = 0;
-	  for ( int j = 0; j < ysize[idx]; ++j )
-	    for ( int i = 0; i < xsize[idx]; ++i )
+	  long ij = 0;
+	  for ( long j = 0; j < ysize[idx]; ++j )
+	    for ( long i = 0; i < xsize[idx]; ++i )
 	      {
                 if ( lcurvilinear )
                   {
@@ -272,24 +267,10 @@ int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int n
   gridDefYsize(gridID2, ysize2);
   if ( lregular || lcurvilinear )
     {
-      gridDefXvals(gridID2, xvals2);
-      gridDefYvals(gridID2, yvals2);
+      gridDefXvals(gridID2, &xvals2[0]);
+      gridDefYvals(gridID2, &yvals2[0]);
     }
 
-  Free(xoff);
-  Free(yoff);
-  Free(xsize);
-  Free(ysize);
-  if ( xvals2 ) Free(xvals2);
-  if ( yvals2 ) Free(yvals2);
-
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
-    {
-      if ( xvals[fileID] ) Free(xvals[fileID]);
-      if ( yvals[fileID] ) Free(yvals[fileID]);
-    }
-  Free(xvals);
-  Free(yvals);
   Free(xyinfo);
 
   gridID = vlistGrid(ef[0].vlistID, igrid);
@@ -316,7 +297,7 @@ void *Collgrid(void *process)
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ens_file_t *ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
+  std::vector<ensfileType> ef(nfiles);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -332,9 +313,9 @@ void *Collgrid(void *process)
     vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
+  std::vector<bool> vars(nvars);
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
-  bool *vars1 = (bool*) Malloc(nvars*sizeof(bool));
+  std::vector<bool> vars1(nvars);
   for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = false;
 
   int nsel = operatorArgc();
@@ -365,7 +346,7 @@ void *Collgrid(void *process)
 	for ( int i = 0; i < nsel; i++ )
 	  fprintf(stderr, "name %d = %s\n", i+1, argnames[i]);
 
-      bool *selfound = (bool*) Malloc(nsel*sizeof(bool));
+      std::vector<bool> selfound(nsel);
       for ( int i = 0; i < nsel; i++ ) selfound[i] = false;
 
       char varname[CDI_MAX_NAME];
@@ -386,8 +367,6 @@ void *Collgrid(void *process)
       for ( int isel = 0; isel < nsel; isel++ )
 	if ( selfound[isel] == false )
 	  cdoAbort("Variable name %s not found!", argnames[isel]);
-
-      Free(selfound);
     }
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -405,8 +384,8 @@ void *Collgrid(void *process)
     {
       size_t gridsize = vlistGridsizeMax(ef[fileID].vlistID);
       ef[fileID].gridsize = gridsize;
-      ef[fileID].gridindex = (int*) Malloc(gridsize*sizeof(int));
-      ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
+      ef[fileID].gridindex.resize(gridsize);
+      ef[fileID].array.resize(gridsize);
     }
 
   int vlistID2 = vlistCreate();
@@ -420,13 +399,11 @@ void *Collgrid(void *process)
   */
   //int vlistID2 = vlistDuplicate(vlistID1);
   int nvars2 = vlistNvars(vlistID2);
-  // int *vars  = (int*) Malloc(nvars*sizeof(int));
-  //for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
 
   int ngrids1 = vlistNgrids(vlistID1);
   int ngrids2 = vlistNgrids(vlistID2);
 
-  int *gridIDs = (int*) Malloc(ngrids2*sizeof(int));
+  std::vector<int> gridIDs(ngrids2);
 
   bool ginit = false;
   for ( int i2 = 0; i2 < ngrids2; ++i2 )
@@ -479,7 +456,8 @@ void *Collgrid(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 	  
-  double *array2 = (gridsize2 > 0) ? (double*) Malloc(gridsize2*sizeof(double)) : NULL;
+  std::vector<double> array2;
+  if ( gridsize2 > 0 ) array2.resize(gridsize2);
 
   int tsID = 0;
   do
@@ -521,7 +499,7 @@ void *Collgrid(void *process)
 #endif
 	      for ( int fileID = 0; fileID < nfiles; fileID++ )
 		{
-		  pstreamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);
+		  pstreamReadRecord(ef[fileID].streamID, &ef[fileID].array[0], &ef[fileID].nmiss);
 
 		  if ( vars[varID2] )
 		    {
@@ -535,11 +513,11 @@ void *Collgrid(void *process)
 
 	      if ( vars[varID2] )
 		{
-		  size_t nmiss = arrayNumMV(gridsize2, array2, missval);
-		  pstreamWriteRecord(streamID2, array2, nmiss);
+		  size_t nmiss = arrayNumMV(gridsize2, &array2[0], missval);
+		  pstreamWriteRecord(streamID2, &array2[0], nmiss);
 		}
 	      else
-		pstreamWriteRecord(streamID2, ef[0].array, ef[0].nmiss);
+		pstreamWriteRecord(streamID2, &ef[0].array[0], ef[0].nmiss);
 	    }
 	}
 
@@ -551,19 +529,6 @@ void *Collgrid(void *process)
     pstreamClose(ef[fileID].streamID);
 
   pstreamClose(streamID2);
-
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
-    {
-      if ( ef[fileID].gridindex ) Free(ef[fileID].gridindex);
-      if ( ef[fileID].array ) Free(ef[fileID].array);
-    }
-
-  if ( ef ) Free(ef);
-  if ( array2 ) Free(array2);
-
-  Free(gridIDs);
-  if ( vars   ) Free(vars);
-  if ( vars1  ) Free(vars1);
 
   cdoFinish();
 

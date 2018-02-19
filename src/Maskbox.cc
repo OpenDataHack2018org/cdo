@@ -107,13 +107,13 @@ void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon
 
 
 static
-void maskbox(bool *mask, int gridID, long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
+void maskbox(std::vector<bool> &mask, int gridID, size_t lat1, size_t lat2, size_t lon11, size_t lon12, size_t lon21, size_t lon22)
 {
-  long nlon = gridInqXsize(gridID);
-  long nlat = gridInqYsize(gridID);
+  size_t nlon = gridInqXsize(gridID);
+  size_t nlat = gridInqYsize(gridID);
 
-  for ( long ilat = 0; ilat < nlat; ilat++ )
-    for ( long ilon = 0; ilon < nlon; ilon++ )
+  for ( size_t ilat = 0; ilat < nlat; ilat++ )
+    for ( size_t ilon = 0; ilon < nlon; ilon++ )
       if (  (lat1 <= ilat && ilat <= lat2 && 
 	      ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))) )
 	mask[nlon*ilat + ilon] = false;
@@ -122,18 +122,18 @@ void maskbox(bool *mask, int gridID, long lat1, long lat2, long lon11, long lon1
 void getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1, double *xlat2);
 
 static
-void maskbox_cell(bool *mask, int gridID)
+void maskbox_cell(std::vector<bool> &mask, int gridID)
 {
   double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
   getlonlatparams(0, &xlon1, &xlon2, &xlat1, &xlat2);
 
   size_t gridsize = gridInqSize(gridID);
 
-  double *xvals = (double *) Malloc(gridsize*sizeof(double));
-  double *yvals = (double *) Malloc(gridsize*sizeof(double));
+  std::vector<double> xvals(gridsize);
+  std::vector<double> yvals(gridsize);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  gridInqXvals(gridID, &xvals[0]);
+  gridInqYvals(gridID, &yvals[0]);
 
   char xunits[CDI_MAX_NAME];
   char yunits[CDI_MAX_NAME];
@@ -170,55 +170,41 @@ void maskbox_cell(bool *mask, int gridID)
             }
         }
     }
-
-  Free(xvals);
-  Free(yvals);
 }
 
 static
-void maskregion(bool *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
+void maskregion(std::vector<bool> &mask, int gridID, double *xcoords, double *ycoords, size_t nofcoords)
 {
-  long nlon = gridInqXsize(gridID);
-  long nlat = gridInqYsize(gridID);
+  size_t nlon = gridInqXsize(gridID);
+  size_t nlat = gridInqYsize(gridID);
 
-  double *xvals = (double*) Malloc(nlon*sizeof(double));
-  double *yvals = (double*) Malloc(nlat*sizeof(double));
+  std::vector<double> xvals(nlon);
+  std::vector<double> yvals(nlat);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);  
+  gridInqXvals(gridID, &xvals[0]);
+  gridInqYvals(gridID, &yvals[0]);  
 
   /* Convert lat/lon units if required */
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID, units);
-    grid_to_degree(units, nlon, xvals, "grid center lon");
+    grid_to_degree(units, nlon, &xvals[0], "grid center lon");
     gridInqYunits(gridID, units);
-    grid_to_degree(units, nlat, yvals, "grid center lat");
+    grid_to_degree(units, nlat, &yvals[0], "grid center lat");
   }
 
-  double xmin = xvals[0];
-  double xmax = xvals[0];
-  double ymin = yvals[0];
-  double ymax = yvals[0];
+  double xmin, xmax;
+  arrayMinMax(nlon, &xvals[0], &xmin, &xmax);
 
-  for ( long i = 1; i < nlon; i++ )
-    {
-      if ( xvals[i] < xmin ) xmin = xvals[i];
-      if ( xvals[i] > xmax ) xmax = xvals[i];
-    }
+  double ymin, ymax;
+  arrayMinMax(nlat, &yvals[0], &ymin, &ymax);
 
-  for ( long i = 1; i < nlat; i++ )
-    {
-      if ( yvals[i] < ymin ) ymin = yvals[i];
-      if ( yvals[i] > ymax ) ymax = yvals[i];
-    }
-
-  for ( long ilat = 0; ilat < nlat; ilat++ )
+  for ( size_t ilat = 0; ilat < nlat; ilat++ )
     {
       double yval = yvals[ilat];
-      for ( long ilon = 0; ilon < nlon; ilon++ )
+      for ( size_t ilon = 0; ilon < nlon; ilon++ )
 	{
-          long i, j;
+          size_t i, j;
           int c = 0;
 	  double xval = xvals[ilon];
 	  if (!( ( ( xval > xmin ) || ( xval < xmax ) ) || ( (yval > ymin) || (yval < ymax) ) ) ) c = !c;
@@ -264,9 +250,6 @@ void maskregion(bool *mask, int gridID, double *xcoords, double *ycoords, int no
 	  if ( c != 0 ) mask[nlon*ilat+ilon] =  false;
 	}
     }
-      
-  Free(xvals);
-  Free(yvals);
 }
 
 
@@ -291,7 +274,6 @@ void *Maskbox(void *process)
   operatorInputArg(cdoOperatorEnter(operatorID));
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
-
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int ngrids = vlistNgrids(vlistID1);
@@ -327,21 +309,18 @@ void *Maskbox(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
+  std::vector<bool> vars(nvars);
   for ( varID = 0; varID < nvars; varID++ )
     {
-      if ( gridID == vlistInqVarGrid(vlistID1, varID) )
-	vars[varID] = true;
-      else
-	vars[varID] = false;
+      vars[varID] = (gridID == vlistInqVarGrid(vlistID1, varID));
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = gridInqSize(gridID);
-  double *array = (double *) Malloc(gridsize*sizeof(double));
-  bool *mask = (bool*) Malloc(gridsize*sizeof(bool));
+  std::vector<double> array(gridsize);
+  std::vector<bool> mask(gridsize);
   for ( size_t i = 0; i < gridsize; ++i ) mask[i] = true;
  
   if ( operatorID == MASKLONLATBOX )
@@ -400,15 +379,15 @@ void *Maskbox(void *process)
 	  if ( vars[varID] )
 	    {
               size_t nmiss;
-	      pstreamReadRecord(streamID1, array, &nmiss);
+	      pstreamReadRecord(streamID1, &array[0], &nmiss);
 
               double missval = vlistInqVarMissval(vlistID1, varID);             
 	      for ( size_t i = 0; i < gridsize; i++ )
                 if ( mask[i] ) array[i] = missval;
 		
-	      nmiss = arrayNumMV(gridsize, array, missval);
+	      nmiss = arrayNumMV(gridsize, &array[0], missval);
 	      pstreamDefRecord(streamID2, varID, levelID);
-	      pstreamWriteRecord(streamID2, array, nmiss);
+	      pstreamWriteRecord(streamID2, &array[0], nmiss);
 	    }
 	}
       tsID++;
@@ -416,10 +395,6 @@ void *Maskbox(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if ( vars  ) Free(vars);
-  if ( array ) Free(array);
-  if ( mask )  Free(mask);
 
   cdoFinish();
 

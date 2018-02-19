@@ -58,9 +58,7 @@ void *CDIwrite(void *process)
   const char *defaultgrid = "global_.2";
   int tsID, varID, levelID;
   int i;
-  int vlistID;
-  int zaxisID, taxisID;
-  int vdate, vtime;
+  int zaxisID;
   int filetype = -1, datatype = -1;
   int irun, nruns = 1;
   unsigned int seed = 1;
@@ -68,8 +66,6 @@ void *CDIwrite(void *process)
   off_t nvalues = 0;
   double file_size = 0, data_size = 0;
   double tw, tw0, t0, twsum = 0;
-  double ***vars = NULL;
-  float *farray = NULL;
 
   srand(seed);
   sinfo[0] = 0;
@@ -102,11 +98,10 @@ void *CDIwrite(void *process)
     zaxisID  = zaxisCreate(ZAXIS_SURFACE, 1);
   else
     {
-      double *levels = (double *) Malloc(nlevs*sizeof(double));
+      std::vector<double> levels(nlevs);
       for ( i = 0; i < nlevs; ++i ) levels[i] = 100*i; 
       zaxisID  = zaxisCreate(ZAXIS_HEIGHT, nlevs);
-      zaxisDefLevels(zaxisID, levels);
-      Free(levels);
+      zaxisDefLevels(zaxisID, &levels[0]);
     }
 
   if ( cdoVerbose )
@@ -118,9 +113,9 @@ void *CDIwrite(void *process)
       cdoPrint("nvars      : %d", nvars);
     }
 
-  double *array = (double*) Malloc(gridsize*sizeof(double));
-  double *xvals = (double*) Malloc(gridsize*sizeof(double));
-  double *yvals = (double*) Malloc(gridsize*sizeof(double));
+  std::vector<double> array(gridsize);
+  std::vector<double> xvals(gridsize);
+  std::vector<double> yvals(gridsize);
 
   int gridID2 = gridID;
   if ( gridInqType(gridID) == GRID_GME ) gridID2 = gridToUnstructured(gridID, 0);
@@ -128,37 +123,35 @@ void *CDIwrite(void *process)
   if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
     gridID2 = gridToCurvilinear(gridID, 0);
 
-  gridInqXvals(gridID2, xvals);
-  gridInqYvals(gridID2, yvals);
+  gridInqXvals(gridID2, &xvals[0]);
+  gridInqYvals(gridID2, &yvals[0]);
 
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID2, units);
-  grid_to_radian(units, gridsize, xvals, "grid center lon");
+  grid_to_radian(units, gridsize, &xvals[0], "grid center lon");
   gridInqYunits(gridID2, units);
-  grid_to_radian(units, gridsize, yvals, "grid center lat");
+  grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
   for ( size_t i = 0; i < gridsize; i++ )
     array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
 
-  Free(xvals);
-  Free(yvals);
-
-  vars = (double ***) Malloc(nvars*sizeof(double **));
+  std::vector<std::vector<std::vector<double>>>vars(nvars);
   for ( varID = 0; varID < nvars; varID++ )
     {
-      vars[varID] = (double **) Malloc(nlevs*sizeof(double *));
+      vars[varID].resize(nlevs);
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  vars[varID][levelID] = (double*) Malloc(gridsize*sizeof(double));
+	  vars[varID][levelID].resize(gridsize);
 	  for ( size_t i = 0; i < gridsize; ++i )
 	    vars[varID][levelID][i] = varID + array[i]*(levelID+1);
 	}
     }
 
-  if ( memtype == MEMTYPE_FLOAT ) farray = (float*) Malloc(gridsize*sizeof(float));
+  std::vector<float> farray;
+  if ( memtype == MEMTYPE_FLOAT ) farray.resize(gridsize);
 
-  vlistID = vlistCreate();
+  int vlistID = vlistCreate();
 
   for ( i = 0; i < nvars; ++i )
     {
@@ -167,7 +160,7 @@ void *CDIwrite(void *process)
       //    vlistDefVarName(vlistID, varID, );
     }
 
-  taxisID = taxisCreate(TAXIS_RELATIVE);
+  int taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
   // vlistDefNtsteps(vlistID, 1);
@@ -192,8 +185,8 @@ void *CDIwrite(void *process)
 
       for ( tsID = 0; tsID < ntimesteps; tsID++ )
 	{
-	  vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
-	  vtime = 0;
+	  int vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
+	  int vtime = 0;
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
 	  pstreamDefTimestep(streamID, tsID);
@@ -206,14 +199,13 @@ void *CDIwrite(void *process)
 		  pstreamDefRecord(streamID, varID, levelID);
 		  if ( memtype == MEMTYPE_FLOAT )
 		    {
-		      double *darray = vars[varID][levelID];
-		      for ( size_t i = 0; i < gridsize; ++i ) farray[i] = darray[i];
-		      pstreamWriteRecordF(streamID, farray, 0);
+		      for ( size_t i = 0; i < gridsize; ++i ) farray[i] = vars[varID][levelID][i];
+		      pstreamWriteRecordF(streamID, &farray[0], 0);
 		      data_size += gridsize*4;
 		    }
 		  else
 		    {
-		      pstreamWriteRecord(streamID, vars[varID][levelID], 0);
+		      pstreamWriteRecord(streamID, &vars[varID][levelID][0], 0);
 		      data_size += gridsize*8;
 		    }
 		}
@@ -243,17 +235,6 @@ void *CDIwrite(void *process)
     print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size, file_size, twsum/nruns);
 
   vlistDestroy(vlistID);
-
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      for ( levelID = 0; levelID < nlevs; levelID++ ) Free(vars[varID][levelID]);
-      Free(vars[varID]);
-    }
-  Free(vars);
-
-  Free(array);
-
-  if ( farray ) Free(farray);
 
   cdoFinish();
 
