@@ -408,6 +408,7 @@ ProcessType::addPipeOutStream()
 pthread_t
 ProcessType::run()
 {
+  Cdo_Debug(CdoDebug::PROCESS, "starting new thread for process ", m_ID);
   pthread_attr_t attr;
   int status = pthread_attr_init(&attr);
   if (status)
@@ -439,7 +440,7 @@ ProcessType::run()
     }
 
   pthread_t thrID;
-  int rval = pthread_create(&thrID, &attr, operatorModule(operatorName), this);
+  int rval = pthread_create(&thrID, &attr, m_module.func, this);
   if (rval != 0)
     {
       errno = rval;

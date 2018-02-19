@@ -618,7 +618,7 @@ void PstreamType::defVlist(int p_vlistID){
     }
 }
 
-int
+void
 PstreamType::inqRecord(int *varID, int *levelID){
 #ifdef  HAVE_LIBPTHREAD
   if (ispipe)
@@ -647,8 +647,6 @@ PstreamType::inqRecord(int *varID, int *levelID){
       if (processNum == 1 && Threading::ompNumThreads == 1)
         timer_stop(timer_read);
     }
-
-  return 0;
 }
 
 void

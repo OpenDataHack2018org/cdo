@@ -20,7 +20,6 @@
 
 #include "process.h"
 
-extern std::map<int, ProcessType> Process;
 
 /**
  * Sets the underlying Process threadID and calls omp_set_num_threads
@@ -205,5 +204,7 @@ int cdoStreamInqVlist(int pstreamID);
  * @return true if pipe otherwise false
  */
 bool cdoStreamIsPipe(int pstreamID);
+
+void runProcesses();
 
 #endif

@@ -21,16 +21,59 @@
 #include "pstream.h"
 /*clang-format off */
 
+/**
+ * Closes pstream and adds its variable count to its process.
+ */
 void  pstreamClose(int pstreamID);
 
+
+/*
+* Get the variable list
+*
+*    @param  streamID  Stream ID, from a previous call to cdoStreamOpenRead(int) or cdoStreamOpenWrite(int,int).
+*
+* Description
+* he function pstreamInqVlist(int) returns the variable list of a stream.
+*
+* @return
+*  returns an identifier to the variable list.
+*
+*/
 int   pstreamInqVlist(int pstreamID);
+/**
+* Define the variable list.
+*
+*     @param  pstreamID Stream ID, from a previous call to  cdoStreamOpenRead(int) or cdoStreamOpenWrite(int,int).
+*     @param  vlistID  Variable list ID, from a previous call to pstreamInqVlist(int).
+*
+* The function pstreamDefVlist(int, int) defines the variable list of a stream.
+*
+* To safeguard against errors by modifying the wrong vlist object,
+* this function makes the passed vlist object immutable.
+* All further vlist changes have to use the vlist object returned by pstreamInqVlist().
+*
+*/
 void  pstreamDefVlist(int pstreamID, int vlistID);
 
-int   pstreamInqRecord(int pstreamID, int *varID, int *levelID);
+/**
+ * Inquires record and sets \p varID.
+ * @param pstreamID
+ * @param varID
+ * @param levelID
+ * If \p pstreamID represents a pipe \p varID will be -1 if an error occured.
+ * If \p pstreamID represents a file either varID will be set or CDO exits with
+ * an error message.
+ **/
+void  pstreamInqRecord(int pstreamID, int *varID, int *levelID);
+/**
+*Define the next record.
+*The function pstreamDefRecord defines the meta-data of the next record.
+*    @param  pstreamID  Stream ID, from a previous call to cdoStreamOpenRead()
+*    or cdoStreamOpenWrite().
+*    @param  varID     Variable identifier.
+*    @param  levelID   Level identifier.
+*/
 void  pstreamDefRecord(int pstreamID, int varID, int levelID);
-
-void  pstreamDefRecord(int pstreamID, int varID, int levelID);
-int   pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
 int   pstreamInqTimestep(int pstreamID, int tsID);
 void  pstreamDefTimestep(int pstreamID, int tsID);

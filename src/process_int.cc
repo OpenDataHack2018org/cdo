@@ -434,8 +434,6 @@ cdoStreamOpenRead(int inStreamIDX)
       Cdo_Debug(CdoDebug::PROCESS,
                 "Trying to open pipe: ", inStream->pipe->name);
       inStream->pstreamOpenReadPipe();
-      process.childProcesses[process.nChildActive]
-          ->run();  // new thread started in here!
       process.nChildActive++;
     }
   else
@@ -623,6 +621,7 @@ cdoInitialize(void *p_process)
   Cdo_Debug(CdoDebug::PROCESS,
             "Initializing process: ", process->m_operatorCommand);
   process->threadID = pthread_self();
+  //std::cout << "SomeMarker" << Process.size() << std::endl;
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PSTREAM)
@@ -718,4 +717,16 @@ cdoStreamInqVlist(int pstreamID)
     cdoAbort("This operator needs complex fields!");
   processDefVarNum(vlistNvars(vlistID));
   return vlistID;
+}
+
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>  
+void runProcesses()
+{
+  for(int i = processNums() - 1 ; i > 0; i--)
+  {
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+        getProcess(i)->run();
+  }
+  getProcess(0)->m_module.func(getProcess(0));
 }

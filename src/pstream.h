@@ -35,7 +35,7 @@ public:
   int inqVlist();
   int inqFileType();
   int inqTimestep(int tsID);
-  int inqRecord(int *varID, int *levelID);
+  void inqRecord(int *varID, int *levelID);
   bool isPipe();
   int inqByteorder();
   size_t getNvals();

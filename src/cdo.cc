@@ -1944,7 +1944,7 @@ int main(int argc, char *argv[])
       close_library_handles();
 #else
       createProcesses(new_argv.size(),(const char**) &new_cargv[0] );
-      getProcess(0)->m_module.func(getProcess(0));
+      runProcesses();
 #endif
       clearProcesses();
 
