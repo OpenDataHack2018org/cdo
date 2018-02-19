@@ -207,4 +207,6 @@ bool cdoStreamIsPipe(int pstreamID);
 
 void runProcesses();
 
+int cdoStreamInqTimestep(int pstreamID, int tsID);
+
 #endif

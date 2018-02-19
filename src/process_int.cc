@@ -59,7 +59,7 @@ processSelf(void)
 
   pthread_mutex_lock(&processMutex);
 
-  for (auto &id_process_pair : Process)
+  for (auto &id_process_pair : Process){
     if (id_process_pair.second.l_threadID)
       {
         if (pthread_equal(id_process_pair.second.threadID, thID))
@@ -68,6 +68,7 @@ processSelf(void)
             return id_process_pair.second;
           }
       }
+  }
 
   pthread_mutex_unlock(&processMutex);
   ERROR("Could not find process for thread: ", thID);
@@ -99,7 +100,15 @@ processDefTimesteps(int streamID)
 }
 
 int
-processInqTimesteps(void)
+cdoStreamInqTimestep(int pstreamID, int tsID)
+{
+  int nrecs = pstreamInqTimestep(pstreamID, tsID);
+  ntimesteps++;
+  return nrecs;
+ }
+
+int
+processInqTimesteps(int pstreamID);
 {
   return processSelf().ntimesteps;
 }
@@ -279,7 +288,7 @@ handleObase(const char *p_argvEntry)
     }
   else
     {
-      CdoError::Abort("Obase missing. Found existing file: ", p_argvEntry,
+      CdoError::Abort(Cdo::progname, "Obase missing. Found existing file: ", p_argvEntry,
                       "instead");
     }
 }
@@ -297,7 +306,7 @@ createNewProcess(ProcessType *p_parentProces, const char *argvEntry)
   ProcessType *newProcess = processCreate(argvEntry);
   if (newProcess->m_module.streamOutCnt == 0)
     {
-      CdoError::Abort("operator -", p_parentProces->operatorName,
+      CdoError::Abort(Cdo::progname, "operator -", p_parentProces->operatorName,
                       " can not take -", newProcess->operatorName,
                       "  with 0 outputs as input");
       exit(EXIT_FAILURE);
@@ -317,6 +326,7 @@ createProcesses(int argc, const char **argv)
   ProcessType *root_process = processCreate(argv[0]);
 
   ProcessType *currentProcess;
+  ProcessType *lastAdded;
 
   int idx = 1;
   std::stack<ProcessType *> call_stack;
@@ -353,6 +363,7 @@ createProcesses(int argc, const char **argv)
             {
               Cdo_Debug(CdoDebug::PROCESS, "Found new Operator: ", argvEntry);
               currentProcess = createNewProcess(currentProcess, argvEntry);
+              lastAdded = currentProcess;
               call_stack.push(currentProcess);
             }
           else if (currentProcess->m_module.streamInCnt != 0)
@@ -361,25 +372,25 @@ createProcesses(int argc, const char **argv)
                         currentProcess->operatorName);
               currentProcess->addFileInStream(argvEntry);
             }
-          while (currentProcess->hasAllInputs()
-                 && currentProcess != root_process)
+          while (call_stack.top()->hasAllInputs() &&
+                 call_stack.top() != root_process)
             {
               Cdo_Debug(CdoDebug::PROCESS, "Removing ",
                         currentProcess->operatorName, " from stack");
               call_stack.top()->checkStreamCnt();
               call_stack.pop();
-              currentProcess = call_stack.top();
             }
-
+            currentProcess = call_stack.top();
           idx++;
         }
-      while ((currentProcess != root_process || !root_process->hasAllInputs())
+      while (!currentProcess->hasAllInputs()
              && idx < argc - cntOutFiles);
     }
 
   if (idx != argc - cntOutFiles)
     {
-      ERROR("To many inputs");
+        CdoError::Abort(Cdo::progname ," To many inputs for operator '", lastAdded->operatorName,"'\n",
+               progname, " ", CdoDebug::argvToString(argc, argv));
     }
 
   while (!call_stack.empty())
@@ -621,7 +632,7 @@ cdoInitialize(void *p_process)
   Cdo_Debug(CdoDebug::PROCESS,
             "Initializing process: ", process->m_operatorCommand);
   process->threadID = pthread_self();
-  //std::cout << "SomeMarker" << Process.size() << std::endl;
+  // std::cout << "SomeMarker" << Process.size() << std::endl;
 
 #if defined(HAVE_LIBPTHREAD)
   if (CdoDebug::PSTREAM)
@@ -662,8 +673,9 @@ cdoFinish(void)
 const char *
 processInqPrompt(void)
 {
-  ProcessType &process = processSelf();
-  return process.inqPrompt();
+
+    ProcessType &process = processSelf();
+    return process.inqPrompt();
 }
 
 extern "C" {
@@ -719,14 +731,17 @@ cdoStreamInqVlist(int pstreamID)
   return vlistID;
 }
 
-#include <thread>         // std::this_thread::sleep_for
-#include <chrono>  
-void runProcesses()
+void
+runProcesses()
 {
-  for(int i = processNums() - 1 ; i > 0; i--)
-  {
-        std::this_thread::sleep_for (std::chrono::milliseconds(10));
-        getProcess(i)->run();
-  }
+  for (auto &idProcessPair : Process)
+    {
+      if (idProcessPair.first != 0)
+        {
+          std::cerr << "Started Process: " << idProcessPair.second.operatorName << std::endl;
+          idProcessPair.second.run();
+        }
+    }
+  std::cerr << "Started Process: " << getProcess(0)->operatorName << std::endl;
   getProcess(0)->m_module.func(getProcess(0));
 }
