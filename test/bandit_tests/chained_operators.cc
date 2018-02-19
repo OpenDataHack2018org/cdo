@@ -39,23 +39,23 @@ go_bandit([]() {
     createProcesses(test_argv.size(), &test_argv[0]);
 
     unsigned int i;
-    for (i = 0; i < Process.size(); i++) {
-      auto process = Process.at(i);
+    for (i = 0; i < processNums(); i++) {
+      auto process = getProcess(i);
       bandit::it("created inputs for:" +
-                     std::string(Process.at(i).operatorName),
+                     std::string(getProcess(i)->operatorName),
                  [&]() {
-                   AssertThat(process.inputStreams.size(),
+                   AssertThat(process->inputStreams.size(),
                               snowhouse::Equals(expectedInputs[i]));
                  });
       bandit::it("created outputs for: " +
-                     std::string(Process.at(i).operatorName),
+                     std::string(getProcess(i)->operatorName),
                  [&]() {
-                   AssertThat(process.outputStreams.size(),
+                   AssertThat(process->outputStreams.size(),
                               snowhouse::Equals(expectedOutputs[i]));
                  });
     }
     bandit::it("created right amount of processes",
-               [&]() { AssertThat(i, snowhouse::Equals(Process.size())); });
+               [&]() { AssertThat(i, snowhouse::Equals(processNums())); });
   });
 
   clearProcesses();
@@ -82,21 +82,21 @@ go_bandit([]() {
         createProcesses(test_argv.size(), &test_argv[0]);
 
         unsigned int i;
-        for (i = 0; i < Process.size(); i++) {
-          auto process = Process.at(i);
-          std::string runInfo = std::string(Process.at(i).operatorName) +
+        for (i = 0; i < processNums(); i++) {
+          auto process = getProcess(i);
+          std::string runInfo = std::string(getProcess(i)->operatorName) +
                                 " in run: " + std::to_string(i + 1);
           bandit::it("created inputs for:" + runInfo, [&]() {
-            AssertThat(process.inputStreams.size(),
+            AssertThat(process->inputStreams.size(),
                        snowhouse::Equals(expectedInputs[i]));
           });
           bandit::it("created outputs for: " + runInfo, [&]() {
-            AssertThat(process.outputStreams.size(),
+            AssertThat(process->outputStreams.size(),
                        snowhouse::Equals(expectedOutputs[i]));
           });
         }
         bandit::it("created right amount of processes",
-                   [&]() { AssertThat(i, snowhouse::Equals(Process.size())); });
+                   [&]() { AssertThat(i, snowhouse::Equals(processNums())); });
       });
 
 });
