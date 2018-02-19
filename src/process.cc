@@ -131,9 +131,9 @@ void
 ProcessType::defPrompt()
 {
   if (m_ID == 0)
-    sprintf(prompt, "%s %s", CDO_progname, operatorName);
+    sprintf(prompt, "%s %s", Cdo::progname, operatorName);
   else
-    sprintf(prompt, "%s(%d) %s", CDO_progname, m_ID + 1, operatorName);
+    sprintf(prompt, "%s(%d) %s", Cdo::progname, m_ID + 1, operatorName);
 }
 
 const char *
