@@ -105,14 +105,15 @@ static
 void gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, int *vdateb, int *vtimeb)
 {
   juldate_t juldate;
-  int year, month, day;
   
   vdateb[0] = vdate;
   vdateb[1] = vdate;
   vtimeb[0] = 0;
   vtimeb[1] = 0;
           
+  int year, month, day;
   cdiDecodeDate(vdate, &year, &month, &day);
+
   if ( tunit == TUNIT_MONTH )
     {
       vdateb[0] = cdiEncodeDate(year, month, 1);
@@ -167,7 +168,6 @@ void *Settime(void *process)
   int sdate = 0, stime = 0;
   int taxisID2 = CDI_UNDEFID;
   size_t nmiss;
-  size_t gridsize;
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 1, incunit = 86400;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
@@ -438,12 +438,11 @@ void *Settime(void *process)
 
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-  pstreamDefVlist(streamID2, vlistID2);
+  int streamID2 = -1;
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
+  std::vector<double> array(gridsizemax);
 
   int tsID1 = 0;
   while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
@@ -547,6 +546,12 @@ void *Settime(void *process)
 	    }
 	}
 
+      if ( streamID2 == -1 )
+        {
+          streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+          pstreamDefVlist(streamID2, vlistID2);
+        }
+
       pstreamDefTimestep(streamID2, tsID1);
 	       
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -554,8 +559,8 @@ void *Settime(void *process)
 	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  pstreamDefRecord(streamID2,  varID,  levelID);
 	  
-	  pstreamReadRecord(streamID1, array, &nmiss);
-	  pstreamWriteRecord(streamID2, array, nmiss);
+	  pstreamReadRecord(streamID1, &array[0], &nmiss);
+	  pstreamWriteRecord(streamID2, &array[0], nmiss);
 	}
       
       tsID1++;
@@ -563,8 +568,6 @@ void *Settime(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if ( array ) Free(array);
 
   cdoFinish();
 
