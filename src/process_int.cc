@@ -103,12 +103,12 @@ int
 cdoStreamInqTimestep(int pstreamID, int tsID)
 {
   int nrecs = pstreamInqTimestep(pstreamID, tsID);
-  ntimesteps++;
+  processSelf().ntimesteps++;
   return nrecs;
  }
 
 int
-processInqTimesteps(int pstreamID);
+processInqTimesteps(int pstreamID)
 {
   return processSelf().ntimesteps;
 }
@@ -390,7 +390,7 @@ createProcesses(int argc, const char **argv)
   if (idx != argc - cntOutFiles)
     {
         CdoError::Abort(Cdo::progname ," To many inputs for operator '", lastAdded->operatorName,"'\n",
-               progname, " ", CdoDebug::argvToString(argc, argv));
+               Cdo::progname, " ", CdoDebug::argvToString(argc, argv));
     }
 
   while (!call_stack.empty())
