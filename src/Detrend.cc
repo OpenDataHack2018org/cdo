@@ -116,9 +116,9 @@ Detrend(void *process)
     }
 
   int nts = tsID;
-
-  NEW_2D(double, array1, Threading::ompNumThreads, nts);
-  NEW_2D(double, array2, Threading::ompNumThreads, nts);
+  
+  VECTOR_2D(double, array1, Threading::ompNumThreads, nts);
+  VECTOR_2D(double, array2, Threading::ompNumThreads, nts);
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -138,16 +138,13 @@ Detrend(void *process)
               for (int tsID = 0; tsID < nts; tsID++)
                 array1[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
-              detrend(nts, missval, array1[ompthID], array2[ompthID]);
+              detrend(nts, missval, &array1[ompthID][0], &array2[ompthID][0]);
 
               for (int tsID = 0; tsID < nts; tsID++)
                 vars[tsID][varID][levelID].ptr[i] = array2[ompthID][tsID];
             }
         }
     }
-
-  DELETE_2D(array1);
-  DELETE_2D(array2);
 
   for (int tsID = 0; tsID < nts; tsID++)
     {

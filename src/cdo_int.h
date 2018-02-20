@@ -90,6 +90,10 @@ enum T_EIGEN_MODE
 #define M_PI 3.14159265358979323846264338327950288 /* pi */
 #endif
 
+#define VECTOR_2D(T, P2D, N, M)                     \
+  std::vector<std::vector<T>> P2D(N);               \
+  if ((N))  for (size_t i = 0; i < (size_t)(N); ++i)  P2D[i].resize(M);
+
 #define NEW_2D(T, P2D, N, M)                     \
   T **P2D = (N) ? new T *[(N)] : nullptr;        \
   if ((N))                                       \

@@ -446,12 +446,12 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   if (nv != nvals) cdoAbort("Internal problem, number of valid values differ!");
 
-  NEW_2D(bool, nbr_mask, Threading::ompNumThreads,
-         numNeighbors);  // mask at nearest neighbors
-  NEW_2D(size_t, nbr_add, Threading::ompNumThreads,
-         numNeighbors);  // source address at nearest neighbors
-  NEW_2D(double, nbr_dist, Threading::ompNumThreads,
-         numNeighbors);  // angular distance four nearest neighbors
+  // mask at nearest neighbors
+  NEW_2D(bool, nbr_mask, Threading::ompNumThreads, numNeighbors);
+  // source address at nearest neighbors
+  VECTOR_2D(size_t, nbr_add, Threading::ompNumThreads, numNeighbors);
+  // angular distance four nearest neighbors
+  VECTOR_2D(double, nbr_dist, Threading::ompNumThreads, numNeighbors);
 
   clock_t start, finish;
   start = clock();
@@ -487,15 +487,14 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      grid_search_nbr(gs, numNeighbors, nbr_add[ompthID], nbr_dist[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
+      grid_search_nbr(gs, numNeighbors, &nbr_add[ompthID][0], &nbr_dist[ompthID][0], xvals[mindex[i]], yvals[mindex[i]]);
 
       /* Compute weights based on inverse distance if mask is false, eliminate
        * those points */
-      double dist_tot = nbr_compute_weights(numNeighbors, NULL, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
+      double dist_tot = nbr_compute_weights(numNeighbors, NULL, &nbr_mask[ompthID][0], &nbr_add[ompthID][0], &nbr_dist[ompthID][0]);
 
       /* Normalize weights and store the link */
-      size_t nadds
-          = nbr_normalize_weights(numNeighbors, dist_tot, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
+      size_t nadds = nbr_normalize_weights(numNeighbors, dist_tot, &nbr_mask[ompthID][0], &nbr_add[ompthID][0], &nbr_dist[ompthID][0]);
       if (nadds)
         {
           double result = 0;
@@ -510,8 +509,6 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   DELETE_2D(nbr_mask);
-  DELETE_2D(nbr_add);
-  DELETE_2D(nbr_dist);
 
   if (gs) gridsearch_delete(gs);
 
