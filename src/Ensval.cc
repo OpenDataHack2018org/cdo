@@ -228,11 +228,11 @@ void *Ensval(void *process)
   int tsID = 0;
   do
     {
-      nrecs0 = pstreamInqTimestep(ef[0].streamID, tsID);
+      nrecs0 = cdoStreamInqTimestep(ef[0].streamID, tsID);
       for ( fileID = 1; fileID < nfiles; fileID++ )
 	{
 	  streamID = ef[fileID].streamID;
-	  nrecs = pstreamInqTimestep(streamID, tsID);
+	  nrecs = cdoStreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0).c_str(), cdoGetStreamName(fileID).c_str());
 	}

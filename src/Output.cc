@@ -192,7 +192,7 @@ void *Output(void *process)
 
       int tsID = 0;
       int taxisID = vlistInqTaxis(vlistID);
-      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID, tsID)) )
 	{
 	  int vdate = taxisInqVdate(taxisID);
 	  int vtime = taxisInqVtime(taxisID);

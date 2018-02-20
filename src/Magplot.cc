@@ -1191,7 +1191,7 @@ void *Magplot(void *process)
 
   init_MAGICS( );
 
-  while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID, tsID)) )
     {
       if( ANIM_FLAG )
         {

@@ -203,12 +203,12 @@ void *Timstat2(void *process)
     }
  
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      int nrecs2 = pstreamInqTimestep(streamID2, tsID);
+      int nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
       if ( nrecs != nrecs2 )
         cdoWarning("Input streams have different number of records!");
 

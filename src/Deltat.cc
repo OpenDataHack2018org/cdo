@@ -54,7 +54,7 @@ void *Deltat(void *process)
   double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
 
   int tsID = 0;
-  int nrecs = pstreamInqTimestep(streamID1, tsID);
+  int nrecs = cdoStreamInqTimestep(streamID1, tsID);
   for ( int recID = 0; recID < nrecs; ++recID )
     {
       pstreamInqRecord(streamID1, &varID, &levelID);
@@ -64,7 +64,7 @@ void *Deltat(void *process)
 
   tsID++;
   int tsID2 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID2);

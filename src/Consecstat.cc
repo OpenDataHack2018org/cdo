@@ -167,7 +167,7 @@ void *Consecstat(void *process)
 
   int itsID = 0;
   int otsID = 0;
-  while ( (nrecs = pstreamInqTimestep(istreamID, itsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(istreamID, itsID)) )
   {
     vdate = taxisInqVdate(itaxisID);
     vtime = taxisInqVtime(itaxisID);

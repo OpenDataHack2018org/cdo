@@ -970,7 +970,7 @@ void *Maggraph(void *process)
 
       int tsID = 0;
       nts_alloc = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID, tsID)) )
 	{
 	  if ( nrecs != 1 ) cdoAbort("Input stream has more than one point in time!");
 	  

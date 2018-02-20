@@ -111,7 +111,7 @@ void *Timselpctl(void *process)
 
   for ( tsID = 0; tsID < noffset; tsID++ )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -135,8 +135,8 @@ void *Timselpctl(void *process)
 
   while ( TRUE )
     {
-      nrecs = pstreamInqTimestep(streamID2, otsID);
-      if ( nrecs != pstreamInqTimestep(streamID3, otsID) )
+      nrecs = cdoStreamInqTimestep(streamID2, otsID);
+      if ( nrecs != cdoStreamInqTimestep(streamID3, otsID) )
         cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
 
       int vdate2 = taxisInqVdate(taxisID2);
@@ -168,7 +168,7 @@ void *Timselpctl(void *process)
       if ( nrecs )
 	for ( nsets = 0; nsets < ndates; nsets++ )
 	  {
-	    nrecs = pstreamInqTimestep(streamID1, tsID);
+	    nrecs = cdoStreamInqTimestep(streamID1, tsID);
 	    if ( nrecs == 0 ) break;
 
 	    dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
@@ -222,7 +222,7 @@ void *Timselpctl(void *process)
 
       for ( int i = 0; i < nskip; i++ )
 	{
-	  nrecs = pstreamInqTimestep(streamID1, tsID);
+	  nrecs = cdoStreamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 	  tsID++;
 	}

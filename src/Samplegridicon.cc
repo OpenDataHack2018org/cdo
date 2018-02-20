@@ -593,7 +593,7 @@ void *Samplegridicon(void *process)
   double *array3 = (double *) Malloc(gridsize2*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       taxisCopyTimestep(taxisID3, taxisID1);

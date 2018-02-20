@@ -362,7 +362,7 @@ void *Seltime(void *process)
 
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);

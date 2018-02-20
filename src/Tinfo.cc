@@ -309,7 +309,7 @@ void *Tinfo(void *process)
       fprintf(stdout, "\n");
 
       tsID = 0;
-      while ( pstreamInqTimestep(streamID, tsID) )
+      while ( cdoStreamInqTimestep(streamID, tsID) )
 	{  
 	  vdate = taxisInqVdate(taxisID);
 	  vtime = taxisInqVtime(taxisID);

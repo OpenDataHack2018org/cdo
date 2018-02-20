@@ -133,7 +133,7 @@ void *Setmiss(void *process)
   double *array = (double*) Malloc(gridsizemax*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);

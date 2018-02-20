@@ -231,7 +231,7 @@ void *Merge(void *process)
 	  vlistID1  = vlistIDs[index];
 	  if ( vlistID1 == -1 ) continue;
 
-	  numrecs[index] = pstreamInqTimestep(streamID1, tsID);
+	  numrecs[index] = cdoStreamInqTimestep(streamID1, tsID);
 	}
 
       for ( index = 0; index < nmerge; index++ ) if ( numrecs[index] != 0 ) break;

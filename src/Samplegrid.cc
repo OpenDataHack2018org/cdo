@@ -185,7 +185,7 @@ void *Samplegrid(void *process)
   if ( CdoDebug::cdoDebugExt ) cdoPrint("gridsize = %ld, gridsize2 = %ld", gridsize, gridsize2);
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);

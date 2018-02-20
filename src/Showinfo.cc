@@ -80,7 +80,7 @@ void *Showinfo(void *process)
     {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) )
+	while ( cdoStreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 
@@ -100,7 +100,7 @@ void *Showinfo(void *process)
     {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) )
+	while ( cdoStreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 
@@ -121,7 +121,7 @@ void *Showinfo(void *process)
       char vdatestr[32];
       int tsID  = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) )
+	while ( cdoStreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	 
@@ -142,7 +142,7 @@ void *Showinfo(void *process)
       char vtimestr[32];
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) )
+	while ( cdoStreamInqTimestep(streamID, tsID) )
 	  {
 	    int vtime = taxisInqVtime(taxisID);
 
@@ -158,7 +158,7 @@ void *Showinfo(void *process)
       char vdatetimestr[64];
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) )
+	while ( cdoStreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    int vtime = taxisInqVtime(taxisID);

@@ -125,7 +125,7 @@ void *Splitsel(void *process)
   /* offset */
   for ( tsID = 0; tsID < noffset; tsID++ )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 )
 	{
 	  cdoWarning("noffset is larger than number of timesteps!");
@@ -156,7 +156,7 @@ void *Splitsel(void *process)
 
       for ( ; nsets < (int)(ndates*(index+1)); nsets++ ) 
 	{
-	  nrecs = pstreamInqTimestep(streamID1, tsID);
+	  nrecs = cdoStreamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
@@ -220,17 +220,17 @@ void *Splitsel(void *process)
       pstreamClose(streamID2);
       if ( nrecs == 0 ) break;
 
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       for ( ; i2 < (int)(nskip*(index+1)); i2++ )
 	{
-	  nrecs = pstreamInqTimestep(streamID1, tsID);
+	  nrecs = cdoStreamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 	  tsID++;
 	}
 
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       index++;

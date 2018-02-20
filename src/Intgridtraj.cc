@@ -127,7 +127,7 @@ void *Intgridtraj(void *process)
   int streamID2 = CDI_UNDEFID;
 
   int tsID = 0;
-  int nrecs = pstreamInqTimestep(streamID1, tsID++);
+  int nrecs = cdoStreamInqTimestep(streamID1, tsID++);
   juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
   for ( int recID = 0; recID < nrecs; recID++ )
     {
@@ -142,7 +142,7 @@ void *Intgridtraj(void *process)
   int tsIDo = 0;
   while ( juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate) )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID++);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID++);
       if ( nrecs == 0 ) break;
       juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
 

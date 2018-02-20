@@ -160,13 +160,13 @@ void *Replace(void *process)
   int nts2 = vlistNtsteps(vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID3, taxisID1);
 
       if ( tsID == 0 || (nts2 != 0 && nts2 != 1) )
 	{
-	  nrecs2 = pstreamInqTimestep(streamID2, tsID);
+	  nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
 	  if ( nrecs2 == 0 )
 	    cdoAbort("Input streams have different number of timesteps!");
 

@@ -446,7 +446,7 @@ void *Settime(void *process)
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID1 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);

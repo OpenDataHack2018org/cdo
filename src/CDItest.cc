@@ -72,7 +72,7 @@ void *CDItest(void *process)
 
       int tsID1 = 0;
       int tsID2 = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
 	{
 	  taxisCopyTimestep(taxisID2, taxisID1);
 

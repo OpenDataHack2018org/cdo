@@ -63,7 +63,7 @@ void *Splitrec(void *process)
 
   int index = 0;
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       for ( int recID = 0; recID < nrecs; recID++ )
 	{

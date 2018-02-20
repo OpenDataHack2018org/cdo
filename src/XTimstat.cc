@@ -120,7 +120,7 @@ void *cdoReadTimestep(void *rarg)
 
   // timer_stop(timer_read);
 
-  num_recs = pstreamInqTimestep(streamID, tsIDnext);
+  num_recs = cdoStreamInqTimestep(streamID, tsIDnext);
 
   return ((void *) &num_recs);
 }
@@ -313,7 +313,7 @@ void *XTimstat(void *process)
 
   int tsID  = 0;
   int otsID = 0;
-  int nrecs = pstreamInqTimestep(streamID1, tsID);
+  int nrecs = cdoStreamInqTimestep(streamID1, tsID);
   int maxrecs = nrecs;
   recinfo_type *recinfo = (recinfo_type *) Malloc(maxrecs*sizeof(recinfo_type));
   

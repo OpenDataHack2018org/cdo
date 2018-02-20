@@ -208,11 +208,11 @@ void *Arith(void *process)
 
   int tsID = 0;
   int tsID2 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamIDx1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamIDx1, tsID)) )
     {
       if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS )
 	{
-	  int nrecs2 = pstreamInqTimestep(streamIDx2, tsID2);
+	  int nrecs2 = cdoStreamInqTimestep(streamIDx2, tsID2);
 	  if ( nrecs2 == 0 )
 	    {
 	      if ( filltype == FILL_NONE && streamIDx2 == streamID2 )
@@ -233,7 +233,7 @@ void *Arith(void *process)
 
 		  vlistCompare(vlistID1, vlistID2, CMP_DIM);
 
-		  nrecs2 = pstreamInqTimestep(streamIDx2, tsID2);
+		  nrecs2 = cdoStreamInqTimestep(streamIDx2, tsID2);
 		  if ( nrecs2 == 0 )
 		    cdoAbort("Empty input stream %s!", cdoGetStreamName(1).c_str());
 		}

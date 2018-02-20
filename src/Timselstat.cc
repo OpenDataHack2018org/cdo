@@ -113,7 +113,7 @@ void *Timselstat(void *process)
 
   for ( tsID = 0; tsID < noffset; tsID++ )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -140,7 +140,7 @@ void *Timselstat(void *process)
     {
       for ( nsets = 0; nsets < ndates; nsets++ )
 	{
-	  nrecs = pstreamInqTimestep(streamID1, tsID);
+	  nrecs = cdoStreamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
@@ -292,7 +292,7 @@ void *Timselstat(void *process)
 
       for ( int i = 0; i < nskip; i++ )
 	{
-	  nrecs = pstreamInqTimestep(streamID1, tsID);
+	  nrecs = cdoStreamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 	  tsID++;
 	}

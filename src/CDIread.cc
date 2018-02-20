@@ -136,7 +136,7 @@ void *CDIread(void *process)
       t0 = timer_val(timer_read);
 
       int tsID = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID, tsID)) )
 	{
 
 	  for ( int recID = 0; recID < nrecs; recID++ )

@@ -1204,7 +1204,7 @@ void *Gradsdes(void *process)
   bool cal365day = (taxisInqCalendar(taxisID) == CALENDAR_365DAYS);
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID);
       int vtime = taxisInqVtime(taxisID);

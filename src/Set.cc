@@ -172,7 +172,7 @@ void *Set(void *process)
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID1 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID1);

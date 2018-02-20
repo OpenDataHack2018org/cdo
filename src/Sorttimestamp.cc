@@ -96,7 +96,7 @@ void *Sorttimestamp(void *process)
       nvars = vlistNvars(vlistID1);
 
       int tsID = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
 	{
 	  if ( xtsID >= nalloc )
 	    {

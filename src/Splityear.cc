@@ -121,7 +121,7 @@ void *Splityear(void *process)
   int mon1 = -1, mon2;
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 

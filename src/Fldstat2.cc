@@ -147,9 +147,9 @@ void *Fldstat2(void *process)
   double *weight = needWeights ? (double*) Malloc(gridsize*sizeof(double)) : NULL;
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
-      nrecs2 = pstreamInqTimestep(streamID2, tsID);
+      nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
 
       if ( nrecs2 == 0 )
 	{

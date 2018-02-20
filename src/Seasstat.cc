@@ -116,7 +116,7 @@ void *Seasstat(void *process)
     {
       long nsets = 0;
       bool newseas = false;
-      while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 	  int vdate = dtlist_get_vdate(dtlist, nsets);

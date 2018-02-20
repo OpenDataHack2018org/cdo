@@ -123,7 +123,7 @@ void *Cat(void *process)
       int ntsteps = vlistNtsteps(vlistID1);
 
       int tsID1 = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
 	{          
           double fstatus = (ntsteps > 1) ? indf+(tsID1+1.)/ntsteps : indf+1.;
           if ( !cdoVerbose ) progressStatus(0, 1, fstatus/nfiles);

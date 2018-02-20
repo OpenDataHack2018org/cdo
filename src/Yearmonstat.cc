@@ -95,7 +95,7 @@ void *Yearmonstat(void *process)
     {
       nsets = 0;
       dsets = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 	  vdate = dtlist_get_vdate(dtlist, nsets);

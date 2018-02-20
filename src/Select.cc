@@ -508,7 +508,7 @@ void *Select(void *process)
 
       bool lstop = false;
       int tsID1 = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
 	{
           timestep++;
 	  bool copytimestep = true;

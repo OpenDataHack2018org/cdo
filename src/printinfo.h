@@ -27,7 +27,7 @@
 #ifdef CDO
 #define  streamInqFiletype        pstreamInqFiletype
 #define  streamInqByteorder       pstreamInqByteorder
-#define  streamInqTimestep        pstreamInqTimestep
+#define  streamInqTimestep        cdoStreamInqTimestep
 #endif
 
 #define DATE_FORMAT "%5.4d-%2.2d-%2.2d"

@@ -84,7 +84,7 @@ void *Eofcoeff3d(void *process)
   int eofID = 0;
   while ( 1 )       
    {     
-     nrecs = pstreamInqTimestep(streamID1, eofID);
+     nrecs = cdoStreamInqTimestep(streamID1, eofID);
      if ( nrecs == 0) break;
 
      for ( int recID = 0; recID < nrecs; recID++ )
@@ -181,7 +181,7 @@ void *Eofcoeff3d(void *process)
   int tsID = 0;
   while ( 1 )
     {      
-      nrecs = pstreamInqTimestep(streamID2, tsID);
+      nrecs = cdoStreamInqTimestep(streamID2, tsID);
       if ( nrecs == 0 ) break;
 
       for ( varID = 0; varID < nvars; varID++ )

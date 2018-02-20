@@ -109,7 +109,7 @@ void *Yhourarith(void *process)
   for ( houroy = 0; houroy < MAX_HOUR ; ++houroy ) vardata2[houroy] = NULL;
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
     {
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
@@ -144,7 +144,7 @@ void *Yhourarith(void *process)
 
 
   tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);

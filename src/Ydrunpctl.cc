@@ -123,9 +123,9 @@ void *Ydrunpctl(void *process)
     }
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
     {
-      if ( nrecs != pstreamInqTimestep(streamID3, tsID) )
+      if ( nrecs != cdoStreamInqTimestep(streamID3, tsID) )
         cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
       
       vdate = taxisInqVdate(taxisID2);
@@ -185,7 +185,7 @@ void *Ydrunpctl(void *process)
   
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 )
 	cdoAbort("File has less then %d timesteps!", ndates);
 
@@ -249,7 +249,7 @@ void *Ydrunpctl(void *process)
 	  vars1[inp] = vars1[inp+1];
 	}
 
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       datetime[ndates-1].date = taxisInqVdate(taxisID1);

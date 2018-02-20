@@ -484,10 +484,10 @@ void *Collgrid(void *process)
   int tsID = 0;
   do
     {
-      nrecs0 = pstreamInqTimestep(ef[0].streamID, tsID);
+      nrecs0 = cdoStreamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
-	  int nrecs = pstreamInqTimestep(ef[fileID].streamID, tsID);
+	  int nrecs = cdoStreamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(0).c_str(), cdoGetStreamName(fileID).c_str());
 	}

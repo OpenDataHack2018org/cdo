@@ -264,11 +264,11 @@ void *Ensstat(void *process)
   int tsID = 0;
   do
     {
-      nrecs0 = pstreamInqTimestep(ef[0].streamID, tsID);
+      nrecs0 = cdoStreamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
 	  int streamID = ef[fileID].streamID;
-	  int nrecs = pstreamInqTimestep(streamID, tsID);
+	  int nrecs = cdoStreamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    {
 	      if ( nrecs == 0 )

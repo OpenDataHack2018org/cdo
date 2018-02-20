@@ -66,7 +66,7 @@ void *Tocomplex(void *process)
       
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID2++);

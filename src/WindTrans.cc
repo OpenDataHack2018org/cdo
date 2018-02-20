@@ -494,7 +494,7 @@ void *DestaggerUV()
   vlistID2 = cdoStreamInqVlist(streamID2); // refresh it
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
@@ -1223,7 +1223,7 @@ void *TransformUV(int operatorID)
   vlistID2 = cdoStreamInqVlist(streamID2); // refresh it
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
@@ -1446,7 +1446,7 @@ void *TransformUV(int operatorID)
         }
 
       tsID++;
-    } // end of while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+    } // end of while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

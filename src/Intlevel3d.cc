@@ -172,7 +172,7 @@ void *Intlevel3d(void *process)
     zlevels_out = (double*) Malloc(gridsize*nlevel*sizeof(double));
     nlevo       = nlevel;  /* number of output levels for later use */
     gridsizeo   = gridsize;/* horizontal gridsize of output z coordinate */
-    nrecs       = pstreamInqTimestep(streamID2, 0);
+    nrecs       = cdoStreamInqTimestep(streamID2, 0);
     if (cdoVerbose) cdoPrint("%d records target 3d vertical height and gridsize %zu",nrecs,gridsize);
 
     for ( int recID = 0; recID < nrecs; recID++ )
@@ -339,7 +339,7 @@ void *Intlevel3d(void *process)
   if ( varID == nvars ) cdoAbort("No processable variable found!");
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = false;
 

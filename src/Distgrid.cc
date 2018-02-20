@@ -334,7 +334,7 @@ void *Distgrid(void *process)
 
   if ( ngrids > 1 ) cdoPrint("Baustelle: number of different grids > 1!");
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       for ( size_t index = 0; index < nsplit; index++ )
 	pstreamDefTimestep(streamIDs[index], tsID);

@@ -399,13 +399,13 @@ void *Mrotuvb(void *process)
     }
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID3, taxisID1);
 
       pstreamDefTimestep(streamID3, tsID);
 
-      nrecs2 = pstreamInqTimestep(streamID2, tsID);
+      nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
 
       if ( nrecs != nrecs2 ) cdoAbort("Input streams have different number of levels!");
 	       

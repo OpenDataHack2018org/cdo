@@ -253,7 +253,7 @@ void *NCL_wind(void *process)
   std::vector<double> arrayo(nlev*gridsizeuv);
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       size_t nmissu = 0, nmissv = 0;
 

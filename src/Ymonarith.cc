@@ -98,7 +98,7 @@ void *Ymonarith(void *process)
   for ( mon = 0; mon < MAX_MON ; mon++ ) vardata2[mon] = NULL;
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
     {
       vdate = taxisInqVdate(taxisID2);
 
@@ -143,7 +143,7 @@ void *Ymonarith(void *process)
 
 
   tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
 

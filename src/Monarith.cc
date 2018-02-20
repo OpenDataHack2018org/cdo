@@ -88,7 +88,7 @@ void *Monarith(void *process)
 
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID1);
       int yearmon1 = vdate / 100;
@@ -102,7 +102,7 @@ void *Monarith(void *process)
 
 	  if ( cdoVerbose ) cdoPrint("Process: Year = %4d  Month = %2d", year1, mon1);
 
-	  nrecs2 = pstreamInqTimestep(streamID2, tsID2);
+	  nrecs2 = cdoStreamInqTimestep(streamID2, tsID2);
 	  if ( nrecs2 == 0 )
 	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoGetStreamName(1).c_str());
 

@@ -67,7 +67,7 @@ void *Subtrend(void *process)
 
 
   int tsID = 0;
-  int nrecs = pstreamInqTimestep(streamID2, tsID);
+  int nrecs = cdoStreamInqTimestep(streamID2, tsID);
 
   for ( int recID = 0; recID < nrecs; recID++ )
     {
@@ -76,7 +76,7 @@ void *Subtrend(void *process)
     }
 
   tsID = 0;
-  nrecs = pstreamInqTimestep(streamID3, tsID);
+  nrecs = cdoStreamInqTimestep(streamID3, tsID);
 
   for ( int recID = 0; recID < nrecs; recID++ )
     {
@@ -86,7 +86,7 @@ void *Subtrend(void *process)
 
 
   tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID4, taxisID1);
       pstreamDefTimestep(streamID4, tsID);

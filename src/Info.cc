@@ -314,7 +314,7 @@ void *Info(void *process)
 
       int indg = 0;
       int tsID = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID, 0);
 	  int vdate = dtlist_get_vdate(dtlist, 0);

@@ -956,7 +956,7 @@ void *Selbox(void *process)
   double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);

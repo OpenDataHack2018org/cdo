@@ -1590,7 +1590,7 @@ void *Echam5ini(void *process)
 	  vars[varID].ptr = (double*) Malloc(nlev*gridsize*sizeof(double));
 	}
 
-      nrecs = pstreamInqTimestep(streamID1, 0);
+      nrecs = cdoStreamInqTimestep(streamID1, 0);
       vdate = taxisInqVdate(taxisID);
       vtime = taxisInqVtime(taxisID);
 

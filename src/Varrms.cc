@@ -113,9 +113,9 @@ void *Varrms(void *process)
   field3.grid = gridID3;
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
-      nrecs = pstreamInqTimestep(streamID2, tsID);
+      nrecs = cdoStreamInqTimestep(streamID2, tsID);
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);

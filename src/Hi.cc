@@ -144,10 +144,10 @@ void *Hi(void *process)
   pstreamDefVlist(streamID4, vlistID4);
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
-      int nrecs2 = pstreamInqTimestep(streamID2, tsID);
-      int nrecs3 = pstreamInqTimestep(streamID3, tsID);
+      int nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
+      int nrecs3 = cdoStreamInqTimestep(streamID3, tsID);
       if ( nrecs2 == 0 || nrecs3 == 0 )
         cdoAbort("Input streams have different number of timesteps!");
 

@@ -159,7 +159,7 @@ void *Timstat3(void *process)
 	{
 	  if ( reached_eof[is] ) continue;
 
-	  nrecs = pstreamInqTimestep(streamID[is], tsID);
+	  nrecs = cdoStreamInqTimestep(streamID[is], tsID);
 	  if ( nrecs == 0 )
 	    {
 	      reached_eof[is] = 1;

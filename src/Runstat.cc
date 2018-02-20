@@ -131,7 +131,7 @@ void *Runstat(void *process)
   int tsID = 0;
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
-      int nrecs = pstreamInqTimestep(streamID1, tsID);
+      int nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) cdoAbort("File has less then %d timesteps!", ndates);
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
@@ -289,7 +289,7 @@ void *Runstat(void *process)
 	  if ( lvarstd || lrange ) vars2[inp] = vars2[inp+1];
 	}
 
-      int nrecs = pstreamInqTimestep(streamID1, tsID);
+      int nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, ndates-1);

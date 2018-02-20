@@ -445,7 +445,7 @@ void *Split(void *process)
 
   int nrecs;
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       for ( int index = 0; index < nsplit; index++ )
 	pstreamDefTimestep(streamIDs[index], tsID);

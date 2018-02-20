@@ -119,8 +119,8 @@ void *Seaspctl(void *process)
   int otsID = 0;
   while ( TRUE )
     {
-      nrecs = pstreamInqTimestep(streamID2, otsID);
-      if ( nrecs != pstreamInqTimestep(streamID3, otsID) )
+      nrecs = cdoStreamInqTimestep(streamID2, otsID);
+      if ( nrecs != cdoStreamInqTimestep(streamID3, otsID) )
         cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
       
       int vdate2 = taxisInqVdate(taxisID2);
@@ -150,7 +150,7 @@ void *Seaspctl(void *process)
 
       int nsets   = 0;
       bool newseas = false;
-      while ( nrecs && (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+      while ( nrecs && (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 	  int vdate1 = dtlist_get_vdate(dtlist, nsets);

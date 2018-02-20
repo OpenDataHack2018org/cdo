@@ -874,7 +874,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
     {
       ntsteps = 0;
       int dummy;
-      while ( ( dummy = pstreamInqTimestep(streamID2, ntsteps++) ) );
+      while ( ( dummy = cdoStreamInqTimestep(streamID2, ntsteps++) ) );
     }
 
   int axissize[3];
@@ -957,7 +957,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, const char *key, stru
 
   int tsID = 0, nrecs = 0;
 
-  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
     {
       while ( nrecs-- )
         {
@@ -3505,7 +3505,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
       int taxisID2 = vlistInqTaxis(vlistID2);
       if ( ntsteps < 0 )
         {
-          while ( ( recdummy = pstreamInqTimestep(streamID2, reccounter++) ) );
+          while ( ( recdummy = cdoStreamInqTimestep(streamID2, reccounter++) ) );
           ntsteps = reccounter;
         }    
       ntsteps-=1;
@@ -3513,9 +3513,9 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
 
       if ( ntsteps > 2 )
         {
-          int recfirst = pstreamInqTimestep(streamID2, 0);
+          int recfirst = cdoStreamInqTimestep(streamID2, 0);
           cdiDecodeDate(taxisInqVdate(taxisID2), &fyear, &fmonth, &dummytwo);
-          int reclast = pstreamInqTimestep(streamID2, ntsteps);    
+          int reclast = cdoStreamInqTimestep(streamID2, ntsteps);    
           cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummytwo);
 
           double covered_years = lyear-fyear + 1.0;
@@ -3542,7 +3542,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
               reccounter = 0;
               if ( cdoVerbose )
                 cdoPrint("Frequency could not be determined by comparing all time steps (%d) divided by covered years (%f).\n          It is now calculated by counting all timesteps in year %d\n          in order to calculate time bounds in case they are not given.", ntsteps, covered_years, fyear);
-              while ( ( recdummy = pstreamInqTimestep(streamID2, reccounter++) ) )
+              while ( ( recdummy = cdoStreamInqTimestep(streamID2, reccounter++) ) )
                 {
                   int reqyear;
                   cdiDecodeDate(taxisInqVdate(taxisID2), &reqyear, &lmonth, &dummytwo);
@@ -3939,7 +3939,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   if ( ntsteps < 0 )
     {
       ntsteps = 0;
-      while ( pstreamInqTimestep(streamID2, ntsteps++)) ;
+      while ( cdoStreamInqTimestep(streamID2, ntsteps++)) ;
       if ( ntsteps == 0 )
         {
           cdoWarning("In checking whether append mode is possible:\n          No time steps found in infile.\n          Switched to replace mode for this variable.");
@@ -4178,7 +4178,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
 
   if ( cdoVerbose )
     cdoPrint("10.4. Start to loop over time steps.");
-  while ( (nrecs = pstreamInqTimestep(*streamID, tsID++)) )
+  while ( (nrecs = cdoStreamInqTimestep(*streamID, tsID++)) )
     { 
       double time_bnds[2];
       double *time_bndsp;

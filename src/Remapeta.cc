@@ -581,7 +581,7 @@ Remapeta(void *process)
     cdoPrint("nvars3D = %d   ltq = %d", nvars3D, (int) ltq);
 
   int tsID = 0;
-  while ((nrecs = pstreamInqTimestep(streamID1, tsID)))
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);

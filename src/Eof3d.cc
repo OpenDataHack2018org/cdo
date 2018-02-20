@@ -103,7 +103,7 @@ void *EOF3d(void *process)
   if ( nts == -1 )
     {
       nts = 0;
-      while ( pstreamInqTimestep(streamID1, nts) ) nts++;
+      while ( cdoStreamInqTimestep(streamID1, nts) ) nts++;
 
       if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
 
@@ -209,7 +209,7 @@ void *EOF3d(void *process)
   /* read the data and create covariance matrices for each var & level */
   while ( TRUE )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       for ( int recID = 0; recID < nrecs; recID++ )

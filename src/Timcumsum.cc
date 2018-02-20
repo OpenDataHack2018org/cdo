@@ -58,7 +58,7 @@ void *Timcumsum(void *process)
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID  = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);

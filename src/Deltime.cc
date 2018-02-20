@@ -103,7 +103,7 @@ void *Deltime(void *process)
   int nfound = 0;
   int tsID  = 0;
   int tsID2 = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       // vtime = taxisInqVtime(taxisID1);

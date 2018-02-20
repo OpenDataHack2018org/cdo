@@ -125,7 +125,7 @@ void *Ydrunstat(void *process)
   
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 )
 	cdoAbort("File has less then %d timesteps!", ndates);
 
@@ -193,7 +193,7 @@ void *Ydrunstat(void *process)
 	    vars2[inp] = vars2[inp+1];
 	}
 
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       datetime[ndates-1].date = taxisInqVdate(taxisID1);

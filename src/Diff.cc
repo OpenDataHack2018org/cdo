@@ -77,14 +77,14 @@ void *Diff(void *process)
   int taxisID = vlistInqTaxis(vlistID1);
   while ( TRUE )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs > 0 )
 	{
 	  date2str(taxisInqVdate(taxisID), vdatestr, sizeof(vdatestr));
 	  time2str(taxisInqVtime(taxisID), vtimestr, sizeof(vtimestr));
 	}
 
-      nrecs2 = pstreamInqTimestep(streamID2, tsID);
+      nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
 
       if ( nrecs == 0 || nrecs2 == 0 ) break;
 

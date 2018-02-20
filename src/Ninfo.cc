@@ -74,7 +74,7 @@ void *Ninfo(void *process)
       int nyear = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) )
+	while ( cdoStreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    cdiDecodeDate(vdate, &year, &mon, &day);
@@ -95,7 +95,7 @@ void *Ninfo(void *process)
       int nmon = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) )
+	while ( cdoStreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    cdiDecodeDate(vdate, &year, &mon, &day);
@@ -116,7 +116,7 @@ void *Ninfo(void *process)
       int ndate = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) )
+	while ( cdoStreamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    
@@ -135,7 +135,7 @@ void *Ninfo(void *process)
       {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( pstreamInqTimestep(streamID, tsID) ) tsID++;
+	while ( cdoStreamInqTimestep(streamID, tsID) ) tsID++;
       fprintf(stdout, "%d\n", tsID);
       break;
       }

@@ -407,7 +407,7 @@ void *Outputgmt(void *process)
     }
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID, tsID)) )
     {
       int vdate = taxisInqVdate(taxisID);
       int vtime = taxisInqVtime(taxisID);

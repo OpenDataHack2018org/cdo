@@ -132,7 +132,7 @@ void *Copy(void *process)
 	}
 
       int tsID1 = 0;
-      while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
 	{
 	  taxisCopyTimestep(taxisID2, taxisID1);
 

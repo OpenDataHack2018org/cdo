@@ -183,7 +183,7 @@ void eca1(const ECA_REQUEST_1 *request)
   while ( TRUE )
     {
       nsets = 0;
-      while ( (nrecs = pstreamInqTimestep(istreamID, itsID)) > 0 )
+      while ( (nrecs = cdoStreamInqTimestep(istreamID, itsID)) > 0 )
         {
           ivdate = taxisInqVdate(itaxisID);
           ivtime = taxisInqVtime(itaxisID);
@@ -556,9 +556,9 @@ void eca2(const ECA_REQUEST_2 *request)
   while ( TRUE )
     {
       nsets = 0;
-      while ( (nrecs = pstreamInqTimestep(istreamID1, itsID)) > 0 )
+      while ( (nrecs = cdoStreamInqTimestep(istreamID1, itsID)) > 0 )
         {
-	  if ( !pstreamInqTimestep(istreamID2, itsID) )
+	  if ( !cdoStreamInqTimestep(istreamID2, itsID) )
 	    cdoAbort("Input streams have different number of time steps!");
 
           ivdate = taxisInqVdate(itaxisID1);
@@ -884,9 +884,9 @@ void eca3(const ECA_REQUEST_3 *request)
   while ( TRUE )
     {
       nsets = 0;
-      while ( (nrecs = pstreamInqTimestep(istreamID1, itsID)) > 0 )
+      while ( (nrecs = cdoStreamInqTimestep(istreamID1, itsID)) > 0 )
         {
-	  if ( !pstreamInqTimestep(istreamID2, itsID) )
+	  if ( !cdoStreamInqTimestep(istreamID2, itsID) )
 	    cdoAbort("Input streams have different number of time steps!");
             
           ivdate1 = taxisInqVdate(itaxisID1);
@@ -1159,7 +1159,7 @@ void eca4(const ECA_REQUEST_4 *request)
   int itsID   = 0;
   int otsID   = 0;
 
-  if ( pstreamInqTimestep(istreamID2, itsID) )
+  if ( cdoStreamInqTimestep(istreamID2, itsID) )
     {
       pstreamInqRecord(istreamID2, &varID, &levelID);
       pstreamReadRecord(istreamID2, mask.ptr, &nmiss);
@@ -1174,7 +1174,7 @@ void eca4(const ECA_REQUEST_4 *request)
   while ( TRUE )
     {
       long nsets = 0;
-      while ( (nrecs = pstreamInqTimestep(istreamID1, itsID)) > 0 )
+      while ( (nrecs = cdoStreamInqTimestep(istreamID1, itsID)) > 0 )
         {
           ivdate = taxisInqVdate(itaxisID);
           ivtime = taxisInqVtime(itaxisID);

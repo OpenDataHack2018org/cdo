@@ -94,7 +94,7 @@ void *Detrend(void *process)
   std::vector<field_type**> vars;
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
 	{

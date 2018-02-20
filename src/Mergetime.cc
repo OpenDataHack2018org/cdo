@@ -85,7 +85,7 @@ void *Mergetime(void *process)
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       sf[fileID].tsID = 0;
-      sf[fileID].nrecs = pstreamInqTimestep(sf[fileID].streamID, sf[fileID].tsID);
+      sf[fileID].nrecs = cdoStreamInqTimestep(sf[fileID].streamID, sf[fileID].tsID);
       if ( sf[fileID].nrecs == 0 )
 	{
 	  pstreamClose(sf[fileID].streamID);
@@ -194,7 +194,7 @@ void *Mergetime(void *process)
 	  tsID2++;
 	}
 
-      sf[fileID].nrecs = pstreamInqTimestep(sf[fileID].streamID, ++sf[fileID].tsID);
+      sf[fileID].nrecs = cdoStreamInqTimestep(sf[fileID].streamID, ++sf[fileID].tsID);
       if ( sf[fileID].nrecs == 0 )
 	{
 	  pstreamClose(sf[fileID].streamID);

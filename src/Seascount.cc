@@ -75,7 +75,7 @@ void *Seascount(void *process)
     {
       int nsets = 0;
       bool newseas = false;
-      while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
         {
           int vdate = taxisInqVdate(taxisID1);
           int vtime = taxisInqVtime(taxisID1);

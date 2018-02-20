@@ -78,7 +78,7 @@ void *Trend(void *process)
     work[w] = field_calloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);

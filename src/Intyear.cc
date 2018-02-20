@@ -89,9 +89,9 @@ void *Intyear(void *process)
   int tsID = 0;
   while ( TRUE )
     {
-      nrecs = pstreamInqTimestep(streamID1, tsID);
+      nrecs = cdoStreamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
-      nrecs = pstreamInqTimestep(streamID2, tsID);
+      nrecs = cdoStreamInqTimestep(streamID2, tsID);
       if ( nrecs == 0 ) cdoAbort("Too few timesteps in second inputfile!");
 
       int vtime  = taxisInqVtime(taxisID1);

@@ -148,7 +148,7 @@ void *Splittime(void *process)
     }
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       int vdate = taxisInqVdate(taxisID1);

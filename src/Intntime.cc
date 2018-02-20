@@ -88,7 +88,7 @@ void *Intntime(void *process)
 
   int tsID = 0;
   int tsIDo = 0;
-  int nrecs = pstreamInqTimestep(streamID1, tsID++);
+  int nrecs = cdoStreamInqTimestep(streamID1, tsID++);
   int vdate1 = taxisInqVdate(taxisID1);
   int vtime1 = taxisInqVtime(taxisID1);
   juldate_t juldate1 = juldate_encode(calendar, vdate1, vtime1);
@@ -107,7 +107,7 @@ void *Intntime(void *process)
       pstreamWriteRecord(streamID2, single1, nmiss1[varID][levelID]);
     }
 
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID++)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID++)) )
     {
       int vdate2 = taxisInqVdate(taxisID1);
       int vtime2 = taxisInqVtime(taxisID1);

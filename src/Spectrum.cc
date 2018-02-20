@@ -190,7 +190,7 @@ void *Spectrum(void *process)
   std::vector<int> vdate, vtime;
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
 	{

@@ -113,14 +113,14 @@ void *Cond2(void *process)
     }
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
     {
-      nrecs = pstreamInqTimestep(streamID3, tsID);
+      nrecs = cdoStreamInqTimestep(streamID3, tsID);
       if ( nrecs == 0 ) cdoAbort("Input streams have different number of timesteps!");
 
       if ( tsID == 0 || filltype == FILL_NONE )
 	{
-	  nrecs2 = pstreamInqTimestep(streamID1, tsID);
+	  nrecs2 = cdoStreamInqTimestep(streamID1, tsID);
 	  if ( nrecs2 == 0 )
 	    cdoAbort("Input streams have different number of timesteps!");
 	}

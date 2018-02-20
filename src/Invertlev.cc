@@ -155,7 +155,7 @@ void *Invertlev(void *process)
   if ( linvert == false ) cdoWarning("No variables with invertable levels found!");
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 

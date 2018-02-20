@@ -111,9 +111,9 @@ void *Yseaspctl(void *process)
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
     {
-      if ( nrecs != pstreamInqTimestep(streamID3, tsID) )
+      if ( nrecs != cdoStreamInqTimestep(streamID3, tsID) )
         cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
       
       vdate = taxisInqVdate(taxisID2);
@@ -165,7 +165,7 @@ void *Yseaspctl(void *process)
     }
 
   tsID = 0;
-  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
