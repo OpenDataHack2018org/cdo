@@ -43,41 +43,41 @@ void genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals, size_t nx
   bool lxcoord = gridInqXvals(gridID1, NULL) > 0;
   bool lycoord = gridInqYvals(gridID1, NULL) > 0;
 
-  double *xvals = NULL, *yvals = NULL;
-  double *xvals2 = NULL, *yvals2 = NULL;
+  std::vector<double> xvals, yvals;
+  std::vector<double> xvals2, yvals2;
 
   if ( lxcoord )
     {
       if ( lregular )
         {
-          xvals = (double*) Malloc(nx*sizeof(double));
+          xvals.resize(nx);
         }
       else
         {
-          xvals = (double*) Malloc(nx*ny*sizeof(double));
-          xvals2 = (double*) Malloc(nxvals*nyvals*sizeof(double));
+          xvals.resize(nx*ny);
+          xvals2.resize(nxvals*nyvals);
         }
       
-      gridInqXvals(gridID1, xvals);
+      gridInqXvals(gridID1, &xvals[0]);
     }
 
   if ( lycoord )
     {
       if ( lregular )
         {
-          yvals = (double*) Malloc(ny*sizeof(double));
+          yvals.resize(ny);
         }
       else
         {
-          yvals = (double*) Malloc(nx*ny*sizeof(double));
-          yvals2 = (double*) Malloc(nxvals*nyvals*sizeof(double));
+          yvals.resize(nx*ny);
+          yvals2.resize(nxvals*nyvals);
         }
 
-      gridInqYvals(gridID1, yvals);
+      gridInqYvals(gridID1, &yvals[0]);
     }
  
-  size_t *xlsize = (size_t*) Malloc(nxblocks*sizeof(size_t));
-  size_t *ylsize = (size_t*) Malloc(nyblocks*sizeof(size_t));
+  std::vector<size_t> xlsize(nxblocks);
+  std::vector<size_t> ylsize(nyblocks);
 
   for ( size_t ix = 0; ix < nxblocks; ++ix ) xlsize[ix] = nxvals;
   if ( nx%nxblocks != 0 ) xlsize[nxblocks-1] = nx - (nxblocks-1)*nxvals;
@@ -92,7 +92,6 @@ void genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals, size_t nx
     for ( size_t ix = 0; ix < nxblocks; ++ix )
       {
 	size_t offset = iy*nyvals*nx + ix*nxvals;
-
 	size_t gridsize2 = xlsize[ix]*ylsize[iy];
 	gridindex[index] = (size_t*) Malloc(gridsize2*sizeof(size_t));
 
@@ -124,13 +123,13 @@ void genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals, size_t nx
 
         if ( lregular )
           {
-            if ( lxcoord ) gridDefXvals(gridID2, xvals+ix*nxvals);
-            if ( lycoord ) gridDefYvals(gridID2, yvals+iy*nyvals);
+            if ( lxcoord ) gridDefXvals(gridID2, &xvals[ix*nxvals]);
+            if ( lycoord ) gridDefYvals(gridID2, &yvals[iy*nyvals]);
           }
         else
           {
-            if ( lxcoord ) gridDefXvals(gridID2, xvals2);
-            if ( lycoord ) gridDefYvals(gridID2, yvals2);
+            if ( lxcoord ) gridDefXvals(gridID2, &xvals2[0]);
+            if ( lycoord ) gridDefYvals(gridID2, &yvals2[0]);
           }
 
         int projID1 = gridInqProj(gridID1);
@@ -175,14 +174,8 @@ void genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals, size_t nx
 	  cdoAbort("Internal problem, index exceeded bounds!");
       }
 
-  if ( xvals2 ) Free(xvals2);
-  if ( yvals2 ) Free(yvals2);
-  if ( xvals ) Free(xvals);
-  if ( yvals ) Free(yvals);
   if ( xpvals ) Free(xpvals);
   if ( ypvals ) Free(ypvals);
-  if ( xlsize ) Free(xlsize);
-  if ( ylsize ) Free(ylsize);
 }
 
 static
@@ -198,7 +191,7 @@ typedef struct
   int *gridIDs;
   size_t *gridsize;
   size_t **gridindex;
-} sgrid_t;
+} sgridType;
 
 
 void *Distgrid(void *process)
@@ -211,7 +204,6 @@ void *Distgrid(void *process)
   int index;
   int gridtype = -1;
   size_t nmiss;
-  int i;
 
   cdoInitialize(process);
 
@@ -226,7 +218,6 @@ void *Distgrid(void *process)
   if ( nyblocks == 0 ) cdoAbort("nyblocks has to be greater than 0!");
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
-
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int ngrids = vlistNgrids(vlistID1);
@@ -274,12 +265,11 @@ void *Distgrid(void *process)
   size_t nsplit = nxblocks*nyblocks;
   if ( nsplit > MAX_BLOCKS ) cdoAbort("Too many blocks (max = %d)!", MAX_BLOCKS);
 
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  std::vector<double> array1(gridsize);
+  std::vector<int> vlistIDs(nsplit);
+  std::vector<int> streamIDs(nsplit);
 
-  int *vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
-  int *streamIDs = (int*) Malloc(nsplit*sizeof(int));
-
-  sgrid_t *grids = (sgrid_t*) Malloc(ngrids*sizeof(sgrid_t));
+  sgridType *grids = (sgridType*) Malloc(ngrids*sizeof(sgridType));
   for ( int i = 0; i < ngrids; i++ )
     {  
       grids[i].gridID    = vlistGrid(vlistID1, i);
@@ -298,7 +288,7 @@ void *Distgrid(void *process)
   for ( int i = 0; i < ngrids; i++ )
     {
       gridID1 = vlistGrid(vlistID1, i);
-      genGrids(gridID1, grids[i].gridIDs, xinc, yinc, nxblocks, nyblocks, grids[i].gridindex, grids[i].gridsize, nsplit);
+      genGrids(gridID1, &grids[i].gridIDs[0], xinc, yinc, nxblocks, nyblocks, grids[i].gridindex, grids[i].gridsize, nsplit);
       /*
       if ( cdoVerbose )
 	for ( size_t index = 0; index < nsplit; index++ )
@@ -312,7 +302,7 @@ void *Distgrid(void *process)
   for ( size_t index = 0; index < nsplit; index++ )
     if ( grids[0].gridsize[index] > gridsize2max ) gridsize2max = grids[0].gridsize[index];
 
-  double *array2 = (double*) Malloc(gridsize2max*sizeof(double));
+  std::vector<double> array2(gridsize2max);
 
   strcpy(filename, cdoGetObase());
   int nchars = strlen(filename);
@@ -328,7 +318,6 @@ void *Distgrid(void *process)
 	sprintf(filename+nchars+5, "%s", filesuffix);
 
       streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
-
       pstreamDefVlist(streamIDs[index], vlistIDs[index]);
     }
 
@@ -342,17 +331,17 @@ void *Distgrid(void *process)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, array1, &nmiss);
+	  pstreamReadRecord(streamID1, &array1[0], &nmiss);
 
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 
 	  for ( size_t index = 0; index < nsplit; index++ )
 	    {
-	      i = 0;
-	      window_cell(array1, array2, grids[i].gridsize[index], grids[i].gridindex[index]);
+	      int i = 0;
+	      window_cell(&array1[0], &array2[0], grids[i].gridsize[index], grids[i].gridindex[index]);
 	      pstreamDefRecord(streamIDs[index], varID, levelID);
-	      if ( nmiss > 0 ) nmiss = arrayNumMV(grids[i].gridsize[index], array2, missval);
-	      pstreamWriteRecord(streamIDs[index], array2, nmiss);
+	      if ( nmiss > 0 ) nmiss = arrayNumMV(grids[i].gridsize[index], &array2[0], missval);
+	      pstreamWriteRecord(streamIDs[index], &array2[0], nmiss);
 	    }
 	}
 
@@ -366,12 +355,6 @@ void *Distgrid(void *process)
       pstreamClose(streamIDs[index]);
       vlistDestroy(vlistIDs[index]);
     }
-
-  if ( array1 ) Free(array1);
-  if ( array2 ) Free(array2);
-
-  if ( vlistIDs  ) Free(vlistIDs);
-  if ( streamIDs ) Free(streamIDs);
 
   for ( int i = 0; i < ngrids; i++ )
     {
