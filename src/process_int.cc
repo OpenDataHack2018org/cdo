@@ -24,21 +24,20 @@
 #include <sys/stat.h> /* stat */
 
 #include <map>
-#include <vector>
 #include <stack>
+#include <vector>
 
 // Debug and message includes
-#include <cdi.h>
 #include "cdoDebugOutput.h"
 #include "exception.h"
+#include <cdi.h>
 
+#include "cdoOptions.h"
+#include "exception.h"
 #include "process_int.h"
 #include "pstream_int.h"
 #include "util_files.h"
-#include "cdoOptions.h"
-#include "exception.h"
 #include "util_operatorStrings.h"
-#include "util_files.h"
 
 std::map<int, ProcessType> Process;
 std::map<int, char *> obase;
@@ -59,16 +58,17 @@ processSelf(void)
 
   pthread_mutex_lock(&processMutex);
 
-  for (auto &id_process_pair : Process){
-    if (id_process_pair.second.l_threadID)
-      {
-        if (pthread_equal(id_process_pair.second.threadID, thID))
-          {
-            pthread_mutex_unlock(&processMutex);
-            return id_process_pair.second;
-          }
-      }
-  }
+  for (auto &id_process_pair : Process)
+    {
+      if (id_process_pair.second.l_threadID)
+        {
+          if (pthread_equal(id_process_pair.second.threadID, thID))
+            {
+              pthread_mutex_unlock(&processMutex);
+              return id_process_pair.second;
+            }
+        }
+    }
 
   pthread_mutex_unlock(&processMutex);
   ERROR("Could not find process for thread: ", thID);
@@ -96,16 +96,24 @@ processDefTimesteps(int streamID)
   ProcessType &process = processSelf();
 
   (void *) streamID;
-  process.ntimesteps++;
 }
 
 int
 cdoStreamInqTimestep(int pstreamID, int tsID)
 {
-  int nrecs = pstreamInqTimestep(pstreamID, tsID);
-  processSelf().ntimesteps++;
+  int nrecs = 0;
+  Cdo_Debug(CdoDebug::PROCESS, "Inquiring Timestep ", tsID, " for stream ",
+            pstreamID);
+  ProcessType &process = processSelf();
+  PstreamType *pstreamptr = pstreamToPointer(pstreamID);
+  nrecs = pstreamInqTimestep(pstreamptr, tsID);
+  if (nrecs && tsID != pstreamptr->tsID)
+    {
+      process.timesteps.insert(tsID);
+      process.ntimesteps = process.timesteps.size();
+    }
   return nrecs;
- }
+}
 
 int
 processInqTimesteps(int pstreamID)
@@ -288,7 +296,8 @@ handleObase(const char *p_argvEntry)
     }
   else
     {
-      CdoError::Abort(Cdo::progname, "Obase missing. Found existing file: ", p_argvEntry,
+      CdoError::Abort(Cdo::progname,
+                      "Obase missing. Found existing file: ", p_argvEntry,
                       "instead");
     }
 }
@@ -372,25 +381,25 @@ createProcesses(int argc, const char **argv)
                         currentProcess->operatorName);
               currentProcess->addFileInStream(argvEntry);
             }
-          while (call_stack.top()->hasAllInputs() &&
-                 call_stack.top() != root_process)
+          while (call_stack.top()->hasAllInputs()
+                 && call_stack.top() != root_process)
             {
               Cdo_Debug(CdoDebug::PROCESS, "Removing ",
-                        currentProcess->operatorName, " from stack");
+                        call_stack.top()->operatorName, " from stack");
               call_stack.top()->checkStreamCnt();
               call_stack.pop();
             }
-            currentProcess = call_stack.top();
+          currentProcess = call_stack.top();
           idx++;
         }
-      while (!currentProcess->hasAllInputs()
-             && idx < argc - cntOutFiles);
+      while (!currentProcess->hasAllInputs() && idx < argc - cntOutFiles);
     }
 
   if (idx != argc - cntOutFiles)
     {
-        CdoError::Abort(Cdo::progname ," To many inputs for operator '", lastAdded->operatorName,"'\n",
-               Cdo::progname, " ", CdoDebug::argvToString(argc, argv));
+      CdoError::Abort(Cdo::progname, " To many inputs for operator '",
+                      lastAdded->operatorName, "'\n", Cdo::progname, " ",
+                      CdoDebug::argvToString(argc, argv));
     }
 
   while (!call_stack.empty())
@@ -674,8 +683,8 @@ const char *
 processInqPrompt(void)
 {
 
-    ProcessType &process = processSelf();
-    return process.inqPrompt();
+  ProcessType &process = processSelf();
+  return process.inqPrompt();
 }
 
 extern "C" {
@@ -738,7 +747,8 @@ runProcesses()
     {
       if (idProcessPair.first != 0)
         {
-          std::cerr << "Started Process: " << idProcessPair.second.operatorName << std::endl;
+          std::cerr << "Started Process: " << idProcessPair.second.operatorName
+                    << std::endl;
           idProcessPair.second.run();
         }
     }

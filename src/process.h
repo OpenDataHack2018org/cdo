@@ -24,6 +24,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <set>
 
 constexpr int MAX_PROCESS = 128;
 constexpr int MAX_STREAM = 64;
@@ -74,6 +75,7 @@ public:
   size_t m_nvals;
   short nvars;
 
+  std::set<int> timesteps;
   int ntimesteps;
   int m_streamCnt;
   const char *m_operatorCommand;

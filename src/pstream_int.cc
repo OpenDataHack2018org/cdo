@@ -48,25 +48,23 @@ pstreamDefVlist(int pstreamID, int vlistID)
 }
 
 int
-pstreamInqTimestep(int pstreamID, int tsID)
+pstreamInqTimestep(PstreamType* p_pstreamptr, int tsID)
 {
-  PstreamType *pstreamptr = pstreamToPointer(pstreamID);
   int nrecs = -1;
 #ifdef  HAVE_LIBPTHREAD
-  if(pstreamptr->isPipe())
+  if(p_pstreamptr->isPipe())
   {
       if (CdoDebug::PSTREAM){
-          MESSAGE(pstreamptr->pipe->name.c_str(), " pstreamID ",  pstreamptr->self);}
-      nrecs = pstreamptr->pipe->pipeInqTimestep(tsID);
+          MESSAGE(p_pstreamptr->pipe->name.c_str(), " pstreamID ",  p_pstreamptr->self);}
+      nrecs = p_pstreamptr->pipe->pipeInqTimestep(tsID);
   }
   else
 #endif
   {
-      if (pstreamptr->mfiles){tsID -= pstreamptr->tsID0;}
-      nrecs = pstreamptr->inqTimestep(tsID);
-      if (nrecs && tsID != pstreamptr->tsID){
-          processDefTimesteps(pstreamID);
-          pstreamptr->tsID = tsID;
+      if (p_pstreamptr->mfiles){tsID -= p_pstreamptr->tsID0;}
+      nrecs = p_pstreamptr->inqTimestep(tsID);
+      if (nrecs && tsID != p_pstreamptr->tsID){
+          p_pstreamptr->tsID = tsID;
         }
   }
   return nrecs;

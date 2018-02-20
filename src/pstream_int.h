@@ -75,7 +75,7 @@ void  pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 */
 void  pstreamDefRecord(int pstreamID, int varID, int levelID);
 
-int   pstreamInqTimestep(int pstreamID, int tsID);
+int   pstreamInqTimestep(PstreamType *p_pstreamptr, int tsID);
 void  pstreamDefTimestep(int pstreamID, int tsID);
 
 void  pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
