@@ -14,8 +14,8 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifdef  HAVE_CONFIG_H
-#  include "config.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #if defined(HAVE_HDF5_H)
@@ -26,7 +26,7 @@
 #include <zlib.h>
 #endif
 
-#ifdef  HAVE_LIBXML2
+#ifdef HAVE_LIBXML2
 #include <libxml/xmlversion.h>
 #endif
 
@@ -38,7 +38,7 @@
 #include <proj_api.h>
 #endif
 
-#ifdef  HAVE_LIBCMOR
+#ifdef HAVE_LIBCMOR
 extern "C" {
 #include "cmor.h"
 }
@@ -47,19 +47,21 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 
-#include "cdo_int.h" // HAVE_OPENMP4
+#include "cdo_int.h"  // HAVE_OPENMP4
 
 extern "C" {
 size_t getMemorySize(void);
 }
 
-void printFeatures(void)
+void
+printFeatures(void)
 {
   fprintf(stderr, "Features:");
-  size_t memory_size = getMemorySize()/(1024*1024*1024);
-  if ( memory_size > 0 ) fprintf(stderr, " %zuGB", memory_size);
-#ifdef  __cplusplus
-  fprintf(stderr, " C++%d", (int)((__cplusplus -  (__cplusplus / 10000) * 10000) / 100));
+  size_t memory_size = getMemorySize() / (1024 * 1024 * 1024);
+  if (memory_size > 0) fprintf(stderr, " %zuGB", memory_size);
+#ifdef __cplusplus
+  fprintf(stderr, " C++%d",
+          (int) ((__cplusplus - (__cplusplus / 10000) * 10000) / 100));
 #endif
 #if defined(HAVE_CF_INTERFACE)
   fprintf(stderr, " Fortran");
@@ -67,10 +69,10 @@ void printFeatures(void)
 #if defined(ENABLE_DATA)
   fprintf(stderr, " DATA");
 #endif
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   fprintf(stderr, " PTHREADS");
 #endif
-#ifdef  _OPENMP
+#ifdef _OPENMP
   fprintf(stderr, " OpenMP");
 #if defined(HAVE_OPENMP45)
   fprintf(stderr, "45");
@@ -80,19 +82,19 @@ void printFeatures(void)
   fprintf(stderr, "3");
 #endif
 #endif
-#if  defined(HAVE_LIBHDF5)
+#if defined(HAVE_LIBHDF5)
   fprintf(stderr, " HDF5");
 #endif
-#if  defined(HAVE_NETCDF4)
+#if defined(HAVE_NETCDF4)
   fprintf(stderr, " NC4");
-#if  defined(HAVE_NC4HDF5)
+#if defined(HAVE_NC4HDF5)
   fprintf(stderr, "/HDF5");
-#if  defined(HAVE_NC4HDF5_THREADSAFE)
+#if defined(HAVE_NC4HDF5_THREADSAFE)
   fprintf(stderr, "/threadsafe");
 #endif
 #endif
 #endif
-#if  defined(HAVE_LIBNC_DAP)
+#if defined(HAVE_LIBNC_DAP)
   fprintf(stderr, " OPeNDAP");
 #endif
 #if defined(HAVE_LIBSZ)
@@ -106,25 +108,25 @@ void printFeatures(void)
 #if defined(HAVE_LIBUDUNITS2)
   fprintf(stderr, " UDUNITS2");
 #endif
-#ifdef  HAVE_LIBPROJ
+#ifdef HAVE_LIBPROJ
   fprintf(stderr, " PROJ.4");
 #endif
-#ifdef  HAVE_LIBXML2
+#ifdef HAVE_LIBXML2
   fprintf(stderr, " XML2");
 #endif
-#ifdef  HAVE_LIBMAGICS
+#ifdef HAVE_LIBMAGICS
   fprintf(stderr, " MAGICS");
 #endif
 #if defined(HAVE_LIBDRMAA)
   fprintf(stderr, " DRMAA");
 #endif
-#ifdef  HAVE_LIBCURL
+#ifdef HAVE_LIBCURL
   fprintf(stderr, " CURL");
 #endif
-#ifdef  HAVE_LIBFFTW3
+#ifdef HAVE_LIBFFTW3
   fprintf(stderr, " FFTW3");
 #endif
-#ifdef  HAVE_LIBCMOR
+#ifdef HAVE_LIBCMOR
   fprintf(stderr, " CMOR");
 #endif
 #if defined(__AVX2__)
@@ -139,66 +141,69 @@ void printFeatures(void)
   fprintf(stderr, " SSE3");
 #elif defined(__SSE2__)
   fprintf(stderr, " SSE2");
-#endif 
+#endif
   fprintf(stderr, "\n");
 }
 
-
-void printLibraries(void)
+void
+printLibraries(void)
 {
   fprintf(stderr, "Libraries:");
-#if  defined(HAVE_LIBHDF5)
+#if defined(HAVE_LIBHDF5)
   fprintf(stderr, " HDF5");
-#if  defined(H5_VERS_MAJOR)
-  unsigned h5h_majnum = H5_VERS_MAJOR, h5h_minnum = H5_VERS_MINOR, h5h_relnum = H5_VERS_RELEASE;
+#if defined(H5_VERS_MAJOR)
+  unsigned h5h_majnum = H5_VERS_MAJOR, h5h_minnum = H5_VERS_MINOR,
+           h5h_relnum = H5_VERS_RELEASE;
   fprintf(stderr, "/%u.%u.%u", h5h_majnum, h5h_minnum, h5h_relnum);
 
   unsigned h5l_majnum, h5l_minnum, h5l_relnum;
   H5get_libversion(&h5l_majnum, &h5l_minnum, &h5l_relnum);
-  if ( (h5h_majnum != h5l_majnum) || (h5h_minnum != h5l_minnum) || (h5h_relnum != h5l_relnum) )
+  if ((h5h_majnum != h5l_majnum) || (h5h_minnum != h5l_minnum)
+      || (h5h_relnum != h5l_relnum))
     fprintf(stderr, "(%u.%u.%u)", h5l_majnum, h5l_minnum, h5l_relnum);
 #endif
 #endif
-  /*
-#if defined(HAVE_LIBZ)
-  {
-    fprintf(stderr, " zlib/%s", zlibVersion());
-#if defined(ZLIB_VERSION)
-    if ( strcmp(ZLIB_VERSION, zlibVersion()) != 0 )
-      fprintf(stderr, "(h%s)", ZLIB_VERSION);
-#else
-    fprintf(stderr, "(header not found)");
-#endif
-  }
-#endif
-  */
-#ifdef  HAVE_LIBPROJ
+    /*
+  #if defined(HAVE_LIBZ)
+    {
+      fprintf(stderr, " zlib/%s", zlibVersion());
+  #if defined(ZLIB_VERSION)
+      if ( strcmp(ZLIB_VERSION, zlibVersion()) != 0 )
+        fprintf(stderr, "(h%s)", ZLIB_VERSION);
+  #else
+      fprintf(stderr, "(header not found)");
+  #endif
+    }
+  #endif
+    */
+#ifdef HAVE_LIBPROJ
   fprintf(stderr, " proj");
 #if defined(PJ_VERSION)
-  fprintf(stderr, "/%g", PJ_VERSION*0.01);
-#endif
-#endif
-  
-#ifdef  HAVE_LIBCMOR
-  fprintf(stderr, " CMOR");
-#if defined(CMOR_VERSION_MAJOR)
-  fprintf(stderr, "/%u.%u.%u", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR, CMOR_VERSION_PATCH);
+  fprintf(stderr, "/%g", PJ_VERSION * 0.01);
 #endif
 #endif
 
-#ifdef  HAVE_LIBXML2
+#ifdef HAVE_LIBCMOR
+  fprintf(stderr, " CMOR");
+#if defined(CMOR_VERSION_MAJOR)
+  fprintf(stderr, "/%u.%u.%u", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR,
+          CMOR_VERSION_PATCH);
+#endif
+#endif
+
+#ifdef HAVE_LIBXML2
   fprintf(stderr, " xml2");
 #if defined(LIBXML_DOTTED_VERSION)
   fprintf(stderr, "/%s", LIBXML_DOTTED_VERSION);
 #endif
 #endif
 
-#ifdef  HAVE_LIBCURL
+#ifdef HAVE_LIBCURL
   {
     curl_version_info_data *version_data = curl_version_info(CURLVERSION_NOW);
     fprintf(stderr, " curl/%s", version_data->version);
 #if defined(LIBCURL_VERSION)
-    if ( strcmp(LIBCURL_VERSION, version_data->version) != 0 )
+    if (strcmp(LIBCURL_VERSION, version_data->version) != 0)
       fprintf(stderr, "(h%s)", LIBCURL_VERSION);
 #else
     fprintf(stderr, "(header not found)");

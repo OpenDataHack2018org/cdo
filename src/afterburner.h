@@ -92,10 +92,10 @@ struct Control
   struct Date OldDate;
   struct Date StartDate;
 
-  int     nvct;
+  int nvct;
   double *vct;
 
-  int *   vert_index;
+  int *vert_index;
   size_t *pnmiss;
   double *Orography;
   double *p_of_height;
@@ -128,9 +128,9 @@ struct Control
 
   int NumCodesRequest;
 
-  int    NumLevel;
-  int    NumLevelFound;
-  int    NumLevelRequest;
+  int NumLevel;
+  int NumLevelFound;
+  int NumLevelRequest;
   double LevelRequest[MaxLevel];
 
   double *rcoslat;
@@ -141,25 +141,25 @@ struct Control
 
 struct Variable
 {
-  int     needed0;  /* var needed for process  */
-  int     needed;   /* var needed for process  */
-  int     selected; /* var selected for output */
-  int     detected; /* var detected in input   */
-  int     comp;     /* compute var if selected and not detected */
-  int     sfit;
-  int     hlev;
-  int     plev;
-  int     ivarID;
-  int     ovarID;  /* 1st variable ID */
-  int     ovarID2; /* 2nd variable ID used for variance */
-  int     tableID;
-  int     igridID;
-  int     ogridID;
-  int     izaxisID;
-  int     ozaxisID;
-  size_t  nmiss0;
-  size_t  nmiss;
-  double  missval;
+  int needed0;  /* var needed for process  */
+  int needed;   /* var needed for process  */
+  int selected; /* var selected for output */
+  int detected; /* var detected in input   */
+  int comp;     /* compute var if selected and not detected */
+  int sfit;
+  int hlev;
+  int plev;
+  int ivarID;
+  int ovarID;  /* 1st variable ID */
+  int ovarID2; /* 2nd variable ID used for variance */
+  int tableID;
+  int igridID;
+  int ogridID;
+  int izaxisID;
+  int ozaxisID;
+  size_t nmiss0;
+  size_t nmiss;
+  double missval;
   double *spectral;
   double *spectral0;
   double *fourier;
@@ -170,26 +170,31 @@ struct Variable
   double *grid0;
   double *mean;
   double *variance;
-  int *   samp;
+  int *samp;
 };
 
 /* FFT */
 void fft_set(double *trigs, long *ifax, long n);
-void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon,
-           long nlev, long nfc);
-void gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev,
-           long nfc);
+void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc,
+           double *restrict gp, long nlat, long nlon, long nlev, long nfc);
+void gp2fc(double *trig, long *ifax, const double *restrict gp,
+           double *restrict fc, long nlat, long nlon, long nlev, long nfc);
 
 /* Convert Spectral Array to new resolution */
 void sp2sp(double *arrayIn, int truncIn, double *arrayOut, int truncOut);
-void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nlat, long nfc, long nt);
-void fc2sp(double *fa, double *sa, double *poli, int klev, int nlat, int nfc, int nt);
+void sp2fc(const double *sa, double *fa, const double *poli, long nlev,
+           long nlat, long nfc, long nt);
+void fc2sp(double *fa, double *sa, double *poli, int klev, int nlat, int nfc,
+           int nt);
 
 /* Physc */
-void dv2ps(const double *restrict div, double *restrict pot, long nlev, long ntr);
-void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g, int nt, int nsp, int nlev);
+void dv2ps(const double *restrict div, double *restrict pot, long nlev,
+           long ntr);
+void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g,
+           int nt, int nsp, int nlev);
 void scaluv(double *fu, double rclat[], int nlat, int lot);
-void uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2, double *pol3, int klev, int nlat, int nt);
+void uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2,
+           double *pol3, int klev, int nlat, int nt);
 void geninx(long ntr, double *f, double *g);
 
 /* clang-format off */
@@ -250,8 +255,10 @@ void geninx(long ntr, double *f, double *g);
 void after_read_vct(const char *vctfile, double **vct, int *nvct);
 
 void after_gp2sp(struct Control *globs, struct Variable *vars, int ccode);
-void after_GP2FC(double *gp, double *fc, long nlat, long nlon, long nlev, long nfc);
-void after_FC2GP(double *fc, double *gp, long nlat, long nlon, long nlev, long nfc);
+void after_GP2FC(double *gp, double *fc, long nlat, long nlon, long nlev,
+                 long nfc);
+void after_FC2GP(double *fc, double *gp, long nlat, long nlon, long nlev,
+                 long nfc);
 void after_FCrh2FCsh(struct Control *globs, struct Variable *vars);
 void after_SPuv2SPdv(struct Control *globs, struct Variable *vars);
 void after_FCsh2FCrh(struct Control *globs, struct Variable *vars);
@@ -260,14 +267,18 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars);
 void after_processPL(struct Control *globs, struct Variable *vars);
 void after_processML(struct Control *globs, struct Variable *vars);
 
-void    after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID,
-                                int levelID, size_t nmiss);
-double *after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int levelID);
-void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID,
+void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars,
+                             int code, int gridID, int zaxisID, int levelID,
+                             size_t nmiss);
+double *after_get_dataptr(struct Variable *vars, int code, int gridID,
+                          int zaxisID, int levelID);
+void after_EchamAddRecord(struct Control *globs, struct Variable *vars,
+                          int code, int gridID, int zaxisID, int levelID,
                           size_t nmiss);
 
 void after_AnalysisDependencies(struct Variable *vars, int ncodes);
-void after_EchamDependencies(struct Variable *vars, int ncodes, int type, int source);
+void after_EchamDependencies(struct Variable *vars, int ncodes, int type,
+                             int source);
 
 void after_legini_setup(struct Control *globs, struct Variable *vars);
 

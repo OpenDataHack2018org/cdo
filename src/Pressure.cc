@@ -23,7 +23,6 @@
       Pressure    deltap               Difference of two half hybrid levels
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -33,8 +32,8 @@
 #include "stdnametable.h"
 #include "util_string.h"
 
-
-void *Pressure(void *process)
+void *
+Pressure(void *process)
 {
   ModelMode mode(ModelMode::UNDEF);
   int nrecs;
@@ -69,144 +68,162 @@ void *Pressure(void *process)
   size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int nhlev;
-  double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
+  double *vct
+      = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
 
   bool l3Dvars = (zaxisIDh != -1 && gridsize > 0);
-  if ( !l3Dvars ) cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
-    
-  double *ps_prog    = (double*) Malloc(gridsize*sizeof(double));
-  double *deltap     = (double*) Malloc(gridsize*nhlevf*sizeof(double));
-  double *full_press = (double*) Malloc(gridsize*nhlevf*sizeof(double));
-  double *half_press = (double*) Malloc(gridsize*nhlevh*sizeof(double));
+  if (!l3Dvars)
+    cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
 
-  if ( operatorID == PRESSURE_FL || operatorID == DELTAP )
+  double *ps_prog = (double *) Malloc(gridsize * sizeof(double));
+  double *deltap = (double *) Malloc(gridsize * nhlevf * sizeof(double));
+  double *full_press = (double *) Malloc(gridsize * nhlevf * sizeof(double));
+  double *half_press = (double *) Malloc(gridsize * nhlevh * sizeof(double));
+
+  if (operatorID == PRESSURE_FL || operatorID == DELTAP)
     {
-      if ( cdoVerbose ) cdoPrint("Creating ZAXIS_HYBRID .. (nhlevf=%d)", nhlevf);
+      if (cdoVerbose) cdoPrint("Creating ZAXIS_HYBRID .. (nhlevf=%d)", nhlevf);
       zaxisIDp = zaxisCreate(ZAXIS_HYBRID, nhlevf);
     }
   else
     {
-      if ( cdoVerbose ) cdoPrint("Creating ZAXIS_HYBRID_HALF .. (nhlevh=%d)", nhlevh);
+      if (cdoVerbose)
+        cdoPrint("Creating ZAXIS_HYBRID_HALF .. (nhlevh=%d)", nhlevh);
       zaxisIDp = zaxisCreate(ZAXIS_HYBRID_HALF, nhlevh);
     }
 
-  double *level = (double*) Malloc(nhlevh*sizeof(double));
-  for ( int l = 0; l < nhlevh; l++ ) level[l] = l+1;
+  double *level = (double *) Malloc(nhlevh * sizeof(double));
+  for (int l = 0; l < nhlevh; l++)
+    level[l] = l + 1;
   zaxisDefLevels(zaxisIDp, level);
   Free(level);
 
-  zaxisDefVct(zaxisIDp, 2*nhlevh, vct);
+  zaxisDefVct(zaxisIDp, 2 * nhlevh, vct);
 
   int nvars = vlistNvars(vlistID1);
 
   bool useTable = false;
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       int tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
-      if ( tableNum > 0 && tableNum != 255 )
-	{
-	  useTable = true;
-	  break;
-	}
+      if (tableNum > 0 && tableNum != 255)
+        {
+          useTable = true;
+          break;
+        }
     }
 
-  if ( cdoVerbose && useTable ) cdoPrint("Use code tables!");
+  if (cdoVerbose && useTable) cdoPrint("Use code tables!");
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
-      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      int nlevel   = zaxisInqSize(zaxisID);
-      int instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
+      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      int nlevel = zaxisInqSize(zaxisID);
+      int instNum = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
       int tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
-      int code     = vlistInqVarCode(vlistID1, varID);
-      int param    = vlistInqVarParam(vlistID1, varID);
+      int code = vlistInqVarCode(vlistID1, varID);
+      int param = vlistInqVarParam(vlistID1, varID);
 
       cdiParamToString(param, paramstr, sizeof(paramstr));
 
-      if ( useTable )
-	{
-	  if ( tableNum == 2 )
-	    {
-	      mode = ModelMode::WMO;
-	      wmo_gribcodes(&gribcodes);
-	    }
-	  else if ( tableNum == 128 )
-	    {
-	      mode = ModelMode::ECHAM;
-	      echam_gribcodes(&gribcodes);
-	    }
-          //  KNMI: HIRLAM model version 7.2 uses tableNum=1    (LAMH_D11*)
-          //  KNMI: HARMONIE model version 36 uses tableNum=1   (grib*)   (opreational NWP version)
-          //  KNMI: HARMONIE model version 38 uses tableNum=253 (grib,grib_md) and tableNum=1 (grib_sfx) (research version)
-	  else if ( tableNum == 1 || tableNum == 253 )
-	    {
-	      mode = ModelMode::HIRLAM;
-	      hirlam_harmonie_gribcodes(&gribcodes);
-	    }
-	}
-      else
-	{
-	  mode = ModelMode::ECHAM;
-	  echam_gribcodes(&gribcodes);
-	}
-
-      if ( cdoVerbose )
+      if (useTable)
         {
-	  vlistInqVarName(vlistID1, varID, varname);
-	  cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s Varname = %s varID = %d",
-                   (int)mode, instNum, tableNum, code, paramstr, varname, varID);
+          if (tableNum == 2)
+            {
+              mode = ModelMode::WMO;
+              wmo_gribcodes(&gribcodes);
+            }
+          else if (tableNum == 128)
+            {
+              mode = ModelMode::ECHAM;
+              echam_gribcodes(&gribcodes);
+            }
+          //  KNMI: HIRLAM model version 7.2 uses tableNum=1    (LAMH_D11*)
+          //  KNMI: HARMONIE model version 36 uses tableNum=1   (grib*)
+          //  (opreational NWP version) KNMI: HARMONIE model version 38 uses
+          //  tableNum=253 (grib,grib_md) and tableNum=1 (grib_sfx) (research
+          //  version)
+          else if (tableNum == 1 || tableNum == 253)
+            {
+              mode = ModelMode::HIRLAM;
+              hirlam_harmonie_gribcodes(&gribcodes);
+            }
+        }
+      else
+        {
+          mode = ModelMode::ECHAM;
+          echam_gribcodes(&gribcodes);
         }
 
-      if ( code <= 0 )
-	{
-	  vlistInqVarName(vlistID1, varID, varname);
+      if (cdoVerbose)
+        {
+          vlistInqVarName(vlistID1, varID, varname);
+          cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s "
+                   "Varname = %s varID = %d",
+                   (int) mode, instNum, tableNum, code, paramstr, varname,
+                   varID);
+        }
 
-	  strtolower(varname);
+      if (code <= 0)
+        {
+          vlistInqVarName(vlistID1, varID, varname);
 
-	  /*                        ECHAM                            ECMWF       */
-	  if      ( strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0 ) code = 129;
-	  else if ( strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0 ) code = 130;
-	  else if ( strcmp(varname, "aps")   == 0 || strcmp(varname, "sp"  ) == 0 ) code = 134;
-	  else if ( strcmp(varname, "ps")    == 0 )                                 code = 134;
-	  else if ( strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0 ) code = 152;
-	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
-	}
+          strtolower(varname);
 
-      if ( mode == ModelMode::ECHAM )
-	{
-	  if      ( code == gribcodes.ps   && nlevel == 1 ) psID    = varID;
-	  else if ( code == gribcodes.lsp  && nlevel == 1 ) lnpsID  = varID;
-	}
-      else if ( mode == ModelMode::WMO || mode == ModelMode::HIRLAM )
-	{
-	  if ( code == gribcodes.ps        && nlevel == 1 ) psID    = varID;
+          /*                        ECHAM                            ECMWF */
+          if (strcmp(varname, "geosp") == 0 || strcmp(varname, "z") == 0)
+            code = 129;
+          else if (strcmp(varname, "st") == 0 || strcmp(varname, "t") == 0)
+            code = 130;
+          else if (strcmp(varname, "aps") == 0 || strcmp(varname, "sp") == 0)
+            code = 134;
+          else if (strcmp(varname, "ps") == 0)
+            code = 134;
+          else if (strcmp(varname, "lsp") == 0 || strcmp(varname, "lnsp") == 0)
+            code = 152;
+          /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
+        }
+
+      if (mode == ModelMode::ECHAM)
+        {
+          if (code == gribcodes.ps && nlevel == 1)
+            psID = varID;
+          else if (code == gribcodes.lsp && nlevel == 1)
+            lnpsID = varID;
+        }
+      else if (mode == ModelMode::WMO || mode == ModelMode::HIRLAM)
+        {
+          if (code == gribcodes.ps && nlevel == 1) psID = varID;
         }
     }
 
   int pvarID = lnpsID;
-  if ( zaxisIDh != -1 && lnpsID != -1 )
+  if (zaxisIDh != -1 && lnpsID != -1)
     {
       int gridID = vlistInqVarGrid(vlistID1, lnpsID);
-      if ( gridInqType(gridID) == GRID_SPECTRAL )
-	{
-	  lnpsID = -1;
-	  cdoWarning("Spectral LOG(%s) not supported - using %s!", var_stdname(surface_air_pressure), var_stdname(surface_air_pressure));
-	}
+      if (gridInqType(gridID) == GRID_SPECTRAL)
+        {
+          lnpsID = -1;
+          cdoWarning("Spectral LOG(%s) not supported - using %s!",
+                     var_stdname(surface_air_pressure),
+                     var_stdname(surface_air_pressure));
+        }
     }
 
-  if ( zaxisIDh != -1 && lnpsID == -1 )
+  if (zaxisIDh != -1 && lnpsID == -1)
     {
       pvarID = psID;
-      if ( psID == -1 )
-	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
+      if (psID == -1)
+        cdoAbort("%s not found!", var_stdname(surface_air_pressure));
     }
 
   int gridID = vlistInqVarGrid(vlistID1, pvarID);
-  if ( gridInqType(gridID) == GRID_SPECTRAL )
-    cdoAbort("%s on spectral representation not supported!", var_stdname(surface_air_pressure));
+  if (gridInqType(gridID) == GRID_SPECTRAL)
+    cdoAbort("%s on spectral representation not supported!",
+             var_stdname(surface_air_pressure));
 
-  double *pdata = (double*) Malloc(gridsize*sizeof(double));
+  double *pdata = (double *) Malloc(gridsize * sizeof(double));
 
   int vlistID2 = vlistCreate();
   varID = vlistDefVar(vlistID2, gridID, zaxisIDp, TIME_VARYING);
@@ -223,66 +240,69 @@ void *Pressure(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( varID == pvarID )
-	    {	  
-	      pstreamReadRecord(streamID1, pdata, &nmiss);
-	      if ( nmiss > 0 ) cdoAbort("Missing valus unsupported!");
-	    }
-	}
+          if (varID == pvarID)
+            {
+              pstreamReadRecord(streamID1, pdata, &nmiss);
+              if (nmiss > 0) cdoAbort("Missing valus unsupported!");
+            }
+        }
 
-      if ( zaxisIDh != -1 )
-	{
-	  if ( lnpsID != -1 )
-	    for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = exp(pdata[i]);
-	  else if ( psID != -1 )
-	    arrayCopy(gridsize, pdata, ps_prog);
+      if (zaxisIDh != -1)
+        {
+          if (lnpsID != -1)
+            for (size_t i = 0; i < gridsize; i++)
+              ps_prog[i] = exp(pdata[i]);
+          else if (psID != -1)
+            arrayCopy(gridsize, pdata, ps_prog);
 
-	  /* check range of ps_prog */
-	  arrayMinMaxMask(gridsize, ps_prog, NULL, &minval, &maxval);
-	  if ( minval < MIN_PS || maxval > MAX_PS )
-	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
-	    
-	  presh(full_press, half_press, vct, ps_prog, nhlevf, gridsize);
-	}
+          /* check range of ps_prog */
+          arrayMinMaxMask(gridsize, ps_prog, NULL, &minval, &maxval);
+          if (minval < MIN_PS || maxval > MAX_PS)
+            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval,
+                       maxval);
 
-      if ( operatorID == PRESSURE_FL )
-	{
-	  nlevel = nhlevf;
-	  pout = full_press;
-	}
-      else if ( operatorID == DELTAP )
-	{
-	  nlevel = nhlevf;
-	  for ( k = 0; k < nhlevf; ++k )
-	    for ( size_t i = 0; i < gridsize; ++i )
-	      {
-		deltap[k*gridsize+i] = half_press[(k+1)*gridsize+i] - half_press[k*gridsize+i];
-	      }
+          presh(full_press, half_press, vct, ps_prog, nhlevf, gridsize);
+        }
 
-	  pout = deltap;
-	}
-      else if ( operatorID == PRESSURE_HL )
-	{
-	  nlevel = nhlevh;
-	  pout = half_press;
-	}
-	  
+      if (operatorID == PRESSURE_FL)
+        {
+          nlevel = nhlevf;
+          pout = full_press;
+        }
+      else if (operatorID == DELTAP)
+        {
+          nlevel = nhlevf;
+          for (k = 0; k < nhlevf; ++k)
+            for (size_t i = 0; i < gridsize; ++i)
+              {
+                deltap[k * gridsize + i] = half_press[(k + 1) * gridsize + i]
+                                           - half_press[k * gridsize + i];
+              }
+
+          pout = deltap;
+        }
+      else if (operatorID == PRESSURE_HL)
+        {
+          nlevel = nhlevh;
+          pout = half_press;
+        }
+
       varID = 0;
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  size_t offset = levelID*gridsize;
-	  pstreamWriteRecord(streamID2, pout+offset, 0);
-	}
+      for (levelID = 0; levelID < nlevel; levelID++)
+        {
+          pstreamDefRecord(streamID2, varID, levelID);
+          size_t offset = levelID * gridsize;
+          pstreamWriteRecord(streamID2, pout + offset, 0);
+        }
 
       tsID++;
     }
@@ -290,12 +310,12 @@ void *Pressure(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( pdata      ) Free(pdata);
-  if ( ps_prog    ) Free(ps_prog);
-  if ( deltap     ) Free(deltap);
-  if ( full_press ) Free(full_press);
-  if ( half_press ) Free(half_press);
-  if ( vct        ) Free(vct);
+  if (pdata) Free(pdata);
+  if (ps_prog) Free(ps_prog);
+  if (deltap) Free(deltap);
+  if (full_press) Free(full_press);
+  if (half_press) Free(half_press);
+  if (vct) Free(vct);
 
   cdoFinish();
 

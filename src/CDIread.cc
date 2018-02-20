@@ -15,17 +15,16 @@
   GNU General Public License for more details.
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "timer.h"
 
-
-const char *filetypestr(int filetype)
+const char *
+filetypestr(int filetype)
 {
-  switch ( filetype )
+  switch (filetype)
     {
       // clang-format off
     case CDI_FILETYPE_GRB:  return ("GRIB");
@@ -43,8 +42,8 @@ const char *filetypestr(int filetype)
     }
 }
 
-
-const char *datatypestr(int datatype)
+const char *
+datatypestr(int datatype)
 {
   static char str[20];
 
@@ -68,22 +67,28 @@ const char *datatypestr(int datatype)
   // clang-format on
 }
 
-static
-void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size, double tw)
+static void
+print_stat(const char *sinfo, int memtype, int datatype, int filetype,
+           off_t nvalues, double data_size, double file_size, double tw)
 {
   nvalues /= 1000000;
-  data_size /= 1024.*1024.*1024.;
-  if ( memtype == MEMTYPE_FLOAT )
-    cdoPrint("%s Read %.1f GB of 32 bit floats from %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype), filetypestr(filetype), nvalues/tw);
+  data_size /= 1024. * 1024. * 1024.;
+  if (memtype == MEMTYPE_FLOAT)
+    cdoPrint("%s Read %.1f GB of 32 bit floats from %s %s, %.1f MVal/s", sinfo,
+             data_size, datatypestr(datatype), filetypestr(filetype),
+             nvalues / tw);
   else
-    cdoPrint("%s Read %.1f GB of 64 bit floats from %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype), filetypestr(filetype), nvalues/tw);
+    cdoPrint("%s Read %.1f GB of 64 bit floats from %s %s, %.1f MVal/s", sinfo,
+             data_size, datatypestr(datatype), filetypestr(filetype),
+             nvalues / tw);
 
-  file_size /= 1024.*1024.*1024.;
-  cdoPrint("%s Read %.1f GB in %.1f seconds, total %.1f MB/s", sinfo, file_size, tw, 1024*file_size/tw);
+  file_size /= 1024. * 1024. * 1024.;
+  cdoPrint("%s Read %.1f GB in %.1f seconds, total %.1f MB/s", sinfo, file_size,
+           tw, 1024 * file_size / tw);
 }
 
-
-void *CDIread(void *process)
+void *
+CDIread(void *process)
 {
   int memtype = CDO_Memtype;
   int varID, levelID;
@@ -102,20 +107,20 @@ void *CDIread(void *process)
 
   cdoInitialize(process);
 
-  if ( cdoVerbose ) cdoPrint("parameter: <nruns>");
+  if (cdoVerbose) cdoPrint("parameter: <nruns>");
 
-  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+  if (operatorArgc() > 1) cdoAbort("Too many arguments!");
 
-  if ( operatorArgc() == 1 ) nruns = parameter2int(operatorArgv()[0]);
+  if (operatorArgc() == 1) nruns = parameter2int(operatorArgv()[0]);
 
-  if ( nruns <  0 ) nruns = 0;
-  if ( nruns > 99 ) nruns = 99;
+  if (nruns < 0) nruns = 0;
+  if (nruns > 99) nruns = 99;
 
-  if ( cdoVerbose ) cdoPrint("nruns      : %d", nruns);
+  if (cdoVerbose) cdoPrint("nruns      : %d", nruns);
 
   // vlistDefNtsteps(vlistID, 1);
 
-  for ( int irun = 0; irun < nruns; ++irun )
+  for (int irun = 0; irun < nruns; ++irun)
     {
       tw0 = timer_val(timer_read);
       data_size = 0;
@@ -127,47 +132,49 @@ void *CDIread(void *process)
 
       filetype = pstreamInqFiletype(streamID);
       datatype = vlistInqVarDatatype(vlistID, 0);
-	  
+
       size_t gridsize = vlistGridsizeMax(vlistID);
-      
-      if ( darray == NULL ) darray = (double*) Malloc(gridsize*sizeof(double));
-      if ( farray == NULL && memtype == MEMTYPE_FLOAT ) farray = (float*) Malloc(gridsize*sizeof(float));
+
+      if (darray == NULL) darray = (double *) Malloc(gridsize * sizeof(double));
+      if (farray == NULL && memtype == MEMTYPE_FLOAT)
+        farray = (float *) Malloc(gridsize * sizeof(float));
 
       t0 = timer_val(timer_read);
 
       int tsID = 0;
-      while ( (nrecs = cdoStreamInqTimestep(streamID, tsID)) )
-	{
+      while ((nrecs = cdoStreamInqTimestep(streamID, tsID)))
+        {
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID, &varID, &levelID);
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID, &varID, &levelID);
 
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-	      nvalues += gridsize;
+              gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+              nvalues += gridsize;
 
-	      if ( memtype == MEMTYPE_FLOAT )
-		{
+              if (memtype == MEMTYPE_FLOAT)
+                {
                   pstreamReadRecordF(streamID, farray, &nmiss);
-                  //  for ( size_t i = 0; i < gridsize; ++i ) darray[i] = farray[i];
-		  data_size += gridsize*4;
-		}
-	      else
-		{
-		  pstreamReadRecord(streamID, darray, &nmiss);
-		  data_size += gridsize*8;
-		}
-	    }
+                  //  for ( size_t i = 0; i < gridsize; ++i ) darray[i] =
+                  //  farray[i];
+                  data_size += gridsize * 4;
+                }
+              else
+                {
+                  pstreamReadRecord(streamID, darray, &nmiss);
+                  data_size += gridsize * 8;
+                }
+            }
 
-	  if ( cdoVerbose )
-	    {
-	      tw = timer_val(timer_read) - t0;
-	      t0 = timer_val(timer_read);
-	      cdoPrint("Timestep %d: %.2f seconds", tsID+1, tw);
-	    }
+          if (cdoVerbose)
+            {
+              tw = timer_val(timer_read) - t0;
+              t0 = timer_val(timer_read);
+              cdoPrint("Timestep %d: %.2f seconds", tsID + 1, tw);
+            }
 
-	  tsID++;
-	}
+          tsID++;
+        }
 
       pstreamClose(streamID);
 
@@ -176,16 +183,18 @@ void *CDIread(void *process)
 
       file_size = (double) fileSize(cdoGetStreamName(0).c_str());
 
-      if ( nruns > 1 ) snprintf(sinfo, sizeof(sinfo), "(run %d)", irun+1);
+      if (nruns > 1) snprintf(sinfo, sizeof(sinfo), "(run %d)", irun + 1);
 
-      print_stat(sinfo, memtype, datatype, filetype, nvalues, data_size, file_size, tw);
+      print_stat(sinfo, memtype, datatype, filetype, nvalues, data_size,
+                 file_size, tw);
     }
 
-  if ( nruns > 1 )
-    print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size, file_size, twsum/nruns);
+  if (nruns > 1)
+    print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size,
+               file_size, twsum / nruns);
 
-  if ( darray ) Free(darray);
-  if ( farray ) Free(farray);
+  if (darray) Free(darray);
+  if (farray) Free(farray);
 
   cdoFinish();
 

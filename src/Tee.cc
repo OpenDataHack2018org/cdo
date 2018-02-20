@@ -20,8 +20,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Tee(void *process)
+void *
+Tee(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -52,41 +52,41 @@ void *Tee(void *process)
   pstreamDefVlist(streamID3, vlistID3);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       taxisCopyTimestep(taxisID3, taxisID1);
 
       pstreamDefTimestep(streamID2, tsID);
       pstreamDefTimestep(streamID3, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{ 
-	  if ( lcopy )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      pstreamDefRecord(streamID2,  varID,  levelID);
-	      pstreamCopyRecord(streamID2, streamID1);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          if (lcopy)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      pstreamDefRecord(streamID3,  varID,  levelID);
-	      pstreamCopyRecord(streamID3, streamID1);
-	    }
-	  else
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
-	      pstreamReadRecord(streamID1, array, &nmiss);
+              pstreamDefRecord(streamID2, varID, levelID);
+              pstreamCopyRecord(streamID2, streamID1);
 
-	      pstreamDefRecord(streamID2,  varID,  levelID);
-	      pstreamWriteRecord(streamID2, array, nmiss);
+              pstreamDefRecord(streamID3, varID, levelID);
+              pstreamCopyRecord(streamID3, streamID1);
+            }
+          else
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
+              pstreamReadRecord(streamID1, array, &nmiss);
 
-	      pstreamDefRecord(streamID3,  varID,  levelID);
-	      pstreamWriteRecord(streamID3, array, nmiss);
-	    }
-	}
+              pstreamDefRecord(streamID2, varID, levelID);
+              pstreamWriteRecord(streamID2, array, nmiss);
+
+              pstreamDefRecord(streamID3, varID, levelID);
+              pstreamWriteRecord(streamID3, array, nmiss);
+            }
+        }
 
       tsID++;
     }
@@ -95,7 +95,7 @@ void *Tee(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID3);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 

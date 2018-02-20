@@ -24,136 +24,163 @@ int fileno(FILE *stream);
 
 extern int CDO_parser_errorno;
 
-enum {CTIMESTEP, CDATE, CTIME, CDELTAT, CDAY, CMONTH, CYEAR, CSECOND, CMINUTE, CHOUR, CLEN};
+enum
+{
+  CTIMESTEP,
+  CDATE,
+  CTIME,
+  CDELTAT,
+  CDAY,
+  CMONTH,
+  CYEAR,
+  CSECOND,
+  CMINUTE,
+  CHOUR,
+  CLEN
+};
 
-typedef enum { typeCon, typeVar, typeFun, typeFun1c, typeOpr, typeCom } nodeEnum;
+typedef enum {
+  typeCon,
+  typeVar,
+  typeFun,
+  typeFun1c,
+  typeOpr,
+  typeCom
+} nodeEnum;
 
 // commands
-typedef struct {
-  char *cname;                // command name
-  char *vname;                // variable name
+typedef struct
+{
+  char *cname;  // command name
+  char *vname;  // variable name
 } comNodeType;
 
 // constants
-typedef struct {
-  double value;               // value of constant
+typedef struct
+{
+  double value;  // value of constant
 } conNodeType;
 
 // variables
-typedef struct {
-  char *nm;                   // variable name
+typedef struct
+{
+  char *nm;  // variable name
 } varNodeType;
 
 // 1c functions
-typedef struct {
-  char *name;                 // function name
-  double value;               // value of constant
-  struct nodeTypeTag *op;     // operand
+typedef struct
+{
+  char *name;              // function name
+  double value;            // value of constant
+  struct nodeTypeTag *op;  // operand
 } fun1cNodeType;
 
 // functions
-typedef struct {
-  char *name;                 // function name
-  struct nodeTypeTag *op;     // operand
+typedef struct
+{
+  char *name;              // function name
+  struct nodeTypeTag *op;  // operand
 } funNodeType;
 
 // operators
-typedef struct {
-  int oper;                   // operator             
-  int nops;                   // number of operands   
+typedef struct
+{
+  int oper;                   // operator
+  int nops;                   // number of operands
   struct nodeTypeTag *op[1];  // operands (expandable)
 } oprNodeType;
 
 // parameter
-typedef struct {
-  bool       select;
-  bool       remove;
-  bool       lmiss;
-  int        coord;
-  int        gridID;
-  int        zaxisID;
-  int        datatype;
-  int        steptype;
-  size_t     ngp;
-  size_t     nlev;
-  size_t     nmiss;
-  char      *name;
-  char      *longname;
-  char      *units;
-  double     missval;
-  double    *data;
-  double    *weight;
+typedef struct
+{
+  bool select;
+  bool remove;
+  bool lmiss;
+  int coord;
+  int gridID;
+  int zaxisID;
+  int datatype;
+  int steptype;
+  size_t ngp;
+  size_t nlev;
+  size_t nmiss;
+  char *name;
+  char *longname;
+  char *units;
+  double missval;
+  double *data;
+  double *weight;
 } paramType;
 
-
-typedef struct nodeTypeTag {
-  bool      ltmpobj;
+typedef struct nodeTypeTag
+{
+  bool ltmpobj;
   paramType param;
 
-  nodeEnum  type;             // type of node
+  nodeEnum type;  // type of node
 
   // union must be last entry in nodeType
   // because operNodeType may dynamically increase
-  union {
-    comNodeType com;          // commands
-    conNodeType con;          // constants
-    varNodeType var;          // variables
-    funNodeType fun;          // functions
-    fun1cNodeType fun1c;      // functions
-    oprNodeType opr;          // operators
+  union
+  {
+    comNodeType com;      // commands
+    conNodeType con;      // constants
+    varNodeType var;      // variables
+    funNodeType fun;      // functions
+    fun1cNodeType fun1c;  // functions
+    oprNodeType opr;      // operators
   } u;
 } nodeType;
 
-
-typedef struct {
-  bool       needed;
-  int        coord;
-  int        cdiID;
-  size_t     size;
-  char      *units;
-  char      *longname;
-  double    *data;
+typedef struct
+{
+  bool needed;
+  int coord;
+  int cdiID;
+  size_t size;
+  char *units;
+  char *longname;
+  double *data;
 } coordType;
 
-
-typedef struct {
-  bool       init;
-  bool       debug;
-  bool      *needed;
-  int        maxparams;
-  int        nparams;
-  int        nvars1;
-  int        ncoords;
-  int        maxcoords;
-  int        tsID;
-  int        pointID;
-  int        surfaceID;
+typedef struct
+{
+  bool init;
+  bool debug;
+  bool *needed;
+  int maxparams;
+  int nparams;
+  int nvars1;
+  int ncoords;
+  int maxcoords;
+  int tsID;
+  int pointID;
+  int surfaceID;
   coordType *coords;
   paramType *params;
 } parseParamType;
 
-
-typedef union{
-  double    cvalue;           // constant value
-  char     *varnm;            // variable name 
-  char     *fname;            // function name 
-  nodeType *nPtr;             // node pointer  
+typedef union
+{
+  double cvalue;   // constant value
+  char *varnm;     // variable name
+  char *fname;     // function name
+  nodeType *nPtr;  // node pointer
 } yysType;
 
+#define YYSTYPE yysType
+#define YY_EXTRA_TYPE parseParamType *
 
-#define YYSTYPE        yysType
-#define YY_EXTRA_TYPE  parseParamType *
-
-#define YY_DECL int yylex(YYSTYPE *yylval_param, parseParamType *parse_arg, void *yyscanner)
+#define YY_DECL \
+  int yylex(YYSTYPE *yylval_param, parseParamType *parse_arg, void *yyscanner)
 YY_DECL;
 
-int  yyparse(parseParamType *parse_arg, void*);
+int yyparse(parseParamType *parse_arg, void *);
 void yyerror(void *parse_arg, void *scanner, const char *errstr);
 
-int  yylex_init(void **);
-int  yylex_destroy(void *);
+int yylex_init(void **);
+int yylex_destroy(void *);
 void yyset_extra(YY_EXTRA_TYPE, void *);
 
 nodeType *expr_run(nodeType *p, parseParamType *parse_arg);
 int params_get_coordID(parseParamType *parse_arg, int coord, int cdiID);
-

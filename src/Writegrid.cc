@@ -27,43 +27,44 @@
 #include "pstream_int.h"
 #include "grid.h"
 
-
-void *Writegrid(void *process)
+void *
+Writegrid(void *process)
 {
   cdoInitialize(process);
 
   int streamID = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID = cdoStreamInqVlist(streamID);
-  int gridID  = vlistGrid(vlistID, 0);
+  int gridID = vlistGrid(vlistID, 0);
 
   int gridtype = gridInqType(gridID);
   size_t gridsize = gridInqSize(gridID);
 
-  if ( gridtype == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
+  if (gridtype == GRID_GME) gridID = gridToUnstructured(gridID, 1);
 
-  if ( gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED )
+  if (gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED)
     gridID = gridToCurvilinear(gridID, 1);
 
-  if ( gridInqXbounds(gridID, NULL) == 0 || gridInqYbounds(gridID, NULL) == 0 )
+  if (gridInqXbounds(gridID, NULL) == 0 || gridInqYbounds(gridID, NULL) == 0)
     cdoAbort("Grid corner missing!");
 
-  int *mask = (int*) Malloc(gridsize*sizeof(int));
+  int *mask = (int *) Malloc(gridsize * sizeof(int));
 
-  if ( gridInqMask(gridID, NULL) )
+  if (gridInqMask(gridID, NULL))
     {
       gridInqMask(gridID, mask);
     }
   else
     {
-      for ( size_t i = 0; i < gridsize; i++ ) mask[i] = 1;
+      for (size_t i = 0; i < gridsize; i++)
+        mask[i] = 1;
     }
-      
+
   writeNCgrid(cdoGetStreamName(1).c_str(), gridID, mask);
 
   pstreamClose(streamID);
 
-  if ( mask ) Free(mask);
+  if (mask) Free(mask);
 
   cdoFinish();
 

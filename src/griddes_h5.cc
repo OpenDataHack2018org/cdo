@@ -14,13 +14,13 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #define H5_USE_16_API
 
-#ifdef  HAVE_LIBHDF5
+#ifdef HAVE_LIBHDF5
 #include "hdf5.h"
 #endif
 
@@ -28,80 +28,80 @@
 #include "cdo_int.h"
 #include "griddes.h"
 
-
-#ifdef  HAVE_LIBHDF5
-static
-herr_t obj_info(hid_t loc_id, const char *name, void *objname)
+#ifdef HAVE_LIBHDF5
+static herr_t
+obj_info(hid_t loc_id, const char *name, void *objname)
 {
   herr_t lexist = 0;
 
   H5G_stat_t statbuf;
   H5Gget_objinfo(loc_id, name, FALSE, &statbuf);
 
-  if ( strcmp(name, (char *) objname) == 0 )
+  if (strcmp(name, (char *) objname) == 0)
     {
       lexist = 1;
 
       H5G_obj_t obj_type = statbuf.type;
 
-      switch (obj_type) {
-      case H5G_GROUP:
-	if ( cdoVerbose ) cdoPrint("HDF5 object '%s' is a group", name);
-	break;
-      case H5G_DATASET: 
-	if ( cdoVerbose ) cdoPrint("HDF5 object '%s' is a dataset", name);
-	break;
-      case H5G_TYPE: 
-	if ( cdoVerbose ) cdoPrint("HDF5 object '%s' is a named datatype", name);
-	break;
-      default:
-	/*cdoAbort(" Unable to identify an object %s", name);*/
-	break;
-      }
+      switch (obj_type)
+        {
+        case H5G_GROUP:
+          if (cdoVerbose) cdoPrint("HDF5 object '%s' is a group", name);
+          break;
+        case H5G_DATASET:
+          if (cdoVerbose) cdoPrint("HDF5 object '%s' is a dataset", name);
+          break;
+        case H5G_TYPE:
+          if (cdoVerbose)
+            cdoPrint("HDF5 object '%s' is a named datatype", name);
+          break;
+        default:
+          /*cdoAbort(" Unable to identify an object %s", name);*/
+          break;
+        }
     }
 
   return lexist;
 }
 #endif
 
-
-#ifdef  HAVE_LIBHDF5
-static
-int h5find_object(hid_t file_id, const  char *name)
+#ifdef HAVE_LIBHDF5
+static int
+h5find_object(hid_t file_id, const char *name)
 {
   return (int) H5Giterate(file_id, "/", NULL, obj_info, (void *) name);
 }
 #endif
 
-static
-void fill_gridvals(size_t xsize, size_t ysize, double *xvals, double *yvals)
+static void
+fill_gridvals(size_t xsize, size_t ysize, double *xvals, double *yvals)
 {
   size_t i, j, ii, jj;
   size_t index, index2;
 
   double xmin = -180;
-  double xmax =  180;
+  double xmax = 180;
   double ymin = -90;
-  double ymax =  90;
+  double ymax = 90;
 
-  for ( ii = 0; ii < xsize/2; ++ii )
+  for (ii = 0; ii < xsize / 2; ++ii)
     {
-      index2 = ysize/2*xsize + ii;
-      if ( xvals[index2] > -180 && xvals[index2] < 360 )
-	{
-	  xmin = xvals[index2];
-	  break;
-	}
+      index2 = ysize / 2 * xsize + ii;
+      if (xvals[index2] > -180 && xvals[index2] < 360)
+        {
+          xmin = xvals[index2];
+          break;
+        }
     }
 
-  for ( ii = xsize-1; ii > xsize/2; --ii )
+  for (ii = xsize - 1; ii > xsize / 2; --ii)
     {
-      index2 = ysize/2*xsize + ii;
-      if ( xvals[index2] > -180 && xvals[index2] < 360 )
-	{
-	  xmax = xvals[index2];
-	  break;
-	}
+      index2 = ysize / 2 * xsize + ii;
+      if (xvals[index2] > -180 && xvals[index2] < 360)
+        {
+          xmax = xvals[index2];
+          break;
+        }
     }
   /*
   for ( jj = 0; jj < ysize; ++jj )
@@ -112,202 +112,201 @@ void fill_gridvals(size_t xsize, size_t ysize, double *xvals, double *yvals)
       if ( xvals[index2] < -180 || xvals[index2] > 360 ) xvals[index2] = 0;
     }
   */
-  for ( jj = 0; jj < ysize/2; ++jj )
+  for (jj = 0; jj < ysize / 2; ++jj)
     {
-      index2 = jj*xsize + xsize/2;
-      if ( yvals[index2] > -90 && yvals[index2] < 90 )
-	{
-	  ymax = yvals[index2];
-	  break;
-	}
+      index2 = jj * xsize + xsize / 2;
+      if (yvals[index2] > -90 && yvals[index2] < 90)
+        {
+          ymax = yvals[index2];
+          break;
+        }
     }
 
-  for ( jj = ysize-1; jj > ysize/2; --jj )
+  for (jj = ysize - 1; jj > ysize / 2; --jj)
     {
-      index2 = jj*xsize + xsize/2;
-      if ( yvals[index2] > -90 && yvals[index2] < 90 )
-	{
-	  ymin = yvals[index2];
-	  break;
-	}
+      index2 = jj * xsize + xsize / 2;
+      if (yvals[index2] > -90 && yvals[index2] < 90)
+        {
+          ymin = yvals[index2];
+          break;
+        }
     }
 
   /* printf("xmin %g, xmax %g, ymin %g, ymax %g\n", xmin, xmax, ymin, ymax); */
-  
-  for ( i = 0; i < xsize*ysize; ++i )
-    {
-      if ( xvals[i] > -180 && xvals[i] < 360 )
-	{
-	  if ( xvals[i] < xmin ) xmin = xvals[i];
-	  if ( xvals[i] > xmax ) xmax = xvals[i];
-	}
 
-      if ( yvals[i] > -90 && yvals[i] < 90 )
-	{
-	  if ( yvals[i] < ymin ) ymin = yvals[i];
-	  if ( yvals[i] > ymax ) ymax = yvals[i];
-	}
+  for (i = 0; i < xsize * ysize; ++i)
+    {
+      if (xvals[i] > -180 && xvals[i] < 360)
+        {
+          if (xvals[i] < xmin) xmin = xvals[i];
+          if (xvals[i] > xmax) xmax = xvals[i];
+        }
+
+      if (yvals[i] > -90 && yvals[i] < 90)
+        {
+          if (yvals[i] < ymin) ymin = yvals[i];
+          if (yvals[i] > ymax) ymax = yvals[i];
+        }
     }
 
-  for ( j = 0; j < ysize; ++j )
-    for ( i = 0; i < xsize; ++i )
+  for (j = 0; j < ysize; ++j)
+    for (i = 0; i < xsize; ++i)
       {
-	index = j*xsize + i;
+        index = j * xsize + i;
 
-	if ( xvals[index] < -180 || xvals[index] > 360 )
-	  {
-	    if ( i < xsize/2 )
-	      xvals[index] = xmin;
-	    else
-	      xvals[index] = xmax;
-	    /*
-	    if ( j < ysize/2 )
-	      for ( jj = j+1; jj < ysize/2; ++jj )
-		{
-		  index2 = jj*xsize + i;
-		  if ( xvals[index2] > -180 && xvals[index2] < 360 )
-		    {
-		      xvals[index] = xvals[index2];
-		      break;
-		    }
-		}
-	    else
-	      for ( jj = j-1; jj > ysize/2; --jj )
-		{
-		  index2 = jj*xsize + i;
-		  if ( xvals[index2] > -180 && xvals[index2] < 360 )
-		    {
-		      xvals[index] = xvals[index2];
-		      break;
-		    }
-		}
-	    */
-	    /*
-	    if ( i < xsize/2 )
-	      {
-		xvals[index] = xmin;
-		for ( ii = i+1; ii < xsize/2; ++ii )
-		  {
-		    index2 = j*xsize + ii;
-		    if ( xvals[index2] > -180 && xvals[index2] < 360 )
-		      {
-			xvals[index] = (xmin*(ii-i) + xvals[index2]*(i))/ii;
-			break;
-		      }
-		  }
-	      }
-	    else
-	      {
-		for ( ii = i-1; ii >= xsize/2; --ii )
-		  {
-		    index2 = j*xsize + ii;
-		    if ( xvals[index2] > -180 && xvals[index2] < 360 )
-		      {
-			xvals[index] = (xmax*(i-ii) + xvals[index2]*((xsize-1)-i))/(xsize-1-ii);
-			break;
-		      }
-		  }
-	      }
-	    */
-	  }
+        if (xvals[index] < -180 || xvals[index] > 360)
+          {
+            if (i < xsize / 2)
+              xvals[index] = xmin;
+            else
+              xvals[index] = xmax;
+            /*
+            if ( j < ysize/2 )
+              for ( jj = j+1; jj < ysize/2; ++jj )
+                {
+                  index2 = jj*xsize + i;
+                  if ( xvals[index2] > -180 && xvals[index2] < 360 )
+                    {
+                      xvals[index] = xvals[index2];
+                      break;
+                    }
+                }
+            else
+              for ( jj = j-1; jj > ysize/2; --jj )
+                {
+                  index2 = jj*xsize + i;
+                  if ( xvals[index2] > -180 && xvals[index2] < 360 )
+                    {
+                      xvals[index] = xvals[index2];
+                      break;
+                    }
+                }
+            */
+            /*
+            if ( i < xsize/2 )
+              {
+                xvals[index] = xmin;
+                for ( ii = i+1; ii < xsize/2; ++ii )
+                  {
+                    index2 = j*xsize + ii;
+                    if ( xvals[index2] > -180 && xvals[index2] < 360 )
+                      {
+                        xvals[index] = (xmin*(ii-i) + xvals[index2]*(i))/ii;
+                        break;
+                      }
+                  }
+              }
+            else
+              {
+                for ( ii = i-1; ii >= xsize/2; --ii )
+                  {
+                    index2 = j*xsize + ii;
+                    if ( xvals[index2] > -180 && xvals[index2] < 360 )
+                      {
+                        xvals[index] = (xmax*(i-ii) +
+            xvals[index2]*((xsize-1)-i))/(xsize-1-ii); break;
+                      }
+                  }
+              }
+            */
+          }
 
-	if ( yvals[index] < -90 || yvals[index] > 90 )
-	  {
-	    if ( j < ysize/2 )
-	      yvals[index] = ymax;
-	    else
-	      yvals[index] = ymin;
+        if (yvals[index] < -90 || yvals[index] > 90)
+          {
+            if (j < ysize / 2)
+              yvals[index] = ymax;
+            else
+              yvals[index] = ymin;
 
-	    if ( i < xsize/2 )
-	      for ( ii = i+1; ii < xsize/2; ++ii )
-		{
-		  index2 = j*xsize + ii;
-		  if ( yvals[index2] > -90 && yvals[index2] < 90 )
-		    {
-		      yvals[index] = yvals[index2];
-		      break;
-		    }
-		}
-	    else
-	      for ( ii = i-1; ii > xsize/2; --ii )
-		{
-		  index2 = j*xsize + ii;
-		  if ( yvals[index2] > -90 && yvals[index2] < 90 )
-		    {
-		      yvals[index] = yvals[index2];
-		      break;
-		    }
-		}
-	  }
+            if (i < xsize / 2)
+              for (ii = i + 1; ii < xsize / 2; ++ii)
+                {
+                  index2 = j * xsize + ii;
+                  if (yvals[index2] > -90 && yvals[index2] < 90)
+                    {
+                      yvals[index] = yvals[index2];
+                      break;
+                    }
+                }
+            else
+              for (ii = i - 1; ii > xsize / 2; --ii)
+                {
+                  index2 = j * xsize + ii;
+                  if (yvals[index2] > -90 && yvals[index2] < 90)
+                    {
+                      yvals[index] = yvals[index2];
+                      break;
+                    }
+                }
+          }
       }
 }
 
-
-void correct_sinxvals(int xsize, int ysize, double *xvals)
+void
+correct_sinxvals(int xsize, int ysize, double *xvals)
 {
   long i, j, istart, index;
 
   double xmin = -180;
-  double xmax =  180;
+  double xmax = 180;
 
-  for ( j = 0; j < ysize; ++j )
+  for (j = 0; j < ysize; ++j)
     {
-      istart = xsize/2-1;
-      xmin = xvals[j*xsize+istart];
-      for ( i = istart-1; i >= 0; i-- )
-	{
-	  index = j*xsize+i;
-	  if ( xvals[index] > xmin ) break;
-	  xmin = xvals[index];
-	}
+      istart = xsize / 2 - 1;
+      xmin = xvals[j * xsize + istart];
+      for (i = istart - 1; i >= 0; i--)
+        {
+          index = j * xsize + i;
+          if (xvals[index] > xmin) break;
+          xmin = xvals[index];
+        }
 
-      if ( i >= 0 )
-	{
-	  istart = i;
-	  // printf("%d %d %g\n",j,i, xmin);
-	  for ( i = 0; i <= istart; ++i )
-	    {
-	      index = j*xsize+i;
-	      xvals[index] = xmin;
-	    }
-	}
+      if (i >= 0)
+        {
+          istart = i;
+          // printf("%d %d %g\n",j,i, xmin);
+          for (i = 0; i <= istart; ++i)
+            {
+              index = j * xsize + i;
+              xvals[index] = xmin;
+            }
+        }
 
-      istart = xsize/2;
-      xmax = xvals[j*xsize+istart];
-      for ( i = istart+1; i < xsize; i++ )
-	{
-	  index = j*xsize+i;
-	  if ( xvals[index] < xmax ) break;
-	  xmax = xvals[index];
-	}
+      istart = xsize / 2;
+      xmax = xvals[j * xsize + istart];
+      for (i = istart + 1; i < xsize; i++)
+        {
+          index = j * xsize + i;
+          if (xvals[index] < xmax) break;
+          xmax = xvals[index];
+        }
 
-      if ( i < xsize )
-	{
-	  istart = i;
-	  // printf("%d %d %g\n",j,i, xmax);
-	  for ( i = istart; i < xsize; ++i )
-	    {
-	      index = j*xsize+i;
-	      xvals[index] = xmax;
-	    }
-	}
+      if (i < xsize)
+        {
+          istart = i;
+          // printf("%d %d %g\n",j,i, xmax);
+          for (i = istart; i < xsize; ++i)
+            {
+              index = j * xsize + i;
+              xvals[index] = xmax;
+            }
+        }
     }
 }
 
-
-int gridFromH5file(const char *gridfile)
+int
+gridFromH5file(const char *gridfile)
 {
-  int       gridID = -1;
-#ifdef  HAVE_LIBHDF5
-  hid_t	    lon_id = -1;    /* Dataset ID	        	*/
-  hid_t	    lat_id = -1;    /* Dataset ID	        	*/
-  hid_t     att_id;
-  hid_t     dataspace;   
-  hsize_t   dims_out[9];    /* dataset dimensions               */
-  herr_t    status;	    /* Generic return value		*/
-  int       rank;
+  int gridID = -1;
+#ifdef HAVE_LIBHDF5
+  hid_t lon_id = -1; /* Dataset ID	        	*/
+  hid_t lat_id = -1; /* Dataset ID	        	*/
+  hid_t att_id;
+  hid_t dataspace;
+  hsize_t dims_out[9]; /* dataset dimensions               */
+  herr_t status;       /* Generic return value		*/
+  int rank;
   griddes_t grid;
-
 
   gridInit(&grid);
 
@@ -319,85 +318,114 @@ int gridFromH5file(const char *gridfile)
 
   H5Pclose(fapl_id);
 
-  if ( file_id < 0 ) return gridID;
+  if (file_id < 0) return gridID;
 
-  if ( h5find_object(file_id, "lon") > 0 && 
-       h5find_object(file_id, "lat") > 0 )
+  if (h5find_object(file_id, "lon") > 0 && h5find_object(file_id, "lat") > 0)
     {
       lon_id = H5Dopen(file_id, "/lon");
       lat_id = H5Dopen(file_id, "/lat");
     }
-  else if ( h5find_object(file_id, "Longitude") > 0 && 
-	    h5find_object(file_id, "Latitude") > 0 )
+  else if (h5find_object(file_id, "Longitude") > 0
+           && h5find_object(file_id, "Latitude") > 0)
     {
       lon_id = H5Dopen(file_id, "/Longitude");
       lat_id = H5Dopen(file_id, "/Latitude");
     }
-  
-  if ( lon_id >= 0 && lat_id >= 0 )
-    {
-      dataspace = H5Dget_space(lon_id);    /* dataspace handle */
-      rank      = H5Sget_simple_extent_ndims(dataspace);
-      status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
 
-      if ( rank != 2 )
-	{
-	  //if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
-	  goto RETURN;
-	}
+  if (lon_id >= 0 && lat_id >= 0)
+    {
+      dataspace = H5Dget_space(lon_id); /* dataspace handle */
+      rank = H5Sget_simple_extent_ndims(dataspace);
+      status = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
+
+      if (rank != 2)
+        {
+          // if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
+          goto RETURN;
+        }
 
       // check for netcdf4 attribute
-      if ( H5Aexists(lon_id, "DIMENSION_LIST") ) goto RETURN;
-      if ( H5Aexists(lat_id, "DIMENSION_LIST") ) goto RETURN;
+      if (H5Aexists(lon_id, "DIMENSION_LIST")) goto RETURN;
+      if (H5Aexists(lat_id, "DIMENSION_LIST")) goto RETURN;
 
-      if ( H5Aexists(lon_id, "bounds") ) goto RETURN;
-      if ( H5Aexists(lat_id, "bounds") ) goto RETURN;
+      if (H5Aexists(lon_id, "bounds")) goto RETURN;
+      if (H5Aexists(lat_id, "bounds")) goto RETURN;
 
       /*
       printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
-	     (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
+             (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
       */
 
-      hid_t type_id = H5Dget_type(lon_id);  /* get datatype*/
+      hid_t type_id = H5Dget_type(lon_id); /* get datatype*/
 
       hid_t native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
       int ftype = 0;
-      if      ( H5Tequal(native_type, H5T_NATIVE_SCHAR)  > 0 ) {ftype=0;}
-      else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0;}
-      else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0;}
-      else if ( H5Tequal(native_type, H5T_NATIVE_USHORT) > 0 ) {ftype=0;}
-      else if ( H5Tequal(native_type, H5T_NATIVE_INT)    > 0 ) {ftype=0;}
-      else if ( H5Tequal(native_type, H5T_NATIVE_UINT)   > 0 ) {ftype=0;}
-      else if ( H5Tequal(native_type, H5T_NATIVE_FLOAT)  > 0 ) {ftype=1;}
-      else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) {ftype=1;}
+      if (H5Tequal(native_type, H5T_NATIVE_SCHAR) > 0)
+        {
+          ftype = 0;
+        }
+      else if (H5Tequal(native_type, H5T_NATIVE_UCHAR) > 0)
+        {
+          ftype = 0;
+        }
+      else if (H5Tequal(native_type, H5T_NATIVE_SHORT) > 0)
+        {
+          ftype = 0;
+        }
+      else if (H5Tequal(native_type, H5T_NATIVE_USHORT) > 0)
+        {
+          ftype = 0;
+        }
+      else if (H5Tequal(native_type, H5T_NATIVE_INT) > 0)
+        {
+          ftype = 0;
+        }
+      else if (H5Tequal(native_type, H5T_NATIVE_UINT) > 0)
+        {
+          ftype = 0;
+        }
+      else if (H5Tequal(native_type, H5T_NATIVE_FLOAT) > 0)
+        {
+          ftype = 1;
+        }
+      else if (H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0)
+        {
+          ftype = 1;
+        }
       else
-	{
-	  cdoWarning("Grid has unsupported native datatype!");
-	  goto RETURN;
-	}
+        {
+          cdoWarning("Grid has unsupported native datatype!");
+          goto RETURN;
+        }
       H5Tclose(native_type);
 
       grid.xsize = dims_out[1];
       grid.ysize = dims_out[0];
-      grid.size  = grid.xsize*grid.ysize;
+      grid.size = grid.xsize * grid.ysize;
 
-      grid.xvals = (double*) Malloc(grid.size*sizeof(double));
-      grid.yvals = (double*) Malloc(grid.size*sizeof(double));
+      grid.xvals = (double *) Malloc(grid.size * sizeof(double));
+      grid.yvals = (double *) Malloc(grid.size * sizeof(double));
 
-      if ( ftype )
-	{
-	  status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals);
-	  status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals);
-	}
+      if (ftype)
+        {
+          status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+                           H5P_DEFAULT, grid.xvals);
+          status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+                           H5P_DEFAULT, grid.yvals);
+        }
       else
-	{
-	  int *iarray = (int*) Malloc(grid.size*sizeof(int));
-	  status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	  for ( size_t i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
-	  status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	  for ( size_t i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
-	  Free(iarray);
-	}
+        {
+          int *iarray = (int *) Malloc(grid.size * sizeof(int));
+          status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
+                           H5P_DEFAULT, iarray);
+          for (size_t i = 0; i < grid.size; ++i)
+            grid.xvals[i] = iarray[i];
+          status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
+                           H5P_DEFAULT, iarray);
+          for (size_t i = 0; i < grid.size; ++i)
+            grid.yvals[i] = iarray[i];
+          Free(iarray);
+        }
 
       status = H5Sclose(dataspace);
 
@@ -412,7 +440,7 @@ int gridFromH5file(const char *gridfile)
 
       gridID = gridDefine(grid);
     }
-  else  if ( h5find_object(file_id, "where") > 0 )
+  else if (h5find_object(file_id, "where") > 0)
     {
       double xscale = 1, yscale = 1;
       double xoffset = 0, yoffset = 0;
@@ -420,131 +448,162 @@ int gridFromH5file(const char *gridfile)
       size_t i;
 
       grp_id = H5Gopen(file_id, "/where/lon/what");
-      if ( grp_id >= 0 )
-	{
-	  att_id = H5Aopen_name(grp_id, "gain");
-	  if ( att_id >= 0 )
-	    {
-	      status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &xscale);
-	      H5Aclose(att_id);
-	    }
+      if (grp_id >= 0)
+        {
+          att_id = H5Aopen_name(grp_id, "gain");
+          if (att_id >= 0)
+            {
+              status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &xscale);
+              H5Aclose(att_id);
+            }
 
-	  att_id = H5Aopen_name(grp_id, "offset");
-	  if ( att_id >= 0 )
-	    {
-	      status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &xoffset);
-	      H5Aclose(att_id);
-	    }
-	  
-	  H5Gclose(grp_id);
-	}
+          att_id = H5Aopen_name(grp_id, "offset");
+          if (att_id >= 0)
+            {
+              status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &xoffset);
+              H5Aclose(att_id);
+            }
+
+          H5Gclose(grp_id);
+        }
 
       grp_id = H5Gopen(file_id, "/where/lat/what");
-      if ( grp_id >= 0 )
-	{
-	  att_id = H5Aopen_name(grp_id, "gain");
-	  if ( att_id >= 0 )
-	    {
-	      status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &yscale);
-	      H5Aclose(att_id);
-	    }
+      if (grp_id >= 0)
+        {
+          att_id = H5Aopen_name(grp_id, "gain");
+          if (att_id >= 0)
+            {
+              status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &yscale);
+              H5Aclose(att_id);
+            }
 
-	  att_id = H5Aopen_name(grp_id, "offset");
-	  if ( att_id >= 0 )
-	    {
-	      status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &yoffset);
-	      H5Aclose(att_id);
-	    }
-	  
-	  H5Gclose(grp_id);
-	}
+          att_id = H5Aopen_name(grp_id, "offset");
+          if (att_id >= 0)
+            {
+              status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &yoffset);
+              H5Aclose(att_id);
+            }
+
+          H5Gclose(grp_id);
+        }
 
       /* Open an existing dataset. */
       lon_id = H5Dopen(file_id, "/where/lon/data");
-      if ( lon_id >= 0 )
-	lat_id = H5Dopen(file_id, "/where/lat/data");
+      if (lon_id >= 0) lat_id = H5Dopen(file_id, "/where/lat/data");
 
-      if ( lon_id >= 0 && lat_id >= 0 )
-	{
-	  dataspace = H5Dget_space(lon_id);    /* dataspace handle */
-	  rank      = H5Sget_simple_extent_ndims(dataspace);
-	  status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
+      if (lon_id >= 0 && lat_id >= 0)
+        {
+          dataspace = H5Dget_space(lon_id); /* dataspace handle */
+          rank = H5Sget_simple_extent_ndims(dataspace);
+          status = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
 
-	  if ( rank != 2 )
-	    {
-	      //if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
-	      goto RETURN;
-	    }
-	  /*
-	  printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
-		 (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
-	  */
+          if (rank != 2)
+            {
+              // if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
+              goto RETURN;
+            }
+          /*
+          printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
+                 (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
+          */
 
-	  hid_t type_id = H5Dget_type(lon_id);  /* get datatype*/
+          hid_t type_id = H5Dget_type(lon_id); /* get datatype*/
 
-	  hid_t native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
-	  int ftype = 0;
-	  if      ( H5Tequal(native_type, H5T_NATIVE_SCHAR)  > 0 ) {ftype=0;}
-	  else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0;}
-	  else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0;}
-	  else if ( H5Tequal(native_type, H5T_NATIVE_USHORT) > 0 ) {ftype=0;}
-	  else if ( H5Tequal(native_type, H5T_NATIVE_INT)    > 0 ) {ftype=0;}
-	  else if ( H5Tequal(native_type, H5T_NATIVE_UINT)   > 0 ) {ftype=0;}
-	  else if ( H5Tequal(native_type, H5T_NATIVE_FLOAT)  > 0 ) {ftype=1;}
-	  else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) {ftype=1;}
-	  else
-	    {
-	      cdoWarning("Grid has unsupported native datatype!");
-	      goto RETURN;
-	    }
-	  H5Tclose(native_type);
+          hid_t native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+          int ftype = 0;
+          if (H5Tequal(native_type, H5T_NATIVE_SCHAR) > 0)
+            {
+              ftype = 0;
+            }
+          else if (H5Tequal(native_type, H5T_NATIVE_UCHAR) > 0)
+            {
+              ftype = 0;
+            }
+          else if (H5Tequal(native_type, H5T_NATIVE_SHORT) > 0)
+            {
+              ftype = 0;
+            }
+          else if (H5Tequal(native_type, H5T_NATIVE_USHORT) > 0)
+            {
+              ftype = 0;
+            }
+          else if (H5Tequal(native_type, H5T_NATIVE_INT) > 0)
+            {
+              ftype = 0;
+            }
+          else if (H5Tequal(native_type, H5T_NATIVE_UINT) > 0)
+            {
+              ftype = 0;
+            }
+          else if (H5Tequal(native_type, H5T_NATIVE_FLOAT) > 0)
+            {
+              ftype = 1;
+            }
+          else if (H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0)
+            {
+              ftype = 1;
+            }
+          else
+            {
+              cdoWarning("Grid has unsupported native datatype!");
+              goto RETURN;
+            }
+          H5Tclose(native_type);
 
-	  grid.xsize = dims_out[1];
-	  grid.ysize = dims_out[0];
-	  grid.size  = grid.xsize*grid.ysize;
+          grid.xsize = dims_out[1];
+          grid.ysize = dims_out[0];
+          grid.size = grid.xsize * grid.ysize;
 
-	  grid.xvals = (double*) Malloc(grid.size*sizeof(double));
-	  grid.yvals = (double*) Malloc(grid.size*sizeof(double));
+          grid.xvals = (double *) Malloc(grid.size * sizeof(double));
+          grid.yvals = (double *) Malloc(grid.size * sizeof(double));
 
-	  if ( ftype )
-	    {
-	      status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals);
-	      status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals);
-	    }
-	  else
-	    {
-	      int *iarray = (int*) Malloc(grid.size*sizeof(int));
-	      status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	      for ( size_t i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
-	      status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	      for ( size_t i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
-	      Free(iarray);
-	    }
+          if (ftype)
+            {
+              status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+                               H5P_DEFAULT, grid.xvals);
+              status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+                               H5P_DEFAULT, grid.yvals);
+            }
+          else
+            {
+              int *iarray = (int *) Malloc(grid.size * sizeof(int));
+              status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
+                               H5P_DEFAULT, iarray);
+              for (size_t i = 0; i < grid.size; ++i)
+                grid.xvals[i] = iarray[i];
+              status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
+                               H5P_DEFAULT, iarray);
+              for (size_t i = 0; i < grid.size; ++i)
+                grid.yvals[i] = iarray[i];
+              Free(iarray);
+            }
 
-	  status = H5Sclose(dataspace);
-	  
-	  /* Close the dataset. */
-	  status = H5Dclose(lon_id);
-	  status = H5Dclose(lat_id);
+          status = H5Sclose(dataspace);
 
-	  for ( i = 0; i < grid.size; ++i ) grid.xvals[i] = grid.xvals[i]*xscale + xoffset;
-	  for ( i = 0; i < grid.size; ++i ) grid.yvals[i] = grid.yvals[i]*yscale + yoffset;
+          /* Close the dataset. */
+          status = H5Dclose(lon_id);
+          status = H5Dclose(lat_id);
 
-	  grid.type = GRID_CURVILINEAR;
-	  grid.datatype = CDI_DATATYPE_FLT32;
+          for (i = 0; i < grid.size; ++i)
+            grid.xvals[i] = grid.xvals[i] * xscale + xoffset;
+          for (i = 0; i < grid.size; ++i)
+            grid.yvals[i] = grid.yvals[i] * yscale + yoffset;
 
-	  gridID = gridDefine(grid);
-	}
+          grid.type = GRID_CURVILINEAR;
+          grid.datatype = CDI_DATATYPE_FLT32;
+
+          gridID = gridDefine(grid);
+        }
     }
 
- RETURN:
+RETURN:
 
   /* Close file */
-  if ( file_id >= 0 )  status = H5Fclose(file_id);
+  if (file_id >= 0) status = H5Fclose(file_id);
 
-  (void)status;
+  (void) status;
 
-  if ( gridID != -1 && cdoVerbose ) cdoPrint("%s: grid created.", __func__);
+  if (gridID != -1 && cdoVerbose) cdoPrint("%s: grid created.", __func__);
 
 #else
   cdoWarning("HDF5 support not compiled in!");

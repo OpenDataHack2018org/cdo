@@ -22,7 +22,6 @@
       Yearmonstat   yearmonavg         Yearly average from monthly data
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -30,7 +29,8 @@
 #include "pstream_int.h"
 #include "datetime.h"
 
-void *Yearmonstat(void *process)
+void *
+Yearmonstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int vdate = 0, vtime = 0;
@@ -69,11 +69,11 @@ void *Yearmonstat(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   int calendar = taxisInqCalendar(taxisID1);
   dtlist_type *dtlist = dtlist_new();
@@ -84,155 +84,161 @@ void *Yearmonstat(void *process)
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
 
-  int tsID    = 0;
-  int otsID   = 0;
-  while ( TRUE )
+  int tsID = 0;
+  int otsID = 0;
+  while (TRUE)
     {
       nsets = 0;
       dsets = 0;
-      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
-	{
-	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-	  vdate = dtlist_get_vdate(dtlist, nsets);
-	  vtime = dtlist_get_vtime(dtlist, nsets);
-	  cdiDecodeDate(vdate, &year, &month, &day);
+      while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
+        {
+          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
+          vdate = dtlist_get_vdate(dtlist, nsets);
+          vtime = dtlist_get_vtime(dtlist, nsets);
+          cdiDecodeDate(vdate, &year, &month, &day);
 
-	  if ( nsets == 0 ) year0 = year;
+          if (nsets == 0) year0 = year;
 
-	  if ( year != year0 ) break;
+          if (year != year0) break;
 
-	  if ( nsets > 0 && month == month0 )
-	    {
-	      date2str(vdate0, vdatestr, sizeof(vdatestr));
-	      time2str(vtime0, vtimestr, sizeof(vtimestr));
-	      cdoWarning("   last timestep: %s %s", vdatestr, vtimestr);
-	      date2str(vdate, vdatestr, sizeof(vdatestr));
-	      time2str(vtime, vtimestr, sizeof(vtimestr));
-	      cdoWarning("current timestep: %s %s", vdatestr, vtimestr);
-	      cdoAbort("Month does not change!");
-	    }
+          if (nsets > 0 && month == month0)
+            {
+              date2str(vdate0, vdatestr, sizeof(vdatestr));
+              time2str(vtime0, vtimestr, sizeof(vtimestr));
+              cdoWarning("   last timestep: %s %s", vdatestr, vtimestr);
+              date2str(vdate, vdatestr, sizeof(vdatestr));
+              time2str(vtime, vtimestr, sizeof(vtimestr));
+              cdoWarning("current timestep: %s %s", vdatestr, vtimestr);
+              cdoAbort("Month does not change!");
+            }
 
-	  dpm = days_per_month(calendar, year, month);
+          dpm = days_per_month(calendar, year, month);
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      if ( tsID == 0 )
-		{
-		  recVarID[recID]   = varID;
-		  recLevelID[recID] = levelID;
-		}
+              if (tsID == 0)
+                {
+                  recVarID[recID] = varID;
+                  recLevelID[recID] = levelID;
+                }
 
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+              gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	      if ( nsets == 0 )
-		{
-		  pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
-		  vars1[varID][levelID].nmiss = nmiss;
+              if (nsets == 0)
+                {
+                  pstreamReadRecord(streamID1, vars1[varID][levelID].ptr,
+                                    &nmiss);
+                  vars1[varID][levelID].nmiss = nmiss;
 
-		  farcmul(&vars1[varID][levelID], dpm);
+                  farcmul(&vars1[varID][levelID], dpm);
 
-		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
-		    {
-		      if ( samp1[varID][levelID].ptr == NULL )
-			samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
+                  if (nmiss > 0 || samp1[varID][levelID].ptr)
+                    {
+                      if (samp1[varID][levelID].ptr == NULL)
+                        samp1[varID][levelID].ptr
+                            = (double *) Malloc(gridsize * sizeof(double));
 
-		      for ( size_t i = 0; i < gridsize; i++ )
-			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
-			  samp1[varID][levelID].ptr[i] = 0;
-			else
-			  samp1[varID][levelID].ptr[i] = dpm;
-		    }
-		}
-	      else
-		{
-		  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = nmiss;
-		  field.grid    = vars1[varID][levelID].grid;
-		  field.missval = vars1[varID][levelID].missval;
+                      for (size_t i = 0; i < gridsize; i++)
+                        if (DBL_IS_EQUAL(vars1[varID][levelID].ptr[i],
+                                         vars1[varID][levelID].missval))
+                          samp1[varID][levelID].ptr[i] = 0;
+                        else
+                          samp1[varID][levelID].ptr[i] = dpm;
+                    }
+                }
+              else
+                {
+                  pstreamReadRecord(streamID1, field.ptr, &nmiss);
+                  field.nmiss = nmiss;
+                  field.grid = vars1[varID][levelID].grid;
+                  field.missval = vars1[varID][levelID].missval;
 
-		  farcmul(&field, dpm);
+                  farcmul(&field, dpm);
 
-		  if ( field.nmiss > 0 || samp1[varID][levelID].ptr )
-		    {
-		      if ( samp1[varID][levelID].ptr == NULL )
-			{
-			  samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-			  for ( size_t i = 0; i < gridsize; i++ )
-			    samp1[varID][levelID].ptr[i] = dsets;
-			}
+                  if (field.nmiss > 0 || samp1[varID][levelID].ptr)
+                    {
+                      if (samp1[varID][levelID].ptr == NULL)
+                        {
+                          samp1[varID][levelID].ptr
+                              = (double *) Malloc(gridsize * sizeof(double));
+                          for (size_t i = 0; i < gridsize; i++)
+                            samp1[varID][levelID].ptr[i] = dsets;
+                        }
 
-		      for ( size_t i = 0; i < gridsize; i++ )
-			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
-			  samp1[varID][levelID].ptr[i] += dpm;
-		    }
+                      for (size_t i = 0; i < gridsize; i++)
+                        if (!DBL_IS_EQUAL(field.ptr[i],
+                                          vars1[varID][levelID].missval))
+                          samp1[varID][levelID].ptr[i] += dpm;
+                    }
 
-		  farfun(&vars1[varID][levelID], field, operfunc);
-		}
-	    }
+                  farfun(&vars1[varID][levelID], field, operfunc);
+                }
+            }
 
-	  month0 = month;
-	  vdate0 = vdate;
-	  vtime0 = vtime;
-	  nsets++;
-	  dsets += dpm;
-	  tsID++;
-	}
+          month0 = month;
+          vdate0 = vdate;
+          vtime0 = vtime;
+          nsets++;
+          dsets += dpm;
+          tsID++;
+        }
 
-      if ( nrecs == 0 && nsets == 0 ) break;
+      if (nrecs == 0 && nsets == 0) break;
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    {
-	      if ( samp1[varID][levelID].ptr == NULL )
-		farcdiv(&vars1[varID][levelID], dsets);
-	      else
-		fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
-	    }
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
+          nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          for (levelID = 0; levelID < nlevel; levelID++)
+            {
+              if (samp1[varID][levelID].ptr == NULL)
+                farcdiv(&vars1[varID][levelID], dsets);
+              else
+                fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
+            }
+        }
 
-      if ( cdoVerbose )
-	{
-	  date2str(vdate0, vdatestr, sizeof(vdatestr));
-	  time2str(vtime0, vtimestr, sizeof(vtimestr));
-	  cdoPrint("%s %s  nsets = %ld", vdatestr, vtimestr, nsets);
-	}
+      if (cdoVerbose)
+        {
+          date2str(vdate0, vdatestr, sizeof(vdatestr));
+          time2str(vtime0, vtimestr, sizeof(vtimestr));
+          cdoPrint("%s %s  nsets = %ld", vdatestr, vtimestr, nsets);
+        }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
       pstreamDefTimestep(streamID2, otsID);
 
-      for ( int recID = 0; recID < nrecords; recID++ )
-	{
-	  varID   = recVarID[recID];
-	  levelID = recLevelID[recID];
+      for (int recID = 0; recID < nrecords; recID++)
+        {
+          varID = recVarID[recID];
+          levelID = recLevelID[recID];
 
-	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
+          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+            continue;
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,
+                             vars1[varID][levelID].nmiss);
+        }
 
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
       otsID++;
     }
-
 
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  if (recVarID) Free(recVarID);
+  if (recLevelID) Free(recLevelID);
 
   dtlist_delete(dtlist);
 

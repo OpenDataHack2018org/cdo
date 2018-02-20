@@ -18,6 +18,6 @@
 #ifndef READLINE_H
 #define READLINE_H
 
-int     readline(FILE *fp, char *line, int len);
+int readline(FILE *fp, char *line, int len);
 
 #endif

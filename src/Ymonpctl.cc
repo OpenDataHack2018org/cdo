@@ -28,18 +28,18 @@
 #include "percentiles_hist.h"
 #include "percentiles.h"
 
-#define  NMONTH     17
+#define NMONTH 17
 
-static
-int getmonth(int date)
+static int
+getmonth(int date)
 {
   int year, month, day;
   cdiDecodeDate(date, &year, &month, &day);
   return month;
 }
 
-
-void *Ymonpctl(void *process)
+void *
+Ymonpctl(void *process)
 {
   int varID;
   int gridID;
@@ -61,7 +61,7 @@ void *Ymonpctl(void *process)
   double pn = parameter2double(operatorArgv()[0]);
   percentile_check_number(pn);
 
-  for ( month = 0; month < NMONTH; month++ )
+  for (month = 0; month < NMONTH; month++)
     {
       vars1[month] = NULL;
       hsets[month] = NULL;
@@ -86,164 +86,179 @@ void *Ymonpctl(void *process)
   /* TODO - check that time axes 2 and 3 are equal */
 
   int taxisID4 = taxisDuplicate(taxisID1);
-  if ( taxisHasBounds(taxisID4) ) taxisDeleteBounds(taxisID4);
+  if (taxisHasBounds(taxisID4)) taxisDeleteBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
   int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
-  int nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
-      if ( nrecs != cdoStreamInqTimestep(streamID3, tsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
-      
+      if (nrecs != cdoStreamInqTimestep(streamID3, tsID))
+        cdoAbort("Number of records at time step %d of %s and %s differ!",
+                 tsID + 1, cdoGetStreamName(1).c_str(),
+                 cdoGetStreamName(2).c_str());
+
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
-      
-      if ( vdate != taxisInqVdate(taxisID3) )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
-        
-      if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
+
+      if (vdate != taxisInqVdate(taxisID3))
+        cdoAbort("Verification dates at time step %d of %s and %s differ!",
+                 tsID + 1, cdoGetStreamName(1).c_str(),
+                 cdoGetStreamName(2).c_str());
+
+      if (cdoVerbose)
+        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
-      if ( month < 0 || month >= NMONTH )
-	cdoAbort("Month %d out of range!", month);
+      if (month < 0 || month >= NMONTH)
+        cdoAbort("Month %d out of range!", month);
 
       vdates2[month] = vdate;
 
-      if ( vars1[month] == NULL )
-	{
-	  vars1[month] = field_malloc(vlistID1, FIELD_PTR);
+      if (vars1[month] == NULL)
+        {
+          vars1[month] = field_malloc(vlistID1, FIELD_PTR);
           hsets[month] = hsetCreate(nvars);
 
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      gridID   = vlistInqVarGrid(vlistID1, varID);
-	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          for (varID = 0; varID < nvars; varID++)
+            {
+              gridID = vlistInqVarGrid(vlistID1, varID);
+              nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
               hsetCreateVarLevels(hsets[month], varID, nlevels, gridID);
-	    }
-	}
-      
-      for ( int recID = 0; recID < nrecs; recID++ )
+            }
+        }
+
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-	  pstreamReadRecord(streamID2, vars1[month][varID][levelID].ptr, &nmiss);
+          pstreamReadRecord(streamID2, vars1[month][varID][levelID].ptr,
+                            &nmiss);
           vars1[month][varID][levelID].nmiss = nmiss;
         }
-      for ( int recID = 0; recID < nrecs; recID++ )
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID3, &varID, &levelID);
-	  pstreamReadRecord(streamID3, field.ptr, &nmiss);
-          field.nmiss   = nmiss;
-          field.grid    = vars1[month][varID][levelID].grid;
-	  field.missval = vars1[month][varID][levelID].missval;
-	  
-	  hsetDefVarLevelBounds(hsets[month], varID, levelID, &vars1[month][varID][levelID], &field);
+          pstreamReadRecord(streamID3, field.ptr, &nmiss);
+          field.nmiss = nmiss;
+          field.grid = vars1[month][varID][levelID].grid;
+          field.missval = vars1[month][varID][levelID].missval;
+
+          hsetDefVarLevelBounds(hsets[month], varID, levelID,
+                                &vars1[month][varID][levelID], &field);
         }
-      
+
       tsID++;
     }
 
   tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
+      if (cdoVerbose)
+        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
-      if ( month < 0 || month >= NMONTH )
-	cdoAbort("Month %d out of range!", month);
+      if (month < 0 || month >= NMONTH)
+        cdoAbort("Month %d out of range!", month);
 
       vdates1[month] = vdate;
       vtimes1[month] = vtime;
 
-      if ( vars1[month] == NULL )
-        cdoAbort("No data for month %d in %s and %s", month, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
+      if (vars1[month] == NULL)
+        cdoAbort("No data for month %d in %s and %s", month,
+                 cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( tsID == 0 )
-	    {
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
-	    }
+          if (tsID == 0)
+            {
+              recVarID[recID] = varID;
+              recLevelID[recID] = levelID;
+            }
 
-	  pstreamReadRecord(streamID1, vars1[month][varID][levelID].ptr, &nmiss);
-	  vars1[month][varID][levelID].nmiss = nmiss;
+          pstreamReadRecord(streamID1, vars1[month][varID][levelID].ptr,
+                            &nmiss);
+          vars1[month][varID][levelID].nmiss = nmiss;
 
-	  hsetAddVarLevelValues(hsets[month], varID, levelID, &vars1[month][varID][levelID]);
-	}
+          hsetAddVarLevelValues(hsets[month], varID, levelID,
+                                &vars1[month][varID][levelID]);
+        }
 
       nsets[month]++;
       tsID++;
     }
 
   int otsID = 0;
-  for ( month = 0; month < NMONTH; month++ )
-    if ( nsets[month] )
+  for (month = 0; month < NMONTH; month++)
+    if (nsets[month])
       {
-        if ( getmonth(vdates1[month]) != getmonth(vdates2[month]) )
-          cdoAbort("Verification dates for the month %d of %s and %s are different!",
-                   month, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
+        if (getmonth(vdates1[month]) != getmonth(vdates2[month]))
+          cdoAbort(
+              "Verification dates for the month %d of %s and %s are different!",
+              month, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
 
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
-	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      
-	    for ( levelID = 0; levelID < nlevels; levelID++ )
-	      hsetGetVarLevelPercentiles(&vars1[month][varID][levelID], hsets[month], varID, levelID, pn);
-	  }
+        for (varID = 0; varID < nvars; varID++)
+          {
+            if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
+            nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
-	taxisDefVdate(taxisID4, vdates1[month]);
-	taxisDefVtime(taxisID4, vtimes1[month]);
-	pstreamDefTimestep(streamID4, otsID);
+            for (levelID = 0; levelID < nlevels; levelID++)
+              hsetGetVarLevelPercentiles(&vars1[month][varID][levelID],
+                                         hsets[month], varID, levelID, pn);
+          }
 
-	for ( int recID = 0; recID < nrecords; recID++ )
-	  {
-	    varID    = recVarID[recID];
-	    levelID  = recLevelID[recID];
+        taxisDefVdate(taxisID4, vdates1[month]);
+        taxisDefVtime(taxisID4, vtimes1[month]);
+        pstreamDefTimestep(streamID4, otsID);
 
-	    if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
+        for (int recID = 0; recID < nrecords; recID++)
+          {
+            varID = recVarID[recID];
+            levelID = recLevelID[recID];
 
-	    pstreamDefRecord(streamID4, varID, levelID);
-	    pstreamWriteRecord(streamID4, vars1[month][varID][levelID].ptr, vars1[month][varID][levelID].nmiss);
-	  }
+            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+              continue;
 
-	otsID++;
+            pstreamDefRecord(streamID4, varID, levelID);
+            pstreamWriteRecord(streamID4, vars1[month][varID][levelID].ptr,
+                               vars1[month][varID][levelID].nmiss);
+          }
+
+        otsID++;
       }
 
-  for ( month = 0; month < NMONTH; month++ )
+  for (month = 0; month < NMONTH; month++)
     {
-      if ( vars1[month] != NULL )
-	{
-	  field_free(vars1[month], vlistID1); 
-	  hsetDestroy(hsets[month]);
-	}
+      if (vars1[month] != NULL)
+        {
+          field_free(vars1[month], vlistID1);
+          hsetDestroy(hsets[month]);
+        }
     }
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  if (recVarID) Free(recVarID);
+  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID4);
   pstreamClose(streamID3);

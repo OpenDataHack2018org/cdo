@@ -23,14 +23,14 @@
  * are rearranged as far as necessary to get the nth element to its proper
  * position, with no element less than the nth element placed after it.
  * Based on the Quicksort algorithm.
- * 
+ *
  * @param array   the array
  * @param length  the length of the array
  * @param n       the ordinal number of the element to be found. Must be
  *                in the interval [0, length - 1]
- * 
+ *
  * @return the nth smallest value in the input array
- * 
+ *
  * @author Ralf Quast
  * @version 1.0
  */

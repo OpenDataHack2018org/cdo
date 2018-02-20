@@ -23,12 +23,12 @@
 
 #include <cdi.h>
 
-#include "cdo_int.h"  /* processSelf */
+#include "cdo_int.h" /* processSelf */
 #include "pstream_int.h"
 #include "listarray.h"
 
-
-void *Selrec(void *process)
+void *
+Selrec(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -36,7 +36,8 @@ void *Selrec(void *process)
 
   cdoInitialize(process);
 
-  if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
+  if (processSelf().m_ID != 0)
+    cdoAbort("This operator can't be combined with other operators!");
 
   operatorInputArg("records");
 
@@ -44,18 +45,19 @@ void *Selrec(void *process)
 
   int *intarr = (int *) lista_dataptr(ilista);
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
-      for ( int i = 0; i < nsel; i++ )
-	cdoPrint("intarr entry: %d %d", i, intarr[i]);
+      for (int i = 0; i < nsel; i++)
+        cdoPrint("intarr entry: %d %d", i, intarr[i]);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int filetype = pstreamInqFiletype(streamID1);
 
-  if ( filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 ||
-       filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5 )
+  if (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2
+      || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C
+      || filetype == CDI_FILETYPE_NC5)
     cdoAbort("This operator does not work on NetCDF data!");
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
@@ -70,28 +72,28 @@ void *Selrec(void *process)
 
   int recordID = 0;
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-     
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  recordID++;
-	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  for ( int i = 0; i < nsel; i++ )
-	    {
-	      if ( recordID == intarr[i] )
-		{
-		  pstreamDefRecord(streamID2, varID, levelID);
-		  pstreamCopyRecord(streamID2, streamID1);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          recordID++;
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-		  break;
-		}
-	    }
-	}
-       
+          for (int i = 0; i < nsel; i++)
+            {
+              if (recordID == intarr[i])
+                {
+                  pstreamDefRecord(streamID2, varID, levelID);
+                  pstreamCopyRecord(streamID2, streamID1);
+
+                  break;
+                }
+            }
+        }
+
       tsID++;
     }
 

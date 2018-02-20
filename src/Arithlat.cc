@@ -22,15 +22,14 @@
       Arithlat   divcoslat       Divide by cos(lat)
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "grid.h"
 
-
-void *Arithlat(void *process)
+void *
+Arithlat(void *process)
 {
   int gridtype;
   int gridID0 = -1;
@@ -62,76 +61,84 @@ void *Arithlat(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, array, &nmiss);
-	  
-	  int gridID = vlistInqVarGrid(vlistID1, varID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, array, &nmiss);
 
-	  if ( gridID != gridID0 )
-	    {
-	      gridID0 = gridID;
+          int gridID = vlistInqVarGrid(vlistID1, varID);
 
-	      gridtype = gridInqType(gridID);
-              int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
-	      if ( gridtype == GRID_LONLAT      ||
-		   gridtype == GRID_GAUSSIAN    ||
-		   projtype == CDI_PROJ_LCC )
-		{
-		  gridID = gridToCurvilinear(gridID, 0);
-		}
-	      else if ( gridtype == GRID_CURVILINEAR ||
-			gridtype == GRID_UNSTRUCTURED )
-		{
-		  /* No conversion necessary */
-		}
-	      else if ( gridtype == GRID_GME )
-		{
-		  gridID = gridToUnstructured(gridID, 0);
-		}
-	      else
-		{
-		  if ( gridtype == GRID_GAUSSIAN_REDUCED )
-		    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
-			     gridNamePtr(gridtype));
-		  else
-		    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
-		}
+          if (gridID != gridID0)
+            {
+              gridID0 = gridID;
 
-	      gridsize = gridInqSize(gridID);
+              gridtype = gridInqType(gridID);
+              int projtype = (gridtype == GRID_PROJECTION)
+                                 ? gridInqProjType(gridID)
+                                 : -1;
+              if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN
+                  || projtype == CDI_PROJ_LCC)
+                {
+                  gridID = gridToCurvilinear(gridID, 0);
+                }
+              else if (gridtype == GRID_CURVILINEAR
+                       || gridtype == GRID_UNSTRUCTURED)
+                {
+                  /* No conversion necessary */
+                }
+              else if (gridtype == GRID_GME)
+                {
+                  gridID = gridToUnstructured(gridID, 0);
+                }
+              else
+                {
+                  if (gridtype == GRID_GAUSSIAN_REDUCED)
+                    cdoAbort("Unsupported grid type: %s, use CDO option -R to "
+                             "convert reduced to regular grid!",
+                             gridNamePtr(gridtype));
+                  else
+                    cdoAbort("Unsupported grid type: %s",
+                             gridNamePtr(gridtype));
+                }
 
-	      scale = (double*) Realloc(scale, gridsize*sizeof(double));
-	      gridInqYvals(gridID, scale);
+              gridsize = gridInqSize(gridID);
 
-	      /* Convert lat/lon units if required */
-	      
-	      gridInqXunits(gridID, units);
+              scale = (double *) Realloc(scale, gridsize * sizeof(double));
+              gridInqYvals(gridID, scale);
 
-	      grid_to_radian(units, gridsize, scale, "grid latitudes");
+              /* Convert lat/lon units if required */
 
-	      if ( operfunc == func_mul )
-		for ( size_t i = 0; i < gridsize; ++i ) scale[i] = cos(scale[i]);
-	      else
-		for ( size_t i = 0; i < gridsize; ++i ) scale[i] = 1./cos(scale[i]);
+              gridInqXunits(gridID, units);
 
-	      if ( cdoVerbose ) for ( unsigned i = 0; i < 10; ++i ) cdoPrint("coslat  %3d  %g", i+1, scale[i]);
-	    }
+              grid_to_radian(units, gridsize, scale, "grid latitudes");
 
-	  for ( size_t i = 0; i < gridsize; ++i ) array[i] *= scale[i];
+              if (operfunc == func_mul)
+                for (size_t i = 0; i < gridsize; ++i)
+                  scale[i] = cos(scale[i]);
+              else
+                for (size_t i = 0; i < gridsize; ++i)
+                  scale[i] = 1. / cos(scale[i]);
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, array, nmiss);
-	}
+              if (cdoVerbose)
+                for (unsigned i = 0; i < 10; ++i)
+                  cdoPrint("coslat  %3d  %g", i + 1, scale[i]);
+            }
+
+          for (size_t i = 0; i < gridsize; ++i)
+            array[i] *= scale[i];
+
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, array, nmiss);
+        }
 
       tsID++;
     }
@@ -139,8 +146,8 @@ void *Arithlat(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( array ) Free(array);
-  if ( scale ) Free(scale);
+  if (array) Free(array);
+  if (scale) Free(scale);
 
   cdoFinish();
 

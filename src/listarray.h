@@ -18,18 +18,16 @@
 #ifndef _LISTA_H
 #define _LISTA_H
 
-#define  INT_LISTA  1
-#define  FLT_LISTA  2
+#define INT_LISTA 1
+#define FLT_LISTA 2
 
-
-typedef struct {
+typedef struct
+{
   void *array;
   int nalloc;
   int allinc;
   int type;
-}
-lista_t;
-
+} lista_t;
 
 lista_t *lista_new(int type);
 void lista_destroy(lista_t *lista);
@@ -41,4 +39,4 @@ double lista_get_flt(lista_t *lista, int num);
 int args2int_lista(int argc, char **argv, lista_t *lista);
 int args2flt_lista(int argc, char **argv, lista_t *lista);
 
-#endif  /* _LISTA_H */
+#endif /* _LISTA_H */

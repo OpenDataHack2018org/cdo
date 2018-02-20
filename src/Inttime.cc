@@ -21,18 +21,16 @@
       Inttime    inttime         Time interpolation
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "datetime.h"
 
-
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit);
 
-
-void *Inttime(void *process)
+void *
+Inttime(void *process)
 {
   int streamID2 = -1;
   int nlevel;
@@ -48,41 +46,48 @@ void *Inttime(void *process)
   cdoInitialize(process);
 
   operatorInputArg("date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
-  if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
+  if (operatorArgc() < 2) cdoAbort("Too few arguments!");
 
   const char *datestr = operatorArgv()[0];
   const char *timestr = operatorArgv()[1];
 
-  if ( strchr(datestr, '-') )
+  if (strchr(datestr, '-'))
     {
-      year = 1; month = 1; day = 1;
+      year = 1;
+      month = 1;
+      day = 1;
       sscanf(datestr, "%d-%d-%d", &year, &month, &day);
       vdate = cdiEncodeDate(year, month, day);
     }
   else
     {
-      vdate = (int)strtol(datestr, &rstr, 10);
-      if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", datestr);
+      vdate = (int) strtol(datestr, &rstr, 10);
+      if (*rstr != 0)
+        cdoAbort("Parameter string contains invalid characters: %s", datestr);
     }
 
-  if ( strchr(timestr, ':') )
+  if (strchr(timestr, ':'))
     {
-      hour = 0; minute = 0; second = 0;
+      hour = 0;
+      minute = 0;
+      second = 0;
       sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
       vtime = cdiEncodeTime(hour, minute, second);
     }
   else
     {
-      vtime = (int)strtol(timestr, &rstr, 10);
-      if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", timestr);
+      vtime = (int) strtol(timestr, &rstr, 10);
+      if (*rstr != 0)
+        cdoAbort("Parameter string contains invalid characters: %s", timestr);
     }
 
-  if ( operatorArgc() == 3 )
+  if (operatorArgc() == 3)
     {
       const char *timeunits = operatorArgv()[2];
-      incperiod = (int)strtol(timeunits, NULL, 10);
-      if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
-      while ( isdigit((int) *timeunits) ) timeunits++;
+      incperiod = (int) strtol(timeunits, NULL, 10);
+      if (timeunits[0] == '-' || timeunits[0] == '+') timeunits++;
+      while (isdigit((int) *timeunits))
+        timeunits++;
 
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
     }
@@ -94,42 +99,42 @@ void *Inttime(void *process)
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
-  if ( ijulinc == 0 ) vlistDefNtsteps(vlistID2, 1);
+  if (ijulinc == 0) vlistDefNtsteps(vlistID2, 1);
 
-  int nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
-  size_t **nmiss1   = (size_t **) Malloc(nvars*sizeof(size_t *));
-  size_t **nmiss2   = (size_t **) Malloc(nvars*sizeof(size_t *));
-  double **vardata1 = (double **) Malloc(nvars*sizeof(double *));
-  double **vardata2 = (double **) Malloc(nvars*sizeof(double *));
+  size_t **nmiss1 = (size_t **) Malloc(nvars * sizeof(size_t *));
+  size_t **nmiss2 = (size_t **) Malloc(nvars * sizeof(size_t *));
+  double **vardata1 = (double **) Malloc(nvars * sizeof(double *));
+  double **vardata2 = (double **) Malloc(nvars * sizeof(double *));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      nmiss1[varID]   = (size_t*) Malloc(nlevel*sizeof(size_t));
-      nmiss2[varID]   = (size_t*) Malloc(nlevel*sizeof(size_t));
-      vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
-      vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
+      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      nmiss1[varID] = (size_t *) Malloc(nlevel * sizeof(size_t));
+      nmiss2[varID] = (size_t *) Malloc(nlevel * sizeof(size_t));
+      vardata1[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
+      vardata2[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
     }
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
-  if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
+  if (taxisHasBounds(taxisID2)) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int calendar = taxisInqCalendar(taxisID1);
 
   juldate_t juldate = juldate_encode(calendar, vdate, vtime);
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
       cdoPrint("date %d  time %d", vdate, vtime);
       cdoPrint("juldate  = %f", juldate_to_seconds(juldate));
@@ -138,164 +143,182 @@ void *Inttime(void *process)
 
   int tsID = 0;
   int nrecs = cdoStreamInqTimestep(streamID1, tsID++);
-  juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
-  for ( int recID = 0; recID < nrecs; recID++ )
+  juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1),
+                                      taxisInqVtime(taxisID1));
+  for (int recID = 0; recID < nrecs; recID++)
     {
       pstreamInqRecord(streamID1, &varID, &levelID);
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      offset   = gridsize*levelID;
-      single1  = vardata1[varID] + offset;
+      offset = gridsize * levelID;
+      single1 = vardata1[varID] + offset;
       pstreamReadRecord(streamID1, single1, &nmiss1[varID][levelID]);
     }
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
-      cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+      cdoPrint("date %d  time %d", taxisInqVdate(taxisID1),
+               taxisInqVtime(taxisID1));
       cdoPrint("juldate1  = %f", juldate_to_seconds(juldate1));
     }
 
-  if ( juldate_to_seconds(juldate1) > juldate_to_seconds(juldate) )
+  if (juldate_to_seconds(juldate1) > juldate_to_seconds(juldate))
     cdoWarning("start time %d %d out of range!", vdate, vtime);
 
   int tsIDo = 0;
-  while ( juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate) )
+  while (juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate))
     {
       nrecs = cdoStreamInqTimestep(streamID1, tsID++);
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
 
-      juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
-      if ( cdoVerbose )
-	{
-	  cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
-	  cdoPrint("juldate2  = %f", juldate_to_seconds(juldate2));
-	}
+      juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1),
+                                          taxisInqVtime(taxisID1));
+      if (cdoVerbose)
+        {
+          cdoPrint("date %d  time %d", taxisInqVdate(taxisID1),
+                   taxisInqVtime(taxisID1));
+          cdoPrint("juldate2  = %f", juldate_to_seconds(juldate2));
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  recVarID[recID]   = varID;
-	  recLevelID[recID] = levelID;
+          recVarID[recID] = varID;
+          recLevelID[recID] = levelID;
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
-	  single2  = vardata2[varID] + offset;
-	  pstreamReadRecord(streamID1, single2, &nmiss2[varID][levelID]);
-	}
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          offset = gridsize * levelID;
+          single2 = vardata2[varID] + offset;
+          pstreamReadRecord(streamID1, single2, &nmiss2[varID][levelID]);
+        }
 
-      while ( juldate_to_seconds(juldate) <= juldate_to_seconds(juldate2) )
-	{
-	  if ( juldate_to_seconds(juldate) >= juldate_to_seconds(juldate1) &&
-	       juldate_to_seconds(juldate) <= juldate_to_seconds(juldate2) )
-	    {
-	      juldate_decode(calendar, juldate, &vdate, &vtime);
+      while (juldate_to_seconds(juldate) <= juldate_to_seconds(juldate2))
+        {
+          if (juldate_to_seconds(juldate) >= juldate_to_seconds(juldate1)
+              && juldate_to_seconds(juldate) <= juldate_to_seconds(juldate2))
+            {
+              juldate_decode(calendar, juldate, &vdate, &vtime);
 
-	      if ( cdoVerbose )
-		{
-		  char vdatestr[32], vtimestr[32];	  
-		  /*
-		  cdoPrint("juldate1 %f", juldate_to_seconds(juldate1));
-		  cdoPrint("juldate  %f", juldate_to_seconds(juldate));
-		  cdoPrint("juldate2 %f", juldate_to_seconds(juldate2));
-		  */
-		  date2str(vdate, vdatestr, sizeof(vdatestr));
-		  time2str(vtime, vtimestr, sizeof(vtimestr));
-		  cdoPrint("%s %s  %f  %d", vdatestr, vtimestr, juldate_to_seconds(juldate), calendar);
-		}
+              if (cdoVerbose)
+                {
+                  char vdatestr[32], vtimestr[32];
+                  /*
+                  cdoPrint("juldate1 %f", juldate_to_seconds(juldate1));
+                  cdoPrint("juldate  %f", juldate_to_seconds(juldate));
+                  cdoPrint("juldate2 %f", juldate_to_seconds(juldate2));
+                  */
+                  date2str(vdate, vdatestr, sizeof(vdatestr));
+                  time2str(vtime, vtimestr, sizeof(vtimestr));
+                  cdoPrint("%s %s  %f  %d", vdatestr, vtimestr,
+                           juldate_to_seconds(juldate), calendar);
+                }
 
-	      if ( streamID2 == -1 )
-		{
-		  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-		  pstreamDefVlist(streamID2, vlistID2);
-		}
+              if (streamID2 == -1)
+                {
+                  streamID2
+                      = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+                  pstreamDefVlist(streamID2, vlistID2);
+                }
 
-	      taxisDefVdate(taxisID2, vdate);
-	      taxisDefVtime(taxisID2, vtime);
-	      pstreamDefTimestep(streamID2, tsIDo++);
+              taxisDefVdate(taxisID2, vdate);
+              taxisDefVtime(taxisID2, vtime);
+              pstreamDefTimestep(streamID2, tsIDo++);
 
-	      double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
-                            juldate_to_seconds(juldate_sub(juldate2, juldate1));
-	      double fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / 
-	   	            juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac1
+                  = juldate_to_seconds(juldate_sub(juldate2, juldate))
+                    / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac2
+                  = juldate_to_seconds(juldate_sub(juldate, juldate1))
+                    / juldate_to_seconds(juldate_sub(juldate2, juldate1));
 
-	      for ( int recID = 0; recID < nrecs; recID++ )
-		{
-		  varID    = recVarID[recID];
-		  levelID  = recLevelID[recID];
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-		  offset   = gridsize*levelID;
-		  single1  = vardata1[varID] + offset;
-		  single2  = vardata2[varID] + offset;
+              for (int recID = 0; recID < nrecs; recID++)
+                {
+                  varID = recVarID[recID];
+                  levelID = recLevelID[recID];
+                  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+                  offset = gridsize * levelID;
+                  single1 = vardata1[varID] + offset;
+                  single2 = vardata2[varID] + offset;
 
-		  size_t nmiss3 = 0;
+                  size_t nmiss3 = 0;
 
-		  if ( nmiss1[varID][levelID] > 0 || nmiss2[varID][levelID] > 0 )
-		    {
-		      double missval1 = vlistInqVarMissval(vlistID1, varID);
-		      double missval2 = vlistInqVarMissval(vlistID2, varID);
+                  if (nmiss1[varID][levelID] > 0 || nmiss2[varID][levelID] > 0)
+                    {
+                      double missval1 = vlistInqVarMissval(vlistID1, varID);
+                      double missval2 = vlistInqVarMissval(vlistID2, varID);
 
-		      for ( size_t i = 0; i < gridsize; i++ )
-			{
-			  if ( !DBL_IS_EQUAL(single1[i], missval1) &&
-			       !DBL_IS_EQUAL(single2[i], missval2) )
-			    array[i] = single1[i]*fac1 + single2[i]*fac2;
-			  else if (  DBL_IS_EQUAL(single1[i], missval1) &&
-				    !DBL_IS_EQUAL(single2[i], missval2) && fac2 >= 0.5 )
-			    array[i] = single2[i];
-			  else if (  DBL_IS_EQUAL(single2[i], missval2) &&
-				    !DBL_IS_EQUAL(single1[i], missval1) && fac1 >= 0.5 )
-			    array[i] = single1[i];
-			  else
-			    {
-			      array[i] = missval1;
-			      nmiss3++;
-			    }
-			}
-		    }
-		  else
-		    {
-		      for ( size_t i = 0; i < gridsize; i++ )
-			array[i] = single1[i]*fac1 + single2[i]*fac2;
-		    }
+                      for (size_t i = 0; i < gridsize; i++)
+                        {
+                          if (!DBL_IS_EQUAL(single1[i], missval1)
+                              && !DBL_IS_EQUAL(single2[i], missval2))
+                            array[i] = single1[i] * fac1 + single2[i] * fac2;
+                          else if (DBL_IS_EQUAL(single1[i], missval1)
+                                   && !DBL_IS_EQUAL(single2[i], missval2)
+                                   && fac2 >= 0.5)
+                            array[i] = single2[i];
+                          else if (DBL_IS_EQUAL(single2[i], missval2)
+                                   && !DBL_IS_EQUAL(single1[i], missval1)
+                                   && fac1 >= 0.5)
+                            array[i] = single1[i];
+                          else
+                            {
+                              array[i] = missval1;
+                              nmiss3++;
+                            }
+                        }
+                    }
+                  else
+                    {
+                      for (size_t i = 0; i < gridsize; i++)
+                        array[i] = single1[i] * fac1 + single2[i] * fac2;
+                    }
 
-		  pstreamDefRecord(streamID2, varID, levelID);
-		  pstreamWriteRecord(streamID2, array, nmiss3);
-		}
-	    }
+                  pstreamDefRecord(streamID2, varID, levelID);
+                  pstreamWriteRecord(streamID2, array, nmiss3);
+                }
+            }
 
-	  if ( ijulinc == 0 ) break;
+          if (ijulinc == 0) break;
 
-	  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
-	    {
-	      juldate_decode(calendar, juldate, &vdate, &vtime);
+          if (tunit == TUNIT_MONTH || tunit == TUNIT_YEAR)
+            {
+              juldate_decode(calendar, juldate, &vdate, &vtime);
 
-	      cdiDecodeDate(vdate, &year, &month, &day);
-	      
-	      month += ijulinc;
+              cdiDecodeDate(vdate, &year, &month, &day);
 
-	      while ( month > 12 ) { month -= 12; year++; }
-	      while ( month <  1 ) { month += 12; year--; }
+              month += ijulinc;
 
-	      vdate = cdiEncodeDate(year, month, day);
-		
-	      juldate = juldate_encode(calendar, vdate, vtime);
-	    }
-	  else
-	    {
-	      juldate = juldate_add_seconds(ijulinc, juldate);
-	    }
-	}
+              while (month > 12)
+                {
+                  month -= 12;
+                  year++;
+                }
+              while (month < 1)
+                {
+                  month += 12;
+                  year--;
+                }
+
+              vdate = cdiEncodeDate(year, month, day);
+
+              juldate = juldate_encode(calendar, vdate, vtime);
+            }
+          else
+            {
+              juldate = juldate_add_seconds(ijulinc, juldate);
+            }
+        }
 
       juldate1 = juldate2;
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  vardatap        = vardata1[varID];
-	  vardata1[varID] = vardata2[varID];
-	  vardata2[varID] = vardatap;
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          vardatap = vardata1[varID];
+          vardata1[varID] = vardata2[varID];
+          vardata2[varID] = vardatap;
+        }
     }
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       Free(nmiss1[varID]);
       Free(nmiss2[varID]);
@@ -308,12 +331,13 @@ void *Inttime(void *process)
   Free(vardata1);
   Free(vardata2);
 
-  if ( array )  Free(array);
+  if (array) Free(array);
 
-  if ( streamID2 != -1 ) pstreamClose(streamID2);
+  if (streamID2 != -1) pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( tsIDo == 0 ) cdoWarning("date/time out of time axis, no time step interpolated!");
+  if (tsIDo == 0)
+    cdoWarning("date/time out of time axis, no time step interpolated!");
 
   cdoFinish();
 

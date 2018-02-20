@@ -40,7 +40,6 @@
 #include "cdoOptions.h"
 #include "util_files.h"
 
-
 typedef struct
 {
   int streamID;
@@ -49,7 +48,6 @@ typedef struct
   double missval[2];
   double *array[2];
 } ens_file_t;
-
 
 typedef struct
 {
@@ -70,66 +68,70 @@ typedef struct
   int nvars;
 } ensstat_arg_t;
 
-
-static
-void *ensstat_func(void *ensarg)
+static void *
+ensstat_func(void *ensarg)
 {
-  if ( CDO_task ) cdo_omp_set_num_threads(Threading::ompNumThreads);
+  if (CDO_task) cdo_omp_set_num_threads(Threading::ompNumThreads);
 
-  ensstat_arg_t *arg = (ensstat_arg_t*) ensarg;
+  ensstat_arg_t *arg = (ensstat_arg_t *) ensarg;
   int t = arg->t;
   int nfiles = arg->nfiles;
   ens_file_t *ef = arg->ef;
   field_type *field = arg->field;
 
   bool lmiss = false;
-  for ( int fileID = 0; fileID < nfiles; fileID++ ) if ( ef[fileID].nmiss[t] > 0 ) lmiss = true;
+  for (int fileID = 0; fileID < nfiles; fileID++)
+    if (ef[fileID].nmiss[t] > 0) lmiss = true;
 
   int gridID = vlistInqVarGrid(arg->vlistID1, arg->varID[t]);
   size_t gridsize = gridInqSize(gridID);
   double missval = vlistInqVarMissval(arg->vlistID1, arg->varID[t]);
 
   size_t nmiss = 0;
-#ifdef  HAVE_OPENMP4
-#pragma omp parallel for default(shared)  reduction(+:nmiss)
+#ifdef HAVE_OPENMP4
+#pragma omp parallel for default(shared) reduction(+ : nmiss)
 #endif
-  for ( size_t i = 0; i < gridsize; ++i )
+  for (size_t i = 0; i < gridsize; ++i)
     {
       int ompthID = cdo_omp_get_thread_num();
 
       field[ompthID].missval = missval;
       field[ompthID].nmiss = 0;
-      for ( int fileID = 0; fileID < nfiles; fileID++ )
+      for (int fileID = 0; fileID < nfiles; fileID++)
         {
           field[ompthID].ptr[fileID] = ef[fileID].array[t][i];
-          if ( lmiss && DBL_IS_EQUAL(field[ompthID].ptr[fileID], ef[fileID].missval[t]) )
+          if (lmiss
+              && DBL_IS_EQUAL(field[ompthID].ptr[fileID],
+                              ef[fileID].missval[t]))
             {
               field[ompthID].ptr[fileID] = missval;
               field[ompthID].nmiss++;
             }
         }
 
-      arg->array2[i] = arg->lpctl ? fldpctl(field[ompthID], arg->pn) : fldfun(field[ompthID], arg->operfunc);
+      arg->array2[i] = arg->lpctl ? fldpctl(field[ompthID], arg->pn)
+                                  : fldfun(field[ompthID], arg->operfunc);
 
-      if ( DBL_IS_EQUAL(arg->array2[i], field[ompthID].missval) ) nmiss++;
+      if (DBL_IS_EQUAL(arg->array2[i], field[ompthID].missval)) nmiss++;
 
-      if ( arg->count_data ) arg->count2[i] = nfiles - field[ompthID].nmiss;
+      if (arg->count_data) arg->count2[i] = nfiles - field[ompthID].nmiss;
     }
 
   pstreamDefRecord(arg->streamID2, arg->varID[t], arg->levelID[t]);
   pstreamWriteRecord(arg->streamID2, arg->array2, nmiss);
 
-  if ( arg->count_data )
+  if (arg->count_data)
     {
-      pstreamDefRecord(arg->streamID2, arg->varID[t]+arg->nvars, arg->levelID[t]);
+      pstreamDefRecord(arg->streamID2, arg->varID[t] + arg->nvars,
+                       arg->levelID[t]);
       pstreamWriteRecord(arg->streamID2, arg->count2, 0);
     }
 
   return NULL;
 }
 
-
-void *Ensstat(void *process)
+void *
+Ensstat(void *process)
 {
   void *task = CDO_task ? cdo_task_new() : NULL;
   ensstat_arg_t ensstat_arg;
@@ -162,7 +164,7 @@ void *Ensstat(void *process)
   int nargc = argc;
 
   double pn = 0;
-  if ( operfunc == func_pctl )
+  if (operfunc == func_pctl)
     {
       operatorInputArg("percentile number");
       pn = parameter2int(operatorArgv()[0]);
@@ -171,39 +173,43 @@ void *Ensstat(void *process)
     }
 
   bool count_data = false;
-  if ( argc == 1 )
+  if (argc == 1)
     {
-      if ( strcmp("count", operatorArgv()[nargc-1]) == 0 ) count_data = true;
-      else cdoAbort("Unknown parameter: >%s<", operatorArgv()[nargc-1]); 
+      if (strcmp("count", operatorArgv()[nargc - 1]) == 0)
+        count_data = true;
+      else
+        cdoAbort("Unknown parameter: >%s<", operatorArgv()[nargc - 1]);
     }
-    
+
   int nfiles = cdoStreamCnt() - 1;
 
-  if ( cdoVerbose ) cdoPrint("Ensemble over %d files.", nfiles);
+  if (cdoVerbose) cdoPrint("Ensemble over %d files.", nfiles);
 
   const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
-  if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
+  if (!cdoOverwriteMode && fileExists(ofilename)
+      && !userFileOverwrite(ofilename))
     cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ens_file_t *ef = (ens_file_t *) Malloc(nfiles*sizeof(ens_file_t));
+  ens_file_t *ef = (ens_file_t *) Malloc(nfiles * sizeof(ens_file_t));
 
-  field_type *field = (field_type *) Malloc(Threading::ompNumThreads*sizeof(field_type));
-  for ( int i = 0; i < Threading::ompNumThreads; i++ )
+  field_type *field
+      = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
+  for (int i = 0; i < Threading::ompNumThreads; i++)
     {
       field_init(&field[i]);
       field[i].size = nfiles;
-      field[i].ptr  = (double*) Malloc(nfiles*sizeof(double));
+      field[i].ptr = (double *) Malloc(nfiles * sizeof(double));
     }
 
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
+  for (int fileID = 0; fileID < nfiles; fileID++)
     {
       ef[fileID].streamID = cdoStreamOpenRead(cdoStreamName(fileID));
-      ef[fileID].vlistID  = cdoStreamInqVlist(ef[fileID].streamID);
+      ef[fileID].vlistID = cdoStreamInqVlist(ef[fileID].streamID);
     }
 
   /* check that the contents is always the same */
-  for ( int fileID = 1; fileID < nfiles; fileID++ )
+  for (int fileID = 1; fileID < nfiles; fileID++)
     vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
   int vlistID1 = ef[0].vlistID;
@@ -214,32 +220,34 @@ void *Ensstat(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
+  for (int fileID = 0; fileID < nfiles; fileID++)
     {
-      ef[fileID].array[0] = (double*) Malloc(gridsizemax*sizeof(double));
-      ef[fileID].array[1] = task ? (double*) Malloc(gridsizemax*sizeof(double)) : NULL;
+      ef[fileID].array[0] = (double *) Malloc(gridsizemax * sizeof(double));
+      ef[fileID].array[1]
+          = task ? (double *) Malloc(gridsizemax * sizeof(double)) : NULL;
     }
 
-  double *array2 = (double *) Malloc(gridsizemax*sizeof(double));
+  double *array2 = (double *) Malloc(gridsizemax * sizeof(double));
 
   int nvars = vlistNvars(vlistID2);
   double *count2 = NULL;
-  if ( count_data )
+  if (count_data)
     {
-      count2 = (double *) Malloc(gridsizemax*sizeof(double));
-      for ( int varID = 0; varID < nvars; ++varID )
-	{
-	  char name[CDI_MAX_NAME];
-	  vlistInqVarName(vlistID2, varID, name);
-	  strcat(name, "_count");
-	  int gridID = vlistInqVarGrid(vlistID2, varID);
-	  int zaxisID = vlistInqVarZaxis(vlistID2, varID);
-	  int timetype = vlistInqVarTimetype(vlistID2, varID);
-	  int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, timetype);
-	  vlistDefVarName(vlistID2, cvarID, name);
-	  vlistDefVarDatatype(vlistID2, cvarID, CDI_DATATYPE_INT16);
-	  if ( cvarID != (varID+nvars) ) cdoAbort("Internal error, varIDs do not match!");
-	}
+      count2 = (double *) Malloc(gridsizemax * sizeof(double));
+      for (int varID = 0; varID < nvars; ++varID)
+        {
+          char name[CDI_MAX_NAME];
+          vlistInqVarName(vlistID2, varID, name);
+          strcat(name, "_count");
+          int gridID = vlistInqVarGrid(vlistID2, varID);
+          int zaxisID = vlistInqVarZaxis(vlistID2, varID);
+          int timetype = vlistInqVarTimetype(vlistID2, varID);
+          int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, timetype);
+          vlistDefVarName(vlistID2, cvarID, name);
+          vlistDefVarDatatype(vlistID2, cvarID, CDI_DATATYPE_INT16);
+          if (cvarID != (varID + nvars))
+            cdoAbort("Internal error, varIDs do not match!");
+        }
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
@@ -265,57 +273,65 @@ void *Ensstat(void *process)
   do
     {
       nrecs0 = cdoStreamInqTimestep(ef[0].streamID, tsID);
-      for ( int fileID = 1; fileID < nfiles; fileID++ )
-	{
-	  int streamID = ef[fileID].streamID;
-	  int nrecs = cdoStreamInqTimestep(streamID, tsID);
-	  if ( nrecs != nrecs0 )
-	    {
-	      if ( nrecs == 0 )
+      for (int fileID = 1; fileID < nfiles; fileID++)
+        {
+          int streamID = ef[fileID].streamID;
+          int nrecs = cdoStreamInqTimestep(streamID, tsID);
+          if (nrecs != nrecs0)
+            {
+              if (nrecs == 0)
                 {
                   lwarning = true;
-                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(fileID).c_str());
+                  cdoWarning(
+                      "Inconsistent ensemble file, too few time steps in %s!",
+                      cdoGetStreamName(fileID).c_str());
                 }
-	      else if ( nrecs0 == 0 )
+              else if (nrecs0 == 0)
                 {
                   lwarning = true;
-                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(0).c_str());
+                  cdoWarning(
+                      "Inconsistent ensemble file, too few time steps in %s!",
+                      cdoGetStreamName(0).c_str());
                 }
-	      else
+              else
                 {
                   lerror = true;
-                  cdoWarning("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
-                             tsID+1, cdoGetStreamName(0).c_str(), cdoGetStreamName(fileID).c_str());
+                  cdoWarning("Inconsistent ensemble file, number of records at "
+                             "time step %d of %s and %s differ!",
+                             tsID + 1, cdoGetStreamName(0).c_str(),
+                             cdoGetStreamName(fileID).c_str());
                 }
               goto CLEANUP;
-	    }
-	}
+            }
+        }
 
-      if ( nrecs0 > 0 )
-	{
-	  taxisCopyTimestep(taxisID2, taxisID1);
-	  pstreamDefTimestep(streamID2, tsID);
-	}
+      if (nrecs0 > 0)
+        {
+          taxisCopyTimestep(taxisID2, taxisID1);
+          pstreamDefTimestep(streamID2, tsID);
+        }
 
-      for ( int recID = 0; recID < nrecs0; recID++ )
-	{
+      for (int recID = 0; recID < nrecs0; recID++)
+        {
           int varID = 0, levelID;
 
-	  for ( int fileID = 0; fileID < nfiles; fileID++ )
-	    {
-	      pstreamInqRecord(ef[fileID].streamID, &varID, &levelID);
-              ef[fileID].missval[t] = vlistInqVarMissval(ef[fileID].vlistID, varID);
-	    }
+          for (int fileID = 0; fileID < nfiles; fileID++)
+            {
+              pstreamInqRecord(ef[fileID].streamID, &varID, &levelID);
+              ef[fileID].missval[t]
+                  = vlistInqVarMissval(ef[fileID].vlistID, varID);
+            }
           //#pragma omp parallel for default(none) shared(ef, nfiles)
-	  for ( int fileID = 0; fileID < nfiles; fileID++ )
-	    {
-	      pstreamReadRecord(ef[fileID].streamID, ef[fileID].array[t], &ef[fileID].nmiss[t]);
-	    }
+          for (int fileID = 0; fileID < nfiles; fileID++)
+            {
+              pstreamReadRecord(ef[fileID].streamID, ef[fileID].array[t],
+                                &ef[fileID].nmiss[t]);
+            }
 
           ensstat_arg.ef = ef;
           ensstat_arg.varID[t] = varID;
           ensstat_arg.levelID[t] = levelID;
-          if ( task )
+          if (task)
             {
               cdo_task_start(task, ensstat_func, &ensstat_arg);
               cdo_task_wait(task);
@@ -329,32 +345,37 @@ void *Ensstat(void *process)
 
       tsID++;
     }
-  while ( nrecs0 > 0 );
+  while (nrecs0 > 0);
 
- CLEANUP:
+CLEANUP:
 
-  if ( lwarning ) cdoWarning("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
-  if ( lerror ) cdoAbort("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
+  if (lwarning)
+    cdoWarning("Inconsistent ensemble, processed only the first %d timesteps!",
+               tsID);
+  if (lerror)
+    cdoAbort("Inconsistent ensemble, processed only the first %d timesteps!",
+             tsID);
 
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
+  for (int fileID = 0; fileID < nfiles; fileID++)
     pstreamClose(ef[fileID].streamID);
 
   pstreamClose(streamID2);
 
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
+  for (int fileID = 0; fileID < nfiles; fileID++)
     {
-      if ( ef[fileID].array[0] ) Free(ef[fileID].array[0]);
-      if ( ef[fileID].array[1] ) Free(ef[fileID].array[1]);
+      if (ef[fileID].array[0]) Free(ef[fileID].array[0]);
+      if (ef[fileID].array[1]) Free(ef[fileID].array[1]);
     }
 
-  if ( ef ) Free(ef);
-  if ( array2 ) Free(array2);
-  if ( count2 ) Free(count2);
+  if (ef) Free(ef);
+  if (array2) Free(array2);
+  if (count2) Free(count2);
 
-  for ( int i = 0; i < Threading::ompNumThreads; i++ ) if ( field[i].ptr ) Free(field[i].ptr);
-  if ( field ) Free(field);
+  for (int i = 0; i < Threading::ompNumThreads; i++)
+    if (field[i].ptr) Free(field[i].ptr);
+  if (field) Free(field);
 
-  if ( task ) cdo_task_delete(task);
+  if (task) cdo_task_delete(task);
 
   cdoFinish();
 

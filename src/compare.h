@@ -15,42 +15,44 @@
   GNU General Public License for more details.
 */
 
-#ifndef  COMPARE_H
-#define  COMPARE_H
+#ifndef COMPARE_H
+#define COMPARE_H
 
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <cmath>
 #include <string.h>
 
-#ifdef  __xlC__  /* performance problem on IBM */
+#ifdef __xlC__ /* performance problem on IBM */
 #ifndef DBL_IS_NAN
-#  define DBL_IS_NAN(x)     ((x) != (x))
+#define DBL_IS_NAN(x) ((x) != (x))
 #endif
 #else
 #ifndef DBL_IS_NAN
 #if defined(HAVE_DECL_ISNAN)
-#  define DBL_IS_NAN(x)     (std::isnan(x))
+#define DBL_IS_NAN(x) (std::isnan(x))
 #elif defined(FP_NAN)
-#  define DBL_IS_NAN(x)     (fpclassify(x) == FP_NAN)
+#define DBL_IS_NAN(x) (fpclassify(x) == FP_NAN)
 #else
-#  define DBL_IS_NAN(x)     ((x) != (x))
+#define DBL_IS_NAN(x) ((x) != (x))
 #endif
 #endif
 #endif
 
 #ifndef DBL_IS_EQUAL
 /*#define DBL_IS_EQUAL(x,y) (!(x < y || y < x)) */
-#  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
+#define DBL_IS_EQUAL(x, y)                                                   \
+  (DBL_IS_NAN(x) || DBL_IS_NAN(y) ? (DBL_IS_NAN(x) && DBL_IS_NAN(y) ? 1 : 0) \
+                                  : !(x < y || y < x))
 #endif
 
 #ifndef IS_EQUAL
-#  define IS_NOT_EQUAL(x,y) (x < y || y < x)
-#  define IS_EQUAL(x,y)     (!IS_NOT_EQUAL(x,y))
+#define IS_NOT_EQUAL(x, y) (x < y || y < x)
+#define IS_EQUAL(x, y) (!IS_NOT_EQUAL(x, y))
 #endif
 
-#define STR_IS_EQ(x,y) ((*x)==(*y) && strcmp(x,y) == 0)
+#define STR_IS_EQ(x, y) ((*x) == (*y) && strcmp(x, y) == 0)
 
-#endif  /* COMPARE_H */
+#endif /* COMPARE_H */

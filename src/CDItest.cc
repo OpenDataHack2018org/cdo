@@ -19,15 +19,14 @@
    This module contains the following operators:
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "process_int.h"
 
-
-void *CDItest(void *process)
+void *
+CDItest(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -39,21 +38,21 @@ void *CDItest(void *process)
   cdoInitialize(process);
 
   bool lcopy = false;
-  //bool lcopy = UNCHANGED_RECORD;
+  // bool lcopy = UNCHANGED_RECORD;
 
-  int NCOPY = cdoOperatorAdd("ncopy",   0, 0, NULL);
+  int NCOPY = cdoOperatorAdd("ncopy", 0, 0, NULL);
   UNUSED(NCOPY);
 
   int operatorID = cdoOperatorID();
   UNUSED(operatorID);
 
   //  operatorInputArg("Number of copies");
-  if ( operatorArgc() == 1 ) max_copy = parameter2int(operatorArgv()[0]);
+  if (operatorArgc() == 1) max_copy = parameter2int(operatorArgv()[0]);
 
   processStartTime(&s_utime, &s_stime);
 
   int n = 0;
-  while ( TRUE )
+  while (TRUE)
     {
       int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -68,34 +67,34 @@ void *CDItest(void *process)
       pstreamDefVlist(streamID2, vlistID2);
 
       size_t gridsize = vlistGridsizeMax(vlistID1);
-      double *array = (double*) Malloc(gridsize*sizeof(double));
+      double *array = (double *) Malloc(gridsize * sizeof(double));
 
       int tsID1 = 0;
       int tsID2 = 0;
-      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
-	{
-	  taxisCopyTimestep(taxisID2, taxisID1);
+      while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
+        {
+          taxisCopyTimestep(taxisID2, taxisID1);
 
-	  pstreamDefTimestep(streamID2, tsID2);
-	       
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
-	      pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	      if ( lcopy )
-		{
-		  pstreamCopyRecord(streamID2, streamID1);
-		}
-	      else
-		{
-		  pstreamReadRecord(streamID1, array, &nmiss);
-		  pstreamWriteRecord(streamID2, array, nmiss);
-		}
-	    }
-	  tsID1++;
-	  tsID2++;
-	}
+          pstreamDefTimestep(streamID2, tsID2);
+
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
+              pstreamDefRecord(streamID2, varID, levelID);
+
+              if (lcopy)
+                {
+                  pstreamCopyRecord(streamID2, streamID1);
+                }
+              else
+                {
+                  pstreamReadRecord(streamID1, array, &nmiss);
+                  pstreamWriteRecord(streamID2, array, nmiss);
+                }
+            }
+          tsID1++;
+          tsID2++;
+        }
 
       pstreamClose(streamID1);
       pstreamClose(streamID2);
@@ -103,22 +102,23 @@ void *CDItest(void *process)
       vlistDestroy(vlistID2);
       taxisDestroy(taxisID2);
 
-      if ( array ) Free(array);
+      if (array) Free(array);
 
       n++;
 
       cdoProcessTime(&e_utime, &e_stime);
 
       double c_usertime = e_utime - s_utime;
-      double c_systime  = e_stime - s_stime;
-      double c_cputime  = c_usertime + c_systime;
+      double c_systime = e_stime - s_stime;
+      double c_cputime = c_usertime + c_systime;
 
       s_utime = e_utime;
       s_stime = e_stime;
 
-      cdoPrint("Copy number %d: %.2fs %.2fs %.2fs", n, c_usertime, c_systime, c_cputime);
+      cdoPrint("Copy number %d: %.2fs %.2fs %.2fs", n, c_usertime, c_systime,
+               c_cputime);
 
-      if ( n == max_copy ) break;
+      if (n == max_copy) break;
     }
 
   cdoFinish();

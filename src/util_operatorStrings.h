@@ -20,8 +20,8 @@
 #include <array>
 #include <vector>
 
-typedef  std::vector<std::array<std::string,2>> CdoArgv;
-typedef  std::array<std::string,2> cdoCommand;
+typedef std::vector<std::array<std::string, 2>> CdoArgv;
+typedef std::array<std::string, 2> cdoCommand;
 
 cdoCommand split(std::string p_command);
 

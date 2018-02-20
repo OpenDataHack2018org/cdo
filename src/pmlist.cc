@@ -20,15 +20,17 @@
 
 #include "pmlist.h"
 
-keyValues_t *kvlist_search(list_t *kvlist, const char *key)
+keyValues_t *
+kvlist_search(list_t *kvlist, const char *key)
 {
-  if ( key )
+  if (key)
     {
       listNode_t *node = kvlist->head;
-      while ( node )
+      while (node)
         {
-          keyValues_t *kv = *(keyValues_t **)node->data;
-          if ( kv->key && *(kv->key) == *key && strcmp(kv->key, key) == 0 ) return kv;
+          keyValues_t *kv = *(keyValues_t **) node->data;
+          if (kv->key && *(kv->key) == *key && strcmp(kv->key, key) == 0)
+            return kv;
           node = node->next;
         }
     }
@@ -36,19 +38,21 @@ keyValues_t *kvlist_search(list_t *kvlist, const char *key)
   return NULL;
 }
 
-
-list_t *pmlist_search_kvlist(list_t *pmlist, const char *key, const char *value)
+list_t *
+pmlist_search_kvlist(list_t *pmlist, const char *key, const char *value)
 {
-  if ( pmlist && key && value )
+  if (pmlist && key && value)
     {
       listNode_t *node = pmlist->head;
-      while ( node )
+      while (node)
         {
-          if ( node->data )
+          if (node->data)
             {
-              list_t *kvlist = *(list_t **)node->data;
+              list_t *kvlist = *(list_t **) node->data;
               keyValues_t *kv = kvlist_search(kvlist, key);
-              if ( kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0 ) return kvlist;
+              if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value
+                  && strcmp(kv->values[0], value) == 0)
+                return kvlist;
             }
           node = node->next;
         }
@@ -57,138 +61,147 @@ list_t *pmlist_search_kvlist(list_t *pmlist, const char *key, const char *value)
   return NULL;
 }
 
-
-bool kvlist_print_iter(void *data)
+bool
+kvlist_print_iter(void *data)
 {
-  keyValues_t *keyval = *(keyValues_t **)data;
+  keyValues_t *keyval = *(keyValues_t **) data;
   char *key = keyval->key;
   char **values = keyval->values;
   int nvalues = keyval->nvalues;
   printf("  %s =", key);
-  for ( int i = 0; i < nvalues; ++i ) printf(" '%s'", values[i]);
+  for (int i = 0; i < nvalues; ++i)
+    printf(" '%s'", values[i]);
   printf("\n");
 
   return true;
 }
 
-
-void kvlist_print(list_t *kvlist)
+void
+kvlist_print(list_t *kvlist)
 {
   printf("Key/Value list %s:\n", list_name(kvlist));
   list_for_each(kvlist, kvlist_print_iter);
 }
 
-
-bool pmlist_print_iter(void *data)
+bool
+pmlist_print_iter(void *data)
 {
-  list_t *kvlist = *(list_t **)data;
+  list_t *kvlist = *(list_t **) data;
   const char *listname = list_name(kvlist);
-  printf("\nFound %s list with %d key/values: \n", listname?listname:"", list_size(kvlist));
+  printf("\nFound %s list with %d key/values: \n", listname ? listname : "",
+         list_size(kvlist));
   list_for_each(kvlist, kvlist_print_iter);
   return true;
 }
 
-
-void free_keyval(void *data)
+void
+free_keyval(void *data)
 {
-  keyValues_t *keyval = *(keyValues_t **)data;
-  if ( keyval->key ) free(keyval->key);
+  keyValues_t *keyval = *(keyValues_t **) data;
+  if (keyval->key) free(keyval->key);
   int nvalues = keyval->nvalues;
-  for ( int i = 0; i < nvalues; ++i )
-    if ( keyval->values[i] ) free(keyval->values[i]);
+  for (int i = 0; i < nvalues; ++i)
+    if (keyval->values[i]) free(keyval->values[i]);
   free(keyval->values);
   free(keyval);
 }
 
-
-void free_kvlist(void *data)
+void
+free_kvlist(void *data)
 {
-  list_t *kvlist = *(list_t **)data;
-  //int n = list_size(kvlist);
+  list_t *kvlist = *(list_t **) data;
+  // int n = list_size(kvlist);
   list_destroy(kvlist);
-  //printf("Successfully freed %d keyvalues...\n", n);
+  // printf("Successfully freed %d keyvalues...\n", n);
 }
 
-
-list_t *kvlist_new(const char *name)
+list_t *
+kvlist_new(const char *name)
 {
   return list_new(sizeof(keyValues_t *), free_keyval, name);
 }
 
-
-void kvlist_destroy(list_t *list)
+void
+kvlist_destroy(list_t *list)
 {
   list_destroy(list);
 }
 
-
-void kvlist_append(list_t *kvlist, const char *key, const char **values, int nvalues)
+void
+kvlist_append(list_t *kvlist, const char *key, const char **values, int nvalues)
 {
   keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));
   keyval->key = strdup(key);
   keyval->nvalues = nvalues;
-  keyval->values = (char **) malloc(nvalues*sizeof(char*));
-  for ( int i = 0; i < nvalues; ++i ) keyval->values[i] = strdup(values[i]);
+  keyval->values = (char **) malloc(nvalues * sizeof(char *));
+  for (int i = 0; i < nvalues; ++i)
+    keyval->values[i] = strdup(values[i]);
   list_append(kvlist, &keyval);
 }
 
-
-int kvlist_parse_cmdline(list_t *kvlist, int nparams, char **params)
+int
+kvlist_parse_cmdline(list_t *kvlist, int nparams, char **params)
 {
   /* Assume key = value pairs. That is, if params[i] contains no '='
    * then treat it as if it belongs to the values of params[i-1]. */
   char key[256];
   int i = 0;
-  while ( i < nparams )
+  while (i < nparams)
     {
       char *end = strchr(params[i], '=');
-      if ( end == NULL )
+      if (end == NULL)
         {
           fprintf(stderr, "Missing '=' in key/value string: >%s<\n", params[i]);
           return -1;
         }
 
-      snprintf(key, sizeof(key), "%.*s", (int)(end-params[i]), params[i]);
-      key[sizeof(key)-1] = 0;
+      snprintf(key, sizeof(key), "%.*s", (int) (end - params[i]), params[i]);
+      key[sizeof(key) - 1] = 0;
 
       int j = 1;
-      while ( i + j < nparams && strchr(params[i + j], '=') == NULL ) j++;
+      while (i + j < nparams && strchr(params[i + j], '=') == NULL)
+        j++;
 
       int nvalues = j;
 
-      const char **values = nvalues ? (const char**) malloc(nvalues*sizeof(char*)) : NULL;
+      const char **values
+          = nvalues ? (const char **) malloc(nvalues * sizeof(char *)) : NULL;
 
       values[0] = end + 1;
-      if ( *values[0] == 0 ) nvalues = 0;
+      if (*values[0] == 0) nvalues = 0;
 
-      for ( j = 1; j < nvalues; ++j ) values[j] = params[i + j];
+      for (j = 1; j < nvalues; ++j)
+        values[j] = params[i + j];
       kvlist_append(kvlist, key, values, nvalues);
 
-      if ( values ) free(values);
-      
+      if (values) free(values);
+
       i += j;
     }
 
   return 0;
 }
 
-
-list_t *pmlist_search_kvlist_ventry(list_t *pmlist, const char *key, const char *value, int nentry, const char **entry)
+list_t *
+pmlist_search_kvlist_ventry(list_t *pmlist, const char *key, const char *value,
+                            int nentry, const char **entry)
 {
-  if ( pmlist && key && value )
+  if (pmlist && key && value)
     {
       listNode_t *node = pmlist->head;
-      while ( node )
+      while (node)
         {
-          if ( node->data )
+          if (node->data)
             {
-              list_t *kvlist = *(list_t **)node->data;
+              list_t *kvlist = *(list_t **) node->data;
               const char *listname = list_name(kvlist);
-              for ( int i = 0; i < nentry; ++i )
-                if ( strcmp(listname, entry[i]) == 0 )
+              for (int i = 0; i < nentry; ++i)
+                if (strcmp(listname, entry[i]) == 0)
                   {
                     keyValues_t *kv = kvlist_search(kvlist, key);
-                    if ( kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0 ) return kvlist;
+                    if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value
+                        && strcmp(kv->values[0], value) == 0)
+                      return kvlist;
                   }
             }
           node = node->next;
@@ -198,20 +211,20 @@ list_t *pmlist_search_kvlist_ventry(list_t *pmlist, const char *key, const char 
   return NULL;
 }
 
-
-list_t *pmlist_get_kvlist_ventry(list_t *pmlist, int nentry, const char **entry)
+list_t *
+pmlist_get_kvlist_ventry(list_t *pmlist, int nentry, const char **entry)
 {
-  if ( pmlist )
+  if (pmlist)
     {
       listNode_t *node = pmlist->head;
-      while ( node )
+      while (node)
         {
-          if ( node->data )
+          if (node->data)
             {
-              list_t *kvlist = *(list_t **)node->data;
+              list_t *kvlist = *(list_t **) node->data;
               const char *listname = list_name(kvlist);
-              for ( int i = 0; i < nentry; ++i )
-                if ( strcmp(listname, entry[i]) == 0 ) return kvlist;
+              for (int i = 0; i < nentry; ++i)
+                if (strcmp(listname, entry[i]) == 0) return kvlist;
             }
           node = node->next;
         }
@@ -274,8 +287,8 @@ int main(void)
     list_append(pmlist, &kvlist);
     numLists++;
   }
-  
- 
+
+
   printf("pmlist=%s n=%d:\n", list_name(pmlist), list_size(pmlist));
   list_for_each(pml, pmlist_print_iter);
 

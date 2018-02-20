@@ -25,215 +25,309 @@
 #include "expr_fun.h"
 #include "expr_yacc.h"
 
-
-static const char *ExIn[] = {"expr", "init"};
+static const char *ExIn[] = { "expr", "init" };
 static const char *tmpvnm = "_tmp_";
 int pointID = -1;
 int surfaceID = -1;
 
-enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C, FT_0};
+enum
+{
+  FT_STD,
+  FT_CONST,
+  FT_FLD,
+  FT_VERT,
+  FT_COORD,
+  FT_1C,
+  FT_0
+};
 
-#define    COMPLT(x,y)  ((x) < (y))
-#define    COMPGT(x,y)  ((x) > (y))
-#define    COMPLE(x,y)  ((x) <= (y))
-#define    COMPGE(x,y)  ((x) >= (y))
-#define    COMPNE(x,y)  IS_NOT_EQUAL(x,y)
-#define    COMPEQ(x,y)  IS_EQUAL(x,y)
-#define   COMPLEG(x,y)  ((x) < (y) ? -1. : ((x) > (y)))
-#define   COMPAND(x,y)  (IS_NOT_EQUAL(x,0) && IS_NOT_EQUAL(y,0))
-#define    COMPOR(x,y)  (IS_NOT_EQUAL(x,0) || IS_NOT_EQUAL(y,0))
-#define   COMPNOT(x)    (IS_EQUAL(x,0))
-#define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
-#define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
-#define  MVCOMPLE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLE(x,y))
-#define  MVCOMPGE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGE(x,y))
-#define  MVCOMPNE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPNE(x,y))
-#define  MVCOMPEQ(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPEQ(x,y))
-#define MVCOMPLEG(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLEG(x,y))
-#define MVCOMPAND(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPAND(x,y))
-#define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
+#define COMPLT(x, y) ((x) < (y))
+#define COMPGT(x, y) ((x) > (y))
+#define COMPLE(x, y) ((x) <= (y))
+#define COMPGE(x, y) ((x) >= (y))
+#define COMPNE(x, y) IS_NOT_EQUAL(x, y)
+#define COMPEQ(x, y) IS_EQUAL(x, y)
+#define COMPLEG(x, y) ((x) < (y) ? -1. : ((x) > (y)))
+#define COMPAND(x, y) (IS_NOT_EQUAL(x, 0) && IS_NOT_EQUAL(y, 0))
+#define COMPOR(x, y) (IS_NOT_EQUAL(x, 0) || IS_NOT_EQUAL(y, 0))
+#define COMPNOT(x) (IS_EQUAL(x, 0))
+#define MVCOMPLT(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPLT(x, y))
+#define MVCOMPGT(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPGT(x, y))
+#define MVCOMPLE(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPLE(x, y))
+#define MVCOMPGE(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPGE(x, y))
+#define MVCOMPNE(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPNE(x, y))
+#define MVCOMPEQ(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPEQ(x, y))
+#define MVCOMPLEG(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPLEG(x, y))
+#define MVCOMPAND(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPAND(x, y))
+#define MVCOMPOR(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPOR(x, y))
 
-static double f_float(double x)          { return (float)(x); }
-static double f_int(double x)            { return (int)(x); }
-static double f_nint(double x)           { return round(x); }
-static double f_sqr(double x)            { return x*x;      }
-static double f_rad(double x)            { return x*M_PI/180.; }
-static double f_deg(double x)            { return x*180./M_PI; }
-static double pt_ngp(paramType *p)       { return p->ngp;   }
-static double pt_nlev(paramType *p)      { return p->nlev;  }
-static double pt_size(paramType *p)      { return p->ngp*p->nlev; }
-static double pt_missval(paramType *p)   { return p->missval; }
-static double ts_ctimestep(double *data) { return lround(data[CTIMESTEP]); }
-static double ts_cdate(double *data)     { return lround(data[CDATE]); }
-static double ts_ctime(double *data)     { return lround(data[CTIME]); }
-static double ts_cdeltat(double *data)   { return        data[CDELTAT]; }
-static double ts_cday(double *data)      { return        data[CDAY]; }
-static double ts_cmonth(double *data)    { return        data[CMONTH]; }
-static double ts_cyear(double *data)     { return        data[CYEAR]; }
-static double ts_csecond(double *data)   { return        data[CSECOND]; }
-static double ts_cminute(double *data)   { return        data[CMINUTE]; }
-static double ts_chour(double *data)     { return        data[CHOUR]; }
+static double
+f_float(double x)
+{
+  return (float) (x);
+}
+static double
+f_int(double x)
+{
+  return (int) (x);
+}
+static double
+f_nint(double x)
+{
+  return round(x);
+}
+static double
+f_sqr(double x)
+{
+  return x * x;
+}
+static double
+f_rad(double x)
+{
+  return x * M_PI / 180.;
+}
+static double
+f_deg(double x)
+{
+  return x * 180. / M_PI;
+}
+static double
+pt_ngp(paramType *p)
+{
+  return p->ngp;
+}
+static double
+pt_nlev(paramType *p)
+{
+  return p->nlev;
+}
+static double
+pt_size(paramType *p)
+{
+  return p->ngp * p->nlev;
+}
+static double
+pt_missval(paramType *p)
+{
+  return p->missval;
+}
+static double
+ts_ctimestep(double *data)
+{
+  return lround(data[CTIMESTEP]);
+}
+static double
+ts_cdate(double *data)
+{
+  return lround(data[CDATE]);
+}
+static double
+ts_ctime(double *data)
+{
+  return lround(data[CTIME]);
+}
+static double
+ts_cdeltat(double *data)
+{
+  return data[CDELTAT];
+}
+static double
+ts_cday(double *data)
+{
+  return data[CDAY];
+}
+static double
+ts_cmonth(double *data)
+{
+  return data[CMONTH];
+}
+static double
+ts_cyear(double *data)
+{
+  return data[CYEAR];
+}
+static double
+ts_csecond(double *data)
+{
+  return data[CSECOND];
+}
+static double
+ts_cminute(double *data)
+{
+  return data[CMINUTE];
+}
+static double
+ts_chour(double *data)
+{
+  return data[CHOUR];
+}
 
-typedef struct {
+typedef struct
+{
   int type;
   int flag;
   const char *name;  // function name
-  double (*func)();    // pointer to function
-}
-func_t;
+  double (*func)();  // pointer to function
+} func_t;
 
-static func_t fun_sym_tbl[] =
-{
+static func_t fun_sym_tbl[] = {
   // scalar functions
-  {FT_STD, 0, "abs",   (double (*)()) (double (*)(double)) fabs},
-  {FT_STD, 0, "floor", (double (*)()) (double (*)(double)) floor},
-  {FT_STD, 0, "ceil",  (double (*)()) (double (*)(double)) ceil},
-  {FT_STD, 0, "sqrt",  (double (*)()) (double (*)(double)) sqrt},
-  {FT_STD, 0, "exp",   (double (*)()) (double (*)(double)) exp},
-  {FT_STD, 0, "erf",   (double (*)()) (double (*)(double)) erf},
-  {FT_STD, 0, "log",   (double (*)()) (double (*)(double)) log},
-  {FT_STD, 0, "ln",    (double (*)()) (double (*)(double)) log},
-  {FT_STD, 0, "log10", (double (*)()) (double (*)(double)) log10},
-  {FT_STD, 0, "sin",   (double (*)()) (double (*)(double)) sin},
-  {FT_STD, 0, "cos",   (double (*)()) (double (*)(double)) cos},
-  {FT_STD, 0, "tan",   (double (*)()) (double (*)(double)) tan},
-  {FT_STD, 0, "sinh",  (double (*)()) (double (*)(double)) sinh},
-  {FT_STD, 0, "cosh",  (double (*)()) (double (*)(double)) cosh},
-  {FT_STD, 0, "tanh",  (double (*)()) (double (*)(double)) tanh},
-  {FT_STD, 0, "asin",  (double (*)()) (double (*)(double)) asin},
-  {FT_STD, 0, "acos",  (double (*)()) (double (*)(double)) acos},
-  {FT_STD, 0, "atan",  (double (*)()) (double (*)(double)) atan},
-  {FT_STD, 0, "asinh", (double (*)()) (double (*)(double)) asinh},
-  {FT_STD, 0, "acosh", (double (*)()) (double (*)(double)) acosh},
-  {FT_STD, 0, "atanh", (double (*)()) (double (*)(double)) atanh},
-  {FT_STD, 0, "gamma", (double (*)()) (double (*)(double)) tgamma},
-  {FT_STD, 0, "float", (double (*)()) f_float},
-  {FT_STD, 0, "int",   (double (*)()) f_int},
-  {FT_STD, 0, "nint",  (double (*)()) f_nint},
-  {FT_STD, 0, "sqr",   (double (*)()) f_sqr},
-  {FT_STD, 0, "rad",   (double (*)()) f_rad},
-  {FT_STD, 0, "deg",   (double (*)()) f_deg},
+  { FT_STD, 0, "abs", (double (*)())(double (*)(double)) fabs },
+  { FT_STD, 0, "floor", (double (*)())(double (*)(double)) floor },
+  { FT_STD, 0, "ceil", (double (*)())(double (*)(double)) ceil },
+  { FT_STD, 0, "sqrt", (double (*)())(double (*)(double)) sqrt },
+  { FT_STD, 0, "exp", (double (*)())(double (*)(double)) exp },
+  { FT_STD, 0, "erf", (double (*)())(double (*)(double)) erf },
+  { FT_STD, 0, "log", (double (*)())(double (*)(double)) log },
+  { FT_STD, 0, "ln", (double (*)())(double (*)(double)) log },
+  { FT_STD, 0, "log10", (double (*)())(double (*)(double)) log10 },
+  { FT_STD, 0, "sin", (double (*)())(double (*)(double)) sin },
+  { FT_STD, 0, "cos", (double (*)())(double (*)(double)) cos },
+  { FT_STD, 0, "tan", (double (*)())(double (*)(double)) tan },
+  { FT_STD, 0, "sinh", (double (*)())(double (*)(double)) sinh },
+  { FT_STD, 0, "cosh", (double (*)())(double (*)(double)) cosh },
+  { FT_STD, 0, "tanh", (double (*)())(double (*)(double)) tanh },
+  { FT_STD, 0, "asin", (double (*)())(double (*)(double)) asin },
+  { FT_STD, 0, "acos", (double (*)())(double (*)(double)) acos },
+  { FT_STD, 0, "atan", (double (*)())(double (*)(double)) atan },
+  { FT_STD, 0, "asinh", (double (*)())(double (*)(double)) asinh },
+  { FT_STD, 0, "acosh", (double (*)())(double (*)(double)) acosh },
+  { FT_STD, 0, "atanh", (double (*)())(double (*)(double)) atanh },
+  { FT_STD, 0, "gamma", (double (*)())(double (*)(double)) tgamma },
+  { FT_STD, 0, "float", (double (*)()) f_float },
+  { FT_STD, 0, "int", (double (*)()) f_int },
+  { FT_STD, 0, "nint", (double (*)()) f_nint },
+  { FT_STD, 0, "sqr", (double (*)()) f_sqr },
+  { FT_STD, 0, "rad", (double (*)()) f_rad },
+  { FT_STD, 0, "deg", (double (*)()) f_deg },
 
   // constant functions
-  {FT_CONST, 0, "ngp",     (double (*)()) pt_ngp},      // number of horizontal grid points
-  {FT_CONST, 0, "nlev",    (double (*)()) pt_nlev},     // number of vertical levels
-  {FT_CONST, 0, "size",    (double (*)()) pt_size},     // ngp*nlev
-  {FT_CONST, 0, "missval", (double (*)()) pt_missval},  // Returns the missing value of a variable
+  { FT_CONST, 0, "ngp",
+    (double (*)()) pt_ngp },  // number of horizontal grid points
+  { FT_CONST, 0, "nlev", (double (*)()) pt_nlev },  // number of vertical levels
+  { FT_CONST, 0, "size", (double (*)()) pt_size },  // ngp*nlev
+  { FT_CONST, 0, "missval",
+    (double (*)()) pt_missval },  // Returns the missing value of a variable
 
   // cdo field functions (Reduce grid to point)
-  {FT_FLD, 0, "fldmin",  (double (*)()) fldmin},
-  {FT_FLD, 0, "fldmax",  (double (*)()) fldmax},
-  {FT_FLD, 0, "fldsum",  (double (*)()) fldsum},
-  {FT_FLD, 1, "fldmean", (double (*)()) fldmeanw},
-  {FT_FLD, 1, "fldavg",  (double (*)()) fldavgw},
-  {FT_FLD, 1, "fldstd",  (double (*)()) fldstdw},
-  {FT_FLD, 1, "fldstd1", (double (*)()) fldstd1w},
-  {FT_FLD, 1, "fldvar",  (double (*)()) fldvarw},
-  {FT_FLD, 1, "fldvar1", (double (*)()) fldvar1w},
+  { FT_FLD, 0, "fldmin", (double (*)()) fldmin },
+  { FT_FLD, 0, "fldmax", (double (*)()) fldmax },
+  { FT_FLD, 0, "fldsum", (double (*)()) fldsum },
+  { FT_FLD, 1, "fldmean", (double (*)()) fldmeanw },
+  { FT_FLD, 1, "fldavg", (double (*)()) fldavgw },
+  { FT_FLD, 1, "fldstd", (double (*)()) fldstdw },
+  { FT_FLD, 1, "fldstd1", (double (*)()) fldstd1w },
+  { FT_FLD, 1, "fldvar", (double (*)()) fldvarw },
+  { FT_FLD, 1, "fldvar1", (double (*)()) fldvar1w },
 
   // cdo field functions (Reduce level to point)
-  {FT_VERT, 0, "vertmin",  (double (*)()) fldmin},
-  {FT_VERT, 0, "vertmax",  (double (*)()) fldmax},
-  {FT_VERT, 0, "vertsum",  (double (*)()) fldsum},
-  {FT_VERT, 1, "vertmean", (double (*)()) fldmeanw},
-  {FT_VERT, 1, "vertavg",  (double (*)()) fldavgw},
-  {FT_VERT, 1, "vertstd",  (double (*)()) fldstdw},
-  {FT_VERT, 1, "vertstd1", (double (*)()) fldstd1w},
-  {FT_VERT, 1, "vertvar",  (double (*)()) fldvarw},
-  {FT_VERT, 1, "vertvar1", (double (*)()) fldvar1w},
-  
-  {FT_COORD, 0, "clon",       NULL},
-  {FT_COORD, 0, "clat",       NULL},
-  {FT_COORD, 0, "clev",       NULL},
-  {FT_COORD, 0, "gridarea",   NULL},
-  {FT_COORD, 0, "gridweight", NULL},
+  { FT_VERT, 0, "vertmin", (double (*)()) fldmin },
+  { FT_VERT, 0, "vertmax", (double (*)()) fldmax },
+  { FT_VERT, 0, "vertsum", (double (*)()) fldsum },
+  { FT_VERT, 1, "vertmean", (double (*)()) fldmeanw },
+  { FT_VERT, 1, "vertavg", (double (*)()) fldavgw },
+  { FT_VERT, 1, "vertstd", (double (*)()) fldstdw },
+  { FT_VERT, 1, "vertstd1", (double (*)()) fldstd1w },
+  { FT_VERT, 1, "vertvar", (double (*)()) fldvarw },
+  { FT_VERT, 1, "vertvar1", (double (*)()) fldvar1w },
 
-  {FT_0, 0, "ctimestep", (double (*)()) ts_ctimestep},
-  {FT_0, 0, "cdate",     (double (*)()) ts_cdate},
-  {FT_0, 0, "ctime",     (double (*)()) ts_ctime},
-  {FT_0, 0, "cdeltat",   (double (*)()) ts_cdeltat},
-  {FT_0, 0, "cday",      (double (*)()) ts_cday},
-  {FT_0, 0, "cmonth",    (double (*)()) ts_cmonth},
-  {FT_0, 0, "cyear",     (double (*)()) ts_cyear},
-  {FT_0, 0, "csecond",   (double (*)()) ts_csecond},
-  {FT_0, 0, "cminute",   (double (*)()) ts_cminute},
-  {FT_0, 0, "chour",     (double (*)()) ts_chour},
+  { FT_COORD, 0, "clon", NULL },
+  { FT_COORD, 0, "clat", NULL },
+  { FT_COORD, 0, "clev", NULL },
+  { FT_COORD, 0, "gridarea", NULL },
+  { FT_COORD, 0, "gridweight", NULL },
 
-  {FT_1C, 0, "sellevel",  NULL},
-  {FT_1C, 0, "sellevidx", NULL},
+  { FT_0, 0, "ctimestep", (double (*)()) ts_ctimestep },
+  { FT_0, 0, "cdate", (double (*)()) ts_cdate },
+  { FT_0, 0, "ctime", (double (*)()) ts_ctime },
+  { FT_0, 0, "cdeltat", (double (*)()) ts_cdeltat },
+  { FT_0, 0, "cday", (double (*)()) ts_cday },
+  { FT_0, 0, "cmonth", (double (*)()) ts_cmonth },
+  { FT_0, 0, "cyear", (double (*)()) ts_cyear },
+  { FT_0, 0, "csecond", (double (*)()) ts_csecond },
+  { FT_0, 0, "cminute", (double (*)()) ts_cminute },
+  { FT_0, 0, "chour", (double (*)()) ts_chour },
+
+  { FT_1C, 0, "sellevel", NULL },
+  { FT_1C, 0, "sellevidx", NULL },
   // {FT_1C, 0, "gridindex", NULL},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
 
-static
-void node_data_delete(nodeType *p)
+static void
+node_data_delete(nodeType *p)
 {
-  if ( p )
+  if (p)
     {
-      if ( p->param.data ) { Free(p->param.data); p->param.data = NULL;}
+      if (p->param.data)
+        {
+          Free(p->param.data);
+          p->param.data = NULL;
+        }
     }
 }
 
-static
-void node_delete(nodeType *p)
+static void
+node_delete(nodeType *p)
 {
-  if ( p )
+  if (p)
     {
-      if ( p->type == typeVar ) node_data_delete(p);
+      if (p->type == typeVar) node_data_delete(p);
       Free(p);
     }
 }
 
-static
-int get_funcID(const char *fun)
+static int
+get_funcID(const char *fun)
 {
   int funcID = -1;
-  for ( int i = 0; i < NumFunc; i++ )
-    if ( STR_IS_EQ(fun, fun_sym_tbl[i].name) )
-      { 
-	funcID = i;
-	break;
+  for (int i = 0; i < NumFunc; i++)
+    if (STR_IS_EQ(fun, fun_sym_tbl[i].name))
+      {
+        funcID = i;
+        break;
       }
 
-  if ( funcID == -1 ) cdoAbort("Function >%s< not available!", fun);
+  if (funcID == -1) cdoAbort("Function >%s< not available!", fun);
 
-  if ( STR_IS_EQ(fun_sym_tbl[funcID].name, "nint") ) cdo_check_round();
+  if (STR_IS_EQ(fun_sym_tbl[funcID].name, "nint")) cdo_check_round();
 
   return funcID;
 }
 
-static
-bool isCompare(int oper)
+static bool
+isCompare(int oper)
 {
-  return oper==LEG||oper==GE||oper==LE||oper==EQ||oper==NE||oper==GT||oper==LT;
+  return oper == LEG || oper == GE || oper == LE || oper == EQ || oper == NE
+         || oper == GT || oper == LT;
 }
 
-static
-void param_meta_copy(paramType *out, paramType *in)
+static void
+param_meta_copy(paramType *out, paramType *in)
 {
-  out->gridID   = in->gridID;
-  out->zaxisID  = in->zaxisID;
+  out->gridID = in->gridID;
+  out->zaxisID = in->zaxisID;
   out->datatype = in->datatype;
   out->steptype = in->steptype;
-  out->ngp      = in->ngp;
-  out->nlev     = in->nlev;
-  out->missval  = in->missval;
-  out->nmiss    = 0;
-  out->coord    = 0;
-  out->lmiss    = true;
-  out->name     = NULL;
+  out->ngp = in->ngp;
+  out->nlev = in->nlev;
+  out->missval = in->missval;
+  out->nmiss = 0;
+  out->coord = 0;
+  out->lmiss = true;
+  out->name = NULL;
   out->longname = NULL;
-  out->units    = NULL;
-  out->data     = NULL;
+  out->units = NULL;
+  out->data = NULL;
 }
 
-static
-nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
+static nodeType *
+expr_con_con(int oper, nodeType *p1, nodeType *p2)
 {
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type    = typeCon;
+  p->type = typeCon;
   p->ltmpobj = true;
 
   double cval1 = p1->u.con.value;
@@ -256,9 +350,10 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
   return p;
 }
 
-static
-void oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1, double missval2,
-                       double *restrict odat, double cval, const double *restrict idat)
+static void
+oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1,
+                  double missval2, double *restrict odat, double cval,
+                  const double *restrict idat)
 {
   size_t i;
 
@@ -327,9 +422,10 @@ void oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1, double m
   // clang-format on
 }
 
-static
-void oper_expr_var_con(int oper, bool nmiss, size_t n, double missval1, double missval2,
-                       double *restrict odat, const double *restrict idat, double cval)
+static void
+oper_expr_var_con(int oper, bool nmiss, size_t n, double missval1,
+                  double missval2, double *restrict odat,
+                  const double *restrict idat, double cval)
 {
   size_t i;
 
@@ -399,9 +495,10 @@ void oper_expr_var_con(int oper, bool nmiss, size_t n, double missval1, double m
   // clang-format on
 }
 
-static
-void oper_expr_var_var(int oper, bool nmiss, size_t ngp, double missval1, double missval2,
-                       double *restrict odat, const double *restrict idat1, const double *restrict idat2)
+static void
+oper_expr_var_var(int oper, bool nmiss, size_t ngp, double missval1,
+                  double missval2, double *restrict odat,
+                  const double *restrict idat1, const double *restrict idat2)
 {
   size_t i;
 
@@ -478,80 +575,84 @@ void oper_expr_var_var(int oper, bool nmiss, size_t ngp, double missval1, double
   // clang-format on
 }
 
-static
-nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
+static nodeType *
+expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
 {
-  size_t ngp   = p2->param.ngp;
-  size_t nlev  = p2->param.nlev;
+  size_t ngp = p2->param.ngp;
+  size_t nlev = p2->param.nlev;
   size_t nmiss = p2->param.nmiss;
   int datatype = p2->param.datatype;
   double missval1 = p2->param.missval;
   double missval2 = p2->param.missval;
 
-  size_t n = ngp*nlev;
+  size_t n = ngp * nlev;
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type     = typeVar;
-  p->ltmpobj  = true;
+  p->type = typeVar;
+  p->ltmpobj = true;
   p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p2->param);
   p->param.name = p->u.var.nm;
 
-  if ( ! init )
+  if (!init)
     {
-      p->param.data = (double*) Malloc(n*sizeof(double));
+      p->param.data = (double *) Malloc(n * sizeof(double));
       double *restrict odat = p->param.data;
       const double *restrict idat = p2->param.data;
       double cval = p1->u.con.value;
-      if ( datatype == CDI_DATATYPE_FLT32 && isCompare(oper) ) cval = (float) cval;
+      if (datatype == CDI_DATATYPE_FLT32 && isCompare(oper))
+        cval = (float) cval;
 
-      oper_expr_con_var(oper, nmiss>0, n, missval1, missval2, odat, cval, idat);
+      oper_expr_con_var(oper, nmiss > 0, n, missval1, missval2, odat, cval,
+                        idat);
 
       p->param.nmiss = arrayNumMV(n, odat, missval1);
     }
-  
+
   return p;
 }
 
-static
-nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
+static nodeType *
+expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
 {
-  size_t ngp   = p1->param.ngp;
-  size_t nlev  = p1->param.nlev;
+  size_t ngp = p1->param.ngp;
+  size_t nlev = p1->param.nlev;
   size_t nmiss = p1->param.nmiss;
   int datatype = p1->param.datatype;
   double missval1 = p1->param.missval;
   double missval2 = p1->param.missval;
 
-  size_t n = ngp*nlev;
+  size_t n = ngp * nlev;
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type     = typeVar;
-  p->ltmpobj  = true;
+  p->type = typeVar;
+  p->ltmpobj = true;
   p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
 
-  if ( ! init )
+  if (!init)
     {
-      p->param.data = (double*) Malloc(n*sizeof(double));
+      p->param.data = (double *) Malloc(n * sizeof(double));
       double *restrict odat = p->param.data;
       const double *restrict idat = p1->param.data;
       double cval = p2->u.con.value;
-      if ( datatype == CDI_DATATYPE_FLT32 && isCompare(oper) ) cval = (float) cval;
+      if (datatype == CDI_DATATYPE_FLT32 && isCompare(oper))
+        cval = (float) cval;
 
-      oper_expr_var_con(oper, nmiss>0, n, missval1, missval2, odat, idat, cval);
+      oper_expr_var_con(oper, nmiss > 0, n, missval1, missval2, odat, idat,
+                        cval);
 
       p->param.nmiss = arrayNumMV(n, odat, missval1);
     }
-  
+
   return p;
 }
 
-static
-nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
+static nodeType *
+expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 {
   nodeType *px = p1;
   size_t nmiss1 = p1->param.nmiss;
@@ -564,13 +665,17 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 
   size_t ngp = ngp1;
 
-  if ( ngp1 != ngp2 )
+  if (ngp1 != ngp2)
     {
-      if ( ngp1 == 1 || ngp2 == 1 )
+      if (ngp1 == 1 || ngp2 == 1)
         {
-          if ( ngp1 == 1 ) { ngp = ngp2; px = p2; }
+          if (ngp1 == 1)
+            {
+              ngp = ngp2;
+              px = p2;
+            }
         }
-      else 
+      else
         {
           cdoAbort("%s: Number of grid points differ (%s[%ld] <-> %s[%ld])",
                    __func__, p1->param.name, ngp1, p2->param.name, ngp2);
@@ -581,23 +686,27 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
   size_t nlev2 = p2->param.nlev;
 
   size_t nlev = nlev1;
-  if ( nlev1 != nlev2 )
+  if (nlev1 != nlev2)
     {
-      if ( nlev1 == 1 || nlev2 == 1 )
+      if (nlev1 == 1 || nlev2 == 1)
         {
-          if ( nlev1 == 1 ) { nlev = nlev2; px = p2; }
+          if (nlev1 == 1)
+            {
+              nlev = nlev2;
+              px = p2;
+            }
         }
-      else 
+      else
         {
           cdoAbort("%s: Number of levels differ (%s[%ld] <-> %s[%ld])",
                    __func__, p1->param.name, nlev1, p2->param.name, nlev2);
         }
     }
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type     = typeVar;
-  p->ltmpobj  = true;
+  p->type = typeVar;
+  p->ltmpobj = true;
   p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &px->param);
@@ -605,351 +714,398 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
   int steptype1 = p1->param.steptype;
   int steptype2 = p2->param.steptype;
 
-  if ( p->param.steptype == TIME_CONSTANT )
+  if (p->param.steptype == TIME_CONSTANT)
     {
-      if ( steptype1 != TIME_CONSTANT )
+      if (steptype1 != TIME_CONSTANT)
         p->param.steptype = steptype1;
-      else if ( steptype2 != TIME_CONSTANT )
+      else if (steptype2 != TIME_CONSTANT)
         p->param.steptype = steptype2;
     }
 
   p->param.name = p->u.var.nm;
-  //printf("%s %s nmiss %zu %zu\n", p->u.var.nm, px->param.name, nmiss1, nmiss2);
+  // printf("%s %s nmiss %zu %zu\n", p->u.var.nm, px->param.name, nmiss1,
+  // nmiss2);
 
-  if ( ! init )
+  if (!init)
     {
-      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
+      p->param.data = (double *) Malloc(ngp * nlev * sizeof(double));
 
-      for ( size_t k = 0; k < nlev; k++ )
+      for (size_t k = 0; k < nlev; k++)
         {
           size_t loff1 = 0, loff2 = 0;
-          size_t loff = k*ngp;
+          size_t loff = k * ngp;
 
-          if ( nlev1 > 1 ) loff1 = k*ngp1;
-          if ( nlev2 > 1 ) loff2 = k*ngp2;
+          if (nlev1 > 1) loff1 = k * ngp1;
+          if (nlev2 > 1) loff2 = k * ngp2;
 
-          const double *restrict idat1 = p1->param.data+loff1;
-          const double *restrict idat2 = p2->param.data+loff2;
-          double *restrict odat = p->param.data+loff;
+          const double *restrict idat1 = p1->param.data + loff1;
+          const double *restrict idat2 = p2->param.data + loff2;
+          double *restrict odat = p->param.data + loff;
           size_t nmiss = nmiss1 > 0 || nmiss2 > 0;
 
-          if ( ngp1 != ngp2 )
+          if (ngp1 != ngp2)
             {
-              if ( ngp2 == 1 )
-                oper_expr_var_con(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2[0]);
+              if (ngp2 == 1)
+                oper_expr_var_con(oper, nmiss, ngp, missval1, missval2, odat,
+                                  idat1, idat2[0]);
               else
-                oper_expr_con_var(oper, nmiss, ngp, missval1, missval2, odat, idat1[0], idat2);
+                oper_expr_con_var(oper, nmiss, ngp, missval1, missval2, odat,
+                                  idat1[0], idat2);
             }
           else
             {
-              oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2);
+              oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat,
+                                idat1, idat2);
             }
-          }
+        }
 
-      p->param.nmiss = arrayNumMV(ngp*nlev, p->param.data, missval1);
+      p->param.nmiss = arrayNumMV(ngp * nlev, p->param.data, missval1);
     }
-  
+
   return p;
 }
 
-static
-void ex_copy_var(int init, nodeType *p2, nodeType *p1)
+static void
+ex_copy_var(int init, nodeType *p2, nodeType *p1)
 {
-  if ( cdoVerbose ) cdoPrint("\t%s\tcopy\t%s[L%zu][N%zu] = %s[L%zu][N%zu]",
-                             ExIn[init], p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
-  
+  if (cdoVerbose)
+    cdoPrint("\t%s\tcopy\t%s[L%zu][N%zu] = %s[L%zu][N%zu]", ExIn[init],
+             p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name,
+             p2->param.nlev, p2->param.ngp);
+
   size_t ngp = p1->param.ngp;
   assert(ngp > 0);
 
-  if ( ngp != p2->param.ngp )
-    cdoAbort("%s: Number of grid points differ (%s[%zu] = %s[%zu])",
-             __func__, p2->param.name, p2->param.ngp, p1->param.name, ngp);
+  if (ngp != p2->param.ngp)
+    cdoAbort("%s: Number of grid points differ (%s[%zu] = %s[%zu])", __func__,
+             p2->param.name, p2->param.ngp, p1->param.name, ngp);
 
   size_t nlev = p1->param.nlev;
   assert(nlev > 0);
 
-  if ( nlev != p2->param.nlev )
-    cdoAbort("%s: Number of levels differ (%s[%zu] = %s[%zu])",
-             __func__, p2->param.name, p2->param.nlev, p1->param.name, nlev);
+  if (nlev != p2->param.nlev)
+    cdoAbort("%s: Number of levels differ (%s[%zu] = %s[%zu])", __func__,
+             p2->param.name, p2->param.nlev, p1->param.name, nlev);
 
-  if ( ! init )
+  if (!init)
     {
       double *restrict odat = p2->param.data;
       const double *restrict idat = p1->param.data;
-      for ( size_t i = 0; i < ngp*nlev; ++i ) odat[i] = idat[i];
-  
+      for (size_t i = 0; i < ngp * nlev; ++i)
+        odat[i] = idat[i];
+
       p2->param.missval = p1->param.missval;
-      p2->param.nmiss   = p1->param.nmiss;
+      p2->param.nmiss = p1->param.nmiss;
     }
 }
 
-static
-void ex_copy_con(int init, nodeType *p2, nodeType *p1)
+static void
+ex_copy_con(int init, nodeType *p2, nodeType *p1)
 {
   double cval = p1->u.con.value;
 
-  if ( cdoVerbose ) cdoPrint("\t%s\tcopy\t%s[L%zu][N%zu] = %g", ExIn[init], p2->param.name, p2->param.nlev, p2->param.ngp, cval);
-  
+  if (cdoVerbose)
+    cdoPrint("\t%s\tcopy\t%s[L%zu][N%zu] = %g", ExIn[init], p2->param.name,
+             p2->param.nlev, p2->param.ngp, cval);
+
   size_t ngp = p2->param.ngp;
   assert(ngp > 0);
 
   size_t nlev = p2->param.nlev;
   assert(nlev > 0);
 
-  if ( ! init )
+  if (!init)
     {
       double *restrict odat = p2->param.data;
       assert(odat != NULL);
 
-      for ( size_t i = 0; i < ngp*nlev; ++i ) odat[i] = cval;
+      for (size_t i = 0; i < ngp * nlev; ++i)
+        odat[i] = cval;
     }
 }
 
-static
-void ex_copy(int init, nodeType *p2, nodeType *p1)
+static void
+ex_copy(int init, nodeType *p2, nodeType *p1)
 {
-  if ( p1->type == typeCon )
+  if (p1->type == typeCon)
     ex_copy_con(init, p2, p1);
   else
     ex_copy_var(init, p2, p1);
 }
 
-static
-nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
+static nodeType *
+expr(int init, int oper, nodeType *p1, nodeType *p2)
 {
-  if ( p1 == NULL || p2 == NULL ) return  NULL;
-  
+  if (p1 == NULL || p2 == NULL) return NULL;
+
   const char *coper = "???";
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
-      switch ( oper )
+      switch (oper)
         {
-        case '+':  coper = "+"; break;
-        case '-':  coper = "-"; break;
-        case '*':  coper = "*"; break;
-        case '/':  coper = "/"; break;
-        case '^':  coper = "^"; break;
-        case LT:   coper = "<"; break;
-        case GT:   coper = ">"; break;
-        case LE:   coper = "<="; break;
-        case GE:   coper = ">="; break;
-        case NE:   coper = "!="; break;
-        case EQ:   coper = "=="; break;
-        case LEG:  coper = "<=>"; break;
-        case AND:  coper = "&&"; break;
-        case OR:   coper = "||"; break;
-        default: cdoAbort("Internal error, expr operator >%c< not implemented!\n", oper);
+        case '+': coper = "+"; break;
+        case '-': coper = "-"; break;
+        case '*': coper = "*"; break;
+        case '/': coper = "/"; break;
+        case '^': coper = "^"; break;
+        case LT: coper = "<"; break;
+        case GT: coper = ">"; break;
+        case LE: coper = "<="; break;
+        case GE: coper = ">="; break;
+        case NE: coper = "!="; break;
+        case EQ: coper = "=="; break;
+        case LEG: coper = "<=>"; break;
+        case AND: coper = "&&"; break;
+        case OR: coper = "||"; break;
+        default:
+          cdoAbort("Internal error, expr operator >%c< not implemented!\n",
+                   oper);
         }
     }
 
- nodeType *p = NULL;
+  nodeType *p = NULL;
 
-  if ( p1->type == typeVar && p2->type == typeVar )
+  if (p1->type == typeVar && p2->type == typeVar)
     {
       p = expr_var_var(init, oper, p1, p2);
-      if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %s %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
+      if (cdoVerbose)
+        cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %s %s %s", ExIn[init],
+                 p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper,
+                 p2->u.var.nm);
     }
-  else if ( p1->type == typeVar && p2->type == typeCon )
+  else if (p1->type == typeVar && p2->type == typeCon)
     {
       p = expr_var_con(init, oper, p1, p2);
-      if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %s %s %g", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.con.value);
+      if (cdoVerbose)
+        cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %s %s %g", ExIn[init],
+                 p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper,
+                 p2->u.con.value);
     }
-  else if ( p1->type == typeCon && p2->type == typeVar )
+  else if (p1->type == typeCon && p2->type == typeVar)
     {
       p = expr_con_var(init, oper, p1, p2);
-      if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %g %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
+      if (cdoVerbose)
+        cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %g %s %s", ExIn[init],
+                 p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value,
+                 coper, p2->u.var.nm);
     }
-  else if ( p1->type == typeCon && p2->type == typeCon )
+  else if (p1->type == typeCon && p2->type == typeCon)
     {
       p = expr_con_con(oper, p1, p2);
-      if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%g = %g %s %g", ExIn[init], p->u.con.value, p1->u.con.value, coper, p2->u.con.value);
+      if (cdoVerbose)
+        cdoPrint("\t%s\tarith\t%g = %g %s %g", ExIn[init], p->u.con.value,
+                 p1->u.con.value, coper, p2->u.con.value);
     }
   else
     cdoAbort("Internal problem!");
 
-  if ( p1->ltmpobj ) node_delete(p1);
-  if ( p2->ltmpobj ) node_delete(p2);
+  if (p1->ltmpobj) node_delete(p1);
+  if (p2->ltmpobj) node_delete(p2);
 
   return p;
 }
 
-static
-nodeType *ex_fun0_con(int init, int funcID, double *data)
+static nodeType *
+ex_fun0_con(int init, int funcID, double *data)
 {
   int functype = fun_sym_tbl[funcID].type;
-  if ( functype != FT_0 ) cdoAbort("Function %s not available for constant values!", fun_sym_tbl[funcID].name);
+  if (functype != FT_0)
+    cdoAbort("Function %s not available for constant values!",
+             fun_sym_tbl[funcID].name);
 
-  if ( cdoVerbose ) cdoPrint("\t%s\tfunc\t%s", ExIn[init], fun_sym_tbl[funcID].name);
+  if (cdoVerbose)
+    cdoPrint("\t%s\tfunc\t%s", ExIn[init], fun_sym_tbl[funcID].name);
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type    = typeCon;
+  p->type = typeCon;
   p->ltmpobj = true;
 
-  if ( ! init )
+  if (!init)
     {
-      double (*exprfunc)(double*) = (double (*)(double*)) fun_sym_tbl[funcID].func;
+      double (*exprfunc)(double *)
+          = (double (*)(double *)) fun_sym_tbl[funcID].func;
       p->u.con.value = exprfunc(data);
     }
 
   return p;
 }
 
-static
-nodeType *ex_fun_con(int funcID, nodeType *p1)
+static nodeType *
+ex_fun_con(int funcID, nodeType *p1)
 {
   int functype = fun_sym_tbl[funcID].type;
-  if ( functype != FT_STD ) cdoAbort("Function %s not available for constant values!", fun_sym_tbl[funcID].name);
+  if (functype != FT_STD)
+    cdoAbort("Function %s not available for constant values!",
+             fun_sym_tbl[funcID].name);
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type    = typeCon;
+  p->type = typeCon;
   p->ltmpobj = true;
 
   double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
   p->u.con.value = exprfunc(p1->u.con.value);
 
-  if ( p1->ltmpobj ) node_delete(p1);
-  else Free(p1);
+  if (p1->ltmpobj)
+    node_delete(p1);
+  else
+    Free(p1);
 
   return p;
 }
 
-static
-nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
+static nodeType *
+ex_fun_var(int init, int funcID, nodeType *p1)
 {
   const char *funcname = fun_sym_tbl[funcID].name;
   int functype = fun_sym_tbl[funcID].type;
   int funcflag = fun_sym_tbl[funcID].flag;
 
-  size_t ngp  = p1->param.ngp;
+  size_t ngp = p1->param.ngp;
   size_t nlev = p1->param.nlev;
   size_t nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type     = typeVar;
-  p->ltmpobj  = true;
+  p->type = typeVar;
+  p->ltmpobj = true;
   p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &p1->param);
 
-  if ( functype == FT_CONST )
+  if (functype == FT_CONST)
     {
       p->type = typeCon;
-      double (*exprfunc)(paramType*) = (double (*)(paramType*)) fun_sym_tbl[funcID].func;
+      double (*exprfunc)(paramType *)
+          = (double (*)(paramType *)) fun_sym_tbl[funcID].func;
       p->u.con.value = exprfunc(&p1->param);
     }
-  else if ( functype == FT_FLD )
+  else if (functype == FT_FLD)
     {
       p->param.gridID = pointID;
-      p->param.ngp    = 1;
+      p->param.ngp = 1;
     }
-  else if ( functype == FT_VERT )
+  else if (functype == FT_VERT)
     {
       p->param.zaxisID = surfaceID;
-      p->param.nlev    = 1;
+      p->param.nlev = 1;
     }
 
-  if ( ! init )
+  if (!init)
     {
-      p->param.data = (double*) Malloc(p->param.ngp*p->param.nlev*sizeof(double));
-      double *restrict pdata  = p->param.data;
+      p->param.data
+          = (double *) Malloc(p->param.ngp * p->param.nlev * sizeof(double));
+      double *restrict pdata = p->param.data;
       double *restrict p1data = p1->param.data;
-  
-      if ( functype == FT_STD )
+
+      if (functype == FT_STD)
         {
-          double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
-          if ( nmiss > 0 )
+          double (*exprfunc)(double)
+              = (double (*)(double)) fun_sym_tbl[funcID].func;
+          if (nmiss > 0)
             {
-              for ( size_t i = 0; i < ngp*nlev; i++ )
+              for (size_t i = 0; i < ngp * nlev; i++)
                 {
                   errno = -1;
-                  pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : exprfunc(p1data[i]);
-                  if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
-                  else if ( std::isnan(pdata[i]) ) pdata[i] = missval;
+                  pdata[i] = DBL_IS_EQUAL(p1data[i], missval)
+                                 ? missval
+                                 : exprfunc(p1data[i]);
+                  if (errno == EDOM || errno == ERANGE)
+                    pdata[i] = missval;
+                  else if (std::isnan(pdata[i]))
+                    pdata[i] = missval;
                 }
             }
           else
             {
-              for ( size_t i = 0; i < ngp*nlev; i++ )
+              for (size_t i = 0; i < ngp * nlev; i++)
                 {
                   errno = -1;
                   pdata[i] = exprfunc(p1data[i]);
-                  if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
-                  else if ( std::isnan(pdata[i]) ) pdata[i] = missval;
+                  if (errno == EDOM || errno == ERANGE)
+                    pdata[i] = missval;
+                  else if (std::isnan(pdata[i]))
+                    pdata[i] = missval;
                 }
             }
         }
-      else if ( functype == FT_FLD )
+      else if (functype == FT_FLD)
         {
           field_type field;
           double *weights = NULL;
-          //if ( funcflag == 1 ) weights = fld_weights(p1->param.gridID, ngp);
-          if ( funcflag == 1 )
+          // if ( funcflag == 1 ) weights = fld_weights(p1->param.gridID, ngp);
+          if (funcflag == 1)
             {
               weights = p1->param.weight;
-              assert(weights!=NULL);
+              assert(weights != NULL);
             }
-          
-          double (*exprfunc)(field_type) = (double (*)(field_type)) fun_sym_tbl[funcID].func;
-          for ( size_t k = 0; k < nlev; k++ )
+
+          double (*exprfunc)(field_type)
+              = (double (*)(field_type)) fun_sym_tbl[funcID].func;
+          for (size_t k = 0; k < nlev; k++)
             {
-              fld_field_init(&field, nmiss, missval, ngp, p1data+k*ngp, weights);
+              fld_field_init(&field, nmiss, missval, ngp, p1data + k * ngp,
+                             weights);
               pdata[k] = exprfunc(field);
             }
-          //if ( weights ) Free(weights);
+          // if ( weights ) Free(weights);
         }
-      else if ( functype == FT_VERT )
+      else if (functype == FT_VERT)
         {
           field_type field;
           double *weights = NULL;
-          if ( funcflag == 1 ) weights = vert_weights(p1->param.zaxisID, nlev);
-          double *array = (double*) Malloc(nlev*sizeof(double));
-          double (*exprfunc)(field_type) = (double (*)(field_type)) fun_sym_tbl[funcID].func;
-          for ( size_t i = 0; i < ngp; i++ )
+          if (funcflag == 1) weights = vert_weights(p1->param.zaxisID, nlev);
+          double *array = (double *) Malloc(nlev * sizeof(double));
+          double (*exprfunc)(field_type)
+              = (double (*)(field_type)) fun_sym_tbl[funcID].func;
+          for (size_t i = 0; i < ngp; i++)
             {
-              for ( size_t k = 0; k < nlev; k++ ) array[k] = p1data[k*ngp+i];
+              for (size_t k = 0; k < nlev; k++)
+                array[k] = p1data[k * ngp + i];
               fld_field_init(&field, nmiss, missval, nlev, array, weights);
               pdata[i] = exprfunc(field);
             }
-          if ( array ) Free(array);
-          if ( weights ) Free(weights);
+          if (array) Free(array);
+          if (weights) Free(weights);
         }
-      else if ( functype == FT_CONST )
+      else if (functype == FT_CONST)
         {
         }
       else
-        cdoAbort("Intermal error, wrong function type (%d) for %s()!", functype, funcname);
+        cdoAbort("Intermal error, wrong function type (%d) for %s()!", functype,
+                 funcname);
 
-      p->param.nmiss = arrayNumMV(p->param.ngp*p->param.nlev, pdata, missval);
+      p->param.nmiss = arrayNumMV(p->param.ngp * p->param.nlev, pdata, missval);
     }
 
-  if ( p1->ltmpobj ) node_delete(p1);
-  else Free(p1);
-  
+  if (p1->ltmpobj)
+    node_delete(p1);
+  else
+    Free(p1);
+
   return p;
 }
 
-static
-nodeType *ex_fun(int init, int funcID, nodeType *p1)
+static nodeType *
+ex_fun(int init, int funcID, nodeType *p1)
 {
   nodeType *p = NULL;
 
-  if ( p1->type == typeVar )
+  if (p1->type == typeVar)
     {
-      if ( cdoVerbose ) cdoPrint("\t%s\tfunc\t%s (%s)", ExIn[init], fun_sym_tbl[funcID].name, p1->u.var.nm);
+      if (cdoVerbose)
+        cdoPrint("\t%s\tfunc\t%s (%s)", ExIn[init], fun_sym_tbl[funcID].name,
+                 p1->u.var.nm);
       p = ex_fun_var(init, funcID, p1);
     }
-  else if ( p1->type == typeCon )
+  else if (p1->type == typeCon)
     {
-      if ( cdoVerbose ) cdoPrint("\t%s\tfunc\t%s (%g)", ExIn[init], fun_sym_tbl[funcID].name, p1->u.con.value);
+      if (cdoVerbose)
+        cdoPrint("\t%s\tfunc\t%s (%g)", ExIn[init], fun_sym_tbl[funcID].name,
+                 p1->u.con.value);
       p = ex_fun_con(funcID, p1);
     }
   else
@@ -958,35 +1114,37 @@ nodeType *ex_fun(int init, int funcID, nodeType *p1)
   return p;
 }
 
-static
-size_t get_levidx(size_t nlev, const double *data, double value, const char *funcname)
+static size_t
+get_levidx(size_t nlev, const double *data, double value, const char *funcname)
 {
   size_t levidx;
-  
-  for ( levidx = 0; levidx < nlev; ++levidx )
-    if ( IS_EQUAL(data[levidx], value) )
-      break;
-  if ( levidx == nlev ) cdoAbort("%s(): level %g not found!", funcname, value);
+
+  for (levidx = 0; levidx < nlev; ++levidx)
+    if (IS_EQUAL(data[levidx], value)) break;
+  if (levidx == nlev) cdoAbort("%s(): level %g not found!", funcname, value);
 
   return levidx;
 }
 
-static
-nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parseParamType *parse_arg)
+static nodeType *
+fun1c(int init, int funcID, nodeType *p1, double value,
+      parseParamType *parse_arg)
 {
-  const char *funcname = fun_sym_tbl[funcID].name;            
-  if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
-  if ( p1->ltmpobj ) cdoAbort("Temporary objects not allowed in function %s()!", funcname);
+  const char *funcname = fun_sym_tbl[funcID].name;
+  if (p1->type != typeVar)
+    cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
+  if (p1->ltmpobj)
+    cdoAbort("Temporary objects not allowed in function %s()!", funcname);
 
-  size_t ngp   = p1->param.ngp;
-  size_t nlev  = p1->param.nlev;
+  size_t ngp = p1->param.ngp;
+  size_t nlev = p1->param.nlev;
   size_t nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type     = typeVar;
-  p->ltmpobj  = true;
+  p->type = typeVar;
+  p->ltmpobj = true;
   p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
@@ -996,13 +1154,13 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parseParamType
   int zaxisID = p1->param.zaxisID;
   int coordID = params_get_coordID(parse_arg, 'z', zaxisID);
   size_t levidx = 0;
-  
+
   double *data = NULL;
-  if ( init )
+  if (init)
     {
       parse_arg->coords[coordID].needed = true;
 
-      data = (double*) Malloc(nlev*sizeof(double));
+      data = (double *) Malloc(nlev * sizeof(double));
       cdoZaxisInqLevels(zaxisID, data);
     }
   else
@@ -1010,21 +1168,22 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parseParamType
       data = parse_arg->coords[coordID].data;
     }
 
-  if ( STR_IS_EQ(funcname, "sellevidx") )
+  if (STR_IS_EQ(funcname, "sellevidx"))
     {
       long ilevidx = lround(value);
-      if ( ilevidx < 1 || ilevidx > (long)nlev )
-        cdoAbort("%s(): level index %ld out of range (range: 1-%zu)!", funcname, ilevidx, nlev);
+      if (ilevidx < 1 || ilevidx > (long) nlev)
+        cdoAbort("%s(): level index %ld out of range (range: 1-%zu)!", funcname,
+                 ilevidx, nlev);
       levidx = (size_t) ilevidx - 1;
     }
-  else if ( STR_IS_EQ(funcname, "sellevel") )
+  else if (STR_IS_EQ(funcname, "sellevel"))
     {
       levidx = get_levidx(nlev, data, value, funcname);
     }
   else
     cdoAbort("Function %s() not implemented!", funcname);
 
-  if ( init )
+  if (init)
     {
       double level = data[levidx];
       int zaxisID2 = zaxisCreate(zaxisInqType(zaxisID), 1);
@@ -1032,50 +1191,59 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parseParamType
       p->param.zaxisID = zaxisID2;
     }
 
-  if ( init ) Free(data);
+  if (init) Free(data);
 
-  if ( ! init )
+  if (!init)
     {
-      p->param.data = (double*) Malloc(ngp*sizeof(double));
+      p->param.data = (double *) Malloc(ngp * sizeof(double));
       double *restrict pdata = p->param.data;
-      const double *restrict p1data = p1->param.data+ngp*levidx;
+      const double *restrict p1data = p1->param.data + ngp * levidx;
 
-      for ( size_t i = 0; i < ngp; i++ ) pdata[i] = p1data[i];
+      for (size_t i = 0; i < ngp; i++)
+        pdata[i] = p1data[i];
 
-      if ( nmiss > 0 ) nmiss = arrayNumMV(ngp, pdata, missval);
+      if (nmiss > 0) nmiss = arrayNumMV(ngp, pdata, missval);
       p->param.nmiss = nmiss;
     }
 
-  if ( p1->ltmpobj ) node_delete(p1);
+  if (p1->ltmpobj) node_delete(p1);
 
   return p;
 }
 
-static
-nodeType *coord_fun(int init, int funcID, nodeType *p1, parseParamType *parse_arg)
+static nodeType *
+coord_fun(int init, int funcID, nodeType *p1, parseParamType *parse_arg)
 {
-  const char *funcname = fun_sym_tbl[funcID].name;            
-  if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
-  if ( p1->ltmpobj ) cdoAbort("Temporary objects not allowed in function %s()!", funcname);
-            
+  const char *funcname = fun_sym_tbl[funcID].name;
+  if (p1->type != typeVar)
+    cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
+  if (p1->ltmpobj)
+    cdoAbort("Temporary objects not allowed in function %s()!", funcname);
+
   size_t len = 3 + strlen(p1->u.var.nm);
-  char *cname = (char*) Calloc(len, 1);
+  char *cname = (char *) Calloc(len, 1);
   strcpy(cname, p1->u.var.nm);
-            
-  if      ( STR_IS_EQ(funcname, "clon") ) strcat(cname, ".x");
-  else if ( STR_IS_EQ(funcname, "clat") ) strcat(cname, ".y");
-  else if ( STR_IS_EQ(funcname, "clev") ) strcat(cname, ".z");
-  else if ( STR_IS_EQ(funcname, "gridarea")   ) strcat(cname, ".a");
-  else if ( STR_IS_EQ(funcname, "gridweight") ) strcat(cname, ".w");
-  else cdoAbort("Implementation missing for function %s!", funcname);
-  
+
+  if (STR_IS_EQ(funcname, "clon"))
+    strcat(cname, ".x");
+  else if (STR_IS_EQ(funcname, "clat"))
+    strcat(cname, ".y");
+  else if (STR_IS_EQ(funcname, "clev"))
+    strcat(cname, ".z");
+  else if (STR_IS_EQ(funcname, "gridarea"))
+    strcat(cname, ".a");
+  else if (STR_IS_EQ(funcname, "gridweight"))
+    strcat(cname, ".w");
+  else
+    cdoAbort("Implementation missing for function %s!", funcname);
+
   Free(p1->u.var.nm);
   p1->u.var.nm = cname;
 
   nodeType *p = expr_run(p1, parse_arg);
   p->param.lmiss = false;
 
-  if ( ! init )
+  if (!init)
     {
       /*
       size_t ngp  = p1->param.ngp;
@@ -1094,53 +1262,54 @@ nodeType *coord_fun(int init, int funcID, nodeType *p1, parseParamType *parse_ar
   return p;
 }
 
-static
-nodeType *ex_uminus_var(int init, nodeType *p1)
+static nodeType *
+ex_uminus_var(int init, nodeType *p1)
 {
-  size_t ngp   = p1->param.ngp;
-  size_t nlev  = p1->param.nlev;
+  size_t ngp = p1->param.ngp;
+  size_t nlev = p1->param.nlev;
   size_t nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type     = typeVar;
-  p->ltmpobj  = true;
+  p->type = typeVar;
+  p->ltmpobj = true;
   p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
 
-  if ( ! init )
+  if (!init)
     {
-      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
+      p->param.data = (double *) Malloc(ngp * nlev * sizeof(double));
       double *restrict pdata = p->param.data;
       const double *restrict p1data = p1->param.data;
 
-      if ( nmiss > 0 )
+      if (nmiss > 0)
         {
-          for ( size_t i = 0; i < ngp*nlev; ++i )
-            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : -(p1data[i]);
+          for (size_t i = 0; i < ngp * nlev; ++i)
+            pdata[i]
+                = DBL_IS_EQUAL(p1data[i], missval) ? missval : -(p1data[i]);
         }
       else
         {
-          for ( size_t i = 0; i < ngp*nlev; ++i )
+          for (size_t i = 0; i < ngp * nlev; ++i)
             pdata[i] = -(p1data[i]);
         }
 
       p->param.nmiss = nmiss;
     }
 
-  if ( p1->ltmpobj ) node_delete(p1);
-  
+  if (p1->ltmpobj) node_delete(p1);
+
   return p;
 }
 
-static
-nodeType *ex_uminus_con(nodeType *p1)
+static nodeType *
+ex_uminus_con(nodeType *p1)
 {
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type    = typeCon;
+  p->type = typeCon;
   p->ltmpobj = true;
 
   p->u.con.value = -(p1->u.con.value);
@@ -1148,19 +1317,20 @@ nodeType *ex_uminus_con(nodeType *p1)
   return p;
 }
 
-static
-nodeType *ex_uminus(int init, nodeType *p1)
+static nodeType *
+ex_uminus(int init, nodeType *p1)
 {
   nodeType *p = NULL;
 
-  if ( p1->type == typeVar )
+  if (p1->type == typeVar)
     {
-      if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%s)", ExIn[init], p1->u.var.nm);
+      if (cdoVerbose) cdoPrint("\t%s\tneg\t- (%s)", ExIn[init], p1->u.var.nm);
       p = ex_uminus_var(init, p1);
     }
-  else if ( p1->type == typeCon )
+  else if (p1->type == typeCon)
     {
-      if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%g)", ExIn[init], p1->u.con.value);
+      if (cdoVerbose)
+        cdoPrint("\t%s\tneg\t- (%g)", ExIn[init], p1->u.con.value);
       p = ex_uminus_con(p1);
     }
   else
@@ -1169,53 +1339,54 @@ nodeType *ex_uminus(int init, nodeType *p1)
   return p;
 }
 
-static
-nodeType *ex_not_var(int init, nodeType *p1)
+static nodeType *
+ex_not_var(int init, nodeType *p1)
 {
-  size_t ngp   = p1->param.ngp;
-  size_t nlev  = p1->param.nlev;
+  size_t ngp = p1->param.ngp;
+  size_t nlev = p1->param.nlev;
   size_t nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type     = typeVar;
-  p->ltmpobj  = true;
+  p->type = typeVar;
+  p->ltmpobj = true;
   p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
 
-  if ( ! init )
+  if (!init)
     {
-      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
+      p->param.data = (double *) Malloc(ngp * nlev * sizeof(double));
       double *restrict pdata = p->param.data;
       const double *restrict p1data = p1->param.data;
 
-      if ( nmiss > 0 )
+      if (nmiss > 0)
         {
-          for ( size_t i = 0; i < ngp*nlev; ++i )
-            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : COMPNOT(p1data[i]);
+          for (size_t i = 0; i < ngp * nlev; ++i)
+            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval
+                                                        : COMPNOT(p1data[i]);
         }
       else
         {
-          for ( size_t i = 0; i < ngp*nlev; ++i )
+          for (size_t i = 0; i < ngp * nlev; ++i)
             pdata[i] = COMPNOT(p1data[i]);
         }
 
       p->param.nmiss = nmiss;
     }
 
-  if ( p1->ltmpobj ) node_delete(p1);
-  
+  if (p1->ltmpobj) node_delete(p1);
+
   return p;
 }
 
-static
-nodeType *ex_not_con(nodeType *p1)
+static nodeType *
+ex_not_con(nodeType *p1)
 {
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type    = typeCon;
+  p->type = typeCon;
   p->ltmpobj = true;
 
   p->u.con.value = COMPNOT(p1->u.con.value);
@@ -1223,19 +1394,20 @@ nodeType *ex_not_con(nodeType *p1)
   return p;
 }
 
-static
-nodeType *ex_not(int init, nodeType *p1)
+static nodeType *
+ex_not(int init, nodeType *p1)
 {
   nodeType *p = NULL;
 
-  if ( p1->type == typeVar )
+  if (p1->type == typeVar)
     {
-      if ( cdoVerbose ) cdoPrint("\t%s\tnot\t! (%s)", ExIn[init], p1->u.var.nm);
+      if (cdoVerbose) cdoPrint("\t%s\tnot\t! (%s)", ExIn[init], p1->u.var.nm);
       p = ex_not_var(init, p1);
     }
-  else if ( p1->type == typeCon )
+  else if (p1->type == typeCon)
     {
-      if ( cdoVerbose ) cdoPrint("\t%s\tnot\t! (%g)", ExIn[init], p1->u.con.value);
+      if (cdoVerbose)
+        cdoPrint("\t%s\tnot\t! (%g)", ExIn[init], p1->u.con.value);
       p = ex_not_con(p1);
     }
   else
@@ -1244,27 +1416,32 @@ nodeType *ex_not(int init, nodeType *p1)
   return p;
 }
 
-static
-nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
+static nodeType *
+ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 {
-  if ( p1->type == typeCon ) cdoAbort("expr?expr:expr: First expression is a constant but must be a variable!");
+  if (p1->type == typeCon)
+    cdoAbort("expr?expr:expr: First expression is a constant but must be a "
+             "variable!");
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
-      fprintf(stderr, "cdo expr:\t%s\tifelse\t%s[L%zu][N%zu] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
-      if ( p2->type == typeCon )
+      fprintf(stderr, "cdo expr:\t%s\tifelse\t%s[L%zu][N%zu] ? ", ExIn[init],
+              p1->u.var.nm, p1->param.nlev, p1->param.ngp);
+      if (p2->type == typeCon)
         fprintf(stderr, "%g : ", p2->u.con.value);
       else
-        fprintf(stderr, "%s[L%zu][N%zu] : ", p2->u.var.nm, p2->param.nlev, p2->param.ngp);
-      if ( p3->type == typeCon )
+        fprintf(stderr, "%s[L%zu][N%zu] : ", p2->u.var.nm, p2->param.nlev,
+                p2->param.ngp);
+      if (p3->type == typeCon)
         fprintf(stderr, "%g\n", p3->u.con.value);
       else
-        fprintf(stderr, "%s[L%zu][N%zu]\n", p3->u.var.nm, p3->param.nlev, p3->param.ngp);
+        fprintf(stderr, "%s[L%zu][N%zu]\n", p3->u.var.nm, p3->param.nlev,
+                p3->param.ngp);
     }
 
   size_t nmiss1 = p1->param.nmiss;
-  size_t ngp1   = p1->param.ngp;
-  size_t nlev1  = p1->param.nlev;
+  size_t ngp1 = p1->param.ngp;
+  size_t nlev1 = p1->param.nlev;
   double missval1 = p1->param.missval;
 
   size_t ngp = ngp1;
@@ -1275,8 +1452,8 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
   double *pdata2 = NULL;
   size_t ngp2 = 1;
   size_t nlev2 = 1;
-  
-  if ( p2->type == typeCon )
+
+  if (p2->type == typeCon)
     {
       pdata2 = &p2->u.con.value;
     }
@@ -1287,35 +1464,39 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
       missval2 = p2->param.missval;
       pdata2 = p2->param.data;
 
-      if ( ngp2 > 1 && ngp2 != ngp )
+      if (ngp2 > 1 && ngp2 != ngp)
         {
-          if ( ngp == 1 )
+          if (ngp == 1)
             {
               ngp = ngp2;
               px = p2;
             }
           else
-            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", ngp1, ngp2);
+            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = "
+                     "%ld, ngp2 = %ld)",
+                     ngp1, ngp2);
         }
 
-      if ( nlev2 > 1 && nlev2 != nlev )
-	{
-	  if ( nlev == 1 )
-	    {
-	      nlev = nlev2;
-	      px = p2;
-	    }
-	  else
-	    cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, nlev2 = %ld)", nlev, nlev2);
-	}
+      if (nlev2 > 1 && nlev2 != nlev)
+        {
+          if (nlev == 1)
+            {
+              nlev = nlev2;
+              px = p2;
+            }
+          else
+            cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, "
+                     "nlev2 = %ld)",
+                     nlev, nlev2);
+        }
     }
 
   double missval3 = missval1;
   double *pdata3 = NULL;
   size_t ngp3 = 1;
   size_t nlev3 = 1;
-  
-  if ( p3->type == typeCon )
+
+  if (p3->type == typeCon)
     {
       pdata3 = &p3->u.con.value;
     }
@@ -1326,69 +1507,73 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
       missval3 = p3->param.missval;
       pdata3 = p3->param.data;
 
-      if ( ngp3 > 1 && ngp3 != ngp )
+      if (ngp3 > 1 && ngp3 != ngp)
         {
-          if ( ngp == 1 )
+          if (ngp == 1)
             {
               ngp = ngp3;
               px = p3;
             }
           else
-            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp3 = %ld)", ngp1, ngp3);
+            cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = "
+                     "%ld, ngp3 = %ld)",
+                     ngp1, ngp3);
         }
 
-      if ( nlev3 > 1 && nlev3 != nlev )
-	{
-	  if ( nlev == 1 )
-	    {
-	      nlev = nlev3;
-	      px = p3;
-	    }
-	  else
-	    cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, nlev3 = %ld)", nlev, nlev3);
-	}
+      if (nlev3 > 1 && nlev3 != nlev)
+        {
+          if (nlev == 1)
+            {
+              nlev = nlev3;
+              px = p3;
+            }
+          else
+            cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, "
+                     "nlev3 = %ld)",
+                     nlev, nlev3);
+        }
     }
 
-  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+  nodeType *p = (nodeType *) Calloc(1, sizeof(nodeType));
 
-  p->type     = typeVar;
-  p->ltmpobj  = true;
+  p->type = typeVar;
+  p->ltmpobj = true;
   p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &px->param);
   p->param.name = p->u.var.nm;
 
-  if ( ! init )
+  if (!init)
     {
       size_t nmiss = 0;
       double *pdata1 = p1->param.data;
-      
-      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
-      for ( size_t k = 0; k < nlev; ++k )
+      p->param.data = (double *) Malloc(ngp * nlev * sizeof(double));
+
+      for (size_t k = 0; k < nlev; ++k)
         {
-          size_t loff1 = (nlev1 == 1) ? 0 : k*ngp1;
-          size_t loff  = k*ngp;
+          size_t loff1 = (nlev1 == 1) ? 0 : k * ngp1;
+          size_t loff = k * ngp;
           size_t loff2 = (nlev2 == 1) ? 0 : loff;
           size_t loff3 = (nlev3 == 1) ? 0 : loff;
 
-          const double *restrict idat1 = pdata1+loff1;
-          const double *restrict idat2 = pdata2+loff2;
-          const double *restrict idat3 = pdata3+loff3;
-          double *restrict odat = p->param.data+loff;
+          const double *restrict idat1 = pdata1 + loff1;
+          const double *restrict idat2 = pdata2 + loff2;
+          const double *restrict idat3 = pdata3 + loff3;
+          double *restrict odat = p->param.data + loff;
 
           double ival1 = idat1[0];
           double ival2 = idat2[0];
           double ival3 = idat3[0];
-          for ( size_t i = 0; i < ngp; ++i ) 
+          for (size_t i = 0; i < ngp; ++i)
             {
-              if ( ngp1 > 1 ) ival1 = idat1[i];
-              if ( ngp2 > 1 ) ival2 = idat2[i];
-              if ( ngp3 > 1 ) ival3 = idat3[i];
+              if (ngp1 > 1) ival1 = idat1[i];
+              if (ngp2 > 1) ival2 = idat2[i];
+              if (ngp3 > 1) ival3 = idat3[i];
 
-              if ( nmiss1 && DBL_IS_EQUAL(ival1, missval1) )
+              if (nmiss1 && DBL_IS_EQUAL(ival1, missval1))
                 odat[i] = missval1;
-              else if ( IS_NOT_EQUAL(ival1, 0) )
+              else if (IS_NOT_EQUAL(ival1, 0))
                 odat[i] = DBL_IS_EQUAL(ival2, missval2) ? missval1 : ival2;
               else
                 odat[i] = DBL_IS_EQUAL(ival3, missval3) ? missval1 : ival3;
@@ -1400,9 +1585,9 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
       p->param.nmiss = nmiss;
     }
 
-  if ( p1->ltmpobj ) node_delete(p1);
-  if ( p2->ltmpobj ) node_delete(p2);
-  if ( p3->ltmpobj ) node_delete(p3);
+  if (p1->ltmpobj) node_delete(p1);
+  if (p2->ltmpobj) node_delete(p2);
+  if (p3->ltmpobj) node_delete(p3);
 
   return p;
 }
@@ -1428,21 +1613,21 @@ int exNode(nodeType *p, parseParamType *parse_arg)
 }
 */
 
-static
-int param_search_name(int nparam, paramType *params, const char *name)
+static int
+param_search_name(int nparam, paramType *params, const char *name)
 {
   int varID = -1;
 
-  for ( varID = nparam-1; varID >= 0; --varID )
+  for (varID = nparam - 1; varID >= 0; --varID)
     {
-      if ( STR_IS_EQ(params[varID].name, name) ) break;
+      if (STR_IS_EQ(params[varID].name, name)) break;
     }
 
   return varID;
 }
 
-
-nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
+nodeType *
+expr_run(nodeType *p, parseParamType *parse_arg)
 {
   pointID = parse_arg->pointID;
   surfaceID = parse_arg->surfaceID;
@@ -1451,31 +1636,33 @@ nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
   int varID;
   nodeType *rnode = NULL;
 
-  if ( ! p ) return rnode;
+  if (!p) return rnode;
 
   /*  if ( ! init ) { exNode(p, parse_arg); return 0; } */
 
-  switch ( p->type )
+  switch (p->type)
     {
     case typeCom:
       {
         const char *cname = p->u.com.cname;
         const char *vname = p->u.com.vname;
-        if ( parse_arg->debug ) cdoPrint("\tstatement\t\t%s(%s)", cname, vname);
+        if (parse_arg->debug) cdoPrint("\tstatement\t\t%s(%s)", cname, vname);
 
         varID = param_search_name(parse_arg->nparams, params, vname);
-        if ( varID == -1 ) cdoAbort("Variable %s not found, needed for statement %s(%s)!", vname, cname, vname);
+        if (varID == -1)
+          cdoAbort("Variable %s not found, needed for statement %s(%s)!", vname,
+                   cname, vname);
 
-        if ( init )
+        if (init)
           {
-            if ( STR_IS_EQ(cname, "remove") )
+            if (STR_IS_EQ(cname, "remove"))
               {
                 params[varID].remove = true;
               }
           }
         else
           {
-            if ( STR_IS_EQ(cname, "print") )
+            if (STR_IS_EQ(cname, "print"))
               {
                 size_t maxout = 100;
                 int vartsID = parse_arg->tsID;
@@ -1484,29 +1671,32 @@ nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
                 size_t nlev = params[varID].nlev;
                 const double *data = params[varID].data;
                 long tsID = lround(params[vartsID].data[0]);
-                for ( size_t k = 0; k < nlev; ++k )
-                  for ( size_t i = 0; i < ngp; ++i )
+                for (size_t k = 0; k < nlev; ++k)
+                  for (size_t i = 0; i < ngp; ++i)
                     {
-                      if ( i < maxout || (ngp > maxout && i >= (ngp-maxout)) )
+                      if (i < maxout || (ngp > maxout && i >= (ngp - maxout)))
                         {
-                          if ( steptype == TIME_CONSTANT )
-                            fprintf(stdout, "   %s[lev=%zu:gp=%zu] = %g\n", vname, k+1, i+1, data[k*ngp+i]);
+                          if (steptype == TIME_CONSTANT)
+                            fprintf(stdout, "   %s[lev=%zu:gp=%zu] = %g\n",
+                                    vname, k + 1, i + 1, data[k * ngp + i]);
                           else
-                            fprintf(stdout, "   %s[ts=%ld:lev=%zu:gp=%zu] = %g\n", vname, tsID, k+1, i+1, data[k*ngp+i]);
+                            fprintf(
+                                stdout, "   %s[ts=%ld:lev=%zu:gp=%zu] = %g\n",
+                                vname, tsID, k + 1, i + 1, data[k * ngp + i]);
                         }
-                      else if ( i == maxout )
+                      else if (i == maxout)
                         {
                           fprintf(stdout, "   .......\n");
                         }
                     }
               }
           }
-        
+
         break;
       }
     case typeCon:
       {
-        if ( parse_arg->debug ) cdoPrint("\tpush\tconst\t%g", p->u.con.value);
+        if (parse_arg->debug) cdoPrint("\tpush\tconst\t%g", p->u.con.value);
 
         rnode = p;
 
@@ -1516,118 +1706,133 @@ nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
       {
         const char *vnm = p->u.var.nm;
         varID = param_search_name(parse_arg->nparams, params, vnm);
-        if ( varID == -1 && init )
+        if (varID == -1 && init)
           {
             size_t len = strlen(vnm);
-            int coord = vnm[len-1];
-            if ( len > 2 && vnm[len-2] == '.' )
+            int coord = vnm[len - 1];
+            if (len > 2 && vnm[len - 2] == '.')
               {
-                if ( coord == 'x' || coord == 'y' || coord == 'a' || coord == 'w' )
+                if (coord == 'x' || coord == 'y' || coord == 'a'
+                    || coord == 'w')
                   {
                     char *varname = strdup(vnm);
-                    varname[len-2] = 0;
-                    varID = param_search_name(parse_arg->nparams, params, varname);
+                    varname[len - 2] = 0;
+                    varID = param_search_name(parse_arg->nparams, params,
+                                              varname);
                     free(varname);
-                    if ( varID == -1 )
+                    if (varID == -1)
                       {
-                        cdoAbort("Coordinate %c: variable >%s< not found!", coord, varname);
+                        cdoAbort("Coordinate %c: variable >%s< not found!",
+                                 coord, varname);
                       }
                     else
                       {
                         int nvarID = parse_arg->nparams;
-                        if ( nvarID >= parse_arg->maxparams )
-                          cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
+                        if (nvarID >= parse_arg->maxparams)
+                          cdoAbort("Too many parameter (limit=%d)",
+                                   parse_arg->maxparams);
 
-                        int coordID = params_get_coordID(parse_arg, coord, params[varID].gridID);
+                        int coordID = params_get_coordID(parse_arg, coord,
+                                                         params[varID].gridID);
                         parse_arg->coords[coordID].needed = true;
                         const char *units = parse_arg->coords[coordID].units;
-                        const char *longname = parse_arg->coords[coordID].longname;
+                        const char *longname
+                            = parse_arg->coords[coordID].longname;
 
-                        params[nvarID].coord    = coord;
-                        params[nvarID].lmiss    = false;
-                        params[nvarID].name     = strdup(vnm);
-                        params[nvarID].missval  = params[varID].missval;
-                        params[nvarID].gridID   = params[varID].gridID;
-                        params[nvarID].zaxisID  = parse_arg->surfaceID;
+                        params[nvarID].coord = coord;
+                        params[nvarID].lmiss = false;
+                        params[nvarID].name = strdup(vnm);
+                        params[nvarID].missval = params[varID].missval;
+                        params[nvarID].gridID = params[varID].gridID;
+                        params[nvarID].zaxisID = parse_arg->surfaceID;
                         params[nvarID].steptype = TIME_CONSTANT;
-                        params[nvarID].ngp      = params[varID].ngp;
-                        params[nvarID].nlev     = 1;
-                        if ( units ) params[nvarID].units = strdup(units);
-                        if ( longname ) params[nvarID].longname = strdup(longname);
+                        params[nvarID].ngp = params[varID].ngp;
+                        params[nvarID].nlev = 1;
+                        if (units) params[nvarID].units = strdup(units);
+                        if (longname)
+                          params[nvarID].longname = strdup(longname);
                         parse_arg->nparams++;
                         varID = nvarID;
                       }
                   }
-                else if ( coord == 'z' )
+                else if (coord == 'z')
                   {
                     char *varname = strdup(vnm);
-                    varname[len-2] = 0;
-                    varID = param_search_name(parse_arg->nparams, params, varname);
+                    varname[len - 2] = 0;
+                    varID = param_search_name(parse_arg->nparams, params,
+                                              varname);
                     free(varname);
-                    if ( varID == -1 )
+                    if (varID == -1)
                       {
-                        cdoAbort("Coordinate %c: variable >%s< not found!", coord, varname);
+                        cdoAbort("Coordinate %c: variable >%s< not found!",
+                                 coord, varname);
                       }
                     else
                       {
                         int nvarID = parse_arg->nparams;
-                        if ( nvarID >= parse_arg->maxparams )
-                          cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
-                          
-                        int coordID = params_get_coordID(parse_arg, coord, params[varID].zaxisID);
+                        if (nvarID >= parse_arg->maxparams)
+                          cdoAbort("Too many parameter (limit=%d)",
+                                   parse_arg->maxparams);
+
+                        int coordID = params_get_coordID(parse_arg, coord,
+                                                         params[varID].zaxisID);
                         parse_arg->coords[coordID].needed = true;
                         const char *units = parse_arg->coords[coordID].units;
-                        const char *longname = parse_arg->coords[coordID].longname;
-                                     
-                        params[nvarID].coord    = coord;
-                        params[nvarID].lmiss    = false;
-                        params[nvarID].name     = strdup(vnm);
-                        params[nvarID].missval  = params[varID].missval;
-                        params[nvarID].gridID   = parse_arg->pointID;
-                        params[nvarID].zaxisID  = params[varID].zaxisID;
+                        const char *longname
+                            = parse_arg->coords[coordID].longname;
+
+                        params[nvarID].coord = coord;
+                        params[nvarID].lmiss = false;
+                        params[nvarID].name = strdup(vnm);
+                        params[nvarID].missval = params[varID].missval;
+                        params[nvarID].gridID = parse_arg->pointID;
+                        params[nvarID].zaxisID = params[varID].zaxisID;
                         params[nvarID].steptype = TIME_CONSTANT;
-                        params[nvarID].ngp      = 1;
-                        params[nvarID].nlev     = params[varID].nlev;
-                        if ( units ) params[nvarID].units = strdup(units);
-                        if ( longname ) params[nvarID].longname = strdup(longname);
+                        params[nvarID].ngp = 1;
+                        params[nvarID].nlev = params[varID].nlev;
+                        if (units) params[nvarID].units = strdup(units);
+                        if (longname)
+                          params[nvarID].longname = strdup(longname);
                         parse_arg->nparams++;
                         varID = nvarID;
                       }
                   }
               }
           }
-        if ( varID == -1 )
+        if (varID == -1)
           {
             cdoAbort("Variable >%s< not found!", p->u.var.nm);
           }
-        else if ( init )
+        else if (init)
           {
-            if ( varID < parse_arg->nvars1 && parse_arg->needed[varID] == false )
+            if (varID < parse_arg->nvars1 && parse_arg->needed[varID] == false)
               {
                 parse_arg->needed[varID] = true;
               }
           }
 
-
         param_meta_copy(&p->param, &params[varID]);
-        p->param.coord    = params[varID].coord;
-        p->param.lmiss    = params[varID].lmiss;
-        p->param.name     = params[varID].name;
+        p->param.coord = params[varID].coord;
+        p->param.lmiss = params[varID].lmiss;
+        p->param.name = params[varID].name;
         p->param.longname = params[varID].longname;
-        p->param.units    = params[varID].units;
+        p->param.units = params[varID].units;
         p->ltmpobj = false;
         /*
         if ( parse_arg->debug )
-          printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d  varID=%d\n",
-                 p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
+          printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d
+        varID=%d\n", p->u.var.nm, p->param.name, p->param.gridID,
+        p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
         */
-        if ( ! init )
+        if (!init)
           {
-            p->param.data  = params[varID].data;
+            p->param.data = params[varID].data;
             p->param.nmiss = params[varID].nmiss;
           }
 
-        if ( parse_arg->debug ) cdoPrint("\tpush\tvar\t%s[L%zu][N%zu]", vnm, p->param.nlev, p->param.ngp);
+        if (parse_arg->debug)
+          cdoPrint("\tpush\tvar\t%s[L%zu][N%zu]", vnm, p->param.nlev,
+                   p->param.ngp);
 
         rnode = p;
 
@@ -1637,10 +1842,10 @@ nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
       {
         int funcID = get_funcID(p->u.fun1c.name);
         int functype = fun_sym_tbl[funcID].type;
-        
+
         nodeType *fnode = expr_run(p->u.fun1c.op, parse_arg);
-        
-        if ( functype == FT_1C )
+
+        if (functype == FT_1C)
           {
             double value = p->u.fun1c.value;
             rnode = fun1c(init, funcID, fnode, value, parse_arg);
@@ -1655,11 +1860,11 @@ nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
 
         nodeType *fnode = expr_run(p->u.fun.op, parse_arg);
 
-        if ( functype == FT_COORD )
+        if (functype == FT_COORD)
           {
             rnode = coord_fun(init, funcID, fnode, parse_arg);
           }
-        else if ( functype == FT_0 )
+        else if (functype == FT_0)
           {
             int vartsID = parse_arg->tsID;
             rnode = ex_fun0_con(init, funcID, params[vartsID].data);
@@ -1668,10 +1873,11 @@ nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
           {
             int functype = fun_sym_tbl[funcID].type;
             int funcflag = fun_sym_tbl[funcID].flag;
-            if ( functype == FT_FLD && funcflag == 1 )
+            if (functype == FT_FLD && funcflag == 1)
               {
-                int coordID = params_get_coordID(parse_arg, 'w', fnode->param.gridID);
-                if ( init )
+                int coordID
+                    = params_get_coordID(parse_arg, 'w', fnode->param.gridID);
+                if (init)
                   parse_arg->coords[coordID].needed = true;
                 else
                   fnode->param.weight = parse_arg->coords[coordID].data;
@@ -1680,74 +1886,85 @@ nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
             // if ( fnode->ltmpobj ) node_delete(fnode);
             // Free(fnode);
           }
-        
+
         break;
       }
     case typeOpr:
-      switch( p->u.opr.oper )
-	{
+      switch (p->u.opr.oper)
+        {
         case '=':
           {
             rnode = expr_run(p->u.opr.op[1], parse_arg);
 
             const char *varname2 = p->u.opr.op[0]->u.var.nm;
 
-            if ( parse_arg->debug )
+            if (parse_arg->debug)
               {
-                if ( rnode && rnode->type == typeVar)
-                  cdoPrint("\tpop\tvar\t%s[L%zu][N%zu]", varname2, rnode->param.nlev, rnode->param.ngp);
+                if (rnode && rnode->type == typeVar)
+                  cdoPrint("\tpop\tvar\t%s[L%zu][N%zu]", varname2,
+                           rnode->param.nlev, rnode->param.ngp);
                 else
                   cdoPrint("\tpop\tconst\t%s", varname2);
               }
 
-            if ( init )
+            if (init)
               {
                 varID = param_search_name(parse_arg->nparams, params, varname2);
-                if ( varID >= 0 )
+                if (varID >= 0)
                   {
-                    if ( varID < parse_arg->nvars1 )
+                    if (varID < parse_arg->nvars1)
                       {
                         params[varID].select = true;
                         parse_arg->needed[varID] = true;
                       }
-                    else if ( params[varID].coord )
-                      cdoAbort("Coordinate variable %s is read only!", varname2);
+                    else if (params[varID].coord)
+                      cdoAbort("Coordinate variable %s is read only!",
+                               varname2);
                     /*
                       else
                       cdoWarning("Variable %s already defined!", varname2);
                     */
                   }
-                else if ( p->u.opr.op[1]->type != typeCon )
+                else if (p->u.opr.op[1]->type != typeCon)
                   {
                     varID = parse_arg->nparams;
-                    if ( varID >= parse_arg->maxparams )
-                      cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
+                    if (varID >= parse_arg->maxparams)
+                      cdoAbort("Too many parameter (limit=%d)",
+                               parse_arg->maxparams);
 
                     param_meta_copy(&params[varID], &rnode->param);
                     params[varID].coord = 0;
                     params[varID].lmiss = rnode->param.lmiss;
-                    params[varID].name  = strdup(varname2);
+                    params[varID].name = strdup(varname2);
                     params[varID].nmiss = rnode->param.nmiss;
-                    if ( rnode->param.units ) params[varID].units = strdup(rnode->param.units);
-                    if ( rnode->param.longname ) params[varID].longname = strdup(rnode->param.longname);
+                    if (rnode->param.units)
+                      params[varID].units = strdup(rnode->param.units);
+                    if (rnode->param.longname)
+                      params[varID].longname = strdup(rnode->param.longname);
                     parse_arg->nparams++;
                   }
               }
             else
               {
                 varID = param_search_name(parse_arg->nparams, params, varname2);
-                if ( varID < 0 ) cdoAbort("Variable >%s< not found!", varname2);
-                else if ( params[varID].coord ) cdoAbort("Coordinate variable %s is read only!", varname2);
+                if (varID < 0)
+                  cdoAbort("Variable >%s< not found!", varname2);
+                else if (params[varID].coord)
+                  cdoAbort("Coordinate variable %s is read only!", varname2);
                 param_meta_copy(&p->param, &params[varID]);
-                p->param.name  = params[varID].name;
-                p->param.data  = params[varID].data;
-                p->ltmpobj     = false;
-                
+                p->param.name = params[varID].name;
+                p->param.data = params[varID].data;
+                p->ltmpobj = false;
+
                 ex_copy(init, p, rnode);
                 params[varID].nmiss = p->param.nmiss;
               }
-            
-            if ( rnode && rnode->ltmpobj ) { node_delete(rnode); rnode = NULL; }
+
+            if (rnode && rnode->ltmpobj)
+              {
+                node_delete(rnode);
+                rnode = NULL;
+              }
             // else Free(rnode);
 
             break;
@@ -1766,18 +1983,17 @@ nodeType *expr_run(nodeType *p, parseParamType *parse_arg)
           }
         case '?':
           {
-            rnode = ex_ifelse(init,
-                              expr_run(p->u.opr.op[0], parse_arg),
+            rnode = ex_ifelse(init, expr_run(p->u.opr.op[0], parse_arg),
                               expr_run(p->u.opr.op[1], parse_arg),
                               expr_run(p->u.opr.op[2], parse_arg));
-            
+
             break;
           }
         default:
           {
-            rnode = expr(init, p->u.opr.oper,
-                         expr_run(p->u.opr.op[0], parse_arg),
-                         expr_run(p->u.opr.op[1], parse_arg));
+            rnode
+                = expr(init, p->u.opr.oper, expr_run(p->u.opr.op[0], parse_arg),
+                       expr_run(p->u.opr.op[1], parse_arg));
 
             break;
           }

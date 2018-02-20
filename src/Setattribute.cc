@@ -20,58 +20,61 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-static
-void set_attributes(list_t *kvlist, int vlistID)
+static void
+set_attributes(list_t *kvlist, int vlistID)
 {
-  enum {Undefined=-99};
+  enum
+  {
+    Undefined = -99
+  };
   const int delim = '@';
   int nvars = vlistNvars(vlistID);
   int ngrids = vlistNgrids(vlistID);
   int nzaxis = vlistNzaxis(vlistID);
-  int maxvars = nvars+ngrids*2+nzaxis;
-  int *varIDs = (int*) Malloc(maxvars*sizeof(int));
+  int maxvars = nvars + ngrids * 2 + nzaxis;
+  int *varIDs = (int *) Malloc(maxvars * sizeof(int));
 
   int kvn = list_size(kvlist);
-  char **wname = (char**) Malloc(kvn*sizeof(char*));
-  for ( int i = 0; i < kvn; ++i ) wname[i] = NULL;
+  char **wname = (char **) Malloc(kvn * sizeof(char *));
+  for (int i = 0; i < kvn; ++i)
+    wname[i] = NULL;
 
   char name[CDI_MAX_NAME];
   char buffer[CDI_MAX_NAME];
-  for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
+  for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
     {
       char *varname = NULL, *attname = NULL;
-      keyValues_t *kv = *(keyValues_t **)kvnode->data;
+      keyValues_t *kv = *(keyValues_t **) kvnode->data;
       strcpy(buffer, kv->key);
       char *result = strrchr(buffer, delim);
-      if ( result == NULL )
+      if (result == NULL)
         {
           attname = buffer;
         }
       else
         {
-          attname = result+1;
+          attname = result + 1;
           *result = 0;
           varname = buffer;
         }
 
-      if ( *attname == 0 ) cdoAbort("Attribute name missing in >%s<!", kv->key);
+      if (*attname == 0) cdoAbort("Attribute name missing in >%s<!", kv->key);
 
       int nv = 0;
       int cdiID = Undefined;
-      if ( varname && *varname )
+      if (varname && *varname)
         {
-          for ( int idx = 0; idx < nvars; idx++ )
+          for (int idx = 0; idx < nvars; idx++)
             {
               vlistInqVarName(vlistID, idx, name);
-              if ( wildcardmatch(varname, name) == 0 )
+              if (wildcardmatch(varname, name) == 0)
                 {
                   cdiID = vlistID;
                   varIDs[nv++] = idx;
                 }
             }
 
-          if ( cdiID == Undefined )
+          if (cdiID == Undefined)
             {
               /*
               for ( int idx = 0; idx < ngrids; idx++ )
@@ -91,11 +94,11 @@ void set_attributes(list_t *kvlist, int vlistID)
                     }
                 }
               */
-              for ( int idx = 0; idx < nzaxis; idx++ )
+              for (int idx = 0; idx < nzaxis; idx++)
                 {
                   int zaxisID = vlistZaxis(vlistID, idx);
                   zaxisInqName(zaxisID, name);
-                  if ( wildcardmatch(varname, name) == 0 )
+                  if (wildcardmatch(varname, name) == 0)
                     {
                       cdiID = zaxisID;
                       varIDs[nv++] = CDI_GLOBAL;
@@ -103,23 +106,23 @@ void set_attributes(list_t *kvlist, int vlistID)
                 }
             }
 
-          if ( cdiID == Undefined )
+          if (cdiID == Undefined)
             {
               bool lwarn = true;
-              for ( int i = 0; i < kvn; ++i )
+              for (int i = 0; i < kvn; ++i)
                 {
-                  if ( wname[i] == NULL )
+                  if (wname[i] == NULL)
                     {
                       wname[i] = strdup(varname);
                       break;
                     }
-                  if ( STR_IS_EQ(wname[i], varname) )
+                  if (STR_IS_EQ(wname[i], varname))
                     {
                       lwarn = false;
                       break;
                     }
                 }
-              if ( lwarn )
+              if (lwarn)
                 {
                   cdoWarning("Variable >%s< not found!", varname);
                 }
@@ -131,28 +134,33 @@ void set_attributes(list_t *kvlist, int vlistID)
           varIDs[nv++] = CDI_GLOBAL;
         }
 
-      if ( cdiID != Undefined && nv > 0 )
+      if (cdiID != Undefined && nv > 0)
         {
           const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
           int nvalues = kv->nvalues;
-          if ( nvalues == 1 && !*value ) nvalues = 0;
+          if (nvalues == 1 && !*value) nvalues = 0;
           int dtype = literals_find_datatype(nvalues, kv->values);
 
-          for ( int idx = 0; idx < nv; ++idx )
+          for (int idx = 0; idx < nv; ++idx)
             {
               int varID = varIDs[idx];
-              // if ( cdoVerbose ) printf("varID, cdiID, attname %d %d %s %d\n", varID, cdiID, attname, (int)strlen(attname));
-              if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
+              // if ( cdoVerbose ) printf("varID, cdiID, attname %d %d %s %d\n",
+              // varID, cdiID, attname, (int)strlen(attname));
+              if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16
+                  || dtype == CDI_DATATYPE_INT32)
                 {
-                  int *ivals = (int*) Malloc(nvalues*sizeof(int));
-                  for ( int i = 0; i < nvalues; ++i ) ivals[i] = literal_to_int(kv->values[i]);
+                  int *ivals = (int *) Malloc(nvalues * sizeof(int));
+                  for (int i = 0; i < nvalues; ++i)
+                    ivals[i] = literal_to_int(kv->values[i]);
                   cdiDefAttInt(cdiID, varID, attname, dtype, nvalues, ivals);
                   Free(ivals);
                 }
-              else if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
+              else if (dtype == CDI_DATATYPE_FLT32
+                       || dtype == CDI_DATATYPE_FLT64)
                 {
-                  double *dvals = (double*) Malloc(nvalues*sizeof(double));
-                  for ( int i = 0; i < nvalues; ++i ) dvals[i] = literal_to_double(kv->values[i]);
+                  double *dvals = (double *) Malloc(nvalues * sizeof(double));
+                  for (int i = 0; i < nvalues; ++i)
+                    dvals[i] = literal_to_double(kv->values[i]);
                   cdiDefAttFlt(cdiID, varID, attname, dtype, nvalues, dvals);
                   Free(dvals);
                 }
@@ -162,15 +170,16 @@ void set_attributes(list_t *kvlist, int vlistID)
                   cdiDefAttTxt(cdiID, varID, attname, len, value);
                 }
             }
-         }
+        }
     }
 
   Free(varIDs);
-  for ( int i = 0; i < kvn; ++i ) if ( wname[i] ) free(wname[i]);
+  for (int i = 0; i < kvn; ++i)
+    if (wname[i]) free(wname[i]);
 }
 
-
-void *Setattribute(void *process)
+void *
+Setattribute(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -186,30 +195,32 @@ void *Setattribute(void *process)
   operatorInputArg(cdoOperatorEnter(operatorID));
 
   int natts = operatorArgc();
-  if ( natts == 0 ) cdoAbort("Parameter missing!");
+  if (natts == 0) cdoAbort("Parameter missing!");
 
   list_t *pmlist = NULL;
   list_t *kvlist = kvlist_new("SETATTRIBUTES");
-  if ( kvlist_parse_cmdline(kvlist, natts, operatorArgv()) != 0 ) cdoAbort("Parse error!");
-  if ( cdoVerbose ) kvlist_print(kvlist);
+  if (kvlist_parse_cmdline(kvlist, natts, operatorArgv()) != 0)
+    cdoAbort("Parse error!");
+  if (cdoVerbose) kvlist_print(kvlist);
 
-  if ( natts == 1 )
+  if (natts == 1)
     {
-      keyValues_t *kv = *(keyValues_t **)kvlist->head->data;
-      if ( STR_IS_EQ(kv->key, "FILE") )
+      keyValues_t *kv = *(keyValues_t **) kvlist->head->data;
+      if (STR_IS_EQ(kv->key, "FILE"))
         {
-          if ( cdoVerbose ) cdoPrint("Reading attributes from: %s", kv->values[0]);
+          if (cdoVerbose)
+            cdoPrint("Reading attributes from: %s", kv->values[0]);
           const char *filename = parameter2word(kv->values[0]);
           FILE *fp = fopen(filename, "r");
-          if ( fp == NULL ) cdoAbort("Open failed on: %s\n", filename);
+          if (fp == NULL) cdoAbort("Open failed on: %s\n", filename);
 
           pmlist = namelist_to_pmlist(fp, filename);
-          if ( pmlist == NULL ) cdoAbort("Parse error!");
+          if (pmlist == NULL) cdoAbort("Parse error!");
           list_destroy(kvlist);
-          kvlist = *(list_t **)pmlist->head->data;
-          if ( kvlist == NULL ) cdoAbort("Parse error!");
+          kvlist = *(list_t **) pmlist->head->data;
+          if (kvlist == NULL) cdoAbort("Parse error!");
           fclose(fp);
-          if ( cdoVerbose ) kvlist_print(kvlist);
+          if (cdoVerbose) kvlist_print(kvlist);
         }
     }
 
@@ -220,8 +231,10 @@ void *Setattribute(void *process)
 
   set_attributes(kvlist, vlistID2);
 
-  if ( pmlist ) list_destroy(pmlist);
-  else          list_destroy(kvlist);
+  if (pmlist)
+    list_destroy(pmlist);
+  else
+    list_destroy(kvlist);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -231,25 +244,25 @@ void *Setattribute(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   double *array = NULL;
-  if ( ! lcopy )
+  if (!lcopy)
     {
       size_t gridsize = (size_t) vlistGridsizeMax(vlistID1);
-      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) Malloc(gridsize*sizeof(double));
+      if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
+      array = (double *) Malloc(gridsize * sizeof(double));
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-          if ( lcopy )
+
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          if (lcopy)
             {
               pstreamCopyRecord(streamID2, streamID1);
             }
@@ -267,7 +280,7 @@ void *Setattribute(void *process)
   pstreamClose(streamID1);
   pstreamClose(streamID2);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 

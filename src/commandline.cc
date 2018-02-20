@@ -21,55 +21,59 @@
 #include <stdlib.h>
 #include "dmemory.h"
 
-static int    gargc = 0;
+static int gargc = 0;
 static char **gargv;
 
 static char *CDO_CommandLine = NULL;
 
-
-void freeCommandLine(void)
+void
+freeCommandLine(void)
 {
-  if ( CDO_CommandLine ) Free(CDO_CommandLine);
+  if (CDO_CommandLine) Free(CDO_CommandLine);
 }
 
-
-void initCommandLine(void)
+void
+initCommandLine(void)
 {
   size_t maxlen = 1;
-  for ( int iarg = 0; iarg < gargc; iarg++ ) maxlen += strlen(gargv[iarg]) + 1;
+  for (int iarg = 0; iarg < gargc; iarg++)
+    maxlen += strlen(gargv[iarg]) + 1;
 
-  CDO_CommandLine = (char*) Malloc(maxlen);
+  CDO_CommandLine = (char *) Malloc(maxlen);
   atexit(freeCommandLine);
-  
+
   char *pargv;
   size_t offset = 0;
-  for ( int iarg = 0; iarg < gargc; iarg++ )
+  for (int iarg = 0; iarg < gargc; iarg++)
     {
-      if ( iarg == 0 )
+      if (iarg == 0)
         {
           pargv = strrchr(gargv[0], '/');
-          if ( pargv == 0 ) pargv = gargv[0];
-          else              pargv++;
+          if (pargv == 0)
+            pargv = gargv[0];
+          else
+            pargv++;
         }
       else
         pargv = gargv[iarg];
-      
+
       size_t len = strlen(pargv);
-      if ( offset+len+1 > maxlen ) break;
-      memcpy(CDO_CommandLine+offset, pargv, len);
+      if (offset + len + 1 > maxlen) break;
+      memcpy(CDO_CommandLine + offset, pargv, len);
       offset += len;
       CDO_CommandLine[offset] = ' ';
       offset++;
     }
 
-  CDO_CommandLine[offset-1] = '\0';
+  CDO_CommandLine[offset - 1] = '\0';
 }
 
-char *commandLine(void)
+char *
+commandLine(void)
 {
   static bool init = false;
 
-  if ( !init )
+  if (!init)
     {
       initCommandLine();
       init = true;
@@ -78,7 +82,8 @@ char *commandLine(void)
   return CDO_CommandLine;
 }
 
-void setCommandLine(int argc, char **argv)
+void
+setCommandLine(int argc, char **argv)
 {
   gargc = argc;
   gargv = argv;

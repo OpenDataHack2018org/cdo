@@ -34,7 +34,8 @@ userFileOverwrite(const char *restrict filename)
 
   if (!Options::silentMode && stdin_is_tty && stderr_is_tty)
     {
-      fprintf(stderr, "File %s already exists, overwrite? (yes/no): ", filename);
+      fprintf(stderr,
+              "File %s already exists, overwrite? (yes/no): ", filename);
       char line[1024];
       readline(stdin, line, 1024);
       char *pline = line;

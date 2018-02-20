@@ -25,9 +25,10 @@
       Yhourstat   yhourmean        Multi-year hourly mean
       Yhourstat   yhouravg         Multi-year hourly average
       Yhourstat   yhourvar         Multi-year hourly variance
-      Yhourstat   yhourvar1        Multi-year hourly variance [Normalize by (n-1)]
-      Yhourstat   yhourstd         Multi-year hourly standard deviation
-      Yhourstat   yhourstd1        Multi-year hourly standard deviation [Normalize by (n-1)]
+      Yhourstat   yhourvar1        Multi-year hourly variance [Normalize by
+   (n-1)] Yhourstat   yhourstd         Multi-year hourly standard deviation
+      Yhourstat   yhourstd1        Multi-year hourly standard deviation
+   [Normalize by (n-1)]
 */
 
 #include <cdi.h>
@@ -35,37 +36,37 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
+#define MAX_HOUR 9301 /* 31*12*25 + 1 */
 
-#define  MAX_HOUR  9301  /* 31*12*25 + 1 */
-
-
-static
-int hour_of_year(int vdate, int vtime)
+static int
+hour_of_year(int vdate, int vtime)
 {
   int year, month, day, houroy;
   int hour, minute, second;
 
   cdiDecodeDate(vdate, &year, &month, &day);
   cdiDecodeTime(vtime, &hour, &minute, &second);
-      
-  if ( month >= 1 && month <= 12 && day >= 1 && day <=31 && hour >= 0 && hour < 24 )
-    houroy = ((month-1)*31 + day - 1)*25 + hour + 1;
+
+  if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && hour >= 0
+      && hour < 24)
+    houroy = ((month - 1) * 31 + day - 1) * 25 + hour + 1;
   else
     houroy = 0;
 
-  if ( houroy < 0 || houroy >= MAX_HOUR )
+  if (houroy < 0 || houroy >= MAX_HOUR)
     {
       char vdatestr[32], vtimestr[32];
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
-      cdoAbort("Hour of year %d out of range (%s %s)!", houroy, vdatestr, vtimestr);
+      cdoAbort("Hour of year %d out of range (%s %s)!", houroy, vdatestr,
+               vtimestr);
     }
 
   return houroy;
 }
 
-
-void *Yhourstat(void *process)
+void *
+Yhourstat(void *process)
 {
   int varID;
   int nrecs;
@@ -99,7 +100,7 @@ void *Yhourstat(void *process)
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
   // clang-format on
 
-  for ( int houroy = 0; houroy < MAX_HOUR; ++houroy )
+  for (int houroy = 0; houroy < MAX_HOUR; ++houroy)
     {
       vars1[houroy] = NULL;
       vars2[houroy] = NULL;
@@ -114,7 +115,7 @@ void *Yhourstat(void *process)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
-  if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
+  if (taxisHasBounds(taxisID2)) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -127,191 +128,203 @@ void *Yhourstat(void *process)
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
+  field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
   int tsID = 0;
   int otsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
-      if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
+      if (cdoVerbose)
+        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       int houroy = hour_of_year(vdate, vtime);
 
       vdates[houroy] = vdate;
       vtimes[houroy] = vtime;
 
-      if ( vars1[houroy] == NULL )
-	{
-	  vars1[houroy] = field_malloc(vlistID1, FIELD_PTR);
-	  samp1[houroy] = field_malloc(vlistID1, FIELD_NONE);
-	  if ( lvarstd || lrange )
-	    vars2[houroy] = field_malloc(vlistID1, FIELD_PTR);
-	}
+      if (vars1[houroy] == NULL)
+        {
+          vars1[houroy] = field_malloc(vlistID1, FIELD_PTR);
+          samp1[houroy] = field_malloc(vlistID1, FIELD_NONE);
+          if (lvarstd || lrange)
+            vars2[houroy] = field_malloc(vlistID1, FIELD_PTR);
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( tsID == 0 )
-	    {
-              recinfo[recID].varID   = varID;
+          if (tsID == 0)
+            {
+              recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
-	    }
+              recinfo[recID].lconst
+                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+            }
 
           field_type *psamp1 = &samp1[houroy][varID][levelID];
           field_type *pvars1 = &vars1[houroy][varID][levelID];
-          field_type *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
+          field_type *pvars2
+              = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
           int nsets = houroy_nsets[houroy];
 
-	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  if ( nsets == 0 )
-	    {
-	      pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-	      pvars1->nmiss = nmiss;
-              if ( lrange )
+          if (nsets == 0)
+            {
+              pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
+              pvars1->nmiss = nmiss;
+              if (lrange)
                 {
                   pvars2->nmiss = pvars1->nmiss;
-                  for ( size_t i = 0; i < gridsize; i++ )
+                  for (size_t i = 0; i < gridsize; i++)
                     pvars2->ptr[i] = pvars1->ptr[i];
                 }
 
-	      if ( nmiss > 0 || psamp1->ptr )
-		{
-		  if ( psamp1->ptr == NULL )
-		    psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
+              if (nmiss > 0 || psamp1->ptr)
+                {
+                  if (psamp1->ptr == NULL)
+                    psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
-		  for ( size_t i = 0; i < gridsize; i++ )
-                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
-		}
-	    }
-	  else
-	    {
-	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = nmiss;
-	      field.grid    = pvars1->grid;
-	      field.missval = pvars1->missval;
+                  for (size_t i = 0; i < gridsize; i++)
+                    psamp1->ptr[i]
+                        = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                }
+            }
+          else
+            {
+              pstreamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss = nmiss;
+              field.grid = pvars1->grid;
+              field.missval = pvars1->missval;
 
-	      if ( field.nmiss > 0 || psamp1->ptr )
-		{
-		  if ( psamp1->ptr == NULL )
-		    {
-		      psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( size_t i = 0; i < gridsize; i++ )
-			psamp1->ptr[i] = nsets;
-		    }
-		  
-		  for ( size_t i = 0; i < gridsize; i++ )
-		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-		      psamp1->ptr[i]++;
-		}
+              if (field.nmiss > 0 || psamp1->ptr)
+                {
+                  if (psamp1->ptr == NULL)
+                    {
+                      psamp1->ptr
+                          = (double *) Malloc(gridsize * sizeof(double));
+                      for (size_t i = 0; i < gridsize; i++)
+                        psamp1->ptr[i] = nsets;
+                    }
 
-	      if ( lvarstd )
-		{
-		  farsumq(pvars2, field);
-		  farsum(pvars1, field);
-		}
-              else if ( lrange )
+                  for (size_t i = 0; i < gridsize; i++)
+                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
+                      psamp1->ptr[i]++;
+                }
+
+              if (lvarstd)
+                {
+                  farsumq(pvars2, field);
+                  farsum(pvars1, field);
+                }
+              else if (lrange)
                 {
                   farmin(pvars2, field);
                   farmax(pvars1, field);
                 }
-	      else
-		{
-		  farfun(pvars1, field, operfunc);
-		}
-	    }
-	}
+              else
+                {
+                  farfun(pvars1, field, operfunc);
+                }
+            }
+        }
 
-      if ( houroy_nsets[houroy] == 0 && lvarstd )
-        for ( int recID = 0; recID < maxrecs; recID++ )
+      if (houroy_nsets[houroy] == 0 && lvarstd)
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-	    if ( recinfo[recID].lconst ) continue;
+            if (recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[houroy][varID][levelID];
             field_type *pvars2 = &vars2[houroy][varID][levelID];
 
             farmoq(pvars2, *pvars1);
-	  }
+          }
 
       houroy_nsets[houroy]++;
       tsID++;
     }
 
-  for ( int houroy = 0; houroy < MAX_HOUR; ++houroy )
-    if ( houroy_nsets[houroy] )
+  for (int houroy = 0; houroy < MAX_HOUR; ++houroy)
+    if (houroy_nsets[houroy])
       {
         int nsets = houroy_nsets[houroy];
-        for ( int recID = 0; recID < maxrecs; recID++ )
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-	    if ( recinfo[recID].lconst ) continue;
+            if (recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[houroy][varID][levelID];
             field_type *pvars1 = &vars1[houroy][varID][levelID];
-            field_type *pvars2 = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
+            field_type *pvars2
+                = vars2[houroy] ? &vars2[houroy][varID][levelID] : NULL;
 
-            if ( lmean )
+            if (lmean)
               {
-                if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
-                else               farcdiv(pvars1, (double)nsets);
+                if (psamp1->ptr)
+                  fardiv(pvars1, *psamp1);
+                else
+                  farcdiv(pvars1, (double) nsets);
               }
-            else if ( lvarstd )
+            else if (lvarstd)
               {
-                if ( psamp1->ptr )
+                if (psamp1->ptr)
                   {
-                    if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
-                    else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                    if (lstd)
+                      farstd(pvars1, *pvars2, *psamp1, divisor);
+                    else
+                      farvar(pvars1, *pvars2, *psamp1, divisor);
                   }
                 else
                   {
-                    if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
-                    else        farcvar(pvars1, *pvars2, nsets, divisor);
+                    if (lstd)
+                      farcstd(pvars1, *pvars2, nsets, divisor);
+                    else
+                      farcvar(pvars1, *pvars2, nsets, divisor);
                   }
               }
-            else if ( lrange )
+            else if (lrange)
               {
                 farsub(pvars1, *pvars2);
               }
           }
 
-	taxisDefVdate(taxisID2, vdates[houroy]);
-	taxisDefVtime(taxisID2, vtimes[houroy]);
-	pstreamDefTimestep(streamID2, otsID);
+        taxisDefVdate(taxisID2, vdates[houroy]);
+        taxisDefVtime(taxisID2, vtimes[houroy]);
+        pstreamDefTimestep(streamID2, otsID);
 
-	for ( int recID = 0; recID < maxrecs; recID++ )
-	  {
-	    if ( otsID && recinfo[recID].lconst ) continue;
+        for (int recID = 0; recID < maxrecs; recID++)
+          {
+            if (otsID && recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[houroy][varID][levelID];
 
-	    pstreamDefRecord(streamID2, varID, levelID);
-	    pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
-	  }
+            pstreamDefRecord(streamID2, varID, levelID);
+            pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
+          }
 
-	otsID++;
+        otsID++;
       }
 
-  for ( int houroy = 0; houroy < MAX_HOUR; ++houroy )
+  for (int houroy = 0; houroy < MAX_HOUR; ++houroy)
     {
-      if ( vars1[houroy] != NULL )
-	{
-	  field_free(samp1[houroy], vlistID1);
-	  field_free(vars1[houroy], vlistID1);
-	  if ( lvarstd ) field_free(vars2[houroy], vlistID1);
-	}
+      if (vars1[houroy] != NULL)
+        {
+          field_free(samp1[houroy], vlistID1);
+          field_free(vars1[houroy], vlistID1);
+          if (lvarstd) field_free(vars2[houroy], vlistID1);
+        }
     }
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

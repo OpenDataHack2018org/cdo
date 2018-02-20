@@ -20,9 +20,10 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-#define  MAX_LINE_LEN  4096
+#define MAX_LINE_LEN 4096
 
-void *Setrcaname(void *process)
+void *
+Setrcaname(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -50,52 +51,56 @@ void *Setrcaname(void *process)
   int nvars = vlistNvars(vlistID2);
 
   FILE *fp = fopen(rcsnames[0], "r");
-  if ( fp != NULL )
+  if (fp != NULL)
     {
-      while ( readline(fp, line, MAX_LINE_LEN) )
-	{
-	  sscanf(line, "%d\t%d\t%d\t%s\t%s\t%s", &scode, &sltype, &slevel, sname, sdescription, sunits);
-	  /*
-	  printf("%s\n", line);
-	  printf("%d:%d:%d:%s:%s:%s\n", scode, sltype, slevel, sname, sdescription, sunits);
-	  */
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      code = vlistInqVarCode(vlistID2, varID);
-	      zaxisID = vlistInqVarZaxis(vlistID2, varID);
-	      nlev = zaxisInqSize(zaxisID);
+      while (readline(fp, line, MAX_LINE_LEN))
+        {
+          sscanf(line, "%d\t%d\t%d\t%s\t%s\t%s", &scode, &sltype, &slevel,
+                 sname, sdescription, sunits);
+          /*
+          printf("%s\n", line);
+          printf("%d:%d:%d:%s:%s:%s\n", scode, sltype, slevel, sname,
+          sdescription, sunits);
+          */
+          for (varID = 0; varID < nvars; varID++)
+            {
+              code = vlistInqVarCode(vlistID2, varID);
+              zaxisID = vlistInqVarZaxis(vlistID2, varID);
+              nlev = zaxisInqSize(zaxisID);
 
-	      ltype = zaxis2ltype(zaxisID);
+              ltype = zaxis2ltype(zaxisID);
 
-	      if ( code == scode )
-		{
-		  if ( ltype == 105 )
-		    {
-		      if ( nlev != 1 )
-			{
-			  cdoWarning("Number of levels should be 1 for level type 105!");
-			  cdoWarning("Maybe environment variable SPLIT_LTYPE_105 is not set.");
-			  continue;
-			}
-		      level = (int) cdoZaxisInqLevel(zaxisID, 0);
-		      if ( sltype == 105 && slevel == level )
-			{
-			  vlistDefVarName(vlistID2, varID, sname);
-			  vlistDefVarLongname(vlistID2, varID, sdescription);
-			  vlistDefVarUnits(vlistID2, varID, sunits);
-			  break;
-			}
-		    }
-		  else if ( sltype != 105 )
-		    {
-		      vlistDefVarName(vlistID2, varID, sname);
-		      vlistDefVarLongname(vlistID2, varID, sdescription);
-		      vlistDefVarUnits(vlistID2, varID, sunits);
-		      break;
-		    }
-		}
-	    }
-	}
+              if (code == scode)
+                {
+                  if (ltype == 105)
+                    {
+                      if (nlev != 1)
+                        {
+                          cdoWarning("Number of levels should be 1 for level "
+                                     "type 105!");
+                          cdoWarning("Maybe environment variable "
+                                     "SPLIT_LTYPE_105 is not set.");
+                          continue;
+                        }
+                      level = (int) cdoZaxisInqLevel(zaxisID, 0);
+                      if (sltype == 105 && slevel == level)
+                        {
+                          vlistDefVarName(vlistID2, varID, sname);
+                          vlistDefVarLongname(vlistID2, varID, sdescription);
+                          vlistDefVarUnits(vlistID2, varID, sunits);
+                          break;
+                        }
+                    }
+                  else if (sltype != 105)
+                    {
+                      vlistDefVarName(vlistID2, varID, sname);
+                      vlistDefVarLongname(vlistID2, varID, sdescription);
+                      vlistDefVarUnits(vlistID2, varID, sunits);
+                      break;
+                    }
+                }
+            }
+        }
 
       fclose(fp);
     }
@@ -112,33 +117,33 @@ void *Setrcaname(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
 
-  if ( ! lcopy )
+  if (!lcopy)
     {
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double*) Malloc(gridsize*sizeof(double));
+      array = (double *) Malloc(gridsize * sizeof(double));
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
 
-	  if ( lcopy )
-	    {
-	      pstreamCopyRecord(streamID2, streamID1);
-	    }
-	  else
-	    {
-	      pstreamReadRecord(streamID1, array, &nmiss);
-	      pstreamWriteRecord(streamID2, array, nmiss);
-	    }
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          if (lcopy)
+            {
+              pstreamCopyRecord(streamID2, streamID1);
+            }
+          else
+            {
+              pstreamReadRecord(streamID1, array, &nmiss);
+              pstreamWriteRecord(streamID2, array, nmiss);
+            }
+        }
 
       tsID++;
     }
@@ -148,8 +153,8 @@ void *Setrcaname(void *process)
 
   vlistDestroy(vlistID2);
 
-  if ( ! lcopy )
-    if ( array ) Free(array);
+  if (!lcopy)
+    if (array) Free(array);
 
   cdoFinish();
 

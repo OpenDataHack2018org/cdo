@@ -33,7 +33,6 @@
 #include <glob.h>
 #endif
 
-
 #include "cdo_int.h"
 #include "error.h"
 #include "modules.h"
@@ -48,10 +47,11 @@
 #include <iostream>
 #include <string>
 
-
 static int pthreadScope = 0;
 
-ProcessType::ProcessType(int p_ID, const char* p_operatorName, const char *operatorCommand) : m_ID(p_ID) , operatorName(p_operatorName)
+ProcessType::ProcessType(int p_ID, const char *p_operatorName,
+                         const char *operatorCommand)
+    : m_ID(p_ID), operatorName(p_operatorName)
 {
   initProcess();
   setOperatorArgv(operatorCommand);
@@ -140,8 +140,7 @@ const char *
 ProcessType::inqPrompt()
 {
   const char *newPrompt = "cdo";
-  if (prompt[0])
-    newPrompt = prompt;
+  if (prompt[0]) newPrompt = prompt;
 
   return newPrompt;
 }
@@ -170,37 +169,34 @@ ProcessType::checkStreamCnt(void)
   if (wantedStreamInCnt == -1 && wantedStreamOutCnt == -1)
     cdoAbort("I/O stream counts unlimited no allowed!");
 
-  // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n", wantedStreamInCnt,wantedStreamOutCnt);
+  // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n",
+  // wantedStreamInCnt,wantedStreamOutCnt);
   if (wantedStreamInCnt == -1)
     {
       wantedStreamInCnt = m_streamCnt - wantedStreamOutCnt;
-      if (wantedStreamInCnt < 1)
-        cdoAbort("Input streams missing!");
+      if (wantedStreamInCnt < 1) cdoAbort("Input streams missing!");
     }
 
   if (wantedStreamOutCnt == -1)
     {
       wantedStreamOutCnt = m_streamCnt - wantedStreamInCnt;
-      if (wantedStreamOutCnt < 1)
-        cdoAbort("Output streams missing!");
+      if (wantedStreamOutCnt < 1) cdoAbort("Output streams missing!");
     }
-   //printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n", wantedStreamInCnt,wantedStreamOutCnt);
+  // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n",
+  // wantedStreamInCnt,wantedStreamOutCnt);
 
   streamCnt = wantedStreamInCnt + wantedStreamOutCnt;
-   //printf(" streamCnt %d %d\n", m_streamCnt, streamCnt);
+  // printf(" streamCnt %d %d\n", m_streamCnt, streamCnt);
 
   if (m_streamCnt > streamCnt)
     cdoAbort("Too many streams!"
              " Operator needs %d input and %d output streams.",
-             wantedStreamInCnt,
-             wantedStreamOutCnt);
+             wantedStreamInCnt, wantedStreamOutCnt);
 
   if (m_streamCnt < streamCnt && !obase)
     cdoAbort("Too few streams specified!"
              " Operator %s needs %d input and %d output streams.",
-             m_operatorCommand,
-             wantedStreamInCnt,
-             wantedStreamOutCnt);
+             m_operatorCommand, wantedStreamInCnt, wantedStreamOutCnt);
 
   /*TEMP*/ /*NEEDS REWORK streamArguments does not exist anymore*/
   /*
@@ -222,8 +218,7 @@ ProcessType::checkStreamCnt(void)
      }
      */
 
-  if (wantedStreamInCnt == 1 && streamInCnt0 == -1)
-    return 1;
+  if (wantedStreamInCnt == 1 && streamInCnt0 == -1) return 1;
 
   return 0;
 }
@@ -237,7 +232,6 @@ ProcessType::hasAllInputs()
     }
   return m_module.streamInCnt == (inputStreams.size());
 }
-
 
 void
 ProcessType::setInactive()
@@ -288,7 +282,8 @@ ProcessType::inqUserInputForOpArg(const char *enter)
                       break;
                     }
                   len = 0;
-                  while (pline[len] != ' ' && pline[len] != ',' && pline[len] != '\\' && len < linelen)
+                  while (pline[len] != ' ' && pline[len] != ','
+                         && pline[len] != '\\' && len < linelen)
                     len++;
 
                   m_oargv.push_back((char *) Malloc(len + 1));
@@ -365,10 +360,11 @@ ProcessType::addFileInStream(std::string file)
 void
 ProcessType::addFileOutStream(std::string file)
 {
-  if(file[0] == '-')
-  {
-      ERROR("Missing output file. Found an operator instead of filename: ", file);
-  }
+  if (file[0] == '-')
+    {
+      ERROR("Missing output file. Found an operator instead of filename: ",
+            file);
+    }
   outputStreams.push_back(create_pstream(file));
   m_streamCnt++;
 }
@@ -411,24 +407,27 @@ ProcessType::run()
   Cdo_Debug(CdoDebug::PROCESS, "starting new thread for process ", m_ID);
   pthread_attr_t attr;
   int status = pthread_attr_init(&attr);
-  if (status)
-    SysError("pthread_attr_init failed for '%s'", operatorName);
+  if (status) SysError("pthread_attr_init failed for '%s'", operatorName);
   status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
   if (status)
     SysError("pthread_attr_setdetachstate failed for '%s'", operatorName);
   /*
     param.sched_priority = 0;
     status = pthread_attr_setschedparam(&attr, &param);
-    if ( status ) SysError("pthread_attr_setschedparam failed for '%s'", newarg+1);
+    if ( status ) SysError("pthread_attr_setschedparam failed for '%s'",
+    newarg+1);
   */
   /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
-  /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'", newarg+1); */
+  /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'",
+   * newarg+1); */
 
   pthread_attr_getscope(&attr, &pthreadScope);
 
   /* status = pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS); */
-  /* if ( status ) SysError("pthread_attr_setscope failed for '%s'", newarg+1); */
-  /* If system scheduling scope is specified, then the thread is scheduled against all threads in the system */
+  /* if ( status ) SysError("pthread_attr_setscope failed for '%s'", newarg+1);
+   */
+  /* If system scheduling scope is specified, then the thread is scheduled
+   * against all threads in the system */
   /* pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
 
   size_t stacksize = 0;
@@ -450,7 +449,6 @@ ProcessType::run()
   return thrID;
 }
 
-
 void
 ProcessType::query_user_exit(const char *argument)
 {
@@ -466,22 +464,27 @@ ProcessType::query_user_exit(const char *argument)
   usr_rpl[0] = 'z';
   usr_rpl[1] = '\0';
 
-  while (!(usr_rpl_lng == 1 && (*usr_rpl == 'o' || *usr_rpl == 'O' || *usr_rpl == 'e' || *usr_rpl == 'E')))
+  while (!(usr_rpl_lng == 1
+           && (*usr_rpl == 'o' || *usr_rpl == 'O' || *usr_rpl == 'e'
+               || *usr_rpl == 'E')))
     {
       if (nbr_itr++ > USR_RPL_MAX_NBR)
         {
-          (void) fprintf(
-              stdout, "\n%s: ERROR %d failed attempts to obtain valid interactive input.\n", prompt, nbr_itr - 1);
+          (void) fprintf(stdout,
+                         "\n%s: ERROR %d failed attempts to obtain valid "
+                         "interactive input.\n",
+                         prompt, nbr_itr - 1);
           exit(EXIT_FAILURE);
         }
 
       if (nbr_itr > 1)
         (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
-      (void) fprintf(
-          stdout, "%s: %s exists ---`e'xit, or `o'verwrite (delete existing file) (e/o)? ", prompt, argument);
+      (void) fprintf(stdout,
+                     "%s: %s exists ---`e'xit, or `o'verwrite (delete existing "
+                     "file) (e/o)? ",
+                     prompt, argument);
       (void) fflush(stdout);
-      if (fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL)
-        continue;
+      if (fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL) continue;
 
       /* Ensure last character in input string is \n and replace that with \0 */
       usr_rpl_lng = strlen(usr_rpl);
@@ -493,7 +496,8 @@ ProcessType::query_user_exit(const char *argument)
           }
     }
 
-  /* Ensure one case statement for each exit condition in preceding while loop */
+  /* Ensure one case statement for each exit condition in preceding while loop
+   */
   usr_rpl_int = (int) usr_rpl[0];
   switch (usr_rpl_int)
     {
@@ -505,8 +509,8 @@ ProcessType::query_user_exit(const char *argument)
     } /* end switch */
 }
 
-
-/** function for operators with obase usage, will be called while operator execution */
+/** function for operators with obase usage, will be called while operator
+ * execution */
 
 cdoTimes
 ProcessType::getTimes(int p_processNums)
@@ -536,32 +540,28 @@ ProcessType::getTimes(int p_processNums)
   return times;
 }
 
-
-
 void
 ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
 {
 #if defined(HAVE_SYS_TIMES_H)
   if (cdoBenchmark)
-    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime, p_times.c_systime, p_times.c_cputime, p_memstring);
+    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime,
+            p_times.c_systime, p_times.c_cputime, p_memstring);
   else
     {
       if (!Options::silentMode)
         fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
     }
   if (cdoBenchmark && m_ID == 0)
-  {
-    p_times.p_usertime = a_utime;
-    p_times.p_systime = a_stime;
+    {
+      p_times.p_usertime = a_utime;
+      p_times.p_systime = a_stime;
 
-    p_times.p_cputime = p_times.p_usertime + p_times.p_systime;
-    fprintf(stderr,
-            "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n",
-            p_times.p_usertime,
-            p_times.p_systime,
-            p_times.p_cputime,
-            p_memstring);
-  }
+      p_times.p_cputime = p_times.p_usertime + p_times.p_systime;
+      fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n",
+              p_times.p_usertime, p_times.p_systime, p_times.p_cputime,
+              p_memstring);
+    }
 #else
   fprintf(stderr, "\n");
 #endif
@@ -580,23 +580,14 @@ ProcessType::printProcessedValues()
     {
       if (sizeof(int64_t) > sizeof(size_t))
 #if defined(_WIN32)
-        fprintf(stderr,
-                "Processed %I64d value%s from %d variable%s",
+        fprintf(stderr, "Processed %I64d value%s from %d variable%s",
 #else
-        fprintf(stderr,
-                "Processed %jd value%s from %d variable%s",
+        fprintf(stderr, "Processed %jd value%s from %d variable%s",
 #endif
-                (intmax_t) nvals,
-                ADD_PLURAL(nvals),
-                nvars,
-                ADD_PLURAL(nvars));
+                (intmax_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
       else
-        fprintf(stderr,
-                "Processed %zu value%s from %d variable%s",
-                (size_t) nvals,
-                ADD_PLURAL(nvals),
-                nvars,
-                ADD_PLURAL(nvars));
+        fprintf(stderr, "Processed %zu value%s from %d variable%s",
+                (size_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
     }
   else if (nvars > 0)
     {

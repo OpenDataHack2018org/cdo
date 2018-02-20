@@ -30,7 +30,8 @@
 #include "printinfo.h"
 #include "text.h"
 
-const char *tunit2str(int tunits)
+const char *
+tunit2str(int tunits)
 {
   // clang-format off
   if      ( tunits == TUNIT_YEAR )       return ("years");
@@ -48,8 +49,8 @@ const char *tunit2str(int tunits)
   // clang-format on
 }
 
-
-const char *calendar2str(int calendar)
+const char *
+calendar2str(int calendar)
 {
   // clang-format off
   if      ( calendar == CALENDAR_STANDARD )  return ("standard");
@@ -62,27 +63,34 @@ const char *calendar2str(int calendar)
   // clang-format on
 }
 
-static
-void limitStringLength(char* string, size_t maxlen)
+static void
+limitStringLength(char *string, size_t maxlen)
 {
-  string[maxlen-1] = 0;
+  string[maxlen - 1] = 0;
   size_t len = strlen(string);
 
-  if ( len > 10 )
+  if (len > 10)
     {
-      for ( size_t i = 3; i < len; ++i )
-	if ( string[i] == ' ' || string[i] == ',' || (i>10 && string[i] == '.') )
-	  {
-	    string[i] = 0;
-	    break;
-	  }
+      for (size_t i = 3; i < len; ++i)
+        if (string[i] == ' ' || string[i] == ','
+            || (i > 10 && string[i] == '.'))
+          {
+            string[i] = 0;
+            break;
+          }
     }
 }
 
-
-void *Sinfo(void *process)
+void *
+Sinfo(void *process)
 {
-  enum {func_generic, func_param, func_name, func_code};
+  enum
+  {
+    func_generic,
+    func_param,
+    func_name,
+    func_code
+  };
   char tmpname[CDI_MAX_NAME];
   char varname[CDI_MAX_NAME];
   char paramstr[32];
@@ -104,10 +112,10 @@ void *Sinfo(void *process)
 
   int operatorID = cdoOperatorID();
 
-  int operfunc  = cdoOperatorF1(operatorID);
+  int operfunc = cdoOperatorF1(operatorID);
   int lensemble = cdoOperatorF2(operatorID);
 
-  for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
+  for (int indf = 0; indf < cdoStreamCnt(); indf++)
     {
       int streamID = cdoStreamOpenRead(cdoStreamName(indf));
       int vlistID = cdoStreamInqVlist(streamID);
@@ -122,57 +130,71 @@ void *Sinfo(void *process)
       int nsubtypes = vlistNsubtypes(vlistID);
 
       set_text_color(stdout, BRIGHT, BLACK);
-      if ( lensemble )
-	fprintf(stdout, "%6d : Institut Source   T Steptype Einfo Levels Num    Points Num Dtype : ",  -(indf+1));
-      else if ( nsubtypes > 1 )
-	fprintf(stdout, "%6d : Institut Source   T Steptype Subtypes Levels Num    Points Num Dtype : ",  -(indf+1));
+      if (lensemble)
+        fprintf(stdout,
+                "%6d : Institut Source   T Steptype Einfo Levels Num    Points "
+                "Num Dtype : ",
+                -(indf + 1));
+      else if (nsubtypes > 1)
+        fprintf(stdout,
+                "%6d : Institut Source   T Steptype Subtypes Levels Num    "
+                "Points Num Dtype : ",
+                -(indf + 1));
       else
-	fprintf(stdout, "%6d : Institut Source   T Steptype Levels Num    Points Num Dtype : ",  -(indf+1));
+        fprintf(stdout,
+                "%6d : Institut Source   T Steptype Levels Num    Points Num "
+                "Dtype : ",
+                -(indf + 1));
 
-      if      ( operfunc == func_name ) fprintf(stdout, "Parameter name");
-      else if ( operfunc == func_code ) fprintf(stdout, "Table Code");
-      else                              fprintf(stdout, "Parameter ID");
+      if (operfunc == func_name)
+        fprintf(stdout, "Parameter name");
+      else if (operfunc == func_code)
+        fprintf(stdout, "Table Code");
+      else
+        fprintf(stdout, "Parameter ID");
 
-      if ( cdoVerbose ) fprintf(stdout, " : Extra" );              
+      if (cdoVerbose) fprintf(stdout, " : Extra");
       reset_text_color(stdout);
-      fprintf(stdout, "\n" );              
+      fprintf(stdout, "\n");
 
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  int param   = vlistInqVarParam(vlistID, varID);
-	  int code    = vlistInqVarCode(vlistID, varID);
-	  int tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
-	  int gridID  = vlistInqVarGrid(vlistID, varID);
-	  int zaxisID = vlistInqVarZaxis(vlistID, varID);
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          int param = vlistInqVarParam(vlistID, varID);
+          int code = vlistInqVarCode(vlistID, varID);
+          int tabnum = tableInqNum(vlistInqVarTable(vlistID, varID));
+          int gridID = vlistInqVarGrid(vlistID, varID);
+          int zaxisID = vlistInqVarZaxis(vlistID, varID);
 
-	  set_text_color(stdout, BRIGHT, BLACK);
-	  fprintf(stdout, "%6d", varID+1);
-	  reset_text_color(stdout);
-	  set_text_color(stdout, RESET, BLACK);
-	  fprintf(stdout, " : ");
-	  reset_text_color(stdout);
-	      
-	  set_text_color(stdout, RESET, BLUE);
-	  // institute info
-	  const char *instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
-	  strcpy(tmpname, "unknown");
-	  if ( instptr ) strncpy(tmpname, instptr, CDI_MAX_NAME);
-	  limitStringLength(tmpname, 32);
-	  fprintf(stdout, "%-8s ", tmpname);
+          set_text_color(stdout, BRIGHT, BLACK);
+          fprintf(stdout, "%6d", varID + 1);
+          reset_text_color(stdout);
+          set_text_color(stdout, RESET, BLACK);
+          fprintf(stdout, " : ");
+          reset_text_color(stdout);
 
-	  // source info
-	  const char *modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
-	  strcpy(tmpname, "unknown");
-	  if ( modelptr ) strncpy(tmpname, modelptr, CDI_MAX_NAME);
-	  limitStringLength(tmpname, 32);
-	  fprintf(stdout, "%-8s ", tmpname);
+          set_text_color(stdout, RESET, BLUE);
+          // institute info
+          const char *instptr
+              = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
+          strcpy(tmpname, "unknown");
+          if (instptr) strncpy(tmpname, instptr, CDI_MAX_NAME);
+          limitStringLength(tmpname, 32);
+          fprintf(stdout, "%-8s ", tmpname);
+
+          // source info
+          const char *modelptr
+              = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
+          strcpy(tmpname, "unknown");
+          if (modelptr) strncpy(tmpname, modelptr, CDI_MAX_NAME);
+          limitStringLength(tmpname, 32);
+          fprintf(stdout, "%-8s ", tmpname);
 
           // timetype
           int timetype = vlistInqVarTimetype(vlistID, varID);
-          fprintf(stdout, "%c ", timetype==TIME_CONSTANT ? 'c' : 'v');
-               
-	  // tsteptype
-	  int tsteptype = vlistInqVarTsteptype(vlistID, varID);
+          fprintf(stdout, "%c ", timetype == TIME_CONSTANT ? 'c' : 'v');
+
+          // tsteptype
+          int tsteptype = vlistInqVarTsteptype(vlistID, varID);
           // clang-format off
 	  if      ( tsteptype == TSTEP_INSTANT  ) fprintf(stdout, "%-8s ", "instant");
 	  else if ( tsteptype == TSTEP_INSTANT2 ) fprintf(stdout, "%-8s ", "instant");
@@ -186,83 +208,88 @@ void *Sinfo(void *process)
 	  else                                    fprintf(stdout, "%-8s ", "unknown");
           // clang-format on
 
-	  /* ensemble information */
-	  if ( lensemble )
-	    {
+          /* ensemble information */
+          if (lensemble)
+            {
               int perturbationNumber, numberOfForecastsInEnsemble;
-              int r1 = cdiInqKeyInt(vlistID, varID, CDI_KEY_PERTURBATIONNUMBER, &perturbationNumber);
-              int r2 = cdiInqKeyInt(vlistID, varID, CDI_KEY_NUMBEROFFORECASTSINENSEMBLE, &numberOfForecastsInEnsemble);
-	      if ( r1 == 0 && r2 == 0 )
-		fprintf(stdout, "%2d/%-2d ", perturbationNumber, numberOfForecastsInEnsemble);
-	      else
-		fprintf(stdout, "--/-- ");
-	    }
+              int r1 = cdiInqKeyInt(vlistID, varID, CDI_KEY_PERTURBATIONNUMBER,
+                                    &perturbationNumber);
+              int r2 = cdiInqKeyInt(vlistID, varID,
+                                    CDI_KEY_NUMBEROFFORECASTSINENSEMBLE,
+                                    &numberOfForecastsInEnsemble);
+              if (r1 == 0 && r2 == 0)
+                fprintf(stdout, "%2d/%-2d ", perturbationNumber,
+                        numberOfForecastsInEnsemble);
+              else
+                fprintf(stdout, "--/-- ");
+            }
 
-          if ( nsubtypes > 1 )
+          if (nsubtypes > 1)
             {
               int subtypeID = vlistInqVarSubtype(vlistID, varID);
               int subtypesize = subtypeInqSize(subtypeID);
               fprintf(stdout, " %6d  ", subtypesize);
-              fprintf(stdout, "%3d ", vlistSubtypeIndex(vlistID, subtypeID) + 1);
+              fprintf(stdout, "%3d ",
+                      vlistSubtypeIndex(vlistID, subtypeID) + 1);
             }
-	  reset_text_color(stdout);
+          reset_text_color(stdout);
 
-	  /* layer info */
-	  int levelsize = zaxisInqSize(zaxisID);
-	  set_text_color(stdout, RESET, GREEN);
-	  fprintf(stdout, "%6d ", levelsize);
-	  reset_text_color(stdout);
-	  fprintf(stdout, "%3d ", vlistZaxisIndex(vlistID, zaxisID) + 1);
+          /* layer info */
+          int levelsize = zaxisInqSize(zaxisID);
+          set_text_color(stdout, RESET, GREEN);
+          fprintf(stdout, "%6d ", levelsize);
+          reset_text_color(stdout);
+          fprintf(stdout, "%3d ", vlistZaxisIndex(vlistID, zaxisID) + 1);
 
-	  /* grid info */
-	  size_t gridsize = gridInqSize(gridID);
-	  set_text_color(stdout, RESET, GREEN);
-	  fprintf(stdout, "%9zu ", gridsize);
-	  reset_text_color(stdout);
-	  fprintf(stdout, "%3d ", vlistGridIndex(vlistID, gridID) + 1);
+          /* grid info */
+          size_t gridsize = gridInqSize(gridID);
+          set_text_color(stdout, RESET, GREEN);
+          fprintf(stdout, "%9zu ", gridsize);
+          reset_text_color(stdout);
+          fprintf(stdout, "%3d ", vlistGridIndex(vlistID, gridID) + 1);
 
-	  /* datatype */
-	  int datatype = vlistInqVarDatatype(vlistID, varID);
-	  datatype2str(datatype, pstr);
+          /* datatype */
+          int datatype = vlistInqVarDatatype(vlistID, varID);
+          datatype2str(datatype, pstr);
 
-	  set_text_color(stdout, RESET, BLUE);
-	  fprintf(stdout, " %-3s", pstr);
+          set_text_color(stdout, RESET, BLUE);
+          fprintf(stdout, " %-3s", pstr);
 
           int comptype = vlistInqVarCompType(vlistID, varID);
-	  if ( comptype == CDI_COMPRESS_NONE )
-	    fprintf(stdout, "  ");
-	  else
-	    fprintf(stdout, "%c ", (int)comp_name(comptype)[0]);
+          if (comptype == CDI_COMPRESS_NONE)
+            fprintf(stdout, "  ");
+          else
+            fprintf(stdout, "%c ", (int) comp_name(comptype)[0]);
 
-	  reset_text_color(stdout);
-	      
-	  set_text_color(stdout, RESET, BLACK);
-	  fprintf(stdout, ": ");
-	  reset_text_color(stdout);
+          reset_text_color(stdout);
 
-	  /* parameter info */
-	  cdiParamToString(param, paramstr, sizeof(paramstr));
+          set_text_color(stdout, RESET, BLACK);
+          fprintf(stdout, ": ");
+          reset_text_color(stdout);
 
-	  if ( operfunc == func_name ) vlistInqVarName(vlistID, varID, varname);
+          /* parameter info */
+          cdiParamToString(param, paramstr, sizeof(paramstr));
 
-	  set_text_color(stdout, BRIGHT, GREEN);
-	  if ( operfunc == func_name )
-	    fprintf(stdout, "%-14s", varname);
-	  else if ( operfunc == func_code )
-	    fprintf(stdout, "%4d %4d   ", tabnum, code);
-	  else
-	    fprintf(stdout, "%-14s", paramstr);
-	  reset_text_color(stdout);
+          if (operfunc == func_name) vlistInqVarName(vlistID, varID, varname);
 
-	  if ( cdoVerbose )
-	    {
-	      char varextra[CDI_MAX_NAME];
-	      vlistInqVarExtra(vlistID, varID, varextra);
-	      fprintf(stdout, " : %s", varextra);              
-	    }
+          set_text_color(stdout, BRIGHT, GREEN);
+          if (operfunc == func_name)
+            fprintf(stdout, "%-14s", varname);
+          else if (operfunc == func_code)
+            fprintf(stdout, "%4d %4d   ", tabnum, code);
+          else
+            fprintf(stdout, "%-14s", paramstr);
+          reset_text_color(stdout);
 
-	  fprintf(stdout, "\n");
-	}
+          if (cdoVerbose)
+            {
+              char varextra[CDI_MAX_NAME];
+              vlistInqVarExtra(vlistID, varID, varextra);
+              fprintf(stdout, " : %s", varextra);
+            }
+
+          fprintf(stdout, "\n");
+        }
 
       set_text_color(stdout, BRIGHT, BLACK);
       fprintf(stdout, "   Grid coordinates");
@@ -278,7 +305,7 @@ void *Sinfo(void *process)
 
       printZaxisInfo(vlistID);
 
-      if ( nsubtypes > 1 )
+      if (nsubtypes > 1)
         {
           fprintf(stdout, "   Subtypes");
           fprintf(stdout, " :\n");
@@ -289,62 +316,67 @@ void *Sinfo(void *process)
       int taxisID = vlistInqTaxis(vlistID);
       int ntsteps = vlistNtsteps(vlistID);
 
-      if ( ntsteps != 0 )
-	{
-	  set_text_color(stdout, BRIGHT, BLACK);
-	  fprintf(stdout, "   Time coordinate");
-	  reset_text_color(stdout);
-	  if ( ntsteps == CDI_UNDEFID )
-	    fprintf(stdout, " :  unlimited steps\n");
-	  else
-	    fprintf(stdout, " :  %d step%s\n", ntsteps, ntsteps == 1 ? "" : "s");
+      if (ntsteps != 0)
+        {
+          set_text_color(stdout, BRIGHT, BLACK);
+          fprintf(stdout, "   Time coordinate");
+          reset_text_color(stdout);
+          if (ntsteps == CDI_UNDEFID)
+            fprintf(stdout, " :  unlimited steps\n");
+          else
+            fprintf(stdout, " :  %d step%s\n", ntsteps,
+                    ntsteps == 1 ? "" : "s");
 
-	  if ( taxisID != CDI_UNDEFID )
-	    {
-	      if ( taxisInqType(taxisID) != TAXIS_ABSOLUTE )
-		{
-		  int vdate = taxisInqRdate(taxisID);
-		  int vtime = taxisInqRtime(taxisID);
+          if (taxisID != CDI_UNDEFID)
+            {
+              if (taxisInqType(taxisID) != TAXIS_ABSOLUTE)
+                {
+                  int vdate = taxisInqRdate(taxisID);
+                  int vtime = taxisInqRtime(taxisID);
 
-		  date2str(vdate, vdatestr, sizeof(vdatestr));
-		  time2str(vtime, vtimestr, sizeof(vtimestr));
+                  date2str(vdate, vdatestr, sizeof(vdatestr));
+                  time2str(vtime, vtimestr, sizeof(vtimestr));
 
-		  fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
-		      
-		  int tunits = taxisInqTunit(taxisID);
-		  if ( tunits != CDI_UNDEFID )  fprintf(stdout, "  Units = %s", tunit2str(tunits));
-	      
-		  int calendar = taxisInqCalendar(taxisID);
-		  if ( calendar != CDI_UNDEFID )  fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
+                  fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 
-		  if ( taxisHasBounds(taxisID) )
-		    fprintf(stdout, "  Bounds = true");
+                  int tunits = taxisInqTunit(taxisID);
+                  if (tunits != CDI_UNDEFID)
+                    fprintf(stdout, "  Units = %s", tunit2str(tunits));
 
-		  fprintf(stdout, "\n");
+                  int calendar = taxisInqCalendar(taxisID);
+                  if (calendar != CDI_UNDEFID)
+                    fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
 
-		  if ( taxisInqType(taxisID) == TAXIS_FORECAST )
-		    {
-		      vdate = taxisInqFdate(taxisID);
-		      vtime = taxisInqFtime(taxisID);
+                  if (taxisHasBounds(taxisID))
+                    fprintf(stdout, "  Bounds = true");
 
-		      date2str(vdate, vdatestr, sizeof(vdatestr));
-		      time2str(vtime, vtimestr, sizeof(vtimestr));
+                  fprintf(stdout, "\n");
 
-		      fprintf(stdout, "     ForecastRefTime = %s %s", vdatestr, vtimestr);
-		      fprintf(stdout, "\n");
-		    }
-		}
-	    }
+                  if (taxisInqType(taxisID) == TAXIS_FORECAST)
+                    {
+                      vdate = taxisInqFdate(taxisID);
+                      vtime = taxisInqFtime(taxisID);
 
-	  fprintf(stdout, "  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss\n");
+                      date2str(vdate, vdatestr, sizeof(vdatestr));
+                      time2str(vtime, vtimestr, sizeof(vtimestr));
 
-	  set_text_color(stdout, RESET, MAGENTA);
+                      fprintf(stdout, "     ForecastRefTime = %s %s", vdatestr,
+                              vtimestr);
+                      fprintf(stdout, "\n");
+                    }
+                }
+            }
 
-	  printTimesteps(streamID, taxisID, cdoVerbose);
+          fprintf(stdout, "  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  "
+                          "YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss\n");
 
-	  reset_text_color(stdout);
-	  fprintf(stdout, "\n");
-	}
+          set_text_color(stdout, RESET, MAGENTA);
+
+          printTimesteps(streamID, taxisID, cdoVerbose);
+
+          reset_text_color(stdout);
+          fprintf(stdout, "\n");
+        }
 
       pstreamClose(streamID);
     }

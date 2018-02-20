@@ -26,14 +26,13 @@
       Compc      gtc             Greater then constant
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Compc(void *process)
+void *
+Compc(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -66,71 +65,83 @@ void *Compc(void *process)
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
-  double *array2 = (double*) Malloc(gridsizemax*sizeof(double));
+  double *array1 = (double *) Malloc(gridsizemax * sizeof(double));
+  double *array2 = (double *) Malloc(gridsizemax * sizeof(double));
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, array1, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  double missval  = vlistInqVarMissval(vlistID1, varID);
-	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          double missval = vlistInqVarMissval(vlistID1, varID);
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  bool rc_is_missval = DBL_IS_EQUAL(rc, missval);
+          bool rc_is_missval = DBL_IS_EQUAL(rc, missval);
 
           int datatype = vlistInqVarDatatype(vlistID1, varID);
-          double rcv = (datatype == CDI_DATATYPE_FLT32) ? (float)rc : rc;
+          double rcv = (datatype == CDI_DATATYPE_FLT32) ? (float) rc : rc;
 
-	  if ( operatorID == EQC )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : IS_EQUAL(array1[i], rcv);
-	    }
-	  else if ( operatorID == NEC )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : IS_NOT_EQUAL(array1[i], rcv);
-	    }
-	  else if ( operatorID == LEC )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] <= rcv;
-	    }
-	  else if ( operatorID == LTC )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] < rcv;
-	    }
-	  else if ( operatorID == GEC )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] >= rcv;
-	    }
-	  else if ( operatorID == GTC )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] > rcv;
-	    }
-	  else
-	    {
-	      cdoAbort("Operator not implemented!");
-	    }
+          if (operatorID == EQC)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
+                                ? missval
+                                : IS_EQUAL(array1[i], rcv);
+            }
+          else if (operatorID == NEC)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
+                                ? missval
+                                : IS_NOT_EQUAL(array1[i], rcv);
+            }
+          else if (operatorID == LEC)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
+                                ? missval
+                                : array1[i] <= rcv;
+            }
+          else if (operatorID == LTC)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
+                                ? missval
+                                : array1[i] < rcv;
+            }
+          else if (operatorID == GEC)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
+                                ? missval
+                                : array1[i] >= rcv;
+            }
+          else if (operatorID == GTC)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
+                                ? missval
+                                : array1[i] > rcv;
+            }
+          else
+            {
+              cdoAbort("Operator not implemented!");
+            }
 
           nmiss = arrayNumMV(gridsize, array2, missval);
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, array2, nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, array2, nmiss);
+        }
 
       tsID++;
     }
@@ -138,8 +149,8 @@ void *Compc(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( array2 ) Free(array2);
-  if ( array1 ) Free(array1);
+  if (array2) Free(array2);
+  if (array1) Free(array1);
 
   cdoFinish();
 

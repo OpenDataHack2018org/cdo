@@ -20,51 +20,52 @@
 
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "grid.h"
 
-
-void trms(field_type field1, field_type field2, double *dp, field_type *field3)
+void
+trms(field_type field1, field_type field2, double *dp, field_type *field3)
 {
   int k, nlev;
   size_t rnmiss = 0;
-  int    zaxis    = field1.zaxis;
-  int    grid1    = field1.grid;
-  double *array1  = field1.ptr;
-  int    grid2    = field2.grid;
-  double *array2  = field2.ptr;
+  int zaxis = field1.zaxis;
+  int grid1 = field1.grid;
+  double *array1 = field1.ptr;
+  int grid2 = field2.grid;
+  double *array2 = field2.ptr;
   double missval1 = field1.missval;
   double missval2 = field2.missval;
-  double *w       = field1.weight;
+  double *w = field1.weight;
   double rsum = 0, rsumw = 0, ravg = 0, wp;
 
-  nlev   = zaxisInqSize(zaxis);
+  nlev = zaxisInqSize(zaxis);
   size_t len = gridInqSize(grid1);
-  if ( len != gridInqSize(grid2) )
-    cdoAbort("fields have different size!");
+  if (len != gridInqSize(grid2)) cdoAbort("fields have different size!");
 
-  for ( k = 0; k < nlev; k++ ) 
-    for ( size_t i = 0; i < len; i++ ) 
+  for (k = 0; k < nlev; k++)
+    for (size_t i = 0; i < len; i++)
       {
-	wp = w[i]*dp[k*len+i];
-	rsum  = ADDMN(rsum, MULMN(wp, MULMN( SUBMN(array2[k*len+i], array1[k*len+i]),
-				      SUBMN(array2[k*len+i], array1[k*len+i]))));
-	rsumw = ADDMN(rsumw, wp);
+        wp = w[i] * dp[k * len + i];
+        rsum = ADDMN(
+            rsum,
+            MULMN(wp, MULMN(SUBMN(array2[k * len + i], array1[k * len + i]),
+                            SUBMN(array2[k * len + i], array1[k * len + i]))));
+        rsumw = ADDMN(rsumw, wp);
       }
 
-  ravg = SQRTMN( DIVMN(rsum, rsumw));
+  ravg = SQRTMN(DIVMN(rsum, rsumw));
 
-  if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
+  if (DBL_IS_EQUAL(ravg, missval1)) rnmiss++;
 
   field3->ptr[0] = ravg;
-  field3->nmiss  = rnmiss;
+  field3->nmiss = rnmiss;
 }
 
-void *Trms(void *process)
+void *
+Trms(void *process)
 {
   int gridID1, gridID3, lastgrid = -1;
   int code = 0, oldcode = 0;
@@ -99,15 +100,15 @@ void *Trms(void *process)
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
-      if ( vlistInqVarCode(vlistID1, varID) == pcode )
-	pvarID = varID;
+      if (vlistInqVarCode(vlistID1, varID) == pcode)
+        pvarID = varID;
       else
-	vlistDefFlag(vlistID1, varID, 0, TRUE);
+        vlistDefFlag(vlistID1, varID, 0, TRUE);
     }
 
-  if ( pvarID == -1 ) cdoAbort("pressure variable missing!");
+  if (pvarID == -1) cdoAbort("pressure variable missing!");
 
   int vlistID3 = vlistCreate();
   cdoVlistCopyFlag(vlistID3, vlistID1);
@@ -119,55 +120,54 @@ void *Trms(void *process)
   int ngrids = vlistNgrids(vlistID1);
   int index = 0;
   gridID1 = vlistGrid(vlistID1, index);
-  
-  if ( needWeights &&
-       gridInqType(gridID1) != GRID_LONLAT &&
-       gridInqType(gridID1) != GRID_GAUSSIAN )
+
+  if (needWeights && gridInqType(gridID1) != GRID_LONLAT
+      && gridInqType(gridID1) != GRID_GAUSSIAN)
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
   vlistChangeGridIndex(vlistID3, index, gridID3);
-  if ( ngrids > 1 ) cdoAbort("Too many different grids!");
+  if (ngrids > 1) cdoAbort("Too many different grids!");
 
   int nzaxis = vlistNzaxis(vlistID1);
-  for ( index = 0; index < nzaxis; index++ )
+  for (index = 0; index < nzaxis; index++)
     {
       zaxisID = vlistZaxis(vlistID1, index);
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
-	{
-	  vctsize = zaxisInqVctSize(zaxisID);
-	  const double *vct = zaxisInqVctPtr(zaxisID);
-	  va = vct;
-	  vb = vct + vctsize/2;
-	  /*
-	  for ( i = 0; i < vctsize/2; i++ )
-	    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
-	  for ( i = 0; i < vctsize/2-1; i++ )
-	    fprintf(stdout, "%5d %25.17f %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i],
-		    (va[i+1] + vb[i+1]*101300) - (va[i] + vb[i]*101300));
-	  */
+      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID)
+        {
+          vctsize = zaxisInqVctSize(zaxisID);
+          const double *vct = zaxisInqVctPtr(zaxisID);
+          va = vct;
+          vb = vct + vctsize / 2;
+          /*
+          for ( i = 0; i < vctsize/2; i++ )
+            fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i],
+          vct[vctsize/2+i]); for ( i = 0; i < vctsize/2-1; i++ ) fprintf(stdout,
+          "%5d %25.17f %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i], (va[i+1]
+          + vb[i+1]*101300) - (va[i] + vb[i]*101300));
+          */
 
-	  break;
-	}
+          break;
+        }
     }
 
-  if ( vctsize == 0 ) cdoAbort("VCT missing!");
+  if (vctsize == 0) cdoAbort("VCT missing!");
 
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
-  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata1 = (double **) Malloc(nvars * sizeof(double *));
+  double **vardata2 = (double **) Malloc(nvars * sizeof(double *));
 
   size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, pvarID));
-  int nlevel   = vctsize/2 - 1;
-  double *dp = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  int nlevel = vctsize / 2 - 1;
+  double *dp = (double *) Malloc(gridsize * nlevel * sizeof(double));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
-      vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
+      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      vardata1[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
+      vardata2[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
     }
 
   field_type field1, field2, field3;
@@ -177,87 +177,89 @@ void *Trms(void *process)
 
   size_t lim = vlistGridsizeMax(vlistID1);
   field1.weight = NULL;
-  if ( needWeights )
-    field1.weight = (double*) Malloc(lim*sizeof(double));
+  if (needWeights) field1.weight = (double *) Malloc(lim * sizeof(double));
 
   field2.weight = NULL;
 
-  field3.ptr  = &sglval;
+  field3.ptr = &sglval;
   field3.grid = gridID3;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       nrecs = cdoStreamInqTimestep(streamID2, tsID);
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
-	  single   = vardata1[varID] + offset;
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          offset = gridsize * levelID;
+          single = vardata1[varID] + offset;
 
-	  pstreamReadRecord(streamID1, single, &nmiss);
-	  if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
+          pstreamReadRecord(streamID1, single, &nmiss);
+          if (nmiss) cdoAbort("Missing values unsupported for this operator!");
 
-	  pstreamInqRecord(streamID2, &varID, &levelID);
+          pstreamInqRecord(streamID2, &varID, &levelID);
 
-	  single   = vardata2[varID] + offset;
-	  pstreamReadRecord(streamID2, single, &nmiss);
-	  if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
-	}
+          single = vardata2[varID] + offset;
+          pstreamReadRecord(streamID2, single, &nmiss);
+          if (nmiss) cdoAbort("Missing values unsupported for this operator!");
+        }
 
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, pvarID));
-      for ( size_t i = 0; i < gridsize; i++ )
-	{
-	  vardata1[pvarID][i] = exp(vardata1[pvarID][i]);
-	  vardata2[pvarID][i] = exp(vardata2[pvarID][i]);
-	}
+      for (size_t i = 0; i < gridsize; i++)
+        {
+          vardata1[pvarID][i] = exp(vardata1[pvarID][i]);
+          vardata2[pvarID][i] = exp(vardata2[pvarID][i]);
+        }
 
-      nlevel = vctsize/2 - 1;
-      for ( int k = 0; k < nlevel; k++ )
-	{
-	  offset = gridsize*k;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    {
-	      double dp1 = (va[k+1] + vb[k+1]*vardata1[pvarID][i]) - (va[k] + vb[k]*vardata1[pvarID][i]);
-	      double dp2 = (va[k+1] + vb[k+1]*vardata2[pvarID][i]) - (va[k] + vb[k]*vardata2[pvarID][i]);
+      nlevel = vctsize / 2 - 1;
+      for (int k = 0; k < nlevel; k++)
+        {
+          offset = gridsize * k;
+          for (size_t i = 0; i < gridsize; i++)
+            {
+              double dp1 = (va[k + 1] + vb[k + 1] * vardata1[pvarID][i])
+                           - (va[k] + vb[k] * vardata1[pvarID][i]);
+              double dp2 = (va[k + 1] + vb[k + 1] * vardata2[pvarID][i])
+                           - (va[k] + vb[k] * vardata2[pvarID][i]);
 
-	      dp[offset+i] = 0.5 * (dp1 + dp2);
-	    }
-	}
+              dp[offset + i] = 0.5 * (dp1 + dp2);
+            }
+        }
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  field1.ptr = vardata1[varID];
-	  field2.ptr = vardata2[varID];
+      for (varID = 0; varID < nvars; varID++)
+        {
+          field1.ptr = vardata1[varID];
+          field2.ptr = vardata2[varID];
 
-	  field1.zaxis   = vlistInqVarZaxis(vlistID1, varID);
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
+          field1.zaxis = vlistInqVarZaxis(vlistID1, varID);
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field2.grid = vlistInqVarGrid(vlistID2, varID);
           bool wstatus = false;
-	  if ( needWeights && field1.grid != lastgrid )
-	    {
-	      lastgrid = field1.grid;
-	      wstatus = gridWeights(field1.grid, field1.weight);
-	    }
-	  code = vlistInqVarCode(vlistID1, varID);
-	  if ( wstatus != 0 && tsID == 0 && code != oldcode )
-	    cdoWarning("Using constant area weights for code %d!", oldcode=code);
+          if (needWeights && field1.grid != lastgrid)
+            {
+              lastgrid = field1.grid;
+              wstatus = gridWeights(field1.grid, field1.weight);
+            }
+          code = vlistInqVarCode(vlistID1, varID);
+          if (wstatus != 0 && tsID == 0 && code != oldcode)
+            cdoWarning("Using constant area weights for code %d!",
+                       oldcode = code);
 
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
-	  field2.missval = vlistInqVarMissval(vlistID2, varID);
-	  field3.missval = vlistInqVarMissval(vlistID3, varID);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
+          field2.missval = vlistInqVarMissval(vlistID2, varID);
+          field3.missval = vlistInqVarMissval(vlistID3, varID);
 
-	  trms(field1, field2, dp, &field3);
+          trms(field1, field2, dp, &field3);
 
-	  pstreamDefRecord(streamID3, varID, 0);
-	  pstreamWriteRecord(streamID3, &sglval, field3.nmiss);
-	}
+          pstreamDefRecord(streamID3, varID, 0);
+          pstreamWriteRecord(streamID3, &sglval, field3.nmiss);
+        }
 
       tsID++;
     }
@@ -268,9 +270,9 @@ void *Trms(void *process)
 
   vlistDestroy(vlistID3);
 
-  if ( field1.weight ) Free(field1.weight);
+  if (field1.weight) Free(field1.weight);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       Free(vardata1[varID]);
       Free(vardata2[varID]);

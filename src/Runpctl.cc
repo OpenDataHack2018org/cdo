@@ -28,8 +28,8 @@
 #include "percentiles.h"
 #include "datetime.h"
 
-
-void *Runpctl(void *process)
+void *
+Runpctl(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int varID;
@@ -42,7 +42,7 @@ void *Runpctl(void *process)
 
   operatorInputArg("percentile number, number of timesteps");
   operatorCheckArgc(2);
-  double pn  = parameter2double(operatorArgv()[0]);
+  double pn = parameter2double(operatorArgv()[0]);
   percentile_check_number(pn);
   int ndates = parameter2int(operatorArgv()[1]);
 
@@ -59,7 +59,7 @@ void *Runpctl(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<recinfo_type> recinfo(maxrecs);
@@ -68,62 +68,65 @@ void *Runpctl(void *process)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  field_type ***vars1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
-  double *array = (double*) Malloc(ndates*sizeof(double));
-  
-  for ( int its = 0; its < ndates; its++ )
+  field_type ***vars1
+      = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  double *array = (double *) Malloc(ndates * sizeof(double));
+
+  for (int its = 0; its < ndates; its++)
     vars1[its] = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID;
-  for ( tsID = 0; tsID < ndates; tsID++ )
+  for (tsID = 0; tsID < ndates; tsID++)
     {
       int nrecs = cdoStreamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 ) cdoAbort("File has less than %d timesteps!", ndates);
+      if (nrecs == 0) cdoAbort("File has less than %d timesteps!", ndates);
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
-        
-      for ( int recID = 0; recID < nrecs; recID++ )
+
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          if ( tsID == 0 )
+          if (tsID == 0)
             {
-              recinfo[recID].varID   = varID;
+              recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+              recinfo[recID].lconst
+                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
-          
+
           pstreamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
           vars1[tsID][varID][levelID].nmiss = nmiss;
         }
     }
 
   int otsID = 0;
-  while ( TRUE )
+  while (TRUE)
     {
-      for ( varID = 0; varID < nvars; varID++ )
+      for (varID = 0; varID < nvars; varID++)
         {
-          if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
-          
+          if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
+
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           int nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           double missval = vlistInqVarMissval(vlistID1, varID);
-          
-          for ( levelID = 0; levelID < nlevels; levelID++ )
+
+          for (levelID = 0; levelID < nlevels; levelID++)
             {
-              nmiss = 0;  
-              for ( size_t i = 0; i < gridsize; i++ )
+              nmiss = 0;
+              for (size_t i = 0; i < gridsize; i++)
                 {
                   int j = 0;
-                  for ( int inp = 0; inp < ndates; inp++ )
+                  for (int inp = 0; inp < ndates; inp++)
                     {
                       double val = vars1[inp][varID][levelID].ptr[i];
-                      if ( !DBL_IS_EQUAL(val, missval) ) array[j++] = val;
+                      if (!DBL_IS_EQUAL(val, missval)) array[j++] = val;
                     }
 
-                  if ( j > 0 )
+                  if (j > 0)
                     {
-                      vars1[0][varID][levelID].ptr[i] = percentile(array, j, pn);
+                      vars1[0][varID][levelID].ptr[i]
+                          = percentile(array, j, pn);
                     }
                   else
                     {
@@ -131,22 +134,23 @@ void *Runpctl(void *process)
                       nmiss++;
                     }
                 }
-              vars1[0][varID][levelID].nmiss = nmiss;  
+              vars1[0][varID][levelID].nmiss = nmiss;
             }
         }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
       pstreamDefTimestep(streamID2, otsID);
 
-      for ( int recID = 0; recID < maxrecs; recID++ )
+      for (int recID = 0; recID < maxrecs; recID++)
         {
-          if ( otsID && recinfo[recID].lconst ) continue;
+          if (otsID && recinfo[recID].lconst) continue;
 
-          int varID   = recinfo[recID].varID;
+          int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, vars1[0][varID][levelID].ptr, vars1[0][varID][levelID].nmiss);
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, vars1[0][varID][levelID].ptr,
+                             vars1[0][varID][levelID].nmiss);
         }
 
       otsID++;
@@ -154,24 +158,26 @@ void *Runpctl(void *process)
       dtlist_shift(dtlist);
 
       vars1[ndates] = vars1[0];
-      for ( int inp = 0; inp < ndates; inp++ ) vars1[inp] = vars1[inp+1];
+      for (int inp = 0; inp < ndates; inp++)
+        vars1[inp] = vars1[inp + 1];
 
       int nrecs = cdoStreamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
 
-      dtlist_taxisInqTimestep(dtlist, taxisID1, ndates-1);
+      dtlist_taxisInqTimestep(dtlist, taxisID1, ndates - 1);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
-          vars1[ndates-1][varID][levelID].nmiss = nmiss;
+          pstreamReadRecord(streamID1, vars1[ndates - 1][varID][levelID].ptr,
+                            &nmiss);
+          vars1[ndates - 1][varID][levelID].nmiss = nmiss;
         }
 
       tsID++;
     }
 
-  for ( int its = 0; its < ndates; its++ )
+  for (int its = 0; its < ndates; its++)
     field_free(vars1[its], vlistID1);
 
   Free(vars1);

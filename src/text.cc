@@ -16,35 +16,36 @@
 */
 #include "text.h"
 
-int stdin_is_tty  = 0;
+int stdin_is_tty = 0;
 int stdout_is_tty = 0;
 int stderr_is_tty = 0;
 
 int CDO_Color = 0;
 
-void set_text_color(FILE *fp, int attr, int fg)
+void
+set_text_color(FILE *fp, int attr, int fg)
 {
   int bg = -1;
 
-  if ( fp == stdout && !COLOR_STDOUT ) return;
-  if ( fp == stderr && !COLOR_STDERR ) return;
+  if (fp == stdout && !COLOR_STDOUT) return;
+  if (fp == stderr && !COLOR_STDERR) return;
 
   fprintf(fp, "%c[%d", 0x1B, attr);
-  if ( fg >= 0 )
+  if (fg >= 0)
     {
-      fprintf(fp, ";%d", fg+30);
-      if ( bg >= 0 ) fprintf(fp, ";%d", bg+40);
+      fprintf(fp, ";%d", fg + 30);
+      if (bg >= 0) fprintf(fp, ";%d", bg + 40);
     }
   fprintf(fp, "m");
 }
 
-
-void reset_text_color(FILE *fp)
+void
+reset_text_color(FILE *fp)
 {
   int attr = RESET;
 
-  if ( fp == stdout && !COLOR_STDOUT ) return;
-  if ( fp == stderr && !COLOR_STDERR ) return;
+  if (fp == stdout && !COLOR_STDOUT) return;
+  if (fp == stderr && !COLOR_STDERR) return;
 
   fprintf(fp, "%c[%dm", 0x1B, attr);
 }

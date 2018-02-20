@@ -29,34 +29,36 @@ static size_t ghistorysize = 0;
 static char strtime[32];
 static char datetimestr[32];
 
-static
-void init_strtime()
+static void
+init_strtime()
 {
   time_t tp;
   struct tm *ltime;
 
   tp = time(NULL);
 
-  if ( tp != -1 )
+  if (tp != -1)
     {
       ltime = localtime(&tp);
-      (void) strftime(strtime, sizeof(strtime), "%a %b %d %H:%M:%S %Y: ", ltime);
-      (void) strftime(datetimestr, sizeof(datetimestr), "%Y-%m-%dT%H:%M:%SZ", ltime);
+      (void) strftime(strtime, sizeof(strtime),
+                      "%a %b %d %H:%M:%S %Y: ", ltime);
+      (void) strftime(datetimestr, sizeof(datetimestr), "%Y-%m-%dT%H:%M:%SZ",
+                      ltime);
     }
 }
 
-static
-char *get_strtimeptr()
+static char *
+get_strtimeptr()
 {
-  if ( strlen(strtime) == 0 ) init_strtime();
+  if (strlen(strtime) == 0) init_strtime();
 
   return strtime;
 }
 
-
-void cdoInqHistory(int fileID)
+void
+cdoInqHistory(int fileID)
 {
-  if ( ghistory ) return;
+  if (ghistory) return;
   /*
     {
       Free(ghistory);
@@ -66,78 +68,78 @@ void cdoInqHistory(int fileID)
   */
 
   ghistorysize = streamInqHistorySize(fileID);
-  if ( ghistorysize > 0 )
+  if (ghistorysize > 0)
     {
       size_t len;
-      ghistory = (char*) Malloc(ghistorysize+1);
+      ghistory = (char *) Malloc(ghistorysize + 1);
       ghistory[ghistorysize] = 0;
       streamInqHistoryString(fileID, ghistory);
       len = strlen(ghistory);
-      if ( len < ghistorysize )
-	{
-	  /* printf("%d %d\n", len, ghistorysize); */
-	  ghistorysize = len;
-	}
+      if (len < ghistorysize)
+        {
+          /* printf("%d %d\n", len, ghistorysize); */
+          ghistorysize = len;
+        }
     }
 }
 
-
-void cdoDefHistory(int fileID, char *histstring)
+void
+cdoDefHistory(int fileID, char *histstring)
 {
   char *strtimeptr = NULL;
   size_t historysize = 0;
 
-  if ( !CDO_Reset_History ) historysize += ghistorysize+1;
+  if (!CDO_Reset_History) historysize += ghistorysize + 1;
 
-  if ( CDO_Append_History )
+  if (CDO_Append_History)
     {
       strtimeptr = get_strtimeptr();
-      historysize += strlen(strtimeptr)+strlen(histstring)+1;
+      historysize += strlen(strtimeptr) + strlen(histstring) + 1;
     }
 
-  if ( historysize )
+  if (historysize)
     {
-      char *history = (char*) Malloc(historysize);
+      char *history = (char *) Malloc(historysize);
       history[0] = 0;
 
-      if ( CDO_Append_History )
+      if (CDO_Append_History)
         {
-          if ( strtimeptr ) strcpy(history, strtimeptr);
+          if (strtimeptr) strcpy(history, strtimeptr);
           strcat(history, histstring);
         }
 
-      if ( !CDO_Reset_History )
-        if ( ghistory )
+      if (!CDO_Reset_History)
+        if (ghistory)
           {
-            if ( CDO_Append_History ) strcat(history, "\n");
+            if (CDO_Append_History) strcat(history, "\n");
             strcat(history, ghistory);
           }
-  
+
       streamDefHistory(fileID, strlen(history), history);
       Free(history);
     }
 }
 
-
-void cdo_def_creation_date(int vlistID)
+void
+cdo_def_creation_date(int vlistID)
 {
-  if ( strlen(datetimestr) == 0 ) init_strtime();
-  cdiDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int)strlen(datetimestr), datetimestr);
+  if (strlen(datetimestr) == 0) init_strtime();
+  cdiDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int) strlen(datetimestr),
+               datetimestr);
 }
 
+#define UUIDSTR_SIZE (CDI_UUID_SIZE * 2 + 4)
 
-#define UUIDSTR_SIZE (CDI_UUID_SIZE*2 + 4)
-
-static
-void get_uuid(char uuidstr[UUIDSTR_SIZE])
+static void
+get_uuid(char uuidstr[UUIDSTR_SIZE])
 {
   unsigned char uuid[CDI_UUID_SIZE];
   cdiCreateUUID(uuid);
   cdiUUID2Str(uuid, uuidstr);
 }
 
-
-void cdo_def_tracking_id(int vlistID, const char *uuid_attribute)
+void
+cdo_def_tracking_id(int vlistID, const char *uuid_attribute)
 {
   char uuidstr[UUIDSTR_SIZE];
   get_uuid(uuidstr);

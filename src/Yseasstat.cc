@@ -25,9 +25,10 @@
       Yseasstat  yseasmean       Multi-year seasonal mean
       Yseasstat  yseasavg        Multi-year seasonal average
       Yseasstat  yseasvar        Multi-year seasonal variance
-      Yseasstat  yseasvar1       Multi-year seasonal variance [Normalize by (n-1)]
-      Yseasstat  yseasstd        Multi-year seasonal standard deviation
-      Yseasstat  yseasstd1       Multi-year seasonal standard deviation [Normalize by (n-1)]
+      Yseasstat  yseasvar1       Multi-year seasonal variance [Normalize by
+   (n-1)] Yseasstat  yseasstd        Multi-year seasonal standard deviation
+      Yseasstat  yseasstd1       Multi-year seasonal standard deviation
+   [Normalize by (n-1)]
 */
 
 #include <cdi.h>
@@ -35,30 +36,30 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-#define  NSEAS       4
+#define NSEAS 4
 
-typedef struct {
+typedef struct
+{
   int vdate;
   int vtime;
-}
-date_time_t;
+} date_time_t;
 
-
-void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
+void
+set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 {
   int year, month, day;
   cdiDecodeDate(vdate_new, &year, &month, &day);
-  if ( month == 12 ) vdate_new = cdiEncodeDate(year-1, month, day);
+  if (month == 12) vdate_new = cdiEncodeDate(year - 1, month, day);
 
-  if ( vdate_new > datetime->vdate )
+  if (vdate_new > datetime->vdate)
     {
       datetime->vdate = vdate_new;
       datetime->vtime = vtime_new;
     }
 }
 
-
-void *Yseasstat(void *process)
+void *
+Yseasstat(void *process)
 {
   int varID;
   int year, month, day;
@@ -93,12 +94,12 @@ void *Yseasstat(void *process)
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
   // clang-format on
 
-  for ( int seas = 0; seas < NSEAS; seas++ )
+  for (int seas = 0; seas < NSEAS; seas++)
     {
-      vars1[seas]  = NULL;
-      vars2[seas]  = NULL;
-      samp1[seas]  = NULL;
-      seas_nsets[seas]  = 0;
+      vars1[seas] = NULL;
+      vars2[seas] = NULL;
+      samp1[seas] = NULL;
+      seas_nsets[seas] = 0;
       datetime[seas].vdate = 0;
       datetime[seas].vtime = 0;
     }
@@ -110,7 +111,7 @@ void *Yseasstat(void *process)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
-  if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
+  if (taxisHasBounds(taxisID2)) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -123,11 +124,11 @@ void *Yseasstat(void *process)
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
+  field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
   int tsID = 0;
   int otsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
@@ -137,175 +138,186 @@ void *Yseasstat(void *process)
 
       set_date(vdate, vtime, &datetime[seas]);
 
-      if ( vars1[seas] == NULL )
-	{
-	  vars1[seas] = field_malloc(vlistID1, FIELD_PTR);
-	  samp1[seas] = field_malloc(vlistID1, FIELD_NONE);
-	  if ( lvarstd || lrange )
-	    vars2[seas] = field_malloc(vlistID1, FIELD_PTR);
-	}
+      if (vars1[seas] == NULL)
+        {
+          vars1[seas] = field_malloc(vlistID1, FIELD_PTR);
+          samp1[seas] = field_malloc(vlistID1, FIELD_NONE);
+          if (lvarstd || lrange)
+            vars2[seas] = field_malloc(vlistID1, FIELD_PTR);
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( tsID == 0 )
-	    {
-              recinfo[recID].varID   = varID;
+          if (tsID == 0)
+            {
+              recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
-	    }
+              recinfo[recID].lconst
+                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+            }
 
           field_type *psamp1 = &samp1[seas][varID][levelID];
           field_type *pvars1 = &vars1[seas][varID][levelID];
-          field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
+          field_type *pvars2
+              = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
           int nsets = seas_nsets[seas];
 
-	  size_t gridsize = pvars1->size;
+          size_t gridsize = pvars1->size;
 
-	  if ( nsets == 0 )
-	    {
-	      pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-	      pvars1->nmiss = nmiss;
-              if ( lrange )
+          if (nsets == 0)
+            {
+              pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
+              pvars1->nmiss = nmiss;
+              if (lrange)
                 {
                   pvars2->nmiss = pvars1->nmiss;
-                  for ( size_t i = 0; i < gridsize; i++ )
+                  for (size_t i = 0; i < gridsize; i++)
                     pvars2->ptr[i] = pvars1->ptr[i];
                 }
 
-	      if ( nmiss > 0 || psamp1->ptr )
-		{
-		  if ( psamp1->ptr == NULL )
-		    psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
+              if (nmiss > 0 || psamp1->ptr)
+                {
+                  if (psamp1->ptr == NULL)
+                    psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
-		  for ( size_t i = 0; i < gridsize; i++ )
-                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
-		}
-	    }
-	  else
-	    {
-	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = nmiss;
-	      field.grid    = pvars1->grid;
-	      field.missval = pvars1->missval;
+                  for (size_t i = 0; i < gridsize; i++)
+                    psamp1->ptr[i]
+                        = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                }
+            }
+          else
+            {
+              pstreamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss = nmiss;
+              field.grid = pvars1->grid;
+              field.missval = pvars1->missval;
 
-	      if ( field.nmiss > 0 || psamp1->ptr )
-		{
-		  if ( psamp1->ptr == NULL )
-		    {
-		      psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( size_t i = 0; i < gridsize; i++ )
-			psamp1->ptr[i] = nsets;
-		    }
-		  
-		  for ( size_t i = 0; i < gridsize; i++ )
-		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-		      psamp1->ptr[i]++;
-		}
+              if (field.nmiss > 0 || psamp1->ptr)
+                {
+                  if (psamp1->ptr == NULL)
+                    {
+                      psamp1->ptr
+                          = (double *) Malloc(gridsize * sizeof(double));
+                      for (size_t i = 0; i < gridsize; i++)
+                        psamp1->ptr[i] = nsets;
+                    }
 
-	      if ( lvarstd )
-		{
-		  farsumq(pvars2, field);
-		  farsum(pvars1, field);
-		}
-              else if ( lrange )
+                  for (size_t i = 0; i < gridsize; i++)
+                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
+                      psamp1->ptr[i]++;
+                }
+
+              if (lvarstd)
+                {
+                  farsumq(pvars2, field);
+                  farsum(pvars1, field);
+                }
+              else if (lrange)
                 {
                   farmin(pvars2, field);
                   farmax(pvars1, field);
                 }
-	      else
-		{
-		  farfun(pvars1, field, operfunc);
-		}
-	    }
-	}
+              else
+                {
+                  farfun(pvars1, field, operfunc);
+                }
+            }
+        }
 
-      if ( seas_nsets[seas] == 0 && lvarstd )
-        for ( int recID = 0; recID < maxrecs; recID++ )
+      if (seas_nsets[seas] == 0 && lvarstd)
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-	    if ( recinfo[recID].lconst ) continue;
+            if (recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[seas][varID][levelID];
             field_type *pvars2 = &vars2[seas][varID][levelID];
 
             farmoq(pvars2, *pvars1);
-	  }
+          }
 
       seas_nsets[seas]++;
       tsID++;
     }
 
-  for ( int seas = 0; seas < NSEAS; seas++ )
-    if ( seas_nsets[seas] )
+  for (int seas = 0; seas < NSEAS; seas++)
+    if (seas_nsets[seas])
       {
         int nsets = seas_nsets[seas];
-        for ( int recID = 0; recID < maxrecs; recID++ )
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-	    if ( recinfo[recID].lconst ) continue;
+            if (recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[seas][varID][levelID];
             field_type *pvars1 = &vars1[seas][varID][levelID];
-            field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
+            field_type *pvars2
+                = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
 
-            if ( lmean )
+            if (lmean)
               {
-                if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
-                else               farcdiv(pvars1, (double)nsets);
+                if (psamp1->ptr)
+                  fardiv(pvars1, *psamp1);
+                else
+                  farcdiv(pvars1, (double) nsets);
               }
-            else if ( lvarstd )
+            else if (lvarstd)
               {
-                if ( psamp1->ptr )
+                if (psamp1->ptr)
                   {
-                    if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
-                    else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                    if (lstd)
+                      farstd(pvars1, *pvars2, *psamp1, divisor);
+                    else
+                      farvar(pvars1, *pvars2, *psamp1, divisor);
                   }
                 else
                   {
-                    if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
-                    else        farcvar(pvars1, *pvars2, nsets, divisor);
+                    if (lstd)
+                      farcstd(pvars1, *pvars2, nsets, divisor);
+                    else
+                      farcvar(pvars1, *pvars2, nsets, divisor);
                   }
               }
-            else if ( lrange )
+            else if (lrange)
               {
                 farsub(pvars1, *pvars2);
               }
           }
 
-	taxisDefVdate(taxisID2, datetime[seas].vdate);
-	taxisDefVtime(taxisID2, datetime[seas].vtime);
-	pstreamDefTimestep(streamID2, otsID);
+        taxisDefVdate(taxisID2, datetime[seas].vdate);
+        taxisDefVtime(taxisID2, datetime[seas].vtime);
+        pstreamDefTimestep(streamID2, otsID);
 
-	for ( int recID = 0; recID < maxrecs; recID++ )
-	  {
-            if ( otsID && recinfo[recID].lconst ) continue;
+        for (int recID = 0; recID < maxrecs; recID++)
+          {
+            if (otsID && recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[seas][varID][levelID];
 
-	    pstreamDefRecord(streamID2, varID, levelID);
-	    pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
-	  }
+            pstreamDefRecord(streamID2, varID, levelID);
+            pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
+          }
 
-	otsID++;
+        otsID++;
       }
 
-  for ( int seas = 0; seas < NSEAS; seas++ )
+  for (int seas = 0; seas < NSEAS; seas++)
     {
-      if ( vars1[seas] != NULL )
-	{
-	  field_free(vars1[seas], vlistID1);
-	  field_free(samp1[seas], vlistID1);
-	  if ( lvarstd ) Free(vars2[seas]);
-	}
+      if (vars1[seas] != NULL)
+        {
+          field_free(vars1[seas], vlistID1);
+          field_free(samp1[seas], vlistID1);
+          if (lvarstd) Free(vars2[seas]);
+        }
     }
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

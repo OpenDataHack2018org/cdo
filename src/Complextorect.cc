@@ -15,14 +15,13 @@
   GNU General Public License for more details.
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Complextorect(void *process)
+void *
+Complextorect(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -42,13 +41,13 @@ void *Complextorect(void *process)
   int vlistID3 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID2);
-  for ( varID = 0; varID < nvars; ++varID )
+  for (varID = 0; varID < nvars; ++varID)
     {
       datatype = vlistInqVarDatatype(vlistID2, varID);
-      if ( datatype == CDI_DATATYPE_CPX64 )
-	datatype = CDI_DATATYPE_FLT64;
+      if (datatype == CDI_DATATYPE_CPX64)
+        datatype = CDI_DATATYPE_FLT64;
       else
-	datatype = CDI_DATATYPE_FLT32;
+        datatype = CDI_DATATYPE_FLT32;
 
       vlistDefVarDatatype(vlistID2, varID, datatype);
       vlistDefVarDatatype(vlistID3, varID, datatype);
@@ -67,12 +66,12 @@ void *Complextorect(void *process)
   pstreamDefVlist(streamID3, vlistID3);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double*) Malloc(2*gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
-  double *array3 = (double*) Malloc(gridsize*sizeof(double));
-      
-  int tsID  = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  double *array1 = (double *) Malloc(2 * gridsize * sizeof(double));
+  double *array2 = (double *) Malloc(gridsize * sizeof(double));
+  double *array3 = (double *) Malloc(gridsize * sizeof(double));
+
+  int tsID = 0;
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       taxisCopyTimestep(taxisID3, taxisID1);
@@ -80,26 +79,26 @@ void *Complextorect(void *process)
       pstreamDefTimestep(streamID2, tsID);
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamDefRecord(streamID3, varID, levelID);
-	      
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamDefRecord(streamID3, varID, levelID);
 
-	  pstreamReadRecord(streamID1, array1, &nmiss);
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  for ( size_t i = 0; i < gridsize; ++i )
-	    {
-	      array2[i] = array1[2*i];
-	      array3[i] = array1[2*i+1];
-	    }
+          pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  pstreamWriteRecord(streamID2, array2, nmiss);
-	  pstreamWriteRecord(streamID3, array3, nmiss);
-	}
-       
+          for (size_t i = 0; i < gridsize; ++i)
+            {
+              array2[i] = array1[2 * i];
+              array3[i] = array1[2 * i + 1];
+            }
+
+          pstreamWriteRecord(streamID2, array2, nmiss);
+          pstreamWriteRecord(streamID3, array3, nmiss);
+        }
+
       tsID++;
     }
 
@@ -107,9 +106,9 @@ void *Complextorect(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( array1 ) Free(array1);
-  if ( array2 ) Free(array2);
-  if ( array3 ) Free(array3);
+  if (array1) Free(array1);
+  if (array2) Free(array2);
+  if (array3) Free(array3);
 
   vlistDestroy(vlistID2);
   vlistDestroy(vlistID3);

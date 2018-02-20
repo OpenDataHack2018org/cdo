@@ -24,157 +24,168 @@
 
 namespace CdoLog
 {
-    void StdOut(std::stringstream &message);
+void StdOut(std::stringstream &message);
 
-    template <typename ...T>
-    static void  expand(std::stringstream &p_message, T&& ...args)
-    {
-           //for showing that the dummy array is never used
-           using expander = int[];
-           //creating dummy array with expanding the parameter pack in its
-           //initializer list while writing each element of the pack into message
-           expander{0,(void(p_message << std::forward<T>(args)),0)...};
-           p_message << std::endl;
-    }
+template <typename... T>
+static void
+expand(std::stringstream &p_message, T &&... args)
+{
+  // for showing that the dummy array is never used
+  using expander = int[];
+  // creating dummy array with expanding the parameter pack in its
+  // initializer list while writing each element of the pack into message
+  expander{ 0, (void(p_message << std::forward<T>(args)), 0)... };
+  p_message << std::endl;
+}
 
-    template <typename ...T>
-    void StdOut(T&& ...args)
-    {
-        std::stringstream message;
-        expand(message, args...);
-        std::cout << message.str();
-    }
- 
-    template <typename ...T>
-    void StdErr(T&& ...args)
-    {
-        std::stringstream message;
-        expand(message, args...);
-        std::cout << message.str();
-    }
+template <typename... T>
+void
+StdOut(T &&... args)
+{
+  std::stringstream message;
+  expand(message, args...);
+  std::cout << message.str();
+}
+
+template <typename... T>
+void
+StdErr(T &&... args)
+{
+  std::stringstream message;
+  expand(message, args...);
+  std::cout << message.str();
+}
 }
 
 namespace CdoDebug
 {
-    //Debug Switches
-    extern int cdoDebug;
-    extern int cdoDebugExt; //  Debug level for the KNMI extensions
-    //Subsystem Debug Switches
-    extern int  PSTREAM;
-    extern int PROCESS;
-    extern int PIPE;
-    extern int ARGUMENT;
-    extern int PTHREAD;
+// Debug Switches
+extern int cdoDebug;
+extern int cdoDebugExt;  //  Debug level for the KNMI extensions
+// Subsystem Debug Switches
+extern int PSTREAM;
+extern int PROCESS;
+extern int PIPE;
+extern int ARGUMENT;
+extern int PTHREAD;
 
-    //File switches and streams
-    extern std::string outfile;
-    extern bool print_to_seperate_file;
-    extern std::fstream outfile_stream;
+// File switches and streams
+extern std::string outfile;
+extern bool print_to_seperate_file;
+extern std::fstream outfile_stream;
 
+std::string get_padding(const char *p_func);
 
-    std::string get_padding(const char *p_func);
+void CdoStartMessage();
+void CdoEndMessage();
+void SetDebug(int p_debug_level);
+std::string argvToString(int argc, const char **argv);
 
-    void CdoStartMessage();
-    void CdoEndMessage();
-    void SetDebug(int p_debug_level);
-    std::string argvToString(int argc, const char** argv);
+void printMessage(std::stringstream &p_message, bool both = false);
+void printError(std::stringstream &p_message, bool both = false);
 
-    void printMessage(std::stringstream &p_message,bool both = false);
-    void printError(std::stringstream &p_message,bool both = false);
-
-    template <typename ...T>
-    void Message_ (const char * p_func, T&& ...args)
-    {
-        std::stringstream message;
-        message << p_func <<": " << get_padding(p_func);
-        CdoLog::expand(message, args...);
-        printMessage(message);
-    }
-
-    template <typename ...T>
-    void PrintDebug(const char * p_func, int p_debugScope ,T&& ...args)
-    {
-        if(p_debugScope > 0){
-        std::stringstream message;
-        message << p_func <<": " << get_padding(p_func);
-        CdoLog::expand(message, args...);
-        printMessage(message);
-        }
-    }
-
-    template <typename ...T>
-    void Warning_(T&& ...args)
-    {
-        std::stringstream message;
-        message << "Warning: ";
-        CdoLog::expand(message, args...);
-        printMessage(message, true);
-    }
-
-
+template <typename... T>
+void
+Message_(const char *p_func, T &&... args)
+{
+  std::stringstream message;
+  message << p_func << ": " << get_padding(p_func);
+  CdoLog::expand(message, args...);
+  printMessage(message);
 }
 
-namespace CdoError{
-    static int _ExitOnError = 1;
-
-    template <typename ...T>
-    void Abort(const char* progname, T&& ...args)
+template <typename... T>
+void
+PrintDebug(const char *p_func, int p_debugScope, T &&... args)
+{
+  if (p_debugScope > 0)
     {
-          std::stringstream message;
-          message << progname << " (Abort): ";
-          CdoLog::expand(message, args...);
-          CdoDebug::printError(message,true);
-          if ( CdoError::_ExitOnError )
-          {
-              if(CdoDebug::print_to_seperate_file) CdoDebug::outfile_stream.close();
-              exit(EXIT_FAILURE);
-          }
-    }
-
-    template <typename ...T>
-    void Error_(const char* p_file, const int p_line, const char* caller, T&& ...args)
-    {
-          std::stringstream message;
-          message << "Error in: " << p_file << ":" << p_line << " " << caller << " ";
-          CdoLog::expand(message, args...);
-          CdoDebug::printError(message,true);
-          if ( CdoError::_ExitOnError )
-          {
-              if(CdoDebug::print_to_seperate_file) CdoDebug::outfile_stream.close();
-              exit(EXIT_FAILURE);
-          }
-    }
-
-    template <typename ...T>
-    void SysError_(const char* p_file, const int p_line,  const char* p_func, T&& ...args)
-    {
-        int saved_errno = errno;
-        std::stringstream message;
-        message << "SysError in:" << p_file << std::endl;
-        message << "    " << "in function: p_func ,line: " << p_line << std::endl;
-        CdoLog::StdOut(message, args...);
-        if(saved_errno)
-        {
-            errno = saved_errno;
-            perror("Sytem error message");
-        }
-        exit(EXIT_FAILURE);
+      std::stringstream message;
+      message << p_func << ": " << get_padding(p_func);
+      CdoLog::expand(message, args...);
+      printMessage(message);
     }
 }
-#if  defined  WITH_CALLER_NAME
-#  define  SYS_ERROR(...)    CdoError::SysError_( __FILE__ , __LINE__ , __func__ , __VA_ARGS__)
-#  define    ERROR_C(...)    CdoError::Error_( __FILE__ , __LINE__ ,  caller, __VA_ARGS__)
-#  define    ERROR(...)    CdoError::Error_( __FILE__ , __LINE__ , __func__ , __VA_ARGS__)
-#  define   WARNING(...)    CdoError::Warning_( __func__ , __VA_ARGS__)
-#  define  MESSAGE_C(...)    CdoDebug::Message_(   caller , __VA_ARGS__)
-#  define   MESSAGE(...)    CdoDebug::Message_( __func__ , __VA_ARGS__)
+
+template <typename... T>
+void
+Warning_(T &&... args)
+{
+  std::stringstream message;
+  message << "Warning: ";
+  CdoLog::expand(message, args...);
+  printMessage(message, true);
+}
+}
+
+namespace CdoError
+{
+static int _ExitOnError = 1;
+
+template <typename... T>
+void
+Abort(const char *progname, T &&... args)
+{
+  std::stringstream message;
+  message << progname << " (Abort): ";
+  CdoLog::expand(message, args...);
+  CdoDebug::printError(message, true);
+  if (CdoError::_ExitOnError)
+    {
+      if (CdoDebug::print_to_seperate_file) CdoDebug::outfile_stream.close();
+      exit(EXIT_FAILURE);
+    }
+}
+
+template <typename... T>
+void
+Error_(const char *p_file, const int p_line, const char *caller, T &&... args)
+{
+  std::stringstream message;
+  message << "Error in: " << p_file << ":" << p_line << " " << caller << " ";
+  CdoLog::expand(message, args...);
+  CdoDebug::printError(message, true);
+  if (CdoError::_ExitOnError)
+    {
+      if (CdoDebug::print_to_seperate_file) CdoDebug::outfile_stream.close();
+      exit(EXIT_FAILURE);
+    }
+}
+
+template <typename... T>
+void
+SysError_(const char *p_file, const int p_line, const char *p_func,
+          T &&... args)
+{
+  int saved_errno = errno;
+  std::stringstream message;
+  message << "SysError in:" << p_file << std::endl;
+  message << "    "
+          << "in function: p_func ,line: " << p_line << std::endl;
+  CdoLog::StdOut(message, args...);
+  if (saved_errno)
+    {
+      errno = saved_errno;
+      perror("Sytem error message");
+    }
+  exit(EXIT_FAILURE);
+}
+}
+#if defined WITH_CALLER_NAME
+#define SYS_ERROR(...) \
+  CdoError::SysError_(__FILE__, __LINE__, __func__, __VA_ARGS__)
+#define ERROR_C(...) CdoError::Error_(__FILE__, __LINE__, caller, __VA_ARGS__)
+#define ERROR(...) CdoError::Error_(__FILE__, __LINE__, __func__, __VA_ARGS__)
+#define WARNING(...) CdoError::Warning_(__func__, __VA_ARGS__)
+#define MESSAGE_C(...) CdoDebug::Message_(caller, __VA_ARGS__)
+#define MESSAGE(...) CdoDebug::Message_(__func__, __VA_ARGS__)
 #else
-#  define  SYS_ERROR(...)    CdoError::SysError_(__FILE__, __LINE__,"", __VA_ARGS__)
-#  define    ERROR_C(...)    CdoError::Error_(__FILE__, __LINE__,"", __VA_ARGS__)
-#  define    ERROR(...)      CdoError::Error_(__FILE__, __LINE__,"", __VA_ARGS__)
-#  define   WARNING(...)     CdoError::Warning_(__VA_ARGS__)
-#  define  MESSAGE_C(...)    CdoDebug::Message_(__VA_ARGS__)
-#  define   MESSAGE(...)     CdoDebug::Message_(__func__,__VA_ARGS__)
+#define SYS_ERROR(...) CdoError::SysError_(__FILE__, __LINE__, "", __VA_ARGS__)
+#define ERROR_C(...) CdoError::Error_(__FILE__, __LINE__, "", __VA_ARGS__)
+#define ERROR(...) CdoError::Error_(__FILE__, __LINE__, "", __VA_ARGS__)
+#define WARNING(...) CdoError::Warning_(__VA_ARGS__)
+#define MESSAGE_C(...) CdoDebug::Message_(__VA_ARGS__)
+#define MESSAGE(...) CdoDebug::Message_(__func__, __VA_ARGS__)
 #endif
-#  define Cdo_Debug(...) CdoDebug::PrintDebug(__func__,__VA_ARGS__)
+#define Cdo_Debug(...) CdoDebug::PrintDebug(__func__, __VA_ARGS__)
 #endif

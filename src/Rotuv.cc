@@ -21,26 +21,25 @@
       Rotuv      rotuvb          Backward rotation
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "grid.h"
 
-
-static
-void rot_uv_back(int gridID, double *us, double *vs)
+static void
+rot_uv_back(int gridID, double *us, double *vs)
 {
   double xpole = 0, ypole = 0, angle = 0;
-  if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
+  if (gridInqType(gridID) == GRID_PROJECTION
+      && gridInqProjType(gridID) == CDI_PROJ_RLL)
     gridInqParamRLL(gridID, &xpole, &ypole, &angle);
 
   size_t nlon = gridInqXsize(gridID);
   size_t nlat = gridInqYsize(gridID);
 
-  double *xvals = (double*) Malloc(nlon*sizeof(double));
-  double *yvals = (double*) Malloc(nlat*sizeof(double));
+  double *xvals = (double *) Malloc(nlon * sizeof(double));
+  double *yvals = (double *) Malloc(nlat * sizeof(double));
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
@@ -54,31 +53,33 @@ void rot_uv_back(int gridID, double *us, double *vs)
   grid_to_degree(units, 1, &ypole, "ypole");
   grid_to_degree(units, nlat, yvals, "grid center lat");
 
-  if ( xpole > 180 ) xpole-=360;
-  if ( angle > 180 ) angle-=360;
+  if (xpole > 180) xpole -= 360;
+  if (angle > 180) angle -= 360;
 
   double u, v;
-  for ( size_t ilat = 0; ilat < nlat; ilat++ )
-    for ( size_t ilon = 0; ilon < nlon; ilon++ )
+  for (size_t ilat = 0; ilat < nlat; ilat++)
+    for (size_t ilon = 0; ilon < nlon; ilon++)
       {
-	size_t i = ilat*nlon + ilon;
+        size_t i = ilat * nlon + ilon;
 
-        double xval = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
+        double xval
+            = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
         double yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
 
-	usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
+        usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
 
-	us[i] = u;
-	vs[i] = v;
+        us[i] = u;
+        vs[i] = v;
       }
 
   Free(xvals);
   Free(yvals);
 }
 
-#define  MAXARG     16384
+#define MAXARG 16384
 
-void *Rotuv(void *process)
+void *
+Rotuv(void *process)
 {
   int varID, levelID;
   int varID1, varID2, nlevel1, nlevel2;
@@ -96,27 +97,27 @@ void *Rotuv(void *process)
   operatorInputArg("pairs of u and v in the rotated system");
 
   int nch = operatorArgc();
-  if ( nch%2 ) cdoAbort("Odd number of input arguments!");
+  if (nch % 2) cdoAbort("Odd number of input arguments!");
 
-  bool lvar = false; // We have a list of codes
-  int len = (int)strlen(operatorArgv()[0]);
+  bool lvar = false;  // We have a list of codes
+  int len = (int) strlen(operatorArgv()[0]);
   int ix = (operatorArgv()[0][0] == '-') ? 1 : 0;
-  for ( int i = ix; i < len; ++i )
-    if ( !isdigit(operatorArgv()[0][i]) )
+  for (int i = ix; i < len; ++i)
+    if (!isdigit(operatorArgv()[0][i]))
       {
-        lvar = true; // We have a list of variables
+        lvar = true;  // We have a list of variables
         break;
       }
 
-  if ( lvar )
+  if (lvar)
     {
-      for ( int i = 0; i < nch; i++ )
-	chvars[i] = operatorArgv()[i];
+      for (int i = 0; i < nch; i++)
+        chvars[i] = operatorArgv()[i];
     }
   else
     {
-      for ( int i = 0; i < nch; i++ )
-	chcodes[i] = parameter2int(operatorArgv()[i]);
+      for (int i = 0; i < nch; i++)
+        chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -127,48 +128,50 @@ void *Rotuv(void *process)
   int nvars = vlistNvars(vlistID1);
   int nrecs = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecs*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecs*sizeof(int));
+  int *recVarID = (int *) Malloc(nrecs * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecs * sizeof(int));
 
-  size_t **varnmiss = (size_t **) Malloc(nvars*sizeof(size_t *));
-  double **vardata  = (double **) Malloc(nvars*sizeof(double *));
+  size_t **varnmiss = (size_t **) Malloc(nvars * sizeof(size_t *));
+  double **vardata = (double **) Malloc(nvars * sizeof(double *));
 
   bool lfound[MAXARG];
-  for ( int i = 0; i < nch; i++ ) lfound[i] = false;
+  for (int i = 0; i < nch; i++)
+    lfound[i] = false;
 
-  if ( lvar )
+  if (lvar)
     {
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  vlistInqVarName(vlistID2, varID, varname);
-	  for ( int i = 0; i < nch; i++ )
-	    if ( strcmp(varname, chvars[i]) == 0 ) lfound[i] = true;
-	}
-      for ( int i = 0; i < nch; i++ )
-	if ( ! lfound[i] ) cdoAbort("Variable %s not found!", chvars[i]);
+      for (varID = 0; varID < nvars; varID++)
+        {
+          vlistInqVarName(vlistID2, varID, varname);
+          for (int i = 0; i < nch; i++)
+            if (strcmp(varname, chvars[i]) == 0) lfound[i] = true;
+        }
+      for (int i = 0; i < nch; i++)
+        if (!lfound[i]) cdoAbort("Variable %s not found!", chvars[i]);
     }
   else
     {
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  code = vlistInqVarCode(vlistID2, varID);
-	  for ( int i = 0; i < nch; i++ )
-	    if ( code == chcodes[i] ) lfound[i] = true;
-	}
-      for ( int i = 0; i < nch; i++ )
-	if ( ! lfound[i] ) cdoAbort("Code %d not found!", chcodes[i]);
+      for (varID = 0; varID < nvars; varID++)
+        {
+          code = vlistInqVarCode(vlistID2, varID);
+          for (int i = 0; i < nch; i++)
+            if (code == chcodes[i]) lfound[i] = true;
+        }
+      for (int i = 0; i < nch; i++)
+        if (!lfound[i]) cdoAbort("Code %d not found!", chcodes[i]);
     }
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       gridID = vlistInqVarGrid(vlistID1, varID);
-      if ( ! (gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) )
-	cdoAbort("Only rotated lon/lat grids supported!");
+      if (!(gridInqType(gridID) == GRID_PROJECTION
+            && gridInqProjType(gridID) == CDI_PROJ_RLL))
+        cdoAbort("Only rotated lon/lat grids supported!");
 
       gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      varnmiss[varID] = (size_t*) Malloc(nlevel*sizeof(size_t));
-      vardata[varID]  = (double*) Malloc(gridsize*nlevel*sizeof(double));
+      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      varnmiss[varID] = (size_t *) Malloc(nlevel * sizeof(size_t));
+      vardata[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
     }
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -179,112 +182,111 @@ void *Rotuv(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  recVarID[recID]   = varID;
-	  recLevelID[recID] = levelID;
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));	  
-	  size_t offset  = gridsize*levelID;
-	  single  = vardata[varID] + offset;
-	  pstreamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
-	  if ( varnmiss[varID][levelID] )
-	    cdoAbort("Missing values unsupported for this operator!");
-	}
+          recVarID[recID] = varID;
+          recLevelID[recID] = levelID;
 
-      for ( int i = 0; i < nch; i += 2 )
-	{
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( lvar )
-		{
-		  vlistInqVarName(vlistID2, varID, varname);
-		  if ( strcmp(varname, chvars[i]) == 0 ) break;
-		}
-	      else
-		{
-		  code = vlistInqVarCode(vlistID2, varID);
-		  if ( code == chcodes[i] ) break;
-		}
-	    }
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t offset = gridsize * levelID;
+          single = vardata[varID] + offset;
+          pstreamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
+          if (varnmiss[varID][levelID])
+            cdoAbort("Missing values unsupported for this operator!");
+        }
 
-	  if ( varID == nvars )
-	    cdoAbort("u-wind not found!");
-	  else
-	    usvar = vardata[varID];
-
-	  varID1 = varID;
-	  
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( lvar )
-		{
-		  vlistInqVarName(vlistID2, varID, varname);
-		  if ( strcmp(varname, chvars[i+1]) == 0 ) break;
-		}
-	      else
-		{
-		  code = vlistInqVarCode(vlistID2, varID);
-		  if ( code == chcodes[i+1] ) break;
-		}
-	    }
-
-	  if ( varID == nvars )
-	    cdoAbort("v-wind not found!");
-	  else
-	    vsvar = vardata[varID];
-
-	  varID2 = varID;
-
-	  if ( cdoVerbose )
+      for (int i = 0; i < nch; i += 2)
+        {
+          for (varID = 0; varID < nvars; varID++)
             {
-              if ( lvar )
+              if (lvar)
+                {
+                  vlistInqVarName(vlistID2, varID, varname);
+                  if (strcmp(varname, chvars[i]) == 0) break;
+                }
+              else
+                {
+                  code = vlistInqVarCode(vlistID2, varID);
+                  if (code == chcodes[i]) break;
+                }
+            }
+
+          if (varID == nvars)
+            cdoAbort("u-wind not found!");
+          else
+            usvar = vardata[varID];
+
+          varID1 = varID;
+
+          for (varID = 0; varID < nvars; varID++)
+            {
+              if (lvar)
+                {
+                  vlistInqVarName(vlistID2, varID, varname);
+                  if (strcmp(varname, chvars[i + 1]) == 0) break;
+                }
+              else
+                {
+                  code = vlistInqVarCode(vlistID2, varID);
+                  if (code == chcodes[i + 1]) break;
+                }
+            }
+
+          if (varID == nvars)
+            cdoAbort("v-wind not found!");
+          else
+            vsvar = vardata[varID];
+
+          varID2 = varID;
+
+          if (cdoVerbose)
+            {
+              if (lvar)
                 {
                   vlistInqVarName(vlistID2, varID1, varname);
                   vlistInqVarName(vlistID2, varID2, varname2);
-                  cdoPrint("Using var %s [%s](u) and var %s [%s](v)",
-                           varname, chvars[i],
-                           varname2, chvars[i+1]);
+                  cdoPrint("Using var %s [%s](u) and var %s [%s](v)", varname,
+                           chvars[i], varname2, chvars[i + 1]);
                 }
               else
                 cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
                          vlistInqVarCode(vlistID1, varID1), chcodes[i],
-                         vlistInqVarCode(vlistID1, varID2), chcodes[i+1]);
+                         vlistInqVarCode(vlistID1, varID2), chcodes[i + 1]);
             }
 
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
-	  nlevel1  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
-	  nlevel2  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID2));
+          gridID = vlistInqVarGrid(vlistID1, varID);
+          gridsize = gridInqSize(gridID);
+          nlevel1 = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
+          nlevel2 = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID2));
 
-	  if ( nlevel1 != nlevel2 )
-	    cdoAbort("u-wind and v-wind have different number of levels!");
+          if (nlevel1 != nlevel2)
+            cdoAbort("u-wind and v-wind have different number of levels!");
 
-	  for ( levelID = 0; levelID < nlevel1; levelID++ )
-	    {
-	      size_t offset = gridsize*levelID;
-	      rot_uv_back(gridID, usvar + offset, vsvar + offset);
-	    }
-	}
+          for (levelID = 0; levelID < nlevel1; levelID++)
+            {
+              size_t offset = gridsize * levelID;
+              rot_uv_back(gridID, usvar + offset, vsvar + offset);
+            }
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  varID    = recVarID[recID];
-	  levelID  = recLevelID[recID];
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  size_t offset   = gridsize*levelID;
-	  single   = vardata[varID] + offset;
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          varID = recVarID[recID];
+          levelID = recLevelID[recID];
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t offset = gridsize * levelID;
+          single = vardata[varID] + offset;
 
-	  pstreamDefRecord(streamID2, varID,  levelID);
-	  pstreamWriteRecord(streamID2, single, varnmiss[varID][levelID]);     
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, single, varnmiss[varID][levelID]);
+        }
 
       tsID++;
     }
@@ -292,7 +294,7 @@ void *Rotuv(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       Free(varnmiss[varID]);
       Free(vardata[varID]);

@@ -18,5 +18,4 @@
 #ifndef PSTREAM_WRITE_H
 #define PSTREAM_WRITE_H
 
-
-#endif  /* PSTREAM_WRITE_H */
+#endif /* PSTREAM_WRITE_H */

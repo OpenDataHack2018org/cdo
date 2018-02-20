@@ -26,58 +26,72 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-static const char WCT_NAME[]     = "wind_chill_temperature";
-static const char WCT_LONGNAME[] = "Windchill temperature describes the fact that low temperatures are felt to be even lower in case of wind. It is based on the rate of heat loss from exposed skin caused by wind and cold. It is calculated according to the empirical formula: 33 + (T - 33) * (0.478 + 0.237 * ( SQRTMN(ff*3.6) - 0.0124 * ff * 3.6)) with T  = air temperature in degree Celsius, ff = 10 m wind speed in m/s. Windchill temperature is only defined for temperatures at or below 33 degree Celsius and wind speeds above 1.39 m/s. It is mainly used for freezing temperatures.";
-static const char WCT_UNITS[]    = "Celsius";
+static const char WCT_NAME[] = "wind_chill_temperature";
+static const char WCT_LONGNAME[]
+    = "Windchill temperature describes the fact that low temperatures are felt "
+      "to be even lower in case of wind. It is based on the rate of heat loss "
+      "from exposed skin caused by wind and cold. It is calculated according "
+      "to the empirical formula: 33 + (T - 33) * (0.478 + 0.237 * ( "
+      "SQRTMN(ff*3.6) - 0.0124 * ff * 3.6)) with T  = air temperature in "
+      "degree Celsius, ff = 10 m wind speed in m/s. Windchill temperature is "
+      "only defined for temperatures at or below 33 degree Celsius and wind "
+      "speeds above 1.39 m/s. It is mainly used for freezing temperatures.";
+static const char WCT_UNITS[] = "Celsius";
 
 static const int FIRST_VAR = 0;
 
-
-static double windchillTemperature(double t, double ff, double missval)
+static double
+windchillTemperature(double t, double ff, double missval)
 {
-  static const double tmax = 33.0; 
+  static const double tmax = 33.0;
   static const double vmin = 1.39; /* minimum wind speed (m/s) */
-  
-  return ff < vmin || t > tmax ? missval : tmax + (t - tmax) * (0.478 + 0.237 * (sqrt(ff * 3.6) - 0.0124 * ff * 3.6));
+
+  return ff < vmin || t > tmax
+             ? missval
+             : tmax
+                   + (t - tmax)
+                         * (0.478
+                            + 0.237 * (sqrt(ff * 3.6) - 0.0124 * ff * 3.6));
 }
 
-
-static void farexpr(field_type *field1, field_type field2, double (*expression)(double, double, double))
+static void
+farexpr(field_type *field1, field_type field2,
+        double (*expression)(double, double, double))
 {
   size_t i, len;
-  const int     grid1    = field1->grid;
-  const size_t  nmiss1   = field1->nmiss;
-  const double  missval1 = field1->missval;
-  double       *array1   = field1->ptr;
-  const int     grid2    = field2.grid;
-  const size_t  nmiss2   = field2.nmiss;
-  const double  missval2 = field2.missval;
-  const double *array2   = field2.ptr;
+  const int grid1 = field1->grid;
+  const size_t nmiss1 = field1->nmiss;
+  const double missval1 = field1->missval;
+  double *array1 = field1->ptr;
+  const int grid2 = field2.grid;
+  const size_t nmiss2 = field2.nmiss;
+  const double missval2 = field2.missval;
+  const double *array2 = field2.ptr;
 
   len = gridInqSize(grid1);
-  if ( len != gridInqSize(grid2) )
+  if (len != gridInqSize(grid2))
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  if ( nmiss1 > 0 || nmiss2 > 0 )
+  if (nmiss1 > 0 || nmiss2 > 0)
     {
-      for ( i = 0; i < len; i++ )
-        if ( DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) )  
-	  array1[i] = missval1;
-	else
-	  array1[i] = expression(array1[i], array2[i], missval1);
+      for (i = 0; i < len; i++)
+        if (DBL_IS_EQUAL(array1[i], missval1)
+            || DBL_IS_EQUAL(array2[i], missval2))
+          array1[i] = missval1;
+        else
+          array1[i] = expression(array1[i], array2[i], missval1);
     }
   else
     {
-      for ( i = 0; i < len; i++ )
-        array1[i] = expression(array1[i], array2[i], missval1);  
+      for (i = 0; i < len; i++)
+        array1[i] = expression(array1[i], array2[i], missval1);
     }
 
   field1->nmiss = arrayNumMV(len, array1, missval1);
 }
 
-   
-void *Wct(void *process)
+void *
+Wct(void *process)
 {
   int nrecs, nrecs2;
   size_t nmiss;
@@ -96,22 +110,23 @@ void *Wct(void *process)
   int taxisID1 = vlistInqTaxis(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_DIM);
-  
+
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  
+
   field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  if ( cdoVerbose )
-    cdoPrint("Number of timesteps: file1 %d, file2 %d", vlistNtsteps(vlistID1), vlistNtsteps(vlistID2));
+  if (cdoVerbose)
+    cdoPrint("Number of timesteps: file1 %d, file2 %d", vlistNtsteps(vlistID1),
+             vlistNtsteps(vlistID2));
 
   int vlistID3 = vlistCreate();
-  int gridID   = vlistInqVarGrid(vlistID1, FIRST_VAR);
-  int zaxisID  = vlistInqVarZaxis(vlistID1, FIRST_VAR);
-  int varID3   = vlistDefVar(vlistID3, gridID, zaxisID, TIME_VARYING);
+  int gridID = vlistInqVarGrid(vlistID1, FIRST_VAR);
+  int zaxisID = vlistInqVarZaxis(vlistID1, FIRST_VAR);
+  int varID3 = vlistDefVar(vlistID3, gridID, zaxisID, TIME_VARYING);
 
   int taxisID3 = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(taxisID3, TUNIT_MINUTE);
@@ -129,42 +144,41 @@ void *Wct(void *process)
   pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
-      if ( nrecs2 == 0 )
+      if (nrecs2 == 0)
         cdoAbort("Input streams have different number of timesteps!");
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID1, &levelID1);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID1, &levelID1);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = nmiss;
-          
-	  pstreamInqRecord(streamID2, &varID2, &levelID2);
-	  pstreamReadRecord(streamID2, field2.ptr, &nmiss);
+
+          pstreamInqRecord(streamID2, &varID2, &levelID2);
+          pstreamReadRecord(streamID2, field2.ptr, &nmiss);
           field2.nmiss = nmiss;
-	  
-	  if ( varID1 != varID2 || levelID1 != levelID2 )
-	    cdoAbort("Input streams have different structure!");
-	    
-          if ( varID1 != FIRST_VAR )
-            continue;
-            
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID1);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID1);
 
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID2);
-	  field2.missval = vlistInqVarMissval(vlistID2, varID2);
+          if (varID1 != varID2 || levelID1 != levelID2)
+            cdoAbort("Input streams have different structure!");
 
-	  farexpr(&field1, field2, windchillTemperature);
-	  
-	  pstreamDefRecord(streamID3, varID3, levelID1);
-	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
-	}
+          if (varID1 != FIRST_VAR) continue;
+
+          field1.grid = vlistInqVarGrid(vlistID1, varID1);
+          field1.missval = vlistInqVarMissval(vlistID1, varID1);
+
+          field2.grid = vlistInqVarGrid(vlistID2, varID2);
+          field2.missval = vlistInqVarMissval(vlistID2, varID2);
+
+          farexpr(&field1, field2, windchillTemperature);
+
+          pstreamDefRecord(streamID3, varID3, levelID1);
+          pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
+        }
 
       tsID++;
     }
@@ -173,8 +187,8 @@ void *Wct(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( field1.ptr ) Free(field1.ptr);
-  if ( field2.ptr ) Free(field2.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field2.ptr) Free(field2.ptr);
 
   cdoFinish();
 

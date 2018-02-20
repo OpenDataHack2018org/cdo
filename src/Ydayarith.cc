@@ -29,10 +29,10 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
+#define MAX_DOY 373
 
-#define  MAX_DOY   373
-
-void *Ydayarith(void *process)
+void *
+Ydayarith(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -65,8 +65,8 @@ void *Ydayarith(void *process)
   field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -78,90 +78,93 @@ void *Ydayarith(void *process)
 
   int nvars = vlistNvars(vlistID2);
 
-  for ( int dayoy = 0; dayoy < MAX_DOY ; dayoy++ ) vardata2[dayoy] = NULL;
+  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
+    vardata2[dayoy] = NULL;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
       int vdate = taxisInqVdate(taxisID2);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
       int dayoy = 0;
-      if ( month >= 1 && month <= 12 ) dayoy = (month-1)*31 + day;
+      if (month >= 1 && month <= 12) dayoy = (month - 1) * 31 + day;
 
-      if ( dayoy < 0 || dayoy >= MAX_DOY )
-	cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
+      if (dayoy < 0 || dayoy >= MAX_DOY)
+        cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
-      if ( vardata2[dayoy] != NULL ) cdoAbort("Day of year %d already allocatd (date=%d)!", dayoy, vdate);
+      if (vardata2[dayoy] != NULL)
+        cdoAbort("Day of year %d already allocatd (date=%d)!", dayoy, vdate);
 
-      vardata2[dayoy]  = (double **) Malloc(nvars*sizeof(double *));
-      varnmiss2[dayoy] = (size_t **) Malloc(nvars*sizeof(size_t *));
+      vardata2[dayoy] = (double **) Malloc(nvars * sizeof(double *));
+      varnmiss2[dayoy] = (size_t **) Malloc(nvars * sizeof(size_t *));
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
+      for (varID = 0; varID < nvars; varID++)
+        {
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  size_t nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	  vardata2[dayoy][varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[dayoy][varID] = (size_t*) Malloc(nlev*sizeof(size_t));
-	}
+          size_t nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          vardata2[dayoy][varID]
+              = (double *) Malloc(nlev * gridsize * sizeof(double));
+          varnmiss2[dayoy][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID2, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID2, &varID, &levelID);
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  size_t offset   = gridsize*levelID;
+          size_t offset = gridsize * levelID;
 
-	  pstreamReadRecord(streamID2, vardata2[dayoy][varID]+offset, &nmiss);
-	  varnmiss2[dayoy][varID][levelID] = nmiss;
-	}
+          pstreamReadRecord(streamID2, vardata2[dayoy][varID] + offset, &nmiss);
+          varnmiss2[dayoy][varID][levelID] = nmiss;
+        }
 
       tsID++;
     }
 
-
   tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       int vdate = taxisInqVdate(taxisID1);
 
       cdiDecodeDate(vdate, &year, &month, &day);
-      
-      int dayoy = 0;
-      if ( month >= 1 && month <= 12 ) dayoy = (month-1)*31 + day;
 
-      if ( dayoy < 0 || dayoy >= MAX_DOY )
-	cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
+      int dayoy = 0;
+      if (month >= 1 && month <= 12) dayoy = (month - 1) * 31 + day;
+
+      if (dayoy < 0 || dayoy >= MAX_DOY)
+        cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
       taxisCopyTimestep(taxisID3, taxisID1);
 
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = nmiss;
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          size_t offset   = gridsize*levelID;
-	  if ( vardata2[dayoy] == NULL ) cdoAbort("Day of year %d not found (date=%d)!", dayoy, vdate);
-	  arrayCopy(gridsize, vardata2[dayoy][varID]+offset, field2.ptr);
-	  field2.nmiss = varnmiss2[dayoy][varID][levelID];
+          size_t offset = gridsize * levelID;
+          if (vardata2[dayoy] == NULL)
+            cdoAbort("Day of year %d not found (date=%d)!", dayoy, vdate);
+          arrayCopy(gridsize, vardata2[dayoy][varID] + offset, field2.ptr);
+          field2.nmiss = varnmiss2[dayoy][varID][levelID];
 
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
-	  field2.missval = vlistInqVarMissval(vlistID2, varID);
+          field2.grid = vlistInqVarGrid(vlistID2, varID);
+          field2.missval = vlistInqVarMissval(vlistID2, varID);
 
-	  farfun(&field1, field2, operfunc);
+          farfun(&field1, field2, operfunc);
 
           nmiss = field1.nmiss;
-	  pstreamDefRecord(streamID3, varID, levelID);
-	  pstreamWriteRecord(streamID3, field1.ptr, nmiss);
-	}
+          pstreamDefRecord(streamID3, varID, levelID);
+          pstreamWriteRecord(streamID3, field1.ptr, nmiss);
+        }
       tsID++;
     }
 
@@ -169,21 +172,21 @@ void *Ydayarith(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-    if ( vardata2[dayoy] )
+  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
+    if (vardata2[dayoy])
       {
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    Free(vardata2[dayoy][varID]);
-	    Free(varnmiss2[dayoy][varID]);
-	  }
+        for (varID = 0; varID < nvars; varID++)
+          {
+            Free(vardata2[dayoy][varID]);
+            Free(varnmiss2[dayoy][varID]);
+          }
 
         Free(vardata2[dayoy]);
         Free(varnmiss2[dayoy]);
       }
 
-  if ( field1.ptr ) Free(field1.ptr);
-  if ( field2.ptr ) Free(field2.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field2.ptr) Free(field2.ptr);
 
   cdoFinish();
 

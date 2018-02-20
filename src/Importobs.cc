@@ -15,26 +15,24 @@
   GNU General Public License for more details.
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "grid.h"
 
+#define MAX_VARS 6
 
-#define  MAX_VARS   6
-
-
-static
-void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
+static void
+init_vars(int vlistID, int gridID, int zaxisID, int nvars)
 {
-  int  code[]  = {11, 17, 33, 34, 1, 2/*, 3*/};
-  const char *name[]  = {"temp", "depoint", "u", "v", "height", "pressure" /*, "station"*/};
-  const char *units[] = {"Celsius", "", "m/s", "m/s", "m", "hPa" /*, ""*/};
+  int code[] = { 11, 17, 33, 34, 1, 2 /*, 3*/ };
+  const char *name[]
+      = { "temp", "depoint", "u", "v", "height", "pressure" /*, "station"*/ };
+  const char *units[] = { "Celsius", "", "m/s", "m/s", "m", "hPa" /*, ""*/ };
   int varID;
 
-  for ( int i = 0; i < nvars; ++i )
+  for (int i = 0; i < nvars; ++i)
     {
       varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARYING);
       vlistDefVarParam(vlistID, varID, cdiEncodeParam(code[i], 255, 255));
@@ -44,42 +42,44 @@ void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
     }
 }
 
-static
-void init_data(int vlistID, int nvars, double *data[])
+static void
+init_data(int vlistID, int nvars, double *data[])
 {
-  for ( int varID = 0; varID < nvars; ++varID )
+  for (int varID = 0; varID < nvars; ++varID)
     {
       size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      double missval  = vlistInqVarMissval(vlistID, varID);
-      
-      for ( size_t i = 0; i < gridsize; ++i ) data[varID][i] = missval;
-    } 
+      double missval = vlistInqVarMissval(vlistID, varID);
+
+      for (size_t i = 0; i < gridsize; ++i)
+        data[varID][i] = missval;
+    }
 }
 
-static
-void write_data(int streamID, int vlistID, int nvars, double *data[])
+static void
+write_data(int streamID, int vlistID, int nvars, double *data[])
 {
-  for ( int varID = 0; varID < nvars; ++varID )
+  for (int varID = 0; varID < nvars; ++varID)
     {
       size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      double missval  = vlistInqVarMissval(vlistID, varID);
+      double missval = vlistInqVarMissval(vlistID, varID);
       size_t nmiss = arrayNumMV(gridsize, data[varID], missval);
       pstreamDefRecord(streamID, varID, 0);
       pstreamWriteRecord(streamID, data[varID], nmiss);
     }
 }
 
-static
-int getDate(const char *name)
+static int
+getDate(const char *name)
 {
-  char *pname = (char *)strchr(name, '_');
-  int date = pname ? atoi(pname+1) : 0;
+  char *pname = (char *) strchr(name, '_');
+  int date = pname ? atoi(pname + 1) : 0;
   return date;
 }
 
-#define  MAX_LINE_LEN  4096
+#define MAX_LINE_LEN 4096
 
-void *Importobs(void *process)
+void *
+Importobs(void *process)
 {
   char line[MAX_LINE_LEN];
   int i, j;
@@ -96,15 +96,15 @@ void *Importobs(void *process)
 
   cdoInitialize(process);
 
-  cdoOperatorAdd("import_obs",     0, 0, "grid description file or name");
+  cdoOperatorAdd("import_obs", 0, 0, "grid description file or name");
 
   int operatorID = cdoOperatorID();
 
-  operatorInputArg(cdoOperatorEnter(operatorID));  
+  operatorInputArg(cdoOperatorEnter(operatorID));
 
   int gridID = cdoDefineGrid(operatorArgv()[0]);
 
-  if ( gridInqType(gridID) != GRID_LONLAT ) 
+  if (gridInqType(gridID) != GRID_LONLAT)
     cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID)));
 
   size_t gridsize = gridInqSize(gridID);
@@ -113,8 +113,8 @@ void *Importobs(void *process)
 
   // printf("gridsize=%d, xsize=%d, ysize=%d\n", gridsize, xsize, ysize);
 
-  double *xvals = (double*) Malloc(gridsize*sizeof(double));
-  double *yvals = (double*) Malloc(gridsize*sizeof(double));
+  double *xvals = (double *) Malloc(gridsize * sizeof(double));
+  double *yvals = (double *) Malloc(gridsize * sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -129,10 +129,14 @@ void *Importobs(void *process)
   }
 
   FILE *fp = fopen(cdoGetStreamName(0).c_str(), "r");
-  if ( fp == NULL ) { perror(cdoGetStreamName(0).c_str()); exit(EXIT_FAILURE); }
+  if (fp == NULL)
+    {
+      perror(cdoGetStreamName(0).c_str());
+      exit(EXIT_FAILURE);
+    }
 
   int vdate = getDate(cdoGetStreamName(0).c_str());
-  if ( vdate <= 999999 ) vdate = vdate*100 + 1;
+  if (vdate <= 999999) vdate = vdate * 100 + 1;
 
   int streamID = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -143,7 +147,8 @@ void *Importobs(void *process)
   int vlistID = vlistCreate();
   vlistDefTaxis(vlistID, taxisID);
 
-  for ( i = 0; i < nvars; ++i ) data[i] = (double*) Malloc(gridsize*sizeof(double));
+  for (i = 0; i < nvars; ++i)
+    data[i] = (double *) Malloc(gridsize * sizeof(double));
 
   init_vars(vlistID, gridID, zaxisID, nvars);
 
@@ -151,77 +156,82 @@ void *Importobs(void *process)
 
   int vdate0 = 0;
   int vtime0 = 0;
-  //ntime = 0;
+  // ntime = 0;
   int tsID = 0;
-  while ( readline(fp, line, MAX_LINE_LEN) )
+  while (readline(fp, line, MAX_LINE_LEN))
     {
-      sscanf(line, "%s %s %s %g %g %g %d %g %g %g", 
-             dummy, station, datetime, &lat, &lon, &height1, &code, &pressure, &height2, &value);
+      sscanf(line, "%s %s %s %g %g %g %d %g %g %g", dummy, station, datetime,
+             &lat, &lon, &height1, &code, &pressure, &height2, &value);
       sscanf(datetime, "%d_%d", &vdate, &vtime);
 
-      if ( vdate != vdate0 || vtime != vtime0 )
+      if (vdate != vdate0 || vtime != vtime0)
         {
-          if ( tsID > 0 ) write_data(streamID, vlistID, nvars, data);
+          if (tsID > 0) write_data(streamID, vlistID, nvars, data);
 
           vdate0 = vdate;
           vtime0 = vtime;
           /*
-            printf("%s %d %d %g %g %g %d %g %g %g\n", 
-            station, vdate, vtime, lat, lon, height1, code, pressure, height2, value);	    
+            printf("%s %d %d %g %g %g %d %g %g %g\n",
+            station, vdate, vtime, lat, lon, height1, code, pressure, height2,
+            value);
           */
           taxisDefVdate(taxisID, vdate);
           taxisDefVtime(taxisID, vtime);
           pstreamDefTimestep(streamID, tsID);
-      
+
           init_data(vlistID, nvars, data);
 
           tsID++;
         }
 
-      if ( lon < lonmin ) lonmin = lon;
-      if ( lon > lonmax ) lonmax = lon;
-      if ( lat < latmin ) latmin = lat;
-      if ( lat > latmax ) latmax = lat;
+      if (lon < lonmin) lonmin = lon;
+      if (lon > lonmax) lonmax = lon;
+      if (lat < latmin) latmin = lat;
+      if (lat > latmax) latmax = lat;
 
-      dy =  yvals[1] - yvals[0];
-      for ( j = 0; j < ysize; ++j )
-        if ( lat >= (yvals[j]-dy/2) && lat < (yvals[j]+dy/2) )  break;
+      dy = yvals[1] - yvals[0];
+      for (j = 0; j < ysize; ++j)
+        if (lat >= (yvals[j] - dy / 2) && lat < (yvals[j] + dy / 2)) break;
 
-      dx =  xvals[1] - xvals[0];
-      if ( lon < (xvals[0] - dx/2) && lon < 0 ) lon+=360;
-      for ( i = 0; i < xsize; ++i )
-        if ( lon >= (xvals[i]-dx/2) && lon < (xvals[i]+dx/2) )  break;
-	  
+      dx = xvals[1] - xvals[0];
+      if (lon < (xvals[0] - dx / 2) && lon < 0) lon += 360;
+      for (i = 0; i < xsize; ++i)
+        if (lon >= (xvals[i] - dx / 2) && lon < (xvals[i] + dx / 2)) break;
+
       index = -1;
-      if ( code == 11 ) index = 0;
-      if ( code == 17 ) index = 1;
-      if ( code == 33 ) index = 2;
-      if ( code == 34 ) index = 3;
+      if (code == 11) index = 0;
+      if (code == 17) index = 1;
+      if (code == 33) index = 2;
+      if (code == 34) index = 3;
 
-      //printf("%d %d %d %g %g %g %g\n", i, j, index, dx, dy, lon, lat);
-      if ( i < xsize && j < ysize && index >= 0 )
+      // printf("%d %d %d %g %g %g %g\n", i, j, index, dx, dy, lon, lat);
+      if (i < xsize && j < ysize && index >= 0)
         {
           pstation = station;
-          while (isalpha(*pstation)) pstation++;
+          while (isalpha(*pstation))
+            pstation++;
           // printf("station %s %d\n", pstation, atoi(pstation));
-          data[index][j*xsize+i] = value;
-          data[    4][j*xsize+i] = height1;
-          data[    5][j*xsize+i] = pressure;
+          data[index][j * xsize + i] = value;
+          data[4][j * xsize + i] = height1;
+          data[5][j * xsize + i] = pressure;
           // data[    6][j*xsize+i] = atoi(pstation);
         }
 
       /*
-        printf("%s %d %d %g %g %g %d %g %g %g\n", 
-        station, vdate, vtime, lat, lon, height1, code, pressure, height2, value);
+        printf("%s %d %d %g %g %g %d %g %g %g\n",
+        station, vdate, vtime, lat, lon, height1, code, pressure, height2,
+        value);
       */
     }
 
   write_data(streamID, vlistID, nvars, data);
 
-  for ( i = 0; i < nvars; ++i ) Free(data[i]);
+  for (i = 0; i < nvars; ++i)
+    Free(data[i]);
 
-  if ( cdoVerbose )
-    printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax, latmin, latmax);
+  if (cdoVerbose)
+    printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax,
+           latmin, latmax);
 
   processDefVarNum(vlistNvars(vlistID));
 

@@ -24,7 +24,7 @@
 #include "remap.h"
 #include "timer.h"
 
-#ifdef  HAVE_LIBYAC
+#ifdef HAVE_LIBYAC
 extern "C" {
 #include "points.h"
 #include "grid_reg2d.h"
@@ -36,32 +36,38 @@ extern "C" {
 }
 #endif
 
-int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort, timer_yar_remap_con, timer_yar_remap_bil;
+int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort,
+    timer_yar_remap_con, timer_yar_remap_bil;
 
-
-void yar_remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts, 
-	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array)
+void
+yar_remap(double *restrict dst_array, double missval, long dst_size,
+          long num_links, double *restrict map_wts, long num_wts,
+          const int *restrict dst_add, const int *restrict src_add,
+          const double *restrict src_array)
 {
   long n;
 
-  for ( n = 0; n < dst_size; ++n ) dst_array[n] = missval;
+  for (n = 0; n < dst_size; ++n)
+    dst_array[n] = missval;
 
-  for ( n = 0; n < num_links; ++n ) dst_array[dst_add[n]] = 0;
+  for (n = 0; n < num_links; ++n)
+    dst_array[dst_add[n]] = 0;
 
-  for ( n = 0; n < num_links; ++n )
+  for (n = 0; n < num_links; ++n)
     {
-      
-      //printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[n]);
-      
-      //dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
-      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[n];
+
+      // printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n],
+      // n, map_wts[n]);
+
+      // dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
+      dst_array[dst_add[n]] += src_array[src_add[n]] * map_wts[n];
     }
-  //for ( n = 0; n < 10; ++n ) printf("array1 %d %g\n", n, src_array[n]);
-  //for ( n = 0; n < 10; ++n ) printf("array2 %d %g\n", n, dst_array[n]);
+  // for ( n = 0; n < 10; ++n ) printf("array1 %d %g\n", n, src_array[n]);
+  // for ( n = 0; n < 10; ++n ) printf("array2 %d %g\n", n, dst_array[n]);
 }
 
-
-void yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
+void
+yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
 {
   /*
     Input variables:
@@ -74,17 +80,17 @@ void yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
 
   /*  If the weight is ZERO, do not bother storing the link */
 
-  if ( IS_EQUAL(weight, 0) ) return;
+  if (IS_EQUAL(weight, 0)) return;
 
   /*
-     If the link does not yet exist, increment number of links and 
-     check to see if remap arrays need to be increased to accomodate 
+     If the link does not yet exist, increment number of links and
+     check to see if remap arrays need to be increased to accomodate
      the new link. Then store the link.
   */
   nlink = rv->num_links;
 
   rv->num_links++;
-  if ( rv->num_links >= rv->max_links )
+  if (rv->num_links >= rv->max_links)
     resize_remap_vars(rv, rv->resize_increment);
 
   rv->src_cell_add[nlink] = add1;
@@ -93,23 +99,25 @@ void yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
   rv->wts[nlink] = weight;
 }
 
+void
+set_source_data(double *source_data, double init_value, unsigned size_x,
+                unsigned size_y)
+{
 
-void set_source_data(double * source_data, double init_value,
-                     unsigned size_x, unsigned size_y) {
-
-   for (unsigned i = 0; i < size_x; ++i)
-      for (unsigned j = 0; j < size_y; ++j)
-         source_data[i + j * size_x] = init_value;
+  for (unsigned i = 0; i < size_x; ++i)
+    for (unsigned j = 0; j < size_y; ++j)
+      source_data[i + j * size_x] = init_value;
 }
 
-
 /*
-  This routine stores the address and weight for four links associated with one destination
-  point in the appropriate address and weight arrays and resizes those arrays if necessary.
+  This routine stores the address and weight for four links associated with one
+  destination point in the appropriate address and weight arrays and resizes
+  those arrays if necessary.
 */
-#ifdef  HAVE_LIBYAC
-static
-void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weights[4])
+#ifdef HAVE_LIBYAC
+static void
+store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4],
+                 double weights[4])
 {
   /*
     Input variables:
@@ -125,99 +133,122 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weigh
   */
   rv->num_links += 4;
 
-  if ( rv->num_links >= rv->max_links ) 
+  if (rv->num_links >= rv->max_links)
     resize_remap_vars(rv, rv->resize_increment);
 
-  for ( long n = 0; n < 4; ++n )
+  for (long n = 0; n < 4; ++n)
     {
-      rv->src_cell_add[nlink+n] = src_add[n];
-      rv->tgt_cell_add[nlink+n] = dst_add;
-      rv->wts         [nlink+n] = weights[n];
+      rv->src_cell_add[nlink + n] = src_add[n];
+      rv->tgt_cell_add[nlink + n] = dst_add;
+      rv->wts[nlink + n] = weights[n];
     }
 
 } /* store_link_bilin */
 #endif
 
-void yar_remap_bil(field_type *field1, field_type *field2)
+void
+yar_remap_bil(field_type *field1, field_type *field2)
 {
   double dxIn, dxOut;
   remapType remap;
   /* static int index = 0; */
 
-  int gridIDin  = field1->grid;
+  int gridIDin = field1->grid;
   int gridIDout = field2->grid;
 
-  if ( ! (gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)) )
+  if (!(gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)))
     cdoAbort("Source grid has no values");
 
   remap.src_grid.num_srch_bins = 0;
   remap.tgt_grid.num_srch_bins = 0;
   remap.vars.pinit = false;
 
-  if ( cdoTimer ) timer_start(timer_yar_remap_init);
-  remap_grids_init(RemapType::BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remap_vars_init(RemapType::BILINEAR, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
-  if ( cdoTimer ) timer_stop(timer_yar_remap_init);
+  if (cdoTimer) timer_start(timer_yar_remap_init);
+  remap_grids_init(RemapType::BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout,
+                   &remap.tgt_grid);
+  remap_vars_init(RemapType::BILINEAR, remap.src_grid.size, remap.tgt_grid.size,
+                  &remap.vars);
+  if (cdoTimer) timer_stop(timer_yar_remap_init);
 
-
-  if ( cdoTimer ) timer_start(timer_yar_remap_init);
+  if (cdoTimer) timer_start(timer_yar_remap_init);
   int nlonIn = gridInqXsize(gridIDin);
   int nlatIn = gridInqYsize(gridIDin);
   // size_t gridsize1 = gridInqSize(gridIDin);
-  double *lonIn = (double*) Malloc(nlonIn*sizeof(double));
-  double *latIn = (double*) Malloc(nlatIn*sizeof(double));
+  double *lonIn = (double *) Malloc(nlonIn * sizeof(double));
+  double *latIn = (double *) Malloc(nlatIn * sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
-  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= DEG2RAD;
-  for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlonIn; ++i)
+    lonIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlatIn; ++i)
+    latIn[i] *= DEG2RAD;
 
-  double *xlonIn = (double*) Malloc((nlonIn+1)*sizeof(double));
-  double *xlatIn = (double*) Malloc((nlatIn+1)*sizeof(double));
+  double *xlonIn = (double *) Malloc((nlonIn + 1) * sizeof(double));
+  double *xlatIn = (double *) Malloc((nlatIn + 1) * sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = xlonIn[1] - xlonIn[0];
-  for ( int i = 0; i < nlonIn; ++i ) xlonIn[i] -= dxIn/2;
-  for ( int i = 0; i < nlatIn; ++i ) xlatIn[i] -= dxIn/2;
-  for ( int i = 0; i < nlonIn; ++i ) xlonIn[i] *= DEG2RAD;
-  for ( int i = 0; i < nlatIn; ++i ) xlatIn[i] *= DEG2RAD;
-  xlonIn[nlonIn] = xlonIn[nlonIn-1]+dxIn*DEG2RAD;
+  for (int i = 0; i < nlonIn; ++i)
+    xlonIn[i] -= dxIn / 2;
+  for (int i = 0; i < nlatIn; ++i)
+    xlatIn[i] -= dxIn / 2;
+  for (int i = 0; i < nlonIn; ++i)
+    xlonIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlatIn; ++i)
+    xlatIn[i] *= DEG2RAD;
+  xlonIn[nlonIn] = xlonIn[nlonIn - 1] + dxIn * DEG2RAD;
   xlatIn[nlatIn] = -xlatIn[0];
- 
-  if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
+
+  if (!(gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)))
     cdoAbort("Target grid has no values");
 
   int nlonOut = gridInqXsize(gridIDout);
   int nlatOut = gridInqYsize(gridIDout);
   // size_t gridsize2 = gridInqSize(gridIDout);
-  double *lonOut = (double*) Malloc(nlonOut*sizeof(double));
-  double *latOut = (double*) Malloc(nlatOut*sizeof(double));
+  double *lonOut = (double *) Malloc(nlonOut * sizeof(double));
+  double *latOut = (double *) Malloc(nlatOut * sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
-  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= DEG2RAD;
-  for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlonOut; ++i)
+    lonOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlatOut; ++i)
+    latOut[i] *= DEG2RAD;
 
-  double *xlonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
-  double *xlatOut = (double*) Malloc((nlatOut+1)*sizeof(double));
+  double *xlonOut = (double *) Malloc((nlonOut + 1) * sizeof(double));
+  double *xlatOut = (double *) Malloc((nlatOut + 1) * sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = xlonOut[1] - xlonOut[0];
-  for ( int i = 0; i < nlonOut; ++i ) xlonOut[i] -= dxOut/2;
-  for ( int i = 0; i < nlatOut; ++i ) xlatOut[i] -= dxOut/2;
-  for ( int i = 0; i < nlonOut; ++i ) xlonOut[i] *= DEG2RAD;
-  for ( int i = 0; i < nlatOut; ++i ) xlatOut[i] *= DEG2RAD;
-  xlonOut[nlonOut] = xlonOut[nlonOut-1]+dxOut*DEG2RAD;
+  for (int i = 0; i < nlonOut; ++i)
+    xlonOut[i] -= dxOut / 2;
+  for (int i = 0; i < nlatOut; ++i)
+    xlatOut[i] -= dxOut / 2;
+  for (int i = 0; i < nlonOut; ++i)
+    xlonOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlatOut; ++i)
+    xlatOut[i] *= DEG2RAD;
+  xlonOut[nlonOut] = xlonOut[nlonOut - 1] + dxOut * DEG2RAD;
   xlatOut[nlatOut] = xlatOut[0];
 
   printf("source grid: inc = %g  nlon = %d  nlat = %d\n", dxIn, nlonIn, nlatIn);
-  printf("target grid: inc = %g  nlon = %d  nlat = %d\n", dxOut, nlonOut, nlatOut);
+  printf("target grid: inc = %g  nlon = %d  nlat = %d\n", dxOut, nlonOut,
+         nlatOut);
 
-  printf("lonIn: %g %g %g ... %g %g\n", lonIn[0]/DEG2RAD, lonIn[1]/DEG2RAD, lonIn[2]/DEG2RAD, lonIn[nlonIn-2]/DEG2RAD, lonIn[nlonIn-1]/DEG2RAD);
-  printf("latIn: %g %g %g ... %g %g\n", latIn[0]/DEG2RAD, latIn[1]/DEG2RAD, latIn[2]/DEG2RAD, latIn[nlatIn-2]/DEG2RAD, latIn[nlatIn-1]/DEG2RAD);
+  printf("lonIn: %g %g %g ... %g %g\n", lonIn[0] / DEG2RAD, lonIn[1] / DEG2RAD,
+         lonIn[2] / DEG2RAD, lonIn[nlonIn - 2] / DEG2RAD,
+         lonIn[nlonIn - 1] / DEG2RAD);
+  printf("latIn: %g %g %g ... %g %g\n", latIn[0] / DEG2RAD, latIn[1] / DEG2RAD,
+         latIn[2] / DEG2RAD, latIn[nlatIn - 2] / DEG2RAD,
+         latIn[nlatIn - 1] / DEG2RAD);
 
-  printf("lonOut: %g %g %g ... %g %g\n", lonOut[0]/DEG2RAD, lonOut[1]/DEG2RAD, lonOut[2]/DEG2RAD, lonOut[nlonOut-2]/DEG2RAD, lonOut[nlonOut-1]/DEG2RAD);
-  printf("latOut: %g %g %g ... %g %g\n", latOut[0]/DEG2RAD, latOut[1]/DEG2RAD, latOut[2]/DEG2RAD, latOut[nlatOut-2]/DEG2RAD, latOut[nlatOut-1]/DEG2RAD);
+  printf("lonOut: %g %g %g ... %g %g\n", lonOut[0] / DEG2RAD,
+         lonOut[1] / DEG2RAD, lonOut[2] / DEG2RAD,
+         lonOut[nlonOut - 2] / DEG2RAD, lonOut[nlonOut - 1] / DEG2RAD);
+  printf("latOut: %g %g %g ... %g %g\n", latOut[0] / DEG2RAD,
+         latOut[1] / DEG2RAD, latOut[2] / DEG2RAD,
+         latOut[nlatOut - 2] / DEG2RAD, latOut[nlatOut - 1] / DEG2RAD);
 
-#ifdef  HAVE_LIBYAC
+#ifdef HAVE_LIBYAC
 
   //--------------------------------------------
   // define a grid
@@ -229,12 +260,12 @@ void yar_remap_bil(field_type *field1, field_type *field2)
   num_target_cells[0] = nlonOut;
   num_target_cells[1] = nlatOut;
 
-  unsigned cyclic[2] = {0,0};
+  unsigned cyclic[2] = { 0, 0 };
   struct grid *source_grid;
 
   source_grid = reg2d_grid_new(xlonIn, xlatIn, num_source_cells, cyclic);
 
-  if ( cdoTimer ) timer_stop(timer_yar_remap_init);
+  if (cdoTimer) timer_stop(timer_yar_remap_init);
 
   struct points source_points;
 
@@ -249,22 +280,24 @@ void yar_remap_bil(field_type *field1, field_type *field2)
 
   struct dep_list deps;
   unsigned search_id;
-  //struct interpolation interpolation;
+  // struct interpolation interpolation;
 
-  printf("src num_grid_corners %d\n", get_num_grid_corners(get_point_grid(&source_points)));
+  printf("src num_grid_corners %d\n",
+         get_num_grid_corners(get_point_grid(&source_points)));
 
   // search_id = search_init(get_point_grid(&source_points));
   struct grid_search *search;
-  unsigned const * curr_src_corners;
+  unsigned const *curr_src_corners;
 
-  if ( cdoTimer ) timer_start(timer_yar_remap_bil);
+  if (cdoTimer) timer_start(timer_yar_remap_bil);
 
   search = bucket_search_new(source_grid);
   /*
   search = sphere_part_search_new(source_grid);
   printf("search %p\n", search);
   printf("search->vtable %p\n", search->vtable);
-  printf("search->vtable->do_point_search_p3 %d\n", search->vtable->do_point_search_p3);
+  printf("search->vtable->do_point_search_p3 %d\n",
+  search->vtable->do_point_search_p3);
   */
   /*
 
@@ -275,7 +308,7 @@ void yar_remap_bil(field_type *field1, field_type *field2)
       printf("num_deps_per_element %d %d\n", i, deps.num_deps_per_element[i]);
       curr_src_corners = get_dependencies_of_element(deps,i);
       for ( int k = 0; k < deps.num_deps_per_element[i]; ++k )
-	printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
+        printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
     }
 
   for ( int i = 0; i < 10; ++i )
@@ -285,20 +318,21 @@ void yar_remap_bil(field_type *field1, field_type *field2)
       printf("num_deps_per_element %d %d\n", i, deps.num_deps_per_element[i]);
       curr_src_corners = get_dependencies_of_element(deps,i);
       for ( int k = 0; k < deps.num_deps_per_element[i]; ++k )
-	printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
+        printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
     }
   */
-  for ( size_t i = 0; i < gridsize2; ++i )
+  for (size_t i = 0; i < gridsize2; ++i)
     {
       double wgts[4];
       double plon;
       double plat;
-      double iguess = 0.5, jguess = 0.5;         /*  current guess for bilinear coordinate  */
+      double iguess = 0.5,
+             jguess = 0.5; /*  current guess for bilinear coordinate  */
       int ix, iy;
       int dst_add = i;
 
-      iy = dst_add/nlonOut;
-      ix = dst_add - iy*nlonOut;
+      iy = dst_add / nlonOut;
+      ix = dst_add - iy * nlonOut;
 
       plon = lonOut[ix];
       plat = latOut[iy];
@@ -306,70 +340,73 @@ void yar_remap_bil(field_type *field1, field_type *field2)
       // do search
       do_point_search_p3(search, &plon, &plat, 1, &deps, &source_points);
 
-      if ( i < 10 ) printf("total_num_dependencies: %d\n", get_total_num_dependencies(deps));
-      //printf("i, ix, iy %d %d %d\n", i, ix, iy);
-      curr_src_corners = get_dependencies_of_element(deps,0);
-      for ( int k = 0; k < deps.num_deps_per_element[i]; ++k )
-	{
-	}
+      if (i < 10)
+        printf("total_num_dependencies: %d\n",
+               get_total_num_dependencies(deps));
+      // printf("i, ix, iy %d %d %d\n", i, ix, iy);
+      curr_src_corners = get_dependencies_of_element(deps, 0);
+      for (int k = 0; k < deps.num_deps_per_element[i]; ++k)
+        {
+        }
 
-      if ( deps.num_deps_per_element[0] == 4 )
-	{
-	  int sa, src_add[4];                /*  address for the four source points     */
-	  double src_lats[4];            /* latitudes  of the four corner points   */
-	  double src_lons[4];            /* longitudes of the four corner points   */
+      if (deps.num_deps_per_element[0] == 4)
+        {
+          int sa, src_add[4]; /*  address for the four source points     */
+          double src_lats[4]; /* latitudes  of the four corner points   */
+          double src_lons[4]; /* longitudes of the four corner points   */
 
-	  for ( int k = 0; k < deps.num_deps_per_element[0]; ++k )
-	    {
-	      sa = curr_src_corners[k];
-	      src_add[k] = sa;
-	      iy = sa/nlonIn;
-	      ix = sa - iy*nlonIn;
-	      src_lats[k] = latIn[iy];
-	      src_lons[k] = lonIn[ix];
-	      if ( i < 3 ) printf("i, k, iy, ix %d %d %d %d\n", i, k, iy, ix);
-	    }
+          for (int k = 0; k < deps.num_deps_per_element[0]; ++k)
+            {
+              sa = curr_src_corners[k];
+              src_add[k] = sa;
+              iy = sa / nlonIn;
+              ix = sa - iy * nlonIn;
+              src_lats[k] = latIn[iy];
+              src_lons[k] = lonIn[ix];
+              if (i < 3) printf("i, k, iy, ix %d %d %d %d\n", i, k, iy, ix);
+            }
 
-	  // try it with do_point_search_p3
-	  if ( find_ij_weights(plon, plat, src_lons, src_lats, &iguess, &jguess) )
-	    {
+          // try it with do_point_search_p3
+          if (find_ij_weights(plon, plat, src_lons, src_lats, &iguess, &jguess))
+            {
 
-	      wgts[0] = (1.-iguess)*(1.-jguess);
-	      wgts[1] = iguess*(1.-jguess);
-	      wgts[2] = iguess*jguess;
-	      wgts[3] = (1.-iguess)*jguess;
+              wgts[0] = (1. - iguess) * (1. - jguess);
+              wgts[1] = iguess * (1. - jguess);
+              wgts[2] = iguess * jguess;
+              wgts[3] = (1. - iguess) * jguess;
 
-#ifdef  _OPENMP
+#ifdef _OPENMP
 #pragma omp critical
 #endif
-	      store_link_bilin(&remap.vars, dst_add, src_add, wgts);
-	    }
-	}
+              store_link_bilin(&remap.vars, dst_add, src_add, wgts);
+            }
+        }
     }
 
-  if ( cdoTimer ) timer_stop(timer_yar_remap_bil);
+  if (cdoTimer) timer_stop(timer_yar_remap_bil);
 
   double *array1 = field1->ptr;
   double *array2 = field2->ptr;
   double missval = field1->missval;
 
-  if ( cdoTimer ) timer_start(timer_yar_remap);
-  yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts,
-	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
-  if ( cdoTimer ) timer_stop(timer_yar_remap);
+  if (cdoTimer) timer_start(timer_yar_remap);
+  yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links,
+            remap.vars.wts, remap.vars.num_wts, remap.vars.tgt_cell_add,
+            remap.vars.src_cell_add, array1);
+  if (cdoTimer) timer_stop(timer_yar_remap);
 
   field2->nmiss = arrayNumMV(gridInqSize(gridIDout), array2, missval);
 
   // if (array) Free(array);
-  //free(lonIn);
-  //free(latIn);
-  //free(lonOut);
-  //free(latOut);
+  // free(lonIn);
+  // free(latIn);
+  // free(lonOut);
+  // free(latOut);
 #endif
 }
 
-
-void yar_remap_con(field_type *field1, field_type *field2)
+void
+yar_remap_con(field_type *field1, field_type *field2)
 {
   int nlonIn, nlatIn;
   int nlonOut, nlatOut;
@@ -382,74 +419,92 @@ void yar_remap_con(field_type *field1, field_type *field2)
   remapType remap;
   /* static int index = 0; */
 
-  gridIDin  = field1->grid;
+  gridIDin = field1->grid;
   gridIDout = field2->grid;
 
-  if ( ! (gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)) )
+  if (!(gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)))
     cdoAbort("Source grid has no values");
 
   remap.src_grid.num_srch_bins = 0;
   remap.tgt_grid.num_srch_bins = 0;
   remap.vars.pinit = false;
 
-  if ( cdoTimer ) timer_start(timer_yar_remap_init);
-  remap_grids_init(RemapType::CONSERV, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remap_vars_init(RemapType::CONSERV, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
-  if ( cdoTimer ) timer_stop(timer_yar_remap_init);
+  if (cdoTimer) timer_start(timer_yar_remap_init);
+  remap_grids_init(RemapType::CONSERV, 0, gridIDin, &remap.src_grid, gridIDout,
+                   &remap.tgt_grid);
+  remap_vars_init(RemapType::CONSERV, remap.src_grid.size, remap.tgt_grid.size,
+                  &remap.vars);
+  if (cdoTimer) timer_stop(timer_yar_remap_init);
 
-
-  if ( cdoTimer ) timer_start(timer_yar_remap_init);
+  if (cdoTimer) timer_start(timer_yar_remap_init);
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
   // size_t gridsize1 = gridInqSize(gridIDin);
-  lonIn = (double*) Malloc((nlonIn+1)*sizeof(double));
-  latIn = (double*) Malloc((nlatIn+1)*sizeof(double));
+  lonIn = (double *) Malloc((nlonIn + 1) * sizeof(double));
+  latIn = (double *) Malloc((nlatIn + 1) * sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
-  xlonIn = (double*) Malloc((nlonIn)*sizeof(double));
-  xlatIn = (double*) Malloc((nlatIn)*sizeof(double));
+  xlonIn = (double *) Malloc((nlonIn) * sizeof(double));
+  xlatIn = (double *) Malloc((nlatIn) * sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = lonIn[1] - lonIn[0];
-  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] -= dxIn/2;
-  for ( int i = 0; i < nlatIn; ++i ) latIn[i] -= dxIn/2;
-  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= DEG2RAD;
-  for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= DEG2RAD;
-  lonIn[nlonIn] = lonIn[nlonIn-1]+dxIn*DEG2RAD;
+  for (int i = 0; i < nlonIn; ++i)
+    lonIn[i] -= dxIn / 2;
+  for (int i = 0; i < nlatIn; ++i)
+    latIn[i] -= dxIn / 2;
+  for (int i = 0; i < nlonIn; ++i)
+    lonIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlatIn; ++i)
+    latIn[i] *= DEG2RAD;
+  lonIn[nlonIn] = lonIn[nlonIn - 1] + dxIn * DEG2RAD;
   latIn[nlatIn] = -latIn[0];
 
-  if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
+  if (!(gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)))
     cdoAbort("Target grid has no values");
 
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
   // size_t gridsize2 = gridInqSize(gridIDout);
-  lonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
-  latOut = (double*) Malloc((nlatOut+1)*sizeof(double));
+  lonOut = (double *) Malloc((nlonOut + 1) * sizeof(double));
+  latOut = (double *) Malloc((nlatOut + 1) * sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
-  xlonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
-  xlatOut = (double*) Malloc((nlatOut+1)*sizeof(double));
+  xlonOut = (double *) Malloc((nlonOut + 1) * sizeof(double));
+  xlatOut = (double *) Malloc((nlatOut + 1) * sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = lonOut[1] - lonOut[0];
-  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] -= dxOut/2;
-  for ( int i = 0; i < nlatOut; ++i ) latOut[i] -= dxOut/2;
-  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= DEG2RAD;
-  for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= DEG2RAD;
-  lonOut[nlonOut] = lonOut[nlonOut-1]+dxOut*DEG2RAD;
+  for (int i = 0; i < nlonOut; ++i)
+    lonOut[i] -= dxOut / 2;
+  for (int i = 0; i < nlatOut; ++i)
+    latOut[i] -= dxOut / 2;
+  for (int i = 0; i < nlonOut; ++i)
+    lonOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlatOut; ++i)
+    latOut[i] *= DEG2RAD;
+  lonOut[nlonOut] = lonOut[nlonOut - 1] + dxOut * DEG2RAD;
   latOut[nlatOut] = latOut[0];
 
   printf("source grid: inc = %g  nlon = %d  nlat = %d\n", dxIn, nlonIn, nlatIn);
-  printf("target grid: inc = %g  nlon = %d  nlat = %d\n", dxOut, nlonOut, nlatOut);
+  printf("target grid: inc = %g  nlon = %d  nlat = %d\n", dxOut, nlonOut,
+         nlatOut);
 
-  printf("lonIn: %g %g %g ... %g %g\n", lonIn[0]/DEG2RAD, lonIn[1]/DEG2RAD, lonIn[2]/DEG2RAD, lonIn[nlonIn-2]/DEG2RAD, lonIn[nlonIn-1]/DEG2RAD);
-  printf("latIn: %g %g %g ... %g %g\n", latIn[0]/DEG2RAD, latIn[1]/DEG2RAD, latIn[2]/DEG2RAD, latIn[nlatIn-2]/DEG2RAD, latIn[nlatIn-1]/DEG2RAD);
+  printf("lonIn: %g %g %g ... %g %g\n", lonIn[0] / DEG2RAD, lonIn[1] / DEG2RAD,
+         lonIn[2] / DEG2RAD, lonIn[nlonIn - 2] / DEG2RAD,
+         lonIn[nlonIn - 1] / DEG2RAD);
+  printf("latIn: %g %g %g ... %g %g\n", latIn[0] / DEG2RAD, latIn[1] / DEG2RAD,
+         latIn[2] / DEG2RAD, latIn[nlatIn - 2] / DEG2RAD,
+         latIn[nlatIn - 1] / DEG2RAD);
 
-  printf("lonOut: %g %g %g ... %g %g\n", lonOut[0]/DEG2RAD, lonOut[1]/DEG2RAD, lonOut[2]/DEG2RAD, lonOut[nlonOut-2]/DEG2RAD, lonOut[nlonOut-1]/DEG2RAD);
-  printf("latOut: %g %g %g ... %g %g\n", latOut[0]/DEG2RAD, latOut[1]/DEG2RAD, latOut[2]/DEG2RAD, latOut[nlatOut-2]/DEG2RAD, latOut[nlatOut-1]/DEG2RAD);
+  printf("lonOut: %g %g %g ... %g %g\n", lonOut[0] / DEG2RAD,
+         lonOut[1] / DEG2RAD, lonOut[2] / DEG2RAD,
+         lonOut[nlonOut - 2] / DEG2RAD, lonOut[nlonOut - 1] / DEG2RAD);
+  printf("latOut: %g %g %g ... %g %g\n", latOut[0] / DEG2RAD,
+         latOut[1] / DEG2RAD, latOut[2] / DEG2RAD,
+         latOut[nlatOut - 2] / DEG2RAD, latOut[nlatOut - 1] / DEG2RAD);
 
-#ifdef  HAVE_LIBYAC
+#ifdef HAVE_LIBYAC
 
   //--------------------------------------------
   // define a grid
@@ -461,13 +516,13 @@ void yar_remap_con(field_type *field1, field_type *field2)
   num_target_cells[0] = nlonOut;
   num_target_cells[1] = nlatOut;
 
-  unsigned cyclic[2] = {1,0};
+  unsigned cyclic[2] = { 1, 0 };
   struct grid *source_grid, *target_grid;
 
   source_grid = reg2d_grid_new(lonIn, latIn, num_source_cells, cyclic);
   target_grid = reg2d_grid_new(lonOut, latOut, num_target_cells, cyclic);
 
-  if ( cdoTimer ) timer_stop(timer_yar_remap_init);
+  if (cdoTimer) timer_stop(timer_yar_remap_init);
 
   struct points source_points, target_points;
 
@@ -483,173 +538,183 @@ void yar_remap_con(field_type *field1, field_type *field2)
 
   struct dep_list deps;
   unsigned search_id;
-  //struct interpolation interpolation;
+  // struct interpolation interpolation;
 
-  // printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_points)));
-  //printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_points)));
+  // printf("src num_grid_corners %d\n",
+  // get_num_grid_corners(*get_point_grid(&source_points)));
+  // printf("tgt num_grid_corners %d\n",
+  // get_num_grid_corners(*get_point_grid(&target_points)));
 
   struct grid_search *search;
 
-  if ( cdoTimer ) timer_start(timer_yar_remap_con);
+  if (cdoTimer) timer_start(timer_yar_remap_con);
 
   search = bucket_search_new(source_grid);
   // search_id = search_init(&source_grid);
- 
-  do_cell_search(search, target_grid, &deps);
 
+  do_cell_search(search, target_grid, &deps);
 
   printf("total_num_dependencies: %d\n", get_total_num_dependencies(deps));
   int num_elements = deps.num_elements;
   printf("dep num elements: %d\n", deps.num_elements);
 
-  enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
+  enum edge_type quad_type[]
+      = { GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE };
 
   int n;
   double weight_sum;
-  double const epsilon = 1.0e-10; // relative precision 
+  double const epsilon = 1.0e-10;  // relative precision
 
   double *weight;
-  weight = (double*) Malloc(gridsize1*sizeof(double));
+  weight = (double *) Malloc(gridsize1 * sizeof(double));
 
   double tgt_area;
   double *area;
-  area = (double*) Malloc(gridsize1*sizeof(double));
+  area = (double *) Malloc(gridsize1 * sizeof(double));
 
   struct grid_cell *SourceCell;
-  SourceCell = (struct grid_cell*) Malloc(gridsize1  * sizeof(struct grid_cell));
+  SourceCell
+      = (struct grid_cell *) Malloc(gridsize1 * sizeof(struct grid_cell));
 
-  for ( int n = 0; n <  gridsize1; n++ ) {
-    SourceCell[n].num_corners   = 4;
-    SourceCell[n].edge_type     = quad_type;
-    SourceCell[n].coordinates_x = (double*) Malloc( 4 * sizeof(double));
-    SourceCell[n].coordinates_y = (double*) Malloc( 4 * sizeof(double));
-  }
+  for (int n = 0; n < gridsize1; n++)
+    {
+      SourceCell[n].num_corners = 4;
+      SourceCell[n].edge_type = quad_type;
+      SourceCell[n].coordinates_x = (double *) Malloc(4 * sizeof(double));
+      SourceCell[n].coordinates_y = (double *) Malloc(4 * sizeof(double));
+    }
 
-  struct grid_cell  TargetCell;
+  struct grid_cell TargetCell;
 
-  TargetCell.num_corners   = 4;
-  TargetCell.edge_type     = quad_type;
+  TargetCell.num_corners = 4;
+  TargetCell.edge_type = quad_type;
 
-  TargetCell.coordinates_x = (double*) Malloc( 4 * sizeof(double));
-  TargetCell.coordinates_y = (double*) Malloc( 4 * sizeof(double));
+  TargetCell.coordinates_x = (double *) Malloc(4 * sizeof(double));
+  TargetCell.coordinates_y = (double *) Malloc(4 * sizeof(double));
 
-  unsigned const * curr_deps;
-  //struct polygons polygons;
+  unsigned const *curr_deps;
+  // struct polygons polygons;
 
-  //polygon_create ( &polygons );
+  // polygon_create ( &polygons );
 
-  for ( int i = 0; i < num_elements; ++i )
+  for (int i = 0; i < num_elements; ++i)
     {
       int index2 = i;
-      int ilat2 = index2/nlonOut;
-      int ilon2 = index2 - ilat2*nlonOut;
+      int ilat2 = index2 / nlonOut;
+      int ilon2 = index2 - ilat2 * nlonOut;
 
-      TargetCell.coordinates_x[0] =  lonOut[ilon2];
-      TargetCell.coordinates_y[0] =  latOut[ilat2];
-      TargetCell.coordinates_x[1] =  lonOut[ilon2+1];
-      TargetCell.coordinates_y[1] =  latOut[ilat2];
-      TargetCell.coordinates_x[2] =  lonOut[ilon2+1];
-      TargetCell.coordinates_y[2] =  latOut[ilat2+1];
-      TargetCell.coordinates_x[3] =  lonOut[ilon2];
-      TargetCell.coordinates_y[3] =  latOut[ilat2+1];
+      TargetCell.coordinates_x[0] = lonOut[ilon2];
+      TargetCell.coordinates_y[0] = latOut[ilat2];
+      TargetCell.coordinates_x[1] = lonOut[ilon2 + 1];
+      TargetCell.coordinates_y[1] = latOut[ilat2];
+      TargetCell.coordinates_x[2] = lonOut[ilon2 + 1];
+      TargetCell.coordinates_y[2] = latOut[ilat2 + 1];
+      TargetCell.coordinates_x[3] = lonOut[ilon2];
+      TargetCell.coordinates_y[3] = latOut[ilat2 + 1];
 
-      if ( cdoVerbose )
-	{
-	  printf("target:\n");
-	  for ( int n = 0; n < 4; ++n )
-	    printf(" %g %g", TargetCell.coordinates_x[n]/DEG2RAD, TargetCell.coordinates_y[n]/DEG2RAD);
-	  printf("\n");
-	}
+      if (cdoVerbose)
+        {
+          printf("target:\n");
+          for (int n = 0; n < 4; ++n)
+            printf(" %g %g", TargetCell.coordinates_x[n] / DEG2RAD,
+                   TargetCell.coordinates_y[n] / DEG2RAD);
+          printf("\n");
+        }
 
-      if ( cdoVerbose )
-	printf("num_deps_per_element %d %d\n", i, deps.num_deps_per_element[i]);
+      if (cdoVerbose)
+        printf("num_deps_per_element %d %d\n", i, deps.num_deps_per_element[i]);
       int num_deps = deps.num_deps_per_element[i];
       int nSourceCells = num_deps;
 
-      if ( num_deps > 0 ) curr_deps = get_dependencies_of_element(deps, i);
-      for ( int k = 0; k < num_deps; ++k )
-	{
-	  int index1 = curr_deps[k];
-	  int ilat1 = index1/nlonIn;
-	  int ilon1 = index1 - ilat1*nlonIn;
-	  if ( cdoVerbose )
-	    printf("  dep: %d %d %d %d %d %d\n", k, nlonOut, nlatOut, index1, ilon1, ilat1);
-	
-	  SourceCell[k].coordinates_x[0] =  lonIn[ilon1];
-	  SourceCell[k].coordinates_y[0] =  latIn[ilat1];
-	  SourceCell[k].coordinates_x[1] =  lonIn[ilon1+1];
-	  SourceCell[k].coordinates_y[1] =  latIn[ilat1];
-	  SourceCell[k].coordinates_x[2] =  lonIn[ilon1+1];
-	  SourceCell[k].coordinates_y[2] =  latIn[ilat1+1];
-	  SourceCell[k].coordinates_x[3] =  lonIn[ilon1];
-	  SourceCell[k].coordinates_y[3] =  latIn[ilat1+1];
-	  if ( cdoVerbose )
-	    {
-	      printf("source: %d\n", k);
-	      for ( int n = 0; n < 4; ++n )
-		printf(" %g %g", SourceCell[k].coordinates_x[n]/DEG2RAD, SourceCell[k].coordinates_y[n]/DEG2RAD);
-	      printf("\n");
-	    }
-	}
+      if (num_deps > 0) curr_deps = get_dependencies_of_element(deps, i);
+      for (int k = 0; k < num_deps; ++k)
+        {
+          int index1 = curr_deps[k];
+          int ilat1 = index1 / nlonIn;
+          int ilon1 = index1 - ilat1 * nlonIn;
+          if (cdoVerbose)
+            printf("  dep: %d %d %d %d %d %d\n", k, nlonOut, nlatOut, index1,
+                   ilon1, ilat1);
+
+          SourceCell[k].coordinates_x[0] = lonIn[ilon1];
+          SourceCell[k].coordinates_y[0] = latIn[ilat1];
+          SourceCell[k].coordinates_x[1] = lonIn[ilon1 + 1];
+          SourceCell[k].coordinates_y[1] = latIn[ilat1];
+          SourceCell[k].coordinates_x[2] = lonIn[ilon1 + 1];
+          SourceCell[k].coordinates_y[2] = latIn[ilat1 + 1];
+          SourceCell[k].coordinates_x[3] = lonIn[ilon1];
+          SourceCell[k].coordinates_y[3] = latIn[ilat1 + 1];
+          if (cdoVerbose)
+            {
+              printf("source: %d\n", k);
+              for (int n = 0; n < 4; ++n)
+                printf(" %g %g", SourceCell[k].coordinates_x[n] / DEG2RAD,
+                       SourceCell[k].coordinates_y[n] / DEG2RAD);
+              printf("\n");
+            }
+        }
       /*
-      polygon_partial_weights(nSourceCells, SourceCell, TargetCell, weight, &polygons);
+      polygon_partial_weights(nSourceCells, SourceCell, TargetCell, weight,
+      &polygons);
 
       correct_weights ( nSourceCells, weight );
       */
-      compute_overlap_areas ( nSourceCells, SourceCell, TargetCell, area);
+      compute_overlap_areas(nSourceCells, SourceCell, TargetCell, area);
 
       // tgt_area = huiliers_area(TargetCell);
       tgt_area = cell_area(TargetCell);
       for (n = 0; n < nSourceCells; ++n)
-	weight[n] = area[n] / tgt_area;
+        weight[n] = area[n] / tgt_area;
       /*
       weight_sum = 0.0;
       for ( n = 0; n < nSourceCells; ++n ) weight_sum += weight[n];
-      
+
       if ( fabs(weight_sum-1.0) > epsilon ) {
-	printf ("test 2.) weight %lf\n", weight_sum );
-	PUT_ERR("test 2.) weight deviates from expected value of 1.0!\n");
+        printf ("test 2.) weight %lf\n", weight_sum );
+        PUT_ERR("test 2.) weight deviates from expected value of 1.0!\n");
       }
       */
-      correct_weights ( nSourceCells, weight );
+      correct_weights(nSourceCells, weight);
       /*
       weight_sum = 0.0;
       for ( n = 0; n < nSourceCells; ++n ) weight_sum += weight[n];
-      
+
       if ( fabs(weight_sum-1.0) > epsilon ) {
-	printf ("test 2.) weight %lf\n", weight_sum );
-	PUT_ERR("test 2.) weight deviates from expected value of 1.0!\n");
+        printf ("test 2.) weight %lf\n", weight_sum );
+        PUT_ERR("test 2.) weight deviates from expected value of 1.0!\n");
       }
       */
-      for ( int k = 0; k < num_deps; ++k )
-	{
-	  int index1 = curr_deps[k];
-	  int ilat1 = index1/nlonIn;
-	  int ilon1 = index1 - ilat1*nlonIn;
-	  long add1, add2;
+      for (int k = 0; k < num_deps; ++k)
+        {
+          int index1 = curr_deps[k];
+          int ilat1 = index1 / nlonIn;
+          int ilon1 = index1 - ilat1 * nlonIn;
+          long add1, add2;
 
-	  add1 = index1;
-	  add2 = index2;
+          add1 = index1;
+          add2 = index2;
 
-	  yar_store_link_cnsrv(&remap.vars, add1, add2, weight[k]);
+          yar_store_link_cnsrv(&remap.vars, add1, add2, weight[k]);
 
-	  if ( cdoVerbose )
-	    printf("  result dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
-	}
+          if (cdoVerbose)
+            printf("  result dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut,
+                   index1, ilon1, ilat1, weight[k]);
+        }
       // correct_weights ( nSourceCells, weight );
     }
 
-  //polygon_destroy ( &polygons );
-  if ( cdoTimer ) timer_stop(timer_yar_remap_con);
+  // polygon_destroy ( &polygons );
+  if (cdoTimer) timer_stop(timer_yar_remap_con);
 
   double *array1 = field1->ptr;
   double *array2 = field2->ptr;
   double missval = field1->missval;
 
-  if ( cdoTimer ) timer_start(timer_yar_remap);
-  yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts,
-	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
-  if ( cdoTimer ) timer_stop(timer_yar_remap);
+  if (cdoTimer) timer_start(timer_yar_remap);
+  yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links,
+            remap.vars.wts, remap.vars.num_wts, remap.vars.tgt_cell_add,
+            remap.vars.src_cell_add, array1);
+  if (cdoTimer) timer_stop(timer_yar_remap);
 
   field2->nmiss = arrayNumMV(gridInqSize(gridIDout), array2, missval);
 
@@ -664,15 +729,15 @@ void yar_remap_con(field_type *field1, field_type *field2)
   Free(weight);
   Free(area);
 
-  //free(lonIn);
-  //free(latIn);
-  //free(lonOut);
-  //free(latOut);
+  // free(lonIn);
+  // free(latIn);
+  // free(lonOut);
+  // free(latOut);
 #endif
 }
 
-
-void *YAR(void *process)
+void *
+YAR(void *process)
 {
   int nrecs;
   int index;
@@ -681,19 +746,19 @@ void *YAR(void *process)
   size_t nmiss;
   double missval;
 
-  if ( cdoTimer )
+  if (cdoTimer)
     {
-      timer_yar_remap        = timer_new("yar remap");
-      timer_yar_remap_init   = timer_new("yar remap init");
-      timer_yar_remap_sort   = timer_new("yar remap sort");
-      timer_yar_remap_con    = timer_new("yar remap con");
-      timer_yar_remap_bil    = timer_new("yar remap bil");
+      timer_yar_remap = timer_new("yar remap");
+      timer_yar_remap_init = timer_new("yar remap init");
+      timer_yar_remap_sort = timer_new("yar remap sort");
+      timer_yar_remap_con = timer_new("yar remap con");
+      timer_yar_remap_bil = timer_new("yar remap bil");
     }
 
   cdoInitialize(process);
 
-  int YARBIL = cdoOperatorAdd("yarbil",  0, 0, NULL);
-  int YARCON = cdoOperatorAdd("yarcon",  0, 0, NULL);
+  int YARBIL = cdoOperatorAdd("yarbil", 0, 0, NULL);
+  int YARCON = cdoOperatorAdd("yarcon", 0, 0, NULL);
 
   int operatorID = cdoOperatorID();
 
@@ -715,12 +780,14 @@ void *YAR(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     {
       gridID1 = vlistGrid(vlistID1, index);
 
-      if ( gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
-	cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
+      if (gridInqType(gridID1) != GRID_LONLAT
+          && gridInqType(gridID1) != GRID_GAUSSIAN)
+        cdoAbort("Interpolation of %s data unsupported!",
+                 gridNamePtr(gridInqType(gridID1)));
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
@@ -730,53 +797,53 @@ void *YAR(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double *) Malloc(gridsize * sizeof(double));
 
   gridsize = gridInqSize(gridID2);
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  gridID1 = vlistInqVarGrid(vlistID1, varID);
-	  missval = vlistInqVarMissval(vlistID1, varID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  field1.grid    = gridID1;
-	  field1.nmiss   = nmiss;
-	  field1.missval = missval;
-	  field1.ptr     = array1;
-	  field2.grid    = gridID2;
-	  field2.ptr     = array2;
-	  field2.nmiss   = 0;
+          gridID1 = vlistInqVarGrid(vlistID1, varID);
+          missval = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( operatorID == YARBIL )
-	    yar_remap_bil(&field1, &field2);
-	  else if ( operatorID == YARCON )
-	    yar_remap_con(&field1, &field2);
-	  else
-	    cdoAbort("Not implemented!");
+          field1.grid = gridID1;
+          field1.nmiss = nmiss;
+          field1.missval = missval;
+          field1.ptr = array1;
+          field2.grid = gridID2;
+          field2.ptr = array2;
+          field2.nmiss = 0;
 
-	  nmiss = field2.nmiss;
+          if (operatorID == YARBIL)
+            yar_remap_bil(&field1, &field2);
+          else if (operatorID == YARCON)
+            yar_remap_con(&field1, &field2);
+          else
+            cdoAbort("Not implemented!");
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, array2, nmiss);
-	}
+          nmiss = field2.nmiss;
+
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, array2, nmiss);
+        }
       tsID++;
     }
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( array2 ) Free(array2);
-  if ( array1 ) Free(array1);
+  if (array2) Free(array2);
+  if (array1) Free(array1);
 
   cdoFinish();
 

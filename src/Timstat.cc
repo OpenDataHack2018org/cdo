@@ -70,18 +70,22 @@
       Yearstat   yearstd1        Yearly standard deviation [Normalize by (n-1)]
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "datetime.h"
 
+enum
+{
+  HOUR_LEN = 4,
+  DAY_LEN = 6,
+  MON_LEN = 8,
+  YEAR_LEN = 10
+};
 
-enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
-
-static
-void timstatAddOperators(void)
+static void
+timstatAddOperators(void)
 {
   // clang-format off
   cdoOperatorAdd("timrange",  func_range, DATE_LEN, NULL);
@@ -166,20 +170,20 @@ void *Timstat(void *argument)
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
   // clang-format on
 
-  if ( operfunc == func_mean )
+  if (operfunc == func_mean)
     {
       int oargc = operatorArgc();
       char **oargv = operatorArgv();
 
-      if ( oargc == 1 )
-	{
-	  lvfrac = true;
-	  vfrac = atof(oargv[0]);
-	  if ( cdoVerbose ) cdoPrint("Set vfrac to %g", vfrac);
-	  if ( vfrac < 0 || vfrac > 1 ) cdoAbort("vfrac out of range!");
-	}
-      else if ( oargc > 1 )
-	cdoAbort("Too many arguments!");
+      if (oargc == 1)
+        {
+          lvfrac = true;
+          vfrac = atof(oargv[0]);
+          if (cdoVerbose) cdoPrint("Set vfrac to %g", vfrac);
+          if (vfrac < 0 || vfrac > 1) cdoAbort("vfrac out of range!");
+        }
+      else if (oargc > 1)
+        cdoAbort("Too many arguments!");
     }
 
   int cmplen = DATE_LEN - comparelen;
@@ -189,26 +193,31 @@ void *Timstat(void *argument)
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
-  if ( cmplen == 0 ) vlistDefNtsteps(vlistID2, 1);
+  if (cmplen == 0) vlistDefNtsteps(vlistID2, 1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   taxisWithBounds(taxisID2);
-  if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
+  if (taxisInqType(taxisID2) == TAXIS_FORECAST)
+    taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int nvars   = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
   const char *freq = NULL;
-  if      ( comparelen == DAY_LEN )  freq = "day";
-  else if ( comparelen == MON_LEN )  freq = "mon";
-  else if ( comparelen == YEAR_LEN ) freq = "year";
-  if ( freq ) cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int)strlen(freq), freq);
+  if (comparelen == DAY_LEN)
+    freq = "day";
+  else if (comparelen == MON_LEN)
+    freq = "mon";
+  else if (comparelen == YEAR_LEN)
+    freq = "year";
+  if (freq)
+    cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int) strlen(freq), freq);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  if ( cdoDiag )
+  if (cdoDiag)
     {
       char filename[8192];
 
@@ -219,14 +228,14 @@ void *Timstat(void *argument)
 
       vlistID3 = vlistDuplicate(vlistID1);
 
-      for ( varID = 0; varID < nvars; ++varID )
-	{
-	  vlistDefVarDatatype(vlistID3, varID, CDI_DATATYPE_INT32);
-	  vlistDefVarMissval(vlistID3, varID, -1);
-	  vlistDefVarUnits(vlistID3, varID, "");
-	  vlistDefVarAddoffset(vlistID3, varID, 0);
-	  vlistDefVarScalefactor(vlistID3, varID, 1);
-	}
+      for (varID = 0; varID < nvars; ++varID)
+        {
+          vlistDefVarDatatype(vlistID3, varID, CDI_DATATYPE_INT32);
+          vlistDefVarMissval(vlistID3, varID, -1);
+          vlistDefVarUnits(vlistID3, varID, "");
+          vlistDefVarAddoffset(vlistID3, varID, 0);
+          vlistDefVarScalefactor(vlistID3, varID, 1);
+        }
 
       taxisID3 = taxisDuplicate(taxisID1);
       taxisWithBounds(taxisID3);
@@ -243,263 +252,277 @@ void *Timstat(void *argument)
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
 
   int FIELD_MEMTYPE = 0;
-  if ( CDO_Memtype == MEMTYPE_FLOAT ) FIELD_MEMTYPE = MEMTYPE_FLOAT;
+  if (CDO_Memtype == MEMTYPE_FLOAT) FIELD_MEMTYPE = MEMTYPE_FLOAT;
 
   field_type field;
   field_init(&field);
   field.memtype = FIELD_MEMTYPE;
-  if ( FIELD_MEMTYPE == MEMTYPE_FLOAT )
-    field.ptrf = (float*) Malloc(gridsizemax*sizeof(float));
+  if (FIELD_MEMTYPE == MEMTYPE_FLOAT)
+    field.ptrf = (float *) Malloc(gridsizemax * sizeof(float));
   else
-    field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
+    field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **vars2 = NULL;
-  if ( lvarstd || lrange ) vars2 = field_malloc(vlistID1, FIELD_PTR);
+  if (lvarstd || lrange) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
-  int tsID  = 0;
+  int tsID = 0;
   int otsID = 0;
-  while ( TRUE )
+  while (TRUE)
     {
       int nsets = 0;
-      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
-	{
-	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-	  int vdate = dtlist_get_vdate(dtlist, nsets);
-	  int vtime = dtlist_get_vtime(dtlist, nsets);
+      while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
+        {
+          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
+          int vdate = dtlist_get_vdate(dtlist, nsets);
+          int vtime = dtlist_get_vtime(dtlist, nsets);
 
-	  if ( nsets == 0 ) SET_DATE(indate2, vdate, vtime);
-	  SET_DATE(indate1, vdate, vtime);
+          if (nsets == 0) SET_DATE(indate2, vdate, vtime);
+          SET_DATE(indate1, vdate, vtime);
 
-	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
+          if (DATE_IS_NEQ(indate1, indate2, cmplen)) break;
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      if ( tsID == 0 )
-		{
-                  recinfo[recID].varID   = varID;
+              if (tsID == 0)
+                {
+                  recinfo[recID].varID = varID;
                   recinfo[recID].levelID = levelID;
-                  recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
-		}
+                  recinfo[recID].lconst
+                      = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+                }
 
               field_type *psamp1 = &samp1[varID][levelID];
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-	      nwpv     = pvars1->nwpv;
-	      size_t gridsize = pvars1->size;
+              nwpv = pvars1->nwpv;
+              size_t gridsize = pvars1->size;
 
-	      if ( nsets == 0 )
-		{
-		  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-		  pvars1->nmiss = nmiss;
-                  if ( lrange )
+              if (nsets == 0)
+                {
+                  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
+                  pvars1->nmiss = nmiss;
+                  if (lrange)
                     {
                       pvars2->nmiss = nmiss;
-		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
+                      for (size_t i = 0; i < nwpv * gridsize; i++)
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
-		  if ( nmiss > 0 || psamp1->ptr )
-		    {
-		      if ( psamp1->ptr == NULL )
-			psamp1->ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+                  if (nmiss > 0 || psamp1->ptr)
+                    {
+                      if (psamp1->ptr == NULL)
+                        psamp1->ptr = (double *) Malloc(nwpv * gridsize
+                                                        * sizeof(double));
 
-		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
-                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
-		    }
-		}
-	      else
-		{
-                  if ( CDO_Memtype == MEMTYPE_FLOAT )
+                      for (size_t i = 0; i < nwpv * gridsize; i++)
+                        psamp1->ptr[i]
+                            = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                    }
+                }
+              else
+                {
+                  if (CDO_Memtype == MEMTYPE_FLOAT)
                     pstreamReadRecordF(streamID1, field.ptrf, &nmiss);
                   else
                     pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = nmiss;
-		  field.size    = gridsize;
-		  field.grid    = pvars1->grid;
-		  field.missval = pvars1->missval;
-		  if ( field.nmiss > 0 || psamp1->ptr )
-		    {
-		      if ( psamp1->ptr == NULL )
-			{
-			  psamp1->ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-			  for ( size_t i = 0; i < nwpv*gridsize; i++ )
-			    psamp1->ptr[i] = nsets;
-			}
+                  field.nmiss = nmiss;
+                  field.size = gridsize;
+                  field.grid = pvars1->grid;
+                  field.missval = pvars1->missval;
+                  if (field.nmiss > 0 || psamp1->ptr)
+                    {
+                      if (psamp1->ptr == NULL)
+                        {
+                          psamp1->ptr = (double *) Malloc(nwpv * gridsize
+                                                          * sizeof(double));
+                          for (size_t i = 0; i < nwpv * gridsize; i++)
+                            psamp1->ptr[i] = nsets;
+                        }
 
-		      for ( size_t i = 0; i < nwpv*gridsize; i++ )
-			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-			  psamp1->ptr[i]++;
-		    }
+                      for (size_t i = 0; i < nwpv * gridsize; i++)
+                        if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
+                          psamp1->ptr[i]++;
+                    }
 
-		  if ( lvarstd )
-		    {
-		      farsumq(pvars2, field);
-		      farsum(pvars1, field);
-		    }
-                  else if ( lrange )
+                  if (lvarstd)
+                    {
+                      farsumq(pvars2, field);
+                      farsum(pvars1, field);
+                    }
+                  else if (lrange)
                     {
                       farmin(pvars2, field);
                       farmax(pvars1, field);
                     }
-		  else
-		    {
-		      farfun(pvars1, field, operfunc);
-		    }
-		}
-	    }
+                  else
+                    {
+                      farfun(pvars1, field, operfunc);
+                    }
+                }
+            }
 
-	  if ( nsets == 0 && lvarstd )
-            for ( int recID = 0; recID < maxrecs; recID++ )
+          if (nsets == 0 && lvarstd)
+            for (int recID = 0; recID < maxrecs; recID++)
               {
-                if ( recinfo[recID].lconst ) continue;
+                if (recinfo[recID].lconst) continue;
 
-                int varID   = recinfo[recID].varID;
+                int varID = recinfo[recID].varID;
                 int levelID = recinfo[recID].levelID;
                 field_type *pvars1 = &vars1[varID][levelID];
                 field_type *pvars2 = &vars2[varID][levelID];
 
                 farmoq(pvars2, *pvars1);
-	      }
+              }
 
-	  vdate0 = vdate;
-	  vtime0 = vtime;
-	  nsets++;
-	  tsID++;
-	}
+          vdate0 = vdate;
+          vtime0 = vtime;
+          nsets++;
+          tsID++;
+        }
 
-      if ( nrecs == 0 && nsets == 0 ) break;
+      if (nrecs == 0 && nsets == 0) break;
 
-      for ( int recID = 0; recID < maxrecs; recID++ )
+      for (int recID = 0; recID < maxrecs; recID++)
         {
-          if ( recinfo[recID].lconst ) continue;
+          if (recinfo[recID].lconst) continue;
 
-          int varID   = recinfo[recID].varID;
+          int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = &samp1[varID][levelID];
           field_type *pvars1 = &vars1[varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-          if ( lmean )
+          if (lmean)
             {
-              if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
-              else               farcdiv(pvars1, (double)nsets);
+              if (psamp1->ptr)
+                fardiv(pvars1, *psamp1);
+              else
+                farcdiv(pvars1, (double) nsets);
             }
-          else if ( lvarstd )
+          else if (lvarstd)
             {
-              if ( psamp1->ptr )
+              if (psamp1->ptr)
                 {
-                  if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
-                  else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                  if (lstd)
+                    farstd(pvars1, *pvars2, *psamp1, divisor);
+                  else
+                    farvar(pvars1, *pvars2, *psamp1, divisor);
                 }
               else
                 {
-                  if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
-                  else        farcvar(pvars1, *pvars2, nsets, divisor);
+                  if (lstd)
+                    farcstd(pvars1, *pvars2, nsets, divisor);
+                  else
+                    farcvar(pvars1, *pvars2, nsets, divisor);
                 }
             }
-          else if ( lrange )
+          else if (lrange)
             {
               farsub(pvars1, *pvars2);
             }
         }
 
-      if ( cdoVerbose )
-	{
-	  char vdatestr[32], vtimestr[32];
-	  date2str(vdate0, vdatestr, sizeof(vdatestr));
-	  time2str(vtime0, vtimestr, sizeof(vtimestr));
-	  cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac, nsets);
-	}
+      if (cdoVerbose)
+        {
+          char vdatestr[32], vtimestr[32];
+          date2str(vdate0, vdatestr, sizeof(vdatestr));
+          time2str(vtime0, vtimestr, sizeof(vtimestr));
+          cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac,
+                   nsets);
+        }
 
-      if ( lvfrac && operfunc == func_mean )
-        for ( int recID = 0; recID < maxrecs; recID++ )
+      if (lvfrac && operfunc == func_mean)
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-            if ( recinfo[recID].lconst ) continue;
+            if (recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[varID][levelID];
             field_type *pvars1 = &vars1[varID][levelID];
 
-            int nwpv     = pvars1->nwpv;
+            int nwpv = pvars1->nwpv;
             size_t gridsize = gridInqSize(pvars1->grid);
             double missval = pvars1->missval;
-            if ( psamp1->ptr )
+            if (psamp1->ptr)
               {
                 int irun = 0;
-                for ( size_t i = 0; i < nwpv*gridsize; ++i )
+                for (size_t i = 0; i < nwpv * gridsize; ++i)
                   {
-                    if ( (psamp1->ptr[i] / nsets) < vfrac )
+                    if ((psamp1->ptr[i] / nsets) < vfrac)
                       {
                         pvars1->ptr[i] = missval;
                         irun++;
                       }
                   }
 
-                if ( irun ) pvars1->nmiss = arrayNumMV(nwpv*gridsize, pvars1->ptr, missval);
-	      }
-	  }
+                if (irun)
+                  pvars1->nmiss
+                      = arrayNumMV(nwpv * gridsize, pvars1->ptr, missval);
+              }
+          }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
       pstreamDefTimestep(streamID2, otsID);
 
-      if ( cdoDiag )
-	{
-	  dtlist_stat_taxisDefTimestep(dtlist, taxisID3, nsets);
-	  pstreamDefTimestep(streamID3, otsID);
-	}
+      if (cdoDiag)
+        {
+          dtlist_stat_taxisDefTimestep(dtlist, taxisID3, nsets);
+          pstreamDefTimestep(streamID3, otsID);
+        }
 
-      for ( int recID = 0; recID < maxrecs; recID++ )
-	{
-          if ( otsID && recinfo[recID].lconst ) continue;
+      for (int recID = 0; recID < maxrecs; recID++)
+        {
+          if (otsID && recinfo[recID].lconst) continue;
 
-          int varID   = recinfo[recID].varID;
+          int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = &samp1[varID][levelID];
           field_type *pvars1 = &vars1[varID][levelID];
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
-          
-	  if ( cdoDiag )
-	    {
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
+
+          if (cdoDiag)
+            {
               double *sampptr = field.ptr;
-	      if ( psamp1->ptr ) sampptr = psamp1->ptr;
+              if (psamp1->ptr)
+                sampptr = psamp1->ptr;
               else
                 {
                   size_t gridsize = pvars1->size;
-                  for ( size_t i = 0; i < gridsize; ++i ) sampptr[i] = nsets;
+                  for (size_t i = 0; i < gridsize; ++i)
+                    sampptr[i] = nsets;
                 }
 
               pstreamDefRecord(streamID3, varID, levelID);
               pstreamWriteRecord(streamID3, sampptr, 0);
-	    }
-	}
+            }
+        }
 
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
       otsID++;
     }
 
-
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
-  if ( lvarstd || lrange ) field_free(vars2, vlistID1);
+  if (lvarstd || lrange) field_free(vars2, vlistID1);
 
   dtlist_delete(dtlist);
 
-  if ( cdoDiag ) pstreamClose(streamID3);
+  if (cdoDiag) pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
   cdoFinish();
 

@@ -26,28 +26,25 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
+typedef struct
+{
+  int levelID;
+  size_t nmiss;
+  double level;
+} levinfo_t;
 
 typedef struct
 {
-  int        levelID;
-  size_t     nmiss;
-  double     level;
-}
-levinfo_t;
-
-typedef struct
-{
-  int        varID;
-  int        nlevs;
-  int        code;
-  char       param[CDI_MAX_NAME];
-  char       name[CDI_MAX_NAME];
+  int varID;
+  int nlevs;
+  int code;
+  char param[CDI_MAX_NAME];
+  char name[CDI_MAX_NAME];
   levinfo_t *levInfo;
-}
-varinfo_t;
+} varinfo_t;
 
-static
-int cmpvarcode(const void *s1, const void *s2)
+static int
+cmpvarcode(const void *s1, const void *s2)
 {
   const varinfo_t *x = (const varinfo_t *) s1;
   const varinfo_t *y = (const varinfo_t *) s2;
@@ -55,14 +52,16 @@ int cmpvarcode(const void *s1, const void *s2)
   /*
   printf("%d %d  %d %d\n", x->code, y->code, x, y);
   */
-  if      ( x->code < y->code ) cmp = -1;
-  else if ( x->code > y->code ) cmp =  1;
+  if (x->code < y->code)
+    cmp = -1;
+  else if (x->code > y->code)
+    cmp = 1;
 
   return cmp;
 }
 
-static
-int cmpvarparam(const void *s1, const void *s2)
+static int
+cmpvarparam(const void *s1, const void *s2)
 {
   const varinfo_t *x = (const varinfo_t *) s1;
   const varinfo_t *y = (const varinfo_t *) s2;
@@ -70,8 +69,8 @@ int cmpvarparam(const void *s1, const void *s2)
   return strcmp(x->param, y->param);
 }
 
-static
-int cmpvarname(const void *s1, const void *s2)
+static int
+cmpvarname(const void *s1, const void *s2)
 {
   const varinfo_t *x = (const varinfo_t *) s1;
   const varinfo_t *y = (const varinfo_t *) s2;
@@ -79,73 +78,79 @@ int cmpvarname(const void *s1, const void *s2)
   return strcmp(x->name, y->name);
 }
 
-static
-int cmpvarlevel(const void *s1, const void *s2)
+static int
+cmpvarlevel(const void *s1, const void *s2)
 {
   const levinfo_t *x = (const levinfo_t *) s1;
   const levinfo_t *y = (const levinfo_t *) s2;
   int cmp = 0;
 
-  if      ( x->level < y->level ) cmp = -1;
-  else if ( x->level > y->level ) cmp =  1;
+  if (x->level < y->level)
+    cmp = -1;
+  else if (x->level > y->level)
+    cmp = 1;
 
   return cmp;
 }
 
-static
-int cmpvarlevelrev(const void *s1, const void *s2)
+static int
+cmpvarlevelrev(const void *s1, const void *s2)
 {
   const levinfo_t *x = (const levinfo_t *) s1;
   const levinfo_t *y = (const levinfo_t *) s2;
   int cmp = 0;
 
-  if      ( x->level > y->level ) cmp = -1;
-  else if ( x->level < y->level ) cmp =  1;
+  if (x->level > y->level)
+    cmp = -1;
+  else if (x->level < y->level)
+    cmp = 1;
 
   return cmp;
 }
 
-static
-void setNmiss(int varID, int levelID, int nvars, varinfo_t *varInfo, size_t nmiss)
+static void
+setNmiss(int varID, int levelID, int nvars, varinfo_t *varInfo, size_t nmiss)
 {
   int vindex, lindex;
 
-  for ( vindex = 0; vindex < nvars; vindex++ )
-    if ( varInfo[vindex].varID == varID ) break;
+  for (vindex = 0; vindex < nvars; vindex++)
+    if (varInfo[vindex].varID == varID) break;
 
-  if ( vindex == nvars ) cdoAbort("Internal problem; varID not found!");
+  if (vindex == nvars) cdoAbort("Internal problem; varID not found!");
 
-  int nlevs = varInfo[vindex].nlevs; 
-  for ( lindex = 0; lindex < nlevs; lindex++ )
-    if ( varInfo[vindex].levInfo[lindex].levelID == levelID ) break;
+  int nlevs = varInfo[vindex].nlevs;
+  for (lindex = 0; lindex < nlevs; lindex++)
+    if (varInfo[vindex].levInfo[lindex].levelID == levelID) break;
 
-  if ( lindex == nlevs ) cdoAbort("Internal problem; levelID not found!");
+  if (lindex == nlevs) cdoAbort("Internal problem; levelID not found!");
 
   varInfo[vindex].levInfo[lindex].nmiss = nmiss;
 }
 
-
-void paramToStringLong(int param, char *paramstr, int maxlen)
+void
+paramToStringLong(int param, char *paramstr, int maxlen)
 {
   int len;
 
   int dis, cat, num;
   cdiDecodeParam(param, &num, &cat, &dis);
 
-  size_t umaxlen = maxlen >= 0 ? (unsigned)maxlen : 0U;
-  if ( dis == 255 && (cat == 255 || cat == 0 ) )
+  size_t umaxlen = maxlen >= 0 ? (unsigned) maxlen : 0U;
+  if (dis == 255 && (cat == 255 || cat == 0))
     len = snprintf(paramstr, umaxlen, "%03d", num);
-  else  if ( dis == 255 )
+  else if (dis == 255)
     len = snprintf(paramstr, umaxlen, "%03d.%03d", num, cat);
   else
     len = snprintf(paramstr, umaxlen, "%03d.%03d.%03d", num, cat, dis);
 
-  if ( len >= maxlen || len < 0)
-    fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
+  if (len >= maxlen || len < 0)
+    fprintf(stderr,
+            "Internal problem (%s): size of input string is too small!\n",
+            __func__);
 }
 
-
-void *Sort(void *process)
+void *
+Sort(void *process)
 {
   int varID, levelID, zaxisID;
   int vindex, lindex;
@@ -166,12 +171,12 @@ void *Sort(void *process)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+  if (operatorArgc() > 1) cdoAbort("Too many arguments!");
 
-  if ( operatorID == SORTLEVEL && operatorArgc() == 1 )
+  if (operatorID == SORTLEVEL && operatorArgc() == 1)
     {
       int iarg = parameter2int(operatorArgv()[0]);
-      if ( iarg < 0 ) cmpvarlev = cmpvarlevelrev;
+      if (iarg < 0) cmpvarlev = cmpvarlevelrev;
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -196,111 +201,119 @@ void *Sort(void *process)
 
   int nvars = vlistNvars(vlistID1);
 
-  varinfo_t *varInfo = (varinfo_t*) Malloc(nvars*sizeof(varinfo_t));
-  for ( varID = 0; varID < nvars; ++varID )
+  varinfo_t *varInfo = (varinfo_t *) Malloc(nvars * sizeof(varinfo_t));
+  for (varID = 0; varID < nvars; ++varID)
     {
       nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       varInfo[varID].nlevs = nlevs;
-      varInfo[varID].levInfo = (levinfo_t*) Malloc(nlevs*sizeof(levinfo_t));
+      varInfo[varID].levInfo = (levinfo_t *) Malloc(nlevs * sizeof(levinfo_t));
     }
 
-  double **vardata = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata = (double **) Malloc(nvars * sizeof(double *));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      vardata[varID] = (double*) Malloc(gridsize*nlevs*sizeof(double));
+      nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      vardata[varID] = (double *) Malloc(gridsize * nlevs * sizeof(double));
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( tsID == 0 )
-	    {
-	      varInfo[varID].varID = varID;
-	      varInfo[varID].code  = vlistInqVarCode(vlistID1, varID);
-	      int iparam  = vlistInqVarParam(vlistID1, varID);
-	      paramToStringLong(iparam, varInfo[varID].param, sizeof(varInfo[varID].param));
-	      vlistInqVarName(vlistID1, varID, varInfo[varID].name);
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      varInfo[varID].levInfo[levelID].levelID = levelID;
-	      varInfo[varID].levInfo[levelID].level   = cdoZaxisInqLevel(zaxisID, levelID);
-	    }
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
-	  single   = vardata[varID] + offset;
+          if (tsID == 0)
+            {
+              varInfo[varID].varID = varID;
+              varInfo[varID].code = vlistInqVarCode(vlistID1, varID);
+              int iparam = vlistInqVarParam(vlistID1, varID);
+              paramToStringLong(iparam, varInfo[varID].param,
+                                sizeof(varInfo[varID].param));
+              vlistInqVarName(vlistID1, varID, varInfo[varID].name);
+              zaxisID = vlistInqVarZaxis(vlistID1, varID);
+              varInfo[varID].levInfo[levelID].levelID = levelID;
+              varInfo[varID].levInfo[levelID].level
+                  = cdoZaxisInqLevel(zaxisID, levelID);
+            }
 
-	  pstreamReadRecord(streamID1, single, &nmiss);
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          offset = gridsize * levelID;
+          single = vardata[varID] + offset;
 
-	  setNmiss(varID, levelID, nvars, varInfo, nmiss);
-	  // varInfo[varID].levInfo[levelID].nmiss = nmiss;
-	}
+          pstreamReadRecord(streamID1, single, &nmiss);
 
-      if ( tsID == 0 )
-	{
-	  if ( cdoVerbose )
-	    for ( vindex = 0; vindex < nvars; vindex++ )
-	      {
-		nlevs = varInfo[vindex].nlevs;
-		for ( lindex = 0; lindex < nlevs; ++lindex )
-		  printf("sort in: %d %s %d %d %g\n",
-			 vindex, varInfo[vindex].name, varInfo[vindex].code, varInfo[vindex].nlevs, varInfo[vindex].levInfo[lindex].level);
-	      }
+          setNmiss(varID, levelID, nvars, varInfo, nmiss);
+          // varInfo[varID].levInfo[levelID].nmiss = nmiss;
+        }
 
-	  if      ( operatorID == SORTCODE )
-	    qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarcode);
-	  else if ( operatorID == SORTPARAM )
-	    qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarparam);
-	  else if ( operatorID == SORTNAME )
-	    qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarname);
-	  else if ( operatorID == SORTLEVEL )
-	    {
-	      for ( vindex = 0; vindex < nvars; vindex++ )
-		{
-		  nlevs = varInfo[vindex].nlevs;
-		  qsort(varInfo[vindex].levInfo, nlevs, sizeof(levinfo_t), cmpvarlev);
-		}
-	    }
+      if (tsID == 0)
+        {
+          if (cdoVerbose)
+            for (vindex = 0; vindex < nvars; vindex++)
+              {
+                nlevs = varInfo[vindex].nlevs;
+                for (lindex = 0; lindex < nlevs; ++lindex)
+                  printf("sort in: %d %s %d %d %g\n", vindex,
+                         varInfo[vindex].name, varInfo[vindex].code,
+                         varInfo[vindex].nlevs,
+                         varInfo[vindex].levInfo[lindex].level);
+              }
 
-	  if ( cdoVerbose )
-	    for ( vindex = 0; vindex < nvars; vindex++ )
-	      {
-		nlevs = varInfo[vindex].nlevs;
-		for ( lindex = 0; lindex < nlevs; ++lindex )
-		  printf("sort out: %d %s %d %d %g\n",
-			 vindex, varInfo[vindex].name, varInfo[vindex].code, varInfo[vindex].nlevs, varInfo[vindex].levInfo[lindex].level);
-	      }
-	}
+          if (operatorID == SORTCODE)
+            qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarcode);
+          else if (operatorID == SORTPARAM)
+            qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarparam);
+          else if (operatorID == SORTNAME)
+            qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarname);
+          else if (operatorID == SORTLEVEL)
+            {
+              for (vindex = 0; vindex < nvars; vindex++)
+                {
+                  nlevs = varInfo[vindex].nlevs;
+                  qsort(varInfo[vindex].levInfo, nlevs, sizeof(levinfo_t),
+                        cmpvarlev);
+                }
+            }
 
-      for ( vindex = 0; vindex < nvars; vindex++ )
-	{
-	  varID = varInfo[vindex].varID;
-	  nlevs = varInfo[vindex].nlevs;
-	  for ( lindex = 0; lindex < nlevs; ++lindex )
-	    {
-	      levelID = varInfo[vindex].levInfo[lindex].levelID;
-	      nmiss   = varInfo[vindex].levInfo[lindex].nmiss;
+          if (cdoVerbose)
+            for (vindex = 0; vindex < nvars; vindex++)
+              {
+                nlevs = varInfo[vindex].nlevs;
+                for (lindex = 0; lindex < nlevs; ++lindex)
+                  printf("sort out: %d %s %d %d %g\n", vindex,
+                         varInfo[vindex].name, varInfo[vindex].code,
+                         varInfo[vindex].nlevs,
+                         varInfo[vindex].levInfo[lindex].level);
+              }
+        }
 
-	      if ( tsID == 0 || vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT )
-		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-		  offset   = gridsize*levelID;
-		  single   = vardata[varID] + offset;
+      for (vindex = 0; vindex < nvars; vindex++)
+        {
+          varID = varInfo[vindex].varID;
+          nlevs = varInfo[vindex].nlevs;
+          for (lindex = 0; lindex < nlevs; ++lindex)
+            {
+              levelID = varInfo[vindex].levInfo[lindex].levelID;
+              nmiss = varInfo[vindex].levInfo[lindex].nmiss;
 
-		  pstreamDefRecord(streamID2, varID, levelID);
-		  pstreamWriteRecord(streamID2, single, nmiss);
-		}
-	    }
-	}
+              if (tsID == 0
+                  || vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT)
+                {
+                  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+                  offset = gridsize * levelID;
+                  single = vardata[varID] + offset;
+
+                  pstreamDefRecord(streamID2, varID, levelID);
+                  pstreamWriteRecord(streamID2, single, nmiss);
+                }
+            }
+        }
 
       tsID++;
     }
@@ -308,10 +321,12 @@ void *Sort(void *process)
   pstreamClose(streamID1);
   pstreamClose(streamID2);
 
-  for ( varID = 0; varID < nvars; varID++ ) Free(vardata[varID]);
+  for (varID = 0; varID < nvars; varID++)
+    Free(vardata[varID]);
   Free(vardata);
 
-  for ( vindex = 0; vindex < nvars; vindex++ ) Free(varInfo[vindex].levInfo);
+  for (vindex = 0; vindex < nvars; vindex++)
+    Free(varInfo[vindex].levInfo);
   Free(varInfo);
 
   cdoFinish();

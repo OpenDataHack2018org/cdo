@@ -32,8 +32,8 @@
 #include "specspace.h"
 #include "listarray.h"
 
-
-void *FC(void *process)
+void *
+FC(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -52,10 +52,10 @@ void *FC(void *process)
 
   bool lcopy = UNCHANGED_RECORD;
 
-  int FC2SP  = cdoOperatorAdd("fc2sp",  0, 0, NULL);
-  int SP2FC  = cdoOperatorAdd("sp2fc", 0, 0, NULL);
-  int FC2GP  = cdoOperatorAdd("fc2gp",  0, 0, NULL);
-  int GP2FC  = cdoOperatorAdd("gp2fc", 0, 0, NULL);
+  int FC2SP = cdoOperatorAdd("fc2sp", 0, 0, NULL);
+  int SP2FC = cdoOperatorAdd("sp2fc", 0, 0, NULL);
+  int FC2GP = cdoOperatorAdd("fc2gp", 0, 0, NULL);
+  int GP2FC = cdoOperatorAdd("gp2fc", 0, 0, NULL);
 
   int operatorID = cdoOperatorID();
 
@@ -70,220 +70,222 @@ void *FC(void *process)
 
   int ngrids = vlistNgrids(vlistID1);
   /* find first spectral grid */
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     {
       gridID = vlistGrid(vlistID1, index);
-      if ( gridInqType(gridID) == GRID_SPECTRAL )
-	{
-	  gridIDsp = gridID;
-	  break;
-	}
+      if (gridInqType(gridID) == GRID_SPECTRAL)
+        {
+          gridIDsp = gridID;
+          break;
+        }
     }
   /* find first gaussian grid */
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     {
       gridID = vlistGrid(vlistID1, index);
-      if ( gridInqType(gridID) == GRID_GAUSSIAN )
-	{
-	  gridIDgp = gridID;
-	  break;
-	}
+      if (gridInqType(gridID) == GRID_GAUSSIAN)
+        {
+          gridIDgp = gridID;
+          break;
+        }
     }
   /* find first fourier grid */
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     {
       gridID = vlistGrid(vlistID1, index);
-      if ( gridInqType(gridID) == GRID_FOURIER )
-	{
-	  gridIDfc = gridID;
-	  break;
-	}
+      if (gridInqType(gridID) == GRID_FOURIER)
+        {
+          gridIDfc = gridID;
+          break;
+        }
     }
 
   /* define output grid */
-  if ( operatorID == FC2SP )
+  if (operatorID == FC2SP)
     {
-      if ( gridIDfc == -1 ) cdoWarning("No fourier data found!");
+      if (gridIDfc == -1) cdoWarning("No fourier data found!");
 
       gridID1 = gridIDfc;
 
-      if ( gridID1 != -1 )
-	{
-	  nfc  = gridInqSize(gridID1);
-	  ntr  = gridInqTrunc(gridID1);
-	  nlat = nfc_to_nlat(nfc, ntr);
+      if (gridID1 != -1)
+        {
+          nfc = gridInqSize(gridID1);
+          ntr = gridInqTrunc(gridID1);
+          nlat = nfc_to_nlat(nfc, ntr);
 
-	  if ( gridIDsp != -1 )
-	    if ( ntr != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
+          if (gridIDsp != -1)
+            if (ntr != gridInqTrunc(gridIDsp)) gridIDsp = -1;
 
-	  if ( gridIDsp == -1 )
-	    {
-	      nsp = (ntr+1)*(ntr+2);
-	      gridIDsp = gridCreate(GRID_SPECTRAL, nsp);
-	      gridDefTrunc(gridIDsp, ntr);
-	      gridDefComplexPacking(gridIDsp, 1);
-	    }
+          if (gridIDsp == -1)
+            {
+              nsp = (ntr + 1) * (ntr + 2);
+              gridIDsp = gridCreate(GRID_SPECTRAL, nsp);
+              gridDefTrunc(gridIDsp, ntr);
+              gridDefComplexPacking(gridIDsp, 1);
+            }
 
-	  gridID2 = gridIDsp;
-	  nlon = 2*nlat;
-	  ntr  = gridInqTrunc(gridID2);
+          gridID2 = gridIDsp;
+          nlon = 2 * nlat;
+          ntr = gridInqTrunc(gridID2);
 
-	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
-	}
+          sptrans = sptrans_new(nlon, nlat, ntr, 0);
+        }
     }
-  else if ( operatorID == SP2FC )
-    {   
-      if ( gridIDsp == -1 ) cdoWarning("No spectral data found!");
+  else if (operatorID == SP2FC)
+    {
+      if (gridIDsp == -1) cdoWarning("No spectral data found!");
 
       gridID1 = gridIDsp;
 
-      if ( gridID1 != -1 )
-	{
-	  ntr  = gridInqTrunc(gridID1);
-	  nlat = ntr_to_nlat(ntr);
+      if (gridID1 != -1)
+        {
+          ntr = gridInqTrunc(gridID1);
+          nlat = ntr_to_nlat(ntr);
 
-	  if ( gridIDfc != -1 )
-	    {
-	      if ( ntr != gridInqTrunc(gridIDfc) ) gridIDfc = -1;
-	    }
+          if (gridIDfc != -1)
+            {
+              if (ntr != gridInqTrunc(gridIDfc)) gridIDfc = -1;
+            }
 
-	  if ( gridIDfc == -1 )
-	    {
-	      nfc = 2*nlat*(ntr+1);
+          if (gridIDfc == -1)
+            {
+              nfc = 2 * nlat * (ntr + 1);
               gridIDfc = gridCreate(GRID_FOURIER, nfc);
-	      gridDefTrunc(gridIDfc, ntr);
-	    }
+              gridDefTrunc(gridIDfc, ntr);
+            }
 
-	  gridID2 = gridIDfc;
-	  nlon = 2*nlat;
-      
-	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
-	}
+          gridID2 = gridIDfc;
+          nlon = 2 * nlat;
+
+          sptrans = sptrans_new(nlon, nlat, ntr, 0);
+        }
     }
-  else if ( operatorID == GP2FC )
+  else if (operatorID == GP2FC)
     {
-      if ( gridIDgp == -1 ) cdoWarning("No Gaussian grid data found!");
+      if (gridIDgp == -1) cdoWarning("No Gaussian grid data found!");
 
       gridID1 = gridIDgp;
 
-      if ( gridID1 != -1 )
-	{
-	  nlon = gridInqXsize(gridID1);
-	  nlat = gridInqYsize(gridID1);
-	  ntr  = nlat_to_ntr(nlat);
+      if (gridID1 != -1)
+        {
+          nlon = gridInqXsize(gridID1);
+          nlat = gridInqYsize(gridID1);
+          ntr = nlat_to_ntr(nlat);
 
-	  if ( gridIDfc != -1 )
-	    if ( ntr != gridInqTrunc(gridIDfc) ) gridIDfc = -1;
+          if (gridIDfc != -1)
+            if (ntr != gridInqTrunc(gridIDfc)) gridIDfc = -1;
 
-	  if ( gridIDfc == -1 )
-	    {
-	      nfc = 2*nlat*(ntr+1);
-	      gridIDfc = gridCreate(GRID_FOURIER, nfc);
-	      gridDefTrunc(gridIDfc, ntr);
-	    }
+          if (gridIDfc == -1)
+            {
+              nfc = 2 * nlat * (ntr + 1);
+              gridIDfc = gridCreate(GRID_FOURIER, nfc);
+              gridDefTrunc(gridIDfc, ntr);
+            }
 
-	  gridID2 = gridIDfc;
-	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
- 	}
+          gridID2 = gridIDfc;
+          sptrans = sptrans_new(nlon, nlat, ntr, 0);
+        }
     }
-  else if ( operatorID == FC2GP )
-    {   
-      if ( gridIDfc == -1 ) cdoWarning("No fourier data found!");
+  else if (operatorID == FC2GP)
+    {
+      if (gridIDfc == -1) cdoWarning("No fourier data found!");
 
       gridID1 = gridIDfc;
 
-      if ( gridID1 != -1 )
-	{
-	  nfc  = gridInqSize(gridID1);
-	  ntr  = gridInqTrunc(gridID1);
-	  nlat = nfc_to_nlat(nfc, ntr);
+      if (gridID1 != -1)
+        {
+          nfc = gridInqSize(gridID1);
+          ntr = gridInqTrunc(gridID1);
+          nlat = nfc_to_nlat(nfc, ntr);
 
-	  if ( gridIDgp != -1 )
-	    {
-	      if ( nlat != gridInqYsize(gridIDgp) ) gridIDgp = -1;
-	    }
+          if (gridIDgp != -1)
+            {
+              if (nlat != gridInqYsize(gridIDgp)) gridIDgp = -1;
+            }
 
-	  if ( gridIDgp == -1 )
-	    {
-	      char gridname[20];
-	      snprintf(gridname, sizeof(gridname), "t%dgrid", ntr);
+          if (gridIDgp == -1)
+            {
+              char gridname[20];
+              snprintf(gridname, sizeof(gridname), "t%dgrid", ntr);
 
-	      gridIDgp = grid_from_name(gridname);
-	    }
+              gridIDgp = grid_from_name(gridname);
+            }
 
-	  gridID2 = gridIDgp;
-	  nlon = gridInqXsize(gridID2);
-	  nlat = gridInqYsize(gridID2);
-      
-	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
-	}
+          gridID2 = gridIDgp;
+          nlon = gridInqXsize(gridID2);
+          nlat = gridInqYsize(gridID2);
+
+          sptrans = sptrans_new(nlon, nlat, ntr, 0);
+        }
     }
 
   // printf("nfc %d, ntr %d, nlat %zu, nlon %zu\n", nfc, ntr, nlat, nlon);
 
   int nvars = vlistNvars(vlistID2);
-  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
-  for ( varID = 0; varID < nvars; varID++ )
+  bool *vars = (bool *) Malloc(nvars * sizeof(bool));
+  for (varID = 0; varID < nvars; varID++)
     vars[varID] = gridID1 == vlistInqVarGrid(vlistID1, varID);
 
-  if ( gridID1 != -1 ) vlistChangeGrid(vlistID2, gridID1, gridID2);
+  if (gridID1 != -1) vlistChangeGrid(vlistID2, gridID1, gridID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
-  double *array1 = (double*) Malloc(gridsizemax*sizeof(double));
+  double *array1 = (double *) Malloc(gridsizemax * sizeof(double));
 
-  if ( gridID2 != -1 )
+  if (gridID2 != -1)
     {
       size_t gridsize = gridInqSize(gridID2);
-      array2 = (double*) Malloc(gridsize*sizeof(double));
+      array2 = (double *) Malloc(gridsize * sizeof(double));
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( vars[varID] )
-	    {
-	      pstreamReadRecord(streamID1, array1, &nmiss);
-	      if ( nmiss ) cdoAbort("Missing values unsupported for spectral/fourier data!");
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      gridID1 = vlistInqVarGrid(vlistID1, varID);
-	      if ( operatorID == FC2SP )
-		four2spec(sptrans, gridID1, array1, gridID2, array2);	      
-	      else if ( operatorID == SP2FC )
-		spec2four(sptrans, gridID1, array1, gridID2, array2);
-	      else if ( operatorID == FC2GP )
-		four2grid(sptrans, gridID1, array1, gridID2, array2);	      
-	      else if ( operatorID == GP2FC )
-		grid2four(sptrans, gridID1, array1, gridID2, array2);
+          if (vars[varID])
+            {
+              pstreamReadRecord(streamID1, array1, &nmiss);
+              if (nmiss)
+                cdoAbort(
+                    "Missing values unsupported for spectral/fourier data!");
 
-	      pstreamDefRecord(streamID2, varID, levelID);
-	      pstreamWriteRecord(streamID2, array2, nmiss);  
-	    }   
-	  else
-	    {
-	      pstreamDefRecord(streamID2, varID, levelID);
-	      if ( lcopy )
-		{
-		  pstreamCopyRecord(streamID2, streamID1);
-		}
-	      else
-		{
-		  pstreamReadRecord(streamID1, array1, &nmiss);
-		  pstreamWriteRecord(streamID2, array1, nmiss);
-		}
-	    }    
-	}
+              gridID1 = vlistInqVarGrid(vlistID1, varID);
+              if (operatorID == FC2SP)
+                four2spec(sptrans, gridID1, array1, gridID2, array2);
+              else if (operatorID == SP2FC)
+                spec2four(sptrans, gridID1, array1, gridID2, array2);
+              else if (operatorID == FC2GP)
+                four2grid(sptrans, gridID1, array1, gridID2, array2);
+              else if (operatorID == GP2FC)
+                grid2four(sptrans, gridID1, array1, gridID2, array2);
+
+              pstreamDefRecord(streamID2, varID, levelID);
+              pstreamWriteRecord(streamID2, array2, nmiss);
+            }
+          else
+            {
+              pstreamDefRecord(streamID2, varID, levelID);
+              if (lcopy)
+                {
+                  pstreamCopyRecord(streamID2, streamID1);
+                }
+              else
+                {
+                  pstreamReadRecord(streamID1, array1, &nmiss);
+                  pstreamWriteRecord(streamID2, array1, nmiss);
+                }
+            }
+        }
 
       tsID++;
     }
@@ -291,9 +293,9 @@ void *FC(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( array2 ) Free(array2);
-  if ( array1 ) Free(array1);
-  if ( vars )   Free(vars);
+  if (array2) Free(array2);
+  if (array1) Free(array1);
+  if (vars) Free(vars);
 
   sptrans_delete(sptrans);
 

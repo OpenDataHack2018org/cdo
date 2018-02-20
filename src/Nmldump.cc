@@ -24,75 +24,89 @@
 
 #include "cdo_int.h"
 
-
-static
-void print_values(int nvalues, char **values)
+static void
+print_values(int nvalues, char **values)
 {
   char fltstr[128];
-  if ( nvalues && values )
+  if (nvalues && values)
     {
       int dtype = literals_find_datatype(nvalues, values);
-      for ( int i = 0; i < nvalues; ++i )
+      for (int i = 0; i < nvalues; ++i)
         {
-          if ( i ) printf(", ");
+          if (i) printf(", ");
           switch (dtype)
             {
-            case CDI_DATATYPE_INT8:  printf("%db", literal_to_int(values[i])); break;
-            case CDI_DATATYPE_INT16: printf("%ds", literal_to_int(values[i])); break;
-            case CDI_DATATYPE_INT32: printf("%d",  literal_to_int(values[i])); break;
-            case CDI_DATATYPE_FLT32: printf("%sf", double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr), literal_to_double(values[i]))); break;
-            case CDI_DATATYPE_FLT64: printf("%s",  double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr), literal_to_double(values[i]))); break;
+            case CDI_DATATYPE_INT8:
+              printf("%db", literal_to_int(values[i]));
+              break;
+            case CDI_DATATYPE_INT16:
+              printf("%ds", literal_to_int(values[i]));
+              break;
+            case CDI_DATATYPE_INT32:
+              printf("%d", literal_to_int(values[i]));
+              break;
+            case CDI_DATATYPE_FLT32:
+              printf("%sf",
+                     double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr),
+                                      literal_to_double(values[i])));
+              break;
+            case CDI_DATATYPE_FLT64:
+              printf("%s",
+                     double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr),
+                                      literal_to_double(values[i])));
+              break;
             default: printf("\"%s\"", values[i]);
             }
         }
     }
 }
 
-
-void kvldump(list_t *pmlist)
+void
+kvldump(list_t *pmlist)
 {
-  if ( pmlist )
+  if (pmlist)
     {
-      for ( listNode_t *pmnode = pmlist->head; pmnode; pmnode = pmnode->next )
+      for (listNode_t *pmnode = pmlist->head; pmnode; pmnode = pmnode->next)
         {
-          if ( pmnode->data )
+          if (pmnode->data)
             {
-              list_t *kvlist = *(list_t **)pmnode->data;
-              if ( kvlist )
+              list_t *kvlist = *(list_t **) pmnode->data;
+              if (kvlist)
                 {
                   const char *listname = list_name(kvlist);
-                  if ( listname ) printf("&%s\n", list_name(kvlist));
-                  for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
+                  if (listname) printf("&%s\n", list_name(kvlist));
+                  for (listNode_t *kvnode = kvlist->head; kvnode;
+                       kvnode = kvnode->next)
                     {
-                      keyValues_t *kv = *(keyValues_t **)kvnode->data;
+                      keyValues_t *kv = *(keyValues_t **) kvnode->data;
                       const char *key = kv->key;
-                      if ( listname ) printf("  ");
+                      if (listname) printf("  ");
                       printf("%s = ", key);
                       print_values(kv->nvalues, kv->values);
                       printf("\n");
                     }
-                  if ( listname ) printf("/\n");
+                  if (listname) printf("/\n");
                 }
             }
         }
     }
 }
 
-
-void *Nmldump(void *process)
+void *
+Nmldump(void *process)
 {
   cdoInitialize(process);
 
-  int NMLDUMP = cdoOperatorAdd("nmldump",  0, 0, NULL);
-  int KVLDUMP = cdoOperatorAdd("kvldump",  0, 0, NULL);
+  int NMLDUMP = cdoOperatorAdd("nmldump", 0, 0, NULL);
+  int KVLDUMP = cdoOperatorAdd("kvldump", 0, 0, NULL);
 
   int operatorID = cdoOperatorID();
 
   list_t *pmlist = namelist_to_pmlist(stdin, "STDIN");
 
-  if ( operatorID == NMLDUMP )
+  if (operatorID == NMLDUMP)
     list_for_each(pmlist, pmlist_print_iter);
-  else if ( operatorID == KVLDUMP )
+  else if (operatorID == KVLDUMP)
     kvldump(pmlist);
 
   list_destroy(pmlist);

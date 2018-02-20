@@ -19,8 +19,8 @@
 #include "datetime.h"
 #include "calendar.h"
 
-
-juldate_t juldate_encode(int calendar, int date, int time)
+juldate_t
+juldate_encode(int calendar, int date, int time)
 {
   int year, month, day, hour, minute, second;
   juldate_t juldate;
@@ -29,36 +29,36 @@ juldate_t juldate_encode(int calendar, int date, int time)
   cdiDecodeTime(time, &hour, &minute, &second);
 
   encode_caldaysec(calendar, year, month, day, hour, minute, second,
-		   &juldate.julday, &juldate.secofday);
+                   &juldate.julday, &juldate.secofday);
 
   return juldate;
 }
 
-
-void juldate_decode(int calendar, juldate_t juldate, int *date, int *time)
+void
+juldate_decode(int calendar, juldate_t juldate, int *date, int *time)
 {
   int year, month, day, hour, minute, second;
-  
-  decode_caldaysec(calendar, juldate.julday, juldate.secofday, 
-		   &year, &month, &day, &hour, &minute, &second);
+
+  decode_caldaysec(calendar, juldate.julday, juldate.secofday, &year, &month,
+                   &day, &hour, &minute, &second);
 
   *date = cdiEncodeDate(year, month, day);
   *time = cdiEncodeTime(hour, minute, second);
 }
 
-
-juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1)
+juldate_t
+juldate_sub(juldate_t juldate2, juldate_t juldate1)
 {
   juldate_t juldate;
 
-  (void) julday_sub(juldate1.julday, juldate1.secofday, juldate2.julday, juldate2.secofday, 
-		    &juldate.julday, &juldate.secofday);
+  (void) julday_sub(juldate1.julday, juldate1.secofday, juldate2.julday,
+                    juldate2.secofday, &juldate.julday, &juldate.secofday);
 
   return juldate;
 }
 
-
-juldate_t juldate_add_seconds(int seconds, juldate_t juldate)
+juldate_t
+juldate_add_seconds(int seconds, juldate_t juldate)
 {
   juldate_t juldate_new = juldate;
 
@@ -67,10 +67,10 @@ juldate_t juldate_add_seconds(int seconds, juldate_t juldate)
   return juldate_new;
 }
 
-
-double juldate_to_seconds(juldate_t juldate)
+double
+juldate_to_seconds(juldate_t juldate)
 {
-  double seconds = juldate.julday*86400. + juldate.secofday;
+  double seconds = juldate.julday * 86400. + juldate.secofday;
 
   return seconds;
 }

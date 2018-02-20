@@ -28,15 +28,15 @@
 #include "pstream_int.h"
 #include "grid.h"
 
+void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2,
+                  long *lon11, long *lon12, long *lon21, long *lon22);
 
-void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
+void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2,
+                 long *lon11, long *lon12, long *lon21, long *lon22);
 
-void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
-
-
-static
-void setcbox(double constant, double *array, int gridID,
-	     long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
+static void
+setcbox(double constant, double *array, int gridID, long lat1, long lat2,
+        long lon11, long lon12, long lon21, long lon22)
 {
   long nlon, nlat;
   long ilat, ilon;
@@ -44,16 +44,18 @@ void setcbox(double constant, double *array, int gridID,
   nlon = gridInqXsize(gridID);
   nlat = gridInqYsize(gridID);
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
-    for ( ilon = 0; ilon < nlon; ilon++ )
-      if ( (lat1 <= ilat && ilat <= lat2 && 
-	    ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))) ) {
-	array[nlon*ilat + ilon] = constant;
-      }
+  for (ilat = 0; ilat < nlat; ilat++)
+    for (ilon = 0; ilon < nlon; ilon++)
+      if ((lat1 <= ilat && ilat <= lat2
+           && ((lon11 <= ilon && ilon <= lon12)
+               || (lon21 <= ilon && ilon <= lon22))))
+        {
+          array[nlon * ilat + ilon] = constant;
+        }
 }
 
-
-void *Setbox(void *process)
+void *
+Setbox(void *process)
 {
   int SETCLONLATBOX, SETCINDEXBOX;
   int operatorID;
@@ -74,8 +76,12 @@ void *Setbox(void *process)
 
   cdoInitialize(process);
 
-  SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0, "constant, western and eastern longitude and southern and northern latitude");
-  SETCINDEXBOX  = cdoOperatorAdd("setcindexbox",  0, 0, "constant, index of first and last longitude and index of first and last latitude");
+  SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0,
+                                 "constant, western and eastern longitude and "
+                                 "southern and northern latitude");
+  SETCINDEXBOX = cdoOperatorAdd("setcindexbox", 0, 0,
+                                "constant, index of first and last longitude "
+                                "and index of first and last latitude");
 
   operatorID = cdoOperatorID();
 
@@ -89,29 +95,30 @@ void *Setbox(void *process)
 
   ngrids = vlistNgrids(vlistID1);
   ndiffgrids = 0;
-  for ( index = 1; index < ngrids; index++ )
-    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
-      ndiffgrids++;
+  for (index = 1; index < ngrids; index++)
+    if (vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index)) ndiffgrids++;
 
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     {
-      gridID   = vlistGrid(vlistID1, index);
+      gridID = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID);
-      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) break;
-      if ( gridtype == GRID_CURVILINEAR ) break;
-      if ( operatorID == SETCINDEXBOX && gridtype == GRID_GENERIC &&
-	   gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 ) break;
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN) break;
+      if (gridtype == GRID_CURVILINEAR) break;
+      if (operatorID == SETCINDEXBOX && gridtype == GRID_GENERIC
+          && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0)
+        break;
     }
 
-  if ( gridInqType(gridID) == GRID_GAUSSIAN_REDUCED )
-    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
+  if (gridInqType(gridID) == GRID_GAUSSIAN_REDUCED)
+    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a "
+             "regular grid!");
 
-  if ( index == ngrids ) cdoAbort("No regular grid found!");
-  if ( ndiffgrids > 0 )  cdoAbort("Too many different grids!");
+  if (index == ngrids) cdoAbort("No regular grid found!");
+  if (ndiffgrids > 0) cdoAbort("Too many different grids!");
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == SETCLONLATBOX )
+  if (operatorID == SETCLONLATBOX)
     genlonlatbox(1, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
   else
     genindexbox(1, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
@@ -123,8 +130,8 @@ void *Setbox(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   nvars = vlistNvars(vlistID1);
-  vars  = (int*) Malloc(nvars*sizeof(int));
-  for ( varID = 0; varID < nvars; varID++ )
+  vars = (int *) Malloc(nvars * sizeof(int));
+  for (varID = 0; varID < nvars; varID++)
     {
       vars[varID] = (gridID == vlistInqVarGrid(vlistID1, varID));
     }
@@ -134,30 +141,31 @@ void *Setbox(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   gridsize = gridInqSize(gridID);
-  array = (double*) Malloc(gridsize*sizeof(double));
+  array = (double *) Malloc(gridsize * sizeof(double));
 
   tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( vars[varID] )
-	    {
-	      pstreamReadRecord(streamID1, array, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
+          if (vars[varID])
+            {
+              pstreamReadRecord(streamID1, array, &nmiss);
 
-	      double missval = vlistInqVarMissval(vlistID1, varID);
-	      nmiss = arrayNumMV(gridsize, array, missval);
-	      pstreamDefRecord(streamID2, varID, levelID);
-	      pstreamWriteRecord(streamID2, array, nmiss);
-	    }
-	}
+              setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21,
+                      lon22);
+
+              double missval = vlistInqVarMissval(vlistID1, varID);
+              nmiss = arrayNumMV(gridsize, array, missval);
+              pstreamDefRecord(streamID2, varID, levelID);
+              pstreamWriteRecord(streamID2, array, nmiss);
+            }
+        }
 
       tsID++;
     }
@@ -165,8 +173,8 @@ void *Setbox(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( vars  ) Free(vars);
-  if ( array ) Free(array);
+  if (vars) Free(vars);
+  if (array) Free(array);
 
   cdoFinish();
 

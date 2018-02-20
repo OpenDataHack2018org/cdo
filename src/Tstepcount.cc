@@ -27,29 +27,27 @@
 #include "pstream_int.h"
 #include "cdoOptions.h"
 
+#define NALLOC_INC 1024
 
-#define  NALLOC_INC  1024
-
-
-static
-double tstepcount(long nts, double missval1, double *array1, double refval)
+static double
+tstepcount(long nts, double missval1, double *array1, double refval)
 {
   long j;
   long n = 0;
 
-  if ( DBL_IS_EQUAL(refval, missval1) ) return missval1;
+  if (DBL_IS_EQUAL(refval, missval1)) return missval1;
 
-  for ( j = 0; j < nts; j++ )
+  for (j = 0; j < nts; j++)
     {
       n++;
-      if ( DBL_IS_EQUAL(array1[j], refval) ) break;  
+      if (DBL_IS_EQUAL(array1[j], refval)) break;
     }
 
   return (j == nts) ? missval1 : (double) n;
 }
 
-
-void *Tstepcount(void *process)
+void *
+Tstepcount(void *process)
 {
   int nrecs;
   int gridID, varID, levelID;
@@ -64,7 +62,7 @@ void *Tstepcount(void *process)
 
   cdoInitialize(process);
 
-  if ( operatorArgc() == 1 ) refval = parameter2double(operatorArgv()[0]);
+  if (operatorArgc() == 1) refval = parameter2double(operatorArgv()[0]);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -74,7 +72,7 @@ void *Tstepcount(void *process)
   vlistDefNtsteps(vlistID2, 1);
 
   int nvars = vlistNvars(vlistID1);
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     vlistDefVarUnits(vlistID2, varID, "steps");
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -84,66 +82,71 @@ void *Tstepcount(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  std::vector<field_type**> vars;
+  std::vector<field_type **> vars;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      if ( tsID >= nalloc )
-	{
-	  nalloc += NALLOC_INC;
+      if (tsID >= nalloc)
+        {
+          nalloc += NALLOC_INC;
           vars.resize(nalloc);
-	}
+        }
 
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  size_t gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
-	  vars[tsID][varID][levelID].nmiss = nmiss;
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          gridID = vlistInqVarGrid(vlistID1, varID);
+          size_t gridsize = gridInqSize(gridID);
+          vars[tsID][varID][levelID].ptr
+              = (double *) Malloc(gridsize * sizeof(double));
+          pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
+          vars[tsID][varID][levelID].nmiss = nmiss;
+        }
 
       tsID++;
     }
 
   int nts = tsID;
 
-  memory_t *mem = (memory_t*) Malloc(Threading::ompNumThreads*sizeof(memory_t));
-  for ( int i = 0; i < Threading::ompNumThreads; i++ )
-    mem[i].array1 = (double*) Malloc(nts*sizeof(double));
+  memory_t *mem
+      = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
+  for (int i = 0; i < Threading::ompNumThreads; i++)
+    mem[i].array1 = (double *) Malloc(nts * sizeof(double));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       gridID = vlistInqVarGrid(vlistID1, varID);
-      double missval  = vlistInqVarMissval(vlistID1, varID);
+      double missval = vlistInqVarMissval(vlistID1, varID);
       size_t gridsize = gridInqSize(gridID);
-      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-#ifdef  _OPENMP
-#pragma omp parallel for default(none) shared(gridsize,mem,vars,varID,levelID,nts,missval,refval) schedule(dynamic,1)
+      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      for (levelID = 0; levelID < nlevel; levelID++)
+        {
+#ifdef _OPENMP
+#pragma omp parallel for default(none)                                \
+    shared(gridsize, mem, vars, varID, levelID, nts, missval, refval) \
+        schedule(dynamic, 1)
 #endif
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    {
-	      int ompthID = cdo_omp_get_thread_num();
+          for (size_t i = 0; i < gridsize; i++)
+            {
+              int ompthID = cdo_omp_get_thread_num();
 
-	      for ( int tsID = 0; tsID < nts; tsID++ )
-		mem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+              for (int tsID = 0; tsID < nts; tsID++)
+                mem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
-	      double count = tstepcount(nts, missval, mem[ompthID].array1, refval);
-	      vars[0][varID][levelID].ptr[i] = count;
-	    }
-	}
+              double count
+                  = tstepcount(nts, missval, mem[ompthID].array1, refval);
+              vars[0][varID][levelID].ptr[i] = count;
+            }
+        }
     }
 
-  for ( int i = 0; i < Threading::ompNumThreads; i++ )
+  for (int i = 0; i < Threading::ompNumThreads; i++)
     Free(mem[i].array1);
   Free(mem);
 
@@ -151,21 +154,22 @@ void *Tstepcount(void *process)
   taxisDefVtime(taxisID2, vtime);
   pstreamDefTimestep(streamID2, 0);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
-      gridID   = vlistInqVarGrid(vlistID2, varID);
+      gridID = vlistInqVarGrid(vlistID2, varID);
       double missval = vlistInqVarMissval(vlistID2, varID);
       size_t gridsize = gridInqSize(gridID);
       int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-	  nmiss = arrayNumMV(gridsize, vars[0][varID][levelID].ptr, missval);
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, vars[0][varID][levelID].ptr, nmiss);
-	}
+      for (levelID = 0; levelID < nlevel; levelID++)
+        {
+          nmiss = arrayNumMV(gridsize, vars[0][varID][levelID].ptr, missval);
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, vars[0][varID][levelID].ptr, nmiss);
+        }
     }
 
-  for ( tsID = 0; tsID < nts; tsID++ ) field_free(vars[tsID], vlistID1);
+  for (tsID = 0; tsID < nts; tsID++)
+    field_free(vars[tsID], vlistID1);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

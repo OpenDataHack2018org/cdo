@@ -22,14 +22,12 @@
       Adisit      adipot          compute potential from insitu temperature
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "grid.h"
 #include "util_string.h"
-
 
 /*
 !>
@@ -45,117 +43,117 @@
 */
 
 /* compute insitu temperature from potential temperature */
-static
-double adisit_1(double tpot, double sal, double p)
+static double
+adisit_1(double tpot, double sal, double p)
 {
   double a_a1 = 3.6504E-4, a_a2 = 8.3198E-5, a_a3 = 5.4065E-7, a_a4 = 4.0274E-9,
-         a_b1 = 1.7439E-5, a_b2 = 2.9778E-7,
-         a_c1 = 8.9309E-7, a_c2 = 3.1628E-8, a_c3 = 2.1987E-10,
-         a_d = 4.1057E-9,
-         a_e1 = 1.6056E-10, a_e2 = 5.0484E-12;
+         a_b1 = 1.7439E-5, a_b2 = 2.9778E-7, a_c1 = 8.9309E-7, a_c2 = 3.1628E-8,
+         a_c3 = 2.1987E-10, a_d = 4.1057E-9, a_e1 = 1.6056E-10,
+         a_e2 = 5.0484E-12;
 
   double qc = p * (a_a1 + p * (a_c1 - a_e1 * p));
   double qv = p * (a_b1 - a_d * p);
   double dc = 1. + p * (-a_a2 + p * (a_c2 - a_e2 * p));
   double dv = a_b2 * p;
-  double qnq  = -p * (-a_a3 + p * a_c3);
-  double qn3  = -p * a_a4;
+  double qnq = -p * (-a_a3 + p * a_c3);
+  double qn3 = -p * a_a4;
 
   double tpo = tpot;
-  double qvs = qv*(sal - 35.) + qc;
-  double dvs = dv*(sal - 35.) + dc;
-  double t   = (tpo + qvs)/dvs;
-  double fne = - qvs + t*(dvs + t*(qnq + t*qn3)) - tpo;
-  double fst = dvs + t*(2.*qnq + 3.*qn3*t);
-  t = t - fne/fst;
+  double qvs = qv * (sal - 35.) + qc;
+  double dvs = dv * (sal - 35.) + dc;
+  double t = (tpo + qvs) / dvs;
+  double fne = -qvs + t * (dvs + t * (qnq + t * qn3)) - tpo;
+  double fst = dvs + t * (2. * qnq + 3. * qn3 * t);
+  t = t - fne / fst;
 
   return t;
 }
 
 /* compute potential temperature from insitu temperature */
 /* Ref: Gill, p. 602, Section A3.5:Potential Temperature */
-static
-double adipot(double t, double s, double p)
+static double
+adipot(double t, double s, double p)
 {
   double a_a1 = 3.6504E-4, a_a2 = 8.3198E-5, a_a3 = 5.4065E-7, a_a4 = 4.0274E-9,
-         a_b1 = 1.7439E-5, a_b2 = 2.9778E-7,
-         a_c1 = 8.9309E-7, a_c2 = 3.1628E-8, a_c3 = 2.1987E-10,
-         a_d = 4.1057E-9,
-         a_e1 = 1.6056E-10, a_e2 = 5.0484E-12;
+         a_b1 = 1.7439E-5, a_b2 = 2.9778E-7, a_c1 = 8.9309E-7, a_c2 = 3.1628E-8,
+         a_c3 = 2.1987E-10, a_d = 4.1057E-9, a_e1 = 1.6056E-10,
+         a_e2 = 5.0484E-12;
 
   double s_rel = s - 35.0;
 
-  double aa = (a_a1+ t*(a_a2 - t*(a_a3 - a_a4*t)));
-  double bb = s_rel*(a_b1 -a_b2*t)     ;
-  double cc = (a_c1 + t*(-a_c2 + a_c3*t));
-  double cc1 = a_d*s_rel;
-  double dd = (-a_e1 + a_e2*t);
+  double aa = (a_a1 + t * (a_a2 - t * (a_a3 - a_a4 * t)));
+  double bb = s_rel * (a_b1 - a_b2 * t);
+  double cc = (a_c1 + t * (-a_c2 + a_c3 * t));
+  double cc1 = a_d * s_rel;
+  double dd = (-a_e1 + a_e2 * t);
 
-  double tpot = t-p*(aa + bb + p*(cc - cc1 + p*dd));
+  double tpot = t - p * (aa + bb + p * (cc - cc1 + p * dd));
 
   return tpot;
 }
 
-static
-void calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho, field_type sao, field_type tis)
+static void
+calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho,
+            field_type sao, field_type tis)
 {
   /* pressure units: hPa     */
   /* tho units:      Celsius */
   /* sao units:      psu     */
 
-  for ( long levelID = 0; levelID < nlevel; ++levelID )
+  for (long levelID = 0; levelID < nlevel; ++levelID)
     {
-      long offset = gridsize*levelID;
+      long offset = gridsize * levelID;
       double *thoptr = tho.ptr + offset;
       double *saoptr = sao.ptr + offset;
       double *tisptr = tis.ptr + offset;
 
-      for ( long i = 0; i < gridsize; ++i )
-	{
-	  if ( DBL_IS_EQUAL(thoptr[i], tho.missval) ||
-	       DBL_IS_EQUAL(saoptr[i], sao.missval) )
-	    {
-	      tisptr[i] = tis.missval;
-	    }
-	  else
-	    {
-	      tisptr[i] = adisit_1(thoptr[i], saoptr[i], pressure[levelID]); 
-	    }
-	}
+      for (long i = 0; i < gridsize; ++i)
+        {
+          if (DBL_IS_EQUAL(thoptr[i], tho.missval)
+              || DBL_IS_EQUAL(saoptr[i], sao.missval))
+            {
+              tisptr[i] = tis.missval;
+            }
+          else
+            {
+              tisptr[i] = adisit_1(thoptr[i], saoptr[i], pressure[levelID]);
+            }
+        }
     }
 }
 
-static
-void calc_adipot(long gridsize, long nlevel, double *pressure, field_type t, field_type s, field_type tpot)
+static void
+calc_adipot(long gridsize, long nlevel, double *pressure, field_type t,
+            field_type s, field_type tpot)
 {
   /* pressure units: hPa     */
   /* t units:      Celsius */
   /* s units:      psu     */
 
-  for ( long levelID = 0; levelID < nlevel; ++levelID )
+  for (long levelID = 0; levelID < nlevel; ++levelID)
     {
-      long offset = gridsize*levelID;
+      long offset = gridsize * levelID;
       double *tptr = t.ptr + offset;
       double *sptr = s.ptr + offset;
       double *tpotptr = tpot.ptr + offset;
 
-      for ( long i = 0; i < gridsize; ++i )
-	{
-	  if ( DBL_IS_EQUAL(tptr[i], t.missval) ||
-	       DBL_IS_EQUAL(sptr[i], s.missval) )
-	    {
-	      tpotptr[i] = tpot.missval;
-	    }
-	  else
-	    {
-	      tpotptr[i] = adipot(tptr[i], sptr[i], pressure[levelID]); 
-	    }
-	}
+      for (long i = 0; i < gridsize; ++i)
+        {
+          if (DBL_IS_EQUAL(tptr[i], t.missval)
+              || DBL_IS_EQUAL(sptr[i], s.missval))
+            {
+              tpotptr[i] = tpot.missval;
+            }
+          else
+            {
+              tpotptr[i] = adipot(tptr[i], sptr[i], pressure[levelID]);
+            }
+        }
     }
 }
 
-
-void *Adisit(void *process)
+void *
+Adisit(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -175,95 +173,105 @@ void *Adisit(void *process)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
-  
+  if (operatorArgc() == 1) pin = parameter2double(operatorArgv()[0]);
+
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       int code = vlistInqVarCode(vlistID1, varID);
 
-      if ( code <= 0 )
-	{
-	  vlistInqVarName(vlistID1, varID, varname);
-	  vlistInqVarStdname(vlistID1,varID, stdname);
-	  strtolower(varname);
+      if (code <= 0)
+        {
+          vlistInqVarName(vlistID1, varID, varname);
+          vlistInqVarStdname(vlistID1, varID, stdname);
+          strtolower(varname);
 
-               if ( strcmp(varname, "s")     == 0 ) code = 5;
-          else if ( strcmp(varname, "t")     == 0 ) code = 2;
-	  else if ( strcmp(stdname, "sea_water_salinity") == 0 ) code = 5;
-          
-          if ( operatorID == ADISIT )
-          {
-	   if ( strcmp(stdname, "sea_water_potential_temperature") == 0 ) code = 2;
-          }
-          else {
-	   if ( strcmp(stdname, "sea_water_temperature") == 0 ) code = 2;
-          }
-	}
+          if (strcmp(varname, "s") == 0)
+            code = 5;
+          else if (strcmp(varname, "t") == 0)
+            code = 2;
+          else if (strcmp(stdname, "sea_water_salinity") == 0)
+            code = 5;
 
-      if      ( code == 2 ) thoID = varID;
-      else if ( code == 5 ) saoID = varID;
+          if (operatorID == ADISIT)
+            {
+              if (strcmp(stdname, "sea_water_potential_temperature") == 0)
+                code = 2;
+            }
+          else
+            {
+              if (strcmp(stdname, "sea_water_temperature") == 0) code = 2;
+            }
+        }
+
+      if (code == 2)
+        thoID = varID;
+      else if (code == 5)
+        saoID = varID;
     }
 
-  if ( saoID == -1 ) cdoAbort("Sea water salinity not found!");
-  if ( thoID == -1 ) cdoAbort("Potential or Insitu temperature not found!");
+  if (saoID == -1) cdoAbort("Sea water salinity not found!");
+  if (thoID == -1) cdoAbort("Potential or Insitu temperature not found!");
 
   int gridID = vlistGrid(vlistID1, 0);
   size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int zaxisID = vlistInqVarZaxis(vlistID1, saoID);
   int nlevel1 = zaxisInqSize(zaxisID);
-      zaxisID = vlistInqVarZaxis(vlistID1, thoID);
+  zaxisID = vlistInqVarZaxis(vlistID1, thoID);
   int nlevel2 = zaxisInqSize(zaxisID);
 
-  if ( nlevel1 != nlevel2 ) cdoAbort("temperature and salinity have different number of levels!");
+  if (nlevel1 != nlevel2)
+    cdoAbort("temperature and salinity have different number of levels!");
   int nlevel = nlevel1;
 
-  double *pressure = (double*) Malloc(nlevel*sizeof(double));
+  double *pressure = (double *) Malloc(nlevel * sizeof(double));
   cdoZaxisInqLevels(zaxisID, pressure);
 
-  if ( pin >= 0 ) 
-    for ( i = 0; i < nlevel; ++i ) pressure[i] = pin;
+  if (pin >= 0)
+    for (i = 0; i < nlevel; ++i)
+      pressure[i] = pin;
   else
-    for ( i = 0; i < nlevel; ++i ) pressure[i] /= 10;
+    for (i = 0; i < nlevel; ++i)
+      pressure[i] /= 10;
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
       cdoPrint("Level Pressure");
-      for ( i = 0; i < nlevel; ++i )
-	cdoPrint("%5d  %g", i+1, pressure[i]);
+      for (i = 0; i < nlevel; ++i)
+        cdoPrint("%5d  %g", i + 1, pressure[i]);
     }
 
   field_type tho, sao, tis;
   field_init(&tho);
   field_init(&sao);
   field_init(&tis);
-  tho.ptr = (double*) Malloc(gridsize*nlevel*sizeof(double));
-  sao.ptr = (double*) Malloc(gridsize*nlevel*sizeof(double));
-  tis.ptr = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  tho.ptr = (double *) Malloc(gridsize * nlevel * sizeof(double));
+  sao.ptr = (double *) Malloc(gridsize * nlevel * sizeof(double));
+  tis.ptr = (double *) Malloc(gridsize * nlevel * sizeof(double));
 
   tho.nmiss = 0;
   sao.nmiss = 0;
   tis.nmiss = 0;
-  
+
   tho.missval = vlistInqVarMissval(vlistID1, thoID);
   sao.missval = vlistInqVarMissval(vlistID1, saoID);
   tis.missval = tho.missval;
 
   int datatype = CDI_DATATYPE_FLT32;
-  if ( vlistInqVarDatatype(vlistID1, thoID) == CDI_DATATYPE_FLT64 &&
-       vlistInqVarDatatype(vlistID1, saoID) == CDI_DATATYPE_FLT64 )
+  if (vlistInqVarDatatype(vlistID1, thoID) == CDI_DATATYPE_FLT64
+      && vlistInqVarDatatype(vlistID1, saoID) == CDI_DATATYPE_FLT64)
     datatype = CDI_DATATYPE_FLT64;
 
   int vlistID2 = vlistCreate();
 
   int tisID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARYING);
-  if ( operatorID == ADISIT )
+  if (operatorID == ADISIT)
     {
       vlistDefVarParam(vlistID2, tisID2, cdiEncodeParam(20, 255, 255));
       vlistDefVarName(vlistID2, tisID2, "to");
@@ -290,7 +298,6 @@ void *Adisit(void *process)
   vlistDefVarMissval(vlistID2, saoID2, sao.missval);
   vlistDefVarDatatype(vlistID2, saoID2, datatype);
 
-
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
@@ -300,47 +307,46 @@ void *Adisit(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; ++recID )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  offset = gridsize*levelID;
+      for (int recID = 0; recID < nrecs; ++recID)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( varID == thoID )
+          offset = gridsize * levelID;
+
+          if (varID == thoID)
             {
-              pstreamReadRecord(streamID1, tho.ptr+offset, &tho.nmiss);
+              pstreamReadRecord(streamID1, tho.ptr + offset, &tho.nmiss);
             }
-	  if ( varID == saoID )
+          if (varID == saoID)
             {
-              pstreamReadRecord(streamID1, sao.ptr+offset, &sao.nmiss);
+              pstreamReadRecord(streamID1, sao.ptr + offset, &sao.nmiss);
             }
         }
 
-      if ( operatorID == ADISIT )
-        calc_adisit(gridsize, nlevel, pressure, tho, sao, tis); 
+      if (operatorID == ADISIT)
+        calc_adisit(gridsize, nlevel, pressure, tho, sao, tis);
       else
-        calc_adipot(gridsize, nlevel, pressure, tho, sao, tis); 
+        calc_adipot(gridsize, nlevel, pressure, tho, sao, tis);
 
+      for (levelID = 0; levelID < nlevel; ++levelID)
+        {
+          offset = gridsize * levelID;
 
-      for ( levelID = 0; levelID < nlevel; ++levelID )
-	{
-	  offset = gridsize*levelID;
+          single = tis.ptr + offset;
+          nmiss = arrayNumMV(gridsize, single, tis.missval);
+          pstreamDefRecord(streamID2, tisID2, levelID);
+          pstreamWriteRecord(streamID2, single, nmiss);
 
-	  single = tis.ptr+offset;
-	  nmiss = arrayNumMV(gridsize, single, tis.missval);
-	  pstreamDefRecord(streamID2, tisID2, levelID);
-	  pstreamWriteRecord(streamID2, single, nmiss);     
-
-	  single = sao.ptr+offset;
-	  nmiss = arrayNumMV(gridsize, single, sao.missval);
-	  pstreamDefRecord(streamID2, saoID2, levelID);
-	  pstreamWriteRecord(streamID2, single, nmiss);     
-	}
+          single = sao.ptr + offset;
+          nmiss = arrayNumMV(gridsize, single, sao.missval);
+          pstreamDefRecord(streamID2, saoID2, levelID);
+          pstreamWriteRecord(streamID2, single, nmiss);
+        }
 
       tsID++;
     }

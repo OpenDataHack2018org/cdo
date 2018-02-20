@@ -21,8 +21,8 @@
   Pack      reduce
 */
 
-#ifdef  _OPENMP
-#  include <omp.h>
+#ifdef _OPENMP
+#include <omp.h>
 #endif
 
 #include <limits.h>
@@ -36,28 +36,29 @@
 
 /* read only the first data variable from input filename into a given double
  * pointer */
-void read_first_record(char *filename, double *field)
+void
+read_first_record(char *filename, double *field)
 {
   size_t nmiss;
-  int varID,levelID;
+  int varID, levelID;
   int streamID = streamOpenRead(filename);
-  streamInqTimestep(streamID,0);
-  streamInqRecord(streamID,&varID,&levelID);
+  streamInqTimestep(streamID, 0);
+  streamInqRecord(streamID, &varID, &levelID);
   streamReadRecord(streamID, field, &nmiss);
   streamClose(streamID);
 }
 
-
 /*
  * count the number of locations, for which the mask is TRUE
  * */
-int countMask(double *maskField, int gridSize, double falseVal)
+int
+countMask(double *maskField, int gridSize, double falseVal)
 {
   int counter = 0;
 
   for (int i = 0; i < gridSize; i++)
     {
-      if (!DBL_IS_EQUAL(maskField[i],falseVal)) counter += 1;
+      if (!DBL_IS_EQUAL(maskField[i], falseVal)) counter += 1;
     }
   return counter;
 }
@@ -66,7 +67,8 @@ int countMask(double *maskField, int gridSize, double falseVal)
  * the operators argument has to be a single horizontal field,
  * non-zero values are used to mark the relevant locations
  */
-void *MapReduce(void *process)
+void *
+MapReduce(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -79,26 +81,28 @@ void *MapReduce(void *process)
 
   /* check input grid type and size - this will be used for selecting relevant
    * variables from the input file*/
-  int inputGridID   = cdoDefineGrid(operatorArgv()[0]);
+  int inputGridID = cdoDefineGrid(operatorArgv()[0]);
   size_t inputGridSize = gridInqSize(inputGridID);
   int inputGridType = gridInqType(inputGridID);
-  if ( CdoDebug::cdoDebug ) cdoPrint("MapReduce: input gridSize: %zu", inputGridSize);
+  if (CdoDebug::cdoDebug)
+    cdoPrint("MapReduce: input gridSize: %zu", inputGridSize);
 
   /* creata an index list of the relevant locations  {{{ */
-  double *inputMaskField = (double*) Malloc(inputGridSize*sizeof(double));
+  double *inputMaskField = (double *) Malloc(inputGridSize * sizeof(double));
   read_first_record(operatorArgv()[0], inputMaskField);
 
   /* non-zero values mark the relevant points */
   int maskSize = countMask(inputMaskField, inputGridSize, 0.0);
-  if ( CdoDebug::cdoDebug ) cdoPrint("MapReduce: maskSize = %d",maskSize);
+  if (CdoDebug::cdoDebug) cdoPrint("MapReduce: maskSize = %d", maskSize);
 
-  int *maskIndexList = (int *) Malloc(maskSize*sizeof(int));
-  for (int m = 0; m < maskSize; m++) maskIndexList[m] = -1;
+  int *maskIndexList = (int *) Malloc(maskSize * sizeof(int));
+  for (int m = 0; m < maskSize; m++)
+    maskIndexList[m] = -1;
 
   size_t k = 0;
   for (size_t i = 0; i < inputGridSize; i++)
     {
-      if (!DBL_IS_EQUAL(inputMaskField[i],0.0))
+      if (!DBL_IS_EQUAL(inputMaskField[i], 0.0))
         {
           maskIndexList[k] = i;
           k += 1;
@@ -107,37 +111,39 @@ void *MapReduce(void *process)
   /* }}} */
 
   /* check if coordinated bounds shound not be created */
-  if ( 2 <= operatorArgc() )
-  {
-    char *coordinatesLimitation = operatorArgv()[1];
-    if ( 0 == strncmp("nobounds",coordinatesLimitation,8) ) nobounds = TRUE;
-    if ( 0 == strncmp("nocoords",coordinatesLimitation,8) ) nocoords = TRUE;
-  }
+  if (2 <= operatorArgc())
+    {
+      char *coordinatesLimitation = operatorArgv()[1];
+      if (0 == strncmp("nobounds", coordinatesLimitation, 8)) nobounds = TRUE;
+      if (0 == strncmp("nocoords", coordinatesLimitation, 8)) nocoords = TRUE;
+    }
   /* create unstructured output grid including bounds*/
-  int outputGridID = gridToUnstructuredSelecton(inputGridID, maskSize, maskIndexList, nocoords, nobounds);
+  int outputGridID = gridToUnstructuredSelecton(
+      inputGridID, maskSize, maskIndexList, nocoords, nobounds);
 
   /* create output vlist: Only variabes which have the same gridtype and
    * gridsize as the input mask should be proessed. Everything else is ignoreds
    * {{{ */
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
-  int vlistID1  = cdoStreamInqVlist(streamID1);
-  int nvars     = vlistNvars(vlistID1);
-  int *vars     = (int*) Malloc(nvars*sizeof(int));
+  int vlistID1 = cdoStreamInqVlist(streamID1);
+  int nvars = vlistNvars(vlistID1);
+  int *vars = (int *) Malloc(nvars * sizeof(int));
 
   /* use vlist flags for marking the corresponding variables */
   vlistClearFlag(vlistID1);
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       vars[varID] = FALSE;
 
       int gridID = vlistInqVarGrid(vlistID1, varID);
-      if (inputGridType == gridInqType(gridID) && inputGridSize == gridInqSize(gridID))
+      if (inputGridType == gridInqType(gridID)
+          && inputGridSize == gridInqSize(gridID))
         {
           vars[varID] = TRUE;
-          int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-          int nlevs    = zaxisInqSize(zaxisID);
-          for ( int levID = 0; levID < nlevs; levID++ )
+          int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+          int nlevs = zaxisInqSize(zaxisID);
+          for (int levID = 0; levID < nlevs; levID++)
             {
               vlistDefFlag(vlistID1, varID, levID, TRUE);
             }
@@ -147,50 +153,48 @@ void *MapReduce(void *process)
   cdoVlistCopyFlag(vlistID2, vlistID1);
   /* }}} */
 
-  int taxisID1  = vlistInqTaxis(vlistID1);
-  int taxisID2  = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   /* use the new selection grid for all output variables */
   int ngrids = vlistNgrids(vlistID2);
-  for ( int index = 0; index < ngrids; index++ ) vlistChangeGridIndex(vlistID2, index, outputGridID);
+  for (int index = 0; index < ngrids; index++)
+    vlistChangeGridIndex(vlistID2, index, outputGridID);
 
   /* loop over input fields and mask the data values {{{ */
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  double *arrayIn  = (double *)Malloc(inputGridSize*sizeof(double));
-  double *arrayOut = (double *)Malloc(maskSize*sizeof(double));
+  double *arrayIn = (double *) Malloc(inputGridSize * sizeof(double));
+  double *arrayOut = (double *) Malloc(maskSize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
           if (TRUE == vars[varID])
             {
-              int varID2   = vlistFindVar(vlistID2, varID);
+              int varID2 = vlistFindVar(vlistID2, varID);
               int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
               pstreamReadRecord(streamID1, arrayIn, &nmiss);
 
-              for (int i = 0; i < maskSize;  i++)
+              for (int i = 0; i < maskSize; i++)
                 arrayOut[i] = arrayIn[maskIndexList[i]];
-
 
               pstreamDefRecord(streamID2, varID2, levelID2);
               pstreamWriteRecord(streamID2, arrayOut, 0);
-
             }
         }
       tsID++;
     }
   /* }}} */
-
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

@@ -31,9 +31,10 @@
 
 #include <time.h>
 
-#define  MAX_STREAMS 32
+#define MAX_STREAMS 32
 
-struct tm datetime_to_tm(int date, int time)
+struct tm
+datetime_to_tm(int date, int time)
 {
   int year, month, day, hour, minute, second;
   cdiDecodeDate(date, &year, &month, &day);
@@ -42,23 +43,24 @@ struct tm datetime_to_tm(int date, int time)
   struct tm stime;
   memset(&stime, 0, sizeof(struct tm));
 
-  stime.tm_sec  = second;
-  stime.tm_min  = minute;
+  stime.tm_sec = second;
+  stime.tm_min = minute;
   stime.tm_hour = hour;
   stime.tm_mday = day;
-  stime.tm_mon  = month-1;
-  stime.tm_year = year-1900;
+  stime.tm_mon = month - 1;
+  stime.tm_year = year - 1900;
 
   return stime;
 }
 
-void *Splittime(void *process)
+void *
+Splittime(void *process)
 {
   int streamID2;
   int varID;
   int nrecs;
   int levelID;
-  int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
+  int streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   int index = 0;
   size_t nmiss;
   char filesuffix[32];
@@ -68,7 +70,8 @@ void *Splittime(void *process)
 
   cdoInitialize(process);
 
-  if ( processSelf().m_ID != 0 ) cdoAbort("This operator can't be combined with other operators!");
+  if (processSelf().m_ID != 0)
+    cdoAbort("This operator can't be combined with other operators!");
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -83,17 +86,19 @@ void *Splittime(void *process)
   UNUSED(SPLITHOUR);
 
   int operatorID = cdoOperatorID();
-  int operfunc   = cdoOperatorF1(operatorID);
+  int operfunc = cdoOperatorF1(operatorID);
   int operintval = cdoOperatorF2(operatorID);
 
   const char *format = NULL;
-  if ( operatorID == SPLITMON && operatorArgc() == 1 ) format = operatorArgv()[0];
+  if (operatorID == SPLITMON && operatorArgc() == 1) format = operatorArgv()[0];
 
   const char *seas_name[4];
   get_season_name(seas_name);
 
-  for ( int i = 0; i < MAX_STREAMS; i++ ) streamIDs[i] = -1;
-  for ( int i = 0; i < MAX_STREAMS; i++ ) tsIDs[i] = 0;
+  for (int i = 0; i < MAX_STREAMS; i++)
+    streamIDs[i] = -1;
+  for (int i = 0; i < MAX_STREAMS; i++)
+    tsIDs[i] = 0;
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -109,177 +114,178 @@ void *Splittime(void *process)
 
   const char *refname = cdoGetObase();
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix),
+                   pstreamInqFiletype(streamID1), vlistID1, refname);
 
   //  if ( ! lcopy )
-    {
-      int gridsizemax = vlistGridsizeMax(vlistID1);
-      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
-      array = (double*) Malloc(gridsizemax*sizeof(double));
-    }
+  {
+    int gridsizemax = vlistGridsizeMax(vlistID1);
+    if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
+    array = (double *) Malloc(gridsizemax * sizeof(double));
+  }
 
   int nvars = vlistNvars(vlistID1);
   int nconst = 0;
-  for ( varID = 0; varID < nvars; varID++ )
-    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) nconst++;
+  for (varID = 0; varID < nvars; varID++)
+    if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) nconst++;
 
-  if ( nconst )
+  if (nconst)
     {
-      vars = (field_type **) Malloc(nvars*sizeof(field_type *));
+      vars = (field_type **) Malloc(nvars * sizeof(field_type *));
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
-	    {
-	      int gridID = vlistInqVarGrid(vlistID1, varID);
-	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      size_t gridsize = gridInqSize(gridID);
-		  
-	      vars[varID] = (field_type*) Malloc(nlevel*sizeof(field_type));
+      for (varID = 0; varID < nvars; varID++)
+        {
+          if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+            {
+              int gridID = vlistInqVarGrid(vlistID1, varID);
+              int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+              size_t gridsize = gridInqSize(gridID);
 
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		{
-		  field_init(&vars[varID][levelID]);
-		  vars[varID][levelID].grid = gridID;
-		  vars[varID][levelID].ptr  = (double*) Malloc(gridsize*sizeof(double));
-		}
-	    }
-	}
+              vars[varID] = (field_type *) Malloc(nlevel * sizeof(field_type));
+
+              for (levelID = 0; levelID < nlevel; levelID++)
+                {
+                  field_init(&vars[varID][levelID]);
+                  vars[varID][levelID].grid = gridID;
+                  vars[varID][levelID].ptr
+                      = (double *) Malloc(gridsize * sizeof(double));
+                }
+            }
+        }
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
-      if ( operfunc == func_date )
-	{
-	  index = (vdate/operintval)%100;
-	  if ( index < 0 ) index = -index;
+      if (operfunc == func_date)
+        {
+          index = (vdate / operintval) % 100;
+          if (index < 0) index = -index;
 
-	  if ( operatorID == SPLITSEAS ) index = month_to_season(index);
-	}
-      else if ( operfunc == func_time )
-	{
-	  index = (vtime/operintval)%100;
-	}
+          if (operatorID == SPLITSEAS) index = month_to_season(index);
+        }
+      else if (operfunc == func_time)
+        {
+          index = (vtime / operintval) % 100;
+        }
 
-      if ( index < 0 || index >= MAX_STREAMS )
-	cdoAbort("Index out of range!");
+      if (index < 0 || index >= MAX_STREAMS) cdoAbort("Index out of range!");
 
       streamID2 = streamIDs[index];
-      if ( streamID2 < 0 )
-	{
-	  if ( operatorID == SPLITSEAS )
-	    {
-	      sprintf(filename+nchars, "%3s", seas_name[index]);
-	      if ( filesuffix[0] )
-		sprintf(filename+nchars+3, "%s", filesuffix);
-	    }
-	  else
-	    {
-	      size_t slen;
-	      char oformat[32];
-	      strcpy(oformat, "%02d");
+      if (streamID2 < 0)
+        {
+          if (operatorID == SPLITSEAS)
+            {
+              sprintf(filename + nchars, "%3s", seas_name[index]);
+              if (filesuffix[0])
+                sprintf(filename + nchars + 3, "%s", filesuffix);
+            }
+          else
+            {
+              size_t slen;
+              char oformat[32];
+              strcpy(oformat, "%02d");
 
-	      if ( operatorID == SPLITMON && format )
-		{
-		  char sbuf[32];
-		  struct tm stime = datetime_to_tm(vdate, vtime);
-		  slen = strftime(sbuf, 32, format, &stime);
+              if (operatorID == SPLITMON && format)
+                {
+                  char sbuf[32];
+                  struct tm stime = datetime_to_tm(vdate, vtime);
+                  slen = strftime(sbuf, 32, format, &stime);
 
-		  if ( slen ) strcpy(oformat, sbuf);
-		}
+                  if (slen) strcpy(oformat, sbuf);
+                }
 
-	      slen = sprintf(filename+nchars, oformat, index);
-	      if ( filesuffix[0] )
-		sprintf(filename+nchars+slen, "%s", filesuffix);
-	    }
+              slen = sprintf(filename + nchars, oformat, index);
+              if (filesuffix[0])
+                sprintf(filename + nchars + slen, "%s", filesuffix);
+            }
 
-	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
+          if (cdoVerbose) cdoPrint("create file %s", filename);
 
-	  streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
-	  pstreamDefVlist(streamID2, vlistID2);
-	  streamIDs[index] = streamID2;
-	}
+          streamID2 = cdoStreamOpenWrite(filename, cdoFiletype());
+          pstreamDefVlist(streamID2, vlistID2);
+          streamIDs[index] = streamID2;
+        }
 
       pstreamDefTimestep(streamID2, tsIDs[index]);
 
-      if ( tsID > 0 && tsIDs[index] == 0 && nconst )
-	{
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
-		{
-		  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		  for ( levelID = 0; levelID < nlevel; levelID++ )
-		    {
-		      pstreamDefRecord(streamID2, varID, levelID);
-		      nmiss = vars[varID][levelID].nmiss;
-		      pstreamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
-		    }
-		}
-	    }
-	}
+      if (tsID > 0 && tsIDs[index] == 0 && nconst)
+        {
+          for (varID = 0; varID < nvars; varID++)
+            {
+              if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+                {
+                  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+                  for (levelID = 0; levelID < nlevel; levelID++)
+                    {
+                      pstreamDefRecord(streamID2, varID, levelID);
+                      nmiss = vars[varID][levelID].nmiss;
+                      pstreamWriteRecord(streamID2, vars[varID][levelID].ptr,
+                                         nmiss);
+                    }
+                }
+            }
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
 
-	  if ( lcopy && !(tsID == 0 && nconst) )
-	    {
-	      pstreamCopyRecord(streamID2, streamID1);
-	    }
-	  else
-	    {
-	      pstreamReadRecord(streamID1, array, &nmiss);
-	      pstreamWriteRecord(streamID2, array, nmiss);
+          if (lcopy && !(tsID == 0 && nconst))
+            {
+              pstreamCopyRecord(streamID2, streamID1);
+            }
+          else
+            {
+              pstreamReadRecord(streamID1, array, &nmiss);
+              pstreamWriteRecord(streamID2, array, nmiss);
 
-	      if ( tsID == 0 && nconst )
-		{
-		  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
-		    {
-		      int gridID  = vlistInqVarGrid(vlistID1, varID);
-		      size_t gridsize = gridInqSize(gridID);
-		      arrayCopy(gridsize, array, vars[varID][levelID].ptr);
-		      vars[varID][levelID].nmiss = nmiss;
-		    }
-		}
-	    }
-	}
+              if (tsID == 0 && nconst)
+                {
+                  if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+                    {
+                      int gridID = vlistInqVarGrid(vlistID1, varID);
+                      size_t gridsize = gridInqSize(gridID);
+                      arrayCopy(gridsize, array, vars[varID][levelID].ptr);
+                      vars[varID][levelID].nmiss = nmiss;
+                    }
+                }
+            }
+        }
 
       tsIDs[index]++;
       tsID++;
     }
 
   pstreamClose(streamID1);
- 
-  if ( array ) Free(array);
 
-  if ( nconst )
+  if (array) Free(array);
+
+  if (nconst)
     {
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  if ( vlistInqVarTimetype(vlistID2, varID) == TIME_CONSTANT )
-	    {
-	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		if ( vars[varID][levelID].ptr )
-		  Free(vars[varID][levelID].ptr);
+      for (varID = 0; varID < nvars; varID++)
+        {
+          if (vlistInqVarTimetype(vlistID2, varID) == TIME_CONSTANT)
+            {
+              int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+              for (levelID = 0; levelID < nlevel; levelID++)
+                if (vars[varID][levelID].ptr) Free(vars[varID][levelID].ptr);
 
-	      Free(vars[varID]);
-	    }
-	}
+              Free(vars[varID]);
+            }
+        }
 
-      if ( vars ) Free(vars);
+      if (vars) Free(vars);
     }
 
-  for ( index = 0; index < MAX_STREAMS; index++ )
+  for (index = 0; index < MAX_STREAMS; index++)
     {
-      if ( streamIDs[index] >= 0 ) pstreamClose(streamIDs[index]);
+      if (streamIDs[index] >= 0) pstreamClose(streamIDs[index]);
     }
 
   vlistDestroy(vlistID2);

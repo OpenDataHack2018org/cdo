@@ -22,15 +22,17 @@
 
 // a common function used to free malloc'd objects
 typedef void (*freeFunction_t)(void *);
- 
+
 typedef bool (*listIterator_t)(void *);
- 
-typedef struct _listNode_t {
+
+typedef struct _listNode_t
+{
   void *data;
   struct _listNode_t *next;
 } listNode_t;
- 
-typedef struct {
+
+typedef struct
+{
   size_t logicalLength;
   size_t elementSize;
   char *name;
@@ -38,10 +40,10 @@ typedef struct {
   listNode_t *tail;
   freeFunction_t freeFunc;
 } list_t;
- 
+
 list_t *list_new(size_t elementSize, freeFunction_t freeFunc, const char *name);
 void list_destroy(list_t *list);
- 
+
 void list_prepend(list_t *list, void *element);
 void list_append(list_t *list, void *element);
 int list_size(list_t *list);

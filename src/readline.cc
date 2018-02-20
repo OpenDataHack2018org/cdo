@@ -17,29 +17,32 @@
 
 #include <stdio.h>
 
-int readline(FILE *fp, char *line, int len)
+int
+readline(FILE *fp, char *line, int len)
 {
   int ichar, ipos = 0;
 
-  while ( (ichar = fgetc(fp)) != EOF )
+  while ((ichar = fgetc(fp)) != EOF)
     {
-      if ( ichar == '\r' )
+      if (ichar == '\r')
         {
-          if ( (ichar = fgetc(fp)) != EOF )
-            if ( ichar != '\n' ) ungetc(ichar, fp);
+          if ((ichar = fgetc(fp)) != EOF)
+            if (ichar != '\n') ungetc(ichar, fp);
           break;
         }
-      if ( ichar == '\n' ) break;
+      if (ichar == '\n') break;
       line[ipos++] = ichar;
-      if ( ipos >= len )
-	{
-	  fprintf(stderr, "readline Warning: end of line not found (maxlen = %d)!\n", len);
-	  break;
-	}
+      if (ipos >= len)
+        {
+          fprintf(stderr,
+                  "readline Warning: end of line not found (maxlen = %d)!\n",
+                  len);
+          break;
+        }
     }
   line[ipos] = 0;
 
-  if ( feof(fp) && ipos == 0 ) return 0;
+  if (feof(fp) && ipos == 0) return 0;
 
   return 1;
 }

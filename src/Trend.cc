@@ -21,21 +21,23 @@
       Trend      trend           Trend
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Trend(void *process)
+void *
+Trend(void *process)
 {
   int vdate = 0, vtime = 0;
   int varID, levelID;
   size_t nmiss;
   int nrecs;
   double temp1, temp2;
-  enum {nwork = 5};
+  enum
+  {
+    nwork = 5
+  };
   field_type **work[5];
 
   cdoInitialize(process);
@@ -51,10 +53,10 @@ void *Trend(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -63,87 +65,93 @@ void *Trend(void *process)
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID2);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  for ( int w = 0; w < nwork; w++ )
+  for (int w = 0; w < nwork; w++)
     work[w] = field_calloc(vlistID1, FIELD_PTR);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      double zj = (double)tsID;
-      
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      double zj = (double) tsID;
 
-	  if ( tsID == 0 )
-	    {
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
-	    }
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+          if (tsID == 0)
+            {
+              recVarID[recID] = varID;
+              recLevelID[recID] = levelID;
+            }
 
-	  double missval  = vlistInqVarMissval(vlistID1, varID);
-	  int gridID   = vlistInqVarGrid(vlistID1, varID);
-	  size_t gridsize = gridInqSize(gridID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
 
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    if ( !DBL_IS_EQUAL(field1.ptr[i], missval) )
-	      {
-		work[0][varID][levelID].ptr[i] += zj;
-		work[1][varID][levelID].ptr[i] += zj * zj;
-		work[2][varID][levelID].ptr[i] += zj * field1.ptr[i];
-		work[3][varID][levelID].ptr[i] += field1.ptr[i];
-		work[4][varID][levelID].ptr[i]++;
-	      }      
-	}
+          double missval = vlistInqVarMissval(vlistID1, varID);
+          int gridID = vlistInqVarGrid(vlistID1, varID);
+          size_t gridsize = gridInqSize(gridID);
+
+          for (size_t i = 0; i < gridsize; i++)
+            if (!DBL_IS_EQUAL(field1.ptr[i], missval))
+              {
+                work[0][varID][levelID].ptr[i] += zj;
+                work[1][varID][levelID].ptr[i] += zj * zj;
+                work[2][varID][levelID].ptr[i] += zj * field1.ptr[i];
+                work[3][varID][levelID].ptr[i] += field1.ptr[i];
+                work[4][varID][levelID].ptr[i]++;
+              }
+        }
 
       tsID++;
     }
-	  
 
   taxisDefVdate(taxisID2, vdate);
   taxisDefVtime(taxisID2, vtime);
   pstreamDefTimestep(streamID2, 0);
   pstreamDefTimestep(streamID3, 0);
 
-  for ( int recID = 0; recID < nrecords; recID++ )
+  for (int recID = 0; recID < nrecords; recID++)
     {
-      varID   = recVarID[recID];
+      varID = recVarID[recID];
       levelID = recLevelID[recID];
 
-      double missval  = vlistInqVarMissval(vlistID1, varID);
-      int gridID   = vlistInqVarGrid(vlistID1, varID);
+      double missval = vlistInqVarMissval(vlistID1, varID);
+      int gridID = vlistInqVarGrid(vlistID1, varID);
       size_t gridsize = gridInqSize(gridID);
 
-      double missval1  = missval;
-      double missval2  = missval;
+      double missval1 = missval;
+      double missval2 = missval;
 
-      for ( size_t i = 0; i < gridsize; i++ )
-	{
-	  temp1 = SUBMN(work[2][varID][levelID].ptr[i],
-		      DIVMN( MULMN(work[0][varID][levelID].ptr[i], work[3][varID][levelID].ptr[i]), work[4][varID][levelID].ptr[i]));
-	  temp2 = SUBMN(work[1][varID][levelID].ptr[i],
-		      DIVMN( MULMN(work[0][varID][levelID].ptr[i], work[0][varID][levelID].ptr[i]), work[4][varID][levelID].ptr[i]));
+      for (size_t i = 0; i < gridsize; i++)
+        {
+          temp1 = SUBMN(work[2][varID][levelID].ptr[i],
+                        DIVMN(MULMN(work[0][varID][levelID].ptr[i],
+                                    work[3][varID][levelID].ptr[i]),
+                              work[4][varID][levelID].ptr[i]));
+          temp2 = SUBMN(work[1][varID][levelID].ptr[i],
+                        DIVMN(MULMN(work[0][varID][levelID].ptr[i],
+                                    work[0][varID][levelID].ptr[i]),
+                              work[4][varID][levelID].ptr[i]));
 
-	  field2.ptr[i] = DIVMN(temp1, temp2);
-	  field1.ptr[i] = SUBMN( DIVMN(work[3][varID][levelID].ptr[i], work[4][varID][levelID].ptr[i]),
-			      MULMN( DIVMN(work[0][varID][levelID].ptr[i], work[4][varID][levelID].ptr[i]), field2.ptr[i]));
-	}
+          field2.ptr[i] = DIVMN(temp1, temp2);
+          field1.ptr[i] = SUBMN(DIVMN(work[3][varID][levelID].ptr[i],
+                                      work[4][varID][levelID].ptr[i]),
+                                MULMN(DIVMN(work[0][varID][levelID].ptr[i],
+                                            work[4][varID][levelID].ptr[i]),
+                                      field2.ptr[i]));
+        }
 
       nmiss = arrayNumMV(gridsize, field1.ptr, missval);
       pstreamDefRecord(streamID2, varID, levelID);
@@ -154,14 +162,14 @@ void *Trend(void *process)
       pstreamWriteRecord(streamID3, field2.ptr, nmiss);
     }
 
+  for (int w = 0; w < nwork; w++)
+    field_free(work[w], vlistID1);
 
-  for ( int w = 0; w < nwork; w++ ) field_free(work[w], vlistID1);
+  if (field1.ptr) Free(field1.ptr);
+  if (field2.ptr) Free(field2.ptr);
 
-  if ( field1.ptr ) Free(field1.ptr);
-  if ( field2.ptr ) Free(field2.ptr);
-
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  if (recVarID) Free(recVarID);
+  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID3);
   pstreamClose(streamID2);

@@ -25,52 +25,53 @@
       Arithc     mod             Modulo operator
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-int *fill_vars(int vlistID)
+int *
+fill_vars(int vlistID)
 {
   int varID;
   int nvars = vlistNvars(vlistID);
-  int *vars = (int*) Malloc(nvars*sizeof(int));
+  int *vars = (int *) Malloc(nvars * sizeof(int));
 
-  if ( cdoNumVarnames )
+  if (cdoNumVarnames)
     {
       int nfound = 0;
       char varname[CDI_MAX_NAME];
 
-      for ( varID = 0; varID < nvars; ++varID )
-	{
-	  vars[varID] = 0;
+      for (varID = 0; varID < nvars; ++varID)
+        {
+          vars[varID] = 0;
 
-	  vlistInqVarName(vlistID, varID, varname);
+          vlistInqVarName(vlistID, varID, varname);
 
-	  for ( int i = 0; i < cdoNumVarnames; ++i )
-	    if ( strcmp(varname, cdoVarnames[i]) == 0 )
-	      {
-		vars[varID] = 1;
-		nfound++;
-		break;
-	      }
-	}
+          for (int i = 0; i < cdoNumVarnames; ++i)
+            if (strcmp(varname, cdoVarnames[i]) == 0)
+              {
+                vars[varID] = 1;
+                nfound++;
+                break;
+              }
+        }
 
-      if ( nfound == 0 )
-	cdoAbort("Variable -n %s%s not found!", cdoVarnames[0], cdoNumVarnames > 1 ? ",..." : "");
+      if (nfound == 0)
+        cdoAbort("Variable -n %s%s not found!", cdoVarnames[0],
+                 cdoNumVarnames > 1 ? ",..." : "");
     }
   else
     {
-      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = 1;
+      for (varID = 0; varID < nvars; ++varID)
+        vars[varID] = 1;
     }
 
   return vars;
 }
 
-
-void *Arithc(void *process)
+void *
+Arithc(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -110,34 +111,34 @@ void *Arithc(void *process)
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double *) Malloc(gridsize * sizeof(double));
   field.weight = NULL;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field.ptr, &field.nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field.ptr, &field.nmiss);
 
-	  if ( vars[varID] )
-	    {
-	      field.grid    = vlistInqVarGrid(vlistID1, varID);
-	      field.missval = vlistInqVarMissval(vlistID1, varID);
+          if (vars[varID])
+            {
+              field.grid = vlistInqVarGrid(vlistID1, varID);
+              field.missval = vlistInqVarMissval(vlistID1, varID);
 
-	      farcfun(&field, rconst, operfunc);
+              farcfun(&field, rconst, operfunc);
 
-	      // recalculate number of missing values
+              // recalculate number of missing values
               field.nmiss = arrayNumMV(gridsize, field.ptr, field.missval);
-	    }
+            }
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, field.ptr, field.nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, field.ptr, field.nmiss);
+        }
 
       tsID++;
     }
@@ -145,8 +146,8 @@ void *Arithc(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( field.ptr ) Free(field.ptr);
-  if ( vars ) Free(vars);
+  if (field.ptr) Free(field.ptr);
+  if (vars) Free(vars);
 
   vlistDestroy(vlistID2);
 

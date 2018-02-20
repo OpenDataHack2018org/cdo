@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* 
+/*
  * Return the filetype extension (const char) for a given filetype (int)
  * TODO: handle lists of extensions i.e. grb and grb2 for GRIB2-format
  */

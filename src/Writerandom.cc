@@ -26,8 +26,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Writerandom(void *process)
+void *
+Writerandom(void *process)
 {
   size_t gridsize;
   int nrecs;
@@ -50,64 +50,66 @@ void *Writerandom(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      double **recdata = (double**) Malloc(nrecs*sizeof(double*));
-      int *recvarID   = (int*) Malloc(nrecs*sizeof(int));
-      int *reclevelID = (int*) Malloc(nrecs*sizeof(int));
-      size_t *recnmiss = (size_t*) Malloc(nrecs*sizeof(size_t));
-      int *recindex   = (int*) Malloc(nrecs*sizeof(int));
+      double **recdata = (double **) Malloc(nrecs * sizeof(double *));
+      int *recvarID = (int *) Malloc(nrecs * sizeof(int));
+      int *reclevelID = (int *) Malloc(nrecs * sizeof(int));
+      size_t *recnmiss = (size_t *) Malloc(nrecs * sizeof(size_t));
+      int *recindex = (int *) Malloc(nrecs * sizeof(int));
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  recvarID[recID] = varID;
-	  reclevelID[recID] = levelID;
-	  recdata[recID] = (double*) Malloc(gridsize*sizeof(double));
-	  pstreamReadRecord(streamID1, recdata[recID], &recnmiss[recID]);
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          recvarID[recID] = varID;
+          reclevelID[recID] = levelID;
+          recdata[recID] = (double *) Malloc(gridsize * sizeof(double));
+          pstreamReadRecord(streamID1, recdata[recID], &recnmiss[recID]);
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ ) recindex[recID] = -1;
+      for (int recID = 0; recID < nrecs; recID++)
+        recindex[recID] = -1;
 
-      for ( rindex = nrecs-1; rindex >= 0; rindex-- )
-	{
-	  int index = (int) (rindex*((double)rand())/((double)RAND_MAX));
-	  /*	printf("rindex %d %d\n", rindex, index); */
-	  int ipos = -1;
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      if ( recindex[recID] == -1 ) ipos++;
-	      if ( recindex[recID] == -1 && ipos == index )
-		{
-		  recindex[recID] = rindex;
-		  break;
-		}
-	    }
-	}
+      for (rindex = nrecs - 1; rindex >= 0; rindex--)
+        {
+          int index = (int) (rindex * ((double) rand()) / ((double) RAND_MAX));
+          /*	printf("rindex %d %d\n", rindex, index); */
+          int ipos = -1;
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              if (recindex[recID] == -1) ipos++;
+              if (recindex[recID] == -1 && ipos == index)
+                {
+                  recindex[recID] = rindex;
+                  break;
+                }
+            }
+        }
 
       /*
       for ( int recID = 0; recID < nrecs; recID++ )
-	printf("recID %d %d\n", recID, recindex[recID]);
+        printf("recID %d %d\n", recID, recindex[recID]);
       */
-      for ( int recID = 0; recID < nrecs; recID++ )
-	if ( recindex[recID] == -1 )
-	  cdoAbort("Internal problem! Random initialize.");
+      for (int recID = 0; recID < nrecs; recID++)
+        if (recindex[recID] == -1)
+          cdoAbort("Internal problem! Random initialize.");
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  rindex   = recindex[recID];
-	  varID    = recvarID[rindex];
-	  levelID  = reclevelID[rindex];
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, recdata[rindex], recnmiss[rindex]);
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          rindex = recindex[recID];
+          varID = recvarID[rindex];
+          levelID = reclevelID[rindex];
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, recdata[rindex], recnmiss[rindex]);
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ ) Free(recdata[recID]);
+      for (int recID = 0; recID < nrecs; recID++)
+        Free(recdata[recID]);
 
       Free(recdata);
       Free(recvarID);

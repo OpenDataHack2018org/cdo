@@ -25,13 +25,13 @@
 
 #ifndef __CFORTRAN_LOADED
 #ifdef __clang__
-#  pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wreserved-id-macro"
-#  endif
-#  include "cfortran.h"
-#  ifdef __clang__
-#    pragma GCC diagnostic pop
-#  endif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreserved-id-macro"
+#endif
+#include "cfortran.h"
+#ifdef __clang__
+#pragma GCC diagnostic pop
+#endif
 #endif
 
 #endif

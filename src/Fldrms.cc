@@ -20,15 +20,14 @@
 
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "grid.h"
 
-
-void *Fldrms(void *process)
+void *
+Fldrms(void *process)
 {
   int lastgrid = -1;
   int index;
@@ -62,26 +61,24 @@ void *Fldrms(void *process)
 
   int ngrids = vlistNgrids(vlistID1);
   int ndiffgrids = 0;
-  for ( index = 1; index < ngrids; index++ )
-    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
-      ndiffgrids++;
+  for (index = 1; index < ngrids; index++)
+    if (vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index)) ndiffgrids++;
 
   index = 0;
   int gridID1 = vlistGrid(vlistID1, index);
   int gridID2 = vlistGrid(vlistID2, index);
 
-  if ( gridInqSize(gridID1) != gridInqSize(gridID2) )
+  if (gridInqSize(gridID1) != gridInqSize(gridID2))
     cdoAbort("Fields have different grid size!");
-  
-  if ( needWeights &&
-       gridInqType(gridID1) != GRID_LONLAT &&
-       gridInqType(gridID1) != GRID_GAUSSIAN )
+
+  if (needWeights && gridInqType(gridID1) != GRID_LONLAT
+      && gridInqType(gridID1) != GRID_GAUSSIAN)
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     vlistChangeGridIndex(vlistID3, index, gridID3);
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
+  if (ndiffgrids > 0) cdoAbort("Too many different grids!");
 
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
@@ -92,19 +89,18 @@ void *Fldrms(void *process)
   field_init(&field3);
 
   size_t lim = vlistGridsizeMax(vlistID1);
-  field1.ptr    = (double*) Malloc(lim*sizeof(double));
+  field1.ptr = (double *) Malloc(lim * sizeof(double));
   field1.weight = NULL;
-  if ( needWeights )
-    field1.weight = (double*) Malloc(lim*sizeof(double));
+  if (needWeights) field1.weight = (double *) Malloc(lim * sizeof(double));
 
-  field2.ptr    = (double*) Malloc(lim*sizeof(double));
+  field2.ptr = (double *) Malloc(lim * sizeof(double));
   field2.weight = NULL;
 
-  field3.ptr  = &sglval;
+  field3.ptr = &sglval;
   field3.grid = gridID3;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       nrecs = cdoStreamInqTimestep(streamID2, tsID);
 
@@ -112,43 +108,46 @@ void *Fldrms(void *process)
 
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = nmiss;
-	  pstreamInqRecord(streamID2, &varID, &levelID);
-	  pstreamReadRecord(streamID2, field2.ptr, &nmiss);
+          pstreamInqRecord(streamID2, &varID, &levelID);
+          pstreamReadRecord(streamID2, field2.ptr, &nmiss);
           field2.nmiss = nmiss;
 
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field2.grid = vlistInqVarGrid(vlistID2, varID);
 
-          if ( needWeights && field1.grid != lastgrid )
-	    {
-	      lastgrid = field1.grid;
-	      field1.weight[0] = 1;
-	      if ( field1.size > 1 )
-		{
-		  int wstatus = gridWeights(field1.grid, field1.weight);
-		  if ( wstatus != 0 && tsID == 0 && levelID == 0 )
-		    {
-		      char varname[CDI_MAX_NAME];
-		      vlistInqVarName(vlistID1, varID, varname);
-		      cdoWarning("Grid cell bounds not available, using constant grid cell area weights for variable %s!", varname);
-		    }
-		}
-	    }
+          if (needWeights && field1.grid != lastgrid)
+            {
+              lastgrid = field1.grid;
+              field1.weight[0] = 1;
+              if (field1.size > 1)
+                {
+                  int wstatus = gridWeights(field1.grid, field1.weight);
+                  if (wstatus != 0 && tsID == 0 && levelID == 0)
+                    {
+                      char varname[CDI_MAX_NAME];
+                      vlistInqVarName(vlistID1, varID, varname);
+                      cdoWarning("Grid cell bounds not available, using "
+                                 "constant grid cell area weights for variable "
+                                 "%s!",
+                                 varname);
+                    }
+                }
+            }
 
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
-	  field2.missval = vlistInqVarMissval(vlistID1, varID);
-	  field3.missval = vlistInqVarMissval(vlistID1, varID);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
+          field2.missval = vlistInqVarMissval(vlistID1, varID);
+          field3.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  fldrms(field1, field2, &field3);
+          fldrms(field1, field2, &field3);
 
-	  pstreamDefRecord(streamID3, varID,  levelID);
-	  pstreamWriteRecord(streamID3, &sglval, field3.nmiss);
-	}
+          pstreamDefRecord(streamID3, varID, levelID);
+          pstreamWriteRecord(streamID3, &sglval, field3.nmiss);
+        }
       tsID++;
     }
 
@@ -156,9 +155,9 @@ void *Fldrms(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( field1.ptr )    Free(field1.ptr);
-  if ( field1.weight ) Free(field1.weight);
-  if ( field2.ptr )    Free(field2.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field1.weight) Free(field1.weight);
+  if (field2.ptr) Free(field2.ptr);
 
   cdoFinish();
 

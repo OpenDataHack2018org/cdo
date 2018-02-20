@@ -15,10 +15,10 @@
   GNU General Public License for more details.
 */
 
-#ifndef  CDO_INT_H
-#define  CDO_INT_H
+#ifndef CDO_INT_H
+#define CDO_INT_H
 
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
@@ -45,66 +45,78 @@
 #include "process_int.h"
 #include "exception.h"
 
-#ifdef  _OPENMP
-#define  OPENMP3   200805 
-#define  OPENMP4   201307
-#define  OPENMP45  201511
+#ifdef _OPENMP
+#define OPENMP3 200805
+#define OPENMP4 201307
+#define OPENMP45 201511
 
 #if _OPENMP >= OPENMP3
-#define  HAVE_OPENMP3   1
+#define HAVE_OPENMP3 1
 #endif
 
 #if _OPENMP >= OPENMP4
-#define  HAVE_OPENMP4   1
+#define HAVE_OPENMP4 1
 #endif
 
 #if _OPENMP >= OPENMP45
-#define  HAVE_OPENMP45  1
+#define HAVE_OPENMP45 1
 #endif
 #endif
 
-
-
-
-#define  cmpstr(s1, s2)          (strncmp(s1, s2, strlen(s2)))
-#define  cmpstrlen(s1, s2, len)  (strncmp(s1, s2, len = strlen(s2)))
-
+#define cmpstr(s1, s2) (strncmp(s1, s2, strlen(s2)))
+#define cmpstrlen(s1, s2, len) (strncmp(s1, s2, len = strlen(s2)))
 
 /* sxxxYYYYMMDDhhmm0 */
-#define  DATE_LEN  31        /* YYYYMMDDhhmmss allocate DTLEN+1 !!!! */
-#define  SET_DATE(dtstr, date, time)      (sprintf(dtstr, "%*d%*d", DATE_LEN-6, date, 6, time))
-#define  DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
+#define DATE_LEN 31 /* YYYYMMDDhhmmss allocate DTLEN+1 !!!! */
+#define SET_DATE(dtstr, date, time) \
+  (sprintf(dtstr, "%*d%*d", DATE_LEN - 6, date, 6, time))
+#define DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
 
-enum T_WEIGHT_MODE {WEIGHT_OFF, WEIGHT_ON};
-enum T_EIGEN_MODE  {JACOBI, DANIELSON_LANCZOS};
+enum T_WEIGHT_MODE
+{
+  WEIGHT_OFF,
+  WEIGHT_ON
+};
+enum T_EIGEN_MODE
+{
+  JACOBI,
+  DANIELSON_LANCZOS
+};
 
-
-#ifndef  M_LN10
-#define  M_LN10      2.30258509299404568401799145468436421  /* log_e 10 */
+#ifndef M_LN10
+#define M_LN10 2.30258509299404568401799145468436421 /* log_e 10 */
 #endif
 
-#ifndef  M_PI
-#define  M_PI        3.14159265358979323846264338327950288  /* pi */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327950288 /* pi */
 #endif
 
+#define NEW_2D(T, P2D, N, M)                     \
+  T **P2D = (N) ? new T *[(N)] : nullptr;        \
+  if ((N))                                       \
+    {                                            \
+      P2D[0] = (M) ? new T[(N) * (M)] : nullptr; \
+      for (size_t i = 1; i < (size_t)(N); ++i)   \
+        P2D[i] = P2D[0] + i * (M);               \
+    }
+#define DELETE_2D(P2D)             \
+  if (P2D)                         \
+    {                              \
+      if (P2D[0]) delete[] P2D[0]; \
+      delete[] P2D;                \
+      P2D = nullptr;               \
+    }
 
-#define  NEW_2D(T, P2D, N, M)     T **P2D = (N)?new T*[(N)]:nullptr;                          \
-                                  if ((N)) { P2D[0] = (M)?new T[(N)*(M)]:nullptr;             \
-                                             for ( size_t i = 1; i < (size_t) (N); ++i ) P2D[i] = P2D[0] + i*(M); }
-#define  DELETE_2D(P2D) if (P2D) { if (P2D[0]) delete[] P2D[0]; delete[] P2D; P2D = nullptr; }
+#define IX2D(y, x, nx) ((y) * (nx) + (x))
 
-
-#define  IX2D(y,x,nx)  ((y)*(nx)+(x))
-
-#define  MEMTYPE_DOUBLE  1
-#define  MEMTYPE_FLOAT   2
-
+#define MEMTYPE_DOUBLE 1
+#define MEMTYPE_FLOAT 2
 
 void print_pthread_info(void);
 
 void cdoProcessTime(double *utime, double *stime);
 
-int     readline(FILE *fp, char *line, int len);
+int readline(FILE *fp, char *line, int len);
 
 int zaxis2ltype(int zaxisID);
 
@@ -114,20 +126,20 @@ void datetime2str(int date, int time, char *datetimestr, int maxlen);
 void date2str(int date, char *datestr, int maxlen);
 void time2str(int time, char *timestr, int maxlen);
 
-const char * tunit2str(int tunits);
-const char * calendar2str(int calendar);
+const char *tunit2str(int tunits);
+const char *calendar2str(int calendar);
 
-void    cdo_set_grids(const char *gridarg);
-void    defineInstitution(const char *instarg);
-int     defineTable(const char *tablearg);
+void cdo_set_grids(const char *gridarg);
+void defineInstitution(const char *instarg);
+int defineTable(const char *tablearg);
 
-void    nospec(int vlistID);
-void    gridWrite(FILE *fp, int gridID);
+void nospec(int vlistID);
+void gridWrite(FILE *fp, int gridID);
 
 void openLock(void);
 void openUnlock(void);
 
-int  cdf_openread(const char *filename);
+int cdf_openread(const char *filename);
 
 void printFiletype(int streamID, int vlistID);
 
@@ -135,14 +147,15 @@ off_t fileSize(const char *restrict filename);
 
 const char *parameter2word(const char *string);
 double parameter2double(const char *string);
-bool   parameter2bool(const char *string);
-int    parameter2int(const char *string);
+bool parameter2bool(const char *string);
+int parameter2int(const char *string);
 size_t parameter2sizet(const char *string);
-int    parameter2intlist(const char *string);
+int parameter2intlist(const char *string);
 
 int referenceToGrid(int gridID1);
 
-void cdo_read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *fp, const char *dname);
+void cdo_read_field(const char *name, char *pline, int size, double *field,
+                    int *lineno, FILE *fp, const char *dname);
 
 double cdoZaxisInqLevel(int zaxisID, int levelID);
 int cdoZaxisInqLevels(int zaxisID, double *levels);
@@ -164,18 +177,20 @@ extern "C" {
 
 void cdiDefTableID(int tableID);
 
-void gridGenXvals(int xsize, double xfirst, double xlast, double xinc, double *xvals);
-void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast, double yinc, double *yvals);
+void gridGenXvals(int xsize, double xfirst, double xlast, double xinc,
+                  double *xvals);
+void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast,
+                  double yinc, double *yvals);
 
 void gaussaw(double *restrict pa, double *restrict pw, size_t nlat);
 
 int qu2reg3_double(double *pfield, int *kpoint, int klat, int klon,
-		   double msval, int *kret, int omisng, int operio, int oveggy);
+                   double msval, int *kret, int omisng, int operio, int oveggy);
 
 void cdoCompareGrids(int gridID1, int gridID2);
 
-#if defined (__cplusplus)
+#if defined(__cplusplus)
 }
 #endif
 
-#endif  /* CDO_INT_H */
+#endif /* CDO_INT_H */

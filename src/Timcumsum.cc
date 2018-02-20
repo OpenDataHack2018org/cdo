@@ -21,14 +21,13 @@
       Timcumsum    timcumsum         Cumulative sum over time
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Timcumsum(void *process)
+void *
+Timcumsum(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -49,53 +48,55 @@ void *Timcumsum(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
 
-  int tsID  = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  int tsID = 0;
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-    
-      for ( int recID = 0; recID < nrecs; recID++ )
+
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
           field_type *pvars1 = &vars1[varID][levelID];
-              
+
           gridsize = gridInqSize(pvars1->grid);
 
-          if ( tsID == 0 )
+          if (tsID == 0)
             {
               pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
               // pvars1->nmiss = nmiss;
-              if ( nmiss )
-                for ( size_t i = 0; i < gridsize; ++i )
-                  if ( DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval) ) pvars1->ptr[i] = 0;
+              if (nmiss)
+                for (size_t i = 0; i < gridsize; ++i)
+                  if (DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval))
+                    pvars1->ptr[i] = 0;
             }
           else
             {
               pstreamReadRecord(streamID1, field.ptr, &nmiss);
               // field.nmiss   = nmiss;
-              field.size    = gridsize;
-              field.grid    = pvars1->grid;
+              field.size = gridsize;
+              field.grid = pvars1->grid;
               field.missval = pvars1->missval;
 
-              if ( nmiss )
-                for ( size_t i = 0; i < gridsize; ++i )
-                  if ( DBL_IS_EQUAL(field.ptr[i], pvars1->missval) ) field.ptr[i] = 0;
+              if (nmiss)
+                for (size_t i = 0; i < gridsize; ++i)
+                  if (DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
+                    field.ptr[i] = 0;
 
               farfun(pvars1, field, func_sum);
             }
-          
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
+
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
         }
 
       tsID++;
@@ -106,7 +107,7 @@ void *Timcumsum(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
   cdoFinish();
 

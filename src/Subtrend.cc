@@ -21,14 +21,13 @@
      Subtrend   subtrend        Subtract trend
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Subtrend(void *process)
+void *
+Subtrend(void *process)
 {
   int gridID, varID, levelID;
   size_t nmiss;
@@ -59,17 +58,16 @@ void *Subtrend(void *process)
   field_type field1, field4;
   field_init(&field1);
   field_init(&field4);
-  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
-  field4.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field4.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   field_type **vars2 = field_malloc(vlistID1, FIELD_PTR);
   field_type **vars3 = field_malloc(vlistID1, FIELD_PTR);
 
-
   int tsID = 0;
   int nrecs = cdoStreamInqTimestep(streamID2, tsID);
 
-  for ( int recID = 0; recID < nrecs; recID++ )
+  for (int recID = 0; recID < nrecs; recID++)
     {
       pstreamInqRecord(streamID2, &varID, &levelID);
       pstreamReadRecord(streamID2, vars2[varID][levelID].ptr, &nmiss);
@@ -78,37 +76,39 @@ void *Subtrend(void *process)
   tsID = 0;
   nrecs = cdoStreamInqTimestep(streamID3, tsID);
 
-  for ( int recID = 0; recID < nrecs; recID++ )
+  for (int recID = 0; recID < nrecs; recID++)
     {
       pstreamInqRecord(streamID3, &varID, &levelID);
       pstreamReadRecord(streamID3, vars3[varID][levelID].ptr, &nmiss);
     }
 
-
   tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID4, taxisID1);
       pstreamDefTimestep(streamID4, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
 
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
+          gridID = vlistInqVarGrid(vlistID1, varID);
+          gridsize = gridInqSize(gridID);
 
-	  double missval = vlistInqVarMissval(vlistID1, varID);
-	  double missval1 = missval;
-	  double missval2 = missval;
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    field4.ptr[i] = SUBMN(field1.ptr[i], ADDMN(vars2[varID][levelID].ptr[i], MULMN(vars3[varID][levelID].ptr[i], tsID)));
-    
-	  nmiss = arrayNumMV(gridsize, field4.ptr, missval);
-	  pstreamDefRecord(streamID4, varID, levelID);
-	  pstreamWriteRecord(streamID4, field4.ptr, nmiss);
-	}
+          double missval = vlistInqVarMissval(vlistID1, varID);
+          double missval1 = missval;
+          double missval2 = missval;
+          for (size_t i = 0; i < gridsize; i++)
+            field4.ptr[i]
+                = SUBMN(field1.ptr[i],
+                        ADDMN(vars2[varID][levelID].ptr[i],
+                              MULMN(vars3[varID][levelID].ptr[i], tsID)));
+
+          nmiss = arrayNumMV(gridsize, field4.ptr, missval);
+          pstreamDefRecord(streamID4, varID, levelID);
+          pstreamWriteRecord(streamID4, field4.ptr, nmiss);
+        }
 
       tsID++;
     }
@@ -116,8 +116,8 @@ void *Subtrend(void *process)
   field_free(vars2, vlistID1);
   field_free(vars3, vlistID1);
 
-  if ( field1.ptr ) Free(field1.ptr);
-  if ( field4.ptr ) Free(field4.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field4.ptr) Free(field4.ptr);
 
   pstreamClose(streamID4);
   pstreamClose(streamID3);

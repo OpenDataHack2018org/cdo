@@ -18,9 +18,8 @@
 #include <cdi.h>
 #include "cdo_int.h"
 
-
-static
-int readInstitution(const char *instfile)
+static int
+readInstitution(const char *instfile)
 {
   int instID = CDI_UNDEFID;
   char line[1024], *pline;
@@ -31,70 +30,69 @@ int readInstitution(const char *instfile)
 
   FILE *instfp = fopen(instfile, "r");
 
-  if ( instfp == NULL ) return instID;
+  if (instfp == NULL) return instID;
 
-  while ( readline(instfp, line, 1024) )
+  while (readline(instfp, line, 1024))
     {
       lnr++;
-      if ( line[0] == '#' ) continue;
-      if ( nvar == maxvar ) break;
+      if (line[0] == '#') continue;
+      if (nvar == maxvar) break;
       nvar++;
 
       pline = line;
-      while ( isspace((int) *pline) ) pline++;
+      while (isspace((int) *pline))
+        pline++;
 
-      if ( nvar == 1 )
-	{
-	  if ( isdigit((int) pline[0]) )
-	    maxvar = 4;
-	  else
-	    maxvar = 2;
-	}
+      if (nvar == 1)
+        {
+          if (isdigit((int) pline[0]))
+            maxvar = 4;
+          else
+            maxvar = 2;
+        }
 
-      if ( nvar == 1 && maxvar == 4 )
-	{
-	  center = atoi(pline);
-	}
+      if (nvar == 1 && maxvar == 4)
+        {
+          center = atoi(pline);
+        }
 
-      if ( nvar == 2 && maxvar == 4 )
-	{
-	  if ( ! isdigit((int) pline[0]) )
-	    cdoAbort("wrong format in line %d. Missing subcenter!", lnr);
+      if (nvar == 2 && maxvar == 4)
+        {
+          if (!isdigit((int) pline[0]))
+            cdoAbort("wrong format in line %d. Missing subcenter!", lnr);
 
-	  subcenter = atoi(pline);
-	}
+          subcenter = atoi(pline);
+        }
 
-      if ( (nvar == 3 && maxvar == 4) || (nvar == 1 && maxvar == 2) )
-	{
-	  strcpy(name, pline);
-	}
+      if ((nvar == 3 && maxvar == 4) || (nvar == 1 && maxvar == 2))
+        {
+          strcpy(name, pline);
+        }
 
-      if ( (nvar == 4 && maxvar == 4) || (nvar == 2 && maxvar == 2) )
-	{
-	  strcpy(longname, pline);
-	}
+      if ((nvar == 4 && maxvar == 4) || (nvar == 2 && maxvar == 2))
+        {
+          strcpy(longname, pline);
+        }
     }
 
   fclose(instfp);
 
   instID = institutInq(center, subcenter, name, longname);
-  if ( instID == CDI_UNDEFID )
+  if (instID == CDI_UNDEFID)
     instID = institutDef(center, subcenter, name, longname);
 
   return instID;
 }
 
-
-void defineInstitution(const char *instarg)
+void
+defineInstitution(const char *instarg)
 {
   const char *instname = instarg;
   int instID = readInstitution(instname);
 
-  if ( instID == CDI_UNDEFID )
-    instID = institutInq(0, 0, instname, NULL);
+  if (instID == CDI_UNDEFID) instID = institutInq(0, 0, instname, NULL);
 
-  if ( instID == CDI_UNDEFID )
-    cdoAbort("institution <%s> not found", instname);
+  if (instID == CDI_UNDEFID) cdoAbort("institution <%s> not found", instname);
 
   cdoDefaultInstID = instID;
 }

@@ -28,25 +28,32 @@
 #include "pstream_int.h"
 #include "datetime.h"
 
-
-#define MAX_GAPS   64
-#define MAX_NTSM  128
+#define MAX_GAPS 64
+#define MAX_NTSM 128
 #define LIM_NTSM 1024
 
-enum {TU_SECONDS=0, TU_MINUTES, TU_HOURS, TU_DAYS, TU_MONTHS, TU_YEARS};
-const char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
-int   iunits[] = {1, 60, 3600, 86400, 1, 12};
+enum
+{
+  TU_SECONDS = 0,
+  TU_MINUTES,
+  TU_HOURS,
+  TU_DAYS,
+  TU_MONTHS,
+  TU_YEARS
+};
+const char *tunits[] = { "second", "minute", "hour", "day", "month", "year" };
+int iunits[] = { 1, 60, 3600, 86400, 1, 12 };
 
-
-void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit)
+void
+getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit)
 {
   *incperiod = 0;
-  *incunit   = 0;
+  *incunit = 0;
 
-  int lperiod = (jdelta < 0) ? (int)(jdelta-0.5) : (int)(jdelta+0.5);
+  int lperiod = (jdelta < 0) ? (int) (jdelta - 0.5) : (int) (jdelta + 0.5);
 
   int sign = 1;
-  if ( lperiod < 0 )
+  if (lperiod < 0)
     {
       int tmp = vdate1;
       vdate1 = vdate0;
@@ -62,37 +69,37 @@ void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incu
   int year1, month1, day1;
   cdiDecodeDate(vdate1, &year1, &month1, &day1);
 
-  int deltay = year1-year0;
-  int deltam = deltay*12 + (month1-month0);
-  if ( deltay == 0 ) deltay = 1;
-  if ( deltam == 0 ) deltam = 1;
+  int deltay = year1 - year0;
+  int deltam = deltay * 12 + (month1 - month0);
+  if (deltay == 0) deltay = 1;
+  if (deltam == 0) deltam = 1;
 
-  if ( lperiod/60 >= 1 && lperiod/60 < 60 )
+  if (lperiod / 60 >= 1 && lperiod / 60 < 60)
     {
-      *incperiod = lperiod/60;
+      *incperiod = lperiod / 60;
       *incunit = TU_MINUTES;
     }
-  else if ( lperiod/3600 >= 1 && lperiod/3600 < 24 )
+  else if (lperiod / 3600 >= 1 && lperiod / 3600 < 24)
     {
-      *incperiod = lperiod/3600;
+      *incperiod = lperiod / 3600;
       *incunit = TU_HOURS;
     }
-  else if ( lperiod/(3600*24) >= 1 && lperiod/(3600*24) < 32 )
+  else if (lperiod / (3600 * 24) >= 1 && lperiod / (3600 * 24) < 32)
     {
-      *incperiod = lperiod/(3600*24);
+      *incperiod = lperiod / (3600 * 24);
       *incunit = TU_DAYS;
-      if ( *incperiod >= 27 && deltam == 1 )
-	{
-	  *incperiod = 1;
-	  *incunit = TU_MONTHS;
-	}
+      if (*incperiod >= 27 && deltam == 1)
+        {
+          *incperiod = 1;
+          *incunit = TU_MONTHS;
+        }
     }
-  else if ( lperiod/(3600*24*30) >= 1 && lperiod/(3600*24*30) < 12 )
+  else if (lperiod / (3600 * 24 * 30) >= 1 && lperiod / (3600 * 24 * 30) < 12)
     {
       *incperiod = deltam;
       *incunit = TU_MONTHS;
     }
-  else if ( lperiod/(3600*24*30*12) >= 1 )
+  else if (lperiod / (3600 * 24 * 30 * 12) >= 1)
     {
       *incperiod = deltay;
       *incunit = TU_YEARS;
@@ -106,110 +113,121 @@ void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incu
   *incperiod *= sign;
 }
 
-static
-void printBounds(int taxisID, int calendar)
+static void
+printBounds(int taxisID, int calendar)
 {
   int vdate0, vdate1;
   taxisInqVdateBounds(taxisID, &vdate0, &vdate1);
   int vtime0, vtime1;
   taxisInqVtimeBounds(taxisID, &vtime0, &vtime1);
 
-   char vdatestr[32], vtimestr[32];
-   date2str(vdate0, vdatestr, sizeof(vdatestr));
-  time2str(vtime0, vtimestr, sizeof(vtimestr));	  
+  char vdatestr[32], vtimestr[32];
+  date2str(vdate0, vdatestr, sizeof(vdatestr));
+  time2str(vtime0, vtimestr, sizeof(vtimestr));
   fprintf(stdout, " %s %s", vdatestr, vtimestr);
 
   date2str(vdate1, vdatestr, sizeof(vdatestr));
-  time2str(vtime1, vtimestr, sizeof(vtimestr));	  
+  time2str(vtime1, vtimestr, sizeof(vtimestr));
   fprintf(stdout, " %s %s", vdatestr, vtimestr);
 
-  juldate_t juldate0  = juldate_encode(calendar, vdate0, vtime0);
-  juldate_t juldate1  = juldate_encode(calendar, vdate1, vtime1);
-  double    jdelta    = juldate_to_seconds(juldate_sub(juldate1, juldate0));
+  juldate_t juldate0 = juldate_encode(calendar, vdate0, vtime0);
+  juldate_t juldate1 = juldate_encode(calendar, vdate1, vtime1);
+  double jdelta = juldate_to_seconds(juldate_sub(juldate1, juldate0));
 
   int incperiod = 0, incunit = 0;
   getTimeInc(jdelta, vdate0, vdate1, &incperiod, &incunit);
-  
-  /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600), incperiod%3600);*/
-  int len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], abs(incperiod)!=1?"s":"");
-  for ( int i = 0; i < 11-len; ++i ) fprintf(stdout, " ");
+
+  /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600),
+   * incperiod%3600);*/
+  int len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit],
+                    abs(incperiod) != 1 ? "s" : "");
+  for (int i = 0; i < 11 - len; ++i)
+    fprintf(stdout, " ");
 }
 
-static
-int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2], 
-	     int vdatem[MAX_GAPS][MAX_NTSM], int vtimem[MAX_GAPS][MAX_NTSM],
-	     int tsID, int incperiod0, int incunit0, int vdate, int vdate0, int vtime0,
-	     int calendar, int day0, juldate_t juldate, juldate_t juldate0)
+static int
+fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
+         int vdatem[MAX_GAPS][MAX_NTSM], int vtimem[MAX_GAPS][MAX_NTSM],
+         int tsID, int incperiod0, int incunit0, int vdate, int vdate0,
+         int vtime0, int calendar, int day0, juldate_t juldate,
+         juldate_t juldate0)
 {
   int its = 0;
   int year, month, day;
   int ndate, ntime;
   int ijulinc = incperiod0 * iunits[incunit0];
 
-  if ( ijulinc > 0 && ngaps < MAX_GAPS )
+  if (ijulinc > 0 && ngaps < MAX_GAPS)
     {
       rangetsm[ngaps][0] = tsID;
-      rangetsm[ngaps][1] = tsID+1;
+      rangetsm[ngaps][1] = tsID + 1;
 
-      if ( incunit0 == TU_MONTHS || incunit0 == TU_YEARS )
-	{
-	  its = 0;
-	  ndate = vdate0;
-	  //printf("fill_gap %d\n", ndate);
-	  while ( TRUE )
-	    {
-	      cdiDecodeDate(ndate, &year, &month, &day);
-	      
-	      month += ijulinc;
-				  
-	      while ( month > 12 ) { month -= 12; year++; }
-	      while ( month <  1 ) { month += 12; year--; }
-	      
-	      if ( day0 == 31 )
-		day = days_per_month(calendar, year, month);
-	      
-	      ndate = cdiEncodeDate(year, month, day);
-	      ntime = vtime0;
-	      if ( ndate >= vdate ) break;
-	      /* printf("\n1 %d %d\n", ndate, ntime); */
-	      if ( its < MAX_NTSM )
-		{
-		  vdatem[ngaps][its] = ndate;
-		  vtimem[ngaps][its] = ntime;
-		}
-	      else if ( its >= LIM_NTSM )
-		break;
+      if (incunit0 == TU_MONTHS || incunit0 == TU_YEARS)
+        {
+          its = 0;
+          ndate = vdate0;
+          // printf("fill_gap %d\n", ndate);
+          while (TRUE)
+            {
+              cdiDecodeDate(ndate, &year, &month, &day);
 
-	      its++;
-	    }
-	}
+              month += ijulinc;
+
+              while (month > 12)
+                {
+                  month -= 12;
+                  year++;
+                }
+              while (month < 1)
+                {
+                  month += 12;
+                  year--;
+                }
+
+              if (day0 == 31) day = days_per_month(calendar, year, month);
+
+              ndate = cdiEncodeDate(year, month, day);
+              ntime = vtime0;
+              if (ndate >= vdate) break;
+              /* printf("\n1 %d %d\n", ndate, ntime); */
+              if (its < MAX_NTSM)
+                {
+                  vdatem[ngaps][its] = ndate;
+                  vtimem[ngaps][its] = ntime;
+                }
+              else if (its >= LIM_NTSM)
+                break;
+
+              its++;
+            }
+        }
       else
-	{
-	  its = 0;
-	  juldate0 = juldate_add_seconds(ijulinc, juldate0);
-	  while ( juldate_to_seconds(juldate0) < juldate_to_seconds(juldate) )
-	    {
-	      juldate_decode(calendar, juldate0, &ndate, &ntime);
-	      juldate0 = juldate_add_seconds(ijulinc, juldate0);
-	      if ( its < MAX_NTSM )
-		{
-		  vdatem[ngaps][its] = ndate;
-		  vtimem[ngaps][its] = ntime;
-		}
-	      else if ( its >= LIM_NTSM )
-		break;
+        {
+          its = 0;
+          juldate0 = juldate_add_seconds(ijulinc, juldate0);
+          while (juldate_to_seconds(juldate0) < juldate_to_seconds(juldate))
+            {
+              juldate_decode(calendar, juldate0, &ndate, &ntime);
+              juldate0 = juldate_add_seconds(ijulinc, juldate0);
+              if (its < MAX_NTSM)
+                {
+                  vdatem[ngaps][its] = ndate;
+                  vtimem[ngaps][its] = ntime;
+                }
+              else if (its >= LIM_NTSM)
+                break;
 
-	      its++;
-	    }
-	}			
+              its++;
+            }
+        }
       ntsm[ngaps] = its;
     }
 
   return its;
 }
 
-
-void *Tinfo(void *process)
+void *
+Tinfo(void *process)
 {
   int vdate_first = 0, vtime_first = 0;
   int vdate0 = 0, vtime0 = 0;
@@ -230,7 +248,7 @@ void *Tinfo(void *process)
   double jdelta = 0, jdelta0 = 0;
   int arrow = 0;
   int i, len;
-  char vdatestr[32], vtimestr[32];	  
+  char vdatestr[32], vtimestr[32];
 
   cdoInitialize(process);
 
@@ -243,180 +261,193 @@ void *Tinfo(void *process)
   int taxisID = vlistInqTaxis(vlistID);
   int ntsteps = vlistNtsteps(vlistID);
 
-  if ( ntsteps != 0 )
+  if (ntsteps != 0)
     {
-      if ( ntsteps == CDI_UNDEFID )
-	fprintf(stdout, "   Time axis :  unlimited steps\n");
+      if (ntsteps == CDI_UNDEFID)
+        fprintf(stdout, "   Time axis :  unlimited steps\n");
       else
-	fprintf(stdout, "   Time axis :  %d step%s\n", ntsteps, ntsteps == 1 ? "" : "s");
+        fprintf(stdout, "   Time axis :  %d step%s\n", ntsteps,
+                ntsteps == 1 ? "" : "s");
 
-      if ( taxisID != CDI_UNDEFID )
-	{
-	  if ( taxisInqType(taxisID) != TAXIS_ABSOLUTE )
-	    {
-	      vdate = taxisInqRdate(taxisID);
-	      vtime = taxisInqRtime(taxisID);
-	      
-	      date2str(vdate, vdatestr, sizeof(vdatestr));
-	      time2str(vtime, vtimestr, sizeof(vtimestr));
+      if (taxisID != CDI_UNDEFID)
+        {
+          if (taxisInqType(taxisID) != TAXIS_ABSOLUTE)
+            {
+              vdate = taxisInqRdate(taxisID);
+              vtime = taxisInqRtime(taxisID);
 
-	      fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
-		      
-	      int unit = taxisInqTunit(taxisID);
-	      if ( unit != CDI_UNDEFID )  fprintf(stdout, "  Units = %s", tunit2str(unit));
-	      
-	      int calendar = taxisInqCalendar(taxisID);
-	      if ( calendar != CDI_UNDEFID )  fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
+              date2str(vdate, vdatestr, sizeof(vdatestr));
+              time2str(vtime, vtimestr, sizeof(vtimestr));
 
-	      if ( taxisHasBounds(taxisID) )
-		fprintf(stdout, "  Bounds = true");
+              fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 
-	      fprintf(stdout, "\n");
+              int unit = taxisInqTunit(taxisID);
+              if (unit != CDI_UNDEFID)
+                fprintf(stdout, "  Units = %s", tunit2str(unit));
 
-	      if ( taxisInqType(taxisID) == TAXIS_FORECAST )
-		{
-		  int fdate = taxisInqFdate(taxisID);
-		  int ftime = taxisInqFtime(taxisID);
-	      
-		  date2str(fdate, vdatestr, sizeof(vdatestr));
-		  time2str(ftime, vtimestr, sizeof(vtimestr));
+              int calendar = taxisInqCalendar(taxisID);
+              if (calendar != CDI_UNDEFID)
+                fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
 
-		  fprintf(stdout, "     Forecast RefTime = %s %s", vdatestr, vtimestr);
-		      
-		  unit = taxisInqForecastTunit(taxisID);
-		  if ( unit != CDI_UNDEFID )  fprintf(stdout, "  Units = %s", tunit2str(unit));
+              if (taxisHasBounds(taxisID)) fprintf(stdout, "  Bounds = true");
 
-		  fprintf(stdout, "\n");
+              fprintf(stdout, "\n");
 
-		  lforecast = true;
-		}
-	    }
-	}
+              if (taxisInqType(taxisID) == TAXIS_FORECAST)
+                {
+                  int fdate = taxisInqFdate(taxisID);
+                  int ftime = taxisInqFtime(taxisID);
+
+                  date2str(fdate, vdatestr, sizeof(vdatestr));
+                  time2str(ftime, vtimestr, sizeof(vtimestr));
+
+                  fprintf(stdout, "     Forecast RefTime = %s %s", vdatestr,
+                          vtimestr);
+
+                  unit = taxisInqForecastTunit(taxisID);
+                  if (unit != CDI_UNDEFID)
+                    fprintf(stdout, "  Units = %s", tunit2str(unit));
+
+                  fprintf(stdout, "\n");
+
+                  lforecast = true;
+                }
+            }
+        }
 
       int calendar = taxisInqCalendar(taxisID);
 
       fprintf(stdout, "\n");
       fprintf(stdout, "         Verification Time              ");
-      if ( lforecast ) fprintf(stdout, " Forecast Reference Time     ");
-      if ( taxisHasBounds(taxisID) )
-	fprintf(stdout, " lower bound          upper bound");
+      if (lforecast) fprintf(stdout, " Forecast Reference Time     ");
+      if (taxisHasBounds(taxisID))
+        fprintf(stdout, " lower bound          upper bound");
       fprintf(stdout, "\n");
 
       fprintf(stdout, "Timestep YYYY-MM-DD hh:mm:ss   Increment");
-      if ( lforecast ) fprintf(stdout, " YYYY-MM-DD hh:mm:ss   Period");
-      if ( taxisHasBounds(taxisID) )
-	fprintf(stdout, " YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  Difference");
+      if (lforecast) fprintf(stdout, " YYYY-MM-DD hh:mm:ss   Period");
+      if (taxisHasBounds(taxisID))
+        fprintf(stdout,
+                " YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  Difference");
       fprintf(stdout, "\n");
 
       tsID = 0;
-      while ( cdoStreamInqTimestep(streamID, tsID) )
-	{  
-	  vdate = taxisInqVdate(taxisID);
-	  vtime = taxisInqVtime(taxisID);
-	  
-	  cdiDecodeDate(vdate, &year, &month, &day);
-	      
-	  date2str(vdate, vdatestr, sizeof(vdatestr));
-	  time2str(vtime, vtimestr, sizeof(vtimestr));
+      while (cdoStreamInqTimestep(streamID, tsID))
+        {
+          vdate = taxisInqVdate(taxisID);
+          vtime = taxisInqVtime(taxisID);
 
-	  fprintf(stdout, "%6d  %s %s", tsID+1, vdatestr, vtimestr);
+          cdiDecodeDate(vdate, &year, &month, &day);
 
-	  if ( tsID )
-	    {
-	      cdiDecodeDate(vdate0, &year0, &month0, &day0);
+          date2str(vdate, vdatestr, sizeof(vdatestr));
+          time2str(vtime, vtimestr, sizeof(vtimestr));
 
-	      juldate0  = juldate_encode(calendar, vdate0, vtime0);
-	      juldate   = juldate_encode(calendar, vdate, vtime);
-	      jdelta    = juldate_to_seconds(juldate_sub(juldate, juldate0));
+          fprintf(stdout, "%6d  %s %s", tsID + 1, vdatestr, vtimestr);
 
-	      getTimeInc(jdelta, vdate0, vdate, &incperiod, &incunit);
+          if (tsID)
+            {
+              cdiDecodeDate(vdate0, &year0, &month0, &day0);
 
-	      /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600), incperiod%3600);*/
-	      len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], abs(incperiod)!=1?"s":"");
-	      for ( i = 0; i < 11-len; ++i ) fprintf(stdout, " ");
-	    }
-	  else
-	    {
-	      vdate_first = vdate;
-	      vtime_first = vtime;
-	      fprintf(stdout, "   --------");
-	    }
+              juldate0 = juldate_encode(calendar, vdate0, vtime0);
+              juldate = juldate_encode(calendar, vdate, vtime);
+              jdelta = juldate_to_seconds(juldate_sub(juldate, juldate0));
 
-	  if ( lforecast )
-	    {
-	      int fdate = taxisInqFdate(taxisID);
-	      int ftime = taxisInqFtime(taxisID);
-	      
-	      date2str(fdate, vdatestr, sizeof(vdatestr));
-	      time2str(ftime, vtimestr, sizeof(vtimestr));
+              getTimeInc(jdelta, vdate0, vdate, &incperiod, &incunit);
 
-	      fprintf(stdout, " %s %s", vdatestr, vtimestr);
+              /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600,
+               * fmod(jdelta,3600), incperiod%3600);*/
+              len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit],
+                            abs(incperiod) != 1 ? "s" : "");
+              for (i = 0; i < 11 - len; ++i)
+                fprintf(stdout, " ");
+            }
+          else
+            {
+              vdate_first = vdate;
+              vtime_first = vtime;
+              fprintf(stdout, "   --------");
+            }
 
-	      double fc_period = taxisInqForecastPeriod(taxisID);
-	      fprintf(stdout, " %7g", fc_period);
-	    }
+          if (lforecast)
+            {
+              int fdate = taxisInqFdate(taxisID);
+              int ftime = taxisInqFtime(taxisID);
 
-	  if ( taxisHasBounds(taxisID) ) printBounds(taxisID, calendar);
+              date2str(fdate, vdatestr, sizeof(vdatestr));
+              time2str(ftime, vtimestr, sizeof(vtimestr));
 
-	  if (  tsID > 1 && (incperiod != incperiod0 || incunit != incunit0) )
-	    {
-	      if ( tsID == 2 && (jdelta0 > jdelta) )
-		{
-		  jdelta0    = jdelta;
-		  incperiod0 = incperiod;
-		  incunit0   = incunit;
+              fprintf(stdout, " %s %s", vdatestr, vtimestr);
 
-		  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem,
-				 1, incperiod0, incunit0, vdate_first, vdate, vtime,
-				 calendar, day, juldate0, 
-				 juldate_encode(calendar, vdate_first, vtime_first));
+              double fc_period = taxisInqForecastPeriod(taxisID);
+              fprintf(stdout, " %7g", fc_period);
+            }
 
-		  arrow = '^';
-		}
-	      else
-		{
-		  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem,
-				 tsID, incperiod0, incunit0, vdate, vdate0, vtime0,
-				 calendar, day0, juldate, juldate0);
+          if (taxisHasBounds(taxisID)) printBounds(taxisID, calendar);
 
-		  arrow = '<';
+          if (tsID > 1 && (incperiod != incperiod0 || incunit != incunit0))
+            {
+              if (tsID == 2 && (jdelta0 > jdelta))
+                {
+                  jdelta0 = jdelta;
+                  incperiod0 = incperiod;
+                  incunit0 = incunit;
 
-		  if (  its == 0 && incperiod < 0 )
-		    {
-		      its = -1;
-		      vdate = vdate0;
-		      vtime = vtime0;
-		    }
-		}
+                  its = fill_gap(
+                      ngaps, ntsm, rangetsm, vdatem, vtimem, 1, incperiod0,
+                      incunit0, vdate_first, vdate, vtime, calendar, day,
+                      juldate0,
+                      juldate_encode(calendar, vdate_first, vtime_first));
 
-	      if ( its > 0 )
-		{
-		  ngaps++;
-		  if ( cdoVerbose )
-		    fprintf(stdout, "  %c--- Gap %d, missing %s%d timestep%s",
-			    arrow, ngaps, its>=LIM_NTSM?"more than ":"", its, its!=1?"s":"");
-		}
-	      else if ( its < 0 )
-		{
-		  if ( cdoVerbose )
-		    fprintf(stdout, "  %c--- Wrong date/time information, negative increment!", arrow);
-		}
-	    }
+                  arrow = '^';
+                }
+              else
+                {
+                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, tsID,
+                                 incperiod0, incunit0, vdate, vdate0, vtime0,
+                                 calendar, day0, juldate, juldate0);
 
-	  if ( tsID == 1 )
-	    {
-	      jdelta0    = jdelta;
-	      incperiod0 = incperiod;
-	      incunit0   = incunit;
-	    }
+                  arrow = '<';
 
-	  fprintf(stdout, "\n");
+                  if (its == 0 && incperiod < 0)
+                    {
+                      its = -1;
+                      vdate = vdate0;
+                      vtime = vtime0;
+                    }
+                }
 
-	  vdate0 = vdate;
-	  vtime0 = vtime;
+              if (its > 0)
+                {
+                  ngaps++;
+                  if (cdoVerbose)
+                    fprintf(stdout, "  %c--- Gap %d, missing %s%d timestep%s",
+                            arrow, ngaps, its >= LIM_NTSM ? "more than " : "",
+                            its, its != 1 ? "s" : "");
+                }
+              else if (its < 0)
+                {
+                  if (cdoVerbose)
+                    fprintf(stdout,
+                            "  %c--- Wrong date/time information, negative "
+                            "increment!",
+                            arrow);
+                }
+            }
 
-	  tsID++;
-	}
+          if (tsID == 1)
+            {
+              jdelta0 = jdelta;
+              incperiod0 = incperiod;
+              incunit0 = incunit;
+            }
+
+          fprintf(stdout, "\n");
+
+          vdate0 = vdate;
+          vtime0 = vtime;
+
+          tsID++;
+        }
     }
 
   pstreamClose(streamID);
@@ -431,52 +462,55 @@ void *Tinfo(void *process)
   time2str(vtime, vtimestr, sizeof(vtimestr));
   fprintf(stdout, " End date            : %s %s\n", vdatestr, vtimestr);
 
-  fprintf(stdout, " Increment           : %3d %s%s\n", 
-	  incperiod0, tunits[incunit0], incperiod0!=1?"s":"");
+  fprintf(stdout, " Increment           : %3d %s%s\n", incperiod0,
+          tunits[incunit0], incperiod0 != 1 ? "s" : "");
   fprintf(stdout, " Number of timesteps : %d\n", tsID);
   fprintf(stdout, " Gaps identified     : %d\n", ngaps);
 
-  if ( cdoVerbose && ngaps )
+  if (cdoVerbose && ngaps)
     {
-      fprintf(stdout, "\nFound potentially %d gap%s in the time series", ngaps, ngaps!=1?"s":"");
-      if ( ngaps >= MAX_GAPS )
-	{
-	  ngaps = MAX_GAPS;
-	  fprintf(stdout, ", here are the first %d", ngaps);
-	}
+      fprintf(stdout, "\nFound potentially %d gap%s in the time series", ngaps,
+              ngaps != 1 ? "s" : "");
+      if (ngaps >= MAX_GAPS)
+        {
+          ngaps = MAX_GAPS;
+          fprintf(stdout, ", here are the first %d", ngaps);
+        }
       fprintf(stdout, ":\n");
-      for ( igap = 0; igap < ngaps; ++igap )
-	{
-	  fprintf(stdout, "  Gap %d between timestep %d and %d, missing %d timestep%s",
-		  igap+1, rangetsm[igap][0], rangetsm[igap][1], ntsm[igap], ntsm[igap]!=1?"s":"");
-	  if ( ntsm[igap] >= MAX_NTSM )
-	    {
-	      ntsm[igap] = MAX_NTSM;
-	      fprintf(stdout, ", here are the first %d", ntsm[igap]);
-	    }
-	  fprintf(stdout, ":\n");
-	  
-	  ntimeout = 0;
-	  for ( its = 0; its < ntsm[igap]; ++its )
-	    {
-	      if ( ntimeout == 4 )
-		{
-		  ntimeout = 0;
-		  fprintf(stdout, "\n");
-		}
+      for (igap = 0; igap < ngaps; ++igap)
+        {
+          fprintf(stdout,
+                  "  Gap %d between timestep %d and %d, missing %d timestep%s",
+                  igap + 1, rangetsm[igap][0], rangetsm[igap][1], ntsm[igap],
+                  ntsm[igap] != 1 ? "s" : "");
+          if (ntsm[igap] >= MAX_NTSM)
+            {
+              ntsm[igap] = MAX_NTSM;
+              fprintf(stdout, ", here are the first %d", ntsm[igap]);
+            }
+          fprintf(stdout, ":\n");
 
-	      vdate = vdatem[igap][its];
-	      vtime = vtimem[igap][its];
+          ntimeout = 0;
+          for (its = 0; its < ntsm[igap]; ++its)
+            {
+              if (ntimeout == 4)
+                {
+                  ntimeout = 0;
+                  fprintf(stdout, "\n");
+                }
 
-	      date2str(vdate, vdatestr, sizeof(vdatestr));
-	      time2str(vtime, vtimestr, sizeof(vtimestr));
-	      fprintf(stdout, "  %s %s", vdatestr, vtimestr);
+              vdate = vdatem[igap][its];
+              vtime = vtimem[igap][its];
 
-	      ntimeout++;
-	      tsID++;
-	    }
-	  fprintf(stdout, "\n");
-	}
+              date2str(vdate, vdatestr, sizeof(vdatestr));
+              time2str(vtime, vtimestr, sizeof(vtimestr));
+              fprintf(stdout, "  %s %s", vdatestr, vtimestr);
+
+              ntimeout++;
+              tsID++;
+            }
+          fprintf(stdout, "\n");
+        }
     }
 
   cdoFinish();

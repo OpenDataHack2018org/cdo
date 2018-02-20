@@ -24,4 +24,4 @@ void *cdo_task_wait(void *task);
 void *cdo_task_new();
 void cdo_task_delete(void *task);
 
-#endif  /* CDO_TASK_H */
+#endif /* CDO_TASK_H */

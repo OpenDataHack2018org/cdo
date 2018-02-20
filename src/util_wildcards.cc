@@ -23,16 +23,15 @@
 #include <string>
 #include <glob.h>
 
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
 
 #ifndef strdupx
 #ifndef strdup
 char *strdup(const char *s);
 #endif
-#define strdupx  strdup
+#define strdupx strdup
 /*
 #define strdupx(s)			          \
 ({					      	  \
@@ -43,7 +42,6 @@ char *strdup(const char *s);
 })
 */
 #endif
-
 
 #if defined(HAVE_GLOB_H)
 static int
@@ -69,8 +67,7 @@ find_wildcard(const char *string, size_t len)
 
   if (len > 0)
     {
-      if (string[0] == '~')
-        status = 1;
+      if (string[0] == '~') status = 1;
 
       if (status == 0)
         {
@@ -110,37 +107,40 @@ expand_filename(const char *string)
   return filename;
 }
 #if defined(HAVE_WORDEXP_H)
-/* Expands all input file wildcards and removes the 
+/* Expands all input file wildcards and removes the
  * wildcard while inserting all expanded files into argv
  */
-std::vector<std::string> expandWildCards(std::vector<std::string> argv)
+std::vector<std::string>
+expandWildCards(std::vector<std::string> argv)
 {
 
-    int flags = WRDE_UNDEF;
-    wordexp_t glob_results;
+  int flags = WRDE_UNDEF;
+  wordexp_t glob_results;
 
-    for(size_t idx = 1; idx < argv.size(); idx++){
-        //if argv[idx] contains wildcard (* or [?]+)
-        //multiple ** are ignored
-      if(argv[idx][0] != '-' && argv[idx].find_first_of("*?") != std::string::npos)
-      {
+  for (size_t idx = 1; idx < argv.size(); idx++)
+    {
+      // if argv[idx] contains wildcard (* or [?]+)
+      // multiple ** are ignored
+      if (argv[idx][0] != '-'
+          && argv[idx].find_first_of("*?") != std::string::npos)
+        {
           wordexp(argv[idx].c_str(), &glob_results, flags);
-          //range based insert (glob_results.we_wordv is inserted before wildcard
-          argv.insert(argv.begin() + idx + 1,
-                  glob_results.we_wordv,
-                  glob_results.we_wordv + glob_results.we_wordc);
-          //delete wildcard
+          // range based insert (glob_results.we_wordv is inserted before
+          // wildcard
+          argv.insert(argv.begin() + idx + 1, glob_results.we_wordv,
+                      glob_results.we_wordv + glob_results.we_wordc);
+          // delete wildcard
           argv.erase(argv.begin() + idx);
           wordfree(&glob_results);
-      }
+        }
     }
 
-    return argv;
+  return argv;
 }
 #else
-std::vector<std::string> expandWildCards(std::vector<std::string> argv)
+std::vector<std::string>
+expandWildCards(std::vector<std::string> argv)
 {
-    return argv;
+  return argv;
 }
 #endif
-

@@ -15,13 +15,12 @@
   GNU General Public License for more details.
 */
 
-
 #include "cdo_int.h"
 #include <cdi.h>
 #include "percentiles.h"
 
-
-void merfun(field_type field1, field_type *field2, int function)
+void
+merfun(field_type field1, field_type *field2, int function)
 {
   // clang-format off
   switch (function)
@@ -41,8 +40,8 @@ void merfun(field_type field1, field_type *field2, int function)
   // clang-format on
 }
 
-
-void mermin(field_type field1, field_type *field2)
+void
+mermin(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double rmin;
@@ -52,28 +51,29 @@ void mermin(field_type field1, field_type *field2)
 
   std::vector<double> v(ny);
 
-  for ( size_t i = 0; i < nx; ++i )
+  for (size_t i = 0; i < nx; ++i)
     {
-      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
+      for (size_t j = 0; j < ny; j++)
+        v[j] = field1.ptr[j * nx + i];
 
-      if ( field1.nmiss > 0 )
-	{
+      if (field1.nmiss > 0)
+        {
           rmin = arrayMinMV(ny, &v[0], field1.missval);
-	  if ( DBL_IS_EQUAL(rmin, field1.missval) ) rnmiss++;
-	}
+          if (DBL_IS_EQUAL(rmin, field1.missval)) rnmiss++;
+        }
       else
-	{
+        {
           rmin = arrayMin(ny, &v[0]);
-	}
+        }
 
       field2->ptr[i] = rmin;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void mermax(field_type field1, field_type *field2)
+void
+mermax(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double rmax;
@@ -83,28 +83,29 @@ void mermax(field_type field1, field_type *field2)
 
   std::vector<double> v(ny);
 
-  for ( size_t i = 0; i < nx; ++i )
+  for (size_t i = 0; i < nx; ++i)
     {
-      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
+      for (size_t j = 0; j < ny; j++)
+        v[j] = field1.ptr[j * nx + i];
 
-      if ( field1.nmiss > 0 )
-	{
+      if (field1.nmiss > 0)
+        {
           rmax = arrayMaxMV(ny, &v[0], field1.missval);
-	  if ( DBL_IS_EQUAL(rmax, field1.missval) ) rnmiss++;
-	}
+          if (DBL_IS_EQUAL(rmax, field1.missval)) rnmiss++;
+        }
       else
-	{
+        {
           rmax = arrayMax(ny, &v[0]);
-	}
+        }
 
       field2->ptr[i] = rmax;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void merrange(field_type field1, field_type *field2)
+void
+merrange(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double range;
@@ -114,28 +115,29 @@ void merrange(field_type field1, field_type *field2)
 
   std::vector<double> v(ny);
 
-  for ( size_t i = 0; i < nx; ++i )
+  for (size_t i = 0; i < nx; ++i)
     {
-      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
+      for (size_t j = 0; j < ny; j++)
+        v[j] = field1.ptr[j * nx + i];
 
-      if ( field1.nmiss > 0 )
-	{
+      if (field1.nmiss > 0)
+        {
           range = arrayRangeMV(ny, &v[0], field1.missval);
-	  if ( DBL_IS_EQUAL(range, field1.missval) ) rnmiss++;
-	}
+          if (DBL_IS_EQUAL(range, field1.missval)) rnmiss++;
+        }
       else
-	{
+        {
           range = arrayRange(ny, &v[0]);
-	}
+        }
 
       field2->ptr[i] = range;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void mersum(field_type field1, field_type *field2)
+void
+mersum(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double rsum = 0;
@@ -145,28 +147,29 @@ void mersum(field_type field1, field_type *field2)
 
   std::vector<double> v(ny);
 
-  for ( size_t i = 0; i < nx; ++i )
+  for (size_t i = 0; i < nx; ++i)
     {
-      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
+      for (size_t j = 0; j < ny; j++)
+        v[j] = field1.ptr[j * nx + i];
 
-      if ( field1.nmiss > 0 )
-	{
+      if (field1.nmiss > 0)
+        {
           rsum = arraySumMV(ny, &v[0], field1.missval);
-	  if ( DBL_IS_EQUAL(rsum, field1.missval) ) rnmiss++;
-	}
+          if (DBL_IS_EQUAL(rsum, field1.missval)) rnmiss++;
+        }
       else
-	{
+        {
           rsum = arraySum(ny, &v[0]);
-	}
+        }
 
       field2->ptr[i] = rsum;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void mermeanw(field_type field1, field_type *field2)
+void
+mermeanw(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double rmean = 0;
@@ -177,30 +180,32 @@ void mermeanw(field_type field1, field_type *field2)
   std::vector<double> v(ny);
   std::vector<double> w(ny);
 
-  for ( size_t i = 0; i < nx; ++i )
+  for (size_t i = 0; i < nx; ++i)
     {
-      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
-      for ( size_t j = 0; j < ny; j++ ) w[j] = field1.weight[j*nx+i];
+      for (size_t j = 0; j < ny; j++)
+        v[j] = field1.ptr[j * nx + i];
+      for (size_t j = 0; j < ny; j++)
+        w[j] = field1.weight[j * nx + i];
 
-      if ( field1.nmiss )
-	{
+      if (field1.nmiss)
+        {
           rmean = arrayWeightedMeanMV(ny, &v[0], &w[0], field1.missval);
-	}
+        }
       else
-	{
+        {
           rmean = arrayWeightedMean(ny, &v[0], &w[0], field1.missval);
-	}
+        }
 
-      if ( DBL_IS_EQUAL(rmean, field1.missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(rmean, field1.missval)) rnmiss++;
 
       field2->ptr[i] = rmean;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void meravgw(field_type field1, field_type *field2)
+void
+meravgw(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double ravg = 0;
@@ -211,126 +216,136 @@ void meravgw(field_type field1, field_type *field2)
   std::vector<double> v(ny);
   std::vector<double> w(ny);
 
-  for ( size_t i = 0; i < nx; ++i )
+  for (size_t i = 0; i < nx; ++i)
     {
-      for ( size_t j = 0; j < ny; j++ ) v[j] = field1.ptr[j*nx+i];
-      for ( size_t j = 0; j < ny; j++ ) w[j] = field1.weight[j*nx+i];
+      for (size_t j = 0; j < ny; j++)
+        v[j] = field1.ptr[j * nx + i];
+      for (size_t j = 0; j < ny; j++)
+        w[j] = field1.weight[j * nx + i];
 
-      if ( field1.nmiss )
-	{
+      if (field1.nmiss)
+        {
           ravg = arrayWeightedAvgMV(ny, &v[0], &w[0], field1.missval);
-	}
+        }
       else
-	{
+        {
           ravg = arrayWeightedMean(ny, &v[0], &w[0], field1.missval);
-	}
+        }
 
-      if ( DBL_IS_EQUAL(ravg, field1.missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(ravg, field1.missval)) rnmiss++;
 
       field2->ptr[i] = ravg;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-static
-void prevarsum_merw(const double *restrict array, const double *restrict w, size_t  nx, size_t  ny, size_t nmiss, 
-                    double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
-{ 
-  *rsum   = 0;
-  *rsumq  = 0;
-  *rsumw  = 0;
+static void
+prevarsum_merw(const double *restrict array, const double *restrict w,
+               size_t nx, size_t ny, size_t nmiss, double missval,
+               double *restrict rsum, double *restrict rsumw,
+               double *restrict rsumq, double *restrict rsumwq)
+{
+  *rsum = 0;
+  *rsumq = 0;
+  *rsumw = 0;
   *rsumwq = 0;
 
-  if ( nmiss > 0 )
+  if (nmiss > 0)
     {
-      for ( size_t  j = 0; j < ny; j++ )
-        if ( !DBL_IS_EQUAL(array[j*nx], missval) &&
-             !DBL_IS_EQUAL(w[j*nx], missval) )
+      for (size_t j = 0; j < ny; j++)
+        if (!DBL_IS_EQUAL(array[j * nx], missval)
+            && !DBL_IS_EQUAL(w[j * nx], missval))
           {
-            *rsum   += w[j*nx] * array[j*nx];
-            *rsumq  += w[j*nx] * array[j*nx] * array[j*nx];
-            *rsumw  += w[j*nx];
-            *rsumwq += w[j*nx] * w[j*nx];
+            *rsum += w[j * nx] * array[j * nx];
+            *rsumq += w[j * nx] * array[j * nx] * array[j * nx];
+            *rsumw += w[j * nx];
+            *rsumwq += w[j * nx] * w[j * nx];
           }
     }
   else
     {
-      for ( size_t  j = 0; j < ny; j++ )
+      for (size_t j = 0; j < ny; j++)
         {
-          *rsum   += w[j*nx] * array[j*nx];
-          *rsumq  += w[j*nx] * array[j*nx] * array[j*nx];
-          *rsumw  += w[j*nx];
-          *rsumwq += w[j*nx] * w[j*nx];
+          *rsum += w[j * nx] * array[j * nx];
+          *rsumq += w[j * nx] * array[j * nx] * array[j * nx];
+          *rsumw += w[j * nx];
+          *rsumwq += w[j * nx] * w[j * nx];
         }
     }
 }
 
-
-void mervarw(field_type field1, field_type *field2)
+void
+mervarw(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
-  size_t nmiss   = field1.nmiss;
+  int grid = field1.grid;
+  size_t nmiss = field1.nmiss;
   double missval = field1.missval;
-  double *array  = field1.ptr;
-  double *w      = field1.weight;
+  double *array = field1.ptr;
+  double *w = field1.weight;
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
   size_t nx = gridInqXsize(grid);
   int ny = gridInqYsize(grid);
 
-  for ( size_t i = 0; i < nx; i++ )
+  for (size_t i = 0; i < nx; i++)
     {
-      prevarsum_merw(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+      prevarsum_merw(array + i, w + i, nx, ny, nmiss, missval, &rsum, &rsumw,
+                     &rsumq, &rsumwq);
 
-      rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
-      if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+      rvar = IS_NOT_EQUAL(rsumw, 0)
+                 ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw)
+                 : missval;
+      if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
-      if ( DBL_IS_EQUAL(rvar, missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(rvar, missval)) rnmiss++;
 
       field2->ptr[i] = rvar;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void mervar1w(field_type field1, field_type *field2)
+void
+mervar1w(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
-  size_t nmiss   = field1.nmiss;
+  int grid = field1.grid;
+  size_t nmiss = field1.nmiss;
   double missval = field1.missval;
-  double *array  = field1.ptr;
-  double *w      = field1.weight;
+  double *array = field1.ptr;
+  double *w = field1.weight;
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
   size_t nx = gridInqXsize(grid);
   int ny = gridInqYsize(grid);
 
-  for ( size_t i = 0; i < nx; i++ )
+  for (size_t i = 0; i < nx; i++)
     {
-      prevarsum_merw(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+      prevarsum_merw(array + i, w + i, nx, ny, nmiss, missval, &rsum, &rsumw,
+                     &rsumq, &rsumwq);
 
-      rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
-      if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+      rvar = (rsumw * rsumw > rsumwq)
+                 ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq)
+                 : missval;
+      if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
-      if ( DBL_IS_EQUAL(rvar, missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(rvar, missval)) rnmiss++;
 
       field2->ptr[i] = rvar;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void merstdw(field_type field1, field_type *field2)
+void
+merstdw(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
+  int grid = field1.grid;
   double missval = field1.missval;
   double rstd;
 
@@ -338,23 +353,23 @@ void merstdw(field_type field1, field_type *field2)
 
   mervarw(field1, field2);
 
-  for ( size_t i = 0; i < nx; i++ )
+  for (size_t i = 0; i < nx; i++)
     {
       rstd = varToStd(field2->ptr[i], missval);
 
-      if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(rstd, missval)) rnmiss++;
 
       field2->ptr[i] = rstd;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void merstd1w(field_type field1, field_type *field2)
+void
+merstd1w(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
+  int grid = field1.grid;
   double missval = field1.missval;
   double rstd;
 
@@ -362,42 +377,43 @@ void merstd1w(field_type field1, field_type *field2)
 
   mervar1w(field1, field2);
 
-  for ( size_t i = 0; i < nx; i++ )
+  for (size_t i = 0; i < nx; i++)
     {
       rstd = varToStd(field2->ptr[i], missval);
 
-      if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(rstd, missval)) rnmiss++;
 
       field2->ptr[i] = rstd;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
 /* RQ */
-void merpctl(field_type field1, field_type *field2, int p)
+void
+merpctl(field_type field1, field_type *field2, int p)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
-  size_t nmiss   = field1.nmiss;
+  int grid = field1.grid;
+  size_t nmiss = field1.nmiss;
   double missval = field1.missval;
-  double *array  = field1.ptr;
+  double *array = field1.ptr;
 
   size_t nx = gridInqXsize(grid);
   size_t ny = gridInqYsize(grid);
-  
-  double *array2 = (double*) Malloc(nx*sizeof(double));
-  
-  if ( nmiss > 0 )
+
+  double *array2 = (double *) Malloc(nx * sizeof(double));
+
+  if (nmiss > 0)
     {
-      for ( size_t i = 0; i < nx; i++ )
+      for (size_t i = 0; i < nx; i++)
         {
           size_t l = 0;
-          for ( size_t j = 0; j < ny; j++ )
-	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
-	      array2[l++] = array[j*nx+i];
-	    
-          if ( l > 0 )
+          for (size_t j = 0; j < ny; j++)
+            if (!DBL_IS_EQUAL(array[j * nx + i], missval))
+              array2[l++] = array[j * nx + i];
+
+          if (l > 0)
             {
               field2->ptr[i] = percentile(array2, l, p);
             }
@@ -410,12 +426,12 @@ void merpctl(field_type field1, field_type *field2, int p)
     }
   else
     {
-      for ( size_t i = 0; i < nx; i++ )
-      	{
-          if ( ny > 0 )
+      for (size_t i = 0; i < nx; i++)
+        {
+          if (ny > 0)
             {
-              for ( size_t j = 0; j < ny; j++ )
-                array2[j] = array[j*nx+i];
+              for (size_t j = 0; j < ny; j++)
+                array2[j] = array[j * nx + i];
               field2->ptr[i] = percentile(array2, ny, p);
             }
           else
@@ -423,7 +439,7 @@ void merpctl(field_type field1, field_type *field2, int p)
               field2->ptr[i] = missval;
               rnmiss++;
             }
-      	}
+        }
     }
 
   Free(array2);

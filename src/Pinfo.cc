@@ -20,14 +20,13 @@
 
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Pinfo(void *process)
+void *
+Pinfo(void *process)
 {
   int varID;
   int nrecs;
@@ -35,7 +34,7 @@ void *Pinfo(void *process)
   size_t nmiss, imiss = 0;
   int ivals = 0;
   char varname[CDI_MAX_NAME];
-  char vdatestr[32], vtimestr[32];	  
+  char vdatestr[32], vtimestr[32];
   double level;
   double arrmin, arrmax, arrmean;
 
@@ -64,12 +63,12 @@ void *Pinfo(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double *) Malloc(gridsize * sizeof(double));
+  double *array2 = (double *) Malloc(gridsize * sizeof(double));
 
   int indg = 0;
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
@@ -80,76 +79,83 @@ void *Pinfo(void *process)
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  if ( tsID == 0 && recID == 0 )
-	    {
-	      if ( operatorID == PINFOV )
-		fprintf(stdout, "   Rec :       Date  Time    Varname     Level    Size    Miss :"
-			    "     Minimum        Mean     Maximum\n");
-	      else
-		fprintf(stdout, "   Rec :       Date  Time    Code  Level    Size    Miss :"
-			"     Minimum        Mean     Maximum\n");
-	    }
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          if (tsID == 0 && recID == 0)
+            {
+              if (operatorID == PINFOV)
+                fprintf(stdout, "   Rec :       Date  Time    Varname     "
+                                "Level    Size    Miss :"
+                                "     Minimum        Mean     Maximum\n");
+              else
+                fprintf(
+                    stdout,
+                    "   Rec :       Date  Time    Code  Level    Size    Miss :"
+                    "     Minimum        Mean     Maximum\n");
+            }
 
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  indg += 1;
-	  int code     = vlistInqVarCode(vlistID1, varID);
-	  int gridID   = vlistInqVarGrid(vlistID1, varID);
-	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	  size_t gridsize = gridInqSize(gridID);
-	  double missval = vlistInqVarMissval(vlistID1, varID);
+          indg += 1;
+          int code = vlistInqVarCode(vlistID1, varID);
+          int gridID = vlistInqVarGrid(vlistID1, varID);
+          int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+          size_t gridsize = gridInqSize(gridID);
+          double missval = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( operatorID == PINFOV ) vlistInqVarName(vlistID1, varID, varname);
+          if (operatorID == PINFOV) vlistInqVarName(vlistID1, varID, varname);
 
-	  if ( operatorID == PINFOV )
-	    fprintf(stdout, "%6d :%s %s %-8s ", indg, vdatestr, vtimestr, varname);
-	  else
-	    fprintf(stdout, "%6d :%s %s %3d", indg, vdatestr, vtimestr, code);
+          if (operatorID == PINFOV)
+            fprintf(stdout, "%6d :%s %s %-8s ", indg, vdatestr, vtimestr,
+                    varname);
+          else
+            fprintf(stdout, "%6d :%s %s %3d", indg, vdatestr, vtimestr, code);
 
-	  level = cdoZaxisInqLevel(zaxisID, levelID);
-	  fprintf(stdout, " %7g ", level);
+          level = cdoZaxisInqLevel(zaxisID, levelID);
+          fprintf(stdout, " %7g ", level);
 
-	  fprintf(stdout, "%7zu %7zu :", gridsize, nmiss);
+          fprintf(stdout, "%7zu %7zu :", gridsize, nmiss);
 
-	  if ( gridInqType(gridID) == GRID_SPECTRAL ||
-	       (gridsize == 1 && nmiss == 0) )
-	    {
-	      fprintf(stdout, "            %#12.5g\n", array1[0]);
-	    }
-	  else
-	    {
-	      if ( nmiss > 0 )
-		{
-                  ivals = arrayMinMaxMeanMV(gridsize, array1, missval, &arrmin, &arrmax, &arrmean);
-		  imiss = gridsize - ivals;
-		  gridsize = ivals;
-		}
-	      else
-		{
+          if (gridInqType(gridID) == GRID_SPECTRAL
+              || (gridsize == 1 && nmiss == 0))
+            {
+              fprintf(stdout, "            %#12.5g\n", array1[0]);
+            }
+          else
+            {
+              if (nmiss > 0)
+                {
+                  ivals = arrayMinMaxMeanMV(gridsize, array1, missval, &arrmin,
+                                            &arrmax, &arrmean);
+                  imiss = gridsize - ivals;
+                  gridsize = ivals;
+                }
+              else
+                {
                   arrayMinMaxMean(gridsize, array1, &arrmin, &arrmax, &arrmean);
-		}
+                }
 
-	      if ( gridsize )
-		{
-		  fprintf(stdout, "%#12.5g%#12.5g%#12.5g\n", arrmin, arrmean, arrmax);
-		}
-	      else
-		{
-		  fprintf(stdout, "                     nan\n");
-		}
+              if (gridsize)
+                {
+                  fprintf(stdout, "%#12.5g%#12.5g%#12.5g\n", arrmin, arrmean,
+                          arrmax);
+                }
+              else
+                {
+                  fprintf(stdout, "                     nan\n");
+                }
 
-	      if ( imiss != nmiss && nmiss > 0 )
-		fprintf(stdout, "Found %zu of %zu missing values!\n", imiss, nmiss);
-	    }
+              if (imiss != nmiss && nmiss > 0)
+                fprintf(stdout, "Found %zu of %zu missing values!\n", imiss,
+                        nmiss);
+            }
 
           arrayCopy(gridsize, array1, array2);
 
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  pstreamWriteRecord(streamID2, array2, nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, array2, nmiss);
+        }
 
       tsID++;
     }
@@ -157,8 +163,8 @@ void *Pinfo(void *process)
   pstreamClose(streamID1);
   pstreamClose(streamID2);
 
-  if ( array1 ) Free(array1);
-  if ( array2 ) Free(array2);
+  if (array1) Free(array1);
+  if (array2) Free(array2);
 
   cdoFinish();
 

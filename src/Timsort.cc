@@ -21,30 +21,31 @@
      Timsort    timsort         Sort over the time
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "cdoOptions.h"
 
-#define  NALLOC_INC  1024
+#define NALLOC_INC 1024
 
-static
-int cmpdarray(const void *s1, const void *s2)
+static int
+cmpdarray(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const double *x = (double *)s1;
-  const double *y = (double *)s2;
+  const double *x = (double *) s1;
+  const double *y = (double *) s2;
 
-  if      ( *x < *y ) cmp = -1;
-  else if ( *x > *y ) cmp =  1;
+  if (*x < *y)
+    cmp = -1;
+  else if (*x > *y)
+    cmp = 1;
 
   return cmp;
 }
 
-
-void *Timsort(void *process)
+void *
+Timsort(void *process)
 {
   int nrecs;
   int gridID, varID, levelID;
@@ -66,97 +67,101 @@ void *Timsort(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
-  std::vector<field_type**> vars;
+  std::vector<field_type **> vars;
   std::vector<int> vdate, vtime;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      if ( tsID >= nalloc )
-	{
-	  nalloc += NALLOC_INC;
-	  vdate.resize(nalloc);
-	  vtime.resize(nalloc);
-	  vars.resize(nalloc);
-	}
+      if (tsID >= nalloc)
+        {
+          nalloc += NALLOC_INC;
+          vdate.resize(nalloc);
+          vtime.resize(nalloc);
+          vars.resize(nalloc);
+        }
 
       vdate[tsID] = taxisInqVdate(taxisID1);
       vtime[tsID] = taxisInqVtime(taxisID1);
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  gridID = vlistInqVarGrid(vlistID1, varID);
-	  size_t gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
-	  vars[tsID][varID][levelID].nmiss = nmiss;
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          gridID = vlistInqVarGrid(vlistID1, varID);
+          size_t gridsize = gridInqSize(gridID);
+          vars[tsID][varID][levelID].ptr
+              = (double *) Malloc(gridsize * sizeof(double));
+          pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
+          vars[tsID][varID][levelID].nmiss = nmiss;
+        }
 
       tsID++;
     }
 
   int nts = tsID;
 
-  double **sarray = (double **) Malloc(Threading::ompNumThreads*sizeof(double *));
-  for ( int i = 0; i < Threading::ompNumThreads; i++ )
-    sarray[i] = (double*) Malloc(nts*sizeof(double));
+  double **sarray
+      = (double **) Malloc(Threading::ompNumThreads * sizeof(double *));
+  for (int i = 0; i < Threading::ompNumThreads; i++)
+    sarray[i] = (double *) Malloc(nts * sizeof(double));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
-      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
+      if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
       gridID = vlistInqVarGrid(vlistID1, varID);
       size_t gridsize = gridInqSize(gridID);
       int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-#ifdef  _OPENMP
-#pragma omp parallel for default(none) shared(gridsize,nts,sarray,vars,varID,levelID)
+      for (levelID = 0; levelID < nlevel; levelID++)
+        {
+#ifdef _OPENMP
+#pragma omp parallel for default(none) \
+    shared(gridsize, nts, sarray, vars, varID, levelID)
 #endif
-	  for ( size_t i = 0; i < gridsize; i++ )
-	    {
-	      int ompthID = cdo_omp_get_thread_num();
+          for (size_t i = 0; i < gridsize; i++)
+            {
+              int ompthID = cdo_omp_get_thread_num();
 
-	      for ( int tsID = 0; tsID < nts; tsID++ )
-		sarray[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
+              for (int tsID = 0; tsID < nts; tsID++)
+                sarray[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
-	      qsort(sarray[ompthID], nts, sizeof(double), cmpdarray);  	      
+              qsort(sarray[ompthID], nts, sizeof(double), cmpdarray);
 
-	      for ( int tsID = 0; tsID < nts; tsID++ )
-		vars[tsID][varID][levelID].ptr[i] = sarray[ompthID][tsID];
-	    }
-	}
+              for (int tsID = 0; tsID < nts; tsID++)
+                vars[tsID][varID][levelID].ptr[i] = sarray[ompthID][tsID];
+            }
+        }
     }
 
-  for ( int i = 0; i < Threading::ompNumThreads; i++ )
-    if ( sarray[i] ) Free(sarray[i]);
+  for (int i = 0; i < Threading::ompNumThreads; i++)
+    if (sarray[i]) Free(sarray[i]);
 
-  if ( sarray ) Free(sarray);
+  if (sarray) Free(sarray);
 
-  for ( tsID = 0; tsID < nts; tsID++ )
+  for (tsID = 0; tsID < nts; tsID++)
     {
       taxisDefVdate(taxisID2, vdate[tsID]);
       taxisDefVtime(taxisID2, vtime[tsID]);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    {
-	      if ( vars[tsID][varID][levelID].ptr )
-		{
-		  nmiss = vars[tsID][varID][levelID].nmiss;
-		  pstreamDefRecord(streamID2, varID, levelID);
-		  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
-		}
-	    }
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          for (levelID = 0; levelID < nlevel; levelID++)
+            {
+              if (vars[tsID][varID][levelID].ptr)
+                {
+                  nmiss = vars[tsID][varID][levelID].nmiss;
+                  pstreamDefRecord(streamID2, varID, levelID);
+                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr,
+                                     nmiss);
+                }
+            }
+        }
 
-      field_free(vars[tsID], vlistID1);      
+      field_free(vars[tsID], vlistID1);
     }
 
   pstreamClose(streamID2);

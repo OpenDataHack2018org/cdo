@@ -24,36 +24,39 @@
 /**
  * Closes pstream and adds its variable count to its process.
  */
-void  pstreamClose(int pstreamID);
-
+void pstreamClose(int pstreamID);
 
 /*
-* Get the variable list
-*
-*    @param  streamID  Stream ID, from a previous call to cdoStreamOpenRead(int) or cdoStreamOpenWrite(int,int).
-*
-* Description
-* he function pstreamInqVlist(int) returns the variable list of a stream.
-*
-* @return
-*  returns an identifier to the variable list.
-*
-*/
-int   pstreamInqVlist(int pstreamID);
+ * Get the variable list
+ *
+ *    @param  streamID  Stream ID, from a previous call to
+ * cdoStreamOpenRead(int) or cdoStreamOpenWrite(int,int).
+ *
+ * Description
+ * he function pstreamInqVlist(int) returns the variable list of a stream.
+ *
+ * @return
+ *  returns an identifier to the variable list.
+ *
+ */
+int pstreamInqVlist(int pstreamID);
 /**
-* Define the variable list.
-*
-*     @param  pstreamID Stream ID, from a previous call to  cdoStreamOpenRead(int) or cdoStreamOpenWrite(int,int).
-*     @param  vlistID  Variable list ID, from a previous call to pstreamInqVlist(int).
-*
-* The function pstreamDefVlist(int, int) defines the variable list of a stream.
-*
-* To safeguard against errors by modifying the wrong vlist object,
-* this function makes the passed vlist object immutable.
-* All further vlist changes have to use the vlist object returned by pstreamInqVlist().
-*
-*/
-void  pstreamDefVlist(int pstreamID, int vlistID);
+ * Define the variable list.
+ *
+ *     @param  pstreamID Stream ID, from a previous call to
+ * cdoStreamOpenRead(int) or cdoStreamOpenWrite(int,int).
+ *     @param  vlistID  Variable list ID, from a previous call to
+ * pstreamInqVlist(int).
+ *
+ * The function pstreamDefVlist(int, int) defines the variable list of a stream.
+ *
+ * To safeguard against errors by modifying the wrong vlist object,
+ * this function makes the passed vlist object immutable.
+ * All further vlist changes have to use the vlist object returned by
+ * pstreamInqVlist().
+ *
+ */
+void pstreamDefVlist(int pstreamID, int vlistID);
 
 /**
  * Inquires record and sets \p varID.
@@ -64,31 +67,32 @@ void  pstreamDefVlist(int pstreamID, int vlistID);
  * If \p pstreamID represents a file either varID will be set or CDO exits with
  * an error message.
  **/
-void  pstreamInqRecord(int pstreamID, int *varID, int *levelID);
+void pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 /**
-*Define the next record.
-*The function pstreamDefRecord defines the meta-data of the next record.
-*    @param  pstreamID  Stream ID, from a previous call to cdoStreamOpenRead()
-*    or cdoStreamOpenWrite().
-*    @param  varID     Variable identifier.
-*    @param  levelID   Level identifier.
-*/
-void  pstreamDefRecord(int pstreamID, int varID, int levelID);
+ *Define the next record.
+ *The function pstreamDefRecord defines the meta-data of the next record.
+ *    @param  pstreamID  Stream ID, from a previous call to cdoStreamOpenRead()
+ *    or cdoStreamOpenWrite().
+ *    @param  varID     Variable identifier.
+ *    @param  levelID   Level identifier.
+ */
+void pstreamDefRecord(int pstreamID, int varID, int levelID);
 
-int   pstreamInqTimestep(PstreamType *p_pstreamptr, int tsID);
-void  pstreamDefTimestep(int pstreamID, int tsID);
+int pstreamInqTimestep(PstreamType *p_pstreamptr, int tsID);
+void pstreamDefTimestep(int pstreamID, int tsID);
 
-void  pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
-int   pstreamInqFiletype(int pstreamID);
-int   pstreamInqByteorder(int pstreamID);
-int   pstreamFileID (int pstreamID);
+void pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum,
+                        off_t *bignum);
+int pstreamInqFiletype(int pstreamID);
+int pstreamInqByteorder(int pstreamID);
+int pstreamFileID(int pstreamID);
 
-void  pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
-void  pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
-void  pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
+void pstreamReadRecord(int pstreamID, double *data, size_t *nmiss);
+void pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss);
+void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
-void  pstreamWriteRecord(int pstreamID, double *data, size_t nmiss);
-void  pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss);
+void pstreamWriteRecord(int pstreamID, double *data, size_t nmiss);
+void pstreamWriteRecordF(int pstreamID, float *data, size_t nmiss);
 
 /*clang-format on */
 

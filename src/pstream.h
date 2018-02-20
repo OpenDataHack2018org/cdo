@@ -18,7 +18,7 @@
 #ifndef PSTREAM_H
 #define PSTREAM_H
 
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h" /* _FILE_OFFSET_BITS influence off_t */
 #endif
 
@@ -41,29 +41,29 @@ public:
   size_t getNvals();
 
   int pstreamOpenReadPipe();
-  int pstreamOpenWritePipe(const char* filename, int filetype);
+  int pstreamOpenWritePipe(const char *filename, int filetype);
   int pstreamOpenWriteFile(int filetype);
-  void pstreamOpenReadFile(const char* filename);
-  void openAppend(const char * p_filename);
+  void pstreamOpenReadFile(const char *filename);
+  void openAppend(const char *p_filename);
 
   void writeRecord(double *data, size_t nmiss);
   void writeRecordF(float *data, size_t nmiss);
 
   void readRecord(double *data, size_t *nmiss);
   void readRecordF(float *data, size_t *nmiss);
-  void copyRecord(PstreamType * dest);
+  void copyRecord(PstreamType *dest);
 
   void defVarList(int vlistID);
   void defTimestep(int p_tsID);
   void defVlist(int p_vlistID);
-  void defRecord(int varID,int levelID);
+  void defRecord(int varID, int levelID);
 
   void init();
   void close();
   void waitForPipe();
   void closePipe();
 
-  int self; //aka the id of the pstream
+  int self;  // aka the id of the pstream
   std::pair<int, int> m_id;
   int mode;
   int m_fileID;
@@ -79,14 +79,14 @@ public:
   std::string m_name;
   std::vector<std::string> m_mfnames;
   varlist_t *m_varlist;
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   std::shared_ptr<pipe_t> pipe;
   pthread_t rthreadID; /* read  thread ID */
   pthread_t wthreadID; /* write thread ID */
 #endif
 private:
-   PstreamType();
-   void checkDatarange(int varID, double *array, size_t nmiss);
+  PstreamType();
+  void checkDatarange(int varID, double *array, size_t nmiss);
 };
 
 PstreamType *pstreamToPointer(int pstreamID);

@@ -20,15 +20,14 @@
 
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "grid.h"
 
-
-void *Varrms(void *process)
+void *
+Varrms(void *process)
 {
   int lastgrid = -1;
   int wstatus = FALSE;
@@ -60,8 +59,8 @@ void *Varrms(void *process)
   gridDefYvals(gridID3, &slat);
 
   vlistClearFlag(vlistID1);
-  int nvars    = vlistNvars(vlistID1);
-  for ( varID = 0; varID < nvars; varID++ )
+  int nvars = vlistNvars(vlistID1);
+  for (varID = 0; varID < nvars; varID++)
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
   int vlistID3 = vlistCreate();
@@ -74,27 +73,26 @@ void *Varrms(void *process)
   int ngrids = vlistNgrids(vlistID1);
   int index = 0;
   int gridID1 = vlistGrid(vlistID1, index);
-  
-  if ( needWeights &&
-       gridInqType(gridID1) != GRID_LONLAT &&
-       gridInqType(gridID1) != GRID_GAUSSIAN )
+
+  if (needWeights && gridInqType(gridID1) != GRID_LONLAT
+      && gridInqType(gridID1) != GRID_GAUSSIAN)
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
   vlistChangeGridIndex(vlistID3, index, gridID3);
-  if ( ngrids > 1 ) cdoAbort("Too many different grids!");
+  if (ngrids > 1) cdoAbort("Too many different grids!");
 
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
-  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata1 = (double **) Malloc(nvars * sizeof(double *));
+  double **vardata2 = (double **) Malloc(nvars * sizeof(double *));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
-      vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
+      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      vardata1[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
+      vardata2[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
     }
 
   field_type field1, field2, field3;
@@ -104,66 +102,67 @@ void *Varrms(void *process)
 
   size_t lim = vlistGridsizeMax(vlistID1);
   field1.weight = NULL;
-  if ( needWeights )
-    field1.weight = (double*) Malloc(lim*sizeof(double));
+  if (needWeights) field1.weight = (double *) Malloc(lim * sizeof(double));
 
   field2.weight = NULL;
 
-  field3.ptr  = &sglval;
+  field3.ptr = &sglval;
   field3.grid = gridID3;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       nrecs = cdoStreamInqTimestep(streamID2, tsID);
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
-	  single   = vardata1[varID] + offset;
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          offset = gridsize * levelID;
+          single = vardata1[varID] + offset;
 
-	  pstreamReadRecord(streamID1, single, &nmiss);
-	  if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
+          pstreamReadRecord(streamID1, single, &nmiss);
+          if (nmiss) cdoAbort("Missing values unsupported for this operator!");
 
-	  pstreamInqRecord(streamID2, &varID, &levelID);
+          pstreamInqRecord(streamID2, &varID, &levelID);
 
-	  single = vardata2[varID] + offset;
-	  pstreamReadRecord(streamID2, single, &nmiss);
-	  if ( nmiss ) cdoAbort("this operator does not work with missing values!");
-	}
+          single = vardata2[varID] + offset;
+          pstreamReadRecord(streamID2, single, &nmiss);
+          if (nmiss)
+            cdoAbort("this operator does not work with missing values!");
+        }
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  field1.ptr = vardata1[varID];
-	  field2.ptr = vardata2[varID];
+      for (varID = 0; varID < nvars; varID++)
+        {
+          field1.ptr = vardata1[varID];
+          field2.ptr = vardata2[varID];
 
-	  field1.zaxis   = vlistInqVarZaxis(vlistID1, varID);
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
-	  if ( needWeights && field1.grid != lastgrid )
-	    {
-	      lastgrid = field1.grid;
-	      wstatus = gridWeights(field1.grid, field1.weight);
-	    }
-	  int code = vlistInqVarCode(vlistID1, varID);
-	  if ( wstatus != 0 && tsID == 0 && code != oldcode )
-	    cdoWarning("Using constant area weights for code %d!", oldcode=code);
+          field1.zaxis = vlistInqVarZaxis(vlistID1, varID);
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field2.grid = vlistInqVarGrid(vlistID2, varID);
+          if (needWeights && field1.grid != lastgrid)
+            {
+              lastgrid = field1.grid;
+              wstatus = gridWeights(field1.grid, field1.weight);
+            }
+          int code = vlistInqVarCode(vlistID1, varID);
+          if (wstatus != 0 && tsID == 0 && code != oldcode)
+            cdoWarning("Using constant area weights for code %d!",
+                       oldcode = code);
 
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
-	  field2.missval = vlistInqVarMissval(vlistID1, varID);
-	  field3.missval = vlistInqVarMissval(vlistID1, varID);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
+          field2.missval = vlistInqVarMissval(vlistID1, varID);
+          field3.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  varrms(field1, field2, &field3);
+          varrms(field1, field2, &field3);
 
-	  pstreamDefRecord(streamID3, varID, 0);
-	  pstreamWriteRecord(streamID3, &sglval, field3.nmiss);
-	}
+          pstreamDefRecord(streamID3, varID, 0);
+          pstreamWriteRecord(streamID3, &sglval, field3.nmiss);
+        }
 
       tsID++;
     }
@@ -174,9 +173,9 @@ void *Varrms(void *process)
 
   vlistDestroy(vlistID3);
 
-  if ( field1.weight ) Free(field1.weight);
+  if (field1.weight) Free(field1.weight);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       Free(vardata1[varID]);
       Free(vardata2[varID]);

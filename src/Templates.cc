@@ -20,8 +20,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Template1(void *process)
+void *
+Template1(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -45,33 +45,33 @@ void *Template1(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   double *array = NULL;
-  if ( ! lcopy )
+  if (!lcopy)
     {
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double*) Malloc(gridsize*sizeof(double));
+      array = (double *) Malloc(gridsize * sizeof(double));
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	  if ( lcopy )
-	    {
-	      pstreamCopyRecord(streamID2, streamID1);
-	    }
-	  else
-	    {
-	      pstreamReadRecord(streamID1, array, &nmiss);
-	      pstreamWriteRecord(streamID2, array, nmiss);
-	    }
-	}
+
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          if (lcopy)
+            {
+              pstreamCopyRecord(streamID2, streamID1);
+            }
+          else
+            {
+              pstreamReadRecord(streamID1, array, &nmiss);
+              pstreamWriteRecord(streamID2, array, nmiss);
+            }
+        }
 
       tsID++;
     }
@@ -81,15 +81,15 @@ void *Template1(void *process)
 
   vlistDestroy(vlistID2);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 
   return 0;
 }
 
-
-void *Template2(void *process)
+void *
+Template2(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -111,22 +111,22 @@ void *Template2(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	  pstreamReadRecord(streamID1, array, &nmiss);
-	  pstreamWriteRecord(streamID2, array, nmiss);
-	}
+
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          pstreamReadRecord(streamID1, array, &nmiss);
+          pstreamWriteRecord(streamID2, array, nmiss);
+        }
 
       tsID++;
     }
@@ -136,7 +136,7 @@ void *Template2(void *process)
 
   vlistDestroy(vlistID2);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 

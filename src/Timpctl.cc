@@ -25,7 +25,6 @@
       Yearpctl   yearpctl        Yearly percentiles
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -34,17 +33,16 @@
 #include "percentiles.h"
 #include "datetime.h"
 
-
-static
-void timpctl(int operatorID)
+static void
+timpctl(int operatorID)
 {
   int timestat_date = TIMESTAT_MEAN;
-  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
+  char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
   int nrecs;
   int gridID, varID, levelID;
   size_t nmiss;
   int nlevels;
-  
+
   operatorInputArg("percentile number");
   double pn = parameter2double(operatorArgv()[0]);
   percentile_check_number(pn);
@@ -54,7 +52,7 @@ void timpctl(int operatorID)
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int streamID2 = cdoStreamOpenRead(cdoStreamName(1));
   int streamID3 = cdoStreamOpenRead(cdoStreamName(2));
-  
+
   int vlistID1 = cdoStreamInqVlist(streamID1);
   int vlistID2 = cdoStreamInqVlist(streamID2);
   int vlistID3 = cdoStreamInqVlist(streamID3);
@@ -62,8 +60,8 @@ void timpctl(int operatorID)
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
   vlistCompare(vlistID1, vlistID3, CMP_ALL);
-  
-  if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(vlistID4, 1);
+
+  if (cdoOperatorF2(operatorID) == 16) vlistDefNtsteps(vlistID4, 1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -77,11 +75,11 @@ void timpctl(int operatorID)
   int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
-  int nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords * sizeof(int));
+  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -91,108 +89,117 @@ void timpctl(int operatorID)
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize * sizeof(double));
+  field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   HISTOGRAM_SET *hset = hsetCreate(nvars);
-  
-  for ( varID = 0; varID < nvars; varID++ )
+
+  for (varID = 0; varID < nvars; varID++)
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      gridID = vlistInqVarGrid(vlistID1, varID);
+      nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
       hsetCreateVarLevels(hset, varID, nlevels, gridID);
     }
 
   int tsID = 0;
   int otsID = 0;
-  while ( TRUE )
-    {      
+  while (TRUE)
+    {
       nrecs = cdoStreamInqTimestep(streamID2, otsID);
-      if ( nrecs != cdoStreamInqTimestep(streamID3, otsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
+      if (nrecs != cdoStreamInqTimestep(streamID3, otsID))
+        cdoAbort("Number of records at time step %d of %s and %s differ!",
+                 otsID + 1, cdoGetStreamName(1).c_str(),
+                 cdoGetStreamName(2).c_str());
 
       int vdate2 = taxisInqVdate(taxisID2);
       int vtime2 = taxisInqVtime(taxisID2);
       int vdate3 = taxisInqVdate(taxisID3);
       int vtime3 = taxisInqVtime(taxisID3);
-      if ( vdate2 != vdate3 || vtime2 != vtime3 )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
-      
-      for ( int recID = 0; recID < nrecs; recID++ )
+      if (vdate2 != vdate3 || vtime2 != vtime3)
+        cdoAbort("Verification dates at time step %d of %s and %s differ!",
+                 otsID + 1, cdoGetStreamName(1).c_str(),
+                 cdoGetStreamName(2).c_str());
+
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-	  pstreamReadRecord(streamID2, vars1[varID][levelID].ptr, &nmiss);
+          pstreamReadRecord(streamID2, vars1[varID][levelID].ptr, &nmiss);
           vars1[varID][levelID].nmiss = nmiss;
         }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID3, &varID, &levelID);
-	  pstreamReadRecord(streamID3, field.ptr, &nmiss);
-          field.nmiss   = nmiss;
-          field.grid    = vars1[varID][levelID].grid;
-	  field.missval = vars1[varID][levelID].missval;
-	  
-	  hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID], &field);
+          pstreamReadRecord(streamID3, field.ptr, &nmiss);
+          field.nmiss = nmiss;
+          field.grid = vars1[varID][levelID].grid;
+          field.missval = vars1[varID][levelID].missval;
+
+          hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID],
+                                &field);
         }
-          
+
       int nsets = 0;
-      while ( nrecs && (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
-	{
-	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-	  int vdate1 = dtlist_get_vdate(dtlist, nsets);
-	  int vtime1 = dtlist_get_vtime(dtlist, nsets);
+      while (nrecs && (nrecs = cdoStreamInqTimestep(streamID1, tsID)))
+        {
+          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
+          int vdate1 = dtlist_get_vdate(dtlist, nsets);
+          int vtime1 = dtlist_get_vtime(dtlist, nsets);
 
-	  if ( nsets == 0 ) SET_DATE(indate2, vdate1, vtime1);
-	  SET_DATE(indate1, vdate1, vtime1);
+          if (nsets == 0) SET_DATE(indate2, vdate1, vtime1);
+          SET_DATE(indate1, vdate1, vtime1);
 
-	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
+          if (DATE_IS_NEQ(indate1, indate2, cmplen)) break;
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
-	      if ( tsID == 0 )
-		{
-		  recVarID[recID]   = varID;
-		  recLevelID[recID] = levelID;
-		}
-	      pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
+              if (tsID == 0)
+                {
+                  recVarID[recID] = varID;
+                  recLevelID[recID] = levelID;
+                }
+              pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
               vars1[varID][levelID].nmiss = nmiss;
 
-	      hsetAddVarLevelValues(hset, varID, levelID, &vars1[varID][levelID]);
-	    }
+              hsetAddVarLevelValues(hset, varID, levelID,
+                                    &vars1[varID][levelID]);
+            }
 
-	  nsets++;
-	  tsID++;
-	}
+          nsets++;
+          tsID++;
+        }
 
-      if ( nrecs == 0 && nsets == 0 ) break;
-      
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
-	  nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  
-	  for ( levelID = 0; levelID < nlevels; levelID++ )
-            hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID, levelID, pn);
-	}
+      if (nrecs == 0 && nsets == 0) break;
+
+      for (varID = 0; varID < nvars; varID++)
+        {
+          if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
+          nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+
+          for (levelID = 0; levelID < nlevels; levelID++)
+            hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID,
+                                       levelID, pn);
+        }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
       pstreamDefTimestep(streamID4, otsID);
 
-      for ( int recID = 0; recID < nrecords; recID++ )
-	{
-	  varID   = recVarID[recID];
-	  levelID = recLevelID[recID];
+      for (int recID = 0; recID < nrecords; recID++)
+        {
+          varID = recVarID[recID];
+          levelID = recLevelID[recID];
 
-	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
+          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+            continue;
 
-	  pstreamDefRecord(streamID4, varID, levelID);
-	  pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
-	}
+          pstreamDefRecord(streamID4, varID, levelID);
+          pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr,
+                             vars1[varID][levelID].nmiss);
+        }
 
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
       otsID++;
     }
 
@@ -200,11 +207,11 @@ void timpctl(int operatorID)
   hsetDestroy(hset);
 
   dtlist_delete(dtlist);
-  
-  if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  if (field.ptr) Free(field.ptr);
+
+  if (recVarID) Free(recVarID);
+  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID4);
   pstreamClose(streamID3);
@@ -212,10 +219,11 @@ void timpctl(int operatorID)
   pstreamClose(streamID1);
 }
 
-void *Timpctl(void *process)
+void *
+Timpctl(void *process)
 {
   int operatorID;
-  
+
   cdoInitialize(process);
 
   // clang-format off
@@ -227,7 +235,7 @@ void *Timpctl(void *process)
   // clang-format on
 
   operatorID = cdoOperatorID();
-  
+
   timpctl(operatorID);
 
   cdoFinish();

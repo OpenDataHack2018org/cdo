@@ -17,57 +17,61 @@
 
 /*
       MODULE      OPERATOR     INDEX    DESCRIPTION
-      
+
       EcaCfd      eca_cfd      CFD      maximum number of consecutive frost days
-      EcaCsu      eca_csu      CSU      maximum number of consecutive summer days
-      EcaCwdi     eca_cwdi     CWDI     cold wave duration index
-      EcaCwfi     eca_cwfi     CWFI     number of cold-spell days
-      EcaEtr      eca_etr      ETR      intra-period extreme temperature range
-      EcaFd       eca_fd       FD       number of frost days
-      EcaGsl      eca_gsl      GSL      growing season length
+      EcaCsu      eca_csu      CSU      maximum number of consecutive summer
+   days EcaCwdi     eca_cwdi     CWDI     cold wave duration index EcaCwfi
+   eca_cwfi     CWFI     number of cold-spell days EcaEtr      eca_etr      ETR
+   intra-period extreme temperature range EcaFd       eca_fd       FD
+   number of frost days EcaGsl      eca_gsl      GSL      growing season length
       EcaHd       eca_hd       HD       heating degree days
       EcaHwdi     eca_hwdi     HWDI     heat wave duration index
       EcaHwfi     eca_hwfi     HWFI     number of warm-spell days
       EcaId       eca_id       ID       number of ice days
       EcaSu       eca_su       SU       number of summer days
-      EcaTg10p    eca_tg10p    TG10p    percent of time TX < 10th percentile of daily mean temperature
-      EcaTg90p    eca_tg90p    TG90p    percent of time TX > 90th percentile of daily mean temperature
-      EcaTn10p    eca_tn10p    TN10p    percent of time TX < 10th percentile of daily minimum temperature   
-      EcaTn90p    eca_tn90p    TN90p    percent of time TX > 90th percentile of daily minimum temperature
-      EcaTr       eca_tr       TR       number of tropical nights
-      EcaTx10p    eca_tx10p    TX10p    percent of time TX < 10th percentile of daily maximum temperature
-      EcaTx90p    eca_tx90p    TX90p    percent of time TX > 90th percentile of daily maximum temperature
+      EcaTg10p    eca_tg10p    TG10p    percent of time TX < 10th percentile of
+   daily mean temperature EcaTg90p    eca_tg90p    TG90p    percent of time TX >
+   90th percentile of daily mean temperature EcaTn10p    eca_tn10p    TN10p
+   percent of time TX < 10th percentile of daily minimum temperature EcaTn90p
+   eca_tn90p    TN90p    percent of time TX > 90th percentile of daily minimum
+   temperature EcaTr       eca_tr       TR       number of tropical nights
+      EcaTx10p    eca_tx10p    TX10p    percent of time TX < 10th percentile of
+   daily maximum temperature EcaTx90p    eca_tx90p    TX90p    percent of time
+   TX > 90th percentile of daily maximum temperature
 
       EcaCdd      eca_cdd      CDD      maximum number of consecutive dry days
       EcaCwd      eca_cwd      CWD      maximum number of consecutive wet days
-      EcaR10mm    eca_r10mm    R10mm    number of days with precipitation >= 10 mm
-      EcaR20mm    eca_r20mm    R20mm    number of days with precipitation >= 20 mm
-      EcaR75p     eca_r75p     R75p     Percent of time RR > 75th percentile of daily precipitation amount 
-      EcaR75ptot  eca_r75ptot  R75pTOT  Percentage of annual total precipitation due to events wit RR > 75th percentile of daily precipitation amount
-      EcaR90p     eca_r90p     R90p     Percent of time RR > 90th percentile of daily precipitation amount
-      EcaR90ptot  eca_r90ptot  R90pTOT  Percentage of annual total precipitation due to events wit RR > 90th percentile of daily precipitation amount
-      EcaR95p     eca_r95p     R95p     Percent of time RR > 95th percentile of daily precipitation amount
-      EcaR95ptot  eca_r95ptot  R95pTOT  Percentage of annual total precipitation due to events wit RR > 95th percentile of daily precipitation amount
-      EcaR99p     eca_r99p     R99p     Percent of time RR > 75th percentile of daily precipitation amount
-      EcaR99ptot  eca_r99ptot  R99pTOT  Percentage of annual total precipitation due to events wit RR > 99th percentile of daily precipitation amount
-      EcaRr1      eca_rr1      RR1      number of wet days
-      EcaSdii     eca_sdii     SDII     simple daily intensity index
-      
-      Fdns        fdns                  frost days without surface snow 
+      EcaR10mm    eca_r10mm    R10mm    number of days with precipitation >= 10
+   mm EcaR20mm    eca_r20mm    R20mm    number of days with precipitation >= 20
+   mm EcaR75p     eca_r75p     R75p     Percent of time RR > 75th percentile of
+   daily precipitation amount EcaR75ptot  eca_r75ptot  R75pTOT  Percentage of
+   annual total precipitation due to events wit RR > 75th percentile of daily
+   precipitation amount EcaR90p     eca_r90p     R90p     Percent of time RR >
+   90th percentile of daily precipitation amount EcaR90ptot  eca_r90ptot
+   R90pTOT  Percentage of annual total precipitation due to events wit RR > 90th
+   percentile of daily precipitation amount EcaR95p     eca_r95p     R95p
+   Percent of time RR > 95th percentile of daily precipitation amount EcaR95ptot
+   eca_r95ptot  R95pTOT  Percentage of annual total precipitation due to events
+   wit RR > 95th percentile of daily precipitation amount EcaR99p     eca_r99p
+   R99p     Percent of time RR > 75th percentile of daily precipitation amount
+      EcaR99ptot  eca_r99ptot  R99pTOT  Percentage of annual total precipitation
+   due to events wit RR > 99th percentile of daily precipitation amount EcaRr1
+   eca_rr1      RR1      number of wet days EcaSdii     eca_sdii     SDII
+   simple daily intensity index
+
+      Fdns        fdns                  frost days without surface snow
 
       Strwin      strwin                number of strong-wind days
-      Strbre      strbre                number of strong-breeze days 
-      Strgal      strgal                number of strong-gale days 
-      Hurr        hurr                  number of hurricane days 
+      Strbre      strbre                number of strong-breeze days
+      Strgal      strgal                number of strong-gale days
+      Hurr        hurr                  number of hurricane days
 */
-
 
 #include "cdo_int.h"
 #include "ecacore.h"
 #include "ecautil.h"
 
-
-#define TO_DEG_CELSIUS(x) ((x) - 273.15)
+#define TO_DEG_CELSIUS(x) ((x) -273.15)
 #define TO_KELVIN(x) ((x) + 273.15)
 
 // clang-format off
@@ -1034,573 +1038,575 @@ void *EcaPd(void *process)
 
   operatorID = cdoOperatorID();
 
-  if ( operatorID == ECA_PD )
+  if (operatorID == ECA_PD)
     {
       operatorInputArg("daily precipitation amount threshold in [mm]");
 
-      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
-      if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+      if (operatorArgc() < 1) cdoAbort("Too few arguments!");
+      if (operatorArgc() > 1) cdoAbort("Too many arguments!");
 
       threshold = parameter2double(operatorArgv()[0]);
 
-      if ( threshold < 0 ) cdoAbort("Parameter out of range: threshold = %g", threshold);
+      if (threshold < 0)
+        cdoAbort("Parameter out of range: threshold = %g", threshold);
 
       sprintf(lnamebuffer, PD_LONGNAME, threshold);
-      request.var1.name     = PD_NAME;
+      request.var1.name = PD_NAME;
       request.var1.longname = lnamebuffer;
-      request.var1.units    = PD_UNITS;
+      request.var1.units = PD_UNITS;
     }
-  else if ( operatorID == ECA_R10MM )
+  else if (operatorID == ECA_R10MM)
     {
       threshold = 10;
 
-      request.var1.name     = R10MM_NAME;
+      request.var1.name = R10MM_NAME;
       request.var1.longname = R10MM_LONGNAME;
-      request.var1.units    = R10MM_UNITS;
+      request.var1.units = R10MM_UNITS;
     }
-  else if ( operatorID == ECA_R20MM )
+  else if (operatorID == ECA_R20MM)
     {
       threshold = 20;
 
-      request.var1.name     = R20MM_NAME;
+      request.var1.name = R20MM_NAME;
       request.var1.longname = R20MM_LONGNAME;
-      request.var1.units    = R20MM_UNITS;
+      request.var1.units = R20MM_UNITS;
     }
-  
-  if ( cdoVerbose ) cdoPrint("threshold = %g", threshold);
 
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = threshold;
-  request.var1.f2       = farnum;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;   
-  request.var1.addc     = 0.0;    
-  request.var1.epilog   = NONE;
-  request.var2.h2       = NULL;
-  request.var2.h3       = NULL;
-  
+  if (cdoVerbose) cdoPrint("threshold = %g", threshold);
+
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = threshold;
+  request.var1.f2 = farnum;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = NONE;
+  request.var2.h2 = NULL;
+  request.var2.h3 = NULL;
+
   eca1(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaR75p(void *process)
+void *
+EcaR75p(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_r75p", 0, 31, NULL);
 
-  request.var1.name     = R75P_NAME;
+  request.var1.name = R75P_NAME;
   request.var1.longname = R75P_LONGNAME;
-  request.var1.units    = R75P_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
-  request.var1.f2       = NULL;
-  request.var1.f3       = farselgt;
-  request.var1.f4       = farnum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = PERCENT_OF_TIME;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = R75P_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = 1.0;
+  request.var1.f2 = NULL;
+  request.var1.f3 = farselgt;
+  request.var1.f4 = farnum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = PERCENT_OF_TIME;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaR75ptot(void *process)
+void *
+EcaR75ptot(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_r75ptot", 0, 31, NULL);
 
-  request.var1.name     = R75PTOT_NAME;
+  request.var1.name = R75PTOT_NAME;
   request.var1.longname = R75PTOT_LONGNAME;
-  request.var1.units    = R75PTOT_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
-  request.var1.f2       = NULL;
-  request.var1.f3       = farselgt;
-  request.var1.f4       = farsum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = PERCENT_OF_TOTAL_AMOUNT;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = R75PTOT_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = 1.0;
+  request.var1.f2 = NULL;
+  request.var1.f3 = farselgt;
+  request.var1.f4 = farsum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = PERCENT_OF_TOTAL_AMOUNT;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaR90p(void *process)
+void *
+EcaR90p(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_r90p", 0, 31, NULL);
 
-  request.var1.name     = R90P_NAME;
+  request.var1.name = R90P_NAME;
   request.var1.longname = R90P_LONGNAME;
-  request.var1.units    = R90P_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
-  request.var1.f2       = NULL;
-  request.var1.f3       = farselgt;
-  request.var1.f4       = farnum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = PERCENT_OF_TIME;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = R90P_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = 1.0;
+  request.var1.f2 = NULL;
+  request.var1.f3 = farselgt;
+  request.var1.f4 = farnum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = PERCENT_OF_TIME;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaR90ptot(void *process)
+void *
+EcaR90ptot(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_r90ptot", 0, 31, NULL);
 
-  request.var1.name     = R90PTOT_NAME;
+  request.var1.name = R90PTOT_NAME;
   request.var1.longname = R90PTOT_LONGNAME;
-  request.var1.units    = R90PTOT_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
-  request.var1.f2       = NULL;
-  request.var1.f3       = farselgt;
-  request.var1.f4       = farsum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = PERCENT_OF_TOTAL_AMOUNT;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = R90PTOT_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = 1.0;
+  request.var1.f2 = NULL;
+  request.var1.f3 = farselgt;
+  request.var1.f4 = farsum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = PERCENT_OF_TOTAL_AMOUNT;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaR95p(void *process)
+void *
+EcaR95p(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_r95p", 0, 31, NULL);
 
-  request.var1.name     = R95P_NAME;
+  request.var1.name = R95P_NAME;
   request.var1.longname = R95P_LONGNAME;
-  request.var1.units    = R95P_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
-  request.var1.f2       = NULL;
-  request.var1.f3       = farselgt;
-  request.var1.f4       = farnum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = PERCENT_OF_TIME;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = R95P_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = 1.0;
+  request.var1.f2 = NULL;
+  request.var1.f3 = farselgt;
+  request.var1.f4 = farnum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = PERCENT_OF_TIME;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaR95ptot(void *process)
+void *
+EcaR95ptot(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_r95ptot", 0, 31, NULL);
 
-  request.var1.name     = R95PTOT_NAME;
+  request.var1.name = R95PTOT_NAME;
   request.var1.longname = R95PTOT_LONGNAME;
-  request.var1.units    = R95PTOT_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
-  request.var1.f2       = NULL;
-  request.var1.f3       = farselgt;
-  request.var1.f4       = farsum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = PERCENT_OF_TOTAL_AMOUNT;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = R95PTOT_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = 1.0;
+  request.var1.f2 = NULL;
+  request.var1.f3 = farselgt;
+  request.var1.f4 = farsum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = PERCENT_OF_TOTAL_AMOUNT;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaR99p(void *process)
+void *
+EcaR99p(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_r99p", 0, 31, NULL);
 
-  request.var1.name     = R99P_NAME;
+  request.var1.name = R99P_NAME;
   request.var1.longname = R99P_LONGNAME;
-  request.var1.units    = R99P_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
-  request.var1.f2       = NULL;
-  request.var1.f3       = farselgt;
-  request.var1.f4       = farnum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = PERCENT_OF_TIME;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = R99P_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = 1.0;
+  request.var1.f2 = NULL;
+  request.var1.f3 = farselgt;
+  request.var1.f4 = farnum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = PERCENT_OF_TIME;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaR99ptot(void *process)
+void *
+EcaR99ptot(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_r99ptot", 0, 31, NULL);
 
-  request.var1.name     = R99PTOT_NAME;
+  request.var1.name = R99PTOT_NAME;
   request.var1.longname = R99PTOT_LONGNAME;
-  request.var1.units    = NULL;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
-  request.var1.f2       = NULL;
-  request.var1.f3       = farselgt;
-  request.var1.f4       = farsum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = PERCENT_OF_TOTAL_AMOUNT;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = NULL;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = 1.0;
+  request.var1.f2 = NULL;
+  request.var1.f3 = farselgt;
+  request.var1.f4 = farsum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = PERCENT_OF_TOTAL_AMOUNT;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaRr1(void *process)
+void *
+EcaRr1(void *process)
 {
   ECA_REQUEST_1 request;
   char lnamebuffer[1024];
   double threshold = 1;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_rr1", 0, 31, NULL);
 
-  if ( operatorArgc() == 1 ) threshold = parameter2double(operatorArgv()[0]);
-  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+  if (operatorArgc() == 1) threshold = parameter2double(operatorArgv()[0]);
+  if (operatorArgc() > 1) cdoAbort("Too many arguments!");
 
   sprintf(lnamebuffer, RR1_LONGNAME, threshold);
 
-  request.var1.name     = RR1_NAME;
+  request.var1.name = RR1_NAME;
   request.var1.longname = lnamebuffer;
-  request.var1.units    = RR1_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = threshold;
-  request.var1.f2       = farnum;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;    
-  request.var1.addc     = 0.0; 
-  request.var1.epilog   = NONE;   
-  request.var2.h2       = NULL;    
-  request.var2.h3       = NULL;    
-   
+  request.var1.units = RR1_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = threshold;
+  request.var1.f2 = farnum;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = NONE;
+  request.var2.h2 = NULL;
+  request.var2.h3 = NULL;
+
   eca1(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaRx1day(void *process)
+void *
+EcaRx1day(void *process)
 {
   ECA_REQUEST_1 request;
-  
+
   cdoInitialize(process);
-  if ( operatorArgc() > 0 )
+  if (operatorArgc() > 0)
     {
-      if ( 'm' == operatorArgv()[0][0] )
-        cdoOperatorAdd("eca_rx1day", 0, 8,  NULL); /* monthly mode */
+      if ('m' == operatorArgv()[0][0])
+        cdoOperatorAdd("eca_rx1day", 0, 8, NULL); /* monthly mode */
       else
-        cdoWarning("Parameter value '%s' is invalid. The only valid value is 'm' indicating monthly mode. Operating in yearly mode now.",
+        cdoWarning("Parameter value '%s' is invalid. The only valid value is "
+                   "'m' indicating monthly mode. Operating in yearly mode now.",
                    operatorArgv()[0]);
     }
-  else 
+  else
     cdoOperatorAdd("eca_rx1day", 0, 31, NULL);
 
-  request.var1.name     = RX1DAY_NAME;
+  request.var1.name = RX1DAY_NAME;
   request.var1.longname = RX1DAY_LONGNAME;
-  request.var1.units    = RX1DAY_UNITS;
-  request.var1.f1       = NULL;
-  request.var1.f2       = farmax;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;    
-  request.var1.addc     = 0.0;    
-  request.var1.epilog   = NONE;
-  request.var2.h2       = NULL;
-  request.var2.h3       = NULL;
-   
+  request.var1.units = RX1DAY_UNITS;
+  request.var1.f1 = NULL;
+  request.var1.f2 = farmax;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = NONE;
+  request.var2.h2 = NULL;
+  request.var2.h3 = NULL;
+
   eca1(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaRx5day(void *process)
+void *
+EcaRx5day(void *process)
 {
   char *longname;
   double argX = 50.0;
   ECA_REQUEST_1 request;
-  
+
   cdoInitialize(process);
-  if ( operatorArgc() > 0 ) argX = parameter2double(operatorArgv()[0]);
-  
-  longname = (char*) Malloc(strlen(RX5DAY_LONGNAME2) + 40);
+  if (operatorArgc() > 0) argX = parameter2double(operatorArgv()[0]);
+
+  longname = (char *) Malloc(strlen(RX5DAY_LONGNAME2) + 40);
   sprintf(longname, RX5DAY_LONGNAME2, argX);
-  
+
   cdoOperatorAdd("eca_rx5day", 0, 31, NULL);
 
-  request.var1.name     = RX5DAY_NAME;
+  request.var1.name = RX5DAY_NAME;
   request.var1.longname = RX5DAY_LONGNAME;
-  request.var1.units    = RX5DAY_UNITS;
-  request.var1.f1       = NULL;
-  request.var1.f2       = farmax;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0; 
-  request.var1.addc     = 0.0; 
-  request.var1.epilog   = NONE;
-  request.var2.name     = RX5DAY_NAME2;
+  request.var1.units = RX5DAY_UNITS;
+  request.var1.f1 = NULL;
+  request.var1.f2 = farmax;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = NONE;
+  request.var2.name = RX5DAY_NAME2;
   request.var2.longname = longname;
-  request.var2.units    = RX5DAY_UNITS2;
-  request.var2.h1       = farselgec;
-  request.var2.h1arg    = argX;
-  request.var2.h2       = farnum;
-  request.var2.h3       = NULL;
-   
+  request.var2.units = RX5DAY_UNITS2;
+  request.var2.h1 = farselgec;
+  request.var2.h1arg = argX;
+  request.var2.h2 = farnum;
+  request.var2.h3 = NULL;
+
   eca1(&request);
-  
+
   Free(longname);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *EcaSdii(void *process)
+void *
+EcaSdii(void *process)
 {
   ECA_REQUEST_1 request;
   char lnamebuffer[1024];
   double threshold = 1;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("eca_sdii", 0, 31, NULL);
 
-  if ( operatorArgc() == 1 ) threshold = parameter2double(operatorArgv()[0]);
-  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+  if (operatorArgc() == 1) threshold = parameter2double(operatorArgv()[0]);
+  if (operatorArgc() > 1) cdoAbort("Too many arguments!");
 
   sprintf(lnamebuffer, SDII_LONGNAME, threshold);
 
-  request.var1.name     = SDII_NAME;
+  request.var1.name = SDII_NAME;
   request.var1.longname = lnamebuffer;
-  request.var1.units    = SDII_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = threshold;
-  request.var1.f2       = farsum;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;    
-  request.var1.addc     = 0.0;    
-  request.var1.epilog   = MEAN;
-  request.var2.h2       = NULL;
-  request.var2.h3       = NULL;
-   
+  request.var1.units = SDII_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = threshold;
+  request.var1.f2 = farsum;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = MEAN;
+  request.var2.h2 = NULL;
+  request.var2.h3 = NULL;
+
   eca1(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *Fdns(void *process)
+void *
+Fdns(void *process)
 {
   ECA_REQUEST_2 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("fdns", 0, 31, NULL);
 
-  request.var1.name     = FDNS_NAME;
+  request.var1.name = FDNS_NAME;
   request.var1.longname = FDNS_LONGNAME;
-  request.var1.units    = FDNS_UNITS;
-  request.var1.f1       = farsellec;
-  request.var1.f1arg    = TO_KELVIN(0.0);
-  request.var1.f2       = farsellec;
-  request.var1.f2arg    = 0.01;
-  request.var1.f3       = faradd; /* any f with f(a, b) = miss, if a = miss or b = miss will do here */
-  request.var1.f4       = farnum;
-  request.var1.f5       = NULL;
-  request.var1.epilog   = NONE;
-  request.var2.h2       = NULL;
-    
+  request.var1.units = FDNS_UNITS;
+  request.var1.f1 = farsellec;
+  request.var1.f1arg = TO_KELVIN(0.0);
+  request.var1.f2 = farsellec;
+  request.var1.f2arg = 0.01;
+  request.var1.f3 = faradd; /* any f with f(a, b) = miss, if a = miss or b =
+                               miss will do here */
+  request.var1.f4 = farnum;
+  request.var1.f5 = NULL;
+  request.var1.epilog = NONE;
+  request.var2.h2 = NULL;
+
   eca2(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *Strwin(void *process)
+void *
+Strwin(void *process)
 {
   char *longname;
   double maxWind = 10.5;
   ECA_REQUEST_1 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("strwin", 0, 31, NULL);
 
-  if ( operatorArgc() > 0 )
-    maxWind = parameter2double(operatorArgv()[0]);
+  if (operatorArgc() > 0) maxWind = parameter2double(operatorArgv()[0]);
 
-  longname = (char*) Malloc(strlen(STRWIN_LONGNAME) + 40);
+  longname = (char *) Malloc(strlen(STRWIN_LONGNAME) + 40);
   sprintf(longname, STRWIN_LONGNAME, maxWind);
-         
-  request.var1.name     = STRWIN_NAME;
+
+  request.var1.name = STRWIN_NAME;
   request.var1.longname = longname;
-  request.var1.units    = STRWIN_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = maxWind;
-  request.var1.f2       = farnum;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;    
-  request.var1.addc     = 0.0;    
-  request.var1.epilog   = NONE;
-  request.var2.name     = STRWIN_NAME2;
+  request.var1.units = STRWIN_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = maxWind;
+  request.var1.f2 = farnum;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = NONE;
+  request.var2.name = STRWIN_NAME2;
   request.var2.longname = STRWIN_LONGNAME2;
-  request.var2.units    = STRWIN_UNITS2;
-  request.var2.h1       = farselgec;
-  request.var2.h1arg    = maxWind;
-  request.var2.h2       = farnum2;
-  request.var2.h3       = farmax;
-   
+  request.var2.units = STRWIN_UNITS2;
+  request.var2.h1 = farselgec;
+  request.var2.h1arg = maxWind;
+  request.var2.h2 = farnum2;
+  request.var2.h3 = farmax;
+
   eca1(&request);
-  
+
   Free(longname);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *Strbre(void *process)
+void *
+Strbre(void *process)
 {
   static const double maxWind = 10.5;
   ECA_REQUEST_1 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("strbre", 0, 31, NULL);
-         
-  request.var1.name     = STRBRE_NAME;
+
+  request.var1.name = STRBRE_NAME;
   request.var1.longname = STRBRE_LONGNAME;
-  request.var1.units    = STRWIN_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = maxWind;
-  request.var1.f2       = farnum;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;    
-  request.var1.addc     = 0.0;    
-  request.var1.epilog   = NONE;
-  request.var2.name     = STRBRE_NAME2;
+  request.var1.units = STRWIN_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = maxWind;
+  request.var1.f2 = farnum;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = NONE;
+  request.var2.name = STRBRE_NAME2;
   request.var2.longname = STRBRE_LONGNAME2;
-  request.var2.units    = STRWIN_UNITS2;
-  request.var2.h1       = farselgec;
-  request.var2.h1arg    = maxWind;
-  request.var2.h2       = farnum2;
-  request.var2.h3       = farmax;
-   
+  request.var2.units = STRWIN_UNITS2;
+  request.var2.h1 = farselgec;
+  request.var2.h1arg = maxWind;
+  request.var2.h2 = farnum2;
+  request.var2.h3 = farmax;
+
   eca1(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *Strgal(void *process)
+void *
+Strgal(void *process)
 {
   static const double maxWind = 20.5;
   ECA_REQUEST_1 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("strgal", 0, 31, NULL);
-         
-  request.var1.name     = STRBRE_NAME;
+
+  request.var1.name = STRBRE_NAME;
   request.var1.longname = STRBRE_LONGNAME;
-  request.var1.units    = STRWIN_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = maxWind;
-  request.var1.f2       = farnum;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;    
-  request.var1.addc     = 0.0;    
-  request.var1.epilog   = NONE;
-  request.var2.name     = STRBRE_NAME2;
+  request.var1.units = STRWIN_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = maxWind;
+  request.var1.f2 = farnum;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = NONE;
+  request.var2.name = STRBRE_NAME2;
   request.var2.longname = STRBRE_LONGNAME2;
-  request.var2.units    = STRWIN_UNITS2;
-  request.var2.h1       = farselgec;
-  request.var2.h1arg    = maxWind;
-  request.var2.h2       = farnum2;
-  request.var2.h3       = farmax;
-   
+  request.var2.units = STRWIN_UNITS2;
+  request.var2.h1 = farselgec;
+  request.var2.h1arg = maxWind;
+  request.var2.h2 = farnum2;
+  request.var2.h3 = farmax;
+
   eca1(&request);
   cdoFinish();
-  
+
   return 0;
 }
 
-
-void *Hurr(void *process)
+void *
+Hurr(void *process)
 {
   static const double maxWind = 32.5;
   ECA_REQUEST_1 request;
-  
+
   cdoInitialize(process);
   cdoOperatorAdd("hurr", 0, 31, NULL);
-         
-  request.var1.name     = HURR_NAME;
+
+  request.var1.name = HURR_NAME;
   request.var1.longname = HURR_LONGNAME;
-  request.var1.units    = STRWIN_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = maxWind;
-  request.var1.f2       = farnum;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;    
-  request.var1.addc     = 0.0;    
-  request.var1.epilog   = NONE;
-  request.var2.name     = HURR_NAME2;
+  request.var1.units = STRWIN_UNITS;
+  request.var1.f1 = farselgec;
+  request.var1.f1arg = maxWind;
+  request.var1.f2 = farnum;
+  request.var1.f3 = NULL;
+  request.var1.mulc = 0.0;
+  request.var1.addc = 0.0;
+  request.var1.epilog = NONE;
+  request.var2.name = HURR_NAME2;
   request.var2.longname = HURR_LONGNAME2;
-  request.var2.units    = STRWIN_UNITS2;
-  request.var2.h1       = farselgec;
-  request.var2.h1arg    = maxWind;
-  request.var2.h2       = farnum2;
-  request.var2.h3       = farmax;
-   
+  request.var2.units = STRWIN_UNITS2;
+  request.var2.h1 = farselgec;
+  request.var2.h1arg = maxWind;
+  request.var2.h2 = farnum2;
+  request.var2.h3 = farmax;
+
   eca1(&request);
   cdoFinish();
-  
+
   return 0;
 }
 // clang-format on

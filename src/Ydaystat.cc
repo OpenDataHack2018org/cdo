@@ -27,7 +27,8 @@
       Ydaystat   ydayvar         Multi-year daily variance
       Ydaystat   ydayvar1        Multi-year daily variance [Normalize by (n-1)]
       Ydaystat   ydaystd         Multi-year daily standard deviation
-      Ydaystat   ydaystd1        Multi-year daily standard deviation [Normalize by (n-1)]
+      Ydaystat   ydaystd1        Multi-year daily standard deviation [Normalize
+   by (n-1)]
 */
 
 #include <cdi.h>
@@ -35,41 +36,46 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-#define  MAX_DOY       373
+#define MAX_DOY 373
 
 int yearMode = 0;
 
-static
-void set_parameter(void)
+static void
+set_parameter(void)
 {
   int pargc = operatorArgc();
-  if ( pargc )
-    { 
+  if (pargc)
+    {
       char **pargv = operatorArgv();
 
-      list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "PARAMETER");
-      if ( kvlist_parse_cmdline(kvlist, pargc, pargv) != 0 ) cdoAbort("Parse error!");
-      if ( cdoVerbose ) kvlist_print(kvlist);
+      list_t *kvlist
+          = list_new(sizeof(keyValues_t *), free_keyval, "PARAMETER");
+      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0)
+        cdoAbort("Parse error!");
+      if (cdoVerbose) kvlist_print(kvlist);
 
-      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
+      for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
         {
-          keyValues_t *kv = *(keyValues_t **)kvnode->data;
+          keyValues_t *kv = *(keyValues_t **) kvnode->data;
           const char *key = kv->key;
-          if ( kv->nvalues > 1 ) cdoAbort("Too many values for parameter key >%s<!", key);
-          if ( kv->nvalues < 1 ) cdoAbort("Missing value for parameter key >%s<!", key);
+          if (kv->nvalues > 1)
+            cdoAbort("Too many values for parameter key >%s<!", key);
+          if (kv->nvalues < 1)
+            cdoAbort("Missing value for parameter key >%s<!", key);
           const char *value = kv->values[0];
-          
-          if ( STR_IS_EQ(key, "yearMode") ) yearMode = parameter2int(value);
-          else cdoAbort("Invalid parameter key >%s<!", key);
-        }          
-          
+
+          if (STR_IS_EQ(key, "yearMode"))
+            yearMode = parameter2int(value);
+          else
+            cdoAbort("Invalid parameter key >%s<!", key);
+        }
+
       list_destroy(kvlist);
     }
 }
 
-
-void *Ydaystat(void *process)
+void *
+Ydaystat(void *process)
 {
   int varID, levelID;
   int year, month, day;
@@ -105,7 +111,7 @@ void *Ydaystat(void *process)
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
   // clang-format on
 
-  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
+  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
     {
       vars1[dayoy] = NULL;
       vars2[dayoy] = NULL;
@@ -120,7 +126,7 @@ void *Ydaystat(void *process)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
-  if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
+  if (taxisHasBounds(taxisID2)) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -133,216 +139,230 @@ void *Ydaystat(void *process)
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
+  field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
   int tsID = 0;
   int otsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
-      if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
+      if (cdoVerbose)
+        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
       int dayoy = 0;
-      if ( month >= 1 && month <= 12 ) dayoy = (month-1)*31 + day;
+      if (month >= 1 && month <= 12) dayoy = (month - 1) * 31 + day;
 
-      if ( dayoy < 0 || dayoy >= MAX_DOY )
-	cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
+      if (dayoy < 0 || dayoy >= MAX_DOY)
+        cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
       vdates[dayoy] = vdate;
       vtimes[dayoy] = vtime;
 
-      if ( vars1[dayoy] == NULL )
-	{
-	  vars1[dayoy] = field_malloc(vlistID1, FIELD_PTR);
-	  samp1[dayoy] = field_malloc(vlistID1, FIELD_NONE);
-	  if ( lvarstd || lrange )
-	    vars2[dayoy] = field_malloc(vlistID1, FIELD_PTR);
-	}
+      if (vars1[dayoy] == NULL)
+        {
+          vars1[dayoy] = field_malloc(vlistID1, FIELD_PTR);
+          samp1[dayoy] = field_malloc(vlistID1, FIELD_NONE);
+          if (lvarstd || lrange)
+            vars2[dayoy] = field_malloc(vlistID1, FIELD_PTR);
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( tsID == 0 )
-	    {
-              recinfo[recID].varID   = varID;
+          if (tsID == 0)
+            {
+              recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
-	    }
+              recinfo[recID].lconst
+                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+            }
 
           field_type *psamp1 = &samp1[dayoy][varID][levelID];
           field_type *pvars1 = &vars1[dayoy][varID][levelID];
-          field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
+          field_type *pvars2
+              = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
           int nsets = dayoy_nsets[dayoy];
 
-	  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  if ( nsets == 0 )
-	    {
-	      pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-	      pvars1->nmiss = nmiss;
-              if ( lrange )
+          if (nsets == 0)
+            {
+              pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
+              pvars1->nmiss = nmiss;
+              if (lrange)
                 {
                   pvars2->nmiss = pvars1->nmiss;
-                  for ( size_t i = 0; i < gridsize; i++ )
+                  for (size_t i = 0; i < gridsize; i++)
                     pvars2->ptr[i] = pvars1->ptr[i];
                 }
 
-	      if ( nmiss > 0 || psamp1->ptr )
-		{
-		  if ( psamp1->ptr == NULL )
-		    psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
+              if (nmiss > 0 || psamp1->ptr)
+                {
+                  if (psamp1->ptr == NULL)
+                    psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
-		  for ( size_t i = 0; i < gridsize; i++ )
-                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
-		}
-	    }
-	  else
-	    {
-	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = nmiss;
-	      field.grid    = pvars1->grid;
-	      field.missval = pvars1->missval;
+                  for (size_t i = 0; i < gridsize; i++)
+                    psamp1->ptr[i]
+                        = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                }
+            }
+          else
+            {
+              pstreamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss = nmiss;
+              field.grid = pvars1->grid;
+              field.missval = pvars1->missval;
 
-	      if ( field.nmiss > 0 || psamp1->ptr )
-		{
-		  if ( psamp1->ptr == NULL )
-		    {
-		      psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( size_t i = 0; i < gridsize; i++ )
-			psamp1->ptr[i] = nsets;
-		    }
-		  
-		  for ( size_t i = 0; i < gridsize; i++ )
-		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-		      psamp1->ptr[i]++;
-		}
+              if (field.nmiss > 0 || psamp1->ptr)
+                {
+                  if (psamp1->ptr == NULL)
+                    {
+                      psamp1->ptr
+                          = (double *) Malloc(gridsize * sizeof(double));
+                      for (size_t i = 0; i < gridsize; i++)
+                        psamp1->ptr[i] = nsets;
+                    }
 
-	      if ( lvarstd )
-		{
-		  farsumq(pvars2, field);
-		  farsum(pvars1, field);
-		}
-              else if ( lrange )
+                  for (size_t i = 0; i < gridsize; i++)
+                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
+                      psamp1->ptr[i]++;
+                }
+
+              if (lvarstd)
+                {
+                  farsumq(pvars2, field);
+                  farsum(pvars1, field);
+                }
+              else if (lrange)
                 {
                   farmin(pvars2, field);
                   farmax(pvars1, field);
                 }
-	      else
-		{
-		  farfun(pvars1, field, operfunc);
-		}
-	    }
-	}
+              else
+                {
+                  farfun(pvars1, field, operfunc);
+                }
+            }
+        }
 
-      if ( dayoy_nsets[dayoy] == 0 && lvarstd )
-        for ( int recID = 0; recID < maxrecs; recID++ )
+      if (dayoy_nsets[dayoy] == 0 && lvarstd)
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-	    if ( recinfo[recID].lconst ) continue;
+            if (recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[dayoy][varID][levelID];
             field_type *pvars2 = &vars2[dayoy][varID][levelID];
 
             farmoq(pvars2, *pvars1);
-	  }
+          }
 
       dayoy_nsets[dayoy]++;
       tsID++;
     }
 
   // set the year to the minimum of years found on output timestep
-  if ( yearMode )
+  if (yearMode)
     {
       int outyear = 1e9;
-      for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-        if ( dayoy_nsets[dayoy] )
+      for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
+        if (dayoy_nsets[dayoy])
           {
             cdiDecodeDate(vdates[dayoy], &year, &month, &day);
-            if ( year < outyear ) outyear = year;
+            if (year < outyear) outyear = year;
           }
-      for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-        if ( dayoy_nsets[dayoy] )
+      for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
+        if (dayoy_nsets[dayoy])
           {
             cdiDecodeDate(vdates[dayoy], &year, &month, &day);
-            if ( year > outyear ) vdates[dayoy] = cdiEncodeDate(outyear, month, day);
-            //  printf("vdates[%d] = %d  nsets = %d\n", dayoy, vdates[dayoy], nsets[dayoy]);
+            if (year > outyear)
+              vdates[dayoy] = cdiEncodeDate(outyear, month, day);
+            //  printf("vdates[%d] = %d  nsets = %d\n", dayoy, vdates[dayoy],
+            //  nsets[dayoy]);
           }
     }
 
-  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-    if ( dayoy_nsets[dayoy] )
+  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
+    if (dayoy_nsets[dayoy])
       {
         int nsets = dayoy_nsets[dayoy];
-        for ( int recID = 0; recID < maxrecs; recID++ )
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-	    if ( recinfo[recID].lconst ) continue;
+            if (recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[dayoy][varID][levelID];
             field_type *pvars1 = &vars1[dayoy][varID][levelID];
-            field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
+            field_type *pvars2
+                = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
 
-            if ( lmean )
+            if (lmean)
               {
-                if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
-                else               farcdiv(pvars1, (double)nsets);
+                if (psamp1->ptr)
+                  fardiv(pvars1, *psamp1);
+                else
+                  farcdiv(pvars1, (double) nsets);
               }
-            else if ( lvarstd )
+            else if (lvarstd)
               {
-                if ( psamp1->ptr )
+                if (psamp1->ptr)
                   {
-                    if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
-                    else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                    if (lstd)
+                      farstd(pvars1, *pvars2, *psamp1, divisor);
+                    else
+                      farvar(pvars1, *pvars2, *psamp1, divisor);
                   }
                 else
                   {
-                    if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
-                    else        farcvar(pvars1, *pvars2, nsets, divisor);
+                    if (lstd)
+                      farcstd(pvars1, *pvars2, nsets, divisor);
+                    else
+                      farcvar(pvars1, *pvars2, nsets, divisor);
                   }
               }
-            else if ( lrange )
+            else if (lrange)
               {
                 farsub(pvars1, *pvars2);
               }
           }
 
-	taxisDefVdate(taxisID2, vdates[dayoy]);
-	taxisDefVtime(taxisID2, vtimes[dayoy]);
-	pstreamDefTimestep(streamID2, otsID);
+        taxisDefVdate(taxisID2, vdates[dayoy]);
+        taxisDefVtime(taxisID2, vtimes[dayoy]);
+        pstreamDefTimestep(streamID2, otsID);
 
-        for ( int recID = 0; recID < maxrecs; recID++ )
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-	    if ( otsID && recinfo[recID].lconst ) continue;
+            if (otsID && recinfo[recID].lconst) continue;
 
-            int varID   = recinfo[recID].varID;
+            int varID = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
             field_type *pvars1 = &vars1[dayoy][varID][levelID];
 
-	    pstreamDefRecord(streamID2, varID, levelID);
-	    pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
-	  }
+            pstreamDefRecord(streamID2, varID, levelID);
+            pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
+          }
 
-	otsID++;
+        otsID++;
       }
 
-  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
+  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
     {
-      if ( vars1[dayoy] != NULL )
-	{
-	  field_free(vars1[dayoy], vlistID1);
-	  field_free(samp1[dayoy], vlistID1);
-	  if ( lvarstd ) field_free(vars2[dayoy], vlistID1);
-	}
+      if (vars1[dayoy] != NULL)
+        {
+          field_free(vars1[dayoy], vlistID1);
+          field_free(samp1[dayoy], vlistID1);
+          if (lvarstd) field_free(vars2[dayoy], vlistID1);
+        }
     }
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

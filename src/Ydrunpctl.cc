@@ -30,18 +30,18 @@
 #include "percentiles.h"
 #include "datetime.h"
 
-
 #define NDAY 373
 
-int getmonthday(int date)
+int
+getmonthday(int date)
 {
   int year, month, day;
   cdiDecodeDate(date, &year, &month, &day);
-  return month*100+day;
+  return month * 100 + day;
 }
 
-
-void *Ydrunpctl(void *process)
+void *
+Ydrunpctl(void *process)
 {
   int varID;
   int gridID;
@@ -57,17 +57,17 @@ void *Ydrunpctl(void *process)
   int nsets[NDAY];
   field_type **vars2[NDAY];
   HISTOGRAM_SET *hsets[NDAY];
-    
+
   cdoInitialize(process);
   cdoOperatorAdd("ydrunpctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number, number of timesteps");
   operatorCheckArgc(2);
-  double pn  = parameter2double(operatorArgv()[0]);
+  double pn = parameter2double(operatorArgv()[0]);
   percentile_check_number(pn);
   int ndates = parameter2int(operatorArgv()[1]);
-  
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+
+  for (dayoy = 0; dayoy < NDAY; dayoy++)
     {
       vars2[dayoy] = NULL;
       hsets[dayoy] = NULL;
@@ -92,176 +92,185 @@ void *Ydrunpctl(void *process)
   /* TODO - check that time axes 2 and 3 are equal */
 
   int taxisID4 = taxisDuplicate(taxisID1);
-  if ( taxisHasBounds(taxisID4) ) taxisDeleteBounds(taxisID4);
+  if (taxisHasBounds(taxisID4)) taxisDeleteBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
   int calendar = taxisInqCalendar(taxisID1);
-  int dpy      = calendar_dpy(calendar);
+  int dpy = calendar_dpy(calendar);
 
   int streamID4 = cdoStreamOpenWrite(cdoStreamName(3), cdoFiletype());
   pstreamDefVlist(streamID4, vlistID4);
 
-  int nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  cdo_datetime_t *datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
-  
-  field_type ***vars1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
-  
-  for ( its = 0; its < ndates; its++ )
+  cdo_datetime_t *datetime
+      = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
+
+  field_type ***vars1
+      = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+
+  for (its = 0; its < ndates; its++)
     {
       vars1[its] = field_malloc(vlistID1, FIELD_PTR);
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
-      if ( nrecs != cdoStreamInqTimestep(streamID3, tsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
-      
+      if (nrecs != cdoStreamInqTimestep(streamID3, tsID))
+        cdoAbort("Number of records at time step %d of %s and %s differ!",
+                 tsID + 1, cdoGetStreamName(1).c_str(),
+                 cdoGetStreamName(2).c_str());
+
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
-      
-      if ( vdate != taxisInqVdate(taxisID3) )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
-        
-      if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
+
+      if (vdate != taxisInqVdate(taxisID3))
+        cdoAbort("Verification dates at time step %d of %s and %s differ!",
+                 tsID + 1, cdoGetStreamName(1).c_str(),
+                 cdoGetStreamName(2).c_str());
+
+      if (cdoVerbose)
+        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
-      if ( month >= 1 && month <= 12 )
-	dayoy = (month-1)*31 + day;
+      if (month >= 1 && month <= 12)
+        dayoy = (month - 1) * 31 + day;
       else
-	dayoy = 0;
+        dayoy = 0;
 
-      if ( dayoy < 0 || dayoy >= NDAY )
-	cdoAbort("Day %d out of range!", dayoy);
+      if (dayoy < 0 || dayoy >= NDAY) cdoAbort("Day %d out of range!", dayoy);
 
       vdates2[dayoy] = vdate;
-      //vtimes2[dayoy] = vtime;
+      // vtimes2[dayoy] = vtime;
 
-      if ( vars2[dayoy] == NULL )
-	{
-	  vars2[dayoy] = field_malloc(vlistID2, FIELD_PTR);
+      if (vars2[dayoy] == NULL)
+        {
+          vars2[dayoy] = field_malloc(vlistID2, FIELD_PTR);
           hsets[dayoy] = hsetCreate(nvars);
 
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      gridID   = vlistInqVarGrid(vlistID2, varID);
-	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          for (varID = 0; varID < nvars; varID++)
+            {
+              gridID = vlistInqVarGrid(vlistID2, varID);
+              nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
               hsetCreateVarLevels(hsets[dayoy], varID, nlevels, gridID);
-	    }
-	}
-      
-      for ( int recID = 0; recID < nrecs; recID++ )
+            }
+        }
+
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-	  pstreamReadRecord(streamID2, vars2[dayoy][varID][levelID].ptr, &nmiss);
+          pstreamReadRecord(streamID2, vars2[dayoy][varID][levelID].ptr,
+                            &nmiss);
           vars2[dayoy][varID][levelID].nmiss = nmiss;
         }
-      for ( int recID = 0; recID < nrecs; recID++ )
+      for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID3, &varID, &levelID);
-	  pstreamReadRecord(streamID3, field.ptr, &nmiss);
-          field.nmiss   = nmiss;
-          field.grid    = vars2[dayoy][varID][levelID].grid;
-	  field.missval = vars2[dayoy][varID][levelID].missval;
-	  
-	  hsetDefVarLevelBounds(hsets[dayoy], varID, levelID, &vars2[dayoy][varID][levelID], &field);
+          pstreamReadRecord(streamID3, field.ptr, &nmiss);
+          field.nmiss = nmiss;
+          field.grid = vars2[dayoy][varID][levelID].grid;
+          field.missval = vars2[dayoy][varID][levelID].missval;
+
+          hsetDefVarLevelBounds(hsets[dayoy], varID, levelID,
+                                &vars2[dayoy][varID][levelID], &field);
         }
-      
+
       tsID++;
     }
-  
-  for ( tsID = 0; tsID < ndates; tsID++ )
+
+  for (tsID = 0; tsID < ndates; tsID++)
     {
       nrecs = cdoStreamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 )
-	cdoAbort("File has less then %d timesteps!", ndates);
+      if (nrecs == 0) cdoAbort("File has less then %d timesteps!", ndates);
 
       datetime[tsID].date = taxisInqVdate(taxisID1);
       datetime[tsID].time = taxisInqVtime(taxisID1);
-	
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( tsID == 0 )
-	    {
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
-	    }
-	  
-	  pstreamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
-	  vars1[tsID][varID][levelID].nmiss = nmiss;
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+
+          if (tsID == 0)
+            {
+              recVarID[recID] = varID;
+              recLevelID[recID] = levelID;
+            }
+
+          pstreamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
+          vars1[tsID][varID][levelID].nmiss = nmiss;
+        }
     }
-  
-  while ( TRUE )
+
+  while (TRUE)
     {
       datetime_avg(dpy, ndates, datetime);
-      
+
       vdate = datetime[ndates].date;
       vtime = datetime[ndates].time;
-      
+
       cdiDecodeDate(vdate, &year, &month, &day);
 
-      if ( month >= 1 && month <= 12 )
-	dayoy = (month-1)*31 + day;
+      if (month >= 1 && month <= 12)
+        dayoy = (month - 1) * 31 + day;
       else
-	dayoy = 0;
+        dayoy = 0;
 
-      if ( dayoy < 0 || dayoy >= NDAY )
-	cdoAbort("Day %d out of range!", dayoy);
+      if (dayoy < 0 || dayoy >= NDAY) cdoAbort("Day %d out of range!", dayoy);
 
       vdates1[dayoy] = vdate;
       vtimes1[dayoy] = vtime;
-      
-      if ( vars2[dayoy] == NULL )
-        cdoAbort("No data for day %d in %s and %s", dayoy, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
-	  nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      
-	  for ( levelID = 0; levelID < nlevels; levelID++ )
-	    for ( inp = 0; inp < ndates; inp++ )
-	      hsetAddVarLevelValues(hsets[dayoy], varID, levelID, &vars1[inp][varID][levelID]);
-	}
-        
+      if (vars2[dayoy] == NULL)
+        cdoAbort("No data for day %d in %s and %s", dayoy,
+                 cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
+
+      for (varID = 0; varID < nvars; varID++)
+        {
+          if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
+          nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+
+          for (levelID = 0; levelID < nlevels; levelID++)
+            for (inp = 0; inp < ndates; inp++)
+              hsetAddVarLevelValues(hsets[dayoy], varID, levelID,
+                                    &vars1[inp][varID][levelID]);
+        }
+
       datetime[ndates] = datetime[0];
       vars1[ndates] = vars1[0];
 
-      for ( inp = 0; inp < ndates; inp++ )
-	{
-	  datetime[inp] = datetime[inp+1];
-	  vars1[inp] = vars1[inp+1];
-	}
+      for (inp = 0; inp < ndates; inp++)
+        {
+          datetime[inp] = datetime[inp + 1];
+          vars1[inp] = vars1[inp + 1];
+        }
 
       nrecs = cdoStreamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
 
-      datetime[ndates-1].date = taxisInqVdate(taxisID1);
-      datetime[ndates-1].time = taxisInqVtime(taxisID1);
+      datetime[ndates - 1].date = taxisInqVdate(taxisID1);
+      datetime[ndates - 1].time = taxisInqVtime(taxisID1);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  
-	  pstreamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
-	  vars1[ndates-1][varID][levelID].nmiss = nmiss;
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+
+          pstreamReadRecord(streamID1, vars1[ndates - 1][varID][levelID].ptr,
+                            &nmiss);
+          vars1[ndates - 1][varID][levelID].nmiss = nmiss;
+        }
 
       nsets[dayoy] += ndates;
       tsID++;
@@ -271,81 +280,84 @@ void *Ydrunpctl(void *process)
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( nsets[dayoy] )
       {
-	int year, month, day;
-	cdiDecodeDate(vdates1[dayoy], &year, &month, &day);
-	if ( year < outyear ) outyear = year;
+        int year, month, day;
+        cdiDecodeDate(vdates1[dayoy], &year, &month, &day);
+        if ( year < outyear ) outyear = year;
       }
 
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( nsets[dayoy] )
       {
-	int year, month, day;
-	cdiDecodeDate(vdates1[dayoy], &year, &month, &day);
-	vdates1[dayoy] = cdiEncodeDate(outyear, month, day);
+        int year, month, day;
+        cdiDecodeDate(vdates1[dayoy], &year, &month, &day);
+        vdates1[dayoy] = cdiEncodeDate(outyear, month, day);
       }
   */
   int otsID = 0;
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
-    if ( nsets[dayoy] )
+  for (dayoy = 0; dayoy < NDAY; dayoy++)
+    if (nsets[dayoy])
       {
-        if ( getmonthday(vdates1[dayoy]) != getmonthday(vdates2[dayoy]) )
-          cdoAbort("Verification dates for day %d of %s, %s and %s are different!",
-                   dayoy, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
+        if (getmonthday(vdates1[dayoy]) != getmonthday(vdates2[dayoy]))
+          cdoAbort(
+              "Verification dates for day %d of %s, %s and %s are different!",
+              dayoy, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
 
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
-	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      
-	    for ( levelID = 0; levelID < nlevels; levelID++ )
-	      hsetGetVarLevelPercentiles(&vars2[dayoy][varID][levelID], hsets[dayoy], varID, levelID, pn);
-	  }
+        for (varID = 0; varID < nvars; varID++)
+          {
+            if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
+            nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
-	taxisDefVdate(taxisID4, vdates1[dayoy]);
-	taxisDefVtime(taxisID4, vtimes1[dayoy]);
-	pstreamDefTimestep(streamID4, otsID);
+            for (levelID = 0; levelID < nlevels; levelID++)
+              hsetGetVarLevelPercentiles(&vars2[dayoy][varID][levelID],
+                                         hsets[dayoy], varID, levelID, pn);
+          }
 
-	for ( int recID = 0; recID < nrecords; recID++ )
-	  {
-	    varID    = recVarID[recID];
-	    levelID  = recLevelID[recID];
+        taxisDefVdate(taxisID4, vdates1[dayoy]);
+        taxisDefVtime(taxisID4, vtimes1[dayoy]);
+        pstreamDefTimestep(streamID4, otsID);
 
-	    if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
+        for (int recID = 0; recID < nrecords; recID++)
+          {
+            varID = recVarID[recID];
+            levelID = recLevelID[recID];
 
-	    pstreamDefRecord(streamID4, varID, levelID);
-	    pstreamWriteRecord(streamID4, vars2[dayoy][varID][levelID].ptr,
+            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+              continue;
+
+            pstreamDefRecord(streamID4, varID, levelID);
+            pstreamWriteRecord(streamID4, vars2[dayoy][varID][levelID].ptr,
                                vars2[dayoy][varID][levelID].nmiss);
-	  }
+          }
 
-	otsID++;
+        otsID++;
       }
-  
-  for ( its = 0; its < ndates; its++ )
+
+  for (its = 0; its < ndates; its++)
     {
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  for ( levelID = 0; levelID < nlevels; levelID++ )
-	    Free(vars1[its][varID][levelID].ptr);
-	  Free(vars1[its][varID]);
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          for (levelID = 0; levelID < nlevels; levelID++)
+            Free(vars1[its][varID][levelID].ptr);
+          Free(vars1[its][varID]);
+        }
       Free(vars1[its]);
     }
   Free(vars1);
 
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for (dayoy = 0; dayoy < NDAY; dayoy++)
     {
-      if ( vars2[dayoy] != NULL )
-	{
-	  field_free(vars2[dayoy], vlistID2); 
-	  hsetDestroy(hsets[dayoy]);
-	}
+      if (vars2[dayoy] != NULL)
+        {
+          field_free(vars2[dayoy], vlistID2);
+          hsetDestroy(hsets[dayoy]);
+        }
     }
 
-  if ( field.ptr ) Free(field.ptr);
-  
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  if (field.ptr) Free(field.ptr);
+
+  if (recVarID) Free(recVarID);
+  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID4);
   pstreamClose(streamID3);

@@ -29,7 +29,6 @@
       Seltime    selsmon         Select single month
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -37,41 +36,46 @@
 #include "listarray.h"
 #include "util_string.h"
 
-void season_to_months(const char *season, int *imonths)
+void
+season_to_months(const char *season, int *imonths)
 {
   const char *smons = "JFMAMJJASONDJFMAMJJASOND";
-  const int imons[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-  assert(strlen(smons)==(sizeof(imons)/sizeof(int)));
+  const int imons[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+  assert(strlen(smons) == (sizeof(imons) / sizeof(int)));
 
   size_t len = strlen(season);
-  if ( len == 3 && strcmp(season, "ANN") == 0 )
+  if (len == 3 && strcmp(season, "ANN") == 0)
     {
-      for ( size_t k = 0; k < 12; ++k ) imonths[k+1] = 1;
+      for (size_t k = 0; k < 12; ++k)
+        imonths[k + 1] = 1;
     }
   else
     {
-      if ( len > 12 ) cdoAbort("Too many months %d (limit=12)!", (int)len);
+      if (len > 12) cdoAbort("Too many months %d (limit=12)!", (int) len);
       char *season_u = strdup(season);
       strtoupper(season_u);
       const char *sstr = strstr(smons, season_u);
       free(season_u);
-      if ( sstr == NULL ) cdoAbort("Season %s not available!", season);
-      size_t ks = (size_t)(sstr-smons);
+      if (sstr == NULL) cdoAbort("Season %s not available!", season);
+      size_t ks = (size_t)(sstr - smons);
       size_t ke = ks + len;
-      for ( size_t k = ks; k < ke; ++k ) imonths[imons[k]]++;
+      for (size_t k = ks; k < ke; ++k)
+        imonths[imons[k]]++;
     }
 }
 
-static
-int seaslist(lista_t *ilista)
+static int
+seaslist(lista_t *ilista)
 {
   int imon[13]; /* 1-12 ! */
-  for ( int i = 0; i < 13; ++i ) imon[i] = 0;
+  for (int i = 0; i < 13; ++i)
+    imon[i] = 0;
 
   int nsel = operatorArgc();
-  if ( isdigit(*operatorArgv()[0]))
+  if (isdigit(*operatorArgv()[0]))
     {
-      for ( int i = 0; i < nsel; i++ )
+      for (int i = 0; i < nsel; i++)
         {
           int ival = parameter2int(operatorArgv()[i]);
           // clang-format off
@@ -85,87 +89,95 @@ int seaslist(lista_t *ilista)
     }
   else
     {
-      for ( int i = 0; i < nsel; i++ )
+      for (int i = 0; i < nsel; i++)
         season_to_months(operatorArgv()[i], imon);
     }
 
   nsel = 0;
-  for ( int i = 1; i < 13; ++i ) if ( imon[i] ) lista_set_int(ilista, nsel++, i);
+  for (int i = 1; i < 13; ++i)
+    if (imon[i]) lista_set_int(ilista, nsel++, i);
 
   return nsel;
 }
 
-
-double datestr_to_double(const char *datestr, int opt)
+double
+datestr_to_double(const char *datestr, int opt)
 {
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   double fval = 0;
 
   size_t len = strlen(datestr);
 
-  for ( size_t i = 0; i < len; ++i )
+  for (size_t i = 0; i < len; ++i)
     {
       int c = datestr[i];
-      if ( !(isdigit(c) || c == '-' || c == ':' || c == '.' || c == 'T') )
-        cdoAbort("Date string >%s< contains invalid character at position %zu!", datestr, i+1);
+      if (!(isdigit(c) || c == '-' || c == ':' || c == '.' || c == 'T'))
+        cdoAbort("Date string >%s< contains invalid character at position %zu!",
+                 datestr, i + 1);
     }
 
-  if ( opt ) { hour = 23; minute = 59; second = 59; }
+  if (opt)
+    {
+      hour = 23;
+      minute = 59;
+      second = 59;
+    }
 
-  if ( strchr(datestr, '-') == NULL )
+  if (strchr(datestr, '-') == NULL)
     {
       fval = parameter2double(datestr);
     }
-  else if ( strchr(datestr, 'T') )
+  else if (strchr(datestr, 'T'))
     {
-      int status = sscanf(datestr, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
-      if ( status != 6 ) cdoAbort("Invalid date string >%s<!", datestr);
+      int status = sscanf(datestr, "%d-%d-%dT%d:%d:%d", &year, &month, &day,
+                          &hour, &minute, &second);
+      if (status != 6) cdoAbort("Invalid date string >%s<!", datestr);
       fval = cdiEncodeTime(hour, minute, second);
-      if ( fabs(fval) > 0 ) fval /= 1000000;
+      if (fabs(fval) > 0) fval /= 1000000;
       fval += cdiEncodeDate(year, month, day);
     }
   else
     {
       int status = sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-      if ( status != 3 ) cdoAbort("Invalid date string >%s<!", datestr);
+      if (status != 3) cdoAbort("Invalid date string >%s<!", datestr);
       fval = cdiEncodeTime(hour, minute, second);
-      if ( fabs(fval) > 0 ) fval /= 1000000;
+      if (fabs(fval) > 0) fval /= 1000000;
       fval += cdiEncodeDate(year, month, day);
     }
 
   return fval;
 }
 
-static
-int datelist(lista_t *flista)
+static int
+datelist(lista_t *flista)
 {
   bool set2 = true;
   double fval = 0;
 
   int nsel = operatorArgc();
-  if ( nsel < 1 ) cdoAbort("Too few arguments!");
-  if ( nsel > 2 ) cdoAbort("Too many arguments!");
+  if (nsel < 1) cdoAbort("Too few arguments!");
+  if (nsel > 2) cdoAbort("Too many arguments!");
 
-  for ( int i = 0; i < nsel; i++ )
+  for (int i = 0; i < nsel; i++)
     {
-      if ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
-	{
+      if (operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0)
+        {
           fval = (i == 0) ? -99999999999. : 99999999999.;
-	  lista_set_flt(flista, i,  fval);
-	}
+          lista_set_flt(flista, i, fval);
+        }
       else
-	{
-	  fval = datestr_to_double(operatorArgv()[i], 0);
-	  if ( strchr(operatorArgv()[i], 'T') )
-	    set2 = false;
-	  else if ( nsel > 1 && i > 0 )
-	    fval += 0.999;
-	}
+        {
+          fval = datestr_to_double(operatorArgv()[i], 0);
+          if (strchr(operatorArgv()[i], 'T'))
+            set2 = false;
+          else if (nsel > 1 && i > 0)
+            fval += 0.999;
+        }
 
       lista_set_flt(flista, i, fval);
     }
 
-  if ( nsel == 1 && set2 )
+  if (nsel == 1 && set2)
     {
       fval += 0.999;
       lista_set_flt(flista, nsel, fval);
@@ -175,8 +187,8 @@ int datelist(lista_t *flista)
   return nsel;
 }
 
-
-void *Seltime(void *process)
+void *
+Seltime(void *process)
 {
   int streamID2 = -1;
   int nrecs;
@@ -220,59 +232,62 @@ void *Seltime(void *process)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == SELSEASON )
+  if (operatorID == SELSEASON)
     {
       nsel = seaslist(ilista);
     }
-  else if ( operatorID == SELDATE )
+  else if (operatorID == SELDATE)
     {
       nsel = datelist(flista);
     }
-  else if ( operatorID == SELTIME )
+  else if (operatorID == SELTIME)
     {
       nsel = operatorArgc();
-      if ( nsel < 1 ) cdoAbort("Too few arguments!");
-      for ( i = 0; i < nsel; i++ )
-	{
-	  if ( strchr(operatorArgv()[i], ':') )
-	    {
-	      sscanf(operatorArgv()[i], "%d:%d:%d", &hour, &minute, &second);
-	      lista_set_int(ilista, i, cdiEncodeTime(hour, minute, second));
-	    }
-	  else
-	    {
-	      lista_set_int(ilista, i, parameter2int(operatorArgv()[i]));
-	    }
-	}
+      if (nsel < 1) cdoAbort("Too few arguments!");
+      for (i = 0; i < nsel; i++)
+        {
+          if (strchr(operatorArgv()[i], ':'))
+            {
+              sscanf(operatorArgv()[i], "%d:%d:%d", &hour, &minute, &second);
+              lista_set_int(ilista, i, cdiEncodeTime(hour, minute, second));
+            }
+          else
+            {
+              lista_set_int(ilista, i, parameter2int(operatorArgv()[i]));
+            }
+        }
     }
   else
     {
       nsel = args2int_lista(operatorArgc(), operatorArgv(), ilista);
     }
 
-  if ( nsel < 1 ) cdoAbort("No timestep selected!");
+  if (nsel < 1) cdoAbort("No timestep selected!");
 
   int *intarr = (int *) lista_dataptr(ilista);
   double *fltarr = (double *) lista_dataptr(flista);
 
-  if ( operatorID == SELSMON )
+  if (operatorID == SELSMON)
     {
-      if ( nsel > 1 ) nts1 = intarr[1];
-      if ( nsel > 2 ) nts2 = intarr[2];
-      else            nts2 = nts1;
+      if (nsel > 1) nts1 = intarr[1];
+      if (nsel > 2)
+        nts2 = intarr[2];
+      else
+        nts2 = nts1;
 
-      if ( nsel > 3 ) cdoAbort("Too many parameters");
+      if (nsel > 3) cdoAbort("Too many parameters");
 
-      if ( cdoVerbose )
-	cdoPrint("mon=%d  nts1=%d  nts2=%d", intarr[0], nts1, nts2);
+      if (cdoVerbose)
+        cdoPrint("mon=%d  nts1=%d  nts2=%d", intarr[0], nts1, nts2);
 
       nsel = 1;
     }
 
-  if ( nsel )
+  if (nsel)
     {
-      selfound = (bool*) Malloc(nsel*sizeof(bool));
-      for ( i = 0; i < nsel; i++ ) selfound[i] = false;
+      selfound = (bool *) Malloc(nsel * sizeof(bool));
+      for (i = 0; i < nsel; i++)
+        selfound[i] = false;
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -286,83 +301,86 @@ void *Seltime(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  if ( ! lcopy )
+  if (!lcopy)
     {
       size_t gridsize = vlistGridsizeMax(vlistID1);
-      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) Malloc(gridsize*sizeof(double));
+      if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
+      array = (double *) Malloc(gridsize * sizeof(double));
     }
 
   int ntsteps = vlistNtsteps(vlistID1);
 
   // add support for negative timestep values
-  if ( operatorID == SELTIMESTEP && ntsteps > 0 )
+  if (operatorID == SELTIMESTEP && ntsteps > 0)
     {
-      for ( i = 0; i < nsel; i++ )
-	{
-	  if ( intarr[i] < 0 )
-	    {
-	      if ( cdoVerbose )
-		cdoPrint("timestep %d changed to %d", intarr[i], ntsteps + 1 + intarr[i]);
-	      intarr[i] = ntsteps + 1 + intarr[i];
-	    }
-	}
+      for (i = 0; i < nsel; i++)
+        {
+          if (intarr[i] < 0)
+            {
+              if (cdoVerbose)
+                cdoPrint("timestep %d changed to %d", intarr[i],
+                         ntsteps + 1 + intarr[i]);
+              intarr[i] = ntsteps + 1 + intarr[i];
+            }
+        }
     }
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
-      for ( int i = 0; i < nsel; i++ )
-	if ( operatorID == SELDATE )
-	  cdoPrint("fltarr entry: %d %14.4f", i+1, fltarr[i]);
-	else
-	  cdoPrint("intarr entry: %d %d", i+1, intarr[i]);
+      for (int i = 0; i < nsel; i++)
+        if (operatorID == SELDATE)
+          cdoPrint("fltarr entry: %d %14.4f", i + 1, fltarr[i]);
+        else
+          cdoPrint("intarr entry: %d %d", i + 1, intarr[i]);
     }
 
   int nvars = vlistNvars(vlistID1);
   int nconst = 0;
-  for ( varID = 0; varID < nvars; varID++ )
-    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) nconst++;
-      
+  for (varID = 0; varID < nvars; varID++)
+    if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) nconst++;
+
   bool lnts1 = (operatorID == SELSMON) && (nts1 > 0);
 
-  if ( lnts1 || nconst )
+  if (lnts1 || nconst)
     {
-      if ( lnts1 )
-	{
-	  vdate_list = (int*) Malloc(nts1*sizeof(int));
-	  vtime_list = (int*) Malloc(nts1*sizeof(int));
-	}
+      if (lnts1)
+        {
+          vdate_list = (int *) Malloc(nts1 * sizeof(int));
+          vtime_list = (int *) Malloc(nts1 * sizeof(int));
+        }
       else
-	{
-	  nts1 = 1;
-	}
+        {
+          nts1 = 1;
+        }
 
-      vars  = (field_type ***) Malloc(nts1*sizeof(field_type **));
+      vars = (field_type ***) Malloc(nts1 * sizeof(field_type **));
 
-      for ( int tsID = 0; tsID < nts1; tsID++ )
-	{
-	  vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
+      for (int tsID = 0; tsID < nts1; tsID++)
+        {
+          vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( lnts1 || (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) )
-		{
-		  int gridID  = vlistInqVarGrid(vlistID1, varID);
-		  int nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		  size_t gridsize = gridInqSize(gridID);
-		  
-		  for ( levelID = 0; levelID < nlevel; levelID++ )
-		    {
-		      vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-		    }
-		}
-	    }
-	}
+          for (varID = 0; varID < nvars; varID++)
+            {
+              if (lnts1
+                  || (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT))
+                {
+                  int gridID = vlistInqVarGrid(vlistID1, varID);
+                  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+                  size_t gridsize = gridInqSize(gridID);
+
+                  for (levelID = 0; levelID < nlevel; levelID++)
+                    {
+                      vars[tsID][varID][levelID].ptr
+                          = (double *) Malloc(gridsize * sizeof(double));
+                    }
+                }
+            }
+        }
     }
 
-  int tsID  = 0;
+  int tsID = 0;
   int tsID2 = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
@@ -370,305 +388,323 @@ void *Seltime(void *process)
       bool copytimestep = false;
       int selival = -1;
 
-      if ( operfunc == func_step )
-	{
-	  selival = tsID + 1;
-	  if ( selival > intarr[nsel-1] ) break;
-	}
-      else if ( operfunc == func_date )
-	{
+      if (operfunc == func_step)
+        {
+          selival = tsID + 1;
+          if (selival > intarr[nsel - 1]) break;
+        }
+      else if (operfunc == func_date)
+        {
           int year, month, day;
           cdiDecodeDate(vdate, &year, &month, &day);
-          if      ( operatorID == SELYEAR ) selival = year;
-          else if ( operatorID == SELDAY  ) selival = day;
-          else                              selival = month;
-	}
-      else if ( operfunc == func_time )
-	{
+          if (operatorID == SELYEAR)
+            selival = year;
+          else if (operatorID == SELDAY)
+            selival = day;
+          else
+            selival = month;
+        }
+      else if (operfunc == func_time)
+        {
           int hour, minute, second;
           cdiDecodeTime(vtime, &hour, &minute, &second);
-          if      ( operatorID == SELHOUR ) selival = hour;
-          else if ( operatorID == SELTIME ) selival = vtime;
-	}
-      else if ( operfunc == func_datetime )
-	{
-	  selfval = vdate + vtime/1000000.;
-	}
+          if (operatorID == SELHOUR)
+            selival = hour;
+          else if (operatorID == SELTIME)
+            selival = vtime;
+        }
+      else if (operfunc == func_datetime)
+        {
+          selfval = vdate + vtime / 1000000.;
+        }
 
-      if ( operatorID == SELDATE )
-	{
-	  if ( selfval >= fltarr[0] && selfval <= fltarr[nsel-1] )
-	    {
-	      copytimestep = true;
-	      selfound[0]      = true;
-	      selfound[nsel-1] = true;
-	    }
-          else if ( selfval > fltarr[nsel-1] )
+      if (operatorID == SELDATE)
+        {
+          if (selfval >= fltarr[0] && selfval <= fltarr[nsel - 1])
+            {
+              copytimestep = true;
+              selfound[0] = true;
+              selfound[nsel - 1] = true;
+            }
+          else if (selfval > fltarr[nsel - 1])
             {
               break;
             }
-	}
+        }
       else
-	{
-	  for ( i = 0; i < nsel; i++ )
-	    if ( selival == intarr[i] )
-	      {
-		copytimestep = true;
-		selfound[i] = true;
-		break;
-	      }
-	}
+        {
+          for (i = 0; i < nsel; i++)
+            if (selival == intarr[i])
+              {
+                copytimestep = true;
+                selfound[i] = true;
+                break;
+              }
+        }
 
       bool copy_nts2 = false;
-      if ( operatorID == SELSMON && copytimestep == false )
-	{
-	  copy_nts2 = false;
+      if (operatorID == SELSMON && copytimestep == false)
+        {
+          copy_nts2 = false;
 
-	  if ( process_nts1 )
-	    {
-	      process_nts2 = true;
-	      its2 = 0;
-	      process_nts1 = false;
-	    }
+          if (process_nts1)
+            {
+              process_nts2 = true;
+              its2 = 0;
+              process_nts1 = false;
+            }
 
-	  if ( process_nts2 )
-	    {
-	      if ( its2++ < nts2 )
-		copy_nts2 = true;
-	      else
-		process_nts2 = false;
-	    }
-	}
+          if (process_nts2)
+            {
+              if (its2++ < nts2)
+                copy_nts2 = true;
+              else
+                process_nts2 = false;
+            }
+        }
 
-      if ( copytimestep || copy_nts2 )
-	{
-	  taxisCopyTimestep(taxisID2, taxisID1);
-	  if ( tsID2 == 0 )
-	    {
-	      streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-	      pstreamDefVlist(streamID2, vlistID2);
-	    }
+      if (copytimestep || copy_nts2)
+        {
+          taxisCopyTimestep(taxisID2, taxisID1);
+          if (tsID2 == 0)
+            {
+              streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+              pstreamDefVlist(streamID2, vlistID2);
+            }
 
-	  if ( lnts1 && ncts == 0 )
-	    {
-	      nts = nts1;
-	      if ( its1 < nts1 )
-		{
-		  nts = its1;
-		  cdoWarning("%d timesteps missing before month %d!", nts1-its1, intarr[0]);
-		}
+          if (lnts1 && ncts == 0)
+            {
+              nts = nts1;
+              if (its1 < nts1)
+                {
+                  nts = its1;
+                  cdoWarning("%d timesteps missing before month %d!",
+                             nts1 - its1, intarr[0]);
+                }
 
-	      for ( it = 0; it < nts; it++ )
-		{
-		  taxisDefVdate(taxisID2, vdate_list[it]);
-		  taxisDefVtime(taxisID2, vtime_list[it]);
-		  pstreamDefTimestep(streamID2, tsID2++);
-		  
-		  for ( varID = 0; varID < nvars; varID++ )
-		    {
-		      if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT && tsID2 > 1 ) continue;
-		      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		      for ( levelID = 0; levelID < nlevel; levelID++ )
-			{
-			  pstreamDefRecord(streamID2, varID, levelID);
-			  double *single = vars[it][varID][levelID].ptr;
-			  size_t nmiss = vars[it][varID][levelID].nmiss;
-			  pstreamWriteRecord(streamID2, single, nmiss);
-			}
-		    }
-		}
+              for (it = 0; it < nts; it++)
+                {
+                  taxisDefVdate(taxisID2, vdate_list[it]);
+                  taxisDefVtime(taxisID2, vtime_list[it]);
+                  pstreamDefTimestep(streamID2, tsID2++);
 
-	      its1 = 0;
-	    }
+                  for (varID = 0; varID < nvars; varID++)
+                    {
+                      if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT
+                          && tsID2 > 1)
+                        continue;
+                      int nlevel
+                          = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+                      for (levelID = 0; levelID < nlevel; levelID++)
+                        {
+                          pstreamDefRecord(streamID2, varID, levelID);
+                          double *single = vars[it][varID][levelID].ptr;
+                          size_t nmiss = vars[it][varID][levelID].nmiss;
+                          pstreamWriteRecord(streamID2, single, nmiss);
+                        }
+                    }
+                }
 
-	  ncts++;
-	  if ( !process_nts2 )
-	    {
-	      its2 = 0;
-	      process_nts1 = true;
-	    }
+              its1 = 0;
+            }
 
-	  pstreamDefTimestep(streamID2, tsID2++);
+          ncts++;
+          if (!process_nts2)
+            {
+              its2 = 0;
+              process_nts1 = true;
+            }
 
-	  if ( tsID > 0 && lconstout )
-	    {
-	      lconstout = false;
-	      nts = nts1 - 1;
-	      for ( varID = 0; varID < nvars; varID++ )
-		{
-		  if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
-		    {
-		      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		      for ( levelID = 0; levelID < nlevel; levelID++ )
-			{
-			  pstreamDefRecord(streamID2, varID, levelID);
-			  double *single = vars[nts][varID][levelID].ptr;
-			  size_t nmiss = vars[nts][varID][levelID].nmiss;
-			  pstreamWriteRecord(streamID2, single, nmiss);
-			}
-		    }
-		}
-	    }
+          pstreamDefTimestep(streamID2, tsID2++);
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
-	      pstreamDefRecord(streamID2, varID, levelID);
-	      if ( lcopy )
-		{
-		  pstreamCopyRecord(streamID2, streamID1);
-		}
-	      else
-		{
-		  pstreamReadRecord(streamID1, array, &nmiss);
-		  pstreamWriteRecord(streamID2, array, nmiss);
-		}
-	    }
-	}
+          if (tsID > 0 && lconstout)
+            {
+              lconstout = false;
+              nts = nts1 - 1;
+              for (varID = 0; varID < nvars; varID++)
+                {
+                  if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+                    {
+                      int nlevel
+                          = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+                      for (levelID = 0; levelID < nlevel; levelID++)
+                        {
+                          pstreamDefRecord(streamID2, varID, levelID);
+                          double *single = vars[nts][varID][levelID].ptr;
+                          size_t nmiss = vars[nts][varID][levelID].nmiss;
+                          pstreamWriteRecord(streamID2, single, nmiss);
+                        }
+                    }
+                }
+            }
+
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
+              pstreamDefRecord(streamID2, varID, levelID);
+              if (lcopy)
+                {
+                  pstreamCopyRecord(streamID2, streamID1);
+                }
+              else
+                {
+                  pstreamReadRecord(streamID1, array, &nmiss);
+                  pstreamWriteRecord(streamID2, array, nmiss);
+                }
+            }
+        }
       else
-	{
-	  ncts = 0;
+        {
+          ncts = 0;
 
-	  if ( lnts1 || tsID == 0 )
-	    {
-	      if ( tsID == 0 && nconst && (!lnts1) ) lconstout = true;
+          if (lnts1 || tsID == 0)
+            {
+              if (tsID == 0 && nconst && (!lnts1)) lconstout = true;
 
-	      nts = nts1-1;
-	      if ( lnts1 )
-		{
-		  if ( its1 <= nts )
-		    nts = its1;
-		  else
-		    for ( it = 0; it < nts; it++ )
-		      {
-			vdate_list[it] = vdate_list[it+1];
-			vtime_list[it] = vtime_list[it+1];
-			for ( varID = 0; varID < nvars; varID++ )
-			  {
-			    if ( vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
-			    int gridID   = vlistInqVarGrid(vlistID1, varID);
-			    size_t gridsize = gridInqSize(gridID);
-			    int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-			    for ( levelID = 0; levelID < nlevel; levelID++ )
-			      {
-				memcpy(vars[it][varID][levelID].ptr,
-				       vars[it+1][varID][levelID].ptr,
-				       gridsize*sizeof(double));
-				vars[it][varID][levelID].nmiss = vars[it+1][varID][levelID].nmiss;
-			      }
-			  }
-		      }
+              nts = nts1 - 1;
+              if (lnts1)
+                {
+                  if (its1 <= nts)
+                    nts = its1;
+                  else
+                    for (it = 0; it < nts; it++)
+                      {
+                        vdate_list[it] = vdate_list[it + 1];
+                        vtime_list[it] = vtime_list[it + 1];
+                        for (varID = 0; varID < nvars; varID++)
+                          {
+                            if (vlistInqVarTimetype(vlistID1, varID)
+                                == TIME_CONSTANT)
+                              continue;
+                            int gridID = vlistInqVarGrid(vlistID1, varID);
+                            size_t gridsize = gridInqSize(gridID);
+                            int nlevel = zaxisInqSize(
+                                vlistInqVarZaxis(vlistID1, varID));
+                            for (levelID = 0; levelID < nlevel; levelID++)
+                              {
+                                memcpy(vars[it][varID][levelID].ptr,
+                                       vars[it + 1][varID][levelID].ptr,
+                                       gridsize * sizeof(double));
+                                vars[it][varID][levelID].nmiss
+                                    = vars[it + 1][varID][levelID].nmiss;
+                              }
+                          }
+                      }
 
-		  vdate_list[nts] = taxisInqVdate(taxisID1);
-		  vtime_list[nts] = taxisInqVtime(taxisID1);
+                  vdate_list[nts] = taxisInqVdate(taxisID1);
+                  vtime_list[nts] = taxisInqVtime(taxisID1);
 
-		  its1++;
-		}
+                  its1++;
+                }
 
-	      for ( int recID = 0; recID < nrecs; recID++ )
-		{
-		  pstreamInqRecord(streamID1, &varID, &levelID);
-		  if ( lnts1 || (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) )
-		    {
-		      double *single = vars[nts][varID][levelID].ptr;
-		      pstreamReadRecord(streamID1, single, &nmiss);
-		      vars[nts][varID][levelID].nmiss = nmiss;
-		    }
-		}
-	    }
-	}
-       
+              for (int recID = 0; recID < nrecs; recID++)
+                {
+                  pstreamInqRecord(streamID1, &varID, &levelID);
+                  if (lnts1
+                      || (vlistInqVarTimetype(vlistID1, varID)
+                          == TIME_CONSTANT))
+                    {
+                      double *single = vars[nts][varID][levelID].ptr;
+                      pstreamReadRecord(streamID1, single, &nmiss);
+                      vars[nts][varID][levelID].nmiss = nmiss;
+                    }
+                }
+            }
+        }
+
       tsID++;
     }
 
-  if ( streamID2 != -1 ) pstreamClose(streamID2);
+  if (streamID2 != -1) pstreamClose(streamID2);
   pstreamClose(streamID1);
- 
-  if ( operatorID == SELSMON )
-    if ( its2 < nts2 )
-      cdoWarning("%d timesteps missing after the last month!", nts2-its2);
 
-  if ( array ) Free(array);
+  if (operatorID == SELSMON)
+    if (its2 < nts2)
+      cdoWarning("%d timesteps missing after the last month!", nts2 - its2);
 
-  for ( int isel = 0; isel < nsel; isel++ )
+  if (array) Free(array);
+
+  for (int isel = 0; isel < nsel; isel++)
     {
-      if ( selfound[isel] == false )
-	{
-	 
-	  int isel2;
-	  int lcont = FALSE;
-	  for ( isel2 = isel+1; isel2 < nsel; isel2++ )
-	    if ( selfound[isel2] ) break;
-	  if ( isel2 == nsel && (nsel-isel) > 1 ) lcont = TRUE;
+      if (selfound[isel] == false)
+        {
 
-	  if ( operatorID == SELTIMESTEP )
-	    {
-	      int lcont2 = FALSE;
-	      if ( lcont )
-		{    
-		  for ( isel2 = isel+1; isel2 < nsel; isel2++ )
-		    if ( intarr[isel2-1] != intarr[isel2]-1 ) break;
-		  if ( isel2 == nsel ) lcont2 = TRUE;
-		}
+          int isel2;
+          int lcont = FALSE;
+          for (isel2 = isel + 1; isel2 < nsel; isel2++)
+            if (selfound[isel2]) break;
+          if (isel2 == nsel && (nsel - isel) > 1) lcont = TRUE;
 
-	      if ( lcont2 )
-		{
-		  cdoWarning("Time steps %d-%d not found!", intarr[isel], intarr[nsel-1]);
-		  break;
-		}
-	      else
-		cdoWarning("Time step %d not found!", intarr[isel]);
-	    }
-	  else if ( operatorID == SELDATE )
-	    {
-	      if ( isel == 0 )
-		cdoWarning("Date between %14.4f and %14.4f not found!", fltarr[0], fltarr[nsel-1]);
-	    }
-	  else if ( operatorID == SELTIME )
-	    {
-	      cdoWarning("Time %d not found!", intarr[isel]);
-	    }
-	  else if ( operatorID == SELHOUR )
-	    {
-	      cdoWarning("Hour %d not found!", intarr[isel]);
-	    }
-	  else if ( operatorID == SELDAY )
-	    {
-	      cdoWarning("Day %d not found!", intarr[isel]);
-	    }
-	  else if ( operatorID == SELMONTH )
-	    {
-	      cdoWarning("Month %d not found!", intarr[isel]);
-	    }
-	  else if ( operatorID == SELYEAR )
-	    {
-	      cdoWarning("Year %d not found!", intarr[isel]);
-	    }
-	  else if ( operatorID == SELSEASON )
-	    {
-	      if ( isel < 3 )
-		cdoWarning("Month %d not found!", intarr[isel]);
-	    }
-	}
+          if (operatorID == SELTIMESTEP)
+            {
+              int lcont2 = FALSE;
+              if (lcont)
+                {
+                  for (isel2 = isel + 1; isel2 < nsel; isel2++)
+                    if (intarr[isel2 - 1] != intarr[isel2] - 1) break;
+                  if (isel2 == nsel) lcont2 = TRUE;
+                }
+
+              if (lcont2)
+                {
+                  cdoWarning("Time steps %d-%d not found!", intarr[isel],
+                             intarr[nsel - 1]);
+                  break;
+                }
+              else
+                cdoWarning("Time step %d not found!", intarr[isel]);
+            }
+          else if (operatorID == SELDATE)
+            {
+              if (isel == 0)
+                cdoWarning("Date between %14.4f and %14.4f not found!",
+                           fltarr[0], fltarr[nsel - 1]);
+            }
+          else if (operatorID == SELTIME)
+            {
+              cdoWarning("Time %d not found!", intarr[isel]);
+            }
+          else if (operatorID == SELHOUR)
+            {
+              cdoWarning("Hour %d not found!", intarr[isel]);
+            }
+          else if (operatorID == SELDAY)
+            {
+              cdoWarning("Day %d not found!", intarr[isel]);
+            }
+          else if (operatorID == SELMONTH)
+            {
+              cdoWarning("Month %d not found!", intarr[isel]);
+            }
+          else if (operatorID == SELYEAR)
+            {
+              cdoWarning("Year %d not found!", intarr[isel]);
+            }
+          else if (operatorID == SELSEASON)
+            {
+              if (isel < 3) cdoWarning("Month %d not found!", intarr[isel]);
+            }
+        }
     }
 
-  if ( selfound ) Free(selfound);
+  if (selfound) Free(selfound);
 
   lista_destroy(ilista);
   lista_destroy(flista);
 
-  if ( lnts1 || nconst )
+  if (lnts1 || nconst)
     {
-      for ( tsID = 0; tsID < nts1; tsID++ ) field_free(vars[tsID], vlistID2);
+      for (tsID = 0; tsID < nts1; tsID++)
+        field_free(vars[tsID], vlistID2);
 
-      if ( vars  ) Free(vars);
-      if ( vdate_list ) Free(vdate_list);
-      if ( vtime_list ) Free(vtime_list);
+      if (vars) Free(vars);
+      if (vdate_list) Free(vdate_list);
+      if (vtime_list) Free(vtime_list);
     }
 
   vlistDestroy(vlistID2);
 
-  if ( tsID2 == 0 ) cdoAbort("No timesteps selected!");
+  if (tsID2 == 0) cdoAbort("No timesteps selected!");
 
   cdoFinish();
 

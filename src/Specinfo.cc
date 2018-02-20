@@ -21,196 +21,205 @@
       Specinfo specinfo  Spectral information
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream_int.h"
 
-
-#define NTR2NSP(ntr)          ((ntr+1)*(ntr+2))
-#define NSP2NTR(nsp)          ((int) ((((sqrt((double)(4*nsp+1)))-3)/2)))
-#define NGP2NLEVEL(ngp)        ((int) (log10(((double)ngp)/80.)/log10(4.)))
-#define NGP_ICON(nrooti,nlevel) ((int) (20*nrooti*nrooti*ipow(4, nlevel)))
+#define NTR2NSP(ntr) ((ntr + 1) * (ntr + 2))
+#define NSP2NTR(nsp) ((int) ((((sqrt((double) (4 * nsp + 1))) - 3) / 2)))
+#define NGP2NLEVEL(ngp) ((int) (log10(((double) ngp) / 80.) / log10(4.)))
+#define NGP_ICON(nrooti, nlevel) \
+  ((int) (20 * nrooti * nrooti * ipow(4, nlevel)))
 /*#define NGP_GME(ni)           ((ni+1)*(ni+1)*10)*/
-#define NGP_GME(ni)           (2+ni*ni*10)
-#define NGP2NI(ngp)           ((int) sqrt((double)ngp/10.) - 1)
+#define NGP_GME(ni) (2 + ni * ni * 10)
+#define NGP2NI(ngp) ((int) sqrt((double) ngp / 10.) - 1)
 
-
-static
-void fac(int nlonin, int *nlonout, int *ierr)
-{  
+static void
+fac(int nlonin, int *nlonout, int *ierr)
+{
   int n2 = 0;
   int n3 = 0;
   int n5 = 0;
 
   int m = nlonin;
 
-  while (m%2 == 0)
+  while (m % 2 == 0)
     {
-      m = m/2;
+      m = m / 2;
       n2++;
     }
-  while (m%3 == 0)
+  while (m % 3 == 0)
     {
-      m = m/3;
+      m = m / 3;
       n3++;
     }
-  while (m%5 == 0)
+  while (m % 5 == 0)
     {
-      m = m/5;
+      m = m / 5;
       n5++;
     }
 
-  if (m == 1) {
-    *nlonout = nlonin;
-    *ierr = 0;
-  } else {
-    *nlonout =  nlonin+1;
-    *ierr = 1;
-  }
+  if (m == 1)
+    {
+      *nlonout = nlonin;
+      *ierr = 0;
+    }
+  else
+    {
+      *nlonout = nlonin + 1;
+      *ierr = 1;
+    }
 
   return;
 }
 
-static
-int nlat2nlon(int nlat)
+static int
+nlat2nlon(int nlat)
 {
-  if ( nlat == 0 ) cdoAbort("nlat = 0!");
+  if (nlat == 0) cdoAbort("nlat = 0!");
 
-  int nlon = 2*nlat;
+  int nlon = 2 * nlat;
 
   int m, ierr;
   fac(nlon, &m, &ierr);
   /* adjust till fft is possible */
-  while (ierr != 0) 
+  while (ierr != 0)
     {
       nlon = m;
       /* correct here nlon so that nlat keeps always even */
-      while (nlon%4 != 0) nlon++;
+      while (nlon % 4 != 0)
+        nlon++;
       fac(nlon, &m, &ierr);
     }
 
   return nlon;
 }
 
-
-int ngp2ntr(int ngp)
+int
+ngp2ntr(int ngp)
 {
-  int ntr   = (int)lround(sqrt(0.25+ngp)-1.5);
+  int ntr = (int) lround(sqrt(0.25 + ngp) - 1.5);
   int nlonl = nlat_to_nlon(ntr_to_nlat_linear(ntr));
-  int nlatl = nlonl/2;
+  int nlatl = nlonl / 2;
 
-  ntr = (2*nlatl-1)/2;
+  ntr = (2 * nlatl - 1) / 2;
 
   return ntr;
 }
 
-
-int ipow(int i1, int i2)
+int
+ipow(int i1, int i2)
 {
   int i3 = 1;
 
-  for ( int i = 0; i < i2; ++i ) i3 *= i1;
+  for (int i = 0; i < i2; ++i)
+    i3 *= i1;
 
   return i3;
 }
 
-
-void lookup_ni(int nsp, int *nroot, int *ni)
+void
+lookup_ni(int nsp, int *nroot, int *ni)
 {
   int tbl2[12], tbl3[12], tbl5[12];
-  int i, d, d2, n2, d3, n3, d5, n5 ;
-    
-  for ( i = 0; i < 12; ++i )
+  int i, d, d2, n2, d3, n3, d5, n5;
+
+  for (i = 0; i < 12; ++i)
     {
-      tbl2[i] = 10*2*2*ipow(4, (i+1))+2;
-      tbl3[i] = 10*3*3*ipow(4, (i+1))+2;
-      tbl5[i] = 10*5*5*ipow(4, (i+1))+2;
+      tbl2[i] = 10 * 2 * 2 * ipow(4, (i + 1)) + 2;
+      tbl3[i] = 10 * 3 * 3 * ipow(4, (i + 1)) + 2;
+      tbl5[i] = 10 * 5 * 5 * ipow(4, (i + 1)) + 2;
     }
 
-  for ( i = 0; i < 12; ++i ) if (tbl2[i] >= nsp) break;
+  for (i = 0; i < 12; ++i)
+    if (tbl2[i] >= nsp) break;
   n2 = i;
-  d2 = tbl2[n2]-nsp;
+  d2 = tbl2[n2] - nsp;
 
-  for ( i = 0; i < 12; ++i ) if (tbl3[i] >= nsp) break;
+  for (i = 0; i < 12; ++i)
+    if (tbl3[i] >= nsp) break;
   n3 = i;
-  d3 = tbl3[n3]-nsp;
+  d3 = tbl3[n3] - nsp;
 
-  for ( i = 0; i < 12; ++i ) if (tbl5[i] >= nsp) break;
+  for (i = 0; i < 12; ++i)
+    if (tbl5[i] >= nsp) break;
   n5 = i;
-  d5 = tbl5[n5]-nsp;
+  d5 = tbl5[n5] - nsp;
 
   d = d2;
-  if ( d3 < d ) d = d3;
-  if ( d5 < d ) d = d5;
+  if (d3 < d) d = d3;
+  if (d5 < d) d = d5;
 
-  if ( d == d2 )
+  if (d == d2)
     {
       *nroot = 2;
-      *ni = 2*ipow(2, n2+1);
+      *ni = 2 * ipow(2, n2 + 1);
     }
-  else if ( d == d3 )
+  else if (d == d3)
     {
       *nroot = 3;
-      *ni = 3*ipow(2, n3+1);
+      *ni = 3 * ipow(2, n3 + 1);
     }
-  else if ( d == d5 )
+  else if (d == d5)
     {
       *nroot = 5;
-      *ni = 5*ipow(2, n5+1);
+      *ni = 5 * ipow(2, n5 + 1);
     }
 }
 
-
-void lookup_rl(int nsp, int *nroot, int *nlevel)
+void
+lookup_rl(int nsp, int *nroot, int *nlevel)
 {
   int tbl2[12], tbl3[12], tbl5[12];
-  int i, d, d2, n2, d3, n3, d5, n5 ;
-    
-  for ( i = 0; i < 12; ++i )
+  int i, d, d2, n2, d3, n3, d5, n5;
+
+  for (i = 0; i < 12; ++i)
     {
-      tbl2[i] = 20*2*2*ipow(4, (i+1));
-      tbl3[i] = 20*3*3*ipow(4, (i+1));
-      tbl5[i] = 20*5*5*ipow(4, (i+1));
+      tbl2[i] = 20 * 2 * 2 * ipow(4, (i + 1));
+      tbl3[i] = 20 * 3 * 3 * ipow(4, (i + 1));
+      tbl5[i] = 20 * 5 * 5 * ipow(4, (i + 1));
     }
 
-  for ( i = 0; i < 12; ++i ) if (tbl2[i] >= nsp) break;
+  for (i = 0; i < 12; ++i)
+    if (tbl2[i] >= nsp) break;
   n2 = i;
-  d2 = tbl2[n2]-nsp;
+  d2 = tbl2[n2] - nsp;
 
-  for ( i = 0; i < 12; ++i ) if (tbl3[i] >= nsp) break;
+  for (i = 0; i < 12; ++i)
+    if (tbl3[i] >= nsp) break;
   n3 = i;
-  d3 = tbl3[n3]-nsp;
+  d3 = tbl3[n3] - nsp;
 
-  for ( i = 0; i < 12; ++i ) if (tbl5[i] >= nsp) break;
+  for (i = 0; i < 12; ++i)
+    if (tbl5[i] >= nsp) break;
   n5 = i;
-  d5 = tbl5[n5]-nsp;
+  d5 = tbl5[n5] - nsp;
 
   d = d2;
-  if ( d3 < d ) d = d3;
-  if ( d5 < d ) d = d5;
+  if (d3 < d) d = d3;
+  if (d5 < d) d = d5;
 
-  if ( d == d2 )
+  if (d == d2)
     {
       *nroot = 2;
-      *nlevel = n2+1;
+      *nlevel = n2 + 1;
     }
-  else if ( d == d3 )
+  else if (d == d3)
     {
       *nroot = 3;
-      *nlevel = n3+1;
+      *nlevel = n3 + 1;
     }
-  else if ( d == d5 )
+  else if (d == d5)
     {
       *nroot = 5;
-      *nlevel = n5+1;
+      *nlevel = n5 + 1;
     }
 }
 
-
-void *Specinfo(void *process)
+void *
+Specinfo(void *process)
 {
   char arg[128], *parg;
   bool nout1 = false, nout2 = false;
@@ -226,52 +235,53 @@ void *Specinfo(void *process)
 
   int len = strlen(operatorArgv()[0]);
 
-  if ( (len+1) >= 128 ) cdoAbort("Parameter string too large!");
+  if ((len + 1) >= 128) cdoAbort("Parameter string too large!");
 
-  for ( i = 0; i < len; i++ ) arg[i] = toupper(operatorArgv()[0][i]);
+  for (i = 0; i < len; i++)
+    arg[i] = toupper(operatorArgv()[0][i]);
   arg[len] = 0;
 
-  if ( arg[0] == 'T' && arg[1] == 'L' )
+  if (arg[0] == 'T' && arg[1] == 'L')
     {
       parg = &arg[2];
-      if ( *parg == '=' ) parg++;
-      if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
-      ntr2   = atoi(parg);
-      nsp2   = NTR2NSP(ntr2);
-      nlat2  = ntr_to_nlat_linear(ntr2);
-      nlon2  = nlat_to_nlon(nlat2);
-      ngp2   = nlon2*nlat2;
+      if (*parg == '=') parg++;
+      if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
+      ntr2 = atoi(parg);
+      nsp2 = NTR2NSP(ntr2);
+      nlat2 = ntr_to_nlat_linear(ntr2);
+      nlon2 = nlat_to_nlon(nlat2);
+      ngp2 = nlon2 * nlat2;
 
       lookup_ni(nsp2, &nrootg2, &ni2);
       lookup_rl(nsp2, &nrooti2, &nlevel2);
 
-      nout1  = false;
-      nout2  = true;
+      nout1 = false;
+      nout2 = true;
     }
-  else if ( arg[0] == 'T' )
+  else if (arg[0] == 'T')
     {
       parg = &arg[1];
-      if ( *parg == '=' ) parg++;
-      if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
-      ntr1   = atoi(parg);
-      nsp1   = NTR2NSP(ntr1);
-      nlat1  = ntr_to_nlat(ntr1);
-      nlon1  = nlat_to_nlon(nlat1);
-      ngp1   = nlon1*nlat1;
+      if (*parg == '=') parg++;
+      if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
+      ntr1 = atoi(parg);
+      nsp1 = NTR2NSP(ntr1);
+      nlat1 = ntr_to_nlat(ntr1);
+      nlon1 = nlat_to_nlon(nlat1);
+      ngp1 = nlon1 * nlat1;
 
       lookup_ni(nsp1, &nrootg1, &ni1);
       lookup_rl(nsp1, &nrooti1, &nlevel1);
 
-      nout1  = true;
-      nout2  = false;
+      nout1 = true;
+      nout2 = false;
     }
-  else if ( arg[0] == 'N' && arg[1] == 'I' )
+  else if (arg[0] == 'N' && arg[1] == 'I')
     {
       parg = &arg[2];
-      if ( *parg == '=' ) parg++;
-      if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
-      ni1    = atoi(parg);
-      ni2    = ni1;
+      if (*parg == '=') parg++;
+      if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
+      ni1 = atoi(parg);
+      ni2 = ni1;
       ngp_gme1 = NGP_GME(ni1);
       ngp_gme2 = NGP_GME(ni2);
 
@@ -283,11 +293,11 @@ void *Specinfo(void *process)
 
       nlat1 = ntr_to_nlat(ntr1);
       nlon1 = nlat_to_nlon(nlat1);
-      nlat1 = nlon1/2;
+      nlat1 = nlon1 / 2;
 
       nlat2 = ntr_to_nlat_linear(ntr2);
       nlon2 = nlat_to_nlon(nlat2);
-      nlat2 = nlon2/2;
+      nlat2 = nlon2 / 2;
 
       /* lookup_ni(nsp1, &nrootg1, &ni1); */
       lookup_rl(nsp1, &nrooti1, &nlevel1);
@@ -297,29 +307,29 @@ void *Specinfo(void *process)
       nrooti2 = nrooti1;
       nlevel2 = nlevel1;
 
-      nout1  = true;
-      nout2  = true;
+      nout1 = true;
+      nout2 = true;
     }
-  else if ( arg[0] == 'N' && arg[1] == 'L' && arg[2] == 'O' && arg[3] == 'N' )
+  else if (arg[0] == 'N' && arg[1] == 'L' && arg[2] == 'O' && arg[3] == 'N')
     {
       parg = &arg[4];
-      if ( *parg == '=' ) parg++;
-      if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
-      nlon1  = atoi(parg);
-      nlon2  = nlon1;
-      nlat1  = nlon1 / 2;
-      nlat2  = nlon2 / 2;
-      nlon1  = nlat2nlon(nlat1);
-      nlon2  = nlat2nlon(nlat2);
-      nlat1  = nlon1 / 2;
-      nlat2  = nlon2 / 2;
-      ntr1   = (nlat1*2-1)/3;
-      ntr2   = (nlat2*2-1)/2;
-      ngp1   = nlon1*nlat1;
-      ngp2   = nlon2*nlat2;
+      if (*parg == '=') parg++;
+      if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
+      nlon1 = atoi(parg);
+      nlon2 = nlon1;
+      nlat1 = nlon1 / 2;
+      nlat2 = nlon2 / 2;
+      nlon1 = nlat2nlon(nlat1);
+      nlon2 = nlat2nlon(nlat2);
+      nlat1 = nlon1 / 2;
+      nlat2 = nlon2 / 2;
+      ntr1 = (nlat1 * 2 - 1) / 3;
+      ntr2 = (nlat2 * 2 - 1) / 2;
+      ngp1 = nlon1 * nlat1;
+      ngp2 = nlon2 * nlat2;
 
-      nsp1   = NTR2NSP(ntr1);
-      nsp2   = NTR2NSP(ntr2);
+      nsp1 = NTR2NSP(ntr1);
+      nsp2 = NTR2NSP(ntr2);
 
       lookup_ni(nsp1, &nrootg1, &ni1);
       lookup_rl(nsp1, &nrooti1, &nlevel1);
@@ -327,27 +337,27 @@ void *Specinfo(void *process)
       lookup_ni(nsp2, &nrootg2, &ni2);
       lookup_rl(nsp2, &nrooti2, &nlevel2);
 
-      nout1  = true;
-      nout2  = true;
+      nout1 = true;
+      nout2 = true;
     }
-  else if ( arg[0] == 'N' && arg[1] == 'L' && arg[2] == 'A' && arg[3] == 'T' )
+  else if (arg[0] == 'N' && arg[1] == 'L' && arg[2] == 'A' && arg[3] == 'T')
     {
       parg = &arg[4];
-      if ( *parg == '=' ) parg++;
-      if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
-      nlat1  = atoi(parg);
-      nlat2  = nlat1;
-      nlon1  = nlat2nlon(nlat1);
-      nlon2  = nlat2nlon(nlat2);
-      nlat1  = nlon1 / 2;
-      nlat2  = nlon2 / 2;
-      ntr1   = (nlat1*2-1)/3;
-      ntr2   = (nlat2*2-1)/2;
-      ngp1   = nlon1*nlat1;
-      ngp2   = nlon2*nlat2;
+      if (*parg == '=') parg++;
+      if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
+      nlat1 = atoi(parg);
+      nlat2 = nlat1;
+      nlon1 = nlat2nlon(nlat1);
+      nlon2 = nlat2nlon(nlat2);
+      nlat1 = nlon1 / 2;
+      nlat2 = nlon2 / 2;
+      ntr1 = (nlat1 * 2 - 1) / 3;
+      ntr2 = (nlat2 * 2 - 1) / 2;
+      ngp1 = nlon1 * nlat1;
+      ngp2 = nlon2 * nlat2;
 
-      nsp1   = NTR2NSP(ntr1);
-      nsp2   = NTR2NSP(ntr2);
+      nsp1 = NTR2NSP(ntr1);
+      nsp2 = NTR2NSP(ntr2);
 
       lookup_ni(nsp1, &nrootg1, &ni1);
       lookup_rl(nsp1, &nrooti1, &nlevel1);
@@ -355,27 +365,27 @@ void *Specinfo(void *process)
       lookup_ni(nsp2, &nrootg2, &ni2);
       lookup_rl(nsp2, &nrooti2, &nlevel2);
 
-      nout1  = true;
-      nout2  = true;
+      nout1 = true;
+      nout2 = true;
     }
-  else if ( arg[0] == 'N' )
+  else if (arg[0] == 'N')
     {
       parg = &arg[1];
-      if ( *parg == '=' ) parg++;
-      if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
-      nlat1  = 2*atoi(parg);
-      nlat2  = nlat1;
-      nlon1  = nlat2nlon(nlat1);
-      nlon2  = nlat2nlon(nlat2);
-      nlat1  = nlon1 / 2;
-      nlat2  = nlon2 / 2;
-      ntr1   = (nlat1*2-1)/3;
-      ntr2   = (nlat2*2-1)/2;
-      ngp1   = nlon1*nlat1;
-      ngp2   = nlon2*nlat2;
+      if (*parg == '=') parg++;
+      if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
+      nlat1 = 2 * atoi(parg);
+      nlat2 = nlat1;
+      nlon1 = nlat2nlon(nlat1);
+      nlon2 = nlat2nlon(nlat2);
+      nlat1 = nlon1 / 2;
+      nlat2 = nlon2 / 2;
+      ntr1 = (nlat1 * 2 - 1) / 3;
+      ntr2 = (nlat2 * 2 - 1) / 2;
+      ngp1 = nlon1 * nlat1;
+      ngp2 = nlon2 * nlat2;
 
-      nsp1   = NTR2NSP(ntr1);
-      nsp2   = NTR2NSP(ntr2);
+      nsp1 = NTR2NSP(ntr1);
+      nsp2 = NTR2NSP(ntr2);
 
       lookup_ni(nsp1, &nrootg1, &ni1);
       lookup_rl(nsp1, &nrooti1, &nlevel1);
@@ -383,25 +393,26 @@ void *Specinfo(void *process)
       lookup_ni(nsp2, &nrootg2, &ni2);
       lookup_rl(nsp2, &nrooti2, &nlevel2);
 
-      nout1  = true;
-      nout2  = true;
+      nout1 = true;
+      nout2 = true;
     }
-  else if ( arg[0] == 'I' && arg[1] == 'C' && arg[2] == 'O' && arg[3] == 'N' )
+  else if (arg[0] == 'I' && arg[1] == 'C' && arg[2] == 'O' && arg[3] == 'N')
     {
       parg = &arg[4];
-      if ( *parg != 'R' ) cdoAbort("Wrong parameter: %s", arg);
+      if (*parg != 'R') cdoAbort("Wrong parameter: %s", arg);
       parg++;
-      if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
+      if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
       nrooti1 = atoi(parg);
       nrooti2 = nrooti1;
-      while ( isdigit((int) *parg) ) parg++;
-      if ( *parg != 'L' ) cdoAbort("Wrong parameter: %s", arg);
+      while (isdigit((int) *parg))
+        parg++;
+      if (*parg != 'L') cdoAbort("Wrong parameter: %s", arg);
       parg++;
-      if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
+      if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
       nlevel1 = atoi(parg);
       nlevel2 = nlevel1;
-      ngp_icon1 = NGP_ICON(nrooti1,nlevel1);
-      ngp_icon2 = NGP_ICON(nrooti1,nlevel2);
+      ngp_icon1 = NGP_ICON(nrooti1, nlevel1);
+      ngp_icon2 = NGP_ICON(nrooti1, nlevel2);
 
       ntr1 = ngp2ntr(ngp_icon1);
       nsp1 = NTR2NSP(ntr1);
@@ -410,11 +421,11 @@ void *Specinfo(void *process)
 
       nlat1 = ntr_to_nlat(ntr1);
       nlon1 = nlat_to_nlon(nlat1);
-      nlat1 = nlon1/2;
+      nlat1 = nlon1 / 2;
 
       nlat2 = ntr_to_nlat_linear(ntr2);
       nlon2 = nlat_to_nlon(nlat2);
-      nlat2 = nlon2/2;
+      nlat2 = nlon2 / 2;
 
       lookup_ni(nsp1, &nrootg1, &ni1);
       /* lookup_rl(nsp1, &nrooti1, &nlevel1);*/
@@ -424,28 +435,33 @@ void *Specinfo(void *process)
       nrooti2 = nrooti1;
       nlevel2 = nlevel1;
 
-      nout1  = true;
-      nout2  = true;
+      nout1 = true;
+      nout2 = true;
     }
   else
     cdoAbort("Unsupported parameter: %s", arg);
 
-  nsp1      = NTR2NSP(ntr1);
-  nsp2      = NTR2NSP(ntr2);
-  ngp1      = nlon1*nlat1;
-  ngp2      = nlon2*nlat2;
-  ngp_gme1  = NGP_GME(ni1);
-  ngp_gme2  = NGP_GME(ni2);
-  ngp_icon1 = NGP_ICON(nrooti1,nlevel1);
-  ngp_icon2 = NGP_ICON(nrooti2,nlevel2);
+  nsp1 = NTR2NSP(ntr1);
+  nsp2 = NTR2NSP(ntr2);
+  ngp1 = nlon1 * nlat1;
+  ngp2 = nlon2 * nlat2;
+  ngp_gme1 = NGP_GME(ni1);
+  ngp_gme2 = NGP_GME(ni2);
+  ngp_icon1 = NGP_ICON(nrooti1, nlevel1);
+  ngp_icon2 = NGP_ICON(nrooti2, nlevel2);
 
-  fprintf(stdout, "truncation     nsp  nlon  nlat      ngp  gme    ngp_gme  icon   ngp_icon\n");
+  fprintf(stdout, "truncation     nsp  nlon  nlat      ngp  gme    ngp_gme  "
+                  "icon   ngp_icon\n");
 
-  if ( nout1 ) fprintf(stdout, "   T%-4d  %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n",
-		       ntr1, nsp1, nlon1, nlat1, ngp1, ni1, ngp_gme1, nrooti1, nlevel1, ngp_icon1);
+  if (nout1)
+    fprintf(stdout, "   T%-4d  %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n",
+            ntr1, nsp1, nlon1, nlat1, ngp1, ni1, ngp_gme1, nrooti1, nlevel1,
+            ngp_icon1);
 
-  if ( nout2 ) fprintf(stdout, "   TL%-4d %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n",
-		       ntr2, nsp2, nlon2, nlat2, ngp2, ni2, ngp_gme2, nrooti2, nlevel2, ngp_icon2);
+  if (nout2)
+    fprintf(stdout, "   TL%-4d %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n",
+            ntr2, nsp2, nlon2, nlat2, ngp2, ni2, ngp_gme2, nrooti2, nlevel2,
+            ngp_icon2);
 
   cdoFinish();
 

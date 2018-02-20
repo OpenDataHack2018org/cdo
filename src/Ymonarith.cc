@@ -33,13 +33,16 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
+#define MAX_MON 12
 
-#define  MAX_MON    12
-
-
-void *Ymonarith(void *process)
+void *
+Ymonarith(void *process)
 {
-  enum {MONTHLY, SEASONAL};
+  enum
+  {
+    MONTHLY,
+    SEASONAL
+  };
   int nrecs, nlev;
   int varID, levelID;
   int offset;
@@ -80,8 +83,8 @@ void *Ymonarith(void *process)
   field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -91,100 +94,101 @@ void *Ymonarith(void *process)
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  int nvars  = vlistNvars(vlistID2);
+  int nvars = vlistNvars(vlistID2);
 
-  if ( opertype == SEASONAL ) get_season_name(seas_name);
+  if (opertype == SEASONAL) get_season_name(seas_name);
 
-  for ( mon = 0; mon < MAX_MON ; mon++ ) vardata2[mon] = NULL;
+  for (mon = 0; mon < MAX_MON; mon++)
+    vardata2[mon] = NULL;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
       vdate = taxisInqVdate(taxisID2);
 
       cdiDecodeDate(vdate, &year, &mon, &day);
-      if ( mon < 1 || mon > MAX_MON ) cdoAbort("Month %d out of range!", mon);
+      if (mon < 1 || mon > MAX_MON) cdoAbort("Month %d out of range!", mon);
       mon--;
 
-      if ( opertype == SEASONAL ) mon = month_to_season(mon+1);
+      if (opertype == SEASONAL) mon = month_to_season(mon + 1);
 
-      if ( vardata2[mon] != NULL )
-	{
-	  if ( opertype == SEASONAL )
-	    cdoAbort("Season %s already allocatd!", seas_name[mon]);
-	  else
-	    cdoAbort("Month %d already allocatd!", mon);
-	}
+      if (vardata2[mon] != NULL)
+        {
+          if (opertype == SEASONAL)
+            cdoAbort("Season %s already allocatd!", seas_name[mon]);
+          else
+            cdoAbort("Month %d already allocatd!", mon);
+        }
 
-      vardata2[mon]  = (double **) Malloc(nvars*sizeof(double *));
-      varnmiss2[mon] = (size_t **) Malloc(nvars*sizeof(size_t *));
+      vardata2[mon] = (double **) Malloc(nvars * sizeof(double *));
+      varnmiss2[mon] = (size_t **) Malloc(nvars * sizeof(size_t *));
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	  vardata2[mon][varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[mon][varID] = (size_t*) Malloc(nlev*sizeof(size_t));
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          vardata2[mon][varID]
+              = (double *) Malloc(nlev * gridsize * sizeof(double));
+          varnmiss2[mon][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID2, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID2, &varID, &levelID);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  offset   = gridsize*levelID;
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          offset = gridsize * levelID;
 
-	  pstreamReadRecord(streamID2, vardata2[mon][varID]+offset, &nmiss);
-	  varnmiss2[mon][varID][levelID] = nmiss;
-	}
+          pstreamReadRecord(streamID2, vardata2[mon][varID] + offset, &nmiss);
+          varnmiss2[mon][varID][levelID] = nmiss;
+        }
 
       tsID++;
     }
 
-
   tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       vdate = taxisInqVdate(taxisID1);
 
       cdiDecodeDate(vdate, &year, &mon, &day);
-      if ( mon < 1 || mon > MAX_MON ) cdoAbort("Month %d out of range!", mon);
+      if (mon < 1 || mon > MAX_MON) cdoAbort("Month %d out of range!", mon);
       mon--;
 
-      if ( opertype == SEASONAL ) mon = month_to_season(mon+1);
+      if (opertype == SEASONAL) mon = month_to_season(mon + 1);
 
-      if ( vardata2[mon] == NULL )
-	{
-	  if ( opertype == SEASONAL )
-	    cdoAbort("Season %s not found!", seas_name[mon]);
-	  else
-	    cdoAbort("Month %d not found!", mon);
-	}
+      if (vardata2[mon] == NULL)
+        {
+          if (opertype == SEASONAL)
+            cdoAbort("Season %s not found!", seas_name[mon]);
+          else
+            cdoAbort("Month %d not found!", mon);
+        }
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss   = nmiss;
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
-          
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  offset   = gridsize*levelID;
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = nmiss;
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  arrayCopy(gridsize, vardata2[mon][varID]+offset, field2.ptr);
-	  field2.nmiss   = varnmiss2[mon][varID][levelID];
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
-	  field2.missval = vlistInqVarMissval(vlistID2, varID);
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          offset = gridsize * levelID;
 
-	  farfun(&field1, field2, operfunc);
+          arrayCopy(gridsize, vardata2[mon][varID] + offset, field2.ptr);
+          field2.nmiss = varnmiss2[mon][varID][levelID];
+          field2.grid = vlistInqVarGrid(vlistID2, varID);
+          field2.missval = vlistInqVarMissval(vlistID2, varID);
 
-	  pstreamDefRecord(streamID3, varID, levelID);
-	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
-	}
+          farfun(&field1, field2, operfunc);
+
+          pstreamDefRecord(streamID3, varID, levelID);
+          pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
+        }
       tsID++;
     }
 
@@ -192,21 +196,21 @@ void *Ymonarith(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  for ( mon = 0; mon < MAX_MON ; mon++ ) 
-    if ( vardata2[mon] )
+  for (mon = 0; mon < MAX_MON; mon++)
+    if (vardata2[mon])
       {
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    Free(vardata2[mon][varID]);
-	    Free(varnmiss2[mon][varID]);
-	  }
+        for (varID = 0; varID < nvars; varID++)
+          {
+            Free(vardata2[mon][varID]);
+            Free(varnmiss2[mon][varID]);
+          }
 
         Free(vardata2[mon]);
         Free(varnmiss2[mon]);
       }
 
-  if ( field1.ptr ) Free(field1.ptr);
-  if ( field2.ptr ) Free(field2.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field2.ptr) Free(field2.ptr);
 
   cdoFinish();
 

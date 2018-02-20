@@ -19,54 +19,63 @@
 #include "dmemory.h"
 #include "cdoDebugOutput.h"
 
-typedef  std::array<std::vector<std::string>,2> CdoArgv;
-typedef  std::array<std::string,2> cdoCommand;
-enum class Command{Name = 0, Arg = 1};
-
-cdoCommand split(std::string p_command)
+typedef std::array<std::vector<std::string>, 2> CdoArgv;
+typedef std::array<std::string, 2> cdoCommand;
+enum class Command
 {
-    cdoCommand splitted{""};
-    int pos =  p_command.find(',');
+  Name = 0,
+  Arg = 1
+};
 
-    splitted[Command::name] += p_command.substr(0, pos);
-    if(pos != std::string::npos)
-        splitted[CommandArg] += p_command.substr(pos + 1);
+cdoCommand
+split(std::string p_command)
+{
+  cdoCommand splitted{ "" };
+  int pos = p_command.find(',');
 
-    return splitted;
+  splitted[Command::name] += p_command.substr(0, pos);
+  if (pos != std::string::npos)
+    splitted[CommandArg] += p_command.substr(pos + 1);
+
+  return splitted;
 }
 
-CdoArgv preProcessArgv(std::vector<std::string> argv)
+CdoArgv
+preProcessArgv(std::vector<std::string> argv)
 {
-    CdoArgv preProcessedArgv;
-    for(std::string arg : argv)
+  CdoArgv preProcessedArgv;
+  for (std::string arg : argv)
     {
-        std::array<std::string,2> refinedCommand;
-        refinedCommand = split(arg);
-        preProcessedArgv[Command::Name].push_back(refinedCommand[Command::Name]);
-        preProcessedArgv[Command::Arg].push_back(refinedCommand[Command::Arg]);
-        MESSAGE("processed: ", refinedCommand[Command::Name], " ", refinedCommand[Command::Arg]);
+      std::array<std::string, 2> refinedCommand;
+      refinedCommand = split(arg);
+      preProcessedArgv[Command::Name].push_back(refinedCommand[Command::Name]);
+      preProcessedArgv[Command::Arg].push_back(refinedCommand[Command::Arg]);
+      MESSAGE("processed: ", refinedCommand[Command::Name], " ",
+              refinedCommand[Command::Arg]);
     }
-    return preProcessedArgv;
+  return preProcessedArgv;
 }
 
-const char *getOperatorName(const char *operatorCommand)
+const char *
+getOperatorName(const char *operatorCommand)
 {
   char *operatorName = NULL;
 
-  if ( operatorCommand )
+  if (operatorCommand)
     {
-      if ( operatorCommand[0] == '-' ) operatorCommand++;
-      char *commapos = (char *)strchr(operatorCommand, ',');
-      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand) : strlen(operatorCommand);
+      if (operatorCommand[0] == '-') operatorCommand++;
+      char *commapos = (char *) strchr(operatorCommand, ',');
+      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand)
+                                      : strlen(operatorCommand);
 
-      operatorName = (char*) Malloc(len+1);
+      operatorName = (char *) Malloc(len + 1);
 
       memcpy(operatorName, operatorCommand, len);
       operatorName[len] = '\0';
     }
 
   /*  return operatorName; */
-  if(is_alias(operatorName))
+  if (is_alias(operatorName))
     {
       operatorName = get_original(operatorName);
     }
@@ -74,24 +83,24 @@ const char *getOperatorName(const char *operatorCommand)
   return operatorName;
 }
 
-char *getOperatorArg(const char *p_operatorCommand)
+char *
+getOperatorArg(const char *p_operatorCommand)
 {
   char *operatorCommand = NULL;
 
-  if ( p_operatorCommand )
+  if (p_operatorCommand)
     {
-      char *commapos = (char *)strchr(p_operatorCommand, ',');
-      if ( commapos )
+      char *commapos = (char *) strchr(p_operatorCommand, ',');
+      if (commapos)
         {
-          size_t len = strlen(commapos+1);
-          if ( len )
+          size_t len = strlen(commapos + 1);
+          if (len)
             {
-              operatorCommand = (char*) Malloc(len+1);
-              strcpy(operatorCommand, commapos+1);
+              operatorCommand = (char *) Malloc(len + 1);
+              strcpy(operatorCommand, commapos + 1);
             }
         }
     }
 
   return operatorCommand;
 }
-

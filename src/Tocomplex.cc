@@ -15,14 +15,13 @@
   GNU General Public License for more details.
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Tocomplex(void *process)
+void *
+Tocomplex(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -41,13 +40,13 @@ void *Tocomplex(void *process)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID2);
-  for ( varID = 0; varID < nvars; ++varID )
+  for (varID = 0; varID < nvars; ++varID)
     {
       int datatype = vlistInqVarDatatype(vlistID2, varID);
-      if ( datatype == CDI_DATATYPE_FLT64 )
-	datatype = CDI_DATATYPE_CPX64;
+      if (datatype == CDI_DATATYPE_FLT64)
+        datatype = CDI_DATATYPE_CPX64;
       else
-	datatype = CDI_DATATYPE_CPX32;
+        datatype = CDI_DATATYPE_CPX32;
 
       vlistDefVarDatatype(vlistID2, varID, datatype);
     }
@@ -56,58 +55,59 @@ void *Tocomplex(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  if ( cdoFiletype() != CDI_FILETYPE_EXT ) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
+  if (cdoFiletype() != CDI_FILETYPE_EXT)
+    cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(2*gridsize*sizeof(double));
-      
-  int tsID  = 0;
+  double *array1 = (double *) Malloc(gridsize * sizeof(double));
+  double *array2 = (double *) Malloc(2 * gridsize * sizeof(double));
+
+  int tsID = 0;
   int tsID2 = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID2++);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2, varID, levelID);
-	      
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
 
-	  pstreamReadRecord(streamID1, array1, &nmiss);
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  if ( operatorID == RETOCOMPLEX )
-	    {
-	      for ( size_t i = 0; i < gridsize; ++i )
-		{
-		  array2[2*i]   = array1[i];
-		  array2[2*i+1] = 0;
-		}
-	    }
-	  else if ( operatorID == IMTOCOMPLEX )
-	    {
-	      for ( size_t i = 0; i < gridsize; ++i )
-		{
-		  array2[2*i]   = 0;
-		  array2[2*i+1] = array1[i];
-		}
-	    }
+          pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  pstreamWriteRecord(streamID2, array2, nmiss);
-	}
-       
+          if (operatorID == RETOCOMPLEX)
+            {
+              for (size_t i = 0; i < gridsize; ++i)
+                {
+                  array2[2 * i] = array1[i];
+                  array2[2 * i + 1] = 0;
+                }
+            }
+          else if (operatorID == IMTOCOMPLEX)
+            {
+              for (size_t i = 0; i < gridsize; ++i)
+                {
+                  array2[2 * i] = 0;
+                  array2[2 * i + 1] = array1[i];
+                }
+            }
+
+          pstreamWriteRecord(streamID2, array2, nmiss);
+        }
+
       tsID++;
     }
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( array1 ) Free(array1);
-  if ( array2 ) Free(array2);
+  if (array1) Free(array1);
+  if (array2) Free(array2);
 
   vlistDestroy(vlistID2);
 

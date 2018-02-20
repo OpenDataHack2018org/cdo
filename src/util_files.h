@@ -19,6 +19,6 @@
 
 bool fileExists(const char *filename);
 bool userFileOverwrite(const char *filename);
-int  cdoFiletype(void);
+int cdoFiletype(void);
 
 #endif

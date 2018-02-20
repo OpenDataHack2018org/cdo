@@ -18,9 +18,9 @@
 /*
    This module contains the following operators:
 
-      Vertint    ap2pl           Model air pressure level to pressure level interpolation
+      Vertint    ap2pl           Model air pressure level to pressure level
+   interpolation
 */
-
 
 #include <cdi.h>
 
@@ -31,53 +31,60 @@
 #include "stdnametable.h"
 #include "util_string.h"
 
-static
-bool is_height_axis(int zaxisID, int nlevel)
+static bool
+is_height_axis(int zaxisID, int nlevel)
 {
   bool isheight = false;
-  if ( nlevel > 1 )
+  if (nlevel > 1)
     {
-      if ( zaxisInqType(zaxisID) == ZAXIS_REFERENCE )
+      if (zaxisInqType(zaxisID) == ZAXIS_REFERENCE)
         {
           char units[CDI_MAX_NAME];
           char stdname[CDI_MAX_NAME];
           zaxisInqUnits(zaxisID, units);
           zaxisInqStdname(zaxisID, stdname);
-          if ( strcmp(stdname, "height") == 0 && *units == 0 )
-            isheight = true;
+          if (strcmp(stdname, "height") == 0 && *units == 0) isheight = true;
         }
     }
   return isheight;
 }
 
-static
-void change_height_zaxis(int vlistID1, int vlistID2, int zaxisID2)
+static void
+change_height_zaxis(int vlistID1, int vlistID2, int zaxisID2)
 {
   int nzaxis = vlistNzaxis(vlistID1);
-  for ( int iz = 0; iz < nzaxis; ++iz )
+  for (int iz = 0; iz < nzaxis; ++iz)
     {
       int zaxisID = vlistZaxis(vlistID1, iz);
-      int nlevel  = zaxisInqSize(zaxisID);
+      int nlevel = zaxisInqSize(zaxisID);
 
-      if ( is_height_axis(zaxisID, nlevel) && nlevel > 1 )
-	{
+      if (is_height_axis(zaxisID, nlevel) && nlevel > 1)
+        {
           vlistChangeZaxisIndex(vlistID2, iz, zaxisID2);
-	}
+        }
     }
 }
 
-
-void *Vertintap(void *process)
+void *
+Vertintap(void *process)
 {
-  enum {func_pl, func_hl};
-  enum {type_lin, type_log};
+  enum
+  {
+    func_pl,
+    func_hl
+  };
+  enum
+  {
+    type_lin,
+    type_log
+  };
   int nrecs;
   int varID, levelID;
   int zaxisIDh = -1;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int apressID = -1, dpressID = -1;
   int psID = -1, tempID = -1;
-  //int sortlevels = TRUE;
+  // int sortlevels = TRUE;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   bool extrapolate = false;
   lista_t *flista = lista_new(FLT_LISTA);
@@ -97,18 +104,18 @@ void *Vertintap(void *process)
   bool useHightLevel = cdoOperatorF1(operatorID) == func_hl;
   bool useLogType = cdoOperatorF2(operatorID) == type_log;
 
-  if ( operatorID == AP2PL || operatorID == AP2HL || operatorID == AP2PL_LP )
+  if (operatorID == AP2PL || operatorID == AP2HL || operatorID == AP2PL_LP)
     {
       char *envstr = getenv("EXTRAPOLATE");
 
-      if ( envstr && isdigit((int) envstr[0]) )
-	{
-          if ( atoi(envstr) == 1 ) extrapolate = true;
-          if ( extrapolate )
-            cdoPrint("Extrapolation of missing values enabled!");
-	}
+      if (envstr && isdigit((int) envstr[0]))
+        {
+          if (atoi(envstr) == 1) extrapolate = true;
+          if (extrapolate) cdoPrint("Extrapolation of missing values enabled!");
+        }
     }
-  else if ( operatorID == AP2PLX ||  operatorID == AP2HLX || operatorID == AP2PLX_LP )
+  else if (operatorID == AP2PLX || operatorID == AP2HLX
+           || operatorID == AP2PLX_LP)
     {
       extrapolate = true;
     }
@@ -117,28 +124,32 @@ void *Vertintap(void *process)
 
   int nplev = 0;
   double *plev = NULL;
-  if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
+  if (operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0)
     {
-      if ( useHightLevel )
+      if (useHightLevel)
         {
-          double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
-          nplev = sizeof(stdlev)/sizeof(*stdlev);
-          plev  = (double *) Malloc(nplev*sizeof(double));
-          for ( int i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+          double stdlev[] = { 10,    50,    100,   500,   1000, 5000,
+                              10000, 15000, 20000, 25000, 30000 };
+          nplev = sizeof(stdlev) / sizeof(*stdlev);
+          plev = (double *) Malloc(nplev * sizeof(double));
+          for (int i = 0; i < nplev; ++i)
+            plev[i] = stdlev[i];
         }
       else
         {
-          double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
-                             10000,  7000,  5000,  3000,  2000, 1000 };
-          nplev = sizeof(stdlev)/sizeof(*stdlev);
-          plev  = (double *) Malloc(nplev*sizeof(double));
-          for ( int i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+          double stdlev[] = { 100000, 92500, 85000, 70000, 60000, 50000,
+                              40000,  30000, 25000, 20000, 15000, 10000,
+                              7000,   5000,  3000,  2000,  1000 };
+          nplev = sizeof(stdlev) / sizeof(*stdlev);
+          plev = (double *) Malloc(nplev * sizeof(double));
+          for (int i = 0; i < nplev; ++i)
+            plev[i] = stdlev[i];
         }
     }
   else
     {
       nplev = args2flt_lista(operatorArgc(), operatorArgv(), flista);
-      plev  = (double *) lista_dataptr(flista);
+      plev = (double *) lista_dataptr(flista);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -158,55 +169,67 @@ void *Vertintap(void *process)
 
   int nvars = vlistNvars(vlistID1);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       vlistInqVarStdname(vlistID1, varID, stdname);
       strtolower(stdname);
 
-      if      ( strcmp(stdname, var_stdname(surface_air_pressure)) == 0 ) psID = varID; 
-      else if ( strcmp(stdname, var_stdname(air_pressure))         == 0 ) apressID = varID; 
-      else if ( strcmp(stdname, var_stdname(pressure_thickness))   == 0 ) dpressID = varID; 
-      else if ( strcmp(stdname, var_stdname(air_temperature))      == 0 ) tempID = varID; 
+      if (strcmp(stdname, var_stdname(surface_air_pressure)) == 0)
+        psID = varID;
+      else if (strcmp(stdname, var_stdname(air_pressure)) == 0)
+        apressID = varID;
+      else if (strcmp(stdname, var_stdname(pressure_thickness)) == 0)
+        dpressID = varID;
+      else if (strcmp(stdname, var_stdname(air_temperature)) == 0)
+        tempID = varID;
     }
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
       cdoPrint("Found:");
-      if ( psID     != -1 ) cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
-      if ( apressID != -1 ) cdoPrint("  %s -> %s", var_stdname(air_pressure), cdoVlistInqVarName(vlistID1, apressID, varname));
-      if ( dpressID != -1 ) cdoPrint("  %s -> %s", var_stdname(pressure_thickness), cdoVlistInqVarName(vlistID1, dpressID, varname));
-      if ( tempID   != -1 ) cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
+      if (psID != -1)
+        cdoPrint("  %s -> %s", var_stdname(surface_air_pressure),
+                 cdoVlistInqVarName(vlistID1, psID, varname));
+      if (apressID != -1)
+        cdoPrint("  %s -> %s", var_stdname(air_pressure),
+                 cdoVlistInqVarName(vlistID1, apressID, varname));
+      if (dpressID != -1)
+        cdoPrint("  %s -> %s", var_stdname(pressure_thickness),
+                 cdoVlistInqVarName(vlistID1, dpressID, varname));
+      if (tempID != -1)
+        cdoPrint("  %s -> %s", var_stdname(air_temperature),
+                 cdoVlistInqVarName(vlistID1, tempID, varname));
     }
 
-  if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));
+  if (apressID == -1) cdoAbort("%s not found!", var_stdname(air_pressure));
 
   int nzaxis = vlistNzaxis(vlistID1);
-  for ( int i = 0; i < nzaxis; i++ )
+  for (int i = 0; i < nzaxis; i++)
     {
       int zaxisID = vlistZaxis(vlistID1, i);
-      if ( zaxisID == vlistInqVarZaxis(vlistID1, apressID) )
+      if (zaxisID == vlistInqVarZaxis(vlistID1, apressID))
         {
           bool mono_level = true;
           nlevel = zaxisInqSize(zaxisID);
 
-          if ( is_height_axis(zaxisID, nlevel) )
+          if (is_height_axis(zaxisID, nlevel))
             {
               std::vector<double> level(nlevel);
               cdoZaxisInqLevels(zaxisID, &level[0]);
               int l;
-              for ( l = 0; l < nlevel; l++ )
+              for (l = 0; l < nlevel; l++)
                 {
-                  if ( (l+1) != (int) (level[l]+0.5) ) break;
+                  if ((l + 1) != (int) (level[l] + 0.5)) break;
                 }
-              if ( l == nlevel ) mono_level = true; 
+              if (l == nlevel) mono_level = true;
             }
-      
-          if ( is_height_axis(zaxisID, nlevel) && mono_level )
+
+          if (is_height_axis(zaxisID, nlevel) && mono_level)
             {
               zaxisIDh = zaxisID;
-              nhlev    = nlevel;
-              nhlevf   = nhlev;
-              nhlevh   = nhlevf + 1;
+              nhlev = nlevel;
+              nhlevf = nhlev;
+              nhlevh = nhlevf + 1;
 
               break;
             }
@@ -214,7 +237,7 @@ void *Vertintap(void *process)
     }
 
   change_height_zaxis(vlistID1, vlistID2, zaxisIDp);
-  
+
   std::vector<bool> vars(nvars);
   std::vector<bool> varinterp(nvars);
   std::vector<size_t *> varnmiss(nvars);
@@ -224,98 +247,107 @@ void *Vertintap(void *process)
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
   std::vector<size_t> pnmiss;
-  if ( !extrapolate ) pnmiss.resize(nplev);
+  if (!extrapolate) pnmiss.resize(nplev);
 
   // check levels
-  if ( zaxisIDh != -1 )
+  if (zaxisIDh != -1)
     {
       int nlev = zaxisInqSize(zaxisIDh);
-      if ( nlev != nhlev ) cdoAbort("Internal error, wrong number of height level!");
+      if (nlev != nhlev)
+        cdoAbort("Internal error, wrong number of height level!");
       std::vector<double> levels(nlev);
       cdoZaxisInqLevels(zaxisIDh, &levels[0]);
 
-      for ( int ilev = 0; ilev < nlev; ++ilev )
-	{
-	  if ( (ilev+1) != (int)levels[ilev] )
-	    {
-	      //sortlevels = FALSE;
-	      break;
-	    }
-	}
+      for (int ilev = 0; ilev < nlev; ++ilev)
+        {
+          if ((ilev + 1) != (int) levels[ilev])
+            {
+              // sortlevels = FALSE;
+              break;
+            }
+        }
     }
 
   std::vector<int> vert_index;
   std::vector<double> ps_prog, full_press, half_press;
-  if ( zaxisIDh != -1 && gridsize > 0 )
+  if (zaxisIDh != -1 && gridsize > 0)
     {
-      vert_index.resize(gridsize*nplev);
+      vert_index.resize(gridsize * nplev);
       ps_prog.resize(gridsize);
-      full_press.resize(gridsize*nhlevf);
-      half_press.resize(gridsize*nhlevh);
+      full_press.resize(gridsize * nhlevf);
+      half_press.resize(gridsize * nhlevh);
     }
   else
     cdoWarning("No 3D variable with generalized height level found!");
 
-  if ( useHightLevel )
+  if (useHightLevel)
     {
       std::vector<double> phlev(nplev);
       height2pressure(&phlev[0], plev, nplev);
 
-      if ( cdoVerbose )
-	for ( int i = 0; i < nplev; ++i )
-	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
+      if (cdoVerbose)
+        for (int i = 0; i < nplev; ++i)
+          cdoPrint("level = %d   height = %g   pressure = %g", i + 1, plev[i],
+                   phlev[i]);
 
       arrayCopy(nplev, &phlev[0], plev);
     }
 
-  if ( useLogType )
-    for ( int k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
+  if (useLogType)
+    for (int k = 0; k < nplev; k++)
+      plev[k] = log(plev[k]);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
-      int gridID   = vlistInqVarGrid(vlistID1, varID);
-      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      int nlevel   = zaxisInqSize(zaxisID);
+      int gridID = vlistInqVarGrid(vlistID1, varID);
+      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      int nlevel = zaxisInqSize(zaxisID);
 
-      if ( gridInqType(gridID) == GRID_SPECTRAL )
-	cdoAbort("Spectral data unsupported!");
+      if (gridInqType(gridID) == GRID_SPECTRAL)
+        cdoAbort("Spectral data unsupported!");
 
-      vardata1[varID] = (double *) Malloc(gridsize*nlevel*sizeof(double));
-           
-      if ( zaxisID == zaxisIDh ||
-	   (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)) )
-	{
-	  varinterp[varID] = true;
-	  vardata2[varID]  = (double *) Malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = (size_t *) Calloc(maxlev, sizeof(size_t));
-	}
+      vardata1[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
+
+      if (zaxisID == zaxisIDh
+          || (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1
+              && (nlevel == nhlevh || nlevel == nhlevf)))
+        {
+          varinterp[varID] = true;
+          vardata2[varID]
+              = (double *) Malloc(gridsize * nplev * sizeof(double));
+          varnmiss[varID] = (size_t *) Calloc(maxlev, sizeof(size_t));
+        }
       else
-	{
-	  if ( is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && nlevel > 1 )
+        {
+          if (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && nlevel > 1)
             {
               vlistInqVarName(vlistID1, varID, varname);
-              cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
-                         varID+1, varname, nlevel);
+              cdoWarning("Parameter %d has wrong number of levels, skipped! "
+                         "(param=%s nlevel=%d)",
+                         varID + 1, varname, nlevel);
             }
 
-	  varinterp[varID] = false;
-	  vardata2[varID]  = vardata1[varID];
-	  varnmiss[varID]  = (size_t *) Malloc(nlevel*sizeof(size_t));
-	}
-    }
-  
-  if ( zaxisIDh != -1 && psID == -1 )
-    {
-      if ( dpressID != -1 )
-        cdoWarning("Surface pressure not found - set to vertical sum of %s!", var_stdname(pressure_thickness));
-      else
-        cdoWarning("Surface pressure not found - set to lower bound of %s!", var_stdname(air_pressure));
+          varinterp[varID] = false;
+          vardata2[varID] = vardata1[varID];
+          varnmiss[varID] = (size_t *) Malloc(nlevel * sizeof(size_t));
+        }
     }
 
-  for ( varID = 0; varID < nvars; ++varID )
+  if (zaxisIDh != -1 && psID == -1)
     {
-      if ( varinterp[varID] && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT )
-	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
+      if (dpressID != -1)
+        cdoWarning("Surface pressure not found - set to vertical sum of %s!",
+                   var_stdname(pressure_thickness));
+      else
+        cdoWarning("Surface pressure not found - set to lower bound of %s!",
+                   var_stdname(air_pressure));
+    }
+
+  for (varID = 0; varID < nvars; ++varID)
+    {
+      if (varinterp[varID]
+          && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+        vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -323,132 +355,155 @@ void *Vertintap(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      for ( varID = 0; varID < nvars; ++varID )
-	{
+      for (varID = 0; varID < nvars; ++varID)
+        {
           vars[varID] = false;
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    varnmiss[varID][levelID] = 0;
-	}
+          nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          for (levelID = 0; levelID < nlevel; levelID++)
+            varnmiss[varID][levelID] = 0;
+        }
 
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  /*
-	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	  nlevel   = zaxisInqSize(zaxisID);
-	  if ( sortlevels && zaxisIDh != -1 && zaxisID == zaxisIDh && nlevel == nhlev )
-	    {
-	      levelID = (int) (zaxisInqLevel(zaxisIDh, levelID)-1);
-	      printf("levelID %d\n", levelID);
-	    }
-	  */
-	  size_t offset = gridsize*levelID;
-	  double *single1 = vardata1[varID] + offset;
- 	  pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          /*
+          zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+          nlevel   = zaxisInqSize(zaxisID);
+          if ( sortlevels && zaxisIDh != -1 && zaxisID == zaxisIDh && nlevel ==
+          nhlev )
+            {
+              levelID = (int) (zaxisInqLevel(zaxisIDh, levelID)-1);
+              printf("levelID %d\n", levelID);
+            }
+          */
+          size_t offset = gridsize * levelID;
+          double *single1 = vardata1[varID] + offset;
+          pstreamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 
-	  vars[varID] = true;
-	}
+          vars[varID] = true;
+        }
 
-      for ( varID = 0; varID < nvars; varID++ )
-	if ( varinterp[varID]  ) vars[varID] = true;
+      for (varID = 0; varID < nvars; varID++)
+        if (varinterp[varID]) vars[varID] = true;
 
-      if ( zaxisIDh != -1 )
-	{
-	  if ( psID != -1 )
-	    {
-	      arrayCopy(gridsize, vardata1[psID], &ps_prog[0]); 
-	    }
-          else if ( dpressID != -1 )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
-	      for ( int k = 0; k < nhlevf; ++k )
-		for ( size_t i = 0; i < gridsize; i++ )
-		  ps_prog[i] += vardata1[dpressID][k*gridsize+i];
-	    }
-	  else
-	    {
-	      arrayCopy(gridsize, vardata1[apressID]+gridsize*(nhlevf-1), &ps_prog[0]); 
-	      //for ( size_t i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
-	    }
+      if (zaxisIDh != -1)
+        {
+          if (psID != -1)
+            {
+              arrayCopy(gridsize, vardata1[psID], &ps_prog[0]);
+            }
+          else if (dpressID != -1)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                ps_prog[i] = 0;
+              for (int k = 0; k < nhlevf; ++k)
+                for (size_t i = 0; i < gridsize; i++)
+                  ps_prog[i] += vardata1[dpressID][k * gridsize + i];
+            }
+          else
+            {
+              arrayCopy(gridsize, vardata1[apressID] + gridsize * (nhlevf - 1),
+                        &ps_prog[0]);
+              // for ( size_t i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
+            }
 
-	  /* check range of ps_prog */
+          /* check range of ps_prog */
           double minval, maxval;
-	  arrayMinMaxMask(gridsize, &ps_prog[0], NULL, &minval, &maxval);
-	  if ( minval < MIN_PS || maxval > MAX_PS )
-	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+          arrayMinMaxMask(gridsize, &ps_prog[0], NULL, &minval, &maxval);
+          if (minval < MIN_PS || maxval > MAX_PS)
+            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval,
+                       maxval);
 
-	  arrayCopy(gridsize*nhlevf, vardata1[apressID], &full_press[0]); 
+          arrayCopy(gridsize * nhlevf, vardata1[apressID], &full_press[0]);
 
-          for ( size_t i = 0; i < gridsize; i++ ) half_press[i] = 0;
-          for ( int k = 1; k < nhlevf; k++ )
-            for ( size_t i = 0; i < gridsize; i++ )
-              half_press[k*gridsize+i] = 0.5*(full_press[(k-1)*gridsize+i]+full_press[k*gridsize+i]);
-          for ( size_t i = 0; i < gridsize; i++ ) half_press[(nhlevh-1)*gridsize+i] = full_press[(nhlevf-1)*gridsize+i];
-          
-	  if ( useLogType )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
-	      for ( size_t ki = 0; ki < nhlevh*gridsize; ki++ ) half_press[ki] = log(half_press[ki]);
-	      for ( size_t ki = 0; ki < nhlevf*gridsize; ki++ ) full_press[ki] = log(full_press[ki]);
-	    }
+          for (size_t i = 0; i < gridsize; i++)
+            half_press[i] = 0;
+          for (int k = 1; k < nhlevf; k++)
+            for (size_t i = 0; i < gridsize; i++)
+              half_press[k * gridsize + i]
+                  = 0.5
+                    * (full_press[(k - 1) * gridsize + i]
+                       + full_press[k * gridsize + i]);
+          for (size_t i = 0; i < gridsize; i++)
+            half_press[(nhlevh - 1) * gridsize + i]
+                = full_press[(nhlevf - 1) * gridsize + i];
 
-	  genind(&vert_index[0], plev, &full_press[0], gridsize, nplev, nhlevf);
+          if (useLogType)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                ps_prog[i] = log(ps_prog[i]);
+              for (size_t ki = 0; ki < nhlevh * gridsize; ki++)
+                half_press[ki] = log(half_press[ki]);
+              for (size_t ki = 0; ki < nhlevf * gridsize; ki++)
+                full_press[ki] = log(full_press[ki]);
+            }
 
-	  if ( !extrapolate ) genindmiss(&vert_index[0], plev, gridsize, nplev, &ps_prog[0], &pnmiss[0]);
-	}
+          genind(&vert_index[0], plev, &full_press[0], gridsize, nplev, nhlevf);
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  if ( vars[varID] )
-	    {
-	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      int nlevel  = zaxisInqSize(zaxisID);
-	      double missval = vlistInqVarMissval(vlistID1, varID);
-	      if ( varinterp[varID] )
-		{
+          if (!extrapolate)
+            genindmiss(&vert_index[0], plev, gridsize, nplev, &ps_prog[0],
+                       &pnmiss[0]);
+        }
+
+      for (varID = 0; varID < nvars; varID++)
+        {
+          if (vars[varID])
+            {
+              int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+              int nlevel = zaxisInqSize(zaxisID);
+              double missval = vlistInqVarMissval(vlistID1, varID);
+              if (varinterp[varID])
+                {
                   double *hyb_press = NULL;
-		  if      ( nlevel == nhlevf ) hyb_press = &full_press[0];
-		  else if ( nlevel == nhlevh ) hyb_press = &half_press[0];
-		  else
-		    {
+                  if (nlevel == nhlevf)
+                    hyb_press = &full_press[0];
+                  else if (nlevel == nhlevh)
+                    hyb_press = &half_press[0];
+                  else
+                    {
                       vlistInqVarName(vlistID1, varID, varname);
-		      cdoAbort("Number of generalized height level differ from full/half level (param=%s)!", varname);
-		    }
+                      cdoAbort("Number of generalized height level differ from "
+                               "full/half level (param=%s)!",
+                               varname);
+                    }
 
-		  for ( levelID = 0; levelID < nlevel; levelID++ )
-		    {
-		      if ( varnmiss[varID][levelID] )
-			cdoAbort("Missing values unsupported for this operator!");
-		    }
+                  for (levelID = 0; levelID < nlevel; levelID++)
+                    {
+                      if (varnmiss[varID][levelID])
+                        cdoAbort(
+                            "Missing values unsupported for this operator!");
+                    }
 
-		  interp_X(vardata1[varID], vardata2[varID], hyb_press,
-			   &vert_index[0], plev, nplev, gridsize, nlevel, missval);
-		  
-		  if ( !extrapolate ) arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);
-		}
-	    }
-	}
+                  interp_X(vardata1[varID], vardata2[varID], hyb_press,
+                           &vert_index[0], plev, nplev, gridsize, nlevel,
+                           missval);
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  if ( vars[varID] )
-	    {
-	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		{
-		  size_t offset = gridsize*levelID;
-		  double *single2 = vardata2[varID] + offset;
-		  pstreamDefRecord(streamID2, varID, levelID);
-		  pstreamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
-		}
-	    }
-	}
+                  if (!extrapolate)
+                    arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);
+                }
+            }
+        }
+
+      for (varID = 0; varID < nvars; varID++)
+        {
+          if (vars[varID])
+            {
+              int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+              for (levelID = 0; levelID < nlevel; levelID++)
+                {
+                  size_t offset = gridsize * levelID;
+                  double *single2 = vardata2[varID] + offset;
+                  pstreamDefRecord(streamID2, varID, levelID);
+                  pstreamWriteRecord(streamID2, single2,
+                                     varnmiss[varID][levelID]);
+                }
+            }
+        }
 
       tsID++;
     }
@@ -456,11 +511,11 @@ void *Vertintap(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       Free(varnmiss[varID]);
       Free(vardata1[varID]);
-      if ( varinterp[varID] ) Free(vardata2[varID]);
+      if (varinterp[varID]) Free(vardata2[varID]);
     }
 
   lista_destroy(flista);

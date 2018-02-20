@@ -24,31 +24,31 @@
 #include "exception.h"
 #include "util_files.h"
 
-
-int defineTable(const char *tablearg)
+int
+defineTable(const char *tablearg)
 {
   const char *tablename = tablearg;
 
   int tableID = fileExists(tablename) ? tableRead(tablename) : CDI_UNDEFID;
 
-  if ( tableID == CDI_UNDEFID )
+  if (tableID == CDI_UNDEFID)
     {
       char *tablepath = getenv("CD_TABLEPATH");
-      if ( tablepath )
-	{
-	  int len = sizeof(tablepath) + sizeof(tablename) + 3;
-	  char *tablefile = (char*) malloc(len*sizeof(char));
-	  strcpy(tablefile, tablepath);
-	  strcat(tablefile, "/");
-	  strcat(tablefile, tablename);
-	  if ( fileExists(tablename) ) tableID = tableRead(tablefile);
+      if (tablepath)
+        {
+          int len = sizeof(tablepath) + sizeof(tablename) + 3;
+          char *tablefile = (char *) malloc(len * sizeof(char));
+          strcpy(tablefile, tablepath);
+          strcat(tablefile, "/");
+          strcat(tablefile, tablename);
+          if (fileExists(tablename)) tableID = tableRead(tablefile);
           free(tablefile);
-	}
+        }
     }
 
-  if ( tableID == CDI_UNDEFID ) tableID = tableInq(-1, 0, tablename);
+  if (tableID == CDI_UNDEFID) tableID = tableInq(-1, 0, tablename);
 
-  if ( tableID == CDI_UNDEFID ) cdoAbort("table <%s> not found", tablename);
+  if (tableID == CDI_UNDEFID) cdoAbort("table <%s> not found", tablename);
 
   return tableID;
 }

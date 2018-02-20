@@ -19,16 +19,18 @@
 
 #include "grid.h"
 
-
-double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam, double polgam)
+double
+lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
+              double polgam)
 {
   /*
     Name of the original Fortran function: PHTOPHS
 
-    This function converts lambda from one rotated system to lambda in another system. 
-    If the optional argument polgam is present, the other system can also be a rotated one, 
-    where polgam is the angle between the two north poles.
-    If polgam is not present, the other system is the real geographical system.
+    This function converts lambda from one rotated system to lambda in another
+    system. If the optional argument polgam is present, the other system can
+    also be a rotated one, where polgam is the angle between the two north
+    poles. If polgam is not present, the other system is the real geographical
+    system.
 
     phirot : latitude in the rotated system
     lamrot : longitude in the rotated system (E>0)
@@ -39,46 +41,52 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
   */
   double zarg1, zarg2;
 
-  double zsinpol = sin(DEG2RAD*polphi);
-  double zcospol = cos(DEG2RAD*polphi);
+  double zsinpol = sin(DEG2RAD * polphi);
+  double zcospol = cos(DEG2RAD * polphi);
 
-  double zlampol = DEG2RAD*pollam;
-  double zphirot = DEG2RAD*phirot;
-  if ( lamrot > 180.0 ) lamrot -= 360.0;
-  double zlamrot = DEG2RAD*lamrot;
+  double zlampol = DEG2RAD * pollam;
+  double zphirot = DEG2RAD * phirot;
+  if (lamrot > 180.0) lamrot -= 360.0;
+  double zlamrot = DEG2RAD * lamrot;
 
-  if ( polgam > 0 )
+  if (polgam > 0)
     {
-      double zgam  = DEG2RAD*polgam;
-      zarg1 = sin(zlampol) *                                               
- 	    (- zsinpol*cos(zphirot) * (cos(zlamrot)*cos(zgam) - sin(zlamrot)*sin(zgam)) 
- 	     + zcospol*sin(zphirot))                                              
-	- cos(zlampol)*cos(zphirot) * (sin(zlamrot)*cos(zgam) + cos(zlamrot)*sin(zgam));
+      double zgam = DEG2RAD * polgam;
+      zarg1 = sin(zlampol)
+                  * (-zsinpol * cos(zphirot)
+                         * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
+                     + zcospol * sin(zphirot))
+              - cos(zlampol) * cos(zphirot)
+                    * (sin(zlamrot) * cos(zgam) + cos(zlamrot) * sin(zgam));
 
-      zarg2 = cos(zlampol) *                                               
- 	    (- zsinpol*cos(zphirot) * (cos(zlamrot)*cos(zgam) - sin(zlamrot)*sin(zgam)) 
-	     + zcospol*sin(zphirot))                                              
-	+ sin(zlampol)*cos(zphirot) * (sin(zlamrot)*cos(zgam) + cos(zlamrot)*sin(zgam));
-      }
+      zarg2 = cos(zlampol)
+                  * (-zsinpol * cos(zphirot)
+                         * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
+                     + zcospol * sin(zphirot))
+              + sin(zlampol) * cos(zphirot)
+                    * (sin(zlamrot) * cos(zgam) + cos(zlamrot) * sin(zgam));
+    }
   else
     {
-      zarg1 = sin(zlampol)*(- zsinpol*cos(zlamrot)*cos(zphirot)  +
-      		              zcospol*             sin(zphirot)) -
-	      cos(zlampol)*           sin(zlamrot)*cos(zphirot);
-      zarg2 = cos(zlampol)*(- zsinpol*cos(zlamrot)*cos(zphirot)  +
-                              zcospol*             sin(zphirot)) +
-              sin(zlampol)*           sin(zlamrot)*cos(zphirot);
+      zarg1 = sin(zlampol)
+                  * (-zsinpol * cos(zlamrot) * cos(zphirot)
+                     + zcospol * sin(zphirot))
+              - cos(zlampol) * sin(zlamrot) * cos(zphirot);
+      zarg2 = cos(zlampol)
+                  * (-zsinpol * cos(zlamrot) * cos(zphirot)
+                     + zcospol * sin(zphirot))
+              + sin(zlampol) * sin(zlamrot) * cos(zphirot);
     }
 
   double result = 0;
-  if ( fabs(zarg2) > 0 ) result = RAD2DEG*atan2(zarg1, zarg2);
-  if ( fabs(result) < 9.e-14 ) result = 0;
+  if (fabs(zarg2) > 0) result = RAD2DEG * atan2(zarg1, zarg2);
+  if (fabs(result) < 9.e-14) result = 0;
 
   return result;
 }
 
-
-double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
+double
+phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
 {
   /*
     Name of the original Fortran function: PHSTOPH
@@ -99,27 +107,28 @@ double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
   */
   double zarg;
 
-  double zsinpol = sin(DEG2RAD*polphi);
-  double zcospol = cos(DEG2RAD*polphi);
+  double zsinpol = sin(DEG2RAD * polphi);
+  double zcospol = cos(DEG2RAD * polphi);
 
-  double zphirot = DEG2RAD*phirot;
-  if ( lamrot > 180.0 ) lamrot -= 360.0;
-  double zlamrot = DEG2RAD*lamrot;
+  double zphirot = DEG2RAD * phirot;
+  if (lamrot > 180.0) lamrot -= 360.0;
+  double zlamrot = DEG2RAD * lamrot;
 
-  if ( polgam > 0 )
+  if (polgam > 0)
     {
-      double zgam = DEG2RAD*polgam;
-      zarg = zsinpol*sin(zphirot) +
-             zcospol*cos(zphirot)*(cos(zlamrot)*cos(zgam) - sin(zgam)*sin(zlamrot));
+      double zgam = DEG2RAD * polgam;
+      zarg = zsinpol * sin(zphirot)
+             + zcospol * cos(zphirot)
+                   * (cos(zlamrot) * cos(zgam) - sin(zgam) * sin(zlamrot));
     }
   else
-    zarg   = zcospol*cos(zphirot)*cos(zlamrot) + zsinpol*sin(zphirot);
+    zarg = zcospol * cos(zphirot) * cos(zlamrot) + zsinpol * sin(zphirot);
 
-  return RAD2DEG*asin(zarg);
+  return RAD2DEG * asin(zarg);
 }
 
-static
-double lam_to_lamrot(double phi, double rla, double polphi, double pollam)
+static double
+lam_to_lamrot(double phi, double rla, double polphi, double pollam)
 {
   /*
     Name of the original Fortran function: RLSTORL
@@ -133,26 +142,27 @@ double lam_to_lamrot(double phi, double rla, double polphi, double pollam)
 
     result : Rotierte Laenge
   */
-  double zsinpol = sin(DEG2RAD*polphi);
-  double zcospol = cos(DEG2RAD*polphi);
-  double zlampol =     DEG2RAD*pollam;
+  double zsinpol = sin(DEG2RAD * polphi);
+  double zcospol = cos(DEG2RAD * polphi);
+  double zlampol = DEG2RAD * pollam;
 
-  if ( rla > 180.0 ) rla -= 360.0;
+  if (rla > 180.0) rla -= 360.0;
 
-  double zrla = DEG2RAD*rla;
-  double zphi = DEG2RAD*phi;
+  double zrla = DEG2RAD * rla;
+  double zphi = DEG2RAD * phi;
 
-  double zarg1  = - sin(zrla-zlampol)*cos(zphi);
-  double zarg2  = - zsinpol*cos(zphi)*cos(zrla-zlampol)+zcospol*sin(zphi);
+  double zarg1 = -sin(zrla - zlampol) * cos(zphi);
+  double zarg2
+      = -zsinpol * cos(zphi) * cos(zrla - zlampol) + zcospol * sin(zphi);
 
-  if ( fabs(zarg2) < 1.0e-20 ) zarg2 = 1.0e-20;
+  if (fabs(zarg2) < 1.0e-20) zarg2 = 1.0e-20;
 
-  return RAD2DEG*atan2(zarg1,zarg2);
+  return RAD2DEG * atan2(zarg1, zarg2);
 }
 
 #ifdef TEST_GRID_ROT
-static
-double phi_to_phirot(double phi, double lam, double polphi, double pollam)
+static double
+phi_to_phirot(double phi, double lam, double polphi, double pollam)
 {
   /*
     Name of the original Fortran function: PHTOPHS
@@ -166,22 +176,23 @@ double phi_to_phirot(double phi, double lam, double polphi, double pollam)
 
     result : Rotierte Breite
   */
-  double zsinpol = sin(DEG2RAD*polphi);
-  double zcospol = cos(DEG2RAD*polphi);
-  double zlampol =     DEG2RAD*pollam;
+  double zsinpol = sin(DEG2RAD * polphi);
+  double zcospol = cos(DEG2RAD * polphi);
+  double zlampol = DEG2RAD * pollam;
 
-   double zphi = DEG2RAD*phi;
-  if ( lam > 180.0 ) lam -= 360.0;
-  double zlam = DEG2RAD*lam;
+  double zphi = DEG2RAD * phi;
+  if (lam > 180.0) lam -= 360.0;
+  double zlam = DEG2RAD * lam;
 
-  double zarg = zcospol*cos(zphi)*cos(zlam-zlampol) + zsinpol*sin(zphi);
+  double zarg = zcospol * cos(zphi) * cos(zlam - zlampol) + zsinpol * sin(zphi);
 
-  return RAD2DEG*asin(zarg);
+  return RAD2DEG * asin(zarg);
 }
 #endif
 
-void usvs_to_uv(double us, double vs, double phi, double rla,
-		double polphi, double pollam, double *u, double *v)
+void
+usvs_to_uv(double us, double vs, double phi, double rla, double polphi,
+           double pollam, double *u, double *v)
 {
   /*
     Umrechnen der windkomponenten us, vs im rotierten sphaerischen
@@ -193,44 +204,47 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
     rla    : Laenge im geographischen system (E>0)
     polphi : Geographische breite des Nordpols des rot. Systems
     pollam : Geographische laenge des Nordpols des rot. Systems
- 
+
     u      : zonaler wind im geographischen system
     v      : merid. wind im geographischen system
   */
   /* umrechnung von grad in bogenmass */
-  double zpolphi = polphi*DEG2RAD;
-  double zpollam = pollam*DEG2RAD;
+  double zpolphi = polphi * DEG2RAD;
+  double zpollam = pollam * DEG2RAD;
   // Added by Uwe Schulzweida (17/11/2017)
-  if ( pollam < 0 && rla < pollam ) rla += 360.0;
-  //if ( pollam < 0 && rla < 0 ) rla += 360.0;
-  double zrla    = rla   *DEG2RAD;
+  if (pollam < 0 && rla < pollam) rla += 360.0;
+  // if ( pollam < 0 && rla < 0 ) rla += 360.0;
+  double zrla = rla * DEG2RAD;
   double pollamd = pollam;
-  if ( pollamd < 0.0 ) pollamd += 360.0;
+  if (pollamd < 0.0) pollamd += 360.0;
 
   // laenge im rotierten system berechnen
-  double zrlas = lam_to_lamrot(phi, rla, polphi, pollam)*DEG2RAD;
+  double zrlas = lam_to_lamrot(phi, rla, polphi, pollam) * DEG2RAD;
 
   // winkel zbeta berechen (schnittwinkel der breitenkreise)
-  double zarg = - sin(zpolphi)*sin(zrla-zpollam)*sin(zrlas) - cos(zrla-zpollam)*cos(zrlas);
-  if ( zarg >  1.0 ) zarg =  1.0;
-  if ( zarg < -1.0 ) zarg = -1.0;
+  double zarg = -sin(zpolphi) * sin(zrla - zpollam) * sin(zrlas)
+                - cos(zrla - zpollam) * cos(zrlas);
+  if (zarg > 1.0) zarg = 1.0;
+  if (zarg < -1.0) zarg = -1.0;
   /*
   zbeta = acos(zarg);
   zbeta = sign(zbeta, -(rla - (pollamd-180.0)));
   */
   double zbeta = fabs(acos(zarg));
   // if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta;
-  if ( (-(rla - (pollamd-180.0)) < 0) && (-(rla - (pollamd-180.0)) >= -180) ) zbeta = -zbeta;
+  if ((-(rla - (pollamd - 180.0)) < 0) && (-(rla - (pollamd - 180.0)) >= -180))
+    zbeta = -zbeta;
 
   // us - wind transformieren
-  *u = us*cos(zbeta) - vs*sin(zbeta);
-  
+  *u = us * cos(zbeta) - vs * sin(zbeta);
+
   // vs - wind transformieren
-  *v = us*sin(zbeta) + vs*cos(zbeta);
+  *v = us * sin(zbeta) + vs * cos(zbeta);
 }
 
 #ifdef TEST_GRID_ROT
-int main(void)
+int
+main(void)
 {
   double x0, y0, x1, y1, x2, y2;
   double polphi, pollam;
@@ -245,9 +259,9 @@ int main(void)
   x0 = -20.0;
   y0 = 0.0;
 
-  for ( int i = 0; i < 10; i++ )
+  for (int i = 0; i < 10; i++)
     {
-      x0 = i *20.0;
+      x0 = i * 20.0;
       printf("rot in: %g %g\n", x0, y0);
 
       x1 = lamrot_to_lam(y0, x0, polphi, pollam, angle);
@@ -266,4 +280,3 @@ int main(void)
   return 0;
 }
 #endif
-

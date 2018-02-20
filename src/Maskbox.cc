@@ -23,7 +23,6 @@
       Maskbox    maskregion      Mask regions
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -33,96 +32,105 @@
 #define MAX_LINE 256
 #define MAX_VALS 1048576
 
-static
-int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
+static int
+ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 {
   int z = 0, number = 0, jumpedlines = 0;
   char line[MAX_LINE];
 
-  while ( readline(fp, line, MAX_LINE) )
+  while (readline(fp, line, MAX_LINE))
     {
       int i = 0;
-      if ( line[0] == '#' ) 
-         { 
-           jumpedlines++;
-           continue;
-         }  
-      if ( line[0] == '\0' )
-         { 
-           jumpedlines++;
-           continue;
-         }  
-      if ( line[0] == '&' ) break;
-	 
+      if (line[0] == '#')
+        {
+          jumpedlines++;
+          continue;
+        }
+      if (line[0] == '\0')
+        {
+          jumpedlines++;
+          continue;
+        }
+      if (line[0] == '&') break;
+
       char *linep = &line[0];
-     
+
       double xcoord = strtod(linep, &linep);
-      
-      if ( ! (fabs(xcoord) > 0) ) jumpedlines++;
-      
-      while( ( ( isdigit( (int) *linep ) == FALSE ) && ( *linep!='-' )) && ( i < 64) )
-	{	  
-	  if ( *linep == 0 ) 
-	    {
-	      cdoAbort(" y value missing in file %s at  line %d", polyfile, (number+jumpedlines+1));
-	      break;
-	    }
-          if ( ( isspace( (int) *linep) == FALSE && ( *linep!='-' ) ) && ( linep != NULL ) ) 
-	    cdoWarning("unknown character in file %s at line %d", polyfile, (number+jumpedlines+1) );
+
+      if (!(fabs(xcoord) > 0)) jumpedlines++;
+
+      while (((isdigit((int) *linep) == FALSE) && (*linep != '-')) && (i < 64))
+        {
+          if (*linep == 0)
+            {
+              cdoAbort(" y value missing in file %s at  line %d", polyfile,
+                       (number + jumpedlines + 1));
+              break;
+            }
+          if ((isspace((int) *linep) == FALSE && (*linep != '-'))
+              && (linep != NULL))
+            cdoWarning("unknown character in file %s at line %d", polyfile,
+                       (number + jumpedlines + 1));
 
           linep++;
-	  i++;
-	}    
-      if ( ( i >= 63 ) && ( number != 0 ) ) cdoAbort( "Wrong value format in file %s at line %d", polyfile, (number+jumpedlines+1) );
-    
+          i++;
+        }
+      if ((i >= 63) && (number != 0))
+        cdoAbort("Wrong value format in file %s at line %d", polyfile,
+                 (number + jumpedlines + 1));
+
       double ycoord = strtod(linep, NULL);
-     
+
       xvals[number] = xcoord;
       yvals[number] = ycoord;
 
       number++;
     }
 
- 
-  if ( ( number != 0 )&& ( ! (IS_EQUAL(xvals[0], xvals[number-1]) && IS_EQUAL(yvals[0], yvals[number-1])) ) )
+  if ((number != 0)
+      && (!(IS_EQUAL(xvals[0], xvals[number - 1])
+            && IS_EQUAL(yvals[0], yvals[number - 1]))))
     {
       xvals[number] = xvals[0];
       yvals[number] = yvals[0];
       number++;
     }
-  
 
-  if ( cdoVerbose ) 
+  if (cdoVerbose)
     {
-      for ( z = 0; z < number; z++ )  fprintf(stderr, "%d %g %g\n",  (z+1),  xvals[z], yvals[z]);
+      for (z = 0; z < number; z++)
+        fprintf(stderr, "%d %g %g\n", (z + 1), xvals[z], yvals[z]);
     }
 
   return number;
 }
 
+void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2,
+                  long *lon11, long *lon12, long *lon21, long *lon22);
 
-void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
+void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2,
+                 long *lon11, long *lon12, long *lon21, long *lon22);
 
-void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22);
-
-
-static
-void maskbox(std::vector<bool> &mask, int gridID, size_t lat1, size_t lat2, size_t lon11, size_t lon12, size_t lon21, size_t lon22)
+static void
+maskbox(std::vector<bool> &mask, int gridID, size_t lat1, size_t lat2,
+        size_t lon11, size_t lon12, size_t lon21, size_t lon22)
 {
   size_t nlon = gridInqXsize(gridID);
   size_t nlat = gridInqYsize(gridID);
 
-  for ( size_t ilat = 0; ilat < nlat; ilat++ )
-    for ( size_t ilon = 0; ilon < nlon; ilon++ )
-      if (  (lat1 <= ilat && ilat <= lat2 && 
-	      ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))) )
-	mask[nlon*ilat + ilon] = false;
+  for (size_t ilat = 0; ilat < nlat; ilat++)
+    for (size_t ilon = 0; ilon < nlon; ilon++)
+      if ((lat1 <= ilat && ilat <= lat2
+           && ((lon11 <= ilon && ilon <= lon12)
+               || (lon21 <= ilon && ilon <= lon22))))
+        mask[nlon * ilat + ilon] = false;
 }
 
-void getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1, double *xlat2);
+void getlonlatparams(int argc_offset, double *xlon1, double *xlon2,
+                     double *xlat1, double *xlat2);
 
-static
-void maskbox_cell(std::vector<bool> &mask, int gridID)
+static void
+maskbox_cell(std::vector<bool> &mask, int gridID)
 {
   double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
   getlonlatparams(0, &xlon1, &xlon2, &xlat1, &xlat2);
@@ -141,30 +149,30 @@ void maskbox_cell(std::vector<bool> &mask, int gridID)
   gridInqYunits(gridID, yunits);
 
   double xfact = 1, yfact = 1;
-  if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
-  if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
+  if (strncmp(xunits, "radian", 6) == 0) xfact = RAD2DEG;
+  if (strncmp(yunits, "radian", 6) == 0) yfact = RAD2DEG;
 
-  if ( xlon1 > xlon2 ) 
+  if (xlon1 > xlon2)
     cdoAbort("The second longitude have to be greater than the first one!");
 
-  if ( xlat1 > xlat2 )
+  if (xlat1 > xlat2)
     {
       double xtemp = xlat1;
       xlat1 = xlat2;
       xlat2 = xtemp;
     }
-  
-  for ( size_t i = 0; i < gridsize; ++i )
+
+  for (size_t i = 0; i < gridsize; ++i)
     {
       mask[i] = true;
 
-      double xval = xfact*xvals[i];
-      double yval = yfact*yvals[i];
-      if ( yval >= xlat1 && yval <= xlat2 )
+      double xval = xfact * xvals[i];
+      double yval = yfact * yvals[i];
+      if (yval >= xlat1 && yval <= xlat2)
         {
-          if ( ((xval     >= xlon1 && xval     <= xlon2) ||
-                (xval-360 >= xlon1 && xval-360 <= xlon2) ||
-                (xval+360 >= xlon1 && xval+360 <= xlon2)) )
+          if (((xval >= xlon1 && xval <= xlon2)
+               || (xval - 360 >= xlon1 && xval - 360 <= xlon2)
+               || (xval + 360 >= xlon1 && xval + 360 <= xlon2)))
             {
               mask[i] = false;
             }
@@ -172,8 +180,9 @@ void maskbox_cell(std::vector<bool> &mask, int gridID)
     }
 }
 
-static
-void maskregion(std::vector<bool> &mask, int gridID, double *xcoords, double *ycoords, size_t nofcoords)
+static void
+maskregion(std::vector<bool> &mask, int gridID, double *xcoords,
+           double *ycoords, size_t nofcoords)
 {
   size_t nlon = gridInqXsize(gridID);
   size_t nlat = gridInqYsize(gridID);
@@ -182,7 +191,7 @@ void maskregion(std::vector<bool> &mask, int gridID, double *xcoords, double *yc
   std::vector<double> yvals(nlat);
 
   gridInqXvals(gridID, &xvals[0]);
-  gridInqYvals(gridID, &yvals[0]);  
+  gridInqYvals(gridID, &yvals[0]);
 
   /* Convert lat/lon units if required */
   {
@@ -199,61 +208,72 @@ void maskregion(std::vector<bool> &mask, int gridID, double *xcoords, double *yc
   double ymin, ymax;
   arrayMinMax(nlat, &yvals[0], &ymin, &ymax);
 
-  for ( size_t ilat = 0; ilat < nlat; ilat++ )
+  for (size_t ilat = 0; ilat < nlat; ilat++)
     {
       double yval = yvals[ilat];
-      for ( size_t ilon = 0; ilon < nlon; ilon++ )
-	{
+      for (size_t ilon = 0; ilon < nlon; ilon++)
+        {
           size_t i, j;
           int c = 0;
-	  double xval = xvals[ilon];
-	  if (!( ( ( xval > xmin ) || ( xval < xmax ) ) || ( (yval > ymin) || (yval < ymax) ) ) ) c = !c;
-	  	  
-          if ( c == 0 )
-	    {
-	      for ( i = 0, j = nofcoords-1; i < nofcoords; j = i++ )
-	    
-	      if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
-		   ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
-		  ((xval) < (xcoords[j] - (xcoords[i])) * (yval - ycoords[i]) / (ycoords[j] - ycoords[i]) +(xcoords[i])))
-		c = !c;
-	    }
+          double xval = xvals[ilon];
+          if (!(((xval > xmin) || (xval < xmax))
+                || ((yval > ymin) || (yval < ymax))))
+            c = !c;
 
-	  if ( c == 0 )
-	    {
-	      for ( i = 0, j = nofcoords-1; i < nofcoords; j = i++ )
-		{
-		  if ( xvals[ilon] > 180 )
-		    {
-		      if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
-			   ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
-			  ((xval-360) < (xcoords[j] - (xcoords[i])) * (yval - ycoords[i]) / (ycoords[j] - ycoords[i]) +(xcoords[i])))
-			c = !c;
-		    }
-		}
-	    }
- 
-	  if ( c == 0 )
-	    {
-	      for ( i = 0, j = nofcoords-1; i< nofcoords; j = i++ )
-		{		
-		  if ( xval < 0 )
-		    {
-		      if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
-			   ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
-			  ((xval+360) < (xcoords[j] - (xcoords[i])) * (yval - ycoords[i]) / (ycoords[j] - ycoords[i]) +(xcoords[i])))
-			c = !c;
-		    }
-		}
-	    }
-	     
-	  if ( c != 0 ) mask[nlon*ilat+ilon] =  false;
-	}
+          if (c == 0)
+            {
+              for (i = 0, j = nofcoords - 1; i < nofcoords; j = i++)
+
+                if ((((ycoords[i] <= yval) && (yval < ycoords[j]))
+                     || ((ycoords[j] <= yval) && (yval < ycoords[i])))
+                    && ((xval) < (xcoords[j] - (xcoords[i]))
+                                         * (yval - ycoords[i])
+                                         / (ycoords[j] - ycoords[i])
+                                     + (xcoords[i])))
+                  c = !c;
+            }
+
+          if (c == 0)
+            {
+              for (i = 0, j = nofcoords - 1; i < nofcoords; j = i++)
+                {
+                  if (xvals[ilon] > 180)
+                    {
+                      if ((((ycoords[i] <= yval) && (yval < ycoords[j]))
+                           || ((ycoords[j] <= yval) && (yval < ycoords[i])))
+                          && ((xval - 360) < (xcoords[j] - (xcoords[i]))
+                                                     * (yval - ycoords[i])
+                                                     / (ycoords[j] - ycoords[i])
+                                                 + (xcoords[i])))
+                        c = !c;
+                    }
+                }
+            }
+
+          if (c == 0)
+            {
+              for (i = 0, j = nofcoords - 1; i < nofcoords; j = i++)
+                {
+                  if (xval < 0)
+                    {
+                      if ((((ycoords[i] <= yval) && (yval < ycoords[j]))
+                           || ((ycoords[j] <= yval) && (yval < ycoords[i])))
+                          && ((xval + 360) < (xcoords[j] - (xcoords[i]))
+                                                     * (yval - ycoords[i])
+                                                     / (ycoords[j] - ycoords[i])
+                                                 + (xcoords[i])))
+                        c = !c;
+                    }
+                }
+            }
+
+          if (c != 0) mask[nlon * ilat + ilon] = false;
+        }
     }
 }
 
-
-void *Maskbox(void *process)
+void *
+Maskbox(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -278,27 +298,28 @@ void *Maskbox(void *process)
 
   int ngrids = vlistNgrids(vlistID1);
   int ndiffgrids = 0;
-  for ( index = 1; index < ngrids; index++ )
-    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
-      ndiffgrids++;
+  for (index = 1; index < ngrids; index++)
+    if (vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index)) ndiffgrids++;
 
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     {
-      gridID   = vlistGrid(vlistID1, index);
+      gridID = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID);
 
-      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) break;
-      if ( operatorID != MASKREGION && gridtype == GRID_CURVILINEAR ) break;
-      if ( operatorID != MASKREGION && gridtype == GRID_UNSTRUCTURED ) break;
-      if ( operatorID == MASKINDEXBOX && gridtype == GRID_GENERIC &&
-	  gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 ) break;
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN) break;
+      if (operatorID != MASKREGION && gridtype == GRID_CURVILINEAR) break;
+      if (operatorID != MASKREGION && gridtype == GRID_UNSTRUCTURED) break;
+      if (operatorID == MASKINDEXBOX && gridtype == GRID_GENERIC
+          && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0)
+        break;
     }
 
-  if ( gridtype == GRID_GAUSSIAN_REDUCED )
-    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
+  if (gridtype == GRID_GAUSSIAN_REDUCED)
+    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a "
+             "regular grid!");
 
-  if ( index == ngrids ) cdoAbort("No regular lon/lat grid found!");
-  if ( ndiffgrids > 0 )  cdoAbort("Too many different grids!");
+  if (index == ngrids) cdoAbort("No regular lon/lat grid found!");
+  if (ndiffgrids > 0) cdoAbort("Too many different grids!");
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
@@ -310,7 +331,7 @@ void *Maskbox(void *process)
 
   int nvars = vlistNvars(vlistID1);
   std::vector<bool> vars(nvars);
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       vars[varID] = (gridID == vlistInqVarGrid(vlistID1, varID));
     }
@@ -321,12 +342,12 @@ void *Maskbox(void *process)
   size_t gridsize = gridInqSize(gridID);
   std::vector<double> array(gridsize);
   std::vector<bool> mask(gridsize);
-  for ( size_t i = 0; i < gridsize; ++i ) mask[i] = true;
- 
-  if ( operatorID == MASKLONLATBOX )
+  for (size_t i = 0; i < gridsize; ++i)
+    mask[i] = true;
+
+  if (operatorID == MASKLONLATBOX)
     {
-      if ( gridtype == GRID_CURVILINEAR ||
-           gridtype == GRID_UNSTRUCTURED )
+      if (gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED)
         {
           maskbox_cell(mask, gridID);
         }
@@ -336,60 +357,60 @@ void *Maskbox(void *process)
           maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
         }
     }
-  else if ( operatorID == MASKINDEXBOX )
+  else if (operatorID == MASKINDEXBOX)
     {
       genindexbox(0, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
       maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
     }
-  else if ( operatorID == MASKREGION )
+  else if (operatorID == MASKREGION)
     {
-      double *xcoords = (double*) Malloc(MAX_VALS*sizeof(double));
-      double *ycoords = (double*) Malloc(MAX_VALS*sizeof(double));
+      double *xcoords = (double *) Malloc(MAX_VALS * sizeof(double));
+      double *ycoords = (double *) Malloc(MAX_VALS * sizeof(double));
       int nfiles = operatorArgc();
-     
-      for ( int i = 0; i < nfiles; i++ )
-	{
-	  const char *polyfile = operatorArgv()[i];
-	  FILE *fp = fopen(polyfile, "r");
-	 
-	  if ( fp == 0 ) cdoAbort("Open failed on %s", polyfile);   
-	  while ( TRUE )
-	    {
-	      int number = ReadCoords(xcoords, ycoords, polyfile, fp );
-	      if ( number == 0 ) break;
-	      if ( number < 3 ) cdoAbort( "Too less values in file %s", polyfile );
-	      maskregion(mask, gridID, xcoords, ycoords, number);
-	    }
-	  fclose(fp); 
-	}
-      if ( xcoords ) Free( xcoords );
-      if ( ycoords ) Free( ycoords );
+
+      for (int i = 0; i < nfiles; i++)
+        {
+          const char *polyfile = operatorArgv()[i];
+          FILE *fp = fopen(polyfile, "r");
+
+          if (fp == 0) cdoAbort("Open failed on %s", polyfile);
+          while (TRUE)
+            {
+              int number = ReadCoords(xcoords, ycoords, polyfile, fp);
+              if (number == 0) break;
+              if (number < 3) cdoAbort("Too less values in file %s", polyfile);
+              maskregion(mask, gridID, xcoords, ycoords, number);
+            }
+          fclose(fp);
+        }
+      if (xcoords) Free(xcoords);
+      if (ycoords) Free(ycoords);
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( vars[varID] )
-	    {
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+
+          if (vars[varID])
+            {
               size_t nmiss;
-	      pstreamReadRecord(streamID1, &array[0], &nmiss);
+              pstreamReadRecord(streamID1, &array[0], &nmiss);
 
-              double missval = vlistInqVarMissval(vlistID1, varID);             
-	      for ( size_t i = 0; i < gridsize; i++ )
-                if ( mask[i] ) array[i] = missval;
-		
-	      nmiss = arrayNumMV(gridsize, &array[0], missval);
-	      pstreamDefRecord(streamID2, varID, levelID);
-	      pstreamWriteRecord(streamID2, &array[0], nmiss);
-	    }
-	}
+              double missval = vlistInqVarMissval(vlistID1, varID);
+              for (size_t i = 0; i < gridsize; i++)
+                if (mask[i]) array[i] = missval;
+
+              nmiss = arrayNumMV(gridsize, &array[0], missval);
+              pstreamDefRecord(streamID2, varID, levelID);
+              pstreamWriteRecord(streamID2, &array[0], nmiss);
+            }
+        }
       tsID++;
     }
 

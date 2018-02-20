@@ -53,7 +53,7 @@ class ProcessType
 public:
   int m_ID;
   int m_posInParent;
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_t threadID;
   int l_threadID;
 #endif
@@ -83,18 +83,19 @@ public:
   char *operatorArg;
   char prompt[64];
   short m_noper;
-  bool m_isActive;  /*TEMP*/ //not used right now, maybe later (12.Jan.2018)
+  bool m_isActive; /*TEMP*/  // not used right now, maybe later (12.Jan.2018)
 
   module_t m_module;
   std::vector<char *> m_oargv;
-  /*TEMP*/ //remove m_oargc and replace usage with m_oargv.size()/operatorArgc()
+  /*TEMP*/  // remove m_oargc and replace usage with
+            // m_oargv.size()/operatorArgc()
   int m_oargc;
   oper_t oper[MAX_OPERATOR];
 
-  ProcessType(int p_ID, const char* p_operatorNamme, const char *operatorCommand);
+  ProcessType(int p_ID, const char *p_operatorNamme,
+              const char *operatorCommand);
 
   pthread_t run();
-
 
   /**
    * returns the number of in streams this process currently has.
@@ -165,4 +166,3 @@ private:
 };
 
 #endif /* _PROCESS_H */
-

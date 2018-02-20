@@ -21,8 +21,8 @@
 #include "pstream_int.h"
 #include "statistic.h"
 
-
-void *Tests(void *process)
+void *
+Tests(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -42,7 +42,7 @@ void *Tests(void *process)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == STUDENTT || operatorID == CHISQUARE )
+  if (operatorID == STUDENTT || operatorID == CHISQUARE)
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
 
@@ -50,10 +50,10 @@ void *Tests(void *process)
 
       degree_of_freedom = parameter2double(operatorArgv()[0]);
 
-      if ( degree_of_freedom <= 0 )
-	cdoAbort("degree of freedom must be positive!");
+      if (degree_of_freedom <= 0)
+        cdoAbort("degree of freedom must be positive!");
     }
-  else if ( operatorID == BETA )
+  else if (operatorID == BETA)
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
 
@@ -62,10 +62,9 @@ void *Tests(void *process)
       p = parameter2double(operatorArgv()[0]);
       q = parameter2double(operatorArgv()[1]);
 
-      if ( p <= 0 || q <= 0 )
-	cdoAbort("p and q must be positive!");
+      if (p <= 0 || q <= 0) cdoAbort("p and q must be positive!");
     }
-  else if ( operatorID == FISHER )
+  else if (operatorID == FISHER)
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
 
@@ -74,8 +73,7 @@ void *Tests(void *process)
       n = parameter2double(operatorArgv()[0]);
       d = parameter2double(operatorArgv()[1]);
 
-      if ( n <= 0 || d <= 0 )
-	cdoAbort("both degrees must be positive!");
+      if (n <= 0 || d <= 0) cdoAbort("both degrees must be positive!");
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -91,66 +89,74 @@ void *Tests(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double *) Malloc(gridsize * sizeof(double));
+  double *array2 = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);	  
-	  pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  missval = vlistInqVarMissval(vlistID1, varID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, array1, &nmiss);
 
-	  if ( operatorID == NORMAL )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  normal(array1[i], processInqPrompt());
-	    }
-	  else if ( operatorID == STUDENTT )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  student_t(degree_of_freedom, array1[i], processInqPrompt());
-	    }
-	  else if ( operatorID == CHISQUARE )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  chi_square(degree_of_freedom, array1[i], processInqPrompt());
-	    }
-	  else if ( operatorID == BETA )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		{
-		  if ( array1[i] < 0 || array1[i] > 1 )
-		    cdoAbort("Value out of range (0-1)!");
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          missval = vlistInqVarMissval(vlistID1, varID);
 
-		  array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		    beta_distr(p, q, array1[i], processInqPrompt());
-		}
-	    }
-	  else if ( operatorID == FISHER )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  fisher(n, d, array1[i], processInqPrompt());
-	    }
-	  else
-	    {
-	      cdoAbort("Internal problem, operator not implemented!");
-	    }
+          if (operatorID == NORMAL)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval)
+                                ? missval
+                                : normal(array1[i], processInqPrompt());
+            }
+          else if (operatorID == STUDENTT)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval)
+                                ? missval
+                                : student_t(degree_of_freedom, array1[i],
+                                            processInqPrompt());
+            }
+          else if (operatorID == CHISQUARE)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval)
+                                ? missval
+                                : chi_square(degree_of_freedom, array1[i],
+                                             processInqPrompt());
+            }
+          else if (operatorID == BETA)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                {
+                  if (array1[i] < 0 || array1[i] > 1)
+                    cdoAbort("Value out of range (0-1)!");
 
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  pstreamWriteRecord(streamID2, array2, nmiss);
-	}
+                  array2[i]
+                      = DBL_IS_EQUAL(array1[i], missval)
+                            ? missval
+                            : beta_distr(p, q, array1[i], processInqPrompt());
+                }
+            }
+          else if (operatorID == FISHER)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                array2[i] = DBL_IS_EQUAL(array1[i], missval)
+                                ? missval
+                                : fisher(n, d, array1[i], processInqPrompt());
+            }
+          else
+            {
+              cdoAbort("Internal problem, operator not implemented!");
+            }
+
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, array2, nmiss);
+        }
 
       tsID++;
     }
@@ -160,8 +166,8 @@ void *Tests(void *process)
 
   vlistDestroy(vlistID2);
 
-  if ( array1 ) Free(array1);
-  if ( array2 ) Free(array2);
+  if (array1) Free(array1);
+  if (array2) Free(array2);
 
   cdoFinish();
 

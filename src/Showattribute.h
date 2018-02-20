@@ -14,4 +14,4 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-void *printAtts(int vlistID, int varOrGlobal, int natts, char *argument); 
+void *printAtts(int vlistID, int varOrGlobal, int natts, char *argument);

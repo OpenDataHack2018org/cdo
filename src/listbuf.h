@@ -19,14 +19,12 @@
 
 #include <stdio.h>
 
-
 typedef struct
 {
   size_t size;
   char *buffer;
   char *name;
 } listbuf_t;
-
 
 listbuf_t *listbuf_new();
 void listbuf_destroy(listbuf_t *listbuf);

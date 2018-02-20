@@ -30,31 +30,31 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-int stringToParam(const char *paramstr)
+int
+stringToParam(const char *paramstr)
 {
   int pnum = -1, pcat = 255, pdis = 255;
   sscanf(paramstr, "%d.%d.%d", &pnum, &pcat, &pdis);
-  
-  if ( cdoVerbose ) cdoPrint("pnum, pcat, pdis: %d.%d.%d", pnum, pcat, pdis);
+
+  if (cdoVerbose) cdoPrint("pnum, pcat, pdis: %d.%d.%d", pnum, pcat, pdis);
 
   int param = cdiEncodeParam(pnum, pcat, pdis);
 
   return param;
 }
 
-
-void *Set(void *process)
+void *
+Set(void *process)
 {
   int nrecs, nvars, newval = -1, tabnum = 0;
   int varID, levelID;
   size_t nmiss;
   int index, zaxisID1, zaxisID2, nzaxis, nlevs;
   int zaxistype;
-  int newparam    = 0;
-  char *newname   = NULL, *newunit = NULL;
+  int newparam = 0;
+  char *newname = NULL, *newunit = NULL;
   double newlevel = 0;
-  double *levels  = NULL;
+  double *levels = NULL;
 
   cdoInitialize(process);
 
@@ -71,27 +71,27 @@ void *Set(void *process)
   int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
-  if ( operatorID == SETCODE || operatorID == SETLTYPE )
+  if (operatorID == SETCODE || operatorID == SETLTYPE)
     {
       newval = parameter2int(operatorArgv()[0]);
     }
-  else if ( operatorID == SETPARAM )
+  else if (operatorID == SETPARAM)
     {
       newparam = stringToParam(operatorArgv()[0]);
     }
-  else if ( operatorID == SETNAME )
+  else if (operatorID == SETNAME)
     {
       newname = operatorArgv()[0];
     }
-  else if ( operatorID == SETUNIT )
+  else if (operatorID == SETUNIT)
     {
       newunit = operatorArgv()[0];
     }
-  else if ( operatorID == SETTABNUM )
+  else if (operatorID == SETTABNUM)
     {
       tabnum = parameter2int(operatorArgv()[0]);
     }
-  else if ( operatorID == SETLEVEL )
+  else if (operatorID == SETLEVEL)
     {
       newlevel = parameter2double(operatorArgv()[0]);
     }
@@ -106,61 +106,61 @@ void *Set(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  if ( operatorID == SETCODE )
+  if (operatorID == SETCODE)
     {
       nvars = vlistNvars(vlistID2);
-      for ( varID = 0; varID < nvars; varID++ )
-	vlistDefVarCode(vlistID2, varID, newval);
+      for (varID = 0; varID < nvars; varID++)
+        vlistDefVarCode(vlistID2, varID, newval);
     }
-  else if ( operatorID == SETPARAM )
+  else if (operatorID == SETPARAM)
     {
       vlistDefVarParam(vlistID2, 0, newparam);
     }
-  else if ( operatorID == SETNAME )
+  else if (operatorID == SETNAME)
     {
       vlistDefVarName(vlistID2, 0, newname);
     }
-  else if ( operatorID == SETUNIT )
+  else if (operatorID == SETUNIT)
     {
       vlistDefVarUnits(vlistID2, 0, newunit);
     }
-  else if ( operatorID == SETTABNUM )
+  else if (operatorID == SETTABNUM)
     {
       int tableID;
       tableID = tableDef(-1, tabnum, NULL);
       nvars = vlistNvars(vlistID2);
-      for ( varID = 0; varID < nvars; varID++ )
-	vlistDefVarTable(vlistID2, varID, tableID);
+      for (varID = 0; varID < nvars; varID++)
+        vlistDefVarTable(vlistID2, varID, tableID);
     }
-  else if ( operatorID == SETLEVEL )
+  else if (operatorID == SETLEVEL)
     {
       nzaxis = vlistNzaxis(vlistID2);
-      for ( index = 0; index < nzaxis; index++ )
-	{
-	  zaxisID1 = vlistZaxis(vlistID2, index);
-	  zaxisID2 = zaxisDuplicate(zaxisID1);
-	  nlevs = zaxisInqSize(zaxisID2);
-	  levels = (double*) Malloc(nlevs*sizeof(double));
-	  cdoZaxisInqLevels(zaxisID2, levels);
-	  levels[0] = newlevel;
-	  zaxisDefLevels(zaxisID2, levels);
-	  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
-	  Free(levels);
-	}
+      for (index = 0; index < nzaxis; index++)
+        {
+          zaxisID1 = vlistZaxis(vlistID2, index);
+          zaxisID2 = zaxisDuplicate(zaxisID1);
+          nlevs = zaxisInqSize(zaxisID2);
+          levels = (double *) Malloc(nlevs * sizeof(double));
+          cdoZaxisInqLevels(zaxisID2, levels);
+          levels[0] = newlevel;
+          zaxisDefLevels(zaxisID2, levels);
+          vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
+          Free(levels);
+        }
     }
-  else if ( operatorID == SETLTYPE )
+  else if (operatorID == SETLTYPE)
     {
       nzaxis = vlistNzaxis(vlistID2);
-      for ( index = 0; index < nzaxis; index++ )
-	{
-	  zaxisID1 = vlistZaxis(vlistID2, index);
-	  zaxisID2 = zaxisDuplicate(zaxisID1);
+      for (index = 0; index < nzaxis; index++)
+        {
+          zaxisID1 = vlistZaxis(vlistID2, index);
+          zaxisID2 = zaxisDuplicate(zaxisID1);
 
-	  zaxistype = ZAXIS_GENERIC;
-	  zaxisChangeType(zaxisID2, zaxistype);
-	  zaxisDefLtype(zaxisID2, newval);
-	  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
-	}
+          zaxistype = ZAXIS_GENERIC;
+          zaxisChangeType(zaxisID2, zaxistype);
+          zaxisDefLtype(zaxisID2, newval);
+          vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
+        }
     }
 
   // vlistPrint(vlistID2);
@@ -168,23 +168,23 @@ void *Set(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID1 = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID1);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	  pstreamReadRecord(streamID1, array, &nmiss);
-	  pstreamWriteRecord(streamID2, array, nmiss);
-	}
+
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          pstreamReadRecord(streamID1, array, &nmiss);
+          pstreamWriteRecord(streamID2, array, nmiss);
+        }
 
       tsID1++;
     }
@@ -192,7 +192,7 @@ void *Set(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 

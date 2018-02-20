@@ -28,15 +28,16 @@
 
 void genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds);
 
-int getkeyval_dp(const char *keyval, const char *key, double *val)
+int
+getkeyval_dp(const char *keyval, const char *key, double *val)
 {
   int status = 0;
   size_t keylen = strlen(key);
 
-  if ( strncmp(keyval, key, keylen) == 0 )
+  if (strncmp(keyval, key, keylen) == 0)
     {
-      const char *pkv = keyval+keylen;
-      if ( pkv[0] == '=' && pkv[1] != 0 )
+      const char *pkv = keyval + keylen;
+      if (pkv[0] == '=' && pkv[1] != 0)
         {
           *val = parameter2double(&pkv[1]);
           status = 1;
@@ -50,8 +51,8 @@ int getkeyval_dp(const char *keyval, const char *key, double *val)
   return status;
 }
 
-
-void *Setzaxis(void *process)
+void *
+Setzaxis(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -71,24 +72,29 @@ void *Setzaxis(void *process)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == SETZAXIS )
+  if (operatorID == SETZAXIS)
     {
-      operatorInputArg(cdoOperatorEnter(operatorID));  
+      operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(1);
       zaxisID2 = cdoDefineZaxis(operatorArgv()[0]);
     }
-  else if ( operatorID == GENLEVELBOUNDS )
-    { 
+  else if (operatorID == GENLEVELBOUNDS)
+    {
       unsigned npar = operatorArgc();
       char **parnames = operatorArgv();
 
-      for ( unsigned i = 0; i < npar; i++ )
+      for (unsigned i = 0; i < npar; i++)
         {
-          if ( cdoVerbose ) cdoPrint("keyval[%d]: %s", i+1, parnames[i]);
-          
-          if      ( !lzbot && getkeyval_dp(parnames[i], "zbot", &zbot) ) lzbot = true;
-          else if ( !lztop && getkeyval_dp(parnames[i], "ztop", &ztop) ) lztop = true;
-          else cdoAbort("Parameter >%s< unsupported! Supported parameter are: zbot, ztop", parnames[i]);
+          if (cdoVerbose) cdoPrint("keyval[%d]: %s", i + 1, parnames[i]);
+
+          if (!lzbot && getkeyval_dp(parnames[i], "zbot", &zbot))
+            lzbot = true;
+          else if (!lztop && getkeyval_dp(parnames[i], "ztop", &ztop))
+            lztop = true;
+          else
+            cdoAbort("Parameter >%s< unsupported! Supported parameter are: "
+                     "zbot, ztop",
+                     parnames[i]);
         }
     }
 
@@ -103,74 +109,76 @@ void *Setzaxis(void *process)
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  if ( operatorID == SETZAXIS )
+  if (operatorID == SETZAXIS)
     {
       found = 0;
       nzaxis = vlistNzaxis(vlistID1);
-      for ( index = 0; index < nzaxis; index++ )
-	{
-	  zaxisID1 = vlistZaxis(vlistID1, index);
+      for (index = 0; index < nzaxis; index++)
+        {
+          zaxisID1 = vlistZaxis(vlistID1, index);
 
-	  if ( zaxisInqSize(zaxisID1) == zaxisInqSize(zaxisID2) )
-	    {
-	      vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
-	      found++;
-	    }
-	}
-      if ( ! found ) cdoWarning("No zaxis with %d levels found!", zaxisInqSize(zaxisID2));
+          if (zaxisInqSize(zaxisID1) == zaxisInqSize(zaxisID2))
+            {
+              vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
+              found++;
+            }
+        }
+      if (!found)
+        cdoWarning("No zaxis with %d levels found!", zaxisInqSize(zaxisID2));
     }
-  else if ( operatorID == GENLEVELBOUNDS )
+  else if (operatorID == GENLEVELBOUNDS)
     {
       nzaxis = vlistNzaxis(vlistID1);
-      for ( index = 0; index < nzaxis; index++ )
-	{
-	  zaxisID1 = vlistZaxis(vlistID1, index);
+      for (index = 0; index < nzaxis; index++)
+        {
+          zaxisID1 = vlistZaxis(vlistID1, index);
           int nlev = zaxisInqSize(zaxisID1);
-          double *levels  = (double *) Malloc(nlev*sizeof(double));
-          double *lbounds = (double *) Malloc(nlev*sizeof(double));
-          double *ubounds = (double *) Malloc(nlev*sizeof(double));
+          double *levels = (double *) Malloc(nlev * sizeof(double));
+          double *lbounds = (double *) Malloc(nlev * sizeof(double));
+          double *ubounds = (double *) Malloc(nlev * sizeof(double));
 
-          if ( nlev > 1 )
+          if (nlev > 1)
             {
               cdoZaxisInqLevels(zaxisID1, levels);
               zaxisID2 = zaxisDuplicate(zaxisID1);
-              if ( !zaxisInqLevels(zaxisID1, NULL) ) zaxisDefLevels(zaxisID2, levels);
+              if (!zaxisInqLevels(zaxisID1, NULL))
+                zaxisDefLevels(zaxisID2, levels);
 
               genLayerBounds(nlev, levels, lbounds, ubounds);
 
-              if ( lzbot ) lbounds[0] = zbot;
-              if ( lztop ) ubounds[nlev-1] = ztop;
+              if (lzbot) lbounds[0] = zbot;
+              if (lztop) ubounds[nlev - 1] = ztop;
               zaxisDefLbounds(zaxisID2, lbounds);
               zaxisDefUbounds(zaxisID2, ubounds);
-	      vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
+              vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
             }
 
           Free(levels);
           Free(lbounds);
           Free(ubounds);
-	}
+        }
     }
 
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	  pstreamReadRecord(streamID1, array, &nmiss);
-	  pstreamWriteRecord(streamID2, array, nmiss);
-	}
+
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          pstreamReadRecord(streamID1, array, &nmiss);
+          pstreamWriteRecord(streamID2, array, nmiss);
+        }
 
       tsID++;
     }
@@ -178,7 +186,7 @@ void *Setzaxis(void *process)
   pstreamClose(streamID1);
   pstreamClose(streamID2);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 

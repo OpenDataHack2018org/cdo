@@ -20,31 +20,34 @@
 
 #include "field.h"
 
-typedef struct {
+typedef struct
+{
   double min;
   double max;
   double step;
-  int    nbins;
-  int    nsamp;
-  void  *ptr;
-}
-HISTOGRAM;
+  int nbins;
+  int nsamp;
+  void *ptr;
+} HISTOGRAM;
 
-typedef struct {
-  int    nvars;
-  int   *nlevels;
-  int   *grids;
+typedef struct
+{
+  int nvars;
+  int *nlevels;
+  int *grids;
   HISTOGRAM ***histograms;
-}
-HISTOGRAM_SET;
-
+} HISTOGRAM_SET;
 
 HISTOGRAM_SET *hsetCreate(int nvars);
-void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int nhists);
+void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels,
+                         int nhists);
 void hsetDestroy(HISTOGRAM_SET *hset);
 
-void hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID, const field_type *min, const field_type *max);
-void hsetAddVarLevelValues(HISTOGRAM_SET *histField, int varID, int levelID, const field_type *field);
-void hsetGetVarLevelPercentiles(field_type *field, const HISTOGRAM_SET *hset, int varID, int levelID, double pn); 
+void hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID,
+                           const field_type *min, const field_type *max);
+void hsetAddVarLevelValues(HISTOGRAM_SET *histField, int varID, int levelID,
+                           const field_type *field);
+void hsetGetVarLevelPercentiles(field_type *field, const HISTOGRAM_SET *hset,
+                                int varID, int levelID, double pn);
 
 #endif /* PERCENTILES_HIST_H_ */

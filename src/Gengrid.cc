@@ -20,14 +20,13 @@
 
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Gengrid(void *process)
+void *
+Gengrid(void *process)
 {
   int varID, levelID;
   size_t nmiss1, nmiss2;
@@ -44,16 +43,16 @@ void *Gengrid(void *process)
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
 
-  if ( gridInqSize(gridID1) != gridInqSize(gridID2) )
+  if (gridInqSize(gridID1) != gridInqSize(gridID2))
     cdoAbort("Arrays have different grid size!");
 
   size_t gridsize = gridInqSize(gridID1);
   size_t xsize = gridInqXsize(gridID1);
   size_t ysize = gridInqYsize(gridID1);
 
-  double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize*sizeof(double));
-  double *array3 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double *) Malloc(gridsize * sizeof(double));
+  double *array2 = (double *) Malloc(gridsize * sizeof(double));
+  double *array3 = (double *) Malloc(gridsize * sizeof(double));
 
   cdoStreamInqTimestep(streamID1, 0);
   cdoStreamInqTimestep(streamID2, 0);
@@ -68,20 +67,19 @@ void *Gengrid(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( nmiss1 || nmiss2 ) cdoAbort("Missing values unsupported!");
+  if (nmiss1 || nmiss2) cdoAbort("Missing values unsupported!");
 
   int gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
 
-  if ( cdoVerbose ) cdoPrint("xsize %zu  ysize %zu", xsize, ysize);
-  if ( xsize*ysize != gridsize )
-    cdoAbort("xsize*ysize != gridsize");
+  if (cdoVerbose) cdoPrint("xsize %zu  ysize %zu", xsize, ysize);
+  if (xsize * ysize != gridsize) cdoAbort("xsize*ysize != gridsize");
 
   gridDefXsize(gridID3, xsize);
   gridDefYsize(gridID3, ysize);
   gridDefXvals(gridID3, array1);
   gridDefYvals(gridID3, array2);
 
-  if ( datatype == CDI_DATATYPE_FLT64 )
+  if (datatype == CDI_DATATYPE_FLT64)
     gridDefDatatype(gridID3, CDI_DATATYPE_FLT64);
   else
     gridDefDatatype(gridID3, CDI_DATATYPE_FLT32);
@@ -91,17 +89,17 @@ void *Gengrid(void *process)
   arrayMinMax(gridsize, array1, &xminval, &xmaxval);
   arrayMinMax(gridsize, array2, &yminval, &ymaxval);
 
-  if ( cdoVerbose )
-    cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g",
-	     xminval, xmaxval, yminval, ymaxval);
+  if (cdoVerbose)
+    cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g", xminval,
+             xmaxval, yminval, ymaxval);
 
   /* check units */
-  if ( xminval > -4 && xmaxval < 8 && yminval > -2 && ymaxval < 2 )
+  if (xminval > -4 && xmaxval < 8 && yminval > -2 && ymaxval < 2)
     {
       gridDefXunits(gridID3, "radians");
       gridDefYunits(gridID3, "radians");
     }
-  else if ( xminval > -181 && xmaxval < 361 && yminval > -91 && ymaxval < 91 )
+  else if (xminval > -181 && xmaxval < 361 && yminval > -91 && ymaxval < 91)
     {
       /* default is degrees */
     }
@@ -129,16 +127,17 @@ void *Gengrid(void *process)
   int tsID = 0;
   pstreamDefTimestep(streamID3, tsID);
 
-  for ( size_t i = 0; i < gridsize; ++i ) array3[i] = missval;
+  for (size_t i = 0; i < gridsize; ++i)
+    array3[i] = missval;
 
   pstreamDefRecord(streamID3, 0, 0);
   pstreamWriteRecord(streamID3, array3, gridsize);
 
   pstreamClose(streamID3);
 
-  if ( array1 ) Free(array1);
-  if ( array2 ) Free(array2);
-  if ( array3 ) Free(array3);
+  if (array1) Free(array1);
+  if (array2) Free(array2);
+  if (array3) Free(array3);
 
   cdoFinish();
 

@@ -31,7 +31,6 @@
       Zonstat    zonpctl         Zonal percentiles
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -39,8 +38,8 @@
 #include "grid.h"
 #include "percentiles.h"
 
-
-void *Zonstat(void *process)
+void *
+Zonstat(void *process)
 {
   int gridID1 = -1, gridID2 = -1;
   int zongridID = -1;
@@ -69,7 +68,7 @@ void *Zonstat(void *process)
   int operfunc = cdoOperatorF1(operatorID);
 
   double pn = 0;
-  if ( operfunc == func_pctl )
+  if (operfunc == func_pctl)
     {
       operatorInputArg("percentile number");
       pn = parameter2double(operatorArgv()[0]);
@@ -86,41 +85,43 @@ void *Zonstat(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     {
-      if ( gridInqXsize(vlistGrid(vlistID1, index)) > 1 ) 
-	{
-	  if ( gridID1 == -1 ) gridID1 = vlistGrid(vlistID1, index);
-	}
+      if (gridInqXsize(vlistGrid(vlistID1, index)) > 1)
+        {
+          if (gridID1 == -1) gridID1 = vlistGrid(vlistID1, index);
+        }
       else
-	{
-	  if ( zongridID == -1 ) zongridID = vlistGrid(vlistID1, index);
-	}
+        {
+          if (zongridID == -1) zongridID = vlistGrid(vlistID1, index);
+        }
     }
 
   int ndiffgrids = 0;
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     {
-      if ( zongridID != -1 && zongridID == vlistGrid(vlistID1, index) ) continue;
-      if ( gridID1 != vlistGrid(vlistID1, index) ) ndiffgrids++;
+      if (zongridID != -1 && zongridID == vlistGrid(vlistID1, index)) continue;
+      if (gridID1 != vlistGrid(vlistID1, index)) ndiffgrids++;
     }
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
+  if (ndiffgrids > 0) cdoAbort("Too many different grids!");
 
-  if ( gridID1 != -1 )
+  if (gridID1 != -1)
     {
-      if ( gridInqType(gridID1) == GRID_LONLAT   ||
-	   gridInqType(gridID1) == GRID_GAUSSIAN ||
-	   gridInqType(gridID1) == GRID_GENERIC )
-	{
-	  if ( zongridID != -1 && gridInqYsize(zongridID) == gridInqYsize(gridID1) )
-	    gridID2 = zongridID;
-	  else
-	    gridID2 = gridToZonal(gridID1);
-	}
+      if (gridInqType(gridID1) == GRID_LONLAT
+          || gridInqType(gridID1) == GRID_GAUSSIAN
+          || gridInqType(gridID1) == GRID_GENERIC)
+        {
+          if (zongridID != -1
+              && gridInqYsize(zongridID) == gridInqYsize(gridID1))
+            gridID2 = zongridID;
+          else
+            gridID2 = gridToZonal(gridID1);
+        }
       else
-	{
-	  cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
-	}
+        {
+          cdoAbort("Unsupported gridtype: %s",
+                   gridNamePtr(gridInqType(gridID1)));
+        }
     }
   else
     {
@@ -128,7 +129,7 @@ void *Zonstat(void *process)
       cdoWarning("Input stream contains only zonal data!");
     }
 
-  for ( index = 0; index < ngrids; index++ )
+  for (index = 0; index < ngrids; index++)
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -142,42 +143,42 @@ void *Zonstat(void *process)
   field_type field1, field2;
   field_init(&field2);
   field_init(&field2);
-  field1.ptr  = (double*) Malloc(lim*sizeof(double));
-  field2.ptr  = (double*) Malloc(nlatmax*sizeof(double));
+  field1.ptr = (double *) Malloc(lim * sizeof(double));
+  field2.ptr = (double *) Malloc(nlatmax * sizeof(double));
   field2.grid = gridID2;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
 
-          field1.nmiss   = nmiss;
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
-	  field2.missval = vlistInqVarMissval(vlistID1, varID);
+          field1.nmiss = nmiss;
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
+          field2.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( zongridID != -1 && zongridID == field1.grid )
-	    {
-	      arrayCopy(nlatmax, field1.ptr, field2.ptr);
-	      field2.nmiss = field1.nmiss;
-	    }
-	  else
-	    {
-	      if ( operfunc == func_pctl )
-		zonpctl(field1, & field2, pn);
-	      else  
-		zonfun(field1, &field2, operfunc);
-	    }
+          if (zongridID != -1 && zongridID == field1.grid)
+            {
+              arrayCopy(nlatmax, field1.ptr, field2.ptr);
+              field2.nmiss = field1.nmiss;
+            }
+          else
+            {
+              if (operfunc == func_pctl)
+                zonpctl(field1, &field2, pn);
+              else
+                zonfun(field1, &field2, operfunc);
+            }
 
-	  pstreamDefRecord(streamID2, varID,  levelID);
-	  pstreamWriteRecord(streamID2, field2.ptr, field2.nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, field2.ptr, field2.nmiss);
+        }
 
       tsID++;
     }
@@ -185,8 +186,8 @@ void *Zonstat(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( field1.ptr ) Free(field1.ptr);
-  if ( field2.ptr ) Free(field2.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field2.ptr) Free(field2.ptr);
 
   cdoFinish();
 

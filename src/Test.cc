@@ -20,8 +20,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Test(void *process)
+void *
+Test(void *process)
 {
   /*
   int streamID1, streamID2;
@@ -41,8 +41,8 @@ void *Test(void *process)
   return 0;
 }
 
-
-void *Test2(void *process)
+void *
+Test2(void *process)
 {
   /*
   int streamID1, streamID2, streamID3;
@@ -64,8 +64,8 @@ void *Test2(void *process)
   return 0;
 }
 
-
-void *Testdata(void *process)
+void *
+Testdata(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -89,59 +89,64 @@ void *Testdata(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double*) Malloc(gridsize*sizeof(double));
-  float *fval = (float*) Malloc(gridsize*sizeof(float));
-  int *ival = (int*) Malloc(gridsize*sizeof(int));
-  unsigned char *cval = (unsigned char*) Malloc(gridsize*sizeof(unsigned char)*4);
-  unsigned char *cval2 = (unsigned char*) Malloc(gridsize*sizeof(unsigned char)*4);
+  double *array = (double *) Malloc(gridsize * sizeof(double));
+  float *fval = (float *) Malloc(gridsize * sizeof(float));
+  int *ival = (int *) Malloc(gridsize * sizeof(int));
+  unsigned char *cval
+      = (unsigned char *) Malloc(gridsize * sizeof(unsigned char) * 4);
+  unsigned char *cval2
+      = (unsigned char *) Malloc(gridsize * sizeof(unsigned char) * 4);
 
   FILE *fp = fopen("testdata", "w");
 
   int tsID1 = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID2);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	  pstreamReadRecord(streamID1, array, &nmiss);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  for ( size_t i = 0; i < gridsize; ++i )
-	    {
-	      fval[i] = (float) array[i];
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
 
-	      memcpy(&ival[i], &fval[i], 4);
-	      memcpy(&cval[i*4], &fval[i], 4);
+          pstreamReadRecord(streamID1, array, &nmiss);
 
-	      cval2[i+gridsize*0] = cval[i*4+0];
-	      cval2[i+gridsize*1] = cval[i*4+1];
-	      cval2[i+gridsize*2] = cval[i*4+2];
-	      cval2[i+gridsize*3] = cval[i*4+3];
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          for (size_t i = 0; i < gridsize; ++i)
+            {
+              fval[i] = (float) array[i];
 
-	      if ( tsID1 == 0 && recID == 0 )
-	      printf("%4zu %3d %3d %3d %3d %d %g\n",
-		     i, (unsigned int)cval[4*i+0], (unsigned int)cval[4*i+1], (unsigned int)cval[4*i+2], (unsigned int)cval[4*i+3], ival[i], fval[i]);
-	    }
+              memcpy(&ival[i], &fval[i], 4);
+              memcpy(&cval[i * 4], &fval[i], 4);
 
-	  pstreamWriteRecord(streamID2, array, nmiss);
+              cval2[i + gridsize * 0] = cval[i * 4 + 0];
+              cval2[i + gridsize * 1] = cval[i * 4 + 1];
+              cval2[i + gridsize * 2] = cval[i * 4 + 2];
+              cval2[i + gridsize * 3] = cval[i * 4 + 3];
 
-	  fwrite(cval, 4, gridsize, fp);
-	}
+              if (tsID1 == 0 && recID == 0)
+                printf("%4zu %3d %3d %3d %3d %d %g\n", i,
+                       (unsigned int) cval[4 * i + 0],
+                       (unsigned int) cval[4 * i + 1],
+                       (unsigned int) cval[4 * i + 2],
+                       (unsigned int) cval[4 * i + 3], ival[i], fval[i]);
+            }
+
+          pstreamWriteRecord(streamID2, array, nmiss);
+
+          fwrite(cval, 4, gridsize, fp);
+        }
 
       tsID1++;
       tsID2++;
     }
-  
+
   fclose(fp);
   pstreamClose(streamID1);
   pstreamClose(streamID2);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 

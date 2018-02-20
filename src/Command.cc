@@ -19,20 +19,18 @@
    This module contains the following operators:
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "process_int.h"
 #include "counter.h"
 
-
 typedef struct
 {
-  int   param;
-  char  name[CDI_MAX_NAME];
-  char  longname[CDI_MAX_NAME];
-  char  units[CDI_MAX_NAME];
+  int param;
+  char name[CDI_MAX_NAME];
+  char longname[CDI_MAX_NAME];
+  char units[CDI_MAX_NAME];
 } vars_t;
 
 vars_t *all_vars = NULL;
@@ -56,88 +54,87 @@ int com_quit(const char *);
 int com_stat(const char *);
 int com_set(const char *);
 int com_vars(const char *);
-//int com_stat(char *);
+// int com_stat(char *);
 
+typedef struct
+{
+  const char *name;          /* User printable name of the function. */
+  int (*func)(const char *); /* Function to call to do the job. */
+  const char *doc;           /* Documentation for this function. */
+} command_t;
 
-typedef struct {
-  const char  *name; /* User printable name of the function. */
-  int  (*func)(const char *); /* Function to call to do the job. */
-  const char  *doc; /* Documentation for this function. */
-}
-command_t;
-
-command_t commands[] = {
-  { "help", com_help, "Display this text" },
-  { "?",    com_help, "Synonym for 'help'" },
-  { "list", com_list, "List files in DIR" },
-  { "quit", com_quit, "Quit using CDO" },
-  { "stat", com_stat, "Statistic for selected field" },
-  { "set",  com_set,  "set variables" },
-  { "vars", com_vars, "list variables" },
-  //  { "stat", com_stat, "Print out statistics on FILE" },
-  { NULL, NULL, NULL }
-};
-
+command_t commands[]
+    = { { "help", com_help, "Display this text" },
+        { "?", com_help, "Synonym for 'help'" },
+        { "list", com_list, "List files in DIR" },
+        { "quit", com_quit, "Quit using CDO" },
+        { "stat", com_stat, "Statistic for selected field" },
+        { "set", com_set, "set variables" },
+        { "vars", com_vars, "list variables" },
+        //  { "stat", com_stat, "Print out statistics on FILE" },
+        { NULL, NULL, NULL } };
 
 /* Return non-zero if ARG is a valid argument for CALLER, else print
 an error message and return zero. */
-int valid_argument (char *caller, char *arg)
+int
+valid_argument(char *caller, char *arg)
 {
   if (!arg || !*arg)
     {
-      fprintf (stderr, "%s: Argument required.\n", caller);
+      fprintf(stderr, "%s: Argument required.\n", caller);
       return 0;
     }
   return 1;
 }
 
 /* Print out help for ARG, or for all of the commands if ARG is not present. */
-int com_help(const char *arg)
+int
+com_help(const char *arg)
 {
   int printed = 0;
 
-  for ( int i = 0; commands[i].name; i++ )
+  for (int i = 0; commands[i].name; i++)
     {
-      if (!*arg || (strcmp (arg, commands[i].name) == 0))
-	{
-	  printf ("%s\t\t%s.\n", commands[i].name, commands[i].doc);
-	  printed++;
-	}
+      if (!*arg || (strcmp(arg, commands[i].name) == 0))
+        {
+          printf("%s\t\t%s.\n", commands[i].name, commands[i].doc);
+          printed++;
+        }
     }
 
-  if ( !printed )
+  if (!printed)
     {
-      printf ("No commands match '%s'. Possibilties are:\n", arg);
-      for ( int i = 0; commands[i].name; i++ )
-	{
-	  /* Print in six columns. */
-	  if ( printed == 6 )
-	    {
-	      printed = 0;
-	      printf ("\n");
-	    }
-	  printf("%s\t", commands[i].name);
-	  printed++;
-	}
+      printf("No commands match '%s'. Possibilties are:\n", arg);
+      for (int i = 0; commands[i].name; i++)
+        {
+          /* Print in six columns. */
+          if (printed == 6)
+            {
+              printed = 0;
+              printf("\n");
+            }
+          printf("%s\t", commands[i].name);
+          printed++;
+        }
 
-      if (printed) printf ("\n");
+      if (printed) printf("\n");
     }
 
   return 0;
 }
 
-
 /* List the file(s) named in arg. */
-int com_list(const char *arg)
+int
+com_list(const char *arg)
 {
-  if (!arg)
-    arg = "";
+  if (!arg) arg = "";
 
   return 0;
 }
 
 /* The user wishes to quit using this program. Just set DONE non-zero. */
-int com_quit(const char *arg)
+int
+com_quit(const char *arg)
 {
   UNUSED(arg);
 
@@ -146,71 +143,72 @@ int com_quit(const char *arg)
   return 0;
 }
 
-
-int com_stat(const char *arg)
-{ 
+int
+com_stat(const char *arg)
+{
   UNUSED(arg);
 
   fprintf(stdout, "name=%s\n", all_vars[gl_varID].name);
 
-  for ( int tsID = gl_tsID1; tsID <= gl_tsID2; ++tsID )
+  for (int tsID = gl_tsID1; tsID <= gl_tsID2; ++tsID)
     {
       int nrecs = streamInqTimestep(gl_streamID, tsID);
-      if ( nrecs == 0 )
-	{
-	  fprintf(stderr, "Timestep %d out of range!\n", tsID+1);
-	  break;
-	}
+      if (nrecs == 0)
+        {
+          fprintf(stderr, "Timestep %d out of range!\n", tsID + 1);
+          break;
+        }
       else
-	{
-	  size_t nmiss;
-	  size_t gridsize;
-	  double fmin = 1.e50 , fmax = -1.e50, fmean = 0;
-	  counter_t counter;
-	  
-	  counter_start(&counter);
-	  streamReadVarSlice(gl_streamID, gl_varID, levelID, gl_data, &nmiss);
-	  gridsize = gridInqSize(vlistInqVarGrid(gl_vlistID, gl_varID));
-	  for ( size_t i = 0; i < gridsize; ++i )
-	    {
-	      if ( gl_data[i] < fmin ) fmin = gl_data[i];
-	      if ( gl_data[i] > fmax ) fmax = gl_data[i];
-	      fmean += gl_data[i];
-	    }
-	  fmean /= gridsize;
-	  counter_stop(&counter);
-	  
-	  fprintf(stdout, "timestep=%d %g %g %g (%gs)\n",
-		  tsID+1, fmin, fmean, fmax,
-		  counter_cputime(counter));
-	}
+        {
+          size_t nmiss;
+          size_t gridsize;
+          double fmin = 1.e50, fmax = -1.e50, fmean = 0;
+          counter_t counter;
+
+          counter_start(&counter);
+          streamReadVarSlice(gl_streamID, gl_varID, levelID, gl_data, &nmiss);
+          gridsize = gridInqSize(vlistInqVarGrid(gl_vlistID, gl_varID));
+          for (size_t i = 0; i < gridsize; ++i)
+            {
+              if (gl_data[i] < fmin) fmin = gl_data[i];
+              if (gl_data[i] > fmax) fmax = gl_data[i];
+              fmean += gl_data[i];
+            }
+          fmean /= gridsize;
+          counter_stop(&counter);
+
+          fprintf(stdout, "timestep=%d %g %g %g (%gs)\n", tsID + 1, fmin, fmean,
+                  fmax, counter_cputime(counter));
+        }
     }
 
   return 0;
 }
 
-
-int com_set(const char *arg)
+int
+com_set(const char *arg)
 {
   printf("com_set: %s\n", arg);
 
   return 0;
 }
 
-
-int com_vars(const char *arg)
+int
+com_vars(const char *arg)
 {
   char paramstr[32];
 
-  if ( !arg ) arg = "";
+  if (!arg) arg = "";
   printf("com_vars: %s %d\n", arg, gl_nvars);
 
-  for ( int varID = 0; varID < gl_nvars; ++varID )
+  for (int varID = 0; varID < gl_nvars; ++varID)
     {
       cdiParamToString(all_vars[varID].param, paramstr, sizeof(paramstr));
 
-      fprintf(stdout,"varID=%3d, param=%s, name=%s, longname=\"%s\", units=\"%s\"\n",
-	      varID+1, paramstr, all_vars[varID].name, all_vars[varID].longname, all_vars[varID].units);
+      fprintf(stdout,
+              "varID=%3d, param=%s, name=%s, longname=\"%s\", units=\"%s\"\n",
+              varID + 1, paramstr, all_vars[varID].name,
+              all_vars[varID].longname, all_vars[varID].units);
     }
 
   return 0;
@@ -218,49 +216,53 @@ int com_vars(const char *arg)
 
 /* Look up NAME as the name of a command, and return a pointer to that
    command. Return a NULL pointer if NAME isn't a command name. */
-command_t *find_command(char *name)
+command_t *
+find_command(char *name)
 {
-  for ( int i = 0; commands[i].name; i++ )
-    if ( strcmp(name, commands[i].name) == 0)
-      return &commands[i];
+  for (int i = 0; commands[i].name; i++)
+    if (strcmp(name, commands[i].name) == 0) return &commands[i];
 
-  return (command_t *)NULL;
+  return (command_t *) NULL;
 }
 
 // Execute a command line.
-int execute_line(char *line)
+int
+execute_line(char *line)
 {
   // Isolate the command word.
   int i = 0;
-  while ( line[i] && isspace(line[i]) )  i++;
+  while (line[i] && isspace(line[i]))
+    i++;
   char *word = line + i;
-  while ( line[i] && !isspace(line[i]) ) i++;
+  while (line[i] && !isspace(line[i]))
+    i++;
 
-  if ( line[i] ) line[i++] = '\0';
+  if (line[i]) line[i++] = '\0';
 
   command_t *command = find_command(word);
-  if ( !command )
+  if (!command)
     {
-      fprintf (stderr, "%s: No such command!\n", word);
+      fprintf(stderr, "%s: No such command!\n", word);
       return -1;
     }
   // Get argument to command, if any.
-  while ( isspace(line[i]) ) i++;
+  while (isspace(line[i]))
+    i++;
 
   word = line + i;
   // Call the function.
-  return (*(command->func)) (word);
+  return (*(command->func))(word);
 }
 
 // Strip isspace from the start and end of STRING. Return a pointer into STRING.
-char *stripwhite(char *string)
+char *
+stripwhite(char *string)
 {
   char *s;
   for (s = string; isspace(*s); s++)
     ;
-  if (*s == 0)
-    return s;
-  char *t = s + strlen (s) - 1;
+  if (*s == 0) return s;
+  char *t = s + strlen(s) - 1;
   while (t > s && isspace(*t))
     t--;
   *++t = '\0';
@@ -269,13 +271,14 @@ char *stripwhite(char *string)
 }
 
 extern "C" {
-size_t getPeakRSS( );
+size_t getPeakRSS();
 }
 
-void readcmd(const char *prompt, char *line, int size)
+void
+readcmd(const char *prompt, char *line, int size)
 {
   fputs(prompt, stdout);
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
       char memstring[32] = { "" };
       size_t memmax = getPeakRSS();
@@ -283,8 +286,12 @@ void readcmd(const char *prompt, char *line, int size)
         {
           size_t muindex = 0;
           const char *mu[] = { "B", "KB", "MB", "GB", "TB", "PB" };
-          const size_t nmu = sizeof(mu)/sizeof(char*);
-          while (memmax > 9999 && muindex < nmu-1) { memmax /= 1024; muindex++; }
+          const size_t nmu = sizeof(mu) / sizeof(char *);
+          while (memmax > 9999 && muindex < nmu - 1)
+            {
+              memmax /= 1024;
+              muindex++;
+            }
           snprintf(memstring, sizeof(memstring), "%zu%s", memmax, mu[muindex]);
         }
       fputs(" [", stdout);
@@ -295,16 +302,16 @@ void readcmd(const char *prompt, char *line, int size)
   fflush(stdout);
 
   *line = '\0';
-  if ( fgets(line, size, stdin) )
+  if (fgets(line, size, stdin))
     {
-      char *newline = strchr(line, '\n'); // check for trailing '\n'
-      if ( newline )
-	*newline = '\0'; // overwrite the '\n' with a terminating null
+      char *newline = strchr(line, '\n');  // check for trailing '\n'
+      if (newline)
+        *newline = '\0';  // overwrite the '\n' with a terminating null
     }
 }
 
-
-void command_init()
+void
+command_init()
 {
   gl_vlistID = streamInqVlist(gl_streamID);
   int taxisID = vlistInqTaxis(gl_vlistID);
@@ -312,12 +319,12 @@ void command_init()
   UNUSED(taxisID);
 
   size_t gridsize = vlistGridsizeMax(gl_vlistID);
-  gl_data = (double*) Malloc(gridsize*sizeof(double));
+  gl_data = (double *) Malloc(gridsize * sizeof(double));
 
   gl_nvars = vlistNvars(gl_vlistID);
-  all_vars = (vars_t*) Malloc(gl_nvars*sizeof(vars_t));
+  all_vars = (vars_t *) Malloc(gl_nvars * sizeof(vars_t));
 
-  for ( int varID = 0; varID < gl_nvars; ++varID )
+  for (int varID = 0; varID < gl_nvars; ++varID)
     {
       all_vars[varID].param = vlistInqVarParam(gl_vlistID, varID);
       vlistInqVarName(gl_vlistID, varID, all_vars[varID].name);
@@ -326,8 +333,8 @@ void command_init()
     }
 }
 
-
-void *Command(void *process)
+void *
+Command(void *process)
 {
   // int recID, varID, levelID;
   // size_t nmiss;
@@ -335,7 +342,7 @@ void *Command(void *process)
   double e_utime, e_stime;
   double c_cputime = 0, c_usertime = 0, c_systime = 0;
   char line[MAX_LINE];
- 
+
   cdoInitialize(process);
 
   processStartTime(&s_utime, &s_stime);
@@ -343,29 +350,29 @@ void *Command(void *process)
   gl_streamID = streamOpenRead(cdoGetStreamName(0).c_str());
 
   command_init();
-  
+
   // Loop reading and executing lines until the user quits.
-  while ( !Done )
+  while (!Done)
     {
       readcmd("cdo cmd", line, MAX_LINE);
 
       /* Remove leading and trailing whitespace from the line.
-	 Then, if there is anything left, add it to the history list
-	 and execute it. */
+         Then, if there is anything left, add it to the history list
+         and execute it. */
       char *s = stripwhite(line);
       if (*s) execute_line(s);
     }
- 
+
   streamClose(gl_streamID);
 
-  if ( gl_data ) Free(gl_data);
-  if ( all_vars ) Free(all_vars);
-  
+  if (gl_data) Free(gl_data);
+  if (all_vars) Free(all_vars);
+
   cdoProcessTime(&e_utime, &e_stime);
 
   c_usertime = e_utime - s_utime;
-  c_systime  = e_stime - s_stime;
-  c_cputime  = c_usertime + c_systime;
+  c_systime = e_stime - s_stime;
+  c_cputime = c_usertime + c_systime;
 
   s_utime = e_utime;
   s_stime = e_stime;

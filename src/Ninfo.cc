@@ -28,16 +28,25 @@
       Ninfo      ngrids          Number of grids
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Ninfo(void *process)
+void *
+Ninfo(void *process)
 {
-  enum {NYEAR, NMON, NDATE, NTIME, NPAR, NLEVEL, NGRIDPOINTS, NGRIDS};
+  enum
+  {
+    NYEAR,
+    NMON,
+    NDATE,
+    NTIME,
+    NPAR,
+    NLEVEL,
+    NGRIDPOINTS,
+    NGRIDS
+  };
   int varID;
   int date0 = 0;
   int day, mon0 = 0, mon, year0 = 0, year;
@@ -56,114 +65,109 @@ void *Ninfo(void *process)
   // clang-format on
 
   int operatorID = cdoOperatorID();
-  int operfunc   = cdoOperatorF1(operatorID);
+  int operfunc = cdoOperatorF1(operatorID);
 
   int streamID = cdoStreamOpenRead(0);
 
   int vlistID = cdoStreamInqVlist(streamID);
 
-  int nvars   = vlistNvars(vlistID);
+  int nvars = vlistNvars(vlistID);
   int taxisID = vlistInqTaxis(vlistID);
   int ntsteps = vlistNtsteps(vlistID);
-  int ngrids  = vlistNgrids(vlistID);
+  int ngrids = vlistNgrids(vlistID);
 
-  switch ( operfunc )
+  switch (operfunc)
     {
     case NYEAR:
       {
-      int nyear = 0;
-      int tsID = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) )
-	  {
-	    int vdate = taxisInqVdate(taxisID);
-	    cdiDecodeDate(vdate, &year, &mon, &day);
-	 
-	    if ( tsID == 0 || year0 != year )
-	      {
-		year0 = year;
-		nyear++;
-	      }
+        int nyear = 0;
+        int tsID = 0;
+        if (ntsteps != 0)
+          while (cdoStreamInqTimestep(streamID, tsID))
+            {
+              int vdate = taxisInqVdate(taxisID);
+              cdiDecodeDate(vdate, &year, &mon, &day);
 
-	    tsID++;
-	  }
-      fprintf(stdout, "%d\n", nyear);
-      break;
+              if (tsID == 0 || year0 != year)
+                {
+                  year0 = year;
+                  nyear++;
+                }
+
+              tsID++;
+            }
+        fprintf(stdout, "%d\n", nyear);
+        break;
       }
     case NMON:
       {
-      int nmon = 0;
-      int tsID = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) )
-	  {
-	    int vdate = taxisInqVdate(taxisID);
-	    cdiDecodeDate(vdate, &year, &mon, &day);
-	 
-	    if ( tsID == 0 || mon0 != mon )
-	      {
-		mon0 = mon;
-		nmon++;
-	      }
+        int nmon = 0;
+        int tsID = 0;
+        if (ntsteps != 0)
+          while (cdoStreamInqTimestep(streamID, tsID))
+            {
+              int vdate = taxisInqVdate(taxisID);
+              cdiDecodeDate(vdate, &year, &mon, &day);
 
-	    tsID++;
-	  }
-      fprintf(stdout, "%d\n", nmon);
-      break;
+              if (tsID == 0 || mon0 != mon)
+                {
+                  mon0 = mon;
+                  nmon++;
+                }
+
+              tsID++;
+            }
+        fprintf(stdout, "%d\n", nmon);
+        break;
       }
     case NDATE:
       {
-      int ndate = 0;
-      int tsID = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) )
-	  {
-	    int vdate = taxisInqVdate(taxisID);
-	    
-	    if ( tsID == 0 || date0 != vdate )
-	      {
-		date0 = vdate;
-		ndate++;
-	      }
+        int ndate = 0;
+        int tsID = 0;
+        if (ntsteps != 0)
+          while (cdoStreamInqTimestep(streamID, tsID))
+            {
+              int vdate = taxisInqVdate(taxisID);
 
-	    tsID++;
-	  }
-      fprintf(stdout, "%d\n", ndate);
-      break;
+              if (tsID == 0 || date0 != vdate)
+                {
+                  date0 = vdate;
+                  ndate++;
+                }
+
+              tsID++;
+            }
+        fprintf(stdout, "%d\n", ndate);
+        break;
       }
     case NTIME:
       {
-      int tsID = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) ) tsID++;
-      fprintf(stdout, "%d\n", tsID);
-      break;
+        int tsID = 0;
+        if (ntsteps != 0)
+          while (cdoStreamInqTimestep(streamID, tsID))
+            tsID++;
+        fprintf(stdout, "%d\n", tsID);
+        break;
       }
-    case NPAR:
-      fprintf(stdout, "%d\n", nvars);
-      break;
+    case NPAR: fprintf(stdout, "%d\n", nvars); break;
     case NLEVEL:
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  int zaxisID = vlistInqVarZaxis(vlistID, varID);
-	  int levelsize = zaxisInqSize(zaxisID);
-	  fprintf(stdout, "%d\n", levelsize);
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          int zaxisID = vlistInqVarZaxis(vlistID, varID);
+          int levelsize = zaxisInqSize(zaxisID);
+          fprintf(stdout, "%d\n", levelsize);
+        }
       break;
     case NGRIDPOINTS:
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  int gridID = vlistInqVarGrid(vlistID, varID);
-	  size_t gridsize = gridInqSize(gridID);
-	  fprintf(stdout, "%zu\n", gridsize);
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          int gridID = vlistInqVarGrid(vlistID, varID);
+          size_t gridsize = gridInqSize(gridID);
+          fprintf(stdout, "%zu\n", gridsize);
+        }
       break;
-    case NGRIDS:
-      fprintf(stdout, "%d\n", ngrids);
-      break;
-    default:
-      cdoAbort("operator not implemented!");
-      break;
+    case NGRIDS: fprintf(stdout, "%d\n", ngrids); break;
+    default: cdoAbort("operator not implemented!"); break;
     }
 
   pstreamClose(streamID);

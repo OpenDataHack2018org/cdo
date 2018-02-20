@@ -20,8 +20,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *EstFreq(void *process)
+void *
+EstFreq(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -48,95 +48,112 @@ void *EstFreq(void *process)
   int ntsteps = vlistNtsteps(vlistID1);
 
   double *array = NULL;
-  if ( ! lcopy )
+  if (!lcopy)
     {
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double*) Malloc(gridsize*sizeof(double));
+      array = (double *) Malloc(gridsize * sizeof(double));
     }
 
   int tsID = 0;
   int fyear, lyear, fmonth, lmonth, lymonth, dummy;
   int step_per_year = 0, step_per_month, currentyear, currentmon;
 
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = streamInqTimestep(streamID1, tsID)))
     {
-      if ( tsID == 0 )
+      if (tsID == 0)
         {
           cdiDecodeDate(taxisInqVdate(taxisID1), &fyear, &fmonth, &dummy);
           currentyear = fyear;
           currentmon = fmonth;
         }
       else
-        cdiDecodeDate(taxisInqVdate(taxisID1), &currentyear, &currentmon, &dummy);
-      if ( currentyear == fyear )
+        cdiDecodeDate(taxisInqVdate(taxisID1), &currentyear, &currentmon,
+                      &dummy);
+      if (currentyear == fyear)
         {
           lymonth = currentmon;
           step_per_year++;
         }
       taxisCopyTimestep(taxisID2, taxisID1);
       streamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamDefRecord(streamID2,  varID,  levelID);
-	  
-	  if ( lcopy )
-	    {
-	      streamCopyRecord(streamID2, streamID1);
-	    }
-	  else
-	    {
-	      streamReadRecord(streamID1, array, &nmiss);
-	      streamWriteRecord(streamID2, array, nmiss);
-	    }
-	}
+
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          streamInqRecord(streamID1, &varID, &levelID);
+          streamDefRecord(streamID2, varID, levelID);
+
+          if (lcopy)
+            {
+              streamCopyRecord(streamID2, streamID1);
+            }
+          else
+            {
+              streamReadRecord(streamID1, array, &nmiss);
+              streamWriteRecord(streamID2, array, nmiss);
+            }
+        }
 
       tsID++;
     }
 
   char frequency[CDI_MAX_NAME];
 
-  if ( ntsteps > 2 )
+  if (ntsteps > 2)
     {
-      int reclast = streamInqTimestep(streamID2, ntsteps);    
+      int reclast = streamInqTimestep(streamID2, ntsteps);
       cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummy);
-/* First, estimation by maximal number of time steps divided by covered years between last and first time step */
-      if ( cdoVerbose )
-        printf("Frequency is calculated by dividing the number of time steps '%d' included in the time axis by the covered years of the time axis\ncomputed by the difference of the year of the last time stamp '%d' and the year of the first time stamp '%d'.\n", ntsteps, lyear, fyear);
-      double covered_years = lyear-fyear + 1.0;
-      if ( DBL_IS_EQUAL(ntsteps / covered_years, 1.) )
+      /* First, estimation by maximal number of time steps divided by covered
+       * years between last and first time step */
+      if (cdoVerbose)
+        printf("Frequency is calculated by dividing the number of time steps "
+               "'%d' included in the time axis by the covered years of the "
+               "time axis\ncomputed by the difference of the year of the last "
+               "time stamp '%d' and the year of the first time stamp '%d'.\n",
+               ntsteps, lyear, fyear);
+      double covered_years = lyear - fyear + 1.0;
+      if (DBL_IS_EQUAL(ntsteps / covered_years, 1.))
         strcpy(frequency, "yr");
-      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 12.) )
+      else if (DBL_IS_EQUAL(ntsteps / covered_years, 12.))
         strcpy(frequency, "mon");
-      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365.) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 365.25) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 366.) )
+      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365.)
+               || DBL_IS_EQUAL(ntsteps / covered_years, 365.25)
+               || DBL_IS_EQUAL(ntsteps / covered_years, 366.))
         strcpy(frequency, "day");
-      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365.*4) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 365.25*4) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 366.*4) )
+      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365. * 4)
+               || DBL_IS_EQUAL(ntsteps / covered_years, 365.25 * 4)
+               || DBL_IS_EQUAL(ntsteps / covered_years, 366. * 4))
         strcpy(frequency, "6hr");
-      else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365.*8) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 365.25*8) ||
-                DBL_IS_EQUAL(ntsteps / covered_years, 366.*8) )
+      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365. * 8)
+               || DBL_IS_EQUAL(ntsteps / covered_years, 365.25 * 8)
+               || DBL_IS_EQUAL(ntsteps / covered_years, 366. * 8))
         strcpy(frequency, "3hr");
-      else 
+      else
         {
-          int covered_months = lmonth-fmonth+1;
-          if ( cdoVerbose )
-            printf("The fraction ntsteps / covered_years = '%f' is neither 1, 12, 365, 365.25, 366 nor a multiple of 365 which would correspond to frequencies yearly, monthly, daily or subdaily respectively.\n Next try:\n\nFrequency is calculated by dividing the number of time steps '%d' in year '%d' by the covered months in that year '%d'.\n", ntsteps/covered_years, step_per_year, fyear, covered_months);
-          if ( step_per_year > 366*8 )
-            cdoAbort("Step per year '%d' in year '%d' is bigger than 366*8 which corresponds to a frequency of sub-3hourly! This is not yet enabled.", step_per_year, fyear);
+          int covered_months = lmonth - fmonth + 1;
+          if (cdoVerbose)
+            printf("The fraction ntsteps / covered_years = '%f' is neither 1, "
+                   "12, 365, 365.25, 366 nor a multiple of 365 which would "
+                   "correspond to frequencies yearly, monthly, daily or "
+                   "subdaily respectively.\n Next try:\n\nFrequency is "
+                   "calculated by dividing the number of time steps '%d' in "
+                   "year '%d' by the covered months in that year '%d'.\n",
+                   ntsteps / covered_years, step_per_year, fyear,
+                   covered_months);
+          if (step_per_year > 366 * 8)
+            cdoAbort("Step per year '%d' in year '%d' is bigger than 366*8 "
+                     "which corresponds to a frequency of sub-3hourly! This is "
+                     "not yet enabled.",
+                     step_per_year, fyear);
           else
             {
-              if ( (double)step_per_year / (double)covered_months > 31*8 )
+              if ((double) step_per_year / (double) covered_months > 31 * 8)
                 cdoAbort("Frequency is sub-3hourly! Not yet enabled.");
-              else if ( (double)step_per_year / (double)covered_months > 31*4 )
+              else if ((double) step_per_year / (double) covered_months
+                       > 31 * 4)
                 strcpy(frequency, "3hr");
-              else if ( (double)step_per_year / (double)covered_months > 31 )
+              else if ((double) step_per_year / (double) covered_months > 31)
                 strcpy(frequency, "6hr");
-              else if ( (double)step_per_year / (double)covered_months > 1 )
+              else if ((double) step_per_year / (double) covered_months > 1)
                 strcpy(frequency, "day");
               else
                 strcpy(frequency, "mon");
@@ -144,8 +161,10 @@ void *EstFreq(void *process)
         }
     }
   else
-    cdoAbort("For %d found timesteps no frequency can be computed - at least 3 timesteps are required.", ntsteps);
-  if ( cdoVerbose )
+    cdoAbort("For %d found timesteps no frequency can be computed - at least 3 "
+             "timesteps are required.",
+             ntsteps);
+  if (cdoVerbose)
     printf("Your file indicates a frequency of '%s'.\n", frequency);
   cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", 3, frequency);
 
@@ -154,7 +173,7 @@ void *EstFreq(void *process)
 
   vlistDestroy(vlistID2);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 

@@ -20,10 +20,11 @@
 #include "dmemory.h"
 #include "listbuf.h"
 
-listbuf_t *listbuf_new(void)
+listbuf_t *
+listbuf_new(void)
 {
   listbuf_t *listbuf = (listbuf_t *) malloc(sizeof(listbuf_t));
-  if ( listbuf )
+  if (listbuf)
     {
       listbuf->size = 0;
       listbuf->buffer = NULL;
@@ -33,24 +34,24 @@ listbuf_t *listbuf_new(void)
   return listbuf;
 }
 
-
-int listbuf_read(listbuf_t *listbuf, FILE *fp, const char *name)
+int
+listbuf_read(listbuf_t *listbuf, FILE *fp, const char *name)
 {
   int filedes = fileno(fp);
   struct stat buf;
   size_t filesize = 0;
-  if ( fstat(filedes, &buf) == 0 ) filesize = (size_t) buf.st_size;
+  if (fstat(filedes, &buf) == 0) filesize = (size_t) buf.st_size;
 
-  if ( filesize == 0 )
+  if (filesize == 0)
     {
       fprintf(stderr, "%s: empty stream: %s\n", __func__, name);
       return -1;
     }
 
-  char *buffer = (char*) Malloc(filesize);
+  char *buffer = (char *) Malloc(filesize);
   size_t nitems = fread(buffer, 1, filesize, fp);
 
-  if ( nitems != filesize )
+  if (nitems != filesize)
     {
       Free(buffer);
       fprintf(stderr, "%s: read failed on %s!\n", __func__, name);
@@ -60,23 +61,21 @@ int listbuf_read(listbuf_t *listbuf, FILE *fp, const char *name)
   listbuf->size = filesize;
   listbuf->buffer = buffer;
 
-  if ( name ) listbuf->name = strdup(name);
+  if (name) listbuf->name = strdup(name);
 
   return 0;
 }
 
-
-void listbuf_destroy(listbuf_t *listbuf)
+void
+listbuf_destroy(listbuf_t *listbuf)
 {
-  if ( listbuf )
+  if (listbuf)
     {
-      if ( listbuf->buffer ) free(listbuf->buffer);
-      if ( listbuf->name ) free(listbuf->name);
+      if (listbuf->buffer) free(listbuf->buffer);
+      if (listbuf->name) free(listbuf->name);
       listbuf->size = 0;
       listbuf->buffer = NULL;
       listbuf->name = NULL;
       free(listbuf);
     }
 }
-
-

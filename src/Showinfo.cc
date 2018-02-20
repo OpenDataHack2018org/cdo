@@ -31,7 +31,6 @@
       Showinfo   showformat      Show file format
 */
 
-
 #include <stdio.h>
 #include <cdi.h>
 
@@ -39,7 +38,8 @@
 #include "pstream_int.h"
 #include "Showattribute.h"
 
-void *Showinfo(void *process)
+void *
+Showinfo(void *process)
 {
   int date0 = 0;
   int year, month, day;
@@ -72,220 +72,224 @@ void *Showinfo(void *process)
 
   int vlistID = cdoStreamInqVlist(streamID);
 
-  int nvars   = vlistNvars(vlistID);
+  int nvars = vlistNvars(vlistID);
   int taxisID = vlistInqTaxis(vlistID);
   int ntsteps = vlistNtsteps(vlistID);
 
-  if ( operatorID == SHOWYEAR )
+  if (operatorID == SHOWYEAR)
     {
       int tsID = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) )
-	  {
-	    int vdate = taxisInqVdate(taxisID);
+      if (ntsteps != 0)
+        while (cdoStreamInqTimestep(streamID, tsID))
+          {
+            int vdate = taxisInqVdate(taxisID);
 
-	    cdiDecodeDate(vdate, &year, &month, &day);
-	 
-	    if ( tsID == 0 || year0 != year )
-	      {
-		year0 = year;
-		fprintf(stdout, " %4d", year0);
-	      }
+            cdiDecodeDate(vdate, &year, &month, &day);
 
-	    tsID++;
-	  }
+            if (tsID == 0 || year0 != year)
+              {
+                year0 = year;
+                fprintf(stdout, " %4d", year0);
+              }
+
+            tsID++;
+          }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWMON )
+  else if (operatorID == SHOWMON)
     {
       int tsID = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) )
-	  {
-	    int vdate = taxisInqVdate(taxisID);
+      if (ntsteps != 0)
+        while (cdoStreamInqTimestep(streamID, tsID))
+          {
+            int vdate = taxisInqVdate(taxisID);
 
-	    cdiDecodeDate(vdate, &year, &month, &day);
-	 
-	    if ( tsID == 0 || month0 != month )
-	      {
-		month0 = month;
-		fprintf(stdout, " %2d", month0);
-	      }
+            cdiDecodeDate(vdate, &year, &month, &day);
 
-	    tsID++;
-	  }
+            if (tsID == 0 || month0 != month)
+              {
+                month0 = month;
+                fprintf(stdout, " %2d", month0);
+              }
+
+            tsID++;
+          }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWDATE )
+  else if (operatorID == SHOWDATE)
     {
       char vdatestr[32];
-      int tsID  = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) )
-	  {
-	    int vdate = taxisInqVdate(taxisID);
-	 
-	    date2str(vdate, vdatestr, sizeof(vdatestr));
+      int tsID = 0;
+      if (ntsteps != 0)
+        while (cdoStreamInqTimestep(streamID, tsID))
+          {
+            int vdate = taxisInqVdate(taxisID);
 
-	    if ( tsID == 0 || date0 != vdate )
-	      {
-		date0 = vdate;
-		fprintf(stdout, " %s", vdatestr);
-	      }
+            date2str(vdate, vdatestr, sizeof(vdatestr));
 
-	    tsID++;
-	  }
+            if (tsID == 0 || date0 != vdate)
+              {
+                date0 = vdate;
+                fprintf(stdout, " %s", vdatestr);
+              }
+
+            tsID++;
+          }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWTIME )
+  else if (operatorID == SHOWTIME)
     {
       char vtimestr[32];
       int tsID = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) )
-	  {
-	    int vtime = taxisInqVtime(taxisID);
+      if (ntsteps != 0)
+        while (cdoStreamInqTimestep(streamID, tsID))
+          {
+            int vtime = taxisInqVtime(taxisID);
 
-	    time2str(vtime, vtimestr, sizeof(vtimestr));
-	    fprintf(stdout, " %s", vtimestr);
+            time2str(vtime, vtimestr, sizeof(vtimestr));
+            fprintf(stdout, " %s", vtimestr);
 
-	    tsID++;
-	  }
+            tsID++;
+          }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWTIMESTAMP )
+  else if (operatorID == SHOWTIMESTAMP)
     {
       char vdatetimestr[64];
       int tsID = 0;
-      if ( ntsteps != 0 )
-	while ( cdoStreamInqTimestep(streamID, tsID) )
-	  {
-	    int vdate = taxisInqVdate(taxisID);
-	    int vtime = taxisInqVtime(taxisID);
+      if (ntsteps != 0)
+        while (cdoStreamInqTimestep(streamID, tsID))
+          {
+            int vdate = taxisInqVdate(taxisID);
+            int vtime = taxisInqVtime(taxisID);
 
-	    datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
-	    fprintf(stdout, " %s", vdatetimestr);
+            datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
+            fprintf(stdout, " %s", vdatetimestr);
 
-	    tsID++;
-	  }
+            tsID++;
+          }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWCODE )
+  else if (operatorID == SHOWCODE)
     {
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  fprintf(stdout, " %d", vlistInqVarCode(vlistID, varID));
-	}
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          fprintf(stdout, " %d", vlistInqVarCode(vlistID, varID));
+        }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWGRID )  
+  else if (operatorID == SHOWGRID)
     {
-      fprintf(stdout, "# param nr | grid nr | z-axis nr:   /* Use in combination with operatores: griddes and zaxisdes */ \n");	  	  
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  int gridID  = vlistInqVarGrid(vlistID, varID);
-	  int zaxisID = vlistInqVarZaxis(vlistID, varID);
+      fprintf(stdout, "# param nr | grid nr | z-axis nr:   /* Use in "
+                      "combination with operatores: griddes and zaxisdes */ "
+                      "\n");
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          int gridID = vlistInqVarGrid(vlistID, varID);
+          int zaxisID = vlistInqVarZaxis(vlistID, varID);
 
-	  fprintf(stdout, "      %3d     %3d      %3d\n",
-                  vlistInqVarCode(vlistID, varID), vlistGridIndex(vlistID, gridID) + 1, vlistZaxisIndex(vlistID, zaxisID) + 1);
-	}
-    }    
-  else if ( operatorID == SHOWUNIT )
+          fprintf(stdout, "      %3d     %3d      %3d\n",
+                  vlistInqVarCode(vlistID, varID),
+                  vlistGridIndex(vlistID, gridID) + 1,
+                  vlistZaxisIndex(vlistID, zaxisID) + 1);
+        }
+    }
+  else if (operatorID == SHOWUNIT)
     {
       char varunits[CDI_MAX_NAME];
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  varunits[0] = 0;
-	  vlistInqVarUnits(vlistID, varID, varunits);
-          if ( strlen(varunits) ) fprintf(stdout, " %s", varunits);
-	}
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          varunits[0] = 0;
+          vlistInqVarUnits(vlistID, varID, varunits);
+          if (strlen(varunits)) fprintf(stdout, " %s", varunits);
+        }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWPARAM )
+  else if (operatorID == SHOWPARAM)
     {
       char paramstr[32];
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  int param = vlistInqVarParam(vlistID, varID);
-	  cdiParamToString(param, paramstr, sizeof(paramstr));
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          int param = vlistInqVarParam(vlistID, varID);
+          cdiParamToString(param, paramstr, sizeof(paramstr));
 
-	  fprintf(stdout, " %s", paramstr);
-	}
+          fprintf(stdout, " %s", paramstr);
+        }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWNAME )
+  else if (operatorID == SHOWNAME)
     {
       char varname[CDI_MAX_NAME];
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  vlistInqVarName(vlistID, varID, varname);
-	  fprintf(stdout, " %s", varname);
-	}
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          vlistInqVarName(vlistID, varID, varname);
+          fprintf(stdout, " %s", varname);
+        }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWSTDNAME )
+  else if (operatorID == SHOWSTDNAME)
     {
       char stdname[CDI_MAX_NAME];
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  vlistInqVarStdname(vlistID, varID, stdname);
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          vlistInqVarStdname(vlistID, varID, stdname);
           fprintf(stdout, " %s", stdname[0] != 0 ? stdname : "unknown");
-	}
+        }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWLEVEL )
+  else if (operatorID == SHOWLEVEL)
     {
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  int zaxisID = vlistInqVarZaxis(vlistID, varID);
-	  int nlevs = zaxisInqSize(zaxisID);
-	  for ( int levelID = 0; levelID < nlevs; levelID++ )
-	    fprintf(stdout, " %.9g", cdoZaxisInqLevel(zaxisID, levelID));
-	  fprintf(stdout, "\n");
-	}
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          int zaxisID = vlistInqVarZaxis(vlistID, varID);
+          int nlevs = zaxisInqSize(zaxisID);
+          for (int levelID = 0; levelID < nlevs; levelID++)
+            fprintf(stdout, " %.9g", cdoZaxisInqLevel(zaxisID, levelID));
+          fprintf(stdout, "\n");
+        }
     }
-  else if ( operatorID == SHOWLTYPE )
+  else if (operatorID == SHOWLTYPE)
     {
       int nzaxis = vlistNzaxis(vlistID);
-      for ( int index = 0; index < nzaxis; index++ )
-	{
-	  int zaxisID = vlistZaxis(vlistID, index);
-	  int ltype = zaxis2ltype(zaxisID);
+      for (int index = 0; index < nzaxis; index++)
+        {
+          int zaxisID = vlistZaxis(vlistID, index);
+          int ltype = zaxis2ltype(zaxisID);
 
-	  if ( ltype != -1 ) fprintf(stdout, " %d", ltype);
-	}
-      fprintf(stdout, "\n"); 
+          if (ltype != -1) fprintf(stdout, " %d", ltype);
+        }
+      fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWFORMAT )
+  else if (operatorID == SHOWFORMAT)
     {
       printFiletype(streamID, vlistID);
     }
-  else if ( operatorID == SHOWSTDNAME )
+  else if (operatorID == SHOWSTDNAME)
     {
       char stdname[CDI_MAX_NAME];
-      for ( int varID = 0; varID < nvars; varID++ )
-	{
-	  vlistInqVarStdname(vlistID, varID, stdname);
+      for (int varID = 0; varID < nvars; varID++)
+        {
+          vlistInqVarStdname(vlistID, varID, stdname);
           fprintf(stdout, " %s", stdname[0] != 0 ? stdname : "unknown");
-	}
+        }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWATTS || operatorID == SHOWATTSGLOB )
+  else if (operatorID == SHOWATTS || operatorID == SHOWATTSGLOB)
     {
-      if ( operatorID == SHOWATTS )
+      if (operatorID == SHOWATTS)
         {
           int vlistID = cdoStreamInqVlist(streamID);
           int nvars = vlistNvars(vlistID);
-          for ( int varID = 0; varID < nvars; varID++ )
+          for (int varID = 0; varID < nvars; varID++)
             {
               char varname[CDI_MAX_NAME];
               vlistInqVarName(vlistID, varID, varname);
               fprintf(stdout, "%s:\n", varname);
 
-    	      int nattsvar;
-    	      cdiInqNatts(vlistID, varID, &nattsvar);
-    	      printAtts(vlistID, varID, nattsvar, NULL);
-    	    }
+              int nattsvar;
+              cdiInqNatts(vlistID, varID, &nattsvar);
+              printAtts(vlistID, varID, nattsvar, NULL);
+            }
         }
       fprintf(stdout, "Global:\n");
       int natts;

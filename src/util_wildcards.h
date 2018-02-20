@@ -25,5 +25,4 @@ char *expand_filename(const char *args);
 
 std::vector<std::string> expandWildCards(std::vector<std::string> argv);
 
-
 #endif

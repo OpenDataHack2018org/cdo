@@ -29,8 +29,8 @@
 #include "pstream_int.h"
 #include "listarray.h"
 
-
-void *Replacevalues(void *process)
+void *
+Replacevalues(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -53,27 +53,27 @@ void *Replacevalues(void *process)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == SETVALS )
+  if (operatorID == SETVALS)
     {
       nvals = args2flt_lista(operatorArgc(), operatorArgv(), flista);
-      if ( nvals < 2 ) cdoAbort("Too few arguments!");
-      if ( nvals % 2 != 0 )  cdoAbort("Need pairs of arguments!");
+      if (nvals < 2) cdoAbort("Too few arguments!");
+      if (nvals % 2 != 0) cdoAbort("Need pairs of arguments!");
       fltarr = (double *) lista_dataptr(flista);
       nvals = nvals / 2;
     }
-  else if ( operatorID == SETRTOC )
+  else if (operatorID == SETRTOC)
     {
       operatorCheckArgc(3);
-      rmin   = parameter2double(operatorArgv()[0]);
-      rmax   = parameter2double(operatorArgv()[1]);
+      rmin = parameter2double(operatorArgv()[0]);
+      rmax = parameter2double(operatorArgv()[1]);
       newval = parameter2double(operatorArgv()[2]);
     }
-  else if ( operatorID == SETRTOC2 )
+  else if (operatorID == SETRTOC2)
     {
       operatorCheckArgc(4);
-      rmin    = parameter2double(operatorArgv()[0]);
-      rmax    = parameter2double(operatorArgv()[1]);
-      newval  = parameter2double(operatorArgv()[2]);
+      rmin = parameter2double(operatorArgv()[0]);
+      rmax = parameter2double(operatorArgv()[1]);
+      newval = parameter2double(operatorArgv()[2]);
       newval2 = parameter2double(operatorArgv()[3]);
     }
 
@@ -92,63 +92,63 @@ void *Replacevalues(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, array, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, array, &nmiss);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  double missval = vlistInqVarMissval(vlistID1, varID);
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          double missval = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( operatorID == SETVALS )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		if ( !DBL_IS_EQUAL(array[i], missval) )
-		  {
-		    /* printf("\nelem %d val %f ",i,array[i]); */
-		    for ( int j = 0; j < nvals; j++ )
-		      {
-			if ( DBL_IS_EQUAL(array[i], fltarr[j*2] ) )
-			  {
-			    array[i] = fltarr[j*2+1];
-			    /* printf("j=%d %f %f ",j,fltarr[j*2],fltarr[j*2+1]); */
-			    break;
-			  }
-		      }
-		  }
-	    }
-	  else if ( operatorID == SETRTOC )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		if ( !DBL_IS_EQUAL(array[i], missval) )
-		  {
-		    if ( array[i] >= rmin && array[i] <= rmax)
+          if (operatorID == SETVALS)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                if (!DBL_IS_EQUAL(array[i], missval))
+                  {
+                    /* printf("\nelem %d val %f ",i,array[i]); */
+                    for (int j = 0; j < nvals; j++)
+                      {
+                        if (DBL_IS_EQUAL(array[i], fltarr[j * 2]))
+                          {
+                            array[i] = fltarr[j * 2 + 1];
+                            /* printf("j=%d %f %f
+                             * ",j,fltarr[j*2],fltarr[j*2+1]); */
+                            break;
+                          }
+                      }
+                  }
+            }
+          else if (operatorID == SETRTOC)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                if (!DBL_IS_EQUAL(array[i], missval))
+                  {
+                    if (array[i] >= rmin && array[i] <= rmax) array[i] = newval;
+                  }
+            }
+          else if (operatorID == SETRTOC2)
+            {
+              for (size_t i = 0; i < gridsize; i++)
+                if (!DBL_IS_EQUAL(array[i], missval))
+                  {
+                    if (array[i] >= rmin && array[i] <= rmax)
                       array[i] = newval;
-		  }
-	    }
-	  else if ( operatorID == SETRTOC2 )
-	    {
-	      for ( size_t i = 0; i < gridsize; i++ )
-		if ( !DBL_IS_EQUAL(array[i], missval) )
-		  {
-		    if ( array[i] >= rmin && array[i] <= rmax )
-                      array[i] = newval;
-		    else
+                    else
                       array[i] = newval2;
-		  }
-	    }
+                  }
+            }
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, array, nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, array, nmiss);
+        }
 
       tsID++;
     }
@@ -156,7 +156,7 @@ void *Replacevalues(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   lista_destroy(flista);
 

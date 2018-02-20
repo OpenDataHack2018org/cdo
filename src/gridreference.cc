@@ -14,11 +14,11 @@
   GNU General Public License for more details.
 */
 
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#ifdef  HAVE_LIBCURL
+#ifdef HAVE_LIBCURL
 #include <curl/curl.h>
 #include <errno.h>
 #endif
@@ -30,9 +30,9 @@
 /*
  * callback function for curl for writing the network retrieved grid file
  */
-#ifdef  HAVE_LIBCURL
-static
-size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
+#ifdef HAVE_LIBCURL
+static size_t
+write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
   size_t written = fwrite(ptr, size, nmemb, stream);
   return written;
@@ -40,13 +40,14 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
 #endif
 
 /* code from grid_tools.2 */
-static
-int download_gridfile(const char *restrict uri, const char *restrict basename)
+static int
+download_gridfile(const char *restrict uri, const char *restrict basename)
 {
   int rval = 1;
-#ifdef  HAVE_LIBCURL
-  // As curl_easy_init calls non-thread safe curl_global_init the libcurl developer advice
-  // to call curl_global_init first and before potential thread spawning.
+#ifdef HAVE_LIBCURL
+  // As curl_easy_init calls non-thread safe curl_global_init the libcurl
+  // developer advice to call curl_global_init first and before potential thread
+  // spawning.
 
   int curlflags = CURL_GLOBAL_DEFAULT;
 
@@ -55,14 +56,14 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
 #endif
 
   CURLcode ret = curl_global_init(curlflags);
-  if ( ret != 0 )
+  if (ret != 0)
     {
       fprintf(stderr, "ERROR: %s!\n", curl_easy_strerror(ret));
       return -1;
     }
 
   CURL *hd = curl_easy_init();
-  if ( hd == NULL )
+  if (hd == NULL)
     {
       fprintf(stderr, "ERROR: could not get curl handler.\n");
       return -1;
@@ -70,49 +71,54 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
   else
     {
       FILE *fp = fopen(basename, "w");
-      if ( fp == NULL )
-	{
-	  fprintf(stderr, "ERROR: could not open local output file %s. %s.\n", basename, strerror(errno));
-	  return -1;
-	}
+      if (fp == NULL)
+        {
+          fprintf(stderr, "ERROR: could not open local output file %s. %s.\n",
+                  basename, strerror(errno));
+          return -1;
+        }
 
-      //curl_easy_setopt(hd, CURLOPT_VERBOSE, 1);
+      // curl_easy_setopt(hd, CURLOPT_VERBOSE, 1);
       curl_easy_setopt(hd, CURLOPT_URL, uri);
       curl_easy_setopt(hd, CURLOPT_WRITEFUNCTION, write_data);
       curl_easy_setopt(hd, CURLOPT_WRITEDATA, fp);
       ret = curl_easy_perform(hd);
       fclose(fp);
-      if ( ret == 0 ) 
-	{
-	  /*
-	  int ihead;
-	  curl_easy_getinfo(hd, CURLINFO_HEADER_SIZE, &ihead);
-	  printf("ihead %d\n", ihead);
-	  */
-	  char *ctype;
-	  curl_easy_getinfo(hd, CURLINFO_CONTENT_TYPE, &ctype);
+      if (ret == 0)
+        {
+          /*
+          int ihead;
+          curl_easy_getinfo(hd, CURLINFO_HEADER_SIZE, &ihead);
+          printf("ihead %d\n", ihead);
+          */
+          char *ctype;
+          curl_easy_getinfo(hd, CURLINFO_CONTENT_TYPE, &ctype);
 
-	  if ( strstr(ctype, "html") == NULL ) // no html content
-	    {
+          if (strstr(ctype, "html") == NULL)  // no html content
+            {
               double length;
-	      curl_easy_getinfo(hd, CURLINFO_SIZE_DOWNLOAD, &length);
-	      if ( cdoVerbose ) cdoPrint("File %s downloaded - size: %.0lf byte", basename, length); 
-	      rval = 0;
-	    }
-	  else
-	    {
-	      int status = remove(basename);
-	      if (status == -1) perror(basename);
-	      if ( cdoVerbose ) cdoPrint("The requested URL was not found on this server!");
-	    }
-	}
+              curl_easy_getinfo(hd, CURLINFO_SIZE_DOWNLOAD, &length);
+              if (cdoVerbose)
+                cdoPrint("File %s downloaded - size: %.0lf byte", basename,
+                         length);
+              rval = 0;
+            }
+          else
+            {
+              int status = remove(basename);
+              if (status == -1) perror(basename);
+              if (cdoVerbose)
+                cdoPrint("The requested URL was not found on this server!");
+            }
+        }
       else
-	{
-	  int status = remove(basename);
-	  if ( status == -1 ) perror(basename);
-	  fprintf(stderr, "ERROR: %s. Download %s failed.\n\n", curl_easy_strerror(ret), basename);
-	}
-      
+        {
+          int status = remove(basename);
+          if (status == -1) perror(basename);
+          fprintf(stderr, "ERROR: %s. Download %s failed.\n\n",
+                  curl_easy_strerror(ret), basename);
+        }
+
       curl_easy_cleanup(hd);
     }
 #else
@@ -120,7 +126,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
   (void) basename;
 
   cdoWarning("CURL support not compiled in!");
-#endif  
+#endif
 
   return rval;
 }
@@ -132,17 +138,17 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
 /*
  * Search for filename.
  */
-static
-int search_file(const char *restrict directory, const char *restrict filename)
+static int
+search_file(const char *restrict directory, const char *restrict filename)
 {
 #if defined(HAVE_SYS_STAT_H)
   struct stat buf;
   int status = stat(directory, &buf);
 
-  if ( status == 0 )
+  if (status == 0)
     {
       status = stat(filename, &buf);
-      if ( status == 0 ) return 0;
+      if (status == 0) return 0;
     }
   else
     {
@@ -153,8 +159,8 @@ int search_file(const char *restrict directory, const char *restrict filename)
   return 1;
 }
 
-
-int referenceToGrid(int gridID1)
+int
+referenceToGrid(int gridID1)
 {
   int gridID2 = -1;
   char griduri[8912];
@@ -163,9 +169,9 @@ int referenceToGrid(int gridID1)
   griduri[0] = 0;
   gridpath[0] = 0;
 
-  if ( gridInqReference(gridID1, NULL) ) gridInqReference(gridID1, griduri);
+  if (gridInqReference(gridID1, NULL)) gridInqReference(gridID1, griduri);
 
-  if ( griduri[0] == 0 )
+  if (griduri[0] == 0)
     {
       cdoWarning("Reference to horizontal grid not available!");
     }
@@ -174,105 +180,117 @@ int referenceToGrid(int gridID1)
       bool lgriduri = true;
 
       char *basename = strrchr(griduri, '/');
-      if ( basename == NULL )
-	{
-	  basename = griduri;
-	  lgriduri = false;
-	}
+      if (basename == NULL)
+        {
+          basename = griduri;
+          lgriduri = false;
+        }
       else
-	{
-	  basename++;
-	}
+        {
+          basename++;
+        }
 
       strcpy(gridpath, "./");
       strcat(gridpath, basename);
-      if ( cdoVerbose ) cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
-  
+      if (cdoVerbose)
+        cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
+
       /* scan local directory for file */
       int status = search_file("./", gridpath);
-      if ( status != 0 )
-	{
-	  if ( cdoGridSearchDir != NULL)
-	    {
-	      strcpy(gridpath, cdoGridSearchDir);
-	      strcat(gridpath, basename);
-	      if ( cdoVerbose ) cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
+      if (status != 0)
+        {
+          if (cdoGridSearchDir != NULL)
+            {
+              strcpy(gridpath, cdoGridSearchDir);
+              strcat(gridpath, basename);
+              if (cdoVerbose)
+                cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
 
-	      /* scan directory given by environment variable */
-	      status = search_file(cdoGridSearchDir, gridpath);
-	    }
+              /* scan directory given by environment variable */
+              status = search_file(cdoGridSearchDir, gridpath);
+            }
 
-	  if ( status != 0 && lgriduri )
-	    {
-	      /*
-	      strcpy(griduri, "http://icon-downloads.mpimet.mpg.de/grids/public/edzw/icon_grid_0001x_R02B05_R.nc");
-	      char *basename = strrchr(griduri, '/') + 1;
-	      */
-	      if ( cdoVerbose ) cdoPrint("Download horizontal grid file %s to %s", griduri, basename);
-	      status = download_gridfile(griduri, basename);
-	    }
-	}
+          if (status != 0 && lgriduri)
+            {
+              /*
+              strcpy(griduri,
+              "http://icon-downloads.mpimet.mpg.de/grids/public/edzw/icon_grid_0001x_R02B05_R.nc");
+              char *basename = strrchr(griduri, '/') + 1;
+              */
+              if (cdoVerbose)
+                cdoPrint("Download horizontal grid file %s to %s", griduri,
+                         basename);
+              status = download_gridfile(griduri, basename);
+            }
+        }
 
-      if ( status == 0 )
-	{
-	  if ( cdoVerbose ) cdoPrint("Horizontal grid file used: %s", gridpath);
-      
-	  size_t gridsize = gridInqSize(gridID1);
+      if (status == 0)
+        {
+          if (cdoVerbose) cdoPrint("Horizontal grid file used: %s", gridpath);
 
-	  // int number = gridInqNumber(gridID1);
-	  int position = gridInqPosition(gridID1);
+          size_t gridsize = gridInqSize(gridID1);
 
-	  int streamID = streamOpenRead(gridpath);
-	  if ( streamID < 0 ) cdiOpenError(streamID, "Open failed on horizontal grid file >%s<", gridpath);
+          // int number = gridInqNumber(gridID1);
+          int position = gridInqPosition(gridID1);
 
-	  int vlistID = streamInqVlist(streamID);
-	  int ngrids = vlistNgrids(vlistID);
-	  if ( position > 0 && position <= ngrids )
-	    {
-	      int gridID = vlistGrid(vlistID, position-1);
-	      if ( gridInqSize(gridID) == gridsize )
-		gridID2 = gridDuplicate(gridID);
-	      else
-		cdoWarning("Grid size %zu on position %d do not match! Reference=%s", gridsize, position, gridpath);
-	    }
-	  else if ( position == 0 )
-	    {
-	      for ( int grididx = 0; grididx < ngrids; ++grididx )
-		{
-		  int gridID = vlistGrid(vlistID, grididx);
-		  if ( gridInqSize(gridID) == gridsize )
-		    {
-		      gridID2 = gridDuplicate(gridID);
-		      break;
+          int streamID = streamOpenRead(gridpath);
+          if (streamID < 0)
+            cdiOpenError(streamID, "Open failed on horizontal grid file >%s<",
+                         gridpath);
+
+          int vlistID = streamInqVlist(streamID);
+          int ngrids = vlistNgrids(vlistID);
+          if (position > 0 && position <= ngrids)
+            {
+              int gridID = vlistGrid(vlistID, position - 1);
+              if (gridInqSize(gridID) == gridsize)
+                gridID2 = gridDuplicate(gridID);
+              else
+                cdoWarning(
+                    "Grid size %zu on position %d do not match! Reference=%s",
+                    gridsize, position, gridpath);
+            }
+          else if (position == 0)
+            {
+              for (int grididx = 0; grididx < ngrids; ++grididx)
+                {
+                  int gridID = vlistGrid(vlistID, grididx);
+                  if (gridInqSize(gridID) == gridsize)
+                    {
+                      gridID2 = gridDuplicate(gridID);
+                      break;
                     }
-		}
-	    }
-	  else
-	    cdoWarning("Number of grid in reference %d not available! Reference=%s", position, gridpath);
-	  
-	  streamClose(streamID);
-	}
+                }
+            }
+          else
+            cdoWarning(
+                "Number of grid in reference %d not available! Reference=%s",
+                position, gridpath);
 
-      if ( gridID2 != -1 )
-	{
-	  unsigned char uuidOfHGrid1[CDI_UUID_SIZE];
-	  unsigned char uuidOfHGrid2[CDI_UUID_SIZE];
+          streamClose(streamID);
+        }
 
-	  memset(uuidOfHGrid1, 0, 16);
-	  memset(uuidOfHGrid2, 0, 16);
+      if (gridID2 != -1)
+        {
+          unsigned char uuidOfHGrid1[CDI_UUID_SIZE];
+          unsigned char uuidOfHGrid2[CDI_UUID_SIZE];
 
-	  gridInqUUID(gridID1, uuidOfHGrid1);
-	  gridInqUUID(gridID2, uuidOfHGrid2);
-	  
-	  if ( uuidOfHGrid1[0] != 0 && uuidOfHGrid1[0] != 0 && memcmp(uuidOfHGrid1, uuidOfHGrid2, 16) != 0 )
-	    cdoWarning("UUID of horizontal grids differ!");
+          memset(uuidOfHGrid1, 0, 16);
+          memset(uuidOfHGrid2, 0, 16);
 
-	  int number1 = gridInqNumber(gridID1);
-	  int number2 = gridInqNumber(gridID2);
+          gridInqUUID(gridID1, uuidOfHGrid1);
+          gridInqUUID(gridID2, uuidOfHGrid2);
 
-	  if ( number1 > 0 && number2 > 0 && number1 != number2 )
-	    cdoWarning("Number of grid used of horizontal grids differ!");
-	}
+          if (uuidOfHGrid1[0] != 0 && uuidOfHGrid1[0] != 0
+              && memcmp(uuidOfHGrid1, uuidOfHGrid2, 16) != 0)
+            cdoWarning("UUID of horizontal grids differ!");
+
+          int number1 = gridInqNumber(gridID1);
+          int number2 = gridInqNumber(gridID2);
+
+          if (number1 > 0 && number2 > 0 && number1 != number2)
+            cdoWarning("Number of grid used of horizontal grids differ!");
+        }
     }
 
   return gridID2;

@@ -15,22 +15,22 @@
   GNU General Public License for more details.
 */
 
-#ifdef  HAVE_CONFIG_H
-#  include "config.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 #include <stdio.h>
 
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
 #include <limits.h>
 #include <pthread.h>
 #include "pthread_debug.h"
 #endif
 
-
-void print_pthread_info()
+void
+print_pthread_info()
 {
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
   pthread_attr_t attr;
   pthread_mutexattr_t m_attr;
   pthread_condattr_t c_attr;
@@ -39,7 +39,8 @@ void print_pthread_info()
   fprintf(stderr, "PTHREAD_KEYS_MAX    = %d\n", PTHREAD_KEYS_MAX);
 #endif
 #if defined(PTHREAD_DESTRUCTOR_ITERATIONS)
-  fprintf(stderr, "PTHREAD_DESTRUCTOR_ITERATIONS = %d\n", PTHREAD_DESTRUCTOR_ITERATIONS);
+  fprintf(stderr, "PTHREAD_DESTRUCTOR_ITERATIONS = %d\n",
+          PTHREAD_DESTRUCTOR_ITERATIONS);
 #endif
 #if defined(PTHREAD_THREADS_MAX)
   fprintf(stderr, "PTHREAD_THREADS_MAX = %d\n", PTHREAD_THREADS_MAX);

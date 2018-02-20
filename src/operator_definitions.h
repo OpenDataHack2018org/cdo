@@ -308,6 +308,5 @@
 #define  WindTransOperators     {"uvDestag", "rotuvN", "rotuvNorth", "projuvLatLon"}
 #define  SamplegridOperators    {"samplegrid", "subgrid"}
 
-
 /* clang-format on */
 #endif

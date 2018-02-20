@@ -25,21 +25,20 @@
       Yearcount   yearcount         Yearly counts
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Timcount(void *process)
+void *
+Timcount(void *process)
 {
-  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
+  char indate1[DATE_LEN + 1], indate2[DATE_LEN + 1];
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID;
   size_t nmiss;
-  int nwpv; // number of words per value; real:1  complex:2
+  int nwpv;  // number of words per value; real:1  complex:2
 
   cdoInitialize(process);
 
@@ -61,10 +60,10 @@ void *Timcount(void *process)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
-  for ( varID = 0; varID < nvars; varID++ )
-      vlistDefVarUnits(vlistID2, varID, "No.");
+  for (varID = 0; varID < nvars; varID++)
+    vlistDefVarUnits(vlistID2, varID, "No.");
 
-  if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(vlistID2, 1);
+  if (cdoOperatorF2(operatorID) == 16) vlistDefNtsteps(vlistID2, 1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -74,94 +73,97 @@ void *Timcount(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nrecords = vlistNrecs(vlistID1);
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
 
-  int tsID    = 0;
-  int otsID   = 0;
-  while ( TRUE )
+  int tsID = 0;
+  int otsID = 0;
+  while (TRUE)
     {
       int nsets = 0;
-      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
-	{
-	  int vdate = taxisInqVdate(taxisID1);
-	  int vtime = taxisInqVtime(taxisID1);
+      while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
+        {
+          int vdate = taxisInqVdate(taxisID1);
+          int vtime = taxisInqVtime(taxisID1);
 
-	  if ( nsets == 0 ) SET_DATE(indate2, vdate, vtime);
-	  SET_DATE(indate1, vdate, vtime);
+          if (nsets == 0) SET_DATE(indate2, vdate, vtime);
+          SET_DATE(indate1, vdate, vtime);
 
-	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
+          if (DATE_IS_NEQ(indate1, indate2, cmplen)) break;
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      if ( tsID == 0 )
-		{
-		  recVarID[recID]   = varID;
-		  recLevelID[recID] = levelID;
-		}
+              if (tsID == 0)
+                {
+                  recVarID[recID] = varID;
+                  recLevelID[recID] = levelID;
+                }
 
-	      nwpv     = vars1[varID][levelID].nwpv;
-	      gridsize = gridInqSize(vars1[varID][levelID].grid);
+              nwpv = vars1[varID][levelID].nwpv;
+              gridsize = gridInqSize(vars1[varID][levelID].grid);
 
-	      if ( nsets == 0 )
-		{
-		  for ( size_t i = 0; i < nwpv*gridsize; i++ )
-		    vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
-		  vars1[varID][levelID].nmiss = gridsize;
-		}
+              if (nsets == 0)
+                {
+                  for (size_t i = 0; i < nwpv * gridsize; i++)
+                    vars1[varID][levelID].ptr[i]
+                        = vars1[varID][levelID].missval;
+                  vars1[varID][levelID].nmiss = gridsize;
+                }
 
               pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = nmiss;
-              field.grid    = vars1[varID][levelID].grid;
-	      field.missval = vars1[varID][levelID].missval;
+              field.nmiss = nmiss;
+              field.grid = vars1[varID][levelID].grid;
+              field.missval = vars1[varID][levelID].missval;
 
               farcount(&vars1[varID][levelID], field);
-	    }
+            }
 
-	  vdate0 = vdate;
-	  vtime0 = vtime;
-	  nsets++;
-	  tsID++;
-	}
+          vdate0 = vdate;
+          vtime0 = vtime;
+          nsets++;
+          tsID++;
+        }
 
-      if ( nrecs == 0 && nsets == 0 ) break;
+      if (nrecs == 0 && nsets == 0) break;
 
       taxisDefVdate(taxisID2, vdate0);
       taxisDefVtime(taxisID2, vtime0);
       pstreamDefTimestep(streamID2, otsID);
 
-      for ( int recID = 0; recID < nrecords; recID++ )
-	{
-	  varID   = recVarID[recID];
-	  levelID = recLevelID[recID];
+      for (int recID = 0; recID < nrecords; recID++)
+        {
+          varID = recVarID[recID];
+          levelID = recLevelID[recID];
 
-	  if ( otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT ) continue;
+          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+            continue;
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,
+                             vars1[varID][levelID].nmiss);
+        }
 
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
       otsID++;
     }
 
   field_free(vars1, vlistID1);
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  if (recVarID) Free(recVarID);
+  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

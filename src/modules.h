@@ -15,24 +15,23 @@
   GNU General Public License for more details.
 */
 
-  /***
+/***
 
-   Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
-   See COPYING file for copying and redistribution conditions.
+ Copyright (C) 2003-2018 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+ See COPYING file for copying and redistribution conditions.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; version 2 of the License.
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; version 2 of the License.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
- */
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+*/
 
 #ifndef MODULES_H
 #define MODULES_H
-
 
 #include <iostream>
 #include <map>
@@ -44,16 +43,16 @@
   */
 typedef void (*dyn_oper_t)(void *arg);
 
-typedef struct {
-    void *(*func)(void *);               // Module
-    std::vector<std::string> help;       // Help
-    std::vector<const char *> operators; // Operator names
-    short mode;                          // Module mode: 0:intern 1:extern
-    short number;                        // Allowed number type
-    short streamInCnt;                   // Number of input streams
-    short streamOutCnt;                  // Number of output streams
+typedef struct
+{
+  void *(*func)(void *);                // Module
+  std::vector<std::string> help;        // Help
+  std::vector<const char *> operators;  // Operator names
+  short mode;                           // Module mode: 0:intern 1:extern
+  short number;                         // Allowed number type
+  short streamInCnt;                    // Number of input streams
+  short streamOutCnt;                   // Number of output streams
 } module_t;
-
 
 /***
   vector for library handles for loaded custom modules
@@ -90,8 +89,8 @@ int operatorStreamNumber(const char *operatorName);
 
 void operatorPrintAll(void);
 void operatorPrintList(bool print_no_output);
-bool is_alias(const char * operatorName);
-const char* get_original(const char* operatorName);
+bool is_alias(const char *operatorName);
+const char *get_original(const char *operatorName);
 void add_module(std::string module_name, module_t new_module);
 int add_alias(std::string alias, std::string original);
 #ifdef CUSTOM_MODULES

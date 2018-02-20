@@ -15,13 +15,12 @@
   GNU General Public License for more details.
 */
 
-
 #include "cdo_int.h"
 #include <cdi.h>
 #include "percentiles.h"
 
-
-void zonfun(field_type field1, field_type *field2, int function)
+void
+zonfun(field_type field1, field_type *field2, int function)
 {
   // clang-format off
   switch (function)
@@ -41,8 +40,8 @@ void zonfun(field_type field1, field_type *field2, int function)
   // clang-format on
 }
 
-
-void zonmin(field_type field1, field_type *field2)
+void
+zonmin(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double rmin;
@@ -50,26 +49,26 @@ void zonmin(field_type field1, field_type *field2)
   size_t nx = gridInqXsize(field1.grid);
   size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t j = 0; j < ny; ++j )
+  for (size_t j = 0; j < ny; ++j)
     {
-      if ( field1.nmiss )
-	{
-          rmin = arrayMinMV(nx, &field1.ptr[j*nx], field1.missval);
-          if ( DBL_IS_EQUAL(rmin, field1.missval) ) rnmiss++;
-	}
+      if (field1.nmiss)
+        {
+          rmin = arrayMinMV(nx, &field1.ptr[j * nx], field1.missval);
+          if (DBL_IS_EQUAL(rmin, field1.missval)) rnmiss++;
+        }
       else
-	{
-          rmin = arrayMin(nx, &field1.ptr[j*nx]);
-	}
+        {
+          rmin = arrayMin(nx, &field1.ptr[j * nx]);
+        }
 
       field2->ptr[j] = rmin;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void zonmax(field_type field1, field_type *field2)
+void
+zonmax(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double rmax;
@@ -77,26 +76,26 @@ void zonmax(field_type field1, field_type *field2)
   size_t nx = gridInqXsize(field1.grid);
   size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t j = 0; j < ny; ++j )
+  for (size_t j = 0; j < ny; ++j)
     {
-      if ( field1.nmiss )
-	{
-          rmax = arrayMaxMV(nx, &field1.ptr[j*nx], field1.missval);
-          if ( DBL_IS_EQUAL(rmax, field1.missval) ) rnmiss++;
-	}
+      if (field1.nmiss)
+        {
+          rmax = arrayMaxMV(nx, &field1.ptr[j * nx], field1.missval);
+          if (DBL_IS_EQUAL(rmax, field1.missval)) rnmiss++;
+        }
       else
-	{
-          rmax = arrayMax(nx, &field1.ptr[j*nx]);
-	}
+        {
+          rmax = arrayMax(nx, &field1.ptr[j * nx]);
+        }
 
       field2->ptr[j] = rmax;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void zonrange(field_type field1, field_type *field2)
+void
+zonrange(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double range;
@@ -104,26 +103,26 @@ void zonrange(field_type field1, field_type *field2)
   size_t nx = gridInqXsize(field1.grid);
   size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t j = 0; j < ny; ++j )
+  for (size_t j = 0; j < ny; ++j)
     {
-      if ( field1.nmiss )
-	{
-          range = arrayRangeMV(nx, &field1.ptr[j*nx], field1.missval);
-          if ( DBL_IS_EQUAL(range, field1.missval) ) rnmiss++;
-	}
+      if (field1.nmiss)
+        {
+          range = arrayRangeMV(nx, &field1.ptr[j * nx], field1.missval);
+          if (DBL_IS_EQUAL(range, field1.missval)) rnmiss++;
+        }
       else
-	{
-          range = arrayRange(nx, &field1.ptr[j*nx]);
-	}
+        {
+          range = arrayRange(nx, &field1.ptr[j * nx]);
+        }
 
       field2->ptr[j] = range;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void zonsum(field_type field1, field_type *field2)
+void
+zonsum(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double rsum = 0;
@@ -131,17 +130,17 @@ void zonsum(field_type field1, field_type *field2)
   size_t nx = gridInqXsize(field1.grid);
   size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t j = 0; j < ny; ++j )
+  for (size_t j = 0; j < ny; ++j)
     {
-      if ( field1.nmiss )
-	{
-          rsum = arraySumMV(nx, &field1.ptr[j*nx], field1.missval);
-	  if ( DBL_IS_EQUAL(rsum, field1.missval) ) rnmiss++;
- 	}
+      if (field1.nmiss)
+        {
+          rsum = arraySumMV(nx, &field1.ptr[j * nx], field1.missval);
+          if (DBL_IS_EQUAL(rsum, field1.missval)) rnmiss++;
+        }
       else
-	{
-          rsum = arraySum(nx, &field1.ptr[j*nx]);
-	}
+        {
+          rsum = arraySum(nx, &field1.ptr[j * nx]);
+        }
 
       field2->ptr[j] = rsum;
     }
@@ -149,8 +148,8 @@ void zonsum(field_type field1, field_type *field2)
   field2->nmiss = rnmiss;
 }
 
-
-void zonmean(field_type field1, field_type *field2)
+void
+zonmean(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double rmean = 0;
@@ -158,18 +157,18 @@ void zonmean(field_type field1, field_type *field2)
   size_t nx = gridInqXsize(field1.grid);
   size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t j = 0; j < ny; ++j )
+  for (size_t j = 0; j < ny; ++j)
     {
-      if ( field1.nmiss )
-	{
-          rmean = arrayMeanMV(nx, &field1.ptr[j*nx], field1.missval);
-	}
+      if (field1.nmiss)
+        {
+          rmean = arrayMeanMV(nx, &field1.ptr[j * nx], field1.missval);
+        }
       else
-	{
-          rmean = arrayMean(nx, &field1.ptr[j*nx]);
-	}
+        {
+          rmean = arrayMean(nx, &field1.ptr[j * nx]);
+        }
 
-      if ( DBL_IS_EQUAL(rmean, field1.missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(rmean, field1.missval)) rnmiss++;
 
       field2->ptr[j] = rmean;
     }
@@ -177,8 +176,8 @@ void zonmean(field_type field1, field_type *field2)
   field2->nmiss = rnmiss;
 }
 
-
-void zonavg(field_type field1, field_type *field2)
+void
+zonavg(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
   double ravg = 0;
@@ -186,18 +185,18 @@ void zonavg(field_type field1, field_type *field2)
   size_t nx = gridInqXsize(field1.grid);
   size_t ny = gridInqYsize(field1.grid);
 
-  for ( size_t j = 0; j < ny; ++j )
+  for (size_t j = 0; j < ny; ++j)
     {
-      if ( field1.nmiss > 0 )
-	{
-          ravg = arrayAvgMV(nx, &field1.ptr[j*nx], field1.missval);
-	}
+      if (field1.nmiss > 0)
+        {
+          ravg = arrayAvgMV(nx, &field1.ptr[j * nx], field1.missval);
+        }
       else
-	{
-          ravg = arrayMean(nx, &field1.ptr[j*nx]);
-	}
+        {
+          ravg = arrayMean(nx, &field1.ptr[j * nx]);
+        }
 
-      if ( DBL_IS_EQUAL(ravg, field1.missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(ravg, field1.missval)) rnmiss++;
 
       field2->ptr[j] = ravg;
     }
@@ -205,103 +204,110 @@ void zonavg(field_type field1, field_type *field2)
   field2->nmiss = rnmiss;
 }
 
-static
-void prevarsum_zon(const double *restrict array, size_t nx, size_t nmiss,  double missval, 
-                   double *rsum, double *rsumw, double *rsumq, double *rsumwq)
+static void
+prevarsum_zon(const double *restrict array, size_t nx, size_t nmiss,
+              double missval, double *rsum, double *rsumw, double *rsumq,
+              double *rsumwq)
 {
-  double w = 1./nx;
+  double w = 1. / nx;
 
-  *rsum   = 0;
-  *rsumq  = 0;
-  *rsumw  = 0;
+  *rsum = 0;
+  *rsumq = 0;
+  *rsumw = 0;
   *rsumwq = 0;
 
-  if ( nmiss > 0 )
+  if (nmiss > 0)
     {
-      for ( size_t i = 0; i < nx; i++ )
-        if ( !DBL_IS_EQUAL(array[i], missval) )
+      for (size_t i = 0; i < nx; i++)
+        if (!DBL_IS_EQUAL(array[i], missval))
           {
-            *rsum   += w * array[i];
-            *rsumq  += w * array[i] * array[i];
-            *rsumw  += w;
+            *rsum += w * array[i];
+            *rsumq += w * array[i] * array[i];
+            *rsumw += w;
             *rsumwq += w * w;
           }
     }
   else
     {
-      for ( size_t i = 0; i < nx; i++ )
+      for (size_t i = 0; i < nx; i++)
         {
-          *rsum   += w * array[i];
-          *rsumq  += w * array[i] * array[i];
-          *rsumw  += w;
+          *rsum += w * array[i];
+          *rsumq += w * array[i] * array[i];
+          *rsumw += w;
           *rsumwq += w * w;
         }
     }
 }
 
-
-void zonvar(field_type field1, field_type *field2)
+void
+zonvar(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid     = field1.grid;
-  size_t nmiss    = field1.nmiss;
+  int grid = field1.grid;
+  size_t nmiss = field1.nmiss;
   double missval1 = field1.missval;
-  double *array   = field1.ptr;
+  double *array = field1.ptr;
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
   size_t nx = gridInqXsize(grid);
   size_t ny = gridInqYsize(grid);
 
-  for ( size_t  j = 0; j < ny; j++ )
+  for (size_t j = 0; j < ny; j++)
     {
-      prevarsum_zon(array+j*nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq, &rsumwq);
+      prevarsum_zon(array + j * nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq,
+                    &rsumwq);
 
-      rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval1;
-      if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+      rvar = IS_NOT_EQUAL(rsumw, 0)
+                 ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw)
+                 : missval1;
+      if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
-      if ( DBL_IS_EQUAL(rvar, missval1) ) rnmiss++;
+      if (DBL_IS_EQUAL(rvar, missval1)) rnmiss++;
 
       field2->ptr[j] = rvar;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void zonvar1(field_type field1, field_type *field2)
+void
+zonvar1(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid     = field1.grid;
-  size_t nmiss    = field1.nmiss;
+  int grid = field1.grid;
+  size_t nmiss = field1.nmiss;
   double missval1 = field1.missval;
-  double *array   = field1.ptr;
+  double *array = field1.ptr;
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
   size_t nx = gridInqXsize(grid);
   size_t ny = gridInqYsize(grid);
 
-  for ( size_t j = 0; j < ny; j++ )
+  for (size_t j = 0; j < ny; j++)
     {
-      prevarsum_zon(array+j*nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq, &rsumwq);
+      prevarsum_zon(array + j * nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq,
+                    &rsumwq);
 
-      rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval1;
-      if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+      rvar = (rsumw * rsumw > rsumwq)
+                 ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq)
+                 : missval1;
+      if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
-      if ( DBL_IS_EQUAL(rvar, missval1) ) rnmiss++;
+      if (DBL_IS_EQUAL(rvar, missval1)) rnmiss++;
 
       field2->ptr[j] = rvar;
     }
 
-  field2->nmiss  = rnmiss;
+  field2->nmiss = rnmiss;
 }
 
-
-void zonstd(field_type field1, field_type *field2)
+void
+zonstd(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
+  int grid = field1.grid;
   double missval = field1.missval;
   double rstd;
 
@@ -309,11 +315,11 @@ void zonstd(field_type field1, field_type *field2)
 
   zonvar(field1, field2);
 
-  for ( size_t j = 0; j < ny; j++ )
+  for (size_t j = 0; j < ny; j++)
     {
       rstd = varToStd(field2->ptr[j], missval);
 
-      if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(rstd, missval)) rnmiss++;
 
       field2->ptr[j] = rstd;
     }
@@ -321,11 +327,11 @@ void zonstd(field_type field1, field_type *field2)
   field2->nmiss = rnmiss;
 }
 
-
-void zonstd1(field_type field1, field_type *field2)
+void
+zonstd1(field_type field1, field_type *field2)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
+  int grid = field1.grid;
   double missval = field1.missval;
   double rstd;
 
@@ -333,11 +339,11 @@ void zonstd1(field_type field1, field_type *field2)
 
   zonvar1(field1, field2);
 
-  for ( size_t j = 0; j < ny; j++ )
+  for (size_t j = 0; j < ny; j++)
     {
       rstd = varToStd(field2->ptr[j], missval);
 
-      if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
+      if (DBL_IS_EQUAL(rstd, missval)) rnmiss++;
 
       field2->ptr[j] = rstd;
     }
@@ -346,29 +352,30 @@ void zonstd1(field_type field1, field_type *field2)
 }
 
 /* RQ */
-void zonpctl(field_type field1, field_type *field2, int p)
+void
+zonpctl(field_type field1, field_type *field2, int p)
 {
   size_t rnmiss = 0;
-  int    grid    = field1.grid;
-  size_t nmiss   = field1.nmiss;
+  int grid = field1.grid;
+  size_t nmiss = field1.nmiss;
   double missval = field1.missval;
-  double *array  = field1.ptr;
+  double *array = field1.ptr;
 
   size_t nx = gridInqXsize(grid);
   size_t ny = gridInqYsize(grid);
-  
-  if ( nmiss > 0 )
+
+  if (nmiss > 0)
     {
-      double *array2 = (double*) Malloc(nx*sizeof(double));
-      
-      for ( size_t j = 0; j < ny; j++ )
+      double *array2 = (double *) Malloc(nx * sizeof(double));
+
+      for (size_t j = 0; j < ny; j++)
         {
           size_t l = 0;
-          for ( size_t i = 0; i < nx; i++ )
-            if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
-              array2[l++] = array[j*nx+i];
-	    
-          if ( l > 0 )
+          for (size_t i = 0; i < nx; i++)
+            if (!DBL_IS_EQUAL(array[j * nx + i], missval))
+              array2[l++] = array[j * nx + i];
+
+          if (l > 0)
             {
               field2->ptr[j] = percentile(array2, l, p);
             }
@@ -378,16 +385,16 @@ void zonpctl(field_type field1, field_type *field2, int p)
               rnmiss++;
             }
         }
-        
+
       Free(array2);
     }
   else
     {
-      for ( size_t j = 0; j < ny; j++ )
+      for (size_t j = 0; j < ny; j++)
         {
-          if ( nx > 0 )
+          if (nx > 0)
             {
-              field2->ptr[j] = percentile(&array[j*nx], nx, p);
+              field2->ptr[j] = percentile(&array[j * nx], nx, p);
             }
           else
             {

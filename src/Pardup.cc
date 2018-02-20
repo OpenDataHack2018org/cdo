@@ -27,8 +27,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Pardup(void *process)
+void *
+Pardup(void *process)
 {
   int nrecs;
   int varID, varID2, levelID;
@@ -45,11 +45,11 @@ void *Pardup(void *process)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == PARDUP )
+  if (operatorID == PARDUP)
     {
       nmul = 2;
     }
-  else if ( operatorID == PARMUL )
+  else if (operatorID == PARMUL)
     {
       operatorInputArg("number of multiply");
       nmul = parameter2int(operatorArgv()[0]);
@@ -66,72 +66,73 @@ void *Pardup(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
-  double *array    = (double*) Malloc(gridsize*sizeof(double));
-  double **vardata = (double **) Malloc(nvars*sizeof(double *));
-  size_t **varnmiss = (size_t **) Malloc(nvars*sizeof(size_t *));
+  double *array = (double *) Malloc(gridsize * sizeof(double));
+  double **vardata = (double **) Malloc(nvars * sizeof(double *));
+  size_t **varnmiss = (size_t **) Malloc(nvars * sizeof(size_t *));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      vardata[varID]  = (double*) Malloc(gridsize*nlevel*sizeof(double));
-      varnmiss[varID] = (size_t*) Malloc(nlevel*sizeof(size_t));
+      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      vardata[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
+      varnmiss[varID] = (size_t *) Malloc(nlevel * sizeof(size_t));
     }
 
-  for ( int i = 1; i < nmul; i++ )
+  for (int i = 1; i < nmul; i++)
     {
       vlistCat(vlistID2, vlistID1);
-      for ( varID = 0; varID < nvars; varID++ )
-	vlistDefVarParam(vlistID2, varID+nvars*i, cdiEncodeParam(-(varID+nvars*i+1), 255, 255));
+      for (varID = 0; varID < nvars; varID++)
+        vlistDefVarParam(vlistID2, varID + nvars * i,
+                         cdiEncodeParam(-(varID + nvars * i + 1), 255, 255));
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  recVarID[recID]   = varID;
-	  recLevelID[recID] = levelID;
+          recVarID[recID] = varID;
+          recLevelID[recID] = levelID;
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  offset   = gridsize*levelID;
-	  single   = vardata[varID] + offset;
-  
-	  pstreamReadRecord(streamID1, single, &nmiss);
-	  varnmiss[varID][levelID] = nmiss;
-	}
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          offset = gridsize * levelID;
+          single = vardata[varID] + offset;
 
-      for ( int i = 0; i < nmul; i++ )
-	for ( int recID = 0; recID < nrecs; recID++ )
-	  {
-	    varID    = recVarID[recID];
-	    varID2   = varID + i*nvars;
-	    levelID  = recLevelID[recID];
+          pstreamReadRecord(streamID1, single, &nmiss);
+          varnmiss[varID][levelID] = nmiss;
+        }
 
-	    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	    offset   = gridsize*levelID;
-	    single   = vardata[varID] + offset;
-	    nmiss    = varnmiss[varID][levelID];
+      for (int i = 0; i < nmul; i++)
+        for (int recID = 0; recID < nrecs; recID++)
+          {
+            varID = recVarID[recID];
+            varID2 = varID + i * nvars;
+            levelID = recLevelID[recID];
 
-	    arrayCopy(gridsize, single, array);
-	    pstreamDefRecord(streamID2,  varID2,  levelID);
-	    pstreamWriteRecord(streamID2, array, nmiss);
-	  }
+            gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+            offset = gridsize * levelID;
+            single = vardata[varID] + offset;
+            nmiss = varnmiss[varID][levelID];
+
+            arrayCopy(gridsize, single, array);
+            pstreamDefRecord(streamID2, varID2, levelID);
+            pstreamWriteRecord(streamID2, array, nmiss);
+          }
 
       tsID++;
     }
@@ -139,8 +140,10 @@ void *Pardup(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  for ( varID = 0; varID < nvars; varID++ ) Free(vardata[varID]);
-  for ( varID = 0; varID < nvars; varID++ ) Free(varnmiss[varID]);
+  for (varID = 0; varID < nvars; varID++)
+    Free(vardata[varID]);
+  for (varID = 0; varID < nvars; varID++)
+    Free(varnmiss[varID]);
   Free(vardata);
   Free(varnmiss);
   Free(array);

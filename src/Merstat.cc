@@ -25,12 +25,11 @@
       Merstat    mermean         Meridional mean
       Merstat    meravg          Meridional average
       Merstat    merstd          Meridional standard deviation
-      Merstat    merstd          Meridional standard deviation [Normalize by (n-1)]
-      Merstat    mervar          Meridional variance
-      Merstat    mervar          Meridional variance [Normalize by (n-1)]
-      Merstat    merpctl         Meridional percentiles
+      Merstat    merstd          Meridional standard deviation [Normalize by
+   (n-1)] Merstat    mervar          Meridional variance Merstat    mervar
+   Meridional variance [Normalize by (n-1)] Merstat    merpctl
+   Meridional percentiles
 */
-
 
 #include <cdi.h>
 
@@ -39,8 +38,8 @@
 #include "pstream_int.h"
 #include "percentiles.h"
 
-
-void *Merstat(void *process)
+void *
+Merstat(void *process)
 {
   int gridID1, gridID2 = -1, lastgrid = -1;
   int wstatus = FALSE;
@@ -65,13 +64,13 @@ void *Merstat(void *process)
   cdoOperatorAdd("merstd1",  func_std1w, 1, NULL);
   cdoOperatorAdd("merpctl",  func_pctl,  0, NULL);
   // clang-format on
-  
+
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
   bool needWeights = cdoOperatorF2(operatorID) != 0;
 
   double pn = 0;
-  if ( operfunc == func_pctl )
+  if (operfunc == func_pctl)
     {
       operatorInputArg("percentile number");
       pn = parameter2double(operatorArgv()[0]);
@@ -89,18 +88,17 @@ void *Merstat(void *process)
 
   int ngrids = vlistNgrids(vlistID1);
   int ndiffgrids = 0;
-  for ( index = 1; index < ngrids; index++ )
-    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
-      ndiffgrids++;
+  for (index = 1; index < ngrids; index++)
+    if (vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index)) ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
+  if (ndiffgrids > 0) cdoAbort("Too many different grids!");
 
   index = 0;
   gridID1 = vlistGrid(vlistID1, index);
 
-  if ( gridInqType(gridID1) == GRID_LONLAT   ||
-       gridInqType(gridID1) == GRID_GAUSSIAN ||
-       gridInqType(gridID1) == GRID_GENERIC )
+  if (gridInqType(gridID1) == GRID_LONLAT
+      || gridInqType(gridID1) == GRID_GAUSSIAN
+      || gridInqType(gridID1) == GRID_GENERIC)
     {
       gridID2 = gridToMeridional(gridID1);
     }
@@ -122,47 +120,48 @@ void *Merstat(void *process)
   field_init(&field1);
   field_init(&field2);
 
-  field1.ptr    = (double*) Malloc(lim*sizeof(double));
+  field1.ptr = (double *) Malloc(lim * sizeof(double));
   field1.weight = NULL;
-  if ( needWeights )
-    field1.weight = (double*) Malloc(lim*sizeof(double));
+  if (needWeights) field1.weight = (double *) Malloc(lim * sizeof(double));
 
-  field2.ptr  = (double*) Malloc(nlonmax*sizeof(double));
+  field2.ptr = (double *) Malloc(nlonmax * sizeof(double));
   field2.grid = gridID2;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
           field1.nmiss = nmiss;
-	  field1.grid = vlistInqVarGrid(vlistID1, varID);
-	  if ( needWeights && field1.grid != lastgrid )
-	    {
-	      lastgrid = field1.grid;
-	      wstatus = gridWeights(field1.grid, field1.weight);
-	    }
-	  if ( wstatus != 0 && tsID == 0 && levelID == 0 )
-	    {
-	      vlistInqVarName(vlistID1, varID, varname);
-	      cdoWarning("Using constant grid cell area weights for variable %s!", varname);
-	    }
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
-	  field2.missval = vlistInqVarMissval(vlistID1, varID);
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          if (needWeights && field1.grid != lastgrid)
+            {
+              lastgrid = field1.grid;
+              wstatus = gridWeights(field1.grid, field1.weight);
+            }
+          if (wstatus != 0 && tsID == 0 && levelID == 0)
+            {
+              vlistInqVarName(vlistID1, varID, varname);
+              cdoWarning(
+                  "Using constant grid cell area weights for variable %s!",
+                  varname);
+            }
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
+          field2.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( operfunc == func_pctl )
-	    merpctl(field1, & field2, pn);
-	  else  
-	    merfun(field1, &field2, operfunc);
+          if (operfunc == func_pctl)
+            merpctl(field1, &field2, pn);
+          else
+            merfun(field1, &field2, operfunc);
 
-	  pstreamDefRecord(streamID2, varID,  levelID);
-	  pstreamWriteRecord(streamID2, field2.ptr, field2.nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, field2.ptr, field2.nmiss);
+        }
 
       tsID++;
     }
@@ -170,9 +169,9 @@ void *Merstat(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( field1.ptr )    Free(field1.ptr);
-  if ( field1.weight ) Free(field1.weight);
-  if ( field2.ptr )    Free(field2.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field1.weight) Free(field1.weight);
+  if (field2.ptr) Free(field2.ptr);
 
   cdoFinish();
 

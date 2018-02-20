@@ -20,7 +20,6 @@
 
 #include "process.h"
 
-
 /**
  * Sets the underlying Process threadID and calls omp_set_num_threads
  */
@@ -74,14 +73,15 @@ std::string cdoGetStreamName(int p_streamIndex);
  *  Returns the basis name for output files.
  *  If no obase was found Cdo will exit
  */
-char* cdoGetObase();
+char *cdoGetObase();
 
 /**
  * Returns the number type for the operator used in the current process
  */
 int cdoStreamNumber();
 /**
- * Returns the current number of in and out streams that were added to this cdoProcess
+ * Returns the current number of in and out streams that were added to this
+ * cdoProcess
  */
 
 int cdoStreamCnt(void);
@@ -91,9 +91,9 @@ int cdoStreamCnt(void);
 int cdoStreamName(int cnt);
 
 /**
- * Returns the stream ID for \p inStreamIDX. If the input is from another process,
- * a new thread will be started and the found process will run in that thread.
- * Is the ID bigger thatn the count of input streams cdo will exit.
+ * Returns the stream ID for \p inStreamIDX. If the input is from another
+ * process, a new thread will be started and the found process will run in that
+ * thread. Is the ID bigger thatn the count of input streams cdo will exit.
  */
 int cdoStreamOpenRead(int inStreamIDX);
 int cdoStreamOpenWrite(int outStreamIDX, int filetype);
@@ -101,7 +101,7 @@ int cdoStreamOpenWrite(std::string p_filename, int filetype);
 
 /**
  * returns pstreamID for ID \p outStreamIDX.
- * 
+ *
  */
 int cdoStreamOpenAppend(int outStreamIDX);
 
@@ -125,13 +125,14 @@ void operatorCheckArgc(int numargs);
 
 /**
  * Asks user for input.
- * @param enter string that will be displayed when asking for input from the user
+ * @param enter string that will be displayed when asking for input from the
+ * user
  */
 void operatorInputArg(const char *enter);
 /**
  * Returns pointer to first element of operator arguments
  */
-char ** operatorArgv(void);
+char **operatorArgv(void);
 
 /**
  * Returns the number of operator arguments
@@ -171,7 +172,7 @@ ProcessType &processSelf(void);
 /**
  * Returns process with id \p p_processID
  */
-ProcessType* getProcess(int p_processID);
+ProcessType *getProcess(int p_processID);
 
 /**
  * Deletes all processes
@@ -184,7 +185,8 @@ void processStartTime(double *utime, double *stime);
 /**
  * Creates processes from argv.
  * @param argc standard argc  minus the options
- * @param argv standard argv after option processing starting with the first operator
+ * @param argv standard argv after option processing starting with the first
+ * operator
  */
 void createProcesses(int argc, const char **argv);
 

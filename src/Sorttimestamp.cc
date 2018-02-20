@@ -21,39 +21,38 @@
      Sorttimestamp    sorttimestamp         Sort all timesteps
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-#define  NALLOC_INC  1024
+#define NALLOC_INC 1024
 
 typedef struct
 {
-  int      index;
-  double   datetime;
-}
-timeinfo_t;
+  int index;
+  double datetime;
+} timeinfo_t;
 
-static
-int cmpdatetime(const void *s1, const void *s2)
+static int
+cmpdatetime(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const timeinfo_t *x = (timeinfo_t *)s1;
-  const timeinfo_t *y = (timeinfo_t *)s2;
+  const timeinfo_t *x = (timeinfo_t *) s1;
+  const timeinfo_t *y = (timeinfo_t *) s2;
   /*
   printf("%g %g  %d %d\n", x->datetime, y->datetime, x, y);
   */
-  if      ( x->datetime < y->datetime ) cmp = -1;
-  else if ( x->datetime > y->datetime ) cmp =  1;
+  if (x->datetime < y->datetime)
+    cmp = -1;
+  else if (x->datetime > y->datetime)
+    cmp = 1;
 
   return cmp;
 }
 
-
-void *Sorttimestamp(void *process)
+void *
+Sorttimestamp(void *process)
 {
   int nrecs;
   int gridID, varID, levelID;
@@ -65,86 +64,86 @@ void *Sorttimestamp(void *process)
 
   cdoInitialize(process);
 
-  std::vector<field_type**> vars;
+  std::vector<field_type **> vars;
   std::vector<int> vdate, vtime;
 
   int nfiles = cdoStreamCnt() - 1;
 
   int xtsID = 0;
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
+  for (int fileID = 0; fileID < nfiles; fileID++)
     {
       int streamID1 = cdoStreamOpenRead(cdoStreamName(fileID));
 
       int vlistID1 = cdoStreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
-      if ( fileID == 0 )
-	{
-	  vlistID2 = vlistDuplicate(vlistID1);
-	  taxisID2 = taxisDuplicate(taxisID1);
-	  if ( taxisHasBounds(taxisID2) )
-	    {
-	      cdoWarning("Time bounds unsupported by this operator, removed!");
-	      taxisDeleteBounds(taxisID2);
-	    }
-	}
+      if (fileID == 0)
+        {
+          vlistID2 = vlistDuplicate(vlistID1);
+          taxisID2 = taxisDuplicate(taxisID1);
+          if (taxisHasBounds(taxisID2))
+            {
+              cdoWarning("Time bounds unsupported by this operator, removed!");
+              taxisDeleteBounds(taxisID2);
+            }
+        }
       else
-	{
-	  vlistCompare(vlistID2, vlistID1, CMP_ALL);
-	}
+        {
+          vlistCompare(vlistID2, vlistID1, CMP_ALL);
+        }
 
       nvars = vlistNvars(vlistID1);
 
       int tsID = 0;
-      while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
-	{
-	  if ( xtsID >= nalloc )
-	    {
-	      nalloc += NALLOC_INC;
-	      vdate.resize(nalloc);
-	      vtime.resize(nalloc);
-	      vars.resize(nalloc);
-	    }
+      while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
+        {
+          if (xtsID >= nalloc)
+            {
+              nalloc += NALLOC_INC;
+              vdate.resize(nalloc);
+              vtime.resize(nalloc);
+              vars.resize(nalloc);
+            }
 
-	  vdate[xtsID] = taxisInqVdate(taxisID1);
-	  vtime[xtsID] = taxisInqVtime(taxisID1);
+          vdate[xtsID] = taxisInqVdate(taxisID1);
+          vtime[xtsID] = taxisInqVtime(taxisID1);
 
-	  vars[xtsID] = field_malloc(vlistID1, FIELD_NONE);
+          vars[xtsID] = field_malloc(vlistID1, FIELD_NONE);
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
-	      gridID = vlistInqVarGrid(vlistID1, varID);
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
+              gridID = vlistInqVarGrid(vlistID1, varID);
               size_t gridsize = gridInqSize(gridID);
-	      vars[xtsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-	      pstreamReadRecord(streamID1, vars[xtsID][varID][levelID].ptr, &nmiss);
-	      vars[xtsID][varID][levelID].nmiss = nmiss;
-	    }
+              vars[xtsID][varID][levelID].ptr
+                  = (double *) Malloc(gridsize * sizeof(double));
+              pstreamReadRecord(streamID1, vars[xtsID][varID][levelID].ptr,
+                                &nmiss);
+              vars[xtsID][varID][levelID].nmiss = nmiss;
+            }
 
-	  tsID++;
-	  xtsID++;
-	}
+          tsID++;
+          xtsID++;
+        }
 
       pstreamClose(streamID1);
     }
 
   int nts = xtsID;
 
-  timeinfo_t *timeinfo= (timeinfo_t*) Malloc(nts*sizeof(timeinfo_t));
+  timeinfo_t *timeinfo = (timeinfo_t *) Malloc(nts * sizeof(timeinfo_t));
 
-  for ( tsID = 0; tsID < nts; tsID++ )
+  for (tsID = 0; tsID < nts; tsID++)
     {
       int calendar = taxisInqCalendar(taxisID2);
       int julday = date_to_julday(calendar, vdate[tsID]);
       int secofday = time_to_sec(vtime[tsID]);
       double vdatetime = julday + secofday / 86400.;
-      timeinfo[tsID].index    = tsID;
+      timeinfo[tsID].index = tsID;
       timeinfo[tsID].datetime = vdatetime;
     }
-  
 
-  qsort(timeinfo, nts, sizeof(timeinfo_t), cmpdatetime);  	      
-
+  qsort(timeinfo, nts, sizeof(timeinfo_t), cmpdatetime);
 
   vlistDefTaxis(vlistID2, taxisID2);
 
@@ -152,24 +151,25 @@ void *Sorttimestamp(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int tsID2 = 0;
-  for ( tsID = 0; tsID < nts; tsID++ )
+  for (tsID = 0; tsID < nts; tsID++)
     {
       xtsID = timeinfo[tsID].index;
 
-      if ( tsID > 0 )
-	{
-	  if ( IS_EQUAL(timeinfo[tsID].datetime, timeinfo[lasttsID].datetime) )
-	    {
-	      if ( cdoVerbose )
-		{
-		  char vdatestr[32], vtimestr[32];
-		  date2str(vdate[xtsID], vdatestr, sizeof(vdatestr));
-		  time2str(vtime[xtsID], vtimestr, sizeof(vtimestr));
-		  cdoPrint("Timestep %4d %s %s already exists, skipped!", xtsID, vdatestr, vtimestr);
-		}
-	      continue;
-	    }
-	}
+      if (tsID > 0)
+        {
+          if (IS_EQUAL(timeinfo[tsID].datetime, timeinfo[lasttsID].datetime))
+            {
+              if (cdoVerbose)
+                {
+                  char vdatestr[32], vtimestr[32];
+                  date2str(vdate[xtsID], vdatestr, sizeof(vdatestr));
+                  time2str(vtime[xtsID], vtimestr, sizeof(vtimestr));
+                  cdoPrint("Timestep %4d %s %s already exists, skipped!", xtsID,
+                           vdatestr, vtimestr);
+                }
+              continue;
+            }
+        }
 
       lasttsID = tsID;
 
@@ -177,21 +177,22 @@ void *Sorttimestamp(void *process)
       taxisDefVtime(taxisID2, vtime[xtsID]);
       pstreamDefTimestep(streamID2, tsID2++);
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    {
-	      if ( vars[xtsID][varID][levelID].ptr )
-		{
-		  nmiss = vars[xtsID][varID][levelID].nmiss;
-		  pstreamDefRecord(streamID2, varID, levelID);
-		  pstreamWriteRecord(streamID2, vars[xtsID][varID][levelID].ptr, nmiss);
-		}
-	    }
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          for (levelID = 0; levelID < nlevel; levelID++)
+            {
+              if (vars[xtsID][varID][levelID].ptr)
+                {
+                  nmiss = vars[xtsID][varID][levelID].nmiss;
+                  pstreamDefRecord(streamID2, varID, levelID);
+                  pstreamWriteRecord(streamID2, vars[xtsID][varID][levelID].ptr,
+                                     nmiss);
+                }
+            }
+        }
 
-      field_free(vars[xtsID], vlistID2);      
+      field_free(vars[xtsID], vlistID2);
     }
 
   pstreamClose(streamID2);

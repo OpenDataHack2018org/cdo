@@ -21,7 +21,6 @@
       Detrend    detrend         Detrend
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -29,12 +28,10 @@
 #include "cdoOptions.h"
 #include "datetime.h"
 
+#define NALLOC_INC 1024
 
-#define  NALLOC_INC  1024
-
-
-static
-void detrend(long nts, double missval1, double *array1, double *array2)
+static void
+detrend(long nts, double missval1, double *array1, double *array2)
 {
   double zj;
   double sumj, sumjj;
@@ -44,27 +41,27 @@ void detrend(long nts, double missval1, double *array1, double *array2)
   sumx = sumjx = 0;
   sumj = sumjj = 0;
   long n = 0;
-  for ( long j = 0; j < nts; j++ )
-    if ( !DBL_IS_EQUAL(array1[j], missval1) )
+  for (long j = 0; j < nts; j++)
+    if (!DBL_IS_EQUAL(array1[j], missval1))
       {
         zj = j;
-	sumx  += array1[j];
-	sumjx += zj * array1[j];
-	sumj  += zj;
-	sumjj += zj * zj;
-	n++;
+        sumx += array1[j];
+        sumjx += zj * array1[j];
+        sumj += zj;
+        sumjj += zj * zj;
+        n++;
       }
 
-  double work1 = DIVMN( SUBMN(sumjx, DIVMN( MULMN(sumx, sumj), n) ),
-                        SUBMN(sumjj, DIVMN( MULMN(sumj, sumj), n)) );
-  double work2 = SUBMN( DIVMN(sumx, n), MULMN(work1, DIVMN(sumj, n)));
+  double work1 = DIVMN(SUBMN(sumjx, DIVMN(MULMN(sumx, sumj), n)),
+                       SUBMN(sumjj, DIVMN(MULMN(sumj, sumj), n)));
+  double work2 = SUBMN(DIVMN(sumx, n), MULMN(work1, DIVMN(sumj, n)));
 
-  for ( long j = 0; j < nts; j++ )
+  for (long j = 0; j < nts; j++)
     array2[j] = SUBMN(array1[j], ADDMN(work2, MULMN(j, work1)));
 }
 
-
-void *Detrend(void *process)
+void *
+Detrend(void *process)
 {
   size_t gridsize;
   int nrecs;
@@ -91,30 +88,31 @@ void *Detrend(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
-  std::vector<field_type**> vars;
+  std::vector<field_type **> vars;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      if ( tsID >= nalloc )
-	{
-	  nalloc += NALLOC_INC;
-	  vars.resize(nalloc);
-	}
+      if (tsID >= nalloc)
+        {
+          nalloc += NALLOC_INC;
+          vars.resize(nalloc);
+        }
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-	  pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
-	  vars[tsID][varID][levelID].nmiss = nmiss;
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          gridID = vlistInqVarGrid(vlistID1, varID);
+          gridsize = gridInqSize(gridID);
+          vars[tsID][varID][levelID].ptr
+              = (double *) Malloc(gridsize * sizeof(double));
+          pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
+          vars[tsID][varID][levelID].nmiss = nmiss;
+        }
 
       tsID++;
     }
@@ -124,55 +122,57 @@ void *Detrend(void *process)
   NEW_2D(double, array1, Threading::ompNumThreads, nts);
   NEW_2D(double, array2, Threading::ompNumThreads, nts);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      missval  = vlistInqVarMissval(vlistID1, varID);
+      gridID = vlistInqVarGrid(vlistID1, varID);
+      missval = vlistInqVarMissval(vlistID1, varID);
       gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-#ifdef  _OPENMP
-#pragma omp parallel for default(none) shared(array1, array2, vars, varID, levelID, gridsize, nts, missval)
+      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      for (levelID = 0; levelID < nlevel; levelID++)
+        {
+#ifdef _OPENMP
+#pragma omp parallel for default(none) \
+    shared(array1, array2, vars, varID, levelID, gridsize, nts, missval)
 #endif
-	  for ( i = 0; i < gridsize; i++ )
-	    {
+          for (i = 0; i < gridsize; i++)
+            {
               int ompthID = cdo_omp_get_thread_num();
 
-	      for ( int tsID = 0; tsID < nts; tsID++ )
-		array1[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
+              for (int tsID = 0; tsID < nts; tsID++)
+                array1[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
-	      detrend(nts, missval, array1[ompthID], array2[ompthID]);
+              detrend(nts, missval, array1[ompthID], array2[ompthID]);
 
-	      for ( int tsID = 0; tsID < nts; tsID++ )
-		vars[tsID][varID][levelID].ptr[i] = array2[ompthID][tsID];
-	    }
-	}
+              for (int tsID = 0; tsID < nts; tsID++)
+                vars[tsID][varID][levelID].ptr[i] = array2[ompthID][tsID];
+            }
+        }
     }
 
   DELETE_2D(array1);
   DELETE_2D(array2);
 
-  for ( int tsID = 0; tsID < nts; tsID++ )
+  for (int tsID = 0; tsID < nts; tsID++)
     {
       dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    {
-	      if ( vars[tsID][varID][levelID].ptr )
-		{
-		  nmiss = vars[tsID][varID][levelID].nmiss;
-		  pstreamDefRecord(streamID2, varID, levelID);
-		  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
-		  Free(vars[tsID][varID][levelID].ptr);
-		  vars[tsID][varID][levelID].ptr = NULL;
-		}
-	    }
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          for (levelID = 0; levelID < nlevel; levelID++)
+            {
+              if (vars[tsID][varID][levelID].ptr)
+                {
+                  nmiss = vars[tsID][varID][levelID].nmiss;
+                  pstreamDefRecord(streamID2, varID, levelID);
+                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr,
+                                     nmiss);
+                  Free(vars[tsID][varID][levelID].ptr);
+                  vars[tsID][varID][levelID].ptr = NULL;
+                }
+            }
+        }
 
       field_free(vars[tsID], vlistID1);
     }

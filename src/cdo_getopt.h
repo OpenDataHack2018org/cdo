@@ -18,7 +18,8 @@
 #ifndef _CDO_GETOPT_H
 #define _CDO_GETOPT_H
 
-struct cdo_option {
+struct cdo_option
+{
   /* name of long option */
   const char *name;
   /*
@@ -32,12 +33,12 @@ struct cdo_option {
   int val;
 };
 
+#define no_argument 1        // no argument to the option is expect
+#define required_argument 2  // an argument to the option is required
+#define optional_argument 3  // an argument to the option may be presented.
 
-#define  no_argument        1   // no argument to the option is expect
-#define  required_argument  2   // an argument to the option is required
-#define  optional_argument  3   // an argument to the option may be presented.
+int cdo_getopt(int argc, char *const *argv, const char *optstring);
+int cdo_getopt_long(int argc, char *const *argv, const char *optstring,
+                    const struct cdo_option *longopts, int *longindex);
 
-int cdo_getopt(int argc, char * const *argv, const char *optstring);
-int cdo_getopt_long(int argc, char * const *argv, const char *optstring, const struct cdo_option *longopts, int *longindex);
-
-#endif  /* _CDO_GETOPT_H */
+#endif /* _CDO_GETOPT_H */

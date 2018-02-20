@@ -20,8 +20,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Seloperator(void *process)
+void *
+Seloperator(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -39,53 +39,52 @@ void *Seloperator(void *process)
 
   operatorInputArg("code, ltype, level");
 
-  int scode  = parameter2int(operatorArgv()[0]);
+  int scode = parameter2int(operatorArgv()[0]);
   int sltype = parameter2int(operatorArgv()[1]);
 
-  if ( operatorArgc() == 3 )
-    slevel = parameter2double(operatorArgv()[2]);
+  if (operatorArgc() == 3) slevel = parameter2double(operatorArgv()[2]);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
-      code    = vlistInqVarCode(vlistID1, varID);
+      code = vlistInqVarCode(vlistID1, varID);
       zaxisID = vlistInqVarZaxis(vlistID1, varID);
-      nlevs   = zaxisInqSize(zaxisID);
+      nlevs = zaxisInqSize(zaxisID);
 
       ltype = zaxis2ltype(zaxisID);
 
-      for ( levID = 0; levID < nlevs; levID++ )
-	{
-	  level = cdoZaxisInqLevel(zaxisID, levID);
+      for (levID = 0; levID < nlevs; levID++)
+        {
+          level = cdoZaxisInqLevel(zaxisID, levID);
 
-	  if ( operatorArgc() == 3 )
-	    sellevel = IS_EQUAL(level, slevel);
-	  else
-	    sellevel = TRUE;
+          if (operatorArgc() == 3)
+            sellevel = IS_EQUAL(level, slevel);
+          else
+            sellevel = TRUE;
 
-	  if ( scode == -1 || scode == code )
+          if (scode == -1 || scode == code)
             selcode = TRUE;
-	  else
+          else
             selcode = FALSE;
 
-	  if ( sltype == -1 || sltype == ltype )
+          if (sltype == -1 || sltype == ltype)
             selltype = TRUE;
-	  else
+          else
             selltype = FALSE;
 
-	  if ( selcode && selltype && sellevel )
-	    {
-	      vlistDefFlag(vlistID1, varID, levID, TRUE);
-	      selfound = TRUE;
-	    }
-	}
+          if (selcode && selltype && sellevel)
+            {
+              vlistDefFlag(vlistID1, varID, levID, TRUE);
+              selfound = TRUE;
+            }
+        }
     }
 
-  if ( selfound == FALSE )
+  if (selfound == FALSE)
     cdoWarning("Code %d, ltype %d, level %g not found!", scode, sltype, slevel);
 
   int vlistID2 = vlistCreate();
@@ -98,39 +97,39 @@ void *Seloperator(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  if ( ! lcopy )
+  if (!lcopy)
     {
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double*) Malloc(gridsize*sizeof(double));
+      array = (double *) Malloc(gridsize * sizeof(double));
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
-	    {
-	      varID2   = vlistFindVar(vlistID2, varID);
-	      levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
-	      pstreamDefRecord(streamID2, varID2, levelID2);
-	  
-	      if ( lcopy )
-		{
-		  pstreamCopyRecord(streamID2, streamID1);
-		}
-	      else
-		{
-		  pstreamReadRecord(streamID1, array, &nmiss);
-		  pstreamWriteRecord(streamID2, array, nmiss);
-		}
-	    }
-	}
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          if (vlistInqFlag(vlistID1, varID, levelID) == TRUE)
+            {
+              varID2 = vlistFindVar(vlistID2, varID);
+              levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+
+              pstreamDefRecord(streamID2, varID2, levelID2);
+
+              if (lcopy)
+                {
+                  pstreamCopyRecord(streamID2, streamID1);
+                }
+              else
+                {
+                  pstreamReadRecord(streamID1, array, &nmiss);
+                  pstreamWriteRecord(streamID2, array, nmiss);
+                }
+            }
+        }
 
       tsID++;
     }
@@ -140,8 +139,8 @@ void *Seloperator(void *process)
 
   vlistDestroy(vlistID2);
 
-  if ( ! lcopy )
-    if ( array ) Free(array);
+  if (!lcopy)
+    if (array) Free(array);
 
   cdoFinish();
 

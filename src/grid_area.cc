@@ -18,9 +18,8 @@
 #include "cdo_int.h"
 #include "grid.h"
 
-
-static
-void lonlat_to_xyz(double lon, double lat, double *xyz)
+static void
+lonlat_to_xyz(double lon, double lat, double *xyz)
 {
   double coslat = cos(lat);
   xyz[0] = coslat * cos(lon);
@@ -36,7 +35,8 @@ extern "C" {
 }
 
 static
-double yac_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_corner_lat)
+double yac_huiliers_area(int num_corners, double *cell_corner_lon, double
+*cell_corner_lat)
 {
   if ( num_corners < 3 ) return 0;
 
@@ -50,7 +50,7 @@ double yac_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_
      .num_corners     = num_corners};
 
   for ( int i = 0; i < num_corners; ++i ) edge_types[i] = GREAT_CIRCLE;
-  for ( int i = 0; i < num_corners; ++i ) 
+  for ( int i = 0; i < num_corners; ++i )
     lonlat_to_xyz(cell_corner_lon[i], cell_corner_lat[i], coordinates_xyz+i*3);
 
   double area = huiliers_area(cell);
@@ -60,12 +60,13 @@ double yac_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_
 }
 */
 
-static
-void cross_product(const double *restrict a, const double *restrict b, double *restrict c)
+static void
+cross_product(const double *restrict a, const double *restrict b,
+              double *restrict c)
 {
-  c[0] = a[1]*b[2] - a[2]*b[1];
-  c[1] = a[2]*b[0] - a[0]*b[2];
-  c[2] = a[0]*b[1] - a[1]*b[0];
+  c[0] = a[1] * b[2] - a[2] * b[1];
+  c[1] = a[2] * b[0] - a[0] * b[2];
+  c[2] = a[0] * b[1] - a[1] * b[0];
 }
 
 /*
@@ -76,14 +77,15 @@ double scalar_product(const double *restrict a, const double *restrict b)
 }
 */
 
-static
-double norm(const double *restrict a)
+static double
+norm(const double *restrict a)
 {
-  return (a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
+  return (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
 }
 /*
 static
-double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corner_lat)
+double mod_cell_area(int num_corners, double *cell_corner_lon, double
+*cell_corner_lat)
 {
   if ( num_corners < 3 ) return 0;
 
@@ -122,11 +124,11 @@ double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corn
   if ( fabs(area) > 0.0 )
     {
       for ( m = 0; m < M; m++ )
-	s[m] = sqrt(s[m]);
+        s[m] = sqrt(s[m]);
 
       for ( m = 0; m < M; m++ )
-	for ( i = 0; i < 3; i++ )
-	  u[m][i] = u[m][i]/s[m];
+        for ( i = 0; i < 3; i++ )
+          u[m][i] = u[m][i]/s[m];
 
       //  Compute interior angles Ai as the dihedral angles between planes
       //  by using the definition of the scalar product
@@ -142,18 +144,18 @@ double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corn
       //  and cells. Must have something to do with the theorem.
 
       for ( m = 0; m < M; m++ )
-	{
-	  ca[m] = - scalar_product(u[m], u[(m+1)%M]);
-	  if ( ca[m] < -1.0 ) ca[m] = -1.0;
-	  if ( ca[m] >  1.0 ) ca[m] =  1.0;
-	  a[m] = acos(ca[m]);
-	}
+        {
+          ca[m] = - scalar_product(u[m], u[(m+1)%M]);
+          if ( ca[m] < -1.0 ) ca[m] = -1.0;
+          if ( ca[m] >  1.0 ) ca[m] =  1.0;
+          a[m] = acos(ca[m]);
+        }
 
       //  Compute areas = a1 + a2 + a3 - (M-2) * pi. here for a unit sphere:
       area = - (double) (M-2) * M_PI;
 
       for ( m = 0; m < M; m++ )
-	area += a[m];
+        area += a[m];
 
       // area *= EarthRadius * EarthRadius;
       if ( area < 0.0 ) area = 0.0;
@@ -164,21 +166,22 @@ double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corn
 */
 
 /** area of a spherical triangle based on L'Huilier's Theorem
-  *
-  * source code is taken from code by Robert Oehmke of Earth System Modeling
-  * Framework (www.earthsystemmodeling.org)
-  *
-  * the license statement for this routine is as follows:
-  * Earth System Modeling Framework
-  * Copyright 2002-2013, University Corporation for Atmospheric Research,
-  * Massachusetts Institute of Technology, Geophysical Fluid Dynamics
-  * Laboratory, University of Michigan, National Centers for Environmental
-  * Prediction, Los Alamos National Laboratory, Argonne National Laboratory,
-  * NASA Goddard Space Flight Center.
-  * Licensed under the University of Illinois-NCSA License.
-  */
-static
-double mod_tri_area(const double *restrict u, const double *restrict v, const double *restrict w)
+ *
+ * source code is taken from code by Robert Oehmke of Earth System Modeling
+ * Framework (www.earthsystemmodeling.org)
+ *
+ * the license statement for this routine is as follows:
+ * Earth System Modeling Framework
+ * Copyright 2002-2013, University Corporation for Atmospheric Research,
+ * Massachusetts Institute of Technology, Geophysical Fluid Dynamics
+ * Laboratory, University of Michigan, National Centers for Environmental
+ * Prediction, Los Alamos National Laboratory, Argonne National Laboratory,
+ * NASA Goddard Space Flight Center.
+ * Licensed under the University of Illinois-NCSA License.
+ */
+static double
+mod_tri_area(const double *restrict u, const double *restrict v,
+             const double *restrict w)
 {
   double tmp_vec[3];
 
@@ -194,32 +197,34 @@ double mod_tri_area(const double *restrict u, const double *restrict v, const do
   double sinc = sqrt(norm(tmp_vec));
   double c = asin(sinc);
 
-  double s = 0.5*(a+b+c);
+  double s = 0.5 * (a + b + c);
 
-  double t = tan(s*0.5) * tan((s - a)*0.5) * tan((s - b)*0.5) * tan((s - c)*0.5);
+  double t = tan(s * 0.5) * tan((s - a) * 0.5) * tan((s - b) * 0.5)
+             * tan((s - c) * 0.5);
 
   double area = fabs(4.0 * atan(sqrt(fabs(t))));
 
   return area;
 }
 
- /*
-  * source code is taken from code by Robert Oehmke of Earth System Modeling
-  * Framework (www.earthsystemmodeling.org) and adjusted to CDO data structures
-  *
-  * the license statement for this routine is as follows:
-  * Earth System Modeling Framework
-  * Copyright 2002-2013, University Corporation for Atmospheric Research,
-  * Massachusetts Institute of Technology, Geophysical Fluid Dynamics
-  * Laboratory, University of Michigan, National Centers for Environmental
-  * Prediction, Los Alamos National Laboratory, Argonne National Laboratory,
-  * NASA Goddard Space Flight Center.
-  * Licensed under the University of Illinois-NCSA License.
-  */
-static
-double mod_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_corner_lat)
+/*
+ * source code is taken from code by Robert Oehmke of Earth System Modeling
+ * Framework (www.earthsystemmodeling.org) and adjusted to CDO data structures
+ *
+ * the license statement for this routine is as follows:
+ * Earth System Modeling Framework
+ * Copyright 2002-2013, University Corporation for Atmospheric Research,
+ * Massachusetts Institute of Technology, Geophysical Fluid Dynamics
+ * Laboratory, University of Michigan, National Centers for Environmental
+ * Prediction, Los Alamos National Laboratory, Argonne National Laboratory,
+ * NASA Goddard Space Flight Center.
+ * Licensed under the University of Illinois-NCSA License.
+ */
+static double
+mod_huiliers_area(int num_corners, double *cell_corner_lon,
+                  double *cell_corner_lat)
 {
-  if ( num_corners < 3 ) return 0;
+  if (num_corners < 3) return 0;
 
   // sum areas around cell
   double sum = 0.0;
@@ -228,24 +233,31 @@ double mod_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_
   lonlat_to_xyz(cell_corner_lon[0], cell_corner_lat[0], pnt1);
   lonlat_to_xyz(cell_corner_lon[1], cell_corner_lat[1], pnt2);
 
-  for ( int i = 2; i < num_corners; i++ )
+  for (int i = 2; i < num_corners; i++)
     {
       // points that make up a side of cell
       lonlat_to_xyz(cell_corner_lon[i], cell_corner_lat[i], pnt3);
- 
+
       // compute angle for pnt2
       sum += mod_tri_area(pnt1, pnt2, pnt3);
 
-      if ( i < (num_corners-1) ) { pnt2[0] = pnt3[0]; pnt2[1] = pnt3[1]; pnt2[2] = pnt3[2]; }
+      if (i < (num_corners - 1))
+        {
+          pnt2[0] = pnt3[0];
+          pnt2[1] = pnt3[1];
+          pnt2[2] = pnt3[2];
+        }
     }
 
   return sum;
 }
 
-static
-double mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell_corner_lat, double cell_center_lon, double cell_center_lat)
+static double
+mod_huiliers_area2(int num_corners, double *cell_corner_lon,
+                   double *cell_corner_lat, double cell_center_lon,
+                   double cell_center_lat)
 {
-  if ( num_corners < 3 ) return 0;
+  if (num_corners < 3) return 0;
 
   // sum areas around cell
   double sum = 0.0;
@@ -254,20 +266,25 @@ double mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell
   lonlat_to_xyz(cell_center_lon, cell_center_lat, pnt1);
   lonlat_to_xyz(cell_corner_lon[0], cell_corner_lat[0], pnt2);
 
-  for ( int i = 1; i < num_corners; i++ )
+  for (int i = 1; i < num_corners; i++)
     {
-      if ( IS_EQUAL(cell_corner_lon[i], cell_corner_lon[i-1]) && IS_EQUAL(cell_corner_lat[i], cell_corner_lat[i-1]) ) continue;
+      if (IS_EQUAL(cell_corner_lon[i], cell_corner_lon[i - 1])
+          && IS_EQUAL(cell_corner_lat[i], cell_corner_lat[i - 1]))
+        continue;
 
       // points that make up a side of cell
       lonlat_to_xyz(cell_corner_lon[i], cell_corner_lat[i], pnt3);
- 
+
       // compute angle for pnt2
       sum += mod_tri_area(pnt1, pnt2, pnt3);
 
-      pnt2[0] = pnt3[0]; pnt2[1] = pnt3[1]; pnt2[2] = pnt3[2];
+      pnt2[0] = pnt3[0];
+      pnt2[1] = pnt3[1];
+      pnt2[2] = pnt3[2];
     }
 
-  if ( !(IS_EQUAL(cell_corner_lon[0], cell_corner_lon[num_corners-1]) && IS_EQUAL(cell_corner_lat[0], cell_corner_lat[num_corners-1])) )
+  if (!(IS_EQUAL(cell_corner_lon[0], cell_corner_lon[num_corners - 1])
+        && IS_EQUAL(cell_corner_lat[0], cell_corner_lat[num_corners - 1])))
     {
       lonlat_to_xyz(cell_corner_lon[0], cell_corner_lat[0], pnt3);
       sum += mod_tri_area(pnt1, pnt2, pnt3);
@@ -276,8 +293,8 @@ double mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell
   return sum;
 }
 
-
-int gridGenArea(int gridID, double* area)
+int
+gridGenArea(int gridID, double *area)
 {
   int status = 0;
   bool lgrid_gen_bounds = false;
@@ -285,68 +302,67 @@ int gridGenArea(int gridID, double* area)
 
   size_t gridsize = gridInqSize(gridID);
   int gridtype = gridInqType(gridID);
-  int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1; 
+  int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
 
-  if ( gridtype != GRID_LONLAT      &&
-       gridtype != GRID_GAUSSIAN    &&
-       projtype != CDI_PROJ_RLL     &&
-       projtype != CDI_PROJ_LAEA    &&
-       projtype != CDI_PROJ_SINU    &&
-       projtype != CDI_PROJ_LCC     &&
-       gridtype != GRID_GME         &&
-       gridtype != GRID_CURVILINEAR &&
-       gridtype != GRID_UNSTRUCTURED )
+  if (gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN
+      && projtype != CDI_PROJ_RLL && projtype != CDI_PROJ_LAEA
+      && projtype != CDI_PROJ_SINU && projtype != CDI_PROJ_LCC
+      && gridtype != GRID_GME && gridtype != GRID_CURVILINEAR
+      && gridtype != GRID_UNSTRUCTURED)
     {
-      cdoAbort("Internal error! Unsupported gridtype: %s", gridNamePtr(gridtype)); 
+      cdoAbort("Internal error! Unsupported gridtype: %s",
+               gridNamePtr(gridtype));
     }
 
-  if ( gridtype != GRID_UNSTRUCTURED && gridtype != GRID_CURVILINEAR )
+  if (gridtype != GRID_UNSTRUCTURED && gridtype != GRID_CURVILINEAR)
     {
-      if ( gridtype == GRID_GME )
-	{
-	  lgriddestroy = true;
-	  gridID = gridToUnstructured(gridID, 1);
+      if (gridtype == GRID_GME)
+        {
+          lgriddestroy = true;
+          gridID = gridToUnstructured(gridID, 1);
           /*
-	  grid_mask = (int*) Malloc(gridsize*sizeof(int));
-	  gridInqMaskGME(gridID, grid_mask);
+          grid_mask = (int*) Malloc(gridsize*sizeof(int));
+          gridInqMaskGME(gridID, grid_mask);
           if ( grid_mask ) Free(grid_mask);
           */
-	}
+        }
       else
-	{
-	  lgriddestroy = true;
-	  gridID = gridToCurvilinear(gridID, 1);
-	  lgrid_gen_bounds = true;
-	}
+        {
+          lgriddestroy = true;
+          gridID = gridToCurvilinear(gridID, 1);
+          lgrid_gen_bounds = true;
+        }
     }
 
-  if ( gridtype == GRID_UNSTRUCTURED )
+  if (gridtype == GRID_UNSTRUCTURED)
     {
-      if ( gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0 )
-	{
-	  if ( gridInqNumber(gridID) > 0 )
-	    {
-	      lgriddestroy = true;
-	      gridID = referenceToGrid(gridID);
-	      if ( gridID == -1 ) return 1;
-	    }
-	}
+      if (gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0)
+        {
+          if (gridInqNumber(gridID) > 0)
+            {
+              lgriddestroy = true;
+              gridID = referenceToGrid(gridID);
+              if (gridID == -1) return 1;
+            }
+        }
     }
 
   gridtype = gridInqType(gridID);
 
-  size_t nv = ( gridtype == GRID_UNSTRUCTURED ) ? gridInqNvertex(gridID) : 4;
+  size_t nv = (gridtype == GRID_UNSTRUCTURED) ? gridInqNvertex(gridID) : 4;
 
-  if ( gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0 )
+  if (gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0)
     {
-      cdoWarning("Computation of grid cell area weights failed, grid cell center coordinates missing!");
+      cdoWarning("Computation of grid cell area weights failed, grid cell "
+                 "center coordinates missing!");
       status = 1;
       return status;
     }
 
-  if ( nv == 0 )
+  if (nv == 0)
     {
-      cdoWarning("Computation of grid cell area weights failed, grid cell corner coordinates missing!");
+      cdoWarning("Computation of grid cell area weights failed, grid cell "
+                 "corner coordinates missing!");
       status = 1;
       return status;
     }
@@ -356,84 +372,96 @@ int gridGenArea(int gridID, double* area)
   gridInqXunits(gridID, xunitstr);
   gridInqYunits(gridID, yunitstr);
 
-  double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
-  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lon = (double *) Malloc(gridsize * sizeof(double));
+  double *grid_center_lat = (double *) Malloc(gridsize * sizeof(double));
 
   gridInqXvals(gridID, grid_center_lon);
   gridInqYvals(gridID, grid_center_lat);
 
-  double *grid_corner_lon = (double*) Malloc(nv*gridsize*sizeof(double));
-  double *grid_corner_lat = (double*) Malloc(nv*gridsize*sizeof(double));
+  double *grid_corner_lon = (double *) Malloc(nv * gridsize * sizeof(double));
+  double *grid_corner_lat = (double *) Malloc(nv * gridsize * sizeof(double));
 
-  if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
+  if (gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL))
     {
       gridInqXbounds(gridID, grid_corner_lon);
       gridInqYbounds(gridID, grid_corner_lat);
     }
   else
     {
-      if ( lgrid_gen_bounds )
-	{
-	  size_t nlon = gridInqXsize(gridID);
-	  size_t nlat = gridInqYsize(gridID);
-	  double dlon = 0;
-	  if ( nlon == 1 ) dlon = 1;
+      if (lgrid_gen_bounds)
+        {
+          size_t nlon = gridInqXsize(gridID);
+          size_t nlat = gridInqYsize(gridID);
+          double dlon = 0;
+          if (nlon == 1) dlon = 1;
 
-	  grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon, grid_corner_lon, dlon);
-	  grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat, grid_corner_lat);
-	}
+          grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon,
+                                         grid_corner_lon, dlon);
+          grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat,
+                                         grid_corner_lat);
+        }
       else
-	{
-	  status = 1;
-	  return status;
-	}
+        {
+          status = 1;
+          return status;
+        }
     }
-  
-  grid_to_radian(xunitstr, gridsize,    grid_center_lon, "grid1 center longitudes");
-  grid_to_radian(xunitstr, gridsize*nv, grid_corner_lon, "grid1 corner longitudes");
 
-  grid_to_radian(yunitstr, gridsize,    grid_center_lat, "grid1 center latitudes");
-  grid_to_radian(yunitstr, gridsize*nv, grid_corner_lat, "grid1 corner latitudes");
+  grid_to_radian(xunitstr, gridsize, grid_center_lon,
+                 "grid1 center longitudes");
+  grid_to_radian(xunitstr, gridsize * nv, grid_corner_lon,
+                 "grid1 corner longitudes");
 
-  if ( lgriddestroy ) gridDestroy(gridID);
+  grid_to_radian(yunitstr, gridsize, grid_center_lat, "grid1 center latitudes");
+  grid_to_radian(yunitstr, gridsize * nv, grid_corner_lat,
+                 "grid1 corner latitudes");
+
+  if (lgriddestroy) gridDestroy(gridID);
 
   double findex = 0;
 
   progressInit();
 
-#ifdef  HAVE_OPENMP4
+#ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none)  reduction(+:findex)  \
   shared(gridsize,area,nv,grid_corner_lon,grid_corner_lat,grid_center_lon,grid_center_lat)
 #endif
-  for ( size_t i = 0; i < gridsize; ++i )
+  for (size_t i = 0; i < gridsize; ++i)
     {
       int lprogress = 1;
-      if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
+      if (cdo_omp_get_thread_num() != 0) lprogress = 0;
 
       findex++;
-      if ( lprogress ) progressStatus(0, 1, findex/gridsize);
+      if (lprogress) progressStatus(0, 1, findex / gridsize);
 
-      //area[i] = mod_cell_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
-      if ( nv <= 4 )
-	area[i] = mod_huiliers_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
+      // area[i] = mod_cell_area(nv, grid_corner_lon+i*nv,
+      // grid_corner_lat+i*nv);
+      if (nv <= 4)
+        area[i] = mod_huiliers_area(nv, grid_corner_lon + i * nv,
+                                    grid_corner_lat + i * nv);
       else
-	area[i] = mod_huiliers_area2(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv, grid_center_lon[i], grid_center_lat[i]);
+        area[i] = mod_huiliers_area2(nv, grid_corner_lon + i * nv,
+                                     grid_corner_lat + i * nv,
+                                     grid_center_lon[i], grid_center_lat[i]);
     }
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
       double total_area = 0;
-      for ( size_t i = 0; i < gridsize; ++i ) total_area += area[i];
+      for (size_t i = 0; i < gridsize; ++i)
+        total_area += area[i];
       cdoPrint("Total area = %g steradians", total_area);
     }
 
-  if ( gridsize < 20 )
+  if (gridsize < 20)
     {
       double total_area = 0;
-      for ( size_t i = 0; i < gridsize; ++i ) total_area += area[i];
+      for (size_t i = 0; i < gridsize; ++i)
+        total_area += area[i];
       int nzero = 0;
-      for ( size_t i = 0; i < gridsize; ++i ) if ( IS_EQUAL(area[i], 0.) ) nzero++;
-      if ( IS_EQUAL(total_area, 0.) ) status = 2;
+      for (size_t i = 0; i < gridsize; ++i)
+        if (IS_EQUAL(area[i], 0.)) nzero++;
+      if (IS_EQUAL(total_area, 0.)) status = 2;
     }
 
   Free(grid_center_lon);

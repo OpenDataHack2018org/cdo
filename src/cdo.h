@@ -18,5 +18,4 @@
 #ifndef _CDO_H
 #define _CDO_H
 
-
-#endif  /* _CDO_H */
+#endif /* _CDO_H */

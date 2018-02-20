@@ -28,88 +28,90 @@
       Vertstat   vertvar         Vertical variance
       Vertstat   vertvar1        Vertical variance [Normalize by (n-1)]
       Vertstat   vertstd         Vertical standard deviation
-      Vertstat   vertstd1        Vertical standard deviation [Normalize by (n-1)]
+      Vertstat   vertstd1        Vertical standard deviation [Normalize by
+   (n-1)]
 */
-
 
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 
+#define IS_SURFACE_LEVEL(zaxisID) \
+  (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
 
-#define IS_SURFACE_LEVEL(zaxisID)  (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
-
-
-int getSurfaceID(int vlistID)
+int
+getSurfaceID(int vlistID)
 {
   int surfID = -1;
 
   int nzaxis = vlistNzaxis(vlistID);
-  for ( int index = 0; index < nzaxis; ++index )
+  for (int index = 0; index < nzaxis; ++index)
     {
       int zaxisID = vlistZaxis(vlistID, index);
-      if ( IS_SURFACE_LEVEL(zaxisID) )
-	{
-	  surfID = vlistZaxis(vlistID, index);
-	  break;
-	}
+      if (IS_SURFACE_LEVEL(zaxisID))
+        {
+          surfID = vlistZaxis(vlistID, index);
+          break;
+        }
     }
 
-  if ( surfID == -1 ) surfID = zaxisCreate(ZAXIS_SURFACE, 1);
+  if (surfID == -1) surfID = zaxisCreate(ZAXIS_SURFACE, 1);
 
   return surfID;
 }
 
-static
-void setSurfaceID(int vlistID, int surfID)
+static void
+setSurfaceID(int vlistID, int surfID)
 {
   int nzaxis = vlistNzaxis(vlistID);
-  for ( int index = 0; index < nzaxis; ++index )
+  for (int index = 0; index < nzaxis; ++index)
     {
       int zaxisID = vlistZaxis(vlistID, index);
-      if ( zaxisID != surfID || !IS_SURFACE_LEVEL(zaxisID) )
-	vlistChangeZaxisIndex(vlistID, index, surfID);
+      if (zaxisID != surfID || !IS_SURFACE_LEVEL(zaxisID))
+        vlistChangeZaxisIndex(vlistID, index, surfID);
     }
 }
 
-
-void genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds)
+void
+genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds)
 {
-  if ( nlev == 1 )
+  if (nlev == 1)
     {
       lbounds[0] = 0.;
       ubounds[0] = 1.;
     }
   else
     {
-      lbounds[0]      = levels[0];
-      ubounds[nlev-1] = levels[nlev-1];
-      for ( int i = 0; i < nlev-1; ++i )
+      lbounds[0] = levels[0];
+      ubounds[nlev - 1] = levels[nlev - 1];
+      for (int i = 0; i < nlev - 1; ++i)
         {
-          double bound = 0.5*(levels[i] + levels[i+1]);
-          lbounds[i+1] = bound;
-          ubounds[i]   = bound;
+          double bound = 0.5 * (levels[i] + levels[i + 1]);
+          lbounds[i + 1] = bound;
+          ubounds[i] = bound;
         }
     }
 }
 
-
-int getLayerThickness(bool useweights, bool genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights)
+int
+getLayerThickness(bool useweights, bool genbounds, int index, int zaxisID,
+                  int nlev, double *thickness, double *weights)
 {
   int status = 0;
   int i;
-  double *levels  = (double *) Malloc(nlev*sizeof(double));
-  double *lbounds = (double *) Malloc(nlev*sizeof(double));
-  double *ubounds = (double *) Malloc(nlev*sizeof(double));
+  double *levels = (double *) Malloc(nlev * sizeof(double));
+  double *lbounds = (double *) Malloc(nlev * sizeof(double));
+  double *ubounds = (double *) Malloc(nlev * sizeof(double));
 
   cdoZaxisInqLevels(zaxisID, levels);
-  if ( genbounds )
+  if (genbounds)
     {
       status = 2;
       genLayerBounds(nlev, levels, lbounds, ubounds);
     }
-  else if ( useweights && zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
+  else if (useweights && zaxisInqLbounds(zaxisID, NULL)
+           && zaxisInqUbounds(zaxisID, NULL))
     {
       status = 1;
       zaxisInqLbounds(zaxisID, lbounds);
@@ -117,28 +119,35 @@ int getLayerThickness(bool useweights, bool genbounds, int index, int zaxisID, i
     }
   else
     {
-      for ( i = 0; i < nlev; ++i )
-	{
-	  lbounds[i] = 0.;
-	  ubounds[i] = 1.;
-	}
+      for (i = 0; i < nlev; ++i)
+        {
+          lbounds[i] = 0.;
+          ubounds[i] = 1.;
+        }
     }
-  
-  for ( i = 0; i < nlev; ++i ) thickness[i] = fabs(ubounds[i]-lbounds[i]);
+
+  for (i = 0; i < nlev; ++i)
+    thickness[i] = fabs(ubounds[i] - lbounds[i]);
 
   double lsum = 0;
   double wsum = 0;
-  for ( i = 0; i < nlev; ++i ) lsum += thickness[i];
-  for ( i = 0; i < nlev; ++i ) weights[i] = thickness[i];
-  for ( i = 0; i < nlev; ++i ) weights[i] /= (lsum/nlev);
-  for ( i = 0; i < nlev; ++i ) wsum += weights[i];
+  for (i = 0; i < nlev; ++i)
+    lsum += thickness[i];
+  for (i = 0; i < nlev; ++i)
+    weights[i] = thickness[i];
+  for (i = 0; i < nlev; ++i)
+    weights[i] /= (lsum / nlev);
+  for (i = 0; i < nlev; ++i)
+    wsum += weights[i];
 
-  if ( cdoVerbose )
+  if (cdoVerbose)
     {
-      cdoPrint("zaxisID=%d  nlev=%d  layersum=%g  weightsum=%g", index, nlev, lsum, wsum);
+      cdoPrint("zaxisID=%d  nlev=%d  layersum=%g  weightsum=%g", index, nlev,
+               lsum, wsum);
       printf("         level     bounds   thickness  weight\n");
-      for ( i = 0; i < nlev; ++i )
-	printf("   %3d  %6g  %6g/%-6g  %6g  %6g\n", i+1, levels[i], lbounds[i], ubounds[i], thickness[i], weights[i]);
+      for (i = 0; i < nlev; ++i)
+        printf("   %3d  %6g  %6g/%-6g  %6g  %6g\n", i + 1, levels[i],
+               lbounds[i], ubounds[i], thickness[i], weights[i]);
     }
 
   Free(levels);
@@ -148,50 +157,56 @@ int getLayerThickness(bool useweights, bool genbounds, int index, int zaxisID, i
   return status;
 }
 
-static
-void vertstatGetParameter(bool *weights, bool *genbounds)
+static void
+vertstatGetParameter(bool *weights, bool *genbounds)
 {
   int pargc = operatorArgc();
-  if ( pargc )
-    { 
+  if (pargc)
+    {
       char **pargv = operatorArgv();
 
       list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "FLDSTAT");
-      if ( kvlist_parse_cmdline(kvlist, pargc, pargv) != 0 ) cdoAbort("Parse error!");
-      if ( cdoVerbose ) kvlist_print(kvlist);
+      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0)
+        cdoAbort("Parse error!");
+      if (cdoVerbose) kvlist_print(kvlist);
 
-      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
+      for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
         {
-          keyValues_t *kv = *(keyValues_t **)kvnode->data;
+          keyValues_t *kv = *(keyValues_t **) kvnode->data;
           const char *key = kv->key;
-          if ( kv->nvalues > 1 ) cdoAbort("Too many values for parameter key >%s<!", key);
-          if ( kv->nvalues < 1 ) cdoAbort("Missing value for parameter key >%s<!", key);
+          if (kv->nvalues > 1)
+            cdoAbort("Too many values for parameter key >%s<!", key);
+          if (kv->nvalues < 1)
+            cdoAbort("Missing value for parameter key >%s<!", key);
           const char *value = kv->values[0];
-          
-          if      ( STR_IS_EQ(key, "weights")   ) *weights = parameter2bool(value);
-          else if ( STR_IS_EQ(key, "genbounds") ) *genbounds = parameter2bool(value);
-          else cdoAbort("Invalid parameter key >%s<!", key);
-        }          
-          
+
+          if (STR_IS_EQ(key, "weights"))
+            *weights = parameter2bool(value);
+          else if (STR_IS_EQ(key, "genbounds"))
+            *genbounds = parameter2bool(value);
+          else
+            cdoAbort("Invalid parameter key >%s<!", key);
+        }
+
       list_destroy(kvlist);
     }
 }
 
-
-void *Vertstat(void *process)
+void *
+Vertstat(void *process)
 {
   int nrecs;
   int gridID;
   int varID, levelID;
   size_t nmiss;
-  typedef struct {
+  typedef struct
+  {
     int zaxisID;
     int status;
     int numlevel;
     double *thickness;
     double *weights;
-  }
-  vert_t;
+  } vert_t;
 
   cdoInitialize(process);
 
@@ -219,14 +234,14 @@ void *Vertstat(void *process)
   int  divisor = operfunc == func_std1 || operfunc == func_var1;
   // clang-format on
 
-  //int applyWeights = lmean;
+  // int applyWeights = lmean;
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
   int vlistID2 = vlistCreate();
@@ -241,35 +256,37 @@ void *Vertstat(void *process)
 
   int nzaxis = vlistNzaxis(vlistID1);
   int nlev, zaxisID;
-  vert_t *vert = (vert_t*) Malloc(nzaxis*sizeof(vert_t));
-  if ( needWeights )
+  vert_t *vert = (vert_t *) Malloc(nzaxis * sizeof(vert_t));
+  if (needWeights)
     {
       bool useweights = true;
       bool genbounds = false;
-      if ( needWeights ) vertstatGetParameter(&useweights, &genbounds);
+      if (needWeights) vertstatGetParameter(&useweights, &genbounds);
 
-      if ( !useweights )
+      if (!useweights)
         {
           genbounds = false;
           cdoPrint("Using constant vertical weights!");
         }
-      
-      for ( int index = 0; index < nzaxis; ++index )
-	{
-	  zaxisID = vlistZaxis(vlistID1, index);
-	  nlev = zaxisInqSize(zaxisID);
-	  vert[index].numlevel = 0;
-	  vert[index].status   = 0;
-	  vert[index].zaxisID  = zaxisID;
-	  // if ( nlev > 1 )
-	    {
-	      vert[index].numlevel = nlev;
-	      vert[index].thickness = (double *) Malloc(nlev*sizeof(double));
-	      vert[index].weights = (double *) Malloc(nlev*sizeof(double));
-	      vert[index].status = getLayerThickness(useweights, genbounds, index, zaxisID, nlev, vert[index].thickness, vert[index].weights); 
-	    }
-          if ( !useweights ) vert[index].status = 3;
-	}
+
+      for (int index = 0; index < nzaxis; ++index)
+        {
+          zaxisID = vlistZaxis(vlistID1, index);
+          nlev = zaxisInqSize(zaxisID);
+          vert[index].numlevel = 0;
+          vert[index].status = 0;
+          vert[index].zaxisID = zaxisID;
+          // if ( nlev > 1 )
+          {
+            vert[index].numlevel = nlev;
+            vert[index].thickness = (double *) Malloc(nlev * sizeof(double));
+            vert[index].weights = (double *) Malloc(nlev * sizeof(double));
+            vert[index].status
+                = getLayerThickness(useweights, genbounds, index, zaxisID, nlev,
+                                    vert[index].thickness, vert[index].weights);
+          }
+          if (!useweights) vert[index].status = 3;
+        }
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -279,99 +296,104 @@ void *Vertstat(void *process)
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  field_type *vars1 = (field_type*) Malloc(nvars*sizeof(field_type));
-  field_type *samp1 = (field_type*) Malloc(nvars*sizeof(field_type));
+  field_type *vars1 = (field_type *) Malloc(nvars * sizeof(field_type));
+  field_type *samp1 = (field_type *) Malloc(nvars * sizeof(field_type));
   field_type *vars2 = NULL;
-  if ( lvarstd || lrange )
-    vars2 = (field_type*) Malloc(nvars*sizeof(field_type));
+  if (lvarstd || lrange)
+    vars2 = (field_type *) Malloc(nvars * sizeof(field_type));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
+      gridID = vlistInqVarGrid(vlistID1, varID);
       gridsize = gridInqSize(gridID);
-      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+      zaxisID = vlistInqVarZaxis(vlistID1, varID);
       double missval = vlistInqVarMissval(vlistID1, varID);
 
       field_init(&vars1[varID]);
       field_init(&samp1[varID]);
-      vars1[varID].grid    = gridID;
-      vars1[varID].zaxis   = zaxisID;
-      vars1[varID].nsamp   = 0;
-      vars1[varID].nmiss   = 0;
+      vars1[varID].grid = gridID;
+      vars1[varID].zaxis = zaxisID;
+      vars1[varID].nsamp = 0;
+      vars1[varID].nmiss = 0;
       vars1[varID].missval = missval;
-      vars1[varID].ptr     = (double*) Malloc(gridsize*sizeof(double));
-      samp1[varID].grid    = gridID;
-      samp1[varID].nmiss   = 0;
+      vars1[varID].ptr = (double *) Malloc(gridsize * sizeof(double));
+      samp1[varID].grid = gridID;
+      samp1[varID].nmiss = 0;
       samp1[varID].missval = missval;
-      samp1[varID].ptr     = NULL;
-      if ( lvarstd || lrange )
-	{
-	  field_init(&vars2[varID]);
-	  vars2[varID].grid    = gridID;
-	  vars2[varID].nmiss   = 0;
-	  vars2[varID].missval = missval;
-	  vars2[varID].ptr     = (double*) Malloc(gridsize*sizeof(double));
-	}
+      samp1[varID].ptr = NULL;
+      if (lvarstd || lrange)
+        {
+          field_init(&vars2[varID]);
+          vars2[varID].grid = gridID;
+          vars2[varID].nmiss = 0;
+          vars2[varID].missval = missval;
+          vars2[varID].ptr = (double *) Malloc(gridsize * sizeof(double));
+        }
     }
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
           vars1[varID].nsamp++;
-          if ( lrange ) vars2[varID].nsamp++;
-	  gridsize = gridInqSize(vars1[varID].grid);
-	  zaxisID  = vars1[varID].zaxis;
-	  nlev = zaxisInqSize(zaxisID);
+          if (lrange) vars2[varID].nsamp++;
+          gridsize = gridInqSize(vars1[varID].grid);
+          zaxisID = vars1[varID].zaxis;
+          nlev = zaxisInqSize(zaxisID);
 
-	  double layer_weight = 1.0;
-	  double layer_thickness = 1.0;
-	  if ( needWeights )
-	    {
-	      for ( int index = 0; index < nzaxis; ++index )
-		if ( vert[index].zaxisID == zaxisID )
-		  {		    
-		    if ( vert[index].status == 0 && tsID == 0 && levelID == 0 && nlev > 1 )
-		      {
-			char varname[CDI_MAX_NAME];
-			vlistInqVarName(vlistID1, varID, varname);
-			cdoWarning("Layer bounds not available, using constant vertical weights for variable %s!", varname);
-		      }
-		    else
-		      {
-			layer_weight    = vert[index].weights[levelID];
-			layer_thickness = vert[index].thickness[levelID];
-		      }
+          double layer_weight = 1.0;
+          double layer_thickness = 1.0;
+          if (needWeights)
+            {
+              for (int index = 0; index < nzaxis; ++index)
+                if (vert[index].zaxisID == zaxisID)
+                  {
+                    if (vert[index].status == 0 && tsID == 0 && levelID == 0
+                        && nlev > 1)
+                      {
+                        char varname[CDI_MAX_NAME];
+                        vlistInqVarName(vlistID1, varID, varname);
+                        cdoWarning("Layer bounds not available, using constant "
+                                   "vertical weights for variable %s!",
+                                   varname);
+                      }
+                    else
+                      {
+                        layer_weight = vert[index].weights[levelID];
+                        layer_thickness = vert[index].thickness[levelID];
+                      }
 
-		    break;
-		  }
-	    }
+                    break;
+                  }
+            }
 
-	  if ( levelID == 0 )
-	    {
-	      pstreamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
-	      vars1[varID].nmiss = nmiss;
-              if ( lrange )
+          if (levelID == 0)
+            {
+              pstreamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
+              vars1[varID].nmiss = nmiss;
+              if (lrange)
                 {
                   vars2[varID].nmiss = nmiss;
-                  for ( size_t i = 0; i < gridsize; i++ )
+                  for (size_t i = 0; i < gridsize; i++)
                     vars2[varID].ptr[i] = vars1[varID].ptr[i];
                 }
 
-	      if ( operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0) ) farcmul(&vars1[varID], layer_thickness);
-	      if ( lmean && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&vars1[varID], layer_weight);
+              if (operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0))
+                farcmul(&vars1[varID], layer_thickness);
+              if (lmean && IS_NOT_EQUAL(layer_weight, 1.0))
+                farcmul(&vars1[varID], layer_weight);
 
-	      if ( lvarstd )
+              if (lvarstd)
                 {
-                  if ( IS_NOT_EQUAL(layer_weight, 1.0) )
+                  if (IS_NOT_EQUAL(layer_weight, 1.0))
                     {
                       farmoqw(&vars2[varID], vars1[varID], layer_weight);
                       farcmul(&vars1[varID], layer_weight);
@@ -382,45 +404,49 @@ void *Vertstat(void *process)
                     }
                 }
 
-	      if ( nmiss > 0 || samp1[varID].ptr || needWeights )
-		{
-		  if ( samp1[varID].ptr == NULL )
-		    samp1[varID].ptr = (double *) Malloc(gridsize*sizeof(double));
+              if (nmiss > 0 || samp1[varID].ptr || needWeights)
+                {
+                  if (samp1[varID].ptr == NULL)
+                    samp1[varID].ptr
+                        = (double *) Malloc(gridsize * sizeof(double));
 
-		  for ( size_t i = 0; i < gridsize; i++ )
-		    if ( DBL_IS_EQUAL(vars1[varID].ptr[i], vars1[varID].missval) )
-		      samp1[varID].ptr[i] = 0.;
-		    else
-		      samp1[varID].ptr[i] = layer_weight;
-		}
-	    }
-	  else
-	    {
-	      pstreamReadRecord(streamID1, field.ptr, &nmiss);
-              field.nmiss   = nmiss;
-	      field.grid    = vars1[varID].grid;
-	      field.missval = vars1[varID].missval;
+                  for (size_t i = 0; i < gridsize; i++)
+                    if (DBL_IS_EQUAL(vars1[varID].ptr[i], vars1[varID].missval))
+                      samp1[varID].ptr[i] = 0.;
+                    else
+                      samp1[varID].ptr[i] = layer_weight;
+                }
+            }
+          else
+            {
+              pstreamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss = nmiss;
+              field.grid = vars1[varID].grid;
+              field.missval = vars1[varID].missval;
 
-	      if ( operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0) ) farcmul(&field, layer_thickness);
-	      if ( lmean && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&field, layer_weight);
+              if (operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0))
+                farcmul(&field, layer_thickness);
+              if (lmean && IS_NOT_EQUAL(layer_weight, 1.0))
+                farcmul(&field, layer_weight);
 
-	      if ( field.nmiss > 0 || samp1[varID].ptr )
-		{
-		  if ( samp1[varID].ptr == NULL )
-		    {
-		      samp1[varID].ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( size_t i = 0; i < gridsize; i++ )
-			samp1[varID].ptr[i] = vars1[varID].nsamp;
-		    }
+              if (field.nmiss > 0 || samp1[varID].ptr)
+                {
+                  if (samp1[varID].ptr == NULL)
+                    {
+                      samp1[varID].ptr
+                          = (double *) Malloc(gridsize * sizeof(double));
+                      for (size_t i = 0; i < gridsize; i++)
+                        samp1[varID].ptr[i] = vars1[varID].nsamp;
+                    }
 
-		  for ( size_t i = 0; i < gridsize; i++ )
-		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID].missval) )
-		      samp1[varID].ptr[i] += layer_weight;
-		}
+                  for (size_t i = 0; i < gridsize; i++)
+                    if (!DBL_IS_EQUAL(field.ptr[i], vars1[varID].missval))
+                      samp1[varID].ptr[i] += layer_weight;
+                }
 
-	      if ( lvarstd )
-		{
-                  if ( IS_NOT_EQUAL(layer_weight, 1.0) )
+              if (lvarstd)
+                {
+                  if (IS_NOT_EQUAL(layer_weight, 1.0))
                     {
                       farsumqw(&vars2[varID], field, layer_weight);
                       farsumw(&vars1[varID], field, layer_weight);
@@ -430,77 +456,82 @@ void *Vertstat(void *process)
                       farsumq(&vars2[varID], field);
                       farsum(&vars1[varID], field);
                     }
-		}
-              else if ( lrange )
+                }
+              else if (lrange)
                 {
                   farmin(&vars2[varID], field);
                   farmax(&vars1[varID], field);
                 }
-	      else
-		{
-		  farfun(&vars1[varID], field, operfunc);
-		}
-	    }
-	}
+              else
+                {
+                  farfun(&vars1[varID], field, operfunc);
+                }
+            }
+        }
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  if ( vars1[varID].nsamp )
-	    {
-	      if ( lmean )
-		{
-		  if ( samp1[varID].ptr == NULL )
-		    farcdiv(&vars1[varID], (double)vars1[varID].nsamp);
-		  else
-		    fardiv(&vars1[varID], samp1[varID]);
-		}
-	      else if ( lvarstd )
-		{
-		  if ( samp1[varID].ptr == NULL )
-		    {
-		      if ( lstd )
-			farcstd(&vars1[varID], vars2[varID], vars1[varID].nsamp, divisor);
-		      else
-			farcvar(&vars1[varID], vars2[varID], vars1[varID].nsamp, divisor);
-		    }
-		  else
-		    {
-		      if ( lstd )
-			farstd(&vars1[varID], vars2[varID], samp1[varID], divisor);
-		      else
-			farvar(&vars1[varID], vars2[varID], samp1[varID], divisor);
-		    }
-		}
-              else if ( lrange )
+      for (varID = 0; varID < nvars; varID++)
+        {
+          if (vars1[varID].nsamp)
+            {
+              if (lmean)
+                {
+                  if (samp1[varID].ptr == NULL)
+                    farcdiv(&vars1[varID], (double) vars1[varID].nsamp);
+                  else
+                    fardiv(&vars1[varID], samp1[varID]);
+                }
+              else if (lvarstd)
+                {
+                  if (samp1[varID].ptr == NULL)
+                    {
+                      if (lstd)
+                        farcstd(&vars1[varID], vars2[varID], vars1[varID].nsamp,
+                                divisor);
+                      else
+                        farcvar(&vars1[varID], vars2[varID], vars1[varID].nsamp,
+                                divisor);
+                    }
+                  else
+                    {
+                      if (lstd)
+                        farstd(&vars1[varID], vars2[varID], samp1[varID],
+                               divisor);
+                      else
+                        farvar(&vars1[varID], vars2[varID], samp1[varID],
+                               divisor);
+                    }
+                }
+              else if (lrange)
                 {
                   farsub(&vars1[varID], vars2[varID]);
                 }
 
-	      pstreamDefRecord(streamID2, varID, 0);
-	      pstreamWriteRecord(streamID2, vars1[varID].ptr, vars1[varID].nmiss);
-	      vars1[varID].nsamp = 0;
-	    }
-	}
+              pstreamDefRecord(streamID2, varID, 0);
+              pstreamWriteRecord(streamID2, vars1[varID].ptr,
+                                 vars1[varID].nmiss);
+              vars1[varID].nsamp = 0;
+            }
+        }
 
       tsID++;
     }
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       Free(vars1[varID].ptr);
-      if ( samp1[varID].ptr ) Free(samp1[varID].ptr);
-      if ( lvarstd ) Free(vars2[varID].ptr);
+      if (samp1[varID].ptr) Free(samp1[varID].ptr);
+      if (lvarstd) Free(vars2[varID].ptr);
     }
 
   Free(vars1);
   Free(samp1);
-  if ( lvarstd ) Free(vars2);
+  if (lvarstd) Free(vars2);
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
-  if ( needWeights )
-    for ( int index = 0; index < nzaxis; ++index )
-      if ( vert[index].numlevel > 1 )  Free(vert[index].weights);
+  if (needWeights)
+    for (int index = 0; index < nzaxis; ++index)
+      if (vert[index].numlevel > 1) Free(vert[index].weights);
 
   Free(vert);
 

@@ -29,8 +29,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Monarith(void *process)
+void *
+Monarith(void *process)
 {
   int nrecs, nrecs2, nlev;
   int varID, levelID;
@@ -56,14 +56,14 @@ void *Monarith(void *process)
   int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
-  
+
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
   field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -73,87 +73,91 @@ void *Monarith(void *process)
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  int nvars  = vlistNvars(vlistID2);
+  int nvars = vlistNvars(vlistID2);
 
-  double **vardata2  = (double **) Malloc(nvars*sizeof(double *));
-  size_t **varnmiss2 = (size_t **) Malloc(nvars*sizeof(size_t *));
+  double **vardata2 = (double **) Malloc(nvars * sizeof(double *));
+  size_t **varnmiss2 = (size_t **) Malloc(nvars * sizeof(size_t *));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-      vardata2[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-      varnmiss2[varID] = (size_t*) Malloc(nlev*sizeof(size_t));
+      nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+      vardata2[varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
+      varnmiss2[varID] = (size_t *) Malloc(nlev * sizeof(size_t));
     }
 
-  int tsID  = 0;
+  int tsID = 0;
   int tsID2 = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       int vdate = taxisInqVdate(taxisID1);
       int yearmon1 = vdate / 100;
 
-      if ( yearmon1 != yearmon2 )
-	{
-	  int year1, mon1;
+      if (yearmon1 != yearmon2)
+        {
+          int year1, mon1;
 
-	  year1 = yearmon1/100;
-	  mon1  = yearmon1 - (yearmon1/100)*100;
+          year1 = yearmon1 / 100;
+          mon1 = yearmon1 - (yearmon1 / 100) * 100;
 
-	  if ( cdoVerbose ) cdoPrint("Process: Year = %4d  Month = %2d", year1, mon1);
+          if (cdoVerbose)
+            cdoPrint("Process: Year = %4d  Month = %2d", year1, mon1);
 
-	  nrecs2 = cdoStreamInqTimestep(streamID2, tsID2);
-	  if ( nrecs2 == 0 )
-	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoGetStreamName(1).c_str());
+          nrecs2 = cdoStreamInqTimestep(streamID2, tsID2);
+          if (nrecs2 == 0)
+            cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1,
+                     cdoGetStreamName(1).c_str());
 
-	  vdate = taxisInqVdate(taxisID2);
-	  yearmon2 = vdate / 100;
+          vdate = taxisInqVdate(taxisID2);
+          yearmon2 = vdate / 100;
 
-	  if ( yearmon1 != yearmon2 )
-	    {
-	      int year2 = yearmon2/100;
-	      int mon2  = yearmon2 - (yearmon2/100)*100;
-	      cdoAbort("Timestep %d in %s has wrong date! Current year=%4d mon=%2d, expected year=%4d mon=%2d",
-		       tsID2+1, cdoGetStreamName(1).c_str(), year2, mon2, year1, mon1);
-	    }
+          if (yearmon1 != yearmon2)
+            {
+              int year2 = yearmon2 / 100;
+              int mon2 = yearmon2 - (yearmon2 / 100) * 100;
+              cdoAbort("Timestep %d in %s has wrong date! Current year=%4d "
+                       "mon=%2d, expected year=%4d mon=%2d",
+                       tsID2 + 1, cdoGetStreamName(1).c_str(), year2, mon2,
+                       year1, mon1);
+            }
 
-	  for ( int recID = 0; recID < nrecs2; recID++ )
-	    {
-	      pstreamInqRecord(streamID2, &varID, &levelID);
+          for (int recID = 0; recID < nrecs2; recID++)
+            {
+              pstreamInqRecord(streamID2, &varID, &levelID);
 
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	      offset   = gridsize*levelID;
+              gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+              offset = gridsize * levelID;
 
-	      pstreamReadRecord(streamID2, vardata2[varID]+offset, &nmiss);
-	      varnmiss2[varID][levelID] = nmiss;
-	    }
+              pstreamReadRecord(streamID2, vardata2[varID] + offset, &nmiss);
+              varnmiss2[varID][levelID] = nmiss;
+            }
 
-	  tsID2++;
-	}
+          tsID2++;
+        }
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss   = nmiss;
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = nmiss;
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  offset   = gridsize*levelID;
-	  arrayCopy(gridsize, vardata2[varID]+offset, field2.ptr);
-	  field2.nmiss   = varnmiss2[varID][levelID];
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
-	  field2.missval = vlistInqVarMissval(vlistID2, varID);
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          offset = gridsize * levelID;
+          arrayCopy(gridsize, vardata2[varID] + offset, field2.ptr);
+          field2.nmiss = varnmiss2[varID][levelID];
+          field2.grid = vlistInqVarGrid(vlistID2, varID);
+          field2.missval = vlistInqVarMissval(vlistID2, varID);
 
-	  farfun(&field1, field2, operfunc);
+          farfun(&field1, field2, operfunc);
 
-	  pstreamDefRecord(streamID3, varID, levelID);
-	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
-	}
+          pstreamDefRecord(streamID3, varID, levelID);
+          pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
+        }
 
       tsID++;
     }
@@ -162,7 +166,7 @@ void *Monarith(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for (varID = 0; varID < nvars; varID++)
     {
       Free(vardata2[varID]);
       Free(varnmiss2[varID]);
@@ -171,8 +175,8 @@ void *Monarith(void *process)
   Free(vardata2);
   Free(varnmiss2);
 
-  if ( field1.ptr ) Free(field1.ptr);
-  if ( field2.ptr ) Free(field2.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field2.ptr) Free(field2.ptr);
 
   cdoFinish();
 

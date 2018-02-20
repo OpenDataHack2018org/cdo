@@ -31,10 +31,10 @@
    version 2.2 of Bison.  */
 
 #ifndef YY_YY_EXPR_YACC_HH_INCLUDED
-# define YY_YY_EXPR_YACC_HH_INCLUDED
+#define YY_YY_EXPR_YACC_HH_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+#define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -42,28 +42,28 @@ extern int yydebug;
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    CONSTANT = 258,
-    VARIABLE = 259,
-    FUNCTION = 260,
-    QUESTION = 261,
-    COLON = 262,
-    REMOVE = 263,
-    PRINT = 264,
-    AND = 265,
-    OR = 266,
-    LEG = 267,
-    GE = 268,
-    LE = 269,
-    EQ = 270,
-    NE = 271,
-    GT = 272,
-    LT = 273,
-    UMINUS = 274,
-    NOT = 275
-  };
+#define YYTOKENTYPE
+enum yytokentype
+{
+  CONSTANT = 258,
+  VARIABLE = 259,
+  FUNCTION = 260,
+  QUESTION = 261,
+  COLON = 262,
+  REMOVE = 263,
+  PRINT = 264,
+  AND = 265,
+  OR = 266,
+  LEG = 267,
+  GE = 268,
+  LE = 269,
+  EQ = 270,
+  NE = 271,
+  GT = 272,
+  LT = 273,
+  UMINUS = 274,
+  NOT = 275
+};
 #endif
 /* Tokens.  */
 #define CONSTANT 258
@@ -87,8 +87,6 @@ extern int yydebug;
 
 /* Value type.  */
 
-
-
-int yyparse (parseParamType *parse_arg, void *scanner);
+int yyparse(parseParamType *parse_arg, void *scanner);
 
 #endif /* !YY_YY_EXPR_YACC_HH_INCLUDED  */

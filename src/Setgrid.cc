@@ -30,8 +30,8 @@
 #include "pstream_int.h"
 #include "grid.h"
 
-
-void *Setgrid(void *process)
+void *
+Setgrid(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -67,15 +67,15 @@ void *Setgrid(void *process)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorID != UNSETGRIDMASK )
-    operatorInputArg(cdoOperatorEnter(operatorID));  
+  if (operatorID != UNSETGRIDMASK)
+    operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == SETGRID )
+  if (operatorID == SETGRID)
     {
       operatorCheckArgc(1);
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
     }
-  else if ( operatorID == SETGRIDTYPE )
+  else if (operatorID == SETGRIDTYPE)
     {
       operatorCheckArgc(1);
       gridname = operatorArgv()[0];
@@ -95,7 +95,7 @@ void *Setgrid(void *process)
       else cdoAbort("Unsupported grid name: %s", gridname);
       // clang-format on
     }
-  else if ( operatorID == SETGRIDAREA )
+  else if (operatorID == SETGRIDAREA)
     {
       operatorCheckArgc(1);
       char *areafile = operatorArgv()[0];
@@ -108,19 +108,20 @@ void *Setgrid(void *process)
 
       int gridID = vlistInqVarGrid(vlistID, varID);
       areasize = gridInqSize(gridID);
-      areaweight = (double*) Malloc(areasize*sizeof(double));
-  
+      areaweight = (double *) Malloc(areasize * sizeof(double));
+
       streamReadRecord(streamID, areaweight, &nmiss);
       streamClose(streamID);
 
-      if ( cdoVerbose )
-	{
-	  double arrmean, arrmin, arrmax;
+      if (cdoVerbose)
+        {
+          double arrmean, arrmin, arrmax;
           arrayMinMaxMean(areasize, areaweight, &arrmin, &arrmax, &arrmean);
-	  cdoPrint("areaweights: %zu %#12.5g%#12.5g%#12.5g", areasize, arrmin, arrmean, arrmax);
-	}
+          cdoPrint("areaweights: %zu %#12.5g%#12.5g%#12.5g", areasize, arrmin,
+                   arrmean, arrmax);
+        }
     }
-  else if ( operatorID == SETGRIDMASK )
+  else if (operatorID == SETGRIDMASK)
     {
       operatorCheckArgc(1);
       char *maskfile = operatorArgv()[0];
@@ -131,35 +132,35 @@ void *Setgrid(void *process)
       nrecs = streamInqTimestep(streamID, 0);
       streamInqRecord(streamID, &varID, &levelID);
 
-      double missval  = vlistInqVarMissval(vlistID, varID);
-      int gridID   = vlistInqVarGrid(vlistID, varID);
+      double missval = vlistInqVarMissval(vlistID, varID);
+      int gridID = vlistInqVarGrid(vlistID, varID);
       masksize = gridInqSize(gridID);
-      gridmask = (double*) Malloc(masksize*sizeof(double));
-  
+      gridmask = (double *) Malloc(masksize * sizeof(double));
+
       streamReadRecord(streamID, gridmask, &nmiss);
       streamClose(streamID);
 
-      for ( size_t i = 0; i < masksize; i++ )
-	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
+      for (size_t i = 0; i < masksize; i++)
+        if (DBL_IS_EQUAL(gridmask[i], missval)) gridmask[i] = 0;
     }
-  else if ( operatorID == USEGRIDNUMBER )
+  else if (operatorID == USEGRIDNUMBER)
     {
       operatorCheckArgc(1);
       number = parameter2int(operatorArgv()[0]);
     }
-  else if ( operatorID == SETGRIDNUMBER )
+  else if (operatorID == SETGRIDNUMBER)
     {
-      if ( operatorArgc() >= 1 && operatorArgc() <= 2 )
-	{
-	  number = parameter2int(operatorArgv()[0]);
-	  if ( operatorArgc() == 2 ) position = parameter2int(operatorArgv()[1]);
-	}
+      if (operatorArgc() >= 1 && operatorArgc() <= 2)
+        {
+          number = parameter2int(operatorArgv()[0]);
+          if (operatorArgc() == 2) position = parameter2int(operatorArgv()[1]);
+        }
       else
-	{
-	  operatorCheckArgc(1);
-	}
+        {
+          operatorCheckArgc(1);
+        }
     }
-  else if ( operatorID == SETGRIDURI )
+  else if (operatorID == SETGRIDURI)
     {
       operatorCheckArgc(1);
       griduri = operatorArgv()[0];
@@ -174,234 +175,251 @@ void *Setgrid(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  if ( operatorID == SETGRID )
+  if (operatorID == SETGRID)
     {
       int found = 0;
       int ngrids = vlistNgrids(vlistID1);
-      for ( int index = 0; index < ngrids; index++ )
-	{
-	  int gridID1 = vlistGrid(vlistID1, index);
-
-	  if ( gridInqSize(gridID1) == gridInqSize(gridID2) )
-	    {
-	      vlistChangeGridIndex(vlistID2, index, gridID2);
-	      found++;
-	    }
-	}
-      if ( ! found ) cdoWarning("No grid with %zu points found!", gridInqSize(gridID2));
-    }
-  else if ( operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI || operatorID == USEGRIDNUMBER )
-    {
-      if ( operatorID == SETGRIDNUMBER )
-	{
-          int gridID1 = vlistGrid(vlistID1, 0);
-	  gridID2 = gridCreate(GRID_UNSTRUCTURED, gridInqSize(gridID1));
-	  gridDefNumber(gridID2, number);
-	  gridDefPosition(gridID2, position);
-	}
-      else if ( operatorID == USEGRIDNUMBER ) 
+      for (int index = 0; index < ngrids; index++)
         {
-	  if ( number < 1 || number > vlistNgrids(vlistID1) )
-	    cdoAbort("Invalid grid number: %d (max = %d)!", number, vlistNgrids(vlistID1));
-          
-	  gridID2 = vlistGrid(vlistID1, number-1);
+          int gridID1 = vlistGrid(vlistID1, index);
+
+          if (gridInqSize(gridID1) == gridInqSize(gridID2))
+            {
+              vlistChangeGridIndex(vlistID2, index, gridID2);
+              found++;
+            }
+        }
+      if (!found)
+        cdoWarning("No grid with %zu points found!", gridInqSize(gridID2));
+    }
+  else if (operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI
+           || operatorID == USEGRIDNUMBER)
+    {
+      if (operatorID == SETGRIDNUMBER)
+        {
+          int gridID1 = vlistGrid(vlistID1, 0);
+          gridID2 = gridCreate(GRID_UNSTRUCTURED, gridInqSize(gridID1));
+          gridDefNumber(gridID2, number);
+          gridDefPosition(gridID2, position);
+        }
+      else if (operatorID == USEGRIDNUMBER)
+        {
+          if (number < 1 || number > vlistNgrids(vlistID1))
+            cdoAbort("Invalid grid number: %d (max = %d)!", number,
+                     vlistNgrids(vlistID1));
+
+          gridID2 = vlistGrid(vlistID1, number - 1);
         }
       else
-	{
+        {
           int gridID1 = vlistGrid(vlistID1, 0);
-	  gridID2 = gridDuplicate(gridID1);
-	  gridDefReference(gridID2, griduri);
-	}
+          gridID2 = gridDuplicate(gridID1);
+          gridDefReference(gridID2, griduri);
+        }
 
       int found = 0;
       int ngrids = vlistNgrids(vlistID1);
-      for ( int index = 0; index < ngrids; index++ )
-	{
-	  int gridID1 = vlistGrid(vlistID1, index);
+      for (int index = 0; index < ngrids; index++)
+        {
+          int gridID1 = vlistGrid(vlistID1, index);
 
-	  if ( gridInqSize(gridID1) == gridInqSize(gridID2) )
-	    {
-	      vlistChangeGridIndex(vlistID2, index, gridID2);
-	      found++;
-	    }
-	}
-      if ( ! found ) cdoWarning("No horizontal grid with %zu cells found!", gridInqSize(gridID2));
+          if (gridInqSize(gridID1) == gridInqSize(gridID2))
+            {
+              vlistChangeGridIndex(vlistID2, index, gridID2);
+              found++;
+            }
+        }
+      if (!found)
+        cdoWarning("No horizontal grid with %zu cells found!",
+                   gridInqSize(gridID2));
     }
-  else if ( operatorID == SETGRIDTYPE )
+  else if (operatorID == SETGRIDTYPE)
     {
       bool lrgrid = false;
       int ngrids = vlistNgrids(vlistID1);
-      for ( int index = 0; index < ngrids; index++ )
-	{
-	  int gridID1 = vlistGrid(vlistID1, index);
+      for (int index = 0; index < ngrids; index++)
+        {
+          int gridID1 = vlistGrid(vlistID1, index);
           int gridtype1 = gridInqType(gridID1);
-	  gridID2 = -1;
+          gridID2 = -1;
 
-	  if ( gridtype1 == GRID_GENERIC && gridInqSize(gridID1) == 1 ) continue;
-	  
-	  if ( lregular || lregularnn )
-	    {
-	      if ( gridtype1 == GRID_GAUSSIAN_REDUCED )
-                gridID2 = gridToRegular(gridID1);
-	    }
-	  else if ( ldereference )
-	    {
-	      gridID2 = referenceToGrid(gridID1);
-	      if ( gridID2 == -1 ) cdoAbort("Reference to horizontal grid not found!");
-	    }
-	  else
-	    {
-	      if ( gridtype == GRID_CURVILINEAR )
-		{
-                  gridID2 = (gridtype1 == GRID_CURVILINEAR) ? gridID1 : gridToCurvilinear(gridID1, lbounds);
-		}
-	      else if ( gridtype == GRID_UNSTRUCTURED )
-		{
-                  bool ligme = false;
-		  if ( gridtype1 == GRID_GME ) ligme = true;
-		  gridID2 = gridToUnstructured(gridID1, 1);
+          if (gridtype1 == GRID_GENERIC && gridInqSize(gridID1) == 1) continue;
 
-		  if ( ligme )
-		    {
-		      grid2_nvgp = gridInqSize(gridID2);
-		      grid2_vgpm = (int*) Malloc(grid2_nvgp*sizeof(int));
-		      gridInqMaskGME(gridID2, grid2_vgpm);
-		      gridCompress(gridID2);
-		    }
-		}
-	      else if ( gridtype == GRID_LONLAT && gridtype1 == GRID_CURVILINEAR )
-		{
-		  gridID2 = gridCurvilinearToRegular(gridID1);
-		  if ( gridID2 == -1 ) cdoWarning("Conversion of curvilinear grid to regular grid failed!");
- 		}
-	      else if ( gridtype == GRID_LONLAT && gridtype1 == GRID_UNSTRUCTURED )
-		{
-		  gridID2 = -1;
-		  if ( gridID2 == -1 ) cdoWarning("Conversion of unstructured grid to regular grid failed!");
- 		}
-	      else if ( gridtype == GRID_LONLAT && gridtype1 == GRID_GENERIC )
-		{
-		  gridID2 = -1;
-		  if ( gridID2 == -1 ) cdoWarning("Conversion of generic grid to regular grid failed!");
- 		}
-	      else if ( gridtype == GRID_LONLAT && gridtype1 == GRID_LONLAT )
-		{
-		  gridID2 = gridID1;
-		}
-	      else cdoAbort("Unsupported grid name: %s", gridname);
-	    }
-
-	  if ( gridID2 == -1 )
+          if (lregular || lregularnn)
             {
-              if ( !(lregular || lregularnn) )
-                cdoAbort("Unsupported grid type!");
+              if (gridtype1 == GRID_GAUSSIAN_REDUCED)
+                gridID2 = gridToRegular(gridID1);
+            }
+          else if (ldereference)
+            {
+              gridID2 = referenceToGrid(gridID1);
+              if (gridID2 == -1)
+                cdoAbort("Reference to horizontal grid not found!");
+            }
+          else
+            {
+              if (gridtype == GRID_CURVILINEAR)
+                {
+                  gridID2 = (gridtype1 == GRID_CURVILINEAR)
+                                ? gridID1
+                                : gridToCurvilinear(gridID1, lbounds);
+                }
+              else if (gridtype == GRID_UNSTRUCTURED)
+                {
+                  bool ligme = false;
+                  if (gridtype1 == GRID_GME) ligme = true;
+                  gridID2 = gridToUnstructured(gridID1, 1);
+
+                  if (ligme)
+                    {
+                      grid2_nvgp = gridInqSize(gridID2);
+                      grid2_vgpm = (int *) Malloc(grid2_nvgp * sizeof(int));
+                      gridInqMaskGME(gridID2, grid2_vgpm);
+                      gridCompress(gridID2);
+                    }
+                }
+              else if (gridtype == GRID_LONLAT && gridtype1 == GRID_CURVILINEAR)
+                {
+                  gridID2 = gridCurvilinearToRegular(gridID1);
+                  if (gridID2 == -1)
+                    cdoWarning("Conversion of curvilinear grid to regular grid "
+                               "failed!");
+                }
+              else if (gridtype == GRID_LONLAT
+                       && gridtype1 == GRID_UNSTRUCTURED)
+                {
+                  gridID2 = -1;
+                  if (gridID2 == -1)
+                    cdoWarning("Conversion of unstructured grid to regular "
+                               "grid failed!");
+                }
+              else if (gridtype == GRID_LONLAT && gridtype1 == GRID_GENERIC)
+                {
+                  gridID2 = -1;
+                  if (gridID2 == -1)
+                    cdoWarning(
+                        "Conversion of generic grid to regular grid failed!");
+                }
+              else if (gridtype == GRID_LONLAT && gridtype1 == GRID_LONLAT)
+                {
+                  gridID2 = gridID1;
+                }
+              else
+                cdoAbort("Unsupported grid name: %s", gridname);
             }
 
-	  if ( gridID2 != -1 )
+          if (gridID2 == -1)
             {
-              if ( lregular || lregularnn ) lrgrid = true;
+              if (!(lregular || lregularnn)) cdoAbort("Unsupported grid type!");
+            }
+
+          if (gridID2 != -1)
+            {
+              if (lregular || lregularnn) lrgrid = true;
               vlistChangeGridIndex(vlistID2, index, gridID2);
             }
         }
 
-      if ( (lregular || lregularnn) && !lrgrid )
+      if ((lregular || lregularnn) && !lrgrid)
         cdoWarning("No reduced Gaussian grid found!");
     }
-  else if ( operatorID == SETGRIDAREA )
+  else if (operatorID == SETGRIDAREA)
     {
       int ngrids = vlistNgrids(vlistID1);
-      for ( int index = 0; index < ngrids; index++ )
-	{
-	  int gridID1 = vlistGrid(vlistID1, index);
-	  size_t gridsize = gridInqSize(gridID1);
-	  if ( gridsize == areasize )
-	    {
-	      gridID2 = gridDuplicate(gridID1);
-	      gridDefArea(gridID2, areaweight);
-	      vlistChangeGridIndex(vlistID2, index, gridID2);
-	    }
-	}
+      for (int index = 0; index < ngrids; index++)
+        {
+          int gridID1 = vlistGrid(vlistID1, index);
+          size_t gridsize = gridInqSize(gridID1);
+          if (gridsize == areasize)
+            {
+              gridID2 = gridDuplicate(gridID1);
+              gridDefArea(gridID2, areaweight);
+              vlistChangeGridIndex(vlistID2, index, gridID2);
+            }
+        }
     }
-  else if ( operatorID == SETGRIDMASK )
+  else if (operatorID == SETGRIDMASK)
     {
       int ngrids = vlistNgrids(vlistID1);
-      for ( int index = 0; index < ngrids; index++ )
-	{
-	  int gridID1 = vlistGrid(vlistID1, index);
-	  size_t gridsize = gridInqSize(gridID1);
-	  if ( gridsize == masksize )
-	    {
-	      int *mask = (int*) Malloc(masksize*sizeof(int));
-	      for ( size_t i = 0; i < masksize; i++ )
-		{
-		  if ( gridmask[i] < 0 || gridmask[i] > 255 )
-		    mask[i] = 0;
-		  else
-		    mask[i] = (int)lround(gridmask[i]);
-		}
-	      gridID2 = gridDuplicate(gridID1);
-	      gridDefMask(gridID2, mask);
-	      vlistChangeGridIndex(vlistID2, index, gridID2);
-	      Free(mask);
-	    }
-	}
+      for (int index = 0; index < ngrids; index++)
+        {
+          int gridID1 = vlistGrid(vlistID1, index);
+          size_t gridsize = gridInqSize(gridID1);
+          if (gridsize == masksize)
+            {
+              int *mask = (int *) Malloc(masksize * sizeof(int));
+              for (size_t i = 0; i < masksize; i++)
+                {
+                  if (gridmask[i] < 0 || gridmask[i] > 255)
+                    mask[i] = 0;
+                  else
+                    mask[i] = (int) lround(gridmask[i]);
+                }
+              gridID2 = gridDuplicate(gridID1);
+              gridDefMask(gridID2, mask);
+              vlistChangeGridIndex(vlistID2, index, gridID2);
+              Free(mask);
+            }
+        }
     }
-  else if ( operatorID == UNSETGRIDMASK )
+  else if (operatorID == UNSETGRIDMASK)
     {
       int ngrids = vlistNgrids(vlistID1);
-      for ( int index = 0; index < ngrids; index++ )
-	{
-	  int gridID1 = vlistGrid(vlistID1, index);
-	  gridID2 = gridDuplicate(gridID1);
-	  gridDefMask(gridID2, NULL);
-	  vlistChangeGridIndex(vlistID2, index, gridID2);
-	}
+      for (int index = 0; index < ngrids; index++)
+        {
+          int gridID1 = vlistGrid(vlistID1, index);
+          gridID2 = gridDuplicate(gridID1);
+          gridDefMask(gridID2, NULL);
+          vlistChangeGridIndex(vlistID2, index, gridID2);
+        }
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   pstreamDefVlist(streamID2, vlistID2);
-  //vlistPrint(vlistID2);
+  // vlistPrint(vlistID2);
 
-  size_t gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2) : vlistGridsizeMax(vlistID1);
+  size_t gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2)
+                                             : vlistGridsizeMax(vlistID1);
 
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	  pstreamReadRecord(streamID1, array, &nmiss);
 
-	  int gridID1 = vlistInqVarGrid(vlistID1, varID);
-	  if ( lregular || lregularnn )
-	    {
-	      gridID2 = vlistInqVarGrid(vlistID2, varID);
-	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
-		{
-		  double missval = vlistInqVarMissval(vlistID1, varID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          pstreamReadRecord(streamID1, array, &nmiss);
+
+          int gridID1 = vlistInqVarGrid(vlistID1, varID);
+          if (lregular || lregularnn)
+            {
+              gridID2 = vlistInqVarGrid(vlistID2, varID);
+              if (gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED)
+                {
+                  double missval = vlistInqVarMissval(vlistID1, varID);
                   int lnearst = lregularnn ? 1 : 0;
-                  field2regular(gridID1, gridID2, missval, array, nmiss, lnearst);
-		}
-	    }
-	  else if ( gridInqType(gridID1) == GRID_GME )
-	    {
-	      size_t gridsize = gridInqSize(gridID1);
-	      size_t j = 0;
-	      for ( size_t i = 0; i < gridsize; i++ )
-		if ( grid2_vgpm[i] ) array[j++] = array[i];
-	    }
+                  field2regular(gridID1, gridID2, missval, array, nmiss,
+                                lnearst);
+                }
+            }
+          else if (gridInqType(gridID1) == GRID_GME)
+            {
+              size_t gridsize = gridInqSize(gridID1);
+              size_t j = 0;
+              for (size_t i = 0; i < gridsize; i++)
+                if (grid2_vgpm[i]) array[j++] = array[i];
+            }
 
-	  pstreamWriteRecord(streamID2, array, nmiss);
-	}
+          pstreamWriteRecord(streamID2, array, nmiss);
+        }
 
       tsID++;
     }
@@ -409,10 +427,10 @@ void *Setgrid(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if ( gridmask ) Free(gridmask);
-  if ( areaweight ) Free(areaweight);
-  if ( array ) Free(array);
-  if ( grid2_vgpm ) Free(grid2_vgpm);
+  if (gridmask) Free(gridmask);
+  if (areaweight) Free(areaweight);
+  if (array) Free(array);
+  if (grid2_vgpm) Free(grid2_vgpm);
 
   cdoFinish();
 

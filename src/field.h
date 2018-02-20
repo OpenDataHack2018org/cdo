@@ -15,8 +15,8 @@
   GNU General Public License for more details.
 */
 
-#ifndef  FIELD_H
-#define  FIELD_H
+#ifndef FIELD_H
+#define FIELD_H
 
 #include <math.h>
 #include "compare.h"
@@ -24,49 +24,47 @@
 
 double varToStd(double rvar, double missval);
 
-enum field_flag {
-  FIELD_NONE  =  1,
-  FIELD_PTR   =  2,
-  FIELD_WGT   =  4,
-  FIELD_PTR2  =  8,
-  FIELD_FLT   = 16,
-  FIELD_ALL   = FIELD_PTR | FIELD_WGT
+enum field_flag
+{
+  FIELD_NONE = 1,
+  FIELD_PTR = 2,
+  FIELD_WGT = 4,
+  FIELD_PTR2 = 8,
+  FIELD_FLT = 16,
+  FIELD_ALL = FIELD_PTR | FIELD_WGT
 };
 
+typedef struct
+{
+  int fpeRaised;
+  int nwpv;  // number of words per value; real:1  complex:2
+  int memtype;
+  int grid;
+  int zaxis;
+  size_t size;
+  size_t nsamp;
+  size_t nmiss;
+  size_t nmiss2;
+  double missval;
+  double *weight;
+  double *ptr;
+  float *ptrf;
+  void *ptr2;
+} field_type;
 
-typedef struct {
-  int      fpeRaised;
-  int      nwpv; // number of words per value; real:1  complex:2
-  int      memtype;
-  int      grid;
-  int      zaxis;
-  size_t   size;
-  size_t   nsamp;
-  size_t   nmiss;
-  size_t   nmiss2;
-  double   missval;
-  double  *weight;
-  double  *ptr;
-  float   *ptrf;
-  void    *ptr2;
-}
-field_type;
-
-
-typedef struct {
+typedef struct
+{
   short varID;
   short levelID;
-  bool  lconst;
-}
-recinfo_type;
-
+  bool lconst;
+} recinfo_type;
 
 /* fieldmem.cc */
 
-void      field_init(field_type *field);
+void field_init(field_type *field);
 field_type **field_malloc(const int vlistID, const int ptype);
 field_type **field_calloc(const int vlistID, const int ptype);
-void      field_free(field_type **field, const int vlistID);
+void field_free(field_type **field, const int vlistID);
 
 /* field.cc */
 
@@ -88,8 +86,8 @@ double fldstd1w(field_type field);
 double fldvarw(field_type field);
 double fldvar1w(field_type field);
 double fldpctl(field_type field, const double pn);
-void   fldunm(field_type *field);
-int    fldhvs(field_type *field, const size_t nlevels);
+void fldunm(field_type *field);
+int fldhvs(field_type *field, const size_t nlevels);
 double fldskew(field_type field);
 double fldkurt(field_type field);
 
@@ -162,8 +160,10 @@ void farmul(field_type *field1, field_type field2);
 void fardiv(field_type *field1, field_type field2);
 void farmin(field_type *field1, field_type field2);
 void farmax(field_type *field1, field_type field2);
-void farvar(field_type *field1, field_type field2, field_type field3, int divisor);
-void farstd(field_type *field1, field_type field2, field_type field3, int divisor);
+void farvar(field_type *field1, field_type field2, field_type field3,
+            int divisor);
+void farstd(field_type *field1, field_type field2, field_type field3,
+            int divisor);
 void farcvar(field_type *field1, field_type field2, int nsets, int divisor);
 void farcstd(field_type *field1, field_type field2, int nsets, int divisor);
 void farmoq(field_type *field1, field_type field2);
@@ -173,4 +173,4 @@ void farsetmiss(field_type *field1, field_type field2);
 
 void farcount(field_type *field1, field_type field2);
 
-#endif  /* FIELD_H */
+#endif /* FIELD_H */

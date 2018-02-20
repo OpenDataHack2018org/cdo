@@ -18,7 +18,7 @@
 #define UTIL_FILEEXTENSIONS_H
 
 const char *filetypeext(int filetype);
-void        rm_filetypeext(char *file, const char *ext);
-void        repl_filetypeext(char file[], const char *oldext, const char *newext);
+void rm_filetypeext(char *file, const char *ext);
+void repl_filetypeext(char file[], const char *oldext, const char *newext);
 
 #endif

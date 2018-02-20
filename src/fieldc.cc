@@ -15,42 +15,42 @@
   GNU General Public License for more details.
 */
 
-
 #include "cdo_int.h"
 #include <cdi.h>
 
-
-void farcfun(field_type *field, double rconst, int function)
+void
+farcfun(field_type *field, double rconst, int function)
 {
   switch (function)
     {
-    case func_add: farcadd(field, rconst);  break;
-    case func_sub: farcsub(field, rconst);  break;
-    case func_mul: farcmul(field, rconst);  break;
-    case func_div: farcdiv(field, rconst);  break;
-    case func_mod: farmod(field, rconst);   break;
+    case func_add: farcadd(field, rconst); break;
+    case func_sub: farcsub(field, rconst); break;
+    case func_mul: farcmul(field, rconst); break;
+    case func_div: farcdiv(field, rconst); break;
+    case func_mod: farmod(field, rconst); break;
     default: cdoAbort("%s: function %d not implemented!", __func__, function);
     }
 }
 
-void farcmul(field_type *field, double rconst)
+void
+farcmul(field_type *field, double rconst)
 {
   int i, len;
-  int    nwpv     = field->nwpv;
-  int    grid     = field->grid;
-  size_t nmiss    = field->nmiss;
+  int nwpv = field->nwpv;
+  int grid = field->grid;
+  size_t nmiss = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
-  double *array   = field->ptr;
+  double *array = field->ptr;
 
-  if ( nwpv != 2 ) nwpv = 1;
+  if (nwpv != 2) nwpv = 1;
 
-  len    = nwpv*gridInqSize(grid);
+  len = nwpv * gridInqSize(grid);
 
-  if ( nmiss > 0 )
+  if (nmiss > 0)
     {
-      for ( i = 0; i < len; i++ ) 
-	array[i] = MULMN(array[i], rconst);
+      for (i = 0; i < len; i++)
+        array[i] = MULMN(array[i], rconst);
     }
   else
     {
@@ -59,108 +59,108 @@ void farcmul(field_type *field, double rconst)
 #pragma omp parallel for default(shared) private(i)
 #endif
       */
-      for ( i = 0; i < len; i++ ) 
-	array[i] *= rconst;
+      for (i = 0; i < len; i++)
+        array[i] *= rconst;
     }
 }
 
-
-void farcdiv(field_type *field, double rconst)
+void
+farcdiv(field_type *field, double rconst)
 {
   int i, len;
-  int    grid     = field->grid;
-  size_t nmiss    = field->nmiss;
+  int grid = field->grid;
+  size_t nmiss = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
-  double *array   = field->ptr;
+  double *array = field->ptr;
 
-  len    = gridInqSize(grid);
+  len = gridInqSize(grid);
 
-  if ( nmiss > 0 || IS_EQUAL(rconst, 0) )
+  if (nmiss > 0 || IS_EQUAL(rconst, 0))
     {
-      for ( i = 0; i < len; i++ )
-	array[i] = DIVMN(array[i], rconst);
+      for (i = 0; i < len; i++)
+        array[i] = DIVMN(array[i], rconst);
 
-      if ( IS_EQUAL(rconst, 0) ) field->nmiss = len;
+      if (IS_EQUAL(rconst, 0)) field->nmiss = len;
     }
   else
     {
-      for ( i = 0; i < len; i++ ) 
-	array[i] /= rconst;
+      for (i = 0; i < len; i++)
+        array[i] /= rconst;
     }
 }
 
-
-void farcadd(field_type *field, double rconst)
+void
+farcadd(field_type *field, double rconst)
 {
   int i, len;
-  int    grid     = field->grid;
-  size_t nmiss    = field->nmiss;
+  int grid = field->grid;
+  size_t nmiss = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
-  double *array   = field->ptr;
+  double *array = field->ptr;
 
-  len    = gridInqSize(grid);
+  len = gridInqSize(grid);
 
-  if ( nmiss > 0 )
+  if (nmiss > 0)
     {
-      for ( i = 0; i < len; i++ ) 
-	array[i] = ADDMN(array[i], rconst);
+      for (i = 0; i < len; i++)
+        array[i] = ADDMN(array[i], rconst);
     }
   else
     {
-      for ( i = 0; i < len; i++ ) 
-	array[i] += rconst;
+      for (i = 0; i < len; i++)
+        array[i] += rconst;
     }
 }
 
-
-void farcsub(field_type *field, double rconst)
+void
+farcsub(field_type *field, double rconst)
 {
   farcadd(field, -rconst);
 }
 
-
-void farinv(field_type *field)
+void
+farinv(field_type *field)
 {
-  int    grid     = field->grid;
+  int grid = field->grid;
   double missval1 = field->missval;
   double missval2 = field->missval;
-  double *array   = field->ptr;
+  double *array = field->ptr;
 
   size_t len = gridInqSize(grid);
 
-  for ( size_t i = 0; i < len; i++ ) 
+  for (size_t i = 0; i < len; i++)
     array[i] = DIVMN(1.0, array[i]);
 
   field->nmiss = arrayNumMV(len, array, missval1);
 }
 
-
-void farround(field_type *field)
+void
+farround(field_type *field)
 {
-  int    grid     = field->grid;
+  int grid = field->grid;
   double missval1 = field->missval;
-  double *array   = field->ptr;
+  double *array = field->ptr;
 
   size_t len = gridInqSize(grid);
 
-  for ( size_t i = 0; i < len; i++ )
-    if ( !DBL_IS_EQUAL(array[i], missval1) )
-      array[i] = round(array[i]);
+  for (size_t i = 0; i < len; i++)
+    if (!DBL_IS_EQUAL(array[i], missval1)) array[i] = round(array[i]);
 }
 
-
-void farmod(field_type *field, double divisor)
+void
+farmod(field_type *field, double divisor)
 {
-  int    grid     = field->grid;
+  int grid = field->grid;
   double missval1 = field->missval;
-  double *array   = field->ptr;
+  double *array = field->ptr;
 
   size_t len = gridInqSize(grid);
 
-  for ( size_t i = 0; i < len; i++ )
+  for (size_t i = 0; i < len; i++)
     {
-      array[i] = DBL_IS_EQUAL(array[i], missval1) ? missval1 : fmod(array[i], divisor);
+      array[i] = DBL_IS_EQUAL(array[i], missval1) ? missval1
+                                                  : fmod(array[i], divisor);
     }
 }

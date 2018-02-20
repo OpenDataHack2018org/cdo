@@ -27,8 +27,8 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
-
-void *Setgatt(void *process)
+void *
+Setgatt(void *process)
 {
   int nrecs;
   int varID, levelID;
@@ -38,20 +38,20 @@ void *Setgatt(void *process)
 
   cdoInitialize(process);
 
-  int SETGATT  = cdoOperatorAdd("setgatt",  0, 0, "attribute name and string");
-                 cdoOperatorAdd("setgatts", 0, 0, NULL);
+  int SETGATT = cdoOperatorAdd("setgatt", 0, 0, "attribute name and string");
+  cdoOperatorAdd("setgatts", 0, 0, NULL);
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == SETGATT )
+  if (operatorID == SETGATT)
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
-      attname   = operatorArgv()[0];
+      attname = operatorArgv()[0];
       attstring = operatorArgv()[1];
     }
   else
     {
-      attfile   = operatorArgv()[0];
+      attfile = operatorArgv()[0];
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -65,9 +65,10 @@ void *Setgatt(void *process)
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  if ( operatorID == SETGATT )
+  if (operatorID == SETGATT)
     {
-      cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring), attstring);
+      cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int) strlen(attstring),
+                   attstring);
     }
   else
     {
@@ -75,35 +76,38 @@ void *Setgatt(void *process)
       int attlen = 0;
 
       FILE *fp = fopen(attfile, "r");
-      if ( fp == 0 ) cdoAbort("Open failed on %s", attfile);
+      if (fp == 0) cdoAbort("Open failed on %s", attfile);
 
-      while ( readline(fp, line, 1024) )
-	{
-	  attlen = 0;
-	  if ( line[0] == '#' ) continue;
-	  if ( line[0] == '\0' ) continue;
-	  attname = line;
-	  while ( isspace((int) *attname) ) attname++;
-	  if ( attname[0] == '\0' ) continue;
-	  attstring = attname;
-	  while ( *attstring != ' ' && *attstring != '\0' &&
-		  *attstring != '=' && *attstring != '"' ) attstring++;
-	  if ( *attstring == '\0' )
-	    attstring = NULL;
-	  else
-	    {
-	      *attstring = '\0';
-	      attstring++;
-	      while ( isspace((int) *attstring) || (int) *attstring == '=' ||
-		      (int) *attstring == '"' || (int) *attstring == '\'' ) attstring++;
-	      attlen = strlen(attstring);
-	      if ( attstring[attlen-1] == '"' || attstring[attlen-1] == '\'' )
-		attstring[--attlen] = 0;
-	    }
+      while (readline(fp, line, 1024))
+        {
+          attlen = 0;
+          if (line[0] == '#') continue;
+          if (line[0] == '\0') continue;
+          attname = line;
+          while (isspace((int) *attname))
+            attname++;
+          if (attname[0] == '\0') continue;
+          attstring = attname;
+          while (*attstring != ' ' && *attstring != '\0' && *attstring != '='
+                 && *attstring != '"')
+            attstring++;
+          if (*attstring == '\0')
+            attstring = NULL;
+          else
+            {
+              *attstring = '\0';
+              attstring++;
+              while (isspace((int) *attstring) || (int) *attstring == '='
+                     || (int) *attstring == '"' || (int) *attstring == '\'')
+                attstring++;
+              attlen = strlen(attstring);
+              if (attstring[attlen - 1] == '"' || attstring[attlen - 1] == '\'')
+                attstring[--attlen] = 0;
+            }
 
-	  if ( attstring && attlen)
-	    cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, attlen, attstring);
-	}
+          if (attstring && attlen)
+            cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, attlen, attstring);
+        }
 
       fclose(fp);
     }
@@ -111,23 +115,23 @@ void *Setgatt(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  double *array = (double*) Malloc(gridsize*sizeof(double));
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
+  double *array = (double *) Malloc(gridsize * sizeof(double));
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	  pstreamReadRecord(streamID1, array, &nmiss);
-	  pstreamWriteRecord(streamID2, array, nmiss);
-	}
+
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          pstreamReadRecord(streamID1, array, &nmiss);
+          pstreamWriteRecord(streamID2, array, nmiss);
+        }
 
       tsID++;
     }
@@ -135,7 +139,7 @@ void *Setgatt(void *process)
   pstreamClose(streamID1);
   pstreamClose(streamID2);
 
-  if ( array ) Free(array);
+  if (array) Free(array);
 
   cdoFinish();
 

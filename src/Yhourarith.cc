@@ -29,36 +29,37 @@
 #include "cdo_int.h"
 #include "pstream_int.h"
 
+#define MAX_HOUR 9301 /* 31*12*25 + 1 */
 
-#define  MAX_HOUR  9301  /* 31*12*25 + 1 */
-
-static
-int hour_of_year(int vdate, int vtime)
+static int
+hour_of_year(int vdate, int vtime)
 {
   int year, month, day, houroy;
   int hour, minute, second;
 
   cdiDecodeDate(vdate, &year, &month, &day);
   cdiDecodeTime(vtime, &hour, &minute, &second);
-      
-  if ( month >= 1 && month <= 12 && day >= 1 && day <=31 && hour >= 0 && hour < 24 )
-    houroy = ((month-1)*31 + day - 1)*25 + hour + 1;
+
+  if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && hour >= 0
+      && hour < 24)
+    houroy = ((month - 1) * 31 + day - 1) * 25 + hour + 1;
   else
     houroy = 0;
 
-  if ( houroy < 0 || houroy >= MAX_HOUR )
+  if (houroy < 0 || houroy >= MAX_HOUR)
     {
       char vdatestr[32], vtimestr[32];
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
-      cdoAbort("Hour of year %d out of range (%s %s)!", houroy, vdatestr, vtimestr);
+      cdoAbort("Hour of year %d out of range (%s %s)!", houroy, vdatestr,
+               vtimestr);
     }
 
   return houroy;
 }
 
-
-void *Yhourarith(void *process)
+void *
+Yhourarith(void *process)
 {
   int nrecs, nlev;
   int varID, levelID;
@@ -93,8 +94,8 @@ void *Yhourarith(void *process)
   field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field1.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -104,77 +105,81 @@ void *Yhourarith(void *process)
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(2), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID3);
 
-  int nvars  = vlistNvars(vlistID2);
+  int nvars = vlistNvars(vlistID2);
 
-  for ( houroy = 0; houroy < MAX_HOUR ; ++houroy ) vardata2[houroy] = NULL;
+  for (houroy = 0; houroy < MAX_HOUR; ++houroy)
+    vardata2[houroy] = NULL;
 
   int tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID2, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
 
       houroy = hour_of_year(vdate, vtime);
-      if ( vardata2[houroy] != NULL ) cdoAbort("Hour of year %d already allocatd!", houroy);
+      if (vardata2[houroy] != NULL)
+        cdoAbort("Hour of year %d already allocatd!", houroy);
 
-      vardata2[houroy]  = (double **) Malloc(nvars*sizeof(double *));
-      varnmiss2[houroy] = (size_t **) Malloc(nvars*sizeof(size_t *));
+      vardata2[houroy] = (double **) Malloc(nvars * sizeof(double *));
+      varnmiss2[houroy] = (size_t **) Malloc(nvars * sizeof(size_t *));
 
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	  vardata2[houroy][varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[houroy][varID] = (size_t*) Malloc(nlev*sizeof(size_t));
-	}
+      for (varID = 0; varID < nvars; varID++)
+        {
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          vardata2[houroy][varID]
+              = (double *) Malloc(nlev * gridsize * sizeof(double));
+          varnmiss2[houroy][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+        }
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID2, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID2, &varID, &levelID);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  offset   = gridsize*levelID;
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          offset = gridsize * levelID;
 
-	  pstreamReadRecord(streamID2, vardata2[houroy][varID]+offset, &nmiss);
-	  varnmiss2[houroy][varID][levelID] = nmiss;
-	}
+          pstreamReadRecord(streamID2, vardata2[houroy][varID] + offset,
+                            &nmiss);
+          varnmiss2[houroy][varID][levelID] = nmiss;
+        }
 
       tsID++;
     }
 
-
   tsID = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
       houroy = hour_of_year(vdate, vtime);
-      if ( vardata2[houroy] == NULL ) cdoAbort("Hour of year %d not found!", houroy);
+      if (vardata2[houroy] == NULL)
+        cdoAbort("Hour of year %d not found!", houroy);
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
-          field1.nmiss   = nmiss;
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = nmiss;
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  offset   = gridsize*levelID;
-	  arrayCopy(gridsize, vardata2[houroy][varID]+offset, field2.ptr);
-	  field2.nmiss   = varnmiss2[houroy][varID][levelID];
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
-	  field2.missval = vlistInqVarMissval(vlistID2, varID);
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          offset = gridsize * levelID;
+          arrayCopy(gridsize, vardata2[houroy][varID] + offset, field2.ptr);
+          field2.nmiss = varnmiss2[houroy][varID][levelID];
+          field2.grid = vlistInqVarGrid(vlistID2, varID);
+          field2.missval = vlistInqVarMissval(vlistID2, varID);
 
-	  farfun(&field1, field2, operfunc);
+          farfun(&field1, field2, operfunc);
 
-	  pstreamDefRecord(streamID3, varID, levelID);
-	  pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
-	}
+          pstreamDefRecord(streamID3, varID, levelID);
+          pstreamWriteRecord(streamID3, field1.ptr, field1.nmiss);
+        }
 
       tsID++;
     }
@@ -183,21 +188,21 @@ void *Yhourarith(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  for ( houroy = 0; houroy < MAX_HOUR; ++houroy )
-    if ( vardata2[houroy] )
+  for (houroy = 0; houroy < MAX_HOUR; ++houroy)
+    if (vardata2[houroy])
       {
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    Free(vardata2[houroy][varID]);
-	    Free(varnmiss2[houroy][varID]);
-	  }
+        for (varID = 0; varID < nvars; varID++)
+          {
+            Free(vardata2[houroy][varID]);
+            Free(varnmiss2[houroy][varID]);
+          }
 
         Free(vardata2[houroy]);
         Free(varnmiss2[houroy]);
       }
 
-  if ( field1.ptr ) Free(field1.ptr);
-  if ( field2.ptr ) Free(field2.ptr);
+  if (field1.ptr) Free(field1.ptr);
+  if (field2.ptr) Free(field2.ptr);
 
   cdoFinish();
 

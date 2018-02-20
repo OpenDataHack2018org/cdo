@@ -30,7 +30,6 @@
       Settime    shifttime       Shift timesteps
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -39,47 +38,107 @@
 #include "util_string.h"
 #include "datetime.h"
 
-
-int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
+int
+get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
 {
   size_t len = strlen(unit);
-  
-  if      ( memcmp(unit, "seconds", len) == 0 ) { *incunit =     1; *tunit = TUNIT_SECOND;  }
-  else if ( memcmp(unit, "minutes", len) == 0 ) { *incunit =    60; *tunit = TUNIT_MINUTE;  }
-  else if ( memcmp(unit, "hours", len)   == 0 ) { *incunit =  3600; *tunit = TUNIT_HOUR;    }
-  else if ( memcmp(unit, "3hours", len)  == 0 ) { *incunit = 10800; *tunit = TUNIT_3HOURS;  }
-  else if ( memcmp(unit, "6hours", len)  == 0 ) { *incunit = 21600; *tunit = TUNIT_6HOURS;  }
-  else if ( memcmp(unit, "12hours", len) == 0 ) { *incunit = 43200; *tunit = TUNIT_12HOURS; }
-  else if ( memcmp(unit, "days", len)    == 0 ) { *incunit = 86400; *tunit = TUNIT_DAY;     }
-  else if ( memcmp(unit, "months", len)  == 0 ) { *incunit =     1; *tunit = TUNIT_MONTH;   }
-  else if ( memcmp(unit, "years", len)   == 0 ) { *incunit =    12; *tunit = TUNIT_YEAR;    }
-  else cdoAbort("Time unit >%s< unsupported!", unit);
 
-  if ( *tunit == TUNIT_HOUR )
+  if (memcmp(unit, "seconds", len) == 0)
     {
-      if      ( *incperiod ==  3 ) { *incperiod = 1; *incunit = 10800; *tunit = TUNIT_3HOURS;  }
-      else if ( *incperiod ==  6 ) { *incperiod = 1; *incunit = 21600; *tunit = TUNIT_6HOURS;  }
-      else if ( *incperiod == 12 ) { *incperiod = 1; *incunit = 43200; *tunit = TUNIT_12HOURS; }
+      *incunit = 1;
+      *tunit = TUNIT_SECOND;
+    }
+  else if (memcmp(unit, "minutes", len) == 0)
+    {
+      *incunit = 60;
+      *tunit = TUNIT_MINUTE;
+    }
+  else if (memcmp(unit, "hours", len) == 0)
+    {
+      *incunit = 3600;
+      *tunit = TUNIT_HOUR;
+    }
+  else if (memcmp(unit, "3hours", len) == 0)
+    {
+      *incunit = 10800;
+      *tunit = TUNIT_3HOURS;
+    }
+  else if (memcmp(unit, "6hours", len) == 0)
+    {
+      *incunit = 21600;
+      *tunit = TUNIT_6HOURS;
+    }
+  else if (memcmp(unit, "12hours", len) == 0)
+    {
+      *incunit = 43200;
+      *tunit = TUNIT_12HOURS;
+    }
+  else if (memcmp(unit, "days", len) == 0)
+    {
+      *incunit = 86400;
+      *tunit = TUNIT_DAY;
+    }
+  else if (memcmp(unit, "months", len) == 0)
+    {
+      *incunit = 1;
+      *tunit = TUNIT_MONTH;
+    }
+  else if (memcmp(unit, "years", len) == 0)
+    {
+      *incunit = 12;
+      *tunit = TUNIT_YEAR;
+    }
+  else
+    cdoAbort("Time unit >%s< unsupported!", unit);
+
+  if (*tunit == TUNIT_HOUR)
+    {
+      if (*incperiod == 3)
+        {
+          *incperiod = 1;
+          *incunit = 10800;
+          *tunit = TUNIT_3HOURS;
+        }
+      else if (*incperiod == 6)
+        {
+          *incperiod = 1;
+          *incunit = 21600;
+          *tunit = TUNIT_6HOURS;
+        }
+      else if (*incperiod == 12)
+        {
+          *incperiod = 1;
+          *incunit = 43200;
+          *tunit = TUNIT_12HOURS;
+        }
     }
 
   return 0;
 }
 
-static
-void shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
+static void
+shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
 {
   int vdate = *pdate;
   int vtime = *ptime;
 
-  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
+  if (tunit == TUNIT_MONTH || tunit == TUNIT_YEAR)
     {
       int year, month, day;
       cdiDecodeDate(vdate, &year, &month, &day);
-	      
+
       month += ijulinc;
 
-      while ( month > 12 ) { month -= 12; year++; }
-      while ( month <  1 ) { month += 12; year--; }
+      while (month > 12)
+        {
+          month -= 12;
+          year++;
+        }
+      while (month < 1)
+        {
+          month += 12;
+          year--;
+        }
 
       vdate = cdiEncodeDate(year, month, day);
 
@@ -95,63 +154,72 @@ void shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
       *pdate = vdate;
       *ptime = vtime;
 
-      if ( cdoVerbose )
-	cdoPrint("juldate, ijulinc, vdate, vtime: %g %d %d %d",
-		 juldate_to_seconds(juldate), ijulinc, vdate, vtime);
+      if (cdoVerbose)
+        cdoPrint("juldate, ijulinc, vdate, vtime: %g %d %d %d",
+                 juldate_to_seconds(juldate), ijulinc, vdate, vtime);
     }
 }
 
-static
-void gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, int *vdateb, int *vtimeb)
+static void
+gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime,
+           int *vdateb, int *vtimeb)
 {
   juldate_t juldate;
-  
+
   vdateb[0] = vdate;
   vdateb[1] = vdate;
   vtimeb[0] = 0;
   vtimeb[1] = 0;
-          
+
   int year, month, day;
   cdiDecodeDate(vdate, &year, &month, &day);
 
-  if ( tunit == TUNIT_MONTH )
+  if (tunit == TUNIT_MONTH)
     {
       vdateb[0] = cdiEncodeDate(year, month, 1);
       month++;
-      if ( month > 12 ) { month = 1; year++; }
+      if (month > 12)
+        {
+          month = 1;
+          year++;
+        }
       vdateb[1] = cdiEncodeDate(year, month, 1);
     }
-  else if ( tunit == TUNIT_YEAR )
+  else if (tunit == TUNIT_YEAR)
     {
-      vdateb[0] = cdiEncodeDate(year,   1, 1);
-      vdateb[1] = cdiEncodeDate(year+1, 1, 1);
+      vdateb[0] = cdiEncodeDate(year, 1, 1);
+      vdateb[1] = cdiEncodeDate(year + 1, 1, 1);
     }
-  else if ( tunit == TUNIT_DAY )
+  else if (tunit == TUNIT_DAY)
     {
       vdateb[0] = vdate;
       juldate = juldate_encode(calendar, vdateb[0], vtimeb[0]);
       juldate = juldate_add_seconds(86400, juldate);
       juldate_decode(calendar, juldate, &vdateb[1], &vtimeb[1]);
     }
-  else if ( tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS )
+  else if (tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS
+           || tunit == TUNIT_12HOURS)
     {
-      if ( incperiod == 0 ) incperiod = 1;
-      if ( incperiod > 24 ) cdoAbort("Time period must be less equal 24!");
+      if (incperiod == 0) incperiod = 1;
+      if (incperiod > 24) cdoAbort("Time period must be less equal 24!");
 
-      if      ( tunit == TUNIT_3HOURS  ) incperiod = 3;
-      else if ( tunit == TUNIT_6HOURS  ) incperiod = 6;
-      else if ( tunit == TUNIT_12HOURS ) incperiod = 12;
+      if (tunit == TUNIT_3HOURS)
+        incperiod = 3;
+      else if (tunit == TUNIT_6HOURS)
+        incperiod = 6;
+      else if (tunit == TUNIT_12HOURS)
+        incperiod = 12;
 
       int hour, minute, second;
       cdiDecodeTime(vtime, &hour, &minute, &second);
-      int h0 = (hour/incperiod) * incperiod;
+      int h0 = (hour / incperiod) * incperiod;
       vtimeb[0] = cdiEncodeTime(h0, 0, 0);
       int h1 = h0 + incperiod;
-      if ( h1 >= 24 )
+      if (h1 >= 24)
         {
-          vdateb[1] = cdiEncodeDate(year, month, day+1);
+          vdateb[1] = cdiEncodeDate(year, month, day + 1);
           juldate = juldate_encode(calendar, vdateb[0], vtimeb[0]);
-          juldate = juldate_add_seconds(incperiod*3600, juldate);
+          juldate = juldate_add_seconds(incperiod * 3600, juldate);
           juldate_decode(calendar, juldate, &vdateb[1], &vtimeb[1]);
         }
       else
@@ -159,8 +227,8 @@ void gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, in
     }
 }
 
-
-void *Settime(void *process)
+void *
+Settime(void *process)
 {
   int nrecs, newval = 0;
   int varID, levelID;
@@ -200,27 +268,27 @@ void *Settime(void *process)
 
   //  if ( operatorArgc()
 
-  if ( operatorID == SETTAXIS || operatorID == SETREFTIME )
+  if (operatorID == SETTAXIS || operatorID == SETREFTIME)
     {
-      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
-      if ( operatorArgc() > 3 ) cdoAbort("Too many arguments!");
+      if (operatorArgc() < 1) cdoAbort("Too few arguments!");
+      if (operatorArgc() > 3) cdoAbort("Too many arguments!");
 
       const char *datestr = operatorArgv()[0];
       const char *timestr = operatorArgv()[1];
 
-      if ( strchr(datestr+1, '-') )
-	{
-	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-	  sdate = cdiEncodeDate(year, month, day);
-	}
-      else
-	{
-	  sdate = *datestr ? parameter2int(datestr) : 10101;
-	}
-
-      if ( operatorArgc() > 1 )
+      if (strchr(datestr + 1, '-'))
         {
-          if ( strchr(timestr, ':') )
+          sscanf(datestr, "%d-%d-%d", &year, &month, &day);
+          sdate = cdiEncodeDate(year, month, day);
+        }
+      else
+        {
+          sdate = *datestr ? parameter2int(datestr) : 10101;
+        }
+
+      if (operatorArgc() > 1)
+        {
+          if (strchr(timestr, ':'))
             {
               sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
               stime = cdiEncodeTime(hour, minute, second);
@@ -230,15 +298,16 @@ void *Settime(void *process)
               stime = parameter2int(timestr);
             }
 
-          if ( operatorArgc() == 3 )
+          if (operatorArgc() == 3)
             {
               const char *timeunits = operatorArgv()[2];
               int ich = timeunits[0];
-              if ( ich == '-' || ich == '+' || isdigit(ich) )
+              if (ich == '-' || ich == '+' || isdigit(ich))
                 {
-                  incperiod = (int)strtol(timeunits, NULL, 10);
-                  if ( ich == '-' || ich == '+' ) timeunits++;
-                  while ( isdigit((int) *timeunits) ) timeunits++;
+                  incperiod = (int) strtol(timeunits, NULL, 10);
+                  if (ich == '-' || ich == '+') timeunits++;
+                  while (isdigit((int) *timeunits))
+                    timeunits++;
                 }
               get_tunits(timeunits, &incperiod, &incunit, &tunit);
             }
@@ -247,81 +316,99 @@ void *Settime(void *process)
       /* increment in seconds */
       ijulinc = incperiod * incunit;
     }
-  else if ( operatorID == SETDATE )
+  else if (operatorID == SETDATE)
     {
       operatorCheckArgc(1);
       const char *datestr = operatorArgv()[0];
-      if ( strchr(datestr, '-') )
-	{
-	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-	  newval = cdiEncodeDate(year, month, day);
-	}
+      if (strchr(datestr, '-'))
+        {
+          sscanf(datestr, "%d-%d-%d", &year, &month, &day);
+          newval = cdiEncodeDate(year, month, day);
+        }
       else
-	{
-	  newval = parameter2int(datestr);
-	}
+        {
+          newval = parameter2int(datestr);
+        }
     }
-  else if ( operatorID == SETTIME )
+  else if (operatorID == SETTIME)
     {
       operatorCheckArgc(1);
       const char *timestr = operatorArgv()[0];
 
-      if ( strchr(timestr, ':') )
-	{
-	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
-	  newval = cdiEncodeTime(hour, minute, second);
-	}
+      if (strchr(timestr, ':'))
+        {
+          sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
+          newval = cdiEncodeTime(hour, minute, second);
+        }
       else
-	{
-	  newval = parameter2int(timestr);
-	}
+        {
+          newval = parameter2int(timestr);
+        }
     }
-  else if ( operatorID == SHIFTTIME )
+  else if (operatorID == SHIFTTIME)
     {
       operatorCheckArgc(1);
       const char *timeunits = operatorArgv()[0];
-      incperiod = (int)strtol(timeunits, NULL, 10);
-      if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
-      while ( isdigit((int) *timeunits) ) timeunits++;
+      incperiod = (int) strtol(timeunits, NULL, 10);
+      if (timeunits[0] == '-' || timeunits[0] == '+') timeunits++;
+      while (isdigit((int) *timeunits))
+        timeunits++;
 
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       /* increment in seconds */
       ijulinc = incperiod * incunit;
     }
-  else if ( operatorID == SETTUNITS || operatorID == SETTBOUNDS )
+  else if (operatorID == SETTUNITS || operatorID == SETTBOUNDS)
     {
       operatorCheckArgc(1);
       const char *timeunits = operatorArgv()[0];
-      incperiod = (int)strtol(timeunits, NULL, 10);
-      if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
-      while ( isdigit((int) *timeunits) ) timeunits++;
+      incperiod = (int) strtol(timeunits, NULL, 10);
+      if (timeunits[0] == '-' || timeunits[0] == '+') timeunits++;
+      while (isdigit((int) *timeunits))
+        timeunits++;
 
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
-      if ( operatorID == SETTBOUNDS &&
-           !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS ||
-             tunit == TUNIT_DAY || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR) )
-        cdoAbort("Unsupported frequency %s! Use hour, 3hours, 6hours, day, month or year.", timeunits);
+      if (operatorID == SETTBOUNDS
+          && !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS
+               || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS
+               || tunit == TUNIT_DAY || tunit == TUNIT_MONTH
+               || tunit == TUNIT_YEAR))
+        cdoAbort("Unsupported frequency %s! Use hour, 3hours, 6hours, day, "
+                 "month or year.",
+                 timeunits);
     }
-  else if ( operatorID == SETCALENDAR )
+  else if (operatorID == SETCALENDAR)
     {
       operatorCheckArgc(1);
       char *cname = operatorArgv()[0];
       strtolower(cname);
       size_t len = strlen(cname);
-      if ( len < 3 ) len = 7;
-      if      ( strcmp(cname, "standard")  == 0 ) newcalendar = CALENDAR_STANDARD;
-      else if ( strcmp(cname, "gregorian") == 0 ) newcalendar = CALENDAR_GREGORIAN;
-      else if ( strcmp(cname, "proleptic") == 0 ) newcalendar = CALENDAR_PROLEPTIC;
-      else if ( strcmp(cname, "proleptic_gregorian") == 0 ) newcalendar = CALENDAR_PROLEPTIC;
-      else if ( strncmp(cname, "360days", len) == 0 ) newcalendar = CALENDAR_360DAYS;
-      else if ( strncmp(cname, "360_day", len) == 0 ) newcalendar = CALENDAR_360DAYS;
-      else if ( strncmp(cname, "365days", len) == 0 ) newcalendar = CALENDAR_365DAYS;
-      else if ( strncmp(cname, "365_day", len) == 0 ) newcalendar = CALENDAR_365DAYS;
-      else if ( strncmp(cname, "366days", len) == 0 ) newcalendar = CALENDAR_366DAYS;
-      else if ( strncmp(cname, "366_day", len) == 0 ) newcalendar = CALENDAR_366DAYS;
-      else cdoAbort("Calendar >%s< unsupported! Available %s", cname, cdoOperatorEnter(operatorID));
+      if (len < 3) len = 7;
+      if (strcmp(cname, "standard") == 0)
+        newcalendar = CALENDAR_STANDARD;
+      else if (strcmp(cname, "gregorian") == 0)
+        newcalendar = CALENDAR_GREGORIAN;
+      else if (strcmp(cname, "proleptic") == 0)
+        newcalendar = CALENDAR_PROLEPTIC;
+      else if (strcmp(cname, "proleptic_gregorian") == 0)
+        newcalendar = CALENDAR_PROLEPTIC;
+      else if (strncmp(cname, "360days", len) == 0)
+        newcalendar = CALENDAR_360DAYS;
+      else if (strncmp(cname, "360_day", len) == 0)
+        newcalendar = CALENDAR_360DAYS;
+      else if (strncmp(cname, "365days", len) == 0)
+        newcalendar = CALENDAR_365DAYS;
+      else if (strncmp(cname, "365_day", len) == 0)
+        newcalendar = CALENDAR_365DAYS;
+      else if (strncmp(cname, "366days", len) == 0)
+        newcalendar = CALENDAR_366DAYS;
+      else if (strncmp(cname, "366_day", len) == 0)
+        newcalendar = CALENDAR_366DAYS;
+      else
+        cdoAbort("Calendar >%s< unsupported! Available %s", cname,
+                 cdoOperatorEnter(operatorID));
     }
   else
     {
@@ -336,104 +423,104 @@ void *Settime(void *process)
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   bool taxis_has_bounds = taxisHasBounds(taxisID1) > 0;
-  int ntsteps  = vlistNtsteps(vlistID1);
-  int nvars    = vlistNvars(vlistID1);
+  int ntsteps = vlistNtsteps(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  if ( ntsteps == 1 )
+  if (ntsteps == 1)
     {
-      for ( varID = 0; varID < nvars; ++varID )
-	if ( vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT ) break;
+      for (varID = 0; varID < nvars; ++varID)
+        if (vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT) break;
 
-      if ( varID == nvars ) ntsteps = 0;
+      if (varID == nvars) ntsteps = 0;
     }
 
-  if ( ntsteps == 0 )
+  if (ntsteps == 0)
     {
-      for ( varID = 0; varID < nvars; ++varID )
-	vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
+      for (varID = 0; varID < nvars; ++varID)
+        vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
   int calendar = taxisInqCalendar(taxisID1);
 
-  if ( cdoVerbose ) cdoPrint("calendar = %d", calendar);
+  if (cdoVerbose) cdoPrint("calendar = %d", calendar);
 
-  if ( operatorID == SETREFTIME )
+  if (operatorID == SETREFTIME)
     {
       copy_timestep = true;
 
-      if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
-	{
-	  cdoPrint("Changing absolute to relative time axis!");
+      if (taxisInqType(taxisID1) == TAXIS_ABSOLUTE)
+        {
+          cdoPrint("Changing absolute to relative time axis!");
 
-	  taxisID2 = taxisCreate(TAXIS_RELATIVE);
-	}
+          taxisID2 = taxisCreate(TAXIS_RELATIVE);
+        }
       else
-	taxisID2 = taxisDuplicate(taxisID1);
+        taxisID2 = taxisDuplicate(taxisID1);
 
-      if ( operatorArgc() != 3 ) tunit = taxisInqTunit(taxisID1);
+      if (operatorArgc() != 3) tunit = taxisInqTunit(taxisID1);
       taxisDefTunit(taxisID2, tunit);
     }
-  else if ( operatorID == SETTUNITS )
+  else if (operatorID == SETTUNITS)
     {
       copy_timestep = true;
 
-      if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
-	{
-	  cdoPrint("Changing absolute to relative time axis!");
+      if (taxisInqType(taxisID1) == TAXIS_ABSOLUTE)
+        {
+          cdoPrint("Changing absolute to relative time axis!");
 
-	  taxisID2 = taxisCreate(TAXIS_RELATIVE);
-	  taxisDefTunit(taxisID2, tunit);
-	}
+          taxisID2 = taxisCreate(TAXIS_RELATIVE);
+          taxisDefTunit(taxisID2, tunit);
+        }
       else
-	taxisID2 = taxisDuplicate(taxisID1);
+        taxisID2 = taxisDuplicate(taxisID1);
     }
-  else if ( operatorID == SETCALENDAR )
+  else if (operatorID == SETCALENDAR)
     {
       copy_timestep = true;
       /*
       if ( ((char *)argument)[0] == '-' )
-	cdoAbort("This operator does not work with pipes!");
+        cdoAbort("This operator does not work with pipes!");
       */
-      if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
-	{/*
-	  if ( cdoFiletype() != CDI_FILETYPE_NC )
-	    cdoAbort("This operator does not work on an absolute time axis!");
-	 */
-	  cdoPrint("Changing absolute to relative time axis!");
-	  taxisID2 = taxisCreate(TAXIS_RELATIVE);
-	}
+      if (taxisInqType(taxisID1) == TAXIS_ABSOLUTE)
+        { /*
+           if ( cdoFiletype() != CDI_FILETYPE_NC )
+             cdoAbort("This operator does not work on an absolute time axis!");
+          */
+          cdoPrint("Changing absolute to relative time axis!");
+          taxisID2 = taxisCreate(TAXIS_RELATIVE);
+        }
       else
-	taxisID2 = taxisDuplicate(taxisID1);
+        taxisID2 = taxisDuplicate(taxisID1);
     }
   else
     taxisID2 = taxisDuplicate(taxisID1);
 
-  if ( operatorID == SETTAXIS )
+  if (operatorID == SETTAXIS)
     {
       taxisDefTunit(taxisID2, tunit);
       taxisDefRdate(taxisID2, sdate);
       taxisDefRtime(taxisID2, stime);
       juldate = juldate_encode(calendar, sdate, stime);
     }
-  else if ( operatorID == SETTUNITS )
+  else if (operatorID == SETTUNITS)
     {
       taxisDefTunit(taxisID2, tunit);
     }
-  else if ( operatorID == SETCALENDAR )
+  else if (operatorID == SETCALENDAR)
     {
       taxisDefCalendar(taxisID2, newcalendar);
     }
-  else if ( operatorID == SETTBOUNDS )
+  else if (operatorID == SETTBOUNDS)
     {
       taxisWithBounds(taxisID2);
     }
 
-  if ( operatorID != SHIFTTIME )
-    if ( taxis_has_bounds && !copy_timestep )
+  if (operatorID != SHIFTTIME)
+    if (taxis_has_bounds && !copy_timestep)
       {
-	cdoWarning("Time bounds unsupported by this operator, removed!");
-	taxisDeleteBounds(taxisID2);
-	taxis_has_bounds = false;
+        cdoWarning("Time bounds unsupported by this operator, removed!");
+        taxisDeleteBounds(taxisID2);
+        taxis_has_bounds = false;
       }
 
   vlistDefTaxis(vlistID2, taxisID2);
@@ -441,128 +528,144 @@ void *Settime(void *process)
   int streamID2 = -1;
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
   std::vector<double> array(gridsizemax);
 
   int tsID1 = 0;
-  while ( (nrecs = cdoStreamInqTimestep(streamID1, tsID1)) )
+  while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
     {
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
-      if ( operatorID == SETTAXIS )
-	{
-	  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
-	    {
-	      vtime = stime;
-	      if ( tsID1 == 0 )
-		{
-		  vdate = sdate;
-		  cdiDecodeDate(vdate, &year, &month, &day0);
-		}
-	      else
-		{	      
-		  month += ijulinc;
-
-		  while ( month > 12 ) { month -= 12; year++; }
-		  while ( month <  1 ) { month += 12; year--; }
-
-                  day = (day0 == 31) ? days_per_month(calendar, year, month) : day0;
-
-		  vdate = cdiEncodeDate(year, month, day);
-		}
-	    }
-	  else
-	    {
-	      juldate_decode(calendar, juldate, &vdate, &vtime);
-	      juldate = juldate_add_seconds(ijulinc, juldate);
-	    }
-	}
-      else if ( operatorID == SETTBOUNDS )
-	{
-          gen_bounds(calendar, tunit, incperiod, vdate, vtime, vdateb, vtimeb);
-          
-          if ( CDO_CMOR_Mode )
+      if (operatorID == SETTAXIS)
+        {
+          if (tunit == TUNIT_MONTH || tunit == TUNIT_YEAR)
             {
-              juldate_t juldate1 = juldate_encode(calendar, vdateb[0], vtimeb[0]);
-              juldate_t juldate2 = juldate_encode(calendar, vdateb[1], vtimeb[1]);
-              double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-              juldate_t juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
+              vtime = stime;
+              if (tsID1 == 0)
+                {
+                  vdate = sdate;
+                  cdiDecodeDate(vdate, &year, &month, &day0);
+                }
+              else
+                {
+                  month += ijulinc;
+
+                  while (month > 12)
+                    {
+                      month -= 12;
+                      year++;
+                    }
+                  while (month < 1)
+                    {
+                      month += 12;
+                      year--;
+                    }
+
+                  day = (day0 == 31) ? days_per_month(calendar, year, month)
+                                     : day0;
+
+                  vdate = cdiEncodeDate(year, month, day);
+                }
+            }
+          else
+            {
+              juldate_decode(calendar, juldate, &vdate, &vtime);
+              juldate = juldate_add_seconds(ijulinc, juldate);
+            }
+        }
+      else if (operatorID == SETTBOUNDS)
+        {
+          gen_bounds(calendar, tunit, incperiod, vdate, vtime, vdateb, vtimeb);
+
+          if (CDO_CMOR_Mode)
+            {
+              juldate_t juldate1
+                  = juldate_encode(calendar, vdateb[0], vtimeb[0]);
+              juldate_t juldate2
+                  = juldate_encode(calendar, vdateb[1], vtimeb[1]);
+              double seconds
+                  = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
+              juldate_t juldatem
+                  = juldate_add_seconds((int) lround(seconds), juldate1);
               juldate_decode(calendar, juldatem, &vdate, &vtime);
             }
-	}
-      else if ( operatorID == SHIFTTIME )
-	{
-	  shifttime(calendar, tunit, ijulinc, &vdate, &vtime);
-	  if ( taxis_has_bounds )
-	    {
-	      taxisInqVdateBounds(taxisID1, &vdateb[0], &vdateb[1]);
-	      taxisInqVtimeBounds(taxisID1, &vtimeb[0], &vtimeb[1]);	      
-	      shifttime(calendar, tunit, ijulinc, &vdateb[0], &vtimeb[0]);
-	      shifttime(calendar, tunit, ijulinc, &vdateb[1], &vtimeb[1]);
-	    }
-	}
-      else if ( operatorID == SETREFTIME || operatorID == SETCALENDAR || operatorID == SETTUNITS )
-	{
-	  ;
-	}
+        }
+      else if (operatorID == SHIFTTIME)
+        {
+          shifttime(calendar, tunit, ijulinc, &vdate, &vtime);
+          if (taxis_has_bounds)
+            {
+              taxisInqVdateBounds(taxisID1, &vdateb[0], &vdateb[1]);
+              taxisInqVtimeBounds(taxisID1, &vtimeb[0], &vtimeb[1]);
+              shifttime(calendar, tunit, ijulinc, &vdateb[0], &vtimeb[0]);
+              shifttime(calendar, tunit, ijulinc, &vdateb[1], &vtimeb[1]);
+            }
+        }
+      else if (operatorID == SETREFTIME || operatorID == SETCALENDAR
+               || operatorID == SETTUNITS)
+        {
+          ;
+        }
       else
-	{
-	  cdiDecodeDate(vdate, &year, &month, &day);
+        {
+          cdiDecodeDate(vdate, &year, &month, &day);
 
-	  if ( operatorID == SETYEAR ) year  = newval;
-	  if ( operatorID == SETMON  ) month = newval;
-	  if ( operatorID == SETMON && (month < 0 || month > 16) ) cdoAbort("parameter month=%d out of range!", month);
-	  if ( operatorID == SETDAY  ) day   = newval;
-	  if ( operatorID == SETDAY && (day < 0 || day > 31) ) cdoAbort("parameter day=%d out of range!", day);
-      
-	  vdate = cdiEncodeDate(year, month, day);
+          if (operatorID == SETYEAR) year = newval;
+          if (operatorID == SETMON) month = newval;
+          if (operatorID == SETMON && (month < 0 || month > 16))
+            cdoAbort("parameter month=%d out of range!", month);
+          if (operatorID == SETDAY) day = newval;
+          if (operatorID == SETDAY && (day < 0 || day > 31))
+            cdoAbort("parameter day=%d out of range!", day);
 
-	  if ( operatorID == SETDATE  ) vdate = newval;
-	  if ( operatorID == SETTIME  ) vtime = newval;
-	}
+          vdate = cdiEncodeDate(year, month, day);
 
-      if ( copy_timestep )
-	{
-	  taxisCopyTimestep(taxisID2, taxisID1);
-	  if ( operatorID == SETREFTIME )
-	    {
-	      taxisDefRdate(taxisID2, sdate);
-	      taxisDefRtime(taxisID2, stime);
-	    }
-	}
+          if (operatorID == SETDATE) vdate = newval;
+          if (operatorID == SETTIME) vtime = newval;
+        }
+
+      if (copy_timestep)
+        {
+          taxisCopyTimestep(taxisID2, taxisID1);
+          if (operatorID == SETREFTIME)
+            {
+              taxisDefRdate(taxisID2, sdate);
+              taxisDefRtime(taxisID2, stime);
+            }
+        }
       else
-	{
-	  int numavg = taxisInqNumavg(taxisID1);
-	  taxisDefNumavg(taxisID2, numavg);
+        {
+          int numavg = taxisInqNumavg(taxisID1);
+          taxisDefNumavg(taxisID2, numavg);
 
-	  taxisDefVdate(taxisID2, vdate);
-	  taxisDefVtime(taxisID2, vtime);
+          taxisDefVdate(taxisID2, vdate);
+          taxisDefVtime(taxisID2, vtime);
 
-	  if ( taxis_has_bounds || operatorID == SETTBOUNDS )
-	    {
-	      taxisDefVdateBounds(taxisID2, vdateb[0], vdateb[1]);
-	      taxisDefVtimeBounds(taxisID2, vtimeb[0], vtimeb[1]);
-	    }
-	}
+          if (taxis_has_bounds || operatorID == SETTBOUNDS)
+            {
+              taxisDefVdateBounds(taxisID2, vdateb[0], vdateb[1]);
+              taxisDefVtimeBounds(taxisID2, vtimeb[0], vtimeb[1]);
+            }
+        }
 
-      if ( streamID2 == -1 )
+      if (streamID2 == -1)
         {
           streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
           pstreamDefVlist(streamID2, vlistID2);
         }
 
       pstreamDefTimestep(streamID2, tsID1);
-	       
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
-	  pstreamDefRecord(streamID2,  varID,  levelID);
-	  
-	  pstreamReadRecord(streamID1, &array[0], &nmiss);
-	  pstreamWriteRecord(streamID2, &array[0], nmiss);
-	}
-      
+
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
+          pstreamDefRecord(streamID2, varID, levelID);
+
+          pstreamReadRecord(streamID1, &array[0], &nmiss);
+          pstreamWriteRecord(streamID2, &array[0], nmiss);
+        }
+
       tsID1++;
     }
 

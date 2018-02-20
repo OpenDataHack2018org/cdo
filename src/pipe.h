@@ -18,14 +18,14 @@
 #ifndef PIPE_H
 #define PIPE_H
 
-#ifdef  HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <stdbool.h>
 #include <sys/types.h>
 
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
 
 #include <pthread.h>
 #include "pthread_debug.h"
@@ -33,7 +33,7 @@
 
 #endif
 
-#ifdef  HAVE_LIBPTHREAD
+#ifdef HAVE_LIBPTHREAD
 
 #include <condition_variable>
 #include <mutex>

@@ -25,11 +25,11 @@
       Timselstat    timselmean         Time selection mean
       Timselstat    timselavg          Time selection average
       Timselstat    timselvar          Time selection variance
-      Timselstat    timselvar1         Time selection variance [Normalize by (n-1)]
-      Timselstat    timselstd          Time selection standard deviation
-      Timselstat    timselstd1         Time selection standard deviation [Normalize by (n-1)]
+      Timselstat    timselvar1         Time selection variance [Normalize by
+   (n-1)] Timselstat    timselstd          Time selection standard deviation
+      Timselstat    timselstd1         Time selection standard deviation
+   [Normalize by (n-1)]
 */
-
 
 #include <cdi.h>
 
@@ -37,8 +37,8 @@
 #include "pstream_int.h"
 #include "datetime.h"
 
-
-void *Timselstat(void *process)
+void *
+Timselstat(void *process)
 {
   int timestat_date = TIMESTAT_MEAN;
   int nrecs = 0;
@@ -78,7 +78,8 @@ void *Timselstat(void *process)
   int nskip   = (nargc > 2) ? parameter2int(operatorArgv()[2]) : 0;
   // clang-format on
 
-  if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
+  if (cdoVerbose)
+    cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -104,169 +105,180 @@ void *Timselstat(void *process)
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
+  field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **vars2 = NULL;
-  if ( lvarstd || lrange ) vars2 = field_malloc(vlistID1, FIELD_PTR);
+  if (lvarstd || lrange) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
-  for ( tsID = 0; tsID < noffset; tsID++ )
+  for (tsID = 0; tsID < noffset; tsID++)
     {
       nrecs = cdoStreamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
 
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  pstreamInqRecord(streamID1, &varID, &levelID);
+      for (int recID = 0; recID < nrecs; recID++)
+        {
+          pstreamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( tsID == 0 )
-	    {
-              recinfo[recID].varID   = varID;
+          if (tsID == 0)
+            {
+              recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
-	    }
-	}
+              recinfo[recID].lconst
+                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+            }
+        }
     }
 
   int otsID = 0;
-  if ( tsID < noffset )
+  if (tsID < noffset)
     {
       cdoWarning("noffset is larger than number of timesteps!");
       goto LABEL_END;
     }
 
-  while ( TRUE )
+  while (TRUE)
     {
-      for ( nsets = 0; nsets < ndates; nsets++ )
-	{
-	  nrecs = cdoStreamInqTimestep(streamID1, tsID);
-	  if ( nrecs == 0 ) break;
+      for (nsets = 0; nsets < ndates; nsets++)
+        {
+          nrecs = cdoStreamInqTimestep(streamID1, tsID);
+          if (nrecs == 0) break;
 
-	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
+          dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
-	    {
-	      pstreamInqRecord(streamID1, &varID, &levelID);
+          for (int recID = 0; recID < nrecs; recID++)
+            {
+              pstreamInqRecord(streamID1, &varID, &levelID);
 
-	      if ( tsID == 0 )
-		{
-                  recinfo[recID].varID   = varID;
+              if (tsID == 0)
+                {
+                  recinfo[recID].varID = varID;
                   recinfo[recID].levelID = levelID;
-                  recinfo[recID].lconst  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
-		}
+                  recinfo[recID].lconst
+                      = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+                }
 
               field_type *psamp1 = &samp1[varID][levelID];
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-	      size_t gridsize = pvars1->size;
+              size_t gridsize = pvars1->size;
 
-	      if ( nsets == 0 )
-		{
-		  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
-		  pvars1->nmiss = nmiss;
-                  if ( lrange )
+              if (nsets == 0)
+                {
+                  pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
+                  pvars1->nmiss = nmiss;
+                  if (lrange)
                     {
                       pvars2->nmiss = nmiss;
-		      for ( size_t i = 0; i < gridsize; i++ )
+                      for (size_t i = 0; i < gridsize; i++)
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
-		  if ( nmiss > 0 || psamp1->ptr )
-		    {
-		      if ( psamp1->ptr == NULL )
-			psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
+                  if (nmiss > 0 || psamp1->ptr)
+                    {
+                      if (psamp1->ptr == NULL)
+                        psamp1->ptr
+                            = (double *) Malloc(gridsize * sizeof(double));
 
-		      for ( size_t i = 0; i < gridsize; i++ )
-                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
-		    }
-		}
-	      else
-		{
-		  pstreamReadRecord(streamID1, field.ptr, &nmiss);
-                  field.nmiss   = nmiss;
-		  field.grid    = pvars1->grid;
-		  field.missval = pvars1->missval;
+                      for (size_t i = 0; i < gridsize; i++)
+                        psamp1->ptr[i]
+                            = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                    }
+                }
+              else
+                {
+                  pstreamReadRecord(streamID1, field.ptr, &nmiss);
+                  field.nmiss = nmiss;
+                  field.grid = pvars1->grid;
+                  field.missval = pvars1->missval;
 
-		  if ( field.nmiss > 0 || psamp1->ptr )
-		    {
-		      if ( psamp1->ptr == NULL )
-			{
-			  psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
-			  for ( size_t i = 0; i < gridsize; i++ )
-			    psamp1->ptr[i] = nsets;
-			}
+                  if (field.nmiss > 0 || psamp1->ptr)
+                    {
+                      if (psamp1->ptr == NULL)
+                        {
+                          psamp1->ptr
+                              = (double *) Malloc(gridsize * sizeof(double));
+                          for (size_t i = 0; i < gridsize; i++)
+                            psamp1->ptr[i] = nsets;
+                        }
 
-		      for ( size_t i = 0; i < gridsize; i++ )
-			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-			  psamp1->ptr[i]++;
-		    }
+                      for (size_t i = 0; i < gridsize; i++)
+                        if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
+                          psamp1->ptr[i]++;
+                    }
 
-		  if ( lvarstd )
-		    {
-		      farsumq(pvars2, field);
-		      farsum(pvars1, field);
-		    }
-                  else if ( lrange )
+                  if (lvarstd)
+                    {
+                      farsumq(pvars2, field);
+                      farsum(pvars1, field);
+                    }
+                  else if (lrange)
                     {
                       farmin(pvars2, field);
                       farmax(pvars1, field);
                     }
-		  else
-		    {
-		      farfun(pvars1, field, operfunc);
-		    }
-		}
-	    }
+                  else
+                    {
+                      farfun(pvars1, field, operfunc);
+                    }
+                }
+            }
 
-	  if ( nsets == 0 && lvarstd )
-            for ( int recID = 0; recID < maxrecs; recID++ )
+          if (nsets == 0 && lvarstd)
+            for (int recID = 0; recID < maxrecs; recID++)
               {
-                if ( recinfo[recID].lconst ) continue;
+                if (recinfo[recID].lconst) continue;
 
-                int varID   = recinfo[recID].varID;
+                int varID = recinfo[recID].varID;
                 int levelID = recinfo[recID].levelID;
                 field_type *pvars1 = &vars1[varID][levelID];
                 field_type *pvars2 = &vars2[varID][levelID];
 
                 farmoq(pvars2, *pvars1);
-	      }
+              }
 
-	  tsID++;
-	}
+          tsID++;
+        }
 
-      if ( nrecs == 0 && nsets == 0 ) break;
+      if (nrecs == 0 && nsets == 0) break;
 
-      for ( int recID = 0; recID < maxrecs; recID++ )
+      for (int recID = 0; recID < maxrecs; recID++)
         {
-          if ( recinfo[recID].lconst ) continue;
+          if (recinfo[recID].lconst) continue;
 
-          int varID   = recinfo[recID].varID;
+          int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = &samp1[varID][levelID];
           field_type *pvars1 = &vars1[varID][levelID];
           field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-          if ( lmean )
+          if (lmean)
             {
-              if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
-              else               farcdiv(pvars1, (double)nsets);
+              if (psamp1->ptr)
+                fardiv(pvars1, *psamp1);
+              else
+                farcdiv(pvars1, (double) nsets);
             }
-          else if ( lvarstd )
+          else if (lvarstd)
             {
-              if ( psamp1->ptr )
+              if (psamp1->ptr)
                 {
-                  if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
-                  else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                  if (lstd)
+                    farstd(pvars1, *pvars2, *psamp1, divisor);
+                  else
+                    farvar(pvars1, *pvars2, *psamp1, divisor);
                 }
               else
                 {
-                  if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
-                  else        farcvar(pvars1, *pvars2, nsets, divisor);
+                  if (lstd)
+                    farcstd(pvars1, *pvars2, nsets, divisor);
+                  else
+                    farcvar(pvars1, *pvars2, nsets, divisor);
                 }
             }
-          else if ( lrange )
+          else if (lrange)
             {
               farsub(pvars1, *pvars2);
             }
@@ -275,41 +287,40 @@ void *Timselstat(void *process)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
       pstreamDefTimestep(streamID2, otsID);
 
-      for ( int recID = 0; recID < maxrecs; recID++ )
-	{
-          if ( otsID && recinfo[recID].lconst ) continue;
+      for (int recID = 0; recID < maxrecs; recID++)
+        {
+          if (otsID && recinfo[recID].lconst) continue;
 
-          int varID   = recinfo[recID].varID;
+          int varID = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
           field_type *pvars1 = &vars1[varID][levelID];
 
-	  pstreamDefRecord(streamID2, varID, levelID);
-	  pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
-	}
+          pstreamDefRecord(streamID2, varID, levelID);
+          pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
+        }
 
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
       otsID++;
 
-      for ( int i = 0; i < nskip; i++ )
-	{
-	  nrecs = cdoStreamInqTimestep(streamID1, tsID);
-	  if ( nrecs == 0 ) break;
-	  tsID++;
-	}
+      for (int i = 0; i < nskip; i++)
+        {
+          nrecs = cdoStreamInqTimestep(streamID1, tsID);
+          if (nrecs == 0) break;
+          tsID++;
+        }
 
-      if ( nrecs == 0 ) break;
+      if (nrecs == 0) break;
     }
 
- LABEL_END:
-
+LABEL_END:
 
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
-  if ( lvarstd ) field_free(vars2, vlistID1);
+  if (lvarstd) field_free(vars2, vlistID1);
 
   dtlist_delete(dtlist);
 
-  if ( field.ptr ) Free(field.ptr);
+  if (field.ptr) Free(field.ptr);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

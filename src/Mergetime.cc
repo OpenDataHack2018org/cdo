@@ -21,15 +21,14 @@
       Merge      mergetime       Merge datasets sorted by date and time
 */
 
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "pstream_int.h"
 #include "util_files.h"
 
-
-void *Mergetime(void *process)
+void *
+Mergetime(void *process)
 {
   int tsID2 = 0;
   int taxisID2 = CDI_UNDEFID;
@@ -50,14 +49,13 @@ void *Mergetime(void *process)
   cdoInitialize(process);
 
   char *envstr = getenv("SKIP_SAME_TIME");
-  if ( envstr )
+  if (envstr)
     {
       int ival = atoi(envstr);
-      if ( ival == 1 )
+      if (ival == 1)
         {
           skip_same_time = true;
-          if ( cdoVerbose )
-            cdoPrint("Set SKIP_SAME_TIME to %d", ival);
+          if (cdoVerbose) cdoPrint("Set SKIP_SAME_TIME to %d", ival);
         }
     }
 
@@ -65,154 +63,158 @@ void *Mergetime(void *process)
 
   int nfiles = cdoStreamCnt() - 1;
 
-  sfile_t *sf = (sfile_t*) Malloc(nfiles*sizeof(sfile_t));
+  sfile_t *sf = (sfile_t *) Malloc(nfiles * sizeof(sfile_t));
 
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
+  for (int fileID = 0; fileID < nfiles; fileID++)
     {
-      if ( cdoVerbose ) cdoPrint("process: %s", cdoGetStreamName(fileID).c_str());
+      if (cdoVerbose) cdoPrint("process: %s", cdoGetStreamName(fileID).c_str());
 
       sf[fileID].streamID = cdoStreamOpenRead(cdoStreamName(fileID));
       sf[fileID].vlistID = cdoStreamInqVlist(sf[fileID].streamID);
       sf[fileID].taxisID = vlistInqTaxis(sf[fileID].vlistID);
     }
 
-  
   // check that the contents is always the same
-  for ( int fileID = 1; fileID < nfiles; fileID++ )
+  for (int fileID = 1; fileID < nfiles; fileID++)
     vlistCompare(sf[0].vlistID, sf[fileID].vlistID, CMP_ALL);
 
   // read the first time step
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
+  for (int fileID = 0; fileID < nfiles; fileID++)
     {
       sf[fileID].tsID = 0;
-      sf[fileID].nrecs = cdoStreamInqTimestep(sf[fileID].streamID, sf[fileID].tsID);
-      if ( sf[fileID].nrecs == 0 )
-	{
-	  pstreamClose(sf[fileID].streamID);
-	  sf[fileID].streamID = -1;
-	}
+      sf[fileID].nrecs
+          = cdoStreamInqTimestep(sf[fileID].streamID, sf[fileID].tsID);
+      if (sf[fileID].nrecs == 0)
+        {
+          pstreamClose(sf[fileID].streamID);
+          sf[fileID].streamID = -1;
+        }
       else
-	{
-	  sf[fileID].vdate = taxisInqVdate(sf[fileID].taxisID);
-	  sf[fileID].vtime = taxisInqVtime(sf[fileID].taxisID);
-	}
+        {
+          sf[fileID].vdate = taxisInqVdate(sf[fileID].taxisID);
+          sf[fileID].vtime = taxisInqVtime(sf[fileID].taxisID);
+        }
     }
 
   const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
-  if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
+  if (!cdoOverwriteMode && fileExists(ofilename)
+      && !userFileOverwrite(ofilename))
     cdoAbort("Outputfile %s already exists!", ofilename);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
-  if ( ! lcopy )
+  if (!lcopy)
     {
       size_t gridsize = vlistGridsizeMax(sf[0].vlistID);
-      array = (double*) Malloc(gridsize*sizeof(double));
+      array = (double *) Malloc(gridsize * sizeof(double));
     }
 
-  while ( true )
+  while (true)
     {
       bool process_timestep = true;
 
       int next_fileID = -1;
       int vdate = 0;
       int vtime = 0;
-      for ( int fileID = 0; fileID < nfiles; fileID++ )
-	{
-	  if ( sf[fileID].streamID != -1 )
-	    if ( next_fileID == -1 || sf[fileID].vdate < vdate ||
-		 (sf[fileID].vdate == vdate && sf[fileID].vtime < vtime) )
-	      {
-		next_fileID = fileID;
-		vdate = sf[fileID].vdate;
-		vtime = sf[fileID].vtime;
-	      }
-	}
+      for (int fileID = 0; fileID < nfiles; fileID++)
+        {
+          if (sf[fileID].streamID != -1)
+            if (next_fileID == -1 || sf[fileID].vdate < vdate
+                || (sf[fileID].vdate == vdate && sf[fileID].vtime < vtime))
+              {
+                next_fileID = fileID;
+                vdate = sf[fileID].vdate;
+                vtime = sf[fileID].vtime;
+              }
+        }
 
       int fileID = next_fileID;
 
-      if ( cdoVerbose )
-	cdoPrint("nextstep = %d  vdate = %d  vtime = %d", fileID, vdate, vtime);
+      if (cdoVerbose)
+        cdoPrint("nextstep = %d  vdate = %d  vtime = %d", fileID, vdate, vtime);
 
-      if ( fileID == -1 ) break;
+      if (fileID == -1) break;
 
-      if ( skip_same_time )
-	if ( vdate == last_vdate && vtime == last_vtime )
-	  {
-	    char vdatestr[32], vtimestr[32];
-	    date2str(vdate, vdatestr, sizeof(vdatestr));
-	    time2str(vtime, vtimestr, sizeof(vtimestr));
-	    cdoPrint("Timestep %4d in stream %d (%s %s) already exists, skipped!",
-		     sf[fileID].tsID+1, sf[fileID].streamID, vdatestr, vtimestr);
-	    process_timestep = false;
-	  }
+      if (skip_same_time)
+        if (vdate == last_vdate && vtime == last_vtime)
+          {
+            char vdatestr[32], vtimestr[32];
+            date2str(vdate, vdatestr, sizeof(vdatestr));
+            time2str(vtime, vtimestr, sizeof(vtimestr));
+            cdoPrint(
+                "Timestep %4d in stream %d (%s %s) already exists, skipped!",
+                sf[fileID].tsID + 1, sf[fileID].streamID, vdatestr, vtimestr);
+            process_timestep = false;
+          }
 
-      if ( process_timestep )
-	{
-	  if ( tsID2 == 0 )
-	    {
-	      int vlistID1 = sf[fileID].vlistID;
-	      int vlistID2 = vlistDuplicate(vlistID1);
-	      int taxisID1 = vlistInqTaxis(vlistID1);
-	      taxisID2 = taxisDuplicate(taxisID1);
-	      vlistDefTaxis(vlistID2, taxisID2);
-	      
-	      pstreamDefVlist(streamID2, vlistID2);
-	    }
+      if (process_timestep)
+        {
+          if (tsID2 == 0)
+            {
+              int vlistID1 = sf[fileID].vlistID;
+              int vlistID2 = vlistDuplicate(vlistID1);
+              int taxisID1 = vlistInqTaxis(vlistID1);
+              taxisID2 = taxisDuplicate(taxisID1);
+              vlistDefTaxis(vlistID2, taxisID2);
 
-	  last_vdate = vdate;
-	  last_vtime = vtime;
+              pstreamDefVlist(streamID2, vlistID2);
+            }
 
-	  taxisCopyTimestep(taxisID2, sf[fileID].taxisID);
+          last_vdate = vdate;
+          last_vtime = vtime;
 
-	  pstreamDefTimestep(streamID2, tsID2);
-	       
-	  for ( int recID = 0; recID < sf[fileID].nrecs; recID++ )
-	    {
+          taxisCopyTimestep(taxisID2, sf[fileID].taxisID);
+
+          pstreamDefTimestep(streamID2, tsID2);
+
+          for (int recID = 0; recID < sf[fileID].nrecs; recID++)
+            {
               int varID, levelID;
-	      pstreamInqRecord(sf[fileID].streamID, &varID, &levelID);
+              pstreamInqRecord(sf[fileID].streamID, &varID, &levelID);
 
-              if ( tsID2 > 0 && sf[fileID].tsID == 0 )
-                if ( vlistInqVarTimetype(sf[fileID].vlistID, varID) == TIME_CONSTANT )
+              if (tsID2 > 0 && sf[fileID].tsID == 0)
+                if (vlistInqVarTimetype(sf[fileID].vlistID, varID)
+                    == TIME_CONSTANT)
                   continue;
 
               pstreamDefRecord(streamID2, varID, levelID);
-	  
-	      if ( lcopy )
-		{
-		  pstreamCopyRecord(streamID2, sf[fileID].streamID); 
-		}
-	      else
-		{
+
+              if (lcopy)
+                {
+                  pstreamCopyRecord(streamID2, sf[fileID].streamID);
+                }
+              else
+                {
                   size_t nmiss;
-		  pstreamReadRecord(sf[fileID].streamID, array, &nmiss);
-		  pstreamWriteRecord(streamID2, array, nmiss);
-		}
-	    }
+                  pstreamReadRecord(sf[fileID].streamID, array, &nmiss);
+                  pstreamWriteRecord(streamID2, array, nmiss);
+                }
+            }
 
-	  tsID2++;
-	}
+          tsID2++;
+        }
 
-      sf[fileID].nrecs = cdoStreamInqTimestep(sf[fileID].streamID, ++sf[fileID].tsID);
-      if ( sf[fileID].nrecs == 0 )
-	{
-	  pstreamClose(sf[fileID].streamID);
-	  sf[fileID].streamID = -1;
-	}
+      sf[fileID].nrecs
+          = cdoStreamInqTimestep(sf[fileID].streamID, ++sf[fileID].tsID);
+      if (sf[fileID].nrecs == 0)
+        {
+          pstreamClose(sf[fileID].streamID);
+          sf[fileID].streamID = -1;
+        }
       else
-	{
-	  sf[fileID].vdate = taxisInqVdate(sf[fileID].taxisID);
-	  sf[fileID].vtime = taxisInqVtime(sf[fileID].taxisID);
-	}
+        {
+          sf[fileID].vdate = taxisInqVdate(sf[fileID].taxisID);
+          sf[fileID].vtime = taxisInqVtime(sf[fileID].taxisID);
+        }
     }
 
   pstreamClose(streamID2);
 
-  if ( ! lcopy )
-    if ( array ) Free(array);
+  if (!lcopy)
+    if (array) Free(array);
 
-  if ( sf ) Free(sf);
+  if (sf) Free(sf);
 
   cdoFinish();
 
