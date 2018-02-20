@@ -1,0 +1,10 @@
+
+./makedoc
+./makepdf
+./makepdfcmor
+./makerefcard
+./makepdfmagics
+./makepdfeca
+
+cp *.pdf ../
+./cleanup

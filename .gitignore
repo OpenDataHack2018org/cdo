@@ -1,25 +1,53 @@
-*.test
+#=================================
+#           CDO
+#=================================
+#==== Uncategorized ==============
+
 *~
+*.dSYM
+.deps
+.dirstamp
+stamp-h1
+TAGS
+tags
+
+#====== Objects and libs =========
 *.la
 *.lo
 *.o
+.libs
+#=================================
+
+#==== Test files =================
 *.log
 *.trs
-*.dSYM
-.deps
-.libs
-.dirstamp
-stamp-h1
+*.test
+#=================================
+
+#==== Autogen files ==============
+Makefile
+#----- aclocal files -----
+aclocal.m4
+autom4te.cache
+#----- configure files ---
+configure
+config.h.in
 config.log
 config.status
 config.h
-build
+
+#---- Makefiles.in ---------------
+Makefile.in
+#=================================
+
+#==== Documentation pdfs =========
 cdo.pdf
 cdo_eca.pdf
 cdo_magics.pdf
 cdo_cmor.pdf
 cdo_refcard.pdf
-autom4te.cache
-Makefile
-TAGS
-tags
+cdo_libdep.pdf
+
+#---- html folder ----------------
+doc/html/
+#=================================
