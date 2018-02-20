@@ -30,8 +30,7 @@
 #define NTR2NSP(ntr) ((ntr + 1) * (ntr + 2))
 #define NSP2NTR(nsp) ((int) ((((sqrt((double) (4 * nsp + 1))) - 3) / 2)))
 #define NGP2NLEVEL(ngp) ((int) (log10(((double) ngp) / 80.) / log10(4.)))
-#define NGP_ICON(nrooti, nlevel) \
-  ((int) (20 * nrooti * nrooti * ipow(4, nlevel)))
+#define NGP_ICON(nrooti, nlevel) ((int) (20 * nrooti * nrooti * ipow(4, nlevel)))
 /*#define NGP_GME(ni)           ((ni+1)*(ni+1)*10)*/
 #define NGP_GME(ni) (2 + ni * ni * 10)
 #define NGP2NI(ngp) ((int) sqrt((double) ngp / 10.) - 1)
@@ -454,14 +453,12 @@ Specinfo(void *process)
                   "icon   ngp_icon\n");
 
   if (nout1)
-    fprintf(stdout, "   T%-4d  %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n",
-            ntr1, nsp1, nlon1, nlat1, ngp1, ni1, ngp_gme1, nrooti1, nlevel1,
-            ngp_icon1);
+    fprintf(stdout, "   T%-4d  %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n", ntr1, nsp1, nlon1, nlat1, ngp1, ni1,
+            ngp_gme1, nrooti1, nlevel1, ngp_icon1);
 
   if (nout2)
-    fprintf(stdout, "   TL%-4d %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n",
-            ntr2, nsp2, nlon2, nlat2, ngp2, ni2, ngp_gme2, nrooti2, nlevel2,
-            ngp_icon2);
+    fprintf(stdout, "   TL%-4d %8d %5d %5d %8d  ni%d %8d  R%dB%02d  %8d\n", ntr2, nsp2, nlon2, nlat2, ngp2, ni2,
+            ngp_gme2, nrooti2, nlevel2, ngp_icon2);
 
   cdoFinish();
 

@@ -268,8 +268,7 @@ Intgrid(void *process)
 
   int operatorID = cdoOperatorID();
 
-  if (operatorID == INTGRIDBIL || operatorID == INTERPOLATE
-      || operatorID == INTGRIDDIS || operatorID == INTGRIDNN)
+  if (operatorID == INTGRIDBIL || operatorID == INTERPOLATE || operatorID == INTGRIDDIS || operatorID == INTGRIDNN)
     {
       operatorInputArg("grid description file or name");
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
@@ -303,29 +302,23 @@ Intgrid(void *process)
             {
               if (gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN
                   /* && gridInqType(gridID1) != GRID_CURVILINEAR */)
-                cdoAbort("Interpolation of %s data unsupported!",
-                         gridNamePtr(gridtype));
+                cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype));
 
-              gridID2 = operatorID == BOXAVG
-                            ? genBoxavgGrid(gridID1, xinc, yinc)
-                            : genThinoutGrid(gridID1, xinc, yinc);
+              gridID2 = operatorID == BOXAVG ? genBoxavgGrid(gridID1, xinc, yinc) : genThinoutGrid(gridID1, xinc, yinc);
             }
           else
             cdoAbort("Too many different grids!");
         }
       else if (operatorID == INTGRIDBIL || operatorID == INTERPOLATE)
         {
-          bool ldistgen = (grid_is_distance_generic(gridID1)
-                           && grid_is_distance_generic(gridID2));
+          bool ldistgen = (grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2));
           if (!ldistgen && gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN)
-            cdoAbort("Interpolation of %s data unsupported!",
-                     gridNamePtr(gridInqType(gridID1)));
+            cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)));
         }
       else if (operatorID == INTGRIDNN || operatorID == INTGRIDDIS)
         {
           if (gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED)
-            cdoAbort("Interpolation of %s data unsupported!",
-                     gridNamePtr(gridInqType(gridID1)));
+            cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)));
         }
 
       vlistChangeGridIndex(vlistID2, index, gridID2);

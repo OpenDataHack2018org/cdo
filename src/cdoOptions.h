@@ -34,12 +34,12 @@ extern bool cdoCompress;
 extern int cdoCompType;
 extern int cdoCompLevel;
 extern bool cdoInteractive;
-}
+}  // namespace Options
 
 namespace Threading
 {
 extern int ompNumThreads;
 extern bool cdoLockIO;
-}
+}  // namespace Threading
 
 #endif

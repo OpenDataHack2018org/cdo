@@ -84,8 +84,7 @@ Seloperator(void *process)
         }
     }
 
-  if (selfound == FALSE)
-    cdoWarning("Code %d, ltype %d, level %g not found!", scode, sltype, slevel);
+  if (selfound == FALSE) cdoWarning("Code %d, ltype %d, level %g not found!", scode, sltype, slevel);
 
   int vlistID2 = vlistCreate();
   cdoVlistCopyFlag(vlistID2, vlistID1);

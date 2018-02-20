@@ -62,8 +62,7 @@ dayofyear(int calendar, int vdate, int vtime)
   doy += (day - 1);
   doy += (second + minute * 60 + hour * 3600) / 86400.;
 
-  if (cdoVerbose)
-    cdoPrint("vdate, vtime, dpy, doy: %d %d %d %g", vdate, vtime, dpy, doy);
+  if (cdoVerbose) cdoPrint("vdate, vtime, dpy, doy: %d %d %d %g", vdate, vtime, dpy, doy);
 
   return doy;
 }
@@ -136,9 +135,7 @@ Arithdays(void *process)
             rconst = days_per_year(calendar, year);
         }
 
-      if (cdoVerbose)
-        cdoPrint("calendar %d  year %d  month %d  result %g", calendar, year,
-                 month, rconst);
+      if (cdoVerbose) cdoPrint("calendar %d  year %d  month %d  result %g", calendar, year, month, rconst);
 
       for (int recID = 0; recID < nrecs; recID++)
         {

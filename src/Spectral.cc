@@ -122,13 +122,11 @@ Spectral(void *process)
               gridDefComplexPacking(gridIDsp, 1);
             }
 
-          if (gridIDsp == -1
-              && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED)
+          if (gridIDsp == -1 && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED)
             cdoAbort("Gaussian reduced grid found. Use option -R to convert it "
                      "to a regular grid!");
 
-          if (gridIDsp == -1)
-            cdoAbort("Computation of spherical harmonics failed!");
+          if (gridIDsp == -1) cdoAbort("Computation of spherical harmonics failed!");
 
           gridID2 = gridIDsp;
 
@@ -161,11 +159,9 @@ Spectral(void *process)
             {
               char gridname[20];
               if (operatorID == SP2GP)
-                snprintf(gridname, sizeof(gridname), "t%dgrid",
-                         gridInqTrunc(gridIDsp));
+                snprintf(gridname, sizeof(gridname), "t%dgrid", gridInqTrunc(gridIDsp));
               else
-                snprintf(gridname, sizeof(gridname), "tl%dgrid",
-                         gridInqTrunc(gridIDsp));
+                snprintf(gridname, sizeof(gridname), "tl%dgrid", gridInqTrunc(gridIDsp));
 
               gridIDgp = grid_from_name(gridname);
             }
@@ -186,8 +182,7 @@ Spectral(void *process)
       operatorInputArg("truncation");
       if (gridID1 != -1)
         {
-          if (!isdigit(operatorArgv()[0][0]))
-            cdoAbort("parameter truncation must comprise only digits [0-9]!");
+          if (!isdigit(operatorArgv()[0][0])) cdoAbort("parameter truncation must comprise only digits [0-9]!");
           int ntr = parameter2int(operatorArgv()[0]);
           int nsp = (ntr + 1) * (ntr + 2);
           gridIDsp = gridCreate(GRID_SPECTRAL, nsp);
@@ -216,9 +211,7 @@ Spectral(void *process)
           for (i = 0; i < ncut; i++)
             {
               j = wnums[i] - 1;
-              if (j < 0 || j >= maxntr)
-                cdoAbort("wave number %ld out of range (min=1, max=%l qd)!",
-                         wnums[i], maxntr);
+              if (j < 0 || j >= maxntr) cdoAbort("wave number %ld out of range (min=1, max=%l qd)!", wnums[i], maxntr);
               waves[j] = 0;
             }
         }
@@ -265,8 +258,7 @@ Spectral(void *process)
           if (vars[varID])
             {
               pstreamReadRecord(streamID1, array1, &nmiss);
-              if (nmiss)
-                cdoAbort("Missing values unsupported for spectral data!");
+              if (nmiss) cdoAbort("Missing values unsupported for spectral data!");
 
               gridID1 = vlistInqVarGrid(vlistID1, varID);
               if (operatorID == GP2SP || operatorID == GP2SPL)

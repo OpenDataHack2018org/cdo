@@ -80,8 +80,7 @@ Deltat(void *process)
             {
               for (size_t i = 0; i < gridsize; ++i)
                 {
-                  if (DBL_IS_EQUAL(array0[i], missval)
-                      || DBL_IS_EQUAL(array1[i], missval))
+                  if (DBL_IS_EQUAL(array0[i], missval) || DBL_IS_EQUAL(array1[i], missval))
                     array2[i] = missval;
                   else
                     array2[i] = array1[i] - array0[i];

@@ -47,9 +47,7 @@ readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t len)
       line[ipos++] = ichar;
       if (ipos >= len)
         {
-          fprintf(stderr,
-                  "readLineFromBuffer: end of line not found (maxlen = %zu)!\n",
-                  len);
+          fprintf(stderr, "readLineFromBuffer: end of line not found (maxlen = %zu)!\n", len);
           break;
         }
     }
@@ -80,8 +78,7 @@ getElementName(char *pline, char *name)
     pline++;
   size_t len = strlen(pline);
   size_t pos = 0;
-  while (pos < len && !isspace((int) *(pline + pos)) && *(pline + pos) != '='
-         && *(pline + pos) != ':')
+  while (pos < len && !isspace((int) *(pline + pos)) && *(pline + pos) != '=' && *(pline + pos) != ':')
     pos++;
 
   strncpy(name, pline, pos);
@@ -136,8 +133,7 @@ cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
 
       int ientry = -1;
       for (ientry = 0; ientry < nentry; ++ientry)
-        if (strncmp(pline, listentry[ientry], strlen(listentry[ientry])) == 0)
-          break;
+        if (strncmp(pline, listentry[ientry], strlen(listentry[ientry])) == 0) break;
 
       if (ientry < nentry)
         {
@@ -189,8 +185,7 @@ dump_json(const char *js, jsmntok_t *t, size_t count, int level)
     {
       printf("\n");
       //  printf("Object: size %d\n", t->size);
-      printf("Object: size %d count %d level %d\n", t->size, (int) count,
-             level);
+      printf("Object: size %d count %d level %d\n", t->size, (int) count, level);
       j = 0;
       for (i = 0; i < t->size; i++)
         {
@@ -221,8 +216,7 @@ dump_json(const char *js, jsmntok_t *t, size_t count, int level)
 }
 
 static void
-kvlist_append_json(list_t *kvlist, const char *key, const char *js,
-                   jsmntok_t *t, int nvalues)
+kvlist_append_json(list_t *kvlist, const char *key, const char *js, jsmntok_t *t, int nvalues)
 {
   keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));
   keyval->key = strdup(key);
@@ -252,15 +246,13 @@ json_to_pmlist(list_t *pmlist, const char *js, jsmntok_t *t, int count)
       {
         ++i;
         int pmlname = i;
-        if (debug)
-          printf("  object: %.*s\n", t[i].end - t[i].start, js + t[i].start);
+        if (debug) printf("  object: %.*s\n", t[i].end - t[i].start, js + t[i].start);
         ++i;
         if (t[i].type == JSMN_OBJECT)
           {
             int ic = 0;
           NEXT:
-            snprintf(name, sizeof(name), "%.*s",
-                     t[pmlname].end - t[pmlname].start, js + t[pmlname].start);
+            snprintf(name, sizeof(name), "%.*s", t[pmlname].end - t[pmlname].start, js + t[pmlname].start);
             name[sizeof(name) - 1] = 0;
             // printf("new object: %s\n", name);
             list_t *kvlist = kvlist_new(name);
@@ -275,20 +267,16 @@ json_to_pmlist(list_t *pmlist, const char *js, jsmntok_t *t, int count)
 
                 ++i;
                 kvlist_append_json(kvlist, "name", js, &t[i], 1);
-                if (debug)
-                  printf("    name: '%.*s'\n", t[i].end - t[i].start,
-                         js + t[i].start);
+                if (debug) printf("    name: '%.*s'\n", t[i].end - t[i].start, js + t[i].start);
                 ++i;
               }
             int n = t[i].size;
             while (n--)
               {
                 ++i;
-                snprintf(name, sizeof(name), "%.*s", t[i].end - t[i].start,
-                         js + t[i].start);
+                snprintf(name, sizeof(name), "%.*s", t[i].end - t[i].start, js + t[i].start);
                 name[sizeof(name) - 1] = 0;
-                if (debug)
-                  printf("    %.*s:", t[i].end - t[i].start, js + t[i].start);
+                if (debug) printf("    %.*s:", t[i].end - t[i].start, js + t[i].start);
                 ++i;
                 if (t[i].type == JSMN_ARRAY)
                   {
@@ -297,16 +285,13 @@ json_to_pmlist(list_t *pmlist, const char *js, jsmntok_t *t, int count)
                     while (nae--)
                       {
                         ++i;
-                        if (debug)
-                          printf(" '%.*s'", t[i].end - t[i].start,
-                                 js + t[i].start);
+                        if (debug) printf(" '%.*s'", t[i].end - t[i].start, js + t[i].start);
                       }
                   }
                 else
                   {
                     kvlist_append_json(kvlist, name, js, &t[i], 1);
-                    if (debug)
-                      printf(" '%.*s'", t[i].end - t[i].start, js + t[i].start);
+                    if (debug) printf(" '%.*s'", t[i].end - t[i].start, js + t[i].start);
                   }
                 if (debug) printf("\n");
               }
@@ -320,8 +305,7 @@ json_to_pmlist(list_t *pmlist, const char *js, jsmntok_t *t, int count)
 }
 
 void
-cmortablebuf_to_pmlist_json(list_t *pmlist, size_t buffersize, char *buffer,
-                            const char *filename)
+cmortablebuf_to_pmlist_json(list_t *pmlist, size_t buffersize, char *buffer, const char *filename)
 {
   /* Prepare parser */
   jsmn_parser *p = jsmn_new();
@@ -332,19 +316,13 @@ cmortablebuf_to_pmlist_json(list_t *pmlist, size_t buffersize, char *buffer,
       switch (status)
         {
         case JSMN_ERROR_INVAL:
-          fprintf(
-              stderr,
-              "JSON error: Invalid character in %s (line=%d character='%c')!\n",
-              filename, p->lineno, buffer[p->pos]);
+          fprintf(stderr, "JSON error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno,
+                  buffer[p->pos]);
           break;
         case JSMN_ERROR_PART:
-          fprintf(stderr,
-                  "JSON error: End of string not found in %s (line=%d)!\n",
-                  filename, p->lineno);
+          fprintf(stderr, "JSON error: End of string not found in %s (line=%d)!\n", filename, p->lineno);
           break;
-        default:
-          fprintf(stderr, "JSON error in %s (line=%d)\n", filename, p->lineno);
-          break;
+        default: fprintf(stderr, "JSON error in %s (line=%d)\n", filename, p->lineno); break;
         }
     }
 
@@ -356,8 +334,7 @@ list_t *
 cmortable_to_pmlist(FILE *fp, const char *name)
 {
   listbuf_t *listbuf = listbuf_new();
-  if (listbuf_read(listbuf, fp, name))
-    cdoAbort("Read error on CMOR table %s!", name);
+  if (listbuf_read(listbuf, fp, name)) cdoAbort("Read error on CMOR table %s!", name);
 
   list_t *pmlist = NULL;
 

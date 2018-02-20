@@ -132,8 +132,7 @@ scan_code(char *namelist, struct Variable *vars, int maxCodes, int *numCodes)
 }
 
 void
-scan_darray(char *namelist, const char *name, double *values, int maxValues,
-            int *numValues)
+scan_darray(char *namelist, const char *name, double *values, int maxValues, int *numValues)
 {
   char *icp;
   double val;

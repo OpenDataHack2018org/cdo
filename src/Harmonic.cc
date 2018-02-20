@@ -43,8 +43,7 @@ Harmonic(void *process)
 
   cdoInitialize(process);
 
-  operatorInputArg(
-      "wave number and wave length of first harmonic in number of timesteps");
+  operatorInputArg("wave number and wave length of first harmonic in number of timesteps");
 
   operatorCheckArgc(2);
 
@@ -69,8 +68,7 @@ Harmonic(void *process)
 
   refname = cdoGetObase();
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix),
-                   pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   int *streamIDs = (int *) Malloc(n_out * sizeof(int));
 
@@ -112,8 +110,7 @@ Harmonic(void *process)
         {
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-          work[j][varID]
-              = (double *) Malloc(gridsize * nlevel * sizeof(double));
+          work[j][varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
           arrayFill(gridsize * nlevel, work[j][varID], 0.0);
         }
     }
@@ -179,10 +176,8 @@ Harmonic(void *process)
               offset = gridsize * levelID;
               for (size_t i = 0; i < gridsize; i++)
                 out[j][varID][i + offset]
-                    = sqrt(work[j][varID][i + offset]
-                               * work[j][varID][i + offset]
-                           + work[n_out + j][varID][i + offset]
-                                 * work[n_out + j][varID][i + offset])
+                    = sqrt(work[j][varID][i + offset] * work[j][varID][i + offset]
+                           + work[n_out + j][varID][i + offset] * work[n_out + j][varID][i + offset])
                       * 2 / nts;
             }
         }
@@ -198,8 +193,7 @@ Harmonic(void *process)
             {
               offset = gridsize * levelID;
               for (size_t i = 0; i < gridsize; i++)
-                out[n_out - 1][varID][i + offset]
-                    = work[2 * n_out - 1][varID][i + offset] / nts;
+                out[n_out - 1][varID][i + offset] = work[2 * n_out - 1][varID][i + offset] / nts;
             }
         }
     }
@@ -239,15 +233,12 @@ Harmonic(void *process)
               for (size_t i = 0; i < gridsize; i++)
                 {
                   out[j][varID][i + offset]
-                      = work[j][varID][i + offset]
-                                || work[n_out + j][varID][i + offset]
-                            ? atan2(work[j][varID][i + offset],
-                                    work[n_out + j][varID][i + offset])
-                                  * n / (j + 1) / 2 / M_PI
+                      = work[j][varID][i + offset] || work[n_out + j][varID][i + offset]
+                            ? atan2(work[j][varID][i + offset], work[n_out + j][varID][i + offset]) * n / (j + 1) / 2
+                                  / M_PI
                             : missval;
 
-                  if (out[j][varID][i + offset] < 0)
-                    out[j][varID][i + offset] += n / (j + 1.);
+                  if (out[j][varID][i + offset] < 0) out[j][varID][i + offset] += n / (j + 1.);
                 }
             }
         }

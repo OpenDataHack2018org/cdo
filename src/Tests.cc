@@ -50,8 +50,7 @@ Tests(void *process)
 
       degree_of_freedom = parameter2double(operatorArgv()[0]);
 
-      if (degree_of_freedom <= 0)
-        cdoAbort("degree of freedom must be positive!");
+      if (degree_of_freedom <= 0) cdoAbort("degree of freedom must be positive!");
     }
   else if (operatorID == BETA)
     {
@@ -109,45 +108,36 @@ Tests(void *process)
           if (operatorID == NORMAL)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval)
-                                ? missval
-                                : normal(array1[i], processInqPrompt());
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval : normal(array1[i], processInqPrompt());
             }
           else if (operatorID == STUDENTT)
             {
               for (size_t i = 0; i < gridsize; i++)
                 array2[i] = DBL_IS_EQUAL(array1[i], missval)
                                 ? missval
-                                : student_t(degree_of_freedom, array1[i],
-                                            processInqPrompt());
+                                : student_t(degree_of_freedom, array1[i], processInqPrompt());
             }
           else if (operatorID == CHISQUARE)
             {
               for (size_t i = 0; i < gridsize; i++)
                 array2[i] = DBL_IS_EQUAL(array1[i], missval)
                                 ? missval
-                                : chi_square(degree_of_freedom, array1[i],
-                                             processInqPrompt());
+                                : chi_square(degree_of_freedom, array1[i], processInqPrompt());
             }
           else if (operatorID == BETA)
             {
               for (size_t i = 0; i < gridsize; i++)
                 {
-                  if (array1[i] < 0 || array1[i] > 1)
-                    cdoAbort("Value out of range (0-1)!");
+                  if (array1[i] < 0 || array1[i] > 1) cdoAbort("Value out of range (0-1)!");
 
                   array2[i]
-                      = DBL_IS_EQUAL(array1[i], missval)
-                            ? missval
-                            : beta_distr(p, q, array1[i], processInqPrompt());
+                      = DBL_IS_EQUAL(array1[i], missval) ? missval : beta_distr(p, q, array1[i], processInqPrompt());
                 }
             }
           else if (operatorID == FISHER)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval)
-                                ? missval
-                                : fisher(n, d, array1[i], processInqPrompt());
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval : fisher(n, d, array1[i], processInqPrompt());
             }
           else
             {

@@ -48,20 +48,16 @@ set_parameter(void)
     {
       char **pargv = operatorArgv();
 
-      list_t *kvlist
-          = list_new(sizeof(keyValues_t *), free_keyval, "PARAMETER");
-      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0)
-        cdoAbort("Parse error!");
+      list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "PARAMETER");
+      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0) cdoAbort("Parse error!");
       if (cdoVerbose) kvlist_print(kvlist);
 
       for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
         {
           keyValues_t *kv = *(keyValues_t **) kvnode->data;
           const char *key = kv->key;
-          if (kv->nvalues > 1)
-            cdoAbort("Too many values for parameter key >%s<!", key);
-          if (kv->nvalues < 1)
-            cdoAbort("Missing value for parameter key >%s<!", key);
+          if (kv->nvalues > 1) cdoAbort("Too many values for parameter key >%s<!", key);
+          if (kv->nvalues < 1) cdoAbort("Missing value for parameter key >%s<!", key);
           const char *value = kv->values[0];
 
           if (STR_IS_EQ(key, "yearMode"))
@@ -148,16 +144,14 @@ Ydaystat(void *process)
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
-      if (cdoVerbose)
-        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
+      if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
       int dayoy = 0;
       if (month >= 1 && month <= 12) dayoy = (month - 1) * 31 + day;
 
-      if (dayoy < 0 || dayoy >= MAX_DOY)
-        cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
+      if (dayoy < 0 || dayoy >= MAX_DOY) cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
       vdates[dayoy] = vdate;
       vtimes[dayoy] = vtime;
@@ -166,8 +160,7 @@ Ydaystat(void *process)
         {
           vars1[dayoy] = field_malloc(vlistID1, FIELD_PTR);
           samp1[dayoy] = field_malloc(vlistID1, FIELD_NONE);
-          if (lvarstd || lrange)
-            vars2[dayoy] = field_malloc(vlistID1, FIELD_PTR);
+          if (lvarstd || lrange) vars2[dayoy] = field_malloc(vlistID1, FIELD_PTR);
         }
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -178,14 +171,12 @@ Ydaystat(void *process)
             {
               recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst
-                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           field_type *psamp1 = &samp1[dayoy][varID][levelID];
           field_type *pvars1 = &vars1[dayoy][varID][levelID];
-          field_type *pvars2
-              = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
+          field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
           int nsets = dayoy_nsets[dayoy];
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -203,12 +194,10 @@ Ydaystat(void *process)
 
               if (nmiss > 0 || psamp1->ptr)
                 {
-                  if (psamp1->ptr == NULL)
-                    psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
+                  if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
                   for (size_t i = 0; i < gridsize; i++)
-                    psamp1->ptr[i]
-                        = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                 }
             }
           else
@@ -222,15 +211,13 @@ Ydaystat(void *process)
                 {
                   if (psamp1->ptr == NULL)
                     {
-                      psamp1->ptr
-                          = (double *) Malloc(gridsize * sizeof(double));
+                      psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
                       for (size_t i = 0; i < gridsize; i++)
                         psamp1->ptr[i] = nsets;
                     }
 
                   for (size_t i = 0; i < gridsize; i++)
-                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
-                      psamp1->ptr[i]++;
+                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval)) psamp1->ptr[i]++;
                 }
 
               if (lvarstd)
@@ -281,8 +268,7 @@ Ydaystat(void *process)
         if (dayoy_nsets[dayoy])
           {
             cdiDecodeDate(vdates[dayoy], &year, &month, &day);
-            if (year > outyear)
-              vdates[dayoy] = cdiEncodeDate(outyear, month, day);
+            if (year > outyear) vdates[dayoy] = cdiEncodeDate(outyear, month, day);
             //  printf("vdates[%d] = %d  nsets = %d\n", dayoy, vdates[dayoy],
             //  nsets[dayoy]);
           }
@@ -300,8 +286,7 @@ Ydaystat(void *process)
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[dayoy][varID][levelID];
             field_type *pvars1 = &vars1[dayoy][varID][levelID];
-            field_type *pvars2
-                = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
+            field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
 
             if (lmean)
               {

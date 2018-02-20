@@ -146,8 +146,7 @@ set_attributes(list_t *kvlist, int vlistID)
               int varID = varIDs[idx];
               // if ( cdoVerbose ) printf("varID, cdiID, attname %d %d %s %d\n",
               // varID, cdiID, attname, (int)strlen(attname));
-              if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16
-                  || dtype == CDI_DATATYPE_INT32)
+              if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32)
                 {
                   int *ivals = (int *) Malloc(nvalues * sizeof(int));
                   for (int i = 0; i < nvalues; ++i)
@@ -155,8 +154,7 @@ set_attributes(list_t *kvlist, int vlistID)
                   cdiDefAttInt(cdiID, varID, attname, dtype, nvalues, ivals);
                   Free(ivals);
                 }
-              else if (dtype == CDI_DATATYPE_FLT32
-                       || dtype == CDI_DATATYPE_FLT64)
+              else if (dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64)
                 {
                   double *dvals = (double *) Malloc(nvalues * sizeof(double));
                   for (int i = 0; i < nvalues; ++i)
@@ -199,8 +197,7 @@ Setattribute(void *process)
 
   list_t *pmlist = NULL;
   list_t *kvlist = kvlist_new("SETATTRIBUTES");
-  if (kvlist_parse_cmdline(kvlist, natts, operatorArgv()) != 0)
-    cdoAbort("Parse error!");
+  if (kvlist_parse_cmdline(kvlist, natts, operatorArgv()) != 0) cdoAbort("Parse error!");
   if (cdoVerbose) kvlist_print(kvlist);
 
   if (natts == 1)
@@ -208,8 +205,7 @@ Setattribute(void *process)
       keyValues_t *kv = *(keyValues_t **) kvlist->head->data;
       if (STR_IS_EQ(kv->key, "FILE"))
         {
-          if (cdoVerbose)
-            cdoPrint("Reading attributes from: %s", kv->values[0]);
+          if (cdoVerbose) cdoPrint("Reading attributes from: %s", kv->values[0]);
           const char *filename = parameter2word(kv->values[0]);
           FILE *fp = fopen(filename, "r");
           if (fp == NULL) cdoAbort("Open failed on: %s\n", filename);

@@ -85,15 +85,13 @@ Comp(void *process)
   if (vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1)
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream2 >%s< by copying the first record.",
-               cdoGetStreamName(1).c_str());
+      cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoGetStreamName(1).c_str());
       if (ntsteps2 != 1) cdoAbort("stream2 has more than 1 timestep!");
     }
   else if (vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1)
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream1 >%s< by copying the first record.",
-               cdoGetStreamName(0).c_str());
+      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoGetStreamName(0).c_str());
       if (ntsteps1 != 1) cdoAbort("stream1 has more than 1 timestep!");
       fillstream1 = true;
       streamIDx1 = streamID2;
@@ -117,22 +115,19 @@ Comp(void *process)
   double *arrayx1 = array1;
   double *arrayx2 = array2;
 
-  if (cdoVerbose)
-    cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
+  if (cdoVerbose) cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
 
   if (filltype == FILL_NONE)
     {
       if (ntsteps1 != 1 && ntsteps2 == 1)
         {
           filltype = FILL_TS;
-          cdoPrint("Filling up stream2 >%s< by copying the first timestep.",
-                   cdoGetStreamName(1).c_str());
+          cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoGetStreamName(1).c_str());
         }
       else if (ntsteps1 == 1 && ntsteps2 != 1)
         {
           filltype = FILL_TS;
-          cdoPrint("Filling up stream1 >%s< by copying the first timestep.",
-                   cdoGetStreamName(0).c_str());
+          cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
           fillstream1 = true;
           streamIDx1 = streamID2;
           streamIDx2 = streamID1;
@@ -149,8 +144,7 @@ Comp(void *process)
             {
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
               nlev = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
-              vardata[varID]
-                  = (double *) Malloc(nlev * gridsize * sizeof(double));
+              vardata[varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
             }
         }
     }
@@ -177,8 +171,7 @@ Comp(void *process)
       if (tsID == 0 || filltype == FILL_NONE)
         {
           nrecs2 = cdoStreamInqTimestep(streamIDx2, tsID);
-          if (nrecs2 == 0)
-            cdoAbort("Input streams have different number of timesteps!");
+          if (nrecs2 == 0) cdoAbort("Input streams have different number of timesteps!");
         }
 
       taxisCopyTimestep(taxisID3, taxisIDx1);
@@ -202,8 +195,7 @@ Comp(void *process)
 
               if (filltype == FILL_TS)
                 {
-                  size_t gridsize
-                      = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+                  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
                   size_t offset = gridsize * levelID;
                   arrayCopy(gridsize, arrayx2, vardata[varID] + offset);
                 }
@@ -243,15 +235,13 @@ Comp(void *process)
 
           if (datatype1 != datatype2)
             {
-              if (datatype1 == CDI_DATATYPE_FLT32
-                  && datatype2 == CDI_DATATYPE_FLT64)
+              if (datatype1 == CDI_DATATYPE_FLT32 && datatype2 == CDI_DATATYPE_FLT64)
                 {
                   missval2 = (float) missval2;
                   for (size_t i = 0; i < gridsize; i++)
                     array2[i] = (float) array2[i];
                 }
-              else if (datatype1 == CDI_DATATYPE_FLT64
-                       && datatype2 == CDI_DATATYPE_FLT32)
+              else if (datatype1 == CDI_DATATYPE_FLT64 && datatype2 == CDI_DATATYPE_FLT32)
                 {
                   missval1 = (float) missval1;
                   for (size_t i = 0; i < gridsize; i++)
@@ -262,50 +252,44 @@ Comp(void *process)
           if (operatorID == EQ)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i] = (DBL_IS_EQUAL(array1[i], missval1)
-                                     || DBL_IS_EQUAL(array2[i], missval2)
+                array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2)
                                  ? missval1
                                  : IS_EQUAL(array1[i], array2[i]));
             }
           else if (operatorID == NE)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i] = (DBL_IS_EQUAL(array1[i], missval1)
-                                     || DBL_IS_EQUAL(array2[i], missval2)
+                array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2)
                                  ? missval1
                                  : IS_NOT_EQUAL(array1[i], array2[i]));
             }
           else if (operatorID == LE)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i] = (DBL_IS_EQUAL(array1[i], missval1)
-                                     || DBL_IS_EQUAL(array2[i], missval2)
-                                 ? missval1
-                                 : array1[i] <= array2[i]);
+                array3[i]
+                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                              : array1[i] <= array2[i]);
             }
           else if (operatorID == LT)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i] = (DBL_IS_EQUAL(array1[i], missval1)
-                                     || DBL_IS_EQUAL(array2[i], missval2)
-                                 ? missval1
-                                 : array1[i] < array2[i]);
+                array3[i]
+                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                              : array1[i] < array2[i]);
             }
           else if (operatorID == GE)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i] = (DBL_IS_EQUAL(array1[i], missval1)
-                                     || DBL_IS_EQUAL(array2[i], missval2)
-                                 ? missval1
-                                 : array1[i] >= array2[i]);
+                array3[i]
+                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                              : array1[i] >= array2[i]);
             }
           else if (operatorID == GT)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array3[i] = (DBL_IS_EQUAL(array1[i], missval1)
-                                     || DBL_IS_EQUAL(array2[i], missval2)
-                                 ? missval1
-                                 : array1[i] > array2[i]);
+                array3[i]
+                    = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                              : array1[i] > array2[i]);
             }
           else
             {

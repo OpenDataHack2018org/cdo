@@ -68,11 +68,9 @@ Fldrms(void *process)
   int gridID1 = vlistGrid(vlistID1, index);
   int gridID2 = vlistGrid(vlistID2, index);
 
-  if (gridInqSize(gridID1) != gridInqSize(gridID2))
-    cdoAbort("Fields have different grid size!");
+  if (gridInqSize(gridID1) != gridInqSize(gridID2)) cdoAbort("Fields have different grid size!");
 
-  if (needWeights && gridInqType(gridID1) != GRID_LONLAT
-      && gridInqType(gridID1) != GRID_GAUSSIAN)
+  if (needWeights && gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN)
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
   for (index = 0; index < ngrids; index++)

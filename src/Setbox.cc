@@ -28,15 +28,15 @@
 #include "pstream_int.h"
 #include "grid.h"
 
-void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2,
-                  long *lon11, long *lon12, long *lon21, long *lon22);
+void genlonlatbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21,
+                  long *lon22);
 
-void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2,
-                 long *lon11, long *lon12, long *lon21, long *lon22);
+void genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21,
+                 long *lon22);
 
 static void
-setcbox(double constant, double *array, int gridID, long lat1, long lat2,
-        long lon11, long lon12, long lon21, long lon22)
+setcbox(double constant, double *array, int gridID, long lat1, long lat2, long lon11, long lon12, long lon21,
+        long lon22)
 {
   long nlon, nlat;
   long ilat, ilon;
@@ -46,9 +46,7 @@ setcbox(double constant, double *array, int gridID, long lat1, long lat2,
 
   for (ilat = 0; ilat < nlat; ilat++)
     for (ilon = 0; ilon < nlon; ilon++)
-      if ((lat1 <= ilat && ilat <= lat2
-           && ((lon11 <= ilon && ilon <= lon12)
-               || (lon21 <= ilon && ilon <= lon22))))
+      if ((lat1 <= ilat && ilat <= lat2 && ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))))
         {
           array[nlon * ilat + ilon] = constant;
         }
@@ -104,8 +102,8 @@ Setbox(void *process)
       gridtype = gridInqType(gridID);
       if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN) break;
       if (gridtype == GRID_CURVILINEAR) break;
-      if (operatorID == SETCINDEXBOX && gridtype == GRID_GENERIC
-          && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0)
+      if (operatorID == SETCINDEXBOX && gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0
+          && gridInqYsize(gridID) > 0)
         break;
     }
 
@@ -157,8 +155,7 @@ Setbox(void *process)
             {
               pstreamReadRecord(streamID1, array, &nmiss);
 
-              setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21,
-                      lon22);
+              setcbox(constant, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
 
               double missval = vlistInqVarMissval(vlistID1, varID);
               nmiss = arrayNumMV(gridsize, array, missval);

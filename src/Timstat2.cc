@@ -28,15 +28,12 @@
 
 // correlation in time
 static void
-correlationInit(size_t gridsize, const double *array1, const double *array2,
-                double missval1, double missval2, size_t *nofvals,
-                double *work0, double *work1, double *work2, double *work3,
-                double *work4)
+correlationInit(size_t gridsize, const double *array1, const double *array2, double missval1, double missval2,
+                size_t *nofvals, double *work0, double *work1, double *work2, double *work3, double *work4)
 {
   for (size_t i = 0; i < gridsize; ++i)
     {
-      if ((!DBL_IS_EQUAL(array1[i], missval1))
-          && (!DBL_IS_EQUAL(array2[i], missval2)))
+      if ((!DBL_IS_EQUAL(array1[i], missval1)) && (!DBL_IS_EQUAL(array2[i], missval2)))
         {
           work0[i] += array1[i];
           work1[i] += array2[i];
@@ -49,9 +46,8 @@ correlationInit(size_t gridsize, const double *array1, const double *array2,
 }
 
 static size_t
-correlation(size_t gridsize, double missval1, double missval2, size_t *nofvals,
-            double *work0, double *work1, double *work2, double *work3,
-            double *work4)
+correlation(size_t gridsize, double missval1, double missval2, size_t *nofvals, double *work0, double *work1,
+            double *work2, double *work3, double *work4)
 {
   size_t nmiss = 0;
   double cor;
@@ -91,14 +87,12 @@ correlation(size_t gridsize, double missval1, double missval2, size_t *nofvals,
 
 // covariance in time
 static void
-covarianceInit(size_t gridsize, const double *array1, const double *array2,
-               double missval1, double missval2, size_t *nofvals, double *work0,
-               double *work1, double *work2)
+covarianceInit(size_t gridsize, const double *array1, const double *array2, double missval1, double missval2,
+               size_t *nofvals, double *work0, double *work1, double *work2)
 {
   for (size_t i = 0; i < gridsize; ++i)
     {
-      if ((!DBL_IS_EQUAL(array1[i], missval1))
-          && (!DBL_IS_EQUAL(array2[i], missval2)))
+      if ((!DBL_IS_EQUAL(array1[i], missval1)) && (!DBL_IS_EQUAL(array2[i], missval2)))
         {
           work0[i] += array1[i];
           work1[i] += array2[i];
@@ -109,8 +103,8 @@ covarianceInit(size_t gridsize, const double *array1, const double *array2,
 }
 
 static size_t
-covariance(size_t gridsize, double missval1, double missval2, size_t *nofvals,
-           double *work0, double *work1, double *work2)
+covariance(size_t gridsize, double missval1, double missval2, size_t *nofvals, double *work0, double *work1,
+           double *work2)
 {
   size_t nmiss = 0;
   double covar;
@@ -215,8 +209,7 @@ Timstat2(void *process)
       vtime = taxisInqVtime(taxisID1);
 
       int nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
-      if (nrecs != nrecs2)
-        cdoWarning("Input streams have different number of records!");
+      if (nrecs != nrecs2) cdoWarning("Input streams have different number of records!");
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -239,18 +232,14 @@ Timstat2(void *process)
 
           if (operfunc == func_cor)
             {
-              correlationInit(
-                  gridsize, &array1[0], &array2[0], missval1, missval2,
-                  &nofvals[varID][levelID][0], &work[varID][levelID][0][0],
-                  &work[varID][levelID][1][0], &work[varID][levelID][2][0],
-                  &work[varID][levelID][3][0], &work[varID][levelID][4][0]);
+              correlationInit(gridsize, &array1[0], &array2[0], missval1, missval2, &nofvals[varID][levelID][0],
+                              &work[varID][levelID][0][0], &work[varID][levelID][1][0], &work[varID][levelID][2][0],
+                              &work[varID][levelID][3][0], &work[varID][levelID][4][0]);
             }
           else if (operfunc == func_covar)
             {
-              covarianceInit(
-                  gridsize, &array1[0], &array2[0], missval1, missval2,
-                  &nofvals[varID][levelID][0], &work[varID][levelID][0][0],
-                  &work[varID][levelID][1][0], &work[varID][levelID][2][0]);
+              covarianceInit(gridsize, &array1[0], &array2[0], missval1, missval2, &nofvals[varID][levelID][0],
+                             &work[varID][levelID][0][0], &work[varID][levelID][1][0], &work[varID][levelID][2][0]);
             }
         }
 
@@ -274,18 +263,14 @@ Timstat2(void *process)
 
       if (operfunc == func_cor)
         {
-          nmiss = correlation(
-              gridsize, missval1, missval2, &nofvals[varID][levelID][0],
-              &work[varID][levelID][0][0], &work[varID][levelID][1][0],
-              &work[varID][levelID][2][0], &work[varID][levelID][3][0],
-              &work[varID][levelID][4][0]);
+          nmiss = correlation(gridsize, missval1, missval2, &nofvals[varID][levelID][0], &work[varID][levelID][0][0],
+                              &work[varID][levelID][1][0], &work[varID][levelID][2][0], &work[varID][levelID][3][0],
+                              &work[varID][levelID][4][0]);
         }
       else if (operfunc == func_covar)
         {
-          nmiss = covariance(
-              gridsize, missval1, missval2, &nofvals[varID][levelID][0],
-              &work[varID][levelID][0][0], &work[varID][levelID][1][0],
-              &work[varID][levelID][2][0]);
+          nmiss = covariance(gridsize, missval1, missval2, &nofvals[varID][levelID][0], &work[varID][levelID][0][0],
+                             &work[varID][levelID][1][0], &work[varID][levelID][2][0]);
         }
 
       pstreamDefRecord(streamID3, varID, levelID);

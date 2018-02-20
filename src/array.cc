@@ -63,8 +63,7 @@ arrayMinMax(size_t len, const double *array, double *rmin, double *rmax)
 }
 
 size_t
-arrayMinMaxMV(size_t len, const double *array, double missval, double *rmin,
-              double *rmax)
+arrayMinMaxMV(size_t len, const double *array, double missval, double *rmin, double *rmax)
 {
   double min = DBL_MAX;
   double max = -DBL_MAX;
@@ -87,8 +86,7 @@ arrayMinMaxMV(size_t len, const double *array, double missval, double *rmin,
 }
 
 void
-arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax,
-               double *rsum)
+arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax, double *rsum)
 {
   double min = DBL_MAX;
   double max = -DBL_MAX;
@@ -110,8 +108,7 @@ arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax,
 }
 
 size_t
-arrayMinMaxSumMV(size_t len, const double *array, double missval, double *rmin,
-                 double *rmax, double *rsum)
+arrayMinMaxSumMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rsum)
 {
   double min = DBL_MAX;
   double max = -DBL_MAX;
@@ -140,8 +137,7 @@ arrayMinMaxSumMV(size_t len, const double *array, double missval, double *rmin,
 }
 
 void
-arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax,
-                double *rmean)
+arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax, double *rmean)
 {
   double sum;
   arrayMinMaxSum(len, array, rmin, rmax, &sum);
@@ -150,8 +146,7 @@ arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax,
 }
 
 size_t
-arrayMinMaxMeanMV(size_t len, const double *array, double missval, double *rmin,
-                  double *rmax, double *rmean)
+arrayMinMaxMeanMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rmean)
 {
   double sum;
   size_t nvals = arrayMinMaxSumMV(len, array, missval, rmin, rmax, &sum);
@@ -162,8 +157,7 @@ arrayMinMaxMeanMV(size_t len, const double *array, double missval, double *rmin,
 }
 
 void
-arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin,
-                double *rmax)
+arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin, double *rmax)
 {
   double xmin = DBL_MAX;
   double xmax = -DBL_MAX;
@@ -197,8 +191,7 @@ arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin,
 }
 
 void
-arrayAddArray(size_t len, double *restrict array1,
-              const double *restrict array2)
+arrayAddArray(size_t len, double *restrict array1, const double *restrict array2)
 {
   //#ifdef  _OPENMP
   //#pragma omp parallel for default(none) shared(array1,array2)
@@ -208,8 +201,7 @@ arrayAddArray(size_t len, double *restrict array1,
 }
 
 void
-arrayAddArrayMV(size_t len, double *restrict array1,
-                const double *restrict array2, double missval)
+arrayAddArrayMV(size_t len, double *restrict array1, const double *restrict array2, double missval)
 {
   if (DBL_IS_NAN(missval))
     {
@@ -431,8 +423,7 @@ arrayMeanMV(size_t len, const double *restrict array, double missval)
 }
 
 double
-arrayWeightedMean(size_t len, const double *restrict array,
-                  const double *restrict w, double missval)
+arrayWeightedMean(size_t len, const double *restrict array, const double *restrict w, double missval)
 {
   assert(array != NULL);
   assert(w != NULL);
@@ -449,8 +440,7 @@ arrayWeightedMean(size_t len, const double *restrict array,
 }
 
 double
-arrayWeightedMeanMV(size_t len, const double *restrict array,
-                    const double *restrict w, double missval)
+arrayWeightedMeanMV(size_t len, const double *restrict array, const double *restrict w, double missval)
 {
   assert(array != NULL);
   assert(w != NULL);
@@ -486,8 +476,7 @@ arrayAvgMV(size_t len, const double *restrict array, double missval)
 }
 
 double
-arrayWeightedAvgMV(size_t len, const double *restrict array,
-                   const double *restrict w, double missval)
+arrayWeightedAvgMV(size_t len, const double *restrict array, const double *restrict w, double missval)
 {
   assert(array != NULL);
   assert(w != NULL);

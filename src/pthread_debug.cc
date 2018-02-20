@@ -33,8 +33,7 @@
 #define POUT3(caller, x, a, b, c) pout3(caller, #x, x, #a, a, #b, b, #c, c)
 
 static void
-pout2(const char *caller, const char *sval, int ival, const char *sval1,
-      int oval1, const char *sval2, int oval2)
+pout2(const char *caller, const char *sval, int ival, const char *sval1, int oval1, const char *sval2, int oval2)
 {
   if (ival == oval1)
     fprintf(stderr, "%-18s :  %-14s = %s\n", caller, sval, sval1);
@@ -45,8 +44,8 @@ pout2(const char *caller, const char *sval, int ival, const char *sval1,
 }
 
 static void
-pout3(const char *caller, const char *sval, int ival, const char *sval1,
-      int oval1, const char *sval2, int oval2, const char *sval3, int oval3)
+pout3(const char *caller, const char *sval, int ival, const char *sval1, int oval1, const char *sval2, int oval2,
+      const char *sval3, int oval3)
 {
   if (ival == oval1)
     fprintf(stderr, "%-18s :  %-14s = %s\n", caller, sval, sval1);
@@ -85,8 +84,7 @@ print_pthread_attr(const char *caller, pthread_attr_t *attr)
   POUT2(caller, scope, PTHREAD_SCOPE_SYSTEM, PTHREAD_SCOPE_PROCESS);
 
   pthread_attr_getstacksize(attr, &stacksize);
-  fprintf(stderr, "%-18s :  %-14s = %ld\n", caller, "stacksize",
-          (long) stacksize);
+  fprintf(stderr, "%-18s :  %-14s = %ld\n", caller, "stacksize", (long) stacksize);
 }
 
 void
@@ -108,8 +106,7 @@ PTHREAD_PRIO_NONE);
   {
     int kind;
     pthread_mutexattr_getkind_np(m_attr, &kind);
-    POUT3(caller, kind, PTHREAD_MUTEX_FAST_NP, PTHREAD_MUTEX_RECURSIVE_NP,
-          PTHREAD_MUTEX_ERRORCHECK_NP);
+    POUT3(caller, kind, PTHREAD_MUTEX_FAST_NP, PTHREAD_MUTEX_RECURSIVE_NP, PTHREAD_MUTEX_ERRORCHECK_NP);
   }
 #endif
 
@@ -138,8 +135,7 @@ print_pthread_condattr(const char *caller, pthread_condattr_t *c_attr)
 }
 
 int
-Pthread_create(const char *caller, pthread_t *th, pthread_attr_t *attr,
-               void *(*start_routine)(void *), void *arg)
+Pthread_create(const char *caller, pthread_t *th, pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
 {
   int status;
 
@@ -190,12 +186,8 @@ Pthread_mutex_lock(const char *caller, pthread_mutex_t *mutex)
     {
       switch (status)
         {
-        case EINVAL:
-          Error("The mutex has not been properly initialized!");
-          break;
-        case EDEADLK:
-          Error("The mutex is already locked by the calling thread!");
-          break;
+        case EINVAL: Error("The mutex has not been properly initialized!"); break;
+        case EDEADLK: Error("The mutex is already locked by the calling thread!"); break;
         default: Error("Status %d unknown!", status, (void *) mutex); break;
         }
     }
@@ -209,8 +201,7 @@ Pthread_mutex_lock(const char *caller, std::mutex &p_mutex)
     }
   catch (const std::system_error &e)
     {
-      std::cout << "locking failed in " << caller << ". ErrorCode:" << e.code()
-                << " " << e.what() << std::endl;
+      std::cout << "locking failed in " << caller << ". ErrorCode:" << e.code() << " " << e.what() << std::endl;
     }
 }
 
@@ -226,9 +217,7 @@ Pthread_mutex_unlock(const char *caller, pthread_mutex_t *mutex)
     {
       switch (status)
         {
-        case EINVAL:
-          Error("The mutex has not been properly initialized!");
-          break;
+        case EINVAL: Error("The mutex has not been properly initialized!"); break;
         case EPERM: Error("The calling thread does not own the mutex!"); break;
         default: Error("Status %d unknown!", status); break;
         }
@@ -243,19 +232,16 @@ Pthread_mutex_unlock(const char *caller, std::mutex &p_mutex)
     }
   catch (const std::system_error &e)
     {
-      std::cout << "unlocking failed in " << caller
-                << ". ErrorCode:" << e.code() << " " << e.what() << std::endl;
+      std::cout << "unlocking failed in " << caller << ". ErrorCode:" << e.code() << " " << e.what() << std::endl;
     }
 }
 
 void
 Pthread_cond_signal(const char *caller, std::condition_variable &p_cond_var)
 {
-  if (CdoDebug::PTHREAD)
-    Message("+%s (cond = %p)", caller, (void *) &p_cond_var);
+  if (CdoDebug::PTHREAD) Message("+%s (cond = %p)", caller, (void *) &p_cond_var);
   p_cond_var.notify_all();
-  if (CdoDebug::PTHREAD)
-    Message("-%s (cond = %p)", caller, (void *) &p_cond_var);
+  if (CdoDebug::PTHREAD) Message("-%s (cond = %p)", caller, (void *) &p_cond_var);
 }
 void
 Pthread_cond_signal(const char *caller, pthread_cond_t *cond)
@@ -268,30 +254,22 @@ Pthread_cond_signal(const char *caller, pthread_cond_t *cond)
 }
 
 void
-Pthread_cond_wait(const char *caller, std::condition_variable &p_cond,
-                  std::unique_lock<std::mutex> &p_locked_mutex)
+Pthread_cond_wait(const char *caller, std::condition_variable &p_cond, std::unique_lock<std::mutex> &p_locked_mutex)
 {
-  if (CdoDebug::PTHREAD)
-    std::cout << caller << "waiting for condition " << &p_cond << std::endl;
+  if (CdoDebug::PTHREAD) std::cout << caller << "waiting for condition " << &p_cond << std::endl;
   p_cond.wait(p_locked_mutex);
 
-  if (CdoDebug::PTHREAD)
-    std::cout << caller << "finished waiting " << &p_cond << std::endl;
+  if (CdoDebug::PTHREAD) std::cout << caller << "finished waiting " << &p_cond << std::endl;
 }
 
 void
-Pthread_cond_wait(const char *caller, pthread_cond_t *cond,
-                  pthread_mutex_t *mutex)
+Pthread_cond_wait(const char *caller, pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
-  if (CdoDebug::PTHREAD)
-    Message("+%s (cond = %p, mutex =  %p)", caller, (void *) cond,
-            (void *) mutex);
+  if (CdoDebug::PTHREAD) Message("+%s (cond = %p, mutex =  %p)", caller, (void *) cond, (void *) mutex);
 
   pthread_cond_wait(cond, mutex);
 
-  if (CdoDebug::PTHREAD)
-    Message("-%s (cond = %p, mutex = %p)", caller, (void *) cond,
-            (void *) mutex);
+  if (CdoDebug::PTHREAD) Message("-%s (cond = %p, mutex = %p)", caller, (void *) cond, (void *) mutex);
 }
 
 #endif

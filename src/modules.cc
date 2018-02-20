@@ -58,11 +58,9 @@ similar(const char *a, const char *b, unsigned long alen, unsigned long blen)
   /*
     printf("%d %d %s %s\n", alen, blen, a, b);
   */
-  if (alen >= 2 && blen >= 1 && *a && similar(a + 1, b, alen - 2, blen - 1))
-    return true;
+  if (alen >= 2 && blen >= 1 && *a && similar(a + 1, b, alen - 2, blen - 1)) return true;
 
-  if (alen >= 1 && blen >= 2 && *b && similar(a, b + 1, alen - 1, blen - 2))
-    return true;
+  if (alen >= 1 && blen >= 2 && *b && similar(a, b + 1, alen - 1, blen - 2)) return true;
 
   return false;
 }
@@ -78,8 +76,7 @@ similar(const char *a, const char *b, unsigned long alen, unsigned long blen)
 static bool
 similar(std::string original, std::string other)
 {
-  return (
-      similar(original.c_str(), other.c_str(), original.size(), other.size()));
+  return (similar(original.c_str(), other.c_str(), original.size(), other.size()));
 }
 
 /**
@@ -139,8 +136,7 @@ find_similar(std::string operatorName)
         {
           if (similar(string2lower(operatorName), str.first))
             {
-              if (found_similar_operators.size() + str.first.size()
-                  > lines * line_length)
+              if (found_similar_operators.size() + str.first.size() > lines * line_length)
                 {
                   found_similar_operators += "\n";
                   lines++;
@@ -154,8 +150,7 @@ find_similar(std::string operatorName)
         {
           if (similar(string2lower(operatorName), str.first))
             {
-              if (found_similar_operators.size() + str.first.size()
-                  > lines * line_length)
+              if (found_similar_operators.size() + str.first.size() > lines * line_length)
                 {
                   found_similar_operators += "\n";
                   lines++;
@@ -200,8 +195,7 @@ check_operator(std::string operatorName)
         {
           fclose(fp);
           fprintf(stderr, "Use commandline option -h for help.");
-          Error("Operator missing, %s is a file on disk!",
-                operatorName.c_str());
+          Error("Operator missing, %s is a file on disk!", operatorName.c_str());
         }
       // Operator is no filename
       // Checking for similar operators
@@ -244,8 +238,7 @@ add_module(std::string module_name, module_t new_module)
             }
           else
             {
-              Error(
-                  "Tried to add operator but the operator name already exists");
+              Error("Tried to add operator but the operator name already exists");
             }
         }
     }
@@ -275,8 +268,7 @@ add_alias(std::string alias, std::string original)
 
   if (iter_original == modules_map.end())
     {
-      Error("alias %s could not be added: operator %s does not exist",
-            alias.c_str(), original.c_str());
+      Error("alias %s could not be added: operator %s does not exist", alias.c_str(), original.c_str());
       return -2;
     }
   if (modules_map.find(alias) != modules_map.end())
@@ -400,8 +392,7 @@ get_sorted_operator_name_list()
 {
 
   std::vector<std::string> names;
-  for (std::pair<std::string, std::string> operator_module_names_pair :
-       modules_map)
+  for (std::pair<std::string, std::string> operator_module_names_pair : modules_map)
     {
       if (modules[operator_module_names_pair.second].mode == 1)
         {
@@ -421,8 +412,7 @@ std::vector<std::string>
 get_no_output_operator_list()
 {
   std::vector<std::string> names;
-  for (std::pair<std::string, std::string> operator_module_names_pair :
-       modules_map)
+  for (std::pair<std::string, std::string> operator_module_names_pair : modules_map)
     {
       if (modules[operator_module_names_pair.second].mode == 1
           && modules[operator_module_names_pair.second].streamOutCnt == 0)
@@ -435,8 +425,7 @@ get_no_output_operator_list()
   for (std::pair<std::string, std::string> alias : aliases)
     {
       original = alias.second;
-      if (modules[modules_map[original]].mode == 1
-          && modules[modules_map[original]].streamOutCnt == 0)
+      if (modules[modules_map[original]].mode == 1 && modules[modules_map[original]].streamOutCnt == 0)
         {
           names.push_back(alias.first);
         }
@@ -452,8 +441,7 @@ operatorPrintAll(void)
   std::string tab = "   ";
   int tab_width = tab.size();
   // using a set because it sorts the operators alphabetically on its own
-  std::vector<std::string> sorted_operator_names
-      = get_sorted_operator_name_list();
+  std::vector<std::string> sorted_operator_names = get_sorted_operator_name_list();
 
   std::cout << tab;
   for (auto operatorName : sorted_operator_names)
@@ -498,8 +486,7 @@ load_custom_modules(std::string folder_path)
     }
   else
     {
-      std::cerr << "Could not find " << folder_path
-                << "for loading custom modules" << std::endl;
+      std::cerr << "Could not find " << folder_path << "for loading custom modules" << std::endl;
     }
 }
 
@@ -527,8 +514,7 @@ load_custom_module(std::string file_path)
 
   if (dlsym_error)
     {
-      std::cerr << "Cannot load symbol 'init_custom_module': " << dlsym_error
-                << std::endl;
+      std::cerr << "Cannot load symbol 'init_custom_module': " << dlsym_error << std::endl;
       dlclose(lib_handle);
       return;
     }
@@ -562,8 +548,7 @@ get_spacing_for(int p_space, std::string str)
   return spacing;
 }
 std::string
-get_operator_description(std::string p_current_op_name,
-                         std::vector<std::string> help)
+get_operator_description(std::string p_current_op_name, std::vector<std::string> help)
 {
   std::string description = "";
   unsigned long cur_help_idx;
@@ -601,8 +586,7 @@ get_operator_description(std::string p_current_op_name,
       // if the name was found save description for later use
       if (help_contains_name)
         {
-          description = name_section.substr(name_section.find_first_of('-') + 2,
-                                            name_section.size());
+          description = name_section.substr(name_section.find_first_of('-') + 2, name_section.size());
         }
     }
   else
@@ -610,21 +594,18 @@ get_operator_description(std::string p_current_op_name,
 
       line = help.at(++operator_section);
       // search the operator section for current operator line
-      while (line.find(p_current_op_name + " ") == std::string::npos
-             && !line.empty() && operator_section < help.size() - 1)
+      while (line.find(p_current_op_name + " ") == std::string::npos && !line.empty()
+             && operator_section < help.size() - 1)
         {
           line = help.at(++operator_section);
         }
       // if operator line found save description for later use
-      if (!line.empty()
-          && line.find(p_current_op_name + " ") != std::string::npos)
+      if (!line.empty() && line.find(p_current_op_name + " ") != std::string::npos)
         {
           auto op_name_start = line.find_first_not_of(" \t");
 
-          description = line.substr(
-              line.find_first_not_of(" \t",
-                                     op_name_start + p_current_op_name.size()),
-              line.size());
+          description
+              = line.substr(line.find_first_not_of(" \t", op_name_start + p_current_op_name.size()), line.size());
         }
     }
   return description;
@@ -654,8 +635,7 @@ operatorPrintList(bool print_no_output)
 
   // help variables
 
-  for (unsigned long out_list_idx = 0; out_list_idx < list_length;
-       out_list_idx++)
+  for (unsigned long out_list_idx = 0; out_list_idx < list_length; out_list_idx++)
     {
       std::string current_op_name = output_list[out_list_idx];
       current_module = &modules[get_module_name_to(current_op_name)];
@@ -663,22 +643,17 @@ operatorPrintList(bool print_no_output)
         {
 
           output_list[out_list_idx]
-              += std::string(get_spacing_for(16, current_op_name) + "--> "
-                             + aliases[current_op_name]);
+              += std::string(get_spacing_for(16, current_op_name) + "--> " + aliases[current_op_name]);
         }
       else if (!current_module->help.empty())
         {
           // add spaceing and saving output line to the output list
-          std::string description
-              = get_operator_description(current_op_name, current_module->help);
-          output_list[out_list_idx]
-              += get_spacing_for(16, current_op_name) + description;
+          std::string description = get_operator_description(current_op_name, current_module->help);
+          output_list[out_list_idx] += get_spacing_for(16, current_op_name) + description;
         }
-      std::string in_out_info
-          = "(" + std::to_string(current_module->streamInCnt) + "|"
-            + std::to_string(current_module->streamOutCnt) + ")";
-      output_list[out_list_idx]
-          += get_spacing_for(90, output_list[out_list_idx]) + in_out_info;
+      std::string in_out_info = "(" + std::to_string(current_module->streamInCnt) + "|"
+                                + std::to_string(current_module->streamOutCnt) + ")";
+      output_list[out_list_idx] += get_spacing_for(90, output_list[out_list_idx]) + in_out_info;
     }
   // print generated output list
   for (std::string str : output_list)

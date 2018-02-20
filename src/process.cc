@@ -49,8 +49,7 @@
 
 static int pthreadScope = 0;
 
-ProcessType::ProcessType(int p_ID, const char *p_operatorName,
-                         const char *operatorCommand)
+ProcessType::ProcessType(int p_ID, const char *p_operatorName, const char *operatorCommand)
     : m_ID(p_ID), operatorName(p_operatorName)
 {
   initProcess();
@@ -166,8 +165,7 @@ ProcessType::checkStreamCnt(void)
       obase = TRUE;
     }
 
-  if (wantedStreamInCnt == -1 && wantedStreamOutCnt == -1)
-    cdoAbort("I/O stream counts unlimited no allowed!");
+  if (wantedStreamInCnt == -1 && wantedStreamOutCnt == -1) cdoAbort("I/O stream counts unlimited no allowed!");
 
   // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n",
   // wantedStreamInCnt,wantedStreamOutCnt);
@@ -282,8 +280,7 @@ ProcessType::inqUserInputForOpArg(const char *enter)
                       break;
                     }
                   len = 0;
-                  while (pline[len] != ' ' && pline[len] != ','
-                         && pline[len] != '\\' && len < linelen)
+                  while (pline[len] != ' ' && pline[len] != ',' && pline[len] != '\\' && len < linelen)
                     len++;
 
                   m_oargv.push_back((char *) Malloc(len + 1));
@@ -307,8 +304,7 @@ ProcessType::operatorAdd(const char *name, int f1, int f2, const char *enter)
 {
   int operID = m_noper;
 
-  if (operID >= MAX_OPERATOR)
-    cdoAbort("Maximum number of %d operators reached!", MAX_OPERATOR);
+  if (operID >= MAX_OPERATOR) cdoAbort("Maximum number of %d operators reached!", MAX_OPERATOR);
 
   oper[m_noper].f1 = f1;
   oper[m_noper].f2 = f2;
@@ -362,8 +358,7 @@ ProcessType::addFileOutStream(std::string file)
 {
   if (file[0] == '-')
     {
-      ERROR("Missing output file. Found an operator instead of filename: ",
-            file);
+      ERROR("Missing output file. Found an operator instead of filename: ", file);
     }
   outputStreams.push_back(create_pstream(file));
   m_streamCnt++;
@@ -409,8 +404,7 @@ ProcessType::run()
   int status = pthread_attr_init(&attr);
   if (status) SysError("pthread_attr_init failed for '%s'", operatorName);
   status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  if (status)
-    SysError("pthread_attr_setdetachstate failed for '%s'", operatorName);
+  if (status) SysError("pthread_attr_setdetachstate failed for '%s'", operatorName);
   /*
     param.sched_priority = 0;
     status = pthread_attr_setschedparam(&attr, &param);
@@ -464,9 +458,7 @@ ProcessType::query_user_exit(const char *argument)
   usr_rpl[0] = 'z';
   usr_rpl[1] = '\0';
 
-  while (!(usr_rpl_lng == 1
-           && (*usr_rpl == 'o' || *usr_rpl == 'O' || *usr_rpl == 'e'
-               || *usr_rpl == 'E')))
+  while (!(usr_rpl_lng == 1 && (*usr_rpl == 'o' || *usr_rpl == 'O' || *usr_rpl == 'e' || *usr_rpl == 'E')))
     {
       if (nbr_itr++ > USR_RPL_MAX_NBR)
         {
@@ -477,8 +469,7 @@ ProcessType::query_user_exit(const char *argument)
           exit(EXIT_FAILURE);
         }
 
-      if (nbr_itr > 1)
-        (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
+      if (nbr_itr > 1) (void) fprintf(stdout, "%s: ERROR Invalid response.\n", prompt);
       (void) fprintf(stdout,
                      "%s: %s exists ---`e'xit, or `o'verwrite (delete existing "
                      "file) (e/o)? ",
@@ -545,12 +536,10 @@ ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
 {
 #if defined(HAVE_SYS_TIMES_H)
   if (cdoBenchmark)
-    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime,
-            p_times.c_systime, p_times.c_cputime, p_memstring);
+    fprintf(stderr, " [%.2fs %.2fs %.2fs%s]\n", p_times.c_usertime, p_times.c_systime, p_times.c_cputime, p_memstring);
   else
     {
-      if (!Options::silentMode)
-        fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
+      if (!Options::silentMode) fprintf(stderr, " [%.2fs%s]\n", p_times.c_cputime, p_memstring);
     }
   if (cdoBenchmark && m_ID == 0)
     {
@@ -558,9 +547,8 @@ ProcessType::printBenchmarks(cdoTimes p_times, char *p_memstring)
       p_times.p_systime = a_stime;
 
       p_times.p_cputime = p_times.p_usertime + p_times.p_systime;
-      fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n",
-              p_times.p_usertime, p_times.p_systime, p_times.p_cputime,
-              p_memstring);
+      fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n", p_times.p_usertime, p_times.p_systime,
+              p_times.p_cputime, p_memstring);
     }
 #else
   fprintf(stderr, "\n");
@@ -586,16 +574,15 @@ ProcessType::printProcessedValues()
 #endif
                 (intmax_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
       else
-        fprintf(stderr, "Processed %zu value%s from %d variable%s",
-                (size_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
+        fprintf(stderr, "Processed %zu value%s from %d variable%s", (size_t) nvals, ADD_PLURAL(nvals), nvars,
+                ADD_PLURAL(nvars));
     }
   else if (nvars > 0)
     {
       fprintf(stderr, "Processed %d variable%s", nvars, ADD_PLURAL(nvars));
     }
 
-  if (ntimesteps > 0)
-    fprintf(stderr, " over %d timestep%s", ntimesteps, ADD_PLURAL(ntimesteps));
+  if (ntimesteps > 0) fprintf(stderr, " over %d timestep%s", ntimesteps, ADD_PLURAL(ntimesteps));
 
   //  fprintf(stderr, ".");
 }

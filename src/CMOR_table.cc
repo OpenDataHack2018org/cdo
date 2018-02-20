@@ -105,19 +105,13 @@ conv_cmor_table(list_t *pmlist)
 
               if (vlen)
                 {
-                  if (strncmp("name", ename, len) == 0
-                      || strncmp("standard_name", ename, len) == 0
-                      || strncmp("out_name", ename, len) == 0
-                      || strncmp("type", ename, len) == 0
-                      || strncmp("valid_min", ename, len) == 0
-                      || strncmp("valid_max", ename, len) == 0
-                      || strncmp("ok_min_mean_abs", ename, len) == 0
-                      || strncmp("ok_max_mean_abs", ename, len) == 0)
+                  if (strncmp("name", ename, len) == 0 || strncmp("standard_name", ename, len) == 0
+                      || strncmp("out_name", ename, len) == 0 || strncmp("type", ename, len) == 0
+                      || strncmp("valid_min", ename, len) == 0 || strncmp("valid_max", ename, len) == 0
+                      || strncmp("ok_min_mean_abs", ename, len) == 0 || strncmp("ok_max_mean_abs", ename, len) == 0)
                     printf("  %-15s = %s\n", ename, ovalue);
-                  else if (strncmp("long_name", ename, len) == 0
-                           || strncmp("units", ename, len) == 0
-                           || strncmp("cell_methods", ename, len) == 0
-                           || strncmp("cell_measures", ename, len) == 0
+                  else if (strncmp("long_name", ename, len) == 0 || strncmp("units", ename, len) == 0
+                           || strncmp("cell_methods", ename, len) == 0 || strncmp("cell_measures", ename, len) == 0
                            || strncmp("comment", ename, len) == 0)
                     printf("  %-15s = \"%.*s\"\n", ename, vlen, ovalue);
                 }

@@ -25,8 +25,7 @@
 #include "config.h"
 #endif
 
-#if defined(HAVE_LIBUDUNITS2) \
-    && (defined(HAVE_UDUNITS2_H) || defined(HAVE_UDUNITS2_UDUNITS2_H))
+#if defined(HAVE_LIBUDUNITS2) && (defined(HAVE_UDUNITS2_H) || defined(HAVE_UDUNITS2_UDUNITS2_H))
 #define HAVE_UDUNITS2
 #endif
 
@@ -100,8 +99,7 @@ cdo_define_var_units(var_t *var, int vlistID2, int varID, const char *units)
         }
 
       vlistDefVarUnits(vlistID2, varID, units);
-      cdiDefAttTxt(vlistID2, varID, "original_units", (int) strlen(units_old),
-                   units_old);
+      cdiDefAttTxt(vlistID2, varID, "original_units", (int) strlen(units_old), units_old);
     }
 }
 
@@ -248,13 +246,10 @@ apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
               lmissval = true;
               missval = parameter2double(kv->values[0]);
             }
-          else if (STR_IS_EQ(key, "table_id")
-                   || STR_IS_EQ(key, "modeling_realm")
-                   || STR_IS_EQ(key, "realm") || STR_IS_EQ(key, "project_id")
-                   || STR_IS_EQ(key, "frequency"))
+          else if (STR_IS_EQ(key, "table_id") || STR_IS_EQ(key, "modeling_realm") || STR_IS_EQ(key, "realm")
+                   || STR_IS_EQ(key, "project_id") || STR_IS_EQ(key, "frequency"))
             {
-              cdiDefAttTxt(vlistID2, CDI_GLOBAL, key, (int) strlen(value),
-                           value);
+              cdiDefAttTxt(vlistID2, CDI_GLOBAL, key, (int) strlen(value), value);
             }
         }
     }
@@ -276,8 +271,7 @@ apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
             }
         }
 
-      list_t *kvlist = pmlist_search_kvlist_ventry(pmlist, "name", varname,
-                                                   nventry, ventry);
+      list_t *kvlist = pmlist_search_kvlist_ventry(pmlist, "name", varname, nventry, ventry);
       if (kvlist)
         {
           bool lvalid_min = false, lvalid_max = false;
@@ -307,16 +301,13 @@ apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
                   if (!STR_IS_EQ(var->name, outname))
                     {
                       vlistDefVarName(vlistID2, varID, outname);
-                      cdiDefAttTxt(vlistID2, varID, "original_name",
-                                   (int) strlen(var->name), var->name);
+                      cdiDefAttTxt(vlistID2, varID, "original_name", (int) strlen(var->name), var->name);
                     }
                 }
               else if (STR_IS_EQ(key, "param"))
-                vlistDefVarParam(vlistID2, varID,
-                                 stringToParam(parameter2word(value)));
+                vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
               else if (STR_IS_EQ(key, "out_param"))
-                vlistDefVarParam(vlistID2, varID,
-                                 stringToParam(parameter2word(value)));
+                vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
               else if (STR_IS_EQ(key, "comment"))
                 cdiDefAttTxt(vlistID2, varID, key, (int) strlen(value), value);
               else if (STR_IS_EQ(key, "cell_methods"))
@@ -331,19 +322,15 @@ apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
                 {
                   var->lfactor = true;
                   var->factor = parameter2double(value);
-                  if (cdoVerbose)
-                    cdoPrint("%s - scale factor %g", varname, var->factor);
+                  if (cdoVerbose) cdoPrint("%s - scale factor %g", varname, var->factor);
                 }
-              else if (STR_IS_EQ(key, "missval")
-                       || STR_IS_EQ(key, "missing_value"))
+              else if (STR_IS_EQ(key, "missval") || STR_IS_EQ(key, "missing_value"))
                 {
                   double missval = parameter2double(value);
                   double missval_old = vlistInqVarMissval(vlistID2, varID);
                   if (!DBL_IS_EQUAL(missval, missval_old))
                     {
-                      if (cdoVerbose)
-                        cdoPrint("%s - change missval from %g to %g", varname,
-                                 missval_old, missval);
+                      if (cdoVerbose) cdoPrint("%s - change missval from %g to %g", varname, missval_old, missval);
                       var->changemissval = true;
                       var->missval_old = missval_old;
                       vlistDefVarMissval(vlistID2, varID, missval);
@@ -372,13 +359,11 @@ apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
               else if (STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type"))
                 {
                   int datatype = str2datatype(parameter2word(value));
-                  if (datatype != -1)
-                    vlistDefVarDatatype(vlistID2, varID, datatype);
+                  if (datatype != -1) vlistDefVarDatatype(vlistID2, varID, datatype);
                 }
               else
                 {
-                  if (cdoVerbose)
-                    cdoPrint("Attribute %s:%s not supported!", varname, key);
+                  if (cdoVerbose) cdoPrint("Attribute %s:%s not supported!", varname, key);
                 }
             }
 
@@ -490,8 +475,7 @@ CMOR_lite(void *process)
       var_t *var = &vars[varID];
       if (var->convert == false) var->changeunits = false;
       if (var->changeunits)
-        cdoConvertUnits(&var->ut_converter, &var->changeunits,
-                        (char *) &var->units, (char *) &var->units_old,
+        cdoConvertUnits(&var->ut_converter, &var->changeunits, (char *) &var->units, (char *) &var->units_old,
                         var->name);
     }
 
@@ -547,8 +531,7 @@ CMOR_lite(void *process)
             {
               for (size_t i = 0; i < gridsize; ++i)
                 {
-                  if (DBL_IS_EQUAL(array[i], var->missval_old))
-                    array[i] = missval;
+                  if (DBL_IS_EQUAL(array[i], var->missval_old)) array[i] = missval;
                 }
             }
 
@@ -568,8 +551,7 @@ CMOR_lite(void *process)
                 {
                   if (!DBL_IS_EQUAL(array[i], missval))
                     {
-                      array[i] = cv_convert_double(
-                          (const cv_converter *) var->ut_converter, array[i]);
+                      array[i] = cv_convert_double((const cv_converter *) var->ut_converter, array[i]);
                       if (ut_get_status() != UT_SUCCESS) nerr++;
                     }
                 }

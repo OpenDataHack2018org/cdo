@@ -17,26 +17,15 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
-#define MADDMN(x, y)                                                     \
-  (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 \
-                                                              : (x) + (y))
-#define MSUBMN(x, y)                                                     \
-  (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 \
-                                                              : (x) - (y))
-#define MMULMN(x, y)                                                \
-  (DBL_IS_EQUAL((x), 0.) || DBL_IS_EQUAL((y), 0.)                   \
-       ? 0                                                          \
-       : DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) \
-             ? missval1                                             \
-             : (x) * (y))
-#define MDIVMN(x, y)                                          \
-  (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) \
-           || DBL_IS_EQUAL((y), 0.)                           \
-       ? missval1                                             \
-       : (x) / (y))
-#define MPOWMN(x, y)                                                     \
-  (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 \
-                                                              : pow((x), (y)))
+#define MADDMN(x, y) (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : (x) + (y))
+#define MSUBMN(x, y) (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : (x) - (y))
+#define MMULMN(x, y)                              \
+  (DBL_IS_EQUAL((x), 0.) || DBL_IS_EQUAL((y), 0.) \
+       ? 0                                        \
+       : DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : (x) * (y))
+#define MDIVMN(x, y) \
+  (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) || DBL_IS_EQUAL((y), 0.) ? missval1 : (x) / (y))
+#define MPOWMN(x, y) (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : pow((x), (y)))
 #define MSQRTMN(x) (DBL_IS_EQUAL((x), missval1) || (x) < 0 ? missval1 : sqrt(x))
 
 #define ADD(x, y) ((x) + (y))
@@ -46,22 +35,13 @@
 #define POW(x, y) pow((x), (y))
 #define SQRT(x) sqrt(x)
 
-#define ADDM(x, y) \
-  (IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) ? missval1 : (x) + (y))
-#define SUBM(x, y) \
-  (IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) ? missval1 : (x) - (y))
-#define MULM(x, y)                                                     \
-  (IS_EQUAL((x), 0.) || IS_EQUAL((y), 0.)                              \
-       ? 0                                                             \
-       : IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) ? missval1 \
-                                                            : (x) * (y))
-#define DIVM(x, y)                                                         \
-  (IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) || IS_EQUAL((y), 0.) \
-       ? missval1                                                          \
-       : (x) / (y))
-#define POWM(x, y)                                               \
-  (IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) ? missval1 \
-                                                      : pow((x), (y)))
+#define ADDM(x, y) (IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) ? missval1 : (x) + (y))
+#define SUBM(x, y) (IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) ? missval1 : (x) - (y))
+#define MULM(x, y)                            \
+  (IS_EQUAL((x), 0.) || IS_EQUAL((y), 0.) ? 0 \
+                                          : IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) ? missval1 : (x) * (y))
+#define DIVM(x, y) (IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) || IS_EQUAL((y), 0.) ? missval1 : (x) / (y))
+#define POWM(x, y) (IS_EQUAL((x), missval1) || IS_EQUAL((y), missval2) ? missval1 : pow((x), (y)))
 #define SQRTM(x) (IS_EQUAL((x), missval1) || (x) < 0 ? missval1 : sqrt(x))
 
 #define ADDMN(x, y) FADDMN(x, y, missval1, missval2)
@@ -105,24 +85,16 @@ FSQRTMN(double x, double missval1)
 const char *fpe_errstr(int fpeRaised);
 
 void arrayMinMax(size_t len, const double *array, double *rmin, double *rmax);
-size_t arrayMinMaxMV(size_t len, const double *array, double missval,
-                     double *rmin, double *rmax);
-void arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax,
-                    double *rsum);
-size_t arrayMinMaxSumMV(size_t len, const double *array, double missval,
-                        double *rmin, double *rmax, double *rsum);
-void arrayMinMaxMean(size_t len, const double *array, double *rmin,
-                     double *rmax, double *rmean);
-size_t arrayMinMaxMeanMV(size_t len, const double *array, double missval,
-                         double *rmin, double *rmax, double *rmean);
+size_t arrayMinMaxMV(size_t len, const double *array, double missval, double *rmin, double *rmax);
+void arrayMinMaxSum(size_t len, const double *array, double *rmin, double *rmax, double *rsum);
+size_t arrayMinMaxSumMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rsum);
+void arrayMinMaxMean(size_t len, const double *array, double *rmin, double *rmax, double *rmean);
+size_t arrayMinMaxMeanMV(size_t len, const double *array, double missval, double *rmin, double *rmax, double *rmean);
 
-void arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin,
-                     double *rmax);
+void arrayMinMaxMask(size_t len, const double *array, int *mask, double *rmin, double *rmax);
 
-void arrayAddArray(size_t len, double *restrict array1,
-                   const double *restrict array2);
-void arrayAddArrayMV(size_t len, double *restrict array1,
-                     const double *restrict array2, double missval);
+void arrayAddArray(size_t len, double *restrict array1, const double *restrict array2);
+void arrayAddArrayMV(size_t len, double *restrict array1, const double *restrict array2, double missval);
 
 template <typename T>
 void
@@ -154,13 +126,10 @@ double arraySumMV(size_t len, const double *restrict array, double missval);
 
 double arrayMean(size_t len, const double *restrict array);
 double arrayMeanMV(size_t len, const double *restrict array, double missval);
-double arrayWeightedMean(size_t len, const double *restrict array,
-                         const double *restrict w, double missval);
-double arrayWeightedMeanMV(size_t len, const double *restrict array,
-                           const double *restrict w, double missval);
+double arrayWeightedMean(size_t len, const double *restrict array, const double *restrict w, double missval);
+double arrayWeightedMeanMV(size_t len, const double *restrict array, const double *restrict w, double missval);
 
 double arrayAvgMV(size_t len, const double *restrict array, double missval);
-double arrayWeightedAvgMV(size_t len, const double *restrict array,
-                          const double *restrict w, double missval);
+double arrayWeightedAvgMV(size_t len, const double *restrict array, const double *restrict w, double missval);
 
 #endif  //  ARRAY_H

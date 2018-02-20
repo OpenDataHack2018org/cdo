@@ -97,8 +97,7 @@ dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
   if ((size_t) tsID >= dtlist->nalloc)
     {
       dtlist->nalloc += NALLOC;
-      dtlist->dtinfo = (dtinfo_type *) Realloc(
-          dtlist->dtinfo, dtlist->nalloc * sizeof(dtinfo_type));
+      dtlist->dtinfo = (dtinfo_type *) Realloc(dtlist->dtinfo, dtlist->nalloc * sizeof(dtinfo_type));
     }
 
   if ((size_t) tsID >= dtlist->size) dtlist->size = (size_t) tsID + 1;
@@ -125,13 +124,10 @@ dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 
   if (dtlist->has_bounds)
     {
-      taxisInqVdateBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].date),
-                          &(dtlist->dtinfo[tsID].b[1].date));
-      taxisInqVtimeBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].time),
-                          &(dtlist->dtinfo[tsID].b[1].time));
+      taxisInqVdateBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].date), &(dtlist->dtinfo[tsID].b[1].date));
+      taxisInqVtimeBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].time), &(dtlist->dtinfo[tsID].b[1].time));
 
-      if (CDO_Timestat_Bounds
-          && dtlist->dtinfo[tsID].v.date == dtlist->dtinfo[tsID].b[1].date
+      if (CDO_Timestat_Bounds && dtlist->dtinfo[tsID].v.date == dtlist->dtinfo[tsID].b[1].date
           && dtlist->dtinfo[tsID].v.time == dtlist->dtinfo[tsID].b[1].time)
         {
           int calendar = dtlist->calendar;
@@ -147,8 +143,7 @@ dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
           // int hour, minute, second;
           // cdiDecodeTime(vtime, &hour, &minute, &second);
 
-          if (vtime == 0
-              && juldate_to_seconds(juldate1) < juldate_to_seconds(juldate2))
+          if (vtime == 0 && juldate_to_seconds(juldate1) < juldate_to_seconds(juldate2))
             {
               juldate_t juldate = juldate_add_seconds(-1, juldate2);
               juldate_decode(calendar, juldate, &vdate, &vtime);
@@ -170,17 +165,14 @@ dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 void
 dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 {
-  if (tsID < 0 || (size_t) tsID >= dtlist->size)
-    cdoAbort("Internal error; tsID out of bounds!");
+  if (tsID < 0 || (size_t) tsID >= dtlist->size) cdoAbort("Internal error; tsID out of bounds!");
 
   taxisDefVdate(taxisID, dtlist->dtinfo[tsID].v.date);
   taxisDefVtime(taxisID, dtlist->dtinfo[tsID].v.time);
   if (dtlist->has_bounds)
     {
-      taxisDefVdateBounds(taxisID, dtlist->dtinfo[tsID].b[0].date,
-                          dtlist->dtinfo[tsID].b[1].date);
-      taxisDefVtimeBounds(taxisID, dtlist->dtinfo[tsID].b[0].time,
-                          dtlist->dtinfo[tsID].b[1].time);
+      taxisDefVdateBounds(taxisID, dtlist->dtinfo[tsID].b[0].date, dtlist->dtinfo[tsID].b[1].date);
+      taxisDefVtimeBounds(taxisID, dtlist->dtinfo[tsID].b[0].time, dtlist->dtinfo[tsID].b[1].time);
     }
 }
 
@@ -250,8 +242,7 @@ void
 dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
 {
   if ((size_t) nsteps > dtlist->size)
-    cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps,
-             dtlist->size);
+    cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps, dtlist->size);
 
   int stat = dtlist->stat;
   if (CDO_Timestat_Date > 0) stat = CDO_Timestat_Date;
@@ -282,10 +273,8 @@ dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
   taxisDefVtime(taxisID, dtlist->timestat.v.time);
   // if ( dtlist->has_bounds )
   {
-    taxisDefVdateBounds(taxisID, dtlist->timestat.b[0].date,
-                        dtlist->timestat.b[1].date);
-    taxisDefVtimeBounds(taxisID, dtlist->timestat.b[0].time,
-                        dtlist->timestat.b[1].time);
+    taxisDefVdateBounds(taxisID, dtlist->timestat.b[0].date, dtlist->timestat.b[1].date);
+    taxisDefVtimeBounds(taxisID, dtlist->timestat.b[0].time, dtlist->timestat.b[1].time);
   }
 }
 
@@ -313,8 +302,7 @@ dtlist_set_calendar(dtlist_type *dtlist, int calendar)
 int
 dtlist_get_vdate(dtlist_type *dtlist, int tsID)
 {
-  if (tsID < 0 || (size_t) tsID >= dtlist->size)
-    cdoAbort("Internal error; tsID out of bounds!");
+  if (tsID < 0 || (size_t) tsID >= dtlist->size) cdoAbort("Internal error; tsID out of bounds!");
 
   return dtlist->dtinfo[tsID].c.date;
 }
@@ -322,8 +310,7 @@ dtlist_get_vdate(dtlist_type *dtlist, int tsID)
 int
 dtlist_get_vtime(dtlist_type *dtlist, int tsID)
 {
-  if (tsID < 0 || (size_t) tsID >= dtlist->size)
-    cdoAbort("Internal error; tsID out of bounds!");
+  if (tsID < 0 || (size_t) tsID >= dtlist->size) cdoAbort("Internal error; tsID out of bounds!");
 
   return dtlist->dtinfo[tsID].c.time;
 }

@@ -89,8 +89,7 @@ Pardup(void *process)
     {
       vlistCat(vlistID2, vlistID1);
       for (varID = 0; varID < nvars; varID++)
-        vlistDefVarParam(vlistID2, varID + nvars * i,
-                         cdiEncodeParam(-(varID + nvars * i + 1), 255, 255));
+        vlistDefVarParam(vlistID2, varID + nvars * i, cdiEncodeParam(-(varID + nvars * i + 1), 255, 255));
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());

@@ -18,8 +18,7 @@
 #include "namelist.h"
 
 static void
-kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer,
-                       namelisttok_t *t, int nvalues)
+kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, namelisttok_t *t, int nvalues)
 {
   char vbuf[4096];
   keyValues_t *keyval = (keyValues_t *) Malloc(sizeof(keyValues_t));
@@ -83,8 +82,7 @@ namelist_to_pml(list_t *pmlist, namelist_parser *parser, char *buf)
             {
               it++;
               t = &tokens[it];
-              snprintf(name, sizeof(name), "%.*s", t->end - t->start,
-                       buf + t->start);
+              snprintf(name, sizeof(name), "%.*s", t->end - t->start, buf + t->start);
               name[sizeof(name) - 1] = 0;
             }
           kvlist = kvlist_new(name);
@@ -98,8 +96,7 @@ namelist_to_pml(list_t *pmlist, namelist_parser *parser, char *buf)
               list_append(pmlist, &kvlist);
             }
           // printf(" key >%.*s<\n", t->end - t->start, buf+t->start);
-          snprintf(name, sizeof(name), "%.*s", t->end - t->start,
-                   buf + t->start);
+          snprintf(name, sizeof(name), "%.*s", t->end - t->start, buf + t->start);
           name[sizeof(name) - 1] = 0;
           int nvalues = get_number_of_values(ntok - it - 1, &tokens[it + 1]);
           // printf("nvalues %d\n", nvalues);
@@ -134,30 +131,21 @@ namelistbuf_to_pmlist(listbuf_t *listbuf)
                   name, p->lineno, listbuf->buffer[p->pos]);
           break;
         case NAMELIST_ERROR_PART:
-          fprintf(stderr,
-                  "Namelist error: End of string not found in %s (line=%d)!\n",
-                  name, p->lineno);
+          fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", name, p->lineno);
           break;
         case NAMELIST_ERROR_INKEY:
-          fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n",
-                  name, p->lineno);
+          fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", name, p->lineno);
           break;
         case NAMELIST_ERROR_INTYP:
-          fprintf(stderr,
-                  "Namelist error: Invalid key word type in %s (line=%d)!\n",
-                  name, p->lineno);
+          fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", name, p->lineno);
           break;
         case NAMELIST_ERROR_INOBJ:
-          fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n",
-                  name, p->lineno);
+          fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", name, p->lineno);
           break;
         case NAMELIST_ERROR_EMKEY:
-          fprintf(stderr, "Namelist error: Emtry key name in %s (line=%d)!\n",
-                  name, p->lineno);
+          fprintf(stderr, "Namelist error: Emtry key name in %s (line=%d)!\n", name, p->lineno);
           break;
-        default:
-          fprintf(stderr, "Namelist error in %s (line=%d)!\n", name, p->lineno);
-          break;
+        default: fprintf(stderr, "Namelist error in %s (line=%d)!\n", name, p->lineno); break;
         }
       cdoAbort("Namelist error!");
     }
@@ -182,8 +170,7 @@ list_t *
 namelist_to_pmlist(FILE *fp, const char *name)
 {
   listbuf_t *listbuf = listbuf_new();
-  if (listbuf_read(listbuf, fp, name))
-    cdoAbort("Read error on namelist %s!", name);
+  if (listbuf_read(listbuf, fp, name)) cdoAbort("Read error on namelist %s!", name);
 
   list_t *pmlist = namelistbuf_to_pmlist(listbuf);
   if (pmlist == NULL) cdoAbort("Namelist not found!");

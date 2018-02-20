@@ -39,8 +39,7 @@ field_allocate(int vlistID, int ptype, int init)
 
   for (int varID = 0; varID < nvars; ++varID)
     {
-      int nwpv = vlistInqNWPV(
-          vlistID, varID);  // number of words per value; real:1  complex:2
+      int nwpv = vlistInqNWPV(vlistID, varID);  // number of words per value; real:1  complex:2
       int gridID = vlistInqVarGrid(vlistID, varID);
       size_t gridsize = gridInqSize(gridID);
       int zaxisID = vlistInqVarZaxis(vlistID, varID);
@@ -69,18 +68,13 @@ field_allocate(int vlistID, int ptype, int init)
             {
               if (ptype & FIELD_FLT)
                 {
-                  field[varID][levelID].ptrf
-                      = (float *) Malloc(nwpv * gridsize * sizeof(float));
-                  if (init)
-                    arrayFill(nwpv * gridsize, field[varID][levelID].ptrf,
-                              0.0f);
+                  field[varID][levelID].ptrf = (float *) Malloc(nwpv * gridsize * sizeof(float));
+                  if (init) arrayFill(nwpv * gridsize, field[varID][levelID].ptrf, 0.0f);
                 }
               else
                 {
-                  field[varID][levelID].ptr
-                      = (double *) Malloc(nwpv * gridsize * sizeof(double));
-                  if (init)
-                    arrayFill(nwpv * gridsize, field[varID][levelID].ptr, 0.0);
+                  field[varID][levelID].ptr = (double *) Malloc(nwpv * gridsize * sizeof(double));
+                  if (init) arrayFill(nwpv * gridsize, field[varID][levelID].ptr, 0.0);
                 }
             }
 
@@ -88,28 +82,20 @@ field_allocate(int vlistID, int ptype, int init)
             {
               if (ptype & FIELD_FLT)
                 {
-                  field[varID][levelID].ptr2
-                      = Malloc(nwpv * gridsize * sizeof(float));
-                  if (init)
-                    arrayFill(nwpv * gridsize,
-                              (float *) field[varID][levelID].ptr2, 0.0f);
+                  field[varID][levelID].ptr2 = Malloc(nwpv * gridsize * sizeof(float));
+                  if (init) arrayFill(nwpv * gridsize, (float *) field[varID][levelID].ptr2, 0.0f);
                 }
               else
                 {
-                  field[varID][levelID].ptr2
-                      = Malloc(nwpv * gridsize * sizeof(double));
-                  if (init)
-                    arrayFill(nwpv * gridsize,
-                              (double *) field[varID][levelID].ptr2, 0.0);
+                  field[varID][levelID].ptr2 = Malloc(nwpv * gridsize * sizeof(double));
+                  if (init) arrayFill(nwpv * gridsize, (double *) field[varID][levelID].ptr2, 0.0);
                 }
             }
 
           if (ptype & FIELD_WGT)
             {
-              field[varID][levelID].weight
-                  = (double *) Malloc(nwpv * gridsize * sizeof(double));
-              if (init)
-                arrayFill(nwpv * gridsize, field[varID][levelID].weight, 0.0);
+              field[varID][levelID].weight = (double *) Malloc(nwpv * gridsize * sizeof(double));
+              if (init) arrayFill(nwpv * gridsize, field[varID][levelID].weight, 0.0);
             }
         }
     }

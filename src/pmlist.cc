@@ -29,8 +29,7 @@ kvlist_search(list_t *kvlist, const char *key)
       while (node)
         {
           keyValues_t *kv = *(keyValues_t **) node->data;
-          if (kv->key && *(kv->key) == *key && strcmp(kv->key, key) == 0)
-            return kv;
+          if (kv->key && *(kv->key) == *key && strcmp(kv->key, key) == 0) return kv;
           node = node->next;
         }
     }
@@ -50,8 +49,7 @@ pmlist_search_kvlist(list_t *pmlist, const char *key, const char *value)
             {
               list_t *kvlist = *(list_t **) node->data;
               keyValues_t *kv = kvlist_search(kvlist, key);
-              if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value
-                  && strcmp(kv->values[0], value) == 0)
+              if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0)
                 return kvlist;
             }
           node = node->next;
@@ -88,8 +86,7 @@ pmlist_print_iter(void *data)
 {
   list_t *kvlist = *(list_t **) data;
   const char *listname = list_name(kvlist);
-  printf("\nFound %s list with %d key/values: \n", listname ? listname : "",
-         list_size(kvlist));
+  printf("\nFound %s list with %d key/values: \n", listname ? listname : "", list_size(kvlist));
   list_for_each(kvlist, kvlist_print_iter);
   return true;
 }
@@ -164,8 +161,7 @@ kvlist_parse_cmdline(list_t *kvlist, int nparams, char **params)
 
       int nvalues = j;
 
-      const char **values
-          = nvalues ? (const char **) malloc(nvalues * sizeof(char *)) : NULL;
+      const char **values = nvalues ? (const char **) malloc(nvalues * sizeof(char *)) : NULL;
 
       values[0] = end + 1;
       if (*values[0] == 0) nvalues = 0;
@@ -183,8 +179,7 @@ kvlist_parse_cmdline(list_t *kvlist, int nparams, char **params)
 }
 
 list_t *
-pmlist_search_kvlist_ventry(list_t *pmlist, const char *key, const char *value,
-                            int nentry, const char **entry)
+pmlist_search_kvlist_ventry(list_t *pmlist, const char *key, const char *value, int nentry, const char **entry)
 {
   if (pmlist && key && value)
     {
@@ -199,8 +194,7 @@ pmlist_search_kvlist_ventry(list_t *pmlist, const char *key, const char *value,
                 if (strcmp(listname, entry[i]) == 0)
                   {
                     keyValues_t *kv = kvlist_search(kvlist, key);
-                    if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value
-                        && strcmp(kv->values[0], value) == 0)
+                    if (kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0)
                       return kvlist;
                   }
             }

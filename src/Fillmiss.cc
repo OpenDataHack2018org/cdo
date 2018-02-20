@@ -29,7 +29,8 @@
 #include "grid_search.h"
 #include "cdoOptions.h"
 
-extern "C" {
+extern "C"
+{
 #include "clipping/geometry.h"
 }
 
@@ -203,8 +204,7 @@ fillmiss(field_type *field1, field_type *field2, int nfill)
           }
       }
 
-  if (nmiss1 != nmiss2)
-    cdoAbort("found only %zu of %zu missing values!", nmiss2, nmiss1);
+  if (nmiss1 != nmiss2) cdoAbort("found only %zu of %zu missing values!", nmiss2, nmiss1);
 
   Free(matrix2);
   Free(matrix1);
@@ -382,18 +382,12 @@ fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
   Free(matrix1);
 }
 
-int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors,
-                    size_t *restrict nbr_add, double *restrict nbr_dist,
+int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist,
                     double plon, double plat);
-double nbr_compute_weights(size_t numNeighbors,
-                           const int *restrict src_grid_mask,
-                           bool *restrict nbr_mask,
-                           const size_t *restrict nbr_add,
-                           double *restrict nbr_dist);
-size_t nbr_normalize_weights(size_t numNeighbors, double dist_tot,
-                             const bool *restrict nbr_mask,
-                             size_t *restrict nbr_add,
-                             double *restrict nbr_dist);
+double nbr_compute_weights(size_t numNeighbors, const int *restrict src_grid_mask, bool *restrict nbr_mask,
+                           const size_t *restrict nbr_add, double *restrict nbr_dist);
+size_t nbr_normalize_weights(size_t numNeighbors, double dist_tot, const bool *restrict nbr_mask,
+                             size_t *restrict nbr_add, double *restrict nbr_dist);
 
 static void
 setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
@@ -411,8 +405,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 0);
 
-  if (gridInqType(gridID) != GRID_UNSTRUCTURED
-      && gridInqType(gridID) != GRID_CURVILINEAR)
+  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
     gridID = gridToCurvilinear(gridID, 0);
 
   std::vector<double> xvals(gridsize);
@@ -475,9 +468,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   finish = clock();
 
-  if (cdoVerbose)
-    printf("gridsearch created: %.2f seconds\n",
-           ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   progressInit();
 
@@ -496,34 +487,27 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      grid_search_nbr(gs, numNeighbors, nbr_add[ompthID], nbr_dist[ompthID],
-                      xvals[mindex[i]], yvals[mindex[i]]);
+      grid_search_nbr(gs, numNeighbors, nbr_add[ompthID], nbr_dist[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
 
       /* Compute weights based on inverse distance if mask is false, eliminate
        * those points */
-      double dist_tot
-          = nbr_compute_weights(numNeighbors, NULL, nbr_mask[ompthID],
-                                nbr_add[ompthID], nbr_dist[ompthID]);
+      double dist_tot = nbr_compute_weights(numNeighbors, NULL, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
 
       /* Normalize weights and store the link */
       size_t nadds
-          = nbr_normalize_weights(numNeighbors, dist_tot, nbr_mask[ompthID],
-                                  nbr_add[ompthID], nbr_dist[ompthID]);
+          = nbr_normalize_weights(numNeighbors, dist_tot, nbr_mask[ompthID], nbr_add[ompthID], nbr_dist[ompthID]);
       if (nadds)
         {
           double result = 0;
           for (size_t n = 0; n < nadds; ++n)
-            result
-                += array1[vindex[nbr_add[ompthID][n]]] * nbr_dist[ompthID][n];
+            result += array1[vindex[nbr_add[ompthID][n]]] * nbr_dist[ompthID][n];
           array2[mindex[i]] = result;
         }
     }
 
   finish = clock();
 
-  if (cdoVerbose)
-    printf("gridsearch nearest: %.2f seconds\n",
-           ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   DELETE_2D(nbr_mask);
   DELETE_2D(nbr_add);
@@ -633,10 +617,8 @@ Fillmiss(void *process)
               int gridID = vlistInqVarGrid(vlistID1, varID);
 
               if ((operatorID == FILLMISS || operatorID == FILLMISSONESTEP)
-                  && (gridInqType(gridID) == GRID_GME
-                      || gridInqType(gridID) == GRID_UNSTRUCTURED))
-                cdoAbort("%s data unsupported!",
-                         gridNamePtr(gridInqType(gridID)));
+                  && (gridInqType(gridID) == GRID_GME || gridInqType(gridID) == GRID_UNSTRUCTURED))
+                cdoAbort("%s data unsupported!", gridNamePtr(gridInqType(gridID)));
 
               field1.grid = gridID;
               field1.missval = vlistInqVarMissval(vlistID1, varID);

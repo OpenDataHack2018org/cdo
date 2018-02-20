@@ -82,16 +82,12 @@ Arithlat(void *process)
               gridID0 = gridID;
 
               gridtype = gridInqType(gridID);
-              int projtype = (gridtype == GRID_PROJECTION)
-                                 ? gridInqProjType(gridID)
-                                 : -1;
-              if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN
-                  || projtype == CDI_PROJ_LCC)
+              int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
+              if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || projtype == CDI_PROJ_LCC)
                 {
                   gridID = gridToCurvilinear(gridID, 0);
                 }
-              else if (gridtype == GRID_CURVILINEAR
-                       || gridtype == GRID_UNSTRUCTURED)
+              else if (gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED)
                 {
                   /* No conversion necessary */
                 }
@@ -106,8 +102,7 @@ Arithlat(void *process)
                              "convert reduced to regular grid!",
                              gridNamePtr(gridtype));
                   else
-                    cdoAbort("Unsupported grid type: %s",
-                             gridNamePtr(gridtype));
+                    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
                 }
 
               gridsize = gridInqSize(gridID);

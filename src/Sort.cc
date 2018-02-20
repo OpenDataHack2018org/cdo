@@ -144,9 +144,7 @@ paramToStringLong(int param, char *paramstr, int maxlen)
     len = snprintf(paramstr, umaxlen, "%03d.%03d.%03d", num, cat, dis);
 
   if (len >= maxlen || len < 0)
-    fprintf(stderr,
-            "Internal problem (%s): size of input string is too small!\n",
-            __func__);
+    fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
 }
 
 void *
@@ -233,13 +231,11 @@ Sort(void *process)
               varInfo[varID].varID = varID;
               varInfo[varID].code = vlistInqVarCode(vlistID1, varID);
               int iparam = vlistInqVarParam(vlistID1, varID);
-              paramToStringLong(iparam, varInfo[varID].param,
-                                sizeof(varInfo[varID].param));
+              paramToStringLong(iparam, varInfo[varID].param, sizeof(varInfo[varID].param));
               vlistInqVarName(vlistID1, varID, varInfo[varID].name);
               zaxisID = vlistInqVarZaxis(vlistID1, varID);
               varInfo[varID].levInfo[levelID].levelID = levelID;
-              varInfo[varID].levInfo[levelID].level
-                  = cdoZaxisInqLevel(zaxisID, levelID);
+              varInfo[varID].levInfo[levelID].level = cdoZaxisInqLevel(zaxisID, levelID);
             }
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -259,10 +255,8 @@ Sort(void *process)
               {
                 nlevs = varInfo[vindex].nlevs;
                 for (lindex = 0; lindex < nlevs; ++lindex)
-                  printf("sort in: %d %s %d %d %g\n", vindex,
-                         varInfo[vindex].name, varInfo[vindex].code,
-                         varInfo[vindex].nlevs,
-                         varInfo[vindex].levInfo[lindex].level);
+                  printf("sort in: %d %s %d %d %g\n", vindex, varInfo[vindex].name, varInfo[vindex].code,
+                         varInfo[vindex].nlevs, varInfo[vindex].levInfo[lindex].level);
               }
 
           if (operatorID == SORTCODE)
@@ -276,8 +270,7 @@ Sort(void *process)
               for (vindex = 0; vindex < nvars; vindex++)
                 {
                   nlevs = varInfo[vindex].nlevs;
-                  qsort(varInfo[vindex].levInfo, nlevs, sizeof(levinfo_t),
-                        cmpvarlev);
+                  qsort(varInfo[vindex].levInfo, nlevs, sizeof(levinfo_t), cmpvarlev);
                 }
             }
 
@@ -286,10 +279,8 @@ Sort(void *process)
               {
                 nlevs = varInfo[vindex].nlevs;
                 for (lindex = 0; lindex < nlevs; ++lindex)
-                  printf("sort out: %d %s %d %d %g\n", vindex,
-                         varInfo[vindex].name, varInfo[vindex].code,
-                         varInfo[vindex].nlevs,
-                         varInfo[vindex].levInfo[lindex].level);
+                  printf("sort out: %d %s %d %d %g\n", vindex, varInfo[vindex].name, varInfo[vindex].code,
+                         varInfo[vindex].nlevs, varInfo[vindex].levInfo[lindex].level);
               }
         }
 
@@ -302,8 +293,7 @@ Sort(void *process)
               levelID = varInfo[vindex].levInfo[lindex].levelID;
               nmiss = varInfo[vindex].levInfo[lindex].nmiss;
 
-              if (tsID == 0
-                  || vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT)
+              if (tsID == 0 || vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT)
                 {
                   gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
                   offset = gridsize * levelID;

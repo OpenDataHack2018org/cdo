@@ -108,24 +108,20 @@ Ymonpctl(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
       if (nrecs != cdoStreamInqTimestep(streamID3, tsID))
-        cdoAbort("Number of records at time step %d of %s and %s differ!",
-                 tsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
 
       if (vdate != taxisInqVdate(taxisID3))
-        cdoAbort("Verification dates at time step %d of %s and %s differ!",
-                 tsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
-      if (cdoVerbose)
-        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
+      if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
-      if (month < 0 || month >= NMONTH)
-        cdoAbort("Month %d out of range!", month);
+      if (month < 0 || month >= NMONTH) cdoAbort("Month %d out of range!", month);
 
       vdates2[month] = vdate;
 
@@ -146,8 +142,7 @@ Ymonpctl(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-          pstreamReadRecord(streamID2, vars1[month][varID][levelID].ptr,
-                            &nmiss);
+          pstreamReadRecord(streamID2, vars1[month][varID][levelID].ptr, &nmiss);
           vars1[month][varID][levelID].nmiss = nmiss;
         }
       for (int recID = 0; recID < nrecs; recID++)
@@ -158,8 +153,7 @@ Ymonpctl(void *process)
           field.grid = vars1[month][varID][levelID].grid;
           field.missval = vars1[month][varID][levelID].missval;
 
-          hsetDefVarLevelBounds(hsets[month], varID, levelID,
-                                &vars1[month][varID][levelID], &field);
+          hsetDefVarLevelBounds(hsets[month], varID, levelID, &vars1[month][varID][levelID], &field);
         }
 
       tsID++;
@@ -171,19 +165,16 @@ Ymonpctl(void *process)
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      if (cdoVerbose)
-        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
+      if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
-      if (month < 0 || month >= NMONTH)
-        cdoAbort("Month %d out of range!", month);
+      if (month < 0 || month >= NMONTH) cdoAbort("Month %d out of range!", month);
 
       vdates1[month] = vdate;
       vtimes1[month] = vtime;
 
       if (vars1[month] == NULL)
-        cdoAbort("No data for month %d in %s and %s", month,
-                 cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
+        cdoAbort("No data for month %d in %s and %s", month, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -195,12 +186,10 @@ Ymonpctl(void *process)
               recLevelID[recID] = levelID;
             }
 
-          pstreamReadRecord(streamID1, vars1[month][varID][levelID].ptr,
-                            &nmiss);
+          pstreamReadRecord(streamID1, vars1[month][varID][levelID].ptr, &nmiss);
           vars1[month][varID][levelID].nmiss = nmiss;
 
-          hsetAddVarLevelValues(hsets[month], varID, levelID,
-                                &vars1[month][varID][levelID]);
+          hsetAddVarLevelValues(hsets[month], varID, levelID, &vars1[month][varID][levelID]);
         }
 
       nsets[month]++;
@@ -212,9 +201,8 @@ Ymonpctl(void *process)
     if (nsets[month])
       {
         if (getmonth(vdates1[month]) != getmonth(vdates2[month]))
-          cdoAbort(
-              "Verification dates for the month %d of %s and %s are different!",
-              month, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
+          cdoAbort("Verification dates for the month %d of %s and %s are different!", month,
+                   cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
 
         for (varID = 0; varID < nvars; varID++)
           {
@@ -222,8 +210,7 @@ Ymonpctl(void *process)
             nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
             for (levelID = 0; levelID < nlevels; levelID++)
-              hsetGetVarLevelPercentiles(&vars1[month][varID][levelID],
-                                         hsets[month], varID, levelID, pn);
+              hsetGetVarLevelPercentiles(&vars1[month][varID][levelID], hsets[month], varID, levelID, pn);
           }
 
         taxisDefVdate(taxisID4, vdates1[month]);
@@ -235,12 +222,10 @@ Ymonpctl(void *process)
             varID = recVarID[recID];
             levelID = recLevelID[recID];
 
-            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-              continue;
+            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
             pstreamDefRecord(streamID4, varID, levelID);
-            pstreamWriteRecord(streamID4, vars1[month][varID][levelID].ptr,
-                               vars1[month][varID][levelID].nmiss);
+            pstreamWriteRecord(streamID4, vars1[month][varID][levelID].ptr, vars1[month][varID][levelID].nmiss);
           }
 
         otsID++;

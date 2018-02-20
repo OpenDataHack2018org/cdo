@@ -51,29 +51,23 @@ grid_new(int gridID, const char *txt)
       gridID = gridID_gme;
     }
 
-  if (gridInqType(gridID) != GRID_UNSTRUCTURED
-      && gridInqType(gridID) != GRID_CURVILINEAR)
+  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
     {
       lgrid_destroy = true;
       gridID = gridToCurvilinear(gridID, 1);
     }
 
-  if (gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0)
-    cdoAbort("%s grid corner missing!", txt);
+  if (gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0) cdoAbort("%s grid corner missing!", txt);
 
   grid_type *grid = (grid_type *) Malloc(sizeof(grid_type));
 
   grid->gridID = gridID;
   grid->size = gridInqSize(grid->gridID);
-  grid->num_cell_corners = (gridInqType(grid->gridID) == GRID_UNSTRUCTURED)
-                               ? gridInqNvertex(grid->gridID)
-                               : 4;
+  grid->num_cell_corners = (gridInqType(grid->gridID) == GRID_UNSTRUCTURED) ? gridInqNvertex(grid->gridID) : 4;
 
   printf("%s grid size %ld nv %ld\n", txt, grid->size, grid->num_cell_corners);
-  grid->cell_corner_lon
-      = (double *) Malloc(grid->num_cell_corners * grid->size * sizeof(double));
-  grid->cell_corner_lat
-      = (double *) Malloc(grid->num_cell_corners * grid->size * sizeof(double));
+  grid->cell_corner_lon = (double *) Malloc(grid->num_cell_corners * grid->size * sizeof(double));
+  grid->cell_corner_lat = (double *) Malloc(grid->num_cell_corners * grid->size * sizeof(double));
   gridInqXbounds(grid->gridID, grid->cell_corner_lon);
   gridInqYbounds(grid->gridID, grid->cell_corner_lat);
 
@@ -84,10 +78,8 @@ grid_new(int gridID, const char *txt)
   cdiGridInqKeyStr(gridID, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
   cdiGridInqKeyStr(gridID, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
-  grid_to_radian(xunits, grid->num_cell_corners * grid->size,
-                 grid->cell_corner_lon, "grid corner lon");
-  grid_to_radian(yunits, grid->num_cell_corners * grid->size,
-                 grid->cell_corner_lat, "grid corner lat");
+  grid_to_radian(xunits, grid->num_cell_corners * grid->size, grid->cell_corner_lon, "grid corner lon");
+  grid_to_radian(yunits, grid->num_cell_corners * grid->size, grid->cell_corner_lat, "grid corner lat");
 
   // check_lon_range(grid->num_cell_corners*grid->size, grid->cell_corner_lon);
   // check_lat_range(grid->num_cell_corners*grid->size, grid->cell_corner_lat);
@@ -106,8 +98,7 @@ grid_delete(grid_type *grid)
 }
 
 void
-boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon,
-                        const double *restrict corner_lat,
+boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon, const double *restrict corner_lat,
                         float *restrict bound_box)
 {
   long inc = ic * nc;
@@ -141,8 +132,7 @@ boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon,
 }
 
 void
-boundbox_from_corners(long size, long nc, const double *restrict corner_lon,
-                      const double *restrict corner_lat,
+boundbox_from_corners(long size, long nc, const double *restrict corner_lon, const double *restrict corner_lat,
                       float *restrict bound_box)
 {
   long i4, inc, j;
@@ -173,18 +163,15 @@ boundbox_from_corners(long size, long nc, const double *restrict corner_lon,
 static cellsearch_type *
 cellsearch_new(grid_type *src_grid, grid_type *tgt_grid)
 {
-  cellsearch_type *cellsearch
-      = (cellsearch_type *) Malloc(sizeof(cellsearch_type));
+  cellsearch_type *cellsearch = (cellsearch_type *) Malloc(sizeof(cellsearch_type));
 
   cellsearch->src_grid = src_grid;
   cellsearch->tgt_grid = tgt_grid;
 
-  float *src_cell_bound_box
-      = (float *) Malloc(4 * src_grid->size * sizeof(double));
+  float *src_cell_bound_box = (float *) Malloc(4 * src_grid->size * sizeof(double));
 
-  boundbox_from_corners(src_grid->size, src_grid->num_cell_corners,
-                        src_grid->cell_corner_lon, src_grid->cell_corner_lat,
-                        src_cell_bound_box);
+  boundbox_from_corners(src_grid->size, src_grid->num_cell_corners, src_grid->cell_corner_lon,
+                        src_grid->cell_corner_lat, src_cell_bound_box);
 
   cellsearch->src_cell_bound_box = src_cell_bound_box;
 
@@ -205,9 +192,8 @@ search_cells(cellsearch_type *cellsearch, long tgt_cell_add, long *srch_add)
   float *src_cell_bound_box = cellsearch->src_cell_bound_box;
   float tgt_cell_bound_box[4];
 
-  boundbox_from_corners1r(tgt_cell_add, tgt_grid->num_cell_corners,
-                          tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat,
-                          tgt_cell_bound_box);
+  boundbox_from_corners1r(tgt_cell_add, tgt_grid->num_cell_corners, tgt_grid->cell_corner_lon,
+                          tgt_grid->cell_corner_lat, tgt_cell_bound_box);
 
   long src_cell_addm4;
 
@@ -251,8 +237,7 @@ cell_search(int gridIDsrc, int gridIDtgt)
 
       if (cdoVerbose && num_srch_cells > 0)
         {
-          printf("tgt cell %ld: found %ld src cells\n", tgt_cell_add,
-                 num_srch_cells);
+          printf("tgt cell %ld: found %ld src cells\n", tgt_cell_add, num_srch_cells);
           for (long n = 0; n < num_srch_cells; ++n)
             printf("   %ld: %ld\n", n + 1, srch_add[n]);
         }

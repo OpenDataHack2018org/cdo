@@ -52,8 +52,7 @@
 */
 
 void
-rotate_uv2(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat,
-           double *u_lon, double *v_lat)
+rotate_uv2(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat, double *u_lon, double *v_lat)
 {
   /*
  real,intent(in)      :: u_i(ix,iy,iz),v_j(ix,iy,iz)                  ! vector
@@ -118,10 +117,8 @@ rotate_uv2(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat,
         dlon_j = dlon_j * lat_factor;
 
         /* projection by scalar product */
-        u_lon[IX2D(j, i, ix)]
-            = u_i[IX2D(j, i, ix)] * dlon_i + v_j[IX2D(j, i, ix)] * dlat_i;
-        v_lat[IX2D(j, i, ix)]
-            = u_i[IX2D(j, i, ix)] * dlon_j + v_j[IX2D(j, i, ix)] * dlat_j;
+        u_lon[IX2D(j, i, ix)] = u_i[IX2D(j, i, ix)] * dlon_i + v_j[IX2D(j, i, ix)] * dlat_i;
+        v_lat[IX2D(j, i, ix)] = u_i[IX2D(j, i, ix)] * dlon_j + v_j[IX2D(j, i, ix)] * dlat_j;
 
         dist_i = sqrt(dlon_i * dlon_i + dlat_i * dlat_i);
         dist_j = sqrt(dlon_j * dlon_j + dlat_j * dlat_j);
@@ -139,30 +136,26 @@ rotate_uv2(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat,
 
         if (cdoVerbose)
           {
-            absold = sqrt(u_i[IX2D(j, i, ix)] * u_i[IX2D(j, i, ix)]
-                          + v_j[IX2D(j, i, ix)] * v_j[IX2D(j, i, ix)]);
-            absnew = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)]
-                          + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
+            absold = sqrt(u_i[IX2D(j, i, ix)] * u_i[IX2D(j, i, ix)] + v_j[IX2D(j, i, ix)] * v_j[IX2D(j, i, ix)]);
+            absnew
+                = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)] + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
 
             if (i % 20 == 0 && j % 20 == 0 && absold > 0)
               {
-                printf("(absold,absnew) %d %d %g %g %g %g %g %g\n", j + 1,
-                       i + 1, absold, absnew, u_i[IX2D(j, i, ix)],
-                       v_j[IX2D(j, i, ix)], u_lon[IX2D(j, i, ix)],
-                       v_lat[IX2D(j, i, ix)]);
+                printf("(absold,absnew) %d %d %g %g %g %g %g %g\n", j + 1, i + 1, absold, absnew, u_i[IX2D(j, i, ix)],
+                       v_j[IX2D(j, i, ix)], u_lon[IX2D(j, i, ix)], v_lat[IX2D(j, i, ix)]);
 
                 /* test orthogonality */
                 if ((dlon_i * dlon_j + dlat_j * dlat_i) > 0.1)
-                  fprintf(stderr, "orthogonal? %d %d %g\n", j + 1, i + 1,
-                          (dlon_i * dlon_j + dlat_j * dlat_i));
+                  fprintf(stderr, "orthogonal? %d %d %g\n", j + 1, i + 1, (dlon_i * dlon_j + dlat_j * dlat_i));
               }
           }
       }
 }
 
 static void
-uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y,
-             double *grid2x, double *grid2y, double *grid3x, double *grid3y)
+uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y, double *grid2x, double *grid2y, double *grid3x,
+             double *grid3y)
 {
   double gx, gy;
   double gx2, gy2;
@@ -192,13 +185,9 @@ uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y,
   for (size_t j = 0; j < nlat; j++)
     for (size_t i = 0; i < nlon; i++)
       {
-        grid3x[IX2D(j, i, nlon)]
-            = (gxhelp[IX2D(j, i, nlon + 2)] + gxhelp[IX2D(j, i + 1, nlon + 2)])
-              * 0.5;
-        if ((gxhelp[IX2D(j, i, nlon + 2)] > 340
-             && gxhelp[IX2D(j, i + 1, nlon + 2)] < 20)
-            || (gxhelp[IX2D(j, i, nlon + 2)] < 20
-                && gxhelp[IX2D(j, i + 1, nlon + 2)] > 340))
+        grid3x[IX2D(j, i, nlon)] = (gxhelp[IX2D(j, i, nlon + 2)] + gxhelp[IX2D(j, i + 1, nlon + 2)]) * 0.5;
+        if ((gxhelp[IX2D(j, i, nlon + 2)] > 340 && gxhelp[IX2D(j, i + 1, nlon + 2)] < 20)
+            || (gxhelp[IX2D(j, i, nlon + 2)] < 20 && gxhelp[IX2D(j, i + 1, nlon + 2)] > 340))
           {
             if (grid3x[IX2D(j, i, nlon)] < 180)
               grid3x[IX2D(j, i, nlon)] += 180;
@@ -206,9 +195,7 @@ uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y,
               grid3x[IX2D(j, i, nlon)] -= 180;
           }
 
-        grid3y[IX2D(j, i, nlon)]
-            = (gyhelp[IX2D(j, i, nlon + 2)] + gyhelp[IX2D(j, i + 1, nlon + 2)])
-              * 0.5;
+        grid3y[IX2D(j, i, nlon)] = (gyhelp[IX2D(j, i, nlon + 2)] + gyhelp[IX2D(j, i + 1, nlon + 2)]) * 0.5;
       }
 
   /* load to a help field */
@@ -232,13 +219,9 @@ uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y,
   for (size_t j = 1; j < nlat - 1; j++)
     for (size_t i = 0; i < nlon; i++)
       {
-        gx = (gxhelp[IX2D(j, i + 1, nlon + 2)]
-              + gxhelp[IX2D(j - 1, i + 1, nlon + 2)])
-             * 0.5;
-        if ((gxhelp[IX2D(j, i + 1, nlon + 2)] > 340
-             && gxhelp[IX2D(j - 1, i + 1, nlon + 2)] < 20)
-            || (gxhelp[IX2D(j, i + 1, nlon + 2)] < 20
-                && gxhelp[IX2D(j - 1, i + 1, nlon + 2)] > 340))
+        gx = (gxhelp[IX2D(j, i + 1, nlon + 2)] + gxhelp[IX2D(j - 1, i + 1, nlon + 2)]) * 0.5;
+        if ((gxhelp[IX2D(j, i + 1, nlon + 2)] > 340 && gxhelp[IX2D(j - 1, i + 1, nlon + 2)] < 20)
+            || (gxhelp[IX2D(j, i + 1, nlon + 2)] < 20 && gxhelp[IX2D(j - 1, i + 1, nlon + 2)] > 340))
           {
             if (gx < 180)
               gx += 180;
@@ -246,16 +229,13 @@ uv_to_p_grid(size_t nlon, size_t nlat, double *grid1x, double *grid1y,
               gx -= 180;
           }
 
-        gy = (gyhelp[IX2D(j, i + 1, nlon + 2)]
-              + gyhelp[IX2D(j - 1, i + 1, nlon + 2)])
-             * 0.5;
+        gy = (gyhelp[IX2D(j, i + 1, nlon + 2)] + gyhelp[IX2D(j - 1, i + 1, nlon + 2)]) * 0.5;
 
         /* printf("%d %d %g %g %g %g \n", j, i, gx, gy, grid3x[IX2D(j,i,nlon)],
          * grid3y[IX2D(j,i,nlon)]); */
 
         gx2 = (gx + grid3x[IX2D(j, i, nlon)]) * 0.5;
-        if ((gx > 340 && grid3x[IX2D(j, i, nlon)] < 20)
-            || (gx < 20 && grid3x[IX2D(j, i, nlon)] > 340))
+        if ((gx > 340 && grid3x[IX2D(j, i, nlon)] < 20) || (gx < 20 && grid3x[IX2D(j, i, nlon)] > 340))
           {
             if (gx2 < 180)
               gx2 += 180;
@@ -297,11 +277,9 @@ Mrotuvb(void *process)
   int vlistID2 = cdoStreamInqVlist(streamID2);
 
   int nvars = vlistNvars(vlistID1);
-  if (nvars > 1)
-    cdoAbort("More than one variable found in %s", cdoGetStreamName(0).c_str());
+  if (nvars > 1) cdoAbort("More than one variable found in %s", cdoGetStreamName(0).c_str());
   nvars = vlistNvars(vlistID2);
-  if (nvars > 1)
-    cdoAbort("More than one variable found in %s", cdoGetStreamName(1).c_str());
+  if (nvars > 1) cdoAbort("More than one variable found in %s", cdoGetStreamName(1).c_str());
 
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
@@ -309,26 +287,20 @@ Mrotuvb(void *process)
   if (gpint == true && gridID1 == gridID2)
     cdoAbort("Input grids are the same, use parameter >noint< to disable "
              "interpolation!");
-  if (gpint == false && gridID1 != gridID2)
-    cdoAbort("Input grids are not the same!");
+  if (gpint == false && gridID1 != gridID2) cdoAbort("Input grids are not the same!");
   if (gridsize != gridInqSize(gridID2)) cdoAbort("Grids have different size!");
 
-  if (gridInqType(gridID1) != GRID_LONLAT
-      && gridInqType(gridID1) != GRID_GAUSSIAN
+  if (gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN
       && gridInqType(gridID1) != GRID_CURVILINEAR)
     cdoAbort("Grid %s unsupported!", gridNamePtr(gridInqType(gridID1)));
 
-  if (gridInqType(gridID1) != GRID_CURVILINEAR)
-    gridID1 = gridToCurvilinear(gridID1, 1);
+  if (gridInqType(gridID1) != GRID_CURVILINEAR) gridID1 = gridToCurvilinear(gridID1, 1);
 
-  if (gridsize != gridInqSize(gridID1))
-    cdoAbort("Internal problem: gridsize changed!");
+  if (gridsize != gridInqSize(gridID1)) cdoAbort("Internal problem: gridsize changed!");
 
-  if (gridInqType(gridID2) != GRID_CURVILINEAR)
-    gridID2 = gridToCurvilinear(gridID2, 1);
+  if (gridInqType(gridID2) != GRID_CURVILINEAR) gridID2 = gridToCurvilinear(gridID2, 1);
 
-  if (gridsize != gridInqSize(gridID2))
-    cdoAbort("Internal problem: gridsize changed!");
+  if (gridsize != gridInqSize(gridID2)) cdoAbort("Internal problem: gridsize changed!");
 
   size_t nlon = gridInqXsize(gridID1);
   size_t nlat = gridInqYsize(gridID1);
@@ -438,8 +410,7 @@ Mrotuvb(void *process)
 
       nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
 
-      if (nrecs != nrecs2)
-        cdoAbort("Input streams have different number of levels!");
+      if (nrecs != nrecs2) cdoAbort("Input streams have different number of levels!");
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -473,25 +444,18 @@ Mrotuvb(void *process)
               for (size_t j = 0; j < nlat; j++)
                 {
                   uhelp[IX2D(j, 0, nlon + 2)] = uhelp[IX2D(j, nlon, nlon + 2)];
-                  uhelp[IX2D(j, nlon + 1, nlon + 2)]
-                      = uhelp[IX2D(j, 1, nlon + 2)];
+                  uhelp[IX2D(j, nlon + 1, nlon + 2)] = uhelp[IX2D(j, 1, nlon + 2)];
                   vhelp[IX2D(j, 0, nlon + 2)] = vhelp[IX2D(j, nlon, nlon + 2)];
-                  vhelp[IX2D(j, nlon + 1, nlon + 2)]
-                      = vhelp[IX2D(j, 1, nlon + 2)];
+                  vhelp[IX2D(j, nlon + 1, nlon + 2)] = vhelp[IX2D(j, 1, nlon + 2)];
                 }
 
               /* interpolate on pressure points */
               for (size_t j = 1; j < nlat; j++)
                 for (size_t i = 0; i < nlon; i++)
                   {
-                    ufield[IX2D(j, i, nlon)]
-                        = (uhelp[IX2D(j, i, nlon + 2)]
-                           + uhelp[IX2D(j, i + 1, nlon + 2)])
-                          * 0.5;
+                    ufield[IX2D(j, i, nlon)] = (uhelp[IX2D(j, i, nlon + 2)] + uhelp[IX2D(j, i + 1, nlon + 2)]) * 0.5;
                     vfield[IX2D(j, i, nlon)]
-                        = (vhelp[IX2D(j - 1, i + 1, nlon + 2)]
-                           + vhelp[IX2D(j, i + 1, nlon + 2)])
-                          * 0.5;
+                        = (vhelp[IX2D(j - 1, i + 1, nlon + 2)] + vhelp[IX2D(j, i + 1, nlon + 2)]) * 0.5;
                   }
             }
 
@@ -503,8 +467,7 @@ Mrotuvb(void *process)
 
           /* rotate*/
 
-          rotate_uv2(ufield, vfield, nlon, nlat, grid3x, grid3y, urfield,
-                     vrfield);
+          rotate_uv2(ufield, vfield, nlon, nlat, grid3x, grid3y, urfield, vrfield);
 
           /* calc lat, lon, Auv and alpha */
           /*

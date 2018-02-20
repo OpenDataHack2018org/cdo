@@ -20,7 +20,8 @@
 #include "grid.h"
 #include "grid_search.h"
 
-extern "C" {
+extern "C"
+{
 #include "clipping/geometry.h"
 }
 
@@ -36,8 +37,7 @@ typedef struct
 } cellindex_type;
 
 static void
-copy_data_to_index(long ncells, const double *restrict data,
-                   long *restrict cellindex)
+copy_data_to_index(long ncells, const double *restrict data, long *restrict cellindex)
 {
   for (long i = 0; i < ncells; ++i)
     cellindex[i] = lround(data[i]);
@@ -67,9 +67,7 @@ read_cellindex(const char *filename)
   for (int index = 0; index < ngrids; ++index)
     {
       gridID = vlistGrid(vlistID, index);
-      if (gridInqType(gridID) == GRID_UNSTRUCTURED
-          && gridInqNvertex(gridID) == 3)
-        break;
+      if (gridInqType(gridID) == GRID_UNSTRUCTURED && gridInqNvertex(gridID) == 3) break;
     }
 
   if (gridID == -1) cdoAbort("No ICON grid found in %s!", filename);
@@ -89,10 +87,8 @@ read_cellindex(const char *filename)
       // else if ( strcmp(varname, "child_cell_index") == 0 ) cid = varID;
     }
 
-  if (nid == CDI_UNDEFID)
-    cdoAbort("neighbor_cell_index not found in %s!", filename);
-  if (pid == CDI_UNDEFID)
-    cdoAbort("parent_cell_index not found in %s!", filename);
+  if (nid == CDI_UNDEFID) cdoAbort("neighbor_cell_index not found in %s!", filename);
+  if (pid == CDI_UNDEFID) cdoAbort("parent_cell_index not found in %s!", filename);
   // if ( cid == CDI_UNDEFID ) cdoAbort("child_cell_index not found in %s!",
   // filename);
 
@@ -152,9 +148,7 @@ read_grid(const char *filename)
   for (int index = 0; index < ngrids; ++index)
     {
       gridID = vlistGrid(vlistID, index);
-      if (gridInqType(gridID) == GRID_UNSTRUCTURED
-          && gridInqNvertex(gridID) == 3)
-        break;
+      if (gridInqType(gridID) == GRID_UNSTRUCTURED && gridInqNvertex(gridID) == 3) break;
     }
 
   if (gridID == -1) cdoAbort("No ICON grid found in %s!", filename);
@@ -227,8 +221,7 @@ cmpsinfo(const void *s1, const void *s2)
 }
 
 static void
-compute_child_from_parent(cellindex_type *cellindex1,
-                          cellindex_type *cellindex2)
+compute_child_from_parent(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
   long ncells1 = cellindex1->ncells;
   long *parent1 = cellindex1->parent;
@@ -239,8 +232,7 @@ compute_child_from_parent(cellindex_type *cellindex1,
   for (long i = 1; i < ncells1; ++i)
     if (parent1[i] < parent1[i - 1])
       {
-        if (cdoVerbose)
-          cdoPrint("Sort parent index of %s!", cellindex1->filename);
+        if (cdoVerbose) cdoPrint("Sort parent index of %s!", cellindex1->filename);
         sinfo_t *sinfo = (sinfo_t *) Malloc(ncells1 * sizeof(sinfo_t));
         for (long j = 0; j < ncells1; ++j)
           {
@@ -279,8 +271,7 @@ compute_child_from_parent(cellindex_type *cellindex1,
 }
 
 static void
-read_coordinates(const char *filename, long n, double *lon, double *lat, int nv,
-                 double *lon_bnds, double *lat_bnds)
+read_coordinates(const char *filename, long n, double *lon, double *lat, int nv, double *lon_bnds, double *lat_bnds)
 {
   openLock();
   int streamID = streamOpenRead(filename);
@@ -294,13 +285,11 @@ read_coordinates(const char *filename, long n, double *lon, double *lat, int nv,
   for (int index = 0; index < ngrids; ++index)
     {
       gridID = vlistGrid(vlistID, index);
-      if (gridInqType(gridID) == GRID_UNSTRUCTURED
-          && (long) gridInqSize(gridID) == n && gridInqNvertex(gridID) == 3)
+      if (gridInqType(gridID) == GRID_UNSTRUCTURED && (long) gridInqSize(gridID) == n && gridInqNvertex(gridID) == 3)
         break;
     }
 
-  if (gridID == -1)
-    cdoAbort("No ICON grid with %ld cells found in %s!", n, filename);
+  if (gridID == -1) cdoAbort("No ICON grid with %ld cells found in %s!", n, filename);
 
   gridInqXvals(gridID, lon);
   gridInqYvals(gridID, lat);
@@ -326,31 +315,26 @@ read_coordinates(const char *filename, long n, double *lon, double *lat, int nv,
   streamClose(streamID);
 }
 
-int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors,
-                    size_t *restrict nbr_add, double *restrict nbr_dist,
+int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist,
                     double plon, double plat);
 
 int find_coordinate_to_ignore(double *cell_corners_xyz);
 double calculate_the_polygon_area(double cell_corners[], int number_corners);
 bool are_polygon_vertices_arranged_in_clockwise_order(double cell_area);
-int winding_numbers_algorithm(double cell_corners[], int number_corners,
-                              double point[]);
+int winding_numbers_algorithm(double cell_corners[], int number_corners, double point[]);
 
 #define MAX_SEARCH 128  // the triangles are distorted!
 
 static void
-compute_child_from_bounds(cellindex_type *cellindex2, long ncells2,
-                          double *grid_center_lon2, double *grid_center_lat2,
-                          double *grid_corner_lon2, double *grid_corner_lat2,
-                          long ncells1, double *grid_center_lon1,
+compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid_center_lon2, double *grid_center_lat2,
+                          double *grid_corner_lon2, double *grid_corner_lat2, long ncells1, double *grid_center_lon1,
                           double *grid_center_lat1)
 {
   bool xIsCyclic = false;
   size_t dims[2];
   dims[0] = ncells1;
   dims[1] = 0;
-  struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, ncells1,
-                                            grid_center_lon1, grid_center_lat1);
+  struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, ncells1, grid_center_lon1, grid_center_lat1);
   size_t nbr_add[MAX_SEARCH];   // source address at nearest neighbors
   double nbr_dist[MAX_SEARCH];  // angular distance four nearest neighbors
 
@@ -373,8 +357,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2,
           /* Conversion of corner spherical coordinates to Cartesian
            * coordinates. */
 
-          LLtoXYZ(grid_corner_lon2[cell_no2 * ncorner + corner_no],
-                  grid_corner_lat2[cell_no2 * ncorner + corner_no],
+          LLtoXYZ(grid_corner_lon2[cell_no2 * ncorner + corner_no], grid_corner_lat2[cell_no2 * ncorner + corner_no],
                   corner_coordinates);
 
           /* The components of the result vector are appended to the list of
@@ -399,42 +382,33 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2,
         case 1:
           for (int corner_no = 0; corner_no <= ncorner; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 1];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 2];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 1];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 2];
             }
           break;
         case 2:
           for (int corner_no = 0; corner_no <= ncorner; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 2];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 0];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 2];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 0];
             }
           break;
         case 3:
           for (int corner_no = 0; corner_no <= ncorner; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 0];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 1];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 0];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 1];
             }
           break;
         }
 
-      double polygon_area = calculate_the_polygon_area(
-          cell_corners_plane_projection, ncorner + 1);
-      bool is_clockwise
-          = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
+      double polygon_area = calculate_the_polygon_area(cell_corners_plane_projection, ncorner + 1);
+      bool is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
 
       if (invert_result) is_clockwise = !is_clockwise;
       if (is_clockwise) continue;
 
-      grid_search_nbr(gs, MAX_SEARCH, nbr_add, nbr_dist,
-                      grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
+      grid_search_nbr(gs, MAX_SEARCH, nbr_add, nbr_dist, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
       int k = 0;
 
       for (int i = 0; i < MAX_SEARCH; ++i)
@@ -442,8 +416,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2,
           size_t cell_no1 = nbr_add[i];
           if (cell_no1 < SIZE_MAX)
             {
-              LLtoXYZ(grid_center_lon1[cell_no1], grid_center_lat1[cell_no1],
-                      center_point_xyz);
+              LLtoXYZ(grid_center_lon1[cell_no1], grid_center_lat1[cell_no1], center_point_xyz);
 
               switch (coordinate_to_ignore)
                 {
@@ -461,9 +434,8 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2,
                   break;
                 }
 
-              int winding_number = winding_numbers_algorithm(
-                  cell_corners_plane_projection, ncorner + 1,
-                  center_point_plane_projection);
+              int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, ncorner + 1,
+                                                             center_point_plane_projection);
               // printf("%d %g %g %g %g %d\n", cell_no2,
               // RAD2DEG*grid_center_lon2[cell_no2],
               // RAD2DEG*grid_center_lat2[cell_no2],
@@ -483,8 +455,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2,
 }
 
 static void
-compute_child_from_coordinates(cellindex_type *cellindex1,
-                               cellindex_type *cellindex2)
+compute_child_from_coordinates(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
   long ncells1 = cellindex1->ncells;
   long ncells2 = cellindex2->ncells;
@@ -497,11 +468,9 @@ compute_child_from_coordinates(cellindex_type *cellindex1,
   double *lat2_bnds = (double *) Malloc(3 * ncells2 * sizeof(double));
 
   read_coordinates(cellindex1->filename, ncells1, lon1, lat1, 0, NULL, NULL);
-  read_coordinates(cellindex2->filename, ncells2, lon2, lat2, 3, lon2_bnds,
-                   lat2_bnds);
+  read_coordinates(cellindex2->filename, ncells2, lon2, lat2, 3, lon2_bnds, lat2_bnds);
 
-  compute_child_from_bounds(cellindex2, ncells2, lon2, lat2, lon2_bnds,
-                            lat2_bnds, ncells1, lon1, lat1);
+  compute_child_from_bounds(cellindex2, ncells2, lon2, lat2, lon2_bnds, lat2_bnds, ncells1, lon1, lat1);
 
   Free(lon1);
   Free(lat1);
@@ -534,13 +503,11 @@ compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
 }
 
 static void
-compute_sum(long i, long *n, double *sum, double *sumq, long kci,
-            cellindex_type **cellindex, double *array)
+compute_sum(long i, long *n, double *sum, double *sumq, long kci, cellindex_type **cellindex, double *array)
 {
   // printf("compute: i, kci %d %d\n", i, kci);
   long ncells2 = cellindex[kci]->ncells;
-  if (i < 0 || i > ncells2)
-    cdoAbort("Child grid cell index %ld out of bounds %ld!", i, ncells2);
+  if (i < 0 || i > ncells2) cdoAbort("Child grid cell index %ld out of bounds %ld!", i, ncells2);
 
   for (int k = 0; k < MAX_CHILDS; ++k)
     {
@@ -558,8 +525,7 @@ compute_sum(long i, long *n, double *sum, double *sumq, long kci,
 }
 
 static void
-samplegrid(double missval, long nci, cellindex_type **cellindex, double *array1,
-           double *array2, double *array3)
+samplegrid(double missval, long nci, cellindex_type **cellindex, double *array1, double *array2, double *array3)
 {
   static bool lstat = true;
   long kci = nci - 1;
@@ -568,7 +534,7 @@ samplegrid(double missval, long nci, cellindex_type **cellindex, double *array1,
   double x = 0;
 #ifdef _OPENMP
   //#pragma omp parallel for default(none) shared(missval, ncells2, kci,
-  //cellindex, array1, array2, array3)
+  // cellindex, array1, array2, array3)
 #endif
   for (long i = 0; i < ncells2; ++i)
     {
@@ -576,8 +542,7 @@ samplegrid(double missval, long nci, cellindex_type **cellindex, double *array1,
       double sum = 0, sumq = 0;
       compute_sum(i, &n, &sum, &sumq, kci, cellindex, array1);
       array2[i] = n ? sum / n : missval;  // mean
-      double var1
-          = (n * n > n) ? (sumq * n - sum * sum) / (n * n - n) : missval;
+      double var1 = (n * n > n) ? (sumq * n - sum * sum) / (n * n - n) : missval;
       if (var1 < 0 && var1 > -1.e-5) var1 = 0;
       array3[i] = varToStd(var1, missval);  // std1
       if (lstat && n)
@@ -614,9 +579,7 @@ Samplegridicon(void *process)
     {
       cellindex[i] = read_cellindex(operatorArgv()[i]);
       cellindex[i]->filename = operatorArgv()[i];
-      if (cdoVerbose)
-        cdoPrint("Found %ld grid cells in %s", cellindex[i]->ncells,
-                 cellindex[i]->filename);
+      if (cdoVerbose) cdoPrint("Found %ld grid cells in %s", cellindex[i]->ncells, cellindex[i]->filename);
     }
 
   for (int i = 0; i < nsamplegrids - 1; ++i)
@@ -631,8 +594,7 @@ Samplegridicon(void *process)
   long gridsize = vlistGridsizeMax(vlistID1);
   if (cdoVerbose) cdoPrint("Source gridsize = %zu", gridsize);
   if (gridsize != cellindex[0]->ncells)
-    cdoAbort("Gridsize (%ld) of input stream and first grid (%ld) differ!",
-             gridsize, cellindex[0]->ncells);
+    cdoAbort("Gridsize (%ld) of input stream and first grid (%ld) differ!", gridsize, cellindex[0]->ncells);
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
   double *array1 = (double *) Malloc(gridsize * sizeof(double));
 
@@ -651,8 +613,7 @@ Samplegridicon(void *process)
       int gridID = vlistGrid(vlistID1, index);
       int gridtype = gridInqType(gridID);
       if (!(gridtype == GRID_UNSTRUCTURED && gridInqNvertex(gridID) == 3))
-        cdoAbort("Unsupported gridtype: %s with %d corners",
-                 gridNamePtr(gridtype), gridInqNvertex(gridID));
+        cdoAbort("Unsupported gridtype: %s with %d corners", gridNamePtr(gridtype), gridInqNvertex(gridID));
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
       vlistChangeGridIndex(vlistID3, index, gridID2);
@@ -686,8 +647,7 @@ Samplegridicon(void *process)
 
           double missval = vlistInqVarMissval(vlistID1, varID);
 
-          samplegrid(missval, nsamplegrids, &cellindex[0], array1, array2,
-                     array3);
+          samplegrid(missval, nsamplegrids, &cellindex[0], array1, array2, array3);
 
           nmiss = arrayNumMV(gridsize2, array2, missval);
           pstreamDefRecord(streamID2, varID, levelID);

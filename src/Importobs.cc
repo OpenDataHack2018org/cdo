@@ -27,8 +27,7 @@ static void
 init_vars(int vlistID, int gridID, int zaxisID, int nvars)
 {
   int code[] = { 11, 17, 33, 34, 1, 2 /*, 3*/ };
-  const char *name[]
-      = { "temp", "depoint", "u", "v", "height", "pressure" /*, "station"*/ };
+  const char *name[] = { "temp", "depoint", "u", "v", "height", "pressure" /*, "station"*/ };
   const char *units[] = { "Celsius", "", "m/s", "m/s", "m", "hPa" /*, ""*/ };
   int varID;
 
@@ -104,8 +103,7 @@ Importobs(void *process)
 
   int gridID = cdoDefineGrid(operatorArgv()[0]);
 
-  if (gridInqType(gridID) != GRID_LONLAT)
-    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID)));
+  if (gridInqType(gridID) != GRID_LONLAT) cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID)));
 
   size_t gridsize = gridInqSize(gridID);
   int xsize = gridInqXsize(gridID);
@@ -160,8 +158,8 @@ Importobs(void *process)
   int tsID = 0;
   while (readline(fp, line, MAX_LINE_LEN))
     {
-      sscanf(line, "%s %s %s %g %g %g %d %g %g %g", dummy, station, datetime,
-             &lat, &lon, &height1, &code, &pressure, &height2, &value);
+      sscanf(line, "%s %s %s %g %g %g %d %g %g %g", dummy, station, datetime, &lat, &lon, &height1, &code, &pressure,
+             &height2, &value);
       sscanf(datetime, "%d_%d", &vdate, &vtime);
 
       if (vdate != vdate0 || vtime != vtime0)
@@ -229,9 +227,7 @@ Importobs(void *process)
   for (i = 0; i < nvars; ++i)
     Free(data[i]);
 
-  if (cdoVerbose)
-    printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax,
-           latmin, latmax);
+  if (cdoVerbose) printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax, latmin, latmax);
 
   processDefVarNum(vlistNvars(vlistID));
 

@@ -85,8 +85,7 @@ farcpy(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridsize1;
-  if (len != nwpv * gridsize2)
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != nwpv * gridsize2) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (field2.memtype == MEMTYPE_FLOAT)
     for (size_t i = 0; i < len; i++)
@@ -113,8 +112,7 @@ faradd(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -158,8 +156,7 @@ farsum(field_type *field1, field_type field2)
 
   size_t len = nwpv * gridsize1;
 
-  if (len != nwpv * gridsize2)
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != nwpv * gridsize2) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -196,8 +193,7 @@ farsumw(field_type *field1, field_type field2, double w)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -239,8 +235,7 @@ farsumtr(field_type *occur, field_type field, const double refval)
   double *restrict farray = field.ptr;
 
   size_t len = gridInqSize(occur->grid);
-  if (len != gridInqSize(field.grid))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != gridInqSize(field.grid)) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (occur->nmiss > 0 || field.nmiss > 0)
     {
@@ -251,8 +246,7 @@ farsumtr(field_type *occur, field_type field, const double refval)
         if (!DBL_IS_EQUAL(farray[i], fmissval))
           {
             if (!DBL_IS_EQUAL(oarray[i], omissval))
-              oarray[i]
-                  = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : oarray[i] + 1.0;
+              oarray[i] = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : oarray[i] + 1.0;
             else
               oarray[i] = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : 1.0;
           }
@@ -290,8 +284,7 @@ farsumq(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -337,8 +330,7 @@ farsumqw(field_type *field1, field_type field2, double w)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -376,8 +368,7 @@ farsub(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -409,8 +400,7 @@ farmul(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -440,8 +430,7 @@ fardiv(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   for (size_t i = 0; i < len; i++)
     array1[i] = DIVMN(array1[i], array2[i]);
@@ -463,14 +452,11 @@ faratan2(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   for (size_t i = 0; i < len; i++)
-    array1[i]
-        = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2)
-              ? missval1
-              : atan2(array1[i], array2[i]);
+    array1[i] = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ? missval1
+                                                                                       : atan2(array1[i], array2[i]);
 
   field1->nmiss = arrayNumMV(len, array1, missval1);
 }
@@ -489,8 +475,7 @@ farsetmiss(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1)
     {
@@ -517,8 +502,7 @@ farmin(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -526,9 +510,7 @@ farmin(field_type *field1, field_type field2)
         {
           array1[i] = DBL_IS_EQUAL(array2[i], missval2)
                           ? array1[i]
-                          : DBL_IS_EQUAL(array1[i], missval1)
-                                ? array2[i]
-                                : MIN(array1[i], array2[i]);
+                          : DBL_IS_EQUAL(array1[i], missval1) ? array2[i] : MIN(array1[i], array2[i]);
         }
 
       field1->nmiss = arrayNumMV(len, array1, missval1);
@@ -556,8 +538,7 @@ farmax(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
@@ -565,9 +546,7 @@ farmax(field_type *field1, field_type field2)
         {
           array1[i] = DBL_IS_EQUAL(array2[i], missval2)
                           ? array1[i]
-                          : DBL_IS_EQUAL(array1[i], missval1)
-                                ? array2[i]
-                                : MAX(array1[i], array2[i]);
+                          : DBL_IS_EQUAL(array1[i], missval1) ? array2[i] : MAX(array1[i], array2[i]);
         }
 
       field1->nmiss = arrayNumMV(len, array1, missval1);
@@ -597,8 +576,7 @@ farvar(field_type *field1, field_type field2, field_type field3, int divisor)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ((nmiss1 || nmiss2) /*&& (DBL_IS_NAN(missval1) || DBL_IS_NAN(missval2))*/)
     {
@@ -634,8 +612,7 @@ farstd(field_type *field1, field_type field2, field_type field3, int divisor)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   farvar(field1, field2, field3, divisor);
 
@@ -671,16 +648,14 @@ farcvar(field_type *field1, field_type field2, int nsets, int divisor)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nsetx == 0)
     {
       for (size_t i = 0; i < len; i++)
         array1[i] = missval1;
     }
-  else if ((nmiss1
-            || nmiss2) /*&& (DBL_IS_NAN(missval1) || DBL_IS_NAN(missval2))*/)
+  else if ((nmiss1 || nmiss2) /*&& (DBL_IS_NAN(missval1) || DBL_IS_NAN(missval2))*/)
     {
       for (size_t i = 0; i < len; i++)
         {
@@ -714,8 +689,7 @@ farcstd(field_type *field1, field_type field2, int nsets, int divisor)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   farcvar(field1, field2, nsets, divisor);
 
@@ -748,8 +722,7 @@ farmoq(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss2 > 0)
     {
@@ -783,8 +756,7 @@ farmoqw(field_type *field1, field_type field2, double w)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss2 > 0)
     {
@@ -832,8 +804,7 @@ farcount(field_type *field1, field_type field2)
   if (nwpv != 2) nwpv = 1;
 
   size_t len = nwpv * gridInqSize(grid1);
-  if (len != (nwpv * gridInqSize(grid2)))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != (nwpv * gridInqSize(grid2))) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {

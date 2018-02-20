@@ -96,8 +96,7 @@ Merstat(void *process)
   index = 0;
   gridID1 = vlistGrid(vlistID1, index);
 
-  if (gridInqType(gridID1) == GRID_LONLAT
-      || gridInqType(gridID1) == GRID_GAUSSIAN
+  if (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN
       || gridInqType(gridID1) == GRID_GENERIC)
     {
       gridID2 = gridToMeridional(gridID1);
@@ -147,9 +146,7 @@ Merstat(void *process)
           if (wstatus != 0 && tsID == 0 && levelID == 0)
             {
               vlistInqVarName(vlistID1, varID, varname);
-              cdoWarning(
-                  "Using constant grid cell area weights for variable %s!",
-                  varname);
+              cdoWarning("Using constant grid cell area weights for variable %s!", varname);
             }
           field1.missval = vlistInqVarMissval(vlistID1, varID);
           field2.missval = vlistInqVarMissval(vlistID1, varID);

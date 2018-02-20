@@ -28,8 +28,7 @@
 #include "pstream_int.h"
 
 static void
-mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss,
-        double missval)
+mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, double missval)
 {
   size_t ilat;
   int ilev, n;
@@ -79,8 +78,7 @@ mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss,
           for (ilat = 0; ilat < nlat; ilat++)
             {
               field2[ilev][ilat]
-                  += fact * (field1[n][ilat] + field1[n + 1][ilat])
-                     * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
+                  += fact * (field1[n][ilat] + field1[n + 1][ilat]) * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
             }
     }
   else
@@ -96,8 +94,7 @@ mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss,
                 }
               else
                 field2[ilev][ilat]
-                    += fact * (field1[n][ilat] + field1[n + 1][ilat])
-                       * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
+                    += fact * (field1[n][ilat] + field1[n + 1][ilat]) * cosphi[ilat] * (plevel[n] - plevel[n + 1]);
             }
     }
 
@@ -132,8 +129,7 @@ Mastrfu(void *process)
   double missval = vlistInqVarMissval(vlistID1, 0);
 
   int zaxisID = vlistInqVarZaxis(vlistID1, 0);
-  if (zaxisInqType(zaxisID) != ZAXIS_PRESSURE
-      && zaxisInqType(zaxisID) != ZAXIS_GENERIC)
+  if (zaxisInqType(zaxisID) != ZAXIS_PRESSURE && zaxisInqType(zaxisID) != ZAXIS_GENERIC)
     {
       char longname[CDI_MAX_NAME];
       zaxisInqLongname(zaxisID, longname);

@@ -23,8 +23,7 @@
 #define MAX_LINE_LEN 65536
 
 void
-cdo_read_field(const char *name, char *pline, int size, double *field,
-               int *lineno, FILE *fp, const char *dname)
+cdo_read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *fp, const char *dname)
 {
   char line[MAX_LINE_LEN];
   double fval;
@@ -37,8 +36,7 @@ cdo_read_field(const char *name, char *pline, int size, double *field,
         {
           (*lineno)++;
           if (!readline(fp, line, MAX_LINE_LEN))
-            cdoAbort("Incomplete command: >%s< (line: %d file: %s)", name,
-                     *lineno, dname);
+            cdoAbort("Incomplete command: >%s< (line: %d file: %s)", name, *lineno, dname);
           pline = line;
           fval = strtod(pline, &endptr);
         }
@@ -54,8 +52,7 @@ typedef struct
 } kvmap_t;
 
 static void
-grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
-               size_t *iproj, size_t *igmap, const char *dname)
+grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *iproj, size_t *igmap, const char *dname)
 {
   char uuidStr[256];
 
@@ -105,8 +102,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
           else if (STR_IS_EQ(gridtype, "generic"))
             grid->type = GRID_GENERIC;
           else
-            cdoAbort("Invalid gridtype: %s (grid description file: %s)",
-                     gridtype, dname);
+            cdoAbort("Invalid gridtype: %s (grid description file: %s)", gridtype, dname);
 
           if (grid->type == GRID_LONLAT || grid->type == GRID_GAUSSIAN)
             grid->nvertex = 2;
@@ -122,8 +118,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
           else if (STR_IS_EQ(datatype, "float"))
             grid->datatype = CDI_DATATYPE_FLT32;
           else
-            cdoAbort("Invalid datatype: %s (zaxis description file: %s)",
-                     datatype, dname);
+            cdoAbort("Invalid datatype: %s (zaxis description file: %s)", datatype, dname);
         }
       else if (STR_IS_EQ(key, "gridsize"))
         grid->size = parameter2sizet(value);
@@ -229,13 +224,8 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
         grid->uvRelativeToGrid = parameter2bool(value);
       else if (STR_IS_EQ(key, "xvals"))
         {
-          size_t size = (grid->type == GRID_CURVILINEAR
-                         || grid->type == GRID_UNSTRUCTURED)
-                            ? grid->size
-                            : grid->xsize;
-          if (size == 0)
-            cdoAbort("xsize or gridsize undefined (grid description file: %s)!",
-                     dname);
+          size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->xsize;
+          if (size == 0) cdoAbort("xsize or gridsize undefined (grid description file: %s)!", dname);
           if (size != nvalues)
             cdoAbort("xsize=%zu and size of xvals=%zu differ (grid description "
                      "file: %s)!",
@@ -247,13 +237,8 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
         }
       else if (STR_IS_EQ(key, "yvals"))
         {
-          size_t size = (grid->type == GRID_CURVILINEAR
-                         || grid->type == GRID_UNSTRUCTURED)
-                            ? grid->size
-                            : grid->ysize;
-          if (size == 0)
-            cdoAbort("ysize or gridsize undefined (grid description file: %s)!",
-                     dname);
+          size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->ysize;
+          if (size == 0) cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
           if (size != nvalues)
             cdoAbort("ysize=%zu and size of yvals=%zu differ (grid description "
                      "file: %s)!",
@@ -265,51 +250,36 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
         }
       else if (STR_IS_EQ(key, "xbounds"))
         {
-          size_t size = (grid->type == GRID_CURVILINEAR
-                         || grid->type == GRID_UNSTRUCTURED)
-                            ? grid->size
-                            : grid->xsize;
-          if (size == 0)
-            cdoAbort("xsize or gridsize undefined (grid description file: %s)!",
-                     dname);
-          if (grid->nvertex == 0)
-            cdoAbort("nvertex undefined (grid description file: %s)!", dname);
+          size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->xsize;
+          if (size == 0) cdoAbort("xsize or gridsize undefined (grid description file: %s)!", dname);
+          if (grid->nvertex == 0) cdoAbort("nvertex undefined (grid description file: %s)!", dname);
           if (grid->nvertex * size != nvalues)
             cdoAbort("Number of xbounds=%zu and size of xbounds=%zu differ "
                      "(grid description file: %s)!",
                      nvalues, grid->nvertex * size, dname);
 
-          grid->xbounds
-              = (double *) Malloc(grid->nvertex * size * sizeof(double));
+          grid->xbounds = (double *) Malloc(grid->nvertex * size * sizeof(double));
           for (size_t i = 0; i < grid->nvertex * size; ++i)
             grid->xbounds[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "ybounds"))
         {
-          size_t size = (grid->type == GRID_CURVILINEAR
-                         || grid->type == GRID_UNSTRUCTURED)
-                            ? grid->size
-                            : grid->ysize;
-          if (size == 0)
-            cdoAbort("ysize or gridsize undefined (grid description file: %s)!",
-                     dname);
-          if (grid->nvertex == 0)
-            cdoAbort("nvertex undefined (grid description file: %s)!", dname);
+          size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->ysize;
+          if (size == 0) cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
+          if (grid->nvertex == 0) cdoAbort("nvertex undefined (grid description file: %s)!", dname);
           if (grid->nvertex * size != nvalues)
             cdoAbort("Number of ybounds=%zu and size of ybounds=%zu differ "
                      "(grid description file: %s)!",
                      nvalues, grid->nvertex * size, dname);
 
-          grid->ybounds
-              = (double *) Malloc(grid->nvertex * size * sizeof(double));
+          grid->ybounds = (double *) Malloc(grid->nvertex * size * sizeof(double));
           for (size_t i = 0; i < grid->nvertex * size; ++i)
             grid->ybounds[i] = parameter2double(kv->values[i]);
         }
       else if (STR_IS_EQ(key, "gridlatlon"))
         {
           if (grid->size == 0) grid->size = grid->xsize * grid->ysize;
-          if (grid->size == 0)
-            cdoAbort("gridsize undefined (grid description file: %s)!", dname);
+          if (grid->size == 0) cdoAbort("gridsize undefined (grid description file: %s)!", dname);
           if ((size_t) grid->size * 2 != nvalues)
             cdoAbort("Number of gridlonlat values=%zu and size of grid=%zu "
                      "differ (grid description file: %s)!",
@@ -325,8 +295,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
       else if (STR_IS_EQ(key, "mask"))
         {
           size_t size = grid->size;
-          if (grid->size == 0)
-            cdoAbort("gridsize undefined (grid description file: %s)!", dname);
+          if (grid->size == 0) cdoAbort("gridsize undefined (grid description file: %s)!", dname);
           if (size != nvalues)
             cdoAbort("Number of mask values=%zu and size of grid=%zu differ "
                      "(grid description file: %s)!",
@@ -347,8 +316,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
       else if (STR_IS_EQ(key, "rowlon"))
         {
           size_t size = grid->ysize;
-          if (size == 0)
-            cdoAbort("ysize undefined (grid description file: %s)!", dname);
+          if (size == 0) cdoAbort("ysize undefined (grid description file: %s)!", dname);
           grid->rowlon = (int *) Malloc(size * sizeof(int));
           for (size_t i = 0; i < size; ++i)
             {
@@ -366,8 +334,7 @@ grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid,
           break;
         }
       else
-        cdoAbort("Invalid key word >%s< (grid description file: %s)", key,
-                 dname);
+        cdoAbort("Invalid key word >%s< (grid description file: %s)", key, dname);
     }
 }
 
@@ -389,19 +356,16 @@ grid_read_mapping(size_t igmap, size_t nkv, kvmap_t *kvmap, int gridID)
 
       if (STR_IS_EQ(key, "grid_mapping"))
         {
-          cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int) strlen(value) + 1,
-                           value);
+          cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int) strlen(value) + 1, value);
           continue;
         }
 
       if (STR_IS_EQ(key, "grid_mapping_name"))
-        cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int) strlen(value) + 1,
-                         value);
+        cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int) strlen(value) + 1, value);
 
       int dtype = literals_find_datatype(nvalues, kv->values);
 
-      if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16
-          || dtype == CDI_DATATYPE_INT32)
+      if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32)
         {
           int *ivals = (int *) Malloc(nvalues * sizeof(int));
           for (size_t i = 0; i < nvalues; ++i)
@@ -444,14 +408,11 @@ grid_read(FILE *gfp, const char *dname)
     {
       keyValues_t *kv = *(keyValues_t **) kvnode->data;
       if (ik == 0 && !STR_IS_EQ(kv->key, "gridtype"))
-        cdoAbort(
-            "First grid description key word must be >gridtype< (found: %s)!",
-            kv->key);
+        cdoAbort("First grid description key word must be >gridtype< (found: %s)!", kv->key);
 
       if (kv->nvalues == 0)
         {
-          cdoWarning("Grid description key word %s has no values, skipped!",
-                     kv->key);
+          cdoWarning("Grid description key word %s has no values, skipped!", kv->key);
         }
       else
         {
@@ -480,8 +441,7 @@ grid_read(FILE *gfp, const char *dname)
           gridInit(&proj);
           grid_read_data(iproj, nkv, kvmap, &proj, &iproj, &igmap, dname);
 
-          int projID
-              = (proj.type == CDI_UNDEFID) ? CDI_UNDEFID : gridDefine(proj);
+          int projID = (proj.type == CDI_UNDEFID) ? CDI_UNDEFID : gridDefine(proj);
           if (projID != CDI_UNDEFID)
             {
               gridDefProj(gridID, projID);

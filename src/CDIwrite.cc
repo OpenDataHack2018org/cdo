@@ -26,8 +26,8 @@ const char *filetypestr(int filetype);
 const char *datatypestr(int datatype);
 
 static void
-print_stat(const char *sinfo, int memtype, int datatype, int filetype,
-           off_t nvalues, double data_size, double file_size, double tw)
+print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size,
+           double file_size, double tw)
 {
   nvalues /= 1000000;
   data_size /= 1024. * 1024. * 1024.;
@@ -36,19 +36,18 @@ print_stat(const char *sinfo, int memtype, int datatype, int filetype,
   if (tw > 0) rout = nvalues / tw;
 
   if (memtype == MEMTYPE_FLOAT)
-    cdoPrint("%s Wrote %.1f GB of 32 bit floats to %s %s, %.1f MVal/s", sinfo,
-             data_size, datatypestr(datatype), filetypestr(filetype), rout);
+    cdoPrint("%s Wrote %.1f GB of 32 bit floats to %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype),
+             filetypestr(filetype), rout);
   else
-    cdoPrint("%s Wrote %.1f GB of 64 bit floats to %s %s, %.1f MVal/s", sinfo,
-             data_size, datatypestr(datatype), filetypestr(filetype), rout);
+    cdoPrint("%s Wrote %.1f GB of 64 bit floats to %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype),
+             filetypestr(filetype), rout);
 
   file_size /= 1024. * 1024. * 1024.;
 
   rout = 0;
   if (tw > 0) rout = 1024 * file_size / tw;
 
-  cdoPrint("%s Wrote %.1f GB in %.1f seconds, total %.1f MB/s", sinfo,
-           file_size, tw, rout);
+  cdoPrint("%s Wrote %.1f GB in %.1f seconds, total %.1f MB/s", sinfo, file_size, tw, rout);
 }
 
 void *
@@ -73,8 +72,7 @@ CDIwrite(void *process)
 
   cdoInitialize(process);
 
-  if (cdoVerbose)
-    cdoPrint("parameter: <nruns, <grid, <nlevs, <ntimesteps, <nvars>>>>>");
+  if (cdoVerbose) cdoPrint("parameter: <nruns, <grid, <nlevs, <ntimesteps, <nvars>>>>>");
 
   if (operatorArgc() > 5) cdoAbort("Too many arguments!");
 
@@ -123,8 +121,7 @@ CDIwrite(void *process)
   int gridID2 = gridID;
   if (gridInqType(gridID) == GRID_GME) gridID2 = gridToUnstructured(gridID, 0);
 
-  if (gridInqType(gridID) != GRID_UNSTRUCTURED
-      && gridInqType(gridID) != GRID_CURVILINEAR)
+  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
     gridID2 = gridToCurvilinear(gridID, 0);
 
   gridInqXvals(gridID2, &xvals[0]);
@@ -233,13 +230,10 @@ CDIwrite(void *process)
 
       if (nruns > 1) snprintf(sinfo, sizeof(sinfo), "(run %d)", irun + 1);
 
-      print_stat(sinfo, memtype, datatype, filetype, nvalues, data_size,
-                 file_size, tw);
+      print_stat(sinfo, memtype, datatype, filetype, nvalues, data_size, file_size, tw);
     }
 
-  if (nruns > 1)
-    print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size,
-               file_size, twsum / nruns);
+  if (nruns > 1) print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size, file_size, twsum / nruns);
 
   vlistDestroy(vlistID);
 

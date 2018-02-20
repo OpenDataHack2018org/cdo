@@ -39,8 +39,8 @@
 #include "percentiles.h"
 
 static void
-print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID,
-                  double sglval, double *fieldptr, int vdate, int vtime)
+print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr,
+                  int vdate, int vtime)
 {
   static bool showHeader = true;
   int code = vlistInqVarCode(vlistID, varID);
@@ -49,8 +49,7 @@ print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID,
   cdiDecodeDate(vdate, &year, &month, &day);
   cdiDecodeTime(vtime, &hour, &minute, &second);
 
-  if (gridInqType(gridID) == GRID_GAUSSIAN
-      || gridInqType(gridID) == GRID_LONLAT)
+  if (gridInqType(gridID) == GRID_GAUSSIAN || gridInqType(gridID) == GRID_LONLAT)
     {
       int zaxisID = vlistInqVarZaxis(vlistID, varID);
       double level = cdoZaxisInqLevel(zaxisID, levelID);
@@ -78,8 +77,7 @@ print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID,
                 fprintf(stdout,
                         "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g "
                         "%9.7g %12.5g\n",
-                        year, month, day, hour, minute, second, code, level,
-                        xval, yval, sglval);
+                        year, month, day, hour, minute, second, code, level, xval, yval, sglval);
               }
           }
     }
@@ -94,18 +92,15 @@ fldstatGetParameter(bool *weights)
       char **pargv = operatorArgv();
 
       list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "FLDSTAT");
-      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0)
-        cdoAbort("Parse error!");
+      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0) cdoAbort("Parse error!");
       if (cdoVerbose) kvlist_print(kvlist);
 
       for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
         {
           keyValues_t *kv = *(keyValues_t **) kvnode->data;
           const char *key = kv->key;
-          if (kv->nvalues > 1)
-            cdoAbort("Too many values for parameter key >%s<!", key);
-          if (kv->nvalues < 1)
-            cdoAbort("Missing value for parameter key >%s<!", key);
+          if (kv->nvalues > 1) cdoAbort("Too many values for parameter key >%s<!", key);
+          if (kv->nvalues < 1) cdoAbort("Missing value for parameter key >%s<!", key);
           const char *value = kv->values[0];
 
           if (STR_IS_EQ(key, "weights"))
@@ -252,12 +247,10 @@ Fldstat(void *process)
             }
 
           field.missval = vlistInqVarMissval(vlistID1, varID);
-          double sglval = (operfunc == func_pctl) ? fldpctl(field, pn)
-                                                  : fldfun(field, operfunc);
+          double sglval = (operfunc == func_pctl) ? fldpctl(field, pn) : fldfun(field, operfunc);
 
           if (cdoVerbose && (operfunc == func_min || operfunc == func_max))
-            print_location_LL(operfunc, vlistID1, varID, levelID, field.grid,
-                              sglval, field.ptr, vdate, vtime);
+            print_location_LL(operfunc, vlistID1, varID, levelID, field.grid, sglval, field.ptr, vdate, vtime);
 
           nmiss = DBL_IS_EQUAL(sglval, field.missval);
 

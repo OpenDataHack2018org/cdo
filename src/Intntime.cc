@@ -127,11 +127,8 @@ Intntime(void *process)
 
       for (int it = 1; it < numts; it++)
         {
-          double seconds = it
-                           * juldate_to_seconds(juldate_sub(juldate2, juldate1))
-                           / numts;
-          juldate_t juldate
-              = juldate_add_seconds((int) lround(seconds), juldate1);
+          double seconds = it * juldate_to_seconds(juldate_sub(juldate2, juldate1)) / numts;
+          juldate_t juldate = juldate_add_seconds((int) lround(seconds), juldate1);
 
           juldate_decode(calendar, juldate, &vdate, &vtime);
 
@@ -175,16 +172,11 @@ Intntime(void *process)
 
                   for (size_t i = 0; i < gridsize; i++)
                     {
-                      if (!DBL_IS_EQUAL(single1[i], missval1)
-                          && !DBL_IS_EQUAL(single2[i], missval2))
+                      if (!DBL_IS_EQUAL(single1[i], missval1) && !DBL_IS_EQUAL(single2[i], missval2))
                         array[i] = single1[i] * fac1 + single2[i] * fac2;
-                      else if (DBL_IS_EQUAL(single1[i], missval1)
-                               && !DBL_IS_EQUAL(single2[i], missval2)
-                               && fac2 >= 0.5)
+                      else if (DBL_IS_EQUAL(single1[i], missval1) && !DBL_IS_EQUAL(single2[i], missval2) && fac2 >= 0.5)
                         array[i] = single2[i];
-                      else if (DBL_IS_EQUAL(single2[i], missval2)
-                               && !DBL_IS_EQUAL(single1[i], missval1)
-                               && fac1 >= 0.5)
+                      else if (DBL_IS_EQUAL(single2[i], missval2) && !DBL_IS_EQUAL(single1[i], missval1) && fac1 >= 0.5)
                         array[i] = single1[i];
                       else
                         {

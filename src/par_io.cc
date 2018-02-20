@@ -51,8 +51,7 @@ readRecord(void *arg)
 }
 
 void
-parReadRecord(int streamID, int *varID, int *levelID, double *array,
-              size_t *nmiss, par_io_t *parIO)
+parReadRecord(int streamID, int *varID, int *levelID, double *array, size_t *nmiss, par_io_t *parIO)
 {
   int lpario = FALSE;
   int recID = 0, nrecs = 0;
@@ -107,8 +106,7 @@ parReadRecord(int streamID, int *varID, int *levelID, double *array,
           if (recID == 0)
             {
               pthread_attr_init(&parIO->attr);
-              pthread_attr_setdetachstate(&parIO->attr,
-                                          PTHREAD_CREATE_JOINABLE);
+              pthread_attr_setdetachstate(&parIO->attr, PTHREAD_CREATE_JOINABLE);
             }
 
           read_arg->streamID = streamID;

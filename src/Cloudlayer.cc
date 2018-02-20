@@ -73,8 +73,7 @@ vct2plev(const double *vct, double *plevs, long nlevs)
 }
 
 static void
-hl_index(int *kmax, int *kmin, double pmax, double pmin, long nhlevs,
-         double *pph)
+hl_index(int *kmax, int *kmin, double pmax, double pmin, long nhlevs, double *pph)
 {
   long k;
   long MaxLev, MinLev;
@@ -94,8 +93,7 @@ hl_index(int *kmax, int *kmin, double pmax, double pmin, long nhlevs,
 }
 
 static void
-pl_index(int *kmax, int *kmin, double pmax, double pmin, long nlevs,
-         double *plevs)
+pl_index(int *kmax, int *kmin, double pmax, double pmin, long nlevs, double *plevs)
 {
   long k;
   long MaxLev = -1, MinLev = -1;
@@ -175,8 +173,7 @@ Cloudlayer(void *process)
       if (code == aclcac_code)
         {
           aclcac_code_found = 1;
-          if (zaxisInqType(zaxisID) == ZAXIS_PRESSURE
-              || zaxisInqType(zaxisID) == ZAXIS_HYBRID)
+          if (zaxisInqType(zaxisID) == ZAXIS_PRESSURE || zaxisInqType(zaxisID) == ZAXIS_HYBRID)
             {
               aclcacID = varID;
               break;
@@ -322,8 +319,7 @@ Cloudlayer(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          size_t offset
-              = zrev ? (nlevel - 1 - levelID) * gridsize : levelID * gridsize;
+          size_t offset = zrev ? (nlevel - 1 - levelID) * gridsize : levelID * gridsize;
 
           if (varID == aclcacID)
             {
@@ -341,8 +337,7 @@ Cloudlayer(void *process)
       for (varID = 0; varID < nvars2; ++varID)
         {
           if (kmax[varID] != -1 && kmin[varID] != -1)
-            layer_cloud(aclcac, cloud[varID], kmax[varID], kmin[varID],
-                        gridsize);
+            layer_cloud(aclcac, cloud[varID], kmax[varID], kmin[varID], gridsize);
         }
 
       for (varID = 0; varID < nvars2; ++varID)

@@ -50,12 +50,8 @@ datetime2str(int date, int time, char *datetimestr, int maxlen)
   int hour, minute, second;
   cdiDecodeTime(time, &hour, &minute, &second);
 
-  int len = sprintf(datetimestr, DATE_FORMAT "T" TIME_FORMAT, year, month, day,
-                    hour, minute, second);
-  if (len > (maxlen - 1))
-    fprintf(stderr,
-            "Internal problem (%s): sizeof input string is too small!\n",
-            __func__);
+  int len = sprintf(datetimestr, DATE_FORMAT "T" TIME_FORMAT, year, month, day, hour, minute, second);
+  if (len > (maxlen - 1)) fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", __func__);
 }
 
 void
@@ -65,10 +61,7 @@ date2str(int date, char *datestr, int maxlen)
   cdiDecodeDate(date, &year, &month, &day);
 
   int len = sprintf(datestr, DATE_FORMAT, year, month, day);
-  if (len > (maxlen - 1))
-    fprintf(stderr,
-            "Internal problem (%s): sizeof input string is too small!\n",
-            __func__);
+  if (len > (maxlen - 1)) fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", __func__);
 }
 
 void
@@ -78,10 +71,7 @@ time2str(int time, char *timestr, int maxlen)
   cdiDecodeTime(time, &hour, &minute, &second);
 
   int len = sprintf(timestr, TIME_FORMAT, hour, minute, second);
-  if (len > (maxlen - 1))
-    fprintf(stderr,
-            "Internal problem (%s): sizeof input string is too small!\n",
-            __func__);
+  if (len > (maxlen - 1)) fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", __func__);
 }
 
 const char *
@@ -127,8 +117,7 @@ printFiletype(int streamID, int vlistID)
   // clang-format on
 
   int nvars = vlistNvars(vlistID);
-  int comps[] = { CDI_COMPRESS_ZIP, CDI_COMPRESS_JPEG, CDI_COMPRESS_SZIP,
-                  CDI_COMPRESS_AEC };
+  int comps[] = { CDI_COMPRESS_ZIP, CDI_COMPRESS_JPEG, CDI_COMPRESS_SZIP, CDI_COMPRESS_AEC };
   unsigned kk = 0;
   for (unsigned k = 0; k < sizeof(comps) / sizeof(int); ++k)
     for (int varID = 0; varID < nvars; varID++)
@@ -191,8 +180,7 @@ print_yvals(int gridID, int dig)
         {
           int gridtype = gridInqType(gridID);
           fprintf(stdout, " to %.*g", dig, ylast);
-          if (IS_NOT_EQUAL(yinc, 0) && gridtype != GRID_GAUSSIAN
-              && gridtype != GRID_GAUSSIAN_REDUCED)
+          if (IS_NOT_EQUAL(yinc, 0) && gridtype != GRID_GAUSSIAN && gridtype != GRID_GAUSSIAN_REDUCED)
             fprintf(stdout, " by %.*g", dig, yinc);
         }
       fprintf(stdout, " %s", yunits);
@@ -205,8 +193,7 @@ print_xyvals2D(int gridID, int dig)
 {
   if (gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL))
     {
-      char xname[CDI_MAX_NAME], yname[CDI_MAX_NAME], xunits[CDI_MAX_NAME],
-          yunits[CDI_MAX_NAME];
+      char xname[CDI_MAX_NAME], yname[CDI_MAX_NAME], xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
       gridInqXname(gridID, xname);
       gridInqYname(gridID, yname);
       gridInqXunits(gridID, xunits);
@@ -239,8 +226,7 @@ print_xyvals2D(int gridID, int dig)
           size_t xsize = gridInqXsize(gridID);
           if (xsize > 1)
             {
-              double *xvals
-                  = (double *) malloc((size_t) xsize * sizeof(double));
+              double *xvals = (double *) malloc((size_t) xsize * sizeof(double));
               for (size_t i = 0; i < xsize; ++i)
                 xvals[i] = xvals2D[i];
               xinc = fabs(xvals[xsize - 1] - xvals[0]) / (xsize - 1);
@@ -255,8 +241,7 @@ print_xyvals2D(int gridID, int dig)
           size_t ysize = gridInqYsize(gridID);
           if (ysize > 1)
             {
-              double *yvals
-                  = (double *) malloc((size_t) ysize * sizeof(double));
+              double *yvals = (double *) malloc((size_t) ysize * sizeof(double));
               for (size_t i = 0; i < ysize; ++i)
                 yvals[i] = yvals2D[i * xsize];
               yinc = fabs(yvals[ysize - 1] - yvals[0]) / (ysize - 1);
@@ -293,9 +278,7 @@ printGridInfoKernel(int gridID, int index, bool lproj)
   int gridtype = gridInqType(gridID);
 
   if (lproj && gridtype != GRID_PROJECTION)
-    fprintf(stderr,
-            "Internal problem (%s): sub grid not equal GRID_PROJECTION!\n",
-            __func__);
+    fprintf(stderr, "Internal problem (%s): sub grid not equal GRID_PROJECTION!\n", __func__);
 
   int trunc = gridInqTrunc(gridID);
   size_t gridsize = gridInqSize(gridID);
@@ -322,8 +305,7 @@ printGridInfoKernel(int gridID, int index, bool lproj)
       fprintf(stdout, " : ");
     }
 
-  if (gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION
-      || gridtype == GRID_GENERIC || gridtype == GRID_CHARXY
+  if (gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION || gridtype == GRID_GENERIC || gridtype == GRID_CHARXY
       || gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED)
     {
       if (!lproj)
@@ -369,8 +351,7 @@ printGridInfoKernel(int gridID, int index, bool lproj)
       if (gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL))
         {
           fprintf(stdout, "%33s :", "available");
-          if (gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL))
-            fprintf(stdout, " cellbounds");
+          if (gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL)) fprintf(stdout, " cellbounds");
           if (gridHasArea(gridID)) fprintf(stdout, " area");
           if (gridInqMask(gridID, NULL)) fprintf(stdout, " mask");
           fprintf(stdout, "\n");
@@ -381,8 +362,7 @@ printGridInfoKernel(int gridID, int index, bool lproj)
 #ifdef CDO
       set_text_color(stdout, RESET, GREEN);
 #endif
-      fprintf(stdout, "points=%zu  nsp=%zu  truncation=%d", gridsize,
-              gridsize / 2, trunc);
+      fprintf(stdout, "points=%zu  nsp=%zu  truncation=%d", gridsize, gridsize / 2, trunc);
       if (gridInqComplexPacking(gridID)) fprintf(stdout, "  complexPacking");
       my_reset_text_color(stdout);
       fprintf(stdout, "\n");
@@ -392,8 +372,7 @@ printGridInfoKernel(int gridID, int index, bool lproj)
 #ifdef CDO
       set_text_color(stdout, RESET, GREEN);
 #endif
-      fprintf(stdout, "points=%zu  nfc=%zu  truncation=%d\n", gridsize,
-              gridsize / 2, trunc);
+      fprintf(stdout, "points=%zu  nfc=%zu  truncation=%d\n", gridsize, gridsize / 2, trunc);
       my_reset_text_color(stdout);
     }
   else if (gridtype == GRID_GME)
@@ -426,9 +405,7 @@ printGridInfoKernel(int gridID, int index, bool lproj)
         {
           int number = gridInqNumber(gridID);
           int position = gridInqPosition(gridID);
-          if (number > 0)
-            fprintf(stdout, "%33s : number=%d  position=%d\n", "grid", number,
-                    position);
+          if (number > 0) fprintf(stdout, "%33s : number=%d  position=%d\n", "grid", number, position);
 
           if (gridInqReference(gridID, NULL))
             {
@@ -454,12 +431,10 @@ printGridInfoKernel(int gridID, int index, bool lproj)
 
   if (gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED)
     {
-      if (gridHasArea(gridID) || gridInqXbounds(gridID, NULL)
-          || gridInqYbounds(gridID, NULL))
+      if (gridHasArea(gridID) || gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL))
         {
           fprintf(stdout, "%33s :", "available");
-          if (gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL))
-            fprintf(stdout, " cellbounds");
+          if (gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL)) fprintf(stdout, " cellbounds");
           if (gridHasArea(gridID)) fprintf(stdout, " area");
           if (gridInqMask(gridID, NULL)) fprintf(stdout, " mask");
           fprintf(stdout, "\n");
@@ -541,12 +516,10 @@ printZaxisInfo(int vlistID)
 
       if (zaxisInqLevels(zaxisID, NULL))
         {
-          double *levels
-              = (double *) malloc((size_t) levelsize * sizeof(double));
+          double *levels = (double *) malloc((size_t) levelsize * sizeof(double));
           zaxisInqLevels(zaxisID, levels);
 
-          if (!(zaxistype == ZAXIS_SURFACE && levelsize == 1
-                && !(fabs(levels[0]) > 0)))
+          if (!(zaxistype == ZAXIS_SURFACE && levelsize == 1 && !(fabs(levels[0]) > 0)))
             {
               double zfirst = levels[0];
               double zlast = levels[levelsize - 1];
@@ -554,8 +527,7 @@ printZaxisInfo(int vlistID)
                 {
                   zinc = (levels[levelsize - 1] - levels[0]) / (levelsize - 1);
                   for (int levelID = 2; levelID < levelsize; ++levelID)
-                    if (fabs(fabs(levels[levelID] - levels[levelID - 1]) - zinc)
-                        > 0.001 * zinc)
+                    if (fabs(fabs(levels[levelID] - levels[levelID - 1]) - zinc) > 0.001 * zinc)
                       {
                         zinc = 0;
                         break;
@@ -566,8 +538,7 @@ printZaxisInfo(int vlistID)
               if (levelsize > 1)
                 {
                   fprintf(stdout, " to %.*g", dig, zlast);
-                  if (IS_NOT_EQUAL(zinc, 0))
-                    fprintf(stdout, " by %.*g", dig, zinc);
+                  if (IS_NOT_EQUAL(zinc, 0)) fprintf(stdout, " by %.*g", dig, zinc);
                 }
               fprintf(stdout, " %s", zunits);
               fprintf(stdout, "\n");
@@ -645,9 +616,7 @@ printSubtypeInfo(int vlistID)
       int subtypeID = vlistSubtype(vlistID, index);
       int subtypesize = subtypeInqSize(subtypeID);
       // subtypePrint(subtypeID);
-      fprintf(stdout,
-              "  %4d : %-24s :", vlistSubtypeIndex(vlistID, subtypeID) + 1,
-              "tiles");
+      fprintf(stdout, "  %4d : %-24s :", vlistSubtypeIndex(vlistID, subtypeID) + 1, "tiles");
       fprintf(stdout, " ntiles=%d", subtypesize);
       fprintf(stdout, "\n");
     }
@@ -744,8 +713,7 @@ printTimesteps(int streamID, int taxisID, int verbose)
       else
         {
           if (tsID == 2 * NUM_TIMESTEP) fprintf(stdout, "\n   ");
-          if (tsID >= 2 * NUM_TIMESTEP)
-            ndotout = printDot(ndotout, &nfact, &ncout);
+          if (tsID >= 2 * NUM_TIMESTEP) ndotout = printDot(ndotout, &nfact, &ncout);
 
           if (nvdatetime < NUM_TIMESTEP)
             {

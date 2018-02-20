@@ -91,8 +91,7 @@ Selvar(void *process)
 
   int args_are_numeric = operatorArgc() > 0 && isdigit(*operatorArgv()[0]);
 
-  if (TAKES_STRINGS(operatorID)
-      && !(TAKES_INTEGERS(operatorID) && args_are_numeric))
+  if (TAKES_STRINGS(operatorID) && !(TAKES_INTEGERS(operatorID) && args_are_numeric))
     {
       nsel = operatorArgc();
       argnames = operatorArgv();
@@ -138,8 +137,7 @@ Selvar(void *process)
   int nvars = vlistNvars(vlistID1);
   bool *vars = (bool *) Malloc(nvars * sizeof(bool));
 
-  if (operatorID == SELGRID && !args_are_numeric && nsel == 1
-      && strncmp(argnames[0], "var=", 4) == 0)
+  if (operatorID == SELGRID && !args_are_numeric && nsel == 1 && strncmp(argnames[0], "var=", 4) == 0)
     {
       const char *gridvarname = argnames[0] + 4;
       if (*gridvarname == 0) cdoAbort("Variable name missing!");
@@ -205,14 +203,11 @@ Selvar(void *process)
               else if (operatorID == SELGRID && args_are_numeric)
                 found = intarr[isel] == (grididx + 1);
               else if (operatorID == SELGRID && !args_are_numeric)
-                found = memcmp(argnames[isel], gridname, strlen(argnames[isel]))
-                        == 0;
+                found = memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0;
               else if (operatorID == SELZAXIS && args_are_numeric)
                 found = intarr[isel] == (zaxisidx + 1);
               else if (operatorID == SELZAXIS && !args_are_numeric)
-                found = memcmp(argnames[isel], zaxistypename,
-                               strlen(argnames[isel]))
-                        == 0;
+                found = memcmp(argnames[isel], zaxistypename, strlen(argnames[isel])) == 0;
               else if (operatorID == SELZAXISNAME)
                 found = wildcardmatch(argnames[isel], zaxisname) == 0;
               else if (operatorID == SELTABNUM)
@@ -228,8 +223,7 @@ Selvar(void *process)
 
               if (found)
                 {
-                  vlistDefFlag(vlistID1, varID, levID,
-                               !INVERTS_SELECTION(operatorID));
+                  vlistDefFlag(vlistID1, varID, levID, !INVERTS_SELECTION(operatorID));
                   selfound[isel] = true;
                   vars[varID] = ldelete ? false : true;
                 }
@@ -252,8 +246,7 @@ Selvar(void *process)
               if (psvarid != -1 && !vars[psvarid])
                 {
                   vars[psvarid] = true;
-                  vlistDefFlag(vlistID1, psvarid, 0,
-                               !INVERTS_SELECTION(operatorID));
+                  vlistDefFlag(vlistID1, psvarid, 0, !INVERTS_SELECTION(operatorID));
                 }
             }
         }
@@ -270,8 +263,7 @@ Selvar(void *process)
           else if (operatorID == SELNAME || operatorID == DELNAME)
             cdoWarning("Variable name %s not found!", argnames[isel]);
           else if (operatorID == SELSTDNAME)
-            cdoWarning("Variable with standard name %s not found!",
-                       argnames[isel]);
+            cdoWarning("Variable with standard name %s not found!", argnames[isel]);
           else if (operatorID == SELLEVEL)
             cdoWarning("Level %g not found!", fltarr[isel]);
           else if (operatorID == SELLEVIDX)

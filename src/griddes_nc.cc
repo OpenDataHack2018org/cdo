@@ -45,8 +45,7 @@ cdf_openread(const char *filename)
   openLock();
   int istat = nc_open(filename, NC_NOWRITE, &nc_file_id);
   openUnlock();
-  if (istat != NC_NOERR)
-    cdoAbort("Open failed on %s! %s", filename, nc_strerror(istat));
+  if (istat != NC_NOERR) cdoAbort("Open failed on %s! %s", filename, nc_strerror(istat));
   fileID = nc_file_id;
 #else
   cdoWarning("NetCDF support not compiled in!");
@@ -95,14 +94,10 @@ gridFromNCfile(const char *gridfile)
 
       /* check variables */
       if (nc_inq_varid(nc_file_id, "grid_dims", &nc_griddims_id) != NC_NOERR
-          || nc_inq_varid(nc_file_id, "grid_center_lat", &nc_gridlat_id)
-                 != NC_NOERR
-          || nc_inq_varid(nc_file_id, "grid_center_lon", &nc_gridlon_id)
-                 != NC_NOERR
-          || nc_inq_varid(nc_file_id, "grid_corner_lat", &nc_gridclat_id)
-                 != NC_NOERR
-          || nc_inq_varid(nc_file_id, "grid_corner_lon", &nc_gridclon_id)
-                 != NC_NOERR)
+          || nc_inq_varid(nc_file_id, "grid_center_lat", &nc_gridlat_id) != NC_NOERR
+          || nc_inq_varid(nc_file_id, "grid_center_lon", &nc_gridlon_id) != NC_NOERR
+          || nc_inq_varid(nc_file_id, "grid_corner_lat", &nc_gridclat_id) != NC_NOERR
+          || nc_inq_varid(nc_file_id, "grid_corner_lon", &nc_gridclon_id) != NC_NOERR)
         return gridID;
 
       nce(nc_get_var_int(nc_file_id, nc_griddims_id, grid_dims));
@@ -115,9 +110,7 @@ gridFromNCfile(const char *gridfile)
       else
         {
           grid.type = GRID_CURVILINEAR;
-          if (grid.nvertex != 4)
-            cdoAbort("curvilinear grid with %d corners unsupported",
-                     grid.nvertex);
+          if (grid.nvertex != 4) cdoAbort("curvilinear grid with %d corners unsupported", grid.nvertex);
 
           grid.xsize = grid_dims[0];
           grid.ysize = grid_dims[1];
@@ -128,14 +121,11 @@ gridFromNCfile(const char *gridfile)
 
       grid.xvals = (double *) Malloc(grid.size * sizeof(double));
       grid.yvals = (double *) Malloc(grid.size * sizeof(double));
-      grid.xbounds
-          = (double *) Malloc(grid.nvertex * grid.size * sizeof(double));
-      grid.ybounds
-          = (double *) Malloc(grid.nvertex * grid.size * sizeof(double));
+      grid.xbounds = (double *) Malloc(grid.nvertex * grid.size * sizeof(double));
+      grid.ybounds = (double *) Malloc(grid.nvertex * grid.size * sizeof(double));
 
       nce(nc_inq_vartype(nc_file_id, nc_gridlat_id, &xtype));
-      grid.datatype
-          = (xtype == NC_FLOAT) ? CDI_DATATYPE_FLT32 : CDI_DATATYPE_FLT64;
+      grid.datatype = (xtype == NC_FLOAT) ? CDI_DATATYPE_FLT32 : CDI_DATATYPE_FLT64;
 
       nce(nc_get_var_double(nc_file_id, nc_gridlon_id, grid.xvals));
       nce(nc_get_var_double(nc_file_id, nc_gridlat_id, grid.yvals));
@@ -200,8 +190,7 @@ writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   int gridtype = gridInqType(gridID);
   size_t gridsize = gridInqSize(gridID);
 
-  nc_type xtype
-      = (gridInqDatatype(gridID) == CDI_DATATYPE_FLT64) ? NC_DOUBLE : NC_FLOAT;
+  nc_type xtype = (gridInqDatatype(gridID) == CDI_DATATYPE_FLT64) ? NC_DOUBLE : NC_FLOAT;
 
   if (gridtype == GRID_CURVILINEAR)
     {
@@ -235,24 +224,20 @@ writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "title", len, gridfile));
 
   if (CDO_Version_Info)
-    nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO",
-                        (int) strlen(cdoComment()) + 1, cdoComment()));
+    nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO", (int) strlen(cdoComment()) + 1, cdoComment()));
 
   /* define grid size dimension */
 
   nce(nc_def_dim(nc_file_id, "grid_size", gridsize, &nc_gridsize_id));
   if (gridtype == GRID_CURVILINEAR)
     {
-      nce(nc_def_dim(nc_file_id, "grid_xsize", gridInqXsize(gridID),
-                     &nc_gridxsize_id));
-      nce(nc_def_dim(nc_file_id, "grid_ysize", gridInqYsize(gridID),
-                     &nc_gridysize_id));
+      nce(nc_def_dim(nc_file_id, "grid_xsize", gridInqXsize(gridID), &nc_gridxsize_id));
+      nce(nc_def_dim(nc_file_id, "grid_ysize", gridInqYsize(gridID), &nc_gridysize_id));
     }
 
   /* define grid corner dimension */
 
-  nce(nc_def_dim(nc_file_id, "grid_corners", gridInqNvertex(gridID),
-                 &nc_gridcorn_id));
+  nce(nc_def_dim(nc_file_id, "grid_corners", gridInqNvertex(gridID), &nc_gridcorn_id));
 
   /* define grid rank dimension */
 
@@ -260,8 +245,7 @@ writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 
   /* define grid dimension size array */
 
-  nce(nc_def_var(nc_file_id, "grid_dims", NC_INT, 1, &nc_gridrank_id,
-                 &nc_griddims_id));
+  nce(nc_def_var(nc_file_id, "grid_dims", NC_INT, 1, &nc_gridrank_id, &nc_griddims_id));
 
   /* define grid center latitude array */
 
@@ -277,32 +261,24 @@ writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
       nc_dims_id[0] = nc_gridsize_id;
     }
 
-  nce(nc_def_var(nc_file_id, "grid_center_lat", xtype, ndims, nc_dims_id,
-                 &nc_gridlat_id));
+  nce(nc_def_var(nc_file_id, "grid_center_lat", xtype, ndims, nc_dims_id, &nc_gridlat_id));
 
-  nce(nc_put_att_text(nc_file_id, nc_gridlat_id, "units", strlen(units),
-                      units));
-  nce(nc_put_att_text(nc_file_id, nc_gridlat_id, "bounds", 15,
-                      "grid_corner_lat"));
+  nce(nc_put_att_text(nc_file_id, nc_gridlat_id, "units", strlen(units), units));
+  nce(nc_put_att_text(nc_file_id, nc_gridlat_id, "bounds", 15, "grid_corner_lat"));
 
   /* define grid center longitude array */
 
-  nce(nc_def_var(nc_file_id, "grid_center_lon", xtype, ndims, nc_dims_id,
-                 &nc_gridlon_id));
+  nce(nc_def_var(nc_file_id, "grid_center_lon", xtype, ndims, nc_dims_id, &nc_gridlon_id));
 
-  nce(nc_put_att_text(nc_file_id, nc_gridlon_id, "units", strlen(units),
-                      units));
-  nce(nc_put_att_text(nc_file_id, nc_gridlon_id, "bounds", 15,
-                      "grid_corner_lon"));
+  nce(nc_put_att_text(nc_file_id, nc_gridlon_id, "units", strlen(units), units));
+  nce(nc_put_att_text(nc_file_id, nc_gridlon_id, "bounds", 15, "grid_corner_lon"));
 
   /* define grid mask */
 
-  nce(nc_def_var(nc_file_id, "grid_imask", NC_INT, ndims, nc_dims_id,
-                 &nc_grdimask_id));
+  nce(nc_def_var(nc_file_id, "grid_imask", NC_INT, ndims, nc_dims_id, &nc_grdimask_id));
 
   nce(nc_put_att_text(nc_file_id, nc_grdimask_id, "units", 8, "unitless"));
-  nce(nc_put_att_text(nc_file_id, nc_grdimask_id, "coordinates", 31,
-                      "grid_center_lon grid_center_lat"));
+  nce(nc_put_att_text(nc_file_id, nc_grdimask_id, "coordinates", 31, "grid_center_lon grid_center_lat"));
 
   /* define grid corner latitude array */
 
@@ -320,19 +296,15 @@ writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
       nc_dims_id[1] = nc_gridcorn_id;
     }
 
-  nce(nc_def_var(nc_file_id, "grid_corner_lat", xtype, ndims, nc_dims_id,
-                 &nc_gridclat_id));
+  nce(nc_def_var(nc_file_id, "grid_corner_lat", xtype, ndims, nc_dims_id, &nc_gridclat_id));
 
-  nce(nc_put_att_text(nc_file_id, nc_gridclat_id, "units", strlen(units),
-                      units));
+  nce(nc_put_att_text(nc_file_id, nc_gridclat_id, "units", strlen(units), units));
 
   /* define grid corner longitude array */
 
-  nce(nc_def_var(nc_file_id, "grid_corner_lon", xtype, ndims, nc_dims_id,
-                 &nc_gridclon_id));
+  nce(nc_def_var(nc_file_id, "grid_corner_lon", xtype, ndims, nc_dims_id, &nc_gridclon_id));
 
-  nce(nc_put_att_text(nc_file_id, nc_gridclon_id, "units", strlen(units),
-                      units));
+  nce(nc_put_att_text(nc_file_id, nc_gridclon_id, "units", strlen(units), units));
 
   /* end definition stage */
 

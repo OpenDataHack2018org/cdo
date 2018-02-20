@@ -46,9 +46,7 @@ check_ncorner(int ncorner, const double *lon_bounds, const double *lat_bounds)
   int k;
 
   for (k = ncorner - 1; k > 0; --k)
-    if (IS_NOT_EQUAL(lon_bounds[k], lon_bounds[k - 1])
-        || IS_NOT_EQUAL(lat_bounds[k], lat_bounds[k - 1]))
-      break;
+    if (IS_NOT_EQUAL(lon_bounds[k], lon_bounds[k - 1]) || IS_NOT_EQUAL(lat_bounds[k], lat_bounds[k - 1])) break;
 
   if (k < ncorner - 1) ncorner_new = k + 1;
 
@@ -76,8 +74,7 @@ make_cyclic(double *array1, double *array2, int nlon, int nlat)
 }
 
 static void
-output_vrml(int nlon, int nlat, int ngp, double *restrict array, double missval,
-            CPT *cpt)
+output_vrml(int nlon, int nlat, int ngp, double *restrict array, double missval, CPT *cpt)
 {
   double minval, maxval, meanval;
   arrayMinMaxMeanMV(ngp, array, missval, &minval, &maxval, &meanval);
@@ -143,12 +140,9 @@ output_vrml(int nlon, int nlat, int ngp, double *restrict array, double missval,
               {
                 //  r = cpt->lut[n].rgb_high[0];  g = cpt->lut[n].rgb_high[1];
                 //  b = cpt->lut[n].rgb_high[2];
-                r = intlin(val, cpt->lut[n].rgb_low[0], cpt->lut[n].z_low,
-                           cpt->lut[n].rgb_high[0], cpt->lut[n].z_high);
-                g = intlin(val, cpt->lut[n].rgb_low[1], cpt->lut[n].z_low,
-                           cpt->lut[n].rgb_high[1], cpt->lut[n].z_high);
-                b = intlin(val, cpt->lut[n].rgb_low[2], cpt->lut[n].z_low,
-                           cpt->lut[n].rgb_high[2], cpt->lut[n].z_high);
+                r = intlin(val, cpt->lut[n].rgb_low[0], cpt->lut[n].z_low, cpt->lut[n].rgb_high[0], cpt->lut[n].z_high);
+                g = intlin(val, cpt->lut[n].rgb_low[1], cpt->lut[n].z_low, cpt->lut[n].rgb_high[1], cpt->lut[n].z_high);
+                b = intlin(val, cpt->lut[n].rgb_low[2], cpt->lut[n].z_low, cpt->lut[n].rgb_high[2], cpt->lut[n].z_high);
               }
           }
         else
@@ -221,22 +215,18 @@ Outputgmt(void *process)
       if (ninc < 1) cdoAbort("Increment must be greater than 0!");
     }
 
-  if (operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT)
-    luse_grid_corner = true;
+  if (operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT) luse_grid_corner = true;
 
-  if (operatorID == OUTPUTCENTERCPT || operatorID == OUTPUTBOUNDSCPT
-      || operatorID == OUTPUTVRML)
+  if (operatorID == OUTPUTCENTERCPT || operatorID == OUTPUTBOUNDSCPT || operatorID == OUTPUTVRML)
     {
       operatorCheckArgc(1);
       char *cpt_file = operatorArgv()[0];
 
       FILE *cpt_fp = fopen(cpt_file, "r");
-      if (cpt_fp == NULL)
-        cdoAbort("Open failed on color palette table %s", cpt_file);
+      if (cpt_fp == NULL) cdoAbort("Open failed on color palette table %s", cpt_file);
 
       int status = cptRead(cpt_fp, &cpt);
-      if (status != 0)
-        cdoAbort("Error during read of color palette table %s", cpt_file);
+      if (status != 0) cdoAbort("Error during read of color palette table %s", cpt_file);
 
       if (cdoVerbose) cptWrite(stderr, cpt);
     }
@@ -255,8 +245,7 @@ Outputgmt(void *process)
 
   if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 1);
 
-  if (gridInqType(gridID) != GRID_UNSTRUCTURED
-      && gridInqType(gridID) != GRID_CURVILINEAR)
+  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
     {
       gridID = gridToCurvilinear(gridID, 1);
       lgrid_gen_bounds = true;
@@ -300,8 +289,7 @@ Outputgmt(void *process)
         cdoAbort("Bounds not available hovmoeller data!");
     }
 
-  int ncorner
-      = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? gridInqNvertex(gridID) : 4;
+  int ncorner = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? gridInqNvertex(gridID) : 4;
 
   bool grid_is_circular = gridIsCircular(gridID);
 
@@ -352,10 +340,8 @@ Outputgmt(void *process)
     {
       if (ncorner == 0) cdoAbort("grid corner missing!");
       size_t nalloc = ncorner * gridsize;
-      grid_corner_lat
-          = (double *) Realloc(grid_corner_lat, nalloc * sizeof(double));
-      grid_corner_lon
-          = (double *) Realloc(grid_corner_lon, nalloc * sizeof(double));
+      grid_corner_lat = (double *) Realloc(grid_corner_lat, nalloc * sizeof(double));
+      grid_corner_lon = (double *) Realloc(grid_corner_lon, nalloc * sizeof(double));
 
       if (gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL))
         {
@@ -370,22 +356,16 @@ Outputgmt(void *process)
               char yunitstr[CDI_MAX_NAME];
               gridInqXunits(gridID, xunitstr);
               gridInqYunits(gridID, yunitstr);
-              if (!lzon)
-                grid_cell_center_to_bounds_X2D(
-                    xunitstr, nlon, nlat, grid_center_lon, grid_corner_lon, 0);
-              if (!lmer)
-                grid_cell_center_to_bounds_Y2D(
-                    yunitstr, nlon, nlat, grid_center_lat, grid_corner_lat);
+              if (!lzon) grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon, grid_corner_lon, 0);
+              if (!lmer) grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat, grid_corner_lat);
             }
           else
             cdoAbort("Grid corner missing!");
         }
 
       /* Note: using units from latitude instead from bounds */
-      grid_to_degree(units, ncorner * gridsize, grid_corner_lon,
-                     "grid corner lon");
-      grid_to_degree(units, ncorner * gridsize, grid_corner_lat,
-                     "grid corner lat");
+      grid_to_degree(units, ncorner * gridsize, grid_corner_lon, "grid corner lon");
+      grid_to_degree(units, ncorner * gridsize, grid_corner_lat, "grid corner lat");
 
       if (zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL))
         {
@@ -396,8 +376,7 @@ Outputgmt(void *process)
         {
           zaxis_lower_lev[0] = zaxis_center_lev[0];
           for (int i = 1; i < nlev; ++i)
-            zaxis_lower_lev[i]
-                = 0.5 * (zaxis_center_lev[i] + zaxis_center_lev[i - 1]);
+            zaxis_lower_lev[i] = 0.5 * (zaxis_center_lev[i] + zaxis_center_lev[i - 1]);
 
           zaxis_upper_lev[nlev - 1] = zaxis_center_lev[nlev - 1];
           for (int i = 0; i < nlev - 1; ++i)
@@ -405,8 +384,8 @@ Outputgmt(void *process)
 
           if (cdoVerbose)
             for (int i = 0; i < nlev; ++i)
-              fprintf(stderr, "level: %d %g %g %g\n", i + 1, zaxis_lower_lev[i],
-                      zaxis_center_lev[i], zaxis_upper_lev[i]);
+              fprintf(stderr, "level: %d %g %g %g\n", i + 1, zaxis_lower_lev[i], zaxis_center_lev[i],
+                      zaxis_upper_lev[i]);
         }
     }
 
@@ -453,8 +432,7 @@ Outputgmt(void *process)
           else
             fprintf(stdout, "# Mode     = horizonal\n");
 
-          if (operatorID == OUTPUTVECTOR)
-            fprintf(stdout, "# Increment = %d\n", ninc);
+          if (operatorID == OUTPUTVECTOR) fprintf(stdout, "# Increment = %d\n", ninc);
           fprintf(stdout, "#\n");
           fprintf(stdout, "# File  = %s\n", cdoGetStreamName(0).c_str());
           fprintf(stdout, "# Date  = %s\n", vdatestr);
@@ -474,32 +452,26 @@ Outputgmt(void *process)
 
           pstreamReadRecord(streamID, array, &nmiss);
 
-          if (operatorID == OUTPUTCENTER2 && grid_is_circular)
-            make_cyclic(array, array2, nlon, nlat);
+          if (operatorID == OUTPUTCENTER2 && grid_is_circular) make_cyclic(array, array2, nlon, nlat);
 
           double level = zaxis_center_lev[levelID];
 
-          if ((tsID == 0 || lzon || lmer) && operatorID != OUTPUTTRI)
-            fprintf(stdout, "# Level = %g\n", level);
+          if ((tsID == 0 || lzon || lmer) && operatorID != OUTPUTTRI) fprintf(stdout, "# Level = %g\n", level);
           if (lhov) fprintf(stdout, "# Timestep = %d\n", tsID + 1);
 
           if (operatorID != OUTPUTTRI) fprintf(stdout, "#\n");
 
-          if (operatorID == OUTPUTCENTER || operatorID == OUTPUTCENTER2
-              || operatorID == OUTPUTCENTERCPT)
+          if (operatorID == OUTPUTCENTER || operatorID == OUTPUTCENTER2 || operatorID == OUTPUTCENTERCPT)
             {
               if (cdoVerbose)
                 {
                   double minval, maxval, meanval;
-                  arrayMinMaxMeanMV(gridsize, array, missval, &minval, &maxval,
-                                    &meanval);
+                  arrayMinMaxMeanMV(gridsize, array, missval, &minval, &maxval, &meanval);
                   double range = maxval - minval;
-                  fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n",
-                          minval, maxval, range / 20);
+                  fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range / 20);
                   fprintf(stderr, "pscontour -K -JQ0/10i -Rd -I -Cgmt.cpt "
                                   "data.gmt > gmtplot.ps\n");
-                  fprintf(stderr,
-                          "pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps\n");
+                  fprintf(stderr, "pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps\n");
                 }
 
               for (int i = 0; i < nvals; i++)
@@ -509,34 +481,27 @@ Outputgmt(void *process)
                   if (operatorID == OUTPUTCENTER)
                     {
                       if (lzon)
-                        fprintf(stdout, " %g  %g  %g\n", grid_center_lat[i],
-                                level, array[i]);
+                        fprintf(stdout, " %g  %g  %g\n", grid_center_lat[i], level, array[i]);
                       else if (lmer)
-                        fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i],
-                                level, array[i]);
+                        fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i], level, array[i]);
                       else if (lhov)
-                        fprintf(stdout, " %d  %g  %g\n", tsID + 1,
-                                grid_center_lat[i], array[i]);
+                        fprintf(stdout, " %d  %g  %g\n", tsID + 1, grid_center_lat[i], array[i]);
                       else
-                        fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i],
-                                grid_center_lat[i], array[i]);
+                        fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i], grid_center_lat[i], array[i]);
                     }
                   else if (operatorID == OUTPUTCENTER2)
                     {
-                      fprintf(stdout, " %g  %g  %g\n", plon[i], plat[i],
-                              parray[i]);
+                      fprintf(stdout, " %g  %g  %g\n", plon[i], plat[i], parray[i]);
                     }
                   else
                     {
                       if (lzon)
-                        fprintf(stdout, " %g  %g  %g\n", grid_center_lat[i],
-                                level, array[i]);
+                        fprintf(stdout, " %g  %g  %g\n", grid_center_lat[i], level, array[i]);
                       else if (lmer)
-                        fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i],
-                                level, array[i]);
+                        fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i], level, array[i]);
                       else
-                        fprintf(stdout, " %g  %g  %g  %g\n", grid_center_lon[i],
-                                grid_center_lat[i], array[i], array[i]);
+                        fprintf(stdout, " %g  %g  %g  %g\n", grid_center_lon[i], grid_center_lat[i], array[i],
+                                array[i]);
                     }
                 }
               fprintf(stdout, "#\n");
@@ -545,8 +510,7 @@ Outputgmt(void *process)
             {
               int c1, c2, c3;
               int ip1;
-              if (gridInqType(gridID) != GRID_CURVILINEAR)
-                cdoAbort("Unsupported grid!");
+              if (gridInqType(gridID) != GRID_CURVILINEAR) cdoAbort("Unsupported grid!");
 
               int mlon = nlon - 1;
               /* if ( gridIsCircular(gridID) ) mlon = nlon; */
@@ -577,25 +541,18 @@ Outputgmt(void *process)
                 for (int i = 0; i < nlon; i += ninc)
                   {
                     /* compute length of velocity vector */
-                    auv[IX2D(j, i, nlon)]
-                        = sqrt(uf[IX2D(j, i, nlon)] * uf[IX2D(j, i, nlon)]
-                               + vf[IX2D(j, i, nlon)] * vf[IX2D(j, i, nlon)]);
+                    auv[IX2D(j, i, nlon)] = sqrt(uf[IX2D(j, i, nlon)] * uf[IX2D(j, i, nlon)]
+                                                 + vf[IX2D(j, i, nlon)] * vf[IX2D(j, i, nlon)]);
 
-                    alpha[IX2D(j, i, nlon)]
-                        = atan2(vf[IX2D(j, i, nlon)], uf[IX2D(j, i, nlon)]);
-                    alpha[IX2D(j, i, nlon)]
-                        = 90. - alpha[IX2D(j, i, nlon)] * RAD2DEG;
+                    alpha[IX2D(j, i, nlon)] = atan2(vf[IX2D(j, i, nlon)], uf[IX2D(j, i, nlon)]);
+                    alpha[IX2D(j, i, nlon)] = 90. - alpha[IX2D(j, i, nlon)] * RAD2DEG;
 
-                    if (alpha[IX2D(j, i, nlon)] < 0)
-                      alpha[IX2D(j, i, nlon)] += 360;
-                    if (alpha[IX2D(j, i, nlon)] > 360)
-                      alpha[IX2D(j, i, nlon)] -= 360;
+                    if (alpha[IX2D(j, i, nlon)] < 0) alpha[IX2D(j, i, nlon)] += 360;
+                    if (alpha[IX2D(j, i, nlon)] > 360) alpha[IX2D(j, i, nlon)] -= 360;
 
                     if (fabs(auv[IX2D(j, i, nlon)]) > 0)
-                      fprintf(stdout, " %g  %g  %g  %g\n",
-                              grid_center_lon[IX2D(j, i, nlon)],
-                              grid_center_lat[IX2D(j, i, nlon)],
-                              alpha[IX2D(j, i, nlon)], auv[IX2D(j, i, nlon)]);
+                      fprintf(stdout, " %g  %g  %g  %g\n", grid_center_lon[IX2D(j, i, nlon)],
+                              grid_center_lat[IX2D(j, i, nlon)], alpha[IX2D(j, i, nlon)], auv[IX2D(j, i, nlon)]);
                   }
 
               fprintf(stdout, "#\n");
@@ -610,18 +567,15 @@ Outputgmt(void *process)
               if (cdoVerbose)
                 {
                   double minval, maxval, meanval;
-                  arrayMinMaxMeanMV(gridsize, array, missval, &minval, &maxval,
-                                    &meanval);
+                  arrayMinMaxMeanMV(gridsize, array, missval, &minval, &maxval, &meanval);
                   double range = maxval - minval;
-                  fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n",
-                          minval, maxval, range / 20);
+                  fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range / 20);
                   fprintf(stderr, "psxy -K -JQ0/10i -Rd -L -Cgmt.cpt -m "
                                   "data.gmt > gmtplot.ps\n");
                   // fprintf(stderr, "psxy -K -Jx0.028id -Rd -L -Cgmt.cpt -m
                   // data.gmt > gmtplot.ps\n"); fprintf(stderr, "psxy -K
                   // -JN0/10i -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps\n");
-                  fprintf(stderr,
-                          "pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps\n");
+                  fprintf(stderr, "pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps\n");
                   fprintf(stderr, "ps2pdf gmtplot.ps\n");
                 }
 
@@ -641,9 +595,7 @@ Outputgmt(void *process)
                       if (!DBL_IS_EQUAL(array[i], missval))
                         {
                           for (n = 0; n < cpt.ncolors; n++)
-                            if (array[i] > cpt.lut[n].z_low
-                                && array[i] <= cpt.lut[n].z_high)
-                              break;
+                            if (array[i] > cpt.lut[n].z_low && array[i] <= cpt.lut[n].z_high) break;
 
                           if (n == cpt.ncolors)
                             {
@@ -679,10 +631,8 @@ Outputgmt(void *process)
                       double latmax = grid_corner_lat[i * 4];
                       for (int ic = 1; ic < 4; ic++)
                         {
-                          if (grid_corner_lat[i * 4 + ic] < latmin)
-                            latmin = grid_corner_lat[i * 4 + ic];
-                          if (grid_corner_lat[i * 4 + ic] > latmax)
-                            latmax = grid_corner_lat[i * 4 + ic];
+                          if (grid_corner_lat[i * 4 + ic] < latmin) latmin = grid_corner_lat[i * 4 + ic];
+                          if (grid_corner_lat[i * 4 + ic] > latmax) latmax = grid_corner_lat[i * 4 + ic];
                         }
                       xlev[0] = levmin;
                       xlev[1] = levmax;
@@ -705,10 +655,8 @@ Outputgmt(void *process)
                       double lonmax = grid_corner_lon[i * 4];
                       for (int ic = 1; ic < 4; ic++)
                         {
-                          if (grid_corner_lon[i * 4 + ic] < lonmin)
-                            lonmin = grid_corner_lon[i * 4 + ic];
-                          if (grid_corner_lon[i * 4 + ic] > lonmax)
-                            lonmax = grid_corner_lon[i * 4 + ic];
+                          if (grid_corner_lon[i * 4 + ic] < lonmin) lonmin = grid_corner_lon[i * 4 + ic];
+                          if (grid_corner_lon[i * 4 + ic] > lonmax) lonmax = grid_corner_lon[i * 4 + ic];
                         }
                       xlev[0] = levmin;
                       xlev[1] = levmin;
@@ -730,14 +678,11 @@ Outputgmt(void *process)
                     {
                       const double *lon_bounds = grid_corner_lon + i * ncorner;
                       const double *lat_bounds = grid_corner_lat + i * ncorner;
-                      int ncorner_new
-                          = check_ncorner(ncorner, lon_bounds, lat_bounds);
+                      int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
 
                       for (int ic = 0; ic < ncorner_new; ic++)
-                        fprintf(stdout, "   %g  %g\n", lon_bounds[ic],
-                                lat_bounds[ic]);
-                      fprintf(stdout, "   %g  %g\n", lon_bounds[0],
-                              lat_bounds[0]);
+                        fprintf(stdout, "   %g  %g\n", lon_bounds[ic], lat_bounds[ic]);
+                      fprintf(stdout, "   %g  %g\n", lon_bounds[0], lat_bounds[0]);
                     }
                 }
               fprintf(stdout, "\n");

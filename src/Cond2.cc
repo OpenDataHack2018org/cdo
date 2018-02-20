@@ -69,8 +69,7 @@ Cond2(void *process)
   if (vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1)
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream1 >%s< by copying the first record.",
-               cdoGetStreamName(0).c_str());
+      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoGetStreamName(0).c_str());
     }
 
   if (filltype == FILL_NONE) vlistCompare(vlistID1, vlistID2, CMP_DIM);
@@ -95,16 +94,14 @@ Cond2(void *process)
   double *array4 = (double *) Malloc(gridsize * sizeof(double));
 
   if (cdoVerbose)
-    cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d", ntsteps1,
-             ntsteps2, vlistNtsteps(vlistID3));
+    cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d", ntsteps1, ntsteps2, vlistNtsteps(vlistID3));
 
   if (filltype == FILL_NONE)
     {
       if (ntsteps1 == 1 && ntsteps2 != 1)
         {
           filltype = FILL_TS;
-          cdoPrint("Filling up stream1 >%s< by copying the first timestep.",
-                   cdoGetStreamName(0).c_str());
+          cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
 
           nvars = vlistNvars(vlistID1);
           vardata1 = (double **) Malloc(nvars * sizeof(double *));
@@ -113,8 +110,7 @@ Cond2(void *process)
             {
               gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
               nlev = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-              vardata1[varID]
-                  = (double *) Malloc(nlev * gridsize * sizeof(double));
+              vardata1[varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
               varnmiss1[varID] = (size_t *) Malloc(nlev * sizeof(size_t));
             }
         }
@@ -124,14 +120,12 @@ Cond2(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
       nrecs = cdoStreamInqTimestep(streamID3, tsID);
-      if (nrecs == 0)
-        cdoAbort("Input streams have different number of timesteps!");
+      if (nrecs == 0) cdoAbort("Input streams have different number of timesteps!");
 
       if (tsID == 0 || filltype == FILL_NONE)
         {
           nrecs2 = cdoStreamInqTimestep(streamID1, tsID);
-          if (nrecs2 == 0)
-            cdoAbort("Input streams have different number of timesteps!");
+          if (nrecs2 == 0) cdoAbort("Input streams have different number of timesteps!");
         }
 
       taxisCopyTimestep(taxisID4, taxisID2);
@@ -172,14 +166,11 @@ Cond2(void *process)
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           double missval2 = vlistInqVarMissval(vlistID2, varID);
-          if (recID == 0 || filltype != FILL_REC)
-            missval1 = vlistInqVarMissval(vlistID1, varID);
+          if (recID == 0 || filltype != FILL_REC) missval1 = vlistInqVarMissval(vlistID1, varID);
 
           for (size_t i = 0; i < gridsize; i++)
             array4[i]
-                = DBL_IS_EQUAL(array1[i], missval1)
-                      ? missval2
-                      : !DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : array3[i];
+                = DBL_IS_EQUAL(array1[i], missval1) ? missval2 : !DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : array3[i];
 
           nmiss = arrayNumMV(gridsize, array4, missval2);
           pstreamDefRecord(streamID4, varID, levelID);

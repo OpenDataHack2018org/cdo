@@ -210,12 +210,10 @@ params_new(int vlistID)
 }
 
 static void
-params_add_coord(parseParamType *parse_arg, int coord, int cdiID, size_t size,
-                 const char *units, const char *longname)
+params_add_coord(parseParamType *parse_arg, int coord, int cdiID, size_t size, const char *units, const char *longname)
 {
   int ncoords = parse_arg->ncoords;
-  if (ncoords >= parse_arg->maxcoords)
-    cdoAbort("Too many coordinates (limit=%d)", parse_arg->maxcoords);
+  if (ncoords >= parse_arg->maxcoords) cdoAbort("Too many coordinates (limit=%d)", parse_arg->maxcoords);
 
   parse_arg->coords[ncoords].needed = false;
   parse_arg->coords[ncoords].coord = coord;
@@ -236,9 +234,7 @@ params_get_coordID(parseParamType *parse_arg, int coord, int cdiID)
   int ncoords = parse_arg->ncoords;
   for (int coordID = 0; coordID < ncoords; ++coordID)
     {
-      if (parse_arg->coords[coordID].coord == coord
-          && parse_arg->coords[coordID].cdiID == cdiID)
-        return coordID;
+      if (parse_arg->coords[coordID].coord == coord && parse_arg->coords[coordID].cdiID == cdiID) return coordID;
     }
 
   cdoAbort("%s: coordinate %c not found!", __func__, coord);
@@ -263,8 +259,7 @@ params_add_coordinates(int vlistID, parseParamType *parse_arg)
       params_add_coord(parse_arg, 'y', gridID, size, units, "latitude");
 
       params_add_coord(parse_arg, 'a', gridID, size, "m^2", "grid cell area");
-      params_add_coord(parse_arg, 'w', gridID, size, NULL,
-                       "grid cell area weights");
+      params_add_coord(parse_arg, 'w', gridID, size, NULL, "grid cell area weights");
     }
 
   int nzaxis = vlistNzaxis(vlistID);
@@ -286,8 +281,7 @@ params_add_ts(parseParamType *parse_arg)
   if (params)
     {
       varID = parse_arg->nparams;
-      if (varID >= parse_arg->maxparams)
-        cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
+      if (varID >= parse_arg->maxparams) cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
 
       params[varID].name = strdup("_ts");
       params[varID].gridID = parse_arg->pointID;
@@ -319,8 +313,7 @@ params_delete(paramType *params)
 }
 
 static void
-parseParamInit(parseParamType *parse_arg, int vlistID, int pointID,
-               int surfaceID, paramType *params)
+parseParamInit(parseParamType *parse_arg, int vlistID, int pointID, int surfaceID, paramType *params)
 {
   int nvars = vlistNvars(vlistID);
   int ngrids = vlistNgrids(vlistID);
@@ -366,8 +359,7 @@ Expr(void *process)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  char *exprs = readsCommandLine ? exprs_from_arg(operatorArgv()[0])
-                                 : exprs_from_file(operatorArgv()[0]);
+  char *exprs = readsCommandLine ? exprs_from_arg(operatorArgv()[0]) : exprs_from_file(operatorArgv()[0]);
 
   int streamID1 = cdoStreamOpenRead(0);
   int vlistID1 = cdoStreamInqVlist(streamID1);
@@ -401,13 +393,11 @@ Expr(void *process)
 
   if (cdoVerbose)
     for (int varID = 0; varID < nvars1; varID++)
-      if (parse_arg.needed[varID])
-        cdoPrint("Needed var: %d %s", varID, params[varID].name);
+      if (parse_arg.needed[varID]) cdoPrint("Needed var: %d %s", varID, params[varID].name);
 
   if (cdoVerbose)
     for (int varID = 0; varID < parse_arg.nparams; varID++)
-      cdoPrint("var: %d %s ngp=%zu nlev=%zu coord=%c", varID,
-               params[varID].name, params[varID].ngp, params[varID].nlev,
+      cdoPrint("var: %d %s ngp=%zu nlev=%zu coord=%c", varID, params[varID].name, params[varID].ngp, params[varID].nlev,
                params[varID].coord == 0 ? ' ' : params[varID].coord);
 
   int *varIDmap = (int *) Malloc(parse_arg.nparams * sizeof(int));
@@ -438,15 +428,11 @@ Expr(void *process)
       if (pidx >= nvars1 && params[pidx].remove == true) continue;
       if (pidx >= nvars1 && params[pidx].coord) continue;
 
-      int varID = vlistDefVar(vlistID2, params[pidx].gridID,
-                              params[pidx].zaxisID, params[pidx].steptype);
+      int varID = vlistDefVar(vlistID2, params[pidx].gridID, params[pidx].zaxisID, params[pidx].steptype);
       vlistDefVarName(vlistID2, varID, params[pidx].name);
-      if (params[pidx].lmiss)
-        vlistDefVarMissval(vlistID2, varID, params[pidx].missval);
-      if (params[pidx].units)
-        vlistDefVarUnits(vlistID2, varID, params[pidx].units);
-      if (params[pidx].longname)
-        vlistDefVarLongname(vlistID2, varID, params[pidx].longname);
+      if (params[pidx].lmiss) vlistDefVarMissval(vlistID2, varID, params[pidx].missval);
+      if (params[pidx].units) vlistDefVarUnits(vlistID2, varID, params[pidx].units);
+      if (params[pidx].longname) vlistDefVarLongname(vlistID2, varID, params[pidx].longname);
       if (memcmp(params[pidx].name, "var", 3) == 0)
         {
           if (strlen(params[pidx].name) > 3 && isdigit(params[pidx].name[3]))
@@ -461,10 +447,8 @@ Expr(void *process)
   if (cdoVerbose)
     {
       for (int varID = 0; varID < nvars1; varID++)
-        if (parse_arg.needed[varID])
-          printf("needed: %d %s\n", varID, parse_arg.params[varID].name);
-      cdoPrint("vlistNvars(vlistID1)=%d, vlistNvars(vlistID2)=%d",
-               vlistNvars(vlistID1), vlistNvars(vlistID2));
+        if (parse_arg.needed[varID]) printf("needed: %d %s\n", varID, parse_arg.params[varID].name);
+      cdoPrint("vlistNvars(vlistID1)=%d, vlistNvars(vlistID2)=%d", vlistNvars(vlistID1), vlistNvars(vlistID2));
     }
 
   int nvars2 = vlistNvars(vlistID2);
@@ -500,12 +484,9 @@ Expr(void *process)
               parse_arg.coords[i].data = data;
               if (coord == 'x' || coord == 'y')
                 {
-                  if (gridInqType(gridID) == GRID_GENERIC)
-                    cdoAbort("Grid has no geographical coordinates!");
-                  if (gridInqType(gridID) == GRID_GME)
-                    gridID = gridToUnstructured(gridID, 0);
-                  if (gridInqType(gridID) != GRID_UNSTRUCTURED
-                      && gridInqType(gridID) != GRID_CURVILINEAR)
+                  if (gridInqType(gridID) == GRID_GENERIC) cdoAbort("Grid has no geographical coordinates!");
+                  if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 0);
+                  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
                     gridID = gridToCurvilinear(gridID, 0);
 
                   if (coord == 'x')
@@ -553,8 +534,7 @@ Expr(void *process)
           varname[strlen(varname) - 2] = 0;
           if (coord == 'x' || coord == 'y' || coord == 'a' || coord == 'w')
             {
-              int coordID
-                  = params_get_coordID(&parse_arg, coord, params[varID].gridID);
+              int coordID = params_get_coordID(&parse_arg, coord, params[varID].gridID);
               int gridID = parse_arg.coords[coordID].cdiID;
               size_t ngp = parse_arg.coords[coordID].size;
               double *data = parse_arg.coords[coordID].data;
@@ -565,8 +545,7 @@ Expr(void *process)
             }
           else if (coord == 'z')
             {
-              int coordID = params_get_coordID(&parse_arg, coord,
-                                               params[varID].zaxisID);
+              int coordID = params_get_coordID(&parse_arg, coord, params[varID].zaxisID);
               int zaxisID = parse_arg.coords[coordID].cdiID;
               size_t nlev = parse_arg.coords[coordID].size;
               double *data = parse_arg.coords[coordID].data;
@@ -635,8 +614,7 @@ Expr(void *process)
       pstreamDefTimestep(streamID2, tsID);
 
       for (int varID = 0; varID < nvars1; varID++)
-        if (tsID == 0 || params[varID].steptype != TIME_CONSTANT)
-          params[varID].nmiss = 0;
+        if (tsID == 0 || params[varID].steptype != TIME_CONSTANT) params[varID].nmiss = 0;
 
       for (int recID = 0; recID < nrecs; recID++)
         {

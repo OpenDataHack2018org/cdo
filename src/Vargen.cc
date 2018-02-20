@@ -83,10 +83,7 @@ std_atm_pressure(double height)
     Compute the pressure for the given height (in meters) according to the
     solution of the hydrostatic atmosphere
    */
-  return (P_ZERO
-          * exp((-1) * TMP4PRESSURE
-                * log((exp(height / SCALEHEIGHT) * T_ZERO + T_DELTA)
-                      / (T_ZERO + T_DELTA))));
+  return (P_ZERO * exp((-1) * TMP4PRESSURE * log((exp(height / SCALEHEIGHT) * T_ZERO + T_DELTA) / (T_ZERO + T_DELTA))));
 }
 
 static void
@@ -121,11 +118,9 @@ conv_generic_grid(int gridID, size_t gridsize, double *xvals2D, double *yvals2D)
 }
 
 static void
-remap_nn_reg2d_reg2d(size_t nx, size_t ny, const double *restrict data,
-                     int gridID, double *restrict array)
+remap_nn_reg2d_reg2d(size_t nx, size_t ny, const double *restrict data, int gridID, double *restrict array)
 {
-  if (gridInqType(gridID) != GRID_LONLAT)
-    cdoAbort("Internal error, wrong grid type!");
+  if (gridInqType(gridID) != GRID_LONLAT) cdoAbort("Internal error, wrong grid type!");
 
   size_t nxvals = gridInqXsize(gridID);
   size_t nyvals = gridInqYsize(gridID);
@@ -160,19 +155,16 @@ remap_nn_reg2d_reg2d(size_t nx, size_t ny, const double *restrict data,
 }
 
 static void
-remap_nn_reg2d_nonreg2d(size_t nx, size_t ny, const double *restrict data,
-                        int gridID, double *restrict array)
+remap_nn_reg2d_nonreg2d(size_t nx, size_t ny, const double *restrict data, int gridID, double *restrict array)
 {
   int gridID2 = gridID;
   size_t gridsize = gridInqSize(gridID2);
   std::vector<double> xvals(gridsize);
   std::vector<double> yvals(gridsize);
 
-  if (gridInqType(gridID2) == GRID_GME)
-    gridID2 = gridToUnstructured(gridID2, 0);
+  if (gridInqType(gridID2) == GRID_GME) gridID2 = gridToUnstructured(gridID2, 0);
 
-  if (gridInqType(gridID2) != GRID_UNSTRUCTURED
-      && gridInqType(gridID2) != GRID_CURVILINEAR)
+  if (gridInqType(gridID2) != GRID_UNSTRUCTURED && gridInqType(gridID2) != GRID_CURVILINEAR)
     gridID2 = gridToCurvilinear(gridID2, 0);
 
   gridInqXvals(gridID2, &xvals[0]);
@@ -202,8 +194,7 @@ remap_nn_reg2d_nonreg2d(size_t nx, size_t ny, const double *restrict data,
 }
 
 static void
-remap_nn_reg2d(size_t nx, size_t ny, const double *restrict data, int gridID,
-               double *restrict array)
+remap_nn_reg2d(size_t nx, size_t ny, const double *restrict data, int gridID, double *restrict array)
 {
   if (gridInqType(gridID) == GRID_LONLAT)
     remap_nn_reg2d_reg2d(nx, ny, data, gridID, array);
@@ -355,11 +346,9 @@ Vargen(void *process)
      and temperatur. The first (varID) is pressure, second (varID2) is
      temperatur. Add an additional variable for the standard atmosphere.
    */
-  if (operatorID == STDATM)
-    varID2 = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+  if (operatorID == STDATM) varID2 = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
 
-  if (operatorID == MASK)
-    vlistDefVarDatatype(vlistID, varID, CDI_DATATYPE_INT8);
+  if (operatorID == MASK) vlistDefVarDatatype(vlistID, varID, CDI_DATATYPE_INT8);
 
   if (operatorID == STDATM)
     {
@@ -385,9 +374,8 @@ Vargen(void *process)
   int taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
-  if (operatorID == RANDOM || operatorID == SINCOS || operatorID == COSHILL
-      || operatorID == CONST || operatorID == TOPO || operatorID == TEMP
-      || operatorID == MASK || operatorID == STDATM)
+  if (operatorID == RANDOM || operatorID == SINCOS || operatorID == COSHILL || operatorID == CONST || operatorID == TOPO
+      || operatorID == TEMP || operatorID == MASK || operatorID == STDATM)
     vlistDefNtsteps(vlistID, 1);
 
   int streamID = cdoStreamOpenWrite(0, cdoFiletype());
@@ -448,11 +436,9 @@ Vargen(void *process)
                     }
                   else
                     {
-                      if (gridInqType(gridID) == GRID_GME)
-                        gridID = gridToUnstructured(gridID, 0);
+                      if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 0);
 
-                      if (gridInqType(gridID) != GRID_UNSTRUCTURED
-                          && gridInqType(gridID) != GRID_CURVILINEAR)
+                      if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
                         gridID = gridToCurvilinear(gridID, 0);
 
                       gridInqXvals(gridID, xvals);
@@ -474,9 +460,7 @@ Vargen(void *process)
                   else if (operatorID == COSHILL)
                     {
                       for (size_t i = 0; i < gridsize; i++)
-                        array[i]
-                            = 2
-                              - cos(acos(cos(xvals[i]) * cos(yvals[i])) / 1.2);
+                        array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i])) / 1.2);
                     }
 
                   Free(xvals);
@@ -520,14 +504,11 @@ Vargen(void *process)
                 }
               else if (operatorID == STDATM)
                 {
-                  array[0] = (varID == varID2)
-                                 ? std_atm_temperatur(levels[levelID])
-                                 : std_atm_pressure(levels[levelID]);
+                  array[0]
+                      = (varID == varID2) ? std_atm_temperatur(levels[levelID]) : std_atm_pressure(levels[levelID]);
                 }
 
-              if (gridID != gridIDdata
-                  && (operatorID == TOPO || operatorID == TEMP
-                      || operatorID == MASK))
+              if (gridID != gridIDdata && (operatorID == TOPO || operatorID == TEMP || operatorID == MASK))
                 {
                   remap_nn_reg2d(nlon, nlat, data, gridID, &array[0]);
                 }

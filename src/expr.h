@@ -39,7 +39,8 @@ enum
   CLEN
 };
 
-typedef enum {
+typedef enum
+{
   typeCon,
   typeVar,
   typeFun,
@@ -171,8 +172,7 @@ typedef union
 #define YYSTYPE yysType
 #define YY_EXTRA_TYPE parseParamType *
 
-#define YY_DECL \
-  int yylex(YYSTYPE *yylval_param, parseParamType *parse_arg, void *yyscanner)
+#define YY_DECL int yylex(YYSTYPE *yylval_param, parseParamType *parse_arg, void *yyscanner)
 YY_DECL;
 
 int yyparse(parseParamType *parse_arg, void *);

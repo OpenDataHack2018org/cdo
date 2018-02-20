@@ -55,8 +55,7 @@ Setrcaname(void *process)
     {
       while (readline(fp, line, MAX_LINE_LEN))
         {
-          sscanf(line, "%d\t%d\t%d\t%s\t%s\t%s", &scode, &sltype, &slevel,
-                 sname, sdescription, sunits);
+          sscanf(line, "%d\t%d\t%d\t%s\t%s\t%s", &scode, &sltype, &slevel, sname, sdescription, sunits);
           /*
           printf("%s\n", line);
           printf("%d:%d:%d:%s:%s:%s\n", scode, sltype, slevel, sname,

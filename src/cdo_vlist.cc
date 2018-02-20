@@ -31,9 +31,8 @@ double
 cdoZaxisInqLevel(int zaxisID, int levelID)
 {
   int zaxistype = zaxisInqType(zaxisID);
-  double level = zaxisInqLevels(zaxisID, NULL)
-                     ? zaxisInqLevel(zaxisID, levelID)
-                     : (zaxistype == ZAXIS_SURFACE) ? 0 : levelID + 1;
+  double level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID)
+                                               : (zaxistype == ZAXIS_SURFACE) ? 0 : levelID + 1;
   return level;
 }
 
@@ -71,8 +70,7 @@ compare_lat_reg2d(size_t ysize, int gridID1, int gridID2)
       gridInqYvals(gridID1, yvals1);
       gridInqYvals(gridID2, yvals2);
 
-      if (IS_EQUAL(yvals1[0], yvals2[ysize - 1])
-          && IS_EQUAL(yvals1[ysize - 1], yvals2[0]))
+      if (IS_EQUAL(yvals1[0], yvals2[ysize - 1]) && IS_EQUAL(yvals1[ysize - 1], yvals2[0]))
         {
           if (yvals1[0] > yvals2[0])
             cdoWarning("Latitude orientation differ! First grid: N->S; second "
@@ -122,10 +120,8 @@ compare_lon_reg2d(size_t xsize, int gridID1, int gridID2)
 static void
 compare_grid_unstructured(int gridID1, int gridID2)
 {
-  if (gridInqXvals(gridID1, NULL)
-      && gridInqXvals(gridID1, NULL) == gridInqXvals(gridID2, NULL)
-      && gridInqYvals(gridID1, NULL)
-      && gridInqYvals(gridID1, NULL) == gridInqYvals(gridID2, NULL))
+  if (gridInqXvals(gridID1, NULL) && gridInqXvals(gridID1, NULL) == gridInqXvals(gridID2, NULL)
+      && gridInqYvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) == gridInqYvals(gridID2, NULL))
     {
       size_t gridsize = gridInqSize(gridID1);
 
@@ -141,8 +137,7 @@ compare_grid_unstructured(int gridID1, int gridID2)
 
       int inc = gridsize > 10000 ? gridsize / 1000 : 1;
       for (size_t i = 0; i < gridsize; i += inc)
-        if (fabs(xvals1[i] - xvals2[i]) > 2.e-5
-            || fabs(yvals1[i] - yvals2[i]) > 2.e-5)
+        if (fabs(xvals1[i] - xvals2[i]) > 2.e-5 || fabs(yvals1[i] - yvals2[i]) > 2.e-5)
           {
             // printf("%d %g %g %g %g %g %g\n", i, xvals1[i], xvals2[i],
             // yvals1[i], yvals2[i], xvals1[i] - xvals2[i], yvals1[i] -
@@ -165,8 +160,7 @@ cdoCompareGrids(int gridID1, int gridID2)
 
   if (gridInqType(gridID1) == gridInqType(gridID2))
     {
-      if (gridInqType(gridID1) == GRID_GAUSSIAN
-          || gridInqType(gridID1) == GRID_LONLAT)
+      if (gridInqType(gridID1) == GRID_GAUSSIAN || gridInqType(gridID1) == GRID_LONLAT)
         {
           size_t xsize = gridInqXsize(gridID1);
           size_t ysize = gridInqYsize(gridID1);
@@ -181,16 +175,14 @@ cdoCompareGrids(int gridID1, int gridID2)
           else
             cdoWarning("xsize of input grids differ!");
         }
-      else if (gridInqType(gridID1) == GRID_CURVILINEAR
-               || gridInqType(gridID1) == GRID_UNSTRUCTURED)
+      else if (gridInqType(gridID1) == GRID_CURVILINEAR || gridInqType(gridID1) == GRID_UNSTRUCTURED)
         {
           compare_grid_unstructured(gridID1, gridID2);
         }
     }
   else if (gridInqSize(gridID1) > 1)
     {
-      cdoWarning("Grids have different types! First grid: %s; second grid: %s",
-                 gridNamePtr(gridInqType(gridID1)),
+      cdoWarning("Grids have different types! First grid: %s; second grid: %s", gridNamePtr(gridInqType(gridID1)),
                  gridNamePtr(gridInqType(gridID2)));
     }
 }
@@ -212,12 +204,10 @@ vlistCompare(int vlistID1, int vlistID2, int flag)
 
   int nvars = vlistNvars(vlistID1);
 
-  if (nvars != vlistNvars(vlistID2))
-    cdoAbort("Input streams have different number of variables per timestep!");
+  if (nvars != vlistNvars(vlistID2)) cdoAbort("Input streams have different number of variables per timestep!");
 
   if (vlistNrecs(vlistID1) != vlistNrecs(vlistID2))
-    cdoAbort("Input streams have different number of %s per timestep!",
-             nvars == 1 ? "layers" : "records");
+    cdoAbort("Input streams have different number of %s per timestep!", nvars == 1 ? "layers" : "records");
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -242,8 +232,7 @@ vlistCompare(int vlistID1, int vlistID2, int flag)
 
       if (flag & CMP_GRIDSIZE)
         {
-          if (gridInqSize(vlistInqVarGrid(vlistID1, varID))
-              != gridInqSize(vlistInqVarGrid(vlistID2, varID)))
+          if (gridInqSize(vlistInqVarGrid(vlistID1, varID)) != gridInqSize(vlistInqVarGrid(vlistID2, varID)))
             cdoAbort("Grid size of the input parameters do not match!");
         }
 
@@ -255,9 +244,7 @@ vlistCompare(int vlistID1, int vlistID2, int flag)
             {
               int nlev1 = zaxisInqSize(zaxisID1);
               int nlev2 = zaxisInqSize(zaxisID2);
-              if (nlev1 != nlev2)
-                cdoAbort(
-                    "Number of levels of the input parameters do not match!");
+              if (nlev1 != nlev2) cdoAbort("Number of levels of the input parameters do not match!");
 
               double *lev1 = (double *) Malloc(nlev1 * sizeof(double));
               double *lev2 = (double *) Malloc(nlev1 * sizeof(double));
@@ -341,15 +328,13 @@ vlistCompareX(int vlistID1, int vlistID2, int flag)
     {
       if (flag & CMP_GRIDSIZE)
         {
-          if (gridInqSize(vlistInqVarGrid(vlistID1, varID))
-              != gridInqSize(vlistInqVarGrid(vlistID2, 0)))
+          if (gridInqSize(vlistInqVarGrid(vlistID1, varID)) != gridInqSize(vlistInqVarGrid(vlistID2, 0)))
             cdoAbort("Grid size of the input parameters do not match!");
         }
 
       if (flag & CMP_NLEVEL)
         {
-          if ((zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) != nlevels2)
-              && nlevels2 > 1)
+          if ((zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) != nlevels2) && nlevels2 > 1)
             cdoAbort("Number of levels of the input parameters do not match!");
         }
     }
@@ -418,25 +403,21 @@ vlist_check_gridsize(int vlistID)
 
   if (lerror)
     {
-      cdoPrint(
-          "This operator requires all variables on the same horizontal grid.");
+      cdoPrint("This operator requires all variables on the same horizontal grid.");
       cdoPrint("Horizontal grids found:");
       for (int index = 0; index < ngrids; ++index)
         {
           gridID = vlistGrid(vlistID, index);
-          cdoPrint("  grid=%d  type=%s  points=%zu", index + 1,
-                   gridNamePtr(gridInqType(gridID)), gridInqSize(gridID));
+          cdoPrint("  grid=%d  type=%s  points=%zu", index + 1, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID));
         }
-      cdoAbort(
-          "The input stream contains variables on different horizontal grids!");
+      cdoAbort("The input stream contains variables on different horizontal grids!");
     }
 
   return ngp;
 }
 
 double *
-vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev,
-               int *rnhlevf, int *rnhlevh)
+vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlevf, int *rnhlevh)
 {
   double *vct = NULL;
   int zaxisIDh = -1;
@@ -454,13 +435,10 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev,
       int zaxistype = zaxisInqType(zaxisID);
 
       if (cdoVerbose)
-        cdoPrint(
-            "ZAXIS_HYBRID = %d ZAXIS_HYBRID_HALF=%d nlevel=%d mono_level=%d",
-            zaxisInqType(zaxisID) == ZAXIS_HYBRID,
-            zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF, nlevel, mono_level);
+        cdoPrint("ZAXIS_HYBRID = %d ZAXIS_HYBRID_HALF=%d nlevel=%d mono_level=%d",
+                 zaxisInqType(zaxisID) == ZAXIS_HYBRID, zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF, nlevel, mono_level);
 
-      if ((zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF)
-          && nlevel > 1 && !mono_level)
+      if ((zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF) && nlevel > 1 && !mono_level)
         {
           int l;
           double *level = (double *) Malloc(nlevel * sizeof(double));
@@ -473,8 +451,7 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev,
           Free(level);
         }
 
-      if ((zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF)
-          && nlevel > 1 && mono_level)
+      if ((zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF) && nlevel > 1 && mono_level)
         {
           nvct = zaxisInqVctSize(zaxisID);
           if (nlevel == (nvct / 2 - 1))
@@ -525,8 +502,7 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev,
                   double *rvct = (double *) Malloc(nvct * sizeof(double));
                   zaxisInqVct(zaxisID, rvct);
 
-                  if ((int) (rvct[0] + 0.5) == 100000
-                      && rvct[voff] < rvct[voff + 1])
+                  if ((int) (rvct[0] + 0.5) == 100000 && rvct[voff] < rvct[voff + 1])
                     {
                       lhavevct = true;
                       zaxisIDh = zaxisID;
@@ -541,27 +517,22 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev,
 
                       for (int i = 0; i < vctsize / 2; i++)
                         {
-                          if (rvct[voff + i] >= rvct[voff]
-                              && rvct[voff + i] <= rvct[3])
+                          if (rvct[voff + i] >= rvct[voff] && rvct[voff + i] <= rvct[3])
                             {
                               vct[i] = rvct[0] * rvct[voff + i];
                               vct[vctsize / 2 + i] = 0;
                             }
                           else
                             {
-                              vct[i]
-                                  = (rvct[0] * rvct[3] * (1 - rvct[voff + i]))
-                                    / (1 - rvct[3]);
-                              vct[vctsize / 2 + i]
-                                  = (rvct[voff + i] - rvct[3]) / (1 - rvct[3]);
+                              vct[i] = (rvct[0] * rvct[3] * (1 - rvct[voff + i])) / (1 - rvct[3]);
+                              vct[vctsize / 2 + i] = (rvct[voff + i] - rvct[3]) / (1 - rvct[3]);
                             }
                         }
 
                       if (cdoVerbose)
                         {
                           for (int i = 0; i < vctsize / 2; i++)
-                            fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i],
-                                    vct[vctsize / 2 + i]);
+                            fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize / 2 + i]);
                         }
                     }
                   Free(rvct);
@@ -580,8 +551,7 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev,
 }
 
 void
-vlist_change_hybrid_zaxis(int vlistID1, int vlistID2, int zaxisID1,
-                          int zaxisID2)
+vlist_change_hybrid_zaxis(int vlistID1, int vlistID2, int zaxisID1, int zaxisID2)
 {
   int nvct0 = 0;
   double *vct = NULL;
@@ -605,9 +575,7 @@ vlist_change_hybrid_zaxis(int vlistID1, int vlistID2, int zaxisID1,
             }
           else
             {
-              if (nvct0 == nvct
-                  && memcmp(vct, zaxisInqVctPtr(zaxisID), nvct * sizeof(double))
-                         == 0)
+              if (nvct0 == nvct && memcmp(vct, zaxisInqVctPtr(zaxisID), nvct * sizeof(double)) == 0)
                 vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
             }
         }
@@ -637,8 +605,7 @@ vlist_get_psvarid(int vlistID, int zaxisID)
               break;
             }
         }
-      if (cdoVerbose && psvarid == -1)
-        cdoWarning("Surface pressure variable not found - %s", psname);
+      if (cdoVerbose && psvarid == -1) cdoWarning("Surface pressure variable not found - %s", psname);
     }
 
   return psvarid;

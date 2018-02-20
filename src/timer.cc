@@ -214,8 +214,7 @@ timer_new(const char *text)
 static void
 timer_check(int it)
 {
-  if (it < 0 || it > (top_timer - 1))
-    fprintf(rt_unit, "timer: invalid timer id %d\n", it);
+  if (it < 0 || it > (top_timer - 1)) fprintf(rt_unit, "timer: invalid timer id %d\n", it);
 }
 
 double
@@ -255,8 +254,8 @@ timer_report(void)
       if (rt[it].calls > 0) avg /= rt[it].calls;
 
       if (rt[it].stat != rt_stat_undef)
-        fprintf(rt_unit, "%4d %7d %12.4g %12.4g %12.4g %12.4g  %s\n", it,
-                rt[it].calls, rt[it].min, avg, rt[it].max, total, rt[it].text);
+        fprintf(rt_unit, "%4d %7d %12.4g %12.4g %12.4g %12.4g  %s\n", it, rt[it].calls, rt[it].min, avg, rt[it].max,
+                total, rt[it].text);
     }
 }
 
@@ -265,8 +264,7 @@ timer_start(int it)
 {
   timer_check(it);
 
-  if (rt[it].stat == rt_stat_on)
-    fprintf(rt_unit, "timer_start: timer_stop call missing\n");
+  if (rt[it].stat == rt_stat_on) fprintf(rt_unit, "timer_start: timer_stop call missing\n");
 
   set_time_mark(rt[it].mark1);
 

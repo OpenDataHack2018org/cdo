@@ -114,8 +114,7 @@ Vertintap(void *process)
           if (extrapolate) cdoPrint("Extrapolation of missing values enabled!");
         }
     }
-  else if (operatorID == AP2PLX || operatorID == AP2HLX
-           || operatorID == AP2PLX_LP)
+  else if (operatorID == AP2PLX || operatorID == AP2HLX || operatorID == AP2PLX_LP)
     {
       extrapolate = true;
     }
@@ -128,8 +127,7 @@ Vertintap(void *process)
     {
       if (useHightLevel)
         {
-          double stdlev[] = { 10,    50,    100,   500,   1000, 5000,
-                              10000, 15000, 20000, 25000, 30000 };
+          double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev) / sizeof(*stdlev);
           plev = (double *) Malloc(nplev * sizeof(double));
           for (int i = 0; i < nplev; ++i)
@@ -137,9 +135,8 @@ Vertintap(void *process)
         }
       else
         {
-          double stdlev[] = { 100000, 92500, 85000, 70000, 60000, 50000,
-                              40000,  30000, 25000, 20000, 15000, 10000,
-                              7000,   5000,  3000,  2000,  1000 };
+          double stdlev[] = { 100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000,
+                              20000,  15000, 10000, 7000,  5000,  3000,  2000,  1000 };
           nplev = sizeof(stdlev) / sizeof(*stdlev);
           plev = (double *) Malloc(nplev * sizeof(double));
           for (int i = 0; i < nplev; ++i)
@@ -188,17 +185,13 @@ Vertintap(void *process)
     {
       cdoPrint("Found:");
       if (psID != -1)
-        cdoPrint("  %s -> %s", var_stdname(surface_air_pressure),
-                 cdoVlistInqVarName(vlistID1, psID, varname));
+        cdoPrint("  %s -> %s", var_stdname(surface_air_pressure), cdoVlistInqVarName(vlistID1, psID, varname));
       if (apressID != -1)
-        cdoPrint("  %s -> %s", var_stdname(air_pressure),
-                 cdoVlistInqVarName(vlistID1, apressID, varname));
+        cdoPrint("  %s -> %s", var_stdname(air_pressure), cdoVlistInqVarName(vlistID1, apressID, varname));
       if (dpressID != -1)
-        cdoPrint("  %s -> %s", var_stdname(pressure_thickness),
-                 cdoVlistInqVarName(vlistID1, dpressID, varname));
+        cdoPrint("  %s -> %s", var_stdname(pressure_thickness), cdoVlistInqVarName(vlistID1, dpressID, varname));
       if (tempID != -1)
-        cdoPrint("  %s -> %s", var_stdname(air_temperature),
-                 cdoVlistInqVarName(vlistID1, tempID, varname));
+        cdoPrint("  %s -> %s", var_stdname(air_temperature), cdoVlistInqVarName(vlistID1, tempID, varname));
     }
 
   if (apressID == -1) cdoAbort("%s not found!", var_stdname(air_pressure));
@@ -253,8 +246,7 @@ Vertintap(void *process)
   if (zaxisIDh != -1)
     {
       int nlev = zaxisInqSize(zaxisIDh);
-      if (nlev != nhlev)
-        cdoAbort("Internal error, wrong number of height level!");
+      if (nlev != nhlev) cdoAbort("Internal error, wrong number of height level!");
       std::vector<double> levels(nlev);
       cdoZaxisInqLevels(zaxisIDh, &levels[0]);
 
@@ -287,8 +279,7 @@ Vertintap(void *process)
 
       if (cdoVerbose)
         for (int i = 0; i < nplev; ++i)
-          cdoPrint("level = %d   height = %g   pressure = %g", i + 1, plev[i],
-                   phlev[i]);
+          cdoPrint("level = %d   height = %g   pressure = %g", i + 1, plev[i], phlev[i]);
 
       arrayCopy(nplev, &phlev[0], plev);
     }
@@ -303,18 +294,15 @@ Vertintap(void *process)
       int zaxisID = vlistInqVarZaxis(vlistID1, varID);
       int nlevel = zaxisInqSize(zaxisID);
 
-      if (gridInqType(gridID) == GRID_SPECTRAL)
-        cdoAbort("Spectral data unsupported!");
+      if (gridInqType(gridID) == GRID_SPECTRAL) cdoAbort("Spectral data unsupported!");
 
       vardata1[varID] = (double *) Malloc(gridsize * nlevel * sizeof(double));
 
       if (zaxisID == zaxisIDh
-          || (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1
-              && (nlevel == nhlevh || nlevel == nhlevf)))
+          || (is_height_axis(zaxisID, nlevel) && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)))
         {
           varinterp[varID] = true;
-          vardata2[varID]
-              = (double *) Malloc(gridsize * nplev * sizeof(double));
+          vardata2[varID] = (double *) Malloc(gridsize * nplev * sizeof(double));
           varnmiss[varID] = (size_t *) Calloc(maxlev, sizeof(size_t));
         }
       else
@@ -336,17 +324,14 @@ Vertintap(void *process)
   if (zaxisIDh != -1 && psID == -1)
     {
       if (dpressID != -1)
-        cdoWarning("Surface pressure not found - set to vertical sum of %s!",
-                   var_stdname(pressure_thickness));
+        cdoWarning("Surface pressure not found - set to vertical sum of %s!", var_stdname(pressure_thickness));
       else
-        cdoWarning("Surface pressure not found - set to lower bound of %s!",
-                   var_stdname(air_pressure));
+        cdoWarning("Surface pressure not found - set to lower bound of %s!", var_stdname(air_pressure));
     }
 
   for (varID = 0; varID < nvars; ++varID)
     {
-      if (varinterp[varID]
-          && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
+      if (varinterp[varID] && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
         vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
@@ -407,8 +392,7 @@ Vertintap(void *process)
             }
           else
             {
-              arrayCopy(gridsize, vardata1[apressID] + gridsize * (nhlevf - 1),
-                        &ps_prog[0]);
+              arrayCopy(gridsize, vardata1[apressID] + gridsize * (nhlevf - 1), &ps_prog[0]);
               // for ( size_t i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
             }
 
@@ -416,8 +400,7 @@ Vertintap(void *process)
           double minval, maxval;
           arrayMinMaxMask(gridsize, &ps_prog[0], NULL, &minval, &maxval);
           if (minval < MIN_PS || maxval > MAX_PS)
-            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval,
-                       maxval);
+            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           arrayCopy(gridsize * nhlevf, vardata1[apressID], &full_press[0]);
 
@@ -425,13 +408,9 @@ Vertintap(void *process)
             half_press[i] = 0;
           for (int k = 1; k < nhlevf; k++)
             for (size_t i = 0; i < gridsize; i++)
-              half_press[k * gridsize + i]
-                  = 0.5
-                    * (full_press[(k - 1) * gridsize + i]
-                       + full_press[k * gridsize + i]);
+              half_press[k * gridsize + i] = 0.5 * (full_press[(k - 1) * gridsize + i] + full_press[k * gridsize + i]);
           for (size_t i = 0; i < gridsize; i++)
-            half_press[(nhlevh - 1) * gridsize + i]
-                = full_press[(nhlevf - 1) * gridsize + i];
+            half_press[(nhlevh - 1) * gridsize + i] = full_press[(nhlevf - 1) * gridsize + i];
 
           if (useLogType)
             {
@@ -445,9 +424,7 @@ Vertintap(void *process)
 
           genind(&vert_index[0], plev, &full_press[0], gridsize, nplev, nhlevf);
 
-          if (!extrapolate)
-            genindmiss(&vert_index[0], plev, gridsize, nplev, &ps_prog[0],
-                       &pnmiss[0]);
+          if (!extrapolate) genindmiss(&vert_index[0], plev, gridsize, nplev, &ps_prog[0], &pnmiss[0]);
         }
 
       for (varID = 0; varID < nvars; varID++)
@@ -474,17 +451,13 @@ Vertintap(void *process)
 
                   for (levelID = 0; levelID < nlevel; levelID++)
                     {
-                      if (varnmiss[varID][levelID])
-                        cdoAbort(
-                            "Missing values unsupported for this operator!");
+                      if (varnmiss[varID][levelID]) cdoAbort("Missing values unsupported for this operator!");
                     }
 
-                  interp_X(vardata1[varID], vardata2[varID], hyb_press,
-                           &vert_index[0], plev, nplev, gridsize, nlevel,
+                  interp_X(vardata1[varID], vardata2[varID], hyb_press, &vert_index[0], plev, nplev, gridsize, nlevel,
                            missval);
 
-                  if (!extrapolate)
-                    arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);
+                  if (!extrapolate) arrayCopy(nplev, &pnmiss[0], varnmiss[varID]);
                 }
             }
         }
@@ -499,8 +472,7 @@ Vertintap(void *process)
                   size_t offset = gridsize * levelID;
                   double *single2 = vardata2[varID] + offset;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, single2,
-                                     varnmiss[varID][levelID]);
+                  pstreamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
                 }
             }
         }

@@ -115,10 +115,8 @@ Sorttimestamp(void *process)
               pstreamInqRecord(streamID1, &varID, &levelID);
               gridID = vlistInqVarGrid(vlistID1, varID);
               size_t gridsize = gridInqSize(gridID);
-              vars[xtsID][varID][levelID].ptr
-                  = (double *) Malloc(gridsize * sizeof(double));
-              pstreamReadRecord(streamID1, vars[xtsID][varID][levelID].ptr,
-                                &nmiss);
+              vars[xtsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
+              pstreamReadRecord(streamID1, vars[xtsID][varID][levelID].ptr, &nmiss);
               vars[xtsID][varID][levelID].nmiss = nmiss;
             }
 
@@ -164,8 +162,7 @@ Sorttimestamp(void *process)
                   char vdatestr[32], vtimestr[32];
                   date2str(vdate[xtsID], vdatestr, sizeof(vdatestr));
                   time2str(vtime[xtsID], vtimestr, sizeof(vtimestr));
-                  cdoPrint("Timestep %4d %s %s already exists, skipped!", xtsID,
-                           vdatestr, vtimestr);
+                  cdoPrint("Timestep %4d %s %s already exists, skipped!", xtsID, vdatestr, vtimestr);
                 }
               continue;
             }
@@ -186,8 +183,7 @@ Sorttimestamp(void *process)
                 {
                   nmiss = vars[xtsID][varID][levelID].nmiss;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, vars[xtsID][varID][levelID].ptr,
-                                     nmiss);
+                  pstreamWriteRecord(streamID2, vars[xtsID][varID][levelID].ptr, nmiss);
                 }
             }
         }

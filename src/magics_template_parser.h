@@ -19,7 +19,6 @@
 
 int magics_template_parser(void *node);
 
-int SetMagicsParameterValue(const char *param_name, const char *param_type,
-                            const char *param_value);
+int SetMagicsParameterValue(const char *param_name, const char *param_type, const char *param_value);
 
 #endif

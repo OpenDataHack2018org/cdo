@@ -86,8 +86,7 @@ Seasstat(void *process)
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   taxisWithBounds(taxisID2);
-  if (taxisInqType(taxisID2) == TAXIS_FORECAST)
-    taxisDefType(taxisID2, TAXIS_RELATIVE);
+  if (taxisInqType(taxisID2) == TAXIS_FORECAST) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -154,8 +153,7 @@ Seasstat(void *process)
                 {
                   recinfo[recID].varID = varID;
                   recinfo[recID].levelID = levelID;
-                  recinfo[recID].lconst
-                      = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+                  recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
                 }
 
               field_type *psamp1 = &samp1[varID][levelID];
@@ -177,13 +175,10 @@ Seasstat(void *process)
 
                   if (nmiss > 0 || psamp1->ptr)
                     {
-                      if (psamp1->ptr == NULL)
-                        psamp1->ptr
-                            = (double *) Malloc(gridsize * sizeof(double));
+                      if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
                       for (size_t i = 0; i < gridsize; i++)
-                        psamp1->ptr[i]
-                            = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
               else
@@ -197,15 +192,13 @@ Seasstat(void *process)
                     {
                       if (psamp1->ptr == NULL)
                         {
-                          psamp1->ptr
-                              = (double *) Malloc(gridsize * sizeof(double));
+                          psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
                           for (size_t i = 0; i < gridsize; i++)
                             psamp1->ptr[i] = nsets;
                         }
 
                       for (size_t i = 0; i < gridsize; i++)
-                        if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
-                          psamp1->ptr[i]++;
+                        if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval)) psamp1->ptr[i]++;
                     }
 
                   if (lvarstd)
@@ -294,9 +287,8 @@ Seasstat(void *process)
           time2str(vtime0, vtimestr0, sizeof(vtimestr0));
           date2str(vdate1, vdatestr1, sizeof(vdatestr1));
           time2str(vtime1, vtimestr1, sizeof(vtimestr1));
-          cdoPrint("season: %3d %3s  start: %s %s  end: %s %s ntimesteps: %ld",
-                   nseason, seas_name[seas0], vdatestr0, vtimestr0, vdatestr1,
-                   vtimestr1, nsets);
+          cdoPrint("season: %3d %3s  start: %s %s  end: %s %s ntimesteps: %ld", nseason, seas_name[seas0], vdatestr0,
+                   vtimestr0, vdatestr1, vtimestr1, nsets);
         }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
@@ -306,8 +298,8 @@ Seasstat(void *process)
         {
           char vdatestr[32];
           date2str(vdate0, vdatestr, sizeof(vdatestr));
-          cdoWarning("Season %3d (%s) has only %d input time step%s!",
-                     otsID + 1, vdatestr, nsets, nsets == 1 ? "" : "s");
+          cdoWarning("Season %3d (%s) has only %d input time step%s!", otsID + 1, vdatestr, nsets,
+                     nsets == 1 ? "" : "s");
         }
 
       for (int recID = 0; recID < maxrecs; recID++)

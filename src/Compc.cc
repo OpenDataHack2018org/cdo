@@ -94,44 +94,32 @@ Compc(void *process)
           if (operatorID == EQC)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
-                                ? missval
-                                : IS_EQUAL(array1[i], rcv);
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : IS_EQUAL(array1[i], rcv);
             }
           else if (operatorID == NEC)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
-                                ? missval
-                                : IS_NOT_EQUAL(array1[i], rcv);
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : IS_NOT_EQUAL(array1[i], rcv);
             }
           else if (operatorID == LEC)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
-                                ? missval
-                                : array1[i] <= rcv;
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] <= rcv;
             }
           else if (operatorID == LTC)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
-                                ? missval
-                                : array1[i] < rcv;
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] < rcv;
             }
           else if (operatorID == GEC)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
-                                ? missval
-                                : array1[i] >= rcv;
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] >= rcv;
             }
           else if (operatorID == GTC)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval
-                                ? missval
-                                : array1[i] > rcv;
+                array2[i] = DBL_IS_EQUAL(array1[i], missval) || rc_is_missval ? missval : array1[i] > rcv;
             }
           else
             {

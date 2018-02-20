@@ -103,8 +103,7 @@ Tstepcount(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           gridID = vlistInqVarGrid(vlistID1, varID);
           size_t gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
         }
@@ -114,8 +113,7 @@ Tstepcount(void *process)
 
   int nts = tsID;
 
-  memory_t *mem
-      = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
+  memory_t *mem = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
   for (int i = 0; i < Threading::ompNumThreads; i++)
     mem[i].array1 = (double *) Malloc(nts * sizeof(double));
 
@@ -128,9 +126,8 @@ Tstepcount(void *process)
       for (levelID = 0; levelID < nlevel; levelID++)
         {
 #ifdef _OPENMP
-#pragma omp parallel for default(none)                                \
-    shared(gridsize, mem, vars, varID, levelID, nts, missval, refval) \
-        schedule(dynamic, 1)
+#pragma omp parallel for default(none) shared(gridsize, mem, vars, varID, levelID, nts, missval, refval) \
+    schedule(dynamic, 1)
 #endif
           for (size_t i = 0; i < gridsize; i++)
             {
@@ -139,8 +136,7 @@ Tstepcount(void *process)
               for (int tsID = 0; tsID < nts; tsID++)
                 mem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
-              double count
-                  = tstepcount(nts, missval, mem[ompthID].array1, refval);
+              double count = tstepcount(nts, missval, mem[ompthID].array1, refval);
               vars[0][varID][levelID].ptr[i] = count;
             }
         }

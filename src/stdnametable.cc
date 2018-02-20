@@ -145,13 +145,12 @@ wmo_gribcodes(gribcode_t *gribcodes)
 void
 hirlam_harmonie_gribcodes(gribcode_t *gribcodes)
 {
-  gribcodes->geopot = 6;  // Geopotential [m2/s2]
-  gribcodes->temp = 11;   // Temperature [K]
-  gribcodes->hum = 51;    // Specific humidity [kg/kg]
-  gribcodes->ps = 1;      // Pressure [Pa]
-  gribcodes->lsp = 0;     // - not available -
-  gribcodes->gheight
-      = 7;  // 	007 Geopotential height [Gpm]; 008 Geometric height [m]
+  gribcodes->geopot = 6;   // Geopotential [m2/s2]
+  gribcodes->temp = 11;    // Temperature [K]
+  gribcodes->hum = 51;     // Specific humidity [kg/kg]
+  gribcodes->ps = 1;       // Pressure [Pa]
+  gribcodes->lsp = 0;      // - not available -
+  gribcodes->gheight = 7;  // 	007 Geopotential height [Gpm]; 008 Geometric height [m]
   gribcodes->wind = 32;
   gribcodes->uwind = 33;
   gribcodes->vwind = 34;

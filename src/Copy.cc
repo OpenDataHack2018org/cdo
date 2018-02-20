@@ -28,8 +28,9 @@
 #include "pstream_int.h"
 #include "cdoOptions.h"
 
-extern "C" {
-int streamGrbInqDataScanningMode(void);
+extern "C"
+{
+  int streamGrbInqDataScanningMode(void);
 }
 
 void *
@@ -62,8 +63,7 @@ Copy(void *process)
   // DataScanningMode.
   printf("cdo copy/selall : UNCHANGED_RECORD=%d\n", UNCHANGED_RECORD);
   // if (cdiGribDataScanningMode != -1) lcopy = false;
-  printf("cdo copy/selall : cdiGribDataScanningMode=%d; lcopy=%d\n",
-         streamGrbInqDataScanningMode(), lcopy);
+  printf("cdo copy/selall : cdiGribDataScanningMode=%d; lcopy=%d\n", streamGrbInqDataScanningMode(), lcopy);
 #endif  //#ifdef HIRLAM_EXTENSIONS
 
   int operatorID = cdoOperatorID();
@@ -80,8 +80,7 @@ Copy(void *process)
   int tsID2 = 0;
   for (int indf = 0; indf < nfiles; indf++)
     {
-      if (cdoVerbose)
-        cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
+      if (cdoVerbose) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
 
       int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
 
@@ -102,8 +101,7 @@ Copy(void *process)
           if (ntsteps == 1)
             {
               for (varID = 0; varID < nvars; ++varID)
-                if (vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT)
-                  break;
+                if (vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT) break;
 
               if (varID == nvars) ntsteps = 0;
             }
@@ -148,8 +146,7 @@ Copy(void *process)
                   pstreamInqRecord(streamID1, &varID, &levelID);
 
                   if (lconstvars && tsID2 > 0 && tsID1 == 0)
-                    if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-                      continue;
+                    if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
                   pstreamDefRecord(streamID2, varID, levelID);
                   pstreamCopyRecord(streamID2, streamID1);
@@ -162,8 +159,7 @@ Copy(void *process)
                       parIO.nrecs = nrecs;
                       /* fprintf(stderr, "in1 streamID %d varID %d levelID
                        * %d\n", streamID1, varID, levelID);*/
-                      parReadRecord(streamID1, &varID, &levelID,
-                                    (double *) array, &nmiss, &parIO);
+                      parReadRecord(streamID1, &varID, &levelID, (double *) array, &nmiss, &parIO);
                       /* fprintf(stderr, "in2 streamID %d varID %d levelID
                        * %d\n", streamID1, varID, levelID);*/
                     }
@@ -172,9 +168,7 @@ Copy(void *process)
                       pstreamInqRecord(streamID1, &varID, &levelID);
 
                       if (lconstvars && tsID2 > 0 && tsID1 == 0)
-                        if (vlistInqVarTimetype(vlistID1, varID)
-                            == TIME_CONSTANT)
-                          continue;
+                        if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
                       if (CDO_Memtype == MEMTYPE_FLOAT)
                         pstreamReadRecordF(streamID1, (float *) array, &nmiss);

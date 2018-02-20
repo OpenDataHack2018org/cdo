@@ -140,110 +140,74 @@ Math(void *process)
                 {
                 case ABS:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : fabs(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : fabs(array1[i]);
                   break;
                 case FINT:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : (int) (array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : (int) (array1[i]);
                   break;
                 case FNINT:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : round(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : round(array1[i]);
                   break;
                 case SQR:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : array1[i] * array1[i];
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : array1[i] * array1[i];
                   break;
                 case SQRT:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : SQRTMN(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : SQRTMN(array1[i]);
                   break;
                 case EXP:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : exp(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : exp(array1[i]);
                   break;
                 case LN:
                   for (i = 0; i < gridsize; i++)
-                    array2[i]
-                        = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0
-                              ? missval1
-                              : log(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 ? missval1 : log(array1[i]);
                   break;
                 case LOG10:
                   for (i = 0; i < gridsize; i++)
-                    array2[i]
-                        = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0
-                              ? missval1
-                              : log10(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 ? missval1 : log10(array1[i]);
                   break;
                 case SIN:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : sin(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : sin(array1[i]);
                   break;
                 case COS:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : cos(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : cos(array1[i]);
                   break;
                 case TAN:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : tan(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : tan(array1[i]);
                   break;
                 case ASIN:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                        || array1[i] < -1 || array1[i] > 1
-                                    ? missval1
-                                    : asin(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < -1 || array1[i] > 1 ? missval1
+                                                                                                     : asin(array1[i]);
                   break;
                 case ACOS:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                        || array1[i] < -1 || array1[i] > 1
-                                    ? missval1
-                                    : acos(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < -1 || array1[i] > 1 ? missval1
+                                                                                                     : acos(array1[i]);
                   break;
                 case ATAN:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : atan(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : atan(array1[i]);
                   break;
                 case POW:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : pow(array1[i], rc);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : pow(array1[i], rc);
                   break;
                 case RECI:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                        || DBL_IS_EQUAL(array1[i], 0.)
-                                    ? missval1
-                                    : 1 / array1[i];
+                    array2[i]
+                        = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array1[i], 0.) ? missval1 : 1 / array1[i];
                   break;
                 case NOT:
                   for (i = 0; i < gridsize; i++)
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1)
-                                    ? missval1
-                                    : IS_EQUAL(array1[i], 0);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : IS_EQUAL(array1[i], 0);
                   break;
                 default: cdoAbort("operator not implemented!"); break;
                 }
@@ -255,14 +219,11 @@ Math(void *process)
                 case SQR:
                   for (i = 0; i < gridsize; i++)
                     {
-                      array2[i * 2] = array1[i * 2] * array1[i * 2]
-                                      + array1[i * 2 + 1] * array1[i * 2 + 1];
+                      array2[i * 2] = array1[i * 2] * array1[i * 2] + array1[i * 2 + 1] * array1[i * 2 + 1];
                       array2[i * 2 + 1] = 0;
                     }
                   break;
-                default:
-                  cdoAbort("operator not implemented for complex numbers!");
-                  break;
+                default: cdoAbort("operator not implemented for complex numbers!"); break;
                 }
             }
 

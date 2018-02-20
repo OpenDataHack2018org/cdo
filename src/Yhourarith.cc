@@ -40,8 +40,7 @@ hour_of_year(int vdate, int vtime)
   cdiDecodeDate(vdate, &year, &month, &day);
   cdiDecodeTime(vtime, &hour, &minute, &second);
 
-  if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && hour >= 0
-      && hour < 24)
+  if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && hour >= 0 && hour < 24)
     houroy = ((month - 1) * 31 + day - 1) * 25 + hour + 1;
   else
     houroy = 0;
@@ -51,8 +50,7 @@ hour_of_year(int vdate, int vtime)
       char vdatestr[32], vtimestr[32];
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
-      cdoAbort("Hour of year %d out of range (%s %s)!", houroy, vdatestr,
-               vtimestr);
+      cdoAbort("Hour of year %d out of range (%s %s)!", houroy, vdatestr, vtimestr);
     }
 
   return houroy;
@@ -117,8 +115,7 @@ Yhourarith(void *process)
       vtime = taxisInqVtime(taxisID2);
 
       houroy = hour_of_year(vdate, vtime);
-      if (vardata2[houroy] != NULL)
-        cdoAbort("Hour of year %d already allocatd!", houroy);
+      if (vardata2[houroy] != NULL) cdoAbort("Hour of year %d already allocatd!", houroy);
 
       vardata2[houroy] = (double **) Malloc(nvars * sizeof(double *));
       varnmiss2[houroy] = (size_t **) Malloc(nvars * sizeof(size_t *));
@@ -127,8 +124,7 @@ Yhourarith(void *process)
         {
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-          vardata2[houroy][varID]
-              = (double *) Malloc(nlev * gridsize * sizeof(double));
+          vardata2[houroy][varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
           varnmiss2[houroy][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
         }
 
@@ -139,8 +135,7 @@ Yhourarith(void *process)
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           offset = gridsize * levelID;
 
-          pstreamReadRecord(streamID2, vardata2[houroy][varID] + offset,
-                            &nmiss);
+          pstreamReadRecord(streamID2, vardata2[houroy][varID] + offset, &nmiss);
           varnmiss2[houroy][varID][levelID] = nmiss;
         }
 
@@ -154,8 +149,7 @@ Yhourarith(void *process)
       vtime = taxisInqVtime(taxisID1);
 
       houroy = hour_of_year(vdate, vtime);
-      if (vardata2[houroy] == NULL)
-        cdoAbort("Hour of year %d not found!", houroy);
+      if (vardata2[houroy] == NULL) cdoAbort("Hour of year %d not found!", houroy);
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);

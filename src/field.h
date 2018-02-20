@@ -160,10 +160,8 @@ void farmul(field_type *field1, field_type field2);
 void fardiv(field_type *field1, field_type field2);
 void farmin(field_type *field1, field_type field2);
 void farmax(field_type *field1, field_type field2);
-void farvar(field_type *field1, field_type field2, field_type field3,
-            int divisor);
-void farstd(field_type *field1, field_type field2, field_type field3,
-            int divisor);
+void farvar(field_type *field1, field_type field2, field_type field3, int divisor);
+void farstd(field_type *field1, field_type field2, field_type field3, int divisor);
 void farcvar(field_type *field1, field_type field2, int nsets, int divisor);
 void farcstd(field_type *field1, field_type field2, int nsets, int divisor);
 void farmoq(field_type *field1, field_type field2);

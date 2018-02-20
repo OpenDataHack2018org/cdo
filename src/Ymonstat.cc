@@ -127,12 +127,10 @@ Ymonstat(void *process)
       int vdate = taxisInqVdate(taxisID1);
       int vtime = taxisInqVtime(taxisID1);
 
-      if (cdoVerbose)
-        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
+      if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
-      if (month < 0 || month >= NMONTH)
-        cdoAbort("month %d out of range!", month);
+      if (month < 0 || month >= NMONTH) cdoAbort("month %d out of range!", month);
 
       vdates[month] = vdate;
       vtimes[month] = vtime;
@@ -143,8 +141,7 @@ Ymonstat(void *process)
           mon[nmon++] = month;
           vars1[month] = field_malloc(vlistID1, FIELD_PTR);
           samp1[month] = field_malloc(vlistID1, FIELD_NONE);
-          if (lvarstd || lrange)
-            vars2[month] = field_malloc(vlistID1, FIELD_PTR);
+          if (lvarstd || lrange) vars2[month] = field_malloc(vlistID1, FIELD_PTR);
         }
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -155,14 +152,12 @@ Ymonstat(void *process)
             {
               recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst
-                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           field_type *psamp1 = &samp1[month][varID][levelID];
           field_type *pvars1 = &vars1[month][varID][levelID];
-          field_type *pvars2
-              = vars2[month] ? &vars2[month][varID][levelID] : NULL;
+          field_type *pvars2 = vars2[month] ? &vars2[month][varID][levelID] : NULL;
           int nsets = month_nsets[month];
 
           size_t gridsize = pvars1->size;
@@ -180,12 +175,10 @@ Ymonstat(void *process)
 
               if (nmiss > 0 || psamp1->ptr)
                 {
-                  if (psamp1->ptr == NULL)
-                    psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
+                  if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
                   for (size_t i = 0; i < gridsize; i++)
-                    psamp1->ptr[i]
-                        = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                 }
             }
           else
@@ -199,15 +192,13 @@ Ymonstat(void *process)
                 {
                   if (psamp1->ptr == NULL)
                     {
-                      psamp1->ptr
-                          = (double *) Malloc(gridsize * sizeof(double));
+                      psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
                       for (size_t i = 0; i < gridsize; i++)
                         psamp1->ptr[i] = nsets;
                     }
 
                   for (size_t i = 0; i < gridsize; i++)
-                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
-                      psamp1->ptr[i]++;
+                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval)) psamp1->ptr[i]++;
                 }
 
               if (lvarstd)
@@ -277,8 +268,7 @@ Ymonstat(void *process)
     {
       month = mon[i];
       int nsets = month_nsets[month];
-      if (nsets == 0)
-        cdoAbort("Internal problem, nsets[%d] not defined!", month);
+      if (nsets == 0) cdoAbort("Internal problem, nsets[%d] not defined!", month);
 
       for (int recID = 0; recID < maxrecs; recID++)
         {
@@ -288,8 +278,7 @@ Ymonstat(void *process)
           int levelID = recinfo[recID].levelID;
           field_type *psamp1 = &samp1[month][varID][levelID];
           field_type *pvars1 = &vars1[month][varID][levelID];
-          field_type *pvars2
-              = vars2[month] ? &vars2[month][varID][levelID] : NULL;
+          field_type *pvars2 = vars2[month] ? &vars2[month][varID][levelID] : NULL;
 
           if (lmean)
             {

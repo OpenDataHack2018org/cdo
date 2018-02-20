@@ -109,11 +109,9 @@ cdoReadTimestep(void *rarg)
         }
 
       if (CDO_Memtype == MEMTYPE_FLOAT)
-        pstreamReadRecordF(streamID, (float *) input_vars[varID][levelID].ptr2,
-                           &nmiss);
+        pstreamReadRecordF(streamID, (float *) input_vars[varID][levelID].ptr2, &nmiss);
       else
-        pstreamReadRecord(streamID, (double *) input_vars[varID][levelID].ptr2,
-                          &nmiss);
+        pstreamReadRecord(streamID, (double *) input_vars[varID][levelID].ptr2, &nmiss);
 
       input_vars[varID][levelID].nmiss2 = nmiss;
     }
@@ -243,8 +241,7 @@ XTimstat(void *process)
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   taxisWithBounds(taxisID2);
-  if (taxisInqType(taxisID2) == TAXIS_FORECAST)
-    taxisDefType(taxisID2, TAXIS_RELATIVE);
+  if (taxisInqType(taxisID2) == TAXIS_FORECAST) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
@@ -256,8 +253,7 @@ XTimstat(void *process)
     freq = "mon";
   else if (comparelen == YEAR_LEN)
     freq = "year";
-  if (freq)
-    cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int) strlen(freq), freq);
+  if (freq) cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int) strlen(freq), freq);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -297,8 +293,7 @@ XTimstat(void *process)
 
   int FIELD_MEMTYPE = 0;
   if (CDO_Memtype == MEMTYPE_FLOAT) FIELD_MEMTYPE = FIELD_FLT;
-  field_type **input_vars
-      = field_malloc(vlistID1, FIELD_PTR | FIELD_PTR2 | FIELD_MEMTYPE);
+  field_type **input_vars = field_malloc(vlistID1, FIELD_PTR | FIELD_PTR2 | FIELD_MEMTYPE);
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_type **vars2 = NULL;
@@ -327,8 +322,7 @@ XTimstat(void *process)
   int otsID = 0;
   int nrecs = cdoStreamInqTimestep(streamID1, tsID);
   int maxrecs = nrecs;
-  recinfo_type *recinfo
-      = (recinfo_type *) Malloc(maxrecs * sizeof(recinfo_type));
+  recinfo_type *recinfo = (recinfo_type *) Malloc(maxrecs * sizeof(recinfo_type));
 
   tsID++;
   while (TRUE)
@@ -372,8 +366,7 @@ XTimstat(void *process)
           if (nsets == 0)
             {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(maxrecs, recinfo, input_vars, vars1, samp1) if (maxrecs > 1)
+#pragma omp parallel for default(none) shared(maxrecs, recinfo, input_vars, vars1, samp1) if (maxrecs > 1)
 #endif
               for (int recID = 0; recID < maxrecs; recID++)
                 {
@@ -392,21 +385,18 @@ XTimstat(void *process)
                   if (nmiss > 0 || samp1[varID][levelID].ptr)
                     {
                       if (samp1[varID][levelID].ptr == NULL)
-                        samp1[varID][levelID].ptr = (double *) malloc(
-                            nwpv * gridsize * sizeof(double));
+                        samp1[varID][levelID].ptr = (double *) malloc(nwpv * gridsize * sizeof(double));
 
                       for (size_t i = 0; i < nwpv * gridsize; i++)
-                        samp1[varID][levelID].ptr[i]
-                            = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                        samp1[varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
             }
           else
             {
 #ifdef _OPENMP
-#pragma omp parallel for default(none)                                        \
-    shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, \
-           operfunc) if (maxrecs > 1)
+#pragma omp parallel for default(none) \
+    shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, operfunc) if (maxrecs > 1)
 #endif
               for (int recID = 0; recID < maxrecs; recID++)
                 {
@@ -424,15 +414,13 @@ XTimstat(void *process)
                     {
                       if (samp1[varID][levelID].ptr == NULL)
                         {
-                          samp1[varID][levelID].ptr = (double *) malloc(
-                              nwpv * gridsize * sizeof(double));
+                          samp1[varID][levelID].ptr = (double *) malloc(nwpv * gridsize * sizeof(double));
                           for (size_t i = 0; i < nwpv * gridsize; i++)
                             samp1[varID][levelID].ptr[i] = nsets;
                         }
 
                       for (size_t i = 0; i < nwpv * gridsize; i++)
-                        if (!DBL_IS_EQUAL(pinput_var->ptr[i], pvars1->missval))
-                          samp1[varID][levelID].ptr[i]++;
+                        if (!DBL_IS_EQUAL(pinput_var->ptr[i], pvars1->missval)) samp1[varID][levelID].ptr[i]++;
                     }
 
                   if (lvarstd)
@@ -456,8 +444,7 @@ XTimstat(void *process)
                 field_type *pvars1 = &vars1[varID][levelID];
                 field_type *pvars2 = &vars2[varID][levelID];
 
-                if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-                  continue;
+                if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
                 farmoq(pvars2, *pvars1);
               }
@@ -473,8 +460,7 @@ XTimstat(void *process)
       if (lmean)
         {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(vlistID1, nsets, maxrecs, recinfo, vars1, samp1) if (maxrecs > 1)
+#pragma omp parallel for default(none) shared(vlistID1, nsets, maxrecs, recinfo, vars1, samp1) if (maxrecs > 1)
 #endif
           for (int recID = 0; recID < maxrecs; recID++)
             {
@@ -482,8 +468,7 @@ XTimstat(void *process)
               int levelID = recinfo[recID].levelID;
               field_type *pvars1 = &vars1[varID][levelID];
 
-              if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-                continue;
+              if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
               if (samp1[varID][levelID].ptr == NULL)
                 farcdiv(pvars1, (double) nsets);
@@ -500,8 +485,7 @@ XTimstat(void *process)
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = &vars2[varID][levelID];
 
-              if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-                continue;
+              if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
               if (samp1[varID][levelID].ptr == NULL)
                 {
@@ -525,8 +509,7 @@ XTimstat(void *process)
           char vdatestr[32], vtimestr[32];
           date2str(vdate0, vdatestr, sizeof(vdatestr));
           time2str(vtime0, vtimestr, sizeof(vtimestr));
-          cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac,
-                   nsets);
+          cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac, nsets);
         }
 
       if (lvfrac && operfunc == func_mean)
@@ -553,9 +536,7 @@ XTimstat(void *process)
                       }
                   }
 
-                if (irun)
-                  pvars1->nmiss
-                      = arrayNumMV(nwpv * gridsize, pvars1->ptr, missval);
+                if (irun) pvars1->nmiss = arrayNumMV(nwpv * gridsize, pvars1->ptr, missval);
               }
           }
 
@@ -574,8 +555,7 @@ XTimstat(void *process)
           int levelID = recinfo[recID].levelID;
           field_type *pvars1 = &vars1[varID][levelID];
 
-          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-            continue;
+          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);

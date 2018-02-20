@@ -58,8 +58,7 @@ readInstitution(const char *instfile)
 
       if (nvar == 2 && maxvar == 4)
         {
-          if (!isdigit((int) pline[0]))
-            cdoAbort("wrong format in line %d. Missing subcenter!", lnr);
+          if (!isdigit((int) pline[0])) cdoAbort("wrong format in line %d. Missing subcenter!", lnr);
 
           subcenter = atoi(pline);
         }
@@ -78,8 +77,7 @@ readInstitution(const char *instfile)
   fclose(instfp);
 
   instID = institutInq(center, subcenter, name, longname);
-  if (instID == CDI_UNDEFID)
-    instID = institutDef(center, subcenter, name, longname);
+  if (instID == CDI_UNDEFID) instID = institutDef(center, subcenter, name, longname);
 
   return instID;
 }

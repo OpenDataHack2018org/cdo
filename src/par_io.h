@@ -47,7 +47,6 @@ typedef struct
 #endif
 } par_io_t;
 
-void parReadRecord(int streamID, int *varID, int *levelID, double *array,
-                   size_t *nmiss, par_io_t *parIO);
+void parReadRecord(int streamID, int *varID, int *levelID, double *array, size_t *nmiss, par_io_t *parIO);
 
 #endif /* PAR_IO_H */

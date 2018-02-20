@@ -73,8 +73,7 @@ get_type_values(int datatype, double *tmin, double *tmax)
 }
 
 static int
-compute_scale(int datatype, double fmin, double fmax, double *scale_factor,
-              double *add_offset)
+compute_scale(int datatype, double fmin, double fmax, double *scale_factor, double *add_offset)
 {
   double tmin, tmax;
   double ao = 0.0, sf = 1.0;
@@ -141,8 +140,7 @@ Pack(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           int gridID = vlistInqVarGrid(vlistID1, varID);
           size_t gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
           size_t nmiss;
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
@@ -155,8 +153,7 @@ Pack(void *process)
 
   if (cdoDefaultDataType != CDI_UNDEFID)
     {
-      if (cdoDefaultDataType == CDI_DATATYPE_FLT64
-          || cdoDefaultDataType == CDI_DATATYPE_FLT32)
+      if (cdoDefaultDataType == CDI_DATATYPE_FLT64 || cdoDefaultDataType == CDI_DATATYPE_FLT32)
         {
           cdoWarning("Changed default output datatype to int16");
           cdoDefaultDataType = datatype;
@@ -192,8 +189,7 @@ Pack(void *process)
               if (nmiss > 0)
                 {
                   nmisspv += nmiss;
-                  ivals
-                      = arrayMinMaxMV(gridsize, array, missval1, &fmin, &fmax);
+                  ivals = arrayMinMaxMV(gridsize, array, missval1, &fmin, &fmax);
                 }
               else
                 {
@@ -212,9 +208,7 @@ Pack(void *process)
           if (!get_type_values(datatype, &tmin, &tmax))
             {
               if (!(missval2 < tmin || missval2 > tmax))
-                cdoWarning(
-                    "new missing value %g is inside data range (%g - %g)!",
-                    missval2, tmin, tmax);
+                cdoWarning("new missing value %g is inside data range (%g - %g)!", missval2, tmin, tmax);
 
               for (levelID = 0; levelID < nlevel; levelID++)
                 {
@@ -225,8 +219,7 @@ Pack(void *process)
                       size_t nmiss = vars[tsID][varID][levelID].nmiss;
                       if (nmiss > 0)
                         for (size_t i = 0; i < gridsize; ++i)
-                          if (DBL_IS_EQUAL(array[i], missval1))
-                            array[i] = missval2;
+                          if (DBL_IS_EQUAL(array[i], missval1)) array[i] = missval2;
                     }
                 }
             }
@@ -262,8 +255,7 @@ Pack(void *process)
                 {
                   size_t nmiss = vars[tsID][varID][levelID].nmiss;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr,
-                                     nmiss);
+                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
                   Free(vars[tsID][varID][levelID].ptr);
                   vars[tsID][varID][levelID].ptr = NULL;
                 }

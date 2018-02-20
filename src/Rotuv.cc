@@ -31,8 +31,7 @@ static void
 rot_uv_back(int gridID, double *us, double *vs)
 {
   double xpole = 0, ypole = 0, angle = 0;
-  if (gridInqType(gridID) == GRID_PROJECTION
-      && gridInqProjType(gridID) == CDI_PROJ_RLL)
+  if (gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL)
     gridInqParamRLL(gridID, &xpole, &ypole, &angle);
 
   size_t nlon = gridInqXsize(gridID);
@@ -62,8 +61,7 @@ rot_uv_back(int gridID, double *us, double *vs)
       {
         size_t i = ilat * nlon + ilon;
 
-        double xval
-            = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
+        double xval = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
         double yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
 
         usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
@@ -164,8 +162,7 @@ Rotuv(void *process)
   for (varID = 0; varID < nvars; varID++)
     {
       gridID = vlistInqVarGrid(vlistID1, varID);
-      if (!(gridInqType(gridID) == GRID_PROJECTION
-            && gridInqProjType(gridID) == CDI_PROJ_RLL))
+      if (!(gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL))
         cdoAbort("Only rotated lon/lat grids supported!");
 
       gridsize = gridInqSize(gridID);
@@ -198,8 +195,7 @@ Rotuv(void *process)
           size_t offset = gridsize * levelID;
           single = vardata[varID] + offset;
           pstreamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
-          if (varnmiss[varID][levelID])
-            cdoAbort("Missing values unsupported for this operator!");
+          if (varnmiss[varID][levelID]) cdoAbort("Missing values unsupported for this operator!");
         }
 
       for (int i = 0; i < nch; i += 2)
@@ -252,12 +248,10 @@ Rotuv(void *process)
                 {
                   vlistInqVarName(vlistID2, varID1, varname);
                   vlistInqVarName(vlistID2, varID2, varname2);
-                  cdoPrint("Using var %s [%s](u) and var %s [%s](v)", varname,
-                           chvars[i], varname2, chvars[i + 1]);
+                  cdoPrint("Using var %s [%s](u) and var %s [%s](v)", varname, chvars[i], varname2, chvars[i + 1]);
                 }
               else
-                cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
-                         vlistInqVarCode(vlistID1, varID1), chcodes[i],
+                cdoPrint("Using code %d [%d](u) and code %d [%d](v)", vlistInqVarCode(vlistID1, varID1), chcodes[i],
                          vlistInqVarCode(vlistID1, varID2), chcodes[i + 1]);
             }
 
@@ -266,8 +260,7 @@ Rotuv(void *process)
           nlevel1 = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
           nlevel2 = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID2));
 
-          if (nlevel1 != nlevel2)
-            cdoAbort("u-wind and v-wind have different number of levels!");
+          if (nlevel1 != nlevel2) cdoAbort("u-wind and v-wind have different number of levels!");
 
           for (levelID = 0; levelID < nlevel1; levelID++)
             {

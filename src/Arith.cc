@@ -117,8 +117,7 @@ Arith(void *process)
       if (ntsteps1 != 1 && ntsteps2 == 1)
         {
           filltype = FILL_VAR;
-          cdoPrint("Filling up stream2 >%s< by copying the first variable.",
-                   cdoGetStreamName(1).c_str());
+          cdoPrint("Filling up stream2 >%s< by copying the first variable.", cdoGetStreamName(1).c_str());
         }
       else
         {
@@ -135,8 +134,7 @@ Arith(void *process)
       if (ntsteps1 == 1 && ntsteps2 != 1)
         {
           filltype = FILL_VAR;
-          cdoPrint("Filling up stream1 >%s< by copying the first variable.",
-                   cdoGetStreamName(0).c_str());
+          cdoPrint("Filling up stream1 >%s< by copying the first variable.", cdoGetStreamName(0).c_str());
         }
       else
         {
@@ -168,22 +166,19 @@ Arith(void *process)
       varnmiss2 = (size_t *) Malloc(nlevels2 * sizeof(size_t));
     }
 
-  if (cdoVerbose)
-    cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
+  if (cdoVerbose) cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
 
   if (filltype == FILL_NONE)
     {
       if (ntsteps1 != 1 && ntsteps2 == 1)
         {
           filltype = FILL_TS;
-          cdoPrint("Filling up stream2 >%s< by copying the first timestep.",
-                   cdoGetStreamName(1).c_str());
+          cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoGetStreamName(1).c_str());
         }
       else if (ntsteps1 == 1 && ntsteps2 != 1)
         {
           filltype = FILL_TS;
-          cdoPrint("Filling up stream1 >%s< by copying the first timestep.",
-                   cdoGetStreamName(0).c_str());
+          cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
           streamIDx1 = streamID2;
           streamIDx2 = streamID1;
           vlistIDx1 = vlistID2;
@@ -202,8 +197,7 @@ Arith(void *process)
             {
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
               int nlev = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
-              vardata[varID]
-                  = (double *) Malloc(nlev * gridsize * sizeof(double));
+              vardata[varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
               varnmiss[varID] = (size_t *) Malloc(nlev * sizeof(size_t));
             }
         }
@@ -214,8 +208,7 @@ Arith(void *process)
     {
       nvars = vlistNvars(vlistID1);
       for (varID = 0; varID < nvars; varID++)
-        vlistDefVarMissval(vlistID3, varID,
-                           vlistInqVarMissval(vlistID1, varID));
+        vlistDefVarMissval(vlistID3, varID, vlistInqVarMissval(vlistID1, varID));
     }
 
   int taxisID3 = taxisDuplicate(taxisIDx1);
@@ -228,8 +221,7 @@ Arith(void *process)
   int tsID2 = 0;
   while ((nrecs = cdoStreamInqTimestep(streamIDx1, tsID)))
     {
-      if (tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE
-          || filltype == FILL_VARTS)
+      if (tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS)
         {
           int nrecs2 = cdoStreamInqTimestep(streamIDx2, tsID2);
           if (nrecs2 == 0)
@@ -237,8 +229,7 @@ Arith(void *process)
               if (filltype == FILL_NONE && streamIDx2 == streamID2)
                 {
                   filltype = FILL_FILE;
-                  cdoPrint("Filling up stream2 >%s< by copying all timesteps.",
-                           cdoGetStreamName(1).c_str());
+                  cdoPrint("Filling up stream2 >%s< by copying all timesteps.", cdoGetStreamName(1).c_str());
                 }
 
               if (filltype == FILL_FILE)
@@ -254,9 +245,7 @@ Arith(void *process)
                   vlistCompare(vlistID1, vlistID2, CMP_DIM);
 
                   nrecs2 = cdoStreamInqTimestep(streamIDx2, tsID2);
-                  if (nrecs2 == 0)
-                    cdoAbort("Empty input stream %s!",
-                             cdoGetStreamName(1).c_str());
+                  if (nrecs2 == 0) cdoAbort("Empty input stream %s!", cdoGetStreamName(1).c_str());
                 }
               else
                 cdoAbort("Input streams have different number of timesteps!");
@@ -274,8 +263,7 @@ Arith(void *process)
           fieldx1->nmiss = nmiss;
           int varID2 = varID;
 
-          if (tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE
-              || filltype == FILL_VARTS)
+          if (tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS)
             {
               bool lstatus = nlevels2 > 1 ? varID == 0 : recID == 0;
 
@@ -284,23 +272,18 @@ Arith(void *process)
                   pstreamInqRecord(streamIDx2, &varID2, &levelID2);
                   pstreamReadRecord(streamIDx2, fieldx2->ptr, &nmiss);
                   fieldx2->nmiss = nmiss;
-                  if (varID != varID2)
-                    cdoAbort("Internal error, varIDs of input streams differ!");
-                  if (levelID != levelID2)
-                    cdoAbort(
-                        "Internal error, levelIDs of input streams differ!");
+                  if (varID != varID2) cdoAbort("Internal error, varIDs of input streams differ!");
+                  if (levelID != levelID2) cdoAbort("Internal error, levelIDs of input streams differ!");
                 }
 
               if (filltype == FILL_TS)
                 {
-                  size_t gridsize
-                      = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+                  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
                   size_t offset = gridsize * levelID;
                   arrayCopy(gridsize, fieldx2->ptr, vardata[varID] + offset);
                   varnmiss[varID][levelID] = fieldx2->nmiss;
                 }
-              else if (lstatus
-                       && (filltype == FILL_VAR || filltype == FILL_VARTS))
+              else if (lstatus && (filltype == FILL_VAR || filltype == FILL_VARTS))
                 {
                   size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
                   size_t offset = gridsize * levelID2;

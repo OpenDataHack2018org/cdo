@@ -97,8 +97,7 @@ expand_filename(const char *string)
 
       glob(string, glob_flags, 0, &glob_results);
 
-      if (glob_results.gl_pathc == 1)
-        filename = strdupx(glob_results.gl_pathv[0]);
+      if (glob_results.gl_pathc == 1) filename = strdupx(glob_results.gl_pathv[0]);
 
       globfree(&glob_results);
 #endif
@@ -121,14 +120,12 @@ expandWildCards(std::vector<std::string> argv)
     {
       // if argv[idx] contains wildcard (* or [?]+)
       // multiple ** are ignored
-      if (argv[idx][0] != '-'
-          && argv[idx].find_first_of("*?") != std::string::npos)
+      if (argv[idx][0] != '-' && argv[idx].find_first_of("*?") != std::string::npos)
         {
           wordexp(argv[idx].c_str(), &glob_results, flags);
           // range based insert (glob_results.we_wordv is inserted before
           // wildcard
-          argv.insert(argv.begin() + idx + 1, glob_results.we_wordv,
-                      glob_results.we_wordv + glob_results.we_wordc);
+          argv.insert(argv.begin() + idx + 1, glob_results.we_wordv, glob_results.we_wordv + glob_results.we_wordc);
           // delete wildcard
           argv.erase(argv.begin() + idx);
           wordfree(&glob_results);

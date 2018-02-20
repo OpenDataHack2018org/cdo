@@ -33,9 +33,7 @@ isSorted(size_t *restrict array1, size_t *restrict array2, const size_t size)
 {
   for (size_t idx = 1; idx < size; ++idx)
     {
-      if ((array1[idx - 1] > array1[idx])
-          || ((array1[idx - 1] == array1[idx])
-              && (array2[idx - 1] > array2[idx])))
+      if ((array1[idx - 1] > array1[idx]) || ((array1[idx - 1] == array1[idx]) && (array2[idx - 1] > array2[idx])))
         {
           return 0;
         }
@@ -111,8 +109,7 @@ void remap_heapsort_recursiv(const long num_links, int *restrict arr1, int
 */
 
 static void
-remap_heapsort(const size_t num_links, size_t *restrict add1,
-               size_t *restrict add2, size_t *restrict idx)
+remap_heapsort(const size_t num_links, size_t *restrict add1, size_t *restrict add2, size_t *restrict idx)
 {
   size_t add1_tmp, add2_tmp; /* temp for addresses during swap     */
   size_t idx_tmp;
@@ -142,8 +139,7 @@ remap_heapsort(const size_t num_links, size_t *restrict add1,
           if (chk_lvl1 == num_links - 1) max_lvl = chk_lvl1;
 
           if ((add1[chk_lvl1] > add1[max_lvl])
-              || ((add1[chk_lvl1] == add1[max_lvl])
-                  && (add2[chk_lvl1] > add2[max_lvl])))
+              || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
             {
               max_lvl = chk_lvl1;
             }
@@ -152,8 +148,7 @@ remap_heapsort(const size_t num_links, size_t *restrict add1,
             If the parent is greater than both daughters,
             the correct level has been found
           */
-          if ((add1_tmp > add1[max_lvl])
-              || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
+          if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
             {
               add1[final_lvl] = add1_tmp;
               add2[final_lvl] = add2_tmp;
@@ -219,8 +214,7 @@ remap_heapsort(const size_t num_links, size_t *restrict add1,
           if (max_lvl >= (size_t) lvl) max_lvl = chk_lvl1;
 
           if ((add1[chk_lvl1] > add1[max_lvl])
-              || ((add1[chk_lvl1] == add1[max_lvl])
-                  && (add2[chk_lvl1] > add2[max_lvl])))
+              || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
             {
               max_lvl = chk_lvl1;
             }
@@ -229,8 +223,7 @@ remap_heapsort(const size_t num_links, size_t *restrict add1,
             If the parent is greater than both daughters,
             the correct level has been found
           */
-          if ((add1_tmp > add1[max_lvl])
-              || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
+          if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
             {
               add1[final_lvl] = add1_tmp;
               add2[final_lvl] = add2_tmp;
@@ -281,8 +274,7 @@ remap_heapsort(const size_t num_links, size_t *restrict add1,
 }
 
 void
-sort_add(size_t num_links, size_t num_wts, size_t *restrict add1,
-         size_t *restrict add2, double *restrict weights)
+sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the destination
@@ -318,15 +310,13 @@ sort_add(size_t num_links, size_t num_wts, size_t *restrict add1,
   Free(idx);
 
   if (cdoVerbose)
-    if (!isSorted(add1, add2, num_links))
-      fprintf(stderr, ">>>> sort_add failed!!!\n");
+    if (!isSorted(add1, add2, num_links)) fprintf(stderr, ">>>> sort_add failed!!!\n");
 } /* sort_add */
 
 /*****************************************************************************/
 
 void
-sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1,
-              size_t *restrict add2, double *restrict weights)
+sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the
@@ -380,8 +370,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1,
           if (chk_lvl1 == num_links - 1) chk_lvl2 = chk_lvl1;
 
           if ((add1[chk_lvl1] > add1[chk_lvl2])
-              || ((add1[chk_lvl1] == add1[chk_lvl2])
-                  && (add2[chk_lvl1] > add2[chk_lvl2])))
+              || ((add1[chk_lvl1] == add1[chk_lvl2]) && (add2[chk_lvl1] > add2[chk_lvl2])))
             max_lvl = chk_lvl1;
           else
             max_lvl = chk_lvl2;
@@ -390,8 +379,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1,
             If the parent is greater than both daughters,
             the correct level has been found
           */
-          if ((add1_tmp > add1[max_lvl])
-              || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
+          if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
             {
               add1[final_lvl] = add1_tmp;
               add2[final_lvl] = add2_tmp;
@@ -411,8 +399,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1,
               add1[final_lvl] = add1[max_lvl];
               add2[final_lvl] = add2[max_lvl];
               for (n = 0; n < num_wts; n++)
-                weights[num_wts * final_lvl + n]
-                    = weights[num_wts * max_lvl + n];
+                weights[num_wts * final_lvl + n] = weights[num_wts * max_lvl + n];
 
               final_lvl = max_lvl;
               if (2 * final_lvl + 1 >= num_links)
@@ -464,8 +451,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1,
           if (chk_lvl2 >= (size_t) lvl) chk_lvl2 = chk_lvl1;
 
           if ((add1[chk_lvl1] > add1[chk_lvl2])
-              || ((add1[chk_lvl1] == add1[chk_lvl2])
-                  && (add2[chk_lvl1] > add2[chk_lvl2])))
+              || ((add1[chk_lvl1] == add1[chk_lvl2]) && (add2[chk_lvl1] > add2[chk_lvl2])))
             max_lvl = chk_lvl1;
           else
             max_lvl = chk_lvl2;
@@ -474,8 +460,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1,
             If the parent is greater than both daughters,
             the correct level has been found
           */
-          if ((add1_tmp > add1[max_lvl])
-              || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
+          if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
             {
               add1[final_lvl] = add1_tmp;
               add2[final_lvl] = add2_tmp;
@@ -495,8 +480,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1,
               add1[final_lvl] = add1[max_lvl];
               add2[final_lvl] = add2[max_lvl];
               for (n = 0; n < num_wts; n++)
-                weights[num_wts * final_lvl + n]
-                    = weights[num_wts * max_lvl + n];
+                weights[num_wts * final_lvl + n] = weights[num_wts * max_lvl + n];
 
               final_lvl = max_lvl;
               if (2 * final_lvl + 1 >= (size_t) lvl)
@@ -560,12 +544,10 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1,
 
 /* MERGE SORT DEFINES */
 //#define MERGE_SORT_CHUNKS          64
-#define MERGE_SORT_LIMIT_SIZE \
-  4096  // num_links/(MERGE_SORT_CHUNKS*omp_get_num_procs())
+#define MERGE_SORT_LIMIT_SIZE 4096  // num_links/(MERGE_SORT_CHUNKS*omp_get_num_procs())
 
 static void
-merge_lists(size_t *nl, size_t *l11, size_t *l12, size_t *l21, size_t *l22,
-            size_t *idx)
+merge_lists(size_t *nl, size_t *l11, size_t *l12, size_t *l21, size_t *l22, size_t *idx)
 {
   /*
     This routine writes to idx a list of indices relative to *l11 and *l12
@@ -609,9 +591,8 @@ merge_lists(size_t *nl, size_t *l11, size_t *l12, size_t *l21, size_t *l22,
 }
 
 static void
-sort_par(size_t num_links, size_t num_wts, size_t *restrict add1,
-         size_t *restrict add2, double *restrict weights, int parent,
-         int par_depth)
+sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,
+         int parent, int par_depth)
 {
   /*
     This routine is the core of merge-sort. It does the following
@@ -637,26 +618,23 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1,
     and determine the actual position of the sub-array within the original array
   */
 
-  const int nsplit
-      = 2;           /* (only 2 allowed) number of segments to split the data */
-  size_t nl[nsplit]; /* number of links in each sub-array              */
-  int who_am_i;      /* current depth, depth of children and index
-                        to be parent in next call to sort_par          */
+  const int nsplit = 2;                         /* (only 2 allowed) number of segments to split the data */
+  size_t nl[nsplit];                            /* number of links in each sub-array              */
+  int who_am_i;                                 /* current depth, depth of children and index
+                                                   to be parent in next call to sort_par          */
   size_t add_srt[nsplit] /*, add_end[nsplit]*/; /* arrays for start and end
                                                    index of sub array    */
-  size_t *add1s[nsplit],
-      *add2s[nsplit];    /* pointers to sub arrays for sort and merge step */
-  size_t *tmp;           /* pointer to buffer for merging of address lists */
-  double *tmp2 = NULL;   /* pointer to buffer for merging weight lists     */
-  double *wgttmp = NULL; /* pointer to buffer for swap weights             */
+  size_t *add1s[nsplit], *add2s[nsplit];        /* pointers to sub arrays for sort and merge step */
+  size_t *tmp;                                  /* pointer to buffer for merging of address lists */
+  double *tmp2 = NULL;                          /* pointer to buffer for merging weight lists     */
+  double *wgttmp = NULL;                        /* pointer to buffer for swap weights             */
   size_t i, n, m;
 
   // printf("sort_par: parent = %d numlinks = %zu\n", parent, num_links);
   if (nsplit != 2)
     {
-      fprintf(stderr,
-              "Error: splitting into more than two subsegments not allowed\n"
-              "       in this implementation of merge sort\n");
+      fprintf(stderr, "Error: splitting into more than two subsegments not allowed\n"
+                      "       in this implementation of merge sort\n");
       exit(-1);
     }
 
@@ -699,16 +677,15 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1,
     }
 #endif
 
-      //  printf("I am %i nl[0] %i nl[1] %i\n",parent,nl[0],nl[1]);
-      //  printf("add_srt[0] %i add_Srt[1] %i\n",add_srt[0],add_srt[1]);
-      //  if ( 1 )
-      //      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i
-      //      parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
-      //	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
+    //  printf("I am %i nl[0] %i nl[1] %i\n",parent,nl[0],nl[1]);
+    //  printf("add_srt[0] %i add_Srt[1] %i\n",add_srt[0],add_srt[1]);
+    //  if ( 1 )
+    //      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i
+    //      parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
+    //	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
 
 #ifdef _OPENMP
-#pragma omp parallel for if (depth < par_depth) private( \
-    n, m, wgttmp, who_am_i) shared(weights) num_threads(2)
+#pragma omp parallel for if (depth < par_depth) private(n, m, wgttmp, who_am_i) shared(weights) num_threads(2)
 #endif
   for (i = 0; i < nsplit; i++)
     {
@@ -744,9 +721,8 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1,
   /* ********************************* */
   /* Idea I: one CPU merges top-down, the other one bottom-up */
   /* ********************** */
-  merge_lists(nl, add1s[0], add2s[0], add1s[1], add2s[1],
-              idx); /* MERGE THE SEGMENTS     */
-                    /* ********************** */
+  merge_lists(nl, add1s[0], add2s[0], add1s[1], add2s[1], idx); /* MERGE THE SEGMENTS     */
+                                                                /* ********************** */
   tmp = (size_t *) Malloc(num_links * sizeof(size_t));
 
 #ifdef _OPENMP
@@ -796,8 +772,8 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1,
 }
 
 void
-sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1,
-          size_t *restrict add2, double *restrict weights, int parent)
+sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,
+          int parent)
 {
   /*
     This routine is an interface between the parallelized (merge-sort)
@@ -839,8 +815,7 @@ sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1,
   if (num_links > MERGE_SORT_LIMIT_SIZE && parent <= (nthreads - 1))
     {
       sort_par(num_links, num_wts, add1, add2, weights, parent, par_depth);
-      if (cdoVerbose)
-        fprintf(stderr, "sort_iter: Finished iteration parent %i\n", parent);
+      if (cdoVerbose) fprintf(stderr, "sort_iter: Finished iteration parent %i\n", parent);
     }
   else
     {

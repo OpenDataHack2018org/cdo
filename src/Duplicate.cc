@@ -93,8 +93,7 @@ Duplicate(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           int gridID = vlistInqVarGrid(vlistID1, varID);
           size_t gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
         }
@@ -121,8 +120,7 @@ Duplicate(void *process)
                     {
                       nmiss = vars[tsID][varID][levelID].nmiss;
                       pstreamDefRecord(streamID2, varID, levelID);
-                      pstreamWriteRecord(streamID2,
-                                         vars[tsID][varID][levelID].ptr, nmiss);
+                      pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
                     }
                 }
             }

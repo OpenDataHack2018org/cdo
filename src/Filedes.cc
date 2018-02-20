@@ -49,9 +49,8 @@ cdo_print_attributes(FILE *fp, int cdiID, int varID, int nblanks)
     {
       cdiInqAtt(cdiID, varID, ia, attname, &atttype, &attlen);
 
-      if (atttype == CDI_DATATYPE_INT8 || atttype == CDI_DATATYPE_UINT8
-          || atttype == CDI_DATATYPE_INT16 || atttype == CDI_DATATYPE_UINT16
-          || atttype == CDI_DATATYPE_INT32 || atttype == CDI_DATATYPE_UINT32)
+      if (atttype == CDI_DATATYPE_INT8 || atttype == CDI_DATATYPE_UINT8 || atttype == CDI_DATATYPE_INT16
+          || atttype == CDI_DATATYPE_UINT16 || atttype == CDI_DATATYPE_INT32 || atttype == CDI_DATATYPE_UINT32)
         {
           if (attlen > MAXATT) attlen = MAXATT;
           cdiInqAttInt(cdiID, varID, attname, attlen, attint);
@@ -74,13 +73,9 @@ cdo_print_attributes(FILE *fp, int cdiID, int varID, int nblanks)
             {
               if (i > 0) fprintf(fp, ", ");
               if (atttype == CDI_DATATYPE_FLT32)
-                fprintf(fp, "%sf",
-                        double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr),
-                                         attflt[i]));
+                fprintf(fp, "%sf", double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr), attflt[i]));
               else
-                fprintf(fp, "%s",
-                        double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr),
-                                         attflt[i]));
+                fprintf(fp, "%s", double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr), attflt[i]));
             }
           fprintf(fp, "\n");
         }
@@ -113,8 +108,7 @@ static void
 printSource(FILE *fp, int vlistID, int varID)
 {
   /* institute info */
-  const char *instptr
-      = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, varID));
+  const char *instptr = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, varID));
   if (instptr) fprintf(fp, "  institution = %s\n", instptr);
 
   /* source info */
@@ -129,8 +123,7 @@ partab(FILE *fp, int streamID, int option)
   int varID, datatype = -1;
   char pstr[32];
   char paramstr[32];
-  char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME],
-      varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
+  char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
 
   int nvars = vlistNvars(vlistID);
   bool linebreak = (option == 4) ? false : true;
@@ -359,8 +352,7 @@ Filedes(void *process)
                       fprintf(stdout, "#   k         vct_a(k) [Pa]             "
                                       "vct_b(k) []\n");
                       for (int i = 0; i < vctsize / 2; i++)
-                        fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i],
-                                vct[vctsize / 2 + i]);
+                        fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize / 2 + i]);
                     }
                   else
                     {
@@ -393,8 +385,7 @@ Filedes(void *process)
     }
   else if (operatorID == CODETAB)
     {
-      char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME],
-          varunits[CDI_MAX_NAME];
+      char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
 
       for (int varID = 0; varID < nvars; varID++)
         {
@@ -414,8 +405,7 @@ Filedes(void *process)
           fprintf(stdout, "\n");
         }
     }
-  else if (operatorID == PARTAB || operatorID == SPARTAB
-           || operatorID == PARTAB2)
+  else if (operatorID == PARTAB || operatorID == SPARTAB || operatorID == PARTAB2)
     {
       int option = 1;
       if (operatorID == SPARTAB) option = 4;

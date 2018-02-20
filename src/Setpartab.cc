@@ -48,12 +48,11 @@ paramToString(int param, char *paramstr, int maxlen)
     len = snprintf(paramstr, umaxlen, "%d.%d.%d", num, cat, dis);
 
   if (len >= maxlen || len < 0)
-    fprintf(stderr,
-            "Internal problem (%s): size of input string is too small!\n",
-            __func__);
+    fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
 }
 
-typedef enum {
+typedef enum
+{
   CODE_NUMBER,
   PARAMETER_ID,
   VARIABLE_NAME,
@@ -93,16 +92,14 @@ typedef struct
   long nvals, n_lower_min, n_greater_max;
 } var_t;
 
-void cdo_define_var_units(var_t *var, int vlistID2, int varID,
-                          const char *units);
+void cdo_define_var_units(var_t *var, int vlistID2, int varID, const char *units);
 
 void cmor_check_init(int nvars, var_t *vars);
 void cmor_check_eval(int vlistID, int nvars, var_t *vars);
 void cmor_check_prep(var_t *var, long gridsize, double missval, double *array);
 
 static void
-apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
-                    var_t *vars)
+apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 {
   const char *hentry[] = { "Header" };
   const char *ventry[] = { "variable_entry", "parameter" };
@@ -150,21 +147,16 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
         {
           codenum = vlistInqVarCode(vlistID2, varID);
           snprintf(valstr, sizeof(valstr), "%d", codenum);
-          kvlist = pmlist_search_kvlist_ventry(pmlist, "code", valstr, nventry,
-                                               ventry);
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "code", valstr, nventry, ventry);
           if (kvlist)
             {
               int tableID = vlistInqVarTable(vlistID2, varID);
               int tabnum = tableInqNum(tableID);
               int levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
               kv = kvlist_search(kvlist, "table");
-              int table = (kv && kv->nvalues == 1)
-                              ? parameter2int(kv->values[0])
-                              : tabnum;
+              int table = (kv && kv->nvalues == 1) ? parameter2int(kv->values[0]) : tabnum;
               kv = kvlist_search(kvlist, "ltype");
-              int ltype = (kv && kv->nvalues == 1)
-                              ? parameter2int(kv->values[0])
-                              : levtype;
+              int ltype = (kv && kv->nvalues == 1) ? parameter2int(kv->values[0]) : levtype;
               if (!(tabnum == table && levtype == ltype)) kvlist = NULL;
             }
         }
@@ -173,29 +165,24 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
           int param = vlistInqVarParam(vlistID2, varID);
           paramToString(param, paramstr, sizeof(paramstr));
           snprintf(valstr, sizeof(valstr), "%s", paramstr);
-          kvlist = pmlist_search_kvlist_ventry(pmlist, "param", valstr, nventry,
-                                               ventry);
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "param", valstr, nventry, ventry);
           if (kvlist)
             {
               int levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
               kv = kvlist_search(kvlist, "ltype");
-              int ltype = (kv && kv->nvalues == 1)
-                              ? parameter2int(kv->values[0])
-                              : levtype;
+              int ltype = (kv && kv->nvalues == 1) ? parameter2int(kv->values[0]) : levtype;
               if (!(levtype == ltype)) kvlist = NULL;
             }
         }
       else if (ptmode == VARIABLE_NAME)
         {
-          kvlist = pmlist_search_kvlist_ventry(pmlist, "name", varname, nventry,
-                                               ventry);
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "name", varname, nventry, ventry);
         }
 
       if (kvlist)
         {
           int pnum, ptab, pdum;
-          cdiDecodeParam(vlistInqVarParam(vlistID2, varID), &pnum, &ptab,
-                         &pdum);
+          cdiDecodeParam(vlistInqVarParam(vlistID2, varID), &pnum, &ptab, &pdum);
           bool lvalid_min = false, lvalid_max = false;
 
           for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
@@ -215,8 +202,7 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
                 cdo_define_var_units(var, vlistID2, varID, value);
               else if (lv1 && STR_IS_EQ(key, "name"))
                 {
-                  if (ptmode != VARIABLE_NAME)
-                    vlistDefVarName(vlistID2, varID, parameter2word(value));
+                  if (ptmode != VARIABLE_NAME) vlistDefVarName(vlistID2, varID, parameter2word(value));
                 }
               else if (lv1 && STR_IS_EQ(key, "out_name"))
                 {
@@ -224,24 +210,17 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
                   if (!STR_IS_EQ(var->name, outname))
                     {
                       vlistDefVarName(vlistID2, varID, outname);
-                      cdiDefAttTxt(vlistID2, varID, "original_name",
-                                   (int) strlen(var->name), var->name);
+                      cdiDefAttTxt(vlistID2, varID, "original_name", (int) strlen(var->name), var->name);
                     }
                 }
               else if (lv1 && STR_IS_EQ(key, "param"))
-                vlistDefVarParam(vlistID2, varID,
-                                 stringToParam(parameter2word(value)));
+                vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
               else if (lv1 && STR_IS_EQ(key, "out_param"))
-                vlistDefVarParam(vlistID2, varID,
-                                 stringToParam(parameter2word(value)));
+                vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
               else if (lv1 && STR_IS_EQ(key, "code"))
-                vlistDefVarParam(
-                    vlistID2, varID,
-                    cdiEncodeParam(parameter2int(value), ptab, 255));
+                vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               else if (lv1 && STR_IS_EQ(key, "out_code"))
-                vlistDefVarParam(
-                    vlistID2, varID,
-                    cdiEncodeParam(parameter2int(value), ptab, 255));
+                vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               else if (lv1 && STR_IS_EQ(key, "comment"))
                 cdiDefAttTxt(vlistID2, varID, key, (int) strlen(value), value);
               else if (lv1 && STR_IS_EQ(key, "chunktype"))
@@ -258,20 +237,15 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
                 {
                   var->lfactor = true;
                   var->factor = parameter2double(value);
-                  if (cdoVerbose)
-                    cdoPrint("%s - scale factor %g", varname, var->factor);
+                  if (cdoVerbose) cdoPrint("%s - scale factor %g", varname, var->factor);
                 }
-              else if (lv1
-                       && (STR_IS_EQ(key, "missval")
-                           || STR_IS_EQ(key, "missing_value")))
+              else if (lv1 && (STR_IS_EQ(key, "missval") || STR_IS_EQ(key, "missing_value")))
                 {
                   double missval = parameter2double(value);
                   double missval_old = vlistInqVarMissval(vlistID2, varID);
                   if (!DBL_IS_EQUAL(missval, missval_old))
                     {
-                      if (cdoVerbose)
-                        cdoPrint("%s - change missval from %g to %g", varname,
-                                 missval_old, missval);
+                      if (cdoVerbose) cdoPrint("%s - change missval from %g to %g", varname, missval_old, missval);
                       var->changemissval = true;
                       var->missval_old = missval_old;
                       vlistDefVarMissval(vlistID2, varID, missval);
@@ -297,13 +271,10 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
                   var->check_max_mean_abs = true;
                   var->ok_max_mean_abs = parameter2double(value);
                 }
-              else if (lv1
-                       && (STR_IS_EQ(key, "datatype")
-                           || STR_IS_EQ(key, "type")))
+              else if (lv1 && (STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type")))
                 {
                   int datatype = str2datatype(parameter2word(value));
-                  if (datatype != -1)
-                    vlistDefVarDatatype(vlistID2, varID, datatype);
+                  if (datatype != -1) vlistDefVarDatatype(vlistID2, varID, datatype);
                 }
               else if (lv1 && STR_IS_EQ(key, "dimensions"))
                 {
@@ -314,8 +285,7 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
                   if (nvalues == 1 && !*value) nvalues = 0;
                   int dtype = literals_find_datatype(nvalues, kv->values);
 
-                  if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16
-                      || dtype == CDI_DATATYPE_INT32)
+                  if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32)
                     {
                       int *ivals = (int *) Malloc(nvalues * sizeof(int));
                       for (int i = 0; i < nvalues; ++i)
@@ -323,11 +293,9 @@ apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2,
                       cdiDefAttInt(vlistID2, varID, key, dtype, nvalues, ivals);
                       Free(ivals);
                     }
-                  else if (dtype == CDI_DATATYPE_FLT32
-                           || dtype == CDI_DATATYPE_FLT64)
+                  else if (dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64)
                     {
-                      double *dvals
-                          = (double *) Malloc(nvalues * sizeof(double));
+                      double *dvals = (double *) Malloc(nvalues * sizeof(double));
                       for (int i = 0; i < nvalues; ++i)
                         dvals[i] = literal_to_double(kv->values[i]);
                       cdiDefAttFlt(vlistID2, varID, key, dtype, nvalues, dvals);
@@ -368,8 +336,7 @@ Setpartab(void *process)
 
   cdoInitialize(process);
 
-  int SETCODETAB
-      = cdoOperatorAdd("setcodetab", 0, 0, "parameter code table name");
+  int SETCODETAB = cdoOperatorAdd("setcodetab", 0, 0, "parameter code table name");
   int SETPARTABC = cdoOperatorAdd("setpartabc", 0, 0, "parameter table name");
   int SETPARTABP = cdoOperatorAdd("setpartabp", 0, 0, "parameter table name");
   int SETPARTABN = cdoOperatorAdd("setpartabn", 0, 0, "parameter table name");
@@ -472,8 +439,7 @@ Setpartab(void *process)
               if (name[0])
                 {
                   vlistDefVarName(vlistID2, varID, name);
-                  if (longname[0])
-                    vlistDefVarLongname(vlistID2, varID, longname);
+                  if (longname[0]) vlistDefVarLongname(vlistID2, varID, longname);
                   if (units[0]) vlistDefVarUnits(vlistID2, varID, units);
                 }
             }
@@ -534,8 +500,7 @@ Setpartab(void *process)
           var_t *var = &vars[varID];
           if (var->convert == false) var->changeunits = false;
           if (var->changeunits)
-            cdoConvertUnits(&var->ut_converter, &var->changeunits,
-                            (char *) &var->units, (char *) &var->units_old,
+            cdoConvertUnits(&var->ut_converter, &var->changeunits, (char *) &var->units, (char *) &var->units_old,
                             var->name);
         }
     }
@@ -591,8 +556,7 @@ Setpartab(void *process)
             {
               for (size_t i = 0; i < gridsize; ++i)
                 {
-                  if (DBL_IS_EQUAL(array[i], var->missval_old))
-                    array[i] = missval;
+                  if (DBL_IS_EQUAL(array[i], var->missval_old)) array[i] = missval;
                 }
             }
 
@@ -612,8 +576,7 @@ Setpartab(void *process)
                 {
                   if (!DBL_IS_EQUAL(array[i], missval))
                     {
-                      array[i] = cv_convert_double(
-                          (const cv_converter *) var->ut_converter, array[i]);
+                      array[i] = cv_convert_double((const cv_converter *) var->ut_converter, array[i]);
                       if (ut_get_status() != UT_SUCCESS) nerr++;
                     }
                 }

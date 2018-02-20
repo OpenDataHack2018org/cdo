@@ -115,8 +115,7 @@ CDItest(void *process)
       s_utime = e_utime;
       s_stime = e_stime;
 
-      cdoPrint("Copy number %d: %.2fs %.2fs %.2fs", n, c_usertime, c_systime,
-               c_cputime);
+      cdoPrint("Copy number %d: %.2fs %.2fs %.2fs", n, c_usertime, c_systime, c_cputime);
 
       if (n == max_copy) break;
     }

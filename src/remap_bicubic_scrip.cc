@@ -50,8 +50,7 @@ set_bicubic_weights(double iw, double jw, double wgts[4][4])
   // clang-format on
 }
 
-unsigned num_src_points(const int *restrict mask, const size_t src_add[4],
-                        double src_lats[4]);
+unsigned num_src_points(const int *restrict mask, const size_t src_add[4], double src_lats[4]);
 
 static void
 renormalize_weights(const double src_lats[4], double wgts[4][4])
@@ -86,16 +85,13 @@ bicubic_warning(void)
 }
 
 static void
-bicubic_remap(double *restrict tgt_point, const double *restrict src_array,
-              double wgts[4][4], const size_t src_add[4],
-              const double *restrict grad1, const double *restrict grad2,
-              const double *restrict grad3)
+bicubic_remap(double *restrict tgt_point, const double *restrict src_array, double wgts[4][4], const size_t src_add[4],
+              const double *restrict grad1, const double *restrict grad2, const double *restrict grad3)
 {
   *tgt_point = 0.;
   for (unsigned n = 0; n < 4; ++n)
-    *tgt_point
-        += src_array[src_add[n]] * wgts[n][0] + grad1[src_add[n]] * wgts[n][1]
-           + grad2[src_add[n]] * wgts[n][2] + grad3[src_add[n]] * wgts[n][3];
+    *tgt_point += src_array[src_add[n]] * wgts[n][0] + grad1[src_add[n]] * wgts[n][1] + grad2[src_add[n]] * wgts[n][2]
+                  + grad3[src_add[n]] * wgts[n][3];
 }
 
 /*
@@ -106,8 +102,7 @@ bicubic_remap(double *restrict tgt_point, const double *restrict src_array,
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                            remapvars_t *rv)
+scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   extern int timer_remap_bic;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -120,18 +115,14 @@ scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
   /* Compute mappings from source to target grid */
 
-  if (src_grid->rank != 2)
-    cdoAbort("Can not do bicubic interpolation when source grid rank != 2");
+  if (src_grid->rank != 2) cdoAbort("Can not do bicubic interpolation when source grid rank != 2");
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  weightlinks4_t *weightlinks
-      = (weightlinks4_t *) Malloc(tgt_grid_size * sizeof(weightlinks4_t));
-  weightlinks[0].addweights
-      = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
+  weightlinks4_t *weightlinks = (weightlinks4_t *) Malloc(tgt_grid_size * sizeof(weightlinks4_t));
+  weightlinks[0].addweights = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
   for (unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightlinks[tgt_cell_add].addweights
-        = weightlinks[0].addweights + 4 * tgt_cell_add;
+    weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4 * tgt_cell_add;
 
   /* Loop over destination grid */
 
@@ -144,8 +135,7 @@ scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
       findex++;
-      if (cdo_omp_get_thread_num() == 0)
-        progressStatus(0, 1, findex / tgt_grid_size);
+      if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
       weightlinks[tgt_cell_add].nlinks = 0;
 
@@ -162,14 +152,12 @@ scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
       /* Find nearest square of grid points on source grid  */
       int search_result;
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        search_result = grid_search_reg2d(
-            src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
+        search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
+                                          src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
       else
-        search_result = grid_search(
-            src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->cell_center_lat, src_grid->cell_center_lon,
-            src_grid->cell_bound_box, src_grid->bin_addr);
+        search_result
+            = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
+                          src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
 
       /* Check to see if points are land points */
       if (search_result > 0)
@@ -236,10 +224,8 @@ scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 #ifdef TEST_KDTREE
 #include "grid_search.h"
 int
-grid_search_test(struct gridsearch *gs, size_t *restrict src_add,
-                 double *restrict src_lats, double *restrict src_lons,
-                 double plat, double plon, const size_t *restrict src_grid_dims,
-                 double *restrict src_center_lat,
+grid_search_test(struct gridsearch *gs, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                 double plat, double plon, const size_t *restrict src_grid_dims, double *restrict src_center_lat,
                  double *restrict src_center_lon)
 {
   /*
@@ -286,8 +272,7 @@ grid_search_test(struct gridsearch *gs, size_t *restrict src_add,
           if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
           if (k == 2 || k == 3) j = (j > 0) ? j - 1 : 0;
 
-          if (point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons,
-                            src_lats, plon, plat, src_center_lon,
+          if (point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon,
                             src_center_lat))
             {
               search_result = 1;
@@ -316,8 +301,7 @@ grid_search_test(struct gridsearch *gs, size_t *restrict src_add,
 #endif
 
 void
-scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                    const double *restrict src_array,
+scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array,
                     double *restrict tgt_array, double missval)
 {
   int remap_grid_type = src_grid->remap_grid_type;
@@ -331,17 +315,14 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   size_t dims[2] = { src_grid->size, 0 };
   struct gridsearch *gs = NULL;
   if (remap_grid_type != REMAP_GRID_TYPE_REG2D)
-    gs = gridsearch_create(xIsCyclic, dims, src_grid->size,
-                           src_grid->cell_center_lon,
-                           src_grid->cell_center_lat);
+    gs = gridsearch_create(xIsCyclic, dims, src_grid->size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 #endif
 
   size_t tgt_grid_size = tgt_grid->size;
 
   /* Compute mappings from source to target grid */
 
-  if (src_grid->rank != 2)
-    cdoAbort("Can not do bicubic interpolation when source grid rank != 2");
+  if (src_grid->rank != 2) cdoAbort("Can not do bicubic interpolation when source grid rank != 2");
 
   double *grad1_lat = (double *) Malloc(src_grid->size * sizeof(double));
   double *grad1_lon = (double *) Malloc(src_grid->size * sizeof(double));
@@ -360,8 +341,7 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
       findex++;
-      if (cdo_omp_get_thread_num() == 0)
-        progressStatus(0, 1, findex / tgt_grid_size);
+      if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
       tgt_array[tgt_cell_add] = missval;
 
@@ -378,19 +358,16 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
       /* Find nearest square of grid points on source grid  */
       int search_result;
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        search_result = grid_search_reg2d(
-            src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
+        search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
+                                          src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
       else
 #ifdef TEST_KDTREE
-        search_result = grid_search_test(
-            gs, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->cell_center_lat, src_grid->cell_center_lon);
+        search_result = grid_search_test(gs, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
+                                         src_grid->cell_center_lat, src_grid->cell_center_lon);
 #else
-        search_result = grid_search(
-            src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->cell_center_lat, src_grid->cell_center_lon,
-            src_grid->cell_bound_box, src_grid->bin_addr);
+        search_result
+            = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
+                          src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
 #endif
 
       /* Check to see if points are land points */
@@ -413,8 +390,7 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
               sort_add_and_wgts4(4, src_add, wgts);
 
-              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add,
-                            grad1_lat, grad1_lon, grad1_latlon);
+              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, grad1_lat, grad1_lon, grad1_latlon);
             }
           else
             {
@@ -438,8 +414,7 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
               sort_add_and_wgts4(4, src_add, wgts);
 
-              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add,
-                            grad1_lat, grad1_lon, grad1_latlon);
+              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, grad1_lat, grad1_lon, grad1_latlon);
             }
         }
     }

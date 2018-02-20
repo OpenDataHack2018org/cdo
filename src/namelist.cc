@@ -59,8 +59,7 @@ namelist_alloc_token(namelist_parser *parser)
   if (parser->toknext >= parser->num_tokens)
     {
       parser->num_tokens += TOK_MEM_INCR;
-      parser->tokens = (namelisttok_t *) realloc(
-          parser->tokens, sizeof(namelisttok_t) * parser->num_tokens);
+      parser->tokens = (namelisttok_t *) realloc(parser->tokens, sizeof(namelisttok_t) * parser->num_tokens);
       if (parser->tokens == NULL)
         {
           fprintf(stderr, "%s: Failed to allocated more memory!", __func__);
@@ -131,8 +130,7 @@ found:
 
 // Fills next token with NAMELIST string.
 static int
-namelist_parse_string(namelist_parser *parser, const char *buf, size_t len,
-                      char quote)
+namelist_parse_string(namelist_parser *parser, const char *buf, size_t len, char quote)
 {
   int start = parser->pos;
 
@@ -169,16 +167,12 @@ namelist_parse_string(namelist_parser *parser, const char *buf, size_t len,
               // Allows escaped symbol \uXXXX
             case 'u':
               parser->pos++;
-              for (int i = 0;
-                   i < 4 && parser->pos < len && buf[parser->pos] != '\0'; i++)
+              for (int i = 0; i < 4 && parser->pos < len && buf[parser->pos] != '\0'; i++)
                 {
                   // If it isn't a hex character we have an error
-                  if (!((buf[parser->pos] >= 48 && buf[parser->pos] <= 57)
-                        ||  // 0-9
-                        (buf[parser->pos] >= 65 && buf[parser->pos] <= 70)
-                        ||  // A-F
-                        (buf[parser->pos] >= 97
-                         && buf[parser->pos] <= 102)))  // a-f
+                  if (!((buf[parser->pos] >= 48 && buf[parser->pos] <= 57) ||  // 0-9
+                        (buf[parser->pos] >= 65 && buf[parser->pos] <= 70) ||  // A-F
+                        (buf[parser->pos] >= 97 && buf[parser->pos] <= 102)))  // a-f
                     {
                       return NAMELIST_ERROR_INVAL;
                     }
@@ -237,8 +231,7 @@ namelist_parse(namelist_parser *parser, const char *buf, size_t len)
               token = &parser->tokens[i];
               if (token->start != -1 && token->end == -1)
                 {
-                  if (token->type != NAMELIST_OBJECT)
-                    return NAMELIST_ERROR_INOBJ;
+                  if (token->type != NAMELIST_OBJECT) return NAMELIST_ERROR_INOBJ;
                   token->end = parser->pos + 1;
                   break;
                 }
@@ -247,8 +240,7 @@ namelist_parse(namelist_parser *parser, const char *buf, size_t len)
         case '\t':
         case ' ': break;
         case '\r':
-          if (parser->pos + 1 < len && buf[parser->pos + 1] == '\n')
-            parser->pos++;
+          if (parser->pos + 1 < len && buf[parser->pos + 1] == '\n') parser->pos++;
         case '\n': parser->lineno++; break;
         case ',': break;
         case '#':
@@ -261,10 +253,7 @@ namelist_parse(namelist_parser *parser, const char *buf, size_t len)
               }
           break;
         case ':':
-        case '=':
-          status = namelist_check_keyname(buf,
-                                          &parser->tokens[parser->toknext - 1]);
-          break;
+        case '=': status = namelist_check_keyname(buf, &parser->tokens[parser->toknext - 1]); break;
         case '\"':
         case '\'': status = namelist_parse_string(parser, buf, len, c); break;
         default: status = namelist_parse_word(parser, buf, len); break;

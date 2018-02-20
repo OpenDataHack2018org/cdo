@@ -101,9 +101,7 @@ Subtrend(void *process)
           double missval2 = missval;
           for (size_t i = 0; i < gridsize; i++)
             field4.ptr[i]
-                = SUBMN(field1.ptr[i],
-                        ADDMN(vars2[varID][levelID].ptr[i],
-                              MULMN(vars3[varID][levelID].ptr[i], tsID)));
+                = SUBMN(field1.ptr[i], ADDMN(vars2[varID][levelID].ptr[i], MULMN(vars3[varID][levelID].ptr[i], tsID)));
 
           nmiss = arrayNumMV(gridsize, field4.ptr, missval);
           pstreamDefRecord(streamID4, varID, levelID);

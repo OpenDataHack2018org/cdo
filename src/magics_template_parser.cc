@@ -54,8 +54,7 @@ magics_template_parser(void *node)
 
   if (!strcmp((const char *) a_node->name, "magics"))
     {
-      const char *value
-          = (const char *) xmlGetProp(a_node, (const xmlChar *) "version");
+      const char *value = (const char *) xmlGetProp(a_node, (const xmlChar *) "version");
 
       if (value)
         {
@@ -93,21 +92,16 @@ magics_template_parser(void *node)
           else
             {
 
-              param_name = (const char *) xmlGetProp(
-                  cur_node, (const xmlChar *) "parameter");
-              param_type = (const char *) xmlGetProp(cur_node,
-                                                     (const xmlChar *) "type");
-              param_value = (const char *) xmlGetProp(
-                  cur_node, (const xmlChar *) "value");
+              param_name = (const char *) xmlGetProp(cur_node, (const xmlChar *) "parameter");
+              param_type = (const char *) xmlGetProp(cur_node, (const xmlChar *) "type");
+              param_value = (const char *) xmlGetProp(cur_node, (const xmlChar *) "value");
 #if 0
     		printf( "\t\tAttr name: %s Type: %s Value: %s \n", param_name,param_type,param_value);
 #endif
 
-              param_set_flag = SetMagicsParameterValue(param_name, param_type,
-                                                       param_value);
+              param_set_flag = SetMagicsParameterValue(param_name, param_type, param_value);
 
-              if (param_set_flag)
-                printf(" Error in Setting the Parameter %s\n", param_name);
+              if (param_set_flag) printf(" Error in Setting the Parameter %s\n", param_name);
             }
         }
     }
@@ -122,8 +116,7 @@ magics_template_parser(void *node)
 
 #ifdef HAVE_LIBMAGICS
 int
-SetMagicsParameterValue(const char *param_name, const char *param_type,
-                        const char *param_value)
+SetMagicsParameterValue(const char *param_name, const char *param_type, const char *param_value)
 #else
 int
 SetMagicsParameterValue(const char *, const char *, const char *)
@@ -158,14 +151,10 @@ SetMagicsParameterValue(const char *, const char *, const char *)
 #endif
               if (!unsetenv("MAGPLUS_QUIET"))
                 {
-                  if (DBG)
-                    fprintf(stderr,
-                            "Quiet Option %s is un-set successfully!!! \n",
-                            param_value);
+                  if (DBG) fprintf(stderr, "Quiet Option %s is un-set successfully!!! \n", param_value);
                 }
               else
-                fprintf(stderr, "Quiet Option %s COULDN'T be UNSET!!!\n",
-                        param_value);
+                fprintf(stderr, "Quiet Option %s COULDN'T be UNSET!!!\n", param_value);
             }
 
           if (!strcmp(param_value, "on") || !strcmp(param_value, "ON"))
@@ -175,13 +164,10 @@ SetMagicsParameterValue(const char *, const char *, const char *)
 #endif
               if (!setenv("MAGPLUS_QUIET", "1", 1))
                 {
-                  if (DBG)
-                    fprintf(stderr, "Quiet Option %s is set successfully!!! \n",
-                            param_value);
+                  if (DBG) fprintf(stderr, "Quiet Option %s is set successfully!!! \n", param_value);
                 }
               else
-                fprintf(stderr, "Quiet Option %s COULDN'T be SET!!!\n",
-                        param_value);
+                fprintf(stderr, "Quiet Option %s COULDN'T be SET!!!\n", param_value);
             }
         }
     }
@@ -200,12 +186,10 @@ SetMagicsParameterValue(const char *, const char *, const char *)
 	        fprintf(stderr, "param_name : %s\tparam_value: %s\n", param_name, param_value);
 #endif
       if (strchr(param_value, ';')) sep_char = ";";
-      split_str_count
-          = StringSplitWithSeperator(param_value, sep_char, &split_str);
+      split_str_count = StringSplitWithSeperator(param_value, sep_char, &split_str);
       if (split_str_count)
         {
-          float_param_list
-              = (double *) Malloc(sizeof(double) * split_str_count);
+          float_param_list = (double *) Malloc(sizeof(double) * split_str_count);
           for (i = 0; i < split_str_count; i++)
             {
 #if 0
@@ -229,8 +213,7 @@ SetMagicsParameterValue(const char *, const char *, const char *)
   else if (!strcmp(param_type, "intarray"))
     {
       if (strchr(param_value, ';')) sep_char = ";";
-      split_str_count
-          = StringSplitWithSeperator(param_value, sep_char, &split_str);
+      split_str_count = StringSplitWithSeperator(param_value, sep_char, &split_str);
       if (split_str_count)
         {
           int *int_param_list = (int *) Malloc(sizeof(int) * split_str_count);
@@ -254,24 +237,18 @@ SetMagicsParameterValue(const char *, const char *, const char *)
   else if (!strcmp(param_type, "stringarray"))
     {
       if (DBG)
-        fprintf(stderr,
-                "Input strarr is %s  Sep char is %s Search char is %s\n",
-                param_value, sep_char, search_char);
+        fprintf(stderr, "Input strarr is %s  Sep char is %s Search char is %s\n", param_value, sep_char, search_char);
       if (strstr(param_value, ";"))
         {
           sep_char = ";";
         }
 
-      if (DBG)
-        fprintf(stderr, "Input strarr is %s  Sep char is %s\n", param_value,
-                sep_char);
-      split_str_count
-          = StringSplitWithSeperator(param_value, sep_char, &split_str);
+      if (DBG) fprintf(stderr, "Input strarr is %s  Sep char is %s\n", param_value, sep_char);
+      split_str_count = StringSplitWithSeperator(param_value, sep_char, &split_str);
 
       if (DBG)
-        fprintf(stderr,
-                "Input strarr is %s split str count is %d Sep char is %s\n",
-                param_value, split_str_count, sep_char);
+        fprintf(stderr, "Input strarr is %s split str count is %d Sep char is %s\n", param_value, split_str_count,
+                sep_char);
 
       mag_set1c(param_name, (const char **) split_str, split_str_count);
       Free(split_str);

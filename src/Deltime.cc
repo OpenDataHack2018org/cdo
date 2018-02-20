@@ -33,8 +33,7 @@ Deltime(void *process)
   int year, month, day;
   int dday, dmon;
   double *array = NULL;
-  const char *cmons[] = { "",    "jan", "feb", "mar", "apr", "may", "jun",
-                          "jul", "aug", "sep", "oct", "nov", "dec" };
+  const char *cmons[] = { "", "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
   cdoInitialize(process);
 
@@ -115,9 +114,7 @@ Deltime(void *process)
         {
           nfound++;
           copytimestep = FALSE;
-          if (cdoVerbose)
-            cdoPrint("Delete %4.4d-%2.2d-%2.2d at timestep %d", year, month,
-                     day, tsID + 1);
+          if (cdoVerbose) cdoPrint("Delete %4.4d-%2.2d-%2.2d at timestep %d", year, month, day, tsID + 1);
         }
       else
         copytimestep = TRUE;

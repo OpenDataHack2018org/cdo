@@ -205,9 +205,8 @@ zonavg(field_type field1, field_type *field2)
 }
 
 static void
-prevarsum_zon(const double *restrict array, size_t nx, size_t nmiss,
-              double missval, double *rsum, double *rsumw, double *rsumq,
-              double *rsumwq)
+prevarsum_zon(const double *restrict array, size_t nx, size_t nmiss, double missval, double *rsum, double *rsumw,
+              double *rsumq, double *rsumwq)
 {
   double w = 1. / nx;
 
@@ -255,12 +254,9 @@ zonvar(field_type field1, field_type *field2)
 
   for (size_t j = 0; j < ny; j++)
     {
-      prevarsum_zon(array + j * nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq,
-                    &rsumwq);
+      prevarsum_zon(array + j * nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq, &rsumwq);
 
-      rvar = IS_NOT_EQUAL(rsumw, 0)
-                 ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw)
-                 : missval1;
+      rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw) : missval1;
       if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
       if (DBL_IS_EQUAL(rvar, missval1)) rnmiss++;
@@ -287,12 +283,9 @@ zonvar1(field_type field1, field_type *field2)
 
   for (size_t j = 0; j < ny; j++)
     {
-      prevarsum_zon(array + j * nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq,
-                    &rsumwq);
+      prevarsum_zon(array + j * nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq, &rsumwq);
 
-      rvar = (rsumw * rsumw > rsumwq)
-                 ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq)
-                 : missval1;
+      rvar = (rsumw * rsumw > rsumwq) ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq) : missval1;
       if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
       if (DBL_IS_EQUAL(rvar, missval1)) rnmiss++;
@@ -372,8 +365,7 @@ zonpctl(field_type field1, field_type *field2, int p)
         {
           size_t l = 0;
           for (size_t i = 0; i < nx; i++)
-            if (!DBL_IS_EQUAL(array[j * nx + i], missval))
-              array2[l++] = array[j * nx + i];
+            if (!DBL_IS_EQUAL(array[j * nx + i], missval)) array2[l++] = array[j * nx + i];
 
           if (l > 0)
             {

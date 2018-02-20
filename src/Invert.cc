@@ -42,9 +42,8 @@ invertLonDes(int vlistID)
 
       int gridtype = gridInqType(gridID1);
 
-      if (!(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN
-            || gridtype == GRID_PROJECTION || gridtype == GRID_LONLAT
-            || gridtype == GRID_CURVILINEAR))
+      if (!(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION
+            || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR))
         cdoAbort("Unsupported gridtype: %s!", gridNamePtr(gridtype));
 
       if (gridInqXvals(gridID1, NULL))
@@ -81,8 +80,7 @@ invertLonDes(int vlistID)
           size_t nlon = gridInqXsize(gridID1);
           size_t nlat = gridInqYsize(gridID1);
           int nv = gridInqNvertex(gridID1);
-          size_t size
-              = (gridtype == GRID_CURVILINEAR) ? nv * nlon * nlat : nv * nlon;
+          size_t size = (gridtype == GRID_CURVILINEAR) ? nv * nlon * nlat : nv * nlon;
 
           double *xb1 = (double *) Malloc(size * sizeof(double));
           double *xb2 = (double *) Malloc(size * sizeof(double));
@@ -94,8 +92,7 @@ invertLonDes(int vlistID)
               for (size_t ilat = 0; ilat < nlat; ilat++)
                 for (size_t ilon = 0; ilon < nlon; ilon++)
                   for (int iv = 0; iv < nv; iv++)
-                    xb2[ilat * nlon * nv + (nlon - ilon - 1) * nv + iv]
-                        = xb1[ilat * nlon * nv + ilon * nv + iv];
+                    xb2[ilat * nlon * nv + (nlon - ilon - 1) * nv + iv] = xb1[ilat * nlon * nv + ilon * nv + iv];
             }
           else
             {
@@ -167,8 +164,7 @@ invertLatCoord(int gridID)
       size_t nlon = gridInqXsize(gridID);
       size_t nlat = gridInqYsize(gridID);
       int nv = gridInqNvertex(gridID);
-      size_t size
-          = (gridtype == GRID_CURVILINEAR) ? nv * nlon * nlat : nv * nlat;
+      size_t size = (gridtype == GRID_CURVILINEAR) ? nv * nlon * nlat : nv * nlat;
 
       double *yb1 = (double *) Malloc(size * sizeof(double));
       double *yb2 = (double *) Malloc(size * sizeof(double));
@@ -180,8 +176,7 @@ invertLatCoord(int gridID)
           for (size_t ilat = 0; ilat < nlat; ilat++)
             for (size_t ilon = 0; ilon < nlon; ilon++)
               for (int iv = 0; iv < nv; iv++)
-                yb2[(nlat - ilat - 1) * nlon * nv + ilon * nv + iv]
-                    = yb1[ilat * nlon * nv + ilon * nv + iv];
+                yb2[(nlat - ilat - 1) * nlon * nv + ilon * nv + iv] = yb1[ilat * nlon * nv + ilon * nv + iv];
         }
       else
         {
@@ -210,9 +205,8 @@ invertLatDes(int vlistID)
 
       int gridtype = gridInqType(gridID1);
 
-      if (!(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN
-            || gridtype == GRID_PROJECTION || gridtype == GRID_LONLAT
-            || gridtype == GRID_CURVILINEAR))
+      if (!(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION
+            || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR))
         cdoAbort("Unsupported gridtype: %s!", gridNamePtr(gridtype));
 
       invertLatCoord(gridID2);

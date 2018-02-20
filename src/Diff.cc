@@ -125,8 +125,7 @@ Diff(void *process)
                   ndiff++;
                   relm = 1.0;
                 }
-              else if (!DBL_IS_EQUAL(array1[i], missval1)
-                       && !DBL_IS_EQUAL(array2[i], missval2))
+              else if (!DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2))
                 {
                   absdiff = fabs(array1[i] - array2[i]);
                   if (absdiff > 0.) ndiff++;
@@ -138,13 +137,10 @@ Diff(void *process)
                   else if (IS_EQUAL(array1[i] * array2[i], 0.))
                     zero = true;
                   else
-                    relm = MAX(relm,
-                               absdiff / MAX(fabs(array1[i]), fabs(array2[i])));
+                    relm = MAX(relm, absdiff / MAX(fabs(array1[i]), fabs(array2[i])));
                 }
-              else if ((DBL_IS_EQUAL(array1[i], missval1)
-                        && !DBL_IS_EQUAL(array2[i], missval2))
-                       || (!DBL_IS_EQUAL(array1[i], missval1)
-                           && DBL_IS_EQUAL(array2[i], missval2)))
+              else if ((DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2))
+                       || (!DBL_IS_EQUAL(array1[i], missval1) && DBL_IS_EQUAL(array2[i], missval2)))
                 {
                   ndiff++;
                   relm = 1.0;
@@ -176,8 +172,7 @@ Diff(void *process)
                       fprintf(stdout, "\n");
                     }
 
-                  if (operatorID == DIFFN)
-                    vlistInqVarName(vlistID1, varID1, varname);
+                  if (operatorID == DIFFN) vlistInqVarName(vlistID1, varID1, varname);
 
                   set_text_color(stdout, BRIGHT, BLACK);
                   fprintf(stdout, "%6d ", indg);
@@ -199,8 +194,7 @@ Diff(void *process)
                   set_text_color(stdout, RESET, BLACK);
                   fprintf(stdout, ":");
                   reset_text_color(stdout);
-                  fprintf(stdout, " %c %c ", dsgn ? 'T' : 'F',
-                          zero ? 'T' : 'F');
+                  fprintf(stdout, " %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
                   set_text_color(stdout, RESET, BLUE);
                   fprintf(stdout, "%#12.5g%#12.5g", absm, relm);
                   set_text_color(stdout, RESET, BLACK);
@@ -235,16 +229,13 @@ Diff(void *process)
       fprintf(stdout, "\n");
 
       if (ndrec != nd2rec && abslim < abslim2)
-        fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec,
-                ngrec);
+        fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
       /*  fprintf(stdout, "  %d of %d records differ more then one
        * thousandth\n", nprec, ngrec); */
     }
 
-  if (nrecs == 0 && nrecs2 > 0)
-    cdoWarning("stream2 has more time steps than stream1!");
-  if (nrecs > 0 && nrecs2 == 0)
-    cdoWarning("stream1 has more time steps than stream2!");
+  if (nrecs == 0 && nrecs2 > 0) cdoWarning("stream2 has more time steps than stream1!");
+  if (nrecs > 0 && nrecs2 == 0) cdoWarning("stream1 has more time steps than stream2!");
 
   pstreamClose(streamID1);
   pstreamClose(streamID2);

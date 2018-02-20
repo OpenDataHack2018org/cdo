@@ -67,8 +67,7 @@ Setgrid(void *process)
 
   int operatorID = cdoOperatorID();
 
-  if (operatorID != UNSETGRIDMASK)
-    operatorInputArg(cdoOperatorEnter(operatorID));
+  if (operatorID != UNSETGRIDMASK) operatorInputArg(cdoOperatorEnter(operatorID));
 
   if (operatorID == SETGRID)
     {
@@ -117,8 +116,7 @@ Setgrid(void *process)
         {
           double arrmean, arrmin, arrmax;
           arrayMinMaxMean(areasize, areaweight, &arrmin, &arrmax, &arrmean);
-          cdoPrint("areaweights: %zu %#12.5g%#12.5g%#12.5g", areasize, arrmin,
-                   arrmean, arrmax);
+          cdoPrint("areaweights: %zu %#12.5g%#12.5g%#12.5g", areasize, arrmin, arrmean, arrmax);
         }
     }
   else if (operatorID == SETGRIDMASK)
@@ -189,11 +187,9 @@ Setgrid(void *process)
               found++;
             }
         }
-      if (!found)
-        cdoWarning("No grid with %zu points found!", gridInqSize(gridID2));
+      if (!found) cdoWarning("No grid with %zu points found!", gridInqSize(gridID2));
     }
-  else if (operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI
-           || operatorID == USEGRIDNUMBER)
+  else if (operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI || operatorID == USEGRIDNUMBER)
     {
       if (operatorID == SETGRIDNUMBER)
         {
@@ -205,8 +201,7 @@ Setgrid(void *process)
       else if (operatorID == USEGRIDNUMBER)
         {
           if (number < 1 || number > vlistNgrids(vlistID1))
-            cdoAbort("Invalid grid number: %d (max = %d)!", number,
-                     vlistNgrids(vlistID1));
+            cdoAbort("Invalid grid number: %d (max = %d)!", number, vlistNgrids(vlistID1));
 
           gridID2 = vlistGrid(vlistID1, number - 1);
         }
@@ -229,9 +224,7 @@ Setgrid(void *process)
               found++;
             }
         }
-      if (!found)
-        cdoWarning("No horizontal grid with %zu cells found!",
-                   gridInqSize(gridID2));
+      if (!found) cdoWarning("No horizontal grid with %zu cells found!", gridInqSize(gridID2));
     }
   else if (operatorID == SETGRIDTYPE)
     {
@@ -247,22 +240,18 @@ Setgrid(void *process)
 
           if (lregular || lregularnn)
             {
-              if (gridtype1 == GRID_GAUSSIAN_REDUCED)
-                gridID2 = gridToRegular(gridID1);
+              if (gridtype1 == GRID_GAUSSIAN_REDUCED) gridID2 = gridToRegular(gridID1);
             }
           else if (ldereference)
             {
               gridID2 = referenceToGrid(gridID1);
-              if (gridID2 == -1)
-                cdoAbort("Reference to horizontal grid not found!");
+              if (gridID2 == -1) cdoAbort("Reference to horizontal grid not found!");
             }
           else
             {
               if (gridtype == GRID_CURVILINEAR)
                 {
-                  gridID2 = (gridtype1 == GRID_CURVILINEAR)
-                                ? gridID1
-                                : gridToCurvilinear(gridID1, lbounds);
+                  gridID2 = (gridtype1 == GRID_CURVILINEAR) ? gridID1 : gridToCurvilinear(gridID1, lbounds);
                 }
               else if (gridtype == GRID_UNSTRUCTURED)
                 {
@@ -285,8 +274,7 @@ Setgrid(void *process)
                     cdoWarning("Conversion of curvilinear grid to regular grid "
                                "failed!");
                 }
-              else if (gridtype == GRID_LONLAT
-                       && gridtype1 == GRID_UNSTRUCTURED)
+              else if (gridtype == GRID_LONLAT && gridtype1 == GRID_UNSTRUCTURED)
                 {
                   gridID2 = -1;
                   if (gridID2 == -1)
@@ -296,9 +284,7 @@ Setgrid(void *process)
               else if (gridtype == GRID_LONLAT && gridtype1 == GRID_GENERIC)
                 {
                   gridID2 = -1;
-                  if (gridID2 == -1)
-                    cdoWarning(
-                        "Conversion of generic grid to regular grid failed!");
+                  if (gridID2 == -1) cdoWarning("Conversion of generic grid to regular grid failed!");
                 }
               else if (gridtype == GRID_LONLAT && gridtype1 == GRID_LONLAT)
                 {
@@ -320,8 +306,7 @@ Setgrid(void *process)
             }
         }
 
-      if ((lregular || lregularnn) && !lrgrid)
-        cdoWarning("No reduced Gaussian grid found!");
+      if ((lregular || lregularnn) && !lrgrid) cdoWarning("No reduced Gaussian grid found!");
     }
   else if (operatorID == SETGRIDAREA)
     {
@@ -379,8 +364,7 @@ Setgrid(void *process)
   pstreamDefVlist(streamID2, vlistID2);
   // vlistPrint(vlistID2);
 
-  size_t gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2)
-                                             : vlistGridsizeMax(vlistID1);
+  size_t gridsize = (lregular || lregularnn) ? vlistGridsizeMax(vlistID2) : vlistGridsizeMax(vlistID1);
 
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
   double *array = (double *) Malloc(gridsize * sizeof(double));
@@ -406,8 +390,7 @@ Setgrid(void *process)
                 {
                   double missval = vlistInqVarMissval(vlistID1, varID);
                   int lnearst = lregularnn ? 1 : 0;
-                  field2regular(gridID1, gridID2, missval, array, nmiss,
-                                lnearst);
+                  field2regular(gridID1, gridID2, missval, array, nmiss, lnearst);
                 }
             }
           else if (gridInqType(gridID1) == GRID_GME)

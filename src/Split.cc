@@ -34,8 +34,7 @@
 #include "cdo_history.h"
 
 static void
-gen_filename(char *filename, bool swap_obase, const char *obase,
-             const char *suffix)
+gen_filename(char *filename, bool swap_obase, const char *obase, const char *suffix)
 {
   if (swap_obase) strcat(filename, obase);
   if (suffix[0]) strcat(filename, suffix);
@@ -61,8 +60,7 @@ Split(void *process)
 
   cdoInitialize(process);
 
-  if (processSelf().m_ID != 0)
-    cdoAbort("This operator can't be combined with other operators!");
+  if (processSelf().m_ID != 0) cdoAbort("This operator can't be combined with other operators!");
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -102,8 +100,7 @@ Split(void *process)
 
   const char *refname = cdoGetObase();
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix),
-                   pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   if (operatorID == SPLITCODE)
     {
@@ -386,8 +383,7 @@ Split(void *process)
           cdoVlistCopyFlag(vlistID2, vlistID1);
           vlistIDs[index] = vlistID2;
 
-          sprintf(filename + nchars, "%02d",
-                  vlistGridIndex(vlistID1, gridIDs[index]) + 1);
+          sprintf(filename + nchars, "%02d", vlistGridIndex(vlistID1, gridIDs[index]) + 1);
           gen_filename(filename, swap_obase, cdoGetObase(), filesuffix);
 
           streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());
@@ -423,8 +419,7 @@ Split(void *process)
           cdoVlistCopyFlag(vlistID2, vlistID1);
           vlistIDs[index] = vlistID2;
 
-          sprintf(filename + nchars, "%02d",
-                  vlistZaxisIndex(vlistID1, zaxisIDs[index]) + 1);
+          sprintf(filename + nchars, "%02d", vlistZaxisIndex(vlistID1, zaxisIDs[index]) + 1);
           gen_filename(filename, swap_obase, cdoGetObase(), filesuffix);
 
           streamIDs[index] = cdoStreamOpenWrite(filename, cdoFiletype());

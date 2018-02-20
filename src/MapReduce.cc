@@ -84,8 +84,7 @@ MapReduce(void *process)
   int inputGridID = cdoDefineGrid(operatorArgv()[0]);
   size_t inputGridSize = gridInqSize(inputGridID);
   int inputGridType = gridInqType(inputGridID);
-  if (CdoDebug::cdoDebug)
-    cdoPrint("MapReduce: input gridSize: %zu", inputGridSize);
+  if (CdoDebug::cdoDebug) cdoPrint("MapReduce: input gridSize: %zu", inputGridSize);
 
   /* creata an index list of the relevant locations  {{{ */
   double *inputMaskField = (double *) Malloc(inputGridSize * sizeof(double));
@@ -118,8 +117,7 @@ MapReduce(void *process)
       if (0 == strncmp("nocoords", coordinatesLimitation, 8)) nocoords = TRUE;
     }
   /* create unstructured output grid including bounds*/
-  int outputGridID = gridToUnstructuredSelecton(
-      inputGridID, maskSize, maskIndexList, nocoords, nobounds);
+  int outputGridID = gridToUnstructuredSelecton(inputGridID, maskSize, maskIndexList, nocoords, nobounds);
 
   /* create output vlist: Only variabes which have the same gridtype and
    * gridsize as the input mask should be proessed. Everything else is ignoreds
@@ -137,8 +135,7 @@ MapReduce(void *process)
       vars[varID] = FALSE;
 
       int gridID = vlistInqVarGrid(vlistID1, varID);
-      if (inputGridType == gridInqType(gridID)
-          && inputGridSize == gridInqSize(gridID))
+      if (inputGridType == gridInqType(gridID) && inputGridSize == gridInqSize(gridID))
         {
           vars[varID] = TRUE;
           int zaxisID = vlistInqVarZaxis(vlistID1, varID);

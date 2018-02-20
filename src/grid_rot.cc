@@ -20,8 +20,7 @@
 #include "grid.h"
 
 double
-lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
-              double polgam)
+lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam, double polgam)
 {
   /*
     Name of the original Fortran function: PHTOPHS
@@ -53,28 +52,20 @@ lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
     {
       double zgam = DEG2RAD * polgam;
       zarg1 = sin(zlampol)
-                  * (-zsinpol * cos(zphirot)
-                         * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
+                  * (-zsinpol * cos(zphirot) * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
                      + zcospol * sin(zphirot))
-              - cos(zlampol) * cos(zphirot)
-                    * (sin(zlamrot) * cos(zgam) + cos(zlamrot) * sin(zgam));
+              - cos(zlampol) * cos(zphirot) * (sin(zlamrot) * cos(zgam) + cos(zlamrot) * sin(zgam));
 
       zarg2 = cos(zlampol)
-                  * (-zsinpol * cos(zphirot)
-                         * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
+                  * (-zsinpol * cos(zphirot) * (cos(zlamrot) * cos(zgam) - sin(zlamrot) * sin(zgam))
                      + zcospol * sin(zphirot))
-              + sin(zlampol) * cos(zphirot)
-                    * (sin(zlamrot) * cos(zgam) + cos(zlamrot) * sin(zgam));
+              + sin(zlampol) * cos(zphirot) * (sin(zlamrot) * cos(zgam) + cos(zlamrot) * sin(zgam));
     }
   else
     {
-      zarg1 = sin(zlampol)
-                  * (-zsinpol * cos(zlamrot) * cos(zphirot)
-                     + zcospol * sin(zphirot))
+      zarg1 = sin(zlampol) * (-zsinpol * cos(zlamrot) * cos(zphirot) + zcospol * sin(zphirot))
               - cos(zlampol) * sin(zlamrot) * cos(zphirot);
-      zarg2 = cos(zlampol)
-                  * (-zsinpol * cos(zlamrot) * cos(zphirot)
-                     + zcospol * sin(zphirot))
+      zarg2 = cos(zlampol) * (-zsinpol * cos(zlamrot) * cos(zphirot) + zcospol * sin(zphirot))
               + sin(zlampol) * sin(zlamrot) * cos(zphirot);
     }
 
@@ -117,9 +108,7 @@ phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
   if (polgam > 0)
     {
       double zgam = DEG2RAD * polgam;
-      zarg = zsinpol * sin(zphirot)
-             + zcospol * cos(zphirot)
-                   * (cos(zlamrot) * cos(zgam) - sin(zgam) * sin(zlamrot));
+      zarg = zsinpol * sin(zphirot) + zcospol * cos(zphirot) * (cos(zlamrot) * cos(zgam) - sin(zgam) * sin(zlamrot));
     }
   else
     zarg = zcospol * cos(zphirot) * cos(zlamrot) + zsinpol * sin(zphirot);
@@ -152,8 +141,7 @@ lam_to_lamrot(double phi, double rla, double polphi, double pollam)
   double zphi = DEG2RAD * phi;
 
   double zarg1 = -sin(zrla - zlampol) * cos(zphi);
-  double zarg2
-      = -zsinpol * cos(zphi) * cos(zrla - zlampol) + zcospol * sin(zphi);
+  double zarg2 = -zsinpol * cos(zphi) * cos(zrla - zlampol) + zcospol * sin(zphi);
 
   if (fabs(zarg2) < 1.0e-20) zarg2 = 1.0e-20;
 
@@ -191,8 +179,7 @@ phi_to_phirot(double phi, double lam, double polphi, double pollam)
 #endif
 
 void
-usvs_to_uv(double us, double vs, double phi, double rla, double polphi,
-           double pollam, double *u, double *v)
+usvs_to_uv(double us, double vs, double phi, double rla, double polphi, double pollam, double *u, double *v)
 {
   /*
     Umrechnen der windkomponenten us, vs im rotierten sphaerischen
@@ -222,8 +209,7 @@ usvs_to_uv(double us, double vs, double phi, double rla, double polphi,
   double zrlas = lam_to_lamrot(phi, rla, polphi, pollam) * DEG2RAD;
 
   // winkel zbeta berechen (schnittwinkel der breitenkreise)
-  double zarg = -sin(zpolphi) * sin(zrla - zpollam) * sin(zrlas)
-                - cos(zrla - zpollam) * cos(zrlas);
+  double zarg = -sin(zpolphi) * sin(zrla - zpollam) * sin(zrlas) - cos(zrla - zpollam) * cos(zrlas);
   if (zarg > 1.0) zarg = 1.0;
   if (zarg < -1.0) zarg = -1.0;
   /*
@@ -232,8 +218,7 @@ usvs_to_uv(double us, double vs, double phi, double rla, double polphi,
   */
   double zbeta = fabs(acos(zarg));
   // if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta;
-  if ((-(rla - (pollamd - 180.0)) < 0) && (-(rla - (pollamd - 180.0)) >= -180))
-    zbeta = -zbeta;
+  if ((-(rla - (pollamd - 180.0)) < 0) && (-(rla - (pollamd - 180.0)) >= -180)) zbeta = -zbeta;
 
   // us - wind transformieren
   *u = us * cos(zbeta) - vs * sin(zbeta);

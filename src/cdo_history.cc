@@ -40,10 +40,8 @@ init_strtime()
   if (tp != -1)
     {
       ltime = localtime(&tp);
-      (void) strftime(strtime, sizeof(strtime),
-                      "%a %b %d %H:%M:%S %Y: ", ltime);
-      (void) strftime(datetimestr, sizeof(datetimestr), "%Y-%m-%dT%H:%M:%SZ",
-                      ltime);
+      (void) strftime(strtime, sizeof(strtime), "%a %b %d %H:%M:%S %Y: ", ltime);
+      (void) strftime(datetimestr, sizeof(datetimestr), "%Y-%m-%dT%H:%M:%SZ", ltime);
     }
 }
 
@@ -124,8 +122,7 @@ void
 cdo_def_creation_date(int vlistID)
 {
   if (strlen(datetimestr) == 0) init_strtime();
-  cdiDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int) strlen(datetimestr),
-               datetimestr);
+  cdiDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int) strlen(datetimestr), datetimestr);
 }
 
 #define UUIDSTR_SIZE (CDI_UUID_SIZE * 2 + 4)

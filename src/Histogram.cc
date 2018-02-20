@@ -89,9 +89,7 @@ Histogram(void *process)
     {
       zaxisID = vlistZaxis(vlistID1, index);
       nlevel = zaxisInqSize(zaxisID);
-      if (nlevel > 1)
-        cdoAbort("Found 3D field with %d levels. Only 2D fields allowed!",
-                 nlevel);
+      if (nlevel > 1) cdoAbort("Found 3D field with %d levels. Only 2D fields allowed!", nlevel);
       vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
     }
 
@@ -140,8 +138,7 @@ Histogram(void *process)
                   while (index < nbins)
                     {
                       offset = gridsize * index;
-                      if (!DBL_IS_EQUAL(vardata[varID][offset + i], missval)
-                          && array[i] >= fltarr[index]
+                      if (!DBL_IS_EQUAL(vardata[varID][offset + i], missval) && array[i] >= fltarr[index]
                           && array[i] < fltarr[index + 1])
                         {
                           vardata[varID][offset + i] += array[i];
@@ -183,12 +180,9 @@ Histogram(void *process)
                       if (varcount[varID][offset + i] > 0)
                         {
                           if (operatorID == HISTMEAN)
-                            vardata[varID][offset + i]
-                                /= varcount[varID][offset + i];
+                            vardata[varID][offset + i] /= varcount[varID][offset + i];
                           else
-                            vardata[varID][offset + i]
-                                = varcount[varID][offset + i]
-                                  / vartcount[varID][i];
+                            vardata[varID][offset + i] = varcount[varID][offset + i] / vartcount[varID][i];
                         }
                     }
                 }

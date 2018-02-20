@@ -121,8 +121,7 @@ Output(void *process)
                   else
                     {
                       keys[nkeys++] = k;
-                      if (len2 > len && parnames[i][len] == ':'
-                          && isdigit(parnames[i][len + 1]))
+                      if (len2 > len && parnames[i][len] == ':' && isdigit(parnames[i][len + 1]))
                         Keylen[k] = atoi(&parnames[i][len + 1]);
                     }
                   break;
@@ -134,8 +133,7 @@ Output(void *process)
 
       if (cdoVerbose)
         for (k = 0; k < nkeys; ++k)
-          cdoPrint("keynr = %d  keyid = %d  keylen = %d  keyname = %s", k,
-                   keys[k], Keylen[keys[k]], Keynames[keys[k]]);
+          cdoPrint("keynr = %d  keyid = %d  keylen = %d  keyname = %s", k, keys[k], Keylen[keys[k]], Keynames[keys[k]]);
 
       if (lhead)
         {
@@ -169,14 +167,11 @@ Output(void *process)
 
       double *array = (double *) Malloc(gridsize * sizeof(double));
 
-      if (operatorID == OUTPUTFLD || operatorID == OUTPUTXYZ
-          || operatorID == OUTPUTTAB)
+      if (operatorID == OUTPUTFLD || operatorID == OUTPUTXYZ || operatorID == OUTPUTTAB)
         {
-          if (gridInqType(gridID) == GRID_GME)
-            gridID = gridToUnstructured(gridID, 0);
+          if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 0);
 
-          if (gridInqType(gridID) != GRID_UNSTRUCTURED
-              && gridInqType(gridID) != GRID_CURVILINEAR)
+          if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
             gridID = gridToCurvilinear(gridID, 0);
 
           gridtype = gridInqType(gridID);
@@ -233,12 +228,9 @@ Output(void *process)
               pstreamReadRecord(streamID, array, &nmiss);
 
               if (operatorID == OUTPUTSRV)
-                fprintf(stdout, "%4d %8g %8d %4d %8zu %8zu %d %d\n", code,
-                        level, vdate, vtime, nlon, nlat, 0, 0);
+                fprintf(stdout, "%4d %8g %8d %4d %8zu %8zu %d %d\n", code, level, vdate, vtime, nlon, nlat, 0, 0);
 
-              if (operatorID == OUTPUTEXT)
-                fprintf(stdout, "%8d %4d %8g %8zu\n", vdate, code, level,
-                        gridsize);
+              if (operatorID == OUTPUTEXT) fprintf(stdout, "%8d %4d %8g %8zu\n", vdate, code, level, gridsize);
 
               if (operatorID == OUTPUTINT)
                 {
@@ -274,26 +266,21 @@ Output(void *process)
                 {
                   char vdatestr[32], vtimestr[32];
 
-                  if (gridsize > 1)
-                    cdoAbort("operator works only with one gridpoint!");
+                  if (gridsize > 1) cdoAbort("operator works only with one gridpoint!");
 
                   date2str(vdate, vdatestr, sizeof(vdatestr));
                   time2str(vtime, vtimestr, sizeof(vtimestr));
 
-                  fprintf(stdout, "%s %s %12.12g\n", vdatestr, vtimestr,
-                          array[0]);
+                  fprintf(stdout, "%s %s %12.12g\n", vdatestr, vtimestr, array[0]);
                 }
               else if (operatorID == OUTPUTFLD)
                 {
                   int hour, minute, second;
                   cdiDecodeTime(vtime, &hour, &minute, &second);
-                  double xdate
-                      = vdate - (vdate / 100) * 100
-                        + (hour * 3600 + minute * 60 + second) / 86400.;
+                  double xdate = vdate - (vdate / 100) * 100 + (hour * 3600 + minute * 60 + second) / 86400.;
                   for (size_t i = 0; i < gridsize; i++)
                     if (!DBL_IS_EQUAL(array[i], missval))
-                      fprintf(stdout, "%g\t%g\t%g\t%g\n", xdate,
-                              grid_center_lat[i], grid_center_lon[i], array[i]);
+                      fprintf(stdout, "%g\t%g\t%g\t%g\n", xdate, grid_center_lat[i], grid_center_lon[i], array[i]);
                 }
               else if (operatorID == OUTPUTTAB)
                 {
@@ -319,47 +306,21 @@ Output(void *process)
                           len = Keylen[keys[k]];
                           switch (keys[k])
                             {
-                            case kvalue:
-                              fprintf(stdout, "%*g ", len, array[i]);
-                              break;
-                            case kparam:
-                              fprintf(stdout, "%*s ", len, paramstr);
-                              break;
-                            case kcode:
-                              fprintf(stdout, "%*d ", len, code);
-                              break;
-                            case kname:
-                              fprintf(stdout, "%*s ", len, name);
-                              break;
+                            case kvalue: fprintf(stdout, "%*g ", len, array[i]); break;
+                            case kparam: fprintf(stdout, "%*s ", len, paramstr); break;
+                            case kcode: fprintf(stdout, "%*d ", len, code); break;
+                            case kname: fprintf(stdout, "%*s ", len, name); break;
                             case klon: fprintf(stdout, "%*g ", len, lon); break;
                             case klat: fprintf(stdout, "%*g ", len, lat); break;
-                            case klev:
-                              fprintf(stdout, "%*g ", len, level);
-                              break;
-                            case kbin:
-                              fprintf(stdout, "%*g ", len, level);
-                              break;
-                            case kxind:
-                              fprintf(stdout, "%*d ", len, xind + 1);
-                              break;
-                            case kyind:
-                              fprintf(stdout, "%*d ", len, yind + 1);
-                              break;
-                            case ktimestep:
-                              fprintf(stdout, "%*d ", len, tsID + 1);
-                              break;
-                            case kdate:
-                              fprintf(stdout, "%*s ", len, vdatestr);
-                              break;
-                            case ktime:
-                              fprintf(stdout, "%*s ", len, vtimestr);
-                              break;
-                            case kyear:
-                              fprintf(stdout, "%*d ", len, year);
-                              break;
-                            case kmonth:
-                              fprintf(stdout, "%*d ", len, month);
-                              break;
+                            case klev: fprintf(stdout, "%*g ", len, level); break;
+                            case kbin: fprintf(stdout, "%*g ", len, level); break;
+                            case kxind: fprintf(stdout, "%*d ", len, xind + 1); break;
+                            case kyind: fprintf(stdout, "%*d ", len, yind + 1); break;
+                            case ktimestep: fprintf(stdout, "%*d ", len, tsID + 1); break;
+                            case kdate: fprintf(stdout, "%*s ", len, vdatestr); break;
+                            case ktime: fprintf(stdout, "%*s ", len, vtimestr); break;
+                            case kyear: fprintf(stdout, "%*d ", len, year); break;
+                            case kmonth: fprintf(stdout, "%*d ", len, month); break;
                             case kday: fprintf(stdout, "%*d ", len, day); break;
                             }
                         }
@@ -377,9 +338,8 @@ Output(void *process)
                         if (!DBL_IS_EQUAL(array[i], missval))
                           {
                             if (array[i] < fmin) fmin = array[i];
-                            fprintf(stdout, "%g\t%g\t%g\t%g\n",
-                                    grid_center_lon[i], grid_center_lat[i],
-                                    array[i], array[i]);
+                            fprintf(stdout, "%g\t%g\t%g\t%g\n", grid_center_lon[i], grid_center_lat[i], array[i],
+                                    array[i]);
                           }
                       FILE *fp = fopen(fname, "w");
                       if (fp == NULL) cdoAbort("Open failed on %s", fname);
@@ -460,9 +420,7 @@ Output(void *process)
                       arrayMinMax(gridsize, array, &minval, &maxval);
                     }
 
-                  if (gridInqType(gridID) == GRID_SPECTRAL
-                      && gridsize <= 156 /* T11 */ && minval >= -1
-                      && maxval <= 12)
+                  if (gridInqType(gridID) == GRID_SPECTRAL && gridsize <= 156 /* T11 */ && minval >= -1 && maxval <= 12)
                     {
                       long m, n;
                       double *spc = array;

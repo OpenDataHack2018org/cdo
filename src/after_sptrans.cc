@@ -34,8 +34,9 @@
 #define HAVE_OPENMP4 1
 #endif
 
-extern "C" {
-void gaussaw(double *pa, double *pw, size_t nlat);
+extern "C"
+{
+  void gaussaw(double *pa, double *pw, size_t nlat);
 }
 
 static void
@@ -174,8 +175,7 @@ jspleg1(double *pleg, double plat, int ktrunc, double *work)
 /*        and their meridional derivatives       */
 /* ============================================= */
 static void
-phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1,
-     double *ztemp2)
+phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1, double *ztemp2)
 {
   int twowaves;
 
@@ -221,8 +221,7 @@ phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1,
       for (jk = 2; jk < jn; jk += 2)
         {
           jnmjk = jn - jk;
-          zcosfak
-              *= (jk - 1.0) * (jn + jnmjk + 2.0) / (jk * (jn + jnmjk + 1.0));
+          zcosfak *= (jk - 1.0) * (jn + jnmjk + 2.0) / (jk * (jn + jnmjk + 1.0));
           zsinfak = zcosfak * (jnmjk) *zsqp;
           zcospar += zcosfak * cos(lat * jnmjk);
           zsinpar += zsinfak * sin(lat * jnmjk);
@@ -246,9 +245,7 @@ phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1,
 
   hnm[0] = 0.0;
   for (jn = 1; jn < waves; jn++)
-    hnm[jn] = jn
-              * (pmu * ztemp1[jn]
-                 - sqrt((jn + jn + 1.0) / (jn + jn - 1.0)) * ztemp1[jn - 1]);
+    hnm[jn] = jn * (pmu * ztemp1[jn] - sqrt((jn + jn + 1.0) / (jn + jn - 1.0)) * ztemp1[jn - 1]);
 
   hnm += waves;
 
@@ -256,9 +253,7 @@ phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1,
 
   for (jn = 1; jn < waves; jn++)
     hnm[jn] = (jn + 1) * pmu * ztemp2[jn]
-              - sqrt(((jn + jn + 3.0) * ((jn + 1) * (jn + 1) - 1.0))
-                     / (jn + jn + 1.0))
-                    * ztemp2[jn - 1];
+              - sqrt(((jn + jn + 3.0) * ((jn + 1) * (jn + 1) - 1.0)) / (jn + jn + 1.0)) * ztemp2[jn - 1];
 
   hnm += waves;
 
@@ -284,10 +279,8 @@ phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1,
           zcnm = sqrt((zwq * (zq - 2.)) / (zwm2q2 - z2q2));
           zdnm = sqrt((zwq * (jn + 1.)) / zwm2q2);
           zenm = sqrt(zw * jn / ((zq + 1.0) * zwm2));
-          pnm[jn] = zcnm * ztemp1[jn]
-                    - pmu * (zdnm * ztemp1[jn + 1] - zenm * pnm[jn - 1]);
-          hnm[jn] = (jm + jn) * pmu * pnm[jn]
-                    - sqrt(zw * jn * (zq + 1) / zwm2) * pnm[jn - 1];
+          pnm[jn] = zcnm * ztemp1[jn] - pmu * (zdnm * ztemp1[jn + 1] - zenm * pnm[jn - 1]);
+          hnm[jn] = (jm + jn) * pmu * pnm[jn] - sqrt(zw * jn * (zq + 1) / zwm2) * pnm[jn - 1];
         }
       memcpy(ztemp1, ztemp2, twowaves * sizeof(double));
       memcpy(ztemp2, pnm, twowaves * sizeof(double));
@@ -297,10 +290,8 @@ phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1,
 }
 
 void
-after_legini_full(int ntr, int nlat, double *restrict poli,
-                  double *restrict pold, double *restrict pdev,
-                  double *restrict pol2, double *restrict pol3,
-                  double *restrict coslat)
+after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
+                  double *restrict pol2, double *restrict pol3, double *restrict coslat)
 {
   int jgl, jm, jn;
   int jsp;
@@ -354,8 +345,7 @@ after_legini_full(int ntr, int nlat, double *restrict poli,
             if (lpold) pold[jsp] = pnm[jm * waves + jn] * zgwt;
             if (lpdev) pdev[jsp] = hnm[jm * waves + jn] * 2.0 * zradsqrtgmusqr;
             if (lpol2) pol2[jsp] = hnm[jm * waves + jn] * zgwt * zrafgmusqr;
-            if (lpol3)
-              pol3[jsp] = pnm[jm * waves + jn] * zgwt * jm * zrafgmusqr;
+            if (lpol3) pol3[jsp] = pnm[jm * waves + jn] * zgwt * jm * zrafgmusqr;
             jsp += nlat;
           }
 
@@ -378,8 +368,7 @@ after_legini_full(int ntr, int nlat, double *restrict poli,
 }
 
 void
-after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold,
-             double *restrict coslat)
+after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat)
 {
   int is, lats;
 
@@ -437,8 +426,7 @@ after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold,
 
 /* to slow for nec, 2.0 instead of 2.3 GFlops ( vector length too small ) */
 void
-sp2fctest(const double *sa, double *fa, const double *poli, long nlev,
-          long nlat, long nfc, long nt)
+sp2fctest(const double *sa, double *fa, const double *poli, long nlev, long nlat, long nfc, long nt)
 {
   long lats, is;
   double sar, sai;
@@ -487,8 +475,7 @@ sp2fctest(const double *sa, double *fa, const double *poli, long nlev,
 }
 
 void
-sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nlat,
-      long nfc, long nt)
+sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nlat, long nfc, long nt)
 {
   long nsp2 = (nt + 1) * (nt + 2);
 

@@ -73,9 +73,7 @@ Change_e5slm(void *process)
 
   double minval, maxval;
   arrayMinMaxMask(gridsize, cland, NULL, &minval, &maxval);
-  if (minval < 0 || maxval > 1)
-    cdoWarning("Values of SLM out of bounds! (minval=%g, maxval=%g)", minval,
-               maxval);
+  if (minval < 0 || maxval > 1) cdoWarning("Values of SLM out of bounds! (minval=%g, maxval=%g)", minval, maxval);
 
   streamClose(streamIDslm);
 
@@ -87,8 +85,7 @@ Change_e5slm(void *process)
 
   for (varID = 0; varID < nvars; ++varID)
     {
-      if (gridsize != gridInqSize(vlistInqVarGrid(vlistID1, varID)))
-        cdoAbort("gridsize differ!");
+      if (gridsize != gridInqSize(vlistInqVarGrid(vlistID1, varID))) cdoAbort("gridsize differ!");
 
       int code = vlistInqVarCode(vlistID1, varID);
       vlistInqVarName(vlistID1, varID, name);
@@ -155,9 +152,8 @@ Change_e5slm(void *process)
               for (size_t i = 0; i < gridsize; ++i)
                 if (cland[i] < 0.5) array[i] = array[0];
             }
-          else if (code == 70 || code == 71 || code == 140 || code == 173
-                   || code == 174 || code == 198 || code == 200 || code == 212
-                   || code == 226 || code == 229)
+          else if (code == 70 || code == 71 || code == 140 || code == 173 || code == 174 || code == 198 || code == 200
+                   || code == 212 || code == 226 || code == 229)
             {
               cdoPrint("Code %d set sea points to %g!", code, array[0]);
               for (size_t i = 0; i < gridsize; ++i)

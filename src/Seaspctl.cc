@@ -110,8 +110,7 @@ Seaspctl(void *process)
           vars1[varID][levelID].grid = gridID;
           vars1[varID][levelID].nmiss = 0;
           vars1[varID][levelID].missval = missval;
-          vars1[varID][levelID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          vars1[varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
         }
     }
 
@@ -121,8 +120,7 @@ Seaspctl(void *process)
     {
       nrecs = cdoStreamInqTimestep(streamID2, otsID);
       if (nrecs != cdoStreamInqTimestep(streamID3, otsID))
-        cdoAbort("Number of records at time step %d of %s and %s differ!",
-                 otsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
       int vdate2 = taxisInqVdate(taxisID2);
@@ -130,8 +128,7 @@ Seaspctl(void *process)
       int vdate3 = taxisInqVdate(taxisID3);
       int vtime3 = taxisInqVtime(taxisID3);
       if (vdate2 != vdate3 || vtime2 != vtime3)
-        cdoAbort("Verification dates at time step %d of %s and %s differ!",
-                 otsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -149,8 +146,7 @@ Seaspctl(void *process)
           field.grid = vars1[varID][levelID].grid;
           field.missval = vars1[varID][levelID].missval;
 
-          hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID],
-                                &field);
+          hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID], &field);
         }
 
       int nsets = 0;
@@ -191,8 +187,7 @@ Seaspctl(void *process)
               pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
               vars1[varID][levelID].nmiss = nmiss;
 
-              hsetAddVarLevelValues(hset, varID, levelID,
-                                    &vars1[varID][levelID]);
+              hsetAddVarLevelValues(hset, varID, levelID, &vars1[varID][levelID]);
             }
 
           nsets++;
@@ -207,8 +202,7 @@ Seaspctl(void *process)
           nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
           for (levelID = 0; levelID < nlevels; levelID++)
-            hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID,
-                                       levelID, pn);
+            hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID, levelID, pn);
         }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
@@ -219,12 +213,10 @@ Seaspctl(void *process)
           varID = recVarID[recID];
           levelID = recLevelID[recID];
 
-          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-            continue;
+          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
           pstreamDefRecord(streamID4, varID, levelID);
-          pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr,
-                             vars1[varID][levelID].nmiss);
+          pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
         }
 
       if (nrecs == 0) break;

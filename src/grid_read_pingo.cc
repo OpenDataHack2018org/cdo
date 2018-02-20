@@ -33,8 +33,7 @@ skip_nondigit_lines(FILE *gfp)
         c = fgetc(gfp);
       while ((isspace(c) || c == ',') && c != EOF);
 
-      if (c == EOF || isdigit(c) || c == '.' || c == '+' || c == '-'
-          || c == 'N')
+      if (c == EOF || isdigit(c) || c == '.' || c == '+' || c == '-' || c == 'N')
         break;  // N: for NaN
       else
         while (c != '\n' && c != EOF)
@@ -113,8 +112,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
         }
       else if (nlon == (int) grid.xsize)
         {
-          if (input_darray(gfp, nlon, grid.xvals) != (size_t) nlon)
-            return gridID;
+          if (input_darray(gfp, nlon, grid.xvals) != (size_t) nlon) return gridID;
           for (i = 0; i < nlon - 1; i++)
             if (grid.xvals[i + 1] <= grid.xvals[i]) break;
 
@@ -140,14 +138,13 @@ grid_read_pingo(FILE *gfp, const char *dname)
         }
       else if (nlat == (int) grid.ysize)
         {
-          if (input_darray(gfp, nlat, grid.yvals) != (size_t) nlat)
-            return gridID;
+          if (input_darray(gfp, nlat, grid.yvals) != (size_t) nlat) return gridID;
         }
       else
         return gridID;
 
-      if (grid.yvals[0] > 90.001 || grid.yvals[nlat - 1] > 90.001
-          || grid.yvals[0] < -90.001 || grid.yvals[nlat - 1] < -90.001)
+      if (grid.yvals[0] > 90.001 || grid.yvals[nlat - 1] > 90.001 || grid.yvals[0] < -90.001
+          || grid.yvals[nlat - 1] < -90.001)
         {
           cdoPrint("Latitudes must be between 90 and -90!");
           return gridID;
@@ -155,9 +152,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
 
       for (i = 0; i < nlat - 1; i++)
         if (IS_EQUAL(grid.yvals[i + 1], grid.yvals[i])
-            || (i < nlat - 2
-                && ((grid.yvals[i + 1] > grid.yvals[i])
-                    != (grid.yvals[i + 2] > grid.yvals[i + 1]))))
+            || (i < nlat - 2 && ((grid.yvals[i + 1] > grid.yvals[i]) != (grid.yvals[i + 2] > grid.yvals[i + 1]))))
           {
             cdoPrint("Latitudes must be in descending or ascending order!");
             return gridID;
@@ -175,8 +170,7 @@ grid_read_pingo(FILE *gfp, const char *dname)
             yvals[i] = asin(yvals[i]) * RAD2DEG;
 
           for (i = 0; i < (int) grid.ysize; i++)
-            if (fabs(yvals[i] - grid.yvals[i]) > ((yvals[0] - yvals[1]) / 500))
-              break;
+            if (fabs(yvals[i] - grid.yvals[i]) > ((yvals[0] - yvals[1]) / 500)) break;
 
           if (i == (int) grid.ysize) lgauss = true;
 

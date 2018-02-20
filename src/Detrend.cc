@@ -52,8 +52,7 @@ detrend(long nts, double missval1, double *array1, double *array2)
         n++;
       }
 
-  double work1 = DIVMN(SUBMN(sumjx, DIVMN(MULMN(sumx, sumj), n)),
-                       SUBMN(sumjj, DIVMN(MULMN(sumj, sumj), n)));
+  double work1 = DIVMN(SUBMN(sumjx, DIVMN(MULMN(sumx, sumj), n)), SUBMN(sumjj, DIVMN(MULMN(sumj, sumj), n)));
   double work2 = SUBMN(DIVMN(sumx, n), MULMN(work1, DIVMN(sumj, n)));
 
   for (long j = 0; j < nts; j++)
@@ -108,8 +107,7 @@ Detrend(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           gridID = vlistInqVarGrid(vlistID1, varID);
           gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
         }
@@ -131,8 +129,7 @@ Detrend(void *process)
       for (levelID = 0; levelID < nlevel; levelID++)
         {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(array1, array2, vars, varID, levelID, gridsize, nts, missval)
+#pragma omp parallel for default(none) shared(array1, array2, vars, varID, levelID, gridsize, nts, missval)
 #endif
           for (i = 0; i < gridsize; i++)
             {
@@ -166,8 +163,7 @@ Detrend(void *process)
                 {
                   nmiss = vars[tsID][varID][levelID].nmiss;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr,
-                                     nmiss);
+                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
                   Free(vars[tsID][varID][levelID].ptr);
                   vars[tsID][varID][levelID].ptr = NULL;
                 }

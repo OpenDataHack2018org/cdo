@@ -68,8 +68,7 @@
 
 /* sxxxYYYYMMDDhhmm0 */
 #define DATE_LEN 31 /* YYYYMMDDhhmmss allocate DTLEN+1 !!!! */
-#define SET_DATE(dtstr, date, time) \
-  (sprintf(dtstr, "%*d%*d", DATE_LEN - 6, date, 6, time))
+#define SET_DATE(dtstr, date, time) (sprintf(dtstr, "%*d%*d", DATE_LEN - 6, date, 6, time))
 #define DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
 
 enum T_WEIGHT_MODE
@@ -154,8 +153,7 @@ int parameter2intlist(const char *string);
 
 int referenceToGrid(int gridID1);
 
-void cdo_read_field(const char *name, char *pline, int size, double *field,
-                    int *lineno, FILE *fp, const char *dname);
+void cdo_read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *fp, const char *dname);
 
 double cdoZaxisInqLevel(int zaxisID, int levelID);
 int cdoZaxisInqLevels(int zaxisID, double *levels);
@@ -172,22 +170,21 @@ double literal_to_double(const char *literal);
 char *cdoVlistInqVarName(int vlistID, int varID, char *name);
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void cdiDefTableID(int tableID);
+  void cdiDefTableID(int tableID);
 
-void gridGenXvals(int xsize, double xfirst, double xlast, double xinc,
-                  double *xvals);
-void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast,
-                  double yinc, double *yvals);
+  void gridGenXvals(int xsize, double xfirst, double xlast, double xinc, double *xvals);
+  void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast, double yinc, double *yvals);
 
-void gaussaw(double *restrict pa, double *restrict pw, size_t nlat);
+  void gaussaw(double *restrict pa, double *restrict pw, size_t nlat);
 
-int qu2reg3_double(double *pfield, int *kpoint, int klat, int klon,
-                   double msval, int *kret, int omisng, int operio, int oveggy);
+  int qu2reg3_double(double *pfield, int *kpoint, int klat, int klon, double msval, int *kret, int omisng, int operio,
+                     int oveggy);
 
-void cdoCompareGrids(int gridID1, int gridID2);
+  void cdoCompareGrids(int gridID1, int gridID2);
 
 #if defined(__cplusplus)
 }

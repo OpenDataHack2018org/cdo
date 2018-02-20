@@ -91,11 +91,9 @@ Ydayarith(void *process)
       int dayoy = 0;
       if (month >= 1 && month <= 12) dayoy = (month - 1) * 31 + day;
 
-      if (dayoy < 0 || dayoy >= MAX_DOY)
-        cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
+      if (dayoy < 0 || dayoy >= MAX_DOY) cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
-      if (vardata2[dayoy] != NULL)
-        cdoAbort("Day of year %d already allocatd (date=%d)!", dayoy, vdate);
+      if (vardata2[dayoy] != NULL) cdoAbort("Day of year %d already allocatd (date=%d)!", dayoy, vdate);
 
       vardata2[dayoy] = (double **) Malloc(nvars * sizeof(double *));
       varnmiss2[dayoy] = (size_t **) Malloc(nvars * sizeof(size_t *));
@@ -104,8 +102,7 @@ Ydayarith(void *process)
         {
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           size_t nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-          vardata2[dayoy][varID]
-              = (double *) Malloc(nlev * gridsize * sizeof(double));
+          vardata2[dayoy][varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
           varnmiss2[dayoy][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
         }
 
@@ -133,8 +130,7 @@ Ydayarith(void *process)
       int dayoy = 0;
       if (month >= 1 && month <= 12) dayoy = (month - 1) * 31 + day;
 
-      if (dayoy < 0 || dayoy >= MAX_DOY)
-        cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
+      if (dayoy < 0 || dayoy >= MAX_DOY) cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
       taxisCopyTimestep(taxisID3, taxisID1);
 
@@ -148,8 +144,7 @@ Ydayarith(void *process)
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           size_t offset = gridsize * levelID;
-          if (vardata2[dayoy] == NULL)
-            cdoAbort("Day of year %d not found (date=%d)!", dayoy, vdate);
+          if (vardata2[dayoy] == NULL) cdoAbort("Day of year %d not found (date=%d)!", dayoy, vdate);
           arrayCopy(gridsize, vardata2[dayoy][varID] + offset, field2.ptr);
           field2.nmiss = varnmiss2[dayoy][varID][levelID];
 

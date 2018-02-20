@@ -82,8 +82,7 @@ Mergetime(void *process)
   for (int fileID = 0; fileID < nfiles; fileID++)
     {
       sf[fileID].tsID = 0;
-      sf[fileID].nrecs
-          = cdoStreamInqTimestep(sf[fileID].streamID, sf[fileID].tsID);
+      sf[fileID].nrecs = cdoStreamInqTimestep(sf[fileID].streamID, sf[fileID].tsID);
       if (sf[fileID].nrecs == 0)
         {
           pstreamClose(sf[fileID].streamID);
@@ -98,8 +97,7 @@ Mergetime(void *process)
 
   const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
-  if (!cdoOverwriteMode && fileExists(ofilename)
-      && !userFileOverwrite(ofilename))
+  if (!cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename))
     cdoAbort("Outputfile %s already exists!", ofilename);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
@@ -131,8 +129,7 @@ Mergetime(void *process)
 
       int fileID = next_fileID;
 
-      if (cdoVerbose)
-        cdoPrint("nextstep = %d  vdate = %d  vtime = %d", fileID, vdate, vtime);
+      if (cdoVerbose) cdoPrint("nextstep = %d  vdate = %d  vtime = %d", fileID, vdate, vtime);
 
       if (fileID == -1) break;
 
@@ -142,9 +139,8 @@ Mergetime(void *process)
             char vdatestr[32], vtimestr[32];
             date2str(vdate, vdatestr, sizeof(vdatestr));
             time2str(vtime, vtimestr, sizeof(vtimestr));
-            cdoPrint(
-                "Timestep %4d in stream %d (%s %s) already exists, skipped!",
-                sf[fileID].tsID + 1, sf[fileID].streamID, vdatestr, vtimestr);
+            cdoPrint("Timestep %4d in stream %d (%s %s) already exists, skipped!", sf[fileID].tsID + 1,
+                     sf[fileID].streamID, vdatestr, vtimestr);
             process_timestep = false;
           }
 
@@ -174,9 +170,7 @@ Mergetime(void *process)
               pstreamInqRecord(sf[fileID].streamID, &varID, &levelID);
 
               if (tsID2 > 0 && sf[fileID].tsID == 0)
-                if (vlistInqVarTimetype(sf[fileID].vlistID, varID)
-                    == TIME_CONSTANT)
-                  continue;
+                if (vlistInqVarTimetype(sf[fileID].vlistID, varID) == TIME_CONSTANT) continue;
 
               pstreamDefRecord(streamID2, varID, levelID);
 
@@ -195,8 +189,7 @@ Mergetime(void *process)
           tsID2++;
         }
 
-      sf[fileID].nrecs
-          = cdoStreamInqTimestep(sf[fileID].streamID, ++sf[fileID].tsID);
+      sf[fileID].nrecs = cdoStreamInqTimestep(sf[fileID].streamID, ++sf[fileID].tsID);
       if (sf[fileID].nrecs == 0)
         {
           pstreamClose(sf[fileID].streamID);

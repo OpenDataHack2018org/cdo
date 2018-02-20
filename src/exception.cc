@@ -67,12 +67,9 @@ cdiOpenError(int cdiErrno, const char *fmt, const char *path)
         case CDI_FILETYPE_NC5:
           {
             const char *ncv
-                = (filetype == CDI_FILETYPE_NC4
-                   || filetype == CDI_FILETYPE_NC4C)
+                = (filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C)
                       ? "4"
-                      : ((filetype == CDI_FILETYPE_NC2)
-                             ? "2"
-                             : ((filetype == CDI_FILETYPE_NC5) ? "5" : ""));
+                      : ((filetype == CDI_FILETYPE_NC2) ? "2" : ((filetype == CDI_FILETYPE_NC5) ? "5" : ""));
 #if defined HAVE_LIBNETCDF
             fprintf(stderr,
                     "CDO was build with a NetCDF version which doesn't support "

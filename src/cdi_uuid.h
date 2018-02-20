@@ -24,22 +24,23 @@
 #include "cdi.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-static inline int
-cdiUUIDIsNull(const unsigned char uuid[])
-{
-  int isNull = 1;
-  for (size_t i = 0; i < CDI_UUID_SIZE; ++i)
-    isNull &= (uuid[i] == 0);
-  return isNull;
-}
+  static inline int
+  cdiUUIDIsNull(const unsigned char uuid[])
+  {
+    int isNull = 1;
+    for (size_t i = 0; i < CDI_UUID_SIZE; ++i)
+      isNull &= (uuid[i] == 0);
+    return isNull;
+  }
 
-void cdiCreateUUID(unsigned char uuid[CDI_UUID_SIZE]);
+  void cdiCreateUUID(unsigned char uuid[CDI_UUID_SIZE]);
 
-void cdiUUID2Str(const unsigned char uuid[], char uuidstr[]);
-int cdiStr2UUID(const char *uuidstr, unsigned char uuid[]);
+  void cdiUUID2Str(const unsigned char uuid[], char uuidstr[]);
+  int cdiStr2UUID(const char *uuidstr, unsigned char uuid[]);
 
 #if defined(__cplusplus)
 }

@@ -90,8 +90,7 @@ get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
   src_unit = ut_parse(ut_read, src_unit_str, UT_ASCII);
   if (ut_get_status() != UT_SUCCESS)
     {
-      if (cdoVerbose)
-        cdoWarning("Udunits: Error parsing units: [%s]", src_unit_str);
+      if (cdoVerbose) cdoWarning("Udunits: Error parsing units: [%s]", src_unit_str);
       return NULL;
     }
 
@@ -99,8 +98,7 @@ get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
   tgt_unit = ut_parse(ut_read, tgt_unit_str, UT_ASCII);
   if (ut_get_status() != UT_SUCCESS)
     {
-      if (cdoVerbose)
-        cdoWarning("Udunits: Error parsing units: [%s]", tgt_unit_str);
+      if (cdoVerbose) cdoWarning("Udunits: Error parsing units: [%s]", tgt_unit_str);
       return NULL;
     }
 
@@ -118,9 +116,7 @@ get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
       ut_units_converter = ut_get_converter(src_unit, tgt_unit);
       if (ut_units_converter == NULL || ut_get_status() != UT_SUCCESS)
         {
-          if (cdoVerbose)
-            cdoWarning("Udunits: Error getting converter from [%s] to [%s]",
-                       src_unit_str, tgt_unit_str);
+          if (cdoVerbose) cdoWarning("Udunits: Error getting converter from [%s] to [%s]", src_unit_str, tgt_unit_str);
         }
       else
         *rstatus = 0;
@@ -129,16 +125,14 @@ get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
   ut_free(src_unit);
   if (ut_get_status() != UT_SUCCESS)
     {
-      if (cdoVerbose)
-        cdoWarning("Udunits: Error freeing units [%s]", src_unit_str);
+      if (cdoVerbose) cdoWarning("Udunits: Error freeing units [%s]", src_unit_str);
       return NULL;
     }
 
   ut_free(tgt_unit);
   if (ut_get_status() != UT_SUCCESS)
     {
-      if (cdoVerbose)
-        cdoWarning("Udunits: Error freeing units [%s]", tgt_unit_str);
+      if (cdoVerbose) cdoWarning("Udunits: Error freeing units [%s]", tgt_unit_str);
       return NULL;
     }
 
@@ -167,8 +161,7 @@ cdoConvertDestroy()
 #endif
 
 void
-cdoConvertUnits(void **ut_converter, bool *changeunits, char *units,
-                char *units_old, const char *name)
+cdoConvertUnits(void **ut_converter, bool *changeunits, char *units, char *units_old, const char *name)
 {
   if (*changeunits)
     {
@@ -183,9 +176,7 @@ cdoConvertUnits(void **ut_converter, bool *changeunits, char *units,
           if (status == -2)
             {
               if (cdoVerbose)
-                cdoPrint(
-                    "%s - not converted from  [%s] to [%s], units are equal!",
-                    name, units_old, units);
+                cdoPrint("%s - not converted from  [%s] to [%s], units are equal!", name, units_old, units);
             }
           else if (status == -3)
             {
@@ -194,8 +185,7 @@ cdoConvertUnits(void **ut_converter, bool *changeunits, char *units,
                          name, units_old, units);
             }
           else
-            cdoWarning("%s - converting units from [%s] to [%s] failed!", name,
-                       units_old, units);
+            cdoWarning("%s - converting units from [%s] to [%s] failed!", name, units_old, units);
           *changeunits = false;
         }
       else
@@ -203,10 +193,8 @@ cdoConvertUnits(void **ut_converter, bool *changeunits, char *units,
           // if ( cdoVerbose )
           {
             char buf[64];
-            cv_get_expression((const cv_converter *) *ut_converter, buf,
-                              sizeof(buf), name);
-            cdoPrint("%s - convert units from [%s] to [%s] (expression: %s).",
-                     name, units_old, units, buf);
+            cv_get_expression((const cv_converter *) *ut_converter, buf, sizeof(buf), name);
+            cdoPrint("%s - convert units from [%s] to [%s] (expression: %s).", name, units_old, units, buf);
           }
         }
 #else

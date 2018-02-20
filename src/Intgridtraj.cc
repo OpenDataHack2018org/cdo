@@ -28,16 +28,14 @@
 #include "datetime.h"
 
 static int
-readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos,
-            double *ypos)
+readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double *ypos)
 {
   int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
 
   *xpos = 0;
   *ypos = 0;
 
-  int stat = fscanf(fp, "%d-%d-%d %d:%d:%d %lf %lf", &year, &month, &day, &hour,
-                    &minute, &second, xpos, ypos);
+  int stat = fscanf(fp, "%d-%d-%d %d:%d:%d %lf %lf", &year, &month, &day, &hour, &minute, &second, xpos, ypos);
 
   if (stat != EOF)
     {
@@ -112,10 +110,8 @@ Intgridtraj(void *process)
     {
       int gridID1 = vlistGrid(vlistID1, index);
 
-      if (gridInqType(gridID1) != GRID_LONLAT
-          && gridInqType(gridID1) != GRID_GAUSSIAN)
-        cdoAbort("Unsupported grid type: %s",
-                 gridNamePtr(gridInqType(gridID1)));
+      if (gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN)
+        cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)));
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
@@ -128,8 +124,7 @@ Intgridtraj(void *process)
 
   int tsID = 0;
   int nrecs = cdoStreamInqTimestep(streamID1, tsID++);
-  juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1),
-                                      taxisInqVtime(taxisID1));
+  juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
   for (int recID = 0; recID < nrecs; recID++)
     {
       pstreamInqRecord(streamID1, &varID, &levelID);
@@ -145,8 +140,7 @@ Intgridtraj(void *process)
     {
       nrecs = cdoStreamInqTimestep(streamID1, tsID++);
       if (nrecs == 0) break;
-      juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1),
-                                          taxisInqVtime(taxisID1));
+      juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -169,8 +163,7 @@ Intgridtraj(void *process)
             {
               if (streamID2 == CDI_UNDEFID)
                 {
-                  streamID2
-                      = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+                  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
                   pstreamDefVlist(streamID2, vlistID2);
                 }
 
@@ -179,12 +172,10 @@ Intgridtraj(void *process)
               taxisDefVtime(taxisID2, vtime);
               pstreamDefTimestep(streamID2, tsIDo++);
 
-              double fac1
-                  = juldate_to_seconds(juldate_sub(juldate2, juldate))
-                    / juldate_to_seconds(juldate_sub(juldate2, juldate1));
-              double fac2
-                  = juldate_to_seconds(juldate_sub(juldate, juldate1))
-                    / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate))
+                            / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1))
+                            / juldate_to_seconds(juldate_sub(juldate2, juldate1));
               /*
               printf("      %f %f %f %f %f\n", juldate_to_seconds(juldate),
                                                juldate_to_seconds(juldate1),

@@ -91,14 +91,12 @@ const char *line_colours[] = {
   "purple",
 };
 
-const char *graph_params[]
-    = { "ymin", "ymax", "sigma", "stat", "obsv", "device", "linewidth" };
+const char *graph_params[] = { "ymin", "ymax", "sigma", "stat", "obsv", "device", "linewidth" };
 
 int graph_param_count = sizeof(graph_params) / sizeof(char *);
 int num_colours = sizeof(line_colours) / sizeof(char *);
 
-int compareDateOrTimeStr(char *datetimestr1, char *datetimestr2,
-                         const char *sep_char);
+int compareDateOrTimeStr(char *datetimestr1, char *datetimestr2, const char *sep_char);
 
 extern int checkdevice(char *device_in);
 
@@ -107,9 +105,8 @@ extern char *DEVICE_TABLE;
 extern int DEVICE_COUNT;
 
 static void
-maggraph(const char *plotfile, const char *varname, const char *varunits,
-         long nfiles, long *nts, int **vdate, int **vtime, double **datatab,
-         int nparam, char **params)
+maggraph(const char *plotfile, const char *varname, const char *varunits, long nfiles, long *nts, int **vdate,
+         int **vtime, double **datatab, int nparam, char **params)
 {
   char *lines[1];
   char *temp_str;
@@ -148,8 +145,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
     {
       split_str_count = 0;
       sep_char = "=";
-      split_str_count
-          = StringSplitWithSeperator(params[i], sep_char, &split_str);
+      split_str_count = StringSplitWithSeperator(params[i], sep_char, &split_str);
 
       if (!strcmp(split_str[0], "obsv"))
         {
@@ -234,8 +230,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
         {
           if (nts[fileID] != ntime_steps)
             {
-              cdoWarning(
-                  "  Unequal number of time steps! Statistics disabled.");
+              cdoWarning("  Unequal number of time steps! Statistics disabled.");
               stat = FALSE;
               break;
             }
@@ -323,10 +318,8 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
             {
               if (DBG) fprintf(stderr, "%ld\n", fileID);
 
-              if (datatab[fileID][tsID] < min_val)
-                min_val = datatab[fileID][tsID];
-              if (datatab[fileID][tsID] > max_val)
-                max_val = datatab[fileID][tsID];
+              if (datatab[fileID][tsID] < min_val) min_val = datatab[fileID][tsID];
+              if (datatab[fileID][tsID] > max_val) max_val = datatab[fileID][tsID];
 
               mean_val[tsID] += datatab[fileID][tsID];
               std_dev_val[tsID] = 0.;
@@ -349,22 +342,17 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
 
           for (fileID = 0; fileID < nfiles; ++fileID)
             {
-              std_dev_val[tsID] += (datatab[fileID][tsID] - mean_val[tsID])
-                                   * (datatab[fileID][tsID] - mean_val[tsID]);
+              std_dev_val[tsID] += (datatab[fileID][tsID] - mean_val[tsID]) * (datatab[fileID][tsID] - mean_val[tsID]);
             }
           std_dev_val[tsID] /= (double) nfiles;
           std_dev_val[tsID] = pow(std_dev_val[tsID], 0.5);
 
-          if (DBG)
-            fprintf(stderr, " Mean : %g Std Dev: %g\n", mean_val[tsID],
-                    std_dev_val[tsID]);
+          if (DBG) fprintf(stderr, " Mean : %g Std Dev: %g\n", mean_val[tsID], std_dev_val[tsID]);
 
           spread_min[tsID] = mean_val[tsID] - num_sigma * std_dev_val[tsID];
           spread_max[tsID] = mean_val[tsID] + num_sigma * std_dev_val[tsID];
 
-          if (DBG)
-            fprintf(stderr, " Min : %g Max: %g\n", spread_min[tsID],
-                    spread_max[tsID]);
+          if (DBG) fprintf(stderr, " Min : %g Max: %g\n", spread_min[tsID], spread_max[tsID]);
         }
 
       for (tsID = 0; tsID < ntime_steps; ++tsID)
@@ -376,8 +364,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
       if (DBG)
         {
           fprintf(stderr, " %6g %6g\n", min_val, max_val);
-          fprintf(stderr, " %s %s\n", date_time_str[0][0],
-                  date_time_str[0][ntime_steps - 1]);
+          fprintf(stderr, " %s %s\n", date_time_str[0][0], date_time_str[0][ntime_steps - 1]);
           fprintf(stderr, "\n");
         }
 
@@ -397,8 +384,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
         {
           if (DBG) fprintf(stderr, "FILE  %ld\n", fileID);
           date_time = (double *) Malloc(nts[fileID] * sizeof(double));
-          date_time_str[fileID]
-              = (char **) Malloc(nts[fileID] * sizeof(char *));
+          date_time_str[fileID] = (char **) Malloc(nts[fileID] * sizeof(char *));
 
           for (tsID = 0; tsID < nts[fileID]; ++tsID)
             {
@@ -408,30 +394,22 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
 
               date_time_str[fileID][tsID] = (char *) Malloc(256);
               sprintf(date_time_str[fileID][tsID], "%s %s", vdatestr, vtimestr);
-              if (DBG)
-                fprintf(stderr, "%s %s %s\n", vdatestr, vtimestr,
-                        date_time_str[fileID][tsID]);
+              if (DBG) fprintf(stderr, "%s %s %s\n", vdatestr, vtimestr, date_time_str[fileID][tsID]);
 
-              if (datatab[fileID][tsID] < min_val)
-                min_val = datatab[fileID][tsID];
-              if (datatab[fileID][tsID] > max_val)
-                max_val = datatab[fileID][tsID];
+              if (datatab[fileID][tsID] < min_val) min_val = datatab[fileID][tsID];
+              if (datatab[fileID][tsID] > max_val) max_val = datatab[fileID][tsID];
             }
           Free(date_time);
 
           if (fileID == 0)
             {
-              if (DBG)
-                fprintf(stderr, "\n %s %s\n", date_time_str[fileID][0],
-                        date_time_str[fileID][nts[0] - 1]);
+              if (DBG) fprintf(stderr, "\n %s %s\n", date_time_str[fileID][0], date_time_str[fileID][nts[0] - 1]);
               min_index = 0;
               max_index = 0;
             }
           else
             {
-              if (DBG)
-                fprintf(stderr, "compareDateOrTimeStr %s\n",
-                        date_time_str[fileID][0]);
+              if (DBG) fprintf(stderr, "compareDateOrTimeStr %s\n", date_time_str[fileID][0]);
               date2str(vdate[min_index][0], vdatestr1, sizeof(vdatestr));
               date2str(vdate[fileID][0], vdatestr2, sizeof(vdatestr));
               sep_char = "-";
@@ -454,14 +432,10 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
                 }
               if (DBG) fprintf(stderr, "Min File ID %d\n", min_index);
 
-              if (DBG)
-                fprintf(stderr, "compareDateOrTimeStr  %s\n",
-                        date_time_str[fileID][nts[fileID] - 1]);
+              if (DBG) fprintf(stderr, "compareDateOrTimeStr  %s\n", date_time_str[fileID][nts[fileID] - 1]);
 
-              date2str(vdate[max_index][nts[max_index] - 1], vdatestr1,
-                       sizeof(vdatestr));
-              date2str(vdate[fileID][nts[fileID] - 1], vdatestr2,
-                       sizeof(vdatestr));
+              date2str(vdate[max_index][nts[max_index] - 1], vdatestr1, sizeof(vdatestr));
+              date2str(vdate[fileID][nts[fileID] - 1], vdatestr2, sizeof(vdatestr));
               sep_char = "-";
               ret = compareDateOrTimeStr(vdatestr1, vdatestr2, sep_char);
 
@@ -471,10 +445,8 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
                 max_index = fileID;
               else if (!ret)
                 {
-                  time2str(vtime[max_index][nts[max_index] - 1], vtimestr1,
-                           sizeof(vtimestr));
-                  time2str(vtime[fileID][nts[fileID] - 1], vtimestr2,
-                           sizeof(vtimestr));
+                  time2str(vtime[max_index][nts[max_index] - 1], vtimestr1, sizeof(vtimestr));
+                  time2str(vtime[fileID][nts[fileID] - 1], vtimestr2, sizeof(vtimestr));
                   sep_char = ":";
                   ret = compareDateOrTimeStr(vtimestr1, vtimestr2, sep_char);
 
@@ -497,16 +469,14 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
 
   split_str_count = 0;
   sep_char = "-";
-  split_str_count
-      = StringSplitWithSeperator(max_date_time_str, sep_char, &split_str);
+  split_str_count = StringSplitWithSeperator(max_date_time_str, sep_char, &split_str);
   (void) split_str_count;
   num_years = atoi(split_str[0]);
   num_months = atoi(split_str[1]);
   num_days = atoi(split_str[2]);
   Free(split_str);
 
-  split_str_count
-      = StringSplitWithSeperator(min_date_time_str, sep_char, &split_str);
+  split_str_count = StringSplitWithSeperator(min_date_time_str, sep_char, &split_str);
   num_years -= atoi(split_str[0]);
 
   if (num_years <= 1)
@@ -623,11 +593,9 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
       mag_setc("graph_line_colour", line_colours[count % num_colours]);
       mag_setc("legend_user_text", legend_text_data);
       if (stat == TRUE)
-        mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[0],
-                  ntime_steps);
+        mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[0], ntime_steps);
       else
-        mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[i],
-                  nts[i]);
+        mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[i], nts[i]);
 
       /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  begin**/
       mag_setr("graph_x_suppress_below", LLONG_MIN);
@@ -643,8 +611,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
       mag_setc("graph_line_colour", "black");
       sprintf(legend_text_data, "%s", "Obsv");
       mag_setc("legend_user_text", legend_text_data);
-      mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[0],
-                nts[0]);
+      mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[0], nts[0]);
 
       /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  begin**/
       mag_setr("graph_x_suppress_below", LLONG_MIN);
@@ -666,8 +633,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
       mag_seti("graph_line_thickness", linewidth_val);
       mag_setc("graph_line_colour", "grey");
       mag_setc("graph_line_style", "dash");
-      mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[0],
-                ntime_steps);
+      mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[0], ntime_steps);
 
       /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  begin**/
       mag_setr("graph_x_suppress_below", LLONG_MIN);
@@ -684,11 +650,9 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
       mag_seti("graph_line_thickness", 1);
       mag_setc("graph_shade_style", "dot");
       mag_setr("graph_shade_dot_size", 1.);
-      mag_set1c("graph_curve2_date_x_values", (const char **) date_time_str[0],
-                ntime_steps);
+      mag_set1c("graph_curve2_date_x_values", (const char **) date_time_str[0], ntime_steps);
       mag_set1r("graph_curve2_y_values", spread_max, ntime_steps);
-      mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[0],
-                ntime_steps);
+      mag_set1c("graph_curve_date_x_values", (const char **) date_time_str[0], ntime_steps);
       mag_set1r("graph_curve_y_values", spread_min, ntime_steps);
       mag_setc("graph_shade_colour", "grey");
       sprintf(legend_text_data, "%dSigma", num_sigma);
@@ -710,8 +674,7 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
   // sprintf( lines[0],"Variable : %s[%s]",varname, varunits );
   // sprintf( lines[0],"%s  Date : %s --%s",lines[0], min_date_time_str,
   // max_date_time_str );
-  sprintf(lines[0], "Variable : %s[%s]  Date : %s --%s", varname, varunits,
-          min_date_time_str, max_date_time_str);
+  sprintf(lines[0], "Variable : %s[%s]  Date : %s --%s", varname, varunits, min_date_time_str, max_date_time_str);
   mag_set1c("text_lines", (const char **) lines, 1);
 
   mag_setc("text_html", "true");
@@ -739,24 +702,18 @@ maggraph(const char *plotfile, const char *varname, const char *varunits,
 }
 
 int
-compareDateOrTimeStr(char *datetimestr1, char *datetimestr2,
-                     const char *sep_char)
+compareDateOrTimeStr(char *datetimestr1, char *datetimestr2, const char *sep_char)
 {
   int split_str_count1, split_str_count2;
-  int i,
-      flag[3]; /*  '3' since, three fields are expected in the input strings */
+  int i, flag[3]; /*  '3' since, three fields are expected in the input strings */
   char **split_str1 = NULL;
   char **split_str2 = NULL;
 
-  if (DBG)
-    fprintf(stderr, "Inside compareDateOrTimeStr %s %s\n", datetimestr1,
-            datetimestr2);
-  split_str_count1
-      = StringSplitWithSeperator(datetimestr1, sep_char, &split_str1);
+  if (DBG) fprintf(stderr, "Inside compareDateOrTimeStr %s %s\n", datetimestr1, datetimestr2);
+  split_str_count1 = StringSplitWithSeperator(datetimestr1, sep_char, &split_str1);
 
   if (split_str_count1)
-    split_str_count2
-        = StringSplitWithSeperator(datetimestr2, sep_char, &split_str2);
+    split_str_count2 = StringSplitWithSeperator(datetimestr2, sep_char, &split_str2);
   else
     {
       Free(split_str1);
@@ -825,8 +782,7 @@ VerifyGraphParameters(int num_param, char **param_names)
       split_str_count = 0;
       found = FALSE;
       syntax = TRUE;
-      split_str_count
-          = StringSplitWithSeperator(param_names[i], sep_char, &split_str);
+      split_str_count = StringSplitWithSeperator(param_names[i], sep_char, &split_str);
       if (split_str_count > 1)
         {
           for (j = 0; j < graph_param_count; ++j)
@@ -834,8 +790,7 @@ VerifyGraphParameters(int num_param, char **param_names)
               if (!strcmp(split_str[0], graph_params[j]))
                 {
                   found = TRUE;
-                  if (!strcmp(split_str[0], "obsv")
-                      || !strcmp(split_str[0], "stat"))
+                  if (!strcmp(split_str[0], "obsv") || !strcmp(split_str[0], "stat"))
                     {
                       if (IsNumeric(split_str[1]))
                         syntax = FALSE;
@@ -843,15 +798,11 @@ VerifyGraphParameters(int num_param, char **param_names)
                         {
                           temp_str = strdup(split_str[1]);
                           StrToUpperCase(temp_str);
-                          if (strcmp(temp_str, "TRUE")
-                              && strcmp(temp_str, "FALSE"))
-                            syntax = FALSE;
+                          if (strcmp(temp_str, "TRUE") && strcmp(temp_str, "FALSE")) syntax = FALSE;
                         }
                     }
 
-                  if (!strcmp(split_str[0], "ymin")
-                      || !strcmp(split_str[0], "ymax")
-                      || !strcmp(split_str[0], "sigma")
+                  if (!strcmp(split_str[0], "ymin") || !strcmp(split_str[0], "ymax") || !strcmp(split_str[0], "sigma")
                       || !strcmp(split_str[0], "linewidth"))
                     {
                       if (!IsNumeric(split_str[1])) syntax = FALSE;
@@ -865,32 +816,22 @@ VerifyGraphParameters(int num_param, char **param_names)
                         {
                           if (!strcmp(split_str[0], "device"))
                             {
-                              if (DBG)
-                                fprintf(stderr, "Parameter value '%s'\n",
-                                        split_str[1]);
+                              if (DBG) fprintf(stderr, "Parameter value '%s'\n", split_str[1]);
                               if (checkdevice(split_str[1])) syntax = FALSE;
 
                               /* Graph not supported in google earth format */
-                              if (!strcmp(split_str[1], "GIF_ANIMATION")
-                                  || !strcmp(split_str[1], "gif_animation"))
+                              if (!strcmp(split_str[1], "GIF_ANIMATION") || !strcmp(split_str[1], "gif_animation"))
                                 {
                                   syntax = FALSE;
-                                  fprintf(
-                                      stderr,
-                                      "Animation not supported for Graph!\n");
-                                  if (DBG)
-                                    fprintf(stderr, "Parameter value '%s'\n",
-                                            split_str[1]);
+                                  fprintf(stderr, "Animation not supported for Graph!\n");
+                                  if (DBG) fprintf(stderr, "Parameter value '%s'\n", split_str[1]);
                                 }
-                              if (!strcmp(split_str[1], "KML")
-                                  || !strcmp(split_str[1], "kml"))
+                              if (!strcmp(split_str[1], "KML") || !strcmp(split_str[1], "kml"))
                                 {
                                   syntax = FALSE;
                                   fprintf(stderr, " 'kml' format not supported "
                                                   "for  Graph!\n");
-                                  if (DBG)
-                                    fprintf(stderr, "Parameter value '%s'\n",
-                                            split_str[1]);
+                                  if (DBG) fprintf(stderr, "Parameter value '%s'\n", split_str[1]);
                                 }
                             }
                         }
@@ -932,8 +873,7 @@ VerifyGraphParameters(int num_param, char **param_names)
       if (found == TRUE && syntax == FALSE)
         {
           halt_flag = TRUE;
-          fprintf(stderr, "Invalid parameter specification  '%s'!\n",
-                  param_names[i]);
+          fprintf(stderr, "Invalid parameter specification  '%s'!\n", param_names[i]);
         }
       Free(split_str);
     }
@@ -990,9 +930,7 @@ Maggraph(void *process)
 
   for (int fileID = 0; fileID < nfiles; fileID++)
     {
-      if (DBG)
-        fprintf(stderr, " file %d is %s\n", fileID,
-                cdoGetStreamName(fileID).c_str());
+      if (DBG) fprintf(stderr, " file %d is %s\n", fileID, cdoGetStreamName(fileID).c_str());
 
       int streamID = cdoStreamOpenRead(cdoStreamName(fileID));
 
@@ -1010,10 +948,8 @@ Maggraph(void *process)
           int nvars = vlistNvars(vlistID);
 
           if (nvars > 1) cdoAbort("Input stream has more than on variable!");
-          if (gridInqSize(gridID) != 1)
-            cdoAbort("Variable has more than one grid point!");
-          if (zaxisInqSize(zaxisID) != 1)
-            cdoAbort("Variable has more than one level!");
+          if (gridInqSize(gridID) != 1) cdoAbort("Variable has more than one grid point!");
+          if (zaxisInqSize(zaxisID) != 1) cdoAbort("Variable has more than one level!");
 
           vlistID0 = vlistDuplicate(vlistID);
         }
@@ -1026,8 +962,7 @@ Maggraph(void *process)
       nts_alloc = 0;
       while ((nrecs = cdoStreamInqTimestep(streamID, tsID)))
         {
-          if (nrecs != 1)
-            cdoAbort("Input stream has more than one point in time!");
+          if (nrecs != 1) cdoAbort("Input stream has more than one point in time!");
 
           if (tsID == 0)
             {
@@ -1042,12 +977,9 @@ Maggraph(void *process)
           if (nts[fileID] > nts_alloc)
             {
               nts_alloc += NINC_ALLOC;
-              datatab[fileID] = (double *) Realloc(datatab[fileID],
-                                                   nts_alloc * sizeof(double));
-              vdate[fileID]
-                  = (int *) Realloc(vdate[fileID], nts_alloc * sizeof(int));
-              vtime[fileID]
-                  = (int *) Realloc(vtime[fileID], nts_alloc * sizeof(int));
+              datatab[fileID] = (double *) Realloc(datatab[fileID], nts_alloc * sizeof(double));
+              vdate[fileID] = (int *) Realloc(vdate[fileID], nts_alloc * sizeof(int));
+              vtime[fileID] = (int *) Realloc(vtime[fileID], nts_alloc * sizeof(int));
             }
 
           double val;
@@ -1080,8 +1012,7 @@ Maggraph(void *process)
       for (int i = 0; i < nparam; i++)
         fprintf(stderr, "Param %s\n", pnames[i]);
     }
-  maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab,
-           nparam, pnames);
+  maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
 
   /* quit_XMLtemplate_parser( ); */
 

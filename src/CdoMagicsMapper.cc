@@ -47,24 +47,20 @@ typedef struct
   const char *cdo_name;
   const char *magics_name;
   const char *magics_type;
-  int (*Set_magics_param)(const char *user_name,
-                          const char *param_value); /* Function to Update the
-                                                       Corresponding Magics
-                                                       parameters */
-  int (*Reset_magics_param)(const char *user_name); /* Function to Reset the
-                                                       Corresponding Magics
-                                                       parameters  */
+  int (*Set_magics_param)(const char *user_name, const char *param_value); /* Function to Update the
+                                                                              Corresponding Magics
+                                                                              parameters */
+  int (*Reset_magics_param)(const char *user_name);                        /* Function to Reset the
+                                                                              Corresponding Magics
+                                                                              parameters  */
 
 } CdoMagicsMapper;
 
 CdoMagicsMapper mapper[] =
 
-    { { "clevs", "contour_level_list", "floatarray", &Set_magics_param_CLEVS,
-        &Reset_magics_param_CLEVS },
-      { "ccols", "contour_param_2", "intarray", &Set_magics_param_CCOLS,
-        &Reset_magics_param_CCOLS },
-      { "color_table", "contour_param_3", "intarray", &Set_magics_param_CTABLE,
-        &Reset_magics_param_CTABLE } };
+    { { "clevs", "contour_level_list", "floatarray", &Set_magics_param_CLEVS, &Reset_magics_param_CLEVS },
+      { "ccols", "contour_param_2", "intarray", &Set_magics_param_CCOLS, &Reset_magics_param_CCOLS },
+      { "color_table", "contour_param_3", "intarray", &Set_magics_param_CTABLE, &Reset_magics_param_CTABLE } };
 
 void PrintResult(const CdoMagicsMapper *c);
 
@@ -76,8 +72,7 @@ Set_magics_param_CCOLS(const char *user_name, const char *param_value)
   printf("Setting the CCOLS magics params \n");
 
   SetMagicsParameterValue("contour_shade_colour_method", "string", "list");
-  SetMagicsParameterValue("contour_shade_colour_list", "stringarray",
-                          param_value);
+  SetMagicsParameterValue("contour_shade_colour_list", "stringarray", param_value);
 #if 0
 #endif
   return 0;
@@ -96,8 +91,7 @@ Set_magics_param_CLEVS(const char *user_name, const char *param_value)
 {
   if (user_name == NULL) return 1;
 
-  SetMagicsParameterValue("contour_level_selection_type", "string",
-                          "level_list");
+  SetMagicsParameterValue("contour_level_selection_type", "string", "level_list");
   SetMagicsParameterValue("contour_level_list", "floatarray", param_value);
 
   return 0;
@@ -138,8 +132,7 @@ Reset_magics_param_CTABLE(const char *user_name)
 int
 Compare(const void *p1, const void *p2)
 {
-  return strcmp(((CdoMagicsMapper *) p1)->cdo_name,
-                ((CdoMagicsMapper *) p2)->cdo_name);
+  return strcmp(((CdoMagicsMapper *) p1)->cdo_name, ((CdoMagicsMapper *) p2)->cdo_name);
 }
 
 /* Print information about a critter. */
@@ -147,8 +140,7 @@ Compare(const void *p1, const void *p2)
 void
 PrintResult(const CdoMagicsMapper *c)
 {
-  printf("CDO Name:%s\t MAGICS Name:%s\t MAGICS Type:%s\n", c->cdo_name,
-         c->magics_name, c->magics_type);
+  printf("CDO Name:%s\t MAGICS Name:%s\t MAGICS Type:%s\n", c->cdo_name, c->magics_name, c->magics_type);
 }
 
 /* Do the lookup into the sorted array. */
@@ -170,8 +162,7 @@ GetMagicsParameterInfo(const char *user_name, char *param_value)
       once = 0;
     }
 
-  result = (CdoMagicsMapper *) bsearch(&target, mapper, PARAM_COUNT,
-                                       sizeof(CdoMagicsMapper), Compare);
+  result = (CdoMagicsMapper *) bsearch(&target, mapper, PARAM_COUNT, sizeof(CdoMagicsMapper), Compare);
   if (result)
     {
       result->Set_magics_param(result->cdo_name, param_value);

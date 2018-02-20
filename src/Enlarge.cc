@@ -40,9 +40,7 @@ Enlarge(void *process)
   size_t xsize2 = gridInqXsize(gridID2);
   size_t ysize2 = gridInqYsize(gridID2);
 
-  if (cdoVerbose)
-    fprintf(stderr, "gridID2 %d, xsize2 %zu, ysize2 %zu\n", gridID2, xsize2,
-            ysize2);
+  if (cdoVerbose) fprintf(stderr, "gridID2 %d, xsize2 %zu, ysize2 %zu\n", gridID2, xsize2, ysize2);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -54,8 +52,7 @@ Enlarge(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   size_t gridsize2 = gridInqSize(gridID2);
-  if (gridsize2 < vlistGridsizeMax(vlistID1))
-    cdoAbort("Gridsize of input stream is greater than new gridsize!");
+  if (gridsize2 < vlistGridsizeMax(vlistID1)) cdoAbort("Gridsize of input stream is greater than new gridsize!");
 
   int ngrids = vlistNgrids(vlistID1);
   for (int index = 0; index < ngrids; index++)
@@ -108,8 +105,7 @@ Enlarge(void *process)
 
               if (nmiss) nmiss *= xsize2;
             }
-          else if (ysize1 == 1 && xsize1 == xsize2
-                   && xsize1 * ysize1 == gridsize1)
+          else if (ysize1 == 1 && xsize1 == xsize2 && xsize1 * ysize1 == gridsize1)
             {
               if (linfo)
                 {
@@ -129,8 +125,7 @@ Enlarge(void *process)
               for (size_t i = gridsize1; i < gridsize2; i++)
                 array2[i] = array1[gridsize1 - 1];
 
-              if (nmiss && DBL_IS_EQUAL(array1[gridsize1 - 1], missval))
-                nmiss += (gridsize2 - gridsize1);
+              if (nmiss && DBL_IS_EQUAL(array1[gridsize1 - 1], missval)) nmiss += (gridsize2 - gridsize1);
             }
 
           pstreamDefRecord(streamID2, varID, levelID);

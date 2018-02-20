@@ -70,32 +70,28 @@ static void
 FreeSpectral(struct Variable *vars)
 {
   for (int code = MaxCodes - 1; code >= 0; --code)
-    if (vars[code].spectral)
-      vars[code].spectral = (double *) FreeMemory(vars[code].spectral);
+    if (vars[code].spectral) vars[code].spectral = (double *) FreeMemory(vars[code].spectral);
 }
 
 static void
 FreeFourier(struct Variable *vars)
 {
   for (int code = 0; code < MaxCodes; code++)
-    if (vars[code].fourier)
-      vars[code].fourier = (double *) FreeMemory(vars[code].fourier);
+    if (vars[code].fourier) vars[code].fourier = (double *) FreeMemory(vars[code].fourier);
 }
 
 static void
 FreeHybrid(struct Variable *vars)
 {
   for (int code = 0; code < MaxCodes; code++)
-    if (vars[code].hybrid)
-      vars[code].hybrid = (double *) FreeMemory(vars[code].hybrid);
+    if (vars[code].hybrid) vars[code].hybrid = (double *) FreeMemory(vars[code].hybrid);
 }
 
 static void
 FreeGrid(struct Variable *vars)
 {
   for (int code = 0; code < MaxCodes; code++)
-    if (vars[code].grid)
-      vars[code].grid = (double *) FreeMemory(vars[code].grid);
+    if (vars[code].grid) vars[code].grid = (double *) FreeMemory(vars[code].grid);
 }
 
 static void
@@ -150,8 +146,7 @@ VarQuaSum(double *Variance, const double *restrict Sum, int len, int n)
 }
 
 static void
-AddVector(double *dest, const double *src, size_t len, size_t *nmiss,
-          double missval)
+AddVector(double *dest, const double *src, size_t len, size_t *nmiss, double missval)
 {
   if (*nmiss > 0)
     {
@@ -166,24 +161,21 @@ AddVector(double *dest, const double *src, size_t len, size_t *nmiss,
 }
 
 static void
-Add2Vectors(double *dest, const double *restrict srcA,
-            const double *restrict srcB, size_t len)
+Add2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, size_t len)
 {
   for (size_t i = 0; i < len; i++)
     dest[i] = srcA[i] + srcB[i];
 }
 
 static void
-Sub2Vectors(double *dest, const double *restrict srcA,
-            const double *restrict srcB, size_t len)
+Sub2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, size_t len)
 {
   for (size_t i = 0; i < len; i++)
     dest[i] = srcA[i] - srcB[i];
 }
 
 static void
-MultVectorScalar(double *dest, const double *restrict src, double factor,
-                 size_t len, size_t nmiss, double missval)
+MultVectorScalar(double *dest, const double *restrict src, double factor, size_t len, size_t nmiss, double missval)
 {
   if (nmiss > 0)
     {
@@ -203,8 +195,7 @@ MultVectorScalar(double *dest, const double *restrict src, double factor,
 }
 
 static void
-DivVectorIvector(double *dest, const double *restrict src, const int *samp,
-                 size_t len, size_t *nmiss, double missval)
+DivVectorIvector(double *dest, const double *restrict src, const int *samp, size_t len, size_t *nmiss, double missval)
 {
   *nmiss = 0;
 
@@ -244,8 +235,7 @@ after_read_vct(const char *vctfile, double **vct, int *nvct)
       *vct[i] = va;
       *vct[i + *nvct / 2] = vb;
     }
-  fprintf(stdout, "  Reading VCT for %d hybrid levels from file %s\n",
-          *nvct / 2 - 1, vctfile);
+  fprintf(stdout, "  Reading VCT for %d hybrid levels from file %s\n", *nvct / 2 - 1, vctfile);
 
   fclose(fp);
 }
@@ -267,13 +257,11 @@ after_gp2sp(struct Control *globs, struct Variable *vars, int ccode)
         {
           long fieldSize = globs->DimFC * var->hlev;
           var->fourier = alloc_dp(fieldSize, "gp2sp.fourier");
-          after_GP2FC(var->hybrid, var->fourier, globs->Latitudes,
-                      globs->Longitudes, var->hlev, globs->Fouriers);
+          after_GP2FC(var->hybrid, var->fourier, globs->Latitudes, globs->Longitudes, var->hlev, globs->Fouriers);
         }
 
       var->spectral = alloc_dp(globs->Dim3SP, "gp2sp.spectral");
-      fc2sp(var->fourier, var->spectral, globs->pold, var->hlev,
-            globs->Latitudes, globs->Fouriers, globs->Truncation);
+      fc2sp(var->fourier, var->spectral, globs->pold, var->hlev, globs->Latitudes, globs->Fouriers, globs->Truncation);
     }
 }
 
@@ -312,8 +300,8 @@ after_FC2GP(double *fc, double *gp, long nlat, long nlon, long nlev, long nfc)
 /* HUMTEST */
 
 static void
-sh2rh(int AnalysisData, double *sphum, double *rhum, double *t, int lev,
-      int dimgpout, double *level, double *fullpresshybrid)
+sh2rh(int AnalysisData, double *sphum, double *rhum, double *t, int lev, int dimgpout, double *level,
+      double *fullpresshybrid)
 {
   int lp, i;
   int lpi, lfp;
@@ -371,8 +359,7 @@ sh2rh(int AnalysisData, double *sphum, double *rhum, double *t, int lev,
 }
 
 static void
-rh2sh(double *sphum, double *rhum, double *t, int lev, int dimgpout,
-      double *level)
+rh2sh(double *sphum, double *rhum, double *t, int lev, int dimgpout, double *level)
 {
   int lp, i;
   int lpi;
@@ -424,24 +411,20 @@ after_FCrh2FCsh(struct Control *globs, struct Variable *vars)
 {
   const long fieldSize = globs->DimGP * globs->NumLevelRequest;
 
-  if (vars[RHUMIDITY].grid == NULL)
-    vars[RHUMIDITY].grid = alloc_dp(fieldSize, "vars[RHUMIDITY].grid");
-  if (vars[TEMPERATURE].grid == NULL)
-    vars[TEMPERATURE].grid = alloc_dp(fieldSize, "vars[TEMPERATURE].grid");
-  if (vars[HUMIDITY].grid == NULL)
-    vars[HUMIDITY].grid = alloc_dp(fieldSize, "vars[HUMIDITY].grid");
+  if (vars[RHUMIDITY].grid == NULL) vars[RHUMIDITY].grid = alloc_dp(fieldSize, "vars[RHUMIDITY].grid");
+  if (vars[TEMPERATURE].grid == NULL) vars[TEMPERATURE].grid = alloc_dp(fieldSize, "vars[TEMPERATURE].grid");
+  if (vars[HUMIDITY].grid == NULL) vars[HUMIDITY].grid = alloc_dp(fieldSize, "vars[HUMIDITY].grid");
 
-  after_FC2GP(vars[RHUMIDITY].fourier, vars[RHUMIDITY].grid, globs->Latitudes,
-              globs->Longitudes, vars[RHUMIDITY].plev, globs->Fouriers);
-  after_FC2GP(vars[TEMPERATURE].fourier, vars[TEMPERATURE].grid,
-              globs->Latitudes, globs->Longitudes, vars[TEMPERATURE].plev,
+  after_FC2GP(vars[RHUMIDITY].fourier, vars[RHUMIDITY].grid, globs->Latitudes, globs->Longitudes, vars[RHUMIDITY].plev,
               globs->Fouriers);
+  after_FC2GP(vars[TEMPERATURE].fourier, vars[TEMPERATURE].grid, globs->Latitudes, globs->Longitudes,
+              vars[TEMPERATURE].plev, globs->Fouriers);
 
-  rh2sh(vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid,
-        globs->NumLevelRequest, globs->DimGP, globs->LevelRequest);
+  rh2sh(vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid, globs->NumLevelRequest, globs->DimGP,
+        globs->LevelRequest);
 
-  after_GP2FC(vars[HUMIDITY].grid, vars[HUMIDITY].fourier, globs->Latitudes,
-              globs->Longitudes, vars[HUMIDITY].plev, globs->Fouriers);
+  after_GP2FC(vars[HUMIDITY].grid, vars[HUMIDITY].fourier, globs->Latitudes, globs->Longitudes, vars[HUMIDITY].plev,
+              globs->Fouriers);
 
   vars[HUMIDITY].grid = (double *) FreeMemory(vars[HUMIDITY].grid);
   vars[RHUMIDITY].grid = (double *) FreeMemory(vars[RHUMIDITY].grid);
@@ -457,20 +440,15 @@ after_SPuv2SPdv(struct Control *globs, struct Variable *vars)
   Vor = VorOut = vars[VORTICITY].spectral;
   const long fieldSize = globs->DimFC * globs->NumLevelRequest;
 
-  if (vars[U_WIND].fourier == NULL)
-    vars[U_WIND].fourier = alloc_dp(fieldSize, "vars[U_WIND].fourier");
-  if (vars[V_WIND].fourier == NULL)
-    vars[V_WIND].fourier = alloc_dp(fieldSize, "vars[V_WIND].fourier");
+  if (vars[U_WIND].fourier == NULL) vars[U_WIND].fourier = alloc_dp(fieldSize, "vars[U_WIND].fourier");
+  if (vars[V_WIND].fourier == NULL) vars[V_WIND].fourier = alloc_dp(fieldSize, "vars[V_WIND].fourier");
 
-  sp2fc(vars[U_WIND].spectral, vars[U_WIND].fourier, globs->poli,
-        globs->NumLevelRequest, globs->Latitudes, globs->Fouriers,
-        globs->Truncation);
-  sp2fc(vars[V_WIND].spectral, vars[V_WIND].fourier, globs->poli,
-        globs->NumLevelRequest, globs->Latitudes, globs->Fouriers,
-        globs->Truncation);
-  uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, Div, Vor, globs->pol2,
-        globs->pol3, globs->NumLevelRequest, globs->Latitudes,
-        globs->Truncation);
+  sp2fc(vars[U_WIND].spectral, vars[U_WIND].fourier, globs->poli, globs->NumLevelRequest, globs->Latitudes,
+        globs->Fouriers, globs->Truncation);
+  sp2fc(vars[V_WIND].spectral, vars[V_WIND].fourier, globs->poli, globs->NumLevelRequest, globs->Latitudes,
+        globs->Fouriers, globs->Truncation);
+  uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, Div, Vor, globs->pol2, globs->pol3, globs->NumLevelRequest,
+        globs->Latitudes, globs->Truncation);
 
   vars[U_WIND].fourier = (double *) FreeMemory(vars[U_WIND].fourier);
   vars[V_WIND].fourier = (double *) FreeMemory(vars[V_WIND].fourier);
@@ -491,25 +469,20 @@ after_FCsh2FCrh(struct Control *globs, struct Variable *vars)
 {
   const long fieldSize = globs->DimGP * globs->NumLevelRequest;
 
-  if (vars[RHUMIDITY].grid == NULL)
-    vars[RHUMIDITY].grid = alloc_dp(fieldSize, "vars[RHUMIDITY].grid");
-  if (vars[TEMPERATURE].grid == NULL)
-    vars[TEMPERATURE].grid = alloc_dp(fieldSize, "vars[TEMPERATURE].grid");
-  if (vars[HUMIDITY].grid == NULL)
-    vars[HUMIDITY].grid = alloc_dp(fieldSize, "vars[HUMIDITY].grid");
+  if (vars[RHUMIDITY].grid == NULL) vars[RHUMIDITY].grid = alloc_dp(fieldSize, "vars[RHUMIDITY].grid");
+  if (vars[TEMPERATURE].grid == NULL) vars[TEMPERATURE].grid = alloc_dp(fieldSize, "vars[TEMPERATURE].grid");
+  if (vars[HUMIDITY].grid == NULL) vars[HUMIDITY].grid = alloc_dp(fieldSize, "vars[HUMIDITY].grid");
 
-  after_FC2GP(vars[HUMIDITY].fourier, vars[HUMIDITY].grid, globs->Latitudes,
-              globs->Longitudes, vars[HUMIDITY].plev, globs->Fouriers);
-  after_FC2GP(vars[TEMPERATURE].fourier, vars[TEMPERATURE].grid,
-              globs->Latitudes, globs->Longitudes, vars[TEMPERATURE].plev,
+  after_FC2GP(vars[HUMIDITY].fourier, vars[HUMIDITY].grid, globs->Latitudes, globs->Longitudes, vars[HUMIDITY].plev,
               globs->Fouriers);
+  after_FC2GP(vars[TEMPERATURE].fourier, vars[TEMPERATURE].grid, globs->Latitudes, globs->Longitudes,
+              vars[TEMPERATURE].plev, globs->Fouriers);
 
-  sh2rh(globs->AnalysisData, vars[HUMIDITY].grid, vars[RHUMIDITY].grid,
-        vars[TEMPERATURE].grid, globs->NumLevelRequest, globs->DimGP,
-        globs->LevelRequest, vars[FULL_PRESS].hybrid);
+  sh2rh(globs->AnalysisData, vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid, globs->NumLevelRequest,
+        globs->DimGP, globs->LevelRequest, vars[FULL_PRESS].hybrid);
 
-  after_GP2FC(vars[RHUMIDITY].grid, vars[RHUMIDITY].fourier, globs->Latitudes,
-              globs->Longitudes, vars[RHUMIDITY].plev, globs->Fouriers);
+  after_GP2FC(vars[RHUMIDITY].grid, vars[RHUMIDITY].fourier, globs->Latitudes, globs->Longitudes, vars[RHUMIDITY].plev,
+              globs->Fouriers);
 
   vars[HUMIDITY].grid = (double *) FreeMemory(vars[HUMIDITY].grid);
   vars[RHUMIDITY].grid = (double *) FreeMemory(vars[RHUMIDITY].grid);
@@ -521,11 +494,9 @@ static void
 CheckAnalyses(struct Variable *vars)
 {
   for (int code = 0; code < 272; code++)
-    if (vars[code].needed && code != DIVERGENCE && code != VORTICITY
-        && code != STREAM && code != U_WIND && code != HUMIDITY
-        && code != VELOPOT && code != V_WIND && code != RHUMIDITY
-        && code != GEOPOTHEIGHT && code != PS && vars[code].spectral == NULL
-        && vars[code].grid == NULL)
+    if (vars[code].needed && code != DIVERGENCE && code != VORTICITY && code != STREAM && code != U_WIND
+        && code != HUMIDITY && code != VELOPOT && code != V_WIND && code != RHUMIDITY && code != GEOPOTHEIGHT
+        && code != PS && vars[code].spectral == NULL && vars[code].grid == NULL)
       {
         if (labort_after)
           Error("Code  %3d not found", code);
@@ -548,9 +519,7 @@ after_processPL(struct Control *globs, struct Variable *vars)
 
   if (globs->MeanCount == 1)
     {
-      if (globs->Debug)
-        fprintf(stderr, "CheckAnalyses: %d %d\n", globs->TermCount,
-                globs->MeanCount);
+      if (globs->Debug) fprintf(stderr, "CheckAnalyses: %d %d\n", globs->TermCount, globs->MeanCount);
       CheckAnalyses(vars);
       globs->StartDate = globs->OldDate;
     }
@@ -577,20 +546,17 @@ after_processPL(struct Control *globs, struct Variable *vars)
   if (vars[GEOPOTHEIGHT].comp && vars[GEOPOTENTIAL].detected)
     {
       if (vars[GEOPOTHEIGHT].spectral == NULL)
-        vars[GEOPOTHEIGHT].spectral = alloc_dp(
-            globs->DimSP * globs->NumLevelRequest, "GEOPOTHEIGHT.spectral");
-      MultVectorScalar(vars[GEOPOTHEIGHT].spectral, vars[GEOPOTENTIAL].spectral,
-                       C_RG, globs->DimSP * globs->NumLevelRequest, 0, 0);
+        vars[GEOPOTHEIGHT].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "GEOPOTHEIGHT.spectral");
+      MultVectorScalar(vars[GEOPOTHEIGHT].spectral, vars[GEOPOTENTIAL].spectral, C_RG,
+                       globs->DimSP * globs->NumLevelRequest, 0, 0);
       vars[GEOPOTENTIAL].needed = vars[GEOPOTENTIAL].selected;
     }
 
-  if (globs->Type == 50 && vars[HUMIDITY].needed
-      && vars[HUMIDITY].spectral == NULL)
+  if (globs->Type == 50 && vars[HUMIDITY].needed && vars[HUMIDITY].spectral == NULL)
     {
       vars[HUMIDITY].plev = globs->NumLevelRequest;
       vars[HUMIDITY].sfit = TRUE;
-      vars[HUMIDITY].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest,
-                                         "vars[HUMIDITY].spectral");
+      vars[HUMIDITY].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[HUMIDITY].spectral");
       /*
         SPrh2SPsh();
       */
@@ -598,18 +564,15 @@ after_processPL(struct Control *globs, struct Variable *vars)
       vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
     }
 
-  if (vars[U_WIND].spectral && vars[V_WIND].spectral
-      && (vars[DIVERGENCE].comp || vars[VORTICITY].comp))
+  if (vars[U_WIND].spectral && vars[V_WIND].spectral && (vars[DIVERGENCE].comp || vars[VORTICITY].comp))
     {
       vars[DIVERGENCE].hlev = vars[VORTICITY].hlev = 2;
       vars[DIVERGENCE].plev = vars[VORTICITY].plev = globs->NumLevelRequest;
       vars[DIVERGENCE].sfit = vars[VORTICITY].sfit = TRUE;
       if (vars[DIVERGENCE].spectral == NULL)
-        vars[DIVERGENCE].spectral = alloc_dp(
-            globs->DimSP * globs->NumLevelRequest, "vars[DIVERGENCE].spectral");
+        vars[DIVERGENCE].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[DIVERGENCE].spectral");
       if (vars[VORTICITY].spectral == NULL)
-        vars[VORTICITY].spectral = alloc_dp(
-            globs->DimSP * globs->NumLevelRequest, "vars[VORTICITY].spectral");
+        vars[VORTICITY].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[VORTICITY].spectral");
       after_SPuv2SPdv(globs, vars);
     }
 
@@ -619,15 +582,11 @@ after_processPL(struct Control *globs, struct Variable *vars)
       vars[U_WIND].plev = vars[V_WIND].plev = globs->NumLevelRequest;
       vars[U_WIND].sfit = vars[V_WIND].sfit = TRUE;
       if (vars[U_WIND].spectral == NULL)
-        vars[U_WIND].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest,
-                                         "vars[U_WIND].spectral");
+        vars[U_WIND].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[U_WIND].spectral");
       if (vars[V_WIND].spectral == NULL)
-        vars[V_WIND].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest,
-                                         "vars[V_WIND].spectral");
-      dv2uv(vars[DIVERGENCE].spectral, vars[VORTICITY].spectral,
-            vars[U_WIND].spectral, vars[V_WIND].spectral, globs->dv2uv_f1,
-            globs->dv2uv_f2, globs->Truncation, globs->DimSP,
-            globs->NumLevelRequest);
+        vars[V_WIND].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[V_WIND].spectral");
+      dv2uv(vars[DIVERGENCE].spectral, vars[VORTICITY].spectral, vars[U_WIND].spectral, vars[V_WIND].spectral,
+            globs->dv2uv_f1, globs->dv2uv_f2, globs->Truncation, globs->DimSP, globs->NumLevelRequest);
     }
 
   if (vars[VELOPOT].comp)
@@ -636,10 +595,8 @@ after_processPL(struct Control *globs, struct Variable *vars)
       vars[VELOPOT].plev = globs->NumLevelRequest;
       vars[VELOPOT].sfit = TRUE;
       if (vars[VELOPOT].spectral == NULL)
-        vars[VELOPOT].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest,
-                                          "vars[VELOPOT].spectral");
-      dv2ps(vars[DIVERGENCE].spectral, vars[VELOPOT].spectral,
-            globs->NumLevelRequest, globs->Truncation);
+        vars[VELOPOT].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[VELOPOT].spectral");
+      dv2ps(vars[DIVERGENCE].spectral, vars[VELOPOT].spectral, globs->NumLevelRequest, globs->Truncation);
     }
 
   if (vars[STREAM].comp)
@@ -648,10 +605,8 @@ after_processPL(struct Control *globs, struct Variable *vars)
       vars[STREAM].plev = globs->NumLevelRequest;
       vars[STREAM].sfit = TRUE;
       if (vars[STREAM].spectral == NULL)
-        vars[STREAM].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest,
-                                         "vars[STREAM].spectral");
-      dv2ps(vars[VORTICITY].spectral, vars[STREAM].spectral,
-            globs->NumLevelRequest, globs->Truncation);
+        vars[STREAM].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[STREAM].spectral");
+      dv2ps(vars[VORTICITY].spectral, vars[STREAM].spectral, globs->NumLevelRequest, globs->Truncation);
     }
 
   /* --------------------------- */
@@ -663,16 +618,14 @@ after_processPL(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].spectral)
-              Error("Code %d not available on spectral space!", code);
+            if (!vars[code].spectral) Error("Code %d not available on spectral space!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimSP;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID,
-                                  vars[code].spectral + offset, 0);
+                streamWriteRecord(globs->ostreamID, vars[code].spectral + offset, 0);
               }
           }
 
@@ -693,28 +646,22 @@ after_processPL(struct Control *globs, struct Variable *vars)
             if (vars[code].fourier == NULL)
               {
                 fieldSize = vars[code].plev * globs->DimFC;
-                vars[code].fourier
-                    = alloc_dp(fieldSize, FieldName(code, "fourier"));
+                vars[code].fourier = alloc_dp(fieldSize, FieldName(code, "fourier"));
               }
-            sp2fc(vars[code].spectral, vars[code].fourier, globs->poli,
-                  vars[code].plev, globs->Latitudes, globs->Fouriers,
-                  globs->Truncation);
+            sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].plev, globs->Latitudes,
+                  globs->Fouriers, globs->Truncation);
           }
       if (vars[U_WIND].needed && vars[U_WIND].fourier)
-        scaluv(vars[U_WIND].fourier, globs->rcoslat, globs->Latitudes,
-               globs->Fouriers * globs->NumLevelRequest);
+        scaluv(vars[U_WIND].fourier, globs->rcoslat, globs->Latitudes, globs->Fouriers * globs->NumLevelRequest);
       if (vars[V_WIND].needed && vars[V_WIND].fourier)
-        scaluv(vars[V_WIND].fourier, globs->rcoslat, globs->Latitudes,
-               globs->Fouriers * globs->NumLevelRequest);
+        scaluv(vars[V_WIND].fourier, globs->rcoslat, globs->Latitudes, globs->Fouriers * globs->NumLevelRequest);
 
       /* HUMTEST */
-      if (globs->Type < 70 && vars[HUMIDITY].needed
-          && vars[HUMIDITY].fourier == NULL)
+      if (globs->Type < 70 && vars[HUMIDITY].needed && vars[HUMIDITY].fourier == NULL)
         {
           vars[HUMIDITY].plev = globs->NumLevelRequest;
           vars[HUMIDITY].sfit = TRUE;
-          vars[HUMIDITY].fourier = alloc_dp(
-              globs->DimFC * globs->NumLevelRequest, "vars[HUMIDITY].fourier");
+          vars[HUMIDITY].fourier = alloc_dp(globs->DimFC * globs->NumLevelRequest, "vars[HUMIDITY].fourier");
 
           after_FCrh2FCsh(globs, vars);
 
@@ -722,13 +669,11 @@ after_processPL(struct Control *globs, struct Variable *vars)
           vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
         }
 
-      if (globs->Type < 70 && vars[RHUMIDITY].needed
-          && vars[RHUMIDITY].fourier == NULL)
+      if (globs->Type < 70 && vars[RHUMIDITY].needed && vars[RHUMIDITY].fourier == NULL)
         {
           vars[RHUMIDITY].plev = globs->NumLevelRequest;
           vars[RHUMIDITY].sfit = TRUE;
-          vars[RHUMIDITY].fourier = alloc_dp(
-              globs->DimFC * globs->NumLevelRequest, "vars[RHUMIDITY].fourier");
+          vars[RHUMIDITY].fourier = alloc_dp(globs->DimFC * globs->NumLevelRequest, "vars[RHUMIDITY].fourier");
 
           after_FCsh2FCrh(globs, vars);
 
@@ -749,16 +694,14 @@ after_processPL(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].fourier)
-              Error("Code %d not available on fourier space!", code);
+            if (!vars[code].fourier) Error("Code %d not available on fourier space!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimFC;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset,
-                                  0);
+                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset, 0);
               }
           }
 
@@ -775,16 +718,14 @@ after_processPL(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].fourier)
-              Error("Code %d not available on zonal mean!", code);
+            if (!vars[code].fourier) Error("Code %d not available on zonal mean!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimFC;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset,
-                                  0);
+                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset, 0);
               }
           }
 
@@ -814,8 +755,8 @@ after_processPL(struct Control *globs, struct Variable *vars)
                 vars[code].grid = alloc_dp(fieldSize, FieldName(code, "grid"));
               }
 
-            after_FC2GP(vars[code].fourier, vars[code].grid, globs->Latitudes,
-                        globs->Longitudes, vars[code].plev, globs->Fouriers);
+            after_FC2GP(vars[code].fourier, vars[code].grid, globs->Latitudes, globs->Longitudes, vars[code].plev,
+                        globs->Fouriers);
           }
     }
 
@@ -830,11 +771,9 @@ after_processPL(struct Control *globs, struct Variable *vars)
     {
       vars[RHUMIDITY].plev = globs->NumLevelRequest;
       vars[RHUMIDITY].sfit = TRUE;
-      vars[RHUMIDITY].grid = alloc_dp(globs->DimGP * globs->NumLevelRequest,
-                                      "vars[RHUMIDITY].grid");
-      sh2rh(globs->AnalysisData, vars[HUMIDITY].grid, vars[RHUMIDITY].grid,
-            vars[TEMPERATURE].grid, globs->NumLevelRequest, globs->DimGP,
-            globs->LevelRequest, vars[FULL_PRESS].hybrid);
+      vars[RHUMIDITY].grid = alloc_dp(globs->DimGP * globs->NumLevelRequest, "vars[RHUMIDITY].grid");
+      sh2rh(globs->AnalysisData, vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid,
+            globs->NumLevelRequest, globs->DimGP, globs->LevelRequest, vars[FULL_PRESS].hybrid);
       vars[HUMIDITY].needed = vars[HUMIDITY].selected;
       vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
     }
@@ -843,10 +782,9 @@ after_processPL(struct Control *globs, struct Variable *vars)
     {
       vars[HUMIDITY].plev = globs->NumLevelRequest;
       vars[HUMIDITY].sfit = TRUE;
-      vars[HUMIDITY].grid = alloc_dp(globs->DimGP * globs->NumLevelRequest,
-                                     "vars[HUMIDITY].grid");
-      rh2sh(vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid,
-            globs->NumLevelRequest, globs->DimGP, globs->LevelRequest);
+      vars[HUMIDITY].grid = alloc_dp(globs->DimGP * globs->NumLevelRequest, "vars[HUMIDITY].grid");
+      rh2sh(vars[HUMIDITY].grid, vars[RHUMIDITY].grid, vars[TEMPERATURE].grid, globs->NumLevelRequest, globs->DimGP,
+            globs->LevelRequest);
       vars[RHUMIDITY].needed = vars[RHUMIDITY].selected;
       vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
     }
@@ -861,24 +799,20 @@ after_processPL(struct Control *globs, struct Variable *vars)
       if (vars[code].needed && vars[code].grid)
         {
           fieldSize = globs->DimGP * vars[code].plev;
-          if (vars[code].mean == NULL)
-            vars[code].mean = alloc_dp(fieldSize, FieldName(code, "mean"));
+          if (vars[code].mean == NULL) vars[code].mean = alloc_dp(fieldSize, FieldName(code, "mean"));
 
           if (globs->MeanCount == 1)
             arrayCopy(fieldSize, vars[code].grid, vars[code].mean);
           else
-            AddVector(vars[code].mean, vars[code].grid, fieldSize,
-                      &vars[code].nmiss, vars[code].missval);
+            AddVector(vars[code].mean, vars[code].grid, fieldSize, &vars[code].nmiss, vars[code].missval);
 
           if (globs->EndOfInterval)
             {
               if (vars[code].samp == NULL)
-                MultVectorScalar(vars[code].mean, vars[code].mean,
-                                 1.0 / globs->MeanCount, fieldSize,
-                                 vars[code].nmiss, vars[code].missval);
+                MultVectorScalar(vars[code].mean, vars[code].mean, 1.0 / globs->MeanCount, fieldSize, vars[code].nmiss,
+                                 vars[code].missval);
               else
-                DivVectorIvector(vars[code].mean, vars[code].mean,
-                                 vars[code].samp, fieldSize, &vars[code].nmiss,
+                DivVectorIvector(vars[code].mean, vars[code].mean, vars[code].samp, fieldSize, &vars[code].nmiss,
                                  vars[code].missval);
             }
         }
@@ -892,16 +826,13 @@ after_processPL(struct Control *globs, struct Variable *vars)
       if (vars[code].needed && vars[code].mean)
         {
           fieldSize = globs->DimGP * vars[code].plev;
-          if (vars[code].variance == NULL)
-            vars[code].variance = alloc_dp(fieldSize, FieldName(code, "var"));
+          if (vars[code].variance == NULL) vars[code].variance = alloc_dp(fieldSize, FieldName(code, "var"));
           if (globs->MeanCount == 1)
             IniQuaSum(vars[code].variance, vars[code].grid, fieldSize);
           else
             AddQuaSum(vars[code].variance, vars[code].grid, fieldSize);
 
-          if (globs->EndOfInterval)
-            VarQuaSum(vars[code].variance, vars[code].mean, fieldSize,
-                      globs->MeanCount);
+          if (globs->EndOfInterval) VarQuaSum(vars[code].variance, vars[code].mean, fieldSize, globs->MeanCount);
         }
 
   if (globs->Mean && !globs->EndOfInterval)
@@ -925,19 +856,13 @@ after_processPL(struct Control *globs, struct Variable *vars)
                 offset = lindex * globs->DimGP;
                 if (globs->Mean != 2)
                   {
-                    streamDefRecord(globs->ostreamID, vars[code].ovarID,
-                                    lindex);
-                    streamWriteRecord(globs->ostreamID,
-                                      vars[code].mean + offset,
-                                      vars[code].nmiss);
+                    streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+                    streamWriteRecord(globs->ostreamID, vars[code].mean + offset, vars[code].nmiss);
                   }
                 if (globs->Mean >= 2)
                   {
-                    streamDefRecord(globs->ostreamID2, vars[code].ovarID2,
-                                    lindex);
-                    streamWriteRecord(globs->ostreamID2,
-                                      vars[code].variance + offset,
-                                      vars[code].nmiss);
+                    streamDefRecord(globs->ostreamID2, vars[code].ovarID2, lindex);
+                    streamWriteRecord(globs->ostreamID2, vars[code].variance + offset, vars[code].nmiss);
                   }
               }
           }
@@ -961,8 +886,7 @@ after_processPL(struct Control *globs, struct Variable *vars)
               {
                 offset = lindex * globs->DimGP;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].grid + offset,
-                                  vars[code].nmiss);
+                streamWriteRecord(globs->ostreamID, vars[code].grid + offset, vars[code].nmiss);
               }
           }
 
@@ -972,8 +896,8 @@ after_processPL(struct Control *globs, struct Variable *vars)
 }
 
 static void
-theta(double *pthetaf, double *pthetah, double *ph, double *ps, double *tf,
-      double *ts, int levels, int dimgp, int dim3gp)
+theta(double *pthetaf, double *pthetah, double *ph, double *ps, double *tf, double *ts, int levels, int dimgp,
+      int dim3gp)
 {
   double *thetah = pthetah;
   double *thetaf = pthetaf;
@@ -1007,9 +931,8 @@ windSpeed(double *uvspeed, double *u, double *v, int dim3gp)
 }
 
 static void
-Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind,
-      double *halfpress, double *fullpress, double *dpsdx, double *dpsdy,
-      double *vct, int dimgp, int nlev)
+Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind, double *halfpress, double *fullpress,
+      double *dpsdx, double *dpsdy, double *vct, int dimgp, int nlev)
 {
   int i, j;
   double DeltaHybrid, Cterm, Pterm;
@@ -1041,9 +964,8 @@ Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind,
 #endif
       for (i = 0; i < dimgp; i++)
         {
-          omega[i + dimgp]
-              = omega[i] - diver[i] * (halfp[i + dimgp] - halfp[i])
-                - DeltaHybrid * (uwind[i] * dpsdx[i] + vwind[i] * dpsdy[i]);
+          omega[i + dimgp] = omega[i] - diver[i] * (halfp[i + dimgp] - halfp[i])
+                             - DeltaHybrid * (uwind[i] * dpsdx[i] + vwind[i] * dpsdy[i]);
         }
     }
 
@@ -1065,11 +987,10 @@ Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind,
         omega[i] = 0.5 * (omega[i] + omega[i + dimgp]);
     }
 
-      /* compute full level part of vertical velocity */
+    /* compute full level part of vertical velocity */
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private( \
-    i, omega, halfp, fullp, uwind, vwind, DeltaHybrid, Cterm, Pterm)
+#pragma omp parallel for default(shared) private(i, omega, halfp, fullp, uwind, vwind, DeltaHybrid, Cterm, Pterm)
 #endif
   for (j = 0; j < nlev; j++)
     {
@@ -1089,13 +1010,11 @@ Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind,
           for (i = 0; i < dimgp; i++)
             {
               if (IS_NOT_EQUAL(Cterm, 0.0))
-                Pterm = Cterm / (halfp[i + dimgp] - halfp[i])
-                        * log(halfp[i + dimgp] / halfp[i]);
+                Pterm = Cterm / (halfp[i + dimgp] - halfp[i]) * log(halfp[i + dimgp] / halfp[i]);
               else
                 Pterm = 0.0;
 
-              omega[i] += fullp[i] * (uwind[i] * dpsdx[i] + vwind[i] * dpsdy[i])
-                          / (halfp[i + dimgp] - halfp[i])
+              omega[i] += fullp[i] * (uwind[i] * dpsdx[i] + vwind[i] * dpsdy[i]) / (halfp[i + dimgp] - halfp[i])
                           * (DeltaHybrid + Pterm);
             }
         }
@@ -1103,8 +1022,7 @@ Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind,
 }
 
 void
-MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor,
-                 int nlev)
+MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor, int nlev)
 {
   int i, j;
   double vtmp;
@@ -1131,9 +1049,7 @@ MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor,
 #pragma omp parallel for
 #endif
           for (i = 0; i < nhor; i++)
-            geopl[i] = geopl[i + nhor]
-                       + PlanetRD * gtl[i] * (1.0 + vtmp * gql[i])
-                             * log(phl[i + nhor] / phl[i]);
+            geopl[i] = geopl[i + nhor] + PlanetRD * gtl[i] * (1.0 + vtmp * gql[i]) * log(phl[i + nhor] / phl[i]);
         }
 
 #if defined(SX)
@@ -1143,8 +1059,7 @@ MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor,
 #pragma omp parallel for
 #endif
       for (i = 0; i < nhor; i++)
-        geop[i]
-            = geop[i + nhor] + PlanetRD * gt[i] * (1.0 + vtmp * gq[i]) * z2log2;
+        geop[i] = geop[i + nhor] + PlanetRD * gt[i] * (1.0 + vtmp * gq[i]) * z2log2;
     }
   else /* No humidity */
     {
@@ -1188,8 +1103,7 @@ MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor,
 /* ======================================== */
 
 void
-LayerWater(double *ww, double *ll, double pmax, double pmin, int DimGP,
-           int HalfLevels, double *vct)
+LayerWater(double *ww, double *ll, double pmax, double pmin, int DimGP, int HalfLevels, double *vct)
 {
   int i, k;
   int MaxLev, MinLev;
@@ -1220,8 +1134,7 @@ LayerWater(double *ww, double *ll, double pmax, double pmin, int DimGP,
 /* ================================================= */
 
 void
-LayerCloud(double *cc, double *ll, double pmax, double pmin, int DimGP,
-           int HalfLevels, double *vct)
+LayerCloud(double *cc, double *ll, double pmax, double pmin, int DimGP, int HalfLevels, double *vct)
 {
   int i, k;
   int MaxLev, MinLev;
@@ -1254,41 +1167,33 @@ LayerCloud(double *cc, double *ll, double pmax, double pmin, int DimGP,
 void
 after_EchamCompGP(struct Control *globs, struct Variable *vars)
 {
-  if (vars[GEOPOTHEIGHT].comp || vars[SLP].comp || vars[THETAF].needed
-      || vars[HALF_PRESS].needed || vars[RHUMIDITY].comp || vars[OMEGA].comp
-      || globs->Type >= 30)
+  if (vars[GEOPOTHEIGHT].comp || vars[SLP].comp || vars[THETAF].needed || vars[HALF_PRESS].needed
+      || vars[RHUMIDITY].comp || vars[OMEGA].comp || globs->Type >= 30)
     {
-      if (vars[FULL_PRESS].hybrid == NULL)
-        vars[FULL_PRESS].hybrid
-            = alloc_dp(globs->Dim3GP, "vars[FULL_PRESS].hybrid");
+      if (vars[FULL_PRESS].hybrid == NULL) vars[FULL_PRESS].hybrid = alloc_dp(globs->Dim3GP, "vars[FULL_PRESS].hybrid");
 
       vars[HALF_PRESS].hlev = globs->NumLevel + 1;
       vars[HALF_PRESS].plev = globs->NumLevelRequest;
       vars[HALF_PRESS].sfit = FALSE;
 
       if (vars[HALF_PRESS].hybrid == NULL)
-        vars[HALF_PRESS].hybrid
-            = alloc_dp(globs->Dim3GP + globs->DimGP, "vars[HALF_PRESS].hybrid");
+        vars[HALF_PRESS].hybrid = alloc_dp(globs->Dim3GP + globs->DimGP, "vars[HALF_PRESS].hybrid");
 
-      presh(vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vct,
-            vars[PS_PROG].hybrid, globs->NumLevel, globs->DimGP);
+      presh(vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vct, vars[PS_PROG].hybrid, globs->NumLevel,
+            globs->DimGP);
     }
 
-  if (globs->unitsel > 2)
-    vars[FULL_PRESS].hybrid = (double *) FreeMemory(vars[FULL_PRESS].hybrid);
+  if (globs->unitsel > 2) vars[FULL_PRESS].hybrid = (double *) FreeMemory(vars[FULL_PRESS].hybrid);
 
   if (vars[THETAF].needed)
     {
       vars[THETAF].hlev = globs->NumLevel;
       vars[THETAF].plev = globs->NumLevelRequest;
       vars[THETAF].sfit = TRUE;
-      if (vars[THETAF].hybrid == NULL)
-        vars[THETAF].hybrid = alloc_dp(globs->Dim3GP, "vars[THETAF].hybrid");
-      if (vars[THETAH].hybrid == NULL)
-        vars[THETAH].hybrid = alloc_dp(globs->Dim3GP, "vars[THETAH].hybrid");
-      theta(vars[THETAF].hybrid, vars[THETAH].hybrid, vars[HALF_PRESS].hybrid,
-            vars[PS_PROG].hybrid, vars[TEMPERATURE].hybrid, vars[TS].hybrid,
-            globs->NumLevel, globs->DimGP, globs->Dim3GP);
+      if (vars[THETAF].hybrid == NULL) vars[THETAF].hybrid = alloc_dp(globs->Dim3GP, "vars[THETAF].hybrid");
+      if (vars[THETAH].hybrid == NULL) vars[THETAH].hybrid = alloc_dp(globs->Dim3GP, "vars[THETAH].hybrid");
+      theta(vars[THETAF].hybrid, vars[THETAH].hybrid, vars[HALF_PRESS].hybrid, vars[PS_PROG].hybrid,
+            vars[TEMPERATURE].hybrid, vars[TS].hybrid, globs->NumLevel, globs->DimGP, globs->Dim3GP);
     }
 
   if (vars[GEOPOTHEIGHT].comp)
@@ -1296,27 +1201,21 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[GEOPOTHEIGHT].hlev = globs->NumLevel + 1;
       vars[GEOPOTHEIGHT].plev = globs->NumLevelRequest;
       vars[GEOPOTHEIGHT].sfit = TRUE;
-      vars[GEOPOTHEIGHT].hybrid
-          = alloc_dp(globs->Dim3GP + globs->DimGP, "vars[GEOPOTHEIGHT].hybrid");
+      vars[GEOPOTHEIGHT].hybrid = alloc_dp(globs->Dim3GP + globs->DimGP, "vars[GEOPOTHEIGHT].hybrid");
 
-      arrayCopy(globs->DimGP, globs->Orography,
-                vars[GEOPOTHEIGHT].hybrid + globs->Dim3GP);
-      MakeGeopotHeight(vars[GEOPOTHEIGHT].hybrid, vars[TEMPERATURE].hybrid,
-                       vars[HUMIDITY].hybrid, vars[HALF_PRESS].hybrid,
-                       globs->DimGP, globs->NumLevel);
+      arrayCopy(globs->DimGP, globs->Orography, vars[GEOPOTHEIGHT].hybrid + globs->Dim3GP);
+      MakeGeopotHeight(vars[GEOPOTHEIGHT].hybrid, vars[TEMPERATURE].hybrid, vars[HUMIDITY].hybrid,
+                       vars[HALF_PRESS].hybrid, globs->DimGP, globs->NumLevel);
 
       vars[HUMIDITY].needed = vars[HUMIDITY].selected;
     }
-  else if (vars[GEOPOTHEIGHT].hybrid
-           && vars[GEOPOTHEIGHT].hlev == globs->NumLevel)
+  else if (vars[GEOPOTHEIGHT].hybrid && vars[GEOPOTHEIGHT].hlev == globs->NumLevel)
     {
       vars[GEOPOTHEIGHT].hlev = globs->NumLevel + 1;
       vars[GEOPOTHEIGHT].sfit = TRUE;
       vars[GEOPOTHEIGHT].hybrid
-          = (double *) Realloc(vars[GEOPOTHEIGHT].hybrid,
-                               (globs->Dim3GP + globs->DimGP) * sizeof(double));
-      arrayCopy(globs->DimGP, globs->Orography,
-                vars[GEOPOTHEIGHT].hybrid + globs->Dim3GP);
+          = (double *) Realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP + globs->DimGP) * sizeof(double));
+      arrayCopy(globs->DimGP, globs->Orography, vars[GEOPOTHEIGHT].hybrid + globs->Dim3GP);
       for (int i = 0; i < globs->DimGP; i++)
         vars[GEOPOTHEIGHT].hybrid[globs->Dim3GP + i] /= PlanetGrav;
     }
@@ -1333,13 +1232,11 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[OMEGA].hlev = globs->NumLevel + 1;
       vars[OMEGA].plev = globs->NumLevelRequest;
       vars[OMEGA].sfit = TRUE;
-      vars[OMEGA].hybrid
-          = alloc_dp(globs->Dim3GP + globs->DimGP, "OMEGA.hybrid");
+      vars[OMEGA].hybrid = alloc_dp(globs->Dim3GP + globs->DimGP, "OMEGA.hybrid");
 
-      Omega(vars[OMEGA].hybrid, vars[DIVERGENCE].hybrid, vars[U_WIND].hybrid,
-            vars[V_WIND].hybrid, vars[HALF_PRESS].hybrid,
-            vars[FULL_PRESS].hybrid, vars[DPSDX].hybrid, vars[DPSDY].hybrid,
-            globs->vct, globs->DimGP, globs->NumLevel);
+      Omega(vars[OMEGA].hybrid, vars[DIVERGENCE].hybrid, vars[U_WIND].hybrid, vars[V_WIND].hybrid,
+            vars[HALF_PRESS].hybrid, vars[FULL_PRESS].hybrid, vars[DPSDX].hybrid, vars[DPSDY].hybrid, globs->vct,
+            globs->DimGP, globs->NumLevel);
 
       vars[DPSDX].needed = vars[DPSDX].selected;
       vars[DPSDY].needed = vars[DPSDY].selected;
@@ -1350,11 +1247,9 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[WINDSPEED].hlev = globs->NumLevel;
       vars[WINDSPEED].plev = globs->NumLevelRequest;
       vars[WINDSPEED].sfit = TRUE;
-      vars[WINDSPEED].hybrid
-          = alloc_dp(globs->Dim3GP, "vars[WINDSPEED].hybrid");
+      vars[WINDSPEED].hybrid = alloc_dp(globs->Dim3GP, "vars[WINDSPEED].hybrid");
 
-      windSpeed(vars[WINDSPEED].hybrid, vars[U_WIND].hybrid,
-                vars[V_WIND].hybrid, globs->Dim3GP);
+      windSpeed(vars[WINDSPEED].hybrid, vars[U_WIND].hybrid, vars[V_WIND].hybrid, globs->Dim3GP);
     }
 
   if (vars[RHUMIDITY].comp)
@@ -1362,12 +1257,10 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[RHUMIDITY].hlev = globs->NumLevel;
       vars[RHUMIDITY].plev = globs->NumLevelRequest;
       vars[RHUMIDITY].sfit = FALSE;
-      vars[RHUMIDITY].hybrid
-          = alloc_dp(globs->Dim3GP, "vars[RHUMIDITY].hybrid");
+      vars[RHUMIDITY].hybrid = alloc_dp(globs->Dim3GP, "vars[RHUMIDITY].hybrid");
 
-      sh2rh(globs->AnalysisData, vars[HUMIDITY].hybrid, vars[RHUMIDITY].hybrid,
-            vars[TEMPERATURE].hybrid, globs->NumLevel, globs->DimGP,
-            globs->LevelRequest, vars[FULL_PRESS].hybrid);
+      sh2rh(globs->AnalysisData, vars[HUMIDITY].hybrid, vars[RHUMIDITY].hybrid, vars[TEMPERATURE].hybrid,
+            globs->NumLevel, globs->DimGP, globs->LevelRequest, vars[FULL_PRESS].hybrid);
 
       vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
       vars[HUMIDITY].needed = vars[HUMIDITY].selected;
@@ -1391,12 +1284,9 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[SLP].hybrid = alloc_dp(globs->DimGP, "vars[SLP].hybrid");
 
       extra_P(vars[SLP].hybrid, vars[HALF_PRESS].hybrid + globs->Dim3GP,
-              vars[FULL_PRESS].hybrid + globs->Dim3GP - globs->DimGP,
-              globs->Orography,
-              vars[TEMPERATURE].hybrid + globs->Dim3GP - globs->DimGP,
-              globs->DimGP);
-      vars[TEMPERATURE].needed
-          = vars[TEMPERATURE].selected || vars[GEOPOTHEIGHT].selected;
+              vars[FULL_PRESS].hybrid + globs->Dim3GP - globs->DimGP, globs->Orography,
+              vars[TEMPERATURE].hybrid + globs->Dim3GP - globs->DimGP, globs->DimGP);
+      vars[TEMPERATURE].needed = vars[TEMPERATURE].selected || vars[GEOPOTHEIGHT].selected;
     }
 
   if (vars[PRECIP].comp)
@@ -1404,8 +1294,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[PRECIP].hlev = vars[PRECIP].plev = 1;
       vars[PRECIP].sfit = FALSE;
       vars[PRECIP].hybrid = alloc_dp(globs->DimGP, "PRECIP.hybrid");
-      Add2Vectors(vars[PRECIP].hybrid, vars[142].hybrid, vars[143].hybrid,
-                  globs->DimGP);
+      Add2Vectors(vars[PRECIP].hybrid, vars[142].hybrid, vars[143].hybrid, globs->DimGP);
     }
 
   if (vars[NET_TOP].comp)
@@ -1413,8 +1302,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[NET_TOP].hlev = vars[NET_TOP].plev = 1;
       vars[NET_TOP].sfit = FALSE;
       vars[NET_TOP].hybrid = alloc_dp(globs->DimGP, "NET_TOP.hybrid");
-      Add2Vectors(vars[NET_TOP].hybrid, vars[178].hybrid, vars[179].hybrid,
-                  globs->DimGP);
+      Add2Vectors(vars[NET_TOP].hybrid, vars[178].hybrid, vars[179].hybrid, globs->DimGP);
     }
 
   if (vars[NET_BOT].comp)
@@ -1422,8 +1310,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[NET_BOT].hlev = vars[NET_BOT].plev = 1;
       vars[NET_BOT].sfit = FALSE;
       vars[NET_BOT].hybrid = alloc_dp(globs->DimGP, "NET_BOT.hybrid");
-      Add2Vectors(vars[NET_BOT].hybrid, vars[176].hybrid, vars[177].hybrid,
-                  globs->DimGP);
+      Add2Vectors(vars[NET_BOT].hybrid, vars[176].hybrid, vars[177].hybrid, globs->DimGP);
     }
 
   if (vars[NET_HEAT].comp)
@@ -1451,19 +1338,13 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       else
       */
       {
-        MultVectorScalar(vars[NET_HEAT].hybrid, vars[218].hybrid,
-                         C_TIMES_RHOH2O, globs->DimGP, vars[218].nmiss,
+        MultVectorScalar(vars[NET_HEAT].hybrid, vars[218].hybrid, C_TIMES_RHOH2O, globs->DimGP, vars[218].nmiss,
                          vars[218].missval);
-        Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid,
-                    vars[176].hybrid, globs->DimGP);
-        Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid,
-                    vars[177].hybrid, globs->DimGP);
-        Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid,
-                    vars[146].hybrid, globs->DimGP);
-        Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid,
-                    vars[147].hybrid, globs->DimGP);
-        Sub2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid,
-                    vars[220].hybrid, globs->DimGP);
+        Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid, vars[176].hybrid, globs->DimGP);
+        Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid, vars[177].hybrid, globs->DimGP);
+        Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid, vars[146].hybrid, globs->DimGP);
+        Add2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid, vars[147].hybrid, globs->DimGP);
+        Sub2Vectors(vars[NET_HEAT].hybrid, vars[NET_HEAT].hybrid, vars[220].hybrid, globs->DimGP);
       }
     }
 
@@ -1472,12 +1353,9 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[NET_WATER].hlev = vars[NET_WATER].plev = 1;
       vars[NET_WATER].sfit = FALSE;
       vars[NET_WATER].hybrid = alloc_dp(globs->DimGP, "NET_WATER.hybrid");
-      Sub2Vectors(vars[NET_WATER].hybrid, vars[182].hybrid, vars[160].hybrid,
-                  globs->DimGP);
-      Add2Vectors(vars[NET_WATER].hybrid, vars[NET_WATER].hybrid,
-                  vars[142].hybrid, globs->DimGP);
-      Add2Vectors(vars[NET_WATER].hybrid, vars[NET_WATER].hybrid,
-                  vars[143].hybrid, globs->DimGP);
+      Sub2Vectors(vars[NET_WATER].hybrid, vars[182].hybrid, vars[160].hybrid, globs->DimGP);
+      Add2Vectors(vars[NET_WATER].hybrid, vars[NET_WATER].hybrid, vars[142].hybrid, globs->DimGP);
+      Add2Vectors(vars[NET_WATER].hybrid, vars[NET_WATER].hybrid, vars[143].hybrid, globs->DimGP);
     }
 
   if (vars[LOW_WATER].comp)
@@ -1485,8 +1363,8 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[LOW_WATER].hlev = vars[LOW_WATER].plev = 1;
       vars[LOW_WATER].sfit = FALSE;
       vars[LOW_WATER].hybrid = alloc_dp(globs->DimGP, "vars[LOW_WATER].hybrid");
-      LayerWater(vars[222].hybrid, vars[LOW_WATER].hybrid, 75000., 101300.,
-                 globs->DimGP, globs->HalfLevels, globs->vct);
+      LayerWater(vars[222].hybrid, vars[LOW_WATER].hybrid, 75000., 101300., globs->DimGP, globs->HalfLevels,
+                 globs->vct);
     }
 
   if (vars[MID_WATER].comp)
@@ -1494,8 +1372,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[MID_WATER].hlev = vars[MID_WATER].plev = 1;
       vars[MID_WATER].sfit = FALSE;
       vars[MID_WATER].hybrid = alloc_dp(globs->DimGP, "vars[MID_WATER].hybrid");
-      LayerWater(vars[222].hybrid, vars[MID_WATER].hybrid, 46000., 73000.,
-                 globs->DimGP, globs->HalfLevels, globs->vct);
+      LayerWater(vars[222].hybrid, vars[MID_WATER].hybrid, 46000., 73000., globs->DimGP, globs->HalfLevels, globs->vct);
     }
 
   if (vars[HIH_WATER].comp)
@@ -1503,8 +1380,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[HIH_WATER].hlev = vars[HIH_WATER].plev = 1;
       vars[HIH_WATER].sfit = FALSE;
       vars[HIH_WATER].hybrid = alloc_dp(globs->DimGP, "vars[HIH_WATER].hybrid");
-      LayerWater(vars[222].hybrid, vars[HIH_WATER].hybrid, 5000., 44000.,
-                 globs->DimGP, globs->HalfLevels, globs->vct);
+      LayerWater(vars[222].hybrid, vars[HIH_WATER].hybrid, 5000., 44000., globs->DimGP, globs->HalfLevels, globs->vct);
     }
 
   if (vars[ALL_WATER].comp)
@@ -1512,8 +1388,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[ALL_WATER].hlev = vars[ALL_WATER].plev = 1;
       vars[ALL_WATER].sfit = FALSE;
       vars[ALL_WATER].hybrid = alloc_dp(globs->DimGP, "vars[ALL_WATER].hybrid");
-      LayerWater(vars[222].hybrid, vars[ALL_WATER].hybrid, 5000., 101300.,
-                 globs->DimGP, globs->HalfLevels, globs->vct);
+      LayerWater(vars[222].hybrid, vars[ALL_WATER].hybrid, 5000., 101300., globs->DimGP, globs->HalfLevels, globs->vct);
     }
 
   if (vars[LOW_CLOUD].comp)
@@ -1521,8 +1396,8 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[LOW_CLOUD].hlev = vars[LOW_CLOUD].plev = 1;
       vars[LOW_CLOUD].sfit = FALSE;
       vars[LOW_CLOUD].hybrid = alloc_dp(globs->DimGP, "vars[LOW_CLOUD].hybrid");
-      LayerCloud(vars[223].hybrid, vars[LOW_CLOUD].hybrid, 75000., 101300.,
-                 globs->DimGP, globs->HalfLevels, globs->vct);
+      LayerCloud(vars[223].hybrid, vars[LOW_CLOUD].hybrid, 75000., 101300., globs->DimGP, globs->HalfLevels,
+                 globs->vct);
     }
 
   if (vars[MID_CLOUD].comp)
@@ -1530,8 +1405,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[MID_CLOUD].hlev = vars[MID_CLOUD].plev = 1;
       vars[MID_CLOUD].sfit = FALSE;
       vars[MID_CLOUD].hybrid = alloc_dp(globs->DimGP, "vars[MID_CLOUD].hybrid");
-      LayerCloud(vars[223].hybrid, vars[MID_CLOUD].hybrid, 46000., 73000.,
-                 globs->DimGP, globs->HalfLevels, globs->vct);
+      LayerCloud(vars[223].hybrid, vars[MID_CLOUD].hybrid, 46000., 73000., globs->DimGP, globs->HalfLevels, globs->vct);
     }
 
   if (vars[HIH_CLOUD].comp)
@@ -1539,8 +1413,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[HIH_CLOUD].hlev = vars[HIH_CLOUD].plev = 1;
       vars[HIH_CLOUD].sfit = FALSE;
       vars[HIH_CLOUD].hybrid = alloc_dp(globs->DimGP, "vars[HIH_CLOUD].hybrid");
-      LayerCloud(vars[223].hybrid, vars[HIH_CLOUD].hybrid, 5000., 44000.,
-                 globs->DimGP, globs->HalfLevels, globs->vct);
+      LayerCloud(vars[223].hybrid, vars[HIH_CLOUD].hybrid, 5000., 44000., globs->DimGP, globs->HalfLevels, globs->vct);
     }
 
   if (vars[SW_CLF].comp)
@@ -1548,28 +1421,23 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[SW_CLF].hlev = vars[SW_CLF].plev = 1;
       vars[SW_CLF].sfit = FALSE;
       vars[SW_CLF].hybrid = alloc_dp(globs->DimGP, "SW_CLF.hybrid");
-      Sub2Vectors(vars[SW_CLF].hybrid, vars[178].hybrid, vars[224].hybrid,
-                  globs->DimGP);
+      Sub2Vectors(vars[SW_CLF].hybrid, vars[178].hybrid, vars[224].hybrid, globs->DimGP);
     }
 
   if (vars[SW_BOT_CLF].comp)
     {
       vars[SW_BOT_CLF].hlev = vars[SW_BOT_CLF].plev = 1;
       vars[SW_BOT_CLF].sfit = FALSE;
-      vars[SW_BOT_CLF].hybrid
-          = alloc_dp(globs->DimGP, "vars[SW_BOT_CLF].hybrid");
-      Sub2Vectors(vars[SW_BOT_CLF].hybrid, vars[176].hybrid, vars[185].hybrid,
-                  globs->DimGP);
+      vars[SW_BOT_CLF].hybrid = alloc_dp(globs->DimGP, "vars[SW_BOT_CLF].hybrid");
+      Sub2Vectors(vars[SW_BOT_CLF].hybrid, vars[176].hybrid, vars[185].hybrid, globs->DimGP);
     }
 
   if (vars[SW_TOP_CLF].comp)
     {
       vars[SW_TOP_CLF].hlev = vars[SW_TOP_CLF].plev = 1;
       vars[SW_TOP_CLF].sfit = FALSE;
-      vars[SW_TOP_CLF].hybrid
-          = alloc_dp(globs->DimGP, "vars[SW_TOP_CLF].hybrid");
-      Sub2Vectors(vars[SW_TOP_CLF].hybrid, vars[178].hybrid, vars[187].hybrid,
-                  globs->DimGP);
+      vars[SW_TOP_CLF].hybrid = alloc_dp(globs->DimGP, "vars[SW_TOP_CLF].hybrid");
+      Sub2Vectors(vars[SW_TOP_CLF].hybrid, vars[178].hybrid, vars[187].hybrid, globs->DimGP);
     }
 
   if (vars[LW_CLF].comp)
@@ -1577,28 +1445,23 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[LW_CLF].hlev = vars[LW_CLF].plev = 1;
       vars[LW_CLF].sfit = FALSE;
       vars[LW_CLF].hybrid = alloc_dp(globs->DimGP, "LW_CLF.hybrid");
-      Sub2Vectors(vars[LW_CLF].hybrid, vars[179].hybrid, vars[225].hybrid,
-                  globs->DimGP);
+      Sub2Vectors(vars[LW_CLF].hybrid, vars[179].hybrid, vars[225].hybrid, globs->DimGP);
     }
 
   if (vars[LW_BOT_CLF].comp)
     {
       vars[LW_BOT_CLF].hlev = vars[LW_BOT_CLF].plev = 1;
       vars[LW_BOT_CLF].sfit = FALSE;
-      vars[LW_BOT_CLF].hybrid
-          = alloc_dp(globs->DimGP, "vars[LW_BOT_CLF].hybrid");
-      Sub2Vectors(vars[LW_BOT_CLF].hybrid, vars[177].hybrid, vars[186].hybrid,
-                  globs->DimGP);
+      vars[LW_BOT_CLF].hybrid = alloc_dp(globs->DimGP, "vars[LW_BOT_CLF].hybrid");
+      Sub2Vectors(vars[LW_BOT_CLF].hybrid, vars[177].hybrid, vars[186].hybrid, globs->DimGP);
     }
 
   if (vars[LW_TOP_CLF].comp)
     {
       vars[LW_TOP_CLF].hlev = vars[LW_TOP_CLF].plev = 1;
       vars[LW_TOP_CLF].sfit = FALSE;
-      vars[LW_TOP_CLF].hybrid
-          = alloc_dp(globs->DimGP, "vars[LW_TOP_CLF].hybrid");
-      Sub2Vectors(vars[LW_TOP_CLF].hybrid, vars[179].hybrid, vars[188].hybrid,
-                  globs->DimGP);
+      vars[LW_TOP_CLF].hybrid = alloc_dp(globs->DimGP, "vars[LW_TOP_CLF].hybrid");
+      Sub2Vectors(vars[LW_TOP_CLF].hybrid, vars[179].hybrid, vars[188].hybrid, globs->DimGP);
     }
 
   if (vars[NET_CLF].comp)
@@ -1606,12 +1469,9 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[NET_CLF].hlev = vars[NET_CLF].plev = 1;
       vars[NET_CLF].sfit = FALSE;
       vars[NET_CLF].hybrid = alloc_dp(globs->DimGP, "NET_CLF.hybrid");
-      Add2Vectors(vars[NET_CLF].hybrid, vars[178].hybrid, vars[179].hybrid,
-                  globs->DimGP);
-      Sub2Vectors(vars[NET_CLF].hybrid, vars[NET_CLF].hybrid, vars[224].hybrid,
-                  globs->DimGP);
-      Sub2Vectors(vars[NET_CLF].hybrid, vars[NET_CLF].hybrid, vars[225].hybrid,
-                  globs->DimGP);
+      Add2Vectors(vars[NET_CLF].hybrid, vars[178].hybrid, vars[179].hybrid, globs->DimGP);
+      Sub2Vectors(vars[NET_CLF].hybrid, vars[NET_CLF].hybrid, vars[224].hybrid, globs->DimGP);
+      Sub2Vectors(vars[NET_CLF].hybrid, vars[NET_CLF].hybrid, vars[225].hybrid, globs->DimGP);
     }
 
   if (vars[SW_ATM].comp)
@@ -1619,8 +1479,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[SW_ATM].hlev = vars[SW_ATM].plev = 1;
       vars[SW_ATM].sfit = FALSE;
       vars[SW_ATM].hybrid = alloc_dp(globs->DimGP, "vars[SW_ATM].hybrid");
-      Sub2Vectors(vars[SW_ATM].hybrid, vars[178].hybrid, vars[176].hybrid,
-                  globs->DimGP);
+      Sub2Vectors(vars[SW_ATM].hybrid, vars[178].hybrid, vars[176].hybrid, globs->DimGP);
     }
 
   if (vars[LW_ATM].comp)
@@ -1628,8 +1487,7 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[LW_ATM].hlev = vars[LW_ATM].plev = 1;
       vars[LW_ATM].sfit = FALSE;
       vars[LW_ATM].hybrid = alloc_dp(globs->DimGP, "vars[LW_ATM].hybrid");
-      Sub2Vectors(vars[LW_ATM].hybrid, vars[179].hybrid, vars[177].hybrid,
-                  globs->DimGP);
+      Sub2Vectors(vars[LW_ATM].hybrid, vars[179].hybrid, vars[177].hybrid, globs->DimGP);
     }
 
   if (vars[NET_ATM].comp)
@@ -1637,44 +1495,33 @@ after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[NET_ATM].hlev = vars[NET_ATM].plev = 1;
       vars[NET_ATM].sfit = FALSE;
       vars[NET_ATM].hybrid = alloc_dp(globs->DimGP, "vars[NET_ATM].hybrid");
-      Add2Vectors(vars[NET_ATM].hybrid, vars[178].hybrid, vars[179].hybrid,
-                  globs->DimGP);
-      Sub2Vectors(vars[NET_ATM].hybrid, vars[NET_ATM].hybrid, vars[176].hybrid,
-                  globs->DimGP);
-      Sub2Vectors(vars[NET_ATM].hybrid, vars[NET_ATM].hybrid, vars[177].hybrid,
-                  globs->DimGP);
+      Add2Vectors(vars[NET_ATM].hybrid, vars[178].hybrid, vars[179].hybrid, globs->DimGP);
+      Sub2Vectors(vars[NET_ATM].hybrid, vars[NET_ATM].hybrid, vars[176].hybrid, globs->DimGP);
+      Sub2Vectors(vars[NET_ATM].hybrid, vars[NET_ATM].hybrid, vars[177].hybrid, globs->DimGP);
     }
 
   if (vars[SURF_RUNOFF].comp)
     {
       vars[SURF_RUNOFF].hlev = vars[SURF_RUNOFF].plev = 1;
       vars[SURF_RUNOFF].sfit = FALSE;
-      vars[SURF_RUNOFF].hybrid
-          = alloc_dp(globs->DimGP, "vars[SURF_RUNOFF].hybrid");
-      Sub2Vectors(vars[SURF_RUNOFF].hybrid, vars[182].hybrid, vars[221].hybrid,
-                  globs->DimGP);
-      Add2Vectors(vars[SURF_RUNOFF].hybrid, vars[SURF_RUNOFF].hybrid,
-                  vars[142].hybrid, globs->DimGP);
-      Add2Vectors(vars[SURF_RUNOFF].hybrid, vars[SURF_RUNOFF].hybrid,
-                  vars[143].hybrid, globs->DimGP);
+      vars[SURF_RUNOFF].hybrid = alloc_dp(globs->DimGP, "vars[SURF_RUNOFF].hybrid");
+      Sub2Vectors(vars[SURF_RUNOFF].hybrid, vars[182].hybrid, vars[221].hybrid, globs->DimGP);
+      Add2Vectors(vars[SURF_RUNOFF].hybrid, vars[SURF_RUNOFF].hybrid, vars[142].hybrid, globs->DimGP);
+      Add2Vectors(vars[SURF_RUNOFF].hybrid, vars[SURF_RUNOFF].hybrid, vars[143].hybrid, globs->DimGP);
     }
 
   if (vars[FRESH_WATER].comp)
     {
       vars[FRESH_WATER].hlev = vars[FRESH_WATER].plev = 1;
       vars[FRESH_WATER].sfit = FALSE;
-      vars[FRESH_WATER].hybrid
-          = alloc_dp(globs->DimGP, "vars[FRESH_WATER].hybrid");
-      Add2Vectors(vars[FRESH_WATER].hybrid, vars[142].hybrid, vars[143].hybrid,
-                  globs->DimGP);
-      Add2Vectors(vars[FRESH_WATER].hybrid, vars[FRESH_WATER].hybrid,
-                  vars[182].hybrid, globs->DimGP);
+      vars[FRESH_WATER].hybrid = alloc_dp(globs->DimGP, "vars[FRESH_WATER].hybrid");
+      Add2Vectors(vars[FRESH_WATER].hybrid, vars[142].hybrid, vars[143].hybrid, globs->DimGP);
+      Add2Vectors(vars[FRESH_WATER].hybrid, vars[FRESH_WATER].hybrid, vars[182].hybrid, globs->DimGP);
     }
 }
 
 static void
-Derivate(double field[], double derilam[], int levels, int Waves, int Latitudes,
-         double DerivationFactor[])
+Derivate(double field[], double derilam[], int levels, int Waves, int Latitudes, double DerivationFactor[])
 {
   int l, n, lev;
   int i;
@@ -1713,9 +1560,7 @@ after_processML(struct Control *globs, struct Variable *vars)
 
   if (globs->MeanCount == 1)
     {
-      if (globs->Debug)
-        Message("TermCount = %d MeanCount = %d", globs->TermCount,
-                globs->MeanCount);
+      if (globs->Debug) Message("TermCount = %d MeanCount = %d", globs->TermCount, globs->MeanCount);
       globs->StartDate = globs->OldDate;
     }
 
@@ -1733,28 +1578,22 @@ after_processML(struct Control *globs, struct Variable *vars)
       vars[U_WIND].spectral = alloc_dp(globs->Dim3SP, "vars[U_WIND].spectral");
       vars[V_WIND].spectral = alloc_dp(globs->Dim3SP, "vars[V_WIND].spectral");
 
-      if (vars[DIVERGENCE].spectral == NULL)
-        after_gp2sp(globs, vars, DIVERGENCE);
+      if (vars[DIVERGENCE].spectral == NULL) after_gp2sp(globs, vars, DIVERGENCE);
       if (vars[VORTICITY].spectral == NULL) after_gp2sp(globs, vars, VORTICITY);
 
-      dv2uv(vars[DIVERGENCE].spectral, vars[VORTICITY].spectral,
-            vars[U_WIND].spectral, vars[V_WIND].spectral, globs->dv2uv_f1,
-            globs->dv2uv_f2, globs->Truncation, globs->DimSP,
-            vars[DIVERGENCE].hlev);
+      dv2uv(vars[DIVERGENCE].spectral, vars[VORTICITY].spectral, vars[U_WIND].spectral, vars[V_WIND].spectral,
+            globs->dv2uv_f1, globs->dv2uv_f2, globs->Truncation, globs->DimSP, vars[DIVERGENCE].hlev);
     }
 
   if (vars[VELOPOT].comp && globs->Type < 30)
     {
       vars[VELOPOT].hlev = vars[DIVERGENCE].hlev;
       vars[VELOPOT].plev = vars[DIVERGENCE].plev;
-      vars[VELOPOT].spectral
-          = alloc_dp(globs->Dim3SP, "vars[VELOPOT].spectral");
+      vars[VELOPOT].spectral = alloc_dp(globs->Dim3SP, "vars[VELOPOT].spectral");
 
-      if (vars[DIVERGENCE].spectral == NULL)
-        after_gp2sp(globs, vars, DIVERGENCE);
+      if (vars[DIVERGENCE].spectral == NULL) after_gp2sp(globs, vars, DIVERGENCE);
 
-      dv2ps(vars[DIVERGENCE].spectral, vars[VELOPOT].spectral,
-            vars[DIVERGENCE].hlev, globs->Truncation);
+      dv2ps(vars[DIVERGENCE].spectral, vars[VELOPOT].spectral, vars[DIVERGENCE].hlev, globs->Truncation);
     }
 
   if (vars[STREAM].comp && globs->Type < 30)
@@ -1765,16 +1604,14 @@ after_processML(struct Control *globs, struct Variable *vars)
 
       if (vars[VORTICITY].spectral == NULL) after_gp2sp(globs, vars, VORTICITY);
 
-      dv2ps(vars[VORTICITY].spectral, vars[STREAM].spectral,
-            vars[VORTICITY].hlev, globs->Truncation);
+      dv2ps(vars[VORTICITY].spectral, vars[STREAM].spectral, vars[VORTICITY].hlev, globs->Truncation);
     }
 
   if (vars[VORTICITY].spectral && !vars[VORTICITY].needed)
     vars[VORTICITY].spectral = (double *) FreeMemory(vars[VORTICITY].spectral);
 
   if (vars[DIVERGENCE].spectral && !vars[DIVERGENCE].needed)
-    vars[DIVERGENCE].spectral
-        = (double *) FreeMemory(vars[DIVERGENCE].spectral);
+    vars[DIVERGENCE].spectral = (double *) FreeMemory(vars[DIVERGENCE].spectral);
 
   /* --------------------------- */
   /*  Output of spectral fields  */
@@ -1785,16 +1622,14 @@ after_processML(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].spectral)
-              Error("Code %d not available on spectral space!", code);
+            if (!vars[code].spectral) Error("Code %d not available on spectral space!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimSP;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID,
-                                  vars[code].spectral + offset, 0);
+                streamWriteRecord(globs->ostreamID, vars[code].spectral + offset, 0);
               }
           }
 
@@ -1814,14 +1649,11 @@ after_processML(struct Control *globs, struct Variable *vars)
             if (vars[code].fourier == NULL)
               {
                 fieldSize = vars[code].hlev * globs->DimFC;
-                vars[code].fourier
-                    = alloc_dp(fieldSize, FieldName(code, "fourier"));
-                sp2fc(vars[code].spectral, vars[code].fourier, globs->poli,
-                      vars[code].hlev, globs->Latitudes, globs->Fouriers,
-                      globs->Truncation);
+                vars[code].fourier = alloc_dp(fieldSize, FieldName(code, "fourier"));
+                sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].hlev, globs->Latitudes,
+                      globs->Fouriers, globs->Truncation);
               }
-            if (code != LNPS)
-              vars[code].spectral = (double *) FreeMemory(vars[code].spectral);
+            if (code != LNPS) vars[code].spectral = (double *) FreeMemory(vars[code].spectral);
           }
 
       /*    if (globs->Type < 60) globs->poli = FreeMemory(globs->poli); */
@@ -1829,11 +1661,9 @@ after_processML(struct Control *globs, struct Variable *vars)
       /*    if (globs->Type < 50) globs->pol3 = FreeMemory(globs->pol3); */
 
       if (vars[U_WIND].needed && vars[U_WIND].fourier)
-        scaluv(vars[U_WIND].fourier, globs->rcoslat, globs->Latitudes,
-               globs->Fouriers * globs->NumLevel);
+        scaluv(vars[U_WIND].fourier, globs->rcoslat, globs->Latitudes, globs->Fouriers * globs->NumLevel);
       if (vars[V_WIND].needed && vars[V_WIND].fourier)
-        scaluv(vars[V_WIND].fourier, globs->rcoslat, globs->Latitudes,
-               globs->Fouriers * globs->NumLevel);
+        scaluv(vars[V_WIND].fourier, globs->rcoslat, globs->Latitudes, globs->Fouriers * globs->NumLevel);
 
       if (vars[DPSDX].needed)
         {
@@ -1842,8 +1672,7 @@ after_processML(struct Control *globs, struct Variable *vars)
           vars[DPSDX].sfit = FALSE;
           vars[DPSDX].fourier = alloc_dp(globs->DimFC, "vars[DPSDX].fourier");
           if (vars[LNPS].fourier == NULL) after_gp2sp(globs, vars, LNPS);
-          Derivate(vars[LNPS].fourier, vars[DPSDX].fourier, 1, globs->Waves,
-                   globs->Latitudes, globs->DerivationFactor);
+          Derivate(vars[LNPS].fourier, vars[DPSDX].fourier, 1, globs->Waves, globs->Latitudes, globs->DerivationFactor);
         }
       if (vars[DPSDY].needed)
         {
@@ -1852,9 +1681,8 @@ after_processML(struct Control *globs, struct Variable *vars)
           vars[DPSDY].sfit = FALSE;
           vars[DPSDY].fourier = alloc_dp(globs->DimFC, "vars[DPSDY].fourier");
           if (vars[LNPS].spectral == NULL) after_gp2sp(globs, vars, LNPS);
-          sp2fc(vars[LNPS].spectral, vars[DPSDY].fourier, globs->pdev,
-                vars[DPSDY].hlev, globs->Latitudes, globs->Fouriers,
-                globs->Truncation);
+          sp2fc(vars[LNPS].spectral, vars[DPSDY].fourier, globs->pdev, vars[DPSDY].hlev, globs->Latitudes,
+                globs->Fouriers, globs->Truncation);
         }
     }
 
@@ -1869,16 +1697,14 @@ after_processML(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].fourier)
-              Error("Code %d not available on fourier space!", code);
+            if (!vars[code].fourier) Error("Code %d not available on fourier space!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimFC;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset,
-                                  0);
+                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset, 0);
               }
           }
 
@@ -1895,16 +1721,14 @@ after_processML(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].fourier)
-              Error("Code %d not available on zonal mean!", code);
+            if (!vars[code].fourier) Error("Code %d not available on zonal mean!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimFC;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset,
-                                  0);
+                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset, 0);
               }
           }
 
@@ -1924,11 +1748,9 @@ after_processML(struct Control *globs, struct Variable *vars)
             if (vars[code].hybrid == NULL)
               {
                 fieldSize = globs->DimGP * vars[code].hlev;
-                vars[code].hybrid
-                    = alloc_dp(fieldSize, FieldName(code, "hybrid"));
-                after_FC2GP(vars[code].fourier, vars[code].hybrid,
-                            globs->Latitudes, globs->Longitudes,
-                            vars[code].hlev, globs->Fouriers);
+                vars[code].hybrid = alloc_dp(fieldSize, FieldName(code, "hybrid"));
+                after_FC2GP(vars[code].fourier, vars[code].hybrid, globs->Latitudes, globs->Longitudes, vars[code].hlev,
+                            globs->Fouriers);
               }
             vars[code].fourier = (double *) FreeMemory(vars[code].fourier);
           }
@@ -1958,8 +1780,7 @@ after_processML(struct Control *globs, struct Variable *vars)
         {
           globs->Orography = alloc_dp(globs->DimGP, "Orography");
           if (vars[GEOPOTENTIAL].hybrid)
-            arrayCopy(globs->DimGP, vars[GEOPOTENTIAL].hybrid,
-                      globs->Orography);
+            arrayCopy(globs->DimGP, vars[GEOPOTENTIAL].hybrid, globs->Orography);
           else
             {
               if (vars[GEOPOTENTIAL].selected || globs->Type >= 30)
@@ -1990,44 +1811,33 @@ after_processML(struct Control *globs, struct Variable *vars)
                 {
                   fieldSize = globs->DimGP * vars[code].hlev;
 
-                  if (vars[code].mean == NULL)
-                    vars[code].mean
-                        = alloc_dp(fieldSize, FieldName(code, "mean"));
+                  if (vars[code].mean == NULL) vars[code].mean = alloc_dp(fieldSize, FieldName(code, "mean"));
 
                   if (globs->Mean > 1 && vars[code].variance == NULL)
-                    vars[code].variance
-                        = alloc_dp(fieldSize, FieldName(code, "variance"));
+                    vars[code].variance = alloc_dp(fieldSize, FieldName(code, "variance"));
 
                   if (globs->MeanCount == 1)
                     {
                       arrayCopy(fieldSize, vars[code].hybrid, vars[code].mean);
-                      if (globs->Mean > 1)
-                        IniQuaSum(vars[code].variance, vars[code].hybrid,
-                                  fieldSize);
+                      if (globs->Mean > 1) IniQuaSum(vars[code].variance, vars[code].hybrid, fieldSize);
                     }
                   else
                     {
-                      AddVector(vars[code].mean, vars[code].hybrid, fieldSize,
-                                &vars[code].nmiss, vars[code].missval);
-                      if (globs->Mean > 1)
-                        AddQuaSum(vars[code].variance, vars[code].hybrid,
-                                  fieldSize);
+                      AddVector(vars[code].mean, vars[code].hybrid, fieldSize, &vars[code].nmiss, vars[code].missval);
+                      if (globs->Mean > 1) AddQuaSum(vars[code].variance, vars[code].hybrid, fieldSize);
                     }
 
                   if (globs->EndOfInterval)
                     {
                       if (vars[code].samp == NULL)
-                        MultVectorScalar(vars[code].hybrid, vars[code].mean,
-                                         1.0 / globs->MeanCount, fieldSize,
+                        MultVectorScalar(vars[code].hybrid, vars[code].mean, 1.0 / globs->MeanCount, fieldSize,
                                          vars[code].nmiss, vars[code].missval);
                       else
-                        DivVectorIvector(vars[code].hybrid, vars[code].mean,
-                                         vars[code].samp, fieldSize,
+                        DivVectorIvector(vars[code].hybrid, vars[code].mean, vars[code].samp, fieldSize,
                                          &vars[code].nmiss, vars[code].missval);
 
                       if (globs->Mean > 1)
-                        VarQuaSum(vars[code].variance, vars[code].hybrid,
-                                  fieldSize, globs->MeanCount);
+                        VarQuaSum(vars[code].variance, vars[code].hybrid, fieldSize, globs->MeanCount);
                     }
                 }
             }
@@ -2042,8 +1852,7 @@ after_processML(struct Control *globs, struct Variable *vars)
           for (code = 0; code < MaxCodes; code++)
             if (vars[code].selected)
               {
-                if (vars[code].hybrid == NULL)
-                  Error("Internal problem. Code %d not allocated!", code);
+                if (vars[code].hybrid == NULL) Error("Internal problem. Code %d not allocated!", code);
 
                 nlevel = zaxisInqSize(vars[code].ozaxisID);
                 for (lindex = 0; lindex < nlevel; lindex++)
@@ -2051,19 +1860,13 @@ after_processML(struct Control *globs, struct Variable *vars)
                     offset = lindex * globs->DimGP;
                     if (globs->Mean != 2)
                       {
-                        streamDefRecord(globs->ostreamID, vars[code].ovarID,
-                                        lindex);
-                        streamWriteRecord(globs->ostreamID,
-                                          vars[code].hybrid + offset,
-                                          vars[code].nmiss);
+                        streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+                        streamWriteRecord(globs->ostreamID, vars[code].hybrid + offset, vars[code].nmiss);
                       }
                     if (globs->Mean >= 2)
                       {
-                        streamDefRecord(globs->ostreamID2, vars[code].ovarID2,
-                                        lindex);
-                        streamWriteRecord(globs->ostreamID2,
-                                          vars[code].variance + offset,
-                                          vars[code].nmiss);
+                        streamDefRecord(globs->ostreamID2, vars[code].ovarID2, lindex);
+                        streamWriteRecord(globs->ostreamID2, vars[code].variance + offset, vars[code].nmiss);
                       }
                   }
               }
@@ -2082,16 +1885,12 @@ after_processML(struct Control *globs, struct Variable *vars)
   if (globs->Type >= 30)
     {
       if (globs->vert_index == NULL)
-        globs->vert_index = (int *) Malloc(globs->NumLevelRequest * globs->DimGP
-                                           * sizeof(int));
+        globs->vert_index = (int *) Malloc(globs->NumLevelRequest * globs->DimGP * sizeof(int));
 
       if (globs->unitsel)
         {
-          if (globs->p_of_height == NULL)
-            globs->p_of_height
-                = alloc_dp(globs->NumLevelRequest, "p_of_height");
-          height2pressure(globs->p_of_height, globs->LevelRequest,
-                          globs->NumLevelRequest);
+          if (globs->p_of_height == NULL) globs->p_of_height = alloc_dp(globs->NumLevelRequest, "p_of_height");
+          height2pressure(globs->p_of_height, globs->LevelRequest, globs->NumLevelRequest);
           pressureLevel = globs->p_of_height;
         }
       else
@@ -2099,17 +1898,14 @@ after_processML(struct Control *globs, struct Variable *vars)
           pressureLevel = globs->LevelRequest;
         }
 
-      genind(globs->vert_index, pressureLevel, vars[FULL_PRESS].hybrid,
-             globs->DimGP, globs->NumLevelRequest, globs->NumLevel);
+      genind(globs->vert_index, pressureLevel, vars[FULL_PRESS].hybrid, globs->DimGP, globs->NumLevelRequest,
+             globs->NumLevel);
 
       nmiss = 0;
       if (!globs->Extrapolate)
         {
-          if (globs->pnmiss == NULL)
-            globs->pnmiss
-                = (size_t *) Malloc(globs->NumLevelRequest * sizeof(size_t));
-          genindmiss(globs->vert_index, pressureLevel, globs->DimGP,
-                     globs->NumLevelRequest, vars[PS_PROG].hybrid,
+          if (globs->pnmiss == NULL) globs->pnmiss = (size_t *) Malloc(globs->NumLevelRequest * sizeof(size_t));
+          genindmiss(globs->vert_index, pressureLevel, globs->DimGP, globs->NumLevelRequest, vars[PS_PROG].hybrid,
                      globs->pnmiss);
           for (i = 0; i < globs->NumLevelRequest; i++)
             nmiss += globs->pnmiss[i];
@@ -2119,8 +1915,7 @@ after_processML(struct Control *globs, struct Variable *vars)
         if (vars[code].needed && vars[code].hybrid)
           {
             leveltype = zaxisInqType(vars[code].izaxisID);
-            if (vars[code].hlev == 1 || leveltype != ZAXIS_HYBRID
-                || (vars[code].hlev < globs->NumLevel))
+            if (vars[code].hlev == 1 || leveltype != ZAXIS_HYBRID || (vars[code].hlev < globs->NumLevel))
               {
                 if (vars[code].grid) FreeMemory(vars[code].grid);
                 vars[code].grid = vars[code].hybrid;
@@ -2131,27 +1926,21 @@ after_processML(struct Control *globs, struct Variable *vars)
                 if (vars[code].grid == NULL)
                   {
                     fieldSize = globs->DimGP * globs->NumLevelRequest;
-                    vars[code].grid
-                        = alloc_dp(fieldSize, FieldName(code, "grid"));
+                    vars[code].grid = alloc_dp(fieldSize, FieldName(code, "grid"));
                   }
 
                 if (code == TEMPERATURE)
                   {
-                    interp_T(globs->Orography, vars[TEMPERATURE].hybrid,
-                             vars[TEMPERATURE].grid, vars[FULL_PRESS].hybrid,
-                             vars[HALF_PRESS].hybrid, globs->vert_index,
-                             pressureLevel, globs->NumLevelRequest,
-                             globs->DimGP, globs->NumLevel, vars[code].missval);
+                    interp_T(globs->Orography, vars[TEMPERATURE].hybrid, vars[TEMPERATURE].grid,
+                             vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vert_index, pressureLevel,
+                             globs->NumLevelRequest, globs->DimGP, globs->NumLevel, vars[code].missval);
                   }
                 else if (code == GEOPOTHEIGHT)
                   {
-                    if (vars[TEMPERATURE].hybrid == NULL)
-                      Error("Code  130 not found!");
-                    interp_Z(globs->Orography, vars[GEOPOTHEIGHT].hybrid,
-                             vars[GEOPOTHEIGHT].grid, vars[FULL_PRESS].hybrid,
-                             vars[HALF_PRESS].hybrid, globs->vert_index,
-                             vars[TEMPERATURE].hybrid, pressureLevel,
-                             globs->NumLevelRequest, globs->DimGP,
+                    if (vars[TEMPERATURE].hybrid == NULL) Error("Code  130 not found!");
+                    interp_Z(globs->Orography, vars[GEOPOTHEIGHT].hybrid, vars[GEOPOTHEIGHT].grid,
+                             vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vert_index,
+                             vars[TEMPERATURE].hybrid, pressureLevel, globs->NumLevelRequest, globs->DimGP,
                              globs->NumLevel, vars[code].missval);
                   }
                 else
@@ -2159,27 +1948,22 @@ after_processML(struct Control *globs, struct Variable *vars)
                     int numlevel = vars[code].hlev;
                     if (code == OMEGA) numlevel = globs->NumLevel;
                     double *hyb_press = vars[FULL_PRESS].hybrid;
-                    if (numlevel == (globs->NumLevel + 1))
-                      hyb_press = vars[HALF_PRESS].hybrid;
+                    if (numlevel == (globs->NumLevel + 1)) hyb_press = vars[HALF_PRESS].hybrid;
 
-                    interp_X(vars[code].hybrid, vars[code].grid, hyb_press,
-                             globs->vert_index, pressureLevel,
-                             globs->NumLevelRequest, globs->DimGP, numlevel,
-                             vars[code].missval);
+                    interp_X(vars[code].hybrid, vars[code].grid, hyb_press, globs->vert_index, pressureLevel,
+                             globs->NumLevelRequest, globs->DimGP, numlevel, vars[code].missval);
                   }
 
                 if (!globs->Extrapolate) vars[code].nmiss = nmiss;
 
-                if (code != TEMPERATURE)
-                  vars[code].hybrid = (double *) FreeMemory(vars[code].hybrid);
+                if (code != TEMPERATURE) vars[code].hybrid = (double *) FreeMemory(vars[code].hybrid);
               }
           }
     }
 
   vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
   FreeHybrid(vars);
-  if (vars[HALF_PRESS].hybrid)
-    vars[HALF_PRESS].hybrid = (double *) FreeMemory(vars[HALF_PRESS].hybrid);
+  if (vars[HALF_PRESS].hybrid) vars[HALF_PRESS].hybrid = (double *) FreeMemory(vars[HALF_PRESS].hybrid);
 
   /* -------------------------------- */
   /*  Output of pressure level grids  */
@@ -2196,11 +1980,8 @@ after_processML(struct Control *globs, struct Variable *vars)
                 offset = lindex * globs->DimGP;
                 if (globs->Mean != 2)
                   {
-                    streamDefRecord(globs->ostreamID, vars[code].ovarID,
-                                    lindex);
-                    streamWriteRecord(globs->ostreamID,
-                                      vars[code].grid + offset,
-                                      vars[code].nmiss);
+                    streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+                    streamWriteRecord(globs->ostreamID, vars[code].grid + offset, vars[code].nmiss);
                   }
               }
           }
@@ -2219,24 +2000,20 @@ after_processML(struct Control *globs, struct Variable *vars)
         {
           fieldSize = globs->DimGP * vars[code].plev;
 
-          if (vars[code].mean == NULL)
-            vars[code].mean = alloc_dp(fieldSize, FieldName(code, "mean"));
+          if (vars[code].mean == NULL) vars[code].mean = alloc_dp(fieldSize, FieldName(code, "mean"));
 
           if (globs->MeanCount == 1)
             arrayCopy(fieldSize, vars[code].grid, vars[code].mean);
           else
-            AddVector(vars[code].mean, vars[code].grid, fieldSize,
-                      &vars[code].nmiss, vars[code].missval);
+            AddVector(vars[code].mean, vars[code].grid, fieldSize, &vars[code].nmiss, vars[code].missval);
 
           if (globs->EndOfInterval)
             {
               if (vars[code].samp == NULL)
-                MultVectorScalar(vars[code].mean, vars[code].mean,
-                                 1.0 / globs->MeanCount, fieldSize,
-                                 vars[code].nmiss, vars[code].missval);
+                MultVectorScalar(vars[code].mean, vars[code].mean, 1.0 / globs->MeanCount, fieldSize, vars[code].nmiss,
+                                 vars[code].missval);
               else
-                DivVectorIvector(vars[code].mean, vars[code].mean,
-                                 vars[code].samp, fieldSize, &vars[code].nmiss,
+                DivVectorIvector(vars[code].mean, vars[code].mean, vars[code].samp, fieldSize, &vars[code].nmiss,
                                  vars[code].missval);
             }
         }
@@ -2251,17 +2028,14 @@ after_processML(struct Control *globs, struct Variable *vars)
         {
           fieldSize = globs->DimGP * vars[code].plev;
 
-          if (vars[code].variance == NULL)
-            vars[code].variance = alloc_dp(fieldSize, FieldName(code, "var"));
+          if (vars[code].variance == NULL) vars[code].variance = alloc_dp(fieldSize, FieldName(code, "var"));
 
           if (globs->MeanCount == 1)
             IniQuaSum(vars[code].variance, vars[code].grid, fieldSize);
           else
             AddQuaSum(vars[code].variance, vars[code].grid, fieldSize);
 
-          if (globs->EndOfInterval)
-            VarQuaSum(vars[code].variance, vars[code].mean, fieldSize,
-                      globs->MeanCount);
+          if (globs->EndOfInterval) VarQuaSum(vars[code].variance, vars[code].mean, fieldSize, globs->MeanCount);
         }
 
   if (globs->Mean && !globs->EndOfInterval)
@@ -2285,19 +2059,13 @@ after_processML(struct Control *globs, struct Variable *vars)
                 offset = lindex * globs->DimGP;
                 if (globs->Mean != 2)
                   {
-                    streamDefRecord(globs->ostreamID, vars[code].ovarID,
-                                    lindex);
-                    streamWriteRecord(globs->ostreamID,
-                                      vars[code].mean + offset,
-                                      vars[code].nmiss);
+                    streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+                    streamWriteRecord(globs->ostreamID, vars[code].mean + offset, vars[code].nmiss);
                   }
                 if (globs->Mean >= 2)
                   {
-                    streamDefRecord(globs->ostreamID2, vars[code].ovarID2,
-                                    lindex);
-                    streamWriteRecord(globs->ostreamID2,
-                                      vars[code].variance + offset,
-                                      vars[code].nmiss);
+                    streamDefRecord(globs->ostreamID2, vars[code].ovarID2, lindex);
+                    streamWriteRecord(globs->ostreamID2, vars[code].variance + offset, vars[code].nmiss);
                   }
               }
           }
@@ -2315,10 +2083,8 @@ after_processML(struct Control *globs, struct Variable *vars)
     for (code = 0; code < MaxCodes; code++)
       if (vars[code].mean)
         {
-          if (vars[code].variance)
-            vars[code].variance = (double *) FreeMemory(vars[code].variance);
-          if (vars[code].grid)
-            vars[code].grid = (double *) FreeMemory(vars[code].grid);
+          if (vars[code].variance) vars[code].variance = (double *) FreeMemory(vars[code].variance);
+          if (vars[code].grid) vars[code].grid = (double *) FreeMemory(vars[code].grid);
           vars[code].grid = vars[code].mean;
           vars[code].mean = NULL;
         }
@@ -2330,22 +2096,18 @@ after_processML(struct Control *globs, struct Variable *vars)
   if (globs->Type >= 40)
     {
       for (code = 0; code < MaxCodes; code++)
-        if (vars[code].needed && vars[code].grid
-            && (vars[code].sfit || globs->Type < 70))
+        if (vars[code].needed && vars[code].grid && (vars[code].sfit || globs->Type < 70))
           {
-            if (vars[code].nmiss > 0)
-              Error("Missing values for code %d unsupported with TYPE > 30!",
-                    code);
+            if (vars[code].nmiss > 0) Error("Missing values for code %d unsupported with TYPE > 30!", code);
 
             if (vars[code].fourier == NULL)
               {
                 fieldSize = globs->DimFC * vars[code].plev;
-                vars[code].fourier
-                    = alloc_dp(fieldSize, FieldName(code, "fourier"));
+                vars[code].fourier = alloc_dp(fieldSize, FieldName(code, "fourier"));
               }
 
-            after_GP2FC(vars[code].grid, vars[code].fourier, globs->Latitudes,
-                        globs->Longitudes, vars[code].plev, globs->Fouriers);
+            after_GP2FC(vars[code].grid, vars[code].fourier, globs->Latitudes, globs->Longitudes, vars[code].plev,
+                        globs->Fouriers);
 
             if (vars[code].grid && (vars[code].sfit || globs->Type < 70))
               vars[code].grid = (double *) FreeMemory(vars[code].grid);
@@ -2365,16 +2127,14 @@ after_processML(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].fourier)
-              Error("Code %d not available on fourier space!", code);
+            if (!vars[code].fourier) Error("Code %d not available on fourier space!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimFC;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset,
-                                  vars[code].nmiss);
+                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset, vars[code].nmiss);
               }
           }
 
@@ -2391,16 +2151,14 @@ after_processML(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].fourier)
-              Error("Code %d not available on zonal mean!", code);
+            if (!vars[code].fourier) Error("Code %d not available on zonal mean!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimFC;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset,
-                                  vars[code].nmiss);
+                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset, vars[code].nmiss);
               }
           }
 
@@ -2415,11 +2173,9 @@ after_processML(struct Control *globs, struct Variable *vars)
   if (globs->Type >= 50)
     {
       if (vars[U_WIND].needed && vars[U_WIND].fourier)
-        scaluv(vars[U_WIND].fourier, globs->coslat, globs->Latitudes,
-               globs->Fouriers * globs->NumLevelRequest);
+        scaluv(vars[U_WIND].fourier, globs->coslat, globs->Latitudes, globs->Fouriers * globs->NumLevelRequest);
       if (vars[V_WIND].needed && vars[V_WIND].fourier)
-        scaluv(vars[V_WIND].fourier, globs->coslat, globs->Latitudes,
-               globs->Fouriers * globs->NumLevelRequest);
+        scaluv(vars[V_WIND].fourier, globs->coslat, globs->Latitudes, globs->Fouriers * globs->NumLevelRequest);
 
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].needed && vars[code].fourier)
@@ -2427,33 +2183,23 @@ after_processML(struct Control *globs, struct Variable *vars)
             if (vars[code].spectral == NULL)
               {
                 fieldSize = vars[code].plev * globs->DimSP;
-                vars[code].spectral
-                    = alloc_dp(fieldSize, FieldName(code, "spectral"));
+                vars[code].spectral = alloc_dp(fieldSize, FieldName(code, "spectral"));
               }
 
-            fc2sp(vars[code].fourier, vars[code].spectral, globs->pold,
-                  vars[code].plev, globs->Latitudes, globs->Fouriers,
-                  globs->Truncation);
+            fc2sp(vars[code].fourier, vars[code].spectral, globs->pold, vars[code].plev, globs->Latitudes,
+                  globs->Fouriers, globs->Truncation);
           }
 
-      if (vars[DIVERGENCE].needed || vars[VORTICITY].needed
-          || vars[VELOPOT].needed || vars[STREAM].needed)
+      if (vars[DIVERGENCE].needed || vars[VORTICITY].needed || vars[VELOPOT].needed || vars[STREAM].needed)
         {
           if (vars[DIVERGENCE].spectral == NULL)
-            vars[DIVERGENCE].spectral
-                = alloc_dp(globs->DimSP * globs->NumLevelRequest,
-                           "vars[DIVERGENCE].spectral");
+            vars[DIVERGENCE].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[DIVERGENCE].spectral");
           if (vars[VORTICITY].spectral == NULL)
-            vars[VORTICITY].spectral
-                = alloc_dp(globs->DimSP * globs->NumLevelRequest,
-                           "vars[VORTICITY].spectral");
-          if ((vars[U_WIND].fourier == 0 || vars[V_WIND].fourier == 0)
-              && globs->NumLevelRequest)
+            vars[VORTICITY].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[VORTICITY].spectral");
+          if ((vars[U_WIND].fourier == 0 || vars[V_WIND].fourier == 0) && globs->NumLevelRequest)
             Error("uwind or vwind missing!");
-          uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier,
-                vars[DIVERGENCE].spectral, vars[VORTICITY].spectral,
-                globs->pol2, globs->pol3, globs->NumLevelRequest,
-                globs->Latitudes, globs->Truncation);
+          uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, vars[DIVERGENCE].spectral, vars[VORTICITY].spectral,
+                globs->pol2, globs->pol3, globs->NumLevelRequest, globs->Latitudes, globs->Truncation);
         }
 
       if (vars[VELOPOT].needed)
@@ -2462,11 +2208,8 @@ after_processML(struct Control *globs, struct Variable *vars)
           vars[VELOPOT].plev = vars[DIVERGENCE].plev;
           vars[VELOPOT].sfit = TRUE;
           if (vars[VELOPOT].spectral == NULL)
-            vars[VELOPOT].spectral
-                = alloc_dp(globs->DimSP * globs->NumLevelRequest,
-                           "vars[VELOPOT].spectral");
-          dv2ps(vars[DIVERGENCE].spectral, vars[VELOPOT].spectral,
-                globs->NumLevelRequest, globs->Truncation);
+            vars[VELOPOT].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[VELOPOT].spectral");
+          dv2ps(vars[DIVERGENCE].spectral, vars[VELOPOT].spectral, globs->NumLevelRequest, globs->Truncation);
         }
 
       if (vars[STREAM].needed)
@@ -2475,10 +2218,8 @@ after_processML(struct Control *globs, struct Variable *vars)
           vars[STREAM].plev = vars[VORTICITY].plev;
           vars[STREAM].sfit = TRUE;
           if (vars[STREAM].spectral == NULL)
-            vars[STREAM].spectral = alloc_dp(
-                globs->DimSP * globs->NumLevelRequest, "vars[STREAM].spectral");
-          dv2ps(vars[VORTICITY].spectral, vars[STREAM].spectral,
-                globs->NumLevelRequest, globs->Truncation);
+            vars[STREAM].spectral = alloc_dp(globs->DimSP * globs->NumLevelRequest, "vars[STREAM].spectral");
+          dv2ps(vars[VORTICITY].spectral, vars[STREAM].spectral, globs->NumLevelRequest, globs->Truncation);
         }
     }
 
@@ -2500,8 +2241,7 @@ after_processML(struct Control *globs, struct Variable *vars)
               {
                 offset = lindex * globs->DimSP;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID,
-                                  vars[code].spectral + offset, 0);
+                streamWriteRecord(globs->ostreamID, vars[code].spectral + offset, 0);
               }
           }
 
@@ -2521,19 +2261,15 @@ after_processML(struct Control *globs, struct Variable *vars)
             if (vars[code].fourier == NULL)
               {
                 fieldSize = vars[code].plev * globs->DimFC;
-                vars[code].fourier
-                    = alloc_dp(fieldSize, FieldName(code, "fourier"));
+                vars[code].fourier = alloc_dp(fieldSize, FieldName(code, "fourier"));
               }
-            sp2fc(vars[code].spectral, vars[code].fourier, globs->poli,
-                  vars[code].plev, globs->Latitudes, globs->Fouriers,
-                  globs->Truncation);
+            sp2fc(vars[code].spectral, vars[code].fourier, globs->poli, vars[code].plev, globs->Latitudes,
+                  globs->Fouriers, globs->Truncation);
           }
       if (vars[U_WIND].needed && vars[U_WIND].fourier)
-        scaluv(vars[U_WIND].fourier, globs->rcoslat, globs->Latitudes,
-               globs->Fouriers * globs->NumLevelRequest);
+        scaluv(vars[U_WIND].fourier, globs->rcoslat, globs->Latitudes, globs->Fouriers * globs->NumLevelRequest);
       if (vars[V_WIND].needed && vars[V_WIND].fourier)
-        scaluv(vars[V_WIND].fourier, globs->rcoslat, globs->Latitudes,
-               globs->Fouriers * globs->NumLevelRequest);
+        scaluv(vars[V_WIND].fourier, globs->rcoslat, globs->Latitudes, globs->Fouriers * globs->NumLevelRequest);
     }
 
   FreeSpectral(vars);
@@ -2547,16 +2283,14 @@ after_processML(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].fourier)
-              Error("Code %d not available on fourier space!", code);
+            if (!vars[code].fourier) Error("Code %d not available on fourier space!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimFC;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset,
-                                  0);
+                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset, 0);
               }
           }
 
@@ -2573,16 +2307,14 @@ after_processML(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
         if (vars[code].selected)
           {
-            if (!vars[code].fourier)
-              Error("Code %d not available on zonal mean!", code);
+            if (!vars[code].fourier) Error("Code %d not available on zonal mean!", code);
 
             nlevel = zaxisInqSize(vars[code].ozaxisID);
             for (lindex = 0; lindex < nlevel; lindex++)
               {
                 offset = lindex * globs->DimFC;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset,
-                                  vars[code].nmiss);
+                streamWriteRecord(globs->ostreamID, vars[code].fourier + offset, vars[code].nmiss);
               }
           }
 
@@ -2600,11 +2332,10 @@ after_processML(struct Control *globs, struct Variable *vars)
         if (vars[code].needed && vars[code].fourier)
           {
             fieldSize = vars[code].plev * globs->DimGP;
-            if (vars[code].grid == NULL)
-              vars[code].grid = alloc_dp(fieldSize, FieldName(code, "grid"));
+            if (vars[code].grid == NULL) vars[code].grid = alloc_dp(fieldSize, FieldName(code, "grid"));
 
-            after_FC2GP(vars[code].fourier, vars[code].grid, globs->Latitudes,
-                        globs->Longitudes, vars[code].plev, globs->Fouriers);
+            after_FC2GP(vars[code].fourier, vars[code].grid, globs->Latitudes, globs->Longitudes, vars[code].plev,
+                        globs->Fouriers);
           }
     }
 
@@ -2624,8 +2355,7 @@ after_processML(struct Control *globs, struct Variable *vars)
               {
                 offset = lindex * globs->DimGP;
                 streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
-                streamWriteRecord(globs->ostreamID, vars[code].grid + offset,
-                                  vars[code].nmiss);
+                streamWriteRecord(globs->ostreamID, vars[code].grid + offset, vars[code].nmiss);
               }
           }
 
@@ -2636,8 +2366,8 @@ after_processML(struct Control *globs, struct Variable *vars)
 }
 
 void
-after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code,
-                        int gridID, int zaxisID, int levelID, size_t nmiss)
+after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID,
+                        size_t nmiss)
 {
   size_t fieldSize;
   int truncation;
@@ -2661,22 +2391,15 @@ after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code,
           if (code != U_WIND && code != V_WIND)
             {
               fieldSize = globs->Dim3SP;
-              if (vars[code].spectral0 == NULL)
-                vars[code].spectral0
-                    = alloc_dp(fieldSize, FieldName(code, "spectral"));
+              if (vars[code].spectral0 == NULL) vars[code].spectral0 = alloc_dp(fieldSize, FieldName(code, "spectral"));
               truncation = gridInqTrunc(gridID);
-              sp2sp(globs->Field, truncation,
-                    vars[code].spectral0 + levelID * globs->DimSP,
-                    globs->Truncation);
+              sp2sp(globs->Field, truncation, vars[code].spectral0 + levelID * globs->DimSP, globs->Truncation);
             }
           else
             {
               fieldSize = globs->Dim3SP;
-              if (vars[code].spectral0 == NULL)
-                vars[code].spectral0
-                    = alloc_dp(fieldSize, FieldName(code, "spectral"));
-              arrayCopy(globs->DimSP, globs->Field,
-                        vars[code].spectral0 + levelID * globs->DimSP);
+              if (vars[code].spectral0 == NULL) vars[code].spectral0 = alloc_dp(fieldSize, FieldName(code, "spectral"));
+              arrayCopy(globs->DimSP, globs->Field, vars[code].spectral0 + levelID * globs->DimSP);
             }
         }
       else
@@ -2690,10 +2413,8 @@ after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code,
           fieldSize = globs->Dim3GP;
           vars[code].hlev = globs->NumLevelRequest;
           vars[code].plev = globs->NumLevelRequest;
-          if (vars[code].grid0 == NULL)
-            vars[code].grid0 = alloc_dp(fieldSize, FieldName(code, "grid0"));
-          arrayCopy(globs->DimGP, globs->Field,
-                    vars[code].grid0 + levelID * globs->DimGP);
+          if (vars[code].grid0 == NULL) vars[code].grid0 = alloc_dp(fieldSize, FieldName(code, "grid0"));
+          arrayCopy(globs->DimGP, globs->Field, vars[code].grid0 + levelID * globs->DimGP);
         }
       else
         {
@@ -2701,8 +2422,7 @@ after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code,
           fieldSize = globs->DimGP;
           vars[code].hlev = 1;
           vars[code].plev = 1;
-          if (vars[code].grid0 == NULL)
-            vars[code].grid0 = alloc_dp(fieldSize, FieldName(code, "grid0"));
+          if (vars[code].grid0 == NULL) vars[code].grid0 = alloc_dp(fieldSize, FieldName(code, "grid0"));
           arrayCopy(globs->DimGP, globs->Field, vars[code].grid0);
         }
 
@@ -2716,15 +2436,13 @@ after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int code,
             }
 
           for (size_t i = 0; i < gridSize; i++)
-            if (IS_NOT_EQUAL(globs->Field[i], vars[code].missval))
-              vars[code].samp[i + dataOffset]++;
+            if (IS_NOT_EQUAL(globs->Field[i], vars[code].missval)) vars[code].samp[i + dataOffset]++;
         }
     }
 }
 
 double *
-after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID,
-                  int levelID)
+after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID, int levelID)
 {
   int gridtype = gridInqType(gridID);
   int nlevel = zaxisInqSize(zaxisID);
@@ -2736,15 +2454,13 @@ after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID,
 
   if (gridtype == GRID_SPECTRAL)
     {
-      if (vars[code].spectral0 == NULL)
-        vars[code].spectral0 = alloc_dp(dataSize, FieldName(code, "spectral0"));
+      if (vars[code].spectral0 == NULL) vars[code].spectral0 = alloc_dp(dataSize, FieldName(code, "spectral0"));
 
       dataptr = vars[code].spectral0 + dataOffset;
     }
   else
     {
-      if (vars[code].hybrid0 == NULL)
-        vars[code].hybrid0 = alloc_dp(dataSize, FieldName(code, "hybrid0"));
+      if (vars[code].hybrid0 == NULL) vars[code].hybrid0 = alloc_dp(dataSize, FieldName(code, "hybrid0"));
 
       dataptr = vars[code].hybrid0 + dataOffset;
     }
@@ -2753,8 +2469,8 @@ after_get_dataptr(struct Variable *vars, int code, int gridID, int zaxisID,
 }
 
 void
-after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code,
-                     int gridID, int zaxisID, int levelID, size_t nmiss)
+after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code, int gridID, int zaxisID, int levelID,
+                     size_t nmiss)
 {
   int gridtype = gridInqType(gridID);
   int leveltype = zaxisInqType(zaxisID);
@@ -2770,20 +2486,17 @@ after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code,
       vars[code].sfit = TRUE;
       vars[code].hlev = nlevel;
       vars[code].plev = 1;
-      if (nlevel > 1 && leveltype == ZAXIS_HYBRID)
-        vars[code].plev = globs->NumLevelRequest;
+      if (nlevel > 1 && leveltype == ZAXIS_HYBRID) vars[code].plev = globs->NumLevelRequest;
 
       if (gridInqTrunc(gridID) != globs->Truncation)
-        Error("Resolution error. Required %d - Found %d", globs->Truncation,
-              gridInqTrunc(gridID));
+        Error("Resolution error. Required %d - Found %d", globs->Truncation, gridInqTrunc(gridID));
     }
   else
     {
       vars[code].hlev = nlevel;
       vars[code].plev = nlevel;
       vars[code].sfit = FALSE;
-      if (nlevel > 1 && leveltype == ZAXIS_HYBRID
-          && (nlevel == globs->NumLevel || nlevel == globs->NumLevel + 1))
+      if (nlevel > 1 && leveltype == ZAXIS_HYBRID && (nlevel == globs->NumLevel || nlevel == globs->NumLevel + 1))
         {
           vars[code].plev = globs->NumLevelRequest;
           vars[code].sfit = TRUE;
@@ -2800,8 +2513,7 @@ after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code,
 
           double *dataptr = vars[code].hybrid0 + dataOffset;
           for (size_t i = 0; i < gridSize; i++)
-            if (IS_NOT_EQUAL(dataptr[i], vars[code].missval))
-              vars[code].samp[i + dataOffset]++;
+            if (IS_NOT_EQUAL(dataptr[i], vars[code].missval)) vars[code].samp[i + dataOffset]++;
         }
     }
 }
@@ -2814,9 +2526,7 @@ MakeDependencies(struct Variable *vars, int varcode, int depcode)
       vars[depcode].needed = TRUE;
       vars[varcode].comp = TRUE;
 
-      if (afterDebug)
-        fprintf(stderr, "Needed code %d to compute code %d\n", depcode,
-                varcode);
+      if (afterDebug) fprintf(stderr, "Needed code %d to compute code %d\n", depcode, varcode);
 
       if (vars[depcode].ivarID == -1)
         {
@@ -2836,8 +2546,7 @@ MakeDependencies(struct Variable *vars, int varcode, int depcode)
         {
           if (vars[depcode].ivarID == -1)
             {
-              Error("code %d undefined, needed to compute code %d", depcode,
-                    varcode);
+              Error("code %d undefined, needed to compute code %d", depcode, varcode);
             }
           else
             {
@@ -3062,20 +2771,16 @@ after_EchamDependencies(struct Variable *vars, int ncodes, int type, int source)
   MakeDependencies(vars, NET_CLF, 224);
   MakeDependencies(vars, NET_CLF, 225);
 
-  if (vars[DPSDX].needed || vars[DPSDY].needed || vars[GEOPOTHEIGHT].comp
-      || vars[SLP].comp || vars[THETAF].needed || vars[HALF_PRESS].needed
-      || vars[RHUMIDITY].comp || vars[OMEGA].comp || type >= 30)
+  if (vars[DPSDX].needed || vars[DPSDY].needed || vars[GEOPOTHEIGHT].comp || vars[SLP].comp || vars[THETAF].needed
+      || vars[HALF_PRESS].needed || vars[RHUMIDITY].comp || vars[OMEGA].comp || type >= 30)
     vars[PS_PROG].comp = TRUE;
 
   CheckDependencies(vars, 0);
 }
 
-void after_legini_full(int ntr, int nlat, double *restrict poli,
-                       double *restrict pold, double *restrict pdev,
-                       double *restrict pol2, double *restrict pol3,
-                       double *restrict coslat);
-void after_legini(int ntr, int nlat, double *restrict poli,
-                  double *restrict pold, double *restrict coslat);
+void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
+                       double *restrict pol2, double *restrict pol3, double *restrict coslat);
+void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat);
 
 void
 after_legini_setup(struct Control *globs, struct Variable *vars)
@@ -3089,22 +2794,18 @@ after_legini_setup(struct Control *globs, struct Variable *vars)
 
   if (!globs->AnalysisData)
     {
-      if (globs->Type >= 20)
-        globs->pold = (double *) Malloc(pdim * sizeof(double));
-      if (vars[DPSDY].needed)
-        globs->pdev = (double *) Malloc(pdim * sizeof(double));
+      if (globs->Type >= 20) globs->pold = (double *) Malloc(pdim * sizeof(double));
+      if (vars[DPSDY].needed) globs->pdev = (double *) Malloc(pdim * sizeof(double));
     }
 
-  if ((vars[DIVERGENCE].needed || vars[VORTICITY].needed || vars[VELOPOT].needed
-       || vars[STREAM].needed)
+  if ((vars[DIVERGENCE].needed || vars[VORTICITY].needed || vars[VELOPOT].needed || vars[STREAM].needed)
       && globs->Type > 20)
     {
       globs->pol2 = (double *) Malloc(pdim * sizeof(double));
       globs->pol3 = (double *) Malloc(pdim * sizeof(double));
     }
 
-  if (globs->AnalysisData && (globs->Type == 70) && globs->Gaussian
-      && !globs->Spectral)
+  if (globs->AnalysisData && (globs->Type == 70) && globs->Gaussian && !globs->Spectral)
     {
       if (globs->poli)
         {
@@ -3129,8 +2830,7 @@ after_legini_setup(struct Control *globs, struct Variable *vars)
   // NULL && globs->pol3 == NULL ) flag = 0;
 
   if (flag)
-    after_legini_full(ntr, nlat, globs->poli, globs->pold, globs->pdev,
-                      globs->pol2, globs->pol3, globs->coslat);
+    after_legini_full(ntr, nlat, globs->poli, globs->pold, globs->pdev, globs->pol2, globs->pol3, globs->coslat);
   else
     after_legini(ntr, nlat, globs->poli, globs->pold, globs->coslat);
 

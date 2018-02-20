@@ -29,8 +29,7 @@ enum namelisttype
 enum namelisterr
 {
   NAMELIST_ERROR_INVAL = -1,  // Invalid character inside NAMELIST string/word
-  NAMELIST_ERROR_PART
-  = -2,  // The string is not a full NAMELIST packet, more bytes expected
+  NAMELIST_ERROR_PART = -2,   // The string is not a full NAMELIST packet, more bytes expected
   NAMELIST_ERROR_INKEY = -3,  // Invalid character inside NAMELIST key
   NAMELIST_ERROR_INTYP = -4,  // Invalid NAMELIST key type
   NAMELIST_ERROR_INOBJ = -5,  // Invalid NAMELIST object

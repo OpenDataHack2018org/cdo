@@ -68,12 +68,10 @@ Pressure(void *process)
   size_t gridsize = vlist_check_gridsize(vlistID1);
 
   int nhlev;
-  double *vct
-      = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
+  double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
 
   bool l3Dvars = (zaxisIDh != -1 && gridsize > 0);
-  if (!l3Dvars)
-    cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
+  if (!l3Dvars) cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
 
   double *ps_prog = (double *) Malloc(gridsize * sizeof(double));
   double *deltap = (double *) Malloc(gridsize * nhlevf * sizeof(double));
@@ -87,8 +85,7 @@ Pressure(void *process)
     }
   else
     {
-      if (cdoVerbose)
-        cdoPrint("Creating ZAXIS_HYBRID_HALF .. (nhlevh=%d)", nhlevh);
+      if (cdoVerbose) cdoPrint("Creating ZAXIS_HYBRID_HALF .. (nhlevh=%d)", nhlevh);
       zaxisIDp = zaxisCreate(ZAXIS_HYBRID_HALF, nhlevh);
     }
 
@@ -161,8 +158,7 @@ Pressure(void *process)
           vlistInqVarName(vlistID1, varID, varname);
           cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s "
                    "Varname = %s varID = %d",
-                   (int) mode, instNum, tableNum, code, paramstr, varname,
-                   varID);
+                   (int) mode, instNum, tableNum, code, paramstr, varname, varID);
         }
 
       if (code <= 0)
@@ -205,8 +201,7 @@ Pressure(void *process)
       if (gridInqType(gridID) == GRID_SPECTRAL)
         {
           lnpsID = -1;
-          cdoWarning("Spectral LOG(%s) not supported - using %s!",
-                     var_stdname(surface_air_pressure),
+          cdoWarning("Spectral LOG(%s) not supported - using %s!", var_stdname(surface_air_pressure),
                      var_stdname(surface_air_pressure));
         }
     }
@@ -214,14 +209,12 @@ Pressure(void *process)
   if (zaxisIDh != -1 && lnpsID == -1)
     {
       pvarID = psID;
-      if (psID == -1)
-        cdoAbort("%s not found!", var_stdname(surface_air_pressure));
+      if (psID == -1) cdoAbort("%s not found!", var_stdname(surface_air_pressure));
     }
 
   int gridID = vlistInqVarGrid(vlistID1, pvarID);
   if (gridInqType(gridID) == GRID_SPECTRAL)
-    cdoAbort("%s on spectral representation not supported!",
-             var_stdname(surface_air_pressure));
+    cdoAbort("%s on spectral representation not supported!", var_stdname(surface_air_pressure));
 
   double *pdata = (double *) Malloc(gridsize * sizeof(double));
 
@@ -267,8 +260,7 @@ Pressure(void *process)
           /* check range of ps_prog */
           arrayMinMaxMask(gridsize, ps_prog, NULL, &minval, &maxval);
           if (minval < MIN_PS || maxval > MAX_PS)
-            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval,
-                       maxval);
+            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           presh(full_press, half_press, vct, ps_prog, nhlevf, gridsize);
         }
@@ -284,8 +276,7 @@ Pressure(void *process)
           for (k = 0; k < nhlevf; ++k)
             for (size_t i = 0; i < gridsize; ++i)
               {
-                deltap[k * gridsize + i] = half_press[(k + 1) * gridsize + i]
-                                           - half_press[k * gridsize + i];
+                deltap[k * gridsize + i] = half_press[(k + 1) * gridsize + i] - half_press[k * gridsize + i];
               }
 
           pout = deltap;

@@ -68,8 +68,7 @@ EOF3d(void *process)
   int calendar = CALENDAR_STANDARD;
 
   double sum_w;
-  double **cov
-      = NULL; /* TODO: covariance matrix / eigenvectors after solving */
+  double **cov = NULL; /* TODO: covariance matrix / eigenvectors after solving */
   double *eigv;
 
   if (cdoTimer)
@@ -97,8 +96,7 @@ EOF3d(void *process)
 
   /*  eigenvalues */
 
-  if (operfunc == EOF3D_SPATIAL)
-    cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
+  if (operfunc == EOF3D_SPATIAL) cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
   int vlistID1 = cdoStreamInqVlist(streamID1);
@@ -166,8 +164,7 @@ EOF3d(void *process)
 
       for (int tsID = 0; tsID < nts; tsID++)
         {
-          datafields[varID][tsID]
-              = (double *) Malloc(temp_size * sizeof(double));
+          datafields[varID][tsID] = (double *) Malloc(temp_size * sizeof(double));
           for (size_t i = 0; i < temp_size; ++i)
             datafields[varID][tsID][i] = 0;
         }
@@ -182,8 +179,7 @@ EOF3d(void *process)
         {
           if (i < n_eig)
             {
-              eigenvectors[varID][i]
-                  = (double *) Malloc(temp_size * sizeof(double));
+              eigenvectors[varID][i] = (double *) Malloc(temp_size * sizeof(double));
               for (size_t i2 = 0; i2 < temp_size; ++i2)
                 eigenvectors[varID][i][i2] = missval;
             }
@@ -245,8 +241,7 @@ EOF3d(void *process)
                 }
               else
                 {
-                  if (datacounts[varID][offset + i] != 0)
-                    cdoAbort("Missing values unsupported!");
+                  if (datacounts[varID][offset + i] != 0) cdoAbort("Missing values unsupported!");
                   if (missval_warning == false)
                     {
                       // cdoWarning("Missing Value Support not checked for this
@@ -278,8 +273,7 @@ EOF3d(void *process)
           vlistInqVarName(vlistID1, varID, &vname[0]);
           cdoPrint("==========================================================="
                    "=================");
-          cdoPrint("Calculating covariance matrix and SVD for var%i (%s)",
-                   varID, vname);
+          cdoPrint("Calculating covariance matrix and SVD for var%i (%s)", varID, vname);
         }
 
       npack = 0;  // TODO already set to 0
@@ -320,8 +314,7 @@ EOF3d(void *process)
 
       if (cdoVerbose)
         {
-          cdoPrint("varID %i allocated eigv and cov with nts=%i and n=%i",
-                   varID, nts, n);
+          cdoPrint("varID %i allocated eigv and cov with nts=%i and n=%i", varID, nts, n);
           cdoPrint("   npack=%zu, nts=%i temp_size=%zu", npack, nts, temp_size);
         }
 
@@ -336,8 +329,7 @@ EOF3d(void *process)
               double *df2p = datafields[varID][j2];
               double sum = 0;
               for (size_t i = 0; i < npack; i++)
-                sum += weight[pack[i] % gridsizemax] * df1p[pack[i]]
-                       * df2p[pack[i]];
+                sum += weight[pack[i] % gridsizemax] * df1p[pack[i]] * df2p[pack[i]];
               cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
             }
         }
@@ -349,9 +341,7 @@ EOF3d(void *process)
 
       if (cdoTimer) timer_start(timer_eig);
 
-      if (cdoVerbose)
-        cdoPrint("Processed correlation matrix for var %2i | npack: %zu", varID,
-                 n);
+      if (cdoVerbose) cdoPrint("Processed correlation matrix for var %2i | npack: %zu", varID, n);
 
       if (eigen_mode == JACOBI)
         parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
@@ -359,9 +349,7 @@ EOF3d(void *process)
         eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
       /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
 
-      if (cdoVerbose)
-        cdoPrint("Processed SVD decomposition for var %d from %d x %d matrix",
-                 varID, n, n);
+      if (cdoVerbose) cdoPrint("Processed SVD decomposition for var %d from %d x %d matrix", varID, n, n);
 
       for (int eofID = 0; eofID < n; eofID++)
         eigenvalues[varID][eofID][0] = eigv[eofID];
@@ -373,8 +361,7 @@ EOF3d(void *process)
           double *eigenvec = eigenvectors[varID][eofID];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(varID, nts, eofID, npack, pack, cov, datafields, eigenvec)
+#pragma omp parallel for default(none) shared(varID, nts, eofID, npack, pack, cov, datafields, eigenvec)
 #endif
           for (size_t i = 0; i < npack; i++)
             {
@@ -389,11 +376,10 @@ EOF3d(void *process)
           double sum = 0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none)  shared(eigenvec,weight,pack,npack,gridsizemax) reduction(+:sum)
+#pragma omp parallel for default(none) shared(eigenvec, weight, pack, npack, gridsizemax) reduction(+ : sum)
 #endif
           for (size_t i = 0; i < npack; i++)
-            sum += weight[pack[i] % gridsizemax] * eigenvec[pack[i]]
-                   * eigenvec[pack[i]];
+            sum += weight[pack[i] % gridsizemax] * eigenvec[pack[i]] * eigenvec[pack[i]];
 
           if (sum > 0)
             {
@@ -445,9 +431,7 @@ EOF3d(void *process)
   double zvals = 0;
   zaxisDefLevels(zaxisID2, &zvals);
   zaxisDefName(zaxisID2, "zaxis_Reduced");
-  zaxisDefLongname(
-      zaxisID2,
-      "Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
+  zaxisDefLongname(zaxisID2, "Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
 
   int nzaxis = vlistNzaxis(vlistID2);
   for (int i = 0; i < nzaxis; i++)
@@ -493,11 +477,9 @@ EOF3d(void *process)
               size_t offset = levelID * gridsizemax;
               if (tsID < n_eig)
                 {
-                  nmiss = arrayNumMV(
-                      gridsizemax, &eigenvectors[varID][tsID][offset], missval);
+                  nmiss = arrayNumMV(gridsizemax, &eigenvectors[varID][tsID][offset], missval);
                   pstreamDefRecord(streamID3, varID, levelID);
-                  pstreamWriteRecord(streamID3,
-                                     &eigenvectors[varID][tsID][offset], nmiss);
+                  pstreamWriteRecord(streamID3, &eigenvectors[varID][tsID][offset], nmiss);
                 }
             }
 

@@ -55,8 +55,7 @@ Tocomplex(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  if (cdoFiletype() != CDI_FILETYPE_EXT)
-    cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
+  if (cdoFiletype() != CDI_FILETYPE_EXT) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 

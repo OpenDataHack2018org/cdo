@@ -88,10 +88,8 @@ Pinfo(void *process)
                                 "Level    Size    Miss :"
                                 "     Minimum        Mean     Maximum\n");
               else
-                fprintf(
-                    stdout,
-                    "   Rec :       Date  Time    Code  Level    Size    Miss :"
-                    "     Minimum        Mean     Maximum\n");
+                fprintf(stdout, "   Rec :       Date  Time    Code  Level    Size    Miss :"
+                                "     Minimum        Mean     Maximum\n");
             }
 
           pstreamInqRecord(streamID1, &varID, &levelID);
@@ -107,8 +105,7 @@ Pinfo(void *process)
           if (operatorID == PINFOV) vlistInqVarName(vlistID1, varID, varname);
 
           if (operatorID == PINFOV)
-            fprintf(stdout, "%6d :%s %s %-8s ", indg, vdatestr, vtimestr,
-                    varname);
+            fprintf(stdout, "%6d :%s %s %-8s ", indg, vdatestr, vtimestr, varname);
           else
             fprintf(stdout, "%6d :%s %s %3d", indg, vdatestr, vtimestr, code);
 
@@ -117,8 +114,7 @@ Pinfo(void *process)
 
           fprintf(stdout, "%7zu %7zu :", gridsize, nmiss);
 
-          if (gridInqType(gridID) == GRID_SPECTRAL
-              || (gridsize == 1 && nmiss == 0))
+          if (gridInqType(gridID) == GRID_SPECTRAL || (gridsize == 1 && nmiss == 0))
             {
               fprintf(stdout, "            %#12.5g\n", array1[0]);
             }
@@ -126,8 +122,7 @@ Pinfo(void *process)
             {
               if (nmiss > 0)
                 {
-                  ivals = arrayMinMaxMeanMV(gridsize, array1, missval, &arrmin,
-                                            &arrmax, &arrmean);
+                  ivals = arrayMinMaxMeanMV(gridsize, array1, missval, &arrmin, &arrmax, &arrmean);
                   imiss = gridsize - ivals;
                   gridsize = ivals;
                 }
@@ -138,17 +133,14 @@ Pinfo(void *process)
 
               if (gridsize)
                 {
-                  fprintf(stdout, "%#12.5g%#12.5g%#12.5g\n", arrmin, arrmean,
-                          arrmax);
+                  fprintf(stdout, "%#12.5g%#12.5g%#12.5g\n", arrmin, arrmean, arrmax);
                 }
               else
                 {
                   fprintf(stdout, "                     nan\n");
                 }
 
-              if (imiss != nmiss && nmiss > 0)
-                fprintf(stdout, "Found %zu of %zu missing values!\n", imiss,
-                        nmiss);
+              if (imiss != nmiss && nmiss > 0) fprintf(stdout, "Found %zu of %zu missing values!\n", imiss, nmiss);
             }
 
           arrayCopy(gridsize, array1, array2);

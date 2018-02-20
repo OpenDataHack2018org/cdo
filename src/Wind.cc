@@ -103,8 +103,7 @@ Wind(void *process)
           else if (code == 132)
             varID2 = varID;
         }
-      else if (operatorID == DV2UV || operatorID == DV2UVL
-               || operatorID == DV2PS)
+      else if (operatorID == DV2UV || operatorID == DV2UVL || operatorID == DV2PS)
         {
           /* search for divergence and vorticity */
           if (pdis != 255)  // GRIB2
@@ -171,8 +170,7 @@ Wind(void *process)
         {
           gridID1 = vlistInqVarGrid(vlistID1, varID1);
 
-          if (gridInqType(gridID1) != GRID_GAUSSIAN)
-            cdoAbort("U-wind is not on Gaussian grid!");
+          if (gridInqType(gridID1) != GRID_GAUSSIAN) cdoAbort("U-wind is not on Gaussian grid!");
 
           if (gridID1 != vlistInqVarGrid(vlistID1, varID2))
             cdoAbort("U and V wind must have the same grid represention!");
@@ -195,8 +193,7 @@ Wind(void *process)
                 }
             }
 
-          if (gridIDsp == -1
-              && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED)
+          if (gridIDsp == -1 && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED)
             cdoAbort("Gaussian reduced grid found. Use option -R to convert it "
                      "to a regular grid!");
 
@@ -231,8 +228,7 @@ Wind(void *process)
         {
           gridID1 = vlistInqVarGrid(vlistID1, varID2);
 
-          if (gridInqType(gridID1) != GRID_SPECTRAL)
-            cdoAbort("Vorticity is not on spectral grid!");
+          if (gridInqType(gridID1) != GRID_SPECTRAL) cdoAbort("Vorticity is not on spectral grid!");
 
           if (gridID1 != vlistInqVarGrid(vlistID1, varID1))
             cdoAbort("Divergence and vorticity must have the same grid "
@@ -253,11 +249,9 @@ Wind(void *process)
               char gridname[20];
 
               if (operatorID == DV2UV)
-                snprintf(gridname, sizeof(gridname), "t%dgrid",
-                         gridInqTrunc(gridIDsp));
+                snprintf(gridname, sizeof(gridname), "t%dgrid", gridInqTrunc(gridIDsp));
               else
-                snprintf(gridname, sizeof(gridname), "tl%dgrid",
-                         gridInqTrunc(gridIDsp));
+                snprintf(gridname, sizeof(gridname), "tl%dgrid", gridInqTrunc(gridIDsp));
 
               gridIDgp = grid_from_name(gridname);
             }
@@ -292,8 +286,7 @@ Wind(void *process)
         {
           gridID1 = vlistInqVarGrid(vlistID1, varID2);
 
-          if (gridInqType(gridID1) != GRID_SPECTRAL)
-            cdoAbort("Vorticity is not on spectral grid!");
+          if (gridInqType(gridID1) != GRID_SPECTRAL) cdoAbort("Vorticity is not on spectral grid!");
 
           if (gridID1 != vlistInqVarGrid(vlistID1, varID1))
             cdoAbort("Divergence and vorticity must have the same grid "
@@ -343,12 +336,10 @@ Wind(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          if ((varID1 != -1 && varID2 != -1)
-              && (varID == varID1 || varID == varID2))
+          if ((varID1 != -1 && varID2 != -1) && (varID == varID1 || varID == varID2))
             {
               pstreamReadRecord(streamID1, array1, &nmiss);
-              if (nmiss)
-                cdoAbort("Missing values unsupported for spectral data!");
+              if (nmiss) cdoAbort("Missing values unsupported for spectral data!");
 
               gridsize = gridInqSize(gridID1);
               offset = gridsize * levelID;
@@ -376,11 +367,9 @@ Wind(void *process)
       if (varID1 != -1 && varID2 != -1)
         {
           if (operatorID == UV2DV || operatorID == UV2DVL)
-            trans_uv2dv(sptrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1,
-                        ovar2);
+            trans_uv2dv(sptrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
           else if (operatorID == DV2UV || operatorID == DV2UVL)
-            trans_dv2uv(sptrans, dvtrans, nlev, gridID1, ivar1, ivar2, gridID2,
-                        ovar1, ovar2);
+            trans_dv2uv(sptrans, dvtrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
           else if (operatorID == DV2PS)
             {
               dv2ps(ivar1, ovar1, nlev, ntr);
@@ -388,8 +377,7 @@ Wind(void *process)
             }
 
           gridsize = gridInqSize(gridID2);
-          if (operatorID == UV2DV || operatorID == UV2DVL
-              || operatorID == DV2PS)
+          if (operatorID == UV2DV || operatorID == UV2DVL || operatorID == DV2PS)
             {
               for (levelID = 0; levelID < nlev; levelID++)
                 {

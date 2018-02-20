@@ -123,8 +123,7 @@ long find_element(double x, long nelem, const double *array)
 */
 
 int
-rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm,
-                 size_t nym, const double *restrict xm,
+rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, size_t nym, const double *restrict xm,
                  const double *restrict ym)
 {
   constexpr double rtol = 1.e-12;
@@ -145,8 +144,7 @@ rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm,
 }
 
 int
-rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm,
-                  const double *restrict xm)
+rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm)
 {
   int lfound = 0;
   *imin = nxm;
@@ -197,8 +195,7 @@ rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm,
 }
 
 double
-intlinarr2p(long nxm, long nym, double **fieldm, const double *xm,
-            const double *ym, double x, double y)
+intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double *ym, double x, double y)
 {
   long ii, jj;
   double value = 0;
@@ -211,23 +208,18 @@ intlinarr2p(long nxm, long nym, double **fieldm, const double *xm,
 
   if (jj < nym && ii < nxm)
     {
-      value = fieldm[jj - 1][ii - 1] * (x - xm[ii]) * (y - ym[jj])
-                  / ((xm[ii - 1] - xm[ii]) * (ym[jj - 1] - ym[jj]))
-              + fieldm[jj - 1][ii] * (x - xm[ii - 1]) * (y - ym[jj])
-                    / ((xm[ii] - xm[ii - 1]) * (ym[jj - 1] - ym[jj]))
-              + fieldm[jj][ii - 1] * (x - xm[ii]) * (y - ym[jj - 1])
-                    / ((xm[ii - 1] - xm[ii]) * (ym[jj] - ym[jj - 1]))
-              + fieldm[jj][ii] * (x - xm[ii - 1]) * (y - ym[jj - 1])
-                    / ((xm[ii] - xm[ii - 1]) * (ym[jj] - ym[jj - 1]));
+      value = fieldm[jj - 1][ii - 1] * (x - xm[ii]) * (y - ym[jj]) / ((xm[ii - 1] - xm[ii]) * (ym[jj - 1] - ym[jj]))
+              + fieldm[jj - 1][ii] * (x - xm[ii - 1]) * (y - ym[jj]) / ((xm[ii] - xm[ii - 1]) * (ym[jj - 1] - ym[jj]))
+              + fieldm[jj][ii - 1] * (x - xm[ii]) * (y - ym[jj - 1]) / ((xm[ii - 1] - xm[ii]) * (ym[jj] - ym[jj - 1]))
+              + fieldm[jj][ii] * (x - xm[ii - 1]) * (y - ym[jj - 1]) / ((xm[ii] - xm[ii - 1]) * (ym[jj] - ym[jj - 1]));
     }
 
   return value;
 }
 
 static void
-intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym,
-           const double *restrict fieldm, const double *restrict xm,
-           const double *restrict ym, size_t gridsize2, double *field,
+intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym, const double *restrict fieldm,
+           const double *restrict xm, const double *restrict ym, size_t gridsize2, double *field,
            const double *restrict x, const double *restrict y)
 {
   size_t nlon1 = nxm;
@@ -239,8 +231,7 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym,
   bool *grid1_mask = (bool *) Malloc(gridsize1 * sizeof(bool));
   for (size_t jj = 0; jj < nym; ++jj)
     for (size_t ii = 0; ii < nlon1; ++ii)
-      grid1_mask[jj * nlon1 + ii]
-          = !DBL_IS_EQUAL(fieldm[jj * nlon1 + ii], missval);
+      grid1_mask[jj * nlon1 + ii] = !DBL_IS_EQUAL(fieldm[jj * nlon1 + ii], missval);
 
   progressInit();
 
@@ -279,14 +270,10 @@ intlinarr2(double missval, int lon_is_circular, size_t nxm, size_t nym,
       if (lfound)
         {
           double wgts[4];
-          wgts[0] = (x[i] - xm[ii]) * (y[i] - ym[jj])
-                    / ((xm[ii - 1] - xm[ii]) * (ym[jj - 1] - ym[jj]));
-          wgts[1] = (x[i] - xm[ii - 1]) * (y[i] - ym[jj])
-                    / ((xm[ii] - xm[ii - 1]) * (ym[jj - 1] - ym[jj]));
-          wgts[3] = (x[i] - xm[ii - 1]) * (y[i] - ym[jj - 1])
-                    / ((xm[ii] - xm[ii - 1]) * (ym[jj] - ym[jj - 1]));
-          wgts[2] = (x[i] - xm[ii]) * (y[i] - ym[jj - 1])
-                    / ((xm[ii - 1] - xm[ii]) * (ym[jj] - ym[jj - 1]));
+          wgts[0] = (x[i] - xm[ii]) * (y[i] - ym[jj]) / ((xm[ii - 1] - xm[ii]) * (ym[jj - 1] - ym[jj]));
+          wgts[1] = (x[i] - xm[ii - 1]) * (y[i] - ym[jj]) / ((xm[ii] - xm[ii - 1]) * (ym[jj - 1] - ym[jj]));
+          wgts[3] = (x[i] - xm[ii - 1]) * (y[i] - ym[jj - 1]) / ((xm[ii] - xm[ii - 1]) * (ym[jj] - ym[jj - 1]));
+          wgts[2] = (x[i] - xm[ii]) * (y[i] - ym[jj - 1]) / ((xm[ii - 1] - xm[ii]) * (ym[jj] - ym[jj - 1]));
           /*
           double wgts0, wgts1, wgts2, wgts3, iw, jw;
           rect_find_ij_weights(x[i], y[i], ii, jj, xm, ym, &iw, &jw);
@@ -339,8 +326,7 @@ intlinarr(long nxm, double *ym, double *xm, int nx, double *y, double *x)
   */
   for (long jj = 1; jj < nxm; jj++)
     for (long j = 0; j < nx; j++)
-      if (x[j] >= xm[jj - 1] && x[j] <= xm[jj])
-        y[j] = intlin(x[j], ym[jj - 1], xm[jj - 1], ym[jj], xm[jj]);
+      if (x[j] >= xm[jj - 1] && x[j] <= xm[jj]) y[j] = intlin(x[j], ym[jj - 1], xm[jj - 1], ym[jj], xm[jj]);
 }
 
 void
@@ -359,8 +345,7 @@ intgridbil(field_type *field1, field_type *field2)
   int lon_is_circular = 0;
 
   bool lgeorefgrid = true;
-  if (grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2))
-    lgeorefgrid = false;
+  if (grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2)) lgeorefgrid = false;
 
   double **array1_2D = (double **) Malloc(nlat1 * sizeof(double *));
   for (size_t ilat = 0; ilat < nlat1; ilat++)
@@ -414,8 +399,7 @@ intgridbil(field_type *field1, field_type *field2)
           double **field = array1_2D;
           array1_2D = (double **) Malloc(nlat1 * sizeof(double *));
           lon1 = (double *) Realloc(lon1, (nlon1 + 1) * sizeof(double));
-          double *array
-              = (double *) Malloc(nlat1 * (nlon1 + 1) * sizeof(double));
+          double *array = (double *) Malloc(nlat1 * (nlon1 + 1) * sizeof(double));
 
           for (size_t ilat = 0; ilat < nlat1; ilat++)
             {
@@ -430,13 +414,10 @@ intgridbil(field_type *field1, field_type *field2)
         }
 
       if (lon2 < lon1[0] || lon2 > lon1[nlon1 - 1])
-        cdoAbort("Longitude %f out of bounds (%f to %f)!", lon2, lon1[0],
-                 lon1[nlon1 - 1]);
+        cdoAbort("Longitude %f out of bounds (%f to %f)!", lon2, lon1[0], lon1[nlon1 - 1]);
 
-      if (lat2 < MIN(lat1[0], lat1[nlat1 - 1])
-          || lat2 > MAX(lat1[0], lat1[nlat1 - 1]))
-        cdoAbort("Latitude %f out of bounds (%f to %f)!", lat2, lat1[0],
-                 lat1[nlat1 - 1]);
+      if (lat2 < MIN(lat1[0], lat1[nlat1 - 1]) || lat2 > MAX(lat1[0], lat1[nlat1 - 1]))
+        cdoAbort("Latitude %f out of bounds (%f to %f)!", lat2, lat1[0], lat1[nlat1 - 1]);
 
       *array2 = intlinarr2p(nlon1, nlat1, array1_2D, lon1, lat1, lon2, lat2);
       /*
@@ -447,11 +428,9 @@ intgridbil(field_type *field1, field_type *field2)
     {
       if (lgeorefgrid)
         {
-          if (gridInqType(gridID2) == GRID_GME)
-            gridID2 = gridToUnstructured(gridID2, 0);
+          if (gridInqType(gridID2) == GRID_GME) gridID2 = gridToUnstructured(gridID2, 0);
 
-          if (gridInqType(gridID2) != GRID_UNSTRUCTURED
-              && gridInqType(gridID2) != GRID_CURVILINEAR)
+          if (gridInqType(gridID2) != GRID_UNSTRUCTURED && gridInqType(gridID2) != GRID_CURVILINEAR)
             gridID2 = gridToCurvilinear(gridID2, 0);
 
           if (!(gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)))
@@ -498,8 +477,7 @@ intgridbil(field_type *field1, field_type *field2)
           Free(ycoord);
         }
 
-      intlinarr2(missval, lon_is_circular, nlon1, nlat1, array1, lon1, lat1,
-                 gridsize2, array2, xvals2, yvals2);
+      intlinarr2(missval, lon_is_circular, nlon1, nlat1, array1, lon1, lat1, gridsize2, array2, xvals2, yvals2);
 
       field2->nmiss = arrayNumMV(gridsize2, array2, missval);
 
@@ -565,11 +543,9 @@ interpolate(field_type *field1, field_type *field2)
   lon = lon_array + 1;
   lat = lat_array + 1;
 
-  if (!(gridInqXvals(gridIDi, NULL) && gridInqYvals(gridIDi, NULL)))
-    cdoAbort("Source grid has no values");
+  if (!(gridInqXvals(gridIDi, NULL) && gridInqYvals(gridIDi, NULL))) cdoAbort("Source grid has no values");
 
-  if (!(gridInqXvals(gridIDo, NULL) && gridInqYvals(gridIDo, NULL)))
-    cdoAbort("Target grid has no values");
+  if (!(gridInqXvals(gridIDo, NULL) && gridInqYvals(gridIDo, NULL))) cdoAbort("Target grid has no values");
 
   gridInqXvals(gridIDi, lon);
   gridInqYvals(gridIDi, lat);
@@ -585,11 +561,8 @@ interpolate(field_type *field1, field_type *field2)
 
   if (nlon > 1)
     {
-      lon[-1] = lon[nlon - 1] - 360 > 2 * lon[0] - lon[1] ? lon[nlon - 1] - 360
-                                                          : 2 * lon[0] - lon[1];
-      lon[nlon] = lon[0] + 360 < 2 * lon[nlon - 1] - lon[nlon - 2]
-                      ? lon[0] + 360
-                      : 2 * lon[nlon - 1] - lon[nlon - 2];
+      lon[-1] = lon[nlon - 1] - 360 > 2 * lon[0] - lon[1] ? lon[nlon - 1] - 360 : 2 * lon[0] - lon[1];
+      lon[nlon] = lon[0] + 360 < 2 * lon[nlon - 1] - lon[nlon - 2] ? lon[0] + 360 : 2 * lon[nlon - 1] - lon[nlon - 2];
     }
   else
     {
@@ -613,11 +586,9 @@ interpolate(field_type *field1, field_type *field2)
   if (lat[nlat] < -90) lat[nlat] = -99;
   if (lat[nlat] > 90) lat[nlat] = 99;
 
-  lono_array
-      = (double *) Malloc((out_nlon < 2 ? 4 : out_nlon + 2) * sizeof(double));
+  lono_array = (double *) Malloc((out_nlon < 2 ? 4 : out_nlon + 2) * sizeof(double));
   lono = lono_array + 1;
-  lato_array
-      = (double *) Malloc((out_nlat < 2 ? 4 : out_nlat + 2) * sizeof(double));
+  lato_array = (double *) Malloc((out_nlat < 2 ? 4 : out_nlat + 2) * sizeof(double));
   lato = lato_array + 1;
 
   gridInqXvals(gridIDo, lono);
@@ -643,19 +614,16 @@ interpolate(field_type *field1, field_type *field2)
     }
 
   if (lono[out_nlon - 1] - lono[0] >= 360)
-    cdoAbort(
-        "The area covered by the longitudes of output grid must not overlap!");
+    cdoAbort("The area covered by the longitudes of output grid must not overlap!");
 
-  if (lato[0] > 90.001 || lato[out_nlat - 1] > 90.001 || lato[0] < -90.001
-      || lato[out_nlat - 1] < -90.001)
+  if (lato[0] > 90.001 || lato[out_nlat - 1] > 90.001 || lato[0] < -90.001 || lato[out_nlat - 1] < -90.001)
     {
       cdoAbort("Latitudes of output grid must be between 90 and -90!");
     }
 
   for (i = 0; i < out_nlat - 1; i++)
     if (IS_EQUAL(lato[i + 1], lato[i])
-        || (i < out_nlat - 2
-            && ((lato[i + 1] > lato[i]) != (lato[i + 2] > lato[i + 1]))))
+        || (i < out_nlat - 2 && ((lato[i + 1] > lato[i]) != (lato[i + 2] > lato[i + 1]))))
       {
         cdoAbort("Latitudes of output grid must be in descending or ascending "
                  "order!");
@@ -663,13 +631,10 @@ interpolate(field_type *field1, field_type *field2)
 
   if (out_nlon > 1)
     {
-      lono[-1] = lono[out_nlon - 1] - 360 > 2 * lono[0] - lono[1]
-                     ? lono[out_nlon - 1] - 360
-                     : 2 * lono[0] - lono[1];
-      lono[out_nlon]
-          = lono[0] + 360 < 2 * lono[out_nlon - 1] - lono[out_nlon - 2]
-                ? lono[0] + 360
-                : 2 * lono[out_nlon - 1] - lono[out_nlon - 2];
+      lono[-1] = lono[out_nlon - 1] - 360 > 2 * lono[0] - lono[1] ? lono[out_nlon - 1] - 360 : 2 * lono[0] - lono[1];
+      lono[out_nlon] = lono[0] + 360 < 2 * lono[out_nlon - 1] - lono[out_nlon - 2]
+                           ? lono[0] + 360
+                           : 2 * lono[out_nlon - 1] - lono[out_nlon - 2];
     }
   else
     {
@@ -808,9 +773,7 @@ interpolate(field_type *field1, field_type *field2)
   for (olat = 0; olat < out_nlat; olat++)
     xout[olat] = arrayOut + olat * out_nlon;
 
-  wrap_around = nlon > 1
-                && (lon[nlon - 1] >= lon[-1] + 360 - 0.001
-                    || lon[nlon] >= lon[0] + 360 - 0.001);
+  wrap_around = nlon > 1 && (lon[nlon - 1] >= lon[-1] + 360 - 0.001 || lon[nlon] >= lon[0] + 360 - 0.001);
 
   for (ilat = 0; ilat < nlat; ilat++)
     for (ilon = 0; ilon < nlon; ilon++)
@@ -844,8 +807,7 @@ interpolate(field_type *field1, field_type *field2)
             sum += xin[ilat][ilon - 1];
             n++;
           }
-        if (ilon == 0 && wrap_around
-            && !DBL_IS_EQUAL(xin[ilat][2 * nlon - 1], missval))
+        if (ilon == 0 && wrap_around && !DBL_IS_EQUAL(xin[ilat][2 * nlon - 1], missval))
           {
             sum += xin[ilat][2 * nlon - 1];
             n++;
@@ -855,8 +817,7 @@ interpolate(field_type *field1, field_type *field2)
             sum += xin[ilat][ilon + 1];
             n++;
           }
-        if (ilon == nxlon - 1 && wrap_around
-            && !DBL_IS_EQUAL(xin[ilat][1], missval))
+        if (ilon == nxlon - 1 && wrap_around && !DBL_IS_EQUAL(xin[ilat][1], missval))
           {
             sum += xin[ilat][1];
             n++;
@@ -874,8 +835,7 @@ interpolate(field_type *field1, field_type *field2)
             sum += xin[ilat][ilon - 1];
             n++;
           }
-        if (ilon == 0 && wrap_around
-            && !DBL_IS_EQUAL(xin[ilat][2 * nlon - 1], missval))
+        if (ilon == 0 && wrap_around && !DBL_IS_EQUAL(xin[ilat][2 * nlon - 1], missval))
           {
             sum += xin[ilat][2 * nlon - 1];
             n++;
@@ -885,8 +845,7 @@ interpolate(field_type *field1, field_type *field2)
             sum += xin[ilat][ilon + 1];
             n++;
           }
-        if (ilon == nxlon - 1 && wrap_around
-            && !DBL_IS_EQUAL(xin[ilat][1], missval))
+        if (ilon == nxlon - 1 && wrap_around && !DBL_IS_EQUAL(xin[ilat][1], missval))
           {
             sum += xin[ilat][1];
             n++;
@@ -964,15 +923,12 @@ interpolate(field_type *field1, field_type *field2)
                           a21 = xin[ilat - 1][ilon - 1];
                           a22 = xin[ilat - 1][ilon];
                         }
-                      if (DBL_IS_EQUAL(a11, missval)
-                          || DBL_IS_EQUAL(a12, missval)
-                          || DBL_IS_EQUAL(a21, missval)
+                      if (DBL_IS_EQUAL(a11, missval) || DBL_IS_EQUAL(a12, missval) || DBL_IS_EQUAL(a21, missval)
                           || DBL_IS_EQUAL(a22, missval))
                         {
                           continue;
                         }
-                      if (volon1 <= vilon1 && vilon2 <= volon2
-                          && volat1 <= vilat1 && vilat2 <= volat2)
+                      if (volon1 <= vilon1 && vilon2 <= volon2 && volat1 <= vilat1 && vilat2 <= volat2)
                         {
                           vlon1 = vilon1 * M_PI / 180;
                           vlon2 = vilon2 * M_PI / 180;
@@ -989,8 +945,7 @@ interpolate(field_type *field1, field_type *field2)
                           vlon2 = (vilon2 <= volon2 ? vilon2 : volon2);
                           vlat1 = (volat1 <= vilat1 ? vilat1 : volat1);
                           vlat2 = (vilat2 <= volat2 ? vilat2 : volat2);
-                          if (vlon1 >= vlon2 - (volon2 - volon1) * 1e-5
-                              || vlat1 >= vlat2 - (volat2 - volat1) * 1e-5)
+                          if (vlon1 >= vlon2 - (volon2 - volon1) * 1e-5 || vlat1 >= vlat2 - (volat2 - volat1) * 1e-5)
                             {
                               continue;
                             }
@@ -1002,25 +957,18 @@ interpolate(field_type *field1, field_type *field2)
                           vlon2 *= M_PI / 180;
                           vlat1 *= M_PI / 180;
                           vlat2 *= M_PI / 180;
-                          b11 = a11 + (a12 - a11) * faclon1
-                                + (a21 - a11) * faclat1
+                          b11 = a11 + (a12 - a11) * faclon1 + (a21 - a11) * faclat1
                                 + (a22 - a12 - a21 + a11) * faclon1 * faclat1;
-                          b12 = a11 + (a12 - a11) * faclon2
-                                + (a21 - a11) * faclat1
+                          b12 = a11 + (a12 - a11) * faclon2 + (a21 - a11) * faclat1
                                 + (a22 - a12 - a21 + a11) * faclon2 * faclat1;
-                          b21 = a11 + (a12 - a11) * faclon1
-                                + (a21 - a11) * faclat2
+                          b21 = a11 + (a12 - a11) * faclon1 + (a21 - a11) * faclat2
                                 + (a22 - a12 - a21 + a11) * faclon1 * faclat2;
-                          b22 = a11 + (a12 - a11) * faclon2
-                                + (a21 - a11) * faclat2
+                          b22 = a11 + (a12 - a11) * faclon2 + (a21 - a11) * faclat2
                                 + (a22 - a12 - a21 + a11) * faclon2 * faclat2;
                         }
                       wsum += (vlon2 - vlon1) * (sin(vlat2) - sin(vlat1));
-                      t = 2 * sin((vlat2 + vlat1) / 2)
-                          * sin((vlat2 - vlat1) / 2) / (vlat2 - vlat1);
-                      sum += (vlon2 - vlon1) / 2
-                             * ((b11 + b12) * (t - sin(vlat1))
-                                + (b21 + b22) * (sin(vlat2) - t));
+                      t = 2 * sin((vlat2 + vlat1) / 2) * sin((vlat2 - vlat1) / 2) / (vlat2 - vlat1);
+                      sum += (vlon2 - vlon1) / 2 * ((b11 + b12) * (t - sin(vlat1)) + (b21 + b22) * (sin(vlat2) - t));
                     }
                 }
             }
@@ -1076,13 +1024,10 @@ contrast(void)
   static double flat00, flat01, flat10, flat11;
   static long ilon, ilat;
   static int determine_matrix, wrap_around, stop_iteration;
-  static double table[2][2][2][4] = {
-    { { { 8 / 32., 8 / 32., 8 / 32., 8 / 32. },
-        { 12 / 32., 8 / 32., 0, 12 / 32. } },
-      { { 12 / 32., 0, 8 / 32., 12 / 32. }, { 16 / 32., 0, 0, 16 / 32. } } },
-    { { { 0, 12 / 32., 12 / 32., 8 / 32. }, { 0, 16 / 32., 0, 16 / 32. } },
-      { { 0, 0, 16 / 32., 16 / 32. }, { 0, 0, 0, 32 / 32. } } }
-  };
+  static double table[2][2][2][4] = { { { { 8 / 32., 8 / 32., 8 / 32., 8 / 32. }, { 12 / 32., 8 / 32., 0, 12 / 32. } },
+                                        { { 12 / 32., 0, 8 / 32., 12 / 32. }, { 16 / 32., 0, 0, 16 / 32. } } },
+                                      { { { 0, 12 / 32., 12 / 32., 8 / 32. }, { 0, 16 / 32., 0, 16 / 32. } },
+                                        { { 0, 0, 16 / 32., 16 / 32. }, { 0, 0, 0, 32 / 32. } } } };
   static double *case_table;
   static double f;
   static double nom, denom, a, b;
@@ -1116,9 +1061,7 @@ contrast(void)
           for (ilat = 0; ilat < nlat; ilat++)
             xwork[j][ilat] = work[j] + ilat * nlon;
         }
-      wrap_around = nlon > 1
-                    && (lon[nlon - 1] >= lon[-1] + 360 - 0.001
-                        || lon[nlon] >= lon[0] + 360 - 0.001);
+      wrap_around = nlon > 1 && (lon[nlon - 1] >= lon[-1] + 360 - 0.001 || lon[nlon] >= lon[0] + 360 - 0.001);
       determine_matrix = TRUE;
     }
   else
@@ -1163,13 +1106,9 @@ contrast(void)
               lat2 = (lat[ilat + 1] * M_PI / 180 + lat1) / 2;
               dslat0 = sin(lat1) - sin(lat0);
               dslat1 = sin(lat2) - sin(lat1);
-              flat00 = 2 / (lat1 - lat0) * sin((lat1 + lat0) / 2)
-                           * sin((lat1 - lat0) / 2)
-                       - sin(lat0);
+              flat00 = 2 / (lat1 - lat0) * sin((lat1 + lat0) / 2) * sin((lat1 - lat0) / 2) - sin(lat0);
               flat01 = dslat0 - flat00;
-              flat10 = 2 / (lat2 - lat1) * sin((lat2 + lat1) / 2)
-                           * sin((lat2 - lat1) / 2)
-                       - sin(lat1);
+              flat10 = 2 / (lat2 - lat1) * sin((lat2 + lat1) / 2) * sin((lat2 - lat1) / 2) - sin(lat1);
               flat11 = dslat1 - flat10;
               flat00 /= 2;
               flat01 /= 2;
@@ -1178,10 +1117,8 @@ contrast(void)
               if (DBL_IS_EQUAL(xin[ilat][ilon], missval))
                 {
                   xwork[4][ilat][ilon] = 1;
-                  xwork[0][ilat][ilon] = xwork[1][ilat][ilon]
-                      = xwork[2][ilat][ilon] = xwork[3][ilat][ilon]
-                      = xwork[5][ilat][ilon] = xwork[6][ilat][ilon]
-                      = xwork[7][ilat][ilon] = xwork[8][ilat][ilon] = 0;
+                  xwork[0][ilat][ilon] = xwork[1][ilat][ilon] = xwork[2][ilat][ilon] = xwork[3][ilat][ilon]
+                      = xwork[5][ilat][ilon] = xwork[6][ilat][ilon] = xwork[7][ilat][ilon] = xwork[8][ilat][ilon] = 0;
                 }
               else
                 {
@@ -1214,8 +1151,7 @@ contrast(void)
                     }
                   case_table
                       = table[DBL_IS_EQUAL(xin[ilat - 1][ilon - 1], missval)]
-                             [DBL_IS_EQUAL(xin[ilat - 1][ilon], missval)]
-                             [DBL_IS_EQUAL(xin[ilat][ilon - 1], missval)];
+                             [DBL_IS_EQUAL(xin[ilat - 1][ilon], missval)][DBL_IS_EQUAL(xin[ilat][ilon - 1], missval)];
                   f = dlon0 * flat00;
                   a0 = case_table[0] * f;
                   a1 += case_table[1] * f;
@@ -1250,8 +1186,7 @@ contrast(void)
                     }
                   case_table
                       = table[DBL_IS_EQUAL(xin[ilat - 1][ilon + 1], missval)]
-                             [DBL_IS_EQUAL(xin[ilat - 1][ilon], missval)]
-                             [DBL_IS_EQUAL(xin[ilat][ilon + 1], missval)];
+                             [DBL_IS_EQUAL(xin[ilat - 1][ilon], missval)][DBL_IS_EQUAL(xin[ilat][ilon + 1], missval)];
                   f = dlon1 * flat00;
                   a2 = case_table[0] * f;
                   a1 += case_table[1] * f;
@@ -1287,8 +1222,7 @@ contrast(void)
 
                   case_table
                       = table[DBL_IS_EQUAL(xin[ilat + 1][ilon - 1], missval)]
-                             [DBL_IS_EQUAL(xin[ilat + 1][ilon], missval)]
-                             [DBL_IS_EQUAL(xin[ilat][ilon - 1], missval)];
+                             [DBL_IS_EQUAL(xin[ilat + 1][ilon], missval)][DBL_IS_EQUAL(xin[ilat][ilon - 1], missval)];
                   f = dlon0 * flat11;
                   a6 = case_table[0] * f;
                   a7 += case_table[1] * f;
@@ -1324,8 +1258,7 @@ contrast(void)
 
                   case_table
                       = table[DBL_IS_EQUAL(xin[ilat + 1][ilon + 1], missval)]
-                             [DBL_IS_EQUAL(xin[ilat + 1][ilon], missval)]
-                             [DBL_IS_EQUAL(xin[ilat][ilon + 1], missval)];
+                             [DBL_IS_EQUAL(xin[ilat + 1][ilon], missval)][DBL_IS_EQUAL(xin[ilat][ilon + 1], missval)];
                   f = dlon1 * flat11;
                   a8 = case_table[0] * f;
                   a7 += case_table[1] * f;
@@ -1387,14 +1320,10 @@ contrast(void)
     for (ilon = 0; ilon < nlon; ilon++)
       r[ilat][ilon] = r_bar[ilat][ilon] = p[ilat][ilon] = p_bar[ilat][ilon]
           = xin[ilat][ilon]
-            - (xwork[0][ilat][ilon] * xin[ilat - 1][ilon - 1]
-               + xwork[1][ilat][ilon] * xin[ilat - 1][ilon]
-               + xwork[2][ilat][ilon] * xin[ilat - 1][ilon + 1]
-               + xwork[3][ilat][ilon] * xin[ilat][ilon - 1]
-               + xwork[4][ilat][ilon] * xin[ilat][ilon]
-               + xwork[5][ilat][ilon] * xin[ilat][ilon + 1]
-               + xwork[6][ilat][ilon] * xin[ilat + 1][ilon - 1]
-               + xwork[7][ilat][ilon] * xin[ilat + 1][ilon]
+            - (xwork[0][ilat][ilon] * xin[ilat - 1][ilon - 1] + xwork[1][ilat][ilon] * xin[ilat - 1][ilon]
+               + xwork[2][ilat][ilon] * xin[ilat - 1][ilon + 1] + xwork[3][ilat][ilon] * xin[ilat][ilon - 1]
+               + xwork[4][ilat][ilon] * xin[ilat][ilon] + xwork[5][ilat][ilon] * xin[ilat][ilon + 1]
+               + xwork[6][ilat][ilon] * xin[ilat + 1][ilon - 1] + xwork[7][ilat][ilon] * xin[ilat + 1][ilon]
                + xwork[8][ilat][ilon] * xin[ilat + 1][ilon + 1]);
 
   for (iter = 1;; iter++)
@@ -1495,63 +1424,50 @@ contrast(void)
       for (ilat = 1; ilat < nlat; ilat++)
         {
           for (ilon = 1; ilon < nlon; ilon++)
-            r_bar_new[ilat][ilon]
-                += xwork[8][ilat - 1][ilon - 1] * p_bar[ilat - 1][ilon - 1];
+            r_bar_new[ilat][ilon] += xwork[8][ilat - 1][ilon - 1] * p_bar[ilat - 1][ilon - 1];
 
-          r_bar_new[ilat][0]
-              += xwork[8][ilat - 1][nlon - 1] * p_bar[ilat - 1][nlon - 1];
+          r_bar_new[ilat][0] += xwork[8][ilat - 1][nlon - 1] * p_bar[ilat - 1][nlon - 1];
         }
 
       for (ilat = 1; ilat < nlat; ilat++)
         for (ilon = 0; ilon < nlon; ilon++)
-          r_bar_new[ilat][ilon]
-              += xwork[7][ilat - 1][ilon] * p_bar[ilat - 1][ilon];
+          r_bar_new[ilat][ilon] += xwork[7][ilat - 1][ilon] * p_bar[ilat - 1][ilon];
 
       for (ilat = 1; ilat < nlat; ilat++)
         {
           for (ilon = 0; ilon < nlon - 1; ilon++)
-            r_bar_new[ilat][ilon]
-                += xwork[6][ilat - 1][ilon + 1] * p_bar[ilat - 1][ilon + 1];
+            r_bar_new[ilat][ilon] += xwork[6][ilat - 1][ilon + 1] * p_bar[ilat - 1][ilon + 1];
 
-          r_bar_new[ilat][nlon - 1]
-              += xwork[6][ilat - 1][0] * p_bar[ilat - 1][0];
+          r_bar_new[ilat][nlon - 1] += xwork[6][ilat - 1][0] * p_bar[ilat - 1][0];
         }
       for (ilat = 0; ilat < nlat; ilat++)
         {
           for (ilon = 1; ilon < nlon; ilon++)
-            r_bar_new[ilat][ilon]
-                += xwork[5][ilat][ilon - 1] * p_bar[ilat][ilon - 1];
-          r_bar_new[ilat][0]
-              += xwork[5][ilat][nlon - 1] * p_bar[ilat][nlon - 1];
+            r_bar_new[ilat][ilon] += xwork[5][ilat][ilon - 1] * p_bar[ilat][ilon - 1];
+          r_bar_new[ilat][0] += xwork[5][ilat][nlon - 1] * p_bar[ilat][nlon - 1];
         }
 
       for (ilat = 0; ilat < nlat; ilat++)
         {
           for (ilon = 0; ilon < nlon - 1; ilon++)
-            r_bar_new[ilat][ilon]
-                += xwork[3][ilat][ilon + 1] * p_bar[ilat][ilon + 1];
+            r_bar_new[ilat][ilon] += xwork[3][ilat][ilon + 1] * p_bar[ilat][ilon + 1];
 
           r_bar_new[ilat][nlon - 1] += xwork[3][ilat][0] * p_bar[ilat][0];
         }
       for (ilat = 0; ilat < nlat - 1; ilat++)
         {
           for (ilon = 1; ilon < nlon; ilon++)
-            r_bar_new[ilat][ilon]
-                += xwork[2][ilat + 1][ilon - 1] * p_bar[ilat + 1][ilon - 1];
-          r_bar_new[ilat][0]
-              += xwork[2][ilat + 1][nlon - 1] * p_bar[ilat + 1][nlon - 1];
+            r_bar_new[ilat][ilon] += xwork[2][ilat + 1][ilon - 1] * p_bar[ilat + 1][ilon - 1];
+          r_bar_new[ilat][0] += xwork[2][ilat + 1][nlon - 1] * p_bar[ilat + 1][nlon - 1];
         }
       for (ilat = 0; ilat < nlat - 1; ilat++)
         for (ilon = 0; ilon < nlon; ilon++)
-          r_bar_new[ilat][ilon]
-              += xwork[1][ilat + 1][ilon] * p_bar[ilat + 1][ilon];
+          r_bar_new[ilat][ilon] += xwork[1][ilat + 1][ilon] * p_bar[ilat + 1][ilon];
       for (ilat = 0; ilat < nlat - 1; ilat++)
         {
           for (ilon = 0; ilon < nlon - 1; ilon++)
-            r_bar_new[ilat][ilon]
-                += xwork[0][ilat + 1][ilon + 1] * p_bar[ilat + 1][ilon + 1];
-          r_bar_new[ilat][nlon - 1]
-              += xwork[0][ilat + 1][0] * p_bar[ilat + 1][0];
+            r_bar_new[ilat][ilon] += xwork[0][ilat + 1][ilon + 1] * p_bar[ilat + 1][ilon + 1];
+          r_bar_new[ilat][nlon - 1] += xwork[0][ilat + 1][0] * p_bar[ilat + 1][0];
         }
       for (ilat = 0; ilat < nlat; ilat++)
         for (ilon = 0; ilon < nlon; ilon++)
@@ -1567,13 +1483,11 @@ contrast(void)
         for (ilon = 0; ilon < nlon; ilon++)
           {
             p_new[ilat][ilon] = r_new[ilat][ilon] + b * p[ilat][ilon];
-            p_bar_new[ilat][ilon]
-                = r_bar_new[ilat][ilon] + b * p_bar[ilat][ilon];
+            p_bar_new[ilat][ilon] = r_bar_new[ilat][ilon] + b * p_bar[ilat][ilon];
           }
       for (ilat = 0; ilat < nlat; ilat++)
         for (ilon = 0; ilon < nlon; ilon++)
-          if (!DBL_IS_EQUAL(xout[ilat][ilon], missval))
-            xout[ilat][ilon] += a * p[ilat][ilon];
+          if (!DBL_IS_EQUAL(xout[ilat][ilon], missval)) xout[ilat][ilon] += a * p[ilat][ilon];
       swap = r_new;
       r_new = r;
       r = swap;

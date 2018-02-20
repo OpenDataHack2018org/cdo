@@ -39,8 +39,7 @@ print_pthread_info()
   fprintf(stderr, "PTHREAD_KEYS_MAX    = %d\n", PTHREAD_KEYS_MAX);
 #endif
 #if defined(PTHREAD_DESTRUCTOR_ITERATIONS)
-  fprintf(stderr, "PTHREAD_DESTRUCTOR_ITERATIONS = %d\n",
-          PTHREAD_DESTRUCTOR_ITERATIONS);
+  fprintf(stderr, "PTHREAD_DESTRUCTOR_ITERATIONS = %d\n", PTHREAD_DESTRUCTOR_ITERATIONS);
 #endif
 #if defined(PTHREAD_THREADS_MAX)
   fprintf(stderr, "PTHREAD_THREADS_MAX = %d\n", PTHREAD_THREADS_MAX);

@@ -116,8 +116,7 @@ Timcount(void *process)
               if (nsets == 0)
                 {
                   for (size_t i = 0; i < nwpv * gridsize; i++)
-                    vars1[varID][levelID].ptr[i]
-                        = vars1[varID][levelID].missval;
+                    vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
                   vars1[varID][levelID].nmiss = gridsize;
                 }
 
@@ -146,12 +145,10 @@ Timcount(void *process)
           varID = recVarID[recID];
           levelID = recLevelID[recID];
 
-          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-            continue;
+          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,
-                             vars1[varID][levelID].nmiss);
+          pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
         }
 
       if (nrecs == 0) break;

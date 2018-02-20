@@ -67,8 +67,7 @@ Setgatt(void *process)
 
   if (operatorID == SETGATT)
     {
-      cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int) strlen(attstring),
-                   attstring);
+      cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int) strlen(attstring), attstring);
     }
   else
     {
@@ -88,8 +87,7 @@ Setgatt(void *process)
             attname++;
           if (attname[0] == '\0') continue;
           attstring = attname;
-          while (*attstring != ' ' && *attstring != '\0' && *attstring != '='
-                 && *attstring != '"')
+          while (*attstring != ' ' && *attstring != '\0' && *attstring != '=' && *attstring != '"')
             attstring++;
           if (*attstring == '\0')
             attstring = NULL;
@@ -97,16 +95,14 @@ Setgatt(void *process)
             {
               *attstring = '\0';
               attstring++;
-              while (isspace((int) *attstring) || (int) *attstring == '='
-                     || (int) *attstring == '"' || (int) *attstring == '\'')
+              while (isspace((int) *attstring) || (int) *attstring == '=' || (int) *attstring == '"'
+                     || (int) *attstring == '\'')
                 attstring++;
               attlen = strlen(attstring);
-              if (attstring[attlen - 1] == '"' || attstring[attlen - 1] == '\'')
-                attstring[--attlen] = 0;
+              if (attstring[attlen - 1] == '"' || attstring[attlen - 1] == '\'') attstring[--attlen] = 0;
             }
 
-          if (attstring && attlen)
-            cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, attlen, attstring);
+          if (attstring && attlen) cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, attlen, attstring);
         }
 
       fclose(fp);

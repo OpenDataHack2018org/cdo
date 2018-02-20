@@ -112,8 +112,7 @@ day_of_year(int date)
   const int month = (date - year * 10000) / 100;
   const int day = date - year * 10000 - month * 100;
 
-  return gregdate_to_julday(year, month, day) - gregdate_to_julday(year, 1, 1)
-         + 1;
+  return gregdate_to_julday(year, month, day) - gregdate_to_julday(year, 1, 1) + 1;
 }
 
 /**
@@ -155,8 +154,7 @@ count(field_type *field1, const field_type *field2, double mode)
 
   size_t len = gridInqSize(grid1);
 
-  if (len != gridInqSize(grid2))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != gridInqSize(grid2)) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0)
     {
@@ -164,15 +162,13 @@ count(field_type *field1, const field_type *field2, double mode)
         {
           if (DBL_IS_EQUAL(array2[i], missval2))
             {
-              if (IS_EQUAL(mode, 1.0) || DBL_IS_EQUAL(array1[i], missval1))
-                array1[i] = 0.0;
+              if (IS_EQUAL(mode, 1.0) || DBL_IS_EQUAL(array1[i], missval1)) array1[i] = 0.0;
               continue;
             }
 
           if (!DBL_IS_EQUAL(array1[i], missval1))
             {
-              if (IS_EQUAL(mode, 0.0) || IS_EQUAL(mode, 1.0)
-                  || array2[i] > mode)
+              if (IS_EQUAL(mode, 0.0) || IS_EQUAL(mode, 1.0) || array2[i] > mode)
                 array1[i] += 1.0;
               else if (DBL_IS_EQUAL(array2[i], mode))
                 array1[i] += mode;
@@ -224,8 +220,7 @@ count(field_type *field1, const field_type *field2, double mode)
  * @param compare the comparator
  */
 static void
-selcomp(field_type *field1, const field_type *field2,
-        int (*compare)(double, double))
+selcomp(field_type *field1, const field_type *field2, int (*compare)(double, double))
 {
   size_t i;
   const int grid1 = field1->grid;
@@ -239,15 +234,12 @@ selcomp(field_type *field1, const field_type *field2,
 
   size_t len = gridInqSize(grid1);
 
-  if (len != gridInqSize(grid2))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != gridInqSize(grid2)) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
       for (i = 0; i < len; i++)
-        if (DBL_IS_EQUAL(array1[i], missval1)
-            || DBL_IS_EQUAL(array2[i], missval2)
-            || !compare(array1[i], array2[i]))
+        if (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) || !compare(array1[i], array2[i]))
           array1[i] = missval1;
     }
   else
@@ -293,8 +285,7 @@ selcompc(field_type *field, double c, int (*compare)(double, double))
   else if (nmiss > 0)
     {
       for (i = 0; i < len; i++)
-        if (DBL_IS_EQUAL(array[i], missval) || !compare(array[i], c))
-          array[i] = missval;
+        if (DBL_IS_EQUAL(array[i], missval) || !compare(array[i], c)) array[i] = missval;
     }
   else
     {
@@ -373,14 +364,12 @@ farsel(field_type *field1, field_type field2)
 
   size_t len = gridInqSize(grid1);
 
-  if (len != gridInqSize(grid2))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != gridInqSize(grid2)) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss2 > 0)
     {
       for (i = 0; i < len; i++)
-        if (DBL_IS_EQUAL(array2[i], missval2) || DBL_IS_EQUAL(array2[i], 0.0))
-          array1[i] = missval1;
+        if (DBL_IS_EQUAL(array2[i], missval2) || DBL_IS_EQUAL(array2[i], 0.0)) array1[i] = missval1;
     }
   else
     {
@@ -464,8 +453,7 @@ farselgtc(field_type *field, double c)
 }
 
 void
-updateHist(field_type *field[2], int nlevels, size_t gridsize, double *yvals,
-           int onlyNorth)
+updateHist(field_type *field[2], int nlevels, size_t gridsize, double *yvals, int onlyNorth)
 {
   int levelID;
 
@@ -473,16 +461,14 @@ updateHist(field_type *field[2], int nlevels, size_t gridsize, double *yvals,
     for (size_t i = 0; i < gridsize; i++)
       if (onlyNorth)
         {
-          if (yvals[i] >= 0.0)
-            field[1][levelID].ptr[i] = field[0][levelID].ptr[i];
+          if (yvals[i] >= 0.0) field[1][levelID].ptr[i] = field[0][levelID].ptr[i];
         }
       else
         field[1][levelID].ptr[i] = field[0][levelID].ptr[i];
 }
 
 void
-adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval,
-              int ovdate, field_type *startDateWithHist[2],
+adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval, int ovdate, field_type *startDateWithHist[2],
               field_type *endDateWithHist[2])
 {
   int levelID, ovdateSouth;
@@ -524,9 +510,8 @@ adjustEndDate(int nlevels, size_t gridsize, double *yvals, double missval,
 }
 
 void
-computeGsl(int nlevels, size_t gridsize, double *yvals, double missval,
-           field_type *startDateWithHist[2], field_type *endDateWithHist[2],
-           field_type *gslDuration, field_type *gslFirstDay, int useCurrentYear)
+computeGsl(int nlevels, size_t gridsize, double *yvals, double missval, field_type *startDateWithHist[2],
+           field_type *endDateWithHist[2], field_type *gslDuration, field_type *gslFirstDay, int useCurrentYear)
 {
   int levelID;
   double firstDay, duration;
@@ -541,31 +526,20 @@ computeGsl(int nlevels, size_t gridsize, double *yvals, double missval,
               if (yvals[i] < 0.0)
                 {
                   duration
-                      = (double) (date_to_julday(
-                                      CALENDAR_PROLEPTIC,
-                                      (int) endDateWithHist[0][levelID].ptr[i])
-                                  - date_to_julday(
-                                        CALENDAR_PROLEPTIC,
-                                        (int) startDateWithHist[1][levelID]
-                                            .ptr[i]));
+                      = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[0][levelID].ptr[i])
+                                  - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
                 }
               else
                 {
                   duration
-                      = (double) (date_to_julday(
-                                      CALENDAR_PROLEPTIC,
-                                      (int) endDateWithHist[1][levelID].ptr[i])
-                                  - date_to_julday(
-                                        CALENDAR_PROLEPTIC,
-                                        (int) startDateWithHist[1][levelID]
-                                            .ptr[i]));
+                      = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[1][levelID].ptr[i])
+                                  - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
                 }
 
               if (DBL_IS_EQUAL(startDateWithHist[1][levelID].ptr[i], missval))
                 firstDay = missval;
               else
-                firstDay = (double) day_of_year(
-                    (int) startDateWithHist[1][levelID].ptr[i]);
+                firstDay = (double) day_of_year((int) startDateWithHist[1][levelID].ptr[i]);
 
               gslDuration[levelID].ptr[i] = duration;
               gslFirstDay[levelID].ptr[i] = firstDay;
@@ -588,20 +562,13 @@ computeGsl(int nlevels, size_t gridsize, double *yvals, double missval,
               else
                 {
                   duration
-                      = (double) (date_to_julday(
-                                      CALENDAR_PROLEPTIC,
-                                      (int) endDateWithHist[0][levelID].ptr[i])
-                                  - date_to_julday(
-                                        CALENDAR_PROLEPTIC,
-                                        (int) startDateWithHist[0][levelID]
-                                            .ptr[i]));
+                      = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int) endDateWithHist[0][levelID].ptr[i])
+                                  - date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[0][levelID].ptr[i]));
 
-                  if (DBL_IS_EQUAL(startDateWithHist[0][levelID].ptr[i],
-                                   missval))
+                  if (DBL_IS_EQUAL(startDateWithHist[0][levelID].ptr[i], missval))
                     firstDay = missval;
                   else
-                    firstDay = (double) day_of_year(
-                        (int) startDateWithHist[0][levelID].ptr[i]);
+                    firstDay = (double) day_of_year((int) startDateWithHist[0][levelID].ptr[i]);
 
                   gslDuration[levelID].ptr[i] = duration;
                   gslFirstDay[levelID].ptr[i] = firstDay;
@@ -612,17 +579,14 @@ computeGsl(int nlevels, size_t gridsize, double *yvals, double missval,
 
   for (levelID = 0; levelID < nlevels; levelID++)
     {
-      gslDuration[levelID].nmiss
-          = arrayNumMV(gridsize, gslDuration[levelID].ptr, missval);
-      gslFirstDay[levelID].nmiss
-          = arrayNumMV(gridsize, gslFirstDay[levelID].ptr, missval);
+      gslDuration[levelID].nmiss = arrayNumMV(gridsize, gslDuration[levelID].ptr, missval);
+      gslFirstDay[levelID].nmiss = arrayNumMV(gridsize, gslFirstDay[levelID].ptr, missval);
     }
 }
 
 void
-writeGslStream(int ostreamID, int otaxisID, int otsID, int ovarID1, int ovarID2,
-               int ivlistID1, int first_var_id, field_type *gslDuration,
-               field_type *gslFirstDay, int vdate, int vtime, int nlevels)
+writeGslStream(int ostreamID, int otaxisID, int otsID, int ovarID1, int ovarID2, int ivlistID1, int first_var_id,
+               field_type *gslDuration, field_type *gslFirstDay, int vdate, int vtime, int nlevels)
 {
   (void) ivlistID1;
   (void) first_var_id;
@@ -634,13 +598,11 @@ writeGslStream(int ostreamID, int otaxisID, int otsID, int ovarID1, int ovarID2,
   for (int levelID = 0; levelID < nlevels; levelID++)
     {
       pstreamDefRecord(ostreamID, ovarID1, levelID);
-      pstreamWriteRecord(ostreamID, gslDuration[levelID].ptr,
-                         gslDuration[levelID].nmiss);
+      pstreamWriteRecord(ostreamID, gslDuration[levelID].ptr, gslDuration[levelID].nmiss);
     }
   for (int levelID = 0; levelID < nlevels; levelID++)
     {
       pstreamDefRecord(ostreamID, ovarID2, levelID);
-      pstreamWriteRecord(ostreamID, gslFirstDay[levelID].ptr,
-                         gslFirstDay[levelID].nmiss);
+      pstreamWriteRecord(ostreamID, gslFirstDay[levelID].ptr, gslFirstDay[levelID].nmiss);
     }
 }

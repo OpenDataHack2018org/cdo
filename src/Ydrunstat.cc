@@ -51,8 +51,7 @@ typedef struct
 
 static YDAY_STATS *ydstatCreate(int vlistID);
 static void ydstatDestroy(YDAY_STATS *stats);
-static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
-                         field_type **vars1, field_type **vars2, int nsets,
+static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, field_type **vars1, field_type **vars2, int nsets,
                          int operfunc);
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
@@ -86,8 +85,7 @@ Ydrunstat(void *process)
   operatorInputArg("number of timesteps");
   int ndates = parameter2int(operatorArgv()[0]);
 
-  bool lvarstd = operfunc == func_std || operfunc == func_var
-                 || operfunc == func_std1 || operfunc == func_var1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -108,15 +106,12 @@ Ydrunstat(void *process)
   int maxrecs = vlistNrecs(vlistID1);
   std::vector<recinfo_type> recinfo(maxrecs);
 
-  cdo_datetime_t *datetime
-      = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
+  cdo_datetime_t *datetime = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
 
   YDAY_STATS *stats = ydstatCreate(vlistID1);
-  field_type ***vars1
-      = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  field_type ***vars1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
   field_type ***vars2 = NULL;
-  if (lvarstd)
-    vars2 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  if (lvarstd) vars2 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
 
   for (its = 0; its < ndates; its++)
     {
@@ -140,13 +135,11 @@ Ydrunstat(void *process)
             {
               recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst
-                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           field_type *pvars1 = &vars1[tsID][varID][levelID];
-          field_type *pvars2
-              = (vars2 && vars2[tsID]) ? &vars2[tsID][varID][levelID] : NULL;
+          field_type *pvars2 = (vars2 && vars2[tsID]) ? &vars2[tsID][varID][levelID] : NULL;
 
           pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
           pvars1->nmiss = nmiss;
@@ -204,9 +197,7 @@ Ydrunstat(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
 
           field_type *pvars1 = &vars1[ndates - 1][varID][levelID];
-          field_type *pvars2 = (vars2 && vars2[ndates - 1])
-                                   ? &vars2[ndates - 1][varID][levelID]
-                                   : NULL;
+          field_type *pvars2 = (vars2 && vars2[ndates - 1]) ? &vars2[ndates - 1][varID][levelID] : NULL;
 
           pstreamReadRecord(streamID1, pvars1->ptr, &nmiss);
           pvars1->nmiss = nmiss;
@@ -355,8 +346,7 @@ ydstatDestroy(YDAY_STATS *stats)
 }
 
 static void
-ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, field_type **vars1,
-             field_type **vars2, int nsets, int operfunc)
+ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, field_type **vars1, field_type **vars2, int nsets, int operfunc)
 {
   int varID, levelID, nlevels;
   size_t gridsize;
@@ -395,32 +385,25 @@ ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, field_type **vars1,
         {
           if (stats->nsets[dayoy] == 0)
             {
-              arrayCopy(gridsize, vars1[varID][levelID].ptr,
-                        stats->vars1[dayoy][varID][levelID].ptr);
-              stats->vars1[dayoy][varID][levelID].nmiss
-                  = vars1[varID][levelID].nmiss;
+              arrayCopy(gridsize, vars1[varID][levelID].ptr, stats->vars1[dayoy][varID][levelID].ptr);
+              stats->vars1[dayoy][varID][levelID].nmiss = vars1[varID][levelID].nmiss;
 
               if (lvarstd)
                 {
-                  arrayCopy(gridsize, vars2[varID][levelID].ptr,
-                            stats->vars2[dayoy][varID][levelID].ptr);
-                  stats->vars2[dayoy][varID][levelID].nmiss
-                      = vars2[varID][levelID].nmiss;
+                  arrayCopy(gridsize, vars2[varID][levelID].ptr, stats->vars2[dayoy][varID][levelID].ptr);
+                  stats->vars2[dayoy][varID][levelID].nmiss = vars2[varID][levelID].nmiss;
                 }
             }
           else
             {
               if (lvarstd)
                 {
-                  farsum(&stats->vars1[dayoy][varID][levelID],
-                         vars1[varID][levelID]);
-                  farsum(&stats->vars2[dayoy][varID][levelID],
-                         vars2[varID][levelID]);
+                  farsum(&stats->vars1[dayoy][varID][levelID], vars1[varID][levelID]);
+                  farsum(&stats->vars2[dayoy][varID][levelID], vars2[varID][levelID]);
                 }
               else
                 {
-                  farfun(&stats->vars1[dayoy][varID][levelID],
-                         vars1[varID][levelID], operfunc);
+                  farfun(&stats->vars1[dayoy][varID][levelID], vars1[varID][levelID], operfunc);
                 }
             }
         }
@@ -447,12 +430,10 @@ ydstatFinalize(YDAY_STATS *stats, int operfunc)
           case func_mean:
             for (varID = 0; varID < nvars; varID++)
               {
-                if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT)
-                  continue;
+                if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT) continue;
                 nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
                 for (levelID = 0; levelID < nlevels; levelID++)
-                  farcdiv(&stats->vars1[dayoy][varID][levelID],
-                          (double) stats->nsets[dayoy]);
+                  farcdiv(&stats->vars1[dayoy][varID][levelID], (double) stats->nsets[dayoy]);
               }
             break;
 
@@ -460,12 +441,10 @@ ydstatFinalize(YDAY_STATS *stats, int operfunc)
           case func_std1:
             for (varID = 0; varID < nvars; varID++)
               {
-                if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT)
-                  continue;
+                if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT) continue;
                 nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
                 for (levelID = 0; levelID < nlevels; levelID++)
-                  farcstd(&stats->vars1[dayoy][varID][levelID],
-                          stats->vars2[dayoy][varID][levelID],
+                  farcstd(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID],
                           stats->nsets[dayoy], divisor);
               }
             break;
@@ -474,12 +453,10 @@ ydstatFinalize(YDAY_STATS *stats, int operfunc)
           case func_var1:
             for (varID = 0; varID < nvars; varID++)
               {
-                if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT)
-                  continue;
+                if (vlistInqVarTimetype(stats->vlist, varID) == TIME_CONSTANT) continue;
                 nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
                 for (levelID = 0; levelID < nlevels; levelID++)
-                  farcvar(&stats->vars1[dayoy][varID][levelID],
-                          stats->vars2[dayoy][varID][levelID],
+                  farcvar(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID],
                           stats->nsets[dayoy], divisor);
               }
             break;

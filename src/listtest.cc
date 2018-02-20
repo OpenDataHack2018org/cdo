@@ -37,8 +37,7 @@ iterate_string(void *data)
 bool
 iterate_list(void *data)
 {
-  printf("Found %s list with %d strings: \n", list_name(*(list_t **) data),
-         list_size(*(list_t **) data));
+  printf("Found %s list with %d strings: \n", list_name(*(list_t **) data), list_size(*(list_t **) data));
   list_for_each(*(list_t **) data, iterate_string);
   return true;
 }

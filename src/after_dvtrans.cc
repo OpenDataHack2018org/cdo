@@ -56,8 +56,7 @@ dv2ps(const double *restrict div, double *restrict pot, long nlev, long ntr)
 }
 
 void
-dv2uv(double *d, double *o, double *u, double *v, double *f, double *g, int nt,
-      int nsp, int nlev)
+dv2uv(double *d, double *o, double *u, double *v, double *f, double *g, int nt, int nsp, int nlev)
 {
   /* d(nsp,nlev), o(nsp,nlev)     ! divergence, vorticity        */
   /* u(nsp,nlev), v(nsp,nlev)     ! zonal wind, meridional wind  */
@@ -98,14 +97,10 @@ dv2uv(double *d, double *o, double *u, double *v, double *f, double *g, int nt,
 
           for (n = m + 1; n < nt - 1; n++)
             {
-              *u++ = g[i] * o[2 * (i - 1)] - f[i] * d[2 * i + 1]
-                     - g[i + 1] * o[2 * (i + 1)];
-              *u++ = g[i] * o[2 * (i - 1) + 1] + f[i] * d[2 * i]
-                     - g[i + 1] * o[2 * (i + 1) + 1];
-              *v++ = -g[i] * d[2 * (i - 1)] - f[i] * o[2 * i + 1]
-                     + g[i + 1] * d[2 * (i + 1)];
-              *v++ = -g[i] * d[2 * (i - 1) + 1] + f[i] * o[2 * i]
-                     + g[i + 1] * d[2 * (i + 1) + 1];
+              *u++ = g[i] * o[2 * (i - 1)] - f[i] * d[2 * i + 1] - g[i + 1] * o[2 * (i + 1)];
+              *u++ = g[i] * o[2 * (i - 1) + 1] + f[i] * d[2 * i] - g[i + 1] * o[2 * (i + 1) + 1];
+              *v++ = -g[i] * d[2 * (i - 1)] - f[i] * o[2 * i + 1] + g[i + 1] * d[2 * (i + 1)];
+              *v++ = -g[i] * d[2 * (i - 1) + 1] + f[i] * o[2 * i] + g[i + 1] * d[2 * (i + 1) + 1];
               ++i;
             }
 
@@ -198,8 +193,7 @@ scaluv(double *fu, double *rclat, int nlat, int lot)
 }
 
 void
-uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2,
-      double *pol3, int klev, int nlat, int nt)
+uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2, double *pol3, int klev, int nlat, int nt)
 {
   int lev, jmm, jfc, lat, nfc, nsp2;
   double dir, dii, vor, voi;
@@ -211,9 +205,8 @@ uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2,
   nfc = (nt + 1) * 2;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(jmm, jfc, lat, po2, po3, ful, \
-                                                 fvl, sdl, svl, ufr, ufi, vfr, \
-                                                 vfi, dir, dii, vor, voi)
+#pragma omp parallel for default(shared) private(jmm, jfc, lat, po2, po3, ful, fvl, sdl, svl, ufr, ufi, vfr, vfi, dir, \
+                                                 dii, vor, voi)
 #endif
   for (lev = 0; lev < klev; lev++)
     {
@@ -269,8 +262,7 @@ geninx(long ntr, double *f, double *g)
           n2 = n * n;
           if (n)
             {
-              *g++ = -PlanetRadius / n
-                     * sqrt((double) (n2 - m2) / (double) (4 * n2 - 1));
+              *g++ = -PlanetRadius / n * sqrt((double) (n2 - m2) / (double) (4 * n2 - 1));
               *f++ = -PlanetRadius * m / (double) (n2 + n);
             }
           else

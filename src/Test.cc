@@ -92,10 +92,8 @@ Testdata(void *process)
   double *array = (double *) Malloc(gridsize * sizeof(double));
   float *fval = (float *) Malloc(gridsize * sizeof(float));
   int *ival = (int *) Malloc(gridsize * sizeof(int));
-  unsigned char *cval
-      = (unsigned char *) Malloc(gridsize * sizeof(unsigned char) * 4);
-  unsigned char *cval2
-      = (unsigned char *) Malloc(gridsize * sizeof(unsigned char) * 4);
+  unsigned char *cval = (unsigned char *) Malloc(gridsize * sizeof(unsigned char) * 4);
+  unsigned char *cval2 = (unsigned char *) Malloc(gridsize * sizeof(unsigned char) * 4);
 
   FILE *fp = fopen("testdata", "w");
 
@@ -126,11 +124,9 @@ Testdata(void *process)
               cval2[i + gridsize * 3] = cval[i * 4 + 3];
 
               if (tsID1 == 0 && recID == 0)
-                printf("%4zu %3d %3d %3d %3d %d %g\n", i,
-                       (unsigned int) cval[4 * i + 0],
-                       (unsigned int) cval[4 * i + 1],
-                       (unsigned int) cval[4 * i + 2],
-                       (unsigned int) cval[4 * i + 3], ival[i], fval[i]);
+                printf("%4zu %3d %3d %3d %3d %d %g\n", i, (unsigned int) cval[4 * i + 0],
+                       (unsigned int) cval[4 * i + 1], (unsigned int) cval[4 * i + 2], (unsigned int) cval[4 * i + 3],
+                       ival[i], fval[i]);
             }
 
           pstreamWriteRecord(streamID2, array, nmiss);

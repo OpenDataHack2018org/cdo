@@ -27,7 +27,6 @@ nospec(int vlistID)
     {
       int gridID = vlistInqVarGrid(vlistID, varID);
       int gridtype = gridInqType(gridID);
-      if (gridtype == GRID_SPECTRAL)
-        cdoAbort("Operator not defined for spectral fields");
+      if (gridtype == GRID_SPECTRAL) cdoAbort("Operator not defined for spectral fields");
     }
 }

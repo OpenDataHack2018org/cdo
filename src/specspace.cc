@@ -21,21 +21,15 @@
 
 void geninx(long ntr, double *f, double *g);
 void scaluv(double *fu, double *rclat, int nlat, int lot);
-void uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2,
-           double *pol3, int klev, int nlat, int nt);
-void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g,
-           int nt, int nsp, int nlev);
+void uv2dv(double *fu, double *fv, double *sd, double *sv, double *pol2, double *pol3, int klev, int nlat, int nt);
+void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g, int nt, int nsp, int nlev);
 
-void after_legini_full(int ntr, int nlat, double *restrict poli,
-                       double *restrict pold, double *restrict pdev,
-                       double *restrict pol2, double *restrict pol3,
-                       double *restrict coslat);
-void after_legini(int ntr, int nlat, double *restrict poli,
-                  double *restrict pold, double *restrict coslat);
+void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
+                       double *restrict pol2, double *restrict pol3, double *restrict coslat);
+void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat);
 
 void
-grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
-          double *arrayOut)
+grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
   int nlev = 1;
   int ntr = gridInqTrunc(gridIDout);
@@ -53,8 +47,7 @@ grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
 }
 
 void
-spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
-          double *arrayOut)
+spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
   int nlev = 1;
   int ntr = gridInqTrunc(gridIDin);
@@ -72,8 +65,7 @@ spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
 }
 
 void
-four2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
-          double *arrayOut)
+four2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
   (void) gridIDin;
   int nlev = 1;
@@ -86,8 +78,7 @@ four2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
 }
 
 void
-spec2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
-          double *arrayOut)
+spec2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
   int nlev = 1;
   int ntr = gridInqTrunc(gridIDin);
@@ -100,8 +91,7 @@ spec2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
 }
 
 void
-four2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
-          double *arrayOut)
+four2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
   int nlev = 1;
   int ntr = gridInqTrunc(gridIDin);
@@ -114,8 +104,7 @@ four2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
 }
 
 void
-grid2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout,
-          double *arrayOut)
+grid2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
   int nlev = 1;
   int ntr = gridInqTrunc(gridIDout);
@@ -177,8 +166,7 @@ sptrans_new(int nlon, int nlat, int ntr, int flag)
   sptrans->rcoslat = (double *) Malloc(nlat * sizeof(double));
 
   if (flag)
-    after_legini_full(ntr, nlat, sptrans->poli, sptrans->pold, NULL,
-                      sptrans->pol2, sptrans->pol3, sptrans->coslat);
+    after_legini_full(ntr, nlat, sptrans->poli, sptrans->pold, NULL, sptrans->pol2, sptrans->pol3, sptrans->coslat);
   else
     after_legini(ntr, nlat, sptrans->poli, sptrans->pold, sptrans->coslat);
 
@@ -274,16 +262,13 @@ dvtrans_delete(DVTRANS *dvtrans)
 }
 
 void
-trans_uv2dv(SPTRANS *sptrans, int nlev, int gridID1, double *gu, double *gv,
-            int gridID2, double *sd, double *svo)
+trans_uv2dv(SPTRANS *sptrans, int nlev, int gridID1, double *gu, double *gv, int gridID2, double *sd, double *svo)
 {
   if (gridInqType(gridID1) != GRID_GAUSSIAN)
-    cdoAbort("unexpected grid1 type: %s instead of Gaussian",
-             gridNamePtr(gridInqType(gridID1)));
+    cdoAbort("unexpected grid1 type: %s instead of Gaussian", gridNamePtr(gridInqType(gridID1)));
 
   if (gridInqType(gridID2) != GRID_SPECTRAL)
-    cdoAbort("unexpected grid2 type: %s instead of spectral",
-             gridNamePtr(gridInqType(gridID2)));
+    cdoAbort("unexpected grid2 type: %s instead of spectral", gridNamePtr(gridInqType(gridID2)));
 
   int ntr = gridInqTrunc(gridID2);
   int nlon = gridInqXsize(gridID1);
@@ -300,22 +285,19 @@ trans_uv2dv(SPTRANS *sptrans, int nlev, int gridID1, double *gu, double *gv,
   scaluv(fpwork1, sptrans->coslat, nlat, nfc * nlev);
   scaluv(fpwork2, sptrans->coslat, nlat, nfc * nlev);
 
-  uv2dv(fpwork1, fpwork2, sd, svo, sptrans->pol2, sptrans->pol3, nlev, nlat,
-        ntr);
+  uv2dv(fpwork1, fpwork2, sd, svo, sptrans->pol2, sptrans->pol3, nlev, nlat, ntr);
 
   Free(fpwork1);
   Free(fpwork2);
 }
 
 void
-trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev, int gridID1,
-            double *sd, double *svo, int gridID2, double *gu, double *gv)
+trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev, int gridID1, double *sd, double *svo, int gridID2, double *gu,
+            double *gv)
 {
-  if (gridInqType(gridID1) != GRID_SPECTRAL)
-    Warning("unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
+  if (gridInqType(gridID1) != GRID_SPECTRAL) Warning("unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
 
-  if (gridInqType(gridID2) != GRID_GAUSSIAN)
-    Warning("unexpected grid2 type: %s", gridNamePtr(gridInqType(gridID2)));
+  if (gridInqType(gridID2) != GRID_GAUSSIAN) Warning("unexpected grid2 type: %s", gridNamePtr(gridInqType(gridID2)));
 
   int ntr = gridInqTrunc(gridID1);
   int nlon = gridInqXsize(gridID2);

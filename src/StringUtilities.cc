@@ -21,8 +21,7 @@
 #define DBG 0
 
 int
-StringSplitWithSeperator(const char *source_string, const char *seperator,
-                         char ***ptr_split_string)
+StringSplitWithSeperator(const char *source_string, const char *seperator, char ***ptr_split_string)
 {
   char *duplicate_src = NULL, **temp_list = NULL, *temp_str = NULL, *saveptr;
   int n = 0, i;
@@ -32,9 +31,7 @@ StringSplitWithSeperator(const char *source_string, const char *seperator,
 
   if (!str_len) return 0;
 
-  if (DBG)
-    fprintf(stderr, "StringSplitWithSeperator Input str %s , seperator %s \n",
-            source_string, seperator);
+  if (DBG) fprintf(stderr, "StringSplitWithSeperator Input str %s , seperator %s \n", source_string, seperator);
 
   duplicate_src = strdup(source_string);
 
@@ -45,9 +42,7 @@ StringSplitWithSeperator(const char *source_string, const char *seperator,
 
   temp_list = (char **) Malloc(sizeof(char *) * (sep_count + 1));
 
-  if (DBG)
-    fprintf(stderr, "Input str %s , seperator %s  sep count %d\n",
-            duplicate_src, seperator, sep_count);
+  if (DBG) fprintf(stderr, "Input str %s , seperator %s  sep count %d\n", duplicate_src, seperator, sep_count);
 
   while ((temp_str = strtok_r(duplicate_src, seperator, &saveptr)))
     {

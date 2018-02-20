@@ -49,10 +49,8 @@ extern char *DEVICE_TABLE;
 extern int DEVICE_COUNT;
 
 static void
-magvector(const char *plotfile, int operatorID, const char *varname, long nlon,
-          long nlat, double *grid_center_lon, double *grid_center_lat,
-          double *uarray, double *varray, int nparam, char **params,
-          char *datetime)
+magvector(const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon,
+          double *grid_center_lat, double *uarray, double *varray, int nparam, char **params, char *datetime)
 
 {
   long i;
@@ -93,8 +91,7 @@ magvector(const char *plotfile, int operatorID, const char *varname, long nlon,
     {
       split_str_count = 0;
       sep_char = "=";
-      split_str_count
-          = StringSplitWithSeperator(params[i], sep_char, &split_str);
+      split_str_count = StringSplitWithSeperator(params[i], sep_char, &split_str);
       (void) split_str_count;
 
       if (!strcmp(split_str[0], "thin_fac"))
@@ -181,12 +178,10 @@ magvector(const char *plotfile, int operatorID, const char *varname, long nlon,
       mag_seti("wind_arrow_thickness", 1);
       mag_coast();
 
-      if (IS_NOT_EQUAL(THIN_FAC, 2.0f))
-        mag_setr("wind_thinning_factor", THIN_FAC);
+      if (IS_NOT_EQUAL(THIN_FAC, 2.0f)) mag_setr("wind_thinning_factor", THIN_FAC);
 
       /*wind_arrow_unit_velocity */
-      if (IS_NOT_EQUAL(UNIT_VEC, 25.0f))
-        mag_setr("wind_arrow_unit_velocity", UNIT_VEC);
+      if (IS_NOT_EQUAL(UNIT_VEC, 25.0f)) mag_setr("wind_arrow_unit_velocity", UNIT_VEC);
 
       mag_wind();
 
@@ -240,8 +235,7 @@ VerifyVectorParameters(int num_param, char **param_names, int opID)
       split_str_count = 0;
       found = FALSE;
       syntax = TRUE;
-      split_str_count
-          = StringSplitWithSeperator(param_names[i], sep_char, &split_str);
+      split_str_count = StringSplitWithSeperator(param_names[i], sep_char, &split_str);
 
       if (DBG) fprintf(stderr, "Verifying params!\n");
 
@@ -260,8 +254,7 @@ VerifyVectorParameters(int num_param, char **param_names, int opID)
                 {
                   found = TRUE;
 
-                  if (!strcmp(split_str[0], "thin_fac")
-                      || !strcmp(split_str[0], "unit_vec")
+                  if (!strcmp(split_str[0], "thin_fac") || !strcmp(split_str[0], "unit_vec")
                       || !strcmp(split_str[0], "step_freq"))
                     {
                       if (!IsNumeric(split_str[1])) syntax = FALSE;
@@ -275,19 +268,14 @@ VerifyVectorParameters(int num_param, char **param_names, int opID)
                         {
                           if (!strcmp(split_str[0], "device"))
                             {
-                              if (DBG)
-                                fprintf(stderr, "Parameter value '%s'\n",
-                                        split_str[1]);
+                              if (DBG) fprintf(stderr, "Parameter value '%s'\n", split_str[1]);
                               if (checkdevice(split_str[1])) syntax = FALSE;
 
                               /* Vector not supported in google earth format */
-                              if (!strcmp(split_str[1], "KML")
-                                  || !strcmp(split_str[1], "kml"))
+                              if (!strcmp(split_str[1], "KML") || !strcmp(split_str[1], "kml"))
                                 {
                                   syntax = FALSE;
-                                  if (DBG)
-                                    fprintf(stderr, "Parameter value '%s'\n",
-                                            split_str[1]);
+                                  if (DBG) fprintf(stderr, "Parameter value '%s'\n", split_str[1]);
                                 }
                             }
                         }
@@ -308,8 +296,7 @@ VerifyVectorParameters(int num_param, char **param_names, int opID)
       if (found == TRUE && syntax == FALSE)
         {
           halt_flag = TRUE;
-          fprintf(stderr, "Invalid parameter specification  '%s'\n",
-                  param_names[i]);
+          fprintf(stderr, "Invalid parameter specification  '%s'\n", param_names[i]);
         }
 
       if (split_str) Free(split_str);
@@ -365,11 +352,9 @@ Magvector(void *process)
   // int zaxisID = vlistInqVarZaxis(vlistID, varID);
 
   if (gridInqType(gridID) == GRID_GME) cdoAbort("GME grid unspported!");
-  if (gridInqType(gridID) == GRID_UNSTRUCTURED)
-    cdoAbort("Unstructured grid unspported!");
+  if (gridInqType(gridID) == GRID_UNSTRUCTURED) cdoAbort("Unstructured grid unspported!");
 
-  if (gridInqType(gridID) != GRID_CURVILINEAR)
-    gridID = gridToCurvilinear(gridID, 1);
+  if (gridInqType(gridID) != GRID_CURVILINEAR) gridID = gridToCurvilinear(gridID, 1);
 
   size_t gridsize = gridInqSize(gridID);
   int nlon = gridInqXsize(gridID);
@@ -436,28 +421,20 @@ Magvector(void *process)
 
           if (operatorID == VECTOR)
             {
-              if (!strcmp(varname, "var131")
-                  || !strcmp(varname, "u")) /* U Velocity as per GRIB is
-                                               'var131, as per NC 'u' */
+              if (!strcmp(varname, "var131") || !strcmp(varname, "u")) /* U Velocity as per GRIB is
+                                                                          'var131, as per NC 'u' */
                 {
-                  if (DBG)
-                    fprintf(stderr, "Found U VEL in Varname %s\n", varname);
+                  if (DBG) fprintf(stderr, "Found U VEL in Varname %s\n", varname);
                   pstreamReadRecord(streamID, uarray, &nmiss);
-                  if (nmiss)
-                    cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize,
-                              uarray);
+                  if (nmiss) cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize, uarray);
                   found++;
                 }
-              if (!strcmp(varname, "var132")
-                  || !strcmp(varname, "v")) /* V Velocity as per GRIB  is
-                                               'var132, as per NC 'v'*/
+              if (!strcmp(varname, "var132") || !strcmp(varname, "v")) /* V Velocity as per GRIB  is
+                                                                          'var132, as per NC 'v'*/
                 {
-                  if (DBG)
-                    fprintf(stderr, "Found V VEL in Varname %s\n", varname);
+                  if (DBG) fprintf(stderr, "Found V VEL in Varname %s\n", varname);
                   pstreamReadRecord(streamID, varray, &nmiss);
-                  if (nmiss)
-                    cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize,
-                              varray);
+                  if (nmiss) cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize, varray);
                   found++;
                 }
               if (found == 2) break;
@@ -472,12 +449,9 @@ Magvector(void *process)
         {
           if (found == 2)
             {
-              if (DBG)
-                fprintf(stderr,
-                        "Found Both U & V VEL, Creating vector fields! \n");
-              magvector(cdoGetStreamName(1).c_str(), operatorID, varname, nlon,
-                        nlat, grid_center_lon, grid_center_lat, uarray, varray,
-                        nparam, pnames, datetimestr);
+              if (DBG) fprintf(stderr, "Found Both U & V VEL, Creating vector fields! \n");
+              magvector(cdoGetStreamName(1).c_str(), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat,
+                        uarray, varray, nparam, pnames, datetimestr);
             }
           else if (found == 1)
             {

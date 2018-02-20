@@ -34,8 +34,7 @@ split(std::string p_command)
   int pos = p_command.find(',');
 
   splitted[Command::name] += p_command.substr(0, pos);
-  if (pos != std::string::npos)
-    splitted[CommandArg] += p_command.substr(pos + 1);
+  if (pos != std::string::npos) splitted[CommandArg] += p_command.substr(pos + 1);
 
   return splitted;
 }
@@ -50,8 +49,7 @@ preProcessArgv(std::vector<std::string> argv)
       refinedCommand = split(arg);
       preProcessedArgv[Command::Name].push_back(refinedCommand[Command::Name]);
       preProcessedArgv[Command::Arg].push_back(refinedCommand[Command::Arg]);
-      MESSAGE("processed: ", refinedCommand[Command::Name], " ",
-              refinedCommand[Command::Arg]);
+      MESSAGE("processed: ", refinedCommand[Command::Name], " ", refinedCommand[Command::Arg]);
     }
   return preProcessedArgv;
 }
@@ -65,8 +63,7 @@ getOperatorName(const char *operatorCommand)
     {
       if (operatorCommand[0] == '-') operatorCommand++;
       char *commapos = (char *) strchr(operatorCommand, ',');
-      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand)
-                                      : strlen(operatorCommand);
+      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand) : strlen(operatorCommand);
 
       operatorName = (char *) Malloc(len + 1);
 

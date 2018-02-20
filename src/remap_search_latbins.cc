@@ -19,8 +19,8 @@
 #include "remap.h"
 
 static void
-calc_bin_addr(size_t gridsize, size_t nbins, const restr_t *restrict bin_lats,
-              const restr_t *restrict cell_bound_box, size_t *restrict bin_addr)
+calc_bin_addr(size_t gridsize, size_t nbins, const restr_t *restrict bin_lats, const restr_t *restrict cell_bound_box,
+              size_t *restrict bin_addr)
 {
   size_t n2;
 
@@ -44,8 +44,7 @@ calc_bin_addr(size_t gridsize, size_t nbins, const restr_t *restrict bin_lats,
       for (size_t n = 0; n < nbins; ++n)
         {
           n2 = n << 1;
-          if (cell_bound_box_lat1 <= bin_lats[n2 + 1]
-              && cell_bound_box_lat2 >= bin_lats[n2])
+          if (cell_bound_box_lat1 <= bin_lats[n2 + 1] && cell_bound_box_lat2 >= bin_lats[n2])
             {
               /*
 #ifdef  _OPENMP
@@ -68,13 +67,11 @@ calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, RemapType mapType)
   size_t nbins = src_grid->num_srch_bins;
   double dlat = PI / nbins;  // lat/lon intervals for search bins
 
-  if (cdoVerbose)
-    cdoPrint("Using %zu latitude bins to restrict search.", nbins);
+  if (cdoVerbose) cdoPrint("Using %zu latitude bins to restrict search.", nbins);
 
   if (nbins > 0)
     {
-      restr_t *bin_lats = src_grid->bin_lats = (restr_t *) Realloc(
-          src_grid->bin_lats, 2 * nbins * sizeof(restr_t));
+      restr_t *bin_lats = src_grid->bin_lats = (restr_t *) Realloc(src_grid->bin_lats, 2 * nbins * sizeof(restr_t));
 
       for (size_t n = 0; n < nbins; ++n)
         {
@@ -83,19 +80,15 @@ calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, RemapType mapType)
           bin_lats[n2 + 1] = RESTR_SCALE((n + 1) * dlat - PIH);
         }
 
-      src_grid->bin_addr
-          = (size_t *) Realloc(src_grid->bin_addr, 2 * nbins * sizeof(size_t));
+      src_grid->bin_addr = (size_t *) Realloc(src_grid->bin_addr, 2 * nbins * sizeof(size_t));
 
-      calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box,
-                    src_grid->bin_addr);
+      calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
 
       if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
         {
-          tgt_grid->bin_addr = (size_t *) Realloc(tgt_grid->bin_addr,
-                                                  2 * nbins * sizeof(size_t));
+          tgt_grid->bin_addr = (size_t *) Realloc(tgt_grid->bin_addr, 2 * nbins * sizeof(size_t));
 
-          calc_bin_addr(tgt_grid->size, nbins, bin_lats,
-                        tgt_grid->cell_bound_box, tgt_grid->bin_addr);
+          calc_bin_addr(tgt_grid->size, nbins, bin_lats, tgt_grid->cell_bound_box, tgt_grid->bin_addr);
 
           Free(src_grid->bin_lats);
           src_grid->bin_lats = NULL;
@@ -116,10 +109,8 @@ calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, RemapType mapType)
 }
 
 size_t
-get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1,
-               size_t *bin_addr2, restr_t *tgt_cell_bound_box,
-               restr_t *src_cell_bound_box, size_t src_grid_size,
-               size_t *srch_add)
+get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2, restr_t *tgt_cell_bound_box,
+               restr_t *src_cell_bound_box, size_t src_grid_size, size_t *srch_add)
 {
   size_t n2;
   size_t src_cell_addm4;
@@ -175,8 +166,7 @@ get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1,
           bound_box_lon2 -= RESTR_SCALE(PI2);
         }
 
-      for (size_t src_cell_add = min_add; src_cell_add <= max_add;
-           ++src_cell_add)
+      for (size_t src_cell_add = min_add; src_cell_add <= max_add; ++src_cell_add)
         {
           src_cell_addm4 = src_cell_add << 2;
           if ((src_cell_bound_box[src_cell_addm4 + 2] <= bound_box_lon2)
@@ -203,10 +193,8 @@ get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1,
 }
 
 static int
-grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add,
-               double *restrict nbr_dist, double plat, double plon,
-               const double *restrict src_center_lat,
-               const double *restrict src_center_lon)
+grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double *restrict nbr_dist, double plat,
+               double plon, const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
   double distance; /* For computing dist-weighted avg */
@@ -221,8 +209,7 @@ grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add,
   for (size_t srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
       distance = acos(coslat_dst * cos(src_center_lat[srch_add])
-                          * (coslon_dst * cos(src_center_lon[srch_add])
-                             + sinlon_dst * sin(src_center_lon[srch_add]))
+                          * (coslon_dst * cos(src_center_lon[srch_add]) + sinlon_dst * sin(src_center_lon[srch_add]))
                       + sinlat_dst * sin(src_center_lat[srch_add]));
 
       if (distance < dist_min)
@@ -316,9 +303,7 @@ quad_cross_products(double plon, double plat, double lons[4], double lats[4])
 
       if (n == 0) scross_last = scross[n];
 
-      if ((scross[n] < 0 && scross_last > 0)
-          || (scross[n] > 0 && scross_last < 0))
-        break;
+      if ((scross[n] < 0 && scross_last > 0) || (scross[n] > 0 && scross_last < 0)) break;
 
       scross_last = scross[n];
     }
@@ -328,8 +313,7 @@ quad_cross_products(double plon, double plat, double lons[4], double lats[4])
       n = 0;
       if (scross[0] >= 0 && scross[1] >= 0 && scross[2] >= 0 && scross[3] >= 0)
         n = 4;
-      else if (scross[0] <= 0 && scross[1] <= 0 && scross[2] <= 0
-               && scross[3] <= 0)
+      else if (scross[0] <= 0 && scross[1] <= 0 && scross[2] <= 0 && scross[3] <= 0)
         n = 4;
     }
 
@@ -337,10 +321,8 @@ quad_cross_products(double plon, double plat, double lons[4], double lats[4])
 }
 
 bool
-point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j,
-              size_t adds[4], double lons[4], double lats[4], double plon,
-              double plat, const double *restrict center_lon,
-              const double *restrict center_lat)
+point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4], double lats[4],
+              double plon, double plat, const double *restrict center_lon, const double *restrict center_lat)
 {
   bool search_result = false;
   size_t ip1 = (i < (nx - 1)) ? i + 1 : is_cyclic ? 0 : i;
@@ -373,12 +355,9 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j,
 }
 
 int
-grid_search(remapgrid_t *src_grid, size_t *restrict src_add,
-            double *restrict src_lats, double *restrict src_lons, double plat,
-            double plon, const size_t *restrict src_grid_dims,
-            const double *restrict src_center_lat,
-            const double *restrict src_center_lon,
-            const restr_t *restrict src_grid_bound_box,
+grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+            double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
+            const double *restrict src_center_lon, const restr_t *restrict src_grid_bound_box,
             const size_t *restrict src_bin_add)
 {
   /*
@@ -441,10 +420,8 @@ grid_search(remapgrid_t *src_grid, size_t *restrict src_add,
     {
       srch_add4 = srch_add << 2;
       /* First check bounding box */
-      if (rlon >= src_grid_bound_box[srch_add4 + 2]
-          && rlon <= src_grid_bound_box[srch_add4 + 3]
-          && rlat >= src_grid_bound_box[srch_add4]
-          && rlat <= src_grid_bound_box[srch_add4 + 1])
+      if (rlon >= src_grid_bound_box[srch_add4 + 2] && rlon <= src_grid_bound_box[srch_add4 + 3]
+          && rlat >= src_grid_bound_box[srch_add4] && rlat <= src_grid_bound_box[srch_add4 + 1])
         {
           /* We are within bounding box so get really serious */
 
@@ -452,8 +429,7 @@ grid_search(remapgrid_t *src_grid, size_t *restrict src_add,
           size_t j = srch_add / nx;
           size_t i = srch_add - j * nx;
 
-          if (point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add,
-                            src_lons, src_lats, plon, plat, src_center_lon,
+          if (point_in_quad(src_grid->is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon,
                             src_center_lat))
             {
               search_result = 1;
@@ -477,8 +453,7 @@ grid_search(remapgrid_t *src_grid, size_t *restrict src_add,
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-  search_result = grid_search_nn(min_add, max_add, src_add, src_lats, plat,
-                                 plon, src_center_lat, src_center_lon);
+  search_result = grid_search_nn(min_add, max_add, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
 
   return search_result;
 } /* grid_search */

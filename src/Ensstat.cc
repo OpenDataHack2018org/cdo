@@ -100,17 +100,14 @@ ensstat_func(void *ensarg)
       for (int fileID = 0; fileID < nfiles; fileID++)
         {
           field[ompthID].ptr[fileID] = ef[fileID].array[t][i];
-          if (lmiss
-              && DBL_IS_EQUAL(field[ompthID].ptr[fileID],
-                              ef[fileID].missval[t]))
+          if (lmiss && DBL_IS_EQUAL(field[ompthID].ptr[fileID], ef[fileID].missval[t]))
             {
               field[ompthID].ptr[fileID] = missval;
               field[ompthID].nmiss++;
             }
         }
 
-      arg->array2[i] = arg->lpctl ? fldpctl(field[ompthID], arg->pn)
-                                  : fldfun(field[ompthID], arg->operfunc);
+      arg->array2[i] = arg->lpctl ? fldpctl(field[ompthID], arg->pn) : fldfun(field[ompthID], arg->operfunc);
 
       if (DBL_IS_EQUAL(arg->array2[i], field[ompthID].missval)) nmiss++;
 
@@ -122,8 +119,7 @@ ensstat_func(void *ensarg)
 
   if (arg->count_data)
     {
-      pstreamDefRecord(arg->streamID2, arg->varID[t] + arg->nvars,
-                       arg->levelID[t]);
+      pstreamDefRecord(arg->streamID2, arg->varID[t] + arg->nvars, arg->levelID[t]);
       pstreamWriteRecord(arg->streamID2, arg->count2, 0);
     }
 
@@ -187,14 +183,12 @@ Ensstat(void *process)
 
   const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
-  if (!cdoOverwriteMode && fileExists(ofilename)
-      && !userFileOverwrite(ofilename))
+  if (!cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename))
     cdoAbort("Outputfile %s already exists!", ofilename);
 
   ens_file_t *ef = (ens_file_t *) Malloc(nfiles * sizeof(ens_file_t));
 
-  field_type *field
-      = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
+  field_type *field = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
   for (int i = 0; i < Threading::ompNumThreads; i++)
     {
       field_init(&field[i]);
@@ -223,8 +217,7 @@ Ensstat(void *process)
   for (int fileID = 0; fileID < nfiles; fileID++)
     {
       ef[fileID].array[0] = (double *) Malloc(gridsizemax * sizeof(double));
-      ef[fileID].array[1]
-          = task ? (double *) Malloc(gridsizemax * sizeof(double)) : NULL;
+      ef[fileID].array[1] = task ? (double *) Malloc(gridsizemax * sizeof(double)) : NULL;
     }
 
   double *array2 = (double *) Malloc(gridsizemax * sizeof(double));
@@ -245,8 +238,7 @@ Ensstat(void *process)
           int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, timetype);
           vlistDefVarName(vlistID2, cvarID, name);
           vlistDefVarDatatype(vlistID2, cvarID, CDI_DATATYPE_INT16);
-          if (cvarID != (varID + nvars))
-            cdoAbort("Internal error, varIDs do not match!");
+          if (cvarID != (varID + nvars)) cdoAbort("Internal error, varIDs do not match!");
         }
     }
 
@@ -282,24 +274,19 @@ Ensstat(void *process)
               if (nrecs == 0)
                 {
                   lwarning = true;
-                  cdoWarning(
-                      "Inconsistent ensemble file, too few time steps in %s!",
-                      cdoGetStreamName(fileID).c_str());
+                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(fileID).c_str());
                 }
               else if (nrecs0 == 0)
                 {
                   lwarning = true;
-                  cdoWarning(
-                      "Inconsistent ensemble file, too few time steps in %s!",
-                      cdoGetStreamName(0).c_str());
+                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(0).c_str());
                 }
               else
                 {
                   lerror = true;
                   cdoWarning("Inconsistent ensemble file, number of records at "
                              "time step %d of %s and %s differ!",
-                             tsID + 1, cdoGetStreamName(0).c_str(),
-                             cdoGetStreamName(fileID).c_str());
+                             tsID + 1, cdoGetStreamName(0).c_str(), cdoGetStreamName(fileID).c_str());
                 }
               goto CLEANUP;
             }
@@ -318,14 +305,12 @@ Ensstat(void *process)
           for (int fileID = 0; fileID < nfiles; fileID++)
             {
               pstreamInqRecord(ef[fileID].streamID, &varID, &levelID);
-              ef[fileID].missval[t]
-                  = vlistInqVarMissval(ef[fileID].vlistID, varID);
+              ef[fileID].missval[t] = vlistInqVarMissval(ef[fileID].vlistID, varID);
             }
           //#pragma omp parallel for default(none) shared(ef, nfiles)
           for (int fileID = 0; fileID < nfiles; fileID++)
             {
-              pstreamReadRecord(ef[fileID].streamID, ef[fileID].array[t],
-                                &ef[fileID].nmiss[t]);
+              pstreamReadRecord(ef[fileID].streamID, ef[fileID].array[t], &ef[fileID].nmiss[t]);
             }
 
           ensstat_arg.ef = ef;
@@ -349,12 +334,8 @@ Ensstat(void *process)
 
 CLEANUP:
 
-  if (lwarning)
-    cdoWarning("Inconsistent ensemble, processed only the first %d timesteps!",
-               tsID);
-  if (lerror)
-    cdoAbort("Inconsistent ensemble, processed only the first %d timesteps!",
-             tsID);
+  if (lwarning) cdoWarning("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
+  if (lerror) cdoAbort("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
 
   for (int fileID = 0; fileID < nfiles; fileID++)
     pstreamClose(ef[fileID].streamID);

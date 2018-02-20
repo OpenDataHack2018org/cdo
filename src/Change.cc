@@ -83,8 +83,7 @@ Change(void *process)
       for (i = 0; i < nch; i++)
         chints[i] = parameter2int(operatorArgv()[i]);
     }
-  else if (operatorID == CHPARAM || operatorID == CHNAME
-           || operatorID == CHUNIT)
+  else if (operatorID == CHPARAM || operatorID == CHNAME || operatorID == CHUNIT)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
       for (i = 0; i < nch; i++)
@@ -135,8 +134,7 @@ Change(void *process)
         {
           code = vlistInqVarCode(vlistID2, varID);
           for (i = 0; i < nch; i += 2)
-            if (code == chints[i])
-              vlistDefVarCode(vlistID2, varID, chints[i + 1]);
+            if (code == chints[i]) vlistDefVarCode(vlistID2, varID, chints[i + 1]);
         }
     }
   else if (operatorID == CHTABNUM)
@@ -167,8 +165,7 @@ Change(void *process)
               cdoPrint("pnum, pcat, pdis: %d.%d.%d", pnum, pcat, pdis);
             }
           for (i = 0; i < nch; i += 2)
-            if (param == stringToParam(chnames[i]))
-              vlistDefVarParam(vlistID2, varID, stringToParam(chnames[i + 1]));
+            if (param == stringToParam(chnames[i])) vlistDefVarParam(vlistID2, varID, stringToParam(chnames[i + 1]));
         }
     }
   else if (operatorID == CHNAME)
@@ -178,8 +175,7 @@ Change(void *process)
         {
           vlistInqVarName(vlistID2, varID, varname);
           for (i = 0; i < nch; i += 2)
-            if (strcmp(varname, chnames[i]) == 0)
-              vlistDefVarName(vlistID2, varID, chnames[i + 1]);
+            if (strcmp(varname, chnames[i]) == 0) vlistDefVarName(vlistID2, varID, chnames[i + 1]);
         }
     }
   else if (operatorID == CHUNIT)
@@ -190,8 +186,7 @@ Change(void *process)
 
           vlistInqVarUnits(vlistID2, varID, varname);
           for (i = 0; i < nch; i += 2)
-            if (strcmp(varname, chnames[i]) == 0)
-              vlistDefVarUnits(vlistID2, varID, chnames[i + 1]);
+            if (strcmp(varname, chnames[i]) == 0) vlistDefVarUnits(vlistID2, varID, chnames[i + 1]);
         }
     }
   else if (operatorID == CHLEVEL)
@@ -220,8 +215,7 @@ Change(void *process)
                   zaxisID2 = zaxisDuplicate(zaxisID1);
                   for (i = 0; i < nch; i += 2)
                     for (k = 0; k < nlevs; k++)
-                      if (fabs(levels[k] - chlevels[i]) < 0.001)
-                        newlevels[k] = chlevels[i + 1];
+                      if (fabs(levels[k] - chlevels[i]) < 0.001) newlevels[k] = chlevels[i + 1];
 
                   zaxisDefLevels(zaxisID2, newlevels);
                   vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
@@ -268,8 +262,7 @@ Change(void *process)
             {
               zaxisID2 = zaxisDuplicate(zaxisID1);
               for (k = 0; k < nlevs; k++)
-                if (fabs(levels[k] - chlevels[0]) < 0.001)
-                  levels[k] = chlevels[1];
+                if (fabs(levels[k] - chlevels[0]) < 0.001) levels[k] = chlevels[1];
 
               zaxisDefLevels(zaxisID2, levels);
               vlistChangeVarZaxis(vlistID2, varID, zaxisID2);

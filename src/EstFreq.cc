@@ -67,8 +67,7 @@ EstFreq(void *process)
           currentmon = fmonth;
         }
       else
-        cdiDecodeDate(taxisInqVdate(taxisID1), &currentyear, &currentmon,
-                      &dummy);
+        cdiDecodeDate(taxisInqVdate(taxisID1), &currentyear, &currentmon, &dummy);
       if (currentyear == fyear)
         {
           lymonth = currentmon;
@@ -115,16 +114,13 @@ EstFreq(void *process)
         strcpy(frequency, "yr");
       else if (DBL_IS_EQUAL(ntsteps / covered_years, 12.))
         strcpy(frequency, "mon");
-      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365.)
-               || DBL_IS_EQUAL(ntsteps / covered_years, 365.25)
+      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365.) || DBL_IS_EQUAL(ntsteps / covered_years, 365.25)
                || DBL_IS_EQUAL(ntsteps / covered_years, 366.))
         strcpy(frequency, "day");
-      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365. * 4)
-               || DBL_IS_EQUAL(ntsteps / covered_years, 365.25 * 4)
+      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365. * 4) || DBL_IS_EQUAL(ntsteps / covered_years, 365.25 * 4)
                || DBL_IS_EQUAL(ntsteps / covered_years, 366. * 4))
         strcpy(frequency, "6hr");
-      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365. * 8)
-               || DBL_IS_EQUAL(ntsteps / covered_years, 365.25 * 8)
+      else if (DBL_IS_EQUAL(ntsteps / covered_years, 365. * 8) || DBL_IS_EQUAL(ntsteps / covered_years, 365.25 * 8)
                || DBL_IS_EQUAL(ntsteps / covered_years, 366. * 8))
         strcpy(frequency, "3hr");
       else
@@ -137,8 +133,7 @@ EstFreq(void *process)
                    "subdaily respectively.\n Next try:\n\nFrequency is "
                    "calculated by dividing the number of time steps '%d' in "
                    "year '%d' by the covered months in that year '%d'.\n",
-                   ntsteps / covered_years, step_per_year, fyear,
-                   covered_months);
+                   ntsteps / covered_years, step_per_year, fyear, covered_months);
           if (step_per_year > 366 * 8)
             cdoAbort("Step per year '%d' in year '%d' is bigger than 366*8 "
                      "which corresponds to a frequency of sub-3hourly! This is "
@@ -148,8 +143,7 @@ EstFreq(void *process)
             {
               if ((double) step_per_year / (double) covered_months > 31 * 8)
                 cdoAbort("Frequency is sub-3hourly! Not yet enabled.");
-              else if ((double) step_per_year / (double) covered_months
-                       > 31 * 4)
+              else if ((double) step_per_year / (double) covered_months > 31 * 4)
                 strcpy(frequency, "3hr");
               else if ((double) step_per_year / (double) covered_months > 31)
                 strcpy(frequency, "6hr");
@@ -164,8 +158,7 @@ EstFreq(void *process)
     cdoAbort("For %d found timesteps no frequency can be computed - at least 3 "
              "timesteps are required.",
              ntsteps);
-  if (cdoVerbose)
-    printf("Your file indicates a frequency of '%s'.\n", frequency);
+  if (cdoVerbose) printf("Your file indicates a frequency of '%s'.\n", frequency);
   cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", 3, frequency);
 
   streamClose(streamID1);

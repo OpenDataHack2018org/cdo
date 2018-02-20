@@ -28,8 +28,7 @@ juldate_encode(int calendar, int date, int time)
   cdiDecodeDate(date, &year, &month, &day);
   cdiDecodeTime(time, &hour, &minute, &second);
 
-  encode_caldaysec(calendar, year, month, day, hour, minute, second,
-                   &juldate.julday, &juldate.secofday);
+  encode_caldaysec(calendar, year, month, day, hour, minute, second, &juldate.julday, &juldate.secofday);
 
   return juldate;
 }
@@ -39,8 +38,7 @@ juldate_decode(int calendar, juldate_t juldate, int *date, int *time)
 {
   int year, month, day, hour, minute, second;
 
-  decode_caldaysec(calendar, juldate.julday, juldate.secofday, &year, &month,
-                   &day, &hour, &minute, &second);
+  decode_caldaysec(calendar, juldate.julday, juldate.secofday, &year, &month, &day, &hour, &minute, &second);
 
   *date = cdiEncodeDate(year, month, day);
   *time = cdiEncodeTime(hour, minute, second);
@@ -51,8 +49,8 @@ juldate_sub(juldate_t juldate2, juldate_t juldate1)
 {
   juldate_t juldate;
 
-  (void) julday_sub(juldate1.julday, juldate1.secofday, juldate2.julday,
-                    juldate2.secofday, &juldate.julday, &juldate.secofday);
+  (void) julday_sub(juldate1.julday, juldate1.secofday, juldate2.julday, juldate2.secofday, &juldate.julday,
+                    &juldate.secofday);
 
   return juldate;
 }

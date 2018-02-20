@@ -262,9 +262,8 @@ void *Magvector(void *argument);
 void *Maggraph(void *argument);
 
 // HIRLAM_EXTENSIONS
-void *Selmulti(void *argument);  // "selmulti", "delmulti"
-void *WindTrans(
-    void *argument);  // "uvDestag", "rotuvN", "rotuvNorth", "projuvLatLon"
+void *Selmulti(void *argument);    // "selmulti", "delmulti"
+void *WindTrans(void *argument);   // "uvDestag", "rotuvN", "rotuvNorth", "projuvLatLon"
 void *Samplegrid(void *argument);  // "samplegrid", "subgrid"
 
 /* \endcond */

@@ -18,10 +18,8 @@
 #include "remap.h"
 
 int
-grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add,
-                     double *restrict nbr_dist, double plat, double plon,
-                     const double *restrict src_center_lat,
-                     const double *restrict src_center_lon)
+grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat,
+                     double plon, const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
   double coslat_dst = cos(plat);
@@ -67,8 +65,7 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add,
   double *sincoslon = (double *) Malloc(nx * sizeof(double));
 
   for (size_t ii = 0; ii < nx; ++ii)
-    sincoslon[ii] = coslon_dst * cos(src_center_lon[ii])
-                    + sinlon_dst * sin(src_center_lon[ii]);
+    sincoslon[ii] = coslon_dst * cos(src_center_lon[ii]) + sinlon_dst * sin(src_center_lon[ii]);
 
   for (size_t jj = jjf; jj <= jjl; ++jj)
     {
@@ -119,11 +116,8 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add,
 }
 
 int
-grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add,
-                  double *restrict src_lats, double *restrict src_lons,
-                  double plat, double plon,
-                  const size_t *restrict src_grid_dims,
-                  const double *restrict src_center_lat,
+grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                  double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
                   const double *restrict src_center_lon)
 {
   /*
@@ -158,8 +152,7 @@ grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add,
   if (/*plon > PI2 &&*/ plon > src_center_lon[nxm - 1]) plon -= PI2;
 
   size_t ii, jj;
-  int lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon,
-                                src_center_lat);
+  int lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon, src_center_lat);
 
   if (lfound)
     {
@@ -202,8 +195,7 @@ grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add,
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-  search_result = grid_search_reg2d_nn(nx, ny, src_add, src_lats, plat, plon,
-                                       src_center_lat, src_center_lon);
+  search_result = grid_search_reg2d_nn(nx, ny, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
 
   return search_result;
 } /* grid_search_reg2d */

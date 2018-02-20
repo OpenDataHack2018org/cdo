@@ -28,8 +28,7 @@
 #include "stdnametable.h"
 #include "util_string.h"
 
-void MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph,
-                      int nhor, int nlev);
+void MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor, int nlev);
 
 double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf);
 
@@ -43,8 +42,7 @@ Derivepar(void *process)
   int zaxisID;
   int nlevel;
   int surfaceID = -1;
-  int sgeopotID = -1, geopotID = -1, tempID = -1, humID = -1, psID = -1,
-      lnpsID = -1, presID = -1, gheightID = -1;
+  int sgeopotID = -1, geopotID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1, gheightID = -1;
   // int clwcID = -1, ciwcID = -1;
   int code, param;
   int pnum, pcat, pdis;
@@ -73,8 +71,7 @@ Derivepar(void *process)
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int gridID = vlistGrid(vlistID1, 0);
-  if (gridInqType(gridID) == GRID_SPECTRAL)
-    cdoAbort("Spectral data unsupported!");
+  if (gridInqType(gridID) == GRID_SPECTRAL) cdoAbort("Spectral data unsupported!");
 
   size_t gridsize = vlist_check_gridsize(vlistID1);
 
@@ -87,8 +84,7 @@ Derivepar(void *process)
     for (i = 0; i < nvct / 2; ++i)
       cdoPrint("vct: %5d %25.17f %25.17f", i, vct[i], vct[nvct / 2 + i]);
 
-  if (zaxisIDh == -1)
-    cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
+  if (zaxisIDh == -1) cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
 
   int nvars = vlistNvars(vlistID1);
 
@@ -150,9 +146,7 @@ Derivepar(void *process)
           echam_gribcodes(&gribcodes);
         }
 
-      if (cdoVerbose)
-        cdoPrint("Mode = %d  Center = %d  Param = %s", static_cast<int>(mode),
-                 instNum, paramstr);
+      if (cdoVerbose) cdoPrint("Mode = %d  Center = %d  Param = %s", static_cast<int>(mode), instNum, paramstr);
 
       if (code <= 0 || code == 255)
         {
@@ -204,12 +198,10 @@ Derivepar(void *process)
 
       if (operatorID == SEALEVELPRESSURE) humID = -1;
 
-      if (gridInqType(gridID) == GRID_SPECTRAL
-          && zaxisInqType(zaxisID) == ZAXIS_HYBRID)
+      if (gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID)
         cdoAbort("Spectral data on model level unsupported!");
 
-      if (gridInqType(gridID) == GRID_SPECTRAL)
-        cdoAbort("Spectral data unsupported!");
+      if (gridInqType(gridID) == GRID_SPECTRAL) cdoAbort("Spectral data unsupported!");
     }
 
   if (cdoVerbose)
@@ -217,8 +209,7 @@ Derivepar(void *process)
       cdoPrint("Found:");
       if (tempID != -1) cdoPrint("  %s", var_stdname(air_temperature));
       if (psID != -1) cdoPrint("  %s", var_stdname(surface_air_pressure));
-      if (lnpsID != -1)
-        cdoPrint("  LOG(%s)", var_stdname(surface_air_pressure));
+      if (lnpsID != -1) cdoPrint("  LOG(%s)", var_stdname(surface_air_pressure));
       if (sgeopotID != -1) cdoPrint("  %s", var_stdname(surface_geopotential));
       if (geopotID != -1) cdoPrint("  %s", var_stdname(geopotential));
       if (gheightID != -1) cdoPrint("  %s", var_stdname(geopotential_height));
@@ -234,16 +225,14 @@ Derivepar(void *process)
   // lwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
   // iwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
-  double *half_press
-      = (double *) Malloc(gridsize * (nhlevf + 1) * sizeof(double));
+  double *half_press = (double *) Malloc(gridsize * (nhlevf + 1) * sizeof(double));
 
   double *hum = NULL;
   double *gheight = NULL;
   if (operatorID == GHEIGHT)
     {
       if (humID == -1)
-        cdoWarning("%s not found - using algorithm without %s!",
-                   var_stdname(specific_humidity),
+        cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity),
                    var_stdname(specific_humidity));
       else
         hum = (double *) Malloc(gridsize * nhlevf * sizeof(double));
@@ -263,11 +252,10 @@ Derivepar(void *process)
   if (zaxisIDh != -1 && sgeopotID == -1)
     {
       if (geopotID == -1)
-        cdoWarning("%s not found - set to zero!",
-                   var_stdname(surface_geopotential));
+        cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
       else
-        cdoPrint("%s not found - using bottom layer of %s!",
-                 var_stdname(surface_geopotential), var_stdname(geopotential));
+        cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential),
+                 var_stdname(geopotential));
 
       arrayFill(gridsize, sgeopot, 0.0);
     }
@@ -306,8 +294,7 @@ Derivepar(void *process)
   else
     cdoAbort("Internal problem, invalid operatorID: %d!", operatorID);
 
-  vlistDefVarParam(vlistID2, varID,
-                   cdiEncodeParam(var_echamcode(var_id), 128, 255));
+  vlistDefVarParam(vlistID2, varID, cdiEncodeParam(var_echamcode(var_id), 128, 255));
   vlistDefVarName(vlistID2, varID, var_name(var_id));
   vlistDefVarStdname(vlistID2, varID, var_stdname(var_id));
   vlistDefVarUnits(vlistID2, varID, var_units(var_id));
@@ -340,8 +327,7 @@ Derivepar(void *process)
                 {
                   arrayCopy(gridsize, array, sgeopot);
                 }
-              else if (varID == geopotID && sgeopotID == -1
-                       && (levelID + 1) == nhlevf)
+              else if (varID == geopotID && sgeopotID == -1 && (levelID + 1) == nhlevf)
                 {
                   arrayCopy(gridsize, array, sgeopot);
                 }
@@ -365,14 +351,12 @@ Derivepar(void *process)
           /* check range of ps_prog */
           arrayMinMaxMask(gridsize, ps, NULL, &minval, &maxval);
           if (minval < MIN_PS || maxval > MAX_PS)
-            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval,
-                       maxval);
+            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           /* check range of surface geopot */
           arrayMinMaxMask(gridsize, sgeopot, NULL, &minval, &maxval);
           if (minval < MIN_FIS || maxval > MAX_FIS)
-            cdoWarning("Orography out of range (min=%g max=%g)!", minval,
-                       maxval);
+            cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
         }
 
       varID = tempID;
@@ -384,9 +368,7 @@ Derivepar(void *process)
 
           arrayMinMaxMask(gridsize, single2, NULL, &minval, &maxval);
           if (minval < MIN_T || maxval > MAX_T)
-            cdoWarning(
-                "Input temperature at level %d out of range (min=%g max=%g)!",
-                levelID + 1, minval, maxval);
+            cdoWarning("Input temperature at level %d out of range (min=%g max=%g)!", levelID + 1, minval, maxval);
         }
 
       if (humID != -1)
@@ -402,9 +384,7 @@ Derivepar(void *process)
 
               arrayMinMaxMask(gridsize, single2, NULL, &minval, &maxval);
               if (minval < -0.1 || maxval > MAX_Q)
-                cdoWarning(
-                    "Input humidity at level %d out of range (min=%g max=%g)!",
-                    levelID + 1, minval, maxval);
+                cdoWarning("Input humidity at level %d out of range (min=%g max=%g)!", levelID + 1, minval, maxval);
             }
         }
 
@@ -420,16 +400,14 @@ Derivepar(void *process)
           for (levelID = 0; levelID < nlevel; levelID++)
             {
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2, gheight + levelID * gridsize,
-                                 nmissout);
+              pstreamWriteRecord(streamID2, gheight + levelID * gridsize, nmissout);
             }
         }
       else if (operatorID == SEALEVELPRESSURE)
         {
           presh(full_press, half_press, vct, ps, nhlevf, gridsize);
 
-          extra_P(sealevelpressure, half_press + gridsize * (nhlevf),
-                  full_press + gridsize * (nhlevf - 1), sgeopot,
+          extra_P(sealevelpressure, half_press + gridsize * (nhlevf), full_press + gridsize * (nhlevf - 1), sgeopot,
                   temp + gridsize * (nhlevf - 1), gridsize);
 
           pstreamDefRecord(streamID2, 0, 0);

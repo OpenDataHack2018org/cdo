@@ -165,8 +165,7 @@ typedef long long LONGLONG;
 
 #include <stdio.h>  /* NULL [in all machines stdio.h]                      */
 #include <string.h> /* strlen, memset, memcpy, memchr.                     */
-#if !(defined(VAXUltrix) || defined(sun) \
-      || (defined(apollo) && !defined(__STDCPP__)))
+#if !(defined(VAXUltrix) || defined(sun) || (defined(apollo) && !defined(__STDCPP__)))
 #include <stdlib.h> /* malloc,free                                         */
 #else
 #include <malloc.h> /* Had to be removed for DomainOS h105 10.4 sys5.3 425t*/
@@ -176,8 +175,7 @@ typedef long long LONGLONG;
 #endif
 #endif
 
-#if !defined(__GNUC__) && !defined(__sun) \
-    && (defined(sun) || defined(VAXUltrix) || defined(lynx))
+#if !defined(__GNUC__) && !defined(__sun) && (defined(sun) || defined(VAXUltrix) || defined(lynx))
 #define __CF__KnR /* Sun, LynxOS and VAX Ultrix cc only supports K&R.     */
                   /* Manually define __CF__KnR for HP if desired/required.*/
 #endif            /*       i.e. We will generate Kernighan and Ritchie C. */
@@ -192,8 +190,7 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 
 /* 11/29/2003 (KMCCARTY): add *INTEL_COMPILER symbols here */
 /* 04/05/2006 (KMCCARTY): add gFortran symbol here */
-#if defined(CLIPPERFortran) || defined(pgiFortran)          \
-    || defined(__INTEL_COMPILER) || defined(INTEL_COMPILER) \
+#if defined(CLIPPERFortran) || defined(pgiFortran) || defined(__INTEL_COMPILER) || defined(INTEL_COMPILER) \
     || defined(gFortran)
 #define f2cFortran
 #endif
@@ -204,17 +201,14 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 
 /* VAX/VMS does not let us \-split long #if lines. */
 /* Split #if into 2 because some HP-UX can't handle long #if */
-#if !(defined(NAGf90Fortran) || defined(f2cFortran) || defined(hpuxFortran) \
-      || defined(apolloFortran) || defined(sunFortran)                      \
-      || defined(IBMR2Fortran) || defined(CRAYFortran))
-#if !(defined(mipsFortran) || defined(DECFortran) || defined(vmsFortran) \
-      || defined(CONVEXFortran) || defined(PowerStationFortran)          \
-      || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran)         \
+#if !(defined(NAGf90Fortran) || defined(f2cFortran) || defined(hpuxFortran) || defined(apolloFortran) \
+      || defined(sunFortran) || defined(IBMR2Fortran) || defined(CRAYFortran))
+#if !(defined(mipsFortran) || defined(DECFortran) || defined(vmsFortran) || defined(CONVEXFortran) \
+      || defined(PowerStationFortran) || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran)   \
       || defined(SXFortran))
 /* If no Fortran compiler is given, we choose one for the machines we know.   */
 #if defined(__GNUC__) || defined(WIN32) /* 10/2009 BR: warm if guess */
-#warning \
-    "Please specify the fortran compiler using -D flags. Try to guess the compiler used"
+#warning "Please specify the fortran compiler using -D flags. Try to guess the compiler used"
 #endif
 #if defined(lynx) || defined(VAXUltrix)
 #define f2cFortran /* Lynx:      Only support f2c at the moment.   \
@@ -281,12 +275,10 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 #endif /* ...Fortran */
 
 /* Split #if into 2 because some HP-UX can't handle long #if */
-#if !(defined(NAGf90Fortran) || defined(f2cFortran) || defined(hpuxFortran) \
-      || defined(apolloFortran) || defined(sunFortran)                      \
-      || defined(IBMR2Fortran) || defined(CRAYFortran))
-#if !(defined(mipsFortran) || defined(DECFortran) || defined(vmsFortran) \
-      || defined(CONVEXFortran) || defined(PowerStationFortran)          \
-      || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran)         \
+#if !(defined(NAGf90Fortran) || defined(f2cFortran) || defined(hpuxFortran) || defined(apolloFortran) \
+      || defined(sunFortran) || defined(IBMR2Fortran) || defined(CRAYFortran))
+#if !(defined(mipsFortran) || defined(DECFortran) || defined(vmsFortran) || defined(CONVEXFortran) \
+      || defined(PowerStationFortran) || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran)   \
       || defined(SXFortran))
 /* If your compiler barfs on ' #error', replace # with the trigraph for #     */
 #error "cfortran.h:  Can't find your environment among:\
@@ -327,28 +319,27 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 /* Throughout cfortran.h we use: UN = Uppercase Name.  LN = Lowercase Name.   */
 
 /* "extname" changed to "appendus" below (CFITSIO) */
-#if defined(f2cFortran) || defined(NAGf90Fortran) || defined(DECFortran)     \
-    || defined(mipsFortran) || defined(apolloFortran) || defined(sunFortran) \
-    || defined(CONVEXFortran) || defined(SXFortran) || defined(appendus)
+#if defined(f2cFortran) || defined(NAGf90Fortran) || defined(DECFortran) || defined(mipsFortran)     \
+    || defined(apolloFortran) || defined(sunFortran) || defined(CONVEXFortran) || defined(SXFortran) \
+    || defined(appendus)
 #define CFC_(UN, LN) _(LN, _) /* Lowercase FORTRAN symbols.     */
 #define orig_fcallsc(UN, LN) CFC_(UN, LN)
 #else
-#if defined(CRAYFortran) || defined(PowerStationFortran) \
-    || defined(AbsoftProFortran)
-#ifdef _CRAY /* (UN), not UN, circumvents CRAY preprocessor bug.     */
+#if defined(CRAYFortran) || defined(PowerStationFortran) || defined(AbsoftProFortran)
+#ifdef _CRAY              /* (UN), not UN, circumvents CRAY preprocessor bug.     */
 #define CFC_(UN, LN) (UN) /* Uppercase FORTRAN symbols.     */
-#else /* At least VISUAL_CPLUSPLUS barfs on (UN), so need UN. */
-#define CFC_(UN, LN) UN /* Uppercase FORTRAN symbols.     */
+#else                     /* At least VISUAL_CPLUSPLUS barfs on (UN), so need UN. */
+#define CFC_(UN, LN) UN   /* Uppercase FORTRAN symbols.     */
 #endif
 #define orig_fcallsc(UN, LN) CFC_(UN, LN) /* CRAY insists on arg.'s here.   */
-#else /* For following machines one may wish to change the fcallsc default. */
+#else                                     /* For following machines one may wish to change the fcallsc default. */
 #define CF_SAME_NAMESPACE
 #ifdef vmsFortran
 #define CFC_(UN, LN) LN /* Either case FORTRAN symbols.   */
 /* BUT we usually use UN for C macro to FORTRAN routines, so use LN here,*/
 /* because VAX/VMS doesn't do recursive macros.                          */
 #define orig_fcallsc(UN, LN) UN
-#else /* HP-UX without +ppu or IBMR2 without -qextname. NOT reccomended. */
+#else                   /* HP-UX without +ppu or IBMR2 without -qextname. NOT reccomended. */
 #define CFC_(UN, LN) LN /* Lowercase FORTRAN symbols.     */
 #define orig_fcallsc(UN, LN) CFC_(UN, LN)
 #endif /*  vmsFortran */
@@ -442,11 +433,9 @@ only C calling FORTRAN subroutines will work using K&R style.*/
 /* Note that VAX/VMS, IBM, Mips choke on 'type function(...);' prototypes. */
 #define CF_NULL_PROTO ...
 #ifndef __CF__APOLLO67
-#define COMMON_BLOCK_DEF(DEFINITION, NAME) \
-  DEFINITION NAME __attribute((__section(NAME)))
+#define COMMON_BLOCK_DEF(DEFINITION, NAME) DEFINITION NAME __attribute((__section(NAME)))
 #else
-#define COMMON_BLOCK_DEF(DEFINITION, NAME) \
-  DEFINITION NAME #attribute[section(NAME)]
+#define COMMON_BLOCK_DEF(DEFINITION, NAME) DEFINITION NAME #attribute[section(NAME)]
 #endif
 #endif
 
@@ -513,10 +502,8 @@ Apollo                                           : neg.   = TRUE, else FALSE.
 [DECFortran for Ultrix RISC is also called f77 but is the same as VAX/VMS.]
 [MIPS f77 treats .eqv./.neqv. as .eq./.ne. and hence requires LOGICAL_STRICT.]*/
 
-#if defined(NAGf90Fortran) || defined(f2cFortran) || defined(mipsFortran) \
-    || defined(PowerStationFortran) || defined(hpuxFortran800)            \
-    || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran)            \
-    || defined(SXFortran)
+#if defined(NAGf90Fortran) || defined(f2cFortran) || defined(mipsFortran) || defined(PowerStationFortran) \
+    || defined(hpuxFortran800) || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran) || defined(SXFortran)
 /* SX/PowerStationFortran have 0 and 1 defined, others are neither T nor F.   */
 /* hpuxFortran800 has 0 and 0x01000000 defined. Others are unknown.           */
 #define LOGICAL_STRICT /* Other Fortran have .eqv./.neqv. == .eq./.ne.   */
@@ -547,8 +534,7 @@ Apollo                                           : neg.   = TRUE, else FALSE.
 #define C2FLOGICAL(L) _btol(L)
 #define F2CLOGICAL(L) _ltob(&(L)) /* Strangely _ltob() expects a pointer. */
 #else
-#if defined(IBMR2Fortran) || defined(vmsFortran) || defined(DECFortran) \
-    || defined(AbsoftUNIXFortran)
+#if defined(IBMR2Fortran) || defined(vmsFortran) || defined(DECFortran) || defined(AbsoftUNIXFortran)
 /* How come no AbsoftProFortran ? */
 #define C2FLOGICAL(L) ((L) ? (L) | 1 : (L) & ~(int) 1)
 #define F2CLOGICAL(L) ((L) &1 ? (L) : 0)
@@ -589,11 +575,9 @@ Apollo                                           : neg.   = TRUE, else FALSE.
 #define C2FLOGICAL(L) ((L) ? 0x01000000 : 0)
 #else
 #if defined(apolloFortran) || defined(vmsFortran) || defined(DECFortran)
-#define C2FLOGICAL(L) \
-  ((L) ? -1 : 0) /* These machines use -1/0 for .true./.false.*/
+#define C2FLOGICAL(L) ((L) ? -1 : 0) /* These machines use -1/0 for .true./.false.*/
 #else
-#define C2FLOGICAL(L) \
-  ((L) ? 1 : 0) /* All others     use +1/0 for .true./.false.*/
+#define C2FLOGICAL(L) ((L) ? 1 : 0) /* All others     use +1/0 for .true./.false.*/
 #endif
 #endif
 #endif /* LOGICAL_STRICT */
@@ -671,8 +655,7 @@ char t;
 }
 
 #ifndef __CF__KnR
-static int num_elem(const char *strv, unsigned elem_len, int term_char,
-                    int num_term);
+static int num_elem(const char *strv, unsigned elem_len, int term_char, int num_term);
 #endif
 /* kill_trailingn(s,t,e) will kill the trailing t's in string s. e normally
 points to the terminating '\0' of s, but may actually point to anywhere in s.
@@ -715,8 +698,7 @@ char t;
 #endif
 {
   int i;
-  for (i = 0; i < sizeofcstr / elem_len;
-       i++) /* elem_len includes \0 for C strings. */
+  for (i = 0; i < sizeofcstr / elem_len; i++) /* elem_len includes \0 for C strings. */
     kill_trailingn(cstr + elem_len * i, t, cstr + elem_len * (i + 1) - 1);
   return cstr;
 }
@@ -754,10 +736,8 @@ typedef struct dsc$descriptor_s fstring;
 typedef DSC$DESCRIPTOR_A(1) fstringvector;
 /*typedef DSC$DESCRIPTOR_A(2) fstringarrarr;
   typedef DSC$DESCRIPTOR_A(3) fstringarrarrarr;*/
-#define initfstr(F, C, ELEMNO, ELEMLEN)                         \
-  ((F).dsc$l_arsize                                             \
-   = ((F).dsc$w_length = (ELEMLEN))                             \
-     * ((F).dsc$l_m[0] = (F).dsc$bounds[0].dsc$l_u = (ELEMNO)), \
+#define initfstr(F, C, ELEMNO, ELEMLEN)                                                                         \
+  ((F).dsc$l_arsize = ((F).dsc$w_length = (ELEMLEN)) * ((F).dsc$l_m[0] = (F).dsc$bounds[0].dsc$l_u = (ELEMNO)), \
    (F).dsc$a_a0 = ((F).dsc$a_pointer = (C)) - (F).dsc$w_length, (F))
 
 #endif /* PDW: 2/10/98 (CFITSIO) -- Let VMS see NUM_ELEMS definitions */
@@ -812,18 +792,15 @@ many elements are in the vector. */
 /* C string TO Fortran Common Block STRing. */
 /* DIM is the number of DIMensions of the array in terms of strings, not
    characters. e.g. char a[12] has DIM = 0, char a[12][4] has DIM = 1, etc. */
-#define C2FCBSTR(CSTR, FSTR, DIM)                     \
-  c2fstrv((char *) CSTR, (char *) FSTR,               \
-          sizeof(FSTR) / cfelementsof(FSTR, DIM) + 1, \
+#define C2FCBSTR(CSTR, FSTR, DIM)                                                   \
+  c2fstrv((char *) CSTR, (char *) FSTR, sizeof(FSTR) / cfelementsof(FSTR, DIM) + 1, \
           sizeof(FSTR) + cfelementsof(FSTR, DIM))
 
 /* Fortran Common Block string TO C STRing. */
-#define FCB2CSTR(FSTR, CSTR, DIM)                                    \
-  vkill_trailing(f2cstrv((char *) FSTR, (char *) CSTR,               \
-                         sizeof(FSTR) / cfelementsof(FSTR, DIM) + 1, \
-                         sizeof(FSTR) + cfelementsof(FSTR, DIM)),    \
-                 sizeof(FSTR) / cfelementsof(FSTR, DIM) + 1,         \
-                 sizeof(FSTR) + cfelementsof(FSTR, DIM), ' ')
+#define FCB2CSTR(FSTR, CSTR, DIM)                                                                  \
+  vkill_trailing(f2cstrv((char *) FSTR, (char *) CSTR, sizeof(FSTR) / cfelementsof(FSTR, DIM) + 1, \
+                         sizeof(FSTR) + cfelementsof(FSTR, DIM)),                                  \
+                 sizeof(FSTR) / cfelementsof(FSTR, DIM) + 1, sizeof(FSTR) + cfelementsof(FSTR, DIM), ' ')
 
 #define cfDEREFERENCE0
 #define cfDEREFERENCE1 *
@@ -833,11 +810,11 @@ many elements are in the vector. */
 #define cfDEREFERENCE5 *****
 #define cfelementsof(A, D) (sizeof(A) / sizeof(_(cfDEREFERENCE, D)(A)))
 
-  /*-------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*/
 
-  /*               UTILITIES FOR C TO CALL FORTRAN SUBROUTINES               */
+/*               UTILITIES FOR C TO CALL FORTRAN SUBROUTINES               */
 
-  /* Define lookup tables for how to handle the various types of variables.  */
+/* Define lookup tables for how to handle the various types of variables.  */
 
 #ifdef OLD_VAXC /* Prevent %CC-I-PARAMNOTUSED. */
 #pragma nostandard
@@ -901,8 +878,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define INTVVVVVVV_cfV(T, A, B, F)
 #define PINT_cfV(T, A, B, F) _(T, _cfVP)(A, B)
 #define PVOID_cfV(T, A, B, F)
-#if defined(apolloFortran) || defined(hpuxFortran800) \
-    || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran)
+#if defined(apolloFortran) || defined(hpuxFortran800) || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran)
 #define ROUTINE_cfV(T, A, B, F) void (*B)(CF_NULL_PROTO) = (cfCAST_FUNCTION) A;
 #else
 #define ROUTINE_cfV(T, A, B, F)
@@ -915,34 +891,12 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
     fstring f;                 \
     unsigned clen;             \
   } B = { { 0, DSC$K_DTYPE_T, DSC$K_CLASS_S, NULL }, 0 };
-#define PSTRING_cfV(T, A, B, F) \
-  static fstring B = { 0, DSC$K_DTYPE_T, DSC$K_CLASS_S, NULL };
-#define STRINGV_cfV(T, A, B, F)                 \
-  static fstringvector B = { sizeof(A),         \
-                             DSC$K_DTYPE_T,     \
-                             DSC$K_CLASS_A,     \
-                             NULL,              \
-                             0,                 \
-                             0,                 \
-                             { 0, 0, 1, 1, 1 }, \
-                             1,                 \
-                             0,                 \
-                             NULL,              \
-                             0,                 \
-                             { 1, 0 } };
-#define PSTRINGV_cfV(T, A, B, F)                \
-  static fstringvector B = { 0,                 \
-                             DSC$K_DTYPE_T,     \
-                             DSC$K_CLASS_A,     \
-                             NULL,              \
-                             0,                 \
-                             0,                 \
-                             { 0, 0, 1, 1, 1 }, \
-                             1,                 \
-                             0,                 \
-                             NULL,              \
-                             0,                 \
-                             { 1, 0 } };
+#define PSTRING_cfV(T, A, B, F) static fstring B = { 0, DSC$K_DTYPE_T, DSC$K_CLASS_S, NULL };
+#define STRINGV_cfV(T, A, B, F) \
+  static fstringvector B        \
+      = { sizeof(A), DSC$K_DTYPE_T, DSC$K_CLASS_A, NULL, 0, 0, { 0, 0, 1, 1, 1 }, 1, 0, NULL, 0, { 1, 0 } };
+#define PSTRINGV_cfV(T, A, B, F) \
+  static fstringvector B = { 0, DSC$K_DTYPE_T, DSC$K_CLASS_A, NULL, 0, 0, { 0, 0, 1, 1, 1 }, 1, 0, NULL, 0, { 1, 0 } };
 #else
 #define STRING_cfV(T, A, B, F) \
   struct                       \
@@ -978,32 +932,22 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define STRING_cfA(M, I, A, B) STRING_cfC(M, I, A, B, sizeof(A))
 #define PSTRING_cfA(M, I, A, B) PSTRING_cfC(M, I, A, B, sizeof(A))
 #ifdef vmsFortran
-#define AATRINGV_cfA(A, B, sA, filA, silA)                   \
-  initfstr(B, _cf_malloc((sA) - (filA)), (filA), (silA) -1), \
-      c2fstrv(A, B.dsc$a_pointer, (silA), (sA));
-#define APATRINGV_cfA(A, B, sA, filA, silA) \
-  initfstr(B, A, (filA), (silA) -1), c2fstrv(A, A, (silA), (sA));
+#define AATRINGV_cfA(A, B, sA, filA, silA) \
+  initfstr(B, _cf_malloc((sA) - (filA)), (filA), (silA) -1), c2fstrv(A, B.dsc$a_pointer, (silA), (sA));
+#define APATRINGV_cfA(A, B, sA, filA, silA) initfstr(B, A, (filA), (silA) -1), c2fstrv(A, A, (silA), (sA));
 #else
 #define AATRINGV_cfA(A, B, sA, filA, silA) \
-  (B.s = _cf_malloc((sA) - (filA)),        \
-   B.fs = c2fstrv(A, B.s, (B.flen = (silA) -1) + 1, (sA)));
-#define APATRINGV_cfA(A, B, sA, filA, silA) \
-  B.fs = c2fstrv(A, A, (B.flen = (silA) -1) + 1, B.sizeofA = (sA));
+  (B.s = _cf_malloc((sA) - (filA)), B.fs = c2fstrv(A, B.s, (B.flen = (silA) -1) + 1, (sA)));
+#define APATRINGV_cfA(A, B, sA, filA, silA) B.fs = c2fstrv(A, A, (B.flen = (silA) -1) + 1, B.sizeofA = (sA));
 #endif
-#define STRINGV_cfA(M, I, A, B)                               \
-  AATRINGV_cfA((char *) A, B, sizeof(A), firstindexlength(A), \
-               secondindexlength(A))
-#define PSTRINGV_cfA(M, I, A, B)                               \
-  APATRINGV_cfA((char *) A, B, sizeof(A), firstindexlength(A), \
-                secondindexlength(A))
-#define ZTRINGV_cfA(M, I, A, B)                                   \
-  AATRINGV_cfA((char *) A, B,                                     \
-               (_3(M, _ELEMS_, I)) * ((_3(M, _ELEMLEN_, I)) + 1), \
-               (_3(M, _ELEMS_, I)), (_3(M, _ELEMLEN_, I)) + 1)
-#define PZTRINGV_cfA(M, I, A, B)                                   \
-  APATRINGV_cfA((char *) A, B,                                     \
-                (_3(M, _ELEMS_, I)) * ((_3(M, _ELEMLEN_, I)) + 1), \
-                (_3(M, _ELEMS_, I)), (_3(M, _ELEMLEN_, I)) + 1)
+#define STRINGV_cfA(M, I, A, B) AATRINGV_cfA((char *) A, B, sizeof(A), firstindexlength(A), secondindexlength(A))
+#define PSTRINGV_cfA(M, I, A, B) APATRINGV_cfA((char *) A, B, sizeof(A), firstindexlength(A), secondindexlength(A))
+#define ZTRINGV_cfA(M, I, A, B)                                                                       \
+  AATRINGV_cfA((char *) A, B, (_3(M, _ELEMS_, I)) * ((_3(M, _ELEMLEN_, I)) + 1), (_3(M, _ELEMS_, I)), \
+               (_3(M, _ELEMLEN_, I)) + 1)
+#define PZTRINGV_cfA(M, I, A, B)                                                                       \
+  APATRINGV_cfA((char *) A, B, (_3(M, _ELEMS_, I)) * ((_3(M, _ELEMLEN_, I)) + 1), (_3(M, _ELEMS_, I)), \
+                (_3(M, _ELEMLEN_, I)) + 1)
 
 #define PBYTE_cfAAP(A, B) &A
 #define PDOUBLE_cfAAP(A, B) &A
@@ -1024,8 +968,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define INTVVVVVVV_cfAA(T, A, B) _(T, _cfPP) A[0][0][0][0][0][0]
 #define PINT_cfAA(T, A, B) _(T, _cfAAP)(A, B)
 #define PVOID_cfAA(T, A, B) (void *) A
-#if defined(apolloFortran) || defined(hpuxFortran800) \
-    || defined(AbsoftUNIXFortran)
+#if defined(apolloFortran) || defined(hpuxFortran800) || defined(AbsoftUNIXFortran)
 #define ROUTINE_cfAA(T, A, B) &B
 #else
 #define ROUTINE_cfAA(T, A, B) (cfCAST_FUNCTION) A
@@ -1085,21 +1028,17 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define DEFAULT_cfW(A, B)
 #define LOGICAL_cfW(A, B)
 #define PLOGICAL_cfW(A, B) *B = F2CLOGICAL(*B);
-#define STRING_cfW(A, B) \
-  (B.nombre = A,         \
-   B.nombre[B.clen] != '\0' ? B.nombre[B.clen] = '\0' : 0); /* A?="constnt"*/
+#define STRING_cfW(A, B) (B.nombre = A, B.nombre[B.clen] != '\0' ? B.nombre[B.clen] = '\0' : 0); /* A?="constnt"*/
 #define PSTRING_cfW(A, B) kill_trailing(A, ' ');
 #ifdef vmsFortran
 #define STRINGV_cfW(A, B) _cf_free(B.dsc$a_pointer);
-#define PSTRINGV_cfW(A, B)                                           \
-  vkill_trailing(f2cstrv((char *) A, (char *) A, B.dsc$w_length + 1, \
-                         B.dsc$l_arsize + B.dsc$l_m[0]),             \
+#define PSTRINGV_cfW(A, B)                                                                           \
+  vkill_trailing(f2cstrv((char *) A, (char *) A, B.dsc$w_length + 1, B.dsc$l_arsize + B.dsc$l_m[0]), \
                  B.dsc$w_length + 1, B.dsc$l_arsize + B.dsc$l_m[0], ' ');
 #else
 #define STRINGV_cfW(A, B) _cf_free(B.s);
-#define PSTRINGV_cfW(A, B)                                               \
-  vkill_trailing(f2cstrv((char *) A, (char *) A, B.flen + 1, B.sizeofA), \
-                 B.flen + 1, B.sizeofA, ' ');
+#define PSTRINGV_cfW(A, B) \
+  vkill_trailing(f2cstrv((char *) A, (char *) A, B.flen + 1, B.sizeofA), B.flen + 1, B.sizeofA, ' ');
 #endif
 #define ZTRINGV_cfW(A, B) STRINGV_cfW(A, B)
 #define PZTRINGV_cfW(A, B) PSTRINGV_cfW(A, B)
@@ -1117,8 +1056,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define INTVVVVVVV_cfN(T, A) _(T, _cfTYPE) * A
 #define PINT_cfN(T, A) _(T, _cfTYPE) * A
 #define PVOID_cfN(T, A) void *A
-#if defined(apolloFortran) || defined(hpuxFortran800) \
-    || defined(AbsoftUNIXFortran)
+#if defined(apolloFortran) || defined(hpuxFortran800) || defined(AbsoftUNIXFortran)
 #define ROUTINE_cfN(T, A) void (**A)(CF_NULL_PROTO)
 #else
 #define ROUTINE_cfN(T, A) void (*A)(CF_NULL_PROTO)
@@ -1152,9 +1090,8 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
    if using -Aa, otherwise we have a problem.
  */
 #ifndef MAX_PREPRO_ARGS
-#if !defined(__GNUC__)                                         \
-    && (defined(VAXUltrix) || defined(__CF__APOLLO67)          \
-        || (defined(sun) && !defined(__sun)) || defined(_CRAY) \
+#if !defined(__GNUC__)                                                                                       \
+    && (defined(VAXUltrix) || defined(__CF__APOLLO67) || (defined(sun) && !defined(__sun)) || defined(_CRAY) \
         || defined(__ultrix__) || (defined(__hpux) && defined(__CF__KnR)))
 #define MAX_PREPRO_ARGS 31
 #else
@@ -1193,35 +1130,30 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 
 #define CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) \
   S(T1, 1)                                                                   \
-  S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9)    \
-      S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14)
-#define CFARGT27S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-                  TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR)        \
-  S(T1, 1)                                                                   \
-  S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9)    \
-      S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14) S(TF, 15) S(TG, 16)  \
-          S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20) S(TL, 21) S(TM, 22)        \
-              S(TN, 23) S(TO, 24) S(TP, 25) S(TQ, 26) S(TR, 27)
+  S(T2, 2)                                                                   \
+  S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14)
+#define CFARGT27S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
+                  TP, TQ, TR)                                                                                        \
+  S(T1, 1)                                                                                                           \
+  S(T2, 2)                                                                                                           \
+  S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14)   \
+      S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20) S(TL, 21) S(TM, 22) S(TN, 23) S(TO, 24) S(TP, 25)  \
+          S(TQ, 26) S(TR, 27)
 
-#define CFARGT14FS(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,    \
-                   TD, TE)                                                     \
-  F(T1, 1, 0)                                                                  \
-  F(T2, 2, 1) F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1)      \
-      F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1)           \
-          F(TD, 13, 1) F(TE, 14, 1) M CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, \
-                                                T8, T9, TA, TB, TC, TD, TE)
-#define CFARGT27FS(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,    \
-                   TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR) \
-  F(T1, 1, 0)                                                                  \
-  F(T2, 2, 1) F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1)      \
-      F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1)           \
-          F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1)     \
-              F(TI, 18, 1) F(TJ, 19, 1) F(TK, 20, 1) F(TL, 21, 1) F(TM, 22, 1) \
-                  F(TN, 23, 1) F(TO, 24, 1) F(TP, 25, 1) F(TQ, 26, 1)          \
-                      F(TR, 27, 1)                                             \
-                          M CFARGT27S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9,   \
-                                      TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ,  \
-                                      TK, TL, TM, TN, TO, TP, TQ, TR)
+#define CFARGT14FS(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                             \
+  F(T1, 1, 0)                                                                                                   \
+  F(T2, 2, 1)                                                                                                   \
+  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) \
+      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) M CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
+#define CFARGT27FS(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,  \
+                   TN, TO, TP, TQ, TR)                                                                               \
+  F(T1, 1, 0)                                                                                                        \
+  F(T2, 2, 1)                                                                                                        \
+  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1)      \
+      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1)        \
+          F(TK, 20, 1) F(TL, 21, 1) F(TM, 22, 1) F(TN, 23, 1) F(TO, 24, 1) F(TP, 25, 1) F(TQ, 26, 1) F(TR, 27, 1)    \
+              M CFARGT27S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, \
+                          TN, TO, TP, TQ, TR)
 
 #if !(defined(PowerStationFortran) || defined(hpuxFortran800))
 /*  Old CFARGT14 -> CFARGT14FS as seen below, for Absoft cross-compile yields:
@@ -1237,261 +1169,176 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
  #define CFARGT14(F,S,M,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE) \
        CFARGT14FS(F,S,M,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)
 */
-#define CFARGT14(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,  \
-                 TE)                                                           \
-  F(T1, 1, 0)                                                                  \
-  F(T2, 2, 1) F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1)      \
-      F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1)           \
-          F(TD, 13, 1) F(TE, 14, 1) M CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, \
-                                                T8, T9, TA, TB, TC, TD, TE)
-#define CFARGT27(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,  \
-                 TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR)       \
-  F(T1, 1, 0)                                                                  \
-  F(T2, 2, 1) F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1)      \
-      F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1)           \
-          F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1)     \
-              F(TI, 18, 1) F(TJ, 19, 1) F(TK, 20, 1) F(TL, 21, 1) F(TM, 22, 1) \
-                  F(TN, 23, 1) F(TO, 24, 1) F(TP, 25, 1) F(TQ, 26, 1)          \
-                      F(TR, 27, 1)                                             \
-                          M CFARGT27S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9,   \
-                                      TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ,  \
-                                      TK, TL, TM, TN, TO, TP, TQ, TR)
+#define CFARGT14(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                               \
+  F(T1, 1, 0)                                                                                                   \
+  F(T2, 2, 1)                                                                                                   \
+  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) \
+      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) M CFARGT14S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
+#define CFARGT27(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, \
+                 TO, TP, TQ, TR)                                                                                      \
+  F(T1, 1, 0)                                                                                                         \
+  F(T2, 2, 1)                                                                                                         \
+  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1)       \
+      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1)         \
+          F(TK, 20, 1) F(TL, 21, 1) F(TM, 22, 1) F(TN, 23, 1) F(TO, 24, 1) F(TP, 25, 1) F(TQ, 26, 1) F(TR, 27, 1)     \
+              M CFARGT27S(S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,  \
+                          TN, TO, TP, TQ, TR)
 
-#define CFARGT20(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, \
-                 TE, TF, TG, TH, TI, TJ, TK)                                  \
-  F(T1, 1, 0)                                                                 \
-  F(T2, 2, 1) F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1)     \
-      F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1) F(TC, 12, 1)          \
-          F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1)    \
-              F(TI, 18, 1) F(TJ, 19, 1) F(TK, 20, 1) S(T1, 1) S(T2, 2)        \
-                  S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8)       \
-                      S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13)        \
-                          S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18)   \
-                              S(TJ, 19) S(TK, 20)
-#define CFARGTA14(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,   \
-                  TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE) \
-  F(T1, A1, 1, 0)                                                             \
-  F(T2, A2, 2, 1) F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1)             \
-      F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1)         \
-          F(TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) \
-              F(TE, AE, 14, 1) S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5)   \
-                  S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11)     \
-                      S(TC, 12) S(TD, 13) S(TE, 14)
+#define CFARGT20(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)         \
+  F(T1, 1, 0)                                                                                                     \
+  F(T2, 2, 1)                                                                                                     \
+  F(T3, 3, 1) F(T4, 4, 1) F(T5, 5, 1) F(T6, 6, 1) F(T7, 7, 1) F(T8, 8, 1) F(T9, 9, 1) F(TA, 10, 1) F(TB, 11, 1)   \
+      F(TC, 12, 1) F(TD, 13, 1) F(TE, 14, 1) F(TF, 15, 1) F(TG, 16, 1) F(TH, 17, 1) F(TI, 18, 1) F(TJ, 19, 1)     \
+          F(TK, 20, 1) S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) \
+              S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20)
+#define CFARGTA14(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
+                  AA, AB, AC, AD, AE)                                                                                 \
+  F(T1, A1, 1, 0)                                                                                                     \
+  F(T2, A2, 2, 1)                                                                                                     \
+  F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1)     \
+      F(TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) S(T1, 1) S(T2, 2) S(T3, 3) \
+          S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) S(TE, 14)
 #if MAX_PREPRO_ARGS > 31
-#define CFARGTA20(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,   \
-                  TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, A5, A6, A7, A8, \
-                  A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)             \
-  F(T1, A1, 1, 0)                                                             \
-  F(T2, A2, 2, 1) F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1)             \
-      F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1)         \
-          F(TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) \
-              F(TE, AE, 14, 1) F(TF, AF, 15, 1) F(TG, AG, 16, 1)              \
-                  F(TH, AH, 17, 1) F(TI, AI, 18, 1) F(TJ, AJ, 19, 1)          \
-                      F(TK, AK, 20, 1) S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4)    \
-                          S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9)        \
-                              S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13)         \
-                                  S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17)     \
-                                      S(TI, 18) S(TJ, 19) S(TK, 20)
-#define CFARGTA27(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,    \
-                  TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR, A1,  \
-                  A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG,  \
-                  AH, AI, AJ, AK, AL, AM, AN, AO, AP, AQ, AR)                  \
-  F(T1, A1, 1, 0)                                                              \
-  F(T2, A2, 2, 1) F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1)              \
-      F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1) F(       \
-          TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1)    \
-          F(TE, AE, 14, 1) F(TF, AF, 15, 1) F(TG, AG, 16, 1) F(TH, AH, 17, 1)  \
-              F(TI, AI, 18, 1) F(TJ, AJ, 19, 1) F(TK, AK, 20, 1)               \
-                  F(TL, AL, 21, 1) F(TM, AM, 22, 1) F(TN, AN, 23, 1)           \
-                      F(TO, AO, 24, 1) F(TP, AP, 25, 1) F(TQ, AQ, 26, 1)       \
-                          F(TR, AR, 27, 1) S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4) \
-                              S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9)     \
-                                  S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13)      \
-                                      S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17)  \
-                                          S(TI, 18) S(TJ, 19) S(TK, 20)        \
-                                              S(TL, 21) S(TM, 22) S(TN, 23)    \
-                                                  S(TO, 24) S(TP, 25)          \
-                                                      S(TQ, 26) S(TR, 27)
+#define CFARGTA20(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3,  \
+                  A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                                \
+  F(T1, A1, 1, 0)                                                                                                    \
+  F(T2, A2, 2, 1)                                                                                                    \
+  F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1)    \
+      F(TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) F(TF, AF, 15, 1)          \
+          F(TG, AG, 16, 1) F(TH, AH, 17, 1) F(TI, AI, 18, 1) F(TJ, AJ, 19, 1) F(TK, AK, 20, 1) S(T1, 1) S(T2, 2)     \
+              S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) S(TC, 12) S(TD, 13) \
+                  S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20)
+#define CFARGTA27(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN,    \
+                  TO, TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL,  \
+                  AM, AN, AO, AP, AQ, AR)                                                                              \
+  F(T1, A1, 1, 0)                                                                                                      \
+  F(T2, A2, 2, 1)                                                                                                      \
+  F(T3, A3, 3, 1) F(T4, A4, 4, 1) F(T5, A5, 5, 1) F(T6, A6, 6, 1) F(T7, A7, 7, 1) F(T8, A8, 8, 1) F(T9, A9, 9, 1)      \
+      F(TA, AA, 10, 1) F(TB, AB, 11, 1) F(TC, AC, 12, 1) F(TD, AD, 13, 1) F(TE, AE, 14, 1) F(TF, AF, 15, 1)            \
+          F(TG, AG, 16, 1) F(TH, AH, 17, 1) F(TI, AI, 18, 1) F(TJ, AJ, 19, 1) F(TK, AK, 20, 1) F(TL, AL, 21, 1)        \
+              F(TM, AM, 22, 1) F(TN, AN, 23, 1) F(TO, AO, 24, 1) F(TP, AP, 25, 1) F(TQ, AQ, 26, 1) F(TR, AR, 27, 1)    \
+                  S(T1, 1) S(T2, 2) S(T3, 3) S(T4, 4) S(T5, 5) S(T6, 6) S(T7, 7) S(T8, 8) S(T9, 9) S(TA, 10) S(TB, 11) \
+                      S(TC, 12) S(TD, 13) S(TE, 14) S(TF, 15) S(TG, 16) S(TH, 17) S(TI, 18) S(TJ, 19) S(TK, 20)        \
+                          S(TL, 21) S(TM, 22) S(TN, 23) S(TO, 24) S(TP, 25) S(TQ, 26) S(TR, 27)
 #endif
 #else
-#define CFARGT14(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, \
-                 TE)                                                          \
-  F(T1, 1, 0)                                                                 \
-  S(T1, 1) F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4)     \
-      F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) S(T7, 7)          \
-          F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10)    \
-              F(TB, 11, 1) S(TB, 11) F(TC, 12, 1) S(TC, 12) F(TD, 13, 1)      \
-                  S(TD, 13) F(TE, 14, 1) S(TE, 14)
-#define CFARGT27(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, \
-                 TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR)      \
-  F(T1, 1, 0)                                                                 \
-  S(T1, 1) F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4)     \
-      F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) S(T7, 7)          \
-          F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10)    \
-              F(TB, 11, 1) S(TB, 11) F(TC, 12, 1) S(TC, 12) F(TD, 13, 1)      \
-                  S(TD, 13) F(TE, 14, 1) S(TE, 14) F(TF, 15, 1) S(TF, 15)     \
-                      F(TG, 16, 1) S(TG, 16) F(TH, 17, 1) S(TH, 17)           \
-                          F(TI, 18, 1) S(TI, 18) F(TJ, 19, 1) S(TJ, 19)       \
-                              F(TK, 20, 1) S(TK, 20) F(TL, 21, 1) S(TL, 21)   \
-                                  F(TM, 22, 1) S(TM, 22) F(TN, 23, 1)         \
-                                      S(TN, 23) F(TO, 24, 1) S(TO, 24)        \
-                                          F(TP, 25, 1) S(TP, 25) F(TQ, 26, 1) \
-                                              S(TQ, 26) F(TR, 27, 1) S(TR, 27)
+#define CFARGT14(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                                      \
+  F(T1, 1, 0)                                                                                                          \
+  S(T1, 1)                                                                                                             \
+  F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) \
+      S(T7, 7) F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1)    \
+          S(TC, 12) F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14)
+#define CFARGT27(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN,  \
+                 TO, TP, TQ, TR)                                                                                       \
+  F(T1, 1, 0)                                                                                                          \
+  S(T1, 1)                                                                                                             \
+  F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) \
+      S(T7, 7) F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1)    \
+          S(TC, 12) F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14) F(TF, 15, 1) S(TF, 15) F(TG, 16, 1) S(TG, 16)        \
+              F(TH, 17, 1) S(TH, 17) F(TI, 18, 1) S(TI, 18) F(TJ, 19, 1) S(TJ, 19) F(TK, 20, 1) S(TK, 20) F(TL, 21, 1) \
+                  S(TL, 21) F(TM, 22, 1) S(TM, 22) F(TN, 23, 1) S(TN, 23) F(TO, 24, 1) S(TO, 24) F(TP, 25, 1)          \
+                      S(TP, 25) F(TQ, 26, 1) S(TQ, 26) F(TR, 27, 1) S(TR, 27)
 
-#define CFARGT20(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, \
-                 TE, TF, TG, TH, TI, TJ, TK)                                  \
-  F(T1, 1, 0)                                                                 \
-  S(T1, 1) F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4)     \
-      F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) S(T7, 7)          \
-          F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10)    \
-              F(TB, 11, 1) S(TB, 11) F(TC, 12, 1) S(TC, 12) F(TD, 13, 1)      \
-                  S(TD, 13) F(TE, 14, 1) S(TE, 14) F(TF, 15, 1) S(TF, 15)     \
-                      F(TG, 16, 1) S(TG, 16) F(TH, 17, 1) S(TH, 17)           \
-                          F(TI, 18, 1) S(TI, 18) F(TJ, 19, 1) S(TJ, 19)       \
-                              F(TK, 20, 1) S(TK, 20)
-#define CFARGTA14(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,   \
-                  TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE) \
-  F(T1, A1, 1, 0)                                                             \
-  S(T1, 1) F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1)  \
-      S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) S(T6, 6)              \
-          F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1)   \
-              S(T9, 9) F(TA, AA, 10, 1) S(TA, 10) F(TB, AB, 11, 1) S(TB, 11)  \
-                  F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13)       \
-                      F(TE, AE, 14, 1) S(TE, 14)
+#define CFARGT20(F, S, M, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)              \
+  F(T1, 1, 0)                                                                                                          \
+  S(T1, 1)                                                                                                             \
+  F(T2, 2, 1) S(T2, 2) F(T3, 3, 1) S(T3, 3) F(T4, 4, 1) S(T4, 4) F(T5, 5, 1) S(T5, 5) F(T6, 6, 1) S(T6, 6) F(T7, 7, 1) \
+      S(T7, 7) F(T8, 8, 1) S(T8, 8) F(T9, 9, 1) S(T9, 9) F(TA, 10, 1) S(TA, 10) F(TB, 11, 1) S(TB, 11) F(TC, 12, 1)    \
+          S(TC, 12) F(TD, 13, 1) S(TD, 13) F(TE, 14, 1) S(TE, 14) F(TF, 15, 1) S(TF, 15) F(TG, 16, 1) S(TG, 16)        \
+              F(TH, 17, 1) S(TH, 17) F(TI, 18, 1) S(TI, 18) F(TJ, 19, 1) S(TJ, 19) F(TK, 20, 1) S(TK, 20)
+#define CFARGTA14(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
+                  AA, AB, AC, AD, AE)                                                                                 \
+  F(T1, A1, 1, 0)                                                                                                     \
+  S(T1, 1)                                                                                                            \
+  F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) \
+      S(T6, 6) F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)  \
+          F(TB, AB, 11, 1) S(TB, 11) F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13) F(TE, AE, 14, 1) S(TE, 14)
 #if MAX_PREPRO_ARGS > 31
-#define CFARGTA20(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,   \
-                  TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, A5, A6, A7, A8, \
-                  A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)             \
-  F(T1, A1, 1, 0)                                                             \
-  S(T1, 1) F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1)  \
-      S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) S(T6, 6)              \
-          F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1)   \
-              S(T9, 9) F(TA, AA, 10, 1) S(TA, 10) F(TB, AB, 11, 1) S(TB, 11)  \
-                  F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13)       \
-                      F(TE, AE, 14, 1) S(TE, 14) F(TF, AF, 15, 1) S(TF, 15)   \
-                          F(TG, AG, 16, 1) S(TG, 16) F(TH, AH, 17, 1)         \
-                              S(TH, 17) F(TI, AI, 18, 1) S(TI, 18)            \
-                                  F(TJ, AJ, 19, 1) S(TJ, 19) F(TK, AK, 20, 1) \
-                                      S(TK, 20)
-#define CFARGTA27(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,    \
-                  TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR, A1,  \
-                  A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG,  \
-                  AH, AI, AJ, AK, AL, AM, AN, AO, AP, AQ, AR)                  \
-  F(T1, A1, 1, 0)                                                              \
-  S(T1, 1) F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1)   \
-      S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) S(T6, 6)               \
-          F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1)    \
-              S(T9, 9) F(TA, AA, 10, 1) S(TA, 10) F(TB, AB, 11, 1) S(TB, 11)   \
-                  F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13)        \
-                      F(TE, AE, 14, 1) S(TE, 14) F(TF, AF, 15, 1) S(TF, 15) F( \
-                          TG, AG, 16, 1) S(TG, 16) F(TH, AH, 17, 1) S(TH, 17)  \
-                          F(TI, AI, 18, 1) S(TI, 18) F(TJ, AJ, 19, 1)          \
-                              S(TJ, 19) F(TK, AK, 20, 1) S(TK, 20)             \
-                                  F(TL, AL, 21, 1) S(TL, 21) F(TM, AM, 22, 1)  \
-                                      S(TM, 22) F(TN, AN, 23, 1) S(TN, 23)     \
-                                          F(TO, AO, 24, 1) S(TO, 24)           \
-                                              F(TP, AP, 25, 1) S(TP, 25)       \
-                                                  F(TQ, AQ, 26, 1) S(TQ, 26)   \
-                                                      F(TR, AR, 27, 1)         \
-                                                          S(TR, 27)
+#define CFARGTA20(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3,   \
+                  A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                                 \
+  F(T1, A1, 1, 0)                                                                                                     \
+  S(T1, 1)                                                                                                            \
+  F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) \
+      S(T6, 6) F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)  \
+          F(TB, AB, 11, 1) S(TB, 11) F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13) F(TE, AE, 14, 1) S(TE, 14) \
+              F(TF, AF, 15, 1) S(TF, 15) F(TG, AG, 16, 1) S(TG, 16) F(TH, AH, 17, 1) S(TH, 17) F(TI, AI, 18, 1)       \
+                  S(TI, 18) F(TJ, AJ, 19, 1) S(TJ, 19) F(TK, AK, 20, 1) S(TK, 20)
+#define CFARGTA27(F, S, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN,   \
+                  TO, TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, \
+                  AM, AN, AO, AP, AQ, AR)                                                                             \
+  F(T1, A1, 1, 0)                                                                                                     \
+  S(T1, 1)                                                                                                            \
+  F(T2, A2, 2, 1) S(T2, 2) F(T3, A3, 3, 1) S(T3, 3) F(T4, A4, 4, 1) S(T4, 4) F(T5, A5, 5, 1) S(T5, 5) F(T6, A6, 6, 1) \
+      S(T6, 6) F(T7, A7, 7, 1) S(T7, 7) F(T8, A8, 8, 1) S(T8, 8) F(T9, A9, 9, 1) S(T9, 9) F(TA, AA, 10, 1) S(TA, 10)  \
+          F(TB, AB, 11, 1) S(TB, 11) F(TC, AC, 12, 1) S(TC, 12) F(TD, AD, 13, 1) S(TD, 13) F(TE, AE, 14, 1) S(TE, 14) \
+              F(TF, AF, 15, 1) S(TF, 15) F(TG, AG, 16, 1) S(TG, 16) F(TH, AH, 17, 1) S(TH, 17) F(TI, AI, 18, 1)       \
+                  S(TI, 18) F(TJ, AJ, 19, 1) S(TJ, 19) F(TK, AK, 20, 1) S(TK, 20) F(TL, AL, 21, 1) S(TL, 21)          \
+                      F(TM, AM, 22, 1) S(TM, 22) F(TN, AN, 23, 1) S(TN, 23) F(TO, AO, 24, 1) S(TO, 24)                \
+                          F(TP, AP, 25, 1) S(TP, 25) F(TQ, AQ, 26, 1) S(TQ, 26) F(TR, AR, 27, 1) S(TR, 27)
 #endif
 #endif
 
-#define PROTOCCALLSFSUB1(UN, LN, T1)                                      \
-  PROTOCCALLSFSUB14(UN, LN, T1, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB2(UN, LN, T1, T2)                                      \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB3(UN, LN, T1, T2, T3)                                \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB4(UN, LN, T1, T2, T3, T4)                          \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, CF_0, CF_0, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB5(UN, LN, T1, T2, T3, T4, T5)                          \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB6(UN, LN, T1, T2, T3, T4, T5, T6)                    \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, CF_0, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB7(UN, LN, T1, T2, T3, T4, T5, T6, T7)              \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB8(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8)              \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB9(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9)        \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, CF_0, CF_0, \
-                    CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB1(UN, LN, T1) \
+  PROTOCCALLSFSUB14(UN, LN, T1, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB2(UN, LN, T1, T2) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB3(UN, LN, T1, T2, T3) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB4(UN, LN, T1, T2, T3, T4) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB5(UN, LN, T1, T2, T3, T4, T5) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB6(UN, LN, T1, T2, T3, T4, T5, T6) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB7(UN, LN, T1, T2, T3, T4, T5, T6, T7) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB8(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB9(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, CF_0, CF_0, CF_0, CF_0, CF_0)
 #define PROTOCCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA) \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, \
-                    CF_0, CF_0, CF_0)
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, CF_0, CF_0, CF_0)
 #define PROTOCCALLSFSUB11(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB) \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, CF_0, \
-                    CF_0, CF_0)
-#define PROTOCCALLSFSUB12(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC)                                                 \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    CF_0, CF_0)
-#define PROTOCCALLSFSUB13(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD)                                             \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, CF_0)
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB12(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, CF_0, CF_0)
+#define PROTOCCALLSFSUB13(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, CF_0)
 
-#define PROTOCCALLSFSUB15(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF)                                     \
-  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, CF_0, CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB16(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG)                                 \
-  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB17(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH)                             \
-  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB18(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI)                         \
-  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, CF_0, CF_0)
-#define PROTOCCALLSFSUB19(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ)                     \
-  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, CF_0)
+#define PROTOCCALLSFSUB15(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF) \
+  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB16(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG) \
+  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB17(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH) \
+  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB18(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI) \
+  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, CF_0, CF_0)
+#define PROTOCCALLSFSUB19(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ) \
+  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, CF_0)
 
-#define PROTOCCALLSFSUB21(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL)             \
-  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, TK, TL, CF_0, CF_0, CF_0,     \
-                    CF_0, CF_0, CF_0)
-#define PROTOCCALLSFSUB22(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM)         \
-  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, CF_0, CF_0, CF_0, \
-                    CF_0, CF_0)
-#define PROTOCCALLSFSUB23(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN)     \
-  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, CF_0, CF_0,   \
-                    CF_0, CF_0)
-#define PROTOCCALLSFSUB24(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO) \
-  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, CF_0,     \
-                    CF_0, CF_0)
-#define PROTOCCALLSFSUB25(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
-                          TP)                                                 \
-  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, CF_0, \
-                    CF_0)
-#define PROTOCCALLSFSUB26(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
-                          TP, TQ)                                             \
-  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ,   \
-                    CF_0)
+#define PROTOCCALLSFSUB21(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL) \
+  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, CF_0, \
+                    CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB22(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM)                                                                                         \
+  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                    CF_0, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB23(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN)                                                                                     \
+  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                    TN, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB24(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN, TO)                                                                                 \
+  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                    TN, TO, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFSUB25(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN, TO, TP)                                                                             \
+  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                    TN, TO, TP, CF_0, CF_0)
+#define PROTOCCALLSFSUB26(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN, TO, TP, TQ)                                                                         \
+  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                    TN, TO, TP, TQ, CF_0)
 
 #ifndef FCALLSC_QUALIFIER
 #ifdef VISUAL_CPLUSPLUS
@@ -1509,53 +1356,38 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 
 #ifdef CFSUBASFUN
 #define PROTOCCALLSFSUB0(UN, LN) PROTOCCALLSFFUN0(VOID, UN, LN)
-#define PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE)                                         \
-  PROTOCCALLSFFUN14(VOID, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                    TC, TD, TE)
-#define PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK)                 \
-  PROTOCCALLSFFUN20(VOID, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                    TC, TD, TE, TF, TG, TH, TI, TJ, TK)
-#define PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
-                          TP, TQ, TR)                                         \
-  PROTOCCALLSFFUN27(VOID, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                    TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP,   \
-                    TQ, TR)
+#define PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) \
+  PROTOCCALLSFFUN14(VOID, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
+#define PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK) \
+  PROTOCCALLSFFUN20(VOID, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)
+#define PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN, TO, TP, TQ, TR)                                                                     \
+  PROTOCCALLSFFUN27(VOID, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                    TM, TN, TO, TP, TQ, TR)
 #else
 /* Note: Prevent compiler warnings, null #define PROTOCCALLSFSUB14/20 after
    #include-ing cfortran.h if calling the FORTRAN wrapper within the same
    source code where the wrapper is created. */
 #define PROTOCCALLSFSUB0(UN, LN) _(VOID, _cfPU)(CFC_(UN, LN))();
 #ifndef __CF__KnR
-#define PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE)                                         \
-  _(VOID, _cfPU)                                                              \
-  (CFC_(UN, LN))(CFARGT14(NCF, KCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9,   \
-                          TA, TB, TC, TD, TE));
-#define PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK)                 \
-  _(VOID, _cfPU)                                                              \
-  (CFC_(UN, LN))(CFARGT20(NCF, KCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9,   \
-                          TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK));
-#define PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
-                          TP, TQ, TR)                                         \
-  _(VOID, _cfPU)                                                              \
-  (CFC_(UN, LN))(CFARGT27(NCF, KCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9,   \
-                          TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, \
-                          TN, TO, TP, TQ, TR));
+#define PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) \
+  _(VOID, _cfPU)                                                                          \
+  (CFC_(UN, LN))(CFARGT14(NCF, KCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE));
+#define PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK) \
+  _(VOID, _cfPU)                                                                                                  \
+  (CFC_(UN, LN))(                                                                                                 \
+      CFARGT20(NCF, KCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK));
+#define PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN, TO, TP, TQ, TR)                                                                     \
+  _(VOID, _cfPU)                                                                                                      \
+  (CFC_(UN, LN))(CFARGT27(NCF, KCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ,   \
+                          TK, TL, TM, TN, TO, TP, TQ, TR));
 #else
-#define PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE)                                         \
+#define PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) PROTOCCALLSFSUB0(UN, LN)
+#define PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK) \
   PROTOCCALLSFSUB0(UN, LN)
-#define PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK)                 \
-  PROTOCCALLSFSUB0(UN, LN)
-#define PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
-                          TP, TQ, TR)                                         \
+#define PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN, TO, TP, TQ, TR)                                                                     \
   PROTOCCALLSFSUB0(UN, LN)
 #endif
 #endif
@@ -1564,83 +1396,59 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #pragma standard
 #endif
 
-#define CCALLSFSUB1(UN, LN, T1, A1) \
-  CCALLSFSUB5(UN, LN, T1, CF_0, CF_0, CF_0, CF_0, A1, 0, 0, 0, 0)
-#define CCALLSFSUB2(UN, LN, T1, T2, A1, A2) \
-  CCALLSFSUB5(UN, LN, T1, T2, CF_0, CF_0, CF_0, A1, A2, 0, 0, 0)
-#define CCALLSFSUB3(UN, LN, T1, T2, T3, A1, A2, A3) \
-  CCALLSFSUB5(UN, LN, T1, T2, T3, CF_0, CF_0, A1, A2, A3, 0, 0)
-#define CCALLSFSUB4(UN, LN, T1, T2, T3, T4, A1, A2, A3, A4) \
-  CCALLSFSUB5(UN, LN, T1, T2, T3, T4, CF_0, A1, A2, A3, A4, 0)
-#define CCALLSFSUB5(UN, LN, T1, T2, T3, T4, T5, A1, A2, A3, A4, A5)          \
-  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, CF_0, A1, \
-               A2, A3, A4, A5, 0, 0, 0, 0, 0)
-#define CCALLSFSUB6(UN, LN, T1, T2, T3, T4, T5, T6, A1, A2, A3, A4, A5, A6)    \
-  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, CF_0, CF_0, CF_0, CF_0, A1, A2, \
-               A3, A4, A5, A6, 0, 0, 0, 0)
-#define CCALLSFSUB7(UN, LN, T1, T2, T3, T4, T5, T6, T7, A1, A2, A3, A4, A5,  \
-                    A6, A7)                                                  \
-  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, CF_0, CF_0, CF_0, A1, A2, \
-               A3, A4, A5, A6, A7, 0, 0, 0)
-#define CCALLSFSUB8(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, A1, A2, A3, A4,    \
-                    A5, A6, A7, A8)                                            \
-  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, CF_0, CF_0, A1, A2, A3, \
-               A4, A5, A6, A7, A8, 0, 0)
-#define CCALLSFSUB9(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, A1, A2, A3,  \
-                    A4, A5, A6, A7, A8, A9)                                  \
-  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, CF_0, A1, A2, A3, \
-               A4, A5, A6, A7, A8, A9, 0)
-#define CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, A1, A2, \
-                     A3, A4, A5, A6, A7, A8, A9, AA)                         \
-  CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, CF_0,   \
-               CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, 0, 0, 0, 0)
-#define CCALLSFSUB11(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, A1,   \
-                     A2, A3, A4, A5, A6, A7, A8, A9, AA, AB)                   \
-  CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, CF_0, CF_0, \
-               CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, 0, 0, 0)
-#define CCALLSFSUB12(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-                     A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC)         \
-  CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, CF_0, \
-               CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, 0, 0)
-#define CCALLSFSUB13(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-                     TD, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD) \
-  CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,   \
-               CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, 0)
+#define CCALLSFSUB1(UN, LN, T1, A1) CCALLSFSUB5(UN, LN, T1, CF_0, CF_0, CF_0, CF_0, A1, 0, 0, 0, 0)
+#define CCALLSFSUB2(UN, LN, T1, T2, A1, A2) CCALLSFSUB5(UN, LN, T1, T2, CF_0, CF_0, CF_0, A1, A2, 0, 0, 0)
+#define CCALLSFSUB3(UN, LN, T1, T2, T3, A1, A2, A3) CCALLSFSUB5(UN, LN, T1, T2, T3, CF_0, CF_0, A1, A2, A3, 0, 0)
+#define CCALLSFSUB4(UN, LN, T1, T2, T3, T4, A1, A2, A3, A4) CCALLSFSUB5(UN, LN, T1, T2, T3, T4, CF_0, A1, A2, A3, A4, 0)
+#define CCALLSFSUB5(UN, LN, T1, T2, T3, T4, T5, A1, A2, A3, A4, A5) \
+  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, 0, 0, 0, 0, 0)
+#define CCALLSFSUB6(UN, LN, T1, T2, T3, T4, T5, T6, A1, A2, A3, A4, A5, A6) \
+  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, 0, 0, 0, 0)
+#define CCALLSFSUB7(UN, LN, T1, T2, T3, T4, T5, T6, T7, A1, A2, A3, A4, A5, A6, A7) \
+  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, 0, 0, 0)
+#define CCALLSFSUB8(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, A1, A2, A3, A4, A5, A6, A7, A8) \
+  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, 0, 0)
+#define CCALLSFSUB9(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, A1, A2, A3, A4, A5, A6, A7, A8, A9) \
+  CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, 0)
+#define CCALLSFSUB10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA)           \
+  CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, \
+               A9, AA, 0, 0, 0, 0)
+#define CCALLSFSUB11(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB) \
+  CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, \
+               A9, AA, AB, 0, 0, 0)
+#define CCALLSFSUB12(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA,   \
+                     AB, AC)                                                                                           \
+  CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, \
+               AA, AB, AC, 0, 0)
+#define CCALLSFSUB13(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, A1, A2, A3, A4, A5, A6, A7, A8, A9, \
+                     AA, AB, AC, AD)                                                                                 \
+  CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, \
+               AA, AB, AC, AD, 0)
 
 #ifdef __cplusplus
 #define CPPPROTOCLSFSUB0(UN, LN)
-#define CPPPROTOCLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE)
-#define CPPPROTOCLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK)
-#define CPPPROTOCLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
-                          TP, TQ, TR)
+#define CPPPROTOCLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
+#define CPPPROTOCLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)
+#define CPPPROTOCLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN, TO, TP, TQ, TR)
 #else
 #define CPPPROTOCLSFSUB0(UN, LN) PROTOCCALLSFSUB0(UN, LN)
-#define CPPPROTOCLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE)                                         \
-  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE)
-#define CPPPROTOCLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK)                 \
-  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, TK)
-#define CPPPROTOCLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
-                          TP, TQ, TR)                                         \
-  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                    TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ,   \
-                    TR)
+#define CPPPROTOCLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) \
+  PROTOCCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
+#define CPPPROTOCLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK) \
+  PROTOCCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)
+#define CPPPROTOCLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                          TM, TN, TO, TP, TQ, TR)                                                                     \
+  PROTOCCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                    TN, TO, TP, TQ, TR)
 #endif
 
 #ifdef CFSUBASFUN
 #define CCALLSFSUB0(UN, LN) CCALLSFFUN0(UN, LN)
-#define CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC,   \
-                     AD, AE)                                                   \
-  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE)
+#define CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8,   \
+                     A9, AA, AB, AC, AD, AE)                                                                           \
+  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, \
+               AB, AC, AD, AE)
 #else
 /* do{...}while(0) allows if(a==b) FORT(); else BORT(); */
 #define CCALLSFSUB0(UN, LN)                    \
@@ -1649,306 +1457,160 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
       CPPPROTOCLSFSUB0(UN, LN) CFC_(UN, LN)(); \
     }                                          \
   while (0)
-#define CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC,   \
-                     AD, AE)                                                   \
-  do                                                                           \
-    {                                                                          \
-      VVCF(T1, A1, B1)                                                         \
-      VVCF(T2, A2, B2) VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(T5, A5, B5)      \
-          VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8) VVCF(T9, A9, B9)  \
-              VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12)            \
-                  VVCF(TD, AD, B13) VVCF(TE, AE, B14) CPPPROTOCLSFSUB14(       \
-                      UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,  \
-                      TD, TE) ACF(LN, T1, A1, 1) ACF(LN, T2, A2, 2)            \
-                      ACF(LN, T3, A3, 3) ACF(LN, T4, A4, 4) ACF(LN, T5, A5, 5) \
-                          ACF(LN, T6, A6, 6) ACF(LN, T7, A7, 7)                \
-                              ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9)            \
-                                  ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11)      \
-                                      ACF(LN, TC, AC, 12) ACF(LN, TD, AD, 13)  \
-                                          ACF(LN, TE, AE, 14) CFC_(            \
-                                              UN, LN)(CFARGTA14(               \
-                                              AACF, JCF, T1, T2, T3, T4, T5,   \
-                                              T6, T7, T8, T9, TA, TB, TC, TD,  \
-                                              TE, A1, A2, A3, A4, A5, A6, A7,  \
-                                              A8, A9, AA, AB, AC, AD, AE));    \
-      WCF(T1, A1, 1)                                                           \
-      WCF(T2, A2, 2) WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5)              \
-          WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)          \
-              WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13)  \
-                  WCF(TE, AE, 14)                                              \
-    }                                                                          \
+#define CCALLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8,   \
+                     A9, AA, AB, AC, AD, AE)                                                                           \
+  do                                                                                                                   \
+    {                                                                                                                  \
+      VVCF(T1, A1, B1)                                                                                                 \
+      VVCF(T2, A2, B2)                                                                                                 \
+      VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8)            \
+          VVCF(T9, A9, B9) VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14)   \
+              CPPPROTOCLSFSUB14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) ACF(LN, T1, A1, 1)     \
+                  ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3) ACF(LN, T4, A4, 4) ACF(LN, T5, A5, 5) ACF(LN, T6, A6, 6)       \
+                      ACF(LN, T7, A7, 7) ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9) ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11) \
+                          ACF(LN, TC, AC, 12) ACF(LN, TD, AD, 13) ACF(LN, TE, AE, 14)                                  \
+                              CFC_(UN, LN)(CFARGTA14(AACF, JCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,    \
+                                                     TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE));     \
+      WCF(T1, A1, 1)                                                                                                   \
+      WCF(T2, A2, 2)                                                                                                   \
+      WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)         \
+          WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14)                              \
+    }                                                                                                                  \
   while (0)
 #endif
 
 #if MAX_PREPRO_ARGS > 31
-#define CCALLSFSUB15(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB,   \
-                     AC, AD, AE, AF)                                           \
-  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, CF_0, CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7,   \
-               A8, A9, AA, AB, AC, AD, AE, AF, 0, 0, 0, 0, 0)
-#define CCALLSFSUB16(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA,   \
-                     AB, AC, AD, AE, AF, AG)                                   \
-  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, \
-               A9, AA, AB, AC, AD, AE, AF, AG, 0, 0, 0, 0)
-#define CCALLSFSUB17(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
-                     AA, AB, AC, AD, AE, AF, AG, AH)                           \
-  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8,   \
-               A9, AA, AB, AC, AD, AE, AF, AG, AH, 0, 0, 0)
-#define CCALLSFSUB18(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, A1, A2, A3, A4, A5, A6, A7, A8,   \
-                     A9, AA, AB, AC, AD, AE, AF, AG, AH, AI)                   \
-  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, \
-               AA, AB, AC, AD, AE, AF, AG, AH, AI, 0, 0)
-#define CCALLSFSUB19(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, A1, A2, A3, A4, A5, A6, A7,   \
-                     A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ)           \
-  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
-               AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, 0)
+#define CCALLSFSUB15(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, A1, A2, A3, A4, A5, A6, A7, \
+                     A8, A9, AA, AB, AC, AD, AE, AF)                                                                 \
+  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, CF_0, CF_0, CF_0, CF_0, CF_0, A1, \
+               A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, 0, 0, 0, 0, 0)
+#define CCALLSFSUB16(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, A1, A2, A3, A4, A5, A6,   \
+                     A7, A8, A9, AA, AB, AC, AD, AE, AF, AG)                                                           \
+  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, CF_0, CF_0, CF_0, CF_0, A1, A2, \
+               A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, 0, 0, 0, 0)
+#define CCALLSFSUB17(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, A1, A2, A3, A4, A5, \
+                     A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH)                                                 \
+  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, CF_0, CF_0, CF_0, A1, A2, \
+               A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, 0, 0, 0)
+#define CCALLSFSUB18(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, A1, A2, A3, A4,   \
+                     A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI)                                           \
+  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, CF_0, CF_0, A1, A2, A3, \
+               A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, 0, 0)
+#define CCALLSFSUB19(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, A1, A2, A3, \
+                     A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ)                                 \
+  CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, CF_0, A1, A2, A3, \
+               A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, 0)
 
 #ifdef CFSUBASFUN
-#define CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, A5, A6,   \
-                     A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)   \
-  CCALLSFFUN20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, \
-               AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)
+#define CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2,   \
+                     A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                           \
+  CCALLSFFUN20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, \
+               A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)
 #else
-#define CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,  \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, A5, A6,  \
-                     A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)  \
-  do                                                                          \
-    {                                                                         \
-      VVCF(T1, A1, B1)                                                        \
-      VVCF(T2, A2, B2) VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(T5, A5, B5)     \
-          VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8) VVCF(T9, A9, B9) \
-              VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12)           \
-                  VVCF(TD, AD, B13) VVCF(TE, AE, B14) VVCF(TF, AF, B15) VVCF( \
-                      TG, AG, B16) VVCF(TH, AH, B17) VVCF(TI, AI, B18)        \
-                      VVCF(TJ, AJ, B19) VVCF(TK, AK, B20) CPPPROTOCLSFSUB20(  \
-                          UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                          TC, TD, TE, TF, TG, TH, TI, TJ,                     \
-                          TK) ACF(LN, T1, A1, 1) ACF(LN, T2, A2, 2)           \
-                          ACF(LN, T3, A3, 3) ACF(LN, T4, A4,                  \
-                                                 4) ACF(LN, T5, A5,           \
-                                                        5) ACF(LN, T6, A6, 6) \
-                              ACF(LN, T7, A7, 7) ACF(LN, T8, A8, 8)           \
-                                  ACF(LN, T9, A9,                             \
-                                      9) ACF(LN, TA, AA,                      \
-                                             10) ACF(LN, TB, AB,              \
-                                                     11) ACF(LN, TC, AC, 12)  \
-                                      ACF(LN, TD, AD,                         \
-                                          13) ACF(LN, TE, AE, 14)             \
-                                          ACF(LN, TF, AF,                     \
-                                              15) ACF(LN, TG, AG, 16)         \
-                                              ACF(LN, TH, AH,                 \
-                                                  17) ACF(LN, TI, AI, 18)     \
-                                                  ACF(LN, TJ, AJ,             \
-                                                      19) ACF(LN, TK, AK, 20) \
-                                                      CFC_(UN, LN)(CFARGTA20( \
-                                                          AACF, JCF, T1, T2,  \
-                                                          T3, T4, T5, T6, T7, \
-                                                          T8, T9, TA, TB, TC, \
-                                                          TD, TE, TF, TG, TH, \
-                                                          TI, TJ, TK, A1, A2, \
-                                                          A3, A4, A5, A6, A7, \
-                                                          A8, A9, AA, AB, AC, \
-                                                          AD, AE, AF, AG, AH, \
-                                                          AI, AJ, AK));       \
-      WCF(T1, A1, 1)                                                          \
-      WCF(T2, A2, 2) WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5)             \
-          WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)         \
-              WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) \
-                  WCF(TE, AE, 14) WCF(TF, AF, 15) WCF(TG, AG, 16)             \
-                      WCF(TH, AH, 17) WCF(TI, AI, 18) WCF(TJ, AJ, 19)         \
-                          WCF(TK, AK, 20)                                     \
-    }                                                                         \
+#define CCALLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2,  \
+                     A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK)                          \
+  do                                                                                                                  \
+    {                                                                                                                 \
+      VVCF(T1, A1, B1)                                                                                                \
+      VVCF(T2, A2, B2)                                                                                                \
+      VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8) VVCF(     \
+          T9, A9, B9) VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14)       \
+          VVCF(TF, AF, B15) VVCF(TG, AG, B16) VVCF(TH, AH, B17) VVCF(TI, AI, B18) VVCF(TJ, AJ, B19) VVCF(TK, AK, B20) \
+              CPPPROTOCLSFSUB20(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ,   \
+                                TK) ACF(LN, T1, A1, 1) ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3) ACF(LN, T4, A4, 4)       \
+                  ACF(LN, T5, A5, 5) ACF(LN, T6, A6, 6) ACF(LN, T7, A7, 7) ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9)      \
+                      ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11) ACF(LN, TC, AC, 12) ACF(LN, TD, AD, 13)                 \
+                          ACF(LN, TE, AE, 14) ACF(LN, TF, AF, 15) ACF(LN, TG, AG, 16) ACF(LN, TH, AH, 17)             \
+                              ACF(LN, TI, AI, 18) ACF(LN, TJ, AJ, 19) ACF(LN, TK, AK, 20)                             \
+                                  CFC_(UN, LN)(CFARGTA20(AACF, JCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
+                                                         TD, TE, TF, TG, TH, TI, TJ, TK, A1, A2, A3, A4, A5, A6, A7,  \
+                                                         A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK));        \
+      WCF(T1, A1, 1)                                                                                                  \
+      WCF(T2, A2, 2)                                                                                                  \
+      WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)        \
+          WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14) WCF(TF, AF, 15)             \
+              WCF(TG, AG, 16) WCF(TH, AH, 17) WCF(TI, AI, 18) WCF(TJ, AJ, 19) WCF(TK, AK, 20)                         \
+    }                                                                                                                 \
   while (0)
 #endif
 #endif /* MAX_PREPRO_ARGS */
 
 #if MAX_PREPRO_ARGS > 31
-#define CCALLSFSUB21(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, TL, A1, A2, A3, A4, A5,   \
-                     A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ,   \
-                     AK, AL)                                                   \
-  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, TK, TL, CF_0, CF_0, CF_0, CF_0, CF_0, CF_0, \
-               A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, \
-               AH, AI, AJ, AK, AL, 0, 0, 0, 0, 0, 0)
-#define CCALLSFSUB22(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, A1, A2, A3, A4,   \
-                     A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI,   \
-                     AJ, AK, AL, AM)                                           \
-  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, TK, TL, TM, CF_0, CF_0, CF_0, CF_0, CF_0,   \
-               A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, \
-               AH, AI, AJ, AK, AL, AM, 0, 0, 0, 0, 0)
-#define CCALLSFSUB23(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, A1, A2, A3,   \
-                     A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH,   \
-                     AI, AJ, AK, AL, AM, AN)                                   \
-  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, TK, TL, TM, TN, CF_0, CF_0, CF_0, CF_0, A1, \
-               A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, \
-               AI, AJ, AK, AL, AM, AN, 0, 0, 0, 0)
-#define CCALLSFSUB24(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, A1, A2,   \
-                     A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG,   \
-                     AH, AI, AJ, AK, AL, AM, AN, AO)                           \
-  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, CF_0, CF_0, CF_0, A1,   \
-               A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, \
-               AI, AJ, AK, AL, AM, AN, AO, 0, 0, 0)
-#define CCALLSFSUB25(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, A1,   \
-                     A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF,   \
-                     AG, AH, AI, AJ, AK, AL, AM, AN, AO, AP)                   \
-  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, CF_0, CF_0, A1, A2, \
-               A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, \
-               AJ, AK, AL, AM, AN, AO, AP, 0, 0)
-#define CCALLSFSUB26(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ,   \
-                     A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE,   \
-                     AF, AG, AH, AI, AJ, AK, AL, AM, AN, AO, AP, AQ)           \
-  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, CF_0, A1, A2,   \
-               A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, \
-               AJ, AK, AL, AM, AN, AO, AP, AQ, 0)
+#define CCALLSFSUB21(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, A1,   \
+                     A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL)                   \
+  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, CF_0, CF_0, \
+               CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, \
+               AL, 0, 0, 0, 0, 0, 0)
+#define CCALLSFSUB22(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                     A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, AM)           \
+  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, CF_0,   \
+               CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, \
+               AL, AM, 0, 0, 0, 0, 0)
+#define CCALLSFSUB23(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                     TN, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, AM, AN)   \
+  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN,     \
+               CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, \
+               AL, AM, AN, 0, 0, 0, 0)
+#define CCALLSFSUB24(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                     TN, TO, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, AM,   \
+                     AN, AO)                                                                                           \
+  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
+               CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL,   \
+               AM, AN, AO, 0, 0, 0)
+#define CCALLSFSUB25(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                     TN, TO, TP, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL,   \
+                     AM, AN, AO, AP)                                                                                   \
+  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
+               TP, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, AM, \
+               AN, AO, AP, 0, 0)
+#define CCALLSFSUB26(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                     TN, TO, TP, TQ, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK,   \
+                     AL, AM, AN, AO, AP, AQ)                                                                           \
+  CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
+               TP, TQ, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, AM,   \
+               AN, AO, AP, AQ, 0)
 
 #ifdef CFSUBASFUN
-#define CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ,   \
-                     TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD,   \
-                     AE, AF, AG, AH, AI, AJ, AK, AL, AM, AN, AO, AP, AQ, AR)   \
-  CCALLSFFUN27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, \
-               TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR, A1, A2, A3, \
-               A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, \
-               AK, AL, AM, AN, AO, AP, AQ, AR)
+#define CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                     TN, TO, TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ,   \
+                     AK, AL, AM, AN, AO, AP, AQ, AR)                                                                   \
+  CCALLSFFUN27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, \
+               TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, AM, AN, \
+               AO, AP, AQ, AR)
 #else
-#define CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,   \
-                     TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ,   \
-                     TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD,   \
-                     AE, AF, AG, AH, AI, AJ, AK, AL, AM, AN, AO, AP, AQ, AR)   \
-  do                                                                           \
-    {                                                                          \
-      VVCF(T1, A1, B1)                                                         \
-      VVCF(T2, A2, B2) VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(                 \
-          T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8)       \
-          VVCF(T9, A9, B9) VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(           \
-              TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14)                 \
-              VVCF(TF, AF, B15) VVCF(TG, AG, B16) VVCF(TH, AH, B17) VVCF(      \
-                  TI, AI, B18) VVCF(TJ, AJ, B19) VVCF(TK, AK, B20)             \
-                  VVCF(TL, AL, B21) VVCF(TM, AM, B22) VVCF(TN, AN, B23) VVCF(  \
-                      TO, AO,                                                  \
-                      B24) VVCF(TP, AP, B25)                                   \
-                      VVCF(TQ, AQ, B26) VVCF(                                  \
-                          TR,                                                  \
-                          AR,                                                  \
-                          B27) CPPPROTOCLSFSUB27(UN, LN, T1, T2, T3, T4, T5,   \
-                                                 T6,                           \
-                                                 T7,                           \
-                                                 T8,                           \
-                                                 T9,                           \
-                                                 TA,                           \
-                                                 TB,                           \
-                                                 TC,                           \
-                                                 TD,                           \
-                                                 TE,                           \
-                                                 TF,                           \
-                                                 TG,                           \
-                                                 TH,                           \
-                                                 TI,                           \
-                                                 TJ,                           \
-                                                 TK,                           \
-                                                 TL,                           \
-                                                 TM,                           \
-                                                 TN,                           \
-                                                 TO,                           \
-                                                 TP,                           \
-                                                 TQ,                           \
-                                                 TR) ACF(LN, T1, A1, 1)        \
-                          ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3) ACF(           \
-                              LN,                                              \
-                              T4,                                              \
-                              A4,                                              \
-                              4) ACF(LN, T5, A5,                               \
-                                     5) ACF(LN, T6, A6,                        \
-                                            6) ACF(LN, T7, A7,                 \
-                                                   7) ACF(LN, T8, A8, 8)       \
-                              ACF(LN, T9, A9,                                  \
-                                  9) ACF(LN, TA, AA,                           \
-                                         10) ACF(LN, TB, AB,                   \
-                                                 11) ACF(LN, TC, AC,           \
-                                                         12) ACF(LN, TD, AD,   \
-                                                                 13) ACF(LN,   \
-                                                                         TE,   \
-                                                                         AE,   \
-                                                                         14)   \
-                                  ACF(LN, TF, AF,                              \
-                                      15) ACF(LN, TG, AG, 16)                  \
-                                      ACF(LN, TH, AH,                          \
-                                          17) ACF(LN, TI, AI, 18)              \
-                                          ACF(LN, TJ, AJ,                      \
-                                              19) ACF(LN, TK, AK, 20)          \
-                                              ACF(LN, TL, AL,                  \
-                                                  21) ACF(LN, TM, AM, 22)      \
-                                                  ACF(LN, TN, AN, 23) ACF(     \
-                                                      LN,                      \
-                                                      TO,                      \
-                                                      AO,                      \
-                                                      24) ACF(LN, TP, AP, 25)  \
-                                                      ACF(LN, TQ, AQ, 26)      \
-                                                          ACF(LN, TR, AR, 27)  \
-                                                              CFC_(UN, LN)(    \
-                                                                  CFARGTA27(   \
-                                                                      AACF,    \
-                                                                      JCF, T1, \
-                                                                      T2, T3,  \
-                                                                      T4, T5,  \
-                                                                      T6, T7,  \
-                                                                      T8, T9,  \
-                                                                      TA, TB,  \
-                                                                      TC, TD,  \
-                                                                      TE, TF,  \
-                                                                      TG, TH,  \
-                                                                      TI, TJ,  \
-                                                                      TK, TL,  \
-                                                                      TM, TN,  \
-                                                                      TO, TP,  \
-                                                                      TQ, TR,  \
-                                                                      A1, A2,  \
-                                                                      A3, A4,  \
-                                                                      A5, A6,  \
-                                                                      A7, A8,  \
-                                                                      A9, AA,  \
-                                                                      AB, AC,  \
-                                                                      AD, AE,  \
-                                                                      AF, AG,  \
-                                                                      AH, AI,  \
-                                                                      AJ, AK,  \
-                                                                      AL, AM,  \
-                                                                      AN, AO,  \
-                                                                      AP, AQ,  \
-                                                                      AR));    \
-      WCF(T1, A1, 1)                                                           \
-      WCF(T2, A2, 2) WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5)              \
-          WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)          \
-              WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13)  \
-                  WCF(TE, AE, 14) WCF(TF, AF, 15) WCF(TG, AG, 16)              \
-                      WCF(TH, AH, 17) WCF(TI, AI, 18) WCF(TJ, AJ, 19)          \
-                          WCF(TK, AK, 20) WCF(TL, AL, 21) WCF(TM, AM, 22)      \
-                              WCF(TN, AN, 23) WCF(TO, AO, 24) WCF(TP, AP, 25)  \
-                                  WCF(TQ, AQ, 26) WCF(TR, AR, 27)              \
-    }                                                                          \
+#define CCALLSFSUB27(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM,   \
+                     TN, TO, TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, AE, AF, AG, AH, AI, AJ,   \
+                     AK, AL, AM, AN, AO, AP, AQ, AR)                                                                   \
+  do                                                                                                                   \
+    {                                                                                                                  \
+      VVCF(T1, A1, B1)                                                                                                 \
+      VVCF(T2, A2, B2)                                                                                                 \
+      VVCF(T3, A3, B3) VVCF(T4, A4, B4) VVCF(T5, A5, B5) VVCF(T6, A6, B6) VVCF(T7, A7, B7) VVCF(T8, A8, B8)            \
+          VVCF(T9, A9, B9) VVCF(TA, AA, B10) VVCF(TB, AB, B11) VVCF(TC, AC, B12) VVCF(TD, AD, B13) VVCF(TE, AE, B14)   \
+              VVCF(TF, AF, B15) VVCF(TG, AG, B16) VVCF(TH, AH, B17) VVCF(TI, AI, B18) VVCF(TJ, AJ, B19)                \
+                  VVCF(TK, AK, B20) VVCF(TL, AL, B21) VVCF(TM, AM, B22) VVCF(TN, AN, B23) VVCF(TO, AO, B24)            \
+                      VVCF(TP, AP, B25) VVCF(TQ, AQ, B26) VVCF(TR, AR, B27) CPPPROTOCLSFSUB27(                         \
+                          UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL,  \
+                          TM, TN, TO, TP, TQ, TR) ACF(LN, T1, A1, 1) ACF(LN, T2, A2, 2) ACF(LN, T3, A3, 3)             \
+                          ACF(LN, T4, A4, 4) ACF(LN, T5, A5, 5) ACF(LN, T6, A6, 6) ACF(LN, T7, A7, 7)                  \
+                              ACF(LN, T8, A8, 8) ACF(LN, T9, A9, 9) ACF(LN, TA, AA, 10) ACF(LN, TB, AB, 11)            \
+                                  ACF(LN, TC, AC, 12) ACF(LN, TD, AD, 13) ACF(LN, TE, AE, 14) ACF(LN, TF, AF, 15)      \
+                                      ACF(LN, TG, AG, 16) ACF(LN, TH, AH, 17) ACF(LN, TI, AI, 18) ACF(LN, TJ, AJ, 19)  \
+                                          ACF(LN, TK, AK, 20) ACF(LN, TL, AL, 21) ACF(LN, TM, AM, 22)                  \
+                                              ACF(LN, TN, AN, 23) ACF(LN, TO, AO, 24) ACF(LN, TP, AP, 25)              \
+                                                  ACF(LN, TQ, AQ, 26) ACF(LN, TR, AR, 27) CFC_(UN, LN)(                \
+                                                      CFARGTA27(AACF, JCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
+                                                                TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO,    \
+                                                                TP, TQ, TR, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA,    \
+                                                                AB, AC, AD, AE, AF, AG, AH, AI, AJ, AK, AL, AM, AN,    \
+                                                                AO, AP, AQ, AR));                                      \
+      WCF(T1, A1, 1)                                                                                                   \
+      WCF(T2, A2, 2)                                                                                                   \
+      WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9)         \
+          WCF(TA, AA, 10) WCF(TB, AB, 11) WCF(TC, AC, 12) WCF(TD, AD, 13) WCF(TE, AE, 14) WCF(TF, AF, 15)              \
+              WCF(TG, AG, 16) WCF(TH, AH, 17) WCF(TI, AI, 18) WCF(TJ, AJ, 19) WCF(TK, AK, 20) WCF(TL, AL, 21)          \
+                  WCF(TM, AM, 22) WCF(TN, AN, 23) WCF(TO, AO, 24) WCF(TP, AP, 25) WCF(TQ, AQ, 26) WCF(TR, AR, 27)      \
+    }                                                                                                                  \
   while (0)
 #endif
 #endif /* MAX_PREPRO_ARGS */
@@ -2044,8 +1706,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define INT_cfINT(N, A, B, X, Y, Z) DOUBLE_cfINT(N, A, B, X, Y, Z)
 #define LOGICAL_cfINT(N, A, B, X, Y, Z) DOUBLE_cfINT(N, A, B, X, Y, Z)
 #define LONG_cfINT(N, A, B, X, Y, Z) DOUBLE_cfINT(N, A, B, X, Y, Z)
-#define LONGLONG_cfINT(N, A, B, X, Y, Z) \
-  DOUBLE_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
+#define LONGLONG_cfINT(N, A, B, X, Y, Z) DOUBLE_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
 #define SHORT_cfINT(N, A, B, X, Y, Z) DOUBLE_cfINT(N, A, B, X, Y, Z)
 #define PBYTE_cfINT(N, A, B, X, Y, Z) PDOUBLE_cfINT(N, A, B, X, Y, Z)
 #define PDOUBLE_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, PINT, B, X, Y, Z, 0)
@@ -2053,8 +1714,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define PINT_cfINT(N, A, B, X, Y, Z) PDOUBLE_cfINT(N, A, B, X, Y, Z)
 #define PLOGICAL_cfINT(N, A, B, X, Y, Z) PDOUBLE_cfINT(N, A, B, X, Y, Z)
 #define PLONG_cfINT(N, A, B, X, Y, Z) PDOUBLE_cfINT(N, A, B, X, Y, Z)
-#define PLONGLONG_cfINT(N, A, B, X, Y, Z) \
-  PDOUBLE_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
+#define PLONGLONG_cfINT(N, A, B, X, Y, Z) PDOUBLE_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
 #define PSHORT_cfINT(N, A, B, X, Y, Z) PDOUBLE_cfINT(N, A, B, X, Y, Z)
 #define BYTEV_cfINT(N, A, B, X, Y, Z) DOUBLEV_cfINT(N, A, B, X, Y, Z)
 #define BYTEVV_cfINT(N, A, B, X, Y, Z) DOUBLEVV_cfINT(N, A, B, X, Y, Z)
@@ -2062,27 +1722,21 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define BYTEVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVV_cfINT(N, A, B, X, Y, Z)
 #define BYTEVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z)
 #define BYTEVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z)
-#define BYTEVVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
+#define BYTEVVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
 #define DOUBLEV_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, INTV, B, X, Y, Z, 0)
 #define DOUBLEVV_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, INTVV, B, X, Y, Z, 0)
 #define DOUBLEVVV_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, INTVVV, B, X, Y, Z, 0)
-#define DOUBLEVVVV_cfINT(N, A, B, X, Y, Z) \
-  _(CFARGS, N)(A, INTVVVV, B, X, Y, Z, 0)
-#define DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z) \
-  _(CFARGS, N)(A, INTVVVVV, B, X, Y, Z, 0)
-#define DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  _(CFARGS, N)(A, INTVVVVVV, B, X, Y, Z, 0)
-#define DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  _(CFARGS, N)(A, INTVVVVVVV, B, X, Y, Z, 0)
+#define DOUBLEVVVV_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, INTVVVV, B, X, Y, Z, 0)
+#define DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, INTVVVVV, B, X, Y, Z, 0)
+#define DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, INTVVVVVV, B, X, Y, Z, 0)
+#define DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, INTVVVVVVV, B, X, Y, Z, 0)
 #define FLOATV_cfINT(N, A, B, X, Y, Z) DOUBLEV_cfINT(N, A, B, X, Y, Z)
 #define FLOATVV_cfINT(N, A, B, X, Y, Z) DOUBLEVV_cfINT(N, A, B, X, Y, Z)
 #define FLOATVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVV_cfINT(N, A, B, X, Y, Z)
 #define FLOATVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVV_cfINT(N, A, B, X, Y, Z)
 #define FLOATVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z)
 #define FLOATVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z)
-#define FLOATVVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
+#define FLOATVVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
 #define INTV_cfINT(N, A, B, X, Y, Z) DOUBLEV_cfINT(N, A, B, X, Y, Z)
 #define INTVV_cfINT(N, A, B, X, Y, Z) DOUBLEVV_cfINT(N, A, B, X, Y, Z)
 #define INTVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVV_cfINT(N, A, B, X, Y, Z)
@@ -2095,40 +1749,29 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define LOGICALVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVV_cfINT(N, A, B, X, Y, Z)
 #define LOGICALVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVV_cfINT(N, A, B, X, Y, Z)
 #define LOGICALVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z)
-#define LOGICALVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z)
-#define LOGICALVVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
+#define LOGICALVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z)
+#define LOGICALVVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
 #define LONGV_cfINT(N, A, B, X, Y, Z) DOUBLEV_cfINT(N, A, B, X, Y, Z)
 #define LONGVV_cfINT(N, A, B, X, Y, Z) DOUBLEVV_cfINT(N, A, B, X, Y, Z)
 #define LONGVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVV_cfINT(N, A, B, X, Y, Z)
 #define LONGVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVV_cfINT(N, A, B, X, Y, Z)
 #define LONGVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z)
 #define LONGVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z)
-#define LONGVVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
-#define LONGLONGV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEV_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
-#define LONGLONGVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVV_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
-#define LONGLONGVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVV_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
-#define LONGLONGVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVV_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
-#define LONGLONGVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
-#define LONGLONGVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
-#define LONGLONGVVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
+#define LONGVVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
+#define LONGLONGV_cfINT(N, A, B, X, Y, Z) DOUBLEV_cfINT(N, A, B, X, Y, Z)             /* added by MR December 2005 */
+#define LONGLONGVV_cfINT(N, A, B, X, Y, Z) DOUBLEVV_cfINT(N, A, B, X, Y, Z)           /* added by MR December 2005 */
+#define LONGLONGVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVV_cfINT(N, A, B, X, Y, Z)         /* added by MR December 2005 */
+#define LONGLONGVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVV_cfINT(N, A, B, X, Y, Z)       /* added by MR December 2005 */
+#define LONGLONGVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z)     /* added by MR December 2005 */
+#define LONGLONGVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z)   /* added by MR December 2005 */
+#define LONGLONGVVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z) /* added by MR December 2005 */
 #define SHORTV_cfINT(N, A, B, X, Y, Z) DOUBLEV_cfINT(N, A, B, X, Y, Z)
 #define SHORTVV_cfINT(N, A, B, X, Y, Z) DOUBLEVV_cfINT(N, A, B, X, Y, Z)
 #define SHORTVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVV_cfINT(N, A, B, X, Y, Z)
 #define SHORTVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVV_cfINT(N, A, B, X, Y, Z)
 #define SHORTVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVV_cfINT(N, A, B, X, Y, Z)
 #define SHORTVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVV_cfINT(N, A, B, X, Y, Z)
-#define SHORTVVVVVVV_cfINT(N, A, B, X, Y, Z) \
-  DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
+#define SHORTVVVVVVV_cfINT(N, A, B, X, Y, Z) DOUBLEVVVVVVV_cfINT(N, A, B, X, Y, Z)
 #define PVOID_cfINT(N, A, B, X, Y, Z) _(CFARGS, N)(A, B, B, X, Y, Z, 0)
 #define ROUTINE_cfINT(N, A, B, X, Y, Z) PVOID_cfINT(N, A, B, X, Y, Z)
 /*CRAY coughs on the first,
@@ -2178,8 +1821,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 
 #define BYTE_cfPU(A) CFextern INTEGER_BYTE FCALLSC_QUALIFIER A
 #define DOUBLE_cfPU(A) CFextern DOUBLE_PRECISION FCALLSC_QUALIFIER A
-#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) \
-      && defined(RETURNFLOAT))
+#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) && defined(RETURNFLOAT))
 #if defined(f2cFortran) && !defined(gFortran)
 /* f2c/g77 return double from FORTRAN REAL functions. (KMCCARTY, 2005/12/09) */
 #define FLOAT_cfPU(A) CFextern DOUBLE_PRECISION FCALLSC_QUALIFIER A
@@ -2198,8 +1840,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 
 #define BYTE_cfE INTEGER_BYTE A0;
 #define DOUBLE_cfE DOUBLE_PRECISION A0;
-#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) \
-      && defined(RETURNFLOAT))
+#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) && defined(RETURNFLOAT))
 #define FLOAT_cfE FORTRAN_REAL A0;
 #else
 #define FLOAT_cfE   \
@@ -2212,11 +1853,10 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define SHORT_cfE short A0;
 #define VOID_cfE
 #ifdef vmsFortran
-#define STRING_cfE                                                      \
-  static char AA0[1 + MAX_LEN_FORTRAN_FUNCTION_STRING];                 \
-  static fstring A0 = { MAX_LEN_FORTRAN_FUNCTION_STRING, DSC$K_DTYPE_T, \
-                        DSC$K_CLASS_S, AA0 };                           \
-  memset(AA0, CFORTRAN_NON_CHAR, MAX_LEN_FORTRAN_FUNCTION_STRING);      \
+#define STRING_cfE                                                                            \
+  static char AA0[1 + MAX_LEN_FORTRAN_FUNCTION_STRING];                                       \
+  static fstring A0 = { MAX_LEN_FORTRAN_FUNCTION_STRING, DSC$K_DTYPE_T, DSC$K_CLASS_S, AA0 }; \
+  memset(AA0, CFORTRAN_NON_CHAR, MAX_LEN_FORTRAN_FUNCTION_STRING);                            \
   *(AA0 + MAX_LEN_FORTRAN_FUNCTION_STRING) = '\0';
 #else
 #ifdef CRAYFortran
@@ -2247,8 +1887,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #ifdef vmsFortran
 #define STRING_cfGZ(T, UN, LN)    CFC_(UN,LN)(&A0
 #else
-#if defined(CRAYFortran) || defined(AbsoftUNIXFortran) \
-    || defined(AbsoftProFortran)
+#if defined(CRAYFortran) || defined(AbsoftUNIXFortran) || defined(AbsoftProFortran)
 #define STRING_cfGZ(T, UN, LN)    CFC_(UN,LN)( A0
 #else
 #define STRING_cfGZ(T, UN, LN)    CFC_(UN,LN)( A0,MAX_LEN_FORTRAN_FUNCTION_STRING
@@ -2257,8 +1896,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 
 #define INT_cfG(T, UN, LN) INT_cfGZ(T, UN, LN)
 #define VOID_cfG(T, UN, LN) VOID_cfGZ(T, UN, LN)
-#define STRING_cfG(T, UN, LN) \
-  STRING_cfGZ(T, UN, LN), /*, is only diff. from _cfG*/
+#define STRING_cfG(T, UN, LN) STRING_cfGZ(T, UN, LN), /*, is only diff. from _cfG*/
 
 #define BYTEVVVVVVV_cfPP
 #define INTVVVVVVV_cfPP /* These complement FLOATVVVVVVV_cfPP. */
@@ -2298,8 +1936,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define LOGICAL_cfS(M, I, A)
 #define PLOGICAL_cfS(M, I, A)
 #define STRING_cfS(M, I, A) , sizeof(A)
-#define STRINGV_cfS(M, I, A) \
-  , ((unsigned) 0xFFFF * firstindexlength(A) + secondindexlength(A))
+#define STRINGV_cfS(M, I, A) , ((unsigned) 0xFFFF * firstindexlength(A) + secondindexlength(A))
 #define PSTRING_cfS(M, I, A) , sizeof(A)
 #define PSTRINGV_cfS(M, I, A) STRINGV_cfS(M, I, A)
 #define ZTRINGV_cfS(M, I, A)
@@ -2326,157 +1963,92 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 /* No spaces inside expansion. They screws up macro catenation kludge.     */
 #define VOID_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define BYTE_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define DOUBLE_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define DOUBLE_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define FLOAT_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define INT_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LOGICAL_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, LOGICAL, A, B, C, D, E)
+#define LOGICAL_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, LOGICAL, A, B, C, D, E)
 #define LONG_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGLONG_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
+#define LONGLONG_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
 #define SHORT_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define BYTEV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define BYTEVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define BYTEVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define BYTEVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define BYTEVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define BYTEVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define BYTEVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define DOUBLEV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define DOUBLEVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define DOUBLEVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define DOUBLEVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define DOUBLEVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define DOUBLEVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define DOUBLEVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define FLOATV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define FLOATVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define FLOATVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define FLOATVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define FLOATVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define FLOATVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define FLOATVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define BYTEVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define BYTEVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define BYTEVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define BYTEVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define BYTEVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define BYTEVVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define DOUBLEV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define DOUBLEVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define DOUBLEVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define DOUBLEVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define DOUBLEVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define DOUBLEVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define DOUBLEVVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define FLOATV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define FLOATVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define FLOATVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define FLOATVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define FLOATVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define FLOATVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define FLOATVVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define INTV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define INTVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define INTVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define INTVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define INTVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define INTVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define INTVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LOGICALV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LOGICALVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LOGICALVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LOGICALVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LOGICALVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LOGICALVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LOGICALVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define INTVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define INTVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define INTVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define INTVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define INTVVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LOGICALV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LOGICALVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LOGICALVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LOGICALVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LOGICALVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LOGICALVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LOGICALVVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define LONGV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define LONGLONGV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
-#define LONGLONGVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
-#define LONGLONGVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
-#define LONGLONGVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
-#define LONGLONGVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
+#define LONGVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LONGVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LONGVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LONGVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LONGVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LONGVVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define LONGLONGV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)     /* added by MR December 2005 */
+#define LONGLONGVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)    /* added by MR December 2005 */
+#define LONGLONGVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)   /* added by MR December 2005 */
+#define LONGLONGVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)  /* added by MR December 2005 \
+                                                                                          */
+#define LONGLONGVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 \
+                                                                                          */
 #define LONGLONGVVVVVV_cfSTR(N, T, A, B, C, D, E) \
   _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
 #define LONGLONGVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
   _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
-#define SHORTV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define SHORTVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define SHORTVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define SHORTVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define SHORTVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define SHORTVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define SHORTVVVVVVV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define SHORTV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define SHORTVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define SHORTVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define SHORTVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define SHORTVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define SHORTVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define SHORTVVVVVVV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define PBYTE_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define PDOUBLE_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define PFLOAT_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define PDOUBLE_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define PFLOAT_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define PINT_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define PLOGICAL_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, PLOGICAL, A, B, C, D, E)
+#define PLOGICAL_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, PLOGICAL, A, B, C, D, E)
 #define PLONG_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define PLONGLONG_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
-#define PSHORT_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define PLONGLONG_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E) /* added by MR December 2005 */
+#define PSHORT_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
 #define STRING_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, STRING, A, B, C, D, E)
-#define PSTRING_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, PSTRING, A, B, C, D, E)
-#define STRINGV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, STRINGV, A, B, C, D, E)
-#define PSTRINGV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, PSTRINGV, A, B, C, D, E)
-#define PNSTRING_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, PNSTRING, A, B, C, D, E)
-#define PPSTRING_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, PPSTRING, A, B, C, D, E)
+#define PSTRING_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, PSTRING, A, B, C, D, E)
+#define STRINGV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, STRINGV, A, B, C, D, E)
+#define PSTRINGV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, PSTRINGV, A, B, C, D, E)
+#define PNSTRING_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, PNSTRING, A, B, C, D, E)
+#define PPSTRING_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, PPSTRING, A, B, C, D, E)
 #define PVOID_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define ROUTINE_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define SIMPLE_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
-#define ZTRINGV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, ZTRINGV, A, B, C, D, E)
-#define PZTRINGV_cfSTR(N, T, A, B, C, D, E) \
-  _(CFARGS, N)(T, PZTRINGV, A, B, C, D, E)
+#define ROUTINE_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define SIMPLE_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, DEFAULT, A, B, C, D, E)
+#define ZTRINGV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, ZTRINGV, A, B, C, D, E)
+#define PZTRINGV_cfSTR(N, T, A, B, C, D, E) _(CFARGS, N)(T, PZTRINGV, A, B, C, D, E)
 #define CF_0_cfSTR(N, T, A, B, C, D, E)
 
 /* See ACF table comments, which explain why CCF was split into two. */
@@ -2489,39 +2061,29 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
   (B.clen = strlen(A), B.f.dsc$a_pointer = A,          \
    C == sizeof(char *) || C == (unsigned) (B.clen + 1) \
        ? B.f.dsc$w_length = B.clen                     \
-       : (memset((A) + B.clen, ' ', C - B.clen - 1),   \
-          A[B.f.dsc$w_length = C - 1] = '\0'));
+       : (memset((A) + B.clen, ' ', C - B.clen - 1), A[B.f.dsc$w_length = C - 1] = '\0'));
 /* PSTRING_cfC to beware of array A which does not contain any \0.      */
-#define PSTRING_cfC(M, I, A, B, C)                                          \
-  (B.dsc$a_pointer = A, C == sizeof(char *)                                 \
-                            ? B.dsc$w_length = strlen(A)                    \
-                            : (A[C - 1] = '\0', B.dsc$w_length = strlen(A), \
-                               (unsigned) memset((A) + B.dsc$w_length, ' ', \
-                                                 C - B.dsc$w_length - 1),   \
-                               B.dsc$w_length = C - 1));
+#define PSTRING_cfC(M, I, A, B, C)                                                                                   \
+  (B.dsc$a_pointer = A, C == sizeof(char *) ? B.dsc$w_length = strlen(A)                                             \
+                                            : (A[C - 1] = '\0', B.dsc$w_length = strlen(A),                          \
+                                               (unsigned) memset((A) + B.dsc$w_length, ' ', C - B.dsc$w_length - 1), \
+                                               B.dsc$w_length = C - 1));
 #else
-#define STRING_cfC(M, I, A, B, C)                                    \
-  (B.nombre = A, B.clen = (unsigned) strlen(A),                      \
-   C == sizeof(char *) || C == (unsigned) (B.clen + 1)               \
-       ? B.flen = B.clen                                             \
-       : (unsigned) (memset(B.nombre + B.clen, ' ', C - B.clen - 1), \
-                     B.nombre[B.flen = C - 1] = '\0'));
-#define PSTRING_cfC(M, I, A, B, C)                        \
-  (C == sizeof(char *) ? B = strlen(A)                    \
-                       : (A[C - 1] = '\0', B = strlen(A), \
-                          memset((A) + B, ' ', C - B - 1), B = C - 1));
+#define STRING_cfC(M, I, A, B, C)                      \
+  (B.nombre = A, B.clen = (unsigned) strlen(A),        \
+   C == sizeof(char *) || C == (unsigned) (B.clen + 1) \
+       ? B.flen = B.clen                               \
+       : (unsigned) (memset(B.nombre + B.clen, ' ', C - B.clen - 1), B.nombre[B.flen = C - 1] = '\0'));
+#define PSTRING_cfC(M, I, A, B, C) \
+  (C == sizeof(char *) ? B = strlen(A) : (A[C - 1] = '\0', B = strlen(A), memset((A) + B, ' ', C - B - 1), B = C - 1));
 #endif
 /* For CRAYFortran for (P)STRINGV_cfC, B.fs is set, but irrelevant. */
-#define STRINGV_cfC(M, I, A, B, C) \
-  AATRINGV_cfA(A, B, (C / 0xFFFF) * (C % 0xFFFF), C / 0xFFFF, C % 0xFFFF)
-#define PSTRINGV_cfC(M, I, A, B, C) \
-  APATRINGV_cfA(A, B, (C / 0xFFFF) * (C % 0xFFFF), C / 0xFFFF, C % 0xFFFF)
-#define ZTRINGV_cfC(M, I, A, B, C)                                      \
-  AATRINGV_cfA(A, B, (_3(M, _ELEMS_, I)) * ((_3(M, _ELEMLEN_, I)) + 1), \
-               (_3(M, _ELEMS_, I)), (_3(M, _ELEMLEN_, I)) + 1)
-#define PZTRINGV_cfC(M, I, A, B, C)                                      \
-  APATRINGV_cfA(A, B, (_3(M, _ELEMS_, I)) * ((_3(M, _ELEMLEN_, I)) + 1), \
-                (_3(M, _ELEMS_, I)), (_3(M, _ELEMLEN_, I)) + 1)
+#define STRINGV_cfC(M, I, A, B, C) AATRINGV_cfA(A, B, (C / 0xFFFF) * (C % 0xFFFF), C / 0xFFFF, C % 0xFFFF)
+#define PSTRINGV_cfC(M, I, A, B, C) APATRINGV_cfA(A, B, (C / 0xFFFF) * (C % 0xFFFF), C / 0xFFFF, C % 0xFFFF)
+#define ZTRINGV_cfC(M, I, A, B, C) \
+  AATRINGV_cfA(A, B, (_3(M, _ELEMS_, I)) * ((_3(M, _ELEMLEN_, I)) + 1), (_3(M, _ELEMS_, I)), (_3(M, _ELEMLEN_, I)) + 1)
+#define PZTRINGV_cfC(M, I, A, B, C) \
+  APATRINGV_cfA(A, B, (_3(M, _ELEMS_, I)) * ((_3(M, _ELEMLEN_, I)) + 1), (_3(M, _ELEMS_, I)), (_3(M, _ELEMLEN_, I)) + 1)
 
 #define BYTE_cfCCC(A, B) &A
 #define DOUBLE_cfCCC(A, B) &A
@@ -2554,8 +2116,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define INTVVVVVVV_cfCC(T, A, B) A
 #define PINT_cfCC(T, A, B) _(T, _cfCCC)(A, B)
 #define PVOID_cfCC(T, A, B) A
-#if defined(apolloFortran) || defined(hpuxFortran800) \
-    || defined(AbsoftUNIXFortran)
+#if defined(apolloFortran) || defined(hpuxFortran800) || defined(AbsoftUNIXFortran)
 #define ROUTINE_cfCC(T, A, B) &A
 #else
 #define ROUTINE_cfCC(T, A, B) A
@@ -2584,8 +2145,7 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 
 #define BYTE_cfX return A0;
 #define DOUBLE_cfX return A0;
-#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) \
-      && defined(RETURNFLOAT))
+#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) && defined(RETURNFLOAT))
 #define FLOAT_cfX return A0;
 #else
 #define FLOAT_cfX       \
@@ -2598,11 +2158,9 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #define SHORT_cfX return A0;
 #define VOID_cfX return;
 #if defined(vmsFortran) || defined(CRAYFortran)
-#define STRING_cfX \
-  return kill_trailing(kill_trailing(AA0, CFORTRAN_NON_CHAR), ' ');
+#define STRING_cfX return kill_trailing(kill_trailing(AA0, CFORTRAN_NON_CHAR), ' ');
 #else
-#define STRING_cfX \
-  return kill_trailing(kill_trailing(A0, CFORTRAN_NON_CHAR), ' ');
+#define STRING_cfX return kill_trailing(kill_trailing(A0, CFORTRAN_NON_CHAR), ' ');
 #endif
 
 #define CFFUN(NAME) _(__cf__, NAME)
@@ -2614,62 +2172,43 @@ typedef void (*cfCAST_FUNCTION)(CF_NULL_PROTO);
 #pragma standard
 #endif
 
-#define CCALLSFFUN1(UN, LN, T1, A1) \
-  CCALLSFFUN5(UN, LN, T1, CF_0, CF_0, CF_0, CF_0, A1, 0, 0, 0, 0)
-#define CCALLSFFUN2(UN, LN, T1, T2, A1, A2) \
-  CCALLSFFUN5(UN, LN, T1, T2, CF_0, CF_0, CF_0, A1, A2, 0, 0, 0)
-#define CCALLSFFUN3(UN, LN, T1, T2, T3, A1, A2, A3) \
-  CCALLSFFUN5(UN, LN, T1, T2, T3, CF_0, CF_0, A1, A2, A3, 0, 0)
-#define CCALLSFFUN4(UN, LN, T1, T2, T3, T4, A1, A2, A3, A4) \
-  CCALLSFFUN5(UN, LN, T1, T2, T3, T4, CF_0, A1, A2, A3, A4, 0)
-#define CCALLSFFUN5(UN, LN, T1, T2, T3, T4, T5, A1, A2, A3, A4, A5)          \
-  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, CF_0, A1, \
-               A2, A3, A4, A5, 0, 0, 0, 0, 0)
-#define CCALLSFFUN6(UN, LN, T1, T2, T3, T4, T5, T6, A1, A2, A3, A4, A5, A6)    \
-  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, CF_0, CF_0, CF_0, CF_0, A1, A2, \
-               A3, A4, A5, A6, 0, 0, 0, 0)
-#define CCALLSFFUN7(UN, LN, T1, T2, T3, T4, T5, T6, T7, A1, A2, A3, A4, A5,  \
-                    A6, A7)                                                  \
-  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, T7, CF_0, CF_0, CF_0, A1, A2, \
-               A3, A4, A5, A6, A7, 0, 0, 0)
-#define CCALLSFFUN8(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, A1, A2, A3, A4,    \
-                    A5, A6, A7, A8)                                            \
-  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, CF_0, CF_0, A1, A2, A3, \
-               A4, A5, A6, A7, A8, 0, 0)
-#define CCALLSFFUN9(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, A1, A2, A3,  \
-                    A4, A5, A6, A7, A8, A9)                                  \
-  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, CF_0, A1, A2, A3, \
-               A4, A5, A6, A7, A8, A9, 0)
-#define CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, A1, A2, \
-                     A3, A4, A5, A6, A7, A8, A9, AA)                         \
-  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, CF_0,   \
-               CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, 0, 0, 0, 0)
-#define CCALLSFFUN11(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, A1,   \
-                     A2, A3, A4, A5, A6, A7, A8, A9, AA, AB)                   \
-  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, CF_0, CF_0, \
-               CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, 0, 0, 0)
-#define CCALLSFFUN12(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-                     A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC)         \
-  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, CF_0, \
-               CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, 0, 0)
-#define CCALLSFFUN13(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-                     TD, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD) \
-  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD,   \
-               CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC, AD, 0)
+#define CCALLSFFUN1(UN, LN, T1, A1) CCALLSFFUN5(UN, LN, T1, CF_0, CF_0, CF_0, CF_0, A1, 0, 0, 0, 0)
+#define CCALLSFFUN2(UN, LN, T1, T2, A1, A2) CCALLSFFUN5(UN, LN, T1, T2, CF_0, CF_0, CF_0, A1, A2, 0, 0, 0)
+#define CCALLSFFUN3(UN, LN, T1, T2, T3, A1, A2, A3) CCALLSFFUN5(UN, LN, T1, T2, T3, CF_0, CF_0, A1, A2, A3, 0, 0)
+#define CCALLSFFUN4(UN, LN, T1, T2, T3, T4, A1, A2, A3, A4) CCALLSFFUN5(UN, LN, T1, T2, T3, T4, CF_0, A1, A2, A3, A4, 0)
+#define CCALLSFFUN5(UN, LN, T1, T2, T3, T4, T5, A1, A2, A3, A4, A5) \
+  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, 0, 0, 0, 0, 0)
+#define CCALLSFFUN6(UN, LN, T1, T2, T3, T4, T5, T6, A1, A2, A3, A4, A5, A6) \
+  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, 0, 0, 0, 0)
+#define CCALLSFFUN7(UN, LN, T1, T2, T3, T4, T5, T6, T7, A1, A2, A3, A4, A5, A6, A7) \
+  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, T7, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, 0, 0, 0)
+#define CCALLSFFUN8(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, A1, A2, A3, A4, A5, A6, A7, A8) \
+  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, 0, 0)
+#define CCALLSFFUN9(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, A1, A2, A3, A4, A5, A6, A7, A8, A9) \
+  CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, 0)
+#define CCALLSFFUN10(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA)           \
+  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, \
+               A9, AA, 0, 0, 0, 0)
+#define CCALLSFFUN11(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB) \
+  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, CF_0, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, \
+               A9, AA, AB, 0, 0, 0)
+#define CCALLSFFUN12(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA,   \
+                     AB, AC)                                                                                           \
+  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, CF_0, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, \
+               AA, AB, AC, 0, 0)
+#define CCALLSFFUN13(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, A1, A2, A3, A4, A5, A6, A7, A8, A9, \
+                     AA, AB, AC, AD)                                                                                 \
+  CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, CF_0, A1, A2, A3, A4, A5, A6, A7, A8, A9, \
+               AA, AB, AC, AD, 0)
 
-#define CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC,  \
-                     TD, TE, A1, A2, A3, A4, A5, A6, A7, A8, A9, AA, AB, AC,  \
-                     AD, AE)                                                  \
-  ((CFFUN(UN)(                                                                \
-      BCF(T1, A1, 0) BCF(T2, A2, 1) BCF(T3, A3, 1) BCF(T4, A4, 1) BCF(        \
-          T5, A5, 1) BCF(T6, A6, 1) BCF(T7, A7, 1) BCF(T8, A8, 1)             \
-          BCF(T9, A9, 1) BCF(TA, AA, 1) BCF(TB, AB, 1) BCF(TC, AC, 1) BCF(    \
-              TD, AD, 1) BCF(TE, AE, 1) SCF(T1, LN, 1, A1) SCF(T2, LN, 2, A2) \
-              SCF(T3, LN, 3, A3) SCF(T4, LN, 4, A4) SCF(T5, LN, 5, A5)        \
-                  SCF(T6, LN, 6, A6) SCF(T7, LN, 7, A7) SCF(T8, LN, 8, A8)    \
-                      SCF(T9, LN, 9, A9) SCF(TA, LN, 10, AA)                  \
-                          SCF(TB, LN, 11, AB) SCF(TC, LN, 12, AC)             \
-                              SCF(TD, LN, 13, AD) SCF(TE, LN, 14, AE))))
+#define CCALLSFFUN14(UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, A1, A2, A3, A4, A5, A6, A7, A8,   \
+                     A9, AA, AB, AC, AD, AE)                                                                           \
+  ((CFFUN(UN)(BCF(T1, A1, 0) BCF(T2, A2, 1) BCF(T3, A3, 1) BCF(T4, A4, 1) BCF(T5, A5, 1) BCF(T6, A6, 1) BCF(T7, A7, 1) \
+                  BCF(T8, A8, 1) BCF(T9, A9, 1) BCF(TA, AA, 1) BCF(TB, AB, 1) BCF(TC, AC, 1) BCF(TD, AD, 1)            \
+                      BCF(TE, AE, 1) SCF(T1, LN, 1, A1) SCF(T2, LN, 2, A2) SCF(T3, LN, 3, A3) SCF(T4, LN, 4, A4)       \
+                          SCF(T5, LN, 5, A5) SCF(T6, LN, 6, A6) SCF(T7, LN, 7, A7) SCF(T8, LN, 8, A8)                  \
+                              SCF(T9, LN, 9, A9) SCF(TA, LN, 10, AA) SCF(TB, LN, 11, AB) SCF(TC, LN, 12, AC)           \
+                                  SCF(TD, LN, 13, AD) SCF(TE, LN, 14, AE))))
 
 /*  N.B. Create a separate function instead of using (call function, function
 value here) because in order to create the variables needed for the input
@@ -2684,24 +2223,19 @@ causes a compiler warning to come up when one uses FCALLSCFUNn and CCALLSFFUNn
 for the same function in the same source code. Something done by the experts in
 debugging only.*/
 
-#define PROTOCCALLSFFUN0(F, UN, LN)                                            \
-  _(F, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                    \
-  static _Icf(2, U, F, CFFUN(UN), 0)()                                         \
+#define PROTOCCALLSFFUN0(F, UN, LN)             \
+  _(F, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);     \
+  static _Icf(2, U, F, CFFUN(UN), 0)()          \
   {_(F,_cfE) _Icf(3,GZ,F,UN,LN) ABSOFT_cf1(F)); \
-    _(F, _cfX)                                                                 \
+    _(F, _cfX)                                  \
   }
 
-#define PROTOCCALLSFFUN1(T0, UN, LN, T1) \
-  PROTOCCALLSFFUN5(T0, UN, LN, T1, CF_0, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFFUN2(T0, UN, LN, T1, T2) \
-  PROTOCCALLSFFUN5(T0, UN, LN, T1, T2, CF_0, CF_0, CF_0)
-#define PROTOCCALLSFFUN3(T0, UN, LN, T1, T2, T3) \
-  PROTOCCALLSFFUN5(T0, UN, LN, T1, T2, T3, CF_0, CF_0)
-#define PROTOCCALLSFFUN4(T0, UN, LN, T1, T2, T3, T4) \
-  PROTOCCALLSFFUN5(T0, UN, LN, T1, T2, T3, T4, CF_0)
-#define PROTOCCALLSFFUN5(T0, UN, LN, T1, T2, T3, T4, T5)                    \
-  PROTOCCALLSFFUN10(T0, UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, \
-                    CF_0)
+#define PROTOCCALLSFFUN1(T0, UN, LN, T1) PROTOCCALLSFFUN5(T0, UN, LN, T1, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFFUN2(T0, UN, LN, T1, T2) PROTOCCALLSFFUN5(T0, UN, LN, T1, T2, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFFUN3(T0, UN, LN, T1, T2, T3) PROTOCCALLSFFUN5(T0, UN, LN, T1, T2, T3, CF_0, CF_0)
+#define PROTOCCALLSFFUN4(T0, UN, LN, T1, T2, T3, T4) PROTOCCALLSFFUN5(T0, UN, LN, T1, T2, T3, T4, CF_0)
+#define PROTOCCALLSFFUN5(T0, UN, LN, T1, T2, T3, T4, T5) \
+  PROTOCCALLSFFUN10(T0, UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, CF_0)
 #define PROTOCCALLSFFUN6(T0, UN, LN, T1, T2, T3, T4, T5, T6) \
   PROTOCCALLSFFUN10(T0, UN, LN, T1, T2, T3, T4, T5, T6, CF_0, CF_0, CF_0, CF_0)
 #define PROTOCCALLSFFUN7(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7) \
@@ -2711,58 +2245,46 @@ debugging only.*/
 #define PROTOCCALLSFFUN9(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9) \
   PROTOCCALLSFFUN10(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, CF_0)
 #define PROTOCCALLSFFUN10(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA) \
-  PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, \
-                    CF_0, CF_0, CF_0)
-#define PROTOCCALLSFFUN11(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, \
-                          TB)                                                 \
-  PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB,   \
-                    CF_0, CF_0, CF_0)
-#define PROTOCCALLSFFUN12(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, \
-                          TB, TC)                                             \
-  PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB,   \
-                    TC, CF_0, CF_0)
-#define PROTOCCALLSFFUN13(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, \
-                          TB, TC, TD)                                         \
-  PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB,   \
-                    TC, TD, CF_0)
+  PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFFUN11(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB) \
+  PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, CF_0, CF_0, CF_0)
+#define PROTOCCALLSFFUN12(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC) \
+  PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, CF_0, CF_0)
+#define PROTOCCALLSFFUN13(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD) \
+  PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, CF_0)
 
 /* HP/UX 9.01 cc requires the blank between '_Icf(3,G,T0,UN,LN) CCCF(T1,1,0)' */
 
 #ifndef __CF__KnR
-#define PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,  \
-                          TB, TC, TD, TE)                                      \
-  _(T0, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                   \
-  static _Icf(2, U, T0, CFFUN(UN), 0)(CFARGT14FS(                              \
-      UCF, HCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE))   \
+#define PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                \
+  _(T0, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                                                 \
+  static _Icf(2, U, T0, CFFUN(UN),                                                                           \
+              0)(CFARGT14FS(UCF, HCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE))           \
   {       CFARGT14S(VCF,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)    _(T0,_cfE) \
  CCF(LN,T1,1)  CCF(LN,T2,2)  CCF(LN,T3,3)  CCF(LN,T4,4)  CCF(LN,T5,5)          \
  CCF(LN,T6,6)  CCF(LN,T7,7)  CCF(LN,T8,8)  CCF(LN,T9,9)  CCF(LN,TA,10)         \
  CCF(LN,TB,11) CCF(LN,TC,12) CCF(LN,TD,13) CCF(LN,TE,14)    _Icf(3,G,T0,UN,LN) \
- CFARGT14(CCCF,JCF,ABSOFT_cf1(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)); \
-    WCF(T1, A1, 1)                                                             \
-    WCF(T2, A2, 2) WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) \
-        WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) WCF(TA, A10, 10)          \
-            WCF(TB, A11, 11) WCF(TC, A12, 12) WCF(TD, A13, 13)                 \
-                WCF(TE, A14, 14) _(T0, _cfX)                                   \
+ CFARGT14(CCCF,JCF,ABSOFT_cf1(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE));                               \
+    WCF(T1, A1, 1)                                                                                           \
+    WCF(T2, A2, 2)                                                                                           \
+    WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) \
+        WCF(TA, A10, 10) WCF(TB, A11, 11) WCF(TC, A12, 12) WCF(TD, A13, 13) WCF(TE, A14, 14) _(T0, _cfX)     \
   }
 #else
-#define PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,  \
-                          TB, TC, TD, TE)                                      \
-  _(T0, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                   \
-  static _Icf(2, U, T0, CFFUN(UN), 0)(CFARGT14FS(                              \
-      UUCF, HHCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)) \
-      CFARGT14FS(UUUCF, HHHCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                 TC, TD, TE);                                                  \
+#define PROTOCCALLSFFUN14(T0, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                \
+  _(T0, _cfPU)(CFC_(UN, LN))(CF_NULL_PROTO);                                                                 \
+  static _Icf(2, U, T0, CFFUN(UN),                                                                           \
+              0)(CFARGT14FS(UUCF, HHCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE))         \
+      CFARGT14FS(UUUCF, HHHCF, _Z, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE);                  \
   {       CFARGT14S(VCF,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)    _(T0,_cfE) \
  CCF(LN,T1,1)  CCF(LN,T2,2)  CCF(LN,T3,3)  CCF(LN,T4,4)  CCF(LN,T5,5)          \
  CCF(LN,T6,6)  CCF(LN,T7,7)  CCF(LN,T8,8)  CCF(LN,T9,9)  CCF(LN,TA,10)         \
  CCF(LN,TB,11) CCF(LN,TC,12) CCF(LN,TD,13) CCF(LN,TE,14)    _Icf(3,G,T0,UN,LN) \
- CFARGT14(CCCF,JCF,ABSOFT_cf1(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)); \
-    WCF(T1, A1, 1)                                                             \
-    WCF(T2, A2, 2) WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) \
-        WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) WCF(TA, A10, 10)          \
-            WCF(TB, A11, 11) WCF(TC, A12, 12) WCF(TD, A13, 13)                 \
-                WCF(TE, A14, 14) _(T0, _cfX)                                   \
+ CFARGT14(CCCF,JCF,ABSOFT_cf1(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE));                               \
+    WCF(T1, A1, 1)                                                                                           \
+    WCF(T2, A2, 2)                                                                                           \
+    WCF(T3, A3, 3) WCF(T4, A4, 4) WCF(T5, A5, 5) WCF(T6, A6, 6) WCF(T7, A7, 7) WCF(T8, A8, 8) WCF(T9, A9, 9) \
+        WCF(TA, A10, 10) WCF(TB, A11, 11) WCF(TC, A12, 12) WCF(TD, A13, 13) WCF(TE, A14, 14) _(T0, _cfX)     \
   }
 #endif
 
@@ -2831,8 +2353,7 @@ debugging only.*/
 #define ROUTINE_26 ROUTINE_orig
 #define ROUTINE_27 ROUTINE_orig
 
-#define TCF(NAME, TN, I, M) \
-  _SEP_(TN, M, cfCOMMA) _(TN, _cfT)(NAME, I, _(A, I), _(B, I), _(C, I))
+#define TCF(NAME, TN, I, M) _SEP_(TN, M, cfCOMMA) _(TN, _cfT)(NAME, I, _(A, I), _(B, I), _(C, I))
 #define BYTE_cfT(M, I, A, B, D) *A
 #define DOUBLE_cfT(M, I, A, B, D) *A
 #define FLOAT_cfT(M, I, A, B, D) *A
@@ -2849,14 +2370,14 @@ debugging only.*/
 #define LONGV_cfT(M, I, A, B, D) A
 #define LONGLONGV_cfT(M, I, A, B, D) A /* added by MR December 2005 */
 #define SHORTV_cfT(M, I, A, B, D) A
-#define BYTEVV_cfT(M, I, A, B, D) (void *) A     /* We have to cast to void *,*/
-#define BYTEVVV_cfT(M, I, A, B, D) (void *) A    /* since we don't know the   */
-#define BYTEVVVV_cfT(M, I, A, B, D) (void *) A   /* dimensions of the array.  */
-#define BYTEVVVVV_cfT(M, I, A, B, D) (void *) A  /* i.e. Unfortunately, can't \
-                                                  */
-#define BYTEVVVVVV_cfT(M, I, A, B, D) (void *) A /* check that the type */
-#define BYTEVVVVVVV_cfT(M, I, A, B, D) \
-  (void *) A /* matches the prototype.    */
+#define BYTEVV_cfT(M, I, A, B, D) (void *) A   /* We have to cast to void *,*/
+#define BYTEVVV_cfT(M, I, A, B, D) (void *) A  /* since we don't know the   */
+#define BYTEVVVV_cfT(M, I, A, B, D) (void *) A /* dimensions of the array.  */
+#define BYTEVVVVV_cfT(M, I, A, B, D)                                           \
+  (void *) A                                      /* i.e. Unfortunately, can't \
+                                                   */
+#define BYTEVVVVVV_cfT(M, I, A, B, D) (void *) A  /* check that the type */
+#define BYTEVVVVVVV_cfT(M, I, A, B, D) (void *) A /* matches the prototype.    */
 #define DOUBLEVV_cfT(M, I, A, B, D) (void *) A
 #define DOUBLEVVV_cfT(M, I, A, B, D) (void *) A
 #define DOUBLEVVVV_cfT(M, I, A, B, D) (void *) A
@@ -2887,18 +2408,14 @@ debugging only.*/
 #define LONGVVVVV_cfT(M, I, A, B, D) (void *) A
 #define LONGVVVVVV_cfT(M, I, A, B, D) (void *) A
 #define LONGVVVVVVV_cfT(M, I, A, B, D) (void *) A
-#define LONGLONGVV_cfT(M, I, A, B, D) (void *) A /* added by MR December 2005 \
-                                                  */
-#define LONGLONGVVV_cfT(M, I, A, B, D) \
-  (void *) A /* added by MR December 2005 */
-#define LONGLONGVVVV_cfT(M, I, A, B, D) \
-  (void *) A /* added by MR December 2005 */
-#define LONGLONGVVVVV_cfT(M, I, A, B, D) \
-  (void *) A /* added by MR December 2005 */
-#define LONGLONGVVVVVV_cfT(M, I, A, B, D) \
-  (void *) A /* added by MR December 2005 */
-#define LONGLONGVVVVVVV_cfT(M, I, A, B, D) \
-  (void *) A /* added by MR December 2005 */
+#define LONGLONGVV_cfT(M, I, A, B, D)                                              \
+  (void *) A                                          /* added by MR December 2005 \
+                                                       */
+#define LONGLONGVVV_cfT(M, I, A, B, D) (void *) A     /* added by MR December 2005 */
+#define LONGLONGVVVV_cfT(M, I, A, B, D) (void *) A    /* added by MR December 2005 */
+#define LONGLONGVVVVV_cfT(M, I, A, B, D) (void *) A   /* added by MR December 2005 */
+#define LONGLONGVVVVVV_cfT(M, I, A, B, D) (void *) A  /* added by MR December 2005 */
+#define LONGLONGVVVVVVV_cfT(M, I, A, B, D) (void *) A /* added by MR December 2005 */
 #define SHORTVV_cfT(M, I, A, B, D) (void *) A
 #define SHORTVVV_cfT(M, I, A, B, D) (void *) A
 #define SHORTVVVV_cfT(M, I, A, B, D) (void *) A
@@ -2914,8 +2431,7 @@ debugging only.*/
 #define PLONGLONG_cfT(M, I, A, B, D) A /* added by MR December 2005 */
 #define PSHORT_cfT(M, I, A, B, D) A
 #define PVOID_cfT(M, I, A, B, D) A
-#if defined(apolloFortran) || defined(hpuxFortran800) \
-    || defined(AbsoftUNIXFortran)
+#if defined(apolloFortran) || defined(hpuxFortran800) || defined(AbsoftUNIXFortran)
 #define ROUTINE_cfT(M, I, A, B, D) _(ROUTINE_, I)(*A)
 #else
 #define ROUTINE_cfT(M, I, A, B, D) _(ROUTINE_, I) A
@@ -2923,34 +2439,26 @@ debugging only.*/
 /* A == pointer to the characters
    D == length of the string, or of an element in an array of strings
    E == number of elements in an array of strings                             */
-#define TTSTR(A, B, D) \
-  ((B = _cf_malloc(D + 1))[D] = '\0', memcpy(B, A, D), kill_trailing(B, ' '))
-#define TTTTSTR(A, B, D)                     \
-  (!(D < 4 || A[0] || A[1] || A[2] || A[3])) \
-      ? NULL                                 \
-      : memchr(A, '\0', D) ? A : TTSTR(A, B, D)
-#define TTTTSTRV(A, B, D, E)                                               \
-  (_(B, N) = E, B = _cf_malloc(_(B, N) * (D + 1)),                         \
-   (void *) vkill_trailing(f2cstrv(A, B, D + 1, _(B, N) * (D + 1)), D + 1, \
-                           _(B, N) * (D + 1), ' '))
+#define TTSTR(A, B, D) ((B = _cf_malloc(D + 1))[D] = '\0', memcpy(B, A, D), kill_trailing(B, ' '))
+#define TTTTSTR(A, B, D) (!(D < 4 || A[0] || A[1] || A[2] || A[3])) ? NULL : memchr(A, '\0', D) ? A : TTSTR(A, B, D)
+#define TTTTSTRV(A, B, D, E)                       \
+  (_(B, N) = E, B = _cf_malloc(_(B, N) * (D + 1)), \
+   (void *) vkill_trailing(f2cstrv(A, B, D + 1, _(B, N) * (D + 1)), D + 1, _(B, N) * (D + 1), ' '))
 #ifdef vmsFortran
 #define STRING_cfT(M, I, A, B, D) TTTTSTR(A->dsc$a_pointer, B, A->dsc$w_length)
-#define STRINGV_cfT(M, I, A, B, D) \
-  TTTTSTRV(A->dsc$a_pointer, B, A->dsc$w_length, A->dsc$l_m[0])
+#define STRINGV_cfT(M, I, A, B, D) TTTTSTRV(A->dsc$a_pointer, B, A->dsc$w_length, A->dsc$l_m[0])
 #define PSTRING_cfT(M, I, A, B, D) TTSTR(A->dsc$a_pointer, B, A->dsc$w_length)
 #define PPSTRING_cfT(M, I, A, B, D) A->dsc$a_pointer
 #else
 #ifdef CRAYFortran
 #define STRING_cfT(M, I, A, B, D) TTTTSTR(_fcdtocp(A), B, _fcdlen(A))
-#define STRINGV_cfT(M, I, A, B, D)     \
-  TTTTSTRV(_fcdtocp(A), B, _fcdlen(A), \
-           num_elem(_fcdtocp(A), _fcdlen(A), _3(M, _STRV_A, I)))
+#define STRINGV_cfT(M, I, A, B, D) \
+  TTTTSTRV(_fcdtocp(A), B, _fcdlen(A), num_elem(_fcdtocp(A), _fcdlen(A), _3(M, _STRV_A, I)))
 #define PSTRING_cfT(M, I, A, B, D) TTSTR(_fcdtocp(A), B, _fcdlen(A))
 #define PPSTRING_cfT(M, I, A, B, D) _fcdtocp(A)
 #else
 #define STRING_cfT(M, I, A, B, D) TTTTSTR(A, B, D)
-#define STRINGV_cfT(M, I, A, B, D) \
-  TTTTSTRV(A, B, D, num_elem(A, D, _3(M, _STRV_A, I)))
+#define STRINGV_cfT(M, I, A, B, D) TTTTSTRV(A, B, D, num_elem(A, D, _3(M, _STRV_A, I)))
 #define PSTRING_cfT(M, I, A, B, D) TTSTR(A, B, D)
 #define PPSTRING_cfT(M, I, A, B, D) ((void) D, A)
 #endif
@@ -2967,11 +2475,9 @@ debugging only.*/
   if (B) _cf_free(B);
 #define STRINGV_cfR(A, B, D) _cf_free(B);
 /* A and D as defined above for TSTRING(V) */
-#define RRRRPSTR(A, B, D)                                                \
-  if (B)                                                                 \
-    memcpy(A, B, _cfMIN(strlen(B), D)),                                  \
-        (D > strlen(B) ? memset(A + strlen(B), ' ', D - strlen(B)) : 0), \
-        _cf_free(B);
+#define RRRRPSTR(A, B, D) \
+  if (B)                  \
+    memcpy(A, B, _cfMIN(strlen(B), D)), (D > strlen(B) ? memset(A + strlen(B), ' ', D - strlen(B)) : 0), _cf_free(B);
 #define RRRRPSTRV(A, B, D) c2fstrv(B, A, D + 1, (D + 1) * _(B, N)), _cf_free(B);
 #ifdef vmsFortran
 #define PSTRING_cfR(A, B, D) RRRRPSTR(A->dsc$a_pointer, B, A->dsc$w_length)
@@ -3019,8 +2525,7 @@ debugging only.*/
 #endif
 #endif
 #else
-#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) \
-      && defined(RETURNFLOAT))
+#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) && defined(RETURNFLOAT))
 #if defined(f2cFortran) && !defined(gFortran)
 /* f2c/g77 return double from FORTRAN REAL functions. (KMCCARTY, 2005/12/09) */
 #define FLOAT_cfFZ(UN, LN) DOUBLE_PRECISION  FCALLSC_QUALIFIER fcallsc(UN,LN)(
@@ -3052,8 +2557,7 @@ debugging only.*/
 #define INT_cfF(UN, LN) INT_cfFZ(UN, LN)
 #define LOGICAL_cfF(UN, LN) LOGICAL_cfFZ(UN, LN)
 #define LONG_cfF(UN, LN) LONG_cfFZ(UN, LN)
-#define LONGLONG_cfF(UN, LN) \
-  LONGLONG_cfFZ(UN, LN) /* added by MR December 2005 */
+#define LONGLONG_cfF(UN, LN) LONGLONG_cfFZ(UN, LN) /* added by MR December 2005 */
 #define SHORT_cfF(UN, LN) SHORT_cfFZ(UN, LN)
 #define VOID_cfF(UN, LN) VOID_cfFZ(UN, LN)
 #define STRING_cfF(UN, LN) STRING_cfFZ(UN, LN),
@@ -3080,28 +2584,23 @@ debugging only.*/
 #define VOID_cfK
 /* KSTRING copies the string into the position provided by the caller. */
 #ifdef vmsFortran
-#define STRING_cfK                                                     \
-  memcpy(AS->dsc$a_pointer, A0,                                        \
-         _cfMIN(AS->dsc$w_length, (A0 == NULL ? 0 : strlen(A0))));     \
-  AS->dsc$w_length > (A0 == NULL ? 0 : strlen(A0))                     \
-      ? memset(AS->dsc$a_pointer + (A0 == NULL ? 0 : strlen(A0)), ' ', \
-               AS->dsc$w_length - (A0 == NULL ? 0 : strlen(A0)))       \
-      : 0;
+#define STRING_cfK                                                                                                  \
+  memcpy(AS->dsc$a_pointer, A0, _cfMIN(AS->dsc$w_length, (A0 == NULL ? 0 : strlen(A0))));                           \
+  AS->dsc$w_length > (A0 == NULL ? 0 : strlen(A0)) ? memset(AS->dsc$a_pointer + (A0 == NULL ? 0 : strlen(A0)), ' ', \
+                                                            AS->dsc$w_length - (A0 == NULL ? 0 : strlen(A0)))       \
+                                                   : 0;
 #else
 #ifdef CRAYFortran
-#define STRING_cfK                                                \
-  memcpy(_fcdtocp(AS), A0,                                        \
-         _cfMIN(_fcdlen(AS), (A0 == NULL ? 0 : strlen(A0))));     \
-  _fcdlen(AS) > (A0 == NULL ? 0 : strlen(A0))                     \
-      ? memset(_fcdtocp(AS) + (A0 == NULL ? 0 : strlen(A0)), ' ', \
-               _fcdlen(AS) - (A0 == NULL ? 0 : strlen(A0)))       \
+#define STRING_cfK                                                                                             \
+  memcpy(_fcdtocp(AS), A0, _cfMIN(_fcdlen(AS), (A0 == NULL ? 0 : strlen(A0))));                                \
+  _fcdlen(AS) > (A0 == NULL ? 0 : strlen(A0))                                                                  \
+      ? memset(_fcdtocp(AS) + (A0 == NULL ? 0 : strlen(A0)), ' ', _fcdlen(AS) - (A0 == NULL ? 0 : strlen(A0))) \
       : 0;
 #else
-#define STRING_cfK                                           \
-  memcpy(AS, A0, _cfMIN(D0, (A0 == NULL ? 0 : strlen(A0)))); \
-  D0 > (A0 == NULL ? 0 : strlen(A0))                         \
-      ? memset(AS + (A0 == NULL ? 0 : strlen(A0)), ' ',      \
-               D0 - (A0 == NULL ? 0 : strlen(A0)))           \
+#define STRING_cfK                                                                          \
+  memcpy(AS, A0, _cfMIN(D0, (A0 == NULL ? 0 : strlen(A0))));                                \
+  D0 > (A0 == NULL ? 0 : strlen(A0))                                                        \
+      ? memset(AS + (A0 == NULL ? 0 : strlen(A0)), ' ', D0 - (A0 == NULL ? 0 : strlen(A0))) \
       : 0;
 #endif
 #endif
@@ -3112,8 +2611,7 @@ arguments to work correctly. Note that R.. frees and hence may corrupt the
 string. */
 #define BYTE_cfI return A0;
 #define DOUBLE_cfI return A0;
-#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) \
-      && defined(RETURNFLOAT))
+#if !(defined(FLOATFUNCTIONTYPE) && defined(ASSIGNFLOAT) && defined(RETURNFLOAT))
 #define FLOAT_cfI return A0;
 #else
 #define FLOAT_cfI RETURNFLOAT(A0);
@@ -3138,16 +2636,11 @@ string. */
 #define FCALLSCSUB0(CN, UN, LN) FCALLSCFUN0(VOID, CN, UN, LN)
 #define FCALLSCSUB1(CN, UN, LN, T1) FCALLSCFUN1(VOID, CN, UN, LN, T1)
 #define FCALLSCSUB2(CN, UN, LN, T1, T2) FCALLSCFUN2(VOID, CN, UN, LN, T1, T2)
-#define FCALLSCSUB3(CN, UN, LN, T1, T2, T3) \
-  FCALLSCFUN3(VOID, CN, UN, LN, T1, T2, T3)
-#define FCALLSCSUB4(CN, UN, LN, T1, T2, T3, T4) \
-  FCALLSCFUN4(VOID, CN, UN, LN, T1, T2, T3, T4)
-#define FCALLSCSUB5(CN, UN, LN, T1, T2, T3, T4, T5) \
-  FCALLSCFUN5(VOID, CN, UN, LN, T1, T2, T3, T4, T5)
-#define FCALLSCSUB6(CN, UN, LN, T1, T2, T3, T4, T5, T6) \
-  FCALLSCFUN6(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6)
-#define FCALLSCSUB7(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7) \
-  FCALLSCFUN7(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7)
+#define FCALLSCSUB3(CN, UN, LN, T1, T2, T3) FCALLSCFUN3(VOID, CN, UN, LN, T1, T2, T3)
+#define FCALLSCSUB4(CN, UN, LN, T1, T2, T3, T4) FCALLSCFUN4(VOID, CN, UN, LN, T1, T2, T3, T4)
+#define FCALLSCSUB5(CN, UN, LN, T1, T2, T3, T4, T5) FCALLSCFUN5(VOID, CN, UN, LN, T1, T2, T3, T4, T5)
+#define FCALLSCSUB6(CN, UN, LN, T1, T2, T3, T4, T5, T6) FCALLSCFUN6(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6)
+#define FCALLSCSUB7(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7) FCALLSCFUN7(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7)
 #define FCALLSCSUB8(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8) \
   FCALLSCFUN8(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8)
 #define FCALLSCSUB9(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9) \
@@ -3156,80 +2649,54 @@ string. */
   FCALLSCFUN10(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA)
 #define FCALLSCSUB11(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB) \
   FCALLSCFUN11(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB)
-#define FCALLSCSUB12(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC)                                                     \
+#define FCALLSCSUB12(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC) \
   FCALLSCFUN12(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC)
-#define FCALLSCSUB13(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD)                                                 \
-  FCALLSCFUN13(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD)
-#define FCALLSCSUB14(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE)                                             \
-  FCALLSCFUN14(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE)
-#define FCALLSCSUB15(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF)                                         \
-  FCALLSCFUN15(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF)
-#define FCALLSCSUB16(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG)                                     \
-  FCALLSCFUN16(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG)
-#define FCALLSCSUB17(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH)                                 \
-  FCALLSCFUN17(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH)
-#define FCALLSCSUB18(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI)                             \
-  FCALLSCFUN18(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI)
-#define FCALLSCSUB19(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ)                         \
-  FCALLSCFUN19(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ)
-#define FCALLSCSUB20(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ, TK)                     \
-  FCALLSCFUN20(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ, TK)
-#define FCALLSCSUB21(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL)                 \
-  FCALLSCFUN21(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL)
-#define FCALLSCSUB22(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM)             \
-  FCALLSCFUN22(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM)
-#define FCALLSCSUB23(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN)         \
-  FCALLSCFUN23(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN)
-#define FCALLSCSUB24(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO)     \
-  FCALLSCFUN24(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO)
-#define FCALLSCSUB25(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP) \
-  FCALLSCFUN25(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP)
-#define FCALLSCSUB26(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, \
-                     TQ)                                                     \
-  FCALLSCFUN26(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ)
-#define FCALLSCSUB27(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-                     TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, \
-                     TQ, TR)                                                 \
-  FCALLSCFUN27(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, \
-               TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR)
+#define FCALLSCSUB13(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD) \
+  FCALLSCFUN13(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD)
+#define FCALLSCSUB14(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) \
+  FCALLSCFUN14(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)
+#define FCALLSCSUB15(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF) \
+  FCALLSCFUN15(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF)
+#define FCALLSCSUB16(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG) \
+  FCALLSCFUN16(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG)
+#define FCALLSCSUB17(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH) \
+  FCALLSCFUN17(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH)
+#define FCALLSCSUB18(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI) \
+  FCALLSCFUN18(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI)
+#define FCALLSCSUB19(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ) \
+  FCALLSCFUN19(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ)
+#define FCALLSCSUB20(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK) \
+  FCALLSCFUN20(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)
+#define FCALLSCSUB21(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL) \
+  FCALLSCFUN21(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL)
+#define FCALLSCSUB22(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                     TM)                                                                                             \
+  FCALLSCFUN22(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM)
+#define FCALLSCSUB23(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                     TM, TN)                                                                                         \
+  FCALLSCFUN23(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+               TM, TN)
+#define FCALLSCSUB24(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                     TM, TN, TO)                                                                                     \
+  FCALLSCFUN24(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+               TM, TN, TO)
+#define FCALLSCSUB25(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                     TM, TN, TO, TP)                                                                                 \
+  FCALLSCFUN25(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+               TM, TN, TO, TP)
+#define FCALLSCSUB26(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                     TM, TN, TO, TP, TQ)                                                                             \
+  FCALLSCFUN26(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+               TM, TN, TO, TP, TQ)
+#define FCALLSCSUB27(CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+                     TM, TN, TO, TP, TQ, TR)                                                                         \
+  FCALLSCFUN27(VOID, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, \
+               TM, TN, TO, TP, TQ, TR)
 
-#define FCALLSCFUN1(T0, CN, UN, LN, T1) \
-  FCALLSCFUN5(T0, CN, UN, LN, T1, CF_0, CF_0, CF_0, CF_0)
-#define FCALLSCFUN2(T0, CN, UN, LN, T1, T2) \
-  FCALLSCFUN5(T0, CN, UN, LN, T1, T2, CF_0, CF_0, CF_0)
-#define FCALLSCFUN3(T0, CN, UN, LN, T1, T2, T3) \
-  FCALLSCFUN5(T0, CN, UN, LN, T1, T2, T3, CF_0, CF_0)
-#define FCALLSCFUN4(T0, CN, UN, LN, T1, T2, T3, T4) \
-  FCALLSCFUN5(T0, CN, UN, LN, T1, T2, T3, T4, CF_0)
+#define FCALLSCFUN1(T0, CN, UN, LN, T1) FCALLSCFUN5(T0, CN, UN, LN, T1, CF_0, CF_0, CF_0, CF_0)
+#define FCALLSCFUN2(T0, CN, UN, LN, T1, T2) FCALLSCFUN5(T0, CN, UN, LN, T1, T2, CF_0, CF_0, CF_0)
+#define FCALLSCFUN3(T0, CN, UN, LN, T1, T2, T3) FCALLSCFUN5(T0, CN, UN, LN, T1, T2, T3, CF_0, CF_0)
+#define FCALLSCFUN4(T0, CN, UN, LN, T1, T2, T3, T4) FCALLSCFUN5(T0, CN, UN, LN, T1, T2, T3, T4, CF_0)
 #define FCALLSCFUN5(T0, CN, UN, LN, T1, T2, T3, T4, T5) \
   FCALLSCFUN10(T0, CN, UN, LN, T1, T2, T3, T4, T5, CF_0, CF_0, CF_0, CF_0, CF_0)
 #define FCALLSCFUN6(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6) \
@@ -3241,181 +2708,132 @@ string. */
 #define FCALLSCFUN9(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9) \
   FCALLSCFUN10(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, CF_0)
 #define FCALLSCFUN10(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA) \
-  FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, \
-               CF_0, CF_0, CF_0)
-#define FCALLSCFUN11(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, \
-                     TB)                                                     \
-  FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB,   \
-               CF_0, CF_0, CF_0)
-#define FCALLSCFUN12(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC)                                                   \
-  FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               CF_0, CF_0)
-#define FCALLSCFUN13(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD)                                               \
-  FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, CF_0)
+  FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, CF_0, CF_0, CF_0, CF_0)
+#define FCALLSCFUN11(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB) \
+  FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, CF_0, CF_0, CF_0)
+#define FCALLSCFUN12(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC) \
+  FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, CF_0, CF_0)
+#define FCALLSCFUN13(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD) \
+  FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, CF_0)
 
-#define FCALLSCFUN15(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF)                                       \
-  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, CF_0, CF_0, CF_0, CF_0, CF_0)
-#define FCALLSCFUN16(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG)                                   \
-  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, CF_0, CF_0, CF_0, CF_0)
-#define FCALLSCFUN17(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH)                               \
-  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, CF_0, CF_0, CF_0)
-#define FCALLSCFUN18(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI)                           \
-  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, CF_0, CF_0)
-#define FCALLSCFUN19(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ)                       \
-  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, TJ, CF_0)
-#define FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK)                   \
-  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, TJ, TK, CF_0, CF_0, CF_0, CF_0, CF_0,   \
-               CF_0, CF_0)
-#define FCALLSCFUN21(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL)               \
-  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, TJ, TK, TL, CF_0, CF_0, CF_0, CF_0,     \
-               CF_0, CF_0)
-#define FCALLSCFUN22(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM)           \
-  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, CF_0, CF_0, CF_0, CF_0, \
-               CF_0)
-#define FCALLSCFUN23(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN)       \
-  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, CF_0, CF_0, CF_0,   \
-               CF_0)
-#define FCALLSCFUN24(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO)   \
-  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, CF_0, CF_0,     \
-               CF_0)
-#define FCALLSCFUN25(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO,   \
-                     TP)                                                       \
-  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, CF_0, CF_0)
-#define FCALLSCFUN26(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,   \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO,   \
-                     TP, TQ)                                                   \
-  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, \
-               TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, CF_0)
+#define FCALLSCFUN15(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF) \
+  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define FCALLSCFUN16(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG) \
+  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, CF_0, CF_0, CF_0, CF_0)
+#define FCALLSCFUN17(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH) \
+  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, CF_0, CF_0, CF_0)
+#define FCALLSCFUN18(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI) \
+  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, CF_0, CF_0)
+#define FCALLSCFUN19(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ) \
+  FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, CF_0)
+#define FCALLSCFUN20(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK) \
+  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, CF_0, \
+               CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define FCALLSCFUN21(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, \
+                     TL)                                                                                             \
+  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL,   \
+               CF_0, CF_0, CF_0, CF_0, CF_0, CF_0)
+#define FCALLSCFUN22(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,   \
+                     TL, TM)                                                                                           \
+  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, \
+               CF_0, CF_0, CF_0, CF_0, CF_0)
+#define FCALLSCFUN23(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,   \
+                     TL, TM, TN)                                                                                       \
+  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, \
+               TN, CF_0, CF_0, CF_0, CF_0)
+#define FCALLSCFUN24(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,   \
+                     TL, TM, TN, TO)                                                                                   \
+  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, \
+               TN, TO, CF_0, CF_0, CF_0)
+#define FCALLSCFUN25(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,   \
+                     TL, TM, TN, TO, TP)                                                                               \
+  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, \
+               TN, TO, TP, CF_0, CF_0)
+#define FCALLSCFUN26(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,   \
+                     TL, TM, TN, TO, TP, TQ)                                                                           \
+  FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, \
+               TN, TO, TP, TQ, CF_0)
 
 #ifndef __CF__KnR
 #define FCALLSCFUN0(T0, CN, UN, LN) CFextern _(T0,_cfFZ)(UN,LN) ABSOFT_cf2(T0)) \
-  {                                                                          \
-    _Icf(2, UU, T0, A0, 0);                                                  \
-    _Icf(0, L, T0, 0, 0) CN();                                               \
-    _Icf(0, K, T0, 0, 0) _(T0, _cfI)                                         \
+  {                                                                             \
+    _Icf(2, UU, T0, A0, 0);                                                     \
+    _Icf(0, L, T0, 0, 0) CN();                                                  \
+    _Icf(0, K, T0, 0, 0) _(T0, _cfI)                                            \
   }
 
-#define FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,  \
-                     TB, TC, TD, TE)                                          \
+#define FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                           \
                                  CFextern _(T0,_cfF)(UN,LN)                    \
- CFARGT14(NCF,DCF,ABSOFT_cf2(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE) ) \
-  {                                                                           \
-    CFARGT14S(QCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)    \
-    _Icf(2, UU, T0, A0, 0);                                                   \
-    _Icf(0, L, T0, 0, 0) CN(                                                  \
-        TCF(LN, T1, 1, 0) TCF(LN, T2, 2, 1) TCF(LN, T3, 3, 1)                 \
-            TCF(LN, T4, 4, 1) TCF(LN, T5, 5, 1) TCF(LN, T6, 6, 1)             \
-                TCF(LN, T7, 7, 1) TCF(LN, T8, 8, 1) TCF(LN, T9, 9, 1)         \
-                    TCF(LN, TA, 10, 1) TCF(LN, TB, 11, 1) TCF(LN, TC, 12, 1)  \
-                        TCF(LN, TD, 13, 1) TCF(LN, TE, 14, 1));               \
-    _Icf(0, K, T0, 0, 0) CFARGT14S(RCF, T1, T2, T3, T4, T5, T6, T7, T8, T9,   \
-                                   TA, TB, TC, TD, TE) _(T0, _cfI)            \
+ CFARGT14(NCF,DCF,ABSOFT_cf2(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE) )                                          \
+  {                                                                                                                    \
+    CFARGT14S(QCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                                             \
+    _Icf(2, UU, T0, A0, 0);                                                                                            \
+    _Icf(0, L, T0, 0, 0)                                                                                               \
+        CN(TCF(LN, T1, 1, 0) TCF(LN, T2, 2, 1) TCF(LN, T3, 3, 1) TCF(LN, T4, 4, 1) TCF(LN, T5, 5, 1) TCF(LN, T6, 6, 1) \
+               TCF(LN, T7, 7, 1) TCF(LN, T8, 8, 1) TCF(LN, T9, 9, 1) TCF(LN, TA, 10, 1) TCF(LN, TB, 11, 1)             \
+                   TCF(LN, TC, 12, 1) TCF(LN, TD, 13, 1) TCF(LN, TE, 14, 1));                                          \
+    _Icf(0, K, T0, 0, 0) CFARGT14S(RCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) _(T0, _cfI)            \
   }
 
-#define FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,                                         \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO,                                         \
-                     TP, TQ, TR)                                                                                     \
+#define FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,   \
+                     TL, TM, TN, TO, TP, TQ, TR)                                                                       \
                                  CFextern _(T0,_cfF)(UN,LN)                    \
- CFARGT27(NCF,DCF,ABSOFT_cf2(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE,TF,TG,TH,TI,TJ,TK,TL,TM,TN,TO,TP,TQ,TR) ) \
-  {                                                                                                                  \
-    CFARGT27S(QCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF,                                       \
-              TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR)                                                        \
-    _Icf(2, UU, T0, A0, 0);                                                                                          \
-    _Icf(0, L, T0, 0, 0) CN(                                                                                         \
-        TCF(LN, T1, 1, 0) TCF(LN, T2, 2, 1) TCF(LN, T3, 3, 1)                                                        \
-            TCF(LN, T4, 4, 1) TCF(LN, T5, 5, 1) TCF(LN, T6, 6, 1)                                                    \
-                TCF(LN, T7, 7, 1) TCF(LN, T8, 8, 1) TCF(LN, T9, 9, 1) TCF(                                           \
-                    LN, TA, 10, 1) TCF(LN, TB, 11, 1) TCF(LN, TC, 12, 1)                                             \
-                    TCF(LN, TD, 13, 1) TCF(LN, TE, 14, 1) TCF(LN, TF, 15, 1)                                         \
-                        TCF(LN, TG, 16, 1) TCF(LN, TH, 17, 1)                                                        \
-                            TCF(LN, TI, 18, 1) TCF(LN, TJ, 19, 1)                                                    \
-                                TCF(LN, TK, 20, 1) TCF(LN, TL, 21, 1)                                                \
-                                    TCF(LN, TM, 22, 1) TCF(LN, TN, 23, 1)                                            \
-                                        TCF(LN, TO, 24, 1) TCF(LN, TP, 25, 1)                                        \
-                                            TCF(LN, TQ, 26, 1)                                                       \
-                                                TCF(LN, TR, 27, 1));                                                 \
-    _Icf(0, K, T0, 0, 0) CFARGT27S(RCF, T1, T2, T3, T4, T5, T6, T7, T8, T9,                                          \
-                                   TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,                                       \
-                                   TL, TM, TN, TO, TP, TQ, TR) _(T0, _cfI)                                           \
+ CFARGT27(NCF,DCF,ABSOFT_cf2(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE,TF,TG,TH,TI,TJ,TK,TL,TM,TN,TO,TP,TQ,TR) )   \
+  {                                                                                                                    \
+    CFARGT27S(QCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, \
+              TQ, TR)                                                                                                  \
+    _Icf(2, UU, T0, A0, 0);                                                                                            \
+    _Icf(0, L, T0, 0, 0)                                                                                               \
+        CN(TCF(LN, T1, 1, 0) TCF(LN, T2, 2, 1) TCF(LN, T3, 3, 1) TCF(LN, T4, 4, 1) TCF(LN, T5, 5, 1) TCF(LN, T6, 6, 1) \
+               TCF(LN, T7, 7, 1) TCF(LN, T8, 8, 1) TCF(LN, T9, 9, 1) TCF(LN, TA, 10, 1) TCF(LN, TB, 11, 1)             \
+                   TCF(LN, TC, 12, 1) TCF(LN, TD, 13, 1) TCF(LN, TE, 14, 1) TCF(LN, TF, 15, 1) TCF(LN, TG, 16, 1)      \
+                       TCF(LN, TH, 17, 1) TCF(LN, TI, 18, 1) TCF(LN, TJ, 19, 1) TCF(LN, TK, 20, 1) TCF(LN, TL, 21, 1)  \
+                           TCF(LN, TM, 22, 1) TCF(LN, TN, 23, 1) TCF(LN, TO, 24, 1) TCF(LN, TP, 25, 1)                 \
+                               TCF(LN, TQ, 26, 1) TCF(LN, TR, 27, 1));                                                 \
+    _Icf(0, K, T0, 0, 0) CFARGT27S(RCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ,    \
+                                   TK, TL, TM, TN, TO, TP, TQ, TR) _(T0, _cfI)                                         \
   }
 
 #else
 #define FCALLSCFUN0(T0, CN, UN, LN) CFextern _(T0,_cfFZ)(UN,LN) ABSOFT_cf3(T0)) _Icf(0,FF,T0,0,0) \
-  {                                                                                            \
-    _Icf(2, UU, T0, A0, 0);                                                                    \
-    _Icf(0, L, T0, 0, 0) CN();                                                                 \
-    _Icf(0, K, T0, 0, 0) _(T0, _cfI)                                                           \
+  {                                                                                               \
+    _Icf(2, UU, T0, A0, 0);                                                                       \
+    _Icf(0, L, T0, 0, 0) CN();                                                                    \
+    _Icf(0, K, T0, 0, 0) _(T0, _cfI)                                                              \
   }
 
-#define FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,                     \
-                     TB, TC, TD, TE)                                                             \
+#define FCALLSCFUN14(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                           \
                                  CFextern _(T0,_cfF)(UN,LN)                    \
  CFARGT14(NNCF,DDCF,ABSOFT_cf3(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE)) _Icf(0,FF,T0,0,0) \
-       CFARGT14FS(NNNCF,DDDCF,_Z,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE);                     \
-  {                                                                                              \
-    CFARGT14S(QCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                       \
-    _Icf(2, UU, T0, A0, 0);                                                                      \
-    _Icf(0, L, T0, 0, 0) CN(                                                                     \
-        TCF(LN, T1, 1, 0) TCF(LN, T2, 2, 1) TCF(LN, T3, 3, 1)                                    \
-            TCF(LN, T4, 4, 1) TCF(LN, T5, 5, 1) TCF(LN, T6, 6, 1)                                \
-                TCF(LN, T7, 7, 1) TCF(LN, T8, 8, 1) TCF(LN, T9, 9, 1)                            \
-                    TCF(LN, TA, 10, 1) TCF(LN, TB, 11, 1) TCF(LN, TC, 12, 1)                     \
-                        TCF(LN, TD, 13, 1) TCF(LN, TE, 14, 1));                                  \
-    _Icf(0, K, T0, 0, 0) CFARGT14S(RCF, T1, T2, T3, T4, T5, T6, T7, T8, T9,                      \
-                                   TA, TB, TC, TD, TE) _(T0, _cfI)                               \
+       CFARGT14FS(NNNCF,DDDCF,_Z,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE);                                           \
+  {                                                                                                                    \
+    CFARGT14S(QCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE)                                             \
+    _Icf(2, UU, T0, A0, 0);                                                                                            \
+    _Icf(0, L, T0, 0, 0)                                                                                               \
+        CN(TCF(LN, T1, 1, 0) TCF(LN, T2, 2, 1) TCF(LN, T3, 3, 1) TCF(LN, T4, 4, 1) TCF(LN, T5, 5, 1) TCF(LN, T6, 6, 1) \
+               TCF(LN, T7, 7, 1) TCF(LN, T8, 8, 1) TCF(LN, T9, 9, 1) TCF(LN, TA, 10, 1) TCF(LN, TB, 11, 1)             \
+                   TCF(LN, TC, 12, 1) TCF(LN, TD, 13, 1) TCF(LN, TE, 14, 1));                                          \
+    _Icf(0, K, T0, 0, 0) CFARGT14S(RCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE) _(T0, _cfI)            \
   }
 
-#define FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA,                                                            \
-                     TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO,                                                            \
-                     TP, TQ, TR)                                                                                                        \
+#define FCALLSCFUN27(T0, CN, UN, LN, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,                    \
+                     TL, TM, TN, TO, TP, TQ, TR)                                                                                        \
                                  CFextern _(T0,_cfF)(UN,LN)                    \
  CFARGT27(NNCF,DDCF,ABSOFT_cf3(T0),T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE,TF,TG,TH,TI,TJ,TK,TL,TM,TN,TO,TP,TQ,TR)) _Icf(0,FF,T0,0,0) \
        CFARGT27FS(NNNCF,DDDCF,_Z,T1,T2,T3,T4,T5,T6,T7,T8,T9,TA,TB,TC,TD,TE,TF,TG,TH,TI,TJ,TK,TL,TM,TN,TO,TP,TQ,TR);                     \
   {                                                                                                                                     \
-    CFARGT27S(QCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF,                                                          \
-              TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP, TQ, TR)                                                                           \
+    CFARGT27S(QCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK, TL, TM, TN, TO, TP,                  \
+              TQ, TR)                                                                                                                   \
     _Icf(2, UU, T0, A0, 0);                                                                                                             \
-    _Icf(0, L, T0, 0, 0) CN(                                                                                                            \
-        TCF(LN, T1, 1, 0) TCF(LN, T2, 2, 1) TCF(LN, T3, 3, 1)                                                                           \
-            TCF(LN, T4, 4, 1) TCF(LN, T5, 5, 1) TCF(LN, T6, 6, 1)                                                                       \
-                TCF(LN, T7, 7, 1) TCF(LN, T8, 8, 1) TCF(LN, T9, 9, 1) TCF(                                                              \
-                    LN, TA, 10, 1) TCF(LN, TB, 11, 1) TCF(LN, TC, 12, 1)                                                                \
-                    TCF(LN, TD, 13, 1) TCF(LN, TE, 14, 1) TCF(LN, TF, 15, 1)                                                            \
-                        TCF(LN, TG, 16, 1) TCF(LN, TH, 17, 1)                                                                           \
-                            TCF(LN, TI, 18, 1) TCF(LN, TJ, 19, 1)                                                                       \
-                                TCF(LN, TK, 20, 1) TCF(LN, TL, 21, 1)                                                                   \
-                                    TCF(LN, TM, 22, 1) TCF(LN, TN, 23, 1)                                                               \
-                                        TCF(LN, TO, 24, 1) TCF(LN, TP, 25, 1)                                                           \
-                                            TCF(LN, TQ, 26, 1)                                                                          \
-                                                TCF(LN, TR, 27, 1));                                                                    \
-    _Icf(0, K, T0, 0, 0) CFARGT27S(RCF, T1, T2, T3, T4, T5, T6, T7, T8, T9,                                                             \
-                                   TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ, TK,                                                          \
-                                   TL, TM, TN, TO, TP, TQ, TR) _(T0, _cfI)                                                              \
+    _Icf(0, L, T0, 0, 0)                                                                                                                \
+        CN(TCF(LN, T1, 1, 0) TCF(LN, T2, 2, 1) TCF(LN, T3, 3, 1) TCF(LN, T4, 4, 1) TCF(LN, T5, 5, 1) TCF(LN, T6, 6, 1)                  \
+               TCF(LN, T7, 7, 1) TCF(LN, T8, 8, 1) TCF(LN, T9, 9, 1) TCF(LN, TA, 10, 1) TCF(LN, TB, 11, 1)                              \
+                   TCF(LN, TC, 12, 1) TCF(LN, TD, 13, 1) TCF(LN, TE, 14, 1) TCF(LN, TF, 15, 1) TCF(LN, TG, 16, 1)                       \
+                       TCF(LN, TH, 17, 1) TCF(LN, TI, 18, 1) TCF(LN, TJ, 19, 1) TCF(LN, TK, 20, 1) TCF(LN, TL, 21, 1)                   \
+                           TCF(LN, TM, 22, 1) TCF(LN, TN, 23, 1) TCF(LN, TO, 24, 1) TCF(LN, TP, 25, 1)                                  \
+                               TCF(LN, TQ, 26, 1) TCF(LN, TR, 27, 1));                                                                  \
+    _Icf(0, K, T0, 0, 0) CFARGT27S(RCF, T1, T2, T3, T4, T5, T6, T7, T8, T9, TA, TB, TC, TD, TE, TF, TG, TH, TI, TJ,                     \
+                                   TK, TL, TM, TN, TO, TP, TQ, TR) _(T0, _cfI)                                                          \
   }
 
 #endif

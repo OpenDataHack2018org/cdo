@@ -139,18 +139,15 @@ printBounds(int taxisID, int calendar)
 
   /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600),
    * incperiod%3600);*/
-  int len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit],
-                    abs(incperiod) != 1 ? "s" : "");
+  int len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], abs(incperiod) != 1 ? "s" : "");
   for (int i = 0; i < 11 - len; ++i)
     fprintf(stdout, " ");
 }
 
 static int
-fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
-         int vdatem[MAX_GAPS][MAX_NTSM], int vtimem[MAX_GAPS][MAX_NTSM],
-         int tsID, int incperiod0, int incunit0, int vdate, int vdate0,
-         int vtime0, int calendar, int day0, juldate_t juldate,
-         juldate_t juldate0)
+fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2], int vdatem[MAX_GAPS][MAX_NTSM],
+         int vtimem[MAX_GAPS][MAX_NTSM], int tsID, int incperiod0, int incunit0, int vdate, int vdate0, int vtime0,
+         int calendar, int day0, juldate_t juldate, juldate_t juldate0)
 {
   int its = 0;
   int year, month, day;
@@ -266,8 +263,7 @@ Tinfo(void *process)
       if (ntsteps == CDI_UNDEFID)
         fprintf(stdout, "   Time axis :  unlimited steps\n");
       else
-        fprintf(stdout, "   Time axis :  %d step%s\n", ntsteps,
-                ntsteps == 1 ? "" : "s");
+        fprintf(stdout, "   Time axis :  %d step%s\n", ntsteps, ntsteps == 1 ? "" : "s");
 
       if (taxisID != CDI_UNDEFID)
         {
@@ -282,12 +278,10 @@ Tinfo(void *process)
               fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 
               int unit = taxisInqTunit(taxisID);
-              if (unit != CDI_UNDEFID)
-                fprintf(stdout, "  Units = %s", tunit2str(unit));
+              if (unit != CDI_UNDEFID) fprintf(stdout, "  Units = %s", tunit2str(unit));
 
               int calendar = taxisInqCalendar(taxisID);
-              if (calendar != CDI_UNDEFID)
-                fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
+              if (calendar != CDI_UNDEFID) fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
 
               if (taxisHasBounds(taxisID)) fprintf(stdout, "  Bounds = true");
 
@@ -301,12 +295,10 @@ Tinfo(void *process)
                   date2str(fdate, vdatestr, sizeof(vdatestr));
                   time2str(ftime, vtimestr, sizeof(vtimestr));
 
-                  fprintf(stdout, "     Forecast RefTime = %s %s", vdatestr,
-                          vtimestr);
+                  fprintf(stdout, "     Forecast RefTime = %s %s", vdatestr, vtimestr);
 
                   unit = taxisInqForecastTunit(taxisID);
-                  if (unit != CDI_UNDEFID)
-                    fprintf(stdout, "  Units = %s", tunit2str(unit));
+                  if (unit != CDI_UNDEFID) fprintf(stdout, "  Units = %s", tunit2str(unit));
 
                   fprintf(stdout, "\n");
 
@@ -320,15 +312,12 @@ Tinfo(void *process)
       fprintf(stdout, "\n");
       fprintf(stdout, "         Verification Time              ");
       if (lforecast) fprintf(stdout, " Forecast Reference Time     ");
-      if (taxisHasBounds(taxisID))
-        fprintf(stdout, " lower bound          upper bound");
+      if (taxisHasBounds(taxisID)) fprintf(stdout, " lower bound          upper bound");
       fprintf(stdout, "\n");
 
       fprintf(stdout, "Timestep YYYY-MM-DD hh:mm:ss   Increment");
       if (lforecast) fprintf(stdout, " YYYY-MM-DD hh:mm:ss   Period");
-      if (taxisHasBounds(taxisID))
-        fprintf(stdout,
-                " YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  Difference");
+      if (taxisHasBounds(taxisID)) fprintf(stdout, " YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  Difference");
       fprintf(stdout, "\n");
 
       tsID = 0;
@@ -356,8 +345,7 @@ Tinfo(void *process)
 
               /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600,
                * fmod(jdelta,3600), incperiod%3600);*/
-              len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit],
-                            abs(incperiod) != 1 ? "s" : "");
+              len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], abs(incperiod) != 1 ? "s" : "");
               for (i = 0; i < 11 - len; ++i)
                 fprintf(stdout, " ");
             }
@@ -392,19 +380,15 @@ Tinfo(void *process)
                   incperiod0 = incperiod;
                   incunit0 = incunit;
 
-                  its = fill_gap(
-                      ngaps, ntsm, rangetsm, vdatem, vtimem, 1, incperiod0,
-                      incunit0, vdate_first, vdate, vtime, calendar, day,
-                      juldate0,
-                      juldate_encode(calendar, vdate_first, vtime_first));
+                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, 1, incperiod0, incunit0, vdate_first, vdate,
+                                 vtime, calendar, day, juldate0, juldate_encode(calendar, vdate_first, vtime_first));
 
                   arrow = '^';
                 }
               else
                 {
-                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, tsID,
-                                 incperiod0, incunit0, vdate, vdate0, vtime0,
-                                 calendar, day0, juldate, juldate0);
+                  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem, tsID, incperiod0, incunit0, vdate, vdate0,
+                                 vtime0, calendar, day0, juldate, juldate0);
 
                   arrow = '<';
 
@@ -420,9 +404,8 @@ Tinfo(void *process)
                 {
                   ngaps++;
                   if (cdoVerbose)
-                    fprintf(stdout, "  %c--- Gap %d, missing %s%d timestep%s",
-                            arrow, ngaps, its >= LIM_NTSM ? "more than " : "",
-                            its, its != 1 ? "s" : "");
+                    fprintf(stdout, "  %c--- Gap %d, missing %s%d timestep%s", arrow, ngaps,
+                            its >= LIM_NTSM ? "more than " : "", its, its != 1 ? "s" : "");
                 }
               else if (its < 0)
                 {
@@ -462,15 +445,13 @@ Tinfo(void *process)
   time2str(vtime, vtimestr, sizeof(vtimestr));
   fprintf(stdout, " End date            : %s %s\n", vdatestr, vtimestr);
 
-  fprintf(stdout, " Increment           : %3d %s%s\n", incperiod0,
-          tunits[incunit0], incperiod0 != 1 ? "s" : "");
+  fprintf(stdout, " Increment           : %3d %s%s\n", incperiod0, tunits[incunit0], incperiod0 != 1 ? "s" : "");
   fprintf(stdout, " Number of timesteps : %d\n", tsID);
   fprintf(stdout, " Gaps identified     : %d\n", ngaps);
 
   if (cdoVerbose && ngaps)
     {
-      fprintf(stdout, "\nFound potentially %d gap%s in the time series", ngaps,
-              ngaps != 1 ? "s" : "");
+      fprintf(stdout, "\nFound potentially %d gap%s in the time series", ngaps, ngaps != 1 ? "s" : "");
       if (ngaps >= MAX_GAPS)
         {
           ngaps = MAX_GAPS;
@@ -479,10 +460,8 @@ Tinfo(void *process)
       fprintf(stdout, ":\n");
       for (igap = 0; igap < ngaps; ++igap)
         {
-          fprintf(stdout,
-                  "  Gap %d between timestep %d and %d, missing %d timestep%s",
-                  igap + 1, rangetsm[igap][0], rangetsm[igap][1], ntsm[igap],
-                  ntsm[igap] != 1 ? "s" : "");
+          fprintf(stdout, "  Gap %d between timestep %d and %d, missing %d timestep%s", igap + 1, rangetsm[igap][0],
+                  rangetsm[igap][1], ntsm[igap], ntsm[igap] != 1 ? "s" : "");
           if (ntsm[igap] >= MAX_NTSM)
             {
               ntsm[igap] = MAX_NTSM;

@@ -57,41 +57,30 @@ gen_param(const char *fmt, ...)
 }
 
 static void
-verify_lcc_parameter(double lon_0, double lat_0, double lat_1, double lat_2,
-                     double a, double rf, double x_0, double y_0)
+verify_lcc_parameter(double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0,
+                     double y_0)
 {
   const char *projection = "lambert_conformal_conic";
 
   if (IS_NOT_EQUAL(a, grid_missval) && a > 1.e10)
-    cdoWarning("%s mapping parameter %s out of bounds!", projection,
-               "earth_radius");
+    cdoWarning("%s mapping parameter %s out of bounds!", projection, "earth_radius");
   if (IS_NOT_EQUAL(rf, grid_missval) && rf > 0)
-    cdoWarning("%s mapping parameter %s out of bounds!", projection,
-               "inverse_flattening");
+    cdoWarning("%s mapping parameter %s out of bounds!", projection, "inverse_flattening");
   if (lon_0 < -360 || lon_0 > 360)
-    cdoWarning("%s mapping parameter %s out of bounds!", projection,
-               "longitude_of_central_meridian");
+    cdoWarning("%s mapping parameter %s out of bounds!", projection, "longitude_of_central_meridian");
   if (lat_0 < -90 || lat_0 > 90)
-    cdoWarning("%s mapping parameter %s out of bounds!", projection,
-               "latitude_of_central_meridian");
-  if (lat_1 < -90 || lat_1 > 90)
-    cdoWarning("%s mapping parameter %s out of bounds!", projection,
-               "standard_parallel");
-  if (lat_2 < -90 || lat_2 > 90)
-    cdoWarning("%s mapping parameter %s out of bounds!", projection,
-               "standard_parallel");
+    cdoWarning("%s mapping parameter %s out of bounds!", projection, "latitude_of_central_meridian");
+  if (lat_1 < -90 || lat_1 > 90) cdoWarning("%s mapping parameter %s out of bounds!", projection, "standard_parallel");
+  if (lat_2 < -90 || lat_2 > 90) cdoWarning("%s mapping parameter %s out of bounds!", projection, "standard_parallel");
   if (IS_NOT_EQUAL(x_0, grid_missval) && (x_0 < -1.e20 || x_0 > 1.e20))
-    cdoWarning("%s mapping parameter %s out of bounds!", projection,
-               "false_easting");
+    cdoWarning("%s mapping parameter %s out of bounds!", projection, "false_easting");
   if (IS_NOT_EQUAL(y_0, grid_missval) && (y_0 < -1.e20 || y_0 > 1.e20))
-    cdoWarning("%s mapping parameter %s out of bounds!", projection,
-               "false_northing");
+    cdoWarning("%s mapping parameter %s out of bounds!", projection, "false_northing");
 }
 
 int
-proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1,
-                   double lat_2, double a, double rf, size_t nvals,
-                   double *xvals, double *yvals)
+proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf,
+                   size_t nvals, double *xvals, double *yvals)
 {
   int status = 0;
 #ifdef HAVE_LIBPROJ
@@ -100,8 +89,7 @@ proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1,
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=lcc");
   if (IS_NOT_EQUAL(a, missval) && a > 0) params[nbpar++] = gen_param("a=%g", a);
-  if (IS_NOT_EQUAL(rf, missval) && rf > 0)
-    params[nbpar++] = gen_param("rf=%g", rf);
+  if (IS_NOT_EQUAL(rf, missval) && rf > 0) params[nbpar++] = gen_param("rf=%g", rf);
   params[nbpar++] = gen_param("lon_0=%g", lon_0);
   params[nbpar++] = gen_param("lat_0=%g", lat_0);
   params[nbpar++] = gen_param("lat_1=%g", lat_1);
@@ -150,12 +138,10 @@ proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1,
 }
 
 static void
-lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1,
-              double lat_2, double a, double rf, size_t nvals, double *xvals,
-              double *yvals)
+lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, size_t nvals,
+              double *xvals, double *yvals)
 {
-  int status = proj_lonlat_to_lcc(missval, lon_0, lat_0, lat_1, lat_2, a, rf,
-                                  nvals, xvals, yvals);
+  int status = proj_lonlat_to_lcc(missval, lon_0, lat_0, lat_1, lat_2, a, rf, nvals, xvals, yvals);
 #ifdef HAVE_LIBPROJ
   if (status == -1) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 #else
@@ -167,19 +153,16 @@ int
 cdo_lonlat_to_lcc(int gridID, size_t nvals, double *xvals, double *yvals)
 {
   double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
-  gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf,
-                  &xval_0, &yval_0, &x_0, &y_0);
+  gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
 
-  lonlat_to_lcc(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, nvals, xvals,
-                yvals);
+  lonlat_to_lcc(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, nvals, xvals, yvals);
 
   return 0;
 }
 
 int
-proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1,
-                   double lat_2, double a, double rf, double x_0, double y_0,
-                   size_t nvals, double *xvals, double *yvals)
+proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf,
+                   double x_0, double y_0, size_t nvals, double *xvals, double *yvals)
 {
   int status = 0;
 #ifdef HAVE_LIBPROJ
@@ -187,18 +170,14 @@ proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1,
 
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=lcc");
-  if (IS_NOT_EQUAL(a, grid_missval) && a > 0)
-    params[nbpar++] = gen_param("a=%g", a);
-  if (IS_NOT_EQUAL(rf, grid_missval) && rf > 0)
-    params[nbpar++] = gen_param("rf=%g", rf);
+  if (IS_NOT_EQUAL(a, grid_missval) && a > 0) params[nbpar++] = gen_param("a=%g", a);
+  if (IS_NOT_EQUAL(rf, grid_missval) && rf > 0) params[nbpar++] = gen_param("rf=%g", rf);
   params[nbpar++] = gen_param("lon_0=%g", lon_0);
   params[nbpar++] = gen_param("lat_0=%g", lat_0);
   params[nbpar++] = gen_param("lat_1=%g", lat_1);
   params[nbpar++] = gen_param("lat_2=%g", lat_2);
-  if (IS_NOT_EQUAL(x_0, grid_missval))
-    params[nbpar++] = gen_param("x_0=%g", x_0);
-  if (IS_NOT_EQUAL(y_0, grid_missval))
-    params[nbpar++] = gen_param("y_0=%g", y_0);
+  if (IS_NOT_EQUAL(x_0, grid_missval)) params[nbpar++] = gen_param("x_0=%g", x_0);
+  if (IS_NOT_EQUAL(y_0, grid_missval)) params[nbpar++] = gen_param("y_0=%g", y_0);
 
   if (cdoVerbose)
     for (int i = 0; i < nbpar; ++i)
@@ -241,12 +220,10 @@ proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1,
 }
 
 static void
-lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1,
-              double lat_2, double a, double rf, double x_0, double y_0,
-              size_t nvals, double *xvals, double *yvals)
+lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0,
+              double y_0, size_t nvals, double *xvals, double *yvals)
 {
-  int status = proj_lcc_to_lonlat(missval, lon_0, lat_0, lat_1, lat_2, a, rf,
-                                  x_0, y_0, nvals, xvals, yvals);
+  int status = proj_lcc_to_lonlat(missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0, nvals, xvals, yvals);
 #ifdef HAVE_LIBPROJ
   if (status == -1) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 #else
@@ -260,43 +237,36 @@ cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
   const char *projection = "lambert_conformal_conic";
 
   double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
-  gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf,
-                  &xval_0, &yval_0, &x_0, &y_0);
+  gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
 
   int status = 0;
   if (!status && IS_EQUAL(lon_0, grid_missval))
     {
       status = 1;
-      cdoWarning("%s mapping parameter %s missing!", projection,
-                 "longitude_of_central_meridian");
+      cdoWarning("%s mapping parameter %s missing!", projection, "longitude_of_central_meridian");
     }
   if (!status && IS_EQUAL(lat_0, grid_missval))
     {
       status = 1;
-      cdoWarning("%s mapping parameter %s missing!", projection,
-                 "latitude_of_central_meridian");
+      cdoWarning("%s mapping parameter %s missing!", projection, "latitude_of_central_meridian");
     }
   if (!status && IS_EQUAL(lat_1, grid_missval))
     {
       status = 1;
-      cdoWarning("%s mapping parameter %s missing!", projection,
-                 "standard_parallel");
+      cdoWarning("%s mapping parameter %s missing!", projection, "standard_parallel");
     }
-  if (!status && IS_EQUAL(x_0, grid_missval) && IS_EQUAL(y_0, grid_missval)
-      && IS_NOT_EQUAL(xval_0, grid_missval)
+  if (!status && IS_EQUAL(x_0, grid_missval) && IS_EQUAL(y_0, grid_missval) && IS_NOT_EQUAL(xval_0, grid_missval)
       && IS_NOT_EQUAL(yval_0, grid_missval))
     {
 #ifdef HAVE_LIBPROJ
       x_0 = xval_0;
       y_0 = yval_0;
-      lonlat_to_lcc(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, 1, &x_0,
-                    &y_0);
+      lonlat_to_lcc(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, 1, &x_0, &y_0);
       x_0 = -x_0;
       y_0 = -y_0;
 #else
       status = 1;
-      cdoWarning("%s mapping parameter %s missing!", projection,
-                 "false_easting and false_northing");
+      cdoWarning("%s mapping parameter %s missing!", projection, "false_easting and false_northing");
 #endif
     }
 
@@ -304,8 +274,7 @@ cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
 
   verify_lcc_parameter(lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0);
 
-  lcc_to_lonlat(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0,
-                nvals, xvals, yvals);
+  lcc_to_lonlat(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0, nvals, xvals, yvals);
 
   return 0;
 }
@@ -314,34 +283,26 @@ void
 grid_def_param_sinu(int gridID)
 {
   const char *projection = "sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int) strlen(projection) + 1,
-                   projection);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int) strlen(projection) + 1, projection);
   const char *mapvarname = "Sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int) strlen(mapvarname) + 1,
-                   mapvarname);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int) strlen(mapvarname) + 1, mapvarname);
 
-  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name",
-               (int) strlen(projection), projection);
+  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int) strlen(projection), projection);
 }
 
 void
 grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
 {
   const char *projection = "lambert_azimuthal_equal_area";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int) strlen(projection) + 1,
-                   projection);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int) strlen(projection) + 1, projection);
   const char *mapvarname = "Lambert_AEA";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int) strlen(mapvarname) + 1,
-                   mapvarname);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int) strlen(mapvarname) + 1, mapvarname);
 
-  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name",
-               (int) strlen(projection), projection);
+  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int) strlen(projection), projection);
 
   cdiDefAttFlt(gridID, CDI_GLOBAL, "earth_radius", CDI_DATATYPE_FLT64, 1, &a);
-  cdiDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin",
-               CDI_DATATYPE_FLT64, 1, &lon_0);
-  cdiDefAttFlt(gridID, CDI_GLOBAL, "latitude_of_projection_origin",
-               CDI_DATATYPE_FLT64, 1, &lat_0);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin", CDI_DATATYPE_FLT64, 1, &lon_0);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "latitude_of_projection_origin", CDI_DATATYPE_FLT64, 1, &lat_0);
 }
 
 void
@@ -385,8 +346,7 @@ cdo_sinu_to_lonlat(size_t nvals, double *xvals, double *yvals)
 }
 
 static bool
-cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname,
-                          int attlen, double *attflt)
+cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int attlen, double *attflt)
 {
   bool status = true;
 
@@ -410,8 +370,7 @@ cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname,
 }
 
 static void
-grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0,
-                    double *x_0, double *y_0)
+grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, double *x_0, double *y_0)
 {
   *a = 0;
   *lon_0 = 0;
@@ -438,16 +397,13 @@ grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0,
               if (attlen != 1) continue;
 
               double attflt;
-              if (cdiInqAttConvertedToFloat(gridID, atttype, attname, attlen,
-                                            &attflt))
+              if (cdiInqAttConvertedToFloat(gridID, atttype, attname, attlen, &attflt))
                 {
                   if (strcmp(attname, "earth_radius") == 0)
                     *a = attflt;
-                  else if (strcmp(attname, "longitude_of_projection_origin")
-                           == 0)
+                  else if (strcmp(attname, "longitude_of_projection_origin") == 0)
                     *lon_0 = attflt;
-                  else if (strcmp(attname, "latitude_of_projection_origin")
-                           == 0)
+                  else if (strcmp(attname, "latitude_of_projection_origin") == 0)
                     *lat_0 = attflt;
                   else if (strcmp(attname, "false_easting") == 0)
                     *x_0 = attflt;

@@ -31,8 +31,7 @@
 #include "grid.h"
 
 static void
-sampleData(double *array1, int gridID1, double *array2, int gridID2,
-           int resampleFactor)
+sampleData(double *array1, int gridID1, double *array2, int gridID2, int resampleFactor)
 {
   size_t nlon1 = gridInqXsize(gridID1);
   size_t nlat1 = gridInqYsize(gridID1);
@@ -43,8 +42,7 @@ sampleData(double *array1, int gridID1, double *array2, int gridID2,
   if (CdoDebug::cdoDebugExt >= 100)
     cdoPrint("%s(): (nlon1: %zu; nlat1: %zu) => (nlon2: %zu; nlat2: %zu); "
              "gridID1: %d; gridID2: %d; resampleFactor: %d)",
-             __func__, nlon1, nlat1, nlon2, nlat2, gridID1, gridID2,
-             resampleFactor);
+             __func__, nlon1, nlat1, nlon2, nlat2, gridID1, gridID2, resampleFactor);
 
   for (size_t ilat1 = 0; ilat1 < nlat1; ilat1 += resampleFactor)
     for (size_t ilon1 = 0; ilon1 < nlon1; ilon1 += resampleFactor)
@@ -52,22 +50,18 @@ sampleData(double *array1, int gridID1, double *array2, int gridID2,
 }
 
 static void
-cropData(double *array1, int gridID1, double *array2, int gridID2, int subI0,
-         int subI1, int subJ0, int subJ1)
+cropData(double *array1, int gridID1, double *array2, int gridID2, int subI0, int subI1, int subJ0, int subJ1)
 {
   long nlon1 = gridInqXsize(gridID1);
   long nlon2 = gridInqXsize(gridID2);
   long rowLen = subI1 - subI0 + 1;  // must be same as nlon1
 
-  if (rowLen != nlon2)
-    cdoAbort("cropData() rowLen!= nlon2 [%d != %d]", rowLen, nlon2);
+  if (rowLen != nlon2) cdoAbort("cropData() rowLen!= nlon2 [%d != %d]", rowLen, nlon2);
 
-  if (CdoDebug::cdoDebugExt >= 10)
-    cdoPrint("cropData(%d,%d,%d,%d) ...", subI0, subI1, subJ0, subJ1);
+  if (CdoDebug::cdoDebugExt >= 10) cdoPrint("cropData(%d,%d,%d,%d) ...", subI0, subI1, subJ0, subJ1);
 
   long array2Idx = 0;
-  for (long ilat1 = subJ0; ilat1 <= subJ1;
-       ilat1++)  // copy the last row as well..
+  for (long ilat1 = subJ0; ilat1 <= subJ1; ilat1++)  // copy the last row as well..
     {
       arrayCopy(rowLen, &array1[ilat1 * nlon1 + subI0], &array2[array2Idx]);
       array2Idx += rowLen;
@@ -92,11 +86,8 @@ Samplegrid(void *process)
 
   cdoInitialize(process);
 
-  int SAMPLEGRID = cdoOperatorAdd(
-      "samplegrid", 0, 0,
-      "resample factor, typically 2 (which will half the resolution)");
-  int SUBGRID
-      = cdoOperatorAdd("subgrid", 0, 0, " sub-grid indices: i0,i1,j0,j1");
+  int SAMPLEGRID = cdoOperatorAdd("samplegrid", 0, 0, "resample factor, typically 2 (which will half the resolution)");
+  int SUBGRID = cdoOperatorAdd("subgrid", 0, 0, " sub-grid indices: i0,i1,j0,j1");
 
   int operatorID = cdoOperatorID();
 
@@ -110,8 +101,7 @@ Samplegrid(void *process)
                  "resample-factor (2,3,4, .. etc)");
       resampleFactor = parameter2int(operatorArgv()[0]);
 
-      if (CdoDebug::cdoDebugExt)
-        cdoPrint("resampleFactor = %d", resampleFactor);
+      if (CdoDebug::cdoDebugExt) cdoPrint("resampleFactor = %d", resampleFactor);
     }
   else if (operatorID == SUBGRID)
     {
@@ -156,9 +146,8 @@ Samplegrid(void *process)
       if (gridInqSize(gridSrcID) <= 1) continue;
 
       int gridtype = gridInqType(gridSrcID);
-      if (!(gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT
-            || gridtype == GRID_PROJECTION || gridtype == GRID_CURVILINEAR
-            || gridtype == GRID_GENERIC))
+      if (!(gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION
+            || gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC))
         cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridtype));
 
       if (operatorID == SAMPLEGRID)
@@ -167,8 +156,7 @@ Samplegrid(void *process)
         }
       else if (operatorID == SUBGRID)
         {
-          gridIDsampled
-              = cdo_define_subgrid_grid(gridSrcID, subI0, subI1, subJ0, subJ1);
+          gridIDsampled = cdo_define_subgrid_grid(gridSrcID, subI0, subI1, subJ0, subJ1);
         }
 
       sbox[index].gridSrcID = gridSrcID;
@@ -185,8 +173,7 @@ Samplegrid(void *process)
 
   if (CdoDebug::cdoDebugExt)
     {
-      if (operatorID == SAMPLEGRID)
-        cdoPrint("Resampled grid has been created.");
+      if (operatorID == SAMPLEGRID) cdoPrint("Resampled grid has been created.");
       if (operatorID == SUBGRID) cdoPrint("Sub-grid has been created.");
     }
 
@@ -201,8 +188,7 @@ Samplegrid(void *process)
   if (vlistNumber(vlistID2) != CDI_REAL) gridsize2 *= 2;
   double *array2 = (double *) Malloc(gridsize2 * sizeof(double));
 
-  if (CdoDebug::cdoDebugExt)
-    cdoPrint("gridsize = %ld, gridsize2 = %ld", gridsize, gridsize2);
+  if (CdoDebug::cdoDebugExt) cdoPrint("gridsize = %ld, gridsize2 = %ld", gridsize, gridsize2);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -217,8 +203,7 @@ Samplegrid(void *process)
 
           pstreamDefRecord(streamID2, varID, levelID);
 
-          if (CdoDebug::cdoDebugExt >= 20)
-            cdoPrint("Processing record (%d) of %d.", recID, nrecs);
+          if (CdoDebug::cdoDebugExt >= 20) cdoPrint("Processing record (%d) of %d.", recID, nrecs);
 
           if (vars[varID])
             {
@@ -227,21 +212,18 @@ Samplegrid(void *process)
               for (index = 0; index < ngrids; index++)
                 if (gridSrcID == sbox[index].gridSrcID) break;
 
-              if (index == ngrids)
-                cdoAbort("Internal problem, grid not found!");
+              if (index == ngrids) cdoAbort("Internal problem, grid not found!");
 
               int gridIDsampled = sbox[index].gridIDsampled;
               gridsize2 = gridInqSize(gridIDsampled);
 
               if (operatorID == SAMPLEGRID)
                 {
-                  sampleData(array1, gridSrcID, array2, gridIDsampled,
-                             resampleFactor);
+                  sampleData(array1, gridSrcID, array2, gridIDsampled, resampleFactor);
                 }
               else if (operatorID == SUBGRID)
                 {
-                  cropData(array1, gridSrcID, array2, gridIDsampled, subI0,
-                           subI1, subJ0, subJ1);
+                  cropData(array1, gridSrcID, array2, gridIDsampled, subI0, subI1, subJ0, subJ1);
                 }
 
               if (nmiss)

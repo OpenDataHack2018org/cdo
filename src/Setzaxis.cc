@@ -123,8 +123,7 @@ Setzaxis(void *process)
               found++;
             }
         }
-      if (!found)
-        cdoWarning("No zaxis with %d levels found!", zaxisInqSize(zaxisID2));
+      if (!found) cdoWarning("No zaxis with %d levels found!", zaxisInqSize(zaxisID2));
     }
   else if (operatorID == GENLEVELBOUNDS)
     {
@@ -141,8 +140,7 @@ Setzaxis(void *process)
             {
               cdoZaxisInqLevels(zaxisID1, levels);
               zaxisID2 = zaxisDuplicate(zaxisID1);
-              if (!zaxisInqLevels(zaxisID1, NULL))
-                zaxisDefLevels(zaxisID2, levels);
+              if (!zaxisInqLevels(zaxisID1, NULL)) zaxisDefLevels(zaxisID2, levels);
 
               genLayerBounds(nlev, levels, lbounds, ubounds);
 

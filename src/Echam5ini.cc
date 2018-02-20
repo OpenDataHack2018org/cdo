@@ -72,8 +72,7 @@ iniatts(ATTS *atts)
 }
 
 static void
-inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name,
-       const char *longname, const char *units)
+inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name, const char *longname, const char *units)
 {
   var->gridtype = gridtype;
   var->zaxistype = zaxistype;
@@ -91,17 +90,12 @@ inivars_ml(VAR **vars)
 {
   *vars = (VAR *) Malloc((nvars_ml + 1) * sizeof(VAR));
 
-  inivar(&(*vars)[0], GRID_GAUSSIAN, ZAXIS_HYBRID, 133, "Q",
-         "specific humidity", "kg/kg");
-  inivar(&(*vars)[1], GRID_SPECTRAL, ZAXIS_HYBRID, 138, "SVO", "vorticity",
-         "1/s");
-  inivar(&(*vars)[2], GRID_SPECTRAL, ZAXIS_HYBRID, 155, "SD", "divergence",
-         "1/s");
-  inivar(&(*vars)[3], GRID_SPECTRAL, ZAXIS_HYBRID, 130, "STP", "temperature",
-         "K");
+  inivar(&(*vars)[0], GRID_GAUSSIAN, ZAXIS_HYBRID, 133, "Q", "specific humidity", "kg/kg");
+  inivar(&(*vars)[1], GRID_SPECTRAL, ZAXIS_HYBRID, 138, "SVO", "vorticity", "1/s");
+  inivar(&(*vars)[2], GRID_SPECTRAL, ZAXIS_HYBRID, 155, "SD", "divergence", "1/s");
+  inivar(&(*vars)[3], GRID_SPECTRAL, ZAXIS_HYBRID, 130, "STP", "temperature", "K");
   /* Don't change the order (lsp must be the last one)! */
-  inivar(&(*vars)[4], GRID_SPECTRAL, ZAXIS_SURFACE, 152, "LSP",
-         "log surface pressure", "");
+  inivar(&(*vars)[4], GRID_SPECTRAL, ZAXIS_SURFACE, 152, "LSP", "log surface pressure", "");
 }
 
 #ifdef HAVE_LIBNETCDF
@@ -257,8 +251,7 @@ import_e5ml(const char *filename, VAR **vars)
             }
 
           nce(nc_inq_varid(nc_file_id, (*vars)[iv].name, &nc_var_id));
-          nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count,
-                                 (*vars)[iv].ptr + i * nvals));
+          nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count, (*vars)[iv].ptr + i * nvals));
         }
     }
 
@@ -279,8 +272,7 @@ import_e5ml(const char *filename, VAR **vars)
   (*vars)[nvars_ml].ptr = (double *) Malloc(nsp * 2 * sizeof(double));
 
   nce(nc_inq_varid(nc_file_id, "STP", &nc_var_id));
-  nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count,
-                         (*vars)[nvars_ml].ptr));
+  nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count, (*vars)[nvars_ml].ptr));
 
   /*close input file */
   nce(nc_close(nc_file_id));
@@ -295,8 +287,7 @@ import_e5ml(const char *filename, VAR **vars)
 }
 
 static void
-export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
-            int ntr)
+export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
 {
 #ifdef HAVE_LIBNETCDF
   int nc_var_id;
@@ -307,8 +298,7 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
   int ilev;
   int lon, lat;
   int nlon, nlat, nlev, nlevp1 /*, nvct*/, nsp, n2, i, nvclev;
-  int lat_dimid, lon_dimid, nlev_dimid, nlevp1_dimid, nsp_dimid, nvclev_dimid,
-      n2_dimid;
+  int lat_dimid, lon_dimid, nlev_dimid, nlevp1_dimid, nsp_dimid, nvclev_dimid, n2_dimid;
   int gridIDgp = -1, gridIDsp, zaxisIDml = -1;
   int gridtype, zaxistype;
   int nc_file_id;
@@ -331,8 +321,7 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
   if (date_and_time_in_sec != -1)
     {
       date_and_time = localtime(&date_and_time_in_sec);
-      (void) strftime(timestr, sizeof(timestr), "%d/%m/%Y %H:%M",
-                      date_and_time);
+      (void) strftime(timestr, sizeof(timestr), "%d/%m/%Y %H:%M", date_and_time);
     }
 
   username = getenv("LOGNAME");
@@ -385,8 +374,7 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
   nlon = lon;
   nlat = lat;
 
-  data_size = nlon + nlat + 2 * nvclev + 2 * nsp * 2 * nlev + nsp * 2 * nlevp1
-              + nlon * nlat * nlev;
+  data_size = nlon + nlat + 2 * nvclev + 2 * nsp * 2 * nlev + nsp * 2 * nlevp1 + nlon * nlat * nlev;
 
   if (data_size * 8 > 2147000000)
     {
@@ -455,15 +443,11 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
   nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "vtime", NC_INT, 1, &vtime));
 
   // attint = 31;
-  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_n", NC_INT, 1,
-                     &ntr));
-  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_m", NC_INT, 1,
-                     &ntr));
-  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_k", NC_INT, 1,
-                     &ntr));
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_n", NC_INT, 1, &ntr));
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_m", NC_INT, 1, &ntr));
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_k", NC_INT, 1, &ntr));
 
-  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "file_type",
-                      strlen(strfiletype_ml), strfiletype_ml));
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "file_type", strlen(strfiletype_ml), strfiletype_ml));
 
   nce(nc_def_dim(nc_file_id, "lat", lat, &lat_dimid));
 
@@ -563,8 +547,7 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
           if (code == 152)
             {
               lspid = varid;
-              if (gridtype != GRID_SPECTRAL)
-                cdoAbort("%s has wrong gridtype!", vars[varid].name);
+              if (gridtype != GRID_SPECTRAL) cdoAbort("%s has wrong gridtype!", vars[varid].name);
             }
           continue;
         }
@@ -586,8 +569,7 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
           dimidsp[0] = nsp_dimid;
           dimidsp[1] = n2_dimid;
 
-          if (strcmp(vars[varid].name, "STP") == 0
-              || strcmp(vars[varid].name, "T") == 0)
+          if (strcmp(vars[varid].name, "STP") == 0 || strcmp(vars[varid].name, "T") == 0)
             dimidsp[2] = nlevp1_dimid;
           else
             dimidsp[2] = nlev_dimid;
@@ -596,15 +578,11 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
         cdoAbort("Unsupported grid!");
 
       nce(nc_redef(nc_file_id));
-      nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp,
-                     &nc_var_id));
+      nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
       if (vars[varid].longname && *vars[varid].longname)
-        nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name",
-                            strlen(vars[varid].longname),
-                            vars[varid].longname));
+        nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", strlen(vars[varid].longname), vars[varid].longname));
       if (vars[varid].units && *vars[varid].units)
-        nce(nc_put_att_text(nc_file_id, nc_var_id, "units",
-                            strlen(vars[varid].units), vars[varid].units));
+        nce(nc_put_att_text(nc_file_id, nc_var_id, "units", strlen(vars[varid].units), vars[varid].units));
       nce(nc_enddef(nc_file_id));
 
       if (dimidsp[2] == nlevp1_dimid) nc_stpid = nc_var_id;
@@ -630,8 +608,7 @@ export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime,
               count[2] = 1;
             }
 
-          nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                 vars[varid].ptr + i * nvals));
+          nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
         }
     }
 
@@ -693,16 +670,14 @@ read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID)
       count[2] = nlon;
 
       nce(nc_inq_varid(nc_file_id, name, &nc_var_id));
-      nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count,
-                             var->ptr + i * gridsize));
+      nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count, var->ptr + i * gridsize));
     }
 }
 #endif
 
 #ifdef HAVE_LIBNETCDF
 static void
-read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID,
-          int nhgl, int nmp1)
+read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID, int nhgl, int nmp1)
 {
   int nlev, nfc, i;
   int gridtype, zaxistype;
@@ -717,8 +692,7 @@ read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID,
   nfc = gridInqSize(gridID);
   nlev = zaxisInqSize(zaxisID);
 
-  if (nfc != nhgl * nmp1 * 2)
-    cdoAbort("%s: inconsistent dimension length!", __func__);
+  if (nfc != nhgl * nmp1 * 2) cdoAbort("%s: inconsistent dimension length!", __func__);
 
   var->gridID = gridID;
   var->zaxisID = zaxisID;
@@ -739,8 +713,7 @@ read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID,
       count[3] = 1;
 
       nce(nc_inq_varid(nc_file_id, name, &nc_var_id));
-      nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count,
-                             var->ptr + i * nfc));
+      nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count, var->ptr + i * nfc));
     }
 }
 #endif
@@ -755,8 +728,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
   size_t nvals;
   size_t start[3], count[3];
   int nlon, nlat, nlev, nvct, nfc, i;
-  int gridIDgp, gridIDfc, gridIDhgl, zaxisIDml, zaxisIDmlh, zaxisIDsfc,
-      zaxisIDbsfc, zaxisIDn2;
+  int gridIDgp, gridIDfc, gridIDhgl, zaxisIDml, zaxisIDmlh, zaxisIDsfc, zaxisIDbsfc, zaxisIDn2;
   int nc_file_id;
   char filetype[256];
   double *xvals, *yvals, *vct, *levs;
@@ -1005,26 +977,22 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
   varid = 0;
   for (ncvarid = 0; ncvarid < nvars; ncvarid++)
     {
-      nce(nc_inq_var(nc_file_id, ncvarid, name, &xtype, &nvdims, dimidsp,
-                     &nvatts));
+      nce(nc_inq_var(nc_file_id, ncvarid, name, &xtype, &nvdims, dimidsp, &nvatts));
 
-      if (varid >= max_vars)
-        cdoAbort("Too many variables (max = %d)!", max_vars);
+      if (varid >= max_vars) cdoAbort("Too many variables (max = %d)!", max_vars);
 
       if (nvdims == 4)
         {
-          if (dimidsp[0] == nhgl_dimid && dimidsp[1] == nmp1_dimid
-              && dimidsp[2] == complex_dimid && dimidsp[3] == lev_dimid)
+          if (dimidsp[0] == nhgl_dimid && dimidsp[1] == nmp1_dimid && dimidsp[2] == complex_dimid
+              && dimidsp[3] == lev_dimid)
             {
-              read_fc4d(nc_file_id, name, &(*vars)[varid], gridIDfc, zaxisIDml,
-                        nhgl, nmp1);
+              read_fc4d(nc_file_id, name, &(*vars)[varid], gridIDfc, zaxisIDml, nhgl, nmp1);
               varid++;
             }
-          else if (dimidsp[0] == nhgl_dimid && dimidsp[1] == nmp1_dimid
-                   && dimidsp[2] == complex_dimid && dimidsp[3] == ilev_dimid)
+          else if (dimidsp[0] == nhgl_dimid && dimidsp[1] == nmp1_dimid && dimidsp[2] == complex_dimid
+                   && dimidsp[3] == ilev_dimid)
             {
-              read_fc4d(nc_file_id, name, &(*vars)[varid], gridIDfc, zaxisIDmlh,
-                        nhgl, nmp1);
+              read_fc4d(nc_file_id, name, &(*vars)[varid], gridIDfc, zaxisIDmlh, nhgl, nmp1);
               varid++;
             }
           else
@@ -1034,28 +1002,22 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
         }
       else if (nvdims == 3)
         {
-          if (dimidsp[0] == lat_dimid && dimidsp[1] == lev_dimid
-              && dimidsp[2] == lon_dimid)
+          if (dimidsp[0] == lat_dimid && dimidsp[1] == lev_dimid && dimidsp[2] == lon_dimid)
             {
               read_gg3d(nc_file_id, name, &(*vars)[varid], gridIDgp, zaxisIDml);
               varid++;
             }
-          else if (dimidsp[0] == lat_dimid && dimidsp[1] == ilev_dimid
-                   && dimidsp[2] == lon_dimid)
+          else if (dimidsp[0] == lat_dimid && dimidsp[1] == ilev_dimid && dimidsp[2] == lon_dimid)
             {
-              read_gg3d(nc_file_id, name, &(*vars)[varid], gridIDgp,
-                        zaxisIDmlh);
+              read_gg3d(nc_file_id, name, &(*vars)[varid], gridIDgp, zaxisIDmlh);
               varid++;
             }
-          else if (dimidsp[0] == lat_dimid && dimidsp[1] == belowsurface_dimid
-                   && dimidsp[2] == lon_dimid)
+          else if (dimidsp[0] == lat_dimid && dimidsp[1] == belowsurface_dimid && dimidsp[2] == lon_dimid)
             {
-              read_gg3d(nc_file_id, name, &(*vars)[varid], gridIDgp,
-                        zaxisIDbsfc);
+              read_gg3d(nc_file_id, name, &(*vars)[varid], gridIDgp, zaxisIDbsfc);
               varid++;
             }
-          else if (dimidsp[0] == lat_dimid && dimidsp[1] == n2_dimid
-                   && dimidsp[2] == lon_dimid)
+          else if (dimidsp[0] == lat_dimid && dimidsp[1] == n2_dimid && dimidsp[2] == lon_dimid)
             {
               read_gg3d(nc_file_id, name, &(*vars)[varid], gridIDgp, zaxisIDn2);
               varid++;
@@ -1071,8 +1033,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
             {
               nvals = nlon * nlat;
 
-              inivar(&(*vars)[varid], GRID_GAUSSIAN, ZAXIS_SURFACE, 0, name,
-                     NULL, NULL);
+              inivar(&(*vars)[varid], GRID_GAUSSIAN, ZAXIS_SURFACE, 0, name, NULL, NULL);
 
               (*vars)[varid].gridID = gridIDgp;
               (*vars)[varid].zaxisID = zaxisIDsfc;
@@ -1090,16 +1051,14 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
             {
               nvals = nhgl;
 
-              inivar(&(*vars)[varid], GRID_GENERIC, ZAXIS_HYBRID, 0, name, NULL,
-                     NULL);
+              inivar(&(*vars)[varid], GRID_GENERIC, ZAXIS_HYBRID, 0, name, NULL, NULL);
 
               (*vars)[varid].gridID = gridIDhgl;
               (*vars)[varid].zaxisID = zaxisIDml;
               (*vars)[varid].gridsize = nvals;
               (*vars)[varid].nlev = nlev;
 
-              (*vars)[varid].ptr
-                  = (double *) Malloc(nvals * nlev * sizeof(double));
+              (*vars)[varid].ptr = (double *) Malloc(nvals * nlev * sizeof(double));
 
               for (i = 0; i < nlev; i++)
                 {
@@ -1109,8 +1068,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
                   count[1] = 1;
 
                   nce(nc_inq_varid(nc_file_id, name, &nc_var_id));
-                  nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count,
-                                         (*vars)[varid].ptr + i * nvals));
+                  nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count, (*vars)[varid].ptr + i * nvals));
                 }
 
               varid++;
@@ -1182,8 +1140,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
   /* create file */
   nce(nc_create(filename, NC_CLOBBER, &nc_file_id));
 
-  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "file_type",
-                      strlen(strfiletype_res), strfiletype_res));
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "file_type", strlen(strfiletype_res), strfiletype_res));
 
   n2 = 2;
   complex = 2;
@@ -1251,8 +1208,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
 
   nce(nc_def_dim(nc_file_id, "nmp1", nmp1, &nmp1_dimid));
 
-  nce(nc_def_dim(nc_file_id, "belowsurface", belowsurface,
-                 &belowsurface_dimid));
+  nce(nc_def_dim(nc_file_id, "belowsurface", belowsurface, &belowsurface_dimid));
 
   nce(nc_def_dim(nc_file_id, "lev", lev, &lev_dimid));
 
@@ -1284,8 +1240,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[3] = lev_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 4, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 4, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
 
           for (i = 0; i < nlev; i++)
@@ -1299,8 +1254,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
               count[2] = 2;
               count[3] = 1;
 
-              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                     vars[varid].ptr + i * nvals));
+              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
             }
         }
       else if (gridtype == GRID_FOURIER && zaxistype == ZAXIS_HYBRID_HALF)
@@ -1313,8 +1267,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[3] = ilev_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 4, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 4, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
 
           for (i = 0; i < ilev; i++)
@@ -1328,8 +1281,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
               count[2] = 2;
               count[3] = 1;
 
-              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                     vars[varid].ptr + i * nvals));
+              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
             }
         }
       else if (gridtype == GRID_GAUSSIAN && zaxistype == ZAXIS_HYBRID)
@@ -1341,8 +1293,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[2] = lon_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
 
           for (i = 0; i < nlev; i++)
@@ -1354,8 +1305,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
               count[1] = 1;
               count[2] = lon;
 
-              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                     vars[varid].ptr + i * nvals));
+              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
             }
         }
       else if (gridtype == GRID_GAUSSIAN && zaxistype == ZAXIS_HYBRID_HALF)
@@ -1367,8 +1317,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[2] = lon_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
 
           for (i = 0; i < ilev; i++)
@@ -1380,8 +1329,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
               count[1] = 1;
               count[2] = lon;
 
-              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                     vars[varid].ptr + i * nvals));
+              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
             }
         }
       else if (gridtype == GRID_GAUSSIAN && zaxistype == ZAXIS_DEPTH_BELOW_LAND)
@@ -1393,8 +1341,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[2] = lon_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
 
           for (i = 0; i < belowsurface; i++)
@@ -1406,8 +1353,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
               count[1] = 1;
               count[2] = lon;
 
-              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                     vars[varid].ptr + i * nvals));
+              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
             }
         }
       else if (gridtype == GRID_GAUSSIAN && zaxistype == ZAXIS_GENERIC)
@@ -1419,8 +1365,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[2] = lon_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
 
           for (i = 0; i < n2; i++)
@@ -1432,8 +1377,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
               count[1] = 1;
               count[2] = lon;
 
-              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                     vars[varid].ptr + i * nvals));
+              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
             }
         }
       else if (gridtype == GRID_GAUSSIAN && zaxistype == ZAXIS_HYBRID_HALF)
@@ -1445,8 +1389,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[2] = lon_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
 
           for (i = 0; i < ilev; i++)
@@ -1458,8 +1401,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
               count[1] = 1;
               count[2] = lon;
 
-              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                     vars[varid].ptr + i * nvals));
+              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
             }
         }
       else if (gridtype == GRID_GAUSSIAN && zaxistype == ZAXIS_SURFACE)
@@ -1468,8 +1410,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[1] = lon_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 2, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 2, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
           nce(nc_put_var_double(nc_file_id, nc_var_id, vars[varid].ptr));
         }
@@ -1481,8 +1422,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
           dimidsp[1] = lev_dimid;
 
           nce(nc_redef(nc_file_id));
-          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 2, dimidsp,
-                         &nc_var_id));
+          nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 2, dimidsp, &nc_var_id));
           nce(nc_enddef(nc_file_id));
 
           for (i = 0; i < nlev; i++)
@@ -1492,8 +1432,7 @@ export_e5res(const char *filename, VAR *vars, int nvars)
               count[0] = nvals;
               count[1] = 1;
 
-              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count,
-                                     vars[varid].ptr + i * nvals));
+              nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr + i * nvals));
             }
         }
       else
@@ -1609,13 +1548,10 @@ Echam5ini(void *process)
            vars[iv].gridID, vars[iv].zaxisID, gridInqSize(vars[iv].gridID),
            zaxisInqSize(vars[iv].zaxisID));
           */
-          varID = vlistDefVar(vlistID2, vars[iv].gridID, vars[iv].zaxisID,
-                              TIME_CONSTANT);
-          if (vars[iv].code > 0)
-            vlistDefVarCode(vlistID2, varID, vars[iv].code);
+          varID = vlistDefVar(vlistID2, vars[iv].gridID, vars[iv].zaxisID, TIME_CONSTANT);
+          if (vars[iv].code > 0) vlistDefVarCode(vlistID2, varID, vars[iv].code);
           if (vars[iv].name) vlistDefVarName(vlistID2, varID, vars[iv].name);
-          if (vars[iv].longname)
-            vlistDefVarLongname(vlistID2, varID, vars[iv].longname);
+          if (vars[iv].longname) vlistDefVarLongname(vlistID2, varID, vars[iv].longname);
           if (vars[iv].units) vlistDefVarUnits(vlistID2, varID, vars[iv].units);
           vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
         }
@@ -1623,16 +1559,14 @@ Echam5ini(void *process)
       for (iatt = 0; iatt < atts.natxt; ++iatt)
         {
           /* printf("%s: %s\n", atts.atxtname[iatt], atts.atxtentry[iatt]); */
-          cdiDefAttTxt(vlistID2, CDI_GLOBAL, atts.atxtname[iatt],
-                       (int) strlen(atts.atxtentry[iatt]) + 1,
+          cdiDefAttTxt(vlistID2, CDI_GLOBAL, atts.atxtname[iatt], (int) strlen(atts.atxtentry[iatt]) + 1,
                        atts.atxtentry[iatt]);
         }
 
       taxisID = taxisCreate(TAXIS_ABSOLUTE);
       vlistDefTaxis(vlistID2, taxisID);
 
-      if (cdoDefaultFileType == CDI_UNDEFID)
-        cdoDefaultFileType = CDI_FILETYPE_NC;
+      if (cdoDefaultFileType == CDI_UNDEFID) cdoDefaultFileType = CDI_FILETYPE_NC;
 
       streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -1649,8 +1583,7 @@ Echam5ini(void *process)
           for (levelID = 0; levelID < nlev; levelID++)
             {
               pstreamDefRecord(streamID2, varID, levelID);
-              pstreamWriteRecord(streamID2,
-                                 vars[varID].ptr + levelID * gridsize, 0);
+              pstreamWriteRecord(streamID2, vars[varID].ptr + levelID * gridsize, 0);
             }
         }
 
@@ -1737,8 +1670,7 @@ Echam5ini(void *process)
 
           if (zaxistype == ZAXIS_HYBRID && nlev == 1) zaxistype = ZAXIS_SURFACE;
 
-          inivar(&vars[varID], gridtype, zaxistype, code, name, longname,
-                 units);
+          inivar(&vars[varID], gridtype, zaxistype, code, name, longname, units);
 
           vars[varID].gridID = gridID;
           vars[varID].zaxisID = zaxisID;
@@ -1765,15 +1697,13 @@ Echam5ini(void *process)
           gridID = vlistInqVarGrid(vlistID1, varID);
           gridsize = gridInqSize(gridID);
 
-          pstreamReadRecord(streamID1, vars[varID].ptr + levelID * gridsize,
-                            &nmiss);
+          pstreamReadRecord(streamID1, vars[varID].ptr + levelID * gridsize, &nmiss);
         }
 
       pstreamClose(streamID1);
 
       if (operatorID == EXPORT_E5ML)
-        export_e5ml(cdoGetStreamName(1).c_str(), vars, nvars, vdate, vtime,
-                    ntr);
+        export_e5ml(cdoGetStreamName(1).c_str(), vars, nvars, vdate, vtime, ntr);
       else if (operatorID == EXPORT_E5RES)
         export_e5res(cdoGetStreamName(1).c_str(), vars, nvars);
       else

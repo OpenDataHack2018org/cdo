@@ -76,31 +76,21 @@ main(int argc, char *argv[])
                   filename, p->lineno, buffer[p->pos]);
           break;
         case NAMELIST_ERROR_PART:
-          fprintf(stderr,
-                  "Namelist error: End of string not found in %s (line=%d)!\n",
-                  filename, p->lineno);
+          fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", filename, p->lineno);
           break;
         case NAMELIST_ERROR_INKEY:
-          fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n",
-                  filename, p->lineno);
+          fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", filename, p->lineno);
           break;
         case NAMELIST_ERROR_INTYP:
-          fprintf(stderr,
-                  "Namelist error: Invalid key word type in %s (line=%d)!\n",
-                  filename, p->lineno);
+          fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", filename, p->lineno);
           break;
         case NAMELIST_ERROR_INOBJ:
-          fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n",
-                  filename, p->lineno);
+          fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", filename, p->lineno);
           break;
         case NAMELIST_ERROR_EMKEY:
-          fprintf(stderr, "Namelsit error: Emtry key name in %s (line=%d)!\n",
-                  filename, p->lineno);
+          fprintf(stderr, "Namelsit error: Emtry key name in %s (line=%d)!\n", filename, p->lineno);
           break;
-        default:
-          fprintf(stderr, "Namelsit error in %s (line=%d)!\n", filename,
-                  p->lineno);
-          break;
+        default: fprintf(stderr, "Namelsit error in %s (line=%d)!\n", filename, p->lineno); break;
         }
     }
 

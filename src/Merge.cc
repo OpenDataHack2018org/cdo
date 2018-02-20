@@ -65,8 +65,7 @@ checkDupEntry(int vlistID1, int vlistID2, const char *filename)
           size_t gsize2 = gridInqSize(gridID2);
           int ztype2 = zaxisInqType(zaxisID2);
           int nlev2 = zaxisInqSize(zaxisID2);
-          if (gtype1 == gtype2 && gsize1 == gsize2 && ztype1 == ztype2
-              && nlev1 == nlev2)
+          if (gtype1 == gtype2 && gsize1 == gsize2 && ztype1 == ztype2 && nlev1 == nlev2)
             {
               if (nlev2 > mlev2)
                 {
@@ -75,8 +74,7 @@ checkDupEntry(int vlistID1, int vlistID2, const char *filename)
                 }
               cdoZaxisInqLevels(zaxisID2, lev2);
 
-              if (zaxisInqLevels(zaxisID1, NULL)
-                  && zaxisInqLevels(zaxisID2, NULL))
+              if (zaxisInqLevels(zaxisID1, NULL) && zaxisInqLevels(zaxisID2, NULL))
                 {
                   for (k = 0; k < nlev2; ++k)
                     if (!IS_EQUAL(lev1[k], lev2[k])) break;
@@ -86,19 +84,15 @@ checkDupEntry(int vlistID1, int vlistID2, const char *filename)
                       if (param1 < 0 || param2 < 0)
                         {
                           if (strcmp(vname1, vname2) == 0)
-                            cdoWarning("Duplicate entry of parameter %s in %s!",
-                                       vname2, filename);
+                            cdoWarning("Duplicate entry of parameter %s in %s!", vname2, filename);
                         }
                       else
                         {
                           if (param1 == param2)
                             {
                               char paramstr[32];
-                              cdiParamToString(param2, paramstr,
-                                               sizeof(paramstr));
-                              cdoWarning(
-                                  "Duplicate entry of parameter %s in %s!",
-                                  paramstr, filename);
+                              cdiParamToString(param2, paramstr, sizeof(paramstr));
+                              cdoWarning("Duplicate entry of parameter %s in %s!", paramstr, filename);
                             }
                         }
                     }
@@ -143,8 +137,7 @@ Merge(void *process)
 
   const char *ofilename = cdoGetStreamName(streamCnt - 1).c_str();
 
-  if (!cdoOverwriteMode && fileExists(ofilename)
-      && !userFileOverwrite(ofilename))
+  if (!cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename))
     cdoAbort("Outputfile %s already exists!", ofilename);
 
   int *streamIDs = (int *) Malloc(nmerge * sizeof(int));
@@ -218,8 +211,7 @@ Merge(void *process)
       vlistPrint(vlistID2);
     }
 
-  int streamID2
-      = cdoStreamOpenWrite(cdoStreamName(streamCnt - 1), cdoFiletype());
+  int streamID2 = cdoStreamOpenWrite(cdoStreamName(streamCnt - 1), cdoFiletype());
 
   vlistDefTaxis(vlistID2, taxisID2);
   pstreamDefVlist(streamID2, vlistID2);
@@ -250,8 +242,7 @@ Merge(void *process)
       if (tsID == 1)
         {
           for (index = 0; index < nmerge; index++)
-            if (numrecs[index] == 0 && numsteps[index] == 1)
-              vlistIDs[index] = -1;
+            if (numrecs[index] == 0 && numsteps[index] == 1) vlistIDs[index] = -1;
           /*
           for ( index = 0; index < nmerge; index++ )
             if ( vlistIDs[index] != -1 )
@@ -282,8 +273,7 @@ Merge(void *process)
               {
                 cdoWarning("Input stream %d has %d timestep%s. Stream %d has "
                            "more timesteps, skipped!",
-                           index + 1, tsID, tsID == 1 ? "" : "s",
-                           taxisindex + 1);
+                           index + 1, tsID, tsID == 1 ? "" : "s", taxisindex + 1);
                 break;
               }
           if (index < nmerge) break;
@@ -307,8 +297,7 @@ Merge(void *process)
               varID2 = vlistMergedVar(vlistID1, varID);
               levelID2 = vlistMergedLevel(vlistID1, varID, levelID);
 
-              if (cdoVerbose)
-                cdoPrint("var %d %d %d %d", varID, levelID, varID2, levelID2);
+              if (cdoVerbose) cdoPrint("var %d %d %d %d", varID, levelID, varID2, levelID2);
 
               pstreamDefRecord(streamID2, varID2, levelID2);
               if (lcopy)
