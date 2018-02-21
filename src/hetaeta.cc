@@ -484,7 +484,6 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
         const double *fis2, double *ps2, double *t2, double *q2, int nvars, double **vars1, double **vars2,
         double *tscor, double *pscor, double *secor)
 {
-  double epsm1i;
   long jblt;
   long jlev = 0;
   int lpsmod = 1;
@@ -499,63 +498,62 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
   long nlev1p1 = nlev1 + 1;
   long nlev2p1 = nlev2 + 1;
 
-  NEW_2D(double, ph1, Threading::ompNumThreads, nlev1p1);
-  NEW_2D(double, lnph1, Threading::ompNumThreads, nlev1p1);
-  NEW_2D(double, fi1, Threading::ompNumThreads, nlev1p1);
+  VECTOR_2D(double, ph1, Threading::ompNumThreads, nlev1p1);
+  VECTOR_2D(double, lnph1, Threading::ompNumThreads, nlev1p1);
+  VECTOR_2D(double, fi1, Threading::ompNumThreads, nlev1p1);
 
-  NEW_2D(double, pf1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, lnpf1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, tv1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, theta1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, rh1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, zvar, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, pf1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, lnpf1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, tv1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, theta1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, rh1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, zvar, Threading::ompNumThreads, nlev1);
 
-  NEW_2D(double, ph2, Threading::ompNumThreads, nlev2p1);
-  NEW_2D(double, lnph2, Threading::ompNumThreads, nlev2p1);
-  NEW_2D(double, fi2, Threading::ompNumThreads, nlev2p1);
+  VECTOR_2D(double, ph2, Threading::ompNumThreads, nlev2p1);
+  VECTOR_2D(double, lnph2, Threading::ompNumThreads, nlev2p1);
+  VECTOR_2D(double, fi2, Threading::ompNumThreads, nlev2p1);
 
-  NEW_2D(double, pf2, Threading::ompNumThreads, nlev2);
-  NEW_2D(double, rh2, Threading::ompNumThreads, nlev2);
-  NEW_2D(double, wgt, Threading::ompNumThreads, nlev2);
-  NEW_2D(long, idx, Threading::ompNumThreads, nlev2);
+  VECTOR_2D(double, pf2, Threading::ompNumThreads, nlev2);
+  VECTOR_2D(double, rh2, Threading::ompNumThreads, nlev2);
+  VECTOR_2D(double, wgt, Threading::ompNumThreads, nlev2);
+  VECTOR_2D(long, idx, Threading::ompNumThreads, nlev2);
 
-  NEW_2D(double, zt2, Threading::ompNumThreads, ltq ? nlev2 : 0);
-  NEW_2D(double, zq2, Threading::ompNumThreads, ltq ? nlev2 : 0);
-  NEW_2D(double, rh_pbl, Threading::ompNumThreads, ltq ? nlev2 : 0);
-  NEW_2D(double, theta_pbl, Threading::ompNumThreads, ltq ? nlev2 : 0);
+  VECTOR_2D(double, zt2, Threading::ompNumThreads, ltq ? nlev2 : 0);
+  VECTOR_2D(double, zq2, Threading::ompNumThreads, ltq ? nlev2 : 0);
+  VECTOR_2D(double, rh_pbl, Threading::ompNumThreads, ltq ? nlev2 : 0);
+  VECTOR_2D(double, theta_pbl, Threading::ompNumThreads, ltq ? nlev2 : 0);
 
   if (nvars > MAX_VARS)
     {
       fprintf(stderr, "Too many vars (max = %d)!\n", MAX_VARS);
       exit(-1);
     }
-  // if ( nvars > 0 )
-  double ***vars_pbl_2 = (double ***) Malloc(Threading::ompNumThreads * sizeof(double **));
 
+  std::vector<std::vector<std::vector<double>>> vars_pbl_2(Threading::ompNumThreads);
   if (nvars > 0)
     {
       for (int i = 0; i < Threading::ompNumThreads; i++)
         {
-          vars_pbl_2[i] = (double **) Malloc(nvars * sizeof(double *));
+          vars_pbl_2[i].resize(nvars);
           for (int iv = 0; iv < nvars; ++iv)
-            vars_pbl_2[i][iv] = (double *) Malloc(nlev2 * sizeof(double));
+            vars_pbl_2[i][iv].resize(nlev2);
         }
     }
 
-  double *af1 = new double[nlev1];
-  double *bf1 = new double[nlev1];
-  double *etaf1 = new double[nlev1];
+  std::vector<double> af1(nlev1);
+  std::vector<double> bf1(nlev1);
+  std::vector<double> etaf1(nlev1);
 
-  double *etah2 = new double[nlev2p1];
+  std::vector<double> etah2(nlev2p1);
 
-  double *af2 = new double[nlev2];
-  double *bf2 = new double[nlev2];
-  double *etaf2 = new double[nlev2];
+  std::vector<double> af2(nlev2);
+  std::vector<double> bf2(nlev2);
+  std::vector<double> etaf2(nlev2);
 
-  double *w1 = new double[nlev2];
-  double *w2 = new double[nlev2];
-  long *jl1 = new long[nlev2];
-  long *jl2 = new long[nlev2];
+  std::vector<double> w1(nlev2);
+  std::vector<double> w2(nlev2);
+  std::vector<long> jl1(nlev2);
+  std::vector<long> jl2(nlev2);
 
   /******* set coordinate system ETA's, A's, B's
            calculate half and full level ETA
@@ -626,7 +624,7 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
       w1[k] = 1.0 - w2[k];
     }
 
-  epsm1i = 1.0 / epsilon - 1.0;
+  double epsm1i = 1.0 / epsilon - 1.0;
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none) firstprivate(lpsmod) private(vars_pbl) schedule(dynamic, 1) shared(            \
@@ -639,16 +637,17 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
       int ompthID = cdo_omp_get_thread_num();
 
       for (int iv = 0; iv < nvars; ++iv)
-        vars_pbl[iv] = vars_pbl_2[ompthID][iv];
+        vars_pbl[iv] = &vars_pbl_2[ompthID][iv][0];
 
       if (imiss && imiss[ij]) continue;
 
-      hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars, af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2, ah1, bh1, ps1,
-                 epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt,
-                 ph1[ompthID], lnph1[ompthID], fi1[ompthID], pf1[ompthID], lnpf1[ompthID], tv1[ompthID],
-                 theta1[ompthID], rh1[ompthID], zvar[ompthID], ph2[ompthID], lnph2[ompthID], fi2[ompthID], pf2[ompthID],
-                 rh2[ompthID], wgt[ompthID], idx[ompthID], rh_pbl[ompthID], theta_pbl[ompthID], vars_pbl, zt2[ompthID],
-                 zq2[ompthID]);
+      hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars, &af1[0], &bf1[0], &etah2[0], &af2[0], &bf2[0], &w1[0],
+                 &w2[0], &jl1[0], &jl2[0], ah1, bh1, ps1, epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, vars1, vars2, t2,
+                 q2, tscor, pscor, secor, jblt, &ph1[ompthID][0], &lnph1[ompthID][0], &fi1[ompthID][0],
+                 &pf1[ompthID][0], &lnpf1[ompthID][0], &tv1[ompthID][0], &theta1[ompthID][0], &rh1[ompthID][0],
+                 &zvar[ompthID][0], &ph2[ompthID][0], &lnph2[ompthID][0], &fi2[ompthID][0], &pf2[ompthID][0],
+                 &rh2[ompthID][0], &wgt[ompthID][0], &idx[ompthID][0], &rh_pbl[ompthID][0], &theta_pbl[ompthID][0],
+                 vars_pbl, &zt2[ompthID][0], &zq2[ompthID][0]);
 
     } /* end for ij */
 
@@ -656,56 +655,6 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const
   fclose(old);
   fclose(new);
 #endif
-
-  DELETE_2D(ph1);
-  DELETE_2D(lnph1);
-  DELETE_2D(fi1);
-
-  DELETE_2D(pf1);
-  DELETE_2D(lnpf1);
-  DELETE_2D(tv1);
-  DELETE_2D(theta1);
-  DELETE_2D(rh1);
-  DELETE_2D(zvar);
-
-  DELETE_2D(ph2);
-  DELETE_2D(lnph2);
-  DELETE_2D(fi2);
-
-  DELETE_2D(pf2);
-  // DELETE_2D(lnpf2);
-  DELETE_2D(rh2);
-  DELETE_2D(wgt);
-  DELETE_2D(idx);
-
-  DELETE_2D(zt2);
-  DELETE_2D(zq2);
-  DELETE_2D(rh_pbl);
-  DELETE_2D(theta_pbl);
-
-  if (nvars > 0)
-    {
-      for (int i = 0; i < Threading::ompNumThreads; i++)
-        {
-          for (int iv = 0; iv < nvars; ++iv)
-            Free(vars_pbl_2[i][iv]);
-
-          Free(vars_pbl_2[i]);
-        }
-    }
-  Free(vars_pbl_2);
-
-  delete[] af1;
-  delete[] bf1;
-  delete[] etaf1;
-  delete[] etah2;
-  delete[] af2;
-  delete[] bf2;
-  delete[] etaf2;
-  delete[] w1;
-  delete[] w2;
-  delete[] jl1;
-  delete[] jl2;
 
   return;
 }

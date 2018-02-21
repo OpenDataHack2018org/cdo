@@ -1975,7 +1975,7 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *r
   long nvals = lot * jump;
 
   double *restrict wfc = (double *) Malloc(nvals * sizeof(double));
-  NEW_2D(double, wgp2d, nthmax, nvals);
+  VECTOR_2D(double, wgp2d, nthmax, nvals);
 
 #ifdef _OPENMP
 #pragma omp parallel for default(shared)
@@ -2010,7 +2010,7 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *r
   for (long nb = 0; nb < nblox; nb++)
     {
       int ompthID = cdo_omp_get_thread_num();
-      double *restrict wgp = wgp2d[ompthID];
+      double *restrict wgp = &wgp2d[ompthID][0];
 
       long istart = istartv[nb];
       long nvex = (nb == 0) ? nvex0 : NFFT;
@@ -2091,7 +2091,6 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *r
 
   Free(istartv);
   Free(wfc);
-  DELETE_2D(wgp2d);
 }
 
 void
