@@ -49,10 +49,10 @@ Arith(void *process)
   int nlevels2 = 1;
   int varID, levelID;
   int levelID2;
-  size_t *varnmiss2 = NULL;
-  size_t **varnmiss = NULL;
-  double *vardata2 = NULL;
-  double **vardata = NULL;
+  std::vector<std::vector<size_t>> varnmiss;
+  std::vector<std::vector<double>> vardata;
+  std::vector<size_t> varnmiss2;
+  std::vector<double> vardata2;
 
   cdoInitialize(process);
 
@@ -122,8 +122,7 @@ Arith(void *process)
       else
         {
           filltype = FILL_VARTS;
-          cdoPrint("Filling up stream2 >%s< by copying the first variable of "
-                   "each timestep.",
+          cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.",
                    cdoGetStreamName(1).c_str());
         }
     }
@@ -139,8 +138,7 @@ Arith(void *process)
       else
         {
           filltype = FILL_VARTS;
-          cdoPrint("Filling up stream1 >%s< by copying the first variable of "
-                   "each timestep.",
+          cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.",
                    cdoGetStreamName(0).c_str());
         }
       streamIDx1 = streamID2;
@@ -162,8 +160,8 @@ Arith(void *process)
   field2.ptr = (double *) Malloc(gridsize * sizeof(double));
   if (filltype == FILL_VAR || filltype == FILL_VARTS)
     {
-      vardata2 = (double *) Malloc(gridsize * nlevels2 * sizeof(double));
-      varnmiss2 = (size_t *) Malloc(nlevels2 * sizeof(size_t));
+      vardata2.resize(gridsize * nlevels2);
+      varnmiss2.resize(nlevels2);
     }
 
   if (cdoVerbose) cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
@@ -191,14 +189,14 @@ Arith(void *process)
       if (filltype == FILL_TS)
         {
           nvars = vlistNvars(vlistIDx2);
-          vardata = (double **) Malloc(nvars * sizeof(double *));
-          varnmiss = (size_t **) Malloc(nvars * sizeof(size_t *));
+          vardata.resize(nvars);
+          varnmiss.resize(nvars);
           for (varID = 0; varID < nvars; varID++)
             {
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
               int nlev = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
-              vardata[varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
-              varnmiss[varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+              vardata[varID].resize(nlev * gridsize);
+              varnmiss[varID].resize(nlev);
             }
         }
     }
@@ -280,14 +278,14 @@ Arith(void *process)
                 {
                   size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
                   size_t offset = gridsize * levelID;
-                  arrayCopy(gridsize, fieldx2->ptr, vardata[varID] + offset);
+                  arrayCopy(gridsize, fieldx2->ptr, &vardata[varID][offset]);
                   varnmiss[varID][levelID] = fieldx2->nmiss;
                 }
               else if (lstatus && (filltype == FILL_VAR || filltype == FILL_VARTS))
                 {
                   size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
                   size_t offset = gridsize * levelID2;
-                  arrayCopy(gridsize, fieldx2->ptr, vardata2 + offset);
+                  arrayCopy(gridsize, fieldx2->ptr, &vardata2[offset]);
                   varnmiss2[levelID2] = fieldx2->nmiss;
                 }
             }
@@ -295,7 +293,7 @@ Arith(void *process)
             {
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID2));
               size_t offset = gridsize * levelID;
-              arrayCopy(gridsize, vardata[varID] + offset, fieldx2->ptr);
+              arrayCopy(gridsize, &vardata[varID][offset], fieldx2->ptr);
               fieldx2->nmiss = varnmiss[varID][levelID];
             }
 
@@ -307,7 +305,7 @@ Arith(void *process)
               levelID2 = (nlevels2 > 1) ? levelID : 0;
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
               size_t offset = gridsize * levelID2;
-              arrayCopy(gridsize, vardata2 + offset, fieldx2->ptr);
+              arrayCopy(gridsize, &vardata2[offset], fieldx2->ptr);
               fieldx2->nmiss = varnmiss2[levelID2];
               fieldx2->grid = vlistInqVarGrid(vlistIDx2, 0);
               fieldx2->missval = vlistInqVarMissval(vlistIDx2, 0);
@@ -334,22 +332,8 @@ Arith(void *process)
 
   vlistDestroy(vlistID3);
 
-  if (vardata)
-    {
-      for (varID = 0; varID < nvars; varID++)
-        {
-          Free(vardata[varID]);
-          Free(varnmiss[varID]);
-        }
-
-      Free(vardata);
-      Free(varnmiss);
-    }
-
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);
-  if (vardata2) Free(vardata2);
-  if (varnmiss2) Free(varnmiss2);
 
   cdoFinish();
 

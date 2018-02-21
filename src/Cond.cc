@@ -43,8 +43,8 @@ Cond(void *process)
   size_t nmiss1, nmiss2;
   double missval1 = -9.E33;
   double missval2 = -9.E33;
-  size_t **varnmiss1 = NULL;
-  double **vardata1 = NULL;
+  std::vector<std::vector<size_t>> varnmiss1;
+  std::vector<std::vector<double>> vardata1;
 
   cdoInitialize(process);
 
@@ -90,9 +90,9 @@ Cond(void *process)
   if (filltype == FILL_REC && gridsize != gridInqSize(vlistGrid(vlistID1, 0)))
     cdoAbort("Stream1 >%s< has wrong gridsize!", cdoGetStreamName(0).c_str());
 
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
-  double *array3 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsize);
+  std::vector<double> array2(gridsize);
+  std::vector<double> array3(gridsize);
 
   if (cdoVerbose) cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
 
@@ -104,14 +104,14 @@ Cond(void *process)
           cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoGetStreamName(0).c_str());
 
           nvars = vlistNvars(vlistID1);
-          vardata1 = (double **) Malloc(nvars * sizeof(double *));
-          varnmiss1 = (size_t **) Malloc(nvars * sizeof(size_t *));
+          vardata1.resize(nvars);
+          varnmiss1.resize(nvars);
           for (varID = 0; varID < nvars; varID++)
             {
               gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
               nlev = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-              vardata1[varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
-              varnmiss1[varID] = (size_t *) Malloc(nlev * sizeof(size_t));
+              vardata1[varID].resize(nlev * gridsize);
+              varnmiss1[varID].resize(nlev);
             }
         }
     }
@@ -126,27 +126,26 @@ Cond(void *process)
         }
 
       taxisCopyTimestep(taxisID3, taxisID2);
-
       pstreamDefTimestep(streamID3, tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-          pstreamReadRecord(streamID2, array2, &nmiss2);
+          pstreamReadRecord(streamID2, &array2[0], &nmiss2);
 
           if (tsID == 0 || filltype == FILL_NONE)
             {
               if (recID == 0 || filltype != FILL_REC)
                 {
                   pstreamInqRecord(streamID1, &varID, &levelID);
-                  pstreamReadRecord(streamID1, array1, &nmiss1);
+                  pstreamReadRecord(streamID1, &array1[0], &nmiss1);
                 }
 
               if (filltype == FILL_TS)
                 {
                   gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
                   offset = gridsize * levelID;
-                  arrayCopy(gridsize, array1, vardata1[varID] + offset);
+                  arrayCopy(gridsize, &array1[0], &vardata1[varID][offset]);
                   varnmiss1[varID][levelID] = nmiss1;
                 }
             }
@@ -154,7 +153,7 @@ Cond(void *process)
             {
               gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
               offset = gridsize * levelID;
-              arrayCopy(gridsize, vardata1[varID] + offset, array1);
+              arrayCopy(gridsize, &vardata1[varID][offset], &array1[0]);
               nmiss1 = varnmiss1[varID][levelID];
             }
 
@@ -180,9 +179,9 @@ Cond(void *process)
               cdoAbort("Operator not implemented!");
             }
 
-          size_t nmiss3 = arrayNumMV(gridsize, array3, missval2);
+          size_t nmiss3 = arrayNumMV(gridsize, &array3[0], missval2);
           pstreamDefRecord(streamID3, varID, levelID);
-          pstreamWriteRecord(streamID3, array3, nmiss3);
+          pstreamWriteRecord(streamID3, &array3[0], nmiss3);
         }
 
       tsID++;
@@ -191,22 +190,6 @@ Cond(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (vardata1)
-    {
-      for (varID = 0; varID < nvars; varID++)
-        {
-          Free(vardata1[varID]);
-          Free(varnmiss1[varID]);
-        }
-
-      Free(vardata1);
-      Free(varnmiss1);
-    }
-
-  if (array3) Free(array3);
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   cdoFinish();
 

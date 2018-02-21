@@ -44,7 +44,7 @@ Comp(void *process)
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   double missval1, missval2 = 0;
-  double **vardata = NULL;
+  std::vector<std::vector<double>> vardata;
 
   cdoInitialize(process);
 
@@ -139,12 +139,12 @@ Comp(void *process)
       if (filltype == FILL_TS)
         {
           nvars = vlistNvars(vlistIDx2);
-          vardata = (double **) Malloc(nvars * sizeof(double *));
+          vardata.resize(nvars);
           for (varID = 0; varID < nvars; varID++)
             {
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
               nlev = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
-              vardata[varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
+              vardata[varID].resize(nlev * gridsize);
             }
         }
     }
@@ -197,14 +197,14 @@ Comp(void *process)
                 {
                   size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
                   size_t offset = gridsize * levelID;
-                  arrayCopy(gridsize, arrayx2, vardata[varID] + offset);
+                  arrayCopy(gridsize, arrayx2, &vardata[varID][offset]);
                 }
             }
           else if (filltype == FILL_TS)
             {
               size_t gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
               size_t offset = gridsize * levelID;
-              arrayCopy(gridsize, vardata[varID] + offset, arrayx2);
+              arrayCopy(gridsize, &vardata[varID][offset], arrayx2);
             }
 
           int datatype1 = vlistInqVarDatatype(vlistIDx1, varID);
@@ -227,8 +227,7 @@ Comp(void *process)
             }
 
           if (gridsize1 != gridsize2)
-            cdoAbort("Streams have different gridsize (gridsize1 = %zu; "
-                     "gridsize2 = %zu!",
+            cdoAbort("Streams have different gridsize (gridsize1 = %zu; gridsize2 = %zu)!",
                      gridsize1, gridsize2);
 
           size_t gridsize = gridsize1;
@@ -307,13 +306,6 @@ Comp(void *process)
   pstreamClose(streamID3);
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (vardata)
-    {
-      for (varID = 0; varID < nvars; varID++)
-        Free(vardata[varID]);
-      Free(vardata);
-    }
 
   if (array3) Free(array3);
   if (array2) Free(array2);
