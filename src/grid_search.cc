@@ -666,11 +666,7 @@ gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *pra
 
   if (gs)
     {
-      std::vector<double> out_dist_sqr(nnn);
-      nadds = nft->knnRangeSearch(&query_pt[0], range, nnn, &adds[0], &out_dist_sqr[0]);
-
-      for (size_t i = 0; i < nadds; ++i)
-        dist[i] = out_dist_sqr[i];
+      nadds = nft->knnRangeSearch(&query_pt[0], range, nnn, &adds[0], &dist[0]);
 
       double frange = range;
       if (prange) *prange = frange;
