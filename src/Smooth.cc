@@ -112,23 +112,23 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   for (size_t i = 0; i < gridsize; ++i)
     mask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
-  double *xvals = (double *) Malloc(gridsize * sizeof(double));
-  double *yvals = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> xvals(gridsize);
+  std::vector<double> yvals(gridsize);
 
   if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 0);
 
   if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
     gridID = gridToCurvilinear(gridID, 0);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  gridInqXvals(gridID, &xvals[0]);
+  gridInqYvals(gridID, &yvals[0]);
 
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID, units);
-  grid_to_radian(units, gridsize, xvals, "grid center lon");
+  grid_to_radian(units, gridsize, &xvals[0], "grid center lon");
   gridInqYunits(gridID, units);
-  grid_to_radian(units, gridsize, yvals, "grid center lat");
+  grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
   struct gsknn **knn = (struct gsknn **) Malloc(Threading::ompNumThreads * sizeof(struct gsknn *));
   for (int i = 0; i < Threading::ompNumThreads; i++)
@@ -140,7 +140,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   bool xIsCyclic = false;
   size_t dims[2] = { gridsize, 0 };
-  struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, gridsize, xvals, yvals);
+  struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, gridsize, &xvals[0], &yvals[0]);
 
   gs->search_radius = spoint.radius;
 
@@ -210,8 +210,6 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   if (gridID0 != gridID) gridDestroy(gridID);
 
   Free(mask);
-  Free(xvals);
-  Free(yvals);
 }
 
 static inline void
@@ -465,8 +463,7 @@ Smooth(void *process)
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if (gridsizemax < spoint.maxpoints) spoint.maxpoints = gridsizemax;
   if (cdoVerbose)
-    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, "
-             "weight0 = %g, weightR = %g",
+    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
              xnsmooth, spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
 
   spoint.radius *= DEG2RAD;
