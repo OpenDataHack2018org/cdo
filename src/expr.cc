@@ -61,106 +61,28 @@ enum
 #define MVCOMPAND(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPAND(x, y))
 #define MVCOMPOR(x, y) (DBL_IS_EQUAL((x), missval1) ? missval1 : COMPOR(x, y))
 
-static double
-f_float(double x)
-{
-  return (float) (x);
-}
-static double
-f_int(double x)
-{
-  return (int) (x);
-}
-static double
-f_nint(double x)
-{
-  return round(x);
-}
-static double
-f_sqr(double x)
-{
-  return x * x;
-}
-static double
-f_rad(double x)
-{
-  return x * M_PI / 180.;
-}
-static double
-f_deg(double x)
-{
-  return x * 180. / M_PI;
-}
-static double
-pt_ngp(paramType *p)
-{
-  return p->ngp;
-}
-static double
-pt_nlev(paramType *p)
-{
-  return p->nlev;
-}
-static double
-pt_size(paramType *p)
-{
-  return p->ngp * p->nlev;
-}
-static double
-pt_missval(paramType *p)
-{
-  return p->missval;
-}
-static double
-ts_ctimestep(double *data)
-{
-  return lround(data[CTIMESTEP]);
-}
-static double
-ts_cdate(double *data)
-{
-  return lround(data[CDATE]);
-}
-static double
-ts_ctime(double *data)
-{
-  return lround(data[CTIME]);
-}
-static double
-ts_cdeltat(double *data)
-{
-  return data[CDELTAT];
-}
-static double
-ts_cday(double *data)
-{
-  return data[CDAY];
-}
-static double
-ts_cmonth(double *data)
-{
-  return data[CMONTH];
-}
-static double
-ts_cyear(double *data)
-{
-  return data[CYEAR];
-}
-static double
-ts_csecond(double *data)
-{
-  return data[CSECOND];
-}
-static double
-ts_cminute(double *data)
-{
-  return data[CMINUTE];
-}
-static double
-ts_chour(double *data)
-{
-  return data[CHOUR];
-}
+// clang-format off
+static double f_float(double x) { return (float) (x); }
+static double f_int(double x) { return (int) (x); }
+static double f_nint(double x) { return round(x); }
+static double f_sqr(double x) { return x * x; }
+static double f_rad(double x) { return x * M_PI / 180.; }
+static double f_deg(double x) { return x * 180. / M_PI; }
+static double pt_ngp(paramType *p) { return p->ngp; }
+static double pt_nlev(paramType *p) { return p->nlev; }
+static double pt_size(paramType *p) { return p->ngp * p->nlev; }
+static double pt_missval(paramType *p) { return p->missval; }
+static double ts_ctimestep(double *data) { return lround(data[CTIMESTEP]); }
+static double ts_cdate(double *data) { return lround(data[CDATE]); }
+static double ts_ctime(double *data) { return lround(data[CTIME]); }
+static double ts_cdeltat(double *data) { return data[CDELTAT]; }
+static double ts_cday(double *data) { return data[CDAY]; }
+static double ts_cmonth(double *data) { return data[CMONTH]; }
+static double ts_cyear(double *data) { return data[CYEAR]; }
+static double ts_csecond(double *data) { return data[CSECOND]; }
+static double ts_cminute(double *data) { return data[CMINUTE]; }
+static double ts_chour(double *data) { return data[CHOUR]; }
+// clang-format on
 
 typedef struct
 {
@@ -775,11 +697,7 @@ ex_copy_var(int init, nodeType *p2, nodeType *p1)
 
   if (!init)
     {
-      double *restrict odat = p2->param.data;
-      const double *restrict idat = p1->param.data;
-      for (size_t i = 0; i < ngp * nlev; ++i)
-        odat[i] = idat[i];
-
+      arrayCopy(ngp * nlev, p1->param.data, p2->param.data);
       p2->param.missval = p1->param.missval;
       p2->param.nmiss = p1->param.nmiss;
     }
@@ -801,11 +719,8 @@ ex_copy_con(int init, nodeType *p2, nodeType *p1)
 
   if (!init)
     {
-      double *restrict odat = p2->param.data;
-      assert(odat != NULL);
-
-      for (size_t i = 0; i < ngp * nlev; ++i)
-        odat[i] = cval;
+      assert(p2->param.data != NULL);
+      arrayFill(ngp * nlev, p2->param.data, cval);
     }
 }
 
@@ -1152,12 +1067,9 @@ fun1c(int init, int funcID, nodeType *p1, double value, parseParamType *parse_ar
   if (!init)
     {
       p->param.data = (double *) Malloc(ngp * sizeof(double));
-      double *restrict pdata = p->param.data;
-      const double *restrict p1data = p1->param.data + ngp * levidx;
-
-      for (size_t i = 0; i < ngp; i++)
-        pdata[i] = p1data[i];
-
+      double *pdata = p->param.data;
+      const double *p1data = p1->param.data + ngp * levidx;
+      arrayCopy(ngp, p1data, pdata);
       if (nmiss > 0) nmiss = arrayNumMV(ngp, pdata, missval);
       p->param.nmiss = nmiss;
     }
@@ -1888,32 +1800,27 @@ expr_run(nodeType *p, parseParamType *parse_arg)
                 rnode = NULL;
               }
             // else Free(rnode);
-
             break;
           }
         case UMINUS:
           {
             rnode = ex_uminus(init, expr_run(p->u.opr.op[0], parse_arg));
-
             break;
           }
         case NOT:
           {
             rnode = ex_not(init, expr_run(p->u.opr.op[0], parse_arg));
-
             break;
           }
         case '?':
           {
             rnode = ex_ifelse(init, expr_run(p->u.opr.op[0], parse_arg), expr_run(p->u.opr.op[1], parse_arg),
                               expr_run(p->u.opr.op[2], parse_arg));
-
             break;
           }
         default:
           {
             rnode = expr(init, p->u.opr.oper, expr_run(p->u.opr.op[0], parse_arg), expr_run(p->u.opr.op[1], parse_arg));
-
             break;
           }
         }

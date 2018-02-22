@@ -17,14 +17,12 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
+// clang-format off
 #define MADDMN(x, y) (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : (x) + (y))
 #define MSUBMN(x, y) (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : (x) - (y))
-#define MMULMN(x, y)                              \
-  (DBL_IS_EQUAL((x), 0.) || DBL_IS_EQUAL((y), 0.) \
-       ? 0                                        \
-       : DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : (x) * (y))
-#define MDIVMN(x, y) \
-  (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) || DBL_IS_EQUAL((y), 0.) ? missval1 : (x) / (y))
+#define MMULMN(x, y) (DBL_IS_EQUAL((x), 0.) || DBL_IS_EQUAL((y), 0.) \
+                      ? 0  : DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : (x) * (y))
+#define MDIVMN(x, y) (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) || DBL_IS_EQUAL((y), 0.) ? missval1 : (x) / (y))
 #define MPOWMN(x, y) (DBL_IS_EQUAL((x), missval1) || DBL_IS_EQUAL((y), missval2) ? missval1 : pow((x), (y)))
 #define MSQRTMN(x) (DBL_IS_EQUAL((x), missval1) || (x) < 0 ? missval1 : sqrt(x))
 
@@ -51,36 +49,31 @@
 #define POWMN(x, y) FPOWMN(x, y, missval1, missval2)
 #define SQRTMN(x) FSQRTMN(x, missval1)
 
-static inline double
-FADDMN(double x, double y, double missval1, double missval2)
+static inline double FADDMN(double x, double y, double missval1, double missval2)
 {
   return MADDMN(x, y);
 }
-static inline double
-FSUBMN(double x, double y, double missval1, double missval2)
+static inline double FSUBMN(double x, double y, double missval1, double missval2)
 {
   return MSUBMN(x, y);
 }
-static inline double
-FMULMN(double x, double y, double missval1, double missval2)
+static inline double FMULMN(double x, double y, double missval1, double missval2)
 {
   return MMULMN(x, y);
 }
-static inline double
-FDIVMN(double x, double y, double missval1, double missval2)
+static inline double FDIVMN(double x, double y, double missval1, double missval2)
 {
   return MDIVMN(x, y);
 }
-static inline double
-FPOWMN(double x, double y, double missval1, double missval2)
+static inline double FPOWMN(double x, double y, double missval1, double missval2)
 {
   return MPOWMN(x, y);
 }
-static inline double
-FSQRTMN(double x, double missval1)
+static inline double FSQRTMN(double x, double missval1)
 {
   return MSQRTMN(x);
 }
+// clang-format on
 
 const char *fpe_errstr(int fpeRaised);
 
