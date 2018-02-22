@@ -18,7 +18,6 @@
 #ifndef FIELD_H
 #define FIELD_H
 
-#include <math.h>
 #include "compare.h"
 #include "array.h"
 

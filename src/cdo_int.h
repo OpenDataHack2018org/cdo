@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <math.h>
+#include <cmath>
 #include <float.h>
 #include <ctype.h>
 #include <stdarg.h>
