@@ -80,19 +80,16 @@ Replace(void *process)
           size_t gridsize2 = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
           int nlevel2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
 
-          if (gridsize1 != gridsize2)
-            cdoAbort("Variables have different gridsize!");
+          if (gridsize1 != gridsize2) cdoAbort("Variables have different gridsize!");
 
-          if (nlevel1 < nlevel2)
-            cdoAbort("Variables have different number of levels!");
+          if (nlevel1 < nlevel2) cdoAbort("Variables have different number of levels!");
 
           if (cdoVerbose) cdoPrint("Variable %s replaced.", varname1);
 
           varlist1[nchvars] = varID1;
           varlist2[nchvars] = varID2;
           nchvars++;
-          if (nchvars > MAX_VARS)
-            cdoAbort("Internal problem - too many variables!");
+          if (nchvars > MAX_VARS) cdoAbort("Internal problem - too many variables!");
         }
       else
         {
@@ -112,8 +109,7 @@ Replace(void *process)
           int nlevel1 = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
           int nlevel2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
-          vardata2[idx]
-              = (double *) Malloc(nlevel2 * gridsize * sizeof(double));
+          vardata2[idx] = (double *) Malloc(nlevel2 * gridsize * sizeof(double));
           varnmiss2[idx] = (size_t *) Malloc(nlevel2 * sizeof(size_t));
           varlevel[idx] = (int *) Malloc(nlevel1 * sizeof(int));
           /*
@@ -140,8 +136,7 @@ Replace(void *process)
                         break;
                       }
 
-                  if (l1 == nlevel1)
-                    cdoWarning("Level %g not found!", level2[l2]);
+                  if (l1 == nlevel1) cdoWarning("Level %g not found!", level2[l2]);
                 }
 
               Free(level1);
@@ -170,8 +165,7 @@ Replace(void *process)
       if (tsID == 0 || (nts2 != 0 && nts2 != 1))
         {
           nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
-          if (nrecs2 == 0)
-            cdoAbort("Input streams have different number of timesteps!");
+          if (nrecs2 == 0) cdoAbort("Input streams have different number of timesteps!");
 
           for (int recID = 0; recID < nrecs2; recID++)
             {
@@ -180,8 +174,7 @@ Replace(void *process)
               for (idx = 0; idx < nchvars; idx++)
                 if (varlist2[idx] == varID)
                   {
-                    size_t gridsize
-                        = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+                    size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
                     int offset = gridsize * levelID;
                     parray = vardata2[idx] + offset;
                     pstreamReadRecord(streamID2, parray, &nmiss);
@@ -205,8 +198,7 @@ Replace(void *process)
                 levelID2 = varlevel[idx][levelID];
                 if (levelID2 != -1)
                   {
-                    size_t gridsize
-                        = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+                    size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
                     int offset = gridsize * levelID2;
                     parray = vardata2[idx] + offset;
                     nmiss = varnmiss2[idx][levelID2];

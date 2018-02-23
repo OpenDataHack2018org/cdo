@@ -103,8 +103,7 @@ Vertwind(void *process)
   int gridID = vlistInqVarGrid(vlistID1, omegaID);
   int zaxisID = vlistInqVarZaxis(vlistID1, omegaID);
 
-  if (psID == -1 && zaxisInqType(zaxisID) == ZAXIS_HYBRID)
-    cdoAbort("Surface pressure (code 134) not found!");
+  if (psID == -1 && zaxisInqType(zaxisID) == ZAXIS_HYBRID) cdoAbort("Surface pressure (code 134) not found!");
 
   size_t gridsize = gridInqSize(gridID);
   int nlevel = zaxisInqSize(zaxisID);
@@ -185,8 +184,7 @@ Vertwind(void *process)
             pstreamReadRecord(streamID1, ps_prog, &nmiss);
         }
 
-      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID)
-        presh(fpress, hpress, vct, ps_prog, nlevel, gridsize);
+      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID) presh(fpress, hpress, vct, ps_prog, nlevel, gridsize);
 
       for (levelID = 0; levelID < nlevel; ++levelID)
         {
@@ -194,8 +192,7 @@ Vertwind(void *process)
 
           for (size_t i = 0; i < gridsize; ++i)
             {
-              if (DBL_IS_EQUAL(temp[offset + i], missval_t)
-                  || DBL_IS_EQUAL(omega[offset + i], missval_wap)
+              if (DBL_IS_EQUAL(temp[offset + i], missval_t) || DBL_IS_EQUAL(omega[offset + i], missval_wap)
                   || DBL_IS_EQUAL(sq[offset + i], missval_sq))
                 {
                   wms[offset + i] = missval_out;

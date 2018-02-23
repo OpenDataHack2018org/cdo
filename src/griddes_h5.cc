@@ -52,8 +52,7 @@ obj_info(hid_t loc_id, const char *name, void *objname)
           if (cdoVerbose) cdoPrint("HDF5 object '%s' is a dataset", name);
           break;
         case H5G_TYPE:
-          if (cdoVerbose)
-            cdoPrint("HDF5 object '%s' is a named datatype", name);
+          if (cdoVerbose) cdoPrint("HDF5 object '%s' is a named datatype", name);
           break;
         default:
           /*cdoAbort(" Unable to identify an object %s", name);*/
@@ -325,8 +324,7 @@ gridFromH5file(const char *gridfile)
       lon_id = H5Dopen(file_id, "/lon");
       lat_id = H5Dopen(file_id, "/lat");
     }
-  else if (h5find_object(file_id, "Longitude") > 0
-           && h5find_object(file_id, "Latitude") > 0)
+  else if (h5find_object(file_id, "Longitude") > 0 && h5find_object(file_id, "Latitude") > 0)
     {
       lon_id = H5Dopen(file_id, "/Longitude");
       lat_id = H5Dopen(file_id, "/Latitude");
@@ -408,20 +406,16 @@ gridFromH5file(const char *gridfile)
 
       if (ftype)
         {
-          status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-                           H5P_DEFAULT, grid.xvals);
-          status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-                           H5P_DEFAULT, grid.yvals);
+          status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals);
+          status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals);
         }
       else
         {
           int *iarray = (int *) Malloc(grid.size * sizeof(int));
-          status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-                           H5P_DEFAULT, iarray);
+          status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
           for (size_t i = 0; i < grid.size; ++i)
             grid.xvals[i] = iarray[i];
-          status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-                           H5P_DEFAULT, iarray);
+          status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
           for (size_t i = 0; i < grid.size; ++i)
             grid.yvals[i] = iarray[i];
           Free(iarray);
@@ -559,20 +553,16 @@ gridFromH5file(const char *gridfile)
 
           if (ftype)
             {
-              status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-                               H5P_DEFAULT, grid.xvals);
-              status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-                               H5P_DEFAULT, grid.yvals);
+              status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals);
+              status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals);
             }
           else
             {
               int *iarray = (int *) Malloc(grid.size * sizeof(int));
-              status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-                               H5P_DEFAULT, iarray);
+              status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
               for (size_t i = 0; i < grid.size; ++i)
                 grid.xvals[i] = iarray[i];
-              status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-                               H5P_DEFAULT, iarray);
+              status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
               for (size_t i = 0; i < grid.size; ++i)
                 grid.yvals[i] = iarray[i];
               Free(iarray);

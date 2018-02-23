@@ -42,8 +42,7 @@ Eofcoeff(void *process)
 
   cdoInitialize(process);
 
-  if (processSelf().m_ID != 0)
-    cdoAbort("This operator can't be combined with other operators!");
+  if (processSelf().m_ID != 0) cdoAbort("This operator can't be combined with other operators!");
 
   cdoOperatorAdd("eofcoeff", 0, 0, NULL);
 
@@ -63,15 +62,11 @@ Eofcoeff(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   if (gridsize != vlistGridsizeMax(vlistID2))
-    cdoAbort("Gridsize of input files does not match! %zu and %zu", gridsize,
-             vlistGridsizeMax(vlistID2));
+    cdoAbort("Gridsize of input files does not match! %zu and %zu", gridsize, vlistGridsizeMax(vlistID2));
 
-  if (vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1)
-    cdoAbort("Too many different grids in input!");
+  if (vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1) cdoAbort("Too many different grids in input!");
 
-  int nvars = vlistNvars(vlistID1) == vlistNvars(vlistID2)
-                  ? vlistNvars(vlistID1)
-                  : -1;
+  int nvars = vlistNvars(vlistID1) == vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
   int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));
 
   if (gridID1 != gridID2) cdoCompareGrids(gridID1, gridID2);
@@ -81,8 +76,7 @@ Eofcoeff(void *process)
 
   const char *refname = cdoGetObase();
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix),
-                   pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   field_type ***eof = (field_type ***) Malloc(nvars * sizeof(field_type **));
   for (varID = 0; varID < nvars; varID++)
@@ -101,13 +95,11 @@ Eofcoeff(void *process)
           if (eofID == 0)
             eof[varID][levelID] = (field_type *) Malloc(1 * sizeof(field_type));
           else
-            eof[varID][levelID] = (field_type *) Realloc(
-                eof[varID][levelID], (eofID + 1) * sizeof(field_type));
+            eof[varID][levelID] = (field_type *) Realloc(eof[varID][levelID], (eofID + 1) * sizeof(field_type));
           eof[varID][levelID][eofID].grid = gridID1;
           eof[varID][levelID][eofID].nmiss = 0;
           eof[varID][levelID][eofID].missval = missval1;
-          eof[varID][levelID][eofID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          eof[varID][levelID][eofID].ptr = (double *) Malloc(gridsize * sizeof(double));
           arrayFill(gridsize, &eof[varID][levelID][eofID].ptr[0], missval1);
 
           if (varID >= nvars) cdoAbort("Internal error - too high varID");
@@ -121,8 +113,7 @@ Eofcoeff(void *process)
 
   int neof = eofID;
 
-  if (cdoVerbose)
-    cdoPrint("%s contains %i eof's", cdoGetStreamName(0).c_str(), neof);
+  if (cdoVerbose) cdoPrint("%s contains %i eof's", cdoGetStreamName(0).c_str(), neof);
   // Create 1x1 Grid for output
   int gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
@@ -154,9 +145,7 @@ Eofcoeff(void *process)
 
       streamIDs[eofID] = cdoStreamOpenWrite(oname, cdoFiletype());
 
-      if (cdoVerbose)
-        cdoPrint("opened %s ('w')  as stream%i for %i. eof", oname,
-                 streamIDs[eofID], eofID + 1);
+      if (cdoVerbose) cdoPrint("opened %s ('w')  as stream%i for %i. eof", oname, streamIDs[eofID], eofID + 1);
 
       pstreamDefVlist(streamIDs[eofID], vlistID3);
     }
@@ -198,14 +187,11 @@ Eofcoeff(void *process)
               out.missval = missval2;
               for (size_t i = 0; i < gridsize; i++)
                 {
-                  if (!DBL_IS_EQUAL(in.ptr[i], missval2)
-                      && !DBL_IS_EQUAL(eof[varID][levelID][eofID].ptr[i],
-                                       missval1))
+                  if (!DBL_IS_EQUAL(in.ptr[i], missval2) && !DBL_IS_EQUAL(eof[varID][levelID][eofID].ptr[i], missval1))
                     {
                       // double tmp =
                       // w[i]*in.ptr[i]*eof[varID][levelID][eofID].ptr[i];
-                      double tmp
-                          = in.ptr[i] * eof[varID][levelID][eofID].ptr[i];
+                      double tmp = in.ptr[i] * eof[varID][levelID][eofID].ptr[i];
                       out.ptr[0] += tmp;
                     }
                 }

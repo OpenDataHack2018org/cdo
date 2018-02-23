@@ -73,8 +73,7 @@ util_walltime(void)
   if (gettimeofday(&tbuf, NULL) == -1) perror("UTIL_WALLTIME");
 
   // if ( time_init == 0. )
-  if (!(time_init < 0. || 0. < time_init))
-    time_init = (double) tbuf.tv_sec + (tbuf.tv_usec * 1.0e-6);
+  if (!(time_init < 0. || 0. < time_init)) time_init = (double) tbuf.tv_sec + (tbuf.tv_usec * 1.0e-6);
 
   time_in_secs = (double) tbuf.tv_sec + (tbuf.tv_usec * 1.0e-6) - time_init;
 #endif
@@ -82,15 +81,15 @@ util_walltime(void)
   return (time_in_secs);
 }
 
-  /****************************************************************************/
+/****************************************************************************/
 
 #ifdef _AIX
 
-  /*
-   * High-Resolution Time
-   * pwr4: measurement (util_read_real_time) overhead ~ 0.07 us
-   *       conversion  (util_diff_real_time) overhead ~ 0.3 us
-   */
+/*
+ * High-Resolution Time
+ * pwr4: measurement (util_read_real_time) overhead ~ 0.07 us
+ *       conversion  (util_diff_real_time) overhead ~ 0.3 us
+ */
 
 #include <sys/systemcfg.h>
 

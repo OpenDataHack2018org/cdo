@@ -30,13 +30,11 @@
 
 #define GRID_TMPDIR "/opt/griddata/tmp"
 
-int ftpget(int flag, const char *url, const char *path, const char *target,
-           const char *source);
+int ftpget(int flag, const char *url, const char *path, const char *target, const char *source);
 
 #if defined(HAVE_LIBDRMAA)
 static drmaa_job_template_t *
-create_job_template(const char *expname, const char *jobfilename,
-                    const char *jobname, const char *tmppath)
+create_job_template(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath)
 {
   drmaa_job_template_t *job = NULL;
 
@@ -95,8 +93,7 @@ create_job_template(const char *expname, const char *jobfilename,
 
   /* allocate job template */
 
-  if (drmaa_allocate_job_template(&job, NULL, 0) != DRMAA_ERRNO_SUCCESS)
-    return NULL;
+  if (drmaa_allocate_job_template(&job, NULL, 0) != DRMAA_ERRNO_SUCCESS) return NULL;
 
   /* the job's name */
   drmaa_set_attribute(job, DRMAA_JOB_NAME, jobname, NULL, 0);
@@ -128,12 +125,9 @@ create_job_template(const char *expname, const char *jobfilename,
   drmaa_get_attribute_names(&job_attributes, error, DRMAA_ERROR_STRING_BUFFER);
 
   if (cdoVerbose)
-    while ((drmaa_errno
-            = drmaa_get_next_attr_name(job_attributes, name, DRMAA_ATTR_BUFFER))
-           == DRMAA_ERRNO_SUCCESS)
+    while ((drmaa_errno = drmaa_get_next_attr_name(job_attributes, name, DRMAA_ATTR_BUFFER)) == DRMAA_ERRNO_SUCCESS)
       {
-        drmaa_get_attribute(job, name, value, DRMAA_ATTR_BUFFER, error,
-                            DRMAA_ERROR_STRING_BUFFER);
+        drmaa_get_attribute(job, name, value, DRMAA_ATTR_BUFFER, error, DRMAA_ERROR_STRING_BUFFER);
 
         fprintf(stderr, "name: %-25s \t %s\n", name, value);
       }
@@ -146,8 +140,8 @@ create_job_template(const char *expname, const char *jobfilename,
 
 #if defined(HAVE_LIBDRMAA)
 static int
-drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
-             const char *tmppath, const char *ftppath)
+drmaa_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath,
+             const char *ftppath)
 {
   char status[DRMAA_ERROR_STRING_BUFFER];
   char jobid[DRMAA_JOBNAME_BUFFER], jobout[DRMAA_JOBNAME_BUFFER];
@@ -179,8 +173,7 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
       return 1;
     }
 
-  while ((drmaa_errno = drmaa_run_job(jobid, sizeof(jobid) - 1, job, status,
-                                      sizeof(status) - 1))
+  while ((drmaa_errno = drmaa_run_job(jobid, sizeof(jobid) - 1, job, status, sizeof(status) - 1))
          == DRMAA_ERRNO_DRM_COMMUNICATION_FAILURE)
     {
       fprintf(stderr, "drmaa_run_job() failed - retry: %s\n", status);
@@ -210,13 +203,11 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
         {
           sleep(1);
 
-          errnum
-              = drmaa_job_ps(jobid, &stat, status, DRMAA_ERROR_STRING_BUFFER);
+          errnum = drmaa_job_ps(jobid, &stat, status, DRMAA_ERROR_STRING_BUFFER);
 
           if (errnum != DRMAA_ERRNO_SUCCESS) break;
 
-          if (stat == DRMAA_PS_QUEUED_ACTIVE || stat == DRMAA_PS_SYSTEM_ON_HOLD
-              || stat == DRMAA_PS_USER_ON_HOLD
+          if (stat == DRMAA_PS_QUEUED_ACTIVE || stat == DRMAA_PS_SYSTEM_ON_HOLD || stat == DRMAA_PS_USER_ON_HOLD
               || stat == DRMAA_PS_USER_SYSTEM_ON_HOLD)
             {
               fprintf(stdout, "\b\b\b\b\b\b\b\b\b\bqueued   ");
@@ -233,8 +224,7 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
         {
           sleep(1);
 
-          errnum
-              = drmaa_job_ps(jobid, &stat, status, DRMAA_ERROR_STRING_BUFFER);
+          errnum = drmaa_job_ps(jobid, &stat, status, DRMAA_ERROR_STRING_BUFFER);
 
           if (errnum != DRMAA_ERRNO_SUCCESS) break;
 
@@ -254,8 +244,7 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
 
   /* wait for job */
 
-  drmaa_errno = drmaa_wait(jobid, jobout, sizeof(jobout) - 1, &stat,
-                           DRMAA_TIMEOUT_WAIT_FOREVER, &rusage, status,
+  drmaa_errno = drmaa_wait(jobid, jobout, sizeof(jobout) - 1, &stat, DRMAA_TIMEOUT_WAIT_FOREVER, &rusage, status,
                            sizeof(status) - 1);
 
   if (drmaa_errno != DRMAA_ERRNO_SUCCESS)
@@ -284,9 +273,7 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
               fprintf(stdout, "\b\b\b\b\b\b\b\b\b\bfinished  \n");
             }
 
-          if (exit_status)
-            fprintf(stdout, "%s job %s exit status %d\n", expname, jobid,
-                    exit_status);
+          if (exit_status) fprintf(stdout, "%s job %s exit status %d\n", expname, jobid, exit_status);
         }
       else
         {
@@ -295,8 +282,7 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
             {
               char termsig[DRMAA_SIGNAL_BUFFER + 1];
               drmaa_wtermsig(termsig, DRMAA_SIGNAL_BUFFER, stat, NULL, 0);
-              fprintf(stderr, "job %s finished due to signal %s\n", jobid,
-                      termsig);
+              fprintf(stderr, "job %s finished due to signal %s\n", jobid, termsig);
             }
           else
             fprintf(stderr, "job %s finished with unclear conditions\n", jobid);
@@ -309,8 +295,7 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
     {
       fprintf(stderr, "Job usage:\n");
 
-      while (drmaa_get_next_attr_value(rusage, usage, DRMAA_ERROR_STRING_BUFFER)
-             == DRMAA_ERRNO_SUCCESS)
+      while (drmaa_get_next_attr_value(rusage, usage, DRMAA_ERROR_STRING_BUFFER) == DRMAA_ERRNO_SUCCESS)
         {
           fprintf(stderr, "  %s\n", usage);
         }
@@ -349,9 +334,7 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
     status = ftpget(0, ftp_url, ftppath, errname, errname);
     if (status == 0)
       {
-        sprintf(commandline,
-                "cat %s | grep -v cannot | grep -v resize | grep -v rm\n",
-                errname);
+        sprintf(commandline, "cat %s | grep -v cannot | grep -v resize | grep -v rm\n", errname);
         status = system(commandline);
       }
 
@@ -364,8 +347,7 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname,
 #endif
 
 int
-job_submit(const char *expname, const char *jobfilename, const char *jobname,
-           const char *tmppath, const char *ftppath)
+job_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath)
 {
   int status = -1;
 #if defined(HAVE_LIBDRMAA)
@@ -422,8 +404,7 @@ my_progress_func(void *stdout_is_tty, double t, /* dltotal */
 }
 
 int
-ftpget(int flag, const char *url, const char *path, const char *target,
-       const char *source)
+ftpget(int flag, const char *url, const char *path, const char *target, const char *source)
 {
   int status = 0;
 #ifdef HAVE_LIBCURL

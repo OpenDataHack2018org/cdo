@@ -84,8 +84,7 @@ Fourier(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           gridID = vlistInqVarGrid(vlistID1, varID);
           size_t gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr
-              = (double *) Malloc(2 * gridsize * sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double *) Malloc(2 * gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
         }
@@ -98,8 +97,7 @@ Fourier(void *process)
   for (bit = nts; !(bit & 1); bit >>= 1)
     ;
 
-  memory_t *ompmem
-      = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
+  memory_t *ompmem = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
   for (int i = 0; i < Threading::ompNumThreads; i++)
     {
       ompmem[i].real = (double *) Malloc(nts * sizeof(double));
@@ -129,10 +127,8 @@ Fourier(void *process)
 
               for (tsID = 0; tsID < nts; tsID++)
                 {
-                  ompmem[ompthID].real[tsID]
-                      = vars[tsID][varID][levelID].ptr[2 * i];
-                  ompmem[ompthID].imag[tsID]
-                      = vars[tsID][varID][levelID].ptr[2 * i + 1];
+                  ompmem[ompthID].real[tsID] = vars[tsID][varID][levelID].ptr[2 * i];
+                  ompmem[ompthID].imag[tsID] = vars[tsID][varID][levelID].ptr[2 * i + 1];
                   if (DBL_IS_EQUAL(ompmem[ompthID].real[tsID], missval)
                       || DBL_IS_EQUAL(ompmem[ompthID].imag[tsID], missval))
                     lmiss = 1;
@@ -143,15 +139,13 @@ Fourier(void *process)
                   if (bit == 1) /* nts is a power of 2 */
                     fft(ompmem[ompthID].real, ompmem[ompthID].imag, nts, sign);
                   else
-                    ft_r(ompmem[ompthID].real, ompmem[ompthID].imag, nts, sign,
-                         ompmem[ompthID].work_r, ompmem[ompthID].work_i);
+                    ft_r(ompmem[ompthID].real, ompmem[ompthID].imag, nts, sign, ompmem[ompthID].work_r,
+                         ompmem[ompthID].work_i);
 
                   for (tsID = 0; tsID < nts; tsID++)
                     {
-                      vars[tsID][varID][levelID].ptr[2 * i]
-                          = ompmem[ompthID].real[tsID];
-                      vars[tsID][varID][levelID].ptr[2 * i + 1]
-                          = ompmem[ompthID].imag[tsID];
+                      vars[tsID][varID][levelID].ptr[2 * i] = ompmem[ompthID].real[tsID];
+                      vars[tsID][varID][levelID].ptr[2 * i + 1] = ompmem[ompthID].imag[tsID];
                     }
                 }
               else
@@ -193,8 +187,7 @@ Fourier(void *process)
                 {
                   nmiss = vars[tsID][varID][levelID].nmiss;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr,
-                                     nmiss);
+                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
                   Free(vars[tsID][varID][levelID].ptr);
                   vars[tsID][varID][levelID].ptr = NULL;
                 }

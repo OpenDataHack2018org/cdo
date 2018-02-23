@@ -55,7 +55,7 @@ StdErr(T &&... args)
   expand(message, args...);
   std::cout << message.str();
 }
-}
+}  // namespace CdoLog
 
 namespace CdoDebug
 {
@@ -116,7 +116,7 @@ Warning_(T &&... args)
   CdoLog::expand(message, args...);
   printMessage(message, true);
 }
-}
+}  // namespace CdoDebug
 
 namespace CdoError
 {
@@ -154,8 +154,7 @@ Error_(const char *p_file, const int p_line, const char *caller, T &&... args)
 
 template <typename... T>
 void
-SysError_(const char *p_file, const int p_line, const char *p_func,
-          T &&... args)
+SysError_(const char *p_file, const int p_line, const char *p_func, T &&... args)
 {
   int saved_errno = errno;
   std::stringstream message;
@@ -170,10 +169,9 @@ SysError_(const char *p_file, const int p_line, const char *p_func,
     }
   exit(EXIT_FAILURE);
 }
-}
+}  // namespace CdoError
 #if defined WITH_CALLER_NAME
-#define SYS_ERROR(...) \
-  CdoError::SysError_(__FILE__, __LINE__, __func__, __VA_ARGS__)
+#define SYS_ERROR(...) CdoError::SysError_(__FILE__, __LINE__, __func__, __VA_ARGS__)
 #define ERROR_C(...) CdoError::Error_(__FILE__, __LINE__, caller, __VA_ARGS__)
 #define ERROR(...) CdoError::Error_(__FILE__, __LINE__, __func__, __VA_ARGS__)
 #define WARNING(...) CdoError::Warning_(__func__, __VA_ARGS__)

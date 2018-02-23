@@ -31,8 +31,7 @@
 #include "datetime.h"
 
 static void
-printMap(int nlon, int nlat, double *array, double missval, double min,
-         double max)
+printMap(int nlon, int nlat, double *array, double missval, double min, double max)
 {
   /* source code from PINGO */
   int ilon, ilat, i;
@@ -86,8 +85,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
 
   if (nlon >= 1000)
     {
-      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5,
-             "     ");
+      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
       for (ilon = 0; ilon < nlon; ilon++)
         printf("%d", ((ilon + 1) / 1000) % 10);
       putchar('\n');
@@ -96,8 +94,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
 
   if (nlon >= 100)
     {
-      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5,
-             "     ");
+      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
       for (ilon = 0; ilon < nlon; ilon++)
         printf("%d", ((ilon + 1) / 100) % 10);
       putchar('\n');
@@ -106,8 +103,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
 
   if (nlon >= 10)
     {
-      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5,
-             "     ");
+      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
       for (ilon = 0; ilon < nlon; ilon++)
         printf("%d", ((ilon + 1) / 10) % 10);
       putchar('\n');
@@ -125,8 +121,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
 
   for (ilat = 0; ilat < nlat; ilat++)
     {
-      printf("%0*d ", nlat < 10 ? 1 : nlat < 100 ? 2 : nlat < 1000 ? 3 : 4,
-             ilat + 1);
+      printf("%0*d ", nlat < 10 ? 1 : nlat < 100 ? 2 : nlat < 1000 ? 3 : 4, ilat + 1);
       for (ilon = 0; ilon < nlon; ilon++)
         {
           x = array[ilat * nlon + ilon];
@@ -226,8 +221,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
           putchar(c);
           reset_text_color(stdout);
         }
-      printf(" %0*d\n", nlat < 10 ? 1 : nlat < 100 ? 2 : nlat < 1000 ? 3 : 4,
-             ilat + 1);
+      printf(" %0*d\n", nlat < 10 ? 1 : nlat < 100 ? 2 : nlat < 1000 ? 3 : 4, ilat + 1);
       fflush(stdout);
     }
   putchar('\n');
@@ -235,8 +229,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
 
   if (nlon >= 1000)
     {
-      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5,
-             "     ");
+      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
       for (ilon = 0; ilon < nlon; ilon++)
         printf("%d", ((ilon + 1) / 1000) % 10);
       putchar('\n');
@@ -245,8 +238,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
 
   if (nlon >= 100)
     {
-      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5,
-             "     ");
+      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
       for (ilon = 0; ilon < nlon; ilon++)
         printf("%d", ((ilon + 1) / 100) % 10);
       putchar('\n');
@@ -255,8 +247,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
 
   if (nlon >= 10)
     {
-      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5,
-             "     ");
+      printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
       for (ilon = 0; ilon < nlon; ilon++)
         printf("%d", ((ilon + 1) / 10) % 10);
       putchar('\n');
@@ -273,11 +264,8 @@ printMap(int nlon, int nlat, double *array, double missval, double min,
 
   for (i = 0; i < 10; i++)
     {
-      printf("%d=%c%+9.3e,%+9.3e%c%s", (int) i,
-             i == 0 || level[i - 1] >= 0 ? '[' : '[',
-             i == 0 ? min : level[i - 1], i == 9 ? max : level[i],
-             i == 9 || level[i] <= 0 ? ']' : ']',
-             i != 2 && i != 5 && i != 8 ? "  " : "");
+      printf("%d=%c%+9.3e,%+9.3e%c%s", (int) i, i == 0 || level[i - 1] >= 0 ? '[' : '[', i == 0 ? min : level[i - 1],
+             i == 9 ? max : level[i], i == 9 || level[i] <= 0 ? ']' : ']', i != 2 && i != 5 && i != 8 ? "  " : "");
 
       if (i == 2 || i == 5 || i == 8)
         {
@@ -361,8 +349,7 @@ Info(void *process)
       int nvars = vlistNvars(vlistID);
       if (nvars == 0) continue;
 
-      infostat_type *infostat
-          = (infostat_type *) Malloc(nvars * sizeof(infostat_type));
+      infostat_type *infostat = (infostat_type *) Malloc(nvars * sizeof(infostat_type));
 
       size_t gridsizemax = vlistGridsizeMax(vlistID);
       if (vlistNumber(vlistID) != CDI_REAL) gridsizemax *= 2;
@@ -391,8 +378,7 @@ Info(void *process)
                   fprintf(stdout,
                           "%6d :       Date     Time   %s Gridsize    Miss :"
                           "     Minimum        Mean     Maximum : ",
-                          -(indf + 1),
-                          operatorID == XINFON ? "Nlevs" : "Level");
+                          -(indf + 1), operatorID == XINFON ? "Nlevs" : "Level");
 
                   if (operfunc == E_NAME)
                     fprintf(stdout, "Parameter name");
@@ -435,8 +421,7 @@ Info(void *process)
                 {
                   cdiParamToString(param, paramstr, sizeof(paramstr));
 
-                  if (operfunc == E_NAME)
-                    vlistInqVarName(vlistID, varID, varname);
+                  if (operfunc == E_NAME) vlistInqVarName(vlistID, varID, varname);
 
                   set_text_color(stdout, BRIGHT, BLACK);
                   fprintf(stdout, "%6d ", indg);
@@ -470,9 +455,8 @@ Info(void *process)
 
                   if (infostatp->nmiss > 0)
                     {
-                      size_t nvals = arrayMinMaxSumMV(
-                          gridsize, array, missval, &infostatp->min,
-                          &infostatp->max, &infostatp->sum);
+                      size_t nvals = arrayMinMaxSumMV(gridsize, array, missval, &infostatp->min, &infostatp->max,
+                                                      &infostatp->sum);
                       imiss = gridsize - nvals;
                       infostatp->nvals += nvals;
                     }
@@ -486,8 +470,7 @@ Info(void *process)
                     }
                   else
                     {
-                      arrayMinMaxSum(gridsize, array, &infostatp->min,
-                                     &infostatp->max, &infostatp->sum);
+                      arrayMinMaxSum(gridsize, array, &infostatp->min, &infostatp->max, &infostatp->sum);
                       infostatp->nvals += gridsize;
                     }
 
@@ -497,21 +480,17 @@ Info(void *process)
                         {
                           if (infostatp->nvals == 1)
                             {
-                              fprintf(stdout, "            %#12.5g            ",
-                                      infostatp->sum);
+                              fprintf(stdout, "            %#12.5g            ", infostatp->sum);
                             }
                           else
                             {
-                              double mean
-                                  = infostatp->sum / (double) infostatp->nvals;
-                              fprintf(stdout, "%#12.5g%#12.5g%#12.5g",
-                                      infostatp->min, mean, infostatp->max);
+                              double mean = infostatp->sum / (double) infostatp->nvals;
+                              fprintf(stdout, "%#12.5g%#12.5g%#12.5g", infostatp->min, mean, infostatp->max);
                             }
                         }
                       else
                         {
-                          fprintf(stdout,
-                                  "                     nan            ");
+                          fprintf(stdout, "                     nan            ");
                         }
                     }
                 }
@@ -520,8 +499,7 @@ Info(void *process)
                   size_t nvals = 0;
                   for (size_t i = 0; i < gridsize; i++)
                     {
-                      if (!DBL_IS_EQUAL(array[i * 2], missval)
-                          && !DBL_IS_EQUAL(array[i * 2 + 1], missval))
+                      if (!DBL_IS_EQUAL(array[i * 2], missval) && !DBL_IS_EQUAL(array[i * 2 + 1], missval))
                         {
                           infostatp->sum += array[i * 2];
                           infostatp->sumi += array[i * 2 + 1];
@@ -536,12 +514,9 @@ Info(void *process)
                   if (loutput)
                     {
                       double arrmean_r = 0, arrmean_i = 0;
-                      if (infostatp->nvals > 0)
-                        arrmean_r = infostatp->sum / infostatp->nvals;
-                      if (infostatp->nvals > 0)
-                        arrmean_i = infostatp->sumi / infostatp->nvals;
-                      fprintf(stdout, "   -  (%#12.5g,%#12.5g)  -", arrmean_r,
-                              arrmean_i);
+                      if (infostatp->nvals > 0) arrmean_r = infostatp->sum / infostatp->nvals;
+                      if (infostatp->nvals > 0) arrmean_i = infostatp->sumi / infostatp->nvals;
+                      fprintf(stdout, "   -  (%#12.5g,%#12.5g)  -", arrmean_r, arrmean_i);
                     }
                 }
 
@@ -572,26 +547,20 @@ Info(void *process)
                   fprintf(stdout, "\n");
                 }
 
-              if (imiss != nmiss && nmiss > 0)
-                cdoPrint("Found %zu of %zu missing values!", imiss, nmiss);
+              if (imiss != nmiss && nmiss > 0) cdoPrint("Found %zu of %zu missing values!", imiss, nmiss);
 
-              if (fpeRaised > 0)
-                cdoWarning("floating-point exception reported: %s!",
-                           fpe_errstr(fpeRaised));
+              if (fpeRaised > 0) cdoWarning("floating-point exception reported: %s!", fpe_errstr(fpeRaised));
 
               if (operatorID == MAP)
                 {
                   size_t nlon = gridInqXsize(gridID);
                   size_t nlat = gridInqYsize(gridID);
 
-                  if (gridInqType(gridID) == GRID_GAUSSIAN
-                      || gridInqType(gridID) == GRID_LONLAT
+                  if (gridInqType(gridID) == GRID_GAUSSIAN || gridInqType(gridID) == GRID_LONLAT
                       || gridInqType(gridID) == GRID_CURVILINEAR
-                      || (gridInqType(gridID) == GRID_GENERIC
-                          && nlon * nlat == gridInqSize(gridID) && nlon < 1024))
+                      || (gridInqType(gridID) == GRID_GENERIC && nlon * nlat == gridInqSize(gridID) && nlon < 1024))
                     {
-                      printMap(nlon, nlat, array, missval, infostatp->min,
-                               infostatp->max);
+                      printMap(nlon, nlat, array, missval, infostatp->min, infostatp->max);
                     }
                 }
             }

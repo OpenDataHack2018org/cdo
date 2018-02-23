@@ -17,8 +17,7 @@
 #include "merge_sort2.h"
 
 static void
-merge_lists(int *nl, const double *restrict l1, const double *restrict l2,
-            long *idx)
+merge_lists(int *nl, const double *restrict l1, const double *restrict l2, long *idx)
 {
   /*
     This routine writes to idx a list of indices relative to *l11 and *l12
@@ -124,16 +123,14 @@ sort_par(long num_links, double *restrict add1, int parent, int par_depth)
     {
       omp_set_nested(1);
       if (omp_get_nested() == 0)
-        cdoWarning(
-            "openMP implementation seems to not support nested parallelism.\n"
-            "\tMaximum of CPUs used is 2 instead of %i.\n",
-            omp_get_num_threads());
+        cdoWarning("openMP implementation seems to not support nested parallelism.\n"
+                   "\tMaximum of CPUs used is 2 instead of %i.\n",
+                   omp_get_num_threads());
     }
 #endif
 
 #ifdef _OPENMP
-#pragma omp parallel for if (depth < par_depth) private(i, who_am_i) \
-    num_threads(2)
+#pragma omp parallel for if (depth < par_depth) private(i, who_am_i) num_threads(2)
 #endif
   for (i = 0; i < nsplit; i++)
     {
@@ -170,9 +167,8 @@ sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   tmp = (double *) Malloc(num_links * sizeof(double));
 
 #ifdef _OPENMP
-#pragma omp parallel for if (depth                                            \
-                             < par_depth /* && num_links > 4096*/) private(i) \
-    num_threads(2) schedule(static, 1024)
+#pragma omp parallel for if (depth < par_depth /* && num_links > 4096*/) private(i) num_threads(2) \
+    schedule(static, 1024)
 #endif
   for (i = 0; i < num_links; i++)
     tmp[i] = add1[idx[i]];

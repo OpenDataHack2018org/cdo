@@ -51,10 +51,8 @@ typedef struct
 double intlin(double x, double y1, double x1, double y2, double x2);
 
 double
-smooth_knn_compute_weights(size_t numNeighbors,
-                           const bool *restrict src_grid_mask,
-                           struct gsknn *knn, double search_radius,
-                           double weight0, double weightR)
+smooth_knn_compute_weights(size_t numNeighbors, const bool *restrict src_grid_mask, struct gsknn *knn,
+                           double search_radius, double weight0, double weightR)
 {
   bool *restrict nbr_mask = knn->mask;
   const size_t *restrict nbr_add = knn->add;
@@ -79,8 +77,7 @@ smooth_knn_compute_weights(size_t numNeighbors,
 }
 
 size_t
-smooth_knn_normalize_weights(size_t numNeighbors, double dist_tot,
-                             struct gsknn *knn)
+smooth_knn_normalize_weights(size_t numNeighbors, double dist_tot, struct gsknn *knn)
 {
   const bool *restrict nbr_mask = knn->mask;
   size_t *restrict nbr_add = knn->add;
@@ -103,8 +100,8 @@ smooth_knn_normalize_weights(size_t numNeighbors, double dist_tot,
 }
 
 static void
-smooth(int gridID, double missval, const double *restrict array1,
-       double *restrict array2, size_t *nmiss, smoothpoint_t spoint)
+smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss,
+       smoothpoint_t spoint)
 {
   int gridID0 = gridID;
   size_t gridsize = gridInqSize(gridID);
@@ -115,27 +112,25 @@ smooth(int gridID, double missval, const double *restrict array1,
   for (size_t i = 0; i < gridsize; ++i)
     mask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
-  double *xvals = (double *) Malloc(gridsize * sizeof(double));
-  double *yvals = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> xvals(gridsize);
+  std::vector<double> yvals(gridsize);
 
   if (gridInqType(gridID) == GRID_GME) gridID = gridToUnstructured(gridID, 0);
 
-  if (gridInqType(gridID) != GRID_UNSTRUCTURED
-      && gridInqType(gridID) != GRID_CURVILINEAR)
+  if (gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR)
     gridID = gridToCurvilinear(gridID, 0);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  gridInqXvals(gridID, &xvals[0]);
+  gridInqYvals(gridID, &yvals[0]);
 
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID, units);
-  grid_to_radian(units, gridsize, xvals, "grid center lon");
+  grid_to_radian(units, gridsize, &xvals[0], "grid center lon");
   gridInqYunits(gridID, units);
-  grid_to_radian(units, gridsize, yvals, "grid center lat");
+  grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
-  struct gsknn **knn = (struct gsknn **) Malloc(Threading::ompNumThreads
-                                                * sizeof(struct gsknn *));
+  struct gsknn **knn = (struct gsknn **) Malloc(Threading::ompNumThreads * sizeof(struct gsknn *));
   for (int i = 0; i < Threading::ompNumThreads; i++)
     knn[i] = gridsearch_knn_new(numNeighbors);
 
@@ -145,16 +140,13 @@ smooth(int gridID, double missval, const double *restrict array1,
 
   bool xIsCyclic = false;
   size_t dims[2] = { gridsize, 0 };
-  struct gridsearch *gs
-      = gridsearch_create(xIsCyclic, dims, gridsize, xvals, yvals);
+  struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, gridsize, &xvals[0], &yvals[0]);
 
   gs->search_radius = spoint.radius;
 
   finish = clock();
 
-  if (cdoVerbose)
-    printf("gridsearch created: %.2f seconds\n",
-           ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (cdoVerbose) progressInit();
 
@@ -172,16 +164,14 @@ smooth(int gridID, double missval, const double *restrict array1,
       int ompthID = cdo_omp_get_thread_num();
 
       findex++;
-      if (cdoVerbose && cdo_omp_get_thread_num() == 0)
-        progressStatus(0, 1, findex / gridsize);
+      if (cdoVerbose && cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / gridsize);
 
       size_t nadds = gridsearch_knn(gs, knn[ompthID], xvals[i], yvals[i]);
 
       // Compute weights based on inverse distance if mask is false, eliminate
       // those points
       double dist_tot
-          = smooth_knn_compute_weights(nadds, mask, knn[ompthID], spoint.radius,
-                                       spoint.weight0, spoint.weightR);
+          = smooth_knn_compute_weights(nadds, mask, knn[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
 
       // Normalize weights and store the link
       nadds = smooth_knn_normalize_weights(nadds, dist_tot, knn[ompthID]);
@@ -210,9 +200,7 @@ smooth(int gridID, double missval, const double *restrict array1,
 
   finish = clock();
 
-  if (cdoVerbose)
-    printf("gridsearch nearest: %.2f seconds\n",
-           ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (gs) gridsearch_delete(gs);
 
@@ -222,13 +210,10 @@ smooth(int gridID, double missval, const double *restrict array1,
   if (gridID0 != gridID) gridDestroy(gridID);
 
   Free(mask);
-  Free(xvals);
-  Free(yvals);
 }
 
 static inline void
-smooth9_sum(size_t ij, bool *mask, double sfac, const double *restrict array,
-            double *avg, double *divavg)
+smooth9_sum(size_t ij, bool *mask, double sfac, const double *restrict array, double *avg, double *divavg)
 {
   if (mask[ij])
     {
@@ -238,8 +223,7 @@ smooth9_sum(size_t ij, bool *mask, double sfac, const double *restrict array,
 }
 
 static void
-smooth9(int gridID, double missval, const double *restrict array1,
-        double *restrict array2, size_t *nmiss)
+smooth9(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss)
 {
   size_t gridsize = gridInqSize(gridID);
   size_t nlon = gridInqXsize(gridID);
@@ -268,61 +252,45 @@ smooth9(int gridID, double missval, const double *restrict array1,
                   divavg += 1;
                   /* upper left corner */
                   if ((i != 0) && (j != 0))
-                    smooth9_sum(((i - 1) * nlon) + j - 1, mask, 0.3, array1,
-                                &avg, &divavg);
+                    smooth9_sum(((i - 1) * nlon) + j - 1, mask, 0.3, array1, &avg, &divavg);
                   else if (i != 0 && grid_is_cyclic)
-                    smooth9_sum((i - 1) * nlon + j - 1 + nlon, mask, 0.3,
-                                array1, &avg, &divavg);
+                    smooth9_sum((i - 1) * nlon + j - 1 + nlon, mask, 0.3, array1, &avg, &divavg);
 
                   /* upper cell */
-                  if (i != 0)
-                    smooth9_sum(((i - 1) * nlon) + j, mask, 0.5, array1, &avg,
-                                &divavg);
+                  if (i != 0) smooth9_sum(((i - 1) * nlon) + j, mask, 0.5, array1, &avg, &divavg);
 
                   /* upper right corner */
                   if ((i != 0) && (j != (nlon - 1)))
-                    smooth9_sum(((i - 1) * nlon) + j + 1, mask, 0.3, array1,
-                                &avg, &divavg);
+                    smooth9_sum(((i - 1) * nlon) + j + 1, mask, 0.3, array1, &avg, &divavg);
                   else if ((i != 0) && grid_is_cyclic)
-                    smooth9_sum((i - 1) * nlon + j + 1 - nlon, mask, 0.3,
-                                array1, &avg, &divavg);
+                    smooth9_sum((i - 1) * nlon + j + 1 - nlon, mask, 0.3, array1, &avg, &divavg);
 
                   /* left cell */
                   if (j != 0)
-                    smooth9_sum(((i) *nlon) + j - 1, mask, 0.5, array1, &avg,
-                                &divavg);
+                    smooth9_sum(((i) *nlon) + j - 1, mask, 0.5, array1, &avg, &divavg);
                   else if (grid_is_cyclic)
-                    smooth9_sum(i * nlon - 1 + nlon, mask, 0.5, array1, &avg,
-                                &divavg);
+                    smooth9_sum(i * nlon - 1 + nlon, mask, 0.5, array1, &avg, &divavg);
 
                   /* right cell */
                   if (j != (nlon - 1))
-                    smooth9_sum((i * nlon) + j + 1, mask, 0.5, array1, &avg,
-                                &divavg);
+                    smooth9_sum((i * nlon) + j + 1, mask, 0.5, array1, &avg, &divavg);
                   else if (grid_is_cyclic)
-                    smooth9_sum(i * nlon + j + 1 - nlon, mask, 0.5, array1,
-                                &avg, &divavg);
+                    smooth9_sum(i * nlon + j + 1 - nlon, mask, 0.5, array1, &avg, &divavg);
 
                   /* lower left corner */
                   if (mask[ij] && ((i != (nlat - 1)) && (j != 0)))
-                    smooth9_sum(((i + 1) * nlon + j - 1), mask, 0.3, array1,
-                                &avg, &divavg);
+                    smooth9_sum(((i + 1) * nlon + j - 1), mask, 0.3, array1, &avg, &divavg);
                   else if ((i != (nlat - 1)) && grid_is_cyclic)
-                    smooth9_sum((i + 1) * nlon - 1 + nlon, mask, 0.3, array1,
-                                &avg, &divavg);
+                    smooth9_sum((i + 1) * nlon - 1 + nlon, mask, 0.3, array1, &avg, &divavg);
 
                   /* lower cell */
-                  if (i != (nlat - 1))
-                    smooth9_sum(((i + 1) * nlon) + j, mask, 0.5, array1, &avg,
-                                &divavg);
+                  if (i != (nlat - 1)) smooth9_sum(((i + 1) * nlon) + j, mask, 0.5, array1, &avg, &divavg);
 
                   /* lower right corner */
                   if ((i != (nlat - 1)) && (j != (nlon - 1)))
-                    smooth9_sum(((i + 1) * nlon) + j + 1, mask, 0.3, array1,
-                                &avg, &divavg);
+                    smooth9_sum(((i + 1) * nlon) + j + 1, mask, 0.3, array1, &avg, &divavg);
                   else if ((i != (nlat - 1)) && grid_is_cyclic)
-                    smooth9_sum(((i + 1) * nlon) + j + 1 - nlon, mask, 0.3,
-                                array1, &avg, &divavg);
+                    smooth9_sum(((i + 1) * nlon) + j + 1 - nlon, mask, 0.3, array1, &avg, &divavg);
                 }
             }
           else if (mask[j + nlon * i])
@@ -330,21 +298,14 @@ smooth9(int gridID, double missval, const double *restrict array1,
               avg += array1[j + nlon * i];
               divavg += 1;
 
-              smooth9_sum(((i - 1) * nlon) + j - 1, mask, 0.3, array1, &avg,
-                          &divavg);
-              smooth9_sum(((i - 1) * nlon) + j, mask, 0.5, array1, &avg,
-                          &divavg);
-              smooth9_sum(((i - 1) * nlon) + j + 1, mask, 0.3, array1, &avg,
-                          &divavg);
-              smooth9_sum(((i) *nlon) + j - 1, mask, 0.5, array1, &avg,
-                          &divavg);
+              smooth9_sum(((i - 1) * nlon) + j - 1, mask, 0.3, array1, &avg, &divavg);
+              smooth9_sum(((i - 1) * nlon) + j, mask, 0.5, array1, &avg, &divavg);
+              smooth9_sum(((i - 1) * nlon) + j + 1, mask, 0.3, array1, &avg, &divavg);
+              smooth9_sum(((i) *nlon) + j - 1, mask, 0.5, array1, &avg, &divavg);
               smooth9_sum((i * nlon) + j + 1, mask, 0.5, array1, &avg, &divavg);
-              smooth9_sum(((i + 1) * nlon + j - 1), mask, 0.3, array1, &avg,
-                          &divavg);
-              smooth9_sum(((i + 1) * nlon) + j, mask, 0.5, array1, &avg,
-                          &divavg);
-              smooth9_sum(((i + 1) * nlon) + j + 1, mask, 0.3, array1, &avg,
-                          &divavg);
+              smooth9_sum(((i + 1) * nlon + j - 1), mask, 0.3, array1, &avg, &divavg);
+              smooth9_sum(((i + 1) * nlon) + j, mask, 0.5, array1, &avg, &divavg);
+              smooth9_sum(((i + 1) * nlon) + j + 1, mask, 0.3, array1, &avg, &divavg);
             }
 
           if (fabs(divavg) > 0)
@@ -379,9 +340,8 @@ radius_str_to_deg(const char *string)
       else if (strncmp(endptr, "rad", 3) == 0)
         radius *= RAD2DEG;
       else
-        cdoAbort(
-            "Float parameter >%s< contains invalid character at position %d!",
-            string, (int) (endptr - string + 1));
+        cdoAbort("Float parameter >%s< contains invalid character at position %d!", string,
+                 (int) (endptr - string + 1));
     }
 
   if (radius > 180.) radius = 180.;
@@ -411,18 +371,15 @@ smoothGetParameter(int *xnsmooth, smoothpoint_t *spoint)
       char **pargv = operatorArgv();
 
       list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "SMOOTH");
-      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0)
-        cdoAbort("Parse error!");
+      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0) cdoAbort("Parse error!");
       if (cdoVerbose) kvlist_print(kvlist);
 
       for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
         {
           keyValues_t *kv = *(keyValues_t **) kvnode->data;
           const char *key = kv->key;
-          if (kv->nvalues > 1)
-            cdoAbort("Too many values for parameter key >%s<!", key);
-          if (kv->nvalues < 1)
-            cdoAbort("Missing value for parameter key >%s<!", key);
+          if (kv->nvalues > 1) cdoAbort("Too many values for parameter key >%s<!", key);
+          if (kv->nvalues < 1) cdoAbort("Missing value for parameter key >%s<!", key);
           const char *value = kv->values[0];
 
           if (STR_IS_EQ(key, "nsmooth"))
@@ -468,8 +425,7 @@ Smooth(void *process)
 
   if (operatorID == SMOOTH) smoothGetParameter(&xnsmooth, &spoint);
 
-  if (spoint.radius < 0 || spoint.radius > 180)
-    cdoAbort("%s=%g out of bounds (0-180 deg)!", "radius", spoint.radius);
+  if (spoint.radius < 0 || spoint.radius > 180) cdoAbort("%s=%g out of bounds (0-180 deg)!", "radius", spoint.radius);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -487,8 +443,7 @@ Smooth(void *process)
     {
       int gridID = vlistInqVarGrid(vlistID1, varID);
       int gridtype = gridInqType(gridID);
-      if (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT
-          || gridtype == GRID_CURVILINEAR)
+      if (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR)
         {
           varIDs[varID] = 1;
         }
@@ -508,10 +463,8 @@ Smooth(void *process)
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if (gridsizemax < spoint.maxpoints) spoint.maxpoints = gridsizemax;
   if (cdoVerbose)
-    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, "
-             "weight0 = %g, weightR = %g",
-             xnsmooth, spoint.maxpoints, spoint.radius, Form[spoint.form],
-             spoint.weight0, spoint.weightR);
+    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
+             xnsmooth, spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
 
   spoint.radius *= DEG2RAD;
 

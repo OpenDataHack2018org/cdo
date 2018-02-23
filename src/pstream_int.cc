@@ -25,8 +25,7 @@ void
 pstreamClose(int pstreamID)
 {
   PstreamType *pstreamptr = pstreamToPointer(pstreamID);
-  if (pstreamptr == NULL)
-    ERROR("Internal problem, stream ", pstreamID, " not open!");
+  if (pstreamptr == NULL) ERROR("Internal problem, stream ", pstreamID, " not open!");
 
   Cdo_Debug(CdoDebug::PSTREAM, "Adding ", pstreamptr->getNvals(),
             " to pstream ", pstreamptr->self, " ", pstreamptr->m_name);
@@ -59,8 +58,7 @@ pstreamInqTimestep(PstreamType *p_pstreamptr, int tsID)
     {
       if (CdoDebug::PSTREAM)
         {
-          MESSAGE(p_pstreamptr->pipe->name.c_str(), " pstreamID ",
-                  p_pstreamptr->self);
+          MESSAGE(p_pstreamptr->pipe->name.c_str(), " pstreamID ", p_pstreamptr->self);
         }
       nrecs = p_pstreamptr->pipe->pipeInqTimestep(tsID);
     }
@@ -137,9 +135,7 @@ pstreamReadRecordF(int pstreamID, float *data, size_t *nmiss)
 void
 pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 {
-  if (CdoDebug::PSTREAM)
-    MESSAGE("pstreamIDdest = ", pstreamIDdest,
-            "  pstreamIDsrc = ", pstreamIDsrc);
+  if (CdoDebug::PSTREAM) MESSAGE("pstreamIDdest = ", pstreamIDdest, "  pstreamIDsrc = ", pstreamIDsrc);
 
   PstreamType *pstreamptr_dest = pstreamToPointer(pstreamIDdest);
 

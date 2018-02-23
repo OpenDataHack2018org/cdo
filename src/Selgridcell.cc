@@ -37,8 +37,7 @@ genindexgrid(int gridID1, size_t gridsize2, long *cellidx)
   int gridID0 = gridID1;
   int gridtype1 = gridInqType(gridID1);
 
-  if (gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN
-      || gridtype1 == GRID_PROJECTION)
+  if (gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN || gridtype1 == GRID_PROJECTION)
     {
       gridID1 = gridToCurvilinear(gridID1, 0);
       gridtype1 = GRID_CURVILINEAR;
@@ -78,8 +77,7 @@ Selgridcell(void *process)
   cdoInitialize(process);
 
   cdoOperatorAdd("selgridcell", 0, 0, "grid cell indices (1-N)");
-  int DELGRIDCELL
-      = cdoOperatorAdd("delgridcell", 0, 0, "grid cell indices (1-N)");
+  int DELGRIDCELL = cdoOperatorAdd("delgridcell", 0, 0, "grid cell indices (1-N)");
 
   operatorInputArg(cdoOperatorEnter(0));
 
@@ -180,9 +178,7 @@ Selgridcell(void *process)
       if (gridsize == 1) continue;
       if (indmax >= (int) gridsize)
         {
-          cdoWarning(
-              "Max grid index is greater than grid size, skipped grid %d!",
-              index + 1);
+          cdoWarning("Max grid index is greater than grid size, skipped grid %d!", index + 1);
           continue;
         }
 
@@ -190,8 +186,7 @@ Selgridcell(void *process)
 
       if (gridID2 == -1)
         {
-          cdoWarning("Unsupported grid type >%s<, skipped grid %d!",
-                     gridNamePtr(gridtype), index + 1);
+          cdoWarning("Unsupported grid type >%s<, skipped grid %d!", gridNamePtr(gridtype), index + 1);
           continue;
         }
 
@@ -242,8 +237,7 @@ Selgridcell(void *process)
               for (index = 0; index < ngrids; index++)
                 if (gridID1 == sindex[index].gridID1) break;
 
-              if (index == ngrids)
-                cdoAbort("Internal problem, grid not found!");
+              if (index == ngrids) cdoAbort("Internal problem, grid not found!");
 
               gridsize2 = gridInqSize(sindex[index].gridID2);
 

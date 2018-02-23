@@ -69,8 +69,7 @@ Timstat3(void *process)
     {
       if (rconst <= 0) cdoAbort("Constant must be positive!");
 
-      if (risk <= 0 || risk >= 1)
-        cdoAbort("Risk must be greater than 0 and lower than 1!");
+      if (risk <= 0 || risk >= 1) cdoAbort("Risk must be greater than 0 and lower than 1!");
     }
 
   for (is = 0; is < NIN; ++is)
@@ -142,8 +141,7 @@ Timstat3(void *process)
               fwork[iw][varID][levelID].grid = gridID;
               fwork[iw][varID][levelID].nmiss = 0;
               fwork[iw][varID][levelID].missval = missval;
-              fwork[iw][varID][levelID].ptr
-                  = (double *) Calloc(gridsize, sizeof(double));
+              fwork[iw][varID][levelID].ptr = (double *) Calloc(gridsize, sizeof(double));
             }
 
           for (int iw = 0; iw < NIWORK; ++iw)
@@ -195,8 +193,7 @@ Timstat3(void *process)
                   */
                   {
                     fwork[NIN * is + 0][varID][levelID].ptr[i] += in[is].ptr[i];
-                    fwork[NIN * is + 1][varID][levelID].ptr[i]
-                        += in[is].ptr[i] * in[is].ptr[i];
+                    fwork[NIN * is + 1][varID][levelID].ptr[i] += in[is].ptr[i] * in[is].ptr[i];
                     iwork[is][varID][levelID][i]++;
                   }
                 }
@@ -230,12 +227,8 @@ Timstat3(void *process)
               double fnvals0 = iwork[0][varID][levelID][i];
               double fnvals1 = iwork[1][varID][levelID][i];
 
-              double temp0 = DIVMN(MULMN(fwork[0][varID][levelID].ptr[i],
-                                         fwork[0][varID][levelID].ptr[i]),
-                                   fnvals0);
-              double temp1 = DIVMN(MULMN(fwork[2][varID][levelID].ptr[i],
-                                         fwork[2][varID][levelID].ptr[i]),
-                                   fnvals1);
+              double temp0 = DIVMN(MULMN(fwork[0][varID][levelID].ptr[i], fwork[0][varID][levelID].ptr[i]), fnvals0);
+              double temp1 = DIVMN(MULMN(fwork[2][varID][levelID].ptr[i], fwork[2][varID][levelID].ptr[i]), fnvals1);
               double temp2 = SUBMN(fwork[1][varID][levelID].ptr[i], temp0);
               double temp3 = SUBMN(fwork[3][varID][levelID].ptr[i], temp1);
               statistic = DIVMN(temp2, ADDMN(temp2, MULMN(rconst, temp3)));
@@ -243,14 +236,10 @@ Timstat3(void *process)
               if (fnvals0 <= 1 || fnvals1 <= 1)
                 fractil_1 = fractil_2 = missval1;
               else
-                beta_distr_constants((fnvals0 - 1) / 2, (fnvals1 - 1) / 2,
-                                     1 - risk, &fractil_1, &fractil_2,
-                                     __func__);
-              out[0].ptr[i]
-                  = DBL_IS_EQUAL(statistic, missval1)
-                        ? missval1
-                        : statistic <= fractil_1 || statistic >= fractil_2 ? 1
-                                                                           : 0;
+                beta_distr_constants((fnvals0 - 1) / 2, (fnvals1 - 1) / 2, 1 - risk, &fractil_1, &fractil_2, __func__);
+              out[0].ptr[i] = DBL_IS_EQUAL(statistic, missval1)
+                                  ? missval1
+                                  : statistic <= fractil_1 || statistic >= fractil_2 ? 1 : 0;
             }
         }
       else if (operatorID == MEANDIFF2TEST)
@@ -269,55 +258,38 @@ Timstat3(void *process)
               for (int j = 0; j < n_in; j++)
                 {
                   double fnvals = iwork[j][varID][levelID][i];
-                  double tmp = DIVMN(MULMN(fwork[2 * j][varID][levelID].ptr[i],
-                                           fwork[2 * j][varID][levelID].ptr[i]),
-                                     fnvals);
-                  temp0 = ADDMN(
-                      temp0,
-                      DIVMN(SUBMN(fwork[2 * j + 1][varID][levelID].ptr[i], tmp),
-                            var_factor[j]));
+                  double tmp
+                      = DIVMN(MULMN(fwork[2 * j][varID][levelID].ptr[i], fwork[2 * j][varID][levelID].ptr[i]), fnvals);
+                  temp0 = ADDMN(temp0, DIVMN(SUBMN(fwork[2 * j + 1][varID][levelID].ptr[i], tmp), var_factor[j]));
                   deg_of_freedom = ADDMN(deg_of_freedom, fnvals);
                 }
 
-              if (!DBL_IS_EQUAL(temp0, missval1)
-                  && temp0 < 0) /* This is possible because */
-                temp0 = 0;      /* of rounding errors       */
+              if (!DBL_IS_EQUAL(temp0, missval1) && temp0 < 0) /* This is possible because */
+                temp0 = 0;                                     /* of rounding errors       */
 
               double stddev_estimator = SQRTMN(DIVMN(temp0, deg_of_freedom));
               double mean_estimator = -rconst;
               for (int j = 0; j < n_in; j++)
                 {
                   double fnvals = iwork[j][varID][levelID][i];
-                  mean_estimator
-                      = ADDMN(mean_estimator,
-                              MULMN(mean_factor[j],
-                                    DIVMN(fwork[2 * j][varID][levelID].ptr[i],
-                                          fnvals)));
+                  mean_estimator = ADDMN(mean_estimator,
+                                         MULMN(mean_factor[j], DIVMN(fwork[2 * j][varID][levelID].ptr[i], fnvals)));
                 }
 
               double temp1 = 0;
               for (int j = 0; j < n_in; j++)
                 {
                   double fnvals = iwork[j][varID][levelID][i];
-                  temp1 = ADDMN(
-                      temp1, DIVMN(MULMN(MULMN(mean_factor[j], mean_factor[j]),
-                                         var_factor[j]),
-                                   fnvals));
+                  temp1 = ADDMN(temp1, DIVMN(MULMN(MULMN(mean_factor[j], mean_factor[j]), var_factor[j]), fnvals));
                 }
 
               double norm = SQRTMN(temp1);
 
-              double temp2
-                  = DIVMN(DIVMN(mean_estimator, norm), stddev_estimator);
-              fractil
-                  = deg_of_freedom < 1
-                        ? missval1
-                        : student_t_inv(deg_of_freedom, 1 - risk / 2, __func__);
+              double temp2 = DIVMN(DIVMN(mean_estimator, norm), stddev_estimator);
+              fractil = deg_of_freedom < 1 ? missval1 : student_t_inv(deg_of_freedom, 1 - risk / 2, __func__);
 
-              out[0].ptr[i] = DBL_IS_EQUAL(temp2, missval1)
-                                      || DBL_IS_EQUAL(fractil, missval1)
-                                  ? missval1
-                                  : fabs(temp2) >= fractil;
+              out[0].ptr[i] = DBL_IS_EQUAL(temp2, missval1) || DBL_IS_EQUAL(fractil, missval1) ? missval1
+                                                                                               : fabs(temp2) >= fractil;
             }
         }
 

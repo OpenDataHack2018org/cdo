@@ -109,13 +109,10 @@ Runstat(void *process)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  field_type ***vars1
-      = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  field_type ***vars1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
   field_type ***vars2 = NULL, ***samp1 = NULL;
-  if (!runstat_nomiss)
-    samp1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
-  if (lvarstd || lrange)
-    vars2 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  if (!runstat_nomiss) samp1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  if (lvarstd || lrange) vars2 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
 
   for (int its = 0; its < ndates; its++)
     {
@@ -143,8 +140,7 @@ Runstat(void *process)
             {
               recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst
-                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           field_type *psamp1 = samp1 ? &samp1[tsID][varID][levelID] : NULL;
@@ -177,8 +173,7 @@ Runstat(void *process)
                 psamp1->ptr[i] = (double) imask[i];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(tsID, gridsize, imask, samp1, varID, levelID)
+#pragma omp parallel for default(none) shared(tsID, gridsize, imask, samp1, varID, levelID)
 #endif
               for (int inp = 0; inp < tsID; inp++)
                 {
@@ -192,8 +187,7 @@ Runstat(void *process)
             {
               farmoq(pvars2, *pvars1);
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(tsID, vars1, vars2, varID, levelID, pvars1)
+#pragma omp parallel for default(none) shared(tsID, vars1, vars2, varID, levelID, pvars1)
 #endif
               for (int inp = 0; inp < tsID; inp++)
                 {
@@ -204,8 +198,7 @@ Runstat(void *process)
           else if (lrange)
             {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(tsID, vars1, vars2, varID, levelID, pvars1)
+#pragma omp parallel for default(none) shared(tsID, vars1, vars2, varID, levelID, pvars1)
 #endif
               for (int inp = 0; inp < tsID; inp++)
                 {
@@ -216,8 +209,7 @@ Runstat(void *process)
           else
             {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(tsID, vars1, operfunc, varID, levelID, pvars1)
+#pragma omp parallel for default(none) shared(tsID, vars1, operfunc, varID, levelID, pvars1)
 #endif
               for (int inp = 0; inp < tsID; inp++)
                 {
@@ -310,11 +302,9 @@ Runstat(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          field_type *psamp1
-              = samp1 ? &samp1[ndates - 1][varID][levelID] : NULL;
+          field_type *psamp1 = samp1 ? &samp1[ndates - 1][varID][levelID] : NULL;
           field_type *pvars1 = &vars1[ndates - 1][varID][levelID];
-          field_type *pvars2
-              = vars2 ? &vars2[ndates - 1][varID][levelID] : NULL;
+          field_type *pvars2 = vars2 ? &vars2[ndates - 1][varID][levelID] : NULL;
 
           size_t gridsize = pvars1->size;
 
@@ -327,8 +317,7 @@ Runstat(void *process)
                 pvars2->ptr[i] = pvars1->ptr[i];
             }
 
-          if (runstat_nomiss && nmiss > 0)
-            cdoAbort("Missing values supported swichted off!");
+          if (runstat_nomiss && nmiss > 0) cdoAbort("Missing values supported swichted off!");
 
           if (!runstat_nomiss)
             {
@@ -341,8 +330,7 @@ Runstat(void *process)
                 psamp1->ptr[i] = (double) imask[i];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(ndates, imask, gridsize, samp1, varID, levelID)
+#pragma omp parallel for default(none) shared(ndates, imask, gridsize, samp1, varID, levelID)
 #endif
               for (int inp = 0; inp < ndates - 1; inp++)
                 {
@@ -356,8 +344,7 @@ Runstat(void *process)
             {
               farmoq(pvars2, *pvars1);
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(ndates, vars1, vars2, varID, levelID, pvars1)
+#pragma omp parallel for default(none) shared(ndates, vars1, vars2, varID, levelID, pvars1)
 #endif
               for (int inp = 0; inp < ndates - 1; inp++)
                 {
@@ -368,8 +355,7 @@ Runstat(void *process)
           else if (lrange)
             {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(ndates, vars1, vars2, varID, levelID, pvars1)
+#pragma omp parallel for default(none) shared(ndates, vars1, vars2, varID, levelID, pvars1)
 #endif
               for (int inp = 0; inp < ndates - 1; inp++)
                 {
@@ -380,8 +366,7 @@ Runstat(void *process)
           else
             {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(ndates, vars1, varID, levelID, operfunc, pvars1)
+#pragma omp parallel for default(none) shared(ndates, vars1, varID, levelID, operfunc, pvars1)
 #endif
               for (int inp = 0; inp < ndates - 1; inp++)
                 {

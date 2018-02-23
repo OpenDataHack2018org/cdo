@@ -142,8 +142,7 @@ Yseasstat(void *process)
         {
           vars1[seas] = field_malloc(vlistID1, FIELD_PTR);
           samp1[seas] = field_malloc(vlistID1, FIELD_NONE);
-          if (lvarstd || lrange)
-            vars2[seas] = field_malloc(vlistID1, FIELD_PTR);
+          if (lvarstd || lrange) vars2[seas] = field_malloc(vlistID1, FIELD_PTR);
         }
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -154,14 +153,12 @@ Yseasstat(void *process)
             {
               recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst
-                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           field_type *psamp1 = &samp1[seas][varID][levelID];
           field_type *pvars1 = &vars1[seas][varID][levelID];
-          field_type *pvars2
-              = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
+          field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
           int nsets = seas_nsets[seas];
 
           size_t gridsize = pvars1->size;
@@ -179,12 +176,10 @@ Yseasstat(void *process)
 
               if (nmiss > 0 || psamp1->ptr)
                 {
-                  if (psamp1->ptr == NULL)
-                    psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
+                  if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
                   for (size_t i = 0; i < gridsize; i++)
-                    psamp1->ptr[i]
-                        = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                 }
             }
           else
@@ -198,15 +193,13 @@ Yseasstat(void *process)
                 {
                   if (psamp1->ptr == NULL)
                     {
-                      psamp1->ptr
-                          = (double *) Malloc(gridsize * sizeof(double));
+                      psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
                       for (size_t i = 0; i < gridsize; i++)
                         psamp1->ptr[i] = nsets;
                     }
 
                   for (size_t i = 0; i < gridsize; i++)
-                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
-                      psamp1->ptr[i]++;
+                    if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval)) psamp1->ptr[i]++;
                 }
 
               if (lvarstd)
@@ -255,8 +248,7 @@ Yseasstat(void *process)
             int levelID = recinfo[recID].levelID;
             field_type *psamp1 = &samp1[seas][varID][levelID];
             field_type *pvars1 = &vars1[seas][varID][levelID];
-            field_type *pvars2
-                = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
+            field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
 
             if (lmean)
               {

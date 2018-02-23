@@ -29,8 +29,7 @@
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 bool
-find_ij_weights(double plon, double plat, double *restrict src_lons,
-                double *restrict src_lats, double *ig, double *jg)
+find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
 {
   bool lfound = false;
   long iter;                     /*  iteration counters   */
@@ -68,8 +67,7 @@ find_ij_weights(double plon, double plat, double *restrict src_lons,
 
   for (iter = 0; iter < remap_max_iter; ++iter)
     {
-      dthp = plat - src_lats[0] - dth1 * iguess - dth2 * jguess
-             - dth3 * iguess * jguess;
+      dthp = plat - src_lats[0] - dth1 * iguess - dth2 * jguess - dth3 * iguess * jguess;
       dphp = plon - src_lons[0];
 
       if (dphp > THREE * PIH) dphp -= PI2;
@@ -113,8 +111,7 @@ set_bilinear_weights(double iw, double jw, double wgts[4])
 }
 
 unsigned
-num_src_points(const int *restrict mask, const size_t src_add[4],
-               double src_lats[4])
+num_src_points(const int *restrict mask, const size_t src_add[4], double src_lats[4])
 {
   unsigned icount = 0;
 
@@ -141,8 +138,7 @@ renormalize_weights(const double src_lats[4], double wgts[4])
 }
 
 static void
-bilinear_warning(double plon, double plat, double iw, double jw,
-                 size_t *src_add, double *src_lons, double *src_lats,
+bilinear_warning(double plon, double plat, double iw, double jw, size_t *src_add, double *src_lons, double *src_lats,
                  remapgrid_t *src_grid)
 {
   static bool lwarn = true;
@@ -150,23 +146,16 @@ bilinear_warning(double plon, double plat, double iw, double jw,
   if (cdoVerbose)
     {
       cdoPrint("Point coords: %g %g", plat * RAD2DEG, plon * RAD2DEG);
-      cdoPrint("Src grid lats: %g %g %g %g", src_lats[0] * RAD2DEG,
-               src_lats[1] * RAD2DEG, src_lats[2] * RAD2DEG,
+      cdoPrint("Src grid lats: %g %g %g %g", src_lats[0] * RAD2DEG, src_lats[1] * RAD2DEG, src_lats[2] * RAD2DEG,
                src_lats[3] * RAD2DEG);
-      cdoPrint("Src grid lons: %g %g %g %g", src_lons[0] * RAD2DEG,
-               src_lons[1] * RAD2DEG, src_lons[2] * RAD2DEG,
+      cdoPrint("Src grid lons: %g %g %g %g", src_lons[0] * RAD2DEG, src_lons[1] * RAD2DEG, src_lons[2] * RAD2DEG,
                src_lons[3] * RAD2DEG);
-      cdoPrint("Src grid addresses: %zu %zu %zu %zu", src_add[0], src_add[1],
-               src_add[2], src_add[3]);
-      cdoPrint("Src grid lats: %g %g %g %g",
-               src_grid->cell_center_lat[src_add[0]] * RAD2DEG,
-               src_grid->cell_center_lat[src_add[1]] * RAD2DEG,
-               src_grid->cell_center_lat[src_add[2]] * RAD2DEG,
+      cdoPrint("Src grid addresses: %zu %zu %zu %zu", src_add[0], src_add[1], src_add[2], src_add[3]);
+      cdoPrint("Src grid lats: %g %g %g %g", src_grid->cell_center_lat[src_add[0]] * RAD2DEG,
+               src_grid->cell_center_lat[src_add[1]] * RAD2DEG, src_grid->cell_center_lat[src_add[2]] * RAD2DEG,
                src_grid->cell_center_lat[src_add[3]] * RAD2DEG);
-      cdoPrint("Src grid lons: %g %g %g %g",
-               src_grid->cell_center_lon[src_add[0]] * RAD2DEG,
-               src_grid->cell_center_lon[src_add[1]] * RAD2DEG,
-               src_grid->cell_center_lon[src_add[2]] * RAD2DEG,
+      cdoPrint("Src grid lons: %g %g %g %g", src_grid->cell_center_lon[src_add[0]] * RAD2DEG,
+               src_grid->cell_center_lon[src_add[1]] * RAD2DEG, src_grid->cell_center_lon[src_add[2]] * RAD2DEG,
                src_grid->cell_center_lon[src_add[3]] * RAD2DEG);
       cdoPrint("Current iw,jw : %g %g", iw, jw);
     }
@@ -182,14 +171,13 @@ bilinear_warning(double plon, double plat, double iw, double jw,
 }
 
 static void
-bilinear_remap(double *restrict tgt_point, const double *restrict src_array,
-               const double wgts[4], const size_t src_add[4])
+bilinear_remap(double *restrict tgt_point, const double *restrict src_array, const double wgts[4],
+               const size_t src_add[4])
 {
   // *tgt_point = 0.;
   // for ( unsigned n = 0; n < 4; ++n ) *tgt_point +=
   // src_array[src_add[n]]*wgts[n];
-  *tgt_point = src_array[src_add[0]] * wgts[0] + src_array[src_add[1]] * wgts[1]
-               + src_array[src_add[2]] * wgts[2]
+  *tgt_point = src_array[src_add[0]] * wgts[0] + src_array[src_add[1]] * wgts[1] + src_array[src_add[2]] * wgts[2]
                + src_array[src_add[3]] * wgts[3];
 }
 
@@ -201,8 +189,7 @@ bilinear_remap(double *restrict tgt_point, const double *restrict src_array,
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                             remapvars_t *rv)
+scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   extern int timer_remap_bil;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -215,18 +202,14 @@ scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
   /* Compute mappings from source to target grid */
 
-  if (src_grid->rank != 2)
-    cdoAbort("Can not do bilinear interpolation when source grid rank != 2");
+  if (src_grid->rank != 2) cdoAbort("Can not do bilinear interpolation when source grid rank != 2");
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  weightlinks_t *weightlinks
-      = (weightlinks_t *) Malloc(tgt_grid_size * sizeof(weightlinks_t));
-  weightlinks[0].addweights
-      = (addweight_t *) Malloc(4 * tgt_grid_size * sizeof(addweight_t));
+  weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size * sizeof(weightlinks_t));
+  weightlinks[0].addweights = (addweight_t *) Malloc(4 * tgt_grid_size * sizeof(addweight_t));
   for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
-    weightlinks[tgt_cell_add].addweights
-        = weightlinks[0].addweights + 4 * tgt_cell_add;
+    weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4 * tgt_cell_add;
 
   double findex = 0;
 
@@ -239,8 +222,7 @@ scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
       findex++;
-      if (cdo_omp_get_thread_num() == 0)
-        progressStatus(0, 1, findex / tgt_grid_size);
+      if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
       weightlinks[tgt_cell_add].nlinks = 0;
 
@@ -257,14 +239,12 @@ scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
       // Find nearest square of grid points on source grid
       int search_result;
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        search_result = grid_search_reg2d(
-            src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
+        search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
+                                          src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
       else
-        search_result = grid_search(
-            src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->cell_center_lat, src_grid->cell_center_lon,
-            src_grid->cell_bound_box, src_grid->bin_addr);
+        search_result
+            = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
+                          src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
 
       // Check to see if points are mask points
       if (search_result > 0)
@@ -288,8 +268,7 @@ scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
             }
           else
             {
-              bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats,
-                               src_grid);
+              bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
 
               search_result = -1;
             }
@@ -331,10 +310,8 @@ scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 #ifdef TEST_KDTREE
 #include "grid_search.h"
 int
-grid_search_test(struct gridsearch *gs, size_t *restrict src_add,
-                 double *restrict src_lats, double *restrict src_lons,
-                 double plat, double plon, const size_t *restrict src_grid_dims,
-                 double *restrict src_center_lat,
+grid_search_test(struct gridsearch *gs, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                 double plat, double plon, const size_t *restrict src_grid_dims, double *restrict src_center_lat,
                  double *restrict src_center_lon)
 {
   /*
@@ -381,8 +358,7 @@ grid_search_test(struct gridsearch *gs, size_t *restrict src_add,
           if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
           if (k == 2 || k == 3) j = (j > 0) ? j - 1 : 0;
 
-          if (point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons,
-                            src_lats, plon, plat, src_center_lon,
+          if (point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon,
                             src_center_lat))
             {
               search_result = 1;
@@ -411,8 +387,7 @@ grid_search_test(struct gridsearch *gs, size_t *restrict src_add,
 #endif
 
 void
-scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                     const double *restrict src_array,
+scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array,
                      double *restrict tgt_array, double missval)
 {
   extern int timer_remap_bil;
@@ -429,9 +404,7 @@ scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   size_t dims[2] = { src_grid->size, 0 };
   struct gridsearch *gs = NULL;
   if (remap_grid_type != REMAP_GRID_TYPE_REG2D)
-    gs = gridsearch_create(xIsCyclic, dims, src_grid->size,
-                           src_grid->cell_center_lon,
-                           src_grid->cell_center_lat);
+    gs = gridsearch_create(xIsCyclic, dims, src_grid->size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 #else
   void *gs;
 #endif
@@ -440,8 +413,7 @@ scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
   /* Compute mappings from source to target grid */
 
-  if (src_grid->rank != 2)
-    cdoAbort("Can not do bilinear interpolation when source grid rank != 2");
+  if (src_grid->rank != 2) cdoAbort("Can not do bilinear interpolation when source grid rank != 2");
 
   double findex = 0;
 
@@ -455,8 +427,7 @@ scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
       findex++;
-      if (cdo_omp_get_thread_num() == 0)
-        progressStatus(0, 1, findex / tgt_grid_size);
+      if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
       tgt_array[tgt_cell_add] = missval;
 
@@ -473,19 +444,16 @@ scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
       // Find nearest square of grid points on source grid
       int search_result;
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        search_result = grid_search_reg2d(
-            src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
+        search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
+                                          src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
       else
 #ifdef TEST_KDTREE
-        search_result = grid_search_test(
-            gs, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->cell_center_lat, src_grid->cell_center_lon);
+        search_result = grid_search_test(gs, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
+                                         src_grid->cell_center_lat, src_grid->cell_center_lon);
 #else
-        search_result = grid_search(
-            src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-            src_grid->cell_center_lat, src_grid->cell_center_lon,
-            src_grid->cell_bound_box, src_grid->bin_addr);
+        search_result
+            = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
+                          src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
 #endif
 
       // Check to see if points are mask points
@@ -508,13 +476,11 @@ scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
               sort_add_and_wgts(4, src_add, wgts);
 
-              bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts,
-                             src_add);
+              bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
             }
           else
             {
-              bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats,
-                               src_grid);
+              bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
 
               search_result = -1;
             }
@@ -534,8 +500,7 @@ scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
               sort_add_and_wgts(4, src_add, wgts);
 
-              bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts,
-                             src_add);
+              bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
             }
         }
     }

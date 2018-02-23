@@ -52,8 +52,7 @@ detrend(long nts, double missval1, double *array1, double *array2)
         n++;
       }
 
-  double work1 = DIVMN(SUBMN(sumjx, DIVMN(MULMN(sumx, sumj), n)),
-                       SUBMN(sumjj, DIVMN(MULMN(sumj, sumj), n)));
+  double work1 = DIVMN(SUBMN(sumjx, DIVMN(MULMN(sumx, sumj), n)), SUBMN(sumjj, DIVMN(MULMN(sumj, sumj), n)));
   double work2 = SUBMN(DIVMN(sumx, n), MULMN(work1, DIVMN(sumj, n)));
 
   for (long j = 0; j < nts; j++)
@@ -108,8 +107,7 @@ Detrend(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           gridID = vlistInqVarGrid(vlistID1, varID);
           gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
         }
@@ -118,9 +116,9 @@ Detrend(void *process)
     }
 
   int nts = tsID;
-
-  NEW_2D(double, array1, Threading::ompNumThreads, nts);
-  NEW_2D(double, array2, Threading::ompNumThreads, nts);
+  
+  VECTOR_2D(double, array1, Threading::ompNumThreads, nts);
+  VECTOR_2D(double, array2, Threading::ompNumThreads, nts);
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -131,8 +129,7 @@ Detrend(void *process)
       for (levelID = 0; levelID < nlevel; levelID++)
         {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(array1, array2, vars, varID, levelID, gridsize, nts, missval)
+#pragma omp parallel for default(none) shared(array1, array2, vars, varID, levelID, gridsize, nts, missval)
 #endif
           for (i = 0; i < gridsize; i++)
             {
@@ -141,16 +138,13 @@ Detrend(void *process)
               for (int tsID = 0; tsID < nts; tsID++)
                 array1[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
-              detrend(nts, missval, array1[ompthID], array2[ompthID]);
+              detrend(nts, missval, &array1[ompthID][0], &array2[ompthID][0]);
 
               for (int tsID = 0; tsID < nts; tsID++)
                 vars[tsID][varID][levelID].ptr[i] = array2[ompthID][tsID];
             }
         }
     }
-
-  DELETE_2D(array1);
-  DELETE_2D(array2);
 
   for (int tsID = 0; tsID < nts; tsID++)
     {
@@ -166,8 +160,7 @@ Detrend(void *process)
                 {
                   nmiss = vars[tsID][varID][levelID].nmiss;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr,
-                                     nmiss);
+                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
                   Free(vars[tsID][varID][levelID].ptr);
                   vars[tsID][varID][levelID].ptr = NULL;
                 }

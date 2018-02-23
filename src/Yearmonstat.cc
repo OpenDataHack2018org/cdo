@@ -133,8 +133,7 @@ Yearmonstat(void *process)
 
               if (nsets == 0)
                 {
-                  pstreamReadRecord(streamID1, vars1[varID][levelID].ptr,
-                                    &nmiss);
+                  pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
                   vars1[varID][levelID].nmiss = nmiss;
 
                   farcmul(&vars1[varID][levelID], dpm);
@@ -142,12 +141,10 @@ Yearmonstat(void *process)
                   if (nmiss > 0 || samp1[varID][levelID].ptr)
                     {
                       if (samp1[varID][levelID].ptr == NULL)
-                        samp1[varID][levelID].ptr
-                            = (double *) Malloc(gridsize * sizeof(double));
+                        samp1[varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
 
                       for (size_t i = 0; i < gridsize; i++)
-                        if (DBL_IS_EQUAL(vars1[varID][levelID].ptr[i],
-                                         vars1[varID][levelID].missval))
+                        if (DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval))
                           samp1[varID][levelID].ptr[i] = 0;
                         else
                           samp1[varID][levelID].ptr[i] = dpm;
@@ -166,15 +163,13 @@ Yearmonstat(void *process)
                     {
                       if (samp1[varID][levelID].ptr == NULL)
                         {
-                          samp1[varID][levelID].ptr
-                              = (double *) Malloc(gridsize * sizeof(double));
+                          samp1[varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
                           for (size_t i = 0; i < gridsize; i++)
                             samp1[varID][levelID].ptr[i] = dsets;
                         }
 
                       for (size_t i = 0; i < gridsize; i++)
-                        if (!DBL_IS_EQUAL(field.ptr[i],
-                                          vars1[varID][levelID].missval))
+                        if (!DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval))
                           samp1[varID][levelID].ptr[i] += dpm;
                     }
 
@@ -220,12 +215,10 @@ Yearmonstat(void *process)
           varID = recVarID[recID];
           levelID = recLevelID[recID];
 
-          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-            continue;
+          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr,
-                             vars1[varID][levelID].nmiss);
+          pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
         }
 
       if (nrecs == 0) break;

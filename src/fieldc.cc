@@ -160,7 +160,6 @@ farmod(field_type *field, double divisor)
 
   for (size_t i = 0; i < len; i++)
     {
-      array[i] = DBL_IS_EQUAL(array[i], missval1) ? missval1
-                                                  : fmod(array[i], divisor);
+      array[i] = DBL_IS_EQUAL(array[i], missval1) ? missval1 : fmod(array[i], divisor);
     }
 }

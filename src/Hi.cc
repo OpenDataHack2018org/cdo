@@ -27,13 +27,12 @@
 #include "pstream_int.h"
 
 static const char HI_NAME[] = "hum_index";
-static const char HI_LONGNAME[]
-    = "Humindex describes empirically in units of temperature how the "
-      "temperature and humidity influence the wellness of a human being. HI = "
-      "T + 5/9 * (A - 10) with A = e * (6.112 * 10 ** ((7.5 * T)/(237.7 + T)) "
-      "* R), T  = air temperature in degree Celsius, R = relative humidity, e "
-      "= vapour pressure. Humindex is only defined for temperatures of at "
-      "least 26 degree Celsius and relative humidity of at least 40 percent.";
+static const char HI_LONGNAME[] = "Humindex describes empirically in units of temperature how the "
+                                  "temperature and humidity influence the wellness of a human being. HI = "
+                                  "T + 5/9 * (A - 10) with A = e * (6.112 * 10 ** ((7.5 * T)/(237.7 + T)) "
+                                  "* R), T  = air temperature in degree Celsius, R = relative humidity, e "
+                                  "= vapour pressure. Humindex is only defined for temperatures of at "
+                                  "least 26 degree Celsius and relative humidity of at least 40 percent.";
 static const char HI_UNITS[] = "Celsius";
 
 static const int FIRST_VAR = 0;
@@ -46,15 +45,11 @@ humidityIndex(double t, double e, double r, double missval)
 
   if (t < tmin || r < rmin) return missval;
 
-  return t
-         + (5.0 / 9.0)
-               * ((0.01 * r * e * 6.112 * pow(10.0, (7.5 * t) / (237.7 + t)))
-                  - 10.0);
+  return t + (5.0 / 9.0) * ((0.01 * r * e * 6.112 * pow(10.0, (7.5 * t) / (237.7 + t))) - 10.0);
 }
 
 static void
-farexpr(field_type *field1, field_type field2, field_type field3,
-        double (*expression)(double, double, double, double))
+farexpr(field_type *field1, field_type field2, field_type field3, double (*expression)(double, double, double, double))
 {
   const int grid1 = field1->grid;
   const size_t nmiss1 = field1->nmiss;
@@ -71,15 +66,12 @@ farexpr(field_type *field1, field_type field2, field_type field3,
 
   size_t len = gridInqSize(grid1);
 
-  if (len != gridInqSize(grid2) || len != gridInqSize(grid3))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != gridInqSize(grid2) || len != gridInqSize(grid3)) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0 || nmiss3 > 0)
     {
       for (size_t i = 0; i < len; i++)
-        if (DBL_IS_EQUAL(array1[i], missval1)
-            || DBL_IS_EQUAL(array2[i], missval2)
-            || DBL_IS_EQUAL(array3[i], missval3))
+        if (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) || DBL_IS_EQUAL(array3[i], missval3))
           array1[i] = missval1;
         else
           array1[i] = expression(array1[i], array2[i], array3[i], missval1);
@@ -130,8 +122,7 @@ Hi(void *process)
   field3.ptr = (double *) Malloc(gridsize * sizeof(double));
 
   if (cdoVerbose)
-    cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d",
-             vlistNtsteps(vlistID1), vlistNtsteps(vlistID2),
+    cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d", vlistNtsteps(vlistID1), vlistNtsteps(vlistID2),
              vlistNtsteps(vlistID3));
 
   int vlistID4 = vlistCreate();
@@ -159,8 +150,7 @@ Hi(void *process)
     {
       int nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
       int nrecs3 = cdoStreamInqTimestep(streamID3, tsID);
-      if (nrecs2 == 0 || nrecs3 == 0)
-        cdoAbort("Input streams have different number of timesteps!");
+      if (nrecs2 == 0 || nrecs3 == 0) cdoAbort("Input streams have different number of timesteps!");
 
       taxisCopyTimestep(taxisID4, taxisID1);
       pstreamDefTimestep(streamID4, tsID);
@@ -179,8 +169,7 @@ Hi(void *process)
           pstreamReadRecord(streamID3, field3.ptr, &nmiss);
           field3.nmiss = nmiss;
 
-          if (varID1 != varID2 || varID1 != varID3 || levelID1 != levelID2
-              || levelID1 != levelID3)
+          if (varID1 != varID2 || varID1 != varID3 || levelID1 != levelID2 || levelID1 != levelID3)
             cdoAbort("Input streams have different structure!");
 
           if (varID1 != FIRST_VAR) continue;

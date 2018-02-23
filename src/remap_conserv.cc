@@ -22,7 +22,8 @@
 #include "cdoOptions.h"
 #include "timer.h"
 
-extern "C" {
+extern "C"
+{
 #include "clipping/clipping.h"
 #include "clipping/area.h"
 #include "clipping/geometry.h"
@@ -56,14 +57,10 @@ search_realloc(size_t num_srch_cells, search_t *search)
 
   if (num_srch_cells > max_srch_cells)
     {
-      partial_areas
-          = (double *) Realloc(partial_areas, num_srch_cells * sizeof(double));
-      partial_weights = (double *) Realloc(partial_weights,
-                                           num_srch_cells * sizeof(double));
-      overlap_buffer = (struct grid_cell *) Realloc(
-          overlap_buffer, num_srch_cells * sizeof(struct grid_cell));
-      src_grid_cells = (struct grid_cell *) Realloc(
-          src_grid_cells, num_srch_cells * sizeof(struct grid_cell));
+      partial_areas = (double *) Realloc(partial_areas, num_srch_cells * sizeof(double));
+      partial_weights = (double *) Realloc(partial_weights, num_srch_cells * sizeof(double));
+      overlap_buffer = (struct grid_cell *) Realloc(overlap_buffer, num_srch_cells * sizeof(struct grid_cell));
+      src_grid_cells = (struct grid_cell *) Realloc(src_grid_cells, num_srch_cells * sizeof(struct grid_cell));
 
       for (size_t n = max_srch_cells; n < num_srch_cells; ++n)
         {
@@ -80,12 +77,9 @@ search_realloc(size_t num_srch_cells, search_t *search)
           src_grid_cells[n].array_size = search->srch_corners;
           src_grid_cells[n].num_corners = search->srch_corners;
           src_grid_cells[n].edge_type = search->src_edge_type;
-          src_grid_cells[n].coordinates_x
-              = (double *) Malloc(search->srch_corners * sizeof(double));
-          src_grid_cells[n].coordinates_y
-              = (double *) Malloc(search->srch_corners * sizeof(double));
-          src_grid_cells[n].coordinates_xyz
-              = (double *) Malloc(3 * search->srch_corners * sizeof(double));
+          src_grid_cells[n].coordinates_x = (double *) Malloc(search->srch_corners * sizeof(double));
+          src_grid_cells[n].coordinates_y = (double *) Malloc(search->srch_corners * sizeof(double));
+          src_grid_cells[n].coordinates_xyz = (double *) Malloc(3 * search->srch_corners * sizeof(double));
         }
 
       max_srch_cells = num_srch_cells;
@@ -113,8 +107,7 @@ search_free(search_t *search)
         {
           Free(overlap_buffer[n].coordinates_x);
           Free(overlap_buffer[n].coordinates_y);
-          if (overlap_buffer[n].coordinates_xyz)
-            Free(overlap_buffer[n].coordinates_xyz);
+          if (overlap_buffer[n].coordinates_xyz) Free(overlap_buffer[n].coordinates_xyz);
           if (overlap_buffer[n].edge_type) Free(overlap_buffer[n].edge_type);
         }
 
@@ -127,15 +120,11 @@ search_free(search_t *search)
   Free(partial_weights);
 }
 
-int rect_grid_search2(long *imin, long *imax, double xmin, double xmax,
-                      long nxm, const double *restrict xm);
+int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm);
 
 static size_t
-get_srch_cells_reg2d(const size_t *restrict src_grid_dims,
-                     const double *restrict src_corner_lat,
-                     const double *restrict src_corner_lon,
-                     const double *restrict tgt_cell_bound_box,
-                     size_t *srch_add)
+get_srch_cells_reg2d(const size_t *restrict src_grid_dims, const double *restrict src_corner_lat,
+                     const double *restrict src_corner_lon, const double *restrict tgt_cell_bound_box, size_t *srch_add)
 {
   bool debug = false;
   long nx = src_grid_dims[0];
@@ -150,8 +139,7 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims,
 
   long imin = nxp1, imax = -1, jmin = nyp1, jmax = -1;
 
-  int lfound = rect_grid_search2(&jmin, &jmax, tgt_cell_bound_box[0],
-                                 tgt_cell_bound_box[1], nyp1, src_corner_lat);
+  int lfound = rect_grid_search2(&jmin, &jmax, tgt_cell_bound_box[0], tgt_cell_bound_box[1], nyp1, src_corner_lat);
   if (!lfound) return 0;
   // printf("lfound, jmin, jmax %d %ld %ld\n", lfound, jmin, jmax);
   // if ( jmin > 0 ) jmin--;
@@ -161,19 +149,14 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims,
   double bound_lon2 = tgt_cell_bound_box[3];
   if (bound_lon1 <= src_lon_max && bound_lon2 >= src_lon_min)
     {
-      if (debug)
-        printf("  b1 %g %g\n", bound_lon1 * RAD2DEG, bound_lon2 * RAD2DEG);
-      if (bound_lon1 < src_lon_min && bound_lon2 > src_lon_min)
-        bound_lon1 = src_lon_min;
-      if (bound_lon2 > src_lon_max && bound_lon1 < src_lon_max)
-        bound_lon2 = src_lon_max;
-      lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxp1,
-                                 src_corner_lon);
+      if (debug) printf("  b1 %g %g\n", bound_lon1 * RAD2DEG, bound_lon2 * RAD2DEG);
+      if (bound_lon1 < src_lon_min && bound_lon2 > src_lon_min) bound_lon1 = src_lon_min;
+      if (bound_lon2 > src_lon_max && bound_lon1 < src_lon_max) bound_lon2 = src_lon_max;
+      lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxp1, src_corner_lon);
       if (lfound)
         {
           if (debug)
-            printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n",
-                   RAD2DEG * src_corner_lon[imin],
+            printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG * src_corner_lon[imin],
                    RAD2DEG * src_corner_lon[imax + 1], imin, imax, jmin, jmax);
           for (long jm = jmin; jm <= jmax; ++jm)
             for (long im = imin; im <= imax; ++im)
@@ -188,14 +171,10 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims,
       long imin2 = nxp1, imax2 = -1;
       bound_lon1 += 2 * M_PI;
       bound_lon2 += 2 * M_PI;
-      if (debug)
-        printf("  b2 %g %g\n", bound_lon1 * RAD2DEG, bound_lon2 * RAD2DEG);
-      if (bound_lon1 < src_lon_min && bound_lon2 > src_lon_min)
-        bound_lon1 = src_lon_min;
-      if (bound_lon2 > src_lon_max && bound_lon1 < src_lon_max)
-        bound_lon2 = src_lon_max;
-      lfound = rect_grid_search2(&imin2, &imax2, bound_lon1, bound_lon2, nxp1,
-                                 src_corner_lon);
+      if (debug) printf("  b2 %g %g\n", bound_lon1 * RAD2DEG, bound_lon2 * RAD2DEG);
+      if (bound_lon1 < src_lon_min && bound_lon2 > src_lon_min) bound_lon1 = src_lon_min;
+      if (bound_lon2 > src_lon_max && bound_lon1 < src_lon_max) bound_lon2 = src_lon_max;
+      lfound = rect_grid_search2(&imin2, &imax2, bound_lon1, bound_lon2, nxp1, src_corner_lon);
       if (lfound)
         {
           if (imax != -1 && imin2 <= imax) imin2 = imax + 1;
@@ -203,10 +182,8 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims,
           if (imin2 >= 0 && imax2 < nxp1)
             {
               if (debug)
-                printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n",
-                       RAD2DEG * src_corner_lon[imin2],
-                       RAD2DEG * src_corner_lon[imax2 + 1], imin2, imax2, jmin,
-                       jmax);
+                printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG * src_corner_lon[imin2],
+                       RAD2DEG * src_corner_lon[imax2 + 1], imin2, imax2, jmin, jmax);
               for (long jm = jmin; jm <= jmax; ++jm)
                 for (long im = imin2; im <= imax2; ++im)
                   srch_add[num_srch_cells++] = jm * nx + im;
@@ -221,14 +198,10 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims,
       long imin3 = nxp1, imax3 = -1;
       bound_lon1 -= 2 * M_PI;
       bound_lon2 -= 2 * M_PI;
-      if (debug)
-        printf("  b3 %g %g\n", bound_lon1 * RAD2DEG, bound_lon2 * RAD2DEG);
-      if (bound_lon1 < src_lon_min && bound_lon2 > src_lon_min)
-        bound_lon1 = src_lon_min;
-      if (bound_lon2 > src_lon_max && bound_lon1 < src_lon_max)
-        bound_lon2 = src_lon_max;
-      lfound = rect_grid_search2(&imin3, &imax3, bound_lon1, bound_lon2, nxp1,
-                                 src_corner_lon);
+      if (debug) printf("  b3 %g %g\n", bound_lon1 * RAD2DEG, bound_lon2 * RAD2DEG);
+      if (bound_lon1 < src_lon_min && bound_lon2 > src_lon_min) bound_lon1 = src_lon_min;
+      if (bound_lon2 > src_lon_max && bound_lon1 < src_lon_max) bound_lon2 = src_lon_max;
+      lfound = rect_grid_search2(&imin3, &imax3, bound_lon1, bound_lon2, nxp1, src_corner_lon);
       if (lfound)
         {
           if (imin != nxp1 && imin3 >= imin) imin3 = imin - 1;
@@ -236,10 +209,8 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims,
           if (imin3 >= 0 && imin3 < nxp1)
             {
               if (debug)
-                printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n",
-                       RAD2DEG * src_corner_lon[imin3],
-                       RAD2DEG * src_corner_lon[imax3 + 1], imin3, imax3, jmin,
-                       jmax);
+                printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG * src_corner_lon[imin3],
+                       RAD2DEG * src_corner_lon[imax3 + 1], imin3, imax3, jmin, jmax);
               for (long jm = jmin; jm <= jmax; ++jm)
                 for (long im = imin3; im <= imax3; ++im)
                   srch_add[num_srch_cells++] = jm * nx + im;
@@ -253,22 +224,17 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims,
 }
 
 static void
-restrict_boundbox(const double *restrict grid_bound_box,
-                  double *restrict bound_box)
+restrict_boundbox(const double *restrict grid_bound_box, double *restrict bound_box)
 {
-  if (bound_box[0] < grid_bound_box[0] && bound_box[1] > grid_bound_box[0])
-    bound_box[0] = grid_bound_box[0];
-  if (bound_box[1] > grid_bound_box[1] && bound_box[0] < grid_bound_box[1])
-    bound_box[1] = grid_bound_box[1];
+  if (bound_box[0] < grid_bound_box[0] && bound_box[1] > grid_bound_box[0]) bound_box[0] = grid_bound_box[0];
+  if (bound_box[1] > grid_bound_box[1] && bound_box[0] < grid_bound_box[1]) bound_box[1] = grid_bound_box[1];
 
-  if (bound_box[2] >= grid_bound_box[3]
-      && (bound_box[3] - 2 * M_PI) > grid_bound_box[2])
+  if (bound_box[2] >= grid_bound_box[3] && (bound_box[3] - 2 * M_PI) > grid_bound_box[2])
     {
       bound_box[2] -= 2 * M_PI;
       bound_box[3] -= 2 * M_PI;
     }
-  if (bound_box[3] <= grid_bound_box[2]
-      && (bound_box[2] - 2 * M_PI) < grid_bound_box[3])
+  if (bound_box[3] <= grid_bound_box[2] && (bound_box[2] - 2 * M_PI) < grid_bound_box[3])
     {
       bound_box[2] += 2 * M_PI;
       bound_box[3] += 2 * M_PI;
@@ -279,10 +245,8 @@ restrict_boundbox(const double *restrict grid_bound_box,
 }
 
 static void
-boundbox_from_corners_reg2d(size_t grid_add, const size_t *restrict grid_dims,
-                            const double *restrict corner_lon,
-                            const double *restrict corner_lat,
-                            double *restrict bound_box)
+boundbox_from_corners_reg2d(size_t grid_add, const size_t *restrict grid_dims, const double *restrict corner_lon,
+                            const double *restrict corner_lat, double *restrict bound_box)
 {
   size_t nx = grid_dims[0];
   size_t iy = grid_add / nx;
@@ -307,8 +271,7 @@ boundbox_from_corners_reg2d(size_t grid_add, const size_t *restrict grid_dims,
 }
 
 static void
-boundbox_from_corners1(size_t ic, size_t nc, const double *restrict corner_lon,
-                       const double *restrict corner_lat,
+boundbox_from_corners1(size_t ic, size_t nc, const double *restrict corner_lon, const double *restrict corner_lat,
                        double *restrict bound_box)
 {
   size_t inc = ic * nc;
@@ -359,8 +322,7 @@ boundbox_from_corners1(size_t ic, size_t nc, const double *restrict corner_lon,
 }
 
 static void
-boundbox_from_corners1r(size_t ic, size_t nc, const double *restrict corner_lon,
-                        const double *restrict corner_lat,
+boundbox_from_corners1r(size_t ic, size_t nc, const double *restrict corner_lon, const double *restrict corner_lat,
                         restr_t *restrict bound_box)
 {
   size_t inc = ic * nc;
@@ -412,8 +374,7 @@ gridcell_area(struct grid_cell cell)
 }
 
 static void
-cdo_compute_overlap_areas(size_t N, search_t *search,
-                          struct grid_cell target_cell)
+cdo_compute_overlap_areas(size_t N, search_t *search, struct grid_cell target_cell)
 {
   double *partial_areas = search->partial_areas;
   struct grid_cell *overlap_buffer = search->overlap_buffer;
@@ -478,9 +439,8 @@ static enum cell_type get_cell_type(struct grid_cell target_cell) {
 }
 */
 static void
-cdo_compute_concave_overlap_areas(size_t N, search_t *search,
-                                  struct grid_cell target_cell,
-                                  double target_node_x, double target_node_y)
+cdo_compute_concave_overlap_areas(size_t N, search_t *search, struct grid_cell target_cell, double target_node_x,
+                                  double target_node_y)
 {
   double *partial_areas = search->partial_areas;
   struct grid_cell *overlap_buffer = search->overlap_buffer;
@@ -513,8 +473,7 @@ cdo_compute_concave_overlap_areas(size_t N, search_t *search,
   double coordinates_x[3] = { -1, -1, -1 };
   double coordinates_y[3] = { -1, -1, -1 };
   double coordinates_xyz[9] = { -1, -1, -1 };
-  enum yac_edge_type edge_types[3]
-      = { GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE };
+  enum yac_edge_type edge_types[3] = { GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE };
   struct grid_cell target_partial_cell;
   target_partial_cell.coordinates_x = coordinates_x;
   target_partial_cell.coordinates_y = coordinates_y;
@@ -533,8 +492,7 @@ cdo_compute_concave_overlap_areas(size_t N, search_t *search,
 
   LLtoXYZ(target_node_x, target_node_y, target_partial_cell.coordinates_xyz);
 
-  for (unsigned num_corners = 0; num_corners < target_cell.num_corners;
-       ++num_corners)
+  for (unsigned num_corners = 0; num_corners < target_cell.num_corners; ++num_corners)
     {
       unsigned corner_a = num_corners;
       unsigned corner_b = (num_corners + 1) % target_cell.num_corners;
@@ -555,59 +513,32 @@ cdo_compute_concave_overlap_areas(size_t N, search_t *search,
       // Compared to the if statement below the alternative seems
       // to be quite costly.
 
-      if (((fabs(target_cell.coordinates_xyz[0 + 3 * corner_a]
-                 - target_cell.coordinates_xyz[0 + 3 * corner_b])
-            < tol)
-           && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_a]
-                    - target_cell.coordinates_xyz[1 + 3 * corner_b])
+      if (((fabs(target_cell.coordinates_xyz[0 + 3 * corner_a] - target_cell.coordinates_xyz[0 + 3 * corner_b]) < tol)
+           && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_a] - target_cell.coordinates_xyz[1 + 3 * corner_b])
                < tol)
-           && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_a]
-                    - target_cell.coordinates_xyz[2 + 3 * corner_b])
+           && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_a] - target_cell.coordinates_xyz[2 + 3 * corner_b])
                < tol))
-          || ((fabs(target_cell.coordinates_xyz[0 + 3 * corner_a]
-                    - target_partial_cell.coordinates_xyz[0])
-               < tol)
-              && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_a]
-                       - target_partial_cell.coordinates_xyz[1])
-                  < tol)
-              && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_a]
-                       - target_partial_cell.coordinates_xyz[2])
-                  < tol))
-          || ((fabs(target_cell.coordinates_xyz[0 + 3 * corner_b]
-                    - target_partial_cell.coordinates_xyz[0])
-               < tol)
-              && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_b]
-                       - target_partial_cell.coordinates_xyz[1])
-                  < tol)
-              && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_b]
-                       - target_partial_cell.coordinates_xyz[2])
-                  < tol)))
+          || ((fabs(target_cell.coordinates_xyz[0 + 3 * corner_a] - target_partial_cell.coordinates_xyz[0]) < tol)
+              && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_a] - target_partial_cell.coordinates_xyz[1]) < tol)
+              && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_a] - target_partial_cell.coordinates_xyz[2]) < tol))
+          || ((fabs(target_cell.coordinates_xyz[0 + 3 * corner_b] - target_partial_cell.coordinates_xyz[0]) < tol)
+              && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_b] - target_partial_cell.coordinates_xyz[1]) < tol)
+              && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_b] - target_partial_cell.coordinates_xyz[2]) < tol)))
         continue;
 
-      target_partial_cell.coordinates_x[1]
-          = target_cell.coordinates_x[corner_a];
-      target_partial_cell.coordinates_y[1]
-          = target_cell.coordinates_y[corner_a];
-      target_partial_cell.coordinates_x[2]
-          = target_cell.coordinates_x[corner_b];
-      target_partial_cell.coordinates_y[2]
-          = target_cell.coordinates_y[corner_b];
+      target_partial_cell.coordinates_x[1] = target_cell.coordinates_x[corner_a];
+      target_partial_cell.coordinates_y[1] = target_cell.coordinates_y[corner_a];
+      target_partial_cell.coordinates_x[2] = target_cell.coordinates_x[corner_b];
+      target_partial_cell.coordinates_y[2] = target_cell.coordinates_y[corner_b];
 
-      target_partial_cell.coordinates_xyz[0 + 3 * 1]
-          = target_cell.coordinates_xyz[0 + 3 * corner_a];
-      target_partial_cell.coordinates_xyz[1 + 3 * 1]
-          = target_cell.coordinates_xyz[1 + 3 * corner_a];
-      target_partial_cell.coordinates_xyz[2 + 3 * 1]
-          = target_cell.coordinates_xyz[2 + 3 * corner_a];
-      target_partial_cell.coordinates_xyz[0 + 3 * 2]
-          = target_cell.coordinates_xyz[0 + 3 * corner_b];
-      target_partial_cell.coordinates_xyz[1 + 3 * 2]
-          = target_cell.coordinates_xyz[1 + 3 * corner_b];
-      target_partial_cell.coordinates_xyz[2 + 3 * 2]
-          = target_cell.coordinates_xyz[2 + 3 * corner_b];
+      target_partial_cell.coordinates_xyz[0 + 3 * 1] = target_cell.coordinates_xyz[0 + 3 * corner_a];
+      target_partial_cell.coordinates_xyz[1 + 3 * 1] = target_cell.coordinates_xyz[1 + 3 * corner_a];
+      target_partial_cell.coordinates_xyz[2 + 3 * 1] = target_cell.coordinates_xyz[2 + 3 * corner_a];
+      target_partial_cell.coordinates_xyz[0 + 3 * 2] = target_cell.coordinates_xyz[0 + 3 * corner_b];
+      target_partial_cell.coordinates_xyz[1 + 3 * 2] = target_cell.coordinates_xyz[1 + 3 * corner_b];
+      target_partial_cell.coordinates_xyz[2 + 3 * 2] = target_cell.coordinates_xyz[2 + 3 * corner_b];
 
-      yac_cell_clipping((unsigned) N, source_cell, target_partial_cell,
-                        overlap_buffer);
+      yac_cell_clipping((unsigned) N, source_cell, target_partial_cell, overlap_buffer);
 
       /* Get the partial areas for the overlapping regions as sum over the
        * partial target cells. */
@@ -654,25 +585,17 @@ get_lonlat_circle_index(remapgrid_t *remap_grid)
             {
               num_i++;
 
-              if (IS_EQUAL(cell_corner_lon[i * 4 + 1],
-                           cell_corner_lon[i * 4 + 2])
-                  && IS_EQUAL(cell_corner_lon[i * 4 + 3],
-                              cell_corner_lon[i * 4 + 0])
-                  && IS_EQUAL(cell_corner_lat[i * 4 + 0],
-                              cell_corner_lat[i * 4 + 1])
-                  && IS_EQUAL(cell_corner_lat[i * 4 + 2],
-                              cell_corner_lat[i * 4 + 3]))
+              if (IS_EQUAL(cell_corner_lon[i * 4 + 1], cell_corner_lon[i * 4 + 2])
+                  && IS_EQUAL(cell_corner_lon[i * 4 + 3], cell_corner_lon[i * 4 + 0])
+                  && IS_EQUAL(cell_corner_lat[i * 4 + 0], cell_corner_lat[i * 4 + 1])
+                  && IS_EQUAL(cell_corner_lat[i * 4 + 2], cell_corner_lat[i * 4 + 3]))
                 {
                   num_eq1++;
                 }
-              else if (IS_EQUAL(cell_corner_lon[i * 4 + 0],
-                                cell_corner_lon[i * 4 + 1])
-                       && IS_EQUAL(cell_corner_lon[i * 4 + 2],
-                                   cell_corner_lon[i * 4 + 3])
-                       && IS_EQUAL(cell_corner_lat[i * 4 + 1],
-                                   cell_corner_lat[i * 4 + 2])
-                       && IS_EQUAL(cell_corner_lat[i * 4 + 3],
-                                   cell_corner_lat[i * 4 + 0]))
+              else if (IS_EQUAL(cell_corner_lon[i * 4 + 0], cell_corner_lon[i * 4 + 1])
+                       && IS_EQUAL(cell_corner_lon[i * 4 + 2], cell_corner_lon[i * 4 + 3])
+                       && IS_EQUAL(cell_corner_lat[i * 4 + 1], cell_corner_lat[i * 4 + 2])
+                       && IS_EQUAL(cell_corner_lat[i * 4 + 3], cell_corner_lat[i * 4 + 0]))
                 {
                   num_eq0++;
                 }
@@ -701,30 +624,26 @@ remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
   if (rv->normOpt == NormOpt::DESTAREA)
     {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared( \
-    num_wts, num_links, rv, tgt_grid) private(tgt_cell_add, norm_factor)
+#pragma omp parallel for default(none) shared(num_wts, num_links, rv, tgt_grid) private(tgt_cell_add, norm_factor)
 #endif
       for (size_t n = 0; n < num_links; ++n)
         {
           tgt_cell_add = rv->tgt_cell_add[n];
-          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0)
-                            ? 1. / tgt_grid->cell_area[tgt_cell_add]
-                            : 0.;
+          norm_factor
+              = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? 1. / tgt_grid->cell_area[tgt_cell_add] : 0.;
           rv->wts[n * num_wts] *= norm_factor;
         }
     }
   else if (rv->normOpt == NormOpt::FRACAREA)
     {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared( \
-    num_wts, num_links, rv, tgt_grid) private(tgt_cell_add, norm_factor)
+#pragma omp parallel for default(none) shared(num_wts, num_links, rv, tgt_grid) private(tgt_cell_add, norm_factor)
 #endif
       for (size_t n = 0; n < num_links; ++n)
         {
           tgt_cell_add = rv->tgt_cell_add[n];
-          norm_factor = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0)
-                            ? 1. / tgt_grid->cell_frac[tgt_cell_add]
-                            : 0.;
+          norm_factor
+              = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? 1. / tgt_grid->cell_frac[tgt_cell_add] : 0.;
           rv->wts[n * num_wts] *= norm_factor;
         }
     }
@@ -734,8 +653,7 @@ remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 }
 
 static void
-set_yac_coordinates(int remap_grid_type, size_t cell_add,
-                    size_t num_cell_corners, remapgrid_t *remap_grid,
+set_yac_coordinates(int remap_grid_type, size_t cell_add, size_t num_cell_corners, remapgrid_t *remap_grid,
                     struct grid_cell *yac_grid_cell)
 {
   if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
@@ -797,8 +715,7 @@ reg2d_bound_box(remapgrid_t *remap_grid, double *grid_bound_box)
 }
 
 void
-remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                      remapvars_t *rv)
+remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells
@@ -821,15 +738,13 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   size_t tgt_num_cell_corners = tgt_grid->num_cell_corners;
 
   size_t max_num_cell_corners = src_num_cell_corners;
-  if (tgt_num_cell_corners > max_num_cell_corners)
-    max_num_cell_corners = tgt_num_cell_corners;
+  if (tgt_num_cell_corners > max_num_cell_corners) max_num_cell_corners = tgt_num_cell_corners;
 
   std::vector<enum yac_edge_type> great_circle_type(max_num_cell_corners);
   for (size_t i = 0; i < max_num_cell_corners; ++i)
     great_circle_type[i] = GREAT_CIRCLE;
 
-  enum yac_edge_type lonlat_circle_type[]
-      = { LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE };
+  enum yac_edge_type lonlat_circle_type[] = { LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE };
 
   enum yac_edge_type *src_edge_type = &great_circle_type[0];
   enum yac_edge_type *tgt_edge_type = &great_circle_type[0];
@@ -839,8 +754,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   if (src_num_cell_corners == 4)
     {
       int lonlat_circle_index = get_lonlat_circle_index(src_grid);
-      if (lonlat_circle_index >= 0)
-        src_edge_type = &lonlat_circle_type[lonlat_circle_index];
+      if (lonlat_circle_index >= 0) src_edge_type = &lonlat_circle_type[lonlat_circle_index];
     }
 
   if (tgt_num_cell_corners == 4)
@@ -855,10 +769,8 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
   if (!(tgt_num_cell_corners < 4 || target_cell_type == LON_LAT_CELL))
     {
-      if (tgt_grid->cell_center_lon == NULL
-          || tgt_grid->cell_center_lat == NULL)
-        cdoAbort("Internal problem (%s): missing target point coordinates!",
-                 __func__);
+      if (tgt_grid->cell_center_lon == NULL || tgt_grid->cell_center_lat == NULL)
+        cdoAbort("Internal problem (%s): missing target point coordinates!", __func__);
     }
 
   std::vector<struct grid_cell> tgt_grid_cell(Threading::ompNumThreads);
@@ -891,11 +803,9 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   srch_corners = src_num_cell_corners;
 
   double src_grid_bound_box[4];
-  if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
-    reg2d_bound_box(src_grid, src_grid_bound_box);
+  if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D) reg2d_bound_box(src_grid, src_grid_bound_box);
 
-  weightlinks_t *weightlinks
-      = (weightlinks_t *) Malloc(tgt_grid_size * sizeof(weightlinks_t));
+  weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size * sizeof(weightlinks_t));
 
   double findex = 0;
 
@@ -933,61 +843,46 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
       clock_t start = clock();
 #endif
 
-      if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D
-          && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D)
+      if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D)
         {
           double tgt_cell_bound_box[4];
-          boundbox_from_corners_reg2d(
-              tgt_cell_add, tgt_grid->dims, tgt_grid->reg2d_corner_lon,
-              tgt_grid->reg2d_corner_lat, tgt_cell_bound_box);
+          boundbox_from_corners_reg2d(tgt_cell_add, tgt_grid->dims, tgt_grid->reg2d_corner_lon,
+                                      tgt_grid->reg2d_corner_lat, tgt_cell_bound_box);
           restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
 
-          num_srch_cells
-              = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat,
-                                     src_grid->reg2d_corner_lon,
-                                     tgt_cell_bound_box, srch_add[ompthID]);
+          num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
+                                                tgt_cell_bound_box, srch_add[ompthID]);
 
-          if (num_srch_cells == 1 && src_grid->dims[0] == 1
-              && src_grid->dims[1] == 1
-              && IS_EQUAL(src_grid->reg2d_corner_lat[0],
-                          src_grid->reg2d_corner_lat[1])
-              && IS_EQUAL(src_grid->reg2d_corner_lon[0],
-                          src_grid->reg2d_corner_lon[1]))
+          if (num_srch_cells == 1 && src_grid->dims[0] == 1 && src_grid->dims[1] == 1
+              && IS_EQUAL(src_grid->reg2d_corner_lat[0], src_grid->reg2d_corner_lat[1])
+              && IS_EQUAL(src_grid->reg2d_corner_lon[0], src_grid->reg2d_corner_lon[1]))
             num_srch_cells = 0;
         }
       else if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
         {
           double tgt_cell_bound_box[4];
-          boundbox_from_corners1(tgt_cell_add, tgt_num_cell_corners,
-                                 tgt_grid->cell_corner_lon,
+          boundbox_from_corners1(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon,
                                  tgt_grid->cell_corner_lat, tgt_cell_bound_box);
           restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
 
-          num_srch_cells
-              = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat,
-                                     src_grid->reg2d_corner_lon,
-                                     tgt_cell_bound_box, srch_add[ompthID]);
+          num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
+                                                tgt_cell_bound_box, srch_add[ompthID]);
 
-          if (num_srch_cells == 1 && src_grid->dims[0] == 1
-              && src_grid->dims[1] == 1
-              && IS_EQUAL(src_grid->reg2d_corner_lat[0],
-                          src_grid->reg2d_corner_lat[1])
-              && IS_EQUAL(src_grid->reg2d_corner_lon[0],
-                          src_grid->reg2d_corner_lon[1]))
+          if (num_srch_cells == 1 && src_grid->dims[0] == 1 && src_grid->dims[1] == 1
+              && IS_EQUAL(src_grid->reg2d_corner_lat[0], src_grid->reg2d_corner_lat[1])
+              && IS_EQUAL(src_grid->reg2d_corner_lon[0], src_grid->reg2d_corner_lon[1]))
             num_srch_cells = 0;
         }
       else
         {
           restr_t tgt_cell_bound_box_r[4];
-          boundbox_from_corners1r(
-              tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon,
-              tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
+          boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon,
+                                  tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
 
           size_t nbins = src_grid->num_srch_bins;
-          num_srch_cells = get_srch_cells(
-              tgt_cell_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
-              tgt_cell_bound_box_r, src_grid->cell_bound_box, src_grid_size,
-              srch_add[ompthID]);
+          num_srch_cells
+              = get_srch_cells(tgt_cell_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr, tgt_cell_bound_box_r,
+                               src_grid->cell_bound_box, src_grid_size, srch_add[ompthID]);
         }
 #ifdef STIMER
       clock_t finish = clock();
@@ -996,15 +891,11 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
       if (0 && cdoVerbose) sum_srch_cells += num_srch_cells;
 
-      if (0 && cdoVerbose)
-        printf("tgt_cell_add %zu  num_srch_cells %zu\n", tgt_cell_add,
-               num_srch_cells);
+      if (0 && cdoVerbose) printf("tgt_cell_add %zu  num_srch_cells %zu\n", tgt_cell_add, num_srch_cells);
 
       if (num_srch_cells == 0) continue;
 
-      set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add,
-                          tgt_num_cell_corners, tgt_grid,
-                          &tgt_grid_cell[ompthID]);
+      set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, &tgt_grid_cell[ompthID]);
 
       // Create search arrays
 
@@ -1018,22 +909,19 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
         {
           size_t srch_corners_new = srch_corners;
           src_cell_add = srch_add[ompthID][n];
-          set_yac_coordinates(src_remap_grid_type, src_cell_add,
-                              srch_corners_new, src_grid, &src_grid_cells[n]);
+          set_yac_coordinates(src_remap_grid_type, src_cell_add, srch_corners_new, src_grid, &src_grid_cells[n]);
         }
 
       if (tgt_num_cell_corners < 4 || target_cell_type == LON_LAT_CELL)
         {
-          cdo_compute_overlap_areas(num_srch_cells, &search[ompthID],
-                                    tgt_grid_cell[ompthID]);
+          cdo_compute_overlap_areas(num_srch_cells, &search[ompthID], tgt_grid_cell[ompthID]);
         }
       else
         {
           double cell_center_lon = tgt_grid->cell_center_lon[tgt_cell_add];
           double cell_center_lat = tgt_grid->cell_center_lat[tgt_cell_add];
-          cdo_compute_concave_overlap_areas(num_srch_cells, &search[ompthID],
-                                            tgt_grid_cell[ompthID],
-                                            cell_center_lon, cell_center_lat);
+          cdo_compute_concave_overlap_areas(num_srch_cells, &search[ompthID], tgt_grid_cell[ompthID], cell_center_lon,
+                                            cell_center_lat);
         }
 
       double tgt_area = gridcell_area(tgt_grid_cell[ompthID]);
@@ -1054,8 +942,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
       for (n = 0; n < num_weights; ++n)
         partial_weights[n] = partial_areas[n] / tgt_area;
 
-      if (rv->normOpt == NormOpt::FRACAREA)
-        yac_correct_weights((unsigned) num_weights, partial_weights);
+      if (rv->normOpt == NormOpt::FRACAREA) yac_correct_weights((unsigned) num_weights, partial_weights);
 
       for (n = 0; n < num_weights; ++n)
         partial_weights[n] *= tgt_area;
@@ -1116,8 +1003,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
           tgt_grid->cell_frac[tgt_cell_add] += partial_weight;
         }
 
-      store_weightlinks(1, num_weights, srch_add[ompthID], partial_weights,
-                        tgt_cell_add, weightlinks);
+      store_weightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightlinks);
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area;
       // printf("area %d %g %g\n", tgt_cell_add,
@@ -1157,12 +1043,10 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   if (cdoVerbose) cdoPrint("Total number of links = %zu", rv->num_links);
 
   for (size_t n = 0; n < src_grid_size; ++n)
-    if (IS_NOT_EQUAL(src_grid->cell_area[n], 0))
-      src_grid->cell_frac[n] /= src_grid->cell_area[n];
+    if (IS_NOT_EQUAL(src_grid->cell_area[n], 0)) src_grid->cell_frac[n] /= src_grid->cell_area[n];
 
   for (size_t n = 0; n < tgt_grid_size; ++n)
-    if (IS_NOT_EQUAL(tgt_grid->cell_area[n], 0))
-      tgt_grid->cell_frac[n] /= tgt_grid->cell_area[n];
+    if (IS_NOT_EQUAL(tgt_grid->cell_area[n], 0)) tgt_grid->cell_frac[n] /= tgt_grid->cell_area[n];
 
   // Perform some error checking on final weights
   if (lcheck)
@@ -1170,8 +1054,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
       remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
       remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
 
-      remapCheckWeights(rv->num_links, rv->num_wts, rv->normOpt,
-                        rv->src_cell_add, rv->tgt_cell_add, rv->wts);
+      remapCheckWeights(rv->num_links, rv->num_wts, rv->normOpt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
     }
 
   if (cdoTimer) timer_stop(timer_remap_con);
@@ -1181,7 +1064,6 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 // void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const
 // double* restrict src_array, double* restrict tgt_array, double missval)
 void
-remap_conserv(remapgrid_t *, remapgrid_t *, const double *restrict,
-              double *restrict, double)
+remap_conserv(remapgrid_t *, remapgrid_t *, const double *restrict, double *restrict, double)
 {
 }  // remap_conserv

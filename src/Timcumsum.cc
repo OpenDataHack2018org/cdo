@@ -76,8 +76,7 @@ Timcumsum(void *process)
               // pvars1->nmiss = nmiss;
               if (nmiss)
                 for (size_t i = 0; i < gridsize; ++i)
-                  if (DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval))
-                    pvars1->ptr[i] = 0;
+                  if (DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval)) pvars1->ptr[i] = 0;
             }
           else
             {
@@ -89,8 +88,7 @@ Timcumsum(void *process)
 
               if (nmiss)
                 for (size_t i = 0; i < gridsize; ++i)
-                  if (DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
-                    field.ptr[i] = 0;
+                  if (DBL_IS_EQUAL(field.ptr[i], pvars1->missval)) field.ptr[i] = 0;
 
               farfun(pvars1, field, func_sum);
             }

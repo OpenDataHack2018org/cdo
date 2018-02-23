@@ -114,20 +114,17 @@ Yseaspctl(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
       if (nrecs != cdoStreamInqTimestep(streamID3, tsID))
-        cdoAbort("Number of records at time step %d of %s and %s differ!",
-                 tsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
 
       if (vdate != taxisInqVdate(taxisID3))
-        cdoAbort("Verification dates at time step %d of %s and %s differ!",
-                 tsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
-      if (cdoVerbose)
-        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
+      if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
@@ -163,8 +160,7 @@ Yseaspctl(void *process)
           field.grid = vars1[seas][varID][levelID].grid;
           field.missval = vars1[seas][varID][levelID].missval;
 
-          hsetDefVarLevelBounds(hsets[seas], varID, levelID,
-                                &vars1[seas][varID][levelID], &field);
+          hsetDefVarLevelBounds(hsets[seas], varID, levelID, &vars1[seas][varID][levelID], &field);
         }
 
       tsID++;
@@ -188,8 +184,7 @@ Yseaspctl(void *process)
       set_date(vdate, vtime, &datetime1[seas]);
 
       if (vars1[seas] == NULL)
-        cdoAbort("No data for season %d in %s and %s", seas,
-                 cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
+        cdoAbort("No data for season %d in %s and %s", seas, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -204,8 +199,7 @@ Yseaspctl(void *process)
           pstreamReadRecord(streamID1, vars1[seas][varID][levelID].ptr, &nmiss);
           vars1[seas][varID][levelID].nmiss = nmiss;
 
-          hsetAddVarLevelValues(hsets[seas], varID, levelID,
-                                &vars1[seas][varID][levelID]);
+          hsetAddVarLevelValues(hsets[seas], varID, levelID, &vars1[seas][varID][levelID]);
         }
 
       nsets[seas]++;
@@ -216,12 +210,10 @@ Yseaspctl(void *process)
   for (seas = 0; seas < NSEAS; seas++)
     if (nsets[seas])
       {
-        if (getmonthday(datetime1[seas].vdate)
-            != getmonthday(datetime2[seas].vdate))
+        if (getmonthday(datetime1[seas].vdate) != getmonthday(datetime2[seas].vdate))
           cdoAbort("Verification dates for the season %d of %s and %s are "
                    "different!",
-                   seas, cdoGetStreamName(0).c_str(),
-                   cdoGetStreamName(1).c_str());
+                   seas, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
 
         for (varID = 0; varID < nvars; varID++)
           {
@@ -229,8 +221,7 @@ Yseaspctl(void *process)
             nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
             for (levelID = 0; levelID < nlevels; levelID++)
-              hsetGetVarLevelPercentiles(&vars1[seas][varID][levelID],
-                                         hsets[seas], varID, levelID, pn);
+              hsetGetVarLevelPercentiles(&vars1[seas][varID][levelID], hsets[seas], varID, levelID, pn);
           }
 
         taxisDefVdate(taxisID4, datetime1[seas].vdate);
@@ -242,12 +233,10 @@ Yseaspctl(void *process)
             varID = recVarID[recID];
             levelID = recLevelID[recID];
 
-            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-              continue;
+            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
             pstreamDefRecord(streamID4, varID, levelID);
-            pstreamWriteRecord(streamID4, vars1[seas][varID][levelID].ptr,
-                               vars1[seas][varID][levelID].nmiss);
+            pstreamWriteRecord(streamID4, vars1[seas][varID][levelID].ptr, vars1[seas][varID][levelID].nmiss);
           }
 
         otsID++;

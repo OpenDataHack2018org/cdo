@@ -67,19 +67,16 @@ init(void)
       // compute the meridian angle for the base vertex.
       double z_rlon = (1.0 + i_mdist[j - 1]) * pi_5;
       // now initialize the coordinates
-      vertices[j] = vec3{ sin(z_w) * cos(z_rlon), sin(z_w) * sin(z_rlon),
-                          cos(z_w) * i_msgn };
+      vertices[j] = vec3{ sin(z_w) * cos(z_rlon), sin(z_w) * sin(z_rlon), cos(z_w) * i_msgn };
     }
 }
 
 // 20 triangles
-static const TriangleList triangles = {
-  { 0, 1, 2 },  { 0, 2, 3 },  { 0, 3, 4 },  { 0, 4, 5 },   { 0, 5, 1 },
-  { 6, 2, 1 },  { 7, 3, 2 },  { 8, 4, 3 },  { 9, 5, 4 },   { 10, 1, 5 },
-  { 2, 6, 7 },  { 3, 7, 8 },  { 4, 8, 9 },  { 5, 9, 10 },  { 1, 10, 6 },
-  { 11, 7, 6 }, { 11, 8, 7 }, { 11, 9, 8 }, { 11, 10, 9 }, { 11, 6, 10 }
-};
-}
+static const TriangleList triangles
+    = { { 0, 1, 2 },  { 0, 2, 3 },  { 0, 3, 4 },  { 0, 4, 5 },  { 0, 5, 1 },   { 6, 2, 1 },  { 7, 3, 2 },
+        { 8, 4, 3 },  { 9, 5, 4 },  { 10, 1, 5 }, { 2, 6, 7 },  { 3, 7, 8 },   { 4, 8, 9 },  { 5, 9, 10 },
+        { 1, 10, 6 }, { 11, 7, 6 }, { 11, 8, 7 }, { 11, 9, 8 }, { 11, 10, 9 }, { 11, 6, 10 } };
+}  // namespace icosahedron
 
 static inline vec3
 addVector(const vec3 &a, const vec3 &b)
@@ -139,8 +136,7 @@ subdivide(VertexList &vertices, TriangleList triangles)
   for (auto &&each : triangles)
     {
       for (int edge = 0; edge < 3; ++edge)
-        mid[edge] = vertexForEdge(lookup, vertices, each.vertex[edge],
-                                  each.vertex[(edge + 1) % 3]);
+        mid[edge] = vertexForEdge(lookup, vertices, each.vertex[edge], each.vertex[(edge + 1) % 3]);
 
       result.push_back({ each.vertex[0], mid[0], mid[2] });
       result.push_back({ each.vertex[1], mid[1], mid[0] });
@@ -236,8 +232,7 @@ circumCenterMean(const vec3 &v0, const vec3 &v1, const vec3 &v2)
 }
 
 size_t
-genIcosphereCoords(int subdivisions, bool lbounds, double **xvals,
-                   double **yvals, double **xbounds, double **ybounds)
+genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yvals, double **xbounds, double **ybounds)
 {
   IndexedMesh mesh = makeIcosphere(subdivisions);
   VertexList &vertices = mesh.first;
@@ -255,13 +250,11 @@ genIcosphereCoords(int subdivisions, bool lbounds, double **xvals,
   size_t i = 0;
   for (Triangle &t : triangles)
     {
-      vec3 center = circumCenterMean(
-          vertices[t.vertex[0]], vertices[t.vertex[1]], vertices[t.vertex[2]]);
+      vec3 center = circumCenterMean(vertices[t.vertex[0]], vertices[t.vertex[1]], vertices[t.vertex[2]]);
       cc2gc(&center[0], &(*xvals)[i], &(*yvals)[i]);
       if (lbounds)
         for (size_t k = 0; k < 3; ++k)
-          cc2gc(&vertices[t.vertex[k]][0], &(*xbounds)[i * 3 + k],
-                &(*ybounds)[i * 3 + k]);
+          cc2gc(&vertices[t.vertex[k]][0], &(*xbounds)[i * 3 + k], &(*ybounds)[i * 3 + k]);
       i++;
     }
 
@@ -281,20 +274,16 @@ main(void)
         {
           double lon, lat;
           cc2gc(&v[0], &lon, &lat);
-          fprintf(stderr, "xyz:%g %g %g   lon:%g lat:%g\n", v[0], v[1], v[2],
-                  rad2deg(lon), rad2deg(lat));
+          fprintf(stderr, "xyz:%g %g %g   lon:%g lat:%g\n", v[0], v[1], v[2], rad2deg(lon), rad2deg(lat));
         }
       for (Triangle &t : triangles)
         {
-          fprintf(stderr, "index: %d %d %d\n", t.vertex[0], t.vertex[1],
-                  t.vertex[2]);
+          fprintf(stderr, "index: %d %d %d\n", t.vertex[0], t.vertex[1], t.vertex[2]);
         }
       for (Triangle &t : triangles)
         {
           double lon, lat;
-          vec3 center
-              = circumCenterMean(vertices[t.vertex[0]], vertices[t.vertex[1]],
-                                 vertices[t.vertex[2]]);
+          vec3 center = circumCenterMean(vertices[t.vertex[0]], vertices[t.vertex[1]], vertices[t.vertex[2]]);
           cc2gc(&center[0], &lon, &lat);
           fprintf(stderr, "center: %g %g\n", rad2deg(lon), rad2deg(lat));
         }

@@ -49,8 +49,7 @@ Splityear(void *process)
 
   cdoInitialize(process);
 
-  if (processSelf().m_ID != 0)
-    cdoAbort("This operator can't be combined with other operators!");
+  if (processSelf().m_ID != 0) cdoAbort("This operator can't be combined with other operators!");
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -78,8 +77,7 @@ Splityear(void *process)
 
   const char *refname = cdoGetObase();
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix),
-                   pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   // if ( ! lcopy )
   {
@@ -111,8 +109,7 @@ Splityear(void *process)
                 {
                   field_init(&vars[varID][levelID]);
                   vars[varID][levelID].grid = gridID;
-                  vars[varID][levelID].ptr
-                      = (double *) Malloc(gridsize * sizeof(double));
+                  vars[varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
                 }
             }
         }
@@ -150,8 +147,7 @@ Splityear(void *process)
 
               sprintf(filename + nchars, "%04d", year1);
               if (ic > 0) sprintf(filename + strlen(filename), "_%d", ic + 1);
-              if (filesuffix[0])
-                sprintf(filename + strlen(filename), "%s", filesuffix);
+              if (filesuffix[0]) sprintf(filename + strlen(filename), "%s", filesuffix);
 
               if (cdoVerbose) cdoPrint("create file %s", filename);
 
@@ -174,8 +170,7 @@ Splityear(void *process)
 
               sprintf(filename + nchars, "%04d", index1);
               // if ( ic > 0 ) sprintf(filename+strlen(filename), "_%d", ic+1);
-              if (filesuffix[0])
-                sprintf(filename + strlen(filename), "%s", filesuffix);
+              if (filesuffix[0]) sprintf(filename + strlen(filename), "%s", filesuffix);
 
               if (cdoVerbose) cdoPrint("create file %s", filename);
 
@@ -197,8 +192,7 @@ Splityear(void *process)
                     {
                       nmiss = vars[varID][levelID].nmiss;
                       pstreamDefRecord(streamID2, varID, levelID);
-                      pstreamWriteRecord(streamID2, vars[varID][levelID].ptr,
-                                         nmiss);
+                      pstreamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
                     }
                 }
             }

@@ -241,10 +241,9 @@ meravgw(field_type field1, field_type *field2)
 }
 
 static void
-prevarsum_merw(const double *restrict array, const double *restrict w,
-               size_t nx, size_t ny, size_t nmiss, double missval,
-               double *restrict rsum, double *restrict rsumw,
-               double *restrict rsumq, double *restrict rsumwq)
+prevarsum_merw(const double *restrict array, const double *restrict w, size_t nx, size_t ny, size_t nmiss,
+               double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq,
+               double *restrict rsumwq)
 {
   *rsum = 0;
   *rsumq = 0;
@@ -254,8 +253,7 @@ prevarsum_merw(const double *restrict array, const double *restrict w,
   if (nmiss > 0)
     {
       for (size_t j = 0; j < ny; j++)
-        if (!DBL_IS_EQUAL(array[j * nx], missval)
-            && !DBL_IS_EQUAL(w[j * nx], missval))
+        if (!DBL_IS_EQUAL(array[j * nx], missval) && !DBL_IS_EQUAL(w[j * nx], missval))
           {
             *rsum += w[j * nx] * array[j * nx];
             *rsumq += w[j * nx] * array[j * nx] * array[j * nx];
@@ -292,12 +290,9 @@ mervarw(field_type field1, field_type *field2)
 
   for (size_t i = 0; i < nx; i++)
     {
-      prevarsum_merw(array + i, w + i, nx, ny, nmiss, missval, &rsum, &rsumw,
-                     &rsumq, &rsumwq);
+      prevarsum_merw(array + i, w + i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
-      rvar = IS_NOT_EQUAL(rsumw, 0)
-                 ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw)
-                 : missval;
+      rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw) : missval;
       if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
       if (DBL_IS_EQUAL(rvar, missval)) rnmiss++;
@@ -325,12 +320,9 @@ mervar1w(field_type field1, field_type *field2)
 
   for (size_t i = 0; i < nx; i++)
     {
-      prevarsum_merw(array + i, w + i, nx, ny, nmiss, missval, &rsum, &rsumw,
-                     &rsumq, &rsumwq);
+      prevarsum_merw(array + i, w + i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
-      rvar = (rsumw * rsumw > rsumwq)
-                 ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq)
-                 : missval;
+      rvar = (rsumw * rsumw > rsumwq) ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq) : missval;
       if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
       if (DBL_IS_EQUAL(rvar, missval)) rnmiss++;
@@ -410,8 +402,7 @@ merpctl(field_type field1, field_type *field2, int p)
         {
           size_t l = 0;
           for (size_t j = 0; j < ny; j++)
-            if (!DBL_IS_EQUAL(array[j * nx + i], missval))
-              array2[l++] = array[j * nx + i];
+            if (!DBL_IS_EQUAL(array[j * nx + i], missval)) array2[l++] = array[j * nx + i];
 
           if (l > 0)
             {

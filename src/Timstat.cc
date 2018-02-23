@@ -198,8 +198,7 @@ void *Timstat(void *argument)
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   taxisWithBounds(taxisID2);
-  if (taxisInqType(taxisID2) == TAXIS_FORECAST)
-    taxisDefType(taxisID2, TAXIS_RELATIVE);
+  if (taxisInqType(taxisID2) == TAXIS_FORECAST) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
@@ -211,8 +210,7 @@ void *Timstat(void *argument)
     freq = "mon";
   else if (comparelen == YEAR_LEN)
     freq = "year";
-  if (freq)
-    cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int) strlen(freq), freq);
+  if (freq) cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int) strlen(freq), freq);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -294,8 +292,7 @@ void *Timstat(void *argument)
                 {
                   recinfo[recID].varID = varID;
                   recinfo[recID].levelID = levelID;
-                  recinfo[recID].lconst
-                      = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+                  recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
                 }
 
               field_type *psamp1 = &samp1[varID][levelID];
@@ -318,13 +315,10 @@ void *Timstat(void *argument)
 
                   if (nmiss > 0 || psamp1->ptr)
                     {
-                      if (psamp1->ptr == NULL)
-                        psamp1->ptr = (double *) Malloc(nwpv * gridsize
-                                                        * sizeof(double));
+                      if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(nwpv * gridsize * sizeof(double));
 
                       for (size_t i = 0; i < nwpv * gridsize; i++)
-                        psamp1->ptr[i]
-                            = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
               else
@@ -341,15 +335,13 @@ void *Timstat(void *argument)
                     {
                       if (psamp1->ptr == NULL)
                         {
-                          psamp1->ptr = (double *) Malloc(nwpv * gridsize
-                                                          * sizeof(double));
+                          psamp1->ptr = (double *) Malloc(nwpv * gridsize * sizeof(double));
                           for (size_t i = 0; i < nwpv * gridsize; i++)
                             psamp1->ptr[i] = nsets;
                         }
 
                       for (size_t i = 0; i < nwpv * gridsize; i++)
-                        if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
-                          psamp1->ptr[i]++;
+                        if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval)) psamp1->ptr[i]++;
                     }
 
                   if (lvarstd)
@@ -435,8 +427,7 @@ void *Timstat(void *argument)
           char vdatestr[32], vtimestr[32];
           date2str(vdate0, vdatestr, sizeof(vdatestr));
           time2str(vtime0, vtimestr, sizeof(vtimestr));
-          cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac,
-                   nsets);
+          cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac, nsets);
         }
 
       if (lvfrac && operfunc == func_mean)
@@ -464,9 +455,7 @@ void *Timstat(void *argument)
                       }
                   }
 
-                if (irun)
-                  pvars1->nmiss
-                      = arrayNumMV(nwpv * gridsize, pvars1->ptr, missval);
+                if (irun) pvars1->nmiss = arrayNumMV(nwpv * gridsize, pvars1->ptr, missval);
               }
           }
 

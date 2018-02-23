@@ -82,18 +82,12 @@ Condc(void *process)
           if (operatorID == IFTHENC)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = !DBL_IS_EQUAL(array1[i], missval)
-                                    && !DBL_IS_EQUAL(array1[i], 0.)
-                                ? rc
-                                : missval;
+                array2[i] = !DBL_IS_EQUAL(array1[i], missval) && !DBL_IS_EQUAL(array1[i], 0.) ? rc : missval;
             }
           else if (operatorID == IFNOTTHENC)
             {
               for (size_t i = 0; i < gridsize; i++)
-                array2[i] = !DBL_IS_EQUAL(array1[i], missval)
-                                    && DBL_IS_EQUAL(array1[i], 0.)
-                                ? rc
-                                : missval;
+                array2[i] = !DBL_IS_EQUAL(array1[i], missval) && DBL_IS_EQUAL(array1[i], 0.) ? rc : missval;
             }
           else
             {

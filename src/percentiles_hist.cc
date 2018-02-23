@@ -197,8 +197,7 @@ hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
 
   assert(nvars > 0);
 
-  if (varID < 0 || varID >= nvars)
-    cdoAbort("Illegal argument: varID %d is undefined (%s)", varID, __func__);
+  if (varID < 0 || varID >= nvars) cdoAbort("Illegal argument: varID %d is undefined (%s)", varID, __func__);
 
   nhists = gridInqSize(grid);
 
@@ -207,15 +206,12 @@ hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
   hset->nlevels[varID] = nlevels;
   hset->grids[varID] = grid;
 
-  hset->histograms[varID]
-      = (HISTOGRAM **) Malloc(nlevels * sizeof(HISTOGRAM *));
-  if (hset->histograms[varID] == NULL)
-    cdoAbort("Not enough memory (%s)", __func__);
+  hset->histograms[varID] = (HISTOGRAM **) Malloc(nlevels * sizeof(HISTOGRAM *));
+  if (hset->histograms[varID] == NULL) cdoAbort("Not enough memory (%s)", __func__);
 
   for (levelID = 0; levelID < nlevels; levelID++)
     {
-      hists = hset->histograms[varID][levelID]
-          = (HISTOGRAM *) Malloc(nhists * sizeof(HISTOGRAM));
+      hists = hset->histograms[varID][levelID] = (HISTOGRAM *) Malloc(nhists * sizeof(HISTOGRAM));
       if (hists == NULL) cdoAbort("Not enough memory (%s)", __func__);
 
       for (histID = 0; histID < nhists; histID++)
@@ -227,8 +223,7 @@ hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
           hists[histID].nsamp = 0;
 
           hists[histID].ptr = (int *) Malloc(nbins * sizeof(int));
-          if (hists[histID].ptr == NULL)
-            cdoAbort("Not enough memory (%s)", __func__);
+          if (hists[histID].ptr == NULL) cdoAbort("Not enough memory (%s)", __func__);
         }
     }
 }
@@ -262,8 +257,7 @@ hsetDestroy(HISTOGRAM_SET *hset)
 }
 
 void
-hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID,
-                      const field_type *field1, const field_type *field2)
+hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID, const field_type *field1, const field_type *field2)
 {
   const double *array1 = field1->ptr;
   const double *array2 = field2->ptr;
@@ -282,21 +276,17 @@ hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID,
 
   assert(nvars > 0);
 
-  if (varID < 0 || varID >= nvars)
-    cdoAbort("Illegal argument: varID %d is undefined (%s)", varID, __func__);
+  if (varID < 0 || varID >= nvars) cdoAbort("Illegal argument: varID %d is undefined (%s)", varID, __func__);
 
   nlevels = hset->nlevels[varID];
 
   assert(nlevels > 0);
 
-  if (levelID < 0 || levelID >= nlevels)
-    cdoAbort("Illegal argument: levelID %d is undefined (%s)", levelID,
-             __func__);
+  if (levelID < 0 || levelID >= nlevels) cdoAbort("Illegal argument: levelID %d is undefined (%s)", levelID, __func__);
 
   grid = hset->grids[varID];
 
-  if (grid != field1->grid || grid != field2->grid)
-    cdoAbort("Grids are different (%s)", __func__);
+  if (grid != field1->grid || grid != field2->grid) cdoAbort("Grids are different (%s)", __func__);
 
   hists = hset->histograms[varID][levelID];
 
@@ -311,8 +301,7 @@ hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID,
       a = array1[i];
       b = array2[i];
 
-      if (DBL_IS_EQUAL(a, field1->missval) || DBL_IS_EQUAL(b, field2->missval)
-          || DBL_IS_EQUAL(a, b))
+      if (DBL_IS_EQUAL(a, field1->missval) || DBL_IS_EQUAL(b, field2->missval) || DBL_IS_EQUAL(a, b))
         histDefBounds(&hists[i], 0.0, 0.0);
       else
         histDefBounds(&hists[i], a, b);
@@ -320,8 +309,7 @@ hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID,
 }
 
 void
-hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID,
-                      const field_type *field)
+hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID, const field_type *field)
 {
   const double *array = field->ptr;
   int i, grid, nvars, nlevels, nhists, nign = 0;
@@ -335,16 +323,13 @@ hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID,
 
   assert(nvars > 0);
 
-  if (varID < 0 || varID >= nvars)
-    cdoAbort("Illegal argument: varID %d is undefined (%s)", varID, __func__);
+  if (varID < 0 || varID >= nvars) cdoAbort("Illegal argument: varID %d is undefined (%s)", varID, __func__);
 
   nlevels = hset->nlevels[varID];
 
   assert(nlevels > 0);
 
-  if (levelID < 0 || levelID >= nlevels)
-    cdoAbort("Illegal argument: levelID %d is undefined (%s)", levelID,
-             __func__);
+  if (levelID < 0 || levelID >= nlevels) cdoAbort("Illegal argument: levelID %d is undefined (%s)", levelID, __func__);
 
   grid = hset->grids[varID];
   if (grid != field->grid) cdoAbort("Grids are different (%s)", __func__);
@@ -360,8 +345,7 @@ hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID,
   if (field->nmiss)
     {
       for (i = 0; i < nhists; i++)
-        if (!DBL_IS_EQUAL(array[i], field->missval))
-          nign += histAddValue(&hists[i], array[i]);
+        if (!DBL_IS_EQUAL(array[i], field->missval)) nign += histAddValue(&hists[i], array[i]);
     }
   else
     {
@@ -369,15 +353,11 @@ hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID,
         nign += histAddValue(&hists[i], array[i]);
     }
 
-  if (nign)
-    cdoWarning(
-        "%d out of %d grid values are out of bounds and have been ignored (%s)",
-        nign, nhists, __func__);
+  if (nign) cdoWarning("%d out of %d grid values are out of bounds and have been ignored (%s)", nign, nhists, __func__);
 }
 
 void
-hsetGetVarLevelPercentiles(field_type *field, const HISTOGRAM_SET *hset,
-                           int varID, int levelID, double p)
+hsetGetVarLevelPercentiles(field_type *field, const HISTOGRAM_SET *hset, int varID, int levelID, double p)
 {
   double *array = field->ptr;
   int i, nvars, nlevels, nhists, grid;
@@ -391,16 +371,13 @@ hsetGetVarLevelPercentiles(field_type *field, const HISTOGRAM_SET *hset,
 
   assert(nvars > 0);
 
-  if (varID < 0 || varID >= nvars)
-    cdoAbort("Illegal argument: varID %d is undefined (%s)", varID, __func__);
+  if (varID < 0 || varID >= nvars) cdoAbort("Illegal argument: varID %d is undefined (%s)", varID, __func__);
 
   nlevels = hset->nlevels[varID];
 
   assert(nlevels > 0);
 
-  if (levelID < 0 || levelID >= nlevels)
-    cdoAbort("Illegal argument: levelID %d is undefined (%s)", levelID,
-             __func__);
+  if (levelID < 0 || levelID >= nlevels) cdoAbort("Illegal argument: levelID %d is undefined (%s)", levelID, __func__);
 
   grid = hset->grids[varID];
 

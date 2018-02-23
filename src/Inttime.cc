@@ -62,8 +62,7 @@ Inttime(void *process)
   else
     {
       vdate = (int) strtol(datestr, &rstr, 10);
-      if (*rstr != 0)
-        cdoAbort("Parameter string contains invalid characters: %s", datestr);
+      if (*rstr != 0) cdoAbort("Parameter string contains invalid characters: %s", datestr);
     }
 
   if (strchr(timestr, ':'))
@@ -77,8 +76,7 @@ Inttime(void *process)
   else
     {
       vtime = (int) strtol(timestr, &rstr, 10);
-      if (*rstr != 0)
-        cdoAbort("Parameter string contains invalid characters: %s", timestr);
+      if (*rstr != 0) cdoAbort("Parameter string contains invalid characters: %s", timestr);
     }
 
   if (operatorArgc() == 3)
@@ -143,8 +141,7 @@ Inttime(void *process)
 
   int tsID = 0;
   int nrecs = cdoStreamInqTimestep(streamID1, tsID++);
-  juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1),
-                                      taxisInqVtime(taxisID1));
+  juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
   for (int recID = 0; recID < nrecs; recID++)
     {
       pstreamInqRecord(streamID1, &varID, &levelID);
@@ -156,8 +153,7 @@ Inttime(void *process)
 
   if (cdoVerbose)
     {
-      cdoPrint("date %d  time %d", taxisInqVdate(taxisID1),
-               taxisInqVtime(taxisID1));
+      cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
       cdoPrint("juldate1  = %f", juldate_to_seconds(juldate1));
     }
 
@@ -170,12 +166,10 @@ Inttime(void *process)
       nrecs = cdoStreamInqTimestep(streamID1, tsID++);
       if (nrecs == 0) break;
 
-      juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1),
-                                          taxisInqVtime(taxisID1));
+      juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
       if (cdoVerbose)
         {
-          cdoPrint("date %d  time %d", taxisInqVdate(taxisID1),
-                   taxisInqVtime(taxisID1));
+          cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
           cdoPrint("juldate2  = %f", juldate_to_seconds(juldate2));
         }
 
@@ -209,14 +203,12 @@ Inttime(void *process)
                   */
                   date2str(vdate, vdatestr, sizeof(vdatestr));
                   time2str(vtime, vtimestr, sizeof(vtimestr));
-                  cdoPrint("%s %s  %f  %d", vdatestr, vtimestr,
-                           juldate_to_seconds(juldate), calendar);
+                  cdoPrint("%s %s  %f  %d", vdatestr, vtimestr, juldate_to_seconds(juldate), calendar);
                 }
 
               if (streamID2 == -1)
                 {
-                  streamID2
-                      = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
+                  streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
                   pstreamDefVlist(streamID2, vlistID2);
                 }
 
@@ -224,12 +216,10 @@ Inttime(void *process)
               taxisDefVtime(taxisID2, vtime);
               pstreamDefTimestep(streamID2, tsIDo++);
 
-              double fac1
-                  = juldate_to_seconds(juldate_sub(juldate2, juldate))
-                    / juldate_to_seconds(juldate_sub(juldate2, juldate1));
-              double fac2
-                  = juldate_to_seconds(juldate_sub(juldate, juldate1))
-                    / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate))
+                            / juldate_to_seconds(juldate_sub(juldate2, juldate1));
+              double fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1))
+                            / juldate_to_seconds(juldate_sub(juldate2, juldate1));
 
               for (int recID = 0; recID < nrecs; recID++)
                 {
@@ -249,15 +239,12 @@ Inttime(void *process)
 
                       for (size_t i = 0; i < gridsize; i++)
                         {
-                          if (!DBL_IS_EQUAL(single1[i], missval1)
-                              && !DBL_IS_EQUAL(single2[i], missval2))
+                          if (!DBL_IS_EQUAL(single1[i], missval1) && !DBL_IS_EQUAL(single2[i], missval2))
                             array[i] = single1[i] * fac1 + single2[i] * fac2;
-                          else if (DBL_IS_EQUAL(single1[i], missval1)
-                                   && !DBL_IS_EQUAL(single2[i], missval2)
+                          else if (DBL_IS_EQUAL(single1[i], missval1) && !DBL_IS_EQUAL(single2[i], missval2)
                                    && fac2 >= 0.5)
                             array[i] = single2[i];
-                          else if (DBL_IS_EQUAL(single2[i], missval2)
-                                   && !DBL_IS_EQUAL(single1[i], missval1)
+                          else if (DBL_IS_EQUAL(single2[i], missval2) && !DBL_IS_EQUAL(single1[i], missval1)
                                    && fac1 >= 0.5)
                             array[i] = single1[i];
                           else
@@ -336,8 +323,7 @@ Inttime(void *process)
   if (streamID2 != -1) pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  if (tsIDo == 0)
-    cdoWarning("date/time out of time axis, no time step interpolated!");
+  if (tsIDo == 0) cdoWarning("date/time out of time axis, no time step interpolated!");
 
   cdoFinish();
 

@@ -36,8 +36,7 @@ Selrec(void *process)
 
   cdoInitialize(process);
 
-  if (processSelf().m_ID != 0)
-    cdoAbort("This operator can't be combined with other operators!");
+  if (processSelf().m_ID != 0) cdoAbort("This operator can't be combined with other operators!");
 
   operatorInputArg("records");
 
@@ -55,9 +54,8 @@ Selrec(void *process)
 
   int filetype = pstreamInqFiletype(streamID1);
 
-  if (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2
-      || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C
-      || filetype == CDI_FILETYPE_NC5)
+  if (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4
+      || filetype == CDI_FILETYPE_NC4C || filetype == CDI_FILETYPE_NC5)
     cdoAbort("This operator does not work on NetCDF data!");
 
   int vlistID1 = cdoStreamInqVlist(streamID1);

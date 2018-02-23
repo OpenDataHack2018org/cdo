@@ -42,11 +42,9 @@ Writegrid(void *process)
 
   if (gridtype == GRID_GME) gridID = gridToUnstructured(gridID, 1);
 
-  if (gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED)
-    gridID = gridToCurvilinear(gridID, 1);
+  if (gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED) gridID = gridToCurvilinear(gridID, 1);
 
-  if (gridInqXbounds(gridID, NULL) == 0 || gridInqYbounds(gridID, NULL) == 0)
-    cdoAbort("Grid corner missing!");
+  if (gridInqXbounds(gridID, NULL) == 0 || gridInqYbounds(gridID, NULL) == 0) cdoAbort("Grid corner missing!");
 
   int *mask = (int *) Malloc(gridsize * sizeof(int));
 

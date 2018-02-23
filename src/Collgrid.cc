@@ -85,8 +85,7 @@ cmpxy_gt(const void *s1, const void *s2)
 }
 
 static int
-genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit,
-        int igrid, long nxblocks)
+genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit, int igrid, long nxblocks)
 {
   bool lsouthnorth = true;
   bool lregular = false;
@@ -98,9 +97,7 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit,
 
   int gridID = vlistGrid(ef[0].vlistID, igrid);
   int gridtype = gridInqType(gridID);
-  if (ngrids > 1 && gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0
-      && gridInqYsize(gridID) == 0)
-    return gridID2;
+  if (ngrids > 1 && gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0) return gridID2;
 
   std::vector<long> xsize(nfiles);
   std::vector<long> ysize(nfiles);
@@ -116,9 +113,7 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit,
         lregular = true;
       else if (gridtype == GRID_CURVILINEAR)
         lcurvilinear = true;
-      else if (
-          gridtype
-          == GRID_GENERIC /*&& gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0*/)
+      else if (gridtype == GRID_GENERIC /*&& gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0*/)
         ;
       else
         cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
@@ -154,8 +149,7 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit,
 
           if (ysize[fileID] > 1)
             {
-              if (yvals[fileID][0] > yvals[fileID][ysize[fileID] - 1])
-                lsouthnorth = false;
+              if (yvals[fileID][0] > yvals[fileID][ysize[fileID] - 1]) lsouthnorth = false;
             }
         }
       else
@@ -168,8 +162,7 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit,
 
   if (cdoVerbose && lregular)
     for (int fileID = 0; fileID < nfiles; fileID++)
-      printf("1 %d %g %g \n", xyinfo[fileID].id, xyinfo[fileID].x,
-             xyinfo[fileID].y);
+      printf("1 %d %g %g \n", xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
   if (lregular)
     {
@@ -177,8 +170,7 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit,
 
       if (cdoVerbose)
         for (int fileID = 0; fileID < nfiles; fileID++)
-          printf("2 %d %g %g \n", xyinfo[fileID].id, xyinfo[fileID].x,
-                 xyinfo[fileID].y);
+          printf("2 %d %g %g \n", xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
       if (lsouthnorth)
         qsort(xyinfo, nfiles, sizeof(xyinfoType), cmpxy_lt);
@@ -187,8 +179,7 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit,
 
       if (cdoVerbose)
         for (int fileID = 0; fileID < nfiles; fileID++)
-          printf("3 %d %g %g \n", xyinfo[fileID].id, xyinfo[fileID].x,
-                 xyinfo[fileID].y);
+          printf("3 %d %g %g \n", xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
       if (nx <= 0)
         {
@@ -208,10 +199,7 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit,
     }
 
   long ny = nfiles / nx;
-  if (nx * ny != nfiles)
-    cdoAbort(
-        "Number of input files (%ld) and number of blocks (%ldx%ld) differ!",
-        nfiles, nx, ny);
+  if (nx * ny != nfiles) cdoAbort("Number of input files (%ld) and number of blocks (%ldx%ld) differ!", nfiles, nx, ny);
 
   long xsize2 = 0;
   for (long i = 0; i < nx; ++i)
@@ -311,8 +299,7 @@ Collgrid(void *process)
   int nfiles = cdoStreamCnt() - 1;
   const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
-  if (!cdoOverwriteMode && fileExists(ofilename)
-      && !userFileOverwrite(ofilename))
+  if (!cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename))
     cdoAbort("Outputfile %s already exists!", ofilename);
 
   std::vector<ensfileType> ef(nfiles);
@@ -388,8 +375,7 @@ Collgrid(void *process)
         }
 
       for (int isel = 0; isel < nsel; isel++)
-        if (selfound[isel] == false)
-          cdoAbort("Variable name %s not found!", argnames[isel]);
+        if (selfound[isel] == false) cdoAbort("Variable name %s not found!", argnames[isel]);
     }
 
   for (varID = 0; varID < nvars; varID++)
@@ -456,8 +442,7 @@ Collgrid(void *process)
       if (gridIDs[i] != -1)
         {
           if (gridsize2 == 0) gridsize2 = gridInqSize(gridIDs[i]);
-          if (gridsize2 != gridInqSize(gridIDs[i]))
-            cdoAbort("gridsize differ!");
+          if (gridsize2 != gridInqSize(gridIDs[i])) cdoAbort("gridsize differ!");
           vlistChangeGridIndex(vlistID2, i, gridIDs[i]);
         }
     }
@@ -490,8 +475,7 @@ Collgrid(void *process)
         {
           int nrecs = cdoStreamInqTimestep(ef[fileID].streamID, tsID);
           if (nrecs != nrecs0)
-            cdoAbort("Number of records at time step %d of %s and %s differ!",
-                     tsID + 1, cdoGetStreamName(0).c_str(),
+            cdoAbort("Number of records at time step %d of %s and %s differ!", tsID + 1, cdoGetStreamName(0).c_str(),
                      cdoGetStreamName(fileID).c_str());
         }
 
@@ -503,8 +487,7 @@ Collgrid(void *process)
         {
           pstreamInqRecord(ef[0].streamID, &varID, &levelID);
           if (cdoVerbose && tsID == 0)
-            printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID,
-                   varID, levelID);
+            printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
 
           for (int fileID = 1; fileID < nfiles; fileID++)
             {
@@ -516,9 +499,7 @@ Collgrid(void *process)
             {
               int varID2 = vlistFindVar(vlistID2, varID);
               int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
-              if (cdoVerbose && tsID == 0)
-                printf("varID %d %d levelID %d %d\n", varID, varID2, levelID,
-                       levelID2);
+              if (cdoVerbose && tsID == 0) printf("varID %d %d levelID %d %d\n", varID, varID2, levelID, levelID2);
 
               double missval = vlistInqVarMissval(vlistID2, varID2);
               for (size_t i = 0; i < gridsize2; i++)
@@ -529,8 +510,7 @@ Collgrid(void *process)
 #endif
               for (int fileID = 0; fileID < nfiles; fileID++)
                 {
-                  pstreamReadRecord(ef[fileID].streamID, &ef[fileID].array[0],
-                                    &ef[fileID].nmiss);
+                  pstreamReadRecord(ef[fileID].streamID, &ef[fileID].array[0], &ef[fileID].nmiss);
 
                   if (vars[varID2])
                     {

@@ -49,10 +49,8 @@ trms(field_type field1, field_type field2, double *dp, field_type *field3)
     for (size_t i = 0; i < len; i++)
       {
         wp = w[i] * dp[k * len + i];
-        rsum = ADDMN(
-            rsum,
-            MULMN(wp, MULMN(SUBMN(array2[k * len + i], array1[k * len + i]),
-                            SUBMN(array2[k * len + i], array1[k * len + i]))));
+        rsum = ADDMN(rsum, MULMN(wp, MULMN(SUBMN(array2[k * len + i], array1[k * len + i]),
+                                           SUBMN(array2[k * len + i], array1[k * len + i]))));
         rsumw = ADDMN(rsumw, wp);
       }
 
@@ -121,8 +119,7 @@ Trms(void *process)
   int index = 0;
   gridID1 = vlistGrid(vlistID1, index);
 
-  if (needWeights && gridInqType(gridID1) != GRID_LONLAT
-      && gridInqType(gridID1) != GRID_GAUSSIAN)
+  if (needWeights && gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN)
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
   vlistChangeGridIndex(vlistID3, index, gridID3);
@@ -223,10 +220,8 @@ Trms(void *process)
           offset = gridsize * k;
           for (size_t i = 0; i < gridsize; i++)
             {
-              double dp1 = (va[k + 1] + vb[k + 1] * vardata1[pvarID][i])
-                           - (va[k] + vb[k] * vardata1[pvarID][i]);
-              double dp2 = (va[k + 1] + vb[k + 1] * vardata2[pvarID][i])
-                           - (va[k] + vb[k] * vardata2[pvarID][i]);
+              double dp1 = (va[k + 1] + vb[k + 1] * vardata1[pvarID][i]) - (va[k] + vb[k] * vardata1[pvarID][i]);
+              double dp2 = (va[k + 1] + vb[k + 1] * vardata2[pvarID][i]) - (va[k] + vb[k] * vardata2[pvarID][i]);
 
               dp[offset + i] = 0.5 * (dp1 + dp2);
             }
@@ -248,8 +243,7 @@ Trms(void *process)
             }
           code = vlistInqVarCode(vlistID1, varID);
           if (wstatus != 0 && tsID == 0 && code != oldcode)
-            cdoWarning("Using constant area weights for code %d!",
-                       oldcode = code);
+            cdoWarning("Using constant area weights for code %d!", oldcode = code);
 
           field1.missval = vlistInqVarMissval(vlistID1, varID);
           field2.missval = vlistInqVarMissval(vlistID2, varID);

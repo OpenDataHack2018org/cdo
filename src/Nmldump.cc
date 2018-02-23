@@ -36,24 +36,14 @@ print_values(int nvalues, char **values)
           if (i) printf(", ");
           switch (dtype)
             {
-            case CDI_DATATYPE_INT8:
-              printf("%db", literal_to_int(values[i]));
-              break;
-            case CDI_DATATYPE_INT16:
-              printf("%ds", literal_to_int(values[i]));
-              break;
-            case CDI_DATATYPE_INT32:
-              printf("%d", literal_to_int(values[i]));
-              break;
+            case CDI_DATATYPE_INT8: printf("%db", literal_to_int(values[i])); break;
+            case CDI_DATATYPE_INT16: printf("%ds", literal_to_int(values[i])); break;
+            case CDI_DATATYPE_INT32: printf("%d", literal_to_int(values[i])); break;
             case CDI_DATATYPE_FLT32:
-              printf("%sf",
-                     double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr),
-                                      literal_to_double(values[i])));
+              printf("%sf", double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr), literal_to_double(values[i])));
               break;
             case CDI_DATATYPE_FLT64:
-              printf("%s",
-                     double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr),
-                                      literal_to_double(values[i])));
+              printf("%s", double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr), literal_to_double(values[i])));
               break;
             default: printf("\"%s\"", values[i]);
             }
@@ -75,8 +65,7 @@ kvldump(list_t *pmlist)
                 {
                   const char *listname = list_name(kvlist);
                   if (listname) printf("&%s\n", list_name(kvlist));
-                  for (listNode_t *kvnode = kvlist->head; kvnode;
-                       kvnode = kvnode->next)
+                  for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
                     {
                       keyValues_t *kv = *(keyValues_t **) kvnode->data;
                       const char *key = kv->key;

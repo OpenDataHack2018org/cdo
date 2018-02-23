@@ -84,8 +84,7 @@ sellist_verify(sellist_t *sellist)
       for (int i = 0; i < sellist->size; ++i)
         {
           selentry_t *e = &(sellist->entry[i]);
-          if (e->type == 0)
-            cdoAbort("Unsupported selection keyword: '%s'!", e->key);
+          if (e->type == 0) cdoAbort("Unsupported selection keyword: '%s'!", e->key);
         }
     }
 }
@@ -118,15 +117,9 @@ sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
             {
               switch (type)
                 {
-                case SELLIST_INT:
-                  e->cvalues = Malloc(e->nvalues * sizeof(int));
-                  break;
-                case SELLIST_FLT:
-                  e->cvalues = Malloc(e->nvalues * sizeof(double));
-                  break;
-                case SELLIST_WORD:
-                  e->cvalues = Malloc(e->nvalues * sizeof(char *));
-                  break;
+                case SELLIST_INT: e->cvalues = Malloc(e->nvalues * sizeof(int)); break;
+                case SELLIST_FLT: e->cvalues = Malloc(e->nvalues * sizeof(double)); break;
+                case SELLIST_WORD: e->cvalues = Malloc(e->nvalues * sizeof(char *)); break;
                 }
             }
 
@@ -157,8 +150,7 @@ sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
                       e->nvalues += k - 1;
                       if (e->nvalues)
                         {
-                          e->cvalues
-                              = Realloc(e->cvalues, e->nvalues * sizeof(int));
+                          e->cvalues = Realloc(e->cvalues, e->nvalues * sizeof(int));
 
                           if (inc >= 0)
                             {
@@ -175,12 +167,8 @@ sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
 
                   break;
                 }
-              case SELLIST_FLT:
-                ((double *) e->cvalues)[i] = parameter2double(e->values[i]);
-                break;
-              case SELLIST_WORD:
-                ((const char **) e->cvalues)[i] = parameter2word(e->values[i]);
-                break;
+              case SELLIST_FLT: ((double *) e->cvalues)[i] = parameter2double(e->values[i]); break;
+              case SELLIST_WORD: ((const char **) e->cvalues)[i] = parameter2word(e->values[i]); break;
               }
 
           if (e->nvalues) e->flag = (bool *) Calloc(e->nvalues, sizeof(bool));
@@ -190,12 +178,8 @@ sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
             switch (type)
               {
               case SELLIST_INT: printf(" %d", ((int *) e->cvalues)[i]); break;
-              case SELLIST_FLT:
-                printf(" %g", ((double *) e->cvalues)[i]);
-                break;
-              case SELLIST_WORD:
-                printf(" %s", ((char **) e->cvalues)[i]);
-                break;
+              case SELLIST_FLT: printf(" %g", ((double *) e->cvalues)[i]); break;
+              case SELLIST_WORD: printf(" %s", ((char **) e->cvalues)[i]); break;
               }
           printf("\n");
 #endif
@@ -210,8 +194,7 @@ sellist_nvalues(sellist_t *sellist, int idx)
 {
   int nvalues = 0;
 
-  if (sellist && idx >= 0 && idx < sellist->size)
-    nvalues = sellist->entry[idx].nvalues;
+  if (sellist && idx >= 0 && idx < sellist->size) nvalues = sellist->entry[idx].nvalues;
 
   return nvalues;
 }
@@ -229,17 +212,9 @@ sellist_check_flag(sellist_t *sellist, int idx)
       for (int i = 0; i < nvalues; ++i)
         if (e->flag[i] == false) switch (e->type)
             {
-            case SELLIST_INT:
-              cdoWarning("%s >%d< not found!", e->txt, ((int *) e->cvalues)[i]);
-              break;
-            case SELLIST_FLT:
-              cdoWarning("%s >%g< not found!", e->txt,
-                         ((double *) e->cvalues)[i]);
-              break;
-            case SELLIST_WORD:
-              cdoWarning("%s >%s< not found!", e->txt,
-                         ((char **) e->cvalues)[i]);
-              break;
+            case SELLIST_INT: cdoWarning("%s >%d< not found!", e->txt, ((int *) e->cvalues)[i]); break;
+            case SELLIST_FLT: cdoWarning("%s >%g< not found!", e->txt, ((double *) e->cvalues)[i]); break;
+            case SELLIST_WORD: cdoWarning("%s >%s< not found!", e->txt, ((char **) e->cvalues)[i]); break;
             }
     }
 }
@@ -380,15 +355,9 @@ sellist_get_val(sellist_t *sellist, int idx, int vindex, void *val)
         {
           switch (e->type)
             {
-            case SELLIST_INT:
-              *(int *) val = ((int *) e->cvalues)[vindex];
-              break;
-            case SELLIST_FLT:
-              *(double *) val = ((double *) e->cvalues)[vindex];
-              break;
-            case SELLIST_WORD:
-              *(const char **) val = ((const char **) e->cvalues)[vindex];
-              break;
+            case SELLIST_INT: *(int *) val = ((int *) e->cvalues)[vindex]; break;
+            case SELLIST_FLT: *(double *) val = ((double *) e->cvalues)[vindex]; break;
+            case SELLIST_WORD: *(const char **) val = ((const char **) e->cvalues)[vindex]; break;
             }
         }
     }
@@ -408,15 +377,9 @@ sellist_def_val(sellist_t *sellist, int idx, int vindex, void *val)
         {
           switch (e->type)
             {
-            case SELLIST_INT:
-              ((int *) e->cvalues)[vindex] = *(int *) val;
-              break;
-            case SELLIST_FLT:
-              ((double *) e->cvalues)[vindex] = *(double *) val;
-              break;
-            case SELLIST_WORD:
-              ((const char **) e->cvalues)[vindex] = *(const char **) val;
-              break;
+            case SELLIST_INT: ((int *) e->cvalues)[vindex] = *(int *) val; break;
+            case SELLIST_FLT: ((double *) e->cvalues)[vindex] = *(double *) val; break;
+            case SELLIST_WORD: ((const char **) e->cvalues)[vindex] = *(const char **) val; break;
             }
         }
     }
@@ -451,8 +414,7 @@ sellist_print(sellist_t *sellist)
           if (nvalues < e->nvalues)
             {
               printf(" ...");
-              sellist_print_val(e->type, (cvalues_t *) e->cvalues,
-                                e->nvalues - 1);
+              sellist_print_val(e->type, (cvalues_t *) e->cvalues, e->nvalues - 1);
             }
           printf("\n");
         }

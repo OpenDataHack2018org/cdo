@@ -24,7 +24,8 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream_int.h"
-extern "C" {
+extern "C"
+{
 #include "clipping/geometry.h"
 }
 #include "time.h"
@@ -124,8 +125,7 @@ quick_sort_by_lon(double *array, size_t array_length)
 {
   if (array_length < 4) return;
 
-  double p = ((array_length / 2) % 2) ? array[(array_length / 2) + 1]
-                                      : array[array_length / 2];
+  double p = ((array_length / 2) % 2) ? array[(array_length / 2) + 1] : array[array_length / 2];
 
   double temp_lon, temp_lat;
   size_t i, j;
@@ -159,8 +159,7 @@ quick_sort_by_lon_ld(long double *array, size_t array_length)
 {
   if (array_length < 4) return;
 
-  long double p = ((array_length / 2) % 2) ? array[(array_length / 2) + 1]
-                                           : array[array_length / 2];
+  long double p = ((array_length / 2) % 2) ? array[(array_length / 2) + 1] : array[array_length / 2];
 
   long double temp_lon, temp_lat;
   size_t i, j;
@@ -189,8 +188,7 @@ quick_sort_by_lon_ld(long double *array, size_t array_length)
 /* This uses quicksort to sort the latitude coordinates in a subarray of all
  * coordinates. */
 static void
-quick_sort_of_subarray_by_lat(double *array, size_t subarray_start,
-                              size_t subarray_end)
+quick_sort_of_subarray_by_lat(double *array, size_t subarray_start, size_t subarray_end)
 {
   size_t subarray_length = (subarray_end - subarray_start) / 2 + 1;
   double *subarray = (double *) Malloc(subarray_length * sizeof(double));
@@ -218,12 +216,10 @@ quick_sort_of_subarray_by_lat(double *array, size_t subarray_start,
 /* This uses quicksort to sort the latitude coordinates in a subarray of all
  * coordinates. */
 static void
-quick_sort_of_subarray_by_lat_ld(long double *array, size_t subarray_start,
-                                 size_t subarray_end)
+quick_sort_of_subarray_by_lat_ld(long double *array, size_t subarray_start, size_t subarray_end)
 {
   size_t subarray_length = (subarray_end - subarray_start) / 2 + 1;
-  long double *subarray
-      = (long double *) Malloc(subarray_length * sizeof(long double));
+  long double *subarray = (long double *) Malloc(subarray_length * sizeof(long double));
   size_t subarray_index = 0;
 
   for (size_t index = subarray_start + 1; index <= subarray_end + 1; index += 2)
@@ -250,12 +246,9 @@ determinant(double matrix[3][3])
 {
   /* Calculates the determinant for a 3 x 3 matrix. */
 
-  return matrix[0][0] * matrix[1][1] * matrix[2][2]
-         + matrix[0][1] * matrix[1][2] * matrix[2][0]
-         + matrix[0][2] * matrix[1][0] * matrix[2][1]
-         - matrix[0][2] * matrix[1][1] * matrix[2][0]
-         - matrix[0][1] * matrix[1][0] * matrix[2][2]
-         - matrix[0][0] * matrix[1][2] * matrix[2][1];
+  return matrix[0][0] * matrix[1][1] * matrix[2][2] + matrix[0][1] * matrix[1][2] * matrix[2][0]
+         + matrix[0][2] * matrix[1][0] * matrix[2][1] - matrix[0][2] * matrix[1][1] * matrix[2][0]
+         - matrix[0][1] * matrix[1][0] * matrix[2][2] - matrix[0][0] * matrix[1][2] * matrix[2][1];
 }
 
 static long double
@@ -263,12 +256,9 @@ determinant_ld(long double matrix[3][3])
 {
   /* Calculates the determinant for a 3 x 3 matrix. */
 
-  return matrix[0][0] * matrix[1][1] * matrix[2][2]
-         + matrix[0][1] * matrix[1][2] * matrix[2][0]
-         + matrix[0][2] * matrix[1][0] * matrix[2][1]
-         - matrix[0][2] * matrix[1][1] * matrix[2][0]
-         - matrix[0][1] * matrix[1][0] * matrix[2][2]
-         - matrix[0][0] * matrix[1][2] * matrix[2][1];
+  return matrix[0][0] * matrix[1][1] * matrix[2][2] + matrix[0][1] * matrix[1][2] * matrix[2][0]
+         + matrix[0][2] * matrix[1][0] * matrix[2][1] - matrix[0][2] * matrix[1][1] * matrix[2][0]
+         - matrix[0][1] * matrix[1][0] * matrix[2][2] - matrix[0][0] * matrix[1][2] * matrix[2][1];
 }
 
 static void
@@ -277,18 +267,15 @@ find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal)
   /* Calculates the unit normal for a plane defined on three points a, b, c in
    * Euclidean space. */
 
-  double matrix_for_x[3][3]
-      = { { 1, a[1], a[2] }, { 1, b[1], b[2] }, { 1, c[1], c[2] } };
+  double matrix_for_x[3][3] = { { 1, a[1], a[2] }, { 1, b[1], b[2] }, { 1, c[1], c[2] } };
 
   double x = determinant(matrix_for_x);
 
-  double matrix_for_y[3][3]
-      = { { a[0], 1, a[2] }, { b[0], 1, b[2] }, { c[0], 1, c[2] } };
+  double matrix_for_y[3][3] = { { a[0], 1, a[2] }, { b[0], 1, b[2] }, { c[0], 1, c[2] } };
 
   double y = determinant(matrix_for_y);
 
-  double matrix_for_z[3][3]
-      = { { a[0], a[1], 1 }, { b[0], b[1], 1 }, { c[0], c[1], 1 } };
+  double matrix_for_z[3][3] = { { a[0], a[1], 1 }, { b[0], b[1], 1 }, { c[0], c[1], 1 } };
 
   double z = determinant(matrix_for_z);
 
@@ -300,24 +287,20 @@ find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal)
 }
 
 static void
-find_unit_normal_ld(long double a[3], long double b[3], long double c[3],
-                    long double *unit_normal)
+find_unit_normal_ld(long double a[3], long double b[3], long double c[3], long double *unit_normal)
 {
   /* Calculates the unit normal for a plane defined on three points a, b, c in
    * Euclidean space. */
 
-  long double matrix_for_x[3][3]
-      = { { 1, a[1], a[2] }, { 1, b[1], b[2] }, { 1, c[1], c[2] } };
+  long double matrix_for_x[3][3] = { { 1, a[1], a[2] }, { 1, b[1], b[2] }, { 1, c[1], c[2] } };
 
   long double x = determinant_ld(matrix_for_x);
 
-  long double matrix_for_y[3][3]
-      = { { a[0], 1, a[2] }, { b[0], 1, b[2] }, { c[0], 1, c[2] } };
+  long double matrix_for_y[3][3] = { { a[0], 1, a[2] }, { b[0], 1, b[2] }, { c[0], 1, c[2] } };
 
   long double y = determinant_ld(matrix_for_y);
 
-  long double matrix_for_z[3][3]
-      = { { a[0], a[1], 1 }, { b[0], b[1], 1 }, { c[0], c[1], 1 } };
+  long double matrix_for_z[3][3] = { { a[0], a[1], 1 }, { b[0], b[1], 1 }, { c[0], c[1], 1 } };
 
   long double z = determinant_ld(matrix_for_z);
 
@@ -339,8 +322,7 @@ find_coordinate_to_ignore(double *cell_corners_xyz)
   double *pcorner_coordinates3 = &cell_corners_xyz[6];
 
   double surface_normal_of_the_cell[3];
-  find_unit_normal(pcorner_coordinates1, pcorner_coordinates2,
-                   pcorner_coordinates3, surface_normal_of_the_cell);
+  find_unit_normal(pcorner_coordinates1, pcorner_coordinates2, pcorner_coordinates3, surface_normal_of_the_cell);
 
   /* The surface normal is used to choose the coordinate to ignore. */
 
@@ -373,8 +355,7 @@ find_coordinate_to_ignore_ld(long double *cell_corners_xyz)
   long double *pcorner_coordinates3 = &cell_corners_xyz[6];
 
   long double surface_normal_of_the_cell[3];
-  find_unit_normal_ld(pcorner_coordinates1, pcorner_coordinates2,
-                      pcorner_coordinates3, surface_normal_of_the_cell);
+  find_unit_normal_ld(pcorner_coordinates1, pcorner_coordinates2, pcorner_coordinates3, surface_normal_of_the_cell);
 
   /* The surface normal is used to choose the coordinate to ignore. */
 
@@ -424,8 +405,7 @@ coordinates, the cell corners or vertices.
 }
 */
 static double
-is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2],
-                      double point[2])
+is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2])
 {
   /*
      Computes whether a point is left of the line through point_on_line_1 and
@@ -436,17 +416,14 @@ is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2],
      modification.
   */
 
-  double answer = ((point_on_line_2[0] - point_on_line_1[0])
-                       * (point[1] - point_on_line_1[1])
-                   - (point[0] - point_on_line_1[0])
-                         * (point_on_line_2[1] - point_on_line_1[1]));
+  double answer = ((point_on_line_2[0] - point_on_line_1[0]) * (point[1] - point_on_line_1[1])
+                   - (point[0] - point_on_line_1[0]) * (point_on_line_2[1] - point_on_line_1[1]));
 
   return answer;
 }
 
 static long double
-is_point_left_of_edge_ld(long double point_on_line_1[2],
-                         long double point_on_line_2[2], long double point[2])
+is_point_left_of_edge_ld(long double point_on_line_1[2], long double point_on_line_2[2], long double point[2])
 {
   /*
      Computes whether a point is left of the line through point_on_line_1 and
@@ -457,17 +434,14 @@ is_point_left_of_edge_ld(long double point_on_line_1[2],
      modification.
   */
 
-  long double answer = ((point_on_line_2[0] - point_on_line_1[0])
-                            * (point[1] - point_on_line_1[1])
-                        - (point[0] - point_on_line_1[0])
-                              * (point_on_line_2[1] - point_on_line_1[1]));
+  long double answer = ((point_on_line_2[0] - point_on_line_1[0]) * (point[1] - point_on_line_1[1])
+                        - (point[0] - point_on_line_1[0]) * (point_on_line_2[1] - point_on_line_1[1]));
 
   return answer;
 }
 
 int
-winding_numbers_algorithm(double cell_corners[], int number_corners,
-                          double point[])
+winding_numbers_algorithm(double cell_corners[], int number_corners, double point[])
 {
   /*
      Computes whether a point is inside the bounds of a cell. This is the
@@ -485,28 +459,20 @@ winding_numbers_algorithm(double cell_corners[], int number_corners,
         {
           if (cell_corners[(i + 1) * 2 + 1] > point[1])
             {
-              double point_on_edge_1[2]
-                  = { cell_corners[i * 2 + 0], cell_corners[i * 2 + 1] };
-              double point_on_edge_2[2] = { cell_corners[(i + 1) * 2 + 0],
-                                            cell_corners[(i + 1) * 2 + 1] };
+              double point_on_edge_1[2] = { cell_corners[i * 2 + 0], cell_corners[i * 2 + 1] };
+              double point_on_edge_2[2] = { cell_corners[(i + 1) * 2 + 0], cell_corners[(i + 1) * 2 + 1] };
 
-              if (is_point_left_of_edge(point_on_edge_1, point_on_edge_2, point)
-                  > 0)
-                winding_number++;
+              if (is_point_left_of_edge(point_on_edge_1, point_on_edge_2, point) > 0) winding_number++;
             }
         }
       else
         {
           if (cell_corners[(i + 1) * 2 + 1] <= point[1])
             {
-              double point_on_edge_1[2]
-                  = { cell_corners[i * 2 + 0], cell_corners[i * 2 + 1] };
-              double point_on_edge_2[2] = { cell_corners[(i + 1) * 2 + 0],
-                                            cell_corners[(i + 1) * 2 + 1] };
+              double point_on_edge_1[2] = { cell_corners[i * 2 + 0], cell_corners[i * 2 + 1] };
+              double point_on_edge_2[2] = { cell_corners[(i + 1) * 2 + 0], cell_corners[(i + 1) * 2 + 1] };
 
-              if (is_point_left_of_edge(point_on_edge_1, point_on_edge_2, point)
-                  < 0)
-                winding_number--;
+              if (is_point_left_of_edge(point_on_edge_1, point_on_edge_2, point) < 0) winding_number--;
             }
         }
     }
@@ -515,8 +481,7 @@ winding_numbers_algorithm(double cell_corners[], int number_corners,
 }
 
 int
-winding_numbers_algorithm_ld(long double cell_corners[], int number_corners,
-                             long double point[])
+winding_numbers_algorithm_ld(long double cell_corners[], int number_corners, long double point[])
 {
   /*
      Computes whether a point is inside the bounds of a cell. This is the
@@ -534,32 +499,20 @@ winding_numbers_algorithm_ld(long double cell_corners[], int number_corners,
         {
           if (cell_corners[(i + 1) * 2 + 1] > point[1])
             {
-              long double point_on_edge_1[2]
-                  = { cell_corners[i * 2 + 0], cell_corners[i * 2 + 1] };
-              long double point_on_edge_2[2]
-                  = { cell_corners[(i + 1) * 2 + 0],
-                      cell_corners[(i + 1) * 2 + 1] };
+              long double point_on_edge_1[2] = { cell_corners[i * 2 + 0], cell_corners[i * 2 + 1] };
+              long double point_on_edge_2[2] = { cell_corners[(i + 1) * 2 + 0], cell_corners[(i + 1) * 2 + 1] };
 
-              if (is_point_left_of_edge_ld(point_on_edge_1, point_on_edge_2,
-                                           point)
-                  > 0)
-                winding_number++;
+              if (is_point_left_of_edge_ld(point_on_edge_1, point_on_edge_2, point) > 0) winding_number++;
             }
         }
       else
         {
           if (cell_corners[(i + 1) * 2 + 1] <= point[1])
             {
-              long double point_on_edge_1[2]
-                  = { cell_corners[i * 2 + 0], cell_corners[i * 2 + 1] };
-              long double point_on_edge_2[2]
-                  = { cell_corners[(i + 1) * 2 + 0],
-                      cell_corners[(i + 1) * 2 + 1] };
+              long double point_on_edge_1[2] = { cell_corners[i * 2 + 0], cell_corners[i * 2 + 1] };
+              long double point_on_edge_2[2] = { cell_corners[(i + 1) * 2 + 0], cell_corners[(i + 1) * 2 + 1] };
 
-              if (is_point_left_of_edge_ld(point_on_edge_1, point_on_edge_2,
-                                           point)
-                  < 0)
-                winding_number--;
+              if (is_point_left_of_edge_ld(point_on_edge_1, point_on_edge_2, point) < 0) winding_number--;
             }
         }
     }
@@ -593,13 +546,10 @@ is_simple_polygon_convex(double cell_corners[], int number_corners)
 
   for (int i = 0; i < number_corners - 2; i++)
     {
-      double turns_to
-          = (cell_corners[i * 2 + 0] - cell_corners[(i + 1) * 2 + 0])
-                * (cell_corners[(i + 1) * 2 + 1]
-                   - cell_corners[(i + 2) * 2 + 1])
-            - (cell_corners[i * 2 + 1] - cell_corners[(i + 1) * 2 + 1])
-                  * (cell_corners[(i + 1) * 2 + 0]
-                     - cell_corners[(i + 2) * 2 + 0]);
+      double turns_to = (cell_corners[i * 2 + 0] - cell_corners[(i + 1) * 2 + 0])
+                            * (cell_corners[(i + 1) * 2 + 1] - cell_corners[(i + 2) * 2 + 1])
+                        - (cell_corners[i * 2 + 1] - cell_corners[(i + 1) * 2 + 1])
+                              * (cell_corners[(i + 1) * 2 + 0] - cell_corners[(i + 2) * 2 + 0]);
 
       /* In the first iteration the direction of winding of the entire polygon
        * is set. Better not be 0.*/
@@ -629,13 +579,10 @@ is_simple_polygon_convex_ld(long double cell_corners[], int number_corners)
 
   for (int i = 0; i < number_corners - 2; i++)
     {
-      long double turns_to
-          = (cell_corners[i * 2 + 0] - cell_corners[(i + 1) * 2 + 0])
-                * (cell_corners[(i + 1) * 2 + 1]
-                   - cell_corners[(i + 2) * 2 + 1])
-            - (cell_corners[i * 2 + 1] - cell_corners[(i + 1) * 2 + 1])
-                  * (cell_corners[(i + 1) * 2 + 0]
-                     - cell_corners[(i + 2) * 2 + 0]);
+      long double turns_to = (cell_corners[i * 2 + 0] - cell_corners[(i + 1) * 2 + 0])
+                                 * (cell_corners[(i + 1) * 2 + 1] - cell_corners[(i + 2) * 2 + 1])
+                             - (cell_corners[i * 2 + 1] - cell_corners[(i + 1) * 2 + 1])
+                                   * (cell_corners[(i + 1) * 2 + 0] - cell_corners[(i + 2) * 2 + 0]);
 
       /* In the first iteration the direction of winding of the entire polygon
        * is set. Better not be 0.*/
@@ -664,9 +611,8 @@ calculate_the_polygon_area(double cell_corners[], int number_corners)
   double twice_the_polygon_area = 0;
 
   for (int i = 0; i < number_corners - 1; i++)
-    twice_the_polygon_area
-        += (cell_corners[i * 2 + 0] * cell_corners[(i + 1) * 2 + 1])
-           - (cell_corners[(i + 1) * 2 + 0] * cell_corners[i * 2 + 1]);
+    twice_the_polygon_area += (cell_corners[i * 2 + 0] * cell_corners[(i + 1) * 2 + 1])
+                              - (cell_corners[(i + 1) * 2 + 0] * cell_corners[i * 2 + 1]);
 
   return twice_the_polygon_area / 2;
 }
@@ -680,9 +626,8 @@ calculate_the_polygon_area_ld(long double cell_corners[], int number_corners)
   long double twice_the_polygon_area = 0;
 
   for (int i = 0; i < number_corners - 1; i++)
-    twice_the_polygon_area
-        += (cell_corners[i * 2 + 0] * cell_corners[(i + 1) * 2 + 1])
-           - (cell_corners[(i + 1) * 2 + 0] * cell_corners[i * 2 + 1]);
+    twice_the_polygon_area += (cell_corners[i * 2 + 0] * cell_corners[(i + 1) * 2 + 1])
+                              - (cell_corners[(i + 1) * 2 + 0] * cell_corners[i * 2 + 1]);
 
   return twice_the_polygon_area / 2;
 }
@@ -714,9 +659,8 @@ are_polygon_vertices_arranged_in_clockwise_order_ld(long double cell_area)
 }
 
 static void
-verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
-            double *grid_center_lon, double *grid_center_lat,
-            double *grid_corner_lon, double *grid_corner_lat)
+verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon,
+            double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat)
 {
   /*
      First, this function performs the following test:
@@ -735,8 +679,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
   */
 
   double center_point_xyz[3];
-  double *cell_corners_xyz_open_cell
-      = (double *) Malloc(3 * ncorner * sizeof(double));
+  double *cell_corners_xyz_open_cell = (double *) Malloc(3 * ncorner * sizeof(double));
 
   double corner_coordinates[3];
   double center_point_plane_projection[2];
@@ -749,19 +692,16 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
   size_t no_of_cells_with_center_points_out_of_bounds = 0;
   size_t no_unique_center_points = 1;
 
-  int *no_cells_with_a_specific_no_of_corners
-      = (int *) Malloc(ncorner * sizeof(int));
+  int *no_cells_with_a_specific_no_of_corners = (int *) Malloc(ncorner * sizeof(int));
 
   for (int i = 0; i < ncorner; i++)
     no_cells_with_a_specific_no_of_corners[i] = 0;
 
   if (ngrids == 1)
-    cdoPrintBlue("Grid consists of %zu cells (type: %s), of which", gridsize,
-                 gridNamePtr(gridtype));
+    cdoPrintBlue("Grid consists of %zu cells (type: %s), of which", gridsize, gridNamePtr(gridtype));
   else
-    cdoPrintBlue(
-        "Grid no %u (of %u) consists of %zu cells (type: %s), of which",
-        gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
+    cdoPrintBlue("Grid no %u (of %u) consists of %zu cells (type: %s), of which", gridno + 1, ngrids, gridsize,
+                 gridNamePtr(gridtype));
   // cdoPrint("");
 
   /* For performing the first test, an array of all center point coordinates is
@@ -791,18 +731,14 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
       if (cell_no == gridsize - 2)
         {
           subarray_end = gridsize * 2 - 2;
-          quick_sort_of_subarray_by_lat(center_point_array, subarray_start,
-                                        subarray_end);
+          quick_sort_of_subarray_by_lat(center_point_array, subarray_start, subarray_end);
         }
 
-      if (fabs(center_point_array[cell_no * 2 + 0]
-               - center_point_array[(cell_no + 1) * 2 + 0])
-          > 0.0001)
+      if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) > 0.0001)
         {
           subarray_end = cell_no * 2;
           if ((subarray_end - subarray_start) > 1)
-            quick_sort_of_subarray_by_lat(center_point_array, subarray_start,
-                                          subarray_end);
+            quick_sort_of_subarray_by_lat(center_point_array, subarray_start, subarray_end);
 
           subarray_start = subarray_end + 2;
         }
@@ -812,13 +748,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
 
   for (size_t cell_no = 0; cell_no < gridsize - 1; cell_no++)
     {
-      if (fabs(center_point_array[cell_no * 2 + 0]
-               - center_point_array[(cell_no + 1) * 2 + 0])
-          < 0.0001)
+      if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) < 0.0001)
         {
-          if (fabs(center_point_array[cell_no * 2 + 1]
-                   - center_point_array[(cell_no + 1) * 2 + 1])
-              < 0.0001)
+          if (fabs(center_point_array[cell_no * 2 + 1] - center_point_array[(cell_no + 1) * 2 + 1]) < 0.0001)
             continue;
           else
             no_unique_center_points += 1;
@@ -833,12 +765,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
 
   // used only actual_number_of_corners
   int *marked_duplicate_indices = (int *) Malloc(ncorner * sizeof(int));
-  double *cell_corners_xyz_without_duplicates
-      = (double *) Malloc(3 * ncorner * sizeof(double));
-  double *cell_corners_xyz
-      = (double *) Malloc(3 * (ncorner + 1) * sizeof(double));
-  double *cell_corners_plane_projection
-      = (double *) Malloc(2 * (ncorner + 1) * sizeof(double));
+  double *cell_corners_xyz_without_duplicates = (double *) Malloc(3 * ncorner * sizeof(double));
+  double *cell_corners_xyz = (double *) Malloc(3 * (ncorner + 1) * sizeof(double));
+  double *cell_corners_plane_projection = (double *) Malloc(2 * (ncorner + 1) * sizeof(double));
 
   /*
      Latitude and longitude are spherical coordinates on a unit circle. Each
@@ -853,16 +782,14 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
       /* Conversion of center point spherical coordinates to Cartesian
        * coordinates. */
 
-      LLtoXYZ_deg(grid_center_lon[cell_no], grid_center_lat[cell_no],
-                  center_point_xyz);
+      LLtoXYZ_deg(grid_center_lon[cell_no], grid_center_lat[cell_no], center_point_xyz);
 
       for (int corner_no = 0; corner_no < ncorner; corner_no++)
         {
           /* Conversion of corner spherical coordinates to Cartesian
            * coordinates. */
 
-          LLtoXYZ_deg(grid_corner_lon[cell_no * ncorner + corner_no],
-                      grid_corner_lat[cell_no * ncorner + corner_no],
+          LLtoXYZ_deg(grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no],
                       corner_coordinates);
 
           /* The components of the result vector are appended to the list of
@@ -888,12 +815,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
         {
           int off = corner_no * 3;
           int off2 = (corner_no - 1) * 3;
-          if (IS_EQUAL(cell_corners_xyz_open_cell[off + 0],
-                       cell_corners_xyz_open_cell[off2 + 0])
-              && IS_EQUAL(cell_corners_xyz_open_cell[off + 1],
-                          cell_corners_xyz_open_cell[off2 + 1])
-              && IS_EQUAL(cell_corners_xyz_open_cell[off + 2],
-                          cell_corners_xyz_open_cell[off2 + 2]))
+          if (IS_EQUAL(cell_corners_xyz_open_cell[off + 0], cell_corners_xyz_open_cell[off2 + 0])
+              && IS_EQUAL(cell_corners_xyz_open_cell[off + 1], cell_corners_xyz_open_cell[off2 + 1])
+              && IS_EQUAL(cell_corners_xyz_open_cell[off + 2], cell_corners_xyz_open_cell[off2 + 2]))
             actual_number_of_corners = actual_number_of_corners - 1;
           else
             break;
@@ -928,22 +852,15 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
 
       for (int i = 0; i < actual_number_of_corners * 3; i = i + 3)
         for (int j = i + 3; j < actual_number_of_corners * 3; j = j + 3)
-          if (fabs(cell_corners_xyz_open_cell[i + 0]
-                   - cell_corners_xyz_open_cell[j + 0])
-                  < 0.000001
-              && fabs(cell_corners_xyz_open_cell[i + 1]
-                      - cell_corners_xyz_open_cell[j + 1])
-                     < 0.000001
-              && fabs(cell_corners_xyz_open_cell[i + 2]
-                      - cell_corners_xyz_open_cell[j + 2])
-                     < 0.000001)
+          if (fabs(cell_corners_xyz_open_cell[i + 0] - cell_corners_xyz_open_cell[j + 0]) < 0.000001
+              && fabs(cell_corners_xyz_open_cell[i + 1] - cell_corners_xyz_open_cell[j + 1]) < 0.000001
+              && fabs(cell_corners_xyz_open_cell[i + 2] - cell_corners_xyz_open_cell[j + 2]) < 0.000001)
             {
               if (cdoVerbose)
                 fprintf(stdout,
                         "The duplicate vertex %f, %f, %f was found in cell no "
                         "%zu.\n",
-                        cell_corners_xyz_open_cell[j],
-                        cell_corners_xyz_open_cell[j + 1],
+                        cell_corners_xyz_open_cell[j], cell_corners_xyz_open_cell[j + 1],
                         cell_corners_xyz_open_cell[j + 2], cell_no + 1);
 
               no_duplicates += 1;
@@ -960,12 +877,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
             {
               int off = corner_no * 3;
               int off2 = unique_corner_number * 3;
-              cell_corners_xyz_without_duplicates[off2 + 0]
-                  = cell_corners_xyz_open_cell[off + 0];
-              cell_corners_xyz_without_duplicates[off2 + 1]
-                  = cell_corners_xyz_open_cell[off + 1];
-              cell_corners_xyz_without_duplicates[off2 + 2]
-                  = cell_corners_xyz_open_cell[off + 2];
+              cell_corners_xyz_without_duplicates[off2 + 0] = cell_corners_xyz_open_cell[off + 0];
+              cell_corners_xyz_without_duplicates[off2 + 1] = cell_corners_xyz_open_cell[off + 1];
+              cell_corners_xyz_without_duplicates[off2 + 2] = cell_corners_xyz_open_cell[off + 2];
               unique_corner_number += 1;
             }
         }
@@ -996,12 +910,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
       for (int corner_no = 0; corner_no < actual_number_of_corners; corner_no++)
         {
           int off = corner_no * 3;
-          cell_corners_xyz[off + 0]
-              = cell_corners_xyz_without_duplicates[off + 0];
-          cell_corners_xyz[off + 1]
-              = cell_corners_xyz_without_duplicates[off + 1];
-          cell_corners_xyz[off + 2]
-              = cell_corners_xyz_without_duplicates[off + 2];
+          cell_corners_xyz[off + 0] = cell_corners_xyz_without_duplicates[off + 0];
+          cell_corners_xyz[off + 1] = cell_corners_xyz_without_duplicates[off + 1];
+          cell_corners_xyz[off + 2] = cell_corners_xyz_without_duplicates[off + 2];
         }
 
       cell_corners_xyz[actual_number_of_corners * 3 + 0] = cell_corners_xyz[0];
@@ -1025,37 +936,28 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
       switch (coordinate_to_ignore)
         {
         case 1:
-          for (int corner_no = 0; corner_no <= actual_number_of_corners;
-               corner_no++)
+          for (int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 1];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 2];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 1];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 2];
             }
           center_point_plane_projection[0] = center_point_xyz[1];
           center_point_plane_projection[1] = center_point_xyz[2];
           break;
         case 2:
-          for (int corner_no = 0; corner_no <= actual_number_of_corners;
-               corner_no++)
+          for (int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 2];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 0];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 2];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 0];
             }
           center_point_plane_projection[0] = center_point_xyz[2];
           center_point_plane_projection[1] = center_point_xyz[0];
           break;
         case 3:
-          for (int corner_no = 0; corner_no <= actual_number_of_corners;
-               corner_no++)
+          for (int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 0];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 1];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 0];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 1];
             }
           center_point_plane_projection[0] = center_point_xyz[0];
           center_point_plane_projection[1] = center_point_xyz[1];
@@ -1064,16 +966,13 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
 
       /* Checking for convexity of the cell. */
 
-      if (is_simple_polygon_convex(cell_corners_plane_projection,
-                                   actual_number_of_corners + 1))
-        no_convex_cells += 1;
+      if (is_simple_polygon_convex(cell_corners_plane_projection, actual_number_of_corners + 1)) no_convex_cells += 1;
 
       /* Checking the arrangement or direction of cell vertices. */
 
-      long double polygon_area = calculate_the_polygon_area(
-          cell_corners_plane_projection, actual_number_of_corners + 1);
-      bool is_clockwise
-          = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
+      long double polygon_area
+          = calculate_the_polygon_area(cell_corners_plane_projection, actual_number_of_corners + 1);
+      bool is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
 
       /* If the direction of the vertices was flipped during the projection onto
        * the two-dimensional plane, the previous result needs to be inverted
@@ -1091,19 +990,16 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
       /* The winding numbers algorithm is used to test whether the presumed
        * center point is within the bounds of the cell. */
 
-      int winding_number = winding_numbers_algorithm(
-          cell_corners_plane_projection, actual_number_of_corners + 1,
-          center_point_plane_projection);
+      int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, actual_number_of_corners + 1,
+                                                     center_point_plane_projection);
 
       // if ( winding_number == 0 ) printf("%d,", cell_no+1);
-      if (winding_number == 0)
-        no_of_cells_with_center_points_out_of_bounds += 1;
+      if (winding_number == 0) no_of_cells_with_center_points_out_of_bounds += 1;
 
       if (cdoVerbose && winding_number == 0)
         {
           printf("cell_no %zu: ", cell_no + 1);
-          printf(" lon=%g lat=%g : ", grid_center_lon[cell_no],
-                 grid_center_lat[cell_no]);
+          printf(" lon=%g lat=%g : ", grid_center_lon[cell_no], grid_center_lat[cell_no]);
           for (int corner_no = 0; corner_no < ncorner; corner_no++)
             printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no],
                    grid_corner_lat[cell_no * ncorner + corner_no]);
@@ -1122,30 +1018,22 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
 
   for (int i = 2; i < ncorner; i++)
     if (no_cells_with_a_specific_no_of_corners[i])
-      cdoPrintBlue("%9d cells have %d vertices",
-                   no_cells_with_a_specific_no_of_corners[i], i + 1);
+      cdoPrintBlue("%9d cells have %d vertices", no_cells_with_a_specific_no_of_corners[i], i + 1);
 
-  if (no_of_cells_with_duplicates)
-    cdoPrintBlue("%9zu cells have duplicate vertices",
-                 no_of_cells_with_duplicates);
+  if (no_of_cells_with_duplicates) cdoPrintBlue("%9zu cells have duplicate vertices", no_of_cells_with_duplicates);
 
-  if (no_nonusable_cells)
-    cdoPrintRed("%9zu cells have unusable vertices", no_nonusable_cells);
+  if (no_nonusable_cells) cdoPrintRed("%9zu cells have unusable vertices", no_nonusable_cells);
 
-  if (no_nonunique_cells)
-    cdoPrintRed("%9zu cells are not unique", no_nonunique_cells);
+  if (no_nonunique_cells) cdoPrintRed("%9zu cells are not unique", no_nonunique_cells);
 
-  if (no_nonconvex_cells)
-    cdoPrintRed("%9zu cells are non-convex", no_nonconvex_cells);
+  if (no_nonconvex_cells) cdoPrintRed("%9zu cells are non-convex", no_nonconvex_cells);
 
   if (no_clockwise_cells)
-    cdoPrintRed("%9zu cells have their vertices arranged in a clockwise order",
-                no_clockwise_cells);
+    cdoPrintRed("%9zu cells have their vertices arranged in a clockwise order", no_clockwise_cells);
 
   if (no_of_cells_with_center_points_out_of_bounds)
-    cdoPrintRed(
-        "%9zu cells have their center points located outside their boundaries",
-        no_of_cells_with_center_points_out_of_bounds);
+    cdoPrintRed("%9zu cells have their center points located outside their boundaries",
+                no_of_cells_with_center_points_out_of_bounds);
 
   // cdoPrint("");
 
@@ -1154,9 +1042,8 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner,
 }
 
 static void
-verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
-               int ncorner, double *grid_center_lon, double *grid_center_lat,
-               double *grid_corner_lon, double *grid_corner_lat)
+verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon,
+               double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat)
 {
   /*
      First, this function performs the following test:
@@ -1175,8 +1062,7 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
   */
 
   long double center_point_xyz[3];
-  long double *cell_corners_xyz_open_cell
-      = (long double *) Malloc(3 * ncorner * sizeof(long double));
+  long double *cell_corners_xyz_open_cell = (long double *) Malloc(3 * ncorner * sizeof(long double));
 
   long double corner_coordinates[3];
   long double center_point_plane_projection[2];
@@ -1189,33 +1075,27 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
   size_t no_of_cells_with_center_points_out_of_bounds = 0;
   size_t no_unique_center_points = 1;
 
-  int *no_cells_with_a_specific_no_of_corners
-      = (int *) Malloc(ncorner * sizeof(int));
+  int *no_cells_with_a_specific_no_of_corners = (int *) Malloc(ncorner * sizeof(int));
 
   for (int i = 0; i < ncorner; i++)
     no_cells_with_a_specific_no_of_corners[i] = 0;
 
   if (ngrids == 1)
-    cdoPrintBlue("Grid consists of %zu cells (type: %s), of which", gridsize,
-                 gridNamePtr(gridtype));
+    cdoPrintBlue("Grid consists of %zu cells (type: %s), of which", gridsize, gridNamePtr(gridtype));
   else
-    cdoPrintBlue(
-        "Grid no %u (of %u) consists of %zu cells (type: %s), of which",
-        gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
+    cdoPrintBlue("Grid no %u (of %u) consists of %zu cells (type: %s), of which", gridno + 1, ngrids, gridsize,
+                 gridNamePtr(gridtype));
   // cdoPrint("");
 
   /* For performing the first test, an array of all center point coordinates is
    * built. */
 
-  long double *center_point_array
-      = (long double *) Malloc(gridsize * 2 * sizeof(long double));
+  long double *center_point_array = (long double *) Malloc(gridsize * 2 * sizeof(long double));
 
   for (size_t cell_no = 0; cell_no < gridsize; cell_no++)
     {
-      center_point_array[cell_no * 2 + 0]
-          = (long double) grid_center_lon[cell_no];
-      center_point_array[cell_no * 2 + 1]
-          = (long double) grid_center_lat[cell_no];
+      center_point_array[cell_no * 2 + 0] = (long double) grid_center_lon[cell_no];
+      center_point_array[cell_no * 2 + 1] = (long double) grid_center_lat[cell_no];
     }
 
   /* The cell center points are sorted by their first coordinate (lon) with
@@ -1234,18 +1114,14 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
       if (cell_no == gridsize - 2)
         {
           subarray_end = gridsize * 2 - 2;
-          quick_sort_of_subarray_by_lat_ld(center_point_array, subarray_start,
-                                           subarray_end);
+          quick_sort_of_subarray_by_lat_ld(center_point_array, subarray_start, subarray_end);
         }
 
-      if (fabs(center_point_array[cell_no * 2 + 0]
-               - center_point_array[(cell_no + 1) * 2 + 0])
-          > 0.0001)
+      if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) > 0.0001)
         {
           subarray_end = cell_no * 2;
           if ((subarray_end - subarray_start) > 1)
-            quick_sort_of_subarray_by_lat_ld(center_point_array, subarray_start,
-                                             subarray_end);
+            quick_sort_of_subarray_by_lat_ld(center_point_array, subarray_start, subarray_end);
 
           subarray_start = subarray_end + 2;
         }
@@ -1255,13 +1131,9 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
 
   for (size_t cell_no = 0; cell_no < gridsize - 1; cell_no++)
     {
-      if (fabs(center_point_array[cell_no * 2 + 0]
-               - center_point_array[(cell_no + 1) * 2 + 0])
-          < 0.0001)
+      if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) < 0.0001)
         {
-          if (fabs(center_point_array[cell_no * 2 + 1]
-                   - center_point_array[(cell_no + 1) * 2 + 1])
-              < 0.0001)
+          if (fabs(center_point_array[cell_no * 2 + 1] - center_point_array[(cell_no + 1) * 2 + 1]) < 0.0001)
             continue;
           else
             no_unique_center_points += 1;
@@ -1276,12 +1148,9 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
 
   // used only actual_number_of_corners
   int *marked_duplicate_indices = (int *) Malloc(ncorner * sizeof(int));
-  long double *cell_corners_xyz_without_duplicates
-      = (long double *) Malloc(3 * ncorner * sizeof(long double));
-  long double *cell_corners_xyz
-      = (long double *) Malloc(3 * (ncorner + 1) * sizeof(long double));
-  long double *cell_corners_plane_projection
-      = (long double *) Malloc(2 * (ncorner + 1) * sizeof(long double));
+  long double *cell_corners_xyz_without_duplicates = (long double *) Malloc(3 * ncorner * sizeof(long double));
+  long double *cell_corners_xyz = (long double *) Malloc(3 * (ncorner + 1) * sizeof(long double));
+  long double *cell_corners_plane_projection = (long double *) Malloc(2 * (ncorner + 1) * sizeof(long double));
 
   /*
      Latitude and longitude are spherical coordinates on a unit circle. Each
@@ -1296,16 +1165,14 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
       /* Conversion of center point spherical coordinates to Cartesian
        * coordinates. */
 
-      LLtoXYZ_deg_ld(grid_center_lon[cell_no], grid_center_lat[cell_no],
-                     center_point_xyz);
+      LLtoXYZ_deg_ld(grid_center_lon[cell_no], grid_center_lat[cell_no], center_point_xyz);
 
       for (int corner_no = 0; corner_no < ncorner; corner_no++)
         {
           /* Conversion of corner spherical coordinates to Cartesian
            * coordinates. */
 
-          LLtoXYZ_deg_ld(grid_corner_lon[cell_no * ncorner + corner_no],
-                         grid_corner_lat[cell_no * ncorner + corner_no],
+          LLtoXYZ_deg_ld(grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no],
                          corner_coordinates);
 
           /* The components of the result vector are appended to the list of
@@ -1331,12 +1198,9 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
         {
           int off = corner_no * 3;
           int off2 = (corner_no - 1) * 3;
-          if (IS_EQUAL(cell_corners_xyz_open_cell[off + 0],
-                       cell_corners_xyz_open_cell[off2 + 0])
-              && IS_EQUAL(cell_corners_xyz_open_cell[off + 1],
-                          cell_corners_xyz_open_cell[off2 + 1])
-              && IS_EQUAL(cell_corners_xyz_open_cell[off + 2],
-                          cell_corners_xyz_open_cell[off2 + 2]))
+          if (IS_EQUAL(cell_corners_xyz_open_cell[off + 0], cell_corners_xyz_open_cell[off2 + 0])
+              && IS_EQUAL(cell_corners_xyz_open_cell[off + 1], cell_corners_xyz_open_cell[off2 + 1])
+              && IS_EQUAL(cell_corners_xyz_open_cell[off + 2], cell_corners_xyz_open_cell[off2 + 2]))
             actual_number_of_corners = actual_number_of_corners - 1;
           else
             break;
@@ -1371,22 +1235,15 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
 
       for (int i = 0; i < actual_number_of_corners * 3; i = i + 3)
         for (int j = i + 3; j < actual_number_of_corners * 3; j = j + 3)
-          if (fabs(cell_corners_xyz_open_cell[i + 0]
-                   - cell_corners_xyz_open_cell[j + 0])
-                  < 0.000001
-              && fabs(cell_corners_xyz_open_cell[i + 1]
-                      - cell_corners_xyz_open_cell[j + 1])
-                     < 0.000001
-              && fabs(cell_corners_xyz_open_cell[i + 2]
-                      - cell_corners_xyz_open_cell[j + 2])
-                     < 0.000001)
+          if (fabs(cell_corners_xyz_open_cell[i + 0] - cell_corners_xyz_open_cell[j + 0]) < 0.000001
+              && fabs(cell_corners_xyz_open_cell[i + 1] - cell_corners_xyz_open_cell[j + 1]) < 0.000001
+              && fabs(cell_corners_xyz_open_cell[i + 2] - cell_corners_xyz_open_cell[j + 2]) < 0.000001)
             {
               if (cdoVerbose)
                 fprintf(stdout,
                         "The duplicate vertex %f, %f, %f was found in cell no "
                         "%zu.\n",
-                        cell_corners_xyz_open_cell[j],
-                        cell_corners_xyz_open_cell[j + 1],
+                        cell_corners_xyz_open_cell[j], cell_corners_xyz_open_cell[j + 1],
                         cell_corners_xyz_open_cell[j + 2], cell_no + 1);
 
               no_duplicates += 1;
@@ -1403,12 +1260,9 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
             {
               int off = corner_no * 3;
               int off2 = unique_corner_number * 3;
-              cell_corners_xyz_without_duplicates[off2 + 0]
-                  = cell_corners_xyz_open_cell[off + 0];
-              cell_corners_xyz_without_duplicates[off2 + 1]
-                  = cell_corners_xyz_open_cell[off + 1];
-              cell_corners_xyz_without_duplicates[off2 + 2]
-                  = cell_corners_xyz_open_cell[off + 2];
+              cell_corners_xyz_without_duplicates[off2 + 0] = cell_corners_xyz_open_cell[off + 0];
+              cell_corners_xyz_without_duplicates[off2 + 1] = cell_corners_xyz_open_cell[off + 1];
+              cell_corners_xyz_without_duplicates[off2 + 2] = cell_corners_xyz_open_cell[off + 2];
               unique_corner_number += 1;
             }
         }
@@ -1439,12 +1293,9 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
       for (int corner_no = 0; corner_no < actual_number_of_corners; corner_no++)
         {
           int off = corner_no * 3;
-          cell_corners_xyz[off + 0]
-              = cell_corners_xyz_without_duplicates[off + 0];
-          cell_corners_xyz[off + 1]
-              = cell_corners_xyz_without_duplicates[off + 1];
-          cell_corners_xyz[off + 2]
-              = cell_corners_xyz_without_duplicates[off + 2];
+          cell_corners_xyz[off + 0] = cell_corners_xyz_without_duplicates[off + 0];
+          cell_corners_xyz[off + 1] = cell_corners_xyz_without_duplicates[off + 1];
+          cell_corners_xyz[off + 2] = cell_corners_xyz_without_duplicates[off + 2];
         }
 
       cell_corners_xyz[actual_number_of_corners * 3 + 0] = cell_corners_xyz[0];
@@ -1468,37 +1319,28 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
       switch (coordinate_to_ignore)
         {
         case 1:
-          for (int corner_no = 0; corner_no <= actual_number_of_corners;
-               corner_no++)
+          for (int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 1];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 2];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 1];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 2];
             }
           center_point_plane_projection[0] = center_point_xyz[1];
           center_point_plane_projection[1] = center_point_xyz[2];
           break;
         case 2:
-          for (int corner_no = 0; corner_no <= actual_number_of_corners;
-               corner_no++)
+          for (int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 2];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 0];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 2];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 0];
             }
           center_point_plane_projection[0] = center_point_xyz[2];
           center_point_plane_projection[1] = center_point_xyz[0];
           break;
         case 3:
-          for (int corner_no = 0; corner_no <= actual_number_of_corners;
-               corner_no++)
+          for (int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++)
             {
-              cell_corners_plane_projection[corner_no * 2 + 0]
-                  = cell_corners_xyz[corner_no * 3 + 0];
-              cell_corners_plane_projection[corner_no * 2 + 1]
-                  = cell_corners_xyz[corner_no * 3 + 1];
+              cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_xyz[corner_no * 3 + 0];
+              cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_xyz[corner_no * 3 + 1];
             }
           center_point_plane_projection[0] = center_point_xyz[0];
           center_point_plane_projection[1] = center_point_xyz[1];
@@ -1507,16 +1349,14 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
 
       /* Checking for convexity of the cell. */
 
-      if (is_simple_polygon_convex_ld(cell_corners_plane_projection,
-                                      actual_number_of_corners + 1))
+      if (is_simple_polygon_convex_ld(cell_corners_plane_projection, actual_number_of_corners + 1))
         no_convex_cells += 1;
 
       /* Checking the arrangement or direction of cell vertices. */
 
-      long double polygon_area = calculate_the_polygon_area_ld(
-          cell_corners_plane_projection, actual_number_of_corners + 1);
-      bool is_clockwise
-          = are_polygon_vertices_arranged_in_clockwise_order_ld(polygon_area);
+      long double polygon_area
+          = calculate_the_polygon_area_ld(cell_corners_plane_projection, actual_number_of_corners + 1);
+      bool is_clockwise = are_polygon_vertices_arranged_in_clockwise_order_ld(polygon_area);
 
       /* If the direction of the vertices was flipped during the projection onto
        * the two-dimensional plane, the previous result needs to be inverted
@@ -1534,19 +1374,16 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
       /* The winding numbers algorithm is used to test whether the presumed
        * center point is within the bounds of the cell. */
 
-      int winding_number = winding_numbers_algorithm_ld(
-          cell_corners_plane_projection, actual_number_of_corners + 1,
-          center_point_plane_projection);
+      int winding_number = winding_numbers_algorithm_ld(cell_corners_plane_projection, actual_number_of_corners + 1,
+                                                        center_point_plane_projection);
 
       // if ( winding_number == 0 ) printf("%d,", cell_no+1);
-      if (winding_number == 0)
-        no_of_cells_with_center_points_out_of_bounds += 1;
+      if (winding_number == 0) no_of_cells_with_center_points_out_of_bounds += 1;
 
       if (cdoVerbose && winding_number == 0)
         {
           printf("cell_no %zu: ", cell_no + 1);
-          printf(" lon=%g lat=%g : ", grid_center_lon[cell_no],
-                 grid_center_lat[cell_no]);
+          printf(" lon=%g lat=%g : ", grid_center_lon[cell_no], grid_center_lat[cell_no]);
           for (int corner_no = 0; corner_no < ncorner; corner_no++)
             printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no],
                    grid_corner_lat[cell_no * ncorner + corner_no]);
@@ -1565,30 +1402,22 @@ verify_grid_ld(int gridtype, size_t gridsize, int gridno, int ngrids,
 
   for (int i = 2; i < ncorner; i++)
     if (no_cells_with_a_specific_no_of_corners[i])
-      cdoPrintBlue("%9d cells have %d vertices",
-                   no_cells_with_a_specific_no_of_corners[i], i + 1);
+      cdoPrintBlue("%9d cells have %d vertices", no_cells_with_a_specific_no_of_corners[i], i + 1);
 
-  if (no_of_cells_with_duplicates)
-    cdoPrintBlue("%9zu cells have duplicate vertices",
-                 no_of_cells_with_duplicates);
+  if (no_of_cells_with_duplicates) cdoPrintBlue("%9zu cells have duplicate vertices", no_of_cells_with_duplicates);
 
-  if (no_nonusable_cells)
-    cdoPrintRed("%9zu cells have unusable vertices", no_nonusable_cells);
+  if (no_nonusable_cells) cdoPrintRed("%9zu cells have unusable vertices", no_nonusable_cells);
 
-  if (no_nonunique_cells)
-    cdoPrintRed("%9zu cells are not unique", no_nonunique_cells);
+  if (no_nonunique_cells) cdoPrintRed("%9zu cells are not unique", no_nonunique_cells);
 
-  if (no_nonconvex_cells)
-    cdoPrintRed("%9zu cells are non-convex", no_nonconvex_cells);
+  if (no_nonconvex_cells) cdoPrintRed("%9zu cells are non-convex", no_nonconvex_cells);
 
   if (no_clockwise_cells)
-    cdoPrintRed("%9zu cells have their vertices arranged in a clockwise order",
-                no_clockwise_cells);
+    cdoPrintRed("%9zu cells have their vertices arranged in a clockwise order", no_clockwise_cells);
 
   if (no_of_cells_with_center_points_out_of_bounds)
-    cdoPrintRed(
-        "%9zu cells have their center points located outside their boundaries",
-        no_of_cells_with_center_points_out_of_bounds);
+    cdoPrintRed("%9zu cells have their center points located outside their boundaries",
+                no_of_cells_with_center_points_out_of_bounds);
 
   // cdoPrint("");
 
@@ -1648,13 +1477,10 @@ Verifygrid(void *argument)
         {
           double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
           int ncorner = 4;
-          if (gridInqType(gridID) == GRID_UNSTRUCTURED)
-            ncorner = gridInqNvertex(gridID);
+          if (gridInqType(gridID) == GRID_UNSTRUCTURED) ncorner = gridInqNvertex(gridID);
 
-          double *grid_center_lat
-              = (double *) Malloc(gridsize * sizeof(double));
-          double *grid_center_lon
-              = (double *) Malloc(gridsize * sizeof(double));
+          double *grid_center_lat = (double *) Malloc(gridsize * sizeof(double));
+          double *grid_center_lon = (double *) Malloc(gridsize * sizeof(double));
 
           gridInqYvals(gridID, grid_center_lat);
           gridInqXvals(gridID, grid_center_lon);
@@ -1669,10 +1495,8 @@ Verifygrid(void *argument)
             {
               if (ncorner == 0) cdoAbort("grid corner missing!");
               size_t nalloc = ncorner * gridsize;
-              grid_corner_lat = (double *) Realloc(grid_corner_lat,
-                                                   nalloc * sizeof(double));
-              grid_corner_lon = (double *) Realloc(grid_corner_lon,
-                                                   nalloc * sizeof(double));
+              grid_corner_lat = (double *) Realloc(grid_corner_lat, nalloc * sizeof(double));
+              grid_corner_lon = (double *) Realloc(grid_corner_lon, nalloc * sizeof(double));
 
               if (gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL))
                 {
@@ -1693,16 +1517,13 @@ Verifygrid(void *argument)
                 }
 
               /* Note: using units from latitude instead from bounds */
-              grid_to_degree(units, ncorner * gridsize, grid_corner_lon,
-                             "grid corner lon");
-              grid_to_degree(units, ncorner * gridsize, grid_corner_lat,
-                             "grid corner lat");
+              grid_to_degree(units, ncorner * gridsize, grid_corner_lon, "grid corner lon");
+              grid_to_degree(units, ncorner * gridsize, grid_corner_lat, "grid corner lat");
             }
 
           if (operatorID == VERIFYGRID)
-            verify_grid_ld(gridtype, gridsize, gridno, ngrids, ncorner,
-                           grid_center_lon, grid_center_lat, grid_corner_lon,
-                           grid_corner_lat);
+            verify_grid_ld(gridtype, gridsize, gridno, ngrids, ncorner, grid_center_lon, grid_center_lat,
+                           grid_corner_lon, grid_corner_lat);
 
           if (grid_center_lon) Free(grid_center_lon);
           if (grid_center_lat) Free(grid_center_lat);
@@ -1712,11 +1533,10 @@ Verifygrid(void *argument)
       else
         {
           if (ngrids == 1)
-            cdoPrintBlue("Grid consists of %zu points (type: %s)", gridsize,
-                         gridNamePtr(gridtype));
+            cdoPrintBlue("Grid consists of %zu points (type: %s)", gridsize, gridNamePtr(gridtype));
           else
-            cdoPrintBlue("Grid no %u (of %u) consists of %zu points (type: %s)",
-                         gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
+            cdoPrintBlue("Grid no %u (of %u) consists of %zu points (type: %s)", gridno + 1, ngrids, gridsize,
+                         gridNamePtr(gridtype));
           // cdoPrint("");
         }
     }

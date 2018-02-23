@@ -58,11 +58,9 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
   int gridtype = gridInqType(gridID1);
   size_t gridsize1 = gridInqSize(gridID1);
 
-  if (xinc < 1 || yinc < 1)
-    cdoAbort("xinc and yinc must not be smaller than 1!");
+  if (xinc < 1 || yinc < 1) cdoAbort("xinc and yinc must not be smaller than 1!");
 
-  if (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT
-      || gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC)
+  if (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC)
     {
       nlon1 = gridInqXsize(gridID1);
       nlat1 = gridInqYsize(gridID1);
@@ -82,13 +80,11 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
       cdoAbort("Unsupported grid: %s", gridNamePtr(gridtype));
     }
 
-  if (xinc > nlon1 || yinc > nlat1)
-    cdoAbort("xinc and/or yinc exceeds gridsize!");
+  if (xinc > nlon1 || yinc > nlat1) cdoAbort("xinc and/or yinc exceeds gridsize!");
 
   if (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT)
     {
-      bool gridHasBounds
-          = (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL));
+      bool gridHasBounds = (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL));
 
       double *xvals1 = (double *) Malloc(nlon1 * sizeof(double));
       double *yvals1 = (double *) Malloc(nlat1 * sizeof(double));
@@ -160,8 +156,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
     }
   else if (gridtype == GRID_CURVILINEAR)
     {
-      bool gridHasBounds
-          = (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL));
+      bool gridHasBounds = (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL));
 
       double *xvals1 = (double *) Malloc(nlon1 * nlat1 * sizeof(double));
       double *yvals1 = (double *) Malloc(nlon1 * nlat1 * sizeof(double));
@@ -181,14 +176,10 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
 
       if (gridHasBounds)
         {
-          grid1_corner_lon
-              = (double *) Malloc(4 * nlon1 * nlat1 * sizeof(double));
-          grid1_corner_lat
-              = (double *) Malloc(4 * nlon1 * nlat1 * sizeof(double));
-          grid2_corner_lon
-              = (double *) Malloc(4 * nlon2 * nlat2 * sizeof(double));
-          grid2_corner_lat
-              = (double *) Malloc(4 * nlon2 * nlat2 * sizeof(double));
+          grid1_corner_lon = (double *) Malloc(4 * nlon1 * nlat1 * sizeof(double));
+          grid1_corner_lat = (double *) Malloc(4 * nlon1 * nlat1 * sizeof(double));
+          grid2_corner_lon = (double *) Malloc(4 * nlon2 * nlat2 * sizeof(double));
+          grid2_corner_lat = (double *) Malloc(4 * nlon2 * nlat2 * sizeof(double));
           gridInqXbounds(gridID1, grid1_corner_lon);
           gridInqYbounds(gridID1, grid1_corner_lat);
 
@@ -196,11 +187,9 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
           {
             char units[CDI_MAX_NAME];
             gridInqXunits(gridID1, units);
-            grid_to_degree(units, 4 * nlon1 * nlat1, grid1_corner_lon,
-                           "grid corner lon");
+            grid_to_degree(units, 4 * nlon1 * nlat1, grid1_corner_lon, "grid corner lon");
             gridInqYunits(gridID1, units);
-            grid_to_degree(units, 4 * nlon1 * nlat1, grid1_corner_lat,
-                           "grid corner lat");
+            grid_to_degree(units, 4 * nlon1 * nlat1, grid1_corner_lat, "grid corner lat");
           }
         }
 
@@ -244,11 +233,9 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                       else if (fabs(xvals1[g1_add] - xvals2_0) > 270.)
                         {
                           if ((xvals1[g1_add] - xvals2_0) > 270.)
-                            xvals2[g2_add]
-                                += (xvals1[g1_add] - 360.) / area_norm;
+                            xvals2[g2_add] += (xvals1[g1_add] - 360.) / area_norm;
                           else if ((xvals1[g1_add] - xvals2_0) < -270.)
-                            xvals2[g2_add]
-                                += (xvals1[g1_add] + 360.) / area_norm;
+                            xvals2[g2_add] += (xvals1[g1_add] + 360.) / area_norm;
                           yvals2[g2_add] += yvals1[g1_add] / area_norm;
                         }
                       else
@@ -273,25 +260,18 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                   g1_add2 = g1_add + 1;
                                   if (g1_add + nlon1 > gridsize1)
                                     {
-                                      cdoWarning(
-                                          "Can't find cell below upper left");
+                                      cdoWarning("Can't find cell below upper left");
                                       continue;
                                     }
                                   g1_add3 = g1_add + nlon1;
                                   for (corner2 = 0; corner2 < 4; corner2++)
                                     {
-                                      lon2 = grid1_corner_lon[4 * g1_add2
-                                                              + corner2];
-                                      lat2 = grid1_corner_lat[4 * g1_add2
-                                                              + corner2];
-                                      lon3 = grid1_corner_lon[4 * g1_add3
-                                                              + corner2];
-                                      lat3 = grid1_corner_lat[4 * g1_add3
-                                                              + corner2];
-                                      if ((IS_EQUAL(lon2, lon)
-                                           && IS_EQUAL(lat2, lat))
-                                          || (IS_EQUAL(lon3, lon)
-                                              && IS_EQUAL(lat3, lat)))
+                                      lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
+                                      lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
+                                      lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
+                                      lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
+                                      if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
+                                          || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
                                         c_flag[corner] = 1;
                                     }
                                 }
@@ -299,8 +279,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                 if (!c_flag[corner]) break;
                               on_up = grid1_corner_lon[4 * g1_add + corner];
                               ax_le = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3]
-                                  < 3)
+                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3)
                                 cdoWarning("found two matching corners!");
                             }
 
@@ -316,25 +295,18 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                   g1_add2 = g1_add - 1;
                                   if (g1_add + nlon1 > gridsize1)
                                     {
-                                      cdoWarning(
-                                          "Can't find cell below upper left");
+                                      cdoWarning("Can't find cell below upper left");
                                       continue;
                                     }
                                   g1_add3 = g1_add + nlon1;
                                   for (corner2 = 0; corner2 < 4; corner2++)
                                     {
-                                      lon2 = grid1_corner_lon[4 * g1_add2
-                                                              + corner2];
-                                      lat2 = grid1_corner_lat[4 * g1_add2
-                                                              + corner2];
-                                      lon3 = grid1_corner_lon[4 * g1_add3
-                                                              + corner2];
-                                      lat3 = grid1_corner_lat[4 * g1_add3
-                                                              + corner2];
-                                      if ((IS_EQUAL(lon2, lon)
-                                           && IS_EQUAL(lat2, lat))
-                                          || (IS_EQUAL(lon3, lon)
-                                              && IS_EQUAL(lat3, lat)))
+                                      lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
+                                      lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
+                                      lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
+                                      lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
+                                      if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
+                                          || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
                                         c_flag[corner] = 1;
                                     }
                                 }
@@ -342,14 +314,12 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                 if (!c_flag[corner]) break;
                               ox_up = grid1_corner_lon[4 * g1_add + corner];
                               ax_ri = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3]
-                                  < 3)
+                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3)
                                 cdoWarning("found two matching corners!");
                             }
 
                           /* lower right cell */
-                          if ((y1 == (y2 + 1) * yinc - 1)
-                              && (x1 == (x2 + 1) * xinc - 1))
+                          if ((y1 == (y2 + 1) * yinc - 1) && (x1 == (x2 + 1) * xinc - 1))
                             {
                               c_flag[0] = c_flag[1] = c_flag[2] = c_flag[3] = 0;
                               for (corner = 0; corner < 4; corner++)
@@ -367,18 +337,12 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                   g1_add3 = g1_add - nlon1;
                                   for (corner2 = 0; corner2 < 4; corner2++)
                                     {
-                                      lon2 = grid1_corner_lon[4 * g1_add2
-                                                              + corner2];
-                                      lat2 = grid1_corner_lat[4 * g1_add2
-                                                              + corner2];
-                                      lon3 = grid1_corner_lon[4 * g1_add3
-                                                              + corner2];
-                                      lat3 = grid1_corner_lat[4 * g1_add3
-                                                              + corner2];
-                                      if ((IS_EQUAL(lon2, lon)
-                                           && IS_EQUAL(lat2, lat))
-                                          || (IS_EQUAL(lon3, lon)
-                                              && IS_EQUAL(lat3, lat)))
+                                      lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
+                                      lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
+                                      lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
+                                      lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
+                                      if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
+                                          || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
                                         c_flag[corner] = 1;
                                     }
                                 }
@@ -386,8 +350,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                 if (!c_flag[corner]) break;
                               ox_lo = grid1_corner_lon[4 * g1_add + corner];
                               an_ri = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3]
-                                  < 3)
+                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3)
                                 cdoWarning("found two matching corners!");
                             }
 
@@ -410,18 +373,12 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                   g1_add3 = g1_add - nlon1;
                                   for (corner2 = 0; corner2 < 4; corner2++)
                                     {
-                                      lon2 = grid1_corner_lon[4 * g1_add2
-                                                              + corner2];
-                                      lat2 = grid1_corner_lat[4 * g1_add2
-                                                              + corner2];
-                                      lon3 = grid1_corner_lon[4 * g1_add3
-                                                              + corner2];
-                                      lat3 = grid1_corner_lat[4 * g1_add3
-                                                              + corner2];
-                                      if ((IS_EQUAL(lon2, lon)
-                                           && IS_EQUAL(lat2, lat))
-                                          || (IS_EQUAL(lon3, lon)
-                                              && IS_EQUAL(lat3, lat)))
+                                      lon2 = grid1_corner_lon[4 * g1_add2 + corner2];
+                                      lat2 = grid1_corner_lat[4 * g1_add2 + corner2];
+                                      lon3 = grid1_corner_lon[4 * g1_add3 + corner2];
+                                      lat3 = grid1_corner_lat[4 * g1_add3 + corner2];
+                                      if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))
+                                          || (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)))
                                         c_flag[corner] = 1;
                                     }
                                 }
@@ -429,8 +386,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
                                 if (!c_flag[corner]) break;
                               on_lo = grid1_corner_lon[4 * g1_add + corner];
                               an_le = grid1_corner_lat[4 * g1_add + corner];
-                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3]
-                                  < 3)
+                              if (c_flag[0] + c_flag[1] + c_flag[2] + c_flag[3] < 3)
                                 cdoWarning("found two matching corners!");
                             }
                         } /* if ( gridHasBounds) */
@@ -489,8 +445,7 @@ genBoxGrid(int gridID1, size_t xinc, size_t yinc)
 }
 
 static void
-gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yinc,
-            int statfunc)
+gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yinc, int statfunc)
 {
   bool useWeight = (field1->weight != NULL);
   /*
@@ -500,14 +455,12 @@ gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yinc,
   */
 
   size_t gridsize = xinc * yinc;
-  field_type *field
-      = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
+  field_type *field = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
   for (int i = 0; i < Threading::ompNumThreads; i++)
     {
       field[i].size = gridsize;
       field[i].ptr = (double *) Malloc(gridsize * sizeof(double));
-      field[i].weight
-          = (useWeight) ? (double *) Malloc(gridsize * sizeof(double)) : NULL;
+      field[i].weight = (useWeight) ? (double *) Malloc(gridsize * sizeof(double)) : NULL;
       field[i].missval = field1->missval;
       field[i].nmiss = 0;
     }
@@ -554,11 +507,8 @@ gridboxstat(field_type *field1, field_type *field2, size_t xinc, size_t yinc,
               size_t index = jj * nlon1 + ii;
               if (ii >= nlon1) break;
               field[ompthID].ptr[isize] = array1[index];
-              if (useWeight)
-                field[ompthID].weight[isize] = field1->weight[index];
-              if (DBL_IS_EQUAL(field[ompthID].ptr[isize],
-                               field[ompthID].missval))
-                field[ompthID].nmiss++;
+              if (useWeight) field[ompthID].weight[isize] = field1->weight[index];
+              if (DBL_IS_EQUAL(field[ompthID].ptr[isize], field[ompthID].missval)) field[ompthID].nmiss++;
               isize++;
             }
         }
@@ -641,8 +591,7 @@ Gridboxstat(void *process)
 
   size_t gridsize1 = gridInqSize(gridID1);
   field1.ptr = (double *) Malloc(gridsize1 * sizeof(double));
-  field1.weight
-      = needWeights ? (double *) Malloc(gridsize1 * sizeof(double)) : NULL;
+  field1.weight = needWeights ? (double *) Malloc(gridsize1 * sizeof(double)) : NULL;
 
   size_t gridsize2 = gridInqSize(gridID2);
   field2.ptr = (double *) Malloc(gridsize2 * sizeof(double));
@@ -678,9 +627,7 @@ Gridboxstat(void *process)
           if (wstatus != 0 && tsID == 0 && levelID == 0)
             {
               vlistInqVarName(vlistID1, varID, varname);
-              cdoWarning(
-                  "Using constant grid cell area weights for variable %s!",
-                  varname);
+              cdoWarning("Using constant grid cell area weights for variable %s!", varname);
             }
 
           gridboxstat(&field1, &field2, xinc, yinc, operfunc);

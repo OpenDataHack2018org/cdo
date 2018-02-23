@@ -139,8 +139,7 @@ gridDefine(griddes_t grid)
       {
         if (grid.size != 1)
           {
-            if (grid.xsize == 0 && grid.type != GRID_GAUSSIAN_REDUCED)
-              Error("xsize undefined!");
+            if (grid.xsize == 0 && grid.type != GRID_GAUSSIAN_REDUCED) Error("xsize undefined!");
             if (grid.ysize == 0) Error("ysize undefined!");
           }
 
@@ -163,51 +162,39 @@ gridDefine(griddes_t grid)
         if (grid.uvRelativeToGrid) gridDefUvRelativeToGrid(gridID, 1);
         if (grid.nvertex) gridDefNvertex(gridID, grid.nvertex);
 
-        if ((grid.def_xfirst || grid.def_xlast || grid.def_xinc)
-            && grid.xvals == NULL)
+        if ((grid.def_xfirst || grid.def_xlast || grid.def_xinc) && grid.xvals == NULL)
           {
             grid.xvals = (double *) Malloc(grid.xsize * sizeof(double));
-            gridGenXvals(grid.xsize, grid.xfirst, grid.xlast, grid.xinc,
-                         grid.xvals);
+            gridGenXvals(grid.xsize, grid.xfirst, grid.xlast, grid.xinc, grid.xvals);
 
             if (grid.genBounds && grid.xbounds == NULL && grid.xsize > 1)
               {
                 grid.nvertex = 2;
-                grid.xbounds = (double *) Malloc(grid.xsize * grid.nvertex
-                                                 * sizeof(double));
+                grid.xbounds = (double *) Malloc(grid.xsize * grid.nvertex * sizeof(double));
                 for (size_t i = 0; i < grid.xsize - 1; ++i)
                   {
-                    grid.xbounds[2 * i + 1]
-                        = 0.5 * (grid.xvals[i] + grid.xvals[i + 1]);
-                    grid.xbounds[2 * (i + 1)]
-                        = 0.5 * (grid.xvals[i] + grid.xvals[i + 1]);
+                    grid.xbounds[2 * i + 1] = 0.5 * (grid.xvals[i] + grid.xvals[i + 1]);
+                    grid.xbounds[2 * (i + 1)] = 0.5 * (grid.xvals[i] + grid.xvals[i + 1]);
                   }
                 grid.xbounds[0] = 2 * grid.xvals[0] - grid.xbounds[1];
-                grid.xbounds[2 * grid.xsize - 1]
-                    = 2 * grid.xvals[grid.xsize - 1]
-                      - grid.xbounds[2 * (grid.xsize - 1)];
+                grid.xbounds[2 * grid.xsize - 1] = 2 * grid.xvals[grid.xsize - 1] - grid.xbounds[2 * (grid.xsize - 1)];
               }
           }
 
-        if ((grid.def_yfirst || grid.def_ylast || grid.def_yinc)
-            && grid.yvals == NULL)
+        if ((grid.def_yfirst || grid.def_ylast || grid.def_yinc) && grid.yvals == NULL)
           {
             if (!grid.def_ylast) grid.ylast = grid.yfirst;
             grid.yvals = (double *) Malloc(grid.ysize * sizeof(double));
-            gridGenYvals(grid.type, grid.ysize, grid.yfirst, grid.ylast,
-                         grid.yinc, grid.yvals);
+            gridGenYvals(grid.type, grid.ysize, grid.yfirst, grid.ylast, grid.yinc, grid.yvals);
 
             if (grid.genBounds && grid.ybounds == NULL && grid.ysize > 1)
               {
                 grid.nvertex = 2;
-                grid.ybounds = (double *) Malloc(grid.ysize * grid.nvertex
-                                                 * sizeof(double));
+                grid.ybounds = (double *) Malloc(grid.ysize * grid.nvertex * sizeof(double));
                 for (size_t i = 0; i < grid.ysize - 1; ++i)
                   {
-                    grid.ybounds[2 * i + 1]
-                        = 0.5 * (grid.yvals[i] + grid.yvals[i + 1]);
-                    grid.ybounds[2 * (i + 1)]
-                        = 0.5 * (grid.yvals[i] + grid.yvals[i + 1]);
+                    grid.ybounds[2 * i + 1] = 0.5 * (grid.yvals[i] + grid.yvals[i + 1]);
+                    grid.ybounds[2 * (i + 1)] = 0.5 * (grid.yvals[i] + grid.yvals[i + 1]);
                   }
 
                 if (grid.yvals[0] > grid.yvals[grid.ysize - 1])
@@ -259,9 +246,7 @@ gridDefine(griddes_t grid)
     case GRID_CURVILINEAR:
     case GRID_UNSTRUCTURED:
       {
-        if (grid.size == 0)
-          grid.size = (grid.type == GRID_CURVILINEAR) ? grid.xsize * grid.ysize
-                                                      : grid.xsize;
+        if (grid.size == 0) grid.size = (grid.type == GRID_CURVILINEAR) ? grid.xsize * grid.ysize : grid.xsize;
 
         gridID = gridCreate(grid.type, grid.size);
 
@@ -361,31 +346,15 @@ gridDefine(griddes_t grid)
 
   if (grid.uuid[0]) gridDefUUID(gridID, grid.uuid);
 
-  if (grid.xname[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_XNAME, strlen(grid.xname) + 1, grid.xname);
-  if (grid.xlongname[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_XLONGNAME, strlen(grid.xlongname) + 1,
-                     grid.xlongname);
-  if (grid.xunits[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_XUNITS, strlen(grid.xunits) + 1,
-                     grid.xunits);
-  if (grid.yname[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_YNAME, strlen(grid.yname) + 1, grid.yname);
-  if (grid.ylongname[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_YLONGNAME, strlen(grid.ylongname) + 1,
-                     grid.ylongname);
-  if (grid.yunits[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_YUNITS, strlen(grid.yunits) + 1,
-                     grid.yunits);
-  if (grid.xdimname[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_XDIMNAME, strlen(grid.xdimname) + 1,
-                     grid.xdimname);
-  if (grid.ydimname[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_YDIMNAME, strlen(grid.ydimname) + 1,
-                     grid.ydimname);
-  if (grid.vdimname[0])
-    cdiGridDefKeyStr(gridID, CDI_KEY_VDIMNAME, strlen(grid.vdimname) + 1,
-                     grid.vdimname);
+  if (grid.xname[0]) cdiGridDefKeyStr(gridID, CDI_KEY_XNAME, strlen(grid.xname) + 1, grid.xname);
+  if (grid.xlongname[0]) cdiGridDefKeyStr(gridID, CDI_KEY_XLONGNAME, strlen(grid.xlongname) + 1, grid.xlongname);
+  if (grid.xunits[0]) cdiGridDefKeyStr(gridID, CDI_KEY_XUNITS, strlen(grid.xunits) + 1, grid.xunits);
+  if (grid.yname[0]) cdiGridDefKeyStr(gridID, CDI_KEY_YNAME, strlen(grid.yname) + 1, grid.yname);
+  if (grid.ylongname[0]) cdiGridDefKeyStr(gridID, CDI_KEY_YLONGNAME, strlen(grid.ylongname) + 1, grid.ylongname);
+  if (grid.yunits[0]) cdiGridDefKeyStr(gridID, CDI_KEY_YUNITS, strlen(grid.yunits) + 1, grid.yunits);
+  if (grid.xdimname[0]) cdiGridDefKeyStr(gridID, CDI_KEY_XDIMNAME, strlen(grid.xdimname) + 1, grid.xdimname);
+  if (grid.ydimname[0]) cdiGridDefKeyStr(gridID, CDI_KEY_YDIMNAME, strlen(grid.ydimname) + 1, grid.ydimname);
+  if (grid.vdimname[0]) cdiGridDefKeyStr(gridID, CDI_KEY_VDIMNAME, strlen(grid.vdimname) + 1, grid.vdimname);
 
   return gridID;
 }
@@ -422,8 +391,7 @@ cdoDefineGrid(const char *gridfile)
   else
     {
       char buffer[4];
-      if (read(fileno, buffer, 4) != 4)
-        SysError("Read grid from %s failed!", filename);
+      if (read(fileno, buffer, 4) != 4) SysError("Read grid from %s failed!", filename);
 
       close(fileno);
 

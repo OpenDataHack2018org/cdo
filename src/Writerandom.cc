@@ -95,8 +95,7 @@ Writerandom(void *process)
         printf("recID %d %d\n", recID, recindex[recID]);
       */
       for (int recID = 0; recID < nrecs; recID++)
-        if (recindex[recID] == -1)
-          cdoAbort("Internal problem! Random initialize.");
+        if (recindex[recID] == -1) cdoAbort("Internal problem! Random initialize.");
 
       for (int recID = 0; recID < nrecs; recID++)
         {

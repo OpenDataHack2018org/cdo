@@ -146,14 +146,11 @@ lowcas(char *ch)
    should be kept to a minimum.                                      */
 
 static gaint mosiz[13] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-static gaint momn[13] = { 0,     44640, 40320, 44640, 43200, 44640, 43200,
-                          44640, 44640, 43200, 44640, 43200, 44640 };
+static gaint momn[13] = { 0, 44640, 40320, 44640, 43200, 44640, 43200, 44640, 44640, 43200, 44640, 43200, 44640 };
 static gaint mnacum[13]
-    = { 0,      0,      44640,  84960,  129600, 172800, 217440,
-        260640, 305280, 349920, 393120, 437760, 480960 };
+    = { 0, 0, 44640, 84960, 129600, 172800, 217440, 260640, 305280, 349920, 393120, 437760, 480960 };
 static gaint mnacul[13]
-    = { 0,      0,      44640,  86400,  131040, 174240, 218880,
-        262080, 306720, 351360, 394560, 439200, 482400 };
+    = { 0, 0, 44640, 86400, 131040, 174240, 218880, 262080, 306720, 351360, 394560, 439200, 482400 };
 
 /* Test for leap year.  Rules are:
 
@@ -438,23 +435,19 @@ timdif(struct dt *dtim1, struct dt *dtim2)
   mo2 = dtim2->mo;
   if (qleap(dtim1->yr))
     {
-      min1 = min1 + mnacul[mo1] + (dtim1->dy * 1440L) + (dtim1->hr * 60L)
-             + dtim1->mn;
+      min1 = min1 + mnacul[mo1] + (dtim1->dy * 1440L) + (dtim1->hr * 60L) + dtim1->mn;
     }
   else
     {
-      min1 = min1 + mnacum[mo1] + (dtim1->dy * 1440L) + (dtim1->hr * 60L)
-             + dtim1->mn;
+      min1 = min1 + mnacum[mo1] + (dtim1->dy * 1440L) + (dtim1->hr * 60L) + dtim1->mn;
     }
   if (qleap(dtim2->yr))
     {
-      min2 = min2 + mnacul[mo2] + (dtim2->dy * 1440L) + (dtim2->hr * 60L)
-             + dtim2->mn;
+      min2 = min2 + mnacul[mo2] + (dtim2->dy * 1440L) + (dtim2->hr * 60L) + dtim2->mn;
     }
   else
     {
-      min2 = min2 + mnacum[mo2] + (dtim2->dy * 1440L) + (dtim2->hr * 60L)
-             + dtim2->mn;
+      min2 = min2 + mnacum[mo2] + (dtim2->dy * 1440L) + (dtim2->hr * 60L) + dtim2->mn;
     }
   if (swap)
     return (min1 - min2);
@@ -462,8 +455,7 @@ timdif(struct dt *dtim1, struct dt *dtim2)
     return (min2 - min1);
 }
 
-static const char *mons[12] = { "jan", "feb", "mar", "apr", "may", "jun",
-                                "jul", "aug", "sep", "oct", "nov", "dec" };
+static const char *mons[12] = { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
 /* Parse an absolute date/time value.  Format is:
 
@@ -693,17 +685,13 @@ cmpwrd(const char *ch1, const char *ch2)
 
   while (*ch1 == *ch2)
     {
-      if (*ch1 == ' ' || *ch1 == '\t' || *ch1 == '\0' || *ch1 == '\n'
-          || *ch1 == '\r')
-        return (1);
+      if (*ch1 == ' ' || *ch1 == '\t' || *ch1 == '\0' || *ch1 == '\n' || *ch1 == '\r') return (1);
       ch1++;
       ch2++;
     }
 
-  if ((*ch1 == ' ' || *ch1 == '\t' || *ch1 == '\0' || *ch1 == '\n'
-       || *ch1 == '\r')
-      && (*ch2 == ' ' || *ch2 == '\t' || *ch2 == '\0' || *ch2 == '\n'
-          || *ch2 == '\r'))
+  if ((*ch1 == ' ' || *ch1 == '\t' || *ch1 == '\0' || *ch1 == '\n' || *ch1 == '\r')
+      && (*ch2 == ' ' || *ch2 == '\t' || *ch2 == '\0' || *ch2 == '\n' || *ch2 == '\r'))
     return (1);
   return 0;
 }
@@ -832,8 +820,7 @@ void
 getwrd(char *ch1, char *ch2, int len)
 {
 
-  while (len > 0 && *ch2 != '\n' && *ch2 != '\0' && *ch2 != '\r' && *ch2 != ' '
-         && *ch2 != '\t')
+  while (len > 0 && *ch2 != '\n' && *ch2 != '\0' && *ch2 != '\r' && *ch2 != ' ' && *ch2 != '\t')
     {
       *ch1 = *ch2;
       len--;
@@ -989,8 +976,7 @@ gr2lev(gadouble *vals, gadouble gr)
       return (*(vals + i) + (gr - *vals) * (*(vals + i) - *(vals + i - 1)));
     }
   i = (gaint) gr;
-  return (*(vals + i)
-          + ((gr - (gadouble) i) * (*(vals + i + 1) - *(vals + i))));
+  return (*(vals + i) + ((gr - (gadouble) i) * (*(vals + i + 1) - *(vals + i))));
 }
 
 /* Convert from world coordinate value to grid value.  This operation
@@ -1005,11 +991,9 @@ lev2gr(gadouble *vals, gadouble lev)
   num = (gaint)(*vals + 0.1);
   for (i = 1; i < num; i++)
     {
-      if ((lev >= *(vals + i) && lev <= *(vals + i + 1))
-          || (lev <= *(vals + i) && lev >= *(vals + i + 1)))
+      if ((lev >= *(vals + i) && lev <= *(vals + i + 1)) || (lev <= *(vals + i) && lev >= *(vals + i + 1)))
         {
-          gr = (gadouble) i
-               + (lev - *(vals + i)) / (*(vals + i + 1) - *(vals + i));
+          gr = (gadouble) i + (lev - *(vals + i)) / (*(vals + i + 1) - *(vals + i));
           return (gr);
         }
     }
@@ -1020,8 +1004,7 @@ lev2gr(gadouble *vals, gadouble lev)
           gr = 1.0 + ((lev - *(vals + 1)) / (*(vals + 2) - *(vals + 1)));
           return (gr);
         }
-      gr = (gadouble) i
-           + ((lev - *(vals + i)) / (*(vals + i) - *(vals + i - 1)));
+      gr = (gadouble) i + ((lev - *(vals + i)) / (*(vals + i) - *(vals + i - 1)));
       return (gr);
     }
   else
@@ -1031,8 +1014,7 @@ lev2gr(gadouble *vals, gadouble lev)
           gr = 1.0 + ((lev - *(vals + 1)) / (*(vals + 2) - *(vals + 1)));
           return (gr);
         }
-      gr = (gadouble) i
-           + ((lev - *(vals + i)) / (*(vals + i) - *(vals + i - 1)));
+      gr = (gadouble) i + ((lev - *(vals + i)) / (*(vals + i) - *(vals + i - 1)));
       return (gr);
     }
 }
@@ -1164,8 +1146,7 @@ getvnm(struct gavar *pvar, char *mrec)
 
   while (1)
     {
-      if (*(mrec + i) == ' ' || *(mrec + i) == '\0' || *(mrec + i) == '\n')
-        break;
+      if (*(mrec + i) == ' ' || *(mrec + i) == '\0' || *(mrec + i) == '\n') break;
       if (*(mrec + i) == '=' && *(mrec + i + 1) == '>')
         {
           flag = 1;
@@ -1209,9 +1190,8 @@ getvnm(struct gavar *pvar, char *mrec)
  */
 
 char *
-gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals,
-       struct gachsub *pch1st, struct gaens *ens1st, gaint t, gaint e,
-       gaint *flag)
+gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachsub *pch1st, struct gaens *ens1st,
+       gaint t, gaint e, gaint *flag)
 {
   struct gachsub *pchsub;
   struct gaens *ens;
@@ -1556,8 +1536,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals,
                   return (NULL);
                 }
               olen += len;
-              work = (char *) galloc(olen,
-                                     "work2"); /* Reallocate output string */
+              work = (char *) galloc(olen, "work2"); /* Reallocate output string */
               if (work == NULL)
                 {
                   gree(fnout, "f244");
@@ -1696,8 +1675,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
         {
           if ((ch = nxtwrd(rec)) == NULL)
             {
-              gaprnt(1,
-                     "Description file warning: Missing fileheader length\n");
+              gaprnt(1, "Description file warning: Missing fileheader length\n");
             }
           else
             {
@@ -1713,9 +1691,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
         {
           if ((ch = nxtwrd(rec)) == NULL)
             {
-              gaprnt(
-                  1,
-                  "Description file warning: Missing xy grid header length\n");
+              gaprnt(1, "Description file warning: Missing xy grid header length\n");
             }
           else
             {
@@ -1847,13 +1823,10 @@ read_gradsdes(char *filename, dsets_t *pfi)
               flag = 0;
               if (pchsub)
                 { /* chain exists */
-                  pchsub->forw = (struct gachsub *) galloc(
-                      sizeof(struct gachsub), "chsubnew");
+                  pchsub->forw = (struct gachsub *) galloc(sizeof(struct gachsub), "chsubnew");
                   if (pchsub->forw == NULL)
                     {
-                      gaprnt(
-                          0,
-                          "Open Error: memory allocation failed for pchsub\n");
+                      gaprnt(0, "Open Error: memory allocation failed for pchsub\n");
                       goto err8;
                     }
                   pchsub = pchsub->forw;
@@ -1861,30 +1834,24 @@ read_gradsdes(char *filename, dsets_t *pfi)
                 }
               else
                 { /* start a new chain */
-                  pfi->pchsub1 = (struct gachsub *) galloc(
-                      sizeof(struct gachsub), "chsub1");
+                  pfi->pchsub1 = (struct gachsub *) galloc(sizeof(struct gachsub), "chsub1");
                   if (pfi->pchsub1 == NULL)
                     {
-                      gaprnt(
-                          0,
-                          "Open Error: memory allocation failed for pchsub1\n");
+                      gaprnt(0, "Open Error: memory allocation failed for pchsub1\n");
                       goto err8;
                     }
                   pchsub = pfi->pchsub1;
                   pchsub->forw = NULL;
                 }
               len = wrdlen(ch);
-              if ((pchsub->ch = (char *) galloc(len + 1, "chsubstr")) == NULL)
-                goto err8;
+              if ((pchsub->ch = (char *) galloc(len + 1, "chsubstr")) == NULL) goto err8;
               getwrd(pchsub->ch, ch, len);
               pchsub->t1 = tim1;
               pchsub->t2 = tim2;
             }
           if (flag)
             {
-              gaprnt(
-                  1,
-                  "Description file warning: Invalid chsub record; Ignored\n");
+              gaprnt(1, "Description file warning: Invalid chsub record; Ignored\n");
             }
         }
       else if (cmpwrd("title", rec))
@@ -2053,18 +2020,14 @@ read_gradsdes(char *filename, dsets_t *pfi)
               tdef.mo = -1000;
               tdef.dy = -1000;
               if ((pos = adtprs(ch, &tdef, &dt1)) == NULL) goto err3b_tdef;
-              if (*pos != ' ' || dt1.yr == -1000 || dt1.mo == -1000
-                  || dt1.dy == -1000)
-                goto err3c_tdef;
+              if (*pos != ' ' || dt1.yr == -1000 || dt1.mo == -1000 || dt1.dy == -1000) goto err3c_tdef;
               if ((ch = nxtwrd(ch)) == NULL) goto err4a_tdef;
               if ((pos = rdtprs(ch, &dt2)) == NULL) goto err4b_tdef;
               v1 = (dt2.yr * 12) + dt2.mo;
               v2 = (dt2.dy * 1440) + (dt2.hr * 60) + dt2.mn;
               /* check if 0 dt */
               if (((int) v1 == 0) && ((int) v2 == 0)) goto err4c_tdef;
-              if ((vals = (gadouble *) galloc(sizeof(gadouble) * 8, "tvals5"))
-                  == NULL)
-                goto err8;
+              if ((vals = (gadouble *) galloc(sizeof(gadouble) * 8, "tvals5")) == NULL) goto err8;
               *(vals) = dt1.yr;
               *(vals + 1) = dt1.mo;
               *(vals + 2) = dt1.dy;
@@ -2085,8 +2048,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((ch = nxtwrd(rec)) == NULL) goto err5;
           if ((pos = intprs(ch, &(pfi->vnum))) == NULL) goto err5;
           size = pfi->vnum * (sizeof(struct gavar) + 7);
-          if ((pvar = (struct gavar *) galloc(size, "pvar2")) == NULL)
-            goto err8;
+          if ((pvar = (struct gavar *) galloc(size, "pvar2")) == NULL) goto err8;
           pfi->pvar1 = pvar;
           i = 0;
           while (i < pfi->vnum)
@@ -2111,8 +2073,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
               if (fgets(rec, 512, descr) == NULL)
                 {
                   gaprnt(0, "Open Error:  Unexpected EOF reading variables\n");
-                  sprintf(pout, "Was expecting %i records.  Found %i.\n",
-                          pfi->vnum, i);
+                  sprintf(pout, "Was expecting %i records.  Found %i.\n", pfi->vnum, i);
                   gaprnt(2, pout);
                   goto retrn;
                 }
@@ -2146,13 +2107,13 @@ read_gradsdes(char *filename, dsets_t *pfi)
                     if ((ddfattr(mrec,pfi)) == -1) goto retrn;
                     else continue;
                   }
-                  else */ continue;
+                  else */
+                  continue;
                 }
               if (cmpwrd("endvars", rec))
                 {
                   gaprnt(0, "Open Error:  Unexpected ENDVARS record\n");
-                  sprintf(pout, "Was expecting %i records.  Found %i.\n",
-                          pfi->vnum, i);
+                  sprintf(pout, "Was expecting %i records.  Found %i.\n", pfi->vnum, i);
                   gaprnt(2, pout);
                   goto err9;
                 }
@@ -2176,8 +2137,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
                   else
                     {
                       /* remaining elements are grib2 level codes */
-                      if ((ch = getdbl(ch, &(pvar->units[j - 1]))) == NULL)
-                        goto err6;
+                      if ((ch = getdbl(ch, &(pvar->units[j - 1]))) == NULL) goto err6;
                     }
                   /* advance through comma-delimited list of levels args */
                   while (*ch == ' ')
@@ -2203,8 +2163,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
               pvar->nvardims = 0;
               while (1)
                 {
-                  if (*ch == 'x' || *ch == 'y' || *ch == 'z' || *ch == 't'
-                      || *ch == 'e')
+                  if (*ch == 'x' || *ch == 'y' || *ch == 'z' || *ch == 't' || *ch == 'e')
                     {
                       if (*(ch + 1) != ',' && *(ch + 1) != ' ') goto err6;
                       if (*ch == 'x')
@@ -2236,8 +2195,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
                     }
                   else
                     {
-                      if ((ch = getdbl(ch, &(pvar->units[j]))) == NULL)
-                        goto err6;
+                      if ((ch = getdbl(ch, &(pvar->units[j]))) == NULL) goto err6;
                       /* no negative array indices for ncflag files */
                       if ((pfi->ncflg) && (pvar->units[j] < 0)) goto err6;
                     }
@@ -2258,8 +2216,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
 
               /* var_t is for data files with dimension sequence: X, Y, Z, T, V
                */
-              if (((int) pvar->units[0] == -1) && ((int) pvar->units[1] == 20))
-                pvar->var_t = 1;
+              if (((int) pvar->units[0] == -1) && ((int) pvar->units[1] == 20)) pvar->var_t = 1;
 
               /* non-float data types */
               if (((int) pvar->units[0] == -1) && ((int) pvar->units[1] == 40))
@@ -2374,8 +2331,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
     {
       pfi->dnum[4] = 1;
       /* set up linear scaling */
-      if ((vals = (gadouble *) galloc(sizeof(gadouble) * 6, "evals3")) == NULL)
-        goto err8;
+      if ((vals = (gadouble *) galloc(sizeof(gadouble) * 6, "evals3")) == NULL) goto err8;
       v1 = v2 = 1;
       *(vals + 1) = v1 - v2;
       *(vals) = v2;
@@ -2607,8 +2563,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
          that contains the data for each timestep.
          If the ensemble has no data file for a given time,
          the fnums value will be -1 */
-      pfi->fnums = (gaint *) galloc(sizeof(gaint) * pfi->dnum[3] * pfi->dnum[4],
-                                    "fnums1");
+      pfi->fnums = (gaint *) galloc(sizeof(gaint) * pfi->dnum[3] * pfi->dnum[4], "fnums1");
       if (pfi->fnums == NULL)
         {
           gaprnt(0, "Open Error: memory allocation failed for fnums\n");
@@ -2634,8 +2589,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           /* get dt structure for ensemble initial time */
           gr2t(pfi->grvals[3], ens->gt, &tdefe);
           /* get filename for initial time of current ensemble member  */
-          ch = gafndt(pfi->name, &tdefe, &tdefe, pfi->abvals[3], pfi->pchsub1,
-                      pfi->ens1, ens->gt, e, &flag);
+          ch = gafndt(pfi->name, &tdefe, &tdefe, pfi->abvals[3], pfi->pchsub1, pfi->ens1, ens->gt, e, &flag);
           if (ch == NULL)
             {
               sprintf(pout,
@@ -2648,9 +2602,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           /* set the pfi->tmplat flag to the flag returned by gafndt */
           if (flag == 0)
             {
-              gaprnt(
-                  1,
-                  "Warning: OPTIONS keyword \"template\" is used, but the \n");
+              gaprnt(1, "Warning: OPTIONS keyword \"template\" is used, but the \n");
               gaprnt(1, "   DSET entry contains no substitution templates.\n");
               pfi->tmplat = 1;
             }
@@ -2671,9 +2623,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
                                     "binary, \n");
                           gaprnt(0, "  and the E dimension size is greater "
                                     "than 1 \n");
-                          gaprnt(
-                              0,
-                              "  and templating in the T dimension is used,\n");
+                          gaprnt(0, "  and templating in the T dimension is used,\n");
                           gaprnt(0, "  then templating in the E dimension must "
                                     "also be used.\n");
                           goto retrn;
@@ -2699,8 +2649,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
             {
               /* get filename for time index=t ens=e */
               gr2t(pfi->grvals[3], (gadouble) t, &tdef);
-              pos = gafndt(pfi->name, &tdef, &tdefe, pfi->abvals[3],
-                           pfi->pchsub1, pfi->ens1, t, e, &flag);
+              pos = gafndt(pfi->name, &tdef, &tdefe, pfi->abvals[3], pfi->pchsub1, pfi->ens1, t, e, &flag);
               if (pos == NULL)
                 {
                   sprintf(pout,

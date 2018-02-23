@@ -72,8 +72,7 @@ limitStringLength(char *string, size_t maxlen)
   if (len > 10)
     {
       for (size_t i = 3; i < len; ++i)
-        if (string[i] == ' ' || string[i] == ','
-            || (i > 10 && string[i] == '.'))
+        if (string[i] == ' ' || string[i] == ',' || (i > 10 && string[i] == '.'))
           {
             string[i] = 0;
             break;
@@ -174,16 +173,14 @@ Sinfo(void *process)
 
           set_text_color(stdout, RESET, BLUE);
           // institute info
-          const char *instptr
-              = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
+          const char *instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
           strcpy(tmpname, "unknown");
           if (instptr) strncpy(tmpname, instptr, CDI_MAX_NAME);
           limitStringLength(tmpname, 32);
           fprintf(stdout, "%-8s ", tmpname);
 
           // source info
-          const char *modelptr
-              = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
+          const char *modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
           strcpy(tmpname, "unknown");
           if (modelptr) strncpy(tmpname, modelptr, CDI_MAX_NAME);
           limitStringLength(tmpname, 32);
@@ -212,14 +209,10 @@ Sinfo(void *process)
           if (lensemble)
             {
               int perturbationNumber, numberOfForecastsInEnsemble;
-              int r1 = cdiInqKeyInt(vlistID, varID, CDI_KEY_PERTURBATIONNUMBER,
-                                    &perturbationNumber);
-              int r2 = cdiInqKeyInt(vlistID, varID,
-                                    CDI_KEY_NUMBEROFFORECASTSINENSEMBLE,
-                                    &numberOfForecastsInEnsemble);
+              int r1 = cdiInqKeyInt(vlistID, varID, CDI_KEY_PERTURBATIONNUMBER, &perturbationNumber);
+              int r2 = cdiInqKeyInt(vlistID, varID, CDI_KEY_NUMBEROFFORECASTSINENSEMBLE, &numberOfForecastsInEnsemble);
               if (r1 == 0 && r2 == 0)
-                fprintf(stdout, "%2d/%-2d ", perturbationNumber,
-                        numberOfForecastsInEnsemble);
+                fprintf(stdout, "%2d/%-2d ", perturbationNumber, numberOfForecastsInEnsemble);
               else
                 fprintf(stdout, "--/-- ");
             }
@@ -229,8 +222,7 @@ Sinfo(void *process)
               int subtypeID = vlistInqVarSubtype(vlistID, varID);
               int subtypesize = subtypeInqSize(subtypeID);
               fprintf(stdout, " %6d  ", subtypesize);
-              fprintf(stdout, "%3d ",
-                      vlistSubtypeIndex(vlistID, subtypeID) + 1);
+              fprintf(stdout, "%3d ", vlistSubtypeIndex(vlistID, subtypeID) + 1);
             }
           reset_text_color(stdout);
 
@@ -324,8 +316,7 @@ Sinfo(void *process)
           if (ntsteps == CDI_UNDEFID)
             fprintf(stdout, " :  unlimited steps\n");
           else
-            fprintf(stdout, " :  %d step%s\n", ntsteps,
-                    ntsteps == 1 ? "" : "s");
+            fprintf(stdout, " :  %d step%s\n", ntsteps, ntsteps == 1 ? "" : "s");
 
           if (taxisID != CDI_UNDEFID)
             {
@@ -340,15 +331,12 @@ Sinfo(void *process)
                   fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 
                   int tunits = taxisInqTunit(taxisID);
-                  if (tunits != CDI_UNDEFID)
-                    fprintf(stdout, "  Units = %s", tunit2str(tunits));
+                  if (tunits != CDI_UNDEFID) fprintf(stdout, "  Units = %s", tunit2str(tunits));
 
                   int calendar = taxisInqCalendar(taxisID);
-                  if (calendar != CDI_UNDEFID)
-                    fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
+                  if (calendar != CDI_UNDEFID) fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
 
-                  if (taxisHasBounds(taxisID))
-                    fprintf(stdout, "  Bounds = true");
+                  if (taxisHasBounds(taxisID)) fprintf(stdout, "  Bounds = true");
 
                   fprintf(stdout, "\n");
 
@@ -360,8 +348,7 @@ Sinfo(void *process)
                       date2str(vdate, vdatestr, sizeof(vdatestr));
                       time2str(vtime, vtimestr, sizeof(vtimestr));
 
-                      fprintf(stdout, "     ForecastRefTime = %s %s", vdatestr,
-                              vtimestr);
+                      fprintf(stdout, "     ForecastRefTime = %s %s", vdatestr, vtimestr);
                       fprintf(stdout, "\n");
                     }
                 }

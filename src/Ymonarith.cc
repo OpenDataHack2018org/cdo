@@ -127,8 +127,7 @@ Ymonarith(void *process)
         {
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           nlev = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-          vardata2[mon][varID]
-              = (double *) Malloc(nlev * gridsize * sizeof(double));
+          vardata2[mon][varID] = (double *) Malloc(nlev * gridsize * sizeof(double));
           varnmiss2[mon][varID] = (size_t *) Malloc(nlev * sizeof(size_t));
         }
 

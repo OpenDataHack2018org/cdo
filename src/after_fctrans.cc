@@ -129,8 +129,8 @@ fft_set(double *trigs, long *ifax, long n)
 }
 
 static int
-rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
-       long inc2, long inc3, long inc4, long lot, long n, long ifac, long la)
+rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, long inc2, long inc3, long inc4, long lot,
+       long n, long ifac, long la)
 {
   /*
      rpassc' - performs one pass through data as part;
@@ -674,50 +674,22 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
 #endif
                         for (ijk = 0; ijk < lot; ++ijk)
                           {
-                            a10 = (a[i0 + i]
-                                   - 0.25
-                                         * ((a[i1 + i] + a[i4 + i])
-                                            + (a[i2 + i] + a[i3 + i])))
-                                  + QT5
-                                        * ((a[i1 + i] + a[i4 + i])
-                                           - (a[i2 + i] + a[i3 + i]));
-                            a20 = (a[i0 + i]
-                                   - 0.25
-                                         * ((a[i1 + i] + a[i4 + i])
-                                            + (a[i2 + i] + a[i3 + i])))
-                                  - QT5
-                                        * ((a[i1 + i] + a[i4 + i])
-                                           - (a[i2 + i] + a[i3 + i]));
-                            b10 = (b[i0 + i]
-                                   - 0.25
-                                         * ((b[i1 + i] - b[i4 + i])
-                                            + (b[i2 + i] - b[i3 + i])))
-                                  + QT5
-                                        * ((b[i1 + i] - b[i4 + i])
-                                           - (b[i2 + i] - b[i3 + i]));
-                            b20 = (b[i0 + i]
-                                   - 0.25
-                                         * ((b[i1 + i] - b[i4 + i])
-                                            + (b[i2 + i] - b[i3 + i])))
-                                  - QT5
-                                        * ((b[i1 + i] - b[i4 + i])
-                                           - (b[i2 + i] - b[i3 + i]));
+                            a10 = (a[i0 + i] - 0.25 * ((a[i1 + i] + a[i4 + i]) + (a[i2 + i] + a[i3 + i])))
+                                  + QT5 * ((a[i1 + i] + a[i4 + i]) - (a[i2 + i] + a[i3 + i]));
+                            a20 = (a[i0 + i] - 0.25 * ((a[i1 + i] + a[i4 + i]) + (a[i2 + i] + a[i3 + i])))
+                                  - QT5 * ((a[i1 + i] + a[i4 + i]) - (a[i2 + i] + a[i3 + i]));
+                            b10 = (b[i0 + i] - 0.25 * ((b[i1 + i] - b[i4 + i]) + (b[i2 + i] - b[i3 + i])))
+                                  + QT5 * ((b[i1 + i] - b[i4 + i]) - (b[i2 + i] - b[i3 + i]));
+                            b20 = (b[i0 + i] - 0.25 * ((b[i1 + i] - b[i4 + i]) + (b[i2 + i] - b[i3 + i])))
+                                  - QT5 * ((b[i1 + i] - b[i4 + i]) - (b[i2 + i] - b[i3 + i]));
 
-                            a11 = S72 * (b[i1 + i] + b[i4 + i])
-                                  + S36 * (b[i2 + i] + b[i3 + i]);
-                            a21 = S36 * (b[i1 + i] + b[i4 + i])
-                                  - S72 * (b[i2 + i] + b[i3 + i]);
-                            b11 = S72 * (a[i1 + i] - a[i4 + i])
-                                  + S36 * (a[i2 + i] - a[i3 + i]);
-                            b21 = S36 * (a[i1 + i] - a[i4 + i])
-                                  - S72 * (a[i2 + i] - a[i3 + i]);
+                            a11 = S72 * (b[i1 + i] + b[i4 + i]) + S36 * (b[i2 + i] + b[i3 + i]);
+                            a21 = S36 * (b[i1 + i] + b[i4 + i]) - S72 * (b[i2 + i] + b[i3 + i]);
+                            b11 = S72 * (a[i1 + i] - a[i4 + i]) + S36 * (a[i2 + i] - a[i3 + i]);
+                            b21 = S36 * (a[i1 + i] - a[i4 + i]) - S72 * (a[i2 + i] - a[i3 + i]);
 
-                            c[j0 + j] = a[i0 + i]
-                                        + ((a[i1 + i] + a[i4 + i])
-                                           + (a[i2 + i] + a[i3 + i]));
-                            d[j0 + j] = b[i0 + i]
-                                        + ((b[i1 + i] - b[i4 + i])
-                                           + (b[i2 + i] - b[i3 + i]));
+                            c[j0 + j] = a[i0 + i] + ((a[i1 + i] + a[i4 + i]) + (a[i2 + i] + a[i3 + i]));
+                            d[j0 + j] = b[i0 + i] + ((b[i1 + i] - b[i4 + i]) + (b[i2 + i] - b[i3 + i]));
                             c[j1 + j] = c1 * (a10 - a11) - s1 * (b10 + b11);
                             d[j1 + j] = s1 * (a10 - a11) + c1 * (b10 + b11);
                             c[j4 + j] = c4 * (a10 + a11) - s4 * (b10 - b11);
@@ -752,20 +724,14 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
                 for (ijk = 0; ijk < lot; ++ijk)
                   {
                     c[j0 + j] = a[i0 + i] + a[i1 + i] + a[i2 + i];
-                    c[j1 + j] = (QT5 * (a[i0 + i] - a[i1 + i])
-                                 + (0.25 * (a[i0 + i] + a[i1 + i]) - a[i2 + i]))
+                    c[j1 + j] = (QT5 * (a[i0 + i] - a[i1 + i]) + (0.25 * (a[i0 + i] + a[i1 + i]) - a[i2 + i]))
                                 - (S36 * b[i0 + i] + S72 * b[i1 + i]);
-                    c[j4 + j]
-                        = -(QT5 * (a[i0 + i] - a[i1 + i])
-                            + (0.25 * (a[i0 + i] + a[i1 + i]) - a[i2 + i]))
-                          - (S36 * b[i0 + i] + S72 * b[i1 + i]);
-                    c[j2 + j] = (QT5 * (a[i0 + i] - a[i1 + i])
-                                 - (0.25 * (a[i0 + i] + a[i1 + i]) - a[i2 + i]))
+                    c[j4 + j] = -(QT5 * (a[i0 + i] - a[i1 + i]) + (0.25 * (a[i0 + i] + a[i1 + i]) - a[i2 + i]))
+                                - (S36 * b[i0 + i] + S72 * b[i1 + i]);
+                    c[j2 + j] = (QT5 * (a[i0 + i] - a[i1 + i]) - (0.25 * (a[i0 + i] + a[i1 + i]) - a[i2 + i]))
                                 - (S72 * b[i0 + i] - S36 * b[i1 + i]);
-                    c[j3 + j]
-                        = -(QT5 * (a[i0 + i] - a[i1 + i])
-                            - (0.25 * (a[i0 + i] + a[i1 + i]) - a[i2 + i]))
-                          - (S72 * b[i0 + i] - S36 * b[i1 + i]);
+                    c[j3 + j] = -(QT5 * (a[i0 + i] - a[i1 + i]) - (0.25 * (a[i0 + i] + a[i1 + i]) - a[i2 + i]))
+                                - (S72 * b[i0 + i] - S36 * b[i1 + i]);
                     i += inc3;
                     j += inc4;
                   }
@@ -788,22 +754,14 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
                 for (ijk = 0; ijk < lot; ++ijk)
                   {
                     c[j0 + j] = 2.0 * (a[i0 + i] + a[i1 + i] + a[i2 + i]);
-                    c[j1 + j]
-                        = (2.0 * (a[i0 + i] - 0.25 * (a[i1 + i] + a[i2 + i]))
-                           + qqrt5 * (a[i1 + i] - a[i2 + i]))
-                          - (ssin72 * b[i1 + i] + ssin36 * b[i2 + i]);
-                    c[j2 + j]
-                        = (2.0 * (a[i0 + i] - 0.25 * (a[i1 + i] + a[i2 + i]))
-                           - qqrt5 * (a[i1 + i] - a[i2 + i]))
-                          - (ssin36 * b[i1 + i] - ssin72 * b[i2 + i]);
-                    c[j3 + j]
-                        = (2.0 * (a[i0 + i] - 0.25 * (a[i1 + i] + a[i2 + i]))
-                           - qqrt5 * (a[i1 + i] - a[i2 + i]))
-                          + (ssin36 * b[i1 + i] - ssin72 * b[i2 + i]);
-                    c[j4 + j]
-                        = (2.0 * (a[i0 + i] - 0.25 * (a[i1 + i] + a[i2 + i]))
-                           + qqrt5 * (a[i1 + i] - a[i2 + i]))
-                          + (ssin72 * b[i1 + i] + ssin36 * b[i2 + i]);
+                    c[j1 + j] = (2.0 * (a[i0 + i] - 0.25 * (a[i1 + i] + a[i2 + i])) + qqrt5 * (a[i1 + i] - a[i2 + i]))
+                                - (ssin72 * b[i1 + i] + ssin36 * b[i2 + i]);
+                    c[j2 + j] = (2.0 * (a[i0 + i] - 0.25 * (a[i1 + i] + a[i2 + i])) - qqrt5 * (a[i1 + i] - a[i2 + i]))
+                                - (ssin36 * b[i1 + i] - ssin72 * b[i2 + i]);
+                    c[j3 + j] = (2.0 * (a[i0 + i] - 0.25 * (a[i1 + i] + a[i2 + i])) - qqrt5 * (a[i1 + i] - a[i2 + i]))
+                                + (ssin36 * b[i1 + i] - ssin72 * b[i2 + i]);
+                    c[j4 + j] = (2.0 * (a[i0 + i] - 0.25 * (a[i1 + i] + a[i2 + i])) + qqrt5 * (a[i1 + i] - a[i2 + i]))
+                                + (ssin72 * b[i1 + i] + ssin36 * b[i2 + i]);
                     i += inc3;
                     j += inc4;
                   }
@@ -840,22 +798,16 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
 #endif
                 for (ijk = 0; ijk < lot; ++ijk)
                   {
-                    c[ja + j]
-                        = (a[ia + i] + a[id + i]) + (a[ib + i] + a[ic + i]);
-                    c[jd + j]
-                        = (a[ia + i] - a[id + i]) - (a[ib + i] - a[ic + i]);
-                    c[jb + j] = ((a[ia + i] - a[id + i])
-                                 + 0.5 * (a[ib + i] - a[ic + i]))
-                                - S60 * (b[ib + i] + b[ic + i]);
-                    c[jf + j] = ((a[ia + i] - a[id + i])
-                                 + 0.5 * (a[ib + i] - a[ic + i]))
-                                + S60 * (b[ib + i] + b[ic + i]);
-                    c[jc + j] = ((a[ia + i] + a[id + i])
-                                 - 0.5 * (a[ib + i] + a[ic + i]))
-                                - S60 * (b[ib + i] - b[ic + i]);
-                    c[je + j] = ((a[ia + i] + a[id + i])
-                                 - 0.5 * (a[ib + i] + a[ic + i]))
-                                + S60 * (b[ib + i] - b[ic + i]);
+                    c[ja + j] = (a[ia + i] + a[id + i]) + (a[ib + i] + a[ic + i]);
+                    c[jd + j] = (a[ia + i] - a[id + i]) - (a[ib + i] - a[ic + i]);
+                    c[jb + j]
+                        = ((a[ia + i] - a[id + i]) + 0.5 * (a[ib + i] - a[ic + i])) - S60 * (b[ib + i] + b[ic + i]);
+                    c[jf + j]
+                        = ((a[ia + i] - a[id + i]) + 0.5 * (a[ib + i] - a[ic + i])) + S60 * (b[ib + i] + b[ic + i]);
+                    c[jc + j]
+                        = ((a[ia + i] + a[id + i]) - 0.5 * (a[ib + i] + a[ic + i])) - S60 * (b[ib + i] - b[ic + i]);
+                    c[je + j]
+                        = ((a[ia + i] + a[id + i]) - 0.5 * (a[ib + i] + a[ic + i])) + S60 * (b[ib + i] - b[ic + i]);
                     i += inc3;
                     j += inc4;
                   }
@@ -903,14 +855,10 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
                           {
                             a11 = a[ie + i] + a[ib + i] + a[ic + i] + a[iF + i];
                             a20 = a[ia + i] + a[id + i] - 0.5 * a11;
-                            a21 = S60
-                                  * ((a[ie + i] + a[ib + i])
-                                     - (a[ic + i] + a[iF + i]));
+                            a21 = S60 * ((a[ie + i] + a[ib + i]) - (a[ic + i] + a[iF + i]));
                             b11 = b[ib + i] - b[ie + i] + b[ic + i] - b[iF + i];
                             b20 = b[ia + i] - b[id + i] - 0.5 * b11;
-                            b21 = S60
-                                  * ((b[ib + i] - b[ie + i])
-                                     - (b[ic + i] - b[iF + i]));
+                            b21 = S60 * ((b[ib + i] - b[ie + i]) - (b[ic + i] - b[iF + i]));
 
                             c[ja + j] = a[ia + i] + a[id + i] + a11;
                             d[ja + j] = b[ia + i] - b[id + i] + b11;
@@ -919,23 +867,15 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
                             c[je + j] = c4 * (a20 + b21) - s4 * (b20 - a21);
                             d[je + j] = s4 * (a20 + b21) + c4 * (b20 - a21);
 
-                            a11 = (a[ie + i] - a[ib + i])
-                                  + (a[ic + i] - a[iF + i]);
-                            b11 = (b[ie + i] + b[ib + i])
-                                  - (b[ic + i] + b[iF + i]);
+                            a11 = (a[ie + i] - a[ib + i]) + (a[ic + i] - a[iF + i]);
+                            b11 = (b[ie + i] + b[ib + i]) - (b[ic + i] + b[iF + i]);
                             a20 = (a[ia + i] - a[id + i]) - 0.5 * a11;
-                            a21 = S60
-                                  * ((a[ie + i] - a[ib + i])
-                                     - (a[ic + i] - a[iF + i]));
+                            a21 = S60 * ((a[ie + i] - a[ib + i]) - (a[ic + i] - a[iF + i]));
                             b20 = (b[ia + i] + b[id + i]) + 0.5 * b11;
-                            b21 = S60
-                                  * ((b[ie + i] + b[ib + i])
-                                     + (b[ic + i] + b[iF + i]));
+                            b21 = S60 * ((b[ie + i] + b[ib + i]) + (b[ic + i] + b[iF + i]));
 
-                            c[jd + j] = c3 * (a[ia + i] - a[id + i] + a11)
-                                        - s3 * (b[ia + i] + b[id + i] - b11);
-                            d[jd + j] = s3 * (a[ia + i] - a[id + i] + a11)
-                                        + c3 * (b[ia + i] + b[id + i] - b11);
+                            c[jd + j] = c3 * (a[ia + i] - a[id + i] + a11) - s3 * (b[ia + i] + b[id + i] - b11);
+                            d[jd + j] = s3 * (a[ia + i] - a[id + i] + a11) + c3 * (b[ia + i] + b[id + i] - b11);
                             c[jb + j] = c1 * (a20 - b21) - s1 * (b20 - a21);
                             d[jb + j] = s1 * (a20 - b21) + c1 * (b20 - a21);
                             c[jf + j] = c5 * (a20 + b21) - s5 * (b20 + a21);
@@ -968,14 +908,10 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
                   {
                     c[ja + j] = a[ib + i] + (a[ia + i] + a[ic + i]);
                     c[jd + j] = b[ib + i] - (b[ia + i] + b[ic + i]);
-                    c[jb + j] = (S60 * (a[ia + i] - a[ic + i]))
-                                - (0.5 * (b[ia + i] + b[ic + i]) + b[ib + i]);
-                    c[jf + j] = -(S60 * (a[ia + i] - a[ic + i]))
-                                - (0.5 * (b[ia + i] + b[ic + i]) + b[ib + i]);
-                    c[jc + j] = S60 * (b[ic + i] - b[ia + i])
-                                + (0.5 * (a[ia + i] + a[ic + i]) - a[ib + i]);
-                    c[je + j] = S60 * (b[ic + i] - b[ia + i])
-                                - (0.5 * (a[ia + i] + a[ic + i]) - a[ib + i]);
+                    c[jb + j] = (S60 * (a[ia + i] - a[ic + i])) - (0.5 * (b[ia + i] + b[ic + i]) + b[ib + i]);
+                    c[jf + j] = -(S60 * (a[ia + i] - a[ic + i])) - (0.5 * (b[ia + i] + b[ic + i]) + b[ib + i]);
+                    c[jc + j] = S60 * (b[ic + i] - b[ia + i]) + (0.5 * (a[ia + i] + a[ic + i]) - a[ib + i]);
+                    c[je + j] = S60 * (b[ic + i] - b[ia + i]) - (0.5 * (a[ia + i] + a[ic + i]) - a[ib + i]);
                     i += inc3;
                     j += inc4;
                   }
@@ -994,22 +930,16 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
 #endif
                 for (ijk = 0; ijk < lot; ++ijk)
                   {
-                    c[ja + j] = (2.0 * (a[ia + i] + a[id + i]))
-                                + (2.0 * (a[ib + i] + a[ic + i]));
-                    c[jd + j] = (2.0 * (a[ia + i] - a[id + i]))
-                                - (2.0 * (a[ib + i] - a[ic + i]));
-                    c[jb + j] = (2.0 * (a[ia + i] - a[id + i])
-                                 + (a[ib + i] - a[ic + i]))
-                                - (D60 * (b[ib + i] + b[ic + i]));
-                    c[jf + j] = (2.0 * (a[ia + i] - a[id + i])
-                                 + (a[ib + i] - a[ic + i]))
-                                + (D60 * (b[ib + i] + b[ic + i]));
-                    c[jc + j] = (2.0 * (a[ia + i] + a[id + i])
-                                 - (a[ib + i] + a[ic + i]))
-                                - (D60 * (b[ib + i] - b[ic + i]));
-                    c[je + j] = (2.0 * (a[ia + i] + a[id + i])
-                                 - (a[ib + i] + a[ic + i]))
-                                + (D60 * (b[ib + i] - b[ic + i]));
+                    c[ja + j] = (2.0 * (a[ia + i] + a[id + i])) + (2.0 * (a[ib + i] + a[ic + i]));
+                    c[jd + j] = (2.0 * (a[ia + i] - a[id + i])) - (2.0 * (a[ib + i] - a[ic + i]));
+                    c[jb + j]
+                        = (2.0 * (a[ia + i] - a[id + i]) + (a[ib + i] - a[ic + i])) - (D60 * (b[ib + i] + b[ic + i]));
+                    c[jf + j]
+                        = (2.0 * (a[ia + i] - a[id + i]) + (a[ib + i] - a[ic + i])) + (D60 * (b[ib + i] + b[ic + i]));
+                    c[jc + j]
+                        = (2.0 * (a[ia + i] + a[id + i]) - (a[ib + i] + a[ic + i])) - (D60 * (b[ib + i] - b[ic + i]));
+                    c[je + j]
+                        = (2.0 * (a[ia + i] + a[id + i]) - (a[ib + i] + a[ic + i])) + (D60 * (b[ib + i] - b[ic + i]));
                     i += inc3;
                     j += inc4;
                   }
@@ -1089,8 +1019,8 @@ rpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
 }
 
 static int
-qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
-       long inc2, long inc3, long inc4, long lot, long n, long ifac, long la)
+qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1, long inc2, long inc3, long inc4, long lot,
+       long n, long ifac, long la)
 {
   /*
      qpassc - performs one pass through data as part
@@ -1185,14 +1115,10 @@ qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
 #endif
                         for (ijk = 0; ijk < lot; ++ijk)
                           {
-                            c[j0 + j]
-                                = a[i0 + i] + c1 * a[i1 + i] + s1 * b[i1 + i];
-                            c[j1 + j]
-                                = a[i0 + i] - c1 * a[i1 + i] - s1 * b[i1 + i];
-                            d[j0 + j]
-                                = c1 * b[i1 + i] - s1 * a[i1 + i] + b[i0 + i];
-                            d[j1 + j]
-                                = c1 * b[i1 + i] - s1 * a[i1 + i] - b[i0 + i];
+                            c[j0 + j] = a[i0 + i] + c1 * a[i1 + i] + s1 * b[i1 + i];
+                            c[j1 + j] = a[i0 + i] - c1 * a[i1 + i] - s1 * b[i1 + i];
+                            d[j0 + j] = c1 * b[i1 + i] - s1 * a[i1 + i] + b[i0 + i];
+                            d[j1 + j] = c1 * b[i1 + i] - s1 * a[i1 + i] - b[i0 + i];
                             i += inc3;
                             j += inc4;
                           }
@@ -1305,18 +1231,12 @@ qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
 #endif
                         for (ijk = 0; ijk < lot; ++ijk)
                           {
-                            a1 = c1 * a[ib + i] + s1 * b[ib + i]
-                                 + c2 * a[ic + i] + s2 * b[ic + i];
-                            b1 = c1 * b[ib + i] - s1 * a[ib + i]
-                                 + c2 * b[ic + i] - s2 * a[ic + i];
+                            a1 = c1 * a[ib + i] + s1 * b[ib + i] + c2 * a[ic + i] + s2 * b[ic + i];
+                            b1 = c1 * b[ib + i] - s1 * a[ib + i] + c2 * b[ic + i] - s2 * a[ic + i];
                             a2 = a[ia + i] - 0.5 * a1;
                             b2 = b[ia + i] - 0.5 * b1;
-                            a3 = S60
-                                 * (c1 * a[ib + i] + s1 * b[ib + i]
-                                    - c2 * a[ic + i] - s2 * b[ic + i]);
-                            b3 = S60
-                                 * (c1 * b[ib + i] - s1 * a[ib + i]
-                                    - c2 * b[ic + i] + s2 * a[ic + i]);
+                            a3 = S60 * (c1 * a[ib + i] + s1 * b[ib + i] - c2 * a[ic + i] - s2 * b[ic + i]);
+                            b3 = S60 * (c1 * b[ib + i] - s1 * a[ib + i] - c2 * b[ic + i] + s2 * a[ic + i]);
 
                             c[ja + j] = a[ia + i] + a1;
                             d[ja + j] = b[ia + i] + b1;
@@ -1458,14 +1378,10 @@ qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
                             b0 = b[i0 + i] + c2 * b[i2 + i] - s2 * a[i2 + i];
                             b2 = b[i0 + i] - c2 * b[i2 + i] + s2 * a[i2 + i];
 
-                            a1 = c1 * a[i1 + i] + s1 * b[i1 + i]
-                                 + c3 * a[i3 + i] + s3 * b[i3 + i];
-                            a3 = c1 * a[i1 + i] + s1 * b[i1 + i]
-                                 - c3 * a[i3 + i] - s3 * b[i3 + i];
-                            b1 = c1 * b[i1 + i] - s1 * a[i1 + i]
-                                 + c3 * b[i3 + i] - s3 * a[i3 + i];
-                            b3 = c1 * b[i1 + i] - s1 * a[i1 + i]
-                                 - c3 * b[i3 + i] + s3 * a[i3 + i];
+                            a1 = c1 * a[i1 + i] + s1 * b[i1 + i] + c3 * a[i3 + i] + s3 * b[i3 + i];
+                            a3 = c1 * a[i1 + i] + s1 * b[i1 + i] - c3 * a[i3 + i] - s3 * b[i3 + i];
+                            b1 = c1 * b[i1 + i] - s1 * a[i1 + i] + c3 * b[i3 + i] - s3 * a[i3 + i];
+                            b3 = c1 * b[i1 + i] - s1 * a[i1 + i] - c3 * b[i3 + i] + s3 * a[i3 + i];
 
                             c[j0 + j] = a0 + a1;
                             c[j2 + j] = a0 - a1;
@@ -1620,22 +1536,14 @@ qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
 #endif
                         for (ijk = 0; ijk < lot; ++ijk)
                           {
-                            a1p4 = c1 * a[i1 + i] + s1 * b[i1 + i]
-                                   + c4 * a[i4 + i] + s4 * b[i4 + i];
-                            a1m4 = c1 * a[i1 + i] + s1 * b[i1 + i]
-                                   - c4 * a[i4 + i] - s4 * b[i4 + i];
-                            a2p3 = c2 * a[i2 + i] + s2 * b[i2 + i]
-                                   + c3 * a[i3 + i] + s3 * b[i3 + i];
-                            a2m3 = c2 * a[i2 + i] + s2 * b[i2 + i]
-                                   - c3 * a[i3 + i] - s3 * b[i3 + i];
-                            b1p4 = c1 * b[i1 + i] - s1 * a[i1 + i]
-                                   + c4 * b[i4 + i] - s4 * a[i4 + i];
-                            b1m4 = c1 * b[i1 + i] - s1 * a[i1 + i]
-                                   - c4 * b[i4 + i] + s4 * a[i4 + i];
-                            b2p3 = c2 * b[i2 + i] - s2 * a[i2 + i]
-                                   + c3 * b[i3 + i] - s3 * a[i3 + i];
-                            b2m3 = c2 * b[i2 + i] - s2 * a[i2 + i]
-                                   - c3 * b[i3 + i] + s3 * a[i3 + i];
+                            a1p4 = c1 * a[i1 + i] + s1 * b[i1 + i] + c4 * a[i4 + i] + s4 * b[i4 + i];
+                            a1m4 = c1 * a[i1 + i] + s1 * b[i1 + i] - c4 * a[i4 + i] - s4 * b[i4 + i];
+                            a2p3 = c2 * a[i2 + i] + s2 * b[i2 + i] + c3 * a[i3 + i] + s3 * b[i3 + i];
+                            a2m3 = c2 * a[i2 + i] + s2 * b[i2 + i] - c3 * a[i3 + i] - s3 * b[i3 + i];
+                            b1p4 = c1 * b[i1 + i] - s1 * a[i1 + i] + c4 * b[i4 + i] - s4 * a[i4 + i];
+                            b1m4 = c1 * b[i1 + i] - s1 * a[i1 + i] - c4 * b[i4 + i] + s4 * a[i4 + i];
+                            b2p3 = c2 * b[i2 + i] - s2 * a[i2 + i] + c3 * b[i3 + i] - s3 * a[i3 + i];
+                            b2m3 = c2 * b[i2 + i] - s2 * a[i2 + i] - c3 * b[i3 + i] + s3 * a[i3 + i];
 
                             a025 = a[i0 + i] - 0.25 * (a1p4 + a2p3);
                             aqrt = QT5 * (a1p4 - a2p3);
@@ -2035,8 +1943,8 @@ qpassc(double *a, double *b, double *c, double *d, double *trigs, long inc1,
 /* Fast Fourier Transform */
 /* ====================== */
 void
-fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc,
-      double *restrict gp, long nlat, long nlon, long nlev, long nfc)
+fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon,
+      long nlev, long nfc)
 {
   /* fc2gp performs fourier to gridpoint transforms using           */
   /* multiple fast fourier transform of length nlon                 */
@@ -2063,12 +1971,11 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc,
   long nvex = lot - (nblox - 1) * NFFT;
   long nvex0 = nvex;
 
-  long nthmax
-      = (nblox < Threading::ompNumThreads) ? nblox : Threading::ompNumThreads;
+  long nthmax = (nblox < Threading::ompNumThreads) ? nblox : Threading::ompNumThreads;
   long nvals = lot * jump;
 
   double *restrict wfc = (double *) Malloc(nvals * sizeof(double));
-  NEW_2D(double, wgp2d, nthmax, nvals);
+  VECTOR_2D(double, wgp2d, nthmax, nvals);
 
 #ifdef _OPENMP
 #pragma omp parallel for default(shared)
@@ -2096,14 +2003,14 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc,
       nvex = NFFT;
     }
 
-      // printf("nblox %ld nvex0 %ld  lot %ld\n",nblox, nvex0, lot);
+    // printf("nblox %ld nvex0 %ld  lot %ld\n",nblox, nvex0, lot);
 #ifdef _OPENMP
 #pragma omp parallel for default(shared)
 #endif
   for (long nb = 0; nb < nblox; nb++)
     {
       int ompthID = cdo_omp_get_thread_num();
-      double *restrict wgp = wgp2d[ompthID];
+      double *restrict wgp = &wgp2d[ompthID][0];
 
       long istart = istartv[nb];
       long nvex = (nb == 0) ? nvex0 : NFFT;
@@ -2134,11 +2041,9 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc,
           long ifac = ifax[k + 1];
 
           if (k & 1)
-            rpassc(wgp, wgp + la, wfc + ia, wfc + ia + ifac * la, trig, 1, 1,
-                   nx, jump, nvex, nlon, ifac, la);
+            rpassc(wgp, wgp + la, wfc + ia, wfc + ia + ifac * la, trig, 1, 1, nx, jump, nvex, nlon, ifac, la);
           else
-            rpassc(wfc + ia, wfc + ia + la, wgp, wgp + ifac * la, trig, 1, 1,
-                   jump, nx, nvex, nlon, ifac, la);
+            rpassc(wfc + ia, wfc + ia + la, wgp, wgp + ifac * la, trig, 1, 1, jump, nx, nvex, nlon, ifac, la);
 
           la *= ifac;
           ia = istart;
@@ -2186,12 +2091,11 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc,
 
   Free(istartv);
   Free(wfc);
-  DELETE_2D(wgp2d);
 }
 
 void
-gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc,
-      long nlat, long nlon, long nlev, long nfc)
+gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev,
+      long nfc)
 {
   long lot, fou, ia, ifac, jump, k, la;
   long lat, lev, lon, nfax, rix, wix;
@@ -2249,11 +2153,9 @@ gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc,
           ifac = ifax[nfax - k];
           la /= ifac;
           if (k & 1)
-            qpassc(wfc, wfc + ifac * la, wgp + ia, wgp + ia + la, trig, 1, 1,
-                   nx, jump, nvex, nlon, ifac, la);
+            qpassc(wfc, wfc + ifac * la, wgp + ia, wgp + ia + la, trig, 1, 1, nx, jump, nvex, nlon, ifac, la);
           else
-            qpassc(wgp + ia, wgp + ia + ifac * la, wfc, wfc + la, trig, 1, 1,
-                   jump, nx, nvex, nlon, ifac, la);
+            qpassc(wgp + ia, wgp + ia + ifac * la, wfc, wfc + la, trig, 1, 1, jump, nx, nvex, nlon, ifac, la);
           ia = istart + 1;
         }
 

@@ -56,8 +56,7 @@ printAtts(int vlistID, int varOrGlobal, int natts, char *argument)
         }
       else
         {
-          if (stdname[0])
-            fprintf(stdout, "  standard_name = \"%s\"\n", stdname);
+          if (stdname[0]) fprintf(stdout, "  standard_name = \"%s\"\n", stdname);
           if (longname[0]) fprintf(stdout, "  long_name = \"%s\"\n", longname);
           if (units[0]) fprintf(stdout, "  units = \"%s\"\n", units);
           fprintf(stdout, "  missing_value = \"%e\"\n", misval);
@@ -108,8 +107,7 @@ printAtts(int vlistID, int varOrGlobal, int natts, char *argument)
 }
 
 void
-check_varname_and_print(int vlistID, int nvars, char *checkvarname,
-                        char *attname)
+check_varname_and_print(int vlistID, int nvars, char *checkvarname, char *attname)
 {
   int varID = 0;
   for (varID = 0; varID < nvars; varID++)
@@ -125,8 +123,7 @@ check_varname_and_print(int vlistID, int nvars, char *checkvarname,
           break;
         }
     }
-  if (nvars == varID && checkvarname)
-    cdoAbort("Could not find variable %s in infile.", checkvarname);
+  if (nvars == varID && checkvarname) cdoAbort("Could not find variable %s in infile.", checkvarname);
 }
 
 void *

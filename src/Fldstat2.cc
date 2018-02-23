@@ -30,9 +30,8 @@
 /* routine corr copied from PINGO */
 /* correclation in space */
 static double
-correlation_s(const double *restrict in0, const double *restrict in1,
-              const double *restrict weight, double missval1, double missval2,
-              long gridsize)
+correlation_s(const double *restrict in0, const double *restrict in1, const double *restrict weight, double missval1,
+              double missval2, long gridsize)
 {
   double sum0, sum1, sum00, sum01, sum11, wsum0;
   sum0 = sum1 = sum00 = sum01 = sum11 = 0;
@@ -40,8 +39,7 @@ correlation_s(const double *restrict in0, const double *restrict in1,
 
   for (long i = 0; i < gridsize; ++i)
     {
-      if (IS_NOT_EQUAL(weight[i], missval1) && IS_NOT_EQUAL(in0[i], missval1)
-          && IS_NOT_EQUAL(in1[i], missval2))
+      if (IS_NOT_EQUAL(weight[i], missval1) && IS_NOT_EQUAL(in0[i], missval1) && IS_NOT_EQUAL(in1[i], missval2))
         {
           sum0 += weight[i] * in0[i];
           sum1 += weight[i] * in1[i];
@@ -52,20 +50,17 @@ correlation_s(const double *restrict in0, const double *restrict in1,
         }
     }
 
-  double out = IS_NOT_EQUAL(wsum0, 0)
-                   ? DIVMN((sum01 * wsum0 - sum0 * sum1),
-                           SQRTMN((sum00 * wsum0 - sum0 * sum0)
-                                  * (sum11 * wsum0 - sum1 * sum1)))
-                   : missval1;
+  double out = IS_NOT_EQUAL(wsum0, 0) ? DIVMN((sum01 * wsum0 - sum0 * sum1),
+                                              SQRTMN((sum00 * wsum0 - sum0 * sum0) * (sum11 * wsum0 - sum1 * sum1)))
+                                      : missval1;
 
   return out;
 }
 
 /* covariance in space */
 static double
-covariance_s(const double *restrict in0, const double *restrict in1,
-             const double *restrict weight, double missval1, double missval2,
-             long gridsize)
+covariance_s(const double *restrict in0, const double *restrict in1, const double *restrict weight, double missval1,
+             double missval2, long gridsize)
 {
   double sum0, sum1, sum01, wsum0, wsum00;
   sum0 = sum1 = sum01 = 0;
@@ -73,8 +68,7 @@ covariance_s(const double *restrict in0, const double *restrict in1,
 
   for (long i = 0; i < gridsize; ++i)
     {
-      if (IS_NOT_EQUAL(weight[i], missval1) && IS_NOT_EQUAL(in0[i], missval1)
-          && IS_NOT_EQUAL(in1[i], missval2))
+      if (IS_NOT_EQUAL(weight[i], missval1) && IS_NOT_EQUAL(in0[i], missval1) && IS_NOT_EQUAL(in1[i], missval2))
         {
           sum0 += weight[i] * in0[i];
           sum1 += weight[i] * in1[i];
@@ -84,9 +78,7 @@ covariance_s(const double *restrict in0, const double *restrict in1,
         }
     }
 
-  double out = IS_NOT_EQUAL(wsum0, 0)
-                   ? (sum01 * wsum0 - sum0 * sum1) / (wsum0 * wsum0)
-                   : missval1;
+  double out = IS_NOT_EQUAL(wsum0, 0) ? (sum01 * wsum0 - sum0 * sum1) / (wsum0 * wsum0) : missval1;
 
   return out;
 }
@@ -148,8 +140,7 @@ Fldstat2(void *process)
 
   double *array1 = (double *) Malloc(gridsize * sizeof(double));
   double *array2 = (double *) Malloc(gridsize * sizeof(double));
-  double *weight
-      = needWeights ? (double *) Malloc(gridsize * sizeof(double)) : NULL;
+  double *weight = needWeights ? (double *) Malloc(gridsize * sizeof(double)) : NULL;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -183,9 +174,7 @@ Fldstat2(void *process)
           if (wstatus && tsID == 0 && levelID == 0)
             {
               vlistInqVarName(vlistID1, varID, varname);
-              cdoWarning(
-                  "Using constant grid cell area weights for variable %s!",
-                  varname);
+              cdoWarning("Using constant grid cell area weights for variable %s!", varname);
             }
 
           double missval1 = vlistInqVarMissval(vlistID1, varID);
@@ -193,13 +182,11 @@ Fldstat2(void *process)
 
           if (operfunc == func_cor)
             {
-              sglval = correlation_s(array1, array2, weight, missval1, missval2,
-                                     gridsize);
+              sglval = correlation_s(array1, array2, weight, missval1, missval2, gridsize);
             }
           else if (operfunc == func_covar)
             {
-              sglval = covariance_s(array1, array2, weight, missval1, missval2,
-                                    gridsize);
+              sglval = covariance_s(array1, array2, weight, missval1, missval2, gridsize);
             }
 
           size_t nmiss3 = DBL_IS_EQUAL(sglval, missval1) ? 1 : 0;

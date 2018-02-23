@@ -26,14 +26,13 @@
 #include "libncl.h"
 
 static void
-uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat,
-            size_t nlon, size_t nlat, size_t nlev, int boundOpt, double *div)
+uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev,
+            int boundOpt, double *div)
 {
   int ierror;
 
   // Test dimension sizes.
-  if ((nlon > INT_MAX) || (nlat > INT_MAX))
-    cdoAbort("nlat and/or nlon is greater than INT_MAX!");
+  if ((nlon > INT_MAX) || (nlat > INT_MAX)) cdoAbort("nlat and/or nlon is greater than INT_MAX!");
 
   int inlon = (int) nlon;
   int inlat = (int) nlat;
@@ -49,8 +48,7 @@ uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat,
       arrayFill(gridsize_uv, tmp_div, 0.0);
       // Call the Fortran routine.
 #ifdef HAVE_CF_INTERFACE
-      DDVFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missval, boundOpt, tmp_div,
-              ierror);
+      DDVFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missval, boundOpt, tmp_div, ierror);
 #else
       cdoAbort("Fortran support not compiled in!");
 #endif
@@ -58,14 +56,13 @@ uv2dv_cfd_W(double missval, double *u, double *v, double *lon, double *lat,
 }
 
 static void
-uv2vr_cfd_W(double missval, double *u, double *v, double *lon, double *lat,
-            size_t nlon, size_t nlat, size_t nlev, int boundOpt, double *vort)
+uv2vr_cfd_W(double missval, double *u, double *v, double *lon, double *lat, size_t nlon, size_t nlat, size_t nlev,
+            int boundOpt, double *vort)
 {
   int ierror;
 
   // Test dimension sizes.
-  if ((nlon > INT_MAX) || (nlat > INT_MAX))
-    cdoAbort("nlat and/or nlon is greater than INT_MAX!");
+  if ((nlon > INT_MAX) || (nlat > INT_MAX)) cdoAbort("nlat and/or nlon is greater than INT_MAX!");
 
   int inlon = (int) nlon;
   int inlat = (int) nlat;
@@ -81,8 +78,7 @@ uv2vr_cfd_W(double missval, double *u, double *v, double *lon, double *lat,
       arrayFill(gridsize_uv, tmp_vort, 0.0);
       // Call the Fortran routine.
 #ifdef HAVE_CF_INTERFACE
-      DVRFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missval, boundOpt, tmp_vort,
-              ierror);
+      DVRFIDF(tmp_u, tmp_v, lat, lon, inlon, inlat, missval, boundOpt, tmp_vort, ierror);
 #else
       cdoAbort("Fortran support not compiled in!");
 #endif
@@ -120,9 +116,7 @@ static void
 print_parameter(void)
 {
   cdoPrint("u=%s, v=%s, boundOpt=%d, outMode=%s", name_u, name_v, boundOpt,
-           outMode == OutMode::NEW
-               ? "new"
-               : outMode == OutMode::APPEND ? "append" : "replace");
+           outMode == OutMode::NEW ? "new" : outMode == OutMode::APPEND ? "append" : "replace");
 }
 
 static void
@@ -136,20 +130,16 @@ set_parameter(void)
     {
       char **pargv = operatorArgv();
 
-      list_t *kvlist
-          = list_new(sizeof(keyValues_t *), free_keyval, "PARAMETER");
-      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0)
-        cdoAbort("Parse error!");
+      list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "PARAMETER");
+      if (kvlist_parse_cmdline(kvlist, pargc, pargv) != 0) cdoAbort("Parse error!");
       if (cdoVerbose) kvlist_print(kvlist);
 
       for (listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next)
         {
           keyValues_t *kv = *(keyValues_t **) kvnode->data;
           const char *key = kv->key;
-          if (kv->nvalues > 1)
-            cdoAbort("Too many values for parameter key >%s<!", key);
-          if (kv->nvalues < 1)
-            cdoAbort("Missing value for parameter key >%s<!", key);
+          if (kv->nvalues > 1) cdoAbort("Too many values for parameter key >%s<!", key);
+          if (kv->nvalues < 1) cdoAbort("Missing value for parameter key >%s<!", key);
           const char *value = kv->values[0];
 
           if (STR_IS_EQ(key, "u"))
@@ -189,10 +179,8 @@ NCL_wind(void *process)
 
   cdoInitialize(process);
 
-  int UV2DV_CFD
-      = cdoOperatorAdd("uv2dv_cfd", 0, 0, "[u, v, boundsOpt, outMode]");
-  int UV2VR_CFD
-      = cdoOperatorAdd("uv2vr_cfd", 0, 0, "[u, v, boundsOpt, outMode]");
+  int UV2DV_CFD = cdoOperatorAdd("uv2dv_cfd", 0, 0, "[u, v, boundsOpt, outMode]");
+  int UV2VR_CFD = cdoOperatorAdd("uv2vr_cfd", 0, 0, "[u, v, boundsOpt, outMode]");
 
   int operatorID = cdoOperatorID();
 
@@ -220,17 +208,14 @@ NCL_wind(void *process)
   int gridtype = gridInqType(gridIDu);
   size_t gridsizeuv = gridInqSize(gridIDu);
 
-  if (!((gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN)
-        && gridtype == gridInqType(gridIDv)))
+  if (!((gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN) && gridtype == gridInqType(gridIDv)))
     cdoAbort("u and v must be on a regular lonlat or Gaussian grid!");
 
-  if (!(gridsizeuv == gridInqSize(gridIDv)))
-    cdoAbort("u and v must have the same grid size!");
+  if (!(gridsizeuv == gridInqSize(gridIDv))) cdoAbort("u and v must have the same grid size!");
 
   if (boundOpt == -1) boundOpt = gridIsCircular(gridIDu) ? 1 : 0;
   if (cdoVerbose) print_parameter();
-  if (boundOpt < 0 || boundOpt > 3)
-    cdoAbort("Parameter boundOpt=%d out of bounds (0-3)!", boundOpt);
+  if (boundOpt < 0 || boundOpt > 3) cdoAbort("Parameter boundOpt=%d out of bounds (0-3)!", boundOpt);
 
   size_t nlon = gridInqXsize(gridIDu);
   size_t nlat = gridInqYsize(gridIDu);
@@ -238,8 +223,7 @@ NCL_wind(void *process)
   int zaxisIDu = vlistInqVarZaxis(vlistID1, varIDu);
   int nlev = zaxisInqSize(zaxisIDu);
 
-  if (nlev != zaxisInqSize(vlistInqVarZaxis(vlistID1, varIDv)))
-    cdoAbort("u and v must have the same number of level!");
+  if (nlev != zaxisInqSize(vlistInqVarZaxis(vlistID1, varIDv))) cdoAbort("u and v must have the same number of level!");
 
   double missvalu = vlistInqVarMissval(vlistID1, varIDu);
   double missvalv = vlistInqVarMissval(vlistID1, varIDv);
@@ -299,14 +283,12 @@ NCL_wind(void *process)
             {
               if (varID == varIDu)
                 {
-                  std::copy_n(&array[0], gridsizeuv,
-                              &arrayu[levelID * gridsizeuv]);
+                  std::copy_n(&array[0], gridsizeuv, &arrayu[levelID * gridsizeuv]);
                   nmissu += nmiss;
                 }
               if (varID == varIDv)
                 {
-                  std::copy_n(&array[0], gridsizeuv,
-                              &arrayv[levelID * gridsizeuv]);
+                  std::copy_n(&array[0], gridsizeuv, &arrayv[levelID * gridsizeuv]);
                   nmissv += nmiss;
                 }
             }
@@ -333,11 +315,9 @@ NCL_wind(void *process)
         }
 
       if (operatorID == UV2DV_CFD)
-        uv2dv_cfd_W(missvalu, &arrayu[0], &arrayv[0], &lon[0], &lat[0], nlon,
-                    nlat, nlev, boundOpt, &arrayo[0]);
+        uv2dv_cfd_W(missvalu, &arrayu[0], &arrayv[0], &lon[0], &lat[0], nlon, nlat, nlev, boundOpt, &arrayo[0]);
       else if (operatorID == UV2VR_CFD)
-        uv2vr_cfd_W(missvalu, &arrayu[0], &arrayv[0], &lon[0], &lat[0], nlon,
-                    nlat, nlev, boundOpt, &arrayo[0]);
+        uv2vr_cfd_W(missvalu, &arrayu[0], &arrayv[0], &lon[0], &lat[0], nlon, nlat, nlev, boundOpt, &arrayo[0]);
 
       for (levelID = 0; levelID < nlev; ++levelID)
         {

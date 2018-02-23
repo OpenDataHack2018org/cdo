@@ -29,19 +29,20 @@
 #define _DEBUG 4   /* Error flag: debug          */
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-extern int _ExitOnError; /* If set to 1, exit on error (default 1)       */
-extern int _Verbose;     /* If set to 1, errors are reported (default 1) */
-extern int _Debug;       /* If set to 1, debuggig (default 0)            */
+  extern int _ExitOnError; /* If set to 1, exit on error (default 1)       */
+  extern int _Verbose;     /* If set to 1, errors are reported (default 1) */
+  extern int _Debug;       /* If set to 1, debuggig (default 0)            */
 
-void SysError_(const char *caller, const char *fmt, ...);
-void Error_(const char *caller, const char *fmt, ...);
-void Warning_(const char *caller, const char *fmt, ...);
-/* delegate used by Warning_ unless mode is PIO */
-void cdiWarning(const char *caller, const char *fmt, va_list ap);
-void Message_(const char *caller, const char *fmt, ...);
+  void SysError_(const char *caller, const char *fmt, ...);
+  void Error_(const char *caller, const char *fmt, ...);
+  void Warning_(const char *caller, const char *fmt, ...);
+  /* delegate used by Warning_ unless mode is PIO */
+  void cdiWarning(const char *caller, const char *fmt, va_list ap);
+  void Message_(const char *caller, const char *fmt, ...);
 
 #if defined WITH_CALLER_NAME
 #define SysError(...) SysError_(__func__, __VA_ARGS__)
@@ -64,14 +65,11 @@ void Message_(const char *caller, const char *fmt, ...);
 #define __attribute__(x) /*NOTHING*/
 #endif
 
-void cdiAbortC(const char *caller, const char *filename,
-               const char *functionname, int line, const char *errorString, ...)
-    __attribute__((noreturn));
-#define xabortC(caller, ...) \
-  cdiAbortC(caller, __FILE__, __func__, __LINE__, __VA_ARGS__)
+  void cdiAbortC(const char *caller, const char *filename, const char *functionname, int line, const char *errorString,
+                 ...) __attribute__((noreturn));
+#define xabortC(caller, ...) cdiAbortC(caller, __FILE__, __func__, __LINE__, __VA_ARGS__)
 #define xabort(...) cdiAbortC(NULL, __FILE__, __func__, __LINE__, __VA_ARGS__)
-#define cdiAbort(file, func, line, ...) \
-  cdiAbortC(NULL, (file), (func), (line), __VA_ARGS__)
+#define cdiAbort(file, func, line, ...) cdiAbortC(NULL, (file), (func), (line), __VA_ARGS__)
 
 #define xassert(arg)                             \
   do                                             \
@@ -86,10 +84,8 @@ void cdiAbortC(const char *caller, const char *filename,
     }                                            \
   while (0)
 
-void cdiAbortC_serial(const char *caller, const char *filename,
-                      const char *functionname, int line,
-                      const char *errorString, va_list ap)
-    __attribute__((noreturn));
+  void cdiAbortC_serial(const char *caller, const char *filename, const char *functionname, int line,
+                        const char *errorString, va_list ap) __attribute__((noreturn));
 
 #if defined(__cplusplus)
 }

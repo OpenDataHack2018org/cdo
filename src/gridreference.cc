@@ -73,8 +73,7 @@ download_gridfile(const char *restrict uri, const char *restrict basename)
       FILE *fp = fopen(basename, "w");
       if (fp == NULL)
         {
-          fprintf(stderr, "ERROR: could not open local output file %s. %s.\n",
-                  basename, strerror(errno));
+          fprintf(stderr, "ERROR: could not open local output file %s. %s.\n", basename, strerror(errno));
           return -1;
         }
 
@@ -98,25 +97,21 @@ download_gridfile(const char *restrict uri, const char *restrict basename)
             {
               double length;
               curl_easy_getinfo(hd, CURLINFO_SIZE_DOWNLOAD, &length);
-              if (cdoVerbose)
-                cdoPrint("File %s downloaded - size: %.0lf byte", basename,
-                         length);
+              if (cdoVerbose) cdoPrint("File %s downloaded - size: %.0lf byte", basename, length);
               rval = 0;
             }
           else
             {
               int status = remove(basename);
               if (status == -1) perror(basename);
-              if (cdoVerbose)
-                cdoPrint("The requested URL was not found on this server!");
+              if (cdoVerbose) cdoPrint("The requested URL was not found on this server!");
             }
         }
       else
         {
           int status = remove(basename);
           if (status == -1) perror(basename);
-          fprintf(stderr, "ERROR: %s. Download %s failed.\n\n",
-                  curl_easy_strerror(ret), basename);
+          fprintf(stderr, "ERROR: %s. Download %s failed.\n\n", curl_easy_strerror(ret), basename);
         }
 
       curl_easy_cleanup(hd);
@@ -192,8 +187,7 @@ referenceToGrid(int gridID1)
 
       strcpy(gridpath, "./");
       strcat(gridpath, basename);
-      if (cdoVerbose)
-        cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
+      if (cdoVerbose) cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
 
       /* scan local directory for file */
       int status = search_file("./", gridpath);
@@ -203,8 +197,7 @@ referenceToGrid(int gridID1)
             {
               strcpy(gridpath, cdoGridSearchDir);
               strcat(gridpath, basename);
-              if (cdoVerbose)
-                cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
+              if (cdoVerbose) cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
 
               /* scan directory given by environment variable */
               status = search_file(cdoGridSearchDir, gridpath);
@@ -217,9 +210,7 @@ referenceToGrid(int gridID1)
               "http://icon-downloads.mpimet.mpg.de/grids/public/edzw/icon_grid_0001x_R02B05_R.nc");
               char *basename = strrchr(griduri, '/') + 1;
               */
-              if (cdoVerbose)
-                cdoPrint("Download horizontal grid file %s to %s", griduri,
-                         basename);
+              if (cdoVerbose) cdoPrint("Download horizontal grid file %s to %s", griduri, basename);
               status = download_gridfile(griduri, basename);
             }
         }
@@ -234,9 +225,7 @@ referenceToGrid(int gridID1)
           int position = gridInqPosition(gridID1);
 
           int streamID = streamOpenRead(gridpath);
-          if (streamID < 0)
-            cdiOpenError(streamID, "Open failed on horizontal grid file >%s<",
-                         gridpath);
+          if (streamID < 0) cdiOpenError(streamID, "Open failed on horizontal grid file >%s<", gridpath);
 
           int vlistID = streamInqVlist(streamID);
           int ngrids = vlistNgrids(vlistID);
@@ -246,9 +235,7 @@ referenceToGrid(int gridID1)
               if (gridInqSize(gridID) == gridsize)
                 gridID2 = gridDuplicate(gridID);
               else
-                cdoWarning(
-                    "Grid size %zu on position %d do not match! Reference=%s",
-                    gridsize, position, gridpath);
+                cdoWarning("Grid size %zu on position %d do not match! Reference=%s", gridsize, position, gridpath);
             }
           else if (position == 0)
             {
@@ -263,9 +250,7 @@ referenceToGrid(int gridID1)
                 }
             }
           else
-            cdoWarning(
-                "Number of grid in reference %d not available! Reference=%s",
-                position, gridpath);
+            cdoWarning("Number of grid in reference %d not available! Reference=%s", position, gridpath);
 
           streamClose(streamID);
         }
@@ -281,8 +266,7 @@ referenceToGrid(int gridID1)
           gridInqUUID(gridID1, uuidOfHGrid1);
           gridInqUUID(gridID2, uuidOfHGrid2);
 
-          if (uuidOfHGrid1[0] != 0 && uuidOfHGrid1[0] != 0
-              && memcmp(uuidOfHGrid1, uuidOfHGrid2, 16) != 0)
+          if (uuidOfHGrid1[0] != 0 && uuidOfHGrid1[0] != 0 && memcmp(uuidOfHGrid1, uuidOfHGrid2, 16) != 0)
             cdoWarning("UUID of horizontal grids differ!");
 
           int number1 = gridInqNumber(gridID1);

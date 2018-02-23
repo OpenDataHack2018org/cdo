@@ -18,7 +18,7 @@
 #define REMAP_H
 
 #include <stdint.h>
-#include <math.h>
+#include <cmath>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288 /* pi */
@@ -119,8 +119,7 @@ typedef struct
   double *cell_corner_lat; /* each grid corner in radians   */
 
   double *cell_area; /* tot area of each grid cell    */
-  double
-      *cell_frac; /* fractional area of grid cells participating in remapping */
+  double *cell_frac; /* fractional area of grid cells participating in remapping */
 
   restr_t *cell_bound_box; /* lon/lat bounding box for use    */
   int num_srch_bins;       /* num of bins for restricted srch */
@@ -179,126 +178,89 @@ typedef struct
 void remap_set_threshhold(double threshhold);
 void remap_set_int(int remapvar, int value);
 
-void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1,
-                      remapgrid_t *src_grid, int gridID2,
+void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2,
                       remapgrid_t *tgt_grid);
-void remap_vars_init(RemapType mapType, size_t src_grid_size,
-                     size_t tgt_grid_size, remapvars_t *rv);
+void remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapvars_t *rv);
 
 void remapVarsFree(remapvars_t *rv);
 void remapGridFree(remapgrid_t *grid);
 
-void remap(double *restrict dst_array, double missval, size_t dst_size,
-           size_t num_links, double *restrict map_wts, size_t num_wts,
-           const size_t *restrict dst_add, const size_t *restrict src_add,
-           const double *restrict src_array, const double *restrict src_grad1,
-           const double *restrict src_grad2, const double *restrict src_grad3,
-           remaplink_t links, long links_per_value);
+void remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_links, double *restrict map_wts,
+           size_t num_wts, const size_t *restrict dst_add, const size_t *restrict src_add,
+           const double *restrict src_array, const double *restrict src_grad1, const double *restrict src_grad2,
+           const double *restrict src_grad3, remaplink_t links, long links_per_value);
 
-void remap_laf(double *restrict dst_array, double missval, size_t dst_size,
-               size_t num_links, double *restrict map_wts, size_t num_wts,
-               const size_t *restrict dst_add, const size_t *restrict src_add,
+void remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t num_links, double *restrict map_wts,
+               size_t num_wts, const size_t *restrict dst_add, const size_t *restrict src_add,
                const double *restrict src_array);
 
-void remap_sum(double *restrict dst_array, double missval, size_t dst_size,
-               size_t num_links, double *restrict map_wts, size_t num_wts,
-               const size_t *restrict dst_add, const size_t *restrict src_add,
+void remap_sum(double *restrict dst_array, double missval, size_t dst_size, size_t num_links, double *restrict map_wts,
+               size_t num_wts, const size_t *restrict dst_add, const size_t *restrict src_add,
                const double *restrict src_array);
 
-void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                                  remapvars_t *rv);
-void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                                 remapvars_t *rv);
-void remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid,
-                           remapgrid_t *tgt_grid, remapvars_t *rv);
-void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                                 remapvars_t *rv);
-void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                           remapvars_t *rv);
+void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
-void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                          const double *restrict src_array,
+void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array,
                           double *restrict tgt_array, double missval);
-void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                         const double *restrict src_array,
+void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array,
                          double *restrict tgt_array, double missval);
-void remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid,
-                   remapgrid_t *tgt_grid, const double *restrict src_array,
+void remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array,
                    double *restrict tgt_array, double missval);
-void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                   const double *restrict src_array, double *restrict tgt_array,
-                   double missval);
+void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array,
+                   double *restrict tgt_array, double missval);
 
 void resize_remap_vars(remapvars_t *rv, int64_t increment);
 
-void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid,
-                remapvars_t rv, const double *restrict array1,
-                const double *restrict array2, double missval);
-void remap_gradients(remapgrid_t grid, const double *restrict array,
-                     double *restrict grad_lat, double *restrict grad_lon,
-                     double *restrict grad_latlon);
+void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv,
+                const double *restrict array1, const double *restrict array2, double missval);
+void remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict grad_lat,
+                     double *restrict grad_lon, double *restrict grad_latlon);
 
 void reorder_links(remapvars_t *rv);
 
-void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1,
-              size_t *restrict add2, double *restrict weights);
-void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1,
-               size_t *restrict add2, double *restrict weights, int parent);
+void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights);
+void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,
+               int parent);
 
-void write_remap_scrip(const char *interp_file, RemapType mapType,
-                       SubmapType submapType, int numNeighbors, int remap_order,
-                       remapgrid_t src_grid, remapgrid_t tgt_grid,
-                       remapvars_t rv);
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2,
-                      RemapType *mapType, SubmapType *submapType,
-                      int *numNeighbors, int *remap_order,
-                      remapgrid_t *src_grid, remapgrid_t *tgt_grid,
+void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors,
+                       int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv);
+void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
+                      int *numNeighbors, int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
                       remapvars_t *rv);
 
-void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid,
-                   RemapType mapType);
-size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1,
-                      size_t *bin_addr2, restr_t *tgt_cell_bound_box,
-                      restr_t *src_cell_bound_box, size_t src_grid_size,
-                      size_t *srch_add);
+void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, RemapType mapType);
+size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2,
+                      restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, size_t src_grid_size, size_t *srch_add);
 
-int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add,
-                         double *restrict nbr_dist, double plat, double plon,
-                         const double *restrict src_center_lat,
-                         const double *restrict src_center_lon);
+int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat,
+                         double plon, const double *restrict src_center_lat, const double *restrict src_center_lon);
 
-int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add,
-                      double *restrict src_lats, double *restrict src_lons,
-                      double plat, double plon,
-                      const size_t *restrict src_grid_dims,
-                      const double *restrict src_center_lat,
-                      const double *restrict src_center_lon);
+int grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats,
+                      double *restrict src_lons, double plat, double plon, const size_t *restrict src_grid_dims,
+                      const double *restrict src_center_lat, const double *restrict src_center_lon);
 
-bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j,
-                   size_t adds[4], double lons[4], double lats[4], double plon,
-                   double plat, const double *restrict center_lon,
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4],
+                   double lats[4], double plon, double plat, const double *restrict center_lon,
                    const double *restrict center_lat);
 
-int grid_search(remapgrid_t *src_grid, size_t *restrict src_add,
-                double *restrict src_lats, double *restrict src_lons,
-                double plat, double plon, const size_t *restrict src_grid_dims,
-                const double *restrict src_center_lat,
-                const double *restrict src_center_lon,
-                const restr_t *restrict src_grid_bound_box,
+int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
+                const double *restrict src_center_lon, const restr_t *restrict src_grid_bound_box,
                 const size_t *restrict src_bin_add);
 
-bool find_ij_weights(double plon, double plat, double *restrict src_lons,
-                     double *restrict src_lats, double *ig, double *jg);
-int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm,
-                     size_t nym, const double *restrict xm,
+bool find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig,
+                     double *jg);
+int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, size_t nym, const double *restrict xm,
                      const double *restrict ym);
 
-void remapgrid_get_lonlat(remapgrid_t *grid, size_t cell_add, double *plon,
-                          double *plat);
+void remapgrid_get_lonlat(remapgrid_t *grid, size_t cell_add, double *plon, double *plat);
 
-void remapCheckArea(size_t grid_size, double *restrict cell_area,
-                    const char *name);
-void remapCheckWeights(size_t num_links, size_t num_wts, NormOpt normOpt,
-                       size_t *src_cell_add, size_t *tgt_cell_add, double *wts);
+void remapCheckArea(size_t grid_size, double *restrict cell_area, const char *name);
+void remapCheckWeights(size_t num_links, size_t num_wts, NormOpt normOpt, size_t *src_cell_add, size_t *tgt_cell_add,
+                       double *wts);
 
 #endif /* REMAP_H */

@@ -170,8 +170,7 @@ Ensval(void *process)
 
   int streamID1 = ef[0].streamID;
 
-  if (cdoVerbose)
-    cdoPrint("Opened %i Input Files for Ensemble Operator", nfiles);
+  if (cdoVerbose) cdoPrint("Opened %i Input Files for Ensemble Operator", nfiles);
 
   /* check for identical contents of all ensemble members */
   int nvars = vlistNvars(ef[0].vlistID);
@@ -194,8 +193,7 @@ Ensval(void *process)
 
   const char *refname = cdoGetObase();
   memset(file_suffix, 0, sizeof(file_suffix));
-  cdoGenFileSuffix(file_suffix, sizeof(file_suffix),
-                   pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(file_suffix, sizeof(file_suffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   for (stream = 0; stream < nostreams; stream++)
     {
@@ -229,8 +227,7 @@ Ensval(void *process)
       sprintf(ofilename, "%s.%s%s", ofilebase, type_suffix, file_suffix);
       // fprintf(stderr, "StreamID %i: %s\n", stream, ofilename);
 
-      if (!cdoOverwriteMode && fileExists(ofilename)
-          && !userFileOverwrite(ofilename))
+      if (!cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename))
         cdoAbort("Outputfile %s already exists!", ofilename);
 
       streamID2[stream] = cdoStreamOpenWrite(ofilename, cdoFiletype());
@@ -267,8 +264,7 @@ Ensval(void *process)
           streamID = ef[fileID].streamID;
           nrecs = cdoStreamInqTimestep(streamID, tsID);
           if (nrecs != nrecs0)
-            cdoAbort("Number of records at time step %d of %s and %s differ!",
-                     tsID + 1, cdoGetStreamName(0).c_str(),
+            cdoAbort("Number of records at time step %d of %s and %s differ!", tsID + 1, cdoGetStreamName(0).c_str(),
                      cdoGetStreamName(fileID).c_str());
         }
 
@@ -289,8 +285,7 @@ Ensval(void *process)
                   gridID = vlistInqVarGrid(vlistID1, varID);
                   gridsize = gridInqSize(gridID);
                   missval = vlistInqVarMissval(vlistID1, varID);
-                  gridsize = gridInqSize(vlistInqVarGrid(
-                      vlistID1, varID));  // vlistGridsizeMax(vlistID1);
+                  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));  // vlistGridsizeMax(vlistID1);
                   if (weights) Free(weights);
                   weights = (double *) Malloc(gridsize * sizeof(double));
                 }
@@ -306,12 +301,13 @@ Ensval(void *process)
           // ysize = gridInqYsize(gridID);
 
           /*	  if ( xsize > 1 && ysize > 1 )  {
-	    gridWeights(gridID, weights);
-	    sum_weights=0;
-	    for ( i=0; i<gridsize; i++ )  
-	      sum_weights += weights[i];
-	  }
-	  else*/ {
+            gridWeights(gridID, weights);
+            sum_weights=0;
+            for ( i=0; i<gridsize; i++ )
+              sum_weights += weights[i];
+          }
+          else*/
+          {
             for (size_t i = 0; i < gridsize; i++)
               weights[i] = 1. / gridsize;
             sum_weights = 1.;
@@ -357,24 +353,16 @@ Ensval(void *process)
 
                   /* Loop start at zero ==> 1st ensemble (c-indexing) */
                   for (k = 0; k < nens - 1; k++)
-                    {                    /* Cumulate alpha and beta      */
-                      if (xa > x[k + 1]) /* left of heavyside            */
-                        alpha[k + 1]
-                            += (x[k + 1] - x[k])
-                               * weights[i]; /*                              */
-                      else if (xa < x[k])    /* right of heavyside           */
-                        beta[k + 1]
-                            += (x[k + 1] - x[k])
-                               * weights[i]; /*                              */
+                    {                                                   /* Cumulate alpha and beta      */
+                      if (xa > x[k + 1])                                /* left of heavyside            */
+                        alpha[k + 1] += (x[k + 1] - x[k]) * weights[i]; /*                              */
+                      else if (xa < x[k])                               /* right of heavyside           */
+                        beta[k + 1] += (x[k + 1] - x[k]) * weights[i];  /*                              */
                       else if (x[k + 1] >= xa && xa >= x[k])
-                        { /* hitting jump pf heavyside    */
-                          alpha[k + 1]
-                              += (xa - x[k])
-                                 * weights[i]; /* (occurs exactly once!) */
-                          beta[k + 1]
-                              += (x[k + 1] - xa)
-                                 * weights[i]; /* ****************************
-                                                */
+                        {                                              /* hitting jump pf heavyside    */
+                          alpha[k + 1] += (xa - x[k]) * weights[i];    /* (occurs exactly once!) */
+                          beta[k + 1] += (x[k + 1] - xa) * weights[i]; /* ****************************
+                                                                        */
                         }
                     }
                 }
@@ -521,17 +509,16 @@ Ensval(void *process)
               if (cdoVerbose)
                 {
                   //	      cdoPrint("Brier score for var %i level %i
-                  //calculated",varID, levelID);
+                  // calculated",varID, levelID);
                   cdoPrint("BRS: obar %12.6g "
                            "brs  %12.6g reli %12.6g resol %12.6g u %12.6g",
-                           obar, brs_reli - brs_resol + brs_uncty, brs_reli,
-                           brs_resol, brs_uncty);
+                           obar, brs_reli - brs_resol + brs_uncty, brs_reli, brs_resol, brs_uncty);
                 }
             }
 
           if (cdoVerbose && operfunc == CRPS)
-            cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g",
-                     crps, crps_reli, crps_pot, crps_reli + crps_pot);
+            cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g", crps, crps_reli, crps_pot,
+                     crps_reli + crps_pot);
 
           for (stream = 0; stream < nostreams; stream++)
             {

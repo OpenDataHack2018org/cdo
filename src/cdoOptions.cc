@@ -32,11 +32,11 @@ bool cdoCompress = false;
 int cdoCompType = CDI_COMPRESS_NONE;
 int cdoCompLevel = 0;
 bool cdoInteractive = false;
-}
+}  // namespace Options
 
 namespace Threading
 {
 int ompNumThreads = 1;
 bool cdoLockIO = false;
-}
+}  // namespace Threading
 #include "util_files.h"

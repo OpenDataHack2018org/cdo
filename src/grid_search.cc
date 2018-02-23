@@ -96,10 +96,9 @@ struct PointCloud
   // bool kdtree_get_bbox(BBOX& /* bb */) const { return false; }
 };
 
-typedef nanoflann::KDTreeSingleIndexAdaptor<
-    nanoflann::L2_Simple_Adaptor<double, PointCloud<double>>,
-    PointCloud<double>, 3 /* dim */
-    >
+typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloud<double>>,
+                                            PointCloud<double>, 3 /* dim */
+                                            >
     nfTree_t;
 
 static double
@@ -158,12 +157,9 @@ gridsearch_extrapolate(struct gridsearch *gs)
 }
 
 struct gridsearch *
-gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2],
-                        const double *restrict lons,
-                        const double *restrict lats)
+gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
 {
-  struct gridsearch *gs
-      = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
+  struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
   gs->is_cyclic = xIsCyclic;
   gs->is_reg2d = true;
@@ -214,15 +210,11 @@ gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2],
 }
 
 static void *
-gs_create_kdtree(size_t n, const double *restrict lons,
-                 const double *restrict lats, struct gridsearch *gs)
+gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
 {
-  struct kd_point *pointlist
-      = (struct kd_point *) Malloc(n * sizeof(struct kd_point));
+  struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));
   // see  example_cartesian.c
-  if (cdoVerbose)
-    printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n,
-           Threading::ompNumThreads);
+  if (cdoVerbose) printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
 
   kdata_t min[3] = { 1.e9, 1.e9, 1.e9 };
   kdata_t max[3] = { -1.e9, -1.e9, -1.e9 };
@@ -250,12 +242,9 @@ gs_create_kdtree(size_t n, const double *restrict lons,
       gs->max[j] = max[j];
     }
 
-  if (cdoVerbose)
-    printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0],
-           max[1], max[2]);
+  if (cdoVerbose) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
 
-  kdTree_t *kdt
-      = kd_buildTree(pointlist, n, min, max, 3, Threading::ompNumThreads);
+  kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, Threading::ompNumThreads);
   if (pointlist) Free(pointlist);
   if (kdt == NULL) cdoAbort("kd_buildTree failed!");
 
@@ -263,13 +252,10 @@ gs_create_kdtree(size_t n, const double *restrict lons,
 }
 
 static void *
-gs_create_nanoflann(size_t n, const double *restrict lons,
-                    const double *restrict lats, struct gridsearch *gs)
+gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
 {
   PointCloud<double> *pointcloud = new PointCloud<double>();
-  if (cdoVerbose)
-    printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n,
-           Threading::ompNumThreads);
+  if (cdoVerbose) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
 
   double min[3] = { 1.e9, 1.e9, 1.e9 };
   double max[3] = { -1.e9, -1.e9, -1.e9 };
@@ -310,9 +296,7 @@ gs_create_nanoflann(size_t n, const double *restrict lons,
     }
 
   // construct a kd-tree index:
-  nfTree_t *nft = new nfTree_t(
-      3 /*dim*/, *pointcloud,
-      nanoflann::KDTreeSingleIndexAdaptorParams(50 /* max leaf */));
+  nfTree_t *nft = new nfTree_t(3 /*dim*/, *pointcloud, nanoflann::KDTreeSingleIndexAdaptorParams(50 /* max leaf */));
   nft->buildIndex();
 
   return (void *) nft;
@@ -342,8 +326,7 @@ gs_destroy_full(void *search_container)
 }
 
 static void *
-gs_create_full(size_t n, const double *restrict lons,
-               const double *restrict lats)
+gs_create_full(size_t n, const double *restrict lons, const double *restrict lats)
 {
   struct gsFull *full = (struct gsFull *) Calloc(1, sizeof(struct gsFull));
 
@@ -369,11 +352,9 @@ gs_create_full(size_t n, const double *restrict lons,
 }
 
 struct gridsearch *
-gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n,
-                  const double *restrict lons, const double *restrict lats)
+gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
 {
-  struct gridsearch *gs
-      = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
+  struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
   gs->is_cyclic = xIsCyclic;
   gs->is_curve = n != 1 && n == dims[0] * dims[1];
@@ -440,8 +421,7 @@ gs_set_range(double *prange)
 }
 
 static size_t
-gs_nearest_kdtree(void *search_container, double lon, double lat,
-                  double *prange, struct gridsearch *gs)
+gs_nearest_kdtree(void *search_container, double lon, double lat, double *prange, struct gridsearch *gs)
 {
   size_t index = GS_NOT_FOUND;
   kdTree_t *kdt = (kdTree_t *) search_container;
@@ -479,9 +459,8 @@ gs_nearest_kdtree(void *search_container, double lon, double lat,
   return index;
 }
 
-bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j,
-                   size_t adds[4], double lons[4], double lats[4], double plon,
-                   double plat, const double *restrict center_lon,
+bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4],
+                   double lats[4], double plon, double plat, const double *restrict center_lon,
                    const double *restrict center_lat);
 
 static size_t
@@ -505,8 +484,7 @@ llindex_in_quad(struct gridsearch *gs, size_t index, double lon, double lat)
           if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
           if (k == 2 || k == 3) j = (j > 0) ? j - 1 : 0;
 
-          if (point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats, lon, lat,
-                            gs->plons, gs->plats))
+          if (point_in_quad(is_cyclic, nx, ny, i, j, adds, lons, lats, lon, lat, gs->plons, gs->plats))
             {
               ret_index = index;
               break;
@@ -518,8 +496,7 @@ llindex_in_quad(struct gridsearch *gs, size_t index, double lon, double lat)
 }
 
 static size_t
-gs_nearest_nanoflann(void *search_container, double lon, double lat,
-                     double *prange, struct gridsearch *gs)
+gs_nearest_nanoflann(void *search_container, double lon, double lat, double *prange, struct gridsearch *gs)
 {
   size_t index = GS_NOT_FOUND;
   nfTree_t *nft = (nfTree_t *) search_container;
@@ -594,8 +571,7 @@ gs_nearest_full(void *search_container, double lon, double lat, double *prange)
 }
 
 size_t
-gridsearch_nearest(struct gridsearch *gs, double lon, double lat,
-                   double *prange)
+gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *prange)
 {
   size_t index = GS_NOT_FOUND;
 
@@ -609,16 +585,15 @@ gridsearch_nearest(struct gridsearch *gs, double lon, double lat,
       else cdoAbort("%s::method_nn undefined!", __func__);
       // clang-format on
 
-      if (!gs->extrapolate && gs->is_curve)
-        index = llindex_in_quad(gs, index, lon, lat);
+      if (!gs->extrapolate && gs->is_curve) index = llindex_in_quad(gs, index, lon, lat);
     }
 
   return index;
 }
 
 static size_t
-gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat,
-                   double *prange, size_t nnn, size_t *adds, double *dist)
+gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
+                   double *dist)
 {
   size_t nadds = 0;
 
@@ -671,8 +646,8 @@ gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat,
 }
 
 static size_t
-gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat,
-                      double *prange, size_t nnn, size_t *adds, double *dist)
+gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
+                      double *dist)
 {
   size_t nadds = 0;
 
@@ -691,12 +666,7 @@ gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat,
 
   if (gs)
     {
-      std::vector<double> out_dist_sqr(nnn);
-      nadds = nft->knnRangeSearch(&query_pt[0], range, nnn, &adds[0],
-                                  &out_dist_sqr[0]);
-
-      for (size_t i = 0; i < nadds; ++i)
-        dist[i] = out_dist_sqr[i];
+      nadds = nft->knnRangeSearch(&query_pt[0], range, nnn, &adds[0], &dist[0]);
 
       double frange = range;
       if (prange) *prange = frange;
@@ -706,8 +676,8 @@ gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat,
 }
 
 size_t
-gridsearch_qnearest(struct gridsearch *gs, double lon, double lat,
-                    double *prange, size_t nnn, size_t *adds, double *dist)
+gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
+                    double *dist)
 {
   size_t nadds = 0;
 
@@ -744,13 +714,12 @@ gridsearch_qnearest(struct gridsearch *gs, double lon, double lat,
 #define TINY 1.e-14
 
 static void
-knn_store_distance(size_t nadd, double distance, size_t numNeighbors,
-                   size_t *restrict nbr_add, double *restrict nbr_dist)
+knn_store_distance(size_t nadd, double distance, size_t numNeighbors, size_t *restrict nbr_add,
+                   double *restrict nbr_dist)
 {
   if (numNeighbors == 1)
     {
-      if (distance < nbr_dist[0]
-          || (distance <= nbr_dist[0] && nadd < nbr_add[0]))
+      if (distance < nbr_dist[0] || (distance <= nbr_dist[0] && nadd < nbr_add[0]))
         {
           nbr_add[0] = nadd;
           nbr_dist[0] = distance;
@@ -760,8 +729,7 @@ knn_store_distance(size_t nadd, double distance, size_t numNeighbors,
     {
       for (size_t nchk = 0; nchk < numNeighbors; ++nchk)
         {
-          if (distance < nbr_dist[nchk]
-              || (distance <= nbr_dist[nchk] && nadd < nbr_add[nchk]))
+          if (distance < nbr_dist[nchk] || (distance <= nbr_dist[nchk] && nadd < nbr_add[nchk]))
             {
               for (size_t n = numNeighbors - 1; n > nchk; --n)
                 {
@@ -777,13 +745,11 @@ knn_store_distance(size_t nadd, double distance, size_t numNeighbors,
 }
 
 static void
-knn_check_distance(size_t numNeighbors, const size_t *restrict nbr_add,
-                   double *restrict nbr_dist)
+knn_check_distance(size_t numNeighbors, const size_t *restrict nbr_add, double *restrict nbr_dist)
 {
   // If distance is zero, set to small number
   for (size_t nchk = 0; nchk < numNeighbors; ++nchk)
-    if (nbr_add[nchk] != GS_NOT_FOUND && nbr_dist[nchk] <= 0.)
-      nbr_dist[nchk] = TINY;
+    if (nbr_add[nchk] != GS_NOT_FOUND && nbr_dist[nchk] <= 0.) nbr_dist[nchk] = TINY;
 }
 
 void
@@ -807,12 +773,9 @@ gridsearch_knn_new(size_t size)
 
   knn->ndist = size;
   knn->size = size;
-  knn->mask
-      = (bool *) Malloc(size * sizeof(bool));  // mask at nearest neighbors
-  knn->add = (size_t *) Malloc(
-      size * sizeof(size_t));  // source address at nearest neighbors
-  knn->dist = (double *) Malloc(
-      size * sizeof(double));  // angular distance of the nearest neighbors
+  knn->mask = (bool *) Malloc(size * sizeof(bool));      // mask at nearest neighbors
+  knn->add = (size_t *) Malloc(size * sizeof(size_t));   // source address at nearest neighbors
+  knn->dist = (double *) Malloc(size * sizeof(double));  // angular distance of the nearest neighbors
   knn->tmpadd = NULL;
   knn->tmpdist = NULL;
 
@@ -837,8 +800,7 @@ gridsearch_knn_delete(struct gsknn *knn)
 }
 
 size_t
-gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon,
-               double plat)
+gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat)
 {
   /*
     Output variables:
@@ -869,10 +831,8 @@ gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon,
     ndist *= 2;
   if (ndist > gs->n) ndist = gs->n;
 
-  if (knn->tmpadd == NULL)
-    knn->tmpadd = (size_t *) Malloc(ndist * sizeof(size_t));
-  if (knn->tmpdist == NULL)
-    knn->tmpdist = (double *) Malloc(ndist * sizeof(double));
+  if (knn->tmpadd == NULL) knn->tmpadd = (size_t *) Malloc(ndist * sizeof(size_t));
+  if (knn->tmpdist == NULL) knn->tmpdist = (double *) Malloc(ndist * sizeof(double));
 
   size_t *adds = knn->tmpadd;
   double *dist = knn->tmpdist;

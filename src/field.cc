@@ -150,13 +150,11 @@ fldmeanw(field_type field)
 
   if (field.nmiss)
     {
-      rmean = arrayWeightedMeanMV(field.size, field.ptr, field.weight,
-                                  field.missval);
+      rmean = arrayWeightedMeanMV(field.size, field.ptr, field.weight, field.missval);
     }
   else
     {
-      rmean = arrayWeightedMean(field.size, field.ptr, field.weight,
-                                field.missval);
+      rmean = arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
     }
 
   return rmean;
@@ -186,22 +184,19 @@ fldavgw(field_type field)
 
   if (field.nmiss)
     {
-      ravg = arrayWeightedAvgMV(field.size, field.ptr, field.weight,
-                                field.missval);
+      ravg = arrayWeightedAvgMV(field.size, field.ptr, field.weight, field.missval);
     }
   else
     {
-      ravg = arrayWeightedMean(field.size, field.ptr, field.weight,
-                               field.missval);
+      ravg = arrayWeightedMean(field.size, field.ptr, field.weight, field.missval);
     }
 
   return ravg;
 }
 
 static void
-prevarsum(const double *restrict array, size_t len, size_t nmiss,
-          double missval, double *rsum, double *rsumw, double *rsumq,
-          double *rsumwq)
+prevarsum(const double *restrict array, size_t len, size_t nmiss, double missval, double *rsum, double *rsumw,
+          double *rsumq, double *rsumwq)
 {
   assert(array != NULL);
 
@@ -237,9 +232,8 @@ prevarsum(const double *restrict array, size_t len, size_t nmiss,
 }
 
 static void
-preskewsum(const double *restrict array, size_t len, size_t nmiss,
-           const double mean, double missval, double *rsum3w, double *rsum4w,
-           double *rsum3diff, double *rsum2diff)
+preskewsum(const double *restrict array, size_t len, size_t nmiss, const double mean, double missval, double *rsum3w,
+           double *rsum4w, double *rsum3diff, double *rsum2diff)
 {
   assert(array != NULL);
 
@@ -251,8 +245,7 @@ preskewsum(const double *restrict array, size_t len, size_t nmiss,
       for (size_t i = 0; i < len; ++i)
         if (!DBL_IS_EQUAL(array[i], missval))
           {
-            xsum3diff
-                += (array[i] - mean) * (array[i] - mean) * (array[i] - mean);
+            xsum3diff += (array[i] - mean) * (array[i] - mean) * (array[i] - mean);
             xsum2diff += (array[i] - mean) * (array[i] - mean);
             xsum3w += 1;
             xsum4w += 1;
@@ -262,8 +255,7 @@ preskewsum(const double *restrict array, size_t len, size_t nmiss,
     {
       for (size_t i = 0; i < len; ++i)
         {
-          xsum3diff
-              += (array[i] - mean) * (array[i] - mean) * (array[i] - mean);
+          xsum3diff += (array[i] - mean) * (array[i] - mean) * (array[i] - mean);
           xsum2diff += (array[i] - mean) * (array[i] - mean);
         }
       xsum3w = len;
@@ -277,9 +269,8 @@ preskewsum(const double *restrict array, size_t len, size_t nmiss,
 }
 
 static void
-prekurtsum(const double *restrict array, size_t len, size_t nmiss,
-           const double mean, double missval, double *rsum3w, double *rsum4w,
-           double *rsum2diff, double *rsum4diff)
+prekurtsum(const double *restrict array, size_t len, size_t nmiss, const double mean, double missval, double *rsum3w,
+           double *rsum4w, double *rsum2diff, double *rsum4diff)
 {
   assert(array != NULL);
 
@@ -292,8 +283,7 @@ prekurtsum(const double *restrict array, size_t len, size_t nmiss,
         if (!DBL_IS_EQUAL(array[i], missval))
           {
             xsum2diff += (array[i] - mean) * (array[i] - mean);
-            xsum4diff += (array[i] - mean) * (array[i] - mean)
-                         * (array[i] - mean) * (array[i] - mean);
+            xsum4diff += (array[i] - mean) * (array[i] - mean) * (array[i] - mean) * (array[i] - mean);
             xsum3w += 1;
             xsum4w += 1;
           }
@@ -303,8 +293,7 @@ prekurtsum(const double *restrict array, size_t len, size_t nmiss,
       for (size_t i = 0; i < len; ++i)
         {
           xsum2diff += (array[i] - mean) * (array[i] - mean);
-          xsum4diff += (array[i] - mean) * (array[i] - mean) * (array[i] - mean)
-                       * (array[i] - mean);
+          xsum4diff += (array[i] - mean) * (array[i] - mean) * (array[i] - mean) * (array[i] - mean);
         }
       xsum3w = len;
       xsum4w = len;
@@ -327,9 +316,7 @@ fldvar(field_type field)
 
   prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
-  double rvar = IS_NOT_EQUAL(rsumw, 0)
-                    ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw)
-                    : missval;
+  double rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw) : missval;
   if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
   return rvar;
@@ -346,9 +333,7 @@ fldvar1(field_type field)
 
   prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
-  double rvar = (rsumw * rsumw > rsumwq)
-                    ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq)
-                    : missval;
+  double rvar = (rsumw * rsumw > rsumwq) ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq) : missval;
   if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
   return rvar;
@@ -367,8 +352,7 @@ fldkurt(field_type field)
   double rsum2diff, rsum4diff;
 
   prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
-  prekurtsum(field.ptr, len, nmiss, (rsum / rsumw), missval, &rsum3w, &rsum4w,
-             &rsum2diff, &rsum4diff);
+  prekurtsum(field.ptr, len, nmiss, (rsum / rsumw), missval, &rsum3w, &rsum4w, &rsum2diff, &rsum4diff);
 
   if (IS_EQUAL(rsum3w, 0.0) || IS_EQUAL(rsum2diff, 0.0)) return missval;
   double rvar = ((rsum4diff / rsum3w) / pow((rsum2diff) / (rsum3w), 2)) - 3.0;
@@ -391,12 +375,9 @@ fldskew(field_type field)
   double rsum3diff, rsum2diff;
 
   prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
-  preskewsum(field.ptr, len, nmiss, (rsum / rsumw), missval, &rsum3w, &rsum4w,
-             &rsum3diff, &rsum2diff);
+  preskewsum(field.ptr, len, nmiss, (rsum / rsumw), missval, &rsum3w, &rsum4w, &rsum3diff, &rsum2diff);
 
-  if (IS_EQUAL(rsum3w, 0.0) || IS_EQUAL(rsum3w, 1.0)
-      || IS_EQUAL(rsum2diff, 0.0))
-    return missval;
+  if (IS_EQUAL(rsum3w, 0.0) || IS_EQUAL(rsum3w, 1.0) || IS_EQUAL(rsum2diff, 0.0)) return missval;
   double rvar = (rsum3diff / rsum3w) / pow((rsum2diff) / (rsum3w - 1.0), 1.5);
 
   if (rvar < 0 && rvar > -1.e-5) rvar = 0;
@@ -405,9 +386,8 @@ fldskew(field_type field)
 }
 
 static void
-prevarsumw(const double *restrict array, const double *restrict w, size_t len,
-           size_t nmiss, double missval, double *rsum, double *rsumw,
-           double *rsumq, double *rsumwq)
+prevarsumw(const double *restrict array, const double *restrict w, size_t len, size_t nmiss, double missval,
+           double *rsum, double *rsumw, double *rsumq, double *rsumwq)
 {
   assert(array != NULL);
   assert(w != NULL);
@@ -452,12 +432,9 @@ fldvarw(field_type field)
   double rsum, rsumw;
   double rsumq, rsumwq;
 
-  prevarsumw(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw,
-             &rsumq, &rsumwq);
+  prevarsumw(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
-  double rvar = IS_NOT_EQUAL(rsumw, 0)
-                    ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw)
-                    : missval;
+  double rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw) : missval;
   if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
   return rvar;
@@ -472,12 +449,9 @@ fldvar1w(field_type field)
   double rsum, rsumw;
   double rsumq, rsumwq;
 
-  prevarsumw(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw,
-             &rsumq, &rsumwq);
+  prevarsumw(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
-  double rvar = (rsumw * rsumw > rsumwq)
-                    ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq)
-                    : missval;
+  double rvar = (rsumw * rsumw > rsumwq) ? (rsumq * rsumw - rsum * rsum) / (rsumw * rsumw - rsumwq) : missval;
   if (rvar < 0 && rvar > -1.e-5) rvar = 0;
 
   return rvar;
@@ -542,8 +516,7 @@ fldrms(field_type field, field_type field2, field_type *field3)
   double rsum = 0, rsumw = 0, ravg = 0;
 
   len = gridInqSize(grid1);
-  if (len != (size_t) gridInqSize(grid2))
-    cdoAbort("fields have different size!");
+  if (len != (size_t) gridInqSize(grid2)) cdoAbort("fields have different size!");
 
   /*
   if ( nmiss1 > 0 )
@@ -552,8 +525,7 @@ fldrms(field_type field, field_type field2, field_type *field3)
     for (i = 0; i < len; i++)
       if (!DBL_IS_EQUAL(w[i], missval1))
         {
-          rsum = ADDMN(rsum, MULMN(w[i], MULMN(SUBMN(array2[i], array1[i]),
-                                               SUBMN(array2[i], array1[i]))));
+          rsum = ADDMN(rsum, MULMN(w[i], MULMN(SUBMN(array2[i], array1[i]), SUBMN(array2[i], array1[i]))));
           rsumw = ADDMN(rsumw, w[i]);
         }
   }
@@ -595,8 +567,7 @@ varrms(field_type field, field_type field2, field_type *field3)
 
   nlev = zaxisInqSize(zaxis);
   len = gridInqSize(grid1);
-  if (len != (size_t) gridInqSize(grid2))
-    cdoAbort("fields have different size!");
+  if (len != (size_t) gridInqSize(grid2)) cdoAbort("fields have different size!");
 
   /*
   if ( nmiss1 > 0 )
@@ -606,11 +577,8 @@ varrms(field_type field, field_type field2, field_type *field3)
       for (i = 0; i < len; i++)
         /*	  if ( !DBL_IS_EQUAL(w[i], missval1) ) */
         {
-          rsum = ADDMN(
-              rsum,
-              MULMN(w[i],
-                    MULMN(SUBMN(array2[k * len + i], array1[k * len + i]),
-                          SUBMN(array2[k * len + i], array1[k * len + i]))));
+          rsum = ADDMN(rsum, MULMN(w[i], MULMN(SUBMN(array2[k * len + i], array1[k * len + i]),
+                                               SUBMN(array2[k * len + i], array1[k * len + i]))));
           rsumw = ADDMN(rsumw, w[i]);
         }
   }
@@ -647,8 +615,7 @@ fldpctl(field_type field, const double pn)
 
           size_t j = 0;
           for (size_t i = 0; i < field.size; i++)
-            if (!DBL_IS_EQUAL(field.ptr[i], field.missval))
-              v[j++] = field.ptr[i];
+            if (!DBL_IS_EQUAL(field.ptr[i], field.missval)) v[j++] = field.ptr[i];
 
           pctl = percentile(&v[0], j, pn);
         }

@@ -23,8 +23,7 @@
 double intlin(double x, double y1, double x1, double y2, double x2);
 
 static void
-isosurface(double isoval, long nlev1, double *lev1, field_type *field3D,
-           field_type *field2D)
+isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, field_type *field2D)
 {
   size_t gridsize = gridInqSize(field3D->grid);
   size_t nmiss = field3D->nmiss;
@@ -51,12 +50,9 @@ isosurface(double isoval, long nlev1, double *lev1, field_type *field3D,
               if (lmiss1 || lmiss2) continue;
             }
 
-          if ((isoval >= val1 && isoval <= val2)
-              || (isoval >= val2 && isoval <= val1))
+          if ((isoval >= val1 && isoval <= val2) || (isoval >= val2 && isoval <= val1))
             {
-              data2D[i] = IS_EQUAL(val1, val2) ? lev1[k]
-                                               : intlin(isoval, lev1[k], val1,
-                                                        lev1[k + 1], val2);
+              data2D[i] = IS_EQUAL(val1, val2) ? lev1[k] : intlin(isoval, lev1[k], val1, lev1[k + 1], val2);
               break;
             }
         }
@@ -103,8 +99,7 @@ Isosurface(void *process)
     {
       zaxisID = vlistZaxis(vlistID1, i);
       nlevel = zaxisInqSize(zaxisID);
-      if (zaxisInqType(zaxisID) != ZAXIS_HYBRID
-          && zaxisInqType(zaxisID) != ZAXIS_HYBRID_HALF)
+      if (zaxisInqType(zaxisID) != ZAXIS_HYBRID && zaxisInqType(zaxisID) != ZAXIS_HYBRID_HALF)
         if (nlevel > 1)
           {
             zaxisID1 = zaxisID;
@@ -120,8 +115,7 @@ Isosurface(void *process)
 
   int zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
   for (i = 0; i < nzaxis; i++)
-    if (zaxisID1 == vlistZaxis(vlistID1, i))
-      vlistChangeZaxisIndex(vlistID2, i, zaxisIDsfc);
+    if (zaxisID1 == vlistZaxis(vlistID1, i)) vlistChangeZaxisIndex(vlistID2, i, zaxisIDsfc);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
 

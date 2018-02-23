@@ -195,9 +195,7 @@ getCdoPath()
         return "$HOME/bin/cdo";
       else
         {
-          fprintf(
-              stderr,
-              "cdo binary not found! Use CDO_PATH to set the path to cdo.\n");
+          fprintf(stderr, "cdo binary not found! Use CDO_PATH to set the path to cdo.\n");
           exit(-1);
         }
     }
@@ -228,8 +226,7 @@ submitCdoCommand(const char *argument)
 static void
 testEcaFd()
 {
-  const double array[] = { MISSVAL,        MISSVAL,         TO_KELVIN(1.0),
-                           TO_KELVIN(1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0) };
+  const double array[] = { MISSVAL, MISSVAL, TO_KELVIN(1.0), TO_KELVIN(1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0) };
 
   int nvars = 1;
   int nts = 1;
@@ -266,8 +263,7 @@ testEcaFd()
 static void
 testEcaSu()
 {
-  const double array[] = { MISSVAL,         MISSVAL,         TO_KELVIN(26.0),
-                           TO_KELVIN(24.0), TO_KELVIN(26.0), TO_KELVIN(24.0) };
+  const double array[] = { MISSVAL, MISSVAL, TO_KELVIN(26.0), TO_KELVIN(24.0), TO_KELVIN(26.0), TO_KELVIN(24.0) };
 
   int nvars = 1;
   int nts = 1;
@@ -300,8 +296,7 @@ testEcaSu()
 static void
 testFdns()
 {
-  const double array1[] = { MISSVAL, TO_KELVIN(1.0), TO_KELVIN(-1.0),
-                            TO_KELVIN(-1.0), TO_KELVIN(-1.0) };
+  const double array1[] = { MISSVAL, TO_KELVIN(1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0) };
   const double array2[] = { 0.0, 0.0, 1.0, 0.0, MISSVAL };
 
   int nvars = 1;
@@ -357,11 +352,9 @@ testFdns()
 static void
 testEcaGsl()
 {
-  const double array1[]
-      = { TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),
-          TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(-1.0),
-          TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0),
-          TO_KELVIN(-1.0), TO_KELVIN(-1.0) };
+  const double array1[] = { TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(6.0),
+                            TO_KELVIN(6.0),  TO_KELVIN(6.0),  TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0),
+                            TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0) };
   const double array2[] = { 0.5 };
 
   int nvars = 2;
@@ -439,8 +432,7 @@ array2[4], array3[4], MISSVAL), 1.0e-5));
 static void
 testTimcount()
 {
-  const double array[] = { MISSVAL, MISSVAL,        TO_KELVIN(1.0),
-                           MISSVAL, TO_KELVIN(1.0), TO_KELVIN(1.0) };
+  const double array[] = { MISSVAL, MISSVAL, TO_KELVIN(1.0), MISSVAL, TO_KELVIN(1.0), TO_KELVIN(1.0) };
 
   /* number of output variables and time steps */
   int nvars = 1;

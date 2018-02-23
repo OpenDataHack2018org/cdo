@@ -115,11 +115,9 @@ vctFromFile(const char *filename, int *nvct)
       pline = line;
       num = (int) strtod(pline, &pline);
       if (pline == NULL) cdoAbort("Format error in VCT file %s!", filename);
-      if (num != i)
-        cdoWarning("Inconsistent VCT file, entry %d is %d.", i, num);
+      if (num != i) cdoWarning("Inconsistent VCT file, entry %d is %d.", i, num);
 
-      if (i + maxvct / 2 >= maxvct - 1)
-        cdoAbort("Too many values in VCT file!");
+      if (i + maxvct / 2 >= maxvct - 1) cdoAbort("Too many values in VCT file!");
 
       vct2[i] = strtod(pline, &pline);
       if (pline == NULL) cdoAbort("Format error in VCT file %s!", filename);
@@ -161,8 +159,7 @@ vert_sum(double *sum, double *var3d, size_t gridsize, long nlevel)
 }
 
 static void
-vert_sumw(double *sum, double *var3d, size_t gridsize, long nlevel,
-          double *deltap)
+vert_sumw(double *sum, double *var3d, size_t gridsize, long nlevel, double *deltap)
 {
   size_t i;
   int k;
@@ -210,12 +207,9 @@ vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf)
             }
           else
             {
-              if (cdoVerbose)
-                cdoPrint("nlevel = (nvct1/2 - 1): nlevel = %d", nlevel);
+              if (cdoVerbose) cdoPrint("nlevel = (nvct1/2 - 1): nlevel = %d", nlevel);
               if (nlevel < (nvct / 2 - 1))
-                cdoPrint(
-                    "z-axis %d has only %d of %d hybrid sigma pressure levels!",
-                    i + 1, nlevel, (nvct / 2 - 1));
+                cdoPrint("z-axis %d has only %d of %d hybrid sigma pressure levels!", i + 1, nlevel, (nvct / 2 - 1));
             }
         }
     }
@@ -332,11 +326,9 @@ Remapeta(void *process)
       /* check range of surface_geopotential */
       arrayMinMaxMask(nfis2gp, fis2, imiss, &minval, &maxval);
       if (minval < MIN_FIS || maxval > MAX_FIS)
-        cdoWarning("%s out of range (min=%g max=%g)!",
-                   var_stdname(surface_geopotential), minval, maxval);
+        cdoWarning("%s out of range (min=%g max=%g)!", var_stdname(surface_geopotential), minval, maxval);
 
-      if (minval < -1.e10 || maxval > 1.e10)
-        cdoAbort("%s out of range!", var_stdname(surface_geopotential));
+      if (minval < -1.e10 || maxval > 1.e10) cdoAbort("%s out of range!", var_stdname(surface_geopotential));
 
       streamClose(streamID);
     }
@@ -349,8 +341,7 @@ Remapeta(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int gridID = vlistGrid(vlistID1, 0);
-  if (gridInqType(gridID) == GRID_SPECTRAL)
-    cdoAbort("Spectral data unsupported!");
+  if (gridInqType(gridID) == GRID_SPECTRAL) cdoAbort("Spectral data unsupported!");
 
   size_t gridsize = vlist_check_gridsize(vlistID1);
 
@@ -378,8 +369,7 @@ Remapeta(void *process)
     {
       int zaxisID = vlistZaxis(vlistID1, i);
       int nlevel = zaxisInqSize(zaxisID);
-      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == 1)
-        vlistChangeZaxisIndex(vlistID2, i, surfaceID);
+      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == 1) vlistChangeZaxisIndex(vlistID2, i, surfaceID);
     }
 
   double *a1 = vct1;
@@ -391,8 +381,7 @@ Remapeta(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  if (zaxisIDh == -1)
-    cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
+  if (zaxisIDh == -1) cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
 
   int nvars = vlistNvars(vlistID1);
 
@@ -417,21 +406,13 @@ Remapeta(void *process)
           if (code == -1)
             {
               /*                                  ECHAM ECMWF       */
-              if (sgeopotID == -1
-                  && (strcmp(varname, "geosp") == 0
-                      || strcmp(varname, "z") == 0))
+              if (sgeopotID == -1 && (strcmp(varname, "geosp") == 0 || strcmp(varname, "z") == 0))
                 code = 129;
-              else if (tempID == -1
-                       && (strcmp(varname, "st") == 0
-                           || strcmp(varname, "t") == 0))
+              else if (tempID == -1 && (strcmp(varname, "st") == 0 || strcmp(varname, "t") == 0))
                 code = 130;
-              else if (psID == -1
-                       && (strcmp(varname, "aps") == 0
-                           || strcmp(varname, "ps") == 0))
+              else if (psID == -1 && (strcmp(varname, "aps") == 0 || strcmp(varname, "ps") == 0))
                 code = 134;
-              else if (lnpsID == -1
-                       && (strcmp(varname, "lsp") == 0
-                           || strcmp(varname, "lnsp") == 0))
+              else if (lnpsID == -1 && (strcmp(varname, "lsp") == 0 || strcmp(varname, "lnsp") == 0))
                 code = 152;
               else if (sqID == -1 && (strcmp(varname, "q") == 0))
                 code = 133;
@@ -449,15 +430,12 @@ Remapeta(void *process)
       else if (code == 152 && nlevel == 1)
         lnpsID = varID;
 
-      if (gridInqType(gridID) == GRID_SPECTRAL
-          && zaxisInqType(zaxisID) == ZAXIS_HYBRID)
+      if (gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID)
         cdoAbort("Spectral data on model level unsupported!");
 
-      if (gridInqType(gridID) == GRID_SPECTRAL)
-        cdoAbort("Spectral data unsupported!");
+      if (gridInqType(gridID) == GRID_SPECTRAL) cdoAbort("Spectral data unsupported!");
 
-      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1
-          && nlevel == nhlevf1)
+      if (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlevf1)
         {
           if (!(code == 130 || code == 133)) varids[nvars3D++] = varID;
         }
@@ -473,8 +451,7 @@ Remapeta(void *process)
       cdoPrint("Found:");
       if (tempID != -1) cdoPrint("  %s", var_stdname(air_temperature));
       if (psID != -1) cdoPrint("  %s", var_stdname(surface_air_pressure));
-      if (lnpsID != -1)
-        cdoPrint("  LOG(%s)", var_stdname(surface_air_pressure));
+      if (lnpsID != -1) cdoPrint("  LOG(%s)", var_stdname(surface_air_pressure));
       if (sgeopotID != -1) cdoPrint("  %s", var_stdname(surface_geopotential));
       if (sqID != -1) cdoPrint("  %s", var_stdname(specific_humidity));
     }
@@ -508,10 +485,8 @@ Remapeta(void *process)
     {
       deltap1 = (double *) Malloc(gridsize * nhlevf1 * sizeof(double));
       deltap2 = (double *) Malloc(gridsize * nhlevf2 * sizeof(double));
-      half_press1
-          = (double *) Malloc(gridsize * (nhlevf1 + 1) * sizeof(double));
-      half_press2
-          = (double *) Malloc(gridsize * (nhlevf2 + 1) * sizeof(double));
+      half_press1 = (double *) Malloc(gridsize * (nhlevf1 + 1) * sizeof(double));
+      half_press2 = (double *) Malloc(gridsize * (nhlevf2 + 1) * sizeof(double));
     }
 
   double *array = (double *) Malloc(gridsize * sizeof(double));
@@ -520,8 +495,7 @@ Remapeta(void *process)
   double *ps1 = (double *) Malloc(gridsize * sizeof(double));
 
   if (lfis2 == false) fis2 = (double *) Malloc(gridsize * sizeof(double));
-  if (lfis2 == true && gridsize != nfis2gp)
-    cdoAbort("Orographies have different grid size!");
+  if (lfis2 == true && gridsize != nfis2gp) cdoAbort("Orographies have different grid size!");
 
   double *ps2 = (double *) Malloc(gridsize * sizeof(double));
 
@@ -552,9 +526,7 @@ Remapeta(void *process)
 
   if (zaxisIDh != -1 && sgeopotID == -1)
     {
-      if (ltq)
-        cdoWarning("%s not found - set to zero!",
-                   var_stdname(surface_geopotential));
+      if (ltq) cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
 
       arrayFill(gridsize, fis1, 0.0);
     }
@@ -609,14 +581,12 @@ Remapeta(void *process)
               else if (ltq && varID == sqID)
                 arrayCopy(gridsize, array, q1 + offset);
               /* else if ( zaxisID == zaxisIDh ) */
-              else if (zaxisInqType(zaxisID) == ZAXIS_HYBRID
-                       && nlevel == nhlevf1)
+              else if (zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == nhlevf1)
                 {
                   for (i = 0; i < nvars3D; ++i)
                     if (varID == varids[i]) break;
 
-                  if (i == nvars3D)
-                    cdoAbort("Internal error, 3D variable not found!");
+                  if (i == nvars3D) cdoAbort("Internal error, 3D variable not found!");
 
                   arrayCopy(gridsize, array, vars1[i] + offset);
                 }
@@ -638,14 +608,12 @@ Remapeta(void *process)
           /* check range of ps_prog */
           arrayMinMaxMask(gridsize, ps1, imiss, &minval, &maxval);
           if (minval < MIN_PS || maxval > MAX_PS)
-            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval,
-                       maxval);
+            cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
           /* check range of geop */
           arrayMinMaxMask(gridsize, fis1, imiss, &minval, &maxval);
           if (minval < MIN_FIS || maxval > MAX_FIS)
-            cdoWarning("Orography out of range (min=%g max=%g)!", minval,
-                       maxval);
+            cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
         }
 
       if (lfis2 == false)
@@ -679,23 +647,19 @@ Remapeta(void *process)
 
               arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_Q || maxval > MAX_Q)
-                cdoWarning(
-                    "Input humidity at level %d out of range (min=%g max=%g)!",
-                    levelID + 1, minval, maxval);
+                cdoWarning("Input humidity at level %d out of range (min=%g max=%g)!", levelID + 1, minval, maxval);
             }
         }
 
       if (nvars3D || ltq)
         {
           if (cdoTimer) timer_start(timer_hetaeta);
-          hetaeta(ltq, gridsize, imiss, nhlevf1, a1, b1, fis1, ps1, t1, q1,
-                  nhlevf2, a2, b2, fis2, ps2, t2, q2, nvars3D, vars1, vars2,
-                  tscor, pscor, secor);
+          hetaeta(ltq, gridsize, imiss, nhlevf1, a1, b1, fis1, ps1, t1, q1, nhlevf2, a2, b2, fis2, ps2, t2, q2, nvars3D,
+                  vars1, vars2, tscor, pscor, secor);
           if (cdoTimer) timer_stop(timer_hetaeta);
         }
 
-      if (cptop > 0)
-        nctop = ncctop(cptop, (long) nhlevf2, (long) nhlevf2 + 1, a2, b2);
+      if (cptop > 0) nctop = ncctop(cptop, (long) nhlevf2, (long) nhlevf2 + 1, a2, b2);
 
       if (zaxisIDh != -1 && sgeopotID != -1)
         {
@@ -754,9 +718,7 @@ Remapeta(void *process)
 
               arrayMinMaxMask(gridsize, single2, imiss, &minval, &maxval);
               if (minval < MIN_Q || maxval > MAX_Q)
-                cdoWarning(
-                    "Output humidity at level %d out of range (min=%g max=%g)!",
-                    levelID + 1, minval, maxval);
+                cdoWarning("Output humidity at level %d out of range (min=%g max=%g)!", levelID + 1, minval, maxval);
 
               setmissval(gridsize, imiss, missval, single2);
               pstreamDefRecord(streamID2, varID, levelID);
@@ -783,9 +745,7 @@ Remapeta(void *process)
               for (k = 0; k < nhlevf1; ++k)
                 for (size_t i = 0; i < gridsize; ++i)
                   {
-                    deltap1[k * gridsize + i]
-                        = half_press1[(k + 1) * gridsize + i]
-                          - half_press1[k * gridsize + i];
+                    deltap1[k * gridsize + i] = half_press1[(k + 1) * gridsize + i] - half_press1[k * gridsize + i];
                     deltap1[k * gridsize + i] = log(deltap1[k * gridsize + i]);
                   }
               vert_sumw(sum1, vars1[iv], gridsize, nhlevf1, deltap1);
@@ -794,9 +754,7 @@ Remapeta(void *process)
               for (k = 0; k < nhlevf2; ++k)
                 for (size_t i = 0; i < gridsize; ++i)
                   {
-                    deltap2[k * gridsize + i]
-                        = half_press2[(k + 1) * gridsize + i]
-                          - half_press2[k * gridsize + i];
+                    deltap2[k * gridsize + i] = half_press2[(k + 1) * gridsize + i] - half_press2[k * gridsize + i];
                     deltap2[k * gridsize + i] = log(deltap2[k * gridsize + i]);
                   }
               vert_sumw(sum2, vars2[iv], gridsize, nhlevf2, deltap2);

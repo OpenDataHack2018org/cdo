@@ -18,7 +18,8 @@
 #ifndef ECA_H_
 #define ECA_H_
 
-typedef enum {
+typedef enum
+{
   NONE,
   MEAN,
   PERCENT_OF_TIME,

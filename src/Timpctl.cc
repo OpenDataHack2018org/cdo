@@ -108,8 +108,7 @@ timpctl(int operatorID)
     {
       nrecs = cdoStreamInqTimestep(streamID2, otsID);
       if (nrecs != cdoStreamInqTimestep(streamID3, otsID))
-        cdoAbort("Number of records at time step %d of %s and %s differ!",
-                 otsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Number of records at time step %d of %s and %s differ!", otsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
       int vdate2 = taxisInqVdate(taxisID2);
@@ -117,8 +116,7 @@ timpctl(int operatorID)
       int vdate3 = taxisInqVdate(taxisID3);
       int vtime3 = taxisInqVtime(taxisID3);
       if (vdate2 != vdate3 || vtime2 != vtime3)
-        cdoAbort("Verification dates at time step %d of %s and %s differ!",
-                 otsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
       for (int recID = 0; recID < nrecs; recID++)
@@ -136,8 +134,7 @@ timpctl(int operatorID)
           field.grid = vars1[varID][levelID].grid;
           field.missval = vars1[varID][levelID].missval;
 
-          hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID],
-                                &field);
+          hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID], &field);
         }
 
       int nsets = 0;
@@ -163,8 +160,7 @@ timpctl(int operatorID)
               pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
               vars1[varID][levelID].nmiss = nmiss;
 
-              hsetAddVarLevelValues(hset, varID, levelID,
-                                    &vars1[varID][levelID]);
+              hsetAddVarLevelValues(hset, varID, levelID, &vars1[varID][levelID]);
             }
 
           nsets++;
@@ -179,8 +175,7 @@ timpctl(int operatorID)
           nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
           for (levelID = 0; levelID < nlevels; levelID++)
-            hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID,
-                                       levelID, pn);
+            hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID, levelID, pn);
         }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
@@ -191,12 +186,10 @@ timpctl(int operatorID)
           varID = recVarID[recID];
           levelID = recLevelID[recID];
 
-          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-            continue;
+          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
           pstreamDefRecord(streamID4, varID, levelID);
-          pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr,
-                             vars1[varID][levelID].nmiss);
+          pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
         }
 
       if (nrecs == 0) break;

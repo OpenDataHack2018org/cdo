@@ -255,9 +255,7 @@ FC(void *process)
           if (vars[varID])
             {
               pstreamReadRecord(streamID1, array1, &nmiss);
-              if (nmiss)
-                cdoAbort(
-                    "Missing values unsupported for spectral/fourier data!");
+              if (nmiss) cdoAbort("Missing values unsupported for spectral/fourier data!");
 
               gridID1 = vlistInqVarGrid(vlistID1, varID);
               if (operatorID == FC2SP)

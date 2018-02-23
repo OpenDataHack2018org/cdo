@@ -53,8 +53,7 @@ Cat(void *process)
 
   for (int indf = 0; indf < nfiles; ++indf)
     {
-      if (cdoVerbose)
-        cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
+      if (cdoVerbose) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
       if (cdoTimer) tw0 = timer_val(timer_cat);
 
       int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
@@ -69,15 +68,12 @@ Cat(void *process)
           if (ntsteps == 1)
             {
               for (varID = 0; varID < nvars; ++varID)
-                if (vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT)
-                  break;
+                if (vlistInqVarTimetype(vlistID1, varID) != TIME_CONSTANT) break;
 
               if (varID == nvars) ntsteps = 0;
             }
 
-          bool file_exists = (!cdoOverwriteMode)
-                                 ? fileExists(cdoGetStreamName(nfiles).c_str())
-                                 : false;
+          bool file_exists = (!cdoOverwriteMode) ? fileExists(cdoGetStreamName(nfiles).c_str()) : false;
           if (file_exists)
             {
               streamID2 = cdoStreamOpenAppend(cdoStreamName(nfiles));
@@ -88,19 +84,15 @@ Cat(void *process)
               vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
               tsID2 = vlistNtsteps(vlistID2);
-              if (tsID2 == 0)
-                tsID2 = 1; /* bug fix for time constant data only */
+              if (tsID2 == 0) tsID2 = 1; /* bug fix for time constant data only */
 
               if (ntsteps == 0) lconstvars = false;
             }
           else
             {
-              if (cdoVerbose)
-                cdoPrint("Output file doesn't exist, creating: %s",
-                         cdoGetStreamName(nfiles).c_str());
+              if (cdoVerbose) cdoPrint("Output file doesn't exist, creating: %s", cdoGetStreamName(nfiles).c_str());
 
-              streamID2
-                  = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+              streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
               vlistID2 = vlistDuplicate(vlistID1);
               taxisID2 = taxisDuplicate(taxisID1);
@@ -132,8 +124,7 @@ Cat(void *process)
       int tsID1 = 0;
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
         {
-          double fstatus
-              = (ntsteps > 1) ? indf + (tsID1 + 1.) / ntsteps : indf + 1.;
+          double fstatus = (ntsteps > 1) ? indf + (tsID1 + 1.) / ntsteps : indf + 1.;
           if (!cdoVerbose) progressStatus(0, 1, fstatus / nfiles);
 
           taxisCopyTimestep(taxisID2, taxisID1);
@@ -145,8 +136,7 @@ Cat(void *process)
               pstreamInqRecord(streamID1, &varID, &levelID);
 
               if (lconstvars && tsID2 > 0 && tsID1 == 0)
-                if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-                  continue;
+                if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
               pstreamDefRecord(streamID2, varID, levelID);
 
@@ -168,9 +158,7 @@ Cat(void *process)
       pstreamClose(streamID1);
 
       if (cdoTimer) tw = timer_val(timer_cat) - tw0;
-      if (cdoTimer)
-        cdoPrint("Processed file: %s   %.2f seconds",
-                 cdoGetStreamName(indf).c_str(), tw);
+      if (cdoTimer) cdoPrint("Processed file: %s   %.2f seconds", cdoGetStreamName(indf).c_str(), tw);
     }
 
   pstreamClose(streamID2);

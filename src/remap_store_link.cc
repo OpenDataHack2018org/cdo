@@ -134,8 +134,8 @@ sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
 }
 
 void
-store_weightlinks(int lalloc, size_t num_weights, size_t *srch_add,
-                  double *weights, size_t cell_add, weightlinks_t *weightlinks)
+store_weightlinks(int lalloc, size_t num_weights, size_t *srch_add, double *weights, size_t cell_add,
+                  weightlinks_t *weightlinks)
 {
   weightlinks[cell_add].nlinks = 0;
   weightlinks[cell_add].offset = 0;
@@ -163,8 +163,8 @@ store_weightlinks(int lalloc, size_t num_weights, size_t *srch_add,
 }
 
 void
-store_weightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4],
-                   size_t cell_add, weightlinks4_t *weightlinks)
+store_weightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], size_t cell_add,
+                   weightlinks4_t *weightlinks)
 {
   weightlinks[cell_add].nlinks = 0;
   weightlinks[cell_add].offset = 0;
@@ -187,8 +187,7 @@ store_weightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4],
 }
 
 void
-weightlinks2remaplinks(int lalloc, size_t tgt_grid_size,
-                       weightlinks_t *weightlinks, remapvars_t *rv)
+weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightlinks, remapvars_t *rv)
 {
   size_t nlinks = 0;
 
@@ -216,8 +215,7 @@ weightlinks2remaplinks(int lalloc, size_t tgt_grid_size,
 #pragma omp parallel for schedule(static) default(none) \
     shared(src_cell_adds, tgt_cell_adds, wts, weightlinks, tgt_grid_size)
 #endif
-      for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size;
-           ++tgt_cell_add)
+      for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
         {
           size_t num_links = weightlinks[tgt_cell_add].nlinks;
           if (num_links)
@@ -235,8 +233,7 @@ weightlinks2remaplinks(int lalloc, size_t tgt_grid_size,
 
       if (lalloc)
         {
-          for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size;
-               ++tgt_cell_add)
+          for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
             {
               size_t num_links = weightlinks[tgt_cell_add].nlinks;
               if (num_links) Free(weightlinks[tgt_cell_add].addweights);
@@ -250,8 +247,7 @@ weightlinks2remaplinks(int lalloc, size_t tgt_grid_size,
 }
 
 void
-weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks,
-                        remapvars_t *rv)
+weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remapvars_t *rv)
 {
   size_t nlinks = 0;
 
@@ -276,11 +272,9 @@ weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks,
       double *restrict wts = rv->wts;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(src_cell_adds, tgt_cell_adds, wts, weightlinks, tgt_grid_size)
+#pragma omp parallel for default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightlinks, tgt_grid_size)
 #endif
-      for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size;
-           ++tgt_cell_add)
+      for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
         {
           size_t num_links = weightlinks[tgt_cell_add].nlinks;
           if (num_links)

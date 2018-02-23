@@ -72,8 +72,7 @@ Intyear(void *process)
 
   const char *refname = cdoGetObase();
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix),
-                   pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   for (int iy = 0; iy < nyears; iy++)
     {
@@ -102,8 +101,7 @@ Intyear(void *process)
       for (int iy = 0; iy < nyears; iy++)
         {
           if (iyears[iy] < year1 || iyears[iy] > year2)
-            cdoAbort("Year %d out of bounds (first year %d; last year %d)!",
-                     iyears[iy], year1, year2);
+            cdoAbort("Year %d out of bounds (first year %d; last year %d)!", iyears[iy], year1, year2);
           int vdate3 = vdate1 - year1 * 10000 + iyears[iy] * 10000;
           taxisDefVdate(taxisID3, vdate3);
           taxisDefVtime(taxisID3, vtime);
@@ -134,8 +132,7 @@ Intyear(void *process)
 
                   for (size_t i = 0; i < gridsize; i++)
                     {
-                      if (!DBL_IS_EQUAL(array1[i], missval1)
-                          && !DBL_IS_EQUAL(array2[i], missval2))
+                      if (!DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2))
                         array3[i] = array1[i] * fac1 + array2[i] * fac2;
                       /* 2010-04-19 Uwe Schulzweida: removed
                       else if ( DBL_IS_EQUAL(array1[i], missval1) &&

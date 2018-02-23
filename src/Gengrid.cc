@@ -43,8 +43,7 @@ Gengrid(void *process)
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
 
-  if (gridInqSize(gridID1) != gridInqSize(gridID2))
-    cdoAbort("Arrays have different grid size!");
+  if (gridInqSize(gridID1) != gridInqSize(gridID2)) cdoAbort("Arrays have different grid size!");
 
   size_t gridsize = gridInqSize(gridID1);
   size_t xsize = gridInqXsize(gridID1);
@@ -90,8 +89,7 @@ Gengrid(void *process)
   arrayMinMax(gridsize, array2, &yminval, &ymaxval);
 
   if (cdoVerbose)
-    cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g", xminval,
-             xmaxval, yminval, ymaxval);
+    cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g", xminval, xmaxval, yminval, ymaxval);
 
   /* check units */
   if (xminval > -4 && xmaxval < 8 && yminval > -2 && ymaxval < 2)

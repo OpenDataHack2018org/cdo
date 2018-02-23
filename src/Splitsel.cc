@@ -43,8 +43,7 @@ Splitsel(void *process)
 
   cdoInitialize(process);
 
-  if (processSelf().m_ID != 0)
-    cdoAbort("This operator can't be combined with other operators!");
+  if (processSelf().m_ID != 0) cdoAbort("This operator can't be combined with other operators!");
 
   bool lcopy = UNCHANGED_RECORD;
 
@@ -65,8 +64,7 @@ Splitsel(void *process)
   if (nargc > 1) noffset = parameter2double(operatorArgv()[1]);
   if (nargc > 2) nskip = parameter2double(operatorArgv()[2]);
 
-  if (cdoVerbose)
-    cdoPrint("nsets = %f, noffset = %f, nskip = %f", ndates, noffset, nskip);
+  if (cdoVerbose) cdoPrint("nsets = %f, noffset = %f, nskip = %f", ndates, noffset, nskip);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -83,8 +81,7 @@ Splitsel(void *process)
 
   const char *refname = cdoGetObase();
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix),
-                   pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   //  if ( ! lcopy )
   {
@@ -116,8 +113,7 @@ Splitsel(void *process)
                 {
                   field_init(&vars[varID][levelID]);
                   vars[varID][levelID].grid = gridID;
-                  vars[varID][levelID].ptr
-                      = (double *) Malloc(gridsize * sizeof(double));
+                  vars[varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
                 }
             }
         }
@@ -179,14 +175,12 @@ Splitsel(void *process)
                 {
                   if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
                     {
-                      int nlevel
-                          = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+                      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
                       for (levelID = 0; levelID < nlevel; levelID++)
                         {
                           pstreamDefRecord(streamID2, varID, levelID);
                           nmiss = vars[varID][levelID].nmiss;
-                          pstreamWriteRecord(streamID2,
-                                             vars[varID][levelID].ptr, nmiss);
+                          pstreamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
                         }
                     }
                 }

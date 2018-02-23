@@ -50,8 +50,7 @@ results_template_parser(void *node, const char *varname)
 
   if (!strcmp((const char *) a_node->name, "results"))
     {
-      const char *value
-          = (const char *) xmlGetProp(a_node, (const xmlChar *) "version");
+      const char *value = (const char *) xmlGetProp(a_node, (const xmlChar *) "version");
 
       if (value)
         {
@@ -87,17 +86,15 @@ results_template_parser(void *node, const char *varname)
           else
             {
 
-            /* 	Loop Over the attributes and get the corresponding
-                    Magics Parameter name and type, set the value
-            */
+              /* 	Loop Over the attributes and get the corresponding
+                      Magics Parameter name and type, set the value
+              */
 
 #if 0
 	      printf( "Finding varname = %s  result_name = %s\n", varname, xmlGetProp( cur_node,"name") );
 #endif
 
-              if (strcmp(varname, (const char *) xmlGetProp(cur_node,
-                                                            (xmlChar *) "name"))
-                  == 0)
+              if (strcmp(varname, (const char *) xmlGetProp(cur_node, (xmlChar *) "name")) == 0)
                 {
 #if 0
 	          printf( "Found varname = %s  result_name = %s\n", varname, xmlGetProp( cur_node,"name") );
@@ -112,8 +109,7 @@ results_template_parser(void *node, const char *varname)
 
                           /* if( !GetMagicsParameterInfo( attr->name,
                            * &magics_param_name, &param_type ) ) */
-                          if (!GetMagicsParameterInfo((const char *) attr->name,
-                                                      (char *) param_value))
+                          if (!GetMagicsParameterInfo((const char *) attr->name, (char *) param_value))
                             {
 
 #if 0
@@ -136,8 +132,7 @@ results_template_parser(void *node, const char *varname)
                 }
               else
                 {
-                  fprintf(stderr,
-                          "Var Name not matching resetting Magics Params!\n");
+                  fprintf(stderr, "Var Name not matching resetting Magics Params!\n");
                   /* Call the Reset functions of all the features to Reset the
                    * magics params to default */
                 }

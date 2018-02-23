@@ -100,13 +100,10 @@ Monarith(void *process)
           year1 = yearmon1 / 100;
           mon1 = yearmon1 - (yearmon1 / 100) * 100;
 
-          if (cdoVerbose)
-            cdoPrint("Process: Year = %4d  Month = %2d", year1, mon1);
+          if (cdoVerbose) cdoPrint("Process: Year = %4d  Month = %2d", year1, mon1);
 
           nrecs2 = cdoStreamInqTimestep(streamID2, tsID2);
-          if (nrecs2 == 0)
-            cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1,
-                     cdoGetStreamName(1).c_str());
+          if (nrecs2 == 0) cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoGetStreamName(1).c_str());
 
           vdate = taxisInqVdate(taxisID2);
           yearmon2 = vdate / 100;
@@ -117,8 +114,7 @@ Monarith(void *process)
               int mon2 = yearmon2 - (yearmon2 / 100) * 100;
               cdoAbort("Timestep %d in %s has wrong date! Current year=%4d "
                        "mon=%2d, expected year=%4d mon=%2d",
-                       tsID2 + 1, cdoGetStreamName(1).c_str(), year2, mon2,
-                       year1, mon1);
+                       tsID2 + 1, cdoGetStreamName(1).c_str(), year2, mon2, year1, mon1);
             }
 
           for (int recID = 0; recID < nrecs2; recID++)

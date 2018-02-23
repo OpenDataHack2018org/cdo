@@ -24,15 +24,13 @@
 #define MAX_BLOCKS 65536
 
 static void
-genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals,
-         size_t nxblocks, size_t nyblocks, size_t **gridindex,
+genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals, size_t nxblocks, size_t nyblocks, size_t **gridindex,
          size_t *ogridsize, size_t nsplit)
 {
   double *xpvals = NULL, *ypvals = NULL;
   int gridtype = gridInqType(gridID1);
   bool lregular = true;
-  if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN
-      || gridtype == GRID_GENERIC)
+  if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_GENERIC)
     lregular = true;
   else if (gridtype == GRID_CURVILINEAR)
     lregular = false;
@@ -178,8 +176,7 @@ genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals,
         ogridsize[index] = gridsize2;
 
         index++;
-        if (index > nsplit)
-          cdoAbort("Internal problem, index exceeded bounds!");
+        if (index > nsplit) cdoAbort("Internal problem, index exceeded bounds!");
       }
 
   if (xpvals) Free(xpvals);
@@ -234,10 +231,8 @@ Distgrid(void *process)
     {
       gridID1 = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
-      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN
-          || gridtype == GRID_CURVILINEAR
-          || (gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0
-              && gridInqYsize(gridID1) > 0))
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR
+          || (gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0))
         break;
     }
 
@@ -253,20 +248,17 @@ Distgrid(void *process)
   for (int i = 1; i < ngrids; i++)
     {
       gridID1 = vlistGrid(vlistID1, i);
-      if (gridsize != gridInqSize(gridID1))
-        cdoAbort("Gridsize must not change!");
+      if (gridsize != gridInqSize(gridID1)) cdoAbort("Gridsize must not change!");
     }
 
   if (nxblocks > nx)
     {
-      cdoPrint("nxblocks (%zu) greater than nx (%zu), set to %zu!", nxblocks,
-               nx, nx);
+      cdoPrint("nxblocks (%zu) greater than nx (%zu), set to %zu!", nxblocks, nx, nx);
       nxblocks = nx;
     }
   if (nyblocks > ny)
     {
-      cdoPrint("nyblocks (%zu) greater than ny (%zu), set to %zu!", nyblocks,
-               ny, ny);
+      cdoPrint("nyblocks (%zu) greater than ny (%zu), set to %zu!", nyblocks, ny, ny);
       nyblocks = ny;
     }
 
@@ -303,8 +295,8 @@ Distgrid(void *process)
   for (int i = 0; i < ngrids; i++)
     {
       gridID1 = vlistGrid(vlistID1, i);
-      genGrids(gridID1, &grids[i].gridIDs[0], xinc, yinc, nxblocks, nyblocks,
-               grids[i].gridindex, grids[i].gridsize, nsplit);
+      genGrids(gridID1, &grids[i].gridIDs[0], xinc, yinc, nxblocks, nyblocks, grids[i].gridindex, grids[i].gridsize,
+               nsplit);
       /*
       if ( cdoVerbose )
         for ( size_t index = 0; index < nsplit; index++ )
@@ -317,8 +309,7 @@ Distgrid(void *process)
 
   size_t gridsize2max = 0;
   for (size_t index = 0; index < nsplit; index++)
-    if (grids[0].gridsize[index] > gridsize2max)
-      gridsize2max = grids[0].gridsize[index];
+    if (grids[0].gridsize[index] > gridsize2max) gridsize2max = grids[0].gridsize[index];
 
   std::vector<double> array2(gridsize2max);
 
@@ -327,8 +318,7 @@ Distgrid(void *process)
 
   const char *refname = cdoGetObase();
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix),
-                   pstreamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
 
   for (size_t index = 0; index < nsplit; index++)
     {
@@ -356,12 +346,9 @@ Distgrid(void *process)
           for (size_t index = 0; index < nsplit; index++)
             {
               int i = 0;
-              window_cell(&array1[0], &array2[0], grids[i].gridsize[index],
-                          grids[i].gridindex[index]);
+              window_cell(&array1[0], &array2[0], grids[i].gridsize[index], grids[i].gridindex[index]);
               pstreamDefRecord(streamIDs[index], varID, levelID);
-              if (nmiss > 0)
-                nmiss
-                    = arrayNumMV(grids[i].gridsize[index], &array2[0], missval);
+              if (nmiss > 0) nmiss = arrayNumMV(grids[i].gridsize[index], &array2[0], missval);
               pstreamWriteRecord(streamIDs[index], &array2[0], nmiss);
             }
         }

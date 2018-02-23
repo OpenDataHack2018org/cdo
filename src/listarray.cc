@@ -75,11 +75,9 @@ listaCheck(lista_t *lista, int num)
     {
       lista->nalloc += lista->allinc;
       if (lista->type == INT_LISTA)
-        lista->array
-            = (int *) Realloc(lista->array, lista->nalloc * sizeof(int));
+        lista->array = (int *) Realloc(lista->array, lista->nalloc * sizeof(int));
       else
-        lista->array
-            = (double *) Realloc(lista->array, lista->nalloc * sizeof(double));
+        lista->array = (double *) Realloc(lista->array, lista->nalloc * sizeof(double));
     }
 }
 
@@ -128,9 +126,7 @@ get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
           if (intstr[i] == '/')
             ival = parameter2intlist(intstr + i + 1);
           else
-            fprintf(stderr,
-                    "Syntax error in >%.*s<! Character %c not allowed.\n", iend,
-                    intstr, intstr[i]);
+            fprintf(stderr, "Syntax error in >%.*s<! Character %c not allowed.\n", iend, intstr, intstr[i]);
           break;
         }
     }
@@ -199,9 +195,7 @@ args2flt_lista(int argc, char **argv, lista_t *lista)
     {
       len = (int) strlen(argv[iarg]);
       for (i = 0; i < len; i++)
-        if (argv[iarg][i] != '/' && argv[iarg][i] != '-'
-            && !isdigit(argv[iarg][i]))
-          break;
+        if (argv[iarg][i] != '/' && argv[iarg][i] != '-' && !isdigit(argv[iarg][i])) break;
 
       if (i != len)
         {

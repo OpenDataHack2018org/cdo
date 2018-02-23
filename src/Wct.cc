@@ -27,15 +27,14 @@
 #include "pstream_int.h"
 
 static const char WCT_NAME[] = "wind_chill_temperature";
-static const char WCT_LONGNAME[]
-    = "Windchill temperature describes the fact that low temperatures are felt "
-      "to be even lower in case of wind. It is based on the rate of heat loss "
-      "from exposed skin caused by wind and cold. It is calculated according "
-      "to the empirical formula: 33 + (T - 33) * (0.478 + 0.237 * ( "
-      "SQRTMN(ff*3.6) - 0.0124 * ff * 3.6)) with T  = air temperature in "
-      "degree Celsius, ff = 10 m wind speed in m/s. Windchill temperature is "
-      "only defined for temperatures at or below 33 degree Celsius and wind "
-      "speeds above 1.39 m/s. It is mainly used for freezing temperatures.";
+static const char WCT_LONGNAME[] = "Windchill temperature describes the fact that low temperatures are felt "
+                                   "to be even lower in case of wind. It is based on the rate of heat loss "
+                                   "from exposed skin caused by wind and cold. It is calculated according "
+                                   "to the empirical formula: 33 + (T - 33) * (0.478 + 0.237 * ( "
+                                   "SQRTMN(ff*3.6) - 0.0124 * ff * 3.6)) with T  = air temperature in "
+                                   "degree Celsius, ff = 10 m wind speed in m/s. Windchill temperature is "
+                                   "only defined for temperatures at or below 33 degree Celsius and wind "
+                                   "speeds above 1.39 m/s. It is mainly used for freezing temperatures.";
 static const char WCT_UNITS[] = "Celsius";
 
 static const int FIRST_VAR = 0;
@@ -46,17 +45,11 @@ windchillTemperature(double t, double ff, double missval)
   static const double tmax = 33.0;
   static const double vmin = 1.39; /* minimum wind speed (m/s) */
 
-  return ff < vmin || t > tmax
-             ? missval
-             : tmax
-                   + (t - tmax)
-                         * (0.478
-                            + 0.237 * (sqrt(ff * 3.6) - 0.0124 * ff * 3.6));
+  return ff < vmin || t > tmax ? missval : tmax + (t - tmax) * (0.478 + 0.237 * (sqrt(ff * 3.6) - 0.0124 * ff * 3.6));
 }
 
 static void
-farexpr(field_type *field1, field_type field2,
-        double (*expression)(double, double, double))
+farexpr(field_type *field1, field_type field2, double (*expression)(double, double, double))
 {
   size_t i, len;
   const int grid1 = field1->grid;
@@ -69,14 +62,12 @@ farexpr(field_type *field1, field_type field2,
   const double *array2 = field2.ptr;
 
   len = gridInqSize(grid1);
-  if (len != gridInqSize(grid2))
-    cdoAbort("Fields have different gridsize (%s)", __func__);
+  if (len != gridInqSize(grid2)) cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (nmiss1 > 0 || nmiss2 > 0)
     {
       for (i = 0; i < len; i++)
-        if (DBL_IS_EQUAL(array1[i], missval1)
-            || DBL_IS_EQUAL(array2[i], missval2))
+        if (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2))
           array1[i] = missval1;
         else
           array1[i] = expression(array1[i], array2[i], missval1);
@@ -119,9 +110,7 @@ Wct(void *process)
   field1.ptr = (double *) Malloc(gridsize * sizeof(double));
   field2.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  if (cdoVerbose)
-    cdoPrint("Number of timesteps: file1 %d, file2 %d", vlistNtsteps(vlistID1),
-             vlistNtsteps(vlistID2));
+  if (cdoVerbose) cdoPrint("Number of timesteps: file1 %d, file2 %d", vlistNtsteps(vlistID1), vlistNtsteps(vlistID2));
 
   int vlistID3 = vlistCreate();
   int gridID = vlistInqVarGrid(vlistID1, FIRST_VAR);
@@ -147,8 +136,7 @@ Wct(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
-      if (nrecs2 == 0)
-        cdoAbort("Input streams have different number of timesteps!");
+      if (nrecs2 == 0) cdoAbort("Input streams have different number of timesteps!");
 
       taxisCopyTimestep(taxisID3, taxisID1);
       pstreamDefTimestep(streamID3, tsID);
@@ -163,8 +151,7 @@ Wct(void *process)
           pstreamReadRecord(streamID2, field2.ptr, &nmiss);
           field2.nmiss = nmiss;
 
-          if (varID1 != varID2 || levelID1 != levelID2)
-            cdoAbort("Input streams have different structure!");
+          if (varID1 != varID2 || levelID1 != levelID2) cdoAbort("Input streams have different structure!");
 
           if (varID1 != FIRST_VAR) continue;
 

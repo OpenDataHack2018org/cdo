@@ -91,8 +91,7 @@ Timsort(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           gridID = vlistInqVarGrid(vlistID1, varID);
           size_t gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
         }
@@ -102,8 +101,7 @@ Timsort(void *process)
 
   int nts = tsID;
 
-  double **sarray
-      = (double **) Malloc(Threading::ompNumThreads * sizeof(double *));
+  double **sarray = (double **) Malloc(Threading::ompNumThreads * sizeof(double *));
   for (int i = 0; i < Threading::ompNumThreads; i++)
     sarray[i] = (double *) Malloc(nts * sizeof(double));
 
@@ -117,8 +115,7 @@ Timsort(void *process)
       for (levelID = 0; levelID < nlevel; levelID++)
         {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(gridsize, nts, sarray, vars, varID, levelID)
+#pragma omp parallel for default(none) shared(gridsize, nts, sarray, vars, varID, levelID)
 #endif
           for (size_t i = 0; i < gridsize; i++)
             {
@@ -155,8 +152,7 @@ Timsort(void *process)
                 {
                   nmiss = vars[tsID][varID][levelID].nmiss;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr,
-                                     nmiss);
+                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
                 }
             }
         }

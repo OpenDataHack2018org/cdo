@@ -44,22 +44,19 @@
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 static void
-scale_eigvec_grid(double *restrict out, int tsID, size_t npack,
-                  const size_t *restrict pack, const double *restrict weight,
-                  double **covar, double sum_w)
+scale_eigvec_grid(double *restrict out, int tsID, size_t npack, const size_t *restrict pack,
+                  const double *restrict weight, double **covar, double sum_w)
 {
   for (size_t i = 0; i < npack; ++i)
     out[pack[i]] = covar[tsID][i] / sqrt(weight[pack[i]] / sum_w);
 }
 
 static void
-scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack,
-                  const size_t *restrict pack, const double *restrict weight,
-                  double **covar, double **data, double missval, double sum_w)
+scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack, const size_t *restrict pack,
+                  const double *restrict weight, double **covar, double **data, double missval, double sum_w)
 {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(npack, nts, tsID, pack, data, covar, out)
+#pragma omp parallel for default(none) shared(npack, nts, tsID, pack, data, covar, out)
 #endif
   for (size_t i = 0; i < npack; ++i)
     {
@@ -81,8 +78,7 @@ scale_eigvec_time(double *restrict out, int tsID, int nts, size_t npack,
   double sum = 0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) reduction(+:sum)	\
-  shared(out,weight,pack,npack)
+#pragma omp parallel for default(none) reduction(+ : sum) shared(out, weight, pack, npack)
 #endif
   for (size_t i = 0; i < npack; ++i)
     {
@@ -126,22 +122,19 @@ get_eigenmode(void)
           cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. "
                      "Available options are",
                      envstr);
-          cdoWarning(
-              "  - 'jacobi' for a one-sided parallelized jacobi algorithm");
+          cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
           cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
         }
     }
 
   if (cdoVerbose)
-    cdoPrint("Using CDO_SVD_MODE '%s' from %s",
-             eigen_mode == JACOBI ? "jacobi" : "danielson_lanczos",
+    cdoPrint("Using CDO_SVD_MODE '%s' from %s", eigen_mode == JACOBI ? "jacobi" : "danielson_lanczos",
              envstr ? "Environment" : " default");
 
 #ifdef _OPENMP
   if (omp_get_max_threads() > 1 && eigen_mode == DANIELSON_LANCZOS)
     {
-      cdoWarning("Requested parallel computation with %i Threads ",
-                 omp_get_max_threads());
+      cdoWarning("Requested parallel computation with %i Threads ", omp_get_max_threads());
       cdoWarning("  but environmental setting CDO_SVD_MODE causes sequential ");
       cdoWarning("  Singular value decomposition");
     }
@@ -169,8 +162,7 @@ get_weightmode(void)
     }
 
   if (cdoVerbose)
-    cdoPrint("Using CDO_WEIGHT_MODE '%s' from %s",
-             weight_mode == WEIGHT_OFF ? "off" : "on",
+    cdoPrint("Using CDO_WEIGHT_MODE '%s' from %s", weight_mode == WEIGHT_OFF ? "off" : "on",
              envstr ? "Environment" : " default");
 
   return weight_mode;
@@ -239,8 +231,7 @@ EOFs(void *process)
 
   int ngrids = vlistNgrids(vlistID1);
   for (int index = 1; index < ngrids; index++)
-    if (vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
-      cdoAbort("Too many different grids!");
+    if (vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index)) cdoAbort("Too many different grids!");
 
   /* eigenvalues */
 
@@ -302,8 +293,7 @@ EOFs(void *process)
     }
   else if (grid_space)
     {
-      if (((double) gridsize) * gridsize > (double) SIZE_MAX)
-        cdoAbort("Grid space too large!");
+      if (((double) gridsize) * gridsize > (double) SIZE_MAX) cdoAbort("Grid space too large!");
 
       if ((size_t) n_eig > gridsize)
         {
@@ -357,16 +347,11 @@ EOFs(void *process)
           eofdata[varID][levelID].covar = NULL;
           eofdata[varID][levelID].data = NULL;
 
-          if (time_space)
-            eofdata[varID][levelID].data
-                = (double **) Malloc(nts * sizeof(double *));
+          if (time_space) eofdata[varID][levelID].data = (double **) Malloc(nts * sizeof(double *));
         }
     }
 
-  if (cdoVerbose)
-    cdoPrint(
-        "Allocated eigenvalue/eigenvector structures with nts=%d gridsize=%zu",
-        nts, gridsize);
+  if (cdoVerbose) cdoPrint("Allocated eigenvalue/eigenvector structures with nts=%d gridsize=%zu", nts, gridsize);
 
   double *covar_array = NULL;
   double **covar = NULL;
@@ -392,8 +377,7 @@ EOFs(void *process)
               npack = 0;
               for (size_t i = 0; i < gridsize; ++i)
                 {
-                  if (!DBL_IS_EQUAL(weight[i], 0.0)
-                      && !DBL_IS_EQUAL(weight[i], missval)
+                  if (!DBL_IS_EQUAL(weight[i], 0.0) && !DBL_IS_EQUAL(weight[i], missval)
                       && !DBL_IS_EQUAL(in[i], missval))
                     {
                       pack[npack] = i;
@@ -412,9 +396,7 @@ EOFs(void *process)
           size_t ipack = 0;
           for (size_t i = 0; i < gridsize; ++i)
             {
-              if (!DBL_IS_EQUAL(weight[i], 0.0)
-                  && !DBL_IS_EQUAL(weight[i], missval)
-                  && !DBL_IS_EQUAL(in[i], missval))
+              if (!DBL_IS_EQUAL(weight[i], 0.0) && !DBL_IS_EQUAL(weight[i], missval) && !DBL_IS_EQUAL(in[i], missval))
                 {
                   if (pack[ipack] != i) cdoAbort("Missing values unsupported!");
                   ipack++;
@@ -427,8 +409,7 @@ EOFs(void *process)
               if (!eofdata[varID][levelID].init)
                 {
                   n = npack;
-                  double *covar_array
-                      = (double *) Malloc(npack * npack * sizeof(double));
+                  double *covar_array = (double *) Malloc(npack * npack * sizeof(double));
                   covar = (double **) Malloc(npack * sizeof(double *));
                   for (size_t i = 0; i < npack; ++i)
                     covar[i] = covar_array + npack * i;
@@ -575,11 +556,9 @@ EOFs(void *process)
                               else
                                 {
                                   j = pack[jpack];
-                                  covar[ipack][jpack]
-                                      = covar[ipack][jpack] *  // covariance
-                                        sqrt(weight[i]) * sqrt(weight[j])
-                                        / sum_w /  // weights
-                                        nts;  // number of data contributing
+                                  covar[ipack][jpack] = covar[ipack][jpack] *                        // covariance
+                                                        sqrt(weight[i]) * sqrt(weight[j]) / sum_w /  // weights
+                                                        nts;  // number of data contributing
                                 }
                             }
                         }
@@ -591,8 +570,7 @@ EOFs(void *process)
                                  "npack=%zu",
                                  nts, nts, npack);
 
-                      covar_array
-                          = (double *) Malloc(nts * nts * sizeof(double));
+                      covar_array = (double *) Malloc(nts * nts * sizeof(double));
                       covar = (double **) Malloc(nts * sizeof(double *));
                       for (int i = 0; i < nts; ++i)
                         covar[i] = covar_array + nts * i;
@@ -620,10 +598,7 @@ EOFs(void *process)
                             }
                         }
 
-                      if (cdoVerbose)
-                        cdoPrint(
-                            "finished calculation of covar-matrix for var %s",
-                            vname);
+                      if (cdoVerbose) cdoPrint("finished calculation of covar-matrix for var %s", vname);
                     }
 
                   if (cdoTimer) timer_stop(timer_cov);
@@ -634,11 +609,9 @@ EOFs(void *process)
                   if (eigen_mode == JACOBI)
                     // TODO: use return status (>0 okay, -1 did not converge at
                     // all)
-                    parallel_eigen_solution_of_symmetric_matrix(covar, eig_val,
-                                                                n, __func__);
+                    parallel_eigen_solution_of_symmetric_matrix(covar, eig_val, n, __func__);
                   else
-                    eigen_solution_of_symmetric_matrix(covar, eig_val, n,
-                                                       __func__);
+                    eigen_solution_of_symmetric_matrix(covar, eig_val, n, __func__);
 
                   if (cdoTimer) timer_stop(timer_eig);
                   /* NOW: covar contains the eigenvectors, eig_val the
@@ -658,11 +631,9 @@ EOFs(void *process)
               if (tsID < n_eig)
                 {
                   if (grid_space)
-                    scale_eigvec_grid(out, tsID, npack, pack, weight, covar,
-                                      sum_w);
+                    scale_eigvec_grid(out, tsID, npack, pack, weight, covar, sum_w);
                   else if (time_space)
-                    scale_eigvec_time(out, tsID, nts, npack, pack, weight,
-                                      covar, data, missval, sum_w);
+                    scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, data, missval, sum_w);
 
                   nmiss = arrayNumMV(gridsize, out, missval);
                   pstreamDefRecord(streamID3, varID, levelID);
@@ -683,17 +654,13 @@ EOFs(void *process)
 
       for (levelID = 0; levelID < nlevs; levelID++)
         {
-          if (eofdata[varID][levelID].eig_val)
-            Free(eofdata[varID][levelID].eig_val);
-          if (eofdata[varID][levelID].covar_array)
-            Free(eofdata[varID][levelID].covar_array);
-          if (eofdata[varID][levelID].covar)
-            Free(eofdata[varID][levelID].covar);
+          if (eofdata[varID][levelID].eig_val) Free(eofdata[varID][levelID].eig_val);
+          if (eofdata[varID][levelID].covar_array) Free(eofdata[varID][levelID].covar_array);
+          if (eofdata[varID][levelID].covar) Free(eofdata[varID][levelID].covar);
           if (time_space && eofdata[varID][levelID].data)
             {
               for (tsID = 0; tsID < nts; tsID++)
-                if (eofdata[varID][levelID].data[tsID])
-                  Free(eofdata[varID][levelID].data[tsID]);
+                if (eofdata[varID][levelID].data[tsID]) Free(eofdata[varID][levelID].data[tsID]);
               Free(eofdata[varID][levelID].data);
             }
         }

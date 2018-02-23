@@ -30,8 +30,7 @@
 #include "listarray.h"
 
 static double
-vert_interp_lev_kernel(double w1, double w2, double var1L1, double var1L2,
-                       double missval)
+vert_interp_lev_kernel(double w1, double w2, double var1L1, double var1L2, double missval)
 {
   double var2 = missval;
 
@@ -59,9 +58,8 @@ vert_interp_lev_kernel(double w1, double w2, double var1L1, double var1L2,
 }
 
 static void
-vert_interp_lev(size_t gridsize, double missval, double *vardata1,
-                double *vardata2, int nlev2, int *lev_idx1, int *lev_idx2,
-                double *lev_wgt1, double *lev_wgt2)
+vert_interp_lev(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1,
+                int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   for (int ilev = 0; ilev < nlev2; ++ilev)
     {
@@ -78,13 +76,11 @@ vert_interp_lev(size_t gridsize, double missval, double *vardata1,
       double *var1L2 = vardata1 + gridsize * idx2;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval)
+#pragma omp parallel for default(none) shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval)
 #endif
       for (size_t i = 0; i < gridsize; ++i)
         {
-          var2[i] = vert_interp_lev_kernel(wgt1, wgt2, var1L1[i], var1L2[i],
-                                           missval);
+          var2[i] = vert_interp_lev_kernel(wgt1, wgt2, var1L1[i], var1L2[i], missval);
         }
     }
 }
@@ -93,9 +89,8 @@ vert_interp_lev(size_t gridsize, double missval, double *vardata1,
  * 3d vertical interpolation routine (see vert_interp_lev() in src/Intlevel.cc)
  */
 void
-vert_interp_lev3d(size_t gridsize, double missval, double *vardata1,
-                  double *vardata2, int nlev2, int *lev_idx1, int *lev_idx2,
-                  double *lev_wgt1, double *lev_wgt2)
+vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *vardata2, int nlev2, int *lev_idx1,
+                  int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   for (int ilev = 0; ilev < nlev2; ilev++)
     {
@@ -103,9 +98,8 @@ vert_interp_lev3d(size_t gridsize, double missval, double *vardata1,
       double *var2 = vardata2 + offset;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none)                                     \
-    shared(offset, gridsize, vardata1, var2, lev_idx1, lev_idx2, lev_wgt1, \
-           lev_wgt2, missval)
+#pragma omp parallel for default(none) \
+    shared(offset, gridsize, vardata1, var2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2, missval)
 #endif
       for (size_t i = 0; i < gridsize; i++)
         {
@@ -129,9 +123,8 @@ vert_interp_lev3d(size_t gridsize, double missval, double *vardata1,
 }
 
 void
-vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
-                 int *lev_idx1, int *lev_idx2, double *lev_wgt1,
-                 double *lev_wgt2)
+vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2, int *lev_idx1, int *lev_idx2,
+                 double *lev_wgt1, double *lev_wgt2)
 {
   int i1;
   int idx1 = 0, idx2 = 0;
@@ -197,9 +190,8 @@ vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
 }
 
 static void
-vert_gen_weights3d1d(bool expol, int nlev1, size_t gridsize, double *xlev1,
-                     int nlev2, double *lev2, int *xlev_idx1, int *xlev_idx2,
-                     double *xlev_wgt1, double *xlev_wgt2)
+vert_gen_weights3d1d(bool expol, int nlev1, size_t gridsize, double *xlev1, int nlev2, double *lev2, int *xlev_idx1,
+                     int *xlev_idx2, double *xlev_wgt1, double *xlev_wgt2)
 {
   std::vector<double> lev1(nlev1);
   std::vector<int> lev_idx1(nlev2);
@@ -212,8 +204,7 @@ vert_gen_weights3d1d(bool expol, int nlev1, size_t gridsize, double *xlev1,
       for (int k = 0; k < nlev1; ++k)
         lev1[k] = xlev1[k * gridsize + i];
 
-      vert_gen_weights(expol, nlev1, &lev1[0], nlev2, &lev2[0], &lev_idx1[0],
-                       &lev_idx2[0], &lev_wgt1[0], &lev_wgt2[0]);
+      vert_gen_weights(expol, nlev1, &lev1[0], nlev2, &lev2[0], &lev_idx1[0], &lev_idx2[0], &lev_wgt1[0], &lev_wgt2[0]);
 
       for (int k = 0; k < nlev2; ++k)
         xlev_idx1[k * gridsize + i] = lev_idx1[k] * gridsize + i;
@@ -387,8 +378,7 @@ Intlevel(void *process)
         {
           int zaxisID = vlistZaxis(vlistID1, i);
           nlevel = zaxisInqSize(zaxisID);
-          if (zaxisInqType(zaxisID) != ZAXIS_HYBRID
-              && zaxisInqType(zaxisID) != ZAXIS_HYBRID_HALF)
+          if (zaxisInqType(zaxisID) != ZAXIS_HYBRID && zaxisInqType(zaxisID) != ZAXIS_HYBRID_HALF)
             if (nlevel > 1)
               {
                 zaxisID1 = zaxisID;
@@ -441,8 +431,7 @@ Intlevel(void *process)
   zaxisDefLevels(zaxisID2, lev2);
   int nzaxis = vlistNzaxis(vlistID1);
   for (int i = 0; i < nzaxis; i++)
-    if (zaxisID1 == vlistZaxis(vlistID1, i))
-      vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
+    if (zaxisID1 == vlistZaxis(vlistID1, i)) vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 
   int *lev_idx1 = (int *) Malloc(wisize * sizeof(int));
   int *lev_idx2 = (int *) Malloc(wisize * sizeof(int));
@@ -473,8 +462,7 @@ Intlevel(void *process)
       if (zaxisID == zaxisID1)
         {
           varinterp[varID] = true;
-          vardata2[varID]
-              = (double *) Malloc(gridsize * nlev2 * sizeof(double));
+          vardata2[varID] = (double *) Malloc(gridsize * nlev2 * sizeof(double));
           varnmiss[varID] = (size_t *) Calloc(maxlev, sizeof(size_t));
         }
       else
@@ -513,18 +501,15 @@ Intlevel(void *process)
                 {
                   size_t offset1 = zvarGridsize * levelID;
                   size_t offset2 = zvarGridsize * (levelID + 1);
-                  arrayCopy(zvarGridsize, vardata1[zvarID] + offset1,
-                            lev1 + offset2);
+                  arrayCopy(zvarGridsize, vardata1[zvarID] + offset1, lev1 + offset2);
                 }
 
               vert_init_level_0_and_N(nlev1, zvarGridsize, lev1);
-              vert_gen_weights3d1d(expol, nlev1 + 2, zvarGridsize, lev1, nlev2,
-                                   lev2, lev_idx1, lev_idx2, lev_wgt1,
+              vert_gen_weights3d1d(expol, nlev1 + 2, zvarGridsize, lev1, nlev2, lev2, lev_idx1, lev_idx2, lev_wgt1,
                                    lev_wgt2);
             }
           else
-            vert_gen_weights(expol, nlev1 + 2, lev1, nlev2, lev2, lev_idx1,
-                             lev_idx2, lev_wgt1, lev_wgt2);
+            vert_gen_weights(expol, nlev1 + 2, lev1, nlev2, lev2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
         }
 
       for (varID = 0; varID < nvars; varID++)
@@ -536,20 +521,17 @@ Intlevel(void *process)
               size_t gridsize = gridInqSize(gridID);
 
               if (zvarname)
-                vert_interp_lev3d(gridsize, missval, vardata1[varID],
-                                  vardata2[varID], nlev2, lev_idx1, lev_idx2,
+                vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2,
                                   lev_wgt1, lev_wgt2);
               else
-                vert_interp_lev(gridsize, missval, vardata1[varID],
-                                vardata2[varID], nlev2, lev_idx1, lev_idx2,
+                vert_interp_lev(gridsize, missval, vardata1[varID], vardata2[varID], nlev2, lev_idx1, lev_idx2,
                                 lev_wgt1, lev_wgt2);
 
               for (levelID = 0; levelID < nlev2; levelID++)
                 {
                   size_t offset = gridsize * levelID;
                   double *single2 = vardata2[varID] + offset;
-                  varnmiss[varID][levelID]
-                      = arrayNumMV(gridsize, single2, missval);
+                  varnmiss[varID][levelID] = arrayNumMV(gridsize, single2, missval);
                 }
             }
         }
@@ -565,8 +547,7 @@ Intlevel(void *process)
                   size_t offset = gridsize * levelID;
                   double *single2 = vardata2[varID] + offset;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, single2,
-                                     varnmiss[varID][levelID]);
+                  pstreamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
                 }
             }
         }

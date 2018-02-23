@@ -74,8 +74,7 @@ CdoStartMessage()
   std::stringstream message;
   outfile_stream.open(outfile, std::fstream::in | std::fstream::app);
 
-  message << std::string(padding_width, ' ')
-          << "  == CDO Start ==" << std::endl;
+  message << std::string(padding_width, ' ') << "  == CDO Start ==" << std::endl;
   printMessage(message);
 }
 void
@@ -121,7 +120,7 @@ printMessage(std::stringstream &p_message, bool printToBoth)
       std::cout << p_message.str();
     }
 }
-}
+}  // namespace CdoDebug
 namespace CdoLog
 {
 void
@@ -129,4 +128,4 @@ StdOut(std::stringstream &p_message)
 {
   std::cout << p_message.str();
 }
-}
+}  // namespace CdoLog

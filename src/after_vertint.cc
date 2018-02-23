@@ -31,8 +31,7 @@
 int Mars = 0;
 
 void
-height2pressure(double *restrict phlev, const double *restrict hlev,
-                long nphlev)
+height2pressure(double *restrict phlev, const double *restrict hlev, long nphlev)
 {
   double exp_arg;
   double height;
@@ -62,8 +61,8 @@ pressure2height(double *restrict hlev, const double *restrict plev, long nphlev)
 }
 
 void
-presh(double *restrict fullp, double *halfp, const double *restrict vct,
-      const double *restrict ps, long nhlev, long ngp)
+presh(double *restrict fullp, double *halfp, const double *restrict vct, const double *restrict ps, long nhlev,
+      long ngp)
 {
   if (ps == NULL)
     {
@@ -91,14 +90,12 @@ presh(double *restrict fullp, double *halfp, const double *restrict vct,
 }
 
 void
-genind(int *nx, const double *restrict plev, const double *restrict fullp,
-       long ngp, long nplev, long nhlev)
+genind(int *nx, const double *restrict plev, const double *restrict fullp, long ngp, long nplev, long nhlev)
 {
   arrayFill(ngp * nplev, nx, 0);
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(nx, plev, fullp, ngp, nplev, nhlev)
+#pragma omp parallel for default(none) shared(nx, plev, fullp, ngp, nplev, nhlev)
 #endif
   for (long lp = 0; lp < nplev; lp++)
     {
@@ -116,12 +113,11 @@ genind(int *nx, const double *restrict plev, const double *restrict fullp,
 }
 
 void
-genindmiss(int *nx, const double *restrict plev, int ngp, int nplev,
-           const double *restrict ps_prog, size_t *restrict pnmiss)
+genindmiss(int *nx, const double *restrict plev, int ngp, int nplev, const double *restrict ps_prog,
+           size_t *restrict pnmiss)
 {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(nx, plev, ngp, nplev, ps_prog, pnmiss)
+#pragma omp parallel for default(none) shared(nx, plev, ngp, nplev, ps_prog, pnmiss)
 #endif
   for (long lp = 0; lp < nplev; lp++)
     {
@@ -141,8 +137,7 @@ genindmiss(int *nx, const double *restrict plev, int ngp, int nplev,
 } /* genindmiss */
 
 void
-extra_P(double *restrict slp, const double *restrict halfp,
-        const double *restrict fullp, const double *restrict geop,
+extra_P(double *restrict slp, const double *restrict halfp, const double *restrict fullp, const double *restrict geop,
         const double *restrict temp, long ngp)
 {
   double alpha, tstar, tmsl, zprt, zprtal;
@@ -212,8 +207,7 @@ extra_T(double pres, double halfp, double fullp, double geop, double temp)
       if (zhts > 2000. && z1 > 298.)
         {
           ztmsl = 298.;
-          if (zhts < 2500.)
-            ztmsl = 0.002 * ((2500. - zhts) * z1 + (zhts - 2000.) * ztmsl);
+          if (zhts < 2500.) ztmsl = 0.002 * ((2500. - zhts) * z1 + (zhts - 2000.) * ztmsl);
         }
 
       double zalph;
@@ -225,8 +219,7 @@ extra_T(double pres, double halfp, double fullp, double geop, double temp)
         zalph = PlanetRD * zlapse * zrg;
 
       double zalp = zalph * log(pres / halfp);
-      peval
-          = tstar * (1.0 + zalp * (1.0 + zalp * (0.5 + 0.16666666667 * zalp)));
+      peval = tstar * (1.0 + zalp * (1.0 + zalp * (0.5 + 0.16666666667 * zalp)));
     }
 
   return peval;
@@ -261,20 +254,15 @@ extra_Z(double pres, double halfp, double fullp, double geop, double temp)
   const double zalp = log(pres / halfp);
   const double zalpal = zalp * alpha;
 
-  return (geop
-          - PlanetRD * tstar * zalp * (1.0 + zalpal * (0.5 + zalpal / 6.0)))
-         * zrg;
+  return (geop - PlanetRD * tstar * zalp * (1.0 + zalpal * (0.5 + zalpal / 6.0))) * zrg;
 } /* extra_Z */
 
 void
-interp_X(const double *restrict gt, double *pt,
-         const double *restrict hyb_press, const int *nx,
-         const double *restrict plev, long nplev, long ngp, long nhlev,
-         double missval)
+interp_X(const double *restrict gt, double *pt, const double *restrict hyb_press, const int *nx,
+         const double *restrict plev, long nplev, long ngp, long nhlev, double missval)
 {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(gt, pt, hyb_press, nx, plev, nplev, ngp, nhlev, missval)
+#pragma omp parallel for default(none) shared(gt, pt, hyb_press, nx, plev, nplev, ngp, nhlev, missval)
 #endif
   for (long lp = 0; lp < nplev; lp++)
     {
@@ -292,23 +280,19 @@ interp_X(const double *restrict gt, double *pt,
               nh = nl + ngp;
               ptl[i] = (nh >= ngp * nhlev)
                            ? gt[nl]
-                           : gt[nl]
-                                 + (pres - hyb_press[nl]) * (gt[nh] - gt[nl])
-                                       / (hyb_press[nh] - hyb_press[nl]);
+                           : gt[nl] + (pres - hyb_press[nl]) * (gt[nh] - gt[nl]) / (hyb_press[nh] - hyb_press[nl]);
             }
         }
     }
 } /* interp_X */
 
 void
-interp_T(const double *restrict geop, const double *restrict gt, double *pt,
-         const double *restrict fullp, const double *restrict halfp,
-         const int *nx, const double *restrict plev, long nplev, long ngp,
-         long nhlev, double missval)
+interp_T(const double *restrict geop, const double *restrict gt, double *pt, const double *restrict fullp,
+         const double *restrict halfp, const int *nx, const double *restrict plev, long nplev, long ngp, long nhlev,
+         double missval)
 {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared( \
-    geop, gt, pt, fullp, halfp, nx, plev, nplev, ngp, nhlev, missval, Mars)
+#pragma omp parallel for default(none) shared(geop, gt, pt, fullp, halfp, nx, plev, nplev, ngp, nhlev, missval, Mars)
 #endif
   for (long lp = 0; lp < nplev; lp++)
     {
@@ -334,16 +318,14 @@ interp_T(const double *restrict geop, const double *restrict gt, double *pt,
 #if defined(SX)
 #pragma cdir inline
 #endif
-                    ptl[i] = extra_T(pres, halfp[nhlev * ngp + i],
-                                     fullp[(nhlev - 1) * ngp + i], geop[i],
+                    ptl[i] = extra_T(pres, halfp[nhlev * ngp + i], fullp[(nhlev - 1) * ngp + i], geop[i],
                                      gt[(nhlev - 1) * ngp + i]);
                 }
               else
                 {
                   nh = nl + 1;
                   ptl[i] = gt[nl * ngp + i]
-                           + (pres - fullp[nl * ngp + i])
-                                 * (gt[nh * ngp + i] - gt[nl * ngp + i])
+                           + (pres - fullp[nl * ngp + i]) * (gt[nh * ngp + i] - gt[nl * ngp + i])
                                  / (fullp[nh * ngp + i] - fullp[nl * ngp + i]);
                 }
             }
@@ -352,9 +334,8 @@ interp_T(const double *restrict geop, const double *restrict gt, double *pt,
 } /* interp_T */
 
 void
-interp_Z(const double *restrict geop, const double *restrict gz, double *pz,
-         const double *restrict fullp, const double *restrict halfp,
-         const int *nx, const double *restrict gt, const double *restrict plev,
+interp_Z(const double *restrict geop, const double *restrict gz, double *pz, const double *restrict fullp,
+         const double *restrict halfp, const int *nx, const double *restrict gt, const double *restrict plev,
          long nplev, long ngp, long nhlev, double missval)
 {
   assert(geop != NULL);
@@ -364,9 +345,8 @@ interp_Z(const double *restrict geop, const double *restrict gz, double *pz,
   assert(halfp != NULL);
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none)                                  \
-    shared(geop, gz, pz, fullp, halfp, nx, gt, plev, nplev, ngp, nhlev, \
-           missval, Mars)
+#pragma omp parallel for default(none) \
+    shared(geop, gz, pz, fullp, halfp, nx, gt, plev, nplev, ngp, nhlev, missval, Mars)
 #endif
   for (long lp = 0; lp < nplev; lp++)
     {
@@ -394,16 +374,14 @@ interp_Z(const double *restrict geop, const double *restrict gz, double *pz,
 #if defined(SX)
 #pragma cdir inline
 #endif
-                    pzl[i] = extra_Z(pres, halfp[nhlev * ngp + i],
-                                     fullp[(nhlev - 1) * ngp + i], geop[i],
+                    pzl[i] = extra_Z(pres, halfp[nhlev * ngp + i], fullp[(nhlev - 1) * ngp + i], geop[i],
                                      gt[(nhlev - 1) * ngp + i]);
                 }
               else
                 {
                   nh = nl + 1;
                   pzl[i] = gz[nl * ngp + i]
-                           + (pres - halfp[nl * ngp + i])
-                                 * (gz[nh * ngp + i] - gz[nl * ngp + i])
+                           + (pres - halfp[nl * ngp + i]) * (gz[nh * ngp + i] - gz[nl * ngp + i])
                                  / (halfp[nh * ngp + i] - halfp[nl * ngp + i]);
                 }
             }

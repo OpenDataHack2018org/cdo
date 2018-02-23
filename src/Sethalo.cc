@@ -79,28 +79,18 @@ gentpngrid(int gridID1)
             {
               for (ilon = 0; ilon < nlon1; ilon++)
                 {
-                  xvals2[(ilat + 2) * nlon1 + ilon]
-                      = xvals1[ilat * nlon1 + ilon];
-                  yvals2[(ilat + 2) * nlon1 + ilon]
-                      = yvals1[ilat * nlon1 + ilon];
+                  xvals2[(ilat + 2) * nlon1 + ilon] = xvals1[ilat * nlon1 + ilon];
+                  yvals2[(ilat + 2) * nlon1 + ilon] = yvals1[ilat * nlon1 + ilon];
                 }
             }
 
           for (ilon = 0; ilon < nlon1; ilon++)
             {
               ilonr = nlon1 - ilon - 1;
-              xvals2[1 * nlon1 + ilon]
-                  = xvals2[2 * nlon1
-                           + ilonr]; /* syncronise line 2 with line 3 */
-              xvals2[0 * nlon1 + ilon]
-                  = xvals2[3 * nlon1
-                           + ilonr]; /* syncronise line 1 with line 4 */
-              yvals2[1 * nlon1 + ilon]
-                  = yvals2[2 * nlon1
-                           + ilonr]; /* syncronise line 2 with line 3 */
-              yvals2[0 * nlon1 + ilon]
-                  = yvals2[3 * nlon1
-                           + ilonr]; /* syncronise line 1 with line 4 */
+              xvals2[1 * nlon1 + ilon] = xvals2[2 * nlon1 + ilonr]; /* syncronise line 2 with line 3 */
+              xvals2[0 * nlon1 + ilon] = xvals2[3 * nlon1 + ilonr]; /* syncronise line 1 with line 4 */
+              yvals2[1 * nlon1 + ilon] = yvals2[2 * nlon1 + ilonr]; /* syncronise line 2 with line 3 */
+              yvals2[0 * nlon1 + ilon] = yvals2[3 * nlon1 + ilonr]; /* syncronise line 1 with line 4 */
             }
 
           gridDefXvals(gridID2, xvals2);
@@ -133,10 +123,8 @@ gentpngrid(int gridID1)
                 {
                   for (ilon = 0; ilon < 4 * nlon1; ilon++)
                     {
-                      xbounds2[4 * (ilat + 2) * nlon1 + ilon]
-                          = xbounds1[4 * ilat * nlon1 + ilon];
-                      ybounds2[4 * (ilat + 2) * nlon1 + ilon]
-                          = ybounds1[4 * ilat * nlon1 + ilon];
+                      xbounds2[4 * (ilat + 2) * nlon1 + ilon] = xbounds1[4 * ilat * nlon1 + ilon];
+                      ybounds2[4 * (ilat + 2) * nlon1 + ilon] = ybounds1[4 * ilat * nlon1 + ilon];
                     }
                 }
 
@@ -146,14 +134,10 @@ gentpngrid(int gridID1)
                   for (k = 0; k < 4; ++k)
                     {
                       kr = 3 - k;
-                      xbounds2[4 * 1 * nlon1 + 4 * ilon + k]
-                          = xbounds2[4 * 2 * nlon1 + 4 * ilonr + kr];
-                      xbounds2[4 * 0 * nlon1 + 4 * ilon + k]
-                          = xbounds2[4 * 3 * nlon1 + 4 * ilonr + kr];
-                      ybounds2[4 * 1 * nlon1 + 4 * ilon + k]
-                          = ybounds2[4 * 2 * nlon1 + 4 * ilonr + kr];
-                      ybounds2[4 * 0 * nlon1 + 4 * ilon + k]
-                          = ybounds2[4 * 3 * nlon1 + 4 * ilonr + kr];
+                      xbounds2[4 * 1 * nlon1 + 4 * ilon + k] = xbounds2[4 * 2 * nlon1 + 4 * ilonr + kr];
+                      xbounds2[4 * 0 * nlon1 + 4 * ilon + k] = xbounds2[4 * 3 * nlon1 + 4 * ilonr + kr];
+                      ybounds2[4 * 1 * nlon1 + 4 * ilon + k] = ybounds2[4 * 2 * nlon1 + 4 * ilonr + kr];
+                      ybounds2[4 * 0 * nlon1 + 4 * ilon + k] = ybounds2[4 * 3 * nlon1 + 4 * ilonr + kr];
                     }
                 }
               /*
@@ -455,10 +439,8 @@ tpnhalo(double *array1, int gridID1, double *array2)
   for (size_t ilon = 0; ilon < nlon; ilon++)
     {
       size_t ilonr = nlon - ilon - 1;
-      array2[1 * nlon + ilon]
-          = array2[2 * nlon + ilonr]; /* syncronise line 2 with line 3 */
-      array2[0 * nlon + ilon]
-          = array2[3 * nlon + ilonr]; /* syncronise line 1 with line 4 */
+      array2[1 * nlon + ilon] = array2[2 * nlon + ilonr]; /* syncronise line 2 with line 3 */
+      array2[0 * nlon + ilon] = array2[3 * nlon + ilonr]; /* syncronise line 1 with line 4 */
     }
 }
 
@@ -497,9 +479,7 @@ Sethalo(void *process)
       gridtype = gridInqType(gridID1);
       if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN) break;
       if (gridtype == GRID_CURVILINEAR) break;
-      if (gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0
-          && gridInqYsize(gridID1) > 0)
-        break;
+      if (gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) break;
     }
 
   if (gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED)

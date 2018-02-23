@@ -68,8 +68,7 @@ Runpctl(void *process)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  field_type ***vars1
-      = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  field_type ***vars1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
   double *array = (double *) Malloc(ndates * sizeof(double));
 
   for (int its = 0; its < ndates; its++)
@@ -91,8 +90,7 @@ Runpctl(void *process)
             {
               recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst
-                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           pstreamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
@@ -125,8 +123,7 @@ Runpctl(void *process)
 
                   if (j > 0)
                     {
-                      vars1[0][varID][levelID].ptr[i]
-                          = percentile(array, j, pn);
+                      vars1[0][varID][levelID].ptr[i] = percentile(array, j, pn);
                     }
                   else
                     {
@@ -149,8 +146,7 @@ Runpctl(void *process)
           int levelID = recinfo[recID].levelID;
 
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, vars1[0][varID][levelID].ptr,
-                             vars1[0][varID][levelID].nmiss);
+          pstreamWriteRecord(streamID2, vars1[0][varID][levelID].ptr, vars1[0][varID][levelID].nmiss);
         }
 
       otsID++;
@@ -169,8 +165,7 @@ Runpctl(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, vars1[ndates - 1][varID][levelID].ptr,
-                            &nmiss);
+          pstreamReadRecord(streamID1, vars1[ndates - 1][varID][levelID].ptr, &nmiss);
           vars1[ndates - 1][varID][levelID].nmiss = nmiss;
         }
 

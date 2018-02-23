@@ -68,23 +68,20 @@ datatypestr(int datatype)
 }
 
 static void
-print_stat(const char *sinfo, int memtype, int datatype, int filetype,
-           off_t nvalues, double data_size, double file_size, double tw)
+print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size,
+           double file_size, double tw)
 {
   nvalues /= 1000000;
   data_size /= 1024. * 1024. * 1024.;
   if (memtype == MEMTYPE_FLOAT)
-    cdoPrint("%s Read %.1f GB of 32 bit floats from %s %s, %.1f MVal/s", sinfo,
-             data_size, datatypestr(datatype), filetypestr(filetype),
-             nvalues / tw);
+    cdoPrint("%s Read %.1f GB of 32 bit floats from %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype),
+             filetypestr(filetype), nvalues / tw);
   else
-    cdoPrint("%s Read %.1f GB of 64 bit floats from %s %s, %.1f MVal/s", sinfo,
-             data_size, datatypestr(datatype), filetypestr(filetype),
-             nvalues / tw);
+    cdoPrint("%s Read %.1f GB of 64 bit floats from %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype),
+             filetypestr(filetype), nvalues / tw);
 
   file_size /= 1024. * 1024. * 1024.;
-  cdoPrint("%s Read %.1f GB in %.1f seconds, total %.1f MB/s", sinfo, file_size,
-           tw, 1024 * file_size / tw);
+  cdoPrint("%s Read %.1f GB in %.1f seconds, total %.1f MB/s", sinfo, file_size, tw, 1024 * file_size / tw);
 }
 
 void *
@@ -136,8 +133,7 @@ CDIread(void *process)
       size_t gridsize = vlistGridsizeMax(vlistID);
 
       if (darray == NULL) darray = (double *) Malloc(gridsize * sizeof(double));
-      if (farray == NULL && memtype == MEMTYPE_FLOAT)
-        farray = (float *) Malloc(gridsize * sizeof(float));
+      if (farray == NULL && memtype == MEMTYPE_FLOAT) farray = (float *) Malloc(gridsize * sizeof(float));
 
       t0 = timer_val(timer_read);
 
@@ -185,13 +181,10 @@ CDIread(void *process)
 
       if (nruns > 1) snprintf(sinfo, sizeof(sinfo), "(run %d)", irun + 1);
 
-      print_stat(sinfo, memtype, datatype, filetype, nvalues, data_size,
-                 file_size, tw);
+      print_stat(sinfo, memtype, datatype, filetype, nvalues, data_size, file_size, tw);
     }
 
-  if (nruns > 1)
-    print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size,
-               file_size, twsum / nruns);
+  if (nruns > 1) print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size, file_size, twsum / nruns);
 
   if (darray) Free(darray);
   if (farray) Free(farray);

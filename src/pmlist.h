@@ -39,14 +39,10 @@ void free_kvlist(void *data);
 
 list_t *kvlist_new(const char *name);
 void kvlist_destroy(list_t *list);
-void kvlist_append(list_t *kvlist, const char *key, const char **values,
-                   int nvalues);
+void kvlist_append(list_t *kvlist, const char *key, const char **values, int nvalues);
 int kvlist_parse_cmdline(list_t *kvlist, int nparams, char **params);
 
-list_t *pmlist_search_kvlist_ventry(list_t *pmlist, const char *key,
-                                    const char *value, int nentry,
-                                    const char **entry);
-list_t *pmlist_get_kvlist_ventry(list_t *pmlist, int nentry,
-                                 const char **entry);
+list_t *pmlist_search_kvlist_ventry(list_t *pmlist, const char *key, const char *value, int nentry, const char **entry);
+list_t *pmlist_get_kvlist_ventry(list_t *pmlist, int nentry, const char **entry);
 
 #endif

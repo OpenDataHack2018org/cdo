@@ -21,8 +21,8 @@
 #include "griddes.h"
 #include "util_string.h"
 
-size_t genIcosphereCoords(int subdivisions, bool lbounds, double **xvals,
-                          double **yvals, double **xbounds, double **ybounds);
+size_t genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yvals, double **xbounds,
+                          double **ybounds);
 
 static void
 gen_grid_icosphere(griddes_t *grid, const char *pline)
@@ -75,8 +75,7 @@ gen_grid_icosphere(griddes_t *grid, const char *pline)
   grid->type = gridtype;
   if (lbounds) grid->nvertex = 3;
 
-  size_t ncells = genIcosphereCoords(b + 1, lbounds, &grid->xvals, &grid->yvals,
-                                     &grid->xbounds, &grid->ybounds);
+  size_t ncells = genIcosphereCoords(b + 1, lbounds, &grid->xvals, &grid->yvals, &grid->xbounds, &grid->ybounds);
   grid->xsize = ncells;
   grid->ysize = ncells;
   strcpy(grid->xname, "clon");
@@ -86,14 +85,12 @@ gen_grid_icosphere(griddes_t *grid, const char *pline)
 }
 
 static void
-gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1,
-                double lon2, double lat1, double lat2)
+gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
   int gridtype = GRID_LONLAT;
   bool lbounds = true;
 
-  if (*pline != 0 && (*pline == '+' || *pline == '-')
-      && (isdigit((int) *(pline + 1)) || ispunct((int) *(pline + 1))))
+  if (*pline != 0 && (*pline == '+' || *pline == '-') && (isdigit((int) *(pline + 1)) || ispunct((int) *(pline + 1))))
     {
       char *endptr = (char *) pline;
       double off = strtod(pline, &endptr);
@@ -158,8 +155,7 @@ gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1,
   grid->type = gridtype;
 
   if (lon1 >= lon2 || lat1 >= lat2)
-    cdoAbort("Invalid grid box: lon1=%g lon2=%g lat1=%g lat2=%g", lon1, lon2,
-             lat1, lat2);
+    cdoAbort("Invalid grid box: lon1=%g lon2=%g lat1=%g lat2=%g", lon1, lon2, lat1, lat2);
 
   size_t nlon = (size_t)((lon2 - lon1) / inc + 0.5);
   size_t nlat = (size_t)((lat2 - lat1) / inc + 0.5);
@@ -319,8 +315,7 @@ grid_from_name(const char *gridnameptr)
           grid.def_yfirst = true;
         }
     }
-  else if (gridname[0] == 'l' && gridname[1] == 'o'
-           && gridname[2] == 'n') /* lon=<LON>_lat=<LAT> */
+  else if (gridname[0] == 'l' && gridname[1] == 'o' && gridname[2] == 'n') /* lon=<LON>_lat=<LAT> */
     {
       /* only one gridpoint */
       pline = &gridname[3];
@@ -333,12 +328,10 @@ grid_from_name(const char *gridnameptr)
           grid.xvals = (double *) Malloc(sizeof(double));
           grid.yvals = (double *) Malloc(sizeof(double));
           grid.xvals[0] = atof(pline);
-          while (isdigit((int) *pline) || ispunct((int) *pline)
-                 || *pline == '-')
+          while (isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-')
             pline++;
           if (*pline == '_') pline++;
-          if (!(pline[0] == 'l' && pline[1] == 'a' && pline[2] == 't'))
-            return gridID;
+          if (!(pline[0] == 'l' && pline[1] == 'a' && pline[2] == 't')) return gridID;
           pline += 3;
           if (*pline == '=') pline++;
           if (isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-')
@@ -347,8 +340,7 @@ grid_from_name(const char *gridnameptr)
             return gridID;
         }
     }
-  else if (gridname[0] == 'g' && gridname[1] == 'm'
-           && gridname[2] == 'e') /* gme<NI> */
+  else if (gridname[0] == 'g' && gridname[1] == 'm' && gridname[2] == 'e') /* gme<NI> */
     {
       pline = &gridname[3];
       if (isdigit((int) *pline))
@@ -411,8 +403,7 @@ grid_from_name(const char *gridnameptr)
             }
         }
     }
-  else if (gridname[0] == 'g'
-           && isdigit(gridname[1])) /* g<LON>x<LAT> or g<SIZE> */
+  else if (gridname[0] == 'g' && isdigit(gridname[1])) /* g<LON>x<LAT> or g<SIZE> */
     {
       pline = &gridname[1];
       if (isdigit((int) *pline))

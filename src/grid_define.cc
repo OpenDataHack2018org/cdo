@@ -37,8 +37,7 @@ and V
 @EndFunction
 */
 int
-cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag,
-                           double *destagGridOffsets)
+cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagGridOffsets)
 {
   /* Example of horizontal grids (Hirlam LAMH_D11):
        U : lonlat       > size      : dim = 399300  nlon = 726  nlat = 550
@@ -55,10 +54,8 @@ cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag,
   lon = -195  lat = 30
   */
   if (CdoDebug::cdoDebugExt)
-    cdoPrint(
-        "%s(gridID_u=%d,gridID_v=%d,destagGridOffsets(%02.1f,%02.1f)) ...\n",
-        __func__, gridID_u_stag, gridID_v_stag, destagGridOffsets[0],
-        destagGridOffsets[1]);
+    cdoPrint("%s(gridID_u=%d,gridID_v=%d,destagGridOffsets(%02.1f,%02.1f)) ...\n", __func__, gridID_u_stag,
+             gridID_v_stag, destagGridOffsets[0], destagGridOffsets[1]);
 
   if (CdoDebug::cdoDebugExt > 1)
     {
@@ -97,8 +94,7 @@ cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag,
     }
 
   double xfirst = 0, xlast = 0, yfirst = 0, ylast = 0;
-  if (IS_EQUAL(destagGridOffsets[0], -0.5)
-      && IS_EQUAL(destagGridOffsets[1], -0.5))
+  if (IS_EQUAL(destagGridOffsets[0], -0.5) && IS_EQUAL(destagGridOffsets[1], -0.5))
     {
       xfirst = xfirst_V;
       xlast = xlast_V;
@@ -106,8 +102,7 @@ cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag,
       yfirst = yfirst_U;
       ylast = ylast_U;
     }
-  else if (IS_EQUAL(destagGridOffsets[0], 0.5)
-           && IS_EQUAL(destagGridOffsets[1], 0.5))
+  else if (IS_EQUAL(destagGridOffsets[0], 0.5) && IS_EQUAL(destagGridOffsets[1], 0.5))
     {
       xfirst = xfirst_V + xinc * destagGridOffsets[0];
       xlast = xlast_V + xinc * destagGridOffsets[0];
@@ -200,29 +195,25 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
               longitudeOfFirstGridPointInDegrees = -7.89
               latitudeOfFirstGridPointInDegrees = 42.935
   */
-  if (CdoDebug::cdoDebugExt)
-    cdoPrint("%s(gridSrcID=%d, sampleFactor=%d) ...", __func__, gridSrcID,
-             sampleFactor);
+  if (CdoDebug::cdoDebugExt) cdoPrint("%s(gridSrcID=%d, sampleFactor=%d) ...", __func__, gridSrcID, sampleFactor);
 
   int gridtype = gridInqType(gridSrcID);
-  if (!(gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT
-        || gridtype == GRID_PROJECTION || gridtype == GRID_CURVILINEAR
-        || gridtype == GRID_GENERIC))
+  if (!(gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION
+        || gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC))
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridtype));
 
   int gridXsize = gridInqXsize(gridSrcID);
   int gridYsize = gridInqYsize(gridSrcID);
 
-  if ((sampleFactor < 1) || (gridXsize < 1) || (gridYsize < 1)
-      || (sampleFactor > (gridXsize / 4)) || (sampleFactor > (gridYsize / 4)))
+  if ((sampleFactor < 1) || (gridXsize < 1) || (gridYsize < 1) || (sampleFactor > (gridXsize / 4))
+      || (sampleFactor > (gridYsize / 4)))
     cdoAbort("%s(): Unsupported sampleFactor (%d)! Note that: gridXsize = %d, "
              "gridYsize = %d",
              __func__, sampleFactor, gridXsize, gridYsize);
 
   if (CdoDebug::cdoDebugExt > 20) cdo_print_grid(gridSrcID, 1);
 
-  int xsize = (gridXsize + (sampleFactor - 1))
-              / sampleFactor;  // HARM36_L25: (789 + 2-1) / 2 = 395
+  int xsize = (gridXsize + (sampleFactor - 1)) / sampleFactor;  // HARM36_L25: (789 + 2-1) / 2 = 395
   int ysize = (gridYsize + (sampleFactor - 1)) / sampleFactor;
 
   int gridID_sampled = gridCreate(gridtype, xsize * ysize);
@@ -232,8 +223,7 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
 
   gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
   gridDefDatatype(gridID_sampled, gridInqDatatype(gridSrcID));
-  if (gridInqUvRelativeToGrid(gridSrcID))
-    gridDefUvRelativeToGrid(gridID_sampled, 1);
+  if (gridInqUvRelativeToGrid(gridSrcID)) gridDefUvRelativeToGrid(gridID_sampled, 1);
 
   grid_copy_attributes(gridSrcID, gridID_sampled);
 
@@ -243,8 +233,7 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
     {
       if (gridtype == GRID_CURVILINEAR)
         {
-          double *vals
-              = (double *) Malloc(gridXsize * gridYsize * sizeof(double));
+          double *vals = (double *) Malloc(gridXsize * gridYsize * sizeof(double));
           gridInqXvals(gridSrcID, vals);
           double *pvals = vals;
           for (int j = 0; j < gridYsize; j += sampleFactor)
@@ -304,8 +293,7 @@ The function @func{cdo_define_subgrid_grid} defines a sub-grid of another grid
 @EndFunction
 */
 int
-cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0,
-                        int subJ1)
+cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int subJ1)
 {
   /* Example of horizontal grids (Harmonie HARM36_L25):
               #
@@ -351,31 +339,27 @@ cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0,
               latitudeOfFirstGridPointInDegrees = ...
   */
   if (CdoDebug::cdoDebugExt)
-    cdoPrint("%s(gridSrcID=%d, (subI0,subI1,subJ0,subJ1) = (%d,%d,%d,%d) ...",
-             __func__, gridSrcID, subI0, subI1, subJ0, subJ1);
+    cdoPrint("%s(gridSrcID=%d, (subI0,subI1,subJ0,subJ1) = (%d,%d,%d,%d) ...", __func__, gridSrcID, subI0, subI1, subJ0,
+             subJ1);
 
   int gridXsize = gridInqXsize(gridSrcID);
   int gridYsize = gridInqYsize(gridSrcID);
   int maxIndexI = gridXsize - 1;
   int maxIndexJ = gridYsize - 1;
 
-  if ((subI0 < 0) || (subI0 > maxIndexI) || (subI1 <= subI0)
-      || (subI1 > maxIndexI) || (subJ0 < 0) || (subJ0 > maxIndexJ)
-      || (subJ1 <= subJ0) || (subJ1 > maxIndexJ))
+  if ((subI0 < 0) || (subI0 > maxIndexI) || (subI1 <= subI0) || (subI1 > maxIndexI) || (subJ0 < 0)
+      || (subJ0 > maxIndexJ) || (subJ1 <= subJ0) || (subJ1 > maxIndexJ))
     cdoAbort("%s() Incorrect subgrid specified!  (subI0,subI1,subJ0,subJ1) "
              "=(%d,%d,%d,%d) Note that: gridXsize = %d, gridYsize = %d",
              __func__, subI0, subI1, subJ0, subJ1, gridXsize, gridYsize);
 
   int gridtype = gridInqType(gridSrcID);
-  if (!(gridtype == GRID_PROJECTION
-        && gridInqProjType(gridSrcID) == CDI_PROJ_LCC))
-    cdoAbort("%s() Error; Only LCC grid is supported; use selindexbox!",
-             __func__);
+  if (!(gridtype == GRID_PROJECTION && gridInqProjType(gridSrcID) == CDI_PROJ_LCC))
+    cdoAbort("%s() Error; Only LCC grid is supported; use selindexbox!", __func__);
 
   double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
 
-  gridInqParamLCC(gridSrcID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a,
-                  &rf, &xval_0, &yval_0, &x_0, &y_0);
+  gridInqParamLCC(gridSrcID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
   x_0 = grid_missval;
   y_0 = grid_missval;
 
@@ -395,15 +379,10 @@ cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0,
 
   if (CdoDebug::cdoDebugExt)
     {
-      cdoPrint(
-          "%s() Original LCC grid as curvilinear (with lats-lons computed):",
-          __func__);
-      cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridIDcurvl),
-               gridInqYsize(gridIDcurvl));
-      cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f",
-               gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
-      cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f",
-               gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) - 1),
+      cdoPrint("%s() Original LCC grid as curvilinear (with lats-lons computed):", __func__);
+      cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
+      cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
+      cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) - 1),
                gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) - 1));
       cdoPrint("xval_0 %4.3f, yval_0 %4.3f", xval_0, yval_0);
     }
@@ -430,8 +409,7 @@ cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0,
 
   gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
   gridDefDatatype(gridID_sampled, gridInqDatatype(gridSrcID));
-  if (gridInqUvRelativeToGrid(gridSrcID))
-    gridDefUvRelativeToGrid(gridID_sampled, 1);
+  if (gridInqUvRelativeToGrid(gridSrcID)) gridDefUvRelativeToGrid(gridID_sampled, 1);
 
   grid_copy_attributes(gridSrcID, gridID_sampled);
 
@@ -441,13 +419,11 @@ cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0,
   if (CdoDebug::cdoDebugExt)
     {
       cdoPrint("%s()  Sub-grid:", __func__);
-      cdoPrint("grid Xsize   %zu, grid Ysize   %zu",
-               gridInqXsize(gridID_sampled), gridInqYsize(gridID_sampled));
+      cdoPrint("grid Xsize   %zu, grid Ysize   %zu", gridInqXsize(gridID_sampled), gridInqYsize(gridID_sampled));
       cdoPrint("xval_0 %4.3f, yval_0 %4.3f", xval_0, yval_0);
     }
 
-  gridDefParamLCC(gridID_sampled, grid_missval, lon_0, lat_0, lat_1, lat_2, a,
-                  rf, xval_0, yval_0, x_0, y_0);
+  gridDefParamLCC(gridID_sampled, grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0);
 
   gridDestroy(gridIDcurvl);
 

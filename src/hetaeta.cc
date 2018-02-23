@@ -89,28 +89,19 @@ esat(double temperature)
 /* Source from INTERA */
 
 static void
-hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
-           long nvars, const double *restrict af1, const double *restrict bf1,
-           const double *restrict etah2, const double *restrict af2,
-           const double *restrict bf2, const double *restrict w1,
-           const double *restrict w2, const long *restrict jl1,
-           const long *restrict jl2, const double *restrict ah1,
-           const double *restrict bh1, const double *restrict ps1,
-           double epsm1i, const double *restrict q1, const double *restrict t1,
-           const double *restrict fis1, const double *restrict fis2,
-           double *restrict ps2, const double *restrict ah2,
-           const double *restrict bh2, double *restrict *restrict vars1,
-           double *restrict *restrict vars2, double *restrict t2,
-           double *restrict q2, double *restrict tscor, double *restrict pscor,
-           double *restrict secor, long jblt, double *restrict ph1,
-           double *restrict lnph1, double *restrict fi1, double *restrict pf1,
-           double *restrict lnpf1, double *restrict tv1,
-           double *restrict theta1, double *restrict rh1, double *restrict zvar,
-           double *restrict ph2, double *restrict lnph2, double *restrict fi2,
-           double *restrict pf2, double *restrict rh2, double *restrict wgt,
-           long *restrict idx, double *restrict rh_pbl,
-           double *restrict theta_pbl, double *restrict *restrict vars_pbl,
-           double *restrict zt2, double *restrict zq2)
+hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long nvars, const double *restrict af1,
+           const double *restrict bf1, const double *restrict etah2, const double *restrict af2,
+           const double *restrict bf2, const double *restrict w1, const double *restrict w2, const long *restrict jl1,
+           const long *restrict jl2, const double *restrict ah1, const double *restrict bh1, const double *restrict ps1,
+           double epsm1i, const double *restrict q1, const double *restrict t1, const double *restrict fis1,
+           const double *restrict fis2, double *restrict ps2, const double *restrict ah2, const double *restrict bh2,
+           double *restrict *restrict vars1, double *restrict *restrict vars2, double *restrict t2, double *restrict q2,
+           double *restrict tscor, double *restrict pscor, double *restrict secor, long jblt, double *restrict ph1,
+           double *restrict lnph1, double *restrict fi1, double *restrict pf1, double *restrict lnpf1,
+           double *restrict tv1, double *restrict theta1, double *restrict rh1, double *restrict zvar,
+           double *restrict ph2, double *restrict lnph2, double *restrict fi2, double *restrict pf2,
+           double *restrict rh2, double *restrict wgt, long *restrict idx, double *restrict rh_pbl,
+           double *restrict theta_pbl, double *restrict *restrict vars_pbl, double *restrict zt2, double *restrict zq2)
 {
   long ijk, ijk1, ijk2;
   long jlev = 0, jlevr, jnop;
@@ -180,8 +171,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
             q = 0;
             fi = 0;
           }
-        fprintf(old, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi / g, pf1[k],
-                t, q);
+        fprintf(old, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi / g, pf1[k], t, q);
         for (int iv = 0; iv < nvars; ++iv)
           fprintf(old, " %18.10f", vars1[iv][ijk]);
         fprintf(old, "\n");
@@ -250,10 +240,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
       else
         {
           /* virtual temperatur not constant near new surface */
-          double zbb = zc * zc
-                       + zb
-                             * (zps * (zb * zps + 2.0 * zc)
-                                + 2.0 * (fi1[jlev] - fis2[ij]) / rair);
+          double zbb = zc * zc + zb * (zps * (zb * zps + 2.0 * zc) + 2.0 * (fi1[jlev] - fis2[ij]) / rair);
           ps2[ij] = exp((sqrt(zbb) - zc) / zb);
         }
     }
@@ -288,9 +275,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
           if (ph1[k] > p_firef) break;
         }
 
-      fiadj = fi1[jlev]
-              + (fi1[jlev - 1] - fi1[jlev]) * log(ph1[jlev] / p_firef)
-                    / log(ph1[jlev] / ph1[jlev - 1]);
+      fiadj = fi1[jlev] + (fi1[jlev - 1] - fi1[jlev]) * log(ph1[jlev] / p_firef) / log(ph1[jlev] / ph1[jlev - 1]);
     }
 
   /******* find the new boundary layer top */
@@ -376,8 +361,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
   if (ltq)
     {
       /* correction of potential temperature at top of PBL */
-      dteta
-          = zt2[jjblt] * pow(apr / pf2[jjblt], rair_d_cpair) - theta_pbl[jjblt];
+      dteta = zt2[jjblt] * pow(apr / pf2[jjblt], rair_d_cpair) - theta_pbl[jjblt];
 
       /* merge top layer values */
       rh2[jjblt] = 0.5 * (rh2[jjblt] + rh_pbl[jjblt]);
@@ -421,9 +405,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
       /* problem at top level, top pressure is zero per definition */
       for (int k = nlev2 - 1; k > 0; --k)
         {
-          fi2[k] = fi2[k + 1]
-                   + rair * zt2[k] * (lnph2[k + 1] - lnph2[k])
-                         * (1.0 + epsm1i * zq2[k]);
+          fi2[k] = fi2[k + 1] + rair * zt2[k] * (lnph2[k + 1] - lnph2[k]) * (1.0 + epsm1i * zq2[k]);
         }
 
       /* search next level above reference level in new system */
@@ -436,8 +418,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
       /* correct surface pressure */
       dfi = fiadj
             - (fi2[jlev + 1]
-               + (fi2[jlev] - fi2[jlev + 1]) * log(ph2[jlev + 1] / p_firef)
-                     / log(ph2[jlev + 1] / ph2[jlev]));
+               + (fi2[jlev] - fi2[jlev + 1]) * log(ph2[jlev + 1] / p_firef) / log(ph2[jlev + 1] / ph2[jlev]));
       double ztv = (1.0 + epsm1i * zq2[nlev2 - 1]) * zt2[nlev2 - 1];
       ps2[ij] = ps2[ij] * exp(dfi / (rair * ztv));
     }
@@ -469,8 +450,7 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
             q = 0;
             fi = 0;
           }
-        fprintf(new, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi / g, pf2[k],
-                t, q);
+        fprintf(new, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi / g, pf2[k], t, q);
         for (int iv = 0; iv < nvars; ++iv)
           fprintf(new, " %18.10f", vars2[iv][ijk]);
         fprintf(new, "\n");
@@ -484,12 +464,9 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
       pscor[ij] = pow(ps2[ij] / ps1[ij], rair_d_cpair);
 
       /* correction term of static energy of lowest layer */
-      secor[ij] = tv1[nlev1 - 1]
-                  * (cpair
-                     + rair
-                           * (1.0
-                              - ph1[nlev1 - 1] / (ps1[ij] - ph1[nlev1 - 1])
-                                    * log(ps1[ij] / ph1[nlev1 - 1])));
+      secor[ij]
+          = tv1[nlev1 - 1]
+            * (cpair + rair * (1.0 - ph1[nlev1 - 1] / (ps1[ij] - ph1[nlev1 - 1]) * log(ps1[ij] / ph1[nlev1 - 1])));
     }
 
   if (ltq)
@@ -502,14 +479,11 @@ hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
 }
 
 void
-hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1,
-        const double *bh1, const double *fis1, const double *ps1,
-        const double *t1, const double *q1, int nlev2, const double *ah2,
-        const double *bh2, const double *fis2, double *ps2, double *t2,
-        double *q2, int nvars, double **vars1, double **vars2, double *tscor,
-        double *pscor, double *secor)
+hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1, const double *bh1, const double *fis1,
+        const double *ps1, const double *t1, const double *q1, int nlev2, const double *ah2, const double *bh2,
+        const double *fis2, double *ps2, double *t2, double *q2, int nvars, double **vars1, double **vars2,
+        double *tscor, double *pscor, double *secor)
 {
-  double epsm1i;
   long jblt;
   long jlev = 0;
   int lpsmod = 1;
@@ -524,64 +498,62 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1,
   long nlev1p1 = nlev1 + 1;
   long nlev2p1 = nlev2 + 1;
 
-  NEW_2D(double, ph1, Threading::ompNumThreads, nlev1p1);
-  NEW_2D(double, lnph1, Threading::ompNumThreads, nlev1p1);
-  NEW_2D(double, fi1, Threading::ompNumThreads, nlev1p1);
+  VECTOR_2D(double, ph1, Threading::ompNumThreads, nlev1p1);
+  VECTOR_2D(double, lnph1, Threading::ompNumThreads, nlev1p1);
+  VECTOR_2D(double, fi1, Threading::ompNumThreads, nlev1p1);
 
-  NEW_2D(double, pf1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, lnpf1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, tv1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, theta1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, rh1, Threading::ompNumThreads, nlev1);
-  NEW_2D(double, zvar, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, pf1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, lnpf1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, tv1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, theta1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, rh1, Threading::ompNumThreads, nlev1);
+  VECTOR_2D(double, zvar, Threading::ompNumThreads, nlev1);
 
-  NEW_2D(double, ph2, Threading::ompNumThreads, nlev2p1);
-  NEW_2D(double, lnph2, Threading::ompNumThreads, nlev2p1);
-  NEW_2D(double, fi2, Threading::ompNumThreads, nlev2p1);
+  VECTOR_2D(double, ph2, Threading::ompNumThreads, nlev2p1);
+  VECTOR_2D(double, lnph2, Threading::ompNumThreads, nlev2p1);
+  VECTOR_2D(double, fi2, Threading::ompNumThreads, nlev2p1);
 
-  NEW_2D(double, pf2, Threading::ompNumThreads, nlev2);
-  NEW_2D(double, rh2, Threading::ompNumThreads, nlev2);
-  NEW_2D(double, wgt, Threading::ompNumThreads, nlev2);
-  NEW_2D(long, idx, Threading::ompNumThreads, nlev2);
+  VECTOR_2D(double, pf2, Threading::ompNumThreads, nlev2);
+  VECTOR_2D(double, rh2, Threading::ompNumThreads, nlev2);
+  VECTOR_2D(double, wgt, Threading::ompNumThreads, nlev2);
+  VECTOR_2D(long, idx, Threading::ompNumThreads, nlev2);
 
-  NEW_2D(double, zt2, Threading::ompNumThreads, ltq ? nlev2 : 0);
-  NEW_2D(double, zq2, Threading::ompNumThreads, ltq ? nlev2 : 0);
-  NEW_2D(double, rh_pbl, Threading::ompNumThreads, ltq ? nlev2 : 0);
-  NEW_2D(double, theta_pbl, Threading::ompNumThreads, ltq ? nlev2 : 0);
+  VECTOR_2D(double, zt2, Threading::ompNumThreads, ltq ? nlev2 : 0);
+  VECTOR_2D(double, zq2, Threading::ompNumThreads, ltq ? nlev2 : 0);
+  VECTOR_2D(double, rh_pbl, Threading::ompNumThreads, ltq ? nlev2 : 0);
+  VECTOR_2D(double, theta_pbl, Threading::ompNumThreads, ltq ? nlev2 : 0);
 
   if (nvars > MAX_VARS)
     {
       fprintf(stderr, "Too many vars (max = %d)!\n", MAX_VARS);
       exit(-1);
     }
-  // if ( nvars > 0 )
-  double ***vars_pbl_2
-      = (double ***) Malloc(Threading::ompNumThreads * sizeof(double **));
 
+  std::vector<std::vector<std::vector<double>>> vars_pbl_2(Threading::ompNumThreads);
   if (nvars > 0)
     {
       for (int i = 0; i < Threading::ompNumThreads; i++)
         {
-          vars_pbl_2[i] = (double **) Malloc(nvars * sizeof(double *));
+          vars_pbl_2[i].resize(nvars);
           for (int iv = 0; iv < nvars; ++iv)
-            vars_pbl_2[i][iv] = (double *) Malloc(nlev2 * sizeof(double));
+            vars_pbl_2[i][iv].resize(nlev2);
         }
     }
 
-  double *af1 = new double[nlev1];
-  double *bf1 = new double[nlev1];
-  double *etaf1 = new double[nlev1];
+  std::vector<double> af1(nlev1);
+  std::vector<double> bf1(nlev1);
+  std::vector<double> etaf1(nlev1);
 
-  double *etah2 = new double[nlev2p1];
+  std::vector<double> etah2(nlev2p1);
 
-  double *af2 = new double[nlev2];
-  double *bf2 = new double[nlev2];
-  double *etaf2 = new double[nlev2];
+  std::vector<double> af2(nlev2);
+  std::vector<double> bf2(nlev2);
+  std::vector<double> etaf2(nlev2);
 
-  double *w1 = new double[nlev2];
-  double *w2 = new double[nlev2];
-  long *jl1 = new long[nlev2];
-  long *jl2 = new long[nlev2];
+  std::vector<double> w1(nlev2);
+  std::vector<double> w2(nlev2);
+  std::vector<long> jl1(nlev2);
+  std::vector<long> jl2(nlev2);
 
   /******* set coordinate system ETA's, A's, B's
            calculate half and full level ETA
@@ -647,42 +619,35 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1,
               if (etaf2[k] > etaf1[jlev]) break;
             }
           jl2[k] = jl1[k] + 1;
-          w2[k] = log(etaf2[k] / etaf1[jl1[k]])
-                  / log(etaf1[jl2[k]] / etaf1[jl1[k]]);
+          w2[k] = log(etaf2[k] / etaf1[jl1[k]]) / log(etaf1[jl2[k]] / etaf1[jl1[k]]);
         }
       w1[k] = 1.0 - w2[k];
     }
 
-  epsm1i = 1.0 / epsilon - 1.0;
+  double epsm1i = 1.0 / epsilon - 1.0;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) firstprivate(lpsmod) private(vars_pbl)  \
-    schedule(dynamic, 1)                                                       \
-        shared(ngp, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2,  \
-               lnph2, fi2, pf2, rh_pbl, zt2, zq2, theta_pbl, rh2, wgt, idx,    \
-               vars_pbl_2, af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2, ltq,   \
-               nvars, imiss, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, fis1, fis2, \
-               ps2, ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor,       \
-               secor, jblt)
+#pragma omp parallel for default(none) firstprivate(lpsmod) private(vars_pbl) schedule(dynamic, 1) shared(            \
+    ngp, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, zt2, zq2, theta_pbl, rh2, \
+    wgt, idx, vars_pbl_2, af1, bf1, etah2, af2, bf2, w1, w2, jl1, jl2, ltq, nvars, imiss, ah1, bh1, ps1, nlev1,       \
+    epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt)
 #endif
   for (int ij = 0; ij < ngp; ++ij)
     {
       int ompthID = cdo_omp_get_thread_num();
 
       for (int iv = 0; iv < nvars; ++iv)
-        vars_pbl[iv] = vars_pbl_2[ompthID][iv];
+        vars_pbl[iv] = &vars_pbl_2[ompthID][iv][0];
 
       if (imiss && imiss[ij]) continue;
 
-      hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars, af1, bf1, etah2,
-                 af2, bf2, w1, w2, jl1, jl2, ah1, bh1, ps1, epsm1i, q1, t1,
-                 fis1, fis2, ps2, ah2, bh2, vars1, vars2, t2, q2, tscor, pscor,
-                 secor, jblt, ph1[ompthID], lnph1[ompthID], fi1[ompthID],
-                 pf1[ompthID], lnpf1[ompthID], tv1[ompthID], theta1[ompthID],
-                 rh1[ompthID], zvar[ompthID], ph2[ompthID], lnph2[ompthID],
-                 fi2[ompthID], pf2[ompthID], rh2[ompthID], wgt[ompthID],
-                 idx[ompthID], rh_pbl[ompthID], theta_pbl[ompthID], vars_pbl,
-                 zt2[ompthID], zq2[ompthID]);
+      hetaeta_sc(ltq, lpsmod, ij, ngp, nlev1, nlev2, nvars, &af1[0], &bf1[0], &etah2[0], &af2[0], &bf2[0], &w1[0],
+                 &w2[0], &jl1[0], &jl2[0], ah1, bh1, ps1, epsm1i, q1, t1, fis1, fis2, ps2, ah2, bh2, vars1, vars2, t2,
+                 q2, tscor, pscor, secor, jblt, &ph1[ompthID][0], &lnph1[ompthID][0], &fi1[ompthID][0],
+                 &pf1[ompthID][0], &lnpf1[ompthID][0], &tv1[ompthID][0], &theta1[ompthID][0], &rh1[ompthID][0],
+                 &zvar[ompthID][0], &ph2[ompthID][0], &lnph2[ompthID][0], &fi2[ompthID][0], &pf2[ompthID][0],
+                 &rh2[ompthID][0], &wgt[ompthID][0], &idx[ompthID][0], &rh_pbl[ompthID][0], &theta_pbl[ompthID][0],
+                 vars_pbl, &zt2[ompthID][0], &zq2[ompthID][0]);
 
     } /* end for ij */
 
@@ -690,56 +655,6 @@ hetaeta(bool ltq, int ngp, const int *imiss, int nlev1, const double *ah1,
   fclose(old);
   fclose(new);
 #endif
-
-  DELETE_2D(ph1);
-  DELETE_2D(lnph1);
-  DELETE_2D(fi1);
-
-  DELETE_2D(pf1);
-  DELETE_2D(lnpf1);
-  DELETE_2D(tv1);
-  DELETE_2D(theta1);
-  DELETE_2D(rh1);
-  DELETE_2D(zvar);
-
-  DELETE_2D(ph2);
-  DELETE_2D(lnph2);
-  DELETE_2D(fi2);
-
-  DELETE_2D(pf2);
-  // DELETE_2D(lnpf2);
-  DELETE_2D(rh2);
-  DELETE_2D(wgt);
-  DELETE_2D(idx);
-
-  DELETE_2D(zt2);
-  DELETE_2D(zq2);
-  DELETE_2D(rh_pbl);
-  DELETE_2D(theta_pbl);
-
-  if (nvars > 0)
-    {
-      for (int i = 0; i < Threading::ompNumThreads; i++)
-        {
-          for (int iv = 0; iv < nvars; ++iv)
-            Free(vars_pbl_2[i][iv]);
-
-          Free(vars_pbl_2[i]);
-        }
-    }
-  Free(vars_pbl_2);
-
-  delete[] af1;
-  delete[] bf1;
-  delete[] etaf1;
-  delete[] etah2;
-  delete[] af2;
-  delete[] bf2;
-  delete[] etaf2;
-  delete[] w1;
-  delete[] w2;
-  delete[] jl1;
-  delete[] jl2;
 
   return;
 }
@@ -753,92 +668,64 @@ main(int argc, char *argv[])
 {
   printf("NGP = %d\n", NGP);
 
-  double a2[41] = {
-    0.00000000000000000,     2000.00000000000000000,  4000.00000000000000000,
-    6000.00000000000000000,  8000.00000000000000000,  9976.13671875000000000,
-    11902.14453125000000000, 13722.03125000000000000, 15379.80468750000000000,
-    16819.47265625000000000, 18045.18359375000000000, 19027.69531250000000000,
-    19755.10937500000000000, 20222.20312500000000000, 20429.86328125000000000,
-    20384.48046875000000000, 20097.40234375000000000, 19584.32812500000000000,
-    18864.75000000000000000, 17961.35937500000000000, 16899.46875000000000000,
-    15706.44921875000000000, 14411.12500000000000000, 13043.21875000000000000,
-    11632.75781250000000000, 10209.50000000000000000, 8802.35546875000000000,
-    7438.80468750000000000,  6144.31640625000000000,  4941.77734375000000000,
-    3850.91333007812500000,  2887.69653320312500000,  2063.77978515625000000,
-    1385.91259765625000000,  855.36181640625000000,   467.33349609375000000,
-    210.39390563964843750,   65.88919067382812500,    7.36769962310791016,
-    0.00000000000000000,     0.00000000000000000
-  };
+  double a2[41] = { 0.00000000000000000,     2000.00000000000000000,  4000.00000000000000000,  6000.00000000000000000,
+                    8000.00000000000000000,  9976.13671875000000000,  11902.14453125000000000, 13722.03125000000000000,
+                    15379.80468750000000000, 16819.47265625000000000, 18045.18359375000000000, 19027.69531250000000000,
+                    19755.10937500000000000, 20222.20312500000000000, 20429.86328125000000000, 20384.48046875000000000,
+                    20097.40234375000000000, 19584.32812500000000000, 18864.75000000000000000, 17961.35937500000000000,
+                    16899.46875000000000000, 15706.44921875000000000, 14411.12500000000000000, 13043.21875000000000000,
+                    11632.75781250000000000, 10209.50000000000000000, 8802.35546875000000000,  7438.80468750000000000,
+                    6144.31640625000000000,  4941.77734375000000000,  3850.91333007812500000,  2887.69653320312500000,
+                    2063.77978515625000000,  1385.91259765625000000,  855.36181640625000000,   467.33349609375000000,
+                    210.39390563964843750,   65.88919067382812500,    7.36769962310791016,     0.00000000000000000,
+                    0.00000000000000000 };
 
   double b2[41]
-      = { 0.00000000000000000, 0.00000000000000000, 0.00000000000000000,
-          0.00000000000000000, 0.00000000000000000, 0.00039085815660655,
-          0.00182679994031787, 0.00513499975204468, 0.01114289835095406,
-          0.02067789807915688, 0.03412120044231415, 0.05169039964675903,
-          0.07353377342224121, 0.09967470169067383, 0.13002246618270874,
-          0.16438430547714233, 0.20247590541839600, 0.24393308162689209,
-          0.28832298517227173, 0.33515489101409912, 0.38389205932617188,
-          0.43396288156509399, 0.48477149009704590, 0.53570991754531860,
-          0.58616840839385986, 0.63554751873016357, 0.68326860666275024,
-          0.72878581285476685, 0.77159661054611206, 0.81125342845916748,
-          0.84737491607666016, 0.87965691089630127, 0.90788388252258301,
-          0.93194031715393066, 0.95182150602340698, 0.96764522790908813,
-          0.97966271638870239, 0.98827010393142700, 0.99401938915252686,
-          0.99763011932373047, 1.00000000000000000 };
+      = { 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000,
+          0.00039085815660655, 0.00182679994031787, 0.00513499975204468, 0.01114289835095406, 0.02067789807915688,
+          0.03412120044231415, 0.05169039964675903, 0.07353377342224121, 0.09967470169067383, 0.13002246618270874,
+          0.16438430547714233, 0.20247590541839600, 0.24393308162689209, 0.28832298517227173, 0.33515489101409912,
+          0.38389205932617188, 0.43396288156509399, 0.48477149009704590, 0.53570991754531860, 0.58616840839385986,
+          0.63554751873016357, 0.68326860666275024, 0.72878581285476685, 0.77159661054611206, 0.81125342845916748,
+          0.84737491607666016, 0.87965691089630127, 0.90788388252258301, 0.93194031715393066, 0.95182150602340698,
+          0.96764522790908813, 0.97966271638870239, 0.98827010393142700, 0.99401938915252686, 0.99763011932373047,
+          1.00000000000000000 };
 
-  double a1[20] = {
-    0.00000000000000000,     2000.00000000000000000,  4000.00000000000000000,
-    6046.10937500000000000,  8267.92968750000000000,  10609.51171875000000000,
-    12851.10156250000000000, 14698.50000000000000000, 15861.12890625000000000,
-    16116.23828125000000000, 15356.92187500000000000, 13621.46093750000000000,
-    11101.55859375000000000, 8127.14453125000000000,  5125.14062500000000000,
-    2549.96899414062500000,  783.19506835937500000,   0.00000000000000000,
-    0.00000000000000000,     0.00000000000000000
-  };
+  double a1[20] = { 0.00000000000000000,     2000.00000000000000000,  4000.00000000000000000,  6046.10937500000000000,
+                    8267.92968750000000000,  10609.51171875000000000, 12851.10156250000000000, 14698.50000000000000000,
+                    15861.12890625000000000, 16116.23828125000000000, 15356.92187500000000000, 13621.46093750000000000,
+                    11101.55859375000000000, 8127.14453125000000000,  5125.14062500000000000,  2549.96899414062500000,
+                    783.19506835937500000,   0.00000000000000000,     0.00000000000000000,     0.00000000000000000 };
 
   double b1[20]
-      = { 0.00000000000000000, 0.00000000000000000, 0.00000000000000000,
-          0.00033899326808751, 0.00335718691349030, 0.01307003945112228,
-          0.03407714888453484, 0.07064980268478394, 0.12591671943664551,
-          0.20119541883468628, 0.29551959037780762, 0.40540921688079834,
-          0.52493220567703247, 0.64610791206359863, 0.75969839096069336,
-          0.85643762350082397, 0.92874687910079956, 0.97298520803451538,
-          0.99228149652481079, 1.00000000000000000 };
+      = { 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.00033899326808751, 0.00335718691349030,
+          0.01307003945112228, 0.03407714888453484, 0.07064980268478394, 0.12591671943664551, 0.20119541883468628,
+          0.29551959037780762, 0.40540921688079834, 0.52493220567703247, 0.64610791206359863, 0.75969839096069336,
+          0.85643762350082397, 0.92874687910079956, 0.97298520803451538, 0.99228149652481079, 1.00000000000000000 };
 
-  double iu1[19] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  double iu1[19] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
-  double iv1[19] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  double iv1[19] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
-  double it1[19]
-      = { 224.2257, 212.7505, 209.553,  208.7785, 211.7619, 220.2336, 221.2698,
-          220.3876, 227.1461, 237.6735, 248.1776, 258.1013, 264.4792, 269.1322,
-          271.9017, 275.6761, 279.819,  282.2512, 284.141 };
+  double it1[19] = { 224.2257, 212.7505, 209.553,  208.7785, 211.7619, 220.2336, 221.2698, 220.3876, 227.1461, 237.6735,
+                     248.1776, 258.1013, 264.4792, 269.1322, 271.9017, 275.6761, 279.819,  282.2512, 284.141 };
 
-  double iq1[19]
-      = { 2.512447e-06, 2.176736e-06, 2.170464e-06, 2.01653e-06,  1.805185e-06,
-          1.726813e-06, 3.75322e-06,  8.901303e-06, 3.285719e-05, 0.0001270178,
-          0.0003347051, 0.0007223329, 0.001228461,  0.001733165,  0.002967748,
-          0.004558741,  0.004706143,  0.004668835,  0.004677606 };
+  double iq1[19] = { 2.512447e-06, 2.176736e-06, 2.170464e-06, 2.01653e-06,  1.805185e-06, 1.726813e-06, 3.75322e-06,
+                     8.901303e-06, 3.285719e-05, 0.0001270178, 0.0003347051, 0.0007223329, 0.001228461,  0.001733165,
+                     0.002967748,  0.004558741,  0.004706143,  0.004668835,  0.004677606 };
 
   double icl1[19]
-      = { 0.0,           0.0,           0.0,           0.0,
-          0.0,           0.0,           -4.987459e-40, -4.791847e-39,
-          -3.970467e-23, -1.902515e-23, -1.694066e-21, -3.705769e-22,
-          -1.799945e-21, -4.632211e-22, 2.072752e-05,  0.000149563,
-          -1.482308e-20, -2.541099e-21, 5.033612e-05 };
+      = { 0.0,           0.0,           0.0,           0.0,           0.0,           0.0,           -4.987459e-40,
+          -4.791847e-39, -3.970467e-23, -1.902515e-23, -1.694066e-21, -3.705769e-22, -1.799945e-21, -4.632211e-22,
+          2.072752e-05,  0.000149563,   -1.482308e-20, -2.541099e-21, 5.033612e-05 };
 
   double ici1[19]
-      = { -4.408104e-37, 0.0,           0.0,           -2.003328e-25,
-          -9.305782e-24, -2.15067e-23,  -9.926167e-23, -1.958764e-21,
-          -8.735027e-22, -2.779327e-22, -2.117582e-21, -1.323489e-21,
-          -8.470329e-22, -4.102816e-22, -1.429368e-21, -2.646978e-21,
-          -5.029258e-22, -8.205632e-22, -1.588187e-21 };
+      = { -4.408104e-37, 0.0,           0.0,           -2.003328e-25, -9.305782e-24, -2.15067e-23,  -9.926167e-23,
+          -1.958764e-21, -8.735027e-22, -2.779327e-22, -2.117582e-21, -1.323489e-21, -8.470329e-22, -4.102816e-22,
+          -1.429368e-21, -2.646978e-21, -5.029258e-22, -8.205632e-22, -1.588187e-21 };
 
   double icc1[19]
-      = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,       0.0, 0.0, 0.0,        0.0,
-          0.0, 0.0, 0.0, 0.0, 0.0, 0.4445496, 0.0, 0.0, 0.001098633 };
+      = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4445496, 0.0, 0.0, 0.001098633 };
 
   double ifis1 = 9.121094, ips1 = 102511.8;
 
@@ -907,19 +794,16 @@ main(int argc, char *argv[])
     fis2[ij] = fis1[ij];
 
   if (ltq)
-    hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, t1, q1, 40, a2, b2, fis2,
-            ps2, t2, q2, 5, vars1, vars2, tscor, pscor, secor);
+    hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, t1, q1, 40, a2, b2, fis2, ps2, t2, q2, 5, vars1, vars2, tscor, pscor,
+            secor);
   else
-    hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, NULL, NULL, 40, a2, b2, fis2,
-            ps2, NULL, NULL, 5, vars1, vars2, NULL, NULL, NULL);
+    hetaeta(ltq, NGP, NULL, 19, a1, b1, fis1, ps1, NULL, NULL, 40, a2, b2, fis2, ps2, NULL, NULL, 5, vars1, vars2, NULL,
+            NULL, NULL);
 
-  double ot2[40]
-      = { 224.226, 212.75,  209.616, 208.895, 210.468, 213.454, 218.091,
-          220.49,  220.977, 221.114, 220.731, 220.803, 223.595, 226.547,
-          230.566, 234.99,  239.411, 243.722, 248.125, 252.164, 256.221,
-          259.499, 262.082, 264.584, 266.487, 268.319, 269.761, 270.879,
-          271.881, 273.501, 274.932, 276.493, 278.199, 279.638, 280.811,
-          281.746, 282.613, 283.479, 284.087, 284.343 };
+  double ot2[40] = { 224.226, 212.75,  209.616, 208.895, 210.468, 213.454, 218.091, 220.49,  220.977, 221.114,
+                     220.731, 220.803, 223.595, 226.547, 230.566, 234.99,  239.411, 243.722, 248.125, 252.164,
+                     256.221, 259.499, 262.082, 264.584, 266.487, 268.319, 269.761, 270.879, 271.881, 273.501,
+                     274.932, 276.493, 278.199, 279.638, 280.811, 281.746, 282.613, 283.479, 284.087, 284.343 };
 
   int lerror = 0;
   for (k = 0; k < 40; ++k)
@@ -927,8 +811,7 @@ main(int argc, char *argv[])
 
   if (lerror)
     for (k = 0; k < 40; ++k)
-      printf("%d %g %g %g\n", k, t2[k * NGP], ot2[k],
-             fabs(t2[k * NGP] - ot2[k]));
+      printf("%d %g %g %g\n", k, t2[k * NGP], ot2[k], fabs(t2[k * NGP] - ot2[k]));
 
   return 0;
 }

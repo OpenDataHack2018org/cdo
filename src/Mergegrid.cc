@@ -36,8 +36,7 @@ gen_index(int gridID1, int gridID2, int *index)
 
   size_t gridsize2 = gridInqSize(gridID2);
 
-  if (gridtype1 != gridtype2)
-    cdoAbort("Input streams have different grid types!");
+  if (gridtype1 != gridtype2) cdoAbort("Input streams have different grid types!");
 
   if (index == NULL) cdoAbort("Internal problem, index not allocated!");
 
@@ -52,11 +51,9 @@ gen_index(int gridID1, int gridID2, int *index)
       int nlon2 = gridInqXsize(gridID2);
       int nlat2 = gridInqYsize(gridID2);
 
-      if (!(gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)))
-        cdoAbort("Grid 1 has no values!");
+      if (!(gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL))) cdoAbort("Grid 1 has no values!");
 
-      if (!(gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)))
-        cdoAbort("Grid 2 has no values!");
+      if (!(gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL))) cdoAbort("Grid 2 has no values!");
 
       double *xvals1 = (double *) Malloc(nlon1 * sizeof(double));
       double *yvals1 = (double *) Malloc(nlat1 * sizeof(double));
@@ -179,15 +176,13 @@ Mergegrid(void *process)
   for (index = 1; index < vlistNgrids(vlistID1); index++)
     if (vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index)) ndiffgrids++;
 
-  if (ndiffgrids > 0)
-    cdoAbort("Too many different grids in %s!", cdoGetStreamName(0).c_str());
+  if (ndiffgrids > 0) cdoAbort("Too many different grids in %s!", cdoGetStreamName(0).c_str());
 
   ndiffgrids = 0;
   for (index = 1; index < vlistNgrids(vlistID2); index++)
     if (vlistGrid(vlistID2, 0) != vlistGrid(vlistID2, index)) ndiffgrids++;
 
-  if (ndiffgrids > 0)
-    cdoAbort("Too many different grids in %s!", cdoGetStreamName(1).c_str());
+  if (ndiffgrids > 0) cdoAbort("Too many different grids in %s!", cdoGetStreamName(1).c_str());
 
   int gridID1 = vlistGrid(vlistID1, 0);
   int gridID2 = vlistGrid(vlistID2, 0);
@@ -214,11 +209,9 @@ Mergegrid(void *process)
       taxisCopyTimestep(taxisID3, taxisID1);
 
       int nrecs2 = cdoStreamInqTimestep(streamID2, tsID);
-      if (nrecs2 == 0)
-        cdoAbort("Input streams have different number of timesteps!");
+      if (nrecs2 == 0) cdoAbort("Input streams have different number of timesteps!");
 
-      if (nrecs != nrecs2)
-        cdoAbort("Input streams have different number of records!");
+      if (nrecs != nrecs2) cdoAbort("Input streams have different number of records!");
 
       pstreamDefTimestep(streamID3, tsID);
 

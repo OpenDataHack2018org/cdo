@@ -46,10 +46,8 @@
 static double
 adisit_1(double tpot, double sal, double p)
 {
-  double a_a1 = 3.6504E-4, a_a2 = 8.3198E-5, a_a3 = 5.4065E-7, a_a4 = 4.0274E-9,
-         a_b1 = 1.7439E-5, a_b2 = 2.9778E-7, a_c1 = 8.9309E-7, a_c2 = 3.1628E-8,
-         a_c3 = 2.1987E-10, a_d = 4.1057E-9, a_e1 = 1.6056E-10,
-         a_e2 = 5.0484E-12;
+  double a_a1 = 3.6504E-4, a_a2 = 8.3198E-5, a_a3 = 5.4065E-7, a_a4 = 4.0274E-9, a_b1 = 1.7439E-5, a_b2 = 2.9778E-7,
+         a_c1 = 8.9309E-7, a_c2 = 3.1628E-8, a_c3 = 2.1987E-10, a_d = 4.1057E-9, a_e1 = 1.6056E-10, a_e2 = 5.0484E-12;
 
   double qc = p * (a_a1 + p * (a_c1 - a_e1 * p));
   double qv = p * (a_b1 - a_d * p);
@@ -74,10 +72,8 @@ adisit_1(double tpot, double sal, double p)
 static double
 adipot(double t, double s, double p)
 {
-  double a_a1 = 3.6504E-4, a_a2 = 8.3198E-5, a_a3 = 5.4065E-7, a_a4 = 4.0274E-9,
-         a_b1 = 1.7439E-5, a_b2 = 2.9778E-7, a_c1 = 8.9309E-7, a_c2 = 3.1628E-8,
-         a_c3 = 2.1987E-10, a_d = 4.1057E-9, a_e1 = 1.6056E-10,
-         a_e2 = 5.0484E-12;
+  double a_a1 = 3.6504E-4, a_a2 = 8.3198E-5, a_a3 = 5.4065E-7, a_a4 = 4.0274E-9, a_b1 = 1.7439E-5, a_b2 = 2.9778E-7,
+         a_c1 = 8.9309E-7, a_c2 = 3.1628E-8, a_c3 = 2.1987E-10, a_d = 4.1057E-9, a_e1 = 1.6056E-10, a_e2 = 5.0484E-12;
 
   double s_rel = s - 35.0;
 
@@ -93,8 +89,7 @@ adipot(double t, double s, double p)
 }
 
 static void
-calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho,
-            field_type sao, field_type tis)
+calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho, field_type sao, field_type tis)
 {
   /* pressure units: hPa     */
   /* tho units:      Celsius */
@@ -109,8 +104,7 @@ calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho,
 
       for (long i = 0; i < gridsize; ++i)
         {
-          if (DBL_IS_EQUAL(thoptr[i], tho.missval)
-              || DBL_IS_EQUAL(saoptr[i], sao.missval))
+          if (DBL_IS_EQUAL(thoptr[i], tho.missval) || DBL_IS_EQUAL(saoptr[i], sao.missval))
             {
               tisptr[i] = tis.missval;
             }
@@ -123,8 +117,7 @@ calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho,
 }
 
 static void
-calc_adipot(long gridsize, long nlevel, double *pressure, field_type t,
-            field_type s, field_type tpot)
+calc_adipot(long gridsize, long nlevel, double *pressure, field_type t, field_type s, field_type tpot)
 {
   /* pressure units: hPa     */
   /* t units:      Celsius */
@@ -139,8 +132,7 @@ calc_adipot(long gridsize, long nlevel, double *pressure, field_type t,
 
       for (long i = 0; i < gridsize; ++i)
         {
-          if (DBL_IS_EQUAL(tptr[i], t.missval)
-              || DBL_IS_EQUAL(sptr[i], s.missval))
+          if (DBL_IS_EQUAL(tptr[i], t.missval) || DBL_IS_EQUAL(sptr[i], s.missval))
             {
               tpotptr[i] = tpot.missval;
             }
@@ -200,8 +192,7 @@ Adisit(void *process)
 
           if (operatorID == ADISIT)
             {
-              if (strcmp(stdname, "sea_water_potential_temperature") == 0)
-                code = 2;
+              if (strcmp(stdname, "sea_water_potential_temperature") == 0) code = 2;
             }
           else
             {
@@ -226,8 +217,7 @@ Adisit(void *process)
   zaxisID = vlistInqVarZaxis(vlistID1, thoID);
   int nlevel2 = zaxisInqSize(zaxisID);
 
-  if (nlevel1 != nlevel2)
-    cdoAbort("temperature and salinity have different number of levels!");
+  if (nlevel1 != nlevel2) cdoAbort("temperature and salinity have different number of levels!");
   int nlevel = nlevel1;
 
   double *pressure = (double *) Malloc(nlevel * sizeof(double));

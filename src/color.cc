@@ -36,15 +36,13 @@ double rint(double x);
 int
 check_rgb(int rgb[])
 {
-  return (((rgb[0] < 0 || rgb[0] > 255) || (rgb[1] < 0 || rgb[1] > 255)
-           || (rgb[2] < 0 || rgb[2] > 255)));
+  return (((rgb[0] < 0 || rgb[0] > 255) || (rgb[1] < 0 || rgb[1] > 255) || (rgb[2] < 0 || rgb[2] > 255)));
 }
 
 int
 check_hsv(double h, double s, double v)
 {
-  return (
-      ((h < 0.0 || h > 360.0) || (s < 0.0 || s > 1.0) || (h < 0.0 || v > 1.0)));
+  return (((h < 0.0 || h > 360.0) || (s < 0.0 || s > 1.0) || (h < 0.0 || v > 1.0)));
 }
 
 int
@@ -146,8 +144,7 @@ getrgb(char *line, int rgb[], int color_model)
   if (count == 3)
     { /* c/m/y/k */
       double cmyk[4];
-      n = sscanf(line, "%lf/%lf/%lf/%lf", &cmyk[0], &cmyk[1], &cmyk[2],
-                 &cmyk[3]);
+      n = sscanf(line, "%lf/%lf/%lf/%lf", &cmyk[0], &cmyk[1], &cmyk[2], &cmyk[3]);
       if (n != 4 || check_cmyk(cmyk)) return (TRUE);
       cmyk_to_rgb(rgb, cmyk);
       return (FALSE);
@@ -211,8 +208,7 @@ cptRead(FILE *fp, CPT *cpt)
   int n = 0, i, nread, annot, n_alloc = small_chunk, color_model, id;
   double dz;
   int gap, error = FALSE;
-  char T0[64], T1[64], T2[64], T3[64], T4[64], T5[64], T6[64], T7[64], T8[64],
-      T9[64];
+  char T0[64], T1[64], T2[64], T3[64], T4[64], T5[64], T6[64], T7[64], T8[64], T9[64];
   char line[BUFSIZ], option[64], c;
 
   if (fp == NULL) return (READERR);
@@ -257,12 +253,10 @@ cptRead(FILE *fp, CPT *cpt)
       if (id < 3)
         { /* Foreground, background, or nan color */
           cpt->bfn[id].skip = FALSE;
-          if ((nread = sscanf(&line[2], "%s %s %s %s", T1, T2, T3, T4)) < 1)
-            error = TRUE;
+          if ((nread = sscanf(&line[2], "%s %s %s %s", T1, T2, T3, T4)) < 1) error = TRUE;
           if (T1[0] == 'p' || T1[0] == 'P')
             { /* Gave a pattern */
-              fprintf(stderr, "%s: CPT Pattern fill (%s) unsupported!\n",
-                      __func__, T1);
+              fprintf(stderr, "%s: CPT Pattern fill (%s) unsupported!\n", __func__, T1);
               return (READERR);
             }
           else
@@ -314,12 +308,10 @@ cptRead(FILE *fp, CPT *cpt)
 
       /* Chop off this information so it does not affect our column count below
        */
-      nread = sscanf(line, "%s %s %s %s %s %s %s %s %s %s", T0, T1, T2, T3, T4,
-                     T5, T6, T7, T8, T9);
+      nread = sscanf(line, "%s %s %s %s %s %s %s %s %s %s", T0, T1, T2, T3, T4, T5, T6, T7, T8, T9);
 
-      if (nread <= 0) continue; /* Probably a line with spaces - skip */
-      if (color_model == CMYK && nread != 10)
-        error = TRUE; /* CMYK should results in 10 fields */
+      if (nread <= 0) continue;                             /* Probably a line with spaces - skip */
+      if (color_model == CMYK && nread != 10) error = TRUE; /* CMYK should results in 10 fields */
       if (color_model != CMYK && !(nread == 4 || nread == 8))
         error = TRUE; /* HSV or RGB should result in 8 fields, gray, patterns,
                          or skips in 4 */
@@ -330,21 +322,17 @@ cptRead(FILE *fp, CPT *cpt)
         { /* Skip this slice */
           if (nread != 4)
             {
-              fprintf(stderr,
-                      "%s: z-slice to skip not in [z0 - z1 -] format!\n",
-                      __func__);
+              fprintf(stderr, "%s: z-slice to skip not in [z0 - z1 -] format!\n", __func__);
               return (READERR);
             }
           cpt->lut[n].z_high = atof(T2);
           cpt->lut[n].skip = TRUE; /* Don't paint this slice if possible*/
           for (i = 0; i < 3; i++)
-            cpt->lut[n].rgb_low[i] = cpt->lut[n].rgb_high[i]
-                = 255; /* If you must, use page color */
+            cpt->lut[n].rgb_low[i] = cpt->lut[n].rgb_high[i] = 255; /* If you must, use page color */
         }
       else if (T1[0] == 'p' || T1[0] == 'P')
         { /* Gave pattern fill */
-          fprintf(stderr, "%s: CPT Pattern fill (%s) unsupported!\n", __func__,
-                  T1);
+          fprintf(stderr, "%s: CPT Pattern fill (%s) unsupported!\n", __func__, T1);
           return (READERR);
         }
       else
@@ -352,12 +340,9 @@ cptRead(FILE *fp, CPT *cpt)
           if (nread == 4)
             { /* gray shades */
               cpt->lut[n].z_high = atof(T2);
-              cpt->lut[n].rgb_low[0] = cpt->lut[n].rgb_low[1]
-                  = cpt->lut[n].rgb_low[2] = irint(atof(T1));
-              cpt->lut[n].rgb_high[0] = cpt->lut[n].rgb_high[1]
-                  = cpt->lut[n].rgb_high[2] = irint(atof(T3));
-              if (cpt->lut[n].rgb_low[0] < 0 || cpt->lut[n].rgb_high[0] < 0)
-                error++;
+              cpt->lut[n].rgb_low[0] = cpt->lut[n].rgb_low[1] = cpt->lut[n].rgb_low[2] = irint(atof(T1));
+              cpt->lut[n].rgb_high[0] = cpt->lut[n].rgb_high[1] = cpt->lut[n].rgb_high[2] = irint(atof(T3));
+              if (cpt->lut[n].rgb_low[0] < 0 || cpt->lut[n].rgb_high[0] < 0) error++;
             }
           else if (color_model == CMYK)
             {
@@ -385,9 +370,7 @@ cptRead(FILE *fp, CPT *cpt)
           cpt->lut[n].i_dz = 1.0 / dz;
 
           for (i = 0; i < 3; i++)
-            cpt->lut[n].rgb_diff[i]
-                = cpt->lut[n].rgb_high[i]
-                  - cpt->lut[n].rgb_low[i]; /* Used in get_rgb24 */
+            cpt->lut[n].rgb_diff[i] = cpt->lut[n].rgb_high[i] - cpt->lut[n].rgb_low[i]; /* Used in get_rgb24 */
         }
 
       n++;
@@ -395,11 +378,8 @@ cptRead(FILE *fp, CPT *cpt)
         {
           i = n_alloc;
           n_alloc += small_chunk;
-          cpt->lut = (LUT *) Realloc((void *) cpt->lut,
-                                     (size_t) n_alloc * sizeof(LUT));
-          memset((void *) &cpt->lut[i], 0,
-                 (size_t)(small_chunk
-                          * sizeof(LUT))); /* Initialize new structs to zero */
+          cpt->lut = (LUT *) Realloc((void *) cpt->lut, (size_t) n_alloc * sizeof(LUT));
+          memset((void *) &cpt->lut[i], 0, (size_t)(small_chunk * sizeof(LUT))); /* Initialize new structs to zero */
         }
     }
 
@@ -453,10 +433,9 @@ cptWrite(FILE *fp, CPT cpt)
 
   for (n = 0; n < cpt.ncolors; n++)
     {
-      fprintf(fp, "%g\t%d\t%d\t%d\t%g\t%d\t%d\t%d\n", cpt.lut[n].z_low,
-              cpt.lut[n].rgb_low[0], cpt.lut[n].rgb_low[1],
-              cpt.lut[n].rgb_low[2], cpt.lut[n].z_high, cpt.lut[n].rgb_high[0],
-              cpt.lut[n].rgb_high[1], cpt.lut[n].rgb_high[2]);
+      fprintf(fp, "%g\t%d\t%d\t%d\t%g\t%d\t%d\t%d\n", cpt.lut[n].z_low, cpt.lut[n].rgb_low[0], cpt.lut[n].rgb_low[1],
+              cpt.lut[n].rgb_low[2], cpt.lut[n].z_high, cpt.lut[n].rgb_high[0], cpt.lut[n].rgb_high[1],
+              cpt.lut[n].rgb_high[2]);
     }
 
   for (k = 0; k < 3; k++)
@@ -464,8 +443,7 @@ cptWrite(FILE *fp, CPT cpt)
       if (cpt.bfn[k].skip)
         fprintf(fp, "%c -\n", code[k]);
       else
-        fprintf(fp, "%c\t%d\t%d\t%d\n", code[k], cpt.bfn[k].rgb[0],
-                cpt.bfn[k].rgb[1], cpt.bfn[k].rgb[2]);
+        fprintf(fp, "%c\t%d\t%d\t%d\n", code[k], cpt.bfn[k].rgb[0], cpt.bfn[k].rgb[1], cpt.bfn[k].rgb[2]);
     }
 
   return (status);
@@ -490,12 +468,10 @@ cptWriteC(FILE *fp, CPT cpt, const char *name)
       fprintf(fp,
               "  { %7g, %7g, %7g, {%3d, %3d, %3d}, {%3d, %3d, %3d}, {%3d, %3d, "
               "%3d}, %d, %d},\n",
-              cpt.lut[n].z_low, cpt.lut[n].z_high, cpt.lut[n].i_dz,
-              cpt.lut[n].rgb_low[0], cpt.lut[n].rgb_low[1],
-              cpt.lut[n].rgb_low[2], cpt.lut[n].rgb_high[0],
-              cpt.lut[n].rgb_high[1], cpt.lut[n].rgb_high[2],
-              cpt.lut[n].rgb_diff[0], cpt.lut[n].rgb_diff[1],
-              cpt.lut[n].rgb_diff[2], cpt.lut[n].annot, cpt.lut[n].skip);
+              cpt.lut[n].z_low, cpt.lut[n].z_high, cpt.lut[n].i_dz, cpt.lut[n].rgb_low[0], cpt.lut[n].rgb_low[1],
+              cpt.lut[n].rgb_low[2], cpt.lut[n].rgb_high[0], cpt.lut[n].rgb_high[1], cpt.lut[n].rgb_high[2],
+              cpt.lut[n].rgb_diff[0], cpt.lut[n].rgb_diff[1], cpt.lut[n].rgb_diff[2], cpt.lut[n].annot,
+              cpt.lut[n].skip);
     }
   fprintf(fp, "};\n");
 
@@ -505,8 +481,8 @@ cptWriteC(FILE *fp, CPT cpt, const char *name)
   fprintf(fp, "  {\n");
   for (k = 0; k < 3; k++)
     {
-      fprintf(fp, "    {{%3d, %3d, %3d}, %d},\n", cpt.bfn[k].rgb[0],
-              cpt.bfn[k].rgb[1], cpt.bfn[k].rgb[2], cpt.bfn[k].skip);
+      fprintf(fp, "    {{%3d, %3d, %3d}, %d},\n", cpt.bfn[k].rgb[0], cpt.bfn[k].rgb[1], cpt.bfn[k].rgb[2],
+              cpt.bfn[k].skip);
     }
   fprintf(fp, "  }\n");
   fprintf(fp, "};\n");

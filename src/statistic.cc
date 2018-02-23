@@ -65,8 +65,7 @@ int max_jacobi_iter;
 
 void make_symmetric_matrix_triangular(double **a, int n, double *d, double *e);
 double pythagoras(double a, double b);
-void eigen_solution_of_triangular_matrix(double *d, double *e, int n,
-                                         double **a, const char *prompt);
+void eigen_solution_of_triangular_matrix(double *d, double *e, int n, double **a, const char *prompt);
 int lu_decomposition(double **a, int n, int *index, int *sign);
 void lu_backsubstitution(double **a, int n, int *index, double *b);
 
@@ -78,8 +77,7 @@ static double gamma_help_2(double a, double x, const char *prompt);
 static double beta_help(double a, double b, double x, const char *prompt);
 
 void
-eigen_solution_of_symmetric_matrix(double **a, double *eig_val, int n,
-                                   const char *prompt)
+eigen_solution_of_symmetric_matrix(double **a, double *eig_val, int n, const char *prompt)
 /* After return the rows (!!!) of a are the eigenvectors */
 {
   double *e;
@@ -259,8 +257,7 @@ pythagoras(double a, double b)
 #define MAX_ITER 1000
 
 void
-eigen_solution_of_triangular_matrix(double *d, double *e, int n, double **a,
-                                    const char *prompt)
+eigen_solution_of_triangular_matrix(double *d, double *e, int n, double **a, const char *prompt)
 {
   int i, k, l, m, iter;
   double b, c, f, g, p, r, s;
@@ -293,8 +290,7 @@ eigen_solution_of_triangular_matrix(double *d, double *e, int n, double **a,
             }
           g = (d[l + 1] - d[l]) / (2 * e[l]);
           r = pythagoras(g, 1);
-          g = d[m] - d[l]
-              + e[l] / (g + (fabs(g) > 0 ? (g >= 0 ? fabs(r) : -fabs(r)) : r));
+          g = d[m] - d[l] + e[l] / (g + (fabs(g) > 0 ? (g >= 0 ? fabs(r) : -fabs(r)) : r));
           s = c = 1;
           p = 0;
           for (i = m - 1; i >= l; i--)
@@ -610,8 +606,7 @@ ft(double *real, double *imag, int n, int sign)
 
 /* reentrant version of ft */
 void
-ft_r(double *restrict real, double *restrict imag, int n, int sign,
-     double *restrict work_r, double *restrict work_i)
+ft_r(double *restrict real, double *restrict imag, int n, int sign, double *restrict work_r, double *restrict work_i)
 {
   /* sign should be 1 (FT) or -1 (reverse FT) */
   int j, k;
@@ -650,9 +645,8 @@ double
 lngamma(double x)
 {
   double a, b, temp, ser;
-  static double cof[6]
-      = { 76.18009172947146,  -86.50532032941677,    24.01409824083091,
-          -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5 };
+  static double cof[6] = { 76.18009172947146,  -86.50532032941677,    24.01409824083091,
+                           -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5 };
   int j;
 
   a = b = x;
@@ -696,12 +690,9 @@ gamma_help_1(double a, double x, const char *prompt)
       ap++;
       del *= x / ap;
       sum += del;
-      if (fabs(del) < fabs(sum) * eps)
-        return sum * exp(-x + a * log(x) - (gln));
+      if (fabs(del) < fabs(sum) * eps) return sum * exp(-x + a * log(x) - (gln));
     }
-  fprintf(stderr,
-          "%s: ERROR! Too many iterations in routine \"gamma_help_1\"!\n",
-          prompt);
+  fprintf(stderr, "%s: ERROR! Too many iterations in routine \"gamma_help_1\"!\n", prompt);
   exit(1);
   return 0;
 }
@@ -732,9 +723,7 @@ gamma_help_2(double a, double x, const char *prompt)
       h *= del;
       if (fabs(del - 1) < eps) return exp(-x + a * log(x) - gln) * h;
     }
-  fprintf(stderr,
-          "%s: ERROR! Too many iterations in routine \"gamma_help_2\"!\n",
-          prompt);
+  fprintf(stderr, "%s: ERROR! Too many iterations in routine \"gamma_help_2\"!\n", prompt);
   exit(1);
   return -1;
 }
@@ -775,8 +764,7 @@ incomplete_beta(double a, double b, double x, const char *prompt)
 
   c = (DBL_IS_EQUAL(x, 0.) || DBL_IS_EQUAL(x, 1.))
           ? 0
-          : exp(lngamma(a + b) - lngamma(a) - lngamma(b) + a * log(x)
-                + b * log(1 - x));
+          : exp(lngamma(a + b) - lngamma(a) - lngamma(b) + a * log(x) + b * log(1 - x));
 
   if (x < (a + 1) / (a + b + 2))
     return c * beta_help(a, b, x, prompt) / a;
@@ -820,8 +808,7 @@ beta_help(double a, double b, double x, const char *prompt)
       h *= del;
       if (fabs(del - 1.0) < eps) return h;
     }
-  fprintf(stderr, "%s: ERROR! Too many iterations in routine \"beta_help\"!\n",
-          prompt);
+  fprintf(stderr, "%s: ERROR! Too many iterations in routine \"beta_help\"!\n", prompt);
   exit(1);
   return -1;
 }
@@ -836,8 +823,7 @@ double
 normal(double x, const char *prompt)
 {
   return x > 0 ? 0.5 * (1 + incomplete_gamma(0.5, x * x / 2, prompt))
-               : x < 0 ? 0.5 * (1 - incomplete_gamma(0.5, x * x / 2, prompt))
-                       : 0.5;
+               : x < 0 ? 0.5 * (1 - incomplete_gamma(0.5, x * x / 2, prompt)) : 0.5;
 }
 
 double
@@ -887,8 +873,7 @@ student_t_density(double n, double x, const char *prompt)
               prompt);
       exit(4);
     }
-  return exp(lngamma((n + 1) / 2) - lngamma(n / 2)) / sqrt(n / 2)
-         * pow((1 + x * x / n), -(n + 1) / 2);
+  return exp(lngamma((n + 1) / 2) - lngamma(n / 2)) / sqrt(n / 2) * pow((1 + x * x / n), -(n + 1) / 2);
 }
 
 double
@@ -936,9 +921,7 @@ student_t_inv(double n, double p, const char *prompt)
       x = 0;
       while (TRUE)
         {
-          xx = x
-               - (student_t(n, x, prompt) - p)
-                     / student_t_density(n, x, prompt);
+          xx = x - (student_t(n, x, prompt) - p) / student_t_density(n, x, prompt);
           if (fabs(xx - x) < x * eps) break;
           x = xx;
         }
@@ -960,9 +943,7 @@ chi_square_density(double n, double x, const char *prompt)
               prompt);
       exit(4);
     }
-  return x <= 0 ? 0
-                : pow(2, -n / 2) * pow(x, n / 2 - 1)
-                      * exp(-x / 2 - lngamma(n / 2));
+  return x <= 0 ? 0 : pow(2, -n / 2) * pow(x, n / 2 - 1) * exp(-x / 2 - lngamma(n / 2));
 }
 
 double
@@ -998,14 +979,12 @@ chi_square_inv(double n, double p, const char *prompt)
 
   if (DBL_IS_EQUAL(n, last_n) && DBL_IS_EQUAL(p, last_p)) return last_x;
 
-  if (DBL_IS_EQUAL(n, last_last_n) && DBL_IS_EQUAL(p, last_last_p))
-    return last_last_x;
+  if (DBL_IS_EQUAL(n, last_last_n) && DBL_IS_EQUAL(p, last_last_p)) return last_last_x;
 
   x = n;
   while (TRUE)
     {
-      xx = x
-           - (chi_square(n, x, prompt) - p) / chi_square_density(n, x, prompt);
+      xx = x - (chi_square(n, x, prompt) - p) / chi_square_density(n, x, prompt);
       if (fabs(xx - x) < x * eps) break;
       if (xx < 0)
         x /= 2;
@@ -1023,8 +1002,7 @@ chi_square_inv(double n, double p, const char *prompt)
 }
 
 void
-chi_square_constants(double n, double p, double *c1, double *c2,
-                     const char *prompt)
+chi_square_constants(double n, double p, double *c1, double *c2, const char *prompt)
 {
   double delta_c1, delta_c2;
   static double last_n, last_p, last_c1, last_c2;
@@ -1094,10 +1072,7 @@ beta_distr_density(double a, double b, double x, const char *prompt)
               prompt);
       exit(4);
     }
-  return x <= 0
-             ? 0
-             : x >= 1 ? 1
-                      : pow(x, a - 1) * pow(1 - x, b - 1) / beta(a, b, prompt);
+  return x <= 0 ? 0 : x >= 1 ? 1 : pow(x, a - 1) * pow(1 - x, b - 1) / beta(a, b, prompt);
 }
 
 double
@@ -1110,8 +1085,7 @@ double
 beta_distr_inv(double a, double b, double p, const char *prompt)
 {
   static double last_a = -1, last_b, last_p = -1, last_x = -1;
-  static double last_last_a = -1, last_last_b = -1, last_last_p = -1,
-                last_last_x = -1;
+  static double last_last_a = -1, last_last_b = -1, last_last_p = -1, last_last_x = -1;
   double xx, x;
   static const double eps = 1e-10;
 
@@ -1124,20 +1098,14 @@ beta_distr_inv(double a, double b, double p, const char *prompt)
       exit(4);
     }
 
-  if (DBL_IS_EQUAL(a, last_a) && DBL_IS_EQUAL(b, last_b)
-      && DBL_IS_EQUAL(p, last_p))
-    return last_x;
+  if (DBL_IS_EQUAL(a, last_a) && DBL_IS_EQUAL(b, last_b) && DBL_IS_EQUAL(p, last_p)) return last_x;
 
-  if (DBL_IS_EQUAL(a, last_last_a) && DBL_IS_EQUAL(b, last_last_b)
-      && DBL_IS_EQUAL(p, last_last_p))
-    return last_last_x;
+  if (DBL_IS_EQUAL(a, last_last_a) && DBL_IS_EQUAL(b, last_last_b) && DBL_IS_EQUAL(p, last_last_p)) return last_last_x;
 
   x = a / (a + b);
   while (TRUE)
     {
-      xx = x
-           - (beta_distr(a, b, x, prompt) - p)
-                 / beta_distr_density(a, b, x, prompt);
+      xx = x - (beta_distr(a, b, x, prompt) - p) / beta_distr_density(a, b, x, prompt);
       if (fabs(xx - x) < x * eps) break;
       if (xx <= 0)
         x /= 2;
@@ -1163,8 +1131,7 @@ beta_distr_inv(double a, double b, double p, const char *prompt)
 }
 
 void
-beta_distr_constants(double a, double b, double p, double *c1, double *c2,
-                     const char *prompt)
+beta_distr_constants(double a, double b, double p, double *c1, double *c2, const char *prompt)
 {
   double delta_c1, delta_c2;
   static double last_a, last_b, last_p, last_c1, last_c2;
@@ -1181,8 +1148,7 @@ beta_distr_constants(double a, double b, double p, double *c1, double *c2,
       exit(4);
     }
 
-  if (DBL_IS_EQUAL(a, last_a) && DBL_IS_EQUAL(b, last_b)
-      && DBL_IS_EQUAL(p, last_p))
+  if (DBL_IS_EQUAL(a, last_a) && DBL_IS_EQUAL(b, last_b) && DBL_IS_EQUAL(p, last_p))
     {
       *c1 = last_c1;
       *c2 = last_c2;
@@ -1203,8 +1169,7 @@ beta_distr_constants(double a, double b, double p, double *c1, double *c2,
       a21 = -beta_distr_density(a + 1, b, *c1, prompt);
       a22 = beta_distr_density(a + 1, b, *c2, prompt);
       b1 = p + beta_distr(a, b, *c1, prompt) - beta_distr(a, b, *c2, prompt);
-      b2 = p + beta_distr(a + 1, b, *c1, prompt)
-           - beta_distr(a + 1, b, *c2, prompt);
+      b2 = p + beta_distr(a + 1, b, *c1, prompt) - beta_distr(a + 1, b, *c2, prompt);
       /* Solve ((a11,a12),(a21,a22))*(delta_c1,delta_c2)==(b1,b2) */
       det = a11 * a22 - a12 * a21;
       delta_c1 = (b1 * a22 - b2 * a12) / det;
@@ -1257,8 +1222,7 @@ fisher(double m, double n, double x, const char *prompt)
  */
 
 void
-parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n,
-                                            const char func[])
+parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n, const char func[])
 {
   UNUSED(func);
 
@@ -1269,9 +1233,7 @@ parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n,
     max_jacobi_iter = atoi(envstr);
   else
     max_jacobi_iter = MAX_JACOBI_ITER;
-  if (cdoVerbose)
-    cdoPrint("Using MAX_JACOBI_ITER %i from %s", max_jacobi_iter,
-             envstr ? "Environment" : "default");
+  if (cdoVerbose) cdoPrint("Using MAX_JACOBI_ITER %i from %s", max_jacobi_iter, envstr ? "Environment" : "default");
 
   envstr = getenv("FNORM_PRECISION");
   if (envstr)
@@ -1279,9 +1241,7 @@ parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n,
   else
     fnorm_precision = FNORM_PRECISION;
 
-  if (cdoVerbose)
-    cdoPrint("Using FNORM_PRECISION %g from %s", fnorm_precision,
-             envstr ? "Environment" : "default");
+  if (cdoVerbose) cdoPrint("Using FNORM_PRECISION %g from %s", fnorm_precision, envstr ? "Environment" : "default");
 
   // eigen_solution_of_symmetric_matrix(M, A, n, func);
   jacobi_1side(M, A, n);
@@ -1448,16 +1408,14 @@ jacobi_1side(double **M, double *A, long n)
           for (m = 0; m < n; m++)
             {
 #ifdef _OPENMP
-#pragma omp parallel for private(idx, i_ann, j_ann) \
-    shared(M, annihilations, n, n_finished)
+#pragma omp parallel for private(idx, i_ann, j_ann) shared(M, annihilations, n, n_finished)
 #endif
               for (i = 0; i < n / 2; i++)
                 {
                   idx = m * (n / 2) + i;
                   i_ann = annihilations[idx][0];
                   j_ann = annihilations[idx][1];
-                  if (i_ann != j_ann && i_ann && j_ann)
-                    annihilate_1side(M, i_ann, j_ann, n);
+                  if (i_ann != j_ann && i_ann && j_ann) annihilate_1side(M, i_ann, j_ann, n);
                 }
             }
         }
@@ -1466,8 +1424,7 @@ jacobi_1side(double **M, double *A, long n)
           for (m = 0; m < n; m++)
             {
 #ifdef _OPENMP
-#pragma omp parallel for private(idx, i_ann, j_ann) \
-    shared(M, annihilations, n, n_finished)
+#pragma omp parallel for private(idx, i_ann, j_ann) shared(M, annihilations, n, n_finished)
 #endif
               for (i = 0; i < n / 2 - (m % 2); i++)
                 {
@@ -1475,8 +1432,7 @@ jacobi_1side(double **M, double *A, long n)
                   if (m % 2) idx += n / 2;
                   i_ann = annihilations[idx + i][0];
                   j_ann = annihilations[idx + i][1];
-                  if (i_ann && j_ann && i_ann != j_ann)
-                    annihilate_1side(M, i_ann, j_ann, n);
+                  if (i_ann && j_ann && i_ann != j_ann) annihilate_1side(M, i_ann, j_ann, n);
                 }
             }
         }

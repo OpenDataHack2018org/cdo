@@ -113,11 +113,9 @@ Ydrunpctl(void *process)
   field_init(&field);
   field.ptr = (double *) Malloc(gridsize * sizeof(double));
 
-  cdo_datetime_t *datetime
-      = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
+  cdo_datetime_t *datetime = (cdo_datetime_t *) Malloc((ndates + 1) * sizeof(cdo_datetime_t));
 
-  field_type ***vars1
-      = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
+  field_type ***vars1 = (field_type ***) Malloc((ndates + 1) * sizeof(field_type **));
 
   for (its = 0; its < ndates; its++)
     {
@@ -128,20 +126,17 @@ Ydrunpctl(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))
     {
       if (nrecs != cdoStreamInqTimestep(streamID3, tsID))
-        cdoAbort("Number of records at time step %d of %s and %s differ!",
-                 tsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
 
       if (vdate != taxisInqVdate(taxisID3))
-        cdoAbort("Verification dates at time step %d of %s and %s differ!",
-                 tsID + 1, cdoGetStreamName(1).c_str(),
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID + 1, cdoGetStreamName(1).c_str(),
                  cdoGetStreamName(2).c_str());
 
-      if (cdoVerbose)
-        cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
+      if (cdoVerbose) cdoPrint("process timestep: %d %d %d", tsID + 1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
@@ -172,8 +167,7 @@ Ydrunpctl(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID2, &varID, &levelID);
-          pstreamReadRecord(streamID2, vars2[dayoy][varID][levelID].ptr,
-                            &nmiss);
+          pstreamReadRecord(streamID2, vars2[dayoy][varID][levelID].ptr, &nmiss);
           vars2[dayoy][varID][levelID].nmiss = nmiss;
         }
       for (int recID = 0; recID < nrecs; recID++)
@@ -184,8 +178,7 @@ Ydrunpctl(void *process)
           field.grid = vars2[dayoy][varID][levelID].grid;
           field.missval = vars2[dayoy][varID][levelID].missval;
 
-          hsetDefVarLevelBounds(hsets[dayoy], varID, levelID,
-                                &vars2[dayoy][varID][levelID], &field);
+          hsetDefVarLevelBounds(hsets[dayoy], varID, levelID, &vars2[dayoy][varID][levelID], &field);
         }
 
       tsID++;
@@ -234,8 +227,7 @@ Ydrunpctl(void *process)
       vtimes1[dayoy] = vtime;
 
       if (vars2[dayoy] == NULL)
-        cdoAbort("No data for day %d in %s and %s", dayoy,
-                 cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
+        cdoAbort("No data for day %d in %s and %s", dayoy, cdoGetStreamName(1).c_str(), cdoGetStreamName(2).c_str());
 
       for (varID = 0; varID < nvars; varID++)
         {
@@ -244,8 +236,7 @@ Ydrunpctl(void *process)
 
           for (levelID = 0; levelID < nlevels; levelID++)
             for (inp = 0; inp < ndates; inp++)
-              hsetAddVarLevelValues(hsets[dayoy], varID, levelID,
-                                    &vars1[inp][varID][levelID]);
+              hsetAddVarLevelValues(hsets[dayoy], varID, levelID, &vars1[inp][varID][levelID]);
         }
 
       datetime[ndates] = datetime[0];
@@ -267,8 +258,7 @@ Ydrunpctl(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          pstreamReadRecord(streamID1, vars1[ndates - 1][varID][levelID].ptr,
-                            &nmiss);
+          pstreamReadRecord(streamID1, vars1[ndates - 1][varID][levelID].ptr, &nmiss);
           vars1[ndates - 1][varID][levelID].nmiss = nmiss;
         }
 
@@ -298,9 +288,8 @@ Ydrunpctl(void *process)
     if (nsets[dayoy])
       {
         if (getmonthday(vdates1[dayoy]) != getmonthday(vdates2[dayoy]))
-          cdoAbort(
-              "Verification dates for day %d of %s, %s and %s are different!",
-              dayoy, cdoGetStreamName(0).c_str(), cdoGetStreamName(1).c_str());
+          cdoAbort("Verification dates for day %d of %s, %s and %s are different!", dayoy, cdoGetStreamName(0).c_str(),
+                   cdoGetStreamName(1).c_str());
 
         for (varID = 0; varID < nvars; varID++)
           {
@@ -308,8 +297,7 @@ Ydrunpctl(void *process)
             nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
             for (levelID = 0; levelID < nlevels; levelID++)
-              hsetGetVarLevelPercentiles(&vars2[dayoy][varID][levelID],
-                                         hsets[dayoy], varID, levelID, pn);
+              hsetGetVarLevelPercentiles(&vars2[dayoy][varID][levelID], hsets[dayoy], varID, levelID, pn);
           }
 
         taxisDefVdate(taxisID4, vdates1[dayoy]);
@@ -321,12 +309,10 @@ Ydrunpctl(void *process)
             varID = recVarID[recID];
             levelID = recLevelID[recID];
 
-            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
-              continue;
+            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
             pstreamDefRecord(streamID4, varID, levelID);
-            pstreamWriteRecord(streamID4, vars2[dayoy][varID][levelID].ptr,
-                               vars2[dayoy][varID][levelID].nmiss);
+            pstreamWriteRecord(streamID4, vars2[dayoy][varID][levelID].ptr, vars2[dayoy][varID][levelID].nmiss);
           }
 
         otsID++;

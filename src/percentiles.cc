@@ -121,8 +121,7 @@ percentile(double *array, size_t len, double pn)
   else if (percentile_method == NUMPY)
     percentil = percentile_numpy(array, len, pn);
   else
-    cdoAbort("Internal error: percentile method %d not implemented!",
-             percentile_method);
+    cdoAbort("Internal error: percentile method %d not implemented!", percentile_method);
 
   return percentil;
 }

@@ -72,12 +72,10 @@ void afterInqHistory(int fileID);
 void afterDefHistory(int fileID, char *histstring);
 
 int scan_par_obsolate(char *namelist, const char *name, int def);
-void scan_code(char *namelist, struct Variable *vars, int maxCodes,
-               int *numCodes);
+void scan_code(char *namelist, struct Variable *vars, int maxCodes, int *numCodes);
 int scan_par(int verbose, char *namelist, const char *name, int def);
 int scan_time(int verbose, char *namelist, int *hours, int max_hours);
-void scan_darray(char *namelist, const char *name, double *values,
-                 int maxValues, int *numValues);
+void scan_darray(char *namelist, const char *name, double *values, int maxValues, int *numValues);
 
 long get_nfft(void);
 
@@ -183,17 +181,13 @@ after_PostProcess(struct Control *globs)
       if (lstdout)
         {
           if (globs->OutputInterval == DAILY_INTERVAL)
-            fprintf(stdout, " Processed Day %2d  Month %2d  Year %04d",
-                    globs->OldDate.dy, globs->OldDate.mo, globs->OldDate.yr);
+            fprintf(stdout, " Processed Day %2d  Month %2d  Year %04d", globs->OldDate.dy, globs->OldDate.mo,
+                    globs->OldDate.yr);
           else if (globs->OutputInterval == MONTHLY_INTERVAL)
-            fprintf(stdout, " Processed Month %2d  Year %04d",
-                    globs->OldDate.mo, globs->OldDate.yr);
+            fprintf(stdout, " Processed Month %2d  Year %04d", globs->OldDate.mo, globs->OldDate.yr);
           else if (globs->OutputInterval == UNLIM_INTERVAL)
-            fprintf(
-                stdout,
-                " Processed range from %6.4d-%2.2d-%2.2d to %6.4d-%2.2d-%2.2d",
-                globs->StartDate.yr, globs->StartDate.mo, globs->StartDate.dy,
-                globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy);
+            fprintf(stdout, " Processed range from %6.4d-%2.2d-%2.2d to %6.4d-%2.2d-%2.2d", globs->StartDate.yr,
+                    globs->StartDate.mo, globs->StartDate.dy, globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy);
 
           if (globs->Mean)
             fprintf(stdout, "  (Mean of %3d Terms)\n", globs->MeanCount);
@@ -340,8 +334,7 @@ after_SwitchFile(struct Control *globs)
   fprintf(stderr, " Continuation file: %s\n", ifile);
 
   globs->istreamID = streamOpenRead(ifile);
-  if (globs->istreamID < 0)
-    cdiError(globs->istreamID, "Open failed on %s", ifile);
+  if (globs->istreamID < 0) cdiError(globs->istreamID, "Open failed on %s", ifile);
 
   globs->ivlistID = streamInqVlist(globs->istreamID);
   globs->taxisID = vlistInqTaxis(globs->ivlistID);
@@ -376,8 +369,7 @@ after_printProcessStatus(int tsID)
     {
       if (stdout_is_tty)
         {
-          fprintf(stdout,
-                  "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+          fprintf(stdout, "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
           fflush(stdout);
         }
 
@@ -484,8 +476,7 @@ after_readTimestep(void *arg)
       /*
         if ( vars[code].ozaxisID != vars[code].izaxisID && ! Lhybrid2pressure )
       */
-      if ((vars[code].ozaxisID != vars[code].izaxisID)
-          && (leveltype == ZAXIS_PRESSURE))
+      if ((vars[code].ozaxisID != vars[code].izaxisID) && (leveltype == ZAXIS_PRESSURE))
         {
           int level = (int) zaxisInqLevel(zaxisID, levelID);
           for (int i = 0; i < globs->NumLevelRequest; ++i)
@@ -507,30 +498,24 @@ after_readTimestep(void *arg)
         {
           fprintf(stderr, "T%d", globs->Truncation);
 
-          fprintf(stderr,
-                  "  Code %3d   Level%6d   %6.4d-%2.2d-%2.2d  %2.2d:%2.2d:00\n",
-                  code, (int) zaxisInqLevel(zaxisID, levelID),
-                  globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy,
+          fprintf(stderr, "  Code %3d   Level%6d   %6.4d-%2.2d-%2.2d  %2.2d:%2.2d:00\n", code,
+                  (int) zaxisInqLevel(zaxisID, levelID), globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy,
                   globs->OldDate.hr, globs->OldDate.mn);
         }
 
       if (analysisData)
         {
           streamReadRecord(globs->istreamID, globs->Field, &nmiss);
-          after_AnalysisAddRecord(globs, vars, code, gridID, zaxisID, levelID,
-                                  nmiss);
+          after_AnalysisAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
         }
       else
         {
-          double *dataptr
-              = after_get_dataptr(vars, code, gridID, zaxisID, levelID);
+          double *dataptr = after_get_dataptr(vars, code, gridID, zaxisID, levelID);
           streamReadRecord(globs->istreamID, dataptr, &nmiss);
-          after_EchamAddRecord(globs, vars, code, gridID, zaxisID, levelID,
-                               nmiss);
+          after_EchamAddRecord(globs, vars, code, gridID, zaxisID, levelID, nmiss);
         }
 
-      if (iVertID != -1 && oVertID != -1 && (vars[code].izaxisID == iVertID))
-        vars[code].ozaxisID = oVertID;
+      if (iVertID != -1 && oVertID != -1 && (vars[code].izaxisID == iVertID)) vars[code].ozaxisID = oVertID;
     }
 
   TsID++;
@@ -651,8 +636,7 @@ after_check_content(struct Variable *vars, int timestep)
       if (code == PS) continue;
       if (code == HUMIDITY)
         {
-          if (vars[code].needed && !vars[code].selected
-              && vars[code].spectral == NULL && vars[code].hybrid == NULL)
+          if (vars[code].needed && !vars[code].selected && vars[code].spectral == NULL && vars[code].hybrid == NULL)
             {
               static bool lwarn = true;
               if (lwarn) Warning("No humidity in data file, set to zero !");
@@ -662,8 +646,7 @@ after_check_content(struct Variable *vars, int timestep)
         }
       else
         {
-          if (vars[code].needed && !vars[code].comp
-              && vars[code].spectral == NULL && vars[code].hybrid == NULL)
+          if (vars[code].needed && !vars[code].comp && vars[code].spectral == NULL && vars[code].hybrid == NULL)
             {
               if (labort_after)
                 Error("Code  %3d not found at timestep %d!", code, timestep);
@@ -750,9 +733,8 @@ after_control(struct Control *globs, struct Variable *vars)
       rtime = after_getTime(globs->StartDate);
     }
 
-  if (ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2
-      || ofiletype == CDI_FILETYPE_NC4 || ofiletype == CDI_FILETYPE_NC4C
-      || ofiletype == CDI_FILETYPE_NC5)
+  if (ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 || ofiletype == CDI_FILETYPE_NC4
+      || ofiletype == CDI_FILETYPE_NC4C || ofiletype == CDI_FILETYPE_NC5)
     {
       taxisDefCalendar(globs->taxisID2, CALENDAR_PROLEPTIC);
       taxisDefType(globs->taxisID2, TAXIS_RELATIVE);
@@ -788,17 +770,14 @@ after_control(struct Control *globs, struct Variable *vars)
           if (lparallelread)
             {
               statusp = cdo_task_wait(read_task);
-              if (*(int *) statusp < 0)
-                Error("after_readTimestep error! (status = %d)",
-                      *(int *) statusp);
+              if (*(int *) statusp < 0) Error("after_readTimestep error! (status = %d)", *(int *) statusp);
             }
           tsFirst = false;
         }
       else
         {
           statusp = cdo_task_wait(read_task);
-          if (*(int *) statusp < 0)
-            Error("after_readTimestep error! (status = %d)", *(int *) statusp);
+          if (*(int *) statusp < 0) Error("after_readTimestep error! (status = %d)", *(int *) statusp);
         }
 
       nrecs = *(int *) statusp;
@@ -821,8 +800,7 @@ after_control(struct Control *globs, struct Variable *vars)
 
       if (globs->Mean == 0 || globs->EndOfInterval)
         {
-          if (!globs->AnalysisData)
-            after_check_content(vars, globs->TermCount + 1);
+          if (!globs->AnalysisData) after_check_content(vars, globs->TermCount + 1);
           after_defineNextTimestep(globs);
         }
 
@@ -855,19 +833,16 @@ after_setLevel(struct Control *globs)
   double level;
   bool checkLevel = true;
   int numplevelDefault; /* default pressure level */
-  long plevelDefault[]
-      = { 100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000,
-          20000,  15000, 10000, 7000,  5000,  3000,  2000,  1000 };
+  long plevelDefault[] = { 100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000,
+                           20000,  15000, 10000, 7000,  5000,  3000,  2000,  1000 };
   int numhlevelDefault; /* default height level */
-  long hlevelDefault[]
-      = { 0, 1000, 2000, 5000, 10000, 15000, 20000, 25000, 30000 };
+  long hlevelDefault[] = { 0, 1000, 2000, 5000, 10000, 15000, 20000, 25000, 30000 };
 
   numplevelDefault = sizeof(plevelDefault) / sizeof(plevelDefault[0]);
   numhlevelDefault = sizeof(hlevelDefault) / sizeof(hlevelDefault[0]);
 
   if (iVertID != -1)
-    if (zaxisInqType(iVertID) == ZAXIS_HYBRID && globs->Type > 20)
-      Lhybrid2pressure = TRUE;
+    if (zaxisInqType(iVertID) == ZAXIS_HYBRID && globs->Type > 20) Lhybrid2pressure = TRUE;
 
   if (globs->Verbose) lprintf(stdout);
 
@@ -883,8 +858,7 @@ after_setLevel(struct Control *globs)
             {
               if (globs->unitsel == 0)
                 {
-                  if (globs->Verbose)
-                    fprintf(stdout, " Default pressure level selected:\n");
+                  if (globs->Verbose) fprintf(stdout, " Default pressure level selected:\n");
                   globs->NumLevelRequest = numplevelDefault;
                   for (l = 0; l < globs->NumLevelRequest; l++)
                     globs->LevelRequest[l] = plevelDefault[l];
@@ -893,8 +867,7 @@ after_setLevel(struct Control *globs)
                 }
               else
                 {
-                  if (globs->Verbose)
-                    fprintf(stdout, " Default height level selected:\n");
+                  if (globs->Verbose) fprintf(stdout, " Default height level selected:\n");
                   globs->NumLevelRequest = numhlevelDefault;
                   for (l = 0; l < globs->NumLevelRequest; l++)
                     globs->LevelRequest[l] = hlevelDefault[l];
@@ -926,8 +899,7 @@ after_setLevel(struct Control *globs)
           if (globs->Verbose) fprintf(stdout, " No level detected\n");
           checkLevel = false;
         }
-      else if (globs->NumLevelRequest == 1
-               && IS_EQUAL(globs->LevelRequest[0], 0))
+      else if (globs->NumLevelRequest == 1 && IS_EQUAL(globs->LevelRequest[0], 0))
         {
           if (globs->Verbose) fprintf(stdout, " No level selected\n");
           globs->NumLevelRequest = 0;
@@ -969,20 +941,17 @@ after_setLevel(struct Control *globs)
         {
           level = globs->LevelRequest[k];
           for (l = k + 1; l < globs->NumLevelRequest; l++)
-            if (removeLevel[l] == FALSE
-                && IS_EQUAL(level, globs->LevelRequest[l]))
+            if (removeLevel[l] == FALSE && IS_EQUAL(level, globs->LevelRequest[l]))
               {
                 if (globs->Verbose)
-                  fprintf(stdout, "  Level %2d = %13.4f double request\n",
-                          l + 1, globs->LevelRequest[l]);
+                  fprintf(stdout, "  Level %2d = %13.4f double request\n", l + 1, globs->LevelRequest[l]);
                 removeLevel[l] = TRUE;
               }
         }
 
       l = 0;
       for (k = 0; k < globs->NumLevelRequest; k++)
-        if (removeLevel[k] == FALSE)
-          globs->LevelRequest[l++] = globs->LevelRequest[k];
+        if (removeLevel[k] == FALSE) globs->LevelRequest[l++] = globs->LevelRequest[k];
 
       globs->NumLevelRequest = l;
 
@@ -999,16 +968,14 @@ after_setLevel(struct Control *globs)
 
               if (!found)
                 {
-                  fprintf(stdout, "  Level %2d = %14.4f not in input\n", k + 1,
-                          globs->LevelRequest[k]);
+                  fprintf(stdout, "  Level %2d = %14.4f not in input\n", k + 1, globs->LevelRequest[k]);
                   removeLevel[k] = TRUE;
                 }
             }
 
           l = 0;
           for (k = 0; k < globs->NumLevelRequest; k++)
-            if (removeLevel[k] == FALSE)
-              globs->LevelRequest[l++] = globs->LevelRequest[k];
+            if (removeLevel[k] == FALSE) globs->LevelRequest[l++] = globs->LevelRequest[k];
 
           if (l != globs->NumLevelRequest)
             {
@@ -1047,14 +1014,12 @@ after_defineLevel(struct Control *globs, struct Variable *vars)
           {
             if (oVertID == -1)
               {
-                if (globs->NumLevelRequest > globs->NumLevelFound)
-                  Error("Too much level requested");
+                if (globs->NumLevelRequest > globs->NumLevelFound) Error("Too much level requested");
 
                 if (globs->NumLevelFound == globs->NumLevelRequest)
                   {
                     for (i = 0; i < globs->NumLevelRequest; i++)
-                      if (IS_NOT_EQUAL(globs->LevelRequest[i], LevelFound[i]))
-                        break;
+                      if (IS_NOT_EQUAL(globs->LevelRequest[i], LevelFound[i])) break;
 
                     if (i == globs->NumLevelRequest) oVertID = iVertID;
                   }
@@ -1073,8 +1038,7 @@ after_defineLevel(struct Control *globs, struct Variable *vars)
                   {
                     if (vars[code].izaxisID != -1)
                       if (zaxisInqType(vars[code].izaxisID) == ZAXIS_HYBRID
-                          && zaxisInqSize(vars[code].izaxisID)
-                                 >= globs->NumLevelRequest)
+                          && zaxisInqSize(vars[code].izaxisID) >= globs->NumLevelRequest)
                         vars[code].ozaxisID = oVertID;
                   }
               }
@@ -1082,8 +1046,7 @@ after_defineLevel(struct Control *globs, struct Variable *vars)
         else
           {
             zaxisName(zaxisInqType(iVertID), zaxistypename);
-            Error("%s level data unsupported for TYPE %d", zaxistypename,
-                  globs->Type);
+            Error("%s level data unsupported for TYPE %d", zaxistypename, globs->Type);
           }
         break;
       }
@@ -1114,11 +1077,8 @@ after_defineLevel(struct Control *globs, struct Variable *vars)
                 if (vars[code].izaxisID != -1)
                   {
                     int nlev = zaxisInqSize(vars[code].izaxisID);
-                    if (zaxisInqType(vars[code].izaxisID)
-                            == zaxisInqType(iVertID)
-                        && (nlev == globs->NumLevel
-                            || nlev == globs->NumLevel + 1)
-                        && nlev > 1)
+                    if (zaxisInqType(vars[code].izaxisID) == zaxisInqType(iVertID)
+                        && (nlev == globs->NumLevel || nlev == globs->NumLevel + 1) && nlev > 1)
                       vars[code].ozaxisID = oVertID;
                   }
               }
@@ -1164,8 +1124,7 @@ after_defineGrid(struct Control *globs, struct Variable *vars)
             if (globs->Longitudes == 0) Error("number of longitudes undefined");
             if (globs->Latitudes == 0) Error("number of latitudes undefined");
 
-            gaussGridID = gridCreate(GRID_GAUSSIAN,
-                                     globs->Longitudes * globs->Latitudes);
+            gaussGridID = gridCreate(GRID_GAUSSIAN, globs->Longitudes * globs->Latitudes);
             gridDefXsize(gaussGridID, globs->Longitudes);
             gridDefYsize(gaussGridID, globs->Latitudes);
           }
@@ -1177,8 +1136,7 @@ after_defineGrid(struct Control *globs, struct Variable *vars)
     case 40:
     case 60:
       {
-        if (globs->Fouriers == 0)
-          Error("number of fourier coefficients undefined");
+        if (globs->Fouriers == 0) Error("number of fourier coefficients undefined");
         if (globs->Latitudes == 0) Error("number of latitudes undefined");
 
         ogridID = gridCreate(GRID_FOURIER, globs->Fouriers * globs->Latitudes);
@@ -1213,8 +1171,7 @@ after_defineGrid(struct Control *globs, struct Variable *vars)
 }
 
 static void
-after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes,
-               int numCodes)
+after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, int numCodes)
 {
   if (globs->Verbose) lprintf(stdout);
 
@@ -1289,10 +1246,8 @@ after_checkNamelist(struct Control *globs)
 
   if (globs->Extrapolate == FALSE && globs->Type >= 30)
     {
-      if (globs->Type > 30)
-        Error("EXTRAPOLATE = 0 is only available for TYPE = 30!");
-      if (globs->Mean)
-        Error("EXTRAPOLATE = 0 is only available with MEAN = 0!");
+      if (globs->Type > 30) Error("EXTRAPOLATE = 0 is only available for TYPE = 30!");
+      if (globs->Mean) Error("EXTRAPOLATE = 0 is only available with MEAN = 0!");
     }
 }
 
@@ -1300,14 +1255,12 @@ after_checkNamelist(struct Control *globs)
 static void
 after_usage(void)
 {
-  fprintf(stderr,
-          "\nafter [options] <InputFiles> <OutputFile> <VarianceFile>\n");
+  fprintf(stderr, "\nafter [options] <InputFiles> <OutputFile> <VarianceFile>\n");
 #if defined(_OPENMP)
   fprintf(stderr, "     option -P <nthreads> : Set number of OpenMP threads\n");
 #endif
   fprintf(stderr, "     option -a            : Forces analysis data process\n");
-  fprintf(stderr,
-          "     option -c            : Print available codes and names\n");
+  fprintf(stderr, "     option -c            : Print available codes and names\n");
   fprintf(stderr, "     option -d            : Debug mode\n");
   fprintf(stderr, "     option -v <vctfile>  : Read vct from vctfile\n");
   /*  fprintf(stderr, "     option -h : help (this output)\n"); */
@@ -1320,8 +1273,7 @@ after_usage(void)
 
   fprintf(stderr, "  default Namelist: \n");
   fprintf(stderr, "  &SELECT\n");
-  fprintf(stderr,
-          "    TYPE = 0, CODE = -1, LEVEL = -1, MULTI = 0, DAYIN = 30,\n");
+  fprintf(stderr, "    TYPE = 0, CODE = -1, LEVEL = -1, MULTI = 0, DAYIN = 30,\n");
   fprintf(stderr, "    MEAN = 0, TIMESEL = -1, UNITSEL = 0,\n");
   fprintf(stderr, "    FORMAT = 0, PRECISION = 0, SZIP = 0\n");
   fprintf(stderr, "  &END\n");
@@ -1339,9 +1291,7 @@ after_parini(struct Control *globs, struct Variable *vars)
     {
 #if defined(CDO)
       fprintf(stderr, "Default namelist: \n");
-      fprintf(
-          stderr,
-          "  TYPE=0, CODE=-1, LEVEL=-1, INTERVAL=0, MEAN=0, EXTRAPOLATE=0\n");
+      fprintf(stderr, "  TYPE=0, CODE=-1, LEVEL=-1, INTERVAL=0, MEAN=0, EXTRAPOLATE=0\n");
 #endif
       fprintf(stdout, "Enter namelist parameter:\n");
     }
@@ -1381,8 +1331,7 @@ after_parini(struct Control *globs, struct Variable *vars)
   if (globs->Debug)
     {
       lprintf(stderr);
-      fprintf(stderr, "  Length of namelist:%4d bytes\n",
-              (int) strlen(namelist));
+      fprintf(stderr, "  Length of namelist:%4d bytes\n", (int) strlen(namelist));
 
       for (i = 0; i < (int) strlen(namelist); i += 60)
         fprintf(stderr, "  namelist[%02d]=%-60.60s\n", i, namelist + i);
@@ -1398,12 +1347,10 @@ after_parini(struct Control *globs, struct Variable *vars)
   globs->Type = scan_par(globs->Verbose, namelist, "type", 0);
   globs->Multi = scan_par(globs->Verbose, namelist, "multi", 0);
   globs->Mean = scan_par(globs->Verbose, namelist, "mean", 0);
-  globs->OutputInterval
-      = scan_par(globs->Verbose, namelist, "interval", MONTHLY_INTERVAL);
+  globs->OutputInterval = scan_par(globs->Verbose, namelist, "interval", MONTHLY_INTERVAL);
 
 #if defined(CDO)
-  if (globs->Mean >= 2)
-    cdoAbort("Namelist parameter MEAN=%d out of bounds (0:1)", globs->Mean);
+  if (globs->Mean >= 2) cdoAbort("Namelist parameter MEAN=%d out of bounds (0:1)", globs->Mean);
 #endif
 
   int fileFormat = scan_par(globs->Verbose, namelist, "format", -1);
@@ -1463,8 +1410,7 @@ after_parini(struct Control *globs, struct Variable *vars)
   nrqh = scan_time(globs->Verbose, namelist, hours, MaxHours);
   scan_code(namelist, vars, MaxCodes, &globs->NumCodesRequest);
 
-  scan_darray(namelist, "level", globs->LevelRequest, MaxLevel,
-              &globs->NumLevelRequest);
+  scan_darray(namelist, "level", globs->LevelRequest, MaxLevel, &globs->NumLevelRequest);
   if (globs->NumLevelRequest == 1)
     if (IS_EQUAL(globs->LevelRequest[0], -1)) globs->NumLevelRequest = 0;
 
@@ -1582,9 +1528,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
             case 64: globs->Truncation = 42; break;
             case 48: globs->Truncation = 31; break;
             case 32: globs->Truncation = 21; break;
-            default:
-              fprintf(stderr, "%d Gaussian latitudes not supported.\n",
-                      globs->Latitudes);
+            default: fprintf(stderr, "%d Gaussian latitudes not supported.\n", globs->Latitudes);
             }
         }
     }
@@ -1616,19 +1560,15 @@ after_precntl(struct Control *globs, struct Variable *vars)
                         }
                       else
                         {
-                          Warning("Skip %d hybrid level data with %d levels!",
-                                  (nvct / 2 - 1), numlevel);
+                          Warning("Skip %d hybrid level data with %d levels!", (nvct / 2 - 1), numlevel);
                         }
                       continue;
                     }
                 }
-              else if (leveltype == ZAXIS_HYBRID
-                       && globs->nvct == zaxisInqVctSize(zaxisID))
+              else if (leveltype == ZAXIS_HYBRID && globs->nvct == zaxisInqVctSize(zaxisID))
                 continue;
 
-              if (iVertID != -1)
-                Warning("More than %d different vertical grid structure found!",
-                        vertfound);
+              if (iVertID != -1) Warning("More than %d different vertical grid structure found!", vertfound);
 
               vertfound++;
 
@@ -1636,8 +1576,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
 
               iVertID = zaxisID;
               globs->NumLevelFound = numlevel;
-              LevelFound
-                  = (double *) Malloc(globs->NumLevelFound * sizeof(double));
+              LevelFound = (double *) Malloc(globs->NumLevelFound * sizeof(double));
               for (l = 0; l < globs->NumLevelFound; l++)
                 LevelFound[l] = (int) zaxisInqLevel(zaxisID, l);
 
@@ -1651,10 +1590,8 @@ after_precntl(struct Control *globs, struct Variable *vars)
 
                           if (globs->vct == NULL)
                             {
-                              globs->vct = (double *) Malloc(globs->nvct
-                                                             * sizeof(double));
-                              arrayCopy(globs->nvct, zaxisInqVctPtr(zaxisID),
-                                        globs->vct);
+                              globs->vct = (double *) Malloc(globs->nvct * sizeof(double));
+                              arrayCopy(globs->nvct, zaxisInqVctPtr(zaxisID), globs->vct);
                             }
                         }
                       else
@@ -1663,8 +1600,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
                             {
                               fprintf(stderr, " Using internal VCT for L191\n");
                               globs->nvct = (191 + 1) * 2;
-                              globs->vct = (double *) Malloc(globs->nvct
-                                                             * sizeof(double));
+                              globs->vct = (double *) Malloc(globs->nvct * sizeof(double));
                               arrayCopy(globs->nvct, VCT_L191, globs->vct);
                               zaxisDefVct(zaxisID, globs->nvct, globs->vct);
                             }
@@ -1682,8 +1618,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
 
                   if (globs->Debug)
                     for (i = 0; i < globs->nvct / 2; i++)
-                      fprintf(stderr, " vct: %4d %10.4f %10.4f\n", i,
-                              globs->vct[i], globs->vct[i + globs->nvct / 2]);
+                      fprintf(stderr, " vct: %4d %10.4f %10.4f\n", i, globs->vct[i], globs->vct[i + globs->nvct / 2]);
                 }
 
               if (leveltype == ZAXIS_PRESSURE) globs->AnalysisData = TRUE;
@@ -1698,9 +1633,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
   if (specGridID != -1) globs->Spectral = TRUE;
   if (gaussGridID != -1) globs->Gaussian = TRUE;
 
-  if (globs->Debug)
-    fprintf(stderr, "   T = %3d   L = %2d\n", globs->Truncation,
-            globs->NumLevelFound);
+  if (globs->Debug) fprintf(stderr, "   T = %3d   L = %2d\n", globs->Truncation, globs->NumLevelFound);
 
   if (globs->Debug) fprintf(stderr, " CODE CHECK\n");
 
@@ -1728,8 +1661,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
         {
           if (modelInqNamePtr(modelID))
             {
-              if (strncmp(modelInqNamePtr(modelID), "ECHAM5", 6) == 0)
-                Source = S_ECHAM5;
+              if (strncmp(modelInqNamePtr(modelID), "ECHAM5", 6) == 0) Source = S_ECHAM5;
               fprintf(stdout, "%s\n", modelInqNamePtr(modelID));
             }
           else
@@ -1759,9 +1691,8 @@ after_precntl(struct Control *globs, struct Variable *vars)
       vars[code].detected = TRUE;
 
       if (globs->Debug)
-        fprintf(stderr,
-                "Code %3d  Levels = %3d  LevelType = %3d  GridType = %3d\n",
-                code, numlevel, leveltype, gridtype);
+        fprintf(stderr, "Code %3d  Levels = %3d  LevelType = %3d  GridType = %3d\n", code, numlevel, leveltype,
+                gridtype);
     }
 
   if (globs->Debug) Message("FieldDim = %d", FieldDim);
@@ -1772,8 +1703,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
     for (code = 0; code < MaxCodes; code++)
       {
         if (vars[code].detected)
-          fprintf(stderr, " Detected Code %3d with %3d level\n", code,
-                  zaxisInqSize(vars[code].izaxisID));
+          fprintf(stderr, " Detected Code %3d with %3d level\n", code, zaxisInqSize(vars[code].izaxisID));
       }
 }
 
@@ -1794,8 +1724,7 @@ after_postcntl(struct Control *globs, struct Variable *vars)
   char histstring[99];
   int datatype;
 
-  snprintf(histstring, sizeof(histstring), "afterburner version %s  type = %d",
-           VERSION, globs->Type);
+  snprintf(histstring, sizeof(histstring), "afterburner version %s  type = %d", VERSION, globs->Type);
 
 #if defined(AFTERBURNER)
   afterInqHistory(globs->istreamID);
@@ -1811,10 +1740,8 @@ after_postcntl(struct Control *globs, struct Variable *vars)
           gridID = vars[code].igridID;
           zaxisID = vars[code].izaxisID;
           zaxisName(zaxisInqType(zaxisID), zaxistypename);
-          fprintf(stderr,
-                  " Detected Code %3d  grid %-8s size %5zu  level %2d %-8s\n",
-                  code, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID),
-                  zaxisInqSize(zaxisID), zaxistypename);
+          fprintf(stderr, " Detected Code %3d  grid %-8s size %5zu  level %2d %-8s\n", code,
+                  gridNamePtr(gridInqType(gridID)), gridInqSize(gridID), zaxisInqSize(zaxisID), zaxistypename);
         }
 
   if (globs->Debug) lprintf(stdout);
@@ -1876,18 +1803,15 @@ after_postcntl(struct Control *globs, struct Variable *vars)
         if (globs->Mean != 2)
           {
             vlistDefTaxis(globs->ovlistID, globs->taxisID2);
-            ovarID
-                = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, TIME_VARYING);
-            if (globs->Mean)
-              vlistDefVarTsteptype(globs->ovlistID, ovarID, TSTEP_AVG);
+            ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, TIME_VARYING);
+            if (globs->Mean) vlistDefVarTsteptype(globs->ovlistID, ovarID, TSTEP_AVG);
             vlistDefVarCode(globs->ovlistID, ovarID, code);
             vars[code].ovarID = ovarID;
             vlistDefVarInstitut(globs->ovlistID, ovarID, instID);
             vlistDefVarModel(globs->ovlistID, ovarID, modelID);
             vlistDefVarTable(globs->ovlistID, ovarID, tableID);
             if (name[0]) vlistDefVarName(globs->ovlistID, ovarID, name);
-            if (longname[0])
-              vlistDefVarLongname(globs->ovlistID, ovarID, longname);
+            if (longname[0]) vlistDefVarLongname(globs->ovlistID, ovarID, longname);
             if (units[0]) vlistDefVarUnits(globs->ovlistID, ovarID, units);
             vlistDefVarDatatype(globs->ovlistID, ovarID, datatype);
             vlistDefVarMissval(globs->ovlistID, ovarID, vars[code].missval);
@@ -1896,18 +1820,15 @@ after_postcntl(struct Control *globs, struct Variable *vars)
         if (globs->Mean >= 2)
           {
             vlistDefTaxis(globs->ovlistID2, globs->taxisID2);
-            ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID,
-                                  TIME_VARYING);
-            if (globs->Mean)
-              vlistDefVarTsteptype(globs->ovlistID2, ovarID2, TSTEP_AVG);
+            ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, TIME_VARYING);
+            if (globs->Mean) vlistDefVarTsteptype(globs->ovlistID2, ovarID2, TSTEP_AVG);
             vlistDefVarCode(globs->ovlistID2, ovarID2, code);
             vars[code].ovarID2 = ovarID2;
             vlistDefVarInstitut(globs->ovlistID2, ovarID2, instID);
             vlistDefVarModel(globs->ovlistID2, ovarID2, modelID);
             vlistDefVarTable(globs->ovlistID2, ovarID2, tableID);
             if (name[0]) vlistDefVarName(globs->ovlistID2, ovarID2, name);
-            if (longname[0])
-              vlistDefVarLongname(globs->ovlistID2, ovarID2, longname);
+            if (longname[0]) vlistDefVarLongname(globs->ovlistID2, ovarID2, longname);
             if (units[0]) vlistDefVarUnits(globs->ovlistID2, ovarID2, units);
             vlistDefVarDatatype(globs->ovlistID2, ovarID2, datatype);
             vlistDefVarMissval(globs->ovlistID2, ovarID2, vars[code].missval);
@@ -1922,10 +1843,8 @@ after_postcntl(struct Control *globs, struct Variable *vars)
           gridID = vars[code].ogridID;
           zaxisID = vars[code].ozaxisID;
           zaxisName(zaxisInqType(zaxisID), zaxistypename);
-          fprintf(stderr,
-                  " Selected Code %3d  grid %-8s size %5zu  level %2d %-8s\n",
-                  code, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID),
-                  zaxisInqSize(zaxisID), zaxistypename);
+          fprintf(stderr, " Selected Code %3d  grid %-8s size %5zu  level %2d %-8s\n", code,
+                  gridNamePtr(gridInqType(gridID)), gridInqSize(gridID), zaxisInqSize(zaxisID), zaxistypename);
         }
 }
 
@@ -1959,8 +1878,7 @@ after_readVct(struct Control *globs, const char *vctfile)
       globs->vct[i + globs->nvct / 2] = vb;
       i++;
     }
-  fprintf(stdout, "  Read VCT with %d hybrid levels from file %s\n",
-          globs->nvct / 2 - 1, vctfile);
+  fprintf(stdout, "  Read VCT with %d hybrid levels from file %s\n", globs->nvct / 2 - 1, vctfile);
 
   fclose(fp);
 }
@@ -1986,8 +1904,7 @@ after_version(void)
   fprintf(stderr, "\n");
 #endif
 #if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
-  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME,
-          SYSTEM_TYPE, __DATE__, __TIME__);
+  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
   cdiPrintVersion();
   fprintf(stderr, "\n");
@@ -2035,8 +1952,8 @@ static void
 after_printCodes(void)
 {
   int tableID = tableInq(-1, 128, "echam4");
-  int codes[] = { 34,  35,  36,  131, 132, 135, 148, 149, 151, 156, 157,
-                  259, 260, 261, 262, 263, 264, 268, 269, 270, 271, 275 };
+  int codes[]
+      = { 34, 35, 36, 131, 132, 135, 148, 149, 151, 156, 157, 259, 260, 261, 262, 263, 264, 268, 269, 270, 271, 275 };
 
   int ncodes = sizeof(codes) / sizeof(codes[0]);
 
@@ -2114,8 +2031,7 @@ after_procstat(char *procpath, int truncation)
       fprintf(sf,
               "%.7s %4.4ld.%2.2ld.%2.2ld %2.2ld:%2.2ld %s "
               "%-9.9s %7.1f %7.1f T%3.3d %s\n",
-              name, yy, mm, dd, hh, mi, VERSION, proc, MaxMBytes, CPUTime,
-              truncation, hostname);
+              name, yy, mm, dd, hh, mi, VERSION, proc, MaxMBytes, CPUTime, truncation, hostname);
 
       fclose(sf);
     }
@@ -2145,8 +2061,7 @@ after_procstat(char *procpath, int truncation)
 #endif
 
   fprintf(stdout, "   NORMAL EXIT\n");
-  fprintf(stdout, " ------   End    after  -%-11.11s- %7.1f sec", mtype,
-          CPUTime);
+  fprintf(stdout, " ------   End    after  -%-11.11s- %7.1f sec", mtype, CPUTime);
   if (MaxMBytes > 0)
     fprintf(stdout, " --- %7.1f MB ---\n", MaxMBytes);
   else
@@ -2163,8 +2078,7 @@ after_processing(struct Control *globs, struct Variable *vars)
   //  globs->istreamID = streamOpenRead(cdoStreamName(0));
   //#else
   globs->istreamID = streamOpenRead(ifile);
-  if (globs->istreamID < 0)
-    cdiError(globs->istreamID, "Open failed on %s", ifile);
+  if (globs->istreamID < 0) cdiError(globs->istreamID, "Open failed on %s", ifile);
   //#endif
   if (ofiletype == -1) ofiletype = streamInqFiletype(globs->istreamID);
 
@@ -2178,8 +2092,7 @@ after_processing(struct Control *globs, struct Variable *vars)
       globs->ostreamID = cdoStreamOpenWrite(cdoStreamName(ofileidx), ofiletype);
 #else
       globs->ostreamID = streamOpenWrite(ofile, ofiletype);
-      if (globs->ostreamID < 0)
-        cdiError(globs->ostreamID, "Open failed on %s", ofile);
+      if (globs->ostreamID < 0) cdiError(globs->ostreamID, "Open failed on %s", ofile);
 #endif
 
       if (globs->Szip) streamDefCompType(globs->ostreamID, CDI_COMPRESS_SZIP);
@@ -2190,8 +2103,7 @@ after_processing(struct Control *globs, struct Variable *vars)
   if (globs->Mean >= 2)
     {
       globs->ostreamID2 = streamOpenWrite(ofile2, ofiletype);
-      if (globs->ostreamID2 < 0)
-        cdiError(globs->ostreamID2, "Open failed on %s", ofile2);
+      if (globs->ostreamID2 < 0) cdiError(globs->ostreamID2, "Open failed on %s", ofile2);
 
       if (globs->Szip) streamDefCompType(globs->ostreamID, CDI_COMPRESS_SZIP);
 
@@ -2217,19 +2129,15 @@ after_processing(struct Control *globs, struct Variable *vars)
   if (!globs->AnalysisData)
     for (i = 0; i < globs->NumLevelRequest; i++)
       {
-        if ((globs->LevelRequest[i] >= 65535) && globs->unitsel
-            && ofiletype == CDI_FILETYPE_GRB)
+        if ((globs->LevelRequest[i] >= 65535) && globs->unitsel && ofiletype == CDI_FILETYPE_GRB)
           {
-            fprintf(stderr, "\n Level %9.2f out of range (max=65535)!\n",
-                    globs->LevelRequest[i]);
+            fprintf(stderr, "\n Level %9.2f out of range (max=65535)!\n", globs->LevelRequest[i]);
             exit(1);
           }
 
-        if (!globs->unitsel && globs->Type >= 20 && globs->NumLevelRequest > 1
-            && IS_EQUAL(globs->LevelRequest[i], 0))
+        if (!globs->unitsel && globs->Type >= 20 && globs->NumLevelRequest > 1 && IS_EQUAL(globs->LevelRequest[i], 0))
           {
-            fprintf(stderr, "\n Level %9.2f illegal for Type %d\n",
-                    globs->LevelRequest[i], globs->Type);
+            fprintf(stderr, "\n Level %9.2f illegal for Type %d\n", globs->LevelRequest[i], globs->Type);
             exit(1);
           }
       }
@@ -2240,8 +2148,7 @@ after_processing(struct Control *globs, struct Variable *vars)
 
   globs->rcoslat = (double *) Malloc(globs->Latitudes * sizeof(double));
   globs->coslat = (double *) Malloc(globs->Latitudes * sizeof(double));
-  globs->DerivationFactor
-      = (double *) Malloc(globs->Latitudes * sizeof(double));
+  globs->DerivationFactor = (double *) Malloc(globs->Latitudes * sizeof(double));
 
   if (globs->Type < 50 && globs->AnalysisData)
     {
@@ -2256,10 +2163,8 @@ after_processing(struct Control *globs, struct Variable *vars)
     {
       if (ofiletype == CDI_FILETYPE_GRB)
         Error("Can't write fourier coefficients to GRIB!");
-      else if (ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2
-               || ofiletype == CDI_FILETYPE_NC4
-               || ofiletype == CDI_FILETYPE_NC4C
-               || ofiletype == CDI_FILETYPE_NC5)
+      else if (ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 || ofiletype == CDI_FILETYPE_NC4
+               || ofiletype == CDI_FILETYPE_NC4C || ofiletype == CDI_FILETYPE_NC5)
         Error("Can't write fourier coefficients to NetCDF!");
     }
 
@@ -2270,8 +2175,7 @@ after_processing(struct Control *globs, struct Variable *vars)
     filename++;
 
   if (globs->Type >= 30 && globs->Type < 50
-      && (vars[DIVERGENCE].selected || vars[VELOPOT].selected
-          || vars[VORTICITY].selected || vars[STREAM].selected
+      && (vars[DIVERGENCE].selected || vars[VELOPOT].selected || vars[VORTICITY].selected || vars[STREAM].selected
           || globs->AnalysisData))
     {
       /*
@@ -2282,11 +2186,10 @@ after_processing(struct Control *globs, struct Variable *vars)
       if (globs->Type == 41) globs->Type = 61;
 
       if (globs->AnalysisData)
-        fprintf(stderr, "\n TYPE changed to %d (for analysis data)\n",
-                globs->Type);
+        fprintf(stderr, "\n TYPE changed to %d (for analysis data)\n", globs->Type);
       else
-        fprintf(stderr, "\n TYPE changed to %d (with code %d, %d, %d or %d)\n",
-                globs->Type, DIVERGENCE, VELOPOT, VORTICITY, STREAM);
+        fprintf(stderr, "\n TYPE changed to %d (with code %d, %d, %d or %d)\n", globs->Type, DIVERGENCE, VELOPOT,
+                VORTICITY, STREAM);
       /*
       if ( globs->Type == 30 ) newtype = 70;
       if ( globs->Type == 40 ) newtype = 60;
@@ -2305,8 +2208,7 @@ after_processing(struct Control *globs, struct Variable *vars)
   else
     {
       after_EchamDependencies(vars, MaxCodes, globs->Type, Source);
-      vars[GEOPOTENTIAL].needed
-          |= globs->Type >= 30 || vars[SLP].comp || vars[GEOPOTHEIGHT].comp;
+      vars[GEOPOTENTIAL].needed |= globs->Type >= 30 || vars[SLP].comp || vars[GEOPOTHEIGHT].comp;
     }
 
   /*  if ( vars[U_WIND].needed || vars[V_WIND].needed ) */
@@ -2443,10 +2345,8 @@ afterburner(int argc, char *argv[])
   if (numThreads <= 0) numThreads = 1;
   omp_set_num_threads(numThreads);
   if (omp_get_max_threads() > omp_get_num_procs())
-    fprintf(stdout, " Number of threads is greater than number of Cores=%d!\n",
-            omp_get_num_procs());
-  fprintf(stdout, " OpenMP:  num_procs=%d  max_threads=%d\n",
-          omp_get_num_procs(), omp_get_max_threads());
+    fprintf(stdout, " Number of threads is greater than number of Cores=%d!\n", omp_get_num_procs());
+  fprintf(stdout, " OpenMP:  num_procs=%d  max_threads=%d\n", omp_get_num_procs(), omp_get_max_threads());
 #else
   if (numThreads > 0)
     {
@@ -2499,8 +2399,7 @@ afterburner(int argc, char *argv[])
   globs->Nfiles = fargcn - fargc0 - 1;
   if (globs->Nfiles > 0)
     {
-      if (globs->Multi > 0)
-        Error("Namelist parameter MULTI works only with one inputfile");
+      if (globs->Multi > 0) Error("Namelist parameter MULTI works only with one inputfile");
 
       ifiles = (char **) Malloc(globs->Nfiles * sizeof(char *));
       for (i = 0; i < globs->Nfiles; i++)
@@ -2578,8 +2477,7 @@ Afterburner(void *process)
   globs->Nfiles = nfiles - 1;
   if (globs->Nfiles > 0)
     {
-      if (globs->Multi > 0)
-        Error("Namelist parameter MULTI works only with one inputfile");
+      if (globs->Multi > 0) Error("Namelist parameter MULTI works only with one inputfile");
 
       ifiles = (char **) Malloc(globs->Nfiles * sizeof(char *));
       for (int i = 0; i < globs->Nfiles; ++i)

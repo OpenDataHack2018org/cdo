@@ -149,10 +149,8 @@ Setmiss(void *process)
             {
               nmiss = 0;
               for (size_t i = 0; i < gridsize; i++)
-                if (DBL_IS_EQUAL(array[i], missval)
-                    || DBL_IS_EQUAL(array[i], (float) missval)
-                    || DBL_IS_EQUAL(array[i], missval2)
-                    || DBL_IS_EQUAL(array[i], (float) missval2))
+                if (DBL_IS_EQUAL(array[i], missval) || DBL_IS_EQUAL(array[i], (float) missval)
+                    || DBL_IS_EQUAL(array[i], missval2) || DBL_IS_EQUAL(array[i], (float) missval2))
                   {
                     array[i] = missval2;
                     nmiss++;
@@ -174,8 +172,7 @@ Setmiss(void *process)
 #endif
                 {
                   for (size_t i = 0; i < gridsize; i++)
-                    if (DBL_IS_EQUAL(array[i], rconst)
-                        || DBL_IS_EQUAL(array[i], (float) rconst))
+                    if (DBL_IS_EQUAL(array[i], rconst) || DBL_IS_EQUAL(array[i], (float) rconst))
                       {
                         array[i] = missval;
                         nmiss++;
@@ -186,8 +183,7 @@ Setmiss(void *process)
             {
               nmiss = 0;
               for (size_t i = 0; i < gridsize; i++)
-                if (DBL_IS_EQUAL(array[i], missval)
-                    || DBL_IS_EQUAL(array[i], (float) missval))
+                if (DBL_IS_EQUAL(array[i], missval) || DBL_IS_EQUAL(array[i], (float) missval))
                   {
                     array[i] = rconst;
                   }

@@ -90,8 +90,7 @@ y_is_gauss(double *gridyvals, int ysize)
         yvals[i] = asin(yvals[i]) / M_PI * 180.0;
 
       for (i = 0; i < (int) ysize; i++)
-        if (fabs(yvals[i] - gridyvals[i]) > ((yvals[0] - yvals[1]) / 500))
-          break;
+        if (fabs(yvals[i] - gridyvals[i]) > ((yvals[0] - yvals[1]) / 500)) break;
 
       if (i == (int) ysize) lgauss = TRUE;
 
@@ -99,9 +98,7 @@ y_is_gauss(double *gridyvals, int ysize)
       if (lgauss == FALSE)
         {
           for (i = 0; i < (int) ysize; i++)
-            if (fabs(yvals[i] - gridyvals[ysize - i - 1])
-                > ((yvals[0] - yvals[1]) / 500))
-              break;
+            if (fabs(yvals[i] - gridyvals[ysize - i - 1]) > ((yvals[0] - yvals[1]) / 500)) break;
 
           if (i == (int) ysize) lgauss = TRUE;
         }
@@ -312,8 +309,7 @@ Importbinary(void *process)
       else if (pvar->dfrm == 4)
         {
           datatype = CDI_DATATYPE_INT32;
-          if (missval < -2147483648 || missval > 2147483647)
-            missval = -2147483646;
+          if (missval < -2147483648 || missval > 2147483647) missval = -2147483646;
         }
       else if (pfi.flt64)
         datatype = CDI_DATATYPE_FLT64;
@@ -323,8 +319,7 @@ Importbinary(void *process)
 
       for (levelID = 0; levelID < nlevels; ++levelID)
         {
-          if (recID >= nrecs)
-            cdoAbort("Internal problem with number of records!");
+          if (recID >= nrecs) cdoAbort("Internal problem with number of records!");
           recVarID[recID] = varID;
           recLevelID[recID] = levelID;
           var_dfrm[recID] = pvar->dfrm;
@@ -418,11 +413,8 @@ Importbinary(void *process)
                 }
               gr2t(pfi.grvals[3], (gadouble) tcur, &dtim);
               gr2t(pfi.grvals[3], (gadouble) 1, &dtimi);
-              ch = gafndt(pfi.name, &dtim, &dtimi, pfi.abvals[3], pfi.pchsub1,
-                          NULL, tcur, e, &flag);
-              if (ch == NULL)
-                cdoAbort("Couldn't determine data file name for e=%d t=%d!", e,
-                         tcur);
+              ch = gafndt(pfi.name, &dtim, &dtimi, pfi.abvals[3], pfi.pchsub1, NULL, tcur, e, &flag);
+              if (ch == NULL) cdoAbort("Couldn't determine data file name for e=%d t=%d!", e, tcur);
             }
         }
       else
@@ -471,9 +463,7 @@ Importbinary(void *process)
           date2str(vdate, vdatestr, sizeof(vdatestr));
           time2str(vtime, vtimestr, sizeof(vtimestr));
 
-          if (cdoVerbose)
-            cdoPrint(" Reading timestep: %3d %s %s", tsID + 1, vdatestr,
-                     vtimestr);
+          if (cdoVerbose) cdoPrint(" Reading timestep: %3d %s %s", tsID + 1, vdatestr, vtimestr);
 
           taxisDefVdate(taxisID, vdate);
           taxisDefVtime(taxisID, vtime);
@@ -499,9 +489,7 @@ Importbinary(void *process)
                 }
 
               rc = fread(rec, 1, recsize, pfi.infile);
-              if (rc < recsize)
-                cdoAbort("I/O error reading record=%d of timestep=%d!",
-                         recID + 1, tsID + 1);
+              if (rc < recsize) cdoAbort("I/O error reading record=%d of timestep=%d!", recID + 1, tsID + 1);
 
               /* convert */
               if (var_dfrm[recID] == 1)

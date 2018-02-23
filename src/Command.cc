@@ -63,16 +63,15 @@ typedef struct
   const char *doc;           /* Documentation for this function. */
 } command_t;
 
-command_t commands[]
-    = { { "help", com_help, "Display this text" },
-        { "?", com_help, "Synonym for 'help'" },
-        { "list", com_list, "List files in DIR" },
-        { "quit", com_quit, "Quit using CDO" },
-        { "stat", com_stat, "Statistic for selected field" },
-        { "set", com_set, "set variables" },
-        { "vars", com_vars, "list variables" },
-        //  { "stat", com_stat, "Print out statistics on FILE" },
-        { NULL, NULL, NULL } };
+command_t commands[] = { { "help", com_help, "Display this text" },
+                         { "?", com_help, "Synonym for 'help'" },
+                         { "list", com_list, "List files in DIR" },
+                         { "quit", com_quit, "Quit using CDO" },
+                         { "stat", com_stat, "Statistic for selected field" },
+                         { "set", com_set, "set variables" },
+                         { "vars", com_vars, "list variables" },
+                         //  { "stat", com_stat, "Print out statistics on FILE" },
+                         { NULL, NULL, NULL } };
 
 /* Return non-zero if ARG is a valid argument for CALLER, else print
 an error message and return zero. */
@@ -177,8 +176,7 @@ com_stat(const char *arg)
           fmean /= gridsize;
           counter_stop(&counter);
 
-          fprintf(stdout, "timestep=%d %g %g %g (%gs)\n", tsID + 1, fmin, fmean,
-                  fmax, counter_cputime(counter));
+          fprintf(stdout, "timestep=%d %g %g %g (%gs)\n", tsID + 1, fmin, fmean, fmax, counter_cputime(counter));
         }
     }
 
@@ -205,10 +203,8 @@ com_vars(const char *arg)
     {
       cdiParamToString(all_vars[varID].param, paramstr, sizeof(paramstr));
 
-      fprintf(stdout,
-              "varID=%3d, param=%s, name=%s, longname=\"%s\", units=\"%s\"\n",
-              varID + 1, paramstr, all_vars[varID].name,
-              all_vars[varID].longname, all_vars[varID].units);
+      fprintf(stdout, "varID=%3d, param=%s, name=%s, longname=\"%s\", units=\"%s\"\n", varID + 1, paramstr,
+              all_vars[varID].name, all_vars[varID].longname, all_vars[varID].units);
     }
 
   return 0;
@@ -270,8 +266,9 @@ stripwhite(char *string)
   return s;
 }
 
-extern "C" {
-size_t getPeakRSS();
+extern "C"
+{
+  size_t getPeakRSS();
 }
 
 void
@@ -305,8 +302,7 @@ readcmd(const char *prompt, char *line, int size)
   if (fgets(line, size, stdin))
     {
       char *newline = strchr(line, '\n');  // check for trailing '\n'
-      if (newline)
-        *newline = '\0';  // overwrite the '\n' with a terminating null
+      if (newline) *newline = '\0';        // overwrite the '\n' with a terminating null
     }
 }
 

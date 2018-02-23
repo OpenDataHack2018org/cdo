@@ -42,8 +42,7 @@
 #define NALLOC_INC 1024
 
 /* include from Tinfo.c */
-void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod,
-                int *incunit);
+void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit);
 
 static void
 create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
@@ -54,12 +53,8 @@ create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
   int imin = (dimin < 0) ? 0 : (int) floor(dimin);
   int imax = (ceil(dimax) > nts / 2) ? nts / 2 : (int) ceil(dimax);
 
-  if (imin < 0 || imin >= nts)
-    cdoAbort("Parameter fmin=%g: timestep %d out of bounds (1-%d)!", fmin,
-             imin + 1, nts);
-  if (imax < 0 || imax >= nts)
-    cdoAbort("Parameter fmax=%g: timestep %d out of bounds (1-%d)!", fmax,
-             imax + 1, nts);
+  if (imin < 0 || imin >= nts) cdoAbort("Parameter fmin=%g: timestep %d out of bounds (1-%d)!", fmin, imin + 1, nts);
+  if (imax < 0 || imax >= nts) cdoAbort("Parameter fmax=%g: timestep %d out of bounds (1-%d)!", fmax, imax + 1, nts);
 
   fmasc[imin] = 1;
   for (int i = imin + 1; i <= imax; i++)
@@ -68,8 +63,7 @@ create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
 
 #ifdef HAVE_LIBFFTW3
 static void
-filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_T2S,
-            fftw_plan *p_S2T)
+filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
 {
   fftw_execute(*p_T2S);
 
@@ -205,8 +199,7 @@ Filter(void *process)
           pstreamInqRecord(streamID1, &varID, &levelID);
           int gridID = vlistInqVarGrid(vlistID1, varID);
           size_t gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr
-              = (double *) Malloc(gridsize * sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
           if (nmiss)
@@ -235,30 +228,25 @@ Filter(void *process)
             {
               getTimeInc(jdelta, vdate0, vdate, &incperiod0, &incunit0);
               incperiod = incperiod0;
-              if (incperiod == 0)
-                cdoAbort("Time step must be different from zero!");
+              if (incperiod == 0) cdoAbort("Time step must be different from zero!");
               incunit = incunit0;
-              if (cdoVerbose)
-                cdoPrint("Time step %i %s", incperiod, tunits[incunit]);
+              if (cdoVerbose) cdoPrint("Time step %i %s", incperiod, tunits[incunit]);
               fdata = 1. * iunits[incunit] / incperiod;
             }
           else
             getTimeInc(jdelta, vdate0, vdate, &incperiod, &incunit);
 
-          if (calendar != CALENDAR_360DAYS && calendar != CALENDAR_365DAYS
-              && calendar != CALENDAR_366DAYS && incunit0 < 4 && month == 2
-              && day == 29 && (day0 != day || month0 != month || year0 != year))
+          if (calendar != CALENDAR_360DAYS && calendar != CALENDAR_365DAYS && calendar != CALENDAR_366DAYS
+              && incunit0 < 4 && month == 2 && day == 29 && (day0 != day || month0 != month || year0 != year))
             {
               cdoWarning("Filtering of multi-year times series doesn't works "
                          "properly with a standard calendar.");
-              cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)",
-                         year);
+              cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)", year);
             }
 
           if (!(incperiod == incperiod0 && incunit == incunit0))
-            cdoWarning(
-                "Time increment in step %i (%d%s) differs from step 1 (%d%s)!",
-                tsID, incperiod, tunits[incunit], incperiod0, tunits[incunit0]);
+            cdoWarning("Time increment in step %i (%d%s) differs from step 1 (%d%s)!", tsID, incperiod, tunits[incunit],
+                       incperiod0, tunits[incunit0]);
         }
       tsID++;
     }
@@ -266,22 +254,17 @@ Filter(void *process)
   int nts = tsID;
   if (nts <= 1) cdoAbort("Number of time steps <= 1!");
 
-  memory_t *ompmem
-      = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
+  memory_t *ompmem = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
 
   if (use_fftw)
     {
 #ifdef HAVE_LIBFFTW3
       for (int i = 0; i < Threading::ompNumThreads; i++)
         {
-          ompmem[i].in_fft
-              = (fftw_complex *) Malloc(nts * sizeof(fftw_complex));
-          ompmem[i].out_fft
-              = (fftw_complex *) Malloc(nts * sizeof(fftw_complex));
-          ompmem[i].p_T2S = fftw_plan_dft_1d(
-              nts, ompmem[i].in_fft, ompmem[i].out_fft, 1, FFTW_ESTIMATE);
-          ompmem[i].p_S2T = fftw_plan_dft_1d(
-              nts, ompmem[i].out_fft, ompmem[i].in_fft, -1, FFTW_ESTIMATE);
+          ompmem[i].in_fft = (fftw_complex *) Malloc(nts * sizeof(fftw_complex));
+          ompmem[i].out_fft = (fftw_complex *) Malloc(nts * sizeof(fftw_complex));
+          ompmem[i].p_T2S = fftw_plan_dft_1d(nts, ompmem[i].in_fft, ompmem[i].out_fft, 1, FFTW_ESTIMATE);
+          ompmem[i].p_S2T = fftw_plan_dft_1d(nts, ompmem[i].out_fft, ompmem[i].in_fft, -1, FFTW_ESTIMATE);
         }
 #endif
     }
@@ -347,17 +330,14 @@ Filter(void *process)
 
                   for (int tsID = 0; tsID < nts; tsID++)
                     {
-                      ompmem[ompthID].in_fft[tsID][0]
-                          = vars[tsID][varID][levelID].ptr[i];
+                      ompmem[ompthID].in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
                       ompmem[ompthID].in_fft[tsID][1] = 0;
                     }
 
-                  filter_fftw(nts, fmasc, ompmem[ompthID].out_fft,
-                              &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
+                  filter_fftw(nts, fmasc, ompmem[ompthID].out_fft, &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
 
                   for (int tsID = 0; tsID < nts; tsID++)
-                    vars[tsID][varID][levelID].ptr[i]
-                        = ompmem[ompthID].in_fft[tsID][0] / nts;
+                    vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;
                 }
 #endif
             }
@@ -371,17 +351,14 @@ Filter(void *process)
                   int ompthID = cdo_omp_get_thread_num();
 
                   for (int tsID = 0; tsID < nts; tsID++)
-                    ompmem[ompthID].array1[tsID]
-                        = vars[tsID][varID][levelID].ptr[i];
+                    ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
                   arrayFill(nts, ompmem[ompthID].array2, 0.0);
 
-                  filter_intrinsic(nts, fmasc, ompmem[ompthID].array1,
-                                   ompmem[ompthID].array2);
+                  filter_intrinsic(nts, fmasc, ompmem[ompthID].array1, ompmem[ompthID].array2);
 
                   for (int tsID = 0; tsID < nts; tsID++)
-                    vars[tsID][varID][levelID].ptr[i]
-                        = ompmem[ompthID].array1[tsID];
+                    vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].array1[tsID];
                 }
             }
         }
@@ -426,8 +403,7 @@ Filter(void *process)
                 {
                   size_t nmiss = vars[tsID][varID][levelID].nmiss;
                   pstreamDefRecord(streamID2, varID, levelID);
-                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr,
-                                     nmiss);
+                  pstreamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 
                   Free(vars[tsID][varID][levelID].ptr);
                   vars[tsID][varID][levelID].ptr = NULL;

@@ -28,8 +28,7 @@
 #include "grid.h"
 
 void
-rotate_uv(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat,
-          double *u_lon, double *v_lat)
+rotate_uv(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat, double *u_lon, double *v_lat)
 {
   /*
  real,intent(in)      :: u_i(ix,iy,iz),v_j(ix,iy,iz)                  ! vector
@@ -85,10 +84,8 @@ rotate_uv(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat,
         dlon_j = dlon_j * lat_factor;
 
         /* projection by scalar product */
-        u_lon[IX2D(j, i, ix)]
-            = u_i[IX2D(j, i, ix)] * dlon_i + v_j[IX2D(j, i, ix)] * dlat_i;
-        v_lat[IX2D(j, i, ix)]
-            = u_i[IX2D(j, i, ix)] * dlon_j + v_j[IX2D(j, i, ix)] * dlat_j;
+        u_lon[IX2D(j, i, ix)] = u_i[IX2D(j, i, ix)] * dlon_i + v_j[IX2D(j, i, ix)] * dlat_i;
+        v_lat[IX2D(j, i, ix)] = u_i[IX2D(j, i, ix)] * dlon_j + v_j[IX2D(j, i, ix)] * dlat_j;
 
         dist_i = sqrt(dlon_i * dlon_i + dlat_i * dlat_i);
         dist_j = sqrt(dlon_j * dlon_j + dlat_j * dlat_j);
@@ -104,10 +101,8 @@ rotate_uv(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat,
             v_lat[IX2D(j, i, ix)] = 0.0;
           }
 
-        absold = sqrt(u_i[IX2D(j, i, ix)] * u_i[IX2D(j, i, ix)]
-                      + v_j[IX2D(j, i, ix)] * v_j[IX2D(j, i, ix)]);
-        absnew = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)]
-                      + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
+        absold = sqrt(u_i[IX2D(j, i, ix)] * u_i[IX2D(j, i, ix)] + v_j[IX2D(j, i, ix)] * v_j[IX2D(j, i, ix)]);
+        absnew = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)] + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
 
         u_lon[IX2D(j, i, ix)] *= absold;
         v_lat[IX2D(j, i, ix)] *= absold;
@@ -129,30 +124,26 @@ rotate_uv(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat,
 
         if (cdoVerbose)
           {
-            absold = sqrt(u_i[IX2D(j, i, ix)] * u_i[IX2D(j, i, ix)]
-                          + v_j[IX2D(j, i, ix)] * v_j[IX2D(j, i, ix)]);
-            absnew = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)]
-                          + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
+            absold = sqrt(u_i[IX2D(j, i, ix)] * u_i[IX2D(j, i, ix)] + v_j[IX2D(j, i, ix)] * v_j[IX2D(j, i, ix)]);
+            absnew
+                = sqrt(u_lon[IX2D(j, i, ix)] * u_lon[IX2D(j, i, ix)] + v_lat[IX2D(j, i, ix)] * v_lat[IX2D(j, i, ix)]);
 
             if (i % 20 == 0 && j % 20 == 0 && absold > 0)
               {
-                printf("(absold,absnew) %d %d %g %g %g %g %g %g\n", j + 1,
-                       i + 1, absold, absnew, u_i[IX2D(j, i, ix)],
-                       v_j[IX2D(j, i, ix)], u_lon[IX2D(j, i, ix)],
-                       v_lat[IX2D(j, i, ix)]);
+                printf("(absold,absnew) %d %d %g %g %g %g %g %g\n", j + 1, i + 1, absold, absnew, u_i[IX2D(j, i, ix)],
+                       v_j[IX2D(j, i, ix)], u_lon[IX2D(j, i, ix)], v_lat[IX2D(j, i, ix)]);
 
                 /* test orthogonality */
                 if ((dlon_i * dlon_j + dlat_j * dlat_i) > 0.1)
-                  fprintf(stderr, "orthogonal? %d %d %g\n", j + 1, i + 1,
-                          (dlon_i * dlon_j + dlat_j * dlat_i));
+                  fprintf(stderr, "orthogonal? %d %d %g\n", j + 1, i + 1, (dlon_i * dlon_j + dlat_j * dlat_i));
               }
           }
       }
 }
 
 void
-p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y, double *gridux,
-             double *griduy, double *gridvx, double *gridvy)
+p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y, double *gridux, double *griduy, double *gridvx,
+             double *gridvy)
 {
   int i, j, jp1, ip1;
 
@@ -163,11 +154,9 @@ p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y, double *gridux,
         ip1 = i + 1;
         if (ip1 > nlon - 1) ip1 = 0;
 
-        gridux[IX2D(j, i, nlon)]
-            = (grid1x[IX2D(j, i, nlon)] + grid1x[IX2D(j, ip1, nlon)]) * 0.5;
+        gridux[IX2D(j, i, nlon)] = (grid1x[IX2D(j, i, nlon)] + grid1x[IX2D(j, ip1, nlon)]) * 0.5;
         if ((grid1x[IX2D(j, i, nlon)] > 340 && grid1x[IX2D(j, ip1, nlon)] < 20)
-            || (grid1x[IX2D(j, i, nlon)] < 20
-                && grid1x[IX2D(j, ip1, nlon)] > 340))
+            || (grid1x[IX2D(j, i, nlon)] < 20 && grid1x[IX2D(j, ip1, nlon)] > 340))
           {
             if (gridux[IX2D(j, i, nlon)] < 180)
               gridux[IX2D(j, i, nlon)] += 180;
@@ -175,8 +164,7 @@ p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y, double *gridux,
               gridux[IX2D(j, i, nlon)] -= 180;
           }
 
-        griduy[IX2D(j, i, nlon)]
-            = (grid1y[IX2D(j, i, nlon)] + grid1y[IX2D(j, ip1, nlon)]) * 0.5;
+        griduy[IX2D(j, i, nlon)] = (grid1y[IX2D(j, i, nlon)] + grid1y[IX2D(j, ip1, nlon)]) * 0.5;
       }
 
   /* interpolate scalar to v points */
@@ -186,11 +174,9 @@ p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y, double *gridux,
         jp1 = j + 1;
         if (jp1 > nlat - 1) jp1 = nlat - 1;
 
-        gridvx[IX2D(j, i, nlon)]
-            = (grid1x[IX2D(j, i, nlon)] + grid1x[IX2D(jp1, i, nlon)]) * 0.5;
+        gridvx[IX2D(j, i, nlon)] = (grid1x[IX2D(j, i, nlon)] + grid1x[IX2D(jp1, i, nlon)]) * 0.5;
         if ((grid1x[IX2D(j, i, nlon)] > 340 && grid1x[IX2D(jp1, i, nlon)] < 20)
-            || (grid1x[IX2D(j, i, nlon)] < 20
-                && grid1x[IX2D(jp1, i, nlon)] > 340))
+            || (grid1x[IX2D(j, i, nlon)] < 20 && grid1x[IX2D(jp1, i, nlon)] > 340))
           {
             if (gridvx[IX2D(j, i, nlon)] < 180)
               gridvx[IX2D(j, i, nlon)] += 180;
@@ -198,8 +184,7 @@ p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y, double *gridux,
               gridvx[IX2D(j, i, nlon)] -= 180;
           }
 
-        gridvy[IX2D(j, i, nlon)]
-            = (grid1y[IX2D(j, i, nlon)] + grid1y[IX2D(jp1, i, nlon)]) * 0.5;
+        gridvy[IX2D(j, i, nlon)] = (grid1y[IX2D(j, i, nlon)] + grid1y[IX2D(jp1, i, nlon)]) * 0.5;
       }
 }
 
@@ -238,24 +223,20 @@ Mrotuv(void *process)
     }
 
   int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, uid));
-  if (nlevs != zaxisInqSize(vlistInqVarZaxis(vlistID1, vid)))
-    cdoAbort("U and V have different number of levels!");
+  if (nlevs != zaxisInqSize(vlistInqVarZaxis(vlistID1, vid))) cdoAbort("U and V have different number of levels!");
 
   int gridID1 = vlistInqVarGrid(vlistID1, uid);
   int gridID2 = vlistInqVarGrid(vlistID1, vid);
   size_t gridsize = gridInqSize(gridID1);
   if (gridID1 != gridID2) cdoAbort("Input grids differ!");
 
-  if (gridInqType(gridID1) != GRID_LONLAT
-      && gridInqType(gridID1) != GRID_GAUSSIAN
+  if (gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN
       && gridInqType(gridID1) != GRID_CURVILINEAR)
     cdoAbort("Grid %s unsupported!", gridNamePtr(gridInqType(gridID1)));
 
-  if (gridInqType(gridID1) != GRID_CURVILINEAR)
-    gridID1 = gridToCurvilinear(gridID1, 0);
+  if (gridInqType(gridID1) != GRID_CURVILINEAR) gridID1 = gridToCurvilinear(gridID1, 0);
 
-  if (gridsize != gridInqSize(gridID1))
-    cdoAbort("Internal problem: gridsize changed!");
+  if (gridsize != gridInqSize(gridID1)) cdoAbort("Internal problem: gridsize changed!");
 
   size_t nlon = gridInqXsize(gridID1);
   size_t nlat = gridInqYsize(gridID1);
@@ -358,10 +339,8 @@ Mrotuv(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          if (varID == uid)
-            pstreamReadRecord(streamID1, urfield[levelID], &nmiss1);
-          if (varID == vid)
-            pstreamReadRecord(streamID1, vrfield[levelID], &nmiss2);
+          if (varID == uid) pstreamReadRecord(streamID1, urfield[levelID], &nmiss1);
+          if (varID == vid) pstreamReadRecord(streamID1, vrfield[levelID], &nmiss2);
         }
 
       for (levelID = 0; levelID < nlevs; levelID++)
@@ -371,17 +350,14 @@ Mrotuv(void *process)
             {
               for (size_t i = 0; i < gridsize; i++)
                 {
-                  if (DBL_IS_EQUAL(urfield[levelID][i], missval1))
-                    urfield[levelID][i] = 0;
-                  if (DBL_IS_EQUAL(vrfield[levelID][i], missval2))
-                    vrfield[levelID][i] = 0;
+                  if (DBL_IS_EQUAL(urfield[levelID][i], missval1)) urfield[levelID][i] = 0;
+                  if (DBL_IS_EQUAL(vrfield[levelID][i], missval2)) vrfield[levelID][i] = 0;
                 }
             }
 
           /* rotate*/
 
-          rotate_uv(urfield[levelID], vrfield[levelID], nlon, nlat, grid1x,
-                    grid1y, ufield, vfield);
+          rotate_uv(urfield[levelID], vrfield[levelID], nlon, nlat, grid1x, grid1y, ufield, vfield);
 
           /* load to a help field */
           for (size_t j = 0; j < nlat; j++)
@@ -404,24 +380,19 @@ Mrotuv(void *process)
           for (size_t j = 0; j < nlat; j++)
             for (size_t i = 0; i < nlon; i++)
               {
-                ufield[IX2D(j, i, nlon)] = (uhelp[IX2D(j, i + 1, nlon + 2)]
-                                            + uhelp[IX2D(j, i + 2, nlon + 2)])
-                                           * 0.5;
+                ufield[IX2D(j, i, nlon)] = (uhelp[IX2D(j, i + 1, nlon + 2)] + uhelp[IX2D(j, i + 2, nlon + 2)]) * 0.5;
               }
 
           for (size_t j = 0; j < nlat - 1; j++)
             for (size_t i = 0; i < nlon; i++)
               {
                 vfield[IX2D(j, i, nlon)]
-                    = (vhelp[IX2D(j, i + 1, nlon + 2)]
-                       + vhelp[IX2D(j + 1, i + 1, nlon + 2)])
-                      * 0.5;
+                    = (vhelp[IX2D(j, i + 1, nlon + 2)] + vhelp[IX2D(j + 1, i + 1, nlon + 2)]) * 0.5;
               }
 
           for (size_t i = 0; i < nlon; i++)
             {
-              vfield[IX2D(nlat - 1, i, nlon)]
-                  = vhelp[IX2D(nlat - 1, i + 1, nlon + 2)];
+              vfield[IX2D(nlat - 1, i, nlon)] = vhelp[IX2D(nlat - 1, i + 1, nlon + 2)];
             }
 
           pstreamDefRecord(streamID2, 0, levelID);

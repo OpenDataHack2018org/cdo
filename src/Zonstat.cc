@@ -107,20 +107,17 @@ Zonstat(void *process)
 
   if (gridID1 != -1)
     {
-      if (gridInqType(gridID1) == GRID_LONLAT
-          || gridInqType(gridID1) == GRID_GAUSSIAN
+      if (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN
           || gridInqType(gridID1) == GRID_GENERIC)
         {
-          if (zongridID != -1
-              && gridInqYsize(zongridID) == gridInqYsize(gridID1))
+          if (zongridID != -1 && gridInqYsize(zongridID) == gridInqYsize(gridID1))
             gridID2 = zongridID;
           else
             gridID2 = gridToZonal(gridID1);
         }
       else
         {
-          cdoAbort("Unsupported gridtype: %s",
-                   gridNamePtr(gridInqType(gridID1)));
+          cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
         }
     }
   else

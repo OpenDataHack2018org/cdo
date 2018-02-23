@@ -280,8 +280,7 @@ cc2gc(struct cart *x)
 /*****************************************************************************/
 
 static void
-boundary(struct polygon *poly, int kip1s, int kip1e, int kip2s, int kip2e,
-         int knd)
+boundary(struct polygon *poly, int kip1s, int kip1e, int kip2s, int kip2e, int knd)
 {
   struct polygon *ptmp1;
 
@@ -362,9 +361,8 @@ boundary(struct polygon *poly, int kip1s, int kip1e, int kip2s, int kip2e,
 /*****************************************************************************/
 
 static void
-neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s,
-           int kipx2e, int kndx, struct polygon *poly, int kip1s, int kip1e,
-           int kip2s, int kip2e, int knd)
+neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s, int kipx2e, int kndx, struct polygon *poly,
+           int kip1s, int kip1e, int kip2s, int kip2e, int knd)
 {
   struct polygon *ptmp1;
 
@@ -475,21 +473,13 @@ neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s,
 
                       if (jd < 6)
                         {
-                          ptmp1->boundary[jm - 1].lon
-                              = px1[kipx1s + 1 + tmp4 * (kipx2s + 2)
-                                    + tmp5 * (jm) + tmp3];
-                          ptmp1->boundary[jm - 1].lat
-                              = px2[kipx1s + 1 + tmp9 * (kipx2s + 2)
-                                    + tmp10 * (jm) + tmp8];
+                          ptmp1->boundary[jm - 1].lon = px1[kipx1s + 1 + tmp4 * (kipx2s + 2) + tmp5 * (jm) + tmp3];
+                          ptmp1->boundary[jm - 1].lat = px2[kipx1s + 1 + tmp9 * (kipx2s + 2) + tmp10 * (jm) + tmp8];
                         }
                       else
                         {
-                          ptmp1->boundary[jm - 1].lon
-                              = px1[kipx1s + 1 + tmp4 * (kipx2s + 2)
-                                    + tmp5 * (jm + 5) + tmp3];
-                          ptmp1->boundary[jm - 1].lat
-                              = px2[kipx1s + 1 + tmp9 * (kipx2s + 2)
-                                    + tmp10 * (jm + 5) + tmp8];
+                          ptmp1->boundary[jm - 1].lon = px1[kipx1s + 1 + tmp4 * (kipx2s + 2) + tmp5 * (jm + 5) + tmp3];
+                          ptmp1->boundary[jm - 1].lat = px2[kipx1s + 1 + tmp9 * (kipx2s + 2) + tmp10 * (jm + 5) + tmp8];
                         }
                     }
                 }
@@ -498,78 +488,48 @@ neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s,
 
                   ptmp1->type = pentagon;
 
-                  ptmp1->boundary[0].lon = px1[kipx1e - 1 + tmp4 * (kipx2s + 2)
-                                               + tmp5 * jd + tmp3];
-                  ptmp1->boundary[0].lat = px2[kipx1e - 1 + tmp9 * (kipx2s + 2)
-                                               + tmp10 * jd + tmp8];
-                  ptmp1->boundary[1].lon = px1[kipx1e - 2 + tmp4 * (kipx2s + 2)
-                                               + tmp5 * jd + tmp3];
-                  ptmp1->boundary[1].lat = px2[kipx1e - 2 + tmp9 * (kipx2s + 2)
-                                               + tmp10 * jd + tmp8];
-                  ptmp1->boundary[2].lon = px1[kipx1e - 2 + tmp4 * (kipx2s + 1)
-                                               + tmp5 * jd + tmp3];
-                  ptmp1->boundary[2].lat = px2[kipx1e - 2 + tmp9 * (kipx2s + 1)
-                                               + tmp10 * jd + tmp8];
-                  ptmp1->boundary[3].lon
-                      = px1[kipx1e - 1 + tmp4 * (kipx2s) + tmp5 * jd + tmp3];
-                  ptmp1->boundary[3].lat
-                      = px2[kipx1e - 1 + tmp9 * (kipx2s) + tmp10 * jd + tmp8];
-                  ptmp1->boundary[4].lon
-                      = px1[kipx1e + tmp4 * (kipx2s + 1) + tmp5 * jd + tmp3];
-                  ptmp1->boundary[4].lat
-                      = px2[kipx1e + tmp9 * (kipx2s + 1) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[0].lon = px1[kipx1e - 1 + tmp4 * (kipx2s + 2) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[0].lat = px2[kipx1e - 1 + tmp9 * (kipx2s + 2) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[1].lon = px1[kipx1e - 2 + tmp4 * (kipx2s + 2) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[1].lat = px2[kipx1e - 2 + tmp9 * (kipx2s + 2) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[2].lon = px1[kipx1e - 2 + tmp4 * (kipx2s + 1) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[2].lat = px2[kipx1e - 2 + tmp9 * (kipx2s + 1) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[3].lon = px1[kipx1e - 1 + tmp4 * (kipx2s) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[3].lat = px2[kipx1e - 1 + tmp9 * (kipx2s) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[4].lon = px1[kipx1e + tmp4 * (kipx2s + 1) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[4].lat = px2[kipx1e + tmp9 * (kipx2s + 1) + tmp10 * jd + tmp8];
                 }
               else if (j1 == kipx1s + 1 && j2 == kipx2e - 1)
                 {
 
                   ptmp1->type = pentagon;
 
-                  ptmp1->boundary[0].lon = px1[kipx1s + 2 + tmp4 * (kipx2e - 2)
-                                               + tmp5 * jd + tmp3];
-                  ptmp1->boundary[0].lat = px2[kipx1s + 2 + tmp9 * (kipx2e - 2)
-                                               + tmp10 * jd + tmp8];
-                  ptmp1->boundary[1].lon = px1[kipx1s + 2 + tmp4 * (kipx2e - 1)
-                                               + tmp5 * jd + tmp3];
-                  ptmp1->boundary[1].lat = px2[kipx1s + 2 + tmp9 * (kipx2e - 1)
-                                               + tmp10 * jd + tmp8];
-                  ptmp1->boundary[2].lon
-                      = px1[kipx1s + 1 + tmp4 * (kipx2e) + tmp5 * jd + tmp3];
-                  ptmp1->boundary[2].lat
-                      = px2[kipx1s + 1 + tmp9 * (kipx2e) + tmp10 * jd + tmp8];
-                  ptmp1->boundary[3].lon
-                      = px1[kipx1s + tmp4 * (kipx2e - 1) + tmp5 * jd + tmp3];
-                  ptmp1->boundary[3].lat
-                      = px2[kipx1s + tmp9 * (kipx2e - 1) + tmp10 * jd + tmp8];
-                  ptmp1->boundary[4].lon = px1[kipx1s + 1 + tmp4 * (kipx2e - 2)
-                                               + tmp5 * jd + tmp3];
-                  ptmp1->boundary[4].lat = px2[kipx1s + 1 + tmp9 * (kipx2e - 2)
-                                               + tmp10 * jd + tmp8];
+                  ptmp1->boundary[0].lon = px1[kipx1s + 2 + tmp4 * (kipx2e - 2) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[0].lat = px2[kipx1s + 2 + tmp9 * (kipx2e - 2) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[1].lon = px1[kipx1s + 2 + tmp4 * (kipx2e - 1) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[1].lat = px2[kipx1s + 2 + tmp9 * (kipx2e - 1) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[2].lon = px1[kipx1s + 1 + tmp4 * (kipx2e) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[2].lat = px2[kipx1s + 1 + tmp9 * (kipx2e) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[3].lon = px1[kipx1s + tmp4 * (kipx2e - 1) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[3].lat = px2[kipx1s + tmp9 * (kipx2e - 1) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[4].lon = px1[kipx1s + 1 + tmp4 * (kipx2e - 2) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[4].lat = px2[kipx1s + 1 + tmp9 * (kipx2e - 2) + tmp10 * jd + tmp8];
                 }
               else if (j1 == kipx1e - 1 && j2 == kipx2e - 1)
                 {
 
                   ptmp1->type = pentagon;
 
-                  ptmp1->boundary[0].lon
-                      = px1[kipx1e + tmp4 * (kipx2e) + tmp5 * jd + tmp3];
-                  ptmp1->boundary[0].lat
-                      = px2[kipx1e + tmp9 * (kipx2e) + tmp10 * jd + tmp8];
-                  ptmp1->boundary[1].lon
-                      = px1[kipx1e - 2 + tmp4 * (kipx2e) + tmp5 * jd + tmp3];
-                  ptmp1->boundary[1].lat
-                      = px2[kipx1e - 2 + tmp9 * (kipx2e) + tmp10 * jd + tmp8];
-                  ptmp1->boundary[2].lon = px1[kipx1e - 2 + tmp4 * (kipx2e - 1)
-                                               + tmp5 * jd + tmp3];
-                  ptmp1->boundary[2].lat = px2[kipx1e - 2 + tmp9 * (kipx2e - 1)
-                                               + tmp10 * jd + tmp8];
-                  ptmp1->boundary[3].lon = px1[kipx1e - 1 + tmp4 * (kipx2e - 2)
-                                               + tmp5 * jd + tmp3];
-                  ptmp1->boundary[3].lat = px2[kipx1e - 1 + tmp9 * (kipx2e - 2)
-                                               + tmp10 * jd + tmp8];
-                  ptmp1->boundary[4].lon
-                      = px1[kipx1e + tmp4 * (kipx2e - 2) + tmp5 * jd + tmp3];
-                  ptmp1->boundary[4].lat
-                      = px2[kipx1e + tmp9 * (kipx2e - 2) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[0].lon = px1[kipx1e + tmp4 * (kipx2e) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[0].lat = px2[kipx1e + tmp9 * (kipx2e) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[1].lon = px1[kipx1e - 2 + tmp4 * (kipx2e) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[1].lat = px2[kipx1e - 2 + tmp9 * (kipx2e) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[2].lon = px1[kipx1e - 2 + tmp4 * (kipx2e - 1) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[2].lat = px2[kipx1e - 2 + tmp9 * (kipx2e - 1) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[3].lon = px1[kipx1e - 1 + tmp4 * (kipx2e - 2) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[3].lat = px2[kipx1e - 1 + tmp9 * (kipx2e - 2) + tmp10 * jd + tmp8];
+                  ptmp1->boundary[4].lon = px1[kipx1e + tmp4 * (kipx2e - 2) + tmp5 * jd + tmp3];
+                  ptmp1->boundary[4].lat = px2[kipx1e + tmp9 * (kipx2e - 2) + tmp10 * jd + tmp8];
                 }
               else
                 {
@@ -582,10 +542,8 @@ neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s,
                       js1 = j1 + ispokes[jm - 1];
                       js2 = j2 + ispokes[jm + 5];
 
-                      ptmp1->boundary[jm - 1].lon
-                          = px1[js1 + tmp4 * js2 + tmp5 * jd + tmp3];
-                      ptmp1->boundary[jm - 1].lat
-                          = px2[js1 + tmp9 * js2 + tmp10 * jd + tmp8];
+                      ptmp1->boundary[jm - 1].lon = px1[js1 + tmp4 * js2 + tmp5 * jd + tmp3];
+                      ptmp1->boundary[jm - 1].lat = px2[js1 + tmp9 * js2 + tmp10 * jd + tmp8];
                     }
                 }
             }
@@ -598,8 +556,8 @@ neighbours(double *px1, double *px2, int kipx1s, int kipx1e, int kipx2s,
 /*****************************************************************************/
 
 static void
-xd(double *p, int kip1s, int kip1e, int kip2s, int kip2e, int knd, double *px,
-   int kipx1s, int kipx1e, int kipx2s, int kipx2e, int kndx)
+xd(double *p, int kip1s, int kip1e, int kip2s, int kip2e, int knd, double *px, int kipx1s, int kipx1e, int kipx2s,
+   int kipx2e, int kndx)
 {
   int mi1sm1, mi1ep1, mi2sm1, mi2ep1;
   int mns, mpe, mpw, maw, mae, mpp;
@@ -670,8 +628,7 @@ xd(double *p, int kip1s, int kip1e, int kip2s, int kip2e, int knd, double *px,
         {
           for (j1 = kip1s; j1 <= kip1e; j1++)
             {
-              px[j1 + tmp9 * j2 + tmp10 * jd + tmp8]
-                  = p[j1 + tmp4 * j2 + tmp5 * jd + tmp3];
+              px[j1 + tmp9 * j2 + tmp10 * jd + tmp8] = p[j1 + tmp4 * j2 + tmp5 * jd + tmp3];
             }
         }
     }
@@ -691,34 +648,22 @@ xd(double *p, int kip1s, int kip1e, int kip2s, int kip2e, int knd, double *px,
       mpp = jd + 3 - ((jd + 2) / 5) * 5 + 5 * mns;
       for (j = kip2s; j <= kip1e; j++)
         {
-          px[j + tmp9 * mi2sm1 + tmp10 * jd + tmp8]
-              = p[kip1s + 1 + tmp4 * j + tmp5 * mpw + tmp3];
-          px[mi1sm1 + tmp9 * (j + 1) + tmp10 * jd + tmp8]
-              = p[j - 1 + tmp4 * (kip2s + 1) + tmp5 * mpe + tmp3];
-          px[mi1ep1 + tmp9 * j + tmp10 * jd + tmp8]
-              = p[kip1e + 1 - j + tmp4 * (kip2e - 1) + tmp5 * maw + tmp3];
-          px[j - 1 + tmp9 * mi2ep1 + tmp10 * jd + tmp8]
-              = p[kip1e - 1 + tmp4 * (kip2e + 1 - j) + tmp5 * mae + tmp3];
+          px[j + tmp9 * mi2sm1 + tmp10 * jd + tmp8] = p[kip1s + 1 + tmp4 * j + tmp5 * mpw + tmp3];
+          px[mi1sm1 + tmp9 * (j + 1) + tmp10 * jd + tmp8] = p[j - 1 + tmp4 * (kip2s + 1) + tmp5 * mpe + tmp3];
+          px[mi1ep1 + tmp9 * j + tmp10 * jd + tmp8] = p[kip1e + 1 - j + tmp4 * (kip2e - 1) + tmp5 * maw + tmp3];
+          px[j - 1 + tmp9 * mi2ep1 + tmp10 * jd + tmp8] = p[kip1e - 1 + tmp4 * (kip2e + 1 - j) + tmp5 * mae + tmp3];
         }
-      px[mi1sm1 + tmp9 * kip2s + tmp10 * jd + tmp8]
-          = p[kip1s + 1 + tmp4 * kip2s + tmp5 * mpp + tmp3];
-      px[kip1s + tmp9 * mi2sm1 + tmp10 * jd + tmp8]
-          = p[kip1s + 1 + tmp4 * kip2s + tmp5 * mpp + tmp3];
+      px[mi1sm1 + tmp9 * kip2s + tmp10 * jd + tmp8] = p[kip1s + 1 + tmp4 * kip2s + tmp5 * mpp + tmp3];
+      px[kip1s + tmp9 * mi2sm1 + tmp10 * jd + tmp8] = p[kip1s + 1 + tmp4 * kip2s + tmp5 * mpp + tmp3];
 
-      px[mi1ep1 + tmp9 * mi2sm1 + tmp10 * jd + tmp8]
-          = px[kip1e + tmp9 * mi2sm1 + tmp10 * jd + tmp8];
-      px[mi1sm1 + tmp9 * mi2ep1 + tmp10 * jd + tmp8]
-          = px[mi1sm1 + tmp9 * kip2e + tmp10 * jd + tmp8];
+      px[mi1ep1 + tmp9 * mi2sm1 + tmp10 * jd + tmp8] = px[kip1e + tmp9 * mi2sm1 + tmp10 * jd + tmp8];
+      px[mi1sm1 + tmp9 * mi2ep1 + tmp10 * jd + tmp8] = px[mi1sm1 + tmp9 * kip2e + tmp10 * jd + tmp8];
 
-      px[mi1ep1 + tmp9 * kip2e + tmp10 * jd + tmp8]
-          = p[kip1e - 1 + tmp4 * kip2s + tmp5 * mae + tmp3];
-      px[kip1e + tmp9 * mi2ep1 + tmp10 * jd + tmp8]
-          = p[kip1e - 1 + tmp4 * kip2s + tmp5 * mae + tmp3];
+      px[mi1ep1 + tmp9 * kip2e + tmp10 * jd + tmp8] = p[kip1e - 1 + tmp4 * kip2s + tmp5 * mae + tmp3];
+      px[kip1e + tmp9 * mi2ep1 + tmp10 * jd + tmp8] = p[kip1e - 1 + tmp4 * kip2s + tmp5 * mae + tmp3];
 
-      px[mi1sm1 + tmp9 * mi2sm1 + tmp10 * jd + tmp8]
-          = px[kip1s + tmp9 * mi2sm1 + tmp10 * jd + tmp8];
-      px[mi1ep1 + tmp9 * mi2ep1 + tmp10 * jd + tmp8]
-          = px[kip1e + tmp9 * mi2ep1 + tmp10 * jd + tmp8];
+      px[mi1sm1 + tmp9 * mi2sm1 + tmp10 * jd + tmp8] = px[kip1s + tmp9 * mi2sm1 + tmp10 * jd + tmp8];
+      px[mi1ep1 + tmp9 * mi2ep1 + tmp10 * jd + tmp8] = px[kip1e + tmp9 * mi2ep1 + tmp10 * jd + tmp8];
     }
 
   return;
@@ -727,8 +672,7 @@ xd(double *p, int kip1s, int kip1e, int kip2s, int kip2e, int knd, double *px,
 /*****************************************************************************/
 
 static void
-tricntr(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd,
-        int kjd, int kni)
+tricntr(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd, int kni)
 {
   (void) knd;
   double r1, r2, r3;
@@ -778,8 +722,8 @@ tricntr(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd,
 /****************************************************************************/
 
 static void
-gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd,
-     double pgamma, int ki1, int kj1, int ki2, int kj2, int ki, int kj)
+gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd, double pgamma, int ki1, int kj1,
+     int ki2, int kj2, int ki, int kj)
 {
   (void) knd;
 
@@ -790,12 +734,12 @@ gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd,
   int id3 = id2 * 3;
   int ioffset = -(id1 + id2 + id3);
 
-  double r1 = (pxn[ki2 + id1 * kj2 + id2 * 1 + id3 * kjd + ioffset]
-               - pxn[ki1 + id1 * kj1 + id2 * 1 + id3 * kjd + ioffset]);
-  double r2 = (pxn[ki2 + id1 * kj2 + id2 * 2 + id3 * kjd + ioffset]
-               - pxn[ki1 + id1 * kj1 + id2 * 2 + id3 * kjd + ioffset]);
-  double r3 = (pxn[ki2 + id1 * kj2 + id2 * 3 + id3 * kjd + ioffset]
-               - pxn[ki1 + id1 * kj1 + id2 * 3 + id3 * kjd + ioffset]);
+  double r1
+      = (pxn[ki2 + id1 * kj2 + id2 * 1 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 1 + id3 * kjd + ioffset]);
+  double r2
+      = (pxn[ki2 + id1 * kj2 + id2 * 2 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 2 + id3 * kjd + ioffset]);
+  double r3
+      = (pxn[ki2 + id1 * kj2 + id2 * 3 + id3 * kjd + ioffset] - pxn[ki1 + id1 * kj1 + id2 * 3 + id3 * kjd + ioffset]);
 
   double zchord = sqrt((r1 * r1) + (r2 * r2) + (r3 * r3));
 
@@ -808,15 +752,12 @@ gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd,
   double zalpha = sin((1.0 - pgamma) * ztheta) / sin(ztheta);
 
   /* Store the (x,y,z) coordinates of the point x into the array pxn */
-  pxn[ki + id1 * kj + id2 * 1 + id3 * kjd + ioffset]
-      = zalpha * pxn[ki1 + id1 * kj1 + id2 * 1 + id3 * kjd + ioffset]
-        + zbeta * pxn[ki2 + id1 * kj2 + id2 * 1 + id3 * kjd + ioffset];
-  pxn[ki + id1 * kj + id2 * 2 + id3 * kjd + ioffset]
-      = zalpha * pxn[ki1 + id1 * kj1 + id2 * 2 + id3 * kjd + ioffset]
-        + zbeta * pxn[ki2 + id1 * kj2 + id2 * 2 + id3 * kjd + ioffset];
-  pxn[ki + id1 * kj + id2 * 3 + id3 * kjd + ioffset]
-      = zalpha * pxn[ki1 + id1 * kj1 + id2 * 3 + id3 * kjd + ioffset]
-        + zbeta * pxn[ki2 + id1 * kj2 + id2 * 3 + id3 * kjd + ioffset];
+  pxn[ki + id1 * kj + id2 * 1 + id3 * kjd + ioffset] = zalpha * pxn[ki1 + id1 * kj1 + id2 * 1 + id3 * kjd + ioffset]
+                                                       + zbeta * pxn[ki2 + id1 * kj2 + id2 * 1 + id3 * kjd + ioffset];
+  pxn[ki + id1 * kj + id2 * 2 + id3 * kjd + ioffset] = zalpha * pxn[ki1 + id1 * kj1 + id2 * 2 + id3 * kjd + ioffset]
+                                                       + zbeta * pxn[ki2 + id1 * kj2 + id2 * 2 + id3 * kjd + ioffset];
+  pxn[ki + id1 * kj + id2 * 3 + id3 * kjd + ioffset] = zalpha * pxn[ki1 + id1 * kj1 + id2 * 3 + id3 * kjd + ioffset]
+                                                       + zbeta * pxn[ki2 + id1 * kj2 + id2 * 3 + id3 * kjd + ioffset];
 
   return;
 } /* gcpt */
@@ -824,8 +765,8 @@ gcpt(double *pxn, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kjd,
 /****************************************************************************/
 
 static void
-glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
-         int kig2s, int kig2e, int knd, int kni2, int kni3)
+glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e, int kig2s, int kig2e, int knd, int kni2,
+         int kni3)
 {
   double zsgn;
   int j1, j2;
@@ -915,20 +856,15 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
       /*     Next initialize the (x,y,z) coordinates for the corner of the */
       /*     diamond on the same latitude as the (mni,1,,) vertex, which   */
       /*     is (0,mni+1,,) */
-      pxn[0 + id1 * (mni + 1) + id2 * 1 + id3 * jd + ioffset]
-          = zsinw * cos(zrlon + 2 * pid5);
-      pxn[0 + id1 * (mni + 1) + id2 * 2 + id3 * jd + ioffset]
-          = zsinw * sin(zrlon + 2 * pid5);
+      pxn[0 + id1 * (mni + 1) + id2 * 1 + id3 * jd + ioffset] = zsinw * cos(zrlon + 2 * pid5);
+      pxn[0 + id1 * (mni + 1) + id2 * 2 + id3 * jd + ioffset] = zsinw * sin(zrlon + 2 * pid5);
       pxn[0 + id1 * (mni + 1) + id2 * 3 + id3 * jd + ioffset] = zcosw * zsgn;
 
       /*     Initialize the last diamond vertex, which is located */
       /*     in the opposite hemisphere as (mni,mni+1,,)          */
-      pxn[mni + id1 * (mni + 1) + id2 * 1 + id3 * jd + ioffset]
-          = zsinw * cos(zrlon + pid5);
-      pxn[mni + id1 * (mni + 1) + id2 * 2 + id3 * jd + ioffset]
-          = zsinw * sin(zrlon + pid5);
-      pxn[mni + id1 * (mni + 1) + id2 * 3 + id3 * jd + ioffset]
-          = -(zcosw * zsgn);
+      pxn[mni + id1 * (mni + 1) + id2 * 1 + id3 * jd + ioffset] = zsinw * cos(zrlon + pid5);
+      pxn[mni + id1 * (mni + 1) + id2 * 2 + id3 * jd + ioffset] = zsinw * sin(zrlon + pid5);
+      pxn[mni + id1 * (mni + 1) + id2 * 3 + id3 * jd + ioffset] = -(zcosw * zsgn);
 
       /***********************************************************************/
       /*     First a trisection is performed, if required (kni3=1).          */
@@ -945,8 +881,7 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
                   mi1 = (j1 - 1) * mni;
                   mi2 = j2 * ml3 + 1;
                   zgamma = (double) j2 / 3.0;
-                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, zgamma, mi1, 1,
-                       mi1, mni + 1, mi1, mi2);
+                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, zgamma, mi1, 1, mi1, mni + 1, mi1, mi2);
                 }
             }
 
@@ -958,8 +893,7 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
                   mi1 = j2 * ml3;
                   mi2 = (j1 - 1) * mni + 1;
                   zgamma = (double) j2 / 3.0;
-                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, zgamma, 0, mi2,
-                       mni, mi2, mi1, mi2);
+                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, zgamma, 0, mi2, mni, mi2, mi1, mi2);
                 }
             }
 
@@ -969,8 +903,7 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
               mi1 = mni - j2 * ml3;
               mi2 = j2 * ml3 + 1;
               zgamma = (double) j2 / (float) 3.;
-              gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, zgamma, mni, 1, 0,
-                   mni + 1, mi1, mi2);
+              gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, zgamma, mni, 1, 0, mni + 1, mi1, mi2);
             }
 
           /*     Compute coordinates of icosahedral triangle centers. */
@@ -995,8 +928,7 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
                 {
                   mi1 = (j1 - 1) * ml;
                   mi2 = (j2 - 1) * ml + ml2 + 1;
-                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, 0.5, mi1,
-                       mi2 - ml2, mi1, mi2 + ml2, mi1, mi2);
+                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, 0.5, mi1, mi2 - ml2, mi1, mi2 + ml2, mi1, mi2);
                 }
             }
 
@@ -1008,8 +940,7 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
                 {
                   mi1 = (j2 - 1) * ml + ml2;
                   mi2 = (j1 - 1) * ml + 1;
-                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, 0.5, mi1 - ml2,
-                       mi2, mi1 + ml2, mi2, mi1, mi2);
+                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, 0.5, mi1 - ml2, mi2, mi1 + ml2, mi2, mi1, mi2);
                 }
             }
 
@@ -1021,8 +952,8 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
                 {
                   mi1 = (j1 - 1) * ml + ml2;
                   mi2 = (j2 - 1) * ml + ml2 + 1;
-                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, 0.5, mi1 - ml2,
-                       mi2 + ml2, mi1 + ml2, mi2 - ml2, mi1, mi2);
+                  gcpt(pxn, kig1s, kig1e, kig2s, kig2e, knd, jd, 0.5, mi1 - ml2, mi2 + ml2, mi1 + ml2, mi2 - ml2, mi1,
+                       mi2);
                 }
             }
         }
@@ -1034,18 +965,15 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
         {
           for (j1 = kig1s; j1 <= kig1e; ++j1)
             {
-              if (fabs(pxn[j1 + id1 * j2 + id2 * 1 + id3 * jd + ioffset])
-                  < 2.5e-14)
+              if (fabs(pxn[j1 + id1 * j2 + id2 * 1 + id3 * jd + ioffset]) < 2.5e-14)
                 {
                   pxn[j1 + id1 * j2 + id2 * 1 + id3 * jd + ioffset] = 0.0;
                 }
-              if (fabs(pxn[j1 + id1 * j2 + id2 * 2 + id3 * jd + ioffset])
-                  < 2.5e-14)
+              if (fabs(pxn[j1 + id1 * j2 + id2 * 2 + id3 * jd + ioffset]) < 2.5e-14)
                 {
                   pxn[j1 + id1 * j2 + id2 * 2 + id3 * jd + ioffset] = 0.0;
                 }
-              if (fabs(pxn[j1 + id1 * j2 + id2 * 3 + id3 * jd + ioffset])
-                  < 2.5e-14)
+              if (fabs(pxn[j1 + id1 * j2 + id2 * 3 + id3 * jd + ioffset]) < 2.5e-14)
                 {
                   pxn[j1 + id1 * j2 + id2 * 3 + id3 * jd + ioffset] = 0.0;
                 }
@@ -1063,11 +991,10 @@ glo_coor(double *pxn, double *prlon, double *prlat, int kig1s, int kig1e,
         {
           for (j1 = kig1s; j1 <= kig1e; ++j1)
             {
-              prlon[j1 + id1 * j2 + id2 * jd + joffset] = atan2(
-                  pxn[j1 + id1 * j2 + id2 * 2 + id3 * jd + ioffset],
-                  pxn[j1 + id1 * j2 + id2 * 1 + id3 * jd + ioffset] + 1.0e-20);
-              prlat[j1 + id1 * j2 + id2 * jd + joffset]
-                  = asin(pxn[j1 + id1 * j2 + id2 * 3 + id3 * jd + ioffset]);
+              prlon[j1 + id1 * j2 + id2 * jd + joffset]
+                  = atan2(pxn[j1 + id1 * j2 + id2 * 2 + id3 * jd + ioffset],
+                          pxn[j1 + id1 * j2 + id2 * 1 + id3 * jd + ioffset] + 1.0e-20);
+              prlat[j1 + id1 * j2 + id2 * jd + joffset] = asin(pxn[j1 + id1 * j2 + id2 * 3 + id3 * jd + ioffset]);
             }
         }
     }
@@ -1366,50 +1293,39 @@ gme_grid_restore(double *p, int ni, int nd)
         case 3:
         case 4:
           for (j = 0; j <= ni; j++)
-            p[j + tmp4 + tmp5 * jd + tmp3]
-                = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
+            p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
           break;
         case 5:
           for (j = 0; j <= ni; j++)
-            p[j + tmp4 + tmp5 * jd + tmp3]
-                = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
+            p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
           for (j = 0; j <= ni; j++)
             p[tmp4 * (j + 1) + tmp5 * 5 + tmp3] = p[j + tmp4 + tmp5 + tmp3];
           break;
         case 6:
           for (j = 0; j <= ni; j++)
-            p[j + tmp4 * (ni + 1) + tmp5 * 6 + tmp3]
-                = p[ni + tmp4 * (ni + 1 - j) + tmp5 * 2 + tmp3];
+            p[j + tmp4 * (ni + 1) + tmp5 * 6 + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 * 2 + tmp3];
           for (j = 0; j <= ni; j++)
-            p[ni + tmp4 * (j + 1) + tmp5 * 6 + tmp3]
-                = p[ni - j + tmp4 * (ni + 1) + tmp5 + tmp3];
+            p[ni + tmp4 * (j + 1) + tmp5 * 6 + tmp3] = p[ni - j + tmp4 * (ni + 1) + tmp5 + tmp3];
           break;
         case 7:
         case 8:
         case 9:
           for (j = 0; j <= ni; j++)
-            p[j + tmp4 * (ni + 1) + tmp5 * jd + tmp3]
-                = p[ni + tmp4 * (ni + 1 - j) + tmp5 * (jd - 4) + tmp3];
+            p[j + tmp4 * (ni + 1) + tmp5 * jd + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 * (jd - 4) + tmp3];
           for (j = 0; j <= ni; j++)
-            p[ni + tmp4 * (j + 1) + tmp5 * jd + tmp3]
-                = p[ni - j + tmp4 * (ni + 1) + tmp5 * (jd - 5) + tmp3];
+            p[ni + tmp4 * (j + 1) + tmp5 * jd + tmp3] = p[ni - j + tmp4 * (ni + 1) + tmp5 * (jd - 5) + tmp3];
           for (j = 0; j <= ni; j++)
-            p[j + tmp4 + tmp5 * jd + tmp3]
-                = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
+            p[j + tmp4 + tmp5 * jd + tmp3] = p[tmp4 * (j + 1) + tmp5 * (jd - 1) + tmp3];
           break;
         case 10:
           for (j = 0; j <= ni; j++)
-            p[j + tmp4 + tmp5 * 10 + tmp3]
-                = p[tmp4 * (j + 1) + tmp5 * 9 + tmp3];
+            p[j + tmp4 + tmp5 * 10 + tmp3] = p[tmp4 * (j + 1) + tmp5 * 9 + tmp3];
           for (j = 0; j <= ni; j++)
-            p[tmp4 * (j + 1) + tmp5 * 10 + tmp3]
-                = p[j + tmp4 + tmp5 * 6 + tmp3];
+            p[tmp4 * (j + 1) + tmp5 * 10 + tmp3] = p[j + tmp4 + tmp5 * 6 + tmp3];
           for (j = 0; j <= ni; j++)
-            p[j + tmp4 * (ni + 1) + tmp5 * 10 + tmp3]
-                = p[ni + tmp4 * (ni + 1 - j) + tmp5 + tmp3];
+            p[j + tmp4 * (ni + 1) + tmp5 * 10 + tmp3] = p[ni + tmp4 * (ni + 1 - j) + tmp5 + tmp3];
           for (j = 0; j <= ni; j++)
-            p[ni + tmp4 * (j + 1) + tmp5 * 10 + tmp3]
-                = p[ni - j + tmp4 * (ni + 1) + tmp5 * 5 + tmp3];
+            p[ni + tmp4 * (j + 1) + tmp5 * 10 + tmp3] = p[ni - j + tmp4 * (ni + 1) + tmp5 * 5 + tmp3];
           break;
         }
     }
@@ -1420,15 +1336,13 @@ gme_grid_restore(double *p, int ni, int nd)
 /*****************************************************************************/
 
 void
-gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon,
-         double *blat, int *imask, int ni, int nd, int ni2, int ni3)
+gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon, double *blat, int *imask, int ni,
+         int nd, int ni2, int ni3)
 {
   /* check gridsize */
   if ((size_t)(ni + 1) * (ni + 1) * nd != gridsize)
     {
-      fprintf(stderr,
-              "gme_grid: Calculation of the global GME grid failed (ni=%d)!\n",
-              ni);
+      fprintf(stderr, "gme_grid: Calculation of the global GME grid failed (ni=%d)!\n", ni);
       if ((size_t)(ni + 1) * (ni + 1) * nd > gridsize)
         {
           fprintf(stderr,
@@ -1452,20 +1366,16 @@ gme_grid(int lbounds, size_t gridsize, double *rlon, double *rlat, double *blon,
 
   glo_coor(xn, rlon, rlat, im1s, im1e, im2s, im2e, nd, ni2, ni3);
 
-  xd(rlon, im1s, im1e, im2s, im2e, nd, rlonx, im1s - 1, im1e + 1, im2s - 1,
-     im2e + 1, nd);
-  xd(rlat, im1s, im1e, im2s, im2e, nd, rlatx, im1s - 1, im1e + 1, im2s - 1,
-     im2e + 1, nd);
+  xd(rlon, im1s, im1e, im2s, im2e, nd, rlonx, im1s - 1, im1e + 1, im2s - 1, im2e + 1, nd);
+  xd(rlat, im1s, im1e, im2s, im2e, nd, rlatx, im1s - 1, im1e + 1, im2s - 1, im2e + 1, nd);
 
   initmask(imask, ni, nd);
 
   if (lbounds)
     {
-      struct polygon *poly = (struct polygon *) Malloc(
-          (ni + 1) * (ni + 1) * nd * sizeof(struct polygon));
+      struct polygon *poly = (struct polygon *) Malloc((ni + 1) * (ni + 1) * nd * sizeof(struct polygon));
 
-      neighbours(rlonx, rlatx, im1s - 1, im1e + 1, im2s - 1, im2e + 1, nd, poly,
-                 im1s, im1e, im2s, im2e, nd);
+      neighbours(rlonx, rlatx, im1s - 1, im1e + 1, im2s - 1, im2e + 1, nd, poly, im1s, im1e, im2s, im2e, nd);
 
       boundary(poly, im1s, im1e, im2s, im2e, nd);
 

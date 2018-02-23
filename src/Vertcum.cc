@@ -28,12 +28,11 @@
 #include "pstream_int.h"
 #include "field.h"
 
-#define IS_SURFACE_LEVEL(zaxisID) \
-  (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
+#define IS_SURFACE_LEVEL(zaxisID) (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
 
 static void
-add_vars_mv(size_t gridsize, double missval, const double *restrict var1,
-            const double *restrict var2, double *restrict var3)
+add_vars_mv(size_t gridsize, double missval, const double *restrict var1, const double *restrict var2,
+            double *restrict var3)
 {
   double missval1 = missval;
   double missval2 = missval;
@@ -107,8 +106,7 @@ Vertcum(void *process)
                       zaxisInqVct(zaxisID, vct);
 
                       zaxisIDhl = zaxisCreate(ZAXIS_HYBRID_HALF, nlevshl);
-                      double *levels
-                          = (double *) Malloc(nlevshl * sizeof(double));
+                      double *levels = (double *) Malloc(nlevshl * sizeof(double));
                       for (levelID = 0; levelID < nlevshl; ++levelID)
                         levels[levelID] = levelID + 1;
                       zaxisDefLevels(zaxisIDhl, levels);
@@ -118,9 +116,7 @@ Vertcum(void *process)
                     }
                   else if (vct)
                     {
-                      if (memcmp(vct, zaxisInqVctPtr(zaxisID),
-                                 nvct * sizeof(double))
-                          == 0)
+                      if (memcmp(vct, zaxisInqVctPtr(zaxisID), nvct * sizeof(double)) == 0)
                         vlistChangeZaxisIndex(vlistID2, i, zaxisIDhl);
                     }
                 }
@@ -160,8 +156,7 @@ Vertcum(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, vardata1[varID][levelID],
-                            &varnmiss[varID][levelID]);
+          pstreamReadRecord(streamID1, vardata1[varID][levelID], &varnmiss[varID][levelID]);
         }
 
       for (varID = 0; varID < nvars; ++varID)
@@ -184,12 +179,10 @@ Vertcum(void *process)
           for (levelID = 1; levelID < nlevs2; ++levelID)
             {
               if (operatorID == VERTCUMHL && nlevs2 == nlevshl)
-                add_vars_mv(gridsize, missval, vardata1[varID][levelID - 1],
-                            vardata2[varID][levelID - 1],
+                add_vars_mv(gridsize, missval, vardata1[varID][levelID - 1], vardata2[varID][levelID - 1],
                             vardata2[varID][levelID]);
               else
-                add_vars_mv(gridsize, missval, vardata1[varID][levelID],
-                            vardata2[varID][levelID - 1],
+                add_vars_mv(gridsize, missval, vardata1[varID][levelID], vardata2[varID][levelID - 1],
                             vardata2[varID][levelID]);
             }
 

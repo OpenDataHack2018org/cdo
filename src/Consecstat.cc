@@ -43,8 +43,7 @@ enum
 #define SWITCHWARN "Hit default case!This should never happen (%s).\n"
 
 static void
-selEndOfPeriod(field_type *periods, field_type history, field_type current,
-               int isLastTimestep)
+selEndOfPeriod(field_type *periods, field_type history, field_type current, int isLastTimestep)
 {
   size_t i;
   double pmissval = periods->missval;
@@ -55,8 +54,7 @@ selEndOfPeriod(field_type *periods, field_type history, field_type current,
   double *carray = current.ptr;
 
   size_t len = gridInqSize(periods->grid);
-  if (len != gridInqSize(current.grid)
-      || (gridInqSize(current.grid) != gridInqSize(history.grid)))
+  if (len != gridInqSize(current.grid) || (gridInqSize(current.grid) != gridInqSize(history.grid)))
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (!isLastTimestep)
@@ -72,15 +70,11 @@ selEndOfPeriod(field_type *periods, field_type history, field_type current,
                 {
                   if (!DBL_IS_EQUAL(carray[i], cmissval))
                     {
-                      parray[i] = (DBL_IS_EQUAL(carray[i], 0.0)
-                                   && IS_NOT_EQUAL(harray[i], 0.0))
-                                      ? harray[i]
-                                      : pmissval;
+                      parray[i] = (DBL_IS_EQUAL(carray[i], 0.0) && IS_NOT_EQUAL(harray[i], 0.0)) ? harray[i] : pmissval;
                     }
                   else /* DBL_IS_EQUAL(carray[i], cmissval) */
                     {
-                      parray[i] = (IS_NOT_EQUAL(harray[i], 0.0)) ? harray[i]
-                                                                 : pmissval;
+                      parray[i] = (IS_NOT_EQUAL(harray[i], 0.0)) ? harray[i] : pmissval;
                     }
                 }
               else /* DBL_IS_EQUAL(harray[i], hmissval) */
@@ -95,10 +89,7 @@ selEndOfPeriod(field_type *periods, field_type history, field_type current,
 #pragma omp parallel for default(shared)
 #endif
           for (i = 0; i < len; i++)
-            parray[i]
-                = (DBL_IS_EQUAL(carray[i], 0.0) && IS_NOT_EQUAL(harray[i], 0.0))
-                      ? harray[i]
-                      : pmissval;
+            parray[i] = (DBL_IS_EQUAL(carray[i], 0.0) && IS_NOT_EQUAL(harray[i], 0.0)) ? harray[i] : pmissval;
         }
     }
   else
@@ -111,8 +102,7 @@ selEndOfPeriod(field_type *periods, field_type history, field_type current,
           for (i = 0; i < len; i++)
             if (!DBL_IS_EQUAL(carray[i], cmissval))
               {
-                parray[i]
-                    = (DBL_IS_EQUAL(carray[i], 0.0)) ? pmissval : carray[i];
+                parray[i] = (DBL_IS_EQUAL(carray[i], 0.0)) ? pmissval : carray[i];
               }
             else /* DBL_IS_EQUAL(carray[i], cmissval) */
               {
@@ -218,22 +208,18 @@ Consecstat(void *process)
             {
             case CONSECSUM:
               pstreamDefRecord(ostreamID, varID, levelID);
-              pstreamWriteRecord(ostreamID, vars[varID][levelID].ptr,
-                                 vars[varID][levelID].nmiss);
+              pstreamWriteRecord(ostreamID, vars[varID][levelID].ptr, vars[varID][levelID].nmiss);
               break;
             case CONSECTS:
               if (itsID != 0)
                 {
-                  selEndOfPeriod(&periods[varID][levelID], hist[varID][levelID],
-                                 vars[varID][levelID], FALSE);
+                  selEndOfPeriod(&periods[varID][levelID], hist[varID][levelID], vars[varID][levelID], FALSE);
                   pstreamDefRecord(ostreamID, varID, levelID);
-                  pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr,
-                                     periods[varID][levelID].nmiss);
+                  pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, periods[varID][levelID].nmiss);
                 }
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) schedule(static)
-              for (size_t i = 0; i < gridInqSize(vars[varID][levelID].grid);
-                   i++)
+              for (size_t i = 0; i < gridInqSize(vars[varID][levelID].grid); i++)
                 hist[varID][levelID].ptr[i] = vars[varID][levelID].ptr[i];
 #else
               memcpy(hist[varID][levelID].ptr, vars[varID][levelID].ptr,
@@ -259,11 +245,9 @@ Consecstat(void *process)
           nlevels = zaxisInqSize(vlistInqVarZaxis(ovlistID, varID));
           for (levelID = 0; levelID < nlevels; levelID++)
             {
-              selEndOfPeriod(&periods[varID][levelID], hist[varID][levelID],
-                             vars[varID][levelID], TRUE);
+              selEndOfPeriod(&periods[varID][levelID], hist[varID][levelID], vars[varID][levelID], TRUE);
               pstreamDefRecord(ostreamID, varID, levelID);
-              pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr,
-                                 periods[varID][levelID].nmiss);
+              pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, periods[varID][levelID].nmiss);
             }
         }
     }

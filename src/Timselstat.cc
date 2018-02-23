@@ -78,8 +78,7 @@ Timselstat(void *process)
   int nskip   = (nargc > 2) ? parameter2int(operatorArgv()[2]) : 0;
   // clang-format on
 
-  if (cdoVerbose)
-    cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
+  if (cdoVerbose) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -125,8 +124,7 @@ Timselstat(void *process)
             {
               recinfo[recID].varID = varID;
               recinfo[recID].levelID = levelID;
-              recinfo[recID].lconst
-                  = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
         }
     }
@@ -155,8 +153,7 @@ Timselstat(void *process)
                 {
                   recinfo[recID].varID = varID;
                   recinfo[recID].levelID = levelID;
-                  recinfo[recID].lconst
-                      = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+                  recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
                 }
 
               field_type *psamp1 = &samp1[varID][levelID];
@@ -178,13 +175,10 @@ Timselstat(void *process)
 
                   if (nmiss > 0 || psamp1->ptr)
                     {
-                      if (psamp1->ptr == NULL)
-                        psamp1->ptr
-                            = (double *) Malloc(gridsize * sizeof(double));
+                      if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
                       for (size_t i = 0; i < gridsize; i++)
-                        psamp1->ptr[i]
-                            = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                        psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
               else
@@ -198,15 +192,13 @@ Timselstat(void *process)
                     {
                       if (psamp1->ptr == NULL)
                         {
-                          psamp1->ptr
-                              = (double *) Malloc(gridsize * sizeof(double));
+                          psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
                           for (size_t i = 0; i < gridsize; i++)
                             psamp1->ptr[i] = nsets;
                         }
 
                       for (size_t i = 0; i < gridsize; i++)
-                        if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval))
-                          psamp1->ptr[i]++;
+                        if (!DBL_IS_EQUAL(field.ptr[i], pvars1->missval)) psamp1->ptr[i]++;
                     }
 
                   if (lvarstd)

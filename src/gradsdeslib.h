@@ -156,16 +156,16 @@ typedef struct
                           grid/absolute coord transformation
                           (Time coordinate always linear).      */
   gaint idxflg;        /* File records are indexed; 1==grib,station 2==grib2 */
-  gaint flt64;  /* 20120711 Uwe Schulzweida: added support for 64 bit floats */
-  gaint tmplat; /* File name templating:
-                    3==templating on E and T
-                    2==templating only on E
-                    1==templating only on T, or when
-                       ddf has 'options template', but no % in dset
-                    0==no templating  */
-  gaint *fnums; /* File number for each time */
-  gaint fnumc;  /* Current file number that is open */
-  gaint fnume;  /* Current ensemble file number that is open */
+  gaint flt64;         /* 20120711 Uwe Schulzweida: added support for 64 bit floats */
+  gaint tmplat;        /* File name templating:
+                           3==templating on E and T
+                           2==templating only on E
+                           1==templating only on T, or when
+                              ddf has 'options template', but no % in dset
+                           0==no templating  */
+  gaint *fnums;        /* File number for each time */
+  gaint fnumc;         /* Current file number that is open */
+  gaint fnume;         /* Current ensemble file number that is open */
 } dsets_t;
 
 void dsets_init(dsets_t *dsets);
@@ -176,8 +176,7 @@ gadouble liconv(gadouble *, gadouble);
 gadouble gr2lev(gadouble *, gadouble);
 gadouble lev2gr(gadouble *, gadouble);
 void gr2t(gadouble *, gadouble, struct dt *);
-char *gafndt(char *, struct dt *, struct dt *, gadouble *, struct gachsub *,
-             struct gaens *, gaint, gaint, gaint *);
+char *gafndt(char *, struct dt *, struct dt *, gadouble *, struct gachsub *, struct gaens *, gaint, gaint, gaint *);
 
 gaint cmpwrd(const char *ch1, const char *ch2);
 char *intprs(char *ch, int *val);

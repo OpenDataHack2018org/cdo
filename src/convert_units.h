@@ -21,8 +21,7 @@
 #include "config.h"
 #endif
 
-#if defined(HAVE_LIBUDUNITS2) \
-    && (defined(HAVE_UDUNITS2_H) || defined(HAVE_UDUNITS2_UDUNITS2_H))
+#if defined(HAVE_LIBUDUNITS2) && (defined(HAVE_UDUNITS2_H) || defined(HAVE_UDUNITS2_UDUNITS2_H))
 #define HAVE_UDUNITS2
 #endif
 
@@ -39,7 +38,6 @@ void cdoConvertDestroy();
 
 #include "cdo_int.h"
 
-void cdoConvertUnits(void **ut_converter, bool *changeunits, char *units,
-                     char *units_old, const char *name);
+void cdoConvertUnits(void **ut_converter, bool *changeunits, char *units, char *units_old, const char *name);
 
 #endif  // __CONVERT_UNITS_H_

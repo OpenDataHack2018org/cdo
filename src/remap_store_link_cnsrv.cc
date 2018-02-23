@@ -42,15 +42,12 @@ grid_store_init(grid_store_t *grid_store, long gridsize)
   if (grid_store->max_size % grid_store->blk_size > 0) grid_store->nblocks++;
 
   if (cdoVerbose)
-    fprintf(stdout,
-            "blksize = %ld  lastblksize = %ld  max_size = %ld  nblocks = %ld\n",
-            grid_store->blk_size, grid_store->max_size % grid_store->blk_size,
-            grid_store->max_size, grid_store->nblocks);
+    fprintf(stdout, "blksize = %ld  lastblksize = %ld  max_size = %ld  nblocks = %ld\n", grid_store->blk_size,
+            grid_store->max_size % grid_store->blk_size, grid_store->max_size, grid_store->nblocks);
 
   grid_store->blksize = (long *) Malloc(grid_store->nblocks * sizeof(long));
   grid_store->nlayers = (long *) Malloc(grid_store->nblocks * sizeof(long));
-  grid_store->layers
-      = (grid_layer_t **) Malloc(grid_store->nblocks * sizeof(grid_layer_t *));
+  grid_store->layers = (grid_layer_t **) Malloc(grid_store->nblocks * sizeof(grid_layer_t *));
 
   nblocks = grid_store->nblocks;
   for (iblk = 0; iblk < nblocks; ++iblk)
@@ -60,8 +57,7 @@ grid_store_init(grid_store_t *grid_store, long gridsize)
       grid_store->layers[iblk] = NULL;
     }
   if (grid_store->max_size % grid_store->blk_size > 0)
-    grid_store->blksize[grid_store->nblocks - 1]
-        = grid_store->max_size % grid_store->blk_size;
+    grid_store->blksize[grid_store->nblocks - 1] = grid_store->max_size % grid_store->blk_size;
 }
 
 void
@@ -109,8 +105,7 @@ grid_store_delete(grid_store_t *grid_store)
     address and weight arrays and resizes those arrays if necessary.
 */
 void
-store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts,
-                      double *weights, grid_store_t *grid_store)
+store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, double *weights, grid_store_t *grid_store)
 {
   /*
     Input variables:
@@ -129,9 +124,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts,
 
   if (num_wts == 3)
     {
-      if (IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0)
-          && IS_EQUAL(weights[2], 0))
-        return;
+      if (IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0)) return;
     }
   else
     {
@@ -184,8 +177,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts,
     {
       grid_layer = (grid_layer_t *) Malloc(sizeof(grid_layer_t));
       grid_layer->next = NULL;
-      grid_layer->grid2_link
-          = (long *) Malloc(grid_store->blksize[iblk] * sizeof(long));
+      grid_layer->grid2_link = (long *) Malloc(grid_store->blksize[iblk] * sizeof(long));
 
       blksize = grid_store->blksize[iblk];
       for (i = 0; i < blksize; ++i)
@@ -197,8 +189,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts,
     }
 
   rv->num_links++;
-  if (rv->num_links >= rv->max_links)
-    resize_remap_vars(rv, rv->resize_increment);
+  if (rv->num_links >= rv->max_links) resize_remap_vars(rv, rv->resize_increment);
 
   rv->src_cell_add[nlink] = add1;
   rv->tgt_cell_add[nlink] = add2;
@@ -213,8 +204,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts,
     address and weight arrays and resizes those arrays if necessary.
 */
 void
-store_link_cnsrv(remapvars_t *rv, long add1, long add2,
-                 double *restrict weights, long *link_add1[2],
+store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict weights, long *link_add1[2],
                  long *link_add2[2])
 {
   /*
@@ -228,9 +218,7 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2,
 
   /*  If all weights are ZERO, do not bother storing the link */
 
-  if (IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0)
-      && IS_EQUAL(weights[2], 0))
-    return;
+  if (IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0)) return;
 
   /*  Restrict the range of links to search for existing links */
 
@@ -242,8 +230,8 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2,
       max_link = -1;
     }
 
-      /* If the link already exists, add the weight to the current weight arrays
-       */
+    /* If the link already exists, add the weight to the current weight arrays
+     */
 
 #if defined(SX)
 #define STRIPED 1
@@ -258,8 +246,7 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2,
         estrip = MIN(max_link - strip + 1, STRIPLENGTH);
         for (nlink = 0; nlink < estrip; ++nlink)
           {
-            if (add2 == rv->tgt_cell_add[strip + nlink]
-                && add1 == rv->src_cell_add[strip + nlink])
+            if (add2 == rv->tgt_cell_add[strip + nlink] && add1 == rv->src_cell_add[strip + nlink])
               ilink = strip + nlink;
           }
         if (ilink != (max_link + 1)) break;
@@ -303,8 +290,7 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2,
   nlink = rv->num_links;
 
   rv->num_links++;
-  if (rv->num_links >= rv->max_links)
-    resize_remap_vars(rv, rv->resize_increment);
+  if (rv->num_links >= rv->max_links) resize_remap_vars(rv, rv->resize_increment);
 
   rv->src_cell_add[nlink] = add1;
   rv->tgt_cell_add[nlink] = add2;

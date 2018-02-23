@@ -133,15 +133,13 @@ Select(void *process)
   if (nsel == 0) cdoAbort("Parameter missing!");
 
   list_t *kvlist = kvlist_new("SELECT");
-  if (kvlist_parse_cmdline(kvlist, nsel, argnames) != 0)
-    cdoAbort("Parse error!");
+  if (kvlist_parse_cmdline(kvlist, nsel, argnames) != 0) cdoAbort("Parse error!");
   if (cdoVerbose) kvlist_print(kvlist);
 
   keyValues_t *kv = kvlist_search(kvlist, "timestepmask");
   if (kv && kv->nvalues > 0)
     {
-      if (kvlist_search(kvlist, "timestep"))
-        cdoAbort("Parameter timestep and timestepmask can't be combined!");
+      if (kvlist_search(kvlist, "timestep")) cdoAbort("Parameter timestep and timestepmask can't be combined!");
       eval_timestepmask(kv->values[0], kvlist);
     }
 
@@ -177,8 +175,7 @@ Select(void *process)
 
   sellist_verify(sellist);
 
-  if (SELLIST_NVAL(timestepmask) > 1)
-    cdoAbort("Key timestepmask has too many values!");
+  if (SELLIST_NVAL(timestepmask) > 1) cdoAbort("Key timestepmask has too many values!");
   UNUSED(timestepmask);
 
   int streamCnt = cdoStreamCnt();
@@ -193,8 +190,7 @@ Select(void *process)
   for (int indf = 0; indf < nfiles; ++indf)
     {
       if (!cdoVerbose && nfiles > 1) progressStatus(0, 1, (indf + 1.) / nfiles);
-      if (cdoVerbose)
-        cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
+      if (cdoVerbose) cdoPrint("Process file: %s", cdoGetStreamName(indf).c_str());
 
       int streamID1 = cdoStreamOpenRead(cdoStreamName(indf));
 
@@ -225,20 +221,15 @@ Select(void *process)
                 }
             }
 
-          bool lvarsel = SELLIST_NVAL(code) || SELLIST_NVAL(ltype)
-                         || SELLIST_NVAL(zaxisnum) || SELLIST_NVAL(gridnum)
-                         || SELLIST_NVAL(name) || SELLIST_NVAL(param)
-                         || SELLIST_NVAL(zaxisname) || SELLIST_NVAL(gridname)
-                         || SELLIST_NVAL(steptype);
+          bool lvarsel = SELLIST_NVAL(code) || SELLIST_NVAL(ltype) || SELLIST_NVAL(zaxisnum) || SELLIST_NVAL(gridnum)
+                         || SELLIST_NVAL(name) || SELLIST_NVAL(param) || SELLIST_NVAL(zaxisname)
+                         || SELLIST_NVAL(gridname) || SELLIST_NVAL(steptype);
 
           bool llevsel = SELLIST_NVAL(level) || SELLIST_NVAL(levidx);
 
-          ltimsel = SELLIST_NVAL(date) || SELLIST_NVAL(startdate)
-                    || SELLIST_NVAL(enddate) || SELLIST_NVAL(season)
-                    || SELLIST_NVAL(timestep_of_year) || SELLIST_NVAL(timestep)
-                    || SELLIST_NVAL(year) || SELLIST_NVAL(month)
-                    || SELLIST_NVAL(day) || SELLIST_NVAL(hour)
-                    || SELLIST_NVAL(minute);
+          ltimsel = SELLIST_NVAL(date) || SELLIST_NVAL(startdate) || SELLIST_NVAL(enddate) || SELLIST_NVAL(season)
+                    || SELLIST_NVAL(timestep_of_year) || SELLIST_NVAL(timestep) || SELLIST_NVAL(year)
+                    || SELLIST_NVAL(month) || SELLIST_NVAL(day) || SELLIST_NVAL(hour) || SELLIST_NVAL(minute);
 
           for (varID = 0; varID < nvars; ++varID)
             {
@@ -303,11 +294,8 @@ Select(void *process)
 
               bool lvar = found_code || found_name || found_param;
               bool lstep = SELLIST_NVAL(steptype) ? found_stype : true;
-              bool lgrid = (SELLIST_NVAL(gridnum) || SELLIST_NVAL(gridname))
-                               ? (found_grid || found_gname)
-                               : true;
-              bool lvert = (SELLIST_NVAL(ltype) || SELLIST_NVAL(zaxisnum)
-                            || SELLIST_NVAL(zaxisname))
+              bool lgrid = (SELLIST_NVAL(gridnum) || SELLIST_NVAL(gridname)) ? (found_grid || found_gname) : true;
+              bool lvert = (SELLIST_NVAL(ltype) || SELLIST_NVAL(zaxisnum) || SELLIST_NVAL(zaxisname))
                                ? (found_ltype || found_zaxis || found_zname)
                                : true;
 
@@ -323,17 +311,14 @@ Select(void *process)
                     vars[varID] = true;
                   else if (found_ltype || found_zaxis || found_zname)
                     vars[varID] = true;
-                  else if (!lvarsel
-                           && (SELLIST_NVAL(levidx) || SELLIST_NVAL(level)))
+                  else if (!lvarsel && (SELLIST_NVAL(levidx) || SELLIST_NVAL(level)))
                     {
                       for (int levID = 0; levID < nlevs; ++levID)
                         {
                           levidx = levID + 1;
                           level = cdoZaxisInqLevel(zaxisID, levID);
-                          if (!vars[varID] && SELLIST_CHECK(levidx))
-                            vars[varID] = true;
-                          if (!vars[varID] && SELLIST_CHECK(level))
-                            vars[varID] = true;
+                          if (!vars[varID] && SELLIST_CHECK(levidx)) vars[varID] = true;
+                          if (!vars[varID] && SELLIST_CHECK(level)) vars[varID] = true;
                         }
                     }
                 }
@@ -372,13 +357,11 @@ Select(void *process)
                         {
                           if (SELLIST_NVAL(levidx))
                             {
-                              if (SELLIST_CHECK(levidx))
-                                vlistDefFlag(vlistID1, varID, levID, xresult);
+                              if (SELLIST_CHECK(levidx)) vlistDefFlag(vlistID1, varID, levID, xresult);
                             }
                           else if (SELLIST_NVAL(level))
                             {
-                              if (SELLIST_CHECK(level))
-                                vlistDefFlag(vlistID1, varID, levID, xresult);
+                              if (SELLIST_CHECK(level)) vlistDefFlag(vlistID1, varID, levID, xresult);
                             }
                           else
                             {
@@ -440,9 +423,7 @@ Select(void *process)
                 {
                   for (varID = 0; varID < nvars; ++varID)
                     {
-                      if (vars[varID] == true
-                          && vlistInqVarTimetype(vlistID1, varID)
-                                 == TIME_CONSTANT)
+                      if (vars[varID] == true && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT)
                         {
                           lcopy_const = true;
                           break;
@@ -459,8 +440,7 @@ Select(void *process)
               int zaxisID = vlistInqVarZaxis(vlistID1, varID);
               int nlevs = zaxisInqSize(zaxisID);
               for (int levID = 0; levID < nlevs; ++levID)
-                vlistDefFlag(vlistID0, varID, levID,
-                             vlistInqFlag(vlistID1, varID, levID));
+                vlistDefFlag(vlistID0, varID, levID, vlistInqFlag(vlistID1, varID, levID));
             }
 
           // if ( cdoVerbose ) vlistPrint(vlistID0);
@@ -480,15 +460,12 @@ Select(void *process)
           if (ntsteps == 1 && nfiles == 1)
             {
               for (varID = 0; varID < nvars2; ++varID)
-                if (vlistInqVarTimetype(vlistID2, varID) != TIME_CONSTANT)
-                  break;
+                if (vlistInqVarTimetype(vlistID2, varID) != TIME_CONSTANT) break;
 
               if (varID == nvars2) ntsteps = 0;
             }
 
-          ntsteps2 = (operatorID == SELECT && SELLIST_NVAL(timestep) == 1)
-                         ? 1
-                         : ntsteps;
+          ntsteps2 = (operatorID == SELECT && SELLIST_NVAL(timestep) == 1) ? 1 : ntsteps;
 
           if (ntsteps2 == 0 && nfiles > 1)
             {
@@ -506,9 +483,7 @@ Select(void *process)
                   SELLIST_GET_VAL(timestep, i, &ptimestep);
                   if (ptimestep < 0)
                     {
-                      if (cdoVerbose)
-                        cdoPrint("timestep %d changed to %d", ptimestep,
-                                 ptimestep + ntsteps + 1);
+                      if (cdoVerbose) cdoPrint("timestep %d changed to %d", ptimestep, ptimestep + ntsteps + 1);
                       ptimestep += ntsteps + 1;
                       SELLIST_DEF_VAL(timestep, i, &ptimestep);
                     }
@@ -524,8 +499,7 @@ Select(void *process)
 
           SELLIST_GET_VAL(startdate, 0, &startdate);
           SELLIST_GET_VAL(enddate, 0, &enddate);
-          if (SELLIST_NVAL(startdate))
-            fstartdate = datestr_to_double(startdate, 0);
+          if (SELLIST_NVAL(startdate)) fstartdate = datestr_to_double(startdate, 0);
           if (SELLIST_NVAL(enddate)) fenddate = datestr_to_double(enddate, 1);
         }
       else
@@ -560,8 +534,7 @@ Select(void *process)
               if (operatorID == SELECT && SELLIST_NVAL(timestep) > 0)
                 {
                   int ptimestep;
-                  SELLIST_GET_VAL(timestep, SELLIST_NVAL(timestep) - 1,
-                                  &ptimestep);
+                  SELLIST_GET_VAL(timestep, SELLIST_NVAL(timestep) - 1, &ptimestep);
                   if (timestep > ptimestep)
                     {
                       lstop = true;
@@ -588,28 +561,19 @@ Select(void *process)
               if (SELLIST_CHECK(timestep)) copytimestep = true;
               if (SELLIST_CHECK(timestep_of_year)) copytimestep = true;
 
-              if (!copytimestep && SELLIST_NVAL(date) == 0
-                  && SELLIST_NVAL(timestep) == 0
+              if (!copytimestep && SELLIST_NVAL(date) == 0 && SELLIST_NVAL(timestep) == 0
                   && SELLIST_NVAL(timestep_of_year) == 0)
                 {
-                  bool lseason = false, lyear = false, lmonth = false,
-                       lday = false, lhour = false, lminute = false;
+                  bool lseason = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
 
-                  if (SELLIST_NVAL(season) == 0
-                      || SELLIST_CHECK_SEASON(season, month))
-                    lseason = true;
-                  if (SELLIST_NVAL(year) == 0 || SELLIST_CHECK(year))
-                    lyear = true;
-                  if (SELLIST_NVAL(month) == 0 || SELLIST_CHECK(month))
-                    lmonth = true;
+                  if (SELLIST_NVAL(season) == 0 || SELLIST_CHECK_SEASON(season, month)) lseason = true;
+                  if (SELLIST_NVAL(year) == 0 || SELLIST_CHECK(year)) lyear = true;
+                  if (SELLIST_NVAL(month) == 0 || SELLIST_CHECK(month)) lmonth = true;
                   if (SELLIST_NVAL(day) == 0 || SELLIST_CHECK(day)) lday = true;
-                  if (SELLIST_NVAL(hour) == 0 || SELLIST_CHECK(hour))
-                    lhour = true;
-                  if (SELLIST_NVAL(minute) == 0 || SELLIST_CHECK(minute))
-                    lminute = true;
+                  if (SELLIST_NVAL(hour) == 0 || SELLIST_CHECK(hour)) lhour = true;
+                  if (SELLIST_NVAL(minute) == 0 || SELLIST_CHECK(minute)) lminute = true;
 
-                  if (lseason && lyear && lmonth && lday && lhour && lminute)
-                    copytimestep = true;
+                  if (lseason && lyear && lmonth && lday && lhour && lminute) copytimestep = true;
                 }
 
               double fdate = ((double) vdate) + ((double) vtime) / 1000000.;
@@ -637,8 +601,7 @@ Select(void *process)
               if (SELLIST_NVAL(date))
                 {
                   char vdatetimestr[64];
-                  datetime2str(vdate, vtime, vdatetimestr,
-                               sizeof(vdatetimestr));
+                  datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
                   date = vdatetimestr;
                   if (SELLIST_CHECK_DATE(date)) copytimestep = true;
                 }
@@ -653,13 +616,10 @@ Select(void *process)
               taxisCopyTimestep(taxisID2, taxisID1);
               if (streamID2 == CDI_UNDEFID)
                 {
-                  bool lasttimestep = (nfiles == 1) && (ntsteps2 > 1)
-                                      && (ntsteps2 == (tsID1 + 1));
+                  bool lasttimestep = (nfiles == 1) && (ntsteps2 > 1) && (ntsteps2 == (tsID1 + 1));
                   if (lasttimestep && tsID2 == 0) ntsteps2 = 1;
-                  if (ntsteps2 == 0 || ntsteps2 == 1)
-                    vlistDefNtsteps(vlistID2, ntsteps2);
-                  streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles),
-                                                 cdoFiletype());
+                  if (ntsteps2 == 0 || ntsteps2 == 1) vlistDefNtsteps(vlistID2, ntsteps2);
+                  streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
                   pstreamDefVlist(streamID2, vlistID2);
                 }
               pstreamDefTimestep(streamID2, tsID2);
@@ -670,15 +630,12 @@ Select(void *process)
                   if (vlistInqFlag(vlistID0, varID, levelID) == TRUE)
                     {
                       if (lconstvars && tsID2 > 0 && tsID1 == 0)
-                        if (vlistInqVarTimetype(vlistID1, varID)
-                            == TIME_CONSTANT)
-                          continue;
+                        if (vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
 
                       int varID2 = vlistFindVar(vlistID2, varID);
                       int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
-                      if (lcopy_const && tsID2 == 0)
-                        write_const_vars(streamID2, vlistID2, varID2, vardata2);
+                      if (lcopy_const && tsID2 == 0) write_const_vars(streamID2, vlistID2, varID2, vardata2);
 
                       pstreamDefRecord(streamID2, varID2, levelID2);
                       // if ( levelID2 == 0 ) printf("Write varID %d\n",
@@ -696,8 +653,7 @@ Select(void *process)
                     }
                 }
 
-              if (lcopy_const && tsID2 == 0)
-                write_const_vars(streamID2, vlistID2, nvars2, vardata2);
+              if (lcopy_const && tsID2 == 0) write_const_vars(streamID2, vlistID2, nvars2, vardata2);
 
               tsID2++;
             }
@@ -709,24 +665,17 @@ Select(void *process)
                   if (vlistInqFlag(vlistID0, varID, levelID) == TRUE)
                     {
                       int varID2 = vlistFindVar(vlistID2, varID);
-                      if (vlistInqVarTimetype(vlistID2, varID2)
-                          == TIME_CONSTANT)
+                      if (vlistInqVarTimetype(vlistID2, varID2) == TIME_CONSTANT)
                         {
-                          int levelID2
-                              = vlistFindLevel(vlistID2, varID, levelID);
-                          size_t gridsize
-                              = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+                          int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+                          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
                           if (levelID == 0)
                             {
-                              int nlevel = zaxisInqSize(
-                                  vlistInqVarZaxis(vlistID2, varID2));
-                              vardata2[varID2] = (double *) Malloc(
-                                  gridsize * nlevel * sizeof(double));
+                              int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
+                              vardata2[varID2] = (double *) Malloc(gridsize * nlevel * sizeof(double));
                             }
                           size_t nmiss;
-                          pstreamReadRecord(
-                              streamID1, vardata2[varID2] + gridsize * levelID2,
-                              &nmiss);
+                          pstreamReadRecord(streamID1, vardata2[varID2] + gridsize * levelID2, &nmiss);
                         }
                     }
                 }

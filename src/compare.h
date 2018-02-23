@@ -43,9 +43,8 @@
 
 #ifndef DBL_IS_EQUAL
 /*#define DBL_IS_EQUAL(x,y) (!(x < y || y < x)) */
-#define DBL_IS_EQUAL(x, y)                                                   \
-  (DBL_IS_NAN(x) || DBL_IS_NAN(y) ? (DBL_IS_NAN(x) && DBL_IS_NAN(y) ? 1 : 0) \
-                                  : !(x < y || y < x))
+#define DBL_IS_EQUAL(x, y) \
+  (DBL_IS_NAN(x) || DBL_IS_NAN(y) ? (DBL_IS_NAN(x) && DBL_IS_NAN(y) ? 1 : 0) : !(x < y || y < x))
 #endif
 
 #ifndef IS_EQUAL

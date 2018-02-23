@@ -31,8 +31,7 @@
 static void
 correct_xvals(long nlon, long inc, double *xvals)
 {
-  if (IS_EQUAL(xvals[0], xvals[(nlon - 1) * inc]))
-    xvals[(nlon - 1) * inc] += 360;
+  if (IS_EQUAL(xvals[0], xvals[(nlon - 1) * inc])) xvals[(nlon - 1) * inc] += 360;
 
   if (xvals[0] > xvals[(nlon - 1) * inc])
     for (long i = 0; i < nlon; i++)
@@ -50,9 +49,8 @@ correct_xvals(long nlon, long inc, double *xvals)
 }
 
 static void
-gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat,
-              long nlon2, long nlat2, long lat1, long lat2, long lon11,
-              long lon12, long lon21, long lon22, const char *xunits)
+gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat, long nlon2, long nlat2, long lat1,
+              long lat2, long lon11, long lon12, long lon21, long lon22, const char *xunits)
 {
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
@@ -109,8 +107,7 @@ gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat,
             *pxvals2++ = xvals1[i];
           for (long i = lon11; i <= lon12; i++)
             *pxvals2++ = xvals1[i];
-          if (xunits && strncmp(xunits, "degree", 6) == 0)
-            correct_xvals(nlon2, 1, xvals2);
+          if (xunits && strncmp(xunits, "degree", 6) == 0) correct_xvals(nlon2, 1, xvals2);
         }
 
       if (lyvals)
@@ -131,8 +128,7 @@ gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat,
 }
 
 static int
-gengrid(int gridID1, long lat1, long lat2, long lon11, long lon12, long lon21,
-        long lon22)
+gengrid(int gridID1, long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
   long nlon = gridInqXsize(gridID1);
   long nlat = gridInqYsize(gridID1);
@@ -164,8 +160,7 @@ gengrid(int gridID1, long lat1, long lat2, long lon11, long lon12, long lon21,
   cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
   cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
-  gengridxyvals(gridtype, gridID1, gridID2, nlon, nlat, nlon2, nlat2, lat1,
-                lat2, lon11, lon12, lon21, lon22, xunits);
+  gengridxyvals(gridtype, gridID1, gridID2, nlon, nlat, nlon2, nlat2, lat1, lat2, lon11, lon12, lon21, lon22, xunits);
 
   if (gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL))
     {
@@ -246,8 +241,8 @@ gengrid(int gridID1, long lat1, long lat2, long lon11, long lon12, long lon21,
       grid_copy_attributes(projID1, projID2);
       grid_copy_mapping(projID1, projID2);
 
-      gengridxyvals(GRID_PROJECTION, projID1, projID2, nlon, nlat, nlon2, nlat2,
-                    lat1, lat2, lon11, lon12, lon21, lon22, NULL);
+      gengridxyvals(GRID_PROJECTION, projID1, projID2, nlon, nlat, nlon2, nlat2, lat1, lat2, lon11, lon12, lon21, lon22,
+                    NULL);
 
       gridDefProj(gridID2, projID2);
     }
@@ -335,9 +330,8 @@ gengridcell(int gridID1, size_t gridsize2, long *cellidx)
 }
 
 void
-genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1,
-                 double xlat2, long *lat1, long *lat2, long *lon11, long *lon12,
-                 long *lon21, long *lon22)
+genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, double xlat2, long *lat1, long *lat2,
+                 long *lon11, long *lon12, long *lon21, long *lon22)
 {
   long nlon = gridInqXsize(gridID);
   long nlat = gridInqYsize(gridID);
@@ -396,8 +390,7 @@ genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1,
   if (*lon12 >= nlon || xvals[*lon12] > xlon2) (*lon12)--;
   if (*lon12 >= 0 && IS_EQUAL(xvals[*lon12], xvals[*lon21])) (*lon12)--;
 
-  if (*lon12 - *lon11 + 1 + *lon22 - *lon21 + 1 <= 0)
-    cdoAbort("Longitudinal dimension is too small!");
+  if (*lon12 - *lon11 + 1 + *lon22 - *lon21 + 1 <= 0) cdoAbort("Longitudinal dimension is too small!");
 
   if (yvals[0] > yvals[nlat - 1])
     {
@@ -441,9 +434,8 @@ genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1,
 }
 
 static void
-genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1,
-                  double xlat2, long *lat1, long *lat2, long *lon11,
-                  long *lon12, long *lon21, long *lon22)
+genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, double xlat2, long *lat1, long *lat2,
+                  long *lon11, long *lon12, long *lon21, long *lon22)
 {
   long nlon = gridInqXsize(gridID);
   long nlat = gridInqYsize(gridID);
@@ -466,8 +458,7 @@ genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1,
   if (strncmp(xunits, "radian", 6) == 0) xfact = RAD2DEG;
   if (strncmp(yunits, "radian", 6) == 0) yfact = RAD2DEG;
 
-  if (xlon1 > xlon2)
-    cdoAbort("The second longitude have to be greater than the first one!");
+  if (xlon1 > xlon2) cdoAbort("The second longitude have to be greater than the first one!");
   /*
   if ( xlon2 < 180. )
     {
@@ -545,8 +536,7 @@ genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1,
               }
             else
               {
-                if (((xval >= xlon1 && xval <= xlon2)
-                     || (xval - 360 >= xlon1 && xval - 360 <= xlon2)
+                if (((xval >= xlon1 && xval <= xlon2) || (xval - 360 >= xlon1 && xval - 360 <= xlon2)
                      || (xval + 360 >= xlon1 && xval + 360 <= xlon2)))
                   {
                     if (ilon < *lon21) *lon21 = ilon;
@@ -586,8 +576,7 @@ genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1,
 }
 
 void
-getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1,
-                double *xlat2)
+getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1, double *xlat2)
 {
   bool lset = false;
 
@@ -617,8 +606,7 @@ getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1,
 }
 
 void
-genlonlatbox(int argc_offset, int gridID, long *lat1, long *lat2, long *lon11,
-             long *lon12, long *lon21, long *lon22)
+genlonlatbox(int argc_offset, int gridID, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22)
 {
   double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
   getlonlatparams(argc_offset, &xlon1, &xlon2, &xlat1, &xlat2);
@@ -626,16 +614,13 @@ genlonlatbox(int argc_offset, int gridID, long *lat1, long *lat2, long *lon11,
   int gridtype = gridInqType(gridID);
 
   if (gridtype == GRID_CURVILINEAR)
-    genlonlatbox_curv(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11,
-                      lon12, lon21, lon22);
+    genlonlatbox_curv(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
   else
-    genlonlatbox_reg(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11,
-                     lon12, lon21, lon22);
+    genlonlatbox_reg(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
 }
 
 static int
-genlonlatgrid(int gridID1, long *lat1, long *lat2, long *lon11, long *lon12,
-              long *lon21, long *lon22)
+genlonlatgrid(int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22)
 {
   genlonlatbox(0, gridID1, lat1, lat2, lon11, lon12, lon21, lon22);
 
@@ -672,8 +657,7 @@ gencellgrid(int gridID1, long *gridsize2, long **cellidx)
   int gridtype = gridInqType(gridID1);
   size_t gridsize1 = gridInqSize(gridID1);
 
-  if (gridtype != GRID_UNSTRUCTURED)
-    cdoAbort("Internal problem, wrong grid type!");
+  if (gridtype != GRID_UNSTRUCTURED) cdoAbort("Internal problem, wrong grid type!");
 
   double *xvals = (double *) Malloc(gridsize1 * sizeof(double));
   double *yvals = (double *) Malloc(gridsize1 * sizeof(double));
@@ -698,8 +682,7 @@ gencellgrid(int gridID1, long *gridsize2, long **cellidx)
       double xval = xvals[i] * xfact;
       double yval = yvals[i] * yfact;
       if (yval >= xlat1 && yval <= xlat2)
-        if ((xval >= xlon1 && xval <= xlon2)
-            || (xval + 360 >= xlon1 && xval + 360 <= xlon2)
+        if ((xval >= xlon1 && xval <= xlon2) || (xval + 360 >= xlon1 && xval + 360 <= xlon2)
             || (xval - 360 >= xlon1 && xval - 360 <= xlon2))
           {
             nvals++;
@@ -725,8 +708,7 @@ gencellgrid(int gridID1, long *gridsize2, long **cellidx)
 }
 
 void
-genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11,
-            long *lon12, long *lon21, long *lon22)
+genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22)
 {
   operatorCheckArgc(argc_offset + 4);
 
@@ -815,14 +797,12 @@ genindexbox(int argc_offset, int gridID1, long *lat1, long *lat2, long *lon11,
 }
 
 static int
-genindexgrid(int gridID1, long *lat1, long *lat2, long *lon11, long *lon12,
-             long *lon21, long *lon22)
+genindexgrid(int gridID1, long *lat1, long *lat2, long *lon11, long *lon12, long *lon21, long *lon22)
 {
   genindexbox(0, gridID1, lat1, lat2, lon11, lon12, lon21, lon22);
 
   int gridID2 = -1;
-  if (gridInqType(gridID1) == GRID_PROJECTION
-      && gridInqProjType(gridID1) == CDI_PROJ_LCC)
+  if (gridInqType(gridID1) == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_LCC)
     gridID2 = cdo_define_subgrid_grid(gridID1, *lon11, *lon12, *lat1, *lat2);
   else
     gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
@@ -831,8 +811,8 @@ genindexgrid(int gridID1, long *lat1, long *lat2, long *lon11, long *lon12,
 }
 
 static void
-window(int nwpv, double *array1, int gridID1, double *array2, long lat1,
-       long lat2, long lon11, long lon12, long lon21, long lon22)
+window(int nwpv, double *array1, int gridID1, double *array2, long lat1, long lat2, long lon11, long lon12, long lon21,
+       long lon22)
 {
   long ilat, ilon;
   long nlon = gridInqXsize(gridID1);
@@ -866,8 +846,7 @@ window(int nwpv, double *array1, int gridID1, double *array2, long lat1,
 }
 
 static void
-window_cell(int nwpv, double *array1, int gridID1, double *array2,
-            long gridsize2, long *cellidx)
+window_cell(int nwpv, double *array1, int gridID1, double *array2, long gridsize2, long *cellidx)
 {
   if (nwpv == 2)
     {
@@ -933,14 +912,11 @@ Selbox(void *process)
       gridID1 = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
 
-      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN
-          || gridtype == GRID_CURVILINEAR
-          || (gridtype == GRID_PROJECTION
-              && gridInqProjType(gridID1) == CDI_PROJ_RLL)
-          || (gridtype == GRID_PROJECTION
-              && gridInqProjType(gridID1) == CDI_PROJ_LCC)
-          || (operatorID == SELINDEXBOX && gridtype == GRID_GENERIC
-              && gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0)
+      if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR
+          || (gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL)
+          || (gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_LCC)
+          || (operatorID == SELINDEXBOX && gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0
+              && gridInqYsize(gridID1) > 0)
           || (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED))
         {
           if (operatorID == SELLONLATBOX)
@@ -949,19 +925,14 @@ Selbox(void *process)
               if (gridsize == 1) continue;
 
               if (gridtype == GRID_UNSTRUCTURED)
-                gridID2 = gencellgrid(gridID1, &sbox[index].nvals,
-                                      &sbox[index].cellidx);
+                gridID2 = gencellgrid(gridID1, &sbox[index].nvals, &sbox[index].cellidx);
               else
-                gridID2 = genlonlatgrid(gridID1, &sbox[index].lat1,
-                                        &sbox[index].lat2, &sbox[index].lon11,
-                                        &sbox[index].lon12, &sbox[index].lon21,
-                                        &sbox[index].lon22);
+                gridID2 = genlonlatgrid(gridID1, &sbox[index].lat1, &sbox[index].lat2, &sbox[index].lon11,
+                                        &sbox[index].lon12, &sbox[index].lon21, &sbox[index].lon22);
             }
           else
-            gridID2
-                = genindexgrid(gridID1, &sbox[index].lat1, &sbox[index].lat2,
-                               &sbox[index].lon11, &sbox[index].lon12,
-                               &sbox[index].lon21, &sbox[index].lon22);
+            gridID2 = genindexgrid(gridID1, &sbox[index].lat1, &sbox[index].lat2, &sbox[index].lon11,
+                                   &sbox[index].lon12, &sbox[index].lon21, &sbox[index].lon22);
 
           sbox[index].gridID1 = gridID1;
           sbox[index].gridID2 = gridID2;
@@ -971,8 +942,7 @@ Selbox(void *process)
           for (varID = 0; varID < nvars; varID++)
             if (gridID1 == vlistInqVarGrid(vlistID1, varID)) vars[varID] = true;
         }
-      else if (gridtype == GRID_GENERIC && gridInqXsize(gridID1) <= 1
-               && gridInqYsize(gridID1) <= 1)
+      else if (gridtype == GRID_GENERIC && gridInqXsize(gridID1) <= 1 && gridInqYsize(gridID1) <= 1)
         {
         }
       else
@@ -989,12 +959,10 @@ Selbox(void *process)
     {
       if (gridtype != GRID_UNSTRUCTURED)
         {
-          cdoPrint("box1 - idx1,idx2,idy1,idy2: %ld,%ld,%ld,%ld",
-                   sbox[0].lon21 + 1, sbox[0].lon22 + 1, sbox[0].lat1 + 1,
-                   sbox[0].lat2 + 1);
-          cdoPrint("box2 - idx1,idx2,idy1,idy2: %ld,%ld,%ld,%ld",
-                   sbox[0].lon11 + 1, sbox[0].lon12 + 1, sbox[0].lat1 + 1,
-                   sbox[0].lat2 + 1);
+          cdoPrint("box1 - idx1,idx2,idy1,idy2: %ld,%ld,%ld,%ld", sbox[0].lon21 + 1, sbox[0].lon22 + 1,
+                   sbox[0].lat1 + 1, sbox[0].lat2 + 1);
+          cdoPrint("box2 - idx1,idx2,idy1,idy2: %ld,%ld,%ld,%ld", sbox[0].lon11 + 1, sbox[0].lon12 + 1,
+                   sbox[0].lat1 + 1, sbox[0].lat2 + 1);
         }
     }
 
@@ -1037,18 +1005,15 @@ Selbox(void *process)
               for (index = 0; index < ngrids; index++)
                 if (gridID1 == sbox[index].gridID1) break;
 
-              if (index == ngrids)
-                cdoAbort("Internal problem, grid not found!");
+              if (index == ngrids) cdoAbort("Internal problem, grid not found!");
 
               gridsize2 = gridInqSize(sbox[index].gridID2);
 
               if (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED)
-                window_cell(nwpv, array1, gridID1, array2, gridsize2,
-                            sbox[index].cellidx);
+                window_cell(nwpv, array1, gridID1, array2, gridsize2, sbox[index].cellidx);
               else
-                window(nwpv, array1, gridID1, array2, sbox[index].lat1,
-                       sbox[index].lat2, sbox[index].lon11, sbox[index].lon12,
-                       sbox[index].lon21, sbox[index].lon22);
+                window(nwpv, array1, gridID1, array2, sbox[index].lat1, sbox[index].lat2, sbox[index].lon11,
+                       sbox[index].lon12, sbox[index].lon21, sbox[index].lon22);
 
               if (nmiss)
                 {

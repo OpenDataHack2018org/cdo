@@ -39,7 +39,8 @@
 #endif
 
 #ifdef HAVE_LIBCMOR
-extern "C" {
+extern "C"
+{
 #include "cmor.h"
 }
 #endif
@@ -49,8 +50,9 @@ extern "C" {
 
 #include "cdo_int.h"  // HAVE_OPENMP4
 
-extern "C" {
-size_t getMemorySize(void);
+extern "C"
+{
+  size_t getMemorySize(void);
 }
 
 void
@@ -60,8 +62,7 @@ printFeatures(void)
   size_t memory_size = getMemorySize() / (1024 * 1024 * 1024);
   if (memory_size > 0) fprintf(stderr, " %zuGB", memory_size);
 #ifdef __cplusplus
-  fprintf(stderr, " C++%d",
-          (int) ((__cplusplus - (__cplusplus / 10000) * 10000) / 100));
+  fprintf(stderr, " C++%d", (int) ((__cplusplus - (__cplusplus / 10000) * 10000) / 100));
 #endif
 #if defined(HAVE_CF_INTERFACE)
   fprintf(stderr, " Fortran");
@@ -152,14 +153,12 @@ printLibraries(void)
 #if defined(HAVE_LIBHDF5)
   fprintf(stderr, " HDF5");
 #if defined(H5_VERS_MAJOR)
-  unsigned h5h_majnum = H5_VERS_MAJOR, h5h_minnum = H5_VERS_MINOR,
-           h5h_relnum = H5_VERS_RELEASE;
+  unsigned h5h_majnum = H5_VERS_MAJOR, h5h_minnum = H5_VERS_MINOR, h5h_relnum = H5_VERS_RELEASE;
   fprintf(stderr, "/%u.%u.%u", h5h_majnum, h5h_minnum, h5h_relnum);
 
   unsigned h5l_majnum, h5l_minnum, h5l_relnum;
   H5get_libversion(&h5l_majnum, &h5l_minnum, &h5l_relnum);
-  if ((h5h_majnum != h5l_majnum) || (h5h_minnum != h5l_minnum)
-      || (h5h_relnum != h5l_relnum))
+  if ((h5h_majnum != h5l_majnum) || (h5h_minnum != h5l_minnum) || (h5h_relnum != h5l_relnum))
     fprintf(stderr, "(%u.%u.%u)", h5l_majnum, h5l_minnum, h5l_relnum);
 #endif
 #endif
@@ -186,8 +185,7 @@ printLibraries(void)
 #ifdef HAVE_LIBCMOR
   fprintf(stderr, " CMOR");
 #if defined(CMOR_VERSION_MAJOR)
-  fprintf(stderr, "/%u.%u.%u", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR,
-          CMOR_VERSION_PATCH);
+  fprintf(stderr, "/%u.%u.%u", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR, CMOR_VERSION_PATCH);
 #endif
 #endif
 
@@ -203,8 +201,7 @@ printLibraries(void)
     curl_version_info_data *version_data = curl_version_info(CURLVERSION_NOW);
     fprintf(stderr, " curl/%s", version_data->version);
 #if defined(LIBCURL_VERSION)
-    if (strcmp(LIBCURL_VERSION, version_data->version) != 0)
-      fprintf(stderr, "(h%s)", LIBCURL_VERSION);
+    if (strcmp(LIBCURL_VERSION, version_data->version) != 0) fprintf(stderr, "(h%s)", LIBCURL_VERSION);
 #else
     fprintf(stderr, "(header not found)");
 #endif

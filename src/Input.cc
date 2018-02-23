@@ -104,35 +104,29 @@ Input(void *process)
           date = 0;
           time = 0;
 
-          if (nrecs == 0)
-            array = (double *) Malloc(gridsize * nlevs * sizeof(double));
+          if (nrecs == 0) array = (double *) Malloc(gridsize * nlevs * sizeof(double));
 
-          cdoPrint("Enter all %zu elements of timestep %d!", gridsize * nlevs,
-                   nrecs + 1);
+          cdoPrint("Enter all %zu elements of timestep %d!", gridsize * nlevs, nrecs + 1);
 
           size_t rval = input_darray(stdin, gridsize * nlevs, array);
 
           if (nrecs > 0 && rval == 0) break;
 
-          if (rval != gridsize * nlevs)
-            cdoAbort("Too few input elements (%zu of %zu)!", rval,
-                     gridsize * nlevs);
+          if (rval != gridsize * nlevs) cdoAbort("Too few input elements (%zu of %zu)!", rval, gridsize * nlevs);
 
           if (feof(stdin)) break;
         }
       else if (operatorID == INPUTEXT)
         {
           output_filetype = cdoDefaultFileType;
-          if (output_filetype == CDI_UNDEFID)
-            output_filetype = CDI_FILETYPE_EXT;
+          if (output_filetype == CDI_UNDEFID) output_filetype = CDI_FILETYPE_EXT;
 
           cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
                    " of record %d (or EOF(=^D))!",
                    nrecs + 1);
 
           int rval = input_iarray(4, ihead);
-          if (feof(stdin) && nrecs == 0)
-            cdoAbort("Too few header elements (%d of %d)!", rval, 4);
+          if (feof(stdin) && nrecs == 0) cdoAbort("Too few header elements (%d of %d)!", rval, 4);
           if (feof(stdin)) break;
           if (rval != 4) cdoAbort("Invalid header input!");
 
@@ -165,16 +159,14 @@ Input(void *process)
       else if (operatorID == INPUTSRV)
         {
           output_filetype = cdoDefaultFileType;
-          if (output_filetype == CDI_UNDEFID)
-            output_filetype = CDI_FILETYPE_SRV;
+          if (output_filetype == CDI_UNDEFID) output_filetype = CDI_FILETYPE_SRV;
 
           cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
                    " of record %d (or EOF(=^D))!",
                    nrecs + 1);
 
           int rval = input_iarray(8, ihead);
-          if (feof(stdin) && nrecs == 0)
-            cdoAbort("Too few header elements (%d of %d)!", rval, 8);
+          if (feof(stdin) && nrecs == 0) cdoAbort("Too few header elements (%d of %d)!", rval, 8);
           if (feof(stdin)) break;
           if (rval != 8) cdoAbort("Invalid header input!");
 

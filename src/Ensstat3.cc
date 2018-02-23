@@ -81,7 +81,7 @@ Ensstat3(void *process)
   double missval;
   double *dat;                              // pointer to ensemble data for ROC
   double *uThresh = NULL, *lThresh = NULL;  // thresholds for histograms
-  double **roc = NULL;  // receiver operating characteristics table
+  double **roc = NULL;                      // receiver operating characteristics table
   double val;
   int ival;
 
@@ -118,8 +118,7 @@ Ensstat3(void *process)
 
   const char *ofilename = cdoGetStreamName(nfiles).c_str();
 
-  if (!cdoOverwriteMode && fileExists(ofilename)
-      && !userFileOverwrite(ofilename))
+  if (!cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename))
     cdoAbort("Outputfile %s already exists!", ofilename);
 
   ens_file_t *ef = (ens_file_t *) Malloc(nfiles * sizeof(ens_file_t));
@@ -129,8 +128,7 @@ Ensstat3(void *process)
   /* ("first touch strategy")                            */
   /* --> #pragma omp parallel for ...                    */
   /* *************************************************** */
-  field_type *field
-      = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
+  field_type *field = (field_type *) Malloc(Threading::ompNumThreads * sizeof(field_type));
   for (i = 0; i < Threading::ompNumThreads; i++)
     {
       field_init(&field[i]);
@@ -264,14 +262,11 @@ Ensstat3(void *process)
           if (nrecs != nrecs0)
             {
               if (nrecs == 0)
-                cdoAbort(
-                    "Inconsistent ensemble file, too few time steps in %s!",
-                    cdoGetStreamName(fileID).c_str());
+                cdoAbort("Inconsistent ensemble file, too few time steps in %s!", cdoGetStreamName(fileID).c_str());
               else
                 cdoAbort("Inconsistent ensemble file, number of records at "
                          "time step %d of %s and %s differ!",
-                         tsID + 1, cdoGetStreamName(0).c_str(),
-                         cdoGetStreamName(fileID).c_str());
+                         tsID + 1, cdoGetStreamName(0).c_str(), cdoGetStreamName(fileID).c_str());
             }
         }
 
@@ -286,8 +281,7 @@ Ensstat3(void *process)
       for (int recID = 0; recID < nrecs0; recID++)
         {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(ef, nfiles) private(streamID, nmiss) lastprivate(varID, levelID)
+#pragma omp parallel for default(none) shared(ef, nfiles) private(streamID, nmiss) lastprivate(varID, levelID)
 #endif
           for (int fileID = 0; fileID < nfiles; fileID++)
             {
@@ -361,9 +355,7 @@ Ensstat3(void *process)
 
                       for (j = 0; j < nens; j++)
                         for (binID = 0; binID < nbins; binID++)
-                          if (dat[j] >= lThresh[binID]
-                              && dat[j] < uThresh[binID])
-                            hist[binID]++;
+                          if (dat[j] >= lThresh[binID] && dat[j] < uThresh[binID]) hist[binID]++;
 
                       chksum = 0;
                       for (binID = 0; binID < nbins; binID++)
@@ -431,21 +423,17 @@ Ensstat3(void *process)
                       int n = ctg_tab[binID][FP] + ctg_tab[binID][TN];
                       double tpr = ctg_tab[binID][TP] / (double) p;
                       double fpr = ctg_tab[binID][FP] / (double) n;
-                      chksum += ctg_tab[binID][0] + ctg_tab[binID][1]
-                                + ctg_tab[binID][2] + ctg_tab[binID][3];
+                      chksum += ctg_tab[binID][0] + ctg_tab[binID][1] + ctg_tab[binID][2] + ctg_tab[binID][3];
 
                       roc[binID][TPR] = tpr;
                       roc[binID][FPR] = fpr;
 
-                      fprintf(stderr,
-                              "%3i %10.4g: %6i %6i %6i %6i: %10.4g %10.4g\n",
-                              binID, binID < nbins ? lThresh[binID] : 1,
-                              ctg_tab[binID][0], ctg_tab[binID][1],
+                      fprintf(stderr, "%3i %10.4g: %6i %6i %6i %6i: %10.4g %10.4g\n", binID,
+                              binID < nbins ? lThresh[binID] : 1, ctg_tab[binID][0], ctg_tab[binID][1],
                               ctg_tab[binID][2], ctg_tab[binID][3], tpr, fpr);
                     }
                   fprintf(stderr, "nbins %10i\n", nbins);
-                  fprintf(stderr, "#ROC CurveArea: %10.6f\n",
-                          roc_curve_integrate((const double **) roc, nbins));
+                  fprintf(stderr, "#ROC CurveArea: %10.6f\n", roc_curve_integrate((const double **) roc, nbins));
                 }  // if ( DEBUG_ROC )
             }      // else if (operfunc == func_roc )
         }          // for ( recID=0; recID<nrecs; recID++ )
@@ -483,22 +471,18 @@ Ensstat3(void *process)
           int n = ctg_tab[i][FP] + ctg_tab[i][TN];
           double tpr = ctg_tab[i][TP] / (double) p;
           double fpr = ctg_tab[i][FP] / (double) n;
-          chksum
-              += ctg_tab[i][0] + ctg_tab[i][1] + ctg_tab[i][2] + ctg_tab[i][3];
+          chksum += ctg_tab[i][0] + ctg_tab[i][1] + ctg_tab[i][2] + ctg_tab[i][3];
 
           roc[i][TPR] = tpr;
           roc[i][FPR] = fpr;
 
-          int sum = ctg_tab[i][TP] + ctg_tab[i][TN] + ctg_tab[i][FP]
-                    + ctg_tab[i][FN];
+          int sum = ctg_tab[i][TP] + ctg_tab[i][TN] + ctg_tab[i][FP] + ctg_tab[i][FN];
 
-          fprintf(stdout, "%3i %10.4g: %6i %6i %6i %6i (%6i): %10.4g %10.4g\n",
-                  i, i < nbins ? lThresh[i] : 1, ctg_tab[i][0], ctg_tab[i][1],
-                  ctg_tab[i][2], ctg_tab[i][3], sum, tpr, fpr);
+          fprintf(stdout, "%3i %10.4g: %6i %6i %6i %6i (%6i): %10.4g %10.4g\n", i, i < nbins ? lThresh[i] : 1,
+                  ctg_tab[i][0], ctg_tab[i][1], ctg_tab[i][2], ctg_tab[i][3], sum, tpr, fpr);
         }
 
-      fprintf(stdout, "#ROC CurveArea: %10.6f\n",
-              roc_curve_integrate((const double **) roc, nbins));
+      fprintf(stdout, "#ROC CurveArea: %10.6f\n", roc_curve_integrate((const double **) roc, nbins));
     }
 
   for (int fileID = 0; fileID < nfiles; fileID++)

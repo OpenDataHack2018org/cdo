@@ -28,12 +28,10 @@ cdo_read_timestepmask(const char *maskfile, int *n)
   int vlistID = streamInqVlist(streamID);
 
   int nvars = vlistNvars(vlistID);
-  if (nvars > 1)
-    cdoAbort("timestepmask %s contains more than one variable!", maskfile);
+  if (nvars > 1) cdoAbort("timestepmask %s contains more than one variable!", maskfile);
 
   size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, 0));
-  if (gridsize > 1)
-    cdoAbort("timestepmask %s has more than one gridpoint!", maskfile);
+  if (gridsize > 1) cdoAbort("timestepmask %s has more than one gridpoint!", maskfile);
 
   int nlev = zaxisInqSize(vlistInqVarZaxis(vlistID, 0));
   if (nlev > 1) cdoAbort("timestepmask %s has more than one level!", maskfile);
@@ -45,8 +43,7 @@ cdo_read_timestepmask(const char *maskfile, int *n)
       while (streamInqTimestep(streamID, nts))
         nts++;
 
-      if (cdoVerbose)
-        cdoPrint("%s: counted %i timeSteps in %s", __func__, nts, maskfile);
+      if (cdoVerbose) cdoPrint("%s: counted %i timeSteps in %s", __func__, nts, maskfile);
 
       streamClose(streamID);
       streamID = streamOpenRead(maskfile);
@@ -61,8 +58,7 @@ cdo_read_timestepmask(const char *maskfile, int *n)
   int tsID = 0;
   while ((nrecs = streamInqTimestep(streamID, tsID)))
     {
-      if (nrecs != 1)
-        cdoAbort("Internal error; unexprected number of records!");
+      if (nrecs != 1) cdoAbort("Internal error; unexprected number of records!");
 
       int varID, levelID;
       size_t nmiss;

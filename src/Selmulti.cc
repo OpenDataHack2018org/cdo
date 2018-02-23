@@ -24,8 +24,9 @@
 
 // NOTE: All operators in this module works only on GRIB edition 1 files!
 
-extern "C" {
-void streamGrbChangeParameterIdentification(int code, int ltype, int lev);
+extern "C"
+{
+  void streamGrbChangeParameterIdentification(int code, int ltype, int lev);
 }
 
 /*
@@ -136,7 +137,7 @@ typedef struct
   int nlevels;
   int sel_or_del_or_change;  // sel_or_del_or_change:  0:  operator decides,
                              // 1:select , 2:delete, 3:change
-  int simpleMath;  // 1:  simple array arithmetics ( *,+), 0: do nothing
+  int simpleMath;            // 1:  simple array arithmetics ( *,+), 0: do nothing
   float scale;
   float offset;
 
@@ -204,8 +205,7 @@ Selmulti(void *process)
       printf("\n");
     }
   if (!multiSelectionParser(filenameOrString))
-    cdoWarning("Error processing file with selection description!\n%s",
-               filenameOrString);
+    cdoWarning("Error processing file with selection description!\n%s", filenameOrString);
 
   if (operatorID == SELMULTI)
     if (getNumberOfSelectionTuples() == 0)
@@ -249,9 +249,8 @@ Selmulti(void *process)
           double level = zaxisInqLevel(zaxisID, levelID);
 
           if (operatorID == DELMULTI)
-            vlistDefFlag(
-                vlistID1, varID, levelID,
-                TRUE);  // set initially, override bellow if in selection
+            vlistDefFlag(vlistID1, varID, levelID,
+                         TRUE);  // set initially, override bellow if in selection
           if (operatorID == CHANGEMULTI)
             {
               vlistDefFlag(vlistID1, varID, levelID,
@@ -267,12 +266,9 @@ Selmulti(void *process)
               // (int)level, nvars, varID);
               // Note: When the list is Empty then function
               // checkListContainsInt() also returns true !
-              selcode = checkListContainsInt(code, tuplerec->codeLST,
-                                             tuplerec->ncodes);
-              selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST,
-                                              tuplerec->nlevelTypes);
-              sellevel = checkListContainsInt((int) level, tuplerec->levelLST,
-                                              tuplerec->nlevels);
+              selcode = checkListContainsInt(code, tuplerec->codeLST, tuplerec->ncodes);
+              selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
+              sellevel = checkListContainsInt((int) level, tuplerec->levelLST, tuplerec->nlevels);
               if (selcode && selltype && sellevel)
                 {
                   if (operatorID == SELMULTI)
@@ -286,15 +282,12 @@ Selmulti(void *process)
                               if (!tuplerec->simpleMath)
                                 cdoPrint(" Selecting : (code %3i, ltype %3i, "
                                          "level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID,
-                                         levelID);
+                                         code, ltype, (int) (level), varID, levelID);
                               else
-                                cdoPrint(
-                                    " Selecting : (code %3i, ltype %3i, level "
-                                    "%3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
-                                    "OFFSET=%f",
-                                    code, ltype, (int) (level), varID, levelID,
-                                    tuplerec->scale, tuplerec->offset);
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level "
+                                         "%3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
+                                         "OFFSET=%f",
+                                         code, ltype, (int) (level), varID, levelID, tuplerec->scale, tuplerec->offset);
                             }
                           break;
                         case 1:
@@ -304,15 +297,12 @@ Selmulti(void *process)
                               if (!tuplerec->simpleMath)
                                 cdoPrint(" Selecting : (code %3i, ltype %3i, "
                                          "level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID,
-                                         levelID);
+                                         code, ltype, (int) (level), varID, levelID);
                               else
-                                cdoPrint(
-                                    " Selecting : (code %3i, ltype %3i, level "
-                                    "%3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
-                                    "OFFSET=%f",
-                                    code, ltype, (int) (level), varID, levelID,
-                                    tuplerec->scale, tuplerec->offset);
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level "
+                                         "%3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
+                                         "OFFSET=%f",
+                                         code, ltype, (int) (level), varID, levelID, tuplerec->scale, tuplerec->offset);
                             }
                           break;
                         case 2:
@@ -320,18 +310,15 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(
-                                    " Selecting for removal: (code %3i, ltype "
-                                    "%3i, level %3i)   [varID(%d),levelID(%d)]",
-                                    code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting for removal: (code %3i, ltype "
+                                         "%3i, level %3i)   [varID(%d),levelID(%d)]",
+                                         code, ltype, (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting for removal: (code %3i, "
                                          "ltype %3i, level %3i)   "
                                          "[varID(%d),levelID(%d)]; SCALE=%f; "
                                          "OFFSET=%f",
-                                         code, ltype, (int) (level), varID,
-                                         levelID, tuplerec->scale,
-                                         tuplerec->offset);
+                                         code, ltype, (int) (level), varID, levelID, tuplerec->scale, tuplerec->offset);
                             }
                           break;
                         }
@@ -345,18 +332,15 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(
-                                    " Selecting for removal: (code %3i, ltype "
-                                    "%3i, level %3i)   [varID(%d),levelID(%d)]",
-                                    code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting for removal: (code %3i, ltype "
+                                         "%3i, level %3i)   [varID(%d),levelID(%d)]",
+                                         code, ltype, (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting for removal: (code %3i, "
                                          "ltype %3i, level %3i)   "
                                          "[varID(%d),levelID(%d)]; SCALE=%f; "
                                          "OFFSET=%f",
-                                         code, ltype, (int) (level), varID,
-                                         levelID, tuplerec->scale,
-                                         tuplerec->offset);
+                                         code, ltype, (int) (level), varID, levelID, tuplerec->scale, tuplerec->offset);
                             }
                           break;
                         case 1:
@@ -366,15 +350,12 @@ Selmulti(void *process)
                               if (!tuplerec->simpleMath)
                                 cdoPrint(" Selecting : (code %3i, ltype %3i, "
                                          "level %3i)   [varID(%d),levelID(%d)]",
-                                         code, ltype, (int) (level), varID,
-                                         levelID);
+                                         code, ltype, (int) (level), varID, levelID);
                               else
-                                cdoPrint(
-                                    " Selecting : (code %3i, ltype %3i, level "
-                                    "%3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
-                                    "OFFSET=%f",
-                                    code, ltype, (int) (level), varID, levelID,
-                                    tuplerec->scale, tuplerec->offset);
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level "
+                                         "%3i)   [varID(%d),levelID(%d)]; SCALE=%f; "
+                                         "OFFSET=%f",
+                                         code, ltype, (int) (level), varID, levelID, tuplerec->scale, tuplerec->offset);
                             }
                           break;
                         case 2:
@@ -382,18 +363,15 @@ Selmulti(void *process)
                           if (CdoDebug::cdoDebugExt)
                             {
                               if (!tuplerec->simpleMath)
-                                cdoPrint(
-                                    " Selecting for removal: (code %3i, ltype "
-                                    "%3i, level %3i)   [varID(%d),levelID(%d)]",
-                                    code, ltype, (int) (level), varID, levelID);
+                                cdoPrint(" Selecting for removal: (code %3i, ltype "
+                                         "%3i, level %3i)   [varID(%d),levelID(%d)]",
+                                         code, ltype, (int) (level), varID, levelID);
                               else
                                 cdoPrint(" Selecting for removal: (code %3i, "
                                          "ltype %3i, level %3i)   "
                                          "[varID(%d),levelID(%d)]; SCALE=%f; "
                                          "OFFSET=%f",
-                                         code, ltype, (int) (level), varID,
-                                         levelID, tuplerec->scale,
-                                         tuplerec->offset);
+                                         code, ltype, (int) (level), varID, levelID, tuplerec->scale, tuplerec->offset);
                             }
                           break;
                         }
@@ -440,8 +418,7 @@ Selmulti(void *process)
 
           if (vlistInqFlag(vlistID1, varID, levelID) == TRUE)
             {
-              simpleMath
-                  = 0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
+              simpleMath = 0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
               scale = 1.0;
               offset = 0.0;
               code = vlistInqVarCode(vlistID1, varID);
@@ -453,35 +430,26 @@ Selmulti(void *process)
                   TUPLEREC *tuplerec = getSelTuple(ii);
                   // Note: When the list is Empty then function
                   // checkListContainsInt() also returns true !
-                  selcode = checkListContainsInt(code, tuplerec->codeLST,
-                                                 tuplerec->ncodes);
-                  selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST,
-                                                  tuplerec->nlevelTypes);
-                  sellevel = checkListContainsInt(
-                      (int) level, tuplerec->levelLST, tuplerec->nlevels);
+                  selcode = checkListContainsInt(code, tuplerec->codeLST, tuplerec->ncodes);
+                  selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
+                  sellevel = checkListContainsInt((int) level, tuplerec->levelLST, tuplerec->nlevels);
                   lcopy = true;
                   if (selcode && selltype && sellevel)
                     {
                       if (operatorID == CHANGEMULTI)
                         {
                           if (CdoDebug::cdoDebugExt)
-                            cdoPrint(
-                                " Processing: (code %d, ltype %d, level %d);  "
-                                "nvars=%d, varID=%d => (selcode %d, selltype "
-                                "%d, sellevel %d) => change (%d,%d,%d)",
-                                code, ltype, (int) level, nvars, varID, selcode,
-                                selltype, sellevel, tuplerec->changedCode,
-                                tuplerec->changedLevelType,
-                                tuplerec->changedLevel);
-                          if ((tuplerec->changedCode == -1)
-                              && (tuplerec->changedLevelType == -1)
+                            cdoPrint(" Processing: (code %d, ltype %d, level %d);  "
+                                     "nvars=%d, varID=%d => (selcode %d, selltype "
+                                     "%d, sellevel %d) => change (%d,%d,%d)",
+                                     code, ltype, (int) level, nvars, varID, selcode, selltype, sellevel,
+                                     tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
+                          if ((tuplerec->changedCode == -1) && (tuplerec->changedLevelType == -1)
                               && (tuplerec->changedLevel == -1))
                             cdoPrint(" WARNING: Cannot CHANGE identification!");
                           else
-                            streamGrbChangeParameterIdentification(
-                                tuplerec->changedCode,
-                                tuplerec->changedLevelType,
-                                tuplerec->changedLevel);
+                            streamGrbChangeParameterIdentification(tuplerec->changedCode, tuplerec->changedLevelType,
+                                                                   tuplerec->changedLevel);
                           // Calling PROXY function
                           // streamGrbChangeParameterIdentification() which
                           // results in later calling func.
@@ -495,8 +463,7 @@ Selmulti(void *process)
                             cdoPrint(" Processing: (code %d, ltype %d, level "
                                      "%d);  nvars=%d, varID=%d => (selcode %d, "
                                      "selltype %d, sellevel %d)",
-                                     code, ltype, (int) level, nvars, varID,
-                                     selcode, selltype, sellevel);
+                                     code, ltype, (int) level, nvars, varID, selcode, selltype, sellevel);
                         }
                       simpleMath = tuplerec->simpleMath;  // 1:  simple array
                                                           // arithmetics ( *,+),
@@ -520,8 +487,7 @@ Selmulti(void *process)
                   cdoPrint(" Warning: Missing varID or levelID with (code %3i, "
                            "ltype %3i, level %3i)   [varID(%d),levelID(%d)] .. "
                            "#2[varID(%d),levelID(%d)]",
-                           code, ltype, (int) (level), varID, levelID, varID2,
-                           levelID2);
+                           code, ltype, (int) (level), varID, levelID, varID2, levelID2);
                   continue;
                 }
               pstreamDefRecord(streamID2, varID2, levelID2);
@@ -543,8 +509,7 @@ Selmulti(void *process)
                       if (CdoDebug::cdoDebugExt)
                         cdoPrint(" Writing record [%4d] with (code %3i, ltype "
                                  "%3i, level %3i)   [varID(%d),levelID(%d)]",
-                                 recID, code, ltype, (int) (level), varID,
-                                 levelID);
+                                 recID, code, ltype, (int) (level), varID, levelID);
                       pstreamWriteRecord(streamID2, array, nmiss);
                     }
                   else  // 1:  simple array arithmetics ( *,+)
@@ -553,8 +518,7 @@ Selmulti(void *process)
                         cdoPrint(" Writing record [%4d] with (code %3i, ltype "
                                  "%3i, level %3i)   [varID(%d),levelID(%d)]; "
                                  "SCALE=%f; OFFSET=%f",
-                                 recID, code, ltype, (int) (level), varID,
-                                 levelID, scale, offset);
+                                 recID, code, ltype, (int) (level), varID, levelID, scale, offset);
                       for (size_t li = 0; li < gridsize; ++li)
                         if (!DBL_IS_EQUAL(array[li], missval))
                           {
@@ -739,8 +703,7 @@ goToNextSeparator(char *pline)
         }
     }
   if (separatorFound) pline++;
-  if (CdoDebug::cdoDebugExt >= 100)
-    cdoPrint("goToNextSeparator():  pline= ('%s') ", pline);
+  if (CdoDebug::cdoDebugExt >= 100) cdoPrint("goToNextSeparator():  pline= ('%s') ", pline);
   // while ( isspace((int) *pline) ) pline++;
   pline = removeSpaces(pline);
   return pline;
@@ -768,16 +731,12 @@ strContains(char *str, const char *substr)
   char *rv = strstr(str, substr);
   if (rv)
     {
-      if (CdoDebug::cdoDebugExt >= 100)
-        cdoPrint("strContains():  substr('%s') FOUND in str('%s')", substr,
-                 str);
+      if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strContains():  substr('%s') FOUND in str('%s')", substr, str);
       return (rv + lensub);  // points after subStr ..
     }
   else
     {
-      if (CdoDebug::cdoDebugExt >= 100)
-        cdoPrint("strContains():  substr('%s') NOT found in str('%s')", substr,
-                 str);
+      if (CdoDebug::cdoDebugExt >= 100) cdoPrint("strContains():  substr('%s') NOT found in str('%s')", substr, str);
       return rv;
     }
 }
@@ -791,7 +750,7 @@ findParamEnd(char *str)
   if (str == NULL) return NULL;
   // supported endings are: ", " or ";"
   if (ptrEnding == NULL) ptrEnding = strContains(ptr, ", ");  // HIP notation
-  if (ptrEnding == NULL) ptrEnding = strContains(ptr, ";");  // compact notation
+  if (ptrEnding == NULL) ptrEnding = strContains(ptr, ";");   // compact notation
   if (ptrEnding != NULL)
     {
       ptrEnding = removeSpaces(ptrEnding);
@@ -818,8 +777,7 @@ findTupleEnd(char *str)
   if (ptrEnding != NULL)
     {
       ptrEnding = removeSpaces(ptrEnding);
-      if (CdoDebug::cdoDebugExt >= 100)
-        cdoPrint(" findTupleEnd='%s'", ptrEnding);
+      if (CdoDebug::cdoDebugExt >= 100) cdoPrint(" findTupleEnd='%s'", ptrEnding);
       return ptrEnding;
     }
   if (CdoDebug::cdoDebugExt >= 100) cdoPrint(" findTupleEnd=end-of-string");
@@ -839,24 +797,19 @@ readlineForParsing(FILE *gfp, char *strToParsePtr, char *line)
     }
   else if (strToParsePtr != NULL)  // we parse a given string
     {
-      if (CdoDebug::cdoDebugExt >= 30)
-        cdoPrint("%s(): Parsing selection string:  %s", __func__,
-                 strToParsePtr);
+      if (CdoDebug::cdoDebugExt >= 30) cdoPrint("%s(): Parsing selection string:  %s", __func__, strToParsePtr);
       char *tpEnd = NULL;
       if (strlen(strToParsePtr) > 0) tpEnd = findTupleEnd(strToParsePtr);
       if (tpEnd == NULL)
         {
-          if (CdoDebug::cdoDebugExt >= 100)
-            cdoPrint("%s(): End of selection string reached.", __func__);
+          if (CdoDebug::cdoDebugExt >= 100) cdoPrint("%s(): End of selection string reached.", __func__);
           return NULL;
         }
       else
         {
           tpEnd[0] = 0;
-          if (strlen(strToParsePtr) <= MAX_LINE_LEN)
-            strcpy(line, strToParsePtr);
-          if (CdoDebug::cdoDebugExt >= 100)
-            cdoPrint("%s(): Current selection line=%s", __func__, line);
+          if (strlen(strToParsePtr) <= MAX_LINE_LEN) strcpy(line, strToParsePtr);
+          if (CdoDebug::cdoDebugExt >= 100) cdoPrint("%s(): Current selection line=%s", __func__, line);
           strToParsePtr = tpEnd + 1;
           return strToParsePtr;
         }
@@ -886,8 +839,8 @@ multiSelectionParser(const char *filenameOrString)
   char first3chars[4];
   strncpy(first3chars, filenameOrString, 3);
 
-  if ((filenameOrString[0] == '{') || (filenameOrString[0] == '(')
-      || strContains(first3chars, "del") || strContains(first3chars, "sel"))
+  if ((filenameOrString[0] == '{') || (filenameOrString[0] == '(') || strContains(first3chars, "del")
+      || strContains(first3chars, "sel"))
     {
       // cdo selmulti,'(33/34;105;10)'
       // - or -
@@ -899,14 +852,12 @@ multiSelectionParser(const char *filenameOrString)
       if (strToParsePtr[0] == '{') strToParsePtr++;
       int strLn = strlen(strToParsePtr);
       if (strToParsePtr[strLn - 1] == '}') strToParsePtr[strLn - 1] = 0;
-      if (CdoDebug::cdoDebugExt)
-        cdoPrint(" Parsing selection string:  %s", strToParsePtr);
+      if (CdoDebug::cdoDebugExt) cdoPrint(" Parsing selection string:  %s", strToParsePtr);
     }
   else
     {
       gfp = fopen(filenameOrString, "r");
-      if (CdoDebug::cdoDebugExt)
-        cdoPrint(" Parsing file:  %s", filenameOrString);
+      if (CdoDebug::cdoDebugExt) cdoPrint(" Parsing file:  %s", filenameOrString);
       if (gfp == NULL)
         {
           cdoAbort(" Missing file:  %s", filenameOrString);
@@ -941,8 +892,7 @@ multiSelectionParser(const char *filenameOrString)
         }
       if (strpos != NULL)  // we have SELECT ..
         {
-          if (CdoDebug::cdoDebugExt)
-            cdoPrint(" Parsing notation SELECT: %s", strpos);
+          if (CdoDebug::cdoDebugExt) cdoPrint(" Parsing notation SELECT: %s", strpos);
           pline = strpos;
           tuplerec = TUPLERECNew();
           tuplerec->sel_or_del_or_change = selectionRec;
@@ -954,15 +904,13 @@ multiSelectionParser(const char *filenameOrString)
               strpos = strContains(pline, "PARAMETER=");
               if ((strpos) != NULL)
                 {
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint(": PARAMETER=%s", strpos);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint(": PARAMETER=%s", strpos);
                   pline = strpos;
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
@@ -970,10 +918,8 @@ multiSelectionParser(const char *filenameOrString)
                         val = -1;
                       else
                         val = atoi(pline);
-                      if (CdoDebug::cdoDebugExt >= 100)
-                        cdoPrint("code=%d", val);
-                      tuplerec->ncodes = push_backIntList(
-                          val, tuplerec->codeLST, tuplerec->ncodes);
+                      if (CdoDebug::cdoDebugExt >= 100) cdoPrint("code=%d", val);
+                      tuplerec->ncodes = push_backIntList(val, tuplerec->codeLST, tuplerec->ncodes);
                       strpos = goToNextSeparator(pline);
                       pline = strpos;
                       if (!strpos) break;
@@ -984,15 +930,13 @@ multiSelectionParser(const char *filenameOrString)
               strpos = strContains(pline, "LEVTYPE=");
               if ((strpos) != NULL)
                 {
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint(": LEVTYPE=%s", strpos);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint(": LEVTYPE=%s", strpos);
                   pline = strpos;
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
@@ -1011,10 +955,8 @@ multiSelectionParser(const char *filenameOrString)
                         }
                       else
                         convertLevelsHPa2Pa = 0;
-                      if (CdoDebug::cdoDebugExt >= 100)
-                        cdoPrint("levelType=%d", val);
-                      tuplerec->nlevelTypes = push_backIntList(
-                          val, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
+                      if (CdoDebug::cdoDebugExt >= 100) cdoPrint("levelType=%d", val);
+                      tuplerec->nlevelTypes = push_backIntList(val, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
                       strpos = goToNextSeparator(pline);
                       pline = strpos;
                       if (!strpos) break;
@@ -1025,15 +967,13 @@ multiSelectionParser(const char *filenameOrString)
               strpos = strContains(pline, "LEVEL=");
               if ((strpos) != NULL)
                 {
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint(": LEVEL=%s", strpos);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint(": LEVEL=%s", strpos);
                   pline = strpos;
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
@@ -1045,38 +985,32 @@ multiSelectionParser(const char *filenameOrString)
                         {
                           val *= 100;
                         }
-                      if (CdoDebug::cdoDebugExt >= 100)
-                        cdoPrint("level=%d", val);
-                      tuplerec->nlevels = push_backIntList(
-                          val, tuplerec->levelLST, tuplerec->nlevels);
+                      if (CdoDebug::cdoDebugExt >= 100) cdoPrint("level=%d", val);
+                      tuplerec->nlevels = push_backIntList(val, tuplerec->levelLST, tuplerec->nlevels);
                       strpos = goToNextSeparator(pline);
                       pline = strpos;
                       if (!strpos) break;
                       pline = skipSeparator(strpos);
                     }
                 }
-              if (CdoDebug::cdoDebugExt >= 100)
-                cdoPrint("pline='%s' (check SCALE=...)", pline);
+              if (CdoDebug::cdoDebugExt >= 100) cdoPrint("pline='%s' (check SCALE=...)", pline);
               strpos = strContains(pline, "SCALE=");
               if ((strpos) != NULL)
                 {
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint(": SCALE= %s", strpos);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint(": SCALE= %s", strpos);
                   pline = strpos;
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
                       floatval = atof(pline);
-                      if (CdoDebug::cdoDebugExt >= 100)
-                        cdoPrint("scale=%f", floatval);
-                      tuplerec->simpleMath = 1;  // 1:  simple array arithmetics
-                                                 // ( *,+), 0: do nothing
+                      if (CdoDebug::cdoDebugExt >= 100) cdoPrint("scale=%f", floatval);
+                      tuplerec->simpleMath = 1;    // 1:  simple array arithmetics
+                                                   // ( *,+), 0: do nothing
                       tuplerec->scale = floatval;  // tuplerec->offset = 0.0;
                       strpos = goToNextSeparator(pline);
                       pline = strpos;
@@ -1084,28 +1018,24 @@ multiSelectionParser(const char *filenameOrString)
                       pline = skipSeparator(strpos);
                     }
                 }
-              if (CdoDebug::cdoDebugExt >= 100)
-                cdoPrint("pline='%s' (check OFFSET=...)", pline);
+              if (CdoDebug::cdoDebugExt >= 100) cdoPrint("pline='%s' (check OFFSET=...)", pline);
               strpos = strContains(pline, "OFFSET=");
               if ((strpos) != NULL)
                 {
-                  if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint(": OFFSET= %s", strpos);
+                  if (CdoDebug::cdoDebugExt >= 100) cdoPrint(": OFFSET= %s", strpos);
                   pline = strpos;
                   pline = removeSpaces(pline);
                   parEnd = findParamEnd(pline);
                   if ((!parEnd) && (!pline))
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                   while ((pline != parEnd) && (strlen(pline) > 0))
                     {
                       pline = removeSpaces(pline);
                       floatval = atof(pline);
-                      if (CdoDebug::cdoDebugExt >= 100)
-                        cdoPrint("offset=%f", floatval);
-                      tuplerec->simpleMath = 1;  // 1:  simple array arithmetics
-                                                 // ( *,+), 0: do nothing
+                      if (CdoDebug::cdoDebugExt >= 100) cdoPrint("offset=%f", floatval);
+                      tuplerec->simpleMath = 1;     // 1:  simple array arithmetics
+                                                    // ( *,+), 0: do nothing
                       tuplerec->offset = floatval;  // tuplerec->scale = 1.0;
                       strpos = goToNextSeparator(pline);
                       pline = strpos;
@@ -1154,16 +1084,14 @@ multiSelectionParser(const char *filenameOrString)
           // (33/34; 105; 10)
           while ((pline != NULL) && (strlen(pline) != 0) && (pline[0] != ')'))
             {
-              if (CdoDebug::cdoDebugExt >= 100)
-                cdoPrint("[1]: pline='%s'", pline);
+              if (CdoDebug::cdoDebugExt >= 100) cdoPrint("[1]: pline='%s'", pline);
               // 1st is code
               {
                 pline = removeSpaces(pline);
                 parEnd = findParamEnd(pline);
                 if ((!parEnd) && (!pline))
                   if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                             parEnd, pline);
+                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                 while ((pline != parEnd) && (strlen(pline) > 0))
                   {
                     pline = removeSpaces(pline);
@@ -1172,8 +1100,7 @@ multiSelectionParser(const char *filenameOrString)
                     else
                       val = atoi(pline);
                     if (CdoDebug::cdoDebugExt >= 100) cdoPrint("code=%d", val);
-                    tuplerec->ncodes = push_backIntList(val, tuplerec->codeLST,
-                                                        tuplerec->ncodes);
+                    tuplerec->ncodes = push_backIntList(val, tuplerec->codeLST, tuplerec->ncodes);
                     strpos = goToNextSeparator(pline);
                     if (!strpos)
                       {
@@ -1186,15 +1113,13 @@ multiSelectionParser(const char *filenameOrString)
                   }
               }
               // 2nd is level type
-              if (CdoDebug::cdoDebugExt >= 100)
-                cdoPrint("[2]: pline='%s'", pline);
+              if (CdoDebug::cdoDebugExt >= 100) cdoPrint("[2]: pline='%s'", pline);
               {
                 pline = removeSpaces(pline);
                 parEnd = findParamEnd(pline);
                 if ((!parEnd) && (!pline))
                   if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                             parEnd, pline);
+                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                 while ((pline != parEnd) && (strlen(pline) > 0))
                   {
                     pline = removeSpaces(pline);
@@ -1214,10 +1139,8 @@ multiSelectionParser(const char *filenameOrString)
                     else
                       convertLevelsHPa2Pa = 0;
 
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("levelType=%d", val);
-                    tuplerec->nlevelTypes = push_backIntList(
-                        val, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("levelType=%d", val);
+                    tuplerec->nlevelTypes = push_backIntList(val, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
                     strpos = goToNextSeparator(pline);
                     if (!strpos)
                       {
@@ -1230,15 +1153,13 @@ multiSelectionParser(const char *filenameOrString)
                   }
               }
               // 3rd is level
-              if (CdoDebug::cdoDebugExt >= 100)
-                cdoPrint("[3]: pline='%s'", pline);
+              if (CdoDebug::cdoDebugExt >= 100) cdoPrint("[3]: pline='%s'", pline);
               {
                 pline = removeSpaces(pline);
                 parEnd = findParamEnd(pline);
                 if ((!parEnd) && (!pline))
                   if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                             parEnd, pline);
+                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                 while ((pline != parEnd) && (strlen(pline) > 0))
                   {
                     pline = removeSpaces(pline);
@@ -1251,28 +1172,21 @@ multiSelectionParser(const char *filenameOrString)
                         val *= 100;
                       }
                     if (CdoDebug::cdoDebugExt >= 100) cdoPrint("level=%d", val);
-                    tuplerec->nlevels = push_backIntList(
-                        val, tuplerec->levelLST, tuplerec->nlevels);
+                    tuplerec->nlevels = push_backIntList(val, tuplerec->levelLST, tuplerec->nlevels);
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     strpos = goToNextSeparator(pline);
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (!strpos)
                       {
-                        strpos = strContains(
-                            pline, "|");  // compact notation for  changemulti
+                        strpos = strContains(pline, "|");  // compact notation for  changemulti
                         if (strpos)
-                          pline
-                              = strpos
-                                - 1;  // strContains returns character after...
+                          pline = strpos - 1;  // strContains returns character after...
                         else
                           pline = parEnd;
                         if (CdoDebug::cdoDebugExt >= 100)
-                          cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                                   parEnd, pline);
+                          cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                         break;
                       }
                     else
@@ -1285,8 +1199,7 @@ multiSelectionParser(const char *filenameOrString)
               // cdo
               // changemulti,'{(134;1;*|1;105;*);{(6;1;*|6;105;*)};{(246;*;*|76;*;*)};{(247;*;*|58;*;*)};{(248;*;*|71;*;*)}'
               // fileIN fileOUT
-              if (CdoDebug::cdoDebugExt >= 100)
-                cdoPrint("[OPT]: pline='%s'", pline);
+              if (CdoDebug::cdoDebugExt >= 100) cdoPrint("[OPT]: pline='%s'", pline);
               {
                 pline = removeSpaces(pline);
                 // pline points to: "=1;105;*);....."
@@ -1297,70 +1210,51 @@ multiSelectionParser(const char *filenameOrString)
                     // Get changedCode:
                     parEnd = findParamEnd(pline);
                     if ((!parEnd) || (pline[0] == 0))
-                      cdoAbort(
-                          "Channot parse: strpos=%s; parEnd=%s ... pline=%s",
-                          strpos, parEnd, pline);
+                      cdoAbort("Channot parse: strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (pline[0] == '*')
                       val = -1;
                     else
                       val = atoi(pline);
                     tuplerec->changedCode = val;
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("changedCode=%d", val);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("changedCode=%d", val);
                     strpos = goToNextSeparator(pline);
-                    if (!strpos)
-                      cdoAbort(
-                          "Channot parse: strpos=%s; parEnd=%s ... pline=%s",
-                          strpos, parEnd, pline);
+                    if (!strpos) cdoAbort("Channot parse: strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     pline = skipSeparator(strpos);
                     // Get changedLevelType:
                     parEnd = findParamEnd(pline);
                     if ((!parEnd) || (pline[0] == 0))
-                      cdoAbort(
-                          "Channot parse: strpos=%s; parEnd=%s ... pline=%s",
-                          strpos, parEnd, pline);
+                      cdoAbort("Channot parse: strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (pline[0] == '*')
                       val = -1;
                     else
                       val = atoi(pline);
                     tuplerec->changedLevelType = val;
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("changedLevelType=%d", val);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("changedLevelType=%d", val);
                     strpos = goToNextSeparator(pline);
-                    if (!strpos)
-                      cdoAbort(
-                          "Channot parse: strpos=%s; parEnd=%s ... pline=%s",
-                          strpos, parEnd, pline);
+                    if (!strpos) cdoAbort("Channot parse: strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     pline = skipSeparator(strpos);
                     // Get changedLevel:
                     parEnd = findParamEnd(pline);
                     if ((!parEnd) || (pline[0] == 0))
-                      cdoAbort(
-                          "Channot parse: strpos=%s; parEnd=%s ... pline=%s",
-                          strpos, parEnd, pline);
+                      cdoAbort("Channot parse: strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                               parEnd, pline);
+                      cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                     if (pline[0] == '*')
                       val = -1;
                     else
                       val = atoi(pline);
                     tuplerec->changedLevel = val;
-                    if (CdoDebug::cdoDebugExt >= 100)
-                      cdoPrint("changedLevel=%d", val);
+                    if (CdoDebug::cdoDebugExt >= 100) cdoPrint("changedLevel=%d", val);
                     pline = parEnd;
                   }  // changemulti specification
                 parEnd = findParamEnd(pline);
                 if ((!parEnd) && (!pline))
                   if (CdoDebug::cdoDebugExt >= 100)
-                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos,
-                             parEnd, pline);
+                    cdoPrint("strpos=%s; parEnd=%s ... pline=%s", strpos, parEnd, pline);
                 while ((pline != parEnd) && (strlen(pline) > 0))
                   {
                     pline = removeSpaces(pline);
@@ -1373,8 +1267,7 @@ multiSelectionParser(const char *filenameOrString)
                         val *= 100;
                       }
                     if (CdoDebug::cdoDebugExt >= 100) cdoPrint("level=%d", val);
-                    tuplerec->nlevels = push_backIntList(
-                        val, tuplerec->levelLST, tuplerec->nlevels);
+                    tuplerec->nlevels = push_backIntList(val, tuplerec->levelLST, tuplerec->nlevels);
                     strpos = goToNextSeparator(pline);
                     if (!strpos)
                       {
@@ -1410,9 +1303,8 @@ printSelectionTuples()
       char bff[200];
       bff[0] = '\0';
       if (CdoDebug::cdoDebugExt)
-        cdoPrint(" Selection tuple [%d]: ncodes=%d, nlevelTypes=%d, nlevels=%d",
-                 ii, tuplerec->ncodes, tuplerec->nlevelTypes,
-                 tuplerec->nlevels);
+        cdoPrint(" Selection tuple [%d]: ncodes=%d, nlevelTypes=%d, nlevels=%d", ii, tuplerec->ncodes,
+                 tuplerec->nlevelTypes, tuplerec->nlevels);
       for (ri = 0; ri < tuplerec->ncodes; ri++)
         {
           sprintf(bff, "%d", lista_get_int(tuplerec->codeLST, ri));
@@ -1443,8 +1335,7 @@ printSelectionTuples()
 
       if (tuplerec->simpleMath)
         {
-          sprintf(bff, " {scale = %f; offset = %f}", tuplerec->scale,
-                  tuplerec->offset);
+          sprintf(bff, " {scale = %f; offset = %f}", tuplerec->scale, tuplerec->offset);
           strcat(strval, bff);
         }
 
@@ -1452,20 +1343,17 @@ printSelectionTuples()
       // 3:change
       if (tuplerec->sel_or_del_or_change == 1)
         {
-          if (CdoDebug::cdoDebugExt)
-            cdoPrint(" Selection tuple [%d] = %s (select)", ii, strval);
+          if (CdoDebug::cdoDebugExt) cdoPrint(" Selection tuple [%d] = %s (select)", ii, strval);
         }
       else if (tuplerec->sel_or_del_or_change == 2)
         {
-          if (CdoDebug::cdoDebugExt)
-            cdoPrint(" Selection tuple [%d] = %s (delete)", ii, strval);
+          if (CdoDebug::cdoDebugExt) cdoPrint(" Selection tuple [%d] = %s (delete)", ii, strval);
         }
       if (tuplerec->sel_or_del_or_change == 3)
         {
           if (CdoDebug::cdoDebugExt)
-            cdoPrint(" Selection tuple [%d] = %s (change) => (%d; %d;%d;)", ii,
-                     strval, tuplerec->changedCode, tuplerec->changedLevelType,
-                     tuplerec->changedLevel);
+            cdoPrint(" Selection tuple [%d] = %s (change) => (%d; %d;%d;)", ii, strval, tuplerec->changedCode,
+                     tuplerec->changedLevelType, tuplerec->changedLevel);
         }
       else
         cdoPrint(" Selection tuple [%d] = %s (select/delete)", ii, strval);
@@ -1495,8 +1383,7 @@ getNumberOfDeleteSelectionTuples()
   for (ii = 0; ii < NUMTUPLES; ii++)
     {
       TUPLEREC *tuplerec = getSelTuple(ii);
-      cdoPrint("getNumberOfDeleteSelectionTuples() [%d]=%d\n", ii,
-               tuplerec->sel_or_del_or_change);
+      cdoPrint("getNumberOfDeleteSelectionTuples() [%d]=%d\n", ii, tuplerec->sel_or_del_or_change);
       if (tuplerec->sel_or_del_or_change != 1) nn++;
     }
   return nn;

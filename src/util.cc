@@ -46,8 +46,7 @@ int CDO_opterr = 0;
 const char *CDO_optarg = NULL;
 int CDO_optind = 1;
 
-const char *CDO_version
-    = "Climate Data Operators version " VERSION " (http://mpimet.mpg.de/cdo)";
+const char *CDO_version = "Climate Data Operators version " VERSION " (http://mpimet.mpg.de/cdo)";
 
 char *cdoGridSearchDir = NULL;
 
@@ -191,8 +190,7 @@ getOperatorName(const char *operatorCommand)
     {
       if (operatorCommand[0] == '-') operatorCommand++;
       char *commapos = (char *) strchr(operatorCommand, ',');
-      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand)
-                                      : strlen(operatorCommand);
+      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorCommand) : strlen(operatorCommand);
 
       operatorName = (char *) Malloc(len + 1);
 
@@ -298,9 +296,7 @@ parameter2word(const char *string)
     {
       int c = string[i];
       if (iscntrl(c) || isblank(c))
-        cdoAbort(
-            "Word parameter >%s< contains invalid character at position %zu!",
-            string, i + 1);
+        cdoAbort("Word parameter >%s< contains invalid character at position %zu!", string, i + 1);
     }
 
   if (len == 0) cdoAbort("Word parameter >%s< is empty!", string);
@@ -318,13 +314,9 @@ parameter2bool(const char *str)
       if (*str == 't' || *str == 'T' || *str == '1') return true;
       if (*str == 'f' || *str == 'F' || *str == '0') return false;
     }
-  else if (len == 4
-           && (STR_IS_EQ(str, "true") || STR_IS_EQ(str, "TRUE")
-               || STR_IS_EQ(str, "True")))
+  else if (len == 4 && (STR_IS_EQ(str, "true") || STR_IS_EQ(str, "TRUE") || STR_IS_EQ(str, "True")))
     return true;
-  else if (len == 5
-           && (STR_IS_EQ(str, "false") || STR_IS_EQ(str, "FALSE")
-               || STR_IS_EQ(str, "False")))
+  else if (len == 5 && (STR_IS_EQ(str, "false") || STR_IS_EQ(str, "FALSE") || STR_IS_EQ(str, "False")))
     return false;
 
   cdoAbort("Boolean parameter >%s< contains invalid characters!", str);
@@ -338,8 +330,7 @@ parameter2double(const char *string)
   char *endptr = NULL;
   double fval = strtod(string, &endptr);
   if (*endptr != 0)
-    cdoAbort("Float parameter >%s< contains invalid character at position %d!",
-             string, (int) (endptr - string + 1));
+    cdoAbort("Float parameter >%s< contains invalid character at position %d!", string, (int) (endptr - string + 1));
 
   return fval;
 }
@@ -350,9 +341,7 @@ parameter2int(const char *string)
   char *endptr = NULL;
   int ival = (int) strtol(string, &endptr, 10);
   if (*endptr != 0)
-    cdoAbort(
-        "Integer parameter >%s< contains invalid character at position %d!",
-        string, (int) (endptr - string + 1));
+    cdoAbort("Integer parameter >%s< contains invalid character at position %d!", string, (int) (endptr - string + 1));
 
   return ival;
 }
@@ -363,9 +352,7 @@ parameter2sizet(const char *string)
   char *endptr = NULL;
   size_t ival = (size_t) strtoimax(string, &endptr, 10);
   if (*endptr != 0)
-    cdoAbort(
-        "Integer parameter >%s< contains invalid character at position %d!",
-        string, (int) (endptr - string + 1));
+    cdoAbort("Integer parameter >%s< contains invalid character at position %d!", string, (int) (endptr - string + 1));
 
   return ival;
 }
@@ -376,9 +363,7 @@ parameter2intlist(const char *string)
   char *endptr = NULL;
   int ival = (int) strtol(string, &endptr, 10);
   if (*endptr != 0 && *endptr != '/' && (endptr - string) == 0)
-    cdoAbort(
-        "Integer parameter >%s< contains invalid character at position %d!",
-        string, (int) (endptr - string + 1));
+    cdoAbort("Integer parameter >%s< contains invalid character at position %d!", string, (int) (endptr - string + 1));
 
   return ival;
 }
@@ -601,8 +586,7 @@ fileSize(const char *restrict filename)
 }
 
 void
-cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID,
-                 const char *refname)
+cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname)
 {
   if (strncmp(CDO_File_Suffix, "NULL", 4) != 0)
     {
@@ -615,13 +599,10 @@ cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID,
           bool lready = false;
           bool lcompsz = false;
 
-          if (filetype == cdoDefaultFileType && cdoDefaultDataType == -1
-              && cdoDefaultByteorder == -1)
+          if (filetype == cdoDefaultFileType && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1)
             {
               size_t len = 0;
-              if (refname != NULL && *refname != 0 && *refname != '-'
-                  && *refname != '.')
-                len = strlen(refname);
+              if (refname != NULL && *refname != 0 && *refname != '-' && *refname != '.') len = strlen(refname);
 
               if (len > 2)
                 {
@@ -632,29 +613,23 @@ cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID,
                       switch (firstchar)
                         {
                         case 'g':
-                          if (cdoDefaultFileType == CDI_FILETYPE_GRB
-                              || cdoDefaultFileType == CDI_FILETYPE_GRB2)
+                          if (cdoDefaultFileType == CDI_FILETYPE_GRB || cdoDefaultFileType == CDI_FILETYPE_GRB2)
                             lready = true;
                           break;
                         case 'n':
-                          if (cdoDefaultFileType == CDI_FILETYPE_NC
-                              || cdoDefaultFileType == CDI_FILETYPE_NC2
-                              || cdoDefaultFileType == CDI_FILETYPE_NC4
-                              || cdoDefaultFileType == CDI_FILETYPE_NC4C
+                          if (cdoDefaultFileType == CDI_FILETYPE_NC || cdoDefaultFileType == CDI_FILETYPE_NC2
+                              || cdoDefaultFileType == CDI_FILETYPE_NC4 || cdoDefaultFileType == CDI_FILETYPE_NC4C
                               || cdoDefaultFileType == CDI_FILETYPE_NC5)
                             lready = true;
                           break;
                         case 's':
-                          if (cdoDefaultFileType == CDI_FILETYPE_SRV)
-                            lready = true;
+                          if (cdoDefaultFileType == CDI_FILETYPE_SRV) lready = true;
                           break;
                         case 'e':
-                          if (cdoDefaultFileType == CDI_FILETYPE_EXT)
-                            lready = true;
+                          if (cdoDefaultFileType == CDI_FILETYPE_EXT) lready = true;
                           break;
                         case 'i':
-                          if (cdoDefaultFileType == CDI_FILETYPE_IEG)
-                            lready = true;
+                          if (cdoDefaultFileType == CDI_FILETYPE_IEG) lready = true;
                           break;
                         }
                     }
@@ -664,8 +639,7 @@ cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID,
                     {
                       while (len--)
                         {
-                          if (*result == '.' || isalnum(*result))
-                            strncat(filesuffix, result, 1);
+                          if (*result == '.' || isalnum(*result)) strncat(filesuffix, result, 1);
                           result++;
                         }
                     }
@@ -674,16 +648,11 @@ cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID,
 
           if (!lready)
             {
-              strncat(filesuffix, streamFilesuffix(cdoDefaultFileType),
-                      maxlen - 1);
-              if (cdoDefaultFileType == CDI_FILETYPE_GRB
-                  && vlistIsSzipped(vlistID))
-                lcompsz = true;
+              strncat(filesuffix, streamFilesuffix(cdoDefaultFileType), maxlen - 1);
+              if (cdoDefaultFileType == CDI_FILETYPE_GRB && vlistIsSzipped(vlistID)) lcompsz = true;
             }
 
-          if (cdoDefaultFileType == CDI_FILETYPE_GRB
-              && Options::cdoCompType == CDI_COMPRESS_SZIP)
-            lcompsz = true;
+          if (cdoDefaultFileType == CDI_FILETYPE_GRB && Options::cdoCompType == CDI_COMPRESS_SZIP) lcompsz = true;
           if (lcompsz) strncat(filesuffix, ".sz", maxlen - 1);
         }
     }
@@ -726,8 +695,7 @@ cdo_check_round(void)
       for (int i = 0; i < NMAX; ++i)
         {
           vals2[i] = round(vals[i]);
-          if (IS_NOT_EQUAL(vals2[i], rvals[i]))
-            cdoAbort("Function round() produces wrong results!");
+          if (IS_NOT_EQUAL(vals2[i], rvals[i])) cdoAbort("Function round() produces wrong results!");
         }
     }
 }

@@ -57,9 +57,7 @@ fill_vars(int vlistID)
               }
         }
 
-      if (nfound == 0)
-        cdoAbort("Variable -n %s%s not found!", cdoVarnames[0],
-                 cdoNumVarnames > 1 ? ",..." : "");
+      if (nfound == 0) cdoAbort("Variable -n %s%s not found!", cdoVarnames[0], cdoNumVarnames > 1 ? ",..." : "");
     }
   else
     {

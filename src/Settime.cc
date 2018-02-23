@@ -155,14 +155,12 @@ shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
       *ptime = vtime;
 
       if (cdoVerbose)
-        cdoPrint("juldate, ijulinc, vdate, vtime: %g %d %d %d",
-                 juldate_to_seconds(juldate), ijulinc, vdate, vtime);
+        cdoPrint("juldate, ijulinc, vdate, vtime: %g %d %d %d", juldate_to_seconds(juldate), ijulinc, vdate, vtime);
     }
 }
 
 static void
-gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime,
-           int *vdateb, int *vtimeb)
+gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, int *vdateb, int *vtimeb)
 {
   juldate_t juldate;
 
@@ -197,8 +195,7 @@ gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime,
       juldate = juldate_add_seconds(86400, juldate);
       juldate_decode(calendar, juldate, &vdateb[1], &vtimeb[1]);
     }
-  else if (tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS
-           || tunit == TUNIT_12HOURS)
+  else if (tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS)
     {
       if (incperiod == 0) incperiod = 1;
       if (incperiod > 24) cdoAbort("Time period must be less equal 24!");
@@ -371,10 +368,8 @@ Settime(void *process)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       if (operatorID == SETTBOUNDS
-          && !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS
-               || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS
-               || tunit == TUNIT_DAY || tunit == TUNIT_MONTH
-               || tunit == TUNIT_YEAR))
+          && !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS
+               || tunit == TUNIT_DAY || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR))
         cdoAbort("Unsupported frequency %s! Use hour, 3hours, 6hours, day, "
                  "month or year.",
                  timeunits);
@@ -407,8 +402,7 @@ Settime(void *process)
       else if (strncmp(cname, "366_day", len) == 0)
         newcalendar = CALENDAR_366DAYS;
       else
-        cdoAbort("Calendar >%s< unsupported! Available %s", cname,
-                 cdoOperatorEnter(operatorID));
+        cdoAbort("Calendar >%s< unsupported! Available %s", cname, cdoOperatorEnter(operatorID));
     }
   else
     {
@@ -562,8 +556,7 @@ Settime(void *process)
                       year--;
                     }
 
-                  day = (day0 == 31) ? days_per_month(calendar, year, month)
-                                     : day0;
+                  day = (day0 == 31) ? days_per_month(calendar, year, month) : day0;
 
                   vdate = cdiEncodeDate(year, month, day);
                 }
@@ -580,14 +573,10 @@ Settime(void *process)
 
           if (CDO_CMOR_Mode)
             {
-              juldate_t juldate1
-                  = juldate_encode(calendar, vdateb[0], vtimeb[0]);
-              juldate_t juldate2
-                  = juldate_encode(calendar, vdateb[1], vtimeb[1]);
-              double seconds
-                  = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-              juldate_t juldatem
-                  = juldate_add_seconds((int) lround(seconds), juldate1);
+              juldate_t juldate1 = juldate_encode(calendar, vdateb[0], vtimeb[0]);
+              juldate_t juldate2 = juldate_encode(calendar, vdateb[1], vtimeb[1]);
+              double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
+              juldate_t juldatem = juldate_add_seconds((int) lround(seconds), juldate1);
               juldate_decode(calendar, juldatem, &vdate, &vtime);
             }
         }
@@ -602,8 +591,7 @@ Settime(void *process)
               shifttime(calendar, tunit, ijulinc, &vdateb[1], &vtimeb[1]);
             }
         }
-      else if (operatorID == SETREFTIME || operatorID == SETCALENDAR
-               || operatorID == SETTUNITS)
+      else if (operatorID == SETREFTIME || operatorID == SETCALENDAR || operatorID == SETTUNITS)
         {
           ;
         }
@@ -613,11 +601,9 @@ Settime(void *process)
 
           if (operatorID == SETYEAR) year = newval;
           if (operatorID == SETMON) month = newval;
-          if (operatorID == SETMON && (month < 0 || month > 16))
-            cdoAbort("parameter month=%d out of range!", month);
+          if (operatorID == SETMON && (month < 0 || month > 16)) cdoAbort("parameter month=%d out of range!", month);
           if (operatorID == SETDAY) day = newval;
-          if (operatorID == SETDAY && (day < 0 || day > 31))
-            cdoAbort("parameter day=%d out of range!", day);
+          if (operatorID == SETDAY && (day < 0 || day > 31)) cdoAbort("parameter day=%d out of range!", day);
 
           vdate = cdiEncodeDate(year, month, day);
 

@@ -74,8 +74,7 @@ Varrms(void *process)
   int index = 0;
   int gridID1 = vlistGrid(vlistID1, index);
 
-  if (needWeights && gridInqType(gridID1) != GRID_LONLAT
-      && gridInqType(gridID1) != GRID_GAUSSIAN)
+  if (needWeights && gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN)
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
   vlistChangeGridIndex(vlistID3, index, gridID3);
@@ -132,8 +131,7 @@ Varrms(void *process)
 
           single = vardata2[varID] + offset;
           pstreamReadRecord(streamID2, single, &nmiss);
-          if (nmiss)
-            cdoAbort("this operator does not work with missing values!");
+          if (nmiss) cdoAbort("this operator does not work with missing values!");
         }
 
       for (varID = 0; varID < nvars; varID++)
@@ -151,8 +149,7 @@ Varrms(void *process)
             }
           int code = vlistInqVarCode(vlistID1, varID);
           if (wstatus != 0 && tsID == 0 && code != oldcode)
-            cdoWarning("Using constant area weights for code %d!",
-                       oldcode = code);
+            cdoWarning("Using constant area weights for code %d!", oldcode = code);
 
           field1.missval = vlistInqVarMissval(vlistID1, varID);
           field2.missval = vlistInqVarMissval(vlistID1, varID);
