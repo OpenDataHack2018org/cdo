@@ -274,61 +274,41 @@ static void
 boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const double *restrict center_lon,
                      const double *restrict center_lat, restr_t *restrict bound_box)
 {
-  size_t n4, i, j, k, ip1, jp1;
-  size_t n_add, e_add, ne_add;
-  restr_t tmp_lats[4], tmp_lons[4]; /* temps for computing bounding boxes */
+  size_t idx[4];
+  restr_t tmp_lats[4], tmp_lons[4];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box) private( \
-    n4, i, j, k, ip1, jp1, n_add, e_add, ne_add, tmp_lats, tmp_lons)
+#pragma omp parallel for default(none) shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box) \
+  private(idx, tmp_lats, tmp_lons)
 #endif
   for (size_t n = 0; n < size; n++)
     {
-      n4 = n << 2;
+      size_t n4 = n << 2;
 
       /* Find N,S and NE points to this grid point */
 
-      j = n / nx;
-      i = n - j * nx;
+      size_t j = n / nx;
+      size_t i = n - j * nx;
 
-      if (i < (nx - 1))
-        ip1 = i + 1;
-      else
-        {
-          /* 2009-01-09 Uwe Schulzweida: bug fix */
-          ip1 = lonIsCyclic ? 0 : i;
-        }
+      size_t ip1 = (i < (nx - 1)) ? i + 1 : lonIsCyclic ? 0 : i;
+      size_t jp1 = (j < (ny - 1)) ? j + 1 : j;
 
-      if (j < (ny - 1))
-        jp1 = j + 1;
-      else
-        {
-          /* 2008-12-17 Uwe Schulzweida: latitute cyclic ??? (bug fix) */
-          jp1 = j;
-        }
-
-      n_add = jp1 * nx + i;
-      e_add = j * nx + ip1;
-      ne_add = jp1 * nx + ip1;
+      idx[0] = n;
+      idx[1] = j * nx + ip1;    // east
+      idx[2] = jp1 * nx + ip1;  // north-east
+      idx[3] = jp1 * nx + i;    // north
 
       /* Find N,S and NE lat/lon coords and check bounding box */
 
-      tmp_lats[0] = RESTR_SCALE(center_lat[n]);
-      tmp_lats[1] = RESTR_SCALE(center_lat[e_add]);
-      tmp_lats[2] = RESTR_SCALE(center_lat[ne_add]);
-      tmp_lats[3] = RESTR_SCALE(center_lat[n_add]);
-
-      tmp_lons[0] = RESTR_SCALE(center_lon[n]);
-      tmp_lons[1] = RESTR_SCALE(center_lon[e_add]);
-      tmp_lons[2] = RESTR_SCALE(center_lon[ne_add]);
-      tmp_lons[3] = RESTR_SCALE(center_lon[n_add]);
+      for (unsigned j = 0; j < 4; ++j)  tmp_lons[j] = RESTR_SCALE(center_lon[idx[j]]);
+      for (unsigned j = 0; j < 4; ++j)  tmp_lats[j] = RESTR_SCALE(center_lat[idx[j]]);
 
       bound_box[n4] = tmp_lats[0];
       bound_box[n4 + 1] = tmp_lats[0];
       bound_box[n4 + 2] = tmp_lons[0];
       bound_box[n4 + 3] = tmp_lons[0];
 
-      for (k = 1; k < 4; k++)
+      for (unsigned k = 1; k < 4; k++)
         {
           if (tmp_lats[k] < bound_box[n4]) bound_box[n4] = tmp_lats[k];
           if (tmp_lats[k] > bound_box[n4 + 1]) bound_box[n4 + 1] = tmp_lats[k];
@@ -453,7 +433,6 @@ remap_define_reg2d(int gridID, remapgrid_t *grid)
 {
   size_t nx = grid->dims[0];
   size_t ny = grid->dims[1];
-
   size_t nxp1 = nx + 1;
   size_t nyp1 = ny + 1;
 
@@ -634,7 +613,6 @@ cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
       if (grid->lneed_cell_corners)
         {
           if (cdoVerbose) cdoPrint("Grid: boundbox_from_corners");
-
           boundbox_from_corners(grid->size, grid->num_cell_corners, grid->cell_corner_lon, grid->cell_corner_lat,
                                 grid->cell_bound_box);
         }
@@ -662,7 +640,6 @@ cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
       size_t ny = grid->dims[1];
 
       if (cdoVerbose) cdoPrint("Grid: boundbox_from_center");
-
       boundbox_from_center(grid->is_cyclic, grid->size, nx, ny, grid->cell_center_lon, grid->cell_center_lat,
                            grid->cell_bound_box);
     }
@@ -670,8 +647,7 @@ cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
   if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid->lneed_cell_corners)
     check_lon_boundbox_range(grid->size, grid->cell_bound_box);
 
-  /* Try to check for cells that overlap poles */
-
+  // Try to check for cells that overlap poles
   if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid->lneed_cell_corners)
     check_lat_boundbox_range(grid->size, grid->cell_bound_box, grid->cell_center_lat);
 }
@@ -774,7 +750,7 @@ remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgrid_t 
     }
   else if (mapType != RemapType::DISTWGT
            //            && mapType != RemapType::BILINEAR
-  )
+           )
     {
       cell_bounding_boxes(src_grid, REMAP_GRID_BASIS_SRC);
       cell_bounding_boxes(tgt_grid, REMAP_GRID_BASIS_TGT);
@@ -1097,7 +1073,6 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t nu
 
     double *dst_array    ! array for remapped field on destination grid
   */
-
   for (size_t i = 0; i < dst_size; ++i) dst_array[i] = missval;
 
   if (num_links == 0) return;
