@@ -142,12 +142,10 @@ remap_heapsort(const size_t num_links, size_t *restrict add1, size_t *restrict a
               || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
             {
               max_lvl = chk_lvl1;
-            }
-
-          /*
-            If the parent is greater than both daughters,
-            the correct level has been found
-          */
+            } /*
+                If the parent is greater than both daughters,
+                the correct level has been found
+              */
           if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
             {
               add1[final_lvl] = add1_tmp;
@@ -217,12 +215,10 @@ remap_heapsort(const size_t num_links, size_t *restrict add1, size_t *restrict a
               || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
             {
               max_lvl = chk_lvl1;
-            }
-
-          /*
-            If the parent is greater than both daughters,
-            the correct level has been found
-          */
+            } /*
+                If the parent is greater than both daughters,
+                the correct level has been found
+              */
           if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
             {
               add1[final_lvl] = add1_tmp;
@@ -294,8 +290,7 @@ sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   if (num_links <= 1) return;
 
   size_t *idx = (size_t *) Malloc(num_links * sizeof(size_t));
-  for (size_t i = 0; i < num_links; ++i)
-    idx[i] = i;
+  for (size_t i = 0; i < num_links; ++i) idx[i] = i;
 
   remap_heapsort(num_links, add1, add2, idx);
 
@@ -303,8 +298,7 @@ sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   memcpy(wgt_tmp, weights, num_wts * num_links * sizeof(double));
 
   for (size_t i = 0; i < num_links; ++i)
-    for (size_t n = 0; n < num_wts; ++n)
-      weights[num_wts * i + n] = wgt_tmp[num_wts * idx[i] + n];
+    for (size_t n = 0; n < num_wts; ++n) weights[num_wts * i + n] = wgt_tmp[num_wts * idx[i] + n];
 
   Free(wgt_tmp);
   Free(idx);
@@ -356,8 +350,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
       final_lvl = lvl;
       add1_tmp = add1[lvl];
       add2_tmp = add2[lvl];
-      for (n = 0; n < num_wts; n++)
-        wgttmp[n] = weights[num_wts * lvl + n];
+      for (n = 0; n < num_wts; n++) wgttmp[n] = weights[num_wts * lvl + n];
 
       /* Loop until proper level is found for this link, or reach bottom */
 
@@ -383,8 +376,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
             {
               add1[final_lvl] = add1_tmp;
               add2[final_lvl] = add2_tmp;
-              for (n = 0; n < num_wts; n++)
-                weights[num_wts * final_lvl + n] = wgttmp[n];
+              for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = wgttmp[n];
 
               break;
             }
@@ -398,16 +390,14 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
               */
               add1[final_lvl] = add1[max_lvl];
               add2[final_lvl] = add2[max_lvl];
-              for (n = 0; n < num_wts; n++)
-                weights[num_wts * final_lvl + n] = weights[num_wts * max_lvl + n];
+              for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = weights[num_wts * max_lvl + n];
 
               final_lvl = max_lvl;
               if (2 * final_lvl + 1 >= num_links)
                 {
                   add1[final_lvl] = add1_tmp;
                   add2[final_lvl] = add2_tmp;
-                  for (n = 0; n < num_wts; n++)
-                    weights[num_wts * final_lvl + n] = wgttmp[n];
+                  for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = wgttmp[n];
 
                   break;
                 }
@@ -431,11 +421,9 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
       add2_tmp = add2[lvl];
       add2[lvl] = add2[0];
 
-      for (n = 0; n < num_wts; n++)
-        wgttmp[n] = weights[num_wts * lvl + n];
+      for (n = 0; n < num_wts; n++) wgttmp[n] = weights[num_wts * lvl + n];
 
-      for (n = 0; n < num_wts; n++)
-        weights[num_wts * lvl + n] = weights[n];
+      for (n = 0; n < num_wts; n++) weights[num_wts * lvl + n] = weights[n];
 
       /* As above this loop sifts the tmp values down until proper level is
        * reached */
@@ -464,8 +452,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
             {
               add1[final_lvl] = add1_tmp;
               add2[final_lvl] = add2_tmp;
-              for (n = 0; n < num_wts; n++)
-                weights[num_wts * final_lvl + n] = wgttmp[n];
+              for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = wgttmp[n];
 
               break;
             }
@@ -479,16 +466,14 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
               */
               add1[final_lvl] = add1[max_lvl];
               add2[final_lvl] = add2[max_lvl];
-              for (n = 0; n < num_wts; n++)
-                weights[num_wts * final_lvl + n] = weights[num_wts * max_lvl + n];
+              for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = weights[num_wts * max_lvl + n];
 
               final_lvl = max_lvl;
               if (2 * final_lvl + 1 >= (size_t) lvl)
                 {
                   add1[final_lvl] = add1_tmp;
                   add2[final_lvl] = add2_tmp;
-                  for (n = 0; n < num_wts; n++)
-                    weights[num_wts * final_lvl + n] = wgttmp[n];
+                  for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = wgttmp[n];
 
                   break;
                 }
@@ -508,12 +493,9 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
   add2[1] = add2[0];
   add2[0] = add2_tmp;
 
-  for (n = 0; n < num_wts; n++)
-    wgttmp[n] = weights[num_wts + n];
-  for (n = 0; n < num_wts; n++)
-    weights[num_wts + n] = weights[n];
-  for (n = 0; n < num_wts; n++)
-    weights[n] = wgttmp[n];
+  for (n = 0; n < num_wts; n++) wgttmp[n] = weights[num_wts + n];
+  for (n = 0; n < num_wts; n++) weights[num_wts + n] = weights[n];
+  for (n = 0; n < num_wts; n++) weights[n] = wgttmp[n];
   /*
   for ( n = 0; n < num_links; n++ )
     printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
@@ -703,14 +685,12 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
       wgttmp = (double *) Malloc(num_wts * nl[i] * sizeof(double));
 
       for (m = 0; m < nl[i]; m++)
-        for (n = 0; n < num_wts; n++)
-          wgttmp[num_wts * m + n] = weights[num_wts * (add_srt[i] + m) + n];
+        for (n = 0; n < num_wts; n++) wgttmp[num_wts * m + n] = weights[num_wts * (add_srt[i] + m) + n];
 
       sort_iter(nl[i], num_wts, add1s[i], add2s[i], wgttmp, who_am_i);
 
       for (m = 0; m < nl[i]; m++)
-        for (n = 0; n < num_wts; n++)
-          weights[num_wts * (add_srt[i] + m) + n] = wgttmp[num_wts * m + n];
+        for (n = 0; n < num_wts; n++) weights[num_wts * (add_srt[i] + m) + n] = wgttmp[num_wts * m + n];
 
       Free(wgttmp);
     }
@@ -728,8 +708,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i) num_threads(2)
 #endif
-  for (i = 0; i < num_links; i++)
-    tmp[i] = add1[idx[i]];
+  for (i = 0; i < num_links; i++) tmp[i] = add1[idx[i]];
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i) num_threads(2)
@@ -743,8 +722,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i) num_threads(2)
 #endif
-  for (i = 0; i < num_links; i++)
-    add2[i] = tmp[i];
+  for (i = 0; i < num_links; i++) add2[i] = tmp[i];
 
   Free(tmp);
   tmp = NULL;
@@ -755,15 +733,13 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
 #pragma omp parallel for if (depth < par_depth) private(i, n) num_threads(2)
 #endif
   for (i = 0; i < num_links; i++)
-    for (n = 0; n < num_wts; n++)
-      tmp2[num_wts * i + n] = weights[num_wts * idx[i] + n];
+    for (n = 0; n < num_wts; n++) tmp2[num_wts * i + n] = weights[num_wts * idx[i] + n];
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i, n) num_threads(2)
 #endif
   for (i = 0; i < num_links; i++)
-    for (n = 0; n < num_wts; n++)
-      weights[num_wts * i + n] = tmp2[num_wts * i + n];
+    for (n = 0; n < num_wts; n++) weights[num_wts * i + n] = tmp2[num_wts * i + n];
 
   Free(tmp2);
   tmp2 = NULL;

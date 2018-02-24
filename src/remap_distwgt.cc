@@ -269,15 +269,12 @@ grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *restri
         {
           size_t nbr_add4[4];
           double nbr_dist4[4];
-          for (size_t n = 0; n < numNeighbors; ++n)
-            nbr_add4[n] = SIZE_MAX;
+          for (size_t n = 0; n < numNeighbors; ++n) nbr_add4[n] = SIZE_MAX;
           search_result = grid_search_reg2d_nn(nx, ny, nbr_add4, nbr_dist4, plat, plon, src_center_lat, src_center_lon);
           if (search_result < 0)
             {
-              for (size_t n = 0; n < numNeighbors; ++n)
-                nbr_add[n] = nbr_add4[n];
-              for (size_t n = 0; n < numNeighbors; ++n)
-                nbr_dist[n] = nbr_dist4[n];
+              for (size_t n = 0; n < numNeighbors; ++n) nbr_add[n] = nbr_add4[n];
+              for (size_t n = 0; n < numNeighbors; ++n) nbr_dist[n] = nbr_dist4[n];
             }
         }
       else
@@ -286,8 +283,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *restri
         }
 
       if (search_result >= 0)
-        for (size_t n = 0; n < numNeighbors; ++n)
-          nbr_add[n] = SIZE_MAX;
+        for (size_t n = 0; n < numNeighbors; ++n) nbr_add[n] = SIZE_MAX;
     }
 
   if (src_add_tmp) Free(src_add_tmp);
@@ -310,10 +306,8 @@ grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr
   */
 
   // Initialize distance and address arrays
-  for (size_t n = 0; n < numNeighbors; ++n)
-    nbr_add[n] = SIZE_MAX;
-  for (size_t n = 0; n < numNeighbors; ++n)
-    nbr_dist[n] = BIGNUM;
+  for (size_t n = 0; n < numNeighbors; ++n) nbr_add[n] = SIZE_MAX;
+  for (size_t n = 0; n < numNeighbors; ++n) nbr_dist[n] = BIGNUM;
 
   size_t ndist = numNeighbors;
   // check some more points if distance is the same use the smaller index (nadd)
@@ -349,15 +343,13 @@ grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr
   else
     {
       nadds = gridsearch_qnearest(gs, plon, plat, &range, ndist, adds, dist);
-      for (size_t i = 0; i < nadds; ++i)
-        dist[i] = sqrt(dist[i]);
+      for (size_t i = 0; i < nadds; ++i) dist[i] = sqrt(dist[i]);
     }
 
   ndist = nadds;
   size_t max_neighbors = (ndist < numNeighbors) ? ndist : numNeighbors;
 
-  for (size_t i = 0; i < ndist; ++i)
-    nbr_store_distance(adds[i], dist[i], max_neighbors, nbr_add, nbr_dist);
+  for (size_t i = 0; i < ndist; ++i) nbr_store_distance(adds[i], dist[i], max_neighbors, nbr_add, nbr_dist);
 
   nbr_check_distance(max_neighbors, nbr_add, nbr_dist);
 
@@ -487,8 +479,7 @@ distwgt_remap(double *restrict tgt_point, const double *restrict src_array, size
               const size_t src_add[4])
 {
   if (nadds) *tgt_point = src_array[src_add[0]] * wgts[0];
-  for (size_t n = 1; n < nadds; ++n)
-    *tgt_point += src_array[src_add[n]] * wgts[n];
+  for (size_t n = 1; n < nadds; ++n) *tgt_point += src_array[src_add[n]] * wgts[n];
 }
 
 void
@@ -614,11 +605,9 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   size_t tgt_grid_size = gridInqSize(gridID2);
 
   int *src_mask = (int *) Malloc(src_grid_size * sizeof(int));
-  for (size_t i = 0; i < src_grid_size; ++i)
-    src_mask[i] = !DBL_IS_EQUAL(src_array[i], src_missval);
+  for (size_t i = 0; i < src_grid_size; ++i) src_mask[i] = !DBL_IS_EQUAL(src_array[i], src_missval);
   int *tgt_mask = (int *) Malloc(tgt_grid_size * sizeof(int));
-  for (size_t i = 0; i < tgt_grid_size; ++i)
-    tgt_mask[i] = 1;
+  for (size_t i = 0; i < tgt_grid_size; ++i) tgt_mask[i] = 1;
 
   double *src_cell_center_lon = (double *) Malloc(src_grid_size * sizeof(double));
   double *src_cell_center_lat = (double *) Malloc(src_grid_size * sizeof(double));

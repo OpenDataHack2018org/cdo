@@ -204,8 +204,7 @@ grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double 
   double sinlon_dst = sin(plon);
 
   double dist_min = BIGNUM;
-  for (unsigned n = 0; n < 4; ++n)
-    nbr_dist[n] = BIGNUM;
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = BIGNUM;
   for (size_t srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
       distance = acos(coslat_dst * cos(src_center_lat[srch_add])
@@ -233,13 +232,10 @@ grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double 
         }
     }
 
-  for (unsigned n = 0; n < 4; ++n)
-    nbr_dist[n] = ONE / (nbr_dist[n] + TINY);
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = ONE / (nbr_dist[n] + TINY);
   distance = 0.0;
-  for (unsigned n = 0; n < 4; ++n)
-    distance += nbr_dist[n];
-  for (unsigned n = 0; n < 4; ++n)
-    nbr_dist[n] /= distance;
+  for (unsigned n = 0; n < 4; ++n) distance += nbr_dist[n];
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] /= distance;
 
   return search_result;
 }
@@ -336,18 +332,15 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
   idx[2] = jp1 * nx + ip1;  // north-east
   idx[3] = jp1 * nx + i;    // north
 
-  for (unsigned j = 0; j < 4; ++j)
-    lons[j] = center_lon[idx[j]];
-  for (unsigned j = 0; j < 4; ++j)
-    lats[j] = center_lat[idx[j]];
+  for (unsigned j = 0; j < 4; ++j) lons[j] = center_lon[idx[j]];
+  for (unsigned j = 0; j < 4; ++j) lats[j] = center_lat[idx[j]];
 
   unsigned n = quad_cross_products(plon, plat, lons, lats);
 
   /* If cross products all same sign, we found the location */
   if (n >= 4)
     {
-      for (unsigned j = 0; j < 4; ++j)
-        adds[j] = idx[j];
+      for (unsigned j = 0; j < 4; ++j) adds[j] = idx[j];
       search_result = true;
     }
 
@@ -393,8 +386,7 @@ grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict sr
 
   // restrict search first using bins
 
-  for (unsigned n = 0; n < 4; ++n)
-    src_add[n] = 0;
+  for (unsigned n = 0; n < 4; ++n) src_add[n] = 0;
 
   // addresses for restricting search
   size_t min_add = src_grid->size - 1;

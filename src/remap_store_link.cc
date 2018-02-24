@@ -118,8 +118,7 @@ sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
       for (n = 0; n < num_weights; ++n)
         {
           addweights[n].add = src_add[n];
-          for (unsigned k = 0; k < 4; ++k)
-            addweights[n].weight[k] = wgts[n][k];
+          for (unsigned k = 0; k < 4; ++k) addweights[n].weight[k] = wgts[n][k];
         }
 
       qsort(&addweights[0], num_weights, sizeof(addweight4_t), cmp_adds4);
@@ -127,8 +126,7 @@ sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
       for (n = 0; n < num_weights; ++n)
         {
           src_add[n] = addweights[n].add;
-          for (unsigned k = 0; k < 4; ++k)
-            wgts[n][k] = addweights[n].weight[k];
+          for (unsigned k = 0; k < 4; ++k) wgts[n][k] = addweights[n].weight[k];
         }
     }
 }
@@ -176,8 +174,7 @@ store_weightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], s
       for (size_t n = 0; n < num_weights; ++n)
         {
           addweights[n].add = srch_add[n];
-          for (unsigned k = 0; k < 4; ++k)
-            addweights[n].weight[k] = weights[n][k];
+          for (unsigned k = 0; k < 4; ++k) addweights[n].weight[k] = weights[n][k];
         }
 
       sort_addweights4(num_weights, addweights);
@@ -285,8 +282,7 @@ weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remap
                 {
                   src_cell_adds[offset + ilink] = addweights[ilink].add;
                   tgt_cell_adds[offset + ilink] = tgt_cell_add;
-                  for (size_t k = 0; k < 4; ++k)
-                    wts[(offset + ilink) * 4 + k] = addweights[ilink].weight[k];
+                  for (size_t k = 0; k < 4; ++k) wts[(offset + ilink) * 4 + k] = addweights[ilink].weight[k];
                 }
             }
         }

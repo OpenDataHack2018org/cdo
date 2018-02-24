@@ -28,8 +28,7 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *res
   double sinlon_dst = sin(plon);
 
   double dist_min = BIGNUM;
-  for (unsigned n = 0; n < 4; ++n)
-    nbr_dist[n] = BIGNUM;
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = BIGNUM;
 
   size_t jjf = 0, jjl = ny - 1;
   if (plon >= src_center_lon[0] && plon <= src_center_lon[nx - 1])
@@ -104,13 +103,10 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *res
 
   Free(sincoslon);
 
-  for (unsigned n = 0; n < 4; ++n)
-    nbr_dist[n] = ONE / (nbr_dist[n] + TINY);
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = ONE / (nbr_dist[n] + TINY);
   double distance = 0.0;
-  for (unsigned n = 0; n < 4; ++n)
-    distance += nbr_dist[n];
-  for (unsigned n = 0; n < 4; ++n)
-    nbr_dist[n] /= distance;
+  for (unsigned n = 0; n < 4; ++n) distance += nbr_dist[n];
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] /= distance;
 
   return search_result;
 }
@@ -139,8 +135,7 @@ grid_search_reg2d(remapgrid_t *src_grid, size_t *restrict src_add, double *restr
   */
   int search_result = 0;
 
-  for (unsigned n = 0; n < 4; ++n)
-    src_add[n] = 0;
+  for (unsigned n = 0; n < 4; ++n) src_add[n] = 0;
 
   size_t nx = src_grid_dims[0];
   size_t ny = src_grid_dims[1];

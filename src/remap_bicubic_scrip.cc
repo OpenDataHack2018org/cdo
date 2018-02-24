@@ -57,16 +57,11 @@ renormalize_weights(const double src_lats[4], double wgts[4][4])
 {
   double sum_wgts = 0.0; /* sum of weights for normalization */
   /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
-  for (unsigned n = 0; n < 4; ++n)
-    sum_wgts += fabs(src_lats[n]);
-  for (unsigned n = 0; n < 4; ++n)
-    wgts[n][0] = fabs(src_lats[n]) / sum_wgts;
-  for (unsigned n = 0; n < 4; ++n)
-    wgts[n][1] = 0.;
-  for (unsigned n = 0; n < 4; ++n)
-    wgts[n][2] = 0.;
-  for (unsigned n = 0; n < 4; ++n)
-    wgts[n][3] = 0.;
+  for (unsigned n = 0; n < 4; ++n) sum_wgts += fabs(src_lats[n]);
+  for (unsigned n = 0; n < 4; ++n) wgts[n][0] = fabs(src_lats[n]) / sum_wgts;
+  for (unsigned n = 0; n < 4; ++n) wgts[n][1] = 0.;
+  for (unsigned n = 0; n < 4; ++n) wgts[n][2] = 0.;
+  for (unsigned n = 0; n < 4; ++n) wgts[n][3] = 0.;
 }
 
 static void
@@ -246,8 +241,7 @@ grid_search_test(struct gridsearch *gs, size_t *restrict src_add, double *restri
   bool is_cyclic = true;
   int search_result = 0;
 
-  for (unsigned n = 0; n < 4; ++n)
-    src_add[n] = 0;
+  for (unsigned n = 0; n < 4; ++n) src_add[n] = 0;
 
   /* Now perform a more detailed search */
 

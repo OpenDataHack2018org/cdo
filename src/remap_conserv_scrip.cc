@@ -1327,8 +1327,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
     }
 
   std::vector<size_t *> srch_add(Threading::ompNumThreads);  // global address of cells in srch arrays
-  for (i = 0; i < Threading::ompNumThreads; ++i)
-    srch_add[i] = new size_t[tgt_grid_size];
+  for (i = 0; i < Threading::ompNumThreads; ++i) srch_add[i] = new size_t[tgt_grid_size];
 
   srch_corners = tgt_num_cell_corners;
 
@@ -1479,8 +1478,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
               /* If integrating in reverse order, change sign of weights */
 
               if (lrevers)
-                for (long k = 0; k < 6; ++k)
-                  weights[k] = -weights[k];
+                for (long k = 0; k < 6; ++k) weights[k] = -weights[k];
 
               /*
                 Store the appropriate addresses and weights.
@@ -1525,8 +1523,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
       free(srch_corner_lat[i]);
     }
 
-  for (i = 0; i < Threading::ompNumThreads; ++i)
-    delete[] srch_add[i];
+  for (i = 0; i < Threading::ompNumThreads; ++i) delete[] srch_add[i];
 
   /* Integrate around each cell on target grid */
 
@@ -1536,11 +1533,9 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
       srch_corner_lon[i] = NULL;
     }
 
-  for (i = 0; i < Threading::ompNumThreads; ++i)
-    max_srch_cells[i] = 0;
+  for (i = 0; i < Threading::ompNumThreads; ++i) max_srch_cells[i] = 0;
 
-  for (i = 0; i < Threading::ompNumThreads; ++i)
-    srch_add[i] = new size_t[src_grid_size];
+  for (i = 0; i < Threading::ompNumThreads; ++i) srch_add[i] = new size_t[src_grid_size];
 
   srch_corners = src_num_cell_corners;
 
@@ -1692,8 +1687,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
               /* If integrating in reverse order, change sign of weights */
 
               if (lrevers)
-                for (long k = 0; k < 6; ++k)
-                  weights[k] = -weights[k];
+                for (long k = 0; k < 6; ++k) weights[k] = -weights[k];
 
               /*
                 Store the appropriate addresses and weights.
@@ -1741,8 +1735,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
       free(srch_corner_lat[i]);
     }
 
-  for (i = 0; i < Threading::ompNumThreads; ++i)
-    delete[] srch_add[i];
+  for (i = 0; i < Threading::ompNumThreads; ++i) delete[] srch_add[i];
 
   /*
      Correct for situations where N/S pole not explicitly included in

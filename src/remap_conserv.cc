@@ -159,8 +159,7 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims, const double *restric
             printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG * src_corner_lon[imin],
                    RAD2DEG * src_corner_lon[imax + 1], imin, imax, jmin, jmax);
           for (long jm = jmin; jm <= jmax; ++jm)
-            for (long im = imin; im <= imax; ++im)
-              srch_add[num_srch_cells++] = jm * nx + im;
+            for (long im = imin; im <= imax; ++im) srch_add[num_srch_cells++] = jm * nx + im;
         }
     }
 
@@ -185,8 +184,7 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims, const double *restric
                 printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG * src_corner_lon[imin2],
                        RAD2DEG * src_corner_lon[imax2 + 1], imin2, imax2, jmin, jmax);
               for (long jm = jmin; jm <= jmax; ++jm)
-                for (long im = imin2; im <= imax2; ++im)
-                  srch_add[num_srch_cells++] = jm * nx + im;
+                for (long im = imin2; im <= imax2; ++im) srch_add[num_srch_cells++] = jm * nx + im;
             }
         }
     }
@@ -212,8 +210,7 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims, const double *restric
                 printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG * src_corner_lon[imin3],
                        RAD2DEG * src_corner_lon[imax3 + 1], imin3, imax3, jmin, jmax);
               for (long jm = jmin; jm <= jmax; ++jm)
-                for (long im = imin3; im <= imax3; ++im)
-                  srch_add[num_srch_cells++] = jm * nx + im;
+                for (long im = imin3; im <= imax3; ++im) srch_add[num_srch_cells++] = jm * nx + im;
             }
         }
     }
@@ -392,8 +389,7 @@ cdo_compute_overlap_areas(size_t N, search_t *search, struct grid_cell target_ce
     }
 
 #ifdef VERBOSE
-  for (size_t n = 0; n < N; n++)
-    printf("overlap area : %lf\n", partial_areas[n]);
+  for (size_t n = 0; n < N; n++) printf("overlap area : %lf\n", partial_areas[n]);
 #endif
 }
 
@@ -483,8 +479,7 @@ cdo_compute_concave_overlap_areas(size_t N, search_t *search, struct grid_cell t
 
   /* Do the clipping and get the cell for the overlapping area */
 
-  for (size_t n = 0; n < N; n++)
-    partial_areas[n] = 0.0;
+  for (size_t n = 0; n < N; n++) partial_areas[n] = 0.0;
 
   // common node point to all partial target cells
   target_partial_cell.coordinates_x[0] = target_node_x;
@@ -553,8 +548,7 @@ cdo_compute_concave_overlap_areas(size_t N, search_t *search, struct grid_cell t
     }
 
 #ifdef VERBOSE
-  for (size_t n = 0; n < N; n++)
-    printf("overlap area %zu: %lf\n", n, partial_areas[n]);
+  for (size_t n = 0; n < N; n++) printf("overlap area %zu: %lf\n", n, partial_areas[n]);
 #endif
 }
 
@@ -741,8 +735,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
   if (tgt_num_cell_corners > max_num_cell_corners) max_num_cell_corners = tgt_num_cell_corners;
 
   std::vector<enum yac_edge_type> great_circle_type(max_num_cell_corners);
-  for (size_t i = 0; i < max_num_cell_corners; ++i)
-    great_circle_type[i] = GREAT_CIRCLE;
+  for (size_t i = 0; i < max_num_cell_corners; ++i) great_circle_type[i] = GREAT_CIRCLE;
 
   enum yac_edge_type lonlat_circle_type[] = { LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE };
 
@@ -797,8 +790,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
     }
 
   std::vector<size_t *> srch_add(Threading::ompNumThreads);
-  for (int i = 0; i < Threading::ompNumThreads; ++i)
-    srch_add[i] = new size_t[src_grid_size];
+  for (int i = 0; i < Threading::ompNumThreads; ++i) srch_add[i] = new size_t[src_grid_size];
 
   srch_corners = src_num_cell_corners;
 
@@ -939,13 +931,11 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
 
       if (0 && cdoVerbose) sum_srch_cells2 += num_weights;
 
-      for (n = 0; n < num_weights; ++n)
-        partial_weights[n] = partial_areas[n] / tgt_area;
+      for (n = 0; n < num_weights; ++n) partial_weights[n] = partial_areas[n] / tgt_area;
 
       if (rv->normOpt == NormOpt::FRACAREA) yac_correct_weights((unsigned) num_weights, partial_weights);
 
-      for (n = 0; n < num_weights; ++n)
-        partial_weights[n] *= tgt_area;
+      for (n = 0; n < num_weights; ++n) partial_weights[n] *= tgt_area;
 
       num_weights_old = num_weights;
       num_weights = 0;

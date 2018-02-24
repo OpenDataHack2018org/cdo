@@ -50,8 +50,7 @@ write_links(int nc_file_id, int nc_add_id, nc_type sizetype, size_t num_links, s
   if (sizetype == NC_INT)
     {
       int *intadd = (int *) Malloc(num_links * sizeof(int));
-      for (size_t i = 0; i < num_links; ++i)
-        intadd[i] = (int) cell_add[i];
+      for (size_t i = 0; i < num_links; ++i) intadd[i] = (int) cell_add[i];
       nce(nc_put_var_int(nc_file_id, nc_add_id, intadd));
       Free(intadd);
     }
@@ -70,8 +69,7 @@ read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
     {
       int *intadd = (int *) Malloc(num_links * sizeof(int));
       nce(nc_get_var_int(nc_file_id, nc_add_id, intadd));
-      for (size_t i = 0; i < num_links; ++i)
-        cell_add[i] = (size_t) intadd[i];
+      for (size_t i = 0; i < num_links; ++i) cell_add[i] = (size_t) intadd[i];
       Free(intadd);
     }
 #ifdef HAVE_NETCDF4

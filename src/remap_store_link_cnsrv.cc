@@ -157,8 +157,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, doubl
 
   if (lstore_link)
     {
-      for (i = 0; i < num_wts; ++i)
-        rv->wts[num_wts * nlink + i] += weights[i];
+      for (i = 0; i < num_wts; ++i) rv->wts[num_wts * nlink + i] += weights[i];
       return;
     }
 
@@ -180,8 +179,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, doubl
       grid_layer->grid2_link = (long *) Malloc(grid_store->blksize[iblk] * sizeof(long));
 
       blksize = grid_store->blksize[iblk];
-      for (i = 0; i < blksize; ++i)
-        grid_layer->grid2_link[i] = -1;
+      for (i = 0; i < blksize; ++i) grid_layer->grid2_link[i] = -1;
 
       grid_layer->grid2_link[iadd2] = nlink;
       *grid_layer2 = grid_layer;
@@ -194,8 +192,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, doubl
   rv->src_cell_add[nlink] = add1;
   rv->tgt_cell_add[nlink] = add2;
 
-  for (i = 0; i < num_wts; ++i)
-    rv->wts[num_wts * nlink + i] = weights[i];
+  for (i = 0; i < num_wts; ++i) rv->wts[num_wts * nlink + i] = weights[i];
 
 } /* store_link_cnsrv_fast */
 

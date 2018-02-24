@@ -545,8 +545,7 @@ remap_define_grid(RemapType mapType, int gridID, remapgrid_t *grid, const char *
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(gridsize, grid)
 #endif
-  for (size_t i = 0; i < gridsize; ++i)
-    grid->mask[i] = TRUE;
+  for (size_t i = 0; i < gridsize; ++i) grid->mask[i] = TRUE;
 
   if (gridInqMask(gridID, NULL))
     {
@@ -924,8 +923,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_li
 
   int iorder = (src_grad1 == NULL) ? 1 : 2;
 
-  for (size_t n = 0; n < dst_size; ++n)
-    dst_array[n] = missval;
+  for (size_t n = 0; n < dst_size; ++n) dst_array[n] = missval;
 
   if (cdoTimer) timer_start(timer_remap);
 
@@ -936,8 +934,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_li
 #ifdef SX
 #pragma cdir nodep
 #endif
-          for (size_t n = 0; n < num_links; ++n)
-            dst_array[dst_add[n]] = 0.;
+          for (size_t n = 0; n < num_links; ++n) dst_array[dst_add[n]] = 0.;
 
           for (size_t j = 0; j < links.num_blks; ++j)
             {
@@ -994,8 +991,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_li
 #ifdef SX
 #pragma cdir nodep
 #endif
-              for (size_t n = 0; n < num_links; ++n)
-                dst_array[dst_add[n]] = 0.;
+              for (size_t n = 0; n < num_links; ++n) dst_array[dst_add[n]] = 0.;
 
               for (size_t n = 0; n < num_links; ++n)
                 {
@@ -1011,8 +1007,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_li
 #ifdef SX
 #pragma cdir nodep
 #endif
-      for (size_t n = 0; n < num_links; ++n)
-        dst_array[dst_add[n]] = 0.;
+      for (size_t n = 0; n < num_links; ++n) dst_array[dst_add[n]] = 0.;
 
       if (num_wts == 3)
         {
@@ -1042,8 +1037,7 @@ get_max_add(size_t num_links, size_t size, const size_t *restrict add)
 {
   size_t *isum = (size_t *) Calloc(size, sizeof(size_t));
 
-  for (size_t n = 0; n < num_links; ++n)
-    isum[add[n]]++;
+  for (size_t n = 0; n < num_links; ++n) isum[add[n]]++;
 
   size_t max_add = 0;
   for (size_t i = 0; i < size; ++i)
@@ -1104,8 +1098,7 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t nu
     double *dst_array    ! array for remapped field on destination grid
   */
 
-  for (size_t i = 0; i < dst_size; ++i)
-    dst_array[i] = missval;
+  for (size_t i = 0; i < dst_size; ++i) dst_array[i] = missval;
 
   if (num_links == 0) return;
 
@@ -1258,8 +1251,7 @@ remap_sum(double *restrict dst_array, double missval, size_t dst_size, size_t nu
     double *dst_array    ! array for remapped field on destination grid
   */
 
-  for (size_t n = 0; n < dst_size; ++n)
-    dst_array[n] = missval;
+  for (size_t n = 0; n < dst_size; ++n) dst_array[n] = missval;
 
 #ifdef SX
 #pragma cdir nodep
@@ -1328,14 +1320,12 @@ remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvar
 
   size_t *tgt_count = (size_t *) Malloc(tgt_grid.size * sizeof(size_t));
 
-  for (size_t n = 0; n < tgt_grid.size; ++n)
-    tgt_count[n] = 0;
+  for (size_t n = 0; n < tgt_grid.size; ++n) tgt_count[n] = 0;
 
 #if defined(SX)
 #pragma vdir nodep
 #endif
-  for (size_t n = 0; n < rv.num_links; ++n)
-    tgt_count[rv.tgt_cell_add[n]]++;
+  for (size_t n = 0; n < rv.num_links; ++n) tgt_count[rv.tgt_cell_add[n]]++;
 
   size_t imin = SIZE_MAX;
   size_t imax = 0;
