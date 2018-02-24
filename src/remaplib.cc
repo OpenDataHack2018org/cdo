@@ -1073,23 +1073,18 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t nu
 
     double *dst_array    ! array for remapped field on destination grid
   */
-  for (size_t i = 0; i < dst_size; ++i) dst_array[i] = missval;
+  arrayFill(dst_size, dst_array, missval);
 
   if (num_links == 0) return;
 
   size_t max_cls = get_max_add(num_links, dst_size, dst_add);
 
 #ifdef _OPENMP
-  double **src_cls2 = (double **) Malloc(Threading::ompNumThreads * sizeof(double *));
-  double **src_wts2 = (double **) Malloc(Threading::ompNumThreads * sizeof(double *));
-  for (int i = 0; i < Threading::ompNumThreads; ++i)
-    {
-      src_cls2[i] = (double *) Malloc(max_cls * sizeof(double));
-      src_wts2[i] = (double *) Malloc(max_cls * sizeof(double));
-    }
+  VECTOR_2D(double, src_cls2, Threading::ompNumThreads, max_cls);
+  VECTOR_2D(double, src_wts2, Threading::ompNumThreads, max_cls);
 #else
-  double *src_cls = (double *) Malloc(max_cls * sizeof(double));
-  double *src_wts = (double *) Malloc(max_cls * sizeof(double));
+  std::vector<double> src_cls(max_cls);
+  std::vector<double> src_wts(max_cls);
 #endif
 
   for (size_t n = 0; n < num_links; ++n)
@@ -1105,11 +1100,11 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t nu
       size_t ncls;
 #ifdef _OPENMP
       int ompthID = cdo_omp_get_thread_num();
-      double *src_cls = src_cls2[ompthID];
-      double *src_wts = src_wts2[ompthID];
+      double *src_cls = &src_cls2[ompthID][0];
+      double *src_wts = &src_wts2[ompthID][0];
 #endif
-      memset(src_cls, 0, max_cls * sizeof(double));
-      memset(src_wts, 0, max_cls * sizeof(double));
+      arrayFill(max_cls, &src_cls[0], 0.0);
+      arrayFill(max_cls, &src_wts[0], 0.0);
       /*
       ncls = 0;
       for ( n = 0; n < num_links; n++ )
@@ -1182,20 +1177,6 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t nu
           dst_array[i] = src_cls[imax];
         }
     }
-
-#ifdef _OPENMP
-  for (int i = 0; i < Threading::ompNumThreads; ++i)
-    {
-      Free(src_cls2[i]);
-      Free(src_wts2[i]);
-    }
-
-  Free(src_cls2);
-  Free(src_wts2);
-#else
-  Free(src_cls);
-  Free(src_wts);
-#endif
 }
 
 /*
@@ -1293,9 +1274,7 @@ remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvar
   cdoPrint("Number of sparse matrix entries %zu", rv.num_links);
   cdoPrint("Total number of dest cells %zu", tgt_grid.size);
 
-  size_t *tgt_count = (size_t *) Malloc(tgt_grid.size * sizeof(size_t));
-
-  for (size_t n = 0; n < tgt_grid.size; ++n) tgt_count[n] = 0;
+  std::vector<size_t> tgt_count(tgt_grid.size, 0);
 
 #if defined(SX)
 #pragma vdir nodep
@@ -1338,8 +1317,6 @@ remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvar
           imax = imax + idiff;
         }
     }
-
-  Free(tgt_count);
 
   if (rv.sort_add) cdoPrint("Sparse matrix entries are explicitly sorted.");
 

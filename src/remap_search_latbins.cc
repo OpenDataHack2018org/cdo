@@ -81,13 +81,11 @@ calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, RemapType mapType)
         }
 
       src_grid->bin_addr = (size_t *) Realloc(src_grid->bin_addr, 2 * nbins * sizeof(size_t));
-
       calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
 
       if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
         {
           tgt_grid->bin_addr = (size_t *) Realloc(tgt_grid->bin_addr, 2 * nbins * sizeof(size_t));
-
           calc_bin_addr(tgt_grid->size, nbins, bin_lats, tgt_grid->cell_bound_box, tgt_grid->bin_addr);
 
           Free(src_grid->bin_lats);
