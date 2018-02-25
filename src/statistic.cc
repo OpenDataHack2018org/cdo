@@ -283,8 +283,7 @@ eigen_solution_of_triangular_matrix(double *d, double *e, int n, double **a, con
           if (iter == MAX_ITER)
             {
               fprintf(stderr,
-                      "%s: ERROR! Too many iterations while"
-                      " determining the eigensolution!\n",
+                      "%s: ERROR! Too many iterations while determining the eigensolution!\n",
                       prompt);
               exit(1);
             }
@@ -664,8 +663,7 @@ incomplete_gamma(double a, double x, const char *prompt)
   if (x < 0 || a <= 0)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"incomplete_gamma\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"incomplete_gamma\")\n",
               prompt);
       exit(4);
     }
@@ -750,8 +748,7 @@ incomplete_beta(double a, double b, double x, const char *prompt)
   if (a <= 0 || b <= 0)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"incomplete_beta\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"incomplete_beta\")\n",
               prompt);
       exit(4);
     }
@@ -836,8 +833,7 @@ normal_inv(double p, const char *prompt)
   if (p <= 0 || p >= 1)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"normal_inv\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"normal_inv\")\n",
               prompt);
       exit(4);
     }
@@ -868,8 +864,7 @@ student_t_density(double n, double x, const char *prompt)
   if (n <= 0)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"student_t_density\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t_density\")\n",
               prompt);
       exit(4);
     }
@@ -882,9 +877,7 @@ student_t(double n, double x, const char *prompt)
   if (n <= 0)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"student_t\")\n",
-              prompt);
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t\")\n", prompt);
       exit(4);
     }
   if (x > 0)
@@ -905,9 +898,7 @@ student_t_inv(double n, double p, const char *prompt)
   if (n <= 0 || p <= 0 || p >= 1)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"student_t_inv\")\n",
-              prompt);
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"student_t_inv\")\n", prompt);
       exit(4);
     }
 
@@ -938,8 +929,7 @@ chi_square_density(double n, double x, const char *prompt)
   if (n <= 0)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"chi_square_density\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_density\")\n",
               prompt);
       exit(4);
     }
@@ -952,8 +942,7 @@ chi_square(double n, double x, const char *prompt)
   if (n <= 0)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"chi_square\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square\")\n",
               prompt);
       exit(4);
     }
@@ -971,8 +960,7 @@ chi_square_inv(double n, double p, const char *prompt)
   if (n <= 0 || p <= 0 || p >= 1)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"chi_square_inv\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_inv\")\n",
               prompt);
       exit(4);
     }
@@ -1013,8 +1001,7 @@ chi_square_constants(double n, double p, double *c1, double *c2, const char *pro
   if (n <= 0 || p <= 0 || p >= 1)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"chi_square_constants\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"chi_square_constants\")\n",
               prompt);
       exit(4);
     }
@@ -1067,8 +1054,7 @@ beta_distr_density(double a, double b, double x, const char *prompt)
   if (a <= 0 || b <= 0)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"beta_distr_density\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_density\")\n",
               prompt);
       exit(4);
     }
@@ -1092,8 +1078,7 @@ beta_distr_inv(double a, double b, double p, const char *prompt)
   if (a <= 0 || b <= 0 || p <= 0 || p >= 1)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"beta_distr_inv\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_inv\")\n",
               prompt);
       exit(4);
     }
@@ -1142,8 +1127,7 @@ beta_distr_constants(double a, double b, double p, double *c1, double *c2, const
   if (a <= 0 || b <= 0 || p <= 0 || p >= 1)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"beta_distr_constants\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"beta_distr_constants\")\n",
               prompt);
       exit(4);
     }
@@ -1203,8 +1187,7 @@ fisher(double m, double n, double x, const char *prompt)
   if (m <= 0 || n <= 0)
     {
       fprintf(stderr,
-              "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
-              "\"fisher\")\n",
+              "%s: IMPLEMENTATION ERROR! (Invalid argument in function \"fisher\")\n",
               prompt);
       exit(4);
     }
@@ -1440,9 +1423,7 @@ jacobi_1side(double **M, double *A, long n)
     }
 
   if (cdoVerbose)
-    cdoPrint("Finished one-sided jacobi scheme for eigenvalue computation "
-             "after %i iterations",
-             n_iter);
+    cdoPrint("Finished one-sided jacobi scheme for eigenvalue computation after %i iterations", n_iter);
 
   //  fprintf(stderr,"finished after %i sweeps (n_finished
   //  %i)\n",n_iter,n_finished);
@@ -1450,12 +1431,9 @@ jacobi_1side(double **M, double *A, long n)
   if (n_iter == max_jacobi_iter && n_finished < count)
     {
       fprintf(stderr,
-              "statistics-module (Warning): Eigenvalue computation with "
-              "one-sided jacobi scheme\n"
-              "                             did not converge properly. %i of "
-              "%i pairs of columns did\n"
-              "                             not achieve requested "
-              "orthogonality of %10.6g\n",
+              "statistics-module (Warning): Eigenvalue computation with one-sided jacobi scheme\n"
+              "                             did not converge properly. %i of %i pairs of columns did\n"
+              "                             not achieve requested orthogonality of %10.6g\n",
               count - n_finished, count, fnorm_precision);
 
       if (n_finished == 0)
