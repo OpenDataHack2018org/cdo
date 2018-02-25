@@ -290,19 +290,16 @@ sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
 
   if (num_links <= 1) return;
 
-  size_t *idx = (size_t *) Malloc(num_links * sizeof(size_t));
+  std::vector<size_t> idx(num_links);
   for (size_t i = 0; i < num_links; ++i) idx[i] = i;
 
-  remap_heapsort(num_links, add1, add2, idx);
+  remap_heapsort(num_links, add1, add2, &idx[0]);
 
-  double *wgt_tmp = (double *) Malloc(num_wts * num_links * sizeof(double));
-  memcpy(wgt_tmp, weights, num_wts * num_links * sizeof(double));
+  std::vector<double> wgt_tmp(num_wts * num_links);
+  memcpy(&wgt_tmp[0], weights, num_wts * num_links * sizeof(double));
 
   for (size_t i = 0; i < num_links; ++i)
     for (size_t n = 0; n < num_wts; ++n) weights[num_wts * i + n] = wgt_tmp[num_wts * idx[i] + n];
-
-  Free(wgt_tmp);
-  Free(idx);
 
   if (cdoVerbose)
     if (!isSorted(add1, add2, num_links)) fprintf(stderr, ">>>> sort_add failed!!!\n");
@@ -414,9 +411,6 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   size_t add_srt[nsplit] /*, add_end[nsplit]*/; /* arrays for start and end
                                                    index of sub array    */
   size_t *add1s[nsplit], *add2s[nsplit];        /* pointers to sub arrays for sort and merge step */
-  size_t *tmp;                                  /* pointer to buffer for merging of address lists */
-  double *tmp2 = NULL;                          /* pointer to buffer for merging weight lists     */
-  double *wgttmp = NULL;                        /* pointer to buffer for swap weights             */
   size_t i, n, m;
 
   // printf("sort_par: parent = %d numlinks = %zu\n", parent, num_links);
@@ -428,7 +422,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     }
 
   // index list to merge sub-arrays
-  size_t *idx = (size_t *) Malloc(num_links * sizeof(size_t));
+  std::vector<size_t> idx(num_links);
 
   /* SPLIT AND SORT THE DATA FRAGMENTS */
   /*
@@ -474,7 +468,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     //	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
 
 #ifdef _OPENMP
-#pragma omp parallel for if (depth < par_depth) private(n, m, wgttmp, who_am_i) shared(weights) num_threads(2)
+#pragma omp parallel for if (depth < par_depth) private(n, m, who_am_i) shared(weights) num_threads(2)
 #endif
   for (i = 0; i < nsplit; i++)
     {
@@ -489,17 +483,15 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
       //	       who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
 #endif
 
-      wgttmp = (double *) Malloc(num_wts * nl[i] * sizeof(double));
+      std::vector<double> wgttmp(num_wts * nl[i]);
 
       for (m = 0; m < nl[i]; m++)
         for (n = 0; n < num_wts; n++) wgttmp[num_wts * m + n] = weights[num_wts * (add_srt[i] + m) + n];
 
-      sort_iter(nl[i], num_wts, add1s[i], add2s[i], wgttmp, who_am_i);
+      sort_iter(nl[i], num_wts, add1s[i], add2s[i], &wgttmp[0], who_am_i);
 
       for (m = 0; m < nl[i]; m++)
         for (n = 0; n < num_wts; n++) weights[num_wts * (add_srt[i] + m) + n] = wgttmp[num_wts * m + n];
-
-      Free(wgttmp);
     }
 
   /* ********************************* */
@@ -508,9 +500,9 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   /* ********************************* */
   /* Idea I: one CPU merges top-down, the other one bottom-up */
   /* ********************** */
-  merge_lists(nl, add1s[0], add2s[0], add1s[1], add2s[1], idx); /* MERGE THE SEGMENTS     */
-                                                                /* ********************** */
-  tmp = (size_t *) Malloc(num_links * sizeof(size_t));
+  merge_lists(nl, add1s[0], add2s[0], add1s[1], add2s[1], &idx[0]); // MERGE THE SEGMENTS
+
+  std::vector<size_t> tmp(num_links);
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i) num_threads(2)
@@ -531,27 +523,19 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
 #endif
   for (i = 0; i < num_links; i++) add2[i] = tmp[i];
 
-  Free(tmp);
-  tmp = NULL;
-
-  tmp2 = (double *) Malloc(num_links * num_wts * sizeof(double));
+  tmp.resize(num_links * num_wts);
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i, n) num_threads(2)
 #endif
   for (i = 0; i < num_links; i++)
-    for (n = 0; n < num_wts; n++) tmp2[num_wts * i + n] = weights[num_wts * idx[i] + n];
+    for (n = 0; n < num_wts; n++) tmp[num_wts * i + n] = weights[num_wts * idx[i] + n];
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i, n) num_threads(2)
 #endif
   for (i = 0; i < num_links; i++)
-    for (n = 0; n < num_wts; n++) weights[num_wts * i + n] = tmp2[num_wts * i + n];
-
-  Free(tmp2);
-  tmp2 = NULL;
-
-  Free(idx);
+    for (n = 0; n < num_wts; n++) weights[num_wts * i + n] = tmp[num_wts * i + n];
 }
 
 void
