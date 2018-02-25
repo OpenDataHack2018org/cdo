@@ -215,10 +215,11 @@ remap_heapsort(const size_t num_links, size_t *restrict add1, size_t *restrict a
               || ((add1[chk_lvl1] == add1[max_lvl]) && (add2[chk_lvl1] > add2[max_lvl])))
             {
               max_lvl = chk_lvl1;
-            } /*
-                If the parent is greater than both daughters,
-                the correct level has been found
-              */
+            }
+          /*
+            If the parent is greater than both daughters,
+            the correct level has been found
+          */
           if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
             {
               add1[final_lvl] = add1_tmp;
@@ -274,8 +275,8 @@ sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
 {
   /*
     This routine sorts address and weight arrays based on the destination
-    address with the source address as a secondary sorting criterion. The method
-    is a standard heap sort.
+    address with the source address as a secondary sorting criterion.
+    The method is a standard heap sort.
   */
   /*
     Input and Output arrays:
@@ -307,202 +308,8 @@ sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     if (!isSorted(add1, add2, num_links)) fprintf(stderr, ">>>> sort_add failed!!!\n");
 } /* sort_add */
 
-/*****************************************************************************/
-
-void
-sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights)
-{
-  /*
-    This routine sorts address and weight arrays based on the
-    destination address with the source address as a secondary
-    sorting criterion. The method is a standard heap sort.
-  */
-  /*
-    Input and Output arrays:
-
-       long num_links; ! num of links for this mapping
-       long num_wts;   ! num of weights for this mapping
-       add1,           ! destination address array [num_links]
-       add2            ! source      address array
-       weights         ! remapping weights [num_links*num_wts]
-  */
-
-  /* Local variables */
-
-  size_t add1_tmp, add2_tmp; /* temp for addresses during swap     */
-  long lvl;                  /* level indexes for heap sort levels */
-  size_t chk_lvl1, chk_lvl2, max_lvl, final_lvl;
-  size_t i, n;
-  double wgttmp[4]; /* temp for holding wts during swap   */
-
-  if (num_links <= 1) return;
-
-  /*
-  for ( n = 0; n < num_links; n++ )
-    printf("in: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
-  */
-  /*
-    start at the lowest level (N/2) of the tree and shift lower
-    values to the bottom of the tree, promoting the larger numbers
-  */
-  for (lvl = num_links / 2 - 1; lvl >= 0; lvl--)
-    {
-      final_lvl = lvl;
-      add1_tmp = add1[lvl];
-      add2_tmp = add2[lvl];
-      for (n = 0; n < num_wts; n++) wgttmp[n] = weights[num_wts * lvl + n];
-
-      /* Loop until proper level is found for this link, or reach bottom */
-
-      for (i = 0; i < num_links; i++)
-        {
-          /* Find the largest of the two daughters */
-
-          chk_lvl1 = 2 * final_lvl + 1;
-          chk_lvl2 = 2 * final_lvl + 2;
-          if (chk_lvl1 == num_links - 1) chk_lvl2 = chk_lvl1;
-
-          if ((add1[chk_lvl1] > add1[chk_lvl2])
-              || ((add1[chk_lvl1] == add1[chk_lvl2]) && (add2[chk_lvl1] > add2[chk_lvl2])))
-            max_lvl = chk_lvl1;
-          else
-            max_lvl = chk_lvl2;
-
-          /*
-            If the parent is greater than both daughters,
-            the correct level has been found
-          */
-          if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
-            {
-              add1[final_lvl] = add1_tmp;
-              add2[final_lvl] = add2_tmp;
-              for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = wgttmp[n];
-
-              break;
-            }
-          else
-            {
-              /*
-                Otherwise, promote the largest daughter and push
-                down one level in the tree.  If haven"t reached
-                the end of the tree, repeat the process.  Otherwise
-                store last values and exit the loop
-              */
-              add1[final_lvl] = add1[max_lvl];
-              add2[final_lvl] = add2[max_lvl];
-              for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = weights[num_wts * max_lvl + n];
-
-              final_lvl = max_lvl;
-              if (2 * final_lvl + 1 >= num_links)
-                {
-                  add1[final_lvl] = add1_tmp;
-                  add2[final_lvl] = add2_tmp;
-                  for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = wgttmp[n];
-
-                  break;
-                }
-            }
-        }
-
-      if (i == num_links) cdoAbort("Internal problem, link 1 not found!");
-    }
-
-  /*
-    Now that the heap has been sorted, strip off the top (largest)
-    value and promote the values below
-  */
-  for (lvl = num_links - 1; lvl >= 2; lvl--)
-    {
-      /* Move the top value and insert it into the correct place */
-
-      add1_tmp = add1[lvl];
-      add1[lvl] = add1[0];
-
-      add2_tmp = add2[lvl];
-      add2[lvl] = add2[0];
-
-      for (n = 0; n < num_wts; n++) wgttmp[n] = weights[num_wts * lvl + n];
-
-      for (n = 0; n < num_wts; n++) weights[num_wts * lvl + n] = weights[n];
-
-      /* As above this loop sifts the tmp values down until proper level is
-       * reached */
-
-      final_lvl = 0;
-
-      for (i = 0; i < num_links; i++)
-        {
-          /* Find the largest of the two daughters */
-
-          chk_lvl1 = 2 * final_lvl + 1;
-          chk_lvl2 = 2 * final_lvl + 2;
-          if (chk_lvl2 >= (size_t) lvl) chk_lvl2 = chk_lvl1;
-
-          if ((add1[chk_lvl1] > add1[chk_lvl2])
-              || ((add1[chk_lvl1] == add1[chk_lvl2]) && (add2[chk_lvl1] > add2[chk_lvl2])))
-            max_lvl = chk_lvl1;
-          else
-            max_lvl = chk_lvl2;
-
-          /*
-            If the parent is greater than both daughters,
-            the correct level has been found
-          */
-          if ((add1_tmp > add1[max_lvl]) || ((add1_tmp == add1[max_lvl]) && (add2_tmp > add2[max_lvl])))
-            {
-              add1[final_lvl] = add1_tmp;
-              add2[final_lvl] = add2_tmp;
-              for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = wgttmp[n];
-
-              break;
-            }
-          else
-            {
-              /*
-                Otherwise, promote the largest daughter and push
-                down one level in the tree.  If haven't reached
-                the end of the tree, repeat the process.  Otherwise
-                store last values and exit the loop
-              */
-              add1[final_lvl] = add1[max_lvl];
-              add2[final_lvl] = add2[max_lvl];
-              for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = weights[num_wts * max_lvl + n];
-
-              final_lvl = max_lvl;
-              if (2 * final_lvl + 1 >= (size_t) lvl)
-                {
-                  add1[final_lvl] = add1_tmp;
-                  add2[final_lvl] = add2_tmp;
-                  for (n = 0; n < num_wts; n++) weights[num_wts * final_lvl + n] = wgttmp[n];
-
-                  break;
-                }
-            }
-        }
-
-      if (i == num_links) cdoAbort("Internal problem, link 2 not found!");
-    }
-
-  /* Swap the last two entries */
-
-  add1_tmp = add1[1];
-  add1[1] = add1[0];
-  add1[0] = add1_tmp;
-
-  add2_tmp = add2[1];
-  add2[1] = add2[0];
-  add2[0] = add2_tmp;
-
-  for (n = 0; n < num_wts; n++) wgttmp[n] = weights[num_wts + n];
-  for (n = 0; n < num_wts; n++) weights[num_wts + n] = weights[n];
-  for (n = 0; n < num_wts; n++) weights[n] = wgttmp[n];
-  /*
-  for ( n = 0; n < num_links; n++ )
-    printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
-  */
-} /* sort_add_orig */
-
-/* ********************************************************************************
+/*
+ ********************************************************************************
      XXX       XXX    XXXXXXXXXX    XXXXXXXXXX       XXXXXXXXXXX   XXXXXXXXXX
     XXXX     XXXX    XXXXXXXXXX    XXXXXXXXXXX     XXXXXXXXXXX    XXXXXXXXXX
     XXXXX   XXXXX    XXX           XXX     XXX     XXX            XXX
@@ -521,7 +328,7 @@ sort_add_orig(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *r
                    XXX    XXX      XXX   XXX XXXX             XXX
            XXXXXXXXXXX     XXX    XXX    XXX   XXXX           XXX
           XXXXXXXXXXX       XXXXXXXX     XXX     XXXX         XXX
-**********************************************************************************
+ **********************************************************************************
 */
 
 /* MERGE SORT DEFINES */
