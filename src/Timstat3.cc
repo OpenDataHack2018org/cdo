@@ -88,10 +88,9 @@ Timstat3(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID[0]);
   int nvars = vlistNvars(vlistID[0]);
-  int nrecs = vlistNrecs(vlistID[0]);
-  int nrecs3 = nrecs;
-  int *recVarID = (int *) Malloc(nrecs * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecs * sizeof(int));
+
+  int maxrecs = vlistNrecs(vlistID[0]);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   int taxisID1 = vlistInqTaxis(vlistID[0]);
   int taxisID3 = taxisDuplicate(taxisID1);
@@ -158,7 +157,7 @@ Timstat3(void *process)
         {
           if (reached_eof[is]) continue;
 
-          nrecs = cdoStreamInqTimestep(streamID[is], tsID);
+          int nrecs = cdoStreamInqTimestep(streamID[is], tsID);
           if (nrecs == 0)
             {
               reached_eof[is] = 1;
@@ -178,8 +177,9 @@ Timstat3(void *process)
 
               if (tsID == 0 && is == 0)
                 {
-                  recVarID[recID] = varID;
-                  recLevelID[recID] = levelID;
+                  recinfo[recID].varID = varID;
+                  recinfo[recID].levelID = levelID;
+                  recinfo[recID].lconst = vlistInqVarTimetype(vlistID[0], varID) == TIME_CONSTANT;
                 }
 
               pstreamReadRecord(streamID[is], in[is].ptr, &nmiss);
@@ -212,10 +212,10 @@ Timstat3(void *process)
   taxisDefVtime(taxisID3, vtime);
   pstreamDefTimestep(streamID3, 0);
 
-  for (int recID = 0; recID < nrecs3; recID++)
+  for (int recID = 0; recID < maxrecs; recID++)
     {
-      varID = recVarID[recID];
-      levelID = recLevelID[recID];
+      int varID = recinfo[recID].varID;
+      int levelID = recinfo[recID].levelID;
 
       missval1 = fwork[0][varID][levelID].missval;
       missval2 = missval1;
@@ -328,9 +328,6 @@ Timstat3(void *process)
     Free(in[i].ptr);
   for (int i = 0; i < NOUT; ++i)
     Free(out[i].ptr);
-
-  Free(recVarID);
-  Free(recLevelID);
 
   cdoFinish();
 

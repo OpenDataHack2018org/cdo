@@ -93,10 +93,9 @@ Ymonpctl(void *process)
   pstreamDefVlist(streamID4, vlistID4);
 
   int nvars = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
@@ -182,8 +181,9 @@ Ymonpctl(void *process)
 
           if (tsID == 0)
             {
-              recVarID[recID] = varID;
-              recLevelID[recID] = levelID;
+              recinfo[recID].varID = varID;
+              recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           pstreamReadRecord(streamID1, vars1[month][varID][levelID].ptr, &nmiss);
@@ -217,13 +217,12 @@ Ymonpctl(void *process)
         taxisDefVtime(taxisID4, vtimes1[month]);
         pstreamDefTimestep(streamID4, otsID);
 
-        for (int recID = 0; recID < nrecords; recID++)
+        for (int recID = 0; recID < maxrecs; recID++)
           {
-            varID = recVarID[recID];
-            levelID = recLevelID[recID];
+            if (otsID && recinfo[recID].lconst) continue;
 
-            if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
-
+            int varID = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
             pstreamDefRecord(streamID4, varID, levelID);
             pstreamWriteRecord(streamID4, vars1[month][varID][levelID].ptr, vars1[month][varID][levelID].nmiss);
           }
@@ -241,9 +240,6 @@ Ymonpctl(void *process)
     }
 
   if (field.ptr) Free(field.ptr);
-
-  if (recVarID) Free(recVarID);
-  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID4);
   pstreamClose(streamID3);

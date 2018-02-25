@@ -70,10 +70,9 @@ Yearmonstat(void *process)
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   int calendar = taxisInqCalendar(taxisID1);
   dtlist_type *dtlist = dtlist_new();
@@ -125,8 +124,9 @@ Yearmonstat(void *process)
 
               if (tsID == 0)
                 {
-                  recVarID[recID] = varID;
-                  recLevelID[recID] = levelID;
+                  recinfo[recID].varID = varID;
+                  recinfo[recID].levelID = levelID;
+                  recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
                 }
 
               gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -210,13 +210,12 @@ Yearmonstat(void *process)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
       pstreamDefTimestep(streamID2, otsID);
 
-      for (int recID = 0; recID < nrecords; recID++)
+      for (int recID = 0; recID < maxrecs; recID++)
         {
-          varID = recVarID[recID];
-          levelID = recLevelID[recID];
+          if (otsID && recinfo[recID].lconst) continue;
 
-          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
-
+          int varID = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
         }
@@ -229,9 +228,6 @@ Yearmonstat(void *process)
   field_free(samp1, vlistID1);
 
   if (field.ptr) Free(field.ptr);
-
-  if (recVarID) Free(recVarID);
-  if (recLevelID) Free(recLevelID);
 
   dtlist_delete(dtlist);
 
