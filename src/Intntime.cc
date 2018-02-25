@@ -51,10 +51,9 @@ Intntime(void *process)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double *) Malloc(gridsize * sizeof(double));
@@ -116,8 +115,8 @@ Intntime(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          recVarID[recID] = varID;
-          recLevelID[recID] = levelID;
+          recinfo[recID].varID = varID;
+          recinfo[recID].levelID = levelID;
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           offset = gridsize * levelID;
@@ -156,8 +155,8 @@ Intntime(void *process)
 
           for (int recID = 0; recID < nrecs; recID++)
             {
-              varID = recVarID[recID];
-              levelID = recLevelID[recID];
+              varID = recinfo[recID].varID;
+              levelID = recinfo[recID].levelID;
               gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
               offset = gridsize * levelID;
               single1 = vardata1[varID] + offset;
@@ -201,8 +200,8 @@ Intntime(void *process)
       pstreamDefTimestep(streamID2, tsIDo++);
       for (int recID = 0; recID < nrecs; recID++)
         {
-          varID = recVarID[recID];
-          levelID = recLevelID[recID];
+          varID = recinfo[recID].varID;
+          levelID = recinfo[recID].levelID;
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
           offset = gridsize * levelID;

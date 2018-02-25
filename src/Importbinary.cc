@@ -232,9 +232,8 @@ Importbinary(void *process)
   int vlistID = vlistCreate();
 
   int *var_zaxisID = (int *) Malloc(nvars * sizeof(int));
-  int *recVarID = (int *) Malloc(nrecs * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecs * sizeof(int));
   int *var_dfrm = (int *) Malloc(nrecs * sizeof(int));
+  std::vector<recinfo_type> recinfo(nrecs);
 
   int recID = 0;
   for (ivar = 0; ivar < nvars; ++ivar)
@@ -320,8 +319,8 @@ Importbinary(void *process)
       for (levelID = 0; levelID < nlevels; ++levelID)
         {
           if (recID >= nrecs) cdoAbort("Internal problem with number of records!");
-          recVarID[recID] = varID;
-          recLevelID[recID] = levelID;
+          recinfo[recID].varID = varID;
+          recinfo[recID].levelID = levelID;
           var_dfrm[recID] = pvar->dfrm;
           recID++;
         }
@@ -482,10 +481,7 @@ Importbinary(void *process)
                 }
               else
                 {
-                  if (pfi.flt64)
-                    recsize = pfi.gsiz * 8;
-                  else
-                    recsize = pfi.gsiz * 4;
+                  recsize = pfi.flt64 ? pfi.gsiz * 8 : pfi.gsiz * 4;
                 }
 
               rc = fread(rec, 1, recsize, pfi.infile);
@@ -565,8 +561,8 @@ Importbinary(void *process)
                 printf("%3d %4d %3d %6zu %6zu %12.5g %12.5g\n", tsID, recID,
               recoffset, nmiss, n_nan, fmin, fmax);
               */
-              varID = recVarID[recID];
-              levelID = recLevelID[recID];
+              varID = recinfo[recID].varID;
+              levelID = recinfo[recID].levelID;
               pstreamDefRecord(streamID, varID, levelID);
               pstreamWriteRecord(streamID, array, nmiss);
             }
@@ -590,8 +586,6 @@ Importbinary(void *process)
   Free(rec);
 
   if (var_zaxisID) Free(var_zaxisID);
-  if (recVarID) Free(recVarID);
-  if (recLevelID) Free(recLevelID);
   if (var_dfrm) Free(var_dfrm);
 
   cdoFinish();

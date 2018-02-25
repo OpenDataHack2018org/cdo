@@ -72,9 +72,8 @@ Timcount(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  int nrecords = vlistNrecs(vlistID1);
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
@@ -106,8 +105,9 @@ Timcount(void *process)
 
               if (tsID == 0)
                 {
-                  recVarID[recID] = varID;
-                  recLevelID[recID] = levelID;
+                  recinfo[recID].varID = varID;
+                  recinfo[recID].levelID = levelID;
+                  recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
                 }
 
               nwpv = vars1[varID][levelID].nwpv;
@@ -140,13 +140,12 @@ Timcount(void *process)
       taxisDefVtime(taxisID2, vtime0);
       pstreamDefTimestep(streamID2, otsID);
 
-      for (int recID = 0; recID < nrecords; recID++)
+      for (int recID = 0; recID < maxrecs; recID++)
         {
-          varID = recVarID[recID];
-          levelID = recLevelID[recID];
+          if (otsID && recinfo[recID].lconst) continue;
 
-          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
-
+          int varID = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
         }
@@ -158,9 +157,6 @@ Timcount(void *process)
   field_free(vars1, vlistID1);
 
   if (field.ptr) Free(field.ptr);
-
-  if (recVarID) Free(recVarID);
-  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

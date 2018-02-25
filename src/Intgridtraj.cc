@@ -78,10 +78,9 @@ Intgridtraj(void *process)
   field_init(&field2);
 
   int nvars = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   double *array = (double *) Malloc(gridsizemax * sizeof(double));
@@ -146,8 +145,9 @@ Intgridtraj(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          recVarID[recID] = varID;
-          recLevelID[recID] = levelID;
+          recinfo[recID].varID = varID;
+          recinfo[recID].levelID = levelID;
+          recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 
           size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           size_t offset = gridsize * levelID;
@@ -184,8 +184,8 @@ Intgridtraj(void *process)
               */
               for (int recID = 0; recID < nrecs; recID++)
                 {
-                  varID = recVarID[recID];
-                  levelID = recLevelID[recID];
+                  varID = recinfo[recID].varID;
+                  levelID = recinfo[recID].levelID;
                   double missval = vlistInqVarMissval(vlistID1, varID);
                   int gridID1 = vlistInqVarGrid(vlistID1, varID);
                   size_t gridsize = gridInqSize(gridID1);

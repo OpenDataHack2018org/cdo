@@ -59,10 +59,8 @@ Regres(void *process)
   int streamID3 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID3, vlistID2);
 
-  int nrecords = vlistNrecs(vlistID1);
-
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
@@ -90,8 +88,9 @@ Regres(void *process)
 
           if (tsID == 1)
             {
-              recVarID[recID] = varID;
-              recLevelID[recID] = levelID;
+              recinfo[recID].varID = varID;
+              recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           pstreamReadRecord(streamID1, field1.ptr, &nmiss);
@@ -117,10 +116,10 @@ Regres(void *process)
   /* pstreamDefTimestep(streamID2, 0); */
   pstreamDefTimestep(streamID3, 0);
 
-  for (int recID = 0; recID < nrecords; recID++)
+  for (int recID = 0; recID < maxrecs; recID++)
     {
-      varID = recVarID[recID];
-      levelID = recLevelID[recID];
+      int varID = recinfo[recID].varID;
+      int levelID = recinfo[recID].levelID;
 
       double missval = vlistInqVarMissval(vlistID1, varID);
       int gridID = vlistInqVarGrid(vlistID1, varID);
@@ -159,9 +158,6 @@ Regres(void *process)
 
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);
-
-  if (recVarID) Free(recVarID);
-  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID3);
   /* pstreamClose(streamID2); */

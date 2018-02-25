@@ -1331,8 +1331,7 @@ TransformUV(int operatorID)
   int nvars = vlistNvars(vlistID1);
   int nrecs = vlistNrecs(vlistID1);
 
-  int *recVarID = (int *) Malloc(nrecs * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecs * sizeof(int));
+  std::vector<recinfo_type> recinfo(nrecs);
 
   size_t **varnmiss = (size_t **) Malloc(nvars * sizeof(size_t *));
   double **vardata = (double **) Malloc(nvars * sizeof(double *));
@@ -1442,8 +1441,8 @@ TransformUV(int operatorID)
 
           if (vardata[varID] == NULL)
             {                        // This means that it is not eighter U neither V.
-              recVarID[recID] = -1;  // We will NOT record/store this field in memory
-              recLevelID[recID] = -1;
+              recinfo[recID].varID = -1;  // We will NOT record/store this field in memory
+              recinfo[recID].levelID = -1;
               // We will stream-copy this data
               pstreamDefRecord(streamID2, varID, levelID);
               // if ( CdoDebug::cdoDebugExt>10 ) cdoPrint("Copying data record..
@@ -1459,8 +1458,8 @@ TransformUV(int operatorID)
             }
           else
             {
-              recVarID[recID] = varID;
-              recLevelID[recID] = levelID;
+              recinfo[recID].varID = varID;
+              recinfo[recID].levelID = levelID;
               gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
               offset = gridsize * levelID;
               single = vardata[varID] + offset;
@@ -1667,10 +1666,10 @@ TransformUV(int operatorID)
 
       for (int recID = 0; recID < nrecs; recID++)
         {
-          varID = recVarID[recID];
+          varID = recinfo[recID].varID;
+          levelID = recinfo[recID].levelID;
           if (varID != -1)
             {
-              levelID = recLevelID[recID];
               code = vlistInqVarCode(vlistID1, varID);
               zaxisID = vlistInqVarZaxis(vlistID1, varID);
               ltype = zaxis2ltype(zaxisID);
@@ -1704,9 +1703,6 @@ TransformUV(int operatorID)
       if (varnmiss[varID]) Free(varnmiss[varID]);
       if (vardata[varID]) Free(vardata[varID]);
     }
-
-  Free(recVarID);
-  Free(recLevelID);
 
   cdoFinish();
 

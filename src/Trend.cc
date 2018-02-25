@@ -54,7 +54,9 @@ Trend(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
+
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   for (varID = 0; varID < nvars; varID++)
     vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
@@ -64,9 +66,6 @@ Trend(void *process)
 
   pstreamDefVlist(streamID2, vlistID2);
   pstreamDefVlist(streamID3, vlistID2);
-
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
@@ -93,8 +92,9 @@ Trend(void *process)
 
           if (tsID == 0)
             {
-              recVarID[recID] = varID;
-              recLevelID[recID] = levelID;
+              recinfo[recID].varID = varID;
+              recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
 
           pstreamReadRecord(streamID1, field1.ptr, &nmiss);
@@ -122,10 +122,10 @@ Trend(void *process)
   pstreamDefTimestep(streamID2, 0);
   pstreamDefTimestep(streamID3, 0);
 
-  for (int recID = 0; recID < nrecords; recID++)
+  for (int recID = 0; recID < maxrecs; recID++)
     {
-      varID = recVarID[recID];
-      levelID = recLevelID[recID];
+      int varID = recinfo[recID].varID;
+      int levelID = recinfo[recID].levelID;
 
       double missval = vlistInqVarMissval(vlistID1, varID);
       int gridID = vlistInqVarGrid(vlistID1, varID);
@@ -163,9 +163,6 @@ Trend(void *process)
 
   if (field1.ptr) Free(field1.ptr);
   if (field2.ptr) Free(field2.ptr);
-
-  if (recVarID) Free(recVarID);
-  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID3);
   pstreamClose(streamID2);

@@ -67,10 +67,9 @@ Pardup(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double *) Malloc(gridsize * sizeof(double));
@@ -105,8 +104,9 @@ Pardup(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          recVarID[recID] = varID;
-          recLevelID[recID] = levelID;
+          recinfo[recID].varID = varID;
+          recinfo[recID].levelID = levelID;
+          recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           offset = gridsize * levelID;
@@ -119,9 +119,9 @@ Pardup(void *process)
       for (int i = 0; i < nmul; i++)
         for (int recID = 0; recID < nrecs; recID++)
           {
-            varID = recVarID[recID];
+            varID = recinfo[recID].varID;
+            levelID = recinfo[recID].levelID;
             varID2 = varID + i * nvars;
-            levelID = recLevelID[recID];
 
             gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
             offset = gridsize * levelID;

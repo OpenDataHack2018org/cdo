@@ -82,10 +82,9 @@ Timselpctl(void *process)
   pstreamDefVlist(streamID4, vlistID4);
 
   int nvars = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID = (int *) Malloc(nrecords * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecords * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -119,8 +118,9 @@ Timselpctl(void *process)
 
           if (tsID == 0)
             {
-              recVarID[recID] = varID;
-              recLevelID[recID] = levelID;
+              recinfo[recID].varID = varID;
+              recinfo[recID].levelID = levelID;
+              recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
             }
         }
     }
@@ -180,8 +180,9 @@ Timselpctl(void *process)
 
                 if (tsID == 0)
                   {
-                    recVarID[recID] = varID;
-                    recLevelID[recID] = levelID;
+                    recinfo[recID].varID = varID;
+                    recinfo[recID].levelID = levelID;
+                    recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
                   }
 
                 pstreamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
@@ -207,13 +208,12 @@ Timselpctl(void *process)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
       pstreamDefTimestep(streamID4, otsID);
 
-      for (int recID = 0; recID < nrecords; recID++)
+      for (int recID = 0; recID < maxrecs; recID++)
         {
-          varID = recVarID[recID];
-          levelID = recLevelID[recID];
+          if (otsID && recinfo[recID].lconst) continue;
 
-          if (otsID && vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT) continue;
-
+          int varID = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
           pstreamDefRecord(streamID4, varID, levelID);
           pstreamWriteRecord(streamID4, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
         }
@@ -239,9 +239,6 @@ LABEL_END:
   dtlist_delete(dtlist);
 
   if (field.ptr) Free(field.ptr);
-
-  if (recVarID) Free(recVarID);
-  if (recLevelID) Free(recLevelID);
 
   pstreamClose(streamID4);
   pstreamClose(streamID3);

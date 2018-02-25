@@ -84,6 +84,7 @@ Rotuv(void *process)
   size_t gridsize;
   int code, gridID;
   int nlevel;
+  int nrecs;
   int chcodes[MAXARG];
   char *chvars[MAXARG];
   char varname[CDI_MAX_NAME];
@@ -124,10 +125,9 @@ Rotuv(void *process)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
-  int nrecs = vlistNrecs(vlistID1);
 
-  int *recVarID = (int *) Malloc(nrecs * sizeof(int));
-  int *recLevelID = (int *) Malloc(nrecs * sizeof(int));
+  int maxrecs = vlistNrecs(vlistID1);
+  std::vector<recinfo_type> recinfo(maxrecs);
 
   size_t **varnmiss = (size_t **) Malloc(nvars * sizeof(size_t *));
   double **vardata = (double **) Malloc(nvars * sizeof(double *));
@@ -188,8 +188,9 @@ Rotuv(void *process)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
 
-          recVarID[recID] = varID;
-          recLevelID[recID] = levelID;
+          recinfo[recID].varID = varID;
+          recinfo[recID].levelID = levelID;
+          recinfo[recID].lconst = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           size_t offset = gridsize * levelID;
@@ -271,8 +272,8 @@ Rotuv(void *process)
 
       for (int recID = 0; recID < nrecs; recID++)
         {
-          varID = recVarID[recID];
-          levelID = recLevelID[recID];
+          varID = recinfo[recID].varID;
+          levelID = recinfo[recID].levelID;
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           size_t offset = gridsize * levelID;
           single = vardata[varID] + offset;
