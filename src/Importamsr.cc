@@ -232,7 +232,6 @@ Importamsr(void *process)
           taxisDefVtime(taxisID, vtime);
           vtime += 120000; /* 13:30:00 */
           pstreamDefTimestep(streamID, tsID);
-          processDefTimesteps(streamID);
 
           read_amsr(fp, vlistID, nvars, data, nmiss);
 
@@ -257,7 +256,6 @@ Importamsr(void *process)
       taxisDefVtime(taxisID, vtime);
       tsID = 0;
       pstreamDefTimestep(streamID, tsID);
-      processDefTimesteps(streamID);
 
       read_amsr(fp, vlistID, nvars, data, nmiss);
 

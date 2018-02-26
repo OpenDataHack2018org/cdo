@@ -90,14 +90,6 @@ processInqVarNum(void)
   return processSelf().nvars;
 }
 
-void
-processDefTimesteps(int streamID)
-{
-  ProcessType &process = processSelf();
-
-  (void *) streamID;
-}
-
 int
 cdoStreamInqTimestep(int pstreamID, int tsID)
 {
@@ -112,12 +104,6 @@ cdoStreamInqTimestep(int pstreamID, int tsID)
       process.ntimesteps = process.timesteps.size();
     }
   return nrecs;
-}
-
-int
-processInqTimesteps(int pstreamID)
-{
-  return processSelf().ntimesteps;
 }
 
 int
@@ -567,7 +553,7 @@ cdoGetStreamName(int p_streamIndex)
   std::string streamName;
   ProcessType &process = processSelf();
   Cdo_Debug(CdoDebug::PROCESS, "stridx ", p_streamIndex);
-  if (p_streamIndex >= process.inputStreams.size())
+  if (p_streamIndex >= static_cast<int>(process.inputStreams.size()))
     {
       Cdo_Debug(CdoDebug::PROCESS, "Getting output stream name", p_streamIndex);
       streamName = cdoGetOutStreamName(p_streamIndex - process.inputStreams.size());
@@ -585,7 +571,7 @@ bool
 cdoStreamIsPipe(int p_streamIndex)
 {
   ProcessType &process = processSelf();
-  if (p_streamIndex >= process.inputStreams.size())
+  if (p_streamIndex >= static_cast<int>(process.inputStreams.size()))
     {
       return process.outputStreams[p_streamIndex - process.inputStreams.size()]->isPipe();
     }
@@ -649,7 +635,7 @@ cdoFinish(void)
 
   if (process.m_ID == 0)
     {
-      printEndTimes(times, memstring);
+      printEndTimes(memstring);
     }
   process.printBenchmarks(times, memstring);
 }
@@ -668,7 +654,7 @@ extern "C"
 }
 
 void
-printEndTimes(cdoTimes p_times, char *p_memstring)
+printEndTimes(char *p_memstring)
 {
   size_t memmax = getPeakRSS();
   if (memmax)

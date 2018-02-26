@@ -28,6 +28,8 @@
 #include <sys/types.h> /* off_t */
 #include <vector>
 
+extern int pthreadScope;
+
 class PstreamType
 {
 public:

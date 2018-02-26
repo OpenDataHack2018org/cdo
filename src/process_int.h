@@ -25,7 +25,7 @@
  */
 void cdoInitialize(void *process);
 void cdoFinish();
-void printEndTimes(cdoTimes p_times, char *p_memstring);
+void printEndTimes(char *p_memstring);
 /**
  * Add operator to process.
  *
@@ -140,17 +140,11 @@ char **operatorArgv(void);
 int operatorArgc(void);
 
 void processDefVarNum(int nvars);
-void processDefTimesteps(int streamID);
 
 /**
  * Returns number of variables
  */
 int processInqVarNum();
-/**
- * Returns number of time steps
- */
-int processInqTimesteps(void);
-
 /**
  * Returns c string representation of this process
  */

@@ -47,7 +47,6 @@
 #include <iostream>
 #include <string>
 
-static int pthreadScope = 0;
 
 ProcessType::ProcessType(int p_ID, const char *p_operatorName, const char *operatorCommand)
     : m_ID(p_ID), operatorName(p_operatorName)
@@ -72,7 +71,7 @@ ProcessType::setOperatorArgv(const char *operatorArguments)
       while ((operatorArg = strchr(operatorArg, ',')) != NULL)
         {
           *operatorArg = '\0';
-          *operatorArg++;
+          operatorArg++;
           if (strlen(operatorArg))
             {
               m_oargv.push_back(operatorArg);
@@ -150,9 +149,7 @@ ProcessType::checkStreamCnt(void)
   int wantedStreamInCnt, wantedStreamOutCnt;
   int streamInCnt0;
   int streamCnt = 0;
-  int i, j;
   int obase = FALSE;
-  int status = 0;
 
   wantedStreamInCnt = operatorStreamInCnt(operatorName);
   wantedStreamOutCnt = operatorStreamOutCnt(operatorName);
@@ -196,26 +193,6 @@ ProcessType::checkStreamCnt(void)
              " Operator %s needs %d input and %d output streams.",
              m_operatorCommand, wantedStreamInCnt, wantedStreamOutCnt);
 
-  /*TEMP*/ /*NEEDS REWORK streamArguments does not exist anymore*/
-  /*
-  for (i = wantedStreamInCnt;i < streamCnt; i++)
-    {
-      if (childProcess[i].args[0] == '-')
-        {
-          cdoAbort("Output file name %s must not begin with \"-\"!", streamArguments[i].args);
-        }
-      else if (!obase)
-        {
-          for (j = 0; j < wantedStreamInCnt;j++) /* does not work with files in pipes */ /*
-             if (strcmp(streamArguments[i].args, streamArguments[j].args) == 0)
-               cdoAbort("Output file name %s is equal to input file name"
-                        " on position %d!\n",
-                        streamArguments[i].args,
-                        j + 1);
-         }
-     }
-     */
-
   if (wantedStreamInCnt == 1 && streamInCnt0 == -1) return 1;
 
   return 0;
@@ -228,7 +205,7 @@ ProcessType::hasAllInputs()
     {
       return false;
     }
-  return m_module.streamInCnt == (inputStreams.size());
+  return m_module.streamInCnt == static_cast<short>(inputStreams.size());
 }
 
 void

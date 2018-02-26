@@ -78,9 +78,9 @@ public:
   std::set<int> timesteps;
   int ntimesteps;
   int m_streamCnt;
-  const char *m_operatorCommand;
-  const char *operatorName;
-  char *operatorArg;
+  char const *m_operatorCommand;
+  char const *operatorName;
+  char const *operatorArg;
   char prompt[64];
   short m_noper;
   bool m_isActive; /*TEMP*/  // not used right now, maybe later (12.Jan.2018)

@@ -57,7 +57,7 @@
 #include "pthread_debug.h"
 
 // TODO: make threadsafe
-static int pthreadScope = 0;
+int pthreadScope = 0;
 static int processNum = 0;
 void
 setProcessNum(int p_num)
@@ -1086,41 +1086,8 @@ set_comp(int fileID, int filetype)
         cdoWarning("Deflate compression not available for non NetCDF4 data!");
     }
 }
-
-static int
-pstreamFindID(const char *p_name)
-{
-  std::string cur_name;
-  for (auto map_pair : _pstream_map)
-    {
-      cur_name = map_pair.second.m_name;
-      if (!(cur_name.empty()))
-        {
-          if (cur_name.compare(p_name) == 0)
-            {
-              return map_pair.first;
-            }
-        }
-    }
-  return -1;
-}
-
 void
 pstreamDebug(int debug)
 {
   CdoDebug::PSTREAM = debug;
-}
-
-static void
-pstream_delete_entry(PstreamType *pstreamptr)
-{
-  int idx = pstreamptr->self;
-
-  PSTREAM_LOCK();
-
-  _pstream_map.erase(idx);
-
-  PSTREAM_UNLOCK();
-
-  if (CdoDebug::PSTREAM) MESSAGE("Removed idx ", idx, " from pstream list");
 }

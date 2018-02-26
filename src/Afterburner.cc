@@ -157,8 +157,7 @@ lprintf(FILE *fp)
   int cval = '-';
 
   fprintf(fp, " ");
-  for (int inum = 0; inum < num; inum++)
-    fprintf(fp, "%c", cval);
+  for (int inum = 0; inum < num; inum++) fprintf(fp, "%c", cval);
   fprintf(fp, "\n");
 }
 
@@ -415,9 +414,6 @@ after_setNextDate(struct Control *globs)
         }
       if (nrecs == 0) break;
 
-#if defined(CDO)
-        //      processDefTimesteps(globs->istreamID);
-#endif
       int vdate = taxisInqVdate(globs->taxisID);
       int vtime = taxisInqVtime(globs->taxisID);
       after_setDateTime(&globs->NextDate, vdate, vtime);
@@ -452,8 +448,7 @@ after_readTimestep(void *arg)
   struct Variable *vars = rarg->vars;
   struct Control *globs = rarg->globs;
 
-  for (int code = 0; code < MaxCodes; code++)
-    vars[code].nmiss0 = 0;
+  for (int code = 0; code < MaxCodes; code++) vars[code].nmiss0 = 0;
 
   for (int recID = 0; recID < nrecs; recID++)
     {
@@ -590,8 +585,7 @@ after_moveTimestep(struct Variable *vars)
 {
   int code;
 
-  for (code = 0; code < MaxCodes; code++)
-    vars[code].nmiss = vars[code].nmiss0;
+  for (code = 0; code < MaxCodes; code++) vars[code].nmiss = vars[code].nmiss0;
 
   for (code = 0; code < MaxCodes; code++)
     if (vars[code].hybrid0)
@@ -696,8 +690,7 @@ after_control(struct Control *globs, struct Variable *vars)
         }
     }
 
-  for (code = 0; code < MaxCodes; code++)
-    vars[code].needed0 = vars[code].needed;
+  for (code = 0; code < MaxCodes; code++) vars[code].needed0 = vars[code].needed;
 
   TsID = 0;
 
@@ -860,8 +853,7 @@ after_setLevel(struct Control *globs)
                 {
                   if (globs->Verbose) fprintf(stdout, " Default pressure level selected:\n");
                   globs->NumLevelRequest = numplevelDefault;
-                  for (l = 0; l < globs->NumLevelRequest; l++)
-                    globs->LevelRequest[l] = plevelDefault[l];
+                  for (l = 0; l < globs->NumLevelRequest; l++) globs->LevelRequest[l] = plevelDefault[l];
                   oVertID = zaxisCreate(ZAXIS_PRESSURE, globs->NumLevelRequest);
                   zaxisDefLevels(oVertID, globs->LevelRequest);
                 }
@@ -869,8 +861,7 @@ after_setLevel(struct Control *globs)
                 {
                   if (globs->Verbose) fprintf(stdout, " Default height level selected:\n");
                   globs->NumLevelRequest = numhlevelDefault;
-                  for (l = 0; l < globs->NumLevelRequest; l++)
-                    globs->LevelRequest[l] = hlevelDefault[l];
+                  for (l = 0; l < globs->NumLevelRequest; l++) globs->LevelRequest[l] = hlevelDefault[l];
                   oVertID = zaxisCreate(ZAXIS_HEIGHT, globs->NumLevelRequest);
                   zaxisDefLevels(oVertID, globs->LevelRequest);
                 }
@@ -885,8 +876,7 @@ after_setLevel(struct Control *globs)
                     fprintf(stdout, " All detected pressure level selected:\n");
                 }
               globs->NumLevelRequest = globs->NumLevelFound;
-              for (l = 0; l < globs->NumLevelRequest; l++)
-                globs->LevelRequest[l] = LevelFound[l];
+              for (l = 0; l < globs->NumLevelRequest; l++) globs->LevelRequest[l] = LevelFound[l];
               oVertID = iVertID;
             }
         }
@@ -935,8 +925,7 @@ after_setLevel(struct Control *globs)
 
   if (checkLevel)
     {
-      for (k = 0; k < globs->NumLevelRequest; k++)
-        removeLevel[k] = FALSE;
+      for (k = 0; k < globs->NumLevelRequest; k++) removeLevel[k] = FALSE;
       for (k = 0; k < globs->NumLevelRequest; k++)
         {
           level = globs->LevelRequest[k];
@@ -957,8 +946,7 @@ after_setLevel(struct Control *globs)
 
       if (globs->AnalysisData || globs->Type < 30)
         {
-          for (k = 0; k < globs->NumLevelRequest; k++)
-            removeLevel[k] = FALSE;
+          for (k = 0; k < globs->NumLevelRequest; k++) removeLevel[k] = FALSE;
           for (k = 0; k < globs->NumLevelRequest; k++)
             {
               level = globs->LevelRequest[k];
@@ -1333,8 +1321,7 @@ after_parini(struct Control *globs, struct Variable *vars)
       lprintf(stderr);
       fprintf(stderr, "  Length of namelist:%4d bytes\n", (int) strlen(namelist));
 
-      for (i = 0; i < (int) strlen(namelist); i += 60)
-        fprintf(stderr, "  namelist[%02d]=%-60.60s\n", i, namelist + i);
+      for (i = 0; i < (int) strlen(namelist); i += 60) fprintf(stderr, "  namelist[%02d]=%-60.60s\n", i, namelist + i);
       lprintf(stderr);
     }
 
@@ -1577,8 +1564,7 @@ after_precntl(struct Control *globs, struct Variable *vars)
               iVertID = zaxisID;
               globs->NumLevelFound = numlevel;
               LevelFound = (double *) Malloc(globs->NumLevelFound * sizeof(double));
-              for (l = 0; l < globs->NumLevelFound; l++)
-                LevelFound[l] = (int) zaxisInqLevel(zaxisID, l);
+              for (l = 0; l < globs->NumLevelFound; l++) LevelFound[l] = (int) zaxisInqLevel(zaxisID, l);
 
               if (leveltype == ZAXIS_HYBRID)
                 {
@@ -2123,8 +2109,7 @@ after_processing(struct Control *globs, struct Variable *vars)
   after_setCodes(globs, vars, MaxCodes, globs->NumCodesRequest);
 
   if (globs->unitsel == 2)
-    for (i = 0; i < globs->NumLevelRequest; i++)
-      globs->LevelRequest[i] = globs->LevelRequest[i] * 1000;
+    for (i = 0; i < globs->NumLevelRequest; i++) globs->LevelRequest[i] = globs->LevelRequest[i] * 1000;
 
   if (!globs->AnalysisData)
     for (i = 0; i < globs->NumLevelRequest; i++)
@@ -2325,8 +2310,7 @@ afterburner(int argc, char *argv[])
   /* --------------------- */
   extern int labort_after;
 
-  while ((c = getopt(argc, argv, "P:b:v:acdgpVw")) != EOF)
-    switch (c)
+  while ((c = getopt(argc, argv, "P:b:v:acdgpVw")) != EOF) switch (c)
       {
       case 'a': globs->AnalysisData = 1; break;
       case 'b': Message("option -b not longer needed!"); break;
@@ -2368,8 +2352,7 @@ afterburner(int argc, char *argv[])
     }
 
   struct Variable vars[MaxCodes + 5];
-  for (code = 0; code < MaxCodes + 5; code++)
-    after_variable_init(&vars[code]);
+  for (code = 0; code < MaxCodes + 5; code++) after_variable_init(&vars[code]);
 
   after_parini(globs, vars); /* read namelist parameter */
 
@@ -2402,8 +2385,7 @@ afterburner(int argc, char *argv[])
       if (globs->Multi > 0) Error("Namelist parameter MULTI works only with one inputfile");
 
       ifiles = (char **) Malloc(globs->Nfiles * sizeof(char *));
-      for (i = 0; i < globs->Nfiles; i++)
-        ifiles[i] = argv[--fargcn];
+      for (i = 0; i < globs->Nfiles; i++) ifiles[i] = argv[--fargcn];
     }
 
   if (ofile2) fprintf(stdout, "Variance File: %-25s\n", ofile2);
@@ -2459,8 +2441,7 @@ Afterburner(void *process)
     }
 
   struct Variable vars[MaxCodes + 5];
-  for (int code = 0; code < MaxCodes + 5; code++)
-    after_variable_init(&vars[code]);
+  for (int code = 0; code < MaxCodes + 5; code++) after_variable_init(&vars[code]);
 
   after_parini(globs, vars); /* read namelist parameter */
 
@@ -2480,10 +2461,8 @@ Afterburner(void *process)
       if (globs->Multi > 0) Error("Namelist parameter MULTI works only with one inputfile");
 
       ifiles = (char **) Malloc(globs->Nfiles * sizeof(char *));
-      for (int i = 0; i < globs->Nfiles; ++i)
-        ifiles[i] = (char *) cdoGetStreamName(--nfiles).c_str();
-      for (int i = 0; i < globs->Nfiles; ++i)
-        printf("files %d %s\n", i + 1, ifiles[i]);
+      for (int i = 0; i < globs->Nfiles; ++i) ifiles[i] = (char *) cdoGetStreamName(--nfiles).c_str();
+      for (int i = 0; i < globs->Nfiles; ++i) printf("files %d %s\n", i + 1, ifiles[i]);
     }
 
   after_processing(globs, vars);
