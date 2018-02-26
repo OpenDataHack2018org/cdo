@@ -168,8 +168,8 @@ PstreamType::init()
   m_varlist = NULL;
 #ifdef HAVE_LIBPTHREAD
   pipe = NULL;
-//  pstreamptr->rthreadID  = 0;
-//  pstreamptr->wthreadID  = 0;
+  rthreadID  = 0;
+  wthreadID  = 0;
 #endif
 }
 PstreamType::PstreamType(int p_id) : self(p_id) { init(); }
