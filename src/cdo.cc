@@ -1962,6 +1962,7 @@ int main(int argc, char *argv[])
       close_library_handles();
 #else
       createProcesses(new_argv.size(),(const char**) &new_cargv[0] );
+      cdoValidateProcesses();
       runProcesses();
 #endif
       clearProcesses();
