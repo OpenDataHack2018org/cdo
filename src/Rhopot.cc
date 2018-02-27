@@ -45,30 +45,42 @@
 static double
 potrho_1(double t, double sal, double p)
 {
-  double r_a0 = 999.842594, r_a1 = 6.793952e-2, r_a2 = -9.095290e-3, r_a3 = 1.001685e-4, r_a4 = -1.120083e-6,
-         r_a5 = 6.536332e-9, r_b0 = 8.24493e-1, r_b1 = -4.0899e-3, r_b2 = 7.6438e-5, r_b3 = -8.2467e-7,
-         r_b4 = 5.3875e-9, r_c0 = -5.72466e-3, r_c1 = 1.0227e-4, r_c2 = -1.6546e-6, r_d0 = 4.8314e-4, r_e0 = 19652.21,
-         r_e1 = 148.4206, r_e2 = -2.327105, r_e3 = 1.360477e-2, r_e4 = -5.155288e-5, r_f0 = 54.6746, r_f1 = -0.603459,
-         r_f2 = 1.09987e-2, r_f3 = -6.1670e-5, r_g0 = 7.944e-2, r_g1 = 1.6483e-2, r_g2 = -5.3009e-4, r_h0 = 3.239908,
-         r_h1 = 1.43713e-3, r_h2 = 1.16092e-4, r_h3 = -5.77905e-7, r_ai0 = 2.2838e-3, r_ai1 = -1.0981e-5,
-         r_ai2 = -1.6078e-6, r_aj0 = 1.91075e-4, r_ak0 = 8.50935e-5, r_ak1 = -6.12293e-6, r_ak2 = 5.2787e-8,
+  // clang-format off
+  double r_a0 = 999.842594, r_a1 = 6.793952e-2, r_a2 = -9.095290e-3,
+         r_a3 = 1.001685e-4, r_a4 = -1.120083e-6, r_a5 = 6.536332e-9,
+         r_b0 = 8.24493e-1, r_b1 = -4.0899e-3, r_b2 = 7.6438e-5,
+         r_b3 = -8.2467e-7, r_b4 = 5.3875e-9,
+         r_c0 = -5.72466e-3, r_c1 = 1.0227e-4, r_c2 = -1.6546e-6,
+         r_d0 = 4.8314e-4,
+         r_e0 = 19652.21, r_e1 = 148.4206, r_e2 = -2.327105,
+         r_e3 = 1.360477e-2, r_e4 = -5.155288e-5,
+         r_f0 = 54.6746, r_f1 = -0.603459, r_f2 = 1.09987e-2,
+         r_f3 = -6.1670e-5,
+         r_g0 = 7.944e-2, r_g1 = 1.6483e-2, r_g2 = -5.3009e-4,
+         r_h0 = 3.239908, r_h1 = 1.43713e-3, r_h2 = 1.16092e-4,
+         r_h3 = -5.77905e-7,
+         r_ai0 = 2.2838e-3, r_ai1 = -1.0981e-5, r_ai2 = -1.6078e-6,
+         r_aj0 = 1.91075e-4,
+         r_ak0 = 8.50935e-5, r_ak1 = -6.12293e-6, r_ak2 = 5.2787e-8,
          r_am0 = -9.9348e-7, r_am1 = 2.0816e-8, r_am2 = 9.1697e-10;
 
   double s = MAX(sal, 0.0);
-  double s3h = sqrt(s * s * s);
+  double s3h = sqrt(s*s*s);
 
   double rho = (r_a0 + t * (r_a1 + t * (r_a2 + t * (r_a3 + t * (r_a4 + t * r_a5))))
-                + s * (r_b0 + t * (r_b1 + t * (r_b2 + t * (r_b3 + t * r_b4)))) + r_d0 * s * s
-                + s3h * (r_c0 + t * (r_c1 + r_c2 * t)))
-               / (1.
-                  - p
-                        / (p
-                               * (r_h0 + t * (r_h1 + t * (r_h2 + t * r_h3)) + s * (r_ai0 + t * (r_ai1 + r_ai2 * t))
-                                  + r_aj0 * s3h
-                                  + (r_ak0 + t * (r_ak1 + t * r_ak2) + s * (r_am0 + t * (r_am1 + t * r_am2))) * p)
-                           + r_e0 + t * (r_e1 + t * (r_e2 + t * (r_e3 + t * r_e4)))
-                           + s * (r_f0 + t * (r_f1 + t * (r_f2 + t * r_f3))) + s3h * (r_g0 + t * (r_g1 + r_g2 * t))));
-
+            + s * (r_b0 + t * (r_b1 + t * (r_b2 + t * (r_b3 + t * r_b4))))    
+            + r_d0 * s*s                 
+            + s3h * (r_c0 + t * (r_c1 + r_c2 * t)))                           
+           / (1.                                                            
+             - p / (p * (r_h0 + t * (r_h1 + t * (r_h2 + t * r_h3))            
+                         + s * (r_ai0 + t * (r_ai1 + r_ai2 * t))              
+                         + r_aj0 * s3h                                        
+                         + (r_ak0 + t * (r_ak1 + t * r_ak2)                   
+                         + s * (r_am0 + t * (r_am1 + t * r_am2))) * p)        
+                    + r_e0 + t * (r_e1 + t * (r_e2 + t * (r_e3 + t * r_e4)))  
+                    + s * (r_f0 + t * (r_f1 + t * (r_f2 + t * r_f3)))         
+                    + s3h * (r_g0 + t * (r_g1 + r_g2 * t))));
+  // clang-format on
   return rho;
 }
 
@@ -156,7 +168,6 @@ Rhopot(void *process)
   if (operatorArgc() == 1) pin = parameter2double(operatorArgv()[0]);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
-
   int vlistID1 = cdoStreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
@@ -176,12 +187,10 @@ Rhopot(void *process)
             code = 5;
           else if (strcmp(varname, "tho") == 0)
             code = 2;
-
           else if (strcmp(varname, "s") == 0)
             code = 5;
           else if (strcmp(varname, "t") == 0)
             code = 2;
-
           else if (strcmp(stdname, "sea_water_salinity") == 0)
             code = 5;
           else if (strcmp(stdname, "sea_water_potential_temperature") == 0)
@@ -221,17 +230,14 @@ Rhopot(void *process)
   cdoZaxisInqLevels(zaxisID, pressure);
 
   if (pin >= 0)
-    for (int i = 0; i < nlevel; ++i)
-      pressure[i] = pin;
+    for (int i = 0; i < nlevel; ++i) pressure[i] = pin;
   else
-    for (int i = 0; i < nlevel; ++i)
-      pressure[i] /= 10;
+    for (int i = 0; i < nlevel; ++i) pressure[i] /= 10;
 
   if (cdoVerbose)
     {
       cdoPrint("Level Pressure");
-      for (int i = 0; i < nlevel; ++i)
-        cdoPrint("%5d  %g", i + 1, pressure[i]);
+      for (int i = 0; i < nlevel; ++i) cdoPrint("%5d  %g", i + 1, pressure[i]);
     }
 
   field_init(&to);
