@@ -36,6 +36,7 @@
 #include "exception.h"
 #include "process_int.h"
 #include "pstream_int.h"
+#include "text.h"
 #include "util_files.h"
 #include "util_operatorStrings.h"
 
@@ -719,7 +720,10 @@ runProcesses()
           /*TEMP*/
           if (Options::silentMode == 0)
             {
-              std::cerr << idProcessPair.second.prompt<< ": Process started" << std::endl;
+              set_text_color(stderr, RESET, GREEN);
+              fprintf(stderr, "%s: ", idProcessPair.second.prompt);
+              reset_text_color(stderr);
+              std::cerr << "Process started" << std::endl;
             }
           idProcessPair.second.run();
         }
