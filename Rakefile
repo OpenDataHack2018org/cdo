@@ -278,7 +278,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                                  : @userConfig["remoteUser"]),
                           cc,
                           [config["dir"],cc,getBranchName].join(File::SEPARATOR),
-                          "./config/default CC=#{cc}",
+                          "autoreconf -v -i ; ./config/default CC=#{cc}",
                           config["hostname"] == 'localhost',
                          "builder on #{config['hostname']}, CC=#{cc}",
                           config.has_key?("envConfigFiles") ? config["envConfigFiles"] : [])
