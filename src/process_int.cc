@@ -383,11 +383,12 @@ createProcesses(int argc, const char **argv)
   setProcessNum(Process.size());
 }
 
-void cdoValidateProcesses()
+void
+cdoValidateProcesses()
 {
-    for(auto &process : Process)
+  for (auto &process : Process)
     {
-        process.second.checkStreamCnt();
+      process.second.checkStreamCnt();
     }
 }
 
@@ -435,7 +436,7 @@ cdoStreamOpenRead(int inStreamIDX)
   else
     {
       Cdo_Debug(CdoDebug::PROCESS, "Trying to open file: ", inStream->m_mfnames[0]);
-          inStream->pstreamOpenReadFile(inStream->m_mfnames[0].c_str());
+      inStream->pstreamOpenReadFile(inStream->m_mfnames[0].c_str());
     }
 
   return inStream->self;  // return ID
@@ -715,10 +716,13 @@ runProcesses()
     {
       if (idProcessPair.first != 0)
         {
-          std::cerr << "Started Process: " << idProcessPair.second.operatorName << std::endl;
+          /*TEMP*/
+          if (Options::silentMode == 0)
+            {
+              std::cerr << idProcessPair.second.prompt<< ": Process started" << std::endl;
+            }
           idProcessPair.second.run();
         }
     }
-  std::cerr << "Started Process: " << getProcess(0)->operatorName << std::endl;
   getProcess(0)->m_module.func(getProcess(0));
 }
