@@ -360,7 +360,6 @@ createProcesses(int argc, const char **argv)
           while (call_stack.top()->hasAllInputs() && call_stack.top() != root_process)
             {
               Cdo_Debug(CdoDebug::PROCESS, "Removing ", call_stack.top()->operatorName, " from stack");
-              call_stack.top()->checkStreamCnt();
               call_stack.pop();
             }
           currentProcess = call_stack.top();
@@ -377,12 +376,19 @@ createProcesses(int argc, const char **argv)
 
   while (!call_stack.empty())
     {
-      call_stack.top()->checkStreamCnt();
       call_stack.pop();
     }
   Cdo_Debug(CdoDebug::PROCESS, "== Process Creation End ==");
 
   setProcessNum(Process.size());
+}
+
+void cdoValidateProcesses()
+{
+    for(auto &process : Process)
+    {
+        process.second.checkStreamCnt();
+    }
 }
 
 void
@@ -429,7 +435,7 @@ cdoStreamOpenRead(int inStreamIDX)
   else
     {
       Cdo_Debug(CdoDebug::PROCESS, "Trying to open file: ", inStream->m_mfnames[0]);
-      inStream->pstreamOpenReadFile(inStream->m_mfnames[0].c_str());
+          inStream->pstreamOpenReadFile(inStream->m_mfnames[0].c_str());
     }
 
   return inStream->self;  // return ID

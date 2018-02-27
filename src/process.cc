@@ -42,11 +42,11 @@
 #include "pthread.h"
 #include "cdoDebugOutput.h"
 #include "util_string.h"
+#include "util_files.h"
 #include "text.h"
 #include "cdoOptions.h"
 #include <iostream>
 #include <string>
-
 
 ProcessType::ProcessType(int p_ID, const char *p_operatorName, const char *operatorCommand)
     : m_ID(p_ID), operatorName(p_operatorName)
@@ -162,20 +162,21 @@ ProcessType::checkStreamCnt(void)
       obase = TRUE;
     }
 
-  if (wantedStreamInCnt == -1 && wantedStreamOutCnt == -1) cdoAbort("I/O stream counts unlimited no allowed!");
+  if (wantedStreamInCnt == -1 && wantedStreamOutCnt == -1)
+    CdoError::Abort(Cdo::progname, "I/O stream counts unlimited no allowed!");
 
   // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n",
   // wantedStreamInCnt,wantedStreamOutCnt);
   if (wantedStreamInCnt == -1)
     {
       wantedStreamInCnt = m_streamCnt - wantedStreamOutCnt;
-      if (wantedStreamInCnt < 1) cdoAbort("Input streams missing!");
+      if (wantedStreamInCnt < 1) CdoError::Abort(Cdo::progname, "Input streams missing!");
     }
 
   if (wantedStreamOutCnt == -1)
     {
       wantedStreamOutCnt = m_streamCnt - wantedStreamInCnt;
-      if (wantedStreamOutCnt < 1) cdoAbort("Output streams missing!");
+      if (wantedStreamOutCnt < 1) CdoError::Abort(Cdo::progname, "Output streams missing!");
     }
   // printf(" wantedStreamInCnt,wantedStreamOutCnt %d %d\n",
   // wantedStreamInCnt,wantedStreamOutCnt);
@@ -184,16 +185,29 @@ ProcessType::checkStreamCnt(void)
   // printf(" streamCnt %d %d\n", m_streamCnt, streamCnt);
 
   if (m_streamCnt > streamCnt)
-    cdoAbort("Too many streams!"
-             " Operator needs %d input and %d output streams.",
-             wantedStreamInCnt, wantedStreamOutCnt);
+    CdoError::Abort(Cdo::progname,
+                    "Too many streams specified!"
+                    " Operator ",
+                    m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt,
+                    " output streams.");
 
   if (m_streamCnt < streamCnt && !obase)
-    cdoAbort("Too few streams specified!"
-             " Operator %s needs %d input and %d output streams.",
-             m_operatorCommand, wantedStreamInCnt, wantedStreamOutCnt);
+    CdoError::Abort(Cdo::progname,
+                    "Too few streams specified!"
+                    " Operator ",
+                    m_operatorCommand, " needs ", wantedStreamInCnt, " input and ", wantedStreamOutCnt,
+                    " output streams.");
 
   if (wantedStreamInCnt == 1 && streamInCnt0 == -1) return 1;
+
+  for (auto inStream : inputStreams)
+    {
+      if (!inStream->isPipe() && !fileExists(inStream->m_mfnames[0].c_str()))
+        {
+          CdoError::Abort(Cdo::progname, "Input file ", inStream->m_mfnames[0].c_str(), " of process ", operatorName,
+                          " does not exists");
+        }
+    }
 
   return 0;
 }
@@ -245,8 +259,7 @@ ProcessType::inqUserInputForOpArg(const char *enter)
             {
 
               pos = 0;
-              while (pline[pos] == ' ' || pline[pos] == ',')
-                pos++;
+              while (pline[pos] == ' ' || pline[pos] == ',') pos++;
               pline += pos;
               linelen = strlen(pline);
               if (linelen > 0)
@@ -257,8 +270,7 @@ ProcessType::inqUserInputForOpArg(const char *enter)
                       break;
                     }
                   len = 0;
-                  while (pline[len] != ' ' && pline[len] != ',' && pline[len] != '\\' && len < linelen)
-                    len++;
+                  while (pline[len] != ' ' && pline[len] != ',' && pline[len] != '\\' && len < linelen) len++;
 
                   m_oargv.push_back((char *) Malloc(len + 1));
                   memcpy(m_oargv[oargc], pline, len);
@@ -335,7 +347,7 @@ ProcessType::addFileOutStream(std::string file)
 {
   if (file[0] == '-')
     {
-      ERROR("Missing output file. Found an operator instead of filename: ", file);
+        CdoError::Abort(Cdo::progname, "Missing output file. Found an operator instead of filename: ", file);
     }
   outputStreams.push_back(create_pstream(file));
   m_streamCnt++;

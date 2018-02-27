@@ -205,4 +205,6 @@ void runProcesses();
 
 int cdoStreamInqTimestep(int pstreamID, int tsID);
 
+void cdoValidateProcesses();
+
 #endif
