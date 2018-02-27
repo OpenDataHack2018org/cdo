@@ -336,6 +336,7 @@ createProcesses(int argc, const char **argv)
       cntOutFiles = 1;
     }
 
+  lastAdded = root_process;
   if (idx < argc - cntOutFiles)
     {
       const char *argvEntry;
@@ -648,9 +649,8 @@ processInqPrompt(void)
   return process.inqPrompt();
 }
 
-extern "C"
-{
-  size_t getPeakRSS();
+extern "C" {
+size_t getPeakRSS();
 }
 
 void
