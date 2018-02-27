@@ -28,9 +28,8 @@
 #include "pstream_int.h"
 #include "cdoOptions.h"
 
-extern "C"
-{
-  int streamGrbInqDataScanningMode(void);
+extern "C" {
+int streamGrbInqDataScanningMode(void);
 }
 
 void *
@@ -43,7 +42,6 @@ Copy(void *process)
   int nrecs;
   int varID, levelID;
   size_t nmiss;
-  int ntsteps, nvars;
   void *array = NULL;
   par_io_t parIO;
 
@@ -55,7 +53,7 @@ Copy(void *process)
                 cdoOperatorAdd("copy",   0, 0, NULL);
   int SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
   int SZIP    = cdoOperatorAdd("szip",   0, 0, NULL);
-  // clang-format on
+// clang-format on
 
 #ifdef HIRLAM_EXTENSIONS
   // KEEP in mind the difference between copy and selall with respect to
@@ -89,14 +87,12 @@ Copy(void *process)
 
       if (indf == 0)
         {
-          streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-
           vlistID2 = vlistDuplicate(vlistID1);
           taxisID2 = taxisDuplicate(taxisID1);
           vlistDefTaxis(vlistID2, taxisID2);
 
-          ntsteps = vlistNtsteps(vlistID1);
-          nvars = vlistNvars(vlistID1);
+          int ntsteps = vlistNtsteps(vlistID1);
+          int nvars = vlistNvars(vlistID1);
 
           if (ntsteps == 1)
             {
@@ -109,23 +105,20 @@ Copy(void *process)
           if (ntsteps == 0 && nfiles > 1)
             {
               lconstvars = false;
-              for (varID = 0; varID < nvars; ++varID)
-                vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
+              for (varID = 0; varID < nvars; ++varID) vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
             }
 
-          pstreamDefVlist(streamID2, vlistID2);
-
-          size_t gridsize = vlistGridsizeMax(vlistID1);
+          size_t gridsizemax = vlistGridsizeMax(vlistID1);
           if (CDO_Memtype == MEMTYPE_FLOAT)
-            array = Malloc(gridsize * sizeof(float));
+            array = Malloc(gridsizemax * sizeof(float));
           else
-            array = Malloc(gridsize * sizeof(double));
+            array = Malloc(gridsizemax * sizeof(double));
 
           if (cdoParIO)
             {
               fprintf(stderr, "Parallel reading enabled!\n");
-              parIO.array = (double *) Malloc(gridsize * sizeof(double));
-              parIO.array_size = gridsize;
+              parIO.array = (double *) Malloc(gridsizemax * sizeof(double));
+              parIO.array_size = gridsizemax;
             }
         }
       else
@@ -137,6 +130,13 @@ Copy(void *process)
       while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
         {
           taxisCopyTimestep(taxisID2, taxisID1);
+
+          if (streamID2 == CDI_UNDEFID)
+            {
+              streamID2 = cdoStreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+              pstreamDefVlist(streamID2, vlistID2);
+            }
+
           pstreamDefTimestep(streamID2, tsID2);
 
           for (int recID = 0; recID < nrecs; recID++)

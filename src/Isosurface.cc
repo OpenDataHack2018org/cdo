@@ -65,15 +65,11 @@ isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, field_t
 void *
 Isosurface(void *process)
 {
-  int nlevel = 0;
   int nrecs;
-  int gridID;
-  int i, offset;
+  int i;
   int varID, levelID;
-  size_t nmiss;
   int zaxisID, zaxisID1 = -1;
-  double missval;
-  double *single;
+  size_t nmiss;
 
   cdoInitialize(process);
 
@@ -95,6 +91,7 @@ Isosurface(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nzaxis = vlistNzaxis(vlistID1);
+  int nlevel = 0;
   for (i = 0; i < nzaxis; i++)
     {
       zaxisID = vlistZaxis(vlistID1, i);
@@ -106,40 +103,38 @@ Isosurface(void *process)
             break;
           }
     }
-
   if (i == nzaxis) cdoAbort("No processable variable found!");
 
   int nlev1 = nlevel;
-  double *lev1 = (double *) Malloc(nlev1 * sizeof(double));
-  cdoZaxisInqLevels(zaxisID1, lev1);
+  std::vector<double> lev1(nlev1);
+  cdoZaxisInqLevels(zaxisID1, &lev1[0]);
 
   int zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
   for (i = 0; i < nzaxis; i++)
     if (zaxisID1 == vlistZaxis(vlistID1, i)) vlistChangeZaxisIndex(vlistID2, i, zaxisIDsfc);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-
   pstreamDefVlist(streamID2, vlistID2);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
-  field.ptr = (double *) Malloc(gridsize * sizeof(double));
+  field.ptr = (double *) Malloc(gridsizemax * sizeof(double));
 
   int nvars = vlistNvars(vlistID1);
 
-  bool *liso = (bool *) Malloc(nvars * sizeof(bool));
-  int *vars = (int *) Malloc(nvars * sizeof(int));
-  field_type *vars1 = (field_type *) Malloc(nvars * sizeof(field_type));
+  std::vector<bool> liso(nvars);
+  std::vector<bool> vars(nvars);
+  std::vector<field_type> vars1(nvars);
 
   for (varID = 0; varID < nvars; varID++)
     {
-      gridID = vlistInqVarGrid(vlistID1, varID);
-      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel = zaxisInqSize(zaxisID);
-      missval = vlistInqVarMissval(vlistID1, varID);
+      int gridID = vlistInqVarGrid(vlistID1, varID);
+      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      size_t gridsize = gridInqSize(gridID);
+      int nlevel = zaxisInqSize(zaxisID);
+      double missval = vlistInqVarMissval(vlistID1, varID);
 
       liso[varID] = (zaxisID == zaxisID1);
 
@@ -155,48 +150,47 @@ Isosurface(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       pstreamDefTimestep(streamID2, tsID);
 
       for (varID = 0; varID < nvars; varID++)
         {
-          vars[varID] = FALSE;
+          vars[varID] = false;
           vars1[varID].nmiss = 0;
         }
 
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-          offset = gridsize * levelID;
-          single = vars1[varID].ptr + offset;
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t offset = gridsize * levelID;
+          double *single = vars1[varID].ptr + offset;
 
           pstreamReadRecord(streamID1, single, &nmiss);
           vars1[varID].nmiss += nmiss;
-          vars[varID] = TRUE;
+          vars[varID] = true;
         }
 
       for (varID = 0; varID < nvars; varID++)
         {
           if (vars[varID])
             {
-              if (liso)
+              if (liso[varID])
                 {
-                  isosurface(isoval, nlev1, lev1, &vars1[varID], &field);
+                  isosurface(isoval, nlev1, &lev1[0], &vars1[varID], &field);
 
                   pstreamDefRecord(streamID2, varID, 0);
                   pstreamWriteRecord(streamID2, field.ptr, field.nmiss);
                 }
               else
                 {
-                  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-                  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-                  missval = vlistInqVarMissval(vlistID2, varID);
+                  size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+                  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+                  double missval = vlistInqVarMissval(vlistID2, varID);
 
                   for (levelID = 0; levelID < nlevel; levelID++)
                     {
-                      offset = gridsize * levelID;
-                      single = vars1[varID].ptr + offset;
+                      size_t offset = gridsize * levelID;
+                      double *single = vars1[varID].ptr + offset;
                       nmiss = arrayNumMV(gridsize, single, missval);
                       pstreamDefRecord(streamID2, varID, levelID);
                       pstreamWriteRecord(streamID2, single, nmiss);
@@ -208,13 +202,7 @@ Isosurface(void *process)
       tsID++;
     }
 
-  for (varID = 0; varID < nvars; varID++)
-    Free(vars1[varID].ptr);
-  Free(vars1);
-
-  Free(vars);
-  Free(liso);
-  if (lev1) Free(lev1);
+  for (varID = 0; varID < nvars; varID++) Free(vars1[varID].ptr);
 
   Free(field.ptr);
 
