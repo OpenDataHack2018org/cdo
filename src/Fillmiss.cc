@@ -443,12 +443,8 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   if (nv != nvals) cdoAbort("Internal problem, number of valid values differ!");
 
-  // mask at nearest neighbors
-  VECTOR_2D(uint8_t, nbr_mask, Threading::ompNumThreads, numNeighbors);
-  // source address at nearest neighbors
-  VECTOR_2D(size_t, nbr_add, Threading::ompNumThreads, numNeighbors);
-  // angular distance four nearest neighbors
-  VECTOR_2D(double, nbr_dist, Threading::ompNumThreads, numNeighbors);
+  std::vector<nbrWeightsType> nbrWeights;
+  for ( int i = 0; i < Threading::ompNumThreads; ++i ) nbrWeights.push_back(nbrWeightsType(numNeighbors));
 
   clock_t start, finish;
   start = clock();
@@ -474,7 +470,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex)  shared(nbr_mask, nbr_add, nbr_dist)  \
+#pragma omp parallel for default(none)  reduction(+:findex)  shared(nbrWeights)  \
   shared(mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
 #endif
   for (size_t i = 0; i < nmiss; ++i)
@@ -484,21 +480,19 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      grid_search_nbr(gs, numNeighbors, &nbr_add[ompthID][0], &nbr_dist[ompthID][0], xvals[mindex[i]],
+      grid_search_nbr(gs, numNeighbors, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0], xvals[mindex[i]],
                       yvals[mindex[i]]);
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
-      double dist_tot
-          = nbr_compute_weights(numNeighbors, NULL, &nbr_mask[ompthID][0], &nbr_add[ompthID][0], &nbr_dist[ompthID][0]);
+      double dist_tot = nbrWeights[ompthID].compute_weights(NULL);
 
       /* Normalize weights and store the link */
-      size_t nadds = nbr_normalize_weights(numNeighbors, dist_tot, &nbr_mask[ompthID][0], &nbr_add[ompthID][0],
-                                           &nbr_dist[ompthID][0]);
+      size_t nadds = nbrWeights[ompthID].normalize_weights(dist_tot);
       if (nadds)
         {
           double result = 0;
           for (size_t n = 0; n < nadds; ++n)
-            result += array1[vindex[nbr_add[ompthID][n]]] * nbr_dist[ompthID][n];
+            result += array1[vindex[nbrWeights[ompthID].m_add[n]]] * nbrWeights[ompthID].m_dist[n];
           array2[mindex[i]] = result;
         }
     }

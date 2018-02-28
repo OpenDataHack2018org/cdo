@@ -168,8 +168,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
       size_t nadds = gridsearch_knn(gs, knn[ompthID], xvals[i], yvals[i]);
 
-      // Compute weights based on inverse distance if mask is false, eliminate
-      // those points
+      // Compute weights based on inverse distance if mask is false, eliminate those points
       double dist_tot
           = smooth_knn_compute_weights(nadds, mask, knn[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
 
