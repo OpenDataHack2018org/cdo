@@ -130,7 +130,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
-  struct gsknn **knn = (struct gsknn **) Malloc(Threading::ompNumThreads * sizeof(struct gsknn *));
+  gsknn **knn = ( gsknn **) Malloc(Threading::ompNumThreads * sizeof( gsknn *));
+  //std::vector<gsknn *> knn(Threading::ompNumThreads);
   for (int i = 0; i < Threading::ompNumThreads; i++)
     knn[i] = gridsearch_knn_new(numNeighbors);
 

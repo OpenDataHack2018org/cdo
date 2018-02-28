@@ -383,8 +383,7 @@ fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
   Free(matrix1);
 }
 
-int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist,
-                    double plon, double plat);
+int grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat);
 
 static void
 setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
@@ -480,19 +479,15 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      grid_search_nbr(gs, numNeighbors, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0], xvals[mindex[i]],
-                      yvals[mindex[i]]);
+      grid_search_nbr(gs, nbrWeights[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
 
-      /* Compute weights based on inverse distance if mask is false, eliminate those points */
-      double dist_tot = nbrWeights[ompthID].compute_weights(NULL);
-
-      /* Normalize weights and store the link */
-      size_t nadds = nbrWeights[ompthID].normalize_weights(dist_tot);
+      // Compute weights based on inverse distance if mask is false, eliminate those points
+      size_t nadds = nbrWeights[ompthID].compute_weights();
       if (nadds)
         {
           double result = 0;
           for (size_t n = 0; n < nadds; ++n)
-            result += array1[vindex[nbrWeights[ompthID].m_add[n]]] * nbrWeights[ompthID].m_dist[n];
+            result += array1[vindex[nbrWeights[ompthID].m_addr[n]]] * nbrWeights[ompthID].m_dist[n];
           array2[mindex[i]] = result;
         }
     }

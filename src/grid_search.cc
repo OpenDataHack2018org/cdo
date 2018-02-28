@@ -772,12 +772,14 @@ gridsearch_knn_new(size_t size)
   struct gsknn *knn = (struct gsknn *) Malloc(sizeof(struct gsknn));
 
   knn->ndist = size;
+  knn->tmpadd = NULL;
+  knn->tmpdist = NULL;
+
+  //knn->nbrWeights.init(size);
   knn->size = size;
   knn->mask = (bool *) Malloc(size * sizeof(bool));      // mask at nearest neighbors
   knn->add = (size_t *) Malloc(size * sizeof(size_t));   // source address at nearest neighbors
   knn->dist = (double *) Malloc(size * sizeof(double));  // angular distance of the nearest neighbors
-  knn->tmpadd = NULL;
-  knn->tmpdist = NULL;
 
   gridsearch_knn_init(knn);
 

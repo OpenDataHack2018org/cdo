@@ -54,8 +54,7 @@ distance(const double *restrict a, const double *restrict b) noexcept
 
 #define MAX_SEARCH_CELLS 25
 static void
-grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist,
-                      double plon, double plat)
+grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat)
 {
   /*
     Output variables:
@@ -68,6 +67,11 @@ grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *restri
     double plat,         ! latitude  of the search point
     double plon,         ! longitude of the search point
   */
+
+  size_t numNeighbors = nbrWeights.numNeighbors();
+  size_t *restrict nbr_add = &nbrWeights.m_addr[0];
+  double *restrict nbr_dist = &nbrWeights.m_dist[0];
+  
   size_t src_add[MAX_SEARCH_CELLS];
   size_t *src_add_tmp = NULL;
   size_t *psrc_add = src_add;
@@ -124,11 +128,8 @@ grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *restri
     }
 
   // Initialize distance and address arrays
-  for (size_t n = 0; n < numNeighbors; ++n)
-    {
-      nbr_add[n] = SIZE_MAX;
-      nbr_dist[n] = BIGNUM;
-    }
+  nbrWeights.init_addr();
+  nbrWeights.init_dist();
 
   if (lfound)
     {
@@ -155,13 +156,12 @@ grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *restri
           double dist = (float) distance(query_pt, xyz);
           if (dist <= search_radius)
             {
-              // Store the address and distance if this is one of the smallest
-              // so far
-              nbr_store_distance(nadd, sqrt(dist), numNeighbors, nbr_add, nbr_dist);
+              // Store the address and distance if this is one of the smallest so far
+              nbrWeights.store_distance(nadd, sqrt(dist), numNeighbors);
             }
         }
 
-      nbr_check_distance(numNeighbors, nbr_add, nbr_dist);
+      nbrWeights.check_distance(numNeighbors);
     }
   else if (gs->extrapolate)
     {
@@ -192,8 +192,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, size_t numNeighbors, size_t *restri
 }  // grid_search_nbr_reg2d
 
 int
-grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist,
-                double plon, double plat)
+grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat)
 {
   /*
     Output variables:
@@ -207,9 +206,11 @@ grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr
     double plon,         ! longitude of the search point
   */
 
+  size_t numNeighbors = nbrWeights.numNeighbors();
+
   // Initialize distance and address arrays
-  for (size_t n = 0; n < numNeighbors; ++n) nbr_add[n] = SIZE_MAX;
-  for (size_t n = 0; n < numNeighbors; ++n) nbr_dist[n] = BIGNUM;
+  nbrWeights.init_addr();
+  nbrWeights.init_dist();
 
   size_t ndist = numNeighbors;
   // check some more points if distance is the same use the smaller index (nadd)
@@ -249,11 +250,11 @@ grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr
     }
 
   ndist = nadds;
-  size_t max_neighbors = (ndist < numNeighbors) ? ndist : numNeighbors;
+  size_t maxNeighbors = (ndist < numNeighbors) ? ndist : numNeighbors;
 
-  for (size_t i = 0; i < ndist; ++i) nbr_store_distance(adds[i], dist[i], max_neighbors, nbr_add, nbr_dist);
+  for (size_t i = 0; i < ndist; ++i) nbrWeights.store_distance(adds[i], dist[i], maxNeighbors);
 
-  nbr_check_distance(max_neighbors, nbr_add, nbr_dist);
+  nbrWeights.check_distance(maxNeighbors);
 
   if (numNeighbors > 16)
     {
@@ -261,9 +262,7 @@ grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr
       Free(adds);
     }
 
-  if (ndist > numNeighbors) ndist = numNeighbors;
-
-  return ndist;
+  return maxNeighbors;
 }  // grid_search_nbr
 
 //  This routine computes the inverse-distance weights for a nearest-neighbor
@@ -334,20 +333,18 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
 
       // Find nearest grid points on source grid and distances to each point
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        grid_search_nbr_reg2d(gs, numNeighbors, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0], plon, plat);
+        grid_search_nbr_reg2d(gs, nbrWeights[ompthID], plon, plat);
       else
-        grid_search_nbr(gs, numNeighbors, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0], plon, plat);
+        grid_search_nbr(gs, nbrWeights[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      double dist_tot = nbrWeights[ompthID].compute_weights(src_grid->mask);
-
-      // Normalize weights and store the link
-      size_t nadds = nbrWeights[ompthID].normalize_weights(dist_tot);
+      size_t nadds = nbrWeights[ompthID].compute_weights(src_grid->mask);
 
       for (size_t n = 0; n < nadds; ++n)
         if (nbrWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = ONE;
 
-      store_weightlinks(0, nadds, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0], tgt_cell_add, &weightlinks[0]);
+      // Store the link
+      store_weightlinks(0, nadds, &nbrWeights[ompthID].m_addr[0], &nbrWeights[ompthID].m_dist[0], tgt_cell_add, &weightlinks[0]);
     }
 
   progressStatus(0, 1, 1);
@@ -431,19 +428,16 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
       // Find nearest grid points on source grid and distances to each point
       if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        grid_search_nbr_reg2d(gs, numNeighbors, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0], plon, plat);
+        grid_search_nbr_reg2d(gs, nbrWeights[ompthID], plon, plat);
       else
-        grid_search_nbr(gs, numNeighbors, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0], plon, plat);
+        grid_search_nbr(gs, nbrWeights[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      double dist_tot = nbrWeights[ompthID].compute_weights(src_grid->mask);
+      size_t nadds = nbrWeights[ompthID].compute_weights(src_grid->mask);
 
-      // Normalize weights and store the link
-      size_t nadds = nbrWeights[ompthID].normalize_weights(dist_tot);
+      if (nadds > 1) sort_add_and_wgts(nadds, &nbrWeights[ompthID].m_addr[0], &nbrWeights[ompthID].m_dist[0]);
 
-      if (nadds > 1) sort_add_and_wgts(nadds, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0]);
-
-      if (nadds) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, &nbrWeights[ompthID].m_dist[0], &nbrWeights[ompthID].m_add[0]);
+      if (nadds) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, &nbrWeights[ompthID].m_dist[0], &nbrWeights[ompthID].m_addr[0]);
     }
 
   progressStatus(0, 1, 1);
@@ -570,18 +564,15 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
       //   grid_search_nbr_reg2d(gs, numNeighbors, nbr_add[ompthID],
       //   nbr_dist[ompthID], plon, plat);
       // else
-      grid_search_nbr(gs, numNeighbors, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0], plon, plat);
+      grid_search_nbr(gs, nbrWeights[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      double dist_tot = nbrWeights[ompthID].compute_weights(src_mask);
+      size_t nadds = nbrWeights[ompthID].compute_weights(src_mask);
 
-      // Normalize weights and store the link
-      size_t nadds = nbrWeights[ompthID].normalize_weights(dist_tot);
-
-      if (nadds > 1) sort_add_and_wgts(nadds, &nbrWeights[ompthID].m_add[0], &nbrWeights[ompthID].m_dist[0]);
+      if (nadds > 1) sort_add_and_wgts(nadds, &nbrWeights[ompthID].m_addr[0], &nbrWeights[ompthID].m_dist[0]);
 
       if (nadds)
-        distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, &nbrWeights[ompthID].m_dist[0], &nbrWeights[ompthID].m_add[0]);
+        distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, &nbrWeights[ompthID].m_dist[0], &nbrWeights[ompthID].m_addr[0]);
       else
         nmiss++;
     }

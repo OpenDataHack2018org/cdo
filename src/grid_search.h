@@ -18,6 +18,7 @@
 #define GRID_SEARCH_H_
 
 #include <stdbool.h>
+#include "nbr_weights.h"
 
 #define GS_NOT_FOUND SIZE_MAX
 
@@ -56,12 +57,14 @@ struct gridsearch
 struct gsknn
 {
   size_t ndist;
+  size_t *tmpadd;
+  double *tmpdist;
+
+  //nbrWeightsType nbrWeights;
   size_t size;
   bool *mask;
   size_t *add;
-  size_t *tmpadd;
   double *dist;
-  double *tmpdist;
 };
 
 struct gsknn *gridsearch_knn_new(size_t size);

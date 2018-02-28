@@ -315,8 +315,7 @@ read_coordinates(const char *filename, long n, double *lon, double *lat, int nv,
   streamClose(streamID);
 }
 
-int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist,
-                    double plon, double plat);
+int grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat);
 
 int find_coordinate_to_ignore(double *cell_corners_xyz);
 double calculate_the_polygon_area(double cell_corners[], int number_corners);
@@ -335,8 +334,8 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
   dims[0] = ncells1;
   dims[1] = 0;
   struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, ncells1, grid_center_lon1, grid_center_lat1);
-  size_t nbr_add[MAX_SEARCH];   // source address at nearest neighbors
-  double nbr_dist[MAX_SEARCH];  // angular distance four nearest neighbors
+  nbrWeightsType nbrWeights(MAX_SEARCH);
+  size_t *nbr_addr = &nbrWeights.m_addr[0];
 
   int ncorner = 3;
   double corner_coordinates[3];
@@ -408,12 +407,12 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
       if (invert_result) is_clockwise = !is_clockwise;
       if (is_clockwise) continue;
 
-      grid_search_nbr(gs, MAX_SEARCH, nbr_add, nbr_dist, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
+      grid_search_nbr(gs, nbrWeights, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
       int k = 0;
 
       for (int i = 0; i < MAX_SEARCH; ++i)
         {
-          size_t cell_no1 = nbr_add[i];
+          size_t cell_no1 = nbr_addr[i];
           if (cell_no1 < SIZE_MAX)
             {
               LLtoXYZ(grid_center_lon1[cell_no1], grid_center_lat1[cell_no1], center_point_xyz);
