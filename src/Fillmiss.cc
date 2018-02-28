@@ -28,6 +28,7 @@
 #include "grid.h"
 #include "grid_search.h"
 #include "cdoOptions.h"
+#include "nbr_weights.h"
 
 extern "C"
 {
@@ -384,10 +385,6 @@ fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
 
 int grid_search_nbr(struct gridsearch *gs, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist,
                     double plon, double plat);
-double nbr_compute_weights(size_t numNeighbors, const int *restrict src_grid_mask, uint8_t *restrict nbr_mask,
-                           const size_t *restrict nbr_add, double *restrict nbr_dist);
-size_t nbr_normalize_weights(size_t numNeighbors, double dist_tot, const uint8_t *restrict nbr_mask,
-                             size_t *restrict nbr_add, double *restrict nbr_dist);
 
 static void
 setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
@@ -490,8 +487,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
       grid_search_nbr(gs, numNeighbors, &nbr_add[ompthID][0], &nbr_dist[ompthID][0], xvals[mindex[i]],
                       yvals[mindex[i]]);
 
-      /* Compute weights based on inverse distance if mask is false, eliminate
-       * those points */
+      /* Compute weights based on inverse distance if mask is false, eliminate those points */
       double dist_tot
           = nbr_compute_weights(numNeighbors, NULL, &nbr_mask[ompthID][0], &nbr_add[ompthID][0], &nbr_dist[ompthID][0]);
 

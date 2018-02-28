@@ -22,38 +22,23 @@
 static int
 cmp_adds(const void *s1, const void *s2)
 {
-  int cmp = 0;
   const addweight_t *c1 = (const addweight_t *) s1;
   const addweight_t *c2 = (const addweight_t *) s2;
-
-  if (c1->add < c2->add)
-    cmp = -1;
-  else if (c1->add > c2->add)
-    cmp = 1;
-
-  return cmp;
+  return (c1->add < c2->add) ? -1 : ((c1->add > c2->add) ? 1 : 0);
 }
 
 static int
 cmp_adds4(const void *s1, const void *s2)
 {
-  int cmp = 0;
   const addweight4_t *c1 = (const addweight4_t *) s1;
   const addweight4_t *c2 = (const addweight4_t *) s2;
-
-  if (c1->add < c2->add)
-    cmp = -1;
-  else if (c1->add > c2->add)
-    cmp = 1;
-
-  return cmp;
+  return (c1->add < c2->add) ? -1 : ((c1->add > c2->add) ? 1 : 0);
 }
 
 static void
 sort_addweights(size_t num_weights, addweight_t *addweights)
 {
   size_t n;
-
   for (n = 1; n < num_weights; ++n)
     if (addweights[n].add < addweights[n - 1].add) break;
   if (n == num_weights) return;
@@ -65,7 +50,6 @@ static void
 sort_addweights4(size_t num_weights, addweight4_t *addweights)
 {
   size_t n;
-
   for (n = 1; n < num_weights; ++n)
     if (addweights[n].add < addweights[n - 1].add) break;
   if (n == num_weights) return;
@@ -77,7 +61,6 @@ void
 sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts)
 {
   size_t n;
-
   for (n = 1; n < num_weights; ++n)
     if (src_add[n] < src_add[n - 1]) break;
   if (n == num_weights) return;
@@ -106,7 +89,6 @@ void
 sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
 {
   size_t n;
-
   for (n = 1; n < num_weights; ++n)
     if (src_add[n] < src_add[n - 1]) break;
   if (n == num_weights) return;
