@@ -48,7 +48,6 @@ get_timestat_date(int *tstat_date)
       if (env_date >= 0)
         {
           *tstat_date = env_date;
-
           if (cdoVerbose) cdoPrint("Set CDO_TIMESTAT_DATE to %s", envstr);
         }
     }
@@ -75,9 +74,7 @@ dtlist_type *
 dtlist_new(void)
 {
   dtlist_type *dtlist = (dtlist_type *) Malloc(sizeof(dtlist_type));
-
   dtlist_init(dtlist);
-
   return dtlist;
 }
 
@@ -85,7 +82,6 @@ void
 dtlist_delete(dtlist_type *dtlist)
 {
   if (dtlist->nalloc > 0 && dtlist->dtinfo) Free(dtlist->dtinfo);
-
   Free(dtlist);
 }
 

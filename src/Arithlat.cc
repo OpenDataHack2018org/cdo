@@ -31,13 +31,12 @@
 void *
 Arithlat(void *process)
 {
-  int gridtype;
   int gridID0 = -1;
   int nrecs;
   int varID, levelID;
   size_t nmiss;
   char units[CDI_MAX_NAME];
-  double *scale = NULL;
+  std::vector<double> scale;
 
   cdoInitialize(process);
 
@@ -59,9 +58,8 @@ Arithlat(void *process)
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-
-  double *array = (double *) Malloc(gridsize * sizeof(double));
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  std::vector<double> array(gridsizemax);
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
@@ -73,15 +71,16 @@ Arithlat(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array, &nmiss);
+          pstreamReadRecord(streamID1, &array[0], &nmiss);
 
           int gridID = vlistInqVarGrid(vlistID1, varID);
+          size_t gridsize = 0;
 
           if (gridID != gridID0)
             {
               gridID0 = gridID;
 
-              gridtype = gridInqType(gridID);
+              int gridtype = gridInqType(gridID);
               int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
               if (gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || projtype == CDI_PROJ_LCC)
                 {
@@ -98,8 +97,7 @@ Arithlat(void *process)
               else
                 {
                   if (gridtype == GRID_GAUSSIAN_REDUCED)
-                    cdoAbort("Unsupported grid type: %s, use CDO option -R to "
-                             "convert reduced to regular grid!",
+                    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
                              gridNamePtr(gridtype));
                   else
                     cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
@@ -107,14 +105,14 @@ Arithlat(void *process)
 
               gridsize = gridInqSize(gridID);
 
-              scale = (double *) Realloc(scale, gridsize * sizeof(double));
-              gridInqYvals(gridID, scale);
+              scale.resize(gridsize);
+              gridInqYvals(gridID, &scale[0]);
 
               /* Convert lat/lon units if required */
 
               gridInqXunits(gridID, units);
 
-              grid_to_radian(units, gridsize, scale, "grid latitudes");
+              grid_to_radian(units, gridsize, &scale[0], "grid latitudes");
 
               if (operfunc == func_mul)
                 for (size_t i = 0; i < gridsize; ++i)
@@ -132,7 +130,7 @@ Arithlat(void *process)
             array[i] *= scale[i];
 
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, array, nmiss);
+          pstreamWriteRecord(streamID2, &array[0], nmiss);
         }
 
       tsID++;
@@ -140,9 +138,6 @@ Arithlat(void *process)
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);
-
-  if (array) Free(array);
-  if (scale) Free(scale);
 
   cdoFinish();
 

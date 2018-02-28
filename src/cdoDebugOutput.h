@@ -127,7 +127,7 @@ void
 Abort(const char *progname, T &&... args)
 {
   std::stringstream message;
-  message << progname << " (Abort): ";
+  message << "\n" << progname << " (Abort): ";
   CdoLog::expand(message, args...);
   CdoDebug::printError(message, true);
   if (CdoError::_ExitOnError)
