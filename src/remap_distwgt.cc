@@ -366,6 +366,7 @@ distwgt_remap(double *restrict tgt_point, const double *restrict src_array, size
   
   if (nadds)
     {
+      if (nadds > 1) sort_add_and_wgts(nadds, nbr_addr, nbr_dist);
       *tgt_point = src_array[nbr_addr[0]] * nbr_dist[0];
       for (size_t n = 1; n < nadds; ++n) *tgt_point += src_array[nbr_addr[n]] * nbr_dist[n];
     }
@@ -439,9 +440,6 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = nbrWeights[ompthID].compute_weights(src_grid->mask);
-
-      if (nadds > 1) sort_add_and_wgts(nadds, &nbrWeights[ompthID].m_addr[0], &nbrWeights[ompthID].m_dist[0]);
-
       if (nadds) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbrWeights[ompthID]);
     }
 
@@ -573,9 +571,6 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = nbrWeights[ompthID].compute_weights(src_mask);
-
-      if (nadds > 1) sort_add_and_wgts(nadds, &nbrWeights[ompthID].m_addr[0], &nbrWeights[ompthID].m_dist[0]);
-
       if (nadds)
         distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbrWeights[ompthID]);
       else
