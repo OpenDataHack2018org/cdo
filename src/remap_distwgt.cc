@@ -359,11 +359,16 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
 }  // remap_distwgt_weights
 
 static void
-distwgt_remap(double *restrict tgt_point, const double *restrict src_array, size_t nadds, const double wgts[4],
-              const size_t src_add[4])
+distwgt_remap(double *restrict tgt_point, const double *restrict src_array, size_t nadds, nbrWeightsType &nbrWeights)
 {
-  if (nadds) *tgt_point = src_array[src_add[0]] * wgts[0];
-  for (size_t n = 1; n < nadds; ++n) *tgt_point += src_array[src_add[n]] * wgts[n];
+  size_t *restrict nbr_addr = &nbrWeights.m_addr[0];
+  double *restrict nbr_dist = &nbrWeights.m_dist[0];
+  
+  if (nadds)
+    {
+      *tgt_point = src_array[nbr_addr[0]] * nbr_dist[0];
+      for (size_t n = 1; n < nadds; ++n) *tgt_point += src_array[nbr_addr[n]] * nbr_dist[n];
+    }
 }
 
 void
@@ -437,7 +442,7 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
       if (nadds > 1) sort_add_and_wgts(nadds, &nbrWeights[ompthID].m_addr[0], &nbrWeights[ompthID].m_dist[0]);
 
-      if (nadds) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, &nbrWeights[ompthID].m_dist[0], &nbrWeights[ompthID].m_addr[0]);
+      if (nadds) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbrWeights[ompthID]);
     }
 
   progressStatus(0, 1, 1);
@@ -572,7 +577,7 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
       if (nadds > 1) sort_add_and_wgts(nadds, &nbrWeights[ompthID].m_addr[0], &nbrWeights[ompthID].m_dist[0]);
 
       if (nadds)
-        distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, &nbrWeights[ompthID].m_dist[0], &nbrWeights[ompthID].m_addr[0]);
+        distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbrWeights[ompthID]);
       else
         nmiss++;
     }

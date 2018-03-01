@@ -19,7 +19,7 @@ class nbrWeightsType
 
  public:
   std::vector<uint8_t> m_mask; // mask at nearest neighbors
-  std::vector<size_t> m_addr;   // source address at nearest neighbors
+  std::vector<size_t> m_addr;  // source address at nearest neighbors
   std::vector<double> m_dist;  // angular distance four nearest neighbors
 
   inline void init(size_t numNeighbors)
@@ -148,8 +148,5 @@ class nbrWeightsType
     return normalize_weights(dist_tot);
   }
 };
-
-void nbr_store_distance(size_t nadd, double distance, size_t numNeighbors, size_t *restrict nbr_add, double *restrict nbr_dist);
-void nbr_check_distance(size_t numNeighbors, const size_t *restrict nbr_add, double *restrict nbr_dist);
 
 #endif
