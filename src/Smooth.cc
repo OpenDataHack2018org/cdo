@@ -51,10 +51,10 @@ typedef struct
 double intlin(double x, double y1, double x1, double y2, double x2);
 
 double
-smooth_knn_compute_weights(size_t numNeighbors, const bool *restrict src_grid_mask, struct gsknn *knn,
+smooth_knn_compute_weights(size_t numNeighbors, const uint8_t *restrict src_grid_mask, struct gsknn *knn,
                            double search_radius, double weight0, double weightR)
 {
-  bool *restrict nbr_mask = knn->mask;
+  uint8_t *restrict nbr_mask = knn->mask;
   const size_t *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
@@ -79,7 +79,7 @@ smooth_knn_compute_weights(size_t numNeighbors, const bool *restrict src_grid_ma
 size_t
 smooth_knn_normalize_weights(size_t numNeighbors, double dist_tot, struct gsknn *knn)
 {
-  const bool *restrict nbr_mask = knn->mask;
+  const uint8_t *restrict nbr_mask = knn->mask;
   size_t *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
@@ -108,7 +108,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   size_t numNeighbors = spoint.maxpoints;
   if (numNeighbors > gridsize) numNeighbors = gridsize;
 
-  bool *mask = (bool *) Malloc(gridsize * sizeof(bool));
+  uint8_t *mask = (uint8_t *) Malloc(gridsize * sizeof(uint8_t));
   for (size_t i = 0; i < gridsize; ++i)
     mask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
@@ -213,7 +213,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 }
 
 static inline void
-smooth9_sum(size_t ij, bool *mask, double sfac, const double *restrict array, double *avg, double *divavg)
+smooth9_sum(size_t ij, uint8_t *mask, double sfac, const double *restrict array, double *avg, double *divavg)
 {
   if (mask[ij])
     {
@@ -230,7 +230,7 @@ smooth9(int gridID, double missval, const double *restrict array1, double *restr
   size_t nlat = gridInqYsize(gridID);
   int grid_is_cyclic = gridIsCircular(gridID);
 
-  bool *mask = (bool *) Malloc(gridsize * sizeof(bool));
+  uint8_t *mask = (uint8_t *) Malloc(gridsize * sizeof(uint8_t));
 
   for (size_t i = 0; i < gridsize; ++i)
     mask[i] = !DBL_IS_EQUAL(missval, array1[i]);

@@ -73,7 +73,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
   double *restrict nbr_dist = &nbrWeights.m_dist[0];
   
   size_t src_add[MAX_SEARCH_CELLS];
-  size_t *src_add_tmp = NULL;
+  std::vector<size_t> src_add_tmp;
   size_t *psrc_add = src_add;
   size_t num_add = 0;
   double *restrict src_center_lon = gs->reg2d_center_lon;
@@ -97,7 +97,11 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
       for (k = 3; k < 10000; k += 2)
         if (numNeighbors <= (k - 2) * (k - 2)) break;
 
-      if ((k * k) > MAX_SEARCH_CELLS) psrc_add = src_add_tmp = (size_t *) Malloc(k * k * sizeof(size_t));
+      if ((k * k) > MAX_SEARCH_CELLS)
+        {
+          src_add_tmp.resize(k * k);
+          psrc_add = &src_add_tmp[0];
+        }
 
       k /= 2;
 
@@ -187,8 +191,6 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
       if (search_result >= 0)
         for (size_t n = 0; n < numNeighbors; ++n) nbr_add[n] = SIZE_MAX;
     }
-
-  if (src_add_tmp) Free(src_add_tmp);
 }  // grid_search_nbr_reg2d
 
 int

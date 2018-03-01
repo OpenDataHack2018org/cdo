@@ -60,9 +60,9 @@ struct gsknn
   size_t *tmpadd;
   double *tmpdist;
 
-  //nbrWeightsType nbrWeights;
+  nbrWeightsType nbrWeights;
   size_t size;
-  bool *mask;
+  uint8_t *mask;
   size_t *add;
   double *dist;
 };

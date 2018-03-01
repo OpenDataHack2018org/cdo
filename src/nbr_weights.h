@@ -28,6 +28,7 @@ class nbrWeightsType
       m_mask.resize(m_numNeighbors);
       m_addr.resize(m_numNeighbors);
       m_dist.resize(m_numNeighbors);
+      // printf("%p %p %p\n", &m_mask[0], &m_addr[0], &m_dist[0]);
     }
 
   nbrWeightsType(size_t numNeighbors)
@@ -50,7 +51,7 @@ class nbrWeightsType
       for (size_t i = 0; i < m_numNeighbors; ++i) m_dist[i] = DBL_MAX;
     }
 
- inline void store_distance(size_t addr, double distance, size_t numNeighbors)
+  inline void store_distance(size_t addr, double distance, size_t numNeighbors)
   {
     assert(numNeighbors <= m_numNeighbors);
     if (numNeighbors == 1)

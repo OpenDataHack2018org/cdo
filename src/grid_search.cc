@@ -777,11 +777,13 @@ gridsearch_knn_new(size_t size)
 
   //knn->nbrWeights.init(size);
   knn->size = size;
-  knn->mask = (bool *) Malloc(size * sizeof(bool));      // mask at nearest neighbors
+  knn->mask = (uint8_t *) Malloc(size * sizeof(uint8_t));      // mask at nearest neighbors
   knn->add = (size_t *) Malloc(size * sizeof(size_t));   // source address at nearest neighbors
   knn->dist = (double *) Malloc(size * sizeof(double));  // angular distance of the nearest neighbors
-
-  gridsearch_knn_init(knn);
+  //knn->mask = &(knn->nbrWeights.m_mask)[0];
+  //knn->add = &(knn->nbrWeights.m_addr)[0];
+  //knn->dist = &(knn->nbrWeights.m_dist)[0];
+  //printf("%p %p %p\n", knn->mask, knn->add, knn->dist);
 
   return knn;
 }
@@ -797,6 +799,7 @@ gridsearch_knn_delete(struct gsknn *knn)
       if (knn->tmpdist) Free(knn->tmpdist);
       if (knn->tmpadd) Free(knn->tmpadd);
       if (knn->mask) Free(knn->mask);
+
       Free(knn);
     }
 }
@@ -816,9 +819,13 @@ gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double pla
     double plon,         ! longitude of the search point
   */
 
+  // nbrWeightsType &nbrWeights = knn->nbrWeights;
+
   double search_radius = gs->search_radius;
 
   // Initialize distance and address arrays
+  // nbrWeights.init_addr();
+  // nbrWeights.init_dist();
   gridsearch_knn_init(knn);
 
   size_t numNeighbors = knn->size;
