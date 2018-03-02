@@ -9,7 +9,7 @@
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-class nbrWeightsType
+class knnWeightsType
 {
  private:
   size_t m_numNeighbors;
@@ -31,7 +31,7 @@ class nbrWeightsType
       m_dist.resize(m_maxNeighbors);
     }
 
-  nbrWeightsType(size_t maxNeighbors)
+  knnWeightsType(size_t maxNeighbors)
     {
       init(maxNeighbors);
     }

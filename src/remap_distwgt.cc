@@ -24,7 +24,6 @@
 #include "remap_store_link.h"
 #include "grid_search.h"
 #include "cdoOptions.h"
-#include "nbr_weights.h"
 
 //  Interpolation using a distance-weighted average
 
@@ -54,7 +53,7 @@ distance(const double *restrict a, const double *restrict b) noexcept
 
 #define MAX_SEARCH_CELLS 25
 static void
-grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat)
+grid_search_nbr_reg2d(struct gridsearch *gs, knnWeightsType &knnWeights, double plon, double plat)
 {
   /*
     Output variables:
@@ -68,9 +67,9 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
     double plon,         ! longitude of the search point
   */
 
-  size_t numNeighbors = nbrWeights.maxNeighbors();
-  size_t *restrict nbr_add = &nbrWeights.m_addr[0];
-  double *restrict nbr_dist = &nbrWeights.m_dist[0];
+  size_t numNeighbors = knnWeights.maxNeighbors();
+  size_t *restrict nbr_add = &knnWeights.m_addr[0];
+  double *restrict nbr_dist = &knnWeights.m_dist[0];
   
   size_t src_add[MAX_SEARCH_CELLS];
   std::vector<size_t> src_add_tmp;
@@ -132,8 +131,8 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
     }
 
   // Initialize distance and address arrays
-  nbrWeights.init_addr();
-  nbrWeights.init_dist();
+  knnWeights.init_addr();
+  knnWeights.init_dist();
 
   if (lfound)
     {
@@ -161,11 +160,11 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
           if (dist <= search_radius)
             {
               // Store the address and distance if this is one of the smallest so far
-              nbrWeights.store_distance(nadd, sqrt(dist), numNeighbors);
+              knnWeights.store_distance(nadd, sqrt(dist), numNeighbors);
             }
         }
 
-      nbrWeights.check_distance();
+      knnWeights.check_distance();
     }
   else if (gs->extrapolate)
     {
@@ -194,7 +193,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
 }  // grid_search_nbr_reg2d
 
 void
-grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat)
+grid_search_nbr(struct gridsearch *gs, knnWeightsType &knnWeights, double plon, double plat)
 {
   /*
     Output variables:
@@ -208,11 +207,11 @@ grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, 
     double plon,         ! longitude of the search point
   */
 
-  size_t numNeighbors = nbrWeights.maxNeighbors();
+  size_t numNeighbors = knnWeights.maxNeighbors();
 
   // Initialize distance and address arrays
-  nbrWeights.init_addr();
-  nbrWeights.init_dist();
+  knnWeights.init_addr();
+  knnWeights.init_dist();
 
   size_t ndist = numNeighbors;
   // check some more points if distance is the same use the smaller index (nadd)
@@ -222,10 +221,10 @@ grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, 
     ndist *= 2;
   if (ndist > gs->n) ndist = gs->n;
 
-  if (nbrWeights.m_tmpaddr.size() == 0) nbrWeights.m_tmpaddr.resize(ndist);
-  if (nbrWeights.m_tmpdist.size() == 0) nbrWeights.m_tmpdist.resize(ndist);
-  size_t *adds = &nbrWeights.m_tmpaddr[0];
-  double *dist = &nbrWeights.m_tmpdist[0];
+  if (knnWeights.m_tmpaddr.size() == 0) knnWeights.m_tmpaddr.resize(ndist);
+  if (knnWeights.m_tmpdist.size() == 0) knnWeights.m_tmpdist.resize(ndist);
+  size_t *adds = &knnWeights.m_tmpaddr[0];
+  double *dist = &knnWeights.m_tmpdist[0];
 
   const double range0 = SQR(gs->search_radius);
   double range = range0;
@@ -254,9 +253,9 @@ grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, 
   ndist = nadds;
   if ( ndist < numNeighbors ) numNeighbors = ndist;
 
-  for (size_t i = 0; i < ndist; ++i) nbrWeights.store_distance(adds[i], dist[i], numNeighbors);
+  for (size_t i = 0; i < ndist; ++i) knnWeights.store_distance(adds[i], dist[i], numNeighbors);
 
-  nbrWeights.check_distance();
+  knnWeights.check_distance();
 }  // grid_search_nbr
 
 //  This routine computes the inverse-distance weights for a nearest-neighbor
@@ -281,8 +280,8 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
   for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + numNeighbors * tgt_cell_add;
 
-  std::vector<nbrWeightsType> nbrWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) nbrWeights.push_back(nbrWeightsType(numNeighbors));
+  std::vector<knnWeightsType> knnWeights;
+  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
 
 #ifdef _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -309,7 +308,7 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(gs, weightlinks, numNeighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, nbrWeights)
+  shared(gs, weightlinks, numNeighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -327,18 +326,18 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
 
       // Find nearest grid points on source grid and distances to each point
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        grid_search_nbr_reg2d(gs, nbrWeights[ompthID], plon, plat);
+        grid_search_nbr_reg2d(gs, knnWeights[ompthID], plon, plat);
       else
-        grid_search_nbr(gs, nbrWeights[ompthID], plon, plat);
+        grid_search_nbr(gs, knnWeights[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = nbrWeights[ompthID].compute_weights(src_grid->mask);
+      size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
 
       for (size_t n = 0; n < nadds; ++n)
-        if (nbrWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = ONE;
+        if (knnWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = ONE;
 
       // Store the link
-      store_weightlinks(0, nadds, &nbrWeights[ompthID].m_addr[0], &nbrWeights[ompthID].m_dist[0], tgt_cell_add, &weightlinks[0]);
+      store_weightlinks(0, nadds, &knnWeights[ompthID].m_addr[0], &knnWeights[ompthID].m_dist[0], tgt_cell_add, &weightlinks[0]);
     }
 
   progressStatus(0, 1, 1);
@@ -367,8 +366,8 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   size_t src_grid_size = src_grid->size;
   size_t tgt_grid_size = tgt_grid->size;
 
-  std::vector<nbrWeightsType> nbrWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) nbrWeights.push_back(nbrWeightsType(numNeighbors));
+  std::vector<knnWeightsType> knnWeights;
+  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
 
 #ifdef _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -396,7 +395,7 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none)  reduction(+:findex) \
   shared(gs, numNeighbors, src_remap_grid_type, src_grid, tgt_grid, tgt_grid_size) \
-  shared(src_array, tgt_array, missval, nbrWeights)
+  shared(src_array, tgt_array, missval, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -414,13 +413,13 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
       // Find nearest grid points on source grid and distances to each point
       if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        grid_search_nbr_reg2d(gs, nbrWeights[ompthID], plon, plat);
+        grid_search_nbr_reg2d(gs, knnWeights[ompthID], plon, plat);
       else
-        grid_search_nbr(gs, nbrWeights[ompthID], plon, plat);
+        grid_search_nbr(gs, knnWeights[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = nbrWeights[ompthID].compute_weights(src_grid->mask);
-      if (nadds) tgt_array[tgt_cell_add] = nbrWeights[ompthID].array_weights_sum(src_array);
+      size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
+      if (nadds) tgt_array[tgt_cell_add] = knnWeights[ompthID].array_weights_sum(src_array);
     }
 
   progressStatus(0, 1, 1);
@@ -491,8 +490,8 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   grid_to_radian(xunits, tgt_grid_size, tgt_cell_center_lon, "tgt cell center lon");
   grid_to_radian(yunits, tgt_grid_size, tgt_cell_center_lat, "tgt cell center lat");
 
-  std::vector<nbrWeightsType> nbrWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) nbrWeights.push_back(nbrWeightsType(numNeighbors));
+  std::vector<knnWeightsType> knnWeights;
+  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
 
 #ifdef _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -523,7 +522,7 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   /*
 #pragma omp parallel for default(none)  reduction(+:findex) \
   shared(gs, numNeighbors, src_grid, tgt_grid, tgt_grid_size)  \
-  shared(src_array, tgt_array, missval, nbrWeights)
+  shared(src_array, tgt_array, missval, knnWeights)
   */
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
@@ -547,12 +546,12 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
       //   grid_search_nbr_reg2d(gs, numNeighbors, nbr_add[ompthID],
       //   nbr_dist[ompthID], plon, plat);
       // else
-      grid_search_nbr(gs, nbrWeights[ompthID], plon, plat);
+      grid_search_nbr(gs, knnWeights[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = nbrWeights[ompthID].compute_weights(src_mask);
+      size_t nadds = knnWeights[ompthID].compute_weights(src_mask);
       if (nadds)
-        tgt_array[tgt_cell_add] = nbrWeights[ompthID].array_weights_sum(src_array);
+        tgt_array[tgt_cell_add] = knnWeights[ompthID].array_weights_sum(src_array);
       else
         nmiss++;
     }

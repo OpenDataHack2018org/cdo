@@ -18,7 +18,7 @@
 #define GRID_SEARCH_H_
 
 #include <stdbool.h>
-#include <nbr_weights.h>
+#include <knn_weights.h>
 
 #define GS_NOT_FOUND SIZE_MAX
 
@@ -55,7 +55,7 @@ struct gridsearch
 };
 
 
-void grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat);
+void grid_search_nbr(struct gridsearch *gs, knnWeightsType &knnWeights, double plon, double plat);
 
 struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons,
                                            const double *restrict lats);

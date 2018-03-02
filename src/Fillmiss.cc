@@ -439,8 +439,8 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   if (nv != nvals) cdoAbort("Internal problem, number of valid values differ!");
 
-  std::vector<nbrWeightsType> nbrWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) nbrWeights.push_back(nbrWeightsType(numNeighbors));
+  std::vector<knnWeightsType> knnWeights;
+  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
 
   clock_t start, finish;
   start = clock();
@@ -466,7 +466,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex)  shared(nbrWeights)  \
+#pragma omp parallel for default(none)  reduction(+:findex)  shared(knnWeights)  \
   shared(mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
 #endif
   for (size_t i = 0; i < nmiss; ++i)
@@ -476,15 +476,15 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      grid_search_nbr(gs, nbrWeights[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
+      grid_search_nbr(gs, knnWeights[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = nbrWeights[ompthID].compute_weights();
+      size_t nadds = knnWeights[ompthID].compute_weights();
       if (nadds)
         {
           double result = 0;
           for (size_t n = 0; n < nadds; ++n)
-            result += array1[vindex[nbrWeights[ompthID].m_addr[n]]] * nbrWeights[ompthID].m_dist[n];
+            result += array1[vindex[knnWeights[ompthID].m_addr[n]]] * knnWeights[ompthID].m_dist[n];
           array2[mindex[i]] = result;
         }
     }

@@ -332,8 +332,8 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
   dims[0] = ncells1;
   dims[1] = 0;
   struct gridsearch *gs = gridsearch_create(xIsCyclic, dims, ncells1, grid_center_lon1, grid_center_lat1);
-  nbrWeightsType nbrWeights(MAX_SEARCH);
-  size_t *nbr_addr = &nbrWeights.m_addr[0];
+  knnWeightsType knnWeights(MAX_SEARCH);
+  size_t *nbr_addr = &knnWeights.m_addr[0];
 
   int ncorner = 3;
   double corner_coordinates[3];
@@ -405,7 +405,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
       if (invert_result) is_clockwise = !is_clockwise;
       if (is_clockwise) continue;
 
-      grid_search_nbr(gs, nbrWeights, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
+      grid_search_nbr(gs, knnWeights, grid_center_lon2[cell_no2], grid_center_lat2[cell_no2]);
       int k = 0;
 
       for (int i = 0; i < MAX_SEARCH; ++i)

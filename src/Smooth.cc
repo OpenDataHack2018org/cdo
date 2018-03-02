@@ -80,8 +80,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
-  std::vector<nbrWeightsType> nbrWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) nbrWeights.push_back(nbrWeightsType(numNeighbors));
+  std::vector<knnWeightsType> knnWeights;
+  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
 
   clock_t start, finish;
 
@@ -106,7 +106,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for schedule(dynamic) default(none)  reduction(+:findex)  reduction(+:nmissx) \
-  shared(cdoVerbose, nbrWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
+  shared(cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -115,14 +115,13 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
       findex++;
       if (cdoVerbose && cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / gridsize);
 
-      grid_search_nbr(gs, nbrWeights[ompthID], xvals[i], yvals[i]);
+      grid_search_nbr(gs, knnWeights[ompthID], xvals[i], yvals[i]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      //size_t nadds = smooth_knn_compute_weights(mask, nbrWeights[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
-      size_t nadds = nbrWeights[ompthID].compute_weights(mask, spoint.radius, spoint.weight0, spoint.weightR);
+      size_t nadds = knnWeights[ompthID].compute_weights(mask, spoint.radius, spoint.weight0, spoint.weightR);
       if (nadds)
         {
-          array2[i] = nbrWeights[ompthID].array_weights_sum(array1);
+          array2[i] = knnWeights[ompthID].array_weights_sum(array1);
         }
       else
         {
