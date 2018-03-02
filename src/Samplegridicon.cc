@@ -315,8 +315,6 @@ read_coordinates(const char *filename, long n, double *lon, double *lat, int nv,
   streamClose(streamID);
 }
 
-int grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat);
-
 int find_coordinate_to_ignore(double *cell_corners_xyz);
 double calculate_the_polygon_area(double cell_corners[], int number_corners);
 bool are_polygon_vertices_arranged_in_clockwise_order(double cell_area);

@@ -28,7 +28,6 @@
 #include "grid.h"
 #include "grid_search.h"
 #include "cdoOptions.h"
-#include "nbr_weights.h"
 
 extern "C"
 {
@@ -382,8 +381,6 @@ fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
   Free(matrix2);
   Free(matrix1);
 }
-
-int grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat);
 
 static void
 setmisstodis(field_type *field1, field_type *field2, int numNeighbors)

@@ -18,7 +18,7 @@
 #define GRID_SEARCH_H_
 
 #include <stdbool.h>
-#include "nbr_weights.h"
+#include <nbr_weights.h>
 
 #define GS_NOT_FOUND SIZE_MAX
 
@@ -54,22 +54,8 @@ struct gridsearch
   void *pointcloud;
 };
 
-struct gsknn
-{
-  size_t ndist;
-  size_t *tmpadd;
-  double *tmpdist;
 
-  nbrWeightsType nbrWeights;
-  size_t size;
-  uint8_t *mask;
-  size_t *add;
-  double *dist;
-};
-
-struct gsknn *gridsearch_knn_new(size_t size);
-void gridsearch_knn_delete(struct gsknn *knn);
-size_t gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat);
+void grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat);
 
 struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons,
                                            const double *restrict lats);
@@ -80,7 +66,5 @@ size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double 
 size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
                            double *dist);
 void gridsearch_extrapolate(struct gridsearch *gs);
-void gridsearch_bound_poly(struct gridsearch *gs, size_t dims[2], size_t n, const double *restrict lons,
-                           const double *restrict lats);
 
 #endif

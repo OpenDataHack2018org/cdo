@@ -48,56 +48,6 @@ typedef struct
   double weightR;
 } smoothpoint_t;
 
-double intlin(double x, double y1, double x1, double y2, double x2);
-
-double
-smooth_knn_compute_weights(size_t numNeighbors, const uint8_t *restrict src_grid_mask, struct gsknn *knn,
-                           double search_radius, double weight0, double weightR)
-{
-  uint8_t *restrict nbr_mask = knn->mask;
-  const size_t *restrict nbr_add = knn->add;
-  double *restrict nbr_dist = knn->dist;
-
-  // Compute weights based on inverse distance if mask is false, eliminate those
-  // points
-  double dist_tot = 0.;  // sum of neighbor distances (for normalizing)
-
-  for (size_t n = 0; n < numNeighbors; ++n)
-    {
-      nbr_mask[n] = false;
-      if (nbr_add[n] < SIZE_MAX && src_grid_mask[nbr_add[n]])
-        {
-          nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightR, search_radius);
-          dist_tot += nbr_dist[n];
-          nbr_mask[n] = true;
-        }
-    }
-
-  return dist_tot;
-}
-
-size_t
-smooth_knn_normalize_weights(size_t numNeighbors, double dist_tot, struct gsknn *knn)
-{
-  const uint8_t *restrict nbr_mask = knn->mask;
-  size_t *restrict nbr_add = knn->add;
-  double *restrict nbr_dist = knn->dist;
-
-  // Normalize weights and store the link
-  size_t nadds = 0;
-
-  for (size_t n = 0; n < numNeighbors; ++n)
-    {
-      if (nbr_mask[n])
-        {
-          nbr_dist[nadds] = nbr_dist[n] / dist_tot;
-          nbr_add[nadds] = nbr_add[n];
-          nadds++;
-        }
-    }
-
-  return nadds;
-}
 
 static void
 smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss,
@@ -130,10 +80,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
-  gsknn **knn = ( gsknn **) Malloc(Threading::ompNumThreads * sizeof( gsknn *));
-  //std::vector<gsknn *> knn(Threading::ompNumThreads);
-  for (int i = 0; i < Threading::ompNumThreads; i++)
-    knn[i] = gridsearch_knn_new(numNeighbors);
+  std::vector<nbrWeightsType> nbrWeights;
+  for ( int i = 0; i < Threading::ompNumThreads; ++i ) nbrWeights.push_back(nbrWeightsType(numNeighbors));
 
   clock_t start, finish;
 
@@ -158,7 +106,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for schedule(dynamic) default(none)  reduction(+:findex)  reduction(+:nmissx) \
-  shared(cdoVerbose, knn, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
+  shared(cdoVerbose, nbrWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -167,27 +115,14 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
       findex++;
       if (cdoVerbose && cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / gridsize);
 
-      size_t nadds = gridsearch_knn(gs, knn[ompthID], xvals[i], yvals[i]);
+      grid_search_nbr(gs, nbrWeights[ompthID], xvals[i], yvals[i]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      double dist_tot
-          = smooth_knn_compute_weights(nadds, mask, knn[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
-
-      // Normalize weights and store the link
-      nadds = smooth_knn_normalize_weights(nadds, dist_tot, knn[ompthID]);
+      //size_t nadds = smooth_knn_compute_weights(mask, nbrWeights[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
+      size_t nadds = nbrWeights[ompthID].compute_weights(mask, spoint.radius, spoint.weight0, spoint.weightR);
       if (nadds)
         {
-          const size_t *restrict nbr_add = knn[ompthID]->add;
-          const double *restrict nbr_dist = knn[ompthID]->dist;
-          /*
-          printf("n %u %d nadds %u dis %g\n", i, nbr_add[0], nadds,
-          nbr_dist[0]); for ( size_t n = 0; n < nadds; ++n ) printf("   n %u add
-          %d dis %g\n", n, nbr_add[n], nbr_dist[n]);
-          */
-          double result = 0;
-          for (size_t n = 0; n < nadds; ++n)
-            result += array1[nbr_add[n]] * nbr_dist[n];
-          array2[i] = result;
+          array2[i] = nbrWeights[ompthID].array_weights_sum(array1);
         }
       else
         {
@@ -203,9 +138,6 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (gs) gridsearch_delete(gs);
-
-  for (int i = 0; i < Threading::ompNumThreads; i++)
-    gridsearch_knn_delete(knn[i]);
 
   if (gridID0 != gridID) gridDestroy(gridID);
 

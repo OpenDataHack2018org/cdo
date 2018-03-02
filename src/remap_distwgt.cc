@@ -68,7 +68,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
     double plon,         ! longitude of the search point
   */
 
-  size_t numNeighbors = nbrWeights.numNeighbors();
+  size_t numNeighbors = nbrWeights.maxNeighbors();
   size_t *restrict nbr_add = &nbrWeights.m_addr[0];
   double *restrict nbr_dist = &nbrWeights.m_dist[0];
   
@@ -165,7 +165,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
             }
         }
 
-      nbrWeights.check_distance(numNeighbors);
+      nbrWeights.check_distance();
     }
   else if (gs->extrapolate)
     {
@@ -193,7 +193,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, nbrWeightsType &nbrWeights, double 
     }
 }  // grid_search_nbr_reg2d
 
-int
+void
 grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, double plat)
 {
   /*
@@ -208,7 +208,7 @@ grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, 
     double plon,         ! longitude of the search point
   */
 
-  size_t numNeighbors = nbrWeights.numNeighbors();
+  size_t numNeighbors = nbrWeights.maxNeighbors();
 
   // Initialize distance and address arrays
   nbrWeights.init_addr();
@@ -222,10 +222,10 @@ grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, 
     ndist *= 2;
   if (ndist > gs->n) ndist = gs->n;
 
-  double zdist[32];
-  size_t zadds[32];
-  double *dist = numNeighbors > 16 ? (double *) Malloc(ndist * sizeof(double)) : zdist;
-  size_t *adds = numNeighbors > 16 ? (size_t *) Malloc(ndist * sizeof(size_t)) : zadds;
+  if (nbrWeights.m_tmpaddr.size() == 0) nbrWeights.m_tmpaddr.resize(ndist);
+  if (nbrWeights.m_tmpdist.size() == 0) nbrWeights.m_tmpdist.resize(ndist);
+  size_t *adds = &nbrWeights.m_tmpaddr[0];
+  double *dist = &nbrWeights.m_tmpdist[0];
 
   const double range0 = SQR(gs->search_radius);
   double range = range0;
@@ -252,19 +252,11 @@ grid_search_nbr(struct gridsearch *gs, nbrWeightsType &nbrWeights, double plon, 
     }
 
   ndist = nadds;
-  size_t maxNeighbors = (ndist < numNeighbors) ? ndist : numNeighbors;
+  if ( ndist < numNeighbors ) numNeighbors = ndist;
 
-  for (size_t i = 0; i < ndist; ++i) nbrWeights.store_distance(adds[i], dist[i], maxNeighbors);
+  for (size_t i = 0; i < ndist; ++i) nbrWeights.store_distance(adds[i], dist[i], numNeighbors);
 
-  nbrWeights.check_distance(maxNeighbors);
-
-  if (numNeighbors > 16)
-    {
-      Free(dist);
-      Free(adds);
-    }
-
-  return maxNeighbors;
+  nbrWeights.check_distance();
 }  // grid_search_nbr
 
 //  This routine computes the inverse-distance weights for a nearest-neighbor
@@ -360,20 +352,6 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
 #endif
 }  // remap_distwgt_weights
 
-static void
-distwgt_remap(double *restrict tgt_point, const double *restrict src_array, size_t nadds, nbrWeightsType &nbrWeights)
-{
-  size_t *restrict nbr_addr = &nbrWeights.m_addr[0];
-  double *restrict nbr_dist = &nbrWeights.m_dist[0];
-  
-  if (nadds)
-    {
-      if (nadds > 1) sort_add_and_wgts(nadds, nbr_addr, nbr_dist);
-      *tgt_point = src_array[nbr_addr[0]] * nbr_dist[0];
-      for (size_t n = 1; n < nadds; ++n) *tgt_point += src_array[nbr_addr[n]] * nbr_dist[n];
-    }
-}
-
 void
 remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array,
               double *restrict tgt_array, double missval)
@@ -442,7 +420,7 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = nbrWeights[ompthID].compute_weights(src_grid->mask);
-      if (nadds) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbrWeights[ompthID]);
+      if (nadds) tgt_array[tgt_cell_add] = nbrWeights[ompthID].array_weights_sum(src_array);
     }
 
   progressStatus(0, 1, 1);
@@ -574,7 +552,7 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = nbrWeights[ompthID].compute_weights(src_mask);
       if (nadds)
-        distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbrWeights[ompthID]);
+        tgt_array[tgt_cell_add] = nbrWeights[ompthID].array_weights_sum(src_array);
       else
         nmiss++;
     }
