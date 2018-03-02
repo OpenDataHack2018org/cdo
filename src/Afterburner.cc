@@ -1889,8 +1889,8 @@ after_version(void)
 #endif
   fprintf(stderr, "\n");
 #endif
-#if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
-  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
+#ifdef SYSTEM_TYPE
+  fprintf(stderr, "System: %s\n", SYSTEM_TYPE);
 #endif
   cdiPrintVersion();
   fprintf(stderr, "\n");

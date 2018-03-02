@@ -205,8 +205,8 @@ cdo_version(void)
   const char *typenames[] = { "srv", "ext", "ieg", "grb1", "grb2", "nc1", "nc2", "nc4", "nc4c", "nc5" };
 
   fprintf(stderr, "%s\n", CDO_version);
-#if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
-  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
+#ifdef SYSTEM_TYPE
+  fprintf(stderr, "System: %s\n", SYSTEM_TYPE);
 #endif
 #if defined(CXX_COMPILER)
   fprintf(stderr, "CXX Compiler: %s\n", CXX_COMPILER);

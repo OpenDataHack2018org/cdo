@@ -122,21 +122,7 @@ AC_DEFINE_UNQUOTED(C_VERSION, ["$C_VERSION"], [C Compiler version])
 if test -z "$F77_VERSION" ; then F77_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(F77_VERSION, ["$F77_VERSION"], [F77 Compiler version])
 
-# Checks for username, hostname and system type
-USERNAME=$LOGNAME
-if test -z "$USERNAME" ; then USERNAME=$USER; fi;
-if test -z "$USERNAME" ; then USERNAME="unknown"; fi;
-AC_DEFINE_UNQUOTED([USER_NAME],["$USERNAME"], [User name])
-AC_SUBST([USER_NAME],["$USERNAME"])
-
-AS_IF([test -z "$HOST"],
-      [HOST=unknown
-       AS_IF([test -x /bin/hostname],[HOST=$(hostname)],
-             [AS_IF([test -x /bin/uname],
-                    [HOST=$(uname -n)])])])
-AC_DEFINE_UNQUOTED([HOST_NAME],["$HOST"],[Host name])
-AC_SUBST([HOST_NAME],["$HOST"])
-
+# Check for system type
 AC_DEFINE_UNQUOTED([SYSTEM_TYPE],["$ac_cv_build"], [System type])
 AC_SUBST([SYSTEM_TYPE],["$ac_cv_build"])
 #  ----------------------------------------------------------------------
