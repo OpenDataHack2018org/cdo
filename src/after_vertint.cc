@@ -75,8 +75,7 @@ presh(double *restrict fullp, double *halfp, const double *restrict vct, const d
     {
       double zp = vct[lh];
       double ze = vct[lh + nhlev + 1];
-      for (long i = 0; i < ngp; i++)
-        halfpres[i] = zp + ze * ps[i];
+      for (long i = 0; i < ngp; i++) halfpres[i] = zp + ze * ps[i];
       halfpres += ngp;
     }
   arrayCopy(ngp, ps, halfpres);
@@ -84,8 +83,7 @@ presh(double *restrict fullp, double *halfp, const double *restrict vct, const d
   if (fullp)
     {
       halfpres = halfp;
-      for (long i = 0; i < ngp * nhlev; i++)
-        fullp[i] = 0.5 * (halfpres[i] + halfpres[i + ngp]);
+      for (long i = 0; i < ngp * nhlev; i++) fullp[i] = 0.5 * (halfpres[i] + halfpres[i + ngp]);
     }
 }
 
@@ -345,8 +343,8 @@ interp_Z(const double *restrict geop, const double *restrict gz, double *pz, con
   assert(halfp != NULL);
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(geop, gz, pz, fullp, halfp, nx, gt, plev, nplev, ngp, nhlev, missval, Mars)
+#pragma omp parallel for default(none) shared(geop, gz, pz, fullp, halfp, nx, gt, plev, nplev, ngp, nhlev, missval, \
+                                              Mars)
 #endif
   for (long lp = 0; lp < nplev; lp++)
     {

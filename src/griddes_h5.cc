@@ -413,11 +413,9 @@ gridFromH5file(const char *gridfile)
         {
           int *iarray = (int *) Malloc(grid.size * sizeof(int));
           status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-          for (size_t i = 0; i < grid.size; ++i)
-            grid.xvals[i] = iarray[i];
+          for (size_t i = 0; i < grid.size; ++i) grid.xvals[i] = iarray[i];
           status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-          for (size_t i = 0; i < grid.size; ++i)
-            grid.yvals[i] = iarray[i];
+          for (size_t i = 0; i < grid.size; ++i) grid.yvals[i] = iarray[i];
           Free(iarray);
         }
 
@@ -560,11 +558,9 @@ gridFromH5file(const char *gridfile)
             {
               int *iarray = (int *) Malloc(grid.size * sizeof(int));
               status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-              for (size_t i = 0; i < grid.size; ++i)
-                grid.xvals[i] = iarray[i];
+              for (size_t i = 0; i < grid.size; ++i) grid.xvals[i] = iarray[i];
               status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-              for (size_t i = 0; i < grid.size; ++i)
-                grid.yvals[i] = iarray[i];
+              for (size_t i = 0; i < grid.size; ++i) grid.yvals[i] = iarray[i];
               Free(iarray);
             }
 
@@ -574,10 +570,8 @@ gridFromH5file(const char *gridfile)
           status = H5Dclose(lon_id);
           status = H5Dclose(lat_id);
 
-          for (i = 0; i < grid.size; ++i)
-            grid.xvals[i] = grid.xvals[i] * xscale + xoffset;
-          for (i = 0; i < grid.size; ++i)
-            grid.yvals[i] = grid.yvals[i] * yscale + yoffset;
+          for (i = 0; i < grid.size; ++i) grid.xvals[i] = grid.xvals[i] * xscale + xoffset;
+          for (i = 0; i < grid.size; ++i) grid.yvals[i] = grid.yvals[i] * yscale + yoffset;
 
           grid.type = GRID_CURVILINEAR;
           grid.datatype = CDI_DATATYPE_FLT32;

@@ -420,8 +420,7 @@ CMOR_lite(void *process)
   memset(vars, 0, nvars * sizeof(var_t));
 
   if (convert_data)
-    for (varID = 0; varID < nvars; ++varID)
-      vars[varID].convert = true;
+    for (varID = 0; varID < nvars; ++varID) vars[varID].convert = true;
 
   const char *filename = operatorArgv()[0];
   FILE *fp = fopen(filename, "r");

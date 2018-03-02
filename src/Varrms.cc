@@ -60,8 +60,7 @@ Varrms(void *process)
 
   vlistClearFlag(vlistID1);
   int nvars = vlistNvars(vlistID1);
-  for (varID = 0; varID < nvars; varID++)
-    vlistDefFlag(vlistID1, varID, 0, TRUE);
+  for (varID = 0; varID < nvars; varID++) vlistDefFlag(vlistID1, varID, 0, TRUE);
 
   int vlistID3 = vlistCreate();
   cdoVlistCopyFlag(vlistID3, vlistID1);

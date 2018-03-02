@@ -22,8 +22,7 @@
 #include "cdoOptions.h"
 #include "timer.h"
 
-extern "C"
-{
+extern "C" {
 #include "clipping/clipping.h"
 #include "clipping/area.h"
 #include "clipping/geometry.h"
@@ -808,14 +807,13 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
   double stimer = 0;
 #endif
 
-  // Loop over destination grid
+// Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for schedule(dynamic) default(none)  reduction(+:findex) \
-  shared(Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, \
-	 rv, cdoVerbose, tgt_num_cell_corners, target_cell_type, \
-         weightlinks,  srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
-	 search, srch_add, tgt_grid_cell, sum_srch_cells, sum_srch_cells2)
+#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(                      \
+    Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose, \
+    tgt_num_cell_corners, target_cell_type, weightlinks, srch_corners, src_grid, tgt_grid, tgt_grid_size,   \
+    src_grid_size, search, srch_add, tgt_grid_cell, sum_srch_cells, sum_srch_cells2)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -830,7 +828,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
 
       weightlinks[tgt_cell_add].nlinks = 0;
 
-      // Get search cells
+// Get search cells
 #ifdef STIMER
       clock_t start = clock();
 #endif

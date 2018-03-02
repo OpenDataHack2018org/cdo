@@ -205,8 +205,7 @@ Arith(void *process)
   if (filltype == FILL_TS && vlistIDx1 != vlistID1)
     {
       nvars = vlistNvars(vlistID1);
-      for (varID = 0; varID < nvars; varID++)
-        vlistDefVarMissval(vlistID3, varID, vlistInqVarMissval(vlistID1, varID));
+      for (varID = 0; varID < nvars; varID++) vlistDefVarMissval(vlistID3, varID, vlistInqVarMissval(vlistID1, varID));
     }
 
   int taxisID3 = taxisDuplicate(taxisIDx1);

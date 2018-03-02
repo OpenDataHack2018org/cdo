@@ -25,8 +25,7 @@
 #include "timer.h"
 
 #ifdef HAVE_LIBYAC
-extern "C"
-{
+extern "C" {
 #include "points.h"
 #include "grid_reg2d.h"
 #include "grid_search.h"
@@ -45,11 +44,9 @@ yar_remap(double *restrict dst_array, double missval, long dst_size, long num_li
 {
   long n;
 
-  for (n = 0; n < dst_size; ++n)
-    dst_array[n] = missval;
+  for (n = 0; n < dst_size; ++n) dst_array[n] = missval;
 
-  for (n = 0; n < num_links; ++n)
-    dst_array[dst_add[n]] = 0;
+  for (n = 0; n < num_links; ++n) dst_array[dst_add[n]] = 0;
 
   for (n = 0; n < num_links; ++n)
     {
@@ -101,8 +98,7 @@ set_source_data(double *source_data, double init_value, unsigned size_x, unsigne
 {
 
   for (unsigned i = 0; i < size_x; ++i)
-    for (unsigned j = 0; j < size_y; ++j)
-      source_data[i + j * size_x] = init_value;
+    for (unsigned j = 0; j < size_y; ++j) source_data[i + j * size_x] = init_value;
 }
 
 /*
@@ -169,24 +165,18 @@ yar_remap_bil(field_type *field1, field_type *field2)
   double *latIn = (double *) Malloc(nlatIn * sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
-  for (int i = 0; i < nlonIn; ++i)
-    lonIn[i] *= DEG2RAD;
-  for (int i = 0; i < nlatIn; ++i)
-    latIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlonIn; ++i) lonIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlatIn; ++i) latIn[i] *= DEG2RAD;
 
   double *xlonIn = (double *) Malloc((nlonIn + 1) * sizeof(double));
   double *xlatIn = (double *) Malloc((nlatIn + 1) * sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = xlonIn[1] - xlonIn[0];
-  for (int i = 0; i < nlonIn; ++i)
-    xlonIn[i] -= dxIn / 2;
-  for (int i = 0; i < nlatIn; ++i)
-    xlatIn[i] -= dxIn / 2;
-  for (int i = 0; i < nlonIn; ++i)
-    xlonIn[i] *= DEG2RAD;
-  for (int i = 0; i < nlatIn; ++i)
-    xlatIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlonIn; ++i) xlonIn[i] -= dxIn / 2;
+  for (int i = 0; i < nlatIn; ++i) xlatIn[i] -= dxIn / 2;
+  for (int i = 0; i < nlonIn; ++i) xlonIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlatIn; ++i) xlatIn[i] *= DEG2RAD;
   xlonIn[nlonIn] = xlonIn[nlonIn - 1] + dxIn * DEG2RAD;
   xlatIn[nlatIn] = -xlatIn[0];
 
@@ -199,24 +189,18 @@ yar_remap_bil(field_type *field1, field_type *field2)
   double *latOut = (double *) Malloc(nlatOut * sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
-  for (int i = 0; i < nlonOut; ++i)
-    lonOut[i] *= DEG2RAD;
-  for (int i = 0; i < nlatOut; ++i)
-    latOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlonOut; ++i) lonOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlatOut; ++i) latOut[i] *= DEG2RAD;
 
   double *xlonOut = (double *) Malloc((nlonOut + 1) * sizeof(double));
   double *xlatOut = (double *) Malloc((nlatOut + 1) * sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = xlonOut[1] - xlonOut[0];
-  for (int i = 0; i < nlonOut; ++i)
-    xlonOut[i] -= dxOut / 2;
-  for (int i = 0; i < nlatOut; ++i)
-    xlatOut[i] -= dxOut / 2;
-  for (int i = 0; i < nlonOut; ++i)
-    xlonOut[i] *= DEG2RAD;
-  for (int i = 0; i < nlatOut; ++i)
-    xlatOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlonOut; ++i) xlonOut[i] -= dxOut / 2;
+  for (int i = 0; i < nlatOut; ++i) xlatOut[i] -= dxOut / 2;
+  for (int i = 0; i < nlonOut; ++i) xlonOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlatOut; ++i) xlatOut[i] *= DEG2RAD;
   xlonOut[nlonOut] = xlonOut[nlonOut - 1] + dxOut * DEG2RAD;
   xlatOut[nlatOut] = xlatOut[0];
 
@@ -377,11 +361,11 @@ yar_remap_bil(field_type *field1, field_type *field2)
 
   field2->nmiss = arrayNumMV(gridInqSize(gridIDout), array2, missval);
 
-  // if (array) Free(array);
-  // free(lonIn);
-  // free(latIn);
-  // free(lonOut);
-  // free(latOut);
+// if (array) Free(array);
+// free(lonIn);
+// free(latIn);
+// free(lonOut);
+// free(latOut);
 #endif
 }
 
@@ -426,14 +410,10 @@ yar_remap_con(field_type *field1, field_type *field2)
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = lonIn[1] - lonIn[0];
-  for (int i = 0; i < nlonIn; ++i)
-    lonIn[i] -= dxIn / 2;
-  for (int i = 0; i < nlatIn; ++i)
-    latIn[i] -= dxIn / 2;
-  for (int i = 0; i < nlonIn; ++i)
-    lonIn[i] *= DEG2RAD;
-  for (int i = 0; i < nlatIn; ++i)
-    latIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlonIn; ++i) lonIn[i] -= dxIn / 2;
+  for (int i = 0; i < nlatIn; ++i) latIn[i] -= dxIn / 2;
+  for (int i = 0; i < nlonIn; ++i) lonIn[i] *= DEG2RAD;
+  for (int i = 0; i < nlatIn; ++i) latIn[i] *= DEG2RAD;
   lonIn[nlonIn] = lonIn[nlonIn - 1] + dxIn * DEG2RAD;
   latIn[nlatIn] = -latIn[0];
 
@@ -451,14 +431,10 @@ yar_remap_con(field_type *field1, field_type *field2)
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = lonOut[1] - lonOut[0];
-  for (int i = 0; i < nlonOut; ++i)
-    lonOut[i] -= dxOut / 2;
-  for (int i = 0; i < nlatOut; ++i)
-    latOut[i] -= dxOut / 2;
-  for (int i = 0; i < nlonOut; ++i)
-    lonOut[i] *= DEG2RAD;
-  for (int i = 0; i < nlatOut; ++i)
-    latOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlonOut; ++i) lonOut[i] -= dxOut / 2;
+  for (int i = 0; i < nlatOut; ++i) latOut[i] -= dxOut / 2;
+  for (int i = 0; i < nlonOut; ++i) lonOut[i] *= DEG2RAD;
+  for (int i = 0; i < nlatOut; ++i) latOut[i] *= DEG2RAD;
   lonOut[nlonOut] = lonOut[nlonOut - 1] + dxOut * DEG2RAD;
   latOut[nlatOut] = latOut[0];
 
@@ -627,8 +603,7 @@ yar_remap_con(field_type *field1, field_type *field2)
 
       // tgt_area = huiliers_area(TargetCell);
       tgt_area = cell_area(TargetCell);
-      for (n = 0; n < nSourceCells; ++n)
-        weight[n] = area[n] / tgt_area;
+      for (n = 0; n < nSourceCells; ++n) weight[n] = area[n] / tgt_area;
       /*
       weight_sum = 0.0;
       for ( n = 0; n < nSourceCells; ++n ) weight_sum += weight[n];
@@ -691,10 +666,10 @@ yar_remap_con(field_type *field1, field_type *field2)
   Free(weight);
   Free(area);
 
-  // free(lonIn);
-  // free(latIn);
-  // free(lonOut);
-  // free(latOut);
+// free(lonIn);
+// free(latIn);
+// free(lonOut);
+// free(latOut);
 #endif
 }
 

@@ -48,13 +48,11 @@ shiftx(bool lcyclic, int nshift, int nx, int ny, const double *array1, double *a
 
       if (!lcyclic && is_cyclic)
         {
-          for (int j = 0; j < ny; j++)
-            array2[IX2D(j, ins, nx)] = missval;
+          for (int j = 0; j < ny; j++) array2[IX2D(j, ins, nx)] = missval;
         }
       else
         {
-          for (int j = 0; j < ny; j++)
-            array2[IX2D(j, ins, nx)] = array1[IX2D(j, i, nx)];
+          for (int j = 0; j < ny; j++) array2[IX2D(j, ins, nx)] = array1[IX2D(j, i, nx)];
         }
     }
 }
@@ -80,13 +78,11 @@ shifty(bool lcyclic, int nshift, int nx, int ny, const double *array1, double *a
 
       if (!lcyclic && is_cyclic)
         {
-          for (int i = 0; i < nx; i++)
-            array2[IX2D(jns, i, nx)] = missval;
+          for (int i = 0; i < nx; i++) array2[IX2D(jns, i, nx)] = missval;
         }
       else
         {
-          for (int i = 0; i < nx; i++)
-            array2[IX2D(jns, i, nx)] = array1[IX2D(j, i, nx)];
+          for (int i = 0; i < nx; i++) array2[IX2D(jns, i, nx)] = array1[IX2D(j, i, nx)];
         }
     }
 }
@@ -116,11 +112,9 @@ shiftx_coord(bool lcyclic, int nshift, int gridID1)
       gridInqXbounds(gridID1, bounds);
       for (int k = 0; k < nv; ++k)
         {
-          for (size_t i = 0; i < nx * ny; ++i)
-            array1[i] = bounds[i * nv + k];
+          for (size_t i = 0; i < nx * ny; ++i) array1[i] = bounds[i * nv + k];
           shiftx(lcyclic, nshift, nx, ny, array1, array2, 0);
-          for (size_t i = 0; i < nx * ny; ++i)
-            bounds[i * nv + k] = array2[i];
+          for (size_t i = 0; i < nx * ny; ++i) bounds[i * nv + k] = array2[i];
         }
       gridDefXbounds(gridID2, bounds);
       Free(bounds);
@@ -157,11 +151,9 @@ shifty_coord(bool lcyclic, int nshift, int gridID1)
       gridInqYbounds(gridID1, bounds);
       for (int k = 0; k < nv; ++k)
         {
-          for (size_t i = 0; i < nx * ny; ++i)
-            array1[i] = bounds[i * nv + k];
+          for (size_t i = 0; i < nx * ny; ++i) array1[i] = bounds[i * nv + k];
           shifty(lcyclic, nshift, nx, ny, array1, array2, 0);
-          for (size_t i = 0; i < nx * ny; ++i)
-            bounds[i * nv + k] = array2[i];
+          for (size_t i = 0; i < nx * ny; ++i) bounds[i * nv + k] = array2[i];
         }
       gridDefYbounds(gridID2, bounds);
       Free(bounds);
@@ -215,8 +207,7 @@ Shiftxy(void *process)
 
   int nvars = vlistNvars(vlistID1);
   bool *vars = (bool *) Malloc(nvars * sizeof(bool));
-  for (varID = 0; varID < nvars; varID++)
-    vars[varID] = false;
+  for (varID = 0; varID < nvars; varID++) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
   for (int index = 0; index < ngrids; index++)

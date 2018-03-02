@@ -20,8 +20,7 @@
 #include "grid.h"
 #include "grid_search.h"
 
-extern "C"
-{
+extern "C" {
 #include "clipping/geometry.h"
 }
 
@@ -39,8 +38,7 @@ typedef struct
 static void
 copy_data_to_index(long ncells, const double *restrict data, long *restrict cellindex)
 {
-  for (long i = 0; i < ncells; ++i)
-    cellindex[i] = lround(data[i]);
+  for (long i = 0; i < ncells; ++i) cellindex[i] = lround(data[i]);
 }
 
 static void
@@ -122,8 +120,7 @@ read_cellindex(const char *filename)
     }
 
   // Fortran to C index
-  for (long i = 0; i < ncells; ++i)
-    cellindex->parent[i] -= 1;
+  for (long i = 0; i < ncells; ++i) cellindex->parent[i] -= 1;
   // for ( long i = 0; i < 3*ncells; ++i ) cellindex->neighbor[i] -= 1;
 
   streamClose(streamID);
@@ -227,8 +224,7 @@ compute_child_from_parent(cellindex_type *cellindex1, cellindex_type *cellindex2
   long *parent1 = cellindex1->parent;
 
   long *idx1 = (long *) Malloc(ncells1 * sizeof(long));
-  for (long i = 0; i < ncells1; ++i)
-    idx1[i] = i;
+  for (long i = 0; i < ncells1; ++i) idx1[i] = i;
   for (long i = 1; i < ncells1; ++i)
     if (parent1[i] < parent1[i - 1])
       {
@@ -254,8 +250,7 @@ compute_child_from_parent(cellindex_type *cellindex1, cellindex_type *cellindex2
   cellindex2->child = child2;
   for (long i = 0; i < ncells2; ++i)
     {
-      for (long k = 0; k < MAX_CHILDS; ++k)
-        child2[i * MAX_CHILDS + k] = -1;
+      for (long k = 0; k < MAX_CHILDS; ++k) child2[i * MAX_CHILDS + k] = -1;
       long j = find_index(i, ncells1, parent1);
       if (j < 0) continue;
       for (long k = 0; k < MAX_CHILDS; ++k)
@@ -346,8 +341,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
   cellindex2->child = child2;
   for (long cell_no2 = 0; cell_no2 < ncells2; ++cell_no2)
     {
-      for (int k = 0; k < MAX_CHILDS; ++k)
-        child2[cell_no2 * MAX_CHILDS + k] = -1;
+      for (int k = 0; k < MAX_CHILDS; ++k) child2[cell_no2 * MAX_CHILDS + k] = -1;
 
       for (int corner_no = 0; corner_no < ncorner; corner_no++)
         {
@@ -530,8 +524,8 @@ samplegrid(double missval, long nci, cellindex_type **cellindex, double *array1,
   long nx = 0;
   double x = 0;
 #ifdef _OPENMP
-  //#pragma omp parallel for default(none) shared(missval, ncells2, kci,
-  // cellindex, array1, array2, array3)
+//#pragma omp parallel for default(none) shared(missval, ncells2, kci,
+// cellindex, array1, array2, array3)
 #endif
   for (long i = 0; i < ncells2; ++i)
     {
@@ -579,8 +573,7 @@ Samplegridicon(void *process)
       if (cdoVerbose) cdoPrint("Found %ld grid cells in %s", cellindex[i]->ncells, cellindex[i]->filename);
     }
 
-  for (int i = 0; i < nsamplegrids - 1; ++i)
-    compute_child(cellindex[i], cellindex[i + 1]);
+  for (int i = 0; i < nsamplegrids - 1; ++i) compute_child(cellindex[i], cellindex[i + 1]);
 
   int gridID2 = read_grid(operatorArgv()[nsamplegrids - 1]);
 
@@ -669,8 +662,7 @@ Samplegridicon(void *process)
   if (array2) Free(array2);
   if (array1) Free(array1);
 
-  for (int i = 0; i < nsamplegrids; ++i)
-    free_cellindex(cellindex[i]);
+  for (int i = 0; i < nsamplegrids; ++i) free_cellindex(cellindex[i]);
 
   cdoFinish();
 

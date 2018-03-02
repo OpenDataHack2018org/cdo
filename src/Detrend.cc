@@ -55,8 +55,7 @@ detrend(long nts, double missval1, double *array1, double *array2)
   double work1 = DIVMN(SUBMN(sumjx, DIVMN(MULMN(sumx, sumj), n)), SUBMN(sumjj, DIVMN(MULMN(sumj, sumj), n)));
   double work2 = SUBMN(DIVMN(sumx, n), MULMN(work1, DIVMN(sumj, n)));
 
-  for (long j = 0; j < nts; j++)
-    array2[j] = SUBMN(array1[j], ADDMN(work2, MULMN(j, work1)));
+  for (long j = 0; j < nts; j++) array2[j] = SUBMN(array1[j], ADDMN(work2, MULMN(j, work1)));
 }
 
 void *
@@ -116,7 +115,7 @@ Detrend(void *process)
     }
 
   int nts = tsID;
-  
+
   VECTOR_2D(double, array1, Threading::ompNumThreads, nts);
   VECTOR_2D(double, array2, Threading::ompNumThreads, nts);
 
@@ -135,13 +134,11 @@ Detrend(void *process)
             {
               int ompthID = cdo_omp_get_thread_num();
 
-              for (int tsID = 0; tsID < nts; tsID++)
-                array1[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
+              for (int tsID = 0; tsID < nts; tsID++) array1[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
               detrend(nts, missval, &array1[ompthID][0], &array2[ompthID][0]);
 
-              for (int tsID = 0; tsID < nts; tsID++)
-                vars[tsID][varID][levelID].ptr[i] = array2[ompthID][tsID];
+              for (int tsID = 0; tsID < nts; tsID++) vars[tsID][varID][levelID].ptr[i] = array2[ompthID][tsID];
             }
         }
     }

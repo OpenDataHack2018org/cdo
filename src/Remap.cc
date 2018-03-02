@@ -470,15 +470,12 @@ scale_gridbox_area(size_t gridsize, const double *restrict array1, size_t gridsi
                    const double *restrict grid2_area)
 {
   double array1sum = 0;
-  for (size_t i = 0; i < gridsize; i++)
-    array1sum += array1[i];
+  for (size_t i = 0; i < gridsize; i++) array1sum += array1[i];
 
   double array2sum = 0;
-  for (size_t i = 0; i < gridsize2; i++)
-    array2sum += grid2_area[i];
+  for (size_t i = 0; i < gridsize2; i++) array2sum += grid2_area[i];
 
-  for (size_t i = 0; i < gridsize2; i++)
-    array2[i] = grid2_area[i] / array2sum * array1sum;
+  for (size_t i = 0; i < gridsize2; i++) array2[i] = grid2_area[i] / array2sum * array1sum;
 
   static bool lgridboxinfo = true;
   if (lgridboxinfo)
@@ -795,8 +792,7 @@ remapSum(remapgrid_t *remapGrid, size_t gridsize, double *array, const char *tag
            remapGrid->cell_frac[i]);
 
   double sum = 0;
-  for (size_t i = 0; i < gridsize; i++)
-    sum += remapGrid->cell_area[i];
+  for (size_t i = 0; i < gridsize; i++) sum += remapGrid->cell_area[i];
 
   printf("%s array sum %g\n", tag, sum);
 }
@@ -954,8 +950,7 @@ Remap(void *argument)
   if (max_remaps < 1) cdoAbort("max_remaps out of range (>0)!");
 
   std::vector<remapType> remaps(max_remaps);
-  for (int r = 0; r < max_remaps; r++)
-    remapInit(&remaps[r]);
+  for (int r = 0; r < max_remaps; r++) remapInit(&remaps[r]);
 
   if (writeRemapWeightsOnly || lremapxxx) remap_genweights = true;
 
@@ -1086,8 +1081,7 @@ Remap(void *argument)
 
               if (gridIsCircular(gridID1) && !lextrapolate) remap_extrapolate = true;
 
-              for (size_t i = 0; i < gridsize; i++)
-                imask[i] = !DBL_IS_EQUAL(array1[i], missval);
+              for (size_t i = 0; i < gridsize; i++) imask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
               for (r = nremaps - 1; r >= 0; r--)
                 {
@@ -1116,8 +1110,7 @@ Remap(void *argument)
                       remapVarsFree(&remaps[n0].vars);
                       remapGridFree(&remaps[n0].src_grid);
                       remapGridFree(&remaps[n0].tgt_grid);
-                      for (r = n0 + 1; r < nremaps; r++)
-                        memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
+                      for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
                       r = nremaps - 1;
                       remapInit(&remaps[r]);
                     }

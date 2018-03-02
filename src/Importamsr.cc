@@ -201,10 +201,8 @@ Importamsr(void *process)
   int gridID = gridCreate(GRID_LONLAT, gridsize);
   gridDefXsize(gridID, NLON);
   gridDefYsize(gridID, NLAT);
-  for (int i = 0; i < NLON; ++i)
-    xvals[i] = 0.25 * (i + 1) - 0.125;
-  for (int i = 0; i < NLAT; ++i)
-    yvals[i] = 0.25 * (i + 1) - 90.125;
+  for (int i = 0; i < NLON; ++i) xvals[i] = 0.25 * (i + 1) - 0.125;
+  for (int i = 0; i < NLAT; ++i) yvals[i] = 0.25 * (i + 1) - 90.125;
   gridDefXvals(gridID, xvals);
   gridDefYvals(gridID, yvals);
 
@@ -218,8 +216,7 @@ Importamsr(void *process)
   if (fsize == 12441600)
     {
       nvars = 6;
-      for (int i = 0; i < nvars; ++i)
-        data[i] = (double *) Malloc(gridsize * sizeof(double));
+      for (int i = 0; i < nvars; ++i) data[i] = (double *) Malloc(gridsize * sizeof(double));
 
       init_amsr_day(vlistID, gridID, zaxisID, nvars);
 
@@ -238,14 +235,12 @@ Importamsr(void *process)
           write_data(streamID, nvars, data, nmiss);
         }
 
-      for (int i = 0; i < nvars; ++i)
-        Free(data[i]);
+      for (int i = 0; i < nvars; ++i) Free(data[i]);
     }
   else if (fsize == 5184000)
     {
       nvars = 5;
-      for (int i = 0; i < nvars; ++i)
-        data[i] = (double *) Malloc(gridsize * sizeof(double));
+      for (int i = 0; i < nvars; ++i) data[i] = (double *) Malloc(gridsize * sizeof(double));
 
       init_amsr_averaged(vlistID, gridID, zaxisID, nvars);
 
@@ -261,8 +256,7 @@ Importamsr(void *process)
 
       write_data(streamID, nvars, data, nmiss);
 
-      for (int i = 0; i < nvars; ++i)
-        Free(data[i]);
+      for (int i = 0; i < nvars; ++i) Free(data[i]);
     }
   else
     cdoAbort("Unexpected file size for AMSR data!");

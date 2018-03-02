@@ -80,8 +80,7 @@ readNcFile(const char path[], double **vars, int nvars, int nts)
       taxisInqVdate(taxisID);
       taxisInqVtime(taxisID);
 
-      for (varID = 0; varID < nvars; ++varID)
-        streamReadVar(streamID, varID, &vars[varID][tsID], &nmiss);
+      for (varID = 0; varID < nvars; ++varID) streamReadVar(streamID, varID, &vars[varID][tsID], &nmiss);
     }
 
   streamClose(streamID);
@@ -163,8 +162,7 @@ createVars(int nvars, int nts)
 
   int i;
 
-  for (i = 0; i < nvars; ++i)
-    vars[i] = &array[i * nts];
+  for (i = 0; i < nvars; ++i) vars[i] = &array[i * nts];
 
   return vars;
 }

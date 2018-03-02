@@ -95,8 +95,7 @@ Setmiss(void *process)
   if (operatorID == SETMISSVAL)
     {
       int nvars = vlistNvars(vlistID2);
-      for (varID = 0; varID < nvars; varID++)
-        vlistDefVarMissval(vlistID2, varID, missval2);
+      for (varID = 0; varID < nvars; varID++) vlistDefVarMissval(vlistID2, varID, missval2);
     }
   else if (operatorID == SETMISSTOC)
     {

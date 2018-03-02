@@ -23,8 +23,7 @@
 #ifdef HAVE_LIBCMOR
 #include <unistd.h>
 
-extern "C"
-{
+extern "C" {
 #include "cmor.h"
 }
 
@@ -130,11 +129,9 @@ readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t len)
 static char *
 skipSeparator(char *pline)
 {
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   if (*pline == '=' || *pline == ':') pline++;
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
 
   return pline;
 }
@@ -195,8 +192,7 @@ handleError(list_t *kvl, int errnum, char *argument)
 static char *
 getElementName(char *pline, char *name, int *errh)
 {
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   size_t len = strlen(pline);
   size_t pos = 0;
   while (pos < len && *(pline + pos) != '=')
@@ -262,11 +258,9 @@ quote_replace(char **values, int nvalues, int i)
 static char *
 getElementValues(char *pline, char **values, int *nvalues, char *keyword, int *errh)
 {
-  while (isspace((int) *pline))
-    pline++;
+  while (isspace((int) *pline)) pline++;
   size_t len = strlen(pline);
-  while (isspace((int) *(pline + (int) len)))
-    len--;
+  while (isspace((int) *(pline + (int) len))) len--;
   *(pline + len) = 0;
   if ((int) len == 0)
     {
@@ -383,8 +377,7 @@ parse_line_to_list(list_t *list, char *pline, const char *kvlname, int checkpml,
             }
           kvlist_append(list, name, (const char **) values, nvalues);
         }
-      while (isspace((int) *pline))
-        pline++;
+      while (isspace((int) *pline)) pline++;
       if (*pline == '/') *pline = 0;
       free_array(values);
     }
@@ -394,8 +387,7 @@ parse_line_to_list(list_t *list, char *pline, const char *kvlname, int checkpml,
 static void
 remove_space_and_comms(char **pline, char *line)
 {
-  while (isspace((int) *(*pline)))
-    (*pline)++;
+  while (isspace((int) *(*pline))) (*pline)++;
   char *tester = *pline;
   int i = 0;
   while (*tester != 0)
@@ -414,11 +406,9 @@ static int
 add_lines_tester(char *line)
 {
   char *tester = line;
-  while (*tester != 0)
-    tester++;
+  while (*tester != 0) tester++;
   tester--;
-  while (isspace((int) *tester))
-    tester--;
+  while (isspace((int) *tester)) tester--;
   if (*tester == ',') return 1;
   return 0;
 }
@@ -943,8 +933,7 @@ construct_var_mapping(int streamID)
 static void
 destruct_var_mapping(struct mapping vars[])
 {
-  for (int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++)
-    Free(vars[i].data);
+  for (int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++) Free(vars[i].data);
   Free(vars);
 }
 
@@ -1026,8 +1015,7 @@ addcharvar(keyValues_t *charvars, int vlistID, const char *key, struct mapping v
   double *xvals, *yvals, *zvals, *subsvals;
 
   subsvals = (double *) Malloc(charvars->nvalues * sizeof(double));
-  for (int i = 0; i < charvars->nvalues; i++)
-    subsvals[i] = i + 1;
+  for (int i = 0; i < charvars->nvalues; i++) subsvals[i] = i + 1;
 
   axissize[0] = gridInqXsize(gridID);
   axissize[1] = gridInqYsize(gridID);
@@ -1160,11 +1148,9 @@ static char *
 trim(char *s)
 {
   if (s == NULL) return s;
-  while (*s != '\0' && (isspace(*s) || *s == '"'))
-    s++;
+  while (*s != '\0' && (isspace(*s) || *s == '"')) s++;
   int n = strlen(s);
-  while (n > 0 && (isspace(s[n - 1]) || s[n - 1] == '"'))
-    n--;
+  while (n > 0 && (isspace(s[n - 1]) || s[n - 1] == '"')) n--;
   s[n] = '\0';
   return s;
 }
@@ -1287,10 +1273,9 @@ attErr(const char **reqAtt, int errnum)
   char errStr[CMOR_MAX_STRING];
   int i = 1;
 
-  sprintf(errStr,
-          "Attribute '%s' is required. Either it is missing or notSet.\n       "
-          "   Make sure that you have configured all following attributes:\n   "
-          "       %s",
+  sprintf(errStr, "Attribute '%s' is required. Either it is missing or notSet.\n       "
+                  "   Make sure that you have configured all following attributes:\n   "
+                  "       %s",
           reqAtt[errnum], reqAtt[0]);
   while (reqAtt[i])
     {
@@ -1418,14 +1403,12 @@ check_mem(list_t *kvl, char *project_id)
 
   int memberlen = strlen(kv_member);
   char ripvaluechar[memberlen][CMOR_MAX_STRING];
-  for (int k = 0; k < memberlen; k++)
-    strcpy(ripvaluechar[k], kv_member);
+  for (int k = 0; k < memberlen; k++) strcpy(ripvaluechar[k], kv_member);
 
   int firstNum, tonull, j = 0;
   for (int i = 0; i < ripcharlen; i++)
     {
-      while (kv_member[j] != ripchar[i] && j < memberlen)
-        j++;
+      while (kv_member[j] != ripchar[i] && j < memberlen) j++;
       if (j == memberlen)
         {
           j = -1;
@@ -1444,8 +1427,7 @@ check_mem(list_t *kvl, char *project_id)
       firstNum = j + 1;
       j = 0;
       if (i < (ripcharlen - 1))
-        while (kv_member[j] != ripchar[i + 1] && j < memberlen)
-          j++;
+        while (kv_member[j] != ripchar[i + 1] && j < memberlen) j++;
       if (j == memberlen)
         {
           j = -1;
@@ -1472,20 +1454,16 @@ check_mem(list_t *kvl, char *project_id)
   if (j != -1)
     {
       if (ripcharlen == 3)
-        for (int i = 0; i < ripcharlen; i++)
-          kv_insert_a_val(kvl, (char *) ripcharCMIP5[i], ripvaluechar[i], 1);
+        for (int i = 0; i < ripcharlen; i++) kv_insert_a_val(kvl, (char *) ripcharCMIP5[i], ripvaluechar[i], 1);
       else
-        for (int i = 0; i < ripcharlen; i++)
-          kv_insert_a_val(kvl, (char *) ripcharCMIP6[i], ripvaluechar[i], 1);
+        for (int i = 0; i < ripcharlen; i++) kv_insert_a_val(kvl, (char *) ripcharCMIP6[i], ripvaluechar[i], 1);
     }
   else
     {
       if (ripcharlen == 3)
-        for (int i = 0; i < ripcharlen; i++)
-          kv_insert_a_val(kvl, (char *) ripcharCMIP5[i], (char *) "-1", 1);
+        for (int i = 0; i < ripcharlen; i++) kv_insert_a_val(kvl, (char *) ripcharCMIP5[i], (char *) "-1", 1);
       else
-        for (int i = 0; i < ripcharlen; i++)
-          kv_insert_a_val(kvl, (char *) ripcharCMIP6[i], (char *) "-1", 1);
+        for (int i = 0; i < ripcharlen; i++) kv_insert_a_val(kvl, (char *) ripcharCMIP6[i], (char *) "-1", 1);
     }
   return 0;
 
@@ -2263,16 +2241,14 @@ setup_dataset(list_t *kvl, int streamID, int *calendar)
     fputs(kv_get_a_val(kvl, "dr", "./"), dataset_json);
     fputs("\",\n", dataset_json);
     fputs("\"output_path_template\" : \"", dataset_json);
-    fputs(kv_get_a_val(kvl, "output_path_template",
-                       "<mip_era><activity_id><institution_id><source_id><"
-                       "experiment_id><variant_label><table><variable_id><grid_"
-                       "label><version>"),
+    fputs(kv_get_a_val(kvl, "output_path_template", "<mip_era><activity_id><institution_id><source_id><"
+                                                    "experiment_id><variant_label><table><variable_id><grid_"
+                                                    "label><version>"),
           dataset_json);
     fputs("\",\n", dataset_json);
     fputs("\"output_file_template\" : \"", dataset_json);
-    fputs(kv_get_a_val(kvl, "output_file_template",
-                       "<variable_id><table><source_id><experiment_id><variant_"
-                       "label><grid_label>"),
+    fputs(kv_get_a_val(kvl, "output_file_template", "<variable_id><table><source_id><experiment_id><variant_"
+                                                    "label><grid_label>"),
           dataset_json);
     fputs("\",\n", dataset_json);
     fputs("\"tracking_prefix\" : \"", dataset_json);
@@ -2431,8 +2407,7 @@ register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname,
           void *charcmor = (void *) Malloc((numchar * maxlen + 1) * sizeof(char));
           sprintf((char *) charcmor, "%s", charvals[0]);
           char blanks[maxlen];
-          for (int i = 0; i < maxlen; i++)
-            blanks[i] = ' ';
+          for (int i = 0; i < maxlen; i++) blanks[i] = ' ';
           sprintf((char *) charcmor, "%s%.*s", (char *) charcmor, (int) (maxlen - strlen(charvals[0])), blanks);
           for (int i = 1; i < numchar; i++)
             {
@@ -3209,8 +3184,7 @@ register_char_axis(int numchar, char **charvals, int *axis_ids, char *chardim)
   void *charcmor = (void *) Malloc(numchar * maxlen * sizeof(char));
   sprintf((char *) charcmor, "%.*s", (int) strlen(charvals[0]), charvals[0]);
   char blanks[maxlen];
-  for (int i = 0; i < maxlen; i++)
-    blanks[i] = ' ';
+  for (int i = 0; i < maxlen; i++) blanks[i] = ' ';
   sprintf((char *) charcmor, "%s%.*s", (char *) charcmor, (int) (maxlen - strlen(charvals[0])), blanks);
   for (int i = 1; i < numchar; i++)
     {
@@ -3243,9 +3217,8 @@ register_projection(int *grid_ids, int projID, double *ycoord_vals, double *xcoo
 
   char p_rll_cmor[CMOR_MAX_STRING];
   int l_p_rll = strlen("grid_north_pole_longitude") + 1;
-  memcpy(p_rll_cmor,
-         "grid_north_pole_latitude\0 "
-         "grid_north_pole_longitude\0north_pole_grid_longitude\0",
+  memcpy(p_rll_cmor, "grid_north_pole_latitude\0 "
+                     "grid_north_pole_longitude\0north_pole_grid_longitude\0",
          3 * l_p_rll);
 
   char u_rll_cmor[CMOR_MAX_STRING];
@@ -3254,10 +3227,9 @@ register_projection(int *grid_ids, int projID, double *ycoord_vals, double *xcoo
 
   char p_lcc_cmor[CMOR_MAX_STRING];
   int l_p_lcc = strlen("longitude_of_central_meridian") + 1;
-  memcpy(p_lcc_cmor,
-         "standard_parallel1\0           "
-         "longitude_of_central_meridian\0latitude_of_projection_"
-         "origin\0standard_parallel2\0           ",
+  memcpy(p_lcc_cmor, "standard_parallel1\0           "
+                     "longitude_of_central_meridian\0latitude_of_projection_"
+                     "origin\0standard_parallel2\0           ",
          4 * l_p_lcc);
 
   char u_lcc_cmor[CMOR_MAX_STRING];
@@ -3304,8 +3276,7 @@ register_projection(int *grid_ids, int projID, double *ycoord_vals, double *xcoo
                p_len, natts);
 
   parameter_values = (double *) Malloc(p_len * sizeof(double));
-  for (int i = 0; i < p_len; i++)
-    parameter_values[i] = 0.0;
+  for (int i = 0; i < p_len; i++) parameter_values[i] = 0.0;
 
   for (int iatt = 0; iatt < natts; ++iatt)
     {
@@ -3371,10 +3342,8 @@ register_projection(int *grid_ids, int projID, double *ycoord_vals, double *xcoo
     {
       double *xii = (double *) Malloc(xlength * sizeof(double));
       double *yii = (double *) Malloc(ylength * sizeof(double));
-      for (int i = 0; i < xlength; i++)
-        xii[i] = (double) i;
-      for (int i = 0; i < ylength; i++)
-        yii[i] = (double) i;
+      for (int i = 0; i < xlength; i++) xii[i] = (double) i;
+      for (int i = 0; i < ylength; i++) yii[i] = (double) i;
       cmf = cmor_axis(&grid_axis[0], (char *) "x", (char *) "m", ylength, (void *) yii, 'd', 0, 0, NULL);
       cmf = cmor_axis(&grid_axis[1], (char *) "y", (char *) "m", xlength, (void *) xii, 'd', 0, 0, NULL);
       cmf = cmor_grid(&grid_ids[0], 2, grid_axis, 'd', (void *) ycoord_vals, (void *) xcoord_vals, 4,
@@ -3474,10 +3443,8 @@ register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids,
               double *yncoord_vals;
               xncoord_vals = (double *) Malloc(xlength * sizeof(double));
               yncoord_vals = (double *) Malloc(ylength * sizeof(double));
-              for (int j = 0; j < ylength; j++)
-                yncoord_vals[j] = (double) j;
-              for (int j = 0; j < xlength; j++)
-                xncoord_vals[j] = (double) j;
+              for (int j = 0; j < ylength; j++) yncoord_vals[j] = (double) j;
+              for (int j = 0; j < xlength; j++) xncoord_vals[j] = (double) j;
               cmf = cmor_axis(&grid_axis[0], (char *) "j_index", (char *) "1", ylength, (void *) yncoord_vals, 'd', 0,
                               0, NULL);
               cmf = cmor_axis(&grid_axis[1], (char *) "i_index", (char *) "1", xlength, (void *) xncoord_vals, 'd', 0,
@@ -3596,11 +3563,9 @@ register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids,
           if ((dimstrlen = gridInqXIsc(gridID)))
             {
               char **xchars = (char **) Malloc((xlength + 1) * sizeof(char *));
-              for (int i = 0; i < xlength; i++)
-                xchars[i] = (char *) Malloc((dimstrlen + 1) * sizeof(char));
+              for (int i = 0; i < xlength; i++) xchars[i] = (char *) Malloc((dimstrlen + 1) * sizeof(char));
               gridInqXCvals(gridID, xchars);
-              for (int j = 0; j < xlength; j++)
-                xchars[j][dimstrlen] = 0;
+              for (int j = 0; j < xlength; j++) xchars[j][dimstrlen] = 0;
               xchars[xlength] = NULL;
               register_char_axis(xlength, xchars, axis_ids, xdimname);
               free_array(xchars);
@@ -3611,11 +3576,9 @@ register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids,
           if ((dimstrlen = gridInqYIsc(gridID)))
             {
               char **ychars = (char **) Malloc((ylength + 1) * sizeof(char));
-              for (int i = 0; i < ylength; i++)
-                ychars[i] = (char *) Malloc((dimstrlen + 1) * sizeof(char));
+              for (int i = 0; i < ylength; i++) ychars[i] = (char *) Malloc((dimstrlen + 1) * sizeof(char));
               gridInqYCvals(gridID, ychars);
-              for (int j = 0; j < ylength; j++)
-                ychars[j][dimstrlen] = 0;
+              for (int j = 0; j < ylength; j++) ychars[j][dimstrlen] = 0;
               ychars[ylength] = NULL;
               register_char_axis(ylength, ychars, axis_ids, ydimname);
               free_array(ychars);
@@ -4474,8 +4437,7 @@ use_chunk_des_files(list_t *kvl, int vlistID, int var_id, char *chunk_des_file, 
 static char **
 empty_array(struct mapping vars[], char ***chunk_files)
 {
-  for (int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++)
-    (*chunk_files)[i] = NULL;
+  for (int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++) (*chunk_files)[i] = NULL;
   return *chunk_files;
 }
 
@@ -4665,8 +4627,7 @@ write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_fr
                                                           tunitsec, time_bnds, time_axis)
                                         : 0;
         }
-      while (nrecs--)
-        read_record(*streamID, vars, vlistID);
+      while (nrecs--) read_record(*streamID, vars, vlistID);
 
       int ps_index = -1;
       if (pscheck) check_for_sfc_pressure(&ps_index, vars, vlistID, tsID);

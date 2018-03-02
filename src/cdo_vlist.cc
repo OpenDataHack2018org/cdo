@@ -51,8 +51,7 @@ cdoZaxisInqLevels(int zaxisID, double *levels)
           if (size == 1 && zaxisInqType(zaxisID) == ZAXIS_SURFACE)
             levels[0] = 0;
           else
-            for (int i = 0; i < size; ++i)
-              levels[i] = i + 1;
+            for (int i = 0; i < size; ++i) levels[i] = i + 1;
         }
     }
 
@@ -276,10 +275,8 @@ vlistCompare(int vlistID1, int vlistID2, int flag)
       NEW_2D(char, names1, nvars, CDI_MAX_NAME);
       NEW_2D(char, names2, nvars, CDI_MAX_NAME);
 
-      for (varID = 0; varID < nvars; varID++)
-        vlistInqVarName(vlistID1, varID, &names1[varID][0]);
-      for (varID = 0; varID < nvars; varID++)
-        vlistInqVarName(vlistID2, varID, &names2[varID][0]);
+      for (varID = 0; varID < nvars; varID++) vlistInqVarName(vlistID1, varID, &names1[varID][0]);
+      for (varID = 0; varID < nvars; varID++) vlistInqVarName(vlistID2, varID, &names2[varID][0]);
 
       qsort(names1[0], nvars, CDI_MAX_NAME, cmpnames);
       qsort(names2[0], nvars, CDI_MAX_NAME, cmpnames);
@@ -287,8 +284,7 @@ vlistCompare(int vlistID1, int vlistID2, int flag)
       for (varID = 0; varID < nvars; varID++)
         if (strcmp(names1[varID], names2[varID]) != 0) break;
 
-      if (varID == nvars)
-        cdoPrint("Use CDO option --sortname to sort the parameter by name (NetCDF only)!");
+      if (varID == nvars) cdoPrint("Use CDO option --sortname to sort the parameter by name (NetCDF only)!");
 
       DELETE_2D(names1);
       DELETE_2D(names2);
@@ -448,7 +444,8 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlev
                   vct = (double *) Malloc(nvct * sizeof(double));
                   zaxisInqVct(zaxisID, vct);
                   if (cdoVerbose)
-                    cdoPrint("Detected half-level model definition : nlevel == (nvct/2 - 1) (nlevel: %d, nvct: %d, nhlevf: %d, nhlevh: %d) ",
+                    cdoPrint("Detected half-level model definition : nlevel == (nvct/2 - 1) (nlevel: %d, nvct: %d, "
+                             "nhlevf: %d, nhlevh: %d) ",
                              nlevel, nvct, nhlevf, nhlevh);
                 }
             }
@@ -465,7 +462,8 @@ vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlev
                   vct = (double *) Malloc(nvct * sizeof(double));
                   zaxisInqVct(zaxisID, vct);
                   if (cdoVerbose)
-                    cdoPrint("Detected full-level model definition : nlevel == (nvct/2) (nlevel: %d, nvct: %d, nhlevf: %d, nhlevh: %d) ",
+                    cdoPrint("Detected full-level model definition : nlevel == (nvct/2) (nlevel: %d, nvct: %d, nhlevf: "
+                             "%d, nhlevh: %d) ",
                              nlevel, nvct, nhlevf, nhlevh);
                 }
             }

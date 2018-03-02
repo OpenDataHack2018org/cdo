@@ -77,8 +77,7 @@ Change_e5slm(void *process)
 
   streamClose(streamIDslm);
 
-  for (size_t i = 0; i < gridsize; ++i)
-    lsea[i] = !(cland[i] > 0);
+  for (size_t i = 0; i < gridsize; ++i) lsea[i] = !(cland[i] > 0);
 
   int nvars = vlistNvars(vlistID1);
   short *codes = (short *) Malloc(nvars * sizeof(short));
@@ -137,14 +136,12 @@ Change_e5slm(void *process)
           if (code == 172)
             {
               cdoPrint("SLM changed!");
-              for (size_t i = 0; i < gridsize; ++i)
-                array[i] = cland[i];
+              for (size_t i = 0; i < gridsize; ++i) array[i] = cland[i];
             }
           else if (code == 99)
             {
               cdoPrint("ALAKE set all values to zero!");
-              for (size_t i = 0; i < gridsize; ++i)
-                array[i] = 0;
+              for (size_t i = 0; i < gridsize; ++i) array[i] = 0;
             }
           else if (code == 232)
             {

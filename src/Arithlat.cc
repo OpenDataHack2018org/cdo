@@ -115,19 +115,15 @@ Arithlat(void *process)
               grid_to_radian(units, gridsize, &scale[0], "grid latitudes");
 
               if (operfunc == func_mul)
-                for (size_t i = 0; i < gridsize; ++i)
-                  scale[i] = cos(scale[i]);
+                for (size_t i = 0; i < gridsize; ++i) scale[i] = cos(scale[i]);
               else
-                for (size_t i = 0; i < gridsize; ++i)
-                  scale[i] = 1. / cos(scale[i]);
+                for (size_t i = 0; i < gridsize; ++i) scale[i] = 1. / cos(scale[i]);
 
               if (cdoVerbose)
-                for (unsigned i = 0; i < 10; ++i)
-                  cdoPrint("coslat  %3d  %g", i + 1, scale[i]);
+                for (unsigned i = 0; i < 10; ++i) cdoPrint("coslat  %3d  %g", i + 1, scale[i]);
             }
 
-          for (size_t i = 0; i < gridsize; ++i)
-            array[i] *= scale[i];
+          for (size_t i = 0; i < gridsize; ++i) array[i] *= scale[i];
 
           pstreamDefRecord(streamID2, varID, levelID);
           pstreamWriteRecord(streamID2, &array[0], nmiss);

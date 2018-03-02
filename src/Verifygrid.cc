@@ -24,14 +24,10 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream_int.h"
-extern "C"
-{
+extern "C" {
 #include "clipping/geometry.h"
 }
 #include "time.h"
-
-
-
 
 static void
 quick_sort(double *array, size_t array_length)
@@ -43,10 +39,8 @@ quick_sort(double *array, size_t array_length)
   double p = array[array_length / 2];
   for (i = 0, j = array_length - 1;; i++, j--)
     {
-      while (array[i] < p)
-        i++;
-      while (p < array[j])
-        j--;
+      while (array[i] < p) i++;
+      while (p < array[j]) j--;
       if (i >= j) break;
       temp = array[i];
       array[i] = array[j];
@@ -55,7 +49,6 @@ quick_sort(double *array, size_t array_length)
   quick_sort(array, i);
   quick_sort(array + i, array_length - i);
 }
-
 
 /* Quicksort is called with a pointer to the array of center points to be sorted
  * and an integer indicating its length. It sorts the array by its longitude
@@ -71,11 +64,9 @@ quick_sort_by_lon(double *array, size_t array_length)
   size_t i, j;
   for (i = 0, j = array_length - 2;; i += 2, j -= 2)
     {
-      while (array[i] < p)
-        i += 2;
+      while (array[i] < p) i += 2;
 
-      while (p < array[j])
-        j -= 2;
+      while (p < array[j]) j -= 2;
 
       if (i >= j) break;
 
@@ -90,7 +81,6 @@ quick_sort_by_lon(double *array, size_t array_length)
   quick_sort_by_lon(array, i);
   quick_sort_by_lon(array + i, array_length - i);
 }
-
 
 /* This uses quicksort to sort the latitude coordinates in a subarray of all
  * coordinates. */
@@ -120,8 +110,6 @@ quick_sort_of_subarray_by_lat(double *array, size_t subarray_start, size_t subar
   Free(subarray);
 }
 
-
-
 static double
 determinant(double matrix[3][3])
 {
@@ -131,7 +119,6 @@ determinant(double matrix[3][3])
          + matrix[0][2] * matrix[1][0] * matrix[2][1] - matrix[0][2] * matrix[1][1] * matrix[2][0]
          - matrix[0][1] * matrix[1][0] * matrix[2][2] - matrix[0][0] * matrix[1][2] * matrix[2][1];
 }
-
 
 static void
 find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal)
@@ -157,7 +144,6 @@ find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal)
   unit_normal[1] = y / magnitude;
   unit_normal[2] = z / magnitude;
 }
-
 
 int
 find_coordinate_to_ignore(double *cell_corners_xyz)
@@ -191,7 +177,6 @@ find_coordinate_to_ignore(double *cell_corners_xyz)
 
   return coordinate_to_ignore;
 }
-
 
 /*
 static
@@ -239,7 +224,6 @@ is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], doub
   return answer;
 }
 
-
 int
 winding_numbers_algorithm(double cell_corners[], int number_corners, double point[])
 {
@@ -279,7 +263,6 @@ winding_numbers_algorithm(double cell_corners[], int number_corners, double poin
 
   return winding_number;
 }
-
 
 static double
 sign(double x)
@@ -330,7 +313,6 @@ is_simple_polygon_convex(double cell_corners[], int number_corners)
   return true;
 }
 
-
 double
 calculate_the_polygon_area(double cell_corners[], int number_corners)
 {
@@ -358,7 +340,6 @@ are_polygon_vertices_arranged_in_clockwise_order(double cell_area)
 
   return status;
 }
-
 
 static void
 verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon,
@@ -396,8 +377,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
   int *no_cells_with_a_specific_no_of_corners = (int *) Malloc(ncorner * sizeof(int));
 
-  for (int i = 0; i < ncorner; i++)
-    no_cells_with_a_specific_no_of_corners[i] = 0;
+  for (int i = 0; i < ncorner; i++) no_cells_with_a_specific_no_of_corners[i] = 0;
 
   if (ngrids == 1)
     cdoPrintBlue("Grid consists of %zu cells (type: %s), of which", gridsize, gridNamePtr(gridtype));
@@ -533,10 +513,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
       if (actual_number_of_corners < 3)
         {
           if (cdoVerbose)
-            fprintf(stdout,
-                    "Less than three vertices found in cell no %zu. This cell "
-                    "is considered degenerate and will be omitted from further "
-                    "computation!\n",
+            fprintf(stdout, "Less than three vertices found in cell no %zu. This cell "
+                            "is considered degenerate and will be omitted from further "
+                            "computation!\n",
                     cell_no + 1);
 
           continue;
@@ -547,8 +526,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
       /* Checks if there are any duplicate vertices in the list of corners. Note
        * that the last (additional) corner has not been set yet. */
 
-      for (int i = 0; i < actual_number_of_corners; i++)
-        marked_duplicate_indices[i] = 0;
+      for (int i = 0; i < actual_number_of_corners; i++) marked_duplicate_indices[i] = 0;
 
       int no_duplicates = 0;
 
@@ -559,9 +537,8 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
               && fabs(cell_corners_xyz_open_cell[i + 2] - cell_corners_xyz_open_cell[j + 2]) < 0.000000001)
             {
               if (cdoVerbose)
-                fprintf(stdout,
-                        "The duplicate vertex %f, %f, %f was found in cell no "
-                        "%zu.\n",
+                fprintf(stdout, "The duplicate vertex %f, %f, %f was found in cell no "
+                                "%zu.\n",
                         cell_corners_xyz_open_cell[j], cell_corners_xyz_open_cell[j + 1],
                         cell_corners_xyz_open_cell[j + 2], cell_no + 1);
 
@@ -597,10 +574,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
       if (actual_number_of_corners < 3)
         {
           if (cdoVerbose)
-            fprintf(stdout,
-                    "Less than three vertices found in cell no %zu. This cell "
-                    "is considered degenerate and will be omitted from further "
-                    "computation!\n",
+            fprintf(stdout, "Less than three vertices found in cell no %zu. This cell "
+                            "is considered degenerate and will be omitted from further "
+                            "computation!\n",
                     cell_no + 1);
 
           continue;
@@ -743,8 +719,6 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
   Free(cell_corners_xyz_open_cell);
 }
 
-
-
 void *
 Verifygrid(void *argument)
 {
@@ -842,8 +816,8 @@ Verifygrid(void *argument)
             }
 
           if (operatorID == VERIFYGRID)
-            verify_grid(gridtype, gridsize, gridno, ngrids, ncorner, grid_center_lon, grid_center_lat,
-                           grid_corner_lon, grid_corner_lat);
+            verify_grid(gridtype, gridsize, gridno, ngrids, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon,
+                        grid_corner_lat);
 
           if (grid_center_lon) Free(grid_center_lon);
           if (grid_center_lat) Free(grid_center_lat);

@@ -62,8 +62,7 @@ Duplicate(void *process)
 
   if (ntsteps == 0)
     {
-      for (varID = 0; varID < nvars; ++varID)
-        vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
+      for (varID = 0; varID < nvars; ++varID) vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -127,8 +126,7 @@ Duplicate(void *process)
         }
     }
 
-  for (tsID = 0; tsID < nts; tsID++)
-    field_free(vars[tsID], vlistID1);
+  for (tsID = 0; tsID < nts; tsID++) field_free(vars[tsID], vlistID1);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

@@ -101,8 +101,7 @@ scan_time(int verbose, char *namelist, int *hours, int max_hours)
   if (verbose)
     {
       fprintf(stdout, " %16.16s = ", "timesel");
-      for (time = 0; time < nrqh; ++time)
-        fprintf(stdout, " %02d", hours[time]);
+      for (time = 0; time < nrqh; ++time) fprintf(stdout, " %02d", hours[time]);
       fprintf(stdout, "\n");
     }
 

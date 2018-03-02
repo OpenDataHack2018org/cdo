@@ -37,8 +37,7 @@ layer_cloud(const double *cc, double *ll, long MaxLev, long MinLev, long dimgp)
 
   ZEPSEC = 1. - 1.0e-12;
 
-  for (i = 0; i < dimgp; i++)
-    ll[i] = 1. - cc[i + MaxLev * dimgp];
+  for (i = 0; i < dimgp; i++) ll[i] = 1. - cc[i + MaxLev * dimgp];
 
   //  printf("maxlev %d minlev %d\n", MaxLev, MinLev);
 
@@ -52,8 +51,7 @@ layer_cloud(const double *cc, double *ll, long MaxLev, long MinLev, long dimgp)
         }
     }
 
-  for (i = 0; i < dimgp; i++)
-    ll[i] = 1. - ll[i];
+  for (i = 0; i < dimgp; i++) ll[i] = 1. - ll[i];
 }
 
 static void
@@ -61,8 +59,7 @@ vct2plev(const double *vct, double *plevs, long nlevs)
 {
   long k;
 
-  for (k = 0; k < nlevs; k++)
-    plevs[k] = vct[k] + vct[k + nlevs] * SCALESLP;
+  for (k = 0; k < nlevs; k++) plevs[k] = vct[k] + vct[k + nlevs] * SCALESLP;
   /*
   for ( k = 0; k < nlevs; k++ )
     printf("plevs %ld %g\n", k, plevs[k]);
@@ -198,8 +195,7 @@ Cloudlayer(void *process)
   int nhlev = nlevel + 1;
 
   double *aclcac = (double *) Malloc(gridsize * nlevel * sizeof(double));
-  for (varID = 0; varID < nvars2; ++varID)
-    cloud[varID] = (double *) Malloc(gridsize * sizeof(double));
+  for (varID = 0; varID < nvars2; ++varID) cloud[varID] = (double *) Malloc(gridsize * sizeof(double));
 
   if (zaxisInqType(zaxisID) == ZAXIS_PRESSURE)
     {
@@ -330,8 +326,7 @@ Cloudlayer(void *process)
 
       for (varID = 0; varID < nvars2; ++varID)
         {
-          for (size_t i = 0; i < gridsize; i++)
-            cloud[varID][i] = missval;
+          for (size_t i = 0; i < gridsize; i++) cloud[varID][i] = missval;
         }
 
       for (varID = 0; varID < nvars2; ++varID)
@@ -357,8 +352,7 @@ Cloudlayer(void *process)
   vlistDestroy(vlistID2);
 
   Free(aclcac);
-  for (varID = 0; varID < nvars2; ++varID)
-    Free(cloud[varID]);
+  for (varID = 0; varID < nvars2; ++varID) Free(cloud[varID]);
 
   cdoFinish();
 

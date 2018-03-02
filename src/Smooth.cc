@@ -48,7 +48,6 @@ typedef struct
   double weightR;
 } smoothpoint_t;
 
-
 static void
 smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, size_t *nmiss,
        smoothpoint_t spoint)
@@ -59,8 +58,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   if (numNeighbors > gridsize) numNeighbors = gridsize;
 
   uint8_t *mask = (uint8_t *) Malloc(gridsize * sizeof(uint8_t));
-  for (size_t i = 0; i < gridsize; ++i)
-    mask[i] = !DBL_IS_EQUAL(array1[i], missval);
+  for (size_t i = 0; i < gridsize; ++i) mask[i] = !DBL_IS_EQUAL(array1[i], missval);
 
   std::vector<double> xvals(gridsize);
   std::vector<double> yvals(gridsize);
@@ -81,7 +79,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
   std::vector<knnWeightsType> knnWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
+  for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
   clock_t start, finish;
 
@@ -105,8 +103,8 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for schedule(dynamic) default(none)  reduction(+:findex)  reduction(+:nmissx) \
-  shared(cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
+#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) reduction(+ : nmissx) shared( \
+    cdoVerbose, knnWeights, spoint, mask, array1, array2, xvals, yvals, gs, gridsize, missval)
 #endif
   for (size_t i = 0; i < gridsize; ++i)
     {
@@ -163,8 +161,7 @@ smooth9(int gridID, double missval, const double *restrict array1, double *restr
 
   uint8_t *mask = (uint8_t *) Malloc(gridsize * sizeof(uint8_t));
 
-  for (size_t i = 0; i < gridsize; ++i)
-    mask[i] = !DBL_IS_EQUAL(missval, array1[i]);
+  for (size_t i = 0; i < gridsize; ++i) mask[i] = !DBL_IS_EQUAL(missval, array1[i]);
 
   *nmiss = 0;
   for (size_t i = 0; i < nlat; i++)
@@ -394,8 +391,8 @@ Smooth(void *process)
   size_t gridsizemax = vlistGridsizeMax(vlistID1);
   if (gridsizemax < spoint.maxpoints) spoint.maxpoints = gridsizemax;
   if (cdoVerbose)
-    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
-             xnsmooth, spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
+    cdoPrint("nsmooth = %d, maxpoints = %zu, radius = %gdeg, form = %s, weight0 = %g, weightR = %g", xnsmooth,
+             spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
 
   spoint.radius *= DEG2RAD;
 

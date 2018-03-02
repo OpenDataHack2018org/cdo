@@ -47,11 +47,9 @@ spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, d
   if (detrend == 1)
     {
       sumx = 0;
-      for (k = 0; k < nrec; k++)
-        sumx += data[k];
+      for (k = 0; k < nrec; k++) sumx += data[k];
       sumx /= nrec;
-      for (k = 0; k < nrec; k++)
-        data[k] -= sumx;
+      for (k = 0; k < nrec; k++) data[k] -= sumx;
     }
   else if (detrend == 2)
     {
@@ -63,8 +61,7 @@ spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, d
         }
       b = (sumkx - sumx * (nrec - 1) / 2.) / ((nrec + 1) * nrec * (nrec - 1) / 12.);
       a = sumx / nrec - b * (nrec - 1) / 2.;
-      for (k = 0; k < nrec; k++)
-        data[k] -= a + b * k;
+      for (k = 0; k < nrec; k++) data[k] -= a + b * k;
     }
 
   if (bit != 1)
@@ -77,8 +74,7 @@ spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, d
     {
       offset = seg_n == 1 ? 0 : (int) ((double) (nrec - seg_l) / (seg_n - 1) * seg_i);
 
-      for (k = 0; k < seg_l; k++)
-        real[k] = data[offset + k];
+      for (k = 0; k < seg_l; k++) real[k] = data[offset + k];
 
       if (detrend == 3)
         {
@@ -92,18 +88,15 @@ spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, d
           b = (sumkx - sumx * (seg_l - 1) / 2.) / ((seg_l + 1) * seg_l * (seg_l - 1) / 12.);
           a = sumx / seg_l - b * (seg_l - 1) / 2.;
 
-          for (k = 0; k < seg_l; k++)
-            real[k] -= a + b * k;
+          for (k = 0; k < seg_l; k++) real[k] -= a + b * k;
         }
 
-      for (k = 0; k < seg_l; k++)
-        real[k] *= window[k];
+      for (k = 0; k < seg_l; k++) real[k] *= window[k];
 
       if (seg_i + 1 < seg_n)
         {
           offset = seg_n == 1 ? 0 : (int) ((double) (nrec - seg_l) / (seg_n - 1) * (seg_i + 1));
-          for (k = 0; k < seg_l; k++)
-            imag[k] = data[offset + k];
+          for (k = 0; k < seg_l; k++) imag[k] = data[offset + k];
           if (detrend == 3)
             {
               sumx = sumkx = 0;
@@ -116,16 +109,13 @@ spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, d
               b = (sumkx - sumx * (seg_l - 1) / 2.) / ((seg_l + 1) * seg_l * (seg_l - 1) / 12.);
               a = sumx / seg_l - b * (seg_l - 1) / 2.;
 
-              for (k = 0; k < seg_l; k++)
-                imag[k] -= a + b * k;
+              for (k = 0; k < seg_l; k++) imag[k] -= a + b * k;
             }
 
-          for (k = 0; k < seg_l; k++)
-            imag[k] *= window[k];
+          for (k = 0; k < seg_l; k++) imag[k] *= window[k];
         }
       else
-        for (k = 0; k < seg_l; k++)
-          imag[k] = 0;
+        for (k = 0; k < seg_l; k++) imag[k] = 0;
 
       if (bit == 1) /* seg_l is a power of 2 */
         fft(real, imag, seg_l, 1);
@@ -147,8 +137,7 @@ spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, d
       Free(work_i);
     }
 
-  for (k = 0; k <= seg_l / 2; k++)
-    spectrum[k] *= seg_l / (seg_n * wssum);
+  for (k = 0; k <= seg_l / 2; k++) spectrum[k] *= seg_l / (seg_n * wssum);
 
   spectrum[0] *= 2;
 
@@ -244,8 +233,7 @@ Spectrum(void *process)
   int nfreq = seg_l / 2 + 1;
 
   std::vector<field_type **> vars2(nfreq);
-  for (freq = 0; freq < nfreq; freq++)
-    vars2[freq] = field_malloc(vlistID1, FIELD_PTR);
+  for (freq = 0; freq < nfreq; freq++) vars2[freq] = field_malloc(vlistID1, FIELD_PTR);
 
   double *array1 = (double *) Malloc(nts * sizeof(double));
   double *array2 = (double *) Malloc(nfreq * sizeof(double));
@@ -256,16 +244,13 @@ Spectrum(void *process)
   switch (which_window)
     {
     case 0:
-      for (k = 0; k < seg_l; k++)
-        window[k] = 1;
+      for (k = 0; k < seg_l; k++) window[k] = 1;
       break;
     case 1:
-      for (k = 0; k < seg_l; k++)
-        window[k] = 1 - cos(2 * M_PI * (k + 1) / (seg_l + 1));
+      for (k = 0; k < seg_l; k++) window[k] = 1 - cos(2 * M_PI * (k + 1) / (seg_l + 1));
       break;
     case 2:
-      for (k = 0; k < seg_l / 2; k++)
-        window[k] = window[seg_l - 1 - k] = k;
+      for (k = 0; k < seg_l / 2; k++) window[k] = window[seg_l - 1 - k] = k;
       break;
     case 3:
       for (k = 0; k < seg_l; k++)
@@ -279,8 +264,7 @@ Spectrum(void *process)
     }
 
   double wssum = 0;
-  for (k = 0; k < seg_l; k++)
-    wssum += window[k] * window[k];
+  for (k = 0; k < seg_l; k++) wssum += window[k] * window[k];
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -291,16 +275,13 @@ Spectrum(void *process)
         {
           for (size_t i = 0; i < gridsize; i++)
             {
-              for (tsID = 0; tsID < nts; tsID++)
-                array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+              for (tsID = 0; tsID < nts; tsID++) array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
-              for (freq = 0; freq < nfreq; freq++)
-                array2[freq] = 0;
+              for (freq = 0; freq < nfreq; freq++) array2[freq] = 0;
 
               spectrum(nts, array1, array2, real, imag, window, wssum, detrend, seg_n, seg_l);
 
-              for (freq = 0; freq < nfreq; freq++)
-                vars2[freq][varID][levelID].ptr[i] = array2[freq];
+              for (freq = 0; freq < nfreq; freq++) vars2[freq][varID][levelID].ptr[i] = array2[freq];
             }
         }
     }
@@ -308,8 +289,7 @@ Spectrum(void *process)
   if (array1) Free(array1);
   if (array2) Free(array2);
 
-  for (tsID = 0; tsID < nts; tsID++)
-    field_free(vars[tsID], vlistID1);
+  for (tsID = 0; tsID < nts; tsID++) field_free(vars[tsID], vlistID1);
 
   for (tsID = 0; tsID < nfreq; tsID++)
     {

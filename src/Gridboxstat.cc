@@ -579,8 +579,7 @@ Gridboxstat(void *process)
              "regular grid!");
 
   int gridID2 = genBoxGrid(gridID1, xinc, yinc);
-  for (int index = 0; index < ngrids; index++)
-    vlistChangeGridIndex(vlistID2, index, gridID2);
+  for (int index = 0; index < ngrids; index++) vlistChangeGridIndex(vlistID2, index, gridID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);

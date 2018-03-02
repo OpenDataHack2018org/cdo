@@ -46,8 +46,7 @@ season_to_months(const char *season, int *imonths)
   size_t len = strlen(season);
   if (len == 3 && strcmp(season, "ANN") == 0)
     {
-      for (size_t k = 0; k < 12; ++k)
-        imonths[k + 1] = 1;
+      for (size_t k = 0; k < 12; ++k) imonths[k + 1] = 1;
     }
   else
     {
@@ -59,8 +58,7 @@ season_to_months(const char *season, int *imonths)
       if (sstr == NULL) cdoAbort("Season %s not available!", season);
       size_t ks = (size_t)(sstr - smons);
       size_t ke = ks + len;
-      for (size_t k = ks; k < ke; ++k)
-        imonths[imons[k]]++;
+      for (size_t k = ks; k < ke; ++k) imonths[imons[k]]++;
     }
 }
 
@@ -68,8 +66,7 @@ static int
 seaslist(lista_t *ilista)
 {
   int imon[13]; /* 1-12 ! */
-  for (int i = 0; i < 13; ++i)
-    imon[i] = 0;
+  for (int i = 0; i < 13; ++i) imon[i] = 0;
 
   int nsel = operatorArgc();
   if (isdigit(*operatorArgv()[0]))
@@ -88,8 +85,7 @@ seaslist(lista_t *ilista)
     }
   else
     {
-      for (int i = 0; i < nsel; i++)
-        season_to_months(operatorArgv()[i], imon);
+      for (int i = 0; i < nsel; i++) season_to_months(operatorArgv()[i], imon);
     }
 
   nsel = 0;
@@ -282,8 +278,7 @@ Seltime(void *process)
   if (nsel)
     {
       selfound = (bool *) Malloc(nsel * sizeof(bool));
-      for (i = 0; i < nsel; i++)
-        selfound[i] = false;
+      for (i = 0; i < nsel; i++) selfound[i] = false;
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -670,8 +665,7 @@ Seltime(void *process)
 
   if (lnts1 || nconst)
     {
-      for (tsID = 0; tsID < nts1; tsID++)
-        field_free(vars[tsID], vlistID2);
+      for (tsID = 0; tsID < nts1; tsID++) field_free(vars[tsID], vlistID2);
 
       if (vars) Free(vars);
       if (vdate_list) Free(vdate_list);

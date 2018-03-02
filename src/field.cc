@@ -574,8 +574,7 @@ varrms(field_type field, field_type field2, field_type *field3)
   */
   {
     for (k = 0; k < nlev; k++)
-      for (i = 0; i < len; i++)
-        /*	  if ( !DBL_IS_EQUAL(w[i], missval1) ) */
+      for (i = 0; i < len; i++) /*	  if ( !DBL_IS_EQUAL(w[i], missval1) ) */
         {
           rsum = ADDMN(rsum, MULMN(w[i], MULMN(SUBMN(array2[k * len + i], array1[k * len + i]),
                                                SUBMN(array2[k * len + i], array1[k * len + i]))));
@@ -678,8 +677,7 @@ fldbrs(field_type field)
   // Using first value as reference
   if (nmiss == 0)
     {
-      for (i = 1; i < len; i++)
-        brs += (array[i] - array[0]) * (array[i] - array[0]);
+      for (i = 1; i < len; i++) brs += (array[i] - array[0]) * (array[i] - array[0]);
       count = i - 1;
     }
   else

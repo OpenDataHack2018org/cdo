@@ -125,8 +125,7 @@ Gengrid(void *process)
   int tsID = 0;
   pstreamDefTimestep(streamID3, tsID);
 
-  for (size_t i = 0; i < gridsize; ++i)
-    array3[i] = missval;
+  for (size_t i = 0; i < gridsize; ++i) array3[i] = missval;
 
   pstreamDefRecord(streamID3, 0, 0);
   pstreamWriteRecord(streamID3, array3, gridsize);

@@ -57,8 +57,7 @@ create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
   if (imax < 0 || imax >= nts) cdoAbort("Parameter fmax=%g: timestep %d out of bounds (1-%d)!", fmax, imax + 1, nts);
 
   fmasc[imin] = 1;
-  for (int i = imin + 1; i <= imax; i++)
-    fmasc[i] = fmasc[nts - i] = 1;
+  for (int i = imin + 1; i <= imax; i++) fmasc[i] = fmasc[nts - i] = 1;
 }
 
 #ifdef HAVE_LIBFFTW3

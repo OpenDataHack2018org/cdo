@@ -70,7 +70,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, knnWeightsType &knnWeights, double 
   size_t numNeighbors = knnWeights.maxNeighbors();
   size_t *restrict nbr_add = &knnWeights.m_addr[0];
   double *restrict nbr_dist = &knnWeights.m_dist[0];
-  
+
   size_t src_add[MAX_SEARCH_CELLS];
   std::vector<size_t> src_add_tmp;
   size_t *psrc_add = src_add;
@@ -251,7 +251,7 @@ grid_search_nbr(struct gridsearch *gs, knnWeightsType &knnWeights, double plon, 
     }
 
   ndist = nadds;
-  if ( ndist < numNeighbors ) numNeighbors = ndist;
+  if (ndist < numNeighbors) numNeighbors = ndist;
 
   for (size_t i = 0; i < ndist; ++i) knnWeights.store_distance(adds[i], dist[i], numNeighbors);
 
@@ -281,7 +281,7 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
     weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + numNeighbors * tgt_cell_add;
 
   std::vector<knnWeightsType> knnWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
+  for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
 #ifdef _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -307,8 +307,8 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(gs, weightlinks, numNeighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, knnWeights)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(gs, weightlinks, numNeighbors, remap_grid_type, \
+                                                                    src_grid, tgt_grid, tgt_grid_size, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -337,7 +337,8 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
         if (knnWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = ONE;
 
       // Store the link
-      store_weightlinks(0, nadds, &knnWeights[ompthID].m_addr[0], &knnWeights[ompthID].m_dist[0], tgt_cell_add, &weightlinks[0]);
+      store_weightlinks(0, nadds, &knnWeights[ompthID].m_addr[0], &knnWeights[ompthID].m_dist[0], tgt_cell_add,
+                        &weightlinks[0]);
     }
 
   progressStatus(0, 1, 1);
@@ -367,7 +368,7 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   size_t tgt_grid_size = tgt_grid->size;
 
   std::vector<knnWeightsType> knnWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
+  for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
 #ifdef _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -393,9 +394,9 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(gs, numNeighbors, src_remap_grid_type, src_grid, tgt_grid, tgt_grid_size) \
-  shared(src_array, tgt_array, missval, knnWeights)
+#pragma omp parallel for default(none)                                                      \
+    reduction(+ : findex) shared(gs, numNeighbors, src_remap_grid_type, src_grid, tgt_grid, \
+                                 tgt_grid_size) shared(src_array, tgt_array, missval, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -491,7 +492,7 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   grid_to_radian(yunits, tgt_grid_size, tgt_cell_center_lat, "tgt cell center lat");
 
   std::vector<knnWeightsType> knnWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
+  for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
 #ifdef _OPENMP
   double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -505,8 +506,8 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   //  src_grid->reg2d_center_lat);
   gs = gridsearch_create(xIsCyclic, dims, src_grid_size, src_cell_center_lon, src_cell_center_lat);
 
-  // if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
-  // gridsearch_extrapolate(gs);
+// if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
+// gridsearch_extrapolate(gs);
 
 #ifdef _OPENMP
   if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
@@ -519,11 +520,11 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-  /*
+/*
 #pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(gs, numNeighbors, src_grid, tgt_grid, tgt_grid_size)  \
-  shared(src_array, tgt_array, missval, knnWeights)
-  */
+shared(gs, numNeighbors, src_grid, tgt_grid, tgt_grid_size)  \
+shared(src_array, tgt_array, missval, knnWeights)
+*/
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {

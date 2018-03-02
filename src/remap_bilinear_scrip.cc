@@ -211,11 +211,11 @@ scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remap
 
   double findex = 0;
 
-  /* Loop over destination grid */
+/* Loop over destination grid */
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  schedule(static)  reduction(+:findex) \
-  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv)
+#pragma omp parallel for default(none) schedule(static) \
+    reduction(+ : findex) shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -414,12 +414,11 @@ scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double 
 
   double findex = 0;
 
-  /* Loop over destination grid */
+/* Loop over destination grid */
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  schedule(static)  reduction(+:findex) \
-  shared(gs) \
-  shared(Options::silentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
+#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(gs) shared( \
+    Options::silentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {

@@ -84,8 +84,7 @@ Inttime(void *process)
       const char *timeunits = operatorArgv()[2];
       incperiod = (int) strtol(timeunits, NULL, 10);
       if (timeunits[0] == '-' || timeunits[0] == '+') timeunits++;
-      while (isdigit((int) *timeunits))
-        timeunits++;
+      while (isdigit((int) *timeunits)) timeunits++;
 
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
     }
@@ -256,8 +255,7 @@ Inttime(void *process)
                     }
                   else
                     {
-                      for (size_t i = 0; i < gridsize; i++)
-                        array[i] = single1[i] * fac1 + single2[i] * fac2;
+                      for (size_t i = 0; i < gridsize; i++) array[i] = single1[i] * fac1 + single2[i] * fac2;
                     }
 
                   pstreamDefRecord(streamID2, varID, levelID);

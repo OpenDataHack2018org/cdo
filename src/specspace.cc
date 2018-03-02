@@ -170,8 +170,7 @@ sptrans_new(int nlon, int nlat, int ntr, int flag)
   else
     after_legini(ntr, nlat, sptrans->poli, sptrans->pold, sptrans->coslat);
 
-  for (int jgl = 0; jgl < nlat; ++jgl)
-    sptrans->rcoslat[jgl] = 1.0 / sptrans->coslat[jgl];
+  for (int jgl = 0; jgl < nlat; ++jgl) sptrans->rcoslat[jgl] = 1.0 / sptrans->coslat[jgl];
 
   return sptrans;
 }

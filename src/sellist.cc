@@ -36,8 +36,7 @@ sellist_create(list_t *kvlist)
       e->nvalues = kv->nvalues;
 #ifdef SELDEBUG
       printf("%s =", e->key);
-      for (int ii = 0; ii < e->nvalues; ++ii)
-        printf(" '%s'", e->values[ii]);
+      for (int ii = 0; ii < e->nvalues; ++ii) printf(" '%s'", e->values[ii]);
       printf("\n");
 #endif
       ++i;
@@ -50,8 +49,7 @@ sellist_create(list_t *kvlist)
       e->cvalues = NULL;
 #ifdef SELDEBUG
       printf("%s =", e->key);
-      for (int ii = 0; ii < e->nvalues; ++ii)
-        printf(" '%s'", e->values[ii]);
+      for (int ii = 0; ii < e->nvalues; ++ii) printf(" '%s'", e->values[ii]);
       printf("\n");
 #endif
     }
@@ -125,8 +123,7 @@ sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
 
           int j = 0;
           int nvalues = e->nvalues;
-          for (int i = 0; i < nvalues; ++i)
-            switch (type)
+          for (int i = 0; i < nvalues; ++i) switch (type)
               {
               case SELLIST_INT:
                 {
@@ -141,11 +138,9 @@ sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
                     {
                       int k = 0;
                       if (inc >= 0)
-                        for (int ival = first; ival <= last; ival += inc)
-                          k++;
+                        for (int ival = first; ival <= last; ival += inc) k++;
                       else
-                        for (int ival = first; ival >= last; ival += inc)
-                          k++;
+                        for (int ival = first; ival >= last; ival += inc) k++;
 
                       e->nvalues += k - 1;
                       if (e->nvalues)
@@ -154,13 +149,11 @@ sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
 
                           if (inc >= 0)
                             {
-                              for (int ival = first; ival <= last; ival += inc)
-                                ((int *) e->cvalues)[j++] = ival;
+                              for (int ival = first; ival <= last; ival += inc) ((int *) e->cvalues)[j++] = ival;
                             }
                           else
                             {
-                              for (int ival = first; ival >= last; ival += inc)
-                                ((int *) e->cvalues)[j++] = ival;
+                              for (int ival = first; ival >= last; ival += inc) ((int *) e->cvalues)[j++] = ival;
                             }
                         }
                     }
@@ -174,8 +167,7 @@ sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
           if (e->nvalues) e->flag = (bool *) Calloc(e->nvalues, sizeof(bool));
 #ifdef SELDEBUG
           printf("%s =", e->key);
-          for (int i = 0; i < e->nvalues; ++i)
-            switch (type)
+          for (int i = 0; i < e->nvalues; ++i) switch (type)
               {
               case SELLIST_INT: printf(" %d", ((int *) e->cvalues)[i]); break;
               case SELLIST_FLT: printf(" %g", ((double *) e->cvalues)[i]); break;
@@ -313,8 +305,7 @@ sellist_check_season(sellist_t *sellist, int idx, int month)
 
       for (int i = 0; i < nvalues; ++i)
         {
-          for (int m = 0; m < 13; ++m)
-            imon[m] = 0;
+          for (int m = 0; m < 13; ++m) imon[m] = 0;
           season_to_months(e->values[i], imon);
           if (imon[month])
             {
@@ -409,8 +400,7 @@ sellist_print(sellist_t *sellist)
           printf("%3d  %-16s %4d  %4d ", idx + 1, e->key, e->type, e->nvalues);
           int nvalues = e->nvalues;
           if (nvalues > 12) nvalues = 11;
-          for (int i = 0; i < nvalues; ++i)
-            sellist_print_val(e->type, (cvalues_t *) e->cvalues, i);
+          for (int i = 0; i < nvalues; ++i) sellist_print_val(e->type, (cvalues_t *) e->cvalues, i);
           if (nvalues < e->nvalues)
             {
               printf(" ...");

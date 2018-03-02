@@ -98,8 +98,8 @@ vert_interp_lev3d(size_t gridsize, double missval, double *vardata1, double *var
       double *var2 = vardata2 + offset;
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(offset, gridsize, vardata1, var2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2, missval)
+#pragma omp parallel for default(none) shared(offset, gridsize, vardata1, var2, lev_idx1, lev_idx2, lev_wgt1, \
+                                              lev_wgt2, missval)
 #endif
       for (size_t i = 0; i < gridsize; i++)
         {
@@ -201,19 +201,14 @@ vert_gen_weights3d1d(bool expol, int nlev1, size_t gridsize, double *xlev1, int 
 
   for (size_t i = 0; i < gridsize; i++)
     {
-      for (int k = 0; k < nlev1; ++k)
-        lev1[k] = xlev1[k * gridsize + i];
+      for (int k = 0; k < nlev1; ++k) lev1[k] = xlev1[k * gridsize + i];
 
       vert_gen_weights(expol, nlev1, &lev1[0], nlev2, &lev2[0], &lev_idx1[0], &lev_idx2[0], &lev_wgt1[0], &lev_wgt2[0]);
 
-      for (int k = 0; k < nlev2; ++k)
-        xlev_idx1[k * gridsize + i] = lev_idx1[k] * gridsize + i;
-      for (int k = 0; k < nlev2; ++k)
-        xlev_idx2[k * gridsize + i] = lev_idx2[k] * gridsize + i;
-      for (int k = 0; k < nlev2; ++k)
-        xlev_wgt1[k * gridsize + i] = lev_wgt1[k];
-      for (int k = 0; k < nlev2; ++k)
-        xlev_wgt2[k * gridsize + i] = lev_wgt2[k];
+      for (int k = 0; k < nlev2; ++k) xlev_idx1[k * gridsize + i] = lev_idx1[k] * gridsize + i;
+      for (int k = 0; k < nlev2; ++k) xlev_idx2[k * gridsize + i] = lev_idx2[k] * gridsize + i;
+      for (int k = 0; k < nlev2; ++k) xlev_wgt1[k * gridsize + i] = lev_wgt1[k];
+      for (int k = 0; k < nlev2; ++k) xlev_wgt2[k * gridsize + i] = lev_wgt2[k];
     }
 }
 
@@ -244,8 +239,7 @@ vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels)
    * Check monotony of vertical levels
    */
   std::vector<double> zlev(nlev);
-  for (int i = 0; i < nlev; ++i)
-    zlev[i] = zlevels[(i + 1) * gridsize];
+  for (int i = 0; i < nlev; ++i) zlev[i] = zlevels[(i + 1) * gridsize];
   bool lup = levelDirUp(nlev, &zlev[0]);
   bool ldown = levelDirDown(nlev, &zlev[0]);
 
@@ -271,8 +265,7 @@ vert_init_level_0_and_N(int nlev, size_t gridsize, double *zlevels)
     cdoWarning("Non monotonic zaxis!");
 
   if (cdoVerbose)
-    for (int i = 0; i < nlev + 2; ++i)
-      cdoPrint("lev1 %d: %g", i, zlevels[i * gridsize]);
+    for (int i = 0; i < nlev + 2; ++i) cdoPrint("lev1 %d: %g", i, zlevels[i * gridsize]);
 }
 
 void *
@@ -313,8 +306,7 @@ Intlevel(void *process)
   double *lev2 = (double *) lista_dataptr(flista);
 
   if (cdoVerbose)
-    for (int i = 0; i < nlev2; ++i)
-      cdoPrint("lev2 %d: %g", i, lev2[i]);
+    for (int i = 0; i < nlev2; ++i) cdoPrint("lev2 %d: %g", i, lev2[i]);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
 
@@ -422,8 +414,7 @@ Intlevel(void *process)
         cdoWarning("Non monotonic zaxis!");
 
       if (cdoVerbose)
-        for (int i = 0; i < nlev1 + 2; ++i)
-          cdoPrint("lev1 %d: %g", i, lev1[i]);
+        for (int i = 0; i < nlev1 + 2; ++i) cdoPrint("lev1 %d: %g", i, lev1[i]);
 
       wisize = nlev2;
     }
@@ -476,8 +467,7 @@ Intlevel(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      for (varID = 0; varID < nvars; ++varID)
-        vars[varID] = false;
+      for (varID = 0; varID < nvars; ++varID) vars[varID] = false;
 
       taxisCopyTimestep(taxisID2, taxisID1);
       pstreamDefTimestep(streamID2, tsID);

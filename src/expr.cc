@@ -943,8 +943,7 @@ ex_fun_var(int init, int funcID, nodeType *p1)
           double (*exprfunc)(field_type) = (double (*)(field_type)) fun_sym_tbl[funcID].func;
           for (size_t i = 0; i < ngp; i++)
             {
-              for (size_t k = 0; k < nlev; k++)
-                array[k] = p1data[k * ngp + i];
+              for (size_t k = 0; k < nlev; k++) array[k] = p1data[k * ngp + i];
               fld_field_init(&field, nmiss, missval, nlev, array, weights);
               pdata[i] = exprfunc(field);
             }
@@ -1152,13 +1151,11 @@ ex_uminus_var(int init, nodeType *p1)
 
       if (nmiss > 0)
         {
-          for (size_t i = 0; i < ngp * nlev; ++i)
-            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : -(p1data[i]);
+          for (size_t i = 0; i < ngp * nlev; ++i) pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : -(p1data[i]);
         }
       else
         {
-          for (size_t i = 0; i < ngp * nlev; ++i)
-            pdata[i] = -(p1data[i]);
+          for (size_t i = 0; i < ngp * nlev; ++i) pdata[i] = -(p1data[i]);
         }
 
       p->param.nmiss = nmiss;
@@ -1232,8 +1229,7 @@ ex_not_var(int init, nodeType *p1)
         }
       else
         {
-          for (size_t i = 0; i < ngp * nlev; ++i)
-            pdata[i] = COMPNOT(p1data[i]);
+          for (size_t i = 0; i < ngp * nlev; ++i) pdata[i] = COMPNOT(p1data[i]);
         }
 
       p->param.nmiss = nmiss;

@@ -105,8 +105,7 @@ Yhourarith(void *process)
 
   int nvars = vlistNvars(vlistID2);
 
-  for (houroy = 0; houroy < MAX_HOUR; ++houroy)
-    vardata2[houroy] = NULL;
+  for (houroy = 0; houroy < MAX_HOUR; ++houroy) vardata2[houroy] = NULL;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))

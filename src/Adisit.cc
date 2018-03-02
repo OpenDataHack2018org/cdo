@@ -224,17 +224,14 @@ Adisit(void *process)
   cdoZaxisInqLevels(zaxisID, pressure);
 
   if (pin >= 0)
-    for (i = 0; i < nlevel; ++i)
-      pressure[i] = pin;
+    for (i = 0; i < nlevel; ++i) pressure[i] = pin;
   else
-    for (i = 0; i < nlevel; ++i)
-      pressure[i] /= 10;
+    for (i = 0; i < nlevel; ++i) pressure[i] /= 10;
 
   if (cdoVerbose)
     {
       cdoPrint("Level Pressure");
-      for (i = 0; i < nlevel; ++i)
-        cdoPrint("%5d  %g", i + 1, pressure[i]);
+      for (i = 0; i < nlevel; ++i) cdoPrint("%5d  %g", i + 1, pressure[i]);
     }
 
   field_type tho, sao, tis;

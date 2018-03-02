@@ -309,8 +309,7 @@ void *Timstat(void *argument)
                   if (lrange)
                     {
                       pvars2->nmiss = nmiss;
-                      for (size_t i = 0; i < nwpv * gridsize; i++)
-                        pvars2->ptr[i] = pvars1->ptr[i];
+                      for (size_t i = 0; i < nwpv * gridsize; i++) pvars2->ptr[i] = pvars1->ptr[i];
                     }
 
                   if (nmiss > 0 || psamp1->ptr)
@@ -336,8 +335,7 @@ void *Timstat(void *argument)
                       if (psamp1->ptr == NULL)
                         {
                           psamp1->ptr = (double *) Malloc(nwpv * gridsize * sizeof(double));
-                          for (size_t i = 0; i < nwpv * gridsize; i++)
-                            psamp1->ptr[i] = nsets;
+                          for (size_t i = 0; i < nwpv * gridsize; i++) psamp1->ptr[i] = nsets;
                         }
 
                       for (size_t i = 0; i < nwpv * gridsize; i++)
@@ -488,8 +486,7 @@ void *Timstat(void *argument)
               else
                 {
                   size_t gridsize = pvars1->size;
-                  for (size_t i = 0; i < gridsize; ++i)
-                    sampptr[i] = nsets;
+                  for (size_t i = 0; i < gridsize; ++i) sampptr[i] = nsets;
                 }
 
               pstreamDefRecord(streamID3, varID, levelID);

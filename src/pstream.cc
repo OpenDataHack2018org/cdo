@@ -168,8 +168,8 @@ PstreamType::init()
   m_varlist = NULL;
 #ifdef HAVE_LIBPTHREAD
   pipe = NULL;
-  rthreadID  = 0;
-  wthreadID  = 0;
+  rthreadID = 0;
+  wthreadID = 0;
 #endif
 }
 PstreamType::PstreamType(int p_id) : self(p_id) { init(); }
@@ -573,8 +573,7 @@ PstreamType::defVlist(int p_vlistID)
         {
           int varID, nvars = vlistNvars(p_vlistID);
 
-          for (varID = 0; varID < nvars; ++varID)
-            vlistDefVarDatatype(p_vlistID, varID, cdoDefaultDataType);
+          for (varID = 0; varID < nvars; ++varID) vlistDefVarDatatype(p_vlistID, varID, cdoDefaultDataType);
 
           if (cdoDefaultDataType == CDI_DATATYPE_FLT64 || cdoDefaultDataType == CDI_DATATYPE_FLT32)
             {
@@ -590,8 +589,7 @@ PstreamType::defVlist(int p_vlistID)
         {
           int varID, nvars = vlistNvars(p_vlistID);
 
-          for (varID = 0; varID < nvars; ++varID)
-            vlistDefVarChunkType(p_vlistID, varID, cdoChunkType);
+          for (varID = 0; varID < nvars; ++varID) vlistDefVarChunkType(p_vlistID, varID, cdoChunkType);
         }
 
       if (CDO_CMOR_Mode)

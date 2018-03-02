@@ -170,8 +170,7 @@ import_e5ml(const char *filename, VAR **vars)
   zaxisIDml = zaxisCreate(ZAXIS_HYBRID, nlev);
 
   levs = (double *) Malloc(nlev * sizeof(double));
-  for (i = 0; i < nlev; i++)
-    levs[i] = i + 1;
+  for (i = 0; i < nlev; i++) levs[i] = i + 1;
   zaxisDefLevels(zaxisIDml, levs);
   Free(levs);
 
@@ -870,8 +869,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
   zaxisIDbsfc = zaxisCreate(ZAXIS_DEPTH_BELOW_LAND, nlev);
 
   levs = (double *) Malloc(nlev * sizeof(double));
-  for (i = 0; i < nlev; i++)
-    levs[i] = 0;
+  for (i = 0; i < nlev; i++) levs[i] = 0;
   zaxisDefLevels(zaxisIDbsfc, levs);
   Free(levs);
 
@@ -881,8 +879,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
   zaxisIDn2 = zaxisCreate(ZAXIS_GENERIC, nlev);
 
   levs = (double *) Malloc(nlev * sizeof(double));
-  for (i = 0; i < nlev; i++)
-    levs[i] = 0;
+  for (i = 0; i < nlev; i++) levs[i] = 0;
   zaxisDefLevels(zaxisIDn2, levs);
   Free(levs);
 
@@ -904,8 +901,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
   zaxisIDml = zaxisCreate(ZAXIS_HYBRID, nlev);
 
   levs = (double *) Malloc(nlev * sizeof(double));
-  for (i = 0; i < nlev; i++)
-    levs[i] = i + 1;
+  for (i = 0; i < nlev; i++) levs[i] = i + 1;
   zaxisDefLevels(zaxisIDml, levs);
   Free(levs);
 
@@ -916,8 +912,7 @@ import_e5res(const char *filename, VAR **vars, ATTS *atts)
   zaxisIDmlh = zaxisCreate(ZAXIS_HYBRID_HALF, nlevp1);
 
   levs = (double *) Malloc(nlevp1 * sizeof(double));
-  for (i = 0; i < nlevp1; i++)
-    levs[i] = i;
+  for (i = 0; i < nlevp1; i++) levs[i] = i;
   zaxisDefLevels(zaxisIDmlh, levs);
   Free(levs);
 

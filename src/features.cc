@@ -39,8 +39,7 @@
 #endif
 
 #ifdef HAVE_LIBCMOR
-extern "C"
-{
+extern "C" {
 #include "cmor.h"
 }
 #endif
@@ -50,9 +49,8 @@ extern "C"
 
 #include "cdo_int.h"  // HAVE_OPENMP4
 
-extern "C"
-{
-  size_t getMemorySize(void);
+extern "C" {
+size_t getMemorySize(void);
 }
 
 void
@@ -101,11 +99,11 @@ printFeatures(void)
 #if defined(HAVE_LIBSZ)
   fprintf(stderr, " SZ");
 #endif
-  /*
+/*
 #if defined(HAVE_LIBZ)
-  fprintf(stderr, " Z");
+fprintf(stderr, " Z");
 #endif
-  */
+*/
 #if defined(HAVE_LIBUDUNITS2)
   fprintf(stderr, " UDUNITS2");
 #endif
@@ -162,19 +160,19 @@ printLibraries(void)
     fprintf(stderr, "(%u.%u.%u)", h5l_majnum, h5l_minnum, h5l_relnum);
 #endif
 #endif
-    /*
-  #if defined(HAVE_LIBZ)
-    {
-      fprintf(stderr, " zlib/%s", zlibVersion());
-  #if defined(ZLIB_VERSION)
-      if ( strcmp(ZLIB_VERSION, zlibVersion()) != 0 )
-        fprintf(stderr, "(h%s)", ZLIB_VERSION);
-  #else
-      fprintf(stderr, "(header not found)");
-  #endif
-    }
-  #endif
-    */
+/*
+#if defined(HAVE_LIBZ)
+{
+  fprintf(stderr, " zlib/%s", zlibVersion());
+#if defined(ZLIB_VERSION)
+  if ( strcmp(ZLIB_VERSION, zlibVersion()) != 0 )
+    fprintf(stderr, "(h%s)", ZLIB_VERSION);
+#else
+  fprintf(stderr, "(header not found)");
+#endif
+}
+#endif
+*/
 #ifdef HAVE_LIBPROJ
   fprintf(stderr, " proj");
 #if defined(PJ_VERSION)

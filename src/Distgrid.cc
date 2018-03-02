@@ -79,19 +79,15 @@ genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals, size_t nxblock
   std::vector<size_t> xlsize(nxblocks);
   std::vector<size_t> ylsize(nyblocks);
 
-  for (size_t ix = 0; ix < nxblocks; ++ix)
-    xlsize[ix] = nxvals;
+  for (size_t ix = 0; ix < nxblocks; ++ix) xlsize[ix] = nxvals;
   if (nx % nxblocks != 0) xlsize[nxblocks - 1] = nx - (nxblocks - 1) * nxvals;
   if (cdoVerbose)
-    for (size_t ix = 0; ix < nxblocks; ++ix)
-      cdoPrint("xblock %zu: %zu", ix, xlsize[ix]);
+    for (size_t ix = 0; ix < nxblocks; ++ix) cdoPrint("xblock %zu: %zu", ix, xlsize[ix]);
 
-  for (size_t iy = 0; iy < nyblocks; ++iy)
-    ylsize[iy] = nyvals;
+  for (size_t iy = 0; iy < nyblocks; ++iy) ylsize[iy] = nyvals;
   if (ny % nyblocks != 0) ylsize[nyblocks - 1] = ny - (nyblocks - 1) * nyvals;
   if (cdoVerbose)
-    for (size_t iy = 0; iy < nyblocks; ++iy)
-      cdoPrint("yblock %zu: %zu", iy, ylsize[iy]);
+    for (size_t iy = 0; iy < nyblocks; ++iy) cdoPrint("yblock %zu: %zu", iy, ylsize[iy]);
 
   size_t index = 0;
   for (size_t iy = 0; iy < nyblocks; ++iy)
@@ -186,8 +182,7 @@ genGrids(int gridID1, int *gridIDs, size_t nxvals, size_t nyvals, size_t nxblock
 static void
 window_cell(double *array1, double *array2, size_t gridsize2, size_t *cellidx)
 {
-  for (size_t i = 0; i < gridsize2; ++i)
-    array2[i] = array1[cellidx[i]];
+  for (size_t i = 0; i < gridsize2; ++i) array2[i] = array1[cellidx[i]];
 }
 
 typedef struct
@@ -283,12 +278,10 @@ Distgrid(void *process)
       grids[i].gridsize = (size_t *) Malloc(nsplit * sizeof(size_t));
       grids[i].gridindex = (size_t **) Malloc(nsplit * sizeof(size_t *));
 
-      for (size_t index = 0; index < nsplit; index++)
-        grids[i].gridindex[index] = NULL;
+      for (size_t index = 0; index < nsplit; index++) grids[i].gridindex[index] = NULL;
     }
 
-  for (size_t index = 0; index < nsplit; index++)
-    vlistIDs[index] = vlistDuplicate(vlistID1);
+  for (size_t index = 0; index < nsplit; index++) vlistIDs[index] = vlistDuplicate(vlistID1);
 
   if (cdoVerbose) cdoPrint("ngrids=%d  nsplit=%zu", ngrids, nsplit);
 
@@ -303,8 +296,7 @@ Distgrid(void *process)
           cdoPrint("Block %d,  gridID %d,  gridsize %zu", index+1,
       grids[i].gridIDs[index], gridInqSize(grids[i].gridIDs[index]));
       */
-      for (size_t index = 0; index < nsplit; index++)
-        vlistChangeGridIndex(vlistIDs[index], i, grids[i].gridIDs[index]);
+      for (size_t index = 0; index < nsplit; index++) vlistChangeGridIndex(vlistIDs[index], i, grids[i].gridIDs[index]);
     }
 
   size_t gridsize2max = 0;
@@ -333,8 +325,7 @@ Distgrid(void *process)
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID)))
     {
-      for (size_t index = 0; index < nsplit; index++)
-        pstreamDefTimestep(streamIDs[index], tsID);
+      for (size_t index = 0; index < nsplit; index++) pstreamDefTimestep(streamIDs[index], tsID);
 
       for (int recID = 0; recID < nrecs; recID++)
         {
@@ -366,13 +357,11 @@ Distgrid(void *process)
 
   for (int i = 0; i < ngrids; i++)
     {
-      for (size_t index = 0; index < nsplit; index++)
-        gridDestroy(grids[i].gridIDs[index]);
+      for (size_t index = 0; index < nsplit; index++) gridDestroy(grids[i].gridIDs[index]);
       Free(grids[i].gridIDs);
       Free(grids[i].gridsize);
 
-      for (size_t index = 0; index < nsplit; index++)
-        Free(grids[i].gridindex[index]);
+      for (size_t index = 0; index < nsplit; index++) Free(grids[i].gridindex[index]);
       Free(grids[i].gridindex);
     }
   Free(grids);

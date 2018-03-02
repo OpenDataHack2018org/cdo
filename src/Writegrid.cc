@@ -54,8 +54,7 @@ Writegrid(void *process)
     }
   else
     {
-      for (size_t i = 0; i < gridsize; i++)
-        mask[i] = 1;
+      for (size_t i = 0; i < gridsize; i++) mask[i] = 1;
     }
 
   writeNCgrid(cdoGetStreamName(1).c_str(), gridID, mask);

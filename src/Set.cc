@@ -109,8 +109,7 @@ Set(void *process)
   if (operatorID == SETCODE)
     {
       nvars = vlistNvars(vlistID2);
-      for (varID = 0; varID < nvars; varID++)
-        vlistDefVarCode(vlistID2, varID, newval);
+      for (varID = 0; varID < nvars; varID++) vlistDefVarCode(vlistID2, varID, newval);
     }
   else if (operatorID == SETPARAM)
     {
@@ -129,8 +128,7 @@ Set(void *process)
       int tableID;
       tableID = tableDef(-1, tabnum, NULL);
       nvars = vlistNvars(vlistID2);
-      for (varID = 0; varID < nvars; varID++)
-        vlistDefVarTable(vlistID2, varID, tableID);
+      for (varID = 0; varID < nvars; varID++) vlistDefVarTable(vlistID2, varID, tableID);
     }
   else if (operatorID == SETLEVEL)
     {

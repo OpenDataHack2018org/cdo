@@ -124,8 +124,8 @@ scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(weightlinks, remap_grid_type, tgt_grid_size, \
+                                                                    src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -329,8 +329,9 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, grad1_lat, grad1_lon, grad1_latlon)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(remap_grid_type, tgt_grid_size, src_grid, \
+                                                                    tgt_grid, src_array, tgt_array, missval,  \
+                                                                    grad1_lat, grad1_lon, grad1_latlon)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {

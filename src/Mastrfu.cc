@@ -52,14 +52,11 @@ mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, d
   gridInqYunits(gridID, units);
 
   if (memcmp(units, "degree", 6) == 0)
-    for (ilat = 0; ilat < nlat; ilat++)
-      phi[ilat] *= DEG2RAD;
+    for (ilat = 0; ilat < nlat; ilat++) phi[ilat] *= DEG2RAD;
 
-  for (ilat = 0; ilat < nlat; ilat++)
-    phi[ilat] = sin(phi[ilat]);
+  for (ilat = 0; ilat < nlat; ilat++) phi[ilat] = sin(phi[ilat]);
 
-  for (ilat = 0; ilat < nlat; ilat++)
-    cosphi[ilat] = sqrt(1.0 - phi[ilat] * phi[ilat]);
+  for (ilat = 0; ilat < nlat; ilat++) cosphi[ilat] = sqrt(1.0 - phi[ilat] * phi[ilat]);
 
   for (ilev = 0; ilev < nlev; ilev++)
     {
@@ -68,8 +65,7 @@ mastrfu(int gridID, int zaxisID, double *array1, double *array2, size_t nmiss, d
     }
 
   for (ilev = 0; ilev < nlev; ilev++)
-    for (ilat = 0; ilat < nlat; ilat++)
-      field2[ilev][ilat] = 0.0;
+    for (ilat = 0; ilat < nlat; ilat++) field2[ilev][ilat] = 0.0;
 
   if (nmiss == 0)
     {

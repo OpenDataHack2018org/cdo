@@ -97,8 +97,7 @@ conv_cmor_table(list_t *pmlist)
                   if (ovalue[i - 1] == '"' && ovalue[i] == '"')
                     {
                       ovalue[i - 1] = '\'';
-                      for (int j = i + 1; j < vlen; ++j)
-                        ovalue[j - 1] = ovalue[j];
+                      for (int j = i + 1; j < vlen; ++j) ovalue[j - 1] = ovalue[j];
                       vlen -= 1;
                     }
                 }

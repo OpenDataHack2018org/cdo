@@ -144,8 +144,7 @@ Ninfo(void *process)
       {
         int tsID = 0;
         if (ntsteps != 0)
-          while (cdoStreamInqTimestep(streamID, tsID))
-            tsID++;
+          while (cdoStreamInqTimestep(streamID, tsID)) tsID++;
         fprintf(stdout, "%d\n", tsID);
         break;
       }

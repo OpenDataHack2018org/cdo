@@ -117,8 +117,7 @@ Pack(void *process)
 
   int nvars = vlistNvars(vlistID1);
   std::vector<bool> varIsConst(nvars);
-  for (int varID = 0; varID < nvars; ++varID)
-    varIsConst[varID] = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
+  for (int varID = 0; varID < nvars; ++varID) varIsConst[varID] = vlistInqVarTimetype(vlistID1, varID) == TIME_CONSTANT;
 
   std::vector<field_type **> vars;
 

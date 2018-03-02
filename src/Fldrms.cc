@@ -73,8 +73,7 @@ Fldrms(void *process)
   if (needWeights && gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN)
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
-  for (index = 0; index < ngrids; index++)
-    vlistChangeGridIndex(vlistID3, index, gridID3);
+  for (index = 0; index < ngrids; index++) vlistChangeGridIndex(vlistID3, index, gridID3);
 
   if (ndiffgrids > 0) cdoAbort("Too many different grids!");
 

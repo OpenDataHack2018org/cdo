@@ -227,11 +227,9 @@ execute_line(char *line)
 {
   // Isolate the command word.
   int i = 0;
-  while (line[i] && isspace(line[i]))
-    i++;
+  while (line[i] && isspace(line[i])) i++;
   char *word = line + i;
-  while (line[i] && !isspace(line[i]))
-    i++;
+  while (line[i] && !isspace(line[i])) i++;
 
   if (line[i]) line[i++] = '\0';
 
@@ -242,8 +240,7 @@ execute_line(char *line)
       return -1;
     }
   // Get argument to command, if any.
-  while (isspace(line[i]))
-    i++;
+  while (isspace(line[i])) i++;
 
   word = line + i;
   // Call the function.
@@ -259,16 +256,14 @@ stripwhite(char *string)
     ;
   if (*s == 0) return s;
   char *t = s + strlen(s) - 1;
-  while (t > s && isspace(*t))
-    t--;
+  while (t > s && isspace(*t)) t--;
   *++t = '\0';
 
   return s;
 }
 
-extern "C"
-{
-  size_t getPeakRSS();
+extern "C" {
+size_t getPeakRSS();
 }
 
 void

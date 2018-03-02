@@ -227,8 +227,8 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict weights
       max_link = -1;
     }
 
-    /* If the link already exists, add the weight to the current weight arrays
-     */
+/* If the link already exists, add the weight to the current weight arrays
+ */
 
 #if defined(SX)
 #define STRIPED 1

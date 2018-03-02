@@ -135,8 +135,7 @@ Ensstat3(void *process)
       field[i].size = nfiles;
       field[i].ptr = (double *) Malloc(nfiles * sizeof(double));
       field[i].weight = (double *) Malloc(nfiles * sizeof(double));
-      for (int fileID = 0; fileID < nfiles; fileID++)
-        field[i].weight[fileID] = 1;
+      for (int fileID = 0; fileID < nfiles; fileID++) field[i].weight[fileID] = 1;
     }
 
   for (int fileID = 0; fileID < nfiles; fileID++)
@@ -150,8 +149,7 @@ Ensstat3(void *process)
     }
 
   /* check for identical contents of all ensemble members */
-  for (int fileID = 1; fileID < nfiles; fileID++)
-    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
+  for (int fileID = 1; fileID < nfiles; fileID++) vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
   int vlistID1 = ef[0].vlistID;
   int vlistID2 = vlistCreate();
@@ -160,8 +158,7 @@ Ensstat3(void *process)
 
   double *levs = (double *) Calloc(nfiles, sizeof(double));
   int zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nfiles);
-  for (i = 0; i < nfiles; i++)
-    levs[i] = i;
+  for (i = 0; i < nfiles; i++) levs[i] = i;
   zaxisDefLevels(zaxisID2, levs);
   zaxisDefName(zaxisID2, "histogram_binID");
 
@@ -215,21 +212,18 @@ Ensstat3(void *process)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
 
-  for (int fileID = 0; fileID < nfiles; fileID++)
-    ef[fileID].array = (double *) Malloc(gridsize * sizeof(double));
+  for (int fileID = 0; fileID < nfiles; fileID++) ef[fileID].array = (double *) Malloc(gridsize * sizeof(double));
 
   if (operfunc == func_rank && datafunc == SPACE)
     { /*need to memorize data for entire grid before writing          */
       array2 = (int **) Malloc((nfiles + 1) * sizeof(int *));
-      for (binID = 0; binID < nfiles; binID++)
-        array2[binID] = (int *) Calloc(gridsize, sizeof(int));
+      for (binID = 0; binID < nfiles; binID++) array2[binID] = (int *) Calloc(gridsize, sizeof(int));
     }
   else if (operfunc == func_rank)
     { /* can process data separately for each timestep and only need */
       /* to cumulate values over the grid                            */
       array2 = (int **) Malloc((nfiles + 1) * sizeof(int *));
-      for (binID = 0; binID < nfiles; binID++)
-        array2[binID] = (int *) Calloc(1, sizeof(int));
+      for (binID = 0; binID < nfiles; binID++) array2[binID] = (int *) Calloc(1, sizeof(int));
     }
 
   if (operfunc == func_roc)
@@ -296,8 +290,7 @@ Ensstat3(void *process)
 
           nmiss = 0;
           if (datafunc == TIME && operfunc == func_rank)
-            for (binID = 0; binID < nfiles; binID++)
-              array2[binID][0] = 0;
+            for (binID = 0; binID < nfiles; binID++) array2[binID][0] = 0;
 
 #ifdef _OPENMP
 #pragma omp parallel for default(shared) private(binID)
@@ -326,11 +319,11 @@ Ensstat3(void *process)
                   switch (operfunc)
                     {
                     case (func_rank):
-                      /* ****************/
-                      /* RANK HISTOGRAM */
-                      /* ************** */
-                      // for ( j=0; j<nfiles; j++ )
-                      //   fprintf(stderr,"%5.2g ",field[ompthID].ptr[j]);
+/* ****************/
+/* RANK HISTOGRAM */
+/* ************** */
+// for ( j=0; j<nfiles; j++ )
+//   fprintf(stderr,"%5.2g ",field[ompthID].ptr[j]);
 #ifdef _OPENMP
 #pragma omp critical
 #endif
@@ -350,16 +343,14 @@ Ensstat3(void *process)
                       dat = &field[ompthID].ptr[1];
                       ival = field[ompthID].ptr[0] > 0.5 ? 1 : 0;
 
-                      for (binID = 0; binID < nbins; binID++)
-                        hist[binID] = 0;
+                      for (binID = 0; binID < nbins; binID++) hist[binID] = 0;
 
                       for (j = 0; j < nens; j++)
                         for (binID = 0; binID < nbins; binID++)
                           if (dat[j] >= lThresh[binID] && dat[j] < uThresh[binID]) hist[binID]++;
 
                       chksum = 0;
-                      for (binID = 0; binID < nbins; binID++)
-                        chksum += hist[binID];
+                      for (binID = 0; binID < nbins; binID++) chksum += hist[binID];
 
                       if (chksum != nens) exit(1);
 
@@ -451,8 +442,7 @@ Ensstat3(void *process)
 
       for (binID = 0; binID < nfiles; binID++)
         {
-          for (i = 0; i < osize; i++)
-            tmpdoub[i] = (double) array2[binID][i];
+          for (i = 0; i < osize; i++) tmpdoub[i] = (double) array2[binID][i];
 
           pstreamDefRecord(streamID2, varID2[varID], binID);
           pstreamWriteRecord(streamID2, tmpdoub, nmiss);
@@ -499,8 +489,7 @@ Ensstat3(void *process)
   if (ef) Free(ef);
   if (array2)
     {
-      for (binID = 0; binID < nfiles; binID++)
-        Free(array2[binID]);
+      for (binID = 0; binID < nfiles; binID++) Free(array2[binID]);
       Free(array2);
     }
 

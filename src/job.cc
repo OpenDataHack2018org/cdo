@@ -55,7 +55,7 @@ create_job_template(const char *expname, const char *jobfilename, const char *jo
 
   int len, len1, len2;
 
-  /* determine hostname */
+/* determine hostname */
 
 #if defined(HAVE_GETHOSTNAME)
   gethostname(host, sizeof(host));
@@ -324,9 +324,8 @@ drmaa_submit(const char *expname, const char *jobfilename, const char *jobname, 
     status = ftpget(0, ftp_url, ftppath, outname, outname);
     if (status == 0)
       {
-        sprintf(commandline,
-                "cat %s | grep -v tty  | grep -v shell | grep -v SunOS | grep "
-                "-v logout\n",
+        sprintf(commandline, "cat %s | grep -v tty  | grep -v shell | grep -v SunOS | grep "
+                             "-v logout\n",
                 outname);
         status = system(commandline);
       }

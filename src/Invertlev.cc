@@ -44,8 +44,7 @@ invertLevDes(int vlistID)
           double *yv1 = (double *) Malloc(nlev * sizeof(double));
           double *yv2 = (double *) Malloc(nlev * sizeof(double));
           zaxisInqLevels(zaxisID1, yv1);
-          for (int ilev = 0; ilev < nlev; ++ilev)
-            yv2[nlev - ilev - 1] = yv1[ilev];
+          for (int ilev = 0; ilev < nlev; ++ilev) yv2[nlev - ilev - 1] = yv1[ilev];
           zaxisDefLevels(zaxisID2, yv2);
           Free(yv1);
           Free(yv2);
@@ -56,13 +55,11 @@ invertLevDes(int vlistID)
           double *yb1 = (double *) Malloc(nlev * sizeof(double));
           double *yb2 = (double *) Malloc(nlev * sizeof(double));
           zaxisInqLbounds(zaxisID1, yb1);
-          for (int ilev = 0; ilev < nlev; ++ilev)
-            yb2[nlev - ilev - 1] = yb1[ilev];
+          for (int ilev = 0; ilev < nlev; ++ilev) yb2[nlev - ilev - 1] = yb1[ilev];
           zaxisDefLbounds(zaxisID2, yb2);
 
           zaxisInqUbounds(zaxisID1, yb1);
-          for (int ilev = 0; ilev < nlev; ++ilev)
-            yb2[nlev - ilev - 1] = yb1[ilev];
+          for (int ilev = 0; ilev < nlev; ++ilev) yb2[nlev - ilev - 1] = yb1[ilev];
           zaxisDefUbounds(zaxisID2, yb2);
           Free(yb1);
           Free(yb2);

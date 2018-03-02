@@ -83,12 +83,10 @@ Setgatt(void *process)
           if (line[0] == '#') continue;
           if (line[0] == '\0') continue;
           attname = line;
-          while (isspace((int) *attname))
-            attname++;
+          while (isspace((int) *attname)) attname++;
           if (attname[0] == '\0') continue;
           attstring = attname;
-          while (*attstring != ' ' && *attstring != '\0' && *attstring != '=' && *attstring != '"')
-            attstring++;
+          while (*attstring != ' ' && *attstring != '\0' && *attstring != '=' && *attstring != '"') attstring++;
           if (*attstring == '\0')
             attstring = NULL;
           else

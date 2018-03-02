@@ -57,12 +57,10 @@ genThinoutGrid(int gridID1, size_t xinc, size_t yinc)
       gridInqYvals(gridID1, &yvals1[0]);
 
       size_t olat = 0;
-      for (size_t ilat = 0; ilat < nlat1; ilat += yinc)
-        yvals2[olat++] = yvals1[ilat];
+      for (size_t ilat = 0; ilat < nlat1; ilat += yinc) yvals2[olat++] = yvals1[ilat];
 
       size_t olon = 0;
-      for (size_t ilon = 0; ilon < nlon1; ilon += xinc)
-        xvals2[olon++] = xvals1[ilon];
+      for (size_t ilon = 0; ilon < nlon1; ilon += xinc) xvals2[olon++] = xvals1[ilon];
 
       gridDefXvals(gridID2, &xvals2[0]);
       gridDefYvals(gridID2, &yvals2[0]);
@@ -176,12 +174,10 @@ boxavg(field_type *field1, field_type *field2, size_t xinc, size_t yinc)
   size_t nlat2 = gridInqYsize(gridID2);
 
   std::vector<double *> xfield1(nlat1);
-  for (size_t ilat = 0; ilat < nlat1; ilat++)
-    xfield1[ilat] = array1 + ilat * nlon1;
+  for (size_t ilat = 0; ilat < nlat1; ilat++) xfield1[ilat] = array1 + ilat * nlon1;
 
   std::vector<double *> xfield2(nlat2);
-  for (size_t ilat = 0; ilat < nlat2; ilat++)
-    xfield2[ilat] = array2 + ilat * nlon2;
+  for (size_t ilat = 0; ilat < nlat2; ilat++) xfield2[ilat] = array2 + ilat * nlon2;
 
   for (size_t ilat = 0; ilat < nlat2; ilat++)
     for (size_t ilon = 0; ilon < nlon2; ilon++)
@@ -223,12 +219,10 @@ thinout(field_type *field1, field_type *field2, int xinc, int yinc)
   size_t nlat2 = gridInqYsize(gridID2);
 
   std::vector<double *> xfield1(nlat1);
-  for (size_t ilat = 0; ilat < nlat1; ilat++)
-    xfield1[ilat] = array1 + ilat * nlon1;
+  for (size_t ilat = 0; ilat < nlat1; ilat++) xfield1[ilat] = array1 + ilat * nlon1;
 
   std::vector<double *> xfield2(nlat2);
-  for (size_t ilat = 0; ilat < nlat2; ilat++)
-    xfield2[ilat] = array2 + ilat * nlon2;
+  for (size_t ilat = 0; ilat < nlat2; ilat++) xfield2[ilat] = array2 + ilat * nlon2;
 
   size_t olat = 0;
   for (size_t ilat = 0; ilat < nlat1; ilat += yinc)

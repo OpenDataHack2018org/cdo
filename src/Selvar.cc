@@ -97,8 +97,7 @@ Selvar(void *process)
       argnames = operatorArgv();
 
       if (cdoVerbose)
-        for (int i = 0; i < nsel; i++)
-          cdoPrint("name %d = %s", i + 1, argnames[i]);
+        for (int i = 0; i < nsel; i++) cdoPrint("name %d = %s", i + 1, argnames[i]);
     }
   else if (TAKES_FLOATS(operatorID))
     {
@@ -106,8 +105,7 @@ Selvar(void *process)
       fltarr = (double *) lista_dataptr(flista);
 
       if (cdoVerbose)
-        for (int i = 0; i < nsel; i++)
-          cdoPrint("flt %d = %g", i + 1, fltarr[i]);
+        for (int i = 0; i < nsel; i++) cdoPrint("flt %d = %g", i + 1, fltarr[i]);
     }
   else
     {
@@ -115,16 +113,14 @@ Selvar(void *process)
       intarr = (int *) lista_dataptr(ilista);
 
       if (cdoVerbose)
-        for (int i = 0; i < nsel; i++)
-          cdoPrint("int %d = %d", i + 1, intarr[i]);
+        for (int i = 0; i < nsel; i++) cdoPrint("int %d = %d", i + 1, intarr[i]);
     }
 
   bool *selfound = NULL;
   if (nsel)
     {
       selfound = (bool *) Malloc(nsel * sizeof(bool));
-      for (int i = 0; i < nsel; i++)
-        selfound[i] = false;
+      for (int i = 0; i < nsel; i++) selfound[i] = false;
     }
 
   /*

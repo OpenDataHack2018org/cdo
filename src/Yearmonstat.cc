@@ -164,8 +164,7 @@ Yearmonstat(void *process)
                       if (samp1[varID][levelID].ptr == NULL)
                         {
                           samp1[varID][levelID].ptr = (double *) Malloc(gridsize * sizeof(double));
-                          for (size_t i = 0; i < gridsize; i++)
-                            samp1[varID][levelID].ptr[i] = dsets;
+                          for (size_t i = 0; i < gridsize; i++) samp1[varID][levelID].ptr[i] = dsets;
                         }
 
                       for (size_t i = 0; i < gridsize; i++)

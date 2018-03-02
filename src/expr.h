@@ -39,15 +39,7 @@ enum
   CLEN
 };
 
-typedef enum
-{
-  typeCon,
-  typeVar,
-  typeFun,
-  typeFun1c,
-  typeOpr,
-  typeCom
-} nodeEnum;
+typedef enum { typeCon, typeVar, typeFun, typeFun1c, typeOpr, typeCom } nodeEnum;
 
 // commands
 typedef struct

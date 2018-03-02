@@ -370,13 +370,11 @@ dumpmap()
   fclose(mapfp);
 
   printf("hinum: %d\n", indx.hinum);
-  for (i = 0; i < indx.hinum; i++)
-    printf("%3d %5d\n", i + 1, indx.hipnt[i]);
+  for (i = 0; i < indx.hinum; i++) printf("%3d %5d\n", i + 1, indx.hipnt[i]);
 
   printf("\n");
   printf("hfnum: %d\n", indx.hfnum);
-  for (i = 0; i < indx.hfnum; i++)
-    printf("%3d %g\n", i + 1, indx.hfpnt[i]);
+  for (i = 0; i < indx.hfnum; i++) printf("%3d %g\n", i + 1, indx.hfpnt[i]);
 
   printf("\n");
 
@@ -400,18 +398,15 @@ dumpmap()
   else
     {
       printf("intnum: %d\n", indx.intnum);
-      for (i = 0; i < indx.intnum; i++)
-        printf("%3d %d\n", i + 1, indx.intpnt[i]);
+      for (i = 0; i < indx.intnum; i++) printf("%3d %d\n", i + 1, indx.intpnt[i]);
 
       printf("\n");
       printf("fltnum: %d\n", indx.fltnum);
-      for (i = 0; i < indx.fltnum; i++)
-        printf("%3d %g\n", i + 1, indx.fltpnt[i]);
+      for (i = 0; i < indx.fltnum; i++) printf("%3d %g\n", i + 1, indx.fltpnt[i]);
 
       printf("\n");
       printf("bignum: %d\n", indxb.bignum);
-      for (i = 0; i < indxb.bignum; i++)
-        printf("%3d %zd\n", i + 1, (size_t) indxb.bigpnt[i]);
+      for (i = 0; i < indxb.bignum; i++) printf("%3d %zd\n", i + 1, (size_t) indxb.bigpnt[i]);
     }
 }
 
@@ -723,8 +718,7 @@ ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
             if (varname[i] == '-') break;
 
           if (i < len)
-            for (j = i; j < len; j++)
-              varname[j] = varname[j + 1];
+            for (j = i; j < len; j++) varname[j] = varname[j + 1];
 
           vlistInqVarLongname(vlistID, varID, varlongname);
           vlistInqVarUnits(vlistID, varID, varunits);
@@ -876,8 +870,7 @@ write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum,
       Put1Byte(map, bcnt, 0); /* initial second */
 
       if (indx.hinum)
-        for (i = 0; i < indx.hinum; i++)
-          Put4Byte(map, bcnt, hinum[i]);
+        for (i = 0; i < indx.hinum; i++) Put4Byte(map, bcnt, hinum[i]);
 
       if (indx.hfnum)
         {
@@ -896,8 +889,7 @@ write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum,
           fdum = fltnum[i];
           rc = flt2ibm(fdum, ibmfloat);
           if (rc < 0) cdoAbort("overflow in IBM float conversion");
-          for (j = 0; j < 4; j++)
-            map[bcnt++] = ibmfloat[j];
+          for (j = 0; j < 4; j++) map[bcnt++] = ibmfloat[j];
         }
 
       /* write out the factors for converting from grid to absolute time */
@@ -907,8 +899,7 @@ write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum,
           fdum = 0;
           rc = flt2ibm(fdum, ibmfloat);
           if (rc < 0) cdoAbort("overflow in IBM float conversion");
-          for (j = 0; j < 4; j++)
-            map[bcnt++] = ibmfloat[j];
+          for (j = 0; j < 4; j++) map[bcnt++] = ibmfloat[j];
         }
 
       fwrite(map, 1, bcnt, mapfp);

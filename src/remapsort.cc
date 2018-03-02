@@ -443,7 +443,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   add2s[1] = &add2[add_srt[1]];
   nl[0] = num_links / nsplit;
   nl[1] = num_links - nl[0];
-  // add_end[0] = nl[0];              add_end[1] = num_links;
+// add_end[0] = nl[0];              add_end[1] = num_links;
 
 #ifdef _OPENMP
   int depth = (int) (log(parent) / log(2));
@@ -460,12 +460,12 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     }
 #endif
 
-    //  printf("I am %i nl[0] %i nl[1] %i\n",parent,nl[0],nl[1]);
-    //  printf("add_srt[0] %i add_Srt[1] %i\n",add_srt[0],add_srt[1]);
-    //  if ( 1 )
-    //      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i
-    //      parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
-    //	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
+//  printf("I am %i nl[0] %i nl[1] %i\n",parent,nl[0],nl[1]);
+//  printf("add_srt[0] %i add_Srt[1] %i\n",add_srt[0],add_srt[1]);
+//  if ( 1 )
+//      printf("\n\nSplitting thread into %i!! (I AM %i) depth %i
+//      parallel_depth %i add_srt[0]%i add_srt[1] %i\n",
+//	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(n, m, who_am_i) shared(weights) num_threads(2)
@@ -474,13 +474,13 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
     {
 
       who_am_i = nsplit * parent + i;
-      //    my_depth = (int) (log(parent)/log(2))+1;
+//    my_depth = (int) (log(parent)/log(2))+1;
 
 #ifdef _OPENMP
-      //      if ( 1 )
-      //	printf("I am %i (parent %i), my_depth is: %i thread_num %i (%i)
-      //\n",
-      //	       who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
+//      if ( 1 )
+//	printf("I am %i (parent %i), my_depth is: %i thread_num %i (%i)
+//\n",
+//	       who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
 #endif
 
       std::vector<double> wgttmp(num_wts * nl[i]);
@@ -500,7 +500,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   /* ********************************* */
   /* Idea I: one CPU merges top-down, the other one bottom-up */
   /* ********************** */
-  merge_lists(nl, add1s[0], add2s[0], add1s[1], add2s[1], &idx[0]); // MERGE THE SEGMENTS
+  merge_lists(nl, add1s[0], add2s[0], add1s[1], add2s[1], &idx[0]);  // MERGE THE SEGMENTS
 
   std::vector<size_t> tmp(num_links);
 

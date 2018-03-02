@@ -71,8 +71,7 @@ Writerandom(void *process)
           pstreamReadRecord(streamID1, recdata[recID], &recnmiss[recID]);
         }
 
-      for (int recID = 0; recID < nrecs; recID++)
-        recindex[recID] = -1;
+      for (int recID = 0; recID < nrecs; recID++) recindex[recID] = -1;
 
       for (rindex = nrecs - 1; rindex >= 0; rindex--)
         {
@@ -107,8 +106,7 @@ Writerandom(void *process)
           pstreamWriteRecord(streamID2, recdata[rindex], recnmiss[rindex]);
         }
 
-      for (int recID = 0; recID < nrecs; recID++)
-        Free(recdata[recID]);
+      for (int recID = 0; recID < nrecs; recID++) Free(recdata[recID]);
 
       Free(recdata);
       Free(recvarID);

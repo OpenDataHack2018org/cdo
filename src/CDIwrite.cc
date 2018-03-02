@@ -99,8 +99,7 @@ CDIwrite(void *process)
   else
     {
       std::vector<double> levels(nlevs);
-      for (i = 0; i < nlevs; ++i)
-        levels[i] = 100 * i;
+      for (i = 0; i < nlevs; ++i) levels[i] = 100 * i;
       zaxisID = zaxisCreate(ZAXIS_HEIGHT, nlevs);
       zaxisDefLevels(zaxisID, &levels[0]);
     }
@@ -134,8 +133,7 @@ CDIwrite(void *process)
   gridInqYunits(gridID2, units);
   grid_to_radian(units, gridsize, &yvals[0], "grid center lat");
 
-  for (size_t i = 0; i < gridsize; i++)
-    array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i])) / 1.2);
+  for (size_t i = 0; i < gridsize; i++) array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i])) / 1.2);
 
   std::vector<std::vector<std::vector<double>>> vars(nvars);
   for (varID = 0; varID < nvars; varID++)
@@ -144,8 +142,7 @@ CDIwrite(void *process)
       for (levelID = 0; levelID < nlevs; levelID++)
         {
           vars[varID][levelID].resize(gridsize);
-          for (size_t i = 0; i < gridsize; ++i)
-            vars[varID][levelID][i] = varID + array[i] * (levelID + 1);
+          for (size_t i = 0; i < gridsize; ++i) vars[varID][levelID][i] = varID + array[i] * (levelID + 1);
         }
     }
 
@@ -200,8 +197,7 @@ CDIwrite(void *process)
                   pstreamDefRecord(streamID, varID, levelID);
                   if (memtype == MEMTYPE_FLOAT)
                     {
-                      for (size_t i = 0; i < gridsize; ++i)
-                        farray[i] = vars[varID][levelID][i];
+                      for (size_t i = 0; i < gridsize; ++i) farray[i] = vars[varID][levelID][i];
                       pstreamWriteRecordF(streamID, &farray[0], 0);
                       data_size += gridsize * 4;
                     }

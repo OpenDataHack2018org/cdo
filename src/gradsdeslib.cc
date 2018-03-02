@@ -55,8 +55,7 @@ dsets_init(dsets_t *pfi)
 
   pfi->pchsub1 = NULL;
 
-  for (int i = 0; i < 5; ++i)
-    pfi->dnum[i] = 0;
+  for (int i = 0; i < 5; ++i) pfi->dnum[i] = 0;
 }
 
 /* Byte swap requested number of 4 byte elements */
@@ -544,8 +543,7 @@ adtprs(char *ch, struct dt *def, struct dt *dtim)
   monam[3] = '\0';
 
   i = 0;
-  while (i < 12 && !cmpwrd(monam, mons[i]))
-    i++;
+  while (i < 12 && !cmpwrd(monam, mons[i])) i++;
   i++;
 
   if (i == 13)
@@ -678,10 +676,8 @@ gaint
 cmpwrd(const char *ch1, const char *ch2)
 {
 
-  while (*ch1 == ' ' || *ch1 == '\t')
-    ch1++; /* Advance past leading blanks.     */
-  while (*ch2 == ' ' || *ch2 == '\t')
-    ch2++;
+  while (*ch1 == ' ' || *ch1 == '\t') ch1++; /* Advance past leading blanks.     */
+  while (*ch2 == ' ' || *ch2 == '\t') ch2++;
 
   while (*ch1 == *ch2)
     {
@@ -783,8 +779,7 @@ nxtwrd(char *ch)
       if (*ch == '\0' || *ch == '\n' || *ch == '\r') return (NULL);
       ch++;
     }
-  while (*ch == ' ' || *ch == '\t')
-    ch++; /* Find next word */
+  while (*ch == ' ' || *ch == '\t') ch++; /* Find next word */
   if (*ch == '\0' || *ch == '\n' || *ch == '\r') return (NULL);
   return (ch);
 }
@@ -807,8 +802,7 @@ getstr(char *ch1, char *ch2, int len)
       ch2++;
     }
   ch1--;
-  while (ch1 >= ch && *ch1 == ' ')
-    ch1--;
+  while (ch1 >= ch && *ch1 == ' ') ch1--;
   ch1++;
   *ch1 = '\0';
 }
@@ -1092,8 +1086,7 @@ deflev(char *ch, char *rec, dsets_t *pfi, gaint dim)
         {
           if (fgets(rec, 256, descr) == NULL) goto err2;
           ch = rec;
-          while (*ch == ' ' || *ch == '\t')
-            ch++;
+          while (*ch == ' ' || *ch == '\t') ch++;
           if (*ch == '\0' || *ch == '\n') goto err3;
         }
       if (getdbl(ch, &v1) == NULL) goto err1;
@@ -1134,8 +1127,7 @@ getvnm(struct gavar *pvar, char *mrec)
   gaint ib, i, j, k, len, flag;
 
   ib = 0;
-  while (*(mrec + ib) == ' ')
-    ib++;
+  while (*(mrec + ib) == ' ') ib++;
 
   if (*(mrec + ib) == '\0' || *(mrec + ib) == '\n') return (1);
 
@@ -1200,8 +1192,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
   (void) vals;
   tused = eused = 0;
   olen = 0;
-  while (*(fn + olen))
-    olen++;
+  while (*(fn + olen)) olen++;
   olen += 5;
   fnout = (char *) galloc(olen, "fnout");
   if (fnout == NULL) return (NULL);
@@ -1220,8 +1211,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
           if (*(in + 2) == 'x' && *(in + 3) == '1')
             {
               sprintf(out, "%i", dtimi->yr / 10);
-              while (*out)
-                out++;
+              while (*out) out++;
               in += 4;
             }
           else if (*(in + 2) == 'x' && *(in + 3) == '3')
@@ -1247,8 +1237,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
           else if (*(in + 2) == 'm' && *(in + 3) == '1')
             {
               sprintf(out, "%i", dtimi->mo);
-              while (*out)
-                out++;
+              while (*out) out++;
               in += 4;
             }
           else if (*(in + 2) == 'm' && *(in + 3) == '2')
@@ -1286,8 +1275,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
           else if (*(in + 2) == 'd' && *(in + 3) == '1')
             {
               sprintf(out, "%i", dtimi->dy);
-              while (*out)
-                out++;
+              while (*out) out++;
               in += 4;
             }
           else if (*(in + 2) == 'd' && *(in + 3) == '2')
@@ -1299,8 +1287,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
           else if (*(in + 2) == 'h' && *(in + 3) == '1')
             {
               sprintf(out, "%i", dtimi->hr);
-              while (*out)
-                out++;
+              while (*out) out++;
               in += 4;
             }
           else if (*(in + 2) == 'h' && *(in + 3) == '2')
@@ -1333,8 +1320,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
         { /* x: decades */
           tused = 1;
           sprintf(out, "%i", dtim->yr / 10);
-          while (*out)
-            out++;
+          while (*out) out++;
           in += 3;
         }
       else if (*in == '%' && *(in + 1) == 'x' && *(in + 2) == '3')
@@ -1364,8 +1350,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
         {
           tused = 1;
           sprintf(out, "%i", dtim->mo);
-          while (*out)
-            out++;
+          while (*out) out++;
           in += 3;
         }
       else if (*in == '%' && *(in + 1) == 'm' && *(in + 2) == '2')
@@ -1408,8 +1393,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
         {
           tused = 1;
           sprintf(out, "%i", dtim->dy);
-          while (*out)
-            out++;
+          while (*out) out++;
           in += 3;
         }
       else if (*in == '%' && *(in + 1) == 'd' && *(in + 2) == '2')
@@ -1423,8 +1407,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
         {
           tused = 1;
           sprintf(out, "%i", dtim->hr);
-          while (*out)
-            out++;
+          while (*out) out++;
           in += 3;
         }
       else if (*in == '%' && *(in + 1) == 'h' && *(in + 2) == '2')
@@ -1458,8 +1441,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
             sprintf(out, "%02i", tdif);
           else
             sprintf(out, "%i", tdif);
-          while (*out)
-            out++;
+          while (*out) out++;
           in += 3;
         }
       else if (*in == '%' && *(in + 1) == 'f' && *(in + 2) == '3')
@@ -1471,8 +1453,7 @@ gafndt(char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, struct gachs
             sprintf(out, "%03i", tdif);
           else
             sprintf(out, "%i", tdif);
-          while (*out)
-            out++;
+          while (*out) out++;
           in += 3;
         }
       /* string substitution */
@@ -1640,8 +1621,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
       jj = 0;
       while (jj < reclen && rec[0] == ' ')
         {
-          for (ii = 0; ii < reclen; ii++)
-            rec[ii] = rec[ii + 1];
+          for (ii = 0; ii < reclen; ii++) rec[ii] = rec[ii + 1];
           jj++;
         }
       /* replace newline with null at end of record */
@@ -1909,9 +1889,8 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((pos = intprs(ch, &(pfi->dnum[0]))) == NULL) goto err1;
           if (pfi->dnum[0] < 1)
             {
-              sprintf(pout,
-                      "Warning: Invalid XDEF syntax in %s -- Changing size of "
-                      "X axis from %d to 1 \n",
+              sprintf(pout, "Warning: Invalid XDEF syntax in %s -- Changing size of "
+                            "X axis from %d to 1 \n",
                       pfi->dnam, pfi->dnum[0]);
               gaprnt(1, pout);
               pfi->dnum[0] = 1;
@@ -1945,9 +1924,8 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((pos = intprs(ch, &(pfi->dnum[1]))) == NULL) goto err1;
           if (pfi->dnum[1] < 1)
             {
-              sprintf(pout,
-                      "Warning: Invalid YDEF syntax in %s -- Changing size of "
-                      "Y axis from %d to 1 \n",
+              sprintf(pout, "Warning: Invalid YDEF syntax in %s -- Changing size of "
+                            "Y axis from %d to 1 \n",
                       pfi->dnam, pfi->dnum[1]);
               gaprnt(1, pout);
               pfi->dnum[1] = 1;
@@ -1974,9 +1952,8 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((pos = intprs(ch, &(pfi->dnum[2]))) == NULL) goto err1;
           if (pfi->dnum[2] < 1)
             {
-              sprintf(pout,
-                      "Warning: Invalid ZDEF syntax in %s -- Changing size of "
-                      "Z axis from %d to 1 \n",
+              sprintf(pout, "Warning: Invalid ZDEF syntax in %s -- Changing size of "
+                            "Z axis from %d to 1 \n",
                       pfi->dnam, pfi->dnum[2]);
               gaprnt(1, pout);
               pfi->dnum[2] = 1;
@@ -2004,9 +1981,8 @@ read_gradsdes(char *filename, dsets_t *pfi)
           if ((pos = intprs(ch, &(pfi->dnum[3]))) == NULL) goto err1;
           if (pfi->dnum[3] < 1)
             {
-              sprintf(pout,
-                      "Warning: Invalid TDEF syntax in %s -- Changing size of "
-                      "T axis from %d to 1 \n",
+              sprintf(pout, "Warning: Invalid TDEF syntax in %s -- Changing size of "
+                            "T axis from %d to 1 \n",
                       pfi->dnam, pfi->dnum[3]);
               gaprnt(1, pout);
               pfi->dnum[3] = 1;
@@ -2082,8 +2058,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
               jj = 0;
               while (jj < reclen && rec[0] == ' ')
                 {
-                  for (ii = 0; ii < reclen; ii++)
-                    rec[ii] = rec[ii + 1];
+                  for (ii = 0; ii < reclen; ii++) rec[ii] = rec[ii + 1];
                   jj++;
                 }
               /* replace newline with null at end of record */
@@ -2124,8 +2099,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
               /* parse the levels fields */
               if ((ch = nxtwrd(rec)) == NULL) goto err6;
               /* begin with 8th element of units aray for levels values */
-              for (j = 0; j < 16; j++)
-                pvar->units[j] = -999;
+              for (j = 0; j < 16; j++) pvar->units[j] = -999;
               j = 8;
               while (1)
                 {
@@ -2140,8 +2114,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
                       if ((ch = getdbl(ch, &(pvar->units[j - 1]))) == NULL) goto err6;
                     }
                   /* advance through comma-delimited list of levels args */
-                  while (*ch == ' ')
-                    ch++;
+                  while (*ch == ' ') ch++;
                   if (*ch == '\0' || *ch == '\n') goto err6;
                   if (*ch != ',') break;
                   ch++;
@@ -2150,8 +2123,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
                       ch++;
                       j++;
                     } /* advance past back to back commas */
-                  while (*ch == ' ')
-                    ch++;
+                  while (*ch == ' ') ch++;
                   if (*ch == '\0' || *ch == '\n') goto err6;
                   j++;
                   if (j > 15) goto err6;
@@ -2199,13 +2171,11 @@ read_gradsdes(char *filename, dsets_t *pfi)
                       /* no negative array indices for ncflag files */
                       if ((pfi->ncflg) && (pvar->units[j] < 0)) goto err6;
                     }
-                  while (*ch == ' ')
-                    ch++;
+                  while (*ch == ' ') ch++;
                   if (*ch == '\0' || *ch == '\n') goto err6;
                   if (*ch != ',') break;
                   ch++;
-                  while (*ch == ' ')
-                    ch++;
+                  while (*ch == ' ') ch++;
                   if (*ch == '\0' || *ch == '\n') goto err6;
                   j++;
                   if (j > 8) goto err6;
@@ -2246,8 +2216,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
           jj = 0;
           while (jj < reclen && rec[0] == ' ')
             {
-              for (ii = 0; ii < reclen; ii++)
-                rec[ii] = rec[ii + 1];
+              for (ii = 0; ii < reclen; ii++) rec[ii] = rec[ii + 1];
               jj++;
             }
           /* replace newline with null at end of record */
@@ -2275,9 +2244,8 @@ read_gradsdes(char *filename, dsets_t *pfi)
                 }
               else
                 {
-                  sprintf(pout,
-                          "Open Error:  Looking for \"endvars\", found \"%s\" "
-                          "instead.\n",
+                  sprintf(pout, "Open Error:  Looking for \"endvars\", found \"%s\" "
+                                "instead.\n",
                           rec);
                   gaprnt(0, pout);
                   goto err9;
@@ -2293,8 +2261,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
               jj = 0;
               while (jj < reclen && rec[0] == ' ')
                 {
-                  for (ii = 0; ii < reclen; ii++)
-                    rec[ii] = rec[ii + 1];
+                  for (ii = 0; ii < reclen; ii++) rec[ii] = rec[ii + 1];
                   jj++;
                 }
               /* replace newline with null at end of record */
@@ -2356,8 +2323,7 @@ read_gradsdes(char *filename, dsets_t *pfi)
       ens->length = pfi->dnum[3];
       ens->gt = 1;
       gr2t(pfi->grvals[3], 1, &ens->tinit);
-      for (j = 0; j < 4; j++)
-        ens->grbcode[j] = -999;
+      for (j = 0; j < 4; j++) ens->grbcode[j] = -999;
     }
 
   /* Make sure there are no conflicting options and data types */
@@ -2592,9 +2558,8 @@ read_gradsdes(char *filename, dsets_t *pfi)
           ch = gafndt(pfi->name, &tdefe, &tdefe, pfi->abvals[3], pfi->pchsub1, pfi->ens1, ens->gt, e, &flag);
           if (ch == NULL)
             {
-              sprintf(pout,
-                      "Open Error: couldn't determine data file name for e=%d "
-                      "t=%d\n",
+              sprintf(pout, "Open Error: couldn't determine data file name for e=%d "
+                            "t=%d\n",
                       e, ens->gt);
               gaprnt(0, pout);
               goto err8;
@@ -2652,9 +2617,8 @@ read_gradsdes(char *filename, dsets_t *pfi)
               pos = gafndt(pfi->name, &tdef, &tdefe, pfi->abvals[3], pfi->pchsub1, pfi->ens1, t, e, &flag);
               if (pos == NULL)
                 {
-                  sprintf(pout,
-                          "Open Error: couldn't determine data file name for "
-                          "e=%d t=%d\n",
+                  sprintf(pout, "Open Error: couldn't determine data file name for "
+                                "e=%d t=%d\n",
                           e, t);
                   gaprnt(0, pout);
                   goto err8;

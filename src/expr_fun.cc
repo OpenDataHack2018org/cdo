@@ -35,8 +35,7 @@ fld_weights(int gridID, size_t ngp)
 {
   static bool lwarn = true;
   double *weights = (double *) Malloc(ngp * sizeof(double));
-  for (size_t i = 0; i < ngp; ++i)
-    weights[i] = 1;
+  for (size_t i = 0; i < ngp; ++i) weights[i] = 1;
 
   if (ngp > 1)
     {
@@ -61,8 +60,7 @@ vert_weights(int zaxisID, size_t nlev)
   static bool lwarn = true;
   double *weights = (double *) Malloc(nlev * sizeof(double));
   double *thickness = (double *) Malloc(nlev * sizeof(double));
-  for (size_t i = 0; i < nlev; ++i)
-    weights[i] = 1;
+  for (size_t i = 0; i < nlev; ++i) weights[i] = 1;
 
   if (nlev > 1)
     {

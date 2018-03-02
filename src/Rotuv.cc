@@ -110,13 +110,11 @@ Rotuv(void *process)
 
   if (lvar)
     {
-      for (int i = 0; i < nch; i++)
-        chvars[i] = operatorArgv()[i];
+      for (int i = 0; i < nch; i++) chvars[i] = operatorArgv()[i];
     }
   else
     {
-      for (int i = 0; i < nch; i++)
-        chcodes[i] = parameter2int(operatorArgv()[i]);
+      for (int i = 0; i < nch; i++) chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -133,8 +131,7 @@ Rotuv(void *process)
   double **vardata = (double **) Malloc(nvars * sizeof(double *));
 
   bool lfound[MAXARG];
-  for (int i = 0; i < nch; i++)
-    lfound[i] = false;
+  for (int i = 0; i < nch; i++) lfound[i] = false;
 
   if (lvar)
     {

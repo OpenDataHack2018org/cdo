@@ -64,8 +64,7 @@ list_with_ints()
 
   list_t *list = list_new(sizeof(int), NULL, NULL);
 
-  for (int i = 1; i <= numbers; i++)
-    list_append(list, &i);
+  for (int i = 1; i <= numbers; i++) list_append(list, &i);
 
   list_for_each(list, iterate_int);
 

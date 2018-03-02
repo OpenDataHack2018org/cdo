@@ -278,8 +278,8 @@ boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const 
   restr_t tmp_lats[4], tmp_lons[4];
 
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box) \
-  private(idx, tmp_lats, tmp_lons)
+#pragma omp parallel for default(none) shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, \
+                                              bound_box) private(idx, tmp_lats, tmp_lons)
 #endif
   for (size_t n = 0; n < size; n++)
     {
@@ -300,8 +300,8 @@ boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const 
 
       /* Find N,S and NE lat/lon coords and check bounding box */
 
-      for (unsigned j = 0; j < 4; ++j)  tmp_lons[j] = RESTR_SCALE(center_lon[idx[j]]);
-      for (unsigned j = 0; j < 4; ++j)  tmp_lats[j] = RESTR_SCALE(center_lat[idx[j]]);
+      for (unsigned j = 0; j < 4; ++j) tmp_lons[j] = RESTR_SCALE(center_lon[idx[j]]);
+      for (unsigned j = 0; j < 4; ++j) tmp_lats[j] = RESTR_SCALE(center_lat[idx[j]]);
 
       bound_box[n4] = tmp_lats[0];
       bound_box[n4 + 1] = tmp_lats[0];
@@ -519,7 +519,7 @@ remap_define_grid(RemapType mapType, int gridID, remapgrid_t *grid, const char *
 
   remapgrid_alloc(mapType, grid);
 
-  /* Initialize logical mask */
+/* Initialize logical mask */
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(gridsize, grid)

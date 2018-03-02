@@ -40,8 +40,7 @@ readInstitution(const char *instfile)
       nvar++;
 
       pline = line;
-      while (isspace((int) *pline))
-        pline++;
+      while (isspace((int) *pline)) pline++;
 
       if (nvar == 1)
         {

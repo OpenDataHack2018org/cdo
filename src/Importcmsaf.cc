@@ -225,11 +225,9 @@ defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double 
   double *xvals = (double *) Malloc(nx * sizeof(double));
   double *yvals = (double *) Malloc(ny * sizeof(double));
 
-  for (int i = 0; i < nx; ++i)
-    xvals[i] = xmin + i * dx + dx / 2;
+  for (int i = 0; i < nx; ++i) xvals[i] = xmin + i * dx + dx / 2;
 
-  for (int i = 0; i < ny; ++i)
-    yvals[i] = ymax - i * dy - dy / 2;
+  for (int i = 0; i < ny; ++i) yvals[i] = ymax - i * dy - dy / 2;
 
   int gridID = gridCreate(GRID_PROJECTION, nx * ny);
 
@@ -255,11 +253,9 @@ defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
   double *xvals = (double *) Malloc(nx * sizeof(double));
   double *yvals = (double *) Malloc(ny * sizeof(double));
 
-  for (int i = 0; i < nx; ++i)
-    xvals[i] = xmin + i * dx + dx / 2;
+  for (int i = 0; i < nx; ++i) xvals[i] = xmin + i * dx + dx / 2;
 
-  for (int i = 0; i < ny; ++i)
-    yvals[i] = ymax - i * dy - dy / 2;
+  for (int i = 0; i < ny; ++i) yvals[i] = ymax - i * dy - dy / 2;
 
   int gridID = gridCreate(GRID_PROJECTION, nx * ny);
 
@@ -889,8 +885,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
           atype_class = H5Tget_class(atype);
 
           len = strlen(attname);
-          for (k = 0; k < len; ++k)
-            attname[k] = tolower(attname[k]);
+          for (k = 0; k < len; ++k) attname[k] = tolower(attname[k]);
 
           if (strcmp(attname, "intercept") == 0 || strcmp(attname, "offset") == 0)
             {
@@ -1051,8 +1046,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
               float *farray = (float *) Malloc(gridsize * nt * sizeof(float));
               status = H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, farray);
               if (status < 0) cdoAbort("Reading of NATIVE_FLOAT variable %s failed!", varname);
-              for (size_t i = 0; i < gridsize * nt; ++i)
-                array[i] = farray[i];
+              for (size_t i = 0; i < gridsize * nt; ++i) array[i] = farray[i];
               Free(farray);
             }
           else
@@ -1066,8 +1060,7 @@ read_dataset(hid_t loc_id, const char *name, void *opdata)
           int *iarray = (int *) Malloc(gridsize * nt * sizeof(int));
           status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
           if (status < 0) cdoAbort("Reading of NATIVE_INT variable %s failed!", varname);
-          for (size_t i = 0; i < gridsize * nt; ++i)
-            array[i] = iarray[i];
+          for (size_t i = 0; i < gridsize * nt; ++i) array[i] = iarray[i];
           Free(iarray);
         }
 
@@ -1425,8 +1418,7 @@ Importcmsaf(void *process)
     {
       vtimes = (int *) Malloc(nt * sizeof(int));
 
-      for (i = 0; i < nt; ++i)
-        vtimes[i] = i * 10000 + 45 * 100;
+      for (i = 0; i < nt; ++i) vtimes[i] = i * 10000 + 45 * 100;
 
       if (dsets.obj[ivar].time)
         {
@@ -1478,8 +1470,7 @@ Importcmsaf(void *process)
     {
       double *levels;
       levels = (double *) Malloc(nz * sizeof(double));
-      for (i = 0; i < nz; ++i)
-        levels[i] = i + 1;
+      for (i = 0; i < nz; ++i) levels[i] = i + 1;
       zaxisID = zaxisCreate(ZAXIS_GENERIC, nz);
       zaxisDefLevels(zaxisID, levels);
       Free(levels);
@@ -1586,8 +1577,7 @@ Importcmsaf(void *process)
   zaxisDestroy(zaxisID);
   taxisDestroy(taxisID);
 
-  for (ivar = 0; ivar < dsets.nsets; ++ivar)
-    Free(dsets.obj[ivar].array);
+  for (ivar = 0; ivar < dsets.nsets; ++ivar) Free(dsets.obj[ivar].array);
 
   if (vtimes) Free(vtimes);
 

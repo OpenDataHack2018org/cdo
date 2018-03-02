@@ -76,20 +76,17 @@ Change(void *process)
   if (operatorID == CHCODE || operatorID == CHTABNUM)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
-      for (i = 0; i < nch; i++)
-        chints[i] = parameter2int(operatorArgv()[i]);
+      for (i = 0; i < nch; i++) chints[i] = parameter2int(operatorArgv()[i]);
     }
   else if (operatorID == CHPARAM || operatorID == CHNAME || operatorID == CHUNIT)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
-      for (i = 0; i < nch; i++)
-        chnames[i] = operatorArgv()[i];
+      for (i = 0; i < nch; i++) chnames[i] = operatorArgv()[i];
     }
   else if (operatorID == CHLEVEL)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
-      for (i = 0; i < nch; i++)
-        chlevels[i] = parameter2double(operatorArgv()[i]);
+      for (i = 0; i < nch; i++) chlevels[i] = parameter2double(operatorArgv()[i]);
     }
   else if (operatorID == CHLEVELC)
     {
@@ -110,8 +107,7 @@ Change(void *process)
   else if (operatorID == CHLTYPE)
     {
       if (nch % 2) cdoAbort("Odd number of input arguments!");
-      for (i = 0; i < nch; i++)
-        chltypes[i] = parameter2int(operatorArgv()[i]);
+      for (i = 0; i < nch; i++) chltypes[i] = parameter2int(operatorArgv()[i]);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -198,8 +194,7 @@ Change(void *process)
               std::vector<double> newlevels(nlevs);
               zaxisInqLevels(zaxisID1, &levels[0]);
 
-              for (k = 0; k < nlevs; k++)
-                newlevels[k] = levels[k];
+              for (k = 0; k < nlevs; k++) newlevels[k] = levels[k];
 
               int nfound = 0;
               for (i = 0; i < nch; i += 2)
@@ -299,7 +294,7 @@ Change(void *process)
   while ((nrecs = cdoStreamInqTimestep(streamID1, tsID1)))
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-      if ( streamID2 == CDI_UNDEFID )
+      if (streamID2 == CDI_UNDEFID)
         {
           streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
           pstreamDefVlist(streamID2, vlistID2);

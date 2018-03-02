@@ -126,8 +126,7 @@ Zonstat(void *process)
       cdoWarning("Input stream contains only zonal data!");
     }
 
-  for (index = 0; index < ngrids; index++)
-    vlistChangeGridIndex(vlistID2, index, gridID2);
+  for (index = 0; index < ngrids; index++) vlistChangeGridIndex(vlistID2, index, gridID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);

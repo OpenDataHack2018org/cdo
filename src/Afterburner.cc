@@ -2014,9 +2014,8 @@ after_procstat(char *procpath, int truncation)
       if ((hostname = getenv("HOST")) == NULL) hostname = unknown;
 
       setvbuf(sf, (char *) NULL, _IONBF, 0);
-      fprintf(sf,
-              "%.7s %4.4ld.%2.2ld.%2.2ld %2.2ld:%2.2ld %s "
-              "%-9.9s %7.1f %7.1f T%3.3d %s\n",
+      fprintf(sf, "%.7s %4.4ld.%2.2ld.%2.2ld %2.2ld:%2.2ld %s "
+                  "%-9.9s %7.1f %7.1f T%3.3d %s\n",
               name, yy, mm, dd, hh, mi, VERSION, proc, MaxMBytes, CPUTime, truncation, hostname);
 
       fclose(sf);

@@ -80,12 +80,10 @@ rotate_uv2(double *u_i, double *v_j, int ix, int iy, double *lon, double *lat, d
 
   /* change sign */
   if (change_sign_u)
-    for (i = 0; i < ix * iy; i++)
-      u_i[i] *= -1;
+    for (i = 0; i < ix * iy; i++) u_i[i] *= -1;
 
   if (change_sign_v)
-    for (i = 0; i < ix * iy; i++)
-      v_j[i] *= -1;
+    for (i = 0; i < ix * iy; i++) v_j[i] *= -1;
 
   /* rotation */
   for (j = 0; j < iy; j++)

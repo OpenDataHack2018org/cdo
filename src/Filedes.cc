@@ -372,8 +372,7 @@ Filedes(void *process)
                     }
                 }
               else
-                for (int i = 0; i < vctsize; i++)
-                  fprintf(stdout, "%5d %25.17f\n", i, vct[i]);
+                for (int i = 0; i < vctsize; i++) fprintf(stdout, "%5d %25.17f\n", i, vct[i]);
 
               break;
             }

@@ -60,8 +60,7 @@ Timcount(void *process)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
-  for (varID = 0; varID < nvars; varID++)
-    vlistDefVarUnits(vlistID2, varID, "No.");
+  for (varID = 0; varID < nvars; varID++) vlistDefVarUnits(vlistID2, varID, "No.");
 
   if (cdoOperatorF2(operatorID) == 16) vlistDefNtsteps(vlistID2, 1);
 

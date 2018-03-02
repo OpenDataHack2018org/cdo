@@ -95,8 +95,7 @@ Output(void *process)
       char **parnames = operatorArgv();
 
       if (cdoVerbose)
-        for (int i = 0; i < npar; i++)
-          cdoPrint("key %d = %s", i + 1, parnames[i]);
+        for (int i = 0; i < npar; i++) cdoPrint("key %d = %s", i + 1, parnames[i]);
 
       keys = (int *) Malloc(npar * sizeof(int));
       nkeys = 0;

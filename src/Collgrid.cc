@@ -202,11 +202,9 @@ genGrid(int ngrids, int nfiles, std::vector<ensfileType> &ef, bool ginit, int ig
   if (nx * ny != nfiles) cdoAbort("Number of input files (%ld) and number of blocks (%ldx%ld) differ!", nfiles, nx, ny);
 
   long xsize2 = 0;
-  for (long i = 0; i < nx; ++i)
-    xsize2 += xsize[xyinfo[i].id];
+  for (long i = 0; i < nx; ++i) xsize2 += xsize[xyinfo[i].id];
   long ysize2 = 0;
-  for (long j = 0; j < ny; ++j)
-    ysize2 += ysize[xyinfo[j * nx].id];
+  for (long j = 0; j < ny; ++j) ysize2 += ysize[xyinfo[j * nx].id];
   if (cdoVerbose) cdoPrint("xsize2 %ld  ysize2 %ld", xsize2, ysize2);
 
   std::vector<double> xvals2, yvals2;
@@ -314,16 +312,13 @@ Collgrid(void *process)
   vlistClearFlag(vlistID1);
 
   /* check that the contents is always the same */
-  for (int fileID = 1; fileID < nfiles; fileID++)
-    vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
+  for (int fileID = 1; fileID < nfiles; fileID++) vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
   int nvars = vlistNvars(vlistID1);
   std::vector<bool> vars(nvars);
-  for (varID = 0; varID < nvars; varID++)
-    vars[varID] = false;
+  for (varID = 0; varID < nvars; varID++) vars[varID] = false;
   std::vector<bool> vars1(nvars);
-  for (varID = 0; varID < nvars; varID++)
-    vars1[varID] = false;
+  for (varID = 0; varID < nvars; varID++) vars1[varID] = false;
 
   int nsel = operatorArgc();
   int noff = 0;
@@ -344,20 +339,17 @@ Collgrid(void *process)
 
   if (nsel == 0)
     {
-      for (varID = 0; varID < nvars; varID++)
-        vars1[varID] = true;
+      for (varID = 0; varID < nvars; varID++) vars1[varID] = true;
     }
   else
     {
       char **argnames = operatorArgv() + noff;
 
       if (cdoVerbose)
-        for (int i = 0; i < nsel; i++)
-          fprintf(stderr, "name %d = %s\n", i + 1, argnames[i]);
+        for (int i = 0; i < nsel; i++) fprintf(stderr, "name %d = %s\n", i + 1, argnames[i]);
 
       std::vector<bool> selfound(nsel);
-      for (int i = 0; i < nsel; i++)
-        selfound[i] = false;
+      for (int i = 0; i < nsel; i++) selfound[i] = false;
 
       char varname[CDI_MAX_NAME];
       for (varID = 0; varID < nvars; varID++)
@@ -384,8 +376,7 @@ Collgrid(void *process)
         {
           int zaxisID = vlistInqVarZaxis(vlistID1, varID);
           int nlevs = zaxisInqSize(zaxisID);
-          for (int levID = 0; levID < nlevs; levID++)
-            vlistDefFlag(vlistID1, varID, levID, TRUE);
+          for (int levID = 0; levID < nlevs; levID++) vlistDefFlag(vlistID1, varID, levID, TRUE);
         }
     }
 
@@ -502,8 +493,7 @@ Collgrid(void *process)
               if (cdoVerbose && tsID == 0) printf("varID %d %d levelID %d %d\n", varID, varID2, levelID, levelID2);
 
               double missval = vlistInqVarMissval(vlistID2, varID2);
-              for (size_t i = 0; i < gridsize2; i++)
-                array2[i] = missval;
+              for (size_t i = 0; i < gridsize2; i++) array2[i] = missval;
 
 #ifdef _OPENMP
 #pragma omp parallel for default(shared)
@@ -515,8 +505,7 @@ Collgrid(void *process)
                   if (vars[varID2])
                     {
                       size_t gridsize = ef[fileID].gridsize;
-                      for (size_t i = 0; i < gridsize; ++i)
-                        array2[ef[fileID].gridindex[i]] = ef[fileID].array[i];
+                      for (size_t i = 0; i < gridsize; ++i) array2[ef[fileID].gridindex[i]] = ef[fileID].array[i];
                     }
                 }
 
@@ -536,8 +525,7 @@ Collgrid(void *process)
     }
   while (nrecs0 > 0);
 
-  for (int fileID = 0; fileID < nfiles; fileID++)
-    pstreamClose(ef[fileID].streamID);
+  for (int fileID = 0; fileID < nfiles; fileID++) pstreamClose(ef[fileID].streamID);
 
   pstreamClose(streamID2);
 

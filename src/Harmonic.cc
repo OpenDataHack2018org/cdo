@@ -279,8 +279,7 @@ Harmonic(void *process)
 
   for (int j = 0; j < n_out; ++j)
     {
-      for (varID = 0; varID < nvars; ++varID)
-        Free(out[j][varID]);
+      for (varID = 0; varID < nvars; ++varID) Free(out[j][varID]);
 
       Free(out[j]);
     }
@@ -289,8 +288,7 @@ Harmonic(void *process)
 
   for (int j = 0; j < n_out * 2; ++j)
     {
-      for (varID = 0; varID < nvars; ++varID)
-        Free(work[j][varID]);
+      for (varID = 0; varID < nvars; ++varID) Free(work[j][varID]);
 
       Free(work[j]);
     }

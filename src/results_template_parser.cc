@@ -86,9 +86,9 @@ results_template_parser(void *node, const char *varname)
           else
             {
 
-              /* 	Loop Over the attributes and get the corresponding
-                      Magics Parameter name and type, set the value
-              */
+/* 	Loop Over the attributes and get the corresponding
+        Magics Parameter name and type, set the value
+*/
 
 #if 0
 	      printf( "Finding varname = %s  result_name = %s\n", varname, xmlGetProp( cur_node,"name") );

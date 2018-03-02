@@ -36,8 +36,7 @@ set_attributes(list_t *kvlist, int vlistID)
 
   int kvn = list_size(kvlist);
   char **wname = (char **) Malloc(kvn * sizeof(char *));
-  for (int i = 0; i < kvn; ++i)
-    wname[i] = NULL;
+  for (int i = 0; i < kvn; ++i) wname[i] = NULL;
 
   char name[CDI_MAX_NAME];
   char buffer[CDI_MAX_NAME];
@@ -149,16 +148,14 @@ set_attributes(list_t *kvlist, int vlistID)
               if (dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32)
                 {
                   int *ivals = (int *) Malloc(nvalues * sizeof(int));
-                  for (int i = 0; i < nvalues; ++i)
-                    ivals[i] = literal_to_int(kv->values[i]);
+                  for (int i = 0; i < nvalues; ++i) ivals[i] = literal_to_int(kv->values[i]);
                   cdiDefAttInt(cdiID, varID, attname, dtype, nvalues, ivals);
                   Free(ivals);
                 }
               else if (dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64)
                 {
                   double *dvals = (double *) Malloc(nvalues * sizeof(double));
-                  for (int i = 0; i < nvalues; ++i)
-                    dvals[i] = literal_to_double(kv->values[i]);
+                  for (int i = 0; i < nvalues; ++i) dvals[i] = literal_to_double(kv->values[i]);
                   cdiDefAttFlt(cdiID, varID, attname, dtype, nvalues, dvals);
                   Free(dvals);
                 }

@@ -311,12 +311,10 @@ Sort(void *process)
   pstreamClose(streamID1);
   pstreamClose(streamID2);
 
-  for (varID = 0; varID < nvars; varID++)
-    Free(vardata[varID]);
+  for (varID = 0; varID < nvars; varID++) Free(vardata[varID]);
   Free(vardata);
 
-  for (vindex = 0; vindex < nvars; vindex++)
-    Free(varInfo[vindex].levInfo);
+  for (vindex = 0; vindex < nvars; vindex++) Free(varInfo[vindex].levInfo);
   Free(varInfo);
 
   cdoFinish();

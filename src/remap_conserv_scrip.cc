@@ -1203,8 +1203,8 @@ normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_l
   else if (rv->normOpt == NormOpt::NONE)
     {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon) private(src_cell_add, norm_factor)
+#pragma omp parallel for default(none) shared(num_links, rv, weights, tgt_grid, src_centroid_lat, \
+                                              src_centroid_lon) private(src_cell_add, norm_factor)
 #endif
       for (long n = 0; n < num_links; ++n)
         {
@@ -1233,7 +1233,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 
   long max_subseg = 100000; /* max number of subsegments per segment to prevent infinite
                                loop */
-                            /* 1000 is too small!!! */
+  /* 1000 is too small!!! */
 
   long srch_corners; /* num of corners of srch cells           */
   long i;
@@ -1334,11 +1334,10 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
   if (cdoTimer) timer_start(timer_remap_con_l1);
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(nbins, num_wts, src_centroid_lon, src_centroid_lat, \
-         remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
-	 srch_corner_lat, srch_corner_lon, max_srch_cells, 		\
-	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(                                                 \
+    nbins, num_wts, src_centroid_lon, src_centroid_lat, remap_store_link_fast, grid_store, link_add1, link_add2, rv, \
+    cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells, src_num_cell_corners, srch_corners,    \
+    src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for (long src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add)
     {
@@ -1350,13 +1349,12 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
       bool lcoinc;  // flag for coincident segments
       bool lthresh = false;
       bool luse_last = false;
-      int avoid_pole_count = 0;         // count attempts to avoid pole
-      double avoid_pole_offset = TINY;  // endpoint offset to avoid pole
-      double intrsct_lat, intrsct_lon;  // lat/lon of next intersect
-      double intrsct_lat_off = 0,
-             intrsct_lon_off = 0;   // lat/lon coords offset for next search
-      double intrsct_x, intrsct_y;  // x,y for intersection
-      long last_loc = -1;           // save location when crossing threshold
+      int avoid_pole_count = 0;                         // count attempts to avoid pole
+      double avoid_pole_offset = TINY;                  // endpoint offset to avoid pole
+      double intrsct_lat, intrsct_lon;                  // lat/lon of next intersect
+      double intrsct_lat_off = 0, intrsct_lon_off = 0;  // lat/lon coords offset for next search
+      double intrsct_x, intrsct_y;                      // x,y for intersection
+      long last_loc = -1;                               // save location when crossing threshold
       long tgt_cell_add;
 
       // Get search cells
@@ -1544,11 +1542,10 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
   findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex) \
-  shared(nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
-         remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
-	 srch_corner_lat, srch_corner_lon, max_srch_cells, 		\
-	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(                                                 \
+    nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, remap_store_link_fast, grid_store, link_add1, link_add2, rv, \
+    cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells, tgt_num_cell_corners, srch_corners,    \
+    src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
   for (long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -1560,13 +1557,12 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
       bool lcoinc;  // flag for coincident segments
       bool lthresh = false;
       bool luse_last = false;
-      int avoid_pole_count = 0;         // count attempts to avoid pole
-      double avoid_pole_offset = TINY;  // endpoint offset to avoid pole
-      double intrsct_lat, intrsct_lon;  // lat/lon of next intersect
-      double intrsct_lat_off = 0,
-             intrsct_lon_off = 0;   // lat/lon coords offset for next search
-      double intrsct_x, intrsct_y;  // x,y for intersection
-      long last_loc = -1;           // save location when crossing threshold
+      int avoid_pole_count = 0;                         // count attempts to avoid pole
+      double avoid_pole_offset = TINY;                  // endpoint offset to avoid pole
+      double intrsct_lat, intrsct_lon;                  // lat/lon of next intersect
+      double intrsct_lat_off = 0, intrsct_lon_off = 0;  // lat/lon coords offset for next search
+      double intrsct_x, intrsct_y;                      // x,y for intersection
+      long last_loc = -1;                               // save location when crossing threshold
       long src_cell_add;
 
       // Get search cells

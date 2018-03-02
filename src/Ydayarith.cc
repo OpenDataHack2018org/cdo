@@ -78,8 +78,7 @@ Ydayarith(void *process)
 
   int nvars = vlistNvars(vlistID2);
 
-  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++)
-    vardata2[dayoy] = NULL;
+  for (int dayoy = 0; dayoy < MAX_DOY; dayoy++) vardata2[dayoy] = NULL;
 
   int tsID = 0;
   while ((nrecs = cdoStreamInqTimestep(streamID2, tsID)))

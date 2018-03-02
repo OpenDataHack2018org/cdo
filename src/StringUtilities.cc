@@ -53,8 +53,7 @@ StringSplitWithSeperator(const char *source_string, const char *seperator, char 
 
   if (DBG)
     {
-      for (i = 0; i < n; i++)
-        fprintf(stderr, "str  %s \n", temp_list[i]);
+      for (i = 0; i < n; i++) fprintf(stderr, "str  %s \n", temp_list[i]);
     }
 
   *ptr_split_string = temp_list;

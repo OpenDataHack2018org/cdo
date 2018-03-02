@@ -67,8 +67,7 @@ fft_set(double *trigs, long *ifax, long n)
     }
 
   long nfax = 0;
-  for (long k = 0; k < 9; ++k)
-    ifax[k] = 0;
+  for (long k = 0; k < 9; ++k) ifax[k] = 0;
 
   ifax[9] = n;
 
@@ -1986,10 +1985,8 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *r
         {
           double *restrict wfcx = wfc + jump * (lat + lev * nlat);
           double *restrict fcx = fc + (lat + lev * nlat * nfc);
-          for (long fou = 0; fou < nfc; ++fou)
-            wfcx[fou] = fcx[fou * nlat];
-          for (long fou = nfc; fou < jump; ++fou)
-            wfcx[fou] = 0.0;
+          for (long fou = 0; fou < nfc; ++fou) wfcx[fou] = fcx[fou * nlat];
+          for (long fou = nfc; fou < jump; ++fou) wfcx[fou] = 0.0;
         }
     }
 
@@ -2003,7 +2000,7 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *r
       nvex = NFFT;
     }
 
-    // printf("nblox %ld nvex0 %ld  lot %ld\n",nblox, nvex0, lot);
+// printf("nblox %ld nvex0 %ld  lot %ld\n",nblox, nvex0, lot);
 #ifdef _OPENMP
 #pragma omp parallel for default(shared)
 #endif
@@ -2059,8 +2056,7 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *r
             {
               long i = ibase;
               long j = jbase;
-              for (long ii = 0; ii < nlon; ii++)
-                wfc[j++] = wgp[i++];
+              for (long ii = 0; ii < nlon; ii++) wfc[j++] = wgp[i++];
               ibase = ibase + nx;
               jbase = jbase + jump;
             }
@@ -2086,8 +2082,7 @@ fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *r
 #pragma omp parallel for default(shared)
 #endif
   for (long j = 0; j < lot; ++j)
-    for (long lon = 0; lon < nlon; ++lon)
-      gp[lon + j * nlon] = wpt[lon + j * jump];
+    for (long lon = 0; lon < nlon; ++lon) gp[lon + j * nlon] = wpt[lon + j * jump];
 
   Free(istartv);
   Free(wfc);
@@ -2129,8 +2124,7 @@ gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, 
   wix = 0;
   for (j = 0; j < lot; ++j)
     {
-      for (lon = 0; lon < nlon; ++lon)
-        wgp[wix + lon] = gp[rix + lon];
+      for (lon = 0; lon < nlon; ++lon) wgp[wix + lon] = gp[rix + lon];
       wgp[wix + nlon] = 0.0;
       wgp[wix + nlon + 1] = 0.0;
       rix += nlon;
@@ -2218,8 +2212,7 @@ gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, 
           fct = fc + wix;
           fct[0] = wpt[0];
           fct[nlat] = 0.0;
-          for (fou = 2; fou < nfc; ++fou)
-            fct[fou * nlat] = wpt[fou];
+          for (fou = 2; fou < nfc; ++fou) fct[fou * nlat] = wpt[fou];
         }
     }
 

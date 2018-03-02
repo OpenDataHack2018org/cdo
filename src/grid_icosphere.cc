@@ -82,8 +82,7 @@ static inline vec3
 addVector(const vec3 &a, const vec3 &b)
 {
   vec3 c;
-  for (unsigned i = 0; i < 3; ++i)
-    c[i] = a[i] + b[i];
+  for (unsigned i = 0; i < 3; ++i) c[i] = a[i] + b[i];
   return c;
 }
 
@@ -91,8 +90,7 @@ static inline vec3
 subVector(const vec3 &a, const vec3 &b)
 {
   vec3 c;
-  for (unsigned i = 0; i < 3; ++i)
-    c[i] = a[i] - b[i];
+  for (unsigned i = 0; i < 3; ++i) c[i] = a[i] - b[i];
   return c;
 }
 
@@ -101,8 +99,7 @@ normalizeVector(const vec3 &a)
 {
   vec3 c;
   double magnitude = sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
-  for (unsigned i = 0; i < 3; ++i)
-    c[i] = a[i] / magnitude;
+  for (unsigned i = 0; i < 3; ++i) c[i] = a[i] / magnitude;
   return c;
 }
 
@@ -156,8 +153,7 @@ makeIcosphere(int subdivisions)
   VertexList vertices = icosahedron::vertices;
   TriangleList triangles = icosahedron::triangles;
 
-  for (int i = 0; i < subdivisions; ++i)
-    triangles = subdivide(vertices, triangles);
+  for (int i = 0; i < subdivisions; ++i) triangles = subdivide(vertices, triangles);
 
   return { vertices, triangles };
 }
@@ -176,8 +172,7 @@ static inline double
 dotProduct(const vec3 &a, const vec3 &b)
 {
   double sum = 0;
-  for (unsigned i = 0; i < 3; ++i)
-    sum += a[i] * b[i];
+  for (unsigned i = 0; i < 3; ++i) sum += a[i] * b[i];
   return sum;
 }
 
@@ -185,8 +180,7 @@ static inline void
 d_normalize(vec3 &v)
 {
   double dnorm = sqrt(dotProduct(v, v));
-  for (unsigned i = 0; i < 3; ++i)
-    v[i] /= dnorm;
+  for (unsigned i = 0; i < 3; ++i) v[i] /= dnorm;
 }
 
 vec3
@@ -205,24 +199,21 @@ circumCenterMean(const vec3 &v0, const vec3 &v1, const vec3 &v2)
   e2 = subVector(v2, v0);
   vec3 cu0 = vectorProduct(e1, e2);
   if (dotProduct(cu0, v0) < 0.0)
-    for (unsigned i = 0; i < 3; ++i)
-      cu0[i] = -cu0[i];
+    for (unsigned i = 0; i < 3; ++i) cu0[i] = -cu0[i];
   d_normalize(cu0);
 
   e1 = subVector(v2, v1);
   e2 = subVector(v0, v1);
   vec3 cu1 = vectorProduct(e1, e2);
   if (dotProduct(cu1, v1) < 0.0)
-    for (unsigned i = 0; i < 3; ++i)
-      cu1[i] = -cu1[i];
+    for (unsigned i = 0; i < 3; ++i) cu1[i] = -cu1[i];
   d_normalize(cu1);
 
   e1 = subVector(v0, v2);
   e2 = subVector(v1, v2);
   vec3 cu2 = vectorProduct(e1, e2);
   if (dotProduct(cu2, v2) < 0.0)
-    for (unsigned i = 0; i < 3; ++i)
-      cu2[i] = -cu2[i];
+    for (unsigned i = 0; i < 3; ++i) cu2[i] = -cu2[i];
   d_normalize(cu2);
 
   vec3 center = addVector(addVector(cu0, cu1), cu2);
@@ -253,8 +244,7 @@ genIcosphereCoords(int subdivisions, bool lbounds, double **xvals, double **yval
       vec3 center = circumCenterMean(vertices[t.vertex[0]], vertices[t.vertex[1]], vertices[t.vertex[2]]);
       cc2gc(&center[0], &(*xvals)[i], &(*yvals)[i]);
       if (lbounds)
-        for (size_t k = 0; k < 3; ++k)
-          cc2gc(&vertices[t.vertex[k]][0], &(*xbounds)[i * 3 + k], &(*ybounds)[i * 3 + k]);
+        for (size_t k = 0; k < 3; ++k) cc2gc(&vertices[t.vertex[k]][0], &(*xbounds)[i * 3 + k], &(*ybounds)[i * 3 + k]);
       i++;
     }
 

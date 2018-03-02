@@ -84,8 +84,7 @@ eval_timestepmask(const char *maskfile, list_t *kvlist)
 
       kvlist_append(kvlist, "timestep", (const char **) values, nvals);
 
-      for (int i = 0; i < nvals; ++i)
-        Free(values[i]);
+      for (int i = 0; i < nvals; ++i) Free(values[i]);
       Free(values);
     }
 
@@ -216,8 +215,7 @@ Select(void *process)
                 {
                   int zaxisID = vlistInqVarZaxis(vlistID1, varID);
                   int nlevs = zaxisInqSize(zaxisID);
-                  for (int levID = 0; levID < nlevs; ++levID)
-                    vlistDefFlag(vlistID1, varID, levID, TRUE);
+                  for (int levID = 0; levID < nlevs; ++levID) vlistDefFlag(vlistID1, varID, levID, TRUE);
                 }
             }
 
@@ -408,8 +406,7 @@ Select(void *process)
                       vars[varID] = true;
                       int zaxisID = vlistInqVarZaxis(vlistID1, varID);
                       int nlevs = zaxisInqSize(zaxisID);
-                      for (int levID = 0; levID < nlevs; ++levID)
-                        vlistDefFlag(vlistID1, varID, levID, TRUE);
+                      for (int levID = 0; levID < nlevs; ++levID) vlistDefFlag(vlistID1, varID, levID, TRUE);
                     }
                 }
               else
@@ -470,8 +467,7 @@ Select(void *process)
           if (ntsteps2 == 0 && nfiles > 1)
             {
               lconstvars = false;
-              for (varID = 0; varID < nvars2; ++varID)
-                vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
+              for (varID = 0; varID < nvars2; ++varID) vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
             }
 
           // support for negative timestep values
@@ -516,8 +512,7 @@ Select(void *process)
       if (lcopy_const)
         {
           vardata2 = (double **) Malloc(nvars2 * sizeof(double));
-          for (varID = 0; varID < nvars2; ++varID)
-            vardata2[varID] = NULL;
+          for (varID = 0; varID < nvars2; ++varID) vardata2[varID] = NULL;
         }
 
       bool lstop = false;

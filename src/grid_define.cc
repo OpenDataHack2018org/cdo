@@ -237,15 +237,13 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
           gridInqXvals(gridSrcID, vals);
           double *pvals = vals;
           for (int j = 0; j < gridYsize; j += sampleFactor)
-            for (int i = 0; i < gridXsize; i += sampleFactor)
-              *pvals++ = vals[j * gridXsize + i];
+            for (int i = 0; i < gridXsize; i += sampleFactor) *pvals++ = vals[j * gridXsize + i];
           gridDefXvals(gridID_sampled, vals);
 
           gridInqYvals(gridSrcID, vals);
           pvals = vals;
           for (int j = 0; j < gridYsize; j += sampleFactor)
-            for (int i = 0; i < gridXsize; i += sampleFactor)
-              *pvals++ = vals[j * gridXsize + i];
+            for (int i = 0; i < gridXsize; i += sampleFactor) *pvals++ = vals[j * gridXsize + i];
           gridDefYvals(gridID_sampled, vals);
           Free(vals);
         }
@@ -253,15 +251,13 @@ cdo_define_sample_grid(int gridSrcID, int sampleFactor)
         {
           double *xvals = (double *) Malloc(gridXsize * sizeof(double));
           gridInqXvals(gridSrcID, xvals);
-          for (int i = 0, j = 0; i < gridXsize; i += sampleFactor)
-            xvals[j++] = xvals[i];
+          for (int i = 0, j = 0; i < gridXsize; i += sampleFactor) xvals[j++] = xvals[i];
           gridDefXvals(gridID_sampled, xvals);
           Free(xvals);
 
           double *yvals = (double *) Malloc(gridYsize * sizeof(double));
           gridInqYvals(gridSrcID, yvals);
-          for (int i = 0, j = 0; i < gridYsize; i += sampleFactor)
-            yvals[j++] = yvals[i];
+          for (int i = 0, j = 0; i < gridYsize; i += sampleFactor) yvals[j++] = yvals[i];
           gridDefYvals(gridID_sampled, yvals);
           Free(yvals);
         }

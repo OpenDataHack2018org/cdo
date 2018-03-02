@@ -88,8 +88,7 @@ nlat2nlon(int nlat)
     {
       nlon = m;
       /* correct here nlon so that nlat keeps always even */
-      while (nlon % 4 != 0)
-        nlon++;
+      while (nlon % 4 != 0) nlon++;
       fac(nlon, &m, &ierr);
     }
 
@@ -113,8 +112,7 @@ ipow(int i1, int i2)
 {
   int i3 = 1;
 
-  for (int i = 0; i < i2; ++i)
-    i3 *= i1;
+  for (int i = 0; i < i2; ++i) i3 *= i1;
 
   return i3;
 }
@@ -236,8 +234,7 @@ Specinfo(void *process)
 
   if ((len + 1) >= 128) cdoAbort("Parameter string too large!");
 
-  for (i = 0; i < len; i++)
-    arg[i] = toupper(operatorArgv()[0][i]);
+  for (i = 0; i < len; i++) arg[i] = toupper(operatorArgv()[0][i]);
   arg[len] = 0;
 
   if (arg[0] == 'T' && arg[1] == 'L')
@@ -403,8 +400,7 @@ Specinfo(void *process)
       if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);
       nrooti1 = atoi(parg);
       nrooti2 = nrooti1;
-      while (isdigit((int) *parg))
-        parg++;
+      while (isdigit((int) *parg)) parg++;
       if (*parg != 'L') cdoAbort("Wrong parameter: %s", arg);
       parg++;
       if (!isdigit((int) *parg)) cdoAbort("Wrong parameter: %s", arg);

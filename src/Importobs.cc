@@ -49,8 +49,7 @@ init_data(int vlistID, int nvars, double *data[])
       size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       double missval = vlistInqVarMissval(vlistID, varID);
 
-      for (size_t i = 0; i < gridsize; ++i)
-        data[varID][i] = missval;
+      for (size_t i = 0; i < gridsize; ++i) data[varID][i] = missval;
     }
 }
 
@@ -145,8 +144,7 @@ Importobs(void *process)
   int vlistID = vlistCreate();
   vlistDefTaxis(vlistID, taxisID);
 
-  for (i = 0; i < nvars; ++i)
-    data[i] = (double *) Malloc(gridsize * sizeof(double));
+  for (i = 0; i < nvars; ++i) data[i] = (double *) Malloc(gridsize * sizeof(double));
 
   init_vars(vlistID, gridID, zaxisID, nvars);
 
@@ -206,8 +204,7 @@ Importobs(void *process)
       if (i < xsize && j < ysize && index >= 0)
         {
           pstation = station;
-          while (isalpha(*pstation))
-            pstation++;
+          while (isalpha(*pstation)) pstation++;
           // printf("station %s %d\n", pstation, atoi(pstation));
           data[index][j * xsize + i] = value;
           data[4][j * xsize + i] = height1;
@@ -224,8 +221,7 @@ Importobs(void *process)
 
   write_data(streamID, vlistID, nvars, data);
 
-  for (i = 0; i < nvars; ++i)
-    Free(data[i]);
+  for (i = 0; i < nvars; ++i) Free(data[i]);
 
   if (cdoVerbose) printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax, latmin, latmax);
 

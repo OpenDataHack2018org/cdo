@@ -197,8 +197,7 @@ Timstat2(void *process)
         {
           nofvals[varID][levelID].resize(gridsize, 0);
           work[varID][levelID].resize(nwork);
-          for (int i = 0; i < nwork; i++)
-            work[varID][levelID][i].resize(gridsize);
+          for (int i = 0; i < nwork; i++) work[varID][levelID][i].resize(gridsize);
         }
     }
 

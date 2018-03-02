@@ -220,7 +220,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
   kdata_t max[3] = { -1.e9, -1.e9, -1.e9 };
 
 #ifdef HAVE_OPENMP45
-#pragma omp parallel for reduction(min : min[:3]) reduction(max : max[:3])
+#pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
 #endif
   for (size_t i = 0; i < n; i++)
     {
@@ -263,7 +263,7 @@ gs_create_nanoflann(size_t n, const double *restrict lons, const double *restric
   // Generating  Point Cloud
   pointcloud->pts.resize(n);
 #ifdef HAVE_OPENMP45
-#pragma omp parallel for reduction(min : min[:3]) reduction(max : max[:3])
+#pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
 #endif
   for (size_t i = 0; i < n; i++)
     {
@@ -332,8 +332,7 @@ gs_create_full(size_t n, const double *restrict lons, const double *restrict lat
 
   double **p = (double **) Malloc(n * sizeof(double *));
   p[0] = (double *) Malloc(3 * n * sizeof(double));
-  for (size_t i = 1; i < n; i++)
-    p[i] = p[0] + i * 3;
+  for (size_t i = 1; i < n; i++) p[i] = p[0] + i * 3;
 
 #ifdef HAVE_OPENMP4
 #pragma omp simd

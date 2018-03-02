@@ -59,8 +59,7 @@ printBounds(FILE *fp, int dig, const char prefix[], size_t nbyte0, size_t n, siz
   for (size_t i = 0; i < n; i++)
     {
       if (i > 0) fprintf(fp, "\n%*s", (int) nbyte0, "");
-      for (size_t iv = 0; iv < nvertex; iv++)
-        fprintf(fp, "%.*g ", dig, bounds[i * nvertex + iv]);
+      for (size_t iv = 0; iv < nvertex; iv++) fprintf(fp, "%.*g ", dig, bounds[i * nvertex + iv]);
     }
   fputs("\n", fp);
 }
@@ -130,8 +129,7 @@ grid_print_attributes(FILE *fp, int gridID)
           int *attint = (int *) resizeBuffer(&attBuf, &attBufSize, attSize);
           cdiInqAttInt(cdiID, varID, attname, attlen, &attint[0]);
           fprintf(fp, "%s =", attname);
-          for (int i = 0; i < attlen; ++i)
-            fprintf(fp, " %d", attint[i]);
+          for (int i = 0; i < attlen; ++i) fprintf(fp, " %d", attint[i]);
           fprintf(fp, "\n");
         }
       else if (atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64)
@@ -177,11 +175,9 @@ grid_print_kernel(int gridID, int opt, FILE *fp)
   if (xstrlen)
     {
       xcvals = (char **) Malloc(xsize * sizeof(char *));
-      for (size_t i = 0; i < xsize; i++)
-        xcvals[i] = (char *) Malloc((xstrlen + 1) * sizeof(char));
+      for (size_t i = 0; i < xsize; i++) xcvals[i] = (char *) Malloc((xstrlen + 1) * sizeof(char));
       gridInqXCvals(gridID, xcvals);
-      for (size_t i = 0; i < xsize; i++)
-        xcvals[i][xstrlen] = 0;
+      for (size_t i = 0; i < xsize; i++) xcvals[i][xstrlen] = 0;
       for (size_t i = 0; i < xsize; i++)
         for (int k = xstrlen - 1; k; k--)
           if (xcvals[i][k] == ' ')
@@ -194,11 +190,9 @@ grid_print_kernel(int gridID, int opt, FILE *fp)
   if (ystrlen)
     {
       ycvals = (char **) Malloc(ysize * sizeof(char *));
-      for (size_t i = 0; i < ysize; i++)
-        ycvals[i] = (char *) Malloc((ystrlen + 1) * sizeof(char));
+      for (size_t i = 0; i < ysize; i++) ycvals[i] = (char *) Malloc((ystrlen + 1) * sizeof(char));
       gridInqYCvals(gridID, ycvals);
-      for (size_t i = 0; i < ysize; i++)
-        ycvals[i][ystrlen] = 0;
+      for (size_t i = 0; i < ysize; i++) ycvals[i][ystrlen] = 0;
       for (size_t i = 0; i < ysize; i++)
         for (int k = ystrlen - 1; k; k--)
           if (ycvals[i][k] == ' ')
@@ -209,9 +203,8 @@ grid_print_kernel(int gridID, int opt, FILE *fp)
 
   int dig = (prec == CDI_DATATYPE_FLT64) ? CDO_dbl_digits : CDO_flt_digits;
 
-  fprintf(fp,
-          "gridtype  = %s\n"
-          "gridsize  = %zu\n",
+  fprintf(fp, "gridtype  = %s\n"
+              "gridsize  = %zu\n",
           gridNamePtr(type), gridsize);
 
   if (type != GRID_GME)
@@ -324,9 +317,8 @@ grid_print_kernel(int gridID, int opt, FILE *fp)
 
             if (IS_NOT_EQUAL(xinc, 0) && opt)
               {
-                fprintf(fp,
-                        "xfirst    = %.*g\n"
-                        "xinc      = %.*g\n",
+                fprintf(fp, "xfirst    = %.*g\n"
+                            "xinc      = %.*g\n",
                         dig, xfirst, dig, xinc);
               }
             else
@@ -356,12 +348,10 @@ grid_print_kernel(int gridID, int opt, FILE *fp)
               fprintf(fp, "x%ss  = \"%.*s\"", attstr, xstrlen, xcvals[0]);
             else
               fprintf(fp, "xstrings  = \"%.*s\"", xstrlen, xcvals[0]);
-            for (size_t i = 1; i < xsize; i++)
-              fprintf(fp, ", \"%.*s\"", xstrlen, xcvals[i]);
+            for (size_t i = 1; i < xsize; i++) fprintf(fp, ", \"%.*s\"", xstrlen, xcvals[i]);
             fprintf(fp, "\n");
 
-            for (size_t i = 0; i < xsize; i++)
-              Free(xcvals[i]);
+            for (size_t i = 0; i < xsize; i++) Free(xcvals[i]);
             Free(xcvals);
           }
 
@@ -377,9 +367,8 @@ grid_print_kernel(int gridID, int opt, FILE *fp)
 
             if (IS_NOT_EQUAL(yinc, 0) && opt)
               {
-                fprintf(fp,
-                        "yfirst    = %.*g\n"
-                        "yinc      = %.*g\n",
+                fprintf(fp, "yfirst    = %.*g\n"
+                            "yinc      = %.*g\n",
                         dig, yfirst, dig, yinc);
               }
             else
@@ -409,12 +398,10 @@ grid_print_kernel(int gridID, int opt, FILE *fp)
               fprintf(fp, "x%ss  = \"%.*s\"", attstr, ystrlen, ycvals[0]);
             else
               fprintf(fp, "ystrings  = \"%.*s\"", ystrlen, ycvals[0]);
-            for (size_t i = 1; i < ysize; i++)
-              fprintf(fp, ", \"%.*s\"", ystrlen, ycvals[i]);
+            for (size_t i = 1; i < ysize; i++) fprintf(fp, ", \"%.*s\"", ystrlen, ycvals[i]);
             fprintf(fp, "\n");
 
-            for (size_t i = 0; i < ysize; i++)
-              Free(ycvals[i]);
+            for (size_t i = 0; i < ysize; i++) Free(ycvals[i]);
             Free(ycvals);
           }
 
@@ -461,9 +448,8 @@ grid_print_kernel(int gridID, int opt, FILE *fp)
       }
     case GRID_SPECTRAL:
       {
-        fprintf(fp,
-                "truncation = %d\n"
-                "complexpacking = %d\n",
+        fprintf(fp, "truncation = %d\n"
+                    "complexpacking = %d\n",
                 gridInqTrunc(gridID), gridInqComplexPacking(gridID));
         break;
       }

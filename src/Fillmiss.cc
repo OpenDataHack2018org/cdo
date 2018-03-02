@@ -29,8 +29,7 @@
 #include "grid_search.h"
 #include "cdoOptions.h"
 
-extern "C"
-{
+extern "C" {
 #include "clipping/geometry.h"
 }
 
@@ -374,8 +373,7 @@ fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
               }
           }
       for (j = 0; j < ny; j++)
-        for (i = 0; i < nx; i++)
-          matrix1[j][i] = matrix2[j][i];
+        for (i = 0; i < nx; i++) matrix1[j][i] = matrix2[j][i];
     }
 
   Free(matrix2);
@@ -440,7 +438,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   if (nv != nvals) cdoAbort("Internal problem, number of valid values differ!");
 
   std::vector<knnWeightsType> knnWeights;
-  for ( int i = 0; i < Threading::ompNumThreads; ++i ) knnWeights.push_back(knnWeightsType(numNeighbors));
+  for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
   clock_t start, finish;
   start = clock();
@@ -466,8 +464,8 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)  reduction(+:findex)  shared(knnWeights)  \
-  shared(mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
+#pragma omp parallel for default(none) reduction(+ : findex) shared(knnWeights) shared( \
+    mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, numNeighbors)
 #endif
   for (size_t i = 0; i < nmiss; ++i)
     {

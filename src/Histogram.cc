@@ -58,8 +58,7 @@ Histogram(void *process)
   if (cdoVerbose)
     {
       printf("nbins = %d\n", nbins);
-      for (int i = 0; i < nbins; i++)
-        printf("flt %d = %g\n", i + 1, fltarr[i]);
+      for (int i = 0; i < nbins; i++) printf("flt %d = %g\n", i + 1, fltarr[i]);
     }
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -73,8 +72,7 @@ Histogram(void *process)
   int zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nbins);
   double *bins = (double *) Malloc(nbins * sizeof(double));
   /* for ( int i = 0; i < nbins; i++ ) bins[i] = (fltarr[i]+fltarr[i+1])/2; */
-  for (int i = 0; i < nbins; i++)
-    bins[i] = fltarr[i];
+  for (int i = 0; i < nbins; i++) bins[i] = fltarr[i];
   zaxisDefLevels(zaxisID2, bins);
   Free(bins);
   zaxisDefLbounds(zaxisID2, fltarr);

@@ -395,8 +395,8 @@ XTimstat(void *process)
           else
             {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) \
-    shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, operfunc) if (maxrecs > 1)
+#pragma omp parallel for default(none) shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, \
+                                              operfunc) if (maxrecs > 1)
 #endif
               for (int recID = 0; recID < maxrecs; recID++)
                 {
@@ -415,8 +415,7 @@ XTimstat(void *process)
                       if (samp1[varID][levelID].ptr == NULL)
                         {
                           samp1[varID][levelID].ptr = (double *) malloc(nwpv * gridsize * sizeof(double));
-                          for (size_t i = 0; i < nwpv * gridsize; i++)
-                            samp1[varID][levelID].ptr[i] = nsets;
+                          for (size_t i = 0; i < nwpv * gridsize; i++) samp1[varID][levelID].ptr[i] = nsets;
                         }
 
                       for (size_t i = 0; i < nwpv * gridsize; i++)

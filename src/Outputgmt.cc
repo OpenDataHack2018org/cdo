@@ -158,8 +158,7 @@ output_vrml(int nlon, int nlat, int ngp, double *restrict array, double missval,
   printf("        height [\n");
 
   for (int j = nlat - 1; j >= 0; --j)
-    for (int i = 0; i < nlon; ++i)
-      printf("%g,\n", array[j * nlon + i]);
+    for (int i = 0; i < nlon; ++i) printf("%g,\n", array[j * nlon + i]);
 
   printf("        ]\n");
   printf("      }\n");
@@ -375,12 +374,10 @@ Outputgmt(void *process)
       else
         {
           zaxis_lower_lev[0] = zaxis_center_lev[0];
-          for (int i = 1; i < nlev; ++i)
-            zaxis_lower_lev[i] = 0.5 * (zaxis_center_lev[i] + zaxis_center_lev[i - 1]);
+          for (int i = 1; i < nlev; ++i) zaxis_lower_lev[i] = 0.5 * (zaxis_center_lev[i] + zaxis_center_lev[i - 1]);
 
           zaxis_upper_lev[nlev - 1] = zaxis_center_lev[nlev - 1];
-          for (int i = 0; i < nlev - 1; ++i)
-            zaxis_upper_lev[i] = zaxis_lower_lev[i + 1];
+          for (int i = 0; i < nlev - 1; ++i) zaxis_upper_lev[i] = zaxis_lower_lev[i + 1];
 
           if (cdoVerbose)
             for (int i = 0; i < nlev; ++i)
@@ -642,8 +639,7 @@ Outputgmt(void *process)
                       xlat[1] = latmin;
                       xlat[2] = latmax;
                       xlat[3] = latmax;
-                      for (int ic = 0; ic < 4; ic++)
-                        fprintf(stdout, "   %g  %g\n", xlat[ic], xlev[ic]);
+                      for (int ic = 0; ic < 4; ic++) fprintf(stdout, "   %g  %g\n", xlat[ic], xlev[ic]);
                       fprintf(stdout, "   %g  %g\n", xlat[0], xlev[0]);
                     }
                   else if (lmer)
@@ -666,8 +662,7 @@ Outputgmt(void *process)
                       xlon[1] = lonmax;
                       xlon[2] = lonmax;
                       xlon[3] = lonmin;
-                      for (int ic = 0; ic < 4; ic++)
-                        fprintf(stdout, "   %g  %g\n", xlon[ic], xlev[ic]);
+                      for (int ic = 0; ic < 4; ic++) fprintf(stdout, "   %g  %g\n", xlon[ic], xlev[ic]);
                       fprintf(stdout, "   %g  %g\n", xlon[0], xlev[0]);
                     }
                   else if (lhov)

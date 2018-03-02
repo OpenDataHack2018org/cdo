@@ -101,8 +101,7 @@ Cat(void *process)
               if (ntsteps == 0 && nfiles > 1)
                 {
                   lconstvars = false;
-                  for (varID = 0; varID < nvars; ++varID)
-                    vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
+                  for (varID = 0; varID < nvars; ++varID) vlistDefVarTimetype(vlistID2, varID, TIME_VARYING);
                 }
 
               pstreamDefVlist(streamID2, vlistID2);

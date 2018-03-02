@@ -72,8 +72,7 @@ Tstepcount(void *process)
   vlistDefNtsteps(vlistID2, 1);
 
   int nvars = vlistNvars(vlistID1);
-  for (varID = 0; varID < nvars; varID++)
-    vlistDefVarUnits(vlistID2, varID, "steps");
+  for (varID = 0; varID < nvars; varID++) vlistDefVarUnits(vlistID2, varID, "steps");
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -114,8 +113,7 @@ Tstepcount(void *process)
   int nts = tsID;
 
   memory_t *mem = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
-  for (int i = 0; i < Threading::ompNumThreads; i++)
-    mem[i].array1 = (double *) Malloc(nts * sizeof(double));
+  for (int i = 0; i < Threading::ompNumThreads; i++) mem[i].array1 = (double *) Malloc(nts * sizeof(double));
 
   for (varID = 0; varID < nvars; varID++)
     {
@@ -126,15 +124,14 @@ Tstepcount(void *process)
       for (levelID = 0; levelID < nlevel; levelID++)
         {
 #ifdef _OPENMP
-#pragma omp parallel for default(none) shared(gridsize, mem, vars, varID, levelID, nts, missval, refval) \
-    schedule(dynamic, 1)
+#pragma omp parallel for default(none) shared(gridsize, mem, vars, varID, levelID, nts, missval, \
+                                              refval) schedule(dynamic, 1)
 #endif
           for (size_t i = 0; i < gridsize; i++)
             {
               int ompthID = cdo_omp_get_thread_num();
 
-              for (int tsID = 0; tsID < nts; tsID++)
-                mem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+              for (int tsID = 0; tsID < nts; tsID++) mem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
               double count = tstepcount(nts, missval, mem[ompthID].array1, refval);
               vars[0][varID][levelID].ptr[i] = count;
@@ -142,8 +139,7 @@ Tstepcount(void *process)
         }
     }
 
-  for (int i = 0; i < Threading::ompNumThreads; i++)
-    Free(mem[i].array1);
+  for (int i = 0; i < Threading::ompNumThreads; i++) Free(mem[i].array1);
   Free(mem);
 
   taxisDefVdate(taxisID2, vdate);
@@ -164,8 +160,7 @@ Tstepcount(void *process)
         }
     }
 
-  for (tsID = 0; tsID < nts; tsID++)
-    field_free(vars[tsID], vlistID1);
+  for (tsID = 0; tsID < nts; tsID++) field_free(vars[tsID], vlistID1);
 
   pstreamClose(streamID2);
   pstreamClose(streamID1);

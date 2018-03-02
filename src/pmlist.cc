@@ -67,8 +67,7 @@ kvlist_print_iter(void *data)
   char **values = keyval->values;
   int nvalues = keyval->nvalues;
   printf("  %s =", key);
-  for (int i = 0; i < nvalues; ++i)
-    printf(" '%s'", values[i]);
+  for (int i = 0; i < nvalues; ++i) printf(" '%s'", values[i]);
   printf("\n");
 
   return true;
@@ -131,8 +130,7 @@ kvlist_append(list_t *kvlist, const char *key, const char **values, int nvalues)
   keyval->key = strdup(key);
   keyval->nvalues = nvalues;
   keyval->values = (char **) malloc(nvalues * sizeof(char *));
-  for (int i = 0; i < nvalues; ++i)
-    keyval->values[i] = strdup(values[i]);
+  for (int i = 0; i < nvalues; ++i) keyval->values[i] = strdup(values[i]);
   list_append(kvlist, &keyval);
 }
 
@@ -156,8 +154,7 @@ kvlist_parse_cmdline(list_t *kvlist, int nparams, char **params)
       key[sizeof(key) - 1] = 0;
 
       int j = 1;
-      while (i + j < nparams && strchr(params[i + j], '=') == NULL)
-        j++;
+      while (i + j < nparams && strchr(params[i + j], '=') == NULL) j++;
 
       int nvalues = j;
 
@@ -166,8 +163,7 @@ kvlist_parse_cmdline(list_t *kvlist, int nparams, char **params)
       values[0] = end + 1;
       if (*values[0] == 0) nvalues = 0;
 
-      for (j = 1; j < nvalues; ++j)
-        values[j] = params[i + j];
+      for (j = 1; j < nvalues; ++j) values[j] = params[i + j];
       kvlist_append(kvlist, key, values, nvalues);
 
       if (values) free(values);

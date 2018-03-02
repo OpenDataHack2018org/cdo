@@ -169,16 +169,14 @@ Ymonstat(void *process)
               if (lrange)
                 {
                   pvars2->nmiss = pvars1->nmiss;
-                  for (size_t i = 0; i < gridsize; i++)
-                    pvars2->ptr[i] = pvars1->ptr[i];
+                  for (size_t i = 0; i < gridsize; i++) pvars2->ptr[i] = pvars1->ptr[i];
                 }
 
               if (nmiss > 0 || psamp1->ptr)
                 {
                   if (psamp1->ptr == NULL) psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
 
-                  for (size_t i = 0; i < gridsize; i++)
-                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                  for (size_t i = 0; i < gridsize; i++) psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                 }
             }
           else
@@ -193,8 +191,7 @@ Ymonstat(void *process)
                   if (psamp1->ptr == NULL)
                     {
                       psamp1->ptr = (double *) Malloc(gridsize * sizeof(double));
-                      for (size_t i = 0; i < gridsize; i++)
-                        psamp1->ptr[i] = nsets;
+                      for (size_t i = 0; i < gridsize; i++) psamp1->ptr[i] = nsets;
                     }
 
                   for (size_t i = 0; i < gridsize; i++)
@@ -241,8 +238,7 @@ Ymonstat(void *process)
       for (month = 1; month <= 12; month++)
         if (month_nsets[month]) smon++;
       if (smon == 12)
-        for (month = 1; month <= 12; month++)
-          mon[month - 1] = month;
+        for (month = 1; month <= 12; month++) mon[month - 1] = month;
     }
 
   /* sort output time steps */

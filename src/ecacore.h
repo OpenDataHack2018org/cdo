@@ -18,13 +18,7 @@
 #ifndef ECA_H_
 #define ECA_H_
 
-typedef enum
-{
-  NONE,
-  MEAN,
-  PERCENT_OF_TIME,
-  PERCENT_OF_TOTAL_AMOUNT
-} ECA_EPILOG;
+typedef enum { NONE, MEAN, PERCENT_OF_TIME, PERCENT_OF_TOTAL_AMOUNT } ECA_EPILOG;
 
 typedef void (*ECA_FUNC_1)(field_type *, double);
 typedef void (*ECA_FUNC_2)(field_type *, field_type);

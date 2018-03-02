@@ -103,16 +103,13 @@ gengridxyvals(int gridtype, int gridID1, int gridID2, long nlon, long nlat, long
     {
       if (lxvals)
         {
-          for (long i = lon21; i <= lon22; i++)
-            *pxvals2++ = xvals1[i];
-          for (long i = lon11; i <= lon12; i++)
-            *pxvals2++ = xvals1[i];
+          for (long i = lon21; i <= lon22; i++) *pxvals2++ = xvals1[i];
+          for (long i = lon11; i <= lon12; i++) *pxvals2++ = xvals1[i];
           if (xunits && strncmp(xunits, "degree", 6) == 0) correct_xvals(nlon2, 1, xvals2);
         }
 
       if (lyvals)
-        for (long i = lat1; i <= lat2; i++)
-          *pyvals2++ = yvals1[i];
+        for (long i = lat1; i <= lat2; i++) *pyvals2++ = yvals1[i];
     }
   /*
     for ( int i = 0; i < nlat2; i++ ) printf("lat : %d %g\n", i+1, yvals2[i]);
@@ -208,12 +205,9 @@ gengrid(int gridID1, long lat1, long lat2, long lon11, long lon12, long lon21, l
       else
         {
           gridDefNvertex(gridID2, 2);
-          for (long i = 2 * lon21; i < 2 * (lon22 + 1); i++)
-            *pxbounds2++ = xbounds1[i];
-          for (long i = 2 * lon11; i < 2 * (lon12 + 1); i++)
-            *pxbounds2++ = xbounds1[i];
-          for (long i = 2 * lat1; i < 2 * (lat2 + 1); i++)
-            *pybounds2++ = ybounds1[i];
+          for (long i = 2 * lon21; i < 2 * (lon22 + 1); i++) *pxbounds2++ = xbounds1[i];
+          for (long i = 2 * lon11; i < 2 * (lon12 + 1); i++) *pxbounds2++ = xbounds1[i];
+          for (long i = 2 * lat1; i < 2 * (lat2 + 1); i++) *pybounds2++ = ybounds1[i];
 
           if (strncmp(xunits, "degree", 6) == 0)
             {
@@ -351,10 +345,8 @@ genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, double xl
   if (strncmp(xunits, "radian", 6) == 0) xfact = RAD2DEG;
   if (strncmp(yunits, "radian", 6) == 0) yfact = RAD2DEG;
 
-  for (long ilat = 0; ilat < nlat; ilat++)
-    yvals[ilat] *= yfact;
-  for (long ilon = 0; ilon < nlon; ilon++)
-    xvals[ilon] *= xfact;
+  for (long ilat = 0; ilat < nlat; ilat++) yvals[ilat] *= yfact;
+  for (long ilon = 0; ilon < nlon; ilon++) xvals[ilon] *= xfact;
 
   if (IS_NOT_EQUAL(xlon1, xlon2))
     {
@@ -837,10 +829,8 @@ window(int nwpv, double *array1, int gridID1, double *array2, long lat1, long la
     {
       for (ilat = lat1; ilat <= lat2; ilat++)
         {
-          for (ilon = lon21; ilon <= lon22; ilon++)
-            *array2++ = array1[ilat * nlon + ilon];
-          for (ilon = lon11; ilon <= lon12; ilon++)
-            *array2++ = array1[ilat * nlon + ilon];
+          for (ilon = lon21; ilon <= lon22; ilon++) *array2++ = array1[ilat * nlon + ilon];
+          for (ilon = lon11; ilon <= lon12; ilon++) *array2++ = array1[ilat * nlon + ilon];
         }
     }
 }
@@ -858,8 +848,7 @@ window_cell(int nwpv, double *array1, int gridID1, double *array2, long gridsize
     }
   else
     {
-      for (long i = 0; i < gridsize2; ++i)
-        array2[i] = array1[cellidx[i]];
+      for (long i = 0; i < gridsize2; ++i) array2[i] = array1[cellidx[i]];
     }
 }
 
@@ -901,8 +890,7 @@ Selbox(void *process)
 
   int nvars = vlistNvars(vlistID1);
   bool *vars = (bool *) Malloc(nvars * sizeof(bool));
-  for (varID = 0; varID < nvars; varID++)
-    vars[varID] = false;
+  for (varID = 0; varID < nvars; varID++) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
   sbox_t *sbox = (sbox_t *) Malloc(ngrids * sizeof(sbox_t));

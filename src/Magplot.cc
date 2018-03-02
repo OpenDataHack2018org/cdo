@@ -197,8 +197,7 @@ magplot(const char *plotfile, int operatorID, const char *varname, const char *u
     {
       fprintf(stderr, "Num params %d\n", nparam);
 
-      for (i = 0; i < nparam; i++)
-        fprintf(stderr, "Param %s\n", params[i]);
+      for (i = 0; i < nparam; i++) fprintf(stderr, "Param %s\n", params[i]);
       fflush(stderr);
 
       for (i = 0; i < nparam; ++i)
@@ -219,8 +218,7 @@ magplot(const char *plotfile, int operatorID, const char *varname, const char *u
 
           if (!strcmp(split_str[0], "list"))
             {
-              for (j = 0; j < split_str_count; j++)
-                fprintf(stderr, "LIST %f\n", LEV_LIST[j]);
+              for (j = 0; j < split_str_count; j++) fprintf(stderr, "LIST %f\n", LEV_LIST[j]);
             }
 
           if (!strcmp(split_str[0], "thickness")) fprintf(stderr, "THICKNESS %d\n", THICKNESS);
@@ -239,14 +237,12 @@ magplot(const char *plotfile, int operatorID, const char *varname, const char *u
 
   if (nlon > 1)
     {
-      for (i = 1; i < nlon; ++i)
-        dlon += (grid_center_lon[i] - grid_center_lon[i - 1]);
+      for (i = 1; i < nlon; ++i) dlon += (grid_center_lon[i] - grid_center_lon[i - 1]);
       dlon /= (nlon - 1);
     }
   if (nlat > 1)
     {
-      for (i = 1; i < nlat; ++i)
-        dlat += (grid_center_lat[nlon * i] - grid_center_lat[nlon * (i - 1)]);
+      for (i = 1; i < nlat; ++i) dlat += (grid_center_lat[nlon * i] - grid_center_lat[nlon * (i - 1)]);
       dlat /= (nlat - 1);
     }
 
@@ -835,9 +831,8 @@ VerifyPlotParameters(int num_param, char **param_names, int opID)
                     {
                       if ((fp = fopen(split_str[1], "r")) == NULL)
                         {
-                          fprintf(stderr,
-                                  "Input Color Table File not found in "
-                                  "specified path '%s'\n",
+                          fprintf(stderr, "Input Color Table File not found in "
+                                          "specified path '%s'\n",
                                   split_str[1]);
                           halt_flag = TRUE;
                         }
@@ -1052,8 +1047,7 @@ ReadColourTable(char *filepath)
       cdoWarning(" Discarding improper format colours and continuing!");
     }
 
-  for (i = 0; i < num_colors; i++)
-    Free(temp_table[i]);
+  for (i = 0; i < num_colors; i++) Free(temp_table[i]);
   Free(temp_table);
 
   return 0;
@@ -1170,8 +1164,7 @@ Magplot(void *process)
     {
       if (DBG)
         {
-          for (int i = 0; i < nparam; i++)
-            fprintf(stderr, "Param %d is %s!\n", i + 1, pnames[i]);
+          for (int i = 0; i < nparam; i++) fprintf(stderr, "Param %d is %s!\n", i + 1, pnames[i]);
         }
 
       VerifyPlotParameters(nparam, pnames, operatorID);

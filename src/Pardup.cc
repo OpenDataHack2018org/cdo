@@ -139,10 +139,8 @@ Pardup(void *process)
   pstreamClose(streamID2);
   pstreamClose(streamID1);
 
-  for (varID = 0; varID < nvars; varID++)
-    Free(vardata[varID]);
-  for (varID = 0; varID < nvars; varID++)
-    Free(varnmiss[varID]);
+  for (varID = 0; varID < nvars; varID++) Free(vardata[varID]);
+  for (varID = 0; varID < nvars; varID++) Free(varnmiss[varID]);
   Free(vardata);
   Free(varnmiss);
   Free(array);

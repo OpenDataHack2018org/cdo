@@ -155,7 +155,7 @@ namelist_parse_string(namelist_parser *parser, const char *buf, size_t len, char
           parser->pos++;
           switch (buf[parser->pos])
             {
-              // Allowed escaped symbols
+            // Allowed escaped symbols
             case '\"':
             case '\\':
             case 'b':
@@ -164,7 +164,7 @@ namelist_parse_string(namelist_parser *parser, const char *buf, size_t len, char
             case 'n':
             case 't':
               break;
-              // Allows escaped symbol \uXXXX
+            // Allows escaped symbol \uXXXX
             case 'u':
               parser->pos++;
               for (int i = 0; i < 4 && parser->pos < len && buf[parser->pos] != '\0'; i++)
@@ -180,7 +180,7 @@ namelist_parse_string(namelist_parser *parser, const char *buf, size_t len, char
                 }
               parser->pos--;
               break;
-              // Unexpected symbol
+            // Unexpected symbol
             default: return NAMELIST_ERROR_INVAL;
             }
         }
@@ -197,10 +197,8 @@ namelist_check_keyname(const char *buf, namelisttok_t *t)
   switch (t->type)
     {
     case NAMELIST_STRING:
-      while (isspace((int) buf[t->start]) && t->start < t->end)
-        t->start++;
-      while (isspace((int) buf[t->end - 1]) && t->start < t->end)
-        t->end--;
+      while (isspace((int) buf[t->start]) && t->start < t->end) t->start++;
+      while (isspace((int) buf[t->end - 1]) && t->start < t->end) t->end--;
       if ((t->end - t->start) < 1) return NAMELIST_ERROR_EMKEY;
       for (int i = t->start; i < t->end; ++i)
         if (isspace((int) buf[i])) return NAMELIST_ERROR_INKEY;

@@ -350,8 +350,7 @@ pipe_t::pipeDefRecord(int p_varID, int p_levelID)
 
   // LOCK
   m_mutex.lock();
-  if (CdoDebug::PIPE) MESSAGE(name.c_str(), " has data ", recIDr, " ",
-                              recIDw);  //<- TODO: rethink positioning
+  if (CdoDebug::PIPE) MESSAGE(name.c_str(), " has data ", recIDr, " ", recIDw);  //<- TODO: rethink positioning
   if (hasdata)
     {
       hasdata = false;

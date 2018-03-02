@@ -27,10 +27,9 @@ pstreamClose(int pstreamID)
   PstreamType *pstreamptr = pstreamToPointer(pstreamID);
   if (pstreamptr == NULL) ERROR("Internal problem, stream ", pstreamID, " not open!");
 
-  Cdo_Debug(CdoDebug::PSTREAM, "Adding ", pstreamptr->getNvals(),
-            " to pstream ", pstreamptr->self, " ", pstreamptr->m_name);
-  if(pstreamptr->rthreadID == pthread_self())
-  processSelf().addNvals(pstreamptr->getNvals());
+  Cdo_Debug(CdoDebug::PSTREAM, "Adding ", pstreamptr->getNvals(), " to pstream ", pstreamptr->self, " ",
+            pstreamptr->m_name);
+  if (pstreamptr->rthreadID == pthread_self()) processSelf().addNvals(pstreamptr->getNvals());
   pstreamptr->close();
 }
 int

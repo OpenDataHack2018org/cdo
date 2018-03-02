@@ -249,17 +249,14 @@ trim_flt(char *ss)
 {
   char *cp = ss;
   if (*cp == '-') cp++;
-  while (isdigit((int) *cp) || *cp == '.')
-    cp++;
+  while (isdigit((int) *cp) || *cp == '.') cp++;
   if (*--cp == '.') return;
 
   char *ep = cp + 1;
-  while (*cp == '0')
-    cp--;
+  while (*cp == '0') cp--;
   cp++;
   if (cp == ep) return;
-  while (*ep)
-    *cp++ = *ep++;
+  while (*ep) *cp++ = *ep++;
   *cp = '\0';
 
   return;
@@ -281,8 +278,7 @@ input_int(char *arg, int intarr[], int maxint, int *nintfound)
 
   intarr[nint++] = atoi(arg);
 
-  while ((arg = strchr(arg, ',')) && (nint < maxint))
-    intarr[nint++] = atoi(++arg);
+  while ((arg = strchr(arg, ',')) && (nint < maxint)) intarr[nint++] = atoi(++arg);
 
   *nintfound = nint;
 }
@@ -407,11 +403,9 @@ void
 get_season_name(const char *seas_name[])
 {
   if (get_season_start() == START_DEC)
-    for (int i = 0; i < 4; ++i)
-      seas_name[i] = seas_name_dec[i];
+    for (int i = 0; i < 4; ++i) seas_name[i] = seas_name_dec[i];
   else
-    for (int i = 0; i < 4; ++i)
-      seas_name[i] = seas_name_jan[i];
+    for (int i = 0; i < 4; ++i) seas_name[i] = seas_name_jan[i];
 }
 
 int
@@ -480,8 +474,7 @@ progressStatus(double offset, double refval, double curval)
   if (ps_cval == 100 && ps_lhead)
     {
       ps_lhead = false;
-      while (ps_nch--)
-        fprintf(stdout, "\b \b");
+      while (ps_nch--) fprintf(stdout, "\b \b");
       fflush(stdout);
     }
 }

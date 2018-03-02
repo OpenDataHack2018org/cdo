@@ -64,21 +64,17 @@ printMap(int nlon, int nlat, double *array, double missval, double min, double m
           min_n = (int) floor(10 * (-min) / (max - min) - 0.5);
           max_n = (int) ceil(10 * (-min) / (max - min) - 0.5);
           level[min_n] = 0;
-          for (i = min_n - 1; i >= 0; i--)
-            level[i] = level[i + 1] - step;
-          for (i = max_n; i < 9; i++)
-            level[i] = level[i - 1] + step;
+          for (i = min_n - 1; i >= 0; i--) level[i] = level[i + 1] - step;
+          for (i = max_n; i < 9; i++) level[i] = level[i - 1] + step;
         }
       else
         {
           level[0] = step * ceil(min / step + 0.5);
-          for (i = 1; i < 9; i++)
-            level[i] = level[i - 1] + step;
+          for (i = 1; i < 9; i++) level[i] = level[i - 1] + step;
         }
     }
   else
-    for (i = 0; i < 9; i++)
-      level[i] = min;
+    for (i = 0; i < 9; i++) level[i] = min;
 
   fputc('\n', stdout);
   fflush(stdout);
@@ -86,8 +82,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min, double m
   if (nlon >= 1000)
     {
       printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
-      for (ilon = 0; ilon < nlon; ilon++)
-        printf("%d", ((ilon + 1) / 1000) % 10);
+      for (ilon = 0; ilon < nlon; ilon++) printf("%d", ((ilon + 1) / 1000) % 10);
       putchar('\n');
       fflush(stdout);
     }
@@ -95,8 +90,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min, double m
   if (nlon >= 100)
     {
       printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
-      for (ilon = 0; ilon < nlon; ilon++)
-        printf("%d", ((ilon + 1) / 100) % 10);
+      for (ilon = 0; ilon < nlon; ilon++) printf("%d", ((ilon + 1) / 100) % 10);
       putchar('\n');
       fflush(stdout);
     }
@@ -104,16 +98,14 @@ printMap(int nlon, int nlat, double *array, double missval, double min, double m
   if (nlon >= 10)
     {
       printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
-      for (ilon = 0; ilon < nlon; ilon++)
-        printf("%d", ((ilon + 1) / 10) % 10);
+      for (ilon = 0; ilon < nlon; ilon++) printf("%d", ((ilon + 1) / 10) % 10);
       putchar('\n');
       fflush(stdout);
     }
 
   printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
 
-  for (ilon = 0; ilon < nlon; ilon++)
-    printf("%d", (ilon + 1) % 10);
+  for (ilon = 0; ilon < nlon; ilon++) printf("%d", (ilon + 1) % 10);
   putchar('\n');
   fflush(stdout);
   putchar('\n');
@@ -230,8 +222,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min, double m
   if (nlon >= 1000)
     {
       printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
-      for (ilon = 0; ilon < nlon; ilon++)
-        printf("%d", ((ilon + 1) / 1000) % 10);
+      for (ilon = 0; ilon < nlon; ilon++) printf("%d", ((ilon + 1) / 1000) % 10);
       putchar('\n');
       fflush(stdout);
     }
@@ -239,8 +230,7 @@ printMap(int nlon, int nlat, double *array, double missval, double min, double m
   if (nlon >= 100)
     {
       printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
-      for (ilon = 0; ilon < nlon; ilon++)
-        printf("%d", ((ilon + 1) / 100) % 10);
+      for (ilon = 0; ilon < nlon; ilon++) printf("%d", ((ilon + 1) / 100) % 10);
       putchar('\n');
       fflush(stdout);
     }
@@ -248,15 +238,13 @@ printMap(int nlon, int nlat, double *array, double missval, double min, double m
   if (nlon >= 10)
     {
       printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
-      for (ilon = 0; ilon < nlon; ilon++)
-        printf("%d", ((ilon + 1) / 10) % 10);
+      for (ilon = 0; ilon < nlon; ilon++) printf("%d", ((ilon + 1) / 10) % 10);
       putchar('\n');
       fflush(stdout);
     }
 
   printf("%.*s", nlat < 10 ? 2 : nlat < 100 ? 3 : nlat < 1000 ? 4 : 5, "     ");
-  for (ilon = 0; ilon < nlon; ilon++)
-    printf("%d", (ilon + 1) % 10);
+  for (ilon = 0; ilon < nlon; ilon++) printf("%d", (ilon + 1) % 10);
   putchar('\n');
   fflush(stdout);
   putchar('\n');
@@ -367,17 +355,15 @@ Info(void *process)
           date2str(vdate, vdatestr, sizeof(vdatestr));
           time2str(vtime, vtimestr, sizeof(vtimestr));
 
-          for (varID = 0; varID < nvars; ++varID)
-            infostat_init(&infostat[varID]);
+          for (varID = 0; varID < nvars; ++varID) infostat_init(&infostat[varID]);
 
           for (int recID = 0; recID < nrecs; ++recID)
             {
               if ((tsID == 0 && recID == 0) || operatorID == MAP)
                 {
                   set_text_color(stdout, BRIGHT, BLACK);
-                  fprintf(stdout,
-                          "%6d :       Date     Time   %s Gridsize    Miss :"
-                          "     Minimum        Mean     Maximum : ",
+                  fprintf(stdout, "%6d :       Date     Time   %s Gridsize    Miss :"
+                                  "     Minimum        Mean     Maximum : ",
                           -(indf + 1), operatorID == XINFON ? "Nlevs" : "Level");
 
                   if (operfunc == E_NAME)

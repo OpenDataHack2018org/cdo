@@ -99,9 +99,8 @@ static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 const char *CDO_username;
 
-extern "C"
-{
-  void streamGrbDefDataScanningMode(int scanmode);
+extern "C" {
+void streamGrbDefDataScanningMode(int scanmode);
 }
 
 void gridsearch_set_method(const char *methodstr);
@@ -139,8 +138,7 @@ cdo_stackframe(void)
   fprintf(stderr, "[bt] Execution path:\n");
   if (messages)
     {
-      for (int i = 0; i < frames; ++i)
-        fprintf(stderr, "[bt] %s\n", messages[i]);
+      for (int i = 0; i < frames; ++i) fprintf(stderr, "[bt] %s\n", messages[i]);
       free(messages);
     }
 #endif
@@ -291,9 +289,8 @@ cdo_usage(void)
   fprintf(stderr, "    -L             Lock IO (sequential access)\n");
   fprintf(stderr, "    -M             Switch to indicate that the I/O streams "
                   "have missing values\n");
-  fprintf(stderr,
-          "    -m <missval>   Set the missing value of non NetCDF files "
-          "(default: %g)\n",
+  fprintf(stderr, "    -m <missval>   Set the missing value of non NetCDF files "
+                  "(default: %g)\n",
           cdiInqMissval());
   fprintf(stderr, "    --no_warnings  Inhibit warning messages\n");
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
@@ -682,8 +679,7 @@ getMemAlignment(void)
       for (int k = 0; k < 4; ++k)
         if (iptr % ma_check[k]) ma_result[k] = 0;
     }
-  for (int i = 0; i < NTESTS; ++i)
-    free(ptr[i]);
+  for (int i = 0; i < NTESTS; ++i) free(ptr[i]);
 
   for (int i = NTESTS - 1; i >= 0; i--)
     {
@@ -692,8 +688,7 @@ getMemAlignment(void)
       for (int k = 0; k < 4; ++k)
         if (iptr % ma_check[k]) ma_result[k] = 0;
     }
-  for (int i = 0; i < NTESTS; ++i)
-    free(ptr[i]);
+  for (int i = 0; i < NTESTS; ++i) free(ptr[i]);
 
   for (int k = 0; k < 4; ++k)
     if (ma_result[k]) ma = ma_check[k];
@@ -757,8 +752,7 @@ defineVarnames(const char *arg)
 {
   size_t len = strlen(arg);
   size_t istart = 0;
-  while (istart < len && (arg[istart] == ' ' || arg[istart] == ','))
-    istart++;
+  while (istart < len && (arg[istart] == ' ' || arg[istart] == ',')) istart++;
 
   len -= istart;
 
@@ -972,8 +966,8 @@ print_system_info()
 #if defined(_OPENACC)
   fprintf(stderr, "OPENACC VERSION     = %d\n", _OPENACC);
 #endif
-  /* OPENMP 3:  201107 */
-  /* OPENMP 4:  201307 gcc 4.9 */
+/* OPENMP 3:  201107 */
+/* OPENMP 4:  201307 gcc 4.9 */
 #ifdef _OPENMP
   fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif
@@ -1222,12 +1216,12 @@ parse_options_long(int argc, char *argv[])
           // cdo_usage();
           // fprintf(stderr, "Illegal option!\n");
           return -1;
-          // break;
+        // break;
         case ':':
           // cdo_usage();
           // fprintf(stderr, "Option requires an argument!\n");
           return -1;
-          // break;
+        // break;
         case 0:
           if (lnetcdf_hdr_pad)
             {
@@ -1382,9 +1376,8 @@ parse_options_long(int argc, char *argv[])
         case 'P':
           if (*CDO_optarg < '1' || *CDO_optarg > '9')
             {
-              fprintf(stderr,
-                      "Unexpected character in number of OpenMP threads (-P "
-                      "<nthreads>): %s!\n",
+              fprintf(stderr, "Unexpected character in number of OpenMP threads (-P "
+                              "<nthreads>): %s!\n",
                       CDO_optarg);
               exit(EXIT_FAILURE);
             }

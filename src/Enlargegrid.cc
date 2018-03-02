@@ -40,8 +40,7 @@ gen_index(int gridID1, int gridID2, int *index)
 
   if (index == NULL) cdoAbort("Internal problem, index not allocated!");
 
-  for (size_t i = 0; i < gridsize2; i++)
-    index[i] = -1;
+  for (size_t i = 0; i < gridsize2; i++) index[i] = -1;
 
   if (gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN)
     {
@@ -215,8 +214,7 @@ Enlargegrid(void *process)
 
           double missval1 = vlistInqVarMissval(vlistID1, varID);
 
-          for (size_t i = 0; i < gridsize2; i++)
-            array2[i] = missval1;
+          for (size_t i = 0; i < gridsize2; i++) array2[i] = missval1;
           for (size_t i = 0; i < gridsize1; i++)
             if (gindex[i] >= 0) array2[gindex[i]] = array1[i];
 
