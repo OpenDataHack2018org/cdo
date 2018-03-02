@@ -94,6 +94,8 @@ cdiOpenError(int cdiErrno, const char *fmt, const char *path)
     }
 }
 
+#include <pthread.h>
+
 void
 cdoAbort(const char *fmt, ...)
 {
@@ -112,6 +114,7 @@ cdoAbort(const char *fmt, ...)
 
   if (_ExitOnError)
     {
+      killProcesses();
       pstreamCloseAll();
       exit(EXIT_FAILURE);
     }

@@ -41,6 +41,7 @@
 
 std::map<int, ProcessType> Process;
 std::map<int, char *> obase;
+std::vector<pthread_t> threadIDs;
 /*TEMP*/  // Possibly not the best solution (19.Jan.2018)
 
 static int NumProcess = 0;
@@ -708,7 +709,6 @@ cdoStreamInqVlist(int pstreamID)
   processDefVarNum(vlistNvars(vlistID));
   return vlistID;
 }
-
 void
 runProcesses()
 {
@@ -721,8 +721,19 @@ runProcesses()
             {
               std::cerr << idProcessPair.second.prompt<< ": Process started" << std::endl;
             }
-          idProcessPair.second.run();
+          threadIDs.push_back(idProcessPair.second.run());
         }
     }
+  threadIDs.push_back(pthread_self());
   getProcess(0)->m_module.func(getProcess(0));
+}
+
+void killProcesses()
+{
+    for(auto threadID : threadIDs)
+    {
+        if(threadID != pthread_self()){
+         pthread_cancel(threadID);
+        }
+    }
 }
