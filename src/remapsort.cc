@@ -502,6 +502,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
   /* ********************** */
   merge_lists(nl, add1s[0], add2s[0], add1s[1], add2s[1], &idx[0]);  // MERGE THE SEGMENTS
 
+  {
   std::vector<size_t> tmp(num_links);
 
 #ifdef _OPENMP
@@ -522,8 +523,10 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
 #pragma omp parallel for if (depth < par_depth) private(i) num_threads(2)
 #endif
   for (i = 0; i < num_links; i++) add2[i] = tmp[i];
+  }
 
-  tmp.resize(num_links * num_wts);
+  {
+  std::vector<double> tmp(num_links*num_wts);
 
 #ifdef _OPENMP
 #pragma omp parallel for if (depth < par_depth) private(i, n) num_threads(2)
@@ -536,6 +539,7 @@ sort_par(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restri
 #endif
   for (i = 0; i < num_links; i++)
     for (n = 0; n < num_wts; n++) weights[num_wts * i + n] = tmp[num_wts * i + n];
+  }
 }
 
 void

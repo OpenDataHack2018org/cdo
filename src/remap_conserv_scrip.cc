@@ -1162,8 +1162,7 @@ norm_weight(double norm_factor, double *weights, double src_centroid_lat, double
 static void
 normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_lat, double *src_centroid_lon)
 {
-  /* Include centroids in weights and normalize using destination area if
-   * requested */
+  /* Include centroids in weights and normalize using destination area if requested */
   long num_links = rv->num_links;
   long src_cell_add; /* current linear address for source grid cell   */
   long tgt_cell_add; /* current linear address for target grid cell   */
@@ -1433,8 +1432,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
           */
           while (IS_NOT_EQUAL(beglat, endlat) || IS_NOT_EQUAL(beglon, endlon))
             {
-              /*  Prevent infinite loops if integration gets stuck near cell or
-               * threshold boundary */
+              /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
               num_subseg++;
               if (num_subseg >= max_subseg)
                 cdoAbort("Integration stalled: num_subseg exceeded limit "
@@ -1454,8 +1452,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
                     }
                 }
 
-              /* Find next intersection of this segment with a gridline on
-               * grid 2. */
+              /* Find next intersection of this segment with a gridline on grid 2. */
 
               intersection(&tgt_cell_add, &intrsct_lat, &intrsct_lon, &lcoinc, beglat, beglon, endlat, endlon, begseg,
                            lbegin, lrevers, num_srch_cells, srch_corners, srch_add[ompthID], srch_corner_lat[ompthID],
@@ -1610,8 +1607,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
           double endlon = tgt_grid->cell_corner_lon[ioffset + next_corn];
           bool lrevers = false;
 
-          /* To ensure exact path taken during both sweeps, always integrate in
-           * the same direction */
+          /* To ensure exact path taken during both sweeps, always integrate in the same direction */
           if ((endlat < beglat) || (IS_EQUAL(endlat, beglat) && endlon < beglon))
             {
               beglat = tgt_grid->cell_corner_lat[ioffset + next_corn];
@@ -1640,8 +1636,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
           */
           while (IS_NOT_EQUAL(beglat, endlat) || IS_NOT_EQUAL(beglon, endlon))
             {
-              /*  Prevent infinite loops if integration gets stuck near cell or
-               * threshold boundary */
+              /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
               num_subseg++;
               if (num_subseg >= max_subseg)
                 cdoAbort("Integration stalled: num_subseg exceeded limit "
@@ -1661,8 +1656,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
                     }
                 }
 
-              /* Find next intersection of this segment with a gridline on
-               * grid 2. */
+              /* Find next intersection of this segment with a gridline on grid 2. */
 
               intersection(&src_cell_add, &intrsct_lat, &intrsct_lon, &lcoinc, beglat, beglon, endlat, endlon, begseg,
                            lbegin, lrevers, num_srch_cells, srch_corners, srch_add[ompthID], srch_corner_lat[ompthID],
