@@ -469,10 +469,6 @@ remap_define_reg2d(int gridID, remapgrid_t *grid)
   grid_gen_corners(nx, grid->reg2d_center_lon, grid->reg2d_corner_lon);
   grid_gen_corners(ny, grid->reg2d_center_lat, grid->reg2d_corner_lat);
   grid_check_lat_borders_rad(ny + 1, grid->reg2d_corner_lat);
-
-  // for ( size_t i = 0; i < nxp1; ++i ) printf("lon %zu %g\n", i,
-  // grid->reg2d_corner_lon[i]); for ( size_t i = 0; i < nyp1; ++i ) printf("lat
-  // %zu %g\n", i, grid->reg2d_corner_lat[i]);
 }
 
 static void

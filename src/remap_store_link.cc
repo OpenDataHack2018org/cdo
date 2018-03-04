@@ -65,7 +65,7 @@ sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts)
     if (src_add[n] < src_add[n - 1]) break;
   if (n == num_weights) return;
 
-  if (num_weights)
+  if (num_weights > 1)
     {
       std::vector<addweight_t> addweights(num_weights);
 
@@ -93,7 +93,7 @@ sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4])
     if (src_add[n] < src_add[n - 1]) break;
   if (n == num_weights) return;
 
-  if (num_weights)
+  if (num_weights > 1)
     {
       std::vector<addweight4_t> addweights(num_weights);
 

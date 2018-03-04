@@ -34,60 +34,45 @@ extern "C" {
 #include <time.h>
 #endif
 
-typedef struct
+struct search_t
 {
   enum yac_edge_type *src_edge_type;
   size_t srch_corners;
   size_t max_srch_cells;
-  double *partial_areas;
-  double *partial_weights;
-  struct grid_cell *src_grid_cells;
-  struct grid_cell *overlap_buffer;
-} search_t;
+  std::vector<double> partial_areas;
+  std::vector<double> partial_weights;
+  std::vector<struct grid_cell> src_grid_cells;
+  std::vector<struct grid_cell> overlap_buffer;
+};
 
 static void
 search_realloc(size_t num_srch_cells, search_t *search)
 {
-  size_t max_srch_cells = search->max_srch_cells;
-  double *partial_areas = search->partial_areas;
-  double *partial_weights = search->partial_weights;
-  struct grid_cell *overlap_buffer = search->overlap_buffer;
-  struct grid_cell *src_grid_cells = search->src_grid_cells;
-
-  if (num_srch_cells > max_srch_cells)
+  if (num_srch_cells > search->max_srch_cells)
     {
-      partial_areas = (double *) Realloc(partial_areas, num_srch_cells * sizeof(double));
-      partial_weights = (double *) Realloc(partial_weights, num_srch_cells * sizeof(double));
-      overlap_buffer = (struct grid_cell *) Realloc(overlap_buffer, num_srch_cells * sizeof(struct grid_cell));
-      src_grid_cells = (struct grid_cell *) Realloc(src_grid_cells, num_srch_cells * sizeof(struct grid_cell));
+      search->partial_areas.resize(num_srch_cells);
+      search->partial_weights.resize(num_srch_cells);
+      search->overlap_buffer.resize(num_srch_cells);
+      search->src_grid_cells.resize(num_srch_cells);
 
-      for (size_t n = max_srch_cells; n < num_srch_cells; ++n)
+      for (size_t n = search->max_srch_cells; n < num_srch_cells; ++n)
         {
-          overlap_buffer[n].array_size = 0;
-          overlap_buffer[n].num_corners = 0;
-          overlap_buffer[n].edge_type = NULL;
-          overlap_buffer[n].coordinates_x = NULL;
-          overlap_buffer[n].coordinates_y = NULL;
-          overlap_buffer[n].coordinates_xyz = NULL;
+          search->overlap_buffer[n].array_size = 0;
+          search->overlap_buffer[n].num_corners = 0;
+          search->overlap_buffer[n].edge_type = NULL;
+          search->overlap_buffer[n].coordinates_x = NULL;
+          search->overlap_buffer[n].coordinates_y = NULL;
+          search->overlap_buffer[n].coordinates_xyz = NULL;
+
+          search->src_grid_cells[n].array_size = search->srch_corners;
+          search->src_grid_cells[n].num_corners = search->srch_corners;
+          search->src_grid_cells[n].edge_type = search->src_edge_type;
+          search->src_grid_cells[n].coordinates_x = new double[search->srch_corners];
+          search->src_grid_cells[n].coordinates_y = new double[search->srch_corners];
+          search->src_grid_cells[n].coordinates_xyz = new double[3 * search->srch_corners];
         }
 
-      for (size_t n = max_srch_cells; n < num_srch_cells; ++n)
-        {
-          src_grid_cells[n].array_size = search->srch_corners;
-          src_grid_cells[n].num_corners = search->srch_corners;
-          src_grid_cells[n].edge_type = search->src_edge_type;
-          src_grid_cells[n].coordinates_x = (double *) Malloc(search->srch_corners * sizeof(double));
-          src_grid_cells[n].coordinates_y = (double *) Malloc(search->srch_corners * sizeof(double));
-          src_grid_cells[n].coordinates_xyz = (double *) Malloc(3 * search->srch_corners * sizeof(double));
-        }
-
-      max_srch_cells = num_srch_cells;
-
-      search->max_srch_cells = max_srch_cells;
-      search->partial_areas = partial_areas;
-      search->partial_weights = partial_weights;
-      search->overlap_buffer = overlap_buffer;
-      search->src_grid_cells = src_grid_cells;
+      search->max_srch_cells = num_srch_cells;
     }
 }
 
@@ -95,28 +80,21 @@ static void
 search_free(search_t *search)
 {
   size_t max_srch_cells = search->max_srch_cells;
-  double *partial_areas = search->partial_areas;
-  double *partial_weights = search->partial_weights;
-  struct grid_cell *overlap_buffer = search->overlap_buffer;
-  struct grid_cell *src_grid_cells = search->src_grid_cells;
 
   for (size_t n = 0; n < max_srch_cells; n++)
     {
-      if (overlap_buffer[n].array_size > 0)
+      if (search->overlap_buffer[n].array_size > 0)
         {
-          Free(overlap_buffer[n].coordinates_x);
-          Free(overlap_buffer[n].coordinates_y);
-          if (overlap_buffer[n].coordinates_xyz) Free(overlap_buffer[n].coordinates_xyz);
-          if (overlap_buffer[n].edge_type) Free(overlap_buffer[n].edge_type);
+          Free(search->overlap_buffer[n].coordinates_x);
+          Free(search->overlap_buffer[n].coordinates_y);
+          if (search->overlap_buffer[n].coordinates_xyz) Free(search->overlap_buffer[n].coordinates_xyz);
+          if (search->overlap_buffer[n].edge_type) Free(search->overlap_buffer[n].edge_type);
         }
 
-      Free(src_grid_cells[n].coordinates_x);
-      Free(src_grid_cells[n].coordinates_y);
-      Free(src_grid_cells[n].coordinates_xyz);
+      delete[] search->src_grid_cells[n].coordinates_x;
+      delete[] search->src_grid_cells[n].coordinates_y;
+      delete[] search->src_grid_cells[n].coordinates_xyz;
     }
-
-  Free(partial_areas);
-  Free(partial_weights);
 }
 
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm);
@@ -372,9 +350,8 @@ gridcell_area(struct grid_cell cell)
 static void
 cdo_compute_overlap_areas(size_t N, search_t *search, struct grid_cell target_cell)
 {
-  double *partial_areas = search->partial_areas;
-  struct grid_cell *overlap_buffer = search->overlap_buffer;
-  struct grid_cell *source_cells = search->src_grid_cells;
+  struct grid_cell *overlap_buffer = &search->overlap_buffer[0];
+  struct grid_cell *source_cells = &search->src_grid_cells[0];
 
   /* Do the clipping and get the cell for the overlapping area */
 
@@ -384,11 +361,11 @@ cdo_compute_overlap_areas(size_t N, search_t *search, struct grid_cell target_ce
 
   for (size_t n = 0; n < N; n++)
     {
-      partial_areas[n] = gridcell_area(overlap_buffer[n]);
+      search->partial_areas[n] = gridcell_area(overlap_buffer[n]);
     }
 
 #ifdef VERBOSE
-  for (size_t n = 0; n < N; n++) printf("overlap area : %lf\n", partial_areas[n]);
+  for (size_t n = 0; n < N; n++) printf("overlap area : %lf\n", search->partial_areas[n]);
 #endif
 }
 
@@ -437,9 +414,9 @@ static void
 cdo_compute_concave_overlap_areas(size_t N, search_t *search, struct grid_cell target_cell, double target_node_x,
                                   double target_node_y)
 {
-  double *partial_areas = search->partial_areas;
-  struct grid_cell *overlap_buffer = search->overlap_buffer;
-  struct grid_cell *source_cell = search->src_grid_cells;
+  double *partial_areas = &search->partial_areas[0];
+  struct grid_cell *overlap_buffer = &search->overlap_buffer[0];
+  struct grid_cell *source_cell = &search->src_grid_cells[0];
 
   /*
   enum cell_type target_cell_type = UNDEF_CELL;
@@ -607,8 +584,7 @@ get_lonlat_circle_index(remapgrid_t *remap_grid)
 static void
 remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 {
-  // Include centroids in weights and normalize using destination area if
-  // requested
+  // Include centroids in weights and normalize using destination area if requested
   size_t num_links = rv->num_links;
   size_t num_wts = rv->num_wts;
   size_t tgt_cell_add;     // current linear address for target grid cell
@@ -649,16 +625,16 @@ static void
 set_yac_coordinates(int remap_grid_type, size_t cell_add, size_t num_cell_corners, remapgrid_t *remap_grid,
                     struct grid_cell *yac_grid_cell)
 {
+  double *coordinates_x = yac_grid_cell->coordinates_x;
+  double *coordinates_y = yac_grid_cell->coordinates_y;
+
   if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
     {
       size_t nx = remap_grid->dims[0];
       size_t iy = cell_add / nx;
       size_t ix = cell_add - iy * nx;
-      const double *restrict reg2d_corner_lon = remap_grid->reg2d_corner_lon;
-      const double *restrict reg2d_corner_lat = remap_grid->reg2d_corner_lat;
-      double *restrict coordinates_x = yac_grid_cell->coordinates_x;
-      double *restrict coordinates_y = yac_grid_cell->coordinates_y;
-
+      const double *reg2d_corner_lon = remap_grid->reg2d_corner_lon;
+      const double *reg2d_corner_lat = remap_grid->reg2d_corner_lat;
       coordinates_x[0] = reg2d_corner_lon[ix];
       coordinates_y[0] = reg2d_corner_lat[iy];
       coordinates_x[1] = reg2d_corner_lon[ix + 1];
@@ -670,10 +646,8 @@ set_yac_coordinates(int remap_grid_type, size_t cell_add, size_t num_cell_corner
     }
   else
     {
-      const double *restrict cell_corner_lon = remap_grid->cell_corner_lon;
-      const double *restrict cell_corner_lat = remap_grid->cell_corner_lat;
-      double *restrict coordinates_x = yac_grid_cell->coordinates_x;
-      double *restrict coordinates_y = yac_grid_cell->coordinates_y;
+      const double *cell_corner_lon = remap_grid->cell_corner_lon;
+      const double *cell_corner_lat = remap_grid->cell_corner_lat;
       for (size_t ic = 0; ic < num_cell_corners; ++ic)
         {
           coordinates_x[ic] = cell_corner_lon[cell_add * num_cell_corners + ic];
@@ -681,9 +655,7 @@ set_yac_coordinates(int remap_grid_type, size_t cell_add, size_t num_cell_corner
         }
     }
 
-  const double *restrict coordinates_x = yac_grid_cell->coordinates_x;
-  const double *restrict coordinates_y = yac_grid_cell->coordinates_y;
-  double *restrict coordinates_xyz = yac_grid_cell->coordinates_xyz;
+  double *coordinates_xyz = yac_grid_cell->coordinates_xyz;
   for (size_t ic = 0; ic < num_cell_corners; ++ic)
     LLtoXYZ(coordinates_x[ic], coordinates_y[ic], coordinates_xyz + ic * 3);
 }
@@ -693,8 +665,8 @@ reg2d_bound_box(remapgrid_t *remap_grid, double *grid_bound_box)
 {
   size_t nx = remap_grid->dims[0];
   size_t ny = remap_grid->dims[1];
-  const double *restrict reg2d_corner_lon = remap_grid->reg2d_corner_lon;
-  const double *restrict reg2d_corner_lat = remap_grid->reg2d_corner_lat;
+  const double *reg2d_corner_lon = remap_grid->reg2d_corner_lon;
+  const double *reg2d_corner_lat = remap_grid->reg2d_corner_lat;
 
   grid_bound_box[0] = reg2d_corner_lat[0];
   grid_bound_box[1] = reg2d_corner_lat[ny];
@@ -713,7 +685,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells
 
-  /* Variables necessary if segment manages to hit pole */
+  // Variables necessary if segment manages to hit pole
   int src_remap_grid_type = src_grid->remap_grid_type;
   int tgt_remap_grid_type = tgt_grid->remap_grid_type;
   extern int timer_remap_con;
@@ -782,10 +754,6 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
       search[i].srch_corners = src_num_cell_corners;
       search[i].src_edge_type = src_edge_type;
       search[i].max_srch_cells = 0;
-      search[i].partial_areas = NULL;
-      search[i].partial_weights = NULL;
-      search[i].src_grid_cells = NULL;
-      search[i].overlap_buffer = NULL;
     }
 
   std::vector<size_t *> srch_add(Threading::ompNumThreads);
@@ -796,7 +764,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
   double src_grid_bound_box[4];
   if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D) reg2d_bound_box(src_grid, src_grid_bound_box);
 
-  weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size * sizeof(weightlinks_t));
+  std::vector<weightlinks_t> weightlinks(tgt_grid_size);
 
   double findex = 0;
 
@@ -891,9 +859,9 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
 
       search_realloc(num_srch_cells, &search[ompthID]);
 
-      double *partial_areas = search[ompthID].partial_areas;
-      double *partial_weights = search[ompthID].partial_weights;
-      struct grid_cell *src_grid_cells = search[ompthID].src_grid_cells;
+      double *partial_areas = &search[ompthID].partial_areas[0];
+      double *partial_weights = &search[ompthID].partial_weights[0];
+      struct grid_cell *src_grid_cells = &search[ompthID].src_grid_cells[0];
 
       for (n = 0; n < num_srch_cells; ++n)
         {
@@ -991,7 +959,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
           tgt_grid->cell_frac[tgt_cell_add] += partial_weight;
         }
 
-      store_weightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightlinks);
+      store_weightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, &weightlinks[0]);
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area;
       // printf("area %d %g %g\n", tgt_cell_add,
@@ -1017,13 +985,10 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
       delete[] tgt_grid_cell[ompthID].coordinates_x;
       delete[] tgt_grid_cell[ompthID].coordinates_y;
       delete[] tgt_grid_cell[ompthID].coordinates_xyz;
-
       delete[] srch_add[ompthID];
     }
 
-  weightlinks2remaplinks(1, tgt_grid_size, weightlinks, rv);
-
-  if (weightlinks) Free(weightlinks);
+  weightlinks2remaplinks(1, tgt_grid_size, &weightlinks[0], rv);
 
   // Normalize weights using destination area if requested
   remapNormalizeWeights(tgt_grid, rv);

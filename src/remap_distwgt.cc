@@ -312,10 +312,10 @@ remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *t
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
-      findex++;
-      if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
-
       int ompthID = cdo_omp_get_thread_num();
+
+      findex++;
+      if (ompthID == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
       weightlinks[tgt_cell_add].nlinks = 0;
 
@@ -400,10 +400,10 @@ remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid,
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
-      findex++;
-      if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
-
       int ompthID = cdo_omp_get_thread_num();
+
+      findex++;
+      if (ompthID == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
       tgt_array[tgt_cell_add] = missval;
 
@@ -528,10 +528,10 @@ shared(src_array, tgt_array, missval, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
-      findex++;
-      if (cdo_omp_get_thread_num() == 0) progressStatus(0, 1, findex / tgt_grid_size);
-
       int ompthID = cdo_omp_get_thread_num();
+
+      findex++;
+      if (ompthID == 0) progressStatus(0, 1, findex / tgt_grid_size);
 
       tgt_array[tgt_cell_add] = tgt_missval;
 

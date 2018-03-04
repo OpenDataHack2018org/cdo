@@ -1805,8 +1805,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
     }
   */
 
-  /* Include centroids in weights and normalize using destination area if
-   * requested */
+  /* Include centroids in weights and normalize using destination area if requested */
   normalize_weights(tgt_grid, rv, src_centroid_lat, src_centroid_lon);
 
   long num_links = rv->num_links;
