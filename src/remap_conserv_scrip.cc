@@ -1087,7 +1087,7 @@ correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv, doub
 
   if (src_cell_add != src_grid_size && tgt_cell_add != tgt_grid_size)
     {
-      store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
+      store_link_cnsrv(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
 
       src_grid->cell_frac[src_cell_add] += weights[0];
       tgt_grid->cell_frac[tgt_cell_add] += weights[3];
@@ -1135,7 +1135,7 @@ correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv, doub
 
   if (src_cell_add != src_grid_size && tgt_cell_add != tgt_grid_size)
     {
-      store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
+      store_link_cnsrv(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
 
       src_grid->cell_frac[src_cell_add] += weights[0];
       tgt_grid->cell_frac[tgt_cell_add] += weights[3];
@@ -1223,17 +1223,12 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 
   bool lcheck = true;
 
-  long max_subseg = 100000; /* max number of subsegments per segment to prevent infinite
-                               loop */
+  long max_subseg = 100000; /* max number of subsegments per segment to prevent infinite loop */
   /* 1000 is too small!!! */
 
   long srch_corners; /* num of corners of srch cells           */
   long i;
 
-  /* Pole_intersection */
-  /* Save last intersection to avoid roundoff during coord transformation */
-  /* Variables necessary if segment manages to hit pole */
-  grid_store_t *grid_store = NULL;
   double findex = 0;
   extern int timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
 
@@ -1244,7 +1239,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
   long nbins = src_grid->num_srch_bins;
   long num_wts = rv->num_wts;
 
-  grid_store = (grid_store_t *) Malloc(sizeof(grid_store_t));
+  grid_store_t *grid_store = (grid_store_t *) Malloc(sizeof(grid_store_t));
   grid_store_init(grid_store, tgt_grid->size);
 
   if (cdoVerbose)
@@ -1454,7 +1449,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 #pragma omp critical
 #endif
                     {
-                      store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
+                      store_link_cnsrv(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
 
                       tgt_grid->cell_frac[tgt_cell_add] += weights[3];
                     }
@@ -1658,7 +1653,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 #pragma omp critical
 #endif
                     {
-                      store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
+                      store_link_cnsrv(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
 
                       src_grid->cell_frac[src_cell_add] += weights[0];
                     }

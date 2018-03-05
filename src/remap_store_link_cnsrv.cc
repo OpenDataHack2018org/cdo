@@ -61,14 +61,12 @@ grid_store_init(grid_store_t *grid_store, long gridsize)
 void
 grid_store_delete(grid_store_t *grid_store)
 {
-  grid_layer_t *grid_layer, *grid_layer_f;
-  long j;
   long nblocks = grid_store->nblocks;
 
   for (long iblk = 0; iblk < nblocks; ++iblk)
     {
-      j = 0;
-      grid_layer = grid_store->layers[iblk];
+      long j = 0;
+      grid_layer_t *grid_layer = grid_store->layers[iblk];
       long nlayers = grid_store->nlayers[iblk];
       long blksize = grid_store->blksize[iblk];
       for (long ilayer = 0; ilayer < nlayers; ++ilayer)
@@ -79,7 +77,7 @@ grid_store_delete(grid_store_t *grid_store)
                 if (grid_layer->grid2_link[i] != -1) j++;
             }
 
-          grid_layer_f = grid_layer;
+          grid_layer_t *grid_layer_f = grid_layer;
           Free(grid_layer->grid2_link);
           grid_layer = grid_layer->next;
           Free(grid_layer_f);
@@ -103,7 +101,7 @@ grid_store_delete(grid_store_t *grid_store)
     address and weight arrays and resizes those arrays if necessary.
 */
 void
-store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, double *weights, grid_store_t *grid_store)
+store_link_cnsrv(remapvars_t *rv, long add1, long add2, long num_wts, double *weights, grid_store_t *grid_store)
 {
   /*
     Input variables:
@@ -113,13 +111,9 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, doubl
   */
   /* Local variables */
   long nlink; /* link index */
-  long ilayer, i, iblk, iadd2;
-  long nlayer, blksize;
-  bool lstore_link;
-  grid_layer_t *grid_layer = NULL, **grid_layer2;
+  grid_layer_t *grid_layer = NULL;
 
   /*  If all weights are ZERO, do not bother storing the link */
-
   if (num_wts == 3)
     {
       if (IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0)) return;
@@ -131,12 +125,13 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, doubl
 
   /* If the link already exists, add the weight to the current weight arrays */
 
-  iblk = BLK_NUM(add2);
-  iadd2 = BLK_IDX(add2);
+  long iblk = BLK_NUM(add2);
+  long iadd2 = BLK_IDX(add2);
 
-  lstore_link = false;
-  grid_layer2 = &grid_store->layers[iblk];
-  nlayer = grid_store->nlayers[iblk];
+  bool lstore_link = false;
+  grid_layer_t **grid_layer2 = &grid_store->layers[iblk];
+  long nlayer = grid_store->nlayers[iblk];
+  long ilayer;
   for (ilayer = 0; ilayer < nlayer; ++ilayer)
     {
       grid_layer = *grid_layer2;
@@ -155,7 +150,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, doubl
 
   if (lstore_link)
     {
-      for (i = 0; i < num_wts; ++i) rv->wts[num_wts * nlink + i] += weights[i];
+      for (long i = 0; i < num_wts; ++i) rv->wts[num_wts * nlink + i] += weights[i];
       return;
     }
 
@@ -176,8 +171,8 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, doubl
       grid_layer->next = NULL;
       grid_layer->grid2_link = (long *) Malloc(grid_store->blksize[iblk] * sizeof(long));
 
-      blksize = grid_store->blksize[iblk];
-      for (i = 0; i < blksize; ++i) grid_layer->grid2_link[i] = -1;
+      long blksize = grid_store->blksize[iblk];
+      for (long i = 0; i < blksize; ++i) grid_layer->grid2_link[i] = -1;
 
       grid_layer->grid2_link[iadd2] = nlink;
       *grid_layer2 = grid_layer;
@@ -190,7 +185,7 @@ store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, doubl
   rv->src_cell_add[nlink] = add1;
   rv->tgt_cell_add[nlink] = add2;
 
-  for (i = 0; i < num_wts; ++i) rv->wts[num_wts * nlink + i] = weights[i];
+  for (long i = 0; i < num_wts; ++i) rv->wts[num_wts * nlink + i] = weights[i];
 
-} /* store_link_cnsrv_fast */
+} /* store_link_cnsrv */
 

@@ -383,17 +383,6 @@ get_remap_env(void)
         }
     }
 
-  envstr = getenv("REMAP_STORE_LINK_FAST");
-  if (envstr)
-    {
-      int ival = atoi(envstr);
-      if (ival >= 0)
-        {
-          if (cdoVerbose) cdoPrint("Set REMAP_STORE_LINK_FAST to %d", ival);
-          remap_set_int(REMAP_STORE_LINK_FAST, ival);
-        }
-    }
-
   envstr = getenv("REMAP_EXTRAPOLATE");
   if (envstr)
     {
