@@ -1024,8 +1024,7 @@ line_integral(double *weights, double in_phi1, double in_phi2, double theta1, do
 
 static void
 correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_lat,
-             double *src_centroid_lon, double *tgt_centroid_lat, double *tgt_centroid_lon, grid_store_t *grid_store,
-             long *link_add1[2], long *link_add2[2])
+             double *src_centroid_lon, double *tgt_centroid_lat, double *tgt_centroid_lon, grid_store_t *grid_store)
 {
   /*
      Correct for situations where N/S pole not explicitly included in
@@ -1088,10 +1087,7 @@ correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv, doub
 
   if (src_cell_add != src_grid_size && tgt_cell_add != tgt_grid_size)
     {
-      if (remap_store_link_fast)
-        store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
-      else
-        store_link_cnsrv(rv, src_cell_add, tgt_cell_add, weights, link_add1, link_add2);
+      store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
 
       src_grid->cell_frac[src_cell_add] += weights[0];
       tgt_grid->cell_frac[tgt_cell_add] += weights[3];
@@ -1139,10 +1135,7 @@ correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv, doub
 
   if (src_cell_add != src_grid_size && tgt_cell_add != tgt_grid_size)
     {
-      if (remap_store_link_fast)
-        store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
-      else
-        store_link_cnsrv(rv, src_cell_add, tgt_cell_add, weights, link_add1, link_add2);
+      store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
 
       src_grid->cell_frac[src_cell_add] += weights[0];
       tgt_grid->cell_frac[tgt_cell_add] += weights[3];
@@ -1251,11 +1244,8 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
   long nbins = src_grid->num_srch_bins;
   long num_wts = rv->num_wts;
 
-  if (remap_store_link_fast)
-    {
-      grid_store = (grid_store_t *) Malloc(sizeof(grid_store_t));
-      grid_store_init(grid_store, tgt_grid->size);
-    }
+  grid_store = (grid_store_t *) Malloc(sizeof(grid_store_t));
+  grid_store_init(grid_store, tgt_grid->size);
 
   if (cdoVerbose)
     {
@@ -1270,28 +1260,6 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 
   long src_num_cell_corners = src_grid->num_cell_corners;
   long tgt_num_cell_corners = tgt_grid->num_cell_corners;
-
-  long *link_add1[2];  // min,max link add to restrict search
-  long *link_add2[2];  // min,max link add to restrict search
-  if (!remap_store_link_fast)
-    {
-      link_add1[0] = (long *) Malloc(src_grid_size * sizeof(long));
-      link_add1[1] = (long *) Malloc(src_grid_size * sizeof(long));
-      link_add2[0] = (long *) Malloc(tgt_grid_size * sizeof(long));
-      link_add2[1] = (long *) Malloc(tgt_grid_size * sizeof(long));
-
-      for (long n = 0; n < src_grid_size; ++n)
-        {
-          link_add1[0][n] = -1;
-          link_add1[1][n] = -1;
-        }
-
-      for (long n = 0; n < tgt_grid_size; ++n)
-        {
-          link_add2[0][n] = -1;
-          link_add2[1][n] = -1;
-        }
-    }
 
   /* Initialize centroid arrays */
 
@@ -1334,7 +1302,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) reduction(+ : findex) shared(                                                 \
-    nbins, num_wts, src_centroid_lon, src_centroid_lat, remap_store_link_fast, grid_store, link_add1, link_add2, rv, \
+    nbins, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, \
     cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells, src_num_cell_corners, srch_corners,    \
     src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
@@ -1486,10 +1454,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 #pragma omp critical
 #endif
                     {
-                      if (remap_store_link_fast)
-                        store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
-                      else
-                        store_link_cnsrv(rv, src_cell_add, tgt_cell_add, weights, link_add1, link_add2);
+                      store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
 
                       tgt_grid->cell_frac[tgt_cell_add] += weights[3];
                     }
@@ -1540,7 +1505,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) reduction(+ : findex) shared(                                                 \
-    nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, remap_store_link_fast, grid_store, link_add1, link_add2, rv, \
+    nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, \
     cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells, tgt_num_cell_corners, srch_corners,    \
     src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
@@ -1693,10 +1658,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
 #pragma omp critical
 #endif
                     {
-                      if (remap_store_link_fast)
-                        store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
-                      else
-                        store_link_cnsrv(rv, src_cell_add, tgt_cell_add, weights, link_add1, link_add2);
+                      store_link_cnsrv_fast(rv, src_cell_add, tgt_cell_add, num_wts, weights, grid_store);
 
                       src_grid->cell_frac[src_cell_add] += weights[0];
                     }
@@ -1734,13 +1696,10 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
      grid.  If missing from both, do complete weight calculation.
   */
   correct_pole(src_grid, tgt_grid, rv, src_centroid_lat, src_centroid_lon, tgt_centroid_lat, tgt_centroid_lon,
-               grid_store, link_add1, link_add2);
+               grid_store);
 
-  if (remap_store_link_fast)
-    {
-      grid_store_delete(grid_store);
-      Free(grid_store);
-    }
+  grid_store_delete(grid_store);
+  Free(grid_store);
 
   /* Finish centroid computation */
 
@@ -1865,14 +1824,6 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
   Free(src_centroid_lon);
   Free(tgt_centroid_lat);
   Free(tgt_centroid_lon);
-
-  if (!remap_store_link_fast)
-    {
-      Free(link_add1[0]);
-      Free(link_add1[1]);
-      Free(link_add2[0]);
-      Free(link_add2[1]);
-    }
 
   if (cdoTimer) timer_stop(timer_remap_con);
 

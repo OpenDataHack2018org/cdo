@@ -383,20 +383,16 @@ get_remap_env(void)
         }
     }
 
-  int remap_store_link_fast = TRUE;
-
   envstr = getenv("REMAP_STORE_LINK_FAST");
   if (envstr)
     {
       int ival = atoi(envstr);
       if (ival >= 0)
         {
-          remap_store_link_fast = ival;
-          if (cdoVerbose) cdoPrint("Set REMAP_STORE_LINK_FAST to %d", remap_store_link_fast);
+          if (cdoVerbose) cdoPrint("Set REMAP_STORE_LINK_FAST to %d", ival);
+          remap_set_int(REMAP_STORE_LINK_FAST, ival);
         }
     }
-
-  remap_set_int(REMAP_STORE_LINK_FAST, remap_store_link_fast);
 
   envstr = getenv("REMAP_EXTRAPOLATE");
   if (envstr)

@@ -90,9 +90,7 @@ size_t remap_max_iter = DEFAULT_MAX_ITER;  // Max iteration count for i, j itera
 void
 remap_set_int(int remapvar, int value)
 {
-  if (remapvar == REMAP_STORE_LINK_FAST)
-    remap_store_link_fast = value;
-  else if (remapvar == REMAP_WRITE_REMAP)
+  if (remapvar == REMAP_WRITE_REMAP)
     remap_write_remap = value > 0;
   else if (remapvar == REMAP_MAX_ITER)
     remap_max_iter = value;
