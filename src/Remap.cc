@@ -26,8 +26,8 @@
       Interpolate remapnn         Nearest neighbor remapping
       Interpolate remaplaf        Largest area fraction remapping
       Genweights  gencon          Generate first order conservative remap
-   weights Genweights  gencon2         Generate second order conservative remap
-   weights Genweights  genbil          Generate bilinear interpolation weights
+      Genweights  gencon2         Generate second order conservative remap
+      Genweights  genbil          Generate bilinear interpolation weights
       Genweights  genbic          Generate bicubic interpolation weights
       Genweights  gendis          Generate distance-weighted averaging weights
       Genweights  gennn           Generate nearest neighbor weights
@@ -490,13 +490,10 @@ set_remapgrids(int filetype, int vlistID, int ngrids, std::vector<bool> &remapgr
           if (gridtype == GRID_GAUSSIAN_REDUCED)
             {
               if (!cdoRegulargrid && filetype == CDI_FILETYPE_GRB)
-                cdoAbort("Unsupported grid type: %s, use CDO option -R to "
-                         "convert reduced to regular Gaussian grid!",
+                cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular Gaussian grid!",
                          gridNamePtr(gridtype));
               else
-                cdoAbort("Unsupported grid type: %s, use CDO operator "
-                         "-setgridtype,regular to convert reduced to regular "
-                         "Gaussian grid!",
+                cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular Gaussian grid!",
                          gridNamePtr(gridtype));
             }
           else if (gridtype == GRID_GENERIC && gridInqSize(gridID) <= 2)
@@ -1061,8 +1058,7 @@ Remap(void *argument)
             {
               if (mapType != RemapType::CONSERV && mapType != RemapType::CONSERV_YAC && gridInqType(gridID1) == GRID_GME
                   && gridInqType(gridID2) == GRID_GME)
-                cdoAbort("Only conservative remapping is available to remap "
-                         "between GME grids!");
+                cdoAbort("Only conservative remapping is available to remap between GME grids!");
 
               if (gridIsCircular(gridID1) && !lextrapolate) remap_extrapolate = true;
 
@@ -1125,8 +1121,7 @@ Remap(void *argument)
 
                       if ((mapType == RemapType::BILINEAR || mapType == RemapType::BICUBIC)
                           && (gridInqType(gridID1) == GRID_GME || gridInqType(gridID1) == GRID_UNSTRUCTURED))
-                        cdoAbort("Bilinear/bicubic interpolation doesn't "
-                                 "support unstructured source grids!");
+                        cdoAbort("Bilinear/bicubic interpolation doesn't support unstructured source grids!");
 
                       // Initialize grid information for both grids
                       if (cdoTimer) timer_start(timer_remap_init);
@@ -1184,8 +1179,7 @@ Remap(void *argument)
                   if (needGradiants)
                     {
                       if (remaps[r].src_grid.rank != 2 && remap_order == 2)
-                        cdoAbort("Second order remapping is not available for "
-                                 "unstructured grids!");
+                        cdoAbort("Second order remapping is not available for unstructured grids!");
 
                       remap_gradients(remaps[r].src_grid, &array1[0], &grad1_lat[0], &grad1_lon[0], &grad1_latlon[0]);
                     }

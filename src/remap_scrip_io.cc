@@ -697,7 +697,6 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
   if (gridInqType(gridID1) == GRID_GME) gridInqMaskGME(gridID1_gme_c, src_grid->vgpm);
 
   rv->pinit = true;
-  rv->wts = NULL;
 
   rv->max_links = rv->num_links;
 
@@ -712,7 +711,6 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
     {
       rv->src_cell_add = (size_t *) Malloc(rv->num_links * sizeof(size_t));
       rv->tgt_cell_add = (size_t *) Malloc(rv->num_links * sizeof(size_t));
-
       rv->wts = (double *) Malloc(rv->num_wts * rv->num_links * sizeof(double));
     }
 

@@ -169,7 +169,6 @@ typedef struct
   remapvars_t vars;
 } remapType;
 
-#define REMAP_STORE_LINK_FAST 1
 #define REMAP_WRITE_REMAP 2
 #define REMAP_MAX_ITER 3
 #define REMAP_NUM_SRCH_BINS 4

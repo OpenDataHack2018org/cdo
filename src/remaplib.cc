@@ -893,6 +893,9 @@ remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_li
 
   int iorder = (src_grad1 == NULL) ? 1 : 2;
 
+#ifdef HAVE_OPENMP4
+#pragma omp parallel for simd default(none) shared(dst_size, dst_array, missval)
+#endif
   for (size_t n = 0; n < dst_size; ++n) dst_array[n] = missval;
 
   if (cdoTimer) timer_start(timer_remap);
@@ -901,8 +904,8 @@ remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_li
     {
       if (links.option)
         {
-#ifdef SX
-#pragma cdir nodep
+#ifdef HAVE_OPENMP4
+#pragma omp parallel for simd default(none) shared(num_links, dst_array, dst_add)
 #endif
           for (size_t n = 0; n < num_links; ++n) dst_array[dst_add[n]] = 0.;
 
@@ -911,11 +914,12 @@ remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_li
               const size_t *restrict dst_addx = links.dst_add[j];
               const size_t *restrict src_addx = links.src_add[j];
               const size_t *restrict windex = links.w_index[j];
+              size_t nlinks = links.num_links[j];
 
 #ifdef HAVE_OPENMP4
-#pragma omp simd
+#pragma omp parallel for simd default(none) shared(nlinks, dst_array, src_array, dst_addx, src_addx, map_wts, num_wts, windex)
 #endif
-              for (size_t n = 0; n < links.num_links[j]; ++n)
+              for (size_t n = 0; n < nlinks; ++n)
                 {
                   dst_array[dst_addx[n]] += src_array[src_addx[n]] * map_wts[num_wts * windex[n]];
                 }
