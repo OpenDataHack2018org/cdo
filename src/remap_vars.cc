@@ -452,7 +452,7 @@ remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, r
    This routine resizes remapping arrays by increasing(decreasing) the max_links by increment
 */
 void
-resize_remap_vars(remapVarsType &rv, int64_t increment)
+remapVarsResize(remapVarsType &rv, int64_t increment)
 {
   /*
     Input variables:
@@ -470,7 +470,7 @@ resize_remap_vars(remapVarsType &rv, int64_t increment)
       rv.wts.resize(rv.num_wts * rv.max_links);
     }
 
-} /* resize_remap_vars */
+} /* remapVarsResize */
 
 void
 remapVarsReorder(remapVarsType &rv)

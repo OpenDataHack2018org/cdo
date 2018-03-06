@@ -180,7 +180,7 @@ store_link_cnsrv(remapVarsType &rv, long add1, long add2, long num_wts, double *
     }
 
   rv.num_links++;
-  if (rv.num_links >= rv.max_links) resize_remap_vars(rv, rv.resize_increment);
+  if (rv.num_links >= rv.max_links) remapVarsResize(rv, rv.resize_increment);
 
   rv.src_cell_add[nlink] = add1;
   rv.tgt_cell_add[nlink] = add2;

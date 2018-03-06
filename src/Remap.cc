@@ -801,7 +801,7 @@ remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
     remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
 
   if (mapType == RemapType::CONSERV && remap->vars.num_links != remap->vars.max_links)
-    resize_remap_vars(remap->vars, remap->vars.num_links - remap->vars.max_links);
+    remapVarsResize(remap->vars, remap->vars.num_links - remap->vars.max_links);
 
   if (remap->vars.sort_add) sort_remap_add(remap->vars);
   if (remap->vars.links_per_value == -1) links_per_value(remap->vars);

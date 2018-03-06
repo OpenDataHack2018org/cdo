@@ -89,7 +89,7 @@ yar_store_link_cnsrv(remapVarsType &rv, long add1, long add2, double weight)
   nlink = rv.num_links;
 
   rv.num_links++;
-  if (rv.num_links >= rv.max_links) resize_remap_vars(rv, rv.resize_increment);
+  if (rv.num_links >= rv.max_links) remapVarsResize(rv, rv.resize_increment);
 
   rv.src_cell_add[nlink] = add1;
   rv.tgt_cell_add[nlink] = add2;
@@ -128,7 +128,7 @@ store_link_bilin(remapVarsType &rv, int dst_add, int src_add[4], double weights[
   */
   rv.num_links += 4;
 
-  if (rv.num_links >= rv.max_links) resize_remap_vars(rv, rv.resize_increment);
+  if (rv.num_links >= rv.max_links) remapVarsResize(rv, rv.resize_increment);
 
   for (long n = 0; n < 4; ++n)
     {
