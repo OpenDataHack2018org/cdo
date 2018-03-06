@@ -155,8 +155,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *r
 
 void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapVarsType &rv,
                 const double *restrict array1, const double *restrict array2, double missval);
-void remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict grad_lat,
-                     double *restrict grad_lon, double *restrict grad_latlon);
+void remap_gradients(remapgrid_t grid, const double *restrict array, gradientsType &gradients);
 
 void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights);
 void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,

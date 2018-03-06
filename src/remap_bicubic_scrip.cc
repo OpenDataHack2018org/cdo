@@ -81,12 +81,16 @@ bicubic_warning(void)
 
 static void
 bicubic_remap(double *restrict tgt_point, const double *restrict src_array, double wgts[4][4], const size_t src_add[4],
-              const double *restrict grad1, const double *restrict grad2, const double *restrict grad3)
+              gradientsType &gradients)
 {
+  const double *restrict glat = &gradients.grad_lat[0];
+  const double *restrict glon = &gradients.grad_lon[0];
+  const double *restrict glatlon = &gradients.grad_latlon[0];
+
   *tgt_point = 0.;
   for (unsigned n = 0; n < 4; ++n)
-    *tgt_point += src_array[src_add[n]] * wgts[n][0] + grad1[src_add[n]] * wgts[n][1] + grad2[src_add[n]] * wgts[n][2]
-                  + grad3[src_add[n]] * wgts[n][3];
+    *tgt_point += src_array[src_add[n]] * wgts[n][0] + glat[src_add[n]] * wgts[n][1] + glon[src_add[n]] * wgts[n][2]
+                  + glatlon[src_add[n]] * wgts[n][3];
 }
 
 /*
@@ -318,11 +322,8 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *
 
   if (src_grid->rank != 2) cdoAbort("Can not do bicubic interpolation when source grid rank != 2");
 
-  double *grad1_lat = (double *) Malloc(src_grid->size * sizeof(double));
-  double *grad1_lon = (double *) Malloc(src_grid->size * sizeof(double));
-  double *grad1_latlon = (double *) Malloc(src_grid->size * sizeof(double));
-
-  remap_gradients(*src_grid, src_array, grad1_lat, grad1_lon, grad1_latlon);
+  gradientsType gradients(src_grid->size);
+  remap_gradients(*src_grid, src_array, gradients);
 
   /* Loop over destination grid */
 
@@ -331,7 +332,7 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) reduction(+ : findex) shared(remap_grid_type, tgt_grid_size, src_grid, \
                                                                     tgt_grid, src_array, tgt_array, missval,  \
-                                                                    grad1_lat, grad1_lon, grad1_latlon)
+                                                                    gradients)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -385,7 +386,7 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *
 
               sort_add_and_wgts4(4, src_add, wgts);
 
-              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, grad1_lat, grad1_lon, grad1_latlon);
+              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, gradients);
             }
           else
             {
@@ -409,14 +410,10 @@ scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *
 
               sort_add_and_wgts4(4, src_add, wgts);
 
-              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, grad1_lat, grad1_lon, grad1_latlon);
+              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, gradients);
             }
         }
     }
-
-  Free(grad1_lat);
-  Free(grad1_lon);
-  Free(grad1_latlon);
 
 #ifdef TEST_KDTREE
   if (gs) gridsearch_delete(gs);

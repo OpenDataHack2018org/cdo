@@ -855,7 +855,6 @@ Remap(void *argument)
   int streamID2 = -1;
   int nrecs;
   int varID, levelID;
-  size_t gridsize2;
   size_t nmiss1, nmiss2;
   int r = -1;
   int nremaps = 0;
@@ -958,7 +957,7 @@ Remap(void *argument)
       for (size_t i = 0; i < gridsize; i++)
         if (remaps[0].src_grid.mask[i] == FALSE) remaps[0].nmiss++;
 
-      gridsize2 = gridInqSize(gridID2);
+      size_t gridsize2 = gridInqSize(gridID2);
       if (gridInqType(gridID2) == GRID_GME)
         {
           remaps[0].tgt_grid.nvgp = gridInqSize(gridID2);
@@ -994,22 +993,17 @@ Remap(void *argument)
 
   size_t grid1sizemax = vlistGridsizeMax(vlistID1);
 
-  bool needGradiants = (mapType == RemapType::BICUBIC);
+  bool needGradients = (mapType == RemapType::BICUBIC);
   if (mapType == RemapType::CONSERV && remap_order == 2)
     {
       if (cdoVerbose) cdoPrint("Second order remapping");
-      needGradiants = true;
+      needGradients = true;
     }
   else
     remap_order = 1;
 
-  std::vector<double> grad1_lat, grad1_lon, grad1_latlon;
-  if (needGradiants)
-    {
-      grad1_lat.resize(grid1sizemax);
-      grad1_lon.resize(grid1sizemax);
-      grad1_latlon.resize(grid1sizemax);
-    }
+  gradientsType gradients;
+  if (needGradients) gradients.init(grid1sizemax);
 
   std::vector<double> array1(grid1sizemax);
   std::vector<int> imask(grid1sizemax);
@@ -1170,32 +1164,31 @@ Remap(void *argument)
                     if (remaps[r].src_grid.vgpm[i]) array1[j++] = array1[i];
                 }
 
+              size_t gridsize2 = gridInqSize(gridID2);
+
               if (remap_genweights)
                 {
                   remaps[r].nused++;
 
-                  if (needGradiants)
+                  if (needGradients)
                     {
                       if (remaps[r].src_grid.rank != 2 && remap_order == 2)
                         cdoAbort("Second order remapping is not available for unstructured grids!");
 
-                      remap_gradients(remaps[r].src_grid, &array1[0], &grad1_lat[0], &grad1_lon[0], &grad1_latlon[0]);
+                      remap_gradients(remaps[r].src_grid, &array1[0], gradients);
                     }
 
                   if (operfunc == REMAPLAF)
-                    remap_laf(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars, &array1[0]);
+                    remap_laf(&array2[0], missval, gridsize2, remaps[r].vars, &array1[0]);
                   else if (operfunc == REMAPSUM)
-                    remap_sum(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars, &array1[0]);
+                    remap_sum(&array2[0], missval, gridsize2, remaps[r].vars, &array1[0]);
                   else
-                    remap(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars, &array1[0],
-                          &grad1_lat[0], &grad1_lon[0], &grad1_latlon[0]);
+                    remap(&array2[0], missval, gridsize2, remaps[r].vars, &array1[0], gradients);
                 }
               else
                 {
                   remapField(mapType, &remaps[r], numNeighbors, &array1[0], &array2[0], missval);
                 }
-
-              gridsize2 = gridInqSize(gridID2);
 
               if (operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON)
                 {

@@ -811,11 +811,14 @@ remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapVar
 /*****************************************************************************/
 
 void
-remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict grad_lat, double *restrict grad_lon,
-                double *restrict grad_latlon)
+remap_gradients(remapgrid_t grid, const double *restrict array, gradientsType &gradients)
 {
   if (grid.rank != 2) cdoAbort("Internal problem (remap_gradients), grid rank = %d!", grid.rank);
 
+  double *restrict grad_lat = &gradients.grad_lat[0];
+  double *restrict grad_lon = &gradients.grad_lon[0];
+  double *restrict grad_latlon = &gradients.grad_latlon[0];
+      
   size_t grid_size = grid.size;
   size_t nx = grid.dims[0];
   size_t ny = grid.dims[1];

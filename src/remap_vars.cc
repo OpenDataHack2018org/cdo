@@ -12,7 +12,7 @@
 */
 void
 remap(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array,
-      const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3)
+      gradientsType &gradients)
 {
   /*
     Input arrays:
@@ -36,6 +36,10 @@ remap(double *restrict dst_array, double missval, size_t dst_size, const remapVa
 
     double *dst_array    ! array for remapped field on destination grid
   */
+  const double *restrict src_grad1 = &gradients.grad_lat[0];
+  const double *restrict src_grad2 = &gradients.grad_lon[0];
+  const double *restrict src_grad3 = &gradients.grad_latlon[0];
+
   size_t num_links = rv.num_links;
   size_t num_wts = rv.num_wts;
   const double *restrict map_wts = &rv.wts[0];
