@@ -38,6 +38,7 @@ extern "C" {
 
 int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort, timer_yar_remap_con, timer_yar_remap_bil;
 
+#ifdef HAVE_LIBYAC
 static void
 yar_remap(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array)
 {
@@ -64,6 +65,7 @@ yar_remap(double *restrict dst_array, double missval, size_t dst_size, const rem
   // for ( n = 0; n < 10; ++n ) printf("array1 %d %g\n", n, src_array[n]);
   // for ( n = 0; n < 10; ++n ) printf("array2 %d %g\n", n, dst_array[n]);
 }
+#endif
 
 void
 yar_store_link_cnsrv(remapVarsType &rv, long add1, long add2, double weight)

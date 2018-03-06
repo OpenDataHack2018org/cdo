@@ -34,17 +34,17 @@ struct remapVarsType
 {
   long links_per_value;
   bool sort_add;
-  bool pinit;              /* true: if the pointers are initialized    */
-  size_t max_links;        /* current size of link arrays              */
-  size_t num_links;        /* actual number of links for remapping     */
-  size_t num_wts;          /* num of weights used in remapping         */
-  RemapType mapType;       /* identifier for remapping method          */
-  NormOpt normOpt;         /* option for normalization (conserv only)  */
-  size_t resize_increment; /* default amount to increase array size    */
+  bool pinit;                       // true: if the pointers are initialized
+  size_t max_links;                 // current size of link arrays
+  size_t num_links;                 // actual number of links for remapping
+  size_t num_wts;                   // num of weights used in remapping
+  RemapType mapType;                // identifier for remapping method
+  NormOpt normOpt;                  // option for normalization (conserv only)
+  size_t resize_increment;          // default amount to increase array size
 
-  std::vector<size_t> src_cell_add; /* source grid address for each link        */
-  std::vector<size_t> tgt_cell_add; /* target grid address for each link        */
-  std::vector<double> wts;          /* map weights for each link [max_links*num_wts] */
+  std::vector<size_t> src_cell_add; // source grid address for each link
+  std::vector<size_t> tgt_cell_add; // target grid address for each link
+  std::vector<double> wts;          // map weights for each link [max_links*num_wts]
 
   remaplink_t links;
 };

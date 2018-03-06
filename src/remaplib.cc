@@ -66,18 +66,11 @@
 #include "config.h"
 #endif
 
-#include <limits.h>
-#include <time.h>
-
 #include <cdi.h>
 
 #include "cdo_int.h"
 #include "grid.h"
-#include "array.h"
 #include "remap.h"
-#include "remap_store_link_cnsrv.h"
-#include "cdoOptions.h"
-#include "timer.h"
 
 #define IS_REG2D_GRID(gridID) (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN)
 
