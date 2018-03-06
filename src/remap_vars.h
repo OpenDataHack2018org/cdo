@@ -58,6 +58,6 @@ void remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_si
 void resize_remap_vars(remapVarsType &rv, int64_t increment);
 void reorder_links(remapVarsType &rv);
 void remapVarsFree(remapVarsType &rv);
-void remapCheckWeights(const remapVarsType &rv);
+void remapVarsCheckWeights(const remapVarsType &rv);
 
 #endif /* REMAP_VARS_H */

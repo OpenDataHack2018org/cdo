@@ -1791,7 +1791,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapV
           tgt_centroid_lon[n] = 0;
         }
 
-      remapCheckWeights(rv);
+      remapVarsCheckWeights(rv);
 
       for (long n = 0; n < num_links; ++n)
         {

@@ -587,7 +587,7 @@ remapVarsFree(remapVarsType &rv)
 } /* remapVarsFree */
 
 void
-remapCheckWeights(const remapVarsType &rv)
+remapVarsCheckWeights(const remapVarsType &rv)
 {
   auto num_links = rv.num_links;
   auto num_wts = rv.num_wts;

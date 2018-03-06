@@ -1007,7 +1007,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsTyp
       remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
       remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
 
-      remapCheckWeights(rv);
+      remapVarsCheckWeights(rv);
     }
 
   if (cdoTimer) timer_stop(timer_remap_con);
