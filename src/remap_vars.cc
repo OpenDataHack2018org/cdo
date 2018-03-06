@@ -395,7 +395,7 @@ remap_sum(double *restrict dst_array, double missval, size_t dst_size, const rem
     allocation of arrays (fairly large so frequent resizing unnecessary).
 */
 void
-remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapVarsType &rv)
+remapVarsInit(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapVarsType &rv)
 {
   /* Initialize all pointer */
   if (rv.pinit == false) rv.pinit = true;

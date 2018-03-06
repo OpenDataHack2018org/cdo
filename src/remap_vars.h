@@ -54,7 +54,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, const re
            const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3);
 void remap_laf(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array);
 void remap_sum(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array);
-void remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapVarsType &rv);
+void remapVarsInit(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapVarsType &rv);
 void remapVarsResize(remapVarsType &rv, int64_t increment);
 void remapVarsReorder(remapVarsType &rv);
 void remapVarsFree(remapVarsType &rv);

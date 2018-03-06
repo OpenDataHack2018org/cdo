@@ -158,7 +158,7 @@ yar_remap_bil(field_type *field1, field_type *field2)
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
   remap_grids_init(RemapType::BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remap_vars_init(RemapType::BILINEAR, remap.src_grid.size, remap.tgt_grid.size, remap.vars);
+  remapVarsInit(RemapType::BILINEAR, remap.src_grid.size, remap.tgt_grid.size, remap.vars);
   if (cdoTimer) timer_stop(timer_yar_remap_init);
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
@@ -397,7 +397,7 @@ yar_remap_con(field_type *field1, field_type *field2)
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
   remap_grids_init(RemapType::CONSERV, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remap_vars_init(RemapType::CONSERV, remap.src_grid.size, remap.tgt_grid.size, remap.vars);
+  remapVarsInit(RemapType::CONSERV, remap.src_grid.size, remap.tgt_grid.size, remap.vars);
   if (cdoTimer) timer_stop(timer_yar_remap_init);
 
   if (cdoTimer) timer_start(timer_yar_remap_init);

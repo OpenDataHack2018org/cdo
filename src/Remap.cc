@@ -1149,7 +1149,7 @@ Remap(void *argument)
 
                   // initialize some remapping variables
                   if (cdoTimer) timer_start(timer_remap_init);
-                  remap_vars_init(mapType, remaps[r].src_grid.size, remaps[r].tgt_grid.size, remaps[r].vars);
+                  remapVarsInit(mapType, remaps[r].src_grid.size, remaps[r].tgt_grid.size, remaps[r].vars);
                   if (cdoTimer) timer_stop(timer_remap_init);
 
                   print_remap_info(operfunc, remap_genweights, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
