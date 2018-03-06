@@ -473,14 +473,14 @@ resize_remap_vars(remapVarsType &rv, int64_t increment)
 } /* resize_remap_vars */
 
 void
-reorder_links(remapVarsType &rv)
+remapVarsReorder(remapVarsType &rv)
 {
   size_t j, nval = 0, num_blks = 0;
   size_t n;
 
   size_t num_links = rv.num_links;
 
-  printf("reorder_links\n");
+  printf("remapVarsReorder\n");
   printf("  num_links %zu\n", num_links);
   rv.links.option = true;
 

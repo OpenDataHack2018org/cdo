@@ -979,7 +979,7 @@ Remap(void *argument)
 
       operfunc = maptype2operfunc(mapType, submapType, numNeighbors, remap_order);
 
-      if (remap_test) reorder_links(remaps[0].vars);
+      if (remap_test) remapVarsReorder(remaps[0].vars);
     }
   else
     {
@@ -1160,7 +1160,7 @@ Remap(void *argument)
 
                       if (writeRemapWeightsOnly) goto WRITE_REMAP;
 
-                      if (remap_test) reorder_links(remaps[r].vars);
+                      if (remap_test) remapVarsReorder(remaps[r].vars);
                     }
                 }
 
