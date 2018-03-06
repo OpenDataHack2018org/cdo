@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <cmath>
+#include "remap_vars.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288 /* pi */
@@ -64,26 +65,11 @@ typedef RESTR_TYPE restr_t;
 
 #define TINY_FRAC 1.e-10
 
-enum struct RemapType
-{
-  UNDEF,
-  BILINEAR,
-  BICUBIC,
-  DISTWGT,
-  CONSERV,
-  CONSERV_YAC
-};
 enum struct SubmapType
 {
   NONE,
   LAF,
   SUM
-};
-enum struct NormOpt
-{
-  NONE,
-  DESTAREA,
-  FRACAREA
 };
 
 typedef struct
@@ -127,35 +113,6 @@ typedef struct
   restr_t *bin_lats;       /* min,max latitude for each search bin   */
 } remapgrid_t;
 
-typedef struct
-{
-  bool option;
-  size_t max_links;
-  size_t num_blks;
-  size_t *num_links;
-  size_t **src_add;
-  size_t **dst_add;
-  size_t **w_index;
-} remaplink_t;
-
-typedef struct
-{
-  long links_per_value;
-  bool sort_add;
-  bool pinit;              /* true: if the pointers are initialized    */
-  size_t max_links;        /* current size of link arrays              */
-  size_t num_links;        /* actual number of links for remapping     */
-  size_t num_wts;          /* num of weights used in remapping         */
-  RemapType mapType;       /* identifier for remapping method          */
-  NormOpt normOpt;         /* option for normalization (conserv only)  */
-  size_t resize_increment; /* default amount to increase array size    */
-
-  std::vector<size_t> src_cell_add; /* source grid address for each link        */
-  std::vector<size_t> tgt_cell_add; /* target grid address for each link        */
-  std::vector<double> wts;          /* map weights for each link [max_links*num_wts] */
-
-  remaplink_t links;
-} remapVarsType;
 
 typedef struct
 {
@@ -178,17 +135,8 @@ void remap_set_int(int remapvar, int value);
 
 void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2,
                       remapgrid_t *tgt_grid);
-void remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapVarsType &rv);
 
-void remapVarsFree(remapVarsType &rv);
 void remapGridFree(remapgrid_t *grid);
-
-void remap(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array,
-           const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3);
-
-void remap_laf(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array);
-
-void remap_sum(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array);
 
 void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv);
 void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv);
@@ -205,14 +153,10 @@ void remap_distwgt(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_
 void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array,
                    double *restrict tgt_array, double missval);
 
-void resize_remap_vars(remapVarsType &rv, int64_t increment);
-
 void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapVarsType &rv,
                 const double *restrict array1, const double *restrict array2, double missval);
 void remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict grad_lat,
                      double *restrict grad_lon, double *restrict grad_latlon);
-
-void reorder_links(remapVarsType &rv);
 
 void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights);
 void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,
@@ -252,6 +196,5 @@ int rect_grid_search(size_t *ii, size_t *jj, double x, double y, size_t nxm, siz
 void remapgrid_get_lonlat(remapgrid_t *grid, size_t cell_add, double *plon, double *plat);
 
 void remapCheckArea(size_t grid_size, double *restrict cell_area, const char *name);
-void remapCheckWeights(const remapVarsType &rv);
 
 #endif /* REMAP_H */

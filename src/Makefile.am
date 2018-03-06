@@ -157,6 +157,8 @@ libcdo_la_SOURCES =            \
                remap.h         \
                remaplib.cc      \
                remapsort.cc     \
+               remap_vars.cc \
+               remap_vars.h  \
                remap_scrip_io.cc \
                remap_search_reg2d.cc \
                remap_search_latbins.cc \
