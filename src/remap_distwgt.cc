@@ -262,7 +262,7 @@ grid_search_nbr(struct gridsearch *gs, knnWeightsType &knnWeights, double plon, 
 //  interpolation.
 
 void
-remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+remap_distwgt_weights(size_t numNeighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv)
 {
   int remap_grid_type = src_grid->remap_grid_type;
 

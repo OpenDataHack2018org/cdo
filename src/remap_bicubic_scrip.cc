@@ -97,7 +97,7 @@ bicubic_remap(double *restrict tgt_point, const double *restrict src_array, doub
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv)
 {
   extern int timer_remap_bic;
   int remap_grid_type = src_grid->remap_grid_type;

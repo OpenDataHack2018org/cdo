@@ -656,19 +656,19 @@ init_remap_timer(void)
 }
 
 static void
-links_per_value(remapvars_t *remapvars)
+links_per_value(remapVarsType &rv)
 {
   long lpv = -1;
 
-  remapvars->links_per_value = lpv;
+  rv.links_per_value = lpv;
   return;
   /*
-  size_t num_links = remapvars->num_links;
+  size_t num_links = rv.num_links;
 
   if ( num_links > 0 )
     {
       lpv = 1;
-      const size_t *restrict dst_add = remapvars->tgt_cell_add;
+      const size_t *restrict dst_add = rv.tgt_cell_add;
       size_t n = 0;
       size_t ival = dst_add[n];
       for ( n = 1; n < num_links; ++n )
@@ -731,12 +731,12 @@ links_per_value(remapvars_t *remapvars)
 
   printf("lpv %zu\n", lpv);
 
-  remapvars->links_per_value = lpv;
+  rv.links_per_value = lpv;
   */
 }
 
 static void
-sort_remap_add(remapvars_t *remapvars)
+sort_remap_add(remapVarsType &rv)
 {
   if (cdoTimer) timer_start(timer_remap_sort);
   if (sort_mode == MERGE_SORT)
@@ -745,13 +745,11 @@ sort_remap_add(remapvars_t *remapvars)
       ** The chunk size is determined by MERGE_SORT_LIMIT_SIZE in remaplib.c.
       ** OpenMP parallelism is supported
       */
-      sort_iter(remapvars->num_links, remapvars->num_wts, remapvars->tgt_cell_add, remapvars->src_cell_add,
-                remapvars->wts, Threading::ompNumThreads);
+      sort_iter(rv.num_links, rv.num_wts, &rv.tgt_cell_add[0], &rv.src_cell_add[0], &rv.wts[0], Threading::ompNumThreads);
     }
   else
     { /* use a pure heap sort without any support of parallelism */
-      sort_add(remapvars->num_links, remapvars->num_wts, remapvars->tgt_cell_add, remapvars->src_cell_add,
-               remapvars->wts);
+      sort_add(rv.num_links, rv.num_wts, &rv.tgt_cell_add[0], &rv.src_cell_add[0], &rv.wts[0]);
     }
   if (cdoTimer) timer_stop(timer_remap_sort);
 }
@@ -792,21 +790,21 @@ static void
 remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
 {
   if (mapType == RemapType::CONSERV)
-    scrip_remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+    scrip_remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapType::BILINEAR)
-    scrip_remap_bilinear_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+    scrip_remap_bilinear_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapType::BICUBIC)
-    scrip_remap_bicubic_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+    scrip_remap_bicubic_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapType::DISTWGT)
-    remap_distwgt_weights(numNeighbors, &remap->src_grid, &remap->tgt_grid, &remap->vars);
+    remap_distwgt_weights(numNeighbors, &remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapType::CONSERV_YAC)
-    remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, &remap->vars);
+    remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
 
   if (mapType == RemapType::CONSERV && remap->vars.num_links != remap->vars.max_links)
-    resize_remap_vars(&remap->vars, remap->vars.num_links - remap->vars.max_links);
+    resize_remap_vars(remap->vars, remap->vars.num_links - remap->vars.max_links);
 
-  if (remap->vars.sort_add) sort_remap_add(&remap->vars);
-  if (remap->vars.links_per_value == -1) links_per_value(&remap->vars);
+  if (remap->vars.sort_add) sort_remap_add(remap->vars);
+  if (remap->vars.links_per_value == -1) links_per_value(remap->vars);
 }
 
 static void
@@ -939,9 +937,9 @@ Remap(void *argument)
   if (lremapxxx)
     {
       read_remap_scrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remap_order,
-                       &remaps[0].src_grid, &remaps[0].tgt_grid, &remaps[0].vars);
+                       &remaps[0].src_grid, &remaps[0].tgt_grid, remaps[0].vars);
 
-      if (remaps[0].vars.links_per_value == 0) links_per_value(&remaps[0].vars);
+      if (remaps[0].vars.links_per_value == 0) links_per_value(remaps[0].vars);
 
       nremaps = 1;
       size_t gridsize = remaps[0].src_grid.size;
@@ -981,7 +979,7 @@ Remap(void *argument)
 
       operfunc = maptype2operfunc(mapType, submapType, numNeighbors, remap_order);
 
-      if (remap_test) reorder_links(&remaps[0].vars);
+      if (remap_test) reorder_links(remaps[0].vars);
     }
   else
     {
@@ -1088,7 +1086,7 @@ Remap(void *argument)
                   else
                     {
                       int n0 = (max_remaps > 1 && remaps[0].nused > remaps[1].nused);
-                      remapVarsFree(&remaps[n0].vars);
+                      remapVarsFree(remaps[n0].vars);
                       remapGridFree(&remaps[n0].src_grid);
                       remapGridFree(&remaps[n0].tgt_grid);
                       for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
@@ -1151,7 +1149,7 @@ Remap(void *argument)
 
                   // initialize some remapping variables
                   if (cdoTimer) timer_start(timer_remap_init);
-                  remap_vars_init(mapType, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
+                  remap_vars_init(mapType, remaps[r].src_grid.size, remaps[r].tgt_grid.size, remaps[r].vars);
                   if (cdoTimer) timer_stop(timer_remap_init);
 
                   print_remap_info(operfunc, remap_genweights, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
@@ -1162,7 +1160,7 @@ Remap(void *argument)
 
                       if (writeRemapWeightsOnly) goto WRITE_REMAP;
 
-                      if (remap_test) reorder_links(&remaps[r].vars);
+                      if (remap_test) reorder_links(remaps[r].vars);
                     }
                 }
 
@@ -1185,18 +1183,12 @@ Remap(void *argument)
                     }
 
                   if (operfunc == REMAPLAF)
-                    remap_laf(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-                              remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add,
-                              &array1[0]);
+                    remap_laf(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars, &array1[0]);
                   else if (operfunc == REMAPSUM)
-                    remap_sum(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-                              remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add,
-                              &array1[0]);
+                    remap_sum(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars, &array1[0]);
                   else
-                    remap(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-                          remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add, &array1[0],
-                          &grad1_lat[0], &grad1_lon[0], &grad1_latlon[0], remaps[r].vars.links,
-                          remaps[r].vars.links_per_value);
+                    remap(&array2[0], missval, gridInqSize(gridID2), remaps[r].vars, &array1[0],
+                          &grad1_lat[0], &grad1_lon[0], &grad1_latlon[0]);
                 }
               else
                 {
@@ -1266,7 +1258,7 @@ WRITE_REMAP:
 
   for (int r = 0; r < nremaps; r++)
     {
-      remapVarsFree(&remaps[r].vars);
+      remapVarsFree(remaps[r].vars);
       remapGridFree(&remaps[r].src_grid);
       remapGridFree(&remaps[r].tgt_grid);
     }

@@ -187,7 +187,7 @@ bilinear_remap(double *restrict tgt_point, const double *restrict src_array, con
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv)
 {
   extern int timer_remap_bil;
   int remap_grid_type = src_grid->remap_grid_type;

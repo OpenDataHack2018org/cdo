@@ -166,7 +166,7 @@ store_weightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], s
 }
 
 void
-weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightlinks, remapvars_t *rv)
+weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightlinks, remapVarsType &rv)
 {
   size_t nlinks = 0;
 
@@ -179,16 +179,16 @@ weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightli
         }
     }
 
-  rv->max_links = nlinks;
-  rv->num_links = nlinks;
+  rv.max_links = nlinks;
+  rv.num_links = nlinks;
   if (nlinks)
     {
-      rv->src_cell_add = (size_t *) Malloc(nlinks * sizeof(size_t));
-      rv->tgt_cell_add = (size_t *) Malloc(nlinks * sizeof(size_t));
-      rv->wts = (double *) Malloc(nlinks * sizeof(double));
-      size_t *restrict src_cell_adds = rv->src_cell_add;
-      size_t *restrict tgt_cell_adds = rv->tgt_cell_add;
-      double *restrict wts = rv->wts;
+      rv.src_cell_add.resize(nlinks);
+      rv.tgt_cell_add.resize(nlinks);
+      rv.wts.resize(nlinks);
+      size_t *restrict src_cell_adds = &rv.src_cell_add[0];
+      size_t *restrict tgt_cell_adds = &rv.tgt_cell_add[0];
+      double *restrict wts = &rv.wts[0];
 
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static) default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightlinks, \
@@ -226,7 +226,7 @@ weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightli
 }
 
 void
-weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remapvars_t *rv)
+weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remapVarsType &rv)
 {
   size_t nlinks = 0;
 
@@ -239,16 +239,16 @@ weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remap
         }
     }
 
-  rv->max_links = nlinks;
-  rv->num_links = nlinks;
+  rv.max_links = nlinks;
+  rv.num_links = nlinks;
   if (nlinks)
     {
-      rv->src_cell_add = (size_t *) Malloc(nlinks * sizeof(size_t));
-      rv->tgt_cell_add = (size_t *) Malloc(nlinks * sizeof(size_t));
-      rv->wts = (double *) Malloc(4 * nlinks * sizeof(double));
-      size_t *restrict src_cell_adds = rv->src_cell_add;
-      size_t *restrict tgt_cell_adds = rv->tgt_cell_add;
-      double *restrict wts = rv->wts;
+      rv.src_cell_add.resize(nlinks);
+      rv.tgt_cell_add.resize(nlinks);
+      rv.wts.resize(4 * nlinks);
+      size_t *restrict src_cell_adds = &rv.src_cell_add[0];
+      size_t *restrict tgt_cell_adds = &rv.tgt_cell_add[0];
+      double *restrict wts = &rv.wts[0];
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(src_cell_adds, tgt_cell_adds, wts, weightlinks, tgt_grid_size)

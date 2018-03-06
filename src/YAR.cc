@@ -38,11 +38,15 @@ extern "C" {
 
 int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort, timer_yar_remap_con, timer_yar_remap_bil;
 
-void
-yar_remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts,
-          long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array)
+static void
+yar_remap(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array)
 {
-  long n;
+  size_t num_links = rv.num_links;
+  const double *restrict map_wts = &rv.wts[0];
+  const size_t *restrict dst_add = &rv.tgt_cell_add[0];
+  const size_t *restrict src_add = &rv.src_cell_add[0];
+
+  size_t n;
 
   for (n = 0; n < dst_size; ++n) dst_array[n] = missval;
 
@@ -62,7 +66,7 @@ yar_remap(double *restrict dst_array, double missval, long dst_size, long num_li
 }
 
 void
-yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
+yar_store_link_cnsrv(remapVarsType &rv, long add1, long add2, double weight)
 {
   /*
     Input variables:
@@ -82,15 +86,15 @@ yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
      check to see if remap arrays need to be increased to accomodate
      the new link. Then store the link.
   */
-  nlink = rv->num_links;
+  nlink = rv.num_links;
 
-  rv->num_links++;
-  if (rv->num_links >= rv->max_links) resize_remap_vars(rv, rv->resize_increment);
+  rv.num_links++;
+  if (rv.num_links >= rv.max_links) resize_remap_vars(rv, rv.resize_increment);
 
-  rv->src_cell_add[nlink] = add1;
-  rv->tgt_cell_add[nlink] = add2;
+  rv.src_cell_add[nlink] = add1;
+  rv.tgt_cell_add[nlink] = add2;
 
-  rv->wts[nlink] = weight;
+  rv.wts[nlink] = weight;
 }
 
 void
@@ -108,7 +112,7 @@ set_source_data(double *source_data, double init_value, unsigned size_x, unsigne
 */
 #ifdef HAVE_LIBYAC
 static void
-store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weights[4])
+store_link_bilin(remapVarsType &rv, int dst_add, int src_add[4], double weights[4])
 {
   /*
     Input variables:
@@ -117,20 +121,20 @@ store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weights[4]
     double weights[4] ! array of remapping weights for these links
   */
   /* link index */
-  long nlink = rv->num_links;
+  long nlink = rv.num_links;
   /*
      Increment number of links and check to see if remap arrays need
      to be increased to accomodate the new link. Then store the link.
   */
-  rv->num_links += 4;
+  rv.num_links += 4;
 
-  if (rv->num_links >= rv->max_links) resize_remap_vars(rv, rv->resize_increment);
+  if (rv.num_links >= rv.max_links) resize_remap_vars(rv, rv.resize_increment);
 
   for (long n = 0; n < 4; ++n)
     {
-      rv->src_cell_add[nlink + n] = src_add[n];
-      rv->tgt_cell_add[nlink + n] = dst_add;
-      rv->wts[nlink + n] = weights[n];
+      rv.src_cell_add[nlink + n] = src_add[n];
+      rv.tgt_cell_add[nlink + n] = dst_add;
+      rv.wts[nlink + n] = weights[n];
     }
 
 } /* store_link_bilin */
@@ -154,7 +158,7 @@ yar_remap_bil(field_type *field1, field_type *field2)
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
   remap_grids_init(RemapType::BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remap_vars_init(RemapType::BILINEAR, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
+  remap_vars_init(RemapType::BILINEAR, remap.src_grid.size, remap.tgt_grid.size, remap.vars);
   if (cdoTimer) timer_stop(timer_yar_remap_init);
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
@@ -343,7 +347,7 @@ yar_remap_bil(field_type *field1, field_type *field2)
 #ifdef _OPENMP
 #pragma omp critical
 #endif
-              store_link_bilin(&remap.vars, dst_add, src_add, wgts);
+              store_link_bilin(remap.vars, dst_add, src_add, wgts);
             }
         }
     }
@@ -355,8 +359,7 @@ yar_remap_bil(field_type *field1, field_type *field2)
   double missval = field1->missval;
 
   if (cdoTimer) timer_start(timer_yar_remap);
-  yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts, remap.vars.num_wts,
-            remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
+  yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars, array1);
   if (cdoTimer) timer_stop(timer_yar_remap);
 
   field2->nmiss = arrayNumMV(gridInqSize(gridIDout), array2, missval);
@@ -394,7 +397,7 @@ yar_remap_con(field_type *field1, field_type *field2)
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
   remap_grids_init(RemapType::CONSERV, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remap_vars_init(RemapType::CONSERV, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
+  remap_vars_init(RemapType::CONSERV, remap.src_grid.size, remap.tgt_grid.size, remap.vars);
   if (cdoTimer) timer_stop(timer_yar_remap_init);
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
@@ -633,7 +636,7 @@ yar_remap_con(field_type *field1, field_type *field2)
           add1 = index1;
           add2 = index2;
 
-          yar_store_link_cnsrv(&remap.vars, add1, add2, weight[k]);
+          yar_store_link_cnsrv(remap.vars, add1, add2, weight[k]);
 
           if (cdoVerbose)
             printf("  result dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
@@ -649,8 +652,7 @@ yar_remap_con(field_type *field1, field_type *field2)
   double missval = field1->missval;
 
   if (cdoTimer) timer_start(timer_yar_remap);
-  yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts, remap.vars.num_wts,
-            remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
+  yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars, array1);
   if (cdoTimer) timer_stop(timer_yar_remap);
 
   field2->nmiss = arrayNumMV(gridInqSize(gridIDout), array2, missval);

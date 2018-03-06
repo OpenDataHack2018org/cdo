@@ -582,41 +582,41 @@ get_lonlat_circle_index(remapgrid_t *remap_grid)
 }
 
 static void
-remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
+remapNormalizeWeights(remapgrid_t *tgt_grid, remapVarsType &rv)
 {
   // Include centroids in weights and normalize using destination area if requested
-  size_t num_links = rv->num_links;
-  size_t num_wts = rv->num_wts;
+  size_t num_links = rv.num_links;
+  size_t num_wts = rv.num_wts;
   size_t tgt_cell_add;     // current linear address for target grid cell
   double norm_factor = 0;  // factor for normalizing wts
 
-  if (rv->normOpt == NormOpt::DESTAREA)
+  if (rv.normOpt == NormOpt::DESTAREA)
     {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(num_wts, num_links, rv, tgt_grid) private(tgt_cell_add, norm_factor)
 #endif
       for (size_t n = 0; n < num_links; ++n)
         {
-          tgt_cell_add = rv->tgt_cell_add[n];
+          tgt_cell_add = rv.tgt_cell_add[n];
           norm_factor
               = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? 1. / tgt_grid->cell_area[tgt_cell_add] : 0.;
-          rv->wts[n * num_wts] *= norm_factor;
+          rv.wts[n * num_wts] *= norm_factor;
         }
     }
-  else if (rv->normOpt == NormOpt::FRACAREA)
+  else if (rv.normOpt == NormOpt::FRACAREA)
     {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(num_wts, num_links, rv, tgt_grid) private(tgt_cell_add, norm_factor)
 #endif
       for (size_t n = 0; n < num_links; ++n)
         {
-          tgt_cell_add = rv->tgt_cell_add[n];
+          tgt_cell_add = rv.tgt_cell_add[n];
           norm_factor
               = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? 1. / tgt_grid->cell_frac[tgt_cell_add] : 0.;
-          rv->wts[n * num_wts] *= norm_factor;
+          rv.wts[n * num_wts] *= norm_factor;
         }
     }
-  else if (rv->normOpt == NormOpt::NONE)
+  else if (rv.normOpt == NormOpt::NONE)
     {
     }
 }
@@ -680,7 +680,7 @@ reg2d_bound_box(remapgrid_t *remap_grid, double *grid_bound_box)
 }
 
 void
-remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv)
 {
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells
@@ -899,7 +899,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
 
       for (n = 0; n < num_weights; ++n) partial_weights[n] = partial_areas[n] / tgt_area;
 
-      if (rv->normOpt == NormOpt::FRACAREA) yac_correct_weights((unsigned) num_weights, partial_weights);
+      if (rv.normOpt == NormOpt::FRACAREA) yac_correct_weights((unsigned) num_weights, partial_weights);
 
       for (n = 0; n < num_weights; ++n) partial_weights[n] *= tgt_area;
 
@@ -993,7 +993,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
   // Normalize weights using destination area if requested
   remapNormalizeWeights(tgt_grid, rv);
 
-  if (cdoVerbose) cdoPrint("Total number of links = %zu", rv->num_links);
+  if (cdoVerbose) cdoPrint("Total number of links = %zu", rv.num_links);
 
   for (size_t n = 0; n < src_grid_size; ++n)
     if (IS_NOT_EQUAL(src_grid->cell_area[n], 0)) src_grid->cell_frac[n] /= src_grid->cell_area[n];
@@ -1007,7 +1007,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t 
       remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
       remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
 
-      remapCheckWeights(rv->num_links, rv->num_wts, rv->normOpt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
+      remapCheckWeights(rv);
     }
 
   if (cdoTimer) timer_stop(timer_remap_con);

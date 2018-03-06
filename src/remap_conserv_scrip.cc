@@ -1023,7 +1023,7 @@ line_integral(double *weights, double in_phi1, double in_phi2, double theta1, do
 } /* line_integral */
 
 static void
-correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_lat,
+correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv, double *src_centroid_lat,
              double *src_centroid_lon, double *tgt_centroid_lat, double *tgt_centroid_lon, grid_store_t *grid_store)
 {
   /*
@@ -1040,7 +1040,7 @@ correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv, doub
   long tgt_cell_add; /* current linear address for target grid cell   */
   double weights[6]; /* local wgt array */
 
-  num_wts = rv->num_wts;
+  num_wts = rv.num_wts;
 
   src_grid_size = src_grid->size;
   tgt_grid_size = tgt_grid->size;
@@ -1153,16 +1153,16 @@ norm_weight(double norm_factor, double *weights, double src_centroid_lat, double
 }
 
 static void
-normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_lat, double *src_centroid_lon)
+normalize_weights(remapgrid_t *tgt_grid, remapVarsType &rv, double *src_centroid_lat, double *src_centroid_lon)
 {
   /* Include centroids in weights and normalize using destination area if requested */
-  long num_links = rv->num_links;
+  long num_links = rv.num_links;
   long src_cell_add; /* current linear address for source grid cell   */
   long tgt_cell_add; /* current linear address for target grid cell   */
-  double *weights = rv->wts;
+  double *weights = &rv.wts[0];
   double norm_factor = 0; /* factor for normalizing wts */
 
-  if (rv->normOpt == NormOpt::DESTAREA)
+  if (rv.normOpt == NormOpt::DESTAREA)
     {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(num_links, rv, weights, tgt_grid, src_centroid_lat, \
@@ -1170,14 +1170,14 @@ normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_l
 #endif
       for (long n = 0; n < num_links; ++n)
         {
-          src_cell_add = rv->src_cell_add[n];
-          tgt_cell_add = rv->tgt_cell_add[n];
+          src_cell_add = rv.src_cell_add[n];
+          tgt_cell_add = rv.tgt_cell_add[n];
           norm_factor
               = IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) ? ONE / tgt_grid->cell_area[tgt_cell_add] : ZERO;
           norm_weight(norm_factor, &weights[n * 3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
         }
     }
-  else if (rv->normOpt == NormOpt::FRACAREA)
+  else if (rv.normOpt == NormOpt::FRACAREA)
     {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(num_links, rv, weights, tgt_grid, src_centroid_lat, \
@@ -1185,14 +1185,14 @@ normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_l
 #endif
       for (long n = 0; n < num_links; ++n)
         {
-          src_cell_add = rv->src_cell_add[n];
-          tgt_cell_add = rv->tgt_cell_add[n];
+          src_cell_add = rv.src_cell_add[n];
+          tgt_cell_add = rv.tgt_cell_add[n];
           norm_factor
               = IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) ? ONE / tgt_grid->cell_frac[tgt_cell_add] : ZERO;
           norm_weight(norm_factor, &weights[n * 3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
         }
     }
-  else if (rv->normOpt == NormOpt::NONE)
+  else if (rv.normOpt == NormOpt::NONE)
     {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(num_links, rv, weights, tgt_grid, src_centroid_lat, \
@@ -1200,7 +1200,7 @@ normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_l
 #endif
       for (long n = 0; n < num_links; ++n)
         {
-          src_cell_add = rv->src_cell_add[n];
+          src_cell_add = rv.src_cell_add[n];
           norm_factor = ONE;
           norm_weight(norm_factor, &weights[n * 3], src_centroid_lat[src_cell_add], src_centroid_lon[src_cell_add]);
         }
@@ -1217,7 +1217,7 @@ normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_l
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv)
 {
   /* local variables */
 
@@ -1237,7 +1237,7 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
   progressInit();
 
   long nbins = src_grid->num_srch_bins;
-  long num_wts = rv->num_wts;
+  long num_wts = rv.num_wts;
 
   grid_store_t *grid_store = (grid_store_t *) Malloc(sizeof(grid_store_t));
   grid_store_init(grid_store, tgt_grid->size);
@@ -1717,48 +1717,48 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
   /*
   if ( 1 )
     {
-      num_links = rv->num_links;
+      num_links = rv.num_links;
 
       if ( cdoVerbose )
         for ( long n = 0; n < num_links; n++ )
-          printf("wts1: %d %g\n", n, rv->wts[3*n]);
+          printf("wts1: %d %g\n", n, rv.wts[3*n]);
 
       for ( long n = 0; n < num_links; n++ )
         {
-          if ( rv->wts[3*n] < 0 )
+          if ( rv.wts[3*n] < 0 )
             {
               int i, n2, nd;
 
               for ( n2 = n+1; n2 < num_links; n2++ )
-                if ( rv->wts[3*n2] >= 0 ) break;
+                if ( rv.wts[3*n2] >= 0 ) break;
 
               nd = n2-n;
               num_links -= nd;
               for ( i = n; i < num_links; i++ )
                 {
-                  rv->wts[3*i]   = rv->wts[3*(i+nd)];
-                  rv->wts[3*i+1] = rv->wts[3*(i+nd)+1];
-                  rv->wts[3*i+2] = rv->wts[3*(i+nd)+2];
+                  rv.wts[3*i]   = rv.wts[3*(i+nd)];
+                  rv.wts[3*i+1] = rv.wts[3*(i+nd)+1];
+                  rv.wts[3*i+2] = rv.wts[3*(i+nd)+2];
 
-                  rv->src_cell_add[i] = rv->src_cell_add[i+nd];
-                  rv->tgt_cell_add[i] = rv->tgt_cell_add[i+nd];
+                  rv.src_cell_add[i] = rv.src_cell_add[i+nd];
+                  rv.tgt_cell_add[i] = rv.tgt_cell_add[i+nd];
                 }
             }
         }
 
-     if ( cdoVerbose ) cdoPrint("Removed number of links = %zu", rv->num_links -
+     if ( cdoVerbose ) cdoPrint("Removed number of links = %zu", rv.num_links -
   num_links);
 
-      rv->num_links = num_links;
+      rv.num_links = num_links;
     }
   */
 
   /* Include centroids in weights and normalize using destination area if requested */
   normalize_weights(tgt_grid, rv, src_centroid_lat, src_centroid_lon);
 
-  long num_links = rv->num_links;
+  long num_links = rv.num_links;
 
-  if (cdoVerbose) cdoPrint("Total number of links = %zu", rv->num_links);
+  if (cdoVerbose) cdoPrint("Total number of links = %zu", rv.num_links);
 
   for (long n = 0; n < src_grid_size; ++n)
     if (IS_NOT_EQUAL(src_grid->cell_area[n], 0)) src_grid->cell_frac[n] /= src_grid->cell_area[n];
@@ -1791,23 +1791,23 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapv
           tgt_centroid_lon[n] = 0;
         }
 
-      remapCheckWeights(num_links, 3, rv->normOpt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
+      remapCheckWeights(rv);
 
       for (long n = 0; n < num_links; ++n)
         {
-          long tgt_cell_add = rv->tgt_cell_add[n];
-          tgt_centroid_lat[tgt_cell_add] += rv->wts[3 * n];
+          long tgt_cell_add = rv.tgt_cell_add[n];
+          tgt_centroid_lat[tgt_cell_add] += rv.wts[3 * n];
         }
 
       /* 2012-01-24 Uwe Schulzweida: changed [tgt_cell_add] to [n] (bug fix) */
       double norm_factor = 0;  // factor for normalizing wts
       for (long n = 0; n < tgt_grid_size; ++n)
         {
-          if (rv->normOpt == NormOpt::DESTAREA)
+          if (rv.normOpt == NormOpt::DESTAREA)
             norm_factor = tgt_grid->cell_frac[n];
-          else if (rv->normOpt == NormOpt::FRACAREA)
+          else if (rv.normOpt == NormOpt::FRACAREA)
             norm_factor = ONE;
-          else if (rv->normOpt == NormOpt::NONE)
+          else if (rv.normOpt == NormOpt::NONE)
             norm_factor = tgt_grid->cell_area[n];
 
           if (tgt_centroid_lat[n] > 0 && fabs(tgt_centroid_lat[n] - norm_factor) > .01)

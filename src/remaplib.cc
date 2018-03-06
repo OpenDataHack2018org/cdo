@@ -133,34 +133,34 @@ remapGridFree(remapgrid_t *grid)
 /*****************************************************************************/
 
 void
-remapVarsFree(remapvars_t *rv)
+remapVarsFree(remapVarsType &rv)
 {
-  if (rv->pinit)
+  if (rv.pinit)
     {
-      rv->pinit = false;
-      rv->sort_add = false;
+      rv.pinit = false;
+      rv.sort_add = false;
 
-      if (rv->src_cell_add) Free(rv->src_cell_add);
-      if (rv->tgt_cell_add) Free(rv->tgt_cell_add);
-      if (rv->wts) Free(rv->wts);
+      rv.src_cell_add.resize(0);
+      rv.tgt_cell_add.resize(0);
+      rv.wts.resize(0);
 
-      if (rv->links.option)
+      if (rv.links.option)
         {
-          rv->links.option = false;
+          rv.links.option = false;
 
-          if (rv->links.num_blks)
+          if (rv.links.num_blks)
             {
-              Free(rv->links.num_links);
-              size_t num_blks = rv->links.num_blks;
+              Free(rv.links.num_links);
+              size_t num_blks = rv.links.num_blks;
               for (size_t i = 0; i < num_blks; ++i)
                 {
-                  Free(rv->links.src_add[i]);
-                  Free(rv->links.dst_add[i]);
-                  Free(rv->links.w_index[i]);
+                  Free(rv.links.src_add[i]);
+                  Free(rv.links.dst_add[i]);
+                  Free(rv.links.w_index[i]);
                 }
-              Free(rv->links.src_add);
-              Free(rv->links.dst_add);
-              Free(rv->links.w_index);
+              Free(rv.links.src_add);
+              Free(rv.links.dst_add);
+              Free(rv.links.w_index);
             }
         }
     }
@@ -762,36 +762,29 @@ remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgrid_t 
     allocation of arrays (fairly large so frequent resizing unnecessary).
 */
 void
-remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapvars_t *rv)
+remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapVarsType &rv)
 {
   /* Initialize all pointer */
-  if (rv->pinit == false)
-    {
-      rv->pinit = true;
-
-      rv->src_cell_add = NULL;
-      rv->tgt_cell_add = NULL;
-      rv->wts = NULL;
-    }
+  if (rv.pinit == false) rv.pinit = true;
 
   /* Determine the number of weights */
 
   if (mapType == RemapType::CONSERV)
-    rv->num_wts = 3;
+    rv.num_wts = 3;
   else if (mapType == RemapType::CONSERV_YAC)
-    rv->num_wts = 1;
+    rv.num_wts = 1;
   else if (mapType == RemapType::BILINEAR)
-    rv->num_wts = 1;
+    rv.num_wts = 1;
   else if (mapType == RemapType::BICUBIC)
-    rv->num_wts = 4;
+    rv.num_wts = 4;
   else if (mapType == RemapType::DISTWGT)
-    rv->num_wts = 1;
+    rv.num_wts = 1;
   else
     cdoAbort("Unknown mapping method!");
 
-  rv->sort_add = (mapType == RemapType::CONSERV);
+  rv.sort_add = (mapType == RemapType::CONSERV);
 
-  rv->links_per_value = -1;
+  rv.links_per_value = -1;
 
   /*
    Initialize num_links and set max_links to four times the largest
@@ -799,27 +792,26 @@ remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, r
    Set a default resize increment to increase the size of link
    arrays if the number of links exceeds the initial size
  */
-  rv->num_links = 0;
-  rv->max_links = 4 * tgt_grid_size;
+  rv.num_links = 0;
+  rv.max_links = 4 * tgt_grid_size;
 
-  rv->resize_increment = (size_t)(0.1 * MAX(src_grid_size, tgt_grid_size));
+  rv.resize_increment = (size_t)(0.1 * MAX(src_grid_size, tgt_grid_size));
 
   /*  Allocate address and weight arrays for mapping 1 */
   if (mapType == RemapType::CONSERV)
     {
-      rv->src_cell_add = (size_t *) Malloc(rv->max_links * sizeof(size_t));
-      rv->tgt_cell_add = (size_t *) Malloc(rv->max_links * sizeof(size_t));
-
-      rv->wts = (double *) Malloc(rv->num_wts * rv->max_links * sizeof(double));
+      rv.src_cell_add.resize(rv.max_links);
+      rv.tgt_cell_add.resize(rv.max_links);
+      rv.wts.resize(rv.num_wts * rv.max_links);
     }
 
-  rv->links.option = false;
-  rv->links.max_links = 0;
-  rv->links.num_blks = 0;
-  rv->links.num_links = NULL;
-  rv->links.src_add = NULL;
-  rv->links.dst_add = NULL;
-  rv->links.w_index = NULL;
+  rv.links.option = false;
+  rv.links.max_links = 0;
+  rv.links.num_blks = 0;
+  rv.links.num_links = NULL;
+  rv.links.src_add = NULL;
+  rv.links.dst_add = NULL;
+  rv.links.w_index = NULL;
 
 } /* remapVarsInit */
 
@@ -830,7 +822,7 @@ remap_vars_init(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, r
    by increment
 */
 void
-resize_remap_vars(remapvars_t *rv, int64_t increment)
+resize_remap_vars(remapVarsType &rv, int64_t increment)
 {
   /*
     Input variables:
@@ -839,14 +831,13 @@ resize_remap_vars(remapvars_t *rv, int64_t increment)
 
   /*  Reallocate arrays at new size */
 
-  rv->max_links += increment;
+  rv.max_links += increment;
 
-  if (rv->max_links)
+  if (rv.max_links)
     {
-      rv->src_cell_add = (size_t *) Realloc(rv->src_cell_add, rv->max_links * sizeof(size_t));
-      rv->tgt_cell_add = (size_t *) Realloc(rv->tgt_cell_add, rv->max_links * sizeof(size_t));
-
-      rv->wts = (double *) Realloc(rv->wts, rv->num_wts * rv->max_links * sizeof(double));
+      rv.src_cell_add.resize(rv.max_links);
+      rv.tgt_cell_add.resize(rv.max_links);
+      rv.wts.resize(rv.num_wts * rv.max_links);
     }
 
 } /* resize_remap_vars */
@@ -859,10 +850,8 @@ resize_remap_vars(remapvars_t *rv, int64_t increment)
   -----------------------------------------------------------------------
 */
 void
-remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_links, double *restrict map_wts,
-      size_t num_wts, const size_t *restrict dst_add, const size_t *restrict src_add, const double *restrict src_array,
-      const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3,
-      remaplink_t links, long links_per_value)
+remap(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array,
+      const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3)
 {
   /*
     Input arrays:
@@ -886,7 +875,14 @@ remap(double *restrict dst_array, double missval, size_t dst_size, size_t num_li
 
     double *dst_array    ! array for remapped field on destination grid
   */
-
+  size_t num_links = rv.num_links;
+  size_t num_wts = rv.num_wts;
+  const double *restrict map_wts = &rv.wts[0];
+  const size_t *restrict dst_add = &rv.tgt_cell_add[0];
+  const size_t *restrict src_add = &rv.src_cell_add[0];
+  remaplink_t links = rv.links;
+  long links_per_value = rv.links_per_value;
+  
   extern int timer_remap;
 
   // Check the order of the interpolation
@@ -1051,9 +1047,7 @@ binary_search_int(const size_t *array, size_t len, size_t value)
   -----------------------------------------------------------------------
 */
 void
-remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t num_links, double *restrict map_wts,
-          size_t num_wts, const size_t *restrict dst_add, const size_t *restrict src_add,
-          const double *restrict src_array)
+remap_laf(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array)
 {
   /*
     Input arrays:
@@ -1071,6 +1065,12 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t nu
 
     double *dst_array    ! array for remapped field on destination grid
   */
+  size_t num_links = rv.num_links;
+  size_t num_wts = rv.num_wts;
+  const double *restrict map_wts = &rv.wts[0];
+  const size_t *restrict dst_add = &rv.tgt_cell_add[0];
+  const size_t *restrict src_add = &rv.src_cell_add[0];
+
   arrayFill(dst_size, dst_array, missval);
 
   if (num_links == 0) return;
@@ -1185,9 +1185,7 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, size_t nu
   -----------------------------------------------------------------------
 */
 void
-remap_sum(double *restrict dst_array, double missval, size_t dst_size, size_t num_links, double *restrict map_wts,
-          size_t num_wts, const size_t *restrict dst_add, const size_t *restrict src_add,
-          const double *restrict src_array)
+remap_sum(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array)
 {
   /*
     Input arrays:
@@ -1204,6 +1202,11 @@ remap_sum(double *restrict dst_array, double missval, size_t dst_size, size_t nu
 
     double *dst_array    ! array for remapped field on destination grid
   */
+  size_t num_links = rv.num_links;
+  size_t num_wts = rv.num_wts;
+  const double *restrict map_wts = &rv.wts[0];
+  const size_t *restrict dst_add = &rv.tgt_cell_add[0];
+  const size_t *restrict src_add = &rv.src_cell_add[0];
 
   for (size_t n = 0; n < dst_size; ++n) dst_array[n] = missval;
 
@@ -1229,7 +1232,7 @@ remap_sum(double *restrict dst_array, double missval, size_t dst_size, size_t nu
 /*****************************************************************************/
 
 void
-remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv, const double *restrict array1,
+remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapVarsType &rv, const double *restrict array1,
            const double *restrict array2, double missval)
 {
   if (remap_order == 2)
@@ -1513,50 +1516,50 @@ remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict
 /*****************************************************************************/
 
 void
-reorder_links(remapvars_t *rv)
+reorder_links(remapVarsType &rv)
 {
   size_t j, nval = 0, num_blks = 0;
   size_t n;
 
-  size_t num_links = rv->num_links;
+  size_t num_links = rv.num_links;
 
   printf("reorder_links\n");
   printf("  num_links %zu\n", num_links);
-  rv->links.option = true;
+  rv.links.option = true;
 
   size_t lastval = -1;
   size_t max_links = 0;
   for (n = 0; n < num_links; n++)
     {
-      if (rv->tgt_cell_add[n] == lastval)
+      if (rv.tgt_cell_add[n] == lastval)
         nval++;
       else
         {
           if (nval > num_blks) num_blks = nval;
           nval = 1;
           max_links++;
-          lastval = rv->tgt_cell_add[n];
+          lastval = rv.tgt_cell_add[n];
         }
     }
 
   if (num_blks)
     {
-      rv->links.max_links = max_links;
-      rv->links.num_blks = num_blks;
+      rv.links.max_links = max_links;
+      rv.links.num_blks = num_blks;
 
-      printf("num_links %zu  max_links %zu  num_blks %zu\n", rv->num_links, max_links, num_blks);
+      printf("num_links %zu  max_links %zu  num_blks %zu\n", rv.num_links, max_links, num_blks);
 
-      rv->links.num_links = (size_t *) Malloc(num_blks * sizeof(size_t));
-      rv->links.dst_add = (size_t **) Malloc(num_blks * sizeof(size_t *));
-      rv->links.src_add = (size_t **) Malloc(num_blks * sizeof(size_t *));
-      rv->links.w_index = (size_t **) Malloc(num_blks * sizeof(size_t *));
+      rv.links.num_links = (size_t *) Malloc(num_blks * sizeof(size_t));
+      rv.links.dst_add = (size_t **) Malloc(num_blks * sizeof(size_t *));
+      rv.links.src_add = (size_t **) Malloc(num_blks * sizeof(size_t *));
+      rv.links.w_index = (size_t **) Malloc(num_blks * sizeof(size_t *));
     }
 
   for (j = 0; j < num_blks; j++)
     {
-      rv->links.dst_add[j] = (size_t *) Malloc(max_links * sizeof(size_t));
-      rv->links.src_add[j] = (size_t *) Malloc(max_links * sizeof(size_t));
-      rv->links.w_index[j] = (size_t *) Malloc(max_links * sizeof(size_t));
+      rv.links.dst_add[j] = (size_t *) Malloc(max_links * sizeof(size_t));
+      rv.links.src_add[j] = (size_t *) Malloc(max_links * sizeof(size_t));
+      rv.links.w_index[j] = (size_t *) Malloc(max_links * sizeof(size_t));
     }
 
   for (j = 0; j < num_blks; j++)
@@ -1567,24 +1570,24 @@ reorder_links(remapvars_t *rv)
 
       for (n = 0; n < num_links; n++)
         {
-          if (rv->tgt_cell_add[n] == lastval)
+          if (rv.tgt_cell_add[n] == lastval)
             nval++;
           else
             {
               nval = 1;
-              lastval = rv->tgt_cell_add[n];
+              lastval = rv.tgt_cell_add[n];
             }
 
           if (nval == j + 1)
             {
-              rv->links.dst_add[j][nlinks] = rv->tgt_cell_add[n];
-              rv->links.src_add[j][nlinks] = rv->src_cell_add[n];
-              rv->links.w_index[j][nlinks] = n;
+              rv.links.dst_add[j][nlinks] = rv.tgt_cell_add[n];
+              rv.links.src_add[j][nlinks] = rv.src_cell_add[n];
+              rv.links.w_index[j][nlinks] = n;
               nlinks++;
             }
         }
 
-      rv->links.num_links[j] = nlinks;
+      rv.links.num_links[j] = nlinks;
       printf("loop %zu  nlinks %zu\n", j + 1, nlinks);
     }
 }
@@ -1599,9 +1602,15 @@ remapCheckArea(size_t grid_size, double *restrict cell_area, const char *name)
 }
 
 void
-remapCheckWeights(size_t num_links, size_t num_wts, NormOpt normOpt, size_t *src_cell_add, size_t *tgt_cell_add,
-                  double *wts)
+remapCheckWeights(const remapVarsType &rv)
 {
+  auto num_links = rv.num_links;
+  auto num_wts = rv.num_wts;
+  auto normOpt = rv.normOpt;
+  auto src_cell_add = &rv.src_cell_add[0];
+  auto tgt_cell_add = &rv.tgt_cell_add[0];
+  auto wts = &rv.wts[0];
+
   for (size_t n = 0; n < num_links; ++n)
     {
       if (wts[n * num_wts] < -0.01)

@@ -47,8 +47,8 @@ void store_weightlinks(int lalloc, size_t num_weights, size_t *srch_add, double 
                        weightlinks_t *weightlinks);
 void store_weightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], size_t cell_add,
                         weightlinks4_t *weightlinks);
-void weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightlinks, remapvars_t *rv);
-void weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remapvars_t *rv);
+void weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightlinks, remapVarsType &rv);
+void weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remapVarsType &rv);
 void sort_add_and_wgts(size_t num_weights, size_t *src_add, double *wgts);
 void sort_add_and_wgts4(size_t num_weights, size_t *src_add, double wgts[4][4]);
 

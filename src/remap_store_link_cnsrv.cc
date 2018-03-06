@@ -101,7 +101,7 @@ grid_store_delete(grid_store_t *grid_store)
     address and weight arrays and resizes those arrays if necessary.
 */
 void
-store_link_cnsrv(remapvars_t *rv, long add1, long add2, long num_wts, double *weights, grid_store_t *grid_store)
+store_link_cnsrv(remapVarsType &rv, long add1, long add2, long num_wts, double *weights, grid_store_t *grid_store)
 {
   /*
     Input variables:
@@ -140,7 +140,7 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2, long num_wts, double *we
         {
           break;
         }
-      else if ((size_t) add1 == rv->src_cell_add[nlink])
+      else if ((size_t) add1 == rv.src_cell_add[nlink])
         {
           lstore_link = true;
           break;
@@ -150,7 +150,7 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2, long num_wts, double *we
 
   if (lstore_link)
     {
-      for (long i = 0; i < num_wts; ++i) rv->wts[num_wts * nlink + i] += weights[i];
+      for (long i = 0; i < num_wts; ++i) rv.wts[num_wts * nlink + i] += weights[i];
       return;
     }
 
@@ -159,7 +159,7 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2, long num_wts, double *we
      check to see if remap arrays need to be increased to accomodate
      the new link. Then store the link.
   */
-  nlink = rv->num_links;
+  nlink = rv.num_links;
 
   if (ilayer < grid_store->nlayers[iblk])
     {
@@ -179,13 +179,13 @@ store_link_cnsrv(remapvars_t *rv, long add1, long add2, long num_wts, double *we
       grid_store->nlayers[iblk]++;
     }
 
-  rv->num_links++;
-  if (rv->num_links >= rv->max_links) resize_remap_vars(rv, rv->resize_increment);
+  rv.num_links++;
+  if (rv.num_links >= rv.max_links) resize_remap_vars(rv, rv.resize_increment);
 
-  rv->src_cell_add[nlink] = add1;
-  rv->tgt_cell_add[nlink] = add2;
+  rv.src_cell_add[nlink] = add1;
+  rv.tgt_cell_add[nlink] = add2;
 
-  for (long i = 0; i < num_wts; ++i) rv->wts[num_wts * nlink + i] = weights[i];
+  for (long i = 0; i < num_wts; ++i) rv.wts[num_wts * nlink + i] = weights[i];
 
 } /* store_link_cnsrv */
 
