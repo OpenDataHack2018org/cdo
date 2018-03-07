@@ -22,22 +22,15 @@ static void
 calc_bin_addr(size_t gridsize, size_t nbins, const float *restrict bin_lats, const float *restrict cell_bound_box,
               size_t *restrict bin_addr)
 {
-  size_t n2;
-
   for (size_t n = 0; n < nbins; ++n)
     {
-      n2 = n << 1;
-      bin_addr[n2] = gridsize;
-      bin_addr[n2 + 1] = 0;
+      bin_addr[n*2] = gridsize;
+      bin_addr[n*2 + 1] = 0;
     }
-  /*
-#ifdef  _OPENMP
-#pragma omp parallel for default(none) \
-  private(n2)  shared(gridsize, nbins, bin_lats, bin_addr, cell_bound_box)
-#endif
-  */
+
   for (size_t nele = 0; nele < gridsize; ++nele)
     {
+      size_t n2;
       size_t nele4 = nele << 2;
       float cell_bound_box_lat1 = cell_bound_box[nele4];
       float cell_bound_box_lat2 = cell_bound_box[nele4 + 1];
@@ -46,15 +39,8 @@ calc_bin_addr(size_t gridsize, size_t nbins, const float *restrict bin_lats, con
           n2 = n << 1;
           if (cell_bound_box_lat1 <= bin_lats[n2 + 1] && cell_bound_box_lat2 >= bin_lats[n2])
             {
-              /*
-#ifdef  _OPENMP
-#pragma omp critical
-#endif
-              */
-              {
-                bin_addr[n2] = MIN(nele, bin_addr[n2]);
-                bin_addr[n2 + 1] = MAX(nele, bin_addr[n2 + 1]);
-              }
+              bin_addr[n2] = MIN(nele, bin_addr[n2]);
+              bin_addr[n2 + 1] = MAX(nele, bin_addr[n2 + 1]);
             }
         }
     }
@@ -80,12 +66,12 @@ calc_lat_bins(remapGridType *src_grid, remapGridType *tgt_grid, RemapType mapTyp
           bin_lats[n2 + 1] = (n + 1) * dlat - PIH;
         }
 
-      src_grid->bin_addr = (size_t *) Realloc(src_grid->bin_addr, 2 * nbins * sizeof(size_t));
+      src_grid->bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
       calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
 
       if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
         {
-          tgt_grid->bin_addr = (size_t *) Realloc(tgt_grid->bin_addr, 2 * nbins * sizeof(size_t));
+          tgt_grid->bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
           calc_bin_addr(tgt_grid->size, nbins, bin_lats, tgt_grid->cell_bound_box, tgt_grid->bin_addr);
 
           Free(src_grid->bin_lats);
@@ -239,7 +225,7 @@ grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double 
   return search_result;
 }
 
-unsigned
+static unsigned
 quad_cross_products(double plon, double plat, double lons[4], double lats[4])
 {
   unsigned n;

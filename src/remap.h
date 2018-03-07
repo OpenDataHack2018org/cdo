@@ -58,41 +58,41 @@ struct remapGridType
 {
   int gridID;
   int remap_grid_type;
-  int rank;                /* rank of the grid */
-  size_t size;             /* total points on the grid */
-  size_t num_cell_corners; /* number of corners for each grid cell */
+  int rank;                 // rank of the grid
+  size_t size;              // total points on the grid
+  size_t num_cell_corners;  // number of corners for each grid cell
 
   bool lneed_cell_corners;
-  bool luse_cell_corners; /* use corners for bounding boxes  */
+  bool luse_cell_corners;   // use corners for bounding boxes
 
   bool lextrapolate;
   bool non_global;
   bool is_cyclic;
 
-  size_t dims[2]; /* size of grid dimension */
+  size_t dims[2];           // size of grid dimension
 
-  int nvgp;  /* size of vgpm           */
-  int *vgpm; /* flag which cells are valid   */
+  int nvgp;                 // size of vgpm
+  int *vgpm;                // flag which cells are valid
 
-  int *mask; /* flag which cells participate */
+  int *mask;                // flag which cells participate
 
-  double *reg2d_center_lon; /* reg2d lon/lat coordinates for */
-  double *reg2d_center_lat; /* each grid center in radians   */
-  double *reg2d_corner_lon; /* reg2d lon/lat coordinates for */
-  double *reg2d_corner_lat; /* each grid corner in radians   */
+  double *reg2d_center_lon; // reg2d lon/lat coordinates for
+  double *reg2d_center_lat; // each grid center in radians
+  double *reg2d_corner_lon; // reg2d lon/lat coordinates for
+  double *reg2d_corner_lat; // each grid corner in radians
 
-  double *cell_center_lon; /* lon/lat coordinates for       */
-  double *cell_center_lat; /* each grid center in radians   */
-  double *cell_corner_lon; /* lon/lat coordinates for       */
-  double *cell_corner_lat; /* each grid corner in radians   */
+  double *cell_center_lon;  // lon/lat coordinates for
+  double *cell_center_lat;  // each grid center in radians
+  double *cell_corner_lon;  // lon/lat coordinates for
+  double *cell_corner_lat;  // each grid corner in radians
 
-  double *cell_area; /* tot area of each grid cell    */
-  double *cell_frac; /* fractional area of grid cells participating in remapping */
+  double *cell_area;        // tot area of each grid cell
+  double *cell_frac;        // fractional area of grid cells participating in remapping
 
-  float *cell_bound_box; /* lon/lat bounding box for use    */
-  int num_srch_bins;       /* num of bins for restricted srch */
-  size_t *bin_addr;        /* min,max adds for grid cells in this lat bin  */
-  float *bin_lats;       /* min,max latitude for each search bin   */
+  int num_srch_bins;        // num of bins for restricted srch
+  size_t *bin_addr;         // min,max adds for grid cells in this lat bin
+  float *bin_lats;          // min,max latitude for each search bin
+  float *cell_bound_box;    // lon/lat bounding box for use
 };
 
 
