@@ -1023,7 +1023,7 @@ line_integral(double *weights, double in_phi1, double in_phi2, double theta1, do
 } /* line_integral */
 
 static void
-correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv, double *src_centroid_lat,
+correct_pole(remapGridType *src_grid, remapGridType *tgt_grid, remapVarsType &rv, double *src_centroid_lat,
              double *src_centroid_lon, double *tgt_centroid_lat, double *tgt_centroid_lon, grid_store_t *grid_store)
 {
   /*
@@ -1153,7 +1153,7 @@ norm_weight(double norm_factor, double *weights, double src_centroid_lat, double
 }
 
 static void
-normalize_weights(remapgrid_t *tgt_grid, remapVarsType &rv, double *src_centroid_lat, double *src_centroid_lon)
+normalize_weights(remapGridType *tgt_grid, remapVarsType &rv, double *src_centroid_lat, double *src_centroid_lon)
 {
   /* Include centroids in weights and normalize using destination area if requested */
   long num_links = rv.num_links;
@@ -1217,7 +1217,7 @@ normalize_weights(remapgrid_t *tgt_grid, remapVarsType &rv, double *src_centroid
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv)
+scrip_remap_conserv_weights(remapGridType *src_grid, remapGridType *tgt_grid, remapVarsType &rv)
 {
   /* local variables */
 

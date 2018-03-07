@@ -143,7 +143,7 @@ maptype2operfunc(RemapType mapType, SubmapType submapType, int numNeighbors, int
 }
 
 static void
-print_remap_info(int operfunc, bool remap_genweights, remapgrid_t *src_grid, remapgrid_t *tgt_grid, size_t nmiss)
+print_remap_info(int operfunc, bool remap_genweights, remapGridType *src_grid, remapGridType *tgt_grid, size_t nmiss)
 {
   char line[256], tmpstr[256];
 
@@ -198,7 +198,7 @@ print_remap_info(int operfunc, bool remap_genweights, remapgrid_t *src_grid, rem
 }
 
 static void
-print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_grid, size_t nmiss)
+print_remap_warning(const char *remap_file, int operfunc, remapGridType *src_grid, size_t nmiss)
 {
   char line[256];
   char tmpstr[256];
@@ -590,7 +590,7 @@ get_normOpt(void)
 }
 
 static void
-remap_normalize(NormOpt normOpt, size_t gridsize, double *array, double missval, remapgrid_t *tgt_grid)
+remap_normalize(NormOpt normOpt, size_t gridsize, double *array, double missval, remapGridType *tgt_grid)
 {
   // used only to check the result of remapcon
 
@@ -625,7 +625,7 @@ remap_normalize(NormOpt normOpt, size_t gridsize, double *array, double missval,
 }
 
 static void
-remap_set_frac_min(size_t gridsize, double *array, double missval, remapgrid_t *tgt_grid)
+remap_set_frac_min(size_t gridsize, double *array, double missval, remapGridType *tgt_grid)
 {
   if (remap_frac_min > 0)
     {
@@ -765,7 +765,7 @@ remapGenNumBins(int ysize)
 }
 
 static void
-remapSum(remapgrid_t *remapGrid, size_t gridsize, double *array, const char *tag)
+remapSum(remapGridType *remapGrid, size_t gridsize, double *array, const char *tag)
 {
   for (size_t i = 0; i < gridsize; i++)
     printf("1 %zd %g %g %g %g\n", i, array[i], remapGrid->cell_frac[i], remapGrid->cell_area[i],

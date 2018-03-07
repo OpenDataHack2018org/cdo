@@ -31,8 +31,8 @@
 #include "remap.h"
 #include "commandline.h"
 
-void remapgrid_init(remapgrid_t *grid);
-void remapgrid_alloc(RemapType mapType, remapgrid_t *grid);
+void remapgrid_init(remapGridType *grid);
+void remapgrid_alloc(RemapType mapType, remapGridType *grid);
 
 #ifdef HAVE_LIBNETCDF
 static void
@@ -81,7 +81,7 @@ read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
 
 void
 write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remap_order,
-                  remapgrid_t src_grid, remapgrid_t tgt_grid, remapVarsType &rv)
+                  remapGridType src_grid, remapGridType tgt_grid, remapVarsType &rv)
 {
 // Writes remap data to a NetCDF file using SCRIP conventions
 /*
@@ -450,7 +450,7 @@ write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapT
 
 void
 read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
-                 int *numNeighbors, int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsType &rv)
+                 int *numNeighbors, int *remap_order, remapGridType *src_grid, remapGridType *tgt_grid, remapVarsType &rv)
 {
 // The routine reads a NetCDF file to extract remapping info in SCRIP format
 /*

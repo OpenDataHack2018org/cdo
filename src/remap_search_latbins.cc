@@ -61,7 +61,7 @@ calc_bin_addr(size_t gridsize, size_t nbins, const float *restrict bin_lats, con
 }
 
 void
-calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, RemapType mapType)
+calc_lat_bins(remapGridType *src_grid, remapGridType *tgt_grid, RemapType mapType)
 {
   size_t n2;
   size_t nbins = src_grid->num_srch_bins;
@@ -347,7 +347,7 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
 }
 
 int
-grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+grid_search(remapGridType *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
             double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
             const double *restrict src_center_lon, const float *restrict src_grid_bound_box,
             const size_t *restrict src_bin_add)
