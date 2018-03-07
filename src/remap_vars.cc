@@ -394,38 +394,21 @@ remap_sum(double *restrict dst_array, double missval, size_t dst_size, const rem
     }
 }
 
-/*
-    This routine initializes some variables and provides an initial
-    allocation of arrays (fairly large so frequent resizing unnecessary).
-*/
 void
 remapVarsInit(RemapType mapType, remapVarsType &rv)
 {
-  /* Initialize all pointer */
+  // Initialize all pointer
   if (rv.pinit == false) rv.pinit = true;
 
-  /* Determine the number of weights */
-
-  if (mapType == RemapType::CONSERV)
-    rv.num_wts = 3;
-  else if (mapType == RemapType::CONSERV_YAC)
-    rv.num_wts = 1;
-  else if (mapType == RemapType::BILINEAR)
-    rv.num_wts = 1;
-  else if (mapType == RemapType::BICUBIC)
-    rv.num_wts = 4;
-  else if (mapType == RemapType::DISTWGT)
-    rv.num_wts = 1;
-  else
-    cdoAbort("Unknown mapping method!");
+  // Determine the number of weights
+  rv.num_wts = (mapType == RemapType::CONSERV) ? 3 : ((mapType == RemapType::BICUBIC) ? 4 : 1);
 
   rv.sort_add = (mapType == RemapType::CONSERV);
-
-  rv.links_per_value = -1;
 
   rv.num_links = 0;
   rv.max_links = 0;
   rv.resize_increment = 1024;
+  rv.links_per_value = -1;
 
   rv.links.option = false;
   rv.links.max_links = 0;
@@ -434,15 +417,14 @@ remapVarsInit(RemapType mapType, remapVarsType &rv)
   rv.links.src_add = NULL;
   rv.links.dst_add = NULL;
   rv.links.w_index = NULL;
-
-} /* remapVarsInit */
+}
 
 void
 remapVarsEnsureSize(remapVarsType &rv, size_t size)
 {
   if ( size >= rv.max_links )
     {
-      rv.max_links += rv.resize_increment;
+      while (size >= rv.max_links) rv.max_links += rv.resize_increment;
 
       rv.src_cell_add.resize(rv.max_links);
       rv.tgt_cell_add.resize(rv.max_links);

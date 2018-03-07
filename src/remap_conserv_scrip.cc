@@ -1696,6 +1696,8 @@ scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapV
   grid_store_delete(grid_store);
   Free(grid_store);
 
+  if (rv.num_links != rv.max_links) remapVarsResize(rv, rv.num_links);
+  
   /* Finish centroid computation */
 
   for (long n = 0; n < src_grid_size; ++n)
