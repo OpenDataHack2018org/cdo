@@ -801,7 +801,7 @@ remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
     remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
 
   if (mapType == RemapType::CONSERV && remap->vars.num_links != remap->vars.max_links)
-    remapVarsResize(remap->vars, remap->vars.num_links - remap->vars.max_links);
+    remapVarsResize(remap->vars, remap->vars.num_links);
 
   if (remap->vars.sort_add) sort_remap_add(remap->vars);
   if (remap->vars.links_per_value == -1) links_per_value(remap->vars);
@@ -1142,9 +1142,7 @@ Remap(void *argument)
                   arrayFill(remaps[r].tgt_grid.size, remaps[r].tgt_grid.cell_frac, 0.0);
 
                   // initialize some remapping variables
-                  if (cdoTimer) timer_start(timer_remap_init);
-                  remapVarsInit(mapType, remaps[r].src_grid.size, remaps[r].tgt_grid.size, remaps[r].vars);
-                  if (cdoTimer) timer_stop(timer_remap_init);
+                  remapVarsInit(mapType, remaps[r].vars);
 
                   print_remap_info(operfunc, remap_genweights, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
 

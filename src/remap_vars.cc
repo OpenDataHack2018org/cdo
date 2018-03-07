@@ -399,7 +399,7 @@ remap_sum(double *restrict dst_array, double missval, size_t dst_size, const rem
     allocation of arrays (fairly large so frequent resizing unnecessary).
 */
 void
-remapVarsInit(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, remapVarsType &rv)
+remapVarsInit(RemapType mapType, remapVarsType &rv)
 {
   /* Initialize all pointer */
   if (rv.pinit == false) rv.pinit = true;
@@ -423,24 +423,9 @@ remapVarsInit(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, rem
 
   rv.links_per_value = -1;
 
-  /*
-   Initialize num_links and set max_links to four times the largest
-   of the destination grid sizes initially (can be changed later).
-   Set a default resize increment to increase the size of link
-   arrays if the number of links exceeds the initial size
- */
   rv.num_links = 0;
-  rv.max_links = 4 * tgt_grid_size;
-
-  rv.resize_increment = (size_t)(0.1 * MAX(src_grid_size, tgt_grid_size));
-
-  /*  Allocate address and weight arrays for mapping 1 */
-  if (mapType == RemapType::CONSERV)
-    {
-      rv.src_cell_add.resize(rv.max_links);
-      rv.tgt_cell_add.resize(rv.max_links);
-      rv.wts.resize(rv.num_wts * rv.max_links);
-    }
+  rv.max_links = 0;
+  rv.resize_increment = 1024;
 
   rv.links.option = false;
   rv.links.max_links = 0;
@@ -452,29 +437,28 @@ remapVarsInit(RemapType mapType, size_t src_grid_size, size_t tgt_grid_size, rem
 
 } /* remapVarsInit */
 
-/*
-   This routine resizes remapping arrays by increasing(decreasing) the max_links by increment
-*/
 void
-remapVarsResize(remapVarsType &rv, int64_t increment)
+remapVarsEnsureSize(remapVarsType &rv, size_t size)
 {
-  /*
-    Input variables:
-    int  increment  ! the number of links to add(subtract) to arrays
-  */
-
-  /*  Reallocate arrays at new size */
-
-  rv.max_links += increment;
-
-  if (rv.max_links)
+  if ( size >= rv.max_links )
     {
+      rv.max_links += rv.resize_increment;
+
       rv.src_cell_add.resize(rv.max_links);
       rv.tgt_cell_add.resize(rv.max_links);
       rv.wts.resize(rv.num_wts * rv.max_links);
     }
+}
 
-} /* remapVarsResize */
+void
+remapVarsResize(remapVarsType &rv, size_t size)
+{
+  rv.max_links = size;
+
+  rv.src_cell_add.resize(rv.max_links);
+  rv.tgt_cell_add.resize(rv.max_links);
+  rv.wts.resize(rv.num_wts * rv.max_links);
+}
 
 void
 remapVarsReorder(remapVarsType &rv)

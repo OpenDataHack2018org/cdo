@@ -91,7 +91,7 @@ yar_store_link_cnsrv(remapVarsType &rv, long add1, long add2, double weight)
   nlink = rv.num_links;
 
   rv.num_links++;
-  if (rv.num_links >= rv.max_links) remapVarsResize(rv, rv.resize_increment);
+  remapVarsEnsureSize(rv, rv.num_links);
 
   rv.src_cell_add[nlink] = add1;
   rv.tgt_cell_add[nlink] = add2;
@@ -130,7 +130,7 @@ store_link_bilin(remapVarsType &rv, int dst_add, int src_add[4], double weights[
   */
   rv.num_links += 4;
 
-  if (rv.num_links >= rv.max_links) remapVarsResize(rv, rv.resize_increment);
+  remapVarsEnsureSize(rv, rv.num_links);
 
   for (long n = 0; n < 4; ++n)
     {
@@ -160,7 +160,7 @@ yar_remap_bil(field_type *field1, field_type *field2)
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
   remap_grids_init(RemapType::BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remapVarsInit(RemapType::BILINEAR, remap.src_grid.size, remap.tgt_grid.size, remap.vars);
+  remapVarsInit(RemapType::BILINEAR, remap.vars);
   if (cdoTimer) timer_stop(timer_yar_remap_init);
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
@@ -399,7 +399,7 @@ yar_remap_con(field_type *field1, field_type *field2)
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
   remap_grids_init(RemapType::CONSERV, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
-  remapVarsInit(RemapType::CONSERV, remap.src_grid.size, remap.tgt_grid.size, remap.vars);
+  remapVarsInit(RemapType::CONSERV, remap.vars);
   if (cdoTimer) timer_stop(timer_yar_remap_init);
 
   if (cdoTimer) timer_start(timer_yar_remap_init);
