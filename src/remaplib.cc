@@ -196,7 +196,7 @@ remapgrid_alloc(RemapType mapType, remapgrid_t *grid)
 /*****************************************************************************/
 static void
 boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon, const double *restrict corner_lat,
-                      restr_t *restrict bound_box)
+                      float *restrict bound_box)
 {
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(bound_box, corner_lat, corner_lon, nc, size)
@@ -205,16 +205,16 @@ boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon,
     {
       size_t i4 = i << 2;  // *4
       size_t inc = i * nc;
-      restr_t clat = RESTR_SCALE(corner_lat[inc]);
-      restr_t clon = RESTR_SCALE(corner_lon[inc]);
+      float clat = corner_lat[inc];
+      float clon = corner_lon[inc];
       bound_box[i4] = clat;
       bound_box[i4 + 1] = clat;
       bound_box[i4 + 2] = clon;
       bound_box[i4 + 3] = clon;
       for (size_t j = 1; j < nc; ++j)
         {
-          clat = RESTR_SCALE(corner_lat[inc + j]);
-          clon = RESTR_SCALE(corner_lon[inc + j]);
+          clat = corner_lat[inc + j];
+          clon = corner_lon[inc + j];
           if (clat < bound_box[i4]) bound_box[i4] = clat;
           if (clat > bound_box[i4 + 1]) bound_box[i4 + 1] = clat;
           if (clon < bound_box[i4 + 2]) bound_box[i4 + 2] = clon;
@@ -225,10 +225,10 @@ boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon,
 
 static void
 boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const double *restrict center_lon,
-                     const double *restrict center_lat, restr_t *restrict bound_box)
+                     const double *restrict center_lat, float *restrict bound_box)
 {
   size_t idx[4];
-  restr_t tmp_lats[4], tmp_lons[4];
+  float tmp_lats[4], tmp_lons[4];
 
 #ifdef _OPENMP
 #pragma omp parallel for default(none) shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, \
@@ -253,8 +253,8 @@ boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const 
 
       /* Find N,S and NE lat/lon coords and check bounding box */
 
-      for (unsigned j = 0; j < 4; ++j) tmp_lons[j] = RESTR_SCALE(center_lon[idx[j]]);
-      for (unsigned j = 0; j < 4; ++j) tmp_lats[j] = RESTR_SCALE(center_lat[idx[j]]);
+      for (unsigned j = 0; j < 4; ++j) tmp_lons[j] = center_lon[idx[j]];
+      for (unsigned j = 0; j < 4; ++j) tmp_lats[j] = center_lat[idx[j]];
 
       bound_box[n4] = tmp_lats[0];
       bound_box[n4 + 1] = tmp_lats[0];
@@ -325,7 +325,7 @@ check_lat_range(size_t nlats, double *lats)
 }
 
 static void
-check_lon_boundbox_range(size_t nlons, restr_t *bound_box)
+check_lon_boundbox_range(size_t nlons, float *bound_box)
 {
   size_t n4;
 
@@ -337,16 +337,16 @@ check_lon_boundbox_range(size_t nlons, restr_t *bound_box)
   for (size_t n = 0; n < nlons; ++n)
     {
       n4 = n << 2;
-      if (RESTR_ABS(bound_box[n4 + 3] - bound_box[n4 + 2]) > RESTR_SCALE(PI))
+      if (fabsf(bound_box[n4 + 3] - bound_box[n4 + 2]) > PI_f)
         {
-          bound_box[n4 + 2] = RESTR_SCALE(0.);
-          bound_box[n4 + 3] = RESTR_SCALE(PI2);
+          bound_box[n4 + 2] = 0.0f;
+          bound_box[n4 + 3] = PI2_f;
         }
     }
 }
 
 static void
-check_lat_boundbox_range(size_t nlats, restr_t *restrict bound_box, double *restrict lats)
+check_lat_boundbox_range(size_t nlats, float *restrict bound_box, double *restrict lats)
 {
   size_t n4;
 
@@ -358,8 +358,8 @@ check_lat_boundbox_range(size_t nlats, restr_t *restrict bound_box, double *rest
   for (size_t n = 0; n < nlats; ++n)
     {
       n4 = n << 2;
-      if (RESTR_SCALE(lats[n]) < bound_box[n4]) bound_box[n4] = RESTR_SCALE(-PIH);
-      if (RESTR_SCALE(lats[n]) > bound_box[n4 + 1]) bound_box[n4 + 1] = RESTR_SCALE(PIH);
+      if ((float)lats[n] < bound_box[n4]) bound_box[n4] = -PIH_f;
+      if ((float)lats[n] > bound_box[n4 + 1]) bound_box[n4 + 1] = PIH_f;
     }
 }
 
@@ -555,7 +555,7 @@ static void
 cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 {
   if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid->luse_cell_corners)
-    grid->cell_bound_box = (restr_t *) Malloc(4 * grid->size * sizeof(restr_t));
+    grid->cell_bound_box = (float *) Malloc(4 * grid->size * sizeof(float));
 
   if (grid->luse_cell_corners)
     {
@@ -565,7 +565,7 @@ cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
           boundbox_from_corners(grid->size, grid->num_cell_corners, grid->cell_corner_lon, grid->cell_corner_lat,
                                 grid->cell_bound_box);
         }
-      else /* full grid search */
+      else // full grid search
         {
           if (cdoVerbose) cdoPrint("Grid: bounds missing -> full grid search!");
 
@@ -574,10 +574,10 @@ cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
           for (size_t i = 0; i < gridsize; ++i)
             {
               i4 = i << 2;
-              grid->cell_bound_box[i4] = RESTR_SCALE(-PIH);
-              grid->cell_bound_box[i4 + 1] = RESTR_SCALE(PIH);
-              grid->cell_bound_box[i4 + 2] = RESTR_SCALE(0.);
-              grid->cell_bound_box[i4 + 3] = RESTR_SCALE(PI2);
+              grid->cell_bound_box[i4] = -PIH_f;
+              grid->cell_bound_box[i4 + 1] = PIH_f;
+              grid->cell_bound_box[i4 + 2] = 0.0f;
+              grid->cell_bound_box[i4 + 3] = PI2_f;
             }
         }
     }
@@ -703,8 +703,7 @@ remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapgrid_t 
     {
       cell_bounding_boxes(src_grid, REMAP_GRID_BASIS_SRC);
       cell_bounding_boxes(tgt_grid, REMAP_GRID_BASIS_TGT);
-      // Set up and assign address ranges to search bins in order to further
-      // restrict later searches
+      // Set up and assign address ranges to search bins in order to further restrict later searches
       calc_lat_bins(src_grid, tgt_grid, mapType);
     }
 

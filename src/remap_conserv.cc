@@ -269,14 +269,14 @@ boundbox_from_corners1(size_t ic, size_t nc, const double *restrict corner_lon, 
       if (clon > bound_box[3]) bound_box[3] = clon;
     }
 
-  if (fabs(bound_box[3] - bound_box[2]) > PI)
+  if (fabsf(bound_box[3] - bound_box[2]) > PI)
     {
       bound_box[2] = 0;
       bound_box[3] = PI2;
     }
 
   /*
-  double dlon = fabs(bound_box[3] - bound_box[2]);
+  double dlon = fabsf(bound_box[3] - bound_box[2]);
 
   if ( dlon > PI )
     {
@@ -297,12 +297,12 @@ boundbox_from_corners1(size_t ic, size_t nc, const double *restrict corner_lon, 
 
 static void
 boundbox_from_corners1r(size_t ic, size_t nc, const double *restrict corner_lon, const double *restrict corner_lat,
-                        restr_t *restrict bound_box)
+                        float *restrict bound_box)
 {
   size_t inc = ic * nc;
 
-  restr_t clat = RESTR_SCALE(corner_lat[inc]);
-  restr_t clon = RESTR_SCALE(corner_lon[inc]);
+  float clat = corner_lat[inc];
+  float clon = corner_lon[inc];
 
   bound_box[0] = clat;
   bound_box[1] = clat;
@@ -311,8 +311,8 @@ boundbox_from_corners1r(size_t ic, size_t nc, const double *restrict corner_lon,
 
   for (size_t j = 1; j < nc; ++j)
     {
-      clat = RESTR_SCALE(corner_lat[inc + j]);
-      clon = RESTR_SCALE(corner_lon[inc + j]);
+      clat = corner_lat[inc + j];
+      clon = corner_lon[inc + j];
 
       if (clat < bound_box[0]) bound_box[0] = clat;
       if (clat > bound_box[1]) bound_box[1] = clat;
@@ -320,19 +320,19 @@ boundbox_from_corners1r(size_t ic, size_t nc, const double *restrict corner_lon,
       if (clon > bound_box[3]) bound_box[3] = clon;
     }
 
-  if (RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI))
+  if (fabsf(bound_box[3] - bound_box[2]) > PI_f)
     {
       bound_box[2] = 0;
-      bound_box[3] = RESTR_SCALE(PI2);
+      bound_box[3] = PI2_f;
     }
   /*
-  if ( RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
+  if ( fabsf(bound_box[3] - bound_box[2]) > PI_f )
     {
-      if ( bound_box[3] > bound_box[2] && (bound_box[3]-RESTR_SCALE(PI2)) <
-  RESTR_SCALE(0.) )
+      if ( bound_box[3] > bound_box[2] && (bound_box[3]-PI2_f) <
+  0.0f )
         {
-          restr_t tmp = bound_box[2];
-          bound_box[2] = bound_box[3] - RESTR_SCALE(PI2);
+          float tmp = bound_box[2];
+          bound_box[2] = bound_box[3] - PI2_f;
           bound_box[3] = tmp;
         }
     }
@@ -833,7 +833,7 @@ remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapVarsTyp
         }
       else
         {
-          restr_t tgt_cell_bound_box_r[4];
+          float tgt_cell_bound_box_r[4];
           boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon,
                                   tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
 

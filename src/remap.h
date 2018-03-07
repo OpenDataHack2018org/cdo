@@ -25,9 +25,12 @@
 #define M_PI 3.14159265358979323846264338327950288 /* pi */
 #endif
 
-#define PI M_PI
-#define PI2 (2.0 * PI)
-#define PIH (0.5 * PI)
+constexpr double PI = M_PI;
+constexpr double PI2 = (2.0 * PI);
+constexpr double PIH = (0.5 * PI);
+constexpr float  PI_f = PI;
+constexpr float  PI2_f = PI2;
+constexpr float  PIH_f = PIH;
 
 #define ZERO 0.0
 #define ONE 1.0
@@ -44,26 +47,6 @@
 
 #define REMAP_GRID_BASIS_SRC 1
 #define REMAP_GRID_BASIS_TGT 2
-
-#define RESTR_TYPE int /* restrict data types: 0 -> double, float; 1 -> int */
-
-typedef RESTR_TYPE restr_t;
-/* short
-#  define RESTR_SFAC     4000
-#  define RESTR_SCALE(x) ((short) (0.5+RESTR_SFAC*(x)))
-#  define RESTR_ABS(x)   abs(x)
-*/
-/* int */
-#define RESTR_SFAC 100000000
-#define RESTR_SCALE(x) ((int) (0.5 + RESTR_SFAC * (x)))
-#define RESTR_ABS(x) abs(x)
-/*
-#  define RESTR_SFAC     1.
-#  define RESTR_SCALE(x) (x)
-#  define RESTR_ABS(x)   fabs(x)
-*/
-
-#define TINY_FRAC 1.e-10
 
 enum struct SubmapType
 {
@@ -107,10 +90,10 @@ typedef struct
   double *cell_area; /* tot area of each grid cell    */
   double *cell_frac; /* fractional area of grid cells participating in remapping */
 
-  restr_t *cell_bound_box; /* lon/lat bounding box for use    */
+  float *cell_bound_box; /* lon/lat bounding box for use    */
   int num_srch_bins;       /* num of bins for restricted srch */
   size_t *bin_addr;        /* min,max adds for grid cells in this lat bin  */
-  restr_t *bin_lats;       /* min,max latitude for each search bin   */
+  float *bin_lats;       /* min,max latitude for each search bin   */
 } remapgrid_t;
 
 
@@ -169,7 +152,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapTy
 
 void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, RemapType mapType);
 size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2,
-                      restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, size_t src_grid_size, size_t *srch_add);
+                      float *tgt_cell_bound_box, float *src_cell_bound_box, size_t src_grid_size, size_t *srch_add);
 
 int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat,
                          double plon, const double *restrict src_center_lat, const double *restrict src_center_lon);
@@ -184,7 +167,7 @@ bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, siz
 
 int grid_search(remapgrid_t *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
                 double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
-                const double *restrict src_center_lon, const restr_t *restrict src_grid_bound_box,
+                const double *restrict src_center_lon, const float *restrict src_grid_bound_box,
                 const size_t *restrict src_bin_add);
 
 bool find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig,
