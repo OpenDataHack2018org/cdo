@@ -27,8 +27,8 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *res
   double coslon_dst = cos(plon);
   double sinlon_dst = sin(plon);
 
-  double dist_min = BIGNUM;
-  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = BIGNUM;
+  double dist_min = DBL_MAX;
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = DBL_MAX;
 
   size_t jjf = 0, jjl = ny - 1;
   if (plon >= src_center_lon[0] && plon <= src_center_lon[nx - 1])

@@ -201,8 +201,9 @@ grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double 
   double coslon_dst = cos(plon);
   double sinlon_dst = sin(plon);
 
-  double dist_min = BIGNUM;
-  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = BIGNUM;
+  double dist_min = DBL_MAX;
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = DBL_MAX;
+
   for (size_t srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
       distance = acos(coslat_dst * cos(src_center_lat[srch_add])
