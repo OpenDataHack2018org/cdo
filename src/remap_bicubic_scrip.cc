@@ -53,10 +53,9 @@ set_bicubic_weights(double iw, double jw, double wgts[4][4])
 unsigned num_src_points(const int *restrict mask, const size_t src_add[4], double src_lats[4]);
 
 static void
-renormalize_weights(const double src_lats[4], double wgts[4][4])
+renormalizeWeights(const double src_lats[4], double wgts[4][4])
 {
-  double sum_wgts = 0.0; /* sum of weights for normalization */
-  /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
+  double sum_wgts = 0.0; // sum of weights for normalization
   for (unsigned n = 0; n < 4; ++n) sum_wgts += fabs(src_lats[n]);
   for (unsigned n = 0; n < 4; ++n) wgts[n][0] = fabs(src_lats[n]) / sum_wgts;
   for (unsigned n = 0; n < 4; ++n) wgts[n][1] = 0.;
@@ -112,18 +111,18 @@ scrip_remap_bicubic_weights(remapGridType *src_grid, remapGridType *tgt_grid, re
 
   progressInit();
 
-  /* Compute mappings from source to target grid */
+  // Compute mappings from source to target grid
 
-  if (src_grid->rank != 2) cdoAbort("Can not do bicubic interpolation when source grid rank != 2");
+  if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  weightlinks4_t *weightlinks = (weightlinks4_t *) Malloc(tgt_grid_size * sizeof(weightlinks4_t));
+  std::vector<weightlinks4_t> weightlinks(tgt_grid_size);
   weightlinks[0].addweights = (addweight4_t *) Malloc(4 * tgt_grid_size * sizeof(addweight4_t));
   for (unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4 * tgt_cell_add;
 
-  /* Loop over destination grid */
+  // Loop over destination grid
 
   double findex = 0;
 
@@ -148,7 +147,7 @@ scrip_remap_bicubic_weights(remapGridType *src_grid, remapGridType *tgt_grid, re
       double src_lons[4];  //  longitudes of four bilinear corners
       double wgts[4][4];   //  bicubic weights for four corners
 
-      /* Find nearest square of grid points on source grid  */
+      // Find nearest square of grid points on source grid
       int search_result;
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
         search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
@@ -158,30 +157,28 @@ scrip_remap_bicubic_weights(remapGridType *src_grid, remapGridType *tgt_grid, re
             = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
                           src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
 
-      /* Check to see if points are land points */
+      // Check to see if points are land points
       if (search_result > 0)
         {
           for (unsigned n = 0; n < 4; ++n)
             if (!src_grid->mask[src_add[n]]) search_result = 0;
         }
 
-      /* If point found, find local iw,jw coordinates for weights  */
+      // If point found, find local iw,jw coordinates for weights
       if (search_result > 0)
         {
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
-          double iw, jw; /*  current guess for bilinear coordinate  */
+          double iw, jw; // current guess for bilinear coordinate
           if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
-              /* Successfully found iw,jw - compute weights */
+              // Successfully found iw,jw - compute weights
               set_bicubic_weights(iw, jw, wgts);
-
-              store_weightlinks4(4, src_add, wgts, tgt_cell_add, weightlinks);
+              store_weightlinks4(4, src_add, wgts, tgt_cell_add, &weightlinks[0]);
             }
           else
             {
               bicubic_warning();
-
               search_result = -1;
             }
         }
@@ -194,20 +191,16 @@ scrip_remap_bicubic_weights(remapGridType *src_grid, remapGridType *tgt_grid, re
         {
           if (num_src_points(src_grid->mask, src_add, src_lats) > 0)
             {
-              renormalize_weights(src_lats, wgts);
-
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
-
-              store_weightlinks4(4, src_add, wgts, tgt_cell_add, weightlinks);
+              renormalizeWeights(src_lats, wgts);
+              store_weightlinks4(4, src_add, wgts, tgt_cell_add, &weightlinks[0]);
             }
         }
     }
 
   if (cdoTimer) timer_stop(timer_remap_bic);
 
-  weightlinks2remaplinks4(tgt_grid_size, weightlinks, rv);
-
-  if (weightlinks) Free(weightlinks);
+  weightlinks2remaplinks4(tgt_grid_size, &weightlinks[0], rv);
 
 } /* scrip_remap_weights_bicubic */
 
@@ -318,14 +311,14 @@ scrip_remap_bicubic(remapGridType *src_grid, remapGridType *tgt_grid, const doub
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  /* Compute mappings from source to target grid */
+  // Compute mappings from source to target grid
 
-  if (src_grid->rank != 2) cdoAbort("Can not do bicubic interpolation when source grid rank != 2");
+  if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
 
   gradientsType gradients(src_grid->size);
   remap_gradients(*src_grid, src_array, gradients);
 
-  /* Loop over destination grid */
+  // Loop over destination grid
 
   double findex = 0;
 
@@ -351,7 +344,7 @@ scrip_remap_bicubic(remapGridType *src_grid, remapGridType *tgt_grid, const doub
       double src_lons[4];  //  longitudes of four bilinear corners
       double wgts[4][4];   //  bicubic weights for four corners
 
-      /* Find nearest square of grid points on source grid  */
+      // Find nearest square of grid points on source grid
       int search_result;
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
         search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
@@ -366,32 +359,29 @@ scrip_remap_bicubic(remapGridType *src_grid, remapGridType *tgt_grid, const doub
                           src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
 #endif
 
-      /* Check to see if points are land points */
+      // Check to see if points are land points
       if (search_result > 0)
         {
           for (unsigned n = 0; n < 4; ++n)
             if (!src_grid->mask[src_add[n]]) search_result = 0;
         }
 
-      /* If point found, find local iw,jw coordinates for weights  */
+      // If point found, find local iw,jw coordinates for weights
       if (search_result > 0)
         {
           tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
-          double iw, jw; /*  current guess for bilinear coordinate  */
+          double iw, jw; // current guess for bilinear coordinate
           if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
-              /* Successfully found iw,jw - compute weights */
+              // Successfully found iw,jw - compute weights
               set_bicubic_weights(iw, jw, wgts);
-
               sort_add_and_wgts4(4, src_add, wgts);
-
               bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, gradients);
             }
           else
             {
               bicubic_warning();
-
               search_result = -1;
             }
         }
@@ -404,12 +394,9 @@ scrip_remap_bicubic(remapGridType *src_grid, remapGridType *tgt_grid, const doub
         {
           if (num_src_points(src_grid->mask, src_add, src_lats) > 0)
             {
-              renormalize_weights(src_lats, wgts);
-
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
-
+              renormalizeWeights(src_lats, wgts);
               sort_add_and_wgts4(4, src_add, wgts);
-
               bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, gradients);
             }
         }

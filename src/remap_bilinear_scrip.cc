@@ -127,10 +127,9 @@ num_src_points(const int *restrict mask, const size_t src_add[4], double src_lat
 }
 
 static void
-renormalize_weights(const double src_lats[4], double wgts[4])
+renormalizeWeights(const double src_lats[4], double wgts[4])
 {
-  double sum_wgts = 0.0; /* sum of weights for normalization */
-  /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
+  double sum_wgts = 0.0; // sum of weights for normalization
   for (unsigned n = 0; n < 4; ++n) sum_wgts += fabs(src_lats[n]);
   for (unsigned n = 0; n < 4; ++n) wgts[n] = fabs(src_lats[n]) / sum_wgts;
 }
@@ -198,20 +197,20 @@ scrip_remap_bilinear_weights(remapGridType *src_grid, remapGridType *tgt_grid, r
 
   progressInit();
 
-  /* Compute mappings from source to target grid */
+  // Compute mappings from source to target grid
 
-  if (src_grid->rank != 2) cdoAbort("Can not do bilinear interpolation when source grid rank != 2");
+  if (src_grid->rank != 2) cdoAbort("Can't do bilinear interpolation when source grid rank != 2");
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size * sizeof(weightlinks_t));
+  std::vector<weightlinks_t> weightlinks(tgt_grid_size);
   weightlinks[0].addweights = (addweight_t *) Malloc(4 * tgt_grid_size * sizeof(addweight_t));
   for (size_t tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4 * tgt_cell_add;
 
   double findex = 0;
 
-/* Loop over destination grid */
+  // Loop over destination grid
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) schedule(static) \
@@ -261,13 +260,11 @@ scrip_remap_bilinear_weights(remapGridType *src_grid, remapGridType *tgt_grid, r
             {
               // Successfully found iw,jw - compute weights
               set_bilinear_weights(iw, jw, wgts);
-
-              store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
+              store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, &weightlinks[0]);
             }
           else
             {
               bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
-
               search_result = -1;
             }
         }
@@ -280,18 +277,14 @@ scrip_remap_bilinear_weights(remapGridType *src_grid, remapGridType *tgt_grid, r
         {
           if (num_src_points(src_grid->mask, src_add, src_lats) > 0)
             {
-              renormalize_weights(src_lats, wgts);
-
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
-
-              store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
+              renormalizeWeights(src_lats, wgts);
+              store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, &weightlinks[0]);
             }
         }
     }
 
-  weightlinks2remaplinks(0, tgt_grid_size, weightlinks, rv);
-
-  if (weightlinks) Free(weightlinks);
+  weightlinks2remaplinks(0, tgt_grid_size, &weightlinks[0], rv);
 
   if (cdoTimer) timer_stop(timer_remap_bil);
 }  // scrip_remap_weights_bilinear
@@ -408,13 +401,13 @@ scrip_remap_bilinear(remapGridType *src_grid, remapGridType *tgt_grid, const dou
 
   size_t tgt_grid_size = tgt_grid->size;
 
-  /* Compute mappings from source to target grid */
+  // Compute mappings from source to target grid
 
-  if (src_grid->rank != 2) cdoAbort("Can not do bilinear interpolation when source grid rank != 2");
+  if (src_grid->rank != 2) cdoAbort("Can't do bilinear interpolation when source grid rank != 2");
 
   double findex = 0;
 
-/* Loop over destination grid */
+  // Loop over destination grid
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(gs) shared( \
@@ -469,15 +462,12 @@ scrip_remap_bilinear(remapGridType *src_grid, remapGridType *tgt_grid, const dou
             {
               // Successfully found iw,jw - compute weights
               set_bilinear_weights(iw, jw, wgts);
-
               sort_add_and_wgts(4, src_add, wgts);
-
               bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
             }
           else
             {
               bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
-
               search_result = -1;
             }
         }
@@ -490,12 +480,9 @@ scrip_remap_bilinear(remapGridType *src_grid, remapGridType *tgt_grid, const dou
         {
           if (num_src_points(src_grid->mask, src_add, src_lats) > 0)
             {
-              renormalize_weights(src_lats, wgts);
-
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
-
+              renormalizeWeights(src_lats, wgts);
               sort_add_and_wgts(4, src_add, wgts);
-
               bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
             }
         }
