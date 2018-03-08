@@ -933,7 +933,7 @@ Remap(void *argument)
       read_remap_scrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remap_order,
                        &remaps[0].src_grid, &remaps[0].tgt_grid, remaps[0].vars);
 
-      if (remaps[0].vars.links_per_value == 0) links_per_value(remaps[0].vars);
+      if (remaps[0].vars.links_per_value == 0) remapLinksPerValue(remaps[0].vars);
 
       nremaps = 1;
       size_t gridsize = remaps[0].src_grid.size;
@@ -1077,8 +1077,8 @@ Remap(void *argument)
                     {
                       int n0 = (max_remaps > 1 && remaps[0].nused > remaps[1].nused);
                       remapVarsFree(remaps[n0].vars);
-                      remapGridFree(&remaps[n0].src_grid);
-                      remapGridFree(&remaps[n0].tgt_grid);
+                      remapGridFree(remaps[n0].src_grid);
+                      remapGridFree(remaps[n0].tgt_grid);
                       for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
                       r = nremaps - 1;
                       remapInit(&remaps[r]);
@@ -1246,8 +1246,8 @@ WRITE_REMAP:
   for (int r = 0; r < nremaps; r++)
     {
       remapVarsFree(remaps[r].vars);
-      remapGridFree(&remaps[r].src_grid);
-      remapGridFree(&remaps[r].tgt_grid);
+      remapGridFree(remaps[r].src_grid);
+      remapGridFree(remaps[r].tgt_grid);
     }
 
   cdoFinish();

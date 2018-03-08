@@ -118,7 +118,7 @@ void remap_set_int(int remapvar, int value);
 void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapGridType *src_grid, int gridID2,
                       remapGridType *tgt_grid);
 
-void remapGridFree(remapGridType *grid);
+void remapGridFree(remapGridType &grid);
 
 void scrip_remap_bilinear_weights(remapGridType *src_grid, remapGridType *tgt_grid, remapVarsType &rv);
 void scrip_remap_bicubic_weights(remapGridType *src_grid, remapGridType *tgt_grid, remapVarsType &rv);

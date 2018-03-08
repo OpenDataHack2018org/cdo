@@ -98,28 +98,28 @@ remap_set_int(int remapvar, int value)
 double intlin(double x, double y1, double x1, double y2, double x2);
 
 void
-remapGridFree(remapGridType *grid)
+remapGridFree(remapGridType &grid)
 {
-  if (grid->vgpm) Free(grid->vgpm);
-  if (grid->mask) Free(grid->mask);
+  if (grid.vgpm) Free(grid.vgpm);
+  if (grid.mask) Free(grid.mask);
 
-  if (grid->reg2d_center_lat) Free(grid->reg2d_center_lat);
-  if (grid->reg2d_center_lon) Free(grid->reg2d_center_lon);
-  if (grid->reg2d_corner_lat) Free(grid->reg2d_corner_lat);
-  if (grid->reg2d_corner_lon) Free(grid->reg2d_corner_lon);
+  if (grid.reg2d_center_lat) Free(grid.reg2d_center_lat);
+  if (grid.reg2d_center_lon) Free(grid.reg2d_center_lon);
+  if (grid.reg2d_corner_lat) Free(grid.reg2d_corner_lat);
+  if (grid.reg2d_corner_lon) Free(grid.reg2d_corner_lon);
 
-  if (grid->cell_center_lat) Free(grid->cell_center_lat);
-  if (grid->cell_center_lon) Free(grid->cell_center_lon);
-  if (grid->cell_corner_lat) Free(grid->cell_corner_lat);
-  if (grid->cell_corner_lon) Free(grid->cell_corner_lon);
+  if (grid.cell_center_lat) Free(grid.cell_center_lat);
+  if (grid.cell_center_lon) Free(grid.cell_center_lon);
+  if (grid.cell_corner_lat) Free(grid.cell_corner_lat);
+  if (grid.cell_corner_lon) Free(grid.cell_corner_lon);
 
-  if (grid->cell_area) Free(grid->cell_area);
-  if (grid->cell_frac) Free(grid->cell_frac);
+  if (grid.cell_area) Free(grid.cell_area);
+  if (grid.cell_frac) Free(grid.cell_frac);
 
-  if (grid->cell_bound_box) Free(grid->cell_bound_box);
+  if (grid.cell_bound_box) Free(grid.cell_bound_box);
 
-  if (grid->bin_addr) Free(grid->bin_addr);
-  if (grid->bin_lats) Free(grid->bin_lats);
+  if (grid.bin_addr) Free(grid.bin_addr);
+  if (grid.bin_lats) Free(grid.bin_lats);
 
 } /* remapGridFree */
 
