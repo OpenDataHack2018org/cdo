@@ -139,7 +139,7 @@ void remap_conserv(RemapGridType *src_grid, RemapGridType *tgt_grid, const doubl
 
 void remapStat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv,
                 const double *restrict array1, const double *restrict array2, double missval);
-void remap_gradients(RemapGridType &grid, const double *restrict array, gradientsType &gradients);
+void remapGradients(RemapGridType &grid, const double *restrict array, gradientsType &gradients);
 
 void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights);
 void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,

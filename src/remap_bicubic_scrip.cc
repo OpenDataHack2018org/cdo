@@ -316,7 +316,7 @@ scrip_remap_bicubic(RemapGridType *src_grid, RemapGridType *tgt_grid, const doub
   if (src_grid->rank != 2) cdoAbort("Can't do bicubic interpolation when source grid rank != 2");
 
   gradientsType gradients(src_grid->size);
-  remap_gradients(*src_grid, src_array, gradients);
+  remapGradients(*src_grid, src_array, gradients);
 
   // Loop over destination grid
 

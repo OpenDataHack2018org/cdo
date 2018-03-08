@@ -799,9 +799,9 @@ remapStat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, Rem
 /*****************************************************************************/
 
 void
-remap_gradients(RemapGridType &grid, const double *restrict array, gradientsType &gradients)
+remapGradients(RemapGridType &grid, const double *restrict array, gradientsType &gradients)
 {
-  if (grid.rank != 2) cdoAbort("Internal problem (remap_gradients), grid rank = %d!", grid.rank);
+  if (grid.rank != 2) cdoAbort("Internal problem (remapGradients), grid rank = %d!", grid.rank);
 
   double *restrict grad_lat = &gradients.grad_lat[0];
   double *restrict grad_lon = &gradients.grad_lon[0];
@@ -987,7 +987,7 @@ remap_gradients(RemapGridType &grid, const double *restrict array, gradientsType
           grad_latlon[n] = delns * (grad_lat_zero - grad_lon_zero);
         }
     }
-} /* remap_gradients */
+} /* remapGradients */
 
 /*****************************************************************************/
 

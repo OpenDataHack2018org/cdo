@@ -1168,7 +1168,7 @@ Remap(void *argument)
                       if (remaps[r].src_grid.rank != 2 && remap_order == 2)
                         cdoAbort("Second order remapping is not available for unstructured grids!");
 
-                      remap_gradients(remaps[r].src_grid, &array1[0], gradients);
+                      remapGradients(remaps[r].src_grid, &array1[0], gradients);
                     }
 
                   if (operfunc == REMAPLAF)
