@@ -451,15 +451,14 @@ gridIsGlobal(int gridID)
 }
 
 static void
-scale_gridbox_area(size_t gridsize, const double *restrict array1, size_t gridsize2, double *restrict array2,
-                   const double *restrict grid2_area)
+scaleGridboxArea(size_t gridsize, const double *restrict array1, size_t gridsize2, double *restrict array2,
+                 const double *restrict grid2_area)
 {
   double array1sum = 0;
   for (size_t i = 0; i < gridsize; i++) array1sum += array1[i];
 
   double array2sum = 0;
   for (size_t i = 0; i < gridsize2; i++) array2sum += grid2_area[i];
-
   for (size_t i = 0; i < gridsize2; i++) array2[i] = grid2_area[i] / array2sum * array1sum;
 
   static bool lgridboxinfo = true;
@@ -546,7 +545,7 @@ set_max_remaps(int vlistID)
 }
 
 static NormOpt
-get_normOpt(void)
+getNormOpt(void)
 {
   NormOpt normOpt(NormOpt::FRACAREA);
 
@@ -845,7 +844,6 @@ remapAddOperators(void)
 void *
 Remap(void *argument)
 {
-  NormOpt normOpt(NormOpt::NONE);
   RemapType mapType(RemapType::UNDEF);
   SubmapType submapType(SubmapType::NONE);
   bool remap_genweights = REMAP_genweights;
@@ -986,7 +984,8 @@ Remap(void *argument)
 
   remap_set_int(REMAP_GENWEIGHTS, (int) remap_genweights);
 
-  if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC) normOpt = get_normOpt();
+  NormOpt normOpt(NormOpt::NONE);
+  if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC) normOpt = getNormOpt();
 
   size_t grid1sizemax = vlistGridsizeMax(vlistID1);
 
@@ -1202,7 +1201,7 @@ Remap(void *argument)
               vlistInqVarName(vlistID1, varID, varname);
               if (operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON)
                 if (strcmp(varname, "gridbox_area") == 0)
-                  scale_gridbox_area(gridsize, &array1[0], gridsize2, &array2[0], remaps[r].tgt_grid.cell_area);
+                  scaleGridboxArea(gridsize, &array1[0], gridsize2, &array2[0], remaps[r].tgt_grid.cell_area);
 
               // calculate some statistics
               if (cdoVerbose)
