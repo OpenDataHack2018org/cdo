@@ -72,7 +72,6 @@ processSelf(void)
     }
 
   pthread_mutex_unlock(&processMutex);
-  ERROR("Could not find process for thread: ", thID);
 #endif
 
   return Process.find(0)->second;
