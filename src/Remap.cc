@@ -198,7 +198,7 @@ remapPrintInfo(int operfunc, bool remap_genweights, remapGridType &src_grid, rem
 }
 
 static void
-print_remap_warning(const char *remap_file, int operfunc, remapGridType *src_grid, size_t nmiss)
+remapPrintWarning(const char *remap_file, int operfunc, remapGridType &src_grid, size_t nmiss)
 {
   char line[256];
   char tmpstr[256];
@@ -209,17 +209,17 @@ print_remap_warning(const char *remap_file, int operfunc, remapGridType *src_gri
   strcat(line, "Remap weights from ");
   strcat(line, remap_file);
   strcat(line, " not used, ");
-  strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
-  if (src_grid->rank == 2)
-    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid->dims[0], src_grid->dims[1]);
+  strcat(line, gridNamePtr(gridInqType(src_grid.gridID)));
+  if (src_grid.rank == 2)
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid.dims[0], src_grid.dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid.dims[0]);
   strcat(line, tmpstr);
   strcat(line, " grid");
 
   if (nmiss > 0)
     {
-      snprintf(tmpstr, sizeof(tmpstr), " with mask (%zu)", gridInqSize(src_grid->gridID) - nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), " with mask (%zu)", gridInqSize(src_grid.gridID) - nmiss);
       strcat(line, tmpstr);
     }
 
@@ -1242,7 +1242,7 @@ WRITE_REMAP:
   pstreamClose(streamID1);
 
   if (lremapxxx && remap_genweights && remaps[0].nused == 0)
-    print_remap_warning(remap_file, operfunc, &remaps[0].src_grid, remaps[0].nmiss);
+    remapPrintWarning(remap_file, operfunc, remaps[0].src_grid, remaps[0].nmiss);
 
   for (int r = 0; r < nremaps; r++)
     {
