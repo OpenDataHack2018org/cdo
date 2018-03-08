@@ -641,7 +641,7 @@ int timer_remap, timer_remap_init, timer_remap_sort;
 int timer_remap_bil, timer_remap_bic, timer_remap_dis, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
 
 static void
-init_remap_timer(void)
+remapTimerInit(void)
 {
   timer_remap = timer_new("remap");
   timer_remap_init = timer_new("remap init");
@@ -655,7 +655,7 @@ init_remap_timer(void)
 }
 
 static void
-links_per_value(remapVarsType &rv)
+remapLinksPerValue(remapVarsType &rv)
 {
   long lpv = -1;
 
@@ -735,7 +735,7 @@ links_per_value(remapVarsType &rv)
 }
 
 static void
-sort_remap_add(remapVarsType &rv)
+remapSortAddr(remapVarsType &rv)
 {
   if (cdoTimer) timer_start(timer_remap_sort);
   if (sort_mode == MERGE_SORT)
@@ -799,8 +799,8 @@ remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
   else if (mapType == RemapType::CONSERV_YAC)
     remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
 
-  if (remap->vars.sort_add) sort_remap_add(remap->vars);
-  if (remap->vars.links_per_value == -1) links_per_value(remap->vars);
+  if (remap->vars.sort_add) remapSortAddr(remap->vars);
+  if (remap->vars.links_per_value == -1) remapLinksPerValue(remap->vars);
 }
 
 static void
@@ -857,7 +857,7 @@ Remap(void *argument)
   char varname[CDI_MAX_NAME];
   char *remap_file = NULL;
 
-  if (cdoTimer) init_remap_timer();
+  if (cdoTimer) remapTimerInit();
 
   cdoInitialize(argument);
 
