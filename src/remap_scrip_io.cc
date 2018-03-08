@@ -78,15 +78,11 @@ read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
 #endif
 
 void
-write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remap_order,
+remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remap_order,
                   RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
 {
-// Writes remap data to a NetCDF file using SCRIP conventions
-/*
-  Input variables:
+  // Writes remap data to a NetCDF file using SCRIP conventions
 
-  interp_file  ! filename for remap data
-*/
 #ifdef HAVE_LIBNETCDF
 
   // Local variables
@@ -442,7 +438,7 @@ write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapT
   cdoAbort("NetCDF support not compiled in!");
 #endif
 
-}  // write_remap_scrip
+}  // remapWriteDataScrip
 
 /*****************************************************************************/
 
@@ -450,12 +446,8 @@ void
 read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
                  int *numNeighbors, int *remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
 {
-// The routine reads a NetCDF file to extract remapping info in SCRIP format
-/*
-  Input variables
+  // The routine reads a NetCDF file to extract remapping info in SCRIP format
 
-  interp_file        ! filename for remap data
-*/
 #ifdef HAVE_LIBNETCDF
 
   // Local variables
@@ -492,11 +484,11 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
   int nc_rmpmatrix_id;     /* id for remapping matrix                  */
 
   char map_name[1024];
-  char map_method[64];    /* character string for mapType             */
-  char normalize_opt[64]; /* character string for normalization option */
-  char convention[64];    /* character string for output convention    */
-  char src_grid_name[64]; /* grid name for source grid                 */
-  char tgt_grid_name[64]; /* grid name for dest   grid                 */
+  char map_method[64];     /* character string for mapType              */
+  char normalize_opt[64];  /* character string for normalization option */
+  char convention[64];     /* character string for output convention    */
+  char src_grid_name[64];  /* grid name for source grid                 */
+  char tgt_grid_name[64];  /* grid name for dest   grid                 */
   char src_grid_units[64];
   char tgt_grid_units[64];
   size_t attlen, dimlen;
@@ -552,12 +544,12 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
 
   if (cmpstr(map_method, "Conservative") == 0)
     {
-      int iatt;
       if (cmpstr(map_method, "Conservative remapping using clipping on sphere") == 0)
         rv.mapType = RemapType::CONSERV_YAC;
       else
         rv.mapType = RemapType::CONSERV;
 
+      int iatt;
       status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
       if (status == NC_NOERR) *remap_order = iatt;
     }
@@ -692,9 +684,7 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
   if (gridInqType(gridID1) == GRID_GME) gridInqMaskGME(gridID1_gme_c, src_grid.vgpm);
 
   rv.pinit = true;
-
   rv.max_links = rv.num_links;
-
   rv.resize_increment = 1024;
 
   // Allocate address and weight arrays for mapping 1

@@ -1234,7 +1234,7 @@ Remap(void *argument)
 WRITE_REMAP:
 
   if (writeRemapWeightsOnly)
-    write_remap_scrip(cdoGetStreamName(1).c_str(), mapType, submapType, numNeighbors, remap_order, remaps[r].src_grid,
+    remapWriteDataScrip(cdoGetStreamName(1).c_str(), mapType, submapType, numNeighbors, remap_order, remaps[r].src_grid,
                       remaps[r].tgt_grid, remaps[r].vars);
 
   pstreamClose(streamID1);
