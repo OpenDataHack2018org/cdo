@@ -166,7 +166,7 @@ store_weightlinks4(size_t num_weights, size_t *srch_add, double weights[4][4], s
 }
 
 void
-weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightlinks, remapVarsType &rv)
+weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightlinks, RemapVarsType &rv)
 {
   size_t nlinks = 0;
 
@@ -226,7 +226,7 @@ weightlinks2remaplinks(int lalloc, size_t tgt_grid_size, weightlinks_t *weightli
 }
 
 void
-weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, remapVarsType &rv)
+weightlinks2remaplinks4(size_t tgt_grid_size, weightlinks4_t *weightlinks, RemapVarsType &rv)
 {
   size_t nlinks = 0;
 

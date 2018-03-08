@@ -143,7 +143,7 @@ maptype2operfunc(RemapType mapType, SubmapType submapType, int numNeighbors, int
 }
 
 static void
-remapPrintInfo(int operfunc, bool remap_genweights, remapGridType &src_grid, remapGridType &tgt_grid, size_t nmiss)
+remapPrintInfo(int operfunc, bool remap_genweights, RemapGridType &src_grid, RemapGridType &tgt_grid, size_t nmiss)
 {
   char line[256], tmpstr[256];
 
@@ -198,7 +198,7 @@ remapPrintInfo(int operfunc, bool remap_genweights, remapGridType &src_grid, rem
 }
 
 static void
-remapPrintWarning(const char *remap_file, int operfunc, remapGridType &src_grid, size_t nmiss)
+remapPrintWarning(const char *remap_file, int operfunc, RemapGridType &src_grid, size_t nmiss)
 {
   char line[256];
   char tmpstr[256];
@@ -589,7 +589,7 @@ getNormOpt(void)
 }
 
 static void
-remapNormalizeField(NormOpt normOpt, size_t gridsize, double *array, double missval, remapGridType *tgt_grid)
+remapNormalizeField(NormOpt normOpt, size_t gridsize, double *array, double missval, RemapGridType *tgt_grid)
 {
   // used only to check the result of remapcon
 
@@ -624,7 +624,7 @@ remapNormalizeField(NormOpt normOpt, size_t gridsize, double *array, double miss
 }
 
 static void
-remapSetFracMin(size_t gridsize, double *array, double missval, remapGridType *tgt_grid)
+remapSetFracMin(size_t gridsize, double *array, double missval, RemapGridType *tgt_grid)
 {
   if (remap_frac_min > 0)
     {
@@ -655,7 +655,7 @@ remapTimerInit(void)
 }
 
 static void
-remapLinksPerValue(remapVarsType &rv)
+remapLinksPerValue(RemapVarsType &rv)
 {
   long lpv = -1;
 
@@ -735,7 +735,7 @@ remapLinksPerValue(remapVarsType &rv)
 }
 
 static void
-remapSortAddr(remapVarsType &rv)
+remapSortAddr(RemapVarsType &rv)
 {
   if (cdoTimer) timer_start(timer_remap_sort);
   if (sort_mode == MERGE_SORT)
@@ -764,7 +764,7 @@ remapGenNumBins(int ysize)
 }
 
 static void
-remapSum(remapGridType *remapGrid, size_t gridsize, double *array, const char *tag)
+remapSum(RemapGridType *remapGrid, size_t gridsize, double *array, const char *tag)
 {
   for (size_t i = 0; i < gridsize; i++)
     printf("1 %zd %g %g %g %g\n", i, array[i], remapGrid->cell_frac[i], remapGrid->cell_area[i],

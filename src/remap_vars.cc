@@ -11,7 +11,7 @@
   -----------------------------------------------------------------------
 */
 void
-remap(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array,
+remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array,
       gradientsType &gradients)
 {
   /*
@@ -212,7 +212,7 @@ binary_search_int(const size_t *array, size_t len, size_t value)
   -----------------------------------------------------------------------
 */
 void
-remap_laf(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array)
+remap_laf(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array)
 {
   /*
     Input arrays:
@@ -350,7 +350,7 @@ remap_laf(double *restrict dst_array, double missval, size_t dst_size, const rem
   -----------------------------------------------------------------------
 */
 void
-remap_sum(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array)
+remap_sum(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array)
 {
   /*
     Input arrays:
@@ -395,7 +395,7 @@ remap_sum(double *restrict dst_array, double missval, size_t dst_size, const rem
 }
 
 void
-remapVarsInit(RemapType mapType, remapVarsType &rv)
+remapVarsInit(RemapType mapType, RemapVarsType &rv)
 {
   // Initialize all pointer
   if (rv.pinit == false) rv.pinit = true;
@@ -420,7 +420,7 @@ remapVarsInit(RemapType mapType, remapVarsType &rv)
 }
 
 void
-remapVarsEnsureSize(remapVarsType &rv, size_t size)
+remapVarsEnsureSize(RemapVarsType &rv, size_t size)
 {
   if ( size >= rv.max_links )
     {
@@ -433,7 +433,7 @@ remapVarsEnsureSize(remapVarsType &rv, size_t size)
 }
 
 void
-remapVarsResize(remapVarsType &rv, size_t size)
+remapVarsResize(RemapVarsType &rv, size_t size)
 {
   rv.max_links = size;
 
@@ -443,7 +443,7 @@ remapVarsResize(remapVarsType &rv, size_t size)
 }
 
 void
-remapVarsReorder(remapVarsType &rv)
+remapVarsReorder(RemapVarsType &rv)
 {
   size_t j, nval = 0, num_blks = 0;
   size_t n;
@@ -520,7 +520,7 @@ remapVarsReorder(remapVarsType &rv)
 }
 
 void
-remapVarsFree(remapVarsType &rv)
+remapVarsFree(RemapVarsType &rv)
 {
   if (rv.pinit)
     {
@@ -557,7 +557,7 @@ remapVarsFree(remapVarsType &rv)
 } /* remapVarsFree */
 
 void
-remapVarsCheckWeights(const remapVarsType &rv)
+remapVarsCheckWeights(const RemapVarsType &rv)
 {
   auto num_links = rv.num_links;
   auto num_wts = rv.num_wts;

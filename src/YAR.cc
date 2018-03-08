@@ -40,7 +40,7 @@ int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort, timer_yar_remap
 
 #ifdef HAVE_LIBYAC
 static void
-yar_remap(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array)
+yar_remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array)
 {
   size_t num_links = rv.num_links;
   const double *restrict map_wts = &rv.wts[0];
@@ -68,7 +68,7 @@ yar_remap(double *restrict dst_array, double missval, size_t dst_size, const rem
 #endif
 
 void
-yar_store_link_cnsrv(remapVarsType &rv, long add1, long add2, double weight)
+yar_store_link_cnsrv(RemapVarsType &rv, long add1, long add2, double weight)
 {
   /*
     Input variables:
@@ -114,7 +114,7 @@ set_source_data(double *source_data, double init_value, unsigned size_x, unsigne
 */
 #ifdef HAVE_LIBYAC
 static void
-store_link_bilin(remapVarsType &rv, int dst_add, int src_add[4], double weights[4])
+store_link_bilin(RemapVarsType &rv, int dst_add, int src_add[4], double weights[4])
 {
   /*
     Input variables:

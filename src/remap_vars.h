@@ -47,7 +47,7 @@ struct remaplink_t
   size_t **w_index;
 };
 
-struct remapVarsType
+struct RemapVarsType
 {
   RemapType mapType;                // identifier for remapping method
   NormOpt normOpt;                  // option for normalization (conserv only)
@@ -67,15 +67,15 @@ struct remapVarsType
 };
 
 
-void remap(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array,
+void remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array,
            gradientsType &gradients);
-void remap_laf(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array);
-void remap_sum(double *restrict dst_array, double missval, size_t dst_size, const remapVarsType &rv, const double *restrict src_array);
-void remapVarsInit(RemapType mapType, remapVarsType &rv);
-void remapVarsEnsureSize(remapVarsType &rv, size_t size);
-void remapVarsResize(remapVarsType &rv, size_t size);
-void remapVarsReorder(remapVarsType &rv);
-void remapVarsFree(remapVarsType &rv);
-void remapVarsCheckWeights(const remapVarsType &rv);
+void remap_laf(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array);
+void remap_sum(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array);
+void remapVarsInit(RemapType mapType, RemapVarsType &rv);
+void remapVarsEnsureSize(RemapVarsType &rv, size_t size);
+void remapVarsResize(RemapVarsType &rv, size_t size);
+void remapVarsReorder(RemapVarsType &rv);
+void remapVarsFree(RemapVarsType &rv);
+void remapVarsCheckWeights(const RemapVarsType &rv);
 
 #endif /* REMAP_VARS_H */
