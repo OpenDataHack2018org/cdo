@@ -137,7 +137,7 @@ void remap_distwgt(size_t numNeighbors, RemapGridType *src_grid, RemapGridType *
 void remap_conserv(RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
                    double *restrict tgt_array, double missval);
 
-void remap_stat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv,
+void remapStat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv,
                 const double *restrict array1, const double *restrict array2, double missval);
 void remap_gradients(RemapGridType &grid, const double *restrict array, gradientsType &gradients);
 

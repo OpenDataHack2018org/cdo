@@ -1204,7 +1204,7 @@ Remap(void *argument)
 
               // calculate some statistics
               if (cdoVerbose)
-                remap_stat(remap_order, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars, &array1[0], &array2[0],
+                remapStat(remap_order, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars, &array1[0], &array2[0],
                            missval);
 
               if (gridInqType(gridID2) == GRID_GME)

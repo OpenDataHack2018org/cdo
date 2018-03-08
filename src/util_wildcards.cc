@@ -107,7 +107,6 @@ expand_filename(const char *string)
 std::vector<std::string>
 expandWildCards(std::vector<std::string> argv)
 {
-
   int flags = WRDE_UNDEF;
   wordexp_t glob_results;
 
@@ -127,7 +126,7 @@ expandWildCards(std::vector<std::string> argv)
               else if ( status == WRDE_SYNTAX )
                 fprintf(stderr, "Shell syntax error in '%s'\n", argv[idx].c_str());               
               else
-                fprintf(stderr, "wordexp() return an error.\n");
+                fprintf(stderr, "wordexp() returns an error.\n");
               exit(EXIT_FAILURE);
             }
           // range based insert (glob_results.we_wordv is inserted before wildcard

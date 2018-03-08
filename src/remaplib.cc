@@ -705,13 +705,9 @@ remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGridType 
 
 /*****************************************************************************/
 
-
-
-/*****************************************************************************/
-
 void
-remap_stat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv, const double *restrict array1,
-           const double *restrict array2, double missval)
+remapStat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv, const double *restrict array1,
+          const double *restrict array2, double missval)
 {
   if (remap_order == 2)
     cdoPrint("Second order mapping from grid1 to grid2:");
@@ -798,8 +794,7 @@ remap_stat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, Re
     }
 
   if (rv.sort_add) cdoPrint("Sparse matrix entries are explicitly sorted.");
-
-} /* remap_stat */
+}
 
 /*****************************************************************************/
 
