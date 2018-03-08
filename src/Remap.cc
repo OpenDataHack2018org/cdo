@@ -931,7 +931,7 @@ Remap(void *argument)
   if (lremapxxx)
     {
       read_remap_scrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remap_order,
-                       &remaps[0].src_grid, &remaps[0].tgt_grid, remaps[0].vars);
+                       remaps[0].src_grid, remaps[0].tgt_grid, remaps[0].vars);
 
       if (remaps[0].vars.links_per_value == 0) remapLinksPerValue(remaps[0].vars);
 
@@ -1113,8 +1113,7 @@ Remap(void *argument)
 
                       // Initialize grid information for both grids
                       if (cdoTimer) timer_start(timer_remap_init);
-                      remap_grids_init(mapType, remap_extrapolate, gridID1, &remaps[r].src_grid, gridID2,
-                                       &remaps[r].tgt_grid);
+                      remapInitGrids(mapType, remap_extrapolate, gridID1, remaps[r].src_grid, gridID2, remaps[r].tgt_grid);
                       if (cdoTimer) timer_stop(timer_remap_init);
                     }
 

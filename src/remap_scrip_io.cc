@@ -31,8 +31,6 @@
 #include "remap.h"
 #include "commandline.h"
 
-void remapgrid_init(remapGridType *grid);
-void remapgrid_alloc(RemapType mapType, remapGridType *grid);
 
 #ifdef HAVE_LIBNETCDF
 static void
@@ -81,7 +79,7 @@ read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
 
 void
 write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remap_order,
-                  remapGridType src_grid, remapGridType tgt_grid, remapVarsType &rv)
+                  remapGridType &src_grid, remapGridType &tgt_grid, remapVarsType &rv)
 {
 // Writes remap data to a NetCDF file using SCRIP conventions
 /*
@@ -450,7 +448,7 @@ write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapT
 
 void
 read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
-                 int *numNeighbors, int *remap_order, remapGridType *src_grid, remapGridType *tgt_grid, remapVarsType &rv)
+                 int *numNeighbors, int *remap_order, remapGridType &src_grid, remapGridType &tgt_grid, remapVarsType &rv)
 {
 // The routine reads a NetCDF file to extract remapping info in SCRIP format
 /*
@@ -623,50 +621,50 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
   if (cdoVerbose) cdoPrint("Remapping between: %s and %s", src_grid_name, tgt_grid_name);
 
   // Initialize remapgrid structure
-  remapgrid_init(src_grid);
-  remapgrid_init(tgt_grid);
+  remapGridInit(src_grid);
+  remapGridInit(tgt_grid);
 
   // Read dimension information
 
   nce(nc_inq_dimid(nc_file_id, "src_grid_size", &nc_srcgrdsize_id));
   nce(nc_inq_dimlen(nc_file_id, nc_srcgrdsize_id, &dimlen));
-  src_grid->size = dimlen;
+  src_grid.size = dimlen;
   /*
-  if (  src_grid->size != gridInqSize(gridID1) )
+  if (  src_grid.size != gridInqSize(gridID1) )
     cdoAbort("Source grids have different size!");
   */
   nce(nc_inq_dimid(nc_file_id, "dst_grid_size", &nc_dstgrdsize_id));
   nce(nc_inq_dimlen(nc_file_id, nc_dstgrdsize_id, &dimlen));
-  tgt_grid->size = dimlen;
+  tgt_grid.size = dimlen;
   /*
-  if ( tgt_grid->size != gridInqSize(gridID2) )
+  if ( tgt_grid.size != gridInqSize(gridID2) )
     cdoAbort("Target grids have different size!");
   */
   status = nc_inq_dimid(nc_file_id, "src_grid_corners", &nc_srcgrdcorn_id);
   if (status == NC_NOERR)
     {
       nce(nc_inq_dimlen(nc_file_id, nc_srcgrdcorn_id, &dimlen));
-      src_grid->num_cell_corners = dimlen;
-      src_grid->luse_cell_corners = true;
-      src_grid->lneed_cell_corners = true;
+      src_grid.num_cell_corners = dimlen;
+      src_grid.luse_cell_corners = true;
+      src_grid.lneed_cell_corners = true;
     }
 
   status = nc_inq_dimid(nc_file_id, "dst_grid_corners", &nc_dstgrdcorn_id);
   if (status == NC_NOERR)
     {
       nce(nc_inq_dimlen(nc_file_id, nc_dstgrdcorn_id, &dimlen));
-      tgt_grid->num_cell_corners = dimlen;
-      tgt_grid->luse_cell_corners = true;
-      tgt_grid->lneed_cell_corners = true;
+      tgt_grid.num_cell_corners = dimlen;
+      tgt_grid.luse_cell_corners = true;
+      tgt_grid.lneed_cell_corners = true;
     }
 
   nce(nc_inq_dimid(nc_file_id, "src_grid_rank", &nc_srcgrdrank_id));
   nce(nc_inq_dimlen(nc_file_id, nc_srcgrdrank_id, &dimlen));
-  src_grid->rank = dimlen;
+  src_grid.rank = dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "dst_grid_rank", &nc_dstgrdrank_id));
   nce(nc_inq_dimlen(nc_file_id, nc_dstgrdrank_id, &dimlen));
-  tgt_grid->rank = dimlen;
+  tgt_grid.rank = dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "num_links", &nc_numlinks_id));
   nce(nc_inq_dimlen(nc_file_id, nc_numlinks_id, &dimlen));
@@ -679,19 +677,19 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
   nce(nc_inq_dimlen(nc_file_id, nc_numwgts_id, &dimlen));
   rv.num_wts = dimlen;
 
-  src_grid->gridID = gridID1;
-  tgt_grid->gridID = gridID2;
+  src_grid.gridID = gridID1;
+  tgt_grid.gridID = gridID2;
 
   if (gridInqType(gridID1) == GRID_GME)
     {
-      src_grid->nvgp = gridInqSize(gridID1);
+      src_grid.nvgp = gridInqSize(gridID1);
       gridID1_gme_c = gridToUnstructured(gridID1, 1);
     }
 
-  remapgrid_alloc(rv.mapType, src_grid);
-  remapgrid_alloc(rv.mapType, tgt_grid);
+  remapGridAlloc(rv.mapType, src_grid);
+  remapGridAlloc(rv.mapType, tgt_grid);
 
-  if (gridInqType(gridID1) == GRID_GME) gridInqMaskGME(gridID1_gme_c, src_grid->vgpm);
+  if (gridInqType(gridID1) == GRID_GME) gridInqMaskGME(gridID1_gme_c, src_grid.vgpm);
 
   rv.pinit = true;
 
@@ -713,7 +711,7 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
   nce(nc_inq_varid(nc_file_id, "src_grid_imask", &nc_srcgrdimask_id));
   nce(nc_inq_varid(nc_file_id, "src_grid_center_lat", &nc_srcgrdcntrlat_id));
   nce(nc_inq_varid(nc_file_id, "src_grid_center_lon", &nc_srcgrdcntrlon_id));
-  if (src_grid->num_cell_corners)
+  if (src_grid.num_cell_corners)
     {
       nce(nc_inq_varid(nc_file_id, "src_grid_corner_lat", &nc_srcgrdcrnrlat_id));
       nce(nc_inq_varid(nc_file_id, "src_grid_corner_lon", &nc_srcgrdcrnrlon_id));
@@ -728,7 +726,7 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
   nce(nc_inq_varid(nc_file_id, "dst_grid_imask", &nc_dstgrdimask_id));
   nce(nc_inq_varid(nc_file_id, "dst_grid_center_lat", &nc_dstgrdcntrlat_id));
   nce(nc_inq_varid(nc_file_id, "dst_grid_center_lon", &nc_dstgrdcntrlon_id));
-  if (tgt_grid->num_cell_corners)
+  if (tgt_grid.num_cell_corners)
     {
       nce(nc_inq_varid(nc_file_id, "dst_grid_corner_lat", &nc_dstgrdcrnrlat_id));
       nce(nc_inq_varid(nc_file_id, "dst_grid_corner_lon", &nc_dstgrdcrnrlon_id));
@@ -747,74 +745,74 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
 
   int dims[2];
   nce(nc_get_var_int(nc_file_id, nc_srcgrddims_id, dims));
-  src_grid->dims[0] = dims[0];
-  src_grid->dims[1] = dims[1];
+  src_grid.dims[0] = dims[0];
+  src_grid.dims[1] = dims[1];
 
-  nce(nc_get_var_int(nc_file_id, nc_srcgrdimask_id, src_grid->mask));
+  nce(nc_get_var_int(nc_file_id, nc_srcgrdimask_id, src_grid.mask));
 
-  nce(nc_get_var_double(nc_file_id, nc_srcgrdcntrlat_id, src_grid->cell_center_lat));
-  nce(nc_get_var_double(nc_file_id, nc_srcgrdcntrlon_id, src_grid->cell_center_lon));
+  nce(nc_get_var_double(nc_file_id, nc_srcgrdcntrlat_id, src_grid.cell_center_lat));
+  nce(nc_get_var_double(nc_file_id, nc_srcgrdcntrlon_id, src_grid.cell_center_lon));
 
   nce(nc_get_att_text(nc_file_id, nc_srcgrdcntrlat_id, "units", src_grid_units));
   nce(nc_inq_attlen(nc_file_id, nc_srcgrdcntrlat_id, "units", &attlen));
   src_grid_units[attlen] = 0;
 
-  grid_to_radian(src_grid_units, src_grid->size, src_grid->cell_center_lon, "source grid center lon");
-  grid_to_radian(src_grid_units, src_grid->size, src_grid->cell_center_lat, "source grid center lat");
+  grid_to_radian(src_grid_units, src_grid.size, src_grid.cell_center_lon, "source grid center lon");
+  grid_to_radian(src_grid_units, src_grid.size, src_grid.cell_center_lat, "source grid center lat");
 
-  if (src_grid->num_cell_corners)
+  if (src_grid.num_cell_corners)
     {
-      nce(nc_get_var_double(nc_file_id, nc_srcgrdcrnrlat_id, src_grid->cell_corner_lat));
-      nce(nc_get_var_double(nc_file_id, nc_srcgrdcrnrlon_id, src_grid->cell_corner_lon));
+      nce(nc_get_var_double(nc_file_id, nc_srcgrdcrnrlat_id, src_grid.cell_corner_lat));
+      nce(nc_get_var_double(nc_file_id, nc_srcgrdcrnrlon_id, src_grid.cell_corner_lon));
 
       nce(nc_get_att_text(nc_file_id, nc_srcgrdcrnrlat_id, "units", src_grid_units));
       nce(nc_inq_attlen(nc_file_id, nc_srcgrdcrnrlat_id, "units", &attlen));
       src_grid_units[attlen] = 0;
 
-      grid_to_radian(src_grid_units, src_grid->num_cell_corners * src_grid->size, src_grid->cell_corner_lon,
+      grid_to_radian(src_grid_units, src_grid.num_cell_corners * src_grid.size, src_grid.cell_corner_lon,
                      "source grid corner lon");
-      grid_to_radian(src_grid_units, src_grid->num_cell_corners * src_grid->size, src_grid->cell_corner_lat,
+      grid_to_radian(src_grid_units, src_grid.num_cell_corners * src_grid.size, src_grid.cell_corner_lat,
                      "source grid corner lat");
     }
 
-  if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_srcgrdarea_id, src_grid->cell_area));
+  if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_srcgrdarea_id, src_grid.cell_area));
 
-  nce(nc_get_var_double(nc_file_id, nc_srcgrdfrac_id, src_grid->cell_frac));
+  nce(nc_get_var_double(nc_file_id, nc_srcgrdfrac_id, src_grid.cell_frac));
 
   nce(nc_get_var_int(nc_file_id, nc_dstgrddims_id, dims));
-  tgt_grid->dims[0] = dims[0];
-  tgt_grid->dims[1] = dims[1];
+  tgt_grid.dims[0] = dims[0];
+  tgt_grid.dims[1] = dims[1];
 
-  nce(nc_get_var_int(nc_file_id, nc_dstgrdimask_id, tgt_grid->mask));
+  nce(nc_get_var_int(nc_file_id, nc_dstgrdimask_id, tgt_grid.mask));
 
-  nce(nc_get_var_double(nc_file_id, nc_dstgrdcntrlat_id, tgt_grid->cell_center_lat));
-  nce(nc_get_var_double(nc_file_id, nc_dstgrdcntrlon_id, tgt_grid->cell_center_lon));
+  nce(nc_get_var_double(nc_file_id, nc_dstgrdcntrlat_id, tgt_grid.cell_center_lat));
+  nce(nc_get_var_double(nc_file_id, nc_dstgrdcntrlon_id, tgt_grid.cell_center_lon));
 
   nce(nc_get_att_text(nc_file_id, nc_dstgrdcntrlat_id, "units", tgt_grid_units));
   nce(nc_inq_attlen(nc_file_id, nc_dstgrdcntrlat_id, "units", &attlen));
   tgt_grid_units[attlen] = 0;
 
-  grid_to_radian(tgt_grid_units, tgt_grid->size, tgt_grid->cell_center_lon, "target grid center lon");
-  grid_to_radian(tgt_grid_units, tgt_grid->size, tgt_grid->cell_center_lat, "target grid center lat");
+  grid_to_radian(tgt_grid_units, tgt_grid.size, tgt_grid.cell_center_lon, "target grid center lon");
+  grid_to_radian(tgt_grid_units, tgt_grid.size, tgt_grid.cell_center_lat, "target grid center lat");
 
-  if (tgt_grid->num_cell_corners)
+  if (tgt_grid.num_cell_corners)
     {
-      nce(nc_get_var_double(nc_file_id, nc_dstgrdcrnrlat_id, tgt_grid->cell_corner_lat));
-      nce(nc_get_var_double(nc_file_id, nc_dstgrdcrnrlon_id, tgt_grid->cell_corner_lon));
+      nce(nc_get_var_double(nc_file_id, nc_dstgrdcrnrlat_id, tgt_grid.cell_corner_lat));
+      nce(nc_get_var_double(nc_file_id, nc_dstgrdcrnrlon_id, tgt_grid.cell_corner_lon));
 
       nce(nc_get_att_text(nc_file_id, nc_dstgrdcrnrlat_id, "units", tgt_grid_units));
       nce(nc_inq_attlen(nc_file_id, nc_dstgrdcrnrlat_id, "units", &attlen));
       tgt_grid_units[attlen] = 0;
 
-      grid_to_radian(tgt_grid_units, tgt_grid->num_cell_corners * tgt_grid->size, tgt_grid->cell_corner_lon,
+      grid_to_radian(tgt_grid_units, tgt_grid.num_cell_corners * tgt_grid.size, tgt_grid.cell_corner_lon,
                      "target grid corner lon");
-      grid_to_radian(tgt_grid_units, tgt_grid->num_cell_corners * tgt_grid->size, tgt_grid->cell_corner_lat,
+      grid_to_radian(tgt_grid_units, tgt_grid.num_cell_corners * tgt_grid.size, tgt_grid.cell_corner_lat,
                      "target grid corner lat");
     }
 
-  if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_dstgrdarea_id, tgt_grid->cell_area));
+  if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_dstgrdarea_id, tgt_grid.cell_area));
 
-  nce(nc_get_var_double(nc_file_id, nc_dstgrdfrac_id, tgt_grid->cell_frac));
+  nce(nc_get_var_double(nc_file_id, nc_dstgrdfrac_id, tgt_grid.cell_frac));
 
   if (rv.num_links > 0)
     {

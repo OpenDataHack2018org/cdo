@@ -115,10 +115,12 @@ struct remapType
 void remap_set_threshhold(double threshhold);
 void remap_set_int(int remapvar, int value);
 
-void remap_grids_init(RemapType mapType, bool lextrapolate, int gridID1, remapGridType *src_grid, int gridID2,
-                      remapGridType *tgt_grid);
+void remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, remapGridType &src_grid, int gridID2,
+                    remapGridType &tgt_grid);
 
+void remapGridInit(remapGridType &grid);
 void remapGridFree(remapGridType &grid);
+void remapGridAlloc(RemapType mapType, remapGridType &grid);
 
 void scrip_remap_bilinear_weights(remapGridType *src_grid, remapGridType *tgt_grid, remapVarsType &rv);
 void scrip_remap_bicubic_weights(remapGridType *src_grid, remapGridType *tgt_grid, remapVarsType &rv);
@@ -135,21 +137,21 @@ void remap_distwgt(size_t numNeighbors, remapGridType *src_grid, remapGridType *
 void remap_conserv(remapGridType *src_grid, remapGridType *tgt_grid, const double *restrict src_array,
                    double *restrict tgt_array, double missval);
 
-void remap_stat(int remap_order, remapGridType src_grid, remapGridType tgt_grid, remapVarsType &rv,
+void remap_stat(int remap_order, remapGridType &src_grid, remapGridType &tgt_grid, remapVarsType &rv,
                 const double *restrict array1, const double *restrict array2, double missval);
-void remap_gradients(remapGridType grid, const double *restrict array, gradientsType &gradients);
+void remap_gradients(remapGridType &grid, const double *restrict array, gradientsType &gradients);
 
 void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights);
 void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights,
                int parent);
 
 void write_remap_scrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors,
-                       int remap_order, remapGridType src_grid, remapGridType tgt_grid, remapVarsType &rv);
+                       int remap_order, remapGridType &src_grid, remapGridType &tgt_grid, remapVarsType &rv);
 void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
-                      int *numNeighbors, int *remap_order, remapGridType *src_grid, remapGridType *tgt_grid,
+                      int *numNeighbors, int *remap_order, remapGridType &src_grid, remapGridType &tgt_grid,
                       remapVarsType &rv);
 
-void calc_lat_bins(remapGridType *src_grid, remapGridType *tgt_grid, RemapType mapType);
+void calc_lat_bins(remapGridType &src_grid, remapGridType &tgt_grid, RemapType mapType);
 size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2,
                       float *tgt_cell_bound_box, float *src_cell_bound_box, size_t src_grid_size, size_t *srch_add);
 

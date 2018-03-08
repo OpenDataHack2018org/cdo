@@ -47,17 +47,17 @@ calc_bin_addr(size_t gridsize, size_t nbins, const float *restrict bin_lats, con
 }
 
 void
-calc_lat_bins(remapGridType *src_grid, remapGridType *tgt_grid, RemapType mapType)
+calc_lat_bins(remapGridType &src_grid, remapGridType &tgt_grid, RemapType mapType)
 {
   size_t n2;
-  size_t nbins = src_grid->num_srch_bins;
+  size_t nbins = src_grid.num_srch_bins;
   double dlat = PI / nbins;  // lat/lon intervals for search bins
 
   if (cdoVerbose) cdoPrint("Using %zu latitude bins to restrict search.", nbins);
 
   if (nbins > 0)
     {
-      float *bin_lats = src_grid->bin_lats = (float *) Realloc(src_grid->bin_lats, 2 * nbins * sizeof(float));
+      float *bin_lats = src_grid.bin_lats = (float *) Realloc(src_grid.bin_lats, 2 * nbins * sizeof(float));
 
       for (size_t n = 0; n < nbins; ++n)
         {
@@ -66,29 +66,29 @@ calc_lat_bins(remapGridType *src_grid, remapGridType *tgt_grid, RemapType mapTyp
           bin_lats[n2 + 1] = (n + 1) * dlat - PIH;
         }
 
-      src_grid->bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
-      calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
+      src_grid.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
+      calc_bin_addr(src_grid.size, nbins, bin_lats, src_grid.cell_bound_box, src_grid.bin_addr);
 
       if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
         {
-          tgt_grid->bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
-          calc_bin_addr(tgt_grid->size, nbins, bin_lats, tgt_grid->cell_bound_box, tgt_grid->bin_addr);
+          tgt_grid.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
+          calc_bin_addr(tgt_grid.size, nbins, bin_lats, tgt_grid.cell_bound_box, tgt_grid.bin_addr);
 
-          Free(src_grid->bin_lats);
-          src_grid->bin_lats = NULL;
+          Free(src_grid.bin_lats);
+          src_grid.bin_lats = NULL;
         }
     }
 
   if (mapType == RemapType::CONSERV_YAC)
     {
-      Free(tgt_grid->cell_bound_box);
-      tgt_grid->cell_bound_box = NULL;
+      Free(tgt_grid.cell_bound_box);
+      tgt_grid.cell_bound_box = NULL;
     }
 
   if (mapType == RemapType::DISTWGT)
     {
-      Free(src_grid->cell_bound_box);
-      src_grid->cell_bound_box = NULL;
+      Free(src_grid.cell_bound_box);
+      src_grid.cell_bound_box = NULL;
     }
 }
 
@@ -322,7 +322,7 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
 
   unsigned n = quad_cross_products(plon, plat, lons, lats);
 
-  /* If cross products all same sign, we found the location */
+  // If cross products all same sign, we found the location
   if (n >= 4)
     {
       for (unsigned j = 0; j < 4; ++j) adds[j] = idx[j];
