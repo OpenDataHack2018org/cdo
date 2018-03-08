@@ -75,47 +75,47 @@ enum
 };
 
 static void
-get_maptype(int operfunc, RemapType *mapType, SubmapType *submapType, int *numNeighbors, int *remap_order)
+getMaptype(int operfunc, RemapType &mapType, SubmapType &submapType, int &numNeighbors, int &remap_order)
 {
   switch (operfunc)
     {
     case REMAPYCON:
     case GENYCON:
-      *mapType = RemapType::CONSERV_YAC;
-      *remap_order = 1;
+      mapType = RemapType::CONSERV_YAC;
+      remap_order = 1;
       break;
     case REMAPCON:
     case GENCON:
-      *mapType = RemapType::CONSERV;
-      *remap_order = 1;
+      mapType = RemapType::CONSERV;
+      remap_order = 1;
       break;
     case REMAPCON2:
     case GENCON2:
-      *mapType = RemapType::CONSERV;
-      *remap_order = 2;
+      mapType = RemapType::CONSERV;
+      remap_order = 2;
       break;
     case REMAPLAF:
     case GENLAF:
-      *mapType = RemapType::CONSERV_YAC;
-      *submapType = SubmapType::LAF;
+      mapType = RemapType::CONSERV_YAC;
+      submapType = SubmapType::LAF;
       break;
     case REMAPSUM:
-      *mapType = RemapType::CONSERV;
-      *submapType = SubmapType::SUM;
+      mapType = RemapType::CONSERV;
+      submapType = SubmapType::SUM;
       break;
     case REMAPBIL:
-    case GENBIL: *mapType = RemapType::BILINEAR; break;
+    case GENBIL: mapType = RemapType::BILINEAR; break;
     case REMAPBIC:
-    case GENBIC: *mapType = RemapType::BICUBIC; break;
+    case GENBIC: mapType = RemapType::BICUBIC; break;
     case REMAPDIS:
     case GENDIS:
-      *mapType = RemapType::DISTWGT;
-      if (*numNeighbors == 0) *numNeighbors = 4;
+      mapType = RemapType::DISTWGT;
+      if (numNeighbors == 0) numNeighbors = 4;
       break;
     case REMAPNN:
     case GENNN:
-      *mapType = RemapType::DISTWGT;
-      *numNeighbors = 1;
+      mapType = RemapType::DISTWGT;
+      numNeighbors = 1;
       break;
     default: cdoAbort("Unknown mapping method"); break;
     }
@@ -979,7 +979,7 @@ Remap(void *argument)
     }
   else
     {
-      get_maptype(operfunc, &mapType, &submapType, &numNeighbors, &remap_order);
+      getMaptype(operfunc, mapType, submapType, numNeighbors, remap_order);
     }
 
   if (!remap_genweights && mapType == RemapType::CONSERV) remap_genweights = true;
