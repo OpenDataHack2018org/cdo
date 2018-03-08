@@ -435,7 +435,7 @@ remapGetenv(void)
 }
 
 static bool
-is_global_grid(int gridID)
+gridIsGlobal(int gridID)
 {
   bool global_grid = true;
   bool non_global = remap_non_global || !gridIsCircular(gridID);
@@ -1090,7 +1090,7 @@ Remap(void *argument)
                       if (gridIsCircular(gridID1) && !lextrapolate) remap_extrapolate = true;
                       remaps[r].src_grid.non_global = false;
                       if (mapType == RemapType::DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1
-                          && !is_global_grid(gridID1))
+                          && !gridIsGlobal(gridID1))
                         remaps[r].src_grid.non_global = true;
                       /*
                         remaps[r].src_grid.luse_cell_area = FALSE;
