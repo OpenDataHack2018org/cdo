@@ -590,7 +590,7 @@ get_normOpt(void)
 }
 
 static void
-remap_normalize(NormOpt normOpt, size_t gridsize, double *array, double missval, remapGridType *tgt_grid)
+remapNormalizeField(NormOpt normOpt, size_t gridsize, double *array, double missval, remapGridType *tgt_grid)
 {
   // used only to check the result of remapcon
 
@@ -1188,7 +1188,7 @@ Remap(void *argument)
               if (operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON)
                 {
                   // used only to check the result of remapcon
-                  if (0) remap_normalize(remaps[r].vars.normOpt, gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
+                  if (0) remapNormalizeField(remaps[r].vars.normOpt, gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
 
                   remap_set_frac_min(gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
                 }
