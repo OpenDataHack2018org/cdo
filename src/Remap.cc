@@ -625,7 +625,7 @@ remapNormalizeField(NormOpt normOpt, size_t gridsize, double *array, double miss
 }
 
 static void
-remap_set_frac_min(size_t gridsize, double *array, double missval, remapGridType *tgt_grid)
+remapSetFracMin(size_t gridsize, double *array, double missval, remapGridType *tgt_grid)
 {
   if (remap_frac_min > 0)
     {
@@ -1190,7 +1190,7 @@ Remap(void *argument)
                   // used only to check the result of remapcon
                   if (0) remapNormalizeField(remaps[r].vars.normOpt, gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
 
-                  remap_set_frac_min(gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
+                  remapSetFracMin(gridsize2, &array2[0], missval, &remaps[r].tgt_grid);
                 }
 
               if (operfunc == REMAPSUM)
