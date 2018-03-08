@@ -49,10 +49,10 @@ struct remaplink_t
 
 struct RemapVarsType
 {
-  RemapType mapType;                // identifier for remapping method
-  NormOpt normOpt;                  // option for normalization (conserv only)
   bool sort_add;
   bool pinit;                       // true: if the pointers are initialized
+  RemapType mapType;                // identifier for remapping method
+  NormOpt normOpt;                  // option for normalization (conserv only)
   long links_per_value;
   size_t max_links;                 // current size of link arrays
   size_t num_links;                 // actual number of links for remapping

@@ -41,7 +41,7 @@ nce(int istat)
 }
 
 static void
-write_links(int nc_file_id, int nc_add_id, nc_type sizetype, size_t num_links, size_t *cell_add)
+writeLinks(int nc_file_id, int nc_add_id, nc_type sizetype, size_t num_links, size_t *cell_add)
 {
   if (num_links == 0) return;
 
@@ -60,7 +60,7 @@ write_links(int nc_file_id, int nc_add_id, nc_type sizetype, size_t num_links, s
 }
 
 static void
-read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
+readLinks(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
 {
   if (num_links < 0x7FFFFC00)  // 2GB
     {
@@ -79,7 +79,7 @@ read_links(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
 
 void
 remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remap_order,
-                  RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
+                    RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
 {
   // Writes remap data to a NetCDF file using SCRIP conventions
 
@@ -428,8 +428,8 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
       rv.tgt_cell_add[i]++;
     }
 
-  write_links(nc_file_id, nc_srcadd_id, sizetype, rv.num_links, &rv.src_cell_add[0]);
-  write_links(nc_file_id, nc_dstadd_id, sizetype, rv.num_links, &rv.tgt_cell_add[0]);
+  writeLinks(nc_file_id, nc_srcadd_id, sizetype, rv.num_links, &rv.src_cell_add[0]);
+  writeLinks(nc_file_id, nc_dstadd_id, sizetype, rv.num_links, &rv.tgt_cell_add[0]);
   nce(nc_put_var_double(nc_file_id, nc_rmpmatrix_id, &rv.wts[0]));
 
   nce(nc_close(nc_file_id));
@@ -442,9 +442,63 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
 
 /*****************************************************************************/
 
+RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remap_order)
+{
+  // Map method
+  size_t attlen;
+  char map_method[64];
+  nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "map_method", map_method));
+  nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "map_method", &attlen));
+  map_method[attlen] = 0;
+
+  *submapType = SubmapType::NONE;
+  *remap_order = 1;
+
+  RemapType mapType = RemapType::UNDEF;
+  if (cmpstr(map_method, "Conservative") == 0)
+    {
+      if (cmpstr(map_method, "Conservative remapping using clipping on sphere") == 0)
+        mapType = RemapType::CONSERV_YAC;
+      else
+        mapType = RemapType::CONSERV;
+
+      int iatt;
+      int status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
+      if (status == NC_NOERR) *remap_order = iatt;
+    }
+  else if (cmpstr(map_method, "Bilinear") == 0)
+    mapType = RemapType::BILINEAR;
+  else if (cmpstr(map_method, "Bicubic") == 0)
+    mapType = RemapType::BICUBIC;
+  else if (cmpstr(map_method, "Distance") == 0)
+    {
+      mapType = RemapType::DISTWGT;
+      *numNeighbors = 4;
+    }
+  else if (cmpstr(map_method, "Nearest") == 0)
+    {
+      mapType = RemapType::DISTWGT;
+      *numNeighbors = 1;
+    }
+  else if (cmpstr(map_method, "Largest") == 0)
+    {
+      mapType = RemapType::CONSERV;
+      *submapType = SubmapType::LAF;
+    }
+  else
+    {
+      cdoPrint("mapType = %s", map_method);
+      cdoAbort("Invalid Map Type");
+    }
+
+  if (cdoVerbose) cdoPrint("mapType = %s", map_method);
+
+  return mapType;
+}
+
 void
 remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
-                 int *numNeighbors, int *remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
+                   int *numNeighbors, int *remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
 {
   // The routine reads a NetCDF file to extract remapping info in SCRIP format
 
@@ -454,7 +508,6 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
 
   bool lgridarea = false;
   int status;
-  int nc_file_id;          /* id for NetCDF file                       */
   int nc_srcgrdsize_id;    /* id for source grid size                  */
   int nc_dstgrdsize_id;    /* id for destination grid size             */
   int nc_srcgrdcorn_id;    /* id for number of source grid corners     */
@@ -484,7 +537,6 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
   int nc_rmpmatrix_id;     /* id for remapping matrix                  */
 
   char map_name[1024];
-  char map_method[64];     /* character string for mapType              */
   char normalize_opt[64];  /* character string for normalization option */
   char convention[64];     /* character string for output convention    */
   char src_grid_name[64];  /* grid name for source grid                 */
@@ -498,7 +550,7 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
   // Open file and read some global information
 
   // nce(nc_open(interp_file, NC_NOWRITE, &nc_file_id));
-  nc_file_id = cdf_openread(interp_file);
+  int nc_file_id = cdf_openread(interp_file);
 
   // Map name
 
@@ -512,13 +564,21 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
       cdoPrint("From file: %s", interp_file);
     }
 
+  // Map Tyoe
+  *mapType = getMapType(nc_file_id, submapType, numNeighbors, remap_order);
+
+  if (*mapType == RemapType::CONSERV) lgridarea = true;
+
+  remapVarsInit(*mapType, rv);
+
+  rv.mapType = *mapType;
+  rv.links_per_value = -1;
+  rv.sort_add = false;
+
   // Normalization option
   nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "normalization", normalize_opt));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "normalization", &attlen));
   normalize_opt[attlen] = 0;
-
-  rv.links_per_value = -1;
-  rv.sort_add = false;
 
   if (strcmp(normalize_opt, "none") == 0)
     rv.normOpt = NormOpt::NONE;
@@ -533,56 +593,6 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
     }
 
   if (cdoVerbose) cdoPrint("normalize_opt = %s", normalize_opt);
-
-  // Map method
-  nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "map_method", map_method));
-  nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "map_method", &attlen));
-  map_method[attlen] = 0;
-
-  *submapType = SubmapType::NONE;
-  *remap_order = 1;
-
-  if (cmpstr(map_method, "Conservative") == 0)
-    {
-      if (cmpstr(map_method, "Conservative remapping using clipping on sphere") == 0)
-        rv.mapType = RemapType::CONSERV_YAC;
-      else
-        rv.mapType = RemapType::CONSERV;
-
-      int iatt;
-      status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
-      if (status == NC_NOERR) *remap_order = iatt;
-    }
-  else if (cmpstr(map_method, "Bilinear") == 0)
-    rv.mapType = RemapType::BILINEAR;
-  else if (cmpstr(map_method, "Bicubic") == 0)
-    rv.mapType = RemapType::BICUBIC;
-  else if (cmpstr(map_method, "Distance") == 0)
-    {
-      rv.mapType = RemapType::DISTWGT;
-      *numNeighbors = 4;
-    }
-  else if (cmpstr(map_method, "Nearest") == 0)
-    {
-      rv.mapType = RemapType::DISTWGT;
-      *numNeighbors = 1;
-    }
-  else if (cmpstr(map_method, "Largest") == 0)
-    {
-      rv.mapType = RemapType::CONSERV;
-      *submapType = SubmapType::LAF;
-    }
-  else
-    {
-      cdoPrint("mapType = %s", map_method);
-      cdoAbort("Invalid Map Type");
-    }
-
-  if (cdoVerbose) cdoPrint("mapType = %s", map_method);
-
-  if (rv.mapType == RemapType::CONSERV) lgridarea = true;
-
-  *mapType = rv.mapType;
 
   // File convention
   nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "conventions", convention));
@@ -683,13 +693,10 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
 
   if (gridInqType(gridID1) == GRID_GME) gridInqMaskGME(gridID1_gme_c, src_grid.vgpm);
 
-  rv.pinit = true;
-  rv.max_links = rv.num_links;
-  rv.resize_increment = 1024;
-
   // Allocate address and weight arrays for mapping 1
   if (rv.num_links > 0)
     {
+      rv.max_links = rv.num_links;
       rv.src_cell_add.resize(rv.num_links);
       rv.tgt_cell_add.resize(rv.num_links);
       rv.wts.resize(rv.num_wts * rv.num_links);
@@ -806,8 +813,8 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
 
   if (rv.num_links > 0)
     {
-      read_links(nc_file_id, nc_srcadd_id, rv.num_links, &rv.src_cell_add[0]);
-      read_links(nc_file_id, nc_dstadd_id, rv.num_links, &rv.tgt_cell_add[0]);
+      readLinks(nc_file_id, nc_srcadd_id, rv.num_links, &rv.src_cell_add[0]);
+      readLinks(nc_file_id, nc_dstadd_id, rv.num_links, &rv.tgt_cell_add[0]);
 
       for (size_t i = 0; i < rv.num_links; ++i)
         {
@@ -826,11 +833,4 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
   cdoAbort("NetCDF support not compiled in!");
 #endif
 
-  rv.links.option = false;
-  rv.links.max_links = 0;
-  rv.links.num_blks = 0;
-  rv.links.num_links = NULL;
-  rv.links.src_add = NULL;
-  rv.links.dst_add = NULL;
-  rv.links.w_index = NULL;
 }  // remapReadDataScrip

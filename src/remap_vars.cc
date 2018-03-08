@@ -400,15 +400,15 @@ remapVarsInit(RemapType mapType, RemapVarsType &rv)
   // Initialize all pointer
   if (rv.pinit == false) rv.pinit = true;
 
+  rv.sort_add = (mapType == RemapType::CONSERV);
+
   // Determine the number of weights
   rv.num_wts = (mapType == RemapType::CONSERV) ? 3 : ((mapType == RemapType::BICUBIC) ? 4 : 1);
 
-  rv.sort_add = (mapType == RemapType::CONSERV);
-
+  rv.links_per_value = -1;
   rv.num_links = 0;
   rv.max_links = 0;
   rv.resize_increment = 1024;
-  rv.links_per_value = -1;
 
   rv.links.option = false;
   rv.links.max_links = 0;
