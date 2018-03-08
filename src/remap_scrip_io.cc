@@ -443,7 +443,7 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
 /*****************************************************************************/
 
 void
-read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
+remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
                  int *numNeighbors, int *remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
 {
   // The routine reads a NetCDF file to extract remapping info in SCRIP format
@@ -833,4 +833,4 @@ read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *m
   rv.links.src_add = NULL;
   rv.links.dst_add = NULL;
   rv.links.w_index = NULL;
-}  // read_remap_scrip
+}  // remapReadDataScrip

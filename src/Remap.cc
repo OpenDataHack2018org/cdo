@@ -930,7 +930,7 @@ Remap(void *argument)
 
   if (lremapxxx)
     {
-      read_remap_scrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remap_order,
+      remapReadDataScrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remap_order,
                        remaps[0].src_grid, remaps[0].tgt_grid, remaps[0].vars);
 
       if (remaps[0].vars.links_per_value == 0) remapLinksPerValue(remaps[0].vars);

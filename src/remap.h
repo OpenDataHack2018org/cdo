@@ -147,7 +147,7 @@ void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *
 
 void remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors,
                        int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv);
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
+void remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
                       int *numNeighbors, int *remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid,
                       RemapVarsType &rv);
 
