@@ -243,7 +243,7 @@ double remap_frac_min = 0;
 bool REMAP_genweights = true;
 
 static void
-get_remap_env(void)
+remapGetenv(void)
 {
   char *envstr;
 
@@ -874,7 +874,7 @@ Remap(void *argument)
 
   if (operfunc == REMAPDIS || operfunc == GENDIS || operfunc == REMAPNN || operfunc == GENNN) remap_extrapolate = true;
 
-  get_remap_env();
+  remapGetenv();
 
   if (cdoVerbose) cdoPrint("Extrapolation %s!", remap_extrapolate ? "enabled" : "disabled");
 
