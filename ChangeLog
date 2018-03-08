@@ -1,3 +1,7 @@
+2018-03-08  Uwe Schulzweida
+
+	* expandWildCards: check error code (bug fix)
+
 2018-02-17  Uwe Schulzweida
 
 	* Fldstat, Vertstat: added option weight=false to disable weighting

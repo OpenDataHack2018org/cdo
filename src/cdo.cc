@@ -170,7 +170,7 @@ cdo_feenableexcept(int excepts)
 }
 
 static void
-cdo_sig_handler(int signo)
+cdoSignalHandler(int signo)
 {
   if (signo == SIGFPE)
     {
@@ -1253,7 +1253,7 @@ parse_options_long(int argc, char *argv[])
                 except = FE_ALL_EXCEPT;
               if (except < 0) cdoAbort("option --%s: unsupported argument: %s", "enableexcept", CDO_optarg);
               cdo_feenableexcept(except);
-              if (signal(SIGFPE, cdo_sig_handler) == SIG_ERR) cdoWarning("can't catch SIGFPE!");
+              if (signal(SIGFPE, cdoSignalHandler) == SIG_ERR) cdoWarning("can't catch SIGFPE!");
             }
           else if (ltimestat_date)
             {
