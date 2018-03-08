@@ -143,7 +143,7 @@ maptype2operfunc(RemapType mapType, SubmapType submapType, int numNeighbors, int
 }
 
 static void
-print_remap_info(int operfunc, bool remap_genweights, remapGridType *src_grid, remapGridType *tgt_grid, size_t nmiss)
+remapPrintInfo(int operfunc, bool remap_genweights, remapGridType &src_grid, remapGridType &tgt_grid, size_t nmiss)
 {
   char line[256], tmpstr[256];
 
@@ -173,24 +173,24 @@ print_remap_info(int operfunc, bool remap_genweights, remapGridType *src_grid, r
   else
     strcat(line, " remapping from ");
 
-  strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
-  if (src_grid->rank == 2)
-    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid->dims[0], src_grid->dims[1]);
+  strcat(line, gridNamePtr(gridInqType(src_grid.gridID)));
+  if (src_grid.rank == 2)
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", src_grid.dims[0], src_grid.dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", src_grid.dims[0]);
   strcat(line, tmpstr);
   strcat(line, " to ");
-  strcat(line, gridNamePtr(gridInqType(tgt_grid->gridID)));
-  if (tgt_grid->rank == 2)
-    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", tgt_grid->dims[0], tgt_grid->dims[1]);
+  strcat(line, gridNamePtr(gridInqType(tgt_grid.gridID)));
+  if (tgt_grid.rank == 2)
+    snprintf(tmpstr, sizeof(tmpstr), " (%zux%zu)", tgt_grid.dims[0], tgt_grid.dims[1]);
   else
-    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", tgt_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%zu)", tgt_grid.dims[0]);
   strcat(line, tmpstr);
   strcat(line, " grid");
 
   if (nmiss > 0)
     {
-      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%zu)", gridInqSize(src_grid->gridID) - nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%zu)", gridInqSize(src_grid.gridID) - nmiss);
       strcat(line, tmpstr);
     }
 
@@ -1141,7 +1141,7 @@ Remap(void *argument)
                   // initialize some remapping variables
                   remapVarsInit(mapType, remaps[r].vars);
 
-                  print_remap_info(operfunc, remap_genweights, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
+                  remapPrintInfo(operfunc, remap_genweights, remaps[r].src_grid, remaps[r].tgt_grid, nmiss1);
 
                   if (remap_genweights)
                     {
