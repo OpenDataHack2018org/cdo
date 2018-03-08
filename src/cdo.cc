@@ -255,25 +255,19 @@ cdo_usage(void)
   fprintf(stderr, "    -a             Generate an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (I8/I16/I32/F32/F64 for "
-                  "nc1/nc2/nc4/nc4c/nc5; F32/F64 for grb2/srv/ext/ieg; P1 - "
-                  "P24 for grb1/grb2)\n");
-  fprintf(stderr, "                   Add L or B to set the byteorder to "
-                  "Little or Big endian\n");
+                  "nc1/nc2/nc4/nc4c/nc5; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2)\n");
+  fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
   fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
   fprintf(stderr, "    -C, --color    Colorized output messages\n");
   fprintf(stderr, "    --enableexcept <except>\n");
   fprintf(stderr, "                   Set individual floating-point traps "
-                  "(DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, "
-                  "ALL_EXCEPT)\n");
+                  "(DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
   fprintf(stderr, "    -f, --format <format>\n");
-  fprintf(stderr, "                   Format of the output file. "
-                  "(grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg)\n");
+  fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
-  fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, "
-                  "r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
+  fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h, --help     Help information for the operators\n");
-  fprintf(stderr, "    --history      Do not append to NetCDF \"history\" "
-                  "global attribute\n");
+  fprintf(stderr, "    --history      Do not append to NetCDF \"history\" global attribute\n");
   fprintf(stderr, "    --netcdf_hdr_pad, --hdr_pad, --header_pad <nbr>\n");
   fprintf(stderr, "                   Pad NetCDF output header with nbr bytes\n");
   /*
@@ -287,11 +281,8 @@ cdo_usage(void)
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
   fprintf(stderr, "    -k <chunktype> NetCDF4 chunk type: auto, grid or lines\n");
   fprintf(stderr, "    -L             Lock IO (sequential access)\n");
-  fprintf(stderr, "    -M             Switch to indicate that the I/O streams "
-                  "have missing values\n");
-  fprintf(stderr, "    -m <missval>   Set the missing value of non NetCDF files "
-                  "(default: %g)\n",
-          cdiInqMissval());
+  fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
+  fprintf(stderr, "    -m <missval>   Set the missing value of non NetCDF files (default: %g)\n", cdiInqMissval());
   fprintf(stderr, "    --no_warnings  Inhibit warning messages\n");
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
   fprintf(stderr, "    --operators    List of all operators\n");
@@ -299,24 +290,18 @@ cdo_usage(void)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
   fprintf(stderr, "    --percentile <method>\n");
-  fprintf(stderr, "                   Percentile method: nrank, nist, numpy, "
-                  "numpy_lower, numpy_higher, numpy_nearest\n");
+  fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
   fprintf(stderr, "    --precision <float_digits[,double_digits]>\n");
-  fprintf(stderr, "                   Precision to use in displaying "
-                  "floating-point data (default: 7,15)\n");
+  fprintf(stderr, "                   Precision to use in displaying floating-point data (default: 7,15)\n");
   fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions\n");
   if (ITSME) fprintf(stderr, "    --remap_genweights 0/1\n");
-  fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to "
-                  "regular grid (cgribex only)\n");
+  fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (cgribex only)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
-  fprintf(stderr, "    -S             Create an extra output stream for the "
-                  "module TIMSTAT. This stream\n");
-  fprintf(stderr, "                   contains the number of non missing "
-                  "values for each output period.\n");
+  fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
+  fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
   fprintf(stderr, "    -s, --silent   Silent mode\n");
   fprintf(stderr, "    --sortname     Alphanumeric sorting of NetCDF parameter names\n");
-  fprintf(stderr, "    -t <codetab>   Set GRIB1 default parameter code table "
-                  "name or file (cgribex only)\n");
+  fprintf(stderr, "    -t <codetab>   Set GRIB1 default parameter code table name or file (cgribex only)\n");
   fprintf(stderr, "                   Predefined tables: ");
   for (int id = 0; id < tableInqNumber(); id++)
     if ((name = tableInqNamePtr(id))) fprintf(stderr, " %s", name);
@@ -334,9 +319,7 @@ cdo_usage(void)
   fprintf(stderr, "        zip[_1-9]  Deflate compression of NetCDF4 variables\n");
 #ifdef HIRLAM_EXTENSIONS
   fprintf(stderr, "    --Dkext <debLev>   Setting debugLevel for extensions\n");
-  fprintf(stderr, "    --outputGribDataScanningMode <mode>   Setting grib "
-                  "scanning mode for data in output file <0, 64, 96>; Default "
-                  "is 64\n");
+  fprintf(stderr, "    --outputGribDataScanningMode <mode>   Setting grib scanning mode for data in output file <0, 64, 96>; Default is 64\n");
 #endif  // HIRLAM_EXTENSIONS
   reset_text_color(stderr);
   fprintf(stderr, "\n");
@@ -476,8 +459,7 @@ setDefaultDataType(const char *datatypestr)
           else
             {
               fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
-              fprintf(stderr, "Use I8/I16/I32/F32/F64 for "
-                              "nc1/nc2/nc4/nc4c/nc5; F32/F64 for "
+              fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c/nc5; F32/F64 for "
                               "grb2/srv/ext/ieg; P1 - P24 for grb1/grb2.\n");
               exit(EXIT_FAILURE);
             }
@@ -493,10 +475,7 @@ setDefaultDataType(const char *datatypestr)
               else if (nbits == 32)
                 cdoDefaultDataType = CDI_DATATYPE_INT32;
               else
-                {
-                  fprintf(stderr, "Unsupported number of bits = %d for datatype INT!\n", nbits);
-                  exit(EXIT_FAILURE);
-                }
+                cdoAbort("Unsupported number of bits = %d for datatype INT!", nbits);
             }
           else if (dtype == D_UINT)
             {
@@ -507,10 +486,7 @@ setDefaultDataType(const char *datatypestr)
               else if (nbits == 32)
                 cdoDefaultDataType = CDI_DATATYPE_UINT32;
               else
-                {
-                  fprintf(stderr, "Unsupported number of bits = %d for datatype UINT!\n", nbits);
-                  exit(EXIT_FAILURE);
-                }
+                cdoAbort("Unsupported number of bits = %d for datatype UINT!", nbits);
             }
           else if (dtype == D_FLT)
             {
@@ -519,10 +495,7 @@ setDefaultDataType(const char *datatypestr)
               else if (nbits == 64)
                 cdoDefaultDataType = CDI_DATATYPE_FLT64;
               else
-                {
-                  fprintf(stderr, "Unsupported number of bits = %d for datatype FLT!\n", nbits);
-                  exit(EXIT_FAILURE);
-                }
+                cdoAbort("Unsupported number of bits = %d for datatype FLT!", nbits);
             }
           else if (dtype == D_CPX)
             {
@@ -531,10 +504,7 @@ setDefaultDataType(const char *datatypestr)
               else if (nbits == 64)
                 cdoDefaultDataType = CDI_DATATYPE_CPX64;
               else
-                {
-                  fprintf(stderr, "Unsupported number of bits = %d for datatype CPX!\n", nbits);
-                  exit(EXIT_FAILURE);
-                }
+                cdoAbort("Unsupported number of bits = %d for datatype CPX!", nbits);
             }
         }
     }
@@ -553,8 +523,7 @@ setDefaultDataType(const char *datatypestr)
         }
       else
         {
-          fprintf(stderr, "Unsupported character in number of bytes: >%s< !\n", datatypestr);
-          exit(EXIT_FAILURE);
+          cdoAbort("Unsupported character in number of bytes: >%s< !", datatypestr);
         }
     }
 }
@@ -588,7 +557,7 @@ grb1/grb2.\n"); exit(EXIT_FAILURE);
       if ( *datatypestr == 'l' || *datatypestr == 'L' )
         {
           if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
-          datatypestr++;setDefaultDataTypeByte
+          datatypestr++;
         }
       else if ( *datatypestr == 'b' || *datatypestr == 'B' )
         {
@@ -597,8 +566,7 @@ grb1/grb2.\n"); exit(EXIT_FAILURE);
         }
       else
         {
-          fprintf(stderr, "Unsupported character in number of bytes: %s!\n",
-datatypestr); exit(EXIT_FAILURE);
+          cdoAbort("Unsupported character in number of bytes: %s!", datatypestr);
         }
     }
 }
@@ -628,9 +596,9 @@ setDefaultFileType(const char *filetypestr, int labort)
         {
           if ( labort )
             {
-              fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
-              fprintf(stderr, "Available filetypes: grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg\n");
-              exit(EXIT_FAILURE);
+              cdoWarning("Unsupported filetype %s!", filetypestr);
+              cdoWarning("Available filetypes: grb1/grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg");
+              cdoAbort("Unsupported filetype %s!", filetypestr);
             }
           else
             {
@@ -649,11 +617,8 @@ setDefaultFileType(const char *filetypestr, int labort)
             {
               fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
               fprintf(stderr, "Use format[_nbits] with:\n");
-              fprintf(stderr, "    format = grb1, grb2, nc1, nc2, nc4, nc4c, "
-                              "nc5, srv, ext or ieg\n");
-              fprintf(stderr, "    nbits  = 32/64 for "
-                              "grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg; 1 - 24 "
-                              "for grb1/grb2\n");
+              fprintf(stderr, "    format = grb1, grb2, nc1, nc2, nc4, nc4c, nc5, srv, ext or ieg\n");
+              fprintf(stderr, "    nbits  = 32/64 for grb2/nc1/nc2/nc4/nc4c/nc5/srv/ext/ieg; 1 - 24 for grb1/grb2\n");
               exit(EXIT_FAILURE);
             }
         }
@@ -726,8 +691,7 @@ defineCompress(const char *arg)
     }
   else
     {
-      fprintf(stderr, "Compression type '%s' unsupported!\n", arg);
-      exit(EXIT_FAILURE);
+      cdoAbort("Compression type '%s' unsupported!", arg);
     }
 }
 
@@ -741,10 +705,7 @@ defineChunktype(const char *arg)
   else if (STR_IS_EQ("lines", arg))
     cdoChunkType = CDI_CHUNK_LINES;
   else
-    {
-      fprintf(stderr, "Chunk type '%s' unsupported!\n", arg);
-      exit(EXIT_FAILURE);
-    }
+    cdoAbort("Chunk type '%s' unsupported!", arg);
 }
 
 static void
@@ -1357,8 +1318,7 @@ parse_options_long(int argc, char *argv[])
             /* printf("host: %s %s\n", host, cdoExpName); */
             cdoExpMode = STR_IS_EQ(host, cdoExpName) ? CDO_EXP_REMOTE : CDO_EXP_LOCAL;
 #else
-            fprintf(stderr, "Function gethostname not available!\n");
-            exit(EXIT_FAILURE);
+            cdoAbort("Function gethostname not available!");
 #endif
             break;
           }
@@ -1375,12 +1335,7 @@ parse_options_long(int argc, char *argv[])
         case 'O': cdoOverwriteMode = TRUE; break;
         case 'P':
           if (*CDO_optarg < '1' || *CDO_optarg > '9')
-            {
-              fprintf(stderr, "Unexpected character in number of OpenMP threads (-P "
-                              "<nthreads>): %s!\n",
-                      CDO_optarg);
-              exit(EXIT_FAILURE);
-            }
+            cdoAbort("Unexpected character in number of OpenMP threads (-P <nthreads>): %s!", CDO_optarg);
           numThreads = atoi(CDO_optarg);
           break;
         case 'p':
@@ -1795,7 +1750,7 @@ void init_aliases()
 
 int main(int argc, char *argv[])
 {
-  int lstop = FALSE;
+  bool lstop = false;
   int noff = 0;
   int status = 0;
   const char *operatorArg = NULL;
@@ -1817,9 +1772,9 @@ int main(int argc, char *argv[])
 
   get_env_vars();
   init_modules();
-  status = parse_options_long(argc, argv);
 
-  if ( status != 0 ) return -1;
+  status = parse_options_long(argc, argv);
+  if (status != 0) return -1;
 
   cdo_set_options();
 #ifdef DEBUG
@@ -1911,17 +1866,12 @@ int main(int argc, char *argv[])
         }
 
       if ( Help ) cdo_usage();
-      lstop = TRUE;
+      lstop = true;
     }
 
   if ( lstop ) return status;
 
   if ( cdoDefaultTableID != CDI_UNDEFID ) cdiDefTableID(cdoDefaultTableID);
-
-  extern int (*proj_lonlat_to_lcc_func)();
-  proj_lonlat_to_lcc_func = (int (*)()) proj_lonlat_to_lcc;
-  extern int (*proj_lcc_to_lonlat_func)();
-  proj_lcc_to_lonlat_func = (int (*)()) proj_lcc_to_lonlat;
   
   const char *operatorName = get_original(getOperatorName(argv[CDO_optind]));
 
@@ -1948,7 +1898,6 @@ int main(int argc, char *argv[])
 
       timer_start(timer_total);
 
-
 #ifdef CUSTOM_MODULES
       load_custom_modules("custom_modules");
       getProcess(0)->m_module.func(getProcess(0));
@@ -1971,9 +1920,7 @@ int main(int argc, char *argv[])
       Free(cdoVarnames);
     }
 
-  /* problems with alias!!! if ( operatorName ) Free(operatorName); */ 
-
-  /* malloc_stats(); */
+  // malloc_stats();
 
   if ( cdoGridSearchDir ) Free(cdoGridSearchDir);
 
