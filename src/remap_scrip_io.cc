@@ -78,7 +78,7 @@ readLinks(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
 #endif
 
 void
-remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remap_order,
+remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remapOrder,
                     RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
 {
   // Writes remap data to a NetCDF file using SCRIP conventions
@@ -239,7 +239,7 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
 
   // Remap order
   if (mapType == RemapType::CONSERV && submapType == SubmapType::NONE)
-    nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "remap_order", NC_INT, 1L, &remap_order));
+    nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "remap_order", NC_INT, 1L, &remapOrder));
 
   // File convention
   strcpy(tmp_string, "SCRIP");
@@ -442,7 +442,7 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
 
 /*****************************************************************************/
 
-RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remap_order)
+RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remapOrder)
 {
   // Map method
   size_t attlen;
@@ -452,7 +452,7 @@ RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, 
   map_method[attlen] = 0;
 
   *submapType = SubmapType::NONE;
-  *remap_order = 1;
+  *remapOrder = 1;
 
   RemapType mapType = RemapType::UNDEF;
   if (cmpstr(map_method, "Conservative") == 0)
@@ -464,7 +464,7 @@ RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, 
 
       int iatt;
       int status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
-      if (status == NC_NOERR) *remap_order = iatt;
+      if (status == NC_NOERR) *remapOrder = iatt;
     }
   else if (cmpstr(map_method, "Bilinear") == 0)
     mapType = RemapType::BILINEAR;
@@ -498,7 +498,7 @@ RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, 
 
 void
 remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
-                   int *numNeighbors, int *remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
+                   int *numNeighbors, int *remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv)
 {
   // The routine reads a NetCDF file to extract remapping info in SCRIP format
 
@@ -565,7 +565,7 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
     }
 
   // Map Tyoe
-  *mapType = getMapType(nc_file_id, submapType, numNeighbors, remap_order);
+  *mapType = getMapType(nc_file_id, submapType, numNeighbors, remapOrder);
 
   if (*mapType == RemapType::CONSERV) lgridarea = true;
 

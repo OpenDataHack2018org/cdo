@@ -472,11 +472,10 @@ remapDefineGrid(RemapType mapType, int gridID, RemapGridType &grid, const char *
 
   if (gridInqMask(gridID, NULL))
     {
-      int *mask = (int *) Malloc(gridsize * sizeof(int));
-      gridInqMask(gridID, mask);
+      std::vector<int> mask(gridsize);
+      gridInqMask(gridID, &mask[0]);
       for (size_t i = 0; i < gridsize; ++i)
         if (mask[i] == 0) grid.mask[i] = FALSE;
-      Free(mask);
     }
 
   if (!remap_write_remap && grid.remap_grid_type == REMAP_GRID_TYPE_REG2D) return;
@@ -706,10 +705,10 @@ remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGridType 
 /*****************************************************************************/
 
 void
-remapStat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv, const double *restrict array1,
+remapStat(int remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv, const double *restrict array1,
           const double *restrict array2, double missval)
 {
-  if (remap_order == 2)
+  if (remapOrder == 2)
     cdoPrint("Second order mapping from grid1 to grid2:");
   else
     cdoPrint("First order mapping from grid1 to grid2:");

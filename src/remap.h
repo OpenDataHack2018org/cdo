@@ -137,8 +137,8 @@ void remap_distwgt(size_t numNeighbors, RemapGridType *src_grid, RemapGridType *
 void remap_conserv(RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
                    double *restrict tgt_array, double missval);
 
-void remapStat(int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv,
-                const double *restrict array1, const double *restrict array2, double missval);
+void remapStat(int remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv,
+               const double *restrict array1, const double *restrict array2, double missval);
 void remapGradients(RemapGridType &grid, const double *restrict array, gradientsType &gradients);
 
 void sort_add(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *restrict add2, double *restrict weights);
@@ -146,10 +146,10 @@ void sort_iter(size_t num_links, size_t num_wts, size_t *restrict add1, size_t *
                int parent);
 
 void remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors,
-                       int remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv);
+                         int remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv);
 void remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
-                      int *numNeighbors, int *remap_order, RemapGridType &src_grid, RemapGridType &tgt_grid,
-                      RemapVarsType &rv);
+                        int *numNeighbors, int *remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid,
+                        RemapVarsType &rv);
 
 void calc_lat_bins(RemapGridType &src_grid, RemapGridType &tgt_grid, RemapType mapType);
 size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2,
