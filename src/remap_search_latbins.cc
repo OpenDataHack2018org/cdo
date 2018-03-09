@@ -19,16 +19,16 @@
 #include "remap.h"
 
 static void
-calc_bin_addr(size_t gridsize, size_t nbins, const float *restrict bin_lats, const float *restrict cell_bound_box,
+calc_bin_addr(size_t ncells, size_t nbins, const float *restrict bin_lats, const float *restrict cell_bound_box,
               size_t *restrict bin_addr)
 {
   for (size_t n = 0; n < nbins; ++n)
     {
-      bin_addr[n*2] = gridsize;
+      bin_addr[n*2] = ncells;
       bin_addr[n*2 + 1] = 0;
     }
 
-  for (size_t nele = 0; nele < gridsize; ++nele)
+  for (size_t nele = 0; nele < ncells; ++nele)
     {
       size_t n2;
       size_t nele4 = nele << 2;
@@ -47,24 +47,24 @@ calc_bin_addr(size_t gridsize, size_t nbins, const float *restrict bin_lats, con
 }
 
 void
-calc_lat_bins(RemapGridType &grid)
+calc_lat_bins(GridSearchBins &searchBins)
 {
-  size_t nbins = grid.num_srch_bins;
+  size_t nbins = searchBins.nbins;
   double dlat = PI / nbins;  // lat interval for search bins
 
   if (cdoVerbose) cdoPrint("Using %zu latitude bins to restrict search.", nbins);
 
   if (nbins > 0)
     {
-      grid.bin_lats = (float *) Malloc(2 * nbins * sizeof(float));
+      searchBins.bin_lats = (float *) Malloc(2 * nbins * sizeof(float));
       for (size_t n = 0; n < nbins; ++n)
         {
-          grid.bin_lats[n*2] = (n) *dlat - PIH;
-          grid.bin_lats[n*2 + 1] = (n + 1) * dlat - PIH;
+          searchBins.bin_lats[n*2] = (n) *dlat - PIH;
+          searchBins.bin_lats[n*2 + 1] = (n + 1) * dlat - PIH;
         }
 
-      grid.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
-      calc_bin_addr(grid.size, nbins, grid.bin_lats, grid.cell_bound_box, grid.bin_addr);
+      searchBins.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
+      calc_bin_addr(searchBins.ncells, nbins, searchBins.bin_lats, searchBins.cell_bound_box, searchBins.bin_addr);
     }
 }
 
@@ -310,8 +310,7 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
 int
 grid_search(RemapGridType *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
             double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
-            const double *restrict src_center_lon, const float *restrict src_grid_bound_box,
-            const size_t *restrict src_bin_add)
+            const double *restrict src_center_lon, GridSearchBins &src_bins)
 {
   /*
     Output variables:
@@ -334,12 +333,13 @@ grid_search(RemapGridType *src_grid, size_t *restrict src_add, double *restrict 
 
     int src_bin_add[][2]           ! latitude bins for restricting
   */
-  /*  Local variables */
-  size_t n2, srch_add, srch_add4; /* dummy indices                    */
+  size_t n2, srch_add, srch_add4;
   int search_result = 0;
-  float *bin_lats = src_grid->bin_lats;
 
-  size_t nbins = src_grid->num_srch_bins;
+  size_t nbins = src_bins.nbins;
+  const size_t *restrict src_bin_add = src_bins.bin_addr;
+  const float *restrict bin_lats = src_bins.bin_lats;
+  const float *restrict src_grid_bound_box = src_bins.cell_bound_box;
 
   float rlat = plat;
   float rlon = plon;

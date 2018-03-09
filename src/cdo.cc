@@ -1623,7 +1623,6 @@ void init_modules()
   add_module("Wind"          , {Wind          , WindHelp          , WindOperators          , 1 , CDI_REAL , 1  , 1  });
   add_module("Writegrid"     , {Writegrid     , {}                , WritegridOperators     , 1 , CDI_REAL , 1  , 1  }); // no cdi output
   add_module("Writerandom"   , {Writerandom   , {}                , WriterandomOperators   , 1 , CDI_REAL , 1  , 1  });
-  add_module("YAR"           , {YAR           , {}                , YAROperators           , 0 , CDI_REAL , 1  , 1  });
   add_module("Yearmonstat"   , {Yearmonstat   , YearmonstatHelp   , YearmonstatOperators   , 1 , CDI_REAL , 1  , 1  });
   add_module("Ydayarith"     , {Ydayarith     , YdayarithHelp     , YdayarithOperators     , 1 , CDI_REAL , 2  , 1  });
   add_module("Ydaypctl"      , {Ydaypctl      , YdaypctlHelp      , YdaypctlOperators      , 1 , CDI_REAL , 3  , 1  });

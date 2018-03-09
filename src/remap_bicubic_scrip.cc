@@ -100,7 +100,7 @@ bicubic_remap(double *restrict tgt_point, const double *restrict src_array, doub
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bicubic_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
+scrip_remap_bicubic_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
 {
   extern int timer_remap_bic;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -127,7 +127,7 @@ scrip_remap_bicubic_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, Re
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(weightlinks, remap_grid_type, tgt_grid_size, \
+#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightlinks, remap_grid_type, tgt_grid_size, \
                                                                     src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
@@ -155,7 +155,7 @@ scrip_remap_bicubic_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, Re
       else
         search_result
             = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
-                          src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
+                          src_grid->cell_center_lon, rsearch.src_bins);
 
       // Check to see if points are land points
       if (search_result > 0)
@@ -292,7 +292,7 @@ grid_search_test(struct gridsearch *gs, size_t *restrict src_add, double *restri
 #endif
 
 void
-scrip_remap_bicubic(RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
+scrip_remap_bicubic(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
                     double *restrict tgt_array, double missval)
 {
   int remap_grid_type = src_grid->remap_grid_type;
@@ -323,7 +323,7 @@ scrip_remap_bicubic(RemapGridType *src_grid, RemapGridType *tgt_grid, const doub
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(remap_grid_type, tgt_grid_size, src_grid, \
+#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, remap_grid_type, tgt_grid_size, src_grid, \
                                                                     tgt_grid, src_array, tgt_array, missval,  \
                                                                     gradients)
 #endif
@@ -356,7 +356,7 @@ scrip_remap_bicubic(RemapGridType *src_grid, RemapGridType *tgt_grid, const doub
 #else
         search_result
             = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
-                          src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
+                          src_grid->cell_center_lon, rsearch.src_bins);
 #endif
 
       // Check to see if points are land points

@@ -1217,7 +1217,7 @@ normalize_weights(RemapGridType *tgt_grid, RemapVarsType &rv, double *src_centro
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
+scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
 {
   /* local variables */
 
@@ -1236,7 +1236,7 @@ scrip_remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, Re
 
   progressInit();
 
-  long nbins = src_grid->num_srch_bins;
+  long nbins = rsearch.src_bins.nbins;
   long num_wts = rv.num_wts;
 
   grid_store_t *grid_store = (grid_store_t *) Malloc(sizeof(grid_store_t));
@@ -1297,7 +1297,7 @@ scrip_remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, Re
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) reduction(+ : findex) shared(                                                 \
-    nbins, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, \
+    rsearch, nbins, num_wts, src_centroid_lon, src_centroid_lat, grid_store, rv, \
     cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells, src_num_cell_corners, srch_corners,    \
     src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
@@ -1320,8 +1320,8 @@ scrip_remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, Re
       long tgt_cell_add;
 
       // Get search cells
-      long num_srch_cells = get_srch_cells(src_cell_add, nbins, src_grid->bin_addr, tgt_grid->bin_addr,
-                                           src_grid->cell_bound_box + src_cell_add * 4, tgt_grid->cell_bound_box,
+      long num_srch_cells = get_srch_cells(src_cell_add, nbins, rsearch.src_bins.bin_addr, rsearch.tgt_bins.bin_addr,
+                                           rsearch.src_bins.cell_bound_box + src_cell_add * 4, rsearch.tgt_bins.cell_bound_box,
                                            tgt_grid_size, srch_add[ompthID]);
 
       if (num_srch_cells == 0) continue;
@@ -1500,7 +1500,7 @@ scrip_remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, Re
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) reduction(+ : findex) shared(                                                 \
-    nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, \
+    rsearch, nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, grid_store, rv, \
     cdoVerbose, max_subseg, srch_corner_lat, srch_corner_lon, max_srch_cells, tgt_num_cell_corners, srch_corners,    \
     src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add)
 #endif
@@ -1523,8 +1523,8 @@ scrip_remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, Re
       long src_cell_add;
 
       // Get search cells
-      long num_srch_cells = get_srch_cells(tgt_cell_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
-                                           tgt_grid->cell_bound_box + tgt_cell_add * 4, src_grid->cell_bound_box,
+      long num_srch_cells = get_srch_cells(tgt_cell_add, nbins, rsearch.tgt_bins.bin_addr, rsearch.src_bins.bin_addr,
+                                           rsearch.tgt_bins.cell_bound_box + tgt_cell_add * 4, rsearch.src_bins.cell_bound_box,
                                            src_grid_size, srch_add[ompthID]);
 
       if (num_srch_cells == 0) continue;

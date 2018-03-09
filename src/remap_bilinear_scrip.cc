@@ -186,7 +186,7 @@ bilinear_remap(double *restrict tgt_point, const double *restrict src_array, con
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bilinear_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
+scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
 {
   extern int timer_remap_bil;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -214,7 +214,7 @@ scrip_remap_bilinear_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, R
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) schedule(static) \
-    reduction(+ : findex) shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv)
+  reduction(+ : findex) shared(rsearch, weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -241,7 +241,7 @@ scrip_remap_bilinear_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, R
       else
         search_result
             = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
-                          src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
+                          src_grid->cell_center_lon, rsearch.src_bins);
 
       // Check to see if points are mask points
       if (search_result > 0)
@@ -377,7 +377,7 @@ grid_search_test(struct gridsearch *gs, size_t *restrict src_add, double *restri
 #endif
 
 void
-scrip_remap_bilinear(RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
+scrip_remap_bilinear(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
                      double *restrict tgt_array, double missval)
 {
   extern int timer_remap_bil;
@@ -410,7 +410,7 @@ scrip_remap_bilinear(RemapGridType *src_grid, RemapGridType *tgt_grid, const dou
   // Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(gs) shared( \
+#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(gs) shared(rsearch,  \
     Options::silentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
@@ -442,7 +442,7 @@ scrip_remap_bilinear(RemapGridType *src_grid, RemapGridType *tgt_grid, const dou
 #else
         search_result
             = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
-                          src_grid->cell_center_lon, src_grid->cell_bound_box, src_grid->bin_addr);
+                          src_grid->cell_center_lon, rsearch.src_bins);
 #endif
 
       // Check to see if points are mask points

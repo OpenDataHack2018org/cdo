@@ -232,7 +232,6 @@
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
-#define  YAROperators           {"yarbil", "yarnn", "yarcon"}
 #define  YearmonstatOperators   {"yearmonmean", "yearmonavg"}
 #define  YdayarithOperators     {"ydayadd", "ydaysub", "ydaymul", "ydaydiv"}
 #define  YdaypctlOperators      {"ydaypctl"}

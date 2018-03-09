@@ -533,7 +533,6 @@ void
 remapGridInit(RemapGridType &grid)
 {
   grid.remap_grid_type = -1;
-  grid.num_srch_bins = remap_num_srch_bins;
 
   grid.num_cell_corners = 0;
   grid.luse_cell_corners = false;
@@ -556,10 +555,6 @@ remapGridInit(RemapGridType &grid)
 
   grid.cell_area = NULL;
   grid.cell_frac = NULL;
-
-  grid.cell_bound_box = NULL;
-  grid.bin_addr = NULL;
-  grid.bin_lats = NULL;
 }
 
 void
@@ -580,19 +575,16 @@ remapGridFree(RemapGridType &grid)
 
   if (grid.cell_area) Free(grid.cell_area);
   if (grid.cell_frac) Free(grid.cell_frac);
-
-  if (grid.cell_bound_box) Free(grid.cell_bound_box);
-
-  if (grid.bin_addr) Free(grid.bin_addr);
-  if (grid.bin_lats) Free(grid.bin_lats);
-
 }
 
 void
 remapSearchInit(RemapType mapType, RemapSearch &search, RemapGridType &src_grid, RemapGridType &tgt_grid)
 {
-  search.src_bins.num_srch_bins = remap_num_srch_bins;
-  search.tgt_bins.num_srch_bins = remap_num_srch_bins;
+  search.src_bins.ncells = src_grid.size;
+  search.tgt_bins.ncells = tgt_grid.size;
+
+  search.src_bins.nbins = remap_num_srch_bins;
+  search.tgt_bins.nbins = remap_num_srch_bins;
 
   search.src_bins.cell_bound_box = NULL;
   search.src_bins.bin_addr = NULL;
@@ -608,25 +600,25 @@ remapSearchInit(RemapType mapType, RemapSearch &search, RemapGridType &src_grid,
           //            && mapType != RemapType::BILINEAR
           )
         {
-          src_grid.cell_bound_box = (float *) Malloc(4 * src_grid.size * sizeof(float));
+          search.src_bins.cell_bound_box = (float *) Malloc(4 * src_grid.size * sizeof(float));
           if ( tgt_grid.luse_cell_corners )
-            tgt_grid.cell_bound_box = (float *) Malloc(4 * tgt_grid.size * sizeof(float));
+            search.tgt_bins.cell_bound_box = (float *) Malloc(4 * tgt_grid.size * sizeof(float));
 
-          cell_bounding_boxes(src_grid, src_grid.cell_bound_box, REMAP_GRID_BASIS_SRC);
-          cell_bounding_boxes(tgt_grid, tgt_grid.cell_bound_box, REMAP_GRID_BASIS_TGT);
+          cell_bounding_boxes(src_grid, search.src_bins.cell_bound_box, REMAP_GRID_BASIS_SRC);
+          cell_bounding_boxes(tgt_grid, search.tgt_bins.cell_bound_box, REMAP_GRID_BASIS_TGT);
           // Set up and assign address ranges to search bins in order to further restrict later searches
-          calc_lat_bins(src_grid);
+          calc_lat_bins(search.src_bins);
           if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
             {
-              calc_lat_bins(tgt_grid);
-              Free(src_grid.bin_lats);
-              src_grid.bin_lats = NULL;
-              Free(tgt_grid.bin_lats);
-              tgt_grid.bin_lats = NULL;
+              calc_lat_bins(search.tgt_bins);
+              Free(search.src_bins.bin_lats);
+              search.src_bins.bin_lats = NULL;
+              Free(search.tgt_bins.bin_lats);
+              search.tgt_bins.bin_lats = NULL;
               if (mapType == RemapType::CONSERV_YAC)
                 {
-                  Free(tgt_grid.cell_bound_box);
-                  tgt_grid.cell_bound_box = NULL;
+                  Free(search.tgt_bins.cell_bound_box);
+                  search.tgt_bins.cell_bound_box = NULL;
                 }
             }
         }

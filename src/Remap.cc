@@ -772,15 +772,15 @@ static void
 remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
 {
   if (mapType == RemapType::CONSERV)
-    scrip_remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
+    scrip_remap_conserv_weights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapType::BILINEAR)
-    scrip_remap_bilinear_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
+    scrip_remap_bilinear_weights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapType::BICUBIC)
-    scrip_remap_bicubic_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
+    scrip_remap_bicubic_weights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapType::DISTWGT)
-    remap_distwgt_weights(numNeighbors, &remap->src_grid, &remap->tgt_grid, remap->vars);
+    remap_distwgt_weights(numNeighbors, remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapType::CONSERV_YAC)
-    remap_conserv_weights(&remap->src_grid, &remap->tgt_grid, remap->vars);
+    remap_conserv_weights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
 
   if (remap->vars.sort_add) remapSortAddr(remap->vars);
   if (remap->vars.links_per_value == -1) remapLinksPerValue(remap->vars);
@@ -790,13 +790,13 @@ static void
 remapField(RemapType mapType, remapType *remap, int numNeighbors, double *array1, double *array2, double missval)
 {
   if (mapType == RemapType::BILINEAR)
-    scrip_remap_bilinear(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+    scrip_remap_bilinear(remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
   else if (mapType == RemapType::BICUBIC)
-    scrip_remap_bicubic(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+    scrip_remap_bicubic(remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
   else if (mapType == RemapType::DISTWGT)
-    remap_distwgt(numNeighbors, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+    remap_distwgt(numNeighbors, remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
   else if (mapType == RemapType::CONSERV_YAC)
-    remap_conserv(&remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+    remap_conserv(remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
 }
 
 static void

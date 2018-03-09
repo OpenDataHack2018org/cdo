@@ -680,7 +680,7 @@ reg2d_bound_box(RemapGridType *remap_grid, double *grid_bound_box)
 }
 
 void
-remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
+remap_conserv_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
 {
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells
@@ -778,7 +778,7 @@ remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVar
 // Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(                      \
+#pragma omp parallel for schedule(dynamic) default(none) reduction(+ : findex) shared(rsearch, \
     Threading::ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, rv, cdoVerbose, \
     tgt_num_cell_corners, target_cell_type, weightlinks, srch_corners, src_grid, tgt_grid, tgt_grid_size,   \
     src_grid_size, search, srch_add, tgt_grid_cell, sum_srch_cells, sum_srch_cells2)
@@ -837,10 +837,10 @@ remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVar
           boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon,
                                   tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
 
-          size_t nbins = src_grid->num_srch_bins;
+          size_t nbins = rsearch.src_bins.nbins;
           num_srch_cells
-              = get_srch_cells(tgt_cell_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr, tgt_cell_bound_box_r,
-                               src_grid->cell_bound_box, src_grid_size, srch_add[ompthID]);
+              = get_srch_cells(tgt_cell_add, nbins, rsearch.tgt_bins.bin_addr, rsearch.src_bins.bin_addr, tgt_cell_bound_box_r,
+                               rsearch.src_bins.cell_bound_box, src_grid_size, srch_add[ompthID]);
         }
 #ifdef STIMER
       clock_t finish = clock();
@@ -1017,6 +1017,6 @@ remap_conserv_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVar
 // void remap_conserv(RemapGridType *src_grid, RemapGridType *tgt_grid, const
 // double* restrict src_array, double* restrict tgt_array, double missval)
 void
-remap_conserv(RemapGridType *, RemapGridType *, const double *restrict, double *restrict, double)
+remap_conserv(RemapSearch &rsearch, RemapGridType *, RemapGridType *, const double *restrict, double *restrict, double)
 {
 }  // remap_conserv

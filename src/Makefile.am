@@ -410,7 +410,6 @@ cdo_SOURCES += Adisit.cc        \
                Writegrid.cc     \
                Writerandom.cc   \
                XTimstat.cc      \
-               YAR.cc           \
                Yearmonstat.cc   \
                Ydayarith.cc     \
                Ydaypctl.cc      \
