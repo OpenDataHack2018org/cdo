@@ -442,7 +442,8 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
 
 /*****************************************************************************/
 
-RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remapOrder)
+#ifdef HAVE_LIBNETCDF
+static RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remapOrder)
 {
   // Map method
   size_t attlen;
@@ -495,6 +496,7 @@ RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, 
 
   return mapType;
 }
+#endif
 
 void
 remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,

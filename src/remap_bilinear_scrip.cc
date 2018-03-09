@@ -301,7 +301,7 @@ scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGridType *src_grid, Rema
 #ifdef TEST_KDTREE
 #include "grid_search.h"
 int
-grid_search_test(struct gridsearch *gs, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+grid_search_test(GridSearch *gs, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
                  double plat, double plon, const size_t *restrict src_grid_dims, double *restrict src_center_lat,
                  double *restrict src_center_lon)
 {
@@ -392,7 +392,7 @@ scrip_remap_bilinear(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridTyp
 #ifdef TEST_KDTREE
   bool xIsCyclic = false;
   size_t dims[2] = { src_grid->size, 0 };
-  struct gridsearch *gs = NULL;
+  GridSearch *gs = NULL;
   if (remap_grid_type != REMAP_GRID_TYPE_REG2D)
     gs = gridsearch_create(xIsCyclic, dims, src_grid->size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 #else

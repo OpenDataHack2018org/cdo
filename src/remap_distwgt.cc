@@ -53,7 +53,7 @@ distance(const double *restrict a, const double *restrict b) noexcept
 
 #define MAX_SEARCH_CELLS 25
 static void
-grid_search_nbr_reg2d(struct gridsearch *gs, knnWeightsType &knnWeights, double plon, double plat)
+grid_search_nbr_reg2d(GridSearch *gs, knnWeightsType &knnWeights, double plon, double plat)
 {
   /*
     Output variables:
@@ -193,7 +193,7 @@ grid_search_nbr_reg2d(struct gridsearch *gs, knnWeightsType &knnWeights, double 
 }  // grid_search_nbr_reg2d
 
 void
-grid_search_nbr(struct gridsearch *gs, knnWeightsType &knnWeights, double plon, double plat)
+grid_search_nbr(GridSearch *gs, knnWeightsType &knnWeights, double plon, double plat)
 {
   /*
     Output variables:
@@ -289,7 +289,7 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGridType *
 
   bool xIsCyclic = src_grid->is_cyclic;
   size_t *dims = src_grid->dims;
-  struct gridsearch *gs = NULL;
+  GridSearch *gs = NULL;
   if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
     gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else
@@ -376,7 +376,7 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGridType *src_grid
 
   bool xIsCyclic = src_grid->is_cyclic;
   size_t *dims = src_grid->dims;
-  struct gridsearch *gs = NULL;
+  GridSearch *gs = NULL;
   if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
     gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else
@@ -500,7 +500,7 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
 
   bool xIsCyclic = gridIsCircular(gridID1);
   size_t dims[2] = { src_grid_size, 0 };
-  struct gridsearch *gs = NULL;
+  GridSearch *gs = NULL;
   // if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
   //  gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon,
   //  src_grid->reg2d_center_lat);

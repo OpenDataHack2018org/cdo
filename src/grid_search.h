@@ -29,7 +29,7 @@ enum struct GridsearchMethod
   kdtree
 };
 
-struct gridsearch
+struct GridSearch
 {
   bool extrapolate;
   bool is_cyclic;
@@ -54,16 +54,16 @@ struct gridsearch
   void *pointcloud;
 };
 
-void grid_search_nbr(struct gridsearch *gs, knnWeightsType &knnWeights, double plon, double plat);
+void grid_search_nbr(GridSearch *gs, knnWeightsType &knnWeights, double plon, double plat);
 
-struct gridsearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons,
-                                           const double *restrict lats);
-struct gridsearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
-                                     const double *restrict lats);
-void gridsearch_delete(struct gridsearch *gs);
-size_t gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
-size_t gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
+GridSearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons,
+                                    const double *restrict lats);
+GridSearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
+                              const double *restrict lats);
+void gridsearch_delete(GridSearch *gs);
+size_t gridsearch_nearest(GridSearch *gs, double lon, double lat, double *range);
+size_t gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
                            double *dist);
-void gridsearch_extrapolate(struct gridsearch *gs);
+void gridsearch_extrapolate(GridSearch *gs);
 
 #endif

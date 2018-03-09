@@ -443,7 +443,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
   clock_t start, finish;
   start = clock();
 
-  struct gridsearch *gs = NULL;
+  GridSearch *gs = NULL;
 
   if (nmiss)
     {

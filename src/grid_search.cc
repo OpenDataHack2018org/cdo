@@ -151,15 +151,15 @@ gridsearch_set_method(const char *methodstr)
 }
 
 void
-gridsearch_extrapolate(struct gridsearch *gs)
+gridsearch_extrapolate(GridSearch *gs)
 {
   gs->extrapolate = true;
 }
 
-struct gridsearch *
+GridSearch *
 gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons, const double *restrict lats)
 {
-  struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
+  GridSearch *gs = (GridSearch *) Calloc(1, sizeof(GridSearch));
 
   gs->is_cyclic = xIsCyclic;
   gs->is_reg2d = true;
@@ -210,7 +210,7 @@ gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict l
 }
 
 static void *
-gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
+gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));
   // see  example_cartesian.c
@@ -252,7 +252,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
 }
 
 static void *
-gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, struct gridsearch *gs)
+gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
 {
   PointCloud<double> *pointcloud = new PointCloud<double>();
   if (cdoVerbose) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
@@ -350,10 +350,10 @@ gs_create_full(size_t n, const double *restrict lons, const double *restrict lat
   return (void *) full;
 }
 
-struct gridsearch *
+GridSearch *
 gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons, const double *restrict lats)
 {
-  struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
+  GridSearch *gs = (GridSearch *) Calloc(1, sizeof(GridSearch));
 
   gs->is_cyclic = xIsCyclic;
   gs->is_curve = n != 1 && n == dims[0] * dims[1];
@@ -380,7 +380,7 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
 }
 
 void
-gridsearch_delete(struct gridsearch *gs)
+gridsearch_delete(GridSearch *gs)
 {
   if (gs)
     {
@@ -420,7 +420,7 @@ gs_set_range(double *prange)
 }
 
 static size_t
-gs_nearest_kdtree(void *search_container, double lon, double lat, double *prange, struct gridsearch *gs)
+gs_nearest_kdtree(void *search_container, double lon, double lat, double *prange, GridSearch *gs)
 {
   size_t index = GS_NOT_FOUND;
   kdTree_t *kdt = (kdTree_t *) search_container;
@@ -463,7 +463,7 @@ bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, siz
                    const double *restrict center_lat);
 
 static size_t
-llindex_in_quad(struct gridsearch *gs, size_t index, double lon, double lat)
+llindex_in_quad(GridSearch *gs, size_t index, double lon, double lat)
 {
   size_t ret_index = index;
   if (ret_index != GS_NOT_FOUND)
@@ -495,7 +495,7 @@ llindex_in_quad(struct gridsearch *gs, size_t index, double lon, double lat)
 }
 
 static size_t
-gs_nearest_nanoflann(void *search_container, double lon, double lat, double *prange, struct gridsearch *gs)
+gs_nearest_nanoflann(void *search_container, double lon, double lat, double *prange, GridSearch *gs)
 {
   size_t index = GS_NOT_FOUND;
   nfTree_t *nft = (nfTree_t *) search_container;
@@ -570,7 +570,7 @@ gs_nearest_full(void *search_container, double lon, double lat, double *prange)
 }
 
 size_t
-gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *prange)
+gridsearch_nearest(GridSearch *gs, double lon, double lat, double *prange)
 {
   size_t index = GS_NOT_FOUND;
 
@@ -591,7 +591,7 @@ gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *prange
 }
 
 static size_t
-gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
+gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
                    double *dist)
 {
   size_t nadds = 0;
@@ -645,7 +645,7 @@ gs_qnearest_kdtree(struct gridsearch *gs, double lon, double lat, double *prange
 }
 
 static size_t
-gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
+gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
                       double *dist)
 {
   size_t nadds = 0;
@@ -675,7 +675,7 @@ gs_qnearest_nanoflann(struct gridsearch *gs, double lon, double lat, double *pra
 }
 
 size_t
-gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
+gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
                     double *dist)
 {
   size_t nadds = 0;
