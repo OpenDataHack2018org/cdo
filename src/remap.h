@@ -95,6 +95,19 @@ struct RemapGridType
   float *cell_bound_box;    // lon/lat bounding box for use
 };
 
+struct GridSearchBins
+{
+  int num_srch_bins;        // num of bins for restricted srch
+  size_t *bin_addr;         // min,max adds for grid cells in this lat bin
+  float *bin_lats;          // min,max latitude for each search bin
+  float *cell_bound_box;    // lon/lat bounding box for use
+};
+
+struct RemapSearchType
+{
+  GridSearchBins src_bins;
+  GridSearchBins tgt_bins;
+};
 
 struct remapType
 {
@@ -105,6 +118,7 @@ struct remapType
   RemapGridType src_grid;
   RemapGridType tgt_grid;
   RemapVarsType vars;
+  RemapSearchType search;
 };
 
 #define REMAP_WRITE_REMAP 2

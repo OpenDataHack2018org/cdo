@@ -63,7 +63,7 @@ enum
   GENDIS,
   GENNN,
   GENLAF,
-  REMAPXXX,
+  REMAP,
   REMAPYCON,
   GENYCON
 };
@@ -803,7 +803,7 @@ static void
 remapAddOperators(void)
 {
   // clang-format off
-  cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
+  cdoOperatorAdd("remap",        REMAP,        0, NULL);
   cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
   cdoOperatorAdd("remapcon",     REMAPCON,     0, NULL);
   cdoOperatorAdd("remapcon2",    REMAPCON2,    0, NULL);
@@ -837,7 +837,6 @@ Remap(void *argument)
   int r = -1;
   int nremaps = 0;
   int numNeighbors = 0;
-  char varname[CDI_MAX_NAME];
   char *remap_file = NULL;
 
   if (cdoTimer) remapTimerInit();
@@ -849,7 +848,7 @@ Remap(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
   bool writeRemapWeightsOnly = cdoOperatorF2(operatorID);
-  bool lremapxxx = operfunc == REMAPXXX;
+  bool lremap = operfunc == REMAP;
 
   remap_set_int(REMAP_WRITE_REMAP, writeRemapWeightsOnly);
 
@@ -859,7 +858,7 @@ Remap(void *argument)
 
   if (cdoVerbose) cdoPrint("Extrapolation %s!", remap_extrapolate ? "enabled" : "disabled");
 
-  if (lremapxxx)
+  if (lremap)
     {
       operatorInputArg("grid description file or name, remap weights file (SCRIP NetCDF)");
       operatorCheckArgc(2);
@@ -909,10 +908,10 @@ Remap(void *argument)
   std::vector<remapType> remaps(max_remaps);
   for (int r = 0; r < max_remaps; r++) remapInit(&remaps[r]);
 
-  if (writeRemapWeightsOnly || lremapxxx) remap_genweights = true;
+  if (writeRemapWeightsOnly || lremap) remap_genweights = true;
 
   int remapOrder = 0;
-  if (lremapxxx)
+  if (lremap)
     {
       remapReadDataScrip(remap_file, gridID1, gridID2, &mapType, &submapType, &numNeighbors, &remapOrder,
                          remaps[0].src_grid, remaps[0].tgt_grid, remaps[0].vars);
@@ -1179,10 +1178,13 @@ Remap(void *argument)
                   remapSum(&remaps[r].tgt_grid, gridsize2, &array2[0], "tgt");
                 }
 
-              vlistInqVarName(vlistID1, varID, varname);
               if (operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON)
-                if (strcmp(varname, "gridbox_area") == 0)
-                  scaleGridboxArea(gridsize, &array1[0], gridsize2, &array2[0], remaps[r].tgt_grid.cell_area);
+                {
+                  char varname[CDI_MAX_NAME];
+                  vlistInqVarName(vlistID1, varID, varname);
+                  if (strcmp(varname, "gridbox_area") == 0)
+                    scaleGridboxArea(gridsize, &array1[0], gridsize2, &array2[0], remaps[r].tgt_grid.cell_area);
+                }
 
               // calculate some statistics
               if (cdoVerbose)
@@ -1217,11 +1219,11 @@ WRITE_REMAP:
 
   if (writeRemapWeightsOnly)
     remapWriteDataScrip(cdoGetStreamName(1).c_str(), mapType, submapType, numNeighbors, remapOrder, remaps[r].src_grid,
-                      remaps[r].tgt_grid, remaps[r].vars);
+                        remaps[r].tgt_grid, remaps[r].vars);
 
   pstreamClose(streamID1);
 
-  if (lremapxxx && remap_genweights && remaps[0].nused == 0)
+  if (lremap && remap_genweights && remaps[0].nused == 0)
     remapPrintWarning(remap_file, operfunc, remaps[0].src_grid, remaps[0].nmiss);
 
   for (int r = 0; r < nremaps; r++)

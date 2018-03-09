@@ -49,7 +49,6 @@ calc_bin_addr(size_t gridsize, size_t nbins, const float *restrict bin_lats, con
 void
 calc_lat_bins(RemapGridType &src_grid, RemapGridType &tgt_grid, RemapType mapType)
 {
-  size_t n2;
   size_t nbins = src_grid.num_srch_bins;
   double dlat = PI / nbins;  // lat/lon intervals for search bins
 
@@ -61,9 +60,8 @@ calc_lat_bins(RemapGridType &src_grid, RemapGridType &tgt_grid, RemapType mapTyp
 
       for (size_t n = 0; n < nbins; ++n)
         {
-          n2 = n << 1;
-          bin_lats[n2] = (n) *dlat - PIH;
-          bin_lats[n2 + 1] = (n + 1) * dlat - PIH;
+          bin_lats[n*2] = (n) *dlat - PIH;
+          bin_lats[n*2 + 1] = (n + 1) * dlat - PIH;
         }
 
       src_grid.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
@@ -96,17 +94,16 @@ size_t
 get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2, float *tgt_cell_bound_box,
                float *src_cell_bound_box, size_t src_grid_size, size_t *srch_add)
 {
-  size_t n2;
   size_t src_cell_addm4;
 
-  /* Restrict searches first using search bins */
+  // Restrict searches first using search bins
 
   size_t min_add = src_grid_size - 1;
   size_t max_add = 0;
 
   for (size_t n = 0; n < nbins; ++n)
     {
-      n2 = n << 1;
+      size_t n2 = n << 1;
       if (tgt_cell_add >= bin_addr1[n2] && tgt_cell_add <= bin_addr1[n2 + 1])
         {
           if (bin_addr2[n2] < min_add) min_add = bin_addr2[n2];
@@ -114,7 +111,7 @@ get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin
         }
     }
 
-  /* Further restrict searches using bounding boxes */
+  // Further restrict searches using bounding boxes
 
   float bound_box_lat1 = tgt_cell_bound_box[0];
   float bound_box_lat2 = tgt_cell_bound_box[1];
@@ -181,7 +178,7 @@ grid_search_nn(size_t min_add, size_t max_add, size_t *restrict nbr_add, double 
                double plon, const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
-  double distance; /* For computing dist-weighted avg */
+  double distance;
   double coslat_dst = cos(plat);
   double sinlat_dst = sin(plat);
   double coslon_dst = cos(plon);
