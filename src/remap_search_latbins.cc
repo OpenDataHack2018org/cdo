@@ -47,46 +47,24 @@ calc_bin_addr(size_t gridsize, size_t nbins, const float *restrict bin_lats, con
 }
 
 void
-calc_lat_bins(RemapGridType &src_grid, RemapGridType &tgt_grid, RemapType mapType)
+calc_lat_bins(RemapGridType &grid)
 {
-  size_t nbins = src_grid.num_srch_bins;
-  double dlat = PI / nbins;  // lat/lon intervals for search bins
+  size_t nbins = grid.num_srch_bins;
+  double dlat = PI / nbins;  // lat interval for search bins
 
   if (cdoVerbose) cdoPrint("Using %zu latitude bins to restrict search.", nbins);
 
   if (nbins > 0)
     {
-      float *bin_lats = src_grid.bin_lats = (float *) Realloc(src_grid.bin_lats, 2 * nbins * sizeof(float));
-
+      grid.bin_lats = (float *) Malloc(2 * nbins * sizeof(float));
       for (size_t n = 0; n < nbins; ++n)
         {
-          bin_lats[n*2] = (n) *dlat - PIH;
-          bin_lats[n*2 + 1] = (n + 1) * dlat - PIH;
+          grid.bin_lats[n*2] = (n) *dlat - PIH;
+          grid.bin_lats[n*2 + 1] = (n + 1) * dlat - PIH;
         }
 
-      src_grid.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
-      calc_bin_addr(src_grid.size, nbins, bin_lats, src_grid.cell_bound_box, src_grid.bin_addr);
-
-      if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
-        {
-          tgt_grid.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
-          calc_bin_addr(tgt_grid.size, nbins, bin_lats, tgt_grid.cell_bound_box, tgt_grid.bin_addr);
-
-          Free(src_grid.bin_lats);
-          src_grid.bin_lats = NULL;
-        }
-    }
-
-  if (mapType == RemapType::CONSERV_YAC)
-    {
-      Free(tgt_grid.cell_bound_box);
-      tgt_grid.cell_bound_box = NULL;
-    }
-
-  if (mapType == RemapType::DISTWGT)
-    {
-      Free(src_grid.cell_bound_box);
-      src_grid.cell_bound_box = NULL;
+      grid.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
+      calc_bin_addr(grid.size, nbins, grid.bin_lats, grid.cell_bound_box, grid.bin_addr);
     }
 }
 

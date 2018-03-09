@@ -1060,6 +1060,7 @@ Remap(void *argument)
                       remapVarsFree(remaps[n0].vars);
                       remapGridFree(remaps[n0].src_grid);
                       remapGridFree(remaps[n0].tgt_grid);
+                      remapSearchFree(remaps[n0].search);
                       for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
                       r = nremaps - 1;
                       remapInit(&remaps[r]);
@@ -1095,6 +1096,7 @@ Remap(void *argument)
                       // Initialize grid information for both grids
                       if (cdoTimer) timer_start(timer_remap_init);
                       remapInitGrids(mapType, remap_extrapolate, gridID1, remaps[r].src_grid, gridID2, remaps[r].tgt_grid);
+                      remapSearchInit(mapType, remaps[r].search, remaps[r].src_grid, remaps[r].tgt_grid);
                       if (cdoTimer) timer_stop(timer_remap_init);
                     }
 
@@ -1231,6 +1233,7 @@ WRITE_REMAP:
       remapVarsFree(remaps[r].vars);
       remapGridFree(remaps[r].src_grid);
       remapGridFree(remaps[r].tgt_grid);
+      remapSearchFree(remaps[r].search);
     }
 
   cdoFinish();

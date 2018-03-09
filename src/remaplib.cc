@@ -95,66 +95,6 @@ remap_set_int(int remapvar, int value)
     cdoAbort("Unsupported remap variable (%d)!", remapvar);
 }
 
-void
-remapGridFree(RemapGridType &grid)
-{
-  if (grid.vgpm) Free(grid.vgpm);
-  if (grid.mask) Free(grid.mask);
-
-  if (grid.reg2d_center_lat) Free(grid.reg2d_center_lat);
-  if (grid.reg2d_center_lon) Free(grid.reg2d_center_lon);
-  if (grid.reg2d_corner_lat) Free(grid.reg2d_corner_lat);
-  if (grid.reg2d_corner_lon) Free(grid.reg2d_corner_lon);
-
-  if (grid.cell_center_lat) Free(grid.cell_center_lat);
-  if (grid.cell_center_lon) Free(grid.cell_center_lon);
-  if (grid.cell_corner_lat) Free(grid.cell_corner_lat);
-  if (grid.cell_corner_lon) Free(grid.cell_corner_lon);
-
-  if (grid.cell_area) Free(grid.cell_area);
-  if (grid.cell_frac) Free(grid.cell_frac);
-
-  if (grid.cell_bound_box) Free(grid.cell_bound_box);
-
-  if (grid.bin_addr) Free(grid.bin_addr);
-  if (grid.bin_lats) Free(grid.bin_lats);
-
-}
-
-void
-remapGridInit(RemapGridType &grid)
-{
-  grid.remap_grid_type = -1;
-  grid.num_srch_bins = remap_num_srch_bins;  // only for source grid ?
-
-  grid.num_cell_corners = 0;
-  grid.luse_cell_corners = false;
-  grid.lneed_cell_corners = false;
-
-  grid.nvgp = 0;
-  grid.vgpm = NULL;
-
-  grid.mask = NULL;
-
-  grid.reg2d_center_lon = NULL;
-  grid.reg2d_center_lat = NULL;
-  grid.reg2d_corner_lon = NULL;
-  grid.reg2d_corner_lat = NULL;
-
-  grid.cell_center_lon = NULL;
-  grid.cell_center_lat = NULL;
-  grid.cell_corner_lon = NULL;
-  grid.cell_corner_lat = NULL;
-
-  grid.cell_area = NULL;
-  grid.cell_frac = NULL;
-
-  grid.cell_bound_box = NULL;
-
-  grid.bin_addr = NULL;
-  grid.bin_lats = NULL;
-}
-
 /*****************************************************************************/
 
 void
@@ -546,53 +486,163 @@ remapDefineGrid(RemapType mapType, int gridID, RemapGridType &grid, const char *
 
 /*  Compute bounding boxes for restricting future grid searches */
 static void
-cell_bounding_boxes(RemapGridType &grid, int remap_grid_basis)
+cell_bounding_boxes(RemapGridType &grid, float *cell_bound_box, int remap_grid_basis)
 {
-  if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid.luse_cell_corners)
-    grid.cell_bound_box = (float *) Malloc(4 * grid.size * sizeof(float));
-
   if (grid.luse_cell_corners)
     {
       if (grid.lneed_cell_corners)
         {
           if (cdoVerbose) cdoPrint("Grid: boundbox_from_corners");
           boundbox_from_corners(grid.size, grid.num_cell_corners, grid.cell_corner_lon, grid.cell_corner_lat,
-                                grid.cell_bound_box);
+                                cell_bound_box);
         }
       else // full grid search
         {
           if (cdoVerbose) cdoPrint("Grid: bounds missing -> full grid search!");
 
           size_t gridsize = grid.size;
-          size_t i4;
           for (size_t i = 0; i < gridsize; ++i)
             {
-              i4 = i << 2;
-              grid.cell_bound_box[i4] = -PIH_f;
-              grid.cell_bound_box[i4 + 1] = PIH_f;
-              grid.cell_bound_box[i4 + 2] = 0.0f;
-              grid.cell_bound_box[i4 + 3] = PI2_f;
+              cell_bound_box[i*4] = -PIH_f;
+              cell_bound_box[i*4 + 1] = PIH_f;
+              cell_bound_box[i*4 + 2] = 0.0f;
+              cell_bound_box[i*4 + 3] = PI2_f;
             }
         }
     }
   else if (remap_grid_basis == REMAP_GRID_BASIS_SRC)
     {
+      if (cdoVerbose) cdoPrint("Grid: boundbox_from_center");
       if (grid.rank != 2) cdoAbort("Internal problem, grid rank = %d!", grid.rank);
 
       size_t nx = grid.dims[0];
       size_t ny = grid.dims[1];
-
-      if (cdoVerbose) cdoPrint("Grid: boundbox_from_center");
       boundbox_from_center(grid.is_cyclic, grid.size, nx, ny, grid.cell_center_lon, grid.cell_center_lat,
-                           grid.cell_bound_box);
+                           cell_bound_box);
     }
 
   if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid.lneed_cell_corners)
-    check_lon_boundbox_range(grid.size, grid.cell_bound_box);
+    check_lon_boundbox_range(grid.size, cell_bound_box);
 
   // Try to check for cells that overlap poles
   if (remap_grid_basis == REMAP_GRID_BASIS_SRC || grid.lneed_cell_corners)
-    check_lat_boundbox_range(grid.size, grid.cell_bound_box, grid.cell_center_lat);
+    check_lat_boundbox_range(grid.size, cell_bound_box, grid.cell_center_lat);
+}
+
+void
+remapGridInit(RemapGridType &grid)
+{
+  grid.remap_grid_type = -1;
+  grid.num_srch_bins = remap_num_srch_bins;
+
+  grid.num_cell_corners = 0;
+  grid.luse_cell_corners = false;
+  grid.lneed_cell_corners = false;
+
+  grid.nvgp = 0;
+  grid.vgpm = NULL;
+
+  grid.mask = NULL;
+
+  grid.reg2d_center_lon = NULL;
+  grid.reg2d_center_lat = NULL;
+  grid.reg2d_corner_lon = NULL;
+  grid.reg2d_corner_lat = NULL;
+
+  grid.cell_center_lon = NULL;
+  grid.cell_center_lat = NULL;
+  grid.cell_corner_lon = NULL;
+  grid.cell_corner_lat = NULL;
+
+  grid.cell_area = NULL;
+  grid.cell_frac = NULL;
+
+  grid.cell_bound_box = NULL;
+  grid.bin_addr = NULL;
+  grid.bin_lats = NULL;
+}
+
+void
+remapGridFree(RemapGridType &grid)
+{
+  if (grid.vgpm) Free(grid.vgpm);
+  if (grid.mask) Free(grid.mask);
+
+  if (grid.reg2d_center_lat) Free(grid.reg2d_center_lat);
+  if (grid.reg2d_center_lon) Free(grid.reg2d_center_lon);
+  if (grid.reg2d_corner_lat) Free(grid.reg2d_corner_lat);
+  if (grid.reg2d_corner_lon) Free(grid.reg2d_corner_lon);
+
+  if (grid.cell_center_lat) Free(grid.cell_center_lat);
+  if (grid.cell_center_lon) Free(grid.cell_center_lon);
+  if (grid.cell_corner_lat) Free(grid.cell_corner_lat);
+  if (grid.cell_corner_lon) Free(grid.cell_corner_lon);
+
+  if (grid.cell_area) Free(grid.cell_area);
+  if (grid.cell_frac) Free(grid.cell_frac);
+
+  if (grid.cell_bound_box) Free(grid.cell_bound_box);
+
+  if (grid.bin_addr) Free(grid.bin_addr);
+  if (grid.bin_lats) Free(grid.bin_lats);
+
+}
+
+void
+remapSearchInit(RemapType mapType, RemapSearch &search, RemapGridType &src_grid, RemapGridType &tgt_grid)
+{
+  search.src_bins.num_srch_bins = remap_num_srch_bins;
+  search.tgt_bins.num_srch_bins = remap_num_srch_bins;
+
+  search.src_bins.cell_bound_box = NULL;
+  search.src_bins.bin_addr = NULL;
+  search.src_bins.bin_lats = NULL;
+
+  search.tgt_bins.cell_bound_box = NULL;
+  search.tgt_bins.bin_addr = NULL;
+  search.tgt_bins.bin_lats = NULL;
+
+  if (!(src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D || tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D))
+    {
+      if (mapType != RemapType::DISTWGT
+          //            && mapType != RemapType::BILINEAR
+          )
+        {
+          src_grid.cell_bound_box = (float *) Malloc(4 * src_grid.size * sizeof(float));
+          if ( tgt_grid.luse_cell_corners )
+            tgt_grid.cell_bound_box = (float *) Malloc(4 * tgt_grid.size * sizeof(float));
+
+          cell_bounding_boxes(src_grid, src_grid.cell_bound_box, REMAP_GRID_BASIS_SRC);
+          cell_bounding_boxes(tgt_grid, tgt_grid.cell_bound_box, REMAP_GRID_BASIS_TGT);
+          // Set up and assign address ranges to search bins in order to further restrict later searches
+          calc_lat_bins(src_grid);
+          if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
+            {
+              calc_lat_bins(tgt_grid);
+              Free(src_grid.bin_lats);
+              src_grid.bin_lats = NULL;
+              Free(tgt_grid.bin_lats);
+              tgt_grid.bin_lats = NULL;
+              if (mapType == RemapType::CONSERV_YAC)
+                {
+                  Free(tgt_grid.cell_bound_box);
+                  tgt_grid.cell_bound_box = NULL;
+                }
+            }
+        }
+    }
+}
+
+void
+remapSearchFree(RemapSearch &search)
+{
+  if (search.src_bins.cell_bound_box) Free(search.src_bins.cell_bound_box);
+  if (search.src_bins.bin_addr) Free(search.src_bins.bin_addr);
+  if (search.src_bins.bin_lats) Free(search.src_bins.bin_lats);
+
+  if (search.tgt_bins.cell_bound_box) Free(search.tgt_bins.cell_bound_box);
+  if (search.tgt_bins.bin_addr) Free(search.tgt_bins.bin_addr);
+  if (search.tgt_bins.bin_lats) Free(search.tgt_bins.bin_lats);
 }
 
 void
@@ -690,17 +740,7 @@ remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGridType 
       if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D) remap_define_reg2d(reg2d_src_gridID, src_grid);
       if (tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D) remap_define_reg2d(reg2d_tgt_gridID, tgt_grid);
     }
-  else if (mapType != RemapType::DISTWGT
-           //            && mapType != RemapType::BILINEAR
-           )
-    {
-      cell_bounding_boxes(src_grid, REMAP_GRID_BASIS_SRC);
-      cell_bounding_boxes(tgt_grid, REMAP_GRID_BASIS_TGT);
-      // Set up and assign address ranges to search bins in order to further restrict later searches
-      calc_lat_bins(src_grid, tgt_grid, mapType);
-    }
-
-} /* remapGridInit */
+}
 
 /*****************************************************************************/
 

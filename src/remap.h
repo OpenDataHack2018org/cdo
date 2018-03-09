@@ -103,7 +103,7 @@ struct GridSearchBins
   float *cell_bound_box;    // lon/lat bounding box for use
 };
 
-struct RemapSearchType
+struct RemapSearch
 {
   GridSearchBins src_bins;
   GridSearchBins tgt_bins;
@@ -118,7 +118,7 @@ struct remapType
   RemapGridType src_grid;
   RemapGridType tgt_grid;
   RemapVarsType vars;
-  RemapSearchType search;
+  RemapSearch search;
 };
 
 #define REMAP_WRITE_REMAP 2
@@ -135,6 +135,8 @@ void remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGrid
 void remapGridInit(RemapGridType &grid);
 void remapGridFree(RemapGridType &grid);
 void remapGridAlloc(RemapType mapType, RemapGridType &grid);
+void remapSearchInit(RemapType mapType, RemapSearch &search, RemapGridType &src_grid, RemapGridType &tgt_grid);
+void remapSearchFree(RemapSearch &search);
 
 void scrip_remap_bilinear_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv);
 void scrip_remap_bicubic_weights(RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv);
@@ -165,7 +167,7 @@ void remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, Remap
                         int *numNeighbors, int *remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid,
                         RemapVarsType &rv);
 
-void calc_lat_bins(RemapGridType &src_grid, RemapGridType &tgt_grid, RemapType mapType);
+void calc_lat_bins(RemapGridType &src_grid);
 size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2,
                       float *tgt_cell_bound_box, float *src_cell_bound_box, size_t src_grid_size, size_t *srch_add);
 
