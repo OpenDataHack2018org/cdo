@@ -837,10 +837,9 @@ remap_conserv_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridTy
           boundbox_from_corners1r(tgt_cell_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon,
                                   tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
 
-          size_t nbins = rsearch.src_bins.nbins;
           num_srch_cells
-              = get_srch_cells(tgt_cell_add, nbins, rsearch.tgt_bins.bin_addr, rsearch.src_bins.bin_addr, tgt_cell_bound_box_r,
-                               rsearch.src_bins.cell_bound_box, src_grid_size, srch_add[ompthID]);
+            = get_srch_cells(tgt_cell_add, rsearch.tgt_bins, rsearch.src_bins, tgt_cell_bound_box_r,
+                             srch_add[ompthID]);
         }
 #ifdef STIMER
       clock_t finish = clock();

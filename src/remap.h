@@ -93,10 +93,10 @@ struct RemapGridType
 struct GridSearchBins
 {
   unsigned nbins;           // num of bins for restricted search
-  size_t *bin_addr;         // min,max adds for grid cells in this lat bin
-  float *bin_lats;          // min,max latitude for each search bin
   size_t ncells;            // total number of grid cells (cell_bound_box)
-  float *cell_bound_box;    // lon/lat bounding box for use
+  std::vector<size_t> bin_addr;         // min,max adds for grid cells in this lat bin
+  std::vector<float> bin_lats;          // min,max latitude for each search bin
+  std::vector<float> cell_bound_box;    // lon/lat bounding box for use
 };
 
 struct RemapSearch
@@ -164,8 +164,8 @@ void remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, Remap
                         RemapVarsType &rv);
 
 void calc_lat_bins(GridSearchBins &searchBins);
-size_t get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2,
-                      float *tgt_cell_bound_box, float *src_cell_bound_box, size_t src_grid_size, size_t *srch_add);
+size_t get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgt_bins, GridSearchBins &src_bins,
+                      float *tgt_cell_bound_box, size_t *srch_add);
 
 int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *restrict nbr_dist, double plat,
                          double plon, const double *restrict src_center_lat, const double *restrict src_center_lon);

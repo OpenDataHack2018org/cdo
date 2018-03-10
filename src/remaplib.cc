@@ -586,39 +586,28 @@ remapSearchInit(RemapType mapType, RemapSearch &search, RemapGridType &src_grid,
   search.src_bins.nbins = remap_num_srch_bins;
   search.tgt_bins.nbins = remap_num_srch_bins;
 
-  search.src_bins.cell_bound_box = NULL;
-  search.src_bins.bin_addr = NULL;
-  search.src_bins.bin_lats = NULL;
-
-  search.tgt_bins.cell_bound_box = NULL;
-  search.tgt_bins.bin_addr = NULL;
-  search.tgt_bins.bin_lats = NULL;
-
   if (!(src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D || tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D))
     {
       if (mapType != RemapType::DISTWGT
           //            && mapType != RemapType::BILINEAR
           )
         {
-          search.src_bins.cell_bound_box = (float *) Malloc(4 * src_grid.size * sizeof(float));
+          search.src_bins.cell_bound_box.resize(4 * src_grid.size);
           if ( tgt_grid.luse_cell_corners )
-            search.tgt_bins.cell_bound_box = (float *) Malloc(4 * tgt_grid.size * sizeof(float));
+            search.tgt_bins.cell_bound_box.resize(4 * tgt_grid.size);
 
-          cell_bounding_boxes(src_grid, search.src_bins.cell_bound_box, REMAP_GRID_BASIS_SRC);
-          cell_bounding_boxes(tgt_grid, search.tgt_bins.cell_bound_box, REMAP_GRID_BASIS_TGT);
+          cell_bounding_boxes(src_grid, &search.src_bins.cell_bound_box[0], REMAP_GRID_BASIS_SRC);
+          cell_bounding_boxes(tgt_grid, &search.tgt_bins.cell_bound_box[0], REMAP_GRID_BASIS_TGT);
           // Set up and assign address ranges to search bins in order to further restrict later searches
           calc_lat_bins(search.src_bins);
           if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
             {
               calc_lat_bins(search.tgt_bins);
-              Free(search.src_bins.bin_lats);
-              search.src_bins.bin_lats = NULL;
-              Free(search.tgt_bins.bin_lats);
-              search.tgt_bins.bin_lats = NULL;
+              if ( search.src_bins.bin_lats.size() ) search.src_bins.bin_lats.resize(0);
+              if ( search.tgt_bins.bin_lats.size() ) search.tgt_bins.bin_lats.resize(0);
               if (mapType == RemapType::CONSERV_YAC)
                 {
-                  Free(search.tgt_bins.cell_bound_box);
-                  search.tgt_bins.cell_bound_box = NULL;
+                  if (search.tgt_bins.cell_bound_box.size()) search.tgt_bins.cell_bound_box.resize(0);
                 }
             }
         }
@@ -628,13 +617,13 @@ remapSearchInit(RemapType mapType, RemapSearch &search, RemapGridType &src_grid,
 void
 remapSearchFree(RemapSearch &search)
 {
-  if (search.src_bins.cell_bound_box) Free(search.src_bins.cell_bound_box);
-  if (search.src_bins.bin_addr) Free(search.src_bins.bin_addr);
-  if (search.src_bins.bin_lats) Free(search.src_bins.bin_lats);
+  if (search.src_bins.bin_addr.size()) search.src_bins.bin_addr.resize(0);
+  if (search.src_bins.bin_lats.size()) search.src_bins.bin_lats.resize(0);
+  if (search.src_bins.cell_bound_box.size()) search.src_bins.cell_bound_box.resize(0);
 
-  if (search.tgt_bins.cell_bound_box) Free(search.tgt_bins.cell_bound_box);
-  if (search.tgt_bins.bin_addr) Free(search.tgt_bins.bin_addr);
-  if (search.tgt_bins.bin_lats) Free(search.tgt_bins.bin_lats);
+  if (search.tgt_bins.bin_addr.size()) search.tgt_bins.bin_addr.resize(0);
+  if (search.tgt_bins.bin_lats.size()) search.tgt_bins.bin_lats.resize(0);
+  if (search.tgt_bins.cell_bound_box.size()) search.tgt_bins.cell_bound_box.resize(0);
 }
 
 void

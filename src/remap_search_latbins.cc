@@ -19,9 +19,14 @@
 #include "remap.h"
 
 static void
-calc_bin_addr(size_t ncells, size_t nbins, const float *restrict bin_lats, const float *restrict cell_bound_box,
-              size_t *restrict bin_addr)
+calc_bin_addr(GridSearchBins &searchBins)
 {
+  size_t ncells = searchBins.ncells;
+  size_t nbins = searchBins.nbins;
+  size_t *restrict bin_addr = &searchBins.bin_addr[0];
+  const float *restrict bin_lats = &searchBins.bin_lats[0];
+  const float *restrict cell_bound_box = &searchBins.cell_bound_box[0];
+
   for (size_t n = 0; n < nbins; ++n)
     {
       bin_addr[n*2] = ncells;
@@ -56,22 +61,28 @@ calc_lat_bins(GridSearchBins &searchBins)
 
   if (nbins > 0)
     {
-      searchBins.bin_lats = (float *) Malloc(2 * nbins * sizeof(float));
+      searchBins.bin_lats.resize(2 * nbins);
       for (size_t n = 0; n < nbins; ++n)
         {
           searchBins.bin_lats[n*2] = (n) *dlat - PIH;
           searchBins.bin_lats[n*2 + 1] = (n + 1) * dlat - PIH;
         }
 
-      searchBins.bin_addr = (size_t *) Malloc(2 * nbins * sizeof(size_t));
-      calc_bin_addr(searchBins.ncells, nbins, searchBins.bin_lats, searchBins.cell_bound_box, searchBins.bin_addr);
+      searchBins.bin_addr.resize(2 * nbins);
+      calc_bin_addr(searchBins);
     }
 }
 
 size_t
-get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin_addr2, float *tgt_cell_bound_box,
-               float *src_cell_bound_box, size_t src_grid_size, size_t *srch_add)
+get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgt_bins, GridSearchBins &src_bins, float *tgt_cell_bound_box,
+               size_t *srch_add)
 {
+  size_t nbins = src_bins.nbins;
+  size_t src_grid_size = src_bins.ncells;
+  const size_t *restrict bin_addr1 = &tgt_bins.bin_addr[0];
+  const size_t *restrict bin_addr2 = &src_bins.bin_addr[0];
+  const float *restrict src_cell_bound_box = &src_bins.cell_bound_box[0];
+
   size_t src_cell_addm4;
 
   // Restrict searches first using search bins
@@ -82,7 +93,7 @@ get_srch_cells(size_t tgt_cell_add, size_t nbins, size_t *bin_addr1, size_t *bin
   for (size_t n = 0; n < nbins; ++n)
     {
       size_t n2 = n << 1;
-      if (tgt_cell_add >= bin_addr1[n2] && tgt_cell_add <= bin_addr1[n2 + 1])
+      if (tgt_cell_addr >= bin_addr1[n2] && tgt_cell_addr <= bin_addr1[n2 + 1])
         {
           if (bin_addr2[n2] < min_add) min_add = bin_addr2[n2];
           if (bin_addr2[n2 + 1] > max_add) max_add = bin_addr2[n2 + 1];
@@ -331,15 +342,15 @@ grid_search(RemapGridType *src_grid, size_t *restrict src_add, double *restrict 
 
     float src_grid_bound_box[][4] ! bound box for source grid
 
-    int src_bin_add[][2]           ! latitude bins for restricting
+    int src_bin_addr[][2]           ! latitude bins for restricting
   */
   size_t n2, srch_add, srch_add4;
   int search_result = 0;
 
   size_t nbins = src_bins.nbins;
-  const size_t *restrict src_bin_add = src_bins.bin_addr;
-  const float *restrict bin_lats = src_bins.bin_lats;
-  const float *restrict src_grid_bound_box = src_bins.cell_bound_box;
+  const size_t *restrict src_bin_addr = &src_bins.bin_addr[0];
+  const float *restrict bin_lats = &src_bins.bin_lats[0];
+  const float *restrict src_grid_bound_box = &src_bins.cell_bound_box[0];
 
   float rlat = plat;
   float rlon = plon;
@@ -357,8 +368,8 @@ grid_search(RemapGridType *src_grid, size_t *restrict src_add, double *restrict 
       n2 = n << 1;
       if (rlat >= bin_lats[n2] && rlat <= bin_lats[n2 + 1])
         {
-          if (src_bin_add[n2] < min_add) min_add = src_bin_add[n2];
-          if (src_bin_add[n2 + 1] > max_add) max_add = src_bin_add[n2 + 1];
+          if (src_bin_addr[n2] < min_add) min_add = src_bin_addr[n2];
+          if (src_bin_addr[n2 + 1] > max_add) max_add = src_bin_addr[n2 + 1];
         }
     }
 
