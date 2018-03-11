@@ -136,7 +136,7 @@ renormalizeWeights(const double src_lats[4], double wgts[4])
 
 static void
 bilinear_warning(double plon, double plat, double iw, double jw, size_t *src_add, double *src_lons, double *src_lats,
-                 RemapGridType *src_grid)
+                 RemapGrid *src_grid)
 {
   static bool lwarn = true;
 
@@ -186,7 +186,7 @@ bilinear_remap(double *restrict tgt_point, const double *restrict src_array, con
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVars &rv)
+scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   extern int timer_remap_bil;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -377,7 +377,7 @@ grid_search_test(GridSearch *gs, size_t *restrict src_add, double *restrict src_
 #endif
 
 void
-scrip_remap_bilinear(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
+scrip_remap_bilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
                      double *restrict tgt_array, double missval)
 {
   extern int timer_remap_bil;

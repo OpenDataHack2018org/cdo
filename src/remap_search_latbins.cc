@@ -319,7 +319,7 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
 }
 
 int
-grid_search(RemapGridType *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
             double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
             const double *restrict src_center_lon, GridSearchBins &src_bins)
 {

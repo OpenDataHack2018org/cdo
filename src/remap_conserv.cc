@@ -531,7 +531,7 @@ cdo_compute_concave_overlap_areas(size_t N, search_t *search, struct grid_cell t
 //#endif
 
 static int
-get_lonlat_circle_index(RemapGridType *remap_grid)
+get_lonlat_circle_index(RemapGrid *remap_grid)
 {
   int lonlat_circle_index = -1;
 
@@ -582,7 +582,7 @@ get_lonlat_circle_index(RemapGridType *remap_grid)
 }
 
 static void
-remapNormalizeWeights(RemapGridType *tgt_grid, RemapVars &rv)
+remapNormalizeWeights(RemapGrid *tgt_grid, RemapVars &rv)
 {
   // Include centroids in weights and normalize using destination area if requested
   size_t num_links = rv.num_links;
@@ -622,7 +622,7 @@ remapNormalizeWeights(RemapGridType *tgt_grid, RemapVars &rv)
 }
 
 static void
-set_yac_coordinates(int remap_grid_type, size_t cell_add, size_t num_cell_corners, RemapGridType *remap_grid,
+set_yac_coordinates(int remap_grid_type, size_t cell_add, size_t num_cell_corners, RemapGrid *remap_grid,
                     struct grid_cell *yac_grid_cell)
 {
   double *coordinates_x = yac_grid_cell->coordinates_x;
@@ -661,7 +661,7 @@ set_yac_coordinates(int remap_grid_type, size_t cell_add, size_t num_cell_corner
 }
 
 static void
-reg2d_bound_box(RemapGridType *remap_grid, double *grid_bound_box)
+reg2d_bound_box(RemapGrid *remap_grid, double *grid_bound_box)
 {
   size_t nx = remap_grid->dims[0];
   size_t ny = remap_grid->dims[1];
@@ -680,7 +680,7 @@ reg2d_bound_box(RemapGridType *remap_grid, double *grid_bound_box)
 }
 
 void
-remap_conserv_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVars &rv)
+remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells
@@ -1013,9 +1013,9 @@ remap_conserv_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridTy
 
 }  // remap_weights_conserv
 
-// void remap_conserv(RemapGridType *src_grid, RemapGridType *tgt_grid, const
+// void remap_conserv(RemapGrid *src_grid, RemapGrid *tgt_grid, const
 // double* restrict src_array, double* restrict tgt_array, double missval)
 void
-remap_conserv(RemapSearch &rsearch, RemapGridType *, RemapGridType *, const double *restrict, double *restrict, double)
+remap_conserv(RemapSearch &rsearch, RemapGrid *, RemapGrid *, const double *restrict, double *restrict, double)
 {
 }  // remap_conserv

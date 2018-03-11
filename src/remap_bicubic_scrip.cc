@@ -100,7 +100,7 @@ bicubic_remap(double *restrict tgt_point, const double *restrict src_array, doub
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bicubic_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVars &rv)
+scrip_remap_bicubic_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   extern int timer_remap_bic;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -292,7 +292,7 @@ grid_search_test(GridSearch *gs, size_t *restrict src_add, double *restrict src_
 #endif
 
 void
-scrip_remap_bicubic(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
+scrip_remap_bicubic(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
                     double *restrict tgt_array, double missval)
 {
   int remap_grid_type = src_grid->remap_grid_type;

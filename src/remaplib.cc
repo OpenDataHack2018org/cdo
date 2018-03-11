@@ -98,7 +98,7 @@ remap_set_int(int remapvar, int value)
 /*****************************************************************************/
 
 void
-remapGridAlloc(RemapType mapType, RemapGridType &grid)
+remapGridAlloc(RemapType mapType, RemapGrid &grid)
 {
   if (grid.nvgp) grid.vgpm = (int *) Malloc(grid.nvgp * sizeof(int));
 
@@ -207,7 +207,7 @@ boundbox_from_center(bool lonIsCyclic, size_t size, size_t nx, size_t ny, const 
 }
 
 void
-remapgrid_get_lonlat(RemapGridType *grid, size_t cell_add, double *plon, double *plat)
+remapgrid_get_lonlat(RemapGrid *grid, size_t cell_add, double *plon, double *plat)
 {
   if (grid->remap_grid_type == REMAP_GRID_TYPE_REG2D)
     {
@@ -317,7 +317,7 @@ grid_check_lat_borders_rad(size_t n, double *ybounds)
 }
 
 static void
-remap_define_reg2d(int gridID, RemapGridType &grid)
+remap_define_reg2d(int gridID, RemapGrid &grid)
 {
   size_t nx = grid.dims[0];
   size_t ny = grid.dims[1];
@@ -360,7 +360,7 @@ remap_define_reg2d(int gridID, RemapGridType &grid)
 }
 
 static void
-remapDefineGrid(RemapType mapType, int gridID, RemapGridType &grid, const char *txt)
+remapDefineGrid(RemapType mapType, int gridID, RemapGrid &grid, const char *txt)
 {
   bool lgrid_destroy = false;
   bool lgrid_gen_bounds = false;
@@ -486,7 +486,7 @@ remapDefineGrid(RemapType mapType, int gridID, RemapGridType &grid, const char *
 
 /*  Compute bounding boxes for restricting future grid searches */
 static void
-cell_bounding_boxes(RemapGridType &grid, float *cell_bound_box, int remap_grid_basis)
+cell_bounding_boxes(RemapGrid &grid, float *cell_bound_box, int remap_grid_basis)
 {
   if (grid.luse_cell_corners)
     {
@@ -530,7 +530,7 @@ cell_bounding_boxes(RemapGridType &grid, float *cell_bound_box, int remap_grid_b
 }
 
 void
-remapGridInit(RemapGridType &grid)
+remapGridInit(RemapGrid &grid)
 {
   grid.remap_grid_type = -1;
 
@@ -558,7 +558,7 @@ remapGridInit(RemapGridType &grid)
 }
 
 void
-remapGridFree(RemapGridType &grid)
+remapGridFree(RemapGrid &grid)
 {
   if (grid.vgpm) Free(grid.vgpm);
   if (grid.mask) Free(grid.mask);
@@ -578,7 +578,7 @@ remapGridFree(RemapGridType &grid)
 }
 
 void
-remapSearchInit(RemapType mapType, RemapSearch &search, RemapGridType &src_grid, RemapGridType &tgt_grid)
+remapSearchInit(RemapType mapType, RemapSearch &search, RemapGrid &src_grid, RemapGrid &tgt_grid)
 {
   search.src_bins.ncells = src_grid.size;
   search.tgt_bins.ncells = tgt_grid.size;
@@ -627,8 +627,8 @@ remapSearchFree(RemapSearch &search)
 }
 
 void
-remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGridType &src_grid, int gridID2,
-               RemapGridType &tgt_grid)
+remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGrid &src_grid, int gridID2,
+               RemapGrid &tgt_grid)
 {
   int reg2d_src_gridID = gridID1;
   int reg2d_tgt_gridID = gridID2;
@@ -726,7 +726,7 @@ remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGridType 
 /*****************************************************************************/
 
 void
-remapStat(int remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVars &rv, const double *restrict array1,
+remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv, const double *restrict array1,
           const double *restrict array2, double missval)
 {
   if (remapOrder == 2)
@@ -819,7 +819,7 @@ remapStat(int remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, Rema
 /*****************************************************************************/
 
 void
-remapGradients(RemapGridType &grid, const double *restrict array, gradientsType &gradients)
+remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gradients)
 {
   if (grid.rank != 2) cdoAbort("Internal problem (remapGradients), grid rank = %d!", grid.rank);
 

@@ -79,7 +79,7 @@ readLinks(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
 
 void
 remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remapOrder,
-                    RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVars &rv)
+                    RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv)
 {
   // Writes remap data to a NetCDF file using SCRIP conventions
 
@@ -500,7 +500,7 @@ static RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeig
 
 void
 remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
-                   int *numNeighbors, int *remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVars &rv)
+                   int *numNeighbors, int *remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv)
 {
   // The routine reads a NetCDF file to extract remapping info in SCRIP format
 

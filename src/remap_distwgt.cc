@@ -262,7 +262,7 @@ grid_search_nbr(GridSearch *gs, knnWeightsType &knnWeights, double plon, double 
 //  interpolation.
 
 void
-remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVars &rv)
+remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -353,7 +353,7 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGridType *
 }  // remap_distwgt_weights
 
 void
-remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, const double *restrict src_array,
+remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
               double *restrict tgt_array, double missval)
 {
   int src_remap_grid_type = src_grid->remap_grid_type;
