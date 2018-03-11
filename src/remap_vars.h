@@ -19,7 +19,7 @@ class gradientsType
   gradientsType() {  }
 };
 
-enum struct RemapType
+enum struct RemapMethod
 {
   UNDEF,
   BILINEAR,
@@ -51,7 +51,7 @@ struct RemapVars
 {
   bool sort_add;
   bool pinit;                       // true: if the pointers are initialized
-  RemapType mapType;                // identifier for remapping method
+  RemapMethod mapType;                // identifier for remapping method
   NormOpt normOpt;                  // option for normalization (conserv only)
   long links_per_value;
   size_t max_links;                 // current size of link arrays
@@ -71,7 +71,7 @@ void remap(double *restrict dst_array, double missval, size_t dst_size, const Re
            gradientsType &gradients);
 void remap_laf(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv, const double *restrict src_array);
 void remap_sum(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv, const double *restrict src_array);
-void remapVarsInit(RemapType mapType, RemapVars &rv);
+void remapVarsInit(RemapMethod mapType, RemapVars &rv);
 void remapVarsEnsureSize(RemapVars &rv, size_t size);
 void remapVarsResize(RemapVars &rv, size_t size);
 void remapVarsReorder(RemapVars &rv);

@@ -395,15 +395,15 @@ remap_sum(double *restrict dst_array, double missval, size_t dst_size, const Rem
 }
 
 void
-remapVarsInit(RemapType mapType, RemapVars &rv)
+remapVarsInit(RemapMethod mapType, RemapVars &rv)
 {
   // Initialize all pointer
   if (rv.pinit == false) rv.pinit = true;
 
-  rv.sort_add = (mapType == RemapType::CONSERV);
+  rv.sort_add = (mapType == RemapMethod::CONSERV);
 
   // Determine the number of weights
-  rv.num_wts = (mapType == RemapType::CONSERV) ? 3 : ((mapType == RemapType::BICUBIC) ? 4 : 1);
+  rv.num_wts = (mapType == RemapMethod::CONSERV) ? 3 : ((mapType == RemapMethod::BICUBIC) ? 4 : 1);
 
   rv.links_per_value = -1;
   rv.num_links = 0;

@@ -838,7 +838,7 @@ remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_
                                   tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
 
           num_srch_cells
-            = get_srch_cells(tgt_cell_add, rsearch.tgt_bins, rsearch.src_bins, tgt_cell_bound_box_r,
+            = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins, tgt_cell_bound_box_r,
                              srch_add[ompthID]);
         }
 #ifdef STIMER

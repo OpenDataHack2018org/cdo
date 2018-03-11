@@ -66,6 +66,10 @@
 #include "config.h"
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>  // omp_get_wtime
+#endif
+
 #include <cdi.h>
 
 #include "cdo_int.h"
@@ -98,7 +102,7 @@ remap_set_int(int remapvar, int value)
 /*****************************************************************************/
 
 void
-remapGridAlloc(RemapType mapType, RemapGrid &grid)
+remapGridAlloc(RemapMethod mapType, RemapGrid &grid)
 {
   if (grid.nvgp) grid.vgpm = (int *) Malloc(grid.nvgp * sizeof(int));
 
@@ -110,7 +114,7 @@ remapGridAlloc(RemapType mapType, RemapGrid &grid)
       grid.cell_center_lat = (double *) Malloc(grid.size * sizeof(double));
     }
 
-  if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
+  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
     {
       grid.cell_area = (double *) Calloc(grid.size, sizeof(double));
     }
@@ -360,7 +364,7 @@ remap_define_reg2d(int gridID, RemapGrid &grid)
 }
 
 static void
-remapDefineGrid(RemapType mapType, int gridID, RemapGrid &grid, const char *txt)
+remapDefineGrid(RemapMethod mapType, int gridID, RemapGrid &grid, const char *txt)
 {
   bool lgrid_destroy = false;
   bool lgrid_gen_bounds = false;
@@ -578,36 +582,58 @@ remapGridFree(RemapGrid &grid)
 }
 
 void
-remapSearchInit(RemapType mapType, RemapSearch &search, RemapGrid &src_grid, RemapGrid &tgt_grid)
+remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, RemapGrid &tgt_grid)
 {
-  search.src_bins.ncells = src_grid.size;
-  search.tgt_bins.ncells = tgt_grid.size;
+  search.srcGrid = &src_grid;
+  search.tgtGrid = &tgt_grid;
 
-  search.src_bins.nbins = remap_num_srch_bins;
-  search.tgt_bins.nbins = remap_num_srch_bins;
+  search.srcBins.ncells = src_grid.size;
+  search.tgtBins.ncells = tgt_grid.size;
 
-  if (!(src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D || tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D))
+  search.srcBins.nbins = remap_num_srch_bins;
+  search.tgtBins.nbins = remap_num_srch_bins;
+
+  search.gs = NULL;
+
+  if (mapType == RemapMethod::DISTWGT
+      //            && mapType != RemapMethod::BILINEAR
+      )
     {
-      if (mapType != RemapType::DISTWGT
-          //            && mapType != RemapType::BILINEAR
-          )
-        {
-          search.src_bins.cell_bound_box.resize(4 * src_grid.size);
-          if ( tgt_grid.luse_cell_corners )
-            search.tgt_bins.cell_bound_box.resize(4 * tgt_grid.size);
+#ifdef _OPENMP
+      double start = cdoVerbose ? omp_get_wtime() : 0;
+#endif
+      bool xIsCyclic = src_grid.is_cyclic;
+      size_t *dims = src_grid.dims;
+      if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
+        search.gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid.reg2d_center_lon, src_grid.reg2d_center_lat);
+      else
+        search.gs = gridsearch_create(xIsCyclic, dims, src_grid.size, src_grid.cell_center_lon, src_grid.cell_center_lat);
 
-          cell_bounding_boxes(src_grid, &search.src_bins.cell_bound_box[0], REMAP_GRID_BASIS_SRC);
-          cell_bounding_boxes(tgt_grid, &search.tgt_bins.cell_bound_box[0], REMAP_GRID_BASIS_TGT);
+      if (src_grid.lextrapolate) gridsearch_extrapolate(search.gs);
+#ifdef _OPENMP
+      if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
+#endif
+    }
+  else
+    {
+      if (!(src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D || tgt_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D))
+        {
+          search.srcBins.cell_bound_box.resize(4 * src_grid.size);
+          if ( tgt_grid.luse_cell_corners )
+            search.tgtBins.cell_bound_box.resize(4 * tgt_grid.size);
+
+          cell_bounding_boxes(src_grid, &search.srcBins.cell_bound_box[0], REMAP_GRID_BASIS_SRC);
+          cell_bounding_boxes(tgt_grid, &search.tgtBins.cell_bound_box[0], REMAP_GRID_BASIS_TGT);
           // Set up and assign address ranges to search bins in order to further restrict later searches
-          calc_lat_bins(search.src_bins);
-          if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
+          calc_lat_bins(search.srcBins);
+          if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
             {
-              calc_lat_bins(search.tgt_bins);
-              if ( search.src_bins.bin_lats.size() ) search.src_bins.bin_lats.resize(0);
-              if ( search.tgt_bins.bin_lats.size() ) search.tgt_bins.bin_lats.resize(0);
-              if (mapType == RemapType::CONSERV_YAC)
+              calc_lat_bins(search.tgtBins);
+              if ( search.srcBins.bin_lats.size() ) search.srcBins.bin_lats.resize(0);
+              if ( search.tgtBins.bin_lats.size() ) search.tgtBins.bin_lats.resize(0);
+              if (mapType == RemapMethod::CONSERV_YAC)
                 {
-                  if (search.tgt_bins.cell_bound_box.size()) search.tgt_bins.cell_bound_box.resize(0);
+                  if (search.tgtBins.cell_bound_box.size()) search.tgtBins.cell_bound_box.resize(0);
                 }
             }
         }
@@ -617,17 +643,20 @@ remapSearchInit(RemapType mapType, RemapSearch &search, RemapGrid &src_grid, Rem
 void
 remapSearchFree(RemapSearch &search)
 {
-  if (search.src_bins.bin_addr.size()) search.src_bins.bin_addr.resize(0);
-  if (search.src_bins.bin_lats.size()) search.src_bins.bin_lats.resize(0);
-  if (search.src_bins.cell_bound_box.size()) search.src_bins.cell_bound_box.resize(0);
+  if (search.srcBins.bin_addr.size()) search.srcBins.bin_addr.resize(0);
+  if (search.srcBins.bin_lats.size()) search.srcBins.bin_lats.resize(0);
+  if (search.srcBins.cell_bound_box.size()) search.srcBins.cell_bound_box.resize(0);
 
-  if (search.tgt_bins.bin_addr.size()) search.tgt_bins.bin_addr.resize(0);
-  if (search.tgt_bins.bin_lats.size()) search.tgt_bins.bin_lats.resize(0);
-  if (search.tgt_bins.cell_bound_box.size()) search.tgt_bins.cell_bound_box.resize(0);
+  if (search.tgtBins.bin_addr.size()) search.tgtBins.bin_addr.resize(0);
+  if (search.tgtBins.bin_lats.size()) search.tgtBins.bin_lats.resize(0);
+  if (search.tgtBins.cell_bound_box.size()) search.tgtBins.cell_bound_box.resize(0);
+
+  if (search.gs) gridsearch_delete(search.gs);
+  search.gs = NULL;
 }
 
 void
-remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGrid &src_grid, int gridID2,
+remapInitGrids(RemapMethod mapType, bool lextrapolate, int gridID1, RemapGrid &src_grid, int gridID2,
                RemapGrid &tgt_grid)
 {
   int reg2d_src_gridID = gridID1;
@@ -636,8 +665,8 @@ remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGrid &src
   remapGridInit(src_grid);
   remapGridInit(tgt_grid);
 
-  if (mapType == RemapType::BILINEAR || mapType == RemapType::BICUBIC || mapType == RemapType::DISTWGT
-      || mapType == RemapType::CONSERV_YAC)
+  if (mapType == RemapMethod::BILINEAR || mapType == RemapMethod::BICUBIC || mapType == RemapMethod::DISTWGT
+      || mapType == RemapMethod::CONSERV_YAC)
     {
       if (IS_REG2D_GRID(gridID1)) src_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // src_grid.remap_grid_type = 0;
@@ -645,21 +674,21 @@ remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGrid &src
 
   if (src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
     {
-      if (IS_REG2D_GRID(gridID2) && mapType == RemapType::CONSERV_YAC)
+      if (IS_REG2D_GRID(gridID2) && mapType == RemapMethod::CONSERV_YAC)
         tgt_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // else src_grid.remap_grid_type = -1;
     }
 
   if (!remap_gen_weights && IS_REG2D_GRID(gridID2) && tgt_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D)
     {
-      if (mapType == RemapType::DISTWGT) tgt_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
-      if (mapType == RemapType::BILINEAR && src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
+      if (mapType == RemapMethod::DISTWGT) tgt_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if (mapType == RemapMethod::BILINEAR && src_grid.remap_grid_type == REMAP_GRID_TYPE_REG2D)
         tgt_grid.remap_grid_type = REMAP_GRID_TYPE_REG2D;
     }
 
   src_grid.lextrapolate = lextrapolate;
 
-  if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
+  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
     {
       if (src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D)
         {

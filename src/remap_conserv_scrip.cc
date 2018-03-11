@@ -1319,8 +1319,8 @@ scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid
       long tgt_cell_add;
 
       // Get search cells
-      long num_srch_cells = get_srch_cells(src_cell_add, rsearch.src_bins, rsearch.tgt_bins,
-                                           &rsearch.src_bins.cell_bound_box[src_cell_add * 4],
+      long num_srch_cells = get_srch_cells(src_cell_add, rsearch.srcBins, rsearch.tgtBins,
+                                           &rsearch.srcBins.cell_bound_box[src_cell_add * 4],
                                            srch_add[ompthID]);
 
       if (num_srch_cells == 0) continue;
@@ -1522,8 +1522,8 @@ scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid
       long src_cell_add;
 
       // Get search cells
-      long num_srch_cells = get_srch_cells(tgt_cell_add, rsearch.tgt_bins, rsearch.src_bins,
-                                           &rsearch.tgt_bins.cell_bound_box[tgt_cell_add * 4],
+      long num_srch_cells = get_srch_cells(tgt_cell_add, rsearch.tgtBins, rsearch.srcBins,
+                                           &rsearch.tgtBins.cell_bound_box[tgt_cell_add * 4],
                                            srch_add[ompthID]);
 
       if (num_srch_cells == 0) continue;

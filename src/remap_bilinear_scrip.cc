@@ -241,7 +241,7 @@ scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGri
       else
         search_result
             = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
-                          src_grid->cell_center_lon, rsearch.src_bins);
+                          src_grid->cell_center_lon, rsearch.srcBins);
 
       // Check to see if points are mask points
       if (search_result > 0)
@@ -442,7 +442,7 @@ scrip_remap_bilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_g
 #else
         search_result
             = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
-                          src_grid->cell_center_lon, rsearch.src_bins);
+                          src_grid->cell_center_lon, rsearch.srcBins);
 #endif
 
       // Check to see if points are mask points

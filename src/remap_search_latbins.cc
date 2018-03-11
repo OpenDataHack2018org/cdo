@@ -74,14 +74,14 @@ calc_lat_bins(GridSearchBins &searchBins)
 }
 
 size_t
-get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgt_bins, GridSearchBins &src_bins, float *tgt_cell_bound_box,
+get_srch_cells(size_t tgt_cell_addr, GridSearchBins &tgtBins, GridSearchBins &srcBins, float *tgt_cell_bound_box,
                size_t *srch_add)
 {
-  size_t nbins = src_bins.nbins;
-  size_t src_grid_size = src_bins.ncells;
-  const size_t *restrict bin_addr1 = &tgt_bins.bin_addr[0];
-  const size_t *restrict bin_addr2 = &src_bins.bin_addr[0];
-  const float *restrict src_cell_bound_box = &src_bins.cell_bound_box[0];
+  size_t nbins = srcBins.nbins;
+  size_t src_grid_size = srcBins.ncells;
+  const size_t *restrict bin_addr1 = &tgtBins.bin_addr[0];
+  const size_t *restrict bin_addr2 = &srcBins.bin_addr[0];
+  const float *restrict src_cell_bound_box = &srcBins.cell_bound_box[0];
 
   size_t src_cell_addm4;
 
@@ -321,7 +321,7 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
 int
 grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
             double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
-            const double *restrict src_center_lon, GridSearchBins &src_bins)
+            const double *restrict src_center_lon, GridSearchBins &srcBins)
 {
   /*
     Output variables:
@@ -347,10 +347,10 @@ grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_
   size_t n2, srch_add, srch_add4;
   int search_result = 0;
 
-  size_t nbins = src_bins.nbins;
-  const size_t *restrict src_bin_addr = &src_bins.bin_addr[0];
-  const float *restrict bin_lats = &src_bins.bin_lats[0];
-  const float *restrict src_grid_bound_box = &src_bins.cell_bound_box[0];
+  size_t nbins = srcBins.nbins;
+  const size_t *restrict src_bin_addr = &srcBins.bin_addr[0];
+  const float *restrict bin_lats = &srcBins.bin_lats[0];
+  const float *restrict src_grid_bound_box = &srcBins.cell_bound_box[0];
 
   float rlat = plat;
   float rlon = plon;

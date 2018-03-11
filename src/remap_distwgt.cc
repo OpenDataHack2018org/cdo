@@ -272,7 +272,6 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
 
   // Compute mappings from source to target grid
 
-  size_t src_grid_size = src_grid->size;
   size_t tgt_grid_size = tgt_grid->size;
 
   std::vector<weightlinks_t> weightlinks(tgt_grid_size);
@@ -287,27 +286,12 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
   double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
-  bool xIsCyclic = src_grid->is_cyclic;
-  size_t *dims = src_grid->dims;
-  GridSearch *gs = NULL;
-  if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-    gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
-  else
-    gs = gridsearch_create(xIsCyclic, dims, src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
-
-  if (src_grid->lextrapolate) gridsearch_extrapolate(gs);
-
-#ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
-  if (cdoVerbose) start = omp_get_wtime();
-#endif
-
   // Loop over destination grid
 
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(gs, weightlinks, numNeighbors, remap_grid_type, \
+#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightlinks, numNeighbors, remap_grid_type, \
                                                                     src_grid, tgt_grid, tgt_grid_size, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
@@ -326,9 +310,9 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
 
       // Find nearest grid points on source grid and distances to each point
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        grid_search_nbr_reg2d(gs, knnWeights[ompthID], plon, plat);
+        grid_search_nbr_reg2d(rsearch.gs, knnWeights[ompthID], plon, plat);
       else
-        grid_search_nbr(gs, knnWeights[ompthID], plon, plat);
+        grid_search_nbr(rsearch.gs, knnWeights[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
@@ -343,7 +327,8 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
 
   progressStatus(0, 1, 1);
 
-  if (gs) gridsearch_delete(gs);
+  if (rsearch.gs) gridsearch_delete(rsearch.gs);
+  rsearch.gs = NULL;
 
   weightlinks2remaplinks(0, tgt_grid_size, &weightlinks[0], rv);
 
@@ -364,7 +349,6 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
 
   // Compute mappings from source to target grid
 
-  size_t src_grid_size = src_grid->size;
   size_t tgt_grid_size = tgt_grid->size;
 
   std::vector<knnWeightsType> knnWeights;
@@ -374,29 +358,14 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
   double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
-  bool xIsCyclic = src_grid->is_cyclic;
-  size_t *dims = src_grid->dims;
-  GridSearch *gs = NULL;
-  if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
-    gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
-  else
-    gs = gridsearch_create(xIsCyclic, dims, src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
-
-  if (src_grid->lextrapolate) gridsearch_extrapolate(gs);
-
-#ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
-  if (cdoVerbose) start = omp_get_wtime();
-#endif
-
   // Loop over destination grid
 
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none)                                                      \
-    reduction(+ : findex) shared(gs, numNeighbors, src_remap_grid_type, src_grid, tgt_grid, \
-                                 tgt_grid_size) shared(src_array, tgt_array, missval, knnWeights)
+  reduction(+ : findex) shared(rsearch, numNeighbors, src_remap_grid_type, src_grid, tgt_grid, \
+                               tgt_grid_size) shared(src_array, tgt_array, missval, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -414,9 +383,9 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
 
       // Find nearest grid points on source grid and distances to each point
       if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        grid_search_nbr_reg2d(gs, knnWeights[ompthID], plon, plat);
+        grid_search_nbr_reg2d(rsearch.gs, knnWeights[ompthID], plon, plat);
       else
-        grid_search_nbr(gs, knnWeights[ompthID], plon, plat);
+        grid_search_nbr(rsearch.gs, knnWeights[ompthID], plon, plat);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
@@ -424,8 +393,6 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
     }
 
   progressStatus(0, 1, 1);
-
-  if (gs) gridsearch_delete(gs);
 
 #ifdef _OPENMP
   if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);

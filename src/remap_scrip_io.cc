@@ -78,7 +78,7 @@ readLinks(int nc_file_id, int nc_add_id, size_t num_links, size_t *cell_add)
 #endif
 
 void
-remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType submapType, int numNeighbors, int remapOrder,
+remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType submapType, int numNeighbors, int remapOrder,
                     RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv)
 {
   // Writes remap data to a NetCDF file using SCRIP conventions
@@ -139,7 +139,7 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
 
   switch (mapType)
     {
-    case RemapType::CONSERV:
+    case RemapMethod::CONSERV:
       lgridarea = true;
       if (submapType == SubmapType::LAF)
         {
@@ -151,7 +151,7 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
           strcpy(map_method, "Conservative remapping");
           break;
         }
-    case RemapType::CONSERV_YAC:
+    case RemapMethod::CONSERV_YAC:
       lgridarea = true;
       /*
       if ( submapType == SubmapType::LAF )
@@ -165,15 +165,15 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
         strcpy(map_method, "Conservative remapping using clipping on sphere");
         break;
       }
-    case RemapType::BILINEAR: strcpy(map_method, "Bilinear remapping"); break;
-    case RemapType::BICUBIC: strcpy(map_method, "Bicubic remapping"); break;
-    case RemapType::DISTWGT:
+    case RemapMethod::BILINEAR: strcpy(map_method, "Bilinear remapping"); break;
+    case RemapMethod::BICUBIC: strcpy(map_method, "Bicubic remapping"); break;
+    case RemapMethod::DISTWGT:
       if (numNeighbors == 1)
         strcpy(map_method, "Nearest neighbor");
       else
         strcpy(map_method, "Distance weighted avg of nearest neighbors");
       break;
-    case RemapType::UNDEF: break;
+    case RemapMethod::UNDEF: break;
     }
 
   /*
@@ -238,7 +238,7 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "map_method", strlen(map_method), map_method));
 
   // Remap order
-  if (mapType == RemapType::CONSERV && submapType == SubmapType::NONE)
+  if (mapType == RemapMethod::CONSERV && submapType == SubmapType::NONE)
     nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "remap_order", NC_INT, 1L, &remapOrder));
 
   // File convention
@@ -443,7 +443,7 @@ remapWriteDataScrip(const char *interp_file, RemapType mapType, SubmapType subma
 /*****************************************************************************/
 
 #ifdef HAVE_LIBNETCDF
-static RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remapOrder)
+static RemapMethod getMapType(int nc_file_id, SubmapType *submapType, int *numNeighbors, int *remapOrder)
 {
   // Map method
   size_t attlen;
@@ -455,35 +455,35 @@ static RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeig
   *submapType = SubmapType::NONE;
   *remapOrder = 1;
 
-  RemapType mapType = RemapType::UNDEF;
+  RemapMethod mapType = RemapMethod::UNDEF;
   if (cmpstr(map_method, "Conservative") == 0)
     {
       if (cmpstr(map_method, "Conservative remapping using clipping on sphere") == 0)
-        mapType = RemapType::CONSERV_YAC;
+        mapType = RemapMethod::CONSERV_YAC;
       else
-        mapType = RemapType::CONSERV;
+        mapType = RemapMethod::CONSERV;
 
       int iatt;
       int status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
       if (status == NC_NOERR) *remapOrder = iatt;
     }
   else if (cmpstr(map_method, "Bilinear") == 0)
-    mapType = RemapType::BILINEAR;
+    mapType = RemapMethod::BILINEAR;
   else if (cmpstr(map_method, "Bicubic") == 0)
-    mapType = RemapType::BICUBIC;
+    mapType = RemapMethod::BICUBIC;
   else if (cmpstr(map_method, "Distance") == 0)
     {
-      mapType = RemapType::DISTWGT;
+      mapType = RemapMethod::DISTWGT;
       *numNeighbors = 4;
     }
   else if (cmpstr(map_method, "Nearest") == 0)
     {
-      mapType = RemapType::DISTWGT;
+      mapType = RemapMethod::DISTWGT;
       *numNeighbors = 1;
     }
   else if (cmpstr(map_method, "Largest") == 0)
     {
-      mapType = RemapType::CONSERV;
+      mapType = RemapMethod::CONSERV;
       *submapType = SubmapType::LAF;
     }
   else
@@ -499,7 +499,7 @@ static RemapType getMapType(int nc_file_id, SubmapType *submapType, int *numNeig
 #endif
 
 void
-remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType *mapType, SubmapType *submapType,
+remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMethod *mapType, SubmapType *submapType,
                    int *numNeighbors, int *remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &rv)
 {
   // The routine reads a NetCDF file to extract remapping info in SCRIP format
@@ -569,7 +569,7 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapType 
   // Map Tyoe
   *mapType = getMapType(nc_file_id, submapType, numNeighbors, remapOrder);
 
-  if (*mapType == RemapType::CONSERV) lgridarea = true;
+  if (*mapType == RemapMethod::CONSERV) lgridarea = true;
 
   remapVarsInit(*mapType, rv);
 

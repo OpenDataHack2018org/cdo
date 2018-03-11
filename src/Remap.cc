@@ -75,45 +75,45 @@ enum
 };
 
 static void
-getMaptype(int operfunc, RemapType &mapType, SubmapType &submapType, int &numNeighbors, int &remapOrder)
+getMaptype(int operfunc, RemapMethod &mapType, SubmapType &submapType, int &numNeighbors, int &remapOrder)
 {
   remapOrder = 1;
   switch (operfunc)
     {
     case REMAPYCON:
     case GENYCON:
-      mapType = RemapType::CONSERV_YAC;
+      mapType = RemapMethod::CONSERV_YAC;
       break;
     case REMAPCON:
     case GENCON:
-      mapType = RemapType::CONSERV;
+      mapType = RemapMethod::CONSERV;
       break;
     case REMAPCON2:
     case GENCON2:
-      mapType = RemapType::CONSERV;
+      mapType = RemapMethod::CONSERV;
       remapOrder = 2;
       break;
     case REMAPLAF:
     case GENLAF:
-      mapType = RemapType::CONSERV_YAC;
+      mapType = RemapMethod::CONSERV_YAC;
       submapType = SubmapType::LAF;
       break;
     case REMAPSUM:
-      mapType = RemapType::CONSERV;
+      mapType = RemapMethod::CONSERV;
       submapType = SubmapType::SUM;
       break;
     case REMAPBIL:
-    case GENBIL: mapType = RemapType::BILINEAR; break;
+    case GENBIL: mapType = RemapMethod::BILINEAR; break;
     case REMAPBIC:
-    case GENBIC: mapType = RemapType::BICUBIC; break;
+    case GENBIC: mapType = RemapMethod::BICUBIC; break;
     case REMAPDIS:
     case GENDIS:
-      mapType = RemapType::DISTWGT;
+      mapType = RemapMethod::DISTWGT;
       if (numNeighbors == 0) numNeighbors = 4;
       break;
     case REMAPNN:
     case GENNN:
-      mapType = RemapType::DISTWGT;
+      mapType = RemapMethod::DISTWGT;
       numNeighbors = 1;
       break;
     default: cdoAbort("Unknown mapping method"); break;
@@ -121,19 +121,19 @@ getMaptype(int operfunc, RemapType &mapType, SubmapType &submapType, int &numNei
 }
 
 static int
-maptype2operfunc(RemapType mapType, SubmapType submapType, int numNeighbors, int remapOrder)
+maptype2operfunc(RemapMethod mapType, SubmapType submapType, int numNeighbors, int remapOrder)
 {
   int operfunc = -1;
 
-  if (mapType == RemapType::CONSERV)
+  if (mapType == RemapMethod::CONSERV)
     operfunc = (remapOrder == 2) ? REMAPCON2 : REMAPCON;
-  else if (mapType == RemapType::CONSERV_YAC)
+  else if (mapType == RemapMethod::CONSERV_YAC)
     operfunc = (submapType == SubmapType::LAF) ? REMAPLAF : REMAPYCON;
-  else if (mapType == RemapType::BILINEAR)
+  else if (mapType == RemapMethod::BILINEAR)
     operfunc = REMAPBIL;
-  else if (mapType == RemapType::BICUBIC)
+  else if (mapType == RemapMethod::BICUBIC)
     operfunc = REMAPBIC;
-  else if (mapType == RemapType::DISTWGT)
+  else if (mapType == RemapMethod::DISTWGT)
     operfunc = (numNeighbors == 1) ? REMAPNN : REMAPDIS;
   else
     cdoAbort("Unsupported mapping method (mapType = %d)", mapType);
@@ -769,17 +769,17 @@ remapInit(remapType *remap)
 }
 
 static void
-remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
+remapGenWeights(RemapMethod mapType, remapType *remap, int numNeighbors)
 {
-  if (mapType == RemapType::CONSERV)
+  if (mapType == RemapMethod::CONSERV)
     scrip_remap_conserv_weights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
-  else if (mapType == RemapType::BILINEAR)
+  else if (mapType == RemapMethod::BILINEAR)
     scrip_remap_bilinear_weights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
-  else if (mapType == RemapType::BICUBIC)
+  else if (mapType == RemapMethod::BICUBIC)
     scrip_remap_bicubic_weights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
-  else if (mapType == RemapType::DISTWGT)
+  else if (mapType == RemapMethod::DISTWGT)
     remap_distwgt_weights(numNeighbors, remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
-  else if (mapType == RemapType::CONSERV_YAC)
+  else if (mapType == RemapMethod::CONSERV_YAC)
     remap_conserv_weights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
 
   if (remap->vars.sort_add) remapSortAddr(remap->vars);
@@ -787,15 +787,15 @@ remapGenWeights(RemapType mapType, remapType *remap, int numNeighbors)
 }
 
 static void
-remapField(RemapType mapType, remapType *remap, int numNeighbors, double *array1, double *array2, double missval)
+remapField(RemapMethod mapType, remapType *remap, int numNeighbors, double *array1, double *array2, double missval)
 {
-  if (mapType == RemapType::BILINEAR)
+  if (mapType == RemapMethod::BILINEAR)
     scrip_remap_bilinear(remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
-  else if (mapType == RemapType::BICUBIC)
+  else if (mapType == RemapMethod::BICUBIC)
     scrip_remap_bicubic(remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
-  else if (mapType == RemapType::DISTWGT)
+  else if (mapType == RemapMethod::DISTWGT)
     remap_distwgt(numNeighbors, remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
-  else if (mapType == RemapType::CONSERV_YAC)
+  else if (mapType == RemapMethod::CONSERV_YAC)
     remap_conserv(remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
 }
 
@@ -827,7 +827,7 @@ remapAddOperators(void)
 void *
 Remap(void *argument)
 {
-  RemapType mapType(RemapType::UNDEF);
+  RemapMethod mapType(RemapMethod::UNDEF);
   SubmapType submapType(SubmapType::NONE);
   bool remap_genweights = REMAP_genweights;
   int streamID2 = -1;
@@ -923,7 +923,7 @@ Remap(void *argument)
       remaps[0].gridID = gridID1;
       remaps[0].gridsize = gridInqSize(gridID1);
 
-      if (mapType == RemapType::DISTWGT && !lextrapolate) remap_extrapolate = true;
+      if (mapType == RemapMethod::DISTWGT && !lextrapolate) remap_extrapolate = true;
       if (gridIsCircular(gridID1) && !lextrapolate) remap_extrapolate = true;
 
       if (gridInqType(gridID1) == GRID_GME) gridsize = remaps[0].src_grid.nvgp;
@@ -963,17 +963,17 @@ Remap(void *argument)
       getMaptype(operfunc, mapType, submapType, numNeighbors, remapOrder);
     }
 
-  if (!remap_genweights && mapType == RemapType::CONSERV) remap_genweights = true;
+  if (!remap_genweights && mapType == RemapMethod::CONSERV) remap_genweights = true;
 
   remap_set_int(REMAP_GENWEIGHTS, (int) remap_genweights);
 
   NormOpt normOpt(NormOpt::NONE);
-  if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC) normOpt = getNormOpt();
+  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC) normOpt = getNormOpt();
 
   size_t grid1sizemax = vlistGridsizeMax(vlistID1);
 
-  bool needGradients = (mapType == RemapType::BICUBIC);
-  if (mapType == RemapType::CONSERV && remapOrder == 2)
+  bool needGradients = (mapType == RemapMethod::BICUBIC);
+  if (mapType == RemapMethod::CONSERV && remapOrder == 2)
     {
       if (cdoVerbose) cdoPrint("Second order remapping");
       needGradients = true;
@@ -1025,7 +1025,7 @@ Remap(void *argument)
 
           if (!skipVar)
             {
-              if (mapType != RemapType::CONSERV && mapType != RemapType::CONSERV_YAC && gridInqType(gridID1) == GRID_GME
+              if (mapType != RemapMethod::CONSERV && mapType != RemapMethod::CONSERV_YAC && gridInqType(gridID1) == GRID_GME
                   && gridInqType(gridID2) == GRID_GME)
                 cdoAbort("Only conservative remapping is available to remap between GME grids!");
 
@@ -1070,7 +1070,7 @@ Remap(void *argument)
                     {
                       if (gridIsCircular(gridID1) && !lextrapolate) remap_extrapolate = true;
                       remaps[r].src_grid.non_global = false;
-                      if (mapType == RemapType::DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1
+                      if (mapType == RemapMethod::DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1
                           && !gridIsGlobal(gridID1))
                         remaps[r].src_grid.non_global = true;
                       /*
@@ -1079,7 +1079,7 @@ Remap(void *argument)
                       */
                       if (gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == false)
                         {
-                          remap_num_srch_bins = (!remap_extrapolate && mapType == RemapType::DISTWGT)
+                          remap_num_srch_bins = (!remap_extrapolate && mapType == RemapMethod::DISTWGT)
                                                     ? 1
                                                     : remapGenNumBins(gridInqYsize(gridID1));
                         }
@@ -1089,7 +1089,7 @@ Remap(void *argument)
                       remaps[r].vars.normOpt = normOpt;
                       remaps[r].vars.pinit = false;
 
-                      if ((mapType == RemapType::BILINEAR || mapType == RemapType::BICUBIC)
+                      if ((mapType == RemapMethod::BILINEAR || mapType == RemapMethod::BICUBIC)
                           && (gridInqType(gridID1) == GRID_GME || gridInqType(gridID1) == GRID_UNSTRUCTURED))
                         cdoAbort("Bilinear/bicubic interpolation doesn't support unstructured source grids!");
 
@@ -1111,7 +1111,7 @@ Remap(void *argument)
 
                   arrayCopy(remaps[r].src_grid.size, &imask[0], remaps[r].src_grid.mask);
 
-                  if (mapType == RemapType::CONSERV || mapType == RemapType::CONSERV_YAC)
+                  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
                     {
                       arrayFill(remaps[r].src_grid.size, remaps[r].src_grid.cell_area, 0.0);
                       arrayFill(remaps[r].src_grid.size, remaps[r].src_grid.cell_frac, 0.0);
