@@ -638,7 +638,7 @@ remapTimerInit(void)
 }
 
 static void
-remapLinksPerValue(RemapVarsType &rv)
+remapLinksPerValue(RemapVars &rv)
 {
   long lpv = -1;
 
@@ -718,7 +718,7 @@ remapLinksPerValue(RemapVarsType &rv)
 }
 
 static void
-remapSortAddr(RemapVarsType &rv)
+remapSortAddr(RemapVars &rv)
 {
   if (cdoTimer) timer_start(timer_remap_sort);
   if (sort_mode == MERGE_SORT)

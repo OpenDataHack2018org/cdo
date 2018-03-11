@@ -101,7 +101,7 @@ grid_store_delete(grid_store_t *grid_store)
     address and weight arrays and resizes those arrays if necessary.
 */
 void
-store_link_cnsrv(RemapVarsType &rv, long add1, long add2, long num_wts, double *weights, grid_store_t *grid_store)
+store_link_cnsrv(RemapVars &rv, long add1, long add2, long num_wts, double *weights, grid_store_t *grid_store)
 {
   /*
     Input variables:

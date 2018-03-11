@@ -582,7 +582,7 @@ get_lonlat_circle_index(RemapGridType *remap_grid)
 }
 
 static void
-remapNormalizeWeights(RemapGridType *tgt_grid, RemapVarsType &rv)
+remapNormalizeWeights(RemapGridType *tgt_grid, RemapVars &rv)
 {
   // Include centroids in weights and normalize using destination area if requested
   size_t num_links = rv.num_links;
@@ -680,7 +680,7 @@ reg2d_bound_box(RemapGridType *remap_grid, double *grid_bound_box)
 }
 
 void
-remap_conserv_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVarsType &rv)
+remap_conserv_weights(RemapSearch &rsearch, RemapGridType *src_grid, RemapGridType *tgt_grid, RemapVars &rv)
 {
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells

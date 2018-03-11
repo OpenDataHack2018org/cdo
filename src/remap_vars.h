@@ -47,7 +47,7 @@ struct remaplink_t
   size_t **w_index;
 };
 
-struct RemapVarsType
+struct RemapVars
 {
   bool sort_add;
   bool pinit;                       // true: if the pointers are initialized
@@ -67,15 +67,15 @@ struct RemapVarsType
 };
 
 
-void remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array,
+void remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv, const double *restrict src_array,
            gradientsType &gradients);
-void remap_laf(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array);
-void remap_sum(double *restrict dst_array, double missval, size_t dst_size, const RemapVarsType &rv, const double *restrict src_array);
-void remapVarsInit(RemapType mapType, RemapVarsType &rv);
-void remapVarsEnsureSize(RemapVarsType &rv, size_t size);
-void remapVarsResize(RemapVarsType &rv, size_t size);
-void remapVarsReorder(RemapVarsType &rv);
-void remapVarsFree(RemapVarsType &rv);
-void remapVarsCheckWeights(const RemapVarsType &rv);
+void remap_laf(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv, const double *restrict src_array);
+void remap_sum(double *restrict dst_array, double missval, size_t dst_size, const RemapVars &rv, const double *restrict src_array);
+void remapVarsInit(RemapType mapType, RemapVars &rv);
+void remapVarsEnsureSize(RemapVars &rv, size_t size);
+void remapVarsResize(RemapVars &rv, size_t size);
+void remapVarsReorder(RemapVars &rv);
+void remapVarsFree(RemapVars &rv);
+void remapVarsCheckWeights(const RemapVars &rv);
 
 #endif /* REMAP_VARS_H */

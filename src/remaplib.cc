@@ -726,7 +726,7 @@ remapInitGrids(RemapType mapType, bool lextrapolate, int gridID1, RemapGridType 
 /*****************************************************************************/
 
 void
-remapStat(int remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVarsType &rv, const double *restrict array1,
+remapStat(int remapOrder, RemapGridType &src_grid, RemapGridType &tgt_grid, RemapVars &rv, const double *restrict array1,
           const double *restrict array2, double missval)
 {
   if (remapOrder == 2)
