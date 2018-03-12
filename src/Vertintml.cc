@@ -310,8 +310,7 @@ Vertintml(void *process)
       if (cdoVerbose)
         {
           vlistInqVarName(vlistID1, varID, varname);
-          cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s "
-                   "Varname = %s varID = %d",
+          cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s Varname = %s varID = %d",
                    mode, instNum, tableNum, code, paramstr, varname, varID);
         }
 
@@ -324,10 +323,9 @@ Vertintml(void *process)
           strtolower(stdname);
 
           code = echamcode_from_stdname(stdname);
-
           if (code == -1)
             {
-              /*                                  ECHAM ECMWF       */
+              //                                       ECHAM                         ECMWF
               if (sgeopotID == -1 && (strcmp(varname, "geosp") == 0 || strcmp(varname, "z") == 0))
                 code = gribcodes.geopot;
               else if (tempID == -1 && (strcmp(varname, "st") == 0 || strcmp(varname, "t") == 0))
@@ -338,7 +336,7 @@ Vertintml(void *process)
                 code = gribcodes.lsp;
               else if (geopotID == -1 && strcmp(stdname, "geopotential_full") == 0)
                 code = gribcodes.geopot;
-              /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
+              // else if ( strcmp(varname, "geopoth") == 0 ) code = 156;
             }
         }
 
@@ -393,8 +391,7 @@ Vertintml(void *process)
           if (zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && nlevel > 1)
             {
               vlistInqVarName(vlistID1, varID, varname);
-              cdoWarning("Parameter %d has wrong number of levels, skipped! "
-                         "(param=%s nlevel=%d)",
+              cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
                          varID + 1, varname, nlevel);
             }
 
@@ -442,8 +439,7 @@ Vertintml(void *process)
     }
 
   if (zaxisIDh != -1 && gheightID != -1 && tempID == -1)
-    cdoAbort("Temperature not found, needed for vertical interpolation of "
-             "geopotheight!");
+    cdoAbort("Temperature not found, needed for vertical interpolation of geopotheight!");
 
   int presID = lnpsID;
   if (psvarID != -1) presID = psvarID;
@@ -474,7 +470,7 @@ Vertintml(void *process)
           suma += vct[i];
           sumb += vct[i + nhlevh];
         }
-      if (!(suma > 0 && sumb > 0)) cdoWarning("VCT is empty!");
+      if (!(suma > 0 || sumb > 0)) cdoWarning("VCT is empty!");
     }
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -495,8 +491,7 @@ Vertintml(void *process)
           int zaxisID = vlistInqVarZaxis(vlistID1, varID);
           int nlevel = zaxisInqSize(zaxisID);
           /*
-          if ( sortlevels && zaxisIDh != -1 && zaxisID == zaxisIDh && nlevel ==
-          nhlev )
+          if ( sortlevels && zaxisIDh != -1 && zaxisID == zaxisIDh && nlevel == nhlev )
             {
               levelID = (int) (zaxisInqLevel(zaxisIDh, levelID)-1);
               printf("levelID %d\n", levelID);
@@ -506,7 +501,6 @@ Vertintml(void *process)
 
           size_t offset = gridsize * levelID;
           double *single = vardata1[varID] + offset;
-
           pstreamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
           vars[varID] = true;
         }
@@ -520,17 +514,15 @@ Vertintml(void *process)
               else if (geopotID != -1)
                 arrayCopy(gridsize, vardata1[geopotID] + gridsize * (nhlevf - 1), &sgeopot[0]);
 
-              /* check range of surface geopot */
+              // check range of surface geopot
               if (extrapolate && (sgeopotID != -1 || geopotID != -1))
                 {
                   arrayMinMaxMask(gridsize, &sgeopot[0], NULL, &minval, &maxval);
                   if (minval < MIN_FIS || maxval > MAX_FIS)
-                    cdoWarning("Surface geopotential out of range (min=%g "
-                               "max=%g) [timestep:%d]!",
+                    cdoWarning("Surface geopotential out of range (min=%g max=%g) [timestep:%d]!",
                                minval, maxval, tsID + 1);
-                  if (gridsize > 1 && minval >= 0 && maxval <= 9000)
-                    cdoWarning("Surface geopotential has an unexpected range "
-                               "(min=%g max=%g) [timestep:%d]!",
+                  if (gridsize > 1 && minval >= 0 && maxval <= 9000 && IS_NOT_EQUAL(minval, maxval) )
+                    cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g) [timestep:%d]!",
                                minval, maxval, tsID + 1);
                 }
             }
@@ -540,7 +532,7 @@ Vertintml(void *process)
           else if (presID != -1)
             arrayCopy(gridsize, vardata1[presID], &ps_prog[0]);
 
-          /* check range of ps_prog */
+          // check range of ps_prog
           arrayMinMaxMask(gridsize, &ps_prog[0], NULL, &minval, &maxval);
           if (minval < MIN_PS || maxval > MAX_PS)
             cdoWarning("Surface pressure out of range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID + 1);
@@ -593,8 +585,7 @@ Vertintml(void *process)
                   else
                     {
                       vlistInqVarName(vlistID1, varID, varname);
-                      cdoAbort("Number of hybrid level differ from full/half "
-                               "level (param=%s)!",
+                      cdoAbort("Number of hybrid level differ from full/half level (param=%s)!",
                                varname);
                     }
 
