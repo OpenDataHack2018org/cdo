@@ -25,10 +25,9 @@
 #include "grid_search.h"
 #include "cdoOptions.h"
 
-//  Interpolation using a distance-weighted average
+// Interpolation using a distance-weighted average
 
-//  This routine finds the closest num_neighbor points to a search point and
-//  computes a distance to each of the neighbors.
+// This routine finds the closest num_neighbor points to a search point and computes a distance to each of the neighbors
 
 static inline void
 LLtoXYZ(double lon, double lat, double *restrict xyz)
@@ -53,7 +52,7 @@ distance(const double *restrict a, const double *restrict b) noexcept
 
 #define MAX_SEARCH_CELLS 25
 static void
-grid_search_nbr_reg2d(GridSearch *gs, knnWeightsType &knnWeights, double plon, double plat)
+grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
 {
   /*
     Output variables:
@@ -193,7 +192,7 @@ grid_search_nbr_reg2d(GridSearch *gs, knnWeightsType &knnWeights, double plon, d
 }  // grid_search_nbr_reg2d
 
 void
-grid_search_nbr(GridSearch *gs, knnWeightsType &knnWeights, double plon, double plat)
+grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights)
 {
   /*
     Output variables:
@@ -258,8 +257,7 @@ grid_search_nbr(GridSearch *gs, knnWeightsType &knnWeights, double plon, double 
   knnWeights.check_distance();
 }  // grid_search_nbr
 
-//  This routine computes the inverse-distance weights for a nearest-neighbor
-//  interpolation.
+//  This routine computes the inverse-distance weights for a nearest-neighbor interpolation.
 
 void
 remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
@@ -309,10 +307,11 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
       remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
       // Find nearest grid points on source grid and distances to each point
+      //remapSearchPoints(rsearch.gs, plon, plat, knnWeights[ompthID]);
       if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        grid_search_nbr_reg2d(rsearch.gs, knnWeights[ompthID], plon, plat);
+        grid_search_nbr_reg2d(rsearch.gs, plon, plat, knnWeights[ompthID]);
       else
-        grid_search_nbr(rsearch.gs, knnWeights[ompthID], plon, plat);
+        grid_search_nbr(rsearch.gs, plon, plat, knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
@@ -383,9 +382,9 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
 
       // Find nearest grid points on source grid and distances to each point
       if (src_remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        grid_search_nbr_reg2d(rsearch.gs, knnWeights[ompthID], plon, plat);
+        grid_search_nbr_reg2d(rsearch.gs, plon, plat, knnWeights[ompthID]);
       else
-        grid_search_nbr(rsearch.gs, knnWeights[ompthID], plon, plat);
+        grid_search_nbr(rsearch.gs, plon, plat, knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
@@ -514,7 +513,7 @@ shared(src_array, tgt_array, missval, knnWeights)
       //   grid_search_nbr_reg2d(gs, numNeighbors, nbr_add[ompthID],
       //   nbr_dist[ompthID], plon, plat);
       // else
-      grid_search_nbr(gs, knnWeights[ompthID], plon, plat);
+      grid_search_nbr(gs, plon, plat, knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights(src_mask);

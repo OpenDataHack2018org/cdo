@@ -54,7 +54,7 @@ struct GridSearch
   void *pointcloud;
 };
 
-void grid_search_nbr(GridSearch *gs, knnWeightsType &knnWeights, double plon, double plat);
+void grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWeights);
 
 GridSearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict lons,
                                     const double *restrict lats);

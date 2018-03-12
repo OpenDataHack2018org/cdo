@@ -474,7 +474,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
       int ompthID = cdo_omp_get_thread_num();
 
-      grid_search_nbr(gs, knnWeights[ompthID], xvals[mindex[i]], yvals[mindex[i]]);
+      grid_search_nbr(gs, xvals[mindex[i]], yvals[mindex[i]], knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
       size_t nadds = knnWeights[ompthID].compute_weights();
