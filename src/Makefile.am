@@ -31,7 +31,6 @@ libcdo_la_SOURCES =            \
                after_namelist.cc \
                afterburnerlib.cc \
                afterburner.h   \
-               vct_l191.h      \
                calendar.h      \
                constants.h     \
                constants.cc     \

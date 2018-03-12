@@ -49,7 +49,6 @@
 #include "afterburner.h"
 #include "constants.h"
 #include "compare.h"
-#include "vct_l191.h"
 #include "cdoOptions.h"
 
 #if defined(_OPENMP)
@@ -1582,24 +1581,12 @@ after_precntl(struct Control *globs, struct Variable *vars)
                         }
                       else
                         {
-                          if (numlevel == 191)
-                            {
-                              fprintf(stderr, " Using internal VCT for L191\n");
-                              globs->nvct = (191 + 1) * 2;
-                              globs->vct = (double *) Malloc(globs->nvct * sizeof(double));
-                              arrayCopy(globs->nvct, VCT_L191, globs->vct);
-                              zaxisDefVct(zaxisID, globs->nvct, globs->vct);
-                            }
-                          else
-                            {
-                              Error("VCT not defined in inputfile!");
-                            }
+                          Error("VCT not defined in inputfile!");
                         }
                     }
 
                   if (numlevel != (globs->nvct / 2 - 1))
-                    Error("Number of hybrid levels %d does not match VCT "
-                          "levels %d",
+                    Error("Number of hybrid levels %d does not match VCT levels %d",
                           numlevel, globs->nvct / 2 - 1);
 
                   if (globs->Debug)
