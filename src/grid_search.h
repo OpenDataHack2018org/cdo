@@ -22,7 +22,7 @@
 
 #define GS_NOT_FOUND SIZE_MAX
 
-enum struct GridsearchMethod
+enum struct PointSearchMethod
 {
   full,
   nanoflann,
@@ -35,7 +35,7 @@ struct GridSearch
   bool is_cyclic;
   bool is_reg2d;
   bool is_curve;
-  GridsearchMethod method_nn;
+  PointSearchMethod method;
   size_t n;
   size_t dims[2];
 

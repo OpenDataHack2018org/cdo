@@ -35,7 +35,7 @@
 #define PI M_PI
 #define PI2 (2.0 * PI)
 
-static GridsearchMethod gridsearch_method_nn(GridsearchMethod::kdtree);
+static PointSearchMethod pointSearchMethod(PointSearchMethod::nanoflann);
 
 struct gsFull
 {
@@ -138,14 +138,14 @@ distance(const double *restrict a, const double *restrict b) noexcept
 }
 
 void
-gridsearch_set_method(const char *methodstr)
+setPointSearchMethod(const char *methodstr)
 {
   if (strcmp(methodstr, "kdtree") == 0)
-    gridsearch_method_nn = GridsearchMethod::kdtree;
+    pointSearchMethod = PointSearchMethod::kdtree;
   else if (strcmp(methodstr, "nanoflann") == 0)
-    gridsearch_method_nn = GridsearchMethod::nanoflann;
+    pointSearchMethod = PointSearchMethod::nanoflann;
   else if (strcmp(methodstr, "full") == 0)
-    gridsearch_method_nn = GridsearchMethod::full;
+    pointSearchMethod = PointSearchMethod::full;
   else
     cdoAbort("gridsearch method %s not available!", methodstr);
 }
@@ -360,18 +360,18 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
   gs->dims[0] = dims[0];
   gs->dims[1] = dims[1];
 
-  gs->method_nn = gridsearch_method_nn;
+  gs->method = pointSearchMethod;
   gs->n = n;
   if (n == 0) return gs;
 
   gs->plons = lons;
   gs->plats = lats;
 
-  if (gs->method_nn == GridsearchMethod::kdtree)
+  if (gs->method == PointSearchMethod::kdtree)
     gs->search_container = gs_create_kdtree(n, lons, lats, gs);
-  else if (gs->method_nn == GridsearchMethod::nanoflann)
+  else if (gs->method == PointSearchMethod::nanoflann)
     gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
-  else if (gs->method_nn == GridsearchMethod::full)
+  else if (gs->method == PointSearchMethod::full)
     gs->search_container = gs_create_full(n, lons, lats);
 
   gs->search_radius = cdo_default_search_radius();
@@ -392,11 +392,11 @@ gridsearch_delete(GridSearch *gs)
       if (gs->sinlat) Free(gs->sinlat);
       if (gs->sinlon) Free(gs->sinlon);
 
-      if (gs->method_nn == GridsearchMethod::kdtree)
+      if (gs->method == PointSearchMethod::kdtree)
         gs_destroy_kdtree(gs->search_container);
-      else if (gs->method_nn == GridsearchMethod::nanoflann)
+      else if (gs->method == PointSearchMethod::nanoflann)
         delete ((PointCloud<double> *) gs->pointcloud);
-      else if (gs->method_nn == GridsearchMethod::full)
+      else if (gs->method == PointSearchMethod::full)
         gs_destroy_full(gs->search_container);
 
       Free(gs);
@@ -578,10 +578,10 @@ gridsearch_nearest(GridSearch *gs, double lon, double lat, double *prange)
     {
       void *sc = gs->search_container;
       // clang-format off
-      if      ( gs->method_nn == GridsearchMethod::kdtree )    index = gs_nearest_kdtree(sc, lon, lat, prange, gs);
-      else if ( gs->method_nn == GridsearchMethod::nanoflann ) index = gs_nearest_nanoflann(sc, lon, lat, prange, gs);
-      else if ( gs->method_nn == GridsearchMethod::full )      index = gs_nearest_full(sc, lon, lat, prange);
-      else cdoAbort("%s::method_nn undefined!", __func__);
+      if      ( gs->method == PointSearchMethod::kdtree )    index = gs_nearest_kdtree(sc, lon, lat, prange, gs);
+      else if ( gs->method == PointSearchMethod::nanoflann ) index = gs_nearest_nanoflann(sc, lon, lat, prange, gs);
+      else if ( gs->method == PointSearchMethod::full )      index = gs_nearest_full(sc, lon, lat, prange);
+      else cdoAbort("%s::method undefined!", __func__);
       // clang-format on
 
       if (!gs->extrapolate && gs->is_curve) index = llindex_in_quad(gs, index, lon, lat);
@@ -591,8 +591,7 @@ gridsearch_nearest(GridSearch *gs, double lon, double lat, double *prange)
 }
 
 static size_t
-gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
-                   double *dist)
+gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
@@ -645,8 +644,7 @@ gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double *prange, size_
 }
 
 static size_t
-gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
-                      double *dist)
+gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
@@ -675,17 +673,16 @@ gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double *prange, si
 }
 
 size_t
-gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
-                    double *dist)
+gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
   if (gs)
     {
       // clang-format off
-      if      ( gs->method_nn == GridsearchMethod::kdtree )    nadds = gs_qnearest_kdtree(gs, lon, lat, prange, nnn, adds, dist);
-      else if ( gs->method_nn == GridsearchMethod::nanoflann ) nadds = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn, adds, dist);
-      else cdoAbort("%s::method_nn undefined!", __func__);
+      if      ( gs->method == PointSearchMethod::kdtree )    nadds = gs_qnearest_kdtree(gs, lon, lat, prange, nnn, adds, dist);
+      else if ( gs->method == PointSearchMethod::nanoflann ) nadds = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn, adds, dist);
+      else cdoAbort("%s::method undefined!", __func__);
       // clang-format on
 
       if (!gs->extrapolate && gs->is_curve)

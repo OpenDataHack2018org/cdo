@@ -1,3 +1,12 @@
+2018-04-26  Uwe Schulzweida
+
+	* Using CDI library version 1.9.4
+	* Version 1.9.4 release
+
+2018-03-13  Uwe Schulzweida
+
+	* remapnn, remapdis: optimized by changing point search to kdtree:nanoflann
+
 2018-03-08  Uwe Schulzweida
 
 	* expandWildCards: check error code (bug fix)

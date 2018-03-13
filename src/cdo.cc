@@ -103,7 +103,7 @@ extern "C" {
 void streamGrbDefDataScanningMode(int scanmode);
 }
 
-void gridsearch_set_method(const char *methodstr);
+void setPointSearchMethod(const char *methodstr);
 
 #define PRINT_RLIMIT(resource)                                                           \
   {                                                                                      \
@@ -1089,7 +1089,7 @@ parse_options_long(int argc, char *argv[])
   int c;
   int lnetcdf_hdr_pad;
   int luse_fftw;
-  int lgridsearchnn;
+  int lpointsearchmethod;
   int lgridsearchradius;
   int lremap_genweights;
   int lprecision;
@@ -1113,7 +1113,7 @@ parse_options_long(int argc, char *argv[])
       { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1  },
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1  },
       { "use_fftw",          required_argument,          &luse_fftw,  1  },
-      { "gridsearchnn",      required_argument,      &lgridsearchnn,  1  },
+      { "pointsearchmethod", required_argument, &lpointsearchmethod,  1  },
       { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
       { "enableexcept",      required_argument,      &lenableexcept,  1  },
@@ -1157,7 +1157,7 @@ parse_options_long(int argc, char *argv[])
       lpercentile = 0;
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
-      lgridsearchnn = 0;
+      lpointsearchmethod = 0;
       lgridsearchradius = 0;
       lremap_genweights = 0;
       lenableexcept = 0;
@@ -1243,9 +1243,9 @@ parse_options_long(int argc, char *argv[])
                 cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", intarg);
               CDO_Use_FFTW = intarg;
             }
-          else if (lgridsearchnn)
+          else if (lpointsearchmethod)
             {
-              gridsearch_set_method(CDO_optarg);
+              setPointSearchMethod(CDO_optarg);
             }
           else if (lgridsearchradius)
             {
