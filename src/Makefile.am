@@ -161,6 +161,7 @@ libcdo_la_SOURCES =            \
                remap_scrip_io.cc \
                remap_search_reg2d.cc \
                remap_search_latbins.cc \
+               remap_search.cc \
                remap_store_link.cc \
                remap_store_link.h \
                remap_store_link_cnsrv.cc \

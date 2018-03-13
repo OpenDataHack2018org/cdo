@@ -141,6 +141,8 @@ void remapGridAlloc(RemapMethod mapType, RemapGrid &grid);
 void remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, RemapGrid &tgt_grid);
 void remapSearchFree(RemapSearch &search);
 
+void remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights);
+  
 void scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
 void scrip_remap_bicubic_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
 void remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
