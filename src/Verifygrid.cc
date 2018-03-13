@@ -50,9 +50,8 @@ quick_sort(double *array, size_t array_length)
   quick_sort(array + i, array_length - i);
 }
 
-/* Quicksort is called with a pointer to the array of center points to be sorted
- * and an integer indicating its length. It sorts the array by its longitude
- * coordinates */
+/* Quicksort is called with a pointer to the array of center points to be sorted and an integer indicating its length.
+ * It sorts the array by its longitude coordinates */
 static void
 quick_sort_by_lon(double *array, size_t array_length)
 {
@@ -82,8 +81,7 @@ quick_sort_by_lon(double *array, size_t array_length)
   quick_sort_by_lon(array + i, array_length - i);
 }
 
-/* This uses quicksort to sort the latitude coordinates in a subarray of all
- * coordinates. */
+/* This uses quicksort to sort the latitude coordinates in a subarray of all coordinates. */
 static void
 quick_sort_of_subarray_by_lat(double *array, size_t subarray_start, size_t subarray_end)
 {
@@ -123,8 +121,7 @@ determinant(double matrix[3][3])
 static void
 find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal)
 {
-  /* Calculates the unit normal for a plane defined on three points a, b, c in
-   * Euclidean space. */
+  /* Calculates the unit normal for a plane defined on three points a, b, c in Euclidean space. */
 
   double matrix_for_x[3][3] = { { 1, a[1], a[2] }, { 1, b[1], b[2] }, { 1, c[1], c[2] } };
 
@@ -148,8 +145,7 @@ find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal)
 int
 find_coordinate_to_ignore(double *cell_corners_xyz)
 {
-  /* Takes the first three corners/vertices of the cell and calculates the unit
-   * normal via determinants. */
+  /* Takes the first three corners/vertices of the cell and calculates the unit normal via determinants. */
 
   double *pcorner_coordinates1 = &cell_corners_xyz[0];
   double *pcorner_coordinates2 = &cell_corners_xyz[3];
@@ -178,44 +174,14 @@ find_coordinate_to_ignore(double *cell_corners_xyz)
   return coordinate_to_ignore;
 }
 
-/*
-static
-size_t no_of_duplicates_in_this_list_of_vertices(double cell_corners[], size_t
-array_length)
-{
-  // Returns the number of coordinate duplicates found in a list of Cartesian
-coordinates, the cell corners or vertices.
-
-  // Ensure that the lenght of the array is a multiple of 3.
-
-  if ( (array_length % 3) != 0 ) return -1;
-
-  // A brute force search for duplicate Cartesian coordinates.
-
-  size_t no_duplicates = 0;
-
-  for (size_t i = 0; i < array_length; i = i + 3){
-    for (size_t j = i + 3; j < array_length; j = j + 3 ){
-      if ( IS_EQUAL(cell_corners[i + 0], cell_corners[j])     &&
-           IS_EQUAL(cell_corners[i + 1], cell_corners[j + 1]) &&
-           IS_EQUAL(cell_corners[i + 2], cell_corners[j + 2]) ){
-            no_duplicates += 1;
-      }
-    }
-  }
-  return no_duplicates;
-}
-*/
 static double
 is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2])
 {
   /*
-     Computes whether a point is left of the line through point_on_line_1 and
-     point_on_line_2. This is part of the solution to the point in polygon
-     problem. Returns 0 if the point is on the line, > 0 if the point is left of
-     the line, and < 0 if the point is right of the line. This algorithm is by
-     Dan Sunday (geomalgorithms.com) and is completely free for use and
-     modification.
+     Computes whether a point is left of the line through point_on_line_1 and point_on_line_2. This is part of the
+     solution to the point in polygon problem. Returns 0 if the point is on the line, > 0 if the point is left of the
+     line, and < 0 if the point is right of the line. This algorithm is by Dan Sunday (geomalgorithms.com) and is
+     completely free for use and modification.
   */
 
   double answer = ((point_on_line_2[0] - point_on_line_1[0]) * (point[1] - point_on_line_1[1])
@@ -228,11 +194,9 @@ int
 winding_numbers_algorithm(double cell_corners[], int number_corners, double point[])
 {
   /*
-     Computes whether a point is inside the bounds of a cell. This is the
-     solution to the point in polygon problem. Returns 0 if the point is
-     outside, returns 1 if the point is inside the cell. Based on an algorithm
-     by Dan Sunday (geomalgorithms.com). His algorithm is completely free for
-     use and modification.
+     Computes whether a point is inside the bounds of a cell. This is the solution to the point in polygon problem.
+     Returns 0 if the point is outside, returns 1 if the point is inside the cell. Based on an algorithm by Dan Sunday
+     (geomalgorithms.com). His algorithm is completely free for use and modification.
   */
 
   int winding_number = 0;
@@ -272,19 +236,10 @@ sign(double x)
   return (x > 0) - (x < 0);
 }
 
-static long double
-sign_ld(long double x)
-{
-  /* Is +1 if x is positive, -1 if x is negative and 0 if x is zero.*/
-
-  return (x > 0) - (x < 0);
-}
-
 static bool
 is_simple_polygon_convex(double cell_corners[], int number_corners)
 {
-  /* Tests in which direction the polygon winds when walking along its edges.
-   * Does so for all edges of the polygon. */
+  /* Tests in which direction the polygon winds when walking along its edges. Does so for all edges of the polygon. */
 
   double direction = 0;
 
@@ -295,8 +250,7 @@ is_simple_polygon_convex(double cell_corners[], int number_corners)
                         - (cell_corners[i * 2 + 1] - cell_corners[(i + 1) * 2 + 1])
                               * (cell_corners[(i + 1) * 2 + 0] - cell_corners[(i + 2) * 2 + 0]);
 
-      /* In the first iteration the direction of winding of the entire polygon
-       * is set. Better not be 0.*/
+      /* In the first iteration the direction of winding of the entire polygon is set. Better not be 0.*/
 
       if (i == 1) direction = turns_to;
 
@@ -316,8 +270,8 @@ is_simple_polygon_convex(double cell_corners[], int number_corners)
 double
 calculate_the_polygon_area(double cell_corners[], int number_corners)
 {
-  /* This algorithm is based on the calculation from Wolfram Mathworld Polygon
-   * Area. It results in the area of planar non-self-intersecting polygon. */
+  /* This algorithm is based on the calculation from Wolfram Mathworld Polygon Area. It results in the area of planar
+   * non-self-intersecting polygon. */
 
   double twice_the_polygon_area = 0;
 
@@ -333,8 +287,8 @@ are_polygon_vertices_arranged_in_clockwise_order(double cell_area)
 {
   bool status = false;
 
-  /* A negative area indicates a clockwise arrangement of vertices, a positive
-   * area a counterclockwise arrangement. There should be an area to begin with.
+  /* A negative area indicates a clockwise arrangement of vertices, a positive area a counterclockwise arrangement.
+   * There should be an area to begin with.
    */
   if (cell_area < 0) status = true;
 
@@ -355,12 +309,14 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
      2) it tests whether all cells are convex and all cell bounds have the same
      orientation, i.e. the corners of the cell are in clockwise or
-     counterclockwise order 3) it tests whether the center point is within the
-     bounds of the cell
+     counterclockwise order
+
+     3) it tests whether the center point is within the bounds of the cell
 
      The results of the tests are printed on stdout.
   */
 
+  constexpr double eps = 0.000000001;
   double center_point_xyz[3];
   double *cell_corners_xyz_open_cell = (double *) Malloc(3 * ncorner * sizeof(double));
 
@@ -386,8 +342,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
                  gridNamePtr(gridtype));
   // cdoPrint("");
 
-  /* For performing the first test, an array of all center point coordinates is
-   * built. */
+  /* For performing the first test, an array of all center point coordinates is built. */
 
   double *center_point_array = (double *) Malloc(gridsize * 2 * sizeof(double));
 
@@ -397,13 +352,11 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
       center_point_array[cell_no * 2 + 1] = grid_center_lat[cell_no];
     }
 
-  /* The cell center points are sorted by their first coordinate (lon) with
-   * quicksort. */
+  /* The cell center points are sorted by their first coordinate (lon) with quicksort. */
 
   quick_sort_by_lon(center_point_array, gridsize * 2);
 
-  /* Now the lat coordinates in subarrays that reflect equal lon coordinates are
-   * sorted with quicksort. */
+  /* Now the lat coordinates in subarrays that reflect equal lon coordinates are sorted with quicksort. */
 
   int subarray_start = 0;
   int subarray_end = 0;
@@ -416,7 +369,7 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
           quick_sort_of_subarray_by_lat(center_point_array, subarray_start, subarray_end);
         }
 
-      if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) > 0.0001)
+      if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) > eps)
         {
           subarray_end = cell_no * 2;
           if ((subarray_end - subarray_start) > 1)
@@ -430,9 +383,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
   for (size_t cell_no = 0; cell_no < gridsize - 1; cell_no++)
     {
-      if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) < 0.0001)
+      if (fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) < eps)
         {
-          if (fabs(center_point_array[cell_no * 2 + 1] - center_point_array[(cell_no + 1) * 2 + 1]) < 0.0001)
+          if (fabs(center_point_array[cell_no * 2 + 1] - center_point_array[(cell_no + 1) * 2 + 1]) < eps)
             continue;
           else
             no_unique_center_points += 1;
@@ -452,30 +405,25 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
   double *cell_corners_plane_projection = (double *) Malloc(2 * (ncorner + 1) * sizeof(double));
 
   /*
-     Latitude and longitude are spherical coordinates on a unit circle. Each
-     such coordinate tuple is transformed into a triple of Cartesian coordinates
-     in Euclidean space. This is first done for the presumed center point of the
-     cell and then for all the corners of the cell. LLtoXYZ_deg is defined in
-     clipping/geometry.h
+     Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a
+     triple of Cartesian coordinates in Euclidean space. This is first done for the presumed center point of the cell
+     and then for all the corners of the cell. LLtoXYZ_deg is defined in clipping/geometry.h
   */
 
   for (size_t cell_no = 0; cell_no < gridsize; cell_no++)
     {
-      /* Conversion of center point spherical coordinates to Cartesian
-       * coordinates. */
+      /* Conversion of center point spherical coordinates to Cartesian coordinates. */
 
       LLtoXYZ_deg(grid_center_lon[cell_no], grid_center_lat[cell_no], center_point_xyz);
 
       for (int corner_no = 0; corner_no < ncorner; corner_no++)
         {
-          /* Conversion of corner spherical coordinates to Cartesian
-           * coordinates. */
+          /* Conversion of corner spherical coordinates to Cartesian coordinates. */
 
           LLtoXYZ_deg(grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no],
                       corner_coordinates);
 
-          /* The components of the result vector are appended to the list of
-           * cell corner coordinates. */
+          /* The components of the result vector are appended to the list of cell corner coordinates. */
 
           int off = corner_no * 3;
           cell_corners_xyz_open_cell[off + 0] = corner_coordinates[0];
@@ -484,11 +432,9 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
         }
 
       /*
-         Not all cells have the same number of corners. The array, however, has
-         ncorner * 3  values for each cell, where ncorner is the maximum number
-         of corners. Unused values have been filled with the values of the final
-         cell. The following identifies the surplus corners and gives the
-         correct length of the cell.
+         Not all cells have the same number of corners. The array, however, has ncorner * 3  values for each cell, where
+         ncorner is the maximum number of corners. Unused values have been filled with the values of the final cell. The
+         following identifies the surplus corners and gives the correct length of the cell.
       */
 
       int actual_number_of_corners = ncorner;
@@ -507,15 +453,14 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
       no_cells_with_a_specific_no_of_corners[actual_number_of_corners - 1] += 1;
 
-      /* If there are less than three corners in the cell, it is unusable and
-       * considered degenerate. No area can be computed. */
+      /* If there are less than three corners in the cell, it is unusable and considered degenerate. No area can be
+       * computed. */
 
       if (actual_number_of_corners < 3)
         {
           if (cdoVerbose)
-            fprintf(stdout, "Less than three vertices found in cell no %zu. This cell "
-                            "is considered degenerate and will be omitted from further "
-                            "computation!\n",
+            fprintf(stdout, "Less than three vertices found in cell no %zu. This cell is considered degenerate and "
+                            "will be omitted from further computation!\n",
                     cell_no + 1);
 
           continue;
@@ -523,8 +468,8 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
       no_usable_cells++;
 
-      /* Checks if there are any duplicate vertices in the list of corners. Note
-       * that the last (additional) corner has not been set yet. */
+      /* Checks if there are any duplicate vertices in the list of corners. Note that the last (additional) corner has
+       * not been set yet. */
 
       for (int i = 0; i < actual_number_of_corners; i++) marked_duplicate_indices[i] = 0;
 
@@ -532,13 +477,12 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
       for (int i = 0; i < actual_number_of_corners * 3; i = i + 3)
         for (int j = i + 3; j < actual_number_of_corners * 3; j = j + 3)
-          if (fabs(cell_corners_xyz_open_cell[i + 0] - cell_corners_xyz_open_cell[j + 0]) < 0.000000001
-              && fabs(cell_corners_xyz_open_cell[i + 1] - cell_corners_xyz_open_cell[j + 1]) < 0.000000001
-              && fabs(cell_corners_xyz_open_cell[i + 2] - cell_corners_xyz_open_cell[j + 2]) < 0.000000001)
+          if (fabs(cell_corners_xyz_open_cell[i + 0] - cell_corners_xyz_open_cell[j + 0]) < eps
+              && fabs(cell_corners_xyz_open_cell[i + 1] - cell_corners_xyz_open_cell[j + 1]) < eps
+              && fabs(cell_corners_xyz_open_cell[i + 2] - cell_corners_xyz_open_cell[j + 2]) < eps)
             {
               if (cdoVerbose)
-                fprintf(stdout, "The duplicate vertex %f, %f, %f was found in cell no "
-                                "%zu.\n",
+                fprintf(stdout, "The duplicate vertex %f, %f, %f was found in cell no %zu.\n",
                         cell_corners_xyz_open_cell[j], cell_corners_xyz_open_cell[j + 1],
                         cell_corners_xyz_open_cell[j + 2], cell_no + 1);
 
@@ -567,23 +511,20 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
       if (no_duplicates != 0) no_of_cells_with_duplicates += 1;
 
-      /* If there are less than three corners in the cell left after removing
-       * duplicates, it is unusable and considered degenerate. No area can be
-       * computed. */
+      /* If there are less than three corners in the cell left after removing duplicates, it is unusable and considered
+       * degenerate. No area can be computed. */
 
       if (actual_number_of_corners < 3)
         {
           if (cdoVerbose)
-            fprintf(stdout, "Less than three vertices found in cell no %zu. This cell "
-                            "is considered degenerate and will be omitted from further "
-                            "computation!\n",
+            fprintf(stdout, "Less than three vertices found in cell no %zu. This cell is considered degenerate and "
+                            "will be omitted from further computation!\n",
                     cell_no + 1);
 
           continue;
         }
 
-      /* We are creating a closed polygon/cell by setting the additional last
-       * corner to be the same as the first one. */
+      /* We are creating a closed polygon/cell by setting the additional last corner to be the same as the first one. */
 
       for (int corner_no = 0; corner_no < actual_number_of_corners; corner_no++)
         {
@@ -599,14 +540,13 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
 
       int coordinate_to_ignore = find_coordinate_to_ignore(cell_corners_xyz);
 
-      /* The remaining two-dimensional coordinates are extracted into one array
-       * for all the cell's corners and into one array for the center point. */
+      /* The remaining two-dimensional coordinates are extracted into one array for all the cell's corners and into one
+       * array for the center point. */
 
-      /* The following projection on the plane that two coordinate axes lie on
-         changes the arrangement of the polygon vertices if the coordinate to be
-         ignored along the third axis is smaller than 0. In this case, the
-         result of the computation of the orientation of vertices needs to be
-         inverted. Clockwise becomes counterclockwise and vice versa. */
+      /* The following projection on the plane that two coordinate axes lie on changes the arrangement of the polygon
+         vertices if the coordinate to be ignored along the third axis is smaller than 0. In this case, the result of
+         the computation of the orientation of vertices needs to be  inverted. Clockwise becomes counterclockwise and
+         vice versa. */
 
       bool invert_result = false;
       if (cell_corners_xyz[coordinate_to_ignore - 1] < 0) invert_result = true;
@@ -652,9 +592,8 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
           = calculate_the_polygon_area(cell_corners_plane_projection, actual_number_of_corners + 1);
       bool is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
 
-      /* If the direction of the vertices was flipped during the projection onto
-       * the two-dimensional plane, the previous result needs to be inverted
-       * now. */
+      /* If the direction of the vertices was flipped during the projection onto the two-dimensional plane, the previous
+       * result needs to be inverted now. */
 
       if (invert_result) is_clockwise = !is_clockwise;
 
@@ -665,8 +604,8 @@ verify_grid(int gridtype, size_t gridsize, int gridno, int ngrids, int ncorner, 
       else
         no_counterclockwise_cells += 1;
 
-      /* The winding numbers algorithm is used to test whether the presumed
-       * center point is within the bounds of the cell. */
+      /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the
+       * cell. */
 
       int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, actual_number_of_corners + 1,
                                                      center_point_plane_projection);
