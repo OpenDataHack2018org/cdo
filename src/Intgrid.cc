@@ -295,7 +295,7 @@ Intgrid(void *process)
           if (index == 0)
             {
               if (gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN
-                  /* && gridInqType(gridID1) != GRID_CURVILINEAR */)
+                  /* && gridtype != GRID_CURVILINEAR */)
                 cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype));
 
               gridID2 = operatorID == BOXAVG ? genBoxavgGrid(gridID1, xinc, yinc) : genThinoutGrid(gridID1, xinc, yinc);
@@ -307,12 +307,16 @@ Intgrid(void *process)
         {
           bool ldistgen = (grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2));
           if (!ldistgen && gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN)
-            cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)));
+            cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype));
         }
       else if (operatorID == INTGRIDNN || operatorID == INTGRIDDIS)
         {
-          if (gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED)
-            cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)));
+          int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID1) : -1;
+          bool lproj4param = (gridtype == GRID_PROJECTION) && grid_has_proj4param(gridID1);
+          if (gridtype != GRID_LONLAT && !lproj4param && projtype != CDI_PROJ_RLL && projtype != CDI_PROJ_LAEA
+              && projtype != CDI_PROJ_SINU && projtype != CDI_PROJ_LCC && gridtype != GRID_GAUSSIAN && gridtype != GRID_GME
+              && gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED)
+            cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridtype));
         }
 
       vlistChangeGridIndex(vlistID2, index, gridID2);

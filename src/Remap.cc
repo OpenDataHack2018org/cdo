@@ -759,13 +759,13 @@ remapSum(RemapGrid *remapGrid, size_t gridsize, double *array, const char *tag)
   printf("%s array sum %g\n", tag, sum);
 }
 
-static void
-remapInit(remapType *remap)
+void
+remapInit(remapType &remap)
 {
-  remap->nused = 0;
-  remap->gridID = -1;
-  remap->gridsize = 0;
-  remap->nmiss = 0;
+  remap.nused = 0;
+  remap.gridID = -1;
+  remap.gridsize = 0;
+  remap.nmiss = 0;
 }
 
 static void
@@ -906,7 +906,7 @@ Remap(void *argument)
   if (max_remaps < 1) cdoAbort("max_remaps out of range (>0)!");
 
   std::vector<remapType> remaps(max_remaps);
-  for (int r = 0; r < max_remaps; r++) remapInit(&remaps[r]);
+  for (int r = 0; r < max_remaps; r++) remapInit(remaps[r]);
 
   if (writeRemapWeightsOnly || lremap) remap_genweights = true;
 
@@ -1063,7 +1063,7 @@ Remap(void *argument)
                       remapSearchFree(remaps[n0].search);
                       for (r = n0 + 1; r < nremaps; r++) memcpy(&remaps[r - 1], &remaps[r], sizeof(remapType));
                       r = nremaps - 1;
-                      remapInit(&remaps[r]);
+                      remapInit(remaps[r]);
                     }
 
                   if (remaps[r].gridID != gridID1)

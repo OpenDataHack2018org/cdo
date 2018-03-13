@@ -19,10 +19,8 @@
 #endif
 
 #include "cdo_int.h"
-#include "grid.h"
 #include "remap.h"
 #include "remap_store_link.h"
-#include "grid_search.h"
 #include "cdoOptions.h"
 
 // Interpolation using a distance-weighted average
@@ -158,9 +156,12 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
 
 #include <cdi.h>
 
+void remapInit(remapType &remap);
+
 void
 intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
 {
+  RemapMethod mapType = RemapMethod::DISTWGT;
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
   double src_missval = field1->missval;
@@ -172,47 +173,21 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
 
   progressInit();
 
-  // Compute mappings from source to target grid
+  // Interpolate from source to target grid
 
-  int src_gridtype = gridInqType(gridID1);
-  int tgt_gridtype = gridInqType(gridID2);
-  if (src_gridtype != GRID_CURVILINEAR && src_gridtype != GRID_UNSTRUCTURED)
-    cdoAbort("Source grid must be curvilinear or unstructured!");
-  if (tgt_gridtype != GRID_CURVILINEAR && tgt_gridtype != GRID_UNSTRUCTURED)
-    cdoAbort("Target grid must be curvilinear or unstructured!");
+  remapType remap;
+  remapInit(remap);
+
+  bool remap_extrapolate = false;
+  remapInitGrids(mapType, remap_extrapolate, gridID1, remap.src_grid, gridID2, remap.tgt_grid);
 
   size_t src_grid_size = gridInqSize(gridID1);
   size_t tgt_grid_size = gridInqSize(gridID2);
 
-  int *src_mask = (int *) Malloc(src_grid_size * sizeof(int));
+  std::vector<int> src_mask(src_grid_size);
   for (size_t i = 0; i < src_grid_size; ++i) src_mask[i] = !DBL_IS_EQUAL(src_array[i], src_missval);
-  int *tgt_mask = (int *) Malloc(tgt_grid_size * sizeof(int));
+  std::vector<int> tgt_mask(tgt_grid_size);
   for (size_t i = 0; i < tgt_grid_size; ++i) tgt_mask[i] = 1;
-
-  double *src_cell_center_lon = (double *) Malloc(src_grid_size * sizeof(double));
-  double *src_cell_center_lat = (double *) Malloc(src_grid_size * sizeof(double));
-  gridInqXvals(gridID1, src_cell_center_lon);
-  gridInqYvals(gridID1, src_cell_center_lat);
-
-  double *tgt_cell_center_lon = (double *) Malloc(tgt_grid_size * sizeof(double));
-  double *tgt_cell_center_lat = (double *) Malloc(tgt_grid_size * sizeof(double));
-  gridInqXvals(gridID2, tgt_cell_center_lon);
-  gridInqYvals(gridID2, tgt_cell_center_lat);
-
-  char xunits[CDI_MAX_NAME];
-  xunits[0] = 0;
-  char yunits[CDI_MAX_NAME];
-  yunits[0] = 0;
-  cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
-  cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
-  grid_to_radian(xunits, src_grid_size, src_cell_center_lon, "src cell center lon");
-  grid_to_radian(yunits, src_grid_size, src_cell_center_lat, "src cell center lat");
-  xunits[0] = 0;
-  yunits[0] = 0;
-  cdiGridInqKeyStr(gridID2, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
-  cdiGridInqKeyStr(gridID2, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
-  grid_to_radian(xunits, tgt_grid_size, tgt_cell_center_lon, "tgt cell center lon");
-  grid_to_radian(yunits, tgt_grid_size, tgt_cell_center_lat, "tgt cell center lat");
 
   std::vector<knnWeightsType> knnWeights;
   for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
@@ -221,16 +196,7 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
-  bool xIsCyclic = gridIsCircular(gridID1);
-  size_t dims[2] = { src_grid_size, 0 };
-  GridSearch *gs = NULL;
-  // if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-  //  gs = gridsearch_create_reg2d(xIsCyclic, dims, src_grid->reg2d_center_lon,
-  //  src_grid->reg2d_center_lat);
-  gs = gridsearch_create(xIsCyclic, dims, src_grid_size, src_cell_center_lon, src_cell_center_lat);
-
-// if ( src_grid->lextrapolate ) gridsearch_extrapolate(gs);
-// gridsearch_extrapolate(gs);
+  remapSearchInit(mapType, remap.search, remap.src_grid, remap.tgt_grid);
 
 #ifdef _OPENMP
   if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
@@ -242,13 +208,6 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   size_t nmiss = 0;
   double findex = 0;
 
-#ifdef HAVE_OPENMP4
-/*
-#pragma omp parallel for default(none)  reduction(+:findex) \
-shared(gs, numNeighbors, src_grid, tgt_grid, tgt_grid_size)  \
-shared(src_array, tgt_array, missval, knnWeights)
-*/
-#endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
       int ompthID = cdo_omp_get_thread_num();
@@ -261,19 +220,13 @@ shared(src_array, tgt_array, missval, knnWeights)
       if (!tgt_mask[tgt_cell_add]) continue;
 
       double plon = 0, plat = 0;
-      // remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
-      plat = tgt_cell_center_lat[tgt_cell_add];
-      plon = tgt_cell_center_lon[tgt_cell_add];
+      remapgrid_get_lonlat(&remap.tgt_grid, tgt_cell_add, &plon, &plat);
 
       // Find nearest grid points on source grid and distances to each point
-      // if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-      //   grid_search_nbr_reg2d(gs, numNeighbors, nbr_add[ompthID],
-      //   nbr_dist[ompthID], plon, plat);
-      // else
-      grid_search_nbr(gs, plon, plat, knnWeights[ompthID]);
+      remapSearchPoints(remap.search, plon, plat, knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = knnWeights[ompthID].compute_weights(src_mask);
+      size_t nadds = knnWeights[ompthID].compute_weights(&src_mask[0]);
       if (nadds)
         tgt_array[tgt_cell_add] = knnWeights[ompthID].array_weights_sum(src_array);
       else
@@ -284,14 +237,9 @@ shared(src_array, tgt_array, missval, knnWeights)
 
   field2->nmiss = nmiss;
 
-  if (gs) gridsearch_delete(gs);
-
-  Free(src_mask);
-  Free(tgt_mask);
-  Free(src_cell_center_lon);
-  Free(src_cell_center_lat);
-  Free(tgt_cell_center_lon);
-  Free(tgt_cell_center_lat);
+  remapGridFree(remap.src_grid);
+  remapGridFree(remap.tgt_grid);
+  remapSearchFree(remap.search);
 
 #ifdef _OPENMP
   if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
