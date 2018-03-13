@@ -269,7 +269,7 @@ boundbox_from_corners1(size_t ic, size_t nc, const double *restrict corner_lon, 
       if (clon > bound_box[3]) bound_box[3] = clon;
     }
 
-  if (fabsf(bound_box[3] - bound_box[2]) > PI)
+  if (fabs(bound_box[3] - bound_box[2]) > PI)
     {
       bound_box[2] = 0;
       bound_box[3] = PI2;

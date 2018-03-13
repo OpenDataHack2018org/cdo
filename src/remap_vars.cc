@@ -36,9 +36,9 @@ remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVa
 
     double *dst_array    ! array for remapped field on destination grid
   */
-  const double *restrict src_grad1 = &gradients.grad_lat[0];
-  const double *restrict src_grad2 = &gradients.grad_lon[0];
-  const double *restrict src_grad3 = &gradients.grad_latlon[0];
+  const double *restrict src_grad1 = gradients.grad_lat.size() ? &gradients.grad_lat[0] : NULL;
+  const double *restrict src_grad2 = gradients.grad_lon.size() ? &gradients.grad_lon[0] : NULL;
+  const double *restrict src_grad3 = gradients.grad_latlon.size() ? &gradients.grad_latlon[0] : NULL;
 
   size_t num_links = rv.num_links;
   size_t num_wts = rv.num_wts;
@@ -130,8 +130,7 @@ remap(double *restrict dst_array, double missval, size_t dst_size, const RemapVa
 
               for (size_t n = 0; n < num_links; ++n)
                 {
-                  // printf("%5d %5d %5ld %g # dst_add src_add n\n", dst_add[n],
-                  // src_add[n], n, map_wts[num_wts*n]);
+                  //printf("%5zu %5zu %5zu %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
                   dst_array[dst_add[n]] += src_array[src_add[n]] * map_wts[num_wts * n];
                 }
             }
