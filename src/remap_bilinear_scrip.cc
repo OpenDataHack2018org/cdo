@@ -189,7 +189,6 @@ void
 scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   extern int timer_remap_bil;
-  int remap_grid_type = src_grid->remap_grid_type;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
@@ -214,7 +213,7 @@ scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGri
 
 #ifdef HAVE_OPENMP4
 #pragma omp parallel for default(none) schedule(static) \
-  reduction(+ : findex) shared(rsearch, weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv)
+  reduction(+ : findex) shared(rsearch, weightlinks, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -234,14 +233,7 @@ scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGri
       double wgts[4];      //  bilinear weights for four corners
 
       // Find nearest square of grid points on source grid
-      int search_result;
-      if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-                                          src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
-      else
-        search_result
-            = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
-                          src_grid->cell_center_lon, rsearch.srcBins);
+      int search_result = remapSearchSquare(rsearch, plon, plat, src_add, src_lats, src_lons);
 
       // Check to see if points are mask points
       if (search_result > 0)
@@ -381,7 +373,6 @@ scrip_remap_bilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_g
                      double *restrict tgt_array, double missval)
 {
   extern int timer_remap_bil;
-  int remap_grid_type = src_grid->remap_grid_type;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
@@ -393,10 +384,9 @@ scrip_remap_bilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_g
   bool xIsCyclic = false;
   size_t dims[2] = { src_grid->size, 0 };
   GridSearch *gs = NULL;
+  int remap_grid_type = src_grid->remap_grid_type;
   if (remap_grid_type != REMAP_GRID_TYPE_REG2D)
     gs = gridsearch_create(xIsCyclic, dims, src_grid->size, src_grid->cell_center_lon, src_grid->cell_center_lat);
-#else
-  void *gs;
 #endif
 
   size_t tgt_grid_size = tgt_grid->size;
@@ -410,8 +400,8 @@ scrip_remap_bilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_g
   // Loop over destination grid
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(gs) shared(rsearch,  \
-    Options::silentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
+#pragma omp parallel for default(none) schedule(static) reduction(+ : findex) shared(rsearch,  \
+    Options::silentMode, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -431,18 +421,11 @@ scrip_remap_bilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_g
       double wgts[4];      //  bilinear weights for four corners
 
       // Find nearest square of grid points on source grid
-      int search_result;
-      if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
-        search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-                                          src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
-      else
 #ifdef TEST_KDTREE
-        search_result = grid_search_test(gs, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
-                                         src_grid->cell_center_lat, src_grid->cell_center_lon);
+      int search_result = grid_search_test(gs, src_add, src_lats, src_lons, plat, plon, src_grid->dims,
+                                           src_grid->cell_center_lat, src_grid->cell_center_lon);
 #else
-        search_result
-            = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, src_grid->dims, src_grid->cell_center_lat,
-                          src_grid->cell_center_lon, rsearch.srcBins);
+      int search_result = remapSearchSquare(rsearch, plon, plat, src_add, src_lats, src_lons);
 #endif
 
       // Check to see if points are mask points

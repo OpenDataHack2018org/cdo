@@ -258,3 +258,19 @@ void remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeight
   else
     grid_search_nbr(rsearch.gs, plon, plat, knnWeights);
 }
+
+
+int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4], double src_lons[4])
+{
+  RemapGrid *src_grid = rsearch.srcGrid;
+  int remap_grid_type = src_grid->remap_grid_type;
+
+  int search_result;
+  if (remap_grid_type == REMAP_GRID_TYPE_REG2D)
+    search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, plat, plon);
+  else
+    search_result
+      = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);
+
+  return search_result;
+}

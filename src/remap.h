@@ -142,7 +142,8 @@ void remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_gr
 void remapSearchFree(RemapSearch &search);
 
 void remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeightsType &knnWeights);
-  
+int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4], double src_lons[4]);
+
 void scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
 void scrip_remap_bicubic_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
 void remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
@@ -180,16 +181,14 @@ int grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double 
                          double plon, const double *restrict src_center_lat, const double *restrict src_center_lon);
 
 int grid_search_reg2d(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats,
-                      double *restrict src_lons, double plat, double plon, const size_t *restrict src_grid_dims,
-                      const double *restrict src_center_lat, const double *restrict src_center_lon);
+                      double *restrict src_lons, double plat, double plon);
 
 bool point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t adds[4], double lons[4],
                    double lats[4], double plon, double plat, const double *restrict center_lon,
                    const double *restrict center_lat);
 
 int grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-                double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
-                const double *restrict src_center_lon, GridSearchBins &srcBins);
+                double plat, double plon, GridSearchBins &srcBins);
 
 bool find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig,
                      double *jg);
