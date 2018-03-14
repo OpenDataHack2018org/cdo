@@ -1217,9 +1217,10 @@ normalize_weights(RemapGrid *tgt_grid, RemapVars &rv, double *src_centroid_lat, 
   -----------------------------------------------------------------------
 */
 void
-remapConservWeightsScrip(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 {
-  /* local variables */
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
 
   bool lcheck = true;
 

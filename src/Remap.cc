@@ -771,16 +771,13 @@ remapInit(remapType &remap)
 static void
 remapGenWeights(RemapMethod mapType, remapType *remap, int numNeighbors)
 {
-  if (mapType == RemapMethod::CONSERV)
-    remapConservWeightsScrip(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
-  else if (mapType == RemapMethod::BILINEAR)
-    remapBilinearWeights(remap->search, remap->vars);
-  else if (mapType == RemapMethod::BICUBIC)
-    remapBicubicWeights(remap->search, remap->vars);
-  else if (mapType == RemapMethod::DISTWGT)
-    remapDistwgtWeights(numNeighbors, remap->search, remap->vars);
-  else if (mapType == RemapMethod::CONSERV_YAC)
-    remapConservWeights(remap->search, remap->vars);
+  // clang-format off
+  if      (mapType == RemapMethod::CONSERV)     remapConservWeightsScrip(remap->search, remap->vars);
+  else if (mapType == RemapMethod::BILINEAR)    remapBilinearWeights(remap->search, remap->vars);
+  else if (mapType == RemapMethod::BICUBIC)     remapBicubicWeights(remap->search, remap->vars);
+  else if (mapType == RemapMethod::DISTWGT)     remapDistwgtWeights(numNeighbors, remap->search, remap->vars);
+  else if (mapType == RemapMethod::CONSERV_YAC) remapConservWeights(remap->search, remap->vars);
+  // clang-format on
 
   if (remap->vars.sort_add) remapSortAddr(remap->vars);
   if (remap->vars.links_per_value == -1) remapLinksPerValue(remap->vars);
@@ -789,14 +786,12 @@ remapGenWeights(RemapMethod mapType, remapType *remap, int numNeighbors)
 static void
 remapField(RemapMethod mapType, remapType *remap, int numNeighbors, double *array1, double *array2, double missval)
 {
-  if (mapType == RemapMethod::BILINEAR)
-    remapBilinear(remap->search, array1, array2, missval);
-  else if (mapType == RemapMethod::BICUBIC)
-    remapBicubic(remap->search, array1, array2, missval);
-  else if (mapType == RemapMethod::DISTWGT)
-    remapDistwgt(numNeighbors, remap->search, array1, array2, missval);
-  else if (mapType == RemapMethod::CONSERV_YAC)
-    remapConserv(remap->search, array1, array2, missval);
+  // clang-format off
+  if      (mapType == RemapMethod::BILINEAR)    remapBilinear(remap->search, array1, array2, missval);
+  else if (mapType == RemapMethod::BICUBIC)     remapBicubic(remap->search, array1, array2, missval);
+  else if (mapType == RemapMethod::DISTWGT)     remapDistwgt(numNeighbors, remap->search, array1, array2, missval);
+  else if (mapType == RemapMethod::CONSERV_YAC) remapConserv(remap->search, array1, array2, missval);
+  // clang-format on
 }
 
 static void
