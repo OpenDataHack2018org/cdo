@@ -53,7 +53,7 @@ done
 # =================
 #         bil    bic    nn   con   ycon
 # reg2d   0.5    1.1   0.5   145     73
-# curv     25     25   9.3   142    155
+# curv    8.8    9.8   9.3   142    155
 #
 # result on bailung: gcc 7.2 sse4_2
 # =================

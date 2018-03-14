@@ -35,7 +35,7 @@
 #define PI M_PI
 #define PI2 (2.0 * PI)
 
-static PointSearchMethod pointSearchMethod(PointSearchMethod::nanoflann);
+PointSearchMethod pointSearchMethod(PointSearchMethod::nanoflann);
 
 struct gsFull
 {
@@ -146,6 +146,8 @@ setPointSearchMethod(const char *methodstr)
     pointSearchMethod = PointSearchMethod::nanoflann;
   else if (strcmp(methodstr, "full") == 0)
     pointSearchMethod = PointSearchMethod::full;
+  else if (strcmp(methodstr, "latbins") == 0)
+    pointSearchMethod = PointSearchMethod::latbins;
   else
     cdoAbort("gridsearch method %s not available!", methodstr);
 }
@@ -361,6 +363,8 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
   gs->dims[1] = dims[1];
 
   gs->method = pointSearchMethod;
+  if ( gs->method == PointSearchMethod::latbins ) gs->method = PointSearchMethod::nanoflann;
+
   gs->n = n;
   if (n == 0) return gs;
 
@@ -369,10 +373,10 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
 
   if (gs->method == PointSearchMethod::kdtree)
     gs->search_container = gs_create_kdtree(n, lons, lats, gs);
-  else if (gs->method == PointSearchMethod::nanoflann)
-    gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
   else if (gs->method == PointSearchMethod::full)
     gs->search_container = gs_create_full(n, lons, lats);
+  else if (gs->method == PointSearchMethod::nanoflann)
+    gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
 
   gs->search_radius = cdo_default_search_radius();
 

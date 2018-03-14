@@ -584,6 +584,8 @@ remapGridFree(RemapGrid &grid)
 void
 remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, RemapGrid &tgt_grid)
 {
+  extern PointSearchMethod pointSearchMethod;
+
   search.srcGrid = &src_grid;
   search.tgtGrid = &tgt_grid;
 
@@ -595,9 +597,14 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
 
   search.gs = NULL;
 
-  if (mapType == RemapMethod::DISTWGT
-      //            && mapType != RemapMethod::BILINEAR
-      )
+  bool useGridsearch = mapType == RemapMethod::DISTWGT;
+  if ( src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D && pointSearchMethod != PointSearchMethod::latbins )
+    {
+      // useGridsearch |= mapType == RemapMethod::BILINEAR;
+      // useGridsearch |= mapType == RemapMethod::BICUBIC;
+    }
+                    
+  if (useGridsearch)
     {
 #ifdef _OPENMP
       double start = cdoVerbose ? omp_get_wtime() : 0;

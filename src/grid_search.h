@@ -14,8 +14,8 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
-#ifndef GRID_SEARCH_H_
-#define GRID_SEARCH_H_
+#ifndef GRID_SEARCH_H
+#define GRID_SEARCH_H
 
 #include <stdbool.h>
 #include <knn_weights.h>
@@ -26,7 +26,8 @@ enum struct PointSearchMethod
 {
   full,
   nanoflann,
-  kdtree
+  kdtree,
+  latbins
 };
 
 struct GridSearch
