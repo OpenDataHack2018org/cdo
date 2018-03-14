@@ -1753,7 +1753,6 @@ int main(int argc, char *argv[])
   bool lstop = false;
   int noff = 0;
   int status = 0;
-  const char *operatorArg = NULL;
 
   cdo_init_is_tty();
 
