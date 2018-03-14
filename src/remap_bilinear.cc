@@ -22,11 +22,7 @@
 #include "timer.h"
 #include "cdoOptions.h"
 
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-/*                                                                         */
-/*      BILINEAR INTERPOLATION                                             */
-/*                                                                         */
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+// Bilinear interpolation
 
 bool
 find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
@@ -135,8 +131,8 @@ renormalizeWeights(const double src_lats[4], double wgts[4])
 }
 
 static void
-bilinear_warning(double plon, double plat, double iw, double jw, size_t *src_add, double *src_lons, double *src_lats,
-                 RemapGrid *src_grid)
+bilinearWarning(double plon, double plat, double iw, double jw, size_t *src_add, double *src_lons, double *src_lats,
+                RemapGrid *src_grid)
 {
   static bool lwarn = true;
 
@@ -168,8 +164,8 @@ bilinear_warning(double plon, double plat, double iw, double jw, size_t *src_add
 }
 
 static void
-bilinear_remap(double *restrict tgt_point, const double *restrict src_array, const double wgts[4],
-               const size_t src_add[4])
+bilinearRemap(double *restrict tgt_point, const double *restrict src_array, const double wgts[4],
+              const size_t src_add[4])
 {
   // *tgt_point = 0.;
   // for ( unsigned n = 0; n < 4; ++n ) *tgt_point +=
@@ -255,11 +251,11 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               // Successfully found iw,jw - compute weights
               set_bilinear_weights(iw, jw, wgts);
-              store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, &weightlinks[0]);
+              storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
             }
           else
             {
-              bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
+              bilinearWarning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
               search_result = -1;
             }
         }
@@ -274,12 +270,12 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
-              store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, &weightlinks[0]);
+              storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
             }
         }
     }
 
-  weightlinks2remaplinks(0, tgt_grid_size, &weightlinks[0], rv);
+  weightlinks2remaplinks(0, tgt_grid_size, weightlinks, rv);
 
   if (cdoTimer) timer_stop(timer_remap_bil);
 }  // scrip_remap_weights_bilinear
@@ -358,11 +354,11 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
               // Successfully found iw,jw - compute weights
               set_bilinear_weights(iw, jw, wgts);
               sort_add_and_wgts(4, src_add, wgts);
-              bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
+              bilinearRemap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
             }
           else
             {
-              bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
+              bilinearWarning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
               search_result = -1;
             }
         }
@@ -378,7 +374,7 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
               sort_add_and_wgts(4, src_add, wgts);
-              bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
+              bilinearRemap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
             }
         }
     }

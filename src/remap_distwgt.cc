@@ -84,8 +84,8 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
         if (knnWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = 1.0;
 
       // Store the link
-      store_weightlinks(0, nadds, &knnWeights[ompthID].m_addr[0], &knnWeights[ompthID].m_dist[0], tgt_cell_add,
-                        &weightlinks[0]);
+      storeWeightlinks(0, nadds, &knnWeights[ompthID].m_addr[0], &knnWeights[ompthID].m_dist[0], tgt_cell_add,
+                       weightlinks);
     }
 
   progressStatus(0, 1, 1);
@@ -93,7 +93,7 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
   if (rsearch.gs) gridsearch_delete(rsearch.gs);
   rsearch.gs = NULL;
 
-  weightlinks2remaplinks(0, tgt_grid_size, &weightlinks[0], rv);
+  weightlinks2remaplinks(0, tgt_grid_size, weightlinks, rv);
 
 #ifdef _OPENMP
   if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);

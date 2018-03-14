@@ -216,7 +216,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));
   // see  example_cartesian.c
-  if (cdoVerbose) printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
+  if (cdoVerbose) cdoPrint("Init kdtree lib 3D: n=%zu  nthreads=%d", n, Threading::ompNumThreads);
 
   kdata_t min[3] = { 1.e9, 1.e9, 1.e9 };
   kdata_t max[3] = { -1.e9, -1.e9, -1.e9 };
@@ -244,7 +244,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
       gs->max[j] = max[j];
     }
 
-  if (cdoVerbose) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
+  if (cdoVerbose) cdoPrint("BBOX: min=%g/%g/%g  max=%g/%g/%g", min[0], min[1], min[2], max[0], max[1], max[2]);
 
   kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, Threading::ompNumThreads);
   if (pointlist) Free(pointlist);

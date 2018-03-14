@@ -961,7 +961,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
           tgt_grid->cell_frac[tgt_cell_add] += partial_weight;
         }
 
-      store_weightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, &weightlinks[0]);
+      storeWeightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightlinks);
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area;
       // printf("area %d %g %g\n", tgt_cell_add,
@@ -990,7 +990,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
       delete[] srch_add[ompthID];
     }
 
-  weightlinks2remaplinks(1, tgt_grid_size, &weightlinks[0], rv);
+  weightlinks2remaplinks(1, tgt_grid_size, weightlinks, rv);
 
   // Normalize weights using destination area if requested
   remapNormalizeWeights(tgt_grid, rv);

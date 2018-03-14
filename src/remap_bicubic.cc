@@ -169,7 +169,7 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               // Successfully found iw,jw - compute weights
               set_bicubic_weights(iw, jw, wgts);
-              store_weightlinks4(4, src_add, wgts, tgt_cell_add, &weightlinks[0]);
+              storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightlinks);
             }
           else
             {
@@ -188,14 +188,14 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
             {
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
-              store_weightlinks4(4, src_add, wgts, tgt_cell_add, &weightlinks[0]);
+              storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightlinks);
             }
         }
     }
 
   if (cdoTimer) timer_stop(timer_remap_bic);
 
-  weightlinks2remaplinks4(tgt_grid_size, &weightlinks[0], rv);
+  weightlinks2remaplinks4(tgt_grid_size, weightlinks, rv);
 
 } /* scrip_remap_weights_bicubic */
 
