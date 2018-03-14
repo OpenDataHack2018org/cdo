@@ -145,13 +145,12 @@ static void
 remapPrintInfo(int operfunc, bool remap_genweights, RemapGrid &src_grid, RemapGrid &tgt_grid, size_t nmiss)
 {
   char line[256], tmpstr[256];
-
   line[0] = 0;
 
   if (operfunc == REMAPBIL || operfunc == GENBIL)
-    strcpy(line, "SCRIP bilinear");
+    strcpy(line, "Bilinear");
   else if (operfunc == REMAPBIC || operfunc == GENBIC)
-    strcpy(line, "SCRIP bicubic");
+    strcpy(line, "Bicubic");
   else if (operfunc == REMAPNN || operfunc == GENNN)
     strcpy(line, "Nearest neighbor");
   else if (operfunc == REMAPDIS || operfunc == GENDIS)
@@ -934,9 +933,9 @@ Remap(void *argument)
       if (gridInqType(gridID2) == GRID_GME)
         {
           remaps[0].tgt_grid.nvgp = gridInqSize(gridID2);
-          remaps[0].tgt_grid.vgpm = (int *) Realloc(remaps[0].tgt_grid.vgpm, gridInqSize(gridID2) * sizeof(int));
+          remaps[0].tgt_grid.vgpm.resize(gridInqSize(gridID2));
           int gridID2_gme = gridToUnstructured(gridID2, 1);
-          gridInqMaskGME(gridID2_gme, remaps[0].tgt_grid.vgpm);
+          gridInqMaskGME(gridID2_gme, &remaps[0].tgt_grid.vgpm[0]);
           gridDestroy(gridID2_gme);
           size_t isize = 0;
           for (size_t i = 0; i < gridsize2; ++i)
@@ -1032,7 +1031,7 @@ Remap(void *argument)
                 {
                   if (gridID1 == remaps[r].gridID && nmiss1 == remaps[r].nmiss)
                     {
-                      if (memcmp(&imask[0], remaps[r].src_grid.mask, remaps[r].src_grid.size * sizeof(int)) == 0)
+                      if (memcmp(&imask[0], &remaps[r].src_grid.mask[0], remaps[r].src_grid.size * sizeof(int)) == 0)
                         {
                           remaps[r].nused++;
                           break;
@@ -1104,15 +1103,15 @@ Remap(void *argument)
                         if (remaps[r].src_grid.vgpm[i]) imask[j++] = imask[i];
                     }
 
-                  arrayCopy(remaps[r].src_grid.size, &imask[0], remaps[r].src_grid.mask);
+                  arrayCopy(remaps[r].src_grid.size, &imask[0], &remaps[r].src_grid.mask[0]);
 
                   if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
                     {
-                      arrayFill(remaps[r].src_grid.size, remaps[r].src_grid.cell_area, 0.0);
-                      arrayFill(remaps[r].src_grid.size, remaps[r].src_grid.cell_frac, 0.0);
-                      arrayFill(remaps[r].tgt_grid.size, remaps[r].tgt_grid.cell_area, 0.0);
+                      arrayFill(remaps[r].src_grid.size, &remaps[r].src_grid.cell_area[0], 0.0);
+                      arrayFill(remaps[r].src_grid.size, &remaps[r].src_grid.cell_frac[0], 0.0);
+                      arrayFill(remaps[r].tgt_grid.size, &remaps[r].tgt_grid.cell_area[0], 0.0);
                     }
-                  arrayFill(remaps[r].tgt_grid.size, remaps[r].tgt_grid.cell_frac, 0.0);
+                  arrayFill(remaps[r].tgt_grid.size, &remaps[r].tgt_grid.cell_frac[0], 0.0);
 
                   // initialize some remapping variables
                   remapVarsInit(mapType, remaps[r].vars);
@@ -1180,7 +1179,7 @@ Remap(void *argument)
                   char varname[CDI_MAX_NAME];
                   vlistInqVarName(vlistID1, varID, varname);
                   if (strcmp(varname, "gridbox_area") == 0)
-                    scaleGridboxArea(gridsize, &array1[0], gridsize2, &array2[0], remaps[r].tgt_grid.cell_area);
+                    scaleGridboxArea(gridsize, &array1[0], gridsize2, &array2[0], &remaps[r].tgt_grid.cell_area[0]);
                 }
 
               // calculate some statistics

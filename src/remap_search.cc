@@ -301,7 +301,6 @@ grid_search_test(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, 
   //     src_center_lon[add]*RAD2DEG, src_center_lat[add]*RAD2DEG,add, range);
   if (add != GS_NOT_FOUND)
     {
-      size_t idx[4];
       for (unsigned k = 0; k < 4; ++k)
         {
           /* Determine neighbor addresses */

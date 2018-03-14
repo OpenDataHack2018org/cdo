@@ -78,7 +78,7 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
       remapSearchPoints(rsearch, plon, plat, knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
+      size_t nadds = knnWeights[ompthID].compute_weights(&src_grid->mask[0]);
 
       for (size_t n = 0; n < nadds; ++n)
         if (knnWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = 1.0;
@@ -148,7 +148,7 @@ remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict s
       remapSearchPoints(rsearch, plon, plat, knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
+      size_t nadds = knnWeights[ompthID].compute_weights(&src_grid->mask[0]);
       if (nadds) tgt_array[tgt_cell_add] = knnWeights[ompthID].array_weights_sum(src_array);
     }
 

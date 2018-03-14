@@ -100,39 +100,6 @@ remap_set_int(int remapvar, int value)
 }
 
 /*****************************************************************************/
-
-void
-remapGridAlloc(RemapMethod mapType, RemapGrid &grid)
-{
-  if (grid.nvgp) grid.vgpm = (int *) Malloc(grid.nvgp * sizeof(int));
-
-  grid.mask = (int *) Malloc(grid.size * sizeof(int));
-
-  if (remap_write_remap || grid.remap_grid_type != REMAP_GRID_TYPE_REG2D)
-    {
-      grid.cell_center_lon = (double *) Malloc(grid.size * sizeof(double));
-      grid.cell_center_lat = (double *) Malloc(grid.size * sizeof(double));
-    }
-
-  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
-    {
-      grid.cell_area = (double *) Calloc(grid.size, sizeof(double));
-    }
-
-  grid.cell_frac = (double *) Calloc(grid.size, sizeof(double));
-
-  if (grid.lneed_cell_corners)
-    {
-      if (grid.num_cell_corners > 0)
-        {
-          size_t nalloc = grid.num_cell_corners * grid.size;
-          grid.cell_corner_lon = (double *) Calloc(nalloc, sizeof(double));
-          grid.cell_corner_lat = (double *) Calloc(nalloc, sizeof(double));
-        }
-    }
-}
-
-/*****************************************************************************/
 static void
 boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon, const double *restrict corner_lat,
                       float *restrict bound_box)
@@ -457,7 +424,7 @@ remapDefineGrid(RemapMethod mapType, int gridID, RemapGrid &grid, const char *tx
         }
     }
 
-  if (gridInqType(grid.gridID) == GRID_GME) gridInqMaskGME(gridID_gme, grid.vgpm);
+  if (gridInqType(grid.gridID) == GRID_GME) gridInqMaskGME(gridID_gme, &grid.vgpm[0]);
 
   /* Convert lat/lon units if required */
 
@@ -534,6 +501,37 @@ cell_bounding_boxes(RemapGrid &grid, float *cell_bound_box, int remap_grid_basis
 }
 
 void
+remapGridAlloc(RemapMethod mapType, RemapGrid &grid)
+{
+  if (grid.nvgp) grid.vgpm.resize(grid.nvgp);
+
+  grid.mask.resize(grid.size);
+
+  if (remap_write_remap || grid.remap_grid_type != REMAP_GRID_TYPE_REG2D)
+    {
+      grid.cell_center_lon = (double *) Malloc(grid.size * sizeof(double));
+      grid.cell_center_lat = (double *) Malloc(grid.size * sizeof(double));
+    }
+
+  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
+    {
+      grid.cell_area.resize(grid.size, 0.0);
+    }
+
+  grid.cell_frac.resize(grid.size, 0.0);
+
+  if (grid.lneed_cell_corners)
+    {
+      if (grid.num_cell_corners > 0)
+        {
+          size_t nalloc = grid.num_cell_corners * grid.size;
+          grid.cell_corner_lon = (double *) Calloc(nalloc, sizeof(double));
+          grid.cell_corner_lat = (double *) Calloc(nalloc, sizeof(double));
+        }
+    }
+}
+
+void
 remapGridInit(RemapGrid &grid)
 {
   grid.remap_grid_type = -1;
@@ -543,9 +541,6 @@ remapGridInit(RemapGrid &grid)
   grid.lneed_cell_corners = false;
 
   grid.nvgp = 0;
-  grid.vgpm = NULL;
-
-  grid.mask = NULL;
 
   grid.reg2d_center_lon = NULL;
   grid.reg2d_center_lat = NULL;
@@ -556,16 +551,13 @@ remapGridInit(RemapGrid &grid)
   grid.cell_center_lat = NULL;
   grid.cell_corner_lon = NULL;
   grid.cell_corner_lat = NULL;
-
-  grid.cell_area = NULL;
-  grid.cell_frac = NULL;
 }
 
 void
 remapGridFree(RemapGrid &grid)
 {
-  if (grid.vgpm) Free(grid.vgpm);
-  if (grid.mask) Free(grid.mask);
+  if (grid.vgpm.size()) grid.vgpm.resize(0);
+  if (grid.mask.size()) grid.mask.resize(0);
 
   if (grid.reg2d_center_lat) Free(grid.reg2d_center_lat);
   if (grid.reg2d_center_lon) Free(grid.reg2d_center_lon);
@@ -577,8 +569,8 @@ remapGridFree(RemapGrid &grid)
   if (grid.cell_corner_lat) Free(grid.cell_corner_lat);
   if (grid.cell_corner_lon) Free(grid.cell_corner_lon);
 
-  if (grid.cell_area) Free(grid.cell_area);
-  if (grid.cell_frac) Free(grid.cell_frac);
+  if (grid.cell_area.size()) grid.cell_area.resize(0);
+  if (grid.cell_frac.size()) grid.cell_frac.resize(0);
 }
 
 void
@@ -780,7 +772,7 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
 
   /* Conservation Test */
 
-  if (src_grid.cell_area)
+  if (src_grid.cell_area.size())
     {
       cdoPrint("  Conservation:");
       double sum = 0;

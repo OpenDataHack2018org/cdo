@@ -60,23 +60,23 @@ struct RemapGrid
 {
   int gridID;
   int remap_grid_type;
-  int rank;                 // rank of the grid
-  size_t size;              // total points on the grid
-  size_t num_cell_corners;  // number of corners for each grid cell
+  int rank;                         // rank of the grid
+  size_t size;                      // total points on the grid
+  size_t num_cell_corners;          // number of corners for each grid cell
 
   bool lneed_cell_corners;
-  bool luse_cell_corners;   // use corners for bounding boxes
+  bool luse_cell_corners;           // use corners for bounding boxes
 
   bool lextrapolate;
   bool non_global;
   bool is_cyclic;
 
-  size_t dims[2];           // size of grid dimension
+  size_t dims[2];                   // size of grid dimension
 
-  int nvgp;                 // size of vgpm
-  int *vgpm;                // flag which cells are valid
+  int nvgp;                         // size of vgpm
+  std::vector<int> vgpm;            // flag which cells are valid
 
-  int *mask;                // flag which cells participate
+  std::vector<int> mask;            // flag which cells participate
 
   double *reg2d_center_lon; // reg2d lon/lat coordinates for
   double *reg2d_center_lat; // each grid center in radians
@@ -88,8 +88,8 @@ struct RemapGrid
   double *cell_corner_lon;  // lon/lat coordinates for
   double *cell_corner_lat;  // each grid corner in radians
 
-  double *cell_area;        // total area of each grid cell
-  double *cell_frac;        // fractional area of grid cells participating in remapping
+  std::vector<double> cell_area;     // total area of each grid cell
+  std::vector<double> cell_frac;     // fractional area of grid cells participating in remapping
 };
 
 struct GridSearchBins

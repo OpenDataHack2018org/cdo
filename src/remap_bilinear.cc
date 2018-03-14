@@ -270,7 +270,7 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
       */
       if (search_result < 0)
         {
-          if (num_src_points(src_grid->mask, src_add, src_lats) > 0)
+          if (num_src_points(&src_grid->mask[0], src_add, src_lats) > 0)
             {
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
@@ -373,7 +373,7 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
       */
       if (search_result < 0)
         {
-          if (num_src_points(src_grid->mask, src_add, src_lats) > 0)
+          if (num_src_points(&src_grid->mask[0], src_add, src_lats) > 0)
             {
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
