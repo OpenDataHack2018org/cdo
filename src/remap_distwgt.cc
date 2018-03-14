@@ -27,8 +27,11 @@
 
 // This routine computes the inverse-distance weights for a nearest-neighbor interpolation.
 void
-remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
   progressInit();
@@ -54,8 +57,8 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_gr
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightlinks, numNeighbors, \
-                                                                    src_grid, tgt_grid, tgt_grid_size, knnWeights)
+#pragma omp parallel for default(none) reduction(+ : findex) \
+  shared(rsearch, weightlinks, numNeighbors, src_grid, tgt_grid, tgt_grid_size, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -98,9 +101,12 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_gr
 }  // remapDistwgtWeights
 
 void
-remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
+remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array,
               double *restrict tgt_array, double missval)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
   progressInit();
@@ -121,9 +127,8 @@ remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Rem
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)                                                      \
-  reduction(+ : findex) shared(rsearch, numNeighbors, src_grid, tgt_grid, \
-                               tgt_grid_size) shared(src_array, tgt_array, missval, knnWeights)
+#pragma omp parallel for default(none)  reduction(+ : findex) \
+  shared(rsearch, numNeighbors, src_grid, tgt_grid, tgt_grid_size, src_array, tgt_array, missval, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -154,7 +159,6 @@ remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Rem
 #endif
 }  // remapDistwgt
 
-#include <cdi.h>
 
 void remapInit(remapType &remap);
 
@@ -181,8 +185,8 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   bool remap_extrapolate = false;
   remapInitGrids(mapType, remap_extrapolate, gridID1, remap.src_grid, gridID2, remap.tgt_grid);
 
-  size_t src_grid_size = gridInqSize(gridID1);
-  size_t tgt_grid_size = gridInqSize(gridID2);
+  size_t src_grid_size = remap.src_grid.size;
+  size_t tgt_grid_size = remap.tgt_grid.size;
 
   std::vector<int> src_mask(src_grid_size);
   for (size_t i = 0; i < src_grid_size; ++i) src_mask[i] = !DBL_IS_EQUAL(src_array[i], src_missval);

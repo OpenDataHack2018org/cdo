@@ -146,7 +146,7 @@ int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src
 
 void remapBilinearWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
 void remapBicubicWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
-void remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
+void remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv);
 void remapConservWeightsScrip(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
 void remapConservWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv);
 
@@ -154,7 +154,7 @@ void remapBilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_gri
                           double *restrict tgt_array, double missval);
 void remapBicubic(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
                          double *restrict tgt_array, double missval);
-void remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
+void remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array,
                    double *restrict tgt_array, double missval);
 void remapConserv(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
                    double *restrict tgt_array, double missval);
