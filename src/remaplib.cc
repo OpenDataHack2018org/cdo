@@ -769,29 +769,29 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
     cdoPrint("Second order mapping from grid1 to grid2:");
   else
     cdoPrint("First order mapping from grid1 to grid2:");
-  cdoPrint("----------------------------------------");
+  cdoPrint("----------------------------------------------");
 
   double mean, minval, maxval;
   arrayMinMaxMeanMV(src_grid.size, array1, missval, &minval, &maxval, &mean);
-  cdoPrint("Grid1 min,mean,max: %g %g %g", minval, mean, maxval);
+  cdoPrint("  Grid1 min,mean,max: %g %g %g", minval, mean, maxval);
 
   arrayMinMaxMeanMV(tgt_grid.size, array2, missval, &minval, &maxval, &mean);
-  cdoPrint("Grid2 min,mean,max: %g %g %g", minval, mean, maxval);
+  cdoPrint("  Grid2 min,mean,max: %g %g %g", minval, mean, maxval);
 
   /* Conservation Test */
 
   if (src_grid.cell_area)
     {
-      cdoPrint("Conservation:");
+      cdoPrint("  Conservation:");
       double sum = 0;
       for (size_t n = 0; n < src_grid.size; ++n)
         if (!DBL_IS_EQUAL(array1[n], missval)) sum += array1[n] * src_grid.cell_area[n] * src_grid.cell_frac[n];
-      cdoPrint("Grid1 Integral = %g", sum);
+      cdoPrint("  Grid1 Integral = %g", sum);
 
       sum = 0;
       for (size_t n = 0; n < tgt_grid.size; ++n)
         if (!DBL_IS_EQUAL(array2[n], missval)) sum += array2[n] * tgt_grid.cell_area[n] * tgt_grid.cell_frac[n];
-      cdoPrint("Grid2 Integral = %g", sum);
+      cdoPrint("  Grid2 Integral = %g", sum);
       /*
       for ( n = 0; n < src_grid.size; n++ )
        fprintf(stderr, "1 %d %g %g %g\n", n, array1[n], src_grid.cell_area[n],
@@ -801,9 +801,9 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
       */
     }
 
-  cdoPrint("Number of weights %zu", rv.num_wts);
-  cdoPrint("Number of sparse matrix entries %zu", rv.num_links);
-  cdoPrint("Total number of dest cells %zu", tgt_grid.size);
+  cdoPrint("  Number of weights %zu", rv.num_wts);
+  cdoPrint("  Number of sparse matrix entries %zu", rv.num_links);
+  cdoPrint("  Total number of dest cells %zu", tgt_grid.size);
 
   std::vector<size_t> tgt_count(tgt_grid.size, 0);
 
@@ -828,12 +828,12 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
   for (size_t i = 0; i < tgt_grid.size; ++i)
     if (tgt_count[i] > 0) icount++;
 
-  cdoPrint("Number of cells participating in remap %zu", icount);
+  cdoPrint("  Number of cells participating in remap %zu", icount);
 
   if (icount)
     {
-      cdoPrint("Min no of entries/row = %zu", imin);
-      cdoPrint("Max no of entries/row = %zu", imax);
+      cdoPrint("  Min no of entries/row = %zu", imin);
+      cdoPrint("  Max no of entries/row = %zu", imax);
 
       imax = imin + idiff;
       for (size_t n = 0; n < 10; ++n)
@@ -842,14 +842,14 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
           for (size_t i = 0; i < tgt_grid.size; ++i)
             if (tgt_count[i] >= imin && tgt_count[i] < imax) icount++;
 
-          if (icount) cdoPrint("Num of rows with entries between %zu - %zu  %zu", imin, imax - 1, icount);
+          if (icount) cdoPrint("  Num of rows with entries between %zu - %zu  %zu", imin, imax - 1, icount);
 
           imin = imin + idiff;
           imax = imax + idiff;
         }
     }
 
-  if (rv.sort_add) cdoPrint("Sparse matrix entries are explicitly sorted.");
+  if (rv.sort_add) cdoPrint("  Sparse matrix entries are explicitly sorted.");
 }
 
 /*****************************************************************************/

@@ -195,15 +195,10 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   std::vector<knnWeightsType> knnWeights;
   for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
-#ifdef _OPENMP
-  double start = cdoVerbose ? omp_get_wtime() : 0;
-#endif
-
   remapSearchInit(mapType, remap.search, remap.src_grid, remap.tgt_grid);
 
 #ifdef _OPENMP
-  if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", omp_get_wtime() - start);
-  if (cdoVerbose) start = omp_get_wtime();
+  double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
   // Loop over destination grid
