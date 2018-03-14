@@ -228,7 +228,7 @@ remapPrintWarning(const char *remap_file, int operfunc, RemapGrid &src_grid, siz
 }
 
 double remap_threshhold = 2;
-double gridsearch_radius = 180;
+double pointSearchRadius = 180;
 int remap_test = 0;
 int remap_non_global = FALSE;
 int remap_num_srch_bins = 180;
@@ -317,8 +317,8 @@ remapGetenv(void)
     {
       double fval = radius_str_to_deg(envstr);
       if (fval < 0 || fval > 180) cdoAbort("%s=%g out of bounds (0-180 deg)!", "CDO_REMAP_RADIUS", fval);
-      gridsearch_radius = fval;
-      if (cdoVerbose) cdoPrint("Set CDO_REMAP_RADIUS to %g", gridsearch_radius);
+      pointSearchRadius = fval;
+      if (cdoVerbose) cdoPrint("Set CDO_REMAP_RADIUS to %g", pointSearchRadius);
     }
 
   envstr = getenv("CDO_GRIDSEARCH_RADIUS");
@@ -326,11 +326,11 @@ remapGetenv(void)
     {
       double fval = radius_str_to_deg(envstr);
       if (fval < 0 || fval > 180) cdoAbort("%s=%g out of bounds (0-180 deg)!", "CDO_GRIDSEARCH_RADIUS", fval);
-      gridsearch_radius = fval;
-      if (cdoVerbose) cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", gridsearch_radius);
+      pointSearchRadius = fval;
+      if (cdoVerbose) cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", pointSearchRadius);
     }
 
-  if (cdoVerbose) cdoPrint("remap_radius = %g deg", gridsearch_radius);
+  if (cdoVerbose) cdoPrint("Point search radius = %g deg", pointSearchRadius);
 
   envstr = getenv("REMAP_AREA_MIN");
   if (envstr)

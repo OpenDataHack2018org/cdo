@@ -46,8 +46,6 @@ remap_set_threshhold(double threshhold)
 {
   north_thresh = threshhold;
   south_thresh = -threshhold;
-
-  if (cdoVerbose) cdoPrint("threshhold: north=%g  south=%g", north_thresh, south_thresh);
 }
 
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -1244,8 +1242,8 @@ remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 
   if (cdoVerbose)
     {
-      cdoPrint("north_thresh: %g", north_thresh);
-      cdoPrint("south_thresh: %g", south_thresh);
+      cdoPrint("North threshhold: %g", north_thresh);
+      cdoPrint("South threshhold: %g", south_thresh);
     }
 
   if (cdoTimer) timer_start(timer_remap_con);

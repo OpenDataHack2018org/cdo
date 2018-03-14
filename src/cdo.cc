@@ -1250,10 +1250,10 @@ parse_options_long(int argc, char *argv[])
             }
           else if (lgridsearchradius)
             {
-              extern double gridsearch_radius;
+              extern double pointSearchRadius;
               double fval = radius_str_to_deg(CDO_optarg);
               if (fval < 0 || fval > 180) cdoAbort("%s=%g out of bounds (0-180 deg)!", "gridsearchradius", fval);
-              gridsearch_radius = fval;
+              pointSearchRadius = fval;
             }
           else if (lremap_genweights)
             {

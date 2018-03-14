@@ -104,9 +104,9 @@ typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double,
 static double
 cdo_default_search_radius(void)
 {
-  extern double gridsearch_radius;
+  extern double pointSearchRadius;
 
-  double search_radius = gridsearch_radius;
+  double search_radius = pointSearchRadius;
 
   if (search_radius < 0.) search_radius = 0.;
   if (search_radius > 180.) search_radius = 180.;
@@ -257,7 +257,7 @@ static void *
 gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
 {
   PointCloud<double> *pointcloud = new PointCloud<double>();
-  if (cdoVerbose) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
+  if (cdoVerbose) cdoPrint("Init nanoflann 3D: n=%zu  nthreads=%d", n, Threading::ompNumThreads);
 
   double min[3] = { 1.e9, 1.e9, 1.e9 };
   double max[3] = { -1.e9, -1.e9, -1.e9 };

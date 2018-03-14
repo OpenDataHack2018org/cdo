@@ -618,7 +618,7 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
 
       if (src_grid.lextrapolate) gridsearch_extrapolate(search.gs);
 #ifdef _OPENMP
-      if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
+      if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", omp_get_wtime() - start);
 #endif
     }
   else

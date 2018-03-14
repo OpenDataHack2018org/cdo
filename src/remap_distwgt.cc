@@ -25,12 +25,12 @@
 
 // Interpolation using a distance-weighted average
 
-// This routine computes the inverse-distance weights for a nearest-neighbor interpolation.
+// This routine computes the inverse-distance weights for a nearest-neighbor interpolation
 void
 remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
-  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
@@ -81,7 +81,7 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
       size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
 
       for (size_t n = 0; n < nadds; ++n)
-        if (knnWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = ONE;
+        if (knnWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = 1.0;
 
       // Store the link
       store_weightlinks(0, nadds, &knnWeights[ompthID].m_addr[0], &knnWeights[ompthID].m_dist[0], tgt_cell_add,
@@ -96,16 +96,16 @@ remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
   weightlinks2remaplinks(0, tgt_grid_size, &weightlinks[0], rv);
 
 #ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
 #endif
 }  // remapDistwgtWeights
 
 void
-remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array,
-              double *restrict tgt_array, double missval)
+remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array,
+             double missval)
 {
   RemapGrid *src_grid = rsearch.srcGrid;
-  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
@@ -155,10 +155,9 @@ remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict s
   progressStatus(0, 1, 1);
 
 #ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
 #endif
 }  // remapDistwgt
-
 
 void remapInit(remapType &remap);
 
@@ -203,7 +202,7 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   remapSearchInit(mapType, remap.search, remap.src_grid, remap.tgt_grid);
 
 #ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
+  if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", omp_get_wtime() - start);
   if (cdoVerbose) start = omp_get_wtime();
 #endif
 
@@ -246,6 +245,6 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   remapSearchFree(remap.search);
 
 #ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
 #endif
 }  // intgriddis

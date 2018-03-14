@@ -455,7 +455,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   finish = clock();
 
-  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   progressInit();
 
@@ -489,7 +489,7 @@ setmisstodis(field_type *field1, field_type *field2, int numNeighbors)
 
   finish = clock();
 
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (gs) gridsearch_delete(gs);
 
