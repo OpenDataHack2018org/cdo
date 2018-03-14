@@ -27,7 +27,7 @@
 
 // This routine computes the inverse-distance weights for a nearest-neighbor interpolation.
 void
-remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
@@ -95,10 +95,10 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
 #ifdef _OPENMP
   if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
 #endif
-}  // remap_distwgt_weights
+}  // remapDistwgtWeights
 
 void
-remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
+remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
               double *restrict tgt_array, double missval)
 {
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
@@ -152,7 +152,7 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
 #ifdef _OPENMP
   if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
 #endif
-}  // remap_distwgt
+}  // remapDistwgt
 
 #include <cdi.h>
 
