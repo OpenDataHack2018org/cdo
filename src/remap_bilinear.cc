@@ -186,7 +186,7 @@ bilinear_remap(double *restrict tgt_point, const double *restrict src_array, con
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapBilinearWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   extern int timer_remap_bil;
 
@@ -290,7 +290,7 @@ scrip_remap_bilinear_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGri
 */
 
 void
-scrip_remap_bilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
+remapBilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
                      double *restrict tgt_array, double missval)
 {
   extern int timer_remap_bil;
@@ -379,4 +379,4 @@ scrip_remap_bilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_g
     }
 
   if (cdoTimer) timer_stop(timer_remap_bil);
-}  // scrip_remap_bilinear
+}  // remapBilinear
