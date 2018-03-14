@@ -186,8 +186,11 @@ bilinear_remap(double *restrict tgt_point, const double *restrict src_array, con
   -----------------------------------------------------------------------
 */
 void
-remapBilinearWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+
   extern int timer_remap_bil;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
@@ -290,9 +293,11 @@ remapBilinearWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_g
 */
 
 void
-remapBilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
-                     double *restrict tgt_array, double missval)
+remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+
   extern int timer_remap_bil;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
