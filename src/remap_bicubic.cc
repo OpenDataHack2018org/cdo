@@ -100,7 +100,7 @@ bicubic_remap(double *restrict tgt_point, const double *restrict src_array, doub
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_bicubic_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapBicubicWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   extern int timer_remap_bic;
 
@@ -205,7 +205,7 @@ scrip_remap_bicubic_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid
 */
 
 void
-scrip_remap_bicubic(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
+remapBicubic(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
                     double *restrict tgt_array, double missval)
 {
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
@@ -292,4 +292,4 @@ scrip_remap_bicubic(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_gr
             }
         }
     }
-}  // scrip_remap_bicubic
+}  // remapBicubic
