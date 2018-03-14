@@ -152,10 +152,8 @@ void remapConservWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *t
 
 void remapBilinear(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
                           double *restrict tgt_array, double missval);
-void remapBicubic(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
-                         double *restrict tgt_array, double missval);
-void remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array,
-                   double *restrict tgt_array, double missval);
+void remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval);
+void remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval);
 void remapConserv(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
                    double *restrict tgt_array, double missval);
 

@@ -776,7 +776,7 @@ remapGenWeights(RemapMethod mapType, remapType *remap, int numNeighbors)
   else if (mapType == RemapMethod::BILINEAR)
     remapBilinearWeights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
   else if (mapType == RemapMethod::BICUBIC)
-    remapBicubicWeights(remap->search, &remap->src_grid, &remap->tgt_grid, remap->vars);
+    remapBicubicWeights(remap->search, remap->vars);
   else if (mapType == RemapMethod::DISTWGT)
     remapDistwgtWeights(numNeighbors, remap->search, remap->vars);
   else if (mapType == RemapMethod::CONSERV_YAC)
@@ -792,7 +792,7 @@ remapField(RemapMethod mapType, remapType *remap, int numNeighbors, double *arra
   if (mapType == RemapMethod::BILINEAR)
     remapBilinear(remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
   else if (mapType == RemapMethod::BICUBIC)
-    remapBicubic(remap->search, &remap->src_grid, &remap->tgt_grid, array1, array2, missval);
+    remapBicubic(remap->search, array1, array2, missval);
   else if (mapType == RemapMethod::DISTWGT)
     remapDistwgt(numNeighbors, remap->search, array1, array2, missval);
   else if (mapType == RemapMethod::CONSERV_YAC)

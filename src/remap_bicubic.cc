@@ -100,8 +100,11 @@ bicubic_remap(double *restrict tgt_point, const double *restrict src_array, doub
   -----------------------------------------------------------------------
 */
 void
-remapBicubicWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+
   extern int timer_remap_bic;
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
@@ -205,9 +208,11 @@ remapBicubicWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_gr
 */
 
 void
-remapBicubic(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
-                    double *restrict tgt_array, double missval)
+remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array, double missval)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
   progressInit();
