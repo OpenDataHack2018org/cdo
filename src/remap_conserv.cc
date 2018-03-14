@@ -680,7 +680,7 @@ reg2d_bound_box(RemapGrid *remap_grid, double *grid_bound_box)
 }
 
 void
-remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapConservWeights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells
@@ -1013,9 +1013,9 @@ remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_
 
 }  // remap_weights_conserv
 
-// void remap_conserv(RemapGrid *src_grid, RemapGrid *tgt_grid, const
+// void remapConserv(RemapGrid *src_grid, RemapGrid *tgt_grid, const
 // double* restrict src_array, double* restrict tgt_array, double missval)
 void
-remap_conserv(RemapSearch &rsearch, RemapGrid *, RemapGrid *, const double *restrict, double *restrict, double)
+remapConserv(RemapSearch &rsearch, RemapGrid *, RemapGrid *, const double *restrict, double *restrict, double)
 {
-}  // remap_conserv
+}  // remapConserv

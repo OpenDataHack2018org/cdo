@@ -1217,7 +1217,7 @@ normalize_weights(RemapGrid *tgt_grid, RemapVars &rv, double *src_centroid_lat, 
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapConservWeightsScrip(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
 {
   /* local variables */
 
@@ -1823,4 +1823,4 @@ scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid
 
   if (cdoTimer) timer_stop(timer_remap_con);
 
-}  // remap_conserv_scrip
+}  // remapConservWeightsScrip
