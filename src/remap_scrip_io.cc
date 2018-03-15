@@ -388,8 +388,8 @@ remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType sub
   dims[1] = (int) tgt_grid.dims[1];
   nce(nc_put_var_int(nc_file_id, nc_dstgrddims_id, dims));
 
-  nce(nc_put_var_int(nc_file_id, nc_srcgrdimask_id, src_grid.mask));
-  nce(nc_put_var_int(nc_file_id, nc_dstgrdimask_id, tgt_grid.mask));
+  nce(nc_put_var_int(nc_file_id, nc_srcgrdimask_id, &src_grid.mask[0]));
+  nce(nc_put_var_int(nc_file_id, nc_dstgrdimask_id, &tgt_grid.mask[0]));
 
   if (src_grid.cell_center_lat) nce(nc_put_var_double(nc_file_id, nc_srcgrdcntrlat_id, src_grid.cell_center_lat));
   if (src_grid.cell_center_lon) nce(nc_put_var_double(nc_file_id, nc_srcgrdcntrlon_id, src_grid.cell_center_lon));
@@ -409,18 +409,18 @@ remapWriteDataScrip(const char *interp_file, RemapMethod mapType, SubmapType sub
       nce(nc_put_var_double(nc_file_id, nc_dstgrdcrnrlon_id, tgt_grid.cell_corner_lon));
     }
 
-  if (lgridarea) nce(nc_put_var_double(nc_file_id, nc_srcgrdarea_id, src_grid.cell_area));
+  if (lgridarea) nce(nc_put_var_double(nc_file_id, nc_srcgrdarea_id, &src_grid.cell_area[0]));
 
-  nce(nc_put_var_double(nc_file_id, nc_srcgrdfrac_id, src_grid.cell_frac));
+  nce(nc_put_var_double(nc_file_id, nc_srcgrdfrac_id, &src_grid.cell_frac[0]));
 
   /*
   if ( luse_cell_area )
     nce(nc_put_var_double(nc_file_id, nc_dstgrdarea_id, tgt_grid.cell_area_in));
   else
   */
-  if (lgridarea) nce(nc_put_var_double(nc_file_id, nc_dstgrdarea_id, tgt_grid.cell_area));
+  if (lgridarea) nce(nc_put_var_double(nc_file_id, nc_dstgrdarea_id, &tgt_grid.cell_area[0]));
 
-  nce(nc_put_var_double(nc_file_id, nc_dstgrdfrac_id, tgt_grid.cell_frac));
+  nce(nc_put_var_double(nc_file_id, nc_dstgrdfrac_id, &tgt_grid.cell_frac[0]));
 
   for (size_t i = 0; i < rv.num_links; i++)
     {
@@ -693,7 +693,7 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMetho
   remapGridAlloc(rv.mapType, src_grid);
   remapGridAlloc(rv.mapType, tgt_grid);
 
-  if (gridInqType(gridID1) == GRID_GME) gridInqMaskGME(gridID1_gme_c, src_grid.vgpm);
+  if (gridInqType(gridID1) == GRID_GME) gridInqMaskGME(gridID1_gme_c, &src_grid.vgpm[0]);
 
   // Allocate address and weight arrays for mapping 1
   if (rv.num_links > 0)
@@ -747,7 +747,7 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMetho
   src_grid.dims[0] = dims[0];
   src_grid.dims[1] = dims[1];
 
-  nce(nc_get_var_int(nc_file_id, nc_srcgrdimask_id, src_grid.mask));
+  nce(nc_get_var_int(nc_file_id, nc_srcgrdimask_id, &src_grid.mask[0]));
 
   nce(nc_get_var_double(nc_file_id, nc_srcgrdcntrlat_id, src_grid.cell_center_lat));
   nce(nc_get_var_double(nc_file_id, nc_srcgrdcntrlon_id, src_grid.cell_center_lon));
@@ -774,15 +774,15 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMetho
                      "source grid corner lat");
     }
 
-  if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_srcgrdarea_id, src_grid.cell_area));
+  if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_srcgrdarea_id, &src_grid.cell_area[0]));
 
-  nce(nc_get_var_double(nc_file_id, nc_srcgrdfrac_id, src_grid.cell_frac));
+  nce(nc_get_var_double(nc_file_id, nc_srcgrdfrac_id, &src_grid.cell_frac[0]));
 
   nce(nc_get_var_int(nc_file_id, nc_dstgrddims_id, dims));
   tgt_grid.dims[0] = dims[0];
   tgt_grid.dims[1] = dims[1];
 
-  nce(nc_get_var_int(nc_file_id, nc_dstgrdimask_id, tgt_grid.mask));
+  nce(nc_get_var_int(nc_file_id, nc_dstgrdimask_id, &tgt_grid.mask[0]));
 
   nce(nc_get_var_double(nc_file_id, nc_dstgrdcntrlat_id, tgt_grid.cell_center_lat));
   nce(nc_get_var_double(nc_file_id, nc_dstgrdcntrlon_id, tgt_grid.cell_center_lon));
@@ -809,9 +809,9 @@ remapReadDataScrip(const char *interp_file, int gridID1, int gridID2, RemapMetho
                      "target grid corner lat");
     }
 
-  if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_dstgrdarea_id, tgt_grid.cell_area));
+  if (lgridarea) nce(nc_get_var_double(nc_file_id, nc_dstgrdarea_id, &tgt_grid.cell_area[0]));
 
-  nce(nc_get_var_double(nc_file_id, nc_dstgrdfrac_id, tgt_grid.cell_frac));
+  nce(nc_get_var_double(nc_file_id, nc_dstgrdfrac_id, &tgt_grid.cell_frac[0]));
 
   if (rv.num_links > 0)
     {

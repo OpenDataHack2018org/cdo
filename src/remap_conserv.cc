@@ -680,8 +680,11 @@ reg2d_bound_box(RemapGrid *remap_grid, double *grid_bound_box)
 }
 
 void
-remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
+
   bool lcheck = true;
   size_t srch_corners;  // num of corners of srch cells
 
@@ -958,7 +961,7 @@ remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_
           tgt_grid->cell_frac[tgt_cell_add] += partial_weight;
         }
 
-      store_weightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, &weightlinks[0]);
+      storeWeightlinks(1, num_weights, srch_add[ompthID], partial_weights, tgt_cell_add, weightlinks);
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area;
       // printf("area %d %g %g\n", tgt_cell_add,
@@ -987,7 +990,7 @@ remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_
       delete[] srch_add[ompthID];
     }
 
-  weightlinks2remaplinks(1, tgt_grid_size, &weightlinks[0], rv);
+  weightlinks2remaplinks(1, tgt_grid_size, weightlinks, rv);
 
   // Normalize weights using destination area if requested
   remapNormalizeWeights(tgt_grid, rv);
@@ -1003,19 +1006,19 @@ remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_
   // Perform some error checking on final weights
   if (lcheck)
     {
-      remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
-      remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
+      remapCheckArea(src_grid_size, &src_grid->cell_area[0], "Source");
+      remapCheckArea(tgt_grid_size, &tgt_grid->cell_area[0], "Target");
 
       remapVarsCheckWeights(rv);
     }
 
   if (cdoTimer) timer_stop(timer_remap_con);
 
-}  // remap_weights_conserv
+}  // remapConservWeights
 
-// void remap_conserv(RemapGrid *src_grid, RemapGrid *tgt_grid, const
+// void remapConserv(RemapGrid *src_grid, RemapGrid *tgt_grid, const
 // double* restrict src_array, double* restrict tgt_array, double missval)
 void
-remap_conserv(RemapSearch &rsearch, RemapGrid *, RemapGrid *, const double *restrict, double *restrict, double)
+remapConserv(RemapSearch &rsearch, const double *restrict, double *restrict, double)
 {
-}  // remap_conserv
+}  // remapConserv

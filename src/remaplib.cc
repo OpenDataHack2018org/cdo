@@ -100,39 +100,6 @@ remap_set_int(int remapvar, int value)
 }
 
 /*****************************************************************************/
-
-void
-remapGridAlloc(RemapMethod mapType, RemapGrid &grid)
-{
-  if (grid.nvgp) grid.vgpm = (int *) Malloc(grid.nvgp * sizeof(int));
-
-  grid.mask = (int *) Malloc(grid.size * sizeof(int));
-
-  if (remap_write_remap || grid.remap_grid_type != REMAP_GRID_TYPE_REG2D)
-    {
-      grid.cell_center_lon = (double *) Malloc(grid.size * sizeof(double));
-      grid.cell_center_lat = (double *) Malloc(grid.size * sizeof(double));
-    }
-
-  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
-    {
-      grid.cell_area = (double *) Calloc(grid.size, sizeof(double));
-    }
-
-  grid.cell_frac = (double *) Calloc(grid.size, sizeof(double));
-
-  if (grid.lneed_cell_corners)
-    {
-      if (grid.num_cell_corners > 0)
-        {
-          size_t nalloc = grid.num_cell_corners * grid.size;
-          grid.cell_corner_lon = (double *) Calloc(nalloc, sizeof(double));
-          grid.cell_corner_lat = (double *) Calloc(nalloc, sizeof(double));
-        }
-    }
-}
-
-/*****************************************************************************/
 static void
 boundbox_from_corners(size_t size, size_t nc, const double *restrict corner_lon, const double *restrict corner_lat,
                       float *restrict bound_box)
@@ -457,7 +424,7 @@ remapDefineGrid(RemapMethod mapType, int gridID, RemapGrid &grid, const char *tx
         }
     }
 
-  if (gridInqType(grid.gridID) == GRID_GME) gridInqMaskGME(gridID_gme, grid.vgpm);
+  if (gridInqType(grid.gridID) == GRID_GME) gridInqMaskGME(gridID_gme, &grid.vgpm[0]);
 
   /* Convert lat/lon units if required */
 
@@ -534,6 +501,37 @@ cell_bounding_boxes(RemapGrid &grid, float *cell_bound_box, int remap_grid_basis
 }
 
 void
+remapGridAlloc(RemapMethod mapType, RemapGrid &grid)
+{
+  if (grid.nvgp) grid.vgpm.resize(grid.nvgp);
+
+  grid.mask.resize(grid.size);
+
+  if (remap_write_remap || grid.remap_grid_type != REMAP_GRID_TYPE_REG2D)
+    {
+      grid.cell_center_lon = (double *) Malloc(grid.size * sizeof(double));
+      grid.cell_center_lat = (double *) Malloc(grid.size * sizeof(double));
+    }
+
+  if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
+    {
+      grid.cell_area.resize(grid.size, 0.0);
+    }
+
+  grid.cell_frac.resize(grid.size, 0.0);
+
+  if (grid.lneed_cell_corners)
+    {
+      if (grid.num_cell_corners > 0)
+        {
+          size_t nalloc = grid.num_cell_corners * grid.size;
+          grid.cell_corner_lon = (double *) Calloc(nalloc, sizeof(double));
+          grid.cell_corner_lat = (double *) Calloc(nalloc, sizeof(double));
+        }
+    }
+}
+
+void
 remapGridInit(RemapGrid &grid)
 {
   grid.remap_grid_type = -1;
@@ -543,9 +541,6 @@ remapGridInit(RemapGrid &grid)
   grid.lneed_cell_corners = false;
 
   grid.nvgp = 0;
-  grid.vgpm = NULL;
-
-  grid.mask = NULL;
 
   grid.reg2d_center_lon = NULL;
   grid.reg2d_center_lat = NULL;
@@ -556,16 +551,13 @@ remapGridInit(RemapGrid &grid)
   grid.cell_center_lat = NULL;
   grid.cell_corner_lon = NULL;
   grid.cell_corner_lat = NULL;
-
-  grid.cell_area = NULL;
-  grid.cell_frac = NULL;
 }
 
 void
 remapGridFree(RemapGrid &grid)
 {
-  if (grid.vgpm) Free(grid.vgpm);
-  if (grid.mask) Free(grid.mask);
+  if (grid.vgpm.size()) grid.vgpm.resize(0);
+  if (grid.mask.size()) grid.mask.resize(0);
 
   if (grid.reg2d_center_lat) Free(grid.reg2d_center_lat);
   if (grid.reg2d_center_lon) Free(grid.reg2d_center_lon);
@@ -577,13 +569,15 @@ remapGridFree(RemapGrid &grid)
   if (grid.cell_corner_lat) Free(grid.cell_corner_lat);
   if (grid.cell_corner_lon) Free(grid.cell_corner_lon);
 
-  if (grid.cell_area) Free(grid.cell_area);
-  if (grid.cell_frac) Free(grid.cell_frac);
+  if (grid.cell_area.size()) grid.cell_area.resize(0);
+  if (grid.cell_frac.size()) grid.cell_frac.resize(0);
 }
 
 void
 remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, RemapGrid &tgt_grid)
 {
+  extern PointSearchMethod pointSearchMethod;
+
   search.srcGrid = &src_grid;
   search.tgtGrid = &tgt_grid;
 
@@ -595,9 +589,14 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
 
   search.gs = NULL;
 
-  if (mapType == RemapMethod::DISTWGT
-      //            && mapType != RemapMethod::BILINEAR
-      )
+  bool useGridsearch = mapType == RemapMethod::DISTWGT;
+  if ( src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D && pointSearchMethod != PointSearchMethod::latbins )
+    {
+      // useGridsearch |= mapType == RemapMethod::BILINEAR;
+      // useGridsearch |= mapType == RemapMethod::BICUBIC;
+    }
+                    
+  if (useGridsearch)
     {
 #ifdef _OPENMP
       double start = cdoVerbose ? omp_get_wtime() : 0;
@@ -611,7 +610,7 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
 
       if (src_grid.lextrapolate) gridsearch_extrapolate(search.gs);
 #ifdef _OPENMP
-      if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
+      if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", omp_get_wtime() - start);
 #endif
     }
   else
@@ -762,29 +761,29 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
     cdoPrint("Second order mapping from grid1 to grid2:");
   else
     cdoPrint("First order mapping from grid1 to grid2:");
-  cdoPrint("----------------------------------------");
+  cdoPrint("----------------------------------------------");
 
   double mean, minval, maxval;
   arrayMinMaxMeanMV(src_grid.size, array1, missval, &minval, &maxval, &mean);
-  cdoPrint("Grid1 min,mean,max: %g %g %g", minval, mean, maxval);
+  cdoPrint("  Grid1 min,mean,max: %g %g %g", minval, mean, maxval);
 
   arrayMinMaxMeanMV(tgt_grid.size, array2, missval, &minval, &maxval, &mean);
-  cdoPrint("Grid2 min,mean,max: %g %g %g", minval, mean, maxval);
+  cdoPrint("  Grid2 min,mean,max: %g %g %g", minval, mean, maxval);
 
   /* Conservation Test */
 
-  if (src_grid.cell_area)
+  if (src_grid.cell_area.size())
     {
-      cdoPrint("Conservation:");
+      cdoPrint("  Conservation:");
       double sum = 0;
       for (size_t n = 0; n < src_grid.size; ++n)
         if (!DBL_IS_EQUAL(array1[n], missval)) sum += array1[n] * src_grid.cell_area[n] * src_grid.cell_frac[n];
-      cdoPrint("Grid1 Integral = %g", sum);
+      cdoPrint("  Grid1 Integral = %g", sum);
 
       sum = 0;
       for (size_t n = 0; n < tgt_grid.size; ++n)
         if (!DBL_IS_EQUAL(array2[n], missval)) sum += array2[n] * tgt_grid.cell_area[n] * tgt_grid.cell_frac[n];
-      cdoPrint("Grid2 Integral = %g", sum);
+      cdoPrint("  Grid2 Integral = %g", sum);
       /*
       for ( n = 0; n < src_grid.size; n++ )
        fprintf(stderr, "1 %d %g %g %g\n", n, array1[n], src_grid.cell_area[n],
@@ -794,9 +793,9 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
       */
     }
 
-  cdoPrint("Number of weights %zu", rv.num_wts);
-  cdoPrint("Number of sparse matrix entries %zu", rv.num_links);
-  cdoPrint("Total number of dest cells %zu", tgt_grid.size);
+  cdoPrint("  Number of weights %zu", rv.num_wts);
+  cdoPrint("  Number of sparse matrix entries %zu", rv.num_links);
+  cdoPrint("  Total number of dest cells %zu", tgt_grid.size);
 
   std::vector<size_t> tgt_count(tgt_grid.size, 0);
 
@@ -821,12 +820,12 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
   for (size_t i = 0; i < tgt_grid.size; ++i)
     if (tgt_count[i] > 0) icount++;
 
-  cdoPrint("Number of cells participating in remap %zu", icount);
+  cdoPrint("  Number of cells participating in remap %zu", icount);
 
   if (icount)
     {
-      cdoPrint("Min no of entries/row = %zu", imin);
-      cdoPrint("Max no of entries/row = %zu", imax);
+      cdoPrint("  Min no of entries/row = %zu", imin);
+      cdoPrint("  Max no of entries/row = %zu", imax);
 
       imax = imin + idiff;
       for (size_t n = 0; n < 10; ++n)
@@ -835,14 +834,14 @@ remapStat(int remapOrder, RemapGrid &src_grid, RemapGrid &tgt_grid, RemapVars &r
           for (size_t i = 0; i < tgt_grid.size; ++i)
             if (tgt_count[i] >= imin && tgt_count[i] < imax) icount++;
 
-          if (icount) cdoPrint("Num of rows with entries between %zu - %zu  %zu", imin, imax - 1, icount);
+          if (icount) cdoPrint("  Num of rows with entries between %zu - %zu  %zu", imin, imax - 1, icount);
 
           imin = imin + idiff;
           imax = imax + idiff;
         }
     }
 
-  if (rv.sort_add) cdoPrint("Sparse matrix entries are explicitly sorted.");
+  if (rv.sort_add) cdoPrint("  Sparse matrix entries are explicitly sorted.");
 }
 
 /*****************************************************************************/

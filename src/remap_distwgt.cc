@@ -25,10 +25,13 @@
 
 // Interpolation using a distance-weighted average
 
-// This routine computes the inverse-distance weights for a nearest-neighbor interpolation.
+// This routine computes the inverse-distance weights for a nearest-neighbor interpolation
 void
-remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapDistwgtWeights(size_t numNeighbors, RemapSearch &rsearch, RemapVars &rv)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
+
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
   progressInit();
@@ -54,8 +57,8 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightlinks, numNeighbors, \
-                                                                    src_grid, tgt_grid, tgt_grid_size, knnWeights)
+#pragma omp parallel for default(none) reduction(+ : findex) \
+  shared(rsearch, weightlinks, numNeighbors, src_grid, tgt_grid, tgt_grid_size, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -75,14 +78,14 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
       remapSearchPoints(rsearch, plon, plat, knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
+      size_t nadds = knnWeights[ompthID].compute_weights(&src_grid->mask[0]);
 
       for (size_t n = 0; n < nadds; ++n)
-        if (knnWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = ONE;
+        if (knnWeights[ompthID].m_mask[n]) tgt_grid->cell_frac[tgt_cell_add] = 1.0;
 
       // Store the link
-      store_weightlinks(0, nadds, &knnWeights[ompthID].m_addr[0], &knnWeights[ompthID].m_dist[0], tgt_cell_add,
-                        &weightlinks[0]);
+      storeWeightlinks(0, nadds, &knnWeights[ompthID].m_addr[0], &knnWeights[ompthID].m_dist[0], tgt_cell_add,
+                       weightlinks);
     }
 
   progressStatus(0, 1, 1);
@@ -90,17 +93,20 @@ remap_distwgt_weights(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_
   if (rsearch.gs) gridsearch_delete(rsearch.gs);
   rsearch.gs = NULL;
 
-  weightlinks2remaplinks(0, tgt_grid_size, &weightlinks[0], rv);
+  weightlinks2remaplinks(0, tgt_grid_size, weightlinks, rv);
 
 #ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
 #endif
-}  // remap_distwgt_weights
+}  // remapDistwgtWeights
 
 void
-remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, const double *restrict src_array,
-              double *restrict tgt_array, double missval)
+remapDistwgt(size_t numNeighbors, RemapSearch &rsearch, const double *restrict src_array, double *restrict tgt_array,
+             double missval)
 {
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;
+
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
   progressInit();
@@ -121,9 +127,8 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
   double findex = 0;
 
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none)                                                      \
-  reduction(+ : findex) shared(rsearch, numNeighbors, src_grid, tgt_grid, \
-                               tgt_grid_size) shared(src_array, tgt_array, missval, knnWeights)
+#pragma omp parallel for default(none)  reduction(+ : findex) \
+  shared(rsearch, numNeighbors, src_grid, tgt_grid, tgt_grid_size, src_array, tgt_array, missval, knnWeights)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -143,18 +148,16 @@ remap_distwgt(size_t numNeighbors, RemapSearch &rsearch, RemapGrid *src_grid, Re
       remapSearchPoints(rsearch, plon, plat, knnWeights[ompthID]);
 
       // Compute weights based on inverse distance if mask is false, eliminate those points
-      size_t nadds = knnWeights[ompthID].compute_weights(src_grid->mask);
+      size_t nadds = knnWeights[ompthID].compute_weights(&src_grid->mask[0]);
       if (nadds) tgt_array[tgt_cell_add] = knnWeights[ompthID].array_weights_sum(src_array);
     }
 
   progressStatus(0, 1, 1);
 
 #ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
 #endif
-}  // remap_distwgt
-
-#include <cdi.h>
+}  // remapDistwgt
 
 void remapInit(remapType &remap);
 
@@ -181,8 +184,8 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   bool remap_extrapolate = false;
   remapInitGrids(mapType, remap_extrapolate, gridID1, remap.src_grid, gridID2, remap.tgt_grid);
 
-  size_t src_grid_size = gridInqSize(gridID1);
-  size_t tgt_grid_size = gridInqSize(gridID2);
+  size_t src_grid_size = remap.src_grid.size;
+  size_t tgt_grid_size = remap.tgt_grid.size;
 
   std::vector<int> src_mask(src_grid_size);
   for (size_t i = 0; i < src_grid_size; ++i) src_mask[i] = !DBL_IS_EQUAL(src_array[i], src_missval);
@@ -192,15 +195,10 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   std::vector<knnWeightsType> knnWeights;
   for (int i = 0; i < Threading::ompNumThreads; ++i) knnWeights.push_back(knnWeightsType(numNeighbors));
 
-#ifdef _OPENMP
-  double start = cdoVerbose ? omp_get_wtime() : 0;
-#endif
-
   remapSearchInit(mapType, remap.search, remap.src_grid, remap.tgt_grid);
 
 #ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", omp_get_wtime() - start);
-  if (cdoVerbose) start = omp_get_wtime();
+  double start = cdoVerbose ? omp_get_wtime() : 0;
 #endif
 
   // Loop over destination grid
@@ -242,6 +240,6 @@ intgriddis(field_type *field1, field_type *field2, size_t numNeighbors)
   remapSearchFree(remap.search);
 
 #ifdef _OPENMP
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime() - start);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", omp_get_wtime() - start);
 #endif
 }  // intgriddis

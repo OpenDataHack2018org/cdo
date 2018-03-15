@@ -320,8 +320,7 @@ point_in_quad(bool is_cyclic, size_t nx, size_t ny, size_t i, size_t j, size_t a
 
 int
 grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-            double plat, double plon, const size_t *restrict src_grid_dims, const double *restrict src_center_lat,
-            const double *restrict src_center_lon, GridSearchBins &srcBins)
+            double plat, double plon, GridSearchBins &srcBins)
 {
   /*
     Output variables:
@@ -344,13 +343,18 @@ grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_
 
     int src_bin_addr[][2]           ! latitude bins for restricting
   */
-  size_t n2, srch_add, srch_add4;
   int search_result = 0;
+
+  const size_t *restrict src_grid_dims = src_grid->dims;
+  const double *restrict src_center_lat = src_grid->cell_center_lat;
+  const double *restrict src_center_lon = src_grid->cell_center_lon;
 
   size_t nbins = srcBins.nbins;
   const size_t *restrict src_bin_addr = &srcBins.bin_addr[0];
   const float *restrict bin_lats = &srcBins.bin_lats[0];
   const float *restrict src_grid_bound_box = &srcBins.cell_bound_box[0];
+
+  size_t n2, srch_add, srch_add4;
 
   float rlat = plat;
   float rlon = plon;
@@ -378,7 +382,6 @@ grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_
   size_t nx = src_grid_dims[0];
   size_t ny = src_grid_dims[1];
 
-  /* srch_loop */
   for (srch_add = min_add; srch_add <= max_add; ++srch_add)
     {
       srch_add4 = srch_add << 2;
@@ -402,7 +405,7 @@ grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_
           /* Otherwise move on to next cell */
 
         } /* Bounding box check */
-    }     /* srch_loop */
+    }
 
   /*
     If no cell found, point is likely either in a box that straddles either pole

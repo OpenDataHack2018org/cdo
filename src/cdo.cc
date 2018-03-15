@@ -293,8 +293,9 @@ cdo_usage(void)
   fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
   fprintf(stderr, "    --precision <float_digits[,double_digits]>\n");
   fprintf(stderr, "                   Precision to use in displaying floating-point data (default: 7,15)\n");
+  if (ITSME) fprintf(stderr, "    --pointsearchmethod [full/kdtree/nanoflann/latbins]\n");
   fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions\n");
-  if (ITSME) fprintf(stderr, "    --remap_genweights 0/1\n");
+  if (ITSME) fprintf(stderr, "    --remap_genweights [0/1]\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (cgribex only)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
@@ -1249,10 +1250,10 @@ parse_options_long(int argc, char *argv[])
             }
           else if (lgridsearchradius)
             {
-              extern double gridsearch_radius;
+              extern double pointSearchRadius;
               double fval = radius_str_to_deg(CDO_optarg);
               if (fval < 0 || fval > 180) cdoAbort("%s=%g out of bounds (0-180 deg)!", "gridsearchradius", fval);
-              gridsearch_radius = fval;
+              pointSearchRadius = fval;
             }
           else if (lremap_genweights)
             {
@@ -1752,7 +1753,6 @@ int main(int argc, char *argv[])
   bool lstop = false;
   int noff = 0;
   int status = 0;
-  const char *operatorArg = NULL;
 
   cdo_init_is_tty();
 

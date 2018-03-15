@@ -169,8 +169,8 @@ libcdo_la_SOURCES =            \
                remap_conserv.cc \
                remap_conserv_scrip.cc \
                remap_distwgt.cc \
-               remap_bicubic_scrip.cc \
-               remap_bilinear_scrip.cc \
+               remap_bicubic.cc \
+               remap_bilinear.cc \
                stdnametable.cc  \
                stdnametable.h  \
                specspace.cc     \

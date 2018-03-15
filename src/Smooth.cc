@@ -93,7 +93,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   finish = clock();
 
-  if (cdoVerbose) printf("gridsearch created: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) cdoPrint("Point search created: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (cdoVerbose) progressInit();
 
@@ -132,7 +132,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
 
   finish = clock();
 
-  if (cdoVerbose) printf("gridsearch nearest: %.2f seconds\n", ((double) (finish - start)) / CLOCKS_PER_SEC);
+  if (cdoVerbose) cdoPrint("Point search nearest: %.2f seconds", ((double) (finish - start)) / CLOCKS_PER_SEC);
 
   if (gs) gridsearch_delete(gs);
 

@@ -35,7 +35,7 @@
 #define PI M_PI
 #define PI2 (2.0 * PI)
 
-static PointSearchMethod pointSearchMethod(PointSearchMethod::nanoflann);
+PointSearchMethod pointSearchMethod(PointSearchMethod::nanoflann);
 
 struct gsFull
 {
@@ -104,9 +104,9 @@ typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double,
 static double
 cdo_default_search_radius(void)
 {
-  extern double gridsearch_radius;
+  extern double pointSearchRadius;
 
-  double search_radius = gridsearch_radius;
+  double search_radius = pointSearchRadius;
 
   if (search_radius < 0.) search_radius = 0.;
   if (search_radius > 180.) search_radius = 180.;
@@ -146,6 +146,8 @@ setPointSearchMethod(const char *methodstr)
     pointSearchMethod = PointSearchMethod::nanoflann;
   else if (strcmp(methodstr, "full") == 0)
     pointSearchMethod = PointSearchMethod::full;
+  else if (strcmp(methodstr, "latbins") == 0)
+    pointSearchMethod = PointSearchMethod::latbins;
   else
     cdoAbort("gridsearch method %s not available!", methodstr);
 }
@@ -214,7 +216,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));
   // see  example_cartesian.c
-  if (cdoVerbose) printf("kdtree lib init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
+  if (cdoVerbose) cdoPrint("Init kdtree lib 3D: n=%zu  nthreads=%d", n, Threading::ompNumThreads);
 
   kdata_t min[3] = { 1.e9, 1.e9, 1.e9 };
   kdata_t max[3] = { -1.e9, -1.e9, -1.e9 };
@@ -242,7 +244,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
       gs->max[j] = max[j];
     }
 
-  if (cdoVerbose) printf("BBOX: min=%g/%g/%g  max=%g/%g/%g\n", min[0], min[1], min[2], max[0], max[1], max[2]);
+  if (cdoVerbose) cdoPrint("BBOX: min=%g/%g/%g  max=%g/%g/%g", min[0], min[1], min[2], max[0], max[1], max[2]);
 
   kdTree_t *kdt = kd_buildTree(pointlist, n, min, max, 3, Threading::ompNumThreads);
   if (pointlist) Free(pointlist);
@@ -255,7 +257,7 @@ static void *
 gs_create_nanoflann(size_t n, const double *restrict lons, const double *restrict lats, GridSearch *gs)
 {
   PointCloud<double> *pointcloud = new PointCloud<double>();
-  if (cdoVerbose) printf("nanoflann init 3D: n=%zu  nthreads=%d\n", n, Threading::ompNumThreads);
+  if (cdoVerbose) cdoPrint("Init nanoflann 3D: n=%zu  nthreads=%d", n, Threading::ompNumThreads);
 
   double min[3] = { 1.e9, 1.e9, 1.e9 };
   double max[3] = { -1.e9, -1.e9, -1.e9 };
@@ -361,6 +363,8 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
   gs->dims[1] = dims[1];
 
   gs->method = pointSearchMethod;
+  if ( gs->method == PointSearchMethod::latbins ) gs->method = PointSearchMethod::nanoflann;
+
   gs->n = n;
   if (n == 0) return gs;
 
@@ -369,10 +373,10 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
 
   if (gs->method == PointSearchMethod::kdtree)
     gs->search_container = gs_create_kdtree(n, lons, lats, gs);
-  else if (gs->method == PointSearchMethod::nanoflann)
-    gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
   else if (gs->method == PointSearchMethod::full)
     gs->search_container = gs_create_full(n, lons, lats);
+  else if (gs->method == PointSearchMethod::nanoflann)
+    gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
 
   gs->search_radius = cdo_default_search_radius();
 

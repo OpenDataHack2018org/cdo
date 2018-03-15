@@ -46,8 +46,6 @@ remap_set_threshhold(double threshhold)
 {
   north_thresh = threshhold;
   south_thresh = -threshhold;
-
-  if (cdoVerbose) cdoPrint("threshhold: north=%g  south=%g", north_thresh, south_thresh);
 }
 
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -1217,9 +1215,10 @@ normalize_weights(RemapGrid *tgt_grid, RemapVars &rv, double *src_centroid_lat, 
   -----------------------------------------------------------------------
 */
 void
-scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid *tgt_grid, RemapVars &rv)
+remapConservWeightsScrip(RemapSearch &rsearch, RemapVars &rv)
 {
-  /* local variables */
+  RemapGrid *src_grid = rsearch.srcGrid;
+  RemapGrid *tgt_grid = rsearch.tgtGrid;;
 
   bool lcheck = true;
 
@@ -1243,8 +1242,8 @@ scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid
 
   if (cdoVerbose)
     {
-      cdoPrint("north_thresh: %g", north_thresh);
-      cdoPrint("south_thresh: %g", south_thresh);
+      cdoPrint("North threshhold: %g", north_thresh);
+      cdoPrint("South threshhold: %g", south_thresh);
     }
 
   if (cdoTimer) timer_start(timer_remap_con);
@@ -1771,8 +1770,8 @@ scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid
 
   if (lcheck)
     {
-      remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
-      remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
+      remapCheckArea(src_grid_size, &src_grid->cell_area[0], "Source");
+      remapCheckArea(tgt_grid_size, &tgt_grid->cell_area[0], "Target");
 
       for (long n = 0; n < src_grid_size; ++n)
         {
@@ -1823,4 +1822,4 @@ scrip_remap_conserv_weights(RemapSearch &rsearch, RemapGrid *src_grid, RemapGrid
 
   if (cdoTimer) timer_stop(timer_remap_con);
 
-}  // remap_conserv_scrip
+}  // remapConservWeightsScrip

@@ -142,6 +142,8 @@ def doSync(builder)
     file.write(`git ls-files`)
     file.write(`git submodule foreach 'git ls-files | sed "s|^|$path/|"'`)
 
+    file.close
+
     # call rsync for a given host
     if builder.isLocal?
       syncCmd = "rsync #{rsyncOpts} -avz --files-from=#{file.path} . #{builder.targetDir}"
@@ -151,7 +153,6 @@ def doSync(builder)
     dbg(syncCmd)
     executeLocal(syncCmd)
   ensure
-    file.close
     file.unlink
   end
 end
@@ -169,9 +170,15 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
     end
   end
 
+  @_help[:reconf] = "create configure script on host" unless @_help.has_key?(:reconf)
+  task toDo[:reconf] do |t|
+    dbg("call 'autoreconf -v -i'")
+    execute("autoreconf -v -i",builder)
+  end
+
   @_help[:conf]= \
     "run configure on host: ./config/default with user settings activated" unless @_help.has_key?(:conf)
-  task toDo[:conf] do |t|
+  task toDo[:conf] => toDo[:reconf] do |t|
     dbg("call #{builder.configureCall}")
     execute("#{builder.configureCall}",builder)
   end
