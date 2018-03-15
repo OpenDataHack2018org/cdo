@@ -259,9 +259,9 @@ void remapSearchPoints(RemapSearch &rsearch, double plon, double plat, knnWeight
     grid_search_nbr(rsearch.gs, plon, plat, knnWeights);
 }
 
-int
-grid_search_test(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
-                 double plat, double plon)
+static int
+grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_lats, double *restrict src_lons,
+                   double plat, double plon)
 {
   /*
     Output variables:
@@ -287,54 +287,66 @@ grid_search_test(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add, 
 
   for (unsigned n = 0; n < 4; ++n) src_add[n] = 0;
 
-  /* Now perform a more detailed search */
-
   size_t nx = src_grid_dims[0];
   size_t ny = src_grid_dims[1];
 
-  double search_radius = gs->search_radius;
-  const double range0 = SQR(search_radius);
+  const double range0 = SQR(gs->search_radius);
   double range = range0;
   size_t add = gridsearch_nearest(gs, plon, plat, &range);
-  // printf("plon, plat, add, range %g %g %g %g %zu %g\n", plon*RAD2DEG,
-  // plat*RAD2DEG,
-  //     src_center_lon[add]*RAD2DEG, src_center_lat[add]*RAD2DEG,add, range);
   if (add != GS_NOT_FOUND)
     {
       for (unsigned k = 0; k < 4; ++k)
         {
-          /* Determine neighbor addresses */
+          // Determine neighbor addresses
           size_t j = add / nx;
           size_t i = add - j * nx;
-          if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
-          if (k == 2 || k == 3) j = (j > 0) ? j - 1 : 0;
-
+          if (k == 0 || k == 2) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;
+          if (k == 0 || k == 1) j = (j > 0) ? j - 1 : 0;
           if (point_in_quad(is_cyclic, nx, ny, i, j, src_add, src_lons, src_lats, plon, plat, src_center_lon,
                             src_center_lat))
             {
               search_result = 1;
               return search_result;
             }
-          /* Otherwise move on to next cell */
         }
-      /*
-        If no cell found, point is likely either in a box that straddles either
-        pole or is outside the grid. Fall back to a distance-weighted average of
-        the four closest points. Go ahead and compute weights here, but store in
-        src_lats and return -add to prevent the parent routine from computing
-        bilinear weights.
-      */
-      // if ( !src_grid->lextrapolate ) return search_result;
+    }
+  
+  /*
+    If no cell found, point is likely either in a box that straddles either pole or is outside the grid.
+    Fall back to a distance-weighted average of the four closest points. Go ahead and compute weights here,
+    but store in src_lats and return -add to prevent the parent routine from computing bilinear weights.
+  */
+  if ( !src_grid->lextrapolate ) return search_result;
 
-      /*
-        printf("Could not find location for %g %g\n", plat*RAD2DEG,
-        plon*RAD2DEG); printf("Using nearest-neighbor for this point\n");
-      */
-      search_result = add;
+  /*
+    printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
+    printf("Using nearest-neighbor average for this point\n");
+  */
+  range = range0;
+  size_t ndist = 4;
+  size_t nadds = gridsearch_qnearest(gs, plon, plat, &range, ndist, src_add, src_lats);
+  if ( nadds == 4 )
+    {
+      for (size_t i = 0; i < 4; ++i) src_lats[i] = sqrt(src_lats[i]);
+          printf("%zu %zu %zu %zu %g %g %g %g\n", src_add[0], src_add[1], src_add[2], src_add[3], src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
+      knnWeightsType knnWeights(4);
+      knnWeights.store_distance(src_add, src_lats, 4);
+      knnWeights.check_distance();
+      nadds = knnWeights.compute_weights();
+      if ( nadds == 4 )
+        {
+          for (size_t i = 0; i < 4; ++i)
+            {
+              src_add[i] = knnWeights.m_addr[i];
+              src_lats[i] = knnWeights.m_dist[i];
+            }
+          printf("%zu %zu %zu %zu %g %g %g %g\n", src_add[0], src_add[1], src_add[2], src_add[3], src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
+          search_result = 1;
+        }
     }
 
   return search_result;
-} /* grid_search_test */
+} /* grid_search_square */
 
 int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src_add[4], double src_lats[4], double src_lons[4])
 {
@@ -347,7 +359,7 @@ int remapSearchSquare(RemapSearch &rsearch, double plon, double plat, size_t src
   else
     {
       if ( rsearch.gs )
-        search_result = grid_search_test(rsearch.gs, src_grid, src_add, src_lats, src_lons, plat, plon);
+        search_result = grid_search_square(rsearch.gs, src_grid, src_add, src_lats, src_lons, plat, plon);
       else
         search_result = grid_search(src_grid, src_add, src_lats, src_lons, plat, plon, rsearch.srcBins);
     }

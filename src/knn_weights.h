@@ -12,10 +12,10 @@ double intlin(double x, double y1, double x1, double y2, double x2);
 class knnWeightsType
 {
 private:
-  size_t m_numNeighbors;
   size_t m_maxNeighbors;
 
 public:
+  size_t m_numNeighbors;
   std::vector<uint8_t> m_mask;  // mask at nearest neighbors
   std::vector<size_t> m_addr;   // source address at nearest neighbors
   std::vector<double> m_dist;   // angular distance four nearest neighbors
@@ -89,6 +89,28 @@ public:
               }
           }
       }
+  }
+
+  inline void
+  store_distance(size_t *addr, double *distance, size_t numNeighbors)
+  {
+    assert(numNeighbors <= m_maxNeighbors);
+    m_numNeighbors = numNeighbors;
+
+    init_addr();
+    init_dist();
+
+    for (size_t i = 0; i < numNeighbors; ++i) store_distance(addr[i], distance[i], numNeighbors);
+  }
+
+  inline void
+  set_distance(size_t *addr, double *distance, size_t numNeighbors)
+  {
+    assert(numNeighbors <= m_maxNeighbors);
+    m_numNeighbors = numNeighbors;
+
+    for (size_t i = 0; i < numNeighbors; ++i) m_addr[i] = addr[i];
+    for (size_t i = 0; i < numNeighbors; ++i) m_dist[i] = distance[i];
   }
 
   inline void

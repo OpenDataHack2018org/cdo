@@ -408,10 +408,9 @@ grid_search(RemapGrid *src_grid, size_t *restrict src_add, double *restrict src_
     }
 
   /*
-    If no cell found, point is likely either in a box that straddles either pole
-    or is outside the grid. Fall back to a distance-weighted average of the four
-    closest points. Go ahead and compute weights here, but store in src_lats and
-    return -add to prevent the parent routine from computing bilinear weights.
+    If no cell found, point is likely either in a box that straddles either pole or is outside the grid.
+    Fall back to a distance-weighted average of the four closest points. Go ahead and compute weights here,
+    but store in src_lats and return -add to prevent the parent routine from computing bilinear weights.
   */
   if (!src_grid->lextrapolate) return search_result;
 

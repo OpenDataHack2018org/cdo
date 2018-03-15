@@ -330,6 +330,8 @@ gs_destroy_full(void *search_container)
 static void *
 gs_create_full(size_t n, const double *restrict lons, const double *restrict lats)
 {
+  if (cdoVerbose) cdoPrint("Init full grid search: n=%zu", n);
+
   struct gsFull *full = (struct gsFull *) Calloc(1, sizeof(struct gsFull));
 
   double **p = (double **) Malloc(n * sizeof(double *));
@@ -415,11 +417,8 @@ gs_set_range(double *prange)
   if (prange)
     range = *prange;
   else
-    range = SQR(2 * M_PI); /* This has to be bigger than the presumed
-                            * maximum distance to the NN but smaller
-                            * than once around the sphere. The content
-                            * of this variable is replaced with the
-                            * distance to the NN squared. */
+    range = SQR(2 * M_PI); /* This has to be bigger than the presumed maximum distance to the NN but smaller than once around
+                              the sphere. The content of this variable is replaced with the distance to the NN squared. */
   return range;
 }
 
@@ -481,7 +480,7 @@ llindex_in_quad(GridSearch *gs, size_t index, double lon, double lat)
       bool is_cyclic = gs->is_cyclic;
       for (unsigned k = 0; k < 4; ++k)
         {
-          /* Determine neighbor addresses */
+          // Determine neighbor addresses
           size_t j = index / nx;
           size_t i = index - j * nx;
           if (k == 1 || k == 3) i = (i > 0) ? i - 1 : (is_cyclic) ? nx - 1 : 0;

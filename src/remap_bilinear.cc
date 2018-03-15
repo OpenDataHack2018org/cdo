@@ -28,12 +28,12 @@ bool
 find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
 {
   bool lfound = false;
-  long iter;                     /*  iteration counters   */
-  double deli, delj;             /*  corrections to iw,jw                   */
-  double dthp, dphp;             /*  difference between point and sw corner */
-  double mat1, mat2, mat3, mat4; /*  matrix elements                        */
-  double determinant;            /*  matrix determinant                     */
-  double converge = 1.e-10;      /* Convergence criterion                   */
+  long iter;                     // iteration counters
+  double deli, delj;             // corrections to iw,jw
+  double dthp, dphp;             // difference between point and sw corner
+  double mat1, mat2, mat3, mat4; // matrix elements
+  double determinant;            // matrix determinant
+  double converge = 1.e-10;      // Convergence criterion
   extern long remap_max_iter;
 
   /* Iterate to find iw,jw for bilinear approximation  */
