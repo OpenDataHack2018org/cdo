@@ -15,6 +15,10 @@
   GNU General Public License for more details.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h" /* _FILE_OFFSET_BITS influence off_t */
+#endif
+
 #include <cdi.h>
 #include "pstream_int.h"
 #include "cdoDebugOutput.h"
