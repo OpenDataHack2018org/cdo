@@ -106,12 +106,14 @@ case "$CC" in
   *)      C_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
 esac
 
+if test -n "$F77" ; then
 case "$F77" in
   pgf*)      F77_VERSION=`$F77 -V | head -2 | tail -n 1`;;
   gfortran*) F77_VERSION=`$F77 --version | head -n 1`;;
   ifort*)    F77_VERSION=`$F77 --version | head -n 1`;;
   *)         F77_VERSION=`$F77 -V 2>&1   | head -n 1 | grep -v error`;;
 esac
+fi
 
 if test -z "$CXX_VERSION" ; then CXX_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(CXX_VERSION, ["$CXX_VERSION"], [CXX Compiler version])
@@ -119,8 +121,10 @@ AC_DEFINE_UNQUOTED(CXX_VERSION, ["$CXX_VERSION"], [CXX Compiler version])
 if test -z "$C_VERSION" ; then C_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(C_VERSION, ["$C_VERSION"], [C Compiler version])
 
+if test -n "$F77" ; then
 if test -z "$F77_VERSION" ; then F77_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(F77_VERSION, ["$F77_VERSION"], [F77 Compiler version])
+fi
 
 # Check for system type
 AC_DEFINE_UNQUOTED([SYSTEM_TYPE],["$ac_cv_build"], [System type])
