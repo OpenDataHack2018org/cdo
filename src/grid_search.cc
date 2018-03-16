@@ -435,14 +435,12 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double *prange
   kdata_t query_pt[3];
   LLtoXYZ(lon, lat, query_pt);
   /*
-  if ( lon*RAD2DEG > -27 && lon*RAD2DEG < 60 &&  lat*RAD2DEG > 30 &&
-  lat*RAD2DEG < 35 )
+  if ( lon*RAD2DEG > -27 && lon*RAD2DEG < 60 &&  lat*RAD2DEG > 30 && lat*RAD2DEG < 35 )
     {
       printf("lon %g lat %g\n", lon*RAD2DEG, lat*RAD2DEG);
       for ( unsigned j = 0; j < 3; ++j )
         if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] )
-          printf("  %g %g\n", query_pt[j] - gs->min[j],  query_pt[j] -
-  gs->max[j]);
+          printf("  %g %g\n", query_pt[j] - gs->min[j],  query_pt[j] - gs->max[j]);
     }
   */
   if (!gs->extrapolate)

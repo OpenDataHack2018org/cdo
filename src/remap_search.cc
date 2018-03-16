@@ -327,22 +327,12 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
   size_t nadds = gridsearch_qnearest(gs, plon, plat, &range, ndist, src_add, src_lats);
   if ( nadds == 4 )
     {
-      for (size_t i = 0; i < 4; ++i) src_lats[i] = sqrt(src_lats[i]);
-          printf("%zu %zu %zu %zu %g %g %g %g\n", src_add[0], src_add[1], src_add[2], src_add[3], src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
-      knnWeightsType knnWeights(4);
-      knnWeights.store_distance(src_add, src_lats, 4);
-      knnWeights.check_distance();
-      nadds = knnWeights.compute_weights();
-      if ( nadds == 4 )
-        {
-          for (size_t i = 0; i < 4; ++i)
-            {
-              src_add[i] = knnWeights.m_addr[i];
-              src_lats[i] = knnWeights.m_dist[i];
-            }
-          printf("%zu %zu %zu %zu %g %g %g %g\n", src_add[0], src_add[1], src_add[2], src_add[3], src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
-          search_result = 1;
-        }
+      for (unsigned i = 0; i < 4; ++i) src_lats[i] = sqrt(src_lats[i]);
+      for (unsigned n = 0; n < 4; ++n) src_lats[n] = 1.0 / (src_lats[n] + TINY);
+      double distance = 0.0;
+      for (unsigned n = 0; n < 4; ++n) distance += src_lats[n];
+      for (unsigned n = 0; n < 4; ++n) src_lats[n] /= distance;
+      search_result = -1;
     }
 
   return search_result;

@@ -103,7 +103,7 @@ grid_search_reg2d_nn(size_t nx, size_t ny, size_t *restrict nbr_add, double *res
 
   Free(sincoslon);
 
-  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = ONE / (nbr_dist[n] + TINY);
+  for (unsigned n = 0; n < 4; ++n) nbr_dist[n] = 1.0 / (nbr_dist[n] + TINY);
   double distance = 0.0;
   for (unsigned n = 0; n < 4; ++n) distance += nbr_dist[n];
   for (unsigned n = 0; n < 4; ++n) nbr_dist[n] /= distance;
