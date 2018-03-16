@@ -5,6 +5,19 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# MapReduce
+#
+for grid  in r18x9 icon_cell; do
+  REFGRID="${grid}_grid"
+  $CDO -f nc -temp,$REFGRID data_${grid}.nc
+  $CDO -f nc -gtc,273.15 -temp,$REFGRID mask_${grid}.nc
+  $CDO -f nc reducegrid,mask_${grid}.nc data_${grid}.nc reduced_${grid}.nc
+  $CDO griddes reduced_${grid}.nc > griddes.${grid}
+  rm -f data_${grid}.nc mask_${grid}.nc reduced_${grid}.nc
+done
+exit
+########################################################################
+#
 # Timstat2
 #
 IFILE=ts_mm_5years
@@ -307,19 +320,6 @@ STATS="min max sum avg mean std std1 var var1"
 IFILE=t21_geosp_tsurf.grb
 for STAT in $STATS; do
   $CDO $FORMAT mer$STAT $IFILE mer${STAT}_ref
-done
-exit
-########################################################################
-#
-# MapReduce
-#
-for grid  in r18x9 icon_cell; do
-  REFGRID="${grid}_grid"
-  $CDO -f nc -temp,$REFGRID data_${grid}.nc
-  $CDO -f nc -gtc,273.15 -temp,$REFGRID mask_${grid}.nc
-  $CDO -f nc reducegrid,mask_${grid}.nc data_${grid}.nc reduced_${grid}.nc
-  $CDO griddes reduced_${grid}.nc > griddes.${grid}
-  rm -f data_${grid}.nc mask_${grid}.nc reduced_${grid}.nc
 done
 exit
 ########################################################################
