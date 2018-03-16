@@ -224,32 +224,52 @@ print_xyvals2D(int gridID, int dig)
       if (gridtype == GRID_CURVILINEAR)
         {
           size_t xsize = gridInqXsize(gridID);
+          size_t ysize = gridInqYsize(gridID);
           if (xsize > 1)
             {
               double *xvals = (double *) malloc((size_t) xsize * sizeof(double));
               for (size_t i = 0; i < xsize; ++i) xvals[i] = xvals2D[i];
               xinc = fabs(xvals[xsize - 1] - xvals[0]) / (xsize - 1);
-              for (size_t i = 2; i < xsize; i++)
+              for (size_t i = 1; i < xsize; i++)
                 if (fabs(fabs(xvals[i - 1] - xvals[i]) - xinc) > 0.01 * xinc)
                   {
                     xinc = 0;
                     break;
                   }
               free(xvals);
+              if ( IS_NOT_EQUAL(xinc, 0) )
+                {
+                  for (size_t i = 1; i < ysize; i++)
+                    if (IS_NOT_EQUAL(xvals2D[i*xsize], xvals2D[0]) ||
+                        IS_NOT_EQUAL(xvals2D[(i+1)*xsize-1], xvals2D[xsize-1]))
+                      {
+                        xinc = 0;
+                        break;
+                      }
+                }
             }
-          size_t ysize = gridInqYsize(gridID);
           if (ysize > 1)
             {
               double *yvals = (double *) malloc((size_t) ysize * sizeof(double));
               for (size_t i = 0; i < ysize; ++i) yvals[i] = yvals2D[i * xsize];
               yinc = fabs(yvals[ysize - 1] - yvals[0]) / (ysize - 1);
-              for (size_t i = 2; i < ysize; i++)
+              for (size_t i = 1; i < ysize; i++)
                 if (fabs(fabs(yvals[i - 1] - yvals[i]) - yinc) > 0.01 * yinc)
                   {
                     yinc = 0;
                     break;
                   }
               free(yvals);
+              if ( IS_NOT_EQUAL(yinc, 0) )
+                {
+                  for (size_t i = 1; i < xsize; i++)
+                    if (IS_NOT_EQUAL(yvals2D[i], yvals2D[0]) ||
+                        IS_NOT_EQUAL(yvals2D[(ysize-1)*xsize+i], yvals2D[(ysize-1)*xsize]))
+                      {
+                        yinc = 0;
+                        break;
+                      }
+                }
             }
         }
 
