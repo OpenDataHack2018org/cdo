@@ -592,8 +592,8 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
   bool useGridsearch = mapType == RemapMethod::DISTWGT;
   if ( src_grid.remap_grid_type != REMAP_GRID_TYPE_REG2D && pointSearchMethod != PointSearchMethod::latbins )
     {
-      // useGridsearch |= mapType == RemapMethod::BILINEAR;
-      // useGridsearch |= mapType == RemapMethod::BICUBIC;
+       useGridsearch |= mapType == RemapMethod::BILINEAR;
+       useGridsearch |= mapType == RemapMethod::BICUBIC;
     }
                     
   if (useGridsearch)

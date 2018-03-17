@@ -5,6 +5,31 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Remap regional grid
+#
+GRID=spain.grid
+cat > $GRID <<EOF
+gridtype=lonlat
+xsize=20
+ysize=18
+xfirst=-13
+yfirst=33
+xinc=.8
+yinc=.8
+EOF
+RMODS="bil bic dis nn con con2 ycon laf"
+IFILE=tsurf_spain.grb
+for RMOD in $RMODS; do
+  OFILE=tsurf_spain_${RMOD}
+  for extra in def off on; do
+      EXTRA="$extra"
+      if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
+      REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},${GRID} $IFILE ${OFILE}_${extra}_ref
+  done
+done
+exit
+########################################################################
+#
 # MapReduce
 #
 for grid  in r18x9 icon_cell; do
@@ -114,31 +139,6 @@ IFILE=t21_geosp_tsurf_sea.grb
 $CDO $FORMAT setmisstoc,0 $IFILE setmisstoc_ref
 $CDO $FORMAT setmisstonn $IFILE setmisstonn_ref
 $CDO $FORMAT setmisstodis $IFILE setmisstodis_ref
-exit
-########################################################################
-#
-# Remap regional grid
-#
-GRID=spain.grid
-cat > $GRID <<EOF
-gridtype=lonlat
-xsize=20
-ysize=18
-xfirst=-13
-yfirst=33
-xinc=.8
-yinc=.8
-EOF
-RMODS="bil bic dis nn con con2 ycon laf"
-IFILE=tsurf_spain.grb
-for RMOD in $RMODS; do
-  OFILE=tsurf_spain_${RMOD}
-  for extra in def off on; do
-      EXTRA="$extra"
-      if [ "$EXTRA" = "def" ]; then EXTRA=""; fi
-      REMAP_EXTRAPOLATE=$EXTRA $CDO $FORMAT remap${RMOD},${GRID} $IFILE ${OFILE}_${extra}_ref
-  done
-done
 exit
 ########################################################################
 #
