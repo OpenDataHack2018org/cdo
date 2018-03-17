@@ -90,6 +90,16 @@ enum T_EIGEN_MODE
 #define M_PI 3.14159265358979323846264338327950288 /* pi */
 #endif
 
+template <typename T>
+inline void vectorFree(std::vector<T> &v)
+{
+  if ( v.size() )
+    {
+      v.clear();
+      v.shrink_to_fit();
+    }
+}
+
 #define VECTOR_2D(T, P2D, N, M)       \
   std::vector<std::vector<T>> P2D(N); \
   if ((N))                            \

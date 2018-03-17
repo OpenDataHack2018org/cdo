@@ -46,55 +46,59 @@ struct search_t
 };
 
 static void
-search_realloc(size_t num_srch_cells, search_t *search)
+cellSearchRealloc(size_t num_srch_cells, search_t &search)
 {
-  if (num_srch_cells > search->max_srch_cells)
+  if (num_srch_cells > search.max_srch_cells)
     {
-      search->partial_areas.resize(num_srch_cells);
-      search->partial_weights.resize(num_srch_cells);
-      search->overlap_buffer.resize(num_srch_cells);
-      search->src_grid_cells.resize(num_srch_cells);
+      search.partial_areas.resize(num_srch_cells);
+      search.partial_weights.resize(num_srch_cells);
+      search.overlap_buffer.resize(num_srch_cells);
+      search.src_grid_cells.resize(num_srch_cells);
 
-      for (size_t n = search->max_srch_cells; n < num_srch_cells; ++n)
+      for (size_t n = search.max_srch_cells; n < num_srch_cells; ++n)
         {
-          search->overlap_buffer[n].array_size = 0;
-          search->overlap_buffer[n].num_corners = 0;
-          search->overlap_buffer[n].edge_type = NULL;
-          search->overlap_buffer[n].coordinates_x = NULL;
-          search->overlap_buffer[n].coordinates_y = NULL;
-          search->overlap_buffer[n].coordinates_xyz = NULL;
+          search.overlap_buffer[n].array_size = 0;
+          search.overlap_buffer[n].num_corners = 0;
+          search.overlap_buffer[n].edge_type = NULL;
+          search.overlap_buffer[n].coordinates_x = NULL;
+          search.overlap_buffer[n].coordinates_y = NULL;
+          search.overlap_buffer[n].coordinates_xyz = NULL;
 
-          search->src_grid_cells[n].array_size = search->srch_corners;
-          search->src_grid_cells[n].num_corners = search->srch_corners;
-          search->src_grid_cells[n].edge_type = search->src_edge_type;
-          search->src_grid_cells[n].coordinates_x = new double[search->srch_corners];
-          search->src_grid_cells[n].coordinates_y = new double[search->srch_corners];
-          search->src_grid_cells[n].coordinates_xyz = new double[3 * search->srch_corners];
+          search.src_grid_cells[n].array_size = search.srch_corners;
+          search.src_grid_cells[n].num_corners = search.srch_corners;
+          search.src_grid_cells[n].edge_type = search.src_edge_type;
+          search.src_grid_cells[n].coordinates_x = new double[search.srch_corners];
+          search.src_grid_cells[n].coordinates_y = new double[search.srch_corners];
+          search.src_grid_cells[n].coordinates_xyz = new double[3 * search.srch_corners];
         }
 
-      search->max_srch_cells = num_srch_cells;
+      search.max_srch_cells = num_srch_cells;
     }
 }
 
 static void
-search_free(search_t *search)
+cellSearchFree(search_t &search)
 {
-  size_t max_srch_cells = search->max_srch_cells;
-
+  size_t max_srch_cells = search.max_srch_cells;
   for (size_t n = 0; n < max_srch_cells; n++)
     {
-      if (search->overlap_buffer[n].array_size > 0)
+      if (search.overlap_buffer[n].array_size > 0)
         {
-          Free(search->overlap_buffer[n].coordinates_x);
-          Free(search->overlap_buffer[n].coordinates_y);
-          if (search->overlap_buffer[n].coordinates_xyz) Free(search->overlap_buffer[n].coordinates_xyz);
-          if (search->overlap_buffer[n].edge_type) Free(search->overlap_buffer[n].edge_type);
+          Free(search.overlap_buffer[n].coordinates_x);
+          Free(search.overlap_buffer[n].coordinates_y);
+          if (search.overlap_buffer[n].coordinates_xyz) Free(search.overlap_buffer[n].coordinates_xyz);
+          if (search.overlap_buffer[n].edge_type) Free(search.overlap_buffer[n].edge_type);
         }
 
-      delete[] search->src_grid_cells[n].coordinates_x;
-      delete[] search->src_grid_cells[n].coordinates_y;
-      delete[] search->src_grid_cells[n].coordinates_xyz;
+      delete[] search.src_grid_cells[n].coordinates_x;
+      delete[] search.src_grid_cells[n].coordinates_y;
+      delete[] search.src_grid_cells[n].coordinates_xyz;
     }
+
+  vectorFree(search.partial_areas);
+  vectorFree(search.partial_weights);
+  vectorFree(search.overlap_buffer);
+  vectorFree(search.src_grid_cells);
 }
 
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm);
@@ -192,7 +196,7 @@ get_srch_cells_reg2d(const size_t *restrict src_grid_dims, const double *restric
         }
     }
 
-  if (debug) printf(" -> num_srch_cells: %zu\n", num_srch_cells);
+  if (debug) printf(" . num_srch_cells: %zu\n", num_srch_cells);
 
   return num_srch_cells;
 }
@@ -353,12 +357,10 @@ cdo_compute_overlap_areas(size_t N, search_t *search, struct grid_cell target_ce
   struct grid_cell *overlap_buffer = &search->overlap_buffer[0];
   struct grid_cell *source_cells = &search->src_grid_cells[0];
 
-  /* Do the clipping and get the cell for the overlapping area */
-
+  // Do the clipping and get the cell for the overlapping area
   yac_cell_clipping(N, source_cells, target_cell, overlap_buffer);
 
-  /* Get the partial areas for the overlapping regions */
-
+  // Get the partial areas for the overlapping regions
   for (size_t n = 0; n < N; n++)
     {
       search->partial_areas[n] = gridcell_area(overlap_buffer[n]);
@@ -485,10 +487,8 @@ cdo_compute_concave_overlap_areas(size_t N, search_t *search, struct grid_cell t
       // to be quite costly.
 
       if (((fabs(target_cell.coordinates_xyz[0 + 3 * corner_a] - target_cell.coordinates_xyz[0 + 3 * corner_b]) < tol)
-           && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_a] - target_cell.coordinates_xyz[1 + 3 * corner_b])
-               < tol)
-           && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_a] - target_cell.coordinates_xyz[2 + 3 * corner_b])
-               < tol))
+           && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_a] - target_cell.coordinates_xyz[1 + 3 * corner_b]) < tol)
+           && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_a] - target_cell.coordinates_xyz[2 + 3 * corner_b]) < tol))
           || ((fabs(target_cell.coordinates_xyz[0 + 3 * corner_a] - target_partial_cell.coordinates_xyz[0]) < tol)
               && (fabs(target_cell.coordinates_xyz[1 + 3 * corner_a] - target_partial_cell.coordinates_xyz[1]) < tol)
               && (fabs(target_cell.coordinates_xyz[2 + 3 * corner_a] - target_partial_cell.coordinates_xyz[2]) < tol))
@@ -511,9 +511,7 @@ cdo_compute_concave_overlap_areas(size_t N, search_t *search, struct grid_cell t
 
       yac_cell_clipping((unsigned) N, source_cell, target_partial_cell, overlap_buffer);
 
-      /* Get the partial areas for the overlapping regions as sum over the
-       * partial target cells. */
-
+      // Get the partial areas for the overlapping regions as sum over the partial target cells.
       for (size_t n = 0; n < N; n++)
         {
           partial_areas[n] += gridcell_area(overlap_buffer[n]);
@@ -859,7 +857,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
       // Create search arrays
 
-      search_realloc(num_srch_cells, &search[ompthID]);
+      cellSearchRealloc(num_srch_cells, search[ompthID]);
 
       double *partial_areas = &search[ompthID].partial_areas[0];
       double *partial_weights = &search[ompthID].partial_weights[0];
@@ -982,7 +980,7 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
   for (int ompthID = 0; ompthID < Threading::ompNumThreads; ++ompthID)
     {
-      search_free(&search[ompthID]);
+      cellSearchFree(search[ompthID]);
 
       delete[] tgt_grid_cell[ompthID].coordinates_x;
       delete[] tgt_grid_cell[ompthID].coordinates_y;
@@ -1016,8 +1014,6 @@ remapConservWeights(RemapSearch &rsearch, RemapVars &rv)
 
 }  // remapConservWeights
 
-// void remapConserv(RemapGrid *src_grid, RemapGrid *tgt_grid, const
-// double* restrict src_array, double* restrict tgt_array, double missval)
 void
 remapConserv(RemapSearch &rsearch, const double *restrict, double *restrict, double)
 {

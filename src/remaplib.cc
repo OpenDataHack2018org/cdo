@@ -556,8 +556,8 @@ remapGridInit(RemapGrid &grid)
 void
 remapGridFree(RemapGrid &grid)
 {
-  if (grid.vgpm.size()) grid.vgpm.resize(0);
-  if (grid.mask.size()) grid.mask.resize(0);
+  vectorFree(grid.vgpm);
+  vectorFree(grid.mask);
 
   if (grid.reg2d_center_lat) Free(grid.reg2d_center_lat);
   if (grid.reg2d_center_lon) Free(grid.reg2d_center_lon);
@@ -569,8 +569,8 @@ remapGridFree(RemapGrid &grid)
   if (grid.cell_corner_lat) Free(grid.cell_corner_lat);
   if (grid.cell_corner_lon) Free(grid.cell_corner_lon);
 
-  if (grid.cell_area.size()) grid.cell_area.resize(0);
-  if (grid.cell_frac.size()) grid.cell_frac.resize(0);
+  vectorFree(grid.cell_area);
+  vectorFree(grid.cell_frac);
 }
 
 void
@@ -628,12 +628,9 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
           if (mapType == RemapMethod::CONSERV || mapType == RemapMethod::CONSERV_YAC)
             {
               calc_lat_bins(search.tgtBins);
-              if ( search.srcBins.bin_lats.size() ) search.srcBins.bin_lats.resize(0);
-              if ( search.tgtBins.bin_lats.size() ) search.tgtBins.bin_lats.resize(0);
-              if (mapType == RemapMethod::CONSERV_YAC)
-                {
-                  if (search.tgtBins.cell_bound_box.size()) search.tgtBins.cell_bound_box.resize(0);
-                }
+              vectorFree(search.srcBins.bin_lats);
+              vectorFree(search.tgtBins.bin_lats);
+              if (mapType == RemapMethod::CONSERV_YAC) vectorFree(search.tgtBins.cell_bound_box);
             }
         }
     }
@@ -642,13 +639,13 @@ remapSearchInit(RemapMethod mapType, RemapSearch &search, RemapGrid &src_grid, R
 void
 remapSearchFree(RemapSearch &search)
 {
-  if (search.srcBins.bin_addr.size()) search.srcBins.bin_addr.resize(0);
-  if (search.srcBins.bin_lats.size()) search.srcBins.bin_lats.resize(0);
-  if (search.srcBins.cell_bound_box.size()) search.srcBins.cell_bound_box.resize(0);
+  vectorFree(search.srcBins.bin_addr);
+  vectorFree(search.srcBins.bin_lats);
+  vectorFree(search.srcBins.cell_bound_box);
 
-  if (search.tgtBins.bin_addr.size()) search.tgtBins.bin_addr.resize(0);
-  if (search.tgtBins.bin_lats.size()) search.tgtBins.bin_lats.resize(0);
-  if (search.tgtBins.cell_bound_box.size()) search.tgtBins.cell_bound_box.resize(0);
+  vectorFree(search.tgtBins.bin_addr);
+  vectorFree(search.tgtBins.bin_lats);
+  vectorFree(search.tgtBins.cell_bound_box);
 
   if (search.gs) gridsearch_delete(search.gs);
   search.gs = NULL;

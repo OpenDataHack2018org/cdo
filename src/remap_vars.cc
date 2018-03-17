@@ -526,9 +526,9 @@ remapVarsFree(RemapVars &rv)
       rv.pinit = false;
       rv.sort_add = false;
 
-      rv.src_cell_add.resize(0);
-      rv.tgt_cell_add.resize(0);
-      rv.wts.resize(0);
+      vectorFree(rv.src_cell_add);
+      vectorFree(rv.tgt_cell_add);
+      vectorFree(rv.wts);
 
       if (rv.links.option)
         {
