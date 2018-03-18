@@ -222,6 +222,10 @@ libcdo_la_SOURCES +=           \
                clipping/dep_list.h           \
                clipping/grid_cell.c          \
                clipping/grid_cell.h          \
+               clipping/sphere_part.c        \
+               clipping/sphere_part.h        \
+               clipping/interval_tree.c      \
+               clipping/interval_tree.h      \
                clipping/intersection.c       \
                clipping/utils.c              \
                clipping/utils.h 

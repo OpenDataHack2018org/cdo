@@ -27,6 +27,7 @@ enum struct PointSearchMethod
   full,
   nanoflann,
   kdtree,
+  spherepart,
   latbins
 };
 
