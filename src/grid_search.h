@@ -22,7 +22,19 @@
 
 #define GS_NOT_FOUND SIZE_MAX
 
-static inline void
+constexpr double
+square(const double x) noexcept
+{
+  return x * x;
+}
+
+constexpr double
+squareDistance(const double *restrict a, const double *restrict b) noexcept
+{
+  return square(a[0] - b[0]) + square(a[1] - b[1]) + square(a[2] - b[2]);
+}
+
+inline void
 cdoLLtoXYZ(double lon, double lat, double *restrict xyz)
 {
   double cos_lat = cos(lat);
@@ -72,7 +84,7 @@ GridSearch *gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double
 GridSearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restrict lons,
                               const double *restrict lats);
 void gridsearch_delete(GridSearch *gs);
-size_t gridsearch_nearest(GridSearch *gs, double lon, double lat, double *range);
+size_t gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double *dist);
 size_t gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist);
 void gridsearch_extrapolate(GridSearch *gs);
 
