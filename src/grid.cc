@@ -207,11 +207,11 @@ grid_copy_mapping(int gridID1, int gridID2)
 void
 grid_to_radian(const char *units, size_t nvals, double *restrict values, const char *description)
 {
-  if (cmpstr(units, "degree") == 0)
+  if (cmpstr(units, "deg") == 0)
     {
       scale_vec(DEG2RAD, nvals, values);
     }
-  else if (cmpstr(units, "radian") == 0)
+  else if (cmpstr(units, "rad") == 0)
     {
       /* No conversion necessary */
     }
@@ -224,11 +224,11 @@ grid_to_radian(const char *units, size_t nvals, double *restrict values, const c
 void
 grid_to_degree(const char *units, size_t nvals, double *restrict values, const char *description)
 {
-  if (cmpstr(units, "radian") == 0)
+  if (cmpstr(units, "rad") == 0)
     {
       for (size_t n = 0; n < nvals; ++n) values[n] *= RAD2DEG;
     }
-  else if (cmpstr(units, "degree") == 0)
+  else if (cmpstr(units, "deg") == 0)
     {
       /* No conversion necessary */
     }
