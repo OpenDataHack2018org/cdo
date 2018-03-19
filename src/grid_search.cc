@@ -34,6 +34,7 @@
 extern "C" {
   //#include "lib/yac/sphere_part.h"
 void *cdo_point_sphere_part_search_new(unsigned num_points, double *coordinates_xyz);
+void cdo_delete_point_sphere_part_search(void * search_container);
 void cdo_point_sphere_part_search_NN(void * search_container,
                                      unsigned num_points, double * x_coordinates,
                                      double * y_coordinates,
@@ -121,18 +122,18 @@ typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double,
     nfTree_t;
 
 static double
-cdo_default_search_radius(void)
+cdoDefaultSearchRadius(void)
 {
   extern double pointSearchRadius;
 
-  double search_radius = pointSearchRadius;
+  double searchRadius = pointSearchRadius;
 
-  if (search_radius < 0.) search_radius = 0.;
-  if (search_radius > 180.) search_radius = 180.;
+  if (searchRadius < 0.) searchRadius = 0.;
+  if (searchRadius > 180.) searchRadius = 180.;
 
-  search_radius = search_radius * DEG2RAD;
+  searchRadius *= DEG2RAD;
 
-  return search_radius;
+  return searchRadius;
 }
 
 static constexpr double
@@ -150,18 +151,14 @@ distance(const double *restrict a, const double *restrict b) noexcept
 void
 setPointSearchMethod(const char *methodstr)
 {
-  if (strcmp(methodstr, "kdtree") == 0)
-    pointSearchMethod = PointSearchMethod::kdtree;
-  else if (strcmp(methodstr, "nanoflann") == 0)
-    pointSearchMethod = PointSearchMethod::nanoflann;
-  else if (strcmp(methodstr, "spherepart") == 0)
-    pointSearchMethod = PointSearchMethod::spherepart;
-  else if (strcmp(methodstr, "full") == 0)
-    pointSearchMethod = PointSearchMethod::full;
-  else if (strcmp(methodstr, "latbins") == 0)
-    pointSearchMethod = PointSearchMethod::latbins;
-  else
-    cdoAbort("gridsearch method %s not available!", methodstr);
+  // clang-format off
+  if      (STR_IS_EQ(methodstr, "kdtree"))     pointSearchMethod = PointSearchMethod::kdtree;
+  else if (STR_IS_EQ(methodstr, "nanoflann"))  pointSearchMethod = PointSearchMethod::nanoflann;
+  else if (STR_IS_EQ(methodstr, "spherepart")) pointSearchMethod = PointSearchMethod::spherepart;
+  else if (STR_IS_EQ(methodstr, "full"))       pointSearchMethod = PointSearchMethod::full;
+  else if (STR_IS_EQ(methodstr, "latbins"))    pointSearchMethod = PointSearchMethod::latbins;
+  else cdoAbort("gridsearch method %s not available!", methodstr);
+  // clang-format on
 }
 
 void
@@ -218,7 +215,7 @@ gridsearch_create_reg2d(bool xIsCyclic, size_t dims[2], const double *restrict l
   gs->coslat = coslat;
   gs->sinlat = sinlat;
 
-  gs->search_radius = cdo_default_search_radius();
+  gs->searchRadius = cdoDefaultSearchRadius();
 
   return gs;
 }
@@ -323,8 +320,8 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
 
   double *coordinates_xyz = (double*) malloc(3 * n * sizeof(*coordinates_xyz));
 
-  kdata_t min[3] = { 1.e9, 1.e9, 1.e9 };
-  kdata_t max[3] = { -1.e9, -1.e9, -1.e9 };
+  double min[3] = { 1.e9, 1.e9, 1.e9 };
+  double max[3] = { -1.e9, -1.e9, -1.e9 };
 
 #ifdef HAVE_OPENMP45
 #pragma omp parallel for reduction(min : min[ : 3]) reduction(max : max[ : 3])
@@ -379,10 +376,7 @@ gs_destroy_full(void *search_container)
 static void
 gs_destroy_spherepart(void *search_container)
 {
-  /*
-  kdTree_t *kdt = (kdTree_t *) search_container;
-  if (kdt) kd_destroyTree(kdt);
-  */
+  cdo_delete_point_sphere_part_search(search_container);
 }
 
 static void *
@@ -431,18 +425,15 @@ gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const double *restri
   gs->plons = lons;
   gs->plats = lats;
 
-  if (gs->method == PointSearchMethod::kdtree)
-    gs->search_container = gs_create_kdtree(n, lons, lats, gs);
-  else if (gs->method == PointSearchMethod::full)
-    gs->search_container = gs_create_full(n, lons, lats);
-  else if (gs->method == PointSearchMethod::nanoflann)
-    gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
-  else if (gs->method == PointSearchMethod::spherepart)
-    gs->search_container = gs_create_spherepart(n, lons, lats, gs);
-  else
-    cdoAbort("%s::method undefined!", __func__);
-
-  gs->search_radius = cdo_default_search_radius();
+  // clang-format off
+  if      (gs->method == PointSearchMethod::kdtree)     gs->search_container = gs_create_kdtree(n, lons, lats, gs);
+  else if (gs->method == PointSearchMethod::full)       gs->search_container = gs_create_full(n, lons, lats);
+  else if (gs->method == PointSearchMethod::nanoflann)  gs->search_container = gs_create_nanoflann(n, lons, lats, gs);
+  else if (gs->method == PointSearchMethod::spherepart) gs->search_container = gs_create_spherepart(n, lons, lats, gs);
+  else cdoAbort("%s::method undefined!", __func__);
+  // clang-format on
+  
+  gs->searchRadius = cdoDefaultSearchRadius();
 
   return gs;
 }
@@ -460,14 +451,12 @@ gridsearch_delete(GridSearch *gs)
       if (gs->sinlat) Free(gs->sinlat);
       if (gs->sinlon) Free(gs->sinlon);
 
-      if (gs->method == PointSearchMethod::kdtree)
-        gs_destroy_kdtree(gs->search_container);
-      else if (gs->method == PointSearchMethod::nanoflann)
-        delete ((PointCloud<double> *) gs->pointcloud);
-      else if (gs->method == PointSearchMethod::spherepart)
-        gs_destroy_spherepart(gs->search_container);
-      else if (gs->method == PointSearchMethod::full)
-        gs_destroy_full(gs->search_container);
+      // clang-format off
+      if      (gs->method == PointSearchMethod::kdtree)     gs_destroy_kdtree(gs->search_container);
+      else if (gs->method == PointSearchMethod::nanoflann)  delete ((PointCloud<double> *) gs->pointcloud);
+      else if (gs->method == PointSearchMethod::spherepart) gs_destroy_spherepart(gs->search_container);
+      else if (gs->method == PointSearchMethod::full)       gs_destroy_full(gs->search_container);
+      // clang-format on
 
       Free(gs);
     }
@@ -498,15 +487,7 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double *prange
 
   kdata_t query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
-  /*
-  if ( lon*RAD2DEG > -27 && lon*RAD2DEG < 60 &&  lat*RAD2DEG > 30 && lat*RAD2DEG < 35 )
-    {
-      printf("lon %g lat %g\n", lon*RAD2DEG, lat*RAD2DEG);
-      for ( unsigned j = 0; j < 3; ++j )
-        if ( query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j] )
-          printf("  %g %g\n", query_pt[j] - gs->min[j],  query_pt[j] - gs->max[j]);
-    }
-  */
+
   if (!gs->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
       if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return index;
@@ -575,15 +556,16 @@ gs_nearest_spherepart(void *search_container, double lon, double lat, double *pr
     for (unsigned j = 0; j < 3; ++j)
       if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return index;
 
-  //kdNode *node = kd_nearest(kdt->node, query_pt, &range, 3);
-
   unsigned local_point_ids_array_size = 0;
   unsigned num_local_point_ids;
   unsigned *local_point_ids = NULL;
+  double cos_angle;
 
-  cdo_point_sphere_part_search_NN(search_container, 1, &lon, &lat, NULL, &local_point_ids,
+  cdo_point_sphere_part_search_NN(search_container, 1, &lon, &lat, &cos_angle, &local_point_ids,
                                   &local_point_ids_array_size, &num_local_point_ids);
 
+  //printf("local_point_ids_array_size %u %u\n", local_point_ids_array_size, num_local_point_ids);
+  //printf("cos_angle %g %g\n", cos_angle, acos(cos_angle));
   double frange = range;
   if (prange) *prange = frange;
 

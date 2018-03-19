@@ -19,14 +19,6 @@
 #include "remap.h"
 #include "grid_search.h"
 
-static inline void
-LLtoXYZ(double lon, double lat, double *restrict xyz)
-{
-  double cos_lat = cos(lat);
-  xyz[0] = cos_lat * cos(lon);
-  xyz[1] = cos_lat * sin(lon);
-  xyz[2] = sin(lat);
-}
 
 static constexpr double
 square(const double x) noexcept
@@ -35,7 +27,7 @@ square(const double x) noexcept
 }
 
 static constexpr double
-distance(const double *restrict a, const double *restrict b) noexcept
+squareDistance(const double *restrict a, const double *restrict b) noexcept
 {
   return square(a[0] - b[0]) + square(a[1] - b[1]) + square(a[2] - b[2]);
 }
@@ -133,8 +125,8 @@ grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &
 
       double xyz[3];
       double query_pt[3];
-      LLtoXYZ(plon, plat, query_pt);
-      double search_radius = SQR(gs->search_radius);
+      cdoLLtoXYZ(plon, plat, query_pt);
+      double sqrSearchRadius = SQR(gs->searchRadius);
 
       for (size_t na = 0; na < num_add; ++na)
         {
@@ -146,11 +138,11 @@ grid_search_nbr_reg2d(GridSearch *gs, double plon, double plat, knnWeightsType &
           xyz[1] = coslat[iy] * sinlon[ix];
           xyz[2] = sinlat[iy];
           // Find distance to this point
-          double dist = (float) distance(query_pt, xyz);
-          if (dist <= search_radius)
+          double sqrDist = (float) squareDistance(query_pt, xyz);
+          if (sqrDist <= sqrSearchRadius)
             {
               // Store the address and distance if this is one of the smallest so far
-              knnWeights.store_distance(nadd, sqrt(dist), numNeighbors);
+              knnWeights.store_distance(nadd, sqrt(sqrDist), numNeighbors);
             }
         }
 
@@ -216,7 +208,7 @@ grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
   size_t *adds = &knnWeights.m_tmpaddr[0];
   double *dist = &knnWeights.m_tmpdist[0];
 
-  const double range0 = SQR(gs->search_radius);
+  const double range0 = SQR(gs->searchRadius);
   double range = range0;
 
   size_t nadds = 0;
@@ -290,7 +282,7 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
   size_t nx = src_grid_dims[0];
   size_t ny = src_grid_dims[1];
 
-  const double range0 = SQR(gs->search_radius);
+  const double range0 = SQR(gs->searchRadius);
   double range = range0;
   size_t add = gridsearch_nearest(gs, plon, plat, &range);
   if (add != GS_NOT_FOUND)

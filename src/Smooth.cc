@@ -89,7 +89,7 @@ smooth(int gridID, double missval, const double *restrict array1, double *restri
   size_t dims[2] = { gridsize, 0 };
   GridSearch *gs = gridsearch_create(xIsCyclic, dims, gridsize, &xvals[0], &yvals[0]);
 
-  gs->search_radius = spoint.radius;
+  gs->searchRadius = spoint.radius;
 
   finish = clock();
 

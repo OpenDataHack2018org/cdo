@@ -1747,6 +1747,18 @@ void yac_delete_point_sphere_part_search(
    free(search);
 }
 
+void cdo_delete_point_sphere_part_search(
+   void * search_container) {
+
+   struct point_sphere_part_search * search = (struct point_sphere_part_search *) search_container;
+   if (search == NULL) return;
+
+   free_point_sphere_part_tree(&(search->base_node));
+   free(search->coordinates_xyz);
+   free(search->inclusive_node_size);
+   free(search);
+}
+
 #ifdef YAC_DEBUG_SPHERE_PART
 struct sphere_part_node * yac_get_sphere_part_tree(struct grid_search * search) {
 

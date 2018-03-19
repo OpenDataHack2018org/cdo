@@ -186,7 +186,7 @@ public:
   }
 
   size_t
-  compute_weights(const uint8_t *src_grid_mask, double search_radius, double weight0, double weightR)
+  compute_weights(const uint8_t *src_grid_mask, double searchRadius, double weight0, double weightR)
   {
     // Compute weights based on inverse distance if mask is false, eliminate those points
 
@@ -198,7 +198,7 @@ public:
         if (m_addr[n] < SIZE_MAX)
           if (src_grid_mask[m_addr[n]])
             {
-              m_dist[n] = intlin(m_dist[n], weight0, 0, weightR, search_radius);
+              m_dist[n] = intlin(m_dist[n], weight0, 0, weightR, searchRadius);
               dist_tot += m_dist[n];
               m_mask[n] = true;
             }

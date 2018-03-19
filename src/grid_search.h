@@ -51,7 +51,7 @@ struct GridSearch
   size_t dims[2];
 
   void *search_container;
-  double search_radius;
+  double searchRadius;
 
   // reg2d search
   double *reg2d_center_lon, *reg2d_center_lat;
