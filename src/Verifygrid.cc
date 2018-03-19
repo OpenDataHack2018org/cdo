@@ -25,7 +25,7 @@
 #include "grid.h"
 #include "pstream_int.h"
 extern "C" {
-#include "clipping/geometry.h"
+#include "lib/yac/geometry.h"
 }
 #include "time.h"
 

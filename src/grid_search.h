@@ -22,6 +22,15 @@
 
 #define GS_NOT_FOUND SIZE_MAX
 
+static inline void
+cdoLLtoXYZ(double lon, double lat, double *restrict xyz)
+{
+  double cos_lat = cos(lat);
+  xyz[0] = cos_lat * cos(lon);
+  xyz[1] = cos_lat * sin(lon);
+  xyz[2] = sin(lat);
+}
+
 enum struct PointSearchMethod
 {
   full,
@@ -64,8 +73,7 @@ GridSearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const do
                               const double *restrict lats);
 void gridsearch_delete(GridSearch *gs);
 size_t gridsearch_nearest(GridSearch *gs, double lon, double lat, double *range);
-size_t gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds,
-                           double *dist);
+size_t gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist);
 void gridsearch_extrapolate(GridSearch *gs);
 
 #endif

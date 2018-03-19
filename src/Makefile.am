@@ -209,26 +209,6 @@ libcdo_la_SOURCES +=           \
                kdtreelib/pmergesort.cc        \
                kdtreelib/pqueue.cc            \
                kdtreelib/pqueue.h
-libcdo_la_SOURCES +=           \
-               clipping/clipping.c           \
-               clipping/clipping.h           \
-               clipping/area.c               \
-               clipping/area.h               \
-               clipping/ensure_array_size.c  \
-               clipping/ensure_array_size.h  \
-               clipping/geometry.h           \
-               clipping/grid.h               \
-               clipping/points.h             \
-               clipping/dep_list.h           \
-               clipping/grid_cell.c          \
-               clipping/grid_cell.h          \
-               clipping/sphere_part.c        \
-               clipping/sphere_part.h        \
-               clipping/interval_tree.c      \
-               clipping/interval_tree.h      \
-               clipping/intersection.c       \
-               clipping/utils.c              \
-               clipping/utils.h 
 #
 bin_PROGRAMS = cdo
 #
@@ -448,6 +428,7 @@ cdo_SOURCES += Magplot.cc       \
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+cdo_LDADD   += $(top_builddir)/src/lib/yac/libyac.la
 if USE_F77
 cdo_LDADD   += $(top_builddir)/src/lib/ncl/libncl.la
 endif

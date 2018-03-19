@@ -32,7 +32,7 @@
 #include "kdtreelib/kdtree.h"
 #include "nanoflann.hpp"
 extern "C" {
-  //#include "clipping/sphere_part.h"
+  //#include "lib/yac/sphere_part.h"
 void *cdo_point_sphere_part_search_new(unsigned num_points, double *coordinates_xyz);
 void cdo_point_sphere_part_search_NN(void * search_container,
                                      unsigned num_points, double * x_coordinates,
@@ -133,15 +133,6 @@ cdo_default_search_radius(void)
   search_radius = search_radius * DEG2RAD;
 
   return search_radius;
-}
-
-static inline void
-LLtoXYZ(double lon, double lat, double *restrict xyz)
-{
-  double cos_lat = cos(lat);
-  xyz[0] = cos_lat * cos(lon);
-  xyz[1] = cos_lat * sin(lon);
-  xyz[2] = sin(lat);
 }
 
 static constexpr double
@@ -248,7 +239,7 @@ gs_create_kdtree(size_t n, const double *restrict lons, const double *restrict l
   for (size_t i = 0; i < n; i++)
     {
       kdata_t *restrict point = pointlist[i].point;
-      LLtoXYZ(lons[i], lats[i], point);
+      cdoLLtoXYZ(lons[i], lats[i], point);
       for (unsigned j = 0; j < 3; ++j)
         {
           min[j] = point[j] < min[j] ? point[j] : min[j];
@@ -291,7 +282,7 @@ gs_create_nanoflann(size_t n, const double *restrict lons, const double *restric
   for (size_t i = 0; i < n; i++)
     {
       double point[3];
-      LLtoXYZ(lons[i], lats[i], point);
+      cdoLLtoXYZ(lons[i], lats[i], point);
       pointcloud->pts[i].x = point[0];
       pointcloud->pts[i].y = point[1];
       pointcloud->pts[i].z = point[2];
@@ -341,7 +332,7 @@ gs_create_spherepart(size_t n, const double *restrict lons, const double *restri
   for (size_t i = 0; i < n; i++)
     {
       double *restrict point = coordinates_xyz + i * 3;
-      LLtoXYZ(lons[i], lats[i], point);
+      cdoLLtoXYZ(lons[i], lats[i], point);
       for (unsigned j = 0; j < 3; ++j)
         {
           min[j] = point[j] < min[j] ? point[j] : min[j];
@@ -410,7 +401,7 @@ gs_create_full(size_t n, const double *restrict lons, const double *restrict lat
 #endif
   for (size_t i = 0; i < n; i++)
     {
-      LLtoXYZ(lons[i], lats[i], p[i]);
+      cdoLLtoXYZ(lons[i], lats[i], p[i]);
     }
 
   full->n = n;
@@ -506,7 +497,7 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double *prange
   kdata_t range = range0;
 
   kdata_t query_pt[3];
-  LLtoXYZ(lon, lat, query_pt);
+  cdoLLtoXYZ(lon, lat, query_pt);
   /*
   if ( lon*RAD2DEG > -27 && lon*RAD2DEG < 60 &&  lat*RAD2DEG > 30 && lat*RAD2DEG < 35 )
     {
@@ -543,7 +534,7 @@ gs_nearest_nanoflann(void *search_container, double lon, double lat, double *pra
   double range = range0;
 
   double query_pt[3];
-  LLtoXYZ(lon, lat, query_pt);
+  cdoLLtoXYZ(lon, lat, query_pt);
 
   if (!gs->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
@@ -578,7 +569,7 @@ gs_nearest_spherepart(void *search_container, double lon, double lat, double *pr
   double range = range0;
 
   double query_pt[3];
-  LLtoXYZ(lon, lat, query_pt);
+  cdoLLtoXYZ(lon, lat, query_pt);
 
   if (!gs->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
@@ -614,7 +605,7 @@ gs_nearest_full(void *search_container, double lon, double lat, double *prange)
   double range0 = gs_set_range(prange);
 
   double query_pt[3];
-  LLtoXYZ(lon, lat, query_pt);
+  cdoLLtoXYZ(lon, lat, query_pt);
 
   size_t n = full->n;
   size_t closestpt = n;
@@ -713,7 +704,7 @@ gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double *prange, size_
   struct pqueue *result = NULL;
 
   kdata_t query_pt[3];
-  LLtoXYZ(lon, lat, query_pt);
+  cdoLLtoXYZ(lon, lat, query_pt);
 
   if (!gs->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
@@ -765,7 +756,7 @@ gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double *prange, si
   double range = range0;
 
   double query_pt[3];
-  LLtoXYZ(lon, lat, query_pt);
+  cdoLLtoXYZ(lon, lat, query_pt);
 
   if (!gs->extrapolate)
     for (unsigned j = 0; j < 3; ++j)
@@ -791,7 +782,7 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double *prange, s
   double range = range0;
 
   double query_pt[3];
-  LLtoXYZ(lon, lat, query_pt);
+  cdoLLtoXYZ(lon, lat, query_pt);
 
   if (!gs->extrapolate)
     for (unsigned j = 0; j < 3; ++j)

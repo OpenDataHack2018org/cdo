@@ -29,9 +29,6 @@
 #include "grid_search.h"
 #include "cdoOptions.h"
 
-extern "C" {
-#include "clipping/geometry.h"
-}
 
 void
 fillmiss(field_type *field1, field_type *field2, int nfill)

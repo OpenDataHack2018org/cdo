@@ -29,9 +29,9 @@ lonlat_to_xyz(double lon, double lat, double *xyz)
 
 /*
 extern "C" {
-#include "clipping/grid.h"
-#include "clipping/grid_cell.h"
-#include "clipping/area.h"
+#include "lib/yac/grid.h"
+#include "lib/yac/grid_cell.h"
+#include "lib/yac/area.h"
 }
 
 static

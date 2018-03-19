@@ -20,10 +20,6 @@
 #include "grid.h"
 #include "grid_search.h"
 
-extern "C" {
-#include "clipping/geometry.h"
-}
-
 constexpr int MAX_CHILDS = 9;
 
 typedef struct
@@ -348,8 +344,8 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
           /* Conversion of corner spherical coordinates to Cartesian
            * coordinates. */
 
-          LLtoXYZ(grid_corner_lon2[cell_no2 * ncorner + corner_no], grid_corner_lat2[cell_no2 * ncorner + corner_no],
-                  corner_coordinates);
+          cdoLLtoXYZ(grid_corner_lon2[cell_no2 * ncorner + corner_no], grid_corner_lat2[cell_no2 * ncorner + corner_no],
+                     corner_coordinates);
 
           /* The components of the result vector are appended to the list of
            * cell corner coordinates. */
@@ -407,7 +403,7 @@ compute_child_from_bounds(cellindex_type *cellindex2, long ncells2, double *grid
           size_t cell_no1 = nbr_addr[i];
           if (cell_no1 < SIZE_MAX)
             {
-              LLtoXYZ(grid_center_lon1[cell_no1], grid_center_lat1[cell_no1], center_point_xyz);
+              cdoLLtoXYZ(grid_center_lon1[cell_no1], grid_center_lat1[cell_no1], center_point_xyz);
 
               switch (coordinate_to_ignore)
                 {

@@ -23,9 +23,9 @@
 #include "timer.h"
 
 extern "C" {
-#include "clipping/clipping.h"
-#include "clipping/area.h"
-#include "clipping/geometry.h"
+#include "lib/yac/clipping.h"
+#include "lib/yac/area.h"
+#include "lib/yac/geometry.h"
 }
 
 //#define STIMER
