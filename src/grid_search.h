@@ -85,7 +85,7 @@ GridSearch *gridsearch_create(bool xIsCyclic, size_t dims[2], size_t n, const do
                               const double *restrict lats);
 void gridsearch_delete(GridSearch *gs);
 size_t gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double *dist);
-size_t gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist);
+size_t gridsearch_qnearest(GridSearch *gs, double lon, double lat, size_t nnn, size_t *adds, double *dist);
 void gridsearch_extrapolate(GridSearch *gs);
 
 #endif

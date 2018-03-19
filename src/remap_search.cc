@@ -176,7 +176,6 @@ grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
       knnWeights.m_addr[numNeighbors]: address of each of the closest points
       knnWeights.m_dist[numNeighbors]: distance to each of the closest points
   */
-
   size_t numNeighbors = knnWeights.maxNeighbors();
 
   // Initialize distance and address arrays
@@ -196,19 +195,14 @@ grid_search_nbr(GridSearch *gs, double plon, double plat, knnWeightsType &knnWei
   size_t *adds = &knnWeights.m_tmpaddr[0];
   double *dist = &knnWeights.m_tmpdist[0];
 
-  const double range0 = SQR(gs->searchRadius);
-  double range = range0;
-
   size_t nadds = 0;
-
   if (numNeighbors == 1)
     {
       nadds = gridsearch_nearest(gs, plon, plat, adds, dist);
     }
   else
     {
-      nadds = gridsearch_qnearest(gs, plon, plat, &range, ndist, adds, dist);
-      for (size_t i = 0; i < nadds; ++i) dist[i] = sqrt(dist[i]);
+      nadds = gridsearch_qnearest(gs, plon, plat, ndist, adds, dist);
     }
 
   ndist = nadds;
@@ -235,19 +229,16 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
                    double plat, double plon)
 {
   /*
-    Output variables:
-
-    int    src_add[4]              ! address of each corner point enclosing P
-    double src_lats[4]             ! latitudes  of the four corner points
-    double src_lons[4]             ! longitudes of the four corner points
-
     Input variables:
 
-    double plat                    ! latitude  of the search point
-    double plon                    ! longitude of the search point
+      plat: latitude  of the search point
+      plon: longitude of the search point
 
-    int src_grid_dims[2]           ! size of each src grid dimension
+    Output variables:
 
+      src_add[4]:   address of each corner point enclosing P
+      src_lats[4]:  latitudes  of the four corner points
+      src_lons[4]:  longitudes of the four corner points
   */
   bool is_cyclic = true;
   int search_result = 0;
@@ -261,8 +252,6 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
   size_t nx = src_grid_dims[0];
   size_t ny = src_grid_dims[1];
 
-  const double range0 = SQR(gs->searchRadius);
-  double range = range0;
   double dist;
   size_t addr;
   size_t nadds = gridsearch_nearest(gs, plon, plat, &addr, &dist);
@@ -291,16 +280,10 @@ grid_search_square(GridSearch *gs, RemapGrid *src_grid, size_t *restrict src_add
   */
   if ( !src_grid->lextrapolate ) return search_result;
 
-  /*
-    printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
-    printf("Using nearest-neighbor average for this point\n");
-  */
-  range = range0;
   size_t ndist = 4;
-  nadds = gridsearch_qnearest(gs, plon, plat, &range, ndist, src_add, src_lats);
+  nadds = gridsearch_qnearest(gs, plon, plat, ndist, src_add, src_lats);
   if ( nadds == 4 )
     {
-      for (unsigned i = 0; i < 4; ++i) src_lats[i] = sqrt(src_lats[i]);
       for (unsigned n = 0; n < 4; ++n) src_lats[n] = 1.0 / (src_lats[n] + TINY);
       double distance = 0.0;
       for (unsigned n = 0; n < 4; ++n) distance += src_lats[n];

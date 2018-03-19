@@ -450,19 +450,6 @@ gridsearch_delete(GridSearch *gs)
     }
 }
 
-static double
-gs_set_range(double *prange)
-{
-  double range;
-
-  if (prange)
-    range = *prange;
-  else
-    range = SQR(2 * M_PI); /* This has to be bigger than the presumed maximum distance to the NN but smaller than once around
-                              the sphere. The content of this variable is replaced with the distance to the NN squared. */
-  return range;
-}
-
 static size_t
 gs_nearest_kdtree(void *search_container, double lon, double lat, double searchRadius, size_t *addr, double *dist, GridSearch *gs)
 {
@@ -470,7 +457,7 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double searchR
   if (kdt == NULL) return 0;
 
   double sqrDistMax = SQR(searchRadius);
-  double range = sqrDistMax;
+  double sqrDist = sqrDistMax;
 
   double query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
@@ -479,12 +466,13 @@ gs_nearest_kdtree(void *search_container, double lon, double lat, double searchR
     for (unsigned j = 0; j < 3; ++j)
       if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return 0;
 
-  kdNode *node = kd_nearest(kdt->node, query_pt, &range, 3);
+  kdNode *node = kd_nearest(kdt->node, query_pt, &sqrDist, 3);
 
-  if (node && range < sqrDistMax)
+
+  if (node && sqrDist < sqrDistMax)
     {
       *addr = node->index;
-      *dist = sqrt(range);
+      *dist = sqrt(sqrDist);
       return 1;
     }
 
@@ -512,7 +500,6 @@ gs_nearest_nanoflann(void *search_container, double lon, double lat, double sear
   nanoflann::KNNResultSet<double> resultSet(sqrDistMax, num_results);
   resultSet.init(&retIndex, &sqrDist);
   nft->findNeighbors(resultSet, query_pt, nanoflann::SearchParams(10));
-  // printf("%zu %g\n", ret_index, out_dist_sqr);
 
   if (retIndex != GS_NOT_FOUND)
     {
@@ -545,6 +532,8 @@ gs_nearest_spherepart(void *search_container, double lon, double lat, double sea
   size_t nadd = 0;
   if ( num_local_point_ids > 0 )
     {
+      if ( cos_angle < -1 ) cos_angle = -1;
+      if ( cos_angle >  1 ) cos_angle =  1;
       *dist = acos(cos_angle);
       if ( *dist <= searchRadius )
         {
@@ -644,7 +633,7 @@ gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double 
         {
           size_t index = *addr;
           if (!gs->extrapolate && gs->is_curve) index = llindex_in_quad(gs, *addr, lon, lat);
-          if (index!=GS_NOT_FOUND) return 1;
+          if (index != GS_NOT_FOUND) return 1;
         }
     }
 
@@ -652,15 +641,15 @@ gridsearch_nearest(GridSearch *gs, double lon, double lat, size_t *addr, double 
 }
 
 static size_t
-gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
+gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
   kdTree_t *kdt = (kdTree_t *) gs->search_container;
   if (kdt == NULL) return nadds;
 
-  kdata_t range0 = gs_set_range(prange);
-  kdata_t range = range0;
+  double sqrDistMax = SQR(searchRadius);
+  kdata_t sqrDist = sqrDistMax;
   struct pqueue *result = NULL;
 
   kdata_t query_pt[3];
@@ -672,11 +661,7 @@ gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double *prange, size_
 
   if (gs)
     {
-      result = kd_qnearest(kdt->node, query_pt, &range, nnn, 3);
-      // printf("range %g %g %g %p\n", lon, lat, range, node);
-
-      kdata_t frange = range;
-
+      result = kd_qnearest(kdt->node, query_pt, &sqrDist, nnn, 3);
       if (result)
         {
           size_t index;
@@ -684,36 +669,33 @@ gs_qnearest_kdtree(GridSearch *gs, double lon, double lat, double *prange, size_
           while (pqremove_min(result, &p))
             {
               index = p->node->index;
-              range = p->dist_sq;
+              sqrDist = p->dist_sq;
               Free(p);  // Free the result node taken from the heap
 
-              if (range < range0)
+              if (sqrDist < sqrDistMax)
                 {
-                  dist[nadds] = range;
                   adds[nadds] = index;
+                  dist[nadds] = sqrt(sqrDist);
                   nadds++;
                 }
             }
           Free(result->d);  // free the heap
           Free(result);     // and free the heap information structure
         }
-
-      if (prange) *prange = frange;
     }
 
   return nadds;
 }
 
 static size_t
-gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
+gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
   nfTree_t *nft = (nfTree_t *) gs->search_container;
   if (nft == NULL) return nadds;
 
-  double range0 = gs_set_range(prange);
-  double range = range0;
+  double sqrDistMax = SQR(searchRadius);
 
   double query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
@@ -722,24 +704,16 @@ gs_qnearest_nanoflann(GridSearch *gs, double lon, double lat, double *prange, si
     for (unsigned j = 0; j < 3; ++j)
       if (query_pt[j] < gs->min[j] || query_pt[j] > gs->max[j]) return nadds;
 
-  if (gs)
-    {
-      nadds = nft->knnRangeSearch(&query_pt[0], range, nnn, &adds[0], &dist[0]);
-
-      double frange = range;
-      if (prange) *prange = frange;
-    }
+  nadds = nft->knnRangeSearch(&query_pt[0], sqrDistMax, nnn, &adds[0], &dist[0]);
+  for ( size_t i = 0; i < nadds; ++i ) dist[i] = sqrt(dist[i]);
 
   return nadds;
 }
 
 static size_t
-gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
+gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double searchRadius, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
-
-  double range0 = gs_set_range(prange);
-  double range = range0;
 
   double query_pt[3];
   cdoLLtoXYZ(lon, lat, query_pt);
@@ -754,19 +728,31 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double *prange, s
       unsigned num_local_point_ids;
       unsigned *local_point_ids = NULL;
 
-      cdo_point_sphere_part_search_NNN(gs->search_container, 1, &lon, &lat, nnn, NULL, NULL,
+      unsigned cos_angles_array_size = 0;
+      double *cos_angles = NULL;
+
+      cdo_point_sphere_part_search_NNN(gs->search_container, 1, &lon, &lat, nnn, &cos_angles, &cos_angles_array_size,
                                        &local_point_ids, &local_point_ids_array_size, &num_local_point_ids);
       nadds = num_local_point_ids;
       if ( nadds )
         {
-          for ( size_t k = 0; k < nadds; ++k )
+          size_t naddsmax = nadds;
+          nadds = 0;
+          for (size_t i = 0; i < naddsmax; ++i)
             {
-              size_t nadd;
-              adds[k] = local_point_ids[k];
-              dist[k] = 1;
+              if ( cos_angles[i] < -1 ) cos_angles[i] = -1;
+              if ( cos_angles[i] >  1 ) cos_angles[i] =  1;
+              double angle = acos(cos_angles[i]);
+              if ( angle < searchRadius )
+                {
+                  adds[nadds] = local_point_ids[i];
+                  dist[nadds] = angle;
+                  nadds++;
+                }       
             }
         }
 
+      free(cos_angles);
       free(local_point_ids);
     }
 
@@ -774,31 +760,31 @@ gs_qnearest_spherepart(GridSearch *gs, double lon, double lat, double *prange, s
 }
 
 size_t
-gridsearch_qnearest(GridSearch *gs, double lon, double lat, double *prange, size_t nnn, size_t *adds, double *dist)
+gridsearch_qnearest(GridSearch *gs, double lon, double lat, size_t nnn, size_t *adds, double *dist)
 {
   size_t nadds = 0;
 
   if (gs)
     {
+      double searchRadius = gs->searchRadius;
       // clang-format off
-      if      ( gs->method == PointSearchMethod::kdtree )     nadds = gs_qnearest_kdtree(gs, lon, lat, prange, nnn, adds, dist);
-      else if ( gs->method == PointSearchMethod::nanoflann )  nadds = gs_qnearest_nanoflann(gs, lon, lat, prange, nnn, adds, dist);
-      else if ( gs->method == PointSearchMethod::spherepart ) nadds = gs_qnearest_spherepart(gs, lon, lat, prange, nnn, adds, dist);
+      if      ( gs->method == PointSearchMethod::kdtree )     nadds = gs_qnearest_kdtree(gs, lon, lat, searchRadius, nnn, adds, dist);
+      else if ( gs->method == PointSearchMethod::nanoflann )  nadds = gs_qnearest_nanoflann(gs, lon, lat, searchRadius, nnn, adds, dist);
+      else if ( gs->method == PointSearchMethod::spherepart ) nadds = gs_qnearest_spherepart(gs, lon, lat, searchRadius, nnn, adds, dist);
       else cdoAbort("%s::method undefined!", __func__);
       // clang-format on
 
       if (!gs->extrapolate && gs->is_curve)
         {
-          size_t nadds_old = nadds;
+          size_t naddsmax = nadds;
           nadds = 0;
-          for (size_t i = 0; i < nadds_old; ++i)
+          for (size_t i = 0; i < naddsmax; ++i)
             {
-              size_t index = adds[i];
-              index = llindex_in_quad(gs, index, lon, lat);
+              size_t index = llindex_in_quad(gs, adds[i], lon, lat);
               if (index != GS_NOT_FOUND)
                 {
-                  dist[nadds] = dist[i];
                   adds[nadds] = adds[i];
+                  dist[nadds] = dist[i];
                   nadds++;
                 }
             }
