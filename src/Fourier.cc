@@ -29,21 +29,20 @@ Fourier(void *process)
 {
   int bit;
   int nrecs;
-  int gridID, varID, levelID;
+  int varID, levelID;
   int nalloc = 0;
   size_t nmiss;
-  typedef struct
+  struct memory_t
   {
     double *real;
     double *imag;
     double *work_r;
     double *work_i;
-  } memory_t;
+  };
 
   cdoInitialize(process);
 
-  operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse "
-                   "transformation)!");
+  operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse transformation)!");
   int sign = parameter2int(operatorArgv()[0]);
 
   int streamID1 = cdoStreamOpenRead(cdoStreamName(0));
@@ -82,7 +81,7 @@ Fourier(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          gridID = vlistInqVarGrid(vlistID1, varID);
+          int gridID = vlistInqVarGrid(vlistID1, varID);
           size_t gridsize = gridInqSize(gridID);
           vars[tsID][varID][levelID].ptr = (double *) Malloc(2 * gridsize * sizeof(double));
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
@@ -111,7 +110,7 @@ Fourier(void *process)
 
   for (varID = 0; varID < nvars; varID++)
     {
-      gridID = vlistInqVarGrid(vlistID1, varID);
+      int gridID = vlistInqVarGrid(vlistID1, varID);
       double missval = vlistInqVarMissval(vlistID1, varID);
       size_t gridsize = gridInqSize(gridID);
       int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
