@@ -211,7 +211,7 @@ check_lon_range(size_t nlons, double *lons)
       if (lons[n] > 2 * PI2) lons[n] = PI2;
 
       if (lons[n] > PI2) lons[n] -= PI2;
-      if (lons[n] < ZERO) lons[n] += PI2;
+      if (lons[n] < 0.0) lons[n] += PI2;
     }
 }
 
@@ -861,14 +861,14 @@ remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gra
 #endif
   for (size_t n = 0; n < grid_size; ++n)
     {
-      grad_lat[n] = ZERO;
-      grad_lon[n] = ZERO;
-      grad_latlon[n] = ZERO;
+      grad_lat[n] = 0.0;
+      grad_lon[n] = 0.0;
+      grad_latlon[n] = 0.0;
 
       if (grid.mask[n])
         {
-          double delew = HALF;
-          double delns = HALF;
+          double delew = 0.5;
+          double delns = 0.5;
 
           size_t j = n / nx + 1;
           size_t i = n - (j - 1) * nx + 1;
@@ -883,12 +883,12 @@ remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gra
           if (jp1 > ny)
             {
               jp1 = j;
-              delns = ONE;
+              delns = 1.0;
             }
           if (jm1 < 1)
             {
               jm1 = j;
-              delns = ONE;
+              delns = 1.0;
             }
 
           size_t in = (jp1 - 1) * nx + i - 1;
@@ -905,12 +905,12 @@ remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gra
           if (!grid.mask[ie])
             {
               ie = n;
-              delew = ONE;
+              delew = 1.0;
             }
           if (!grid.mask[iw])
             {
               iw = n;
-              delew = ONE;
+              delew = 1.0;
             }
 
           grad_lat[n] = delew * (array[ie] - array[iw]);
@@ -919,40 +919,40 @@ remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gra
           if (!grid.mask[in])
             {
               in = n;
-              delns = ONE;
+              delns = 1.0;
             }
           if (!grid.mask[is])
             {
               is = n;
-              delns = ONE;
+              delns = 1.0;
             }
 
           grad_lon[n] = delns * (array[in] - array[is]);
 
           // Compute ij-gradient
-          delew = HALF;
-          delns = (jp1 == j || jm1 == j) ? ONE : HALF;
+          delew = 0.5;
+          delns = (jp1 == j || jm1 == j) ? 1.0 : 0.5;
 
           if (!grid.mask[ine])
             {
               if (in != n)
                 {
                   ine = in;
-                  delew = ONE;
+                  delew = 1.0;
                 }
               else if (ie != n)
                 {
                   ine = ie;
                   inw = iw;
-                  if (inw == n) delew = ONE;
-                  delns = ONE;
+                  if (inw == n) delew = 1.0;
+                  delns = 1.0;
                 }
               else
                 {
                   ine = n;
                   inw = iw;
-                  delew = ONE;
-                  delns = ONE;
+                  delew = 1.0;
+                  delns = 1.0;
                 }
             }
 
@@ -961,21 +961,21 @@ remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gra
               if (in != n)
                 {
                   inw = in;
-                  delew = ONE;
+                  delew = 1.0;
                 }
               else if (iw != n)
                 {
                   inw = iw;
                   ine = ie;
-                  if (ie == n) delew = ONE;
-                  delns = ONE;
+                  if (ie == n) delew = 1.0;
+                  delns = 1.0;
                 }
               else
                 {
                   inw = n;
                   ine = ie;
-                  delew = ONE;
-                  delns = ONE;
+                  delew = 1.0;
+                  delns = 1.0;
                 }
             }
 
@@ -986,21 +986,21 @@ remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gra
               if (is != n)
                 {
                   ise = is;
-                  delew = ONE;
+                  delew = 1.0;
                 }
               else if (ie != n)
                 {
                   ise = ie;
                   isw = iw;
-                  if (isw == n) delew = ONE;
-                  delns = ONE;
+                  if (isw == n) delew = 1.0;
+                  delns = 1.0;
                 }
               else
                 {
                   ise = n;
                   isw = iw;
-                  delew = ONE;
-                  delns = ONE;
+                  delew = 1.0;
+                  delns = 1.0;
                 }
             }
 
@@ -1009,21 +1009,21 @@ remapGradients(RemapGrid &grid, const double *restrict array, gradientsType &gra
               if (is != n)
                 {
                   isw = is;
-                  delew = ONE;
+                  delew = 1.0;
                 }
               else if (iw != n)
                 {
                   isw = iw;
                   ise = ie;
-                  if (ie == n) delew = ONE;
-                  delns = ONE;
+                  if (ie == n) delew = 1.0;
+                  delns = 1.0;
                 }
               else
                 {
                   isw = n;
                   ise = ie;
-                  delew = ONE;
-                  delns = ONE;
+                  delew = 1.0;
+                  delns = 1.0;
                 }
             }
 

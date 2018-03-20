@@ -22,7 +22,7 @@
 #include "timer.h"
 #include "cdoOptions.h"
 
-// Bilinear interpolation
+// bilinear interpolation
 
 bool
 find_ij_weights(double plon, double plat, double *restrict src_lons, double *restrict src_lats, double *ig, double *jg)
@@ -58,8 +58,8 @@ find_ij_weights(double plon, double plat, double *restrict src_lons, double *res
   dph3 = dph3 - dph2;
 
   // current guess for bilinear coordinate
-  double iguess = HALF;
-  double jguess = HALF;
+  double iguess = 0.5;
+  double jguess = 0.5;
 
   for (iter = 0; iter < remap_max_iter; ++iter)
     {
@@ -96,7 +96,7 @@ find_ij_weights(double plon, double plat, double *restrict src_lons, double *res
 }
 
 static void
-set_bilinear_weights(double iw, double jw, double wgts[4])
+bilinearSetWeights(double iw, double jw, double wgts[4])
 {
   // clang-format off
   wgts[0] = (1.-iw) * (1.-jw);
@@ -131,35 +131,14 @@ renormalizeWeights(const double src_lats[4], double wgts[4])
 }
 
 static void
-bilinearWarning(double plon, double plat, double iw, double jw, size_t *src_add, double *src_lons, double *src_lats,
-                RemapGrid *src_grid)
+bilinearWarning(void)
 {
   static bool lwarn = true;
-
-  if (cdoVerbose)
-    {
-      cdoPrint("Point coords: %g %g", plat * RAD2DEG, plon * RAD2DEG);
-      cdoPrint("Src grid lats: %g %g %g %g", src_lats[0] * RAD2DEG, src_lats[1] * RAD2DEG, src_lats[2] * RAD2DEG,
-               src_lats[3] * RAD2DEG);
-      cdoPrint("Src grid lons: %g %g %g %g", src_lons[0] * RAD2DEG, src_lons[1] * RAD2DEG, src_lons[2] * RAD2DEG,
-               src_lons[3] * RAD2DEG);
-      cdoPrint("Src grid addresses: %zu %zu %zu %zu", src_add[0], src_add[1], src_add[2], src_add[3]);
-      cdoPrint("Src grid lats: %g %g %g %g", src_grid->cell_center_lat[src_add[0]] * RAD2DEG,
-               src_grid->cell_center_lat[src_add[1]] * RAD2DEG, src_grid->cell_center_lat[src_add[2]] * RAD2DEG,
-               src_grid->cell_center_lat[src_add[3]] * RAD2DEG);
-      cdoPrint("Src grid lons: %g %g %g %g", src_grid->cell_center_lon[src_add[0]] * RAD2DEG,
-               src_grid->cell_center_lon[src_add[1]] * RAD2DEG, src_grid->cell_center_lon[src_add[2]] * RAD2DEG,
-               src_grid->cell_center_lon[src_add[3]] * RAD2DEG);
-      cdoPrint("Current iw,jw : %g %g", iw, jw);
-    }
 
   if (cdoVerbose || lwarn)
     {
       lwarn = false;
-      //  cdoWarning("Iteration for iw,jw exceed max iteration count of %d!",
-      //  remap_max_iter);
-      cdoWarning("Bilinear interpolation failed for some grid points - used a "
-                 "distance-weighted average instead!");
+      cdoWarning("Bilinear interpolation failed for some grid points - used a distance-weighted average instead!");
     }
 }
 
@@ -168,8 +147,7 @@ bilinearRemap(double *restrict tgt_point, const double *restrict src_array, cons
               const size_t src_add[4])
 {
   // *tgt_point = 0.;
-  // for ( unsigned n = 0; n < 4; ++n ) *tgt_point +=
-  // src_array[src_add[n]]*wgts[n];
+  // for ( unsigned n = 0; n < 4; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
   *tgt_point = src_array[src_add[0]] * wgts[0] + src_array[src_add[1]] * wgts[1] + src_array[src_add[2]] * wgts[2]
                + src_array[src_add[3]] * wgts[3];
 }
@@ -187,10 +165,9 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
   RemapGrid *src_grid = rsearch.srcGrid;
   RemapGrid *tgt_grid = rsearch.tgtGrid;;
 
-  extern int timer_remap_bil;
-
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
+  extern int timer_remap_bil;
   if (cdoTimer) timer_start(timer_remap_bil);
 
   progressInit();
@@ -250,12 +227,12 @@ remapBilinearWeights(RemapSearch &rsearch, RemapVars &rv)
           if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
-              set_bilinear_weights(iw, jw, wgts);
+              bilinearSetWeights(iw, jw, wgts);
               storeWeightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
             }
           else
             {
-              bilinearWarning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
+              bilinearWarning();
               search_result = -1;
             }
         }
@@ -294,10 +271,9 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
   RemapGrid *src_grid = rsearch.srcGrid;
   RemapGrid *tgt_grid = rsearch.tgtGrid;;
 
-  extern int timer_remap_bil;
-
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
+  extern int timer_remap_bil;
   if (cdoTimer) timer_start(timer_remap_bil);
 
   progressInit();
@@ -352,13 +328,13 @@ remapBilinear(RemapSearch &rsearch, const double *restrict src_array, double *re
           if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
-              set_bilinear_weights(iw, jw, wgts);
+              bilinearSetWeights(iw, jw, wgts);
               sort_add_and_wgts(4, src_add, wgts);
               bilinearRemap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
             }
           else
             {
-              bilinearWarning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
+              bilinearWarning();
               search_result = -1;
             }
         }

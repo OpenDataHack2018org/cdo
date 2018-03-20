@@ -30,6 +30,12 @@
 #include "cdoOptions.h"
 #include "timer.h"
 
+#define ZERO 0.0
+#define ONE 1.0
+#define TWO 2.0
+#define HALF 0.5
+#define QUART 0.25
+
 /* #define  BABY_STEP  0.001 */ /* original value */
 #define BABY_STEP 0.001
 

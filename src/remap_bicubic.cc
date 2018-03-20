@@ -21,14 +21,10 @@
 #include "remap_store_link.h"
 #include "timer.h"
 
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-/*                                                                         */
-/*      BICUBIC INTERPOLATION                                              */
-/*                                                                         */
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+// bicubic interpolation
 
 static void
-set_bicubic_weights(double iw, double jw, double wgts[4][4])
+bicubicSetWeights(double iw, double jw, double wgts[4][4])
 {
   // clang-format off
   wgts[0][0] = (1.-jw*jw*(3.-2.*jw))  * (1.-iw*iw*(3.-2.*iw));
@@ -64,23 +60,20 @@ renormalizeWeights(const double src_lats[4], double wgts[4][4])
 }
 
 static void
-bicubic_warning(void)
+bicubicWarning(void)
 {
   static bool lwarn = true;
 
   if (cdoVerbose || lwarn)
     {
       lwarn = false;
-      // cdoWarning("Iteration for iw,jw exceed max iteration count of %d!",
-      // remap_max_iter);
-      cdoWarning("Bicubic interpolation failed for some grid points - used a "
-                 "distance-weighted average instead!");
+      cdoWarning("Bicubic interpolation failed for some grid points - used a distance-weighted average instead!");
     }
 }
 
 static void
-bicubic_remap(double *restrict tgt_point, const double *restrict src_array, double wgts[4][4], const size_t src_add[4],
-              gradientsType &gradients)
+bicubicRemap(double *restrict tgt_point, const double *restrict src_array, double wgts[4][4], const size_t src_add[4],
+             gradientsType &gradients)
 {
   const double *restrict glat = &gradients.grad_lat[0];
   const double *restrict glon = &gradients.grad_lon[0];
@@ -124,13 +117,13 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
   for (unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4 * tgt_cell_add;
 
-  // Loop over destination grid
-
   double findex = 0;
 
+  // Loop over destination grid
+
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, weightlinks, tgt_grid_size, \
-                                                                    src_grid, tgt_grid, rv)
+#pragma omp parallel for default(none) reduction(+ : findex) \
+  shared(rsearch, weightlinks, tgt_grid_size, src_grid, tgt_grid, rv)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -141,8 +134,8 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
 
       if (!tgt_grid->mask[tgt_cell_add]) continue;
 
-      double plat = tgt_grid->cell_center_lat[tgt_cell_add];
-      double plon = tgt_grid->cell_center_lon[tgt_cell_add];
+      double plon = 0, plat = 0;
+      remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
       size_t src_add[4];   //  address for the four source points
       double src_lats[4];  //  latitudes  of four bilinear corners
@@ -168,12 +161,12 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
           if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
-              set_bicubic_weights(iw, jw, wgts);
+              bicubicSetWeights(iw, jw, wgts);
               storeWeightlinks4(4, src_add, wgts, tgt_cell_add, weightlinks);
             }
           else
             {
-              bicubic_warning();
+              bicubicWarning();
               search_result = -1;
             }
         }
@@ -193,11 +186,10 @@ remapBicubicWeights(RemapSearch &rsearch, RemapVars &rv)
         }
     }
 
-  if (cdoTimer) timer_stop(timer_remap_bic);
-
   weightlinks2remaplinks4(tgt_grid_size, weightlinks, rv);
 
-} /* scrip_remap_weights_bicubic */
+  if (cdoTimer) timer_stop(timer_remap_bic);
+} // scrip_remap_weights_bicubic
 
 /*
   -----------------------------------------------------------------------
@@ -215,6 +207,9 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
 
   if (cdoVerbose) cdoPrint("Called %s()", __func__);
 
+  extern int timer_remap_bic;
+  if (cdoTimer) timer_start(timer_remap_bic);
+
   progressInit();
 
   size_t tgt_grid_size = tgt_grid->size;
@@ -226,14 +221,13 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
   gradientsType gradients(src_grid->size);
   remapGradients(*src_grid, src_array, gradients);
 
-  // Loop over destination grid
-
   double findex = 0;
 
+  // Loop over destination grid
+
 #ifdef HAVE_OPENMP4
-#pragma omp parallel for default(none) reduction(+ : findex) shared(rsearch, tgt_grid_size, src_grid, \
-                                                                    tgt_grid, src_array, tgt_array, missval,  \
-                                                                    gradients)
+#pragma omp parallel for default(none) reduction(+ : findex) \
+  shared(rsearch, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, gradients)
 #endif
   for (size_t tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add)
     {
@@ -244,8 +238,8 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
 
       if (!tgt_grid->mask[tgt_cell_add]) continue;
 
-      double plat = tgt_grid->cell_center_lat[tgt_cell_add];
-      double plon = tgt_grid->cell_center_lon[tgt_cell_add];
+      double plon = 0, plat = 0;
+      remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
       size_t src_add[4];   //  address for the four source points
       double src_lats[4];  //  latitudes  of four bilinear corners
@@ -271,13 +265,13 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
           if (find_ij_weights(plon, plat, src_lons, src_lats, &iw, &jw))
             {
               // Successfully found iw,jw - compute weights
-              set_bicubic_weights(iw, jw, wgts);
+              bicubicSetWeights(iw, jw, wgts);
               sort_add_and_wgts4(4, src_add, wgts);
-              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, gradients);
+              bicubicRemap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, gradients);
             }
           else
             {
-              bicubic_warning();
+              bicubicWarning();
               search_result = -1;
             }
         }
@@ -293,8 +287,10 @@ remapBicubic(RemapSearch &rsearch, const double *restrict src_array, double *res
               tgt_grid->cell_frac[tgt_cell_add] = 1.;
               renormalizeWeights(src_lats, wgts);
               sort_add_and_wgts4(4, src_add, wgts);
-              bicubic_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, gradients);
+              bicubicRemap(&tgt_array[tgt_cell_add], src_array, wgts, src_add, gradients);
             }
         }
     }
+
+  if (cdoTimer) timer_stop(timer_remap_bic);
 }  // remapBicubic

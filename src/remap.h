@@ -33,12 +33,7 @@ constexpr float  PI_f = PI;
 constexpr float  PI2_f = PI2;
 constexpr float  PIH_f = PIH;
 
-#define ZERO 0.0
-#define ONE 1.0
-#define TWO 2.0
 #define THREE 3.0
-#define HALF 0.5
-#define QUART 0.25
 #define TINY 1.e-14
 
 #define REMAP_GRID_TYPE_REG2D 1
