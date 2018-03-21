@@ -110,11 +110,11 @@ Math(void *process)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
-  if (vlistNumber(vlistID1) != CDI_REAL) gridsize *= 2;
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
+  if (vlistNumber(vlistID1) != CDI_REAL) gridsizemax *= 2;
 
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsizemax);
+  std::vector<double> array2(gridsizemax);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
   pstreamDefVlist(streamID2, vlistID2);
@@ -128,10 +128,10 @@ Math(void *process)
       for (int recID = 0; recID < nrecs; recID++)
         {
           pstreamInqRecord(streamID1, &varID, &levelID);
-          pstreamReadRecord(streamID1, array1, &nmiss);
+          pstreamReadRecord(streamID1, &array1[0], &nmiss);
 
           double missval1 = vlistInqVarMissval(vlistID1, varID);
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          size_t gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           int number = vlistInqVarNumber(vlistID1, varID);
 
           if (number == CDI_REAL)
@@ -227,9 +227,9 @@ Math(void *process)
                 }
             }
 
-          nmiss = arrayNumMV(gridsize, array2, missval1);
+          nmiss = arrayNumMV(gridsize, &array2[0], missval1);
           pstreamDefRecord(streamID2, varID, levelID);
-          pstreamWriteRecord(streamID2, array2, nmiss);
+          pstreamWriteRecord(streamID2, &array2[0], nmiss);
         }
 
       tsID++;
@@ -239,9 +239,6 @@ Math(void *process)
   pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  if (array2) Free(array2);
-  if (array1) Free(array1);
 
   cdoFinish();
 
