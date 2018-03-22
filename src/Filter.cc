@@ -84,19 +84,16 @@ filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 {
   bool lpower2 = ((nts & (nts - 1)) == 0);
 
-  double *work_r = NULL;
-  double *work_i = NULL;
+  std::vector<double> work_r;
+  std::vector<double> work_i;
 
-  if (!lpower2)
-    {
-      work_r = (double *) Malloc(nts * sizeof(double));
-      work_i = (double *) Malloc(nts * sizeof(double));
-    }
+  if (!lpower2) work_r.resize(nts);
+  if (!lpower2) work_i.resize(nts);
 
   if (lpower2)
     fft(array1, array2, nts, 1);
   else
-    ft_r(array1, array2, nts, 1, work_r, work_i);
+    ft_r(array1, array2, nts, 1, work_r.data(), work_i.data());
 
   for (int i = 0; i < nts; i++)
     if (!fmasc[i]) array1[i] = array2[i] = 0;
@@ -104,10 +101,7 @@ filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
   if (lpower2)
     fft(array1, array2, nts, -1);
   else
-    ft_r(array1, array2, nts, -1, work_r, work_i);
-
-  if (work_r) Free(work_r);
-  if (work_i) Free(work_i);
+    ft_r(array1, array2, nts, -1, work_r.data(), work_i.data());
 
   return;
 }
@@ -133,17 +127,17 @@ Filter(void *process)
   double fmin = 0, fmax = 0;
   double fdata = 0;
   dtlist_type *dtlist = dtlist_new();
-  typedef struct
+  struct FftMemory
   {
-    double *array1;
-    double *array2;
+    std::vector<double> array1;
+    std::vector<double> array2;
 #ifdef HAVE_LIBFFTW3
-    fftw_complex *in_fft;
-    fftw_complex *out_fft;
+    std::vector<fftw_complex> in_fft;
+    std::vector<fftw_complex> out_fft;
     fftw_plan p_T2S;
     fftw_plan p_S2T;
 #endif
-  } memory_t;
+  };
 
   cdoInitialize(process);
 
@@ -238,8 +232,7 @@ Filter(void *process)
           if (calendar != CALENDAR_360DAYS && calendar != CALENDAR_365DAYS && calendar != CALENDAR_366DAYS
               && incunit0 < 4 && month == 2 && day == 29 && (day0 != day || month0 != month || year0 != year))
             {
-              cdoWarning("Filtering of multi-year times series doesn't works "
-                         "properly with a standard calendar.");
+              cdoWarning("Filtering of multi-year times series doesn't works properly with a standard calendar.");
               cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)", year);
             }
 
@@ -253,17 +246,17 @@ Filter(void *process)
   int nts = tsID;
   if (nts <= 1) cdoAbort("Number of time steps <= 1!");
 
-  memory_t *ompmem = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
+  std::vector<FftMemory> ompmem(Threading::ompNumThreads);
 
   if (use_fftw)
     {
 #ifdef HAVE_LIBFFTW3
       for (int i = 0; i < Threading::ompNumThreads; i++)
         {
-          ompmem[i].in_fft = (fftw_complex *) Malloc(nts * sizeof(fftw_complex));
-          ompmem[i].out_fft = (fftw_complex *) Malloc(nts * sizeof(fftw_complex));
-          ompmem[i].p_T2S = fftw_plan_dft_1d(nts, ompmem[i].in_fft, ompmem[i].out_fft, 1, FFTW_ESTIMATE);
-          ompmem[i].p_S2T = fftw_plan_dft_1d(nts, ompmem[i].out_fft, ompmem[i].in_fft, -1, FFTW_ESTIMATE);
+          ompmem[i].in_fft.resize(nts);
+          ompmem[i].out_fft.resize(nts);
+          ompmem[i].p_T2S = fftw_plan_dft_1d(nts, ompmem[i].in_fft.data(), ompmem[i].out_fft.data(), 1, FFTW_ESTIMATE);
+          ompmem[i].p_S2T = fftw_plan_dft_1d(nts, ompmem[i].out_fft.data(), ompmem[i].in_fft.data(), -1, FFTW_ESTIMATE);
         }
 #endif
     }
@@ -271,8 +264,8 @@ Filter(void *process)
     {
       for (int i = 0; i < Threading::ompNumThreads; i++)
         {
-          ompmem[i].array1 = (double *) Malloc(nts * sizeof(double));
-          ompmem[i].array2 = (double *) Malloc(nts * sizeof(double));
+          ompmem[i].array1.resize(nts);
+          ompmem[i].array2.resize(nts);
         }
     }
 
@@ -333,7 +326,7 @@ Filter(void *process)
                       ompmem[ompthID].in_fft[tsID][1] = 0;
                     }
 
-                  filter_fftw(nts, fmasc, ompmem[ompthID].out_fft, &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
+                  filter_fftw(nts, fmasc, ompmem[ompthID].out_fft.data(), &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
 
                   for (int tsID = 0; tsID < nts; tsID++)
                     vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;
@@ -352,9 +345,9 @@ Filter(void *process)
                   for (int tsID = 0; tsID < nts; tsID++)
                     ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
-                  arrayFill(nts, ompmem[ompthID].array2, 0.0);
+                  arrayFill(nts, ompmem[ompthID].array2.data(), 0.0);
 
-                  filter_intrinsic(nts, fmasc, ompmem[ompthID].array1, ompmem[ompthID].array2);
+                  filter_intrinsic(nts, fmasc, ompmem[ompthID].array1.data(), ompmem[ompthID].array2.data());
 
                   for (int tsID = 0; tsID < nts; tsID++)
                     vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].array1[tsID];
@@ -363,29 +356,7 @@ Filter(void *process)
         }
     }
 
-  if (use_fftw)
-    {
-#ifdef HAVE_LIBFFTW3
-      for (int i = 0; i < Threading::ompNumThreads; i++)
-        {
-          Free(ompmem[i].in_fft);
-          Free(ompmem[i].out_fft);
-        }
-#endif
-    }
-  else
-    {
-      for (int i = 0; i < Threading::ompNumThreads; i++)
-        {
-          Free(ompmem[i].array1);
-          Free(ompmem[i].array2);
-        }
-    }
-
-  Free(ompmem);
-
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-
   pstreamDefVlist(streamID2, vlistID2);
 
   for (int tsID = 0; tsID < nts; tsID++)
