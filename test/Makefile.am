@@ -22,7 +22,8 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Runstat.test Runpctl.test Multiyearstat.test Ydrunstat.test \
         Mergetime.test EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
-        Gradsdes.test Collgrid.test Setmiss.test Smooth.test MapReduce.test Ninfo.test
+        Gradsdes.test Collgrid.test Setmiss.test Smooth.test MapReduce.test Ninfo.test \
+        Filter.test
 
 # tests which should fail
 XFAIL_TESTS = 

@@ -57,8 +57,9 @@ MERGETIME    = mergetime_ref mergetime_y1 mergetime_y2 mergetime_y12
 REMAPETA     = remapeta1.nc remapeta2.nc remapeta_ref VCT.L62
 SMOOTH       = smooth1_ref smooth2_ref smooth3_ref
 SETMISS      = setmisstoc_ref setmisstonn_ref setmisstodis_ref
+FILTER       = lowpass_ref highpass_ref bandpass_ref
 
 EXTRA_DIST = $(INPUTDATA) $(FILE) $(GRIB) $(NETCDF) $(EOF) $(COMP) $(YDRUNSTAT) $(YMONSTAT) $(YSEASSTAT) $(SEASSTAT) $(TIMPCTL) \
              $(RUNSTAT) $(RUNPCTL) $(TIMSTAT2) $(TIMSTAT) $(YEARSTAT) $(MONSTAT) $(DAYSTAT) $(VERTSTAT) $(FLDSTAT) $(FLDPSTAT) \
              $(MERSTAT) $(ZONSTAT) $(ENSPSTAT) $(SPECTRAL) $(VERTINT) $(REMAP) $(REMAP2) $(REMAP3) $(SELECT) $(DETREND) \
-             $(THREAD) $(EXPR) $(GRADSDES) $(ARITH) $(MAPREDUCE) $(MERGETIME) $(REMAPETA) $(SMOOTH) $(SETMISS)
+             $(THREAD) $(EXPR) $(GRADSDES) $(ARITH) $(MAPREDUCE) $(MERGETIME) $(REMAPETA) $(SMOOTH) $(SETMISS) $(FILTER)

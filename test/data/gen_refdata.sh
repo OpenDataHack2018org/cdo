@@ -5,6 +5,20 @@ CDO=cdo
 FORMAT="-f srv -b F32"
 ########################################################################
 #
+# Filter
+#
+IFILE=ts_mm_5years
+#
+OFILE=lowpass_ref
+$CDO $FORMAT lowpass,1 $IFILE $OFILE
+OFILE=highpass_ref
+$CDO $FORMAT highpass,1 $IFILE $OFILE
+OFILE=bandpass_ref
+$CDO $FORMAT bandpass,.5,5 $IFILE $OFILE
+#
+exit
+########################################################################
+#
 # Remap regional grid
 #
 GRID=spain.grid
