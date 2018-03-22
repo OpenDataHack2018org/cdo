@@ -1450,7 +1450,7 @@ void init_modules()
   add_module("Deltime"       , {Deltime       , {}                , DeltimeOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Derivepar"     , {Derivepar     , DeriveparHelp     , DeriveparOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Detrend"       , {Detrend       , DetrendHelp       , DetrendOperators       , 1 , CDI_REAL , 1  , 1  });
-  add_module("Diff"          , {Diff          , DiffHelp          , DiffOperators          , 1 , CDI_REAL , 2  , 0  });
+  add_module("Diff"          , {Diff          , DiffHelp          , DiffOperators          , 1 , CDI_BOTH , 2  , 0  });
   add_module("Distgrid"      , {Distgrid      , DistgridHelp      , DistgridOperators      , 1 , CDI_REAL , 1  , -1  });
   add_module("Duplicate"     , {Duplicate     , DuplicateHelp     , DuplicateOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Echam5ini"     , {Echam5ini     , {}                , Echam5iniOperators     , 1 , CDI_REAL , 1  , 1  });

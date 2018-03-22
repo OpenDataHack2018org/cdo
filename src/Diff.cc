@@ -66,10 +66,11 @@ Diff(void *process)
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  size_t gridsize = vlistGridsizeMax(vlistID1);
+  size_t gridsizemax = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double *) Malloc(gridsize * sizeof(double));
-  double *array2 = (double *) Malloc(gridsize * sizeof(double));
+  std::vector<double> array1(gridsizemax);
+  std::vector<double> array2(gridsizemax);
+  std::vector<double> work(vlistNumber(vlistID1) != CDI_REAL ? 2*gridsizemax : 0) ;
 
   int indg = 0;
   int tsID = 0;
@@ -107,8 +108,21 @@ Diff(void *process)
 
           cdiParamToString(param, paramstr, sizeof(paramstr));
 
-          pstreamReadRecord(streamID1, array1, &nmiss1);
-          pstreamReadRecord(streamID2, array2, &nmiss2);
+          if ( vlistInqVarNumber(vlistID1, varID1) == CDI_COMP)
+            {
+              pstreamReadRecord(streamID1, work.data(), &nmiss1);
+              for (size_t i = 0; i < gridsize; ++i) array1[i] = work[i*2];
+            }
+          else
+            pstreamReadRecord(streamID1, array1.data(), &nmiss1);
+
+          if ( vlistInqVarNumber(vlistID1, varID1) == CDI_COMP)
+            {
+              pstreamReadRecord(streamID1, work.data(), &nmiss2);
+              for (size_t i = 0; i < gridsize; ++i) array2[i] = work[i*2];
+            }
+          else
+            pstreamReadRecord(streamID2, array2.data(), &nmiss2);
 
           int ndiff = 0;
           bool dsgn = false;
@@ -156,8 +170,7 @@ Diff(void *process)
                       lhead = false;
 
                       set_text_color(stdout, BRIGHT, BLACK);
-                      fprintf(stdout, "               Date     Time   Level "
-                                      "Gridsize    Miss ");
+                      fprintf(stdout, "               Date     Time   Level Gridsize    Miss ");
                       fprintf(stdout, "   Diff ");
                       fprintf(stdout, ": S Z  Max_Absdiff Max_Reldiff");
 
@@ -230,8 +243,7 @@ Diff(void *process)
 
       if (ndrec != nd2rec && abslim < abslim2)
         fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
-      /*  fprintf(stdout, "  %d of %d records differ more then one
-       * thousandth\n", nprec, ngrec); */
+      //  fprintf(stdout, "  %d of %d records differ more then one thousandth\n", nprec, ngrec);
     }
 
   if (nrecs == 0 && nrecs2 > 0) cdoWarning("stream2 has more time steps than stream1!");
@@ -239,9 +251,6 @@ Diff(void *process)
 
   pstreamClose(streamID1);
   pstreamClose(streamID2);
-
-  if (array1) Free(array1);
-  if (array2) Free(array2);
 
   cdoFinish();
 

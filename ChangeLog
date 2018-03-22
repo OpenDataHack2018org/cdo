@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.4
 	* Version 1.9.4 release
 
+2018-03-22  Uwe Schulzweida
+
+	* diff: added support for complex numbers (only for the real part)
+
 2018-03-17  Uwe Schulzweida
 
 	* remapbil, remapbic: optimized by changing point search from latbins to kdtree:nanoflann
