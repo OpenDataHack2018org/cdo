@@ -196,8 +196,7 @@ Filter(void *process)
           pstreamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
           if (nmiss)
-            cdoAbort("Missing value support for operators in module Filter not "
-                     "added yet!");
+            cdoAbort("Missing value support for operators in module Filter not added yet!");
         }
 
       /* get and check time increment */
