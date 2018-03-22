@@ -27,17 +27,16 @@
 void *
 Fourier(void *process)
 {
-  int bit;
   int nrecs;
   int varID, levelID;
   int nalloc = 0;
   size_t nmiss;
-  struct memory_t
+  struct FourierMemory
   {
-    double *real;
-    double *imag;
-    double *work_r;
-    double *work_i;
+    std::vector<double> real;
+    std::vector<double> imag;
+    std::vector<double> work_r;
+    std::vector<double> work_i;
   };
 
   cdoInitialize(process);
@@ -55,7 +54,6 @@ Fourier(void *process)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int streamID2 = cdoStreamOpenWrite(cdoStreamName(1), cdoFiletype());
-
   pstreamDefVlist(streamID2, vlistID2);
 
   int nvars = vlistNvars(vlistID1);
@@ -93,19 +91,15 @@ Fourier(void *process)
 
   int nts = tsID;
 
-  for (bit = nts; !(bit & 1); bit >>= 1)
-    ;
+  bool lpower2 = ((nts & (nts - 1)) == 0);
 
-  memory_t *ompmem = (memory_t *) Malloc(Threading::ompNumThreads * sizeof(memory_t));
+  std::vector<FourierMemory> ompmem(Threading::ompNumThreads);
   for (int i = 0; i < Threading::ompNumThreads; i++)
     {
-      ompmem[i].real = (double *) Malloc(nts * sizeof(double));
-      ompmem[i].imag = (double *) Malloc(nts * sizeof(double));
-      if (bit != 1)
-        {
-          ompmem[i].work_r = (double *) Malloc(nts * sizeof(double));
-          ompmem[i].work_i = (double *) Malloc(nts * sizeof(double));
-        }
+      ompmem[i].real.resize(nts);
+      ompmem[i].imag.resize(nts);
+      if (!lpower2) ompmem[i].work_r.resize(nts);
+      if (!lpower2) ompmem[i].work_i.resize(nts);
     }
 
   for (varID = 0; varID < nvars; varID++)
@@ -135,11 +129,11 @@ Fourier(void *process)
 
               if (lmiss == 0)
                 {
-                  if (bit == 1) /* nts is a power of 2 */
-                    fft(ompmem[ompthID].real, ompmem[ompthID].imag, nts, sign);
+                  if (lpower2) /* nts is a power of 2 */
+                    fft(ompmem[ompthID].real.data(), ompmem[ompthID].imag.data(), nts, sign);
                   else
-                    ft_r(ompmem[ompthID].real, ompmem[ompthID].imag, nts, sign, ompmem[ompthID].work_r,
-                         ompmem[ompthID].work_i);
+                    ft_r(ompmem[ompthID].real.data(), ompmem[ompthID].imag.data(), nts, sign,
+                         ompmem[ompthID].work_r.data(), ompmem[ompthID].work_i.data());
 
                   for (tsID = 0; tsID < nts; tsID++)
                     {
@@ -158,18 +152,6 @@ Fourier(void *process)
             }
         }
     }
-
-  for (int i = 0; i < Threading::ompNumThreads; i++)
-    {
-      Free(ompmem[i].real);
-      Free(ompmem[i].imag);
-      if (bit != 1)
-        {
-          Free(ompmem[i].work_r);
-          Free(ompmem[i].work_i);
-        }
-    }
-  Free(ompmem);
 
   for (tsID = 0; tsID < nts; tsID++)
     {
